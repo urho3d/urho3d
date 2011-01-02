@@ -1,0 +1,3 @@
+<collisionshape>
+    <trianglemesh name="Models/Level.mdl" />
+</collisionshape>

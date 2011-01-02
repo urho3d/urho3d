@@ -1,0 +1,6 @@
+<material>
+    <technique>
+        <texture unit="diffuse" name="Textures/Flare.dds" />
+        <pass name="ambient" vs="Billboard" ps="Billboard_DiffAdditive" depthwrite="false" blend="add" />
+    </technique>
+</material>

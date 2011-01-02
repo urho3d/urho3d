@@ -1,0 +1,32 @@
+
+> Hi John,
+>
+> I know I'll forget to tell you this if I don't write it right now....
+>
+> >(2) How is the receiving geometry for the shadow decided?
+>
+> I wrote about an LSS-test but actually performing a new VFC test (from the
+> light's view) is the same. In both cases, here's a trick to take advantage
+> of temporal coherence : test the world against a slightly larger than
+> necessary LSS or frustum. Keep the list of touched surfaces. Then next
+> frame, if the new volume is still contained within the previous one used
+for
+> the query, you can reuse the same list immediately. Actually it's a bit
+> similar to what you did in your sphere-tree, I think. Anyway, now the
+O(log
+> N) VFC is O(1) for some frames. It's not worth it for the "real" VFC, but
+> when you have N virtual frustum to test to drop N shadows, that's another
+> story.
+>
+> Two downsides:
+> - You need more ram to keep track of one list of meshes / shadow, but
+> usually it's not a lot.
+> - By using a larger volume for the query you possibly touch more
+> faces/surfaces, which will be rendered in the shadow pass. Usually it's
+not
+> a problem either since rendering is simply faster than geometric queries
+> those days. But of course, "your mileage may vary".
+>
+> Happy new year !
+>
+> Pierre

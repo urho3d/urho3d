@@ -1,0 +1,7 @@
+<material>
+    <base name="Materials/DefaultDiff.xml" />
+    <technique>
+        <texture unit="diffuse" name="Textures/Snow.dds" />
+        <parameter name="MatSpecProperties" value="0.25 16" />
+    </technique>
+</material>

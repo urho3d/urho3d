@@ -1,0 +1,698 @@
+
+@@@'s
+
+
+TODO for COLLISION
+------------------
+
+box-box collision: adjust generated face-face contact points by depth/2 to
+be more fair.
+
+what happens when a GeomTransform's encapsulated object is manipulated,
+e.g. position changed. should this be disallowed? should a GeomTransform
+behave like a space and propagate dirtyness upwards?
+
+make sure that when we are using a large space for static environmental geoms,
+that there is not excessive AABB computation when geoms are added/removed from
+the space. the space AABB is pretty much guaranteed to cover everything, so
+there's no need to compute/test the AABB in this case.
+
+hash space: implement collide2() efficiently instead of the current
+simple-space-like brute-force approach.
+
+hash space: incremental scheme, so we dont have to rebuild the data structures
+for geoms that don't move.
+
+disabled geoms (remove from all collision considerations) ... isn't this the
+same as just taking it out of its enclosing group/space?
+
+integrate:
+	dRay
+	triangle collider - get latest tri collider code from erwin
+	erwin's quadtree space
+
+tests:
+	all aspects of collision API
+
+	dGeomSetBody(0) maintains body-geom linked list properly.
+
+	simple space: instantiate lots of non-moving geoms (i.e. environmental
+	geoms and make sure that we're still able to collide efficiently.
+	make sure AABB computation is efficient, or can be made efficient
+	through proper use of the API.
+
+	test C interface support for making new classes.
+	make sure the dxGeom::aabbTest() function behaves as advertised.
+
+	testing for contact point consistency: test for things that
+	would cause the dynamics to fail or become unstable
+
+	test for: small adjustment in geom position causes a big jump in the
+	contact point set (bad for dynamics).
+
+	test for: if contact constraints observed then it's impossible
+	(or hard) to move the objects so that the penetration is
+	increased. relax this when only a subset of the contact points are
+	returned.
+
+	test for consistency, e.g. the boundary of geoms X and Y can
+	be defined by intersecting with a point, so test the intersection of X
+	and Y by comparing with the point tests.
+
+	check that contact points are in the collision volume
+
+	all existing space tests, and more.
+
+demos:
+	test_buggy: make a terrain out of non-moving geoms. use heirarchical
+	groups to get efficient collision, even with the simple space.
+
+go though the new collision docs and make sure the behavior that is described
+there is actually implemented.
+
+multi-resolution hash table:
+	the current implementation rebuilds a new hash table each time
+	collide() is called. we don't keep any state between calls. this is
+	wasteful if there are unmoving objects in the space.
+
+	make sure we prevent multiple collision callbacks for the same pair
+
+	better virtual address function.
+
+	the collision search can perhaps be optimized - as we search
+	chains we can come across other candidate intersections at
+	other levels, perhaps we should do the intersection check
+	straight away? --> save on list searching time only, which is
+	not too significant.
+
+collision docs:
+	optimization guide: whenever a single geom changes in a simple space,
+	the space AABB has to be recomputed by examining EVERY geom.
+	document this, or find a better behavior.
+
+
+
+TODO BEFORE NEXT RELEASE
+------------------------
+
+g++ needed for compiling tests using gcc 3.2 ? what is the problem?
+
+add joint feedback info from lambda, so that we can get motor forces etc.
+need a way to map constraint indexes to what they mean.
+
+track down and fix the occasional popping/jumping problem in test_boxstack,
+especially when boxes are piled on top of each other. find out if this is
+caused by a configuration singularity or whether there is a bug in LCP.
+i need to add some kind of diagnostic tool to help resolve these kinds of
+problems.
+
+fixup ground plane jitter and shadow jumping in drawstuff.
+
+the inertias/COMs don't appear to be totally correct for the boxstack demo.
+fix up, and add a mode that shows the effective mass box (for a given density).
+
+Improve box-box collision, especially for face-face contact (3 contact points).
+Improve cylinder-box collision (2 contact points).
+
+windows DLL building and unix shared libs. libtool?
+also MSVC project files.
+
+dBodyGetPointVel()
+
+contrib directory - all stuff in ~/3/ode
+
+functions to allow systems to be copied/cloned
+	dBodyTransplant (b, world)
+	dTransplantIsland (b, world)
+	dBodyCopy (bdest, bsrc)
+	dJointCopy (jdest, jsrc)  -- what about body connections?
+	dCloneBody()
+	dCloneJoint()
+	dCloseBodyAndJointList()
+	dCloneIsland()
+
+this collision rule:
+    // no contacts if both geoms on the same body, and the body is not 0
+    if (g1->body == g2->body && g1->body) return 0;
+needs to be replaced. sometimes we want no collision when both bodies are 0,
+but this wont work for geomgroup-to-environment. avoid stupid stuff like
+    dGeomSetBody (geom_group, (dBodyID) 1);
+this also causes "failed-to-report" errors in the space test.
+
+Expose type-specific collision functions?
+
+Automatic code optimization process.
+
+joint limit spongyness: interacts with powered joints badly, because when the
+limit is reached full power is applied. fix or doc.
+
+various hinge2 functions may not function correctly if axis1 and axis2 are not
+perpendicular. in particular the getAngle() and getAngleRate() functions
+probably will give bogus answers.
+
+slow step function will not respect the joint getinfo2 functions calling
+addTorque() because it reads the force/torque accumulators before the
+getinfo2 functions are called.
+
+spaces need multiple lists of objects that can never overlap. objects in these
+lists are never tested against each other.
+
+deleting a body a joint is attached to should adjust the joint to only have
+one body attached. currently the connected joints have *both* their body
+attachments removed. BUT, dont do this if the dJOINT_TWOBODIES flag is set
+on the joint.
+
+document error, mem and math functions.
+
+Web pages
+	credits section
+	projects using ODE
+
+update C++ interface? use SWIG?
+
+collision exclusion groups - exclude if obj1.n == obj2.n ?
+
+make sure the amotor joint can be used with just one body. at the moment it
+only allows two-body attachments.
+
+implement dJointGetAMotorAngleRate()
+
+erwin says: Should the GeomGroup have a cleanupmode as the GeomTransform has?
+
+erwin says: http://q12.org/pipermail/ode/2002-January/000766.html
+        and http://q12.org/pipermail/ode/2001-December/000753.html
+
+rename duplicate filenames (object.h?) - some environments can't handle this.
+
+naming inconsistency: dCreateSphere() should be dSphereCreate() (etc...) to
+match the rest of the API.
+
+
+TODO
+----
+
+joint allocation in joint groups. allocation size should be rounded up using
+dEFFICIENT_SIZE, to properly align all the data members.
+
+all dAlloc() allocations should be aligned using dEFFICIENT_SIZE() ???
+
+automatic body & joint disabling / enabling.
+
+sometimes getting LCP infinite loops.
+
+function to get the entire island of bodies/joints
+
+joints:
+	hinge2 joint - implement trail, i.e. non-convergent steering and wheel
+	axes.
+
+	erp individually settable for each joint?
+
+	more joints:
+		angular3 (constrian full angle not position)
+		fixed path 1 (point must follow fixed path, etc etc)
+		  - other fixed path joints.
+		linear a (point in 1 body fixed to plane of other)
+		linear b (point in 1 body fixed to line on other)
+		linear c (line in 1 body fixed to plane on other)
+		linear d (line in 1 body fixed to line on other) - like
+			prismatic but orientation along line can change
+		Relative-Path-Relative-Oriention Joint (set all dofs of 2
+			bodies relative to each other)
+		spring (with natural length)
+		universal (2 kinds)
+		various angular relationships
+
+	when attaching joints to static env, provision to move attachment
+	point (e.g. give it a linear/angular velocity). this can be used
+	instead of a FPFO joint on a body in many cases.
+	also do this with contacts to static env, to allow for contacts to
+	*moving* objects in the static env.
+
+	interpretation of erp: is it (1) the error reduction per timestep,
+	(2) or a time constant independent of timestep?? if it's (2) then
+	perhaps this should be universal - this is already the meaning for
+	the suspension.
+
+	hinge2 suspension:
+		suspension limits
+		suspension limit restitution and spongyness??
+
+use autoconf? set paths in makefile?
+
+no-arg init functions, for andy
+
+explore: do joint parameters need to be set for the joint to be setup
+correctly, or should set some proper body-dependent params when it is
+attached? this is only really an issue for joints that have no parameters to
+set, such as the fixed joint.
+
+dAlloc() should take an arena parameters which is stored in dWorld.
+
+debugging mode should use dASSERT2 that prints a descriptive error message
+on error, not just the file:line or function. use dASSERT for internal
+consistency checking.
+
+when vectors and matrices are initialized, we must ensure that the padding
+elements are set to 0. this is going to be a problem everywhere!
+
+don't use 3-vectors anywhere. use SIMD friendly 4-vectors.
+
+make sure all data in body/joint etc objects is aligned well for single
+precision SIMD (i.e. all vectors start on a 16 byte boundary).
+
+think about more complicated uses of collision, e.g. a single geom representing
+an articulated structure.
+
+bodyGroup? (like joint group but for bodies). systemGroup?
+
+check the overhead of resizing Array<>s as elements are pushed on to them.
+
+replace alloca() with dPushFrame(), dPopFrame(), and dAlloca() ? allow for
+the possibility of allocating in non-stack memory ?
+
+make sure that we can set mass parameters with non-zero center of mass.
+if this is done after the body position is set, the position is adjusted.
+if this is done before the body position is set, what do we do when the
+pos is set? does the pos always refer to the center of mass from the user's
+point of view?
+
+consider splitting solver into functions, which can be optimized separately.
+might make things go faster.
+
+faster code for islands with a single body? faster code for dynamically
+symmetric bodies?
+
+rotation.cpp functions that set matrices should also set padding elements.
+
+lcp solver must return (L,d) and some other information, so we can re-solve
+for other right hand sides later on, but using the same complimentarity
+solution so there are no integrator discontinuities.
+
+dSetZero() - make fast inline functions for fixed n e.g. (1-4).
+
+need proper `sticky' friction, i.e. compensation for numerical slip.
+
+on windows, make sure gcc-compiles libs can be linked with VC++ apps. need
+to make sure some C++ runtime bits are present?
+
+kill all references to dArray<> (in geom.cpp).
+
+need testing code to test all joints with body-to-static-env
+
+copy stack.cpp, memory.cpp stuff to reuse
+
+dFactorLDLT() is not so efficient for matrix sizes < block size, e.g.
+redundant calls, zero loads, adds etc
+
+contacts: cheaper friction: viscous friction? one step delay friction force.
+
+in geom.cpp, for objects that are never meant to collide, dCollide() will
+always try to find the collider functions, which wastes a bit of time.
+
+geom.cpp:dCollideG() - handle special case of colliding 2 groups more
+efficiently.
+
+timer reporting function:
+	void timerReport (void (*printFunction)(char *, ...));
+
+disabled bodies stored in a separate list, so they are never traversed at all,
+for speed when there are many disabled bodies.
+
+
+MAYBE
+-----
+
+new implementation for joint groups that is not so system dependent.
+maybe individual contacts are reusable? in this case contact information
+should be settable in the contact joints. max_size arg is really annoying.
+
+consider making anchor,axis, (everything) into a joint parameter and setting
+them with a consistent interface. also consider overload the joint functions
+so they are not distinguished by joint type??
+
+collision memory optimizations?
+
+collision: support for persistent contact information?
+
+multiply reference tri list data so that it can be cloned
+	if the tri-list geoms could support rot/pos
+	transformations then we could have several tri-lists pointing to the
+	same vertex information.
+
+height fields
+
+pre-converted collision data -- Creating a hash space and associated
+opcode tree structures may take significant amounts of time for a
+large world with many 10s of thousands of triangles.  Any chance of
+pre-building that off-line and passing a memory block pointer to the
+collision system?
+
+putting objects in multiple spaces -- If it was possible to add
+objects to more than one space, you could do collision queries other
+than 1vsN and NvsN.  That flexibility might be useful when you want to
+only collide against a subset of the space.  For example, a camera
+system may want to collide some rays with occlusion walls but the
+occlusion walls may also need to be in the game-level space to bounce
+against.
+
+
+ALWAYS
+------
+
+make sure functions check their arguments in debug mode (e.g. using dASSERT).
+make sure joint/geom functions check for the specific object type.
+
+vectors alloca()ed on the stack must have the correct alignment, use ALLOCA16.
+
+library should have no global constructors, as it might be used with C linkage.
+
+use `const' in function arguments. blah.
+
+
+
+DON'T BOTHER
+------------
+
+warning if user tries to set mass params with nonzero center of mass.
+
+
+
+DONE
+----
+
+check: when contact attached with (body1,0) and (0,body1), check that polarity
+on depth and error info is okay for the two cases.
+
+set a better convention for which is the 1st and 2nd body in a joint, because
+sometimes we get things swapped (because of the way the joint nodes are used).
+
+hinge and prismatic, attachment to static environment.
+
+turn macros into C++ inline functions? what about C users?
+
+remove `space' argument to geom creation functions? make user add it?
+or just remove it from dCreateGeom() ?  <-- did this one.
+
+test_chain should be in C, not C++. but first must remove global constructors.
+
+add more functionality to C++ interface - dMass, dSpace, dGeom
+
+there should be functions to delete groups of bodies/joints in one go - this
+will be more efficient than deleting them one at a time, because less
+partitioning tests will be needed.
+
+should we expose body and joint object structures so that the user can
+explicitly allocate them locally, or e.g. on the stack? makes allocating
+temporary contact constraints easier. NO --> helps data hiding and therefore
+library binary compatability.
+
+joints:
+	hinge & slider - DONE
+		measure angle, rate - DONE
+		power - DONE
+		joint limits - DONE
+		mixed powered+limited joints, powering away from limit - DONE
+
+	hinge2 - DONE
+		steering angle and rate measurement - DONE
+		steering limits - DONE
+		steering motor - DONE
+		wheel motor - DONE
+		wheel angle rate measurement - DONE
+
+	optional hinge2 suspension: - DONE
+		alignment of B&S part to given axis - DONE
+		global framework for giving epsilon and gamma - DONE
+
+	toss away r-motor, make power & stuff specific to joint - DONE
+		it's just easier that way
+
+	joint code reuse: - DONE
+		use standard functions to set velocity (c), limits (lo,hi),
+		spongyness (epsilon) etc, this prevents these functions from
+		proliferating
+
+	implicit spring framework - actually allow joints to return a value `k'
+		such that J*vnew = c + k*f, where f = force needed to achieve
+		vnew - DONE
+
+	contact slip - DONE
+	contact erp & cfm parameters (not just "softness") - DONE
+
+	hinge2: when we lock back wheels along the steering axis, there is no
+	error correction if they get out of alignment - DONE, just use high
+	and low limits.
+
+	joint limit spongyness: erp and cfm for joint set from world (global)
+	values when joint created. - DONE
+
+	joint limit restitution - DONE
+
+check inertia transformations, e.g. by applying steering torque to a thin
+wheel --> actually, i made test_I
+
+more comprehensive random number comparisons between slow and fast methods.
+	- random PD inertia (not just diagonal).
+	- random velocity
+	- random joint error (make joints then move bodies a bit)
+
+check that J*vnew=c (slow step already does this, but it doesn't equal zero
+for some reason! - actually, when LCP constraint limits are reached, it wont!)
+
+tons of things in lcp.cpp (@@@), especially speed optimizations. also, we
+wanted to do index block switching and index block updates to take advantage
+of the outer product trick ... but this is not worth the effort i think.
+
+lcp.cpp: if lo=hi=0, check operation. can we switch from NL <-> NH without
+going through C? --> done.
+
+andy says: still having trouble with those resource files..
+drawstuff.res doesn't seem to build or be found under cygwin gcc.
+
+DOC how bodies and geoms associated then resolved in contact callback ... not
+really necessary.
+
+fix the "memory leak" in geom.cpp
+
+library should have no global constructors, as it might be used with C linkage.
+	--> as long as test_chain1 works, there are none.
+
+DOC cfm, the derivation and what it means.
+	--> partially done, could be better
+
+joint "get type" function
+
+andy says: in ode/src/error.cpp _snprintf() and _vsnprintf() are missing
+in testode: finite and isnan are missing. copysign is missing
+	russ: okay here's the problem: i have Makefile.platform files for
+	VC++, MinGW, but not Cygwin. Cygwin uses the unix-like functions
+	for everything, but the VC++/MinGW configs assumes the MS C-runtime
+	functions. this is easy to fix, except i need to install Cygwin
+	which is a pain to do over MinGW. argh.
+
+build on linux - assumptions made about location of X11 lib, opengl etc.
+
+implement: dBodyAddForceAtPos,dBodyAddRelForceAtPos,dBodyAddRelForceAtRelPos,
+	dBodyGetPointPos,dBodyGetPointVel,dBodyGetPointRelVel
+
+dJointAttach(), allow both bodies to be 0 to put the joint into limbo.
+
+space near-callback should be given potentially intersecting objects 100 at a
+time instead of 1 at a time, to save on calling costs ... which are trivial,
+so we don't bother to do this.
+
+doccer: @func{} also refs second etc function in function *list*.
+
+make sure joints can return 0 from GetInfo1, i.e. no constraints or "inactive"
+joint, and the step functions will handle it.
+
+when attaching contact with (0,body), instead of setting the reverse flag
+on the joint and checking it in getInfo2(), we should just reverse the normal
+straight away ... ?
+	--> trouble is, dJointAttach() knows nothing about what kind of joint
+	    it is attaching.
+
+hinge2 needs to be attached to two bodies for it to work, make sure this is
+always the case. --> assertion added in dJointAttach().
+
+if two joints connect to the same two bodies, check that the fast solver
+works! -> it should.
+
+functions to get all the joints/bodies a body/joint is connected to.
+
+If I don't have the GCC libraries installed, HUGE_VALF is undefined.
+
+fix capped cylinder - capped cylinder collision so that two contacts can
+be generated.
+
+transformation geometry object.
+
+joint groups should also be destroyed by destroying the world --> naaahhh.
+
+DONT DO THIS: body/joint creators with world = 0 --> not inserted into any
+world. allow bodies/joints to be detached from a world (this is what happens
+to grouped joints when a world is destroyed).
+	can bodies and joints be linked together when not attached to world??
+	what happens when we have an island of b/j, some of which are not in
+	world? soln: dont keep lists of b/j in the world, just infer it from
+	the islands?
+
+body & joint disabling / enabling
+
+start a change log.
+
+collision flags - 0xffff mask.
+
+dBodyGetFiniteRotationMode() / ...Axis()
+
+dBodyAddForceAtRelPos()
+
+ball & socket joint limits and motors.
+
+auto-build env on windows: 3 compilers, debug/release, short/double =
+12 combinations --> auto logs.
+
+handle infinities better: HUGE_VALF is not commanly defined, it seems.
+get rid of the __USE_ISOC9X macro in common.h
+perhaps just use a "big" number instead of the actual IEEE infinity, it's
+more portable anyway.
+	--> new config system
+
+dCloseODE() - tidy up *all* allocated memory, esp in geom.cpp. used to keep
+leak detectors happy.
+
+extra API to get lambda and J'*lambda from last timestep.
+
+better stack implementation that is not so system dependent. but how will
+we do dynamic page allocation? do we even need to?
+
+
+all collision files will now be collision_*, not geom_*
+
+check exported global symbols - no C++ mangling.
+
+rename dSphere etc to dxSphere etc.
+
+C interface support for making new classes.
+
+make sure DLL-ized stuff preserved ... but class numbers should no longer be
+exported.
+
+point geom ( = sphere of radius 0 )
+
+geoms stored in doubly linked lists in space (fast removal).
+
+bodies need to keep geoms pointers and call dGeomMoved() in dBodySetPosition()
+etc and world step. PROBLEM: links dynamics and collision together too much,
+makes it hard to extract ODE collision ... unless we say: dGeomMoved() and
+dGeomID must be supplied by the new collision library!
+
+dCollide() should take spaces as arguments - it should call dSpaceCollide2()
+with its own callback that puts all found contacts in the array, stopping
+when there is no more space left in the array.
+
+dxSpace::getGeom() - the geom numbers will change as geoms are dirtied - find
+some other numbering scheme, or document this behavior.
+
+the 'placeable' property - objects that should not ever be attached to bodies
+should flag an error when setBody etc are called.
+
+dGeomSetBody(0) - DOC: the position and orientation of the body will be
+preserved. in this case the geom should NOT be dirtied (dGeomMoved() should
+not be called).
+
+DOC: dGeomGetBodyNext() as part of dynamics/collision interface
+
+groups/spaces are subclasses of geom.
+
+groups/spaces can contain other groups/spaces. geom can be owned by a
+group/space. collision handling:
+	geom-geom : standard collision function
+	geom-group : special space code
+	group-group : n^2 tests (or n space tests) - hard to optimize because
+		of disjoint space representations.
+	group internal : normal space internal-collision code
+
+groups/spaces can be told that some objects never move, i.e. that the objects
+are locked. should we lock the whole space?
+	locking: the AABB for the object is not recalculated
+
+groups/spaces can be told that the internal contents self-intersect or not.
+actually an old ODE group is the equivalent of an old ODE simple space.
+	- just call dCollide() or not.
+
+the group doesn't get passed to the space callback any more ... only the
+intersecting geoms get passed? maybe the callback can initiate the extra
+intersection tests itself? (because we want programmable flexibility to
+determine what gets intersected and what doesn't)
+	- NO
+
+infrastructure to indicate when an object has moved (and thus its AABB needs
+to be recalculated)
+
+space enumeration functions. make sure that there are no additions or deletions
+while enumeration is taking place.
+	- documented the behavior, didn't disallow it
+
+cache the AABB in the dxGeom? (for non-moving objects) - perhaps keep a
+pointer to separately allocated space? ... no
+
+DOC: dGeomGetClass() is a first-class geom function, not in the "User
+defined classes" section. it returns a constant that can be checked
+against dSphereClass etc.
+
+remove dxGeom dependence on dBodyID? ... not yet
+
+dBase -> dxBase
+
+allow a geom to be inserted into multiple spaces? need this to optimize some
+kinds of tests ... no
+
+update docs.
+
+make CHECK_NOT_LOCKED an assert.
+
+DOC: "Calling these functions on a non-placeable geom results in a
+runtime error." ...in the debug build only?
+
+non-placeable geoms should not allocate dxPosR. perhaps pass a dGeom
+constructor arg that says 'placeable' or not - this also sets the
+GEOM_PLACEABLE flag.
+
+GeomTransform:
+	final_pos and final_R valid if no GEOM_AABB_BAD flag!!!
+	fix up this code, esp use of ComputeTX().
+
+Space incompatibilities: no dSpaceDestroy(), dGeomDestroy() does not
+take a dSpaceID ... dSpaceDestroy() added.
+
+GeomGroup incompatibilities:
+	dCollide() used to take a GeomGroup and would return all the contact
+	points for all the intersecting objects. now you have to call
+	dSpaceCollide2() and get a callback for each one.
+	need to provide old behavior.
+
+simple space optimization: we should keep the precomputed AABB for the
+non-moving geoms around, so that when the other geoms move we can just
+compute the AABBs for those geoms and then combine it with the non-moving AABB.
+  --> too hard!
+
+collision build options: old and new
+
+tidyups for collision:
+	* rationalize what stuff goes in what source files, and file names
+	* minimize set of header files that all collision* sources use - after
+	  all changes.
+	* update ode-cpp stuff (C++ interface header files).
+
+porting guide:
+	ODE list email
+
+	dGeomGetSpaceAABB() deleted
+
+	dGeomGetClass (geom_group); used to return a unique type for
+	GeomGroups, but now it returns dSimpleSpaceID.
+
+tidyups: update DLL declarations.
+

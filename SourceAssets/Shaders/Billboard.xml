@@ -1,0 +1,27 @@
+<shaders>
+    <shader name="Billboard" type="vs">
+        <option name="Spot" define="SPOTLIGHT" />
+    </shader>
+    <shader name="Billboard" type="ps">
+        <option name="Diff" define="DIFFMAP" />
+        <variation name="Unlit" define="UNLIT" exclude="Spec" />
+        <variation name="Additive" define="ADDITIVE" exclude="Spec" />
+        <variation name="Ambient" define="AMBIENT" exclude="Spec" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Point" define="POINTLIGHT" />
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="DirNegative" exclude="Spec">
+            <define name="DIRLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <variation name="PointNegative" exclude="Spec">
+            <define name="POINTLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <variation name="SpotNegative" exclude="Spec">
+            <define name="SPOTLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <option name="Spec" define="SPECULAR" />
+    </shader>
+</shaders>

@@ -1,0 +1,6 @@
+<material>
+    <technique>
+        <texture unit="diffuse" name="Textures/Smoke.dds" />
+        <pass name="ambient" vs="Billboard" ps="Billboard_DiffUnlit" depthwrite="false" blend="alpha" />
+    </technique>
+</material>

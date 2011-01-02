@@ -1,0 +1,68 @@
+<shaders>
+    <shader name="Forward" type="vs">
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Instanced" define="INSTANCED" />
+        <option name="Unlit" define="UNLIT">
+            <exclude name="Normal" />
+            <exclude name="Spot" />
+            <exclude name="Shadow" />
+        </option>
+        <option name="Normal" define="NORMALMAP" />
+        <option name="Spot" define="SPOTLIGHT" />
+        <option name="Shadow" define="SHADOW" />
+    </shader>
+    <shader name="Forward" type="ps">
+        <option name="Diff" define="DIFFMAP" />
+        <option name="Normal" define="NORMALMAP" />
+        <option name="SpecMap" define="SPECMAP" include="Spec" />
+        <variation name="Ambient" define="AMBIENT">
+            <exclude name="Normal" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </variation>
+        <variation name="Unlit" define="UNLIT">
+            <exclude name="Normal" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </variation>
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="DirShadow">
+            <define name="DIRLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="DirNegative">
+            <define name="DIRLIGHT" />
+            <define name="NEGATIVE" />
+            <exclude name="Normal" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </variation>
+        <variation name="Point" define="POINTLIGHT" />
+        <variation name="PointShadow">
+            <define name="POINTLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="PointNegative">
+            <define name="POINTLIGHT" />
+            <define name="NEGATIVE" />
+            <exclude name="Normal" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </variation>
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="SpotShadow">
+            <define name="SPOTLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="SpotNegative">
+            <define name="SPOTLIGHT" />
+            <define name="NEGATIVE" />
+            <exclude name="Normal" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </variation>
+        <option name="Spec" define="SPECULAR" />
+        <option name="HW" define="HWSHADOW" require="SHADOW" />
+    </shader>
+</shaders>

@@ -1,0 +1,197 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#ifndef RENDERER_ANIMATEDMODEL_H
+#define RENDERER_ANIMATEDMODEL_H
+
+#include "Model.h"
+#include "Skeleton.h"
+#include "StaticModel.h"
+
+#include <set>
+
+class Animation;
+class AnimationState;
+
+//! Animated model scene node
+class AnimatedModel : public StaticModel
+{
+    DEFINE_TYPE(AnimatedModel);
+    
+    friend class AnimationState;
+    
+public:
+    //! Construct with initial octant pointer and name
+    AnimatedModel(Octant* octant = 0, const std::string& name = std::string());
+    //! Destruct. Free the animation states
+    virtual ~AnimatedModel();
+    
+    //! Write component state to a stream
+    virtual void save(Serializer& dest);
+    //! Read component state from a stream
+    virtual void load(Deserializer& source, ResourceCache* cache);
+    //! Write component state to an XML element
+    virtual void saveXML(XMLElement& dest);
+    //! Read component state from an XML element
+    virtual void loadXML(const XMLElement& source, ResourceCache* cache);
+    //! Resolve component references after loading
+    virtual void postLoad(ResourceCache* cache);
+    //! Write a network update
+    virtual bool writeNetUpdate(Serializer& dest, Serializer& destRevision, Deserializer& baseRevision, const NetUpdateInfo& info);
+    //! Read a network update
+    virtual void readNetUpdate(Deserializer& source, ResourceCache* cache, const NetUpdateInfo& info);
+    //! Resolve component references after a network update
+    virtual void postNetUpdate(ResourceCache* cache);
+    //! Perform client-side visual smoothing
+    virtual void interpolate(bool snapToEnd);
+    //! Return component references
+    virtual void getComponentRefs(std::vector<ComponentRef>& refs);
+    
+    //! Process renderer raycast
+    virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);
+    //! Pre-octree update step. Update animation if has skeletally attached child nodes
+    virtual void updateNode(const FrameInfo& frame);
+    //! Prepare geometry for rendering
+    virtual void updateGeometry(const FrameInfo& frame, Renderer* renderer);
+    //! Return vertex shader parameter
+    virtual bool getVertexShaderParameter(unsigned batchIndex, VSParameter parameter, const float** data, unsigned* count);
+    
+    //! Set model
+    bool setModel(Model* model);
+    //! Add an animation
+    AnimationState* addAnimationState(Animation* animation);
+    //! Remove an animation by animation pointer
+    void removeAnimationState(Animation* animation);
+    //! Remove an animation by animation name
+    void removeAnimationState(const std::string& animationName);
+    //! Remove an animation by animation name hash
+    void removeAnimationState(StringHash animationNameHash);
+    //! Remove an animation by AnimationState pointer
+    void removeAnimationState(AnimationState* state);
+    //! Remove all animations
+    void removeAllAnimationStates();
+    //! Set animation LOD bias
+    void setAnimationLodBias(float bias);
+    //! Set vertex morph weight by index
+    void setMorphWeight(unsigned index, float weight);
+    //! Set vertex morph weight by name
+    void setMorphWeight(const std::string& name, float weight);
+    //! Set vertex morph weight by name hash
+    void setMorphWeight(StringHash nameHash, float weight);
+    //! Enable automatic animation and morph sync from another animated model
+    void setAutoSyncSource(AnimatedModel* source);
+    //! Reset all vertex morphs to zero
+    void resetMorphWeights();
+    //! Sync animation manually from another animated model
+    void syncAnimation(AnimatedModel* srcNode);
+    //! Sync morphs manually from another animated model
+    void syncMorphs(AnimatedModel* srcNode);
+    
+    //! Return skeleton
+    const Skeleton& getSkeleton() const { return mSkeleton; }
+    //! Return all animation states
+    const std::vector<AnimationState*>& getAnimationStates() const { return mAnimationStates; }
+    //! Return animation state by animation pointer
+    AnimationState* getAnimationState(Animation* animation) const;
+    //! Return animation state by animation name
+    AnimationState* getAnimationState(const std::string& animationName) const;
+    //! Return animation state by animation name hash
+    AnimationState* getAnimationState(const StringHash animationNameHash) const;
+    //! Return animation LOD bias
+    float getAnimationLodBias() const { return mAnimationLodBias; }
+    //! Return all vertex morphs
+    const std::vector<ModelMorph>& getMorphs() const { return mMorphs; }
+    //! Return all morph vertex buffers
+    const std::vector<SharedPtr<VertexBuffer> >& getMorphVertexBuffers() const { return mMorphVertexBuffers; }
+    //! Return number of vertex morphs
+    unsigned getNumMorphs() const { return mMorphs.size(); }
+    //! Return vertex morph weight by index
+    float getMorphWeight(unsigned index) const;
+    //! Return vertex morph weight by name
+    float getMorphWeight(const std::string& name) const;
+    //! Return vertex morph weight by name hash
+    float getMorphWeight(StringHash nameHash) const;
+    //! Return automatic animation sync source
+    AnimatedModel* getAutoSyncSource() const { return mAutoSyncSource; }
+    
+protected:
+    //! Update world-space bounding box
+    virtual void onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox);
+    
+private:
+    //! Mark animation and skinning to require an update
+    void markAnimationDirty();
+    //! Mark animation and skinning to require a forced update (blending order changed)
+    void markAnimationOrderDirty();
+    //! Mark morphs to require an update
+    void markMorphsDirty();
+    //! Set skeleton
+    void setSkeleton(const Skeleton& skeleton);
+    //! Refresh mapping of subgeometry bone indices
+    void refreshGeometryBoneMappings();
+    //! Clone geometries as required
+    void cloneGeometries();
+    //! Recalculate animations
+    void updateAnimation(const FrameInfo& frame);
+    //! Recalculate skinning
+    void updateSkinning();
+    //! Reapply all vertex morphs
+    void updateMorphs();
+    //! Apply a vertex morph
+    void applyMorph(VertexBuffer* buffer, void* lockedMorphRange, const VertexBufferMorph& morph, float weight);
+    //! Remove unnecessary animations after a load or network update
+    void removeExtraAnimations(const std::set<StringHash>& animations);
+    
+    //! Skeleton
+    Skeleton mSkeleton;
+    //! Morph vertex buffers
+    std::vector<SharedPtr<VertexBuffer> > mMorphVertexBuffers;
+    //! Vertex morphs
+    std::vector<ModelMorph> mMorphs;
+    //! Animation states
+    std::vector<AnimationState*> mAnimationStates;
+    //! Skinning matrices
+    std::vector<Matrix4x3> mSkinMatrices;
+    //! Mapping of subgeometry bone indices, used if more bones than skinning shader can manage
+    std::vector<std::vector<unsigned> > mGeometryBoneMappings;
+    //! Subgeometry skinning matrices, used if more bones than skinning shader can manage
+    std::vector<std::vector<Matrix4x3> > mGeometrySkinMatrices;
+    //! Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
+    std::vector<std::vector<Matrix4x3*> > mGeometrySkinMatrixPtrs;
+    //! Automatic animation sync source
+    WeakPtr<AnimatedModel> mAutoSyncSource;
+    //! Animation LOD bias
+    float mAnimationLodBias;
+    //! Animation LOD timer
+    float mAnimationLodTimer;
+    //! Animation dirty flag
+    bool mAnimationDirty;
+    //! Animation order dirty flag
+    bool mAnimationOrderDirty;
+    //! Vertex morphs dirty flag
+    bool mMorphsDirty;
+    //! Automatic animation sync source component reference
+    ComponentRef mAutoSyncSourceRef;
+};
+
+#endif // RENDERER_ANIMATEDMODEL_H

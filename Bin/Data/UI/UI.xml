@@ -1,0 +1,26 @@
+<elements>
+    <element name="Cursor">
+        <texture name="Textures/UI.png" />
+        <imagerect value="0 0 16 24" />
+        <hotspot value="0 0" />
+        <size value="16 24" />
+    </element>
+    <element name="Button">
+        <texture name="Textures/UI.png" />
+        <inactiverect value="16 0 32 16" />
+        <hoverrect value="32 0 48 16" />
+        <pressedrect value="48 0 64 16" />
+        <border value="5 5 5 5" />
+    </element>
+    <element name="Window">
+        <texture name="Textures/UI.png" />
+        <imagerect value="64 0 80 16" />
+        <border value="3 3 3 3" />
+        <resizeborder value="8 8 8 8" />
+        <movable enable="true" />
+        <resizable enable="true" />
+    </element>
+    <element name="Text">
+        <font name="Fonts/Cour.ttf" size="10" />
+    </element>
+</elements>

@@ -1,0 +1,7 @@
+<material>
+    <base name="Materials/DefaultDiffSkinned.xml" />
+    <technique>
+        <texture unit="diffuse" name="Textures/Ninja.dds" />
+        <parameter name="MatSpecProperties" value="0 0" />
+    </technique>
+</material>

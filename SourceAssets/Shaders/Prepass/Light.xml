@@ -1,0 +1,39 @@
+<shaders>
+    <shader name="Light" type="vs">
+        <option name="Ortho" define="ORTHO" />
+        <option name="Dir" define="DIRLIGHT" />
+    </shader>
+    <shader name="Light" type="ps">
+        <option name="Ortho" define="ORTHO" exclude="Linear" />
+        <option name="Linear" define="LINEAR" exclude="Ortho" />
+        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="DirShadow">
+            <define name="DIRLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="DirNegative" exclude="Spec">
+            <define name="DIRLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <variation name="Point" define="POINTLIGHT" />
+        <variation name="PointShadow">
+            <define name="POINTLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="PointNegative" exclude="Spec">
+            <define name="POINTLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <variation name="Spot" define="SPOTLIGHT" />
+        <variation name="SpotShadow">
+            <define name="SPOTLIGHT" />
+            <define name="SHADOW" />
+        </variation>
+        <variation name="SpotNegative" exclude="Spec">
+            <define name="SPOTLIGHT" />
+            <define name="NEGATIVE" />
+        </variation>
+        <option name="Spec" define="SPECULAR" />
+        <option name="HW" define="HWSHADOW" require="SHADOW" />
+    </shader>
+</shaders>

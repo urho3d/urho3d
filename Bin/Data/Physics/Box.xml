@@ -1,0 +1,3 @@
+<collisionshape>
+    <box halfsize="1 1 1" />
+</collisionshape>

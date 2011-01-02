@@ -1,0 +1,3 @@
+<collisionshape>
+    <trianglemesh name="Models/Mushroom.mdl" lodlevel="0" />
+</collisionshape>

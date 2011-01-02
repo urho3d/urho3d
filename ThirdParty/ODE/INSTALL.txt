@@ -1,0 +1,122 @@
+As of version 0.6, ODE has two new build systems, one for Visual Studio
+and another for just about everything else. 
+
+1. Building with Visual Studio
+2. Building with Autotools (Linux, OS X, etc.)
+3. Building with Code::Blocks
+4. Building with Something Else
+
+ 
+1. BUILDING WITH VISUAL STUDIO (2002 and up)
+
+ If you downloaded this source code from Subversion you must first use
+ the Premake build system to generate project files. See build/readme.txt
+ for more details. If you downloaded this source code package from
+ SourceForge this has already been done for you.
+ 
+ The directory ode/build contains project files for all supported
+ versions of Visual Studio. Note that Visual Studio 6 is not supported
+ and users are advised to upgrade to Visual C++ 2005 Express (it's free!)
+
+ Open the appropriate solution for your version, pick the build 
+ configuration you want, and build!
+ 
+ The build configuration choices are:
+ 
+   Debug or Release
+   Single or Double precision
+   Static Library (Lib) or Shared Library (DLL)
+  
+ 
+2. BUILDING WITH AUTOTOOLS (Linux, OS X, etc.)
+
+ If you downloaded the source code from Subversion you must bootstrap the
+ process by running the command:
+ 
+   $ sh autogen.sh
+   
+ If you downloaded a source code package from SourceForge this has 
+ already been done for you. You may see some "underquoted definition" 
+ warnings depending on your platform, these are (for now) harmless 
+ warnings regarding scripts from other m4 installed packages.
+ 
+ Run the configure script to autodetect your build environment.
+ 
+   $ ./configure
+    
+ By default this will build ODE as a static library with single-precision
+ math, trimesh support, and debug symbols enabled. You can modify these 
+ defaults by passing additional parameters to configure. For a full list 
+ of available options, type
+ 
+   $ ./configure --help
+   
+ Some of the more popular options are
+ 
+   --enable-double-precision enable double-precision math
+   --with-trimesh=none disables the trimesh support
+   --with-trimesh=opcode use OPCODE for trimesh code
+   --with-trimesh=gimpact use GIMPACT for trimesh code
+
+  --enabled-shared builds a shared library
+
+ To pass specific flags for an optimized build, you must do so
+ in the CPPFLAGS CFLAGS and CXXFLAGS enviroment variables, 
+ you can set these with the export command before running configure
+ or by defining them on the same call to configure, so for example
+ if you are building for an athlon xp processor and you want the
+ compiler to use SSE instructions you can run configure as follows:
+
+ $ CFLAGS="-msse -march=atlon-xp" CXXFLAGS="-msse -march=atlon-xp" ./configure
+
+ Note that you must set both CFLAGS and CXXFLAGS as ODE contains a mixture of C and C++ files.
+ For preprocessor flags such as -L and -I to define library and header paths 
+ respectively use CPPFLAGS.
+    
+ Once configure has run successfully, build and install ODE:
+ 
+   $ make
+   $ make install
+    
+ The latter command will also create an `ode-config` script which you can
+ use to pass cflags and ldflags to your projects. run `ode-config` from a
+ command prompt to find out how it works.
+ 
+ In addition the option `--with-arch=` allows the user to pass the -march
+ flag to GCC, in order to tune the library for a particular architecture.
+ The arguments for --with-arch are listed on this page for -mtune: 
+    
+ http://gcc.gnu.org/onlinedocs/gcc-3.4.1/gcc/i386-and-x86-64-Options.html#i386%20and%20x86-64%20Options
+ 
+ Note that the link points to posible values for Intel processors, but 
+ other processors are also supported, check the page for your particular
+ processor to see what parameters can be passed to -march in your case.
+
+ 
+3. Building with Code::Blocks
+
+ Because Code::Blocks supports so many different platforms, we do not
+ provide workspaces. Instead, use Premake to create a workspace tailored
+ for your platform and project. Like so:
+ 
+   $ cd ode/build
+   $ premake --with-tests --target cb-gcc
+   
+ To see a complete list of options:
+ 
+   $ cd ode/build
+   $ premake --help
+   
+   
+4. Building with Something Else
+
+ ODE uses the Premake tool to provide support for several different toolsets.
+ Premake adds support for new toolsets on a regular basis, so yours might be
+ supported. Check the Premake website at http://premake.sourceforge.net/, 
+ and then follow the directions for Code::Blocks above, substituting your
+ toolset target in place of `cb-gcc`.
+ 
+ 
+ 
+
+ 

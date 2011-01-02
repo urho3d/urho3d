@@ -1,0 +1,15 @@
+<material>
+    <technique>
+        <parameter name="MatSpecProperties" value="0.5 16" />
+        <pass name="deferred" vs="Deferred/GBuffer_Skinned" ps="Deferred/GBuffer" />
+
+        <pass name="prepass" vs="Prepass/GBuffer_Skinned" ps="Prepass/GBuffer" />
+        <pass name="material" vs="Prepass/Material_Skinned" ps="Prepass/Material" depthwrite="false" depthtest="equal" />
+
+        <pass name="ambient" vs="Forward_Skinned" ps="Forward_Ambient" />
+        <pass name="light" vs="Forward_Skinned" ps="Forward" depthwrite="false" depthtest="equal" blend="add" />
+        <pass name="negative" vs="Forward_Skinned" ps="Forward" depthwrite="false" depthtest="equal" blend="multiply" />
+
+        <pass name="shadow" vs="Shadow_Skinned" ps="Shadow" />
+    </technique>
+</material>
