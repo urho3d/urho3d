@@ -800,8 +800,6 @@ bool RigidBody::isActive() const
 
 void RigidBody::drawDebugGeometry(DebugRenderer* debug)
 {
-    //_controlfp( _PC_24, MCW_PC );
-
     Color color;
     if (!isActive())
         color = Color(0.0f, 1.0f, 0.0f);

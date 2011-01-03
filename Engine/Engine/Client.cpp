@@ -47,8 +47,6 @@ static const int MIN_FILE_FRAGMENT_COUNT = 16;
 static const int MAX_FILE_FRAGMENT_COUNT = 1024;
 static const int FILE_FRAGMENT_COUNT_DELTA = 8;
 
-static Client* instance = 0;
-
 Client::Client(Network* network, ResourceCache* cache, const std::string& downloadDirectory) :
     mNetwork(network),
     mCache(cache),
@@ -58,9 +56,6 @@ Client::Client(Network* network, ResourceCache* cache, const std::string& downlo
     mFrameNumber(1),
     mDownloadDirectory(fixPath(downloadDirectory))
 {
-    if (instance)
-        EXCEPTION("Client already exists");
-    
     if (!mNetwork)
         EXCEPTION("Null network");
     
@@ -72,16 +67,11 @@ Client::Client(Network* network, ResourceCache* cache, const std::string& downlo
     subscribeToEvent(EVENT_PEERDISCONNECTED, EVENT_HANDLER(Client, handlePeerDisconnected));
     subscribeToEvent(EVENT_FILETRANSFERCOMPLETED, EVENT_HANDLER(Client, handleFileTransferCompleted));
     subscribeToEvent(EVENT_FILETRANSFERFAILED, EVENT_HANDLER(Client, handleFileTransferFailed));
-    
-    instance = this;
 }
 
 Client::~Client()
 {
     LOGINFO("Client shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Client::setScene(Scene* scene)
@@ -1078,9 +1068,4 @@ void Client::readNetUpdateBlock(Deserializer& source, unsigned char msgID, const
         }
         break;
     }
-}
-
-Client* getClient()
-{
-    return instance;
 }

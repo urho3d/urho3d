@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Engine.h"
 #include "Log.h"
 #include "RegisterTemplates.h"
 #include "ScriptInstance.h"
@@ -103,6 +104,11 @@ static unsigned ResourceCacheGetMemoryUse(const std::string& type, ResourceCache
     return ptr->getMemoryUse(ShortStringHash(type));
 }
 
+static ResourceCache* GetResourceCache()
+{
+    return getEngine()->getResourceCache();
+}
+
 static void registerResourceCache(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("ResourceCache", 0, asOBJ_REF);
@@ -124,9 +130,10 @@ static void registerResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "uint getMemoryBudget(const string& in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint getMemoryUse(const string& in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint getTotalMemoryUse() const", asMETHOD(ResourceCache, getTotalMemoryUse), asCALL_THISCALL);
-    engine->RegisterGlobalFunction("ResourceCache@+ getResourceCache()", asFUNCTION(getResourceCache), asCALL_CDECL);
-    engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(getResourceCache), asCALL_CDECL);
-    engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(getResourceCache), asCALL_CDECL);
+    
+    engine->RegisterGlobalFunction("ResourceCache@+ getResourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
 }
 
 static Image* ConstructImage(const std::string& name)

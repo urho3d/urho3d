@@ -41,8 +41,6 @@
 
 #include "DebugNew.h"
 
-static UI* instance = 0;
-
 static bool compareUIElements(const UIElement* lhs, const UIElement* rhs)
 {
     return lhs->getPriority() < rhs->getPriority();
@@ -55,9 +53,6 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mMouseDragElement(0),
     mMouseButtons(0)
 {
-    if (instance)
-        EXCEPTION("UI already exists");
-    
     if (!mRenderer)
         EXCEPTION("Null renderer");
     
@@ -79,16 +74,11 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mNoTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
     mDiffTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_DiffVCol.ps2");
     mAlphaTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_AlphaVCol.ps2");
-    
-    instance = this;
 }
 
 UI::~UI()
 {
     LOGINFO("UI shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void UI::setCursor(Cursor* cursor)
@@ -450,9 +440,4 @@ void UI::handleChar(StringHash eventType, VariantMap& eventData)
     UIElement* element = getFocusElement();
     if (element)
         element->onChar(eventData[P_CHAR].getInt());
-}
-
-UI* getUI()
-{
-    return instance;
 }

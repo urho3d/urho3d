@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERPHYSICS_H
-#define SCRIPT_REGISTERPHYSICS_H
+#ifndef ENGINE_REGISTERUI_H
+#define ENGINE_REGISTERUI_H
 
 class asIScriptEngine;
 
-//! Register the Physics library to script
-void registerPhysicsLibrary(asIScriptEngine* engine);
+//! Register the UI library to script
+void registerUILibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERPHYSICS_H
+#endif // ENGINE_REGISTERUI_H

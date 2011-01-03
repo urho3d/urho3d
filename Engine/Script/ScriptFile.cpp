@@ -97,7 +97,7 @@ bool ScriptFile::execute(const std::string& declaration, asIScriptContext* conte
 
 bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context, const std::vector<Variant>& parameters)
 {
-    PROFILE(Script_Execute);
+    PROFILE(Script_ExecuteFunction);
     
     if ((!mCompiled) || (!function))
         return false;
@@ -157,7 +157,7 @@ bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration
 bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, asIScriptContext* context,
     const std::vector<Variant>& parameters)
 {
-    PROFILE(Script_Execute);
+    PROFILE(Script_ExecuteMethod);
     
     if ((!mCompiled) || (!object) || (!method))
         return false;

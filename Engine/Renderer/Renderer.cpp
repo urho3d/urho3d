@@ -63,8 +63,6 @@ static const D3DCMPFUNC d3dCmpFunc[] =
 static std::vector<VertexBuffer*> vertexBuffers;
 static std::vector<unsigned> elementMasks;
 
-static Renderer* instance = 0;
-
 static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Renderer::Renderer(const std::string& windowTitle) :
@@ -94,9 +92,6 @@ Renderer::Renderer(const std::string& windowTitle) :
     mImmediateBuffer(0),
     mDefaultTextureFilterMode(FILTER_BILINEAR)
 {
-    if (instance)
-        EXCEPTION("Renderer already exists");
-    
     LOGINFO("Renderer created");
     
     resetCachedState();
@@ -106,8 +101,6 @@ Renderer::Renderer(const std::string& windowTitle) :
     elementMasks[0] = MASK_DEFAULT;
     
     subscribeToEvent(EVENT_WINDOWMESSAGE, EVENT_HANDLER(Renderer, handleWindowMessage));
-    
-    instance = this;
 }
 
 Renderer::~Renderer()
@@ -151,9 +144,6 @@ Renderer::~Renderer()
     mImpl = 0;
     
     LOGINFO("Renderer shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Renderer::messagePump()
@@ -2211,6 +2201,9 @@ void Renderer::handleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowMessage;
     
+    if (eventData[P_WINDOW].getInt() != (int)mImpl->mWindow)
+        return;
+    
     switch (eventData[P_MSG].getInt())
     {
     case WM_CLOSE:
@@ -2227,25 +2220,18 @@ void Renderer::handleWindowMessage(StringHash eventType, VariantMap& eventData)
 
 LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    if (instance)
-    {
-        using namespace WindowMessage;
-        
-        VariantMap eventData;
-        eventData[P_MSG] = (int)msg;
-        eventData[P_WPARAM] = (int)wParam;
-        eventData[P_LPARAM] = (int)lParam;
-        eventData[P_HANDLED] = false;
-        
-        sendEvent(EVENT_WINDOWMESSAGE, eventData);
-        if (eventData[P_HANDLED].getBool())
-            return 0;
-    }
+    using namespace WindowMessage;
+    
+    VariantMap eventData;
+    eventData[P_WINDOW] = (int)hwnd;
+    eventData[P_MSG] = (int)msg;
+    eventData[P_WPARAM] = (int)wParam;
+    eventData[P_LPARAM] = (int)lParam;
+    eventData[P_HANDLED] = false;
+    
+    sendEvent(EVENT_WINDOWMESSAGE, eventData);
+    if (eventData[P_HANDLED].getBool())
+        return 0;
     
     return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-Renderer* getRenderer()
-{
-    return instance;
 }

@@ -21,12 +21,11 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERRESOURCE_H
-#define SCRIPT_REGISTERRESOURCE_H
+#ifndef ENGINE_REGISTERRENDERER_H
+#define ENGINE_REGISTERRENDERER_H
 
 class asIScriptEngine;
 
-//! Register the Resource library to script
-void registerResourceLibrary(asIScriptEngine* engine);
+void registerRendererLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERRESOURCE_H
+#endif // ENGINE_REGISTERRENDERER_H

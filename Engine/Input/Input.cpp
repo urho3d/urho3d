@@ -32,8 +32,6 @@
 
 #include "DebugNew.h"
 
-static Input* instance = 0;
-
 Input::Input(Renderer* renderer) :
     mRenderer(renderer),
     mToggleFullscreen(true),
@@ -41,24 +39,16 @@ Input::Input(Renderer* renderer) :
     mMinimized(false),
     mActivated(false)
 {
-    if (instance)
-        EXCEPTION("Input already exists");
-    
     LOGINFO("Input created");
     
     makeActive();
     
     subscribeToEvent(EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
-    
-    instance = this;
 }
 
 Input::~Input()
 {
     LOGINFO("Input shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Input::update()
@@ -161,6 +151,9 @@ int Input::getMouseMoveY() const
 void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowMessage;
+    
+    if ((!mRenderer) || (eventData[P_WINDOW].getInt() != mRenderer->getWindowHandle()))
+        return;
     
     int msg = eventData[P_MSG].getInt();
     int wParam = eventData[P_WPARAM].getInt();
@@ -363,9 +356,4 @@ void Input::keyChange(int key, bool newState)
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = mMouseButtonDown;
     sendEvent(newState ? EVENT_KEYDOWN : EVENT_KEYUP, eventData);
-}
-
-Input* getInput()
-{
-    return instance;
 }

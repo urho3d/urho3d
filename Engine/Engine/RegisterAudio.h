@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERINPUT_H
-#define SCRIPT_REGISTERINPUT_H
+#ifndef ENGINE_REGISTERAUDIO_H
+#define ENGINE_REGISTERAUDIO_H
 
 class asIScriptEngine;
 
-//! Register the Input library to script
-void registerInputLibrary(asIScriptEngine* engine);
+//! Register the Audio library to script
+void registerAudioLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERINPUT_H
+#endif // ENGINE_REGISTERAUDIO_H

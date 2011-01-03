@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERCOMMON_H
-#define SCRIPT_REGISTERCOMMON_H
+#ifndef ENGINE_REGISTERSCENE_H
+#define ENGINE_REGISTERSCENE_H
 
 class asIScriptEngine;
 
-//! Register the Common library to script
-void registerCommonLibrary(asIScriptEngine* engine);
+//! Register the Scene library to script
+void registerSceneLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERCOMMON_H
+#endif // ENGINE_REGISTERSCENE_H

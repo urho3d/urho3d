@@ -33,7 +33,7 @@
 
 #include "DebugNew.h"
 
-static Network* instance = 0;
+static unsigned instanceCount = 0;
 
 Network::Network() :
     mServerHost(0),
@@ -45,15 +45,14 @@ Network::Network() :
     mDataOutBps(0),
     mSendPacketEventsDefault(false)
 {
-    if (instance)
-        EXCEPTION("Network already exists");
+    if (!instanceCount)
+    {
+        if (enet_initialize() != 0)
+            EXCEPTION("Could not initialize networking");
+    }
+    ++instanceCount;
     
     LOGINFO("Network created");
-    
-    if (enet_initialize() != 0)
-        EXCEPTION("Could not initialize networking");
-    
-    instance = this;
 }
 
 Network::~Network()
@@ -61,12 +60,11 @@ Network::~Network()
     stopServer();
     stopClient();
     
-    enet_deinitialize();
+    --instanceCount;
+    if (!instanceCount)
+        enet_deinitialize();
     
     LOGINFO("Network shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Network::setServerMaxConnections(int connections)

@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERSCENE_H
-#define SCRIPT_REGISTERSCENE_H
+#ifndef ENGINE_REGISTERPHYSICS_H
+#define ENGINE_REGISTERPHYSICS_H
 
 class asIScriptEngine;
 
-//! Register the Scene library to script
-void registerSceneLibrary(asIScriptEngine* engine);
+//! Register the Physics library to script
+void registerPhysicsLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERSCENE_H
+#endif // ENGINE_REGISTERPHYSICS_H

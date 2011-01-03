@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERAUDIO_H
-#define SCRIPT_REGISTERAUDIO_H
+#ifndef ENGINE_REGISTERCOMMON_H
+#define ENGINE_REGISTERCOMMON_H
 
 class asIScriptEngine;
 
-//! Register the Audio library to script
-void registerAudioLibrary(asIScriptEngine* engine);
+//! Register the Common library to script
+void registerCommonLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERAUDIO_H
+#endif // ENGINE_REGISTERCOMMON_H

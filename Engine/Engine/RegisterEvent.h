@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTEREVENT_H
-#define SCRIPT_REGISTEREVENT_H
+#ifndef ENGINE_REGISTEREVENT_H
+#define ENGINE_REGISTEREVENT_H
 
 class asIScriptEngine;
 
 //! Register the Event library to script
 void registerEventLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTEREVENT_H
+#endif // ENGINE_REGISTEREVENT_H

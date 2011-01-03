@@ -38,8 +38,6 @@
 
 #include "DebugNew.h"
 
-static Audio* instance = 0;
-
 //! Holds the DirectSound buffer and audio thread handle
 class AudioImpl
 {
@@ -78,17 +76,12 @@ Audio::Audio(unsigned windowHandle) :
     mListenerPosition(Vector3::sZero),
     mListenerRotation(Quaternion::sIdentity)
 {
-    if (instance)
-        EXCEPTION("Audio already exists");
-    
     LOGINFO("Audio created");
     
     mImpl = new AudioImpl((HWND)windowHandle);
     
     for (unsigned i = 0; i < MAX_CHANNEL_TYPES; ++i)
         mMasterGain[i] = 1.0f;
-    
-    instance = this;
 }
 
 Audio::~Audio()
@@ -105,9 +98,6 @@ Audio::~Audio()
     mImpl = 0;
     
     LOGINFO("Audio shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 bool Audio::setMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool stereo, bool interpolate)
@@ -493,9 +483,4 @@ DWORD WINAPI AudioImpl::threadFunction(void* data)
     
     impl->mDSBuffer->Stop();
     return 0;
-}
-
-Audio* getAudio()
-{
-    return instance;
 }

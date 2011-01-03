@@ -44,7 +44,18 @@
 #include "PhysicsWorld.h"
 #include "Pipeline.h"
 #include "Profiler.h"
+#include "RegisterAudio.h"
+#include "RegisterCommon.h"
 #include "RegisterEngine.h"
+#include "RegisterEvent.h"
+#include "RegisterInput.h"
+#include "RegisterMath.h"
+#include "RegisterPhysics.h"
+#include "RegisterRenderer.h"
+#include "RegisterResource.h"
+#include "RegisterScene.h"
+#include "RegisterScript.h"
+#include "RegisterUI.h"
 #include "Renderer.h"
 #include "RendererComponentFactory.h"
 #include "RendererResourceFactory.h"
@@ -62,7 +73,7 @@
 
 #include "DebugNew.h"
 
-static Engine* instance = 0;
+Engine* Engine::sInstance = 0;
 
 Engine::Engine(const std::string& logFileName, bool headless) :
     mMinFps(10),
@@ -74,7 +85,7 @@ Engine::Engine(const std::string& logFileName, bool headless) :
     mExiting(false),
     mHeadless(headless)
 {
-    if (instance)
+    if (sInstance)
         EXCEPTION("Engine already exists");
     
     // Set multimedia timer accuracy to allow measuring up to 200 fps
@@ -91,8 +102,6 @@ Engine::Engine(const std::string& logFileName, bool headless) :
     
     mCache = new ResourceCache();
     
-    instance = this;
-    
     // Register the inbuilt events as local only
     static const std::string inbuiltEvents[] = {
         "Update", "PostUpdate", "PostRenderUpdate", "ClientIdentity", "ClientJoinedScene", "ClientLeftScene", "ClientControls",
@@ -105,6 +114,8 @@ Engine::Engine(const std::string& logFileName, bool headless) :
     
     for (unsigned i = 0; inbuiltEvents[i].length(); ++i)
         registerLocalOnlyEvent(inbuiltEvents[i]);
+    
+    sInstance = this;
 }
 
 Engine::~Engine()
@@ -112,8 +123,8 @@ Engine::~Engine()
     // Restore default multimedia timer accuracy
     setTimerPeriod(0);
     
-    if (instance == this)
-        instance = 0;
+    if (sInstance == this)
+        sInstance = 0;
 }
 
 void Engine::init(const std::string& windowTitle, const std::vector<std::string>& arguments)
@@ -337,11 +348,7 @@ ScriptEngine* Engine::createScriptEngine()
     {
         mScriptEngine = new ScriptEngine();
         mCache->addResourceFactory(new ScriptResourceFactory(mScriptEngine));
-        
-        // Register the Engine library
-        LOGDEBUG("Registering Engine library");
-        asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
-        registerEngineLibrary(engine);
+        registerScriptAPI();
     }
     return mScriptEngine;
 }
@@ -583,7 +590,46 @@ void Engine::render()
     mRenderer->endFrame(mFlushGPU);
 }
 
-Engine* getEngine()
+void Engine::registerScriptAPI()
 {
-    return instance;
+    PROFILE(Script_RegisterAPI);
+    
+    asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
+    
+    // Math library
+    LOGDEBUG("Registering Math library");
+    registerMathLibrary(engine);
+    // Common library
+    LOGDEBUG("Registering Common library");
+    registerCommonLibrary(engine);
+    // Event library
+    LOGDEBUG("Registering Event library");
+    registerEventLibrary(engine);
+    // Resource library
+    LOGDEBUG("Registering Resource library");
+    registerResourceLibrary(engine);
+    // Scene library
+    LOGDEBUG("Registering Scene library");
+    registerSceneLibrary(engine);
+    // Audio library
+    LOGDEBUG("Registering Audio library");
+    registerAudioLibrary(engine);
+    // Renderer library
+    LOGDEBUG("Registering Renderer library");
+    registerRendererLibrary(engine);
+    // Input library
+    LOGDEBUG("Registering Input library");
+    registerInputLibrary(engine);
+    // UI library
+    LOGDEBUG("Registering UI library");
+    registerUILibrary(engine);
+    // Physics library
+    LOGDEBUG("Registering Physics library");
+    registerPhysicsLibrary(engine);
+    // Script library
+    LOGDEBUG("Registering Script library");
+    registerScriptLibrary(engine);
+    //  Engine library
+    LOGDEBUG("Registering Engine library");
+    registerEngineLibrary(engine);
 }

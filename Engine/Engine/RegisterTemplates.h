@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERTEMPLATES_H
-#define SCRIPT_REGISTERTEMPLATES_H
+#ifndef ENGINE_REGISTERTEMPLATES_H
+#define ENGINE_REGISTERTEMPLATES_H
 
 #include "BorderImage.h"
 #include "Channel.h"
@@ -406,4 +406,4 @@ template <class T> void registerBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntRect& getBorder() const", asMETHOD(T, getBorder), asCALL_THISCALL);
 }
 
-#endif // SCRIPT_REGISTERTEMPLATES_H
+#endif // ENGINE_REGISTERTEMPLATES_H

@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERUI_H
-#define SCRIPT_REGISTERUI_H
+#ifndef ENGINE_REGISTERINPUT_H
+#define ENGINE_REGISTERINPUT_H
 
 class asIScriptEngine;
 
-//! Register the UI library to script
-void registerUILibrary(asIScriptEngine* engine);
+//! Register the Input library to script
+void registerInputLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERUI_H
+#endif // ENGINE_REGISTERINPUT_H

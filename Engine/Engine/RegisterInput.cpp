@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Controls.h"
+#include "Engine.h"
 #include "Input.h"
 
 #include <angelscript.h>
@@ -178,6 +179,11 @@ static void registerControls(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Controls", "VariantMap extraData", offsetof(Controls, mExtraData));
 }
 
+static Input* GetInput()
+{
+    return getEngine()->getInput();
+}
+
 static void registerInput(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Input", 0, asOBJ_REF);
@@ -194,8 +200,8 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool isActive() const", asMETHOD(Input, isActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isMinimized() const", asMETHOD(Input, isMinimized), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("Input@+ getInput()", asFUNCTION(getInput), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(getInput), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Input@+ getInput()", asFUNCTION(GetInput), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);
 }
 
 void registerInputLibrary(asIScriptEngine* engine)

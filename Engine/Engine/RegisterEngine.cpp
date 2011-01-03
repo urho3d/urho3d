@@ -165,9 +165,14 @@ static bool ClientConnectAddressUserName(const std::string& address, unsigned sh
     return ptr->connect(address, port, userName);
 }
 
+static Client* GetClient()
+{
+    return getEngine()->getClient();
+}
+
 static bool IsClient()
 {
-    return getClient() != 0;
+    return GetClient() != 0;
 }
 
 static void registerClient(asIScriptEngine* engine)
@@ -207,9 +212,9 @@ static void registerClient(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Client", "string getFileTransferStatus() const", asMETHOD(Client, getFileTransferStatus), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "const SceneInfo& getSceneInfo() const", asMETHOD(Client, getSceneInfo), asCALL_THISCALL);
     
+    engine->RegisterGlobalFunction("Client@+ getClient()", asFUNCTION(GetClient), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Client@+ get_client()", asFUNCTION(GetClient), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool isClient()", asFUNCTION(IsClient), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Client@+ getClient()", asFUNCTION(getClient), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Client@+ get_client()", asFUNCTION(getClient), asCALL_CDECL);
 }
 
 static CScriptArray* ServerGetScenes(Server* ptr)
@@ -230,9 +235,14 @@ static CScriptArray* ServerGetConnections(Server* ptr)
     return vectorToHandleArray<Connection*>(result, "array<Connection@>");
 }
 
+static Server* GetServer()
+{
+    return getEngine()->getServer();
+}
+
 static bool IsServer()
 {
-    return getServer() != 0;
+    return GetServer() != 0;
 }
 
 static void registerServer(asIScriptEngine* engine)
@@ -256,16 +266,17 @@ static void registerServer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Server", "array<Scene@>@ getScenes() const", asFUNCTION(ServerGetScenes), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "array<Connection@>@ getConnections() const", asFUNCTION(ServerGetConnections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "uint getNumUsersInScene(Scene@+) const", asMETHOD(Server, getNumUsersInScene), asCALL_THISCALL);
+    
+    engine->RegisterGlobalFunction("Server@+ getServer()", asFUNCTION(GetServer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Server@+ get_server()", asFUNCTION(GetServer), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool isServer()", asFUNCTION(IsServer), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Server@+ getServer()", asFUNCTION(getServer), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Server@+ get_server()", asFUNCTION(getServer), asCALL_CDECL);
 }
 
 static void ParticleEmitterLoadParameters(XMLFile* file, ParticleEmitter* ptr)
 {
     try
     {
-        ptr->loadParameters(file, getResourceCache());
+        ptr->loadParameters(file, getEngine()->getResourceCache());
     }
     catch (Exception& e)
     {
@@ -295,6 +306,11 @@ static void registerParticleEmitter(asIScriptEngine* engine)
     registerRefCasts<Node, ParticleEmitter>(engine, "Node", "ParticleEmitter");
 }
 
+static DebugHud* GetDebugHud()
+{
+    return getEngine()->getDebugHud();
+}
+
 static void registerDebugHud(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_NONE", (void*)&DEBUGHUD_SHOW_NONE);
@@ -313,8 +329,8 @@ static void registerDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "uint getMode() const", asMETHOD(DebugHud, getMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "float getProfilerInterval() const", asMETHOD(DebugHud, getProfilerInterval), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("DebugHud@+ getDebugHud()", asFUNCTION(getDebugHud), asCALL_CDECL);
-    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", asFUNCTION(getDebugHud), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugHud@+ getDebugHud()", asFUNCTION(GetDebugHud), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugHud@+ get_debugHud()", asFUNCTION(GetDebugHud), asCALL_CDECL);
 }
 
 static Scene* EngineCreateScene(const std::string& name, const BoundingBox& octreeSize, unsigned octreeLevels, bool usePhysics, Engine* ptr)

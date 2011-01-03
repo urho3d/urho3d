@@ -42,8 +42,6 @@
 
 #include "DebugNew.h"
 
-static Server* instance = 0;
-
 Server::Server(Network* network) :
     mNetwork(network),
     mNetFps(30),
@@ -52,9 +50,6 @@ Server::Server(Network* network) :
     mMaxSceneRevisions(100),
     mStayRelevantTime(30)
 {
-    if (instance)
-        EXCEPTION("Server already exists");
-    
     if (!mNetwork)
         EXCEPTION("Null network");
     
@@ -62,16 +57,11 @@ Server::Server(Network* network) :
     
     subscribeToEvent(EVENT_PEERCONNECTED, EVENT_HANDLER(Server, handlePeerConnected));
     subscribeToEvent(EVENT_PEERDISCONNECTED, EVENT_HANDLER(Server, handlePeerDisconnected));
-    
-    instance = this;
 }
 
 Server::~Server()
 {
     LOGINFO("Server shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Server::setNetFps(int fps)
@@ -1122,9 +1112,4 @@ unsigned char Server::getClientNetFlags(Connection* connection, Entity* entity, 
         ret &= ~NET_OWNERPREDICT;
     
     return ret;
-}
-
-Server* getServer()
-{
-    return instance;
 }

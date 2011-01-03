@@ -23,12 +23,18 @@
 
 #include "Precompiled.h"
 #include "Audio.h"
+#include "Engine.h"
 #include "PositionalChannel.h"
 #include "RegisterTemplates.h"
 #include "Song.h"
 #include "Sound.h"
 #include "StereoChannel.h"
 #include "VectorBuffer.h"
+
+static Audio* GetAudio()
+{
+    return getEngine()->getAudio();
+}
 
 static void registerAudio(asIScriptEngine* engine)
 {
@@ -61,8 +67,8 @@ static void registerAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "const Vector3& getListenerPosition() const", asMETHOD(Audio, getListenerPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "const Quaternion& getListenerRotation() const", asMETHOD(Audio, getListenerRotation), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("Audio@+ getAudio()", asFUNCTION(getAudio), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(getAudio), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Audio@+ getAudio()", asFUNCTION(GetAudio), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Audio@+ get_audio()", asFUNCTION(GetAudio), asCALL_CDECL);
 }
 
 static Sound* ConstructSound(const std::string& name)
@@ -76,7 +82,7 @@ static void SoundSetData(const VectorBuffer& buffer, Sound* ptr)
         return;
     
     // If the sound is playing, stop it
-    Audio* audio = getAudio();
+    Audio* audio = getEngine()->getAudio();
     if (audio)
         audio->stopSound(ptr);
     

@@ -29,6 +29,7 @@
 //! Operating system window message
 DEFINE_EVENT(EVENT_WINDOWMESSAGE, WindowMessage)
 {
+    EVENT_PARAM(P_WINDOW, Window);              // int
     EVENT_PARAM(P_MSG, Msg);                    // int
     EVENT_PARAM(P_WPARAM, WParam);              // int
     EVENT_PARAM(P_LPARAM, LParam);              // int

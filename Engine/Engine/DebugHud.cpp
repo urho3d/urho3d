@@ -32,19 +32,12 @@
 #include "StringUtils.h"
 #include "Text.h"
 
-static DebugHud* instance = 0;
-
 DebugHud::DebugHud(Engine* engine) :
     mEngine(engine),
     mProfilerInterval(1.0f),
     mProfilerTimer(0.0f)
 {
-    if (instance)
-        EXCEPTION("Debug HUD already exists");
-    
     LOGINFO("Debug HUD created");
-    
-    instance = this;
     
     if (!mEngine)
         return;
@@ -75,9 +68,6 @@ DebugHud::DebugHud(Engine* engine) :
 DebugHud::~DebugHud()
 {
     LOGINFO("Debug HUD shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void DebugHud::update(float timeStep)
@@ -254,9 +244,4 @@ unsigned DebugHud::getMode() const
         mode |= DEBUGHUD_SHOW_PROFILER;
     
     return mode;
-}
-
-DebugHud* getDebugHud()
-{
-    return instance;
 }

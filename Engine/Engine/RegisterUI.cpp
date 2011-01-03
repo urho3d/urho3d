@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Button.h"
 #include "Cursor.h"
+#include "Engine.h"
 #include "Font.h"
 #include "RegisterTemplates.h"
 #include "Text.h"
@@ -40,7 +41,7 @@ void UIElementLoadParameters(XMLFile* file, const std::string& elementName, UIEl
 {
     try
     {
-        ptr->loadParameters(file, elementName, getResourceCache());
+        ptr->loadParameters(file, elementName, getEngine()->getResourceCache());
     }
     catch (Exception& e)
     {
@@ -152,6 +153,21 @@ static void registerWindow(asIScriptEngine* engine)
     registerRefCasts<UIElement, Window>(engine, "UIElement", "Window");
 }
 
+static UI* GetUI()
+{
+    return getEngine()->getUI();
+}
+
+static UIElement* GetUIRoot()
+{
+    return getEngine()->getUIRoot();
+}
+
+static Cursor* GetUICursor()
+{
+    return getEngine()->getUICursor();
+}
+
 static void registerUI(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("UI", 0, asOBJ_REF);
@@ -167,8 +183,12 @@ static void registerUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@+ getFocusElement()", asMETHOD(UI, getFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 getCursorPosition()", asMETHOD(UI, getCursorPosition), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("UI@+ getUI()", asFUNCTION(getUI), asCALL_CDECL);
-    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(getUI), asCALL_CDECL);
+    engine->RegisterGlobalFunction("UI@+ getUI()", asFUNCTION(GetUI), asCALL_CDECL);
+    engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
+    engine->RegisterGlobalFunction("UIElement@+ getUIRoot()", asFUNCTION(GetUIRoot), asCALL_CDECL);
+    engine->RegisterGlobalFunction("UIElement@+ get_uiRoot()", asFUNCTION(GetUIRoot), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Cursor@+ getUICursor()", asFUNCTION(GetUICursor), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Cursor@+ get_uiCursor()", asFUNCTION(GetUICursor), asCALL_CDECL);
 }
 
 void registerUILibrary(asIScriptEngine* engine)

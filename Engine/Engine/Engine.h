@@ -58,6 +58,8 @@ class UIElement;
 //! Urho3D engine. Creates the other subsystems
 class Engine : public RefCounted, public EventListener
 {
+    friend Engine* getEngine();
+    
 public:
     //! Construct with log file name and whether to start in headless mode
     Engine(const std::string& logFileName = "Urho3D.log", bool headless = false);
@@ -159,6 +161,9 @@ public:
     void render();
     
 private:
+    //! Register the script API after script engine creation
+    void registerScriptAPI();
+    
     //! Log
     SharedPtr<Log> mLog;
     //! Profiler
@@ -205,8 +210,15 @@ private:
     bool mExiting;
     //! Headless mode flag
     bool mHeadless;
+    
+    //! Engine instance
+    static Engine* sInstance;
 };
 
-Engine* getEngine();
+//! Return the Engine instance
+inline Engine* getEngine()
+{
+    return Engine::sInstance;
+}
 
 #endif // ENGINE_ENGINE_H

@@ -21,12 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef SCRIPT_REGISTERMATH_H
-#define SCRIPT_REGISTERMATH_H
+#ifndef ENGINE_REGISTERSCRIPT_H
+#define ENGINE_REGISTERSCRIPT_H
 
 class asIScriptEngine;
 
-//! Register the Math library to script
-void registerMathLibrary(asIScriptEngine* engine);
+//! Register the Script library to script
+void registerScriptLibrary(asIScriptEngine* engine);
 
-#endif // SCRIPT_REGISTERMATH_H
+#endif // ENGINE_REGISTERSCRIPT_H

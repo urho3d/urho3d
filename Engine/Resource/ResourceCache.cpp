@@ -30,16 +30,9 @@
 
 #include "DebugNew.h"
 
-static ResourceCache* instance = 0;
-
 ResourceCache::ResourceCache()
 {
-    if (instance)
-        EXCEPTION("Resource cache already exists");
-    
     LOGINFO("Resource cache created");
-    
-    instance = this;
 }
 
 ResourceCache::~ResourceCache()
@@ -50,9 +43,6 @@ ResourceCache::~ResourceCache()
     mFactories.clear();
     
     LOGINFO("Resource cache shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void ResourceCache::addResourceFactory(ResourceFactory* factory)
@@ -470,9 +460,4 @@ void ResourceCache::updateResourceGroup(ShortStringHash type)
         else
             break;
     }
-}
-
-ResourceCache* getResourceCache()
-{
-    return instance;
 }

@@ -245,8 +245,6 @@ static const std::string shadowPSVariations[] =
     "HW"
 };
 
-static Pipeline* instance = 0;
-
 void EdgeFilterParameters::validate()
 {
     mThreshold = max(mThreshold, 0.0f);
@@ -278,9 +276,6 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     mShadersChangedFrameNumber(M_MAX_UNSIGNED),
     mShadersDirty(true)
 {
-    if (instance)
-        EXCEPTION("Rendering pipeline already exists");
-    
     if (!mRenderer)
         EXCEPTION("Null renderer");
     
@@ -314,16 +309,11 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
         mDrawShadows = false;
     
     resetViews();
-    
-    instance = this;
 }
 
 Pipeline::~Pipeline()
 {
     LOGINFO("Rendering pipeline shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void Pipeline::setSpecularLighting(bool enable)
@@ -1376,9 +1366,4 @@ void Pipeline::handleWindowResized(StringHash eventType, VariantMap& eventData)
     mShadersDirty = true;
     mOcclusionBuffers.clear();
     resetViews();
-}
-
-Pipeline* getPipeline()
-{
-    return instance;
 }

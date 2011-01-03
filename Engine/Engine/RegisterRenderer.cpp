@@ -27,6 +27,7 @@
 #include "AnimationState.h"
 #include "BillboardSet.h"
 #include "DebugRenderer.h"
+#include "Engine.h"
 #include "InstancedModel.h"
 #include "Light.h"
 #include "Material.h"
@@ -101,7 +102,7 @@ static Texture2D* ConstructTexture2D(TextureUsage usage, const std::string& name
 {
     try
     {
-        return new Texture2D(getRenderer(), usage, name);
+        return new Texture2D(getEngine()->getRenderer(), usage, name);
     }
     catch (Exception& e)
     {
@@ -137,7 +138,7 @@ static TextureCube* ConstructTextureCube(TextureUsage usage, const std::string& 
 {
     try
     {
-        return new TextureCube(getRenderer(), usage, name);
+        return new TextureCube(getEngine()->getRenderer(), usage, name);
     }
     catch (Exception& e)
     {
@@ -730,6 +731,11 @@ static void registerInstancedModel(asIScriptEngine* engine)
     registerRefCasts<Node, InstancedModel>(engine, "Node", "InstancedModel");
 }
 
+static Renderer* GetRenderer()
+{
+    return getEngine()->getRenderer();
+}
+
 static void registerRenderer(asIScriptEngine* engine)
 {
     engine->RegisterEnum("RenderMode");
@@ -763,8 +769,8 @@ static void registerRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "bool getHardwareShadowSupport() const", asMETHOD(Renderer, getHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool getHiresShadowSupport() const", asMETHOD(Renderer, getHiresShadowSupport), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("Renderer@+ getRenderer()", asFUNCTION(getRenderer), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Renderer@+ get_renderer()", asFUNCTION(getRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Renderer@+ getRenderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Renderer@+ get_renderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
 }
 
 static void ConstructEdgeFilterParameters(EdgeFilterParameters* ptr)
@@ -780,6 +786,11 @@ static void ConstructEdgeFilterParametersCopy(EdgeFilterParameters& parameters, 
 static void ConstructEdgeFilterParametersInit(float threshold, float filterStep, float maxFilter, float maxScale, EdgeFilterParameters* ptr)
 {
     new(ptr) EdgeFilterParameters(threshold, filterStep, maxFilter, maxScale);
+}
+
+static Pipeline* GetPipeline()
+{
+    return getEngine()->getPipeline();
 }
 
 static void registerPipeline(asIScriptEngine* engine)
@@ -834,8 +845,13 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "uint getNumOccluders(bool) const", asMETHOD(Pipeline, getNumOccluders), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumShadowOccluders(bool) const", asMETHOD(Pipeline, getNumShadowOccluders), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("Pipeline@+ getPipeline()", asFUNCTION(getPipeline), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Pipeline@+ get_pipeline()", asFUNCTION(getPipeline), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Pipeline@+ getPipeline()", asFUNCTION(GetPipeline), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Pipeline@+ get_pipeline()", asFUNCTION(GetPipeline), asCALL_CDECL);
+}
+
+static DebugRenderer* GetDebugRenderer()
+{
+    return getEngine()->getDebugRenderer();
 }
 
 static void registerDebugRenderer(asIScriptEngine* engine)
@@ -848,8 +864,8 @@ static void registerDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void addFrustum(const Frustum& in, const Color& in, bool)", asMETHOD(DebugRenderer, addFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void addSkeleton(Skeleton@+, const Color& in, bool)", asMETHOD(DebugRenderer, addSkeleton), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("DebugRenderer@+ getDebugRenderer()", asFUNCTION(getDebugRenderer), asCALL_CDECL);
-    engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(getDebugRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugRenderer@+ getDebugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
+    engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
 }
 
 static void ConstructRayQueryResult(RayQueryResult* ptr)

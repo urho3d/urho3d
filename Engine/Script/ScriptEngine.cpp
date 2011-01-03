@@ -25,27 +25,14 @@
 #include "Exception.h"
 #include "Log.h"
 #include "Profiler.h"
-#include "RegisterAudio.h"
 #include "RegisterArray.h"
-#include "RegisterCommon.h"
-#include "RegisterEvent.h"
-#include "RegisterInput.h"
-#include "RegisterMath.h"
-#include "RegisterPhysics.h"
-#include "RegisterRenderer.h"
-#include "RegisterResource.h"
-#include "RegisterScene.h"
-#include "RegisterScript.h"
 #include "RegisterStdString.h"
-#include "RegisterUI.h"
 #include "ScriptEngine.h"
 #include "StringUtils.h"
 
 #include <angelscript.h>
 
 #include "DebugNew.h"
-
-static ScriptEngine* instance;
 
 void messageCallback(const asSMessageInfo *msg, void *param)
 {
@@ -71,9 +58,6 @@ ScriptEngine::ScriptEngine() :
     mAngelScriptEngine(0),
     mImmediateContext(0)
 {
-    if (instance)
-        EXCEPTION("Script engine already exists");
-    
     mAngelScriptEngine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!mAngelScriptEngine)
         EXCEPTION("Could not create AngelScript engine");
@@ -85,13 +69,16 @@ ScriptEngine::ScriptEngine() :
     mAngelScriptEngine->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, true);
     mAngelScriptEngine->SetMessageCallback(asFUNCTION(messageCallback), 0, asCALL_CDECL);
     
-    // Register the script API
-    registerAPI();
+    // Register the array and string types, but leave it for the script engine instantiator to install the rest of the API
+    {
+        PROFILE(Script_RegisterInbuiltTypes);
+        LOGDEBUG("Registering array and string types");
+        registerArray(mAngelScriptEngine);
+        registerStdString(mAngelScriptEngine);
+    }
     
     // Create the context for immediate execution
     mImmediateContext = createScriptContext();
-    
-    instance = this;
 }
 
 ScriptEngine::~ScriptEngine()
@@ -109,9 +96,6 @@ ScriptEngine::~ScriptEngine()
         mAngelScriptEngine->Release();
         mAngelScriptEngine = 0;
     }
-    
-    if (instance == this)
-        instance = 0;
 }
 
 asIScriptContext* ScriptEngine::createScriptContext()
@@ -155,53 +139,4 @@ void ScriptEngine::garbageCollect()
     PROFILE(Script_GarbageCollect);
     
     mAngelScriptEngine->GarbageCollect();
-}
-
-void ScriptEngine::registerAPI()
-{
-    PROFILE(ScriptEngine_RegisterAPI);
-    
-    // Array and string types
-    LOGDEBUG("Registering array and string types");
-    registerArray(mAngelScriptEngine);
-    registerStdString(mAngelScriptEngine);
-    
-    // Libraries
-    LOGDEBUG("Registering Math library");
-    registerMathLibrary(mAngelScriptEngine);
-    // Common library
-    LOGDEBUG("Registering Common library");
-    registerCommonLibrary(mAngelScriptEngine);
-    // Event library
-    LOGDEBUG("Registering Event library");
-    registerEventLibrary(mAngelScriptEngine);
-    // Resource library
-    LOGDEBUG("Registering Resource library");
-    registerResourceLibrary(mAngelScriptEngine);
-    // Scene library
-    LOGDEBUG("Registering Scene library");
-    registerSceneLibrary(mAngelScriptEngine);
-    // Audio library
-    LOGDEBUG("Registering Audio library");
-    registerAudioLibrary(mAngelScriptEngine);
-    // Renderer library
-    LOGDEBUG("Registering Renderer library");
-    registerRendererLibrary(mAngelScriptEngine);
-    // Input library
-    LOGDEBUG("Registering Input library");
-    registerInputLibrary(mAngelScriptEngine);
-    // UI library
-    LOGDEBUG("Registering UI library");
-    registerUILibrary(mAngelScriptEngine);
-    // Physics library
-    LOGDEBUG("Registering Physics library");
-    registerPhysicsLibrary(mAngelScriptEngine);
-    // Script library
-    LOGDEBUG("Registering Script library");
-    registerScriptLibrary(mAngelScriptEngine);
-}
-
-ScriptEngine* getScriptEngine()
-{
-    return instance;
 }

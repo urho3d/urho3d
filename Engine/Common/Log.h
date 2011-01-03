@@ -41,6 +41,8 @@ enum LogLevel
 //! Urho3D log file
 class Log : public RefCounted
 {
+    friend Log* getLog();
+    
 public:
     //! Construct with a given filename and logging level
     Log(const std::string& fileName = std::string(), LogLevel level = LOG_INFO);
@@ -62,10 +64,17 @@ private:
     FILE* mHandle;
     //! Logging level
     LogLevel mLevel;
+    
+    //! Log instance
+    static Log* sInstance;
 };
 
 //! Return the Log instance
-Log* getLog();
+inline Log* getLog()
+{
+    return Log::sInstance;
+}
+
 //! Write to the log
 void writeToLog(LogLevel level, const std::string& message);
 //! Write raw output to the log

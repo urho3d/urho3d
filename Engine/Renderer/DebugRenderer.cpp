@@ -35,29 +35,19 @@
 
 #include "DebugNew.h"
 
-static DebugRenderer* instance = 0;
-
 DebugRenderer::DebugRenderer(Renderer* renderer, ResourceCache* cache) :
     mRenderer(renderer),
     mCache(cache)
 {
-    if (instance)
-        EXCEPTION("Debug renderer already exists");
-    
     LOGINFO("Debug renderer created");
     
     mDebugVS = mCache->getResource<VertexShader>("Shaders/SM2/Basic_VCol.vs2");
     mDebugPS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
-    
-    instance = this;
 }
 
 DebugRenderer::~DebugRenderer()
 {
     LOGINFO("Debug renderer shut down");
-    
-    if (instance == this)
-        instance = 0;
 }
 
 void DebugRenderer::clear()
@@ -266,9 +256,4 @@ void DebugRenderer::addSkeleton(const Skeleton& skeleton, const Color& color, bo
         
         dest->push_back(newLine);
     }
-}
-
-DebugRenderer* getDebugRenderer()
-{
-    return instance;
 }

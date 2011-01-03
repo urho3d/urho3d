@@ -30,13 +30,13 @@
 
 #include <time.h>
 
-static Log* instance = 0;
+Log* Log::sInstance = 0;
 
 Log::Log(const std::string& fileName, LogLevel level) :
     mHandle(0),
     mLevel(level)
 {
-    if (instance)
+    if (sInstance)
         EXCEPTION("Log already exists");
     
     if (!fileName.empty())
@@ -48,7 +48,7 @@ Log::Log(const std::string& fileName, LogLevel level) :
             write(LOG_ERROR, "Failed to create log file " + fileName);
     }
     
-    instance = this;
+    sInstance = this;
 }
 
 Log::~Log()
@@ -60,8 +60,8 @@ Log::~Log()
         mHandle = 0;
     }
     
-    if (instance == this)
-        instance = 0;
+    if (sInstance == this)
+        sInstance = 0;
 }
 
 void Log::write(LogLevel level, const std::string& message)
@@ -102,19 +102,16 @@ void Log::writeRaw(const std::string& message)
     }
 }
 
-Log* getLog()
-{
-    return instance;
-}
-
 void writeToLog(LogLevel level, const std::string& message)
 {
-    if (instance)
-        instance->write(level, message);
+    Log* log = getLog();
+    if (log)
+        log->write(level, message);
 }
 
 void writeToLogRaw(const std::string& message)
 {
-    if (instance)
-        instance->writeRaw(message);
+    Log* log = getLog();
+    if (log)
+        log->writeRaw(message);
 }

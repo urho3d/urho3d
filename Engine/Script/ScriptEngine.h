@@ -51,9 +51,6 @@ public:
     asIScriptContext* getImmediateContext() const { return mImmediateContext; }
     
 private:
-    //! Register the application interface
-    void registerAPI();
-    
     //! AngelScript engine
     asIScriptEngine* mAngelScriptEngine;
     //! Immediate execution script context
