@@ -190,13 +190,13 @@ private:
     //! Frame update timer
     Timer mFrameTimer;
     //! Minimum frames per second
-    int mMinFps;
+    unsigned mMinFps;
     //! Maximum frames per second
-    int mMaxFps;
+    unsigned mMaxFps;
     //! Maximum frames per second when the application is inactive
-    int mMaxInactiveFps;
+    unsigned mMaxInactiveFps;
     //! Debug draw mode
-    int mDebugDrawMode;
+    unsigned mDebugDrawMode;
     //! Flush GPU flag
     bool mFlushGPU;
     //! Initialized flag

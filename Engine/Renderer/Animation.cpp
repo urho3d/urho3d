@@ -71,7 +71,7 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
         AnimationTrack& newTrack = mTracks[i];
         newTrack.mName = source.readString();
         newTrack.mNameHash = StringHash(newTrack.mName);
-        newTrack.mChannelMask = source.readUInt();
+        newTrack.mChannelMask = source.readUByte();
         
         unsigned keyFrames = source.readUInt();
         newTrack.mKeyFrames.resize(keyFrames);

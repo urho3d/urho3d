@@ -56,7 +56,7 @@ struct AnimationTrack
     //! Bone name hash
     StringHash mNameHash;
     //! Bitmask of included data (position, rotation, scale)
-    unsigned mChannelMask;
+    unsigned char mChannelMask;
     //! Keyframes
     std::vector<AnimationKeyFrame> mKeyFrames;
 };

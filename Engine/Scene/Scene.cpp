@@ -127,7 +127,7 @@ void Scene::save(Serializer& dest, bool throwOnError)
     saveProperties(dest);
     
     // Write entities
-    dest.writeVLE(mEntities.size());
+    dest.writeUInt(mEntities.size());
     for (std::map<EntityID, SharedPtr<Entity> >::iterator i = mEntities.begin(); i != mEntities.end(); ++i)
     {
         // Create a separate serialization buffer for the entity, in case something fails
@@ -165,7 +165,7 @@ void Scene::load(Deserializer& source, bool throwOnError)
     loadProperties(source);
     
     // Read entities
-    unsigned numEntities = source.readVLE();
+    unsigned numEntities = source.readUInt();
     for (unsigned i = 0; i < numEntities; ++i)
         loadEntity(source, throwOnError);
     
@@ -422,7 +422,7 @@ void Scene::loadAsync(File* file)
     loadProperties(*file);
     
     // Begin async loading
-    mAsyncTotalEntities = file->readVLE();
+    mAsyncTotalEntities = file->readUInt();
     mAsyncLoadedEntities = 0;
     mAsyncFile = file;
     mAsyncLoading = true;

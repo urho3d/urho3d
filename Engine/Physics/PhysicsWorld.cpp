@@ -106,8 +106,8 @@ void PhysicsWorld::save(Serializer& dest)
 {
     writeExtensionType(dest);
     dest.writeVector3(getGravity());
-    dest.writeInt(getFps());
-    dest.writeInt(getMaxContacts());
+    dest.writeUInt(getFps());
+    dest.writeUInt(getMaxContacts());
     dest.writeFloat(getBounceThreshold());
     dest.writeFloat(getLinearRestThreshold());
     dest.writeFloat(getLinearDampingThreshold());
@@ -127,8 +127,8 @@ void PhysicsWorld::load(Deserializer& source)
 {
     checkExtensionType(source);
     setGravity(source.readVector3());
-    setFps(source.readInt());
-    setMaxContacts(source.readInt());
+    setFps(source.readUInt());
+    setMaxContacts(source.readUInt());
     setBounceThreshold(source.readFloat());
     setLinearRestThreshold(source.readFloat());
     float threshold = source.readFloat();

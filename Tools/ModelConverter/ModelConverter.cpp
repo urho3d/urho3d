@@ -903,16 +903,12 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
     // Vertexbuffers
     dest.writeUInt(vertexBuffers.size());
     for (unsigned i = 0; i < vertexBuffers.size(); ++i)
-    {
         vertexBuffers[i].writeData(dest);
-    }
     
     // Indexbuffers
     dest.writeUInt(indexBuffers.size());
     for (unsigned i = 0; i < indexBuffers.size(); ++i)
-    {
         indexBuffers[i].writeData(dest);
-    }
     
     // Subgeometries
     dest.writeUInt(subGeometries.size());
@@ -939,9 +935,7 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
     // Morphs
     dest.writeUInt(morphs.size());
     for (unsigned i = 0; i < morphs.size(); ++i)
-    {
         morphs[i].writeData(dest);
-    }
     
     // Skeleton
     dest.writeUInt(bones.size());
@@ -952,7 +946,7 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
         dest.writeVector3(bones[i].mBindPosition);
         dest.writeQuaternion(bones[i].mBindRotation);
         dest.writeVector3(bones[i].mBindScale);
-        dest.writeUInt(bones[i].mCollisionMask);
+        dest.writeUByte(bones[i].mCollisionMask);
         if (bones[i].mCollisionMask & 1)
             dest.writeFloat(bones[i].mRadius);
         if (bones[i].mCollisionMask & 2)
@@ -1059,7 +1053,7 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
                 {
                     AnimationTrack& track = newAnimation.mTracks[i];
                     dest.writeString(track.mName);
-                    dest.writeUInt(track.mChannelMask);
+                    dest.writeUByte(track.mChannelMask);
                     dest.writeUInt(track.mKeyFrames.size());
                     for (unsigned j = 0; j < track.mKeyFrames.size(); ++j)
                     {

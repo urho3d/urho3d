@@ -172,7 +172,7 @@ private:
     //! ODE contact joint group ID
     dJointGroupID mContactJoints;
     //! Simulation steps per second
-    int mFps;
+    unsigned mFps;
     //! Maximum contacts per collision
     unsigned mMaxContacts;
     //! Collision bounce velocity threshold

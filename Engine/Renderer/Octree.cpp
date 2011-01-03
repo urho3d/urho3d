@@ -323,14 +323,14 @@ void Octree::save(Serializer& dest)
 {
     writeExtensionType(dest);
     dest.writeBoundingBox(mWorldBoundingBox);
-    dest.writeVLE(mNumLevels);
+    dest.writeUInt(mNumLevels);
 }
 
 void Octree::load(Deserializer& source)
 {
     checkExtensionType(source);
     BoundingBox box = source.readBoundingBox();
-    unsigned numLevels = source.readVLE();
+    unsigned numLevels = source.readUInt();
     resize(box, numLevels);
 }
 

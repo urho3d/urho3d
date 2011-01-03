@@ -63,7 +63,7 @@ void Skeleton::load(Deserializer& source)
         newBone->reset();
         
         // Read bone collision data
-        unsigned collisionMask = source.readUInt();
+        unsigned char collisionMask = source.readUByte();
         if (collisionMask & BONECOLLISION_SPHERE)
             newBone->setRadius(source.readFloat());
         if (collisionMask & BONECOLLISION_BOX)

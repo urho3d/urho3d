@@ -121,7 +121,7 @@ private:
     //! Bind inverse matrix
     Matrix4x3 mBindInverseTransform;
     //! Supported collision types
-    unsigned mCollisionMask;
+    unsigned char mCollisionMask;
     //! Radius
     float mRadius;
     //! Bounding box

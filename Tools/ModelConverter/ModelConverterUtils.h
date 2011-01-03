@@ -49,7 +49,7 @@ struct ModelBone
     Vector3 mDerivedScale;
     Matrix4x3 mWorldTransform;
     Matrix4x3 mInverseWorldTransform;
-    unsigned mCollisionMask;
+    unsigned char mCollisionMask;
     float mRadius;
     BoundingBox mBoundingBox;
 };
