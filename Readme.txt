@@ -54,10 +54,10 @@ Documentation
 For documentation, see the Urho3D wiki:
 http://code.google.com/p/urho3d/wiki/Urho3D
 
-Urho3D classes have also been sparsely documented using Doxygen notation. Use 
-the Doxyfile in the root directory to build the documentation, which will be 
-created into the "Docs" subdirectory. Doxygen is available at:
-http://www.doxygen.org/
+Urho3D classes have also been sparsely documented using Doxygen notation. To
+generate documentation into the "Docs" subdirectory, open the Doxyfile in the
+root directory with doxywizard and click "Run doxygen" from the "Run" tab. 
+Get Doxygen from http://www.doxygen.org
 
 
 Building

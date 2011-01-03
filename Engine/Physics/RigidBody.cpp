@@ -800,6 +800,8 @@ bool RigidBody::isActive() const
 
 void RigidBody::drawDebugGeometry(DebugRenderer* debug)
 {
+    //_controlfp( _PC_24, MCW_PC );
+
     Color color;
     if (!isActive())
         color = Color(0.0f, 1.0f, 0.0f);
@@ -860,6 +862,7 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                 for (unsigned i = 0; i < 360; i += 45)
                 {
                     unsigned j = i + 45;
+                    
                     float a = radius * sinf(i * M_DEGTORAD);
                     float b = radius * cosf(i * M_DEGTORAD);
                     float c = radius * sinf(j * M_DEGTORAD);
@@ -878,7 +881,7 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                         end = transform * Vector3(a, b, -0.5f * length);
                         debug->addLine(start, end, color);
                     }
-                    if (b >= 0.0f)
+                    if (b > -M_EPSILON)
                     {
                         start = transform * Vector3(a, 0.0f, b + 0.5f * length);
                         end = transform * Vector3(c, 0.0f, d + 0.5f * length);

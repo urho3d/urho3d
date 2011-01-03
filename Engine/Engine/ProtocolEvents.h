@@ -30,8 +30,9 @@
 DEFINE_EVENT(EVENT_CLIENTIDENTITY, ClientIdentity)
 {
     EVENT_PARAM(P_CONNECTION, Connection);      // Connection pointer
-    EVENT_PARAM(P_PACKET, Packet);              // Buffer
-    EVENT_PARAM(P_AUTHORIZE, Authorize);        // bool
+    EVENT_PARAM(P_USERNAME, UserName);          // string
+    EVENT_PARAM(P_AUTHORIZE, Authorize);        // bool (set false to deny access)
+    // Extra login data may exist if sent by the client
 }
 
 //! (Server) Client has joined a scene

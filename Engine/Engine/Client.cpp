@@ -94,7 +94,7 @@ void Client::setMaxPredictionTime(float time)
     mMaxPredictionTime = max(time, 0.0f);
 }
 
-bool Client::connect(const std::string& address, unsigned short port, const std::string& userName)
+bool Client::connect(const std::string& address, unsigned short port, const std::string& userName, const VariantMap& loginData)
 {
     disconnect();
     
@@ -105,6 +105,7 @@ bool Client::connect(const std::string& address, unsigned short port, const std:
     mServerConnection = new Connection(peer);
     mFrameNumber = 1;
     mPendingUserName = userName;
+    mPendingLoginData = loginData;
     return true;
 }
 
@@ -325,6 +326,7 @@ void Client::handleChallenge(VectorBuffer& packet)
     replyPacket.writeUByte(MSG_IDENTITY);
     replyPacket.writeUInt(mServerConnection->getResponse());
     replyPacket.writeString(mPendingUserName);
+    replyPacket.writeVariantMap(mPendingLoginData);
     mServerConnection->sendReliable(replyPacket);
     mServerConnection->updateResponse();
 }

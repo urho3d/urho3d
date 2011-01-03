@@ -131,7 +131,8 @@ public:
     //! Set maximum amount of client-side prediction
     void setMaxPredictionTime(float time);
     //! Connect to a server
-    bool connect(const std::string& address, unsigned short port, const std::string& userName = std::string());
+    bool connect(const std::string& address, unsigned short port, const std::string& userName = std::string(), const VariantMap&
+        loginData = VariantMap());
     //! Disconnect from a server
     void disconnect();
     //! Set client controls to be sent over the network
@@ -237,6 +238,8 @@ private:
     std::set<std::string> mPendingDownloads;
     //! Username to send to the server
     std::string mPendingUserName;
+    //! Extra login data to send to the server
+    VariantMap mPendingLoginData;
 };
 
 //! Return Client instance

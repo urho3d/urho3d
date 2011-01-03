@@ -50,16 +50,16 @@ public:
     //! Load resource
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
-    //! Query for a function by declaration and execute if found
-    bool execute(const std::string& declaration, asIScriptContext* context, const std::vector<Variant>& parameters = std::vector<Variant>());
-    //! Execute a function
-    bool execute(asIScriptFunction* function, asIScriptContext* context, const std::vector<Variant>& parameters = std::vector<Variant>());
-    //! Query for an object method by declaration and execute if found
-    bool execute(asIScriptObject* object, const std::string& declaration, asIScriptContext* context, const std::vector<Variant>& parameters = std::vector<Variant>());
-    //! Execute an object method
-    bool execute(asIScriptObject* object, asIScriptFunction* method, asIScriptContext* context, const std::vector<Variant>& parameters = std::vector<Variant>());
-    //! Create a script object
-    asIScriptObject* createObject(const std::string& className, asIScriptContext* context);
+    //! Query for a function by declaration and execute if found. If context is null, use the immediate context
+    bool execute(const std::string& declaration, asIScriptContext* context = 0, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Execute a function. If context is null, use the immediate context
+    bool execute(asIScriptFunction* function, asIScriptContext* context = 0, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Query for an object method by declaration and execute if found. If context is null, use the immediate context
+    bool execute(asIScriptObject* object, const std::string& declaration, asIScriptContext* context = 0, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Execute an object method. If context is null, use the immediate context
+    bool execute(asIScriptObject* object, asIScriptFunction* method, asIScriptContext* context = 0, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Create a script object. If context is null, use the immediate context
+    asIScriptObject* createObject(const std::string& className, asIScriptContext* context = 0);
     
     //! Return script engine
     ScriptEngine* getScriptEngine() const { return mScriptEngine; }

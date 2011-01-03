@@ -50,6 +50,8 @@ Connection::Connection(Peer* peer) :
     mJoinState(JS_NOTINSCENE),
     mPosition(Vector3::sZero)
 {
+    if (!peer)
+        EXCEPTION("Null networking peer");
 }
 
 Connection::~Connection()
@@ -81,15 +83,13 @@ bool Connection::receiveUnreliable(VectorBuffer& packet)
 void Connection::disconnect()
 {
     leftScene();
-    if (mPeer)
-        mPeer->disconnect();
+    mPeer->disconnect();
 }
 
 void Connection::forceDisconnect()
 {
     leftScene();
-    if (mPeer)
-        mPeer->forceDisconnect();
+    mPeer->forceDisconnect();
 }
 
 void Connection::setUserName(const std::string& userName)
@@ -299,19 +299,17 @@ bool Connection::isConnected() const
 
 void Connection::send(const VectorBuffer& packet, bool reliable)
 {
-    if ((packet.getSize()) && (mPeer) && (mPeer->getConnectionState() == CS_CONNECTED))
+    if ((packet.getSize()) && (mPeer->getConnectionState() == CS_CONNECTED))
         mPeer->send(packet, reliable ? CHN_RELIABLE : CHN_UNRELIABLE, reliable);
 }
 
 bool Connection::receive(VectorBuffer& packet, bool reliable)
 {
-    if (mPeer)
+    if (mPeer->getConnectionState() == CS_CONNECTED)
+        return mPeer->receive(packet, reliable ? CHN_RELIABLE : CHN_UNRELIABLE);
+    else
     {
-        if (mPeer->getConnectionState() == CS_CONNECTED)
-            return mPeer->receive(packet, reliable ? CHN_RELIABLE : CHN_UNRELIABLE);
-        else
-            mPeer->flushPackets();
+        mPeer->flushPackets();
+        return false;
     }
-    
-    return false;
 }

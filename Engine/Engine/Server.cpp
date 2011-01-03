@@ -367,6 +367,7 @@ bool Server::handleIdentity(Connection* connection, VectorBuffer& packet)
 {
     // Set initial username
     std::string userName = packet.readString();
+    VariantMap loginData = packet.readVariantMap();
     if (userName.empty())
         userName = "user" + toString(random(999));
     connection->setUserName(userName);
@@ -374,15 +375,18 @@ bool Server::handleIdentity(Connection* connection, VectorBuffer& packet)
     // Send identity event and check if any event handler denies access
     using namespace ClientIdentity;
     
-    VariantMap eventData;
+    // Initialize eventdata with the logindata received
+    VariantMap eventData = loginData;
     eventData[P_CONNECTION] = (void*)connection;
-    eventData[P_PACKET] = packet.getBuffer();
+    eventData[P_USERNAME] = userName;
     eventData[P_AUTHORIZE] = true;
     sendEvent(EVENT_CLIENTIDENTITY, eventData);
     
     if (!eventData[P_AUTHORIZE].getBool())
     {
-        disconnect(connection, false, "Disconnecting unauthorized client");
+        Peer* peer = connection->getPeer();
+        disconnect(connection, false, "Disconnecting unauthorized client from " + peer->getAddress() + ":" +
+            toString(peer->getPort()));
         return false;
     }
     

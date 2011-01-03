@@ -99,8 +99,11 @@ bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context,
 {
     PROFILE(Script_Execute);
     
-    if ((!mCompiled) || (!context) || (!function))
+    if ((!mCompiled) || (!function))
         return false;
+    
+    if (!context)
+        context = mScriptEngine->getImmediateContext();
     
     if (context->GetState() != asEXECUTION_ACTIVE)
     {
@@ -156,8 +159,11 @@ bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, asI
 {
     PROFILE(Script_Execute);
     
-    if ((!mCompiled) || (!context) || (!object) || (!method))
+    if ((!mCompiled) || (!object) || (!method))
         return false;
+    
+    if (!context)
+        context = mScriptEngine->getImmediateContext();
     
     if (context->GetState() != asEXECUTION_ACTIVE)
     {
@@ -202,8 +208,11 @@ asIScriptObject* ScriptFile::createObject(const std::string& className, asIScrip
 {
     PROFILE(Script_CreateObject);
     
-    if ((!isCompiled()) || (!context))
+    if (!isCompiled())
         return 0;
+    
+    if (!context)
+        context = mScriptEngine->getImmediateContext();
     
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     asIObjectType *type = engine->GetObjectTypeById(mScriptModule->GetTypeIdByDecl(className.c_str()));

@@ -155,6 +155,21 @@ static void DestructSceneInfo(SceneInfo* ptr)
     ptr->~SceneInfo();
 }
 
+static bool ClientConnectAddress(const std::string& address, unsigned short port, Client* ptr)
+{
+    return ptr->connect(address, port);
+}
+
+static bool ClientConnectAddressUserName(const std::string& address, unsigned short port, const std::string& userName, Client* ptr)
+{
+    return ptr->connect(address, port, userName);
+}
+
+static bool IsClient()
+{
+    return getClient() != 0;
+}
+
 static void registerClient(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("SceneInfo", sizeof(SceneInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
@@ -172,7 +187,9 @@ static void registerClient(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Client", asBEHAVE_RELEASE, "void f()", asMETHOD(Client, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "void setScene(Scene@+)", asMETHOD(Client, setScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "void setMaxPredictionTime(float)", asMETHOD(Client, setMaxPredictionTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Client", "bool connect(const string& in, uint16, const string& in)", asMETHOD(Client, connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Client", "bool connect(const string& in, uint16)", asFUNCTION(ClientConnectAddress), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Client", "bool connect(const string& in, uint16, const string& in)", asFUNCTION(ClientConnectAddressUserName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Client", "bool connect(const string& in, uint16, const string& in, const VariantMap& in)", asMETHOD(Client, connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "void disconnect()", asMETHOD(Client, disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "void setControls(const Controls& in)", asMETHOD(Client, setControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "void setPosition(const Vector3& in)", asMETHOD(Client, setPosition), asCALL_THISCALL);
@@ -190,6 +207,7 @@ static void registerClient(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Client", "string getFileTransferStatus() const", asMETHOD(Client, getFileTransferStatus), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "const SceneInfo& getSceneInfo() const", asMETHOD(Client, getSceneInfo), asCALL_THISCALL);
     
+    engine->RegisterGlobalFunction("bool isClient()", asFUNCTION(IsClient), asCALL_CDECL);
     engine->RegisterGlobalFunction("Client@+ getClient()", asFUNCTION(getClient), asCALL_CDECL);
     engine->RegisterGlobalFunction("Client@+ get_client()", asFUNCTION(getClient), asCALL_CDECL);
 }
@@ -210,6 +228,11 @@ static CScriptArray* ServerGetConnections(Server* ptr)
     for (unsigned i = 0; i < connections.size(); ++i)
         result.push_back(connections[i]);
     return vectorToHandleArray<Connection*>(result, "array<Connection@>");
+}
+
+static bool IsServer()
+{
+    return getServer() != 0;
 }
 
 static void registerServer(asIScriptEngine* engine)
@@ -233,6 +256,7 @@ static void registerServer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Server", "array<Scene@>@ getScenes() const", asFUNCTION(ServerGetScenes), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "array<Connection@>@ getConnections() const", asFUNCTION(ServerGetConnections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "uint getNumUsersInScene(Scene@+) const", asMETHOD(Server, getNumUsersInScene), asCALL_THISCALL);
+    engine->RegisterGlobalFunction("bool isServer()", asFUNCTION(IsServer), asCALL_CDECL);
     engine->RegisterGlobalFunction("Server@+ getServer()", asFUNCTION(getServer), asCALL_CDECL);
     engine->RegisterGlobalFunction("Server@+ get_server()", asFUNCTION(getServer), asCALL_CDECL);
 }
