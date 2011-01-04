@@ -277,7 +277,7 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     mShadersDirty(true)
 {
     if (!mRenderer)
-        EXCEPTION("Null renderer");
+        EXCEPTION("Null renderer for Pipeline");
     
     LOGINFO("Rendering pipeline created");
     

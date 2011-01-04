@@ -72,7 +72,7 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget)
 {
     if ((!octree) || (!camera))
     {
-        LOGERROR("Null octree or camera");
+        LOGERROR("Null octree or camera for View");
         return;
     }
     

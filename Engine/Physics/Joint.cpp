@@ -49,7 +49,7 @@ Joint::Joint(PhysicsWorld* world, const std::string& name) :
     mNetDirty(false)
 {
     if (!mWorld)
-        EXCEPTION("Null physics world");
+        EXCEPTION("Null physics world for Joint");
 }
 
 Joint::~Joint()

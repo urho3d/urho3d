@@ -54,10 +54,10 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mMouseButtons(0)
 {
     if (!mRenderer)
-        EXCEPTION("Null renderer");
+        EXCEPTION("Null renderer for UI");
     
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        EXCEPTION("Null resource cache for UI");
     
     LOGINFO("UI created");
     

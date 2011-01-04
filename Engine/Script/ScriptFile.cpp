@@ -43,7 +43,7 @@ ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
     mCompiled(false)
 {
     if (!mScriptEngine)
-        EXCEPTION("Null script engine");
+        EXCEPTION("Null script engine for ScriptFile");
 }
 
 ScriptFile::~ScriptFile()

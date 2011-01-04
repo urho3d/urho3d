@@ -129,7 +129,7 @@ void VectorBuffer::setData(const std::vector<unsigned char>& data)
 void VectorBuffer::setData(const void* data, unsigned size)
 {
     if ((!data) && (size))
-        SAFE_EXCEPTION("Null data pointer");
+        SAFE_EXCEPTION("Null VectorBuffer source");
     
     mBuffer.resize(size);
     if (size)

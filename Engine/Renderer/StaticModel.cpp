@@ -305,7 +305,7 @@ bool StaticModel::setModel(Model* model)
     
     if (!model)
     {
-        LOGERROR("Null model");
+        LOGERROR("Null model for StaticModel");
         return false;
     }
     

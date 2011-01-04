@@ -107,7 +107,7 @@ void AnimationState::loadXML(const XMLElement& element)
 void AnimationState::setAnimation(Animation* animation)
 {
     if (!animation)
-        EXCEPTION("Null animation");
+        EXCEPTION("Null animation for AnimationState");
     
     mAnimation = animation;
     setStartBone(0);

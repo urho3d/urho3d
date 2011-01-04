@@ -182,14 +182,14 @@ void Variant::read(Deserializer& source)
         break;
         
     default:
-        SAFE_EXCEPTION("Unrecognized variant type " + ::toString((int)mType));
+        SAFE_EXCEPTION("Unrecognized Variant type " + ::toString((int)mType));
     }
 }
 
 void Variant::setBuffer(const void* data, unsigned size)
 {
     if ((size) && (!data))
-        EXCEPTION("Null data pointer");
+        EXCEPTION("Null Variant buffer source");
     
     mType = VAR_BUFFER;
     mValue.mBuffer.resize(size);

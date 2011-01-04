@@ -459,7 +459,7 @@ static void ConstructVectorBufferCopy(const VectorBuffer& buffer, VectorBuffer* 
 static void ConstructVectorBufferFromStream(Deserializer* src, unsigned size, VectorBuffer* ptr)
 {
     if (!src)
-        SAFE_EXCEPTION("Null source");
+        SAFE_EXCEPTION("Null VectorBuffer source");
     
     new(ptr) VectorBuffer(*src, size);
 }
@@ -472,7 +472,7 @@ static void DestructVectorBuffer(VectorBuffer* ptr)
 static void VectorBufferSetData(Deserializer* src, unsigned size, VectorBuffer* ptr)
 {
     if (!src)
-        SAFE_EXCEPTION("Null source");
+        SAFE_EXCEPTION("Null VectorBuffer source");
     
     ptr->setData(*src, size);
 }

@@ -120,7 +120,7 @@ void Texture2D::setSize(int width, int height, unsigned format)
 void Texture2D::load(SharedPtr<Image> image)
 {
     if (!image)
-        EXCEPTION("Null image");
+        EXCEPTION("Null image for Texture2D");
     
     unsigned memoryUse = 0;
     

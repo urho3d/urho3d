@@ -540,7 +540,7 @@ bool InstancedModel::setModel(Model* model)
     
     if (!model)
     {
-        LOGERROR("Null model");
+        LOGERROR("Null model for InstancedModel");
         return false;
     }
     

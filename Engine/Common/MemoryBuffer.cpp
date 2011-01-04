@@ -35,7 +35,7 @@ MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
     mReadOnly(false)
 {
     if ((size) && (!data))
-        EXCEPTION("Null memory buffer");
+        EXCEPTION("Null MemoryBuffer source");
 }
 
 MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
@@ -44,7 +44,7 @@ MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
     mReadOnly(true)
 {
     if ((size) && (!data))
-        EXCEPTION("Null memory buffer");
+        EXCEPTION("Null MemoryBuffer source");
 }
 
 void MemoryBuffer::read(void* dest, unsigned size)

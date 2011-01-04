@@ -65,7 +65,7 @@ ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& na
     mEnabled(true)
 {
     if (!mScriptEngine)
-        EXCEPTION("Null script engine");
+        EXCEPTION("Null script engine for ScriptInstance");
     
     mScriptContext = mScriptEngine->createScriptContext();
     if (!mScriptContext)

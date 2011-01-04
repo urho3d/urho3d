@@ -57,7 +57,7 @@ RigidBody::RigidBody(PhysicsWorld* world, const std::string& name) :
     mTempDisabled(false)
 {
     if (!mWorld)
-        EXCEPTION("Null physics world");
+        EXCEPTION("Null physics world for RigidBody");
     
     mWorld->addRigidBody(this);
 }

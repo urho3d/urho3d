@@ -120,7 +120,7 @@ void VertexShader::release()
 void VertexShader::loadParameters(ResourceCache* cache)
 {
     if (!cache)
-        EXCEPTION("Null resource cache");
+        EXCEPTION("Null resource cache for VertexShader");
     
     initializeParameters();
     

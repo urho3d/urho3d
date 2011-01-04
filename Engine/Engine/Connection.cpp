@@ -51,7 +51,7 @@ Connection::Connection(Peer* peer) :
     mPosition(Vector3::sZero)
 {
     if (!peer)
-        EXCEPTION("Null networking peer");
+        EXCEPTION("Null networking peer for Connection");
 }
 
 Connection::~Connection()

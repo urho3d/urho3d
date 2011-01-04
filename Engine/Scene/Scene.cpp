@@ -54,7 +54,7 @@ Scene::Scene(ResourceCache* cache, const std::string& name) :
     mAsyncLoading(false)
 {
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        EXCEPTION("Null resource cache for Scene");
     
     LOGINFO("Scene " + mName + " created");
 }
@@ -406,10 +406,7 @@ void Scene::restorePredictedEntities()
 void Scene::loadAsync(File* file)
 {
     if (!file)
-    {
-        LOGERROR("Null file");
-        return;
-    }
+        EXCEPTION("Null file for async scene loading");
     
     stopAsyncLoading();
     removeAllEntities();
@@ -431,10 +428,7 @@ void Scene::loadAsync(File* file)
 void Scene::loadAsyncXML(File* file)
 {
     if (!file)
-    {
-        LOGERROR("Null file");
-        return;
-    }
+        EXCEPTION("Null file for async XML scene loading");
     
     file->seek(0);
     SharedPtr<XMLFile> xml(new XMLFile());
@@ -571,7 +565,7 @@ void Scene::addEntity(Entity* entity)
 {
     if (!entity)
     {
-        LOGERROR("Null entity");
+        LOGERROR("Null entity for addEntity");
         return;
     }
     

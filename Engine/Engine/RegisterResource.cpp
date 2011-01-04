@@ -214,7 +214,7 @@ static XMLFile* ConstructXMLFile(const std::string& name)
 static void XMLFileLoad(File* file, XMLFile* ptr)
 {
     if (!file)
-        SAFE_EXCEPTION("Null file");
+        SAFE_EXCEPTION("Null XML file");
     try
     {
         ptr->load(*file);

@@ -57,10 +57,10 @@ Client::Client(Network* network, ResourceCache* cache, const std::string& downlo
     mDownloadDirectory(fixPath(downloadDirectory))
 {
     if (!mNetwork)
-        EXCEPTION("Null network");
+        EXCEPTION("Null network for Client");
     
    if (!mCache)
-        EXCEPTION("Null resource cache");
+        EXCEPTION("Null resource cache for Client");
     
     LOGINFO("Client created");
     

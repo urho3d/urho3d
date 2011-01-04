@@ -62,7 +62,7 @@ bool Text::setFont(Font* font, int size)
 {
     if (!font)
     {
-        LOGERROR("Null font");
+        LOGERROR("Null font for Text");
         return false;
     }
     

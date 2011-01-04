@@ -54,7 +54,7 @@ void getVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
-            EXCEPTION("Null geometry");
+            EXCEPTION("Null geometry for CollisionShape");
         
         destVertexCount += geom->getVertexCount();
         destIndexCount += geom->getIndexCount();
@@ -74,7 +74,7 @@ void getVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
-            EXCEPTION("Null geometry");
+            EXCEPTION("Null geometry for CollisionShape");
         
         const unsigned char* vertexData;
         const unsigned char* indexData;
@@ -83,7 +83,7 @@ void getVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         
         geom->lockRawData(vertexData, vertexSize, indexData, indexSize);
         if ((!vertexData) || (!indexData))
-            EXCEPTION("Raw geometry data unavailable");
+            EXCEPTION("Raw geometry data unavailable for CollisionShape");
         
         unsigned vertexStart = geom->getVertexStart();
         unsigned vertexCount = geom->getVertexCount();
@@ -138,7 +138,7 @@ TriangleMeshData::TriangleMeshData(const Model* model, bool makeConvexHull, floa
     mIndexCount(0)
 {
     if (!model)
-        EXCEPTION("Null model");
+        EXCEPTION("Null model for TriangleMeshData");
     
     if (!makeConvexHull)
     {
@@ -191,7 +191,7 @@ TriangleMeshData::TriangleMeshData(const TriangleMeshData* source, const Vector3
     mTriMesh(0)
 {
     if (!source)
-        EXCEPTION("Null source");
+        EXCEPTION("Null TriangleMeshData source");
     
     mID = source->mID + toString(scale);
     
@@ -227,21 +227,21 @@ HeightfieldData::HeightfieldData(const Model* model, unsigned xPoints, unsigned 
     mThickness(thickness)
 {
     if (!model)
-        EXCEPTION("Null model");
+        EXCEPTION("Null model for HeightfieldData");
     
     mID = model->getName() + toString(mThickness) + toString(lodLevel);
     
     const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->getGeometries();
     
     if (!geometries.size())
-        EXCEPTION("Model has no geometries");
+        EXCEPTION("No geometries for HeightfieldData");
     
     if (lodLevel >= geometries[0].size())
         lodLevel = geometries[0].size() / 2;
     
     Geometry* geom = geometries[0][lodLevel];
     if (!geom)
-        EXCEPTION("Null collision geometry");
+        EXCEPTION("Null geometry for HeightfieldData");
     
     const unsigned char* vertexData;
     const unsigned char* indexData;
@@ -305,7 +305,7 @@ HeightfieldData::HeightfieldData(const HeightfieldData* source, const Vector3& s
     mHeightfield(0)
 {
     if (!source)
-        EXCEPTION("Null source");
+        EXCEPTION("Null HeightfieldData source");
     
     mID = source->mID + toString(scale);
     
@@ -491,7 +491,7 @@ void CollisionShape::addTriangleMesh(const Model* model, unsigned lodLevel, cons
     PROFILE(Physics_AddTriangleMesh);
     
     if (!model)
-        EXCEPTION("Null model");
+        EXCEPTION("Null model for addTriangleMesh");
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_TRIANGLEMESH;
@@ -520,7 +520,7 @@ void CollisionShape::addHeightfield(const Model* model, unsigned xPoints, unsign
     PROFILE(Physics_AddTriangleMesh);
     
     if (!model)
-        EXCEPTION("Null model");
+        EXCEPTION("Null model for addHeightField");
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_HEIGHTFIELD;
@@ -549,7 +549,7 @@ void CollisionShape::addConvexHull(const Model* model, float skinWidth, unsigned
     PROFILE(Physics_AddConvexHull);
     
     if (!model)
-        EXCEPTION("Null model");
+        EXCEPTION("Null model for addConvexHull");
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_TRIANGLEMESH;

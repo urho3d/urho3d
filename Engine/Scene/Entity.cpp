@@ -375,7 +375,7 @@ void Entity::addComponent(Component* component)
 {
     if (!component)
     {
-        LOGERROR("Null component");
+        LOGERROR("Null component for addComponent");
         return;
     }
     

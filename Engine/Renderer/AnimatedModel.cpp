@@ -610,7 +610,7 @@ bool AnimatedModel::setModel(Model* model)
     
     if (!model)
     {
-        LOGERROR("Null model");
+        LOGERROR("Null model for AnimatedModel");
         return false;
     }
     

@@ -51,7 +51,7 @@ Server::Server(Network* network) :
     mStayRelevantTime(30)
 {
     if (!mNetwork)
-        EXCEPTION("Null network");
+        EXCEPTION("Null network for Server");
     
     LOGINFO("Server created");
     

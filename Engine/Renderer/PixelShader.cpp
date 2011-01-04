@@ -121,7 +121,7 @@ void PixelShader::clearLastParameterSources()
 void PixelShader::loadParameters(ResourceCache* cache)
 {
     if (!cache)
-        EXCEPTION("Null resource cache");
+        EXCEPTION("Null resource cache for PixelShader");
     
     initializeParameters();
     
