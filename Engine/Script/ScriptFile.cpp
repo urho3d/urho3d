@@ -33,13 +33,15 @@
 
 #include "DebugNew.h"
 
-static const int MAX_NESTING_LEVEL = 100;
+static const int MAX_NESTING_LEVEL = 32;
 static int executeNestingLevel = 0;
+ScriptFile* lastScriptFile = 0;
 
 ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
     Resource(name),
     mScriptEngine(scriptEngine),
     mScriptModule(0),
+    mScriptContext(0),
     mCompiled(false)
 {
     if (!mScriptEngine)
@@ -54,6 +56,13 @@ ScriptFile::~ScriptFile()
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
     }
+    if (mScriptContext)
+    {
+        mScriptContext->Release();
+        mScriptContext = 0;
+    }
+    if (lastScriptFile == this)
+        lastScriptFile = 0;
 }
 
 void ScriptFile::load(Deserializer& source, ResourceCache* cache)
@@ -65,11 +74,13 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     source.read((void*)buffer.getPtr(), dataSize);
     
     // Discard the previous module if there was one
-    setMemoryUse(0);
     mCompiled = false;
+    setMemoryUse(0);
+    removeAllEventHandlers();
+    
+    // Create the module
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     mScriptModule = engine->GetModule(getName().c_str(), asGM_ALWAYS_CREATE);
-    
     if (!mScriptModule)
         EXCEPTION("Failed to create script module " + getName());
     if (mScriptModule->AddScriptSection(getName().c_str(), (const char*)buffer.getPtr(), dataSize) < 0)
@@ -81,6 +92,27 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     
     setMemoryUse(dataSize);
     mCompiled = true;
+}
+
+void ScriptFile::addEventHandler(StringHash eventType, const std::string& handlerName)
+{
+    if (!mCompiled)
+        return;
+    
+    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    asIScriptFunction* function = getFunction(declaration);
+    if (!function)
+    {
+        LOGERROR("Event handler function " + declaration + " not found in " + getName());
+        return;
+    }
+    
+    subscribeToEvent(eventType, EVENT_HANDLER(ScriptFile, handleScriptEvent));
+    mEventHandlers[eventType] = function;
+    
+    // Create a context for script event handling if does not exist already
+    if (!mScriptContext)
+        mScriptContext = mScriptEngine->createScriptContext();
 }
 
 bool ScriptFile::execute(const std::string& declaration, asIScriptContext* context, const std::vector<Variant>& parameters)
@@ -260,6 +292,8 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
 
 void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters)
 {
+    lastScriptFile = this;
+    
     unsigned paramCount = function->GetParamCount();
     for (unsigned i = 0; (i < parameters.size()) && (i < paramCount); ++i)
     {
@@ -318,4 +352,24 @@ void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* fun
             break;
         }
     }
+}
+
+void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
+{
+    if (!mCompiled)
+        return;
+    
+    std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.find(eventType);
+    if (i == mEventHandlers.end())
+        return;
+    
+    std::vector<Variant> parameters;
+    parameters.push_back(Variant((void*)&eventType));
+    parameters.push_back(Variant((void*)&eventData));
+    execute(i->second, mScriptContext, parameters);
+}
+
+ScriptFile* getLastScriptFile()
+{
+    return lastScriptFile;
 }

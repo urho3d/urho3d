@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "ScriptFile.h"
 #include "ScriptInstance.h"
 
 #include <angelscript.h>
@@ -35,23 +36,44 @@ void SendEvent(const std::string& eventType, VariantMap& parameters)
 
 void SubscribeToEvent(const std::string& eventType, const std::string& handlerName)
 {
+    // Try to subscribe to an instance event first, then to a script file event if not found
     ScriptInstance* instance = getScriptContextComponent();
     if (instance)
         instance->addEventHandler(StringHash(eventType), handlerName);
+    else
+    {
+        ScriptFile* file = getLastScriptFile();
+        if (file)
+            file->addEventHandler(StringHash(eventType), handlerName);
+    }
 }
 
 void UnsubscribeFromEvent(const std::string& eventType)
 {
+    // Try to unsubscribe from an instance event first, then from a script file event if not found
     ScriptInstance* instance = getScriptContextComponent();
     if (instance)
         instance->removeEventHandler(StringHash(eventType));
+    else
+    {
+        ScriptFile* file = getLastScriptFile();
+        if (file)
+            file->removeEventHandler(StringHash(eventType));
+    }
 }
 
 void UnsubscribeFromAllEvents()
 {
+    // Try to unsubscribe from instance events first, then from script file events if not found
     ScriptInstance* instance = getScriptContextComponent();
     if (instance)
         instance->removeAllEventHandlers();
+    else
+    {
+        ScriptFile* file = getLastScriptFile();
+        if (file)
+            file->removeAllEventHandlers();
+    }
 }
 
 void registerEventLibrary(asIScriptEngine* engine)

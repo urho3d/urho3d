@@ -25,6 +25,7 @@
 #define SCRIPT_SCRIPTFILE_H
 
 #include "Resource.h"
+#include "ScriptEventListener.h"
 #include "SharedPtr.h"
 #include "Variant.h"
 
@@ -32,12 +33,13 @@
 
 class ScriptEngine;
 class Variant;
-class asIScriptModule;
+class asIScriptContext;
 class asIScriptFunction;
+class asIScriptModule;
 class asIScriptObject;
 
 //! A script file resource
-class ScriptFile : public Resource
+class ScriptFile : public Resource, public ScriptEventListener
 {
     DEFINE_TYPE(ScriptFile);
     
@@ -49,6 +51,8 @@ public:
     
     //! Load resource
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    //! Add an event handler. Called by script exposed subscribeToEvent() function
+    virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     
     //! Query for a function by declaration and execute if found. If context is null, use the immediate context
     bool execute(const std::string& declaration, asIScriptContext* context = 0, const std::vector<Variant>& parameters = std::vector<Variant>());
@@ -75,13 +79,20 @@ public:
 private:
     //! Set parameters for a function or method
     void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
+    //! Handle an event with a handler in script
+    void handleScriptEvent(StringHash eventType, VariantMap& eventData);
     
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;
     //! Script module
     asIScriptModule* mScriptModule;
+    //! Event handler script context
+    asIScriptContext* mScriptContext;
     //! Compiled flag
     bool mCompiled;
 };
+
+//! Get last script file that is executing or has executed script code
+ScriptFile* getLastScriptFile();
 
 #endif // SCRIPT_SCRIPTFILE_H

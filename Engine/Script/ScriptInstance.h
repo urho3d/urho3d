@@ -27,6 +27,7 @@
 #include "Component.h"
 #include "EventListener.h"
 #include "Quaternion.h"
+#include "ScriptEventListener.h"
 #include "SharedPtr.h"
 
 class Entity;
@@ -61,7 +62,7 @@ enum ScriptInstanceMethod
 };
 
 //! A scripted component
-class ScriptInstance : public Component, public EventListener
+class ScriptInstance : public Component, public ScriptEventListener
 {
     DEFINE_TYPE(ScriptInstance);
     
@@ -91,6 +92,8 @@ public:
     virtual void interpolate(bool snapToEnd);
     //! Return component references
     virtual void getComponentRefs(std::vector<ComponentRef>& dest);
+    //! Add an event handler. Called by script exposed subscribeToEvent() function
+    virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     
     //! Set script file and class
     bool setScriptClass(ScriptFile* scriptFile, const std::string& className);
@@ -116,13 +119,6 @@ public:
     bool isRunning() const { return mScriptObject != 0; }
     //! Return whether scripted updates and event handlers are enabled
     bool isEnabled() const { return mEnabled; }
-    
-    //! Add an event handler. Called by script exposed subscribeToEvent() function
-    void addEventHandler(StringHash eventType, const std::string& handlerName);
-    //! Remove an event handler. Called by script exposed unsubcribeFromEvent() function
-    void removeEventHandler(StringHash eventType);
-    //! Remove all event handlers. Called by script exposed unsubscribeFromAllEvent() function
-    void removeAllEventHandlers();
     
 private:
     //! Release object
@@ -154,8 +150,7 @@ private:
     std::string mClassName;
     //! Pointers to supported inbuilt methods
     asIScriptFunction* mMethods[MAX_SCRIPT_METHODS];
-    //! Pointers to event handler methods
-    std::map<StringHash, asIScriptFunction*> mEventHandlers;
+
     //! Enabled flag
     bool mEnabled;
 };

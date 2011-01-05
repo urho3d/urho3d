@@ -341,23 +341,6 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
     mEventHandlers[eventType] = method;
 }
 
-void ScriptInstance::removeEventHandler(StringHash eventType)
-{
-    std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.find(eventType);
-    if (i != mEventHandlers.end())
-    {
-        unsubscribeFromEvent(eventType);
-        mEventHandlers.erase(i);
-    }
-}
-
-void ScriptInstance::removeAllEventHandlers()
-{
-    for (std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.begin(); i != mEventHandlers.end(); ++i)
-        unsubscribeFromEvent(i->first);
-    mEventHandlers.clear();
-}
-
 void ScriptInstance::releaseObject()
 {
     if (mScriptObject)
