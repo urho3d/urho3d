@@ -533,7 +533,8 @@ void Engine::update(float timeStep, Scene* scene, Camera* camera, bool updateSce
     // Rendering and debug geometry update
     if (mPipeline)
     {
-        if ((sceneWeak) && (cameraWeak))
+        // Do not render if the scene is loading asynchronously, and thus incomplete
+        if ((sceneWeak) && (cameraWeak) && (!sceneWeak->isAsyncLoading()))
         {
             mPipeline->update(timeStep, scene->getExtension<Octree>(), camera);
             

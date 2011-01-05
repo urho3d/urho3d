@@ -106,12 +106,9 @@ void Connection::setScene(Scene* scene)
     mScene = scene;
     mJoinState = JS_PREPARESCENE;
     
-    // Client: set the proxy flag to the scene and remove all entities
+    // Client: set the proxy flag to the scene
     if (mPeer->getType() == PEER_SERVER)
-    {
         mScene->setNetFlags(NET_PROXY);
-        mScene->removeAllEntities();
-    }
 }
 
 void Connection::joinedScene()

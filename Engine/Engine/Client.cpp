@@ -38,6 +38,7 @@
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "StringUtils.h"
 
 #include "DebugNew.h"
@@ -67,6 +68,7 @@ Client::Client(Network* network, ResourceCache* cache, const std::string& downlo
     subscribeToEvent(EVENT_PEERDISCONNECTED, EVENT_HANDLER(Client, handlePeerDisconnected));
     subscribeToEvent(EVENT_FILETRANSFERCOMPLETED, EVENT_HANDLER(Client, handleFileTransferCompleted));
     subscribeToEvent(EVENT_FILETRANSFERFAILED, EVENT_HANDLER(Client, handleFileTransferFailed));
+    subscribeToEvent(EVENT_ASYNCLOADFINISHED, EVENT_HANDLER(Client, handleAsyncLoadFinished));
 }
 
 Client::~Client()
@@ -86,6 +88,12 @@ void Client::setMaxPredictionTime(float time)
 
 bool Client::connect(const std::string& address, unsigned short port, const std::string& userName, const VariantMap& loginData)
 {
+    if (!mScene)
+        return false;
+    
+    // Make sure any previous async loading is stopped
+    mScene->stopAsyncLoading();
+    
     disconnect();
     
     Peer* peer = mNetwork->connect(address, port);
@@ -106,6 +114,10 @@ void Client::disconnect()
         mServerConnection->disconnect();
         mServerConnection.reset();
     }
+    
+    // Stop async loading if was in progress
+    if (!mScene)
+        mScene->stopAsyncLoading();
     
     mPendingDownloads.clear();
     mFileTransfers.clear();
@@ -249,7 +261,7 @@ void Client::handleFileTransferCompleted(StringHash eventType, VariantMap& event
         
         // If this was the last required download, can now join scene
         if ((mPendingDownloads.empty()) && (isJoinPending()))
-            setupSceneAndJoin();
+            setupScene();
     }
 }
 
@@ -260,6 +272,18 @@ void Client::handleFileTransferFailed(StringHash eventType, VariantMap& eventDat
     std::string fileName = eventData[P_FILENAME].getString();
     if (mPendingDownloads.find(fileName) != mPendingDownloads.end())
         joinFailed("Failed to transfer file " + fileName);
+}
+
+void Client::handleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
+{
+    if ((!mScene) || (!mServerConnection))
+        return;
+    
+    using namespace AsyncLoadFinished;
+    
+    // If it is the scene used for networking, send join packet now
+    if ((eventData[P_SCENE].getPtr() == (void*)mScene) && (mServerConnection->getJoinState() == JS_LOADSCENE))
+        sendJoinScene();
 }
 
 void Client::handleReliablePacket(VectorBuffer& packet)
@@ -326,7 +350,8 @@ void Client::handleSceneInfo(VectorBuffer& packet)
     if (!mScene)
         return;
     
-    // Empty the scene of any previous contents
+    // Stop all previous loading, associate the scene with the connection
+    mScene->stopAsyncLoading();
     mServerConnection->setScene(mScene);
     
     // Read scene name, number of users and update rate
@@ -354,7 +379,7 @@ void Client::handleSceneInfo(VectorBuffer& packet)
     
     // Check need for downloads: if none, can join immediately
     if (!checkPackages())
-        setupSceneAndJoin();
+        setupScene();
 }
 
 void Client::handleTransferData(VectorBuffer& packet)
@@ -814,19 +839,23 @@ bool Client::requestFile(const std::string& fileName, unsigned size, unsigned ch
     return true;
 }
 
-void Client::setupSceneAndJoin()
+void Client::setupScene()
 {
     mNetFps = mSceneInfo.mNetFps;
     mTimeAcc = 0.0f;
     
+    // Remove all previous content
+    mScene->removeAllEntities();
+    
     // Setup the scene according to the received properties
-    // If no filename, just empty the scene and setup octree/physics/interpolation
+    // If no filename, just setup octree/physics/interpolation
     if (mSceneInfo.mFileName.empty())
     {
         mSceneInfo.mSceneProperties.seek(0);
         mScene->setName(mSceneInfo.mName);
         mScene->removeAllEntities();
         mScene->loadProperties(mSceneInfo.mSceneProperties);
+        sendJoinScene();
     }
     else
     {
@@ -835,16 +864,22 @@ void Client::setupSceneAndJoin()
             SharedPtr<File> sceneFile = mCache->getFile(mSceneInfo.mFileName);
             // Support either binary or XML format scene
             if (getExtension(mSceneInfo.mFileName) == ".xml")
-                mScene->loadXML(*sceneFile);
+                mScene->loadAsyncXML(sceneFile);
             else
-                mScene->load(*sceneFile);
+                mScene->loadAsync(sceneFile);
+            mServerConnection->setJoinState(JS_LOADSCENE);
         }
         catch (...)
         {
             joinFailed("Failed to load scene " + mSceneInfo.mFileName);
-            return;
         }
     }
+}
+
+void Client::sendJoinScene()
+{
+    if ((!mScene) || (!mServerConnection))
+        return;
     
     VectorBuffer packet;
     packet.writeUByte(MSG_JOINSCENE);

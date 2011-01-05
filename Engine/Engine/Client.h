@@ -180,6 +180,8 @@ private:
     void handleFileTransferCompleted(StringHash eventType, VariantMap& eventData);
     //! Handle file transfer failed event
     void handleFileTransferFailed(StringHash eventType, VariantMap& eventData);
+    //! Handle async scene loading finished event
+    void handleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     //! Handle a reliable network packet
     void handleReliablePacket(VectorBuffer& packet);
     //! Handle a challenge packet
@@ -202,8 +204,10 @@ private:
     unsigned checkPackages();
     //! Begin a file download
     bool requestFile(const std::string& fileName, unsigned size, unsigned checksum);
-    //! Setup the client scene and join it
-    void setupSceneAndJoin();
+    //! Begin setup of the client scene
+    void setupScene();
+    //! Send join scene packet after scene setup is complete
+    void sendJoinScene();
     //! Send join failed event
     void joinFailed(const std::string& reason);
     //! Send a client update packet
