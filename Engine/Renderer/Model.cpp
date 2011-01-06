@@ -29,11 +29,34 @@
 #include "Model.h"
 #include "Profiler.h"
 #include "Renderer.h"
+#include "Serializer.h"
 #include "VertexBuffer.h"
 
 #include <cstring>
 
 #include "DebugNew.h"
+
+unsigned storeOrLookupVertexBuffer(VertexBuffer* buffer, std::vector<VertexBuffer*>& dest)
+{
+    for (unsigned i = 0; i < dest.size(); ++i)
+    {
+        if (dest[i] == buffer)
+            return i;
+    }
+    dest.push_back(buffer);
+    return dest.size() - 1;
+}
+
+unsigned storeOrLookupIndexBuffer(IndexBuffer* buffer, std::vector<IndexBuffer*>& dest)
+{
+    for (unsigned i = 0; i < dest.size(); ++i)
+    {
+        if (dest[i] == buffer)
+            return i;
+    }
+    dest.push_back(buffer);
+    return dest.size() - 1;
+}
 
 Model::Model(Renderer* renderer, const std::string& name) :
     Resource(name),
@@ -195,6 +218,109 @@ void Model::load(Deserializer& source, ResourceCache* cache)
     mCollisionLodLevel = source.readUInt();
     mRaycastLodLevel = source.readUInt();
     mOcclusionLodLevel = source.readUInt();
+}
+
+void Model::save(Serializer& dest)
+{
+    // Build lists of vertex and index buffers used by the geometries
+    std::vector<VertexBuffer*> vertexBuffers;
+    std::vector<IndexBuffer*> indexBuffers;
+    
+    for (unsigned i = 0; i < mGeometries.size(); ++i)
+    {
+        for (unsigned j = 0; j < mGeometries[i].size(); ++j)
+        {
+            storeOrLookupVertexBuffer(mGeometries[i][j]->getVertexBuffer(0), vertexBuffers);
+            storeOrLookupIndexBuffer(mGeometries[i][j]->getIndexBuffer(), indexBuffers);
+        }
+    }
+    
+    // Write vertex buffers
+    dest.writeUInt(vertexBuffers.size());
+    for (unsigned i = 0; i < vertexBuffers.size(); ++i)
+    {
+        VertexBuffer* buffer = vertexBuffers[i];
+        dest.writeUInt(buffer->getVertexCount());
+        dest.writeUInt(buffer->getElementMask());
+        dest.writeUInt(buffer->getMorphRangeStart());
+        dest.writeUInt(buffer->getMorphRangeCount());
+        void* data = buffer->lock(0, buffer->getVertexCount(), LOCK_READONLY);
+        dest.write(data, buffer->getVertexCount() * buffer->getVertexSize());
+        buffer->unlock();
+    }
+    // Write index buffers
+    dest.writeUInt(indexBuffers.size());
+    for (unsigned i = 0; i < indexBuffers.size(); ++i)
+    {
+        IndexBuffer* buffer = indexBuffers[i];
+        dest.writeUInt(buffer->getIndexCount());
+        dest.writeUInt(buffer->getIndexSize());
+        void* data = buffer->lock(0, buffer->getIndexCount(), LOCK_READONLY);
+        dest.write(data, buffer->getIndexCount() * buffer->getIndexSize());
+        buffer->unlock();
+    }
+    // Write geometries
+    dest.writeUInt(mGeometries.size());
+    for (unsigned i = 0; i < mGeometries.size(); ++i)
+    {
+        // Write bone mappings
+        dest.writeUInt(mGeometryBoneMappings[i].size());
+        for (unsigned j = 0; j < mGeometryBoneMappings[i].size(); ++j)
+            dest.writeUInt(mGeometryBoneMappings[i][j]);;
+        
+        // Write the LOD levels
+        dest.writeUInt(mGeometries[i].size());
+        for (unsigned j = 0; j < mGeometries[i].size(); ++j)
+        {
+            Geometry* geometry = mGeometries[i][j];
+            dest.writeFloat(geometry->getLodDistance());
+            dest.writeUInt(geometry->getPrimitiveType());
+            dest.writeUInt(storeOrLookupVertexBuffer(geometry->getVertexBuffer(0), vertexBuffers));
+            dest.writeUInt(storeOrLookupIndexBuffer(geometry->getIndexBuffer(), indexBuffers));
+            dest.writeUInt(geometry->getIndexStart());
+            dest.writeUInt(geometry->getIndexCount());
+        }
+    }
+    
+    // Write morphs
+    dest.writeUInt(mMorphs.size());
+    for (unsigned i = 0; i < mMorphs.size(); ++i)
+    {
+        dest.writeString(mMorphs[i].mName);
+        dest.writeUInt(mMorphs[i].mBuffers.size());
+        
+        // Write morph vertex buffers
+        for (std::map<unsigned int, VertexBufferMorph>::const_iterator j = mMorphs[i].mBuffers.begin();
+            j != mMorphs[i].mBuffers.end(); ++j)
+        {
+            dest.writeUInt(j->first);
+            dest.writeUInt(j->second.mElementMask);
+            dest.writeUInt(j->second.mVertexCount);
+            
+            // Base size: size of each vertex index
+            unsigned vertexSize = sizeof(unsigned);
+            // Add size of individual elements
+            if (j->second.mElementMask & MASK_POSITION)
+                vertexSize += sizeof(Vector3);
+            if (j->second.mElementMask & MASK_NORMAL)
+                vertexSize += sizeof(Vector3);
+            if (j->second.mElementMask & MASK_TANGENT)
+                vertexSize += sizeof(Vector3);
+            
+            dest.write(j->second.mMorphData.getPtr(), vertexSize * j->second.mVertexCount);
+        }
+    }
+    
+    // Write skeleton
+    mSkeleton.save(dest);
+    
+    // Write bounding box
+    dest.writeBoundingBox(mBoundingBox);
+    
+    // Write collision/raycast/occlusion LOD levels
+    dest.writeUInt(mCollisionLodLevel);
+    dest.writeUInt(mRaycastLodLevel);
+    dest.writeUInt(mOcclusionLodLevel);
 }
 
 void Model::setBoundingBox(const BoundingBox& box)

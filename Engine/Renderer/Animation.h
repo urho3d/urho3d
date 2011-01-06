@@ -78,6 +78,8 @@ public:
     
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    //! Save resource. Throw exception on error
+    virtual void save(Serializer& dest);
     
     //! Return animation name
     const std::string& getAnimationName() const { return mAnimationName; }

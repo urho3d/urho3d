@@ -29,6 +29,7 @@
 
 class Deserializer;
 class ResourceCache;
+class Serializer;
 
 //! Base class for resources
 class Resource : public HashedType
@@ -39,6 +40,8 @@ public:
     
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0) = 0;
+    //! Save resource. Throw exception if not supported or on error
+    virtual void save(Serializer& dest);
     
     //! Set memory use in bytes, possibly approximate
     void setMemoryUse(unsigned size);

@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Animation.h"
 #include "Deserializer.h"
+#include "Serializer.h"
 
 #include "DebugNew.h"
 
@@ -66,6 +67,7 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
     mTracks.resize(tracks);
     memoryUse += tracks * sizeof(AnimationTrack);
     
+    // Read tracks
     for (unsigned i = 0; i < tracks; ++i)
     {
         AnimationTrack& newTrack = mTracks[i];
@@ -77,6 +79,7 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
         newTrack.mKeyFrames.resize(keyFrames);
         memoryUse += keyFrames * sizeof(AnimationKeyFrame);
         
+        // Read keyframes of the track
         for (unsigned j = 0; j < keyFrames; ++j)
         {
             AnimationKeyFrame& newKeyFrame = newTrack.mKeyFrames[j];
@@ -91,6 +94,35 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
     }
     
     setMemoryUse(memoryUse);
+}
+
+void Animation::save(Serializer& dest)
+{
+    dest.writeString(mAnimationName);
+    dest.writeFloat(mLength);
+    
+    // Write tracks
+    dest.writeUInt(mTracks.size());
+    for (unsigned i = 0; i < mTracks.size(); ++i)
+    {
+        const AnimationTrack& track = mTracks[i];
+        dest.writeString(track.mName);
+        dest.writeUByte(track.mChannelMask);
+        dest.writeUInt(track.mKeyFrames.size());
+        
+        // Write keyframes of the track
+        for (unsigned j = 0; j < track.mKeyFrames.size(); ++j)
+        {
+            const AnimationKeyFrame& keyFrame = track.mKeyFrames[j];
+            dest.writeFloat(keyFrame.mTime);
+            if (track.mChannelMask & CHANNEL_POSITION)
+                dest.writeVector3(keyFrame.mPosition);
+            if (track.mChannelMask & CHANNEL_ROTATION)
+                dest.writeQuaternion(keyFrame.mRotation);
+            if (track.mChannelMask & CHANNEL_SCALE)
+                dest.writeVector3(keyFrame.mScale);
+        }
+    }
 }
 
 unsigned Animation::getNumTracks() const

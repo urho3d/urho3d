@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Exception.h"
 #include "Resource.h"
 
 Resource::Resource(const std::string& name) :
@@ -29,6 +30,11 @@ Resource::Resource(const std::string& name) :
     mNameHash(name),
     mMemoryUse(0)
 {
+}
+
+void Resource::save(Serializer& dest)
+{
+    EXCEPTION("Save not supported for " + getTypeName());
 }
 
 void Resource::setMemoryUse(unsigned size)

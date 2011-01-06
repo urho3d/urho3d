@@ -28,6 +28,7 @@
 
 class Deserializer;
 class ResourceCache;
+class Serializer;
 
 //! A hierarchical collection of bones
 class Skeleton
@@ -38,8 +39,10 @@ public:
     //! Destruct. Detach the root bone from its parent
     ~Skeleton();
     
-    //! Read from stream
+    //! Read from a stream
     void load(Deserializer& source);
+    //! Write to a stream
+    void save(Serializer& dest);
     //! Define from source bones
     void define(const std::vector<SharedPtr<Bone> >& srcBones);
     //! Reset all animated bones, or all bones if forced
@@ -57,6 +60,8 @@ public:
     Bone* getBone(const std::string& boneName) const;
     //! Return bone by name hash
     Bone* getBone(StringHash boneNameHash) const;
+    //! Return bone index from pointer, or 0xffffffff if not found
+    unsigned getBoneIndex(Bone* bone) const;
     //! Return whether bones have attached scene nodes
     bool hasAttachedNodes();
     

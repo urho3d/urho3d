@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Deserializer.h"
 #include "Profiler.h"
+#include "Serializer.h"
 #include "Skeleton.h"
 
 #include "DebugNew.h"
@@ -88,6 +89,37 @@ void Skeleton::load(Deserializer& source)
             
             mBones[parentBoneIndex]->addChild(mBones[i]);
         }
+    }
+}
+
+void Skeleton::save(Serializer& dest)
+{
+    dest.writeUInt(mBones.size());
+    for (unsigned i = 0; i < mBones.size(); ++i)
+    {
+        Bone* bone = mBones[i];
+        
+        // Bone name
+        dest.writeString(bone->getName());
+        
+        // Parent index, same as own if root bone
+        unsigned parentIndex = getBoneIndex(dynamic_cast<Bone*>(bone->getParent()));
+        if (parentIndex == M_MAX_UNSIGNED)
+            parentIndex = i;
+        dest.writeUInt(parentIndex);
+        
+        // Bind transform
+        dest.writeVector3(bone->getBindPosition());
+        dest.writeQuaternion(bone->getBindRotation());
+        dest.writeVector3(bone->getBindScale());
+        
+        // Collision info
+        unsigned char collisionMask = bone->getCollisionMask();
+        dest.writeUByte(collisionMask);
+        if (collisionMask & BONECOLLISION_SPHERE)
+            dest.writeFloat(bone->getRadius());
+        if (collisionMask & BONECOLLISION_BOX)
+            dest.writeBoundingBox(bone->getBoundingBox());
     }
 }
 
@@ -179,6 +211,16 @@ Bone* Skeleton::getBone(StringHash nameHash) const
     return 0;
 }
 
+unsigned Skeleton::getBoneIndex(Bone* bone) const
+{
+    for (unsigned i = 0; i < mBones.size(); ++i)
+    {
+        if (mBones[i] == bone)
+            return i;
+    }
+    return M_MAX_UNSIGNED;
+}
+
 bool Skeleton::hasAttachedNodes()
 {
     if ((mRootBone) && (mRootBone->areAttachedNodesDirty()))
@@ -207,7 +249,7 @@ bool Skeleton::hasAttachedNodes()
         
         mRootBone->clearAttachedNodesDirty();
     }
-
+    
     return mHasAttachedNodes;
 }
 
