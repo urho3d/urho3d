@@ -76,7 +76,7 @@ public:
     //! Destruct
     virtual ~Animation();
     
-    //! Load resources
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
     //! Return animation name

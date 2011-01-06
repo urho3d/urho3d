@@ -29,11 +29,13 @@
 #include "SharedPtr.h"
 #include "Variant.h"
 
+#include <set>
 #include <vector>
 
 class ScriptEngine;
 class Variant;
 class asIScriptContext;
+class asIScriptEngine;
 class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
@@ -49,9 +51,9 @@ public:
     //! Destruct
     virtual ~ScriptFile();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
-    //! Add an event handler. Called by script exposed subscribeToEvent() function
+    //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     
     //! Query for a function by declaration and execute if found. If context is null, use the immediate context
@@ -77,6 +79,8 @@ public:
     bool isCompiled() const { return mCompiled; }
     
 private:
+    //! Add a script section, checking for includes recursively
+    void addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache);
     //! Set parameters for a function or method
     void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
     //! Handle an event with a handler in script
@@ -90,6 +94,8 @@ private:
     asIScriptContext* mScriptContext;
     //! Compiled flag
     bool mCompiled;
+    //! Encountered include files during script file loading
+    std::set<std::string> mAllIncludeFiles;
 };
 
 //! Get last script file that is executing or has executed script code

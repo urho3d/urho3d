@@ -37,7 +37,7 @@ public:
     //! Construct with name
     Resource(const std::string& name);
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0) = 0;
     
     //! Set memory use in bytes, possibly approximate

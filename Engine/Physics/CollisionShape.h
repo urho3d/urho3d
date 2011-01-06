@@ -126,7 +126,7 @@ public:
     //! Destruct. Free subshapes and clean up unused data from the geometry data cache
     virtual ~CollisionShape();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
     //! Add a sphere subshape

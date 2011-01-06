@@ -40,16 +40,16 @@ public:
     //! Destruct
     virtual ~XMLFile();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    
     //! Save the XML document
     void save(const std::string& fileName);
-    
     //! Clear the document and create a root element
     XMLElement createRootElement(const std::string& name);
+    
     //! Return the root element
     XMLElement getRootElement(const std::string& name = std::string(), bool throwIfMissing = true) const;
-    
     //! Return the TinyXML document
     TiXmlDocument* getDocument() const { return mDocument; }
     

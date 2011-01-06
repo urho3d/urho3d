@@ -231,7 +231,7 @@ public:
     //! Destruct
     ~Material();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
     //! Set number of techniques

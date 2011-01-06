@@ -46,7 +46,7 @@ public:
     //! Destruct
     virtual ~VertexShader();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
     //! Return shader hash for state sorting

@@ -38,8 +38,9 @@ public:
     //! Destruct and free sound data
     virtual ~Sound();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    
     //! Load raw sound data
     void loadRaw(Deserializer& source);
     //! Load WAV format sound data

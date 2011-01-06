@@ -22,14 +22,17 @@
 //
 
 #include "Precompiled.h"
-#include "Deserializer.h"
+#include "File.h"
 #include "Log.h"
 #include "Profiler.h"
+#include "ResourceCache.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "SharedArrayPtr.h"
+#include "StringUtils.h"
 
 #include <angelscript.h>
+#include <cstring>
 
 #include "DebugNew.h"
 
@@ -69,12 +72,9 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
 {
     PROFILE(Script_Load);
     
-    unsigned dataSize = source.getSize();
-    SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
-    source.read((void*)buffer.getPtr(), dataSize);
-    
     // Discard the previous module if there was one
     mCompiled = false;
+    mAllIncludeFiles.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
     
@@ -83,14 +83,15 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     mScriptModule = engine->GetModule(getName().c_str(), asGM_ALWAYS_CREATE);
     if (!mScriptModule)
         EXCEPTION("Failed to create script module " + getName());
-    if (mScriptModule->AddScriptSection(getName().c_str(), (const char*)buffer.getPtr(), dataSize) < 0)
-        EXCEPTION("Failed to add script section for script module " + getName());
+    
+    // Add the initial section and check for includes
+    addScriptSection(engine, source, cache);
+    
+    // Compile
     if (mScriptModule->Build() < 0)
         EXCEPTION("Failed to build script module " + getName());
     
     LOGINFO("Compiled script module " + getName());
-    
-    setMemoryUse(dataSize);
     mCompiled = true;
 }
 
@@ -288,6 +289,116 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     
     int id = type->GetMethodIdByDecl(declaration.c_str());
     return mScriptModule->GetFunctionDescriptorById(id);
+}
+
+void ScriptFile::addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache)
+{
+    unsigned dataSize = source.getSize();
+    SharedArrayPtr<char> buffer(new char[dataSize]);
+    source.read((void*)buffer.getPtr(), dataSize);
+    
+    // Pre-parse for includes
+    // Adapted from Angelscript's scriptbuilder add-on
+    std::vector<std::string> includeFiles;
+    unsigned pos = 0;
+    while(pos < dataSize)
+    {
+        int len;
+        asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+        if ((t == asTC_COMMENT) || (t == asTC_WHITESPACE))
+        {
+            pos += len;
+            continue;
+        }
+        // Is this a preprocessor directive?
+        if (buffer[pos] == '#')
+        {
+            int start = pos++;
+            asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+            if (t == asTC_IDENTIFIER)
+            {
+                std::string token(&buffer[pos], len);
+                if (token == "include")
+                {
+                    pos += len;
+                    t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+                    if (t == asTC_WHITESPACE)
+                    {
+                        pos += len;
+                        t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
+                    }
+                    
+                    if ((t == asTC_VALUE) && (len > 2) && (buffer[pos] == '"'))
+                    {
+                        // Get the include file
+                        std::string includeFile(&buffer[pos+1], len - 2);
+                        pos += len;
+                        
+                        // If the file is not found as it is, add the path of current file
+                        if (!cache->exists(includeFile))
+                            includeFile = getPath(getName()) + includeFile;
+                        
+                        std::string includeFileLower = toLower(includeFile);
+                        
+                        // If not included yet, store it for later processing
+                        if (mAllIncludeFiles.find(includeFileLower) == mAllIncludeFiles.end())
+                        {
+                            mAllIncludeFiles.insert(includeFileLower);
+                            includeFiles.push_back(includeFile);
+                        }
+                        
+                        // Overwrite the include directive with space characters to avoid compiler error
+                        memset(&buffer[start], ' ', pos - start);
+                    }
+                }
+            }
+        }
+        // Don't search includes within statement blocks or between tokens in statements
+        else
+        {
+            int len;
+            // Skip until ; or { whichever comes first
+            while ((pos < dataSize) && (buffer[pos] != ';') && (buffer[pos] != '{' ))
+            {
+                engine->ParseToken(&buffer[pos], 0, &len);
+                pos += len;
+            }
+            // Skip entire statement block
+            if ((pos < dataSize) && (buffer[pos] == '{' ))
+            {
+                ++pos;
+                // Find the end of the statement block
+                int level = 1;
+                while ((level > 0) && (pos < dataSize))
+                {
+                    asETokenClass t = engine->ParseToken(&buffer[pos], 0, &len);
+                    if (t == asTC_KEYWORD)
+                    {
+                        if (buffer[pos] == '{')
+                            level++;
+                        else if(buffer[pos] == '}')
+                            level--;
+                    }
+                    pos += len;
+                }
+            }
+            else
+                ++pos;
+        }
+    }
+    
+    // Process includes first
+    for (unsigned i = 0; i < includeFiles.size(); ++i)
+    {
+        SharedPtr<File> file = cache->getFile(includeFiles[i]);
+        addScriptSection(engine, *file, cache);
+    }
+    
+    // Then add this section
+    if (mScriptModule->AddScriptSection(source.getName().c_str(), (const char*)buffer.getPtr(), dataSize) < 0)
+        EXCEPTION("Failed to add script section " + source.getName());
+    
+    setMemoryUse(getMemoryUse() + dataSize);
 }
 
 void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters)

@@ -41,7 +41,7 @@ public:
     //! Destruct
     virtual ~Texture2D();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     //! Release default pool resources
     virtual void onDeviceLost();

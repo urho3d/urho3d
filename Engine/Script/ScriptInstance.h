@@ -92,7 +92,7 @@ public:
     virtual void interpolate(bool snapToEnd);
     //! Return component references
     virtual void getComponentRefs(std::vector<ComponentRef>& dest);
-    //! Add an event handler. Called by script exposed subscribeToEvent() function
+    //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     
     //! Set script file and class

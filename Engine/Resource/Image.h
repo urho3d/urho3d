@@ -83,8 +83,9 @@ public:
     //! Destruct
     virtual ~Image();
     
-    //! Load resource
+    //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    
     //! Set size and number of color components
     void setSize(unsigned width, unsigned height, unsigned components);
     //! Set data

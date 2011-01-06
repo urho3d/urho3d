@@ -31,15 +31,15 @@ class asIScriptFunction;
 class ScriptEventListener : public EventListener
 {
 public:
-    //! Add an event handler. Called by script exposed subscribeToEvent() function
+    //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName) = 0;
-    //! Remove an event handler. Called by script exposed version of unsubcribeFromEvent() function
+    //! Remove an event handler. Called by script exposed version of unsubcribeFromEvent()
     void removeEventHandler(StringHash eventType);
-    //! Remove all event handlers. Called by script exposed version of unsubscribeFromAllEvent() function
+    //! Remove all event handlers. Called by script exposed version of unsubscribeFromAllEvents()
     void removeAllEventHandlers();
     
 protected:
-    //! Pointers to event handler methods
+    //! Pointers to event handler functions or methods
     std::map<StringHash, asIScriptFunction*> mEventHandlers;
 };
 
