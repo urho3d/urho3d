@@ -281,6 +281,8 @@ static Entity* SceneCreateEntityWithNameAndLocalFlag(const std::string& name, bo
 
 static void SceneSave(File* file, bool throwOnError, Scene* ptr)
 {
+    if (!file)
+        SAFE_EXCEPTION("Null scene destination file");
     try
     {
         ptr->save(*file, throwOnError);
@@ -293,6 +295,8 @@ static void SceneSave(File* file, bool throwOnError, Scene* ptr)
 
 static void SceneLoad(File* file, bool throwOnError, Scene* ptr)
 {
+    if (!file)
+        SAFE_EXCEPTION("Null scene source file");
     try
     {
         ptr->load(*file, throwOnError);
@@ -303,11 +307,13 @@ static void SceneLoad(File* file, bool throwOnError, Scene* ptr)
     }
 }
 
-static void SceneSaveXML(const std::string& fileName, bool throwOnError, Scene* ptr)
+static void SceneSaveXML(File* file, bool throwOnError, Scene* ptr)
 {
+    if (!file)
+        SAFE_EXCEPTION("Null scene destination XML file");
     try
     {
-        ptr->saveXML(fileName, throwOnError);
+        ptr->saveXML(*file, throwOnError);
     }
     catch (Exception& e)
     {
@@ -317,6 +323,8 @@ static void SceneSaveXML(const std::string& fileName, bool throwOnError, Scene* 
 
 static void SceneLoadXML(File* file, bool throwOnError, Scene* ptr)
 {
+    if (!file)
+        SAFE_EXCEPTION("Null scene source XML file");
     try
     {
         ptr->loadXML(*file, throwOnError);
@@ -389,7 +397,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Scene", asBEHAVE_RELEASE, "void f()", asMETHOD(Scene, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void save(File@+, bool)", asFUNCTION(SceneSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "void load(File@+, bool)", asFUNCTION(SceneLoad), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Scene", "void saveXML(const string& in, bool)", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "void saveXML(File@+, bool)", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "void loadXML(File@+, bool)", asFUNCTION(SceneLoadXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "void loadAsync(File@+)", asFUNCTION(SceneLoadAsync), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "void loadAsyncXML(File@+)", asFUNCTION(SceneLoadAsyncXML), asCALL_CDECL_OBJLAST);

@@ -72,6 +72,8 @@ public:
     
     //! Return shader parameter index by name
     static PSParameter getParameter(const std::string& name);
+    //! Return shader parameter name by index
+    static const std::string& getParameterName(PSParameter parameter);
     //! Clear remembered shader parameter sources
     static void clearLastParameterSources();
     

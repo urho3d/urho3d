@@ -42,9 +42,9 @@ public:
     
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    //! Save resource. Throw exception on error. Only supports saving to a File
+    virtual void save(Serializer& dest);
     
-    //! Save the XML document
-    void save(const std::string& fileName);
     //! Clear the document and create a root element
     XMLElement createRootElement(const std::string& name);
     

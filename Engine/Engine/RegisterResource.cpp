@@ -214,7 +214,7 @@ static XMLFile* ConstructXMLFile(const std::string& name)
 static void XMLFileLoad(File* file, XMLFile* ptr)
 {
     if (!file)
-        SAFE_EXCEPTION("Null XML file");
+        SAFE_EXCEPTION("Null XML file source");
     try
     {
         ptr->load(*file);
@@ -225,11 +225,25 @@ static void XMLFileLoad(File* file, XMLFile* ptr)
     }
 }
 
+static void XMLFileSave(File* file, XMLFile* ptr)
+{
+    if (!file)
+        SAFE_EXCEPTION("Null XML file for saving");
+    try
+    {
+        ptr->save(*file);
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW(e);
+    }
+}
+
 static void registerXMLFile(asIScriptEngine* engine)
 {
     registerResource<XMLFile>(engine, "XMLFile");
-    engine->RegisterObjectMethod("XMLFile", "void save(const string& in)", asMETHOD(XMLFile, save), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "void load(File@+)", asFUNCTION(XMLFileLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLFile", "void save(File@+)", asFUNCTION(XMLFileSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "XMLElement createRootElement(const string& in)", asMETHOD(XMLFile, createRootElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement getRootElement(const string& in, bool)", asMETHOD(XMLFile, getRootElement), asCALL_THISCALL);
     registerRefCasts<Resource, XMLFile>(engine, "Resource", "XMLFile");

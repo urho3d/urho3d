@@ -36,6 +36,60 @@
 
 #include "DebugNew.h"
 
+static const std::string passNames[] =
+{
+    "deferred",
+    "prepass",
+    "material",
+    "emissive",
+    "postopaque",
+    "ambient",
+    "negative",
+    "light",
+    "shadow"
+};
+
+static const std::string textureUnitNames[] =
+{
+    "diffuse",
+    "normal",
+    "specular",
+    "detail",
+    "environment",
+    "emissive",
+    "lightramp", // Not defined by materials
+    "lightspot" // Not defined by materials
+};
+
+static const std::string blendModeNames[] =
+{
+    "replace",
+    "add",
+    "multiply",
+    "alpha",
+    "addalpha",
+    "premulalpha",
+    "invdestalpha"
+};
+
+static const std::string cullModeNames[] =
+{
+    "none",
+    "ccw",
+    "cw"
+};
+
+static const std::string compareModeNames[] =
+{
+    "always",
+    "equal",
+    "notequal",
+    "less",
+    "lessequal",
+    "greater",
+    "greaterequal"
+};
+
 MaterialPass::MaterialPass() :
     mParent(0),
     mAlphaMask(false),
@@ -327,18 +381,15 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             if (textureElem.hasAttribute("unit"))
             {
                 const std::string unitName = textureElem.getStringLower("unit");
-                unit = MAX_MATERIAL_TEXTURE_UNITS;
-                if ((unitName == "diffuse") || (unitName == "diff"))
+                unit = (TextureUnit)getIndexFromStringList(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS,
+                    MAX_MATERIAL_TEXTURE_UNITS);
+                if (unitName == "diff")
                     unit = TU_DIFFUSE;
-                if ((unitName == "normal") || (unitName == "norm"))
+                if (unitName == "norm")
                     unit = TU_NORMAL;
-                if ((unitName == "specular") || (unitName == "spec"))
+                if (unitName == "spec")
                     unit = TU_SPECULAR;
-                if (unitName == "emissive")
-                    unit = TU_EMISSIVE;
-                if (unitName == "detail")
-                    unit = TU_DETAIL;
-                if ((unitName == "environment") || (unitName == "env"))
+                if (unitName == "env")
                     unit = TU_ENVIRONMENT;
                 if (unit == MAX_MATERIAL_TEXTURE_UNITS)
                     EXCEPTION("Unknown texture unit " + unitName);
@@ -379,24 +430,11 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             if (passElem.hasAttribute("name"))
             {
                 std::string name = passElem.getStringLower("name");
-                if ((name == "deferred") || (name == "gbuffer"))
+                type = (PassType)getIndexFromStringList(name, passNames, MAX_PASSES, MAX_PASSES);
+                if (name == "gbuffer")
                     type = PASS_DEFERRED;
-                if (name == "prepass")
-                    type = PASS_PREPASS;
-                if (name == "material")
-                    type = PASS_MATERIAL;
-                if (name == "emissive")
-                    type = PASS_EMISSIVE;
-                if ((name == "postopaque") || (name == "custom"))
+                if (name == "custom")
                     type = PASS_POSTOPAQUE;
-                if (name == "ambient")
-                    type = PASS_AMBIENT;
-                if (name == "negative")
-                    type = PASS_NEGATIVE;
-                if (name == "light")
-                    type = PASS_LIGHT;
-                if (name == "shadow")
-                    type = PASS_SHADOW;
                 if (type == MAX_PASSES)
                     EXCEPTION("Unknown pass " + name);
             }
@@ -420,48 +458,23 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             if (passElem.hasAttribute("blend"))
             {
                 std::string blend = passElem.getStringLower("blend");
-                if (blend == "replace")
-                    newPass.setBlendMode(BLEND_REPLACE);
-                if (blend == "add")
-                    newPass.setBlendMode(BLEND_ADD);
-                if (blend == "multiply")
-                    newPass.setBlendMode(BLEND_MULTIPLY);
-                if (blend == "alpha")
-                    newPass.setBlendMode(BLEND_ALPHA);
-                if (blend == "addalpha")
-                    newPass.setBlendMode(BLEND_ADDALPHA);
-                if (blend == "premulalpha")
-                    newPass.setBlendMode(BLEND_PREMULALPHA);
-                if (blend == "invdestalpha")
-                    newPass.setBlendMode(BLEND_INVDESTALPHA);
+                newPass.setBlendMode((BlendMode)getIndexFromStringList(blend, blendModeNames, MAX_BLENDMODES, BLEND_REPLACE));
             }
             
             if (passElem.hasAttribute("cull"))
             {
                 std::string cull = passElem.getStringLower("cull");
-                if (cull == "none")
-                    newPass.setCullMode(CULL_NONE);
-                if (cull == "ccw")
-                    newPass.setCullMode(CULL_CCW);
-                if (cull == "cw")
-                    newPass.setCullMode(CULL_CW);
+                newPass.setCullMode((CullMode)getIndexFromStringList(cull, cullModeNames, MAX_CULLMODES, CULL_CCW));
             }
             
             if (passElem.hasAttribute("depthtest"))
             {
                 std::string depthTest = passElem.getStringLower("depthtest");
-                if ((depthTest == "false") || (depthTest == "always"))
+                if (depthTest == "false")
                     newPass.setDepthTestMode(CMP_ALWAYS);
-                if (depthTest == "equal")
-                    newPass.setDepthTestMode(CMP_EQUAL);
-                if (depthTest == "less")
-                    newPass.setDepthTestMode(CMP_LESS);
-                if (depthTest == "lessequal")
-                    newPass.setDepthTestMode(CMP_LESSEQUAL);
-                if (depthTest == "greater")
-                    newPass.setDepthTestMode(CMP_GREATER);
-                if (depthTest == "greaterequal")
-                    newPass.setDepthTestMode(CMP_GREATEREQUAL);
+                else
+                    newPass.setDepthTestMode((CompareMode)getIndexFromStringList(depthTest, compareModeNames, MAX_COMPAREMODES,
+                        CMP_LESSEQUAL));
             }
             
             if (passElem.hasAttribute("depthwrite"))
@@ -494,8 +507,93 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             memoryUse += sizeof(MaterialPass);
     }
     setMemoryUse(memoryUse);
-    
     setDirty();
+}
+
+void Material::save(Serializer& dest)
+{
+    XMLFile xml;
+    XMLElement materialElem = xml.createRootElement("material");
+    
+    // Write techniques
+    for (unsigned i = 0; i < mTechniques.size(); ++i)
+    {
+        MaterialTechnique& technique = mTechniques[i];
+        XMLElement techniqueElem = materialElem.createChildElement("technique");
+        
+        // Write quality & lod settings
+        if (technique.getQualityLevel() != 0)
+            techniqueElem.setInt("quality", technique.getQualityLevel());
+        if (technique.getLodDistance() != 0.0f)
+            techniqueElem.setFloat("loddistance", technique.getLodDistance());
+        if (technique.getRequireSM3())
+            techniqueElem.setBool("sm3", true);
+        
+        // Write texture units
+        for (unsigned j = 0; j < MAX_MATERIAL_TEXTURE_UNITS; ++j)
+        {
+            Texture* texture = technique.getTexture((TextureUnit)j);
+            if (texture)
+            {
+                XMLElement textureElem = techniqueElem.createChildElement("texture");
+                textureElem.setString("unit", textureUnitNames[j]);
+                textureElem.setString("name", texture->getName());
+            }
+        }
+        
+        // Write shader parameters. Exclude default values to keep output simpler
+        const std::map<VSParameter, Vector4>& vsParameters = technique.getVertexShaderParameters();
+        for (std::map<VSParameter, Vector4>::const_iterator j = vsParameters.begin(); j != vsParameters.end(); ++j)
+        {
+            if ((j->first == VSP_UOFFSET) && (j->second == Vector4(1.0f, 0.0f, 0.0f, 0.0f)))
+                continue;
+            if ((j->first == VSP_VOFFSET) && (j->second == Vector4(0.0f, 1.0f, 0.0f, 0.0f)))
+                continue;
+            XMLElement parameterElem = techniqueElem.createChildElement("parameter");
+            parameterElem.setString("name", VertexShader::getParameterName(j->first));
+            parameterElem.setVector4("value", j->second);
+        }
+        const std::map<PSParameter, Vector4>& psParameters = technique.getPixelShaderParameters();
+        for (std::map<PSParameter, Vector4>::const_iterator j = psParameters.begin(); j != psParameters.end(); ++j)
+        {
+            if ((j->first == PSP_MATDIFFCOLOR) && (j->second == Vector4::sUnity))
+                continue;
+            if ((j->first == PSP_MATEMISSIVECOLOR) && (j->second == Vector4::sZero))
+                continue;
+            if ((j->first == PSP_MATSPECPROPERTIES) && (j->second == Vector4::sZero))
+                continue;
+            XMLElement parameterElem = techniqueElem.createChildElement("parameter");
+            parameterElem.setString("name", PixelShader::getParameterName(j->first));
+            parameterElem.setVector4("value", j->second);
+        }
+        
+        // Write passes
+        const std::map<PassType, MaterialPass>& passes = technique.getPasses();
+        for (std::map<PassType, MaterialPass>::const_iterator j = passes.begin(); j != passes.end(); ++j)
+        {
+            XMLElement passElem = techniqueElem.createChildElement("pass");
+            passElem.setString("name", getPassName(j->first));
+            
+            passElem.setString("vs", j->second.getVertexShaderName());
+            passElem.setString("ps", j->second.getPixelShaderName());
+            
+            // Exclude default values to keep output simpler
+            if (j->second.getAlphaMask())
+                passElem.setBool("alphamask", true);
+            if (j->second.getAlphaTest())
+                passElem.setBool("alphatest", true);
+            if (j->second.getBlendMode() != BLEND_REPLACE)
+                passElem.setString("blend", blendModeNames[j->second.getBlendMode()]);
+            if (j->second.getCullMode() != CULL_CCW)
+                passElem.setString("cull", cullModeNames[j->second.getCullMode()]);
+            if (j->second.getDepthTestMode() != CMP_LESSEQUAL)
+                passElem.setString("depthtest", compareModeNames[j->second.getDepthTestMode()]);
+            if (!j->second.getDepthWrite())
+                passElem.setBool("depthwrite", false);
+        }
+    }
+    
+    xml.save(dest);
 }
 
 void Material::setNumTechniques(unsigned num)
@@ -585,22 +683,14 @@ MaterialPass* Material::getPass(unsigned technique, PassType pass)
     return mTechniques[technique].getPass(pass);
 }
 
-const std::string& getPassName(PassType pass)
+const std::string& Material::getPassName(PassType pass)
 {
-    static const std::string passName[] =
-    {
-        "Deferred",
-        "Prepass",
-        "Material",
-        "Emissive",
-        "PostOpaque",
-        "Ambient",
-        "Negative",
-        "Light"
-        "Shadow"
-    };
-    
-    return passName[pass];
+    return passNames[pass];
+}
+
+const std::string& Material::getTextureUnitName(TextureUnit unit)
+{
+    return textureUnitNames[unit];
 }
 
 bool Material::getCastShadows()

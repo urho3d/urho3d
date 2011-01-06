@@ -33,6 +33,23 @@
 
 #include "DebugNew.h"
 
+static const std::string addressModeNames[] =
+{
+    "wrap",
+    "mirror",
+    "clamp",
+    "border"
+};
+
+static const std::string filterModeNames[] =
+{
+    "nearest",
+    "bilinear",
+    "trilinear",
+    "anisotropic",
+    "default"
+};
+
 int Texture::sQuality = QUALITY_HIGH;
 
 Texture::Texture(Renderer* renderer, const std::string& name) :
@@ -153,14 +170,8 @@ void Texture::loadParameters(XMLFile& xml)
             {
                 TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
                 std::string mode = paramElem.getStringLower("mode");
-                if (mode == "wrap")
-                    setAddressMode(coordIndex, ADDRESS_WRAP);
-                if (mode == "mirror")
-                    setAddressMode(coordIndex, ADDRESS_MIRROR);
-                if (mode == "clamp")
-                    setAddressMode(coordIndex, ADDRESS_CLAMP);
-                if (mode == "border")
-                    setAddressMode(coordIndex, ADDRESS_BORDER);
+                setAddressMode(coordIndex, (TextureAddressMode)getIndexFromStringList(mode, addressModeNames, MAX_ADDRESSMODES,
+                    ADDRESS_WRAP));
             }
         }
         
@@ -170,14 +181,7 @@ void Texture::loadParameters(XMLFile& xml)
         if (name == "filter")
         {
             std::string mode = paramElem.getStringLower("mode");
-            if (mode == "nearest")
-                setFilterMode(FILTER_NEAREST);
-            if (mode == "bilinear")
-                setFilterMode(FILTER_BILINEAR);
-            if (mode == "trilinear")
-                setFilterMode(FILTER_TRILINEAR);
-            if (mode == "anisotropic")
-                setFilterMode(FILTER_ANISOTROPIC);
+            setFilterMode((TextureFilterMode)getIndexFromStringList(mode, filterModeNames, MAX_FILTERMODES, FILTER_DEFAULT));
         }
         
         if (name == "mipmap")

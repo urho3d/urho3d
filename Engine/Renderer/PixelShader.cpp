@@ -112,6 +112,20 @@ PSParameter PixelShader::getParameter(const std::string& name)
     return i->second;
 }
 
+const std::string& PixelShader::getParameterName(PSParameter parameter)
+{
+    static const std::string noParameter;
+    
+    initializeParameters();
+    
+    for (std::map<std::string, PSParameter>::iterator i = sParameters.begin(); i != sParameters.end(); ++i)
+    {
+        if (i->second == parameter)
+            return i->first;
+    }
+    return noParameter;
+}
+
 void PixelShader::clearLastParameterSources()
 {
     for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)

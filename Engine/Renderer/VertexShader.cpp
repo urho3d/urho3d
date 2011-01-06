@@ -83,7 +83,7 @@ void VertexShader::load(Deserializer& source, ResourceCache* cache)
         mHash |= 32768;
 }
 
-VSParameter VertexShader::getParameter(const std::string& name) 
+VSParameter VertexShader::getParameter(const std::string& name)
 {
     initializeParameters();
     
@@ -91,6 +91,20 @@ VSParameter VertexShader::getParameter(const std::string& name)
     if (i == sParameters.end())
         return MAX_VS_PARAMETERS;
     return i->second;
+}
+
+const std::string& VertexShader::getParameterName(VSParameter parameter)
+{
+    static const std::string noParameter;
+    
+    initializeParameters();
+    
+    for (std::map<std::string, VSParameter>::iterator i = sParameters.begin(); i != sParameters.end(); ++i)
+    {
+        if (i->second == parameter)
+            return i->first;
+    }
+    return noParameter;
 }
 
 void VertexShader::clearLastParameterSources()

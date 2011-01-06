@@ -61,7 +61,7 @@ public:
     //! Read from a stream
     void load(Deserializer& source, bool throwOnError = true);
     //! Write to an XML file
-    void saveXML(const std::string& fileName, bool throwOnError = true);
+    void saveXML(Serializer& dest, bool throwOnError = true);
     //! Read from an XML file
     void loadXML(Deserializer& source, bool throwOnError = true);
     //! Write properties only to a stream

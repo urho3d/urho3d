@@ -48,7 +48,8 @@ enum BlendMode
     BLEND_ALPHA,
     BLEND_ADDALPHA,
     BLEND_PREMULALPHA,
-    BLEND_INVDESTALPHA
+    BLEND_INVDESTALPHA,
+    MAX_BLENDMODES
 };
 
 //! Depth or stencil compare mode
@@ -60,7 +61,8 @@ enum CompareMode
     CMP_LESS,
     CMP_LESSEQUAL,
     CMP_GREATER,
-    CMP_GREATEREQUAL
+    CMP_GREATEREQUAL,
+    MAX_COMPAREMODES
 };
 
 //! Culling mode
@@ -68,7 +70,8 @@ enum CullMode
 {
     CULL_NONE = 0,
     CULL_CCW,
-    CULL_CW
+    CULL_CW,
+    MAX_CULLMODES
 };
 
 //! Fill mode
@@ -85,7 +88,7 @@ enum StencilOp
     OP_ZERO,
     OP_REF,
     OP_INCR,
-    OP_DECR,
+    OP_DECR
 };
 
 //! Buffer lock mode
@@ -120,7 +123,8 @@ enum TextureFilterMode
     FILTER_BILINEAR,
     FILTER_TRILINEAR,
     FILTER_ANISOTROPIC,
-    FILTER_DEFAULT
+    FILTER_DEFAULT,
+    MAX_FILTERMODES
 };
 
 //! Texture addressing mode
@@ -129,7 +133,8 @@ enum TextureAddressMode
     ADDRESS_WRAP = 0,
     ADDRESS_MIRROR,
     ADDRESS_CLAMP,
-    ADDRESS_BORDER
+    ADDRESS_BORDER,
+    MAX_ADDRESSMODES
 };
 
 //! Texture coordinates

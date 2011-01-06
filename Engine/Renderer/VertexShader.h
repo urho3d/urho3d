@@ -69,6 +69,8 @@ public:
     
     //! Return shader parameter index by name
     static VSParameter getParameter(const std::string& name);
+    //! Return shader parameter name by index
+    static const std::string& getParameterName(VSParameter parameter);
     //! Clear remembered shader parameter sources
     static void clearLastParameterSources();
     

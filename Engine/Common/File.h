@@ -70,6 +70,9 @@ public:
     //! Return a checksum of the file contents, using the SDBM hash algorithm
     unsigned getChecksum();
     
+    //! Return the file handle
+    FILE* getHandle() const { return mHandle; }
+    
 private:
     //! File handle
     FILE* mHandle;

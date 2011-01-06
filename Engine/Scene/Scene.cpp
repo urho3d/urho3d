@@ -172,7 +172,7 @@ void Scene::load(Deserializer& source, bool throwOnError)
     finishLoading(source, throwOnError);
 }
 
-void Scene::saveXML(const std::string& fileName, bool throwOnError)
+void Scene::saveXML(Serializer& dest, bool throwOnError)
 {
     XMLFile xml;
     XMLElement sceneElem = xml.createRootElement("scene");
@@ -204,7 +204,7 @@ void Scene::saveXML(const std::string& fileName, bool throwOnError)
         }
     }
     
-    xml.save(fileName);
+    xml.save(dest);
 }
 
 void Scene::loadXML(Deserializer& source, bool throwOnError)

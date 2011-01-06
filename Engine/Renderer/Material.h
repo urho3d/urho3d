@@ -233,6 +233,8 @@ public:
     
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    //! Save resource. Throw exception on error
+    virtual void save(Serializer& dest);
     
     //! Set number of techniques
     void setNumTechniques(unsigned num);
@@ -268,6 +270,8 @@ public:
     
     //! Return name for pass
     static const std::string& getPassName(PassType pass);
+    //! Return name for texture unit
+    static const std::string& getTextureUnitName(TextureUnit unit);
     
 private:
     //! Re-evaluate shadow casting and occlusion rendering

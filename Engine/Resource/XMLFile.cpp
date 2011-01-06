@@ -56,20 +56,21 @@ void XMLFile::load(Deserializer& source, ResourceCache* cache)
     if (mDocument->Error())
     {
         mDocument->ClearError();
-        SAFE_EXCEPTION("Could not parse XML data from " + source.getName());
+        EXCEPTION("Could not parse XML data from " + source.getName());
     }
     
     // This probably does not reflect internal data structure size accurately
     setMemoryUse(dataSize);
 }
 
-void XMLFile::save(const std::string& fileName)
+void XMLFile::save(Serializer& dest)
 {
-    if (!checkDirectoryAccess(getPath(fileName)))
-        SAFE_EXCEPTION("Access denied to " + fileName);
-    
-    if (!mDocument->SaveFile(getOSPath(fileName).c_str()))
-        SAFE_EXCEPTION("Failed to save XML file " + fileName);
+    // Only support saving to a File
+    File* file = dynamic_cast<File*>(&dest);
+    if (!file)
+        EXCEPTION("XML data destination is not a File");
+    if (!mDocument->SaveFile(file->getHandle()))
+        EXCEPTION("Failed to save XML data to " + file->getName());
 }
 
 XMLElement XMLFile::createRootElement(const std::string& name)
