@@ -242,8 +242,6 @@ void ResourceCache::setMemoryBudget(ShortStringHash type, unsigned budget)
 
 SharedPtr<File> ResourceCache::getFile(const std::string& name)
 {
-    LOGINFO("GetFile: " + name);
-    
     // Check first the packages
     for (unsigned i = 0; i < mPackages.size(); ++i)
     {

@@ -231,7 +231,7 @@ private:
     void setupLightBatch(Batch& batch);
     //! Draw a full screen quad (either near or far)
     void drawFullScreenQuad(Camera& camera, VertexShader* vs, PixelShader* ps, bool nearQuad);
-    //! Draw a split point light to stencil buffer
+    //! Draw a split light to stencil buffer
     void drawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     //! Handle window resized event
     void handleWindowResized(StringHash eventType, VariantMap& eventData);

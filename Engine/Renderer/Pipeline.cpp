@@ -1296,7 +1296,7 @@ void Pipeline::drawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             else
             {
                 // Clear the stencil by drawing the whole point light volume
-                mRenderer->setStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP, 0);
+                mRenderer->setStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_ZERO, 0);
                 mPointLightGeometry->draw(mRenderer);
                 mRenderer->setColorWrite(true);
                 mRenderer->setStencilTest(false);
@@ -1351,7 +1351,7 @@ void Pipeline::drawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                 mRenderer->setVertexShader(mStencilVS);
                 mRenderer->setPixelShader(mStencilPS);
                 mRenderer->setVertexShaderConstant(getVSRegister(VSP_MODELVIEWPROJ), projection * farTransform);
-                mRenderer->setStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP, 0);
+                mRenderer->setStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_ZERO, 0);
                 mDirLightGeometry->draw(mRenderer);
                 mRenderer->setColorWrite(true);
                 mRenderer->setStencilTest(false);
