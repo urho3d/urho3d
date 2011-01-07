@@ -1,0 +1,99 @@
+===============================================================
+Open Asset Import Library (Assimp)
+Developers and Contributors
+===============================================================
+
+The following is the list of all constributors.  
+Thanks for your help!
+
+- Alexander Gessler,
+3DS-, BLEND-, ASE-, DXF-, HMP-, MDL-, MD2-, MD3-, MD5-, MDC-, NFF-, PLY-, STL-, RAW-, OFF-, MS3D-, Q3D- and LWO-Loader, Assimp-Viewer, assimp-cmd, -noboost, Website (Admin and Design).
+
+- Thomas Schulze,
+X-, Collada-, BVH-Loader, Postprocessing framework. Data structure & Interface design, documentation.
+
+- Kim Kulling,
+Obj-Loader, Logging system, Scons-build environment, CMake build environment, Linux build.
+
+- R.Schmidt,
+Linux build, eclipse support.
+
+- Matthias Gubisch,
+Assimp.net
+Visual Studio 9 support, bugfixes.
+
+- Mark Sibly
+B3D-Loader, Assimp testing
+
+- Jonathan Klein
+Ogre Loader
+
+- Sebastian Hempel,
+PyAssimp (first version)
+Compile-Bugfixes for mingw, add enviroment for static library support in make.
+
+- Jonathan Pokrass
+Supplied a bugfix concerning the scaling in the md3 loader.
+
+- Andrew Galante,
+Submitted patches to make Assimp compile with GCC-4, a makefile and the xcode3 workspace.
+
+- Andreas Nagel
+First Assimp testing & verification under Windows Vista 64 Bit.
+
+- Marius Schröder
+Allowed us to use many of his models for screenshots and testing.
+
+- Christian Schubert
+Supplied various XFiles for testing purposes.
+
+- Tizian Wieland
+Searched the web for hundreds of test models for internal use
+
+- John Connors
+Supplied patches for linux and SCons.
+
+- T. R.
+The GUY who performed some of the CSM mocaps.
+
+- Andy Maloney
+Contributed fixes for the documentation and the doxygen markup
+
+- Zhao Lei
+Contributed several bugfixes fixing memory leaks and improving float parsing 
+
+- sueastside
+Updated PyAssimp to the latest Assimp data structures and provided a script to keep the Python binding up-to-date.
+
+- Tobias Rittig
+Collada testing with Cinema 4D
+
+- Brad Grantham
+Improvements in OpenGL-Sample.
+
+- Robert Ramirez
+Add group loading feature to Obj-Loader.
+
+- Chris Maiwald
+Many bugreports, improving Assimp's portability, regular testing & feedback.
+
+- Stepan Hrbek
+Bugreport and fix for a obj-materialloader crash.
+
+- David Nadlinger
+D bindings, CMake install support. 
+
+- Dario Accornero
+Contributed several patches regarding Mac OS/XCode targets, bug reports.
+
+- Martin Walser (Samhayne)
+Contributed the 'SimpleTexturedOpenGl' sample.
+
+- Matthias Fauconneau
+Contributed a fix for the Q3-BSP loader.
+
+- Jørgen P. Tjernø
+Contributed updated and improved xcode workspaces
+
+- drparallax
+Contributed the /samples/SimpleAssimpViewX sample

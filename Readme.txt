@@ -31,6 +31,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 Urho3D uses the following third-party libraries:
 - AngelScript (2.20.0)
 - ENet (1.3.0)
+- Open Asset Import Library (2.0.863)
 - Open Dynamics Engine (svn rev 1770)
 - StanHull
 - stb_image (1.29)

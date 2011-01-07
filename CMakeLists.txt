@@ -90,17 +90,17 @@ endmacro ()
 macro (add_shader NAME)
     add_custom_command (
         OUTPUT ../../Bin/Data/Shaders/SM2/${NAME}.xml
-	    COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/Data/Shaders/SM2 SM2
-	    DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
+        COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/Data/Shaders/SM2 SM2
+        DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
     )
 
     add_custom_command (
         OUTPUT ../../Bin/Data/Shaders/SM3/${NAME}.xml
-	    COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/Data/Shaders/SM3 SM3
-	    DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
-	)
+        COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/Data/Shaders/SM3 SM3
+        DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
+    )
 
-	set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/Data/Shaders/SM2/${NAME}.xml ../../Bin/Data/Shaders/SM3/${NAME}.xml)
+    set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/Data/Shaders/SM2/${NAME}.xml ../../Bin/Data/Shaders/SM3/${NAME}.xml)
 endmacro ()
 
 # Recurse subdirectories
@@ -123,11 +123,13 @@ add_subdirectory (Examples/Test)
 add_subdirectory (SourceAssets/Models)
 add_subdirectory (SourceAssets/Shaders)
 add_subdirectory (ThirdParty/AngelScript)
+add_subdirectory (ThirdParty/Assimp)
 add_subdirectory (ThirdParty/ENet)
 add_subdirectory (ThirdParty/ODE)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/TinyXML)
+add_subdirectory (Tools/AssetImporter)
 add_subdirectory (Tools/ModelConverter)
 add_subdirectory (Tools/NormalMapTool)
 add_subdirectory (Tools/PackageTool)

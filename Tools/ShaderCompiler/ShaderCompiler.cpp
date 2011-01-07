@@ -370,7 +370,8 @@ void run(const std::vector<std::string>& arguments)
                 }
             }
             
-            outDoc.save(outFileName);
+            File outFile(outFileName, FILE_WRITE);
+            outDoc.save(outFile);
         }
         
         shader = shader.getNextElement("shader");
