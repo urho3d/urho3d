@@ -244,9 +244,9 @@ void Sound::setLoop(unsigned repeatOffset, unsigned endOffset)
             endOffset = mDataSize;
         
         // Align repeat and end on sample boundaries
-        unsigned sampleAnd = ~(getSampleSize() - 1);
-        repeatOffset &= sampleAnd;
-        endOffset &= sampleAnd;
+        int sampleSize = getSampleSize();
+        repeatOffset &= -sampleSize;
+        endOffset &= -sampleSize;
         
         mRepeat = mData.getPtr() + repeatOffset;
         mEnd = mData.getPtr() + endOffset;

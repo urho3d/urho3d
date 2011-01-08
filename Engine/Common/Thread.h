@@ -21,44 +21,36 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Mutex.h"
+#ifndef COMMON_THREAD_H
+#define COMMON_THREAD_H
 
-#include <windows.h>
-
-#include "DebugNew.h"
-
-Mutex::Mutex() :
-    mCriticalSection(new CRITICAL_SECTION())
+//! An operating system thread
+class Thread
 {
-    InitializeCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
+public:
+    //! Construct. Does not start the thread yet
+    Thread();
+    //! Destruct. If running, stop and wait for thread to finish
+    ~Thread();
+    
+    //! The function to run in the thread
+    virtual void threadFunction() = 0;
+    
+    //! Start running the thread. Return true if successful, or false if already running or if can not create the thread
+    bool startThread();
+    //! Set the running flag to false and wait for the thread to finish
+    void stopThread();
+    //! Set thread priority. The thread must have been started first
+    void setThreadPriority(int priority);
+    
+    //! Return whether thread exists
+    bool isThreadStarted() const { return mThreadHandle != 0; }
+    
+protected:
+    //! Thread handle
+    void* mThreadHandle;
+    //! Running flag
+    volatile bool mShouldRun;
+};
 
-Mutex::~Mutex()
-{
-    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)mCriticalSection;
-    DeleteCriticalSection(cs);
-    delete cs;
-    mCriticalSection = 0;
-}
-
-void Mutex::acquire()
-{
-    EnterCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
-
-void Mutex::release()
-{
-    LeaveCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
-
-MutexLock::MutexLock(Mutex& mutex) :
-    mMutex(mutex)
-{
-    mMutex.acquire();
-}
-
-MutexLock::~MutexLock()
-{
-    mMutex.release();
-}
+#endif // COMMON_THREAD_H

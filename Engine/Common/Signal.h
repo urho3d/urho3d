@@ -21,44 +21,32 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Mutex.h"
+#ifndef COMMON_SIGNAL_H
+#define COMMON_SIGNAL_H
 
-#include <windows.h>
-
-#include "DebugNew.h"
-
-Mutex::Mutex() :
-    mCriticalSection(new CRITICAL_SECTION())
+//! An operating system signal (event) for communication between threads
+class Signal
 {
-    InitializeCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
+    //! Construct with either automatical or manual reset
+    Signal(bool autoReset = true);
+    //! Destruct
+    ~Signal();
+    
+    //! Raise the signal
+    void set();
+    //! Reset the signal if not automatically reset
+    void reset();
+    //! Wait for the signal to be raised. Reset automatically if enabled
+    void wait();
+    
+    //! Return whether signal is automatically reset
+    bool isAutoReset() const;
+    
+private:
+    //! Event handle
+    void* mHandle;
+    //! Autoreset flag
+    bool mAutoReset;
+};
 
-Mutex::~Mutex()
-{
-    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)mCriticalSection;
-    DeleteCriticalSection(cs);
-    delete cs;
-    mCriticalSection = 0;
-}
-
-void Mutex::acquire()
-{
-    EnterCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
-
-void Mutex::release()
-{
-    LeaveCriticalSection((CRITICAL_SECTION*)mCriticalSection);
-}
-
-MutexLock::MutexLock(Mutex& mutex) :
-    mMutex(mutex)
-{
-    mMutex.acquire();
-}
-
-MutexLock::~MutexLock()
-{
-    mMutex.release();
-}
+#endif // COMMON_SIGNAL_H

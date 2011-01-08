@@ -40,7 +40,7 @@
 
 static const int AUDIO_FPS = 100;
 
-//! Holds the DirectSound buffer and audio thread handle
+//! Holds the DirectSound buffer
 class AudioImpl
 {
     friend class Audio;
@@ -50,23 +50,17 @@ public:
     AudioImpl(HWND windowHandle) :
         mDSObject(0),
         mDSBuffer(0),
-        mAudioThread(0),
         mWindow(windowHandle)
     {
     }
-
+    
 private:
     //! DirectSound interface
     IDirectSound* mDSObject;
     //! DirectSound buffer
     IDirectSoundBuffer* mDSBuffer;
-    //! Audio thread handle
-    HANDLE mAudioThread;
     //! Window handle
     HWND mWindow;
-    
-    //! Runs the audio mixing loop
-    static DWORD WINAPI threadFunction(void* data);
 };
 
 Audio::Audio(unsigned windowHandle) :
@@ -199,7 +193,7 @@ void Audio::update(float timeStep)
 
 bool Audio::play()
 {
-    if (mImpl->mAudioThread)
+    if (mPlaying)
         return true;
     
     if (!mImpl->mDSBuffer)
@@ -221,32 +215,23 @@ bool Audio::play()
         mImpl->mDSBuffer->Unlock(ptr1, bytes1, ptr2, bytes2);
     }
     
-    // Create thread for playback
-    mPlaying = true;
-    
-    mImpl->mAudioThread = CreateThread(0, 0, AudioImpl::threadFunction, this, 0, 0);
-    if (!mImpl->mAudioThread)
+    // Create playback thread
+    if (!startThread())
     {
         LOGERROR("Could not create audio thread");
-        mPlaying = false;
         return false;
     }
     
-    // Set thread priority
-    SetThreadPriority(mImpl->mAudioThread, THREAD_PRIORITY_ABOVE_NORMAL);
+    // Adjust playback thread priority
+    setThreadPriority(THREAD_PRIORITY_ABOVE_NORMAL);
+    mPlaying = true;
     return true;
 }
 
 void Audio::stop()
 {
+    stopThread();
     mPlaying = false;
-    
-    if (mImpl->mAudioThread)
-    {
-        WaitForSingleObject(mImpl->mAudioThread, INFINITE);
-        CloseHandle(mImpl->mAudioThread);
-        mImpl->mAudioThread = 0;
-    }
 }
 
 void Audio::setMasterGain(ChannelType type, float gain)
@@ -338,15 +323,71 @@ void Audio::removeSong(Song* song)
     }
 }
 
-void Audio::releaseBuffer()
+void Audio::threadFunction()
 {
-    stop();
+    AudioImpl* impl = mImpl;
     
-    if (mImpl->mDSBuffer)
+    DWORD playCursor = 0;
+    DWORD writeCursor = 0;
+    
+    while (mShouldRun)
     {
-        mImpl->mDSBuffer->Release();
-        mImpl->mDSBuffer = 0;
+        Timer audioUpdateTimer;
+        
+        // Restore buffer / restart playback if necessary
+        DWORD status;
+        impl->mDSBuffer->GetStatus(&status);
+        if (status == DSBSTATUS_BUFFERLOST)
+        {
+            impl->mDSBuffer->Restore();
+            impl->mDSBuffer->GetStatus(&status);
+        }
+        if (!(status & DSBSTATUS_PLAYING))
+        {
+            impl->mDSBuffer->Play(0, 0, DSBPLAY_LOOPING);
+            writeCursor = 0;
+        }
+        
+        // Get current buffer position
+        impl->mDSBuffer->GetCurrentPosition(&playCursor, 0);
+        playCursor %= mBufferSize;
+        playCursor &= -((int)mSampleSize);
+        
+        if (playCursor != writeCursor)
+        {
+            int writeBytes = playCursor - writeCursor;
+            if (writeBytes < 0)
+                writeBytes += mBufferSize;
+            
+            // Try to lock buffer
+            DWORD bytes1, bytes2;
+            void *ptr1, *ptr2;
+            if (impl->mDSBuffer->Lock(writeCursor, writeBytes, &ptr1, &bytes1, &ptr2, &bytes2, 0) == DS_OK)
+            {
+                // Mix sound to locked positions
+                {
+                    MutexLock lock(mAudioMutex);
+                    
+                    if (bytes1)
+                        mixOutput(ptr1, bytes1);
+                    if (bytes2)
+                        mixOutput(ptr2, bytes2);
+                }
+                
+                // Unlock buffer and update write cursor
+                impl->mDSBuffer->Unlock(ptr1, bytes1, ptr2, bytes2);
+                writeCursor += writeBytes;
+                if (writeCursor >= mBufferSize)
+                    writeCursor -= mBufferSize;
+            }
+        }
+        
+        // Sleep the remaining time of the audio update period
+        int audioSleepTime = max(1000 / AUDIO_FPS - (int)audioUpdateTimer.getMSec(false), 0);
+        Sleep(audioSleepTime);
     }
+    
+    impl->mDSBuffer->Stop();
 }
 
 void Audio::mixOutput(void *dest, unsigned bytes)
@@ -402,91 +443,23 @@ void Audio::mixOutput(void *dest, unsigned bytes)
     {
         short* destPtr = (short*)dest;
         while (clipSounds--)
-        {
-            int sample = *clipPtr++;
-            if (sample > 32767) sample = 32767;
-            if (sample < -32768) sample = -32768;
-            *destPtr++ = sample;
-        }
+            *destPtr++ = clamp(*clipPtr++, -32768, 32767);
     }
     else
     {
         unsigned char* destPtr = (unsigned char*)dest;
         while (clipSounds--)
-        {
-            int sample = ((*clipPtr++) >> 8) + 128;
-            if (sample > 255) sample = 255;
-            if (sample < 0) sample = 0;
-            *destPtr++ = sample;
-        }
+            *destPtr++ = clamp(((*clipPtr++) >> 8) + 128, 0, 255);
     }
 }
 
-DWORD WINAPI AudioImpl::threadFunction(void* data)
+void Audio::releaseBuffer()
 {
-    Audio* audio = (Audio*)data;
-    AudioImpl* impl = audio->getImpl();
+    stop();
     
-    DWORD playCursor = 0;
-    DWORD writeCursor = 0;
-    
-    while (audio->isPlaying())
+    if (mImpl->mDSBuffer)
     {
-        Timer audioUpdateTimer;
-        
-        // Restore buffer / restart playback if necessary
-        DWORD status;
-        impl->mDSBuffer->GetStatus(&status);
-        if (status == DSBSTATUS_BUFFERLOST)
-        {
-            impl->mDSBuffer->Restore();
-            impl->mDSBuffer->GetStatus(&status);
-        }
-        if (!(status & DSBSTATUS_PLAYING))
-        {
-            impl->mDSBuffer->Play(0, 0, DSBPLAY_LOOPING);
-            writeCursor = 0;
-        }
-        
-        // Get current buffer position
-        impl->mDSBuffer->GetCurrentPosition(&playCursor, 0);
-        playCursor %= audio->getBufferSize(); // Paranoia
-        playCursor &= -((int)audio->getSampleSize());
-        
-        if (playCursor != writeCursor)
-        {
-            int writeBytes = playCursor - writeCursor;
-            if (writeBytes < 0)
-                writeBytes += audio->getBufferSize();
-            
-            // Try to lock buffer
-            DWORD bytes1, bytes2;
-            void *ptr1, *ptr2;
-            if (impl->mDSBuffer->Lock(writeCursor, writeBytes, &ptr1, &bytes1, &ptr2, &bytes2, 0) == DS_OK)
-            {
-                // Mix sound to locked positions
-                {
-                    MutexLock lock(audio->getMutex());
-                    
-                    if (bytes1)
-                        audio->mixOutput(ptr1, bytes1);
-                    if (bytes2)
-                        audio->mixOutput(ptr2, bytes2);
-                }
-                
-                // Unlock buffer and update write cursor
-                impl->mDSBuffer->Unlock(ptr1, bytes1, ptr2, bytes2);
-                writeCursor += writeBytes;
-                if (writeCursor >= audio->getBufferSize())
-                    writeCursor -= audio->getBufferSize();
-            }
-        }
-        
-        // Sleep the remaining time of the audio update period
-        int audioSleepTime = max(1000 / AUDIO_FPS - (int)audioUpdateTimer.getMSec(false), 0);
-        Sleep(audioSleepTime);
+        mImpl->mDSBuffer->Release();
+        mImpl->mDSBuffer = 0;
     }
-    
-    impl->mDSBuffer->Stop();
-    return 0;
 }

@@ -24,9 +24,7 @@
 #ifndef COMMON_MUTEX_H
 #define COMMON_MUTEX_H
 
-class MutexImpl;
-
-//! A mutual exclusion primitive
+//! An operating system mutual exclusion primitive
 class Mutex
 {
 public:
@@ -35,14 +33,14 @@ public:
     //! Destruct
     ~Mutex();
     
-    //! Acquire the mutex. Blocks if already acquired
-    void get();
+    //! Acquire the mutex. Block if already acquired
+    void acquire();
     //! Release the mutex
     void release();
     
 private:
-    //! Implementation
-    MutexImpl* mImpl;
+    //! Critical section
+    void* mCriticalSection;
 };
 
 //! A lock which automatically acquires and releases a mutex

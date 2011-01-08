@@ -22,43 +22,35 @@
 //
 
 #include "Precompiled.h"
-#include "Mutex.h"
+#include "Signal.h"
 
 #include <windows.h>
 
 #include "DebugNew.h"
 
-Mutex::Mutex() :
-    mCriticalSection(new CRITICAL_SECTION())
+Signal::Signal(bool autoReset) :
+    mHandle(CreateEvent(0, autoReset ? FALSE : TRUE, FALSE, 0)),
+    mAutoReset(autoReset)
 {
-    InitializeCriticalSection((CRITICAL_SECTION*)mCriticalSection);
 }
 
-Mutex::~Mutex()
+Signal::~Signal()
 {
-    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)mCriticalSection;
-    DeleteCriticalSection(cs);
-    delete cs;
-    mCriticalSection = 0;
+    CloseHandle((HANDLE)mHandle);
+    mHandle = 0;
 }
 
-void Mutex::acquire()
+void Signal::set()
 {
-    EnterCriticalSection((CRITICAL_SECTION*)mCriticalSection);
+    SetEvent((HANDLE)mHandle);
 }
 
-void Mutex::release()
+void Signal::reset()
 {
-    LeaveCriticalSection((CRITICAL_SECTION*)mCriticalSection);
+    ResetEvent((HANDLE)mHandle);
 }
 
-MutexLock::MutexLock(Mutex& mutex) :
-    mMutex(mutex)
+void Signal::wait()
 {
-    mMutex.acquire();
-}
-
-MutexLock::~MutexLock()
-{
-    mMutex.release();
+    WaitForSingleObject((HANDLE)mHandle, INFINITE);
 }

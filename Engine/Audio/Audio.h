@@ -27,6 +27,7 @@
 #include "AudioDefs.h"
 #include "Mutex.h"
 #include "Quaternion.h"
+#include "Thread.h"
 #include "SharedArrayPtr.h"
 
 #include <vector>
@@ -37,7 +38,7 @@ class Song;
 class Sound;
 
 //! Manages a DirectSound audio buffer and the playback thread, channels and songs.
-class Audio : public RefCounted
+class Audio : public RefCounted, public Thread
 {
     friend class AudioImpl;
     
@@ -109,6 +110,9 @@ public:
     Mutex& getMutex() { return mAudioMutex; }
     //! Return channel type specific gain multiplied by master gain
     float getChannelMasterGain(ChannelType type) const { return mMasterGain[CHANNEL_MASTER] * mMasterGain[type]; }
+    
+    //! Mixing thread function
+    virtual void threadFunction();
     
 private:
     //! Mix audio to the buffer

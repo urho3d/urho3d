@@ -22,43 +22,51 @@
 //
 
 #include "Precompiled.h"
-#include "Mutex.h"
+#include "Thread.h"
 
 #include <windows.h>
 
 #include "DebugNew.h"
 
-Mutex::Mutex() :
-    mCriticalSection(new CRITICAL_SECTION())
+DWORD WINAPI threadFunctionStatic(void* data)
 {
-    InitializeCriticalSection((CRITICAL_SECTION*)mCriticalSection);
+    Thread* thread = static_cast<Thread*>(data);
+    thread->threadFunction();
+    return 0;
 }
 
-Mutex::~Mutex()
+Thread::Thread() :
+    mThreadHandle(0),
+    mShouldRun(false)
 {
-    CRITICAL_SECTION* cs = (CRITICAL_SECTION*)mCriticalSection;
-    DeleteCriticalSection(cs);
-    delete cs;
-    mCriticalSection = 0;
 }
 
-void Mutex::acquire()
+Thread::~Thread()
 {
-    EnterCriticalSection((CRITICAL_SECTION*)mCriticalSection);
+    stopThread();
 }
 
-void Mutex::release()
+bool Thread::startThread()
 {
-    LeaveCriticalSection((CRITICAL_SECTION*)mCriticalSection);
+    // Check if already running
+    if (mThreadHandle)
+        return false;
+    
+    mShouldRun = true;
+    mThreadHandle = CreateThread(0, 0, threadFunctionStatic, this, 0, 0);
+    return mThreadHandle != 0;
 }
 
-MutexLock::MutexLock(Mutex& mutex) :
-    mMutex(mutex)
+void Thread::stopThread()
 {
-    mMutex.acquire();
+    mShouldRun = false;
+    WaitForSingleObject((HANDLE)mThreadHandle, INFINITE);
+    CloseHandle((HANDLE)mThreadHandle);
+    mThreadHandle = 0;
 }
 
-MutexLock::~MutexLock()
+void Thread::setThreadPriority(int priority)
 {
-    mMutex.release();
+    if (mThreadHandle)
+        SetThreadPriority((HANDLE)mThreadHandle, priority);
 }
