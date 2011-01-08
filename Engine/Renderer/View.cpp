@@ -94,8 +94,6 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget)
         }
     }
     
-    camera->markInView(mPipeline->getFrameNumber());
-    
     mOctree = octree;
     mCamera = camera;
     mRenderTarget = renderTarget;
@@ -151,6 +149,7 @@ void View::update(const FrameInfo& frame)
     mFrame.mTimeStep = frame.mTimeStep;
     mFrame.mFrameNumber = frame.mFrameNumber;
     
+    mCamera->markInView(mFrame.mFrameNumber);
     getNodes();
     
     if (mPipeline->getRenderer()->getRenderMode() != RENDER_FORWARD)
@@ -296,7 +295,7 @@ void View::getNodes()
         if (flags & NODE_GEOMETRY)
         {
             GeometryNode* geom = static_cast<GeometryNode*>(node);
-            geom->markInView(mFrame.mFrameNumber, this);
+            geom->markInView(mFrame);
             geom->updateGeometry(mFrame, renderer);
             
             // Expand the scene bounding boxes
@@ -325,7 +324,7 @@ void View::getNodes()
             if (!(light->getLightMask() & mZone->getLightMask()))
                 continue;
             
-            light->markInView(mFrame.mFrameNumber, this);
+            light->markInView(mFrame);
             mLights.push_back(light);
         }
     }
@@ -712,7 +711,7 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
         // Get lit geometry only if inside main camera frustum this frame
         if (getLitGeometries)
         {
-            if (geom->isInView(mFrame.mFrameNumber, this))
+            if (geom->isInView(mFrame))
             {
                 if (mergeBoxes)
                 {
@@ -769,7 +768,7 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
                         }
                         
                         // Update geometry now if not updated yet
-                        if (!geom->isInView(mFrame.mFrameNumber, this))
+                        if (!geom->isInView(mFrame))
                             geom->updateGeometry(mFrame, renderer);
                         sShadowCasters[index].push_back(geom);
                     }
@@ -797,7 +796,7 @@ bool View::isShadowCasterVisible(GeometryNode* geom, BoundingBox lightViewBox, c
     else
     {
         // If light is not directional, can do a simple check: if object is visible, its shadow is too
-        if (geom->isInView(mFrame.mFrameNumber, this))
+        if (geom->isInView(mFrame))
             return true;
         
         // For perspective lights, extrusion direction depends on the position of the shadow caster

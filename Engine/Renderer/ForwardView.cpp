@@ -40,7 +40,7 @@ void View::getBatchesForward()
 {
     // Go through geometries for ambient batches
     {
-        PROFILE(Pipeline_GetAmbientBatches);
+        PROFILE(View_GetAmbientBatches);
         for (unsigned i = 0; i < mGeometries.size(); ++i)
         {
             GeometryNode* node = mGeometries[i];
@@ -260,7 +260,7 @@ void View::getBatchesForward()
     
     // Finally sort the batches
     {
-        PROFILE(Pipeline_SortBatches);
+        PROFILE(View_SortBatches);
         
         sortBatches(mAmbientQueue, mAmbientQueueSorted);
         sortBatches(mNegativeQueue, mNegativeQueueSorted);
@@ -281,7 +281,7 @@ void View::renderBatchesForward()
     
     {
         // Render opaque objects' ambient & negative lighting
-        PROFILE(Pipeline_RenderAmbient);
+        PROFILE(View_RenderAmbient);
         
         clearLastParameterSources();
         
@@ -304,7 +304,7 @@ void View::renderBatchesForward()
     
     {
         // Render shadow maps + opaque objects' shadowed additive lighting
-        PROFILE(Pipeline_RenderLights);
+        PROFILE(View_RenderLights);
         
         for (unsigned i = 0; i < mLightQueues.size(); ++i)
         {
@@ -312,7 +312,7 @@ void View::renderBatchesForward()
             
             if (queue.mLight->getShadowMap())
             {
-                PROFILE(Pipeline_RenderShadowMap);
+                PROFILE(View_RenderShadowMap);
                 
                 Texture2D* shadowMap = queue.mLight->getShadowMap();
                 clearLastParameterSources();
@@ -380,7 +380,7 @@ void View::renderBatchesForward()
     
     {
         // Render post-opaque passes
-        PROFILE(Pipeline_RenderForward);
+        PROFILE(View_RenderForward);
         
         clearLastParameterSources();
         
@@ -395,7 +395,7 @@ void View::renderBatchesForward()
     
     {
         // Render transparent objects last (both ambient & additive lighting)
-        PROFILE(Pipeline_RenderTransparent);
+        PROFILE(View_RenderTransparent);
         
         for (unsigned i = 0; i < mTransparentQueueSorted.size(); ++i)
         {

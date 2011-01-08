@@ -44,7 +44,7 @@ VolumeNode::VolumeNode(unsigned flags, Octant* octant, const std::string& name) 
     mDistance(0.0f),
     mSortValue(0.0f),
     mViewFrameNumber(M_MAX_UNSIGNED),
-    mView(0),
+    mViewCamera(0),
     mWorldBoundingBoxDirty(true)
 {
     // Insert initially into the specified octant; the node does not have correct
@@ -297,10 +297,10 @@ const BoundingBox& VolumeNode::getWorldBoundingBox()
     return mWorldBoundingBox;
 }
 
-void VolumeNode::markInView(unsigned frameNumber, View* view)
+void VolumeNode::markInView(const FrameInfo& frame)
 {
-    mViewFrameNumber = frameNumber;
-    mView = view;
+    mViewFrameNumber = frame.mFrameNumber;
+    mViewCamera = frame.mCamera;
 }
 
 void VolumeNode::setSortValue(float value)
@@ -313,9 +313,9 @@ bool VolumeNode::isInView(unsigned frameNumber) const
     return mViewFrameNumber == frameNumber;
 }
 
-bool VolumeNode::isInView(unsigned frameNumber, View* view) const
+bool VolumeNode::isInView(const FrameInfo& frame) const
 {
-    return (mViewFrameNumber == frameNumber) && (mView == view);
+    return (mViewFrameNumber == frame.mFrameNumber) && (mViewCamera == frame.mCamera);
 }
 
 void VolumeNode::onMarkedDirty()

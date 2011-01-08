@@ -354,7 +354,7 @@ void Octree::loadXML(const XMLElement& source)
 
 void Octree::update(float timeStep)
 {
-    // If in headless mode, run a dummy update now to sync skeletally attached objects
+    // If in headless mode, run an update now to reinsert nodes
     if (mHeadless)
     {
         FrameInfo frame;
@@ -395,11 +395,11 @@ void Octree::updateNodes(const FrameInfo& frame)
 {
     PROFILE(Octree_UpdateNodes);
     
-    // Let nodes update themselves before re-insertion
+    // Let nodes update themselves before reinsertion
     for (std::set<VolumeNode*>::iterator i = mNodeUpdates.begin(); i != mNodeUpdates.end(); ++i)
         (*i)->updateNode(frame);
     
-    // Go through nodes which may have to be re-inserted into the octree
+    // Reinsert nodes into the octree
     for (std::set<VolumeNode*>::iterator i = mNodeUpdates.begin(); i != mNodeUpdates.end(); ++i)
     {
         VolumeNode* node = *i;

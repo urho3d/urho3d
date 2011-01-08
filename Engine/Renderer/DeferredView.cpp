@@ -69,7 +69,7 @@ void View::getBatchesDeferred()
     
     // Go through geometries for GBuffer and ambient batches
     {
-        PROFILE(Pipeline_GetAmbientBatches);
+        PROFILE(View_GetAmbientBatches);
         for (unsigned i = 0; i < mGeometries.size(); ++i)
         {
             GeometryNode* node = mGeometries[i];
@@ -339,7 +339,7 @@ void View::getBatchesDeferred()
     
     // Finally sort the batches
     {
-        PROFILE(Pipeline_SortBatches);
+        PROFILE(View_SortBatches);
         
         sortBatches(mGBufferQueue, mGBufferQueueSorted);
         sortBatches(mNegativeLightQueue, mNegativeLightQueueSorted);
@@ -382,7 +382,7 @@ void View::renderBatchesDeferred()
     
     {
         // Render G-buffer
-        PROFILE(Pipeline_RenderGBuffer);
+        PROFILE(View_RenderGBuffer);
         
         clearLastParameterSources();
         
@@ -467,7 +467,7 @@ void View::renderBatchesDeferred()
     
     {
         // Render lights
-        PROFILE(Pipeline_RenderLights);
+        PROFILE(View_RenderLights);
         
         // Negative lights
         if (mNegativeLightQueueSorted.size())
@@ -492,7 +492,7 @@ void View::renderBatchesDeferred()
             LightBatchQueue& queue = mLightQueues[i];
             
             {
-                PROFILE(Pipeline_RenderShadowMap);
+                PROFILE(View_RenderShadowMap);
                 
                 Texture2D* shadowMap = queue.mLight->getShadowMap();
                 clearLastParameterSources();
@@ -588,7 +588,7 @@ void View::renderBatchesDeferred()
     
     {
         // Render forward passes
-        PROFILE(Pipeline_RenderForward);
+        PROFILE(View_RenderForward);
         
         clearLastParameterSources();
         renderer->setStencilTest(false);
@@ -624,7 +624,7 @@ void View::renderBatchesDeferred()
     
     {
         // Render transparent objects last (both ambient & additive lighting)
-        PROFILE(Pipeline_RenderTransparent);
+        PROFILE(View_RenderTransparent);
         
         for (unsigned i = 0; i < mTransparentQueueSorted.size(); ++i)
         {
@@ -636,7 +636,7 @@ void View::renderBatchesDeferred()
     // Render edge filter now if enabled
     if (edgeFilter)
     {
-        PROFILE(Pipeline_RenderEdgeFilter);
+        PROFILE(View_RenderEdgeFilter);
         
         float invWidth = 0.5f / gBufferWidth;
         float invHeight = 0.5f / gBufferHeight;

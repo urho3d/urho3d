@@ -33,7 +33,6 @@ class Octant;
 class Ray;
 class Renderer;
 class RayOctreeQuery;
-class View;
 
 //! Information of the frame being rendered
 struct FrameInfo
@@ -119,7 +118,7 @@ public:
     //! Set sorting value. Called by View
     void setSortValue(float value);
     //! Mark in view this frame. Called by View
-    void markInView(unsigned frameNumber, View* view);
+    void markInView(const FrameInfo& frame);
     //! Return distance from camera
     float getDistance() const { return mDistance; }
     //! Return sorting value
@@ -127,7 +126,7 @@ public:
     //! Return whether is in view this frame
     bool isInView(unsigned frameNumber) const;
     //! Return whether is visible in a specific view this frame
-    bool isInView(unsigned frameNumber, View* view) const;
+    bool isInView(const FrameInfo& frame) const;
     
 protected:
     //! Construct with node flags, initial octree pointer and name
@@ -159,8 +158,8 @@ protected:
     float mSortValue;
     //! Last visible frame number
     unsigned mViewFrameNumber;
-    //! Last visible view
-    View* mView;
+    //! Last camera rendered from. Not safe to dereference
+    Camera* mViewCamera;
     
 private:
     //! World-space bounding box
