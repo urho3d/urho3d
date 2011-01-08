@@ -38,6 +38,8 @@
 
 #include "DebugNew.h"
 
+static const int AUDIO_FPS = 100;
+
 //! Holds the DirectSound buffer and audio thread handle
 class AudioImpl
 {
@@ -430,6 +432,8 @@ DWORD WINAPI AudioImpl::threadFunction(void* data)
     
     while (audio->isPlaying())
     {
+        Timer audioUpdateTimer;
+        
         // Restore buffer / restart playback if necessary
         DWORD status;
         impl->mDSBuffer->GetStatus(&status);
@@ -478,7 +482,9 @@ DWORD WINAPI AudioImpl::threadFunction(void* data)
             }
         }
         
-        Sleep(10);
+        // Sleep the remaining time of the audio update period
+        int audioSleepTime = max(1000 / AUDIO_FPS - (int)audioUpdateTimer.getMSec(false), 0);
+        Sleep(audioSleepTime);
     }
     
     impl->mDSBuffer->Stop();

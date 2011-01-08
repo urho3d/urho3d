@@ -138,5 +138,5 @@ void ScriptEngine::garbageCollect()
 {
     PROFILE(Script_GarbageCollect);
     
-    mAngelScriptEngine->GarbageCollect();
+    mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP);
 }
