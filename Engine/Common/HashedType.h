@@ -27,20 +27,20 @@
 #include "RefCount.h"
 #include "StringHash.h"
 
-#define DEFINE_TYPE(typeName)                                                               \
-    public:                                                                                 \
-        virtual ShortStringHash getType() const { return getTypeStatic(); }                 \
-        virtual const std::string& getTypeName() const { return getTypeNameStatic(); }      \
-        static ShortStringHash getTypeStatic()                                              \
-        {                                                                                   \
-            static const ShortStringHash type(#typeName);                                   \
-            return type;                                                                    \
-        }                                                                                   \
-        static const std::string& getTypeNameStatic()                                       \
-        {                                                                                   \
-            static const std::string name = #typeName;                                      \
-            return name;                                                                    \
-        }                                                                                   \
+#define DEFINE_TYPE(typeName) \
+    public: \
+        virtual ShortStringHash getType() const { return getTypeStatic(); } \
+        virtual const std::string& getTypeName() const { return getTypeNameStatic(); } \
+        static ShortStringHash getTypeStatic() \
+        { \
+            static const ShortStringHash type(#typeName); \
+            return type; \
+        } \
+        static const std::string& getTypeNameStatic() \
+        { \
+            static const std::string name = #typeName; \
+            return name; \
+        } \
 
 //! Base class for objects which can be searched for by type
 class HashedType : public RefCounted

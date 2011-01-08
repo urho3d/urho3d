@@ -76,6 +76,8 @@ public:
     volatile signed char* getPlayPosition() const { return mPos; }
     //! Return channel type
     ChannelType getChannelType() const { return mChannelType; }
+    //! Return playback time position
+    float getTimePosition() const { return mTimePos; }
     //! Return frequency
     float getFrequency() const { return mFrequency; }
     //! Return gain
@@ -142,6 +144,8 @@ private:
     volatile signed char *mPos;
     //! Playback fractional position
     volatile int mFractPos;
+    //! Playback time position
+    volatile float mTimePos;
     //! Audio data decoder
     void* mDecoder;
     //! Decode buffer

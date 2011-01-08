@@ -30,55 +30,55 @@
 
 #include "DebugNew.h"
 
-#define INC_POS_LOOPED()        \
-    pos += intAdd;              \
-    fractPos += fractAdd;       \
-    if (fractPos > 65535)       \
-    {                           \
-        fractPos &= 65535;      \
-        ++pos;                  \
-    }                           \
-    while (pos >= end)          \
-        pos -= (end - repeat);  \
+#define INC_POS_LOOPED() \
+    pos += intAdd; \
+    fractPos += fractAdd; \
+    if (fractPos > 65535) \
+    { \
+        fractPos &= 65535; \
+        ++pos; \
+    } \
+    while (pos >= end) \
+        pos -= (end - repeat); \
 
-#define INC_POS_ONESHOT()       \
-    pos += intAdd;              \
-    fractPos += fractAdd;       \
-    if (fractPos > 65535)       \
-    {                           \
-        fractPos &= 65535;      \
-        ++pos;                  \
-    }                           \
-    if (pos >= end)             \
-    {                           \
-        pos = 0;                \
-        break;                  \
-    }                           \
+#define INC_POS_ONESHOT() \
+    pos += intAdd; \
+    fractPos += fractAdd; \
+    if (fractPos > 65535) \
+    { \
+        fractPos &= 65535; \
+        ++pos; \
+    } \
+    if (pos >= end) \
+    { \
+        pos = 0; \
+        break; \
+    } \
 
 #define INC_POS_STEREO_LOOPED() \
-    pos += (intAdd << 1);       \
-    fractPos += fractAdd;       \
-    if (fractPos > 65535)       \
-    {                           \
-        fractPos &= 65535;      \
-        pos += 2;               \
-    }                           \
-    while (pos >= end)          \
-        pos -= (end - repeat);  \
+    pos += (intAdd << 1); \
+    fractPos += fractAdd; \
+    if (fractPos > 65535) \
+    { \
+        fractPos &= 65535; \
+        pos += 2; \
+    } \
+    while (pos >= end) \
+        pos -= (end - repeat); \
 
-#define INC_POS_STEREO_ONESHOT()\
-    pos += (intAdd << 1);       \
-    fractPos += fractAdd;       \
-    if (fractPos > 65535)       \
-    {                           \
-        fractPos &= 65535;      \
-        pos += 2;               \
-    }                           \
-    if (pos >= end)             \
-    {                           \
-        pos = 0;                \
-        break;                  \
-    }                           \
+#define INC_POS_STEREO_ONESHOT() \
+    pos += (intAdd << 1); \
+    fractPos += fractAdd; \
+    if (fractPos > 65535) \
+    { \
+        fractPos &= 65535; \
+        pos += 2; \
+    } \
+    if (pos >= end) \
+    { \
+        pos = 0; \
+        break; \
+    } \
 
 #define GET_IP_SAMPLE() (((((int)pos[1] - (int)pos[0]) * fractPos) / 65536) + (int)pos[0])
 
@@ -93,6 +93,7 @@ Channel::Channel(Audio* audio) :
     mAudio(audio),
     mPos(0),
     mFractPos(0),
+    mTimePos(0.0f),
     mChannelType(CHANNEL_EFFECT),
     mFrequency(0.0f),
     mGain(1.0f),
@@ -225,6 +226,9 @@ void Channel::setPlayPosition(signed char* pos)
 
 void Channel::playLockless(Sound* sound)
 {
+    // Reset the time position in any case
+    mTimePos = 0.0f;
+    
     if (sound)
     {
         if (!sound->isCompressed())
@@ -270,6 +274,7 @@ void Channel::playLockless(Sound* sound)
 void Channel::stopLockless()
 {
     mPos = 0;
+    mTimePos = 0.0f;
 }
 
 void Channel::setPlayPositionLockless(signed char* pos)
@@ -288,6 +293,7 @@ void Channel::setPlayPositionLockless(signed char* pos)
         pos = end;
     
     mPos = pos;
+    mTimePos = (float)((int)pos - (int)mSound->getStart()) / (mSound->getSampleSize() * mSound->getFrequency());
 }
 
 void Channel::update(float timeStep)
@@ -356,7 +362,10 @@ void Channel::mix(int* dest, unsigned samples, int mixRate, bool stereo, bool in
             if (eof)
             {
                 if (mSound->isLooped())
+                {
                     mSound->rewindDecoder(mDecoder);
+                    mTimePos = 0.0f;
+                }
                 else
                     mDecodeBuffer->setOneshot(); // Stop after the current decode buffer has been played
             }
@@ -425,6 +434,12 @@ void Channel::mix(int* dest, unsigned samples, int mixRate, bool stereo, bool in
                 mixStereoToMono(sound, dest, samples, mixRate);
         }
     }
+    
+    // Update the time position
+    if (!mSound->isCompressed())
+        mTimePos = (float)((int)mPos - (int)mSound->getStart()) / (mSound->getSampleSize() * mSound->getFrequency());
+    else
+        mTimePos += ((float)samples / (float)mixRate) * mFrequency / mSound->getFrequency();
 }
 
 void Channel::mixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)
@@ -1091,25 +1106,22 @@ void Channel::mixNull(float timeStep)
     if ((!mPos) || (!mSound))
         return;
     
-    // Can not support simulated playback of compressed sounds
-    if (mSound->isCompressed())
-        return;
+    // Advance only the time position
+    mTimePos += timeStep * mFrequency / mSound->getFrequency();
     
-    // Calculate approximate advance to sample pos
-    int advance = (int)(mFrequency * timeStep) * mSound->getSampleSize();
-    signed char* end = mSound->getEnd();
-    signed char* repeat = mSound->getRepeat();
-    
-    mPos += advance;
     if (mSound->isLooped())
     {
-        while (mPos >= end)
-            mPos -= (end - repeat);
+        // For simulated playback, simply reset the time position to zero when the sound loops
+        if (mTimePos >= mSound->getLength())
+            mTimePos -= mSound->getLength();
     }
     else
     {
-        if (mPos >= end)
+        if (mTimePos >= mSound->getLength())
+        {
             mPos = 0;
+            mTimePos = 0.0f;
+        }
     }
 }
 

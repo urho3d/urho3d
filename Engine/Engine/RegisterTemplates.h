@@ -249,6 +249,7 @@ template <class T> void registerChannel(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "void setPanning(float)", asMETHODPR(T, setPanning, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Sound@+ getSound() const", asMETHODPR(T, getSound, () const, Sound*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "ChannelType getChannelType() const", asMETHODPR(T, getChannelType, () const, ChannelType), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float getTimePosition() const", asMETHODPR(T, getTimePosition, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getFrequency() const", asMETHODPR(T, getFrequency, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getGain() const", asMETHODPR(T, getGain, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getAttenuation() const", asMETHODPR(T, getAttenuation, () const, float), asCALL_THISCALL);
