@@ -39,8 +39,7 @@ Bone::Bone(Bone* rootBone, const std::string& name) :
     mRadius(0.0f),
     mAnimationEnabled(true),
     mBindInverseTransformDirty(true),
-    mSkinningDirty(true),
-    mAttachedNodesDirty(true)
+    mSkinningDirty(true)
 {
     if (!mRootBone)
         mRootBone = this;
@@ -150,16 +149,6 @@ void Bone::onMarkedDirty()
 void Bone::onParentChanged()
 {
     markBindInverseTransformDirty();
-}
-
-void Bone::onChildAdded(Node* node)
-{
-    mRootBone->mAttachedNodesDirty = true;
-}
-
-void Bone::onChildRemoved(Node* node)
-{
-    mRootBone->mAttachedNodesDirty = true;
 }
 
 void Bone::markBindInverseTransformDirty()

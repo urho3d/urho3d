@@ -30,6 +30,7 @@
 #include "IndexBuffer.h"
 #include "Log.h"
 #include "Material.h"
+#include "Octree.h"
 #include "OctreeQuery.h"
 #include "Profiler.h"
 #include "Renderer.h"
@@ -50,6 +51,8 @@ static bool compareAnimationOrder(AnimationState* lhs, AnimationState* rhs)
 
 AnimatedModel::AnimatedModel(Octant* octant, const std::string& name) :
     StaticModel(NODE_ANIMATEDMODEL, octant, name),
+    mAnimationLodDistance(0.0f),
+    mAnimationLodFrameNumber(M_MAX_UNSIGNED),
     mAnimationLodBias(1.0f),
     mAnimationLodTimer(0.0f),
     mAnimationDirty(true),
@@ -550,9 +553,49 @@ void AnimatedModel::processRayQuery(RayOctreeQuery& query, float initialDistance
 
 void AnimatedModel::updateNode(const FrameInfo& frame)
 {
-    // Update animation here if has attached nodes
-    if (mSkeleton.hasAttachedNodes())
-        updateAnimation(frame);
+    // Update animation here
+    if ((!mAnimationDirty) && (!mAnimationOrderDirty))
+        return;
+    
+    // If node was invisible last frame, need to decide animation LOD distance here
+    // If headless, retain the current animation distance (should be 0)
+    if ((frame.mCamera) && (abs((int)frame.mFrameNumber - (int)mAnimationLodFrameNumber) > 1))
+    {
+        float distance = frame.mCamera->getDistance(getWorldPosition());
+        // If distance is greater than draw distance, no need to update at all
+        if ((mDrawDistance != 0.0f) && (distance > mDrawDistance))
+            return;
+        // Multiply the distance by 2 so that invisible nodes don't update that often
+        static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+        float scale = getWorldScale().dotProduct(dotScale);
+        mAnimationLodDistance = frame.mCamera->getLodDistance(2.0f * distance, scale, mLodBias);
+    }
+    
+    updateAnimation(frame);
+}
+
+void AnimatedModel::updateDistance(const FrameInfo& frame)
+{
+    mDistance = frame.mCamera->getDistance(getWorldPosition());
+    
+    static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+    float scale = getWorldScale().dotProduct(dotScale);
+    float newLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
+    
+    // If model is rendered from several views, use the minimum LOD distance for animation LOD
+    if (frame.mFrameNumber != mAnimationLodFrameNumber)
+    {
+        mAnimationLodDistance = newLodDistance;
+        mAnimationLodFrameNumber = frame.mFrameNumber;
+    }
+    else
+        mAnimationLodDistance = min(mAnimationLodDistance, newLodDistance);
+    
+    if (newLodDistance != mLodDistance)
+    {
+        mLodDistance = newLodDistance;
+        mLodLevelsDirty = true;
+    }
 }
 
 void AnimatedModel::updateGeometry(const FrameInfo& frame, Renderer* renderer)
@@ -563,10 +606,6 @@ void AnimatedModel::updateGeometry(const FrameInfo& frame, Renderer* renderer)
         syncAnimation(mAutoSyncSource);
         syncMorphs(mAutoSyncSource);
     }
-    
-    // Update animation here if no attached nodes
-    if (!mSkeleton.hasAttachedNodes())
-        updateAnimation(frame);
     
     if (mLodLevelsDirty)
         calculateLodLevels();
@@ -965,19 +1004,17 @@ void AnimatedModel::onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox)
 void AnimatedModel::markAnimationDirty()
 {
     mAnimationDirty = true;
-    
-    // If there are attached nodes, mark for octree update to update animation earlier
-    if (mSkeleton.hasAttachedNodes())
-        VolumeNode::onMarkedDirty();
+    // Mark for octree update, as animation is updated before octree reinsertion
+    if (mOctant)
+        mOctant->getRoot()->markNodeForUpdate(this);
 }
 
 void AnimatedModel::markAnimationOrderDirty()
 {
     mAnimationOrderDirty = true;
-    
-    // If there are attached nodes, mark for octree update to update animation earlier
-    if (mSkeleton.hasAttachedNodes())
-        VolumeNode::onMarkedDirty();
+    // Mark for octree update, as animation is updated before octree reinsertion
+    if (mOctant)
+        mOctant->getRoot()->markNodeForUpdate(this);
 }
 
 void AnimatedModel::markMorphsDirty()
@@ -1077,16 +1114,12 @@ void AnimatedModel::refreshGeometryBoneMappings()
 
 void AnimatedModel::updateAnimation(const FrameInfo& frame)
 {
-    if ((!mAnimationDirty) && (!mAnimationOrderDirty))
-        return;
-    
     // If using animation LOD, accumulate time and see if it is time to update
-    // Note: if frameinfo has a null camera, then update animation always (headless mode)
-    if ((frame.mCamera) && (mAnimationLodBias > 0.0f) && (mLodDistance > 0.0f))
+    if ((mAnimationLodBias > 0.0f) && (mAnimationLodDistance > 0.0f))
     {
         mAnimationLodTimer += mAnimationLodBias * frame.mTimeStep * ANIMATION_LOD_BASESCALE;
-        if (mAnimationLodTimer >= mLodDistance)
-            mAnimationLodTimer = fmodf(mAnimationLodTimer, mLodDistance);
+        if (mAnimationLodTimer >= mAnimationLodDistance)
+            mAnimationLodTimer = fmodf(mAnimationLodTimer, mAnimationLodDistance);
         else
         {
             // If animation order changed (animations added/removed), force always an immediate update
@@ -1104,15 +1137,14 @@ void AnimatedModel::updateAnimation(const FrameInfo& frame)
         mAnimationOrderDirty = false;
     }
     
+    // Reset skeleton, then apply all animations
     mSkeleton.reset();
-    
     for (std::vector<AnimationState*>::iterator i = mAnimationStates.begin(); i != mAnimationStates.end(); ++i)
         (*i)->apply();
     
-    mAnimationDirty = false;
-    
-    // Animation has changed the bounding box: mark dirty
+    // Animation has changed the bounding box: mark node for octree reinsertion
     VolumeNode::onMarkedDirty();
+    mAnimationDirty = false;
 }
 
 void AnimatedModel::updateSkinning()

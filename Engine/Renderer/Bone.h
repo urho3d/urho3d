@@ -58,8 +58,6 @@ public:
     void reset(bool force = false);
     //! Clear skinning update flag
     void clearSkinningDirty() { mSkinningDirty = false; }
-    //! Clear attached nodes rescan flag
-    void clearAttachedNodesDirty() { mAttachedNodesDirty = false; }
     
     //! Return root bone
     Bone* getRootBone() const { return mRootBone; }
@@ -87,18 +85,12 @@ public:
     bool isAnimationEnabled() const { return mAnimationEnabled; }
     //! Return whether skinning needs update
     bool isSkinningDirty() const { return mSkinningDirty; }
-    //! Return whether attached scene nodes need rescan
-    bool areAttachedNodesDirty() const { return mAttachedNodesDirty; }
     
 protected:
     //! Transform has changed. Mark skinning to need updating
     virtual void onMarkedDirty();
     //! Parent node has changed. Mark bind inverse matrix to need updating
     virtual void onParentChanged();
-    //! A child node has been added. Mark attached nodes to need rescan
-    virtual void onChildAdded(Node* node);
-    //! A child node has been removed. Mark attached nodes to need rescan
-    virtual void onChildRemoved(Node* node);
     
 private:
     //! Mark the bind inverse matrix to updating
@@ -132,8 +124,6 @@ private:
     bool mBindInverseTransformDirty;
     //! Skinning needs update flag
     bool mSkinningDirty;
-    //! Attached nodes need rescan flag
-    bool mAttachedNodesDirty;
 };
 
 #endif // RENDERER_BONE_H

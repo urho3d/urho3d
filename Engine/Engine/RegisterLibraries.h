@@ -21,12 +21,34 @@
 // THE SOFTWARE.
 //
 
-#ifndef ENGINE_REGISTERAUDIO_H
-#define ENGINE_REGISTERAUDIO_H
+#ifndef ENGINE_REGISTERLIBRARIES_H
+#define ENGINE_REGISTERLIBRARIES_H
 
 class asIScriptEngine;
 
+//! Register the Math library to script
+void registerMathLibrary(asIScriptEngine* engine);
+//! Register the Common library to script
+void registerCommonLibrary(asIScriptEngine* engine);
+//! Register the Event library to script
+void registerEventLibrary(asIScriptEngine* engine);
+//! Register the Resource library to script
+void registerResourceLibrary(asIScriptEngine* engine);
+//! Register the Scene library to script
+void registerSceneLibrary(asIScriptEngine* engine);
 //! Register the Audio library to script
 void registerAudioLibrary(asIScriptEngine* engine);
+//! Register the Renderer library to script
+void registerRendererLibrary(asIScriptEngine* engine);
+//! Register the Input library to script
+void registerInputLibrary(asIScriptEngine* engine);
+//! Register the UI library to script
+void registerUILibrary(asIScriptEngine* engine);
+//! Register the Physics library to script
+void registerPhysicsLibrary(asIScriptEngine* engine);
+//! Register the Script library to script
+void registerScriptLibrary(asIScriptEngine* engine);
+//! Register the Engine library to script
+void registerEngineLibrary(asIScriptEngine* engine);
 
-#endif // ENGINE_REGISTERAUDIO_H
+#endif // ENGINE_REGISTERLIBRARIES_H

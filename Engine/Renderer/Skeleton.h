@@ -62,8 +62,6 @@ public:
     Bone* getBone(StringHash boneNameHash) const;
     //! Return bone index from pointer, or 0xffffffff if not found
     unsigned getBoneIndex(Bone* bone) const;
-    //! Return whether bones have attached scene nodes
-    bool hasAttachedNodes();
     
 private:
     //! Prevent copy construction
@@ -77,8 +75,6 @@ private:
     std::vector<SharedPtr<Bone> > mBones;
     //! Root bone
     SharedPtr<Bone> mRootBone;
-    //! Scene nodes attached to bones flag
-    bool mHasAttachedNodes;
 };
 
 #endif // RENDERER_SKELETON_H

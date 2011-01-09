@@ -30,8 +30,7 @@
 #include "DebugNew.h"
 
 Skeleton::Skeleton() :
-    mRootBone(0),
-    mHasAttachedNodes(false)
+    mRootBone(0)
 {
 }
 
@@ -221,38 +220,6 @@ unsigned Skeleton::getBoneIndex(Bone* bone) const
     return M_MAX_UNSIGNED;
 }
 
-bool Skeleton::hasAttachedNodes()
-{
-    if ((mRootBone) && (mRootBone->areAttachedNodesDirty()))
-    {
-        // Update attached nodes flag by going through all children of root bone
-        mHasAttachedNodes = false;
-        std::vector<Node*> children = mRootBone->getChildren(NODE_ANY, true);
-        // Check if any of the children is either a bone from another skeleton, or another kind of node
-        for (std::vector<Node*>::const_iterator i = children.begin(); i != children.end(); ++i)
-        {
-            if ((*i)->getNodeFlags() & NODE_BONE)
-            {
-                Bone* bone = static_cast<Bone*>(*i);
-                if (bone->getRootBone() != mRootBone)
-                {
-                    mHasAttachedNodes = true;
-                    break;
-                }
-            }
-            else
-            {
-                mHasAttachedNodes = true;
-                break;
-            }
-        }
-        
-        mRootBone->clearAttachedNodesDirty();
-    }
-    
-    return mHasAttachedNodes;
-}
-
 void Skeleton::clearBones()
 {
     if ((mRootBone) && (mRootBone->getParent()))
@@ -260,6 +227,4 @@ void Skeleton::clearBones()
     
     mBones.clear();
     mRootBone.reset();
-    
-    mHasAttachedNodes = false;
 }

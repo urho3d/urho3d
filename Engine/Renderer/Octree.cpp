@@ -354,14 +354,14 @@ void Octree::loadXML(const XMLElement& source)
 
 void Octree::update(float timeStep)
 {
-    // If in headless mode, run an update now to reinsert nodes
+    // If in headless mode, run an update now to update and reinsert nodes
     if (mHeadless)
     {
         FrameInfo frame;
         frame.mCamera = 0;
         frame.mFrameNumber = 0;
         frame.mTimeStep = timeStep;
-        updateNodes(frame);
+        updateOctree(frame);
     }
 }
 
@@ -371,7 +371,7 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
         return;
     
     if (mNumNodes)
-        LOGWARNING("Resizing octree while nodes still exist");
+        LOGWARNING("Octree not empty when resizing. Removing all nodes");
     
     release();
     
@@ -391,53 +391,70 @@ void Octree::clearNodeUpdate(VolumeNode* node)
     mNodeUpdates.erase(node);
 }
 
-void Octree::updateNodes(const FrameInfo& frame)
+void Octree::markNodeForReinsertion(VolumeNode* node)
 {
-    PROFILE(Octree_UpdateNodes);
-    
-    // Let nodes update themselves before reinsertion
-    for (std::set<VolumeNode*>::iterator i = mNodeUpdates.begin(); i != mNodeUpdates.end(); ++i)
-        (*i)->updateNode(frame);
-    
-    // Reinsert nodes into the octree
-    for (std::set<VolumeNode*>::iterator i = mNodeUpdates.begin(); i != mNodeUpdates.end(); ++i)
+    mNodeReinsertions.insert(node);
+}
+
+void Octree::clearNodeReinsertion(VolumeNode* node)
+{
+    mNodeReinsertions.erase(node);
+}
+
+void Octree::updateOctree(const FrameInfo& frame)
+{
     {
-        VolumeNode* node = *i;
-        Octant* octant = node->mOctant;
+        PROFILE(Octree_UpdateNodes);
         
-        if (octant)
+        // Let nodes update themselves before reinsertion
+        for (std::set<VolumeNode*>::iterator i = mNodeUpdates.begin(); i != mNodeUpdates.end(); ++i)
+            (*i)->updateNode(frame);
+    }
+    
+    {
+        PROFILE(Octree_ReinsertNodes);
+        
+        // Reinsert nodes into the octree
+        for (std::set<VolumeNode*>::iterator i = mNodeReinsertions.begin(); i != mNodeReinsertions.end(); ++i)
         {
-            bool reinsert = false;
+            VolumeNode* node = *i;
+            Octant* octant = node->mOctant;
             
-            if (octant == this)
+            if (octant)
             {
-                // Handle root octant as special case: if outside the root, do not reinsert
-                if ((getCullingBox().isInside(node->getWorldBoundingBox()) == INSIDE) && (!checkNodeSize(node)))
-                    reinsert = true;
-            }
-            else
-            {
-                // Otherwise reinsert if outside current octant or if size does not fit octant size
-                if ((octant->getCullingBox().isInside(node->getWorldBoundingBox()) != INSIDE) || (!octant->checkNodeSize(node)))
-                    reinsert = true;
-            }
-            
-            if (reinsert)
-            {
-                insertNode(node);
+                bool reinsert = false;
                 
-                // If old octant (not root) has become empty, delete it
-                while ((octant != this) && (octant->isEmpty()))
+                if (octant == this)
                 {
-                    Octant* parent = octant->getParent();
-                    parent->deleteChild(octant);
-                    octant = parent;
+                    // Handle root octant as special case: if outside the root, do not reinsert
+                    if ((getCullingBox().isInside(node->getWorldBoundingBox()) == INSIDE) && (!checkNodeSize(node)))
+                        reinsert = true;
+                }
+                else
+                {
+                    // Otherwise reinsert if outside current octant or if size does not fit octant size
+                    if ((octant->getCullingBox().isInside(node->getWorldBoundingBox()) != INSIDE) || (!octant->checkNodeSize(node)))
+                        reinsert = true;
+                }
+                
+                if (reinsert)
+                {
+                    insertNode(node);
+                    
+                    // If old octant (not root) has become empty, delete it
+                    while ((octant != this) && (octant->isEmpty()))
+                    {
+                        Octant* parent = octant->getParent();
+                        parent->deleteChild(octant);
+                        octant = parent;
+                    }
                 }
             }
+            else
+                insertNode(node);
         }
-        else
-            insertNode(node);
     }
     
     mNodeUpdates.clear();
+    mNodeReinsertions.clear();
 }

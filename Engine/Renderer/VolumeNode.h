@@ -70,7 +70,7 @@ public:
     
     //! Process renderer raycast
     virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);
-    //! Pre-octree update step
+    //! Update before octree reinsertion. Needs to be requested with markForUpdate()
     virtual void updateNode(const FrameInfo& frame);
     //! Calculate distance for rendering
     virtual void updateDistance(const FrameInfo& frame);
@@ -129,12 +129,14 @@ public:
     bool isInView(const FrameInfo& frame) const;
     
 protected:
-    //! Construct with node flags, initial octree pointer and name
+    //! Construct with node flags, initial octant pointer and name
     VolumeNode(unsigned flags, Octant* octant, const std::string& name);
-    //! Transform has changed. Mark for octree re-insertion
+    //! Transform has changed. Mark that the world-space bounding box needs update, and mark for octree reinsertion
     virtual void onMarkedDirty();
     //! Update world-space bounding box
     virtual void onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox) = 0;
+    //! Mark node for update before octree reinsertion
+    void markForUpdate();
     
     //! Current octree octant
     Octant* mOctant;

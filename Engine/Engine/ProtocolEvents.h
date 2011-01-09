@@ -82,13 +82,6 @@ DEFINE_EVENT(EVENT_JOINSCENEFAILED, JoinSceneFailed)
     EVENT_PARAM(P_REASON, Reason);              // string
 }
 
-//! (Client) Left the scene
-DEFINE_EVENT(EVENT_LEFTSCENE, LeftScene)
-{
-    EVENT_PARAM(P_CONNECTION, Connection);      // Connection pointer
-    EVENT_PARAM(P_SCENE, Scene);                // Scene pointer
-}
-
 //! (Client) File transfer completed
 DEFINE_EVENT(EVENT_FILETRANSFERCOMPLETED, FileTransferCompleted)
 {

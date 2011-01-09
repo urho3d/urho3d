@@ -622,7 +622,6 @@ static void registerSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "uint getNumBones() const", asMETHOD(Skeleton, getNumBones), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(uint) const", asMETHODPR(Skeleton, getBone, (unsigned) const, Bone*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(const string& in) const", asMETHODPR(Skeleton, getBone, (const std::string&) const, Bone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "bool hasAttachedNodes()", asMETHOD(Skeleton, hasAttachedNodes), asCALL_THISCALL);
 }
 
 static void registerAnimatedModel(asIScriptEngine* engine)

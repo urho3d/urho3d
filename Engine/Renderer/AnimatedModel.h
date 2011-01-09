@@ -69,8 +69,10 @@ public:
     
     //! Process renderer raycast
     virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);
-    //! Pre-octree update step. Update animation if has skeletally attached child nodes
+    //! Update before octree reinsertion. Animation is updated here
     virtual void updateNode(const FrameInfo& frame);
+    //! Calculate distance for rendering
+    virtual void updateDistance(const FrameInfo& frame);
     //! Prepare geometry for rendering
     virtual void updateGeometry(const FrameInfo& frame, Renderer* renderer);
     //! Return vertex shader parameter
@@ -138,6 +140,11 @@ protected:
     //! Update world-space bounding box
     virtual void onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox);
     
+    //! Animation LOD distance, the minimum of all LOD view distances last frame
+    float mAnimationLodDistance;
+    //! The frame number animation LOD distance was last calculated on
+    unsigned mAnimationLodFrameNumber;
+    
 private:
     //! Mark animation and skinning to require an update
     void markAnimationDirty();
@@ -151,7 +158,7 @@ private:
     void refreshGeometryBoneMappings();
     //! Clone geometries as required
     void cloneGeometries();
-    //! Recalculate animations
+    //! Recalculate animations. Called from updateNode()
     void updateAnimation(const FrameInfo& frame);
     //! Recalculate skinning
     void updateSkinning();

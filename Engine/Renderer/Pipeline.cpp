@@ -425,8 +425,9 @@ bool Pipeline::update(float timeStep, Octree* octree, Camera* camera)
     if (mShadersDirty)
         loadShaders();
     
-    // Update octree (reinsert nodes, early update for nodes that need that)
-    octree->updateNodes(mFrame);
+    // Update octree. Perform early update for nodes which need that, and reinsert moved nodes
+    mFrame.mCamera = camera;
+    octree->updateOctree(mFrame);
     
     // Add the main view
     addView(octree, camera, 0);

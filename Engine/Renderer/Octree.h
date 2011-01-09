@@ -158,14 +158,18 @@ public:
     //! Scene extension update. Update octree when in headless mode
     virtual void update(float timeStep);
     
-    //! Resize octree. Removes all nodes
+    //! Resize octree. Should be empty at this point; any nodes will be removed
     void resize(const BoundingBox& box, unsigned numLevels);
     //! Mark scene node as requiring an update
     void markNodeForUpdate(VolumeNode* node);
-    //! Clear scene node's updade flag
+    //! Remove scene node from update list
     void clearNodeUpdate(VolumeNode* node);
-    //! Reinsert moved scene nodes and call their update functions
-    void updateNodes(const FrameInfo& frame);
+    //! Mark scene node as requiring a reinsertion
+    void markNodeForReinsertion(VolumeNode* node);
+    //! Remove scene node from reinsertion list
+    void clearNodeReinsertion(VolumeNode* node);
+    //! Update and reinsert scene nodes
+    void updateOctree(const FrameInfo& frame);
     
     //! Return subdivision levels
     unsigned getNumLevels() const { return mNumLevels; }
@@ -175,6 +179,8 @@ public:
 private:
     //! Set of scene nodes that require update
     std::set<VolumeNode*> mNodeUpdates;
+    //! Set of scene nodes that require reinsertion
+    std::set<VolumeNode*> mNodeReinsertions;
     //! Subdivision level
     unsigned mNumLevels;
     //! Headless mode flag

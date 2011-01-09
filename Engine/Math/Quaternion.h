@@ -117,10 +117,9 @@ public:
     Vector3 operator * (const Vector3& rhs) const
     {
         Vector3 qVec(mX,mY,mZ);
-        Vector3 tempVec1 = qVec.crossProduct(rhs);
-        Vector3 tempVec2 = qVec.crossProduct(tempVec1);
-        
-        return rhs + (tempVec1 * (2.0f * mW)) + (tempVec2 * 2.0f);
+        Vector3 cross1(qVec.crossProduct(rhs));
+        Vector3 cross2(qVec.crossProduct(cross1));
+        return rhs + 2.0f * (cross1 * mW + cross2);
     }
     
     //! Return negation

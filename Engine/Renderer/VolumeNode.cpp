@@ -52,16 +52,18 @@ VolumeNode::VolumeNode(unsigned flags, Octant* octant, const std::string& name) 
     if (octant)
     {
         octant->addNode(this);
-        octant->getRoot()->markNodeForUpdate(this);
+        octant->getRoot()->markNodeForReinsertion(this);
     }
 }
 
 VolumeNode::~VolumeNode()
 {
-    // If was in octree and is being deleted now, make sure to clear any reference in dirty list
+    // If was in octree and is being deleted now, make sure to clear any reference in the update/reinsertion lists
     if (mOctant)
     {
-        mOctant->getRoot()->clearNodeUpdate(this);
+        Octree* octree = mOctant->getRoot();
+        octree->clearNodeUpdate(this);
+        octree->clearNodeReinsertion(this);
         mOctant->removeNode(this);
     }
 }
@@ -322,6 +324,12 @@ void VolumeNode::onMarkedDirty()
 {
     mWorldBoundingBoxDirty = true;
     
+    if (mOctant)
+        mOctant->getRoot()->markNodeForReinsertion(this);
+}
+
+void VolumeNode::markForUpdate()
+{
     if (mOctant)
         mOctant->getRoot()->markNodeForUpdate(this);
 }

@@ -44,18 +44,7 @@
 #include "PhysicsWorld.h"
 #include "Pipeline.h"
 #include "Profiler.h"
-#include "RegisterAudio.h"
-#include "RegisterCommon.h"
-#include "RegisterEngine.h"
-#include "RegisterEvent.h"
-#include "RegisterInput.h"
-#include "RegisterMath.h"
-#include "RegisterPhysics.h"
-#include "RegisterRenderer.h"
-#include "RegisterResource.h"
-#include "RegisterScene.h"
-#include "RegisterScript.h"
-#include "RegisterUI.h"
+#include "RegisterLibraries.h"
 #include "Renderer.h"
 #include "RendererComponentFactory.h"
 #include "RendererResourceFactory.h"
@@ -597,40 +586,42 @@ void Engine::registerScriptAPI()
     
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     
-    // Math library
+    // Libraries need to be registered in their dependency order, so that there are for example no undefined Math types
+    // when Common types depending on them are being registered
+    
     LOGDEBUG("Registering Math library");
     registerMathLibrary(engine);
-    // Common library
+    
     LOGDEBUG("Registering Common library");
     registerCommonLibrary(engine);
-    // Event library
+    
     LOGDEBUG("Registering Event library");
     registerEventLibrary(engine);
-    // Resource library
+    
     LOGDEBUG("Registering Resource library");
     registerResourceLibrary(engine);
-    // Scene library
+    
     LOGDEBUG("Registering Scene library");
     registerSceneLibrary(engine);
-    // Audio library
+    
     LOGDEBUG("Registering Audio library");
     registerAudioLibrary(engine);
-    // Renderer library
+    
     LOGDEBUG("Registering Renderer library");
     registerRendererLibrary(engine);
-    // Input library
+    
     LOGDEBUG("Registering Input library");
     registerInputLibrary(engine);
-    // UI library
+    
     LOGDEBUG("Registering UI library");
     registerUILibrary(engine);
-    // Physics library
+    
     LOGDEBUG("Registering Physics library");
     registerPhysicsLibrary(engine);
-    // Script library
+    
     LOGDEBUG("Registering Script library");
     registerScriptLibrary(engine);
-    //  Engine library
+    
     LOGDEBUG("Registering Engine library");
     registerEngineLibrary(engine);
 }
