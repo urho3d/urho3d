@@ -54,18 +54,12 @@ public:
     virtual void saveXML(XMLElement& dest);
     //! Read component state from an XML element
     virtual void loadXML(const XMLElement& source, ResourceCache* cache);
-    //! Resolve component references after loading
-    virtual void postLoad(ResourceCache* cache);
     //! Write a network update
     virtual bool writeNetUpdate(Serializer& dest, Serializer& destRevision, Deserializer& baseRevision, const NetUpdateInfo& info);
     //! Read a network update
     virtual void readNetUpdate(Deserializer& source, ResourceCache* cache, const NetUpdateInfo& info);
-    //! Resolve component references after a network update
-    virtual void postNetUpdate(ResourceCache* cache);
     //! Perform client-side visual smoothing
     virtual void interpolate(bool snapToEnd);
-    //! Return component references
-    virtual void getComponentRefs(std::vector<ComponentRef>& refs);
     
     //! Process renderer raycast
     virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);
@@ -100,14 +94,14 @@ public:
     void setMorphWeight(const std::string& name, float weight);
     //! Set vertex morph weight by name hash
     void setMorphWeight(StringHash nameHash, float weight);
-    //! Enable automatic animation and morph sync from another animated model
-    void setAutoSyncSource(AnimatedModel* source);
     //! Reset all vertex morphs to zero
     void resetMorphWeights();
-    //! Sync animation manually from another animated model
+    //! Sync animation from another animated model
     void syncAnimation(AnimatedModel* srcNode);
-    //! Sync morphs manually from another animated model
+    //! Sync morphs from another animated model
     void syncMorphs(AnimatedModel* srcNode);
+    //! Set animation & morphs local mode. If enabled, they are not sent over network even if the node is otherwise replicated
+    void setLocalAnimation(bool enable);
     
     //! Return skeleton
     const Skeleton& getSkeleton() const { return mSkeleton; }
@@ -133,8 +127,8 @@ public:
     float getMorphWeight(const std::string& name) const;
     //! Return vertex morph weight by name hash
     float getMorphWeight(StringHash nameHash) const;
-    //! Return automatic animation sync source
-    AnimatedModel* getAutoSyncSource() const { return mAutoSyncSource; }
+    //! Return whether animation is local
+    bool getLocalAnimation() const { return mLocalAnimation; }
     
 protected:
     //! Update world-space bounding box
@@ -185,8 +179,6 @@ private:
     std::vector<std::vector<Matrix4x3> > mGeometrySkinMatrices;
     //! Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
     std::vector<std::vector<Matrix4x3*> > mGeometrySkinMatrixPtrs;
-    //! Automatic animation sync source
-    WeakPtr<AnimatedModel> mAutoSyncSource;
     //! Animation LOD bias
     float mAnimationLodBias;
     //! Animation LOD timer
@@ -197,8 +189,8 @@ private:
     bool mAnimationOrderDirty;
     //! Vertex morphs dirty flag
     bool mMorphsDirty;
-    //! Automatic animation sync source component reference
-    ComponentRef mAutoSyncSourceRef;
+    //! Local animation flag
+    bool mLocalAnimation;
 };
 
 #endif // RENDERER_ANIMATEDMODEL_H

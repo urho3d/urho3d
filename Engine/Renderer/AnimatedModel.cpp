@@ -57,7 +57,8 @@ AnimatedModel::AnimatedModel(Octant* octant, const std::string& name) :
     mAnimationLodTimer(0.0f),
     mAnimationDirty(true),
     mAnimationOrderDirty(true),
-    mMorphsDirty(true)
+    mMorphsDirty(true),
+    mLocalAnimation(false)
 {
 }
 
@@ -91,10 +92,6 @@ void AnimatedModel::save(Serializer& dest)
     dest.writeVLE(mMorphs.size());
     for (unsigned i = 0; i < mMorphs.size(); ++i)
         dest.writeFloat(mMorphs[i].mWeight);
-    
-    // Write autosyncsource reference
-    ComponentRef autoSyncSourceRef(mAutoSyncSource.getPtr());
-    autoSyncSourceRef.write(dest);
 }
 
 void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
@@ -127,9 +124,6 @@ void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
     unsigned numMorphs = source.readVLE();
     for (unsigned i = 0; i < numMorphs; ++i)
         setMorphWeight(i, source.readFloat());
-    
-    // Read autosyncsource reference
-    mAutoSyncSourceRef.read(source);
 }
 
 void AnimatedModel::saveXML(XMLElement& dest)
@@ -163,14 +157,6 @@ void AnimatedModel::saveXML(XMLElement& dest)
         XMLElement morphElem = dest.createChildElement("morph");
         morphElem.setInt("index", i);
         morphElem.setFloat("weight", mMorphs[i].mWeight);
-    }
-    
-    // Write autosyncsource reference
-    ComponentRef autoSyncSourceRef(mAutoSyncSource.getPtr(), true);
-    if (autoSyncSourceRef.mEntityID)
-    {
-        XMLElement syncSourceElem = dest.createChildElement("syncsource");
-        autoSyncSourceRef.writeXML(syncSourceElem);
     }
 }
 
@@ -211,22 +197,6 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
         unsigned index = morphElem.getInt("index");
         setMorphWeight(index, morphElem.getFloat("weight"));
         morphElem = morphElem.getNextElement("morph");
-    }
-    
-    // Read autosyncsource reference
-    XMLElement syncSourceElem = source.getChildElement("syncsource", false);
-    if (syncSourceElem.notNull())
-        mAutoSyncSourceRef.readXML(syncSourceElem);
-}
-
-void AnimatedModel::postLoad(ResourceCache* cache)
-{
-    Node::postLoad(cache);
-    
-    if (mAutoSyncSourceRef.mDirty)
-    {
-        mAutoSyncSource = static_cast<AnimatedModel*>(mEntity->getScene()->getComponent(mAutoSyncSourceRef));
-        mAutoSyncSourceRef.mDirty = false;
     }
 }
 
@@ -322,11 +292,10 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         else
             baseRevision.readUByte();
     }
-    // Autosyncsource
-    ComponentRef autoSyncSourceRef(mAutoSyncSource);
-    checkComponentRef(autoSyncSourceRef, baseRevision, bits, 32);
-    // If autosyncsource exists, do not send animation or morph data
-    if (mAutoSyncSource)
+    
+    // If local animation, do not send even if changed. It is slightly unoptimal to first check, then disable, but it ensures
+    // that the base revision data stays the same (otherwise out of bounds reads might result when toggling local animation)
+    if (mLocalAnimation)
         bits &= ~(8 | 16);
     
     // Update replication state fully, and network stream by delta
@@ -374,7 +343,6 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
     writeVLEDelta(mMorphs.size(), dest, destRevision, bits & 16);
     for (unsigned i = 0; i < mMorphs.size(); ++i)
         writeUByteDelta((unsigned char)(mMorphs[i].mWeight * 255.0f), dest, destRevision, bits & 16);
-    writeComponentRefDelta(autoSyncSourceRef, dest, destRevision, bits & 32);
     
     return prevBits || (bits != 0);
 }
@@ -454,12 +422,6 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
         for (unsigned i = 0; i < numMorphs; ++i)
             setMorphWeight(i, source.readUByte() / 255.0f);
     }
-    readComponentRefDelta(mAutoSyncSourceRef, source, bits & 32);
-}
-
-void AnimatedModel::postNetUpdate(ResourceCache* cache)
-{
-    postLoad(cache);
 }
 
 void AnimatedModel::interpolate(bool snapToEnd)
@@ -470,14 +432,6 @@ void AnimatedModel::interpolate(bool snapToEnd)
     
     for (std::vector<AnimationState*>::iterator i = mAnimationStates.begin(); i != mAnimationStates.end(); ++i)
         (*i)->interpolate(snapToEnd, t);
-}
-
-void AnimatedModel::getComponentRefs(std::vector<ComponentRef>& dest)
-{
-    if (mParent)
-        dest.push_back(ComponentRef(mParent));
-    if (mAutoSyncSource)
-        dest.push_back(ComponentRef(mAutoSyncSource));
 }
 
 void AnimatedModel::processRayQuery(RayOctreeQuery& query, float initialDistance)
@@ -600,13 +554,6 @@ void AnimatedModel::updateDistance(const FrameInfo& frame)
 
 void AnimatedModel::updateGeometry(const FrameInfo& frame, Renderer* renderer)
 {
-    // Update animation from sync source if one is defined
-    if (!mAutoSyncSource.isExpired())
-    {
-        syncAnimation(mAutoSyncSource);
-        syncMorphs(mAutoSyncSource);
-    }
-    
     if (mLodLevelsDirty)
         calculateLodLevels();
     
@@ -835,11 +782,6 @@ void AnimatedModel::setMorphWeight(StringHash nameHash, float weight)
     }
 }
 
-void AnimatedModel::setAutoSyncSource(AnimatedModel* source)
-{
-    mAutoSyncSource = source;
-}
-
 void AnimatedModel::resetMorphWeights()
 {
     for (std::vector<ModelMorph>::iterator i = mMorphs.begin(); i != mMorphs.end(); ++i)
@@ -853,7 +795,10 @@ void AnimatedModel::syncAnimation(AnimatedModel* srcNode)
     if (!srcNode)
         return;
     
-    setAnimationLodBias(srcNode->getAnimationLodBias());
+    // Make sure the animation proceeds at the same rate as in the source
+    mAnimationLodBias = srcNode->mAnimationLodBias;
+    mAnimationLodDistance = srcNode->mAnimationLodDistance;
+    mAnimationLodFrameNumber = srcNode->mAnimationLodFrameNumber;
     
     const std::vector<AnimationState*>& srcStates = srcNode->getAnimationStates();
     std::set<Animation*> srcAnimations;
@@ -889,6 +834,11 @@ void AnimatedModel::syncMorphs(AnimatedModel* srcNode)
         float srcWeight = srcNode->getMorphWeight(mMorphs[i].mName);
         setMorphWeight(i, srcWeight);
     }
+}
+
+void AnimatedModel::setLocalAnimation(bool enable)
+{
+    mLocalAnimation = enable;
 }
 
 float AnimatedModel::getMorphWeight(unsigned index) const
