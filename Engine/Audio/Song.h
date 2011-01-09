@@ -32,7 +32,7 @@
 class Audio;
 class Channel;
 
-//! Base class for sound resources
+//! Base class for tracked format song resources
 class Song : public Resource
 {
 public:

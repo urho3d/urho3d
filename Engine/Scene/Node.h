@@ -194,6 +194,8 @@ public:
 protected:
     //! Construct with node flags and name
     Node(unsigned flags, const std::string& name = std::string());
+    //! Mark node and child nodes to need world transform recalculation
+    void markDirty();
     //! Return transform for network replication (return world transform is parent scene node is not replicated)
     void getNetTransform(Vector3& position, Quaternion& rotation, Vector3& scale, ComponentRef& parentRef, const NetUpdateInfo& info);
     
@@ -205,16 +207,6 @@ protected:
     virtual void onChildAdded(Node* node) {}
     //! A child scene node has been removed. Perform subclass-specific operations
     virtual void onChildRemoved(Node* node) {}
-    
-    //! Mark node and child node needing world transform recalculation
-    void markDirty()
-    {
-        mDirty = true;
-        onMarkedDirty();
-        
-        for (std::vector<SharedPtr<Node> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
-            (*i)->markDirty();
-    }
     
     //! Parent scene node
     Node* mParent;
@@ -233,12 +225,12 @@ protected:
     unsigned char mInterpolationFlags;
     
 private:
-    //! Return child nodes recursively
-    void getChildrenRecursive(unsigned nodeFlags, std::vector<Node*>& dest) const;
-    //! Remove child node by iterator
-    void removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform = false, bool calledFromDestructor = false);
     //! Recalculate the world transform
     void updateWorldPosition();
+    //! Remove child node by iterator
+    void removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform = false, bool calledFromDestructor = false);
+    //! Return child nodes recursively
+    void getChildrenRecursive(unsigned nodeFlags, std::vector<Node*>& dest) const;
     
     //! Node flags
     unsigned mNodeFlags;

@@ -176,8 +176,15 @@ void Skeleton::define(const std::vector<SharedPtr<Bone > >& srcBones)
 
 void Skeleton::reset(bool force)
 {
+    // Start with resetting the root bone so that node dirtying is done most efficiently
+    if (mRootBone)
+        mRootBone->reset(force);
+    // Then reset the rest of the bones
     for (std::vector<SharedPtr<Bone> >::iterator i = mBones.begin(); i != mBones.end(); ++i)
-        (*i)->reset(force);
+    {
+        if ((*i) != mRootBone)
+            (*i)->reset(force);
+    }
 }
 
 Bone* Skeleton::getBone(unsigned index) const

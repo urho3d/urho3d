@@ -312,6 +312,7 @@ void Node::interpolate(bool snapToEnd)
             mScale = mInterpolationScale;
         mInterpolationFlags = INTERP_NONE;
     }
+    
     markDirty();
 }
 
@@ -565,6 +566,15 @@ Node* Node::getChild(StringHash nameHash, bool recursive) const
     return 0;
 }
 
+void Node::markDirty()
+{
+    mDirty = true;
+    onMarkedDirty();
+    
+    for (std::vector<SharedPtr<Node> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+        (*i)->markDirty();
+}
+
 void Node::getNetTransform(Vector3& position, Quaternion& rotation, Vector3& scale, ComponentRef& parentRef, const NetUpdateInfo& info)
 {
     // Use the parent node only if it will be synced
@@ -584,30 +594,6 @@ void Node::getNetTransform(Vector3& position, Quaternion& rotation, Vector3& sca
         scale = getWorldScale();
         parentRef = ComponentRef();
     }
-}
-
-void Node::getChildrenRecursive(unsigned nodeFlags, std::vector<Node*>& dest) const
-{
-    for (std::vector<SharedPtr<Node> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
-    {
-        if ((*i)->mNodeFlags & nodeFlags)
-            dest.push_back(*i);
-        (*i)->getChildrenRecursive(nodeFlags, dest);
-    }
-}
-
-void Node::removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform, bool calledFromDestructor)
-{
-    Node* node = (*i);
-    if (setWorldTransform)
-        node->setTransform(node->getWorldPosition(), node->getWorldRotation(), node->getWorldScale());
-    node->mParent = 0;
-    node->markDirty();
-    node->onParentChanged();
-    // Calling a virtual function will crash on destruction, so avoid it if necessary
-    if (!calledFromDestructor)
-        onChildRemoved(node);
-    mChildren.erase(i);
 }
 
 void Node::updateWorldPosition()
@@ -630,4 +616,28 @@ void Node::updateWorldPosition()
     
     mDirty = false;
     mWorldTransformDirty = true;
+}
+
+void Node::removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform, bool calledFromDestructor)
+{
+    Node* node = (*i);
+    if (setWorldTransform)
+        node->setTransform(node->getWorldPosition(), node->getWorldRotation(), node->getWorldScale());
+    node->mParent = 0;
+    node->markDirty();
+    node->onParentChanged();
+    // Calling a virtual function will crash on destruction, so avoid it if necessary
+    if (!calledFromDestructor)
+        onChildRemoved(node);
+    mChildren.erase(i);
+}
+
+void Node::getChildrenRecursive(unsigned nodeFlags, std::vector<Node*>& dest) const
+{
+    for (std::vector<SharedPtr<Node> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+    {
+        if ((*i)->mNodeFlags & nodeFlags)
+            dest.push_back(*i);
+        (*i)->getChildrenRecursive(nodeFlags, dest);
+    }
 }
