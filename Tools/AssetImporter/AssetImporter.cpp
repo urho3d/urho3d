@@ -63,16 +63,23 @@ struct ExportModel
 
 int main(int argc, char** argv);
 void run(const std::vector<std::string>& arguments);
-void errorExit(const std::string& error);
+void dumpNodes(aiNode* rootNode, unsigned level);
 void exportModel(ExportModel& model);
 void collectMeshes(ExportModel& model, aiNode* node);
 void buildModel(ExportModel& model);
+void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
+void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
+void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform);
+unsigned getElementMask(aiMesh* mesh);
+aiNode* findNode(const std::string& name, aiNode* rootNode);
 std::string toStdString(const aiString& str);
 Vector3 toVector3(const aiVector3D& vec);
 Vector2 toVector2(const aiVector2D& vec);
 Quaternion toQuaternion(const aiQuaternion& quat);
-aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* baseNode);
+aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* rootNode);
 void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
+void errorExit(const std::string& error);
 
 int main(int argc, char** argv)
 {
@@ -97,7 +104,7 @@ int main(int argc, char** argv)
 void run(const std::vector<std::string>& arguments)
 {
     if (arguments.size() < 2)
-        errorExit("Usage: AssetImporter <inputfile> <outputfile>\n");
+        errorExit("Usage: AssetImporter <inputfile> <outputfile> [rootnode]\n");
     
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(arguments[0].c_str(),
@@ -115,11 +122,44 @@ void run(const std::vector<std::string>& arguments)
     if (!scene)
         errorExit("Could not open input file " + arguments[0]);
     
+    dumpNodes(scene->mRootNode, 0);
+    
     ExportModel model;
     model.mOutName = arguments[1];
     model.mScene = scene;
-    model.mRootNode = scene->mRootNode;
+    
+    if (arguments.size() < 3)
+        model.mRootNode = scene->mRootNode;
+    else
+    {
+        model.mRootNode = findNode(arguments[2], scene->mRootNode);
+        if (!model.mRootNode)
+            errorExit("Could not find scene node " + arguments[2]);
+    }
+    
     exportModel(model);
+}
+
+void dumpNodes(aiNode* rootNode, unsigned level)
+{
+    if (!rootNode)
+        return;
+    
+    std::string indent;
+    indent.resize(level * 2);
+    for (unsigned i = 0; i < level * 2; ++i)
+        indent[i] = ' ';
+    
+    if (!rootNode->mNumMeshes)
+        std::cout << indent << "Node " << toStdString(rootNode->mName) << std::endl;
+    else
+    {
+        std::cout << indent << "Node " << toStdString(rootNode->mName) << " - " << rootNode->mNumMeshes << " geometries"
+            << std::endl;
+    }
+    
+    for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
+        dumpNodes(rootNode->mChildren[i], level + 1);
 }
 
 void exportModel(ExportModel& model)
@@ -133,9 +173,17 @@ void collectMeshes(ExportModel& model, aiNode* node)
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
     {
         aiMesh* mesh = model.mScene->mMeshes[node->mMeshes[i]];
+        for (unsigned j = 0; j < model.mMeshes.size(); ++j)
+        {
+            if (mesh == model.mMeshes[j])
+            {
+                std::cout << "Warning: same mesh found multiple times" << std::endl;
+                break;
+            }
+        }
+        
         model.mMeshes.push_back(mesh);
         model.mMeshNodes.push_back(node);
-        
         model.mTotalVertices += mesh->mNumVertices;
         model.mTotalIndices += mesh->mNumFaces * 3;
     }
@@ -146,109 +194,263 @@ void collectMeshes(ExportModel& model, aiNode* node)
 
 void buildModel(ExportModel& model)
 {
+    if (!model.mRootNode)
+        errorExit("Null root node for model");
+    if (!model.mMeshes.size())
+        errorExit("No meshes");
+    
+    std::cout << "Writing model from node " << toStdString(model.mRootNode->mName) << std::endl;
+    
     SharedPtr<Model> outModel(new Model(0));
     outModel->setNumGeometries(model.mMeshes.size());
     BoundingBox box;
     
-    for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+    bool combineBuffers = true;
+    // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
+    unsigned elementMask = getElementMask(model.mMeshes[0]);
+    for (unsigned i = 1; i < model.mMeshes.size(); ++i)
     {
+        if (getElementMask(model.mMeshes[i]) != elementMask)
+        {
+            combineBuffers = false;
+            break;
+        }
+    }
+    // Check if keeping separate buffers allows to avoid 32-bit indices
+    if ((combineBuffers) && (model.mTotalVertices > 65535))
+    {
+        bool allUnder65k = true;
+        for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+        {
+            if (model.mMeshes[i]->mNumVertices > 65535)
+                allUnder65k = false;
+        }
+        if (allUnder65k == true)
+            combineBuffers = false;
+    }
+    
+    if (!combineBuffers)
+    {
+        std::cout << "Using separate buffers" << std::endl;
+        for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+        {
+            SharedPtr<IndexBuffer> ib(new IndexBuffer(0));
+            SharedPtr<VertexBuffer> vb(new VertexBuffer(0));
+            SharedPtr<Geometry> geom(new Geometry());
+            // Get the world transform of the mesh for baking into the vertices
+            Vector3 pos, scale;
+            Quaternion rot;
+            getPosRotScale(getWorldTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            Matrix4x3 vertexTransform;
+            vertexTransform.define(pos, rot, scale);
+            Matrix3 normalTransform = rot.getRotationMatrix();
+            
+            aiMesh* mesh = model.mMeshes[i];
+            std::cout << "Geometry " << i << ": " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
+                << std::endl;
+            
+            bool largeIndices = mesh->mNumVertices > 65535;
+            unsigned elementMask = getElementMask(mesh);
+            
+            ib->setSize(mesh->mNumFaces * 3, largeIndices);
+            vb->setSize(mesh->mNumVertices, elementMask);
+            
+            // Build the index data
+            void* indexData = ib->lock(0, ib->getIndexCount(), LOCK_NORMAL);
+            if (!largeIndices)
+            {
+                unsigned short* dest = (unsigned short*)indexData;
+                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                    writeShortIndices(dest, mesh, j, 0);
+            }
+            else
+            {
+                unsigned* dest = (unsigned*)indexData;
+                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                    writeLargeIndices(dest, mesh, j, 0);
+            }
+            
+            // Build the vertex data
+            void* vertexData = vb->lock(0, vb->getVertexCount(), LOCK_NORMAL);
+            float* dest = (float*)vertexData;
+            for (unsigned j = 0; j < mesh->mNumVertices; ++j)
+                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform);
+            
+            ib->unlock();
+            vb->unlock();
+            
+            // Define the geometry
+            geom->setIndexBuffer(ib);
+            geom->setVertexBuffer(0, vb);
+            geom->setDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
+            outModel->setNumGeometryLodLevels(i, 1);
+            outModel->setGeometry(i, 0, geom);
+        }
+    }
+    else
+    {
+        std::cout << "Using combined buffers" << std::endl;
         SharedPtr<IndexBuffer> ib(new IndexBuffer(0));
         SharedPtr<VertexBuffer> vb(new VertexBuffer(0));
-        SharedPtr<Geometry> geom(new Geometry());
         
-        // Get the world transform of the mesh for baking into the vertices
-        Vector3 pos;
-        Quaternion rot;
-        Vector3 scale;
-        getPosRotScale(getWorldTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
-        Matrix4x3 vertexTransform;
-        vertexTransform.define(pos, rot, scale);
-        Matrix3 normalTransform = rot.getRotationMatrix();
+        bool largeIndices = model.mTotalIndices > 65535;
+        ib->setSize(model.mTotalIndices, largeIndices);
+        vb->setSize(model.mTotalVertices, elementMask);
         
-        aiMesh* mesh = model.mMeshes[i];
-        bool largeIndices = mesh->mNumVertices > 65535;
-        unsigned elementMask = MASK_POSITION;
-        if (mesh->HasNormals())
-            elementMask |= MASK_NORMAL;
-        //if (mesh->HasTangentsAndBitangents())
-        //    elementMask |= MASK_TANGENT;
-        //if (mesh->GetNumColorChannels() > 0)
-        //    elementMask |= MASK_COLOR;
-        if (mesh->GetNumUVChannels() > 0)
-            elementMask |= MASK_TEXCOORD1;
-        //if (mesh->GetNumUVChannels() > 1)
-        //    elementMask |= MASK_TEXCOORD2;
-        
-        ib->setSize(mesh->mNumFaces * 3, largeIndices);
-        vb->setSize(mesh->mNumVertices, elementMask);
-        
-        // Build the index data
+        unsigned startVertexOffset = 0;
+        unsigned startIndexOffset = 0;
         void* indexData = ib->lock(0, ib->getIndexCount(), LOCK_NORMAL);
-        if (!largeIndices)
-        {
-            unsigned short* dest = (unsigned short*)indexData;
-            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-            {
-                *dest++ = mesh->mFaces[j].mIndices[0];
-                *dest++ = mesh->mFaces[j].mIndices[1];
-                *dest++ = mesh->mFaces[j].mIndices[2];
-            }
-        }
-        else
-        {
-            unsigned* dest = (unsigned*)indexData;
-            for (unsigned j = 0; j < mesh->mNumFaces; ++j)
-            {
-                *dest++ = mesh->mFaces[j].mIndices[0];
-                *dest++ = mesh->mFaces[j].mIndices[1];
-                *dest++ = mesh->mFaces[j].mIndices[2];
-            }
-        }
-        
-        // Build the vertex data
         void* vertexData = vb->lock(0, vb->getVertexCount(), LOCK_NORMAL);
-        float* dest = (float*)vertexData;
-        for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-        {
-            Vector3 vertex = vertexTransform * toVector3(mesh->mVertices[j]);
-            box.merge(vertex);
-            *dest++ = vertex.mX;
-            *dest++ = vertex.mY;
-            *dest++ = vertex.mZ;
-            if (elementMask & MASK_NORMAL)
-            {
-                Vector3 normal = normalTransform * toVector3(mesh->mNormals[j]);
-                *dest++ = normal.mX;
-                *dest++ = normal.mY;
-                *dest++ = normal.mZ;
-            }
-            if (elementMask & MASK_TEXCOORD1)
-            {
-                Vector3 texCoord = toVector3(mesh->mTextureCoords[0][j]);
-                *dest++ = texCoord.mX;
-                *dest++ = texCoord.mY;
-            }
-        }
-        
+        // The buffer is in CPU memory, and therefore locking is irrelevant. Unlock so that draw range checking can lock again
         ib->unlock();
         vb->unlock();
         
-        // Define the geometry
-        geom->setIndexBuffer(ib);
-        geom->setVertexBuffer(0, vb);
-        geom->setDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
-        outModel->setNumGeometryLodLevels(i, 1);
-        outModel->setGeometry(i, 0, geom);
-        outModel->setBoundingBox(box);
+        for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+        {
+            SharedPtr<Geometry> geom(new Geometry());
+            
+            // Get the world transform of the mesh for baking into the vertices
+            Vector3 pos, scale;
+            Quaternion rot;
+            getPosRotScale(getWorldTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            Matrix4x3 vertexTransform;
+            vertexTransform.define(pos, rot, scale);
+            Matrix3 normalTransform = rot.getRotationMatrix();
+            
+            aiMesh* mesh = model.mMeshes[i];
+            std::cout << "Geometry " << i << ": " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
+                << std::endl;
+            
+            // Build the index data
+            if (!largeIndices)
+            {
+                unsigned short* dest = (unsigned short*)indexData + startIndexOffset;
+                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                    writeShortIndices(dest, mesh, j, startVertexOffset);
+            }
+            else
+            {
+                unsigned* dest = (unsigned*)indexData + startIndexOffset;
+                for (unsigned j = 0; j < mesh->mNumFaces; ++j)
+                    writeLargeIndices(dest, mesh, j, startVertexOffset);
+            }
+            
+            // Build the vertex data
+            float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->getVertexSize());
+            for (unsigned j = 0; j < mesh->mNumVertices; ++j)
+                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform);
+            
+            // Define the geometry
+            geom->setIndexBuffer(ib);
+            geom->setVertexBuffer(0, vb);
+            geom->setDrawRange(TRIANGLE_LIST, startIndexOffset, mesh->mNumFaces * 3, true);
+            outModel->setNumGeometryLodLevels(i, 1);
+            outModel->setGeometry(i, 0, geom);
+            
+            startVertexOffset += mesh->mNumVertices;
+            startIndexOffset += mesh->mNumFaces * 3;
+        }
     }
+    
+    outModel->setBoundingBox(box);
     
     File outFile(model.mOutName, FILE_WRITE);
     outModel->save(outFile);
 }
 
-void errorExit(const std::string& error)
+void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset)
 {
-    throw Exception(error);
+    *dest++ = mesh->mFaces[index].mIndices[0] + offset;
+    *dest++ = mesh->mFaces[index].mIndices[1] + offset;
+    *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+}
+
+void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset)
+{
+    *dest++ = mesh->mFaces[index].mIndices[0] + offset;
+    *dest++ = mesh->mFaces[index].mIndices[1] + offset;
+    *dest++ = mesh->mFaces[index].mIndices[2] + offset;
+}
+
+void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform)
+{
+    Vector3 vertex = vertexTransform * toVector3(mesh->mVertices[index]);
+    box.merge(vertex);
+    *dest++ = vertex.mX;
+    *dest++ = vertex.mY;
+    *dest++ = vertex.mZ;
+    if (elementMask & MASK_NORMAL)
+    {
+        Vector3 normal = normalTransform * toVector3(mesh->mNormals[index]);
+        *dest++ = normal.mX;
+        *dest++ = normal.mY;
+        *dest++ = normal.mZ;
+    }
+    if (elementMask & MASK_COLOR)
+    {
+        *((unsigned*)dest) = getD3DColor(Color(mesh->mColors[0][index].r, mesh->mColors[0][index].g, mesh->mColors[0][index].b,
+            mesh->mColors[0][index].a));
+        ++dest;
+    }
+    if (elementMask & MASK_TEXCOORD1)
+    {
+        Vector3 texCoord = toVector3(mesh->mTextureCoords[0][index]);
+        *dest++ = texCoord.mX;
+        *dest++ = texCoord.mY;
+    }
+    if (elementMask & MASK_TEXCOORD2)
+    {
+        Vector3 texCoord = toVector3(mesh->mTextureCoords[1][index]);
+        *dest++ = texCoord.mX;
+        *dest++ = texCoord.mY;
+    }
+    if (elementMask & MASK_TANGENT)
+    {
+        Vector3 tangent = normalTransform * toVector3(mesh->mTangents[index]);
+        Vector3 normal = normalTransform * toVector3(mesh->mNormals[index]);
+        Vector3 bitangent = normalTransform * toVector3(mesh->mBitangents[index]);
+        // Check handedness
+        float w = 1.0f;
+        if ((tangent.crossProduct(normal)).dotProduct(bitangent) < 0.5f)
+            w = -1.0f;
+        
+        *dest++ = tangent.mX;
+        *dest++ = tangent.mY;
+        *dest++ = tangent.mZ;
+        *dest++ = w;
+    }
+}
+
+unsigned getElementMask(aiMesh* mesh)
+{
+    unsigned elementMask = MASK_POSITION;
+    if (mesh->HasNormals())
+        elementMask |= MASK_NORMAL;
+    if (mesh->HasTangentsAndBitangents())
+        elementMask |= MASK_TANGENT;
+    if (mesh->GetNumColorChannels() > 0)
+        elementMask |= MASK_COLOR;
+    if (mesh->GetNumUVChannels() > 0)
+        elementMask |= MASK_TEXCOORD1;
+    if (mesh->GetNumUVChannels() > 1)
+        elementMask |= MASK_TEXCOORD2;
+    return elementMask;
+}
+
+aiNode* findNode(const std::string& name, aiNode* rootNode)
+{
+    if (!rootNode)
+        return 0;
+    if (toLower(toStdString(rootNode->mName)) == toLower(name))
+        return rootNode;
+    for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
+    {
+        aiNode* found = findNode(name, rootNode->mChildren[i]);
+        if (found)
+            return found;
+    }
+    return 0;
 }
 
 std::string toStdString(const aiString& str)
@@ -271,11 +473,11 @@ Quaternion toQuaternion(const aiQuaternion& quat)
     return Quaternion(quat.w, quat.x, quat.y, quat.z);
 }
 
-aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* baseNode)
+aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* rootNode)
 {
     aiMatrix4x4 current = node->mTransformation;
     // If basenode is defined, go only up to it in the parent chain
-    while ((node->mParent) && (node != baseNode))
+    while ((node->mParent) && (node != rootNode))
     {
         node = node->mParent;
         current = node->mTransformation * current;
@@ -293,3 +495,9 @@ void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot,
     rot = toQuaternion(aiRot);
     scale = toVector3(aiScale);
 }
+
+void errorExit(const std::string& error)
+{
+    throw Exception(error);
+}
+

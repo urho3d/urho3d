@@ -22,7 +22,7 @@ void vs(float4 iPos : POSITION,
     #ifdef NORMALMAP
         out float3 oNormal : TEXCOORD2,
         out float3 oTangent : TEXCOORD3,
-        out float3 oBinormal : TEXCOORD4,
+        out float3 oBitangent : TEXCOORD4,
     #else
         out float3 oNormal : TEXCOORD2,
     #endif
@@ -62,7 +62,7 @@ void vs(float4 iPos : POSITION,
     oDepth = calculateDepth(oPos);
     
     #ifdef NORMALMAP
-        oBinormal = cross(oTangent, oNormal) * iTangent.w;
+        oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
 }
 
@@ -72,7 +72,7 @@ void ps(
     #ifdef NORMALMAP
         float3 iNormal : TEXCOORD2,
         float3 iTangent : TEXCOORD3,
-        float3 iBinormal : TEXCOORD4,
+        float3 iBitangent : TEXCOORD4,
     #else
         float3 iNormal : TEXCOORD2,
     #endif
@@ -88,7 +88,7 @@ void ps(
     #endif
 
     #ifdef NORMALMAP
-        float3x3 tbn = float3x3(iTangent, iBinormal, iNormal);
+        float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
         float3 normal = normalize(mul(unpackNormal(tex2D(sNormalMap, iTexCoord)), tbn));
     #else
         float3 normal = normalize(iNormal);

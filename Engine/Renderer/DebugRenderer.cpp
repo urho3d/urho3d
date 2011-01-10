@@ -133,9 +133,9 @@ void DebugRenderer::render()
 void DebugRenderer::addLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest)
 {
     if (depthTest)
-        mLines.push_back(DebugLine(start, end, Renderer::getD3DColor(color)));
+        mLines.push_back(DebugLine(start, end, getD3DColor(color)));
     else
-        mNoDepthLines.push_back(DebugLine(start, end, Renderer::getD3DColor(color)));
+        mNoDepthLines.push_back(DebugLine(start, end, getD3DColor(color)));
 }
 
 void DebugRenderer::addBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
@@ -150,7 +150,7 @@ void DebugRenderer::addBoundingBox(const BoundingBox& box, const Color& color, b
     Vector3 v4(max.mX, min.mY, max.mZ);
     Vector3 v5(min.mX, max.mY, max.mZ);
     
-    unsigned d3dColor = Renderer::getD3DColor(color);
+    unsigned d3dColor = getD3DColor(color);
     
     std::vector<DebugLine>* dest = &mLines;
     if (!depthTest)
@@ -184,7 +184,7 @@ void DebugRenderer::addBoundingBox(const BoundingBox& box, const Matrix4x3& tran
     Vector3 v6(transform * Vector3(max.mX, max.mY, max.mZ));
     Vector3 v7(transform * Vector3(min.mX, max.mY, max.mZ));
     
-    unsigned d3dColor = Renderer::getD3DColor(color);
+    unsigned d3dColor = getD3DColor(color);
     
     std::vector<DebugLine>* dest = &mLines;
     if (!depthTest)
@@ -207,7 +207,7 @@ void DebugRenderer::addBoundingBox(const BoundingBox& box, const Matrix4x3& tran
 void DebugRenderer::addFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
     const Vector3* vertices = frustum.getVertices();
-    unsigned d3dColor = Renderer::getD3DColor(color);
+    unsigned d3dColor = getD3DColor(color);
     
     std::vector<DebugLine>* dest = &mLines;
     if (!depthTest)
@@ -234,7 +234,7 @@ void DebugRenderer::addSkeleton(const Skeleton& skeleton, const Color& color, bo
         return;
     
     DebugLine newLine;
-    newLine.mColor = Renderer::getD3DColor(color);
+    newLine.mColor = getD3DColor(color);
     
     std::vector<DebugLine>* dest = &mLines;
     if (!depthTest)

@@ -164,4 +164,15 @@ public:
     float mTime;
 };
 
+//! Return color packed to a 32-bit integer
+inline unsigned getD3DColor(const Color& color)
+{
+    unsigned r = (unsigned)(color.mR * 255.0f);
+    unsigned g = (unsigned)(color.mG * 255.0f);
+    unsigned b = (unsigned)(color.mB * 255.0f);
+    unsigned a = (unsigned)(color.mA * 255.0f);
+    
+    return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
+}
+
 #endif // COMMON_COLOR_H

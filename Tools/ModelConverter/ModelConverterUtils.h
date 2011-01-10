@@ -129,7 +129,7 @@ struct ModelVertexBuffer
             if (mElementMask & MASK_NORMAL)
                 dest.writeVector3(mVertices[i].mNormal);
             if (mElementMask & MASK_COLOR)
-                dest.writeUInt(Renderer::getD3DColor(mVertices[i].mColor));
+                dest.writeUInt(getD3DColor(mVertices[i].mColor));
             if (mElementMask & MASK_TEXCOORD1)
                 dest.writeVector2(mVertices[i].mTexCoord1);
             if (mElementMask & MASK_TEXCOORD2)

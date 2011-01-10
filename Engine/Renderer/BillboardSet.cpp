@@ -532,7 +532,7 @@ void BillboardSet::updateVertexBuffer(const FrameInfo& frame)
         else
             size = Vector2(mBillboards[index].mSize.mX * worldScale.mX, mBillboards[index].mSize.mY * worldScale.mY);
         
-        unsigned color = Renderer::getD3DColor(mBillboards[index].mColor);
+        unsigned color = getD3DColor(mBillboards[index].mColor);
         
         static float rotationMatrix[2][2];
         float angleRad = mBillboards[index].mRotation * M_DEGTORAD;

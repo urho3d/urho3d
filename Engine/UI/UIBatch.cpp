@@ -67,7 +67,7 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     else
     {
         const Color& color = element.getColor(C_TOPLEFT);
-        unsigned finalColor = Renderer::getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        unsigned finalColor = getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
         quad.mTopLeftColor = finalColor;
         quad.mTopRightColor = finalColor;
         quad.mBottomLeftColor = finalColor;
@@ -105,7 +105,7 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     else
     {
         const Color& color = element.getColor(C_TOPLEFT);
-        unsigned finalColor = Renderer::getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        unsigned finalColor = getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
         quad.mTopLeftColor = finalColor;
         quad.mTopRightColor = finalColor;
         quad.mBottomLeftColor = finalColor;
@@ -256,11 +256,11 @@ unsigned UIBatch::getInterpolatedColor(UIElement& element, int x, int y)
         Color topColor = element.getColor(C_TOPLEFT).lerp(element.getColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element.getColor(C_BOTTOMLEFT).lerp(element.getColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.lerp(bottomColor, cLerpY);
-        return Renderer::getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        return getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
     }
     else
     {
         const Color& color = element.getColor(C_TOPLEFT);
-        return Renderer::getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        return getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
     }
 }

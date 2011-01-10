@@ -23,7 +23,7 @@ void vs(float4 iPos : POSITION,
     out float3 oNormal : TEXCOORD2,
     #ifdef NORMALMAP
         out float3 oTangent : TEXCOORD3,
-        out float3 oBinormal : TEXCOORD4,
+        out float3 oBitangent : TEXCOORD4,
     #endif
     #ifdef SHADOW
         out float4 oShadowPos : TEXCOORD5,
@@ -83,7 +83,7 @@ void vs(float4 iPos : POSITION,
     #endif
     
     #ifdef NORMALMAP
-        oBinormal = cross(oTangent, oNormal) * iTangent.w;
+        oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
     
     oTexCoord = evaluateTexCoord(iTexCoord);
@@ -94,7 +94,7 @@ void ps(float2 iTexCoord : TEXCOORD0,
     #ifdef NORMALMAP
         float3 iNormal : TEXCOORD2,
         float3 iTangent : TEXCOORD3,
-        float3 iBinormal : TEXCOORD4,
+        float3 iBitangent : TEXCOORD4,
     #else
         float3 iNormal : TEXCOORD2,
     #endif
@@ -129,7 +129,7 @@ void ps(float2 iTexCoord : TEXCOORD0,
         #ifndef NEGATIVE
             // Normal (positive) lighting
             #ifdef NORMALMAP
-                float3x3 tbn = float3x3(iTangent, iBinormal, iNormal);
+                float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
                 float3 normal = normalize(mul(unpackNormal(tex2D(sNormalMap, iTexCoord)), tbn));
             #else
                 float3 normal = normalize(iNormal);
