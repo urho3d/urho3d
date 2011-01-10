@@ -8,12 +8,12 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../../Engine/Common ../../Engine/Event ../../Engine/Math ../../Engine/Physics ../../Engine/Renderer
-    ../../Engine/Resource ../../ThirdParty/TinyXML ../../ThirdParty/Assimp/include
+    ../../Engine/Common ../../Engine/Math ../../Engine/Renderer ../../Engine/Resource ../../Engine/Scene
+    ../../ThirdParty/Assimp/include
 )
 
 # Define target & libraries to link
 add_executable (${TARGET_NAME} ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Assimp Common Math Resource TinyXML)
+target_link_libraries (${TARGET_NAME} Assimp Common Math Renderer Scene Resource)
 finalize_exe ()
 

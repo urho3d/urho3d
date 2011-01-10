@@ -519,10 +519,10 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
         // If distance is greater than draw distance, no need to update at all
         if ((mDrawDistance != 0.0f) && (distance > mDrawDistance))
             return;
-        // Multiply the distance by 2 so that invisible nodes don't update that often
+        // Multiply the distance by a constant so that invisible nodes don't update that often
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
         float scale = getWorldScale().dotProduct(dotScale);
-        mAnimationLodDistance = frame.mCamera->getLodDistance(2.0f * distance, scale, mLodBias);
+        mAnimationLodDistance = frame.mCamera->getLodDistance(ANIMATION_LOD_INVISIBLE_FACTOR * distance, scale, mLodBias);
     }
     
     updateAnimation(frame);

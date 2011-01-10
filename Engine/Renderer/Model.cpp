@@ -331,6 +331,7 @@ void Model::setBoundingBox(const BoundingBox& box)
 void Model::setNumGeometries(unsigned num)
 {
     mGeometries.resize(num);
+    mGeometryBoneMappings.resize(num);
 }
 
 bool Model::setNumGeometryLodLevels(unsigned index, unsigned num)
