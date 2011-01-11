@@ -138,11 +138,11 @@ void AnimationState::setStartBone(Bone* startBone)
         
         // Try to find a bone from the skeleton that corresponds to this track
         // with the limitation that it's startBone, or one of its children
-        if (startBone->getName() == tracks[i].mName)
+        if (startBone->getNameHash() == tracks[i].mNameHash)
             trackBone = startBone;
         else
         {
-            trackBone = dynamic_cast<Bone*>(startBone->getChild(tracks[i].mName, true));
+            trackBone = dynamic_cast<Bone*>(startBone->getChild(tracks[i].mNameHash, true));
             // Make sure the child bone actually belongs to the skeleton
             if (trackBone)
             {

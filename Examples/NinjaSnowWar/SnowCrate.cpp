@@ -118,7 +118,6 @@ void SnowCrate::onRemove()
     ParticleEmitter* emitter = obj->createComponent<ParticleEmitter>();
     emitter->loadParameters(cache->getResource<XMLFile>("Particle/SnowExplosionBig.xml"), cache);
     emitter->setPosition(getBody()->getPhysicsPosition());
-    emitter->setAnimationLodBias(100.0f);
     
     GameObject* obj2 = spawnObject<Potion>("Potion");
     obj2->create(getBody()->getPhysicsPosition());

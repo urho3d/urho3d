@@ -522,7 +522,7 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
             return;
         // Multiply the distance by a constant so that invisible nodes don't update that often
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
-        float scale = getWorldScale().dotProduct(dotScale);
+        float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
         mAnimationLodDistance = frame.mCamera->getLodDistance(ANIMATION_LOD_INVISIBLE_FACTOR * distance, scale, mLodBias);
     }
     
@@ -534,7 +534,7 @@ void AnimatedModel::updateDistance(const FrameInfo& frame)
     mDistance = frame.mCamera->getDistance(getWorldPosition());
     
     static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
-    float scale = getWorldScale().dotProduct(dotScale);
+    float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
     float newLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
     
     // If model is rendered from several views, use the minimum LOD distance for animation LOD

@@ -169,7 +169,7 @@ void GeometryNode::updateDistance(const FrameInfo& frame)
     mDistance = frame.mCamera->getDistance(getWorldPosition());
     
     static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
-    float scale = getWorldScale().dotProduct(dotScale);
+    float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
     float newLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
     
     if (newLodDistance != mLodDistance)

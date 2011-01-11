@@ -112,7 +112,7 @@ public:
     //! Return whether a file exists by name
     bool exists(const std::string& name) const;
     //! Return whether a file exists by name hash
-    bool exists(const StringHash nameHash) const;
+    bool exists(StringHash nameHash) const;
     //! Return memory budget for a resource type
     unsigned getMemoryBudget(ShortStringHash type) const;
     //! Return total memory use for a resource type

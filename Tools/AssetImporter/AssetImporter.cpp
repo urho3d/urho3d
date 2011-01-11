@@ -22,6 +22,7 @@
 //
 
 #include "Exception.h"
+#include "Animation.h"
 #include "File.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
@@ -59,6 +60,7 @@ struct ExportModel
     std::vector<aiMesh*> mMeshes;
     std::vector<aiNode*> mMeshNodes;
     std::vector<aiNode*> mBones;
+    std::vector<aiAnimation*> mAnimations;
     std::vector<float> mBoneRadii;
     std::vector<BoundingBox> mBoneHitboxes;
     aiNode* mRootBone;
@@ -73,8 +75,10 @@ void exportModel(ExportModel& model);
 void collectMeshes(ExportModel& model, aiNode* node);
 void collectBones(ExportModel& model);
 void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node);
-void generateBoneCollisionInfo(ExportModel& model);
-void buildModel(ExportModel& model);
+void collectAnimations(ExportModel& model);
+void buildBoneCollisionInfo(ExportModel& model);
+void buildAndSaveModel(ExportModel& model);
+void buildAndSaveAnimations(ExportModel& model);
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName);
 aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
 void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >& blendIndices, std::vector<std::vector<float> >& blendWeights);
@@ -90,6 +94,7 @@ Vector3 toVector3(const aiVector3D& vec);
 Vector2 toVector2(const aiVector2D& vec);
 Quaternion toQuaternion(const aiQuaternion& quat);
 aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* rootNode);
+aiMatrix4x4 getWorldTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
 void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 void errorExit(const std::string& error);
 
@@ -178,8 +183,10 @@ void exportModel(ExportModel& model)
 {
     collectMeshes(model, model.mRootNode);
     collectBones(model);
-    generateBoneCollisionInfo(model);
-    buildModel(model);
+    collectAnimations(model);
+    buildBoneCollisionInfo(model);
+    buildAndSaveModel(model);
+    buildAndSaveAnimations(model);
 }
 
 void collectMeshes(ExportModel& model, aiNode* node)
@@ -265,7 +272,29 @@ void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& nece
     }
 }
 
-void generateBoneCollisionInfo(ExportModel& model)
+void collectAnimations(ExportModel& model)
+{
+    const aiScene* scene = model.mScene;
+    for (unsigned i = 0; i < scene->mNumAnimations; ++i)
+    {
+        aiAnimation* anim = scene->mAnimations[i];
+        bool modelBoneFound = false;
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+            std::string channelName = toStdString(channel->mNodeName);
+            if (getBoneIndex(model, channelName) != M_MAX_UNSIGNED)
+            {
+                modelBoneFound = true;
+                break;
+            }
+        }
+        if (modelBoneFound)
+            model.mAnimations.push_back(anim);
+    }
+}
+
+void buildBoneCollisionInfo(ExportModel& model)
 {
     for (unsigned i = 0; i < model.mMeshes.size(); ++i)
     {
@@ -276,6 +305,8 @@ void generateBoneCollisionInfo(ExportModel& model)
             aiBone* bone = mesh->mBones[j];
             std::string boneName = toStdString(bone->mName);
             unsigned boneIndex = getBoneIndex(model, boneName);
+            if (boneIndex == M_MAX_UNSIGNED)
+                continue;
             aiNode* boneNode = model.mBones[boneIndex];
             aiMatrix4x4 boneWorldTransform = getWorldTransform(boneNode, model.mRootNode);
             aiMatrix4x4 boneInverse = boneWorldTransform;
@@ -298,7 +329,7 @@ void generateBoneCollisionInfo(ExportModel& model)
     }
 }
 
-void buildModel(ExportModel& model)
+void buildAndSaveModel(ExportModel& model)
 {
     if (!model.mRootNode)
         errorExit("Null root node for model");
@@ -539,6 +570,149 @@ void buildModel(ExportModel& model)
     outModel->save(outFile);
 }
 
+void buildAndSaveAnimations(ExportModel& model)
+{
+    for (unsigned i = 0; i < model.mAnimations.size(); ++i)
+    {
+        aiAnimation* anim = model.mAnimations[i];
+        std::string animName = toStdString(anim->mName);
+        if (animName.empty())
+            animName = "Anim" + toString(i + 1);
+        std::cout << "Writing animation " + animName << std::endl;
+        std::string animOutName = getPath(model.mOutName) + getFileName(model.mOutName) + "_" + animName + ".ani";
+        
+        SharedPtr<Animation> outAnim(new Animation());
+        float tickConversion = 1.0f / (float)anim->mTicksPerSecond;
+        outAnim->setAnimationName(animName);
+        outAnim->setLength((float)anim->mDuration * tickConversion);
+        
+        std::cout << "Animation length " << outAnim->getLength() << std::endl;
+        
+        for (unsigned j = 0; j < anim->mNumChannels; ++j)
+        {
+            aiNodeAnim* channel = anim->mChannels[j];
+            std::string channelName = toStdString(channel->mNodeName);
+            std::cout << "Animation track " << channelName << std::endl;
+            unsigned boneIndex = getBoneIndex(model, channelName);
+            if (boneIndex == M_MAX_UNSIGNED)
+            {
+                std::cout << "Warning: skipping animation track " << channelName << " not found in model skeleton" << std::endl;
+                continue;
+            }
+            
+            aiNode* boneNode = model.mBones[boneIndex];
+            
+            AnimationTrack track;
+            track.mName = channelName;
+            track.mNameHash = StringHash(channelName);
+            
+            // Check which channels are used
+            track.mChannelMask = 0;
+            if (channel->mNumPositionKeys > 1)
+                track.mChannelMask |= CHANNEL_POSITION;
+            if (channel->mNumRotationKeys > 1)
+                track.mChannelMask |= CHANNEL_ROTATION;
+            if (channel->mNumScalingKeys > 1)
+                track.mChannelMask |= CHANNEL_SCALE;
+            // Check for redundant identity scale in all keyframes and remove in that case
+            if (track.mChannelMask & CHANNEL_SCALE)
+            {
+                bool redundantScale = true;
+                for (unsigned k = 0; k < channel->mNumScalingKeys; ++k)
+                {
+                    float SCALE_EPSILON = 0.000001f;
+                    Vector3 scaleVec = toVector3(channel->mScalingKeys[k].mValue);
+                    if ((fabsf(scaleVec.mX - 1.0f) >= SCALE_EPSILON) || (fabsf(scaleVec.mY - 1.0f) >= SCALE_EPSILON) ||
+                        (fabsf(scaleVec.mZ - 1.0f) >= SCALE_EPSILON))
+                    {
+                        redundantScale = false;
+                        break;
+                    }
+                }
+                if (redundantScale)
+                    track.mChannelMask &= ~CHANNEL_SCALE;
+            }
+            
+            if (!track.mChannelMask)
+                std::cout << "Warning: skipping animation track " << channelName << " with no keyframes" << std::endl;
+            
+            // Currently only same amount of keyframes is supported
+            // Note: should also check the times of individual keyframes for match
+            if (((channel->mNumPositionKeys > 1) && (channel->mNumRotationKeys > 1) && (channel->mNumPositionKeys != channel->mNumRotationKeys)) ||
+                ((channel->mNumPositionKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumPositionKeys != channel->mNumScalingKeys)) ||
+                ((channel->mNumRotationKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumRotationKeys != channel->mNumScalingKeys)))
+            {
+                std::cout << "Warning: differing amount of channel keyframes, skipping animation track " << channelName << std::endl;
+                continue;
+            }
+            
+            unsigned keyFrames = channel->mNumPositionKeys;
+            if (channel->mNumRotationKeys > keyFrames)
+                keyFrames = channel->mNumRotationKeys;
+            if (channel->mNumScalingKeys > keyFrames)
+                keyFrames = channel->mNumScalingKeys;
+            
+            for (unsigned k = 0; k < keyFrames; ++k)
+            {
+                AnimationKeyFrame kf;
+                kf.mTime = 0.0f;
+                kf.mPosition = Vector3::sZero;
+                kf.mRotation = Quaternion::sIdentity;
+                kf.mScale = Vector3::sUnity;
+                
+                // Get time for the keyframe
+                if ((track.mChannelMask & CHANNEL_POSITION) && (k < channel->mNumPositionKeys))
+                    kf.mTime = (float)channel->mPositionKeys[k].mTime * tickConversion;
+                else if ((track.mChannelMask & CHANNEL_ROTATION) && (k < channel->mNumRotationKeys))
+                    kf.mTime = (float)channel->mRotationKeys[k].mTime * tickConversion;
+                else if ((track.mChannelMask & CHANNEL_SCALE) && (k < channel->mNumScalingKeys))
+                    kf.mTime = (float)channel->mScalingKeys[k].mTime * tickConversion;
+                
+                // Start with the bone's base transform
+                aiMatrix4x4 boneTransform = boneNode->mTransformation;
+                aiVector3D pos, scale;
+                aiQuaternion rot;
+                boneTransform.Decompose(scale, rot, pos);
+                // Then apply the active channels
+                if ((track.mChannelMask & CHANNEL_POSITION) && (k < channel->mNumPositionKeys))
+                    pos = channel->mPositionKeys[k].mValue;
+                if ((track.mChannelMask & CHANNEL_ROTATION) && (k < channel->mNumRotationKeys))
+                    rot = channel->mRotationKeys[k].mValue;
+                if ((track.mChannelMask & CHANNEL_SCALE) && (k < channel->mNumScalingKeys))
+                    scale = channel->mScalingKeys[k].mValue;
+                
+                // If root bone, transform with the model root node transform
+                if (!boneIndex)
+                {
+                    aiMatrix4x4 transMat, scaleMat, rotMat;
+                    aiMatrix4x4::Translation(pos, transMat);
+                    aiMatrix4x4::Scaling(scale, scaleMat);
+                    rotMat = aiMatrix4x4(rot.GetMatrix());
+                    aiMatrix4x4 tform = transMat * rotMat * scaleMat;
+                    tform = getWorldTransform(tform, boneNode, model.mRootNode);
+                    tform.Decompose(scale, rot, pos);
+                }
+                
+                if (track.mChannelMask & CHANNEL_POSITION)
+                    kf.mPosition = toVector3(pos);
+                if (track.mChannelMask & CHANNEL_ROTATION)
+                    kf.mRotation = toQuaternion(rot);
+                if (track.mChannelMask & CHANNEL_SCALE)
+                    kf.mScale = toVector3(scale);
+                
+                std::cout << toString(kf.mRotation) << std::endl;
+                
+                track.mKeyFrames.push_back(kf);
+            }
+            
+            outAnim->addTrack(track);
+        }
+        
+        File outFile(animOutName, FILE_WRITE);
+        outAnim->save(outFile);
+    }
+}
+
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName)
 {
     for (unsigned i = 0; i < model.mBones.size(); ++i)
@@ -546,7 +720,7 @@ unsigned getBoneIndex(ExportModel& model, const std::string& boneName)
         if (toStdString(model.mBones[i]->mName) == boneName)
             return i;
     }
-    errorExit("Bone " + boneName + " not found");
+    return M_MAX_UNSIGNED;
 }
 
 aiBone* getMeshBone(ExportModel& model, const std::string& boneName)
@@ -580,7 +754,10 @@ void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneM
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
             aiBone* bone = mesh->mBones[i];
-            unsigned globalIndex = getBoneIndex(model, toStdString(bone->mName));
+            std::string boneName = toStdString(bone->mName);
+            unsigned globalIndex = getBoneIndex(model, boneName);
+            if (globalIndex == M_MAX_UNSIGNED)
+                errorExit("Bone " + boneName + " not found");
             boneMappings[i] = globalIndex;
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
@@ -597,7 +774,10 @@ void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneM
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
             aiBone* bone = mesh->mBones[i];
-            unsigned globalIndex = getBoneIndex(model, toStdString(bone->mName));
+            std::string boneName = toStdString(bone->mName);
+            unsigned globalIndex = getBoneIndex(model, boneName);
+            if (globalIndex == M_MAX_UNSIGNED)
+                errorExit("Bone " + boneName + " not found");
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
@@ -740,7 +920,10 @@ aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive)
 
 std::string toStdString(const aiString& str)
 {
-    return std::string(str.data);
+    if ((!str.data) || (!str.length))
+        return std::string();
+    else
+        return std::string(str.data);
 }
 
 Vector3 toVector3(const aiVector3D& vec)
@@ -768,6 +951,17 @@ aiMatrix4x4 getWorldTransform(aiNode* node, aiNode* rootNode)
         current = node->mTransformation * current;
     }
     return current;
+}
+
+aiMatrix4x4 getWorldTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode)
+{
+    // If basenode is defined, go only up to it in the parent chain
+    while ((node->mParent) && (node != rootNode))
+    {
+        node = node->mParent;
+        transform = node->mTransformation * transform;
+    }
+    return transform;
 }
 
 void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale)

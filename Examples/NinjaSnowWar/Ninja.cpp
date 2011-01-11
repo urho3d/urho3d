@@ -249,8 +249,6 @@ void Ninja::onCreate(const Vector3& position, const Quaternion& orientation)
     model->setMaterial(cache->getResource<Material>("Materials/Ninja.xml"));
     model->setDrawDistance(tRenderDistance);
     model->setCastShadows(true);
-    // World unit is centimeter, so need bigger animation LOD bias (default 1.0 is for meters)
-    model->setAnimationLodBias(100.0f);
     
     // Create body
     RigidBody* body = createComponent<RigidBody>();
@@ -524,7 +522,6 @@ bool Ninja::onDeathUpdate(float time)
             ParticleEmitter* emitter = obj->createComponent<ParticleEmitter>();
             emitter->loadParameters(cache->getResource<XMLFile>("Particle/Smoke.xml"), cache);
             emitter->setPosition(Vector3(0,-50,0));
-            emitter->setAnimationLodBias(100.0f);
             getBody()->addChild(emitter);
             mSmoke = true;
         }

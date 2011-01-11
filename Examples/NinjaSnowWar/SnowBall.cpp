@@ -197,6 +197,5 @@ void SnowBall::onRemove()
     ParticleEmitter* emitter = obj->createComponent<ParticleEmitter>();
     emitter->loadParameters(cache->getResource<XMLFile>("Particle/SnowExplosion.xml"), cache);
     emitter->setPosition(getBody()->getPhysicsPosition());
-    emitter->setAnimationLodBias(100.0f);
 }
 

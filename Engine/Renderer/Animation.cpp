@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Animation.h"
 #include "Deserializer.h"
+#include "Log.h"
 #include "Serializer.h"
 
 #include "DebugNew.h"
@@ -125,6 +126,73 @@ void Animation::save(Serializer& dest)
     }
 }
 
+void Animation::setAnimationName(const std::string& name)
+{
+    mAnimationName = name;
+    mAnimationNameHash = StringHash(name);
+}
+
+void Animation::setLength(float length)
+{
+    mLength = max(length, 0.0f);
+}
+
+void Animation::setTracks(const std::vector<AnimationTrack>& tracks)
+{
+    mTracks = tracks;
+}
+
+void Animation::addTrack(const AnimationTrack& track)
+{
+    AnimationTrack* existing = const_cast<AnimationTrack*>(getTrack(track.mName));
+    // Make sure the name hash is correct
+    if (existing)
+    {
+        *existing = track;
+        existing->mNameHash = StringHash(existing->mName);
+    }
+    else
+    {
+        mTracks.push_back(track);
+        AnimationTrack* newTrack = &mTracks[mTracks.size() - 1];
+        newTrack->mNameHash = StringHash(newTrack->mName);
+    }
+}
+
+void Animation::removeTrack(unsigned index)
+{
+    if (index >= mTracks.size())
+    {
+        LOGERROR("Illegal track index");
+        return;
+    }
+    mTracks.erase(mTracks.begin() + index);
+}
+
+void Animation::removeTrack(const std::string& name)
+{
+    for (std::vector<AnimationTrack>::iterator i = mTracks.begin(); i != mTracks.end(); ++i)
+    {
+        if (i->mName == name)
+        {
+            mTracks.erase(i);
+            return;
+        }
+    }
+}
+
+void Animation::removeTrack(StringHash nameHash)
+{
+    for (std::vector<AnimationTrack>::iterator i = mTracks.begin(); i != mTracks.end(); ++i)
+    {
+        if (i->mNameHash == nameHash)
+        {
+            mTracks.erase(i);
+            return;
+        }
+    }
+}
+
 unsigned Animation::getNumTracks() const
 {
     return mTracks.size();
@@ -149,7 +217,7 @@ const AnimationTrack* Animation::getTrack(const std::string& name) const
     return 0;
 }
 
-const AnimationTrack* Animation::getTrack(const StringHash nameHash) const
+const AnimationTrack* Animation::getTrack(StringHash nameHash) const
 {
     for (std::vector<AnimationTrack>::const_iterator i = mTracks.begin(); i != mTracks.end(); ++i)
     {

@@ -81,6 +81,21 @@ public:
     //! Save resource. Throw exception on error
     virtual void save(Serializer& dest);
     
+    //! Set animation name
+    void setAnimationName(const std::string& name);
+    //! Set animation length
+    void setLength(float length);
+    //! Set animation tracks
+    void setTracks(const std::vector<AnimationTrack>& tracks);
+    //! Add an animation track. If already exists with the same name, replace
+    void addTrack(const AnimationTrack& track);
+    //! Remove an animation track by index
+    void removeTrack(unsigned index);
+    //! Remove an animation track by bone name
+    void removeTrack(const std::string& name);
+    //! Remove an animation track by bone name hash
+    void removeTrack(StringHash nameHash);
+    
     //! Return animation name
     const std::string& getAnimationName() const { return mAnimationName; }
     //! Return animation name hash
@@ -96,7 +111,7 @@ public:
     //! Return animation track by bone name
     const AnimationTrack* getTrack(const std::string& name) const;
     //! Return animation track by bone name hash
-    const AnimationTrack* getTrack(const StringHash nameHash) const;
+    const AnimationTrack* getTrack(StringHash nameHash) const;
     
 private:
     //! Animation name

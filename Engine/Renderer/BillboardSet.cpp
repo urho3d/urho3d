@@ -261,9 +261,7 @@ void BillboardSet::updateDistance(const FrameInfo& frame)
     
     // Calculate scaled distance for animation LOD
     static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
-    float scale = 1.0f;
-    if (mScaleBillboards)
-        scale = getWorldScale().dotProduct(dotScale);
+    float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
     mLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
 }
 
