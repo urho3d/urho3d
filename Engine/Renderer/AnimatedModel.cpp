@@ -26,6 +26,7 @@
 #include "Animation.h"
 #include "AnimationState.h"
 #include "Camera.h"
+#include "DebugRenderer.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
 #include "Log.h"
@@ -585,6 +586,12 @@ bool AnimatedModel::getVertexShaderParameter(unsigned batchIndex, VSParameter pa
     }
     
     return false;
+}
+
+void AnimatedModel::drawDebugGeometry(DebugRenderer* debug)
+{
+    debug->addBoundingBox(getWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), false);
+    debug->addSkeleton(mSkeleton, Color(0.75f, 0.75f, 0.75f), false);
 }
 
 bool AnimatedModel::setModel(Model* model)

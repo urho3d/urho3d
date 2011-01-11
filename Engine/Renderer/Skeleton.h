@@ -45,6 +45,8 @@ public:
     void save(Serializer& dest);
     //! Define from source bones
     void define(const std::vector<SharedPtr<Bone> >& srcBones);
+    //! Set bones without copying
+    void setBones(const std::vector<SharedPtr<Bone> >& bones, Bone* rootBone);
     //! Reset all animated bones, or all bones if forced
     void reset(bool force = false);
     

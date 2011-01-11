@@ -71,6 +71,8 @@ public:
     virtual void updateGeometry(const FrameInfo& frame, Renderer* renderer);
     //! Return vertex shader parameter
     virtual bool getVertexShaderParameter(unsigned batchIndex, VSParameter parameter, const float** data, unsigned* count);
+    //! Draw debug geometry
+    virtual void drawDebugGeometry(DebugRenderer* debug);
     
     //! Set model
     bool setModel(Model* model);

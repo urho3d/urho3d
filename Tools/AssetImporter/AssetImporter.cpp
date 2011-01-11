@@ -48,7 +48,8 @@ struct ExportModel
 {
     ExportModel() :
         mTotalVertices(0),
-        mTotalIndices(0)
+        mTotalIndices(0),
+        mRootBone(0)
     {
     }
     
@@ -57,6 +58,10 @@ struct ExportModel
     aiNode* mRootNode;
     std::vector<aiMesh*> mMeshes;
     std::vector<aiNode*> mMeshNodes;
+    std::vector<aiNode*> mBones;
+    std::vector<float> mBoneRadii;
+    std::vector<BoundingBox> mBoneHitboxes;
+    aiNode* mRootBone;
     unsigned mTotalVertices;
     unsigned mTotalIndices;
 };
@@ -66,13 +71,20 @@ void run(const std::vector<std::string>& arguments);
 void dumpNodes(aiNode* rootNode, unsigned level);
 void exportModel(ExportModel& model);
 void collectMeshes(ExportModel& model, aiNode* node);
+void collectBones(ExportModel& model);
+void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node);
+void generateBoneCollisionInfo(ExportModel& model);
 void buildModel(ExportModel& model);
+unsigned getBoneIndex(ExportModel& model, const std::string& boneName);
+aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
+void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >& blendIndices, std::vector<std::vector<float> >& blendWeights);
 void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform);
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, std::vector<std::vector<unsigned char> >& blendIndices,
+    std::vector<std::vector<float> >& blendWeights);
 unsigned getElementMask(aiMesh* mesh);
-aiNode* findNode(const std::string& name, aiNode* rootNode);
+aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive = true);
 std::string toStdString(const aiString& str);
 Vector3 toVector3(const aiVector3D& vec);
 Vector2 toVector2(const aiVector2D& vec);
@@ -132,7 +144,7 @@ void run(const std::vector<std::string>& arguments)
         model.mRootNode = scene->mRootNode;
     else
     {
-        model.mRootNode = findNode(arguments[2], scene->mRootNode);
+        model.mRootNode = findNode(arguments[2], scene->mRootNode, false);
         if (!model.mRootNode)
             errorExit("Could not find scene node " + arguments[2]);
     }
@@ -165,6 +177,8 @@ void dumpNodes(aiNode* rootNode, unsigned level)
 void exportModel(ExportModel& model)
 {
     collectMeshes(model, model.mRootNode);
+    collectBones(model);
+    generateBoneCollisionInfo(model);
     buildModel(model);
 }
 
@@ -192,17 +206,117 @@ void collectMeshes(ExportModel& model, aiNode* node)
         collectMeshes(model, node->mChildren[i]);
 }
 
+void collectBones(ExportModel& model)
+{
+    std::set<aiNode*> necessary;
+    std::set<aiNode*> rootNodes;
+    
+    for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+    {
+        aiMesh* mesh = model.mMeshes[i];
+        aiNode* meshNode = model.mMeshNodes[i];
+        aiNode* meshParentNode = meshNode->mParent;
+        aiNode* rootNode = 0;
+        
+        for (unsigned j = 0; j < mesh->mNumBones; ++j)
+        {
+            aiBone* bone = mesh->mBones[j];
+            std::string boneName(toStdString(bone->mName));
+            aiNode* boneNode = findNode(boneName, model.mScene->mRootNode, true);
+            if (!boneNode)
+                errorExit("Could not find scene node for bone " + boneName);
+            necessary.insert(boneNode);
+            rootNode = boneNode;
+            
+            for (;;)
+            {
+                boneNode = boneNode->mParent;
+                if ((!boneNode) || (boneNode == meshNode) || (boneNode == meshParentNode))
+                    break;
+                rootNode = boneNode;
+                necessary.insert(boneNode);
+            }
+            
+            rootNodes.insert(rootNode);
+            if (rootNodes.size() > 1)
+                errorExit("Multiple skeleton root nodes found, not supported");
+        }
+    }
+    
+    model.mRootBone = *rootNodes.begin();
+    collectBonesFinal(model.mBones, necessary, model.mRootBone);
+    // Initialize the bone collision info
+    model.mBoneRadii.resize(model.mBones.size());
+    model.mBoneHitboxes.resize(model.mBones.size());
+    for (unsigned i = 0; i < model.mBones.size(); ++i)
+    {
+        model.mBoneRadii[i] = 0.0f;
+        model.mBoneHitboxes[i] = BoundingBox(0.0f, 0.0f);
+    }
+}
+
+void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node)
+{
+    if (necessary.find(node) != necessary.end())
+    {
+        dest.push_back(node);
+        for (unsigned i = 0; i < node->mNumChildren; ++i)
+            collectBonesFinal(dest, necessary, node->mChildren[i]);
+    }
+}
+
+void generateBoneCollisionInfo(ExportModel& model)
+{
+    for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+    {
+        aiMesh* mesh = model.mMeshes[i];
+        aiMatrix4x4 meshWorldTransform = getWorldTransform(model.mMeshNodes[i], model.mRootNode);
+        for (unsigned j = 0; j < mesh->mNumBones; ++j)
+        {
+            aiBone* bone = mesh->mBones[j];
+            std::string boneName = toStdString(bone->mName);
+            unsigned boneIndex = getBoneIndex(model, boneName);
+            aiNode* boneNode = model.mBones[boneIndex];
+            aiMatrix4x4 boneWorldTransform = getWorldTransform(boneNode, model.mRootNode);
+            aiMatrix4x4 boneInverse = boneWorldTransform;
+            boneInverse.Inverse();
+            for (unsigned k = 0; k < bone->mNumWeights; ++k)
+            {
+                float weight = bone->mWeights[k].mWeight;
+                if (weight > 0.33f)
+                {
+                    aiVector3D vertexWorldSpace = meshWorldTransform * mesh->mVertices[bone->mWeights[k].mVertexId];
+                    aiVector3D vertexBoneSpace = boneInverse * vertexWorldSpace;
+                    Vector3 vertex = toVector3(vertexBoneSpace);
+                    float radius = vertex.getLength();
+                    if (radius > model.mBoneRadii[boneIndex])
+                        model.mBoneRadii[boneIndex] = radius;
+                    model.mBoneHitboxes[boneIndex].merge(vertex);
+                }
+            }
+        }
+    }
+}
+
 void buildModel(ExportModel& model)
 {
     if (!model.mRootNode)
         errorExit("Null root node for model");
+    std::string rootNodeName = toStdString(model.mRootNode->mName);
     if (!model.mMeshes.size())
-        errorExit("No meshes");
+        errorExit("No geometries found starting from node " + rootNodeName);
     
-    std::cout << "Writing model from node " << toStdString(model.mRootNode->mName) << std::endl;
+    std::cout << "Writing model from node " << rootNodeName << std::endl;
+    
+    if (model.mBones.size())
+    {
+        std::cout << "Model has skeleton with " << model.mBones.size() << " bones, root bone is " +
+            toStdString(model.mRootBone->mName) << std::endl;
+    }
     
     SharedPtr<Model> outModel(new Model(0));
     outModel->setNumGeometries(model.mMeshes.size());
+    std::vector<std::vector<unsigned> > allBoneMappings;
     BoundingBox box;
     
     bool combineBuffers = true;
@@ -271,10 +385,17 @@ void buildModel(ExportModel& model)
             }
             
             // Build the vertex data
+            // If there are bones, get blend data
+            std::vector<std::vector<unsigned char> > blendIndices;
+            std::vector<std::vector<float> > blendWeights;
+            std::vector<unsigned> boneMappings;
+            if (model.mBones.size())
+                getBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
+            
             void* vertexData = vb->lock(0, vb->getVertexCount(), LOCK_NORMAL);
             float* dest = (float*)vertexData;
             for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform);
+                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
             
             ib->unlock();
             vb->unlock();
@@ -285,6 +406,8 @@ void buildModel(ExportModel& model)
             geom->setDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
             outModel->setNumGeometryLodLevels(i, 1);
             outModel->setGeometry(i, 0, geom);
+            if (model.mBones.size() > MAX_SKIN_MATRICES)
+                allBoneMappings.push_back(boneMappings);
         }
     }
     else
@@ -336,9 +459,16 @@ void buildModel(ExportModel& model)
             }
             
             // Build the vertex data
+            // If there are bones, get blend data
+            std::vector<std::vector<unsigned char> > blendIndices;
+            std::vector<std::vector<float> > blendWeights;
+            std::vector<unsigned> boneMappings;
+            if (model.mBones.size())
+                getBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
+            
             float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->getVertexSize());
             for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform);
+                writeVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
             
             // Define the geometry
             geom->setIndexBuffer(ib);
@@ -346,6 +476,8 @@ void buildModel(ExportModel& model)
             geom->setDrawRange(TRIANGLE_LIST, startIndexOffset, mesh->mNumFaces * 3, true);
             outModel->setNumGeometryLodLevels(i, 1);
             outModel->setGeometry(i, 0, geom);
+            if (model.mBones.size() > MAX_SKIN_MATRICES)
+                allBoneMappings.push_back(boneMappings);
             
             startVertexOffset += mesh->mNumVertices;
             startIndexOffset += mesh->mNumFaces * 3;
@@ -354,8 +486,128 @@ void buildModel(ExportModel& model)
     
     outModel->setBoundingBox(box);
     
+    // Build skeleton if necessary
+    if (model.mBones.size())
+    {
+        Skeleton skeleton;
+        std::vector<SharedPtr<Bone> > srcBones;
+        
+        for (unsigned i = 0; i < model.mBones.size(); ++i)
+        {
+            aiNode* boneNode = model.mBones[i];
+            std::string boneName(toStdString(boneNode->mName));
+            
+            srcBones.push_back(SharedPtr<Bone>(new Bone(0, boneName)));
+            srcBones[i]->setRootBone(srcBones[0]);
+            
+            aiMatrix4x4 transform;
+            Vector3 pos, scale;
+            Quaternion rot;
+            // Make the root bone transform relative to the model's root node, if it is not already
+            if (boneNode == model.mRootBone)
+                transform = getWorldTransform(boneNode, model.mRootNode);
+            else
+                transform = boneNode->mTransformation;
+            getPosRotScale(transform, pos, rot, scale);
+            
+            srcBones[i]->setBindTransform(pos, rot, scale);
+            srcBones[i]->setInitialTransform(pos, rot, scale);
+            srcBones[i]->setRadius(model.mBoneRadii[i]);
+            srcBones[i]->setBoundingBox(model.mBoneHitboxes[i]);
+        }
+        // Set the bone hierarchy
+        for (unsigned i = 1; i < model.mBones.size(); ++i)
+        {
+            std::string parentName = toStdString(model.mBones[i]->mParent->mName);
+            for (unsigned j = 0; j < srcBones.size(); ++j)
+            {
+                if ((srcBones[j]->getName() == parentName) && (i != j))
+                {
+                    srcBones[j]->addChild(srcBones[i]);
+                    break;
+                }
+            }
+        }
+        
+        skeleton.setBones(srcBones, srcBones[0]);
+        outModel->setSkeleton(skeleton);
+        if (model.mBones.size() > MAX_SKIN_MATRICES)
+            outModel->setGeometryBoneMappings(allBoneMappings);
+    }
+    
     File outFile(model.mOutName, FILE_WRITE);
     outModel->save(outFile);
+}
+
+unsigned getBoneIndex(ExportModel& model, const std::string& boneName)
+{
+    for (unsigned i = 0; i < model.mBones.size(); ++i)
+    {
+        if (toStdString(model.mBones[i]->mName) == boneName)
+            return i;
+    }
+    errorExit("Bone " + boneName + " not found");
+}
+
+aiBone* getMeshBone(ExportModel& model, const std::string& boneName)
+{
+    for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+    {
+        aiMesh* mesh = model.mMeshes[i];
+        for (unsigned j = 0; j < mesh->mNumBones; ++j)
+        {
+            aiBone* bone = mesh->mBones[j];
+            if (toStdString(bone->mName) == boneName)
+                return bone;
+        }
+    }
+    return 0;
+}
+
+void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
+    blendIndices, std::vector<std::vector<float> >& blendWeights)
+{
+    blendIndices.resize(mesh->mNumVertices);
+    blendWeights.resize(mesh->mNumVertices);
+    boneMappings.clear();
+    
+    // If model has more bones than can fit vertex shader parameters, write the per-geometry mappings
+    if (model.mBones.size() > MAX_SKIN_MATRICES)
+    {
+        if (mesh->mNumBones > MAX_SKIN_MATRICES)
+            errorExit("Geometry has too many bone influences");
+        boneMappings.resize(mesh->mNumBones);
+        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        {
+            aiBone* bone = mesh->mBones[i];
+            unsigned globalIndex = getBoneIndex(model, toStdString(bone->mName));
+            boneMappings[i] = globalIndex;
+            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+            {
+                unsigned vertex = bone->mWeights[j].mVertexId;
+                blendIndices[vertex].push_back(i);
+                blendWeights[vertex].push_back(bone->mWeights[j].mWeight);
+                if (blendWeights[vertex].size() > 4)
+                    errorExit("More than 4 bone influences on vertex");
+            }
+        }
+    }
+    else
+    {
+        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        {
+            aiBone* bone = mesh->mBones[i];
+            unsigned globalIndex = getBoneIndex(model, toStdString(bone->mName));
+            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+            {
+                unsigned vertex = bone->mWeights[j].mVertexId;
+                blendIndices[vertex].push_back(globalIndex);
+                blendWeights[vertex].push_back(bone->mWeights[j].mWeight);
+                if (blendWeights[vertex].size() > 4)
+                    errorExit("More than 4 bone influences on vertex");
+            }
+        }
+    }
 }
 
 void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset)
@@ -373,7 +625,8 @@ void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 }
 
 void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform)
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, std::vector<std::vector<unsigned char> >& blendIndices,
+    std::vector<std::vector<float> >& blendWeights)
 {
     Vector3 vertex = vertexTransform * toVector3(mesh->mVertices[index]);
     box.merge(vertex);
@@ -420,6 +673,28 @@ void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
         *dest++ = tangent.mZ;
         *dest++ = w;
     }
+    if (elementMask & MASK_BLENDWEIGHTS)
+    {
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            if (i < blendWeights[index].size())
+                *dest++ = blendWeights[index][i];
+            else
+                *dest++ = 0.0f;
+        }
+    }
+    if (elementMask & MASK_BLENDINDICES)
+    {
+        unsigned char* destBytes = (unsigned char*)dest;
+        ++dest;
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            if (i < blendIndices[index].size())
+                *destBytes++ = blendIndices[index][i];
+            else
+                *destBytes++ = 0;
+        }
+    }
 }
 
 unsigned getElementMask(aiMesh* mesh)
@@ -435,18 +710,28 @@ unsigned getElementMask(aiMesh* mesh)
         elementMask |= MASK_TEXCOORD1;
     if (mesh->GetNumUVChannels() > 1)
         elementMask |= MASK_TEXCOORD2;
+    if (mesh->HasBones())
+        elementMask |= (MASK_BLENDWEIGHTS | MASK_BLENDINDICES);
     return elementMask;
 }
 
-aiNode* findNode(const std::string& name, aiNode* rootNode)
+aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive)
 {
     if (!rootNode)
         return 0;
-    if (toLower(toStdString(rootNode->mName)) == toLower(name))
-        return rootNode;
+    if (!caseSensitive)
+    {
+        if (toLower(toStdString(rootNode->mName)) == toLower(name))
+            return rootNode;
+    }
+    else
+    {
+        if (toStdString(rootNode->mName) == name)
+            return rootNode;
+    }
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
     {
-        aiNode* found = findNode(name, rootNode->mChildren[i]);
+        aiNode* found = findNode(name, rootNode->mChildren[i], caseSensitive);
         if (found)
             return found;
     }

@@ -174,6 +174,12 @@ void Skeleton::define(const std::vector<SharedPtr<Bone > >& srcBones)
     }
 }
 
+void Skeleton::setBones(const std::vector<SharedPtr<Bone> >& bones, Bone* rootBone)
+{
+    mBones = bones;
+    mRootBone = rootBone;
+}
+
 void Skeleton::reset(bool force)
 {
     // Start with resetting the root bone so that node dirtying is done most efficiently
