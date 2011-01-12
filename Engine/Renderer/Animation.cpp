@@ -142,57 +142,6 @@ void Animation::setTracks(const std::vector<AnimationTrack>& tracks)
     mTracks = tracks;
 }
 
-void Animation::addTrack(const AnimationTrack& track)
-{
-    AnimationTrack* existing = const_cast<AnimationTrack*>(getTrack(track.mName));
-    // Make sure the name hash is correct
-    if (existing)
-    {
-        *existing = track;
-        existing->mNameHash = StringHash(existing->mName);
-    }
-    else
-    {
-        mTracks.push_back(track);
-        AnimationTrack* newTrack = &mTracks[mTracks.size() - 1];
-        newTrack->mNameHash = StringHash(newTrack->mName);
-    }
-}
-
-void Animation::removeTrack(unsigned index)
-{
-    if (index >= mTracks.size())
-    {
-        LOGERROR("Illegal track index");
-        return;
-    }
-    mTracks.erase(mTracks.begin() + index);
-}
-
-void Animation::removeTrack(const std::string& name)
-{
-    for (std::vector<AnimationTrack>::iterator i = mTracks.begin(); i != mTracks.end(); ++i)
-    {
-        if (i->mName == name)
-        {
-            mTracks.erase(i);
-            return;
-        }
-    }
-}
-
-void Animation::removeTrack(StringHash nameHash)
-{
-    for (std::vector<AnimationTrack>::iterator i = mTracks.begin(); i != mTracks.end(); ++i)
-    {
-        if (i->mNameHash == nameHash)
-        {
-            mTracks.erase(i);
-            return;
-        }
-    }
-}
-
 unsigned Animation::getNumTracks() const
 {
     return mTracks.size();

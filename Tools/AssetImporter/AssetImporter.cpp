@@ -139,8 +139,6 @@ void run(const std::vector<std::string>& arguments)
     if (!scene)
         errorExit("Could not open input file " + arguments[0]);
     
-    dumpNodes(scene->mRootNode, 0);
-    
     ExportModel model;
     model.mOutName = arguments[1];
     model.mScene = scene;
@@ -341,7 +339,7 @@ void buildAndSaveModel(ExportModel& model)
     
     if (model.mBones.size())
     {
-        std::cout << "Model has skeleton with " << model.mBones.size() << " bones, root bone is " +
+        std::cout << "Model has a skeleton with " << model.mBones.size() << " bones, rootbone " +
             toStdString(model.mRootBone->mName) << std::endl;
     }
     
@@ -391,7 +389,7 @@ void buildAndSaveModel(ExportModel& model)
             Matrix3 normalTransform = rot.getRotationMatrix();
             
             aiMesh* mesh = model.mMeshes[i];
-            std::cout << "Geometry " << i << ": " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
+            std::cout << "Geometry " << i << " has " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
                 << std::endl;
             
             bool largeIndices = mesh->mNumVertices > 65535;
@@ -472,7 +470,7 @@ void buildAndSaveModel(ExportModel& model)
             Matrix3 normalTransform = rot.getRotationMatrix();
             
             aiMesh* mesh = model.mMeshes[i];
-            std::cout << "Geometry " << i << ": " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
+            std::cout << "Geometry " << i << " has " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
                 << std::endl;
             
             // Build the index data
@@ -578,7 +576,6 @@ void buildAndSaveAnimations(ExportModel& model)
         std::string animName = toStdString(anim->mName);
         if (animName.empty())
             animName = "Anim" + toString(i + 1);
-        std::cout << "Writing animation " + animName << std::endl;
         std::string animOutName = getPath(model.mOutName) + getFileName(model.mOutName) + "_" + animName + ".ani";
         
         SharedPtr<Animation> outAnim(new Animation());
@@ -586,13 +583,12 @@ void buildAndSaveAnimations(ExportModel& model)
         outAnim->setAnimationName(animName);
         outAnim->setLength((float)anim->mDuration * tickConversion);
         
-        std::cout << "Animation length " << outAnim->getLength() << std::endl;
-        
+        std::cout << "Writing animation " << animName << " length " << outAnim->getLength() << std::endl;
+        std::vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
             std::string channelName = toStdString(channel->mNodeName);
-            std::cout << "Animation track " << channelName << std::endl;
             unsigned boneIndex = getBoneIndex(model, channelName);
             if (boneIndex == M_MAX_UNSIGNED)
             {
@@ -642,7 +638,7 @@ void buildAndSaveAnimations(ExportModel& model)
                 ((channel->mNumPositionKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumPositionKeys != channel->mNumScalingKeys)) ||
                 ((channel->mNumRotationKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumRotationKeys != channel->mNumScalingKeys)))
             {
-                std::cout << "Warning: differing amount of channel keyframes, skipping animation track " << channelName << std::endl;
+                std::cout << "Warning: differing amounts of channel keyframes, skipping animation track " << channelName << std::endl;
                 continue;
             }
             
@@ -700,13 +696,13 @@ void buildAndSaveAnimations(ExportModel& model)
                 if (track.mChannelMask & CHANNEL_SCALE)
                     kf.mScale = toVector3(scale);
                 
-                std::cout << toString(kf.mRotation) << std::endl;
-                
                 track.mKeyFrames.push_back(kf);
             }
             
-            outAnim->addTrack(track);
+            tracks.push_back(track);
         }
+        
+        outAnim->setTracks(tracks);
         
         File outFile(animOutName, FILE_WRITE);
         outAnim->save(outFile);

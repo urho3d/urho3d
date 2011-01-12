@@ -85,16 +85,8 @@ public:
     void setAnimationName(const std::string& name);
     //! Set animation length
     void setLength(float length);
-    //! Set animation tracks
+    //! Set all animation tracks
     void setTracks(const std::vector<AnimationTrack>& tracks);
-    //! Add an animation track. If already exists with the same name, replace
-    void addTrack(const AnimationTrack& track);
-    //! Remove an animation track by index
-    void removeTrack(unsigned index);
-    //! Remove an animation track by bone name
-    void removeTrack(const std::string& name);
-    //! Remove an animation track by bone name hash
-    void removeTrack(StringHash nameHash);
     
     //! Return animation name
     const std::string& getAnimationName() const { return mAnimationName; }
