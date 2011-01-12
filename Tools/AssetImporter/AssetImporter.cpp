@@ -860,7 +860,7 @@ void collectSceneModels(ExportScene& scene, aiNode* node)
         ExportModel model;
         model.mScene = scene.mScene;
         model.mRootNode = node;
-        model.mOutName = toStdString(node->mName) + ".mdl";
+        model.mOutName = getPath(scene.mOutName) + toStdString(node->mName) + ".mdl";
         std::cout << "Found model " << model.mOutName << std::endl;
         for (unsigned i = 0; i < meshes.size(); ++i)
         {
