@@ -27,7 +27,11 @@
 #include "Geometry.h"
 #include "IndexBuffer.h"
 #include "Model.h"
+#include "Octree.h"
+#include "PhysicsWorld.h"
 #include "Quaternion.h"
+#include "Scene.h"
+#include "StaticModel.h"
 #include "StringUtils.h"
 #include "Vector3.h"
 #include "VertexBuffer.h"
@@ -57,6 +61,7 @@ struct ExportModel
     std::string mOutName;
     const aiScene* mScene;
     aiNode* mRootNode;
+    std::set<unsigned> mMeshIndices;
     std::vector<aiMesh*> mMeshes;
     std::vector<aiNode*> mMeshNodes;
     std::vector<aiNode*> mBones;
@@ -68,10 +73,22 @@ struct ExportModel
     unsigned mTotalIndices;
 };
 
+struct ExportScene
+{
+    std::string mOutName;
+    bool mLocalIDs;
+    bool mNoExtensions;
+    const aiScene* mScene;
+    aiNode* mRootNode;
+    std::vector<ExportModel> mModels;
+    std::vector<aiNode*> mNodes;
+    std::vector<unsigned> mNodeModelIndices;
+};
+
 int main(int argc, char** argv);
 void run(const std::vector<std::string>& arguments);
-void dumpNodes(aiNode* rootNode, unsigned level);
-void exportModel(ExportModel& model);
+void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level);
+void exportModel(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool noAnimations);
 void collectMeshes(ExportModel& model, aiNode* node);
 void collectBones(ExportModel& model);
 void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node);
@@ -79,6 +96,13 @@ void collectAnimations(ExportModel& model);
 void buildBoneCollisionInfo(ExportModel& model);
 void buildAndSaveModel(ExportModel& model);
 void buildAndSaveAnimations(ExportModel& model);
+void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool localIDs, bool noExtensions);
+void collectSceneModels(ExportScene& scene, aiNode* node);
+void collectSceneNodes(ExportScene& scene, aiNode* node);
+void buildAndSaveScene(ExportScene& scene);
+std::set<unsigned> getMeshesUnderNodeSet(aiNode* node);
+std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node);
+unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh);
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName);
 aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
 void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >& blendIndices, std::vector<std::vector<float> >& blendWeights);
@@ -121,10 +145,38 @@ int main(int argc, char** argv)
 void run(const std::vector<std::string>& arguments)
 {
     if (arguments.size() < 2)
-        errorExit("Usage: AssetImporter <inputfile> <outputfile> [rootnode]\n");
+    {
+        errorExit(
+            "Usage: AssetImporter <command> <input file> <output file> [options]\n"
+            "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
+            "Commands:\n"
+            "model     Export a model and animations. Output file is the model name\n"
+            "scene     Export a scene. Output file is the scene XML file name\n"
+            "dumpnodes Dump scene node structure. No output file is generated\n"
+            "\n"
+            "Options:\n"
+            "-l        Use local ID's for scene entities\n"
+            "-na       Do not export animations\n"
+            "-ne       Do not create Octree & PhysicsWorld extensions to the scene\n"
+            "-nm       Do not export materials\n"
+            "-rX       Use scene node X as root node\n"
+            "-t        Generate tangents to model(s)\n"
+        );
+    }
     
-    Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(arguments[0].c_str(),
+    std::string command = toLower(arguments[0]);
+    std::string inFile = arguments[1];
+    std::string outFile;
+    std::string rootNodeName;
+    if (arguments.size() > 2)
+        outFile = arguments[2];
+    
+    bool noMaterials = false;
+    bool noAnimations = false;
+    bool noExtensions = false;
+    bool localIDs = false;
+    
+    unsigned flags = 
         aiProcess_ConvertToLeftHanded |
         aiProcess_JoinIdenticalVertices |
         aiProcess_Triangulate |
@@ -134,28 +186,74 @@ void run(const std::vector<std::string>& arguments)
         aiProcess_FixInfacingNormals |
         aiProcess_FindInvalidData |
         aiProcess_FindInstances |
-        aiProcess_OptimizeMeshes);
+        aiProcess_OptimizeMeshes;
     
-    if (!scene)
-        errorExit("Could not open input file " + arguments[0]);
-    
-    ExportModel model;
-    model.mOutName = arguments[1];
-    model.mScene = scene;
-    
-    if (arguments.size() < 3)
-        model.mRootNode = scene->mRootNode;
-    else
+    for (unsigned i = 3; i < arguments.size(); ++i)
     {
-        model.mRootNode = findNode(arguments[2], scene->mRootNode, false);
-        if (!model.mRootNode)
-            errorExit("Could not find scene node " + arguments[2]);
+        if ((arguments[i].length() >= 2) && (arguments[i][0] == '-'))
+        {
+            std::string parameter;
+            if (arguments[i].length() >= 3)
+                parameter = arguments[i].substr(2);
+            
+            switch (tolower(arguments[i][1]))
+            {
+            case 't':
+                flags |= aiProcess_CalcTangentSpace;
+                break;
+            case 'l':
+                localIDs = true;
+                break;
+            case 'r':
+                rootNodeName = parameter;
+                break;
+            case 'n':
+                if (!parameter.empty())
+                {
+                    switch (tolower(parameter[0]))
+                    {
+                    case 'a':
+                        noAnimations = true;
+                        break;
+                    case 'e':
+                        noExtensions = true;
+                        break;
+                    case 'm':
+                        noMaterials = true;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
     }
     
-    exportModel(model);
+    if ((command != "model") && (command != "scene") && (command != "dumpnodes"))
+        errorExit("Unrecognized command " + command);
+    
+    Assimp::Importer importer;
+    std::cout << "Reading file " << inFile << std::endl;
+    const aiScene* scene = importer.ReadFile(inFile.c_str(), flags);
+    if (!scene)
+        errorExit("Could not open or parse input file " + inFile);
+    
+    aiNode* rootNode = scene->mRootNode;
+    if (!rootNodeName.empty())
+    {
+        rootNode = findNode(rootNodeName, scene->mRootNode, false);
+        if (!rootNode)
+            errorExit("Could not find scene node " + rootNodeName);
+    }
+    
+    if (command == "model")
+        exportModel(scene, rootNode, outFile, noAnimations);
+    if (command == "scene")
+        exportScene(scene, rootNode, outFile, localIDs, noExtensions);
+    if (command == "dumpnodes")
+        dumpNodes(scene, rootNode, 0);
 }
 
-void dumpNodes(aiNode* rootNode, unsigned level)
+void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level)
 {
     if (!rootNode)
         return;
@@ -165,26 +263,40 @@ void dumpNodes(aiNode* rootNode, unsigned level)
     for (unsigned i = 0; i < level * 2; ++i)
         indent[i] = ' ';
     
-    if (!rootNode->mNumMeshes)
-        std::cout << indent << "Node " << toStdString(rootNode->mName) << std::endl;
-    else
-    {
-        std::cout << indent << "Node " << toStdString(rootNode->mName) << " - " << rootNode->mNumMeshes << " geometries"
-            << std::endl;
-    }
+    Vector3 pos, scale;
+    Quaternion rot;
+    getPosRotScale(rootNode->mTransformation, pos, rot, scale);
+    
+    std::cout << indent << "Node " << toStdString(rootNode->mName) << " pos " << toString(pos) << std::endl;
+  
+    if (rootNode->mNumMeshes == 1)
+        std::cout << indent << "  " << rootNode->mNumMeshes << " geometry" << std::endl;
+    if (rootNode->mNumMeshes > 1)
+        std::cout << indent << "  " << rootNode->mNumMeshes << " geometries" << std::endl;
     
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
-        dumpNodes(rootNode->mChildren[i], level + 1);
+        dumpNodes(scene, rootNode->mChildren[i], level + 1);
 }
 
-void exportModel(ExportModel& model)
+void exportModel(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool noAnimations)
 {
+    if (outName.empty())
+        errorExit("No output file defined");
+    
+    ExportModel model;
+    model.mScene = scene;
+    model.mRootNode = rootNode;
+    model.mOutName = outName;
+    
     collectMeshes(model, model.mRootNode);
     collectBones(model);
-    collectAnimations(model);
     buildBoneCollisionInfo(model);
     buildAndSaveModel(model);
-    buildAndSaveAnimations(model);
+    if (!noAnimations)
+    {
+        collectAnimations(model);
+        buildAndSaveAnimations(model);
+    }
 }
 
 void collectMeshes(ExportModel& model, aiNode* node)
@@ -201,6 +313,7 @@ void collectMeshes(ExportModel& model, aiNode* node)
             }
         }
         
+        model.mMeshIndices.insert(node->mMeshes[i]);
         model.mMeshes.push_back(mesh);
         model.mMeshNodes.push_back(node);
         model.mTotalVertices += mesh->mNumVertices;
@@ -707,6 +820,180 @@ void buildAndSaveAnimations(ExportModel& model)
         File outFile(animOutName, FILE_WRITE);
         outAnim->save(outFile);
     }
+}
+
+void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool localIDs, bool noExtensions)
+{
+    if (outName.empty())
+        errorExit("No output file defined");
+    
+    ExportScene outScene;
+    outScene.mOutName = outName;
+    outScene.mLocalIDs = localIDs;
+    outScene.mNoExtensions = noExtensions;
+    outScene.mScene = scene;
+    outScene.mRootNode = rootNode;
+    
+    collectSceneModels(outScene, rootNode);
+    collectSceneNodes(outScene, rootNode);
+    
+    // Save models
+    try
+    {
+        for (unsigned i = 0; i < outScene.mModels.size(); ++i)
+            buildAndSaveModel(outScene.mModels[i]);
+    }
+    catch (...)
+    {
+    }
+    
+    // Save scene
+    buildAndSaveScene(outScene);
+}
+
+void collectSceneModels(ExportScene& scene, aiNode* node)
+{
+    std::vector<std::pair<aiNode*, aiMesh*> > meshes = getMeshesUnderNode(scene.mScene, node);
+    // If meshes encountered, do not recurse further, but build a model for export
+    if (meshes.size())
+    {
+        ExportModel model;
+        model.mScene = scene.mScene;
+        model.mRootNode = node;
+        model.mOutName = toStdString(node->mName) + ".mdl";
+        std::cout << "Found model " << model.mOutName << std::endl;
+        for (unsigned i = 0; i < meshes.size(); ++i)
+        {
+            aiMesh* mesh = meshes[i].second;
+            unsigned meshIndex = getMeshIndex(scene.mScene, mesh);
+            model.mMeshIndices.insert(meshIndex);
+            model.mMeshes.push_back(mesh);
+            model.mMeshNodes.push_back(meshes[i].first);
+            model.mTotalVertices += mesh->mNumVertices;
+            model.mTotalIndices += mesh->mNumFaces * 3;
+        }
+        
+        // Check if a model with identical mesh indices already exists. If yes, do not export twice
+        bool unique = true;
+        for (unsigned i = 0; i < scene.mModels.size(); ++i)
+        {
+            if (scene.mModels[i].mMeshIndices == model.mMeshIndices)
+            {
+                unique = false;
+                break;
+            }
+        }
+        if (unique)
+        {
+            collectBones(model);
+            buildBoneCollisionInfo(model);
+            scene.mModels.push_back(model);
+        }
+        return;
+    }
+    // If no meshes found, recurse to child nodes
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+        collectSceneModels(scene, node->mChildren[i]);
+}
+
+void collectSceneNodes(ExportScene& scene, aiNode* node)
+{
+    std::set<unsigned> meshIndices = getMeshesUnderNodeSet(node);;
+    if (meshIndices.size())
+    {
+        // Check if a matching set of mesh indices is found from the models we are going to write (should be)
+        for (unsigned i = 0; i < scene.mModels.size(); ++i)
+        {
+            if (scene.mModels[i].mMeshIndices == meshIndices)
+            {
+                std::cout << "Found node " << toStdString(node->mName) << std::endl;
+                scene.mNodes.push_back(node);
+                scene.mNodeModelIndices.push_back(i);
+                break;
+            }
+        }
+        return;
+    }
+    // If no meshes found, recurse to child nodes
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+        collectSceneNodes(scene, node->mChildren[i]);
+}
+
+void buildAndSaveScene(ExportScene& scene)
+{
+    std::cout << "Writing scene" << std::endl;
+    
+    SharedPtr<Scene> outScene(new Scene(0, getFileName(scene.mOutName)));
+    if (!scene.mNoExtensions)
+    {
+        //! \todo Make the physics properties configurable
+        PhysicsWorld* physicsWorld = new PhysicsWorld(outScene);
+        physicsWorld->setGravity(Vector3(0.0f, -9.81f, 0.0f));
+        outScene->addExtension(physicsWorld);
+        
+        //! \todo Make the octree properties configurable, or detect from the scene contents
+        Octree* octree = new Octree(BoundingBox(-1000.0f, 1000.0f), 8, true);
+        outScene->addExtension(octree);
+    }
+    
+    for (unsigned i = 0; i < scene.mNodes.size(); ++i)
+    {
+        // Create a simple entity and static model component for each node
+        Entity* entity = outScene->createEntity(toStdString(scene.mNodes[i]->mName), scene.mLocalIDs);
+        StaticModel* staticModel = new StaticModel();
+        entity->addComponent(staticModel);
+        // Create a dummy model so that the reference can be stored
+        SharedPtr<Model> dummyModel(new Model(0, scene.mModels[scene.mNodeModelIndices[i]].mOutName));
+        staticModel->setModel(dummyModel);
+        // Set a flattened transform
+        Vector3 pos, scale;
+        Quaternion rot;
+        getPosRotScale(getWorldTransform(scene.mNodes[i], 0), pos, rot, scale);
+        staticModel->setTransform(pos, rot, scale);
+    }
+    
+    File file(scene.mOutName, FILE_WRITE);
+    outScene->saveXML(file);
+}
+
+std::set<unsigned> getMeshesUnderNodeSet(aiNode* node)
+{
+    std::set<unsigned> ret;
+    
+    // Do not check this model directly, but rather check if there are meshes in the immediate children
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+    {
+        aiNode* childNode = node->mChildren[i];
+        for (unsigned j = 0; j < childNode->mNumMeshes; ++j)
+            ret.insert(childNode->mMeshes[j]);
+    }
+    
+    return ret;
+}
+
+std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node)
+{
+    std::vector<std::pair<aiNode*, aiMesh*> > ret;
+    
+    // Do not check this model directly, but rather check if there are meshes in the immediate children
+    for (unsigned i = 0; i < node->mNumChildren; ++i)
+    {
+        aiNode* childNode = node->mChildren[i];
+        for (unsigned j = 0; j < childNode->mNumMeshes; ++j)
+            ret.push_back(std::make_pair(childNode, scene->mMeshes[childNode->mMeshes[j]]));
+    }
+    
+    return ret;
+}
+
+unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh)
+{
+    for (unsigned i = 0; i < scene->mNumMeshes; ++i)
+    {
+        if (scene->mMeshes[i] == mesh)
+            return i;
+    }
+    return M_MAX_UNSIGNED;
 }
 
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName)

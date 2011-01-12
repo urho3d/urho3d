@@ -53,9 +53,6 @@ Scene::Scene(ResourceCache* cache, const std::string& name) :
     mPlayback(false),
     mAsyncLoading(false)
 {
-    if (!mCache)
-        EXCEPTION("Null resource cache for Scene");
-    
     LOGINFO("Scene " + mName + " created");
 }
 
@@ -155,6 +152,9 @@ void Scene::load(Deserializer& source, bool throwOnError)
 {
     LOGINFO("Loading scene from " + source.getName());
     
+    if (!mCache)
+        EXCEPTION("Null resource cache");
+    
     stopAsyncLoading();
     removeAllEntities();
     
@@ -210,6 +210,9 @@ void Scene::saveXML(Serializer& dest, bool throwOnError)
 void Scene::loadXML(Deserializer& source, bool throwOnError)
 {
     LOGINFO("Loading XML scene from " + source.getName());
+    
+    if (!mCache)
+        EXCEPTION("Null resource cache");
     
     XMLFile xml;
     xml.load(source, mCache);
@@ -408,6 +411,9 @@ void Scene::loadAsync(File* file)
     if (!file)
         EXCEPTION("Null file for async scene loading");
     
+    if (!mCache)
+        EXCEPTION("Null resource cache");
+    
     stopAsyncLoading();
     removeAllEntities();
     
@@ -429,6 +435,9 @@ void Scene::loadAsyncXML(File* file)
 {
     if (!file)
         EXCEPTION("Null file for async XML scene loading");
+    
+    if (!mCache)
+        EXCEPTION("Null resource cache");
     
     file->seek(0);
     SharedPtr<XMLFile> xml(new XMLFile());
