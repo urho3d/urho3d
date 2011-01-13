@@ -71,9 +71,9 @@ Node::~Node()
     {
         std::vector<SharedPtr<Node> >::iterator i = mChildren.end() - 1;
         if (i->getRefCount() > 1)
-            removeChild(i, true, true);
+            removeChild(i, true);
         else
-            removeChild(i, false, true);
+            removeChild(i, false);
     }
 }
 
@@ -477,8 +477,6 @@ void Node::addChild(Node* node)
     
     node->mParent = this;
     node->markDirty();
-    node->onParentChanged();
-    onChildAdded(node);
 }
 
 void Node::removeChild(Node* node, bool setWorldTransform)
@@ -618,17 +616,13 @@ void Node::updateWorldPosition()
     mWorldTransformDirty = true;
 }
 
-void Node::removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform, bool calledFromDestructor)
+void Node::removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform)
 {
     Node* node = (*i);
     if (setWorldTransform)
         node->setTransform(node->getWorldPosition(), node->getWorldRotation(), node->getWorldScale());
     node->mParent = 0;
     node->markDirty();
-    node->onParentChanged();
-    // Calling a virtual function will crash on destruction, so avoid it if necessary
-    if (!calledFromDestructor)
-        onChildRemoved(node);
     mChildren.erase(i);
 }
 

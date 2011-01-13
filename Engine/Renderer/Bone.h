@@ -44,43 +44,37 @@ public:
     
     //! Set root bone
     void setRootBone(Bone* rootBone);
-    //! Set bind pose transform
-    void setBindTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
-    //! Set reset transform
+    //! Set initial transform
     void setInitialTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    //! Set skinning offset matrix
+    void setOffsetMatrix(const Matrix4x3& offset);
     //! Set animation enabled
     void setAnimationEnabled(bool enable);
     //! Set radius for raycasts
     void setRadius(float radius);
     //! Set bounding box for raycasts
     void setBoundingBox(const BoundingBox& box);
-    //! Reset. If animation disabled, does nothing unless forced
+    //! Reset to initial transform. If animation disabled, does nothing unless forced
     void reset(bool force = false);
     //! Clear skinning update flag
     void clearSkinningDirty() { mSkinningDirty = false; }
     
     //! Return root bone
     Bone* getRootBone() const { return mRootBone; }
-    //! Return bind pose position
-    const Vector3& getBindPosition() const { return mBindPosition; }
-    //! Return bind pose rotation
-    const Quaternion& getBindRotation() const { return mBindRotation; }
-    //! Return bind pose scale
-    const Vector3& getBindScale() const { return mBindScale; }
-    //! Return reset position
+    //! Return initial position
     const Vector3& getInitialPosition() const { return mInitialPosition; }
-    //! Return reset rotation
+    //! Return initial rotation
     const Quaternion& getInitialRotation() const { return mInitialRotation; }
-    //! Return reset scale
+    //! Return initial scale
     const Vector3& getInitialScale() const { return mInitialScale; }
+    //! Return offset matrix
+    const Matrix4x3& getOffsetMatrix() const { return mOffsetMatrix; }
     //! Return supported collision types
     unsigned getCollisionMask() const { return mCollisionMask; }
     //! Return radius
     float getRadius() const { return mRadius; }
     //! Return bounding box
     const BoundingBox& getBoundingBox() const { return mBoundingBox; }
-    //! Return bind inverse matrix
-    const Matrix4x3& getBindInverseTransform();
     //! Return whether animation is enabled
     bool isAnimationEnabled() const { return mAnimationEnabled; }
     //! Return whether skinning needs update
@@ -89,29 +83,18 @@ public:
 protected:
     //! Transform has changed. Mark skinning to need updating
     virtual void onMarkedDirty();
-    //! Parent node has changed. Mark bind inverse matrix to need updating
-    virtual void onParentChanged();
     
 private:
-    //! Mark the bind inverse matrix to updating
-    void markBindInverseTransformDirty();
-    
     //! Skeleton root bone
     Bone* mRootBone;
-    //! Bind pose position
-    Vector3 mBindPosition;
-    //! Bind pose rotation
-    Quaternion mBindRotation;
-    //! Bind pose scale
-    Vector3 mBindScale;
     //! Reset position
     Vector3 mInitialPosition;
     //! Reset rotation
     Quaternion mInitialRotation;
     //! Reset scale
     Vector3 mInitialScale;
-    //! Bind inverse matrix
-    Matrix4x3 mBindInverseTransform;
+    //! Offset matrix
+    Matrix4x3 mOffsetMatrix;
     //! Supported collision types
     unsigned char mCollisionMask;
     //! Radius
@@ -120,8 +103,6 @@ private:
     BoundingBox mBoundingBox;
     //! Animation enabled flag
     bool mAnimationEnabled;
-    //! Bind inverse matrix needs update flag
-    bool mBindInverseTransformDirty;
     //! Skinning needs update flag
     bool mSkinningDirty;
 };

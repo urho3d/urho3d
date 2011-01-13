@@ -946,6 +946,11 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
         dest.writeVector3(bones[i].mBindPosition);
         dest.writeQuaternion(bones[i].mBindRotation);
         dest.writeVector3(bones[i].mBindScale);
+        
+        Matrix4x3 offsetMatrix(bones[i].mDerivedPosition, bones[i].mDerivedRotation, bones[i].mDerivedScale);
+        offsetMatrix = offsetMatrix.getInverse();
+        dest.write(offsetMatrix.getData(), sizeof(Matrix4x3));
+        
         dest.writeUByte(bones[i].mCollisionMask);
         if (bones[i].mCollisionMask & 1)
             dest.writeFloat(bones[i].mRadius);

@@ -201,12 +201,6 @@ protected:
     
     //! Transform has changed. Perform subclass-specific operations
     virtual void onMarkedDirty() {}
-    //! Parent has changed. Perform subclass-specific operations
-    virtual void onParentChanged() {}
-    //! A child scene node has been added. Perform subclass-specific operations
-    virtual void onChildAdded(Node* node) {}
-    //! A child scene node has been removed. Perform subclass-specific operations
-    virtual void onChildRemoved(Node* node) {}
     
     //! Parent scene node
     Node* mParent;
@@ -228,7 +222,7 @@ private:
     //! Recalculate the world transform
     void updateWorldPosition();
     //! Remove child node by iterator
-    void removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform = false, bool calledFromDestructor = false);
+    void removeChild(std::vector<SharedPtr<Node> >::iterator i, bool setWorldTransform = false);
     //! Return child nodes recursively
     void getChildrenRecursive(unsigned nodeFlags, std::vector<Node*>& dest) const;
     

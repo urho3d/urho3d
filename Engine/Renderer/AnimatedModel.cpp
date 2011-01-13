@@ -235,7 +235,7 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
     {
         if (mAnimationStates[i]->isEnabled())
         {
-            animBits[i] = 1 | 2 | 4 | 8 | 16;
+            animBits[i] = 1 | 2 | 4 | 8 | 16 | 32;
             ++enabledAnimations;
         }
         else
@@ -249,6 +249,7 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         float weight = baseRevision.readFloat();
         float time = baseRevision.readFloat();
         int priority = baseRevision.readUByte();
+        bool useNlerp = baseRevision.readBool();
         
         bool found = false;
         for (unsigned j = 0; j < mAnimationStates.size(); ++j)
@@ -273,6 +274,8 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
                     animBits[j] |= 8;
                 if (priority != state->getPriority())
                     animBits[j] |= 16;
+                if (useNlerp != state->getUseNlerp())
+                    animBits[j] |= 32;
                 if (animBits[j])
                     bits |= 8;
                 break;
@@ -317,6 +320,7 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         destRevision.writeFloat(state->getWeight());
         destRevision.writeFloat(state->getTime());
         destRevision.writeUByte(state->getPriority());
+        destRevision.writeBool(state->getUseNlerp());
     }
     // Then write delta of enabled animations to the net stream
     if (bits & 8)
@@ -339,6 +343,8 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
                 dest.writeUShort((unsigned short)(state->getTime() * 65535.0f / state->getAnimation()->getLength()));
             if (animBits[i] & 16)
                 dest.writeUByte(state->getPriority());
+            if (animBits[i] & 32)
+                dest.writeBool(state->getUseNlerp());
         }
     }
     writeVLEDelta(mMorphs.size(), dest, destRevision, bits & 16);
@@ -394,6 +400,8 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
                     state->setTime(source.readUShort() * state->getAnimation()->getLength() / 65535.0f);
                 if (animBits & 16)
                     state->setPriority(source.readUByte());
+                if (animBits & 32)
+                    state->setUseNlerp(source.readBool());
                 
                 // If state is new, interpolate directly to the end
                 if (newState)
@@ -412,6 +420,8 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
                     source.readUShort();
                 if (animBits & 16)
                     source.readUByte();
+                if (animBits & 32)
+                    source.readBool();
             }
         }
         
@@ -1121,7 +1131,7 @@ void AnimatedModel::updateSkinning()
             
             if (bone->isSkinningDirty())
             {
-                mSkinMatrices[i] = bone->getWorldTransform() * bone->getBindInverseTransform();
+                mSkinMatrices[i] = bone->getWorldTransform() * bone->getOffsetMatrix();
                 bone->clearSkinningDirty();
             }
         }
@@ -1135,7 +1145,7 @@ void AnimatedModel::updateSkinning()
             
             if (bone->isSkinningDirty())
             {
-                mSkinMatrices[i] = bone->getWorldTransform() * bone->getBindInverseTransform();
+                mSkinMatrices[i] = bone->getWorldTransform() * bone->getOffsetMatrix();
                 
                 // Copy the skin matrix to per-geometry matrices as needed
                 for (unsigned j = 0; j < mGeometrySkinMatrixPtrs[i].size(); ++j)

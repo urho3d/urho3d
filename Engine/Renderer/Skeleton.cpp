@@ -53,13 +53,16 @@ void Skeleton::load(Deserializer& source)
     {
         std::string name = source.readString();
         unsigned parentIndex = source.readUInt();
-        Vector3 bindPosition = source.readVector3();
-        Quaternion bindRotation = source.readQuaternion();
-        Vector3 bindScale = source.readVector3();
-        
         SharedPtr<Bone> newBone(new Bone(0, name));
-        newBone->setBindTransform(bindPosition, bindRotation, bindScale);
-        newBone->setInitialTransform(bindPosition, bindRotation, bindScale);
+
+        Vector3 initialPosition = source.readVector3();
+        Quaternion initialRotation = source.readQuaternion();
+        Vector3 initialScale = source.readVector3();
+        Matrix4x3 offsetMatrix;
+        source.read(&offsetMatrix.m00, sizeof(Matrix4x3));
+        
+        newBone->setInitialTransform(initialPosition, initialRotation, initialScale);
+        newBone->setOffsetMatrix(offsetMatrix);
         newBone->reset();
         
         // Read bone collision data
@@ -107,10 +110,11 @@ void Skeleton::save(Serializer& dest)
             parentIndex = i;
         dest.writeUInt(parentIndex);
         
-        // Bind transform
-        dest.writeVector3(bone->getBindPosition());
-        dest.writeQuaternion(bone->getBindRotation());
-        dest.writeVector3(bone->getBindScale());
+        // Initial position and offset matrix
+        dest.writeVector3(bone->getInitialPosition());
+        dest.writeQuaternion(bone->getInitialRotation());
+        dest.writeVector3(bone->getInitialScale());
+        dest.write(bone->getOffsetMatrix().getData(), sizeof(Matrix4x3));
         
         // Collision info
         unsigned char collisionMask = bone->getCollisionMask();
@@ -138,10 +142,9 @@ void Skeleton::define(const std::vector<SharedPtr<Bone > >& srcBones)
         srcBoneIndices[srcBones[i]] = i;
         
         SharedPtr<Bone> newBone(new Bone(0, srcBones[i]->getName()));
-        newBone->setBindTransform(srcBones[i]->getBindPosition(), srcBones[i]->getBindRotation(),
-            srcBones[i]->getBindScale());
         newBone->setInitialTransform(srcBones[i]->getInitialPosition(), srcBones[i]->getInitialRotation(),
             srcBones[i]->getInitialScale());
+        newBone->setOffsetMatrix(srcBones[i]->getOffsetMatrix());
         
         if (srcBones[i]->getCollisionMask() & BONECOLLISION_SPHERE)
             newBone->setRadius(srcBones[i]->getRadius());

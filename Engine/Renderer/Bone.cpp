@@ -29,16 +29,13 @@
 Bone::Bone(Bone* rootBone, const std::string& name) :
     Node(NODE_BONE, name),
     mRootBone(rootBone),
-    mBindPosition(Vector3::sZero),
-    mBindRotation(Quaternion::sIdentity),
-    mBindScale(Vector3::sUnity),
     mInitialPosition(Vector3::sZero),
     mInitialRotation(Quaternion::sIdentity),
     mInitialScale(Vector3::sUnity),
+    mOffsetMatrix(Matrix4x3::sIdentity),
     mCollisionMask(BONECOLLISION_NONE),
     mRadius(0.0f),
     mAnimationEnabled(true),
-    mBindInverseTransformDirty(true),
     mSkinningDirty(true)
 {
     if (!mRootBone)
@@ -58,18 +55,7 @@ void Bone::setRootBone(Bone* rootBone)
     {
         mRootBone = rootBone;
         markDirty();
-        markBindInverseTransformDirty();
     }
-}
-
-void Bone::setBindTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
-{
-    mBindPosition = position;
-    mBindRotation = rotation;
-    mBindScale = scale;
-    
-    markDirty();
-    markBindInverseTransformDirty();
 }
 
 void Bone::setInitialTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
@@ -77,6 +63,11 @@ void Bone::setInitialTransform(const Vector3& position, const Quaternion& rotati
     mInitialPosition = position;
     mInitialRotation = rotation;
     mInitialScale = scale;
+}
+
+void Bone::setOffsetMatrix(const Matrix4x3& offset)
+{
+    mOffsetMatrix = offset;
 }
 
 void Bone::setRadius(float radius)
@@ -102,67 +93,9 @@ void Bone::reset(bool force)
         setTransform(mInitialPosition, mInitialRotation, mInitialScale);
 }
 
-const Matrix4x3& Bone::getBindInverseTransform()
-{
-    if (mBindInverseTransformDirty)
-    {
-        // Have to traverse the hierarchy manually to get the root derived bind transform
-        Vector3 derivedBindPosition = mBindPosition;
-        Quaternion derivedBindRotation = mBindRotation;
-        Vector3 derivedBindScale = mBindScale;
-        
-        if (this != mRootBone)
-        {
-            Bone* parent = dynamic_cast<Bone*>(getParent());
-            while (parent)
-            {
-                const Vector3& parentBindPosition = parent->getBindPosition();
-                const Quaternion& parentBindRotation = parent->getBindRotation();
-                const Vector3& parentBindScale = parent->getBindScale();
-                
-                derivedBindPosition = parentBindPosition + (parentBindRotation * (parentBindScale * derivedBindPosition));
-                derivedBindRotation = parentBindRotation * derivedBindRotation;
-                derivedBindScale = parentBindScale * derivedBindScale;
-                
-                if (parent == mRootBone)
-                    break;
-                parent = dynamic_cast<Bone*>(parent->getParent());
-            }
-        }
-        
-        Matrix4x3 bindTransform(derivedBindPosition, derivedBindRotation, derivedBindScale);
-        mBindInverseTransform = bindTransform.getInverse();
-        
-        mBindInverseTransformDirty = false;
-    }
-    
-    return mBindInverseTransform;
-}
-
 void Bone::onMarkedDirty()
 {
     mSkinningDirty = true;
     // Dirty also the skinning flag of root bone for faster checking of whether any bones have changed in the skeleton
     mRootBone->mSkinningDirty = true;
-}
-
-void Bone::onParentChanged()
-{
-    markBindInverseTransformDirty();
-}
-
-void Bone::markBindInverseTransformDirty()
-{
-    if (!mBindInverseTransformDirty)
-    {
-        mBindInverseTransformDirty = true;
-        
-        // Must also mark dirty all child nodes that are bones
-        for (std::vector<SharedPtr<Node> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
-        {
-            Bone* bone = dynamic_cast<Bone*>(i->getPtr());
-            if (bone)
-                bone->markBindInverseTransformDirty();
-        }
-    }
 }

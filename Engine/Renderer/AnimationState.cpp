@@ -38,6 +38,7 @@ AnimationState::AnimationState(AnimatedModel* node, Animation* animation) :
     mWeight(0.0f),
     mTime(0.0f),
     mPriority(0),
+    mUseNlerp(false),
     mInterpolationFlags(0)
 {
     setAnimation(animation);
@@ -63,6 +64,7 @@ void AnimationState::save(Serializer& dest)
         dest.writeFloat(mInterpolationTime);
     }
     dest.writeInt(mPriority);
+    dest.writeBool(mUseNlerp);
 }
 
 void AnimationState::load(Deserializer& source)
@@ -82,6 +84,7 @@ void AnimationState::load(Deserializer& source)
         mInterpolationFlags = INTERP_WEIGHT | INTERP_TIME;
     }
     mPriority = source.readInt();
+    mUseNlerp = source.readBool();
 }
 
 void AnimationState::saveXML(XMLElement& element)
@@ -92,6 +95,7 @@ void AnimationState::saveXML(XMLElement& element)
     element.setFloat("weight", getWeight());
     element.setFloat("time", getTime());
     element.setInt("priority", getPriority());
+    element.setBool("nlerp", getUseNlerp());
 }
 
 void AnimationState::loadXML(const XMLElement& element)
@@ -102,6 +106,7 @@ void AnimationState::loadXML(const XMLElement& element)
     setWeight(element.getFloat("weight"));
     setTime(element.getFloat("time"));
     setPriority(element.getInt("priority"));
+    setUseNlerp(element.getBool("nlerp"));
 }
 
 void AnimationState::setAnimation(Animation* animation)
@@ -247,6 +252,11 @@ void AnimationState::setPriority(int priority)
     }
 }
 
+void AnimationState::setUseNlerp(bool enable)
+{
+    mUseNlerp = enable;
+}
+
 float AnimationState::getWeight() const
 {
     if (!mNode->isProxy())
@@ -321,7 +331,12 @@ void AnimationState::apply()
                     if (channelMask & CHANNEL_POSITION)
                         bone->setPosition(bone->getPosition().lerp(keyFrame->mPosition, mWeight));
                     if (channelMask & CHANNEL_ROTATION)
-                        bone->setRotation(bone->getRotation().nlerp(keyFrame->mRotation, mWeight));
+                    {
+                        if (!mUseNlerp)
+                            bone->setRotation(bone->getRotation().slerp(keyFrame->mRotation, mWeight));
+                        else
+                            bone->setRotation(bone->getRotation().nlerp(keyFrame->mRotation, mWeight));
+                    }
                     if (channelMask & CHANNEL_SCALE)
                         bone->setScale(bone->getScale().lerp(keyFrame->mScale, mWeight));
                 }
@@ -338,7 +353,12 @@ void AnimationState::apply()
                     if (channelMask & CHANNEL_POSITION)
                         bone->setPosition(keyFrame->mPosition.lerp(nextKeyFrame->mPosition, t));
                     if (channelMask & CHANNEL_ROTATION)
-                        bone->setRotation(keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t));
+                    {
+                        if (!mUseNlerp)
+                            bone->setRotation(keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t));
+                        else
+                            bone->setRotation(keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t));
+                    }
                     if (channelMask & CHANNEL_SCALE)
                         bone->setScale(keyFrame->mScale.lerp(nextKeyFrame->mScale, t));
                 }
@@ -352,8 +372,16 @@ void AnimationState::apply()
                     }
                     if (channelMask & CHANNEL_ROTATION)
                     {
-                        bone->setRotation(bone->getRotation().nlerp(
-                            keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t), mWeight));
+                        if (!mUseNlerp)
+                        {
+                            bone->setRotation(bone->getRotation().slerp(
+                                keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t), mWeight));
+                        }
+                        else
+                        {
+                            bone->setRotation(bone->getRotation().nlerp(
+                                keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t), mWeight));
+                        }
                     }
                     if (channelMask & CHANNEL_SCALE)
                     {
