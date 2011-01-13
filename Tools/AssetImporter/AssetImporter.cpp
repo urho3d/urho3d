@@ -76,8 +76,10 @@ struct ExportModel
 struct ExportScene
 {
     std::string mOutName;
+    std::string mResourcePath;
     bool mLocalIDs;
     bool mNoExtensions;
+    bool mSaveBinary;
     const aiScene* mScene;
     aiNode* mRootNode;
     std::vector<ExportModel> mModels;
@@ -96,7 +98,8 @@ void collectAnimations(ExportModel& model);
 void buildBoneCollisionInfo(ExportModel& model);
 void buildAndSaveModel(ExportModel& model);
 void buildAndSaveAnimations(ExportModel& model);
-void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool localIDs, bool noExtensions);
+void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath, bool localIDs,
+    bool noExtensions, bool saveBinary);
 void collectSceneModels(ExportScene& scene, aiNode* node);
 void collectSceneNodes(ExportScene& scene, aiNode* node);
 void buildAndSaveScene(ExportScene& scene);
@@ -150,17 +153,19 @@ void run(const std::vector<std::string>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model     Export a model and animations. Output file is the model name\n"
-            "scene     Export a scene. Output file is the scene XML file name\n"
+            "model     Export a model and animations\n"
+            "scene     Export a scene and its models\n"
             "dumpnodes Dump scene node structure. No output file is generated\n"
             "\n"
             "Options:\n"
+            "-b        Save scene in binary format (default: XML)\n"
             "-l        Use local ID's for scene entities\n"
             "-na       Do not export animations\n"
             "-ne       Do not create Octree & PhysicsWorld extensions to the scene\n"
             "-nm       Do not export materials\n"
+            "-pX       Use base path X for resources in the scene file\n"
             "-rX       Use scene node X as root node\n"
-            "-t        Generate tangents to model(s)\n"
+            "-t        Generate tangents to model(s)"
         );
     }
     
@@ -168,6 +173,7 @@ void run(const std::vector<std::string>& arguments)
     std::string inFile = arguments[1];
     std::string outFile;
     std::string rootNodeName;
+    std::string resourcePath;
     if (arguments.size() > 2)
         outFile = arguments[2];
     
@@ -175,6 +181,7 @@ void run(const std::vector<std::string>& arguments)
     bool noAnimations = false;
     bool noExtensions = false;
     bool localIDs = false;
+    bool saveBinary = false;
     
     unsigned flags = 
         aiProcess_ConvertToLeftHanded |
@@ -198,14 +205,20 @@ void run(const std::vector<std::string>& arguments)
             
             switch (tolower(arguments[i][1]))
             {
-            case 't':
-                flags |= aiProcess_CalcTangentSpace;
+            case 'b':
+                saveBinary = true;
                 break;
             case 'l':
                 localIDs = true;
                 break;
+            case 'p':
+                resourcePath = parameter;
+                break;
             case 'r':
                 rootNodeName = parameter;
+                break;
+            case 't':
+                flags |= aiProcess_CalcTangentSpace;
                 break;
             case 'n':
                 if (!parameter.empty())
@@ -245,10 +258,13 @@ void run(const std::vector<std::string>& arguments)
             errorExit("Could not find scene node " + rootNodeName);
     }
     
+    if (!resourcePath.empty())
+        resourcePath = fixPath(resourcePath);
+    
     if (command == "model")
         exportModel(scene, rootNode, outFile, noAnimations);
     if (command == "scene")
-        exportScene(scene, rootNode, outFile, localIDs, noExtensions);
+        exportScene(scene, rootNode, outFile, resourcePath, localIDs, noExtensions, saveBinary);
     if (command == "dumpnodes")
         dumpNodes(scene, rootNode, 0);
 }
@@ -822,15 +838,18 @@ void buildAndSaveAnimations(ExportModel& model)
     }
 }
 
-void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool localIDs, bool noExtensions)
+void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath, bool localIDs,
+    bool noExtensions, bool saveBinary)
 {
     if (outName.empty())
         errorExit("No output file defined");
     
     ExportScene outScene;
     outScene.mOutName = outName;
+    outScene.mResourcePath = resourcePath;
     outScene.mLocalIDs = localIDs;
     outScene.mNoExtensions = noExtensions;
+    outScene.mSaveBinary = saveBinary;
     outScene.mScene = scene;
     outScene.mRootNode = rootNode;
     
@@ -943,7 +962,8 @@ void buildAndSaveScene(ExportScene& scene)
         StaticModel* staticModel = new StaticModel();
         entity->addComponent(staticModel);
         // Create a dummy model so that the reference can be stored
-        SharedPtr<Model> dummyModel(new Model(0, scene.mModels[scene.mNodeModelIndices[i]].mOutName));
+        std::string modelPath = scene.mResourcePath + getFileNameAndExtension(scene.mModels[scene.mNodeModelIndices[i]].mOutName);
+        SharedPtr<Model> dummyModel(new Model(0, modelPath));
         staticModel->setModel(dummyModel);
         // Set a flattened transform
         Vector3 pos, scale;
@@ -953,7 +973,10 @@ void buildAndSaveScene(ExportScene& scene)
     }
     
     File file(scene.mOutName, FILE_WRITE);
-    outScene->saveXML(file);
+    if (!scene.mSaveBinary)
+        outScene->saveXML(file);
+    else
+        outScene->save(file);
 }
 
 std::set<unsigned> getMeshesUnderNodeSet(aiNode* node)
