@@ -533,7 +533,7 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
         // Multiply the distance by a constant so that invisible nodes don't update that often
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
         float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
-        mAnimationLodDistance = frame.mCamera->getLodDistance(ANIMATION_LOD_INVISIBLE_FACTOR * distance, scale, mLodBias);
+        mAnimationLodDistance = frame.mCamera->getLodDistance(distance, scale, mLodBias) * ANIMATION_LOD_INVISIBLE_FACTOR;
     }
     
     updateAnimation(frame);

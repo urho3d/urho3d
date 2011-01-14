@@ -399,6 +399,7 @@ void Application::createScene()
         AnimationState* anim = object->addAnimationState(mCache->getResource<Animation>("Models/Jack_Walk.ani"));
         if (anim)
         {
+            anim->setUseNlerp(true);
             anim->setLooped(true);
             anim->setWeight(1.0f);
         }
