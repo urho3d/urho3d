@@ -636,6 +636,7 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "void addWeight(float)", asMETHOD(AnimationState, addWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void addTime(float)", asMETHOD(AnimationState, addTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void setPriority(int)", asMETHOD(AnimationState, setPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void setUseNlerp(bool)", asMETHOD(AnimationState, setUseNlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Animation@+ getAnimation() const", asMETHOD(AnimationState, getAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Bone@+ getStartBone() const", asMETHOD(AnimationState, getStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool isEnabled() const", asMETHOD(AnimationState, isEnabled), asCALL_THISCALL);
@@ -643,6 +644,7 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "float getWeight() const", asMETHOD(AnimationState, getWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float getTime() const", asMETHOD(AnimationState, getTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "int getPriority() const", asMETHOD(AnimationState, getPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "bool getUseNlerp() const", asMETHOD(AnimationState, getUseNlerp), asCALL_THISCALL);
     
     registerGeometryNode<AnimatedModel>(engine, "AnimatedModel");
     engine->RegisterObjectMethod("AnimatedModel", "bool setModel(Model@+)", asMETHOD(AnimatedModel, setModel), asCALL_THISCALL);
