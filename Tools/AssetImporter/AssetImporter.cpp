@@ -26,6 +26,7 @@
 #include "File.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
+#include "Material.h"
 #include "Model.h"
 #include "Octree.h"
 #include "PhysicsWorld.h"
@@ -103,6 +104,8 @@ void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outN
 void collectSceneModels(ExportScene& scene, aiNode* node);
 void collectSceneNodes(ExportScene& scene, aiNode* node);
 void buildAndSaveScene(ExportScene& scene);
+void exportMaterials(const aiScene* scene, const std::string& outName, const std::string& resourcePath);
+void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, const std::string& resourcePath);
 std::set<unsigned> getMeshesUnderNodeSet(aiNode* node);
 std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node);
 unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh);
@@ -267,6 +270,8 @@ void run(const std::vector<std::string>& arguments)
         exportModel(scene, rootNode, outFile, noAnimations);
     if (command == "scene")
         exportScene(scene, rootNode, outFile, resourcePath, localIDs, noExtensions, saveBinary);
+    if ((!noMaterials) && ((command == "model") || (command == "scene")))
+        exportMaterials(scene, outFile, resourcePath);
     if (command == "dumpnodes")
         dumpNodes(scene, rootNode, 0);
 }
@@ -482,7 +487,7 @@ void buildAndSaveModel(ExportModel& model)
     if (!model.mMeshes.size())
         errorExit("No geometries found starting from node " + rootNodeName);
     
-    std::cout << "Writing model from node " << rootNodeName << std::endl;
+    std::cout << "Writing model " << rootNodeName << std::endl;
     
     if (model.mBones.size())
     {
@@ -979,21 +984,42 @@ void buildAndSaveScene(ExportScene& scene)
         outScene->addExtension(octree);
     }
     
+    std::map<std::string, SharedPtr<Material> > dummyMaterials;
+    
     for (unsigned i = 0; i < scene.mNodes.size(); ++i)
     {
+        const ExportModel& model = scene.mModels[scene.mNodeModelIndices[i]];
+        
         // Create a simple entity and static model component for each node
         Entity* entity = outScene->createEntity(toStdString(scene.mNodes[i]->mName), scene.mLocalIDs);
         StaticModel* staticModel = new StaticModel();
         entity->addComponent(staticModel);
         // Create a dummy model so that the reference can be stored
-        std::string modelPath = scene.mResourcePath + getFileNameAndExtension(scene.mModels[scene.mNodeModelIndices[i]].mOutName);
+        std::string modelPath = scene.mResourcePath + getFileNameAndExtension(model.mOutName);
         SharedPtr<Model> dummyModel(new Model(0, modelPath));
+        dummyModel->setNumGeometries(model.mMeshes.size());
         staticModel->setModel(dummyModel);
         // Set a flattened transform
         Vector3 pos, scale;
         Quaternion rot;
         getPosRotScale(getDerivedTransform(scene.mNodes[i], 0), pos, rot, scale);
         staticModel->setTransform(pos, rot, scale);
+        // Set materials if they are known
+        for (unsigned j = 0; j < model.mMeshes.size(); ++j)
+        {
+            aiMaterial* material = scene.mScene->mMaterials[model.mMeshes[j]->mMaterialIndex];
+            aiString matNameStr;
+            material->Get(AI_MATKEY_NAME, matNameStr);
+            std::string matName = toStdString(matNameStr);
+            if (!matName.empty())
+            {
+                std::string matPath = scene.mResourcePath + matName + ".xml";
+                // Create a dummy material so that the reference can be stored
+                if (dummyMaterials.find(matName) == dummyMaterials.end())
+                    dummyMaterials[matName] = new Material(matPath);
+                staticModel->setMaterial(j, dummyMaterials[matName]);
+            }
+        }
     }
     
     File file(scene.mOutName, FILE_WRITE);
@@ -1001,6 +1027,99 @@ void buildAndSaveScene(ExportScene& scene)
         outScene->saveXML(file);
     else
         outScene->save(file);
+}
+
+void exportMaterials(const aiScene* scene, const std::string& outName, const std::string& resourcePath)
+{
+    for (unsigned i = 0; i < scene->mNumMaterials; ++i)
+    {
+        try
+        {
+            buildAndSaveMaterial(scene->mMaterials[i], outName, resourcePath);
+        }
+        catch (...)
+        {
+        }
+    }
+}
+
+void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, const std::string& resourcePath)
+{
+    // Material must have name so it can be successfully saved
+    aiString matNameStr;
+    material->Get(AI_MATKEY_NAME, matNameStr);
+    std::string matName = toStdString(matNameStr);
+    if (matName.empty())
+        return;
+    
+    std::cout << "Writing material " << matName << std::endl;
+    
+    // Do not actually create a material instance, but instead craft an xml file manually, defining a suitable base material
+    XMLFile outMaterial;
+    XMLElement materialElem = outMaterial.createRootElement("material");
+    
+    std::string diffuseTexName;
+    std::string normalTexName;
+    Color diffuseColor;
+    bool hasAlpha = false;
+    float specIntensity = 0.0f;
+    float specPower = 1.0f;
+    
+    aiString stringVal;
+    float floatVal;
+    aiColor3D colorVal;
+    
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
+        diffuseTexName = getFileNameAndExtension(toStdString(stringVal));
+    if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
+        normalTexName = getFileNameAndExtension(toStdString(stringVal));
+    if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
+        diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
+    if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
+    {
+        if (floatVal < 1.0f)
+            hasAlpha = true;
+        diffuseColor.mA = floatVal;
+    }
+    if (material->Get(AI_MATKEY_SHININESS, floatVal) == AI_SUCCESS)
+        specPower = floatVal;
+    if (material->Get(AI_MATKEY_SHININESS_STRENGTH, floatVal) == AI_SUCCESS)
+        specIntensity = floatVal;
+    
+    std::string baseMatName = "Materials/Default";
+    if (!diffuseTexName.empty())
+    {
+        baseMatName += "Diff";
+        if (!normalTexName.empty())
+            baseMatName += "Normal";
+    }
+    if (hasAlpha)
+        baseMatName += "Alpha";
+    XMLElement baseElem = materialElem.createChildElement("base");
+    baseElem.setString("name", baseMatName + ".xml");
+    
+    XMLElement techniqueElem = materialElem.createChildElement("technique");
+    if (!diffuseTexName.empty())
+    {
+        XMLElement diffuseElem = techniqueElem.createChildElement("texture");
+        diffuseElem.setString("unit", "diffuse");
+        diffuseElem.setString("name", resourcePath + diffuseTexName);
+    }
+    if (!normalTexName.empty())
+    {
+        XMLElement normalElem = techniqueElem.createChildElement("texture");
+        normalElem.setString("unit", "diffuse");
+        normalElem.setString("name", resourcePath + normalTexName);
+    }
+    XMLElement diffuseColorElem = techniqueElem.createChildElement("parameter");
+    diffuseColorElem.setString("name", "MatDiffColor");
+    diffuseColorElem.setColor("value", diffuseColor);
+    XMLElement specularElem = techniqueElem.createChildElement("parameter");
+    specularElem.setString("name", "MatSpecProperties");
+    specularElem.setVector2("value", Vector2(specIntensity, specPower));
+    
+    File outFile(getPath(outName) + matName + ".xml", FILE_WRITE);
+    outMaterial.save(outFile);
 }
 
 std::set<unsigned> getMeshesUnderNodeSet(aiNode* node)
