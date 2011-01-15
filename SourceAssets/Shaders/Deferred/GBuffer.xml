@@ -1,10 +1,10 @@
 <shaders>
     <shader name="GBuffer" type="vs">
+        <option name="Normal" define="NORMALMAP" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />
-        <option name="Normal" define="NORMALMAP" />
-    </shader>    
+    </shader>
     <shader name="GBuffer" type="ps">
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" />

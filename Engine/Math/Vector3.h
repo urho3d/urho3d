@@ -206,10 +206,25 @@ public:
         return len;
     }
     
+    //! Normalize to unit length using fast inverse square root
+    void normalizeFast()
+    {
+        float invLen = fastInvSqrt(mX * mX + mY * mY + mZ * mZ);
+        mX *= invLen;
+        mY *= invLen;
+        mZ *= invLen;
+    }
+    
     //! Return length
     float getLength() const
     {
         return sqrtf(mX * mX + mY * mY + mZ * mZ);
+    }
+    
+    //! Return length using fast square root
+    float getLengthFast() const
+    {
+        return fastSqrt(mX * mX + mY * mY + mZ * mZ);
     }
     
     //! Return squared length
@@ -254,6 +269,13 @@ public:
             return *this;
         
         float invLen = 1.0f / len;
+        return *this * invLen;
+    }
+    
+    //! Return normalized to unit length using fast inverse square root
+    Vector3 getNormalizedFast() const
+    {
+        float invLen = fastInvSqrt(mX * mX + mY * mY + mZ * mZ);
         return *this * invLen;
     }
     

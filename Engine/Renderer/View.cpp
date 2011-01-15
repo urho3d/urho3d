@@ -361,7 +361,7 @@ void View::updateOccluders(std::vector<GeometryNode*>& occluders, Camera& camera
         
         // Check that occluder is big enough on the screen
         const BoundingBox& box = node->getWorldBoundingBox();
-        float diagonal = (box.mMax - box.mMin).getLength();
+        float diagonal = (box.mMax - box.mMin).getLengthFast();
         float compare;
         if (!camera.isOrthographic())
             compare = diagonal * halfViewSize / node->getDistance();
@@ -804,7 +804,7 @@ bool View::isShadowCasterVisible(GeometryNode* geom, BoundingBox lightViewBox, c
         Ray extrusionRay(center, center.getNormalized());
         
         float extrusionDistance = shadowCamera.getFarClip();
-        float originalDistance = clamp(center.getLength(), M_EPSILON, extrusionDistance);
+        float originalDistance = clamp(center.getLengthFast(), M_EPSILON, extrusionDistance);
         
         // Because of the perspective, the bounding box must also grow when it is extruded to the distance
         float sizeFactor = extrusionDistance / originalDistance;

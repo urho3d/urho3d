@@ -278,116 +278,146 @@ void AnimationState::apply()
     if (!isEnabled())
         return;
     
-    for (std::map<unsigned, Bone*>::const_iterator i = mTrackToBoneMap.begin(); i != mTrackToBoneMap.end(); ++i)
+    // Check first if full weight or blending
+    if (mWeight == 1.0f)
     {
-        const AnimationTrack* track = mAnimation->getTrack(i->first);
-        Bone* bone = i->second;
-        
-        if ((bone->isAnimationEnabled()) && (track->mKeyFrames.size()))
+        for (std::map<unsigned, Bone*>::const_iterator i = mTrackToBoneMap.begin(); i != mTrackToBoneMap.end(); ++i)
         {
+            const AnimationTrack* track = mAnimation->getTrack(i->first);
+            Bone* bone = i->second;
+            
+            if ((!bone->isAnimationEnabled()) || (!track->mKeyFrames.size()))
+                continue;
+            
             unsigned& frame = mLastKeyFrame[i->first];
             track->getKeyFrameIndex(mTime, frame);
             
             // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
             unsigned nextFrame = frame + 1;
             bool interpolate = true;
-            if (!mLooped)
+            if (nextFrame >= track->mKeyFrames.size())
             {
-                if (nextFrame >= track->mKeyFrames.size())
+                if (!mLooped)
                 {
                     nextFrame = frame;
                     interpolate = false;
                 }
-            }
-            else
-            {
-                if (nextFrame >= track->mKeyFrames.size())
+                else
                     nextFrame = 0;
             }
             
             const AnimationKeyFrame* keyFrame = &track->mKeyFrames[frame];
-            const AnimationKeyFrame* nextKeyFrame = &track->mKeyFrames[nextFrame];
-            float timeInterval = nextKeyFrame->mTime - keyFrame->mTime;
-            if (timeInterval < 0.0f)
-                timeInterval += mAnimation->getLength();
-            
             unsigned char channelMask = track->mChannelMask;
             
             if (!interpolate)
             {
                 // No interpolation, full weight
-                if (mWeight == 1.0f)
-                {
-                    if (channelMask & CHANNEL_POSITION)
-                        bone->setPosition(keyFrame->mPosition);
-                    if (channelMask & CHANNEL_ROTATION)
-                        bone->setRotation(keyFrame->mRotation);
-                    if (channelMask & CHANNEL_SCALE)
-                        bone->setScale(keyFrame->mScale);
-                }
-                // No interpolation, blend between old transform & animation
-                else
-                {
-                    if (channelMask & CHANNEL_POSITION)
-                        bone->setPosition(bone->getPosition().lerp(keyFrame->mPosition, mWeight));
-                    if (channelMask & CHANNEL_ROTATION)
-                    {
-                        if (!mUseNlerp)
-                            bone->setRotation(bone->getRotation().slerp(keyFrame->mRotation, mWeight));
-                        else
-                            bone->setRotation(bone->getRotation().nlerp(keyFrame->mRotation, mWeight));
-                    }
-                    if (channelMask & CHANNEL_SCALE)
-                        bone->setScale(bone->getScale().lerp(keyFrame->mScale, mWeight));
-                }
+                if (channelMask & CHANNEL_POSITION)
+                    bone->setPosition(keyFrame->mPosition);
+                if (channelMask & CHANNEL_ROTATION)
+                    bone->setRotation(keyFrame->mRotation);
+                if (channelMask & CHANNEL_SCALE)
+                    bone->setScale(keyFrame->mScale);
             }
             else
             {
-                float t = 1.0f;
-                if (timeInterval > 0.0f)
-                    t = (mTime - keyFrame->mTime) / timeInterval;
+                const AnimationKeyFrame* nextKeyFrame = &track->mKeyFrames[nextFrame];
+                float timeInterval = nextKeyFrame->mTime - keyFrame->mTime;
+                if (timeInterval < 0.0f)
+                    timeInterval += mAnimation->getLength();
+                float t = clamp((mTime - keyFrame->mTime) / timeInterval, 0.0f, 1.0f);
                 
                 // Interpolation, full weight
-                if (mWeight == 1.0f)
+                if (channelMask & CHANNEL_POSITION)
+                    bone->setPosition(keyFrame->mPosition.lerp(nextKeyFrame->mPosition, t));
+                if (channelMask & CHANNEL_ROTATION)
                 {
-                    if (channelMask & CHANNEL_POSITION)
-                        bone->setPosition(keyFrame->mPosition.lerp(nextKeyFrame->mPosition, t));
-                    if (channelMask & CHANNEL_ROTATION)
-                    {
-                        if (!mUseNlerp)
-                            bone->setRotation(keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t));
-                        else
-                            bone->setRotation(keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t));
-                    }
-                    if (channelMask & CHANNEL_SCALE)
-                        bone->setScale(keyFrame->mScale.lerp(nextKeyFrame->mScale, t));
+                    if (!mUseNlerp)
+                        bone->setRotation(keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t));
+                    else
+                        bone->setRotation(keyFrame->mRotation.nlerpFast(nextKeyFrame->mRotation, t));
                 }
-                // Interpolation, blend between old transform & animation
-                else
+                if (channelMask & CHANNEL_SCALE)
+                    bone->setScale(keyFrame->mScale.lerp(nextKeyFrame->mScale, t));
+            }
+        }
+    }
+    else
+    {
+        for (std::map<unsigned, Bone*>::const_iterator i = mTrackToBoneMap.begin(); i != mTrackToBoneMap.end(); ++i)
+        {
+            const AnimationTrack* track = mAnimation->getTrack(i->first);
+            Bone* bone = i->second;
+            
+            if ((!bone->isAnimationEnabled()) || (!track->mKeyFrames.size()))
+                continue;
+            
+            unsigned& frame = mLastKeyFrame[i->first];
+            track->getKeyFrameIndex(mTime, frame);
+            
+            // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
+            unsigned nextFrame = frame + 1;
+            bool interpolate = true;
+            if (nextFrame >= track->mKeyFrames.size())
+            {
+                if (!mLooped)
                 {
-                    if (channelMask & CHANNEL_POSITION)
+                    nextFrame = frame;
+                    interpolate = false;
+                }
+                else
+                    nextFrame = 0;
+            }
+            
+            const AnimationKeyFrame* keyFrame = &track->mKeyFrames[frame];
+            unsigned char channelMask = track->mChannelMask;
+            
+            if (!interpolate)
+            {
+                // No interpolation, blend between old transform & animation
+                if (channelMask & CHANNEL_POSITION)
+                    bone->setPosition(bone->getPosition().lerp(keyFrame->mPosition, mWeight));
+                if (channelMask & CHANNEL_ROTATION)
+                {
+                    if (!mUseNlerp)
+                        bone->setRotation(bone->getRotation().slerp(keyFrame->mRotation, mWeight));
+                    else
+                        bone->setRotation(bone->getRotation().nlerpFast(keyFrame->mRotation, mWeight));
+                }
+                if (channelMask & CHANNEL_SCALE)
+                    bone->setScale(bone->getScale().lerp(keyFrame->mScale, mWeight));
+            }
+            else
+            {
+                const AnimationKeyFrame* nextKeyFrame = &track->mKeyFrames[nextFrame];
+                float timeInterval = nextKeyFrame->mTime - keyFrame->mTime;
+                if (timeInterval < 0.0f)
+                    timeInterval += mAnimation->getLength();
+                float t = clamp((mTime - keyFrame->mTime) / timeInterval, 0.0f, 1.0f);
+                
+                // Interpolation, blend between old transform & animation
+                if (channelMask & CHANNEL_POSITION)
+                {
+                    bone->setPosition(bone->getPosition().lerp(
+                        keyFrame->mPosition.lerp(nextKeyFrame->mPosition, t), mWeight));
+                }
+                if (channelMask & CHANNEL_ROTATION)
+                {
+                    if (!mUseNlerp)
                     {
-                        bone->setPosition(bone->getPosition().lerp(
-                            keyFrame->mPosition.lerp(nextKeyFrame->mPosition, t), mWeight));
+                        bone->setRotation(bone->getRotation().slerp(
+                            keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t), mWeight));
                     }
-                    if (channelMask & CHANNEL_ROTATION)
+                    else
                     {
-                        if (!mUseNlerp)
-                        {
-                            bone->setRotation(bone->getRotation().slerp(
-                                keyFrame->mRotation.slerp(nextKeyFrame->mRotation, t), mWeight));
-                        }
-                        else
-                        {
-                            bone->setRotation(bone->getRotation().nlerp(
-                                keyFrame->mRotation.nlerp(nextKeyFrame->mRotation, t), mWeight));
-                        }
+                        bone->setRotation(bone->getRotation().nlerpFast(
+                            keyFrame->mRotation.nlerpFast(nextKeyFrame->mRotation, t), mWeight));
                     }
-                    if (channelMask & CHANNEL_SCALE)
-                    {
-                        bone->setScale(bone->getScale().lerp(
-                            keyFrame->mScale.lerp(nextKeyFrame->mScale, t), mWeight));
-                    }
+                }
+                if (channelMask & CHANNEL_SCALE)
+                {
+                    bone->setScale(bone->getScale().lerp(
+                        keyFrame->mScale.lerp(nextKeyFrame->mScale, t), mWeight));
                 }
             }
         }

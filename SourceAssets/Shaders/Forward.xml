@@ -1,8 +1,5 @@
 <shaders>
     <shader name="Forward" type="vs">
-        <variation name="" />
-        <variation name="Skinned" define="SKINNED" />
-        <variation name="Instanced" define="INSTANCED" />
         <option name="Unlit" define="UNLIT">
             <exclude name="Normal" />
             <exclude name="Spot" />
@@ -11,6 +8,9 @@
         <option name="Normal" define="NORMALMAP" />
         <option name="Spot" define="SPOTLIGHT" />
         <option name="Shadow" define="SHADOW" />
+        <variation name="" />
+        <variation name="Skinned" define="SKINNED" />
+        <variation name="Instanced" define="INSTANCED" />
     </shader>
     <shader name="Forward" type="ps">
         <option name="Diff" define="DIFFMAP" />

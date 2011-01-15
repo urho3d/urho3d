@@ -168,6 +168,13 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
+static const std::string geometryVSVariations[] =
+{
+    "",
+    "Skinned",
+    "Instanced"
+};
+
 static const std::string gBufferPSVariations[] =
 {
     "",
@@ -497,14 +504,20 @@ VertexShader* Pipeline::getVertexShader(const std::string& name) const
 {
     // Check for extra underscore with no variations and remove
     std::string fullName = replace(mShaderPath + name + mVSFormat, "_.", ".");
-    return mCache->getResource<VertexShader>(fullName);
+    if (mCache->exists(fullName))
+        return mCache->getResource<VertexShader>(fullName);
+    else
+        return 0;
 }
 
 PixelShader* Pipeline::getPixelShader(const std::string& name) const
 {
     // Check for extra underscore with no variations and remove
     std::string fullName = replace(mShaderPath + name + mPSFormat, "_.", ".");
-    return mCache->getResource<PixelShader>(fullName);
+    if (mCache->exists(fullName))
+        return mCache->getResource<PixelShader>(fullName);
+    else
+        return 0;
 }
 
 unsigned Pipeline::getNumGeometries(bool allViews) const
@@ -682,42 +695,36 @@ Texture2D* Pipeline::getShadowMap(float resolution)
 
 void Pipeline::setBatchShaders(Batch& batch, MaterialTechnique* technique, MaterialPass* pass, bool allowShadows)
 {
+    static std::set<Material*> errorDisplayed;
+    
+    batch.mTechnique = technique;
+    batch.mPass = pass;
+    
     // Check if shaders are unloaded or need reloading
     std::vector<SharedPtr<VertexShader> >& vertexShaders = pass->getVertexShaders();
     std::vector<SharedPtr<PixelShader> >& pixelShaders = pass->getPixelShaders();
-    
     if ((!vertexShaders.size()) || (!pixelShaders.size()) || (technique->getShadersLoadedFrameNumber() !=
         mShadersChangedFrameNumber))
     {
         // First release all previous shaders, then load
         technique->releaseShaders();
         loadMaterialShaders(technique);
-        
-        // Make sure that shaders for this pass are loaded now
-        if ((!vertexShaders.size()) || (!pixelShaders.size()))
+    }
+    
+    // Make sure shaders are loaded now
+    if ((vertexShaders.size()) && (pixelShaders.size()))
+    {
+        // Recognize light pass from the amount of shaders
+        if (pixelShaders.size() == 1)
         {
-            // Do not log error, as it would result in a lot of spam
-            batch.mVertexShader = 0;
-            batch.mPixelShader = 0;
-            batch.mTechnique = 0;
-            batch.mPass = 0;
-            return;
+            unsigned vsi = 0;
+            if (batch.mNode->getNodeFlags() & NODE_GEOMETRY)
+                vsi = static_cast<GeometryNode*>(batch.mNode)->getGeometryType();
+            
+            batch.mVertexShader = vertexShaders[vsi];
+            batch.mPixelShader = pixelShaders[0];
         }
-    }
-    
-    batch.mTechnique = technique;
-    batch.mPass = pass;
-    
-    // Recognize light / vertex light pass from the amount of shaders
-    if ((vertexShaders.size() == 1) && (pixelShaders.size() == 1))
-    {
-        batch.mVertexShader = vertexShaders[0];
-        batch.mPixelShader = pixelShaders[0];
-    }
-    else
-    {
-        // Light pass
-        if (pixelShaders.size() > 1)
+        else
         {
             Light* light = batch.mForwardLight;
             if (!light)
@@ -730,6 +737,8 @@ void Pipeline::setBatchShaders(Batch& batch, MaterialTechnique* technique, Mater
             
             unsigned vsi = 0;
             unsigned psi = 0;
+            if (batch.mNode->getNodeFlags() & NODE_GEOMETRY)
+                vsi = static_cast<GeometryNode*>(batch.mNode)->getGeometryType() * MAX_LIGHT_VS_VARIATIONS;
             
             // Negative lights have no specular or shadows
             if (!light->isNegative())
@@ -760,6 +769,17 @@ void Pipeline::setBatchShaders(Batch& batch, MaterialTechnique* technique, Mater
             
             batch.mVertexShader = vertexShaders[vsi];
             batch.mPixelShader = pixelShaders[psi];
+        }
+    }
+    
+    // Log error if shaders could not be assigned, but only once per material
+    if ((!batch.mVertexShader) || (!batch.mPixelShader))
+    {
+        Material* parentMat = technique->getParent();
+        if (errorDisplayed.find(parentMat) == errorDisplayed.end())
+        {
+            errorDisplayed.insert(parentMat);
+            LOGERROR("Material " + parentMat->getName() + " has missing shaders");
         }
     }
 }
@@ -939,21 +959,24 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
     switch (i->first)
     {
     default:
-        vertexShaders.resize(1);
+        vertexShaders.resize(MAX_GEOMETRYTYPES);
         pixelShaders.resize(1);
-        vertexShaders[0] = getVertexShader(vertexShaderName);
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
+            vertexShaders[j] = getVertexShader(vertexShaderName + geometryVSVariations[j]);
         pixelShaders[0] = getPixelShader(pixelShaderName);
         break;
         
     case PASS_LIGHT:
     case PASS_NEGATIVE:
-        vertexShaders.resize(MAX_LIGHT_VS_VARIATIONS);
+        vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
         pixelShaders.resize(MAX_LIGHT_PS_VARIATIONS);
         
-        for (unsigned j = 0; j < MAX_LIGHT_VS_VARIATIONS; ++j)
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
         {
-            if ((!(j & LVS_SHADOW)) || (allowShadows))
-                vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[j]);
+            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
+            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
+            if ((!(l & LVS_SHADOW)) || (allowShadows))
+                vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g]);
             else
                 vertexShaders[j].reset();
         }
@@ -1137,7 +1160,7 @@ void Pipeline::setupLightBatch(Batch& batch)
     light->overrideTransforms(0, *batch.mCamera, &model, &view);
     
     float lightExtent = light->getVolumeExtent();
-    float lightViewDist = (light->getWorldPosition() - batch.mCamera->getWorldPosition()).getLength();
+    float lightViewDist = (light->getWorldPosition() - batch.mCamera->getWorldPosition()).getLengthFast();
     
     mRenderer->setAlphaTest(false);
     mRenderer->setBlendMode(light->isNegative() ? BLEND_MULTIPLY : BLEND_ADD);
@@ -1267,7 +1290,7 @@ void Pipeline::drawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             light->overrideTransforms(0, camera, &model, &view);
             
             float lightExtent = light->getVolumeExtent();
-            float lightViewDist = (light->getWorldPosition() - camera.getWorldPosition()).getLength();
+            float lightViewDist = (light->getWorldPosition() - camera.getWorldPosition()).getLengthFast();
             bool drawBackFaces = lightViewDist < (lightExtent + camera.getNearClip());
             
             mRenderer->setAlphaTest(false);

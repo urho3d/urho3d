@@ -45,7 +45,7 @@ void Batch::calculateSortKey(bool stateHasPriority, bool frontToBack)
         distance = 65535 - distance;
     
     // Shaders
-    unsigned short shaders = mVertexShader->getHash() + mPixelShader->getHash();
+    unsigned short shaders = (mVertexShader ? mVertexShader->getHash() : 0) + (mPixelShader ? mPixelShader->getHash() : 0);
     
     // Material technique (determines textures and shader parameters)
     unsigned short technique = *((unsigned short*)&mTechnique);

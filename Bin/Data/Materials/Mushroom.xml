@@ -1,5 +1,5 @@
 <material>
-    <base name="Materials/DefaultDiffSkinned.xml" />
+    <base name="Materials/DefaultDiff.xml" />
     <technique>
         <texture unit="diffuse" name="Textures/Mushroom.dds" />
         <parameter name="MatSpecProperties" value="0.1 16" />

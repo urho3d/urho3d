@@ -167,7 +167,7 @@ void UI::update(float timeStep)
         IntVector2 pos = mCursor->getPosition();
         UIElement* element = getElementAt(pos);
         if (element)
-            element->onHover(element->screenToElement(pos), pos);
+            element->onHover(element->screenToElement(pos), pos, mMouseButtons);
     }
     
     {

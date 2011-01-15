@@ -469,7 +469,7 @@ Vector3 Camera::getUpVector()
 float Camera::getDistance(const Vector3& worldPos)
 {
     if (!mOrthographic)
-        return (worldPos - getWorldPosition()).getLength();
+        return (worldPos - getWorldPosition()).getLengthFast();
     else
         return fabsf((getInverseWorldTransform() * worldPos).mZ);
 }

@@ -70,7 +70,7 @@ public:
     void addTime(float delta);
     //! Set blending priority
     void setPriority(int priority);
-    //! Set nlerp use instead of slerp, default false
+    //! Set to use nlerp instead of slerp for rotation, default false
     void setUseNlerp(bool enable);
     
     //! Return animation
@@ -87,7 +87,7 @@ public:
     float getTime() const;
     //! Return blending priority
     int getPriority() const { return mPriority; }
-    //! Return whether using nlerp
+    //! Return whether using nlerp for rotation
     bool getUseNlerp() const { return mUseNlerp; }
     //! Return whether network client smoothing active
     bool isInterpolating() const { return mInterpolationFlags != 0; }

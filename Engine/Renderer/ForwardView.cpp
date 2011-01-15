@@ -160,7 +160,7 @@ void View::getBatchesForward()
                         Batch shadowBatch;
                         shadowBatch.mNode = node;
                         shadowBatch.mCamera = &shadowCamera;
-                        shadowBatch.mDistance = (node->getWorldPosition() - shadowCamera.getPosition()).getLength();
+                        shadowBatch.mDistance = (node->getWorldPosition() - shadowCamera.getPosition()).getLengthFast();
                         shadowBatch.mGeometry = geom;
                         shadowBatch.mBatchIndex = l;
                         shadowBatch.mForwardLight = sSplitLights[j];

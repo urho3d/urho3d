@@ -115,7 +115,7 @@ static void registerConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "const Vector3& getPosition() const", asMETHOD(Connection, getPosition), asCALL_THISCALL);
     
     // Register Variant getPtr() for Connection
-    engine->RegisterObjectMethod("Connection", "Connection@+ getConnection() const", asFUNCTION(getVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Connection@+ getConnection() const", asFUNCTION(getVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("NetUpdateInfo", sizeof(NetUpdateInfo), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("NetUpdateInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructNetUpdateInfo), asCALL_CDECL_OBJLAST);

@@ -167,6 +167,16 @@ public:
         return len;
     }
     
+    //! Normalize to unit length using fast inverse square root
+    void normalizeFast()
+    {
+        float invLen = fastInvSqrt(mW * mW + mX * mX + mY * mY + mZ * mZ);
+        mW *= invLen;
+        mX *= invLen;
+        mY *= invLen;
+        mZ *= invLen;
+    }
+    
     //! Set from an angle (in degrees) and axis
     void fromAngleAxis(float angle, const Vector3& axis);
     //! Set from Euler angles (in degrees)
@@ -182,6 +192,13 @@ public:
             return sIdentity;
         
         float invLen = 1.0f / len;
+        return *this * invLen;
+    }
+    
+    //! Return normalized to unit length, using fast inverse square root
+    Quaternion getNormalizedFast() const
+    {
+        float invLen = fastInvSqrt(mW * mW + mX * mX + mY * mY + mZ * mZ);
         return *this * invLen;
     }
     
@@ -217,6 +234,12 @@ public:
     Quaternion nlerp(const Quaternion& rhs, float t) const
     {
         return (*this * (1.0f - t) + rhs * t).getNormalized();
+    }
+    
+    //! Normalized interpolation with another quaternion, using fast inverse square root
+    Quaternion nlerpFast(const Quaternion& rhs, float t) const
+    {
+        return (*this * (1.0f - t) + rhs * t).getNormalizedFast();
     }
     
     //! Return Euler angles (in degrees)

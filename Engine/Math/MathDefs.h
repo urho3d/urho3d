@@ -36,7 +36,7 @@ static const int M_MAX_INT = 0x7fffffff;
 static const unsigned M_MIN_UNSIGNED = 0x00000000;
 static const unsigned M_MAX_UNSIGNED = 0xffffffff;
 
-static const float M_EPSILON = 0.0000001f;
+static const float M_EPSILON = 0.000001f;
 static const float M_MIN_NEARCLIP = 0.01f;
 static const float M_MAX_FOV = 160.0f;
 static const float M_LARGE_VALUE = 100000000.0f;
@@ -128,6 +128,38 @@ inline bool isPowerOfTwo(unsigned value)
     while (!(value & 1))
         value >>= 1;
     return value == 1;
+}
+
+//! Fast square root
+inline float fastSqrt(float x)
+{
+    union
+    {
+        float f;
+        int i;
+    } u;
+    
+    u.f = x;
+    u.i -= 1 << 23;
+    u.i >>= 1;
+    u.i += 1 << 29;
+    return u.f;
+}
+
+//! Fast inverse square root
+inline float fastInvSqrt(float x)
+{
+    union
+    {
+        float f;
+        int i;
+    } u;
+    
+    float xHalf = 0.5f * x;
+    u.f = x;
+    u.i = 0x5f3759df - (u.i >> 1);
+    x = u.f * (1.5f - xHalf * u.f * u.f);
+    return x;
 }
 
 #endif // MATH_MATHDEFS_H

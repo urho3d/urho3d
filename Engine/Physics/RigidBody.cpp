@@ -372,8 +372,8 @@ void RigidBody::readNetUpdate(Deserializer& source, ResourceCache* cache, const 
     if (bits & (1 | 2 | 64 | 128))
     {
         // If the last network update was stationary, forcibly disable the body so it will not start drifting
-        bool active = (getLinearVelocity().getLength() > getLinearRestThreshold()) ||
-            (getAngularVelocity().getLength() > getAngularRestThreshold());
+        bool active = (getLinearVelocity().getLengthFast() > getLinearRestThreshold()) ||
+            (getAngularVelocity().getLengthFast() > getAngularRestThreshold());
         
         if (!active)
         {

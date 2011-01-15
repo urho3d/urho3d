@@ -39,6 +39,15 @@ enum PrimitiveType
     LINE_LIST
 };
 
+//! Geometry type
+enum GeometryType
+{
+    GEOM_STATIC = 0,
+    GEOM_SKINNED,
+    GEOM_INSTANCED,
+    MAX_GEOMETRYTYPES
+};
+
 //! Blending mode
 enum BlendMode
 {

@@ -80,7 +80,7 @@ public:
     virtual float getDerivedOpacity();
     
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     //! React to mouse drag start

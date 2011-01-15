@@ -69,6 +69,8 @@ public:
     virtual void updateDistance(const FrameInfo& frame);
     //! Prepare geometry for rendering
     virtual void updateGeometry(const FrameInfo& frame, Renderer* renderer);
+    //! Return geometry type, determines vertex shader variation
+    virtual GeometryType getGeometryType() { return GEOM_SKINNED; }
     //! Return vertex shader parameter
     virtual bool getVertexShaderParameter(unsigned batchIndex, VSParameter parameter, const float** data, unsigned* count);
     //! Draw debug geometry

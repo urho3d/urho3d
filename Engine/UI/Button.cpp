@@ -35,8 +35,7 @@ Button::Button(const std::string& name) :
     mInactiveRect(0, 0, 0, 0),
     mHoverRect(0, 0, 0, 0),
     mPressedRect(0, 0, 0, 0),
-    mHoverDelay(0.0f),
-    mPressedDelay(0.1f),
+    mLabelOffset(0, 0),
     mState(BUTTON_INACTIVE),
     mHoveringThisFrame(false)
 {
@@ -58,31 +57,16 @@ XMLElement Button::loadParameters(XMLFile* file, const std::string& elementName,
         setHoverRect(paramElem.getChildElement("hoverrect").getIntRect("value"));
     if (paramElem.hasChildElement("pressedrect"))
         setPressedRect(paramElem.getChildElement("pressedrect").getIntRect("value"));
-    if (paramElem.hasChildElement("hoverdelay"))
-        setHoverDelay(paramElem.getChildElement("hoverdelay").getFloat("value"));
-    if (paramElem.hasChildElement("presseddelay"))
-        setPressedDelay(paramElem.getChildElement("presseddelay").getFloat("value"));
+    if (paramElem.hasChildElement("labeloffset"))
+        setLabelOffset(paramElem.getChildElement("labeloffset").getIntVector2("value"));
     
     return paramElem;
 }
 
 void Button::update(float timeStep)
 {
-    if ((mState != BUTTON_INACTIVE) && (mStateTime <= 0.0f))
-    {
-        if (!mHoveringThisFrame)
-        {
-            mState = BUTTON_INACTIVE;
-            mStateTime = 0.0f;
-        }
-        else
-        {
-            mState = BUTTON_HOVER;
-            mStateTime = mHoverDelay;
-        }
-    }
-    else
-        mStateTime -= timeStep;
+    if (!mHoveringThisFrame)
+        setState(BUTTON_INACTIVE);
     
     mHoveringThisFrame = false;
 }
@@ -107,13 +91,12 @@ void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quad
     BorderImage::getBatches(batches, quads, currentScissor);
 }
 
-void Button::onHover(const IntVector2& position, const IntVector2& screenPosition)
+void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
 {
-    if (mState != BUTTON_PRESSED)
-    {
-        mState = BUTTON_HOVER;
-        mStateTime = mHoverDelay;
-    }
+    if (buttons & MOUSEB_LEFT)
+        setState(BUTTON_PRESSED);
+    else
+        setState(BUTTON_HOVER);
     
     mHoveringThisFrame = true;
 }
@@ -122,8 +105,8 @@ void Button::onClick(const IntVector2& position, const IntVector2& screenPositio
 {
     if (buttons & MOUSEB_LEFT)
     {
-        mState = BUTTON_PRESSED;
-        mStateTime = mPressedDelay;
+        setState(BUTTON_PRESSED);
+        mHoveringThisFrame = true;
         
         using namespace Pressed;
         
@@ -163,16 +146,6 @@ void Button::setPressedRect(int left, int top, int right, int bottom)
     mPressedRect = IntRect(left, top, right, bottom);
 }
 
-void Button::setHoverDelay(float delay)
-{
-    mHoverDelay = delay;
-}
-
-void Button::setPressedDelay(float delay)
-{
-    mPressedDelay = delay;
-}
-
 void Button::setLabel(UIElement* label)
 {
     removeChild(mLabel);
@@ -182,6 +155,36 @@ void Button::setLabel(UIElement* label)
         addChild(mLabel);
         // Center the label element on the button forcibly
         mLabel->setAlignment(HA_CENTER, VA_CENTER);
+        updateLabelOffset();
     }
 }
 
+void Button::setLabelOffset(const IntVector2& offset)
+{
+    mLabelOffset = offset;
+}
+
+void Button::setLabelOffset(int x, int y)
+{
+    mLabelOffset = IntVector2(x, y);
+}
+
+void Button::setState(ButtonState state)
+{
+    if (state != mState)
+    {
+        mState = state;
+        updateLabelOffset();
+    }
+}
+
+void Button::updateLabelOffset()
+{
+    if (!mLabel)
+        return;
+    
+    if (mState == BUTTON_PRESSED)
+        mLabel->setPosition(mLabelOffset);
+    else
+        mLabel->setPosition(IntVector2::sZero);
+}

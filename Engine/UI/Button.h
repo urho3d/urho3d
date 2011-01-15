@@ -50,7 +50,7 @@ public:
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     
@@ -66,12 +66,12 @@ public:
     void setPressedRect(const IntRect& rect);
     //! Set pressed image rectangle
     void setPressedRect(int left, int top, int right, int bottom);
-    //! Set hovering image delay
-    void setHoverDelay(float delay);
-    //! Set pressed image delay
-    void setPressedDelay(float delay);
     //! Set optional label UI element
     void setLabel(UIElement* label);
+    //! Set label offset on press
+    void setLabelOffset(const IntVector2& offset);
+    //! Set label offset on press
+    void setLabelOffset(int x, int y);
     
     //! Return inactive image rectangle
     const IntRect& getInactiveRect() const { return mInactiveRect; }
@@ -79,14 +79,17 @@ public:
     const IntRect& getHoverRect() const { return mHoverRect; }
     //! Return pressed image rectangle
     const IntRect& getPressedRect() const { return mPressedRect; }
-    //! Return hovering image delay
-    float getHoverDelay() const { return mHoverDelay; }
-    //! Return pressed image delay
-    float getPressedDelay() const { return mPressedDelay; }
     //! Return label UI element
     UIElement* getLabel() const { return mLabel; }
+    //! Return label offset on press
+    const IntVector2& getLabelOffset() const { return mLabelOffset; }
     
 protected:
+    //! Set new state
+    void setState(ButtonState state);
+    //! Set offset of label depending on button press state
+    void updateLabelOffset();
+    
     //! Label UI element
     SharedPtr<UIElement> mLabel;
     //! Inactive image rectangle
@@ -95,12 +98,8 @@ protected:
     IntRect mHoverRect;
     //! Pressed image rectangle
     IntRect mPressedRect;
-    //! Hovering image delay
-    float mHoverDelay;
-    //! Pressed image delay
-    float mPressedDelay;
-    //! State timer
-    float mStateTime;
+    //! Label offset on press
+    IntVector2 mLabelOffset;
     //! Current state
     ButtonState mState;
     //! Hovering flag

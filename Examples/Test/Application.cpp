@@ -200,7 +200,7 @@ void Application::init()
     
     XMLFile* uiSetup = mCache->getResource<XMLFile>("UI/UI.xml");
     
-    SharedPtr<Cursor> cursor(new Cursor("Cursor"));
+    Cursor* cursor = new Cursor("Cursor");
     cursor->loadParameters(uiSetup, "Cursor", mCache);
     cursor->setPosition(renderer->getWidth() / 2, renderer->getHeight() / 2);
     ui->setCursor(cursor);
@@ -340,7 +340,7 @@ void Application::createScene()
         
         StaticModel* object = new StaticModel(octree);
         object->setModel(mCache->getResource<Model>("Models/Mushroom.mdl"));
-        object->setMaterial(mCache->getResource<Material>("Materials/MushroomStatic.xml"));
+        object->setMaterial(mCache->getResource<Material>("Materials/Mushroom.xml"));
         object->setCastShadows(true);
         object->setOccluder(true);
         body->addChild(object);
@@ -355,7 +355,7 @@ void Application::createScene()
     {
         InstancedModel* instanced = new InstancedModel(octree);
         instanced->setModel(mCache->getResource<Model>("Models/Mushroom.mdl"));
-        instanced->setMaterial(mCache->getResource<Material>("Materials/MushroomInstanced.xml"));
+        instanced->setMaterial(mCache->getResource<Material>("Materials/Mushroom.xml"));
         instanced->setPosition(Vector3(random() * 160.0f - 80.0f, 0.0f, random() * 160.0f - 80.0f));
         instanced->setCastShadows(true);
         instanced->setNumInstances(50);

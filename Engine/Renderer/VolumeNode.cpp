@@ -282,7 +282,7 @@ void VolumeNode::setLightMask(unsigned mask)
 float VolumeNode::calculateDrawDistance(const Camera& camera, float minScreenSize)
 {
     const BoundingBox& box = getWorldBoundingBox();
-    float diagonal = (box.mMax - box.mMin).getLength();
+    float diagonal = (box.mMax - box.mMin).getLengthFast();
     float halfViewSize = camera.getHalfViewSize();
     
     return diagonal * halfViewSize / minScreenSize;

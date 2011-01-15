@@ -231,7 +231,7 @@ void UIElement::onChar(unsigned key)
 {
 }
 
-void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition)
+void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
 {
 }
 
