@@ -29,6 +29,7 @@
 #include "Application.h"
 #include "BillboardSet.h"
 #include "Button.h"
+#include "CheckBox.h"
 #include "CollisionShape.h"
 #include "Cursor.h"
 #include "CustomObject.h"
@@ -205,7 +206,7 @@ void Application::init()
     cursor->setPosition(renderer->getWidth() / 2, renderer->getHeight() / 2);
     ui->setCursor(cursor);
     
-    //Button* button = new Button("Testbutton");
+    //Button* button = new Button("TestButton");
     //button->loadParameters(uiSetup, "Button", mCache);
     //Text* text = new Text("TEST");
     //text->setFont(mCache->getResource<Font>("cour.ttf"), 12);
@@ -213,6 +214,14 @@ void Application::init()
     //button->setAlignment(HA_CENTER, VA_CENTER);
     //button->setSize(100, 40);
     //uiRoot->addChild(button);
+    //
+    //for (unsigned i = 0; i < 4; ++i)
+    //{
+    //    CheckBox* checkBox = new CheckBox("TestCheckBox" + toString(i));
+    //    checkBox->loadParameters(uiSetup, "CheckBox", mCache);
+    //    checkBox->setPosition(renderer->getWidth() / 3, renderer->getHeight() / 3 + 32 * i);
+    //    uiRoot->addChild(checkBox);
+    //}
     
     mScene = mEngine->createScene();
     PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();

@@ -44,10 +44,11 @@ DEFINE_EVENT(EVENT_PRESSED, Pressed)
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-//! UI element has changed in some way
-DEFINE_EVENT(EVENT_CHANGED, Changed)
+//! UI checkbox toggled
+DEFINE_EVENT(EVENT_TOGGLED, Toggled)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_STATE, State);                // bool
 }
 
 #endif // UI_UIEVENTS_H

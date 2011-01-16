@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Button.h"
+#include "CheckBox.h"
 #include "Cursor.h"
 #include "Engine.h"
 #include "Font.h"
@@ -129,6 +130,21 @@ static void registerButton(asIScriptEngine* engine)
     registerRefCasts<UIElement, Button>(engine, "UIElement", "Button");
 }
 
+static void registerCheckBox(asIScriptEngine* engine)
+{
+    registerBorderImage<CheckBox>(engine, "CheckBox");
+    engine->RegisterObjectMethod("CheckBox", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("CheckBox", "void setChecked(bool)", asMETHOD(CheckBox, setChecked), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(const IntRect& in)", asMETHODPR(CheckBox, setUncheckedRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(int, int, int, int)", asMETHODPR(CheckBox, setUncheckedRect, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setCheckedRect(const IntRect& in)", asMETHODPR(CheckBox, setCheckedRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setCheckedRect(int, int, int, int)", asMETHODPR(CheckBox, setCheckedRect, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "bool isChecked() const", asMETHOD(CheckBox, isChecked), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "const IntRect& getUncheckedRect() const", asMETHOD(CheckBox, getUncheckedRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "const IntRect& getCheckedRect() const", asMETHOD(CheckBox, getCheckedRect), asCALL_THISCALL);
+    registerRefCasts<UIElement, CheckBox>(engine, "UIElement", "CheckBox");
+}
+
 static void registerWindow(asIScriptEngine* engine)
 {
     registerBorderImage<Window>(engine, "Window");
@@ -193,8 +209,9 @@ void registerUILibrary(asIScriptEngine* engine)
     registerUIElement(engine);
     registerText(engine);
     registerBorderImage(engine);
-    registerCursor(engine);
     registerButton(engine);
+    registerCheckBox(engine);
+    registerCursor(engine);
     registerWindow(engine);
     registerUI(engine);
 }

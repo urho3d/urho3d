@@ -26,13 +26,6 @@
 
 #include "BorderImage.h"
 
-//! Button UI element states
-enum ButtonState
-{
-    BUTTON_INACTIVE = 0,
-    BUTTON_PRESSED
-};
-
 //! An image that reacts to mouse presses
 class Button : public BorderImage
 {
@@ -78,8 +71,8 @@ public:
     const IntVector2& getLabelOffset() const { return mLabelOffset; }
     
 protected:
-    //! Set new state
-    void setState(ButtonState state);
+    //! Set new pressed state
+    void setPressed(bool enable);
     //! Set offset of label depending on button press state
     void updateLabelOffset();
     
@@ -93,8 +86,8 @@ protected:
     IntRect mPressedRect;
     //! Label offset on press
     IntVector2 mLabelOffset;
-    //! Current state
-    ButtonState mState;
+    //! Current pressed state
+    bool mPressed;
 };
 
 #endif // UI_BUTTON_H

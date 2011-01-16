@@ -35,7 +35,7 @@ Button::Button(const std::string& name) :
     mInactiveRect(0, 0, 0, 0),
     mPressedRect(0, 0, 0, 0),
     mLabelOffset(0, 0),
-    mState(BUTTON_INACTIVE)
+    mPressed(false)
 {
     mClipChildren = true;
     mEnabled = true;
@@ -64,23 +64,21 @@ XMLElement Button::loadParameters(XMLFile* file, const std::string& elementName,
 void Button::update(float timeStep)
 {
     if (!mHovering)
-        setState(BUTTON_INACTIVE);
+        setPressed(false);
+    
     if (mLabelContainer->getSize() != getSize())
         mLabelContainer->setSize(getSize());
 }
 
 void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    switch (mState)
-    {
-    default:
-        mImageRect = mInactiveRect;
-        break;
-        
-    case BUTTON_PRESSED:
+    if (mLabelContainer->getSize() != getSize())
+        mLabelContainer->setSize(getSize());
+    
+    if (mPressed)
         mImageRect = mPressedRect;
-        break;
-    }
+    else
+        mImageRect = mInactiveRect;
     
     BorderImage::getBatches(batches, quads, currentScissor);
     mHovering = false;
@@ -88,10 +86,7 @@ void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quad
 
 void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
 {
-    if (buttons & MOUSEB_LEFT)
-        setState(BUTTON_PRESSED);
-    else
-        setState(BUTTON_INACTIVE);
+    setPressed((buttons & MOUSEB_LEFT) != 0);
     mHovering = true;
 }
 
@@ -99,7 +94,7 @@ void Button::onClick(const IntVector2& position, const IntVector2& screenPositio
 {
     if (buttons & MOUSEB_LEFT)
     {
-        setState(BUTTON_PRESSED);
+        setPressed(true);
         mHovering = true;
         
         using namespace Pressed;
@@ -153,19 +148,16 @@ void Button::setLabelOffset(int x, int y)
     mLabelOffset = IntVector2(x, y);
 }
 
-void Button::setState(ButtonState state)
+void Button::setPressed(bool enable)
 {
-    if (state != mState)
+    if (enable != mPressed)
     {
-        mState = state;
+        mPressed = enable;
         updateLabelOffset();
     }
 }
 
 void Button::updateLabelOffset()
 {
-    if (mState == BUTTON_PRESSED)
-        mLabelContainer->setPosition(mLabelOffset);
-    else
-        mLabelContainer->setPosition(IntVector2::sZero);
+    mLabelContainer->setPosition(mPressed ? mLabelOffset : IntVector2::sZero);
 }

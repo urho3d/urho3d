@@ -1,11 +1,12 @@
 <elements>
     <element name="Cursor">
+        <size value="16 24" />
         <texture name="Textures/UI.png" />
         <imagerect value="0 0 16 24" />
         <hotspot value="0 0" />
-        <size value="16 24" />
     </element>
     <element name="Button">
+        <size value="16 16" />
         <texture name="Textures/UI.png" />
         <color value="0.85 0.85 0.85" />
         <hovercolor value="0.15 0.15 0.15" />
@@ -24,5 +25,14 @@
     </element>
     <element name="Text">
         <font name="Cour.ttf" size="10" />
+    </element>
+    <element name="CheckBox">
+        <size value="16 16" />
+        <texture name="Textures/UI.png" />
+        <color value="0.85 0.85 0.85" />
+        <hovercolor value="0.15 0.15 0.15" />
+        <uncheckedrect value="64 0 80 16" />
+        <checkedrect value="80 0 96 16" />
+        <border value="4 4 4 4" />
     </element>
 </elements>
