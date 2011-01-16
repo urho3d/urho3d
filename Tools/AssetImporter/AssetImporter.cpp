@@ -91,6 +91,7 @@ struct ExportScene
 int main(int argc, char** argv);
 void run(const std::vector<std::string>& arguments);
 void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level);
+
 void exportModel(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool noAnimations);
 void collectMeshes(ExportModel& model, aiNode* node);
 void collectBones(ExportModel& model);
@@ -99,13 +100,19 @@ void collectAnimations(ExportModel& model);
 void buildBoneCollisionInfo(ExportModel& model);
 void buildAndSaveModel(ExportModel& model);
 void buildAndSaveAnimations(ExportModel& model);
-void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath, bool localIDs,
-    bool noExtensions, bool saveBinary);
+
+void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath,
+    bool localIDs, bool noExtensions, bool saveBinary);
 void collectSceneModels(ExportScene& scene, aiNode* node);
 void collectSceneNodes(ExportScene& scene, aiNode* node);
 void buildAndSaveScene(ExportScene& scene);
+
 void exportMaterials(const aiScene* scene, const std::string& outName, const std::string& resourcePath);
 void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, const std::string& resourcePath);
+
+void combineLods(const std::vector<float>& lodDistances, const std::vector<std::string>& modelNames, const std::string& outName,
+    unsigned collisionLodLevel, unsigned raycastLodLevel, unsigned occlusionLodLevel);
+
 std::set<unsigned> getMeshesUnderNodeSet(aiNode* node);
 std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node);
 unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh);
@@ -114,20 +121,23 @@ aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
 Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName, bool useMeshTransform);
 void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
     blendIndices, std::vector<std::vector<float> >& blendWeights);
+
 void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void writeVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
     const Matrix4x3& vertexTransform, const Matrix3& normalTransform, std::vector<std::vector<unsigned char> >& blendIndices,
     std::vector<std::vector<float> >& blendWeights);
 unsigned getElementMask(aiMesh* mesh);
+
 aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive = true);
+aiMatrix4x4 getDerivedTransform(aiNode* node, aiNode* rootNode);
+aiMatrix4x4 getDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
+void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
+
 std::string toStdString(const aiString& str);
 Vector3 toVector3(const aiVector3D& vec);
 Vector2 toVector2(const aiVector2D& vec);
 Quaternion toQuaternion(const aiQuaternion& quat);
-aiMatrix4x4 getDerivedTransform(aiNode* node, aiNode* rootNode);
-aiMatrix4x4 getDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
-void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 void errorExit(const std::string& error);
 
 int main(int argc, char** argv)
@@ -161,10 +171,15 @@ void run(const std::vector<std::string>& arguments)
             "model     Export a model and animations\n"
             "scene     Export a scene and its models\n"
             "dumpnodes Dump scene node structure. No output file is generated\n"
+            "lod       Combine several Urho3D models as LOD levels of the output model\n"
+            "          Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
-            "-b        Save scene in binary format (default: XML)\n"
-            "-l        Use local ID's for scene entities\n"
+            "-b        Save scene in binary format, default format is XML\n"
+            "-i        Use local ID's for scene entities\n"
+            "-lcX      Use LOD level X for collision mesh, default is middle LOD\n"
+            "-lrX      Use LOD level X for raycast, default is same as visible\n"
+            "-loX      Use LOD level X for occlusion, default is same as visible\n"
             "-na       Do not export animations\n"
             "-ne       Do not create Octree & PhysicsWorld extensions to the scene\n"
             "-nm       Do not export materials\n"
@@ -175,12 +190,8 @@ void run(const std::vector<std::string>& arguments)
     }
     
     std::string command = toLower(arguments[0]);
-    std::string inFile = arguments[1];
-    std::string outFile;
     std::string rootNodeName;
     std::string resourcePath;
-    if (arguments.size() > 2)
-        outFile = arguments[2];
     
     bool noMaterials = false;
     bool noAnimations = false;
@@ -200,6 +211,10 @@ void run(const std::vector<std::string>& arguments)
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
     
+    unsigned collisionLodLevel = M_MAX_UNSIGNED;
+    unsigned raycastLodLevel = M_MAX_UNSIGNED;
+    unsigned occlusionLodLevel = M_MAX_UNSIGNED;
+    
     for (unsigned i = 3; i < arguments.size(); ++i)
     {
         if ((arguments[i].length() >= 2) && (arguments[i][0] == '-'))
@@ -213,8 +228,27 @@ void run(const std::vector<std::string>& arguments)
             case 'b':
                 saveBinary = true;
                 break;
-            case 'l':
+            case 'i':
                 localIDs = true;
+                break;
+            case 'l':
+                if (parameter.length() > 1)
+                {
+                    switch (tolower(parameter[0]))
+                    {
+                    case 'c':
+                        collisionLodLevel = toInt(parameter.substr(1));
+                        break;
+                        
+                    case 'r':
+                        raycastLodLevel = toInt(parameter.substr(1));
+                        break;
+                        
+                    case 'o':
+                        occlusionLodLevel = toInt(parameter.substr(1));
+                        break;
+                    }
+                }
                 break;
             case 'p':
                 resourcePath = parameter;
@@ -246,34 +280,87 @@ void run(const std::vector<std::string>& arguments)
         }
     }
     
-    if ((command != "model") && (command != "scene") && (command != "dumpnodes"))
-        errorExit("Unrecognized command " + command);
-    
-    Assimp::Importer importer;
-    std::cout << "Reading file " << inFile << std::endl;
-    const aiScene* scene = importer.ReadFile(inFile.c_str(), flags);
-    if (!scene)
-        errorExit("Could not open or parse input file " + inFile);
-    
-    aiNode* rootNode = scene->mRootNode;
-    if (!rootNodeName.empty())
+    if ((command == "model") || (command == "scene") || (command == "dumpnodes"))
     {
-        rootNode = findNode(rootNodeName, scene->mRootNode, false);
-        if (!rootNode)
-            errorExit("Could not find scene node " + rootNodeName);
+        std::string inFile = arguments[1];
+        std::string outFile;
+        if (arguments.size() > 2)
+            outFile = arguments[2];
+        
+        Assimp::Importer importer;
+        std::cout << "Reading file " << inFile << std::endl;
+        const aiScene* scene = importer.ReadFile(inFile.c_str(), flags);
+        if (!scene)
+            errorExit("Could not open or parse input file " + inFile);
+        
+        aiNode* rootNode = scene->mRootNode;
+        if (!rootNodeName.empty())
+        {
+            rootNode = findNode(rootNodeName, scene->mRootNode, false);
+            if (!rootNode)
+                errorExit("Could not find scene node " + rootNodeName);
+        }
+        
+        if (!resourcePath.empty())
+            resourcePath = fixPath(resourcePath);
+        
+        if (command == "model")
+            exportModel(scene, rootNode, outFile, noAnimations);
+        if (command == "scene")
+            exportScene(scene, rootNode, outFile, resourcePath, localIDs, noExtensions, saveBinary);
+        if ((!noMaterials) && ((command == "model") || (command == "scene")))
+            exportMaterials(scene, outFile, resourcePath);
+        if (command == "dumpnodes")
+            dumpNodes(scene, rootNode, 0);
     }
-    
-    if (!resourcePath.empty())
-        resourcePath = fixPath(resourcePath);
-    
-    if (command == "model")
-        exportModel(scene, rootNode, outFile, noAnimations);
-    if (command == "scene")
-        exportScene(scene, rootNode, outFile, resourcePath, localIDs, noExtensions, saveBinary);
-    if ((!noMaterials) && ((command == "model") || (command == "scene")))
-        exportMaterials(scene, outFile, resourcePath);
-    if (command == "dumpnodes")
-        dumpNodes(scene, rootNode, 0);
+    else if (command == "lod")
+    {
+        std::vector<float> lodDistances;
+        std::vector<std::string> modelNames;
+        std::string outFile;
+        
+        unsigned numLodArguments = 0;
+        for (unsigned i = 1; i < arguments.size(); ++i)
+        {
+            if (arguments[i][0] == '-')
+                break;
+            ++numLodArguments;
+        }
+        if (numLodArguments < 4)
+            errorExit("Must define at least 2 LOD levels");
+        if (!(numLodArguments & 1))
+            errorExit("No output file defined");
+        
+        for (unsigned i = 1; i < numLodArguments + 1; ++i)
+        {
+            if (i == numLodArguments)
+                outFile = arguments[i];
+            else
+            {
+                if (i & 1)
+                    lodDistances.push_back(max(toFloat(arguments[i]), 0.0f));
+                else
+                    modelNames.push_back(arguments[i]);
+            }
+        }
+        
+        if (collisionLodLevel >= lodDistances.size())
+            collisionLodLevel = M_MAX_UNSIGNED;
+        if (raycastLodLevel >= lodDistances.size())
+            raycastLodLevel = M_MAX_UNSIGNED;
+        if (occlusionLodLevel >= lodDistances.size())
+            occlusionLodLevel = M_MAX_UNSIGNED;
+        
+        if (lodDistances[0] != 0.0f)
+        {
+            std::cout << "Warning: first LOD distance forced to 0" << std::endl;
+            lodDistances[0] = 0.0f;
+        }
+        
+        combineLods(lodDistances, modelNames, outFile, collisionLodLevel, raycastLodLevel, occlusionLodLevel);
+    }
+    else
+        errorExit("Unrecognized command " + command);
 }
 
 void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level)
@@ -443,6 +530,8 @@ void collectAnimations(ExportModel& model)
         if (modelBoneFound)
             model.mAnimations.push_back(anim);
     }
+    
+    //! \todo Vertex morphs are ignored for now
 }
 
 void buildBoneCollisionInfo(ExportModel& model)
@@ -1122,6 +1211,78 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
     outMaterial.save(outFile);
 }
 
+void combineLods(const std::vector<float>& lodDistances, const std::vector<std::string>& modelNames, const std::string& outName,
+    unsigned collisionLodLevel, unsigned raycastLodLevel, unsigned occlusionLodLevel)
+{
+    // Load models
+    std::vector<SharedPtr<Model> > srcModels;
+    for (unsigned i = 0; i < modelNames.size(); ++i)
+    {
+        std::cout << "Reading LOD level " << i << ": model " + modelNames[i] << " distance " << lodDistances[i] << std::endl;
+        File srcFile(modelNames[i]);
+        SharedPtr<Model> srcModel(new Model(0, modelNames[i]));
+        srcModel->load(srcFile, 0);
+        srcModels.push_back(srcModel);
+    }
+    
+    // Check that none of the models already has LOD levels
+    for (unsigned i = 0; i < srcModels.size(); ++i)
+    {
+        for (unsigned j = 0; j < srcModels[i]->getNumGeometries(); ++j)
+        {
+            if (srcModels[i]->getNumGeometryLodLevels(j) > 1)
+                errorExit(modelNames[i] + " already has multiple LOD levels defined");
+        }
+    }
+    
+    // Check for number of geometries (need to have same amount for now)
+    for (unsigned i = 1; i < srcModels.size(); ++i)
+    {
+        if (srcModels[i]->getNumGeometries() != srcModels[0]->getNumGeometries())
+            errorExit(modelNames[i] + " has different amount of geometries than " + modelNames[0]);
+    }
+    
+    // If there are bones, check for compatibility (need to have exact match for now)
+    for (unsigned i = 1; i < srcModels.size(); ++i)
+    {
+        if (srcModels[i]->getSkeleton().getNumBones() != srcModels[0]->getSkeleton().getNumBones())
+            errorExit(modelNames[i] + " has different amount of bones than " + modelNames[0]);
+        for (unsigned j = 0; j < srcModels[0]->getSkeleton().getNumBones(); ++j)
+        {
+            if (srcModels[i]->getSkeleton().getBone(j)->getName() != srcModels[0]->getSkeleton().getBone(j)->getName())
+                errorExit(modelNames[i] + " has different bones than " + modelNames[0]);
+        }
+        if (srcModels[i]->getGeometryBoneMappings() != srcModels[0]->getGeometryBoneMappings())
+            errorExit(modelNames[i] + " has different per-geometry bone mappings than " + modelNames[0]);
+    }
+    
+    // Create the final model
+    SharedPtr<Model> outModel(new Model(0, outName));
+    outModel->setNumGeometries(srcModels[0]->getNumGeometries());
+    for (unsigned i = 0; i < srcModels[0]->getNumGeometries(); ++i)
+    {
+        outModel->setNumGeometryLodLevels(i, srcModels.size());
+        for (unsigned j = 0; j < srcModels.size(); ++j)
+        {
+            Geometry* geom = srcModels[j]->getGeometry(i, 0);
+            geom->setLodDistance(lodDistances[j]);
+            outModel->setGeometry(i, j, geom);
+        }
+    }
+    outModel->setSkeleton(srcModels[0]->getSkeleton());
+    outModel->setGeometryBoneMappings(srcModels[0]->getGeometryBoneMappings());
+    outModel->setBoundingBox(srcModels[0]->getBoundingBox());
+    outModel->setCollisionLodLevel(collisionLodLevel);
+    outModel->setRaycastLodLevel(raycastLodLevel);
+    outModel->setOcclusionLodLevel(occlusionLodLevel);
+    //! \todo Vertex morphs are ignored for now
+    
+    // Save the final model
+    std::cout << "Writing output model" << std::endl;
+    File outFile(outName, FILE_WRITE);
+    outModel->save(outFile);
+}
+
 std::set<unsigned> getMeshesUnderNodeSet(aiNode* node)
 {
     std::set<unsigned> ret;
@@ -1394,29 +1555,6 @@ aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive)
     return 0;
 }
 
-std::string toStdString(const aiString& str)
-{
-    if ((!str.data) || (!str.length))
-        return std::string();
-    else
-        return std::string(str.data);
-}
-
-Vector3 toVector3(const aiVector3D& vec)
-{
-    return Vector3(vec.x, vec.y, vec.z);
-}
-
-Vector2 toVector2(const aiVector2D& vec)
-{
-    return Vector2(vec.x, vec.y);
-}
-
-Quaternion toQuaternion(const aiQuaternion& quat)
-{
-    return Quaternion(quat.w, quat.x, quat.y, quat.z);
-}
-
 aiMatrix4x4 getDerivedTransform(aiNode* node, aiNode* rootNode)
 {
     aiMatrix4x4 current = node->mTransformation;
@@ -1451,8 +1589,31 @@ void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot,
     scale = toVector3(aiScale);
 }
 
+
+std::string toStdString(const aiString& str)
+{
+    if ((!str.data) || (!str.length))
+        return std::string();
+    else
+        return std::string(str.data);
+}
+
+Vector3 toVector3(const aiVector3D& vec)
+{
+    return Vector3(vec.x, vec.y, vec.z);
+}
+
+Vector2 toVector2(const aiVector2D& vec)
+{
+    return Vector2(vec.x, vec.y);
+}
+
+Quaternion toQuaternion(const aiQuaternion& quat)
+{
+    return Quaternion(quat.w, quat.x, quat.y, quat.z);
+}
+
 void errorExit(const std::string& error)
 {
     throw Exception(error);
 }
-

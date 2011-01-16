@@ -89,7 +89,7 @@ public:
     bool setGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
     //! Set skeleton
     void setSkeleton(const Skeleton& skeleton);
-    //! Set bone mappings when model has more bones than skinning shader can handle
+    //! Set bone mappings when model has more bones than the skinning shader can handle
     void setGeometryBoneMappings(const std::vector<std::vector<unsigned> >& mappings);
     //! Set vertex morphs
     void setMorphs(const std::vector<ModelMorph>& morphs);

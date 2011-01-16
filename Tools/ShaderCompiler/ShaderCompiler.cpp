@@ -177,9 +177,13 @@ int main(int argc, char** argv)
 void run(const std::vector<std::string>& arguments)
 {
     if (arguments.size() < 2)
-        errorExit("Usage: ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2] ...\n"
+    {
+        errorExit(
+            "Usage: ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2]\n"
             "Note: .hlsl files will be loaded from definition file directory, and binary\n"
-            "code will be output to same directory as the output file.");
+            "code will be output to same directory as the output file."
+        );
+    }
     
     size_t pos = arguments[0].rfind('\\');
     if (pos != std::string::npos)

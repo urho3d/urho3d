@@ -85,16 +85,18 @@ void run(const std::vector<std::string>& arguments)
 {
     if (arguments.size() < 2)
     {
-        errorExit("Usage: ModelConverter <input file> <output file> [options]\n"
-                  "Options:\n"
-                  "-a   Export animations\n"
-                  "-lcX Use LOD level X for collision mesh, default middle LOD\n"
-                  "-lrX Use LOD level X for raycasts, default same as visible LOD\n"
-                  "-loX Use LOD level X for occlusion, default same as visible LOD\n"
-                  "-m   Export morphs\n"
-                  "-r   Export only rotations from animations\n"
-                  "-s   Split each submesh into own vertex buffer\n"
-                  "-t   Generate tangents\n");
+        errorExit(
+            "Usage: ModelConverter <input file> <output file> [options]\n\n"
+            "Options:\n"
+            "-a   Export animations\n"
+            "-lcX Use LOD level X for collision mesh, default is middle LOD\n"
+            "-lrX Use LOD level X for raycasts, default is same as visible LOD\n"
+            "-loX Use LOD level X for occlusion, default is same as visible LOD\n"
+            "-m   Export morphs\n"
+            "-r   Export only rotations from animations\n"
+            "-s   Split each submesh into own vertex buffer\n"
+            "-t   Generate tangents"
+        );
     }
     
     bool generateTangents = false;

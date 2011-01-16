@@ -61,7 +61,12 @@ int main(int argc, char** argv)
 void run(const std::vector<std::string>& arguments)
 {
     if (arguments.size() < 1)
-        errorExit("Usage: NormalMapTool <input image file>");
+    {
+        errorExit(
+            "Usage: NormalMapTool <inputfile>\n"
+            "Output file will be saved as inputfile.dds"
+        );
+    }
     
     File source(arguments[0]);
     Image image;
