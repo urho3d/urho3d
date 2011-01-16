@@ -122,7 +122,11 @@ enum VertexElement
     ELEMENT_TANGENT,
     ELEMENT_BLENDWEIGHTS,
     ELEMENT_BLENDINDICES,
-    ELEMENT_INSTANCENUMBER
+    ELEMENT_INSTANCENUMBER,
+    ELEMENT_INSTANCEMATRIX1,
+    ELEMENT_INSTANCEMATRIX2,
+    ELEMENT_INSTANCEMATRIX3,
+    MAX_VERTEX_ELEMENTS
 };
 
 //! Texture filtering mode
@@ -201,7 +205,6 @@ static const unsigned CLEAR_STENCIL = 4;
 static const unsigned MAX_RENDERTARGETS = 4;
 static const unsigned MAX_TEXTURE_UNITS = 8;
 static const unsigned MAX_VERTEX_STREAMS = 4;
-static const unsigned MAX_VERTEX_ELEMENTS = 14;
 static const unsigned MAX_SKIN_MATRICES = 64;
 static const unsigned MAX_INSTANCES_PER_BATCH = 32;
 

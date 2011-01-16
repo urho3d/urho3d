@@ -501,7 +501,4 @@ private:
     TextureFilterMode mDefaultTextureFilterMode;
 };
 
-//! Return Renderer instance
-Renderer* getRenderer();
-
 #endif // RENDERER_RENDERER_H

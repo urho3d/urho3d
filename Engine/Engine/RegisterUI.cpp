@@ -117,15 +117,12 @@ static void registerButton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Button", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Button", "void setInactiveRect(const IntRect& in)", asMETHODPR(Button, setInactiveRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setInactiveRect(int, int, int, int)", asMETHODPR(Button, setInactiveRect, (int, int, int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setHoverRect(const IntRect& in)", asMETHODPR(Button, setHoverRect, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setHoverRect(int, int, int, int)", asMETHODPR(Button, setHoverRect, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setPressedRect(const IntRect& in)", asMETHODPR(Button, setPressedRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setPressedRect(int, int, int, int)", asMETHODPR(Button, setPressedRect, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setLabel(UIElement@+)", asMETHOD(Button, setLabel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setLabelOffset(const IntVector2& in)", asMETHODPR(Button, setLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setLabelOffset(int, int)", asMETHODPR(Button, setLabelOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntRect& getInactiveRect() const", asMETHOD(Button, getInactiveRect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "const IntRect& getHoverRect() const", asMETHOD(Button, getHoverRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntRect& getPressedRect() const", asMETHOD(Button, getPressedRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "UIElement@+ getLabel() const", asMETHOD(Button, getLabel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntVector2& getLabelOffset() const", asMETHOD(Button, getLabelOffset), asCALL_THISCALL);

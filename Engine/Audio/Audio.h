@@ -154,7 +154,4 @@ private:
     Quaternion mListenerRotation;
 };
 
-//! Return Audio instance
-Audio* getAudio();
-
 #endif // AUDIO_AUDIO_H

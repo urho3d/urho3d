@@ -119,7 +119,4 @@ private:
     unsigned mMouseButtons;
 };
 
-//! Return UI instance
-UI* getUI();
-
 #endif // UI_UI_H

@@ -57,7 +57,4 @@ private:
     asIScriptContext* mImmediateContext;
 };
 
-//! Return the ScriptEngine instance
-ScriptEngine* getScriptEngine();
-
 #endif // SCRIPT_SCRIPTENGINE_H

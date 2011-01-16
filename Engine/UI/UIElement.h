@@ -114,12 +114,10 @@ public:
     void setVerticalAlignment(VerticalAlignment align);
     //! Set color on all corners
     void setColor(const Color& color);
-    //! Set color on all corners
-    void setColor(float r, float g, float b);
     //! Set color on one corner
     void setColor(UIElementCorner corner, const Color& color);
-    //! Set color on one corner
-    void setColor(UIElementCorner corner, float r, float g, float b);
+    //! Set hover color modification
+    void setHoverColor(const Color& color);
     //! Set priority
     void setPriority(int priority);
     //! Set opacity
@@ -159,6 +157,8 @@ public:
     VerticalAlignment getVerticalAlignment() const { return mVerticalAlignment; }
     //! Return corner color
     const Color& getColor(UIElementCorner corner) const { return mColor[corner]; }
+    //! Return hover color modification
+    const Color& getHoverColor() { return mHoverColor; }
     //! Return priority
     int getPriority() const { return mPriority; }
     //! Return opacity
@@ -175,6 +175,8 @@ public:
     bool hasFocus() const { return mFocus; }
     //! Return whether is visible
     bool isVisible() const { return mVisible; }
+    //! Return whether the cursor is hovering on this element
+    bool isHovering() const { return mHovering; }
     //! Return whether has different color in at least one corner
     bool hasColorGradient() const { return mHasColorGradient; }
     //! Return number of child elements
@@ -208,6 +210,8 @@ protected:
     UIElement* mParent;
     //! Colors
     Color mColor[NUM_UIELEMENT_CORNERS];
+    //! Hover color modification
+    Color mHoverColor;
     //! Priority
     int mPriority;
     //! Bring to front when focused flag
@@ -222,6 +226,8 @@ protected:
     bool mFocus;
     //! Visible flag
     bool mVisible;
+    //! Hovering flag
+    bool mHovering;
     
 private:
     //! Return child elements recursively

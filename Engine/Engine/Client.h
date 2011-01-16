@@ -246,7 +246,4 @@ private:
     VariantMap mPendingLoginData;
 };
 
-//! Return Client instance
-Client* getClient();
-
 #endif // ENGINE_CLIENT_H

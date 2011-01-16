@@ -332,7 +332,4 @@ private:
     FrameInfo mFrame;
 };
 
-//! Return Pipeline instance
-Pipeline* getPipeline();
-
 #endif // RENDERER_PIPELINE_H

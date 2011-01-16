@@ -37,6 +37,7 @@ UIElement::UIElement(const std::string& name) :
     mSize(IntVector2::sZero),
     mHorizontalAlignment(HA_LEFT),
     mVerticalAlignment(VA_TOP),
+    mHoverColor(Color(0.0f, 0.0f, 0.0f)),
     mPriority(0),
     mOpacity(1.0f),
     mBringToFront(false),
@@ -45,6 +46,7 @@ UIElement::UIElement(const std::string& name) :
     mFocusable(false),
     mFocus(false),
     mVisible(true),
+    mHovering(false),
     mScreenPositionDirty(true),
     mDerivedOpacityDirty(true),
     mHasColorGradient(false)
@@ -135,6 +137,8 @@ XMLElement UIElement::loadParameters(XMLFile* file, const std::string& elementNa
         if (colorElem.hasAttribute("bottomright"))
             setColor(C_BOTTOMRIGHT, colorElem.getColor("bottomright"));
     }
+    if (paramElem.hasChildElement("hovercolor"))
+        setHoverColor(paramElem.getChildElement("hovercolor").getColor("value"));
     if (paramElem.hasChildElement("bringtofront"))
         setBringToFront(paramElem.getChildElement("bringtofront").getBool("enable"));
     if (paramElem.hasChildElement("clipchildren"))
@@ -155,6 +159,7 @@ void UIElement::update(float timeStep)
 
 void UIElement::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
+    mHovering = false;
 }
 
 IntVector2 UIElement::getScreenPosition()
@@ -233,6 +238,7 @@ void UIElement::onChar(unsigned key)
 
 void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
 {
+    mHovering = true;
 }
 
 void UIElement::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
@@ -258,8 +264,11 @@ void UIElement::setName(const std::string& name)
 
 void UIElement::setPosition(const IntVector2& position)
 {
-    mPosition = position;
-    markDirty();
+    if (position != mPosition)
+    {
+        mPosition = position;
+        markDirty();
+    }
 }
 
 void UIElement::setPosition(int x, int y)
@@ -269,9 +278,12 @@ void UIElement::setPosition(int x, int y)
 
 void UIElement::setSize(const IntVector2& size)
 {
-    mSize.mX = max(size.mX, 0);
-    mSize.mY = max(size.mY, 0);
-    markDirty();
+    if (size != mSize)
+    {
+        mSize.mX = max(size.mX, 0);
+        mSize.mY = max(size.mY, 0);
+        markDirty();
+    }
 }
 
 void UIElement::setSize(int width, int height)
@@ -315,11 +327,6 @@ void UIElement::setColor(const Color& color)
     mHasColorGradient = false;
 }
 
-void UIElement::setColor(float r, float g, float b)
-{
-    setColor(Color(r, g, b));
-}
-
 void UIElement::setColor(UIElementCorner corner, const Color& color)
 {
     mColor[corner] = color;
@@ -332,9 +339,9 @@ void UIElement::setColor(UIElementCorner corner, const Color& color)
     }
 }
 
-void UIElement::setColor(UIElementCorner corner, float r, float g, float b)
+void UIElement::setHoverColor(const Color& color)
 {
-    setColor(corner, Color(r, g, b));
+    mHoverColor = color;
 }
 
 void UIElement::setPriority(int priority)

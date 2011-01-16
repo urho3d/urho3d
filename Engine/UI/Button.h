@@ -30,7 +30,6 @@
 enum ButtonState
 {
     BUTTON_INACTIVE = 0,
-    BUTTON_HOVER,
     BUTTON_PRESSED
 };
 
@@ -58,10 +57,6 @@ public:
     void setInactiveRect(const IntRect& rect);
     //! Set inactive image rectangle
     void setInactiveRect(int left, int top, int right, int bottom);
-    //! Set hovering image rectangle
-    void setHoverRect(const IntRect& rect);
-    //! Set hovering image rectangle
-    void setHoverRect(int left, int top, int right, int bottom);
     //! Set pressed image rectangle
     void setPressedRect(const IntRect& rect);
     //! Set pressed image rectangle
@@ -75,8 +70,6 @@ public:
     
     //! Return inactive image rectangle
     const IntRect& getInactiveRect() const { return mInactiveRect; }
-    //! Return hovering image rectangle
-    const IntRect& getHoverRect() const { return mHoverRect; }
     //! Return pressed image rectangle
     const IntRect& getPressedRect() const { return mPressedRect; }
     //! Return label UI element
@@ -92,18 +85,16 @@ protected:
     
     //! Label UI element
     SharedPtr<UIElement> mLabel;
+    //! Label container for offsetting
+    SharedPtr<UIElement> mLabelContainer;
     //! Inactive image rectangle
     IntRect mInactiveRect;
-    //! Hovering image rectangle
-    IntRect mHoverRect;
     //! Pressed image rectangle
     IntRect mPressedRect;
     //! Label offset on press
     IntVector2 mLabelOffset;
     //! Current state
     ButtonState mState;
-    //! Hovering flag
-    bool mHoveringThisFrame;
 };
 
 #endif // UI_BUTTON_H

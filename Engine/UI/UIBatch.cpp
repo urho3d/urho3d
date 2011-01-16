@@ -66,12 +66,15 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     }
     else
     {
-        const Color& color = element.getColor(C_TOPLEFT);
-        unsigned finalColor = getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
-        quad.mTopLeftColor = finalColor;
-        quad.mTopRightColor = finalColor;
-        quad.mBottomLeftColor = finalColor;
-        quad.mBottomRightColor = finalColor;
+        Color color = element.getColor(C_TOPLEFT);
+        if (element.isHovering())
+            color += element.getHoverColor();
+        color.mA = element.getDerivedOpacity();
+        unsigned uintColor = getD3DColor(color);
+        quad.mTopLeftColor = uintColor;
+        quad.mTopRightColor = uintColor;
+        quad.mBottomLeftColor = uintColor;
+        quad.mBottomRightColor = uintColor;
     }
     
     mQuads->push_back(quad);
@@ -104,12 +107,15 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     }
     else
     {
-        const Color& color = element.getColor(C_TOPLEFT);
-        unsigned finalColor = getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
-        quad.mTopLeftColor = finalColor;
-        quad.mTopRightColor = finalColor;
-        quad.mBottomLeftColor = finalColor;
-        quad.mBottomRightColor = finalColor;
+        Color color = element.getColor(C_TOPLEFT);
+        if (element.isHovering())
+            color += element.getHoverColor();
+        color.mA = element.getDerivedOpacity();
+        unsigned uintColor = getD3DColor(color);
+        quad.mTopLeftColor = uintColor;
+        quad.mTopRightColor = uintColor;
+        quad.mBottomLeftColor = uintColor;
+        quad.mBottomRightColor = uintColor;
     }
     
     mQuads->push_back(quad);
@@ -256,11 +262,17 @@ unsigned UIBatch::getInterpolatedColor(UIElement& element, int x, int y)
         Color topColor = element.getColor(C_TOPLEFT).lerp(element.getColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element.getColor(C_BOTTOMLEFT).lerp(element.getColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.lerp(bottomColor, cLerpY);
-        return getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        if (element.isHovering())
+            color += element.getHoverColor();
+        color.mA = element.getDerivedOpacity();
+        return getD3DColor(color);
     }
     else
     {
-        const Color& color = element.getColor(C_TOPLEFT);
-        return getD3DColor(Color(color.mR, color.mG, color.mB, element.getDerivedOpacity()));
+        Color color = element.getColor(C_TOPLEFT);
+        if (element.isHovering())
+            color += element.getHoverColor();
+        color.mA = element.getDerivedOpacity();
+        return getD3DColor(color);
     }
 }

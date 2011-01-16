@@ -81,7 +81,7 @@ const BYTE d3dElementUsageIndex[] =
     2, // Instancenumber
     2, // Instancematrix1
     3, // Instancematrix2
-    4, // Instancematrix3
+    4 // Instancematrix3
 };
 
 VertexDeclaration::VertexDeclaration(Renderer* renderer, unsigned elementMask) :

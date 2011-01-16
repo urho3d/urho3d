@@ -139,7 +139,4 @@ private:
     int mStayRelevantTime;
 };
 
-//! Return Server instance
-Server* getServer();
-
 #endif // ENGINE_SERVER_H

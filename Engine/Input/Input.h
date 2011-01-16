@@ -103,7 +103,4 @@ private:
     bool mActivated;
 };
 
-//! Return Input instance
-Input* getInput();
-
 #endif // INPUT_INPUT_H

@@ -162,7 +162,4 @@ template <class T> std::vector<T*> ResourceCache::getResources()
     return ret;
 }
 
-//! Return ResourceCache instance
-ResourceCache* getResourceCache();
-
 #endif // RESOURCE_RESOURCECACHE_H

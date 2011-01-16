@@ -93,6 +93,22 @@ public:
         return Color(mR * rhs, mG * rhs, mB * rhs, mA * rhs);
     }
     
+    //! Add a color
+    Color operator + (const Color& rhs) const
+    {
+        return Color(mR + rhs.mR, mG + rhs.mG, mB + rhs.mB, mA + rhs.mA);
+    }
+    
+    //! Add-assign a color
+    Color& operator += (const Color& rhs)
+    {
+        mR += rhs.mR;
+        mG += rhs.mG;
+        mB += rhs.mB;
+        mA += rhs.mA;
+        return *this;
+    }
+    
     //! Return float data
     const float* getData() const { return &mR; }
     //! Return RGB values as a Vector3
@@ -167,10 +183,10 @@ public:
 //! Return color packed to a 32-bit integer
 inline unsigned getD3DColor(const Color& color)
 {
-    unsigned r = (unsigned)(color.mR * 255.0f);
-    unsigned g = (unsigned)(color.mG * 255.0f);
-    unsigned b = (unsigned)(color.mB * 255.0f);
-    unsigned a = (unsigned)(color.mA * 255.0f);
+    unsigned r = (unsigned)(clamp(color.mR * 255.0f, 0.0f, 255.0f));
+    unsigned g = (unsigned)(clamp(color.mG * 255.0f, 0.0f, 255.0f));
+    unsigned b = (unsigned)(clamp(color.mB * 255.0f, 0.0f, 255.0f));
+    unsigned a = (unsigned)(clamp(color.mA * 255.0f, 0.0f, 255.0f));
     
     return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
 }

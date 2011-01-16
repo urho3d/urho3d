@@ -205,6 +205,15 @@ void Application::init()
     cursor->setPosition(renderer->getWidth() / 2, renderer->getHeight() / 2);
     ui->setCursor(cursor);
     
+    //Button* button = new Button("Testbutton");
+    //button->loadParameters(uiSetup, "Button", mCache);
+    //Text* text = new Text("TEST");
+    //text->setFont(mCache->getResource<Font>("cour.ttf"), 12);
+    //button->setLabel(text);
+    //button->setAlignment(HA_CENTER, VA_CENTER);
+    //button->setSize(100, 40);
+    //uiRoot->addChild(button);
+    
     mScene = mEngine->createScene();
     PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();
     world->setGravity(Vector3(0.0f, -9.81f, 0.0f));
@@ -792,7 +801,10 @@ void Application::handleMouseButtonDown(StringHash eventType, VariantMap& eventD
         if (cursor)
             cursor->setVisible(false);
     }
-    if (button == MOUSEB_LEFT)
+    
+    UI* ui = mEngine->getUI();
+    
+    if ((button == MOUSEB_LEFT) && (!ui->getElementAt(ui->getCursorPosition())))
     {
         // Test creating a new physics object
         if (mCameraEntity)

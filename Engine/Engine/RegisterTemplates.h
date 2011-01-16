@@ -353,9 +353,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setHorizontalAlignment(HorizontalAlignment)", asMETHOD(T, setHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVerticalAlignment(VerticalAlignment)", asMETHOD(T, setVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(const Color& in)", asMETHODPR(T, setColor, (const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setColor(float, float, float)", asMETHODPR(T, setColor, (float, float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(UIElementCorner, const Color& in)", asMETHODPR(T, setColor, (UIElementCorner, const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setColor(UIElementCorner, float, float, float)", asMETHODPR(T, setColor, (UIElementCorner, float, float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setHoverColor(const Color& in)", asMETHOD(T, setHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPriority(int)", asMETHOD(T, setPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setOpacity(float)", asMETHOD(T, setOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setBringToFront(bool)", asMETHOD(T, setBringToFront), asCALL_THISCALL);
@@ -375,6 +374,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "HorizontalAlignment getHorizontalAlignment() const", asMETHOD(T, getHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment getVerticalAlignment() const", asMETHOD(T, getVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& getColor(UIElementCorner) const", asMETHOD(T, getColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Color& getHoverColor() const", asMETHOD(T, getHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getPriority() const", asMETHOD(T, getPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getOpacity() const", asMETHOD(T, getOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getBringToFront() const", asMETHOD(T, getBringToFront), asCALL_THISCALL);
@@ -383,6 +383,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isFocusable() const", asMETHOD(T, isFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasFocus() const", asMETHOD(T, hasFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isVisible() const", asMETHOD(T, isVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool isHovering() const", asMETHOD(T, isHovering), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasColorGradient() const", asMETHOD(T, hasColorGradient), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint getNumChildren(bool) const", asMETHOD(T, getNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, UIElement*), asCALL_THISCALL);
