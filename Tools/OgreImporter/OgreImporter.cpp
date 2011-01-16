@@ -23,7 +23,7 @@
 
 #include "Exception.h"
 #include "File.h"
-#include "ModelConverterUtils.h"
+#include "OgreImporterUtils.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
@@ -86,7 +86,7 @@ void run(const std::vector<std::string>& arguments)
     if (arguments.size() < 2)
     {
         errorExit(
-            "Usage: ModelConverter <input file> <output file> [options]\n\n"
+            "Usage: OgreImporter <input file> <output file> [options]\n\n"
             "Options:\n"
             "-a   Export animations\n"
             "-lcX Use LOD level X for collision mesh, default is middle LOD\n"

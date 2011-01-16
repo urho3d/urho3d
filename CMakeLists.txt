@@ -79,8 +79,8 @@ endmacro ()
 macro (add_model NAME PARAMETERS)
     add_custom_command (
         OUTPUT ../../Bin/Data/Models/${NAME}.mdl
-        COMMAND ../../Bin/ModelConverter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
-        DEPENDS ModelConverter ${NAME}.mesh.xml
+        COMMAND ../../Bin/OgreImporter ${NAME}.mesh.xml ../../Bin/Data/Models/${NAME}.mdl ${PARAMETERS}
+        DEPENDS OgreImporter ${NAME}.mesh.xml
     )
 
     set (ALL_MODELS ${ALL_MODELS} ../../Bin/Data/Models/${NAME}.mdl)
@@ -130,8 +130,8 @@ add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/TinyXML)
 add_subdirectory (Tools/AssetImporter)
-add_subdirectory (Tools/ModelConverter)
 add_subdirectory (Tools/NormalMapTool)
+add_subdirectory (Tools/OgreImporter)
 add_subdirectory (Tools/PackageTool)
 add_subdirectory (Tools/RampGenerator)
 add_subdirectory (Tools/ShaderCompiler)

@@ -1,5 +1,5 @@
 # Define target name
-set (TARGET_NAME ModelConverter)
+set (TARGET_NAME OgreImporter)
 
 # Define source files
 file (GLOB CPP_FILES *.cpp)
