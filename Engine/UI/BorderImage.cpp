@@ -43,7 +43,7 @@ BorderImage::~BorderImage()
 void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     if (!cache)
-        SAFE_EXCEPTION("Null resource cache for UI element");
+        EXCEPTION("Null resource cache for UI element");
     
     UIElement::setStyle(element, cache);
     

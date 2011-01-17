@@ -43,7 +43,7 @@ Cursor::~Cursor()
 void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     if (!cache)
-        SAFE_EXCEPTION("Null resource cache for UI element");
+        EXCEPTION("Null resource cache for UI element");
     
     BorderImage::setStyle(element, cache);
     

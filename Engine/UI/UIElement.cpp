@@ -72,7 +72,7 @@ UIElement::~UIElement()
 void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     if (!cache)
-        SAFE_EXCEPTION("Null resource cache for UI element");
+        EXCEPTION("Null resource cache for UI element");
     
     if (element.hasChildElement("position"))
         setPosition(element.getChildElement("position").getIntVector2("value"));
