@@ -29,14 +29,16 @@
 //! An image with hotspot coordinates
 class Cursor : public BorderImage
 {
+    DEFINE_TYPE(Cursor);
+    
 public:
     //! Construct with name
     Cursor(const std::string& name = std::string());
     //! Destruct
     virtual ~Cursor();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI element screen position
     virtual IntVector2 getScreenPosition();
     

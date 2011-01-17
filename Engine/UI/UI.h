@@ -31,8 +31,9 @@
 class Cursor;
 class Renderer;
 class ResourceCache;
-class UIElement;
 class UIBatch;
+class UIElement;
+class UIElementFactory;
 
 //! Manages the graphical user interface
 class UI : public RefCounted, public EventListener
@@ -53,6 +54,12 @@ public:
     void update(float timeStep);
     //! Render the UI
     void render();
+    //! Add a UI element factory
+    void addElementFactory(UIElementFactory* factory);
+    //! Create a UI element by type. Throw exception if can not create
+    SharedPtr<UIElement> createElement(ShortStringHash type, const std::string& name = std::string());
+    //! Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element
+    SharedPtr<UIElement> loadLayout(XMLFile* file, XMLFile* styleFile = 0);
     
     //! Return root UI elemenet
     UIElement* getRootElement() const { return mRootElement; }
@@ -66,6 +73,8 @@ public:
     UIElement* getFocusElement();
     //! Return cursor position
     IntVector2 getCursorPosition();
+    //! Return UI element factories
+    const std::vector<SharedPtr<UIElementFactory> >& getElementFactories() const { return mFactories; }
     
 private:
     //! Update UI elements and generate batches for UI rendering
@@ -88,6 +97,8 @@ private:
     void handleMouseButtonUp(StringHash eventType, VariantMap& eventData);
     //! Handle character event
     void handleChar(StringHash eventType, VariantMap& eventData);
+    //! Load a UI layout from an XML file recursively
+    void loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile);
     
     //! Renderer
     SharedPtr<Renderer> mRenderer;
@@ -107,6 +118,8 @@ private:
     SharedPtr<UIElement> mRootElement;
     //! Cursor
     SharedPtr<Cursor> mCursor;
+    //! UI element factories
+    std::vector<SharedPtr<UIElementFactory> > mFactories;
     //! UI rendering batches
     std::vector<UIBatch> mBatches;
     //! UI rendering quads

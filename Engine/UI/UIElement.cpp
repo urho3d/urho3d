@@ -37,6 +37,7 @@ UIElement::UIElement(const std::string& name) :
     mSize(IntVector2::sZero),
     mHorizontalAlignment(HA_LEFT),
     mVerticalAlignment(VA_TOP),
+    mChildOffset(IntVector2::sZero),
     mHoverColor(Color(0.0f, 0.0f, 0.0f)),
     mPriority(0),
     mOpacity(1.0f),
@@ -68,33 +69,18 @@ UIElement::~UIElement()
     }
 }
 
-XMLElement UIElement::loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache)
+void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!file)
-        SAFE_EXCEPTION_RET("Null UI definition file", XMLElement());
     if (!cache)
-        SAFE_EXCEPTION_RET("Null resource cache", XMLElement());
+        SAFE_EXCEPTION("Null resource cache for UI element");
     
-    XMLElement rootElem = file->getRootElement();
-    XMLElement paramElem = rootElem.getChildElement("element", false);
-    
-    while (paramElem.notNull())
+    if (element.hasChildElement("position"))
+        setPosition(element.getChildElement("position").getIntVector2("value"));
+    if (element.hasChildElement("size"))
+        setSize(element.getChildElement("size").getIntVector2("value"));
+    if (element.hasChildElement("alignment"))
     {
-        if (paramElem.getString("name") == elementName)
-            break;
-        paramElem = paramElem.getNextElement("element");
-    }
-    
-    if (paramElem.isNull())
-        SAFE_EXCEPTION_RET("No UI element definition " + elementName + " in " + file->getName(), XMLElement());
-    
-    if (paramElem.hasChildElement("position"))
-        setPosition(paramElem.getChildElement("position").getIntVector2("value"));
-    if (paramElem.hasChildElement("size"))
-        setSize(paramElem.getChildElement("size").getIntVector2("value"));
-    if (paramElem.hasChildElement("alignment"))
-    {
-        XMLElement alignElem = paramElem.getChildElement("alignment");
+        XMLElement alignElem = element.getChildElement("alignment");
         
         std::string horiz;
         std::string vert;
@@ -119,13 +105,13 @@ XMLElement UIElement::loadParameters(XMLFile* file, const std::string& elementNa
         if (vert == "bottom")
             setVerticalAlignment(VA_BOTTOM);
     }
-    if (paramElem.hasChildElement("priority"))
-        setPriority(paramElem.getChildElement("priority").getInt("value"));
-    if (paramElem.hasChildElement("opacity"))
-        setOpacity(paramElem.getChildElement("opacity").getFloat("value"));
-    if (paramElem.hasChildElement("color"))
+    if (element.hasChildElement("priority"))
+        setPriority(element.getChildElement("priority").getInt("value"));
+    if (element.hasChildElement("opacity"))
+        setOpacity(element.getChildElement("opacity").getFloat("value"));
+    if (element.hasChildElement("color"))
     {
-        XMLElement colorElem = paramElem.getChildElement("color");
+        XMLElement colorElem = element.getChildElement("color");
         if (colorElem.hasAttribute("value"))
             setColor(colorElem.getColor("value"));
         if (colorElem.hasAttribute("topleft"))
@@ -137,20 +123,18 @@ XMLElement UIElement::loadParameters(XMLFile* file, const std::string& elementNa
         if (colorElem.hasAttribute("bottomright"))
             setColor(C_BOTTOMRIGHT, colorElem.getColor("bottomright"));
     }
-    if (paramElem.hasChildElement("hovercolor"))
-        setHoverColor(paramElem.getChildElement("hovercolor").getColor("value"));
-    if (paramElem.hasChildElement("bringtofront"))
-        setBringToFront(paramElem.getChildElement("bringtofront").getBool("enable"));
-    if (paramElem.hasChildElement("clipchildren"))
-        setClipChildren(paramElem.getChildElement("clipchildren").getBool("enable"));
-    if (paramElem.hasChildElement("enabled"))
-        setEnabled(paramElem.getChildElement("enabled").getBool("enable"));
-    if (paramElem.hasChildElement("focusable"))
-        setFocusable(paramElem.getChildElement("focusable").getBool("enable"));
-    if (paramElem.hasChildElement("visible"))
-        setVisible(paramElem.getChildElement("visible").getBool("enable"));
-    
-    return paramElem;
+    if (element.hasChildElement("hovercolor"))
+        setHoverColor(element.getChildElement("hovercolor").getColor("value"));
+    if (element.hasChildElement("bringtofront"))
+        setBringToFront(element.getChildElement("bringtofront").getBool("enable"));
+    if (element.hasChildElement("clipchildren"))
+        setClipChildren(element.getChildElement("clipchildren").getBool("enable"));
+    if (element.hasChildElement("enabled"))
+        setEnabled(element.getChildElement("enabled").getBool("enable"));
+    if (element.hasChildElement("focusable"))
+        setFocusable(element.getChildElement("focusable").getBool("enable"));
+    if (element.hasChildElement("visible"))
+        setVisible(element.getChildElement("visible").getBool("enable"));
 }
 
 void UIElement::update(float timeStep)
@@ -159,6 +143,7 @@ void UIElement::update(float timeStep)
 
 void UIElement::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
+    // Reset hovering for next frame
     mHovering = false;
 }
 
@@ -200,6 +185,8 @@ IntVector2 UIElement::getScreenPosition()
                 pos.mY += parent->mPosition.mY + parent->mSize.mY - current->mSize.mY;
                 break;
             }
+            
+            pos += parent->mChildOffset;
             
             current = parent;
             parent = parent->mParent;
@@ -397,6 +384,12 @@ void UIElement::setVisible(bool enable)
     mVisible = enable;
 }
 
+void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
+{
+    XMLElement element = getStyleElement(file);
+    setStyle(element, cache);
+}
+
 void UIElement::addChild(UIElement* element)
 {
     if ((!element) || (element->mParent == this) || (mParent == element))
@@ -495,6 +488,23 @@ UIElement* UIElement::getChild(const std::string& name, bool recursive) const
     return 0;
 }
 
+XMLElement UIElement::getStyleElement(XMLFile* file) const
+{
+    if (file)
+    {
+        XMLElement rootElem = file->getRootElement();
+        XMLElement childElem = rootElem.getChildElement("element", false);
+        while (childElem)
+        {
+            if (childElem.getString("type", false) == getTypeName())
+                return childElem;
+            childElem = childElem.getNextElement("element");
+        }
+    }
+    
+    return XMLElement();
+}
+
 IntVector2 UIElement::screenToElement(const IntVector2& screenPosition)
 {
     return screenPosition - getScreenPosition();
@@ -517,6 +527,23 @@ void UIElement::adjustScissor(IntRect& currentScissor)
     }
 }
 
+XMLElement UIElement::getStyleElement(XMLFile* file, const std::string& typeName)
+{
+    if (file)
+    {
+        XMLElement rootElem = file->getRootElement();
+        XMLElement childElem = rootElem.getChildElement("element", false);
+        while (childElem)
+        {
+            if (childElem.getString("type", false) == typeName)
+                return childElem;
+            childElem = childElem.getNextElement("element");
+        }
+    }
+    
+    return XMLElement();
+}
+
 void UIElement::markDirty()
 {
     if ((mScreenPositionDirty) && (mDerivedOpacityDirty))
@@ -527,6 +554,16 @@ void UIElement::markDirty()
     
     for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
         (*i)->markDirty();
+}
+
+void UIElement::setChildOffset(const IntVector2& offset)
+{
+    if (offset != mChildOffset)
+    {
+        mChildOffset = offset;
+        for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+            (*i)->markDirty();
+    }
 }
 
 void UIElement::getChildrenRecursive(std::vector<UIElement*>& dest) const

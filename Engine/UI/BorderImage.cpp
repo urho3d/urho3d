@@ -30,8 +30,9 @@
 
 BorderImage::BorderImage(const std::string& name) :
     UIElement(name),
-    mImageRect(0, 0, 0, 0),
-    mBorder(0, 0, 0, 0)
+    mImageRect(IntRect::sZero),
+    mBorder(IntRect::sZero),
+    mHoverOffset(IntVector2::sZero)
 {
 }
 
@@ -39,18 +40,21 @@ BorderImage::~BorderImage()
 {
 }
 
-XMLElement BorderImage::loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache)
+void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    XMLElement paramElem = UIElement::loadParameters(file, elementName, cache);
+    if (!cache)
+        SAFE_EXCEPTION("Null resource cache for UI element");
     
-    if (paramElem.hasChildElement("texture"))
-        setTexture(cache->getResource<Texture2D>(paramElem.getChildElement("texture").getString("name")));
-    if (paramElem.hasChildElement("imagerect"))
-        setImageRect(paramElem.getChildElement("imagerect").getIntRect("value"));
-    if (paramElem.hasChildElement("border"))
-        setBorder(paramElem.getChildElement("border").getIntRect("value"));
+    UIElement::setStyle(element, cache);
     
-    return paramElem;
+    if (element.hasChildElement("texture"))
+        setTexture(cache->getResource<Texture2D>(element.getChildElement("texture").getString("name")));
+    if (element.hasChildElement("imagerect"))
+        setImageRect(element.getChildElement("imagerect").getIntRect("value"));
+    if (element.hasChildElement("border"))
+        setBorder(element.getChildElement("border").getIntRect("value"));
+    if (element.hasChildElement("hoveroffset"))
+        setHoverOffset(element.getChildElement("hoveroffset").getIntVector2("value"));
 }
 
 void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -69,31 +73,35 @@ void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>&
     IntVector2 innerTextureSize(
         max(mImageRect.mRight - mImageRect.mLeft - mBorder.mLeft - mBorder.mRight, 0),
         max(mImageRect.mBottom - mImageRect.mTop - mBorder.mTop - mBorder.mBottom, 0));
-
+    
+    IntVector2 topLeft(mImageRect.mLeft, mImageRect.mTop);
+    if (mHovering)
+        topLeft += mHoverOffset;
+    
     // Top
     if (mBorder.mTop)
     {
         if (mBorder.mLeft)
-            batch.addQuad(*this, 0, 0, mBorder.mLeft, mBorder.mTop, mImageRect.mLeft, mImageRect.mTop);
+            batch.addQuad(*this, 0, 0, mBorder.mLeft, mBorder.mTop, topLeft.mX, topLeft.mY);
         if (innerSize.mX)
             batch.addQuad(*this, mBorder.mLeft, 0, innerSize.mX, mBorder.mTop,
-            mImageRect.mLeft + mBorder.mLeft, mImageRect.mTop, innerTextureSize.mX, mBorder.mTop);
+            topLeft.mX + mBorder.mLeft, topLeft.mY, innerTextureSize.mX, mBorder.mTop);
         if (mBorder.mRight)
             batch.addQuad(*this, mBorder.mLeft + innerSize.mX, 0, mBorder.mRight, mBorder.mTop,
-            mImageRect.mLeft + mBorder.mLeft + innerTextureSize.mX, mImageRect.mTop);
+            topLeft.mX + mBorder.mLeft + innerTextureSize.mX, topLeft.mY);
     }
     // Middle
     if (innerSize.mY)
     {
         if (mBorder.mLeft)
             batch.addQuad(*this, 0, mBorder.mTop, mBorder.mLeft, innerSize.mY,
-            mImageRect.mLeft, mImageRect.mTop + mBorder.mTop, mBorder.mLeft, innerTextureSize.mY);
+            topLeft.mX, topLeft.mY + mBorder.mTop, mBorder.mLeft, innerTextureSize.mY);
         if (innerSize.mX)
             batch.addQuad(*this, mBorder.mLeft, mBorder.mTop, innerSize.mX, innerSize.mY,
-            mImageRect.mLeft + mBorder.mLeft, mImageRect.mTop + mBorder.mTop, innerTextureSize.mX, innerTextureSize.mY);
+            topLeft.mX + mBorder.mLeft, topLeft.mY + mBorder.mTop, innerTextureSize.mX, innerTextureSize.mY);
         if (mBorder.mRight)
             batch.addQuad(*this, mBorder.mLeft + innerSize.mX, mBorder.mTop, mBorder.mRight,
-            innerSize.mY, mImageRect.mLeft + mBorder.mLeft + innerTextureSize.mX, mImageRect.mTop + mBorder.mTop,
+            innerSize.mY, topLeft.mX + mBorder.mLeft + innerTextureSize.mX, topLeft.mY + mBorder.mTop,
             mBorder.mRight, innerTextureSize.mY);
     }
     // Bottom
@@ -101,18 +109,21 @@ void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>&
     {
         if (mBorder.mLeft)
             batch.addQuad(*this, 0, mBorder.mTop + innerSize.mY, mBorder.mLeft, mBorder.mBottom,
-            mImageRect.mLeft, mImageRect.mTop + mBorder.mTop + innerTextureSize.mY);
+            topLeft.mX, topLeft.mY + mBorder.mTop + innerTextureSize.mY);
         if (innerSize.mX)
             batch.addQuad(*this, mBorder.mLeft, mBorder.mTop + innerSize.mY, innerSize.mX,
-            mBorder.mBottom, mImageRect.mLeft + mBorder.mLeft, mImageRect.mTop + mBorder.mTop + innerTextureSize.mY,
+            mBorder.mBottom, topLeft.mX + mBorder.mLeft, topLeft.mY + mBorder.mTop + innerTextureSize.mY,
             innerTextureSize.mX, mBorder.mBottom);
         if (mBorder.mRight)
             batch.addQuad(*this, mBorder.mLeft + innerSize.mX, mBorder.mTop + innerSize.mY,
-            mBorder.mRight, mBorder.mBottom, mImageRect.mLeft + mBorder.mLeft + innerTextureSize.mX, 
-            mImageRect.mTop + mBorder.mTop + innerTextureSize.mY);
+            mBorder.mRight, mBorder.mBottom, topLeft.mX + mBorder.mLeft + innerTextureSize.mX, 
+            topLeft.mY + mBorder.mTop + innerTextureSize.mY);
     }
     
     UIBatch::addOrMerge(batch, batches);
+    
+    // Reset hovering for next frame
+    mHovering = false;
 }
 
 void BorderImage::setTexture(Texture* texture)
@@ -160,4 +171,14 @@ void BorderImage::setBorder(int left, int top, int right, int bottom)
     mBorder.mTop = max(top, 0);
     mBorder.mRight = max(right, 0);
     mBorder.mBottom = max(bottom, 0);
+}
+
+void BorderImage::setHoverOffset(const IntVector2& offset)
+{
+    mHoverOffset = offset;
+}
+
+void BorderImage::setHoverOffset(int x, int y)
+{
+    mHoverOffset = IntVector2(x, y);
 }

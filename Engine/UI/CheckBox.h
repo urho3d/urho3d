@@ -28,14 +28,16 @@
 
 class CheckBox : public BorderImage
 {
+    DEFINE_TYPE(CheckBox);
+    
 public:
     //! Construct with name
     CheckBox(const std::string& name = std::string());
     //! Destruct
     virtual ~CheckBox();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     //! React to mouse click

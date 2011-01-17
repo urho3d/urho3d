@@ -27,6 +27,7 @@
 #include "BorderImage.h"
 #include "Channel.h"
 #include "Deserializer.h"
+#include "Engine.h"
 #include "GeometryNode.h"
 #include "RegisterArray.h"
 #include "Resource.h"
@@ -331,17 +332,43 @@ template <class T> T* ConstructUIElementWithName(const std::string& name)
     return new T(name);
 }
 
+//! Template function for setting UI element style from an XML element
+template <class T> void UIElementSetStyle(const XMLElement& element, T* ptr)
+{
+    try
+    {
+        ptr->setStyle(element, getEngine()->getResourceCache());
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW(e);
+    }
+}
+
+//! Template function for setting UI element style from an XML file
+template <class T> void UIElementSetStyleAuto(XMLFile* file, T* ptr)
+{
+    try
+    {
+        ptr->setStyleAuto(file, getEngine()->getResourceCache());
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW(e);
+    }
+}
+
 //! Template function for registering a class derived from UIElement
 template <class T> void registerUIElement(asIScriptEngine* engine, const char* className)
 {
     static const std::string declFactory(std::string(className) + "@+ f()");
     static const std::string declFactoryWithName(std::string(className) + "@+ f(const string& in)");
     
-    engine->RegisterObjectType(className, 0, asOBJ_REF);
+    registerHashedType<T>(engine, className);
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactory.c_str(), asFUNCTION(ConstructUIElement<T>), asCALL_CDECL);
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.c_str(), asFUNCTION(ConstructUIElementWithName<T>), asCALL_CDECL);
-    engine->RegisterObjectBehaviour(className, asBEHAVE_ADDREF, "void f()", asMETHODPR(T, addRef, (), void), asCALL_THISCALL);
-    engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, releaseRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setStyle(const XMLElement& in)", asFUNCTION(UIElementSetStyle<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setName(const string& in)", asMETHOD(T, setName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPosition(const IntVector2& in)", asMETHODPR(T, setPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPosition(int, int)", asMETHODPR(T, setPosition, (int, int), void), asCALL_THISCALL);
@@ -371,6 +398,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "const IntVector2& getSize() const", asMETHOD(T, getSize), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getWidth() const", asMETHOD(T, getWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getHeight() const", asMETHOD(T, getHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& getChildOffset() const", asMETHOD(T, getChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "HorizontalAlignment getHorizontalAlignment() const", asMETHOD(T, getHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment getVerticalAlignment() const", asMETHOD(T, getVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& getColor(UIElementCorner) const", asMETHOD(T, getColor), asCALL_THISCALL);
@@ -389,6 +417,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getParent() const", asMETHOD(T, getParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "XMLElement getStyleElement(XMLFile@+) const", asMETHODPR(T, getStyleElement, (XMLFile*) const, XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 screenToElement(const IntVector2& in)", asMETHOD(T, screenToElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 elementToScreen(const IntVector2& in)", asMETHOD(T, elementToScreen), asCALL_THISCALL);
 }
@@ -403,9 +432,12 @@ template <class T> void registerBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "void setFullImageRect()", asMETHOD(T, setFullImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setBorder(const IntRect& in)", asMETHODPR(T, setBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setBorder(int, int, int, int)", asMETHODPR(T, setBorder, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setHoverOffset(const IntVector2& in)", asMETHODPR(T, setHoverOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setHoverOffset(int, int)", asMETHODPR(T, setHoverOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture@+ getTexture() const", asMETHOD(T, setTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getImageRect() const", asMETHOD(T, getImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getBorder() const", asMETHOD(T, getBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& getHoverOffset() const", asMETHOD(T, getHoverOffset), asCALL_THISCALL);
 }
 
 #endif // ENGINE_REGISTERTEMPLATES_H

@@ -38,18 +38,6 @@ static void registerFont(asIScriptEngine* engine)
     registerRefCasts<Resource, Font>(engine, "Resource", "Font");
 }
 
-void UIElementLoadParameters(XMLFile* file, const std::string& elementName, UIElement* ptr)
-{
-    try
-    {
-        ptr->loadParameters(file, elementName, getEngine()->getResourceCache());
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
-}
-
 static void registerUIElement(asIScriptEngine* engine)
 {
     engine->RegisterEnum("HorizontalAlignment");
@@ -69,7 +57,9 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("UIElementCorner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
     
     registerUIElement<UIElement>(engine, "UIElement");
-    engine->RegisterObjectMethod("UIElement", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
+    
+    // Register static function for getting UI style XML element
+    engine->RegisterGlobalFunction("XMLElement getStyleElement(XMLFile@+, const string& in)", asFUNCTIONPR(UIElement::getStyleElement, (XMLFile*, const std::string&), XMLElement), asCALL_CDECL);
     
     // Register Variant getPtr() for UIElement
     engine->RegisterObjectMethod("Variant", "UIElement@+ getUIElement() const", asFUNCTION(getVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
@@ -78,7 +68,6 @@ static void registerUIElement(asIScriptEngine* engine)
 static void registerText(asIScriptEngine* engine)
 {
     registerUIElement<Text>(engine, "Text");
-    engine->RegisterObjectMethod("Text", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Text", "bool setFont(Font@+, int)", asMETHOD(Text, setFont), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setMaxWidth(int)", asMETHOD(Text, setMaxWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setText(const string& in)", asMETHOD(Text, setText), asCALL_THISCALL);
@@ -98,14 +87,12 @@ static void registerText(asIScriptEngine* engine)
 static void registerBorderImage(asIScriptEngine* engine)
 {
     registerBorderImage<BorderImage>(engine, "BorderImage");
-    engine->RegisterObjectMethod("BorderImage", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     registerRefCasts<UIElement, BorderImage>(engine, "UIElement", "BorderImage");
 }
 
 static void registerCursor(asIScriptEngine* engine)
 {
     registerBorderImage<Cursor>(engine, "Cursor");
-    engine->RegisterObjectMethod("Cursor", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Cursor", "void setHotspot(const IntVector2& in)", asMETHODPR(Cursor, setHotspot, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "void setHotspot(int, int)", asMETHODPR(Cursor, setHotspot, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Cursor", "const IntVector2& getHotspot() const", asMETHOD(Cursor, getHotspot), asCALL_THISCALL);
@@ -115,17 +102,14 @@ static void registerCursor(asIScriptEngine* engine)
 static void registerButton(asIScriptEngine* engine)
 {
     registerBorderImage<Button>(engine, "Button");
-    engine->RegisterObjectMethod("Button", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Button", "void setInactiveRect(const IntRect& in)", asMETHODPR(Button, setInactiveRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setInactiveRect(int, int, int, int)", asMETHODPR(Button, setInactiveRect, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setPressedRect(const IntRect& in)", asMETHODPR(Button, setPressedRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setPressedRect(int, int, int, int)", asMETHODPR(Button, setPressedRect, (int, int, int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setLabel(UIElement@+)", asMETHOD(Button, setLabel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setLabelOffset(const IntVector2& in)", asMETHODPR(Button, setLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "void setLabelOffset(int, int)", asMETHODPR(Button, setLabelOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntRect& getInactiveRect() const", asMETHOD(Button, getInactiveRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntRect& getPressedRect() const", asMETHOD(Button, getPressedRect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "UIElement@+ getLabel() const", asMETHOD(Button, getLabel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Button", "const IntVector2& getLabelOffset() const", asMETHOD(Button, getLabelOffset), asCALL_THISCALL);
     registerRefCasts<UIElement, Button>(engine, "UIElement", "Button");
 }
@@ -133,7 +117,6 @@ static void registerButton(asIScriptEngine* engine)
 static void registerCheckBox(asIScriptEngine* engine)
 {
     registerBorderImage<CheckBox>(engine, "CheckBox");
-    engine->RegisterObjectMethod("CheckBox", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("CheckBox", "void setChecked(bool)", asMETHOD(CheckBox, setChecked), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(const IntRect& in)", asMETHODPR(CheckBox, setUncheckedRect, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(int, int, int, int)", asMETHODPR(CheckBox, setUncheckedRect, (int, int, int, int), void), asCALL_THISCALL);
@@ -148,7 +131,6 @@ static void registerCheckBox(asIScriptEngine* engine)
 static void registerWindow(asIScriptEngine* engine)
 {
     registerBorderImage<Window>(engine, "Window");
-    engine->RegisterObjectMethod("Window", "void loadParameters(XMLFile@+, const string& in)", asFUNCTION(UIElementLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Window", "void setMovable(bool)", asMETHOD(Window, setMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void setResizable(bool)", asMETHOD(Window, setResizable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void setMinSize(const IntVector2& in)", asMETHODPR(Window, setMinSize, (const IntVector2&), void), asCALL_THISCALL);
@@ -180,6 +162,53 @@ static Cursor* GetUICursor()
     return getEngine()->getUICursor();
 }
 
+static UIElement* UICreateElement(const std::string& type, const std::string& name, UI* ptr)
+{
+    try
+    {
+        SharedPtr<UIElement> element = ptr->createElement(ShortStringHash(type), name);
+        // The shared pointer will go out of scope, so have to increment the reference count
+        // (here an auto handle can not be used)
+        if (element)
+            element->addRef();
+        return element.getPtr();
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
+static UIElement* UILoadLayout(XMLFile* file, UI* ptr)
+{
+    try
+    {
+        SharedPtr<UIElement> root = ptr->loadLayout(file);
+        if (root)
+            root->addRef();
+        return root.getPtr();
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
+static UIElement* UILoadLayoutWithStyle(XMLFile* file, XMLFile* styleFile, UI* ptr)
+{
+    try
+    {
+        SharedPtr<UIElement> root = ptr->loadLayout(file, styleFile);
+        if (root)
+            root->addRef();
+        return root.getPtr();
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
 static void registerUI(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("UI", 0, asOBJ_REF);
@@ -188,6 +217,9 @@ static void registerUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "void setCursor(Cursor@+)", asMETHOD(UI, setCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void setFocusElement(UIElement@+)", asMETHOD(UI, setFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void bringToFront(UIElement@+)", asMETHOD(UI, bringToFront), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@ createElement(const string& in, const string& in)", asFUNCTION(UICreateElement), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ loadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("UI", "UIElement@ loadLayout(XMLFile@+, XMLFile@+)", asFUNCTION(UILoadLayoutWithStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@+ getRootElement() const", asMETHOD(UI, getRootElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "Cursor@+ getCursor() const", asMETHOD(UI, getCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ getElementAt(const IntVector2& in, bool)", asMETHODPR(UI, getElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);

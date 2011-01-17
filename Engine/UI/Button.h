@@ -29,14 +29,16 @@
 //! An image that reacts to mouse presses
 class Button : public BorderImage
 {
+    DEFINE_TYPE(Button);
+    
 public:
     //! Construct with name
     Button(const std::string& name = std::string());
     //! Destruct
     virtual ~Button();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Perform UI element update
     virtual void update(float timeStep);
     //! Return UI rendering batches
@@ -54,8 +56,6 @@ public:
     void setPressedRect(const IntRect& rect);
     //! Set pressed image rectangle
     void setPressedRect(int left, int top, int right, int bottom);
-    //! Set optional label UI element
-    void setLabel(UIElement* label);
     //! Set label offset on press
     void setLabelOffset(const IntVector2& offset);
     //! Set label offset on press
@@ -65,21 +65,13 @@ public:
     const IntRect& getInactiveRect() const { return mInactiveRect; }
     //! Return pressed image rectangle
     const IntRect& getPressedRect() const { return mPressedRect; }
-    //! Return label UI element
-    UIElement* getLabel() const { return mLabel; }
     //! Return label offset on press
     const IntVector2& getLabelOffset() const { return mLabelOffset; }
     
 protected:
     //! Set new pressed state
     void setPressed(bool enable);
-    //! Set offset of label depending on button press state
-    void updateLabelOffset();
     
-    //! Label UI element
-    SharedPtr<UIElement> mLabel;
-    //! Label container for offsetting
-    SharedPtr<UIElement> mLabelContainer;
     //! Inactive image rectangle
     IntRect mInactiveRect;
     //! Pressed image rectangle

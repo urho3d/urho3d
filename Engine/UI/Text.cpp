@@ -45,17 +45,34 @@ Text::~Text()
 {
 }
 
-XMLElement Text::loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache)
+void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    XMLElement paramElem = UIElement::loadParameters(file, elementName, cache);
+    if (!cache)
+        SAFE_EXCEPTION("Null resource cache for UI element");
     
-    if (paramElem.hasChildElement("font"))
+    UIElement::setStyle(element, cache);
+    
+    if (element.hasChildElement("font"))
     {
-        XMLElement fontElem = paramElem.getChildElement("font");
+        XMLElement fontElem = element.getChildElement("font");
         setFont(cache->getResource<Font>(fontElem.getString("name")), fontElem.getInt("size"));
     }
-    
-    return paramElem;
+    if (element.hasChildElement("maxwidth"))
+        setMaxWidth(element.getChildElement("maxwidth").getInt("value"));
+    if (element.hasChildElement("text"))
+        setText(element.getChildElement("text").getString("value"));
+    if (element.hasChildElement("textspacing"))
+        setTextSpacing(element.getChildElement("textspacing").getFloat("value"));
+    if (element.hasChildElement("textalignment"))
+    {
+        std::string horiz = element.getChildElement("textalignment").getStringLower("value");
+        if (horiz == "left")
+            setTextAlignment(HA_LEFT);
+        if (horiz == "center")
+            setTextAlignment(HA_CENTER);
+        if (horiz == "right")
+            setTextAlignment(HA_RIGHT);
+    }
 }
 
 bool Text::setFont(Font* font, int size)
@@ -108,7 +125,11 @@ void Text::setTextSpacing(float spacing)
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
     if (!mFont)
+    {
+        mHovering = false;
         return;
+    }
+    
     const FontFace* face = mFont->getFace(mFontSize);
     
     UIBatch batch;
@@ -142,6 +163,9 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
     }
     
     UIBatch::addOrMerge(batch, batches);
+    
+    // Reset hovering for next frame
+    mHovering = false;
 }
 
 int Text::getRowHeight() const

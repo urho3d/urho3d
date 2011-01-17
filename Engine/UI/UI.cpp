@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "BaseUIElementFactory.h"
 #include "Cursor.h"
 #include "Font.h"
 #include "InputEvents.h"
@@ -33,6 +34,7 @@
 #include "RendererEvents.h"
 #include "RendererImpl.h"
 #include "ResourceCache.h"
+#include "StringUtils.h"
 #include "Texture2D.h"
 #include "UI.h"
 #include "VertexShader.h"
@@ -74,6 +76,9 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mNoTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
     mDiffTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_DiffVCol.ps2");
     mAlphaTexturePS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_AlphaVCol.ps2");
+    
+    // Add the base element factory
+    addElementFactory(new BaseUIElementFactory());
 }
 
 UI::~UI()
@@ -237,6 +242,66 @@ void UI::render()
         
         mBatches[i].draw(mRenderer, vs, ps);
     }
+}
+
+void UI::addElementFactory(UIElementFactory* factory)
+{
+    if (!factory)
+        return;
+    
+    mFactories.push_back(SharedPtr<UIElementFactory>(factory));
+}
+
+SharedPtr<UIElement> UI::createElement(ShortStringHash type, const std::string& name)
+{
+    SharedPtr<UIElement> element;
+    
+    for (unsigned i = 0; i < mFactories.size(); ++i)
+    {
+        element = mFactories[i]->createElement(type, name);
+        if (element)
+            return element;
+    }
+    
+    EXCEPTION("Could not create unknown UI element type " + toString(type));
+}
+
+SharedPtr<UIElement> UI::loadLayout(XMLFile* file, XMLFile* styleFile)
+{
+    PROFILE(UI_LoadLayout);
+    
+    SharedPtr<UIElement> root;
+    
+    if (!file)
+    {
+        LOGERROR("Null UI layout XML file");
+        return root;
+    }
+    
+    LOGDEBUG("Loading UI layout " + file->getName());
+    
+    XMLElement rootElem = file->getRootElement();
+    XMLElement childElem = rootElem.getChildElement("element", false);
+    if (!childElem)
+    {
+        LOGERROR("No root UI element in " + file->getName());
+        return root;
+    }
+    
+    root = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name", false));
+    
+    // First set the base style from the style file if exists, then apply UI layout overrides
+    if (styleFile)
+        root->setStyleAuto(styleFile, mCache);
+    root->setStyle(childElem, mCache);
+    
+    // Load rest of the elements recursively
+    loadLayout(root, childElem, styleFile);
+    
+    if (childElem.getNextElement("element"))
+        LOGWARNING("Ignored additional root UI elements in " + file->getName());
+    
+    return root;
 }
 
 UIElement* UI::getElementAt(const IntVector2& position, bool enabledOnly)
@@ -440,4 +505,23 @@ void UI::handleChar(StringHash eventType, VariantMap& eventData)
     UIElement* element = getFocusElement();
     if (element)
         element->onChar(eventData[P_CHAR].getInt());
+}
+
+void UI::loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)
+{
+    XMLElement childElem = elem.getChildElement("element", false);
+    while (childElem)
+    {
+        SharedPtr<UIElement> child = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name", false));
+        // First set the base style from the style file if exists, then apply UI layout overrides
+        if (styleFile)
+            child->setStyleAuto(styleFile, mCache);
+        child->setStyle(childElem, mCache);
+        
+        // Add to the hierarchy and recurse
+        current->addChild(child);
+        loadLayout(child, childElem, styleFile);
+        
+        childElem = childElem.getNextElement("element");
+    }
 }

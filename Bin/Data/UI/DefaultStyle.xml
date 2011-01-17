@@ -1,21 +1,20 @@
 <elements>
-    <element name="Cursor">
+    <element type="Cursor">
         <size value="16 24" />
         <texture name="Textures/UI.png" />
         <imagerect value="0 0 16 24" />
         <hotspot value="0 0" />
     </element>
-    <element name="Button">
+    <element type="Button">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
-        <color value="0.85 0.85 0.85" />
-        <hovercolor value="0.15 0.15 0.15" />
         <inactiverect value="16 0 32 16" />
         <pressedrect value="32 0 48 16" />
         <border value="4 4 4 4" />
+        <hoveroffset value="0 16" />
         <labeloffset value="-1 1" />
     </element>
-    <element name="Window">
+    <element type="Window">
         <texture name="Textures/UI.png" />
         <imagerect value="48 0 64 16" />
         <border value="3 3 3 3" />
@@ -23,16 +22,15 @@
         <movable enable="true" />
         <resizable enable="true" />
     </element>
-    <element name="Text">
+    <element type="Text">
         <font name="Cour.ttf" size="10" />
     </element>
-    <element name="CheckBox">
+    <element type="CheckBox">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
-        <color value="0.85 0.85 0.85" />
-        <hovercolor value="0.15 0.15 0.15" />
         <uncheckedrect value="64 0 80 16" />
         <checkedrect value="80 0 96 16" />
         <border value="4 4 4 4" />
+        <hoveroffset value="0 16" />
     </element>
 </elements>

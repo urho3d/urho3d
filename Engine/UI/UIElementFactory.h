@@ -21,49 +21,20 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Cursor.h"
-#include "ResourceCache.h"
-#include "Texture.h"
+#ifndef UI_UIELEMENTFACTORY_H
+#define UI_UIELEMENTFACTORY_H
 
-#include "DebugNew.h"
+#include "RefCount.h"
+#include "StringHash.h"
 
-Cursor::Cursor(const std::string& name) :
-    BorderImage(name),
-    mHotspot(IntVector2::sZero)
+class UIElement;
+
+//! Base class for UI element factories
+class UIElementFactory : public RefCounted
 {
-    // Show on top of all other UI elements
-    mPriority = M_MAX_INT;
-}
+public:
+    //! Create a UI element of the specified type. Return null if can not create
+    virtual UIElement* createElement(ShortStringHash type, const std::string& name = std::string()) = 0;
+};
 
-Cursor::~Cursor()
-{
-}
-
-void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
-{
-    if (!cache)
-        SAFE_EXCEPTION("Null resource cache for UI element");
-    
-    BorderImage::setStyle(element, cache);
-    
-    if (element.hasChildElement("hotspot"))
-        setHotspot(element.getChildElement("hotspot").getIntVector2("value"));
-}
-
-IntVector2 Cursor::getScreenPosition()
-{
-    IntVector2 pos = UIElement::getScreenPosition();
-    pos -= mHotspot;
-    return pos;
-}
-
-void Cursor::setHotspot(const IntVector2& hotspot)
-{
-    mHotspot = hotspot;
-}
-
-void Cursor::setHotspot(int x, int y)
-{
-    setHotspot(IntVector2(x, y));
-}
+#endif // UI_UIELEMENTFACTORY

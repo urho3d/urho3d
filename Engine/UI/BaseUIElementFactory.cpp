@@ -22,48 +22,29 @@
 //
 
 #include "Precompiled.h"
+#include "BaseUIElementFactory.h"
+#include "Button.h"
+#include "CheckBox.h"
 #include "Cursor.h"
-#include "ResourceCache.h"
-#include "Texture.h"
+#include "Text.h"
+#include "Window.h"
 
-#include "DebugNew.h"
-
-Cursor::Cursor(const std::string& name) :
-    BorderImage(name),
-    mHotspot(IntVector2::sZero)
+UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::string& name)
 {
-    // Show on top of all other UI elements
-    mPriority = M_MAX_INT;
-}
-
-Cursor::~Cursor()
-{
-}
-
-void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
-{
-    if (!cache)
-        SAFE_EXCEPTION("Null resource cache for UI element");
+    if (type == BorderImage::getTypeStatic())
+        return new BorderImage(name);
+    if (type == Button::getTypeStatic())
+        return new Button(name);
+    if (type == CheckBox::getTypeStatic())
+        return new CheckBox(name);
+    if (type == Cursor::getTypeStatic())
+        return new Cursor(name);
+    if (type == Text::getTypeStatic())
+        return new Text(std::string(), name);
+    if (type == UIElement::getTypeStatic())
+        return new UIElement(name);
+    if (type == Window::getTypeStatic())
+        return new Window(name);
     
-    BorderImage::setStyle(element, cache);
-    
-    if (element.hasChildElement("hotspot"))
-        setHotspot(element.getChildElement("hotspot").getIntVector2("value"));
-}
-
-IntVector2 Cursor::getScreenPosition()
-{
-    IntVector2 pos = UIElement::getScreenPosition();
-    pos -= mHotspot;
-    return pos;
-}
-
-void Cursor::setHotspot(const IntVector2& hotspot)
-{
-    mHotspot = hotspot;
-}
-
-void Cursor::setHotspot(int x, int y)
-{
-    setHotspot(IntVector2(x, y));
+    return 0;
 }

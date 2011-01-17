@@ -32,8 +32,8 @@
 
 CheckBox::CheckBox(const std::string& name) :
     BorderImage(name),
-    mUncheckedRect(0, 0, 0, 0),
-    mCheckedRect(0, 0, 0, 0),
+    mUncheckedRect(IntRect::sZero),
+    mCheckedRect(IntRect::sZero),
     mChecked(false)
 {
     mEnabled = true;
@@ -43,16 +43,17 @@ CheckBox::~CheckBox()
 {
 }
 
-XMLElement CheckBox::loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache)
+void CheckBox::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    XMLElement paramElem = BorderImage::loadParameters(file, elementName, cache);
+    if (!cache)
+        SAFE_EXCEPTION("Null resource cache for UI element");
     
-    if (paramElem.hasChildElement("uncheckedrect"))
-        setUncheckedRect(paramElem.getChildElement("uncheckedrect").getIntRect("value"));
-    if (paramElem.hasChildElement("checkedrect"))
-        setCheckedRect(paramElem.getChildElement("checkedrect").getIntRect("value"));
+    BorderImage::setStyle(element, cache);
     
-    return paramElem;
+    if (element.hasChildElement("uncheckedrect"))
+        setUncheckedRect(element.getChildElement("uncheckedrect").getIntRect("value"));
+    if (element.hasChildElement("checkedrect"))
+        setCheckedRect(element.getChildElement("checkedrect").getIntRect("value"));
 }
 
 void CheckBox::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -63,7 +64,6 @@ void CheckBox::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& qu
         mImageRect = mUncheckedRect;
     
     BorderImage::getBatches(batches, quads, currentScissor);
-    mHovering = false;
 }
 
 void CheckBox::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)

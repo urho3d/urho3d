@@ -1476,7 +1476,7 @@ void Renderer::setScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         }
     }
     else
-        mScissorRect = IntRect(0, 0, 0, 0);
+        mScissorRect = IntRect::sZero;
     
     if (enable != mScissorTest)
     {
@@ -1528,7 +1528,7 @@ void Renderer::setScissorTest(bool enable, const IntRect& rect)
         }
     }
     else
-        mScissorRect = IntRect(0, 0, 0, 0);
+        mScissorRect = IntRect::sZero;
     
     if (enable != mScissorTest)
     {
@@ -2182,7 +2182,7 @@ void Renderer::resetCachedState()
     mDepthWrite = true;
     mFillMode = FILL_SOLID;
     mScissorTest = false;
-    mScissorRect = IntRect(0, 0, 0, 0);
+    mScissorRect = IntRect::sZero;
     mStencilTest = false;
     mStencilTestMode = CMP_ALWAYS;
     mStencilPass = OP_KEEP;

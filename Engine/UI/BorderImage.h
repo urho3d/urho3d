@@ -32,14 +32,16 @@ class Texture2D;
 //! An UI element with an image that optionally has a border
 class BorderImage : public UIElement
 {
+    DEFINE_TYPE(BorderImage);
+    
 public:
     //! Construct with name
     BorderImage(const std::string& name = std::string());
     //! Destruct
     virtual ~BorderImage();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     
@@ -55,6 +57,10 @@ public:
     void setBorder(const IntRect& rect);
     //! Set image border dimensions
     void setBorder(int left, int top, int right, int bottom);
+    //! Set offset to image rectangle used on hover
+    void setHoverOffset(const IntVector2& offset);
+    //! Set offset to image rectangle used on hover
+    void setHoverOffset(int x, int y);
     
     //! Return texture
     Texture* getTexture() const { return mTexture; }
@@ -62,6 +68,8 @@ public:
     const IntRect& getImageRect() const { return mImageRect; }
     //! Return image border dimensions
     const IntRect& getBorder() const { return mBorder; }
+    //! Return offset to image rectangle used on hover
+    const IntVector2& getHoverOffset() const { return mHoverOffset; }
     
 protected:
     //! Texture
@@ -70,6 +78,8 @@ protected:
     IntRect mImageRect;
     //! Image border dimensions
     IntRect mBorder;
+    //! Offset to image rectangle on hover
+    IntVector2 mHoverOffset;
 };
 
 #endif // UI_BORDERIMAGE_H

@@ -46,14 +46,16 @@ enum WindowDragMode
 //! Window that can optionally by moved or resized
 class Window : public BorderImage
 {
+    DEFINE_TYPE(Window);
+    
 public:
     //! Construct with name
     Window(const std::string& name = std::string());
     //! Destruct
     virtual ~Window();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! React to mouse drag start
     virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     //! React to mouse drag motion

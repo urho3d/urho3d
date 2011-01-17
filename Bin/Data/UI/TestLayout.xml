@@ -1,0 +1,11 @@
+<layout>
+    <element type="Button">
+        <size value="100 40" />
+        <alignment horizontal="center" vertical="center" />
+        <element type="Text">
+            <text value="TEST" />
+            <font name="cour.ttf" size="12" />
+            <alignment horizontal="center" vertical="center" />
+        </element>
+    </element>
+</layout>

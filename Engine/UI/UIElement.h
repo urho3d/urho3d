@@ -25,6 +25,7 @@
 #define UI_UIELEMENT_H
 
 #include "EventListener.h"
+#include "HashedType.h"
 #include "SharedPtr.h"
 #include "UIBatch.h"
 #include "Vector2.h"
@@ -60,16 +61,18 @@ static const unsigned NUM_UIELEMENT_CORNERS = 4;
 class ResourceCache;
 
 //! Base class for UI elements
-class UIElement : public RefCounted, public EventListener
+class UIElement : public HashedType, public EventListener
 {
+    DEFINE_TYPE(UIElement);
+    
 public:
     //! Construct with name
     UIElement(const std::string& name = std::string());
     //! Destruct with name
     virtual ~UIElement();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Perform UI element update
     virtual void update(float timeStep);
     //! Return UI rendering batches
@@ -116,7 +119,7 @@ public:
     void setColor(const Color& color);
     //! Set color on one corner
     void setColor(UIElementCorner corner, const Color& color);
-    //! Set hover color modification
+    //! Set color modification used on hover
     void setHoverColor(const Color& color);
     //! Set priority
     void setPriority(int priority);
@@ -134,6 +137,8 @@ public:
     void setFocus(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);
+    //! Set style from an XML file. Find the style element automatically
+    void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Add a child element
     void addChild(UIElement* element);
     //! Remove a child element
@@ -151,13 +156,15 @@ public:
     int getWidth() const { return mSize.mX; }
     //! Return height
     int getHeight() const { return mSize.mY; }
+    //! Return child element offset
+    const IntVector2& getChildOffset() const { return mChildOffset; }
     //! Return horizontal alignment
     HorizontalAlignment getHorizontalAlignment() const { return mHorizontalAlignment; }
     //! Return vertical alignment
     VerticalAlignment getVerticalAlignment() const { return mVerticalAlignment; }
     //! Return corner color
     const Color& getColor(UIElementCorner corner) const { return mColor[corner]; }
-    //! Return hover color modification
+    //! Return color modification used on hover
     const Color& getHoverColor() { return mHoverColor; }
     //! Return priority
     int getPriority() const { return mPriority; }
@@ -189,6 +196,8 @@ public:
     std::vector<UIElement*> getChildren(bool recursive = false) const;
     //! Return parent element
     UIElement* getParent() const { return mParent; }
+    //! Return first matching UI style element from an XML file. If not found, return empty
+    XMLElement getStyleElement(XMLFile* file) const;
     
     //! Convert screen coordinates to element coordinates
     IntVector2 screenToElement(const IntVector2& screenPosition);
@@ -198,9 +207,14 @@ public:
     //! Adjust scissor for rendering
     void adjustScissor(IntRect& currentScissor);
     
+    //! Return first matching UI style element from an XML file, with freely specified type. If not found, return empty
+    static XMLElement getStyleElement(XMLFile* file, const std::string& typeName);
+    
 protected:
     //! Mark screen position as needing an update
     void markDirty();
+    //! Set child offset
+    void setChildOffset(const IntVector2& offset);
     
     //! Name
     std::string mName;
@@ -210,7 +224,7 @@ protected:
     UIElement* mParent;
     //! Colors
     Color mColor[NUM_UIELEMENT_CORNERS];
-    //! Hover color modification
+    //! Color modification on hover
     Color mHoverColor;
     //! Priority
     int mPriority;
@@ -239,6 +253,8 @@ private:
     IntVector2 mScreenPosition;
     //! Size
     IntVector2 mSize;
+    //! Child elements' offset. Used internally
+    IntVector2 mChildOffset;
     //! Horizontal alignment
     HorizontalAlignment mHorizontalAlignment;
     //! Vertical alignment

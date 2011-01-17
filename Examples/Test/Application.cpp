@@ -28,8 +28,6 @@
 #include "Audio.h"
 #include "Application.h"
 #include "BillboardSet.h"
-#include "Button.h"
-#include "CheckBox.h"
 #include "CollisionShape.h"
 #include "Cursor.h"
 #include "CustomObject.h"
@@ -199,29 +197,15 @@ void Application::init()
     UI* ui = mEngine->getUI();
     UIElement* uiRoot = ui->getRootElement();
     
-    XMLFile* uiSetup = mCache->getResource<XMLFile>("UI/UI.xml");
+    XMLFile* uiStyle = mCache->getResource<XMLFile>("UI/DefaultStyle.xml");
     
     Cursor* cursor = new Cursor("Cursor");
-    cursor->loadParameters(uiSetup, "Cursor", mCache);
+    cursor->setStyleAuto(uiStyle, mCache);
     cursor->setPosition(renderer->getWidth() / 2, renderer->getHeight() / 2);
     ui->setCursor(cursor);
     
-    //Button* button = new Button("TestButton");
-    //button->loadParameters(uiSetup, "Button", mCache);
-    //Text* text = new Text("TEST");
-    //text->setFont(mCache->getResource<Font>("cour.ttf"), 12);
-    //button->setLabel(text);
-    //button->setAlignment(HA_CENTER, VA_CENTER);
-    //button->setSize(100, 40);
-    //uiRoot->addChild(button);
-    //
-    //for (unsigned i = 0; i < 4; ++i)
-    //{
-    //    CheckBox* checkBox = new CheckBox("TestCheckBox" + toString(i));
-    //    checkBox->loadParameters(uiSetup, "CheckBox", mCache);
-    //    checkBox->setPosition(renderer->getWidth() / 3, renderer->getHeight() / 3 + 32 * i);
-    //    uiRoot->addChild(checkBox);
-    //}
+    //XMLFile* uiLayout = mCache->getResource<XMLFile>("UI/TestLayout.xml");
+    //uiRoot->addChild(ui->loadLayout(uiLayout, uiStyle));
     
     mScene = mEngine->createScene();
     PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();

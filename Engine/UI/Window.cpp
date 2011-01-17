@@ -49,22 +49,23 @@ Window::~Window()
 {
 }
 
-XMLElement Window::loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache)
+void Window::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    XMLElement paramElem = BorderImage::loadParameters(file, elementName, cache);
+    if (!cache)
+        SAFE_EXCEPTION("Null resource cache for UI element");
     
-    if (paramElem.hasChildElement("minsize"))
-        setMinSize(paramElem.getChildElement("minsize").getIntVector2("value"));
-    if (paramElem.hasChildElement("maxsize"))
-        setMaxSize(paramElem.getChildElement("maxsize").getIntVector2("value"));
-    if (paramElem.hasChildElement("resizeborder"))
-        setResizeBorder(paramElem.getChildElement("resizeborder").getIntRect("value"));
-    if (paramElem.hasChildElement("movable"))
-        setMovable(paramElem.getChildElement("movable").getBool("enable"));
-    if (paramElem.hasChildElement("resizable"))
-        setResizable(paramElem.getChildElement("resizable").getBool("enable"));
+    BorderImage::setStyle(element, cache);
     
-    return paramElem;
+    if (element.hasChildElement("minsize"))
+        setMinSize(element.getChildElement("minsize").getIntVector2("value"));
+    if (element.hasChildElement("maxsize"))
+        setMaxSize(element.getChildElement("maxsize").getIntVector2("value"));
+    if (element.hasChildElement("resizeborder"))
+        setResizeBorder(element.getChildElement("resizeborder").getIntRect("value"));
+    if (element.hasChildElement("movable"))
+        setMovable(element.getChildElement("movable").getBool("enable"));
+    if (element.hasChildElement("resizable"))
+        setResizable(element.getChildElement("resizable").getBool("enable"));
 }
 
 void Window::onDragStart(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)

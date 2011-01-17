@@ -33,14 +33,16 @@ class Font;
 //! An UI element that displays text
 class Text : public UIElement
 {
+    DEFINE_TYPE(Text);
+    
 public:
     //! Construct with initial text and name
     Text(const std::string& text = std::string(), const std::string& name = std::string());
     //! Destruct
     virtual ~Text();
     
-    //! Load parameters from an XML file
-    virtual XMLElement loadParameters(XMLFile* file, const std::string& elementName, ResourceCache* cache);
+    //! Set UI element style from XML data
+    virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     
