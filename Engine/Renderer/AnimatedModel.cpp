@@ -534,11 +534,8 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
         float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
         mAnimationLodDistance = frame.mCamera->getLodDistance(distance, scale, mLodBias) * ANIMATION_LOD_INVISIBLE_FACTOR;
-        LOGINFO("Invisible update");
     }
-    else
-        LOGINFO("Visible update");
-        
+    
     updateAnimation(frame);
 }
 

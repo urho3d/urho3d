@@ -325,9 +325,7 @@ void AnimationState::apply()
                 float timeInterval = nextKeyFrame->mTime - keyFrame->mTime;
                 if (timeInterval < 0.0f)
                     timeInterval += mAnimation->getLength();
-                float t = 1.0f;
-                if (timeInterval > 0.0f)
-                    t = (mTime - keyFrame->mTime) / timeInterval;
+                float t = timeInterval > 0.0f ? (mTime - keyFrame->mTime) / timeInterval : 1.0f;
                 
                 // Interpolation, full weight
                 if (channelMask & CHANNEL_POSITION)
@@ -395,9 +393,7 @@ void AnimationState::apply()
                 float timeInterval = nextKeyFrame->mTime - keyFrame->mTime;
                 if (timeInterval < 0.0f)
                     timeInterval += mAnimation->getLength();
-                float t = 1.0f;
-                if (timeInterval > 0.0f)
-                    t = (mTime - keyFrame->mTime) / timeInterval;
+                float t = timeInterval > 0.0f ? (mTime - keyFrame->mTime) / timeInterval : 1.0f;
                 
                 // Interpolation, blend between old transform & animation
                 if (channelMask & CHANNEL_POSITION)
