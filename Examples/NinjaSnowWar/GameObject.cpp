@@ -339,7 +339,8 @@ void GameObject::enableAnim(const std::string& name, bool restart)
     else
     {
         AnimationState* state = model->addAnimationState(getAnim(name));
-        state->setWeight(1.0f);
+        if (state)
+            state->setWeight(1.0f);
     }
 }
 
@@ -370,11 +371,13 @@ void GameObject::enableOnlyAnimSmooth(const std::string& name, bool restart, flo
     AnimationState* state = model->getAnimationState(name);
     if (!state)
         state = model->addAnimationState(getAnim(name));
-    if (restart)
-        state->setTime(0.0f);
-    
-    // Increase weight of the animation we're activating, start from 0 if was disabled
-    state->addWeight(time);
+    if (state)
+    {
+        if (restart)
+            state->setTime(0.0f);
+        // Increase weight of the animation we're activating, start from 0 if was disabled
+        state->addWeight(time);
+    }
     
     // Decrease weight of all the rest, until at weight 0 and can be disabled
     std::vector<AnimationState*> states = model->getAnimationStates();

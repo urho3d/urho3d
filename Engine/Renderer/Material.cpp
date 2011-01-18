@@ -342,8 +342,8 @@ void Material::load(Deserializer& source, ResourceCache* cache)
     
     XMLElement rootElem = xml.getRootElement();
     // Check for base material and inherit all settings, techniques and passes
-    XMLElement baseElem = rootElem.getChildElement("base", false);
-    if (baseElem.notNull())
+    XMLElement baseElem = rootElem.getChildElement("base");
+    if (baseElem)
     {
         Material* baseMaterial = cache->getResource<Material>(baseElem.getString("name"));
         mTechniques = baseMaterial->mTechniques;
@@ -358,9 +358,9 @@ void Material::load(Deserializer& source, ResourceCache* cache)
     else
         mTechniques.clear();
     
-    XMLElement techniqueElem = rootElem.getChildElement("technique", false);
+    XMLElement techniqueElem = rootElem.getChildElement("technique");
     unsigned index = 0;
-    while (techniqueElem.notNull())
+    while (techniqueElem)
     {
         if (mTechniques.size() < index + 1)
             setNumTechniques(index + 1);
@@ -374,8 +374,8 @@ void Material::load(Deserializer& source, ResourceCache* cache)
         if (techniqueElem.hasAttribute("sm3"))
             newTechnique.setRequireSM3(techniqueElem.getBool("sm3"));
         
-        XMLElement textureElem = techniqueElem.getChildElement("texture", false);
-        while (textureElem.notNull())
+        XMLElement textureElem = techniqueElem.getChildElement("texture");
+        while (textureElem)
         {
             TextureUnit unit = TU_DIFFUSE;
             if (textureElem.hasAttribute("unit"))
@@ -403,8 +403,8 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             textureElem = textureElem.getNextElement("texture");
         }
         
-        XMLElement parameterElem = techniqueElem.getChildElement("parameter", false);
-        while (parameterElem.notNull())
+        XMLElement parameterElem = techniqueElem.getChildElement("parameter");
+        while (parameterElem)
         {
             std::string name = parameterElem.getString("name");
             Vector4 value = parameterElem.getVector("value");
@@ -423,8 +423,8 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             parameterElem = parameterElem.getNextElement("parameter");
         }
         
-        XMLElement passElem = techniqueElem.getChildElement("pass", false);
-        while (passElem.notNull())
+        XMLElement passElem = techniqueElem.getChildElement("pass");
+        while (passElem)
         {
             PassType type = MAX_PASSES;
             if (passElem.hasAttribute("name"))

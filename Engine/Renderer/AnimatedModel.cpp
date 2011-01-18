@@ -171,8 +171,8 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement modelElem = source.getChildElement("model");
     setModel(cache->getResource<Model>(modelElem.getString("name")));
     
-    XMLElement materialElem = source.getChildElement("material", false);
-    while (materialElem.notNull())
+    XMLElement materialElem = source.getChildElement("material");
+    while (materialElem)
     {
         unsigned index = materialElem.getInt("index");
         setMaterial(index, cache->getResource<Material>(materialElem.getString("name")));
@@ -183,8 +183,8 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement lodElem = source.getChildElement("lod");
     mAnimationLodBias = lodElem.getFloat("animlodbias");
     removeAllAnimationStates();
-    XMLElement animationElem = source.getChildElement("animation", false);
-    while (animationElem.notNull())
+    XMLElement animationElem = source.getChildElement("animation");
+    while (animationElem)
     {
         AnimationState* newState = addAnimationState(cache->getResource<Animation>(animationElem.getString("name")));
         newState->loadXML(animationElem);
@@ -192,8 +192,8 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     }
     
     // Read morph properties
-    XMLElement morphElem = source.getChildElement("morph", false);
-    while (morphElem.notNull())
+    XMLElement morphElem = source.getChildElement("morph");
+    while (morphElem)
     {
         unsigned index = morphElem.getInt("index");
         setMorphWeight(index, morphElem.getFloat("weight"));
@@ -534,8 +534,11 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
         float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
         mAnimationLodDistance = frame.mCamera->getLodDistance(distance, scale, mLodBias) * ANIMATION_LOD_INVISIBLE_FACTOR;
+        LOGINFO("Invisible update");
     }
-    
+    else
+        LOGINFO("Visible update");
+        
     updateAnimation(frame);
 }
 

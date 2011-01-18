@@ -228,7 +228,7 @@ void ComponentRef::readXML(const XMLElement& source)
     if (source)
     {
         mEntityID = source.getInt("id");
-        mHash = ShortStringHash(source.getString("type")) + ShortStringHash(source.getString("name", false));
+        mHash = ShortStringHash(source.getString("type")) + ShortStringHash(source.getString("name"));
     }
     else
     {

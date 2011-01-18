@@ -81,20 +81,11 @@ XMLElement XMLFile::createRootElement(const std::string& name)
     return getRootElement();
 }
 
-XMLElement XMLFile::getRootElement(const std::string& name, bool throwIfMissing) const
+XMLElement XMLFile::getRootElement(const std::string& name) const
 {
     XMLElement rootElem = XMLElement(mDocument->RootElement());
     
-    if ((rootElem.isNull()) && (throwIfMissing))
-        SAFE_EXCEPTION_RET("No root XML element", XMLElement());
-    
-    if ((!name.empty()) && (rootElem.notNull()) && (rootElem.getName() != name))
-    {
-        if (throwIfMissing)
-            SAFE_EXCEPTION_RET("XML document has no root element " + name, XMLElement())
-        else
-            rootElem = XMLElement();
-    }
-    
+    if ((rootElem.isNull()) || ((!name.empty()) && (rootElem.getName() != name)))
+        return XMLElement();
     return rootElem;
 }

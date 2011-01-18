@@ -169,9 +169,9 @@ void ParticleEmitter::loadXML(const XMLElement& source, ResourceCache* cache)
     mActive = emitterElem.getBool("active");
     setNumParticles(getNumBillboards());
     
-    XMLElement particleElem = source.getChildElement("particle", false);
+    XMLElement particleElem = source.getChildElement("particle");
     unsigned index = 0;
-    while ((particleElem.notNull()) && (index < mParticles.size()))
+    while ((particleElem) && (index < mParticles.size()))
     {
         Particle& particle = mParticles[index];
         particle.mVelocity = particleElem.getVector3("velocity");
@@ -439,7 +439,7 @@ void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
     {
         std::vector<ColorFade> fades;
         XMLElement colorFadeElem = rootElem.getChildElement("colorfade");
-        while (colorFadeElem.notNull())
+        while (colorFadeElem)
         {
             ColorFade fade;
             fade.mColor = colorFadeElem.getColor("color");

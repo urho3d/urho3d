@@ -184,9 +184,9 @@ public:
     //! Return the default spotlight attenuation texture
     Texture* getDefaultLightSpot() const { return mDefaultLightSpot; }
     //! Return a vertex shader by name
-    VertexShader* getVertexShader(const std::string& name) const;
+    VertexShader* getVertexShader(const std::string& name, bool checkExists = false) const;
     //! Return a pixel shader by name
-    PixelShader* getPixelShader(const std::string& name) const;
+    PixelShader* getPixelShader(const std::string& name, bool checkExists = false) const;
     //! Return the renderer subsystem
     Renderer* getRenderer() const { return mRenderer; }
     

@@ -493,10 +493,10 @@ XMLElement UIElement::getStyleElement(XMLFile* file) const
     if (file)
     {
         XMLElement rootElem = file->getRootElement();
-        XMLElement childElem = rootElem.getChildElement("element", false);
+        XMLElement childElem = rootElem.getChildElement("element");
         while (childElem)
         {
-            if (childElem.getString("type", false) == getTypeName())
+            if (childElem.getString("type") == getTypeName())
                 return childElem;
             childElem = childElem.getNextElement("element");
         }
@@ -532,10 +532,10 @@ XMLElement UIElement::getStyleElement(XMLFile* file, const std::string& typeName
     if (file)
     {
         XMLElement rootElem = file->getRootElement();
-        XMLElement childElem = rootElem.getChildElement("element", false);
+        XMLElement childElem = rootElem.getChildElement("element");
         while (childElem)
         {
-            if (childElem.getString("type", false) == typeName)
+            if (childElem.getString("type") == typeName)
                 return childElem;
             childElem = childElem.getNextElement("element");
         }

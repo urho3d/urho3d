@@ -157,10 +157,10 @@ void VertexShader::loadParameters(ResourceCache* cache)
     
     // Update (global) parameter register mappings
     XMLElement shadersElem = xml->getRootElement();
-    XMLElement paramsElem = shadersElem.getChildElement("vsparameters", false);
-    XMLElement paramElem = paramsElem.getChildElement("parameter", false);
+    XMLElement paramsElem = shadersElem.getChildElement("vsparameters");
+    XMLElement paramElem = paramsElem.getChildElement("parameter");
     
-    while (paramElem.notNull())
+    while (paramElem)
     {
         std::string name = paramElem.getString("name");
         if (sParameters.find(name) == sParameters.end())
@@ -172,8 +172,8 @@ void VertexShader::loadParameters(ResourceCache* cache)
     }
     
     // Get parameters and texture units used by this shader
-    XMLElement shaderElem = shadersElem.getChildElement("shader", false);
-    while (shaderElem.notNull())
+    XMLElement shaderElem = shadersElem.getChildElement("shader");
+    while (shaderElem)
     {
         std::string name = shaderElem.getString("name");
         std::string type = shaderElem.getStringLower("type");
@@ -183,8 +183,8 @@ void VertexShader::loadParameters(ResourceCache* cache)
             for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
                 mUseParameter[i] = false;
             
-            XMLElement shaderParamElem = shaderElem.getChildElement("parameter", false);
-            while (shaderParamElem.notNull())
+            XMLElement shaderParamElem = shaderElem.getChildElement("parameter");
+            while (shaderParamElem)
             {
                 std::string name = shaderParamElem.getString("name");
                 mUseParameter[sParameters[name]] = true;

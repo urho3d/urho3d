@@ -115,7 +115,7 @@ void Scene::interpolate(float timeStep)
     }
 }
 
-void Scene::save(Serializer& dest, bool throwOnError)
+void Scene::save(Serializer& dest)
 {
     // Write scene name
     dest.writeString(mName);
@@ -139,8 +139,6 @@ void Scene::save(Serializer& dest, bool throwOnError)
         }
         catch (...)
         {
-            if (throwOnError)
-                throw;
             // Something went wrong. Save a zero length buffer
             LOGERROR("Failed to save entity " + toString(entity->getID()));
             dest.writeVLE(0);
@@ -148,7 +146,7 @@ void Scene::save(Serializer& dest, bool throwOnError)
     }
 }
 
-void Scene::load(Deserializer& source, bool throwOnError)
+void Scene::load(Deserializer& source)
 {
     LOGINFO("Loading scene from " + source.getName());
     
@@ -167,12 +165,12 @@ void Scene::load(Deserializer& source, bool throwOnError)
     // Read entities
     unsigned numEntities = source.readUInt();
     for (unsigned i = 0; i < numEntities; ++i)
-        loadEntity(source, throwOnError);
+        loadEntity(source);
     
-    finishLoading(source, throwOnError);
+    finishLoading(source);
 }
 
-void Scene::saveXML(Serializer& dest, bool throwOnError)
+void Scene::saveXML(Serializer& dest)
 {
     XMLFile xml;
     XMLElement sceneElem = xml.createRootElement("scene");
@@ -196,8 +194,6 @@ void Scene::saveXML(Serializer& dest, bool throwOnError)
         }
         catch (...)
         {
-            if (throwOnError)
-                throw;
             // Something went wrong. Remove the element
             sceneElem.removeChildElement("entity");
             LOGERROR("Failed to save entity " + toString(entity->getID()));
@@ -207,7 +203,7 @@ void Scene::saveXML(Serializer& dest, bool throwOnError)
     xml.save(dest);
 }
 
-void Scene::loadXML(Deserializer& source, bool throwOnError)
+void Scene::loadXML(Deserializer& source)
 {
     LOGINFO("Loading XML scene from " + source.getName());
     
@@ -222,17 +218,17 @@ void Scene::loadXML(Deserializer& source, bool throwOnError)
     removeAllEntities();
     
     // Read scene name
-    mName = sceneElem.getString("name", false);
+    mName = sceneElem.getString("name");
     
     // Read extension properties
     loadPropertiesXML(sceneElem);
     
     // Read entities
-    XMLElement entityElem = sceneElem.getChildElement("entity", false);
-    while (entityElem.notNull())
-        loadEntityXML(entityElem, throwOnError);
+    XMLElement entityElem = sceneElem.getChildElement("entity");
+    while (entityElem)
+        loadEntityXML(entityElem);
     
-    finishLoading(source, throwOnError);
+    finishLoading(source);
 }
 
 void Scene::saveProperties(Serializer& dest)
@@ -448,7 +444,7 @@ void Scene::loadAsyncXML(File* file)
     removeAllEntities();
     
     // Read scene name
-    mName = sceneElem.getString("name", false);
+    mName = sceneElem.getString("name");
     
     // Read extension properties
     loadPropertiesXML(sceneElem);
@@ -456,8 +452,8 @@ void Scene::loadAsyncXML(File* file)
     // Count entities
     mAsyncTotalEntities = 0;
     mAsyncLoadedEntities = 0;
-    mAsyncXMLElement = sceneElem.getChildElement("entity", false);
-    while (mAsyncXMLElement.notNull())
+    mAsyncXMLElement = sceneElem.getChildElement("entity");
+    while (mAsyncXMLElement)
     {
         ++mAsyncTotalEntities;
         mAsyncXMLElement = mAsyncXMLElement.getNextElement("entity");
@@ -466,7 +462,7 @@ void Scene::loadAsyncXML(File* file)
     // Begin async loading
     mAsyncFile = file;
     mAsyncXMLFile = xml;
-    mAsyncXMLElement = sceneElem.getChildElement("entity", false);
+    mAsyncXMLElement = sceneElem.getChildElement("entity");
     mAsyncLoading = true;
 }
 
@@ -980,7 +976,7 @@ void Scene::updateAsyncLoading()
     {
         if (mAsyncLoadedEntities >= mAsyncTotalEntities)
         {
-            finishLoading(*mAsyncFile, false);
+            finishLoading(*mAsyncFile);
             stopAsyncLoading();
             
             using namespace AsyncLoadFinished;
@@ -992,9 +988,9 @@ void Scene::updateAsyncLoading()
         }
         
         if (!mAsyncXMLFile)
-            loadEntity(*mAsyncFile, false);
+            loadEntity(*mAsyncFile);
         else
-            loadEntityXML(mAsyncXMLElement, false);
+            loadEntityXML(mAsyncXMLElement);
         ++mAsyncLoadedEntities;
         
         if (asyncTimer.getMSec(false) >= (1000 / ASYNC_MIN_FPS))
@@ -1011,7 +1007,7 @@ void Scene::updateAsyncLoading()
     sendEvent(EVENT_ASYNCLOADPROGRESS, eventData);
 }
 
-void Scene::loadEntity(Deserializer& source, bool throwOnError)
+void Scene::loadEntity(Deserializer& source)
 {
     unsigned entityDataSize = source.readVLE();
     if (entityDataSize)
@@ -1032,19 +1028,17 @@ void Scene::loadEntity(Deserializer& source, bool throwOnError)
         }
         catch (...)
         {
-            if (throwOnError)
-                throw;
             LOGERROR("Failed to load entity " + toString(newEntity->getID()));
             removeEntity(newEntity);
         }
     }
 }
 
-void Scene::loadEntityXML(XMLElement& source, bool throwOnError)
+void Scene::loadEntityXML(XMLElement& source)
 {
     // Create the entity and let it load itself
     EntityID id = source.getInt("id");
-    std::string name = source.getString("name", false);
+    std::string name = source.getString("name");
     Entity* newEntity = createEntity(id, name);
     
     try
@@ -1054,8 +1048,6 @@ void Scene::loadEntityXML(XMLElement& source, bool throwOnError)
     }
     catch (...)
     {
-        if (throwOnError)
-            throw;
         LOGERROR("Failed to load entity " + toString(newEntity->getID()));
         removeEntity(newEntity);
     }
@@ -1079,7 +1071,7 @@ void Scene::updateNextEntityID(EntityID loadedID)
     }
 }
 
-void Scene::finishLoading(Deserializer& source, bool throwOnError)
+void Scene::finishLoading(Deserializer& source)
 {
     // Perform post-load on all entities (resolve entity & component references)
     for (std::map<EntityID, SharedPtr<Entity> >::iterator i = mEntities.begin(); i != mEntities.end(); ++i)
@@ -1090,8 +1082,6 @@ void Scene::finishLoading(Deserializer& source, bool throwOnError)
         }
         catch (...)
         {
-            if (throwOnError)
-                throw;
             LOGERROR("Failed to post-load entity " + toString(i->second->getID()));
         }
     }

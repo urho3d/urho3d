@@ -281,14 +281,14 @@ SharedPtr<UIElement> UI::loadLayout(XMLFile* file, XMLFile* styleFile)
     LOGDEBUG("Loading UI layout " + file->getName());
     
     XMLElement rootElem = file->getRootElement();
-    XMLElement childElem = rootElem.getChildElement("element", false);
+    XMLElement childElem = rootElem.getChildElement("element");
     if (!childElem)
     {
         LOGERROR("No root UI element in " + file->getName());
         return root;
     }
     
-    root = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name", false));
+    root = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name"));
     
     // First set the base style from the style file if exists, then apply UI layout overrides
     if (styleFile)
@@ -509,10 +509,10 @@ void UI::handleChar(StringHash eventType, VariantMap& eventData)
 
 void UI::loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)
 {
-    XMLElement childElem = elem.getChildElement("element", false);
+    XMLElement childElem = elem.getChildElement("element");
     while (childElem)
     {
-        SharedPtr<UIElement> child = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name", false));
+        SharedPtr<UIElement> child = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name"));
         // First set the base style from the style file if exists, then apply UI layout overrides
         if (styleFile)
             child->setStyleAuto(styleFile, mCache);

@@ -178,9 +178,9 @@ void BillboardSet::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement lodElem = source.getChildElement("lod");
     mAnimationLodBias = lodElem.getFloat("animlodbias");
     
-    XMLElement billboardElem = source.getChildElement("billboard", false);
+    XMLElement billboardElem = source.getChildElement("billboard");
     unsigned index = 0;
-    while ((billboardElem.notNull()) && (index < mBillboards.size()))
+    while ((billboardElem) && (index < mBillboards.size()))
     {
         Billboard& billboard = mBillboards[index];
         billboard.mEnabled = billboardElem.hasAttribute("pos");

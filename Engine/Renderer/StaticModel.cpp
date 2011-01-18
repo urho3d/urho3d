@@ -103,8 +103,8 @@ void StaticModel::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement modelElem = source.getChildElement("model");
     setModel(cache->getResource<Model>(modelElem.getString("name")));
     
-    XMLElement materialElem = source.getChildElement("material", false);
-    while (materialElem.notNull())
+    XMLElement materialElem = source.getChildElement("material");
+    while (materialElem)
     {
         unsigned index = materialElem.getInt("index");
         setMaterial(index, cache->getResource<Material>(materialElem.getString("name")));

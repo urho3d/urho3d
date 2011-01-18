@@ -161,8 +161,8 @@ void Entity::loadXML(const XMLElement& source, ResourceCache* cache)
     
     // Read properties
     mProperties.clear();
-    XMLElement propertyElem = source.getChildElement("property", false);
-    while (propertyElem.notNull())
+    XMLElement propertyElem = source.getChildElement("property");
+    while (propertyElem)
     {
         ShortStringHash key;
         if (propertyElem.hasAttribute("hash"))
@@ -177,11 +177,11 @@ void Entity::loadXML(const XMLElement& source, ResourceCache* cache)
     }
     
     // Create and read components
-    XMLElement componentElem = source.getChildElement("component", false);
-    while (componentElem.notNull())
+    XMLElement componentElem = source.getChildElement("component");
+    while (componentElem)
     {
         std::string type = componentElem.getString("type");
-        std::string name = componentElem.getString("name", false);
+        std::string name = componentElem.getString("name");
         Component* newComponent = createComponent(ShortStringHash(type), name);
         newComponent->loadXML(componentElem, cache);
         componentElem = componentElem.getNextElement("component");

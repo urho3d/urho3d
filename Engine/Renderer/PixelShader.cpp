@@ -158,10 +158,10 @@ void PixelShader::loadParameters(ResourceCache* cache)
     
     // Update (global) parameter register mappings
     XMLElement shadersElem = xml->getRootElement();
-    XMLElement paramsElem = shadersElem.getChildElement("psparameters", false);
-    XMLElement paramElem = paramsElem.getChildElement("parameter", false);
+    XMLElement paramsElem = shadersElem.getChildElement("psparameters");
+    XMLElement paramElem = paramsElem.getChildElement("parameter");
     
-    while (paramElem.notNull())
+    while (paramElem)
     {
         std::string name = paramElem.getString("name");
         if (sParameters.find(name) == sParameters.end())
@@ -173,8 +173,8 @@ void PixelShader::loadParameters(ResourceCache* cache)
     }
     
     // Get parameters and texture units used by this shader
-    XMLElement shaderElem = shadersElem.getChildElement("shader", false);
-    while (shaderElem.notNull())
+    XMLElement shaderElem = shadersElem.getChildElement("shader");
+    while (shaderElem)
     {
         std::string name = shaderElem.getString("name");
         std::string type = shaderElem.getStringLower("type");
@@ -186,16 +186,16 @@ void PixelShader::loadParameters(ResourceCache* cache)
             for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
                 mUseTextureUnit[i] = false;
             
-            XMLElement shaderParamElem = shaderElem.getChildElement("parameter", false);
-            while (shaderParamElem.notNull())
+            XMLElement shaderParamElem = shaderElem.getChildElement("parameter");
+            while (shaderParamElem)
             {
                 std::string name = shaderParamElem.getString("name");
                 mUseParameter[sParameters[name]] = true;
                 shaderParamElem = shaderParamElem.getNextElement("parameter");
             }
             
-            XMLElement textureElem = shaderElem.getChildElement("textureunit", false);
-            while (textureElem.notNull())
+            XMLElement textureElem = shaderElem.getChildElement("textureunit");
+            while (textureElem)
             {
                 std::string name = textureElem.getString("name");
                 if (sTextureUnits.find(name) == sTextureUnits.end())

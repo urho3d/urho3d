@@ -161,7 +161,7 @@ void ScriptInstance::loadXML(const XMLElement& source, ResourceCache* cache)
     
     if (mMethods[METHOD_LOADXML])
     {
-        XMLElement dataElem = source.getChildElement("data", false);
+        XMLElement dataElem = source.getChildElement("data");
         if (dataElem)
         {
             std::vector<Variant> parameters;

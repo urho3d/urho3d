@@ -352,9 +352,9 @@ void Sound::loadParameters(ResourceCache* cache)
     
     XMLFile* xml = cache->getResource<XMLFile>(xmlName);
     XMLElement rootElem = xml->getRootElement();
-    XMLElement paramElem = rootElem.getChildElement("", false);
+    XMLElement paramElem = rootElem.getChildElement("");
     
-    while (paramElem.notNull())
+    while (paramElem)
     {
         std::string name = paramElem.getName();
         

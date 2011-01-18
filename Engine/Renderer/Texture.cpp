@@ -157,9 +157,9 @@ void Texture::loadParameters(ResourceCache* cache)
 void Texture::loadParameters(XMLFile& xml)
 {
     XMLElement rootElem = xml.getRootElement();
-    XMLElement paramElem = rootElem.getChildElement("", false);
+    XMLElement paramElem = rootElem.getChildElement("");
     
-    while (paramElem.notNull())
+    while (paramElem)
     {
         std::string name = paramElem.getName();
         

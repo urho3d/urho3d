@@ -500,24 +500,28 @@ void Pipeline::drawDebugGeometry(DebugRenderer* debug)
         lights[i]->drawDebugGeometry(debug);
 }
 
-VertexShader* Pipeline::getVertexShader(const std::string& name) const
+VertexShader* Pipeline::getVertexShader(const std::string& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
     std::string fullName = replace(mShaderPath + name + mVSFormat, "_.", ".");
-    if (mCache->exists(fullName))
-        return mCache->getResource<VertexShader>(fullName);
-    else
-        return 0;
+    if (checkExists)
+    {
+        if (!mCache->exists(fullName))
+            return 0;
+    }
+    return mCache->getResource<VertexShader>(fullName);
 }
 
-PixelShader* Pipeline::getPixelShader(const std::string& name) const
+PixelShader* Pipeline::getPixelShader(const std::string& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
     std::string fullName = replace(mShaderPath + name + mPSFormat, "_.", ".");
-    if (mCache->exists(fullName))
-        return mCache->getResource<PixelShader>(fullName);
-    else
-        return 0;
+    if (checkExists)
+    {
+        if (!mCache->exists(fullName))
+            return 0;
+    }
+    return mCache->getResource<PixelShader>(fullName);
 }
 
 unsigned Pipeline::getNumGeometries(bool allViews) const
@@ -956,52 +960,62 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
     std::vector<SharedPtr<VertexShader> >& vertexShaders = i->second.getVertexShaders();
     std::vector<SharedPtr<PixelShader> >& pixelShaders = i->second.getPixelShaders();
     
-    switch (i->first)
+    // Forget all the old shaders
+    vertexShaders.clear();
+    pixelShaders.clear();
+    
+    try
     {
-    default:
-        vertexShaders.resize(MAX_GEOMETRYTYPES);
-        pixelShaders.resize(1);
-        for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
-            vertexShaders[j] = getVertexShader(vertexShaderName + geometryVSVariations[j]);
-        pixelShaders[0] = getPixelShader(pixelShaderName);
-        break;
-        
-    case PASS_LIGHT:
-    case PASS_NEGATIVE:
-        vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-        pixelShaders.resize(MAX_LIGHT_PS_VARIATIONS);
-        
-        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
+        switch (i->first)
         {
-            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
-            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-            if ((!(l & LVS_SHADOW)) || (allowShadows))
-                vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g]);
-            else
-                vertexShaders[j].reset();
-        }
-        for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
-        {
-            unsigned variation = j % 5;
-            if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
+        default:
+            vertexShaders.resize(MAX_GEOMETRYTYPES);
+            pixelShaders.resize(1);
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
+                vertexShaders[j] = getVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
+            pixelShaders[0] = getPixelShader(pixelShaderName);
+            break;
+            
+        case PASS_LIGHT:
+        case PASS_NEGATIVE:
+            vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+            pixelShaders.resize(MAX_LIGHT_PS_VARIATIONS);
+            
+            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
             {
-                if (allowShadows)
-                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] + 
-                        shadowPSVariations[hwShadows]);
+                unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
+                unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
+                if ((!(l & LVS_SHADOW)) || (allowShadows))
+                    vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
                 else
-                    pixelShaders[j].reset();
+                    vertexShaders[j].reset();
             }
-            else
+            for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
             {
-                // For the negative pass, load only the negative version of the shader
-                bool needed = (pass == PASS_LIGHT) ? (variation != LPS_NEGATIVE) : (variation == LPS_NEGATIVE);
-                if (needed)
-                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j]);
+                unsigned variation = j % 5;
+                if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
+                {
+                    if (allowShadows)
+                        pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] + 
+                            shadowPSVariations[hwShadows]);
+                    else
+                        pixelShaders[j].reset();
+                }
                 else
-                    pixelShaders[j].reset();
+                {
+                    // For the negative pass, load only the negative version of the shader
+                    bool needed = (pass == PASS_LIGHT) ? (variation != LPS_NEGATIVE) : (variation == LPS_NEGATIVE);
+                    if (needed)
+                        pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j]);
+                    else
+                        pixelShaders[j].reset();
+                }
             }
+            break;
         }
-        break;
+    }
+    catch (...)
+    {
     }
     
     technique->markShadersLoaded(mShadersChangedFrameNumber);

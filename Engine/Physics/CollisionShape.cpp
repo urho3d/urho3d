@@ -357,8 +357,8 @@ void CollisionShape::load(Deserializer& source, ResourceCache* cache)
     xml.load(source, cache);
     
     XMLElement rootElem = xml.getRootElement();
-    XMLElement shapeElem = rootElem.getChildElement("", false);
-    while (shapeElem.notNull())
+    XMLElement shapeElem = rootElem.getChildElement("");
+    while (shapeElem)
     {
         std::string type = shapeElem.getName();
         Vector3 position = Vector3::sZero;

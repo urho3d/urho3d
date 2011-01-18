@@ -133,8 +133,8 @@ void StereoChannel::loadXML(const XMLElement& source, ResourceCache* cache)
     mAutoRemove = channelElem.getBool("autoremove");
     
     // Read currently playing sound (if any)
-    XMLElement soundElem = source.getChildElement("sound", false);
-    if (soundElem.notNull())
+    XMLElement soundElem = source.getChildElement("sound");
+    if (soundElem)
     {
         Sound* sound = cache->getResource<Sound>(soundElem.getString("name"));
         unsigned offset = soundElem.getInt("offset");

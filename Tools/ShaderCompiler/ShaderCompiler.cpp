@@ -230,15 +230,15 @@ void run(const std::vector<std::string>& arguments)
     XMLFile outDoc;
     XMLElement outShaders = outDoc.createRootElement("shaders");
     
-    XMLElement shader = shaders.getChildElement("shader", false);
-    while (shader.notNull())
+    XMLElement shader = shaders.getChildElement("shader");
+    while (shader)
     {
         bool writeOutput = false;
         
         std::string source = shader.getString("name");
         
         ShaderType compileType = Both;
-        std::string type = shader.getString("type", false);
+        std::string type = shader.getString("type");
         if ((type == "VS") || (type == "vs"))
             compileType = VS;
         if ((type == "PS") || (type == "ps"))
@@ -248,8 +248,8 @@ void run(const std::vector<std::string>& arguments)
         
         Shader baseShader(source, compileType);
         
-        XMLElement variation = shader.getChildElement("", false);
-        while (variation.notNull())
+        XMLElement variation = shader.getChildElement("");
+        while (variation)
         {
             std::string value = variation.getName();
             if ((value == "variation") || (value == "option"))
@@ -258,24 +258,24 @@ void run(const std::vector<std::string>& arguments)
                 
                 Variation newVar(name, value == "option");
                 
-                std::string simpleDefine = variation.getString("define", false);
+                std::string simpleDefine = variation.getString("define");
                 if (!simpleDefine.empty())
                     newVar.addDefine(simpleDefine);
                     
-                std::string simpleExclude = variation.getString("exclude", false);
+                std::string simpleExclude = variation.getString("exclude");
                 if (!simpleExclude.empty())
                     newVar.addExclude(simpleExclude);
                 
-                std::string simpleInclude = variation.getString("include", false);
+                std::string simpleInclude = variation.getString("include");
                 if (!simpleInclude.empty())
                     newVar.addInclude(simpleInclude);
                 
-                std::string simpleRequire = variation.getString("require", false);
+                std::string simpleRequire = variation.getString("require");
                 if (!simpleRequire.empty())
                     newVar.addRequire(simpleRequire);
                 
-                XMLElement define = variation.getChildElement("define", false);
-                while (define.notNull())
+                XMLElement define = variation.getChildElement("define");
+                while (define)
                 {
                     std::string name = define.getString("name");
                     newVar.addDefine(name);
@@ -283,8 +283,8 @@ void run(const std::vector<std::string>& arguments)
                     define = define.getNextElement("define");
                 }
                 
-                XMLElement exclude = variation.getChildElement("exclude", false);
-                while (exclude.notNull())
+                XMLElement exclude = variation.getChildElement("exclude");
+                while (exclude)
                 {
                     std::string name = exclude.getString("name");
                     newVar.addExclude(name);
@@ -292,8 +292,8 @@ void run(const std::vector<std::string>& arguments)
                     exclude = exclude.getNextElement("exclude");
                 }
                 
-                XMLElement include = variation.getChildElement("include", false);
-                while (include.notNull())
+                XMLElement include = variation.getChildElement("include");
+                while (include)
                 {
                     std::string name = include.getString("name");
                     newVar.addInclude(name);
@@ -301,8 +301,8 @@ void run(const std::vector<std::string>& arguments)
                     include = include.getNextElement("include");
                 }
                 
-                XMLElement require = variation.getChildElement("require", false);
-                while (require.notNull())
+                XMLElement require = variation.getChildElement("require");
+                while (require)
                 {
                     std::string name = require.getString("name");
                     newVar.addRequire(name);

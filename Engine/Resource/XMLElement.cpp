@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Exception.h"
+#include "Log.h"
 #include "StringUtils.h"
 #include "XMLElement.h"
 
@@ -50,17 +51,19 @@ XMLElement::~XMLElement()
 XMLElement XMLElement::createChildElement(const std::string& name)
 {
     if (!mElement)
-        SAFE_EXCEPTION_RET("Null XML element, can not create child element " + name, XMLElement());
-    
+    {
+        LOGERROR("Null XML element, can not create child element " + name);
+        return XMLElement();
+    }
     TiXmlElement newElement(name.c_str());
     mElement->InsertEndChild(newElement);
     return XMLElement(static_cast<TiXmlElement*>(mElement->LastChild()));
 }
 
-void XMLElement::removeChildElement(const std::string& name, bool last)
+bool XMLElement::removeChildElement(const std::string& name, bool last)
 {
     if (!mElement)
-        return;
+        return false;
     
     TiXmlNode* element;
     if (name.empty())
@@ -77,30 +80,41 @@ void XMLElement::removeChildElement(const std::string& name, bool last)
         else
             element = mElement->FirstChild(name.c_str());
     }
-
-    mElement->RemoveChild(element);
+    
+    if (element)
+    {
+        mElement->RemoveChild(element);
+        return true;
+    }
+    
+    return false;
 }
 
-void XMLElement::setAttribute(const std::string& name, const std::string& value)
+bool XMLElement::setAttribute(const std::string& name, const std::string& value)
 {
     if (!mElement)
-        SAFE_EXCEPTION("Null XML element, can not set attribute " + name);
-
+    {
+        LOGERROR("Null XML element, can not set attribute " + name);
+        return false;
+    }
+    
     mElement->SetAttribute(name.c_str(), value.c_str());
+    return true;
 }
 
-void XMLElement::setBool(const std::string& name, bool value)
+bool XMLElement::setBool(const std::string& name, bool value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setBoundingBox(const BoundingBox& value)
+bool XMLElement::setBoundingBox(const BoundingBox& value)
 {
-    setVector3("min", value.mMin);
-    setVector3("max", value.mMax);
+    if (!setVector3("min", value.mMin))
+        return false;
+    return setVector3("max", value.mMax);
 }
 
-void XMLElement::setBuffer(const std::string& name, const void* data, unsigned size)
+bool XMLElement::setBuffer(const std::string& name, const void* data, unsigned size)
 {
     std::string dataStr;
     const unsigned char* bytes = (const unsigned char*)data;
@@ -108,68 +122,71 @@ void XMLElement::setBuffer(const std::string& name, const void* data, unsigned s
     for (unsigned i = 0; i < size; ++i)
         dataStr += toString(bytes[i]) + " ";
     
-    setAttribute(name, dataStr);
+    return setAttribute(name, dataStr);
 }
 
-void XMLElement::setBuffer(const std::string& name, const std::vector<unsigned char>& value)
+bool XMLElement::setBuffer(const std::string& name, const std::vector<unsigned char>& value)
 {
     if (!value.size())
-        setAttribute(name, std::string());
+        return setAttribute(name, std::string());
     else
-        setBuffer(name, &value[0], value.size());
+        return setBuffer(name, &value[0], value.size());
 }
 
-void XMLElement::setColor(const std::string& name, const Color& value)
+bool XMLElement::setColor(const std::string& name, const Color& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setFloat(const std::string& name, float value)
+bool XMLElement::setFloat(const std::string& name, float value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setInt(const std::string& name, int value)
+bool XMLElement::setInt(const std::string& name, int value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setIntRect(const std::string& name, const IntRect& value)
+bool XMLElement::setIntRect(const std::string& name, const IntRect& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setIntVector2(const std::string& name, const IntVector2& value)
+bool XMLElement::setIntVector2(const std::string& name, const IntVector2& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setRect(const std::string& name, const Rect& value)
+bool XMLElement::setRect(const std::string& name, const Rect& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setQuaternion(const std::string& name, const Quaternion& value)
+bool XMLElement::setQuaternion(const std::string& name, const Quaternion& value)
 {
-    XMLElement::setAttribute(name, toString(value));
+    return XMLElement::setAttribute(name, toString(value));
 }
 
-void XMLElement::setString(const std::string& name, const std::string& value)
+bool XMLElement::setString(const std::string& name, const std::string& value)
 {
-    setAttribute(name, value);
+    return setAttribute(name, value);
 }
 
-void XMLElement::setVariant(const Variant& value)
+bool XMLElement::setVariant(const Variant& value)
 {
-    setAttribute("type", value.getTypeName());
-    setAttribute("value", value.toString());
+    if (!setAttribute("type", value.getTypeName()))
+        return false;
+    return setAttribute("value", value.toString());
 }
 
-void XMLElement::setVariantMap(const VariantMap& value)
+bool XMLElement::setVariantMap(const VariantMap& value)
 {
     for (VariantMap::const_iterator i = value.begin(); i != value.end(); ++i)
     {
         XMLElement variantElem = createChildElement("variant");
+        if (!variantElem)
+            return false;
         std::string name = shortHashToString(i->first);
         if (name.empty())
             variantElem.setInt("hash", i->first.mData);
@@ -177,28 +194,30 @@ void XMLElement::setVariantMap(const VariantMap& value)
             variantElem.setString("name", name);
         variantElem.setVariant(i->second);
     }
+    
+    return true;
 }
 
-void XMLElement::setVector2(const std::string& name, const Vector2& value)
+bool XMLElement::setVector2(const std::string& name, const Vector2& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setVector3(const std::string& name, const Vector3& value)
+bool XMLElement::setVector3(const std::string& name, const Vector3& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
-void XMLElement::setVector4(const std::string& name, const Vector4& value)
+bool XMLElement::setVector4(const std::string& name, const Vector4& value)
 {
-    setAttribute(name, toString(value));
+    return setAttribute(name, toString(value));
 }
 
 std::string XMLElement::getName() const
 {
     if (!mElement)
         return std::string();
-
+    
     return std::string(mElement->Value());
 }
 
@@ -225,35 +244,16 @@ bool XMLElement::hasChildElement(const std::string& name) const
         return false;
 }
 
-XMLElement XMLElement::getChildElement(const std::string& name, bool throwIfMissing) const
+XMLElement XMLElement::getChildElement(const std::string& name) const
 {
-    if (throwIfMissing)
-    {
-        if (!mElement)
-            SAFE_EXCEPTION_RET("Null XML element, can not get child element " + name, XMLElement());
-        
-        TiXmlElement* child;
-        if (name.empty())
-            child = mElement->FirstChildElement();
-        else
-            child = mElement->FirstChildElement(name.c_str());
-        
-        if (!child)
-            SAFE_EXCEPTION_RET("XML element " + std::string(mElement->Value()) + " has no child element " + name, XMLElement());
-        
-        return XMLElement(child);
-    }
+    if (!mElement)
+        return XMLElement();
     else
     {
-        if (!mElement)
-            return XMLElement();
+        if (name.empty())
+            return XMLElement(mElement->FirstChildElement());
         else
-        {
-            if (name.empty())
-                return XMLElement(mElement->FirstChildElement());
-            else
-                return XMLElement(mElement->FirstChildElement(name.c_str()));
-        }
+            return XMLElement(mElement->FirstChildElement(name.c_str()));
     }
 }
 
@@ -280,55 +280,40 @@ bool XMLElement::hasAttribute(const std::string& name) const
 }
 
 
-std::string XMLElement::getAttribute(const std::string& name, bool throwIfMissing) const
+std::string XMLElement::getAttribute(const std::string& name) const
 {
-    if (throwIfMissing)
+    if (!mElement)
+        return std::string();
+    else
     {
-        if (!mElement)
-            SAFE_EXCEPTION_RET("Null XML element, can not get attribute " + name, std::string());
-        
         const char* data = mElement->Attribute(name.c_str());
         
         if (!data)
-            SAFE_EXCEPTION_RET("XML element " + std::string(mElement->Value()) + " has no attribute " + name, std::string())
+            return std::string();
         else
             return std::string(data);
     }
-    else
-    {
-        if (!mElement)
-            return std::string();
-        else
-        {
-            const char* data = mElement->Attribute(name.c_str());
-            
-            if (!data)
-                return std::string();
-            else
-                return std::string(data);
-        }
-    }
 }
 
-bool XMLElement::getBool(const std::string& name, bool throwIfMissing) const
+bool XMLElement::getBool(const std::string& name) const
 {
-    return toBool(getAttribute(name, throwIfMissing));
+    return toBool(getAttribute(name));
 }
 
-BoundingBox XMLElement::getBoundingBox(bool throwIfMissing) const
+BoundingBox XMLElement::getBoundingBox() const
 {
     BoundingBox ret;
     
-    ret.mMin = getVector3("min", throwIfMissing);
-    ret.mMax = getVector3("max", throwIfMissing);
+    ret.mMin = getVector3("min");
+    ret.mMax = getVector3("max");
     ret.mDefined = true;
     return ret;
 }
 
-std::vector<unsigned char> XMLElement::getBuffer(const std::string& name, bool throwIfMissing) const
+std::vector<unsigned char> XMLElement::getBuffer(const std::string& name) const
 {
     std::vector<unsigned char> ret;
-    std::vector<std::string> bytes = split(getAttribute(name, throwIfMissing), ' ');
+    std::vector<std::string> bytes = split(getAttribute(name), ' ');
     
     ret.resize(bytes.size());
     for (unsigned i = 0; i < bytes.size(); ++i)
@@ -336,10 +321,10 @@ std::vector<unsigned char> XMLElement::getBuffer(const std::string& name, bool t
     return ret;
 }
 
-void XMLElement::getBuffer(const std::string& name, void* dest, unsigned size, bool throwIfMissing) const
+void XMLElement::getBuffer(const std::string& name, void* dest, unsigned size) const
 {
     std::vector<unsigned char> ret;
-    std::vector<std::string> bytes = split(getAttribute(name, throwIfMissing), ' ');
+    std::vector<std::string> bytes = split(getAttribute(name), ' ');
     unsigned char* destBytes = (unsigned char*)dest;
     if (size < bytes.size())
         SAFE_EXCEPTION("Destination buffer not big enough");
@@ -348,101 +333,101 @@ void XMLElement::getBuffer(const std::string& name, void* dest, unsigned size, b
         destBytes[i] = toInt(bytes[i]);
 }
 
-Color XMLElement::getColor(const std::string& name, bool throwIfMissing) const
+Color XMLElement::getColor(const std::string& name) const
 {
-    return toColor(getAttribute(name, throwIfMissing));
+    return toColor(getAttribute(name));
 }
 
-float XMLElement::getFloat(const std::string& name, bool throwIfMissing) const
+float XMLElement::getFloat(const std::string& name) const
 {
-    return toFloat(getAttribute(name, throwIfMissing));
+    return toFloat(getAttribute(name));
 }
 
-int XMLElement::getInt(const std::string& name, bool throwIfMissing) const
+int XMLElement::getInt(const std::string& name) const
 {
-    return toInt(getAttribute(name, throwIfMissing));
+    return toInt(getAttribute(name));
 }
 
-IntRect XMLElement::getIntRect(const std::string& name, bool throwIfMissing) const
+IntRect XMLElement::getIntRect(const std::string& name) const
 {
-    return toIntRect(getAttribute(name, throwIfMissing));
+    return toIntRect(getAttribute(name));
 }
 
-IntVector2 XMLElement::getIntVector2(const std::string& name, bool throwIfMissing) const
+IntVector2 XMLElement::getIntVector2(const std::string& name) const
 {
-    return toIntVector2(getAttribute(name, throwIfMissing));
+    return toIntVector2(getAttribute(name));
 }
 
-Quaternion XMLElement::getQuaternion(const std::string& name, bool throwIfMissing) const
+Quaternion XMLElement::getQuaternion(const std::string& name) const
 {
-    return toQuaternion(getAttribute(name, throwIfMissing));
+    return toQuaternion(getAttribute(name));
 }
 
-Rect XMLElement::getRect(const std::string& name, bool throwIfMissing) const
+Rect XMLElement::getRect(const std::string& name) const
 {
-    return toRect(getAttribute(name, throwIfMissing));
+    return toRect(getAttribute(name));
 }
 
-std::string XMLElement::getString(const std::string& name, bool throwIfMissing) const
+std::string XMLElement::getString(const std::string& name) const
 {
-    return getAttribute(name, throwIfMissing);
+    return getAttribute(name);
 }
 
-std::string XMLElement::getStringLower(const std::string& name, bool throwIfMissing) const
+std::string XMLElement::getStringLower(const std::string& name) const
 {
-    return toLower(getAttribute(name, throwIfMissing));
+    return toLower(getAttribute(name));
 }
 
-std::string XMLElement::getStringUpper(const std::string& name, bool throwIfMissing) const
+std::string XMLElement::getStringUpper(const std::string& name) const
 {
-    return toUpper(getAttribute(name, throwIfMissing));
+    return toUpper(getAttribute(name));
 }
 
-Variant XMLElement::getVariant(bool throwIfMissing) const
+Variant XMLElement::getVariant() const
 {
     Variant ret;
-    std::string type = getAttribute("type", throwIfMissing);
-    std::string value = getAttribute("value", throwIfMissing);
+    std::string type = getAttribute("type");
+    std::string value = getAttribute("value");
     
     ret.fromString(type, value);
     return ret;
 }
 
-VariantMap XMLElement::getVariantMap(bool throwIfMissing) const
+VariantMap XMLElement::getVariantMap() const
 {
     VariantMap ret;
     
-    XMLElement variantElem = getChildElement("variant", false);
-    while (variantElem.notNull())
+    XMLElement variantElem = getChildElement("variant");
+    while (variantElem)
     {
         ShortStringHash key;
         if (variantElem.hasAttribute("hash"))
             key.mData = variantElem.getInt("hash");
         else
             key = ShortStringHash(variantElem.getString("name"));
-        ret[key] =variantElem.getVariant(throwIfMissing);
+        ret[key] = variantElem.getVariant();
         variantElem = variantElem.getNextElement("variant");
     }
     
     return ret;
 }
 
-Vector2 XMLElement::getVector2(const std::string& name, bool throwIfMissing) const
+Vector2 XMLElement::getVector2(const std::string& name) const
 {
-    return toVector2(getAttribute(name, throwIfMissing));
+    return toVector2(getAttribute(name));
 }
 
-Vector3 XMLElement::getVector3(const std::string& name, bool throwIfMissing) const
+Vector3 XMLElement::getVector3(const std::string& name) const
 {
-    return toVector3(getAttribute(name, throwIfMissing));
+    return toVector3(getAttribute(name));
 }
 
-Vector4 XMLElement::getVector4(const std::string& name, bool throwIfMissing) const
+Vector4 XMLElement::getVector4(const std::string& name) const
 {
-    return toVector4(getAttribute(name, throwIfMissing));
+    return toVector4(getAttribute(name));
 }
 
-Vector4 XMLElement::getVector(const std::string& name, bool throwIfMissing) const
+Vector4 XMLElement::getVector(const std::string& name) const
 {
-    return toVector4(getAttribute(name, throwIfMissing), true);
+    return toVector4(getAttribute(name), true);
 }

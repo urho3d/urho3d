@@ -177,11 +177,11 @@ void loadSkeleton(const std::string& inputFileName)
     {
     }
     
-    if (skeletonRoot.notNull())
+    if (skeletonRoot)
     {
-        XMLElement bonesRoot = skeletonRoot.getChildElement("bones", false);
-        XMLElement bone = bonesRoot.getChildElement("bone", false);
-        while (bone.notNull())
+        XMLElement bonesRoot = skeletonRoot.getChildElement("bones");
+        XMLElement bone = bonesRoot.getChildElement("bone");
+        while (bone)
         {
             unsigned index = bone.getInt("id");
             std::string name = bone.getString("name");
@@ -217,8 +217,8 @@ void loadSkeleton(const std::string& inputFileName)
         
         // Go through the bone hierarchy
         XMLElement boneHierarchy = skeletonRoot.getChildElement("bonehierarchy");
-        XMLElement boneParent = boneHierarchy.getChildElement("boneparent", false);
-        while (boneParent.notNull())
+        XMLElement boneParent = boneHierarchy.getChildElement("boneparent");
+        while (boneParent)
         {
             std::string bone = boneParent.getString("bone");
             std::string parent = boneParent.getString("parent");
@@ -278,10 +278,10 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
     XMLElement subMesh = subMeshes.getChildElement("submesh");
     unsigned totalVertices = 0;
     unsigned maxSubMeshVertices = 0;
-    while (subMesh.notNull())
+    while (subMesh)
     {
-        XMLElement geometry = subMesh.getChildElement("geometry", false);
-        if (geometry.notNull())
+        XMLElement geometry = subMesh.getChildElement("geometry");
+        if (geometry)
         {
             unsigned vertices = geometry.getInt("vertexcount");
             totalVertices += vertices;
@@ -293,8 +293,8 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
         subMesh = subMesh.getNextElement("submesh");
     }
     
-    XMLElement sharedGeometry = root.getChildElement("sharedgeometry", false);
-    if (sharedGeometry.notNull())
+    XMLElement sharedGeometry = root.getChildElement("sharedgeometry");
+    if (sharedGeometry)
     {
         unsigned vertices = sharedGeometry.getInt("vertexcount");
         totalVertices += vertices;
@@ -322,9 +322,9 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
     std::vector<unsigned> vertexStarts;
     vertexStarts.resize(numSubMeshes);
     
-    while (subMesh.notNull())
+    while (subMesh)
     {
-        XMLElement geometry = subMesh.getChildElement("geometry", false);
+        XMLElement geometry = subMesh.getChildElement("geometry");
         XMLElement faces = subMesh.getChildElement("faces");
         
         // If no submesh vertexbuffer, process the shared geometry, but do it only once
@@ -336,7 +336,7 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                 geometry = root.getChildElement("sharedgeometry");
         }
         
-        if (geometry.notNull())
+        if (geometry)
             vertices = geometry.getInt("vertexcount");
         
         ModelSubGeometryLodLevel subGeometryLodLevel;
@@ -374,7 +374,7 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
         if (geometry)
             bufferDef = geometry.getChildElement("vertexbuffer");
         
-        while (bufferDef.notNull())
+        while (bufferDef)
         {
             if (bufferDef.hasAttribute("positions"))
                 vBuf->mElementMask |= MASK_POSITION;
@@ -389,8 +389,8 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                 XMLElement vertex = bufferDef.getChildElement("vertex");
                 while (vertex)
                 {
-                    XMLElement position = vertex.getChildElement("position", false);
-                    if (position.notNull())
+                    XMLElement position = vertex.getChildElement("position");
+                    if (position)
                     {
                         // Convert from right- to left-handed
                         float x = position.getFloat("x");
@@ -401,8 +401,8 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                         vBuf->mVertices[vertexNum].mPosition = vec;
                         box.merge(vec);
                     }
-                    XMLElement normal = vertex.getChildElement("normal", false);
-                    if (normal.notNull())
+                    XMLElement normal = vertex.getChildElement("normal");
+                    if (normal)
                     {
                         // Convert from right- to left-handed
                         float x = normal.getFloat("x");
@@ -412,8 +412,8 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                         
                         vBuf->mVertices[vertexNum].mNormal = vec;
                     }
-                    XMLElement uv = vertex.getChildElement("texcoord", false);
-                    if (uv.notNull())
+                    XMLElement uv = vertex.getChildElement("texcoord");
+                    if (uv)
                     {
                         float x = uv.getFloat("u");
                         float y = uv.getFloat("v");
@@ -452,10 +452,10 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
         
         if (bones.size())
         {
-            XMLElement boneAssignments = subMesh.getChildElement("boneassignments", false);
+            XMLElement boneAssignments = subMesh.getChildElement("boneassignments");
             if (boneAssignments)
             {
-                XMLElement boneAssignment = boneAssignments.getChildElement("vertexboneassignment", false);
+                XMLElement boneAssignment = boneAssignments.getChildElement("vertexboneassignment");
                 while (boneAssignment)
                 {
                     unsigned vertex = boneAssignment.getInt("vertexindex") + vertexStart;
@@ -582,22 +582,22 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
     }
     
     // Process LOD levels, if any
-    XMLElement lods = root.getChildElement("levelofdetail", false);
-    if (lods.notNull())
+    XMLElement lods = root.getChildElement("levelofdetail");
+    if (lods)
     {
         try
         {
             // For now, support only generated LODs, where the vertices are the same
-            XMLElement lod = lods.getChildElement("lodgenerated", false);
-            while (lod.notNull())
+            XMLElement lod = lods.getChildElement("lodgenerated");
+            while (lod)
             {
                 float distance = M_EPSILON;
                 if (lod.hasAttribute("fromdepthsquared"))
                     distance = sqrtf(lod.getFloat("fromdepthsquared"));
                 if (lod.hasAttribute("value"))
                     distance = lod.getFloat("value");
-                XMLElement lodSubMesh = lod.getChildElement("lodfacelist", false);
-                while (lodSubMesh.notNull())
+                XMLElement lodSubMesh = lod.getChildElement("lodfacelist");
+                while (lodSubMesh)
                 {
                     unsigned subMeshIndex = lodSubMesh.getInt("submeshindex");
                     unsigned triangles = lodSubMesh.getInt("numfaces");
@@ -632,7 +632,7 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                     
                     // Append indices to the original index buffer
                     XMLElement triangle = lodSubMesh.getChildElement("face");
-                    while (triangle.notNull())
+                    while (triangle)
                     {
                         unsigned v1 = triangle.getInt("v1");
                         unsigned v2 = triangle.getInt("v2");
@@ -663,10 +663,10 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
         try
         {
             std::vector<XMLElement> poses;
-            XMLElement posesRoot = root.getChildElement("poses", false);
-            if (posesRoot.notNull())
+            XMLElement posesRoot = root.getChildElement("poses");
+            if (posesRoot)
             {
-                XMLElement pose = posesRoot.getChildElement("pose", false);
+                XMLElement pose = posesRoot.getChildElement("pose");
                 while (pose)
                 {
                     poses.push_back(pose);
@@ -675,29 +675,29 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
             }
             
             // Then process animations using the poses
-            XMLElement animsRoot = root.getChildElement("animations", false);
-            if (animsRoot.notNull())
+            XMLElement animsRoot = root.getChildElement("animations");
+            if (animsRoot)
             {
-                XMLElement anim = animsRoot.getChildElement("animation", false);
-                while (anim.notNull())
+                XMLElement anim = animsRoot.getChildElement("animation");
+                while (anim)
                 {
                     std::string name = anim.getString("name");
                     float length = anim.getFloat("length");
                     std::set<unsigned> usedPoses;
-                    XMLElement tracks = anim.getChildElement("tracks", false);
-                    if (tracks.notNull())
+                    XMLElement tracks = anim.getChildElement("tracks");
+                    if (tracks)
                     {
-                        XMLElement track = tracks.getChildElement("track", false);
-                        while (track.notNull())
+                        XMLElement track = tracks.getChildElement("track");
+                        while (track)
                         {
-                            XMLElement keyframes = track.getChildElement("keyframes", false);
-                            if (keyframes.notNull())
+                            XMLElement keyframes = track.getChildElement("keyframes");
+                            if (keyframes)
                             {
-                                XMLElement keyframe = keyframes.getChildElement("keyframe", false);
-                                while (keyframe.notNull())
+                                XMLElement keyframe = keyframes.getChildElement("keyframe");
+                                while (keyframe)
                                 {
                                     float time = keyframe.getFloat("time");
-                                    XMLElement poseref = keyframe.getChildElement("poseref", false);
+                                    XMLElement poseref = keyframe.getChildElement("poseref");
                                     // Get only the end pose
                                     if ((poseref) && (time == length))
                                         usedPoses.insert(poseref.getInt("poseindex"));
@@ -725,7 +725,7 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                         {
                             XMLElement pose = poses[*i];
                             unsigned targetSubMesh = pose.getInt("index");
-                            XMLElement poseOffset = pose.getChildElement("poseoffset", false);
+                            XMLElement poseOffset = pose.getChildElement("poseoffset");
                         
                             if (useOneBuffer)
                                 newMorph.mBuffers[bufIndex].mVertexBuffer = 0;
@@ -736,7 +736,7 @@ void loadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                             
                             ModelVertexBuffer* vBuf = &vertexBuffers[newMorph.mBuffers[bufIndex].mVertexBuffer];
                             
-                            while (poseOffset.notNull())
+                            while (poseOffset)
                             {
                                 // Convert from right- to left-handed
                                 unsigned vertexIndex = poseOffset.getInt("index") + vertexStarts[targetSubMesh];
@@ -968,23 +968,23 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
     dest.writeUInt(raycastLodLevel);
     dest.writeUInt(occlusionLodLevel);
     
-    XMLElement skeletonRoot = skelFile.getRootElement("", false);
-    if ((skeletonRoot.notNull()) && (exportAnimations))
+    XMLElement skeletonRoot = skelFile.getRootElement("");
+    if ((skeletonRoot) && (exportAnimations))
     {
         // Go through animations
-        XMLElement animationsRoot = skeletonRoot.getChildElement("animations", false);
+        XMLElement animationsRoot = skeletonRoot.getChildElement("animations");
         if (animationsRoot)
         {
-            XMLElement animation = animationsRoot.getChildElement("animation", false);
-            while (animation.notNull())
+            XMLElement animation = animationsRoot.getChildElement("animation");
+            while (animation)
             {
                 ModelAnimation newAnimation;
                 newAnimation.mName = animation.getString("name");
                 newAnimation.mLength = animation.getFloat("length");
                 
-                XMLElement tracksRoot = animation.getChildElement("tracks", false);
-                XMLElement track = tracksRoot.getChildElement("track", false);
-                while (track.notNull())
+                XMLElement tracksRoot = animation.getChildElement("tracks");
+                XMLElement track = tracksRoot.getChildElement("track");
+                while (track)
                 {
                     std::string trackName = track.getString("bone");
                     ModelBone* bone = 0;
@@ -1007,8 +1007,8 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
                         newAnimationTrack.mChannelMask = CHANNEL_ROTATION;
                     
                     XMLElement keyFramesRoot = track.getChildElement("keyframes");
-                    XMLElement keyFrame = keyFramesRoot.getChildElement("keyframe", false);
-                    while (keyFrame.notNull())
+                    XMLElement keyFrame = keyFramesRoot.getChildElement("keyframe");
+                    while (keyFrame)
                     {
                         AnimationKeyFrame newKeyFrame;
                         

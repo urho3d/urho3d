@@ -171,9 +171,9 @@ void CustomObject::loadXML(const XMLElement& source, ResourceCache* cache)
     setNumGeometries(geometriesElem.getInt("count"));
     
     unsigned vertexSize = VertexBuffer::getVertexSize(mVertexElementMask);
-    XMLElement geometryElem = source.getChildElement("geometry", false);
+    XMLElement geometryElem = source.getChildElement("geometry");
     unsigned index = 0;
-    while ((geometryElem.notNull()) && (index < mGeometries.size()))
+    while ((geometryElem) && (index < mGeometries.size()))
     {
         CustomGeometry& geometry = mCustomGeometries[index];
         geometry.mBoundingBox = geometryElem.getBoundingBox();

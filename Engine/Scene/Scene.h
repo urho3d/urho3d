@@ -57,13 +57,13 @@ public:
     //! Perform client-side visual smoothing
     void interpolate(float timeStep);
     //! Write to a stream
-    void save(Serializer& dest, bool throwOnError = true);
+    void save(Serializer& dest);
     //! Read from a stream
-    void load(Deserializer& source, bool throwOnError = true);
+    void load(Deserializer& source);
     //! Write to an XML file
-    void saveXML(Serializer& dest, bool throwOnError = true);
+    void saveXML(Serializer& dest);
     //! Read from an XML file
-    void loadXML(Deserializer& source, bool throwOnError = true);
+    void loadXML(Deserializer& source);
     //! Write properties only to a stream
     void saveProperties(Serializer& dest);
     //! Read properties only from a stream
@@ -206,13 +206,13 @@ private:
     //! Update asynchronous loading. Load entities until a set time has passed
     void updateAsyncLoading();
     //! Load an entity from a stream
-    void loadEntity(Deserializer& source, bool throwOnError);
+    void loadEntity(Deserializer& source);
     //! Load an entity from an XML element
-    void loadEntityXML(XMLElement& source, bool throwOnError);
+    void loadEntityXML(XMLElement& source);
     //! Update next entity ID's after loading an entity
     void updateNextEntityID(EntityID loadedID);
     //! Perform post-load after scene loading has finished
-    void finishLoading(Deserializer& source, bool throwOnError);
+    void finishLoading(Deserializer& source);
     
     //! Scene name
     std::string mName;

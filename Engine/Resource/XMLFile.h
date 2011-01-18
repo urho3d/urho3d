@@ -48,8 +48,8 @@ public:
     //! Clear the document and create a root element
     XMLElement createRootElement(const std::string& name);
     
-    //! Return the root element
-    XMLElement getRootElement(const std::string& name = std::string(), bool throwIfMissing = true) const;
+    //! Return the root element, with optionally specified name. Return null element if not found
+    XMLElement getRootElement(const std::string& name = std::string()) const;
     //! Return the TinyXML document
     TiXmlDocument* getDocument() const { return mDocument; }
     

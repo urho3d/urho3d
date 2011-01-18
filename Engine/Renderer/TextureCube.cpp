@@ -129,9 +129,9 @@ void TextureCube::load(Deserializer& source, ResourceCache* cache)
     loadParameters(xml);
     
     XMLElement textureElem = xml.getRootElement();
-    XMLElement faceElem = textureElem.getChildElement("face", false);
+    XMLElement faceElem = textureElem.getChildElement("face");
     unsigned faces = 0;
-    while ((faceElem.notNull()) && (faces < MAX_CUBEMAP_FACES))
+    while ((faceElem) && (faces < MAX_CUBEMAP_FACES))
     {
         std::string name = faceElem.getString("name");
         std::string faceTexPath;
