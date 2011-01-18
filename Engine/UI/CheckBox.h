@@ -26,6 +26,7 @@
 
 #include "BorderImage.h"
 
+//! An image that can be toggled between unchecked and checked state
 class CheckBox : public BorderImage
 {
     DEFINE_TYPE(CheckBox);

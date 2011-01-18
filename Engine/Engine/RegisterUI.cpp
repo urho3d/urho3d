@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "Font.h"
 #include "RegisterTemplates.h"
+#include "Slider.h"
 #include "Text.h"
 #include "UI.h"
 #include "Window.h"
@@ -55,6 +56,10 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("UIElementCorner", "C_TOPRIGHT", C_TOPRIGHT);
     engine->RegisterEnumValue("UIElementCorner", "C_BOTTOMLEFT", C_BOTTOMLEFT);
     engine->RegisterEnumValue("UIElementCorner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
+    
+    engine->RegisterEnum("UIElementOrientation");
+    engine->RegisterEnumValue("UIElementOrientation", "O_HORIZONTAL", O_HORIZONTAL);
+    engine->RegisterEnumValue("UIElementOrientation", "O_VERTICAL", O_VERTICAL);
     
     registerUIElement<UIElement>(engine, "UIElement");
     
@@ -126,6 +131,19 @@ static void registerCheckBox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CheckBox", "const IntRect& getUncheckedRect() const", asMETHOD(CheckBox, getUncheckedRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "const IntRect& getCheckedRect() const", asMETHOD(CheckBox, getCheckedRect), asCALL_THISCALL);
     registerRefCasts<UIElement, CheckBox>(engine, "UIElement", "CheckBox");
+}
+
+static void registerSlider(asIScriptEngine* engine)
+{
+    registerBorderImage<Slider>(engine, "Slider");
+    engine->RegisterObjectMethod("Slider", "void setOrientation(UIElementOrientation)", asMETHOD(Slider, setOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "void setRange(float)", asMETHOD(Slider, setRange), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "void setValue(float)", asMETHOD(Slider, setValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "UIElementOrientation getOrientation() const", asMETHOD(Slider, getOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "float getRange() const", asMETHOD(Slider, getRange), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "float getValue() const", asMETHOD(Slider, getValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "BorderImage@+ getSlider() const", asMETHOD(Slider, getSlider), asCALL_THISCALL);
+    registerRefCasts<UIElement, Slider>(engine, "UIElement", "Slider");
 }
 
 static void registerWindow(asIScriptEngine* engine)
@@ -239,11 +257,12 @@ void registerUILibrary(asIScriptEngine* engine)
 {
     registerFont(engine);
     registerUIElement(engine);
-    registerText(engine);
     registerBorderImage(engine);
     registerButton(engine);
     registerCheckBox(engine);
     registerCursor(engine);
+    registerSlider(engine);
+    registerText(engine);
     registerWindow(engine);
     registerUI(engine);
 }

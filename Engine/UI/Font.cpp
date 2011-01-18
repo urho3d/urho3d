@@ -27,7 +27,6 @@
 #include "Profiler.h"
 #include "Renderer.h"
 #include "RendererImpl.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 
 #include <stb_truetype.h>

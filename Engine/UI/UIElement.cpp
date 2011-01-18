@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Log.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "UIElement.h"
 #include "UIEvents.h"
 
@@ -309,7 +308,7 @@ void UIElement::setVerticalAlignment(VerticalAlignment align)
 
 void UIElement::setColor(const Color& color)
 {
-    for (unsigned i = 0; i < NUM_UIELEMENT_CORNERS; ++i)
+    for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
         mColor[i] = color;
     mHasColorGradient = false;
 }
@@ -319,7 +318,7 @@ void UIElement::setColor(UIElementCorner corner, const Color& color)
     mColor[corner] = color;
     mHasColorGradient = false;
     
-    for (unsigned i = 0; i < NUM_UIELEMENT_CORNERS; ++i)
+    for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
     {
         if ((i != corner) && (mColor[i] != mColor[corner]))
             mHasColorGradient = true;
@@ -513,6 +512,18 @@ IntVector2 UIElement::screenToElement(const IntVector2& screenPosition)
 IntVector2 UIElement::elementToScreen(const IntVector2& position)
 {
     return position + getScreenPosition();
+}
+
+bool UIElement::isInside(IntVector2 position, bool isScreen)
+{
+    if (isScreen)
+        position = screenToElement(position);
+    return (position.mX >= 0) && (position.mY >= 0) && (position.mX < mSize.mX) && (position.mY < mSize.mY);
+}
+
+void UIElement::setHovering(bool enable)
+{
+    mHovering = enable;
 }
 
 void UIElement::adjustScissor(IntRect& currentScissor)

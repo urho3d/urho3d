@@ -28,7 +28,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"

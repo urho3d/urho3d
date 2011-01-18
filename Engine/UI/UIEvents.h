@@ -51,4 +51,11 @@ DEFINE_EVENT(EVENT_TOGGLED, Toggled)
     EVENT_PARAM(P_STATE, State);                // bool
 }
 
+//! UI slider value changed
+DEFINE_EVENT(EVENT_VALUECHANGED, ValueChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_VALUE, Value);                // float
+}
+
 #endif // UI_UIEVENTS_H

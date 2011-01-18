@@ -1,11 +1,39 @@
 <layout>
-    <element type="Button">
-        <size value="100 40" />
-        <alignment horizontal="center" vertical="center" />
-        <element type="Text">
-            <text value="TEST" />
-            <font name="cour.ttf" size="12" />
-            <alignment horizontal="center" vertical="center" />
+    <element type="Window">
+        <position value="50 50" />
+        <size value="250 250" />
+        <resizable enable="false" />
+        <element type="Button">
+            <position value="10 10" />
+            <size value="100 40" />
+            <element type="Text">
+                <text value="TEST" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Slider">
+            <position value="10 200" />
+            <size value="128 16" />
+            <slider range="10" value="5" />
+        </element>
+        <element type="Slider">
+            <position value="200 10" />
+            <size value="16 128 " />
+            <orientation value="vertical" />
+            <slider range="1" value="1" />
+        </element>
+        <element type="CheckBox">
+            <position value="10 100" />
+        </element>
+        <element type="CheckBox">
+            <position value="40 100" />
+        </element>
+        <element type="CheckBox">
+            <position value="10 130" />
+        </element>
+        <element type="CheckBox">
+            <position value="40 130" />
         </element>
     </element>
 </layout>

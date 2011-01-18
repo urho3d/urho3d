@@ -28,7 +28,6 @@
 #include "Ray.h"
 #include "Renderer.h"
 #include "RendererImpl.h"
-#include "StringUtils.h"
 #include "VertexBuffer.h"
 
 #include "DebugNew.h"

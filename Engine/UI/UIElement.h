@@ -53,10 +53,16 @@ enum UIElementCorner
     C_TOPLEFT = 0,
     C_TOPRIGHT,
     C_BOTTOMLEFT,
-    C_BOTTOMRIGHT
+    C_BOTTOMRIGHT,
+    MAX_UIELEMENT_CORNERS
 };
 
-static const unsigned NUM_UIELEMENT_CORNERS = 4;
+//! UI element orientation
+enum UIElementOrientation
+{
+    O_HORIZONTAL = 0,
+    O_VERTICAL
+};
 
 class ResourceCache;
 
@@ -203,7 +209,11 @@ public:
     IntVector2 screenToElement(const IntVector2& screenPosition);
     //! Convert element coordinates to screen coordinates
     IntVector2 elementToScreen(const IntVector2& position);
+    //! Return whether a point (either in element or screen coordinates) is inside the element
+    bool isInside(IntVector2 position, bool isScreen);
     
+    //! Set hovering state
+    void setHovering(bool enable);
     //! Adjust scissor for rendering
     void adjustScissor(IntRect& currentScissor);
     
@@ -223,7 +233,7 @@ protected:
     //! Parent element
     UIElement* mParent;
     //! Colors
-    Color mColor[NUM_UIELEMENT_CORNERS];
+    Color mColor[MAX_UIELEMENT_CORNERS];
     //! Color modification on hover
     Color mHoverColor;
     //! Priority

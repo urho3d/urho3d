@@ -1,10 +1,4 @@
 <elements>
-    <element type="Cursor">
-        <size value="16 24" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="0 0 16 24" />
-        <hotspot value="0 0" />
-    </element>
     <element type="Button">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
@@ -13,6 +7,32 @@
         <border value="4 4 4 4" />
         <hoveroffset value="0 16" />
         <labeloffset value="-1 1" />
+    </element>
+    <element type="CheckBox">
+        <size value="16 16" />
+        <texture name="Textures/UI.png" />
+        <uncheckedrect value="64 0 80 16" />
+        <checkedrect value="80 0 96 16" />
+        <border value="4 4 4 4" />
+        <hoveroffset value="0 16" />
+    </element>
+    <element type="Cursor">
+        <size value="16 24" />
+        <texture name="Textures/UI.png" />
+        <imagerect value="0 0 16 24" />
+        <hotspot value="0 0" />
+    </element>
+    <element type="Slider">
+        <size value="16 16" />
+        <texture name="Textures/UI.png" />
+        <imagerect value="48 0 64 16" />
+        <border value="3 3 3 3" />
+        <slider>
+            <texture name="Textures/UI.png" />
+            <imagerect value="16 0 32 16" />
+            <border value="4 4 4 4" />
+            <hoveroffset value="0 16" />
+        </slider>
     </element>
     <element type="Window">
         <texture name="Textures/UI.png" />
@@ -25,12 +45,5 @@
     <element type="Text">
         <font name="Cour.ttf" size="10" />
     </element>
-    <element type="CheckBox">
-        <size value="16 16" />
-        <texture name="Textures/UI.png" />
-        <uncheckedrect value="64 0 80 16" />
-        <checkedrect value="80 0 96 16" />
-        <border value="4 4 4 4" />
-        <hoveroffset value="0 16" />
-    </element>
+
 </elements>

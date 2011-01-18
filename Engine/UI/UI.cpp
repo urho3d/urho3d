@@ -378,10 +378,7 @@ void UI::getElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         UIElement* element = *i;
         if ((element != mCursor.getPtr()) && (element->isVisible()))
         {
-            const IntVector2& screenPosition = element->getScreenPosition();
-            const IntVector2& size = element->getSize();
-            if ((position.mX >= screenPosition.mX) && (position.mX < screenPosition.mX + size.mX) &&
-                (position.mY >= screenPosition.mY) && (position.mY < screenPosition.mY + size.mY))
+            if (element->isInside(position, true))
             {
                 // Store the current result, then recurse into its children. Because children
                 // are sorted from lowest to highest priority, we should be left with the topmost match
