@@ -233,7 +233,7 @@ bool AnimationController::writeNetUpdate(Serializer& dest, Serializer& destRevis
     // If local animation, do not send even if changed. It is slightly unoptimal to first check, then disable, but it ensures
     // that the base revision data stays the same (otherwise out of bounds reads might result when toggling local animation)
     if ((mModel) && (mModel->getLocalAnimation()) && (checkPrediction(info.mConnection)))
-        bits &= ~(8 | 16);
+        bits &= ~2;
     
     // Update replication state fully, and network stream by delta
     dest.writeUByte(bits);
@@ -362,6 +362,14 @@ void AnimationController::update(float timeStep)
     if (!mModel)
         return;
     
+    // Do not update if being a non-predicted proxy. Non-predicted animation controllers should not be replicated in any case,
+    // as AnimatedModel already sends the full server animation state
+    if ((isProxy()) && (!checkPrediction()))
+        return;
+    // If local animation mode is enabled, do not update during the scene rewind
+    if (isLocalModePlayback())
+        return;
+    
     PROFILE(AnimationController_Update);
     
     // Loop through animations
@@ -426,10 +434,14 @@ void AnimationController::setAnimatedModel(AnimatedModel* model)
 
 bool AnimationController::addAnimation(const std::string& name, unsigned char group)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     if (!mModel)
         return false;
     
-    //! Check if already exists
+    // Check if already exists
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -467,6 +479,10 @@ bool AnimationController::addAnimation(const std::string& name, unsigned char gr
 
 bool AnimationController::removeAnimation(const std::string& name, float fadeTime)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -491,6 +507,10 @@ bool AnimationController::removeAnimation(const std::string& name, float fadeTim
 
 void AnimationController::removeAnimations(unsigned char group, float fadeTime)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return;
+    
     for (std::vector<AnimationControl>::iterator i = mAnimations.begin(); i != mAnimations.end();)
     {
         bool remove = false;
@@ -520,6 +540,10 @@ void AnimationController::removeAnimations(unsigned char group, float fadeTime)
 
 void AnimationController::removeAllAnimations(float fadeTime)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return;
+    
     for (std::vector<AnimationControl>::iterator i = mAnimations.begin(); i != mAnimations.end();)
     {
         bool remove = false;
@@ -547,6 +571,10 @@ void AnimationController::removeAllAnimations(float fadeTime)
 bool AnimationController::setAnimation(const std::string& name, unsigned char group, bool looped, bool restart, float speed, 
     float targetWeight, float fadeTime, float autoFadeTime, bool fadeOutOthersInGroup)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -594,6 +622,10 @@ bool AnimationController::setAnimation(const std::string& name, unsigned char gr
 bool AnimationController::setProperties(const std::string& name, unsigned char group, float speed, float targetWeight, float fadeTime,
     float autoFadeTime)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -610,6 +642,10 @@ bool AnimationController::setProperties(const std::string& name, unsigned char g
 
 bool AnimationController::setPriority(const std::string& name, int priority)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     AnimationState* state = findAnimationState(name);
     if (!state)
         return false;
@@ -619,6 +655,10 @@ bool AnimationController::setPriority(const std::string& name, int priority)
 
 bool AnimationController::setStartBone(const std::string& name, const std::string& startBoneName)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     AnimationState* state = findAnimationState(name);
     if (!state)
         return false;
@@ -629,6 +669,10 @@ bool AnimationController::setStartBone(const std::string& name, const std::strin
 
 bool AnimationController::setBlending(const std::string& name, int priority, const std::string& startBoneName)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     AnimationState* state = findAnimationState(name);
     if (!state)
         return false;
@@ -640,6 +684,10 @@ bool AnimationController::setBlending(const std::string& name, int priority, con
 
 bool AnimationController::setTime(const std::string& name, float time)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     AnimationState* state = findAnimationState(name);
     if (!state)
         return false;
@@ -649,6 +697,10 @@ bool AnimationController::setTime(const std::string& name, float time)
 
 bool AnimationController::setGroup(const std::string& name, unsigned char group)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -660,6 +712,10 @@ bool AnimationController::setGroup(const std::string& name, unsigned char group)
 
 bool AnimationController::setSpeed(const std::string& name, float speed)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -671,6 +727,10 @@ bool AnimationController::setSpeed(const std::string& name, float speed)
 
 bool AnimationController::setWeight(const std::string& name, float weight)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -684,6 +744,10 @@ bool AnimationController::setWeight(const std::string& name, float weight)
 
 bool AnimationController::setFade(const std::string& name, float targetWeight, float time)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -696,6 +760,10 @@ bool AnimationController::setFade(const std::string& name, float targetWeight, f
 
 bool AnimationController::setFadeOthers(const std::string& name, float targetWeight, float time)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -717,6 +785,10 @@ bool AnimationController::setFadeOthers(const std::string& name, float targetWei
 
 bool AnimationController::setLooped(const std::string& name, bool enable)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     AnimationState* state = findAnimationState(name);
     if (!state)
         return false;
@@ -726,6 +798,10 @@ bool AnimationController::setLooped(const std::string& name, bool enable)
 
 bool AnimationController::setAutoFade(const std::string& name, float time)
 {
+    // Do nothing during local animation mode scene rewind
+    if (isLocalModePlayback())
+        return true;
+    
     unsigned index;
     AnimationState* state;
     findAnimation(name, index, state);
@@ -869,6 +945,11 @@ AnimationState* AnimationController::findAnimationState(const std::string& name)
 {
     StringHash nameHash(name);
     return mModel ? mModel->getAnimationState(nameHash) : 0;
+}
+
+bool AnimationController::isLocalModePlayback() const
+{
+    return (isPlayback()) && (checkPrediction()) && (mModel) && (mModel->getLocalAnimation());
 }
 
 void AnimationController::handleScenePostUpdate(StringHash eventType, VariantMap& eventData)

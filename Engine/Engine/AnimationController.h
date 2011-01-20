@@ -163,6 +163,8 @@ private:
     void findAnimation(const std::string& name, unsigned& index, AnimationState*& state) const;
     //! Find the animation state only
     AnimationState* findAnimationState(const std::string& name) const;
+    //! Check if in local animation mode and scene rewind
+    bool isLocalModePlayback() const;
     //! Handle scene post-update event
     void handleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
