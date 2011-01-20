@@ -85,6 +85,8 @@ public:
     float getWeight() const;
     //! Return time position
     float getTime() const;
+    //! Return animation length
+    float getLength() const;
     //! Return blending priority
     int getPriority() const { return mPriority; }
     //! Return whether using nlerp for rotation

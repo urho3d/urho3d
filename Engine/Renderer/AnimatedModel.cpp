@@ -81,17 +81,27 @@ void AnimatedModel::save(Serializer& dest)
     
     // Write skeletal animation properties
     dest.writeFloat(mAnimationLodBias);
-    dest.writeVLE(mAnimationStates.size());
-    for (unsigned i = 0; i < mAnimationStates.size(); ++i)
+    // If this is the predicted component save, and local animation is enabled, do not store animation data
+    bool localAnimation = (isProxy()) && (mLocalAnimation) && (checkPrediction());
+    if (!localAnimation)
     {
-        AnimationState* state = mAnimationStates[i];
-        state->save(dest);
+        dest.writeVLE(mAnimationStates.size());
+        for (unsigned i = 0; i < mAnimationStates.size(); ++i)
+        {
+            AnimationState* state = mAnimationStates[i];
+            state->save(dest);
+        }
+        
+        // Write morph properties
+        dest.writeVLE(mMorphs.size());
+        for (unsigned i = 0; i < mMorphs.size(); ++i)
+            dest.writeFloat(mMorphs[i].mWeight);
     }
-    
-    // Write morph properties
-    dest.writeVLE(mMorphs.size());
-    for (unsigned i = 0; i < mMorphs.size(); ++i)
-        dest.writeFloat(mMorphs[i].mWeight);
+    else
+    {
+        dest.writeVLE(0);
+        dest.writeVLE(0);
+    }
 }
 
 void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
@@ -108,6 +118,8 @@ void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
         setMaterial(i, cache->getResource<Material>(source.readStringHash()));
     
     // Read skeletal animation properties
+    // If this is the predicted component load, and local animation is enabled, do not overwrite the animations
+    bool localAnimation = (isProxy()) && (mLocalAnimation) && (checkPrediction());
     mAnimationLodBias = source.readFloat();
     std::set<StringHash> processed;
     unsigned numAnimationStates = source.readVLE();
@@ -118,7 +130,8 @@ void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
         newState->load(source);
         processed.insert(animation);
     }
-    removeExtraAnimations(processed);
+    if (!localAnimation)
+        removeExtraAnimations(processed);
     
     // Read morph properties
     unsigned numMorphs = source.readVLE();
@@ -224,22 +237,13 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
     checkFloat(mAnimationLodBias, baseRevision, bits, 4);
     // Animations
     unsigned numBaseAnimations = baseRevision.getSize() ? baseRevision.readVLE() : 0;
-    unsigned enabledAnimations = 0;
     if (mAnimationStates.size() != numBaseAnimations)
         bits |= 8;
     static std::vector<unsigned char> animBits;
     animBits.resize(mAnimationStates.size());
     // Assume that animations are new ie. require update of all fields
     for (unsigned i = 0; i < mAnimationStates.size(); ++i)
-    {
-        if (mAnimationStates[i]->isEnabled())
-        {
-            animBits[i] = 1 | 2 | 4 | 8 | 16 | 32;
-            ++enabledAnimations;
-        }
-        else
-            animBits[i] = 0;
-    }
+        animBits[i] = 1 | 2 | 4 | 8 | 16 | 32;
     for (unsigned i = 0; i < numBaseAnimations; ++i)
     {
         StringHash animation = baseRevision.readStringHash();
@@ -258,9 +262,6 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
             {
                 // If animation exists in base state, update only the necessary properties
                 found = true;
-                // If zero weight (disabled), do not update anything
-                if (!state->isEnabled())
-                    continue;
                 animBits[j] = 0;
                 
                 if (startBone != state->getStartBone()->getNameHash())
@@ -295,10 +296,12 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         else
             baseRevision.readUByte();
     }
+    // Local animation flag
+    checkBool(mLocalAnimation, false, baseRevision, bits, 32);
     
     // If local animation, do not send even if changed. It is slightly unoptimal to first check, then disable, but it ensures
     // that the base revision data stays the same (otherwise out of bounds reads might result when toggling local animation)
-    if (mLocalAnimation)
+    if ((mLocalAnimation) && (checkPrediction(info.mConnection)))
         bits &= ~(8 | 16);
     
     // Update replication state fully, and network stream by delta
@@ -321,15 +324,13 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         destRevision.writeUByte(state->getPriority());
         destRevision.writeBool(state->getUseNlerp());
     }
-    // Then write delta of enabled animations to the net stream
+    // Then write delta of animations to the net stream
     if (bits & 8)
     {
-        dest.writeVLE(enabledAnimations);
+        dest.writeVLE(mAnimationStates.size());
         for (unsigned i = 0; i < mAnimationStates.size(); ++i)
         {
             AnimationState* state = mAnimationStates[i];
-            if (!state->isEnabled())
-                continue;
             dest.writeStringHash(state->getAnimation()->getNameHash());
             dest.writeUByte(animBits[i]);
             if (animBits[i] & 1)
@@ -349,6 +350,7 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
     writeVLEDelta(mMorphs.size(), dest, destRevision, bits & 16);
     for (unsigned i = 0; i < mMorphs.size(); ++i)
         writeUByteDelta((unsigned char)(mMorphs[i].mWeight * 255.0f), dest, destRevision, bits & 16);
+    writeBoolDelta(mLocalAnimation, dest, destRevision, bits & 32);
     
     return prevBits || (bits != 0);
 }
@@ -432,6 +434,8 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
         for (unsigned i = 0; i < numMorphs; ++i)
             setMorphWeight(i, source.readUByte() / 255.0f);
     }
+    if (bits & 32)
+        mLocalAnimation = source.readBool();
 }
 
 void AnimatedModel::interpolate(bool snapToEnd)

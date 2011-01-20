@@ -166,7 +166,7 @@ void Node::loadXML(const XMLElement& source, ResourceCache* cache)
         mParentRef.readXML(parentElem);
     }
     else
-        mParentRef.mEntityID = 0;
+        mParentRef = ComponentRef();
     
     markDirty();
 }

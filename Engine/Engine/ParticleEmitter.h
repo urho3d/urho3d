@@ -80,7 +80,7 @@ public:
     //! Read a network update
     virtual void readNetUpdate(Deserializer& source, ResourceCache* cache, const NetUpdateInfo& info);
     
-    //! Update the particle system. Is called from handleSceneUpdate().
+    //! Update the particle system. Is called from handleScenePostUpdate()
     void update(float timeStep);
     //! Load emitter parameters from an XML file
     void loadParameters(XMLFile* file, ResourceCache* cache);
@@ -195,8 +195,8 @@ public:
     bool getUpdateInvisible() const { return mUpdateInvisible; }
     
 private:
-    //! Handle scene update event
-    void handleSceneUpdate(StringHash eventType, VariantMap& eventData);
+    //! Handle scene post-update event
+    void handleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     //! Create a new particle
     bool emitNewParticle();
     //! Return a free particle index

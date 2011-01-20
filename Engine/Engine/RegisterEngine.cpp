@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "AnimationController.h"
 #include "Client.h"
 #include "Connection.h"
 #include "DebugHud.h"
@@ -284,6 +285,42 @@ static void ParticleEmitterLoadParameters(XMLFile* file, ParticleEmitter* ptr)
     }
 }
 
+static void registerAnimationController(asIScriptEngine* engine)
+{
+    registerComponent<AnimationController>(engine, "AnimationController");
+    engine->RegisterObjectMethod("AnimationController", "void setAnimatedModel(AnimatedModel@+)", asMETHOD(AnimationController, setAnimatedModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool addAnimation(const string& in, uint8)", asMETHOD(AnimationController, addAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool removeAnimation(const string& in, float)", asMETHOD(AnimationController, removeAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void removeAnimations(uint8, float)", asMETHOD(AnimationController, removeAnimations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void removeAllAnimations(float)", asMETHOD(AnimationController, removeAllAnimations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setAnimation(const string& in, uint8, bool, bool, float, float, float, float, bool)", asMETHOD(AnimationController, setAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setProperties(const string& in, uint8, float, float, float, float)", asMETHOD(AnimationController, setProperties), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setPriority(const string& in, int)", asMETHOD(AnimationController, setPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setStartBone(const string& in, const string& in)", asMETHOD(AnimationController, setStartBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setBlending(const string& in, int, const string& in)", asMETHOD(AnimationController, setBlending), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setTime(const string& in, float)", asMETHOD(AnimationController, setTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setWeight(const string& in, float)", asMETHOD(AnimationController, setWeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setLooped(const string& in, bool)", asMETHOD(AnimationController, setLooped), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setGroup(const string& in, uint8)", asMETHOD(AnimationController, setGroup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setSpeed(const string& in, float)", asMETHOD(AnimationController, setSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setFade(const string& in, float, float)", asMETHOD(AnimationController, setFade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setFadeOthers(const string& in, float, float)", asMETHOD(AnimationController, setFadeOthers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool setAutoFade(const string& in, float)", asMETHOD(AnimationController, setAutoFade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "AnimatedModel@+ getAnimatedModel() const", asMETHOD(AnimationController, getAnimatedModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool hasAnimation(const string& in) const", asMETHOD(AnimationController, hasAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "int getPriority(const string& in) const", asMETHOD(AnimationController, getPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "Bone@+ getStartBone(const string& in) const", asMETHOD(AnimationController, getStartBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getTime(const string& in) const", asMETHOD(AnimationController, getTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getWeight(const string& in) const", asMETHOD(AnimationController, getWeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool isLooped(const string& in) const", asMETHOD(AnimationController, isLooped), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getLength(const string& in) const", asMETHOD(AnimationController, getLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "uint8 getGroup(const string& in) const", asMETHOD(AnimationController, getGroup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getSpeed(const string& in) const", asMETHOD(AnimationController, getSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getFadeTarget(const string& in) const", asMETHOD(AnimationController, getFadeTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float getAutoFade(const string& in) const", asMETHOD(AnimationController, getAutoFade), asCALL_THISCALL);
+    registerRefCasts<Component, AnimationController>(engine, "Component", "AnimationController");
+}
+
 static void registerParticleEmitter(asIScriptEngine* engine)
 {
     registerGeometryNode<ParticleEmitter>(engine, "ParticleEmitter");
@@ -383,6 +420,7 @@ void registerEngineLibrary(asIScriptEngine* engine)
     registerConnection(engine);
     registerClient(engine);
     registerServer(engine);
+    registerAnimationController(engine);
     registerParticleEmitter(engine);
     registerDebugHud(engine);
     registerEngine(engine);

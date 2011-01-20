@@ -322,117 +322,6 @@ bool GameObject::heal(int amount)
     return false;
 }
 
-void GameObject::enableAnim(const std::string& name, bool restart)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    
-    AnimationState* state = model->getAnimationState(name);
-    if (state)
-    {
-        // Start from beginning if restart explicitly requested
-        if (restart)
-            state->setTime(0.0f);
-        state->setWeight(1.0f);
-    }
-    else
-    {
-        AnimationState* state = model->addAnimationState(getAnim(name));
-        if (state)
-            state->setWeight(1.0f);
-    }
-}
-
-void GameObject::enableOnlyAnim(const std::string& name, bool restart)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    
-    // Enable only the animation we want
-    enableAnim(name, restart);
-    
-    // Disable all others
-    std::vector<AnimationState*> states = model->getAnimationStates();
-    for (unsigned i = 0; i < states.size(); ++i)
-    {
-        if (states[i]->getAnimation()->getName() != name)
-            model->removeAnimationState(states[i]);
-    }
-}
-
-void GameObject::enableOnlyAnimSmooth(const std::string& name, bool restart, float time)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    
-    AnimationState* state = model->getAnimationState(name);
-    if (!state)
-        state = model->addAnimationState(getAnim(name));
-    if (state)
-    {
-        if (restart)
-            state->setTime(0.0f);
-        // Increase weight of the animation we're activating, start from 0 if was disabled
-        state->addWeight(time);
-    }
-    
-    // Decrease weight of all the rest, until at weight 0 and can be disabled
-    std::vector<AnimationState*> states = model->getAnimationStates();
-    for (unsigned i = 0; i < states.size(); ++i)
-    {
-        if (states[i]->getAnimation()->getName() != name)
-        {
-            states[i]->addWeight(-time);
-            if (states[i]->getWeight() == 0.0f)
-                model->removeAnimationState(states[i]);
-        }
-    }
-}
-
-void GameObject::disableAnim(const std::string& name)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    model->removeAnimationState(name);
-}
-
-void GameObject::advanceAnim(const std::string& name, bool looped, float time)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    AnimationState* state = model->getAnimationState(name);
-    if (state)
-    {
-        state->setLooped(looped);
-        state->addTime(time);
-    }
-}
-
-void GameObject::setAnimWeight(const std::string& name, float weight)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    AnimationState* state = model->getAnimationState(name);
-    if (state)
-        state->setWeight(weight);
-}
-
-void GameObject::setAnimPriority(const std::string& name, int priority)
-{
-    AnimatedModel* model = mEntity->getComponent<AnimatedModel>();
-    if (!model)
-        return;
-    AnimationState* state = model->getAnimationState(name);
-    if (state)
-        state->setPriority(priority);
-}
-
 void GameObject::playSound(const std::string& name)
 {
    // Need an unique name to ensure proper replication (we potentially have many sounds in the same entity)
@@ -507,11 +396,6 @@ void GameObject::checkOnGround(VariantMap& collision)
         if (mOnGround == true)
             mIsSliding = false;
     }
-}
-
-Animation* GameObject::getAnim(const std::string& name)
-{
-    return getResourceCache()->getResource<Animation>(name);
 }
 
 Scene* GameObject::getScene() const

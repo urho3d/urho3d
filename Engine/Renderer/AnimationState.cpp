@@ -273,6 +273,11 @@ float AnimationState::getTime() const
         return mInterpolationTime;
 }
 
+float AnimationState::getLength() const
+{
+    return mAnimation->getLength();
+}
+
 void AnimationState::apply()
 {
     if (!isEnabled())

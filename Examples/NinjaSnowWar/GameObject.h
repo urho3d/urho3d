@@ -85,13 +85,6 @@ public:
     
     bool damage(int damage, GameObject* source);
     bool heal(int amount);
-    void enableAnim(const std::string& name, bool restart);
-    void enableOnlyAnim(const std::string& name, bool restart);
-    void enableOnlyAnimSmooth(const std::string& name, bool restart, float time);
-    void disableAnim(const std::string& name);
-    void advanceAnim(const std::string& name, bool looped, float time);
-    void setAnimWeight(const std::string& name, float weight);
-    void setAnimPriority(const std::string& name, int priority);
     template <class T> T* spawnObject(const std::string& name = std::string());
     template <class T> T* createComponent(const std::string& name = std::string());
     void playSound(const std::string& name);
@@ -114,7 +107,6 @@ public:
 protected:
     void checkOnGround(VariantMap& collision);
     
-    Animation* getAnim(const std::string& name);
     ResourceCache* getResourceCache() const;
     
     virtual void onCreate(const Vector3& position, const Quaternion& orientation) {}

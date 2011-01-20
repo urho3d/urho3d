@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "AIController.h"
 #include "AnimatedModel.h"
+#include "AnimationController.h"
 #include "CollisionShape.h"
 #include "Deserializer.h"
 #include "Entity.h"
@@ -58,6 +59,10 @@ static Vector3 tThrowVelocity;
 static Vector3 tThrowPosition;
 static float tThrowDelay;
 static float tRenderDistance;
+
+// Animation groups
+static const int ANIM_MOVE = 1;
+static const int ANIM_ATTACK = 2;
 
 void Ninja::setup()
 {
@@ -250,6 +255,10 @@ void Ninja::onCreate(const Vector3& position, const Quaternion& orientation)
     model->setDrawDistance(tRenderDistance);
     model->setCastShadows(true);
     
+    // Create animation controller
+    AnimationController* controller = createComponent<AnimationController>();
+    controller->setAnimatedModel(model);
+    
     // Create body
     RigidBody* body = createComponent<RigidBody>();
     body->setPosition(position);
@@ -270,8 +279,12 @@ void Ninja::onCreate(const Vector3& position, const Quaternion& orientation)
     // Enable owner prediction on the entity, sync the ninja component to the owner only
     mEntity->setNetFlags(NET_SYNCTOALL | NET_OWNERPREDICT);
     setNetFlags(NET_SYNCTOOWNER | NET_OWNERPREDICT);
-    body->setNetFlags(NET_SYNCTOALL | NET_OWNERPREDICT);
     model->setNetFlags(NET_SYNCTOALL | NET_OWNERPREDICT);
+    controller->setNetFlags(NET_SYNCTOOWNER | NET_OWNERPREDICT);
+    body->setNetFlags(NET_SYNCTOALL | NET_OWNERPREDICT);
+    
+    // Enable local animation for the player's predicted ninja
+    model->setLocalAnimation(true);
 }
 
 bool Ninja::onUpdate(float time)
@@ -285,7 +298,8 @@ bool Ninja::onUpdate(float time)
     if (mHealth <= 0) return onDeathUpdate(time);
     
     RigidBody* body = getBody();
-    if (!body)
+    AnimationController* controller = mEntity->getComponent<AnimationController>();
+    if ((!body) || (!controller))
         return true;
     
     if (mSide == SIDE_ENEMY)
@@ -355,21 +369,14 @@ bool Ninja::onUpdate(float time)
             
             // Walk or sidestep animation
             if (sidemove)
-            {
-                enableOnlyAnimSmooth("Models/Ninja_Stealth.ani", false, time*5.0f);
-                advanceAnim("Models/Ninja_Stealth.ani", true, animDir*time*2.2f);
-            }
+                controller->setAnimation("Models/Ninja_Stealth.ani", ANIM_MOVE, true, false, animDir * 2.2f, 1.0f, 0.2f, 0.0f, true);
             else
-            {
-                enableOnlyAnimSmooth("Models/Ninja_Walk.ani", false, time*5.0f);
-                advanceAnim("Models/Ninja_Walk.ani", true, animDir*time*1.6f);
-            }
+                controller->setAnimation("Models/Ninja_Walk.ani", ANIM_MOVE, true, false, animDir * 1.6f, 1.0f, 0.2f, 0.0f, true);
         }
         else
         {
             // Idle animation
-            enableOnlyAnimSmooth("Models/Ninja_Idle3.ani", false, time*5.0f);
-            advanceAnim("Models/Ninja_Idle3.ani", true, time);
+            controller->setAnimation("Models/Ninja_Idle3.ani", ANIM_MOVE, true, false, 1.0f, 1.0f, 0.2f, 0.0f, true);
         }
         
         // Overall damping to cap maximum speed
@@ -384,7 +391,7 @@ bool Ninja::onUpdate(float time)
                 body->setPosition(body->getPhysicsPosition() + 3.0f * Vector3::sUp);
                 body->applyForce(Vector3(0, tJumpForce, 0));
                 mInAirTime = 1.0f;
-                enableOnlyAnim("Models/Ninja_JumpNoHeight.ani", true);
+                controller->setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 1.0f, 1.0f, 0.0f, 0.0f, true);
                 mOkToJump = false;
             }
         }
@@ -416,10 +423,7 @@ bool Ninja::onUpdate(float time)
         
         // Falling/jumping/sliding animation
         if (mInAirTime > 0.01f)
-        {
-            enableOnlyAnimSmooth("Models/Ninja_JumpNoHeight.ani", false, time*5.0f);
-            advanceAnim("Models/Ninja_JumpNoHeight.ani", false, time);
-        }
+            controller->setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 1.0f, 1.0f, 0.2f, 0.0f, true);
     }
     
     // Shooting
@@ -430,8 +434,9 @@ bool Ninja::onUpdate(float time)
     {
         Vector3 projectileVel = getAim() * tThrowVelocity;
         
-        enableAnim("Models/Ninja_Attack1.ani", true);
-        setAnimPriority("Models/Ninja_Attack1.ani", 10);
+        controller->setAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0f, 0.75f, 0.0f, 0.0f, false);
+        controller->setFade("Models/Ninja_Attack1.ani", 0.0f, 0.5f);
+        controller->setPriority("Models/Ninja_Attack1.ani", 1);
         
         // Do not spawn object for clientside prediction, only animate for now
         if (!isProxy())
@@ -448,9 +453,6 @@ bool Ninja::onUpdate(float time)
         
         mThrowTime = tThrowDelay;
     }
-    // If Attack1 anim is disabled/has weight 0 already, will do nothing, so it's OK to call 
-    // this always
-    advanceAnim("Models/Ninja_Attack1.ani", false, time);
     
     mPrevControls = mControls;
     return true;
@@ -459,6 +461,9 @@ bool Ninja::onUpdate(float time)
 bool Ninja::onDeathUpdate(float time)
 {
     RigidBody* body = getBody();
+    AnimationController* controller = mEntity->getComponent<AnimationController>();
+    if ((!body) || (!controller))
+        return true;
     
     Vector3 vel = body->getLinearVelocity();
     
@@ -497,16 +502,16 @@ bool Ninja::onDeathUpdate(float time)
         if (mDeathDir < 0.0f)
         {
             // Backward death
-            enableOnlyAnim("Models/Ninja_Death1.ani", false);
-            advanceAnim("Models/Ninja_Death1.ani", false, time * 0.5f);
+            controller->removeAnimations(ANIM_ATTACK, 0.1f);
+            controller->setAnimation("Models/Ninja_Death1.ani", ANIM_MOVE, false, false, 0.5f, 1.0f, 0.2f, 0.0f, true);
             if ((mDeathTime >= 0.3f) && (mDeathTime < 0.8f))
                 model->translate(Vector3(0, 0, 425 * time));
         }
         else if (mDeathDir > 0.0f)
         {
             // Forward death
-            enableOnlyAnim("Models/Ninja_Death2.ani", false);
-            advanceAnim("Models/Ninja_Death2.ani", false, time * 0.5f);
+            controller->removeAnimations(ANIM_ATTACK, 0.1f);
+            controller->setAnimation("Models/Ninja_Death2.ani", ANIM_MOVE, false, false, 0.5f, 1.0f, 0.2f, 0.0f, true);
             if ((mDeathTime >= 0.4f) && (mDeathTime < 0.8f))
                 model->translate(Vector3(0, 0, -425 * time));
         }

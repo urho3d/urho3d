@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Material.h"
 #include "ParticleEmitter.h"
+#include "Profiler.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
 #include "Scene.h"
@@ -65,7 +66,7 @@ ParticleEmitter::ParticleEmitter(Octant* octant, const std::string& name) :
 {
     setParticleColor(Color(1.0f, 1.0f, 1.0f));
     setNumParticles(10);
-    subscribeToEvent(EVENT_SCENEUPDATE, EVENT_HANDLER(ParticleEmitter, handleSceneUpdate));
+    subscribeToEvent(EVENT_SCENEPOSTUPDATE, EVENT_HANDLER(ParticleEmitter, handleScenePostUpdate));
 }
 
 void ParticleEmitter::save(Serializer& dest)
@@ -237,6 +238,8 @@ void ParticleEmitter::update(float timeStep)
             return;
     }
     mLastUpdateFrameNumber = mViewFrameNumber;
+    
+    PROFILE(ParticleEmitter_Update);
     
     // If size mismatch, correct it
     if (mParticles.size() != mBillboards.size())
@@ -619,9 +622,9 @@ void ParticleEmitter::setUpdateInvisible(bool enable)
     mUpdateInvisible = enable;
 }
 
-void ParticleEmitter::handleSceneUpdate(StringHash eventType, VariantMap& eventData)
+void ParticleEmitter::handleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    using namespace SceneUpdate;
+    using namespace ScenePostUpdate;
     
     // Check that the scene matches
     Scene* scene = mEntity ? mEntity->getScene() : 0;

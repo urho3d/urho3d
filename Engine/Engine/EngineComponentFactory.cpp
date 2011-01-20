@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "AnimationController.h"
 #include "EngineComponentFactory.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
@@ -35,6 +36,8 @@ EngineComponentFactory::EngineComponentFactory(Octree* octree) :
 
 Component* EngineComponentFactory::createComponent(ShortStringHash type, const std::string& name)
 {
+    if (type == AnimationController::getTypeStatic())
+        return new AnimationController(name);
     if (type == ParticleEmitter::getTypeStatic())
         return new ParticleEmitter(mOctree, name);
     

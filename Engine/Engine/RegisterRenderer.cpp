@@ -643,6 +643,7 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "bool isLooped() const", asMETHOD(AnimationState, isLooped), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float getWeight() const", asMETHOD(AnimationState, getWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float getTime() const", asMETHOD(AnimationState, getTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "float getLength() const", asMETHOD(AnimationState, getLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "int getPriority() const", asMETHOD(AnimationState, getPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool getUseNlerp() const", asMETHOD(AnimationState, getUseNlerp), asCALL_THISCALL);
     

@@ -104,9 +104,8 @@ public:
     void syncAnimation(AnimatedModel* srcNode);
     //! Sync morphs from another animated model
     void syncMorphs(AnimatedModel* srcNode);
-    //! Set animation & morphs local mode. If enabled, they are not sent over network even if the node is otherwise replicated
+    //! Set animation & morphs local mode. If enabled, and prediction is active, they will not be sent over network
     void setLocalAnimation(bool enable);
-    
     //! Return skeleton
     const Skeleton& getSkeleton() const { return mSkeleton; }
     //! Return all animation states
@@ -131,7 +130,7 @@ public:
     float getMorphWeight(const std::string& name) const;
     //! Return vertex morph weight by name hash
     float getMorphWeight(StringHash nameHash) const;
-    //! Return whether animation is local
+    //! Return whether animation is local when prediction is on
     bool getLocalAnimation() const { return mLocalAnimation; }
     
 protected:

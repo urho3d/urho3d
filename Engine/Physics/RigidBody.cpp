@@ -210,7 +210,7 @@ void RigidBody::loadXML(const XMLElement& source, ResourceCache* cache)
         mParentRef.readXML(parentElem);
     }
     else
-        mParentRef.mEntityID = 0;
+        mParentRef = ComponentRef();
     
     // Read the RigidBody properties we store ourselves
     XMLElement bodyElem = source.getChildElement("body");
