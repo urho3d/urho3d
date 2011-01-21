@@ -32,11 +32,7 @@
 UIElement::UIElement(const std::string& name) :
     mName(name),
     mParent(0),
-    mPosition(IntVector2::sZero),
-    mSize(IntVector2::sZero),
-    mHorizontalAlignment(HA_LEFT),
-    mVerticalAlignment(VA_TOP),
-    mChildOffset(IntVector2::sZero),
+    mClipBorder(IntRect::sZero),
     mHoverColor(Color(0.0f, 0.0f, 0.0f)),
     mPriority(0),
     mOpacity(1.0f),
@@ -47,6 +43,11 @@ UIElement::UIElement(const std::string& name) :
     mFocus(false),
     mVisible(true),
     mHovering(false),
+    mPosition(IntVector2::sZero),
+    mSize(IntVector2::sZero),
+    mChildOffset(IntVector2::sZero),
+    mHorizontalAlignment(HA_LEFT),
+    mVerticalAlignment(VA_TOP),
     mScreenPositionDirty(true),
     mDerivedOpacityDirty(true),
     mHasColorGradient(false)
@@ -73,6 +74,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
     if (!cache)
         EXCEPTION("Null resource cache for UI element");
     
+    if (element.hasAttribute("name"))
+        mName = element.getString("name");
     if (element.hasChildElement("position"))
         setPosition(element.getChildElement("position").getIntVector2("value"));
     if (element.hasChildElement("size"))
@@ -104,6 +107,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         if (vert == "bottom")
             setVerticalAlignment(VA_BOTTOM);
     }
+    if (element.hasChildElement("clipborder"))
+        setClipBorder(element.getChildElement("clipborder").getIntRect("value"));
     if (element.hasChildElement("priority"))
         setPriority(element.getChildElement("priority").getInt("value"));
     if (element.hasChildElement("opacity"))
@@ -304,6 +309,19 @@ void UIElement::setVerticalAlignment(VerticalAlignment align)
 {
     mVerticalAlignment = align;
     markDirty();
+}
+
+void UIElement::setClipBorder(const IntRect& rect)
+{
+    mClipBorder.mLeft = max(rect.mLeft, 0);
+    mClipBorder.mTop = max(rect.mTop, 0);
+    mClipBorder.mRight = max(rect.mRight, 0);
+    mClipBorder.mBottom = max(rect.mBottom, 0);
+}
+
+void UIElement::setClipBorder(int left, int top, int right, int bottom)
+{
+    setClipBorder(IntRect(left, top, right, bottom));
 }
 
 void UIElement::setColor(const Color& color)
@@ -531,10 +549,10 @@ void UIElement::adjustScissor(IntRect& currentScissor)
     if (mClipChildren)
     {
         IntVector2 screenPos = getScreenPosition();
-        currentScissor.mLeft = max(currentScissor.mLeft, screenPos.mX);
-        currentScissor.mTop = max(currentScissor.mTop, screenPos.mY);
-        currentScissor.mRight = min(currentScissor.mRight, screenPos.mX + mSize.mX);
-        currentScissor.mBottom = min(currentScissor.mBottom, screenPos.mY + mSize.mY);
+        currentScissor.mLeft = max(currentScissor.mLeft, screenPos.mX + mClipBorder.mLeft);
+        currentScissor.mTop = max(currentScissor.mTop, screenPos.mY + mClipBorder.mTop);
+        currentScissor.mRight = min(currentScissor.mRight, screenPos.mX + mSize.mX - mClipBorder.mRight);
+        currentScissor.mBottom = min(currentScissor.mBottom, screenPos.mY + mSize.mY - mClipBorder.mBottom);
     }
 }
 

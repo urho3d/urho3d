@@ -84,6 +84,8 @@ void Window::onDragStart(const IntVector2& position, const IntVector2& screenPos
     // Top row
     if (position.mY < mResizeBorder.mTop)
     {
+        if (mMovable)
+            mDragMode = DRAG_MOVE;
         if (mResizable)
         {
             mDragMode = DRAG_RESIZE_TOP;
@@ -96,6 +98,8 @@ void Window::onDragStart(const IntVector2& position, const IntVector2& screenPos
     // Bottom row
     else if (position.mY >= mOriginalSize.mY - mResizeBorder.mBottom)
     {
+        if (mMovable)
+            mDragMode = DRAG_MOVE;
         if (mResizable)
         {
             mDragMode = DRAG_RESIZE_BOTTOM;

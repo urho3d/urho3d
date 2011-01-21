@@ -509,14 +509,16 @@ void UI::loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
     XMLElement childElem = elem.getChildElement("element");
     while (childElem)
     {
+        // Create and add to the hierarchy
         SharedPtr<UIElement> child = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name"));
+        current->addChild(child);
+        
         // First set the base style from the style file if exists, then apply UI layout overrides
         if (styleFile)
             child->setStyleAuto(styleFile, mCache);
         child->setStyle(childElem, mCache);
         
-        // Add to the hierarchy and recurse
-        current->addChild(child);
+        // Load the children recursively
         loadLayout(child, childElem, styleFile);
         
         childElem = childElem.getNextElement("element");

@@ -1,7 +1,7 @@
 <layout>
     <element type="Window">
         <position value="50 50" />
-        <size value="250 250" />
+        <size value="400 300" />
         <resizable enable="false" />
         <element type="Button">
             <position value="10 10" />
@@ -11,17 +11,6 @@
                 <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
-        </element>
-        <element type="Slider">
-            <position value="10 200" />
-            <size value="128 16" />
-            <slider range="10" value="5" />
-        </element>
-        <element type="Slider">
-            <position value="200 10" />
-            <size value="16 128 " />
-            <orientation value="vertical" />
-            <slider range="1" value="1" />
         </element>
         <element type="CheckBox">
             <position value="10 100" />
@@ -34,6 +23,29 @@
         </element>
         <element type="CheckBox">
             <position value="40 130" />
+        </element>
+        <element type="Slider" name="ViewSliderV">
+            <position value="350 150" />
+            <size value="10 100" />
+            <orientation value="vertical" />
+        </element>
+        <element type="Slider" name="ViewSliderH">
+            <position value="150 250" />
+            <size value="200 10" />
+            <orientation value="horizontal" />
+        </element>
+        <element type="ScrollView">
+            <position value="150 150" />
+            <size value="200 100" />
+            <viewsize value="200 150" />
+            <horizontalslider name="ViewSliderH" />
+            <verticalslider name="ViewSliderV" />
+            <element type="Text">
+                <position value="1 1" />
+                <font name="times.ttf" size="15" />
+                <text value="Urho3D - a Win32/Direct3D9 rendering and game engine http://urho3d.googlecode.com Licensed under the MIT license, see License.txt for details." />
+                <maxwidth value="200" />
+            </element>
         </element>
     </element>
 </layout>

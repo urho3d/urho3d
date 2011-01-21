@@ -26,6 +26,7 @@
 #include "Button.h"
 #include "CheckBox.h"
 #include "Cursor.h"
+#include "ScrollView.h"
 #include "Slider.h"
 #include "Text.h"
 #include "Window.h"
@@ -40,6 +41,8 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
         return new CheckBox(name);
     if (type == Cursor::getTypeStatic())
         return new Cursor(name);
+    if (type == ScrollView::getTypeStatic())
+        return new ScrollView(name);
     if (type == Slider::getTypeStatic())
         return new Slider(name);
     if (type == Text::getTypeStatic())

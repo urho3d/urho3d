@@ -22,6 +22,13 @@
         <imagerect value="0 0 16 24" />
         <hotspot value="0 0" />
     </element>
+    <element type="ScrollView">
+        <size value="16 16" />
+        <texture name="Textures/UI.png" />
+        <imagerect value="96 0 112 16" />
+        <border value="2 2 2 2" />
+        <clipborder value="1 1 1 1" />
+    </element>
     <element type="Slider">
         <size value="16 16" />
         <texture name="Textures/UI.png" />

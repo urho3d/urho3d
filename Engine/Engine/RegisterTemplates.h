@@ -379,6 +379,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(T, setAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setHorizontalAlignment(HorizontalAlignment)", asMETHOD(T, setHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVerticalAlignment(VerticalAlignment)", asMETHOD(T, setVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setClipBorder(const IntRect& in)", asMETHODPR(T, setClipBorder, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setClipBorder(int, int, int, int)", asMETHODPR(T, setClipBorder, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(const Color& in)", asMETHODPR(T, setColor, (const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(UIElementCorner, const Color& in)", asMETHODPR(T, setColor, (UIElementCorner, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setHoverColor(const Color& in)", asMETHOD(T, setHoverColor), asCALL_THISCALL);
@@ -401,6 +403,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "const IntVector2& getChildOffset() const", asMETHOD(T, getChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "HorizontalAlignment getHorizontalAlignment() const", asMETHOD(T, getHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment getVerticalAlignment() const", asMETHOD(T, getVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& getClipBorder() const", asMETHOD(T, getClipBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& getColor(UIElementCorner) const", asMETHOD(T, getColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& getHoverColor() const", asMETHOD(T, getHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getPriority() const", asMETHOD(T, getPriority), asCALL_THISCALL);

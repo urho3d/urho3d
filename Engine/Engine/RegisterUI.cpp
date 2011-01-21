@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "Font.h"
 #include "RegisterTemplates.h"
+#include "ScrollView.h"
 #include "Slider.h"
 #include "Text.h"
 #include "UI.h"
@@ -146,6 +147,22 @@ static void registerSlider(asIScriptEngine* engine)
     registerRefCasts<UIElement, Slider>(engine, "UIElement", "Slider");
 }
 
+static void registerScrollView(asIScriptEngine* engine)
+{
+    registerBorderImage<ScrollView>(engine, "ScrollView");
+    engine->RegisterObjectMethod("ScrollView", "void setViewPosition(const IntVector2& in)", asMETHODPR(ScrollView, setViewPosition, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setViewPosition(int, int)", asMETHODPR(ScrollView, setViewPosition, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setViewSize(const IntVector2& in)", asMETHODPR(ScrollView, setViewSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setViewSize(int, int)", asMETHODPR(ScrollView, setViewSize, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setHorizontalSlider(Slider@+)", asMETHOD(ScrollView, setHorizontalSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setVerticalSlider(Slider@+)", asMETHOD(ScrollView, setVerticalSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewSize() const", asMETHOD(ScrollView, getViewSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "Slider@+ getHorizontalSlider() const", asMETHOD(ScrollView, getHorizontalSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "Slider@+ getVerticalSlider() const", asMETHOD(ScrollView, getVerticalSlider), asCALL_THISCALL);
+    registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
+}
+
 static void registerWindow(asIScriptEngine* engine)
 {
     registerBorderImage<Window>(engine, "Window");
@@ -262,6 +279,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerCheckBox(engine);
     registerCursor(engine);
     registerSlider(engine);
+    registerScrollView(engine);
     registerText(engine);
     registerWindow(engine);
     registerUI(engine);

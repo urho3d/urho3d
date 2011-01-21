@@ -295,7 +295,8 @@ bool Ninja::onUpdate(float time)
         return true;
     
     // Check health
-    if (mHealth <= 0) return onDeathUpdate(time);
+    if (mHealth <= 0)
+        return onDeathUpdate(time);
     
     RigidBody* body = getBody();
     AnimationController* controller = mEntity->getComponent<AnimationController>();

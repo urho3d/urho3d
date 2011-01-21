@@ -121,6 +121,10 @@ public:
     void setHorizontalAlignment(HorizontalAlignment align);
     //! Set vertical alignment
     void setVerticalAlignment(VerticalAlignment align);
+    //! Set child element clipping border
+    void setClipBorder(const IntRect& rect);
+    //! Set child element clipping border
+    void setClipBorder(int left, int top, int right, int bottom);
     //! Set color on all corners
     void setColor(const Color& color);
     //! Set color on one corner
@@ -168,6 +172,8 @@ public:
     HorizontalAlignment getHorizontalAlignment() const { return mHorizontalAlignment; }
     //! Return vertical alignment
     VerticalAlignment getVerticalAlignment() const { return mVerticalAlignment; }
+    //! Return child element clipping border
+    const IntRect& getClipBorder() const { return mClipBorder; }
     //! Return corner color
     const Color& getColor(UIElementCorner corner) const { return mColor[corner]; }
     //! Return color modification used on hover
@@ -178,7 +184,7 @@ public:
     float getOpacity() const { return mOpacity; }
     //! Return whether should be brought to front when focused
     bool getBringToFront() const { return mBringToFront; }
-    //! Return whether should clip children
+    //! Return whether should clip child elements
     bool getClipChildren() const { return mClipChildren; }
     //! Return whether reacts to input
     bool isEnabled() const { return mEnabled; }
@@ -232,6 +238,8 @@ protected:
     std::vector<SharedPtr<UIElement> > mChildren;
     //! Parent element
     UIElement* mParent;
+    //! Child element clipping border
+    IntRect mClipBorder;
     //! Colors
     Color mColor[MAX_UIELEMENT_CORNERS];
     //! Color modification on hover
