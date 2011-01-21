@@ -1091,11 +1091,7 @@ void AnimatedModel::updateAnimation(const FrameInfo& frame)
         if (mAnimationLodTimer >= mAnimationLodDistance)
             mAnimationLodTimer = fmodf(mAnimationLodTimer, mAnimationLodDistance);
         else
-        {
-            // If animation order changed (animations added/removed), force always an immediate update
-            if (!mAnimationOrderDirty)
-                return;
-        }
+            return;
     }
     
     PROFILE(AnimatedModel_UpdateAnimation);
@@ -1121,8 +1117,7 @@ void AnimatedModel::updateSkinning()
 {
     PROFILE(AnimatedModel_UpdateSkinning);
     
-    // Note: the model's world transform will be baked in the skin matrices. When preparing to render,
-    // the model transform will then be set to identity
+    // Note: the model's world transform will be baked in the skin matrices
     const std::vector<SharedPtr<Bone > >& bones = mSkeleton.getBones();
     
     // Skinning with global matrices only
