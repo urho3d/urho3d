@@ -246,10 +246,7 @@ SharedPtr<File> ResourceCache::getFile(const std::string& name)
     for (unsigned i = 0; i < mPackages.size(); ++i)
     {
         if (mPackages[i]->exists(name))
-        {
-            const PackageEntry& entry = mPackages[i]->getEntry(name);
-            return SharedPtr<File>(new File(name, &mPackages[i]->getFile(), entry));
-        }
+            return SharedPtr<File>(new File(*mPackages[i], name));
     }
     
     // Then the filesystem

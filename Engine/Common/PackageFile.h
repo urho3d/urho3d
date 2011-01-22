@@ -40,7 +40,7 @@ struct PackageEntry
 class PackageFile : public RefCounted
 {
 public:
-    //! Construct and open the package file
+    //! Construct and read the package file directory
     PackageFile(const std::string& fileName);
     //! Destruct. Close the package file
     virtual ~PackageFile();
@@ -51,26 +51,26 @@ public:
     const PackageEntry& getEntry(const std::string& fileName) const;
     //! Return all file entries
     const std::map<std::string, PackageEntry>& getEntries() const { return mEntries; }
-    //! Return the File object representing the whole package file
-    File& getFile() { return mFile; }
     //! Return the package file name
-    const std::string& getName() const { return mFile.getName(); }
+    const std::string& getName() const { return mFileName; }
     //! Return hash of the package file name
     StringHash getNameHash() const { return mNameHash; }
     //! Return number of files
     unsigned getNumFiles() const { return mEntries.size(); }
     //! Return total size of the package file
-    unsigned getTotalSize() const { return mFile.getSize(); }
+    unsigned getTotalSize() const { return mTotalSize; }
     //! Return checksum of the package file contents
     unsigned getChecksum() const { return mChecksum; }
     
 private:
-    //! File object
-    File mFile;
     //! File entries
     std::map<std::string, PackageEntry> mEntries;
+    //! File name
+    std::string mFileName;
     //! Package file name hash
     StringHash mNameHash;
+    //! Package file total size
+    unsigned mTotalSize;
     //! Package file checksum
     unsigned mChecksum;
 };

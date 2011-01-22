@@ -25,6 +25,7 @@
 #define ENGINE_SERVER_H
 
 #include "EventListener.h"
+#include "Timer.h"
 #include "SharedPtr.h"
 
 #include <vector>
@@ -33,6 +34,13 @@ class Connection;
 class Network;
 class Scene;
 class VectorBuffer;
+
+//! Server-side ongoing download, with a timer for closing the file if unused
+struct ServerFileTransfer
+{
+    SharedPtr<File> mFile;
+    Timer mCloseTimer;
+};
 
 //! Provides scenes over the network
 class Server : public RefCounted, public EventListener
@@ -127,6 +135,8 @@ private:
     std::vector<SharedPtr<Scene> > mScenes;
     //! Client connections
     std::vector<SharedPtr<Connection> > mConnections;
+    //! Ongoing file downloads
+    std::map<StringHash, ServerFileTransfer> mFileTransfers;
     //! Network updates per second
     int mNetFps;
     //! Network update time accumulator

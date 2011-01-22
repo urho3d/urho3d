@@ -39,7 +39,7 @@ enum FileMode
     FILE_READWRITE
 };
 
-struct PackageEntry;
+class PackageFile;
 
 //! A file opened either through the filesystem or from within a package file
 class File : public RefCounted, public Deserializer, public Serializer
@@ -47,8 +47,8 @@ class File : public RefCounted, public Deserializer, public Serializer
 public:
     //! Construct and open the file with the specified name and open mode
     File(const std::string& fileName, FileMode mode = FILE_READ);
-    //! Construct by specifying an entry within a package file
-    File(const std::string& fileName, File* packageFile, const PackageEntry& entry);
+    //! Construct by specifying a package file source
+    File(const PackageFile& package, const std::string& fileName);
     //! Destruct. Close the file if open
     virtual ~File();
     
@@ -76,13 +76,11 @@ public:
 private:
     //! File handle
     FILE* mHandle;
-    //! Pointer to package file if opened from within a package
-    WeakPtr<File> mPackageFile;
     //! File name
     std::string mFileName;
     //! Open mode
     FileMode mMode;
-    //! Start position within a package file
+    //! Start position within a package file, 0 for regular files
     unsigned mOffset;
     //! Content checksum
     unsigned mChecksum;

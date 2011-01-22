@@ -38,7 +38,6 @@ void scanDirectoryInternal(std::vector<std::string>& result, std::string path, c
 
 File::File(const std::string& fileName, FileMode mode) :
     mHandle(0),
-    mPackageFile(0),
     mFileName(fileName),
     mMode(mode),
     mOffset(0),
@@ -63,15 +62,20 @@ File::File(const std::string& fileName, FileMode mode) :
     fseek(mHandle, 0, SEEK_SET);
 }
 
-File::File(const std::string& fileName, File* packageFile, const PackageEntry& entry) :
-    Deserializer(entry.mSize),
+File::File(const PackageFile& package, const std::string& fileName) :
     mHandle(0),
-    mPackageFile(packageFile),
     mFileName(fileName),
-    mMode(FILE_READ),
-    mOffset(entry.mOffset),
-    mChecksum(entry.mChecksum)
+    mMode(FILE_READ)
 {
+    const PackageEntry& entry = package.getEntry(fileName);
+    mOffset = entry.mOffset;
+    mSize = entry.mSize;
+    mChecksum = entry.mChecksum;
+    
+    mHandle = fopen(getOSPath(package.getName()).c_str(), "rb");
+    if (!mHandle)
+        EXCEPTION("Could not open package file " + fileName);
+    fseek(mHandle, mOffset, SEEK_SET);
 }
 
 File::~File()
@@ -90,27 +94,15 @@ void File::read(void* dest, unsigned size)
     if (size + mPosition > mSize)
         SAFE_EXCEPTION("Attempted to read past file end");
     
-    // If reading from a package, redirect to it
-    if (mPackageFile.notNull())
+    if (!mHandle)
+        SAFE_EXCEPTION("File not open");
+    
+    size_t ret = fread(dest, size, 1, mHandle);
+    if (ret != 1)
     {
-        if (mPackageFile.isExpired())
-            SAFE_EXCEPTION("Parent package file no longer exists");
-        
-        mPackageFile->seek(mPosition + mOffset);
-        mPackageFile->read(dest, size);
-    }
-    else
-    {
-        if (!mHandle)
-            SAFE_EXCEPTION("File not open");
-        
-        size_t ret = fread(dest, size, 1, mHandle);
-        if (ret != 1)
-        {
-            // Return to the position where the read began
-            fseek(mHandle, mPosition, SEEK_SET);
-            SAFE_EXCEPTION("Error while reading from file");
-        }
+        // Return to the position where the read began
+        fseek(mHandle, mPosition + mOffset, SEEK_SET);
+        SAFE_EXCEPTION("Error while reading from file");
     }
     
     mPosition += size;
@@ -121,13 +113,10 @@ unsigned File::seek(unsigned position)
     if (position > mSize)
         position = mSize;
     
-    if ((mPackageFile.isNull()) && (position != mPosition))
-    {
-        if (!mHandle)
-            SAFE_EXCEPTION_RET("File not open", 0);
+    if (!mHandle)
+        SAFE_EXCEPTION_RET("File not open", 0);
         
-        fseek(mHandle, position, SEEK_SET);
-    }
+    fseek(mHandle, position + mOffset, SEEK_SET);
     
     mPosition = position;
     return mPosition;
@@ -147,7 +136,7 @@ void File::write(const void* data, unsigned size)
     if (fwrite(data, size, 1, mHandle) != 1)
     {
         // Return to the position where the write began
-        fseek(mHandle, mPosition, SEEK_SET);
+        fseek(mHandle, mPosition + mOffset, SEEK_SET);
         SAFE_EXCEPTION("Error while writing to file");
     }
     
@@ -172,7 +161,7 @@ void File::setName(const std::string& name)
 
 unsigned File::getChecksum()
 {
-    if ((mPackageFile) || (mChecksum))
+    if ((mOffset) || (mChecksum))
         return mChecksum;
     
     unsigned oldPos = mPosition;

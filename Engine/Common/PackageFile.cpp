@@ -27,24 +27,27 @@
 #include "StringUtils.h"
 
 PackageFile::PackageFile(const std::string& fileName) :
-    mFile(fileName)
+    mFileName(fileName),
+    mNameHash(StringHash(fileName))
 {
-    // Calculate the filename hash and register the reverse mapping
-    mNameHash = StringHash(fileName);
-    registerHash(fileName);
+    File file(mFileName);
+    mTotalSize = file.getSize();
+    
+    // Register the reverse mapping for the hashed file name
+    registerHash(mFileName);
     
     // Read the directory
-    unsigned numFiles = mFile.readUInt();
-    mChecksum = mFile.readUInt();
+    unsigned numFiles = file.readUInt();
+    mChecksum = file.readUInt();
     
     for (unsigned i = 0; i < numFiles; ++i)
     {
-        std::string entryName = mFile.readString();
+        std::string entryName = file.readString();
         PackageEntry newEntry;
-        newEntry.mOffset = mFile.readUInt();
-        newEntry.mSize = mFile.readUInt();
-        newEntry.mChecksum = mFile.readUInt();
-        if (newEntry.mOffset + newEntry.mSize > mFile.getSize())
+        newEntry.mOffset = file.readUInt();
+        newEntry.mSize = file.readUInt();
+        newEntry.mChecksum = file.readUInt();
+        if (newEntry.mOffset + newEntry.mSize > file.getSize())
             EXCEPTION("File entry " + fileName + " outside package file");
         mEntries[toLower(entryName)] = newEntry;
     }

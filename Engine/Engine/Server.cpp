@@ -42,6 +42,9 @@
 
 #include "DebugNew.h"
 
+// Timeout for closing transferred package files, in milliseconds
+static const int FILE_TIMEOUT = 15 * 1000;
+
 Server::Server(Network* network) :
     mNetwork(network),
     mNetFps(30),
@@ -191,6 +194,15 @@ void Server::update(float timeStep)
             i = mConnections.erase(i);
         else
             ++i;
+    }
+    
+    // Close file transfers that have been unused for some time
+    for (std::map<StringHash, ServerFileTransfer>::iterator i = mFileTransfers.begin(); i != mFileTransfers.end();)
+    {
+        std::map<StringHash, ServerFileTransfer>::iterator current = i;
+        ++i;
+        if (current->second.mCloseTimer.getMSec(false) > FILE_TIMEOUT)
+            mFileTransfers.erase(current);
     }
 }
 
@@ -414,9 +426,30 @@ bool Server::handleRequestFile(Connection* connection, VectorBuffer& packet)
         return true;
     }
     
-    // Check that the fragment range is not outside file
-    File& file = package->getFile();
-    unsigned fileSize = file.getSize();
+    // Open file if not already open
+    File* file = mFileTransfers[nameHash].mFile;
+    if (!file)
+    {
+        try
+        {
+            file = mFileTransfers[nameHash].mFile = new File(package->getName());
+        }
+        catch(...)
+        {
+            LOGERROR("Failed to open package file " + package->getName() + " for file transfer");
+            VectorBuffer replyPacket;
+            replyPacket.writeUByte(MSG_TRANSFERFAILED);
+            replyPacket.writeStringHash(nameHash);
+            replyPacket.writeString("Could not open file");
+            connection->sendReliable(replyPacket);
+            return true;
+        }
+    }
+    
+    mFileTransfers[nameHash].mCloseTimer.reset();
+    
+    // Check that fragment range is valid
+    unsigned fileSize = file->getSize();
     int maxFragments = (fileSize - 1) / FILE_FRAGMENT_SIZE + 1;
     if (fragmentStart + fragmentCount > maxFragments)
         fragmentCount = maxFragments - fragmentStart;
@@ -428,7 +461,7 @@ bool Server::handleRequestFile(Connection* connection, VectorBuffer& packet)
     
     // Send the fragments
     unsigned fragmentOffset = fragmentStart * FILE_FRAGMENT_SIZE;
-    file.seek(fragmentOffset);
+    file->seek(fragmentOffset);
     
     for (int i = fragmentStart; i < fragmentStart + fragmentCount; ++i)
     {
@@ -443,7 +476,7 @@ bool Server::handleRequestFile(Connection* connection, VectorBuffer& packet)
         fragmentPacket.writeStringHash(nameHash);
         fragmentPacket.writeVLE(i);
         fragmentPacket.resize(fragmentPacket.getPosition() + fragmentSize);
-        file.read(fragmentPacket.getModifiableData() + fragmentPacket.getPosition(), fragmentSize);
+        file->read(fragmentPacket.getModifiableData() + fragmentPacket.getPosition(), fragmentSize);
         connection->sendReliable(fragmentPacket);
     }
     
