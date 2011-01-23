@@ -187,7 +187,14 @@ std::string getUserDocumentsDirectory()
     pathName[0] = 0;
     
     SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
-    return fixPath(replace(std::string(pathName), '\\', '/'));
+    return fixPath(std::string(pathName));
+}
+
+unsigned getNumLogicalProcessors()
+{
+    SYSTEM_INFO info;
+    GetSystemInfo(&info);
+    return info.dwNumberOfProcessors;
 }
 
 #ifdef ENABLE_MINIDUMPS

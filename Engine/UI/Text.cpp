@@ -26,8 +26,9 @@
 #include "Log.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "StringUtils.h"
 #include "Text.h"
-#include "Texture.h"
+#include "Texture2D.h"
 
 #include "DebugNew.h"
 
@@ -47,9 +48,6 @@ Text::~Text()
 
 void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     UIElement::setStyle(element, cache);
     
     if (element.hasChildElement("font"))
@@ -60,7 +58,11 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("maxwidth"))
         setMaxWidth(element.getChildElement("maxwidth").getInt("value"));
     if (element.hasChildElement("text"))
-        setText(element.getChildElement("text").getString("value"));
+    {
+        std::string text = element.getChildElement("text").getString("value");
+        replaceInPlace(text, "\\n", "\n");
+        setText(text);
+    }
     if (element.hasChildElement("textspacing"))
         setTextSpacing(element.getChildElement("textspacing").getFloat("value"));
     if (element.hasChildElement("textalignment"))

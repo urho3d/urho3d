@@ -52,10 +52,31 @@ DEFINE_EVENT(EVENT_TOGGLED, Toggled)
 }
 
 //! UI slider value changed
-DEFINE_EVENT(EVENT_VALUECHANGED, ValueChanged)
+DEFINE_EVENT(EVENT_SLIDERCHANGED, SliderChanged)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
     EVENT_PARAM(P_VALUE, Value);                // float
+}
+
+//! ScrollView position changed
+DEFINE_EVENT(EVENT_VIEWCHANGED, ViewChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_X, X);                        // int
+    EVENT_PARAM(P_Y, Y);                        // int
+}
+
+//! Editable text changed
+DEFINE_EVENT(EVENT_TEXTCHANGED, TextChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_TEXT, Text);                  // string
+}
+
+//! Text editing finished (enter pressed on a LineEdit)
+DEFINE_EVENT(EVENT_TEXTFINISHED, TextFinished)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
 #endif // UI_UIEVENTS_H

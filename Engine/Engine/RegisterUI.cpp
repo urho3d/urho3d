@@ -27,6 +27,7 @@
 #include "Cursor.h"
 #include "Engine.h"
 #include "Font.h"
+#include "LineEdit.h"
 #include "RegisterTemplates.h"
 #include "ScrollView.h"
 #include "Slider.h"
@@ -69,25 +70,6 @@ static void registerUIElement(asIScriptEngine* engine)
     
     // Register Variant getPtr() for UIElement
     engine->RegisterObjectMethod("Variant", "UIElement@+ getUIElement() const", asFUNCTION(getVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
-}
-
-static void registerText(asIScriptEngine* engine)
-{
-    registerUIElement<Text>(engine, "Text");
-    engine->RegisterObjectMethod("Text", "bool setFont(Font@+, int)", asMETHOD(Text, setFont), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void setMaxWidth(int)", asMETHOD(Text, setMaxWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void setText(const string& in)", asMETHOD(Text, setText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void setTextAlignment(HorizontalAlignment)", asMETHOD(Text, setTextAlignment), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void setTextSpacing(float)", asMETHOD(Text, setTextSpacing), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "Font@+ getFont() const", asMETHOD(Text, getFont), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "int getFontSize() const", asMETHOD(Text, getFontSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "int getMaxWidth() const", asMETHOD(Text, getMaxWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "const string& getText() const", asMETHOD(Text, getText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "HorizontalAlignment getTextAlignment() const", asMETHOD(Text, getTextAlignment), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "float getTextSpacing() const", asMETHOD(Text, getTextSpacing), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "uint getNumRows() const", asMETHOD(Text, getNumRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "int getRowHeight() const", asMETHOD(Text, getRowHeight), asCALL_THISCALL);
-    registerRefCasts<UIElement, Text>(engine, "UIElement", "Text");
 }
 
 static void registerBorderImage(asIScriptEngine* engine)
@@ -143,7 +125,7 @@ static void registerSlider(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Slider", "UIElementOrientation getOrientation() const", asMETHOD(Slider, getOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getRange() const", asMETHOD(Slider, getRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getValue() const", asMETHOD(Slider, getValue), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Slider", "BorderImage@+ getSlider() const", asMETHOD(Slider, getSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "BorderImage@+ getSliderElement() const", asMETHOD(Slider, getSliderElement), asCALL_THISCALL);
     registerRefCasts<UIElement, Slider>(engine, "UIElement", "Slider");
 }
 
@@ -161,6 +143,41 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "Slider@+ getHorizontalSlider() const", asMETHOD(ScrollView, getHorizontalSlider), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "Slider@+ getVerticalSlider() const", asMETHOD(ScrollView, getVerticalSlider), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
+}
+
+static void registerText(asIScriptEngine* engine)
+{
+    registerUIElement<Text>(engine, "Text");
+    engine->RegisterObjectMethod("Text", "bool setFont(Font@+, int)", asMETHOD(Text, setFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void setMaxWidth(int)", asMETHOD(Text, setMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void setText(const string& in)", asMETHOD(Text, setText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void setTextAlignment(HorizontalAlignment)", asMETHOD(Text, setTextAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void setTextSpacing(float)", asMETHOD(Text, setTextSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "Font@+ getFont() const", asMETHOD(Text, getFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "int getFontSize() const", asMETHOD(Text, getFontSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "int getMaxWidth() const", asMETHOD(Text, getMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "const string& getText() const", asMETHOD(Text, getText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "HorizontalAlignment getTextAlignment() const", asMETHOD(Text, getTextAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "float getTextSpacing() const", asMETHOD(Text, getTextSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "uint getNumRows() const", asMETHOD(Text, getNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "int getRowHeight() const", asMETHOD(Text, getRowHeight), asCALL_THISCALL);
+    registerRefCasts<UIElement, Text>(engine, "UIElement", "Text");
+}
+
+static void registerLineEdit(asIScriptEngine* engine)
+{
+    registerBorderImage<LineEdit>(engine, "LineEdit");
+    engine->RegisterObjectMethod("LineEdit", "void setText(const string& in)", asMETHOD(LineEdit, setText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void setEchoCharacter(uint8)", asMETHOD(LineEdit, setEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void setCursorBlinkRate(float)", asMETHOD(LineEdit, setCursorBlinkRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void setMaxLength(uint)", asMETHOD(LineEdit, setMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "const string& getText() const", asMETHOD(LineEdit, getText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "uint8 getEchoCharacter() const", asMETHOD(LineEdit, getEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "float getCursorBlinkRate() const", asMETHOD(LineEdit, getCursorBlinkRate), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "uint getMaxLength() const", asMETHOD(LineEdit, getMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "Text@+ getTextElement() const", asMETHOD(LineEdit, getTextElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "BorderImage@+ getCursorElement() const", asMETHOD(LineEdit, getCursorElement), asCALL_THISCALL);
+    registerRefCasts<UIElement, LineEdit>(engine, "UIElement", "LineEdit");
 }
 
 static void registerWindow(asIScriptEngine* engine)
@@ -281,6 +298,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerSlider(engine);
     registerScrollView(engine);
     registerText(engine);
+    registerLineEdit(engine);
     registerWindow(engine);
     registerUI(engine);
 }

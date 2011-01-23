@@ -64,7 +64,7 @@ public:
     //! Return slider current value
     float getValue() const { return mValue; }
     //! Return slider image element
-    BorderImage* getSlider() const { return mSlider; }
+    BorderImage* getSliderElement() const { return mSlider; }
     
 protected:
     //! Update slider image position & size

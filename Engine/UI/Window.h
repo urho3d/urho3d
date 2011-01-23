@@ -26,8 +26,6 @@
 
 #include "BorderImage.h"
 
-static const int WINDOW_MIN_SIZE = 4;
-
 //! Window movement and resizing modes
 enum WindowDragMode
 {

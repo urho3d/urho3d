@@ -22,6 +22,22 @@
         <imagerect value="0 0 16 24" />
         <hotspot value="0 0" />
     </element>
+    <element type="LineEdit">
+        <texture name="Textures/UI.png" />
+        <imagerect value="96 0 112 16" />
+        <border value="2 2 2 2" />
+        <clipborder value="1 1 1 1" />
+        <hoveroffset value="0 16" />
+        <text>
+            <position value="1 1" />
+            <font name="Cour.ttf" size="10" />
+        </text>
+        <cursor>
+            <size value="4 16" />
+            <texture name="Textures/UI.png" />
+            <imagerect value="112 0 116 16" />
+        </cursor>
+    </element>
     <element type="ScrollView">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
@@ -52,5 +68,4 @@
     <element type="Text">
         <font name="Cour.ttf" size="10" />
     </element>
-
 </elements>

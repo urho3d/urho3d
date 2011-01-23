@@ -43,9 +43,13 @@
             <element type="Text">
                 <position value="1 1" />
                 <font name="times.ttf" size="15" />
-                <text value="Urho3D - a Win32/Direct3D9 rendering and game engine http://urho3d.googlecode.com Licensed under the MIT license, see License.txt for details." />
+                <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
                 <maxwidth value="200" />
             </element>
+        </element>
+        <element type="LineEdit">
+            <position value="150 270" />
+            <size value="200 16" />
         </element>
     </element>
 </layout>

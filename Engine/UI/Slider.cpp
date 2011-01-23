@@ -24,9 +24,7 @@
 #include "Precompiled.h"
 #include "InputEvents.h"
 #include "Log.h"
-#include "ResourceCache.h"
 #include "Slider.h"
-#include "Texture2D.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -51,9 +49,6 @@ Slider::~Slider()
 
 void Slider::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("orientation"))
@@ -121,12 +116,12 @@ void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosi
     {
         mValue = newValue;
         
-        using namespace ValueChanged;
+        using namespace SliderChanged;
         
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_VALUE] = mValue;
-        sendEvent(EVENT_VALUECHANGED, eventData);
+        sendEvent(EVENT_SLIDERCHANGED, eventData);
     }
 }
 

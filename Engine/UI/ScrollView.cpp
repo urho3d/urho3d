@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "ResourceCache.h"
 #include "ScrollView.h"
 #include "Slider.h"
 #include "UIEvents.h"
@@ -45,9 +44,6 @@ ScrollView::~ScrollView()
 
 void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("viewposition"))
@@ -125,6 +121,7 @@ void ScrollView::updateViewFromSliders()
     if ((!mHorizontalSlider) && (!mVerticalSlider))
         return;
     
+    IntVector2 oldPosition = mViewPosition;
     IntVector2 newPosition = mViewPosition;
     IntVector2 size = getSize();
     
@@ -134,6 +131,17 @@ void ScrollView::updateViewFromSliders()
         newPosition.mY = (int)(mVerticalSlider->getValue() * (float)size.mY);
     
     updateView(newPosition);
+    
+    if (mViewPosition != oldPosition)
+    {
+        using namespace ViewChanged;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_X] = mViewPosition.mX;
+        eventData[P_Y] = mViewPosition.mY;
+        sendEvent(EVENT_VIEWCHANGED, eventData);
+    }
 }
 
 void ScrollView::updateSliders()

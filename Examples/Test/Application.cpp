@@ -514,174 +514,178 @@ void Application::handleUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
     
-    Input* input = mEngine->getInput();
-    
-    float speedMultiplier = 1.0f;
-    if (input->getKeyDown(KEY_SHIFT))
-        speedMultiplier = 5.0f;
-    if (input->getKeyDown(KEY_CONTROL))
-        speedMultiplier = 0.1f;
-    
-    if (input->getKeyDown('W'))
-        mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(0.0f,0.0f,10.0f) * timeStep * speedMultiplier);
-    if (input->getKeyDown('S'))
-        mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(0.0f,0.0f,-10.0f) * timeStep * speedMultiplier);
-    if (input->getKeyDown('A'))
-        mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(-10.0f,0.0f,0.0f) * timeStep * speedMultiplier);
-    if (input->getKeyDown('D'))
-        mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(10.0f,0.0f,0.0f) * timeStep * speedMultiplier);
-    
-    if (input->getKeyPress('1'))
+    UI* ui = mEngine->getUI();
+    if (!ui->getFocusElement())
     {
-        Renderer* renderer = mEngine->getRenderer();
+        Input* input = mEngine->getInput();
         
-        int nextRenderMode = renderer->getRenderMode();
+        float speedMultiplier = 1.0f;
         if (input->getKeyDown(KEY_SHIFT))
-        {
-            --nextRenderMode;
-            if (nextRenderMode < 0)
-                nextRenderMode = 2;
-        }
-        else
-        {
-            ++nextRenderMode;
-            if (nextRenderMode > 2)
-                nextRenderMode = 0;
-        }
+            speedMultiplier = 5.0f;
+        if (input->getKeyDown(KEY_CONTROL))
+            speedMultiplier = 0.1f;
         
-        renderer->setMode((RenderMode)nextRenderMode, renderer->getWidth(), renderer->getHeight(), renderer->getFullscreen(),
-            renderer->getVsync(), renderer->getMultiSample());
-    }
-    
-    if (input->getKeyPress('2'))
-    {
-        texturequality++;
-        if (texturequality > 2)
-            texturequality = 0;
+        if (input->getKeyDown('W'))
+            mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(0.0f,0.0f,10.0f) * timeStep * speedMultiplier);
+        if (input->getKeyDown('S'))
+            mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(0.0f,0.0f,-10.0f) * timeStep * speedMultiplier);
+        if (input->getKeyDown('A'))
+            mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(-10.0f,0.0f,0.0f) * timeStep * speedMultiplier);
+        if (input->getKeyDown('D'))
+            mCameraEntity->getComponent<Camera>()->translateRelative(Vector3(10.0f,0.0f,0.0f) * timeStep * speedMultiplier);
         
-        mEngine->getPipeline()->setTextureQuality(texturequality);
-    }
-    
-    if (input->getKeyPress('3'))
-    {
-        materialquality++;
-        if (materialquality > 2)
-            materialquality = 0;
-        mEngine->getPipeline()->setMaterialQuality(materialquality);
-    }
-    
-    if (input->getKeyPress('4'))
-    {
-        usespecular = !usespecular;
-        mEngine->getPipeline()->setSpecularLighting(usespecular);
-    }
-    
-    if (input->getKeyPress('5'))
-    {
-        drawshadows = !drawshadows;
-        mEngine->getPipeline()->setDrawShadows(drawshadows);
-    }
-    
-    if (input->getKeyPress('6'))
-    {
-        shadowmapsize *= 2;
-        if (shadowmapsize > 2048)
-            shadowmapsize = 512;
-        
-        mEngine->getPipeline()->setShadowMapSize(shadowmapsize);
-    }
-    
-    if (input->getKeyPress('7'))
-    {
-        hiresshadowmap = !hiresshadowmap;
-        mEngine->getPipeline()->setShadowMapHiresDepth(hiresshadowmap);
-    }
-    
-    if (input->getKeyPress('8'))
-    {
-        useocclusion = !useocclusion;
-        mEngine->getPipeline()->setMaxOccluderTriangles(useocclusion ? 5000 : 0);
-    }
-    
-    if (input->getKeyPress('L'))
-    {
-        Light* cameraLight = mCameraEntity->getComponent<Light>();
-        attach = !attach;
-        if (attach)
+        if (input->getKeyPress('1'))
         {
-            cameraLight->setPosition(Vector3::sZero);
-            cameraLight->setRotation(Quaternion::sIdentity);
-            mCameraEntity->getComponent<Camera>()->addChild(cameraLight);
-        }
-        else
-        {
-            // Detach child and set world transform to match what it was before detach
-            mCameraEntity->getComponent<Camera>()->removeChild(cameraLight, true);
-        }
-    }
-    
-    if (input->getKeyPress(' '))
-    {
-        drawdebug++;
-        if (drawdebug > 2) drawdebug = 0;
-        mEngine->setDebugDrawMode(drawdebug);
-    }
-    
-    if (input->getKeyPress('P'))
-    {
-        paused = !paused;
-    }
-    
-    if (input->getKeyPress('C'))
-    {
-        Camera* camera = mCameraEntity->getComponent<Camera>();
-        camera->setOrthographic(!camera->isOrthographic());
-    }
-    
-    if (input->getKeyPress('O'))
-    {
-        if (!mOcclusionDebugImage)
-        {
-            try
+            Renderer* renderer = mEngine->getRenderer();
+            
+            int nextRenderMode = renderer->getRenderMode();
+            if (input->getKeyDown(KEY_SHIFT))
             {
-                Renderer* renderer = mEngine->getRenderer();
-                UIElement* uiRoot = mEngine->getUIRoot();
-                
-                mOcclusionDebugTexture = new Texture2D(renderer, TEXTURE_DYNAMIC);
-                mOcclusionDebugTexture->setNumLevels(1);
-                mOcclusionDebugTexture->setSize(256, 256, D3DFMT_R32F);
-                mOcclusionDebugImage = new BorderImage();
-                mOcclusionDebugImage->setSize(256, 256);
-                mOcclusionDebugImage->setTexture(mOcclusionDebugTexture);
-                mOcclusionDebugImage->setAlignment(HA_RIGHT, VA_BOTTOM);
-                uiRoot->addChild(mOcclusionDebugImage);
+                --nextRenderMode;
+                if (nextRenderMode < 0)
+                    nextRenderMode = 2;
             }
-            catch (...)
+            else
             {
+                ++nextRenderMode;
+                if (nextRenderMode > 2)
+                    nextRenderMode = 0;
+            }
+            
+            renderer->setMode((RenderMode)nextRenderMode, renderer->getWidth(), renderer->getHeight(), renderer->getFullscreen(),
+                renderer->getVsync(), renderer->getMultiSample());
+        }
+        
+        if (input->getKeyPress('2'))
+        {
+            texturequality++;
+            if (texturequality > 2)
+                texturequality = 0;
+            
+            mEngine->getPipeline()->setTextureQuality(texturequality);
+        }
+        
+        if (input->getKeyPress('3'))
+        {
+            materialquality++;
+            if (materialquality > 2)
+                materialquality = 0;
+            mEngine->getPipeline()->setMaterialQuality(materialquality);
+        }
+        
+        if (input->getKeyPress('4'))
+        {
+            usespecular = !usespecular;
+            mEngine->getPipeline()->setSpecularLighting(usespecular);
+        }
+        
+        if (input->getKeyPress('5'))
+        {
+            drawshadows = !drawshadows;
+            mEngine->getPipeline()->setDrawShadows(drawshadows);
+        }
+        
+        if (input->getKeyPress('6'))
+        {
+            shadowmapsize *= 2;
+            if (shadowmapsize > 2048)
+                shadowmapsize = 512;
+            
+            mEngine->getPipeline()->setShadowMapSize(shadowmapsize);
+        }
+        
+        if (input->getKeyPress('7'))
+        {
+            hiresshadowmap = !hiresshadowmap;
+            mEngine->getPipeline()->setShadowMapHiresDepth(hiresshadowmap);
+        }
+        
+        if (input->getKeyPress('8'))
+        {
+            useocclusion = !useocclusion;
+            mEngine->getPipeline()->setMaxOccluderTriangles(useocclusion ? 5000 : 0);
+        }
+        
+        if (input->getKeyPress('L'))
+        {
+            Light* cameraLight = mCameraEntity->getComponent<Light>();
+            attach = !attach;
+            if (attach)
+            {
+                cameraLight->setPosition(Vector3::sZero);
+                cameraLight->setRotation(Quaternion::sIdentity);
+                mCameraEntity->getComponent<Camera>()->addChild(cameraLight);
+            }
+            else
+            {
+                // Detach child and set world transform to match what it was before detach
+                mCameraEntity->getComponent<Camera>()->removeChild(cameraLight, true);
             }
         }
-        else
+        
+        if (input->getKeyPress(' '))
         {
-            mOcclusionDebugImage->setVisible(!mOcclusionDebugImage->isVisible());
+            drawdebug++;
+            if (drawdebug > 2) drawdebug = 0;
+            mEngine->setDebugDrawMode(drawdebug);
         }
+        
+        if (input->getKeyPress('P'))
+        {
+            paused = !paused;
+        }
+        
+        if (input->getKeyPress('C'))
+        {
+            Camera* camera = mCameraEntity->getComponent<Camera>();
+            camera->setOrthographic(!camera->isOrthographic());
+        }
+        
+        if (input->getKeyPress('O'))
+        {
+            if (!mOcclusionDebugImage)
+            {
+                try
+                {
+                    Renderer* renderer = mEngine->getRenderer();
+                    UIElement* uiRoot = mEngine->getUIRoot();
+                    
+                    mOcclusionDebugTexture = new Texture2D(renderer, TEXTURE_DYNAMIC);
+                    mOcclusionDebugTexture->setNumLevels(1);
+                    mOcclusionDebugTexture->setSize(256, 256, D3DFMT_R32F);
+                    mOcclusionDebugImage = new BorderImage();
+                    mOcclusionDebugImage->setSize(256, 256);
+                    mOcclusionDebugImage->setTexture(mOcclusionDebugTexture);
+                    mOcclusionDebugImage->setAlignment(HA_RIGHT, VA_BOTTOM);
+                    uiRoot->addChild(mOcclusionDebugImage);
+                }
+                catch (...)
+                {
+                }
+            }
+            else
+            {
+                mOcclusionDebugImage->setVisible(!mOcclusionDebugImage->isVisible());
+            }
+        }
+        
+        if (input->getKeyPress('T'))
+            mEngine->getDebugHud()->toggle(DEBUGHUD_SHOW_PROFILER);
+        
+        if (input->getKeyPress('F'))
+        {
+            Pipeline* pipeline = mEngine->getPipeline();
+            EdgeFilterParameters params = pipeline->getEdgeFilter();
+            if (params.mMaxFilter > 0.0f)
+                params.mMaxFilter = 0.0f;
+            else
+                params.mMaxFilter = 1.0f;
+            pipeline->setEdgeFilter(params);
+        }
+        
+        if (input->getKeyPress(KEY_ESCAPE))
+            mEngine->exit();
     }
-    
-    if (input->getKeyPress('T'))
-        mEngine->getDebugHud()->toggle(DEBUGHUD_SHOW_PROFILER);
-    
-    if (input->getKeyPress('F'))
-    {
-        Pipeline* pipeline = mEngine->getPipeline();
-        EdgeFilterParameters params = pipeline->getEdgeFilter();
-        if (params.mMaxFilter > 0.0f)
-            params.mMaxFilter = 0.0f;
-        else
-            params.mMaxFilter = 1.0f;
-        pipeline->setEdgeFilter(params);
-    }
-    
-    if (input->getKeyPress(KEY_ESCAPE))
-        mEngine->exit();
 }
 
 void Application::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -797,7 +801,7 @@ void Application::handleMouseButtonDown(StringHash eventType, VariantMap& eventD
     
     UI* ui = mEngine->getUI();
     
-    if ((button == MOUSEB_LEFT) && (!ui->getElementAt(ui->getCursorPosition())))
+    if ((button == MOUSEB_LEFT) && (!ui->getElementAt(ui->getCursorPosition())) && (!ui->getFocusElement()))
     {
         // Test creating a new physics object
         if (mCameraEntity)

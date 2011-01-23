@@ -42,9 +42,6 @@ BorderImage::~BorderImage()
 
 void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     UIElement::setStyle(element, cache);
     
     if (element.hasChildElement("texture"))

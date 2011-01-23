@@ -99,7 +99,7 @@ public:
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
     //! React to a character typed on keyboard
-    virtual void onChar(unsigned key);
+    virtual void onChar(unsigned char c);
     
     //! Set name
     void setName(const std::string& name);

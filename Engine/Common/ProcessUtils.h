@@ -39,6 +39,8 @@ void getArguments(const char* cmdLine, std::vector<std::string>& arguments);
 bool getConsoleInput(std::string& line);
 //! Return the user's document directory which should have read/write access for writing logs, savegames etc.
 std::string getUserDocumentsDirectory();
+//! Return the number of logical processors
+unsigned getNumLogicalProcessors();
 
 #ifdef ENABLE_MINIDUMPS
 //! Write a minidump. Needs to be called from within a structured exception handler

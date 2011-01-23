@@ -24,8 +24,6 @@
 #include "Precompiled.h"
 #include "CheckBox.h"
 #include "InputEvents.h"
-#include "ResourceCache.h"
-#include "Texture.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"

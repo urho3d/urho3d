@@ -470,6 +470,11 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
                 element->onDragStart(element->screenToElement(pos), pos, mMouseButtons);
             }
         }
+        else
+        {
+            // If clicked over no element, or a disabled element, lose focus
+            setFocusElement(0);
+        }
     }
 }
 

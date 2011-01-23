@@ -223,7 +223,7 @@ float UIElement::getDerivedOpacity()
     return mDerivedOpacity;
 }
 
-void UIElement::onChar(unsigned key)
+void UIElement::onChar(unsigned char c)
 {
 }
 

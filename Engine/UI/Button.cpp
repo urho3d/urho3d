@@ -24,8 +24,6 @@
 #include "Precompiled.h"
 #include "Button.h"
 #include "InputEvents.h"
-#include "ResourceCache.h"
-#include "Texture.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -47,9 +45,6 @@ Button::~Button()
 
 void Button::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("inactiverect"))

@@ -23,19 +23,19 @@
 
 #include "Precompiled.h"
 #include "InputEvents.h"
-#include "ResourceCache.h"
-#include "Texture.h"
 #include "Window.h"
 
 #include "DebugNew.h"
+
+static const int DEFAULT_RESIZE_BORDER = 4;
 
 Window::Window(const std::string& name) :
     BorderImage(name),
     mMovable(false),
     mResizable(false),
-    mMinSize(WINDOW_MIN_SIZE, WINDOW_MIN_SIZE),
+    mMinSize(0, 0),
     mMaxSize(M_MAX_INT, M_MAX_INT),
-    mResizeBorder(WINDOW_MIN_SIZE, WINDOW_MIN_SIZE, WINDOW_MIN_SIZE, WINDOW_MIN_SIZE),
+    mResizeBorder(DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER),
     mDragMode(DRAG_NONE)
 {
     mBringToFront = true;
@@ -51,9 +51,6 @@ Window::~Window()
 
 void Window::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("minsize"))
@@ -231,8 +228,8 @@ void Window::setResizeBorder(int left, int top, int right, int bottom)
 
 void Window::validateSize()
 {
-    mMinSize.mX = max(mMinSize.mX, WINDOW_MIN_SIZE);
-    mMinSize.mY = max(mMinSize.mY, WINDOW_MIN_SIZE);
+    mMinSize.mX = max(mMinSize.mX, 0);
+    mMinSize.mY = max(mMinSize.mY, 0);
     mMaxSize.mX = max(mMaxSize.mX, mMinSize.mX);
     mMaxSize.mY = max(mMaxSize.mY, mMinSize.mX);
     

@@ -23,8 +23,6 @@
 
 #include "Precompiled.h"
 #include "Cursor.h"
-#include "ResourceCache.h"
-#include "Texture.h"
 
 #include "DebugNew.h"
 
@@ -42,9 +40,6 @@ Cursor::~Cursor()
 
 void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("hotspot"))
