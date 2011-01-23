@@ -96,7 +96,7 @@ void LineEdit::update(float timeStep)
         if (rowWidths.size())
             textLength = rowWidths[0];
         
-        // This assumes that text alignment is top-left
+        // This assumes text alignment is top-left
         mCursor->setPosition(mText->getPosition() + IntVector2(textLength, 0));
         mCursor->setSize(mCursor->getWidth(), mText->getRowHeight());
         cursorVisible = mCursorBlinkTimer < 0.5f;
@@ -121,14 +121,14 @@ void LineEdit::update(float timeStep)
 void LineEdit::onChar(unsigned char c)
 {
     unsigned currentLength = mLine.length();
-    bool sendChangeEvent = false;
+    bool changed = false;
     
     if (c == '\b')
     {
         if (mLine.length())
         {
             mLine = mLine.substr(0, currentLength - 1);
-            sendChangeEvent = true;
+            changed = true;
         }
     }
     else if (c == '\r')
@@ -146,13 +146,15 @@ void LineEdit::onChar(unsigned char c)
     else if ((c >= 0x20) && ((!mMaxLength) || (currentLength < mMaxLength)))
     {
         mLine += (char)c;
-        sendChangeEvent = true;
+        changed = true;
     }
     
-    updateText();
-    
-    if (sendChangeEvent)
+    if (changed)
     {
+        // Restart cursor blinking from the visible state
+        mCursorBlinkTimer = 0.0f;
+        updateText();
+        
         using namespace TextChanged;
         
         VariantMap eventData;
