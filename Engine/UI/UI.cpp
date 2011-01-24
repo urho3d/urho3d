@@ -159,6 +159,13 @@ void UI::bringToFront(UIElement* element)
     ptr->setPriority(maxPriority);
 }
 
+void UI::clear()
+{
+    mRootElement->removeAllChildren();
+    if (mCursor)
+        mRootElement->addChild(mCursor);
+}
+
 void UI::update(float timeStep)
 {
     PROFILE(UI_Update);

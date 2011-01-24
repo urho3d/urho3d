@@ -395,6 +395,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void addChild(UIElement@+)", asMETHOD(T, addChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void removeChild(UIElement@+)", asMETHOD(T, removeChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void removeAllChildren()", asMETHOD(T, removeAllChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void layoutHorizontal(int, const IntRect& in, bool, bool)", asMETHOD(T, layoutHorizontal), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void layoutVertical(int, const IntRect& in, bool, bool)", asMETHOD(T, layoutVertical), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const string& getName() const", asMETHOD(T, getName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& getPosition() const", asMETHOD(T, getPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& getSize() const", asMETHOD(T, getSize), asCALL_THISCALL);

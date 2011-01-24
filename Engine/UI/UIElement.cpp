@@ -446,6 +446,52 @@ void UIElement::removeAllChildren()
     }
 }
 
+void UIElement::layoutHorizontal(int spacing, const IntRect& border, bool expand, bool contract)
+{
+    IntVector2 currentPos(border.mLeft, border.mTop);
+    IntVector2 neededSize(IntVector2::sZero);
+    for (unsigned i = 0; i < mChildren.size(); ++i)
+    {
+        UIElement* child = mChildren[i];
+        child->setHorizontalAlignment(HA_LEFT);
+        if (child->getVerticalAlignment() == HA_CENTER)
+            child->setPosition(currentPos.mX, 0);
+        else
+            child->setPosition(currentPos);
+        currentPos.mX += child->getWidth() + spacing;
+        if (child->getHeight() + border.mTop + border.mBottom > neededSize.mY)
+            neededSize.mY = child->getHeight() + border.mTop + border.mBottom;
+    }
+    currentPos.mX -= spacing;
+    if (currentPos.mX + border.mRight > neededSize.mX)
+        neededSize.mX = currentPos.mX + border.mRight;
+    
+    adjustSize(neededSize, expand, contract);
+}
+
+void UIElement::layoutVertical(int spacing, const IntRect& border, bool expand, bool contract)
+{
+    IntVector2 currentPos(border.mLeft, border.mTop);
+    IntVector2 neededSize(IntVector2::sZero);
+    for (unsigned i = 0; i < mChildren.size(); ++i)
+    {
+        UIElement* child = mChildren[i];
+        child->setVerticalAlignment(VA_TOP);
+        if (child->getHorizontalAlignment() == HA_CENTER)
+            child->setPosition(0, currentPos.mY);
+        else
+            child->setPosition(currentPos);
+        currentPos.mY += child->getHeight() + spacing;
+        if (child->getWidth() + border.mLeft + border.mRight > neededSize.mX)
+            neededSize.mX = child->getWidth() + border.mLeft + border.mRight;
+    }
+    currentPos.mY -= spacing;
+    if (currentPos.mY + border.mBottom > neededSize.mY)
+        neededSize.mY = currentPos.mY + border.mBottom;
+    
+    adjustSize(neededSize, expand, contract);
+}
+
 std::vector<UIElement*> UIElement::getChildren(bool recursive) const
 {
     if (!recursive)
@@ -601,5 +647,23 @@ void UIElement::getChildrenRecursive(std::vector<UIElement*>& dest) const
     {
         dest.push_back(*i);
         (*i)->getChildrenRecursive(dest);
+    }
+}
+
+void UIElement::adjustSize(const IntVector2& neededSize, bool expand, bool contract)
+{
+    if (expand)
+    {
+        if (getWidth() < neededSize.mX)
+            setWidth(neededSize.mX);
+        if (getHeight() < neededSize.mY)
+            setHeight(neededSize.mY);
+    }
+    if (contract)
+    {
+        if (getWidth() > neededSize.mX)
+            setWidth(neededSize.mX);
+        if (getHeight() > neededSize.mY)
+            setHeight(neededSize.mY);
     }
 }

@@ -50,6 +50,8 @@ public:
     void setFocusElement(UIElement* element);
     //! Bring an UI element to front
     void bringToFront(UIElement* element);
+    //! Clear the UI (excluding the cursor)
+    void clear();
     //! Update the UI
     void update(float timeStep);
     //! Render the UI

@@ -205,7 +205,8 @@ void Application::init()
     ui->setCursor(cursor);
     
     //XMLFile* uiLayout = mCache->getResource<XMLFile>("UI/TestLayout.xml");
-    //uiRoot->addChild(ui->loadLayout(uiLayout, uiStyle));
+    //SharedPtr<UIElement> layoutElement = ui->loadLayout(uiLayout, uiStyle);
+    //uiRoot->addChild(layoutElement);
     
     mScene = mEngine->createScene();
     PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();

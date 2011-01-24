@@ -155,6 +155,10 @@ public:
     void removeChild(UIElement* element);
     //! Remove all child elements
     void removeAllChildren();
+    //! Layout child elements horizontally. Expand/contract the element optionally
+    void layoutHorizontal(int spacing = 0, const IntRect& border = IntRect::sZero, bool expand = true, bool contract = true);
+    //! Layout child elements vertically. Expand/contract the element optionally
+    void layoutVertical(int spacing = 0, const IntRect& border = IntRect::sZero, bool expand = true, bool contract = true);
     
     //! Return name
     const std::string& getName() const { return mName; }
@@ -264,6 +268,8 @@ protected:
 private:
     //! Return child elements recursively
     void getChildrenRecursive(std::vector<UIElement*>& dest) const;
+    //! Adjust size after laying out the child elements
+    void adjustSize(const IntVector2& neededSize, bool expand, bool contract);
     
     //! Position
     IntVector2 mPosition;
