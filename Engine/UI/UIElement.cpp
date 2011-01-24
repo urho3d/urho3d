@@ -450,17 +450,16 @@ void UIElement::layoutHorizontal(int spacing, const IntRect& border, bool expand
 {
     IntVector2 currentPos(border.mLeft, border.mTop);
     IntVector2 neededSize(IntVector2::sZero);
-    for (unsigned i = 0; i < mChildren.size(); ++i)
+    for (std::vector<SharedPtr<UIElement> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
     {
-        UIElement* child = mChildren[i];
-        child->setHorizontalAlignment(HA_LEFT);
-        if (child->getVerticalAlignment() == HA_CENTER)
-            child->setPosition(currentPos.mX, 0);
+        (*i)->setHorizontalAlignment(HA_LEFT);
+        if ((*i)->getVerticalAlignment() == HA_CENTER)
+            (*i)->setPosition(currentPos.mX, 0);
         else
-            child->setPosition(currentPos);
-        currentPos.mX += child->getWidth() + spacing;
-        if (child->getHeight() + border.mTop + border.mBottom > neededSize.mY)
-            neededSize.mY = child->getHeight() + border.mTop + border.mBottom;
+            (*i)->setPosition(currentPos);
+        currentPos.mX += (*i)->getWidth() + spacing;
+        if ((*i)->getHeight() + border.mTop + border.mBottom > neededSize.mY)
+            neededSize.mY = (*i)->getHeight() + border.mTop + border.mBottom;
     }
     currentPos.mX -= spacing;
     if (currentPos.mX + border.mRight > neededSize.mX)
@@ -473,17 +472,16 @@ void UIElement::layoutVertical(int spacing, const IntRect& border, bool expand, 
 {
     IntVector2 currentPos(border.mLeft, border.mTop);
     IntVector2 neededSize(IntVector2::sZero);
-    for (unsigned i = 0; i < mChildren.size(); ++i)
+    for (std::vector<SharedPtr<UIElement> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
     {
-        UIElement* child = mChildren[i];
-        child->setVerticalAlignment(VA_TOP);
-        if (child->getHorizontalAlignment() == HA_CENTER)
-            child->setPosition(0, currentPos.mY);
+        (*i)->setVerticalAlignment(VA_TOP);
+        if ((*i)->getHorizontalAlignment() == HA_CENTER)
+            (*i)->setPosition(0, currentPos.mY);
         else
-            child->setPosition(currentPos);
-        currentPos.mY += child->getHeight() + spacing;
-        if (child->getWidth() + border.mLeft + border.mRight > neededSize.mX)
-            neededSize.mX = child->getWidth() + border.mLeft + border.mRight;
+            (*i)->setPosition(currentPos);
+        currentPos.mY += (*i)->getHeight() + spacing;
+        if ((*i)->getWidth() + border.mLeft + border.mRight > neededSize.mX)
+            neededSize.mX = (*i)->getWidth() + border.mLeft + border.mRight;
     }
     currentPos.mY -= spacing;
     if (currentPos.mY + border.mBottom > neededSize.mY)
@@ -583,6 +581,36 @@ bool UIElement::isInside(IntVector2 position, bool isScreen)
     if (isScreen)
         position = screenToElement(position);
     return (position.mX >= 0) && (position.mY >= 0) && (position.mX < mSize.mX) && (position.mY < mSize.mY);
+}
+
+bool UIElement::isInsideCombined(IntVector2 position, bool isScreen)
+{
+    // If child elements are clipped, no need to expand the rect
+    if (mClipChildren)
+        return isInside(position, isScreen);
+    
+    if (!isScreen)
+        position = elementToScreen(position);
+    
+    IntVector2 screenPosition(getScreenPosition());
+    IntRect combined(screenPosition.mX, screenPosition.mY, screenPosition.mX + mSize.mX, screenPosition.mY + mSize.mY);
+    
+    for (std::vector<SharedPtr<UIElement> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+    {
+        IntVector2 childPos = (*i)->getScreenPosition();
+        const IntVector2& childSize = (*i)->getSize();
+        if (childPos.mX < combined.mLeft)
+            combined.mLeft = childPos.mX;
+        if (childPos.mY < combined.mTop)
+            combined.mTop = childPos.mY;
+        if (childPos.mX + childSize.mX > combined.mRight)
+            combined.mRight = childPos.mX + childSize.mX;
+        if (childPos.mY + childSize.mY > combined.mBottom)
+            combined.mBottom = childPos.mY + childSize.mY;
+    }
+    
+    return (position.mX >= combined.mLeft) && (position.mY >= combined.mTop) && (position.mX < combined.mRight) &&
+        (position.mY < combined.mBottom);
 }
 
 void UIElement::setHovering(bool enable)

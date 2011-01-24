@@ -221,6 +221,8 @@ public:
     IntVector2 elementToScreen(const IntVector2& position);
     //! Return whether a point (either in element or screen coordinates) is inside the element
     bool isInside(IntVector2 position, bool isScreen);
+    //! Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children
+    bool isInsideCombined(IntVector2 position, bool isScreen);
     
     //! Set hovering state
     void setHovering(bool enable);

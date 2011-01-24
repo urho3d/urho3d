@@ -391,8 +391,10 @@ void UI::getElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                 // are sorted from lowest to highest priority, we should be left with the topmost match
                 if ((element->isEnabled()) || (!enabledOnly))
                     result = element;
-                getElementAt(result, element, position, enabledOnly);
             }
+            
+            if (element->isInsideCombined(position, true))
+                getElementAt(result, element, position, enabledOnly);
         }
     }
 }

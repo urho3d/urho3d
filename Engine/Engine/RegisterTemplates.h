@@ -425,6 +425,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "XMLElement getStyleElement(XMLFile@+) const", asMETHODPR(T, getStyleElement, (XMLFile*) const, XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 screenToElement(const IntVector2& in)", asMETHOD(T, screenToElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 elementToScreen(const IntVector2& in)", asMETHOD(T, elementToScreen), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool isInside(IntVector2, bool)", asMETHOD(T, isInside), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool isInsideCombined(IntVector2, bool)", asMETHOD(T, isInsideCombined), asCALL_THISCALL);
 }
 
 //! Template function for registering a class derived from BorderImage
