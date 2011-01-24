@@ -137,6 +137,8 @@ public:
     void setOpacity(float opacity);
     //! Set whether should be brought to front when focused
     void setBringToFront(bool enable);
+    //! Set whether should be put to background when another element is focused
+    void setBringToBack(bool enable);
     //! Set whether should clip child elements
     void setClipChildren(bool enable);
     //! Set whether reacts to input
@@ -188,6 +190,8 @@ public:
     float getOpacity() const { return mOpacity; }
     //! Return whether should be brought to front when focused
     bool getBringToFront() const { return mBringToFront; }
+    //! Return whether should be put to background when another element is focused
+    bool getBringToBack() const { return mBringToBack; }
     //! Return whether should clip child elements
     bool getClipChildren() const { return mClipChildren; }
     //! Return whether reacts to input
@@ -223,6 +227,8 @@ public:
     bool isInside(IntVector2 position, bool isScreen);
     //! Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children
     bool isInsideCombined(IntVector2 position, bool isScreen);
+    //! Return combined screen coordinate rect of element and its children
+    IntRect UIElement::getCombinedScreenRect();
     
     //! Set hovering state
     void setHovering(bool enable);
@@ -254,6 +260,8 @@ protected:
     int mPriority;
     //! Bring to front when focused flag
     bool mBringToFront;
+    //! Bring to back when defocused flag
+    bool mBringToBack;
     //! Clip children flag
     bool mClipChildren;
     //! Reacts to input flag

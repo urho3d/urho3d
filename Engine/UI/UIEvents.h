@@ -26,6 +26,12 @@
 
 #include "Event.h"
 
+//! Trying to focus an UI element. Sent before checking for success. Also sent with 0 pointer for global defocus
+DEFINE_EVENT(EVENT_TRYFOCUS, TryFocus)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
+
 //! UI element focused
 DEFINE_EVENT(EVENT_FOCUSED, Focused)
 {
@@ -75,6 +81,12 @@ DEFINE_EVENT(EVENT_TEXTCHANGED, TextChanged)
 
 //! Text editing finished (enter pressed on a LineEdit)
 DEFINE_EVENT(EVENT_TEXTFINISHED, TextFinished)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
+
+//! Menu item selected
+DEFINE_EVENT(EVENT_ITEMSELECTED, ItemSelected)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
 }

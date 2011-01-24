@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "Font.h"
 #include "LineEdit.h"
+#include "MenuItem.h"
 #include "RegisterTemplates.h"
 #include "ScrollView.h"
 #include "Slider.h"
@@ -89,16 +90,7 @@ static void registerCursor(asIScriptEngine* engine)
 
 static void registerButton(asIScriptEngine* engine)
 {
-    registerBorderImage<Button>(engine, "Button");
-    engine->RegisterObjectMethod("Button", "void setInactiveRect(const IntRect& in)", asMETHODPR(Button, setInactiveRect, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setInactiveRect(int, int, int, int)", asMETHODPR(Button, setInactiveRect, (int, int, int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setPressedRect(const IntRect& in)", asMETHODPR(Button, setPressedRect, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setPressedRect(int, int, int, int)", asMETHODPR(Button, setPressedRect, (int, int, int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setLabelOffset(const IntVector2& in)", asMETHODPR(Button, setLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "void setLabelOffset(int, int)", asMETHODPR(Button, setLabelOffset, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "const IntRect& getInactiveRect() const", asMETHOD(Button, getInactiveRect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "const IntRect& getPressedRect() const", asMETHOD(Button, getPressedRect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Button", "const IntVector2& getLabelOffset() const", asMETHOD(Button, getLabelOffset), asCALL_THISCALL);
+    registerButton<Button>(engine, "Button");
     registerRefCasts<UIElement, Button>(engine, "UIElement", "Button");
 }
 
@@ -178,6 +170,19 @@ static void registerLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "Text@+ getTextElement() const", asMETHOD(LineEdit, getTextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ getCursorElement() const", asMETHOD(LineEdit, getCursorElement), asCALL_THISCALL);
     registerRefCasts<UIElement, LineEdit>(engine, "UIElement", "LineEdit");
+}
+
+static void registerMenuItem(asIScriptEngine* engine)
+{
+    registerButton<MenuItem>(engine, "MenuItem");
+    engine->RegisterObjectMethod("MenuItem", "void setPopup(UIElement@+)", asMETHOD(MenuItem, setPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "void setPopupOffset(const IntVector2& in)", asMETHODPR(MenuItem, setPopupOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "void setPopupOffset(int, int)", asMETHODPR(MenuItem, setPopupOffset, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "void showPopup(bool)", asMETHOD(MenuItem, showPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "UIElement@+ getPopup() const", asMETHOD(MenuItem, getPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "const IntVector2& getPopupOffset() const", asMETHOD(MenuItem, getPopupOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("MenuItem", "bool getShowPopup() const", asMETHOD(MenuItem, getShowPopup), asCALL_THISCALL);
+    registerRefCasts<UIElement, MenuItem>(engine, "UIElement", "MenuItem");
 }
 
 static void registerWindow(asIScriptEngine* engine)
@@ -300,6 +305,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerScrollView(engine);
     registerText(engine);
     registerLineEdit(engine);
+    registerMenuItem(engine);
     registerWindow(engine);
     registerUI(engine);
 }

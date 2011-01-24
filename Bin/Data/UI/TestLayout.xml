@@ -51,5 +51,55 @@
             <position value="150 270" />
             <size value="200 16" />
         </element>
+        <element type="Window" name="TestPopup">
+            <size value="100 80" />
+            <element type="MenuItem">
+                <position value="10 10" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem3" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+            <element type="MenuItem">
+                <position value="10 30" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem4" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+            <element type="MenuItem">
+                <position value="10 50" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem5" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+        </element>
+        <element type="MenuItem">
+            <position value="150 10" />
+            <size value="80 16" />
+            <element type="Text">
+                <text value="MenuItem1" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+            <popup name="TestPopup" />
+            <popupoffset value="0 16" />
+        </element>
+        <element type="MenuItem">
+            <position value="150 40" />
+            <size value="80 16" />
+            <element type="Text">
+                <text value="MenuItem2" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
     </element>
 </layout>

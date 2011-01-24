@@ -37,6 +37,7 @@ UIElement::UIElement(const std::string& name) :
     mPriority(0),
     mOpacity(1.0f),
     mBringToFront(false),
+    mBringToBack(true),
     mClipChildren(false),
     mEnabled(false),
     mFocusable(false),
@@ -131,6 +132,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setHoverColor(element.getChildElement("hovercolor").getColor("value"));
     if (element.hasChildElement("bringtofront"))
         setBringToFront(element.getChildElement("bringtofront").getBool("enable"));
+    if (element.hasChildElement("bringtoback"))
+        setBringToBack(element.getChildElement("bringtoback").getBool("enable"));
     if (element.hasChildElement("clipchildren"))
         setClipChildren(element.getChildElement("clipchildren").getBool("enable"));
     if (element.hasChildElement("enabled"))
@@ -364,6 +367,11 @@ void UIElement::setBringToFront(bool enable)
     mBringToFront = enable;
 }
 
+void UIElement::setBringToBack(bool enable)
+{
+    mBringToBack = enable;
+}
+
 void UIElement::setClipChildren(bool enable)
 {
     mClipChildren = enable;
@@ -592,6 +600,13 @@ bool UIElement::isInsideCombined(IntVector2 position, bool isScreen)
     if (!isScreen)
         position = elementToScreen(position);
     
+    IntRect combined = getCombinedScreenRect();
+    return (position.mX >= combined.mLeft) && (position.mY >= combined.mTop) && (position.mX < combined.mRight) &&
+        (position.mY < combined.mBottom);
+}
+
+IntRect UIElement::getCombinedScreenRect()
+{
     IntVector2 screenPosition(getScreenPosition());
     IntRect combined(screenPosition.mX, screenPosition.mY, screenPosition.mX + mSize.mX, screenPosition.mY + mSize.mY);
     
@@ -609,8 +624,7 @@ bool UIElement::isInsideCombined(IntVector2 position, bool isScreen)
             combined.mBottom = childPos.mY + childSize.mY;
     }
     
-    return (position.mX >= combined.mLeft) && (position.mY >= combined.mTop) && (position.mX < combined.mRight) &&
-        (position.mY < combined.mBottom);
+    return combined;
 }
 
 void UIElement::setHovering(bool enable)

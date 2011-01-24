@@ -37,6 +37,7 @@
 #include "StringUtils.h"
 #include "Texture2D.h"
 #include "UI.h"
+#include "UIEvents.h"
 #include "VertexShader.h"
 
 #include <algorithm>
@@ -100,7 +101,7 @@ void UI::setCursor(Cursor* cursor)
         mCursor = cursor;
         
         IntVector2 pos = mCursor->getPosition();
-        IntVector2 rootSize = mRootElement->getSize();
+        const IntVector2& rootSize = mRootElement->getSize();
         pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
         pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
         mCursor->setPosition(pos);
@@ -109,6 +110,12 @@ void UI::setCursor(Cursor* cursor)
 
 void UI::setFocusElement(UIElement* element)
 {
+    using namespace TryFocus;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)element;
+    sendEvent(EVENT_TRYFOCUS, eventData);
+    
     if (element)
     {
         if ((element->hasFocus()) || (!element->isFocusable()))
@@ -143,13 +150,13 @@ void UI::bringToFront(UIElement* element)
     
     // Get the highest priority used by all other top level elements, decrease their priority by one,
     // and assign that to new front element. However, take into account only active (enabled) elements
-    // so that any noninteractive overlays are left alone
+    // and those which have the BringToBack flag set
     int maxPriority = M_MIN_INT;
     std::vector<UIElement*> topLevelElements = mRootElement->getChildren();
     for (std::vector<UIElement*>::iterator i = topLevelElements.begin(); i != topLevelElements.end(); ++i)
     {
         UIElement* other = *i;
-        if ((other->isEnabled()) && (other != ptr))
+        if ((other->isEnabled()) && (other->getBringToBack()) && (other != ptr))
         {
             int priority = other->getPriority();
             maxPriority = max(priority, maxPriority);
@@ -179,7 +186,11 @@ void UI::update(float timeStep)
         IntVector2 pos = mCursor->getPosition();
         UIElement* element = getElementAt(pos);
         if (element)
-            element->onHover(element->screenToElement(pos), pos, mMouseButtons);
+        {
+            // If a drag is going on, transmit hover only to the element being dragged
+            if ((!mMouseDragElement) || (mMouseDragElement == element))
+                element->onHover(element->screenToElement(pos), pos, mMouseButtons);
+        }
     }
     
     {
@@ -193,7 +204,7 @@ void UI::update(float timeStep)
         
         mBatches.clear();
         mQuads.clear();
-        IntVector2 rootSize = mRootElement->getSize();
+        const IntVector2& rootSize = mRootElement->getSize();
         getBatches(mRootElement, IntRect(0, 0, rootSize.mX, rootSize.mY));
     }
 }
@@ -429,7 +440,7 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         IntVector2 pos = mCursor->getPosition();
         pos.mX += eventData[P_X].getInt();
         pos.mY += eventData[P_Y].getInt();
-        IntVector2 rootSize = mRootElement->getSize();
+        const IntVector2& rootSize = mRootElement->getSize();
         pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
         pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
         mCursor->setPosition(pos);

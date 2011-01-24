@@ -249,14 +249,8 @@ void Window::validatePosition()
     IntVector2 position = getPosition();
     IntVector2 halfSize = getSize() / 2;
     
-    if (position.mX < -halfSize.mX)
-        position.mX = -halfSize.mX;
-    if (position.mX > parentSize.mX - halfSize.mX)
-        position.mX = parentSize.mX - halfSize.mX;
-    if (position.mY < -halfSize.mY)
-        position.mY = -halfSize.mY;
-    if (position.mY > parentSize.mY - halfSize.mY)
-        position.mY = parentSize.mY - halfSize.mY;
+    position.mX = clamp(position.mX, -halfSize.mX, parentSize.mX - halfSize.mX);
+    position.mY = clamp(position.mY, -halfSize.mY, parentSize.mY - halfSize.mY);
     
     setPosition(position);
 }

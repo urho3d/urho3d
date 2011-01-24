@@ -27,6 +27,7 @@
 #include "CheckBox.h"
 #include "Cursor.h"
 #include "LineEdit.h"
+#include "MenuItem.h"
 #include "ScrollView.h"
 #include "Slider.h"
 #include "Text.h"
@@ -44,6 +45,8 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
         return new Cursor(name);
     if (type == LineEdit::getTypeStatic())
         return new LineEdit(std::string(), name);
+    if (type == MenuItem::getTypeStatic())
+        return new MenuItem(name);
     if (type == ScrollView::getTypeStatic())
         return new ScrollView(name);
     if (type == Slider::getTypeStatic())

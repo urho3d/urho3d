@@ -387,6 +387,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setPriority(int)", asMETHOD(T, setPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setOpacity(float)", asMETHOD(T, setOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setBringToFront(bool)", asMETHOD(T, setBringToFront), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setBringToBack(bool)", asMETHOD(T, setBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setClipChildren(bool)", asMETHOD(T, setClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setEnabled(bool)", asMETHOD(T, setEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocusable(bool)", asMETHOD(T, setFocusable), asCALL_THISCALL);
@@ -411,6 +412,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "int getPriority() const", asMETHOD(T, getPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getOpacity() const", asMETHOD(T, getOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getBringToFront() const", asMETHOD(T, getBringToFront), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool getBringToBack() const", asMETHOD(T, getBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getClipChildren() const", asMETHOD(T, getClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isEnabled() const", asMETHOD(T, isEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isFocusable() const", asMETHOD(T, isFocusable), asCALL_THISCALL);
@@ -427,6 +429,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "IntVector2 elementToScreen(const IntVector2& in)", asMETHOD(T, elementToScreen), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isInside(IntVector2, bool)", asMETHOD(T, isInside), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isInsideCombined(IntVector2, bool)", asMETHOD(T, isInsideCombined), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "IntRect getCombinedScreenRect()", asMETHOD(T, getCombinedScreenRect), asCALL_THISCALL);
 }
 
 //! Template function for registering a class derived from BorderImage
@@ -445,6 +448,21 @@ template <class T> void registerBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntRect& getImageRect() const", asMETHOD(T, getImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getBorder() const", asMETHOD(T, getBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& getHoverOffset() const", asMETHOD(T, getHoverOffset), asCALL_THISCALL);
+}
+
+//! Template function for registering a class derived from Button
+template <class T> void registerButton(asIScriptEngine* engine, const char* className)
+{
+    registerBorderImage<T>(engine, className);
+    engine->RegisterObjectMethod(className, "void setInactiveRect(const IntRect& in)", asMETHODPR(T, setInactiveRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setInactiveRect(int, int, int, int)", asMETHODPR(T, setInactiveRect, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setPressedRect(const IntRect& in)", asMETHODPR(T, setPressedRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setPressedRect(int, int, int, int)", asMETHODPR(T, setPressedRect, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setLabelOffset(const IntVector2& in)", asMETHODPR(T, setLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setLabelOffset(int, int)", asMETHODPR(T, setLabelOffset, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& getInactiveRect() const", asMETHOD(T, getInactiveRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& getPressedRect() const", asMETHOD(T, getPressedRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& getLabelOffset() const", asMETHOD(T, getLabelOffset), asCALL_THISCALL);
 }
 
 #endif // ENGINE_REGISTERTEMPLATES_H

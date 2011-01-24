@@ -98,8 +98,8 @@ Engine::Engine(const std::string& logFileName, bool headless) :
         "ControlsUpdate", "ControlsPlayback", "MouseButtonDown", "MouseButtonUp", "MouseMove", "KeyDown", "KeyUp", "Char",
         "PeerConnected", "NetworkPacket", "PeerDisconnected", "PhysicsPreStep", "PhysicsPostStep", "PhysicsCollision",
         "EntityCollision", "WindowMessage", "WindowResized", "BeginFrame", "EndFrame", "SceneUpdate", "ScenePostUpdate",
-        "AsyncLoadProgress", "AsyncLoadFinished", "Focused", "Defocused", "Pressed", "Toggled", "SliderChanged", "ViewChanged",
-        "TextChanged", "TextFinished", ""
+        "AsyncLoadProgress", "AsyncLoadFinished", "TryFocus", "Focused", "Defocused", "Pressed", "Toggled", "SliderChanged",
+        "ViewChanged", "TextChanged", "TextFinished", "ItemSelected", ""
     };
     
     for (unsigned i = 0; inbuiltEvents[i].length(); ++i)

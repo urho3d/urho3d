@@ -123,7 +123,7 @@ void ScrollView::updateViewFromSliders()
     
     IntVector2 oldPosition = mViewPosition;
     IntVector2 newPosition = mViewPosition;
-    IntVector2 size = getSize();
+    const IntVector2& size = getSize();
     
     if (mHorizontalSlider)
         newPosition.mX = (int)(mHorizontalSlider->getValue() * (float)size.mX);
@@ -146,7 +146,7 @@ void ScrollView::updateViewFromSliders()
 
 void ScrollView::updateSliders()
 {
-    IntVector2 size = getSize();
+    const IntVector2& size = getSize();
     
     if ((mHorizontalSlider) && (size.mX > 0) && (mViewSize.mX > 0))
     {

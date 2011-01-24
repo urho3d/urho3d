@@ -38,6 +38,13 @@
             <imagerect value="112 0 116 16" />
         </cursor>
     </element>
+    <element type="MenuItem">
+        <texture name="Textures/UI.png" />
+        <inactiverect value="98 2 110 14" />
+        <pressedrect value="96 0 112 16" />
+        <border value="2 2 2 2" />
+        <hoveroffset value="0 16" />
+    </element>
     <element type="ScrollView">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
