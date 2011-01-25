@@ -28,7 +28,7 @@
 
 #include "DebugNew.h"
 
-LineEdit::LineEdit(const std::string& text, const std::string& name) :
+LineEdit::LineEdit(const std::string& name, const std::string& text) :
     BorderImage(name),
     mEchoCharacter(0),
     mCursorBlinkRate(1.0f),
@@ -44,7 +44,7 @@ LineEdit::LineEdit(const std::string& text, const std::string& name) :
     addChild(mText);
     addChild(mCursor);
     
-    // Show cursor on top of text, and set initial text
+    // Show cursor on top of text
     mCursor->setPriority(1);
     setText(text);
 }

@@ -173,6 +173,10 @@ static void registerControls(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Controls", "void read(Deserializer&)", asMETHOD(Controls, read), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void writeXML(XMLElement&)", asMETHOD(Controls, writeXML), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void readXML(const XMLElement&)", asMETHOD(Controls, readXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "void reset()", asMETHOD(Controls, reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "void set(uint, bool)", asMETHOD(Controls, set), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "bool isDown(uint)", asMETHOD(Controls, isDown), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "bool isPressed(uint, const Controls& in)", asMETHOD(Controls, isPressed), asCALL_THISCALL);
     engine->RegisterObjectProperty("Controls", "uint buttons", offsetof(Controls, mButtons));
     engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, mYaw));
     engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, mPitch));

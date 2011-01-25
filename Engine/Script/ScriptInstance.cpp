@@ -312,8 +312,15 @@ bool ScriptInstance::execute(const std::string& declaration, const std::vector<V
 {
     if ((!mScriptFile) || (!mScriptObject))
         return false;
-    
-    return mScriptFile->execute(mScriptObject, declaration, mScriptContext, parameters);
+    std::map<std::string, asIScriptFunction*>::const_iterator i = mExecuteCache.find(declaration);
+    if (i == mExecuteCache.end())
+    {
+        asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
+        mExecuteCache[declaration] = method;
+        return mScriptFile->execute(mScriptObject, method, mScriptContext, parameters);
+    }
+    else
+        return mScriptFile->execute(mScriptObject, i->second, mScriptContext, parameters);
 }
 
 bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Variant>& parameters)
@@ -366,6 +373,7 @@ void ScriptInstance::clearMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         mMethods[i] = 0;
+    mExecuteCache.clear();
 }
 
 void ScriptInstance::getSupportedMethods()

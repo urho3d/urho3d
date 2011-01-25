@@ -33,8 +33,8 @@ class LineEdit : public BorderImage
     DEFINE_TYPE(LineEdit);
     
 public:
-    //! Construct with initial text and name
-    LineEdit(const std::string& text = std::string(), const std::string& name = std::string());
+    //! Construct with name and initial text
+    LineEdit(const std::string& name = std::string(), const std::string& text = std::string());
     //! Destruct
     virtual ~LineEdit();
     

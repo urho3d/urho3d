@@ -36,8 +36,8 @@ class Text : public UIElement
     DEFINE_TYPE(Text);
     
 public:
-    //! Construct with initial text and name
-    Text(const std::string& text = std::string(), const std::string& name = std::string());
+    //! Construct with name and initial text
+    Text(const std::string& name = std::string(), const std::string& text = std::string());
     //! Destruct
     virtual ~Text();
     

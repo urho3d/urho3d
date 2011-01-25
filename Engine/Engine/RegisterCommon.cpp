@@ -541,6 +541,7 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVectorBuffer), asCALL_CDECL_OBJLAST);
     registerSerializer<VectorBuffer>(engine, "VectorBuffer");
     registerDeserializer<VectorBuffer>(engine, "VectorBuffer");
+    engine->RegisterObjectMethod("VectorBuffer", "VectorBuffer &opAssign(const VectorBuffer& in)", asMETHOD(VectorBuffer, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void setData(Deserializer@+, uint)", asFUNCTION(VectorBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VectorBuffer", "void clear()", asMETHOD(VectorBuffer, clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void resize(uint)", asMETHOD(VectorBuffer, resize), asCALL_THISCALL);

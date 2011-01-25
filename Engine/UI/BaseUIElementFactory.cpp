@@ -44,7 +44,7 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
     if (type == Cursor::getTypeStatic())
         return new Cursor(name);
     if (type == LineEdit::getTypeStatic())
-        return new LineEdit(std::string(), name);
+        return new LineEdit(name);
     if (type == MenuItem::getTypeStatic())
         return new MenuItem(name);
     if (type == ScrollView::getTypeStatic())
@@ -52,7 +52,7 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
     if (type == Slider::getTypeStatic())
         return new Slider(name);
     if (type == Text::getTypeStatic())
-        return new Text(std::string(), name);
+        return new Text(name);
     if (type == UIElement::getTypeStatic())
         return new UIElement(name);
     if (type == Window::getTypeStatic())

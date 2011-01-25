@@ -32,7 +32,7 @@
 
 #include "DebugNew.h"
 
-Text::Text(const std::string& text, const std::string& name) :
+Text::Text(const std::string& name, const std::string& text) :
     UIElement(name),
     mFontSize(DEFAULT_FONT_SIZE),
     mMaxWidth(0),
