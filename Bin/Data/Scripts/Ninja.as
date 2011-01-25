@@ -9,7 +9,7 @@ class Ninja
     {
         Vector3 pos = eventData["Pos"].getVector3();
         Quaternion rot = eventData["Rot"].getQuaternion();
-        
+
         // Create model
         AnimatedModel@ model = entity.createComponent("AnimatedModel");
         model.setModel(cache.getResource("Model", "Models/Ninja.mdl"));
@@ -25,7 +25,7 @@ class Ninja
         RigidBody@ body = entity.createComponent("RigidBody");
         body.setPosition(pos);
         body.setRotation(rot);
-        body.setMode(PHYS_STATIC);
+        body.setMode(PHYS_DYNAMIC);
         body.setMass(80);
         body.setFriction(0.5);
         body.setCollisionShape(cache.getResource("CollisionShape", "Physics/Ninja.xml"));
