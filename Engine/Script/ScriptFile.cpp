@@ -159,7 +159,6 @@ bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context,
         // This is not recommended for performance reasons
         LOGDEBUG("Executing " + std::string(function->GetDeclaration()) + " in a temporary script context");
         asIScriptContext* tempContext = mScriptEngine->createScriptContext();
-        tempContext->SetUserData(context->GetUserData());
         if (tempContext->Prepare(function->GetId()) < 0)
         {
             tempContext->Release();
@@ -221,7 +220,6 @@ bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, asI
         // This is not recommended for performance reasons
         LOGDEBUG("Executing " + std::string(method->GetDeclaration()) + " in a temporary script context");
         asIScriptContext* tempContext = mScriptEngine->createScriptContext();
-        tempContext->SetUserData(context->GetUserData());
         if (tempContext->Prepare(method->GetId()) < 0)
         {
             tempContext->Release();

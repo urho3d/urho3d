@@ -1,4 +1,5 @@
 #include "Scripts/Controls.as"
+#include "Scripts/GameObject.as"
 
 Scene@ gameScene;
 Camera@ gameCamera;
@@ -113,12 +114,8 @@ void spawnPlayer()
     Entity@ playerEntity = gameScene.createEntity("ObjPlayer");
     ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
     instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/Ninja.as"), "Ninja");
-
-    array<Variant> arguments;
-    arguments.resize(2);
-    arguments[0] = Vector3(0, 90, 0);
-    arguments[1] = Quaternion();
-    instance.execute("void create(const Vector3&in, const Quaternion&in)", arguments);
+    GameObject@ object = cast<GameObject>(instance.getScriptObject());
+    object.create(Vector3(0, 90, 0), Quaternion());
 }
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
@@ -176,12 +173,8 @@ void updateControls()
         return;
 
     ScriptInstance@ instance = playerEntity.getComponent("ScriptInstance");
-    array<Variant> arguments;
-    arguments.resize(3);
-    arguments[0] = playerControls.buttons;
-    arguments[1] = playerControls.yaw;
-    arguments[2] = playerControls.pitch;
-    instance.execute("void setControls(uint, float, float)", arguments);
+    GameObject@ object = cast<GameObject>(instance.getScriptObject());
+    object.setControls(playerControls);
 }
 
 void updateCamera()
@@ -199,7 +192,7 @@ void updateCamera()
     Vector3 aimPoint = pos + Vector3(0, 100, 0);
     Vector3 minDist = aimPoint + dir * Vector3(0, 0, -cameraMinDist);
     Vector3 maxDist = aimPoint + dir * Vector3(0, 0, -cameraMaxDist);
-    
+
     // Collide camera ray with static objects
     Vector3 rayDir = (maxDist - minDist).getNormalized();
     float rayDistance = cameraMaxDist - cameraMinDist + cameraSafetyDist;

@@ -1,4 +1,5 @@
 #include "Scripts/Controls.as"
+#include "Scripts/GameObject.as"
 
 const int ANIM_MOVE = 1;
 const int ANIM_ATTACK = 2;
@@ -13,7 +14,7 @@ const Vector3 throwVelocity(0, 425, 2000);
 const Vector3 throwPosition(0, 20, 100);
 const float throwDelay = 0.1;
 
-class Ninja
+class Ninja : ScriptObject, GameObject
 {
     Controls controls;
     Controls prevControls;
@@ -48,7 +49,7 @@ class Ninja
         subscribeToEvent("EntityCollision", "handleEntityCollision");
     }
 
-    void create(const Vector3&in pos, const Quaternion&in rot)
+    void create(const Vector3&in position, const Quaternion&in rotation)
     {
         // Create model
         AnimatedModel@ model = entity.createComponent("AnimatedModel");
@@ -63,8 +64,8 @@ class Ninja
 
         // Create body
         RigidBody@ body = entity.createComponent("RigidBody");
-        body.setPosition(pos);
-        body.setRotation(rot);
+        body.setPosition(position);
+        body.setRotation(rotation);
         body.setMode(PHYS_DYNAMIC);
         body.setMass(mass);
         body.setFriction(friction);
@@ -75,14 +76,12 @@ class Ninja
         body.addChild(model);
         model.setPosition(Vector3(0, -90, 0));
 
-        aimX = rot.getYaw();
+        aimX = rotation.getYaw();
     }
 
-    void setControls(uint buttons, float yaw, float pitch)
+    void setControls(const Controls&in newControls)
     {
-        controls.buttons = buttons;
-        controls.yaw = yaw;
-        controls.pitch = pitch;
+        controls = newControls;
     }
 
     Quaternion getAim()
@@ -184,7 +183,7 @@ class Ninja
                     body.setPosition(body.getPhysicsPosition() + Vector3(0, 3, 0));
                     body.applyForce(Vector3(0, jumpForce, 0));
                     inAirTime = 1.0f;
-                    controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 1.0f, 1.0f, 0.0f, 0.0f, true);
+                    controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 1.0, 1.0, 0.0, 0.0, true);
                     okToJump = false;
                 }
             }
@@ -216,7 +215,7 @@ class Ninja
             
             // Falling/jumping/sliding animation
             if (inAirTime > 0.01f)
-                controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 1.0f, 1.0f, 0.2f, 0.0f, true);
+                controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 1.0, 1.0, 0.2, 0.0, true);
         }
         
         // Shooting
@@ -227,8 +226,8 @@ class Ninja
         {
             Vector3 projectileVel = getAim() * throwVelocity;
             
-            controller.setAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0f, 0.75f, 0.0f, 0.0f, false);
-            controller.setFade("Models/Ninja_Attack1.ani", 0.0f, 0.5f);
+            controller.setAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0, 0.75, 0.0, 0.0, false);
+            controller.setFade("Models/Ninja_Attack1.ani", 0.0, 0.5);
             controller.setPriority("Models/Ninja_Attack1.ani", 1);
             
             /*

@@ -150,15 +150,16 @@ private:
     std::string mClassName;
     //! Pointers to supported inbuilt methods
     asIScriptFunction* mMethods[MAX_SCRIPT_METHODS];
-    //! Cache of executed functions
-    std::map<std::string, asIScriptFunction*> mExecuteCache;
     
     //! Enabled flag
     bool mEnabled;
 };
 
+//! Return the ScriptInstance of the active context
 ScriptInstance* getScriptContextComponent();
+//! Return the entity of the active context
 Entity* getScriptContextEntity();
+//! Return the scene of the active context
 Scene* getScriptContextScene();
 
 #endif // SCRIPT_SCRIPTINSTANCE_H

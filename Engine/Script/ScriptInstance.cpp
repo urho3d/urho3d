@@ -33,6 +33,7 @@
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
+#include "StringUtils.h"
 
 #include <angelscript.h>
 
@@ -57,6 +58,8 @@ static const std::string methodDeclarations[] = {
     "array<ComponentRef> getComponentRefs()"
 };
 
+std::map<void*, ScriptInstance*> objectToInstance;
+
 ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& name) :
     Component(name),
     mScriptEngine(scriptEngine),
@@ -70,7 +73,6 @@ ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& na
     mScriptContext = mScriptEngine->createScriptContext();
     if (!mScriptContext)
         EXCEPTION("Failed to create a script context");
-    mScriptContext->SetUserData(this);
     
     clearMethods();
 }
@@ -291,6 +293,7 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
     mScriptObject = mScriptFile->createObject(mClassName, mScriptContext);
     if (mScriptObject)
     {
+        objectToInstance[(void*)mScriptObject] = this;
         getSupportedMethods();
         if (mMethods[METHOD_START])
             mScriptFile->execute(mScriptObject, mMethods[METHOD_START], mScriptContext);
@@ -312,15 +315,9 @@ bool ScriptInstance::execute(const std::string& declaration, const std::vector<V
 {
     if ((!mScriptFile) || (!mScriptObject))
         return false;
-    std::map<std::string, asIScriptFunction*>::const_iterator i = mExecuteCache.find(declaration);
-    if (i == mExecuteCache.end())
-    {
-        asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
-        mExecuteCache[declaration] = method;
-        return mScriptFile->execute(mScriptObject, method, mScriptContext, parameters);
-    }
-    else
-        return mScriptFile->execute(mScriptObject, i->second, mScriptContext, parameters);
+    
+    asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
+    return mScriptFile->execute(mScriptObject, method, mScriptContext, parameters);
 }
 
 bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Variant>& parameters)
@@ -352,6 +349,8 @@ void ScriptInstance::releaseObject()
 {
     if (mScriptObject)
     {
+        objectToInstance.erase((void*)mScriptObject);
+        
         // If we come here from script, abort execution
         if (mScriptContext->GetState() == asEXECUTION_ACTIVE)
             mScriptContext->Abort();
@@ -373,7 +372,6 @@ void ScriptInstance::clearMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         mMethods[i] = 0;
-    mExecuteCache.clear();
 }
 
 void ScriptInstance::getSupportedMethods()
@@ -477,12 +475,17 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
 
 ScriptInstance* getScriptContextComponent()
 {
-    return static_cast<ScriptInstance*>(asGetActiveContext()->GetUserData());
+    void* object = asGetActiveContext()->GetThisPointer();
+    std::map<void*, ScriptInstance*>::const_iterator i = objectToInstance.find(object);
+    if (i != objectToInstance.end())
+        return i->second;
+    else
+        return 0;
 }
 
 Entity* getScriptContextEntity()
 {
-    ScriptInstance* instance = static_cast<ScriptInstance*>(asGetActiveContext()->GetUserData());
+    ScriptInstance* instance = getScriptContextComponent();
     return instance ? instance->getEntity() : 0;
 }
 
