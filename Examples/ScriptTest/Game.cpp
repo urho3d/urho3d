@@ -63,6 +63,7 @@ Game::Game(const std::vector<std::string>& arguments) :
 
 Game::~Game()
 {
+    mCache->releaseResources(ShortStringHash("ScriptFile"), true);
 }
 
 void Game::run()

@@ -114,7 +114,6 @@ void spawnPlayer()
     ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
     instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/Ninja.as"), "Ninja");
 
-    // To work properly, the script object's methods must be executed in its own context. Therefore we can't directly access the script object
     array<Variant> arguments;
     arguments.resize(2);
     arguments[0] = Vector3(0, 90, 0);
