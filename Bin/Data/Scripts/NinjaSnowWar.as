@@ -124,12 +124,21 @@ void spawnPlayer()
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    if (input.getKeyPress('P'))
+    {
+        paused = !paused;
+        if (paused)
+            messageText.setText("PAUSED");
+        else
+            messageText.setText("");
+    }
     if (input.getKeyPress(KEY_F1))
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
         engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
 
-    updateControls();
+    if (!paused)
+        updateControls();
 }
 
 void handlePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -184,7 +193,6 @@ void updateCamera()
 
     RigidBody@ body = playerEntity.getComponent("RigidBody");
     Vector3 pos = body.getWorldPosition();
-    // Use yaw & pitch from own controls for immediate response
     Quaternion dir;
     dir = dir * Quaternion(playerControls.yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(playerControls.pitch, Vector3(1, 0, 0));
