@@ -368,7 +368,6 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactory.c_str(), asFUNCTION(ConstructUIElement<T>), asCALL_CDECL);
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactoryWithName.c_str(), asFUNCTION(ConstructUIElementWithName<T>), asCALL_CDECL);
     engine->RegisterObjectMethod(className, "void setStyle(const XMLElement& in)", asFUNCTION(UIElementSetStyle<T>), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setName(const string& in)", asMETHOD(T, setName), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPosition(const IntVector2& in)", asMETHODPR(T, setPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPosition(int, int)", asMETHODPR(T, setPosition, (int, int), void), asCALL_THISCALL);
@@ -393,6 +392,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setFocusable(bool)", asMETHOD(T, setFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocus(bool)", asMETHOD(T, setFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void bringToFront()", asMETHOD(T, bringToFront), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void addChild(UIElement@+)", asMETHOD(T, addChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void removeChild(UIElement@+)", asMETHOD(T, removeChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void removeAllChildren()", asMETHOD(T, removeAllChildren), asCALL_THISCALL);
@@ -424,6 +425,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getParent() const", asMETHOD(T, getParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ getRootElement() const", asMETHOD(T, getRootElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLElement getStyleElement(XMLFile@+) const", asMETHODPR(T, getStyleElement, (XMLFile*) const, XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 screenToElement(const IntVector2& in)", asMETHOD(T, screenToElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 elementToScreen(const IntVector2& in)", asMETHOD(T, elementToScreen), asCALL_THISCALL);

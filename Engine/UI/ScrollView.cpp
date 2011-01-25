@@ -51,16 +51,13 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("viewsize"))
         setViewSize(element.getChildElement("viewsize").getIntVector2("value"));
     
-    // If sliders specified, search for them on own hierarchy level
-    if (element.hasChildElement("horizontalslider"))
+    UIElement* root = getRootElement();
+    if (root)
     {
-        if (mParent)
-            setHorizontalSlider(dynamic_cast<Slider*>(mParent->getChild(element.getChildElement("horizontalslider").getString("name"))));
-    }
-    if (element.hasChildElement("verticalslider"))
-    {
-        if (mParent)
-            setVerticalSlider(dynamic_cast<Slider*>(mParent->getChild(element.getChildElement("verticalslider").getString("name"))));
+        if (element.hasChildElement("horizontalslider"))
+            setHorizontalSlider(dynamic_cast<Slider*>(root->getChild(element.getChildElement("horizontalslider").getString("name"), true)));
+        if (element.hasChildElement("verticalslider"))
+            setVerticalSlider(dynamic_cast<Slider*>(root->getChild(element.getChildElement("verticalslider").getString("name"), true)));
     }
 }
 

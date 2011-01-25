@@ -136,36 +136,6 @@ void UI::setFocusElement(UIElement* element)
         element->setFocus(true);
 }
 
-void UI::bringToFront(UIElement* element)
-{
-    if (!element)
-        return;
-    
-    // Follow the parent chain to the top level window. If it has BringToFront mode, bring it to front now
-    UIElement* ptr = element;
-    while ((ptr) && (ptr->getParent() != mRootElement))
-        ptr = ptr->getParent();
-    if ((!ptr) || (!ptr->getBringToFront()))
-        return;
-    
-    // Get the highest priority used by all other top level elements, decrease their priority by one,
-    // and assign that to new front element. However, take into account only active (enabled) elements
-    // and those which have the BringToBack flag set
-    int maxPriority = M_MIN_INT;
-    std::vector<UIElement*> topLevelElements = mRootElement->getChildren();
-    for (std::vector<UIElement*>::iterator i = topLevelElements.begin(); i != topLevelElements.end(); ++i)
-    {
-        UIElement* other = *i;
-        if ((other->isEnabled()) && (other->getBringToBack()) && (other != ptr))
-        {
-            int priority = other->getPriority();
-            maxPriority = max(priority, maxPriority);
-            other->setPriority(priority - 1);
-        }
-    }
-    ptr->setPriority(maxPriority);
-}
-
 void UI::clear()
 {
     mRootElement->removeAllChildren();
@@ -476,7 +446,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             if (button == MOUSEB_LEFT)
             {
                 setFocusElement(element);
-                bringToFront(element);
+                element->bringToFront();
             }
             
             // Handle click

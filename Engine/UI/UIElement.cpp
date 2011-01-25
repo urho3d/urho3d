@@ -415,6 +415,34 @@ void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
     setStyle(element, cache);
 }
 
+void UIElement::bringToFront()
+{
+    // Follow the parent chain to the top level window. If it has BringToFront mode, bring it to front now
+    UIElement* root = getRootElement();
+    UIElement* ptr = this;
+    while ((ptr) && (ptr->getParent() != root))
+        ptr = ptr->getParent();
+    if ((!ptr) || (!ptr->getBringToFront()))
+        return;
+    
+    // Get the highest priority used by all other top level elements, decrease their priority by one,
+    // and assign that to new front element. However, take into account only active (enabled) elements
+    // and those which have the BringToBack flag set
+    int maxPriority = M_MIN_INT;
+    std::vector<UIElement*> topLevelElements = root->getChildren();
+    for (std::vector<UIElement*>::iterator i = topLevelElements.begin(); i != topLevelElements.end(); ++i)
+    {
+        UIElement* other = *i;
+        if ((other->isEnabled()) && (other->getBringToBack()) && (other != ptr))
+        {
+            int priority = other->getPriority();
+            maxPriority = max(priority, maxPriority);
+            other->setPriority(priority - 1);
+        }
+    }
+    ptr->setPriority(maxPriority);
+}
+
 void UIElement::addChild(UIElement* element)
 {
     if ((!element) || (element->mParent == this) || (mParent == element))
@@ -555,6 +583,16 @@ UIElement* UIElement::getChild(const std::string& name, bool recursive) const
     }
     
     return 0;
+}
+
+UIElement* UIElement::getRootElement() const
+{
+    UIElement* root = mParent;
+    if (!root)
+        return 0;
+    while (root->getParent())
+        root = root->getParent();
+    return root;
 }
 
 XMLElement UIElement::getStyleElement(XMLFile* file) const

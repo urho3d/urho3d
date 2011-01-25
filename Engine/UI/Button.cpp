@@ -35,7 +35,6 @@ Button::Button(const std::string& name) :
     mLabelOffset(IntVector2::sZero),
     mPressed(false)
 {
-    mClipChildren = true;
     mEnabled = true;
 }
 

@@ -39,7 +39,6 @@ Window::Window(const std::string& name) :
     mDragMode(DRAG_NONE)
 {
     mBringToFront = true;
-    mClipChildren = true;
     mEnabled = true;
     
     validateSize();

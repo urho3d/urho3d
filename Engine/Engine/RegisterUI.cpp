@@ -273,7 +273,6 @@ static void registerUI(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("UI", asBEHAVE_RELEASE, "void f()", asMETHOD(UI, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void setCursor(Cursor@+)", asMETHOD(UI, setCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void setFocusElement(UIElement@+)", asMETHOD(UI, setFocusElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void bringToFront(UIElement@+)", asMETHOD(UI, bringToFront), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void clear()", asMETHOD(UI, clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@ createElement(const string& in, const string& in)", asFUNCTION(UICreateElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "UIElement@ loadLayout(XMLFile@+)", asFUNCTION(UILoadLayout), asCALL_CDECL_OBJLAST);

@@ -151,6 +151,8 @@ public:
     void setVisible(bool enable);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
+    //! Bring UI element to front
+    void bringToFront();
     //! Add a child element
     void addChild(UIElement* element);
     //! Remove a child element
@@ -216,6 +218,8 @@ public:
     std::vector<UIElement*> getChildren(bool recursive = false) const;
     //! Return parent element
     UIElement* getParent() const { return mParent; }
+    //! Return root element
+    UIElement* getRootElement() const;
     //! Return first matching UI style element from an XML file. If not found, return empty
     XMLElement getStyleElement(XMLFile* file) const;
     
