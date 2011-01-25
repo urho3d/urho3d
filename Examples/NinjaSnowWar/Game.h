@@ -126,7 +126,6 @@ private:
     SharedPtr<Text> mScoreText;
     SharedPtr<Text> mHiScoreText;
     SharedPtr<Text> mMessage;
-    SharedPtr<Song> mSong;
     
     std::vector<Player> mPlayers;
     std::vector<HiScore> mHiScores;

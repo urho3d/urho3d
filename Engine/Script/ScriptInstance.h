@@ -99,7 +99,7 @@ public:
     bool setScriptClass(ScriptFile* scriptFile, const std::string& className);
     //! Enable or disable scripted updates and event handlers
     void setEnabled(bool enable);
-    //! Query for a method by declaration and execute if foud
+    //! Query for a method by declaration and execute if found
     bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
     //! Execute a method
     bool execute(asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>());

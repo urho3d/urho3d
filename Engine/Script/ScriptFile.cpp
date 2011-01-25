@@ -142,6 +142,7 @@ bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context,
     {
         if (context->Prepare(function->GetId()) < 0)
             return false;
+        lastScriptFile = this;
         setParameters(context, function, parameters);
         return context->Execute() >= 0;
     }
@@ -164,6 +165,7 @@ bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context,
             tempContext->Release();
             return false;
         }
+        lastScriptFile = this;
         setParameters(tempContext, function, parameters);
         
         ++executeNestingLevel;
@@ -403,8 +405,6 @@ void ScriptFile::addScriptSection(asIScriptEngine* engine, Deserializer& source,
 
 void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters)
 {
-    lastScriptFile = this;
-    
     unsigned paramCount = function->GetParamCount();
     for (unsigned i = 0; (i < parameters.size()) && (i < paramCount); ++i)
     {

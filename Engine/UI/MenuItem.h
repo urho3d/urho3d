@@ -47,16 +47,16 @@ class MenuItem : public Button
     
     //! Set popup element to show on selection
     void setPopup(UIElement* element);
-    //! Set popup offset when showing it
+    //! Set popup element offset
     void setPopupOffset(const IntVector2& offset);
-    //! Set popup offset when showing it
+    //! Set popup element offset
     void setPopupOffset(int x, int y);
     //! Force the popup to show or hide
     void showPopup(bool enable);
     
     //! Return popup element
     UIElement* getPopup() const { return mPopup; }
-    //! Return popup offset
+    //! Return popup element offset
     const IntVector2& getPopupOffset() const { return mPopupOffset; }
     //! Return whether popup is open
     bool getShowPopup() const { return mShowPopup; }

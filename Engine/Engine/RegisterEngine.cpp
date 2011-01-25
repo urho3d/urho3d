@@ -138,6 +138,7 @@ static void registerConnection(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in)", asFUNCTION(SendRemoteEntityEventToAll), asCALL_CDECL);
     engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in, Connection@+)", asFUNCTION(SendRemoteEntityEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in, Connection@+, float, uint16)", asFUNCTION(SendRemoteEntityEventDelayTTL), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void registerLocalOnlyEvent(const string& in)", asFUNCTIONPR(registerLocalOnlyEvent, (const std::string&), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("Connection@+ getRemoteEventSender()", asFUNCTION(getRemoteEventSender), asCALL_CDECL);
 }
 
@@ -389,9 +390,9 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_ADDREF, "void f()", asMETHOD(Engine, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_RELEASE, "void f()", asMETHOD(Engine, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Scene@ createScene(const string& in, const BoundingBox& in, uint, bool)", asFUNCTION(EngineCreateScene), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Engine", "Client@ createClient(const string& in)", asMETHOD(Engine, createClient), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "Server@ createServer()", asMETHOD(Engine, createServer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "DebugHud@ createDebugHud()", asMETHOD(Engine, createDebugHud), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "Client@+ createClient(const string& in)", asMETHOD(Engine, createClient), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "Server@+ createServer()", asMETHOD(Engine, createServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "DebugHud@+ createDebugHud()", asMETHOD(Engine, createDebugHud), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeClient()", asMETHOD(Engine, removeClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeServer()", asMETHOD(Engine, removeServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMinFps(int)", asMETHOD(Engine, setMinFps), asCALL_THISCALL);

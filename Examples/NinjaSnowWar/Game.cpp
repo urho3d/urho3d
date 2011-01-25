@@ -197,7 +197,6 @@ void Game::init()
     
     // Run server in headless mode
     mEngine = new Engine(logName, runServer);
-    mEngine->createScriptEngine();
     if (runServer)
         openConsoleWindow();
     
@@ -235,9 +234,15 @@ void Game::init()
     if (runClient)
         mClient = mEngine->createClient(downloadDir);
     
-    // Execute sound setup in script to verify that the script interface works
-    ScriptFile* script = mCache->getResource<ScriptFile>("Scripts/NinjaSnowWar.as");
-    script->execute("void initAudio()");
+    // Setup sound. Play music in singleplayer only
+    Audio* audio = mEngine->getAudio();
+    audio->setMasterGain(CHANNEL_MASTER, 0.75f);
+    audio->setMasterGain(CHANNEL_MUSIC, 0.75f);
+    if ((!runServer) && (!runClient))
+    {
+        XM* song = mCache->getResource<XM>("Music/NinjaGods.xm");
+        song->play();
+    }
     
     setupOptions();
     createOverlays();
