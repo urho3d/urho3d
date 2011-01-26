@@ -275,7 +275,7 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
         return false;
     }
     
-    if ((mScriptObject) && (scriptFile == mScriptFile) && (className == mClassName))
+    if ((scriptFile == mScriptFile) && (className == mClassName))
         return true;
     
     releaseObject();
@@ -290,21 +290,7 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
     mScriptFile = scriptFile;
     mClassName = className;
     
-    mScriptObject = mScriptFile->createObject(mClassName, mScriptContext);
-    if (mScriptObject)
-    {
-        mScriptFile->addScriptInstance(this);
-        objectToInstance[(void*)mScriptObject] = this;
-        getSupportedMethods();
-        if (mMethods[METHOD_START])
-            mScriptFile->execute(mScriptObject, mMethods[METHOD_START], mScriptContext);
-        return true;
-    }
-    else
-    {
-        LOGERROR("Failed to create object of class " + mClassName + " from " + mScriptFile->getName());
-        return false;
-    }
+    return createObject();
 }
 
 void ScriptInstance::setEnabled(bool enable)
@@ -344,6 +330,28 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
     
     subscribeToEvent(eventType, EVENT_HANDLER(ScriptInstance, handleScriptEvent));
     mEventHandlers[eventType] = method;
+}
+
+bool ScriptInstance::createObject()
+{
+    if (!mScriptFile)
+        return false;
+    
+    mScriptObject = mScriptFile->createObject(mClassName, mScriptContext);
+    if (mScriptObject)
+    {
+        mScriptFile->addScriptInstance(this);
+        objectToInstance[(void*)mScriptObject] = this;
+        getSupportedMethods();
+        if (mMethods[METHOD_START])
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_START], mScriptContext);
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to create object of class " + mClassName + " from " + mScriptFile->getName());
+        return false;
+    }
 }
 
 void ScriptInstance::releaseObject()

@@ -119,7 +119,9 @@ public:
     //! Return whether scripted updates and event handlers are enabled
     bool isEnabled() const { return mEnabled; }
     
-    //! Release object
+    //! Create the script object. Check for supported methods and register self to the ScriptFile if successful
+    bool createObject();
+    //! Release the script object and unregister self from the ScriptFile
     void releaseObject();
     
 private:

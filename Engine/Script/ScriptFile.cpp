@@ -112,7 +112,7 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     
     // Now let the script instances recreate their objects
     for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
-        (*i)->setScriptClass(this, (*i)->getClassName());
+        (*i)->createObject();
 }
 
 void ScriptFile::addEventHandler(StringHash eventType, const std::string& handlerName)
