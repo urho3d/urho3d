@@ -34,24 +34,10 @@
 
 #include "DebugNew.h"
 
-void messageCallback(const asSMessageInfo *msg, void *param)
+void messageCallback(const asSMessageInfo* msg, void* param)
 {
-    std::string message = std::string(msg->section) + " (" + toString(msg->row) + "," + toString(msg->col) + ") " + std::string(msg->message);
-    
-    switch (msg->type)
-    {
-    case asMSGTYPE_ERROR:
-        LOGERROR(message);
-        break;
-        
-    case asMSGTYPE_WARNING:
-        LOGWARNING(message);
-        break;
-        
-    default:
-        LOGINFO(message);
-        break;
-    }
+    ScriptEngine* engine = static_cast<ScriptEngine*>(param);
+    engine->logMessage(msg);
 }
 
 ScriptEngine::ScriptEngine() :
@@ -67,7 +53,7 @@ ScriptEngine::ScriptEngine() :
     mAngelScriptEngine->SetUserData(this);
     mAngelScriptEngine->SetEngineProperty(asEP_USE_CHARACTER_LITERALS, true);
     mAngelScriptEngine->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, true);
-    mAngelScriptEngine->SetMessageCallback(asFUNCTION(messageCallback), 0, asCALL_CDECL);
+    mAngelScriptEngine->SetMessageCallback(asFUNCTION(messageCallback), this, asCALL_CDECL);
     
     // Register the array and string types, but leave it for the script engine instantiator to install the rest of the API
     {
@@ -139,4 +125,44 @@ void ScriptEngine::garbageCollect()
     PROFILE(Script_GarbageCollect);
     
     mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP);
+}
+
+void ScriptEngine::setLogMode(ScriptLogMode mode)
+{
+    mLogMode = mode;
+}
+
+void ScriptEngine::clearLogMessages()
+{
+    mLogMessages.clear();
+}
+
+void ScriptEngine::logMessage(const asSMessageInfo* msg)
+{
+    std::string message = std::string(msg->section) + " (" + toString(msg->row) + "," + toString(msg->col) + ") " +
+        std::string(msg->message);
+    
+    if (mLogMode == LOGMODE_IMMEDIATE)
+    {
+        switch (msg->type)
+        {
+        case asMSGTYPE_ERROR:
+            LOGERROR(message);
+            break;
+            
+        case asMSGTYPE_WARNING:
+            LOGWARNING(message);
+            break;
+            
+        default:
+            LOGINFO(message);
+            break;
+        }
+    }
+    else
+    {
+        // In retained mode, ignore info messages
+        if ((msg->type == asMSGTYPE_ERROR) || (msg->type == asMSGTYPE_WARNING))
+            mLogMessages += message + "\n";
+    }
 }

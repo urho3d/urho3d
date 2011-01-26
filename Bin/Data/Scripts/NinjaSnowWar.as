@@ -13,13 +13,12 @@ float mouseSensitivity = 0.125;
 float cameraMinDist = 25;
 float cameraMaxDist = 500;
 float cameraSafetyDist = 30;
+bool paused = false;
 
-void init(Scene@ scene)
+void init()
 {
-    @gameScene = @scene;
-
     initAudio();
-    loadScene();
+    initScene();
     createCamera();
     createOverlays();
     spawnPlayer();
@@ -29,6 +28,14 @@ void init(Scene@ scene)
 
     subscribeToEvent("Update", "handleUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
+}
+
+void runFrame()
+{
+    engine.runFrame(gameScene, gameCamera, !paused);
+    
+    if (input.getKeyPress(KEY_ESCAPE))
+        engine.exit();
 }
 
 void initAudio()
@@ -42,8 +49,10 @@ void initAudio()
     song.play(0);
 }
 
-void loadScene()
+void initScene()
 {
+    @gameScene = engine.createScene("ScriptTest", BoundingBox(-100000.0, 100000.0), 8, true);
+
     File@ levelFile = cache.getFile("TestLevel.xml");
     gameScene.loadXML(levelFile);
 }

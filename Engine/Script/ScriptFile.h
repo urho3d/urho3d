@@ -41,7 +41,6 @@ class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
 
-
 //! A script file resource
 class ScriptFile : public Resource, public ScriptEventListener
 {

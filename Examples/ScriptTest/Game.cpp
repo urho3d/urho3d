@@ -47,8 +47,7 @@
 #include "DebugNew.h"
 
 Game::Game(const std::vector<std::string>& arguments) :
-    mArguments(arguments),
-    mPaused(false)
+    mArguments(arguments)
 {
     std::string userDir = getUserDocumentsDirectory();
     std::string applicationDir = userDir + "ScriptTest";
@@ -64,6 +63,7 @@ Game::Game(const std::vector<std::string>& arguments) :
 Game::~Game()
 {
     // The scripts hold references to engine subsystems, not releasing them shows up as numerous memory leaks
+    mScriptFile.reset();
     mCache->releaseResources(ShortStringHash("ScriptFile"), true);
 }
 
@@ -71,19 +71,11 @@ void Game::run()
 {
     init();
     
+    if (!mRunFrameFunction)
+        return;
+    
     while (!mEngine->isExiting())
-    {
-        Entity* cameraEntity = mScene->getEntity("Camera");
-        Camera* camera = 0;
-        if (cameraEntity)
-            camera = cameraEntity->getComponent<Camera>();
-        
-        mEngine->runFrame(mScene, camera, !mPaused);
-        
-        Input* input = mEngine->getInput();
-        if (input->getKeyPress(KEY_ESCAPE))
-            mEngine->exit();
-    }
+        mScriptFile->execute(mRunFrameFunction);
 }
 
 void Game::init()
@@ -104,8 +96,6 @@ void Game::init()
     
     mEngine->init("ScriptTest", mArguments);
     mEngine->createScriptEngine();
-    // Register the pause variable for script access
-    mEngine->getScriptEngine()->getAngelScriptEngine()->RegisterGlobalProperty("bool paused", &mPaused);
     
     mCache->addResourcePath(getSystemFontDirectory());
     
@@ -120,13 +110,12 @@ void Game::init()
     
     createSkyPlaneModel();
     
-    mScene = mEngine->createScene("ScriptTest", BoundingBox(-100000.0f, 100000.f));
+    // Execute the rest of initialization, including scene creation, in script
+    mScriptFile = mCache->getResource<ScriptFile>("Scripts/NinjaSnowWar.as");
+    mInitFunction = mScriptFile->getFunction("void init()");
+    mRunFrameFunction = mScriptFile->getFunction("void runFrame()");
     
-    // Execute the rest of initialization in script
-    ScriptFile* script = mCache->getResource<ScriptFile>("Scripts/NinjaSnowWar.as");
-    std::vector<Variant> arguments;
-    arguments.push_back(Variant((void*)mScene.getPtr()));
-    script->execute("void init(Scene@)", 0, arguments);
+    mScriptFile->execute(mInitFunction);
 }
 
 void Game::createSkyPlaneModel()

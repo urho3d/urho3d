@@ -28,12 +28,20 @@
 
 class asIScriptEngine;
 class asIScriptContext;
+struct asSMessageInfo;
+
+//! Script engine logging mode
+enum ScriptLogMode
+{
+    LOGMODE_IMMEDIATE = 0,
+    LOGMODE_RETAINED
+};
 
 //! Utilizes the AngelScript library for executing scripts
 class ScriptEngine : public RefCounted
 {
 public:
-    //! Construct. Create the AngelScript engine and register the application interface
+    //! Construct. Create the AngelScript engine and register string & array classes
     ScriptEngine();
     //! Destruct. Release the AngelScript engine
     ~ScriptEngine();
@@ -44,17 +52,31 @@ public:
     bool execute(const std::string& line);
     //! Perform garbage collection
     void garbageCollect();
+    //! Set script engine logging mode, immediate is default
+    void setLogMode(ScriptLogMode mode);
+    //! Clear retained mode log messages
+    void clearLogMessages();
+    //! Log a message from the script engine
+    void logMessage(const asSMessageInfo* msg);
     
     //! Return the AngelScript engine
     asIScriptEngine* getAngelScriptEngine() const { return mAngelScriptEngine; }
     //! Return immediate execution script context
     asIScriptContext* getImmediateContext() const { return mImmediateContext; }
+    //! Return logging mode
+    ScriptLogMode getLogMode() const;
+    //! Return retained mode log messages
+    const std::string& getLogMessages() const { return mLogMessages; }
     
 private:
     //! AngelScript engine
     asIScriptEngine* mAngelScriptEngine;
     //! Immediate execution script context
     asIScriptContext* mImmediateContext;
+    //! Script engine logging mode
+    ScriptLogMode mLogMode;
+    //! Retained mode log messages
+    std::string mLogMessages;
 };
 
 #endif // SCRIPT_SCRIPTENGINE_H

@@ -30,6 +30,8 @@
 class Engine;
 class ResourceCache;
 class Scene;
+class ScriptFile;
+class asIScriptFunction;
 
 class Game : public EventListener
 {
@@ -47,8 +49,9 @@ private:
     
     SharedPtr<Engine> mEngine;
     SharedPtr<ResourceCache> mCache;
-    SharedPtr<Scene> mScene;
-    bool mPaused;
+    SharedPtr<ScriptFile> mScriptFile;
+    asIScriptFunction* mInitFunction;
+    asIScriptFunction* mRunFrameFunction;
 };
 
 #endif // GAME_H

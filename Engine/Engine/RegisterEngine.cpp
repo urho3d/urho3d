@@ -389,6 +389,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectType("Engine", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_ADDREF, "void f()", asMETHOD(Engine, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_RELEASE, "void f()", asMETHOD(Engine, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void runFrame(Scene@+, Camera@+, bool)", asMETHOD(Engine, runFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Scene@ createScene(const string& in, const BoundingBox& in, uint, bool)", asFUNCTION(EngineCreateScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Engine", "Client@+ createClient(const string& in)", asMETHOD(Engine, createClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Server@+ createServer()", asMETHOD(Engine, createServer), asCALL_THISCALL);
@@ -411,7 +412,9 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "bool isInitialized() const", asMETHOD(Engine, isInitialized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool isExiting() const", asMETHOD(Engine, isExiting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool isHeadless() const", asMETHOD(Engine, isHeadless), asCALL_THISCALL);
-    
+    engine->RegisterObjectMethod("Engine", "float getNextTimeStep()", asMETHOD(Engine, getNextTimeStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void update(float, Scene@+, Camera@+, bool)", asMETHOD(Engine, update), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void render()", asMETHOD(Engine, render), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Engine@+ getEngine()", asFUNCTION(getEngine), asCALL_CDECL);
     engine->RegisterGlobalFunction("Engine@+ get_engine()", asFUNCTION(getEngine), asCALL_CDECL);
 }

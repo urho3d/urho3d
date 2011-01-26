@@ -88,9 +88,16 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     // Add the initial section and check for includes
     addScriptSection(engine, source, cache);
     
-    // Compile
-    if (mScriptModule->Build() < 0)
-        EXCEPTION("Failed to build script module " + getName());
+    // Compile. Set script engine logging to retained mode so that potential exceptions can show all error info
+    mScriptEngine->setLogMode(LOGMODE_RETAINED);
+    mScriptEngine->clearLogMessages();
+    int result = mScriptModule->Build();
+    mScriptEngine->setLogMode(LOGMODE_IMMEDIATE);
+    if (result < 0)
+    {
+        std::string errors = mScriptEngine->getLogMessages();
+        EXCEPTION("Failed to compile script module " + getName() + ":\n" + errors);
+    }
     
     LOGINFO("Compiled script module " + getName());
     mCompiled = true;
