@@ -75,6 +75,7 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     // Discard the previous module if there was one
     mCompiled = false;
     mAllIncludeFiles.clear();
+    mInterfaceFound.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
     
@@ -251,6 +252,31 @@ asIScriptObject* ScriptFile::createObject(const std::string& className, asIScrip
     asIObjectType *type = engine->GetObjectTypeById(mScriptModule->GetTypeIdByDecl(className.c_str()));
     if (!type)
         return 0;
+    
+    // Ensure that the type implements the "ScriptObject" interface, so it can be returned also to script properly
+    bool found = false;
+    std::map<asIObjectType*, bool>::const_iterator i = mInterfaceFound.find(type);
+    if (i == mInterfaceFound.end())
+    {
+        unsigned numInterfaces = type->GetInterfaceCount();
+        for (unsigned j = 0; j < numInterfaces; ++j)
+        {
+            asIObjectType* interfaceType = type->GetInterface(j);
+            if (!strcmp(interfaceType->GetName(), "ScriptObject"))
+            {
+                found = true;
+                break;
+            }
+        }
+        mInterfaceFound[type] = found;
+    }
+    else
+        found = i->second;
+    if (!found)
+    {
+        LOGERROR("Script class " + className + " does not implement the ScriptObject interface");
+        return 0;
+    }
     
     // Get the factory function id from the object type
     std::string factoryName = className + "@ " + className + "()";

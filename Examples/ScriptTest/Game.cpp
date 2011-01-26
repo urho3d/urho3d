@@ -63,6 +63,7 @@ Game::Game(const std::vector<std::string>& arguments) :
 
 Game::~Game()
 {
+    // The scripts hold references to engine subsystems, not releasing them shows up as numerous memory leaks
     mCache->releaseResources(ShortStringHash("ScriptFile"), true);
 }
 

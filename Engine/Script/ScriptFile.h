@@ -34,11 +34,13 @@
 
 class ScriptEngine;
 class Variant;
+class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
+
 
 //! A script file resource
 class ScriptFile : public Resource, public ScriptEventListener
@@ -100,9 +102,11 @@ private:
     bool mCompiled;
     //! Encountered include files during script file loading
     std::set<std::string> mAllIncludeFiles;
+    //! Search cache for checking whether script classes implement "ScriptObject" interface
+    std::map<asIObjectType*, bool> mInterfaceFound;
 };
 
-//! Get last script file that is executing or has executed script code
+//! Get last script file that is executing or has executed script functions
 ScriptFile* getLastScriptFile();
 
 #endif // SCRIPT_SCRIPTFILE_H
