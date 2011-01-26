@@ -220,10 +220,10 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "float getNetUpdateDistance() const", asMETHOD(Entity, getNetUpdateDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "float getPredictionTimer() const", asMETHOD(Entity, getPredictionTimer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "string getUniqueComponentName()", asMETHOD(Entity, getUniqueComponentName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Entity", "bool hasComponent(const string& in)", asFUNCTION(EntityHasComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Entity", "bool hasComponent(const string& in, const string& in)", asFUNCTION(EntityHasComponentWithName), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in)", asFUNCTION(EntityGetComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in, const string& in)", asFUNCTION(EntityGetComponentWithName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "bool hasComponent(const string& in) const", asFUNCTION(EntityHasComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "bool hasComponent(const string& in, const string& in) const", asFUNCTION(EntityHasComponentWithName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in) const", asFUNCTION(EntityGetComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in, const string& in) const", asFUNCTION(EntityGetComponentWithName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "bool isAuthority() const", asMETHOD(Entity, isAuthority), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isProxy() const", asMETHOD(Entity, isProxy), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isOwnerPredicted() const", asMETHOD(Entity, isOwnerPredicted), asCALL_THISCALL);
@@ -359,6 +359,39 @@ static void SceneLoadAsyncXML(File* file, Scene* ptr)
     }
 }
 
+static CScriptArray* SceneGetEntities(Scene* ptr)
+{
+    const std::map<EntityID, SharedPtr<Entity> >& entities = ptr->getEntities();
+    std::vector<Entity*> result;
+    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
+        result.push_back(i->second);
+    return vectorToHandleArray<Entity*>(result, "array<Entity@>");
+}
+
+static CScriptArray* SceneGetEntitiesWithClass(const std::string& className, Scene* ptr)
+{
+    const std::map<EntityID, SharedPtr<Entity> >& entities = ptr->getEntities();
+    std::vector<Entity*> result;
+    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
+    {
+        const std::vector<SharedPtr<Component> >& components = i->second->getComponents();
+        for (std::vector<SharedPtr<Component> >::const_iterator j = components.begin(); j != components.end(); ++j)
+        {
+            if ((*j)->getType() == ScriptInstance::getTypeStatic())
+            {
+                ScriptInstance* instance = static_cast<ScriptInstance*>(j->getPtr());
+                if (instance->getClassName() == className)
+                {
+                    result.push_back(i->second);
+                    break;
+                }
+            }
+        }
+    }
+    
+    return vectorToHandleArray<Entity*>(result, "array<Entity@>");
+}
+
 static void SendDelayedEvent(const std::string& eventType, const VariantMap& eventData, float delay)
 {
     Scene* scene = getScriptContextScene();
@@ -414,11 +447,13 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void setInterpolationConstant(float)", asMETHOD(Scene, setInterpolationConstant), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void setInterpolationSnapThreshold(float)", asMETHOD(Scene, setInterpolationSnapThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const string& getName() const", asMETHOD(Scene, getName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool hasEntity(uint)", asMETHODPR(Scene, hasEntity, (EntityID) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool hasEntity(Entity@+)", asMETHODPR(Scene, hasEntity, (Entity*) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "bool hasEntity(const string& in)", asMETHODPR(Scene, hasEntity, (const std::string&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(uint)", asMETHODPR(Scene, getEntity, (EntityID) const, Entity*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(const string& in)", asMETHODPR(Scene, getEntity, (const std::string&) const, Entity*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool hasEntity(uint) const", asMETHODPR(Scene, hasEntity, (EntityID) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool hasEntity(Entity@+) const", asMETHODPR(Scene, hasEntity, (Entity*) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "bool hasEntity(const string& in) const", asMETHODPR(Scene, hasEntity, (const std::string&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(uint) const", asMETHODPR(Scene, getEntity, (EntityID) const, Entity*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(const string& in) const", asMETHODPR(Scene, getEntity, (const std::string&) const, Entity*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities() const", asFUNCTION(SceneGetEntities), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities(const string& in) const", asFUNCTION(SceneGetEntitiesWithClass), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Vector3 getEntityPosition(Entity@+) const", asMETHOD(Scene, getEntityPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float getTransientPredictionTime() const", asMETHOD(Scene, getTransientPredictionTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float getInterpolationConstant() const" ,asMETHOD(Scene, getInterpolationConstant), asCALL_THISCALL);
