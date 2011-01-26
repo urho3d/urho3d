@@ -388,7 +388,6 @@ static CScriptArray* SceneGetEntitiesWithClass(const std::string& className, Sce
             }
         }
     }
-    
     return vectorToHandleArray<Entity*>(result, "array<Entity@>");
 }
 

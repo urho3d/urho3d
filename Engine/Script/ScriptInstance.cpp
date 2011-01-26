@@ -275,7 +275,7 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
         return false;
     }
     
-    if ((scriptFile == mScriptFile) && (className == mClassName))
+    if ((mScriptObject) && (scriptFile == mScriptFile) && (className == mClassName))
         return true;
     
     releaseObject();
@@ -293,6 +293,7 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
     mScriptObject = mScriptFile->createObject(mClassName, mScriptContext);
     if (mScriptObject)
     {
+        mScriptFile->addScriptInstance(this);
         objectToInstance[(void*)mScriptObject] = this;
         getSupportedMethods();
         if (mMethods[METHOD_START])
@@ -365,6 +366,8 @@ void ScriptInstance::releaseObject()
         
         mScriptObject->Release();
         mScriptObject = 0;
+        
+        mScriptFile->removeScriptInstance(this);
     }
 }
 

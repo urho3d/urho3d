@@ -71,11 +71,14 @@ void Game::run()
 {
     init();
     
-    if (!mRunFrameFunction)
-        return;
-    
     while (!mEngine->isExiting())
-        mScriptFile->execute(mRunFrameFunction);
+    {
+        mScriptFile->execute("void runFrame()");
+        
+        // Test reloading the ninja script
+        if (mEngine->getInput()->getKeyPress('R'))
+            mCache->reloadResource(mCache->getResource<ScriptFile>("Scripts/Ninja.as"));
+    }
 }
 
 void Game::init()
@@ -112,10 +115,7 @@ void Game::init()
     
     // Execute the rest of initialization, including scene creation, in script
     mScriptFile = mCache->getResource<ScriptFile>("Scripts/NinjaSnowWar.as");
-    mInitFunction = mScriptFile->getFunction("void init()");
-    mRunFrameFunction = mScriptFile->getFunction("void runFrame()");
-    
-    mScriptFile->execute(mInitFunction);
+    mScriptFile->execute("void init()");
 }
 
 void Game::createSkyPlaneModel()

@@ -180,7 +180,7 @@ void updateControls()
     Entity@ playerEntity = gameScene.getEntity("ObjPlayer");
     if (@playerEntity == null)
         return;
-    
+
     ScriptInstance@ instance = playerEntity.getComponent("ScriptInstance");
     GameObject@ object = cast<GameObject>(instance.getScriptObject());
     object.setControls(playerControls);
@@ -205,7 +205,7 @@ void updateCamera()
     // Collide camera ray with static objects (collision mask 2)
     Vector3 rayDir = (maxDist - minDist).getNormalized();
     float rayDistance = cameraMaxDist - cameraMinDist + cameraSafetyDist;
-    array<PhysicsRaycastResult> result = gameScene.getPhysicsWorld().raycast(Ray(minDist, rayDir), rayDistance, 2);
+    array<PhysicsRaycastResult>@ result = gameScene.getPhysicsWorld().raycast(Ray(minDist, rayDir), rayDistance, 2);
     if (result.length() > 0)
         rayDistance = min(rayDistance, result[0].distance - cameraSafetyDist);
     

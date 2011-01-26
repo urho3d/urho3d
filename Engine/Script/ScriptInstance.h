@@ -114,15 +114,15 @@ public:
     asIScriptObject* getScriptObject() const { return mScriptObject; }
     //! Return class name
     const std::string& getClassName() const { return mClassName; }
-    
     //! Return whether object created and running
     bool isRunning() const { return mScriptObject != 0; }
     //! Return whether scripted updates and event handlers are enabled
     bool isEnabled() const { return mEnabled; }
     
-private:
     //! Release object
     void releaseObject();
+    
+private:
     //! Clear supported methods
     void clearMethods();
     //! Check for supported methods

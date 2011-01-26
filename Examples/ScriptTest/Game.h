@@ -50,8 +50,6 @@ private:
     SharedPtr<Engine> mEngine;
     SharedPtr<ResourceCache> mCache;
     SharedPtr<ScriptFile> mScriptFile;
-    asIScriptFunction* mInitFunction;
-    asIScriptFunction* mRunFrameFunction;
 };
 
 #endif // GAME_H

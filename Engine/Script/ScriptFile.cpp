@@ -28,6 +28,7 @@
 #include "ResourceCache.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
+#include "ScriptInstance.h"
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
 
@@ -72,10 +73,17 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
 {
     PROFILE(Script_Load);
     
-    // Discard the previous module if there was one
+    // If script instances have created objects from this file, release them now
+    // Make a copy of the vector because the script instances will remove themselves from the member vector
+    std::vector<ScriptInstance*> instances = mScriptInstances;
+    for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
+        (*i)->releaseObject();
+    
+    // Discard the previous module if there was one, and clear search caches
     mCompiled = false;
     mAllIncludeFiles.clear();
-    mInterfaceFound.clear();
+    mCheckedClasses.clear();
+    mFunctions.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
     
@@ -101,6 +109,10 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     
     LOGINFO("Compiled script module " + getName());
     mCompiled = true;
+    
+    // Now let the script instances recreate their objects
+    for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
+        (*i)->setScriptClass(this, (*i)->getClassName());
 }
 
 void ScriptFile::addEventHandler(StringHash eventType, const std::string& handlerName)
@@ -262,8 +274,10 @@ asIScriptObject* ScriptFile::createObject(const std::string& className, asIScrip
     
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned also to script properly
     bool found = false;
-    std::map<asIObjectType*, bool>::const_iterator i = mInterfaceFound.find(type);
-    if (i == mInterfaceFound.end())
+    std::map<asIObjectType*, bool>::const_iterator i = mCheckedClasses.find(type);
+    if (i != mCheckedClasses.end())
+        found = i->second;
+    else
     {
         unsigned numInterfaces = type->GetInterfaceCount();
         for (unsigned j = 0; j < numInterfaces; ++j)
@@ -275,10 +289,8 @@ asIScriptObject* ScriptFile::createObject(const std::string& className, asIScrip
                 break;
             }
         }
-        mInterfaceFound[type] = found;
+        mCheckedClasses[type] = found;
     }
-    else
-        found = i->second;
     if (!found)
     {
         LOGERROR("Script class " + className + " does not implement the ScriptObject interface");
@@ -302,13 +314,19 @@ asIScriptObject* ScriptFile::createObject(const std::string& className, asIScrip
     return obj;
 }
 
-asIScriptFunction* ScriptFile::getFunction(const std::string& declaration) const
+asIScriptFunction* ScriptFile::getFunction(const std::string& declaration)
 {
     if (!mCompiled)
         return 0;
     
+    std::map<std::string, asIScriptFunction*>::const_iterator i = mFunctions.find(declaration);
+    if (i != mFunctions.end())
+        return i->second;
+    
     int id = mScriptModule->GetFunctionIdByDecl(declaration.c_str());
-    return mScriptModule->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
+    mFunctions[declaration] = function;
+    return function;
 }
 
 asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::string& declaration) const
@@ -322,6 +340,23 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     
     int id = type->GetMethodIdByDecl(declaration.c_str());
     return mScriptModule->GetFunctionDescriptorById(id);
+}
+
+void ScriptFile::addScriptInstance(ScriptInstance* instance)
+{
+    mScriptInstances.push_back(instance);
+}
+
+void ScriptFile::removeScriptInstance(ScriptInstance* instance)
+{
+    for (std::vector<ScriptInstance*>::iterator i = mScriptInstances.begin(); i != mScriptInstances.end(); ++i)
+    {
+        if ((*i) == instance)
+        {
+            mScriptInstances.erase(i);
+            break;
+        }
+    }
 }
 
 void ScriptFile::addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache)

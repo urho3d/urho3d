@@ -33,6 +33,7 @@
 #include <vector>
 
 class ScriptEngine;
+class ScriptInstance;
 class Variant;
 class asIObjectType;
 class asIScriptContext;
@@ -76,12 +77,17 @@ public:
     ScriptEngine* getScriptEngine() const { return mScriptEngine; }
     //! Return script module
     asIScriptModule* getScriptModule() const { return mScriptModule; }
-    //! Return a function by declaration
-    asIScriptFunction* getFunction(const std::string& declaration) const;
+    //! Return a function by declaration. Will be stored to a search cache so that further searches should be faster
+    asIScriptFunction* getFunction(const std::string& declaration);
     //! Return an object method by declaration
     asIScriptFunction* getMethod(asIScriptObject* object, const std::string& declaration) const;
     //! Return whether script compiled successfully
     bool isCompiled() const { return mCompiled; }
+    
+    //! Add script instance to keep track of in case of script reload
+    void addScriptInstance(ScriptInstance* instance);
+    //! Remove script instance to keep track of
+    void removeScriptInstance(ScriptInstance* instance);
     
 private:
     //! Add a script section, checking for includes recursively
@@ -102,7 +108,11 @@ private:
     //! Encountered include files during script file loading
     std::set<std::string> mAllIncludeFiles;
     //! Search cache for checking whether script classes implement "ScriptObject" interface
-    std::map<asIObjectType*, bool> mInterfaceFound;
+    std::map<asIObjectType*, bool> mCheckedClasses;
+    //! Search cache for functions
+    std::map<std::string, asIScriptFunction*> mFunctions;
+    //! ScriptInstances that have created objects from this script file
+    std::vector<ScriptInstance*> mScriptInstances;
 };
 
 //! Get last script file that is executing or has executed script functions
