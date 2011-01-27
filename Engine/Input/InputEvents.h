@@ -48,6 +48,13 @@ DEFINE_EVENT(EVENT_MOUSEMOVE, MouseMove)
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
 }
 
+//! Mouse wheel moved
+DEFINE_EVENT(EVENT_MOUSEWHEEL, MouseWheel)
+{
+    EVENT_PARAM(P_WHEEL, Wheel);                // int
+    EVENT_PARAM(P_BUTTONS, Buttons);            // int
+}
+
 //! Key pressed
 DEFINE_EVENT(EVENT_KEYDOWN, KeyDown)
 {

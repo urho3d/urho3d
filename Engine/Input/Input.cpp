@@ -60,6 +60,7 @@ void Input::update()
     
     memset(mKeyPress, 0, sizeof(mKeyPress));
     mMouseButtonPress = 0;
+    mMouseMoveWheel = 0;
     mRenderer->messagePump();
     
     if (mActivated)
@@ -93,6 +94,7 @@ void Input::update()
     {
         mMouseMoveX = 0;
         mMouseMoveY = 0;
+        mMouseMoveWheel = 0;
     }
     
     if ((mMouseMoveX) || (mMouseMoveY))
@@ -105,6 +107,16 @@ void Input::update()
         eventData[P_BUTTONS] = mMouseButtonDown;
         sendEvent(EVENT_MOUSEMOVE, eventData);
     }
+    if (mMouseMoveWheel)
+    {
+        using namespace MouseWheel;
+        
+        VariantMap eventData;
+        eventData[P_WHEEL] = mMouseMoveWheel;
+        eventData[P_BUTTONS] = mMouseButtonDown;
+        sendEvent(EVENT_MOUSEWHEEL, eventData);
+    }
+    
 }
 
 void Input::setToggleFullscreen(bool enable)
@@ -136,16 +148,6 @@ bool Input::getMouseButtonDown(int button) const
 bool Input::getMouseButtonPress(int button) const
 {
     return (mMouseButtonPress & button) != 0;
-}
-
-int Input::getMouseMoveX() const
-{
-    return mMouseMoveX;
-}
-
-int Input::getMouseMoveY() const
-{
-    return mMouseMoveY;
 }
 
 void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
@@ -190,6 +192,11 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
     case WM_NCMBUTTONUP:
     case WM_MBUTTONUP:
         mouseButtonChange(MOUSEB_MIDDLE, false);
+        eventData[P_HANDLED] = true;
+        break;
+        
+    case WM_MOUSEWHEEL:
+        mMouseMoveWheel += (wParam >> 16);
         eventData[P_HANDLED] = true;
         break;
         
@@ -312,6 +319,7 @@ void Input::clearState()
 {
     mMouseMoveX = 0;
     mMouseMoveY = 0;
+    mMouseMoveWheel = 0;
     mMouseButtonDown = 0;
     mMouseButtonPress = 0;
     

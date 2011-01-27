@@ -200,6 +200,7 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool getMouseButtonPress(int) const", asMETHOD(Input, getMouseButtonPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveX() const", asMETHOD(Input, getMouseMoveX), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveY() const", asMETHOD(Input, getMouseMoveY), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int getMouseMoveWheel() const", asMETHOD(Input, getMouseMoveWheel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getToggleFullscreen() const", asMETHOD(Input, getToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isActive() const", asMETHOD(Input, isActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isMinimized() const", asMETHOD(Input, isMinimized), asCALL_THISCALL);

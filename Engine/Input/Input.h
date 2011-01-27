@@ -55,9 +55,11 @@ public:
     //! Check if a mouse button has been pressed on this frame
     bool getMouseButtonPress(int button) const;
     //! Return horizontal mouse movement since last frame
-    int getMouseMoveX() const;
+    int getMouseMoveX() const { return mMouseMoveX; }
     //! Return vertical mouse movement since last frame
-    int getMouseMoveY() const;
+    int getMouseMoveY() const { return mMouseMoveY; }
+    //! Return mouse wheel movement since last frame
+    int getMouseMoveWheel() const { return mMouseMoveWheel; }
     //! Return whether fullscreen toggle is enabled
     bool getToggleFullscreen() const { return mToggleFullscreen; }
     //! Return whether application window is active
@@ -93,6 +95,8 @@ private:
     int mMouseMoveX;
     //! Vertical mouse movement since last frame
     int mMouseMoveY;
+    //! Mouse wheel movement since last frame
+    int mMouseMoveWheel;
     //! Fullscreen toggle flag
     bool mToggleFullscreen;
     //! Active flag
