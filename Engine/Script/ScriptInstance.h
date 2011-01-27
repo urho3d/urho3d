@@ -35,7 +35,6 @@ class PhysicsWorld;
 class Scene;
 class ScriptEngine;
 class ScriptFile;
-class asIScriptContext;
 class asIScriptFunction;
 class asIScriptObject;
 
@@ -108,8 +107,6 @@ public:
     ScriptEngine* getScriptEngine() const { return mScriptEngine; }
     //! Return script file
     ScriptFile* getScriptFile() const { return mScriptFile; }
-    //! Return script context
-    asIScriptContext* getScriptContext() const { return mScriptContext; }
     //! Return script object
     asIScriptObject* getScriptObject() const { return mScriptObject; }
     //! Return class name
@@ -144,8 +141,6 @@ private:
     SharedPtr<ScriptEngine> mScriptEngine;
     //! Script file
     SharedPtr<ScriptFile> mScriptFile;
-    //! Script context
-    asIScriptContext* mScriptContext;
     //! Script object
     asIScriptObject* mScriptObject;
     //! Class name

@@ -31,8 +31,6 @@
 #include "VectorBuffer.h"
 #include "XMLElement.h"
 
-#include <set>
-
 class ComponentFactory;
 class Deserializer;
 class Engine;
@@ -199,8 +197,6 @@ public:
     
     //! Set client-side prediction controls playback mode. Called by Client
     void setPlayback(bool enable);
-    //! Add a delayed self remove of a (scripted) entity, to be processed at the end of scene update
-    void addDelayedRemoveEntity(EntityID id);
     
 private:
     //! Remove an entity by iterator
@@ -269,9 +265,6 @@ private:
     unsigned mAsyncLoadedEntities;
     //! Asynchronous loading flag
     bool mAsyncLoading;
-    
-    //! Delayed entity removes
-    std::set<EntityID> mDelayedRemoveEntities;
 };
 
 template <class T> SharedPtr<T> Scene::createComponent(const std::string& name)

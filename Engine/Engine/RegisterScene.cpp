@@ -391,41 +391,6 @@ static CScriptArray* SceneGetEntitiesWithClass(const std::string& className, Sce
     return vectorToHandleArray<Entity*>(result, "array<Entity@>");
 }
 
-static void SceneRemoveEntityByID(EntityID id, Scene* ptr)
-{
-    Entity* entity = ptr->getEntity(id);
-    if (entity)
-    {
-        if (entity == getScriptContextEntity())
-            ptr->addDelayedRemoveEntity(id);
-        else
-            ptr->removeEntity(id);
-    }
-}
-
-static void SceneRemoveEntityByPtr(Entity* entity, Scene* ptr)
-{
-    if ((entity) && (entity->getScene() == ptr))
-    {
-        if (entity == getScriptContextEntity())
-            ptr->addDelayedRemoveEntity(entity->getID());
-        else
-            ptr->removeEntity(entity->getID());
-    }
-}
-
-static void SceneRemoveEntityByName(const std::string& name, Scene* ptr)
-{
-    Entity* entity = ptr->getEntity(name);
-    if (entity)
-    {
-        if (entity == getScriptContextEntity())
-            ptr->addDelayedRemoveEntity(entity->getID());
-        else
-            ptr->removeEntity(entity->getID());
-    }
-}
-
 static void SendDelayedEvent(const std::string& eventType, const VariantMap& eventData, float delay)
 {
     Scene* scene = getScriptContextScene();
@@ -472,9 +437,9 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Entity@+ createEntity(const string& in)", asFUNCTION(SceneCreateEntityWithName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Entity@+ createEntity(const string& in, bool)", asFUNCTION(SceneCreateEntityWithNameAndLocalFlag), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "void addEntity(Entity@+)", asMETHOD(Scene, addEntity), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void removeEntity(uint)", asFUNCTION(SceneRemoveEntityByID), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Scene", "void removeEntity(Entity@+)", asFUNCTION(SceneRemoveEntityByPtr), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Scene", "void removeEntity(const string& in)", asFUNCTION(SceneRemoveEntityByName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "void removeEntity(uint)", asMETHODPR(Scene, removeEntity, (EntityID), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void removeEntity(Entity@+)", asMETHODPR(Scene, removeEntity, (Entity*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void removeEntity(const string& in)", asMETHODPR(Scene, removeEntity, (const std::string&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void removeAllEntities(uint8)", asMETHOD(Scene, removeAllEntities), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void setTransientPredictionTime(float)", asMETHOD(Scene, setTransientPredictionTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void setInterpolationConstant(float)", asMETHOD(Scene, setInterpolationConstant), asCALL_THISCALL);

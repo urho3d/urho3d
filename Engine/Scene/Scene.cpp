@@ -96,14 +96,6 @@ void Scene::update(float timeStep)
     // In networked client scenes, interpolate entities and update transient prediction timers
     if ((!isPlayback()) && (isProxy()))
         interpolate(timeStep);
-    
-    // Process delayed removes
-    if (mDelayedRemoveEntities.size())
-    {
-        for (std::set<EntityID>::iterator i = mDelayedRemoveEntities.begin(); i != mDelayedRemoveEntities.end(); ++i)
-            removeEntity(*i);
-        mDelayedRemoveEntities.clear();
-    }
 }
 
 void Scene::interpolate(float timeStep)
@@ -949,11 +941,6 @@ void Scene::setPlayback(bool enable)
     
     for (std::map<ShortStringHash, SharedPtr<SceneExtension> >::iterator i = mExtensions.begin(); i != mExtensions.end(); ++i)
         i->second->setPlayback(enable);
-}
-
-void Scene::addDelayedRemoveEntity(EntityID id)
-{
-    mDelayedRemoveEntities.insert(id);
 }
 
 void Scene::removeEntity(std::map<EntityID, SharedPtr<Entity> >::iterator i)

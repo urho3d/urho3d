@@ -63,16 +63,11 @@ std::map<void*, ScriptInstance*> objectToInstance;
 ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& name) :
     Component(name),
     mScriptEngine(scriptEngine),
-    mScriptContext(0),
     mScriptObject(0),
     mEnabled(true)
 {
     if (!mScriptEngine)
         EXCEPTION("Null script engine for ScriptInstance");
-    
-    mScriptContext = mScriptEngine->createScriptContext();
-    if (!mScriptContext)
-        EXCEPTION("Failed to create a script context");
     
     clearMethods();
 }
@@ -80,12 +75,6 @@ ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& na
 ScriptInstance::~ScriptInstance()
 {
     releaseObject();
-    
-    if (mScriptContext)
-    {
-        mScriptContext->Release();
-        mScriptContext = 0;
-    }
 }
 
 void ScriptInstance::save(Serializer& dest)
@@ -103,7 +92,7 @@ void ScriptInstance::save(Serializer& dest)
     {
         std::vector<Variant> parameters;
         parameters.push_back(Variant((void*)static_cast<Serializer*>(&scriptBuffer)));
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVE], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVE], parameters);
     }
     dest.writeVLE(scriptBuffer.getSize());
     dest.write(scriptBuffer.getData(), scriptBuffer.getSize());
@@ -125,14 +114,14 @@ void ScriptInstance::load(Deserializer& source, ResourceCache* cache)
     {
         std::vector<Variant> parameters;
         parameters.push_back(Variant((void*)static_cast<Deserializer*>(&scriptBuffer)));
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_LOAD], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_LOAD], parameters);
     }
 }
 
 void ScriptInstance::postLoad(ResourceCache* cache)
 {
     if (mMethods[METHOD_POSTLOAD])
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTLOAD], mScriptContext);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTLOAD]);
 }
 
 void ScriptInstance::saveXML(XMLElement& dest)
@@ -149,7 +138,7 @@ void ScriptInstance::saveXML(XMLElement& dest)
         XMLElement dataElem = dest.createChildElement("data");
         std::vector<Variant> parameters;
         parameters.push_back(Variant((void*)&dataElem));
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVEXML], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVEXML], parameters);
     }
 }
 
@@ -168,7 +157,7 @@ void ScriptInstance::loadXML(const XMLElement& source, ResourceCache* cache)
         {
             std::vector<Variant> parameters;
             parameters.push_back(Variant((void*)&dataElem));
-            mScriptFile->execute(mScriptObject, mMethods[METHOD_LOADXML], mScriptContext, parameters);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_LOADXML], parameters);
         }
     }
 }
@@ -190,7 +179,7 @@ bool ScriptInstance::writeNetUpdate(Serializer& dest, Serializer& destRevision, 
         std::vector<Variant> parameters;
         parameters.push_back(Variant((void*)static_cast<Serializer*>(&scriptBuffer)));
         parameters.push_back(Variant((void*)&info));
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_WRITENETUPDATE], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_WRITENETUPDATE], parameters);
     }
     // Compare buffer to previous revision if available
     unsigned scriptDataSize = scriptBuffer.getSize();
@@ -227,7 +216,7 @@ void ScriptInstance::readNetUpdate(Deserializer& source, ResourceCache* cache, c
             std::vector<Variant> parameters;
             parameters.push_back(Variant((void*)static_cast<Deserializer*>(&scriptBuffer)));
             parameters.push_back(Variant((void*)&info));
-            mScriptFile->execute(mScriptObject, mMethods[METHOD_READNETUPDATE], mScriptContext, parameters);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_READNETUPDATE], parameters);
         }
     }
 }
@@ -235,7 +224,7 @@ void ScriptInstance::readNetUpdate(Deserializer& source, ResourceCache* cache, c
 void ScriptInstance::postNetUpdate(ResourceCache* cache)
 {
     if (mMethods[METHOD_POSTNETUPDATE])
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTNETUPDATE], mScriptContext);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTNETUPDATE]);
 }
 
 void ScriptInstance::interpolate(bool snapToEnd)
@@ -244,7 +233,7 @@ void ScriptInstance::interpolate(bool snapToEnd)
     {
         std::vector<Variant> parameters;
         parameters.push_back(Variant(snapToEnd));
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_INTERPOLATE], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_INTERPOLATE], parameters);
     }
 }
 
@@ -252,13 +241,11 @@ void ScriptInstance::getComponentRefs(std::vector<ComponentRef>& dest)
 {
     if ((mEnabled) && (mMethods[METHOD_GETCOMPONENTREFS]))
     {
-        // Must execute in original context to get return value
-        if (mScriptContext->GetState() == asEXECUTION_ACTIVE)
+        asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
+        if (!context)
             return;
-        
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS], mScriptContext);
-        
-        CScriptArray* arr = static_cast<CScriptArray*>(mScriptContext->GetAddressOfReturnValue());
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS]);
+        CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
         if (arr)
         {
             for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -269,12 +256,6 @@ void ScriptInstance::getComponentRefs(std::vector<ComponentRef>& dest)
 
 bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& className)
 {
-    if (asGetActiveContext() == mScriptContext)
-    {
-        LOGERROR("Can not change own script class");
-        return false;
-    }
-    
     if ((scriptFile == mScriptFile) && (className == mClassName))
         return true;
     
@@ -304,7 +285,7 @@ bool ScriptInstance::execute(const std::string& declaration, const std::vector<V
         return false;
     
     asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
-    return mScriptFile->execute(mScriptObject, method, mScriptContext, parameters);
+    return mScriptFile->execute(mScriptObject, method, parameters);
 }
 
 bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Variant>& parameters)
@@ -312,7 +293,7 @@ bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Varian
     if ((!method) || (!mScriptFile) || (!mScriptObject))
         return false;
     
-    return mScriptFile->execute(mScriptObject, method, mScriptContext, parameters);
+    return mScriptFile->execute(mScriptObject, method, parameters);
 }
 
 void ScriptInstance::addEventHandler(StringHash eventType, const std::string& handlerName)
@@ -337,14 +318,14 @@ bool ScriptInstance::createObject()
     if (!mScriptFile)
         return false;
     
-    mScriptObject = mScriptFile->createObject(mClassName, mScriptContext);
+    mScriptObject = mScriptFile->createObject(mClassName);
     if (mScriptObject)
     {
         mScriptFile->addScriptInstance(this);
         objectToInstance[(void*)mScriptObject] = this;
         getSupportedMethods();
         if (mMethods[METHOD_START])
-            mScriptFile->execute(mScriptObject, mMethods[METHOD_START], mScriptContext);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_START]);
         return true;
     }
     else
@@ -358,14 +339,8 @@ void ScriptInstance::releaseObject()
 {
     if (mScriptObject)
     {
-        objectToInstance.erase((void*)mScriptObject);
-        
-        // If we come here from script, abort execution
-        if (mScriptContext->GetState() == asEXECUTION_ACTIVE)
-            mScriptContext->Abort();
-        
         if (mMethods[METHOD_STOP])
-            mScriptFile->execute(mScriptObject, mMethods[METHOD_STOP], mScriptContext);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_STOP]);
         
         removeAllEventHandlers();
         clearMethods();
@@ -374,6 +349,8 @@ void ScriptInstance::releaseObject()
         
         mScriptObject->Release();
         mScriptObject = 0;
+        
+        objectToInstance.erase((void*)mScriptObject);
         
         mScriptFile->removeScriptInstance(this);
     }
@@ -414,7 +391,7 @@ void ScriptInstance::handleSceneUpdate(StringHash eventType, VariantMap& eventDa
     {
         std::vector<Variant> parameters;
         parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATE], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATE], parameters);
     }
 }
 
@@ -431,7 +408,7 @@ void ScriptInstance::handleScenePostUpdate(StringHash eventType, VariantMap& eve
     {
         std::vector<Variant> parameters;
         parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATE], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATE], parameters);
     }
 }
 
@@ -448,7 +425,7 @@ void ScriptInstance::handlePhysicsPreStep(StringHash eventType, VariantMap& even
     {
         std::vector<Variant> parameters;
         parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
     }
 }
 
@@ -465,7 +442,7 @@ void ScriptInstance::handlePhysicsPostStep(StringHash eventType, VariantMap& eve
     {
         std::vector<Variant> parameters;
         parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATEFIXED], mScriptContext, parameters);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATEFIXED], parameters);
     }
 }
 
@@ -481,7 +458,7 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     std::vector<Variant> parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
-    mScriptFile->execute(mScriptObject, i->second, mScriptContext, parameters);
+    mScriptFile->execute(mScriptObject, i->second, parameters);
 }
 
 ScriptInstance* getScriptContextComponent()

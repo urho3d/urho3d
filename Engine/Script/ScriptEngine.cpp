@@ -64,7 +64,10 @@ ScriptEngine::ScriptEngine() :
     }
     
     // Create the context for immediate execution
-    mImmediateContext = createScriptContext();
+    mImmediateContext = mAngelScriptEngine->CreateContext();
+    // Create the function/method contexts
+    for (unsigned i = 0 ; i < MAX_SCRIPT_NESTING_LEVEL; ++i)
+        mScriptFileContexts.push_back(mAngelScriptEngine->CreateContext());
 }
 
 ScriptEngine::~ScriptEngine()
@@ -76,17 +79,18 @@ ScriptEngine::~ScriptEngine()
         mImmediateContext->Release();
         mImmediateContext = 0;
     }
+    for (unsigned i = 0 ; i < MAX_SCRIPT_NESTING_LEVEL; ++i)
+    {
+        if (mScriptFileContexts[i])
+            mScriptFileContexts[i]->Release();
+    }
+    mScriptFileContexts.clear();
     
     if (mAngelScriptEngine)
     {
         mAngelScriptEngine->Release();
         mAngelScriptEngine = 0;
     }
-}
-
-asIScriptContext* ScriptEngine::createScriptContext()
-{
-    return mAngelScriptEngine->CreateContext();
 }
 
 bool ScriptEngine::execute(const std::string& line)
@@ -165,4 +169,11 @@ void ScriptEngine::logMessage(const asSMessageInfo* msg)
         if ((msg->type == asMSGTYPE_ERROR) || (msg->type == asMSGTYPE_WARNING))
             mLogMessages += message + "\n";
     }
+}
+
+asIScriptContext* ScriptEngine::getScriptFileContext(unsigned nestingLevel) const
+{
+    if (nestingLevel >= mScriptFileContexts.size())
+        return 0;
+    return mScriptFileContexts[nestingLevel];
 }

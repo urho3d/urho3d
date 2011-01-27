@@ -37,6 +37,9 @@ enum ScriptLogMode
     LOGMODE_RETAINED
 };
 
+//! Maximum function/method nesting level
+static const unsigned MAX_SCRIPT_NESTING_LEVEL = 32;
+
 //! Utilizes the AngelScript library for executing scripts
 class ScriptEngine : public RefCounted
 {
@@ -46,8 +49,6 @@ public:
     //! Destruct. Release the AngelScript engine
     ~ScriptEngine();
     
-    //! Create a script context
-    asIScriptContext* createScriptContext();
     //! Compile and execute a line of script
     bool execute(const std::string& line);
     //! Perform garbage collection
@@ -63,8 +64,10 @@ public:
     asIScriptEngine* getAngelScriptEngine() const { return mAngelScriptEngine; }
     //! Return immediate execution script context
     asIScriptContext* getImmediateContext() const { return mImmediateContext; }
+    //! Return a script function/method execution context
+    asIScriptContext* getScriptFileContext(unsigned nestingLevel) const;
     //! Return logging mode
-    ScriptLogMode getLogMode() const;
+    ScriptLogMode getLogMode() const { return mLogMode; }
     //! Return retained mode log messages
     const std::string& getLogMessages() const { return mLogMessages; }
     
@@ -73,6 +76,8 @@ private:
     asIScriptEngine* mAngelScriptEngine;
     //! Immediate execution script context
     asIScriptContext* mImmediateContext;
+    //! Script function/method execution contexts
+    std::vector<asIScriptContext*> mScriptFileContexts;
     //! Script engine logging mode
     ScriptLogMode mLogMode;
     //! Retained mode log messages

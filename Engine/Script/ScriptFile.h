@@ -58,20 +58,17 @@ public:
     //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     
-    //! Query for a function by declaration and execute if found. If context is null, use the immediate context
-    bool execute(const std::string& declaration, asIScriptContext* context = 0, const std::vector<Variant>& parameters =
+    //! Query for a function by declaration and execute if found
+    bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Execute a function
+    bool execute(asIScriptFunction* function, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Query for an object method by declaration and execute if found
+    bool execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters =
         std::vector<Variant>());
-    //! Execute a function. If context is null, use the immediate context
-    bool execute(asIScriptFunction* function, asIScriptContext* context = 0, const std::vector<Variant>& parameters =
-        std::vector<Variant>());
-    //! Query for an object method by declaration and execute if found. If context is null, use the immediate context
-    bool execute(asIScriptObject* object, const std::string& declaration, asIScriptContext* context = 0, const std::vector<Variant>&
-        parameters = std::vector<Variant>());
-    //! Execute an object method. If context is null, use the immediate context
-    bool execute(asIScriptObject* object, asIScriptFunction* method, asIScriptContext* context = 0, const std::vector<Variant>&
-        parameters = std::vector<Variant>());
-    //! Create a script object. If context is null, use the immediate context
-    asIScriptObject* createObject(const std::string& className, asIScriptContext* context = 0);
+    //! Execute an object method
+    bool execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Create a script object
+    asIScriptObject* createObject(const std::string& className);
     
     //! Return script engine
     ScriptEngine* getScriptEngine() const { return mScriptEngine; }
@@ -101,8 +98,6 @@ private:
     SharedPtr<ScriptEngine> mScriptEngine;
     //! Script module
     asIScriptModule* mScriptModule;
-    //! Event handler script context
-    asIScriptContext* mScriptContext;
     //! Compiled flag
     bool mCompiled;
     //! Encountered include files during script file loading
@@ -117,5 +112,7 @@ private:
 
 //! Get last script file that is executing or has executed script functions
 ScriptFile* getLastScriptFile();
+//! Get current script execution nesting level
+unsigned getScriptNestingLevel();
 
 #endif // SCRIPT_SCRIPTFILE_H

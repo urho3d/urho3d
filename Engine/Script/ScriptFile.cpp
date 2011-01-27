@@ -37,15 +37,13 @@
 
 #include "DebugNew.h"
 
-static const int MAX_NESTING_LEVEL = 32;
-static int executeNestingLevel = 0;
+static int scriptNestingLevel = 0;
 ScriptFile* lastScriptFile = 0;
 
 ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
     Resource(name),
     mScriptEngine(scriptEngine),
     mScriptModule(0),
-    mScriptContext(0),
     mCompiled(false)
 {
     if (!mScriptEngine)
@@ -59,11 +57,6 @@ ScriptFile::~ScriptFile()
         asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
-    }
-    if (mScriptContext)
-    {
-        mScriptContext->Release();
-        mScriptContext = 0;
     }
     if (lastScriptFile == this)
         lastScriptFile = 0;
@@ -130,13 +123,9 @@ void ScriptFile::addEventHandler(StringHash eventType, const std::string& handle
     
     subscribeToEvent(eventType, EVENT_HANDLER(ScriptFile, handleScriptEvent));
     mEventHandlers[eventType] = function;
-    
-    // Create a context for script event handling if does not exist already
-    if (!mScriptContext)
-        mScriptContext = mScriptEngine->createScriptContext();
 }
 
-bool ScriptFile::execute(const std::string& declaration, asIScriptContext* context, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(const std::string& declaration, const std::vector<Variant>& parameters)
 {
     asIScriptFunction* function = getFunction(declaration);
     if (!function)
@@ -145,58 +134,39 @@ bool ScriptFile::execute(const std::string& declaration, asIScriptContext* conte
         return false;
     }
     
-    return execute(getFunction(declaration), context, parameters);
+    return execute(getFunction(declaration), parameters);
 }
 
-bool ScriptFile::execute(asIScriptFunction* function, asIScriptContext* context, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>& parameters)
 {
     PROFILE(Script_ExecuteFunction);
     
     if ((!mCompiled) || (!function))
         return false;
     
-    if (!context)
-        context = mScriptEngine->getImmediateContext();
+    // Prevent endless loop by nested script execution
+    if (scriptNestingLevel >= MAX_SCRIPT_NESTING_LEVEL)
+    {
+        LOGERROR("Maximum script execution nesting level exceeded");
+        return false;
+    }
     
-    if (context->GetState() != asEXECUTION_ACTIVE)
-    {
-        if (context->Prepare(function->GetId()) < 0)
-            return false;
-        lastScriptFile = this;
-        setParameters(context, function, parameters);
-        return context->Execute() >= 0;
-    }
-    else
-    {
-        // Prevent endless loop by nested script event handling
-        if (executeNestingLevel > MAX_NESTING_LEVEL)
-        {
-            LOGERROR("Maximum script execution nesting level exceeded");
-            return false;
-        }
-        
-        // If context is active, allocate a temp context to allow nested execution.
-        // This is not recommended for performance reasons
-        LOGDEBUG("Executing " + std::string(function->GetDeclaration()) + " in a temporary script context");
-        asIScriptContext* tempContext = mScriptEngine->createScriptContext();
-        if (tempContext->Prepare(function->GetId()) < 0)
-        {
-            tempContext->Release();
-            return false;
-        }
-        lastScriptFile = this;
-        setParameters(tempContext, function, parameters);
-        
-        ++executeNestingLevel;
-        bool success = tempContext->Execute() >= 0;
-        tempContext->Release();
-        --executeNestingLevel;
-        
-        return success;
-    }
+    asIScriptContext* context = mScriptEngine->getScriptFileContext(scriptNestingLevel);
+    
+    if (context->Prepare(function->GetId()) < 0)
+        return false;
+    
+    lastScriptFile = this;
+    setParameters(context, function, parameters);
+    
+    ++scriptNestingLevel;
+    bool success = context->Execute() >= 0;
+    --scriptNestingLevel;
+    
+    return success;
 }
 
-bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, asIScriptContext* context, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters)
 {
     asIScriptFunction* method = getMethod(object, declaration);
     if (!method)
@@ -205,68 +175,54 @@ bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration
         return false;
     }
     
-    return execute(object, method, context, parameters);
+    return execute(object, method, parameters);
 }
 
-bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, asIScriptContext* context,
-    const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters)
 {
     PROFILE(Script_ExecuteMethod);
     
     if ((!mCompiled) || (!object) || (!method))
         return false;
     
-    if (!context)
-        context = mScriptEngine->getImmediateContext();
+    // Prevent endless loop by nested script execution
+    if (scriptNestingLevel >= MAX_SCRIPT_NESTING_LEVEL)
+    {
+        LOGERROR("Maximum script execution nesting level exceeded");
+        return false;
+    }
     
-    if (context->GetState() != asEXECUTION_ACTIVE)
-    {
-        if (context->Prepare(method->GetId()) < 0)
-            return false;
-        context->SetObject(object);
-        setParameters(context, method, parameters);
-        return context->Execute() >= 0;
-    }
-    else
-    {
-        // Prevent endless loop by nested script event handling
-        if (executeNestingLevel > MAX_NESTING_LEVEL)
-        {
-            LOGERROR("Maximum script execution nesting level exceeded");
-            return false;
-        }
-        
-        // If context is active, allocate a temp context to allow nested execution.
-        // This is not recommended for performance reasons
-        LOGDEBUG("Executing " + std::string(method->GetDeclaration()) + " in a temporary script context");
-        asIScriptContext* tempContext = mScriptEngine->createScriptContext();
-        if (tempContext->Prepare(method->GetId()) < 0)
-        {
-            tempContext->Release();
-            return false;
-        }
-        tempContext->SetObject(object);
-        setParameters(tempContext, method, parameters);
-        
-        ++executeNestingLevel;
-        bool success = tempContext->Execute() >= 0;
-        tempContext->Release();
-        --executeNestingLevel;
-        
-        return success;
-    }
+    asIScriptContext* context = mScriptEngine->getScriptFileContext(scriptNestingLevel);
+    
+    // If context is active, allocate a temp context to allow nested execution.
+    if (context->Prepare(method->GetId()) < 0)
+        return false;
+
+    context->SetObject(object);
+    setParameters(context, method, parameters);
+    
+    ++scriptNestingLevel;
+    bool success = context->Execute() >= 0;
+    --scriptNestingLevel;
+    
+    return success;
 }
 
-asIScriptObject* ScriptFile::createObject(const std::string& className, asIScriptContext* context)
+asIScriptObject* ScriptFile::createObject(const std::string& className)
 {
     PROFILE(Script_CreateObject);
     
     if (!isCompiled())
         return 0;
     
-    if (!context)
-        context = mScriptEngine->getImmediateContext();
+    // Prevent endless loop by nested script execution
+    if (scriptNestingLevel >= MAX_SCRIPT_NESTING_LEVEL)
+    {
+        LOGERROR("Maximum script execution nesting level exceeded, can not create object");
+        return false;
+    }
     
+    asIScriptContext* context = mScriptEngine->getScriptFileContext(scriptNestingLevel);
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     asIObjectType *type = engine->GetObjectTypeById(mScriptModule->GetTypeIdByDecl(className.c_str()));
     if (!type)
@@ -543,10 +499,15 @@ void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
     std::vector<Variant> parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
-    execute(i->second, mScriptContext, parameters);
+    execute(i->second, parameters);
 }
 
 ScriptFile* getLastScriptFile()
 {
     return lastScriptFile;
+}
+
+unsigned getScriptNestingLevel()
+{
+    return scriptNestingLevel;
 }
