@@ -32,6 +32,7 @@
 UIElement::UIElement(const std::string& name) :
     mName(name),
     mParent(0),
+    mOrigin(0),
     mClipBorder(IntRect::sZero),
     mHoverColor(Color(0.0f, 0.0f, 0.0f)),
     mPriority(0),
@@ -668,6 +669,11 @@ IntRect UIElement::getCombinedScreenRect()
 void UIElement::setHovering(bool enable)
 {
     mHovering = enable;
+}
+
+void UIElement::setOrigin(UIElement* origin)
+{
+    mOrigin = origin;
 }
 
 void UIElement::adjustScissor(IntRect& currentScissor)

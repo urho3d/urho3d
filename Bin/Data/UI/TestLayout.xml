@@ -51,6 +51,36 @@
             <position value="150 270" />
             <size value="200 16" />
         </element>
+        <element type="Window" name="TestPopup3">
+            <size value="100 80" />
+            <element type="MenuItem">
+                <position value="10 10" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem9" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+            <element type="MenuItem">
+                <position value="10 30" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem10" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+            <element type="MenuItem">
+                <position value="10 50" />
+                <size value="80 16" />
+                <element type="Text">
+                    <text value="MenuItem11" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+        </element>
         <element type="Window" name="TestPopup2">
             <size value="100 80" />
             <element type="MenuItem">
@@ -74,6 +104,8 @@
             <element type="MenuItem">
                 <position value="10 50" />
                 <size value="80 16" />
+                <popup name="TestPopup3" />
+                <popupoffset value="90 0" />
                 <element type="Text">
                     <text value="MenuItem8" />
                     <font name="cour.ttf" size="12" />

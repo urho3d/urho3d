@@ -218,6 +218,8 @@ public:
     std::vector<UIElement*> getChildren(bool recursive = false) const;
     //! Return parent element
     UIElement* getParent() const { return mParent; }
+    //! Return origin element for popups
+    UIElement* getOrigin() const { return mOrigin; }
     //! Return root element
     UIElement* getRootElement() const;
     //! Return first matching UI style element from an XML file. If not found, return empty
@@ -236,6 +238,8 @@ public:
     
     //! Set hovering state
     void setHovering(bool enable);
+    //! Set origin element
+    void setOrigin(UIElement* origin);
     //! Adjust scissor for rendering
     void adjustScissor(IntRect& currentScissor);
     
@@ -254,6 +258,8 @@ protected:
     std::vector<SharedPtr<UIElement> > mChildren;
     //! Parent element
     UIElement* mParent;
+    //! Origin element
+    UIElement* mOrigin;
     //! Child element clipping border
     IntRect mClipBorder;
     //! Colors

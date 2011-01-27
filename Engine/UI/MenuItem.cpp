@@ -38,6 +38,8 @@ MenuItem::MenuItem(const std::string& name) :
 
 MenuItem::~MenuItem()
 {
+    if (mPopup)
+        mPopup->setOrigin(0);
 }
 
 void MenuItem::setStyle(const XMLElement& element, ResourceCache* cache)
@@ -124,6 +126,7 @@ void MenuItem::showPopup(bool enable)
     {
         mPopup->setPosition(getScreenPosition() + mPopupOffset);
         mPopup->setVisible(true);
+        mPopup->setOrigin(this);
         root->addChild(mPopup);
         
         // Set fixed high priority
@@ -132,7 +135,10 @@ void MenuItem::showPopup(bool enable)
         mPopup->bringToFront();
     }
     else
+    {
+        mPopup->setOrigin(0);
         root->removeChild(mPopup);
+    }
     
     mShowPopup = enable;
 }
@@ -145,6 +151,7 @@ void MenuItem::handleTryFocus(StringHash eventType, VariantMap& eventData)
     using namespace TryFocus;
     
     UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    UIElement* root = getRootElement();
     
     // If global defocus, hide the popup
     if (!focusElement)
@@ -159,7 +166,10 @@ void MenuItem::handleTryFocus(StringHash eventType, VariantMap& eventData)
     {
         if ((focusElement == this) || (focusElement == mPopup))
             return;
-        focusElement = focusElement->getParent();
+        if (focusElement->getParent() == root)
+            focusElement = focusElement->getOrigin();
+        else
+            focusElement = focusElement->getParent();
     }
     
     showPopup(false);
