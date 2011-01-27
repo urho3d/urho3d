@@ -65,7 +65,7 @@ void ResourceCache::addResourcePath(const std::string& path)
     for (unsigned i = 0; i < fileNames.size(); ++i)
         registerHash(fileNames[i]);
     
-    LOGINFO("Added resource path " + path);
+    LOGINFO("Added resource path " + fixedPath);
 }
 
 void ResourceCache::addPackageFile(PackageFile* package, bool addAsFirst)
