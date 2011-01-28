@@ -251,10 +251,6 @@ class Ninja : ScriptObject, GameObject
         prevControls = controls;
         
         resetWorldCollision();
-        
-        // Test removing self
-        if (input.getKeyPress('K'))
-        	scene.removeEntity(entity);
     }
     
     void handleEntityCollision(StringHash eventType, VariantMap& eventData)

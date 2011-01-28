@@ -286,6 +286,10 @@ void Text::calculateTextSize()
             height += rowHeight;
             mRowWidths.push_back(rowWidth);
         }
+        
+        // Set row height even if text is empty
+        if (!height)
+            height = rowHeight;
     }
     
     setSize(width, height);

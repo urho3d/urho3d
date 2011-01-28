@@ -149,6 +149,8 @@ public:
     void setFocus(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);
+    //! Set userdata
+    void setUserData(const Variant& userData);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Bring UI element to front
@@ -208,6 +210,8 @@ public:
     bool isHovering() const { return mHovering; }
     //! Return whether has different color in at least one corner
     bool hasColorGradient() const { return mHasColorGradient; }
+    //! Return userdata
+    Variant getUserData() const { return mUserData; }
     //! Return number of child elements
     unsigned getNumChildren(bool recursive = false) const;
     //! Return child element by index
@@ -284,6 +288,8 @@ protected:
     bool mVisible;
     //! Hovering flag
     bool mHovering;
+    //! Userdata
+    Variant mUserData;
     
 private:
     //! Return child elements recursively

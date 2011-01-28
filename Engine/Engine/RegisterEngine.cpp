@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "AnimationController.h"
 #include "Client.h"
+#include "Console.h"
 #include "Connection.h"
 #include "DebugHud.h"
 #include "Engine.h"
@@ -344,6 +345,30 @@ static void registerParticleEmitter(asIScriptEngine* engine)
     registerRefCasts<Node, ParticleEmitter>(engine, "Node", "ParticleEmitter");
 }
 
+static Console* GetConsole()
+{
+    return getEngine()->getConsole();
+}
+
+static void registerConsole(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Console", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("Console", asBEHAVE_ADDREF, "void f()", asMETHOD(Console, addRef), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("Console", asBEHAVE_RELEASE, "void f()", asMETHOD(Console, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setVisible(bool)", asMETHOD(Console, setVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setNumRows(uint)", asMETHOD(Console, setNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setFont(Font@+, int)", asMETHOD(Console, setFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setToggleKey(int)", asMETHOD(Console, setToggleKey), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "int getToggleKey() const", asMETHOD(Console, getToggleKey), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "BorderImage@+ getBackgroundElement() const", asMETHOD(Console, getBackgroundElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEditElement() const", asMETHOD(Console, getLineEditElement), asCALL_THISCALL);
+    
+    engine->RegisterGlobalFunction("Console@+ getConsole()", asFUNCTION(GetConsole), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
+}
+
 static DebugHud* GetDebugHud()
 {
     return getEngine()->getDebugHud();
@@ -393,6 +418,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "Scene@ createScene(const string& in, const BoundingBox& in, uint, bool)", asFUNCTION(EngineCreateScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Engine", "Client@+ createClient(const string& in)", asMETHOD(Engine, createClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Server@+ createServer()", asMETHOD(Engine, createServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "Console@+ createConsole()", asMETHOD(Engine, createConsole), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "DebugHud@+ createDebugHud()", asMETHOD(Engine, createDebugHud), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeClient()", asMETHOD(Engine, removeClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeServer()", asMETHOD(Engine, removeServer), asCALL_THISCALL);
@@ -426,6 +452,7 @@ void registerEngineLibrary(asIScriptEngine* engine)
     registerServer(engine);
     registerAnimationController(engine);
     registerParticleEmitter(engine);
+    registerConsole(engine);
     registerDebugHud(engine);
     registerEngine(engine);
 }

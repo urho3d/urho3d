@@ -69,7 +69,10 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
         Color color = element.getColor(C_TOPLEFT);
         if (element.isHovering())
             color += element.getHoverColor();
-        color.mA = element.getDerivedOpacity();
+        color.mA *= element.getDerivedOpacity();
+        // If alpha is 0, nothing will be rendered, so exit without adding the quad
+        if (color.mA <= 0.0f)
+            return;
         unsigned uintColor = getD3DColor(color);
         quad.mTopLeftColor = uintColor;
         quad.mTopRightColor = uintColor;
@@ -110,7 +113,10 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
         Color color = element.getColor(C_TOPLEFT);
         if (element.isHovering())
             color += element.getHoverColor();
-        color.mA = element.getDerivedOpacity();
+        color.mA *= element.getDerivedOpacity();
+        // If alpha is 0, nothing will be rendered, so exit without adding the quad
+        if (color.mA <= 0.0f)
+            return;
         unsigned uintColor = getD3DColor(color);
         quad.mTopLeftColor = uintColor;
         quad.mTopRightColor = uintColor;
@@ -127,7 +133,7 @@ bool UIBatch::merge(const UIBatch& batch)
     if ((batch.mBlendMode != mBlendMode) ||
         (batch.mScissor != mScissor) ||
         (batch.mTexture != mTexture) ||
-        (batch.mQuads != mQuads) || 
+        (batch.mQuads != mQuads) ||
         (batch.mQuadStart != mQuadStart + mQuadCount))
         return false;
     
@@ -203,10 +209,10 @@ void UIBatch::draw(Renderer* renderer, VertexShader* vs, PixelShader* ps) const
     }
     else
     {
-        renderer->beginImmediate(TRIANGLE_LIST, quads.size() * 6, MASK_POSITION | MASK_COLOR);
+        renderer->beginImmediate(TRIANGLE_LIST, mQuadCount * 6, MASK_POSITION | MASK_COLOR);
         float* dest = (float*)renderer->getImmediateDataPtr();
         
-        for (unsigned i = 0; i < quads.size(); ++i)
+        for (unsigned i = mQuadStart; i < mQuadStart + mQuadCount; ++i)
         {
             const UIQuad& quad = quads[i];
             static Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
@@ -264,7 +270,7 @@ unsigned UIBatch::getInterpolatedColor(UIElement& element, int x, int y)
         Color color = topColor.lerp(bottomColor, cLerpY);
         if (element.isHovering())
             color += element.getHoverColor();
-        color.mA = element.getDerivedOpacity();
+        color.mA *= element.getDerivedOpacity();
         return getD3DColor(color);
     }
     else
@@ -272,7 +278,7 @@ unsigned UIBatch::getInterpolatedColor(UIElement& element, int x, int y)
         Color color = element.getColor(C_TOPLEFT);
         if (element.isHovering())
             color += element.getHoverColor();
-        color.mA = element.getDerivedOpacity();
+        color.mA *= element.getDerivedOpacity();
         return getD3DColor(color);
     }
 }

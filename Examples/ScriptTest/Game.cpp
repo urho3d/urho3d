@@ -22,12 +22,14 @@
 //
 
 #include "Camera.h"
+#include "Console.h"
 #include "Engine.h"
 #include "Font.h"
 #include "Game.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
 #include "Input.h"
+#include "LineEdit.h"
 #include "Log.h"
 #include "Model.h"
 #include "PackageFile.h"
@@ -40,6 +42,7 @@
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "StringUtils.h"
+#include "Texture2D.h"
 #include "VertexBuffer.h"
 
 #include <angelscript.h>
@@ -74,10 +77,6 @@ void Game::run()
     while (!mEngine->isExiting())
     {
         mScriptFile->execute("void runFrame()");
-        
-        // Test reloading the ninja script
-        if (mEngine->getInput()->getKeyPress('R'))
-            mCache->reloadResource(mCache->getResource<ScriptFile>("Scripts/Ninja.as"));
     }
 }
 

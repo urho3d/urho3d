@@ -54,6 +54,8 @@ public:
     void setCursorBlinkRate(float rate);
     //! Set maximum text length. 0 for unlimited
     void setMaxLength(unsigned length);
+    //! Set whether can defocus with ESC, default true
+    void setDefocusable(bool enable);
     
     //! Return text
     const std::string& getText() const { return mLine; }
@@ -63,6 +65,8 @@ public:
     float getCursorBlinkRate() const { return mCursorBlinkRate; }
     //! Return maximum text length
     unsigned getMaxLength() const { return mMaxLength; }
+    //! Return whether can defocus with ESC
+    bool isDefocusable() const { return mDefocusable; }
     //! Return text element
     Text* getTextElement() const { return mText; }
     //! Return cursor element
@@ -82,6 +86,8 @@ protected:
     float mCursorBlinkTimer;
     //! Maximum text length
     unsigned mMaxLength;
+    //! ESC defocus flag
+    bool mDefocusable;
     //! Text element
     SharedPtr<Text> mText;
     //! Cursor element

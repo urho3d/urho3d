@@ -18,6 +18,7 @@ bool paused = false;
 void init()
 {
     initAudio();
+    initConsole();
     initScene();
     createCamera();
     createOverlays();
@@ -33,7 +34,7 @@ void init()
 void runFrame()
 {
     engine.runFrame(gameScene, gameCamera, !paused);
-    
+
     if (input.getKeyPress(KEY_ESCAPE))
         engine.exit();
 }
@@ -47,6 +48,18 @@ void initAudio()
     // Start music playback
     Song@ song = cache.getResource("XM", "Music/NinjaGods.xm");
     song.play(0);
+}
+
+void initConsole()
+{
+    Console@ console = engine.createConsole();
+    console.setNumRows(16);
+    console.setFont(cache.getResource("Font", "cour.ttf"), 12);
+    console.setToggleKey(220);
+    BorderImage@ cursor = console.getLineEditElement().getCursorElement();
+    cursor.setWidth(4);
+    cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
+    cursor.setImageRect(112, 0, 116, 16);
 }
 
 void initScene()
@@ -129,18 +142,21 @@ void spawnPlayer()
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (input.getKeyPress('P'))
+    if (!console.isVisible())
     {
-        paused = !paused;
-        if (paused)
-            messageText.setText("PAUSED");
-        else
-            messageText.setText("");
+        if (input.getKeyPress(KEY_F1))
+            debugHud.toggleAll();
+        if (input.getKeyPress(KEY_F2))
+            engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
+        if (input.getKeyPress('P'))
+        {
+            paused = !paused;
+            if (paused)
+                messageText.setText("PAUSED");
+            else
+                messageText.setText("");
+        }
     }
-    if (input.getKeyPress(KEY_F1))
-        debugHud.toggleAll();
-    if (input.getKeyPress(KEY_F2))
-        engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
 
     if (!paused)
         updateControls();
@@ -154,29 +170,32 @@ void handlePostUpdate(StringHash eventType, VariantMap& eventData)
 void updateControls()
 {
     playerControls.set(CTRL_ALL, false);
-    
-    if (input.getKeyDown('W'))
-        playerControls.set(CTRL_UP, true);
-    if (input.getKeyDown('S'))
-        playerControls.set(CTRL_DOWN, true);
-    if (input.getKeyDown('A'))
-        playerControls.set(CTRL_LEFT, true);
-    if (input.getKeyDown('D'))
-        playerControls.set(CTRL_RIGHT, true);
-    if (input.getKeyDown(KEY_CONTROL))
-        playerControls.set(CTRL_FIRE, true);
-    if (input.getKeyDown(' '))
-        playerControls.set(CTRL_JUMP, true);
+
+    if (!console.isVisible())
+    {
+        if (input.getKeyDown('W'))
+            playerControls.set(CTRL_UP, true);
+        if (input.getKeyDown('S'))
+            playerControls.set(CTRL_DOWN, true);
+        if (input.getKeyDown('A'))
+            playerControls.set(CTRL_LEFT, true);
+        if (input.getKeyDown('D'))
+            playerControls.set(CTRL_RIGHT, true);
+        if (input.getKeyDown(KEY_CONTROL))
+            playerControls.set(CTRL_FIRE, true);
+        if (input.getKeyDown(' '))
+            playerControls.set(CTRL_JUMP, true);
+    }
     
     if (input.getMouseButtonDown(MOUSEB_LEFT))
         playerControls.set(CTRL_FIRE, true);
     if (input.getMouseButtonDown(MOUSEB_RIGHT))
         playerControls.set(CTRL_JUMP, true);
-        
+
     playerControls.yaw += mouseSensitivity * input.getMouseMoveX();
     playerControls.pitch += mouseSensitivity * input.getMouseMoveY();
     playerControls.pitch = clamp(playerControls.pitch, -60, 60);
-    
+
     Entity@ playerEntity = gameScene.getEntity("ObjPlayer");
     if (@playerEntity == null)
         return;

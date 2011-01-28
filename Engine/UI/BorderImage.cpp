@@ -56,9 +56,14 @@ void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
 
 void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
+    bool allOpaque = true;
+    if ((getDerivedOpacity() < 1.0f) || (mColor[C_TOPLEFT].mA < 1.0f) || (mColor[C_TOPRIGHT].mA < 1.0f) ||
+        (mColor[C_BOTTOMLEFT].mA < 1.0f) || (mColor[C_BOTTOMRIGHT].mA < 1.0f))
+        allOpaque = false;
+        
     UIBatch batch;
     batch.begin(&quads);
-    batch.mBlendMode = getDerivedOpacity() == 1.0f ? BLEND_REPLACE : BLEND_ALPHA;
+    batch.mBlendMode = allOpaque ? BLEND_REPLACE : BLEND_ALPHA;
     batch.mScissor = currentScissor;
     batch.mTexture = mTexture;
     

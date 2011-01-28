@@ -34,6 +34,7 @@ LineEdit::LineEdit(const std::string& name, const std::string& text) :
     mCursorBlinkRate(1.0f),
     mCursorBlinkTimer(0.0f),
     mMaxLength(0),
+    mDefocusable(true),
     mDefocus(false)
 {
     mClipChildren = true;
@@ -108,6 +109,8 @@ void LineEdit::update(float timeStep)
         else
             setChildOffset(IntVector2::sZero);
     }
+    else
+        setChildOffset(IntVector2::sZero);
     
     mCursor->setVisible(cursorVisible);
     
@@ -138,11 +141,12 @@ void LineEdit::onChar(unsigned char c)
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         sendEvent(EVENT_TEXTFINISHED, eventData);
-        
-        mDefocus = true;
     }
     else if (c == 27)
-        mDefocus = true;
+    {
+        if (mDefocusable)
+            mDefocus = true;
+    }
     else if ((c >= 0x20) && ((!mMaxLength) || (currentLength < mMaxLength)))
     {
         mLine += (char)c;
@@ -160,7 +164,7 @@ void LineEdit::onChar(unsigned char c)
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_TEXT] = mLine;
-        sendEvent(EVENT_TEXTFINISHED, eventData);
+        sendEvent(EVENT_TEXTCHANGED, eventData);
     }
 }
 
@@ -185,6 +189,11 @@ void LineEdit::setCursorBlinkRate(float rate)
 void LineEdit::setMaxLength(unsigned length)
 {
     mMaxLength = length;
+}
+
+void LineEdit::setDefocusable(bool enable)
+{
+    mDefocusable = enable;
 }
 
 void LineEdit::updateText()

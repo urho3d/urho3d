@@ -28,7 +28,9 @@
 
 #include <cstdio>
 #include <string>
+#include <vector>
 
+//! Logging levels
 enum LogLevel
 {
     LOG_DEBUG = 0,
@@ -36,6 +38,14 @@ enum LogLevel
     LOG_WARNING,
     LOG_ERROR,
     LOG_NONE
+};
+
+//! Log message listener
+class LogListener
+{
+public:
+    //! Write a log message
+    virtual void write(const std::string& message) = 0;
 };
 
 //! Urho3D log file
@@ -55,6 +65,10 @@ public:
     void writeRaw(const std::string& message);
     //! Set logging level
     void setLevel(LogLevel level);
+    //! Add a log listener
+    void addListener(LogListener* listener);
+    //! Remove a log listener
+    void removeListener(LogListener* listener);
     
     //! Return logging level
     LogLevel getLevel() const { return mLevel; }
@@ -64,6 +78,8 @@ private:
     FILE* mHandle;
     //! Logging level
     LogLevel mLevel;
+    //! Log listeners
+    std::vector<LogListener*> mListeners;
     
     //! Log instance
     static Log* sInstance;

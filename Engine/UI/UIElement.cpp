@@ -410,6 +410,11 @@ void UIElement::setVisible(bool enable)
     mVisible = enable;
 }
 
+void UIElement::setUserData(const Variant& userData)
+{
+    mUserData = userData;
+}
+
 void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
 {
     XMLElement element = getStyleElement(file);

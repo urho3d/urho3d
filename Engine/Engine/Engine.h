@@ -39,6 +39,7 @@ static const int DEBUGDRAW_PHYSICS = 2;
 class Audio;
 class Camera;
 class Client;
+class Console;
 class Cursor;
 class DebugHud;
 class DebugRenderer;
@@ -81,6 +82,8 @@ public:
     Server* createServer();
     //! Create the script engine. Call before creating scripted scenes or loading script files
     ScriptEngine* createScriptEngine();
+    //! Create the console
+    Console* createConsole();
     //! Create the debug hud
     DebugHud* createDebugHud();
     //! Remove the client subsystem
@@ -108,6 +111,8 @@ public:
     Audio* getAudio() const { return mAudio; }
     //! Return client subsystem
     Client* getClient() const { return mClient; }
+    //! Return console if created
+    Console* getConsole() const { return mConsole; }
     //! Return debug hud if created
     DebugHud* getDebugHud() const { return mDebugHud; }
     //! Return debug renderer
@@ -172,6 +177,8 @@ private:
     SharedPtr<Audio> mAudio;
     //! Resource cache
     SharedPtr<ResourceCache> mCache;
+    //! Console
+    SharedPtr<Console> mConsole;
     //! Debug hud
     SharedPtr<DebugHud> mDebugHud;
     //! Debug renderer

@@ -26,9 +26,25 @@
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
+static bool ScriptFileExecute(const std::string& functionName, CScriptArray* srcParams, ScriptFile* ptr)
+{
+    if (!srcParams)
+        return false;
+    
+    unsigned numParams = srcParams->GetSize();
+    std::vector<Variant> destParams;
+    destParams.resize(numParams);
+    
+    for (unsigned i = 0; i < numParams; ++i)
+        destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
+    
+    return ptr->execute(functionName, destParams);
+}
+
 static void registerScriptFile(asIScriptEngine* engine)
 {
     registerResource<ScriptFile>(engine, "ScriptFile");
+    engine->RegisterObjectMethod("ScriptFile", "bool execute(const string& in, const array<Variant>@+)", asFUNCTION(ScriptFileExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptFile", "bool isCompiled() const", asMETHOD(ScriptFile, isCompiled), asCALL_THISCALL);
     registerRefCasts<Resource, ScriptFile>(engine, "Resource", "ScriptFile");
 }

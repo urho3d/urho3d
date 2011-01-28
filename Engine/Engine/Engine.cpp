@@ -28,6 +28,7 @@
 #include "BaseComponentFactory.h"
 #include "BaseResourceFactory.h"
 #include "Client.h"
+#include "Console.h"
 #include "Cursor.h"
 #include "DebugHud.h"
 #include "DebugRenderer.h"
@@ -341,6 +342,13 @@ ScriptEngine* Engine::createScriptEngine()
         registerScriptAPI();
     }
     return mScriptEngine;
+}
+
+Console* Engine::createConsole()
+{
+    if (!mConsole)
+        mConsole = new Console(this);
+    return mConsole;
 }
 
 DebugHud* Engine::createDebugHud()

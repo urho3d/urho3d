@@ -311,7 +311,7 @@ void Game::createOverlays()
     
     mMessage = new Text();
     mMessage->setFont(mCache->getResource<Font>("Fonts/BlueHighway.ttf"), 17);
-    mMessage->setColor(Color(1.0f, 0.0f, 0.0f, 0.0f));
+    mMessage->setColor(Color(1.0f, 0.0f, 0.0f));
     mMessage->setAlignment(HA_CENTER, VA_CENTER);
     mMessage->setPosition(0, -height * 2);
     uiRoot->addChild(mMessage);

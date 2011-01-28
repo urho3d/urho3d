@@ -81,14 +81,18 @@ void Log::write(LogLevel level, const std::string& message)
     time(&sysTime);
     const char* dateTime = ctime(&sysTime);
     std::string dateTimeString = replace(std::string(dateTime), "\n", "");
+    std::string formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
-    printf("[%s] %s: %s\n", dateTimeString.c_str(), levelPrefixes[level].c_str(), message.c_str());
+    printf("%s\n", formattedMessage.c_str());
     
     if (mHandle)
     {
-        fprintf(mHandle, "[%s] %s: %s\n", dateTimeString.c_str(), levelPrefixes[level].c_str(), message.c_str());
+        fprintf(mHandle, "%s\n", formattedMessage.c_str());
         fflush(mHandle);
     }
+    
+    for (std::vector<LogListener*>::const_iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+        (*i)->write(formattedMessage);
 }
 
 void Log::writeRaw(const std::string& message)
@@ -99,6 +103,26 @@ void Log::writeRaw(const std::string& message)
     {
         fprintf(mHandle, "%s", message.c_str());
         fflush(mHandle);
+    }
+    
+    for (std::vector<LogListener*>::const_iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+        (*i)->write(message);
+}
+
+void Log::addListener(LogListener* listener)
+{
+    mListeners.push_back(listener);
+}
+
+void Log::removeListener(LogListener* listener)
+{
+    for (std::vector<LogListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+    {
+        if ((*i) == listener)
+        {
+            mListeners.erase(i);
+            return;
+        }
     }
 }
 
