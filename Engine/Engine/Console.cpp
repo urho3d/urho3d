@@ -37,9 +37,7 @@
 
 Console::Console(Engine* engine) :
     mEngine(engine),
-    mFontSize(1),
-    mToggleKey(0),
-    mFocus(false)
+    mFontSize(1)
 {
     LOGINFO("Console created");
     
@@ -56,8 +54,8 @@ Console::Console(Engine* engine) :
     
     mBackground = new BorderImage();
     mBackground->setWidth(uiRoot->getWidth());
-    mBackground->setColor(C_TOPLEFT, Color(0.25f, 0.25f, 0.75f, 0.5f));
-    mBackground->setColor(C_TOPRIGHT, Color(0.25f, 0.25f, 0.75f, 0.5f));
+    mBackground->setColor(C_TOPLEFT, Color(0.25f, 0.25f, 0.5f, 0.5f));
+    mBackground->setColor(C_TOPRIGHT, Color(0.25f, 0.25f, 0.5f, 0.5f));
     mBackground->setColor(C_BOTTOMLEFT, Color(0.5f, 0.5f, 1.0f, 0.5f));
     mBackground->setColor(C_BOTTOMRIGHT, Color(0.5f, 0.5f, 1.0f, 0.5f));
     mBackground->setEnabled(true);
@@ -66,7 +64,7 @@ Console::Console(Engine* engine) :
     
     mLineEdit = new LineEdit();
     mLineEdit->setWidth(uiRoot->getWidth() - 8);
-    mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
+    mLineEdit->setColor(Color(0.0f, 0.0f, 0.25f, 0.5f));
     mLineEdit->setDefocusable(false);
     mBackground->addChild(mLineEdit);
     
@@ -74,8 +72,6 @@ Console::Console(Engine* engine) :
     
     updateElements();
     
-    subscribeToEvent(EVENT_UPDATE, EVENT_HANDLER(Console, handleUpdate));
-    subscribeToEvent(EVENT_KEYDOWN, EVENT_HANDLER(Console, handleKeyDown));
     subscribeToEvent(EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
 }
 
@@ -119,9 +115,17 @@ void Console::setVisible(bool enable)
     
     mBackground->setVisible(enable);
     if (enable)
-        mFocus = true;
+        mEngine->getUI()->setFocusElement(mLineEdit);
     else
+    {
         mLineEdit->setFocus(false);
+        mLineEdit->setText(std::string());
+    }
+}
+
+void Console::toggle()
+{
+    setVisible(!isVisible());
 }
 
 void Console::setNumRows(unsigned rows)
@@ -156,11 +160,6 @@ void Console::setFont(Font* font, int size)
     updateElements();
 }
 
-void Console::setToggleKey(int key)
-{
-    mToggleKey = key;
-}
-
 bool Console::isVisible() const
 {
     if (!mBackground)
@@ -189,24 +188,6 @@ void Console::updateElements()
     int maxWidth = mEngine->getUIRoot()->getWidth();
     if (mBackground->getWidth() > maxWidth)
         mBackground->setWidth(maxWidth);
-}
-
-void Console::handleUpdate(StringHash eventType, VariantMap& eventData)
-{
-    // Focus now if console has been made visible
-    if (mFocus)
-    {
-        mEngine->getUI()->setFocusElement(mLineEdit);
-        mFocus = false;
-    }
-}
-
-void Console::handleKeyDown(StringHash eventType, VariantMap& eventData)
-{
-    using namespace KeyDown;
-    
-    if (eventData[P_KEY].getInt() == mToggleKey)
-        setVisible(!isVisible());
 }
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)

@@ -80,6 +80,21 @@ static void Print(const std::string& str)
     LOGRAW(str + "\n");
 }
 
+static void PrintInt(int value)
+{
+    LOGRAW(toString(value) + "\n");
+}
+
+static void PrintFloat(float value)
+{
+    LOGRAW(toString(value) + "\n");
+}
+
+static void PrintBool(bool value)
+{
+    LOGRAW(toString(value) + "\n");
+}
+
 static void LogDebug(const std::string& str)
 {
     LOGDEBUG(str);
@@ -103,6 +118,9 @@ static void LogError(const std::string& str)
 static void registerLog(asIScriptEngine* engine)
 {
     engine->RegisterGlobalFunction("void print(const string& in)", asFUNCTION(Print), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void print(int)", asFUNCTION(PrintInt), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void print(float)", asFUNCTION(PrintFloat), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void print(bool)", asFUNCTION(PrintBool), asCALL_CDECL);
     engine->RegisterGlobalFunction("void logDebug(const string& in)", asFUNCTION(LogDebug), asCALL_CDECL);
     engine->RegisterGlobalFunction("void logInfo(const string& in)", asFUNCTION(LogInfo), asCALL_CDECL);
     engine->RegisterGlobalFunction("void logWarning(const string& in)", asFUNCTION(LogWarning), asCALL_CDECL);

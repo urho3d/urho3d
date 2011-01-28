@@ -55,7 +55,6 @@ void initConsole()
     Console@ console = engine.createConsole();
     console.setNumRows(16);
     console.setFont(cache.getResource("Font", "cour.ttf"), 12);
-    console.setToggleKey(220);
     BorderImage@ cursor = console.getLineEditElement().getCursorElement();
     cursor.setWidth(4);
     cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
@@ -142,20 +141,20 @@ void spawnPlayer()
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (!console.isVisible())
+    if (input.getKeyPress(220))
+        console.toggle();
+    if (input.getKeyPress(KEY_F1))
+        debugHud.toggleAll();
+    if (input.getKeyPress(KEY_F2))
+        engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
+
+    if ((!console.isVisible()) && (input.getKeyPress('P')))
     {
-        if (input.getKeyPress(KEY_F1))
-            debugHud.toggleAll();
-        if (input.getKeyPress(KEY_F2))
-            engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
-        if (input.getKeyPress('P'))
-        {
-            paused = !paused;
-            if (paused)
-                messageText.setText("PAUSED");
-            else
-                messageText.setText("");
-        }
+        paused = !paused;
+        if (paused)
+            messageText.setText("PAUSED");
+        else
+            messageText.setText("");
     }
 
     if (!paused)
@@ -186,7 +185,7 @@ void updateControls()
         if (input.getKeyDown(' '))
             playerControls.set(CTRL_JUMP, true);
     }
-    
+
     if (input.getMouseButtonDown(MOUSEB_LEFT))
         playerControls.set(CTRL_FIRE, true);
     if (input.getMouseButtonDown(MOUSEB_RIGHT))

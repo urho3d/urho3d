@@ -356,12 +356,11 @@ static void registerConsole(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Console", asBEHAVE_ADDREF, "void f()", asMETHOD(Console, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Console", asBEHAVE_RELEASE, "void f()", asMETHOD(Console, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setVisible(bool)", asMETHOD(Console, setVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void toggle()", asMETHOD(Console, toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setNumRows(uint)", asMETHOD(Console, setNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setFont(Font@+, int)", asMETHOD(Console, setFont), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "void setToggleKey(int)", asMETHOD(Console, setToggleKey), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "int getToggleKey() const", asMETHOD(Console, getToggleKey), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "BorderImage@+ getBackgroundElement() const", asMETHOD(Console, getBackgroundElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEditElement() const", asMETHOD(Console, getLineEditElement), asCALL_THISCALL);
     

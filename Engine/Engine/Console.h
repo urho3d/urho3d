@@ -46,21 +46,19 @@ public:
     //! Write a log message
     virtual void write(const std::string& message);
     
-    //! Show/hide. Showing automatically focuses the line edit
+    //! Show or hide. Showing automatically focuses the line edit
     void setVisible(bool enable);
+    //! Toggle visibility
+    void toggle();
     //! Set number of rows
     void setNumRows(unsigned rows);
     //! Set font to use
     void setFont(Font* font, int size);
-    //! Set key for toggling
-    void setToggleKey(int key);
     
     //! Return whether is visible
     bool isVisible() const;
     //! Return number of rows
     unsigned getNumRows() const { return mRows.size(); }
-    //! Return key for toggling
-    int getToggleKey() const { return mToggleKey; }
     //! Return background element
     BorderImage* getBackgroundElement() const { return mBackground; }
     //! Return line edit element
@@ -69,10 +67,6 @@ public:
 private:
     //! Update layout
     void updateElements();
-    //! Handle update
-    void handleUpdate(StringHash eventType, VariantMap& eventData);
-    //! Handle key press
-    void handleKeyDown(StringHash eventType, VariantMap& eventData);
     //! Handle enter pressed on the line edit
     void handleTextFinished(StringHash eventType, VariantMap& eventData);
     
@@ -88,10 +82,6 @@ private:
     SharedPtr<LineEdit> mLineEdit;
     //! Font size
     int mFontSize;
-    //! Key for toggling
-    int mToggleKey;
-    //! Focus flag
-    bool mFocus;
 };
 
 #endif // ENGINE_CONSOLE_H
