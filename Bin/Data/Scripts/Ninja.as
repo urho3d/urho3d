@@ -1,4 +1,3 @@
-#include "Scripts/Controls.as"
 #include "Scripts/GameObject.as"
 
 const int ANIM_MOVE = 1;
@@ -14,14 +13,10 @@ const Vector3 throwVelocity(0, 425, 2000);
 const Vector3 throwPosition(0, 20, 100);
 const float throwDelay = 0.1;
 
-class Ninja : ScriptObject, GameObject
+class Ninja : GameObject
 {
-    Controls controls;
-    Controls prevControls;
     bool okToJump;
     bool smoke;
-    bool onGround;
-    bool isSliding;
     float inAirTime;
     float onGroundTime;
     float throwTime;
@@ -31,7 +26,7 @@ class Ninja : ScriptObject, GameObject
     float aimX;
     float aimY;
 
-    void start()
+    Ninja()
     {
         okToJump = false;
         smoke = false;
@@ -45,7 +40,10 @@ class Ninja : ScriptObject, GameObject
         dirChangeTime = 0;
         aimX = 0;
         aimY = 0;
+    }
 
+    void start()
+    {
         subscribeToEvent("EntityCollision", "handleEntityCollision");
     }
 
@@ -259,53 +257,5 @@ class Ninja : ScriptObject, GameObject
         // If the other entity does not have a ScriptInstance component, it's static world geometry
         if (!otherEntity.hasComponent("ScriptInstance"))
             handleWorldCollision(eventData);
-    }
-    
-    void handleWorldCollision(VariantMap& eventData)
-    {
-        RigidBody@ body = entity.getComponent("RigidBody");
-
-        VectorBuffer contacts = eventData["Contacts"].getBuffer();
-        while (!contacts.isEof())
-        {
-            Vector3 contactPosition = contacts.readVector3();
-            Vector3 contactNormal = contacts.readVector3();
-            float contactDepth = contacts.readFloat();
-            float contactVelocity = contacts.readFloat();
-
-            // If contact is below center and mostly vertical, assume it's ground contact
-            if (contactPosition.y < body.getPhysicsPosition().y)
-            {
-                float level = abs(contactNormal.y);
-                if (level > 0.75)
-                    onGround = true;
-                else
-                {
-                    // If contact is somewhere inbetween vertical/horizontal, is sliding a slope
-                    if (level > 0.1)
-                        isSliding = true;
-                }
-            }
-        }
-
-        // Ground contact has priority over sliding contact
-        if (onGround == true)
-            isSliding = false;
-    }
-    
-    void resetWorldCollision()
-    {
-        RigidBody@ body = entity.getComponent("RigidBody");
-        if (body.isActive())
-        {
-            onGround = false;
-            isSliding = false;
-        }
-        else
-        {
-            // If body is not active, assume it rests on the ground
-            onGround = true;
-            isSliding = false;
-        }
     }
 }

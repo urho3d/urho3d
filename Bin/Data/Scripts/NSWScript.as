@@ -1,7 +1,6 @@
 // Partial remake of NinjaSnowWar in script
 
-#include "Scripts/Controls.as"
-#include "Scripts/GameObject.as"
+#include "Scripts/Ninja.as"
 
 Scene@ gameScene;
 Camera@ gameCamera;
@@ -144,8 +143,8 @@ void spawnPlayer()
 {
     Entity@ playerEntity = gameScene.createEntity("ObjPlayer");
     ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
-    instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/Ninja.as"), "Ninja");
-    GameObject@ object = cast<GameObject>(instance.getScriptObject());
+    instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NSWScript.as"), "Ninja");
+    Ninja@ object = cast<Ninja>(instance.getScriptObject());
     object.create(Vector3(0, 90, 0), Quaternion());
 }
 
@@ -208,7 +207,7 @@ void updateControls()
         return;
 
     ScriptInstance@ instance = playerEntity.getComponent("ScriptInstance");
-    GameObject@ object = cast<GameObject>(instance.getScriptObject());
+    Ninja@ object = cast<Ninja>(instance.getScriptObject());
     object.setControls(playerControls);
 }
 
@@ -234,7 +233,7 @@ void updateCamera()
     array<PhysicsRaycastResult>@ result = gameScene.getPhysicsWorld().raycast(Ray(minDist, rayDir), rayDistance, 2);
     if (result.length() > 0)
         rayDistance = min(rayDistance, result[0].distance - cameraSafetyDist);
-    
+
     gameCamera.setPosition(minDist + rayDir * rayDistance);
     gameCamera.setRotation(dir);
 
