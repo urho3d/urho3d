@@ -968,7 +968,7 @@ static void registerOctree(asIScriptEngine* engine)
     
     engine->RegisterObjectType("RayQueryResult", sizeof(RayQueryResult), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("RayQueryResult", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRayQueryResult), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("RayQueryResult", "Node@+ get_node()", asFUNCTION(RayQueryResultGetNode), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("RayQueryResult", "Node@+ get_node() const", asFUNCTION(RayQueryResultGetNode), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("RayQueryResult", "float distance", offsetof(RayQueryResult, mDistance));
     engine->RegisterObjectProperty("RayQueryResult", "uint subObject", offsetof(RayQueryResult, mSubObject));
     

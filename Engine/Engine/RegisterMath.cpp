@@ -521,7 +521,7 @@ static void registerVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Frustum", "Intersection isInside(const BoundingBox& in)", asMETHODPR(Frustum, isInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Frustum", "Intersection isInside(const Sphere& in)", asMETHODPR(Frustum, isInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectProperty("Frustum", "bool defined", offsetof(Frustum, mDefined));
-    engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint)", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Frustum", "Vector3 get_vertices(uint) const", asFUNCTION(FrustumGetVertex), asCALL_CDECL_OBJLAST);
 }
 
 void registerMathLibrary(asIScriptEngine* engine)

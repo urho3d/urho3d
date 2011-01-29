@@ -121,7 +121,7 @@ static void registerConnection(asIScriptEngine* engine)
     
     engine->RegisterObjectType("NetUpdateInfo", sizeof(NetUpdateInfo), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("NetUpdateInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructNetUpdateInfo), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("NetUpdateInfo", "Connection@+ get_connection()", asFUNCTION(NetUpdateInfoGetConnection), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("NetUpdateInfo", "Connection@+ get_connection() const", asFUNCTION(NetUpdateInfoGetConnection), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("NetUpdateInfo", "uint16 frameNumber", offsetof(NetUpdateInfo, mFrameNumber));
     engine->RegisterObjectProperty("NetUpdateInfo", "uint16 frameAck", offsetof(NetUpdateInfo, mFrameAck));
     engine->RegisterObjectProperty("NetUpdateInfo", "uint16 remoteFrameNumber", offsetof(NetUpdateInfo, mRemoteFrameNumber));
@@ -178,6 +178,26 @@ static bool IsClient()
     return GetClient() != 0;
 }
 
+static const std::string& SceneInfoGetName(SceneInfo* ptr)
+{
+    return ptr->mName;
+}
+
+static unsigned SceneInfoGetNumUsers(SceneInfo* ptr)
+{
+    return ptr->mNumUsers;
+}
+
+static int SceneInfoGetNetFps(SceneInfo* ptr)
+{
+    return ptr->mNetFps;
+}
+
+static const std::string& SceneInfoGetFileName(SceneInfo* ptr)
+{
+    return ptr->mFileName;
+}
+
 static void registerClient(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("SceneInfo", sizeof(SceneInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
@@ -185,10 +205,10 @@ static void registerClient(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("SceneInfo", asBEHAVE_CONSTRUCT, "void f(const SceneInfo& in)", asFUNCTION(ConstructSceneInfoCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("SceneInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructSceneInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("SceneInfo", "SceneInfo &opAssign(const SceneInfo& in)", asMETHOD(SceneInfo, operator =), asCALL_THISCALL);
-    engine->RegisterObjectProperty("SceneInfo", "string name", offsetof(SceneInfo, mName));
-    engine->RegisterObjectProperty("SceneInfo", "uint numUsers", offsetof(SceneInfo, mNumUsers));
-    engine->RegisterObjectProperty("SceneInfo", "int netFps", offsetof(SceneInfo, mNetFps));
-    engine->RegisterObjectProperty("SceneInfo", "string fileName", offsetof(SceneInfo, mFileName));
+    engine->RegisterObjectMethod("SceneInfo", "const string& get_name() const", asFUNCTION(SceneInfoGetName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("SceneInfo", "uint get_numUsers() const", asFUNCTION(SceneInfoGetNumUsers), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("SceneInfo", "int get_netFps() const", asFUNCTION(SceneInfoGetNetFps), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("SceneInfo", "const string& get_fileName() const", asFUNCTION(SceneInfoGetFileName), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("Client", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Client", asBEHAVE_ADDREF, "void f()", asMETHOD(Client, addRef), asCALL_THISCALL);

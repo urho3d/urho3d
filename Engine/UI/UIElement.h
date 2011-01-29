@@ -238,7 +238,7 @@ public:
     //! Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children
     bool isInsideCombined(IntVector2 position, bool isScreen);
     //! Return combined screen coordinate rect of element and its children
-    IntRect UIElement::getCombinedScreenRect();
+    IntRect getCombinedScreenRect();
     
     //! Set hovering state
     void setHovering(bool enable);

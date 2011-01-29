@@ -71,7 +71,7 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, mPosition));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, mNormal));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "float distance", offsetof(PhysicsRaycastResult, mDistance));
-    engine->RegisterObjectMethod("PhysicsRaycastResult", "RigidBody@+ get_body()", asFUNCTION(PhysicsRaycastResultGetBody), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsRaycastResult", "RigidBody@+ get_body() const", asFUNCTION(PhysicsRaycastResultGetBody), asCALL_CDECL_OBJLAST);
     
     registerHashedType<PhysicsWorld>(engine, "PhysicsWorld");
     engine->RegisterObjectMethod("PhysicsWorld", "void setGravity(const Vector3& in)", asMETHOD(PhysicsWorld, setGravity), asCALL_THISCALL);

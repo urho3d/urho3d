@@ -495,7 +495,7 @@ void UIElement::layoutHorizontal(int spacing, const IntRect& border, bool expand
     for (std::vector<SharedPtr<UIElement> >::iterator i = mChildren.begin(); i != mChildren.end(); ++i)
     {
         (*i)->setHorizontalAlignment(HA_LEFT);
-        if ((*i)->getVerticalAlignment() == HA_CENTER)
+        if ((*i)->getVerticalAlignment() == VA_CENTER)
             (*i)->setPosition(currentPos.mX, 0);
         else
             (*i)->setPosition(currentPos);
