@@ -357,11 +357,9 @@ void BillboardSet::setAnimationLodBias(float bias)
     mAnimationLodBias = max(bias, 0.0f);
 }
 
-void BillboardSet::updated(bool force)
+void BillboardSet::updated()
 {
     markPositionsDirty();
-    if (force)
-        mForceUpdate = true;
 }
 
 Billboard* BillboardSet::getBillboard(unsigned index)

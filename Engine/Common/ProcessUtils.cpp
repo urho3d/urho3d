@@ -48,6 +48,7 @@ bool miniDumpWritten = false;
 #include "DebugNew.h"
 
 std::string currentLine;
+std::vector<std::string> arguments;
 
 void setExecutableWorkingDirectory()
 {
@@ -91,7 +92,7 @@ void errorDialog(const std::string& title, const std::string& message)
     MessageBox(0, message.c_str(), title.c_str(), 0);
 }
 
-void getArguments(const char* cmdLine, std::vector<std::string>& arguments)
+void parseArguments(const char* cmdLine)
 {
     if (!cmdLine)
         return;
@@ -100,6 +101,7 @@ void getArguments(const char* cmdLine, std::vector<std::string>& arguments)
     unsigned cmdStart, cmdEnd;
     bool inCmd = false;
     bool inQuote = false;
+    arguments.clear();
     
     for (unsigned i = 0; i < cmdStr.length(); ++i)
     {
@@ -128,6 +130,11 @@ void getArguments(const char* cmdLine, std::vector<std::string>& arguments)
         cmdEnd = cmdStr.length();
         arguments.push_back(cmdStr.substr(cmdStart, cmdEnd - cmdStart));
     }
+}
+
+const std::vector<std::string>& getArguments()
+{
+    return arguments;
 }
 
 bool getConsoleInput(std::string& line)

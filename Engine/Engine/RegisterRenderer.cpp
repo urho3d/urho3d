@@ -435,6 +435,20 @@ static void registerAnimation(asIScriptEngine* engine)
     registerRefCasts<Resource, Animation>(engine, "Resource", "Animation");
 }
 
+static void registerVolumeNode(asIScriptEngine* engine)
+{
+    registerVolumeNode<VolumeNode>(engine, "VolumeNode");
+    registerRefCasts<Component, VolumeNode>(engine, "Component", "VolumeNode");
+    registerRefCasts<Node, VolumeNode>(engine, "Node", "VolumeNode");
+}
+
+static void registerGeometryNode(asIScriptEngine* engine)
+{
+    registerGeometryNode<GeometryNode>(engine, "GeometryNode");
+    registerRefCasts<Component, GeometryNode>(engine, "Component", "GeometryNode");
+    registerRefCasts<Node, GeometryNode>(engine, "Node", "GeometryNode");
+}
+
 static void ConstructBiasParameters(BiasParameters* ptr)
 {
     new(ptr) BiasParameters(0.0f, 0.0f);
@@ -668,8 +682,10 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "void syncMorphs(AnimatedModel@+)", asMETHOD(AnimatedModel, syncMorphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void setLocalAnimation(bool)", asMETHOD(AnimatedModel, setLocalAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ getSkeleton() const", asMETHOD(AnimatedModel, getSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "uint getNumAnimationStates() const", asMETHOD(AnimatedModel, getNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(Animation@+) const", asMETHODPR(AnimatedModel, getAnimationState, (Animation*) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(const string& in) const", asMETHODPR(AnimatedModel, getAnimationState, (const std::string&) const, AnimationState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(uint) const", asMETHODPR(AnimatedModel, getAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float getAnimationLodBias() const", asMETHOD(AnimatedModel, getAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint getNumMorphs() const", asMETHOD(AnimatedModel, getNumMorphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(uint) const", asMETHODPR(AnimatedModel, getMorphWeight, (unsigned) const, float), asCALL_THISCALL);
@@ -697,7 +713,7 @@ static void registerBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "void setBillboardsSorted(bool)", asMETHOD(BillboardSet, setBillboardsSorted), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void setScaleBillboards(bool)", asMETHOD(BillboardSet, setScaleBillboards), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "void setAnimationLodBias(float)", asMETHOD(BillboardSet, setAnimationLodBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BillboardSet", "void updated(bool)", asMETHOD(BillboardSet, updated), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BillboardSet", "void updated()", asMETHOD(BillboardSet, updated), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Material@+ getMaterial() const", asMETHOD(BillboardSet, getMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "uint getNumBillboards() const", asMETHOD(BillboardSet, getNumBillboards), asCALL_THISCALL);
     engine->RegisterObjectMethod("BillboardSet", "Billboard@+ getBillboard(uint)", asMETHOD(BillboardSet, getBillboard), asCALL_THISCALL);
@@ -979,6 +995,8 @@ void registerRendererLibrary(asIScriptEngine* engine)
     registerMaterial(engine);
     registerModel(engine);
     registerAnimation(engine);
+    registerVolumeNode(engine);
+    registerGeometryNode(engine);
     registerLight(engine);
     registerZone(engine);
     registerStaticModel(engine);

@@ -39,15 +39,12 @@
 #include "GameConfig.h"
 #include "GameEvents.h"
 #include "GameObjectFactory.h"
-#include "Geometry.h"
-#include "IndexBuffer.h"
 #include "Input.h"
 #include "InputEvents.h"
 #include "Light.h"
 #include "Log.h"
 #include "Material.h"
 #include "MemoryBuffer.h"
-#include "Model.h"
 #include "Ninja.h"
 #include "PackageFile.h"
 #include "PositionalChannel.h"
@@ -75,7 +72,6 @@
 #include "Texture2D.h"
 #include "UI.h"
 #include "UIEvents.h"
-#include "VertexBuffer.h"
 #include "XM.h"
 #include "XMLFile.h"
 #include "Zone.h"
@@ -89,8 +85,7 @@ int simulateLatency = 0;
 std::string applicationDir;
 std::string downloadDir;
 
-Game::Game(const std::vector<std::string>& arguments) :
-    mArguments(arguments),
+Game::Game() :
     mTimeScale(1.0f),
     mCameraMinDist(0.0f),
     mCameraMaxDist(0.0f),
@@ -171,11 +166,12 @@ void Game::init()
     std::string logName = "NinjaSnowWar.log";
     
     // Force forward rendering
-    mArguments.insert(mArguments.begin(), "-forward");
+    std::vector<std::string> arguments = getArguments();
+    arguments.insert(arguments.begin(), "-forward");
     
-    for (unsigned i = 0; i < mArguments.size(); ++i)
+    for (unsigned i = 0; i < arguments.size(); ++i)
     {
-        if (toLower(mArguments[i]) == "server")
+        if (toLower(arguments[i]) == "server")
         {
             logName = "Server.log";
             runServer = true;
@@ -183,48 +179,34 @@ void Game::init()
         }
         else
         {
-            if ((mArguments[i][0] != '-') && (!runClient))
+            if ((arguments[i][0] != '-') && (!runClient))
             {
                 logName = "Client.log";
                 runServer = false;
                 runClient = true;
-                address = mArguments[i];
-                if ((mArguments.size() > i + 1) && (mArguments[i + 1][0] != '-'))
-                    mUserName = mArguments[i + 1];
+                address = arguments[i];
+                if ((arguments.size() > i + 1) && (arguments[i + 1][0] != '-'))
+                    mUserName = arguments[i + 1];
             }
         }
     }
     
-    // Run server in headless mode
-    mEngine = new Engine(logName, runServer);
-    if (runServer)
-        openConsoleWindow();
+    // Initialize the engine. If running the server, use headless mode
+    mEngine = new Engine("NinjaSnowWar", logName, runServer);
     
     // Add the resources as a package if available
     mCache = mEngine->getResourceCache();
     if (fileExists("Data.pak"))
         mCache->addPackageFile(new PackageFile("Data.pak"));
+    else
+        mCache->addResourcePath("Data");
     
-    mEngine->init("NinjaSnowWar", mArguments);
+    mEngine->init(arguments);
     
     mCache->addResourcePath(getSystemFontDirectory());
     
-    Pipeline* pipeline = mEngine->getPipeline();
-    if (pipeline)
-    {
-        for (unsigned i = 0; i < mArguments.size(); ++i)
-        {
-            if (toLower(mArguments[i]) == "-noshadows")
-                pipeline->setDrawShadows(false);
-            if (toLower(mArguments[i]) == "-nolimit")
-                mEngine->setMaxFps(0);
-        }
-    }
-    
     DebugHud* debugHud = mEngine->createDebugHud();
     debugHud->setFont(mCache->getResource<Font>("cour.ttf"), 12);
-    
-    createSkyPlaneModel();
     
     if (runServer)
     {
@@ -1180,43 +1162,4 @@ int Game::getObjectCount(ShortStringHash type, int side)
     }
     
     return count;
-}
-
-void Game::createSkyPlaneModel()
-{
-    const float skyplanevertices[] = 
-    {
-        -1, 0, -1, 0, 0,
-        1, 0, -1, 2, 0,
-        1, 0, 1, 2, 2,
-        -1, 0, 1, 0, 2
-    };
-    const unsigned short skyplaneindices[] =
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
-    
-    Renderer* renderer = mEngine->getRenderer();
-    
-    SharedPtr<VertexBuffer> vb(new VertexBuffer(renderer));
-    vb->setSize(4, MASK_POSITION | MASK_TEXCOORD1);
-    vb->setData(skyplanevertices);
-    
-    SharedPtr<IndexBuffer> ib(new IndexBuffer(renderer));
-    ib->setSize(6, false);
-    ib->setData(skyplaneindices);
-    
-    SharedPtr<Geometry> geom(new Geometry());
-    geom->setVertexBuffer(0, vb);
-    geom->setIndexBuffer(ib);
-    geom->setDrawRange(TRIANGLE_LIST, 0, ib->getIndexCount());
-    
-    SharedPtr<Model> model(new Model(renderer, "Models/CloudPlane.mdl"));
-    model->setNumGeometries(1);
-    model->setNumGeometryLodLevels(0, 1);
-    model->setGeometry(0, 0, geom);
-    model->setBoundingBox(BoundingBox(-1, 1));
-    // Add the cloudplane model as a manual resource so it can be retrieved during savegame load
-    mCache->addManualResource(model);
 }

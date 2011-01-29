@@ -25,10 +25,10 @@
 #include "BorderImage.h"
 #include "Console.h"
 #include "Engine.h"
-#include "EngineEvents.h"
 #include "Font.h"
-#include "InputEvents.h"
 #include "LineEdit.h"
+#include "Renderer.h"
+#include "RendererEvents.h"
 #include "ScriptEngine.h"
 #include "StringUtils.h"
 #include "Text.h"
@@ -54,17 +54,17 @@ Console::Console(Engine* engine) :
     
     mBackground = new BorderImage();
     mBackground->setWidth(uiRoot->getWidth());
-    mBackground->setColor(C_TOPLEFT, Color(0.25f, 0.25f, 0.5f, 0.5f));
-    mBackground->setColor(C_TOPRIGHT, Color(0.25f, 0.25f, 0.5f, 0.5f));
-    mBackground->setColor(C_BOTTOMLEFT, Color(0.5f, 0.5f, 1.0f, 0.5f));
-    mBackground->setColor(C_BOTTOMRIGHT, Color(0.5f, 0.5f, 1.0f, 0.5f));
+    mBackground->setColor(C_TOPLEFT, Color(0.0f, 0.25f, 0.0f, 0.75f));
+    mBackground->setColor(C_TOPRIGHT, Color(0.0f, 0.25f, 0.0f, 0.75f));
+    mBackground->setColor(C_BOTTOMLEFT, Color(0.25f, 0.75f, 0.25f, 0.75f));
+    mBackground->setColor(C_BOTTOMRIGHT, Color(0.25f, 0.75f, 0.25f, 0.75f));
+    mBackground->setBringToBack(false);
     mBackground->setEnabled(true);
     mBackground->setVisible(false);
     mBackground->setPriority(200); // Show on top of the debug HUD
     
     mLineEdit = new LineEdit();
-    mLineEdit->setWidth(uiRoot->getWidth() - 8);
-    mLineEdit->setColor(Color(0.0f, 0.0f, 0.25f, 0.5f));
+    mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
     mLineEdit->setDefocusable(false);
     mBackground->addChild(mLineEdit);
     
@@ -73,6 +73,7 @@ Console::Console(Engine* engine) :
     updateElements();
     
     subscribeToEvent(EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
+    subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
 }
 
 Console::~Console()
@@ -117,10 +118,7 @@ void Console::setVisible(bool enable)
     if (enable)
         mEngine->getUI()->setFocusElement(mLineEdit);
     else
-    {
         mLineEdit->setFocus(false);
-        mLineEdit->setText(std::string());
-    }
 }
 
 void Console::toggle()
@@ -169,6 +167,8 @@ bool Console::isVisible() const
 
 void Console::updateElements()
 {
+    int width = mEngine->getRenderer()->getWidth();
+    
     if (mFont)
     {
         try
@@ -182,12 +182,12 @@ void Console::updateElements()
         }
     }
     
+    mLineEdit->setWidth(width - 8);
     mLineEdit->setHeight(mLineEdit->getTextElement()->getRowHeight());
     mBackground->layoutVertical(0, IntRect(4, 4, 4, 4), true, true);
     
-    int maxWidth = mEngine->getUIRoot()->getWidth();
-    if (mBackground->getWidth() > maxWidth)
-        mBackground->setWidth(maxWidth);
+    if (mBackground->getWidth() > width)
+        mBackground->setWidth(width);
 }
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
@@ -202,4 +202,9 @@ void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
             scriptEngine->execute(line);
         mLineEdit->setText(std::string());
     }
+}
+
+void Console::handleWindowResized(StringHash eventType, VariantMap& eventData)
+{
+    updateElements();
 }

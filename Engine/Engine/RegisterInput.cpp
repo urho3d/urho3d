@@ -194,6 +194,7 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Input", asBEHAVE_ADDREF, "void f()", asMETHOD(Input, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Input", asBEHAVE_RELEASE, "void f()", asMETHOD(Input, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void setToggleFullscreen(bool)", asMETHOD(Input, setToggleFullscreen), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void suppressNextChar()", asMETHOD(Input, suppressNextChar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getKeyDown(int) const", asMETHOD(Input, getKeyDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getKeyPress(int) const", asMETHOD(Input, getKeyPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getMouseButtonDown(int) const", asMETHOD(Input, getMouseButtonDown), asCALL_THISCALL);

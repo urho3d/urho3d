@@ -76,6 +76,9 @@ static void registerMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float pow(float)", asFUNCTION(powf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float random()", asFUNCTIONPR(random, (), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float random(float)", asFUNCTIONPR(random, (float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int randomInt()", asFUNCTION(rand), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int randomInt(int)", asFUNCTIONPR(random, (int), int), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void setRandomSeed(int)", asFUNCTION(srand), asCALL_CDECL);
     engine->RegisterGlobalFunction("float min(float, float)", asFUNCTIONPR(min, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float max(float, float)", asFUNCTIONPR(min, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float clamp(float, float, float)", asFUNCTIONPR(clamp, (float, float, float), float), asCALL_CDECL);

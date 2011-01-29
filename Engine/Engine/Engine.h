@@ -62,13 +62,13 @@ class Engine : public RefCounted, public EventListener
     friend Engine* getEngine();
     
 public:
-    //! Construct with log file name and whether to start in headless mode
-    Engine(const std::string& logFileName = "Urho3D.log", bool headless = false);
+    //! Construct with window title, log file name and whether to start in headless mode
+    Engine(const std::string& windowTitle = "Urho3D", const std::string& logFileName = "Urho3D.log", bool headless = false);
     //! Destruct. Free all subsystems
     virtual ~Engine();
     
     //! Initialize and show the application window
-    void init(const std::string& windowTitle, const std::vector<std::string>& arguments = std::vector<std::string>());
+    void init(const std::vector<std::string>& arguments = std::vector<std::string>());
     //! Run one frame with the scene and camera given
     void runFrame(Scene* scene, Camera* camera, bool updateScene = true);
     //! Create a scene
@@ -199,6 +199,8 @@ private:
     SharedPtr<ScriptEngine> mScriptEngine;
     //! UI subsystem
     SharedPtr<UI> mUI;
+    //! Window title
+    std::string mWindowTitle;
     //! Frame update timer
     Timer mFrameTimer;
     //! Minimum frames per second

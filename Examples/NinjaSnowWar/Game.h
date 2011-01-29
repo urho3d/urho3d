@@ -69,7 +69,7 @@ static bool compareHiScores(const HiScore& lhs, const HiScore& rhs)
 class Game : public EventListener
 {
 public:
-    Game(const std::vector<std::string>& arguments);
+    Game();
     ~Game();
     
     void run();
@@ -111,9 +111,6 @@ private:
     void updateCamera();
     void updateStatus(float timeStep);
     int getObjectCount(ShortStringHash type, int side = SIDE_UNDEFINED);
-    void createSkyPlaneModel();
-    
-    std::vector<std::string> mArguments;
     
     SharedPtr<Engine> mEngine;
     SharedPtr<ResourceCache> mCache;

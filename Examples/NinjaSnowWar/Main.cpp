@@ -53,22 +53,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 
 void run(const char* cmdLine)
 {
-    std::vector<std::string> arguments;
-    getArguments(cmdLine, arguments);
+    parseArguments(cmdLine);
     setExecutableWorkingDirectory();
     
     #if !defined(_MSC_VER) || !defined(_DEBUG)
+    std::string error;
     try
     {
-        Game game(arguments);
+        Game game;
         game.run();
     }
     catch (Exception& e)
     {
-        errorDialog("NinjaSnowWar", e.whatStr());
+        error = e.whatStr();
     }
+    // Let the rendering window close first before showing the error dialog
+    if (!error.empty())
+        errorDialog("NinjaSnowWar", error);
     #else
-    Game game(arguments);
+    Game game;
     game.run();
     #endif
 }

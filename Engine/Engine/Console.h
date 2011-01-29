@@ -69,6 +69,8 @@ private:
     void updateElements();
     //! Handle enter pressed on the line edit
     void handleTextFinished(StringHash eventType, VariantMap& eventData);
+    //! Handle rendering window resize
+    void handleWindowResized(StringHash eventType, VariantMap& eventData);
     
     //! Engine
     WeakPtr<Engine> mEngine;

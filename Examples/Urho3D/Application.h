@@ -21,71 +21,30 @@
 // THE SOFTWARE.
 //
 
-#ifndef TEST_APPLICATION_H
-#define TEST_APPLICATION_H
+#ifndef URHO3D_APPLICATION_H
+#define URHO3D_APPLICATION_H
 
 #include "EventListener.h"
 #include "SharedPtr.h"
 
-#include <string>
-#include <vector>
-
-class AnimatedModel;
-class BillboardSet;
-class BorderImage;
-class Camera;
-class Channel;
-class DebugHud;
 class Engine;
-class Entity;
-class Geometry;
-class Light;
-class Material;
-class Model;
-class Node;
-class Octree;
 class ResourceCache;
-class RigidBody;
-class Scene;
-class Song;
-class Sound;
-class Text;
-class Texture2D;
-class TiXmlElement;
-class VolumeNode;
-class XMLFile;
-class Zone;
+class ScriptFile;
 
-class Application : public EventListener
+class Application
 {
 public:
-    Application(const std::vector<std::string>& arguments);
+    Application();
     ~Application();
     
     void run();
-
+    
 private:
     void init();
-    void createScene();
-    void handleUpdate(StringHash eventType, VariantMap& eventData);
-    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    void handleMouseMove(StringHash eventType, VariantMap& eventData);
-    void handleMouseButtonDown(StringHash eventType, VariantMap& eventData);
-    void handleMouseButtonUp(StringHash eventType, VariantMap& eventData);
-    
-    std::vector<std::string> mArguments;
     
     SharedPtr<Engine> mEngine;
     SharedPtr<ResourceCache> mCache;
-    SharedPtr<Scene> mScene;
-    
-    std::vector<Entity*> mAnimatingObjects;
-    std::vector<Entity*> mLights;
-    std::vector<Entity*> mBillboards;
-    Entity* mCameraEntity;
-    
-    SharedPtr<Texture2D> mOcclusionDebugTexture;
-    SharedPtr<BorderImage> mOcclusionDebugImage;
+    SharedPtr<ScriptFile> mScriptFile;
 };
 
-#endif // TEST_APPLICATION_H
+#endif // URHO3D_APPLICATION_H

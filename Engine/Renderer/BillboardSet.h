@@ -93,8 +93,8 @@ public:
     void setScaleBillboards(bool enable);
     //! Set animation LOD bias
     void setAnimationLodBias(float bias);
-    //! Call after changing the billboards. Optionally force update against animation LOD
-    void updated(bool force = false);
+    //! Call after changing the billboards
+    void updated();
     
     //! Return material
     Material* getMaterial() const { return mMaterial; }

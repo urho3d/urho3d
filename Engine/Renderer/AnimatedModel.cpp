@@ -930,6 +930,13 @@ AnimationState* AnimatedModel::getAnimationState(StringHash animationNameHash) c
     return 0;
 }
 
+AnimationState* AnimatedModel::getAnimationState(unsigned index) const
+{
+    if (index >= mAnimationStates.size())
+        return 0;
+    return mAnimationStates[index];
+}
+
 void AnimatedModel::setSkeleton(const Skeleton& skeleton)
 {
     PROFILE(AnimatedModel_SetSkeleton);

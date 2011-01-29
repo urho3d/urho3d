@@ -34,7 +34,7 @@ UIElement::UIElement(const std::string& name) :
     mParent(0),
     mOrigin(0),
     mClipBorder(IntRect::sZero),
-    mHoverColor(Color(0.0f, 0.0f, 0.0f)),
+    mHoverColor(Color(0.0f, 0.0f, 0.0f, 0.0f)),
     mPriority(0),
     mOpacity(1.0f),
     mBringToFront(false),
@@ -712,9 +712,6 @@ XMLElement UIElement::getStyleElement(XMLFile* file, const std::string& typeName
 
 void UIElement::markDirty()
 {
-    if ((mScreenPositionDirty) && (mDerivedOpacityDirty))
-        return;
-    
     mScreenPositionDirty = true;
     mDerivedOpacityDirty = true;
     

@@ -45,6 +45,8 @@ public:
     void update();
     //! Set whether ALT-ENTER fullscreen toggle is enabled
     void setToggleFullscreen(bool enable);
+    //! Suppress the next char message
+    void suppressNextChar();
     
     //! Check if a key is held down
     bool getKeyDown(int key) const;
@@ -105,6 +107,8 @@ private:
     bool mMinimized;
     //! Activated on this frame flag
     bool mActivated;
+    //! Next char message suppress flag
+    bool mSuppressNextChar;
 };
 
 #endif // INPUT_INPUT_H

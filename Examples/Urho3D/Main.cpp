@@ -21,9 +21,8 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Application.h"
 #include "Exception.h"
+#include "Application.h"
 #include "ProcessUtils.h"
 
 #include <windows.h>
@@ -43,7 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     {
         run(cmdLine);
     }
-    __except(writeMiniDump("Test", GetExceptionInformation())) {}
+    __except(writeMiniDump("Urho3D", GetExceptionInformation())) {}
     #else
     run(cmdLine);
     #endif
@@ -53,22 +52,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 
 void run(const char* cmdLine)
 {
-    std::vector<std::string> arguments;
-    getArguments(cmdLine, arguments);
+    parseArguments(cmdLine);
     setExecutableWorkingDirectory();
     
     #if !defined(_MSC_VER) || !defined(_DEBUG)
+    std::string error;
     try
     {
-        Application app(arguments);
-        app.run();
+        Application application;
+        application.run();
     }
     catch (Exception& e)
     {
-        errorDialog("Test", e.whatStr());
+        error = e.whatStr();
     }
+    // Let the rendering window close first before showing the error dialog
+    if (!error.empty())
+        errorDialog("Urho3D", error);
     #else
-    Application app(arguments);
-    app.run();
+    Application application;
+    application.run();
     #endif
 }

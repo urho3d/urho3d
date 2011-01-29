@@ -128,7 +128,7 @@ void ScriptEngine::garbageCollect()
 {
     PROFILE(Script_GarbageCollect);
     
-    mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP);
+    mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP | asGC_DESTROY_GARBAGE | asGC_DETECT_GARBAGE);
 }
 
 void ScriptEngine::setLogMode(ScriptLogMode mode)

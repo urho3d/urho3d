@@ -1,3 +1,5 @@
+// Partial remake of NinjaSnowWar in script
+
 #include "Scripts/Controls.as"
 #include "Scripts/GameObject.as"
 
@@ -15,7 +17,7 @@ float cameraMaxDist = 500;
 float cameraSafetyDist = 30;
 bool paused = false;
 
-void init()
+void start()
 {
     initAudio();
     initConsole();
@@ -24,11 +26,9 @@ void init()
     createOverlays();
     spawnPlayer();
 
-    engine.createDebugHud();
-    debugHud.setFont(cache.getResource("Font", "cour.ttf"), 12);
-
     subscribeToEvent("Update", "handleUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
+    subscribeToEvent("KeyDown", "handleKeyDown");
 }
 
 void runFrame()
@@ -52,6 +52,9 @@ void initAudio()
 
 void initConsole()
 {
+    if (engine.isHeadless())
+        return;
+
     Console@ console = engine.createConsole();
     console.setNumRows(16);
     console.setFont(cache.getResource("Font", "cour.ttf"), 12);
@@ -59,11 +62,14 @@ void initConsole()
     cursor.setWidth(4);
     cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
     cursor.setImageRect(112, 0, 116, 16);
+
+    engine.createDebugHud();
+    debugHud.setFont(cache.getResource("Font", "cour.ttf"), 12);
 }
 
 void initScene()
 {
-    @gameScene = engine.createScene("ScriptTest", BoundingBox(-100000.0, 100000.0), 8, true);
+    @gameScene = engine.createScene("NSWScript", BoundingBox(-100000.0, 100000.0), 8, true);
 
     File@ levelFile = cache.getFile("TestLevel.xml");
     gameScene.loadXML(levelFile);
@@ -73,7 +79,8 @@ void createCamera()
 {
     Entity@ cameraEntity = gameScene.createEntity("Camera");
     @gameCamera = cameraEntity.createComponent("Camera");
-    gameCamera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
+    if (!engine.isHeadless())
+        gameCamera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
     gameCamera.setNearClip(10.0);
     gameCamera.setFarClip(16000.0);
     gameCamera.setPosition(Vector3(0, 200, -1000));
@@ -81,6 +88,9 @@ void createCamera()
 
 void createOverlays()
 {
+    if (engine.isHeadless())
+        return;
+
     BorderImage@ sight = BorderImage();
     sight.setTexture(cache.getResource("Texture2D", "Textures/Sight.png"));
     sight.setAlignment(HA_CENTER, VA_CENTER);
@@ -141,8 +151,6 @@ void spawnPlayer()
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (input.getKeyPress(220))
-        console.toggle();
     if (input.getKeyPress(KEY_F1))
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
@@ -232,4 +240,14 @@ void updateCamera()
 
     audio.setListenerPosition(pos);
     audio.setListenerRotation(dir);
+}
+
+void handleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    // Check for toggling the console
+    if (eventData["Key"].getInt() == 220)
+    {
+        console.toggle();
+        input.suppressNextChar();
+    }
 }

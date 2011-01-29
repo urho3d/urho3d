@@ -577,7 +577,7 @@ bool CScriptArray::GetFlag()
 // Registers the template array type
 void registerArray(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("array<class T>", 0, asOBJ_REF | asOBJ_TEMPLATE);
+    engine->RegisterObjectType("array<class T>", 0, asOBJ_REF | asOBJ_GC | asOBJ_TEMPLATE);
     engine->RegisterObjectBehaviour("array<T>", asBEHAVE_TEMPLATE_CALLBACK, "bool f(int&in)", asFUNCTION(ScriptArrayTemplateCallback), asCALL_CDECL);
     engine->RegisterObjectBehaviour("array<T>", asBEHAVE_FACTORY, "array<T>@ f(int& in)", asFUNCTIONPR(ScriptArrayFactory, (asIObjectType*), CScriptArray*), asCALL_CDECL);
     engine->RegisterObjectBehaviour("array<T>", asBEHAVE_FACTORY, "array<T>@ f(int& in, uint)", asFUNCTIONPR(ScriptArrayFactory2, (asIObjectType*, asUINT), CScriptArray*), asCALL_CDECL);
@@ -594,10 +594,10 @@ void registerArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("array<T>", "void removeLast()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "uint length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
-    //engine->RegisterObjectBehaviour("array<T>", asBEHAVE_GETREFCOUNT, "int f()", asMETHOD(CScriptArray, GetRefCount), asCALL_THISCALL);
-    //engine->RegisterObjectBehaviour("array<T>", asBEHAVE_SETGCFLAG, "void f()", asMETHOD(CScriptArray, SetFlag), asCALL_THISCALL);
-    //engine->RegisterObjectBehaviour("array<T>", asBEHAVE_GETGCFLAG, "bool f()", asMETHOD(CScriptArray, GetFlag), asCALL_THISCALL);
-    //engine->RegisterObjectBehaviour("array<T>", asBEHAVE_ENUMREFS, "void f(int& in)", asMETHOD(CScriptArray, EnumReferences), asCALL_THISCALL);
-    //engine->RegisterObjectBehaviour("array<T>", asBEHAVE_RELEASEREFS, "void f(int& in)", asMETHOD(CScriptArray, ReleaseAllHandles), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("array<T>", asBEHAVE_GETREFCOUNT, "int f()", asMETHOD(CScriptArray, GetRefCount), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("array<T>", asBEHAVE_SETGCFLAG, "void f()", asMETHOD(CScriptArray, SetFlag), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("array<T>", asBEHAVE_GETGCFLAG, "bool f()", asMETHOD(CScriptArray, GetFlag), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("array<T>", asBEHAVE_ENUMREFS, "void f(int& in)", asMETHOD(CScriptArray, EnumReferences), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("array<T>", asBEHAVE_RELEASEREFS, "void f(int& in)", asMETHOD(CScriptArray, ReleaseAllHandles), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("array<T>");
 }

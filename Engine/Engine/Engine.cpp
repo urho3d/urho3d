@@ -44,6 +44,7 @@
 #include "PhysicsResourceFactory.h"
 #include "PhysicsWorld.h"
 #include "Pipeline.h"
+#include "ProcessUtils.h"
 #include "Profiler.h"
 #include "RegisterLibraries.h"
 #include "Renderer.h"
@@ -65,7 +66,8 @@
 
 Engine* Engine::sInstance = 0;
 
-Engine::Engine(const std::string& logFileName, bool headless) :
+Engine::Engine(const std::string& windowTitle, const std::string& logFileName, bool headless) :
+    mWindowTitle(windowTitle),
     mMinFps(10),
     mMaxFps(200),
     mMaxInactiveFps(50),
@@ -118,12 +120,12 @@ Engine::~Engine()
         sInstance = 0;
 }
 
-void Engine::init(const std::string& windowTitle, const std::vector<std::string>& arguments)
+void Engine::init(const std::vector<std::string>& arguments)
 {
-    PROFILE(Engine_Init);
-    
     if (mInitialized)
         return;
+    
+    PROFILE(Engine_Init);
     
     RenderMode mode = RENDER_DEFERRED;
     int width = 0;
@@ -132,6 +134,7 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
     bool fullscreen = true;
     bool vsync = false;
     bool forceSM2 = false;
+    bool shadows = true;
     
     int mixRate = 44100;
     int buffer = 100;
@@ -146,7 +149,11 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
         {
             std::string argument = toLower(arguments[i].substr(1));
             
-            if (argument == "nosound")
+            if (argument == "headless")
+                mHeadless = true;
+            else if (argument == "nolimit")
+                setMaxFps(0);
+            else if (argument == "nosound")
                 sound = false;
             else if (argument == "noip")
                 interpolate = false;
@@ -160,6 +167,8 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
                 mode = RENDER_PREPASS;
             else if (argument == "forward")
                 mode = RENDER_FORWARD;
+            else if (argument == "noshadows")
+                shadows = false;
             else if (argument == "sm2")
                 forceSM2 = true;
             else
@@ -209,7 +218,7 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
     
     if (!mHeadless)
     {
-        mRenderer = new Renderer(windowTitle);
+        mRenderer = new Renderer(mWindowTitle);
         mRenderer->setForceSM2(forceSM2);
         mRenderer->setMode(mode, width, height, fullscreen, vsync, multiSample);
         
@@ -219,6 +228,8 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
     }
     else
     {
+        // Open console window for the log
+        openConsoleWindow();
         // Create the audio system also in headless mode so that length of sound effects can be "simulated"
         mAudio = new Audio((int)INVALID_HANDLE_VALUE);
     }
@@ -242,6 +253,8 @@ void Engine::init(const std::string& windowTitle, const std::vector<std::string>
         mDebugRenderer = new DebugRenderer(mRenderer, mCache);
         mPipeline = new Pipeline(mRenderer, mCache);
         mUI = new UI(mRenderer, mCache);
+        if (!shadows)
+            mPipeline->setDrawShadows(false);
     }
     
     mInitialized = true;
@@ -565,10 +578,6 @@ void Engine::update(float timeStep, Scene* scene, Camera* camera, bool updateSce
     
     // Audio update
     mAudio->update(timeStep);
-    
-    // Script garbage collection
-    if (mScriptEngine)
-        mScriptEngine->garbageCollect();
 }
 
 void Engine::render()

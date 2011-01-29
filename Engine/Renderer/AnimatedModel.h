@@ -110,12 +110,16 @@ public:
     const Skeleton& getSkeleton() const { return mSkeleton; }
     //! Return all animation states
     const std::vector<AnimationState*>& getAnimationStates() const { return mAnimationStates; }
+    //! Return number of animation states
+    unsigned getNumAnimationStates() const { return mAnimationStates.size(); }
     //! Return animation state by animation pointer
     AnimationState* getAnimationState(Animation* animation) const;
     //! Return animation state by animation name
     AnimationState* getAnimationState(const std::string& animationName) const;
     //! Return animation state by animation name hash
     AnimationState* getAnimationState(const StringHash animationNameHash) const;
+    //! Return animation state by index
+    AnimationState* getAnimationState(unsigned index) const;
     //! Return animation LOD bias
     float getAnimationLodBias() const { return mAnimationLodBias; }
     //! Return all vertex morphs

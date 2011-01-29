@@ -34,7 +34,9 @@ void openConsoleWindow();
 //! Display an error dialog with the specified title and message
 void errorDialog(const std::string& title, const std::string& message);
 //! Parse arguments from a command line
-void getArguments(const char* cmdLine, std::vector<std::string>& arguments);
+void parseArguments(const char* cmdLine);
+//! Return previously parsed arguments
+const std::vector<std::string>& getArguments();
 //! Read input from the console window. Return false if there was no input
 bool getConsoleInput(std::string& line);
 //! Return the user's document directory which should have read/write access for writing logs, savegames etc.
