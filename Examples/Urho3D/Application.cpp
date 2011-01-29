@@ -32,6 +32,7 @@
 #include "ResourceCache.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
+#include "StringUtils.h"
 
 #include "DebugNew.h"
 
@@ -61,7 +62,7 @@ void Application::run()
             EXCEPTION("Failed to execute the runFrame() function");
         
         // Script garbage collection
-        mEngine->getScriptEngine()->garbageCollect();
+        mEngine->getScriptEngine()->garbageCollect(false);
     }
 }
 
@@ -70,7 +71,7 @@ void Application::init()
     const std::vector<std::string>& arguments = getArguments();
     std::string scriptFileName;
     if ((arguments.size()) && (arguments[0][0] != '-'))
-        scriptFileName = arguments[0];
+        scriptFileName = replace(arguments[0], '\\', '/');
     if (scriptFileName.empty())
         EXCEPTION("Usage: Urho3D <scriptfile> [options]\n\n"
             "The script file should implement the functions void start() and void runFrame(). See the readme for options.\n");

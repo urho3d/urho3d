@@ -22,7 +22,9 @@
 //
 
 #include "Precompiled.h"
+#include "Engine.h"
 #include "RegisterTemplates.h"
+#include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
@@ -87,8 +89,28 @@ static void registerScriptInstance(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
 }
 
+static bool ScriptEngineExecute(const std::string& line)
+{
+    ScriptEngine* scriptEngine = getEngine()->getScriptEngine();
+    return scriptEngine->execute(line);
+}
+
+static void ScriptEngineGarbageCollect()
+{
+    ScriptEngine* scriptEngine = getEngine()->getScriptEngine();
+    // Perform a full cycle
+    scriptEngine->garbageCollect(true);
+}
+
+static void registerScriptEngine(asIScriptEngine* engine)
+{
+    engine->RegisterGlobalFunction("bool execute(const string& in)", asFUNCTION(ScriptEngineExecute), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void garbageCollect()", asFUNCTION(ScriptEngineGarbageCollect), asCALL_CDECL);
+}
+
 void registerScriptLibrary(asIScriptEngine* engine)
 {
     registerScriptFile(engine);
     registerScriptInstance(engine);
+    registerScriptEngine(engine);
 }

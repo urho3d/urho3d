@@ -52,7 +52,7 @@ public:
     //! Compile and execute a line of script
     bool execute(const std::string& line);
     //! Perform garbage collection
-    void garbageCollect();
+    void garbageCollect(bool fullCycle);
     //! Set script engine logging mode, immediate is default
     void setLogMode(ScriptLogMode mode);
     //! Clear retained mode log messages
