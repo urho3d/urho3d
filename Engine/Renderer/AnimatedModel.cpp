@@ -607,18 +607,15 @@ void AnimatedModel::drawDebugGeometry(DebugRenderer* debug)
     debug->addSkeleton(mSkeleton, Color(0.75f, 0.75f, 0.75f), false);
 }
 
-bool AnimatedModel::setModel(Model* model)
+void AnimatedModel::setModel(Model* model)
 {
     if (model == mModel)
-        return true;
+        return;
     
     PROFILE(AnimatedModel_SetModel);
     
     if (!model)
-    {
-        LOGERROR("Null model for AnimatedModel");
-        return false;
-    }
+        return;
     
     mModel = model;
     
@@ -658,8 +655,6 @@ bool AnimatedModel::setModel(Model* model)
     // Copy bounding box & skeleton
     setBoundingBox(model->getBoundingBox());
     setSkeleton(model->getSkeleton());
-    
-    return true;
 }
 
 AnimationState* AnimatedModel::addAnimationState(Animation* animation)
@@ -668,10 +663,7 @@ AnimationState* AnimatedModel::addAnimationState(Animation* animation)
         return 0;
     
     if (!mSkeleton.getNumBones())
-    {
-        LOGERROR("Animations can not be added to a model without skeleton");
         return 0;
-    }
     
     // Check for not adding twice
     AnimationState* existing = getAnimationState(animation);

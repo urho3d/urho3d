@@ -189,7 +189,7 @@ void Variant::read(Deserializer& source)
 void Variant::setBuffer(const void* data, unsigned size)
 {
     if ((size) && (!data))
-        EXCEPTION("Null Variant buffer source");
+        SAFE_EXCEPTION("Null Variant buffer source");
     
     mType = VAR_BUFFER;
     mValue.mBuffer.resize(size);

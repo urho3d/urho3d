@@ -224,15 +224,24 @@ void ResourceCache::releaseResources(ShortStringHash type, const std::string& pa
         updateResourceGroup(type);
 }
 
-void ResourceCache::reloadResource(Resource* resource)
+bool ResourceCache::reloadResource(Resource* resource)
 {
     if (!resource)
-        return;
+        return false;
     
-    SharedPtr<File> file = getFile(resource->getName());
-    resource->load(*(file.getPtr()), this);
-    resource->resetUseTimer();
-    updateResourceGroup(resource->getType());
+    try
+    {
+        SharedPtr<File> file = getFile(resource->getName());
+        resource->load(*(file.getPtr()), this);
+        resource->resetUseTimer();
+        updateResourceGroup(resource->getType());
+        return true;
+    }
+    catch (...)
+    {
+        releaseResource(resource->getType(), resource->getNameHash());
+        return false;
+    }
 }
 
 void ResourceCache::setMemoryBudget(ShortStringHash type, unsigned budget)
@@ -275,7 +284,7 @@ Resource* ResourceCache::getResource(ShortStringHash type, const std::string& na
 
 Resource* ResourceCache::getResource(ShortStringHash type, StringHash nameHash)
 {
-    // Special case: null hash is allowed to return null pointer to simplify resource loading code
+    // If null hash, return null pointer immediately
     if (!nameHash)
         return 0;
     
@@ -294,20 +303,30 @@ Resource* ResourceCache::getResource(ShortStringHash type, StringHash nameHash)
     }
     
     if (!resource)
-        EXCEPTION("Could not load unknown resource type " + toString(type));
+    {
+        LOGERROR("Could not load unknown resource type " + toString(type));
+        return 0;
+    }
     
     LOGDEBUG("Loading resource " + name);
     
     // Attempt to load the resource
-    SharedPtr<File> file = getFile(name);
-    resource->load(*(file.getPtr()), this);
-    resource->resetUseTimer();
-    
-    // Store to cache
-    mResourceGroups[type].mResources[nameHash] = resource;
-    updateResourceGroup(type);
-    
-    return mResourceGroups[type].mResources[nameHash];
+    try
+    {
+        SharedPtr<File> file = getFile(name);
+        resource->load(*(file.getPtr()), this);
+        resource->resetUseTimer();
+        
+        // Store to cache
+        mResourceGroups[type].mResources[nameHash] = resource;
+        updateResourceGroup(type);
+        
+        return mResourceGroups[type].mResources[nameHash];
+    }
+    catch (...)
+    {
+        return 0;
+    }
 }
 
 std::vector<Resource*> ResourceCache::getResources(ShortStringHash type)

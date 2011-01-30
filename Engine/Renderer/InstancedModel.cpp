@@ -534,18 +534,15 @@ bool InstancedModel::drawOcclusion(OcclusionBuffer* buffer)
     return success;
 }
 
-bool InstancedModel::setModel(Model* model)
+void InstancedModel::setModel(Model* model)
 {
+    if (model == mModel)
+        return;
+    
     PROFILE(InstancedModel_SetModel);
     
     if (!model)
-    {
-        LOGERROR("Null model for InstancedModel");
-        return false;
-    }
-    
-    if (model == mModel)
-        return true;
+        return;
     
     mModel = model;
     mOriginalGeometries.clear();
@@ -563,8 +560,6 @@ bool InstancedModel::setModel(Model* model)
     setBoundingBox(model->getBoundingBox());
     markInstancesDirty();
     resetLodLevels();
-    
-    return true;
 }
 
 void InstancedModel::setMaterial(Material* material)

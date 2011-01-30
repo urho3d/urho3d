@@ -84,16 +84,16 @@ public:
     void releaseResources(ShortStringHash type, bool force = false);
     //! Release resources of a specific type and partial name
     void releaseResources(ShortStringHash type, const std::string& partialName, bool force = false);
-    //! Reload a resource
-    void reloadResource(Resource* resource);
+    //! Reload a resource. Return false and release it if fails
+    bool reloadResource(Resource* resource);
     //! Set memory budget for a specific resource type, default 0 is unlimited
     void setMemoryBudget(ShortStringHash type, unsigned budget);
     
     //! Open and return a file from either the resource load paths or from inside a package file. Throw an exception if fails
     SharedPtr<File> getFile(const std::string& name);
-    //! Return a resource by type and name. Load if not loaded yet. Throw an exception if fails
+    //! Return a resource by type and name. Load if not loaded yet. Return null if fails
     Resource* getResource(ShortStringHash type, const std::string& name);
-    //! Return a resource by type and name hash. Load if not loaded yet. Throw an exception if fails
+    //! Return a resource by type and name hash. Load if not loaded yet. Return null if fails
     Resource* getResource(ShortStringHash type, StringHash nameHash);
     //! Return all resources of a specific type
     std::vector<Resource*> getResources(ShortStringHash type);

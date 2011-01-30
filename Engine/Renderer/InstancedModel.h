@@ -88,7 +88,7 @@ public:
     virtual bool drawOcclusion(OcclusionBuffer* buffer);
     
     //! Set model
-    bool setModel(Model* model);
+    void setModel(Model* model);
     //! Set material on all geometries
     void setMaterial(Material* material);
     //! Set material on one geometry

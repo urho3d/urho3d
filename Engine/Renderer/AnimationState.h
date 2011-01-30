@@ -54,8 +54,6 @@ public:
     void saveXML(XMLElement& element);
     //! Read state from an XML element
     void loadXML(const XMLElement& element);
-    //! Set animation
-    void setAnimation(Animation* animation);
     //! Set start bone
     void setStartBone(Bone* startBone);
     //! Set looping enabled/disabled

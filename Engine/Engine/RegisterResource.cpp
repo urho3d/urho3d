@@ -35,14 +35,7 @@ void registerResource(asIScriptEngine* engine)
 
 static Resource* ResourceCacheGetResource(const std::string& type, const std::string& name, ResourceCache* ptr)
 {
-    try
-    {
-        return ptr->getResource(ShortStringHash(type), name);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW_RET(e, 0);
-    }
+    return ptr->getResource(ShortStringHash(type), name);
 }
 
 static File* ResourceCacheGetFile(const std::string& name, ResourceCache* ptr)
@@ -75,18 +68,6 @@ static void ResourceCacheReleaseResources(const std::string& type, bool force, R
 static void ResourceCacheReleaseResourcesPartial(const std::string& type, const std::string& partialName, bool force, ResourceCache* ptr)
 {
     ptr->releaseResources(ShortStringHash(type), partialName, force);
-}
-
-static void ResourceCacheReloadResource(Resource* resource, ResourceCache* ptr)
-{
-    try
-    {
-        return ptr->reloadResource(resource);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
 }
 
 static void ResourceCacheSetMemoryBudget(const std::string& type, unsigned budget, ResourceCache* ptr)
@@ -122,7 +103,7 @@ static void registerResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "void releaseResource(const string& in, const string& in, bool)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void releaseResources(const string& in, bool)", asFUNCTION(ResourceCacheReleaseResources), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void releaseResources(const string& in, const string& in, bool)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void reloadResource(Resource@+)", asFUNCTION(ResourceCacheReloadResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "bool reloadResource(Resource@+)", asMETHOD(ResourceCache, reloadResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void setMemoryBudget(const string& in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "bool exists(const string& in) const", asMETHODPR(ResourceCache, exists, (const std::string&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "File@ getFile(const string& in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);

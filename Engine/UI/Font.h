@@ -84,7 +84,7 @@ public:
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     
-    //! Return font face. Pack and render to a texture if not rendered yet. Throw exception on error
+    //! Return font face. Pack and render to a texture if not rendered yet. Return empty face on error
     const FontFace* getFace(int pointSize);
     
 private:

@@ -380,7 +380,7 @@ void Material::load(Deserializer& source, ResourceCache* cache)
             TextureUnit unit = TU_DIFFUSE;
             if (textureElem.hasAttribute("unit"))
             {
-                const std::string unitName = textureElem.getStringLower("unit");
+                std::string unitName = textureElem.getStringLower("unit");
                 unit = (TextureUnit)getIndexFromStringList(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS,
                     MAX_MATERIAL_TEXTURE_UNITS);
                 if (unitName == "diff")
@@ -392,14 +392,17 @@ void Material::load(Deserializer& source, ResourceCache* cache)
                 if (unitName == "env")
                     unit = TU_ENVIRONMENT;
                 if (unit == MAX_MATERIAL_TEXTURE_UNITS)
-                    EXCEPTION("Unknown texture unit " + unitName);
+                    LOGERROR("Unknown texture unit " + unitName);
             }
-            std::string name = textureElem.getString("name");
-            // Detect cube maps by file extension: they are defined by an XML file
-            if (getExtension(name) == ".xml")
-                newTechnique.setTexture(unit, cache->getResource<TextureCube>(name));
-            else
-                newTechnique.setTexture(unit, cache->getResource<Texture2D>(name));
+            if (unit != MAX_MATERIAL_TEXTURE_UNITS)
+            {
+                std::string name = textureElem.getString("name");
+                // Detect cube maps by file extension: they are defined by an XML file
+                if (getExtension(name) == ".xml")
+                    newTechnique.setTexture(unit, cache->getResource<TextureCube>(name));
+                else
+                    newTechnique.setTexture(unit, cache->getResource<Texture2D>(name));
+            }
             textureElem = textureElem.getNextElement("texture");
         }
         
@@ -417,7 +420,7 @@ void Material::load(Deserializer& source, ResourceCache* cache)
                 if (psParam != MAX_PS_PARAMETERS)
                     newTechnique.setPixelShaderParameter(psParam, value);
                 else
-                    EXCEPTION("Unknown shader parameter " + name);
+                    LOGERROR("Unknown shader parameter " + name);
             }
             
             parameterElem = parameterElem.getNextElement("parameter");
@@ -436,53 +439,56 @@ void Material::load(Deserializer& source, ResourceCache* cache)
                 if (name == "custom")
                     type = PASS_POSTOPAQUE;
                 if (type == MAX_PASSES)
-                    EXCEPTION("Unknown pass " + name);
+                    LOGERROR("Unknown pass " + name);
             }
             else
-                EXCEPTION("Missing pass name");
+                LOGERROR("Missing pass name");
             
-            MaterialPass& newPass = *newTechnique.createPass(type);
-            
-            if (passElem.hasAttribute("vs"))
-                newPass.setVertexShader(passElem.getString("vs"));
-            
-            if (passElem.hasAttribute("ps"))
-                newPass.setPixelShader(passElem.getString("ps"));
-            
-            if (passElem.hasAttribute("alphamask"))
-                newPass.setAlphaMask(passElem.getBool("alphamask"));
-            
-            if (passElem.hasAttribute("alphatest"))
-                newPass.setAlphaTest(passElem.getBool("alphatest"));
-            
-            if (passElem.hasAttribute("blend"))
+            if (type != MAX_PASSES)
             {
-                std::string blend = passElem.getStringLower("blend");
-                newPass.setBlendMode((BlendMode)getIndexFromStringList(blend, blendModeNames, MAX_BLENDMODES, BLEND_REPLACE));
+                MaterialPass& newPass = *newTechnique.createPass(type);
+                
+                if (passElem.hasAttribute("vs"))
+                    newPass.setVertexShader(passElem.getString("vs"));
+                
+                if (passElem.hasAttribute("ps"))
+                    newPass.setPixelShader(passElem.getString("ps"));
+                
+                if (passElem.hasAttribute("alphamask"))
+                    newPass.setAlphaMask(passElem.getBool("alphamask"));
+                
+                if (passElem.hasAttribute("alphatest"))
+                    newPass.setAlphaTest(passElem.getBool("alphatest"));
+                
+                if (passElem.hasAttribute("blend"))
+                {
+                    std::string blend = passElem.getStringLower("blend");
+                    newPass.setBlendMode((BlendMode)getIndexFromStringList(blend, blendModeNames, MAX_BLENDMODES, BLEND_REPLACE));
+                }
+                
+                if (passElem.hasAttribute("cull"))
+                {
+                    std::string cull = passElem.getStringLower("cull");
+                    newPass.setCullMode((CullMode)getIndexFromStringList(cull, cullModeNames, MAX_CULLMODES, CULL_CCW));
+                }
+                
+                if (passElem.hasAttribute("depthtest"))
+                {
+                    std::string depthTest = passElem.getStringLower("depthtest");
+                    if (depthTest == "false")
+                        newPass.setDepthTestMode(CMP_ALWAYS);
+                    else
+                        newPass.setDepthTestMode((CompareMode)getIndexFromStringList(depthTest, compareModeNames, MAX_COMPAREMODES,
+                            CMP_LESSEQUAL));
+                }
+                
+                if (passElem.hasAttribute("depthwrite"))
+                    newPass.setDepthWrite(passElem.getBool("depthwrite"));
+                
+                // Undefine a pass by setting empty vertex or pixel shader name
+                if ((newPass.getVertexShaderName().empty()) || (newPass.getPixelShaderName().empty()))
+                    newTechnique.removePass(type);
             }
-            
-            if (passElem.hasAttribute("cull"))
-            {
-                std::string cull = passElem.getStringLower("cull");
-                newPass.setCullMode((CullMode)getIndexFromStringList(cull, cullModeNames, MAX_CULLMODES, CULL_CCW));
-            }
-            
-            if (passElem.hasAttribute("depthtest"))
-            {
-                std::string depthTest = passElem.getStringLower("depthtest");
-                if (depthTest == "false")
-                    newPass.setDepthTestMode(CMP_ALWAYS);
-                else
-                    newPass.setDepthTestMode((CompareMode)getIndexFromStringList(depthTest, compareModeNames, MAX_COMPAREMODES,
-                        CMP_LESSEQUAL));
-            }
-            
-            if (passElem.hasAttribute("depthwrite"))
-                newPass.setDepthWrite(passElem.getBool("depthwrite"));
-            
-            // Undefine a pass by setting empty vertex or pixel shader name
-            if ((newPass.getVertexShaderName().empty()) || (newPass.getPixelShaderName().empty()))
-                newTechnique.removePass(type);
             
             passElem = passElem.getNextElement("pass");
         }

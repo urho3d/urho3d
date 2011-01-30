@@ -589,7 +589,7 @@ static void registerZone(asIScriptEngine* engine)
 static void registerStaticModel(asIScriptEngine* engine)
 {
     registerGeometryNode<StaticModel>(engine, "StaticModel");
-    engine->RegisterObjectMethod("StaticModel", "bool setModel(Model@+)", asMETHOD(StaticModel, setModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StaticModel", "void setModel(Model@+)", asMETHOD(StaticModel, setModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "void setMaterial(Material@+)", asMETHODPR(StaticModel, setMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "bool setMaterial(uint, Material@+)", asMETHODPR(StaticModel, setMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("StaticModel", "const BoundingBox& getBoundingBox() const", asMETHOD(StaticModel, getBoundingBox), asCALL_THISCALL);
@@ -603,7 +603,7 @@ static void registerStaticModel(asIScriptEngine* engine)
 static void registerSkybox(asIScriptEngine* engine)
 {
     registerGeometryNode<Skybox>(engine, "Skybox");
-    engine->RegisterObjectMethod("Skybox", "bool setModel(Model@+)", asMETHOD(Skybox, setModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skybox", "void setModel(Model@+)", asMETHOD(Skybox, setModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "void setMaterial(Material@+)", asMETHODPR(Skybox, setMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "bool setMaterial(uint, Material@+)", asMETHODPR(Skybox, setMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skybox", "const BoundingBox& getBoundingBox() const", asMETHOD(Skybox, getBoundingBox), asCALL_THISCALL);
@@ -662,7 +662,7 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "bool getUseNlerp() const", asMETHOD(AnimationState, getUseNlerp), asCALL_THISCALL);
     
     registerGeometryNode<AnimatedModel>(engine, "AnimatedModel");
-    engine->RegisterObjectMethod("AnimatedModel", "bool setModel(Model@+)", asMETHOD(AnimatedModel, setModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void setModel(Model@+)", asMETHOD(AnimatedModel, setModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void setMaterial(Material@+)", asMETHODPR(AnimatedModel, setMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "bool setMaterial(uint, Material@+)", asMETHODPR(AnimatedModel, setMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "const BoundingBox& getBoundingBox() const", asMETHOD(AnimatedModel, getBoundingBox), asCALL_THISCALL);
@@ -735,7 +735,7 @@ static void registerInstancedModel(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Instance", "Vector3 scale", offsetof(Instance, mScale));
     
     registerGeometryNode<InstancedModel>(engine, "InstancedModel");
-    engine->RegisterObjectMethod("InstancedModel", "bool setModel(Model@+)", asMETHOD(InstancedModel, setModel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("InstancedModel", "void setModel(Model@+)", asMETHOD(InstancedModel, setModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("InstancedModel", "void setMaterial(Material@+)", asMETHODPR(InstancedModel, setMaterial, (Material*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("InstancedModel", "bool setMaterial(uint, Material@+)", asMETHODPR(InstancedModel, setMaterial, (unsigned, Material*), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("InstancedModel", "void setNumInstances(uint)", asMETHOD(InstancedModel, setNumInstances), asCALL_THISCALL);

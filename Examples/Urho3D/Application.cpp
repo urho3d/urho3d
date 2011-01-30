@@ -46,10 +46,14 @@ Application::Application()
 
 Application::~Application()
 {
-    // The scripts hold references to engine subsystems, not releasing them shows up as numerous memory leaks
-    mScriptFile.reset();
-    if (mCache)
+    // The scripts possibly hold references to engine subsystems, not releasing them shows up as numerous memory leaks
+    if (mEngine)
+    {
+        mScriptFile.reset();
         mCache->releaseResources(ShortStringHash("ScriptFile"), true);
+        // Perform a full garbage collection before shutdown
+        mEngine->getScriptEngine()->garbageCollect(true);
+    }
 }
 
 void Application::run()

@@ -77,7 +77,7 @@ public:
     virtual void drawDebugGeometry(DebugRenderer* debug);
     
     //! Set model
-    bool setModel(Model* model);
+    void setModel(Model* model);
     //! Add an animation
     AnimationState* addAnimationState(Animation* animation);
     //! Remove an animation by animation pointer

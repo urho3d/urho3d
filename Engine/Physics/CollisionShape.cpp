@@ -373,15 +373,12 @@ void CollisionShape::load(Deserializer& source, ResourceCache* cache)
         
         if (type == "box")
         {
-            Vector3 size;
+            Vector3 size = Vector3::sZero;
             
             if (shapeElem.hasAttribute("size"))
                 size = shapeElem.getVector3("size");
             else if (shapeElem.hasAttribute("halfsize"))
                 size = shapeElem.getVector3("halfsize") * 2.0f;
-            else
-                EXCEPTION("Box without size defined");
-            
             addBox(size, position, rotation);
         }
         
@@ -491,7 +488,10 @@ void CollisionShape::addTriangleMesh(const Model* model, unsigned lodLevel, cons
     PROFILE(Physics_AddTriangleMesh);
     
     if (!model)
-        EXCEPTION("Null model for addTriangleMesh");
+    {
+        LOGERROR("Null model for addTriangleMesh");
+        return;
+    }
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_TRIANGLEMESH;
@@ -520,7 +520,10 @@ void CollisionShape::addHeightfield(const Model* model, unsigned xPoints, unsign
     PROFILE(Physics_AddTriangleMesh);
     
     if (!model)
-        EXCEPTION("Null model for addHeightField");
+    {
+        LOGERROR("Null model for addHeightField");
+        return;
+    }
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_HEIGHTFIELD;
@@ -549,7 +552,10 @@ void CollisionShape::addConvexHull(const Model* model, float skinWidth, unsigned
     PROFILE(Physics_AddConvexHull);
     
     if (!model)
-        EXCEPTION("Null model for addConvexHull");
+    {
+        LOGERROR("Null model for addConvexHull");
+        return;
+    }
     
     CollisionSubShape newShape;
     newShape.mType = SHAPE_TRIANGLEMESH;

@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Log.h"
 #include "Material.h"
 #include "ParticleEmitter.h"
 #include "Profiler.h"
@@ -382,7 +383,7 @@ void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
         else if (type == "sphere")
             mEmitterType = EMITTER_SPHERE;
         else
-            EXCEPTION("Unknown particle emitter type " + type);
+            LOGERROR("Unknown particle emitter type " + type);
     }
     
     if (rootElem.hasChildElement("emittersize"))

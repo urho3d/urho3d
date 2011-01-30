@@ -41,7 +41,18 @@ AnimationState::AnimationState(AnimatedModel* node, Animation* animation) :
     mUseNlerp(false),
     mInterpolationFlags(0)
 {
-    setAnimation(animation);
+    if (!node)
+        EXCEPTION("Null node for AnimationState");
+    if (!animation)
+        EXCEPTION("Null animation for AnimationState");
+    
+    mAnimation = animation;
+    setStartBone(0);
+    
+    // Setup a cache for last keyframe of each track
+    mLastKeyFrame.resize(mAnimation->getNumTracks());
+    for (unsigned i = 0; i < mLastKeyFrame.size(); ++i)
+        mLastKeyFrame[i] = 0;
 }
 
 AnimationState::~AnimationState()
@@ -107,20 +118,6 @@ void AnimationState::loadXML(const XMLElement& element)
     setTime(element.getFloat("time"));
     setPriority(element.getInt("priority"));
     setUseNlerp(element.getBool("nlerp"));
-}
-
-void AnimationState::setAnimation(Animation* animation)
-{
-    if (!animation)
-        EXCEPTION("Null animation for AnimationState");
-    
-    mAnimation = animation;
-    setStartBone(0);
-    
-    // Setup a cache for last keyframe of each track
-    mLastKeyFrame.resize(mAnimation->getNumTracks());
-    for (unsigned i = 0; i < mLastKeyFrame.size(); ++i)
-        mLastKeyFrame[i] = 0;
 }
 
 void AnimationState::setStartBone(Bone* startBone)

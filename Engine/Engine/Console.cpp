@@ -171,15 +171,9 @@ void Console::updateElements()
     
     if (mFont)
     {
-        try
-        {
-            for (unsigned i = 0; i < mRows.size(); ++i)
-                mRows[i]->setFont(mFont, mFontSize);
-            mLineEdit->getTextElement()->setFont(mFont, mFontSize);
-        }
-        catch (...)
-        {
-        }
+        for (unsigned i = 0; i < mRows.size(); ++i)
+            mRows[i]->setFont(mFont, mFontSize);
+        mLineEdit->getTextElement()->setFont(mFont, mFontSize);
     }
     
     mLineEdit->setWidth(width - 8);

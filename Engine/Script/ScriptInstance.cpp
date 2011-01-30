@@ -261,15 +261,11 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
     
     releaseObject();
     
-    if ((!scriptFile) || (className.empty()))
-    {
-        mScriptFile.reset();
-        mClassName = std::string();
-        return true;
-    }
-    
     mScriptFile = scriptFile;
     mClassName = className;
+    
+    if ((!mScriptFile) && (mClassName.empty()))
+        return true;
     
     return createObject();
 }
@@ -316,7 +312,15 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
 bool ScriptInstance::createObject()
 {
     if (!mScriptFile)
+    {
+        LOGERROR("Null script file for ScriptInstance");
         return false;
+    }
+    if (mClassName.empty())
+    {
+        LOGERROR("Empty script class name");
+        return false;
+    }
     
     mScriptObject = mScriptFile->createObject(mClassName);
     if (mScriptObject)

@@ -299,18 +299,15 @@ bool StaticModel::drawOcclusion(OcclusionBuffer* buffer)
     return success;
 }
 
-bool StaticModel::setModel(Model* model)
+void StaticModel::setModel(Model* model)
 {
+    if (model == mModel)
+        return;
+      
     PROFILE(StaticModel_SetModel);
     
     if (!model)
-    {
-        LOGERROR("Null model for StaticModel");
-        return false;
-    }
-    
-    if (model == mModel)
-        return true;
+        return;
     
     mModel = model;
     
@@ -322,8 +319,6 @@ bool StaticModel::setModel(Model* model)
     
     setBoundingBox(model->getBoundingBox());
     resetLodLevels();
-    
-    return true;
 }
 
 void StaticModel::setMaterial(Material* material)

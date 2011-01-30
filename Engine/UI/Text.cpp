@@ -87,18 +87,7 @@ bool Text::setFont(Font* font, int size)
     
     mFont = font;
     mFontSize = max(size, 1);
-    
-    // Catch exception if executed from script
-    try
-    {
-        calculateTextSize();
-    }
-    catch (Exception& e)
-    {
-        mFont = 0;
-        SAFE_RETHROW_RET(e, false);
-    }
-    
+    calculateTextSize();
     return true;
 }
 

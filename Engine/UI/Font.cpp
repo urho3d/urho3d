@@ -67,221 +67,243 @@ const FontFace* Font::getFace(int pointSize)
     if (i != mFaces.end())
         return &i->second;
     
-    PROFILE(Font_GetFace);
-    
-    if (pointSize <= 0)
-        EXCEPTION("Zero or negative point size");
-    
-    if (!mFontData)
-        EXCEPTION("Font not loaded");
-    
-    FontFace newFace;
-    
-    stbtt_fontinfo fontInfo;
-    
-    // Assume 1 font per file for now
-    if (!stbtt_InitFont(&fontInfo, &mFontData[0], 0))
-        EXCEPTION("Could not initialize font");
-    
-    std::vector<bool> glyphUsed;
-    glyphUsed.resize(fontInfo.numGlyphs);
-    for (int i = 0; i < fontInfo.numGlyphs; ++i)
-        glyphUsed[i] = false;
-    
-    // Build glyph mapping and mark used glyphs
-    for (int i = 0; i < MAX_FONT_CHARS; ++i)
+    try
     {
-        newFace.mGlyphIndex[i] = stbtt_FindGlyphIndex(&fontInfo, i);
-        glyphUsed[newFace.mGlyphIndex[i]] = true;
-    }
-    
-    // Get row height
-    int ascent, descent, lineGap;
-    stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
-    
-    // Calculate scale (use ascent only)
-    float scale = (float)pointSize / ascent;
-    
-    // Go through glyphs to get their dimensions & offsets
-    for (int i = 0; i < fontInfo.numGlyphs; ++i)
-    {
-        FontGlyph newGlyph;
+        PROFILE(Font_GetFace);
         
-        int ix0, iy0, ix1, iy1;
-        int advanceWidth, leftSideBearing;
+        if (pointSize <= 0)
+            EXCEPTION("Zero or negative font point size");
         
-        if (glyphUsed[i])
+        if (!mFontData)
+            EXCEPTION("Font not loaded");
+        
+        FontFace newFace;
+        
+        stbtt_fontinfo fontInfo;
+        
+        // Assume 1 font per file for now
+        if (!stbtt_InitFont(&fontInfo, &mFontData[0], 0))
+            EXCEPTION("Could not initialize font");
+        
+        std::vector<bool> glyphUsed;
+        glyphUsed.resize(fontInfo.numGlyphs);
+        for (int i = 0; i < fontInfo.numGlyphs; ++i)
+            glyphUsed[i] = false;
+        
+        // Build glyph mapping and mark used glyphs
+        for (int i = 0; i < MAX_FONT_CHARS; ++i)
         {
-            stbtt_GetGlyphBitmapBox(&fontInfo, i, scale, scale, &ix0, &iy0, &ix1, &iy1);
-            stbtt_GetGlyphHMetrics(&fontInfo, i, &advanceWidth, &leftSideBearing);
-            newGlyph.mWidth = ix1 - ix0;
-            newGlyph.mHeight = iy1 - iy0;
-            newGlyph.mOffsetX = (int)(leftSideBearing * scale);
-            newGlyph.mOffsetY = iy0;
-            newGlyph.mAdvanceX = (int)(advanceWidth * scale);
-        }
-        else
-        {
-            newGlyph.mWidth = 0;
-            newGlyph.mHeight = 0;
-            newGlyph.mOffsetX = 0;
-            newGlyph.mOffsetY = 0;
-            newGlyph.mAdvanceX = 0;
+            newFace.mGlyphIndex[i] = stbtt_FindGlyphIndex(&fontInfo, i);
+            glyphUsed[newFace.mGlyphIndex[i]] = true;
         }
         
-        newFace.mGlyphs.push_back(newGlyph);
-    }
-    
-    // Adjust the Y-offset so that the fonts are top-aligned
-    int scaledAscent = (int)(scale * ascent);
-    for (int i = 0; i < fontInfo.numGlyphs; ++i)
-    {
-        if (glyphUsed[i])
-            newFace.mGlyphs[i].mOffsetY += scaledAscent;
-    }
-    
-    // Calculate row advance
-    newFace.mRowHeight = (int)(scale * (ascent - descent + lineGap));
-    
-    // Now try to pack into the smallest possible texture
-    int texWidth = FONT_TEXTURE_MIN_SIZE;
-    int texHeight = FONT_TEXTURE_MIN_SIZE;
-    bool doubleHorizontal = true;
-    for (;;)
-    {
-        bool success = true;
+        // Get row height
+        int ascent, descent, lineGap;
+        stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
         
-        // Check first for theoretical possible fit. If it fails, there is no need to try to fit
-        int totalArea = 0;
+        // Calculate scale (use ascent only)
+        float scale = (float)pointSize / ascent;
+        
+        // Go through glyphs to get their dimensions & offsets
         for (int i = 0; i < fontInfo.numGlyphs; ++i)
         {
-            if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
-                totalArea += (newFace.mGlyphs[i].mWidth + 1) * (newFace.mGlyphs[i].mHeight + 1);
+            FontGlyph newGlyph;
+            
+            int ix0, iy0, ix1, iy1;
+            int advanceWidth, leftSideBearing;
+            
+            if (glyphUsed[i])
+            {
+                stbtt_GetGlyphBitmapBox(&fontInfo, i, scale, scale, &ix0, &iy0, &ix1, &iy1);
+                stbtt_GetGlyphHMetrics(&fontInfo, i, &advanceWidth, &leftSideBearing);
+                newGlyph.mWidth = ix1 - ix0;
+                newGlyph.mHeight = iy1 - iy0;
+                newGlyph.mOffsetX = (int)(leftSideBearing * scale);
+                newGlyph.mOffsetY = iy0;
+                newGlyph.mAdvanceX = (int)(advanceWidth * scale);
+            }
+            else
+            {
+                newGlyph.mWidth = 0;
+                newGlyph.mHeight = 0;
+                newGlyph.mOffsetX = 0;
+                newGlyph.mOffsetY = 0;
+                newGlyph.mAdvanceX = 0;
+            }
+            
+            newFace.mGlyphs.push_back(newGlyph);
         }
         
-        if (totalArea > texWidth * texHeight)
-            success = false;
-        else
+        // Adjust the Y-offset so that the fonts are top-aligned
+        int scaledAscent = (int)(scale * ascent);
+        for (int i = 0; i < fontInfo.numGlyphs; ++i)
         {
-            PROFILE(Font_FitToTexture);
+            if (glyphUsed[i])
+                newFace.mGlyphs[i].mOffsetY += scaledAscent;
+        }
+        
+        // Calculate row advance
+        newFace.mRowHeight = (int)(scale * (ascent - descent + lineGap));
+        
+        // Now try to pack into the smallest possible texture
+        int texWidth = FONT_TEXTURE_MIN_SIZE;
+        int texHeight = FONT_TEXTURE_MIN_SIZE;
+        bool doubleHorizontal = true;
+        for (;;)
+        {
+            bool success = true;
             
-            AreaAllocator allocator(texWidth, texHeight);
+            // Check first for theoretical possible fit. If it fails, there is no need to try to fit
+            int totalArea = 0;
+            for (int i = 0; i < fontInfo.numGlyphs; ++i)
+            {
+                if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
+                    totalArea += (newFace.mGlyphs[i].mWidth + 1) * (newFace.mGlyphs[i].mHeight + 1);
+            }
+            
+            if (totalArea > texWidth * texHeight)
+                success = false;
+            else
+            {
+                PROFILE(Font_FitToTexture);
+                
+                AreaAllocator allocator(texWidth, texHeight);
+                for (int i = 0; i < fontInfo.numGlyphs; ++i)
+                {
+                    if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
+                    {
+                        int x, y;
+                        // Reserve an empty border between glyphs for filtering
+                        if (!allocator.reserve(newFace.mGlyphs[i].mWidth + 1, newFace.mGlyphs[i].mHeight + 1, x, y))
+                        {
+                            success = false;
+                            break;
+                        }
+                        else
+                        {
+                            newFace.mGlyphs[i].mX = x;
+                            newFace.mGlyphs[i].mY = y;
+                        }
+                    }
+                    else
+                    {
+                        newFace.mGlyphs[i].mX = 0;
+                        newFace.mGlyphs[i].mY = 0;
+                    }
+                }
+            }
+            
+            if (!success)
+            {
+                // Alternate between doubling the horizontal and the vertical dimension
+                if (doubleHorizontal)
+                    texWidth <<= 1;
+                else
+                    texHeight <<= 1;
+                
+                if ((texWidth > FONT_TEXTURE_MAX_SIZE) || (texHeight > FONT_TEXTURE_MAX_SIZE))
+                    EXCEPTION("Font face could not be fit into the largest possible texture");
+                
+                doubleHorizontal = !doubleHorizontal;
+            }
+            else
+                break;
+        }
+        
+        // Create the texture
+        if (mRenderer)
+        {
+            SharedPtr<Texture2D> texture(new Texture2D(mRenderer, TEXTURE_STATIC));
+            
+            texture->setNumLevels(1); // No mipmaps
+            texture->setAddressMode(COORD_U, ADDRESS_BORDER);
+            texture->setAddressMode(COORD_V, ADDRESS_BORDER),
+            texture->setBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+            texture->setSize(texWidth, texHeight, D3DFMT_A8);
+            
+            D3DLOCKED_RECT hwRect;
+            texture->lock(0, 0, &hwRect);
+            
+            // First clear the whole texture
+            for (int y = 0; y < texHeight; ++y)
+            {
+                unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * y;
+                memset(dest, 0, texWidth);
+            }
+            
+            // Render glyphs into texture, and find out a scaling value in case font uses less than full opacity (thin outlines)
+            int sumOpacity = 0;
+            int nonEmptyGlyphs = 0;
             for (int i = 0; i < fontInfo.numGlyphs; ++i)
             {
                 if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
                 {
-                    int x, y;
-                    // Reserve an empty border between glyphs for filtering
-                    if (!allocator.reserve(newFace.mGlyphs[i].mWidth + 1, newFace.mGlyphs[i].mHeight + 1, x, y))
-                    {
-                        success = false;
-                        break;
-                    }
-                    else
-                    {
-                        newFace.mGlyphs[i].mX = x;
-                        newFace.mGlyphs[i].mY = y;
-                    }
-                }
-                else
-                {
-                    newFace.mGlyphs[i].mX = 0;
-                    newFace.mGlyphs[i].mY = 0;
-                }
-            }
-        }
-        
-        if (!success)
-        {
-            // Alternate between doubling the horizontal and the vertical dimension
-            if (doubleHorizontal)
-                texWidth <<= 1;
-            else
-                texHeight <<= 1;
-            
-            if ((texWidth > FONT_TEXTURE_MAX_SIZE) || (texHeight > FONT_TEXTURE_MAX_SIZE))
-                EXCEPTION("Font face could not be fit into the largest possible texture");
-            
-            doubleHorizontal = !doubleHorizontal;
-        }
-        else
-            break;
-    }
-    
-    // Create the texture
-    if (mRenderer)
-    {
-        SharedPtr<Texture2D> texture(new Texture2D(mRenderer, TEXTURE_STATIC));
-        
-        texture->setNumLevels(1); // No mipmaps
-        texture->setAddressMode(COORD_U, ADDRESS_BORDER);
-        texture->setAddressMode(COORD_V, ADDRESS_BORDER),
-        texture->setBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-        texture->setSize(texWidth, texHeight, D3DFMT_A8);
-        
-        D3DLOCKED_RECT hwRect;
-        texture->lock(0, 0, &hwRect);
-        
-        // First clear the whole texture
-        for (int y = 0; y < texHeight; ++y)
-        {
-            unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * y;
-            memset(dest, 0, texWidth);
-        }
-        
-        // Render glyphs into texture, and find out a scaling value in case font uses less than full opacity (thin outlines)
-        int sumOpacity = 0;
-        int nonEmptyGlyphs = 0;
-        for (int i = 0; i < fontInfo.numGlyphs; ++i)
-        {
-            if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
-            {
-                stbtt_MakeGlyphBitmap(&fontInfo, (unsigned char*)hwRect.pBits + hwRect.Pitch * newFace.mGlyphs[i].mY + newFace.mGlyphs[i].mX, newFace.mGlyphs[i].mWidth, newFace.mGlyphs[i].mHeight, hwRect.Pitch, scale, scale, i);
-                
-                int glyphMaxOpacity = 0;
-                for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
-                {
-                    unsigned char* pixels = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
+                    stbtt_MakeGlyphBitmap(&fontInfo, (unsigned char*)hwRect.pBits + hwRect.Pitch * newFace.mGlyphs[i].mY + newFace.mGlyphs[i].mX, newFace.mGlyphs[i].mWidth, newFace.mGlyphs[i].mHeight, hwRect.Pitch, scale, scale, i);
                     
-                    for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
-                        glyphMaxOpacity = max(glyphMaxOpacity, pixels[x]);
-                }
-                
-                if (glyphMaxOpacity > 0)
-                {
-                    sumOpacity += glyphMaxOpacity;
-                    ++nonEmptyGlyphs;
-                }
-            }
-        }
-        
-        // Apply the scaling if necessary
-        int avgOpacity = nonEmptyGlyphs ? sumOpacity / nonEmptyGlyphs : 255;
-        if (avgOpacity < 255)
-        {
-            float scale = 255.0f / avgOpacity;
-            
-            for (int i = 0; i < fontInfo.numGlyphs; ++i)
-            {
-                for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
-                {
-                    unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
-                    for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
+                    int glyphMaxOpacity = 0;
+                    for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
                     {
-                        int pixel = dest[x];
-                        dest[x] = min((int)(pixel * scale), 255);
+                        unsigned char* pixels = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
+                        
+                        for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
+                            glyphMaxOpacity = max(glyphMaxOpacity, pixels[x]);
+                    }
+                    
+                    if (glyphMaxOpacity > 0)
+                    {
+                        sumOpacity += glyphMaxOpacity;
+                        ++nonEmptyGlyphs;
                     }
                 }
             }
+            
+            // Apply the scaling if necessary
+            int avgOpacity = nonEmptyGlyphs ? sumOpacity / nonEmptyGlyphs : 255;
+            if (avgOpacity < 255)
+            {
+                float scale = 255.0f / avgOpacity;
+                
+                for (int i = 0; i < fontInfo.numGlyphs; ++i)
+                {
+                    for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
+                    {
+                        unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
+                        for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
+                        {
+                            int pixel = dest[x];
+                            dest[x] = min((int)(pixel * scale), 255);
+                        }
+                    }
+                }
+            }
+            
+            texture->unlock();
+            setMemoryUse(getMemoryUse() + texWidth * texHeight);
+            newFace.mTexture = staticCast<Texture>(texture);
         }
         
-        texture->unlock();
-        setMemoryUse(getMemoryUse() + texWidth * texHeight);
-        newFace.mTexture = staticCast<Texture>(texture);
+        mFaces[pointSize] = newFace;
+        return &mFaces[pointSize];
     }
-    
-    mFaces[pointSize] = newFace;
-    return &mFaces[pointSize];
+    catch (...)
+    {
+        // An error occurred. Store and return an empty font face
+        FontFace emptyFace;
+        FontGlyph emptyGlyph;
+        emptyGlyph.mX = 0;
+        emptyGlyph.mY = 0;
+        emptyGlyph.mWidth = 0;
+        emptyGlyph.mHeight = 0;
+        emptyGlyph.mOffsetX = 0;
+        emptyGlyph.mOffsetY = 0;
+        emptyGlyph.mAdvanceX = 0;
+        emptyFace.mGlyphs.push_back(emptyGlyph);
+        for (unsigned i = 0; i < MAX_FONT_CHARS; ++i)
+            emptyFace.mGlyphIndex[i] = 0;
+        
+        mFaces[pointSize] = emptyFace;
+        return &mFaces[pointSize];
+    }
 }
 
 std::string getSystemFontDirectory()
