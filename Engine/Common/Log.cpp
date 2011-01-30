@@ -77,6 +77,8 @@ void Log::write(LogLevel level, const std::string& message)
     if ((mLevel > level) || (level == LOG_NONE))
         return;
     
+    mLastMessage = message;
+    
     static time_t sysTime;
     time(&sysTime);
     const char* dateTime = ctime(&sysTime);
@@ -97,6 +99,8 @@ void Log::write(LogLevel level, const std::string& message)
 
 void Log::writeRaw(const std::string& message)
 {
+    mLastMessage = message;
+    
     printf("%s", message.c_str());
     
     if (mHandle)

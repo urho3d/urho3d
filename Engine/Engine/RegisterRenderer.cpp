@@ -98,6 +98,30 @@ static void registerCamera(asIScriptEngine* engine)
     registerRefCasts<Node, Camera>(engine, "Node", "Camera");
 }
 
+static void registerSkeleton(asIScriptEngine* engine)
+{
+    registerNode<Bone>(engine, "Bone");
+    engine->RegisterObjectMethod("Bone", "void setAnimationEnabled(bool)", asMETHOD(Bone, setAnimationEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "void setRadius(float)", asMETHOD(Bone, setRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "void setBoundingBox(const BoundingBox& in)", asMETHOD(Bone, setBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "void reset(bool)", asMETHOD(Bone, reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "Bone@+ getRootBone()", asMETHOD(Bone, getRootBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "float getRadius() const", asMETHOD(Bone, getRadius), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "const BoundingBox& getBoundingBox() const", asMETHOD(Bone, getBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Bone", "bool isAnimationEnabled() const", asMETHOD(Bone, isAnimationEnabled), asCALL_THISCALL);
+    registerRefCasts<Component, Bone>(engine, "Component", "Bone");
+    registerRefCasts<Node, Bone>(engine, "Node", "Bone");
+    
+    engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Skeleton", "void reset(bool)", asMETHOD(Skeleton, reset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ getRootBone() const", asMETHOD(Skeleton, getRootBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "uint getNumBones() const", asMETHOD(Skeleton, getNumBones), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(uint) const", asMETHODPR(Skeleton, getBone, (unsigned) const, Bone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(const string& in) const", asMETHODPR(Skeleton, getBone, (const std::string&) const, Bone*), asCALL_THISCALL);
+}
+
 static Texture2D* ConstructTexture2D(TextureUsage usage, const std::string& name)
 {
     try
@@ -417,6 +441,7 @@ static void registerModel(asIScriptEngine* engine)
 {
     registerResource<Model>(engine, "Model");
     engine->RegisterObjectMethod("Model", "const BoundingBox& getBoundingBox() const", asMETHOD(Model, getBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "Skeleton@+ getSkeleton() const", asMETHOD(Model, getSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint getNumGeometries() const", asMETHOD(Model, getNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint getNumGeometryLodLevels(uint) const", asMETHOD(Model, getNumGeometryLodLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint getNumMorphs() const", asMETHOD(Model, getNumMorphs), asCALL_THISCALL);
@@ -612,30 +637,6 @@ static void registerSkybox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skybox", "Model@+ getModel() const", asMETHOD(Skybox, getModel), asCALL_THISCALL);
     registerRefCasts<Component, Skybox>(engine, "Component", "Skybox");
     registerRefCasts<Node, Skybox>(engine, "Node", "Skybox");
-}
-
-static void registerSkeleton(asIScriptEngine* engine)
-{
-    registerNode<Bone>(engine, "Bone");
-    engine->RegisterObjectMethod("Bone", "void setAnimationEnabled(bool)", asMETHOD(Bone, setAnimationEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "void setRadius(float)", asMETHOD(Bone, setRadius), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "void setBoundingBox(const BoundingBox& in)", asMETHOD(Bone, setBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "void reset(bool)", asMETHOD(Bone, reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "Bone@+ getRootBone()", asMETHOD(Bone, getRootBone), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "float getRadius() const", asMETHOD(Bone, getRadius), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "const BoundingBox& getBoundingBox() const", asMETHOD(Bone, getBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Bone", "bool isAnimationEnabled() const", asMETHOD(Bone, isAnimationEnabled), asCALL_THISCALL);
-    registerRefCasts<Component, Bone>(engine, "Component", "Bone");
-    registerRefCasts<Node, Bone>(engine, "Node", "Bone");
-    
-    engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Skeleton", "void reset(bool)", asMETHOD(Skeleton, reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ getRootBone() const", asMETHOD(Skeleton, getRootBone), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "uint getNumBones() const", asMETHOD(Skeleton, getNumBones), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(uint) const", asMETHODPR(Skeleton, getBone, (unsigned) const, Bone*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(const string& in) const", asMETHODPR(Skeleton, getBone, (const std::string&) const, Bone*), asCALL_THISCALL);
 }
 
 static void registerAnimatedModel(asIScriptEngine* engine)
@@ -991,6 +992,7 @@ static void registerOctree(asIScriptEngine* engine)
 void registerRendererLibrary(asIScriptEngine* engine)
 {
     registerCamera(engine);
+    registerSkeleton(engine);
     registerTexture(engine);
     registerMaterial(engine);
     registerModel(engine);
@@ -1001,7 +1003,6 @@ void registerRendererLibrary(asIScriptEngine* engine)
     registerZone(engine);
     registerStaticModel(engine);
     registerSkybox(engine);
-    registerSkeleton(engine);
     registerAnimatedModel(engine);
     registerBillboardSet(engine);
     registerInstancedModel(engine);

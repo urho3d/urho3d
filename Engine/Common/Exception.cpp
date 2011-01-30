@@ -30,17 +30,19 @@
 
 #include "DebugNew.h"
 
-Exception::Exception(const std::string& what) :
+Exception::Exception(const std::string& what, bool logError) :
     mWhat(what)
 {
-    LOGERROR(what);
+    if (logError)
+        LOGERROR(what);
 }
 
 #ifdef _DEBUG
-Exception::Exception(const std::string& what, const char* file, int line)
+Exception::Exception(const std::string& what, const char* file, int line, bool logError)
 {
     mWhat = what + std::string(" at ") + std::string(file) + std::string(", line ") + toString(line);
-    LOGERROR(mWhat);
+    if (logError)
+        LOGERROR(mWhat);
 }
 #endif
 

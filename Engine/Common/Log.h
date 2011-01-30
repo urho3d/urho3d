@@ -72,12 +72,16 @@ public:
     
     //! Return logging level
     LogLevel getLevel() const { return mLevel; }
+    //! Return last log message
+    const std::string& getLastMessage() const { return mLastMessage; }
     
 private:
     //! Log file handle
     FILE* mHandle;
     //! Logging level
     LogLevel mLevel;
+    //! Last log message
+    std::string mLastMessage;
     //! Log listeners
     std::vector<LogListener*> mListeners;
     

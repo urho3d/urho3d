@@ -96,6 +96,8 @@ void Application::init()
     
     // Execute the rest of initialization, including scene creation, in script
     mScriptFile = mCache->getResource<ScriptFile>(scriptFileName);
+    if (!mScriptFile)
+        throw Exception(getLog()->getLastMessage(), false);
     if (!mScriptFile->execute("void start()"))
         EXCEPTION("Failed to execute the start() function");
 }
