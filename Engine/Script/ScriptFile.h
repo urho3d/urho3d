@@ -77,7 +77,7 @@ public:
     //! Return a function by declaration. Will be stored to a search cache so that further searches should be faster
     asIScriptFunction* getFunction(const std::string& declaration);
     //! Return an object method by declaration
-    asIScriptFunction* getMethod(asIScriptObject* object, const std::string& declaration) const;
+    asIScriptFunction* getMethod(asIScriptObject* object, const std::string& declaration);
     //! Return whether script compiled successfully
     bool isCompiled() const { return mCompiled; }
     
@@ -106,6 +106,8 @@ private:
     std::map<asIObjectType*, bool> mCheckedClasses;
     //! Search cache for functions
     std::map<std::string, asIScriptFunction*> mFunctions;
+    //! Search cache for methods
+    std::map<asIObjectType*, std::map<std::string, asIScriptFunction*> > mMethods;
     //! ScriptInstances that have created objects from this script file
     std::vector<ScriptInstance*> mScriptInstances;
 };

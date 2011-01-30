@@ -72,15 +72,16 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
         (*i)->releaseObject();
     
-    // Discard the previous module if there was one, and clear search caches
+    // Clear search caches
     mCompiled = false;
     mAllIncludeFiles.clear();
     mCheckedClasses.clear();
     mFunctions.clear();
+    mMethods.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
     
-    // Create the module
+    // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     mScriptModule = engine->GetModule(getName().c_str(), asGM_ALWAYS_CREATE);
     if (!mScriptModule)
@@ -285,7 +286,7 @@ asIScriptFunction* ScriptFile::getFunction(const std::string& declaration)
     return function;
 }
 
-asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::string& declaration) const
+asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::string& declaration)
 {
     if ((!mCompiled) || (!object))
         return 0;
@@ -293,9 +294,18 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
+    std::map<asIObjectType*, std::map<std::string, asIScriptFunction*> >::const_iterator i = mMethods.find(type);
+    if (i != mMethods.end())
+    {
+        std::map<std::string, asIScriptFunction*>::const_iterator j = i->second.find(declaration);
+        if (j != i->second.end())
+            return j->second;
+    }
     
     int id = type->GetMethodIdByDecl(declaration.c_str());
-    return mScriptModule->GetFunctionDescriptorById(id);
+    asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
+    mMethods[type][declaration] = function;
+    return function;
 }
 
 void ScriptFile::addScriptInstance(ScriptInstance* instance)
