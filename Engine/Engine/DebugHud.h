@@ -64,7 +64,7 @@ public:
     
 private:
     //! Engine
-    WeakPtr<Engine> mEngine;
+    Engine* mEngine;
     //! Rendering stats text
     SharedPtr<Text> mStatsText;
     //! Rendering mode text

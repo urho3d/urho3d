@@ -43,38 +43,38 @@ Console::Console(Engine* engine) :
 {
     LOGINFO("Console created");
     
-    if (mEngine)
+    if (!mEngine)
+        EXCEPTION("Null Engine for Console");
+    
+    UIElement* uiRoot = mEngine->getUIRoot();
+    if (uiRoot)
     {
-        UIElement* uiRoot = mEngine->getUIRoot();
-        if (uiRoot)
-        {
-            Log* log = getLog();
-            if (log)
-                log->addListener(this);
-            
-            mBackground = new BorderImage();
-            mBackground->setWidth(uiRoot->getWidth());
-            mBackground->setColor(C_TOPLEFT, Color(0.0f, 0.25f, 0.0f, 0.75f));
-            mBackground->setColor(C_TOPRIGHT, Color(0.0f, 0.25f, 0.0f, 0.75f));
-            mBackground->setColor(C_BOTTOMLEFT, Color(0.25f, 0.75f, 0.25f, 0.75f));
-            mBackground->setColor(C_BOTTOMRIGHT, Color(0.25f, 0.75f, 0.25f, 0.75f));
-            mBackground->setBringToBack(false);
-            mBackground->setEnabled(true);
-            mBackground->setVisible(false);
-            mBackground->setPriority(200); // Show on top of the debug HUD
-            
-            mLineEdit = new LineEdit();
-            mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
-            mLineEdit->setDefocusable(false);
-            mBackground->addChild(mLineEdit);
-            
-            uiRoot->addChild(mBackground);
-            
-            updateElements();
-            
-            subscribeToEvent(EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
-            subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
-        }
+        Log* log = getLog();
+        if (log)
+            log->addListener(this);
+        
+        mBackground = new BorderImage();
+        mBackground->setWidth(uiRoot->getWidth());
+        mBackground->setColor(C_TOPLEFT, Color(0.0f, 0.25f, 0.0f, 0.75f));
+        mBackground->setColor(C_TOPRIGHT, Color(0.0f, 0.25f, 0.0f, 0.75f));
+        mBackground->setColor(C_BOTTOMLEFT, Color(0.25f, 0.75f, 0.25f, 0.75f));
+        mBackground->setColor(C_BOTTOMRIGHT, Color(0.25f, 0.75f, 0.25f, 0.75f));
+        mBackground->setBringToBack(false);
+        mBackground->setEnabled(true);
+        mBackground->setVisible(false);
+        mBackground->setPriority(200); // Show on top of the debug HUD
+        
+        mLineEdit = new LineEdit();
+        mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
+        mLineEdit->setDefocusable(false);
+        mBackground->addChild(mLineEdit);
+        
+        uiRoot->addChild(mBackground);
+        
+        updateElements();
+        
+        subscribeToEvent(EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
+        subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
     }
 }
 
@@ -84,12 +84,9 @@ Console::~Console()
     if (log)
         log->removeListener(this);
     
-    if (mEngine)
-    {
-        UIElement* uiRoot = mEngine->getUIRoot();
-        if (uiRoot)
-            uiRoot->removeChild(mBackground);
-    }
+    UIElement* uiRoot = mEngine->getUIRoot();
+    if (uiRoot)
+        uiRoot->removeChild(mBackground);
     
     LOGINFO("Console shut down");
 }
@@ -113,7 +110,7 @@ void Console::write(const std::string& message)
 
 void Console::setVisible(bool enable)
 {
-    if ((!mEngine) || (!mBackground))
+    if (!mBackground)
         return;
     
     mBackground->setVisible(enable);
@@ -169,9 +166,6 @@ bool Console::isVisible() const
 
 void Console::updateElements()
 {
-    if (!mEngine)
-        return;
-    
     int width = mEngine->getRenderer()->getWidth();
     
     if (mFont)
@@ -191,9 +185,6 @@ void Console::updateElements()
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
 {
-    if (!mEngine)
-        return;
-    
     using namespace TextFinished;
     
     if (eventData[P_ELEMENT].getPtr() == (void*)mLineEdit)

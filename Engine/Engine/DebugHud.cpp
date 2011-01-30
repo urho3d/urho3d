@@ -39,45 +39,42 @@ DebugHud::DebugHud(Engine* engine) :
     mProfilerInterval(1.0f),
     mProfilerTimer(0.0f)
 {
+    if (!mEngine)
+        EXCEPTION("Null Engine for Debug HUD");
+    
     LOGINFO("Debug HUD created");
     
-    if (mEngine)
+    UIElement* uiRoot = mEngine->getUIRoot();
+    if (uiRoot)
     {
-        UIElement* uiRoot = mEngine->getUIRoot();
-        if (uiRoot)
-        {
-            mStatsText = new Text();
-            mStatsText->setAlignment(HA_LEFT, VA_TOP);
-            mStatsText->setPriority(100);
-            mStatsText->setVisible(false);
-            uiRoot->addChild(mStatsText);
-            
-            mModeText = new Text();
-            mModeText->setAlignment(HA_LEFT, VA_BOTTOM);
-            mModeText->setPriority(100);
-            mModeText->setVisible(false);
-            uiRoot->addChild(mModeText);
-            
-            mProfilerText = new Text();
-            mProfilerText->setAlignment(HA_RIGHT, VA_TOP);
-            mProfilerText->setPriority(100);
-            mProfilerText->setVisible(false);
-            uiRoot->addChild(mProfilerText);
-        }
+        mStatsText = new Text();
+        mStatsText->setAlignment(HA_LEFT, VA_TOP);
+        mStatsText->setPriority(100);
+        mStatsText->setVisible(false);
+        uiRoot->addChild(mStatsText);
+        
+        mModeText = new Text();
+        mModeText->setAlignment(HA_LEFT, VA_BOTTOM);
+        mModeText->setPriority(100);
+        mModeText->setVisible(false);
+        uiRoot->addChild(mModeText);
+        
+        mProfilerText = new Text();
+        mProfilerText->setAlignment(HA_RIGHT, VA_TOP);
+        mProfilerText->setPriority(100);
+        mProfilerText->setVisible(false);
+        uiRoot->addChild(mProfilerText);
     }
 }
 
 DebugHud::~DebugHud()
 {
-    if (mEngine)
+    UIElement* uiRoot = mEngine->getUIRoot();
+    if (uiRoot)
     {
-        UIElement* uiRoot = mEngine->getUIRoot();
-        if (uiRoot)
-        {
-            uiRoot->removeChild(mStatsText);
-            uiRoot->removeChild(mModeText);
-            uiRoot->removeChild(mProfilerText);
-        }
+        uiRoot->removeChild(mStatsText);
+        uiRoot->removeChild(mModeText);
+        uiRoot->removeChild(mProfilerText);
     }
     
     LOGINFO("Debug HUD shut down");
@@ -85,9 +82,6 @@ DebugHud::~DebugHud()
 
 void DebugHud::update(float timeStep)
 {
-    if (!mEngine)
-        return;
-    
     Pipeline* pipeline = mEngine->getPipeline();
     Renderer* renderer = mEngine->getRenderer();
     if ((!pipeline) || (!renderer))

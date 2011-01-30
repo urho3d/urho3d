@@ -73,7 +73,7 @@ private:
     void handleWindowResized(StringHash eventType, VariantMap& eventData);
     
     //! Engine
-    WeakPtr<Engine> mEngine;
+    Engine* mEngine;
     //! Background
     SharedPtr<BorderImage> mBackground;
     //! Font
