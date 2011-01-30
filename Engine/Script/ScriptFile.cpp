@@ -54,9 +54,18 @@ ScriptFile::~ScriptFile()
 {
     if (mScriptModule)
     {
+        // Release script instances if any exist
+        std::vector<ScriptInstance*> instances = mScriptInstances;
+        for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
+            (*i)->releaseObject();
+        
+        // Remove the module
         asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
+        
+        // Perform a full garbage collection cycle
+        mScriptEngine->garbageCollect(true);
     }
     if (lastScriptFile == this)
         lastScriptFile = 0;

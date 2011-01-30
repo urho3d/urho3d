@@ -135,7 +135,7 @@ void PixelShader::clearLastParameterSources()
 void PixelShader::loadParameters(ResourceCache* cache)
 {
     if (!cache)
-        EXCEPTION("Null resource cache for PixelShader");
+        return;
     
     initializeParameters();
     
@@ -165,9 +165,9 @@ void PixelShader::loadParameters(ResourceCache* cache)
     {
         std::string name = paramElem.getString("name");
         if (sParameters.find(name) == sParameters.end())
-            EXCEPTION("Unknown pixel shader parameter " + name + " in " + getName());
-        
-        sRegisters[sParameters[name]] = paramElem.getInt("index");
+            LOGERROR("Unknown pixel shader parameter " + name + " in " + getName());
+        else
+            sRegisters[sParameters[name]] = paramElem.getInt("index");
         
         paramElem = paramElem.getNextElement("parameter");
     }
@@ -199,9 +199,9 @@ void PixelShader::loadParameters(ResourceCache* cache)
             {
                 std::string name = textureElem.getString("name");
                 if (sTextureUnits.find(name) == sTextureUnits.end())
-                    EXCEPTION("Unknown texture unit " + name + " in " + getName());
-                
-                mUseTextureUnit[sTextureUnits[name]] = true;
+                    LOGERROR("Unknown texture unit " + name + " in " + getName());
+                else
+                    mUseTextureUnit[sTextureUnits[name]] = true;
                 textureElem = textureElem.getNextElement("textureunit");
             }
             
@@ -211,7 +211,7 @@ void PixelShader::loadParameters(ResourceCache* cache)
         shaderElem = shaderElem.getNextElement("shader");
     }
     
-    EXCEPTION("Shader " + shaderName + " not found in shader description XML file");
+    LOGERROR("Shader " + shaderName + " not found in shader description XML file");
 }
 
 void PixelShader::initializeParameters()

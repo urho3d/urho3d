@@ -74,7 +74,7 @@ UIElement::~UIElement()
 void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     if (!cache)
-        EXCEPTION("Null resource cache for UI element");
+        return;
     
     if (element.hasAttribute("name"))
         mName = element.getString("name");

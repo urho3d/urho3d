@@ -59,8 +59,7 @@ Client::Client(Network* network, ResourceCache* cache, const std::string& downlo
 {
     if (!mNetwork)
         EXCEPTION("Null network for Client");
-    
-   if (!mCache)
+    if (!mCache)
         EXCEPTION("Null resource cache for Client");
     
     LOGINFO("Client created");

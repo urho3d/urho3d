@@ -1160,27 +1160,33 @@ void AnimatedModel::updateMorphs()
     
     if (mMorphs.size())
     {
-        // Reset the morph data range from all morphable vertex buffers, then apply morphs
-        for (unsigned i = 0; i < mMorphVertexBuffers.size(); ++i)
+        try
         {
-            VertexBuffer* buffer = mMorphVertexBuffers[i];
-            if (buffer)
+            // Reset the morph data range from all morphable vertex buffers, then apply morphs
+            for (unsigned i = 0; i < mMorphVertexBuffers.size(); ++i)
             {
-                void* lockedMorphRange = buffer->lockMorphRange();
-                buffer->resetMorphRange(lockedMorphRange);
-                
-                for (unsigned j = 0; j < mMorphs.size(); ++j)
+                VertexBuffer* buffer = mMorphVertexBuffers[i];
+                if (buffer)
                 {
-                    if (mMorphs[j].mWeight > 0.0f)
+                    void* lockedMorphRange = buffer->lockMorphRange();
+                    buffer->resetMorphRange(lockedMorphRange);
+                    
+                    for (unsigned j = 0; j < mMorphs.size(); ++j)
                     {
-                        std::map<unsigned, VertexBufferMorph>::iterator k = mMorphs[j].mBuffers.find(i);
-                        if (k != mMorphs[j].mBuffers.end())
-                            applyMorph(buffer, lockedMorphRange, k->second, mMorphs[j].mWeight);
+                        if (mMorphs[j].mWeight > 0.0f)
+                        {
+                            std::map<unsigned, VertexBufferMorph>::iterator k = mMorphs[j].mBuffers.find(i);
+                            if (k != mMorphs[j].mBuffers.end())
+                                applyMorph(buffer, lockedMorphRange, k->second, mMorphs[j].mWeight);
+                        }
                     }
+                    
+                    buffer->unlock();
                 }
-                
-                buffer->unlock();
             }
+        }
+        catch (...)
+        {
         }
     }
     

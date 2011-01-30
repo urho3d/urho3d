@@ -58,7 +58,6 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
 {
     if (!mRenderer)
         EXCEPTION("Null renderer for UI");
-    
     if (!mCache)
         EXCEPTION("Null resource cache for UI");
     

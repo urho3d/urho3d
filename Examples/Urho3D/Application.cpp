@@ -51,8 +51,6 @@ Application::~Application()
     {
         mScriptFile.reset();
         mCache->releaseResources(ShortStringHash("ScriptFile"), true);
-        // Perform a full garbage collection before shutdown
-        mEngine->getScriptEngine()->garbageCollect(true);
     }
 }
 

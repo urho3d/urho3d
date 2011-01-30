@@ -43,9 +43,6 @@ CheckBox::~CheckBox()
 
 void CheckBox::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        EXCEPTION("Null resource cache for UI element");
-    
     BorderImage::setStyle(element, cache);
     
     if (element.hasChildElement("uncheckedrect"))

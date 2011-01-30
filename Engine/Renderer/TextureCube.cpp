@@ -107,13 +107,10 @@ void TextureCube::setSize(int size, unsigned format)
 
 void TextureCube::load(Deserializer& source, ResourceCache* cache)
 {
-    if (!mRenderer)
+    if ((!mRenderer) || (!cache))
         return;
     
     PROFILE(TextureCube_Load);
-    
-    if (!cache)
-        EXCEPTION("Null resource cache for TextureCube");
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     checkTextureBudget(getTypeStatic(), cache);

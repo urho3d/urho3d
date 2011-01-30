@@ -148,10 +148,10 @@ void Scene::save(Serializer& dest)
 
 void Scene::load(Deserializer& source)
 {
-    LOGINFO("Loading scene from " + source.getName());
-    
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        return;
+    
+    LOGINFO("Loading scene from " + source.getName());
     
     stopAsyncLoading();
     removeAllEntities();
@@ -205,10 +205,10 @@ void Scene::saveXML(Serializer& dest)
 
 void Scene::loadXML(Deserializer& source)
 {
-    LOGINFO("Loading XML scene from " + source.getName());
-    
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        return;
+    
+    LOGINFO("Loading XML scene from " + source.getName());
     
     XMLFile xml;
     xml.load(source, mCache);
@@ -404,11 +404,14 @@ void Scene::restorePredictedEntities()
 
 void Scene::loadAsync(File* file)
 {
-    if (!file)
-        EXCEPTION("Null file for async scene loading");
-    
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        return;
+    
+    if (!file)
+    {
+        LOGERROR("Null file for async scene loading");
+        return;
+    }
     
     stopAsyncLoading();
     removeAllEntities();
@@ -429,11 +432,14 @@ void Scene::loadAsync(File* file)
 
 void Scene::loadAsyncXML(File* file)
 {
-    if (!file)
-        EXCEPTION("Null file for async XML scene loading");
-    
     if (!mCache)
-        EXCEPTION("Null resource cache");
+        return;
+    
+    if (!file)
+    {
+        LOGERROR("Null file for async XML scene loading");
+        return;
+    }
     
     file->seek(0);
     SharedPtr<XMLFile> xml(new XMLFile());

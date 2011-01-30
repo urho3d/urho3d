@@ -134,7 +134,7 @@ void VertexShader::release()
 void VertexShader::loadParameters(ResourceCache* cache)
 {
     if (!cache)
-        EXCEPTION("Null resource cache for VertexShader");
+        return;
     
     initializeParameters();
     
@@ -164,9 +164,9 @@ void VertexShader::loadParameters(ResourceCache* cache)
     {
         std::string name = paramElem.getString("name");
         if (sParameters.find(name) == sParameters.end())
-            EXCEPTION("Unknown vertex shader parameter " + name + " in " + getName());
-        
-        sRegisters[sParameters[name]] = paramElem.getInt("index");
+            LOGERROR("Unknown vertex shader parameter " + name + " in " + getName());
+        else
+            sRegisters[sParameters[name]] = paramElem.getInt("index");
         
         paramElem = paramElem.getNextElement("parameter");
     }
@@ -197,7 +197,7 @@ void VertexShader::loadParameters(ResourceCache* cache)
         shaderElem = shaderElem.getNextElement("shader");
     }
     
-    EXCEPTION("Shader " + shaderName + " not found in shader description XML file");
+    LOGERROR("Shader " + shaderName + " not found in shader description XML file");
 }
 
 void VertexShader::initializeParameters()

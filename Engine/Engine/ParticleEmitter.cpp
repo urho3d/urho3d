@@ -353,10 +353,8 @@ void ParticleEmitter::update(float timeStep)
 
 void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
 {
-    if (!file)
+    if ((!file) || (!cache))
         return;
-    if (!cache)
-        EXCEPTION("Null resource cache for ParticleEmitter");
     
     mParameterSource = file;
     XMLElement rootElem = mParameterSource->getRootElement();
