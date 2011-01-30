@@ -49,6 +49,7 @@ void start()
     subscribeToEvent("MouseButtonDown", "handleMouseButtonDown");
     subscribeToEvent("MouseButtonUp", "handleMouseButtonUp");
     subscribeToEvent("PostRenderUpdate", "handlePostRenderUpdate");
+    subscribeToEvent("WindowResized", "handleWindowResized");
 }
 
 void runFrame()
@@ -574,3 +575,9 @@ void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
 }
+
+void handleWindowResized(StringHash eventType, VariantMap& eventData)
+{
+    camera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
+}
+

@@ -9,6 +9,7 @@ Text@ scoreText;
 Text@ hiscoreText;
 Text@ messageText;
 BorderImage@ healthBar;
+BorderImage@ sight;
 
 Controls playerControls;
 float mouseSensitivity = 0.125;
@@ -29,6 +30,7 @@ void start()
     subscribeToEvent("Update", "handleUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
     subscribeToEvent("KeyDown", "handleKeyDown");
+    subscribeToEvent("WindowResized", "handleWindowResized");
 }
 
 void runFrame()
@@ -91,12 +93,13 @@ void createOverlays()
     if (engine.isHeadless())
         return;
 
-    BorderImage@ sight = BorderImage();
-    sight.setTexture(cache.getResource("Texture2D", "Textures/Sight.png"));
-    sight.setAlignment(HA_CENTER, VA_CENTER);
     int height = renderer.getHeight() / 22;
     if (height > 64)
         height = 64;
+
+    @sight = BorderImage();
+    sight.setTexture(cache.getResource("Texture2D", "Textures/Sight.png"));
+    sight.setAlignment(HA_CENTER, VA_CENTER);
     sight.setSize(height, height);
     uiRoot.addChild(sight);
 
@@ -250,4 +253,15 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
         console.toggle();
         input.suppressNextChar();
     }
+}
+
+void handleWindowResized(StringHash eventType, VariantMap& eventData)
+{
+    gameCamera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
+    
+    int height = renderer.getHeight() / 22;
+    if (height > 64)
+        height = 64;
+    sight.setSize(height, height);
+    messageText.setPosition(0, -height * 2);
 }
