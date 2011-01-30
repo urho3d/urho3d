@@ -3,15 +3,16 @@
 const int ANIM_MOVE = 1;
 const int ANIM_ATTACK = 2;
 
-const float mass = 80;
-const float friction = 0.5;
-const float moveForce = 500000;
-const float airMoveForce = 25000;
-const float dampingForce = 1000;
-const float jumpForce = 9000000;
-const Vector3 throwVelocity(0, 425, 2000);
-const Vector3 throwPosition(0, 20, 100);
-const float throwDelay = 0.1;
+const float ninjaMass = 80;
+const float ninjaFriction = 0.5;
+const float ninjaMoveForce = 500000;
+const float ninjaAirMoveForce = 25000;
+const float ninjaDampingForce = 1000;
+const float ninjaJumpForce = 9000000;
+const Vector3 ninjaThrowVelocity(0, 425, 2000);
+const Vector3 ninjaThrowPosition(0, 20, 100);
+const float ninjaThrowDelay = 0.1;
+const float ninjaDrawDistance = 15000;
 
 class Ninja : GameObject
 {
@@ -53,7 +54,7 @@ class Ninja : GameObject
         AnimatedModel@ model = entity.createComponent("AnimatedModel");
         model.setModel(cache.getResource("Model", "Models/Ninja.mdl"));
         model.setMaterial(cache.getResource("Material", "Materials/Ninja.xml"));
-        model.setDrawDistance(15000);
+        model.setDrawDistance(ninjaDrawDistance);
         model.setCastShadows(true);
 
         // Create animation controller
@@ -65,8 +66,8 @@ class Ninja : GameObject
         body.setPosition(position);
         body.setRotation(rotation);
         body.setMode(PHYS_DYNAMIC);
-        body.setMass(mass);
-        body.setFriction(friction);
+        body.setMass(ninjaMass);
+        body.setFriction(ninjaFriction);
         body.setCollisionShape(cache.getResource("CollisionShape", "Physics/Ninja.xml"));
         body.setCollisionGroup(1);
         body.setCollisionMask(3);
@@ -90,7 +91,7 @@ class Ninja : GameObject
         return q;
     }
 
-    void updateFixed(float time)
+    void updateFixed(float timeStep)
     {
         RigidBody@ body = entity.getComponent("RigidBody");
         AnimationController@ controller = entity.getComponent("AnimationController");
@@ -118,12 +119,12 @@ class Ninja : GameObject
         if (onGround)
         {
             inAirTime = 0;
-            onGroundTime += time;
+            onGroundTime += timeStep;
         }
         else
         {
             onGroundTime = 0;
-            inAirTime += time;
+            inAirTime += timeStep;
         }
 
         if ((inAirTime < 0.3f) && (!isSliding))
@@ -154,7 +155,7 @@ class Ninja : GameObject
                 }
                 // Normalize so that diagonal strafing isn't faster
                 force.normalize();
-                force *= moveForce;
+                force *= ninjaMoveForce;
                 body.applyForce(force);
                 
                 // Walk or sidestep animation
@@ -170,7 +171,7 @@ class Ninja : GameObject
             }
 
             // Overall damping to cap maximum speed
-            body.applyForce(Vector3(-dampingForce * vel.x, 0, -dampingForce * vel.z));
+            body.applyForce(Vector3(-ninjaDampingForce * vel.x, 0, -ninjaDampingForce * vel.z));
 
             // Jumping
             if (controls.isDown(CTRL_JUMP))
@@ -179,7 +180,7 @@ class Ninja : GameObject
                 {
                     // Lift slightly off the ground for better animation
                     body.setPosition(body.getPhysicsPosition() + Vector3(0, 3, 0));
-                    body.applyForce(Vector3(0, jumpForce, 0));
+                    body.applyForce(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
                     controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 1.0, 1.0, 0.0, 0.0, true);
                     okToJump = false;
@@ -206,7 +207,7 @@ class Ninja : GameObject
                         force += q * Vector3(1, 0, 0);
                     // Normalize so that diagonal strafing isn't faster
                     force.normalize();
-                    force *= airMoveForce;
+                    force *= ninjaAirMoveForce;
                     body.applyForce(force);
                 }
             }
@@ -218,32 +219,23 @@ class Ninja : GameObject
         
         // Shooting
         if (throwTime >= 0)
-            throwTime -= time;
+            throwTime -= timeStep;
         
         if ((controls.isPressed(CTRL_FIRE, prevControls)) && (throwTime <= 0))
         {
-            Vector3 projectileVel = getAim() * throwVelocity;
-            
+            Vector3 projectileVel = getAim() * ninjaThrowVelocity;
+
             controller.setAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0, 0.75, 0.0, 0.0, false);
             controller.setFade("Models/Ninja_Attack1.ani", 0.0, 0.5);
             controller.setPriority("Models/Ninja_Attack1.ani", 1);
-            
-            /*
-            // Do not spawn object for clientside prediction, only animate for now
-            if (!isProxy())
-            {
-                SnowBall* obj = spawnObject<SnowBall>("Snowball");
-                obj->create(getBody()->getPhysicsPosition() + time * vel + q * tThrowPosition, getAim());
-                obj->setSide(mSide);
-                obj->setOrigin(getEntity()->getID());
-                obj->getBody()->setLinearVelocity(projectileVel);
 
-                //! \todo the throw sound should be instant, and therefore predicted on client
-                playSound("Sounds/NutThrow.wav");
-            }
-            */
+            Entity@ snowball = spawnObject("SnowBall", body.getPhysicsPosition() + vel * timeStep + q * ninjaThrowPosition, getAim());
+            RigidBody@ snowballBody = snowball.getComponent("RigidBody");
+            snowballBody.setLinearVelocity(projectileVel);
             
-            throwTime = throwDelay;
+            playSound("Sounds/NutThrow.wav");
+
+            throwTime = ninjaThrowDelay;
         }
         
         prevControls = controls;
@@ -251,11 +243,5 @@ class Ninja : GameObject
         resetWorldCollision();
     }
     
-    void handleEntityCollision(StringHash eventType, VariantMap& eventData)
-    {
-        Entity@ otherEntity = eventData["OtherEntity"].getEntity();
-        // If the other entity does not have a ScriptInstance component, it's static world geometry
-        if (!otherEntity.hasComponent("ScriptInstance"))
-            handleWorldCollision(eventData);
-    }
+
 }

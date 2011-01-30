@@ -34,8 +34,6 @@
 
 #include "DebugNew.h"
 
-static const int GARBAGE_COLLECT_ITERATIONS = 5;
-
 void messageCallback(const asSMessageInfo* msg, void* param)
 {
     ScriptEngine* engine = static_cast<ScriptEngine*>(param);
@@ -135,7 +133,7 @@ void ScriptEngine::garbageCollect(bool fullCycle)
         mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE);
     else
     {
-        for (int i = 0; i < GARBAGE_COLLECT_ITERATIONS; ++i)
+        for (unsigned i = 0; i < GARBAGE_COLLECT_ITERATIONS; ++i)
             mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP);
     }
 }

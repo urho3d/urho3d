@@ -1,6 +1,7 @@
 // Partial remake of NinjaSnowWar in script
 
 #include "Scripts/Ninja.as"
+#include "Scripts/SnowBall.as"
 
 Scene@ gameScene;
 Camera@ gameCamera;
@@ -68,7 +69,7 @@ void initConsole()
 
 void initScene()
 {
-    @gameScene = engine.createScene("NSWScript", BoundingBox(-100000.0, 100000.0), 8, true);
+    @gameScene = engine.createScene("NinjaSnowWar", BoundingBox(-100000.0, 100000.0), 8, true);
 
     File@ levelFile = cache.getFile("TestLevel.xml");
     gameScene.loadXML(levelFile);
@@ -141,9 +142,9 @@ void createOverlays()
 
 void spawnPlayer()
 {
-    Entity@ playerEntity = gameScene.createEntity("ObjPlayer");
+    Entity@ playerEntity = gameScene.createEntity("Player");
     ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
-    instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NSWScript.as"), "Ninja");
+    instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NinjaSnowWar.as"), "Ninja");
     Ninja@ object = cast<Ninja>(instance.getScriptObject());
     object.create(Vector3(0, 90, 0), Quaternion());
 }
@@ -202,7 +203,7 @@ void updateControls()
     playerControls.pitch += mouseSensitivity * input.getMouseMoveY();
     playerControls.pitch = clamp(playerControls.pitch, -60, 60);
 
-    Entity@ playerEntity = gameScene.getEntity("ObjPlayer");
+    Entity@ playerEntity = gameScene.getEntity("Player");
     if (@playerEntity == null)
         return;
 
@@ -213,7 +214,7 @@ void updateControls()
 
 void updateCamera()
 {
-    Entity@ playerEntity = gameScene.getEntity("ObjPlayer");
+    Entity@ playerEntity = gameScene.getEntity("Player");
     if (@playerEntity == null)
         return;
 

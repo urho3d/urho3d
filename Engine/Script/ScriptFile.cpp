@@ -220,7 +220,7 @@ asIScriptObject* ScriptFile::createObject(const std::string& className)
     if (scriptNestingLevel >= MAX_SCRIPT_NESTING_LEVEL)
     {
         LOGERROR("Maximum script execution nesting level exceeded, can not create object");
-        return false;
+        return 0;
     }
     
     asIScriptContext* context = mScriptEngine->getScriptFileContext(scriptNestingLevel);
@@ -229,7 +229,7 @@ asIScriptObject* ScriptFile::createObject(const std::string& className)
     if (!type)
         return 0;
     
-    // Ensure that the type implements the "ScriptObject" interface, so it can be returned also to script properly
+    // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found = false;
     std::map<asIObjectType*, bool>::const_iterator i = mCheckedClasses.find(type);
     if (i != mCheckedClasses.end())
