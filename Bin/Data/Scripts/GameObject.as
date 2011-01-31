@@ -85,7 +85,7 @@ class GameObject : ScriptObject
         Sound@ sound = cache.getResource("Sound", soundName);
         channel.play(sound, sound.getFrequency());
     }
-    
+
     Entity@ spawnObject(const Vector3&in position, const Quaternion&in rotation, const string&in className)
     {
         Entity@ newEntity = scene.createEntity();
@@ -123,7 +123,7 @@ class GameObject : ScriptObject
     {
         Entity@ newEntity = scene.createEntity();
 
-        // Create a GameObject for managing the effect lifetime
+        // Create a GameObject for managing the sound lifetime
         ScriptInstance@ instance = newEntity.createComponent("ScriptInstance");
         instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NinjaSnowWar.as"), "GameObject");
         GameObject@ object = cast<GameObject>(instance.getScriptObject());
@@ -131,7 +131,7 @@ class GameObject : ScriptObject
             object.duration = duration;
 
         // Create the sound channel
-        PositionalChannel@ channel = newEntity.createComponent("PositionalChannel", entity.getUniqueComponentName());
+        PositionalChannel@ channel = newEntity.createComponent("PositionalChannel");
         channel.setPosition(position);
         channel.setAutoRemove(true);
         channel.setDistanceAttenuation(200, 5000, 1);

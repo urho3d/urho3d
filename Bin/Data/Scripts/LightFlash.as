@@ -24,7 +24,7 @@ class LightFlash : GameObject
         Light@ light = entity.getComponent("Light");
         light.setColor(light.getColor() * max(1.0 - timeStep * 10.0, 0.0));
 
-        if (duration > 0)
+        if (duration >= 0)
         {
             duration -= timeStep;
             if (duration <= 0)
