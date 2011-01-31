@@ -54,6 +54,7 @@
 #include "Scene.h"
 #include "ScriptComponentFactory.h"
 #include "ScriptEngine.h"
+#include "ScriptInstance.h"
 #include "ScriptResourceFactory.h"
 #include "Server.h"
 #include "StringUtils.h"
@@ -371,6 +372,11 @@ DebugHud* Engine::createDebugHud()
     return mDebugHud;
 }
 
+void Engine::setDefaultScene(Scene* scene)
+{
+    mDefaultScene = scene;
+}
+
 void Engine::setMinFps(int fps)
 {
     mMinFps = max(fps, 0);
@@ -642,4 +648,15 @@ void Engine::registerScriptAPI()
     
     LOGDEBUG("Registering Engine library");
     registerEngineLibrary(engine);
+}
+
+
+Scene* getScriptContextScene()
+{
+    Entity* entity = getScriptContextEntity();
+    Scene* entityScene = entity ? entity->getScene() : 0;
+    if (entityScene)
+        return entityScene;
+    // If no entity's scene, try the default stored in Engine
+    return getEngine()->getDefaultScene();
 }

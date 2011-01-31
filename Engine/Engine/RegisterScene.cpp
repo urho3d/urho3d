@@ -177,6 +177,12 @@ static Component* EntityGetComponentWithName(const std::string& type, const std:
     return ptr->getComponent(ShortStringHash(type), name);
 }
 
+static CScriptArray* EntityGetComponents(Entity* ptr)
+{
+    const std::vector<SharedPtr<Component> >& components = ptr->getComponents();
+    return sharedPtrVectorToHandleArray<Component>(components, "array<Component@>");
+}
+
 static Entity* GetEntity()
 {
     return getScriptContextEntity();
@@ -224,6 +230,8 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "bool hasComponent(const string& in, const string& in) const", asFUNCTION(EntityHasComponentWithName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in) const", asFUNCTION(EntityGetComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "Component@+ getComponent(const string& in, const string& in) const", asFUNCTION(EntityGetComponentWithName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "uint getNumComponents() const", asMETHOD(Entity, getNumComponents), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Entity", "array<Component@>@ getComponents() const", asFUNCTION(EntityGetComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "bool isAuthority() const", asMETHOD(Entity, isAuthority), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isProxy() const", asMETHOD(Entity, isProxy), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isOwnerPredicted() const", asMETHOD(Entity, isOwnerPredicted), asCALL_THISCALL);
@@ -365,7 +373,7 @@ static CScriptArray* SceneGetEntities(Scene* ptr)
     std::vector<Entity*> result;
     for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
         result.push_back(i->second);
-    return vectorToHandleArray<Entity*>(result, "array<Entity@>");
+    return vectorToHandleArray<Entity>(result, "array<Entity@>");
 }
 
 static CScriptArray* SceneGetEntitiesWithClass(const std::string& className, Scene* ptr)
@@ -388,7 +396,7 @@ static CScriptArray* SceneGetEntitiesWithClass(const std::string& className, Sce
             }
         }
     }
-    return vectorToHandleArray<Entity*>(result, "array<Entity@>");
+    return vectorToHandleArray<Entity>(result, "array<Entity@>");
 }
 
 static void SendDelayedEvent(const std::string& eventType, const VariantMap& eventData, float delay)
@@ -450,6 +458,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool hasEntity(const string& in) const", asMETHODPR(Scene, hasEntity, (const std::string&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(uint) const", asMETHODPR(Scene, getEntity, (EntityID) const, Entity*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(const string& in) const", asMETHODPR(Scene, getEntity, (const std::string&) const, Entity*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "uint getNumEntities() const", asMETHOD(Scene, getNumEntities), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities() const", asFUNCTION(SceneGetEntities), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities(const string& in) const", asFUNCTION(SceneGetEntitiesWithClass), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Vector3 getEntityPosition(Entity@+) const", asMETHOD(Scene, getEntityPosition), asCALL_THISCALL);

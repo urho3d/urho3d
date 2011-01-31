@@ -156,7 +156,5 @@ private:
 ScriptInstance* getScriptContextComponent();
 //! Return the entity of the active context
 Entity* getScriptContextEntity();
-//! Return the scene of the active context
-Scene* getScriptContextScene();
 
 #endif // SCRIPT_SCRIPTINSTANCE_H

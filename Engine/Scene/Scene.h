@@ -158,6 +158,8 @@ public:
     Entity* getEntity(const std::string& name) const;
     //! Return entity by name hash, or null if not found. Needs to search through all entities
     Entity* getEntity(StringHash nameHash) const;
+    //! Return number of entities
+    unsigned getNumEntities() const { return mEntities.size(); }
     //! Return all entities
     const std::map<EntityID, SharedPtr<Entity> >& getEntities() const { return mEntities; }
     //! Return a component by component reference, or null if not found

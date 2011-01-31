@@ -98,10 +98,10 @@ bool ScriptEngine::execute(const std::string& line)
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
     PROFILE(Script_ExecuteImmediate);
     
-    std::string wrappedLine = "void temp(){\n" + line + ";\n}";
+    std::string wrappedLine = "void f(){\n" + line + ";\n}";
     
     // Create a dummy module for compiling the line
-    asIScriptModule* module = mAngelScriptEngine->GetModule("temp", asGM_ALWAYS_CREATE);
+    asIScriptModule* module = mAngelScriptEngine->GetModule("ExecuteImmediate", asGM_ALWAYS_CREATE);
     if (!module)
         return false;
     

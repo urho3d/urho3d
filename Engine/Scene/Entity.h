@@ -178,6 +178,8 @@ public:
     Component* getComponent(ShortStringHash type, StringHash nameHash) const;
     //! Return a component by combined 16-bit hash, null if not found
     Component* getComponent(unsigned short combinedHash) const;
+    //! Return number of components
+    unsigned getNumComponents() const { return mComponents.size(); }
     //! Return all components
     const std::vector<SharedPtr<Component> >& getComponents() const { return mComponents; }
     //! Return components of a specific type

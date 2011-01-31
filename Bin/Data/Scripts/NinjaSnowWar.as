@@ -72,6 +72,8 @@ void initConsole()
 void initScene()
 {
     @gameScene = engine.createScene("NinjaSnowWar", BoundingBox(-100000.0, 100000.0), 8, true);
+    // Make the scene directly accessible from the console
+    engine.setDefaultScene(gameScene);
 
     File@ levelFile = cache.getFile("TestLevel.xml");
     gameScene.loadXML(levelFile);

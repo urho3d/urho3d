@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "Engine.h"
+#include "Entity.h"
 #include "RegisterTemplates.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"

@@ -915,7 +915,7 @@ static CScriptArray* OctreeGetNodesPoint(const Vector3& point, unsigned includeF
     static std::vector<VolumeNode*> result;
     PointOctreeQuery query(point, result, includeFlags, excludeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode*>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
 }
 
 static CScriptArray* OctreeGetNodesBox(const BoundingBox& box, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
@@ -923,7 +923,7 @@ static CScriptArray* OctreeGetNodesBox(const BoundingBox& box, unsigned includeF
     static std::vector<VolumeNode*> result;
     BoxOctreeQuery query(box, result, includeFlags, excludeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode*>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
 }
 
 static CScriptArray* OctreeGetNodesFrustum(const Frustum& frustum, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
@@ -931,7 +931,7 @@ static CScriptArray* OctreeGetNodesFrustum(const Frustum& frustum, unsigned incl
     static std::vector<VolumeNode*> result;
     FrustumOctreeQuery query(frustum, result, includeFlags, excludeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode*>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
 }
 
 static CScriptArray* OctreeGetNodesSphere(const Sphere& sphere, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
@@ -939,7 +939,7 @@ static CScriptArray* OctreeGetNodesSphere(const Sphere& sphere, unsigned include
     static std::vector<VolumeNode*> result;
     SphereOctreeQuery query(sphere, result, includeFlags, excludeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode*>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
 }
 
 static Octree* SceneGetOctree(Scene* ptr)

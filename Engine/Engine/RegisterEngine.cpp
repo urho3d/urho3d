@@ -243,19 +243,13 @@ static void registerClient(asIScriptEngine* engine)
 static CScriptArray* ServerGetScenes(Server* ptr)
 {
     const std::vector<SharedPtr<Scene> >& scenes = ptr->getScenes();
-    std::vector<Scene*> result;
-    for (unsigned i = 0; i < scenes.size(); ++i)
-        result.push_back(scenes[i]);
-    return vectorToHandleArray<Scene*>(result, "array<Scene@>");
+    return sharedPtrVectorToHandleArray<Scene>(scenes, "array<Scene@>");
 }
 
 static CScriptArray* ServerGetConnections(Server* ptr)
 {
     const std::vector<SharedPtr<Connection> >& connections = ptr->getConnections();
-    std::vector<Connection*> result;
-    for (unsigned i = 0; i < connections.size(); ++i)
-        result.push_back(connections[i]);
-    return vectorToHandleArray<Connection*>(result, "array<Connection@>");
+    return sharedPtrVectorToHandleArray<Connection>(connections, "array<Connection@>");
 }
 
 static Server* GetServer()
@@ -441,6 +435,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "DebugHud@+ createDebugHud()", asMETHOD(Engine, createDebugHud), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeClient()", asMETHOD(Engine, removeClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeServer()", asMETHOD(Engine, removeServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void setDefaultScene(Scene@+)", asMETHOD(Engine, setDefaultScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMinFps(int)", asMETHOD(Engine, setMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMaxFps(int)", asMETHOD(Engine, setMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMaxInactiveFps(int)", asMETHOD(Engine, setMaxInactiveFps), asCALL_THISCALL);
@@ -449,6 +444,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "void exit()", asMETHOD(Engine, exit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void dumpProfilingData()", asMETHOD(Engine, dumpProfilingData), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void dumpResources()", asMETHOD(Engine, dumpResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "Scene@+ getDefaultScene() const", asMETHOD(Engine, getDefaultScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int getMinFps() const", asMETHOD(Engine, getMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int getMaxFps() const", asMETHOD(Engine, getMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int getMaxInactiveFps() const", asMETHOD(Engine, getMaxInactiveFps), asCALL_THISCALL);

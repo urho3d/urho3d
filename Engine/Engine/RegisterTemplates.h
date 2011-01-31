@@ -78,7 +78,7 @@ template <class T> CScriptArray* vectorToArray(const std::vector<T>& vector, con
 }
 
 //! Template function for std::vector to handle array conversion
-template <class T> CScriptArray* vectorToHandleArray(const std::vector<T>& vector, const char* arrayName)
+template <class T> CScriptArray* vectorToHandleArray(const std::vector<T*>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
@@ -92,7 +92,31 @@ template <class T> CScriptArray* vectorToHandleArray(const std::vector<T>& vecto
             // Increment reference count for storing in the array
             if (vector[i])
                 vector[i]->addRef();
-            *(static_cast<T*>(arr->At(i))) = vector[i];
+            *(static_cast<T**>(arr->At(i))) = vector[i];
+        }
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
+//! Template function for shared pointer std::vector to handle array conversion
+template <class T> CScriptArray* sharedPtrVectorToHandleArray(const std::vector<SharedPtr<T> >& vector, const char* arrayName)
+{
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIScriptEngine* engine = context->GetEngine();
+        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        {
+            // Increment reference count for storing in the array
+            if (vector[i].getPtr())
+                vector[i]->addRef();
+            *(static_cast<T**>(arr->At(i))) = vector[i].getPtr();
         }
         
         return arr;

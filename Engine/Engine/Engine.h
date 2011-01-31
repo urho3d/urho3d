@@ -90,6 +90,8 @@ public:
     void removeClient();
     //! Remove the server subsystem
     void removeServer();
+    //! Set the default scene. This will always be available as the "scene" global property to scripting
+    void setDefaultScene(Scene* scene);
     //! Set minimum frames per second. If FPS goes lower than this, time will appear to slow down
     void setMinFps(int fps);
     //! Set maximum frames per second. The engine will sleep if FPS is higher than this
@@ -141,6 +143,8 @@ public:
     UIElement* getUIRoot() const;
     //! Return UI cursor if it has been set
     Cursor* getUICursor() const;
+    //! Return the default scene
+    Scene* getDefaultScene() const { return mDefaultScene; }
     //! Return the minimum frames per second
     int getMinFps() const { return mMinFps; }
     //! Return the maximum frames per second
@@ -199,6 +203,8 @@ private:
     SharedPtr<ScriptEngine> mScriptEngine;
     //! UI subsystem
     SharedPtr<UI> mUI;
+    //! Default scene
+    WeakPtr<Scene> mDefaultScene;
     //! Window title
     std::string mWindowTitle;
     //! Frame update timer
@@ -229,5 +235,8 @@ inline Engine* getEngine()
 {
     return Engine::sInstance;
 }
+
+//! Return the scene of the active context, or the default scene
+Scene* getScriptContextScene();
 
 #endif // ENGINE_ENGINE_H

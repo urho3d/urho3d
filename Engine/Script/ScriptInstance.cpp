@@ -480,9 +480,3 @@ Entity* getScriptContextEntity()
     ScriptInstance* instance = getScriptContextComponent();
     return instance ? instance->getEntity() : 0;
 }
-
-Scene* getScriptContextScene()
-{
-    Entity* entity = getScriptContextEntity();
-    return entity ? entity->getScene() : 0;
-}

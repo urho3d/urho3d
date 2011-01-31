@@ -63,7 +63,9 @@ void runFrame()
 void initScene()
 {
     @testScene = engine.createScene("GraphicsTest", BoundingBox(-1000.0, 1000.0), 8, true);
-    
+    // Make the scene directly accessible from the console
+    engine.setDefaultScene(testScene);
+
     PhysicsWorld@ world = testScene.getPhysicsWorld();
     
     // Set the physics world parameters
