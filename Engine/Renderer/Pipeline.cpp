@@ -964,58 +964,52 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
     vertexShaders.clear();
     pixelShaders.clear();
     
-    try
+    switch (i->first)
     {
-        switch (i->first)
+    default:
+        vertexShaders.resize(MAX_GEOMETRYTYPES);
+        pixelShaders.resize(1);
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
+            vertexShaders[j] = getVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
+        pixelShaders[0] = getPixelShader(pixelShaderName);
+        break;
+        
+    case PASS_LIGHT:
+    case PASS_NEGATIVE:
+        vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+        pixelShaders.resize(MAX_LIGHT_PS_VARIATIONS);
+        
+        for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
         {
-        default:
-            vertexShaders.resize(MAX_GEOMETRYTYPES);
-            pixelShaders.resize(1);
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
-                vertexShaders[j] = getVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
-            pixelShaders[0] = getPixelShader(pixelShaderName);
-            break;
-            
-        case PASS_LIGHT:
-        case PASS_NEGATIVE:
-            vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            pixelShaders.resize(MAX_LIGHT_PS_VARIATIONS);
-            
-            for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
-            {
-                unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
-                unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-                if ((!(l & LVS_SHADOW)) || (allowShadows))
-                    vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
-                else
-                    vertexShaders[j].reset();
-            }
-            for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
-            {
-                unsigned variation = j % 5;
-                if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
-                {
-                    if (allowShadows)
-                        pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] + 
-                            shadowPSVariations[hwShadows]);
-                    else
-                        pixelShaders[j].reset();
-                }
-                else
-                {
-                    // For the negative pass, load only the negative version of the shader
-                    bool needed = (pass == PASS_LIGHT) ? (variation != LPS_NEGATIVE) : (variation == LPS_NEGATIVE);
-                    if (needed)
-                        pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j]);
-                    else
-                        pixelShaders[j].reset();
-                }
-            }
-            break;
+            unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
+            unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
+            if ((!(l & LVS_SHADOW)) || (allowShadows))
+                vertexShaders[j] = getVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
+            else
+                vertexShaders[j].reset();
         }
-    }
-    catch (...)
-    {
+        for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS; ++j)
+        {
+            unsigned variation = j % 5;
+            if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
+            {
+                if (allowShadows)
+                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] + 
+                        shadowPSVariations[hwShadows]);
+                else
+                    pixelShaders[j].reset();
+            }
+            else
+            {
+                // For the negative pass, load only the negative version of the shader
+                bool needed = (pass == PASS_LIGHT) ? (variation != LPS_NEGATIVE) : (variation == LPS_NEGATIVE);
+                if (needed)
+                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j]);
+                else
+                    pixelShaders[j].reset();
+            }
+        }
+        break;
     }
     
     technique->markShadersLoaded(mShadersChangedFrameNumber);
