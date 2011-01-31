@@ -13,6 +13,7 @@ const Vector3 ninjaThrowVelocity(0, 425, 2000);
 const Vector3 ninjaThrowPosition(0, 20, 100);
 const float ninjaThrowDelay = 0.1;
 const float ninjaDrawDistance = 15000;
+const float ninjaCorpseDuration = 3;
 
 class Ninja : GameObject
 {
@@ -29,6 +30,7 @@ class Ninja : GameObject
 
     Ninja()
     {
+        health = maxHealth = 2;
         okToJump = false;
         smoke = false;
         onGround = false;
@@ -93,6 +95,12 @@ class Ninja : GameObject
 
     void updateFixed(float timeStep)
     {
+        if (health <= 0)
+        {
+            deathUpdate(timeStep);
+            return;
+        }
+
         RigidBody@ body = entity.getComponent("RigidBody");
         AnimationController@ controller = entity.getComponent("AnimationController");
 
@@ -229,10 +237,12 @@ class Ninja : GameObject
             controller.setFade("Models/Ninja_Attack1.ani", 0.0, 0.5);
             controller.setPriority("Models/Ninja_Attack1.ani", 1);
 
-            Entity@ snowball = spawnObject("SnowBall", body.getPhysicsPosition() + vel * timeStep + q * ninjaThrowPosition, getAim());
+            Entity@ snowball = spawnObject(body.getPhysicsPosition() + vel * timeStep + q * ninjaThrowPosition, getAim(), "SnowBall");
             RigidBody@ snowballBody = snowball.getComponent("RigidBody");
             snowballBody.setLinearVelocity(projectileVel);
-            
+            GameObject@ snowballObject = cast<GameObject>(snowball.getScriptObject());
+            snowballObject.side = side;
+
             playSound("Sounds/NutThrow.wav");
 
             throwTime = ninjaThrowDelay;
@@ -242,6 +252,79 @@ class Ninja : GameObject
         
         resetWorldCollision();
     }
-    
 
+    void deathUpdate(float timeStep)
+    {
+        RigidBody@ body = entity.getComponent("RigidBody");
+        AnimationController@ controller = entity.getComponent("AnimationController");
+
+        Vector3 vel = body.getLinearVelocity();
+
+        // Overall damping to cap maximum speed
+        body.applyForce(Vector3(-ninjaDampingForce * vel.x, 0, -ninjaDampingForce * vel.z));
+
+        // Collide only to world geometry
+        body.setCollisionMask(2);
+
+        // Pick death animation on first death update
+        if (deathDir == 0)
+        {
+            if (random(1.0) < 0.5)
+                deathDir = -1;
+            else
+                deathDir = 1;
+
+            playSound("Sounds/SmallExplosion.wav");
+        }
+
+        deathTime += timeStep;
+        AnimatedModel@ model = entity.getComponent("AnimatedModel");
+
+        // Move the model node to center the corpse mostly within the physics cylinder
+        // (because of the animation)
+        if (deathDir < 0)
+        {
+            // Backward death
+            controller.removeAnimations(ANIM_ATTACK, 0.1);
+            controller.setAnimation("Models/Ninja_Death1.ani", ANIM_MOVE, false, false, 0.5, 1.0, 0.2, 0.0, true);
+            if ((deathTime >= 0.3) && (deathTime < 0.8))
+                model.translate(Vector3(0, 0, 425 * timeStep));
+        }
+        else if (deathDir > 0)
+        {
+            // Forward death
+            controller.removeAnimations(ANIM_ATTACK, 0.1);
+            controller.setAnimation("Models/Ninja_Death2.ani", ANIM_MOVE, false, false, 0.5, 1.0, 0.2, 0.0, true);
+            if ((deathTime >= 0.4) && (deathTime < 0.8))
+                model.translate(Vector3(0, 0, -425 * timeStep));
+        }
+
+        // Create smokecloud just before vanishing
+        if ((deathTime > (ninjaCorpseDuration - 1)) && (!smoke))
+        {
+            spawnParticleEffect(body.getPhysicsPosition() + Vector3(0, -40, 0), "Particle/Smoke.xml", 8);
+            smoke = true;
+        }
+
+        if (deathTime > ninjaCorpseDuration)
+        {
+            spawnObject(body.getPhysicsPosition() + Vector3(0, -50, 0), Quaternion(), "LightFlash");
+            spawnSound(body.getPhysicsPosition() + Vector3(0, -50, 0), "Sounds/BigExplosion.wav", 2);
+            scene.removeEntity(entity);
+        }
+    }
+
+    bool heal(int amount)
+    {
+        if (health == maxHealth)
+            return false;
+
+        health += amount;
+        if (health > maxHealth)
+            health = maxHealth;
+        // If player, play the "powerup" sound
+        if (side == SIDE_PLAYER)
+            playSound("Sounds/Powerup.wav");
+        return true;
+    }
 }

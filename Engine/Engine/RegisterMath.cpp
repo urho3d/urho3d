@@ -80,7 +80,7 @@ static void registerMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("int randomInt(int)", asFUNCTIONPR(random, (int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("void setRandomSeed(int)", asFUNCTION(srand), asCALL_CDECL);
     engine->RegisterGlobalFunction("float min(float, float)", asFUNCTIONPR(min, (float, float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float max(float, float)", asFUNCTIONPR(min, (float, float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float max(float, float)", asFUNCTIONPR(max, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float clamp(float, float, float)", asFUNCTIONPR(clamp, (float, float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float lerp(float, float, float)", asFUNCTIONPR(lerp, (float, float, float), float), asCALL_CDECL);
 }

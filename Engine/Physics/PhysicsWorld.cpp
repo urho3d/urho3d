@@ -591,16 +591,16 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     
     if (entityA)
     {
-        entityCollisionData[EntityCollision::P_BODY] = (void*)bodyA;
-        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)bodyB;
+        entityCollisionData[EntityCollision::P_BODY] = (void*)rigidBodyA;
+        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyB;
         entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityB;
         entityCollisionData[EntityCollision::P_CONTACTS] = contactsA.getBuffer();
         sendEvent(entityA, EVENT_ENTITYCOLLISION, entityCollisionData);
     }
     if (entityB)
     {
-        entityCollisionData[EntityCollision::P_BODY] = (void*)bodyB;
-        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)bodyA;
+        entityCollisionData[EntityCollision::P_BODY] = (void*)rigidBodyB;
+        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyA;
         entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityA;
         entityCollisionData[EntityCollision::P_CONTACTS] = contactsB.getBuffer();
         sendEvent(entityB, EVENT_ENTITYCOLLISION, entityCollisionData);

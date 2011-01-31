@@ -343,20 +343,20 @@ void ScriptInstance::releaseObject()
 {
     if (mScriptObject)
     {
-        if (mMethods[METHOD_STOP])
+        if ((mScriptFile) && (mMethods[METHOD_STOP]))
             mScriptFile->execute(mScriptObject, mMethods[METHOD_STOP]);
         
         removeAllEventHandlers();
-        clearMethods();
-        // Unsubscribe also the update events
         unsubscribeFromAllEvents();
+        clearMethods();
         
         mScriptObject->Release();
         mScriptObject = 0;
         
         objectToInstance.erase((void*)mScriptObject);
         
-        mScriptFile->removeScriptInstance(this);
+        if (mScriptFile)
+            mScriptFile->removeScriptInstance(this);
     }
 }
 

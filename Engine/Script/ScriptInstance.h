@@ -140,7 +140,7 @@ private:
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;
     //! Script file
-    SharedPtr<ScriptFile> mScriptFile;
+    WeakPtr<ScriptFile> mScriptFile;
     //! Script object
     asIScriptObject* mScriptObject;
     //! Class name

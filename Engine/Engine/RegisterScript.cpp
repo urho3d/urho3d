@@ -75,7 +75,6 @@ static ScriptInstance* GetSelf()
 static void registerScriptInstance(asIScriptEngine* engine)
 {
     registerComponent<ScriptInstance>(engine, "ScriptInstance");
-    engine->RegisterInterface("ScriptObject");
     engine->RegisterObjectMethod("ScriptInstance", "bool setScriptClass(ScriptFile@+, const string& in)", asMETHOD(ScriptInstance, setScriptClass), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void setEnabled(bool)", asMETHOD(ScriptInstance, setEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool execute(const string& in, const array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);

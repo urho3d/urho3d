@@ -6,13 +6,18 @@ const float snowballDampingForce = 20;
 const float snowballMinHitSpeed = 100;
 const float snowballDuration = 5;
 const float snowballGroundHitDuration = 1;
+const float snowballObjectHitDuration = 0;
 const float snowballDrawDistance = 7500;
+const int snowballDamage = 1;
 
 class SnowBall : GameObject
 {
+    int hitDamage;
+
     SnowBall()
     {
         duration = snowballDuration;
+        hitDamage = snowballDamage;
     }
 
     void start()
@@ -51,23 +56,44 @@ class SnowBall : GameObject
             body.applyForce(Vector3(-snowballDampingForce * vel.x, 0, -snowballDampingForce * vel.z));
             
         // Disappear when duration expired
-        if (duration > 0)
+        if (duration >= 0)
         {
             duration -= timeStep;
             if (duration <= 0)
             {
-                spawnParticleEffect("Particle/SnowExplosion.xml", 1, body.getPhysicsPosition(), Quaternion());
+                spawnParticleEffect(body.getPhysicsPosition(), "Particle/SnowExplosion.xml", 1);
                 scene.removeEntity(entity);
             }
         }
     }
     
-    void handleWorldCollision(VariantMap& eventData)
+    void worldCollision(VariantMap& eventData)
     {
-        GameObject::handleWorldCollision(eventData);
+        GameObject::worldCollision(eventData);
         
         // If hit the ground, disappear after a short while
         if (duration > snowballGroundHitDuration)
             duration = snowballGroundHitDuration;
+    }
+
+    void objectCollision(Entity@ otherEntity, GameObject@ otherObject, VariantMap& eventData)
+    {
+        if (hitDamage > 0)
+        {
+            RigidBody@ body = entity.getComponent("RigidBody");
+            if ((body.getLinearVelocity().getLength() >= snowballMinHitSpeed))
+            {
+                if (side != otherObject.side)
+                {
+                    otherObject.damage(this, hitDamage);
+                    // Create a temp entity for the hit sound
+                    spawnSound(body.getPhysicsPosition(), "Sounds/PlayerFistHit.wav", 0.2);
+                }
+
+                hitDamage = 0;
+            }
+        }
+        if (duration > snowballObjectHitDuration)
+            duration = snowballObjectHitDuration;
     }
 }

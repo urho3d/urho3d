@@ -1,7 +1,16 @@
 // Partial remake of NinjaSnowWar in script
 
+#include "Scripts/LightFlash.as"
 #include "Scripts/Ninja.as"
+#include "Scripts/Potion.as"
 #include "Scripts/SnowBall.as"
+#include "Scripts/SnowCrate.as"
+
+const float mouseSensitivity = 0.125;
+const float cameraMinDist = 25;
+const float cameraMaxDist = 500;
+const float cameraSafetyDist = 30;
+const int playerHealth = 20;
 
 Scene@ gameScene;
 Camera@ gameCamera;
@@ -12,11 +21,8 @@ BorderImage@ healthBar;
 BorderImage@ sight;
 
 Controls playerControls;
-float mouseSensitivity = 0.125;
-float cameraMinDist = 25;
-float cameraMaxDist = 500;
-float cameraSafetyDist = 30;
 bool paused = false;
+bool gameOn = false;
 
 void start()
 {
@@ -25,7 +31,7 @@ void start()
     initScene();
     createCamera();
     createOverlays();
-    spawnPlayer();
+    startGame();
 
     subscribeToEvent("Update", "handleUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
@@ -145,13 +151,22 @@ void createOverlays()
     uiRoot.addChild(healthBorder);
 }
 
-void spawnPlayer()
+void startGame()
 {
+    // Clear the scene of all existing scripted entities
+    array<Entity@> scriptedEntities = gameScene.getScriptedEntities();
+    for (int i = 0; i < scriptedEntities.length(); ++i)
+        gameScene.removeEntity(scriptedEntities[i]);
+
     Entity@ playerEntity = gameScene.createEntity("Player");
     ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
     instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NinjaSnowWar.as"), "Ninja");
-    Ninja@ object = cast<Ninja>(instance.getScriptObject());
+    GameObject@ object = cast<GameObject>(instance.getScriptObject());
     object.create(Vector3(0, 90, 0), Quaternion());
+    object.health = object.maxHealth = playerHealth;
+    object.side = SIDE_PLAYER;
+
+    gameOn = true;
 }
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
@@ -177,11 +192,16 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
 void handlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     updateCamera();
+    updateStatus();
 }
 
 void updateControls()
 {
     playerControls.set(CTRL_ALL, false);
+
+    Entity@ playerEntity = gameScene.getEntity("Player");
+    if (@playerEntity == null)
+        return;
 
     if (!console.isVisible())
     {
@@ -208,13 +228,11 @@ void updateControls()
     playerControls.pitch += mouseSensitivity * input.getMouseMoveY();
     playerControls.pitch = clamp(playerControls.pitch, -60, 60);
 
-    Entity@ playerEntity = gameScene.getEntity("Player");
-    if (@playerEntity == null)
-        return;
-
-    ScriptInstance@ instance = playerEntity.getComponent("ScriptInstance");
-    Ninja@ object = cast<Ninja>(instance.getScriptObject());
+    GameObject@ object = cast<GameObject>(playerEntity.getScriptObject());
     object.setControls(playerControls);
+    
+    if ((input.getKeyPress('K')) && (object.health > 0))
+        object.health = object.health - 1;
 }
 
 void updateCamera()
@@ -245,6 +263,19 @@ void updateCamera()
 
     audio.setListenerPosition(pos);
     audio.setListenerRotation(dir);
+}
+
+void updateStatus()
+{
+    if (engine.isHeadless())
+        return;
+
+    Entity@ playerEntity = gameScene.getEntity("Player");
+    if (@playerEntity == null)
+        return;
+
+    GameObject@ object = cast<GameObject>(playerEntity.getScriptObject());
+    healthBar.setWidth(116 * object.health / playerHealth);
 }
 
 void handleKeyDown(StringHash eventType, VariantMap& eventData)
