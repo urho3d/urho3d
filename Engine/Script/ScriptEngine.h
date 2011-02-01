@@ -40,9 +40,6 @@ enum ScriptLogMode
 //! Maximum function/method nesting level
 static const unsigned MAX_SCRIPT_NESTING_LEVEL = 32;
 
-//! Amount of garbage collection iterations when not doing a full cycle
-static const unsigned GARBAGE_COLLECT_ITERATIONS = 5;
-
 //! Utilizes the AngelScript library for executing scripts
 class ScriptEngine : public RefCounted
 {

@@ -45,7 +45,7 @@
     <EnemySpawnRate>1</EnemySpawnRate>
     <EnemySpawnPosition>0 1000 12000</EnemySpawnPosition>
     <EnemySpawnOffset>4000</EnemySpawnOffset>
-    <EnemySpawnVelocity>0 1000 -2500</EnemySpawnVelocity>
+    <EnemySpawnVelocity>0 1000 -3000</EnemySpawnVelocity>
     <PowerUpSpawnRate>15</PowerUpSpawnRate>
     <PowerUpSpawnOffset>4000</PowerUpSpawnOffset>
     <PowerUpSpawnHeight>5000</PowerUpSpawnHeight>

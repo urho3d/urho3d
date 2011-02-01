@@ -92,8 +92,13 @@ void registerLocalOnlyEvent(StringHash eventType)
 
 void registerLocalOnlyEvent(const std::string& name)
 {
-    registerHash(name);
+    registerHash(name, false);
     localOnlyEvents.insert(StringHash(name));
+}
+
+void removeAllLocalOnlyEvents()
+{
+    localOnlyEvents.clear();
 }
 
 bool checkRemoteEvent(StringHash eventType)

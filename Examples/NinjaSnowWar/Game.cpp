@@ -918,7 +918,7 @@ void Game::spawnObjects(float timeStep)
             float maxOffset = GameConfig::getReal("Game/EnemySpawnOffset");
             float offset = random(maxOffset * 2.0f) - maxOffset;
             // Random north/east/south/west direction
-            int dir = random(4);
+            int dir = rand() & 3;
             dir *= 90;
             Quaternion q((float)dir, Vector3::sUp);
             Vector3 position(q * (GameConfig::getVector3("Game/EnemySpawnPosition") + Vector3(offset, 0, 0)));

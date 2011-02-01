@@ -28,6 +28,7 @@
 #include "RegisterArray.h"
 #include "RegisterStdString.h"
 #include "ScriptEngine.h"
+#include "ScriptFile.h"
 #include "StringUtils.h"
 
 #include <angelscript.h>
@@ -128,14 +129,14 @@ void ScriptEngine::garbageCollect(bool fullCycle)
 {
     PROFILE(Script_GarbageCollect);
     
-    // Run either a number of iterations, or a full cycle if requested
-    if (fullCycle)
-        mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE);
-    else
-    {
-        for (unsigned i = 0; i < GARBAGE_COLLECT_ITERATIONS; ++i)
-            mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP);
-    }
+    // Unprepare contexts up to the highest used
+    mImmediateContext->Unprepare();
+    unsigned highest = getHighestScriptNestingLevel();
+    for (unsigned i = 0; i < highest; ++i)
+        mScriptFileContexts[i]->Unprepare();
+    
+    // Then actually garbage collect
+    mAngelScriptEngine->GarbageCollect(fullCycle ? asGC_FULL_CYCLE : asGC_ONE_STEP);
 }
 
 void ScriptEngine::setLogMode(ScriptLogMode mode)

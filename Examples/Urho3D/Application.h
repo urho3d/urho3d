@@ -31,19 +31,24 @@ class Engine;
 class ResourceCache;
 class ScriptFile;
 
+//! Urho3D Shell application
 class Application
 {
 public:
+    //! Construct
     Application();
+    //! Destruct
     ~Application();
     
+    //! Run the script-based initialization & main loop
     void run();
     
 private:
-    void init();
-    
+    //! Engine
     SharedPtr<Engine> mEngine;
+    //! Resource cache
     SharedPtr<ResourceCache> mCache;
+    //! Script file
     SharedPtr<ScriptFile> mScriptFile;
 };
 

@@ -64,6 +64,9 @@ static float ATan2(float y, float x)
 
 static void registerMathFunctions(asIScriptEngine* engine)
 {
+    engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
+    engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
+    
     engine->RegisterGlobalFunction("float sin(float)", asFUNCTION(Sin), asCALL_CDECL);
     engine->RegisterGlobalFunction("float cos(float)", asFUNCTION(Cos), asCALL_CDECL);
     engine->RegisterGlobalFunction("float tan(float)", asFUNCTION(Tan), asCALL_CDECL);

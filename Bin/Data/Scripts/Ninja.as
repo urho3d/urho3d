@@ -1,4 +1,5 @@
 #include "Scripts/GameObject.as"
+#include "Scripts/AIController.as"
 
 const int ANIM_MOVE = 1;
 const int ANIM_ATTACK = 2;
@@ -14,9 +15,13 @@ const Vector3 ninjaThrowPosition(0, 20, 100);
 const float ninjaThrowDelay = 0.1;
 const float ninjaDrawDistance = 15000;
 const float ninjaCorpseDuration = 3;
+const int ninjaPoints = 250;
 
 class Ninja : GameObject
 {
+    Controls controls;
+    Controls prevControls;
+    AIController@ controller;
     bool okToJump;
     bool smoke;
     float inAirTime;
@@ -100,6 +105,10 @@ class Ninja : GameObject
             deathUpdate(timeStep);
             return;
         }
+
+        // AI control if controller exists
+        if (@controller != null)
+            controller.control(this, entity, timeStep);
 
         RigidBody@ body = entity.getComponent("RigidBody");
         AnimationController@ controller = entity.getComponent("AnimationController");
@@ -275,6 +284,12 @@ class Ninja : GameObject
                 deathDir = 1;
 
             playSound("Sounds/SmallExplosion.wav");
+            
+            VariantMap eventData;
+            eventData["Points"] = ninjaPoints;
+            eventData["DamageSide"] = lastDamageSide;
+            sendEvent("Points", eventData);
+            sendEvent("Kill", eventData);
         }
 
         deathTime += timeStep;

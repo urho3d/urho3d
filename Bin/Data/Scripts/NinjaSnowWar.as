@@ -1,4 +1,5 @@
-// Partial remake of NinjaSnowWar in script
+// Remake of NinjaSnowWar in script
+// Does not support load/save, or multiplayer yet.
 
 #include "Scripts/LightFlash.as"
 #include "Scripts/Ninja.as"
@@ -10,7 +11,13 @@ const float mouseSensitivity = 0.125;
 const float cameraMinDist = 25;
 const float cameraMaxDist = 500;
 const float cameraSafetyDist = 30;
+const int initialMaxEnemies = 5;
+const int finalMaxEnemies = 25;
+const int maxPowerups = 5;
+const int incrementEach = 10;
 const int playerHealth = 20;
+const float enemySpawnRate = 1;
+const float powerupSpawnRate = 15;
 
 Scene@ gameScene;
 Camera@ gameCamera;
@@ -21,8 +28,15 @@ BorderImage@ healthBar;
 BorderImage@ sight;
 
 Controls playerControls;
+Controls prevPlayerControls;
 bool paused = false;
 bool gameOn = false;
+int score = 0;
+int hiscore = 0;
+int maxEnemies = 0;
+int incrementCounter = 0;
+float enemySpawnTimer = 0;
+float powerupSpawnTimer = 0;
 
 void start()
 {
@@ -34,7 +48,10 @@ void start()
     startGame();
 
     subscribeToEvent("Update", "handleUpdate");
+    subscribeToEvent("PhysicsPreStep", "handleFixedUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
+    subscribeToEvent("Points", "handlePoints");
+    subscribeToEvent("Kill", "handleKill");
     subscribeToEvent("KeyDown", "handleKeyDown");
     subscribeToEvent("WindowResized", "handleWindowResized");
 }
@@ -155,16 +172,29 @@ void startGame()
 {
     // Clear the scene of all existing scripted entities
     array<Entity@> scriptedEntities = gameScene.getScriptedEntities();
-    for (int i = 0; i < scriptedEntities.length(); ++i)
+    for (uint i = 0; i < scriptedEntities.length(); ++i)
         gameScene.removeEntity(scriptedEntities[i]);
 
     Entity@ playerEntity = gameScene.createEntity("Player");
-    GameObject@ object = cast<GameObject>(playerEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
-    object.create(Vector3(0, 90, 0), Quaternion());
-    object.health = object.maxHealth = playerHealth;
-    object.side = SIDE_PLAYER;
+    Ninja@ playerNinja = cast<Ninja>(playerEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
+    playerNinja.create(Vector3(0, 90, 0), Quaternion());
+    playerNinja.health = playerNinja.maxHealth = playerHealth;
+    playerNinja.side = SIDE_PLAYER;
+    // Make sure the player can not shoot on first frame by holding the button down
+    playerNinja.controls = playerNinja.prevControls = playerControls;
+
+    resetAI();
 
     gameOn = true;
+    score = 0;
+    maxEnemies = initialMaxEnemies;
+    incrementCounter = 0;
+    enemySpawnTimer = 0;
+    powerupSpawnTimer = 0;
+    playerControls.yaw = 0;
+    playerControls.pitch = 0;
+
+    messageText.setText("");
 }
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
@@ -174,7 +204,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.getKeyPress(KEY_F2))
         engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
 
-    if ((!console.isVisible()) && (input.getKeyPress('P')))
+    if ((!console.isVisible()) && (input.getKeyPress('P')) && (gameOn))
     {
         paused = !paused;
         if (paused)
@@ -187,19 +217,121 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         updateControls();
 }
 
+void handleFixedUpdate(StringHash eventType, VariantMap& eventData)
+{
+    // Check that scene being updated matches (we have only one scene, but for completeness...)
+    if (@eventData["Scene"].getScene() != @gameScene)
+        return;
+
+    float timeStep = eventData["TimeStep"].getFloat();
+
+    // Spawn new objects and check for end/restart of game
+    spawnObjects(timeStep);
+    checkEndAndRestart();
+}
+
 void handlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     updateCamera();
     updateStatus();
 }
 
+void handlePoints(StringHash eventType, VariantMap& eventData)
+{
+    if (eventData["DamageSide"].getInt() == SIDE_PLAYER)
+    {
+        score += eventData["Points"].getInt();
+        if (score > hiscore)
+            hiscore = score;
+    }
+}
+
+void handleKill(StringHash eventType, VariantMap& eventData)
+{
+    if (eventData["DamageSide"].getInt() == SIDE_PLAYER)
+    {
+        makeAIHarder();
+     
+        // Increment amount of simultaneous enemies after enough kills
+        incrementCounter++;
+        if (incrementCounter >= incrementEach)
+        {
+            incrementCounter = 0;
+            if (maxEnemies < finalMaxEnemies)
+                maxEnemies++;
+        }
+    }
+}
+
+void spawnObjects(float timeStep)
+{
+    // Spawn powerups
+    powerupSpawnTimer += timeStep;
+    if (powerupSpawnTimer >= powerupSpawnRate)
+    {
+        powerupSpawnTimer = 0;
+        //int numPowerups = gameScene.getScriptedEntities("SnowCrate").length() + gameScene.getScriptedEntities("Potion").length();
+        int numPowerups = 0;
+
+        if (numPowerups < maxPowerups)
+        {
+            const float maxOffset = 4000;
+            float xOffset = random(maxOffset * 2.0f) - maxOffset;
+            float zOffset = random(maxOffset * 2.0f) - maxOffset;
+
+            Vector3 position(xOffset, 5000, zOffset);
+            Entity@ crateEntity = gameScene.createEntity();
+            GameObject@ crateObject = cast<GameObject>(crateEntity.createScriptObject("Scripts/NinjaSnowWar.as", "SnowCrate"));
+            crateObject.create(position, Quaternion());
+        }
+    }
+
+    // Spawn enemies
+    enemySpawnTimer += timeStep;
+    if (enemySpawnTimer > enemySpawnRate)
+    {
+        enemySpawnTimer = 0;
+        // Take the player ninja into account
+        int numEnemies = gameScene.getScriptedEntities("Ninja").length() - 1;
+
+        if (numEnemies < maxEnemies)
+        {
+            const float maxOffset = 4000;
+            float offset = random(maxOffset * 2.0) - maxOffset;
+            // Random north/east/south/west direction
+            int dir = randomInt() & 3;
+            dir *= 90;
+            Quaternion q(dir, Vector3(0, 1, 0));
+            Vector3 position(q * Vector3(offset, 1000, 12000));
+
+            Entity@ enemyEntity = gameScene.createEntity();
+            Ninja@ enemyNinja = cast<Ninja>(enemyEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
+            enemyNinja.create(position, q);
+            enemyNinja.side = SIDE_ENEMY;
+            @enemyNinja.controller = AIController();
+            RigidBody@ enemyBody = enemyEntity.getComponent("RigidBody");
+            enemyBody.setLinearVelocity(q * Vector3(0, 1000, -3000));
+        }
+    }
+}
+
+void checkEndAndRestart()
+{
+    if ((gameOn) && (@gameScene.getEntity("Player") == null))
+    {
+        gameOn = false;
+        messageText.setText("Press Fire or Jump to restart!");
+        return;
+    }
+    
+    if ((!gameOn) && (playerControls.isPressed(CTRL_FIRE | CTRL_JUMP, prevPlayerControls)))
+        startGame();
+}
+
 void updateControls()
 {
+    prevPlayerControls = playerControls;
     playerControls.set(CTRL_ALL, false);
-
-    Entity@ playerEntity = gameScene.getEntity("Player");
-    if (@playerEntity == null)
-        return;
 
     if (!console.isVisible())
     {
@@ -226,11 +358,12 @@ void updateControls()
     playerControls.pitch += mouseSensitivity * input.getMouseMoveY();
     playerControls.pitch = clamp(playerControls.pitch, -60, 60);
 
-    GameObject@ object = cast<GameObject>(playerEntity.getScriptObject());
-    object.setControls(playerControls);
-    
-    if ((input.getKeyPress('K')) && (object.health > 0))
-        object.health = object.health - 1;
+    Entity@ playerEntity = gameScene.getEntity("Player");
+    if (@playerEntity != null)
+    {
+        Ninja@ playerNinja = cast<Ninja>(playerEntity.getScriptObject());
+        playerNinja.controls = playerControls;
+    }
 }
 
 void updateCamera()
@@ -267,6 +400,9 @@ void updateStatus()
 {
     if (engine.isHeadless())
         return;
+
+    scoreText.setText("Score " + score);
+    hiscoreText.setText("Hiscore " + hiscore);
 
     Entity@ playerEntity = gameScene.getEntity("Player");
     if (@playerEntity == null)

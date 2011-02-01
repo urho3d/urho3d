@@ -435,6 +435,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "DebugHud@+ createDebugHud()", asMETHOD(Engine, createDebugHud), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeClient()", asMETHOD(Engine, removeClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void removeServer()", asMETHOD(Engine, removeServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void resetLocalOnlyEvents()", asMETHOD(Engine, resetLocalOnlyEvents), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setDefaultScene(Scene@+)", asMETHOD(Engine, setDefaultScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMinFps(int)", asMETHOD(Engine, setMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMaxFps(int)", asMETHOD(Engine, setMaxFps), asCALL_THISCALL);

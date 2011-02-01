@@ -38,10 +38,6 @@
 
 Application::Application()
 {
-    std::string userDir = getUserDocumentsDirectory();
-    std::string applicationDir = userDir + "Urho3D";
-    
-    createDirectory(applicationDir);
 }
 
 Application::~Application()
@@ -56,20 +52,11 @@ Application::~Application()
 
 void Application::run()
 {
-    init();
+    // Create application directory
+    std::string applicationDir = getUserDocumentsDirectory() + "Urho3D";
+    createDirectory(applicationDir);
     
-    while (!mEngine->isExiting())
-    {
-        if (!mScriptFile->execute("void runFrame()"))
-            EXCEPTION("Failed to execute the runFrame() function");
-        
-        // Script garbage collection
-        mEngine->getScriptEngine()->garbageCollect(false);
-    }
-}
-
-void Application::init()
-{
+    // Parse script file name from the command line
     const std::vector<std::string>& arguments = getArguments();
     std::string scriptFileName;
     if ((arguments.size()) && (arguments[0][0] != '-'))
@@ -78,12 +65,11 @@ void Application::init()
         EXCEPTION("Usage: Urho3D <scriptfile> [options]\n\n"
             "The script file should implement the functions void start() and void runFrame(). See the readme for options.\n");
     
+    // Instantiate the engine
     mEngine = new Engine();
     
     // Add resources
     mCache = mEngine->getResourceCache();
-    if (fileExists("CoreData.pak"))
-        mCache->addPackageFile(new PackageFile("CoreData.pak"));
     if (fileExists("Data.pak"))
         mCache->addPackageFile(new PackageFile("Data.pak"));
     else
@@ -91,6 +77,7 @@ void Application::init()
     
     mCache->addResourcePath(getSystemFontDirectory());
     
+    // Initialize engine & scripting
     mEngine->init(arguments);
     mEngine->createScriptEngine();
     
@@ -100,4 +87,11 @@ void Application::init()
         throw Exception(getLog()->getLastMessage(), false);
     if (!mScriptFile->execute("void start()"))
         EXCEPTION("Failed to execute the start() function");
+    
+    // Run until exited
+    while (!mEngine->isExiting())
+    {
+        if (!mScriptFile->execute("void runFrame()"))
+            EXCEPTION("Failed to execute the runFrame() function");
+    }
 }

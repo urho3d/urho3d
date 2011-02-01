@@ -90,6 +90,8 @@ public:
     void removeClient();
     //! Remove the server subsystem
     void removeServer();
+    //! Clear previous and register the default local only events
+    void resetLocalOnlyEvents();
     //! Set the default scene. This will always be available as the "scene" global property to scripting
     void setDefaultScene(Scene* scene);
     //! Set minimum frames per second. If FPS goes lower than this, time will appear to slow down

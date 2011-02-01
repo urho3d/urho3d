@@ -12,8 +12,6 @@ const int SIDE_ENEMY = 2;
 
 class GameObject : ScriptObject
 {
-    Controls controls;
-    Controls prevControls;
     bool onGround;
     bool isSliding;
     float duration;
@@ -35,11 +33,6 @@ class GameObject : ScriptObject
 
     void create(const Vector3&in position, const Quaternion&in rotation)
     {
-    }
-
-    void setControls(const Controls&in newControls)
-    {
-        controls = newControls;
     }
 
     void updateFixed(float timeStep)

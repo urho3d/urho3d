@@ -95,19 +95,8 @@ Engine::Engine(const std::string& windowTitle, const std::string& logFileName, b
     
     mCache = new ResourceCache();
     
-    // Register the inbuilt events as local only
-    static const std::string inbuiltEvents[] = {
-        "Update", "PostUpdate", "PostRenderUpdate", "ClientIdentity", "ClientJoinedScene", "ClientLeftScene", "ClientControls",
-        "ClientDisconnected", "GotSceneInfoList", "JoinedScene", "JoinSceneFailed", "FileTransferCompleted", "FileTransferFailed",
-        "ControlsUpdate", "ControlsPlayback", "MouseButtonDown", "MouseButtonUp", "MouseMove", "KeyDown", "KeyUp", "Char",
-        "PeerConnected", "NetworkPacket", "PeerDisconnected", "PhysicsPreStep", "PhysicsPostStep", "PhysicsCollision",
-        "EntityCollision", "WindowMessage", "WindowResized", "BeginFrame", "EndFrame", "SceneUpdate", "ScenePostUpdate",
-        "AsyncLoadProgress", "AsyncLoadFinished", "TryFocus", "Focused", "Defocused", "Pressed", "Toggled", "SliderChanged",
-        "ViewChanged", "TextChanged", "TextFinished", "ItemSelected", ""
-    };
-    
-    for (unsigned i = 0; inbuiltEvents[i].length(); ++i)
-        registerLocalOnlyEvent(inbuiltEvents[i]);
+    // Register the engine and library events as local only
+    resetLocalOnlyEvents();
     
     sInstance = this;
 }
@@ -277,9 +266,14 @@ void Engine::runFrame(Scene* scene, Camera* camera, bool updateScene)
     {
         PROFILE(Engine_RunFrame);
         
+        // Get frame timestep / update / render
         float timeStep = getNextTimeStep();
         update(timeStep, scene, camera, updateScene);
         render();
+        
+        // Perform script garbage collection outside everything else
+        if (mScriptEngine)
+            mScriptEngine->garbageCollect(false);
     }
     
     mProfiler->endFrame();
@@ -370,6 +364,24 @@ DebugHud* Engine::createDebugHud()
     if (!mDebugHud)
         mDebugHud = new DebugHud(this);
     return mDebugHud;
+}
+
+void Engine::resetLocalOnlyEvents()
+{
+    static const std::string inbuiltEvents[] = {
+        "Update", "PostUpdate", "PostRenderUpdate", "ClientIdentity", "ClientJoinedScene", "ClientLeftScene", "ClientControls",
+        "ClientDisconnected", "GotSceneInfoList", "JoinedScene", "JoinSceneFailed", "FileTransferCompleted", "FileTransferFailed",
+        "ControlsUpdate", "ControlsPlayback", "MouseButtonDown", "MouseButtonUp", "MouseMove", "KeyDown", "KeyUp", "Char",
+        "PeerConnected", "NetworkPacket", "PeerDisconnected", "PhysicsPreStep", "PhysicsPostStep", "PhysicsCollision",
+        "EntityCollision", "WindowMessage", "WindowResized", "BeginFrame", "EndFrame", "SceneUpdate", "ScenePostUpdate",
+        "AsyncLoadProgress", "AsyncLoadFinished", "TryFocus", "Focused", "Defocused", "Pressed", "Toggled", "SliderChanged",
+        "ViewChanged", "TextChanged", "TextFinished", "ItemSelected", ""
+    };
+    
+    // First clear existing registrations, then register the inbuild events
+    removeAllLocalOnlyEvents();
+    for (unsigned i = 0; inbuiltEvents[i].length(); ++i)
+        registerLocalOnlyEvent(inbuiltEvents[i]);
 }
 
 void Engine::setDefaultScene(Scene* scene)

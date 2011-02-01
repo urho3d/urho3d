@@ -4,6 +4,7 @@ const int snowcrateHealth = 5;
 const float snowcrateMass = 200;
 const float snowcrateFriction = 0.35;
 const float snowcrateDrawDistance = 15000;
+const int snowcratePoints = 250;
 
 class SnowCrate : GameObject
 {
@@ -47,6 +48,11 @@ class SnowCrate : GameObject
             spawnParticleEffect(body.getPhysicsPosition(), "Particle/SnowExplosionBig.xml", 2);
             spawnObject(body.getPhysicsPosition(), Quaternion(), "Potion");
             scene.removeEntity(entity);
+            
+            VariantMap eventData;
+            eventData["Points"] = snowcratePoints;
+            eventData["DamageSide"] = lastDamageSide;
+            sendEvent("Points", eventData);
         }
     }
 }

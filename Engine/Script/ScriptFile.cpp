@@ -37,7 +37,8 @@
 
 #include "DebugNew.h"
 
-static int scriptNestingLevel = 0;
+static unsigned scriptNestingLevel = 0;
+static unsigned highestScriptNestingLevel = 0;
 ScriptFile* lastScriptFile = 0;
 
 ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
@@ -59,13 +60,13 @@ ScriptFile::~ScriptFile()
         for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
             (*i)->releaseObject();
         
+        // Perform a full garbage collection cycle, also clean up contexts which might still refer to the module's functions
+        mScriptEngine->garbageCollect(true);
+        
         // Remove the module
         asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
-        
-        // Perform a full garbage collection cycle
-        mScriptEngine->garbageCollect(true);
     }
     if (lastScriptFile == this)
         lastScriptFile = 0;
@@ -103,12 +104,12 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     mScriptEngine->setLogMode(LOGMODE_RETAINED);
     mScriptEngine->clearLogMessages();
     int result = mScriptModule->Build();
+    std::string errors = mScriptEngine->getLogMessages();
     mScriptEngine->setLogMode(LOGMODE_IMMEDIATE);
     if (result < 0)
-    {
-        std::string errors = mScriptEngine->getLogMessages();
         EXCEPTION("Failed to compile script module " + getName() + ":\n" + errors);
-    }
+    if (!errors.empty())
+        LOGWARNING(errors);
     
     LOGINFO("Compiled script module " + getName());
     mCompiled = true;
@@ -170,6 +171,8 @@ bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>
     setParameters(context, function, parameters);
     
     ++scriptNestingLevel;
+    if (scriptNestingLevel > highestScriptNestingLevel)
+        highestScriptNestingLevel = scriptNestingLevel;
     bool success = context->Execute() >= 0;
     --scriptNestingLevel;
     
@@ -212,6 +215,8 @@ bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, con
     setParameters(context, method, parameters);
     
     ++scriptNestingLevel;
+    if (scriptNestingLevel > highestScriptNestingLevel)
+        highestScriptNestingLevel = scriptNestingLevel;
     bool success = context->Execute() >= 0;
     --scriptNestingLevel;
     
@@ -529,4 +534,11 @@ ScriptFile* getLastScriptFile()
 unsigned getScriptNestingLevel()
 {
     return scriptNestingLevel;
+}
+
+unsigned getHighestScriptNestingLevel()
+{
+    unsigned ret = highestScriptNestingLevel;
+    highestScriptNestingLevel = 0;
+    return ret;
 }

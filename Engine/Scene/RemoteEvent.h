@@ -89,6 +89,8 @@ struct RemoteEvent
 void registerLocalOnlyEvent(StringHash eventType);
 //! Register an event to be only sent locally
 void registerLocalOnlyEvent(const std::string& name);
+//! Remove all registered local only events
+void removeAllLocalOnlyEvents();
 //! Check if an event is allowed to be sent remotely
 bool checkRemoteEvent(StringHash eventType);
 //! Return remote event sender connection. Only non-null during the event handling

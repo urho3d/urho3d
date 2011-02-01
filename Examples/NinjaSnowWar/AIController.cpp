@@ -217,7 +217,7 @@ void AIController::control(Ninja* ninja, float time)
     }
     else
     {
-        // If not, walk idly
+        // If no target, walk idly
         ninja->mControls.set(CTRL_ALL, false);
         ninja->mControls.set(CTRL_UP, true);
         ninja->mDirChangeTime -= time;
