@@ -159,9 +159,7 @@ void startGame()
         gameScene.removeEntity(scriptedEntities[i]);
 
     Entity@ playerEntity = gameScene.createEntity("Player");
-    ScriptInstance@ instance = playerEntity.createComponent("ScriptInstance");
-    instance.setScriptClass(cache.getResource("ScriptFile", "Scripts/NinjaSnowWar.as"), "Ninja");
-    GameObject@ object = cast<GameObject>(instance.getScriptObject());
+    GameObject@ object = cast<GameObject>(playerEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
     object.create(Vector3(0, 90, 0), Quaternion());
     object.health = object.maxHealth = playerHealth;
     object.side = SIDE_PLAYER;

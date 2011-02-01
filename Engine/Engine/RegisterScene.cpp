@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "RegisterTemplates.h"
 #include "Scene.h"
+#include "ScriptFile.h"
 #include "ScriptInstance.h"
 
 static void ConstructComponentRef(ComponentRef* ptr)
@@ -110,6 +111,40 @@ static Component* EntityCreateComponentWithName(const std::string& type, const s
     try
     {
         return ptr->createComponent(ShortStringHash(type), name);
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
+static asIScriptObject* EntityCreateScriptObject(const std::string& scriptFileName, const std::string& className, Entity* ptr)
+{
+    try
+    {
+        ResourceCache* cache = getEngine()->getResourceCache();
+        ScriptFile* file = cache->getResource<ScriptFile>(scriptFileName);
+        if (!file)
+            return 0;
+        // Try first to reuse an existing, empty ScriptInstance
+        const std::vector<SharedPtr<Component> >& components = ptr->getComponents();
+        for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
+        {
+            if ((*i)->getType() == ScriptInstance::getTypeStatic())
+            {
+                ScriptInstance* instance = static_cast<ScriptInstance*>(i->getPtr());
+                asIScriptObject* object = instance->getScriptObject();
+                if (!object)
+                {
+                    instance->setScriptClass(file, className);
+                    return instance->getScriptObject();
+                }
+            }
+        }
+        // Then create a new component if not found
+        ScriptInstance* instance = ptr->createComponent<ScriptInstance>(ptr->getUniqueComponentName());
+        instance->setScriptClass(file, className);
+        return instance->getScriptObject();
     }
     catch (Exception& e)
     {
@@ -243,6 +278,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "void setPredictionFrom(Entity@+)", asMETHOD(Entity, setPredictionFrom), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "Component@+ createComponent(const string& in)", asFUNCTION(EntityCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "Component@+ createComponent(const string& in, const string& in)", asFUNCTION(EntityCreateComponentWithName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "ScriptObject@+ createScriptObject(const string& in, const string& in)", asFUNCTION(EntityCreateScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "void addComponent(Component@+)", asMETHOD(Entity, addComponent), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void removeComponent(Component@+)", asMETHODPR(Entity, removeComponent, (Component*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void removeComponent(const string& in)", asFUNCTION(EntityRemoveComponent), asCALL_CDECL_OBJLAST);

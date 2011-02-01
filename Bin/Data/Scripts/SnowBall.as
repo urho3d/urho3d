@@ -76,7 +76,7 @@ class SnowBall : GameObject
             duration = snowballGroundHitDuration;
     }
 
-    void objectCollision(Entity@ otherEntity, GameObject@ otherObject, VariantMap& eventData)
+    void objectCollision(GameObject@ otherObject, VariantMap& eventData)
     {
         if (hitDamage > 0)
         {

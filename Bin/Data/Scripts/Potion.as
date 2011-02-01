@@ -41,7 +41,7 @@ class Potion : GameObject
         body.addChild(model);
     }
     
-    void objectCollision(Entity@ otherEntity, GameObject@ otherObject, VariantMap& eventData)
+    void objectCollision(GameObject@ otherObject, VariantMap& eventData)
     {
         if (healAmount > 0)
         {
