@@ -171,9 +171,11 @@ void createOverlays()
 void startGame()
 {
     // Clear the scene of all existing scripted entities
-    array<Entity@> scriptedEntities = gameScene.getScriptedEntities();
-    for (uint i = 0; i < scriptedEntities.length(); ++i)
-        gameScene.removeEntity(scriptedEntities[i]);
+    {
+        array<Entity@> scriptedEntities = gameScene.getScriptedEntities();
+        for (uint i = 0; i < scriptedEntities.length(); ++i)
+            gameScene.removeEntity(scriptedEntities[i]);
+    }
 
     Entity@ playerEntity = gameScene.createEntity("Player");
     Ninja@ playerNinja = cast<Ninja>(playerEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
