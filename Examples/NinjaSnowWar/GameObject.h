@@ -81,7 +81,7 @@ public:
     void setMaxHealth(int maxHealth) { mMaxHealth = maxHealth; }
     void setCanCollide(bool enable);
     
-    void postUpdateFixed(float time);
+    void updateFixed(float time);
     
     bool damage(int damage, GameObject* source);
     bool heal(int amount);
@@ -129,7 +129,7 @@ protected:
     int mPoints;
     
 private:
-    void handlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
+    void handlePhysicsPreStep(StringHash eventType, VariantMap& eventData);
     void handleEntityCollision(StringHash eventType, VariantMap& eventData);
 };
 

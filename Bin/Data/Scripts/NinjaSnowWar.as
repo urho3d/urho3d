@@ -304,7 +304,7 @@ void spawnObjects(float timeStep)
             int dir = randomInt() & 3;
             dir *= 90;
             Quaternion q(dir, Vector3(0, 1, 0));
-            Vector3 position(q * Vector3(offset, 1000, 12000));
+            Vector3 position(q * Vector3(offset, 1000, -12000));
 
             Entity@ enemyEntity = gameScene.createEntity();
             Ninja@ enemyNinja = cast<Ninja>(enemyEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
@@ -312,7 +312,7 @@ void spawnObjects(float timeStep)
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();
             RigidBody@ enemyBody = enemyEntity.getComponent("RigidBody");
-            enemyBody.setLinearVelocity(q * Vector3(0, 1000, -3000));
+            enemyBody.setLinearVelocity(q * Vector3(0, 1000, 3000));
         }
     }
 }

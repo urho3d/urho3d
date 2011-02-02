@@ -37,6 +37,7 @@
 #include "PhysicsEvents.h"
 #include "PositionalChannel.h"
 #include "Potion.h"
+#include "Profiler.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
 #include "RigidBody.h"
@@ -63,7 +64,7 @@ GameObject::GameObject() :
     // Do not replicate the GameObject component by default
     setNetFlags(NET_SYNCTONONE);
     
-    subscribeToEvent(EVENT_PHYSICSPOSTSTEP, EVENT_HANDLER(GameObject, handlePhysicsPostStep));
+    subscribeToEvent(EVENT_PHYSICSPRESTEP, EVENT_HANDLER(GameObject, handlePhysicsPreStep));
     subscribeToEvent(EVENT_ENTITYCOLLISION, EVENT_HANDLER(GameObject, handleEntityCollision));
 }
 
@@ -205,12 +206,12 @@ void GameObject::create(const Vector3& position, const Quaternion& orientation)
     sendEvent(EVENT_CREATE, eventData);
 }
 
-void GameObject::postUpdateFixed(float time)
+void GameObject::updateFixed(float time)
 {
-    bool goOn = true;
+    PROFILE(GameObject_Update);
     
     // Perform subclass specific update
-    goOn = onUpdate(time);
+    bool goOn = onUpdate(time);
     
     // Reset ground/sliding flag for the next frame
     RigidBody* body = getBody();
@@ -233,7 +234,8 @@ void GameObject::postUpdateFixed(float time)
     if (mDuration >= 0)
     {
         mDuration -= time;
-        if (mDuration <= 0) goOn = false;
+        if (mDuration <= 0)
+            goOn = false;
     }
     
     // Kind of hack: if there is a light attached, decrease its intensity
@@ -412,14 +414,14 @@ ResourceCache* GameObject::getResourceCache() const
         return 0;
 }
 
-void GameObject::handlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
+void GameObject::handlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
-    using namespace PhysicsPostStep;
+    using namespace PhysicsPreStep;
     
     // Check that the scene matches
     Scene* scene = mEntity ? mEntity->getScene() : 0;
     if (eventData[P_SCENE].getPtr() == (void*)scene)
-        postUpdateFixed(eventData[P_TIMESTEP].getFloat());
+        updateFixed(eventData[P_TIMESTEP].getFloat());
 }
 
 void GameObject::handleEntityCollision(StringHash eventType, VariantMap& eventData)
