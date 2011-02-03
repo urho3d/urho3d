@@ -268,6 +268,13 @@ void Entity::getComponentRefs(std::vector<ComponentRef>& dest)
         (*i)->getComponentRefs(dest);
 }
 
+void Entity::getResourceRefs(std::vector<Resource*>& dest)
+{
+    dest.clear();
+    for (std::vector<SharedPtr<Component> >::iterator i = mComponents.begin(); i != mComponents.end(); ++i)
+        (*i)->getResourceRefs(dest);
+}
+
 void Entity::setName(const std::string& name)
 {
     mName = name;

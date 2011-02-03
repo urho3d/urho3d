@@ -226,6 +226,13 @@ void ParticleEmitter::readNetUpdate(Deserializer& source, ResourceCache* cache, 
     readBoolDelta(mUpdateInvisible, source, bits & 4);
 }
 
+void ParticleEmitter::getResourceRefs(std::vector<Resource*>& dest)
+{
+    BillboardSet::getResourceRefs(dest);
+    if (mParameterSource)
+        dest.push_back(mParameterSource);
+}
+
 void ParticleEmitter::update(float timeStep)
 {
     // If this is a playback update, return so that we do not erroneously accelerate emitter animation

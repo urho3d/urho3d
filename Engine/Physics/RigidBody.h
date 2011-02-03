@@ -68,6 +68,8 @@ public:
     virtual void readNetUpdate(Deserializer& source, ResourceCache* cache, const NetUpdateInfo& info);
     //! Perform client-side visual smoothing
     virtual void interpolate(bool snapToEnd);
+    //! Return resource references
+    virtual void getResourceRefs(std::vector<Resource*>& dest);
     
     //! Set motion mode
     void setMode(PhysicsMode mode);

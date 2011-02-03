@@ -448,6 +448,13 @@ void AnimatedModel::interpolate(bool snapToEnd)
         (*i)->interpolate(snapToEnd, t);
 }
 
+void AnimatedModel::getResourceRefs(std::vector<Resource*>& dest)
+{
+    StaticModel::getResourceRefs(dest);
+    for (unsigned i = 0; i < mAnimationStates.size(); ++i)
+        dest.push_back(mAnimationStates[i]->getAnimation());
+}
+
 void AnimatedModel::processRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     // If no bones or no bone-level testing, use the GeometryNode test

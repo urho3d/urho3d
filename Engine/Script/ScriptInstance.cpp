@@ -55,7 +55,8 @@ static const std::string methodDeclarations[] = {
     "void readNetUpdate(Deserializer&, const NetUpdateInfo&)",
     "void postNetUpdate()",
     "void interpolate(bool)",
-    "array<ComponentRef> getComponentRefs()"
+    "array<ComponentRef> getComponentRefs()",
+    "array<Resource@> getResourceRefs()"
 };
 
 std::map<void*, ScriptInstance*> objectToInstance;
@@ -254,6 +255,23 @@ void ScriptInstance::getComponentRefs(std::vector<ComponentRef>& dest)
     }
 }
 
+void ScriptInstance::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mMethods[METHOD_GETRESOURCEREFS])
+    {
+        asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
+        if (!context)
+            return;
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETRESOURCEREFS]);
+        CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
+        if (arr)
+        {
+            for (unsigned i = 0; i < arr->GetSize(); ++i)
+                dest.push_back(*(static_cast<Resource**>(arr->At(i))));
+        }
+    }
+}
+
 bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& className)
 {
     if ((scriptFile == mScriptFile) && (className == mClassName))
@@ -277,7 +295,7 @@ void ScriptInstance::setEnabled(bool enable)
 
 bool ScriptInstance::execute(const std::string& declaration, const std::vector<Variant>& parameters)
 {
-    if ((!mScriptFile) || (!mScriptObject))
+    if (!mScriptObject)
         return false;
     
     asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
@@ -286,7 +304,7 @@ bool ScriptInstance::execute(const std::string& declaration, const std::vector<V
 
 bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Variant>& parameters)
 {
-    if ((!method) || (!mScriptFile) || (!mScriptObject))
+    if ((!method) || (!mScriptObject))
         return false;
     
     return mScriptFile->execute(mScriptObject, method, parameters);
@@ -294,7 +312,7 @@ bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Varian
 
 void ScriptInstance::addEventHandler(StringHash eventType, const std::string& handlerName)
 {
-    if ((!mScriptFile) || (!mScriptObject))
+    if (!mScriptObject)
         return;
     
     std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
@@ -343,7 +361,7 @@ void ScriptInstance::releaseObject()
 {
     if (mScriptObject)
     {
-        if ((mScriptFile) && (mMethods[METHOD_STOP]))
+        if (mMethods[METHOD_STOP])
             mScriptFile->execute(mScriptObject, mMethods[METHOD_STOP]);
         
         removeAllEventHandlers();
@@ -355,8 +373,7 @@ void ScriptInstance::releaseObject()
         
         objectToInstance.erase((void*)mScriptObject);
         
-        if (mScriptFile)
-            mScriptFile->removeScriptInstance(this);
+        mScriptFile->removeScriptInstance(this);
     }
 }
 

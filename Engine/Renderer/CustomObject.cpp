@@ -202,6 +202,15 @@ void CustomObject::loadXML(const XMLElement& source, ResourceCache* cache)
     }
 }
 
+void CustomObject::getResourceRefs(std::vector<Resource*>& dest)
+{
+    for (unsigned i = 0; i < mCustomGeometries.size(); ++i)
+    {
+        if (mCustomGeometries[i].mMaterial)
+            dest.push_back(mCustomGeometries[i].mMaterial);
+    }
+}
+
 void CustomObject::processRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     PROFILE(CustomObject_Raycast);

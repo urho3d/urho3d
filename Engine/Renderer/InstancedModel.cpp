@@ -294,6 +294,17 @@ void InstancedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, c
     }
 }
 
+void InstancedModel::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mModel)
+        dest.push_back(mModel);
+    for (unsigned i = 0; i < mOriginalMaterials.size(); ++i)
+    {
+        if (mOriginalMaterials[i])
+            dest.push_back(mOriginalMaterials[i]);
+    }
+}
+
 void InstancedModel::processRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     PROFILE(InstancedModel_Raycast);

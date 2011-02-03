@@ -157,6 +157,17 @@ void StaticModel::readNetUpdate(Deserializer& source, ResourceCache* cache, cons
     }
 }
 
+void StaticModel::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mModel)
+        dest.push_back(mModel);
+    for (unsigned i = 0; i < mMaterials.size(); ++i)
+    {
+        if (mMaterials[i])
+            dest.push_back(mMaterials[i]);
+    }
+}
+
 void StaticModel::processRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     PROFILE(StaticModel_Raycast);

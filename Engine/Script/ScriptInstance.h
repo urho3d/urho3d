@@ -57,6 +57,7 @@ enum ScriptInstanceMethod
     METHOD_POSTNETUPDATE,
     METHOD_INTERPOLATE,
     METHOD_GETCOMPONENTREFS,
+    METHOD_GETRESOURCEREFS,
     MAX_SCRIPT_METHODS
 };
 
@@ -91,6 +92,8 @@ public:
     virtual void interpolate(bool snapToEnd);
     //! Return component references
     virtual void getComponentRefs(std::vector<ComponentRef>& dest);
+    //! Return resource references
+    virtual void getResourceRefs(std::vector<Resource*>& dest);
     //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
     

@@ -86,7 +86,8 @@ public:
     void interpolate(bool snapToEnd = false);
     //! Let each component list component references
     void getComponentRefs(std::vector<ComponentRef>& dest);
-    
+    //! Let each component list resource references
+    void getResourceRefs(std::vector<Resource*>& dest);
     //! Set name
     void setName(const std::string& name);
     //! Set network replication flags

@@ -31,6 +31,7 @@ typedef unsigned EntityID;
 class Connection;
 class Deserializer;
 class Entity;
+class Resource;
 class ResourceCache;
 class Serializer;
 class XMLElement;
@@ -96,6 +97,8 @@ public:
     virtual void interpolate(bool snapToEnd = false);
     //! Return component references
     virtual void getComponentRefs(std::vector<ComponentRef>& dest);
+    //! Return resource references
+    virtual void getResourceRefs(std::vector<Resource*>& dest);
     
     //! Set name
     void setName(const std::string& name);

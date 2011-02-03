@@ -238,6 +238,13 @@ void PositionalChannel::readNetUpdate(Deserializer& source, ResourceCache* cache
     }
 }
 
+void PositionalChannel::getResourceRefs(std::vector<Resource*>& dest)
+{
+    Sound* sound = getSound();
+    if (sound)
+        dest.push_back(sound);
+}
+
 void PositionalChannel::update(float timeStep)
 {
     if (!mAudio)

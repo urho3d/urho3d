@@ -83,6 +83,8 @@ public:
     virtual void saveXML(XMLElement& dest);
     //! Read component state from an XML element
     virtual void loadXML(const XMLElement& source, ResourceCache* cache);
+    //! Return resource references
+    virtual void getResourceRefs(std::vector<Resource*>& dest);
     
     //! Process renderer raycast
     virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);

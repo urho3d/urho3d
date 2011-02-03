@@ -194,6 +194,13 @@ void StereoChannel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
     }
 }
 
+void StereoChannel::getResourceRefs(std::vector<Resource*>& dest)
+{
+    Sound* sound = getSound();
+    if (sound)
+        dest.push_back(sound);
+}
+
 void StereoChannel::update(float timeStep)
 {
     if (!mAudio)

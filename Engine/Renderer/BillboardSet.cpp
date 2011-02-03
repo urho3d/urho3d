@@ -237,6 +237,12 @@ void BillboardSet::readNetUpdate(Deserializer& source, ResourceCache* cache, con
         markPositionsDirty();
 }
 
+void BillboardSet::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mMaterial)
+        dest.push_back(mMaterial);
+}
+
 void BillboardSet::updateDistance(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case

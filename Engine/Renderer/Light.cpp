@@ -438,6 +438,14 @@ void Light::readNetUpdate(Deserializer& source, ResourceCache* cache, const NetU
         markDirty();
 }
 
+void Light::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mRampTexture)
+        dest.push_back(mRampTexture);
+    if (mSpotTexture)
+        dest.push_back(mSpotTexture);
+}
+
 void Light::updateDistance(const FrameInfo& frame)
 {
     switch (mLightType)

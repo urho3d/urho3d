@@ -99,6 +99,10 @@ void Component::getComponentRefs(std::vector<ComponentRef>& dest)
 {
 }
 
+void Component::getResourceRefs(std::vector<Resource*>& dest)
+{
+}
+
 void Component::setName(const std::string& name)
 {
     mName = name;

@@ -51,6 +51,8 @@ public:
     virtual bool writeNetUpdate(Serializer& dest, Serializer& destRevision, Deserializer& baseRevision, const NetUpdateInfo& info);
     //! Read a network update
     virtual void readNetUpdate(Deserializer& source, ResourceCache* cache, const NetUpdateInfo& info);
+    //! Return resource references
+    virtual void getResourceRefs(std::vector<Resource*>& dest);
     
     //! Process renderer raycast
     virtual void processRayQuery(RayOctreeQuery& query, float initialDistance);

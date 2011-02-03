@@ -399,6 +399,12 @@ void RigidBody::interpolate(bool snapToEnd)
     Node::interpolate(snapToEnd);
 }
 
+void RigidBody::getResourceRefs(std::vector<Resource*>& dest)
+{
+    if (mCollisionShape)
+        dest.push_back(mCollisionShape);
+}
+
 void RigidBody::setMode(PhysicsMode mode)
 {
     mMode = mode;
