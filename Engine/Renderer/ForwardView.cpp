@@ -244,7 +244,7 @@ void View::getBatchesForward()
                         litTransparencies.insert(node);
                 }
                 
-                // Store light & its shadow batches only if per-pixel lit geometries exist
+                // Store light & its shadow batches only if lit geometries exist
                 if (sLitGeometries[j].size())
                     lightQueueCount++;
             }

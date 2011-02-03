@@ -204,7 +204,7 @@ bool ParticleEmitter::writeNetUpdate(Serializer& dest, Serializer& destRevision,
     dest.writeUByte(bits);
     writeStringHashDelta(getResourceHash(mParameterSource), dest, destRevision, bits & 1);
     writeBoolDelta(mActive, dest, destRevision, bits & 2);
-    writeBoolDelta(mActive, dest, destRevision, bits & 4);
+    writeBoolDelta(mUpdateInvisible, dest, destRevision, bits & 4);
     
     return prevBits || (bits != 0);
 }

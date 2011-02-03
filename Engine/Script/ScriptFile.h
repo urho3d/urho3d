@@ -116,7 +116,7 @@ private:
 ScriptFile* getLastScriptFile();
 //! Get current script execution nesting level
 unsigned getScriptNestingLevel();
-//! Return highest script execution nesting level last frame, and clear
-unsigned getHighestScriptNestingLevel();
+//! Return highest script execution nesting level, optionally reset it
+unsigned getHighestScriptNestingLevel(bool reset = true);
 
 #endif // SCRIPT_SCRIPTFILE_H

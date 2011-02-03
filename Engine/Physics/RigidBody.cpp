@@ -418,7 +418,7 @@ void RigidBody::setMode(PhysicsMode mode)
 
 void RigidBody::setMass(float mass)
 {
-    // Zero mass causes ODE assert on dynamic body. So rather set it to very small
+    // Zero mass causes ODE assert on dynamic body. So rather set it very small
     mMass = max(mass, M_EPSILON);
     updateMass();
 }

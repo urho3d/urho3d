@@ -536,9 +536,10 @@ unsigned getScriptNestingLevel()
     return scriptNestingLevel;
 }
 
-unsigned getHighestScriptNestingLevel()
+unsigned getHighestScriptNestingLevel(bool reset)
 {
     unsigned ret = highestScriptNestingLevel;
-    highestScriptNestingLevel = 0;
+    if (reset)
+        highestScriptNestingLevel = 0;
     return ret;
 }

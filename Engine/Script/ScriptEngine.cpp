@@ -135,8 +135,15 @@ void ScriptEngine::garbageCollect(bool fullCycle)
     for (unsigned i = 0; i < highest; ++i)
         mScriptFileContexts[i]->Unprepare();
     
-    // Then actually garbage collect
-    mAngelScriptEngine->GarbageCollect(fullCycle ? asGC_FULL_CYCLE : asGC_ONE_STEP);
+    if (fullCycle)
+        mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE);
+    else
+    {
+        // If not doing a full cycle, first detect garbage using one cycle, then do a full destruction
+        // This is faster than doing an actual full cycle
+        mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP | asGC_DETECT_GARBAGE);
+        mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE | asGC_DESTROY_GARBAGE);
+    }
 }
 
 void ScriptEngine::setLogMode(ScriptLogMode mode)

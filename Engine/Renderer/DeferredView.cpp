@@ -25,6 +25,7 @@
 #include "Geometry.h"
 #include "GeometryNode.h"
 #include "Light.h"
+#include "Log.h"
 #include "Material.h"
 #include "Pipeline.h"
 #include "PixelShader.h"
@@ -312,8 +313,8 @@ void View::getBatchesDeferred()
                     mPipeline->setLightVolumeShaders(lightBatch);
                     lightBatch.calculateSortKey(true, true);
                     
-                    // Non-shadow casting light can go into the state-sorted light queue
-                    if (sSplitLights[j]->getShadowMap())
+                    // If light is a split point light, it must be treated as shadowed in any case for correct stencil clearing
+                    if ((sSplitLights[j]->getShadowMap()) || (sSplitLights[j]->getLightType() == LIGHT_SPLITPOINT))
                     {
                         lightQueue.mBatches.push_back(lightBatch);
                         lightQueueCount++;
@@ -491,10 +492,11 @@ void View::renderBatchesDeferred()
         {
             LightBatchQueue& queue = mLightQueues[i];
             
+            Texture2D* shadowMap = queue.mLight->getShadowMap();
+            if (shadowMap)
             {
                 PROFILE(View_RenderShadowMap);
                 
-                Texture2D* shadowMap = queue.mLight->getShadowMap();
                 clearLastParameterSources();
                 
                 renderer->setColorWrite(false);
@@ -555,7 +557,7 @@ void View::renderBatchesDeferred()
                     queue.mBatches[j].draw(renderer);
                 }
                 
-                // If was the last split of a shadowed point light, clear the stencil by rendering the point light again
+                // If was the last split of a split point light, clear the stencil by rendering the point light again
                 if ((queue.mLastSplit) && (queue.mLight->getLightType() == LIGHT_SPLITPOINT))
                     mPipeline->drawSplitLightToStencil(*mCamera, queue.mLight, true);
             }
