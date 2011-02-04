@@ -239,6 +239,7 @@ void PixelShader::initializeParameters()
     sParameters["MatEmissiveColor"] = PSP_MATEMISSIVECOLOR;
     sParameters["MatSpecProperties"] = PSP_MATSPECPROPERTIES;
     sParameters["SampleOffsets"] = PSP_SAMPLEOFFSETS;
+    sParameters["ShadowIntensity"] = PSP_SHADOWINTENSITY;
     sParameters["ShadowProjPS"] = PSP_SHADOWPROJ;
     sParameters["SpotProjPS"] = PSP_SPOTPROJ;
     

@@ -335,6 +335,17 @@ void Batch::draw(Renderer* renderer) const
                 Vector4(0.5f * invWidth, -0.5f * invWidth, 0.0f, 0.0f));
         }
         
+        if (ps->needParameterUpdate(PSP_SHADOWINTENSITY, light))
+        {
+            float intensity = light->getShadowIntensity();
+            float fadeStart = light->getShadowFadeDistance();
+            float fadeEnd = light->getShadowDistance();
+            if ((fadeStart > 0.0f) && (fadeEnd > 0.0f) && (fadeEnd > fadeStart))
+                intensity = lerp(intensity, 1.0f, clamp((light->getDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
+            float pcfValues = (1.0f - intensity) * 0.25f;
+            renderer->setPixelShaderConstant(getPSRegister(PSP_SHADOWINTENSITY), Vector4(pcfValues, intensity, 0.0f, 0.0f));
+        }
+        
         if (ps->needParameterUpdate(PSP_SHADOWPROJ, light))
         {
             Camera& shadowCamera = light->getShadowCamera();

@@ -36,8 +36,9 @@ uniform float4 cMatDiffColor : register(C11);
 uniform float3 cMatEmissiveColor : register(C12);
 uniform float2 cMatSpecProperties : register(C13);
 uniform float4 cSampleOffsets : register(C14);
-uniform float4x4 cShadowProjPS : register(C15);
-uniform float4x4 cSpotProjPS : register(C19);
+uniform float2 cShadowIntensity : register(C15);
+uniform float4x4 cShadowProjPS : register(C16);
+uniform float4x4 cSpotProjPS : register(C20);
 
 // Material map samplers
 sampler2D sDiffMap : register(S0);
@@ -310,7 +311,7 @@ float evaluateSpecular(float3 normal, float3 worldPos, float3 lightDir, float sp
 float evaluateShadow(float4 shadowPos)
 {
     // Take four samples and average them
-    float4 pcfValues = 0.25;
+    float4 pcfValues = cShadowIntensity.x;
     #ifdef SM3
         float2 ofs = cSampleOffsets.xy;
         float4 projShadowPos = float4(shadowPos.xyz / shadowPos.w, 0.0);
@@ -321,9 +322,9 @@ float evaluateShadow(float4 shadowPos)
             tex2Dlod(sShadowMap, float4(projShadowPos.xy + float2(ofs.y, ofs.y), projShadowPos.zw)).r
         );
         #ifdef HWSHADOW
-            return dot(inLight, pcfValues);
+            return cShadowIntensity.y + dot(inLight, pcfValues);
         #else
-            return dot(inLight > projShadowPos.z, pcfValues);
+            return cShadowIntensity.y + dot(inLight > projShadowPos.z, pcfValues);
         #endif
     #else
         float2 projOfs = cSampleOffsets.xy * shadowPos.w;
@@ -334,9 +335,9 @@ float evaluateShadow(float4 shadowPos)
             tex2Dproj(sShadowMap, float4(shadowPos.xy + float2(projOfs.y, projOfs.y), shadowPos.zw)).r
         );
         #ifdef HWSHADOW
-            return dot(inLight, pcfValues);
+            return cShadowIntensity.y + dot(inLight, pcfValues);
         #else
-            return dot((inLight * shadowPos.w) > shadowPos.z, pcfValues);
+            return cShadowIntensity.y + dot((inLight * shadowPos.w) > shadowPos.z, pcfValues);
         #endif
     #endif
 }

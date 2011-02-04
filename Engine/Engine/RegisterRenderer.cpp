@@ -565,6 +565,8 @@ static void registerLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "void setShadowBias(const BiasParameters& in)", asMETHOD(Light, setShadowBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShadowCascade(const CascadeParameters& in)", asMETHOD(Light, setShadowCascade), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShadowFocus(const FocusParameters& in)", asMETHOD(Light, setShadowFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void setShadowFadeDistance(float)", asMETHOD(Light, setShadowFadeDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void setShadowIntensity(float)", asMETHOD(Light, setShadowIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShadowResolution(float)", asMETHOD(Light, setShadowResolution), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShadowNearFarRatio(float)", asMETHOD(Light, setShadowNearFarRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setRampTexture(Texture@+)", asMETHOD(Light, setRampTexture), asCALL_THISCALL);
@@ -583,6 +585,8 @@ static void registerLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "const BiasParameters& getShadowBias() const", asMETHOD(Light, getShadowBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const CascadeParameters& getShadowCascade() const", asMETHOD(Light, getShadowCascade), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const FocusParameters& getShadowFocus() const", asMETHOD(Light, getShadowFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "float getShadowFadeDistance() const", asMETHOD(Light, getShadowFadeDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "float getShadowIntensity() const", asMETHOD(Light, getShadowIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float getShadowResolution() const", asMETHOD(Light, getShadowResolution), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float getShadowNearFarRatio() const", asMETHOD(Light, getShadowNearFarRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "Texture@+ getRampTexture() const", asMETHOD(Light, getRampTexture), asCALL_THISCALL);

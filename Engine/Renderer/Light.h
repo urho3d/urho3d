@@ -173,7 +173,7 @@ public:
     //! Set color
     void setColor(const Color& color);
     //! Set specular intensity
-    void setSpecularIntensity(float specularFactor);
+    void setSpecularIntensity(float intensity);
     //! Set range
     void setRange(float range);
     //! Set spotlight field of view
@@ -190,6 +190,10 @@ public:
     void setShadowCascade(const CascadeParameters& parameters);
     //! Set shadow map focusing parameters
     void setShadowFocus(const FocusParameters& parameters);
+    //! Set shadow fade out start distance. Only has effect if shadow distance is also non-zero
+    void setShadowFadeDistance(float distance);
+    //! Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    void setShadowIntensity(float intensity);
     //! Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use
     void setShadowResolution(float resolution);
     //! Set shadow camera near/far clip distance ratio
@@ -227,6 +231,10 @@ public:
     const CascadeParameters& getShadowCascade() const { return mShadowCascade; }
     //! Return shadow map focus parameters
     const FocusParameters& getShadowFocus() const { return mShadowFocus; }
+    //! Return shadow fade start distance
+    float getShadowFadeDistance() const { return mShadowFadeDistance; }
+    //! Return shadow intensity
+    float getShadowIntensity() const { return mShadowIntensity; }
     //! Return shadow resolution
     float getShadowResolution() const { return mShadowResolution; }
     //! Return shadow camera near/far clip distance ratio
@@ -237,10 +245,6 @@ public:
     Texture* getSpotTexture() const { return mSpotTexture; }
     //! Return spotlight frustum
     const Frustum& getFrustum();
-    //! Return volume safety extent of spot or point light
-    float getVolumeExtent() const;
-    //! Return directional light near or far quad transform
-    Matrix4x3 getDirLightTransform(Camera& camera, bool getNearQuad) const;
     
     //! Set near split distance for directional light
     void setNearSplit(float near);
@@ -266,6 +270,10 @@ public:
     Camera& getShadowCamera() { return mShadowCamera; }
     //! Return shadow map
     Texture2D* getShadowMap() const { return mShadowMap; }
+    //! Return volume safety extent of spot or point light
+    float getVolumeExtent() const;
+    //! Return directional light near or far quad transform
+    Matrix4x3 getDirLightTransform(Camera& camera, bool getNearQuad) const;
     
 protected:
     //! Transform has changed. Mark spotlight frustum dirty
@@ -300,6 +308,10 @@ private:
     CascadeParameters mShadowCascade;
     //! Shadow map focus parameters
     FocusParameters mShadowFocus;
+    //! Shadow fade start distance
+    float mShadowFadeDistance;
+    //! Shadow intensity
+    float mShadowIntensity;
     //! Shadow resolution
     float mShadowResolution;
     //! Shadow camera near/far clip distance ratio

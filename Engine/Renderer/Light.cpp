@@ -86,6 +86,8 @@ Light::Light(Octant* octant, const std::string& name) :
     mShadowBias(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
     mShadowCascade(CascadeParameters(1, DEFAULT_LAMBDA, DEFAULT_SHADOWFADERANGE, M_LARGE_VALUE)),
     mShadowFocus(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
+    mShadowFadeDistance(0.0f),
+    mShadowIntensity(0.0f),
     mShadowResolution(1.0f),
     mShadowNearFarRatio(DEFAULT_SHADOWNEARFARRATIO),
     mNearSplit(0.0f),
@@ -128,6 +130,8 @@ void Light::save(Serializer& dest)
     dest.writeBool(mShadowFocus.mZoomOut);
     dest.writeFloat(mShadowFocus.mQuantize);
     dest.writeFloat(mShadowFocus.mMinView);
+    dest.writeFloat(mShadowFadeDistance);
+    dest.writeFloat(mShadowIntensity);
     dest.writeFloat(mShadowResolution);
     dest.writeFloat(mShadowNearFarRatio);
     
@@ -166,6 +170,8 @@ void Light::load(Deserializer& source, ResourceCache* cache)
     mShadowFocus.mZoomOut = source.readBool();
     mShadowFocus.mQuantize = source.readFloat();
     mShadowFocus.mMinView = source.readFloat();
+    mShadowFadeDistance = source.readFloat();
+    mShadowIntensity = source.readFloat();
     mShadowResolution = source.readFloat();
     mShadowNearFarRatio = source.readFloat();
     
@@ -212,6 +218,8 @@ void Light::saveXML(XMLElement& dest)
     lodElem.setInt("shadowdetail", mShadowDetailLevel);
     
     XMLElement shadowElem = dest.createChildElement("shadows");
+    shadowElem.setFloat("fadedistance", mShadowFadeDistance);
+    shadowElem.setFloat("intensity", mShadowIntensity);
     shadowElem.setFloat("resolution", mShadowResolution);
     shadowElem.setFloat("nearfarratio", mShadowNearFarRatio);
     
@@ -258,6 +266,12 @@ void Light::loadXML(const XMLElement& source, ResourceCache* cache)
     mFadeDistance = lodElem.getFloat("fadedistance");
     mDetailLevel = lodElem.getInt("detail");
     mShadowDetailLevel = lodElem.getInt("shadowdetail");
+    
+    XMLElement shadowElem = source.getChildElement("shadows");
+    mShadowFadeDistance = shadowElem.getFloat("fadedistance");
+    mShadowIntensity = shadowElem.getFloat("intensity");
+    mShadowResolution = shadowElem.getFloat("resolution");
+    mShadowNearFarRatio = shadowElem.getFloat("nearfarratio");
     
     XMLElement biasElem = source.getChildElement("shadowbias");
     mShadowBias.mConstantBias = biasElem.getFloat("constant");
@@ -326,8 +340,10 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     checkBool(mShadowFocus.mZoomOut, true, baseRevision, bits2, 4);
     checkFloat(mShadowFocus.mQuantize, DEFAULT_SHADOWQUANTIZE, baseRevision, bits2, 4);
     checkFloat(mShadowFocus.mMinView, DEFAULT_SHADOWMINVIEW, baseRevision, bits2, 4);
-    checkUByte((unsigned char)(mShadowResolution * 100), 100, baseRevision, bits2, 8);
-    checkFloat(mShadowNearFarRatio, DEFAULT_SHADOWNEARFARRATIO, baseRevision, bits2, 16);
+    checkFloat(mShadowFadeDistance, 0.0f, baseRevision, bits2, 8);
+    checkUByte((unsigned char)(mShadowIntensity * 255), 0, baseRevision, bits2, 16);
+    checkUByte((unsigned char)(mShadowResolution * 100), 100, baseRevision, bits2, 32);
+    checkFloat(mShadowNearFarRatio, DEFAULT_SHADOWNEARFARRATIO, baseRevision, bits2, 64);
     
     // Send only information necessary for the light type, and shadow data only for shadowed lights
     if (mLightType == LIGHT_POINT)
@@ -367,8 +383,10 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     writeBoolDelta(mShadowFocus.mZoomOut, dest, destRevision, bits2 & 4);
     writeFloatDelta(mShadowFocus.mQuantize, dest, destRevision, bits2 & 4);
     writeFloatDelta(mShadowFocus.mMinView, dest, destRevision, bits2 & 4);
-    writeUByteDelta((unsigned char)(mShadowResolution * 100), dest, destRevision, bits2 & 8);
-    writeFloatDelta(mShadowNearFarRatio, dest, destRevision, bits2 & 16);
+    writeFloatDelta(mShadowFadeDistance, dest, destRevision, bits2 & 8);
+    writeUByteDelta((unsigned char)(mShadowIntensity * 255), dest, destRevision, bits2 & 16);
+    writeUByteDelta((unsigned char)(mShadowResolution * 100), dest, destRevision, bits2 & 32);
+    writeFloatDelta(mShadowNearFarRatio, dest, destRevision, bits2 & 64);
     
     return prevBits || (bits != 0) || (bits2 != 0);
 }
@@ -427,12 +445,18 @@ void Light::readNetUpdate(Deserializer& source, ResourceCache* cache, const NetU
     readBoolDelta(mShadowFocus.mZoomOut, source, bits2 & 4);
     readFloatDelta(mShadowFocus.mQuantize, source, bits2 & 4);
     readFloatDelta(mShadowFocus.mMinView, source, bits2 & 4);
-    if (bits2 & 8)
+    readFloatDelta(mShadowFadeDistance, source, bits2 & 8);
+    if (bits2 & 16)
+    {
+        int shadowIntensity = source.readUByte();
+        mShadowIntensity = shadowIntensity / 255.0f;
+    }
+    if (bits2 & 32)
     {
         int shadowResolution = source.readUByte();
         mShadowResolution = shadowResolution / 100.0f;
     }
-    readFloatDelta(mShadowNearFarRatio, source, bits2 & 16);
+    readFloatDelta(mShadowNearFarRatio, source, bits2 & 64);
     
     if (bits)
         markDirty();
@@ -562,9 +586,9 @@ void Light::setShadowNearFarRatio(float nearFarRatio)
     mShadowNearFarRatio = clamp(nearFarRatio, 0.0f, 0.5f);
 }
 
-void Light::setSpecularIntensity(float specularFactor)
+void Light::setSpecularIntensity(float intensity)
 {
-    mSpecularIntensity = specularFactor;
+    mSpecularIntensity = max(intensity, 0.0f);
 }
 
 void Light::setFadeDistance(float distance)
@@ -594,6 +618,16 @@ void Light::setShadowFocus(const FocusParameters& parameters)
 {
     mShadowFocus = parameters;
     mShadowFocus.validate();
+}
+
+void Light::setShadowFadeDistance(float distance)
+{
+    mShadowFadeDistance = max(distance, 0.0f);
+}
+
+void Light::setShadowIntensity(float intensity)
+{
+    mShadowIntensity = clamp(intensity, 0.0f, 1.0f);
 }
 
 void Light::setShadowResolution(float resolution)
@@ -633,6 +667,8 @@ void Light::copyFrom(Light* original)
     mShadowBias = original->mShadowBias;
     mShadowCascade = original->mShadowCascade;
     mShadowFocus = original->mShadowFocus;
+    mShadowFadeDistance = original->mShadowFadeDistance;
+    mShadowIntensity = original->mShadowIntensity;
     mShadowResolution = original->mShadowResolution;
     mRampTexture = original->mRampTexture;
     mSpotTexture = original->mSpotTexture;
