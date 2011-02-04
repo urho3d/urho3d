@@ -143,11 +143,6 @@ protected:
     //! Update world-space bounding box
     virtual void onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox);
     
-    //! Animation LOD distance, the minimum of all LOD view distances last frame
-    float mAnimationLodDistance;
-    //! The frame number animation LOD distance was last calculated on
-    unsigned mAnimationLodFrameNumber;
-    
 private:
     //! Mark animation and skinning to require an update
     void markAnimationDirty();
@@ -188,10 +183,14 @@ private:
     std::vector<std::vector<Matrix4x3> > mGeometrySkinMatrices;
     //! Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
     std::vector<std::vector<Matrix4x3*> > mGeometrySkinMatrixPtrs;
+    //! The frame number animation LOD distance was last calculated on
+    unsigned mAnimationLodFrameNumber;
     //! Animation LOD bias
     float mAnimationLodBias;
     //! Animation LOD timer
     float mAnimationLodTimer;
+    //! Animation LOD distance, the minimum of all LOD view distances last frame
+    float mAnimationLodDistance;
     //! Animation dirty flag
     bool mAnimationDirty;
     //! Animation order dirty flag

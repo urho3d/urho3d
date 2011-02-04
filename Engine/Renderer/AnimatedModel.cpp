@@ -51,10 +51,10 @@ static bool compareAnimationOrder(AnimationState* lhs, AnimationState* rhs)
 
 AnimatedModel::AnimatedModel(Octant* octant, const std::string& name) :
     StaticModel(NODE_ANIMATEDMODEL, octant, name),
-    mAnimationLodDistance(0.0f),
     mAnimationLodFrameNumber(M_MAX_UNSIGNED),
     mAnimationLodBias(1.0f),
-    mAnimationLodTimer(0.0f),
+    mAnimationLodTimer(-1.0f),
+    mAnimationLodDistance(0.0f),
     mAnimationDirty(true),
     mAnimationOrderDirty(true),
     mMorphsDirty(true),
@@ -1093,11 +1093,17 @@ void AnimatedModel::updateAnimation(const FrameInfo& frame)
     // If using animation LOD, accumulate time and see if it is time to update
     if ((mAnimationLodBias > 0.0f) && (mAnimationLodDistance > 0.0f))
     {
-        mAnimationLodTimer += mAnimationLodBias * frame.mTimeStep * ANIMATION_LOD_BASESCALE;
-        if (mAnimationLodTimer >= mAnimationLodDistance)
-            mAnimationLodTimer = fmodf(mAnimationLodTimer, mAnimationLodDistance);
+        // Check for first time update
+        if (mAnimationLodTimer >= 0.0f)
+        {
+            mAnimationLodTimer += mAnimationLodBias * frame.mTimeStep * ANIMATION_LOD_BASESCALE;
+            if (mAnimationLodTimer >= mAnimationLodDistance)
+                mAnimationLodTimer = fmodf(mAnimationLodTimer, mAnimationLodDistance);
+            else
+                return;
+        }
         else
-            return;
+            mAnimationLodTimer = 0.0f;
     }
     
     PROFILE(AnimatedModel_UpdateAnimation);

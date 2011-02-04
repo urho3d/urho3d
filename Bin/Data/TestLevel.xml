@@ -17,7 +17,7 @@
             <render castshadows="true" occluder="false" visible="true" />
             <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" fadedistance="0" detail="0" shadowdetail="0" />
             <light type="directional" direction="-0.57735 -0.57735 0.57735" color="1 1 1 1" specular="0" range="0" fov="30" aspectratio="1" />
-            <shadows resolution="1" nearfarratio="0.002" />
+            <shadows fadedistance="0" intensity="0" resolution="1" nearfarratio="0.002" />
             <shadowbias constant="0.00025" slopescaled="0.001" />
             <shadowcascade lambda="0.5" maxrange="5000" faderange="0.2" splits="2" />
             <shadowfocus enable="true" nonuniform="true" zoomout="true" quantize="50" minview="900" />
