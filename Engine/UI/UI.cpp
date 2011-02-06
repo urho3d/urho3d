@@ -69,6 +69,7 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     subscribeToEvent(EVENT_MOUSEMOVE, EVENT_HANDLER(UI, handleMouseMove));
     subscribeToEvent(EVENT_MOUSEBUTTONDOWN, EVENT_HANDLER(UI, handleMouseButtonDown));
     subscribeToEvent(EVENT_MOUSEBUTTONUP, EVENT_HANDLER(UI, handleMouseButtonUp));
+    subscribeToEvent(EVENT_KEYDOWN, EVENT_HANDLER(UI, handleKeyDown));
     subscribeToEvent(EVENT_CHAR, EVENT_HANDLER(UI, handleChar));
     
     mNoTextureVS = mCache->getResource<VertexShader>("Shaders/SM2/Basic_VCol.vs2");
@@ -487,6 +488,15 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
             mMouseDragElement = 0;
         }
     }
+}
+
+void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    using namespace KeyDown;
+    
+    UIElement* element = getFocusElement();
+    if (element)
+        element->onKey(eventData[P_KEY].getInt());
 }
 
 void UI::handleChar(StringHash eventType, VariantMap& eventData)

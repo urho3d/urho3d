@@ -98,7 +98,9 @@ public:
     virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
-    //! React to a character typed on keyboard
+    //! React to a key press
+    virtual void onKey(int key);
+    //! React to a key press translated to a character
     virtual void onChar(unsigned char c);
     
     //! Set name
@@ -147,6 +149,8 @@ public:
     void setFocusable(bool enable);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
+    //! Set selected mode. Actual meaning is element dependent, but is visually same as a constant hover
+    void setSelected(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);
     //! Set userdata
@@ -204,6 +208,8 @@ public:
     bool isFocusable() const { return mFocusable; }
     //! Return whether has focus
     bool hasFocus() const { return mFocus; }
+    //! Return whether is selected. Actual meaning is element dependent
+    bool isSelected() const { return mSelected; }
     //! Return whether is visible
     bool isVisible() const { return mVisible; }
     //! Return whether the cursor is hovering on this element
@@ -284,6 +290,8 @@ protected:
     bool mFocusable;
     //! Focused flag
     bool mFocus;
+    //! Selected flag
+    bool mSelected;
     //! Visible flag
     bool mVisible;
     //! Hovering flag

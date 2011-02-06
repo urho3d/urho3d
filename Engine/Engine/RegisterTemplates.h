@@ -415,6 +415,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setEnabled(bool)", asMETHOD(T, setEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocusable(bool)", asMETHOD(T, setFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocus(bool)", asMETHOD(T, setFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setSelected(bool)", asMETHOD(T, setSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setUserData(const Variant& in)", asMETHOD(T, setUserData), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
@@ -443,6 +444,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isEnabled() const", asMETHOD(T, isEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isFocusable() const", asMETHOD(T, isFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasFocus() const", asMETHOD(T, hasFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool isSelected() const", asMETHOD(T, isSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isVisible() const", asMETHOD(T, isVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isHovering() const", asMETHOD(T, isHovering), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasColorGradient() const", asMETHOD(T, hasColorGradient), asCALL_THISCALL);

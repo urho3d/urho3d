@@ -101,6 +101,8 @@ public:
     bool setScriptClass(ScriptFile* scriptFile, const std::string& className);
     //! Enable or disable scripted updates and event handlers
     void setEnabled(bool enable);
+    //! Set fixed updates per second. 0 (default) uses the physics frame rate
+    void setFixedUpdateFps(int fps);
     //! Query for a method by declaration and execute if found
     bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
     //! Execute a method
@@ -118,6 +120,8 @@ public:
     bool isRunning() const { return mScriptObject != 0; }
     //! Return whether scripted updates and event handlers are enabled
     bool isEnabled() const { return mEnabled; }
+    //! Return fixed updates per second
+    int getFixedUpdateFps() const { return mFixedUpdateFps; }
     
     //! Create the script object. Check for supported methods and register self to the ScriptFile if successful
     bool createObject();
@@ -150,9 +154,16 @@ private:
     std::string mClassName;
     //! Pointers to supported inbuilt methods
     asIScriptFunction* mMethods[MAX_SCRIPT_METHODS];
-    
     //! Enabled flag
     bool mEnabled;
+    //! Fixed update FPS
+    int mFixedUpdateFps;
+    //! Fixed update time interval
+    float mFixedUpdateInterval;
+    //! Fixed update time accumulator
+    float mFixedUpdateTimer;
+    //! Fixed post update time accumulator
+    float mFixedPostUpdateTimer;
 };
 
 //! Return the ScriptInstance of the active context

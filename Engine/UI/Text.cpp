@@ -38,7 +38,8 @@ Text::Text(const std::string& name, const std::string& text) :
     mMaxWidth(0),
     mText(text),
     mTextAlignment(HA_LEFT),
-    mTextSpacing(1.0f)
+    mTextSpacing(1.0f),
+    mRowHeight(0)
 {
 }
 
@@ -132,7 +133,6 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
     unsigned rowIndex = 0;
     int x = getRowStartPosition(rowIndex);
     int y = 0;
-    int rowHeight = (int)(mTextSpacing * face->mRowHeight);
     
     for (unsigned i = 0; i < mPrintText.length(); ++i)
     {
@@ -149,7 +149,7 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
         {
             rowIndex++;
             x = getRowStartPosition(rowIndex);
-            y += rowHeight;
+            y += mRowHeight;
         }
     }
     
@@ -159,30 +159,32 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
     mHovering = false;
 }
 
-int Text::getRowHeight() const
-{
-    if (mFont)
-        return mFont->getFace(mFontSize)->mRowHeight;
-    else
-        return 0;
-}
-
 void Text::calculateTextSize()
 {
     int width = 0;
     int height = 0;
     
     mRowWidths.clear();
+    mPrintText.clear();
+    
+    static std::vector<unsigned> printToText;
+    printToText.clear();
     
     if (mFont)
     {
         const FontFace* face = mFont->getFace(mFontSize);
+        mRowHeight = face->mRowHeight;
         int rowWidth = 0;
-        int rowHeight = (int)(mTextSpacing * face->mRowHeight);
+        int rowHeight = (int)(mTextSpacing * mRowHeight);
         
         // First see if the text must be split up
         if (!mMaxWidth)
+        {
             mPrintText = mText;
+            printToText.resize(mText.length());
+            for (unsigned i = 0; i < mText.length(); ++i)
+                printToText[i] = i;
+        }
         else
         {
             unsigned nextBreak = 0;
@@ -225,9 +227,14 @@ void Text::calculateTextSize()
                         {
                             int copyLength = max(j - i, 1);
                             mPrintText.append(mText.substr(i, copyLength));
-                            i += copyLength;
+                            for (int k = 0; k < copyLength; ++k)
+                            {
+                                printToText.push_back(i);
+                                ++i;
+                            }
                         }
                         mPrintText += '\n';
+                        printToText.push_back(i);
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -237,12 +244,16 @@ void Text::calculateTextSize()
                         // When copying a space, we may be over row width
                         rowWidth += face->mGlyphs[face->mGlyphIndex[mText[i]]].mAdvanceX;
                         if (rowWidth <= mMaxWidth)
+                        {
                             mPrintText += mText[i];
+                            printToText.push_back(i);
+                        }
                     }
                 }
                 else
                 {
                     mPrintText += '\n';
+                    printToText.push_back(i);
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -279,6 +290,30 @@ void Text::calculateTextSize()
         // Set row height even if text is empty
         if (!height)
             height = rowHeight;
+        
+        // Store position of each character
+        mCharPositions.resize(mText.length() + 1);
+        unsigned rowIndex = 0;
+        int x = getRowStartPosition(rowIndex);
+        int y = 0;
+        for (unsigned i = 0; i < mPrintText.length(); ++i)
+        {
+            mCharPositions[printToText[i]] = IntVector2(x, y);
+            unsigned char c = (unsigned char)mPrintText[i];
+            if (c != '\n')
+            {
+                const FontGlyph& glyph = face->mGlyphs[face->mGlyphIndex[c]];
+                x += glyph.mAdvanceX;
+            }
+            else
+            {
+                rowIndex++;
+                x = getRowStartPosition(rowIndex);
+                y += rowHeight;
+            }
+        }
+        // Store the ending position
+        mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
     setSize(width, height);

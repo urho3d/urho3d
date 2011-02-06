@@ -160,14 +160,16 @@ static void registerLineEdit(asIScriptEngine* engine)
 {
     registerBorderImage<LineEdit>(engine, "LineEdit");
     engine->RegisterObjectMethod("LineEdit", "void setText(const string& in)", asMETHOD(LineEdit, setText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "void setEchoCharacter(uint8)", asMETHOD(LineEdit, setEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void setCursorPosition(uint)", asMETHOD(LineEdit, setCursorPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setCursorBlinkRate(float)", asMETHOD(LineEdit, setCursorBlinkRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setMaxLength(uint)", asMETHOD(LineEdit, setMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "void setEchoCharacter(uint8)", asMETHOD(LineEdit, setEchoCharacter), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setDefocusable(bool)", asMETHOD(LineEdit, setDefocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "const string& getText() const", asMETHOD(LineEdit, getText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "uint8 getEchoCharacter() const", asMETHOD(LineEdit, getEchoCharacter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "uint getCursorPosition() const", asMETHOD(LineEdit, getCursorPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "float getCursorBlinkRate() const", asMETHOD(LineEdit, getCursorBlinkRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "uint getMaxLength() const", asMETHOD(LineEdit, getMaxLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "uint8 getEchoCharacter() const", asMETHOD(LineEdit, getEchoCharacter), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool isDefocusable() const", asMETHOD(LineEdit, isDefocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "Text@+ getTextElement() const", asMETHOD(LineEdit, getTextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "BorderImage@+ getCursorElement() const", asMETHOD(LineEdit, getCursorElement), asCALL_THISCALL);

@@ -77,12 +77,14 @@ static void registerScriptInstance(asIScriptEngine* engine)
     registerComponent<ScriptInstance>(engine, "ScriptInstance");
     engine->RegisterObjectMethod("ScriptInstance", "bool setScriptClass(ScriptFile@+, const string& in)", asMETHOD(ScriptInstance, setScriptClass), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void setEnabled(bool)", asMETHOD(ScriptInstance, setEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "void setFixedUpdateFps(int)", asMETHOD(ScriptInstance, setFixedUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool execute(const string& in, const array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "ScriptFile@+ getScriptFile() const", asMETHOD(ScriptInstance, getScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ getScriptObject() const", asMETHOD(ScriptInstance, getScriptObject), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const string& getClassName() const", asMETHOD(ScriptInstance, getClassName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool isRunning() const", asMETHOD(ScriptInstance, isRunning), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool isEnabled() const", asMETHOD(ScriptInstance, isEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "int getFixedUpdateFps() const", asMETHOD(ScriptInstance, getFixedUpdateFps), asCALL_THISCALL);
     registerRefCasts<Component, ScriptInstance>(engine, "Component", "ScriptInstance");
     
     engine->RegisterGlobalFunction("ScriptInstance@+ getSelf()", asFUNCTION(GetSelf), asCALL_CDECL);

@@ -69,12 +69,14 @@ public:
     HorizontalAlignment getTextAlignment() const { return mTextAlignment; }
     //! Return row spacing
     float getTextSpacing() const { return mTextSpacing; }
+    //! Return row height
+    int getRowHeight() const { return mRowHeight; }
     //! Return number of rows
     unsigned getNumRows() const { return mRowWidths.size(); }
     //! Return width of each row
     const std::vector<int>& getRowWidths() const { return mRowWidths; }
-    //! Return row height
-    int getRowHeight() const;
+    //! Return position of each character
+    const std::vector<IntVector2>& getCharPositions() const { return mCharPositions; }
     
 protected:
     //! Calculate text size
@@ -96,8 +98,12 @@ protected:
     HorizontalAlignment mTextAlignment;
     //! Row spacing
     float mTextSpacing;
+    //! Row height
+    int mRowHeight;
     //! Row widths
     std::vector<int> mRowWidths;
+    //! Positions of each character
+    std::vector<IntVector2> mCharPositions;
 };
 
 #endif // UI_STATICTEXT_H

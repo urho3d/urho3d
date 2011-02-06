@@ -97,6 +97,8 @@ private:
     void handleMouseButtonDown(StringHash eventType, VariantMap& eventData);
     //! Handle mouse button up event
     void handleMouseButtonUp(StringHash eventType, VariantMap& eventData);
+    //! Handle keypress event
+    void handleKeyDown(StringHash eventType, VariantMap& eventData);
     //! Handle character event
     void handleChar(StringHash eventType, VariantMap& eventData);
     //! Load a UI layout from an XML file recursively

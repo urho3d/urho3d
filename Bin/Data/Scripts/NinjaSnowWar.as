@@ -222,7 +222,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
 void handleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Check that scene being updated matches (we have only one scene, but for completeness...)
-    if (@eventData["Scene"].getScene() != @gameScene)
+    if (eventData["Scene"].getScene() !is gameScene)
         return;
 
     float timeStep = eventData["TimeStep"].getFloat();
@@ -319,7 +319,7 @@ void spawnObjects(float timeStep)
 
 void checkEndAndRestart()
 {
-    if ((gameOn) && (@gameScene.getEntity("Player") == null))
+    if ((gameOn) && (gameScene.getEntity("Player") is null))
     {
         gameOn = false;
         messageText.setText("Press Fire or Jump to restart!");
@@ -361,7 +361,7 @@ void updateControls()
     playerControls.pitch = clamp(playerControls.pitch, -60, 60);
 
     Entity@ playerEntity = gameScene.getEntity("Player");
-    if (@playerEntity != null)
+    if (playerEntity !is null)
     {
         Ninja@ playerNinja = cast<Ninja>(playerEntity.getScriptObject());
         playerNinja.controls = playerControls;
@@ -371,7 +371,7 @@ void updateControls()
 void updateCamera()
 {
     Entity@ playerEntity = gameScene.getEntity("Player");
-    if (@playerEntity == null)
+    if (playerEntity is null)
         return;
 
     RigidBody@ body = playerEntity.getComponent("RigidBody");
@@ -407,7 +407,7 @@ void updateStatus()
     hiscoreText.setText("Hiscore " + hiscore);
 
     Entity@ playerEntity = gameScene.getEntity("Player");
-    if (@playerEntity == null)
+    if (playerEntity is null)
         return;
 
     GameObject@ object = cast<GameObject>(playerEntity.getScriptObject());

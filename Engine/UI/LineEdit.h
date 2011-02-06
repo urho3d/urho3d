@@ -43,28 +43,36 @@ public:
     //! Perform UI element update
     virtual void update(float timeStep);
     
-    //! React to a character typed on keyboard
+    //! React to mouse click
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    //! React to a key press
+    virtual void onKey(int key);
+    //! React to a key press translated to a character
     virtual void onChar(unsigned char c);
     
     //! Set text
     void setText(const std::string& text);
-    //! Set echo character for password entry and such. 0 (default) shows the actual text
-    void setEchoCharacter(char c);
+    //! Set cursor position
+    void setCursorPosition(unsigned position);
     //! Set cursor blink rate. 0 disables blinking
     void setCursorBlinkRate(float rate);
     //! Set maximum text length. 0 for unlimited
     void setMaxLength(unsigned length);
+    //! Set echo character for password entry and such. 0 (default) shows the actual text
+    void setEchoCharacter(char c);
     //! Set whether can defocus with ESC, default true
     void setDefocusable(bool enable);
     
     //! Return text
     const std::string& getText() const { return mLine; }
-    //! Return echo character
-    char getEchoCharacter() const { return mEchoCharacter; }
+    //! Return cursor position
+    unsigned getCursorPosition() const { return mCursorPosition; }
     //! Return cursor blink rate
     float getCursorBlinkRate() const { return mCursorBlinkRate; }
     //! Return maximum text length
     unsigned getMaxLength() const { return mMaxLength; }
+    //! Return echo character
+    char getEchoCharacter() const { return mEchoCharacter; }
     //! Return whether can defocus with ESC
     bool isDefocusable() const { return mDefocusable; }
     //! Return text element
@@ -78,14 +86,16 @@ protected:
     
     //! Text line
     std::string mLine;
-    //! Echo character
-    char mEchoCharacter;
+    //! Cursor position
+    unsigned mCursorPosition;
     //! Cursor blink rate
     float mCursorBlinkRate;
     //! Cursor blink timer
     float mCursorBlinkTimer;
     //! Maximum text length
     unsigned mMaxLength;
+    //! Echo character
+    char mEchoCharacter;
     //! ESC defocus flag
     bool mDefocusable;
     //! Text element

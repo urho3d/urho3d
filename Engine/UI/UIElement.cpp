@@ -43,6 +43,7 @@ UIElement::UIElement(const std::string& name) :
     mEnabled(false),
     mFocusable(false),
     mFocus(false),
+    mSelected(false),
     mVisible(true),
     mHovering(false),
     mPosition(IntVector2::sZero),
@@ -227,6 +228,10 @@ float UIElement::getDerivedOpacity()
     return mDerivedOpacity;
 }
 
+void UIElement::onKey(int key)
+{
+}
+
 void UIElement::onChar(unsigned char c)
 {
 }
@@ -403,6 +408,11 @@ void UIElement::setFocus(bool enable)
         eventData[P_ELEMENT] = (void*)this;
         sendEvent(mFocus ? EVENT_FOCUSED : EVENT_DEFOCUSED, eventData);
     }
+}
+
+void UIElement::setSelected(bool enable)
+{
+    mVisible = enable;
 }
 
 void UIElement::setVisible(bool enable)

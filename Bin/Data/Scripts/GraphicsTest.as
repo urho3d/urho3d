@@ -55,9 +55,6 @@ void start()
 void runFrame()
 {
     engine.runFrame(testScene, camera, true);
-
-    if (input.getKeyPress(KEY_ESCAPE))
-        engine.exit();
 }
 
 void initScene()
@@ -327,7 +324,7 @@ void initUI()
     cursor.setStyleAuto(uiStyle);
     cursor.setPosition(renderer.getWidth() / 2, renderer.getHeight() / 2);
     ui.setCursor(cursor);
-    
+
     //XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
     //UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
     //uiRoot.addChild(layoutRoot);
@@ -361,7 +358,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     if (!paused)
         animateScene(timeStep);
 
-    if (@ui.getFocusElement() == null)
+    if (ui.getFocusElement() is null)
     {
         float speedMultiplier = 1.0f;
         if (input.getKeyDown(KEY_SHIFT))
@@ -491,7 +488,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
             pipeline.setEdgeFilter(params);
         }
         
-        if (input.getKeyPress(KEY_ESCAPE))
+        if ((input.getKeyPress(KEY_ESCAPE)) && (ui.getFocusElement() is null))
             engine.exit();
     }
 }
@@ -530,7 +527,7 @@ void handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         uiCursor.setVisible(false);
 
     // Test creating a new physics object
-    if ((button == MOUSEB_LEFT) && (@ui.getElementAt(ui.getCursorPosition(), true) == null) && (@ui.getFocusElement() == null))
+    if ((button == MOUSEB_LEFT) && (ui.getElementAt(ui.getCursorPosition(), true) is null) && (ui.getFocusElement() is null))
     {
         Entity@ newEntity = testScene.createEntity();
         
@@ -565,7 +562,7 @@ void handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     IntVector2 pos = ui.getCursorPosition();
-    if (@ui.getElementAt(pos, true) == null)
+    if (ui.getElementAt(pos, true) is null)
     {
         Ray cameraRay = camera.getScreenRay(float(pos.x) / renderer.getWidth(), float(pos.y) / renderer.getHeight());
         array<RayQueryResult> result = testScene.getOctree().raycast(cameraRay, NODE_GEOMETRY, NODE_BILLBOARDSET, 250.0f, RAY_TRIANGLE);

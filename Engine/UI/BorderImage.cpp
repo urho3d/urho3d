@@ -77,7 +77,7 @@ void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>&
         max(mImageRect.mBottom - mImageRect.mTop - mBorder.mTop - mBorder.mBottom, 0));
     
     IntVector2 topLeft(mImageRect.mLeft, mImageRect.mTop);
-    if (mHovering)
+    if ((mHovering) || (mSelected))
         topLeft += mHoverOffset;
     
     // Top

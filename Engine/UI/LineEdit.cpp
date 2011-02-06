@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Input.h"
 #include "LineEdit.h"
 #include "Text.h"
 #include "UIEvents.h"
@@ -30,10 +31,11 @@
 
 LineEdit::LineEdit(const std::string& name, const std::string& text) :
     BorderImage(name),
-    mEchoCharacter(0),
+    mCursorPosition(0),
     mCursorBlinkRate(1.0f),
     mCursorBlinkTimer(0.0f),
     mMaxLength(0),
+    mEchoCharacter(0),
     mDefocusable(true),
     mDefocus(false)
 {
@@ -92,20 +94,22 @@ void LineEdit::update(float timeStep)
     
     if (mFocus)
     {
-        int textLength = 0;
-        const std::vector<int>& rowWidths = mText->getRowWidths();
-        if (rowWidths.size())
-            textLength = rowWidths[0];
+        int x;
+        const std::vector<IntVector2>& charPositions = mText->getCharPositions();
+        if (charPositions.size())
+            x = mCursorPosition < charPositions.size() ? charPositions[mCursorPosition].mX : charPositions.back().mX;
+        else
+            x = 0;
         
         // This assumes text alignment is top-left
-        mCursor->setPosition(mText->getPosition() + IntVector2(textLength, 0));
+        mCursor->setPosition(mText->getPosition() + IntVector2(x, 0));
         mCursor->setSize(mCursor->getWidth(), mText->getRowHeight());
         cursorVisible = mCursorBlinkTimer < 0.5f;
         
         // Scroll if text is longer than what can be visible at once
         int scrollThreshold = max(getWidth() - mClipBorder.mLeft - mClipBorder.mRight - mCursor->getWidth(), 0);
-        if (textLength > scrollThreshold)
-            setChildOffset(IntVector2(-(textLength - scrollThreshold), 0));
+        if (x > scrollThreshold)
+            setChildOffset(IntVector2(-x + scrollThreshold, 0));
         else
             setChildOffset(IntVector2::sZero);
     }
@@ -121,16 +125,88 @@ void LineEdit::update(float timeStep)
     }
 }
 
+void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+{
+    if (buttons & MOUSEB_LEFT)
+    {
+        IntVector2 textPosition = mText->screenToElement(screenPosition);
+        const std::vector<IntVector2>& charPositions = mText->getCharPositions();
+        for (unsigned i = charPositions.size() - 1; i < charPositions.size(); --i)
+        {
+            if (textPosition.mX >= charPositions[i].mX)
+            {
+                mCursorPosition = i;
+                break;
+            }
+        }
+    }
+}
+
+void LineEdit::onKey(int key)
+{
+    bool changed = false;
+    bool cursorMoved = false;
+    
+    switch (key)
+    {
+    case KEY_LEFT:
+        if (mCursorPosition > 0)
+        {
+            --mCursorPosition;
+            cursorMoved = true;
+        }
+        break;
+        
+    case KEY_RIGHT:
+        if (mCursorPosition < mLine.length())
+        {
+            ++mCursorPosition;
+            cursorMoved = true;
+        }
+        break;
+        
+    case KEY_DELETE:
+        if (mCursorPosition < mLine.length())
+        {
+            if (mCursorPosition)
+                mLine = mLine.substr(0, mCursorPosition) + mLine.substr(mCursorPosition + 1);
+            else
+                mLine = mLine.substr(mCursorPosition + 1);
+            changed = true;
+        }
+        break;
+    }
+    
+    // Restart cursor blinking from the visible state
+    if (cursorMoved)
+        mCursorBlinkTimer = 0.0f;
+    
+    if (changed)
+    {
+        updateText();
+        
+        using namespace TextChanged;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_TEXT] = mLine;
+        sendEvent(EVENT_TEXTCHANGED, eventData);
+    }
+}
+
 void LineEdit::onChar(unsigned char c)
 {
-    unsigned currentLength = mLine.length();
     bool changed = false;
     
     if (c == '\b')
     {
-        if (mLine.length())
+        if ((mLine.length()) && (mCursorPosition))
         {
-            mLine = mLine.substr(0, currentLength - 1);
+            if (mCursorPosition < mLine.length())
+                mLine = mLine.substr(0, mCursorPosition - 1) + mLine.substr(mCursorPosition);
+            else
+                mLine = mLine.substr(0, mCursorPosition - 1);
+            --mCursorPosition;
             changed = true;
         }
     }
@@ -147,9 +223,16 @@ void LineEdit::onChar(unsigned char c)
         if (mDefocusable)
             mDefocus = true;
     }
-    else if ((c >= 0x20) && ((!mMaxLength) || (currentLength < mMaxLength)))
+    else if ((c >= 0x20) && ((!mMaxLength) || (mLine.length() < mMaxLength)))
     {
-        mLine += (char)c;
+        static std::string charStr;
+        charStr.resize(1);
+        charStr[0] = c;
+        if (mCursorPosition == mLine.length())
+            mLine += charStr;
+        else
+            mLine = mLine.substr(0, mCursorPosition) + charStr + mLine.substr(mCursorPosition);
+        ++mCursorPosition;
         changed = true;
     }
     
@@ -175,10 +258,11 @@ void LineEdit::setText(const std::string& text)
     updateText();
 }
 
-void LineEdit::setEchoCharacter(char c)
+void LineEdit::setCursorPosition(unsigned position)
 {
-    mEchoCharacter = c;
-    updateText();
+    if (position > mLine.length())
+        position = mLine.length();
+    mCursorPosition = position;
 }
 
 void LineEdit::setCursorBlinkRate(float rate)
@@ -189,6 +273,12 @@ void LineEdit::setCursorBlinkRate(float rate)
 void LineEdit::setMaxLength(unsigned length)
 {
     mMaxLength = length;
+}
+
+void LineEdit::setEchoCharacter(char c)
+{
+    mEchoCharacter = c;
+    updateText();
 }
 
 void LineEdit::setDefocusable(bool enable)
@@ -208,4 +298,6 @@ void LineEdit::updateText()
             echoText[i] = mEchoCharacter;
         mText->setText(echoText);
     }
+    if (mCursorPosition > mLine.length())
+        mCursorPosition = mLine.length();
 }

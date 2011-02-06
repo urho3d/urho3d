@@ -65,7 +65,11 @@ ScriptInstance::ScriptInstance(ScriptEngine* scriptEngine, const std::string& na
     Component(name),
     mScriptEngine(scriptEngine),
     mScriptObject(0),
-    mEnabled(true)
+    mEnabled(true),
+    mFixedUpdateFps(0),
+    mFixedUpdateInterval(0.0f),
+    mFixedUpdateTimer(0.0f),
+    mFixedPostUpdateTimer(0.0f)
 {
     if (!mScriptEngine)
         EXCEPTION("Null script engine for ScriptInstance");
@@ -85,6 +89,8 @@ void ScriptInstance::save(Serializer& dest)
     dest.writeBool(mEnabled);
     dest.writeStringHash(getResourceHash(mScriptFile));
     dest.writeString(mClassName);
+    dest.writeInt(mFixedUpdateFps);
+    dest.writeFloat(mFixedUpdateTimer);
     
     // Save script's data into a separate buffer for safety
     static VectorBuffer scriptBuffer;
@@ -107,6 +113,9 @@ void ScriptInstance::load(Deserializer& source, ResourceCache* cache)
     StringHash scriptFile = source.readStringHash();
     std::string className = source.readString();
     setScriptClass(cache->getResource<ScriptFile>(scriptFile), className);
+    mFixedUpdateFps = source.readInt();
+    mFixedUpdateTimer = mFixedPostUpdateTimer = source.readFloat();
+    mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
     
     static VectorBuffer scriptBuffer;
     unsigned scriptDataSize = source.readVLE();
@@ -133,6 +142,8 @@ void ScriptInstance::saveXML(XMLElement& dest)
     scriptElem.setBool("enabled", mEnabled);
     scriptElem.setString("name", getResourceName(mScriptFile));
     scriptElem.setString("class", mClassName);
+    scriptElem.setInt("fps", mFixedUpdateFps);
+    scriptElem.setFloat("timeacc", mFixedUpdateTimer);
     
     if (mMethods[METHOD_SAVEXML])
     {
@@ -150,6 +161,9 @@ void ScriptInstance::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement scriptElem = source.getChildElement("script");
     mEnabled = scriptElem.getBool("enabled");
     setScriptClass(cache->getResource<ScriptFile>(scriptElem.getString("name")), scriptElem.getString("class"));
+    mFixedUpdateFps = scriptElem.getInt("fps");
+    mFixedUpdateTimer = mFixedPostUpdateTimer = scriptElem.getFloat("timeacc");
+    mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
     
     if (mMethods[METHOD_LOADXML])
     {
@@ -170,6 +184,8 @@ bool ScriptInstance::writeNetUpdate(Serializer& dest, Serializer& destRevision, 
     checkBool(mEnabled, true, baseRevision, bits, 1);
     checkStringHash(scriptFileHash, StringHash(), baseRevision, bits, 2);
     checkString(mClassName, std::string(), baseRevision, bits, 2);
+    checkInt(mFixedUpdateFps, 0, baseRevision, bits, 4);
+    checkFloat(mFixedUpdateTimer, 0.0f, baseRevision, bits, 8);
     
     // Save script's data into a separate buffer for safety
     static VectorBuffer scriptBuffer;
@@ -185,13 +201,15 @@ bool ScriptInstance::writeNetUpdate(Serializer& dest, Serializer& destRevision, 
     // Compare buffer to previous revision if available
     unsigned scriptDataSize = scriptBuffer.getSize();
     if (scriptDataSize)
-        checkBuffer(scriptBuffer, baseRevision, bits, 4);
+        checkBuffer(scriptBuffer, baseRevision, bits, 16);
     
     dest.writeUByte(bits);
     writeBoolDelta(mEnabled, dest, destRevision, bits & 1);
     writeStringHashDelta(scriptFileHash, dest, destRevision, bits & 2);
     writeStringDelta(mClassName, dest, destRevision, bits & 2);
-    writeBufferDelta(scriptBuffer, dest, destRevision, bits & 4);
+    writeIntDelta(mFixedUpdateFps, dest, destRevision, bits & 4);
+    writeFloatDelta(mFixedUpdateTimer, dest, destRevision, bits & 8);
+    writeBufferDelta(scriptBuffer, dest, destRevision, bits & 16);
     
     return bits != 0;
 }
@@ -208,6 +226,13 @@ void ScriptInstance::readNetUpdate(Deserializer& source, ResourceCache* cache, c
         setScriptClass(cache->getResource<ScriptFile>(scriptFile), className);
     }
     if (bits & 4)
+    {
+        mFixedUpdateFps = source.readInt();
+        mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
+    }
+    if (bits & 8)
+        mFixedUpdateTimer = mFixedPostUpdateTimer = source.readFloat();
+    if (bits & 16)
     {
         static VectorBuffer scriptBuffer;
         unsigned scriptDataSize = source.readVLE();
@@ -291,6 +316,14 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
 void ScriptInstance::setEnabled(bool enable)
 {
     mEnabled = enable;
+}
+
+void ScriptInstance::setFixedUpdateFps(int fps)
+{
+    mFixedUpdateFps = max(fps, 0);
+    mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
+    mFixedUpdateTimer = 0.0f;
+    mFixedPostUpdateTimer = 0.0f;
 }
 
 bool ScriptInstance::execute(const std::string& declaration, const std::vector<Variant>& parameters)
@@ -401,7 +434,7 @@ void ScriptInstance::getSupportedMethods()
 
 void ScriptInstance::handleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
+    if ((!mEnabled) || (!mScriptObject))
         return;
     
     using namespace SceneUpdate;
@@ -418,7 +451,7 @@ void ScriptInstance::handleSceneUpdate(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::handleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
+    if ((!mEnabled) || (!mScriptObject))
         return;
     
     using namespace ScenePostUpdate;
@@ -435,7 +468,7 @@ void ScriptInstance::handleScenePostUpdate(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::handlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
-    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
+    if ((!mEnabled) || (!mScriptObject))
         return;
     
     using namespace PhysicsPreStep;
@@ -444,15 +477,30 @@ void ScriptInstance::handlePhysicsPreStep(StringHash eventType, VariantMap& even
     Scene* scene = mEntity ? mEntity->getScene() : 0;
     if (eventData[P_SCENE].getPtr() == (void*)scene)
     {
-        std::vector<Variant> parameters;
-        parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
+        if (!mFixedUpdateFps)
+        {
+            std::vector<Variant> parameters;
+            parameters.push_back(eventData[P_TIMESTEP]);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
+        }
+        else
+        {
+            float timeStep = eventData[P_TIMESTEP].getFloat();
+            mFixedUpdateTimer += timeStep;
+            if (mFixedUpdateTimer >= mFixedUpdateInterval)
+            {
+                mFixedUpdateTimer = fmodf(mFixedUpdateTimer, mFixedUpdateInterval);
+                std::vector<Variant> parameters;
+                parameters.push_back(mFixedUpdateInterval);
+                mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
+            }
+        }
     }
 }
 
 void ScriptInstance::handlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
-    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
+    if ((!mEnabled) || (!mScriptObject))
         return;
     
     using namespace PhysicsPostStep;
@@ -461,9 +509,24 @@ void ScriptInstance::handlePhysicsPostStep(StringHash eventType, VariantMap& eve
     Scene* scene = mEntity ? mEntity->getScene() : 0;
     if (eventData[P_SCENE].getPtr() == (void*)scene)
     {
-        std::vector<Variant> parameters;
-        parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATEFIXED], parameters);
+        if (!mFixedUpdateFps)
+        {
+            std::vector<Variant> parameters;
+            parameters.push_back(eventData[P_TIMESTEP]);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
+        }
+        else
+        {
+            float timeStep = eventData[P_TIMESTEP].getFloat();
+            mFixedPostUpdateTimer += timeStep;
+            if (mFixedPostUpdateTimer >= mFixedUpdateInterval)
+            {
+                mFixedPostUpdateTimer = fmodf(mFixedPostUpdateTimer, mFixedUpdateInterval);
+                std::vector<Variant> parameters;
+                parameters.push_back(mFixedUpdateInterval);
+                mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
+            }
+        }
     }
 }
 
