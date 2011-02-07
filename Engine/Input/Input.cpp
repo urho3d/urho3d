@@ -106,6 +106,7 @@ void Input::update()
         eventData[P_X] = mMouseMoveX;
         eventData[P_Y] = mMouseMoveY;
         eventData[P_BUTTONS] = mMouseButtonDown;
+        eventData[P_QUALIFIERS] = getQualifiers();
         sendEvent(EVENT_MOUSEMOVE, eventData);
     }
     if (mMouseMoveWheel)
@@ -115,6 +116,7 @@ void Input::update()
         VariantMap eventData;
         eventData[P_WHEEL] = mMouseMoveWheel;
         eventData[P_BUTTONS] = mMouseButtonDown;
+        eventData[P_QUALIFIERS] = getQualifiers();
         sendEvent(EVENT_MOUSEWHEEL, eventData);
     }
     
@@ -154,6 +156,34 @@ bool Input::getMouseButtonDown(int button) const
 bool Input::getMouseButtonPress(int button) const
 {
     return (mMouseButtonPress & button) != 0;
+}
+
+bool Input::getQualifierDown(int qualifier) const
+{
+    if (qualifier == QUAL_SHIFT)
+        return mKeyDown[KEY_SHIFT] != 0;
+    if (qualifier == QUAL_CTRL)
+        return mKeyDown[KEY_CTRL] != 0;
+    return false;
+}
+
+bool Input::getQualifierPress(int qualifier) const
+{
+    if (qualifier == QUAL_SHIFT)
+        return mKeyPress[KEY_SHIFT] != 0;
+    if (qualifier == QUAL_CTRL)
+        return mKeyPress[KEY_CTRL] != 0;
+    return false;
+}
+
+int Input::getQualifiers() const
+{
+    int ret = 0;
+    if (mKeyDown[KEY_SHIFT] != 0)
+        ret |= QUAL_SHIFT;
+    if (mKeyDown[KEY_CTRL] != 0)
+        ret |= QUAL_CTRL;
+    return ret;
 }
 
 void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
@@ -262,6 +292,8 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
             
             VariantMap keyEventData;
             keyEventData[P_CHAR] = wParam;
+            eventData[P_BUTTONS] = mMouseButtonDown;
+            eventData[P_QUALIFIERS] = getQualifiers();
             sendEvent(EVENT_CHAR, keyEventData);
         }
         mSuppressNextChar = false;
@@ -353,6 +385,7 @@ void Input::mouseButtonChange(int button, bool newState)
     VariantMap eventData;
     eventData[P_BUTTON] = button;
     eventData[P_BUTTONS] = mMouseButtonDown;
+    eventData[P_QUALIFIERS] = getQualifiers();
     sendEvent(newState ? EVENT_MOUSEBUTTONDOWN : EVENT_MOUSEBUTTONUP, eventData);
 }
 
@@ -371,5 +404,6 @@ void Input::keyChange(int key, bool newState)
     VariantMap eventData;
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = mMouseButtonDown;
+    eventData[P_QUALIFIERS] = getQualifiers();
     sendEvent(newState ? EVENT_KEYDOWN : EVENT_KEYUP, eventData);
 }

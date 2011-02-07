@@ -61,7 +61,7 @@ void CheckBox::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& qu
     BorderImage::getBatches(batches, quads, currentScissor);
 }
 
-void CheckBox::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void CheckBox::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     if (buttons & MOUSEB_LEFT)
     {

@@ -45,11 +45,11 @@ public:
     virtual void update(float timeStep);
     
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to a key press
-    virtual void onKey(int key);
+    virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character
-    virtual void onChar(unsigned char c);
+    virtual void onChar(unsigned char c, int buttons, int qualifiers);
     
     //! Set text
     void setText(const std::string& text);

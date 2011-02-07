@@ -54,7 +54,8 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mCache(cache),
     mMouseDrag(false),
     mMouseDragElement(0),
-    mMouseButtons(0)
+    mMouseButtons(0),
+    mQualifiers(0)
 {
     if (!mRenderer)
         EXCEPTION("Null renderer for UI");
@@ -159,7 +160,7 @@ void UI::update(float timeStep)
         {
             // If a drag is going on, transmit hover only to the element being dragged
             if ((!mMouseDragElement) || (mMouseDragElement == element))
-                element->onHover(element->screenToElement(pos), pos, mMouseButtons);
+                element->onHover(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
         }
     }
     
@@ -404,6 +405,7 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
     using namespace MouseMove;
     
     mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
     
     if ((mCursor) && (mCursor->isVisible()))
     {
@@ -419,7 +421,7 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         {
             UIElement* element = verifyElement(mMouseDragElement);
             if ((element) && (element->isEnabled()) && (element->isVisible()))
-                element->onDragMove(element->screenToElement(pos), pos, mMouseButtons);
+                element->onDragMove(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
             else
             {
                 mMouseDrag = false;
@@ -434,6 +436,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     using namespace MouseButtonDown;
     
     mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
     int button = eventData[P_BUTTON].getInt();
     
     if ((mCursor) && (mCursor->isVisible()))
@@ -450,14 +453,14 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             }
             
             // Handle click
-            element->onClick(element->screenToElement(pos), pos, mMouseButtons);
+            element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
             
             // Handle start of drag
             if (!mMouseDrag)
             {
                 mMouseDrag = true;
                 mMouseDragElement = element;
-                element->onDragStart(element->screenToElement(pos), pos, mMouseButtons);
+                element->onDragStart(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
             }
         }
         else
@@ -473,6 +476,7 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     using namespace MouseButtonUp;
     
     mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
     
     if ((mCursor) && (mCursor->isVisible()))
     {
@@ -494,18 +498,24 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
     
+    mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
+    
     UIElement* element = getFocusElement();
     if (element)
-        element->onKey(eventData[P_KEY].getInt());
+        element->onKey(eventData[P_KEY].getInt(), mMouseButtons, mQualifiers);
 }
 
 void UI::handleChar(StringHash eventType, VariantMap& eventData)
 {
     using namespace Char;
     
+    mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
+    
     UIElement* element = getFocusElement();
     if (element)
-        element->onChar(eventData[P_CHAR].getInt());
+        element->onChar(eventData[P_CHAR].getInt(), mMouseButtons, mQualifiers);
 }
 
 void UI::loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)

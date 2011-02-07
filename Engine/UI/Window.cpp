@@ -64,7 +64,7 @@ void Window::setStyle(const XMLElement& element, ResourceCache* cache)
         setResizable(element.getChildElement("resizable").getBool("enable"));
 }
 
-void Window::onDragStart(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void Window::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     if ((buttons != MOUSEB_LEFT) || (!checkAlignment()))
     {
@@ -120,7 +120,7 @@ void Window::onDragStart(const IntVector2& position, const IntVector2& screenPos
     }
 }
 
-void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     if (mDragMode == DRAG_NONE)
         return;

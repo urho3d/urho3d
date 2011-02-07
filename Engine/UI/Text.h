@@ -55,7 +55,13 @@ public:
     //! Set row alignment
     void setTextAlignment(HorizontalAlignment align);
     //! Set row spacing, 1.0 for original font spacing
-    void setTextSpacing(float spacing);
+    void setRowSpacing(float spacing);
+    //! Set selection
+    void setSelection(unsigned start, unsigned length);
+    //! Set selection background color. Color with 0 alpha (default) disables
+    void setSelectionColor(const Color& color);
+    //! Set hover background color. Color with 0 alpha (default) disables
+    void setHoverColor(const Color& color);
     
     //! Return font
     Font* getFont() const { return mFont; }
@@ -68,7 +74,15 @@ public:
     //! Return row alignment
     HorizontalAlignment getTextAlignment() const { return mTextAlignment; }
     //! Return row spacing
-    float getTextSpacing() const { return mTextSpacing; }
+    float getRowSpacing() const { return mRowSpacing; }
+    //! Return selection start
+    unsigned getSelectionStart() const { return mSelectionStart; }
+    //! Return selection length
+    unsigned getSelectionLength() const { return mSelectionLength; }
+    //! Return selection background color
+    const Color& getSelectionColor() const { return mSelectionColor; }
+    //! Return hover background color
+    const Color& getHoverColor() const { return mHoverColor; }
     //! Return row height
     int getRowHeight() const { return mRowHeight; }
     //! Return number of rows
@@ -77,10 +91,14 @@ public:
     const std::vector<int>& getRowWidths() const { return mRowWidths; }
     //! Return position of each character
     const std::vector<IntVector2>& getCharPositions() const { return mCharPositions; }
+    //! Return size of each character
+    const std::vector<IntVector2>& getCharSizes() const { return mCharSizes; }
     
 protected:
-    //! Calculate text size
-    void calculateTextSize();
+    //! Update text when text, font or spacing changed
+    void updateText();
+    //! Validate text selection to be within the text
+    void validateSelection();
     //! Return row start X position
     int getRowStartPosition(unsigned rowIndex) const;
     
@@ -97,13 +115,23 @@ protected:
     //! Row alignment
     HorizontalAlignment mTextAlignment;
     //! Row spacing
-    float mTextSpacing;
+    float mRowSpacing;
+    //! Selection start
+    unsigned mSelectionStart;
+    //! Selection length
+    unsigned mSelectionLength;
+    //! Selection background color
+    Color mSelectionColor;
+    //! Hover background color
+    Color mHoverColor;
     //! Row height
     int mRowHeight;
     //! Row widths
     std::vector<int> mRowWidths;
     //! Positions of each character
     std::vector<IntVector2> mCharPositions;
+    //! Sizes of each character
+    std::vector<IntVector2> mCharSizes;
 };
 
 #endif // UI_STATICTEXT_H

@@ -39,7 +39,7 @@
 
 Console::Console(Engine* engine) :
     mEngine(engine),
-    mFontSize(1)
+    mFontSize(DEFAULT_FONT_SIZE)
 {
     LOGINFO("Console created");
     

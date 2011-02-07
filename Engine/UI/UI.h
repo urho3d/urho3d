@@ -133,7 +133,9 @@ private:
     //! Mouse drag UI element
     UIElement* mMouseDragElement;
     //! Mouse buttons held down
-    unsigned mMouseButtons;
+    int mMouseButtons;
+    //! Qualifier keys held down
+    int mQualifiers;
 };
 
 #endif // UI_UI_H

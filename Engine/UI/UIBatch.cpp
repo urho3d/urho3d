@@ -82,7 +82,8 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     mQuadCount++;
 }
 
-void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+    int texHeight)
 {
     if (!mQuads)
         return;
@@ -119,6 +120,38 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
         quad.mBottomLeftColor = uintColor;
         quad.mBottomRightColor = uintColor;
     }
+    
+    mQuads->push_back(quad);
+    mQuadCount++;
+}
+
+void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth,
+    int texHeight, const Color& color)
+{
+    if (!mQuads)
+        return;
+    
+    static UIQuad quad;
+    const IntVector2& screenPos = element.getScreenPosition();
+    
+    quad.mLeft = x + screenPos.mX;
+    quad.mTop = y + screenPos.mY;
+    quad.mRight = quad.mLeft + width;
+    quad.mBottom = quad.mTop + height;
+    quad.mLeftUV = texOffsetX;
+    quad.mTopUV = texOffsetY;
+    quad.mRightUV = texOffsetX + texWidth;
+    quad.mBottomUV = texOffsetY + texHeight;
+    
+    Color derivedColor(color.mR, color.mG, color.mB, color.mA * element.getDerivedOpacity());
+    // If alpha is 0, nothing will be rendered, so exit without adding the quad
+    if (derivedColor.mA <= 0.0f)
+        return;
+    unsigned uintColor = getD3DColor(derivedColor);
+    quad.mTopLeftColor = uintColor;
+    quad.mTopRightColor = uintColor;
+    quad.mBottomLeftColor = uintColor;
+    quad.mBottomRightColor = uintColor;
     
     mQuads->push_back(quad);
     mQuadCount++;
@@ -241,6 +274,9 @@ void UIBatch::draw(Renderer* renderer, VertexShader* vs, PixelShader* ps) const
 
 void UIBatch::addOrMerge(const UIBatch& batch, std::vector<UIBatch>& batches)
 {
+    if (!batch.mQuadCount)
+        return;
+    
     if (!batches.size())
         batches.push_back(batch);
     else

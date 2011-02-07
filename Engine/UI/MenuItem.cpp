@@ -63,14 +63,14 @@ void MenuItem::update(float timeStep)
         setPressed(false);
 }
 
-void MenuItem::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void MenuItem::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     // Keep pressed state if showing the popup
     setPressed(((buttons & MOUSEB_LEFT) != 0) || (mShowPopup));
     mHovering = true;
 }
 
-void MenuItem::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void MenuItem::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     setPressed(true);
     // Toggle popup visibility if exists

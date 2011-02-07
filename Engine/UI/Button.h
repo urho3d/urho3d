@@ -44,9 +44,9 @@ public:
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     
     //! Set inactive image rectangle
     void setInactiveRect(const IntRect& rect);

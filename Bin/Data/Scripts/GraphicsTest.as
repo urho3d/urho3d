@@ -363,7 +363,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         float speedMultiplier = 1.0f;
         if (input.getKeyDown(KEY_SHIFT))
             speedMultiplier = 5.0f;
-        if (input.getKeyDown(KEY_CONTROL))
+        if (input.getKeyDown(KEY_CTRL))
             speedMultiplier = 0.1f;
 
         if (input.getKeyDown('W'))

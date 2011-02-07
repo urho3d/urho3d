@@ -31,6 +31,7 @@ DEFINE_EVENT(EVENT_MOUSEBUTTONDOWN, MouseButtonDown)
 {
     EVENT_PARAM(P_BUTTON, Button);              // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Mouse button released
@@ -38,6 +39,7 @@ DEFINE_EVENT(EVENT_MOUSEBUTTONUP, MouseButtonUp)
 {
     EVENT_PARAM(P_BUTTON, Button);              // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Mouse moved
@@ -46,6 +48,7 @@ DEFINE_EVENT(EVENT_MOUSEMOVE, MouseMove)
     EVENT_PARAM(P_X, X);                        // int
     EVENT_PARAM(P_Y, Y);                        // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Mouse wheel moved
@@ -53,6 +56,7 @@ DEFINE_EVENT(EVENT_MOUSEWHEEL, MouseWheel)
 {
     EVENT_PARAM(P_WHEEL, Wheel);                // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Key pressed
@@ -60,6 +64,7 @@ DEFINE_EVENT(EVENT_KEYDOWN, KeyDown)
 {
     EVENT_PARAM(P_KEY, Key);                    // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Key released
@@ -67,24 +72,30 @@ DEFINE_EVENT(EVENT_KEYUP, KeyUp)
 {
     EVENT_PARAM(P_KEY, Key);                    // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Character typed on the keyboard
 DEFINE_EVENT(EVENT_CHAR, Char)
 {
     EVENT_PARAM(P_CHAR, Char);                  // int
+    EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 static const int MOUSEB_LEFT = 1;
 static const int MOUSEB_RIGHT = 2;
 static const int MOUSEB_MIDDLE = 4;
 
+static const int QUAL_SHIFT = 1;
+static const int QUAL_CTRL = 2;
+
 static const int KEY_BACK = 0x08;
 static const int KEY_TAB = 0x09;
 static const int KEY_CLEAR = 0x0c; 
 static const int KEY_RETURN = 0x0d;
 static const int KEY_SHIFT = 0x10;
-static const int KEY_CONTROL = 0x11;
+static const int KEY_CTRL = 0x11;
 static const int KEY_MENU = 0x12;
 static const int KEY_PAUSE = 0x13;
 static const int KEY_CAPITAL = 0x14;
@@ -157,8 +168,8 @@ static const int KEY_NUMLOCK = 0x90;
 static const int KEY_SCROLL = 0x91;
 static const int KEY_LSHIFT = 0xa0;
 static const int KEY_RSHIFT = 0xa1;
-static const int KEY_LCONTROL = 0xa2;
-static const int KEY_RCONTROL = 0xa3;
+static const int KEY_LCTRL = 0xa2;
+static const int KEY_RCTRL = 0xa3;
 static const int KEY_LMENU = 0xa4;
 static const int KEY_RMENU = 0xa5;
 static const int KEY_BROWSER_BACK = 0xa6;

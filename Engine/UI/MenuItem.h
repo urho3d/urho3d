@@ -41,9 +41,9 @@ class MenuItem : public Button
     //! Perform UI element update
     virtual void update(float timeStep);
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     
     //! Set popup element to show on selection
     void setPopup(UIElement* element);

@@ -42,11 +42,11 @@ public:
     //! Perform UI element update
     virtual void update(float timeStep);
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag start
-    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag motion
-    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons);
+    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
     

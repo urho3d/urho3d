@@ -72,6 +72,8 @@ void LineEdit::setStyle(const XMLElement& element, ResourceCache* cache)
     }
     if (element.hasChildElement("maxlength"))
         setMaxLength(element.getChildElement("maxlength").getInt("value"));
+    if (element.hasChildElement("cursorposition"))
+        setCursorPosition(element.getChildElement("cursorposition").getInt("value"));
     
     XMLElement textElem = element.getChildElement("text");
     if (textElem)
@@ -112,7 +114,7 @@ void LineEdit::update(float timeStep)
     }
 }
 
-void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     if (buttons & MOUSEB_LEFT)
     {
@@ -129,7 +131,7 @@ void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void LineEdit::onKey(int key)
+void LineEdit::onKey(int key, int buttons, int qualifiers)
 {
     bool changed = false;
     bool cursorMoved = false;
@@ -180,7 +182,7 @@ void LineEdit::onKey(int key)
         updateCursor();
 }
 
-void LineEdit::onChar(unsigned char c)
+void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
 {
     bool changed = false;
     

@@ -828,7 +828,7 @@ void Game::getControls()
             if (input->getKeyDown('S')) mControls.set(CTRL_DOWN);
             if (input->getKeyDown('A')) mControls.set(CTRL_LEFT);
             if (input->getKeyDown('D')) mControls.set(CTRL_RIGHT);
-            if (input->getKeyDown(KEY_CONTROL)) mControls.set(CTRL_FIRE);
+            if (input->getKeyDown(KEY_CTRL)) mControls.set(CTRL_FIRE);
             if (input->getKeyDown(' ')) mControls.set(CTRL_JUMP);
             if (input->getMouseButtonDown(MOUSEB_LEFT)) mControls.set(CTRL_FIRE);
             if (input->getMouseButtonDown(MOUSEB_RIGHT)) mControls.set(CTRL_JUMP);

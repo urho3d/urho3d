@@ -56,6 +56,12 @@ public:
     bool getMouseButtonDown(int button) const;
     //! Check if a mouse button has been pressed on this frame
     bool getMouseButtonPress(int button) const;
+    //! Check if a qualifier key is held down
+    bool getQualifierDown(int qualifier) const;
+    //! Check if a qualifier key has been pressed on this frame
+    bool getQualifierPress(int qualifier) const;
+    //! Return the currently held down qualifiers
+    int getQualifiers() const;
     //! Return horizontal mouse movement since last frame
     int getMouseMoveX() const { return mMouseMoveX; }
     //! Return vertical mouse movement since last frame

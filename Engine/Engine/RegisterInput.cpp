@@ -33,12 +33,14 @@ static void registerKeyCodes(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int MOUSEB_LEFT", (void*)&MOUSEB_LEFT);
     engine->RegisterGlobalProperty("const int MOUSEB_RIGHT", (void*)&MOUSEB_RIGHT);
     engine->RegisterGlobalProperty("const int MOUSEB_MIDDLE", (void*)&MOUSEB_MIDDLE);
+    engine->RegisterGlobalProperty("const int QUAL_SHIFT", (void*)&QUAL_SHIFT);
+    engine->RegisterGlobalProperty("const int QUAL_CTRL", (void*)&QUAL_CTRL);
     engine->RegisterGlobalProperty("const int KEY_BACK", (void*)&KEY_BACK);
     engine->RegisterGlobalProperty("const int KEY_TAB", (void*)&KEY_TAB);
     engine->RegisterGlobalProperty("const int KEY_CLEAR", (void*)&KEY_CLEAR);
     engine->RegisterGlobalProperty("const int KEY_RETURN", (void*)&KEY_RETURN);
     engine->RegisterGlobalProperty("const int KEY_SHIFT", (void*)&KEY_SHIFT);
-    engine->RegisterGlobalProperty("const int KEY_CONTROL", (void*)&KEY_CONTROL);
+    engine->RegisterGlobalProperty("const int KEY_CTRL", (void*)&KEY_CTRL);
     engine->RegisterGlobalProperty("const int KEY_MENU", (void*)&KEY_MENU);
     engine->RegisterGlobalProperty("const int KEY_PAUSE", (void*)&KEY_PAUSE);
     engine->RegisterGlobalProperty("const int KEY_CAPITAL", (void*)&KEY_CAPITAL);
@@ -111,8 +113,8 @@ static void registerKeyCodes(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_SCROLL", (void*)&KEY_SCROLL);
     engine->RegisterGlobalProperty("const int KEY_LSHIFT", (void*)&KEY_LSHIFT);
     engine->RegisterGlobalProperty("const int KEY_RSHIFT", (void*)&KEY_RSHIFT);
-    engine->RegisterGlobalProperty("const int KEY_LCONTROL", (void*)&KEY_LCONTROL);
-    engine->RegisterGlobalProperty("const int KEY_RCONTROL", (void*)&KEY_RCONTROL);
+    engine->RegisterGlobalProperty("const int KEY_LCTRL", (void*)&KEY_LCTRL);
+    engine->RegisterGlobalProperty("const int KEY_RCTRL", (void*)&KEY_RCTRL);
     engine->RegisterGlobalProperty("const int KEY_LMENU", (void*)&KEY_LMENU);
     engine->RegisterGlobalProperty("const int KEY_RMENU", (void*)&KEY_RMENU);
     engine->RegisterGlobalProperty("const int KEY_BROWSER_BACK", (void*)&KEY_BROWSER_BACK);
@@ -199,6 +201,9 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool getKeyPress(int) const", asMETHOD(Input, getKeyPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getMouseButtonDown(int) const", asMETHOD(Input, getMouseButtonDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getMouseButtonPress(int) const", asMETHOD(Input, getMouseButtonPress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool getQualifierDown(int) const", asMETHOD(Input, getQualifierDown), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool getQualifierPress(int) const", asMETHOD(Input, getQualifierPress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "int getQualifiers() const", asMETHOD(Input, getQualifiers), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveX() const", asMETHOD(Input, getMouseMoveX), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveY() const", asMETHOD(Input, getMouseMoveY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveWheel() const", asMETHOD(Input, getMouseMoveWheel), asCALL_THISCALL);

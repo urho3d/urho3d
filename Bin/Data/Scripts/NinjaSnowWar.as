@@ -345,7 +345,7 @@ void updateControls()
             playerControls.set(CTRL_LEFT, true);
         if (input.getKeyDown('D'))
             playerControls.set(CTRL_RIGHT, true);
-        if (input.getKeyDown(KEY_CONTROL))
+        if (input.getKeyDown(KEY_CTRL))
             playerControls.set(CTRL_FIRE, true);
         if (input.getKeyDown(' '))
             playerControls.set(CTRL_JUMP, true);

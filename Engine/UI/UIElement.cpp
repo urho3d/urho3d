@@ -139,6 +139,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setEnabled(element.getChildElement("enabled").getBool("enable"));
     if (element.hasChildElement("focusable"))
         setFocusable(element.getChildElement("focusable").getBool("enable"));
+    if (element.hasChildElement("selected"))
+        setSelected(element.getChildElement("selected").getBool("enable"));
     if (element.hasChildElement("visible"))
         setVisible(element.getChildElement("visible").getBool("enable"));
 }
@@ -225,24 +227,20 @@ float UIElement::getDerivedOpacity()
     return mDerivedOpacity;
 }
 
-void UIElement::onKey(int key)
-{
-}
-
-void UIElement::onChar(unsigned char c)
-{
-}
-
-void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     mHovering = true;
 }
 
-void UIElement::onClick(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void UIElement::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
 }
 
-void UIElement::onDragStart(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void UIElement::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+{
+}
+
+void UIElement::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
 }
 
@@ -250,7 +248,11 @@ void UIElement::onDragEnd(const IntVector2& position, const IntVector2& screenPo
 {
 }
 
-void UIElement::onDragMove(const IntVector2& position, const IntVector2& screenPosition, unsigned buttons)
+void UIElement::onKey(int key, int buttons, int qualifiers)
+{
+}
+
+void UIElement::onChar(unsigned char c, int buttons, int qualifiers)
 {
 }
 

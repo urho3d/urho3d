@@ -38,7 +38,11 @@ Text::Text(const std::string& name, const std::string& text) :
     mMaxWidth(0),
     mText(text),
     mTextAlignment(HA_LEFT),
-    mTextSpacing(1.0f),
+    mRowSpacing(1.0f),
+    mSelectionStart(0),
+    mSelectionLength(0),
+    mSelectionColor(Color(0.0f, 0.0f, 0.0f, 0.0f)),
+    mHoverColor(Color(0.0f, 0.0f, 0.0f, 0.0f)),
     mRowHeight(0)
 {
 }
@@ -64,8 +68,6 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
         replaceInPlace(text, "\\n", "\n");
         setText(text);
     }
-    if (element.hasChildElement("textspacing"))
-        setTextSpacing(element.getChildElement("textspacing").getFloat("value"));
     if (element.hasChildElement("textalignment"))
     {
         std::string horiz = element.getChildElement("textalignment").getStringLower("value");
@@ -76,6 +78,17 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
         if (horiz == "right")
             setTextAlignment(HA_RIGHT);
     }
+    if (element.hasChildElement("rowspacing"))
+        setRowSpacing(element.getChildElement("rowspacing").getFloat("value"));
+    if (element.hasChildElement("selection"))
+    {
+        XMLElement selectionElem = element.getChildElement("selection");
+        setSelection(selectionElem.getInt("start"), selectionElem.getInt("length"));
+    }
+    if (element.hasChildElement("selectioncolor"))
+        setSelectionColor(element.getChildElement("selectioncolor").getColor("value"));
+    if (element.hasChildElement("hovercolor"))
+        setHoverColor(element.getChildElement("hovercolor").getColor("value"));
 }
 
 bool Text::setFont(Font* font, int size)
@@ -86,80 +99,163 @@ bool Text::setFont(Font* font, int size)
         return false;
     }
     
-    mFont = font;
-    mFontSize = max(size, 1);
-    calculateTextSize();
+    if ((font != mFont) || (size != mFontSize))
+    {
+        mFont = font;
+        mFontSize = max(size, 1);
+        updateText();
+    }
+    
     return true;
 }
 
 void Text::setMaxWidth(int maxWidth)
 {
-    mMaxWidth = max(maxWidth, 0);
-    calculateTextSize();
+    if (maxWidth != mMaxWidth)
+    {
+        mMaxWidth = max(maxWidth, 0);
+        updateText();
+    }
 }
 
 void Text::setText(const std::string& text)
 {
     mText = text;
-    calculateTextSize();
+    
+    validateSelection();
+    updateText();
 }
 
 void Text::setTextAlignment(HorizontalAlignment align)
 {
-    mTextAlignment = align;
+    if (align != mTextAlignment)
+    {
+        mTextAlignment = align;
+        updateText();
+    }
 }
 
-void Text::setTextSpacing(float spacing)
+void Text::setRowSpacing(float spacing)
 {
-    mTextSpacing = max(spacing, 0.5f);
+    if (spacing != mRowSpacing)
+    {
+        mRowSpacing = max(spacing, 0.5f);
+        updateText();
+    }
+}
+
+void Text::setSelection(unsigned start, unsigned length)
+{
+    mSelectionStart = start;
+    mSelectionLength = length;
+    validateSelection();
+}
+
+void Text::setSelectionColor(const Color& color)
+{
+    mSelectionColor = color;
+}
+
+void Text::setHoverColor(const Color& color)
+{
+    mHoverColor = color;
 }
 
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    if (!mFont)
+    // Hovering batch
+    if (((mHovering) || (mSelected)) && (mHoverColor.mA > 0.0f))
     {
-        mHovering = false;
-        return;
+        UIBatch batch;
+        batch.begin(&quads);
+        batch.mBlendMode = BLEND_ALPHA;
+        batch.mScissor = currentScissor;
+        batch.mTexture = 0;
+        batch.addQuad(*this, 0, 0, getWidth(), getHeight(), 0, 0, 0, 0, mHoverColor);
+        UIBatch::addOrMerge(batch, batches);
     }
     
-    const FontFace* face = mFont->getFace(mFontSize);
-    
-    UIBatch batch;
-    batch.begin(&quads);
-    batch.mBlendMode = BLEND_ALPHA;
-    batch.mScissor = currentScissor;
-    batch.mTexture = face->mTexture;
-    
-    unsigned rowIndex = 0;
-    int x = getRowStartPosition(rowIndex);
-    int y = 0;
-    
-    for (unsigned i = 0; i < mPrintText.length(); ++i)
+    // Selection batch
+    if ((mSelectionLength) && (mCharSizes.size() >= mSelectionStart + mSelectionLength) && (mSelectionColor.mA > 0.0f))
     {
-        unsigned char c = (unsigned char)mPrintText[i];
+        UIBatch batch;
+        batch.begin(&quads);
+        batch.mBlendMode = BLEND_ALPHA;
+        batch.mScissor = currentScissor;
+        batch.mTexture = 0;
         
-        if (c != '\n')
+        IntVector2 currentStart = mCharPositions[mSelectionStart];
+        IntVector2 currentEnd = currentStart;
+        for (unsigned i = mSelectionStart; i < mSelectionStart + mSelectionLength; ++i)
         {
-            const FontGlyph& glyph = face->mGlyphs[face->mGlyphIndex[c]];
-            if (c != ' ')
-                batch.addQuad(*this, x + glyph.mOffsetX, y + glyph.mOffsetY, glyph.mWidth, glyph.mHeight, glyph.mX, glyph.mY);
-            x += glyph.mAdvanceX;
+            // Check if row changes, and start a new quad in that case
+            if ((mCharSizes[i].mX) && (mCharSizes[i].mY))
+            {
+                if (mCharPositions[i].mY != currentStart.mY)
+                {
+                    batch.addQuad(*this, currentStart.mX, currentStart.mY, currentEnd.mX - currentStart.mX, currentEnd.mY - currentStart.mY,
+                        0, 0, 0, 0, mSelectionColor);
+                    currentStart = mCharPositions[i];
+                    currentEnd = currentStart + mCharSizes[i];
+                }
+                else
+                {
+                    currentEnd.mX += mCharSizes[i].mX;
+                    currentEnd.mY = max(currentStart.mY + mCharSizes[i].mY, currentEnd.mY);
+                }
+            }
         }
-        else
+        if (currentEnd != currentStart)
         {
-            rowIndex++;
-            x = getRowStartPosition(rowIndex);
-            y += mRowHeight;
+            batch.addQuad(*this, currentStart.mX, currentStart.mY, currentEnd.mX - currentStart.mX, currentEnd.mY - currentStart.mY,
+                0, 0, 0, 0, mSelectionColor);
         }
+        
+        UIBatch::addOrMerge(batch, batches);
     }
     
-    UIBatch::addOrMerge(batch, batches);
+    // Text batch
+    if (mFont)
+    {
+        const FontFace* face = mFont->getFace(mFontSize);
+        
+        UIBatch batch;
+        batch.begin(&quads);
+        batch.mBlendMode = BLEND_ALPHA;
+        batch.mScissor = currentScissor;
+        batch.mTexture = face->mTexture;
+        
+        unsigned rowIndex = 0;
+        int x = getRowStartPosition(rowIndex);
+        int y = 0;
+        
+        for (unsigned i = 0; i < mPrintText.length(); ++i)
+        {
+            unsigned char c = (unsigned char)mPrintText[i];
+            
+            if (c != '\n')
+            {
+                const FontGlyph& glyph = face->mGlyphs[face->mGlyphIndex[c]];
+                if (c != ' ')
+                    batch.addQuad(*this, x + glyph.mOffsetX, y + glyph.mOffsetY, glyph.mWidth, glyph.mHeight, glyph.mX, glyph.mY);
+                x += glyph.mAdvanceX;
+            }
+            else
+            {
+                rowIndex++;
+                x = getRowStartPosition(rowIndex);
+                y += mRowHeight;
+            }
+        }
+        
+        UIBatch::addOrMerge(batch, batches);
+    }
     
     // Reset hovering for next frame
     mHovering = false;
 }
 
-void Text::calculateTextSize()
+void Text::updateText()
 {
     int width = 0;
     int height = 0;
@@ -175,7 +271,7 @@ void Text::calculateTextSize()
         const FontFace* face = mFont->getFace(mFontSize);
         mRowHeight = face->mRowHeight;
         int rowWidth = 0;
-        int rowHeight = (int)(mTextSpacing * mRowHeight);
+        int rowHeight = (int)(mRowSpacing * mRowHeight);
         
         // First see if the text must be split up
         if (!mMaxWidth)
@@ -291,8 +387,10 @@ void Text::calculateTextSize()
         if (!height)
             height = rowHeight;
         
-        // Store position of each character
+        // Store position & size of each character
         mCharPositions.resize(mText.length() + 1);
+        mCharSizes.resize(mText.length());
+        
         unsigned rowIndex = 0;
         int x = getRowStartPosition(rowIndex);
         int y = 0;
@@ -303,10 +401,12 @@ void Text::calculateTextSize()
             if (c != '\n')
             {
                 const FontGlyph& glyph = face->mGlyphs[face->mGlyphIndex[c]];
+                mCharSizes[printToText[i]] = IntVector2(glyph.mAdvanceX, mRowHeight);
                 x += glyph.mAdvanceX;
             }
             else
             {
+                mCharSizes[printToText[i]] = IntVector2::sZero;
                 rowIndex++;
                 x = getRowStartPosition(rowIndex);
                 y += rowHeight;
@@ -320,6 +420,24 @@ void Text::calculateTextSize()
     if (mMaxWidth)
         width = mMaxWidth;
     setSize(width, height);
+}
+
+void Text::validateSelection()
+{
+    unsigned textLength = mText.length();
+    
+    if (textLength)
+    {
+        if (mSelectionStart >= textLength)
+            mSelectionStart = textLength - 1;
+        if (mSelectionStart + mSelectionLength > textLength)
+            mSelectionLength = textLength - mSelectionStart;
+    }
+    else
+    {
+        mSelectionStart = 0;
+        mSelectionLength = 0;
+    }
 }
 
 int Text::getRowStartPosition(unsigned rowIndex) const
