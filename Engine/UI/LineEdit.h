@@ -26,6 +26,7 @@
 
 #include "BorderImage.h"
 
+class Font;
 class Text;
 
 class LineEdit : public BorderImage
@@ -83,9 +84,19 @@ public:
 protected:
     //! Update displayed text
     void updateText();
+    //! Update cursor position and restart cursor blinking
+    void updateCursor();
     
+    //! Text element
+    SharedPtr<Text> mText;
+    //! Cursor element
+    SharedPtr<BorderImage> mCursor;
     //! Text line
     std::string mLine;
+    //! Last known text font
+    Font* mLastFont;
+    //! Last known text size
+    int mLastFontSize;
     //! Cursor position
     unsigned mCursorPosition;
     //! Cursor blink rate
@@ -98,10 +109,6 @@ protected:
     char mEchoCharacter;
     //! ESC defocus flag
     bool mDefocusable;
-    //! Text element
-    SharedPtr<Text> mText;
-    //! Cursor element
-    SharedPtr<BorderImage> mCursor;
     //! Defocus flag (defocus on next update)
     bool mDefocus;
 };

@@ -67,8 +67,6 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     else
     {
         Color color = element.getColor(C_TOPLEFT);
-        if ((element.isHovering()) || (element.isSelected()))
-            color += element.getHoverColor();
         color.mA *= element.getDerivedOpacity();
         // If alpha is 0, nothing will be rendered, so exit without adding the quad
         if (color.mA <= 0.0f)
@@ -111,8 +109,6 @@ void UIBatch::addQuad(UIElement& element, int x, int y, int width, int height, i
     else
     {
         Color color = element.getColor(C_TOPLEFT);
-        if ((element.isHovering()) || (element.isSelected()))
-            color += element.getHoverColor();
         color.mA *= element.getDerivedOpacity();
         // If alpha is 0, nothing will be rendered, so exit without adding the quad
         if (color.mA <= 0.0f)
@@ -268,16 +264,12 @@ unsigned UIBatch::getInterpolatedColor(UIElement& element, int x, int y)
         Color topColor = element.getColor(C_TOPLEFT).lerp(element.getColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element.getColor(C_BOTTOMLEFT).lerp(element.getColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.lerp(bottomColor, cLerpY);
-        if ((element.isHovering()) || (element.isSelected()))
-            color += element.getHoverColor();
         color.mA *= element.getDerivedOpacity();
         return getD3DColor(color);
     }
     else
     {
         Color color = element.getColor(C_TOPLEFT);
-        if ((element.isHovering()) || (element.isSelected()))
-            color += element.getHoverColor();
         color.mA *= element.getDerivedOpacity();
         return getD3DColor(color);
     }

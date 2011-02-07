@@ -131,8 +131,6 @@ public:
     void setColor(const Color& color);
     //! Set color on one corner
     void setColor(UIElementCorner corner, const Color& color);
-    //! Set color modification used on hover
-    void setHoverColor(const Color& color);
     //! Set priority
     void setPriority(int priority);
     //! Set opacity
@@ -190,8 +188,6 @@ public:
     const IntRect& getClipBorder() const { return mClipBorder; }
     //! Return corner color
     const Color& getColor(UIElementCorner corner) const { return mColor[corner]; }
-    //! Return color modification used on hover
-    const Color& getHoverColor() { return mHoverColor; }
     //! Return priority
     int getPriority() const { return mPriority; }
     //! Return opacity
@@ -274,8 +270,6 @@ protected:
     IntRect mClipBorder;
     //! Colors
     Color mColor[MAX_UIELEMENT_CORNERS];
-    //! Color modification on hover
-    Color mHoverColor;
     //! Priority
     int mPriority;
     //! Bring to front when focused flag

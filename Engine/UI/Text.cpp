@@ -316,6 +316,9 @@ void Text::calculateTextSize()
         mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
+    // If maxwidth is nonzero, fix the element width
+    if (mMaxWidth)
+        width = mMaxWidth;
     setSize(width, height);
 }
 

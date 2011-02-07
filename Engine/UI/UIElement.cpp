@@ -34,7 +34,6 @@ UIElement::UIElement(const std::string& name) :
     mParent(0),
     mOrigin(0),
     mClipBorder(IntRect::sZero),
-    mHoverColor(Color(0.0f, 0.0f, 0.0f, 0.0f)),
     mPriority(0),
     mOpacity(1.0f),
     mBringToFront(false),
@@ -130,8 +129,6 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         if (colorElem.hasAttribute("bottomright"))
             setColor(C_BOTTOMRIGHT, colorElem.getColor("bottomright"));
     }
-    if (element.hasChildElement("hovercolor"))
-        setHoverColor(element.getChildElement("hovercolor").getColor("value"));
     if (element.hasChildElement("bringtofront"))
         setBringToFront(element.getChildElement("bringtofront").getBool("enable"));
     if (element.hasChildElement("bringtoback"))
@@ -350,11 +347,6 @@ void UIElement::setColor(UIElementCorner corner, const Color& color)
         if ((i != corner) && (mColor[i] != mColor[corner]))
             mHasColorGradient = true;
     }
-}
-
-void UIElement::setHoverColor(const Color& color)
-{
-    mHoverColor = color;
 }
 
 void UIElement::setPriority(int priority)

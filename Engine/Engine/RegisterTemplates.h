@@ -406,7 +406,6 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setClipBorder(int, int, int, int)", asMETHODPR(T, setClipBorder, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(const Color& in)", asMETHODPR(T, setColor, (const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setColor(UIElementCorner, const Color& in)", asMETHODPR(T, setColor, (UIElementCorner, const Color&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setHoverColor(const Color& in)", asMETHOD(T, setHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setPriority(int)", asMETHOD(T, setPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setOpacity(float)", asMETHOD(T, setOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setBringToFront(bool)", asMETHOD(T, setBringToFront), asCALL_THISCALL);
@@ -435,7 +434,6 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "VerticalAlignment getVerticalAlignment() const", asMETHOD(T, getVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getClipBorder() const", asMETHOD(T, getClipBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& getColor(UIElementCorner) const", asMETHOD(T, getColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Color& getHoverColor() const", asMETHOD(T, getHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getPriority() const", asMETHOD(T, getPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float getOpacity() const", asMETHOD(T, getOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getBringToFront() const", asMETHOD(T, getBringToFront), asCALL_THISCALL);

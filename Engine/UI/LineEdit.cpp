@@ -31,6 +31,8 @@
 
 LineEdit::LineEdit(const std::string& name, const std::string& text) :
     BorderImage(name),
+    mLastFont(0),
+    mLastFontSize(0),
     mCursorPosition(0),
     mCursorBlinkRate(1.0f),
     mCursorBlinkTimer(0.0f),
@@ -90,32 +92,17 @@ void LineEdit::update(float timeStep)
     else
         mCursorBlinkTimer = 0.0f;
     
-    bool cursorVisible = false;
-    
-    if (mFocus)
+    // Update cursor position if font has changed
+    if ((mText->getFont() != mLastFont) || (mText->getFontSize() != mLastFontSize))
     {
-        int x;
-        const std::vector<IntVector2>& charPositions = mText->getCharPositions();
-        if (charPositions.size())
-            x = mCursorPosition < charPositions.size() ? charPositions[mCursorPosition].mX : charPositions.back().mX;
-        else
-            x = 0;
-        
-        // This assumes text alignment is top-left
-        mCursor->setPosition(mText->getPosition() + IntVector2(x, 0));
-        mCursor->setSize(mCursor->getWidth(), mText->getRowHeight());
-        cursorVisible = mCursorBlinkTimer < 0.5f;
-        
-        // Scroll if text is longer than what can be visible at once
-        int scrollThreshold = max(getWidth() - mClipBorder.mLeft - mClipBorder.mRight - mCursor->getWidth(), 0);
-        if (x > scrollThreshold)
-            setChildOffset(IntVector2(-x + scrollThreshold, 0));
-        else
-            setChildOffset(IntVector2::sZero);
+        mLastFont = mText->getFont();
+        mLastFontSize = mText->getFontSize();
+        updateCursor();
     }
-    else
-        setChildOffset(IntVector2::sZero);
-    
+   
+    bool cursorVisible = false;
+    if (mFocus)
+        cursorVisible = mCursorBlinkTimer < 0.5f;
     mCursor->setVisible(cursorVisible);
     
     if (mDefocus)
@@ -135,7 +122,7 @@ void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosit
         {
             if (textPosition.mX >= charPositions[i].mX)
             {
-                mCursorPosition = i;
+                setCursorPosition(i);
                 break;
             }
         }
@@ -177,13 +164,10 @@ void LineEdit::onKey(int key)
         break;
     }
     
-    // Restart cursor blinking from the visible state
-    if (cursorMoved)
-        mCursorBlinkTimer = 0.0f;
-    
     if (changed)
     {
         updateText();
+        updateCursor();
         
         using namespace TextChanged;
         
@@ -192,6 +176,8 @@ void LineEdit::onKey(int key)
         eventData[P_TEXT] = mLine;
         sendEvent(EVENT_TEXTCHANGED, eventData);
     }
+    else if (cursorMoved)
+        updateCursor();
 }
 
 void LineEdit::onChar(unsigned char c)
@@ -238,9 +224,8 @@ void LineEdit::onChar(unsigned char c)
     
     if (changed)
     {
-        // Restart cursor blinking from the visible state
-        mCursorBlinkTimer = 0.0f;
         updateText();
+        updateCursor();
         
         using namespace TextChanged;
         
@@ -262,7 +247,12 @@ void LineEdit::setCursorPosition(unsigned position)
 {
     if (position > mLine.length())
         position = mLine.length();
-    mCursorPosition = position;
+    
+    if (position != mCursorPosition)
+    {
+        mCursorPosition = position;
+        updateCursor();
+    }
 }
 
 void LineEdit::setCursorBlinkRate(float rate)
@@ -299,5 +289,32 @@ void LineEdit::updateText()
         mText->setText(echoText);
     }
     if (mCursorPosition > mLine.length())
+    {
         mCursorPosition = mLine.length();
+        updateCursor();
+    }
+}
+
+void LineEdit::updateCursor()
+{
+    int x = 0;
+    const std::vector<IntVector2>& charPositions = mText->getCharPositions();
+    if (charPositions.size())
+        x = mCursorPosition < charPositions.size() ? charPositions[mCursorPosition].mX : charPositions.back().mX;
+    
+    mCursor->setPosition(mText->getPosition() + IntVector2(x, 0));
+    mCursor->setSize(mCursor->getWidth(), mText->getRowHeight());
+    
+    // Scroll if necessary
+    int sx = -getChildOffset().mX;
+    int left = mClipBorder.mLeft;
+    int right = getWidth() - mClipBorder.mLeft - mClipBorder.mRight - mCursor->getWidth();
+    if (x - sx > right)
+        sx = x - right;
+    if (x - sx < left)
+        sx = x - left;
+    setChildOffset(IntVector2(-sx, 0));
+    
+    // Restart blinking
+    mCursorBlinkTimer = 0.0f;
 }

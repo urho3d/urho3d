@@ -48,7 +48,7 @@ public:
     
     //! Set font and font size
     bool setFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    //! Set maximum row width
+    //! Set maximum row width. If not 0, also fixes the element width to this value
     void setMaxWidth(int maxWidth);
     //! Set text
     void setText(const std::string& text);
