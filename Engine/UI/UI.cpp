@@ -54,6 +54,7 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mCache(cache),
     mMouseDrag(false),
     mMouseDragElement(0),
+    mDefocusElement(0),
     mMouseButtons(0),
     mQualifiers(0)
 {
@@ -117,11 +118,8 @@ void UI::setFocusElement(UIElement* element)
     eventData[P_ELEMENT] = (void*)element;
     sendEvent(EVENT_TRYFOCUS, eventData);
     
-    if (element)
-    {
-        if ((element->hasFocus()) || (!element->isFocusable()))
-            return;
-    }
+    if ((element) && (element->hasFocus()))
+        return;
     
     std::vector<UIElement*> allChildren = mRootElement->getChildren(true);
     
@@ -133,7 +131,7 @@ void UI::setFocusElement(UIElement* element)
             other->setFocus(false);
     }
     
-    if (element)
+    if ((element) && (element->isFocusable()))
         element->setFocus(true);
 }
 
@@ -162,6 +160,15 @@ void UI::update(float timeStep)
             if ((!mMouseDragElement) || (mMouseDragElement == element))
                 element->onHover(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
         }
+    }
+    
+    // Defocus element now if should
+    if (mDefocusElement)
+    {
+        // Do nothing if the focus element changed in the meanwhile
+        if (mDefocusElement == getFocusElement())
+            setFocusElement(0);
+        mDefocusElement = 0;
     }
     
     {
@@ -505,9 +512,9 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
     UIElement* element = getFocusElement();
     if (element)
     {
+        // Switch focus between focusable sibling elements
         if (key == KEY_TAB)
         {
-            // Switch focus between focusable sibling elements
             UIElement* parent = element->getParent();
             if (parent)
             {
@@ -530,6 +537,10 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
                 }
             }
         }
+        // Defocus the element
+        else if ((key == KEY_ESC) && (element->isDefocusable()))
+            mDefocusElement = element;
+        // If none of the special keys, pass the key to the focused element
         else
             element->onKey(key, mMouseButtons, mQualifiers);
     }

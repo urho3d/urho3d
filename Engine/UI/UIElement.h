@@ -149,6 +149,8 @@ public:
     void setEnabled(bool enable);
     //! Set whether can be focused
     void setFocusable(bool enable);
+    //! Set whether can be defocused by pressing ESC
+    void setDefocusable(bool enable);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
     //! Set selected mode. Actual meaning is element dependent, but is visually same as a constant hover
@@ -206,6 +208,8 @@ public:
     bool isEnabled() const { return mEnabled; }
     //! Return whether can be focused
     bool isFocusable() const { return mFocusable; }
+    //! Return whether can be defocused with ESC
+    bool isDefocusable() const { return mDefocusable; }
     //! Return whether has focus
     bool hasFocus() const { return mFocus; }
     //! Return whether is selected. Actual meaning is element dependent
@@ -286,6 +290,8 @@ protected:
     bool mEnabled;
     //! Focusable flag
     bool mFocusable;
+    //! Defocusable flag
+    bool mDefocusable;
     //! Focused flag
     bool mFocus;
     //! Selected flag

@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "InputEvents.h"
 #include "ScrollView.h"
 #include "Slider.h"
 #include "UIEvents.h"
@@ -32,10 +33,13 @@ ScrollView::ScrollView(const std::string& name) :
     BorderImage(name),
     mViewPosition(IntVector2::sZero),
     mViewSize(IntVector2::sZero),
-    mLastSize(IntVector2::sZero)
+    mLastSize(IntVector2::sZero),
+    mScrollStep(0.25f),
+    mPageStep(1.0f)
 {
     mClipChildren = true;
     mEnabled = true;
+    mFocusable = true;
 }
 
 ScrollView::~ScrollView()
@@ -50,6 +54,10 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
         setViewPosition(element.getChildElement("viewposition").getIntVector2("value"));
     if (element.hasChildElement("viewsize"))
         setViewSize(element.getChildElement("viewsize").getIntVector2("value"));
+    if (element.hasChildElement("scrollstep"))
+        setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
+    if (element.hasChildElement("pagestep"))
+        setScrollStep(element.getChildElement("pagestep").getFloat("value"));
     
     UIElement* root = getRootElement();
     if (root)
@@ -74,6 +82,89 @@ void ScrollView::update(float timeStep)
     }
     else
         updateViewFromSliders();
+}
+
+void ScrollView::onKey(int key, int buttons, int qualifiers)
+{
+    switch (key)
+    {
+    case KEY_LEFT:
+        if (mHorizontalSlider)
+        {
+            if (qualifiers & QUAL_CTRL)
+                mHorizontalSlider->setValue(0.0f);
+            else
+                mHorizontalSlider->setValue(mHorizontalSlider->getValue() - mScrollStep);
+        }
+        break;
+        
+    case KEY_RIGHT:
+        if (mHorizontalSlider)
+        {
+            if (qualifiers & QUAL_CTRL)
+                mHorizontalSlider->setValue(mHorizontalSlider->getRange());
+            else
+                mHorizontalSlider->setValue(mHorizontalSlider->getValue() + mScrollStep);
+        }
+        break;
+        
+    case KEY_UP:
+        if (mVerticalSlider)
+        {
+            if (qualifiers & QUAL_CTRL)
+                mVerticalSlider->setValue(0.0f);
+            else
+                mVerticalSlider->setValue(mVerticalSlider->getValue() - mScrollStep);
+        }
+        break;
+        
+    case KEY_DOWN:
+        if (mVerticalSlider)
+        {
+            if (qualifiers & QUAL_CTRL)
+                mVerticalSlider->setValue(mVerticalSlider->getRange());
+            else
+                mVerticalSlider->setValue(mVerticalSlider->getValue() + mScrollStep);
+        }
+        break;
+        
+    case KEY_PAGEUP:
+        if (mVerticalSlider)
+            mVerticalSlider->setValue(mVerticalSlider->getValue() - mPageStep);
+        break;
+        
+    case KEY_PAGEDOWN:
+        if (mVerticalSlider)
+            mVerticalSlider->setValue(mVerticalSlider->getValue() + mPageStep);
+        break;
+    
+    case KEY_HOME:
+        if (mVerticalSlider)
+            mVerticalSlider->setValue(0.0f);
+        break;
+    
+    case KEY_END:
+        if (mVerticalSlider)
+            mVerticalSlider->setValue(mVerticalSlider->getRange());
+        break;
+    }
+}
+
+void ScrollView::onFocus()
+{
+    // Set selected state (constant hover) on the sliders to show they are now under key control
+    if (mHorizontalSlider)
+        mHorizontalSlider->setSelected(true);
+    if (mVerticalSlider)
+        mVerticalSlider->setSelected(true);
+}
+
+void ScrollView::onDefocus()
+{
+    if (mHorizontalSlider)
+        mHorizontalSlider->setSelected(false);
+    if (mVerticalSlider)
+        mVerticalSlider->setSelected(false);
 }
 
 void ScrollView::setViewPosition(const IntVector2& position)
@@ -111,6 +202,16 @@ void ScrollView::setVerticalSlider(Slider* slider)
 {
     mVerticalSlider = slider;
     updateSliders();
+}
+
+void ScrollView::setScrollStep(float step)
+{
+    mScrollStep = max(step, 0.0f);
+}
+
+void ScrollView::setPageStep(float step)
+{
+    mPageStep = max(step, 0.0f);
 }
 
 void ScrollView::updateViewFromSliders()

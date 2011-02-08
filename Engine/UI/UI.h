@@ -132,6 +132,8 @@ private:
     bool mMouseDrag;
     //! Mouse drag UI element
     UIElement* mMouseDragElement;
+    //! Element to defocus on the next update
+    UIElement* mDefocusElement;
     //! Mouse buttons held down
     int mMouseButtons;
     //! Qualifier keys held down

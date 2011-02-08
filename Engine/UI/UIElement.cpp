@@ -43,6 +43,7 @@ UIElement::UIElement(const std::string& name) :
     mClipChildren(false),
     mEnabled(false),
     mFocusable(false),
+    mDefocusable(true),
     mFocus(false),
     mSelected(false),
     mVisible(true),
@@ -141,6 +142,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setEnabled(element.getChildElement("enabled").getBool("enable"));
     if (element.hasChildElement("focusable"))
         setFocusable(element.getChildElement("focusable").getBool("enable"));
+    if (element.hasChildElement("defocusable"))
+        setDefocusable(element.getChildElement("defocusable").getBool("enable"));
     if (element.hasChildElement("selected"))
         setSelected(element.getChildElement("selected").getBool("enable"));
     if (element.hasChildElement("visible"))
@@ -397,6 +400,11 @@ void UIElement::setFocusable(bool enable)
     mFocusable = enable;
 }
 
+void UIElement::setDefocusable(bool enable)
+{
+    mDefocusable = enable;
+}
+
 void UIElement::setFocus(bool enable)
 {
     if (!mFocusable)
@@ -421,7 +429,7 @@ void UIElement::setFocus(bool enable)
 
 void UIElement::setSelected(bool enable)
 {
-    mVisible = enable;
+    mSelected = enable;
 }
 
 void UIElement::setVisible(bool enable)

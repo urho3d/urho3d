@@ -60,7 +60,7 @@ void runFrame()
 {
     engine.runFrame(gameScene, gameCamera, !paused);
 
-    if (input.getKeyPress(KEY_ESCAPE))
+    if (input.getKeyPress(KEY_ESC))
         engine.exit();
 }
 

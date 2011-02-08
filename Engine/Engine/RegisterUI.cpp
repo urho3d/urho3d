@@ -130,10 +130,14 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "void setViewSize(int, int)", asMETHODPR(ScrollView, setViewSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setHorizontalSlider(Slider@+)", asMETHOD(ScrollView, setHorizontalSlider), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setVerticalSlider(Slider@+)", asMETHOD(ScrollView, setVerticalSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setScrollStep(float)", asMETHOD(ScrollView, setScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setPageStep(float)", asMETHOD(ScrollView, setPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewSize() const", asMETHOD(ScrollView, getViewSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "Slider@+ getHorizontalSlider() const", asMETHOD(ScrollView, getHorizontalSlider), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "Slider@+ getVerticalSlider() const", asMETHOD(ScrollView, getVerticalSlider), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "float getScrollStep() const", asMETHOD(ScrollView, getScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "float getPageStep() const", asMETHOD(ScrollView, getPageStep), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
 }
 
@@ -172,7 +176,6 @@ static void registerLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "void setCursorBlinkRate(float)", asMETHOD(LineEdit, setCursorBlinkRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setMaxLength(uint)", asMETHOD(LineEdit, setMaxLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setEchoCharacter(uint8)", asMETHOD(LineEdit, setEchoCharacter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "void setDefocusable(bool)", asMETHOD(LineEdit, setDefocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setCursorMovable(bool)", asMETHOD(LineEdit, setCursorMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setTextSelectable(bool)", asMETHOD(LineEdit, setTextSelectable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "void setTextCopyable(bool)", asMETHOD(LineEdit, setTextCopyable), asCALL_THISCALL);
@@ -181,7 +184,6 @@ static void registerLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "float getCursorBlinkRate() const", asMETHOD(LineEdit, getCursorBlinkRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "uint getMaxLength() const", asMETHOD(LineEdit, getMaxLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "uint8 getEchoCharacter() const", asMETHOD(LineEdit, getEchoCharacter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "bool isDefocusable() const", asMETHOD(LineEdit, isDefocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool isCursorMovable() const", asMETHOD(LineEdit, isCursorMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool isTextSelectable() const", asMETHOD(LineEdit, isTextSelectable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool isTextCopyable() const", asMETHOD(LineEdit, isTextCopyable), asCALL_THISCALL);

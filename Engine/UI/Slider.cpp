@@ -74,8 +74,9 @@ void Slider::update(float timeStep)
     if (mDragSlider)
         mHovering = true;
     
-    // Copy hover effect to the slider button
+    // Copy hover and selection effect to the slider button
     mSlider->setHovering(mHovering);
+    mSlider->setSelected(mSelected);
 }
 
 void Slider::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
@@ -138,14 +139,22 @@ void Slider::setOrientation(UIElementOrientation orientation)
 
 void Slider::setRange(float range)
 {
-    mRange = max(range, 0.0f);
-    updateSlider();
+    range = max(range, 0.0f);
+    if (range != mRange)
+    {
+        mRange = range;
+        updateSlider();
+    }
 }
 
 void Slider::setValue(float value)
 {
-    mValue = max(value, 0.0f);
-    updateSlider();
+    value = clamp(value, 0.0f, mRange);
+    if (value != mValue)
+    {
+        mValue = value;
+        updateSlider();
+    }
 }
 
 void Slider::updateSlider()

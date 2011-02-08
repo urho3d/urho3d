@@ -209,7 +209,7 @@ void initScene()
         billboard.setPosition(Vector3(random() * 200.0 - 100.0, random() * 15.0 + 5.0, random() * 200.0 - 100.0));
         billboard.setMaterial(cache.getResource("Material", "Materials/LitSmoke.xml"));
         billboard.setBillboardsSorted(true);
-        
+
         for (uint j = 0; j < NUM_BILLBOARDS; ++j)
         {
             Billboard@ bb = billboard.getBillboard(j);
@@ -488,7 +488,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
             pipeline.setEdgeFilter(params);
         }
         
-        if ((input.getKeyPress(KEY_ESCAPE)) && (ui.getFocusElement() is null))
+        if ((input.getKeyPress(KEY_ESC)) && (ui.getFocusElement() is null))
             engine.exit();
     }
 }

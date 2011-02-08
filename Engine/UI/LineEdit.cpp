@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Input.h"
 #include "LineEdit.h"
-#include "Log.h"
 #include "Text.h"
 #include "UIEvents.h"
 
@@ -40,11 +39,9 @@ LineEdit::LineEdit(const std::string& name, const std::string& text) :
     mCursorBlinkTimer(0.0f),
     mMaxLength(0),
     mEchoCharacter(0),
-    mDefocusable(true),
     mCursorMovable(true),
     mTextSelectable(true),
-    mTextCopyable(true),
-    mDefocus(false)
+    mTextCopyable(true)
 {
     mClipChildren = true;
     mEnabled = true;
@@ -69,8 +66,6 @@ void LineEdit::setStyle(const XMLElement& element, ResourceCache* cache)
     
     if (element.hasChildElement("maxlength"))
         setMaxLength(element.getChildElement("maxlength").getInt("value"));
-    if (element.hasChildElement("defocusable"))
-        setDefocusable(element.getChildElement("defocusable").getBool("enable"));
     if (element.hasChildElement("cursormovable"))
         setCursorMovable(element.getChildElement("cursormovable").getBool("enable"));
     if (element.hasChildElement("textselectable"))
@@ -121,12 +116,6 @@ void LineEdit::update(float timeStep)
     if (mFocus)
         cursorVisible = mCursorBlinkTimer < 0.5f;
     mCursor->setVisible(cursorVisible);
-    
-    if (mDefocus)
-    {
-        setFocus(false);
-        mDefocus = false;
-    }
 }
 
 void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
@@ -261,6 +250,22 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
         }
         break;
         
+    case KEY_HOME:
+        if ((mCursorMovable) && (mCursorPosition > 0))
+        {
+            mCursorPosition = 0;
+            cursorMoved = true;
+        }
+        break;
+        
+    case KEY_END:
+        if ((mCursorMovable) && (mCursorPosition < mLine.length()))
+        {
+            mCursorPosition = mLine.length();
+            cursorMoved = true;
+        }
+        break;
+        
     case KEY_DELETE:
         if (!mText->getSelectionLength())
         {
@@ -329,14 +334,6 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         sendEvent(EVENT_TEXTFINISHED, eventData);
         
         mText->clearSelection();
-    }
-    else if (c == 27)
-    {
-        if (mDefocusable)
-        {
-            mText->clearSelection();
-            mDefocus = true;
-        }
     }
     else if ((c >= 0x20) && ((!mMaxLength) || (mLine.length() < mMaxLength)))
     {
@@ -427,11 +424,6 @@ void LineEdit::setEchoCharacter(char c)
 {
     mEchoCharacter = c;
     updateText();
-}
-
-void LineEdit::setDefocusable(bool enable)
-{
-    mDefocusable = enable;
 }
 
 void LineEdit::setCursorMovable(bool enable)

@@ -44,14 +44,14 @@ static void registerKeyCodes(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_MENU", (void*)&KEY_MENU);
     engine->RegisterGlobalProperty("const int KEY_PAUSE", (void*)&KEY_PAUSE);
     engine->RegisterGlobalProperty("const int KEY_CAPITAL", (void*)&KEY_CAPITAL);
-    engine->RegisterGlobalProperty("const int KEY_ESCAPE", (void*)&KEY_ESCAPE);
+    engine->RegisterGlobalProperty("const int KEY_ESC", (void*)&KEY_ESC);
     engine->RegisterGlobalProperty("const int KEY_CONVERT", (void*)&KEY_CONVERT);
     engine->RegisterGlobalProperty("const int KEY_NONCONVERT", (void*)&KEY_NONCONVERT);
     engine->RegisterGlobalProperty("const int KEY_ACCEPT", (void*)&KEY_ACCEPT);
     engine->RegisterGlobalProperty("const int KEY_MODECHANGE", (void*)&KEY_MODECHANGE);
     engine->RegisterGlobalProperty("const int KEY_SPACE", (void*)&KEY_SPACE);
-    engine->RegisterGlobalProperty("const int KEY_PRIOR", (void*)&KEY_PRIOR);
-    engine->RegisterGlobalProperty("const int KEY_NEXT", (void*)&KEY_NEXT);
+    engine->RegisterGlobalProperty("const int KEY_PAGEUP", (void*)&KEY_PAGEUP);
+    engine->RegisterGlobalProperty("const int KEY_PAGEDOWN", (void*)&KEY_PAGEDOWN);
     engine->RegisterGlobalProperty("const int KEY_END", (void*)&KEY_END);
     engine->RegisterGlobalProperty("const int KEY_HOME", (void*)&KEY_HOME);
     engine->RegisterGlobalProperty("const int KEY_LEFT", (void*)&KEY_LEFT);

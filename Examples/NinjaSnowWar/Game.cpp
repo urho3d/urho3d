@@ -151,7 +151,7 @@ void Game::run()
             saveGame();
         if (input->getKeyPress(KEY_F7))
             loadGame();
-        if (input->getKeyPress(KEY_ESCAPE))
+        if (input->getKeyPress(KEY_ESC))
             mEngine->exit();
     }
 }

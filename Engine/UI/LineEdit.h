@@ -69,8 +69,6 @@ public:
     void setMaxLength(unsigned length);
     //! Set echo character for password entry and such. 0 (default) shows the actual text
     void setEchoCharacter(char c);
-    //! Set whether can defocus with ESC, default true
-    void setDefocusable(bool enable);
     //! Set whether can move cursor with arrows or mouse, default true
     void setCursorMovable(bool enable);
     //! Set whether selections are allowed, default true
@@ -88,8 +86,6 @@ public:
     unsigned getMaxLength() const { return mMaxLength; }
     //! Return echo character
     char getEchoCharacter() const { return mEchoCharacter; }
-    //! Return whether can defocus with ESC
-    bool isDefocusable() const { return mDefocusable; }
     //! Return whether can move cursor with arrows or mouse
     bool isCursorMovable() const { return mCursorMovable; }
     //! Return whether selections are allowed
@@ -131,16 +127,12 @@ protected:
     unsigned mMaxLength;
     //! Echo character
     char mEchoCharacter;
-    //! ESC defocus flag
-    bool mDefocusable;
     //! Cursor movable flag
     bool mCursorMovable;
     //! Text selectable flag
     bool mTextSelectable;
     //! Copy-paste enable flag
     bool mTextCopyable;
-    //! Defocus flag (defocus on next update)
-    bool mDefocus;
 };
 
 #endif // UI_LINEEDIT_H

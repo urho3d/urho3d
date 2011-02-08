@@ -43,6 +43,12 @@ public:
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Perform UI element update
     virtual void update(float timeStep);
+    //! React to a key press
+    virtual void onKey(int key, int buttons, int qualifiers);
+    //! React to gaining focus
+    virtual void onFocus();
+    //! React to losing focus
+    virtual void onDefocus();
     
     //! Set view offset from the top-left corner
     void setViewPosition(const IntVector2& position);
@@ -56,6 +62,10 @@ public:
     void setHorizontalSlider(Slider* slider);
     //! Set vertical slider
     void setVerticalSlider(Slider* slider);
+    //! Set arrow key scroll step
+    void setScrollStep(float step);
+    //! Set arrow key page step
+    void setPageStep(float step);
     
     //! Return view offset from the top-left corner
     const IntVector2& getViewPosition() const { return mViewPosition; }
@@ -65,6 +75,10 @@ public:
     Slider* getHorizontalSlider() const { return mHorizontalSlider; }
     //! Return vertical slider
     Slider* getVerticalSlider() const { return mVerticalSlider; }
+    //! Return arrow key scroll step
+    float getScrollStep() const { return mScrollStep; }
+    //! Return arrow key page step
+    float getPageStep() const { return mPageStep; }
     
 protected:
     //! Update the view from sliders if available
@@ -84,6 +98,10 @@ protected:
     IntVector2 mViewSize;
     //! Last known own size
     IntVector2 mLastSize;
+    //! Arrow key scroll step
+    float mScrollStep;
+    //! Arrow key page step
+    float mPageStep;
 };
 
 #endif // UI_SCROLLVIEW_H
