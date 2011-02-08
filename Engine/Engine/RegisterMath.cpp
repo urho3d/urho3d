@@ -402,6 +402,49 @@ static void registerRay(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Ray", "Vector3 direction", offsetof(Ray, mDirection));
 }
 
+static void ConstructRect(Rect* ptr)
+{
+    // Init to zero because performance is not critical
+    new(ptr) Rect(Rect::sZero);
+}
+
+static void ConstructRectCopy(const Rect& rect, Rect* ptr)
+{
+    new(ptr) Rect(rect);
+}
+
+static void ConstructRectInit(float left, float top, float right, float bottom, Rect* ptr)
+{
+    new(ptr) Rect(left, top, right, bottom);
+}
+
+static void ConstructRectInitVec(const Vector2& min, const Vector2& max, Rect* ptr)
+{
+    new(ptr) Rect(min, max);
+}
+
+static void registerRect(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Rect", sizeof(Rect), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CA);
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructRect), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(const Rect& in)", asFUNCTION(ConstructRectCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructRectInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(const Vector2& in, const Vector2& in)", asFUNCTION(ConstructRectInitVec), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Rect", "Rect &opAssign(const Rect& in)", asMETHOD(Rect, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "bool &opEquals(const Rect& in) const", asMETHOD(Rect, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "void define(const Vector2& in, const Vector2& in)", asMETHODPR(Rect, define, (const Vector2&, const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "void define(const Vector2& in)", asMETHODPR(Rect, define, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "void merge(const Vector2& in)", asMETHODPR(Rect, merge, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "void merge(const Rect& in)", asMETHODPR(Rect, merge, (const Rect&), void), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Rect", "Vector2 min", offsetof(Rect, mMin));
+    engine->RegisterObjectProperty("Rect", "Vector2 max", offsetof(Rect, mMax));
+    engine->RegisterObjectProperty("Rect", "float left", offsetof(Rect, mMin.mX));
+    engine->RegisterObjectProperty("Rect", "float top", offsetof(Rect, mMin.mY));
+    engine->RegisterObjectProperty("Rect", "float right", offsetof(Rect, mMax.mX));
+    engine->RegisterObjectProperty("Rect", "float bottom", offsetof(Rect, mMax.mY));
+    engine->RegisterObjectProperty("Rect", "bool defined", offsetof(Rect, mDefined));
+}
+
 static void ConstructBoundingBox(BoundingBox* ptr)
 {
     new(ptr) BoundingBox();
@@ -537,5 +580,6 @@ void registerMathLibrary(asIScriptEngine* engine)
     registerVector4(engine);
     registerQuaternion(engine);
     registerRay(engine);
+    registerRect(engine);
     registerVolumes(engine);
 }

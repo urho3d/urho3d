@@ -50,8 +50,17 @@ struct Particle
     float mScale;
     //! Rotation speed
     float mRotationSpeed;
-    //! Current color index (color fade optimization)
+    //! Current color fade index
     unsigned mColorIndex;
+    //! Current texture animation index
+    unsigned mTexIndex;
+};
+
+//! Texture animation
+struct TextureAnimation
+{
+    Rect mUV;
+    float mTime;
 };
 
 class ResourceCache;
@@ -138,6 +147,8 @@ public:
     void setParticleColor(const Color& color);
     //! Set color fade of particles
     void setParticleColors(const std::vector<ColorFade>& colors);
+    //! Set texture animation of particles
+    void setParticleTextureAnimation(const std::vector<TextureAnimation>& animation);
     //! Set emitter active/inactive state and optionally reset active/inactive timer
     void setActive(bool enable, bool resetPeriod = false);
     //! Set whether emitter should update when not visible
@@ -191,6 +202,10 @@ public:
     float getParticleSizeAdd() const { return mSizeAdd; }
     //! Return particle size multiplicative parameter
     float getParticleSizeMul() const { return mSizeMul; }
+    //! Return particle colors
+    const std::vector<ColorFade>& getParticleColors() const { return mColors; }
+    //! Return particle texture animation
+    const std::vector<TextureAnimation>& getParticleTextureAnimation() const { return mTextureAnimation; }
     //! Return whether emitter is active
     bool isActive() const { return mActive; }
     //! Return whether emitter should update when invisible
@@ -216,6 +231,8 @@ private:
     std::vector<Particle> mParticles;
     //! Color fade range
     std::vector<ColorFade> mColors;
+    //! Texture animation
+    std::vector<TextureAnimation> mTextureAnimation;
     //! Emitter shape
     EmitterType mEmitterType;
     //! Emitter size

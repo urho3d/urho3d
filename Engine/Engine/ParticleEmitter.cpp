@@ -95,6 +95,7 @@ void ParticleEmitter::save(Serializer& dest)
             dest.writeFloat(particle.mScale);
             dest.writeFloat(particle.mRotationSpeed);
             dest.writeVLE(particle.mColorIndex);
+            dest.writeVLE(particle.mTexIndex);
         }
     }
 }
@@ -123,6 +124,7 @@ void ParticleEmitter::load(Deserializer& source, ResourceCache* cache)
             particle.mScale = source.readFloat();
             particle.mRotationSpeed = source.readFloat();
             particle.mColorIndex = source.readVLE();
+            particle.mTexIndex = source.readVLE();
         }
     }
 }
@@ -153,6 +155,7 @@ void ParticleEmitter::saveXML(XMLElement& dest)
             particleElem.setFloat("scale", particle.mScale);
             particleElem.setFloat("rotspeed", particle.mRotationSpeed);
             particleElem.setInt("color", particle.mColorIndex);
+            particleElem.setInt("tex", particle.mTexIndex);
         }
     }
 }
@@ -182,6 +185,7 @@ void ParticleEmitter::loadXML(const XMLElement& source, ResourceCache* cache)
         particle.mScale = particleElem.getFloat("scale");
         particle.mRotationSpeed = particleElem.getFloat("rotspeed");
         particle.mColorIndex = particleElem.getInt("color");
+        particle.mTexIndex = particleElem.getInt("tex");
         particleElem = particleElem.getNextElement("particle");
         ++index;
     }
@@ -351,6 +355,17 @@ void ParticleEmitter::update(float timeStep)
                 else
                     billboard.mColor = mColors[index].mColor;
             }
+            
+            // Texture animation
+            unsigned& texIndex = particle.mTexIndex;
+            if ((mTextureAnimation.size()) && (texIndex < mTextureAnimation.size() - 1))
+            {
+                if (particle.mTimer >= mTextureAnimation[texIndex + 1].mTime)
+                {
+                    billboard.mUV = mTextureAnimation[texIndex + 1].mUV;
+                    ++texIndex;
+                }
+            }
         }
     }
     
@@ -457,6 +472,21 @@ void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
             colorFadeElem = colorFadeElem.getNextElement("colorfade");
         }
         setParticleColors(fades);
+    }
+    
+    if (rootElem.hasChildElement("texanim"))
+    {
+        std::vector<TextureAnimation> animations;
+        XMLElement animElem = rootElem.getChildElement("texanim");
+        while (animElem)
+        {
+            TextureAnimation animation;
+            animation.mUV = animElem.getRect("uv");
+            animation.mTime = animElem.getFloat("time");
+            animations.push_back(animation);
+            animElem = animElem.getNextElement("texanim");
+        }
+        setParticleTextureAnimation(animations);
     }
 }
 
@@ -614,6 +644,11 @@ void ParticleEmitter::setParticleColors(const std::vector<ColorFade>& colors)
     mColors = colors;
 }
 
+void ParticleEmitter::setParticleTextureAnimation(const std::vector<TextureAnimation>& animation)
+{
+    mTextureAnimation = animation;
+}
+
 void ParticleEmitter::setActive(bool enable, bool resetPeriod)
 {
     if ((enable != mActive) || (resetPeriod))
@@ -696,11 +731,15 @@ bool ParticleEmitter::emitNewParticle()
     particle.mScale = 1.0f;
     particle.mRotationSpeed = lerp(mRotationSpeedMin, mRotationSpeedMax, random(1.0f));
     particle.mColorIndex = 0;
+    particle.mTexIndex = 0;
+    
     billboard.mPosition = startPos;
     billboard.mSize = mParticles[index].mSize;
+    billboard.mUV = mTextureAnimation.size() ? mTextureAnimation[0].mUV : Rect::sPositiveRect;
     billboard.mRotation = lerp(mRotationMin, mRotationMax, random(1.0f));
     billboard.mColor = mColors[0].mColor;
     billboard.mEnabled = true;
+    
     return true;
 }
 

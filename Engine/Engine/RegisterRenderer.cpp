@@ -707,6 +707,7 @@ static void registerBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Billboard", "Vector3 position", offsetof(Billboard, mPosition));
     engine->RegisterObjectProperty("Billboard", "Vector2 size", offsetof(Billboard, mSize));
+    engine->RegisterObjectProperty("Billboard", "Rect uv", offsetof(Billboard, mUV));
     engine->RegisterObjectProperty("Billboard", "Color color", offsetof(Billboard, mColor));
     engine->RegisterObjectProperty("Billboard", "float rotation", offsetof(Billboard, mRotation));
     engine->RegisterObjectProperty("Billboard", "bool enabled", offsetof(Billboard, mEnabled));

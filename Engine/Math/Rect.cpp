@@ -25,6 +25,7 @@
 #include "Rect.h"
 
 const Rect Rect::sFullRect(-1.0f, -1.0f, 1.0f, 1.0f);
+const Rect Rect::sPositiveRect(0.0f, 0.0f, 1.0f, 1.0f);
 const Rect Rect::sZero(0.0f, 0.0f, 0.0f, 0.0f);
 
 const IntRect IntRect::sZero(0, 0, 0, 0);

@@ -88,6 +88,7 @@ void BillboardSet::save(Serializer& dest)
         {
             dest.writeVector3(billboard.mPosition);
             dest.writeVector2(billboard.mSize);
+            dest.writeRect(billboard.mUV);
             dest.writeColor(billboard.mColor);
             dest.writeFloat(billboard.mRotation);
         }
@@ -115,6 +116,7 @@ void BillboardSet::load(Deserializer& source, ResourceCache* cache)
         {
             billboard.mPosition = source.readVector3();
             billboard.mSize = source.readVector2();
+            billboard.mUV = source.readRect();
             billboard.mColor = source.readColor();
             billboard.mRotation = source.readFloat();
         }
@@ -122,6 +124,7 @@ void BillboardSet::load(Deserializer& source, ResourceCache* cache)
         {
             billboard.mPosition = Vector3::sZero;
             billboard.mSize = Vector2::sZero;
+            billboard.mUV = Rect::sPositiveRect;
             billboard.mColor = Color();
             billboard.mRotation = 0.0f;
         }
@@ -156,6 +159,7 @@ void BillboardSet::saveXML(XMLElement& dest)
         {
             billboardElem.setVector3("pos", billboard.mPosition);
             billboardElem.setVector2("size", billboard.mSize);
+            billboardElem.setRect("uv", billboard.mUV);
             billboardElem.setColor("color", billboard.mColor);
             billboardElem.setFloat("rot", billboard.mRotation);
         }
@@ -188,6 +192,7 @@ void BillboardSet::loadXML(const XMLElement& source, ResourceCache* cache)
         {
             billboard.mPosition = billboardElem.getVector3("pos");
             billboard.mSize = billboardElem.getVector2("size");
+            billboard.mUV = billboardElem.getRect("uv");
             billboard.mColor = billboardElem.getColor("color");
             billboard.mRotation = billboardElem.getFloat("rot");
         }
@@ -320,6 +325,7 @@ void BillboardSet::setNumBillboards(unsigned num)
     {
         mBillboards[i].mPosition = Vector3::sZero;
         mBillboards[i].mSize = Vector2::sUnity;
+        mBillboards[i].mUV = Rect::sPositiveRect;
         mBillboards[i].mColor = Color(1.0f, 1.0f, 1.0f);
         mBillboards[i].mRotation = 0.0f;
         mBillboards[i].mEnabled = false;
@@ -519,25 +525,27 @@ void BillboardSet::updateVertexBuffer(const FrameInfo& frame)
     for (unsigned i = 0; i < numBillboards; ++i)
     {
         unsigned index = mSortOrder[i];
-        if (!mBillboards[index].mEnabled)
+        const Billboard& billboard = mBillboards[index];
+        
+        if (!billboard.mEnabled)
             continue;
         
         Vector3 position;
         if (!mBillboardsRelative)
-            position = mBillboards[index].mPosition;
+            position = billboard.mPosition;
         else
-            position = worldTransform * mBillboards[index].mPosition;
+            position = worldTransform * billboard.mPosition;
         
         Vector2 size;
         if (!mScaleBillboards)
-            size = mBillboards[index].mSize;
+            size = billboard.mSize;
         else
-            size = Vector2(mBillboards[index].mSize.mX * worldScale.mX, mBillboards[index].mSize.mY * worldScale.mY);
+            size = Vector2(billboard.mSize.mX * worldScale.mX, mBillboards[index].mSize.mY * worldScale.mY);
         
-        unsigned color = getD3DColor(mBillboards[index].mColor);
+        unsigned color = getD3DColor(billboard.mColor);
         
         static float rotationMatrix[2][2];
-        float angleRad = mBillboards[index].mRotation * M_DEGTORAD;
+        float angleRad = billboard.mRotation * M_DEGTORAD;
         rotationMatrix[0][0] = cosf(angleRad);
         rotationMatrix[0][1] = sinf(angleRad);
         rotationMatrix[1][0] = -rotationMatrix[0][1];
@@ -545,25 +553,25 @@ void BillboardSet::updateVertexBuffer(const FrameInfo& frame)
         
         *dest++ = position.mX; *dest++ = position.mY; *dest++ = position.mZ;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = 0.0f; *dest++ = 1.0f;
+        *dest++ = billboard.mUV.mMin.mX; *dest++ = billboard.mUV.mMax.mY;
         *dest++ = -size.mX * rotationMatrix[0][0] + size.mY * rotationMatrix[0][1];
         *dest++ = -size.mX * rotationMatrix[1][0] + size.mY * rotationMatrix[1][1];
         
         *dest++ = position.mX; *dest++ = position.mY; *dest++ = position.mZ;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = 1.0f; *dest++ = 1.0f;
+        *dest++ = billboard.mUV.mMax.mX; *dest++ = billboard.mUV.mMax.mY;
         *dest++ = size.mX * rotationMatrix[0][0] + size.mY * rotationMatrix[0][1];
         *dest++ = size.mX * rotationMatrix[1][0] + size.mY * rotationMatrix[1][1];
         
         *dest++ = position.mX; *dest++ = position.mY; *dest++ = position.mZ;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = 1.0f; *dest++ = 0.0f;
+        *dest++ = billboard.mUV.mMax.mX; *dest++ = billboard.mUV.mMin.mY;
         *dest++ = size.mX * rotationMatrix[0][0] - size.mY * rotationMatrix[0][1];
         *dest++ = size.mX * rotationMatrix[1][0] - size.mY * rotationMatrix[1][1];
         
         *dest++ = position.mX; *dest++ = position.mY; *dest++ = position.mZ;
         *((unsigned*)dest) = color; dest++;
-        *dest++ = 0.0f; *dest++ = 0.0f;
+        *dest++ = billboard.mUV.mMin.mX; *dest++ = billboard.mUV.mMin.mY;
         *dest++ = -size.mX * rotationMatrix[0][0] - size.mY * rotationMatrix[0][1];
         *dest++ = -size.mX * rotationMatrix[1][0] - size.mY * rotationMatrix[1][1];
     }

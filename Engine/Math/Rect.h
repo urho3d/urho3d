@@ -144,6 +144,8 @@ public:
     
     //! A rect in the range (-1, -1) - (1, 1)
     static const Rect sFullRect;
+    //! A rect in the range (0, 0) - (1, 1)
+    static const Rect sPositiveRect;
     //! A zero-sized rect
     static const Rect sZero;
 };

@@ -26,6 +26,7 @@
 
 #include "Color.h"
 #include "GeometryNode.h"
+#include "Rect.h"
 
 class IndexBuffer;
 class Renderer;
@@ -38,6 +39,8 @@ struct Billboard
     Vector3 mPosition;
     //! Two-dimensional size
     Vector2 mSize;
+    //! UV coordinates
+    Rect mUV;
     //! Color
     Color mColor;
     //! Rotation
