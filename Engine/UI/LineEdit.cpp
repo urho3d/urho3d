@@ -34,6 +34,7 @@ LineEdit::LineEdit(const std::string& name, const std::string& text) :
     mLastFont(0),
     mLastFontSize(0),
     mCursorPosition(0),
+    mDragStartPosition(0),
     mCursorBlinkRate(1.0f),
     mCursorBlinkTimer(0.0f),
     mMaxLength(0),
@@ -62,18 +63,8 @@ void LineEdit::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     BorderImage::setStyle(element, cache);
     
-    if (element.hasChildElement("cursorblinkrate"))
-        setCursorBlinkRate(element.getChildElement("cursorblinkrate").getFloat("value"));
-    if (element.hasChildElement("echocharacter"))
-    {
-        std::string text = element.getChildElement("echocharacter").getString("value");
-        if (text.length())
-            setEchoCharacter(text[0]);
-    }
     if (element.hasChildElement("maxlength"))
         setMaxLength(element.getChildElement("maxlength").getInt("value"));
-    if (element.hasChildElement("cursorposition"))
-        setCursorPosition(element.getChildElement("cursorposition").getInt("value"));
     
     XMLElement textElem = element.getChildElement("text");
     if (textElem)
@@ -82,9 +73,21 @@ void LineEdit::setStyle(const XMLElement& element, ResourceCache* cache)
             setText(textElem.getString("value"));
         mText->setStyle(textElem, cache);
     }
+    
     XMLElement cursorElem = element.getChildElement("cursor");
     if (cursorElem)
         mCursor->setStyle(cursorElem, cache);
+    
+    if (element.hasChildElement("cursorposition"))
+        setCursorPosition(element.getChildElement("cursorposition").getInt("value"));
+    if (element.hasChildElement("cursorblinkrate"))
+        setCursorBlinkRate(element.getChildElement("cursorblinkrate").getFloat("value"));
+    if (element.hasChildElement("echocharacter"))
+    {
+        std::string text = element.getChildElement("echocharacter").getString("value");
+        if (text.length())
+            setEchoCharacter(text[0]);
+    }
 }
 
 void LineEdit::update(float timeStep)
@@ -118,15 +121,35 @@ void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosit
 {
     if (buttons & MOUSEB_LEFT)
     {
-        IntVector2 textPosition = mText->screenToElement(screenPosition);
-        const std::vector<IntVector2>& charPositions = mText->getCharPositions();
-        for (unsigned i = charPositions.size() - 1; i < charPositions.size(); --i)
+        unsigned pos = getCharIndex(position);
+        if (pos != M_MAX_UNSIGNED)
         {
-            if (textPosition.mX >= charPositions[i].mX)
-            {
-                setCursorPosition(i);
-                break;
-            }
+            setCursorPosition(pos);
+            mText->setSelection(0, 0);
+        }
+    }
+}
+
+void LineEdit::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+{
+    mDragStartPosition = getCharIndex(position);
+}
+
+void LineEdit::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+{
+    unsigned start = mDragStartPosition;
+    unsigned current = getCharIndex(position);
+    if ((start != M_MAX_UNSIGNED) && (current != M_MAX_UNSIGNED))
+    {
+        if (start < current)
+        {
+            mText->setSelection(start, current - start);
+            setCursorPosition(current);
+        }
+        else
+        {
+            mText->setSelection(current, start - current);
+            setCursorPosition(start);
         }
     }
 }
@@ -139,6 +162,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
     switch (key)
     {
     case KEY_LEFT:
+        mText->setSelection(0, 0);
         if (mCursorPosition > 0)
         {
             --mCursorPosition;
@@ -147,6 +171,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_RIGHT:
+        mText->setSelection(0, 0);
         if (mCursorPosition < mLine.length())
         {
             ++mCursorPosition;
@@ -155,12 +180,24 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_DELETE:
-        if (mCursorPosition < mLine.length())
+        if (!mText->getSelectionLength())
         {
-            if (mCursorPosition)
+            if (mCursorPosition < mLine.length())
+            {
                 mLine = mLine.substr(0, mCursorPosition) + mLine.substr(mCursorPosition + 1);
+                changed = true;
+            }
+        }
+        else
+        {
+            // If a selection exists, erase it
+            unsigned start = mText->getSelectionStart();
+            unsigned length = mText->getSelectionLength();
+            if (start + length < mLine.length())
+                mLine = mLine.substr(0, start) + mLine.substr(start + length);
             else
-                mLine = mLine.substr(mCursorPosition + 1);
+                mLine = mLine.substr(0, start);
+            mText->setSelection(0, 0);
             changed = true;
         }
         break;
@@ -216,11 +253,27 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         static std::string charStr;
         charStr.resize(1);
         charStr[0] = c;
-        if (mCursorPosition == mLine.length())
-            mLine += charStr;
+        
+        if (!mText->getSelectionLength())
+        {
+            if (mCursorPosition == mLine.length())
+                mLine += charStr;
+            else
+                mLine = mLine.substr(0, mCursorPosition) + charStr + mLine.substr(mCursorPosition);
+            ++mCursorPosition;
+        }
         else
-            mLine = mLine.substr(0, mCursorPosition) + charStr + mLine.substr(mCursorPosition);
-        ++mCursorPosition;
+        {
+            // If a selection exists, erase it first
+            unsigned start = mText->getSelectionStart();
+            unsigned length = mText->getSelectionLength();
+            if (start + length < mLine.length())
+                mLine = mLine.substr(0, start) + charStr + mLine.substr(start + length);
+            else
+                mLine = mLine.substr(0, start) + charStr;
+            mText->setSelection(0, 0);
+            mCursorPosition = start + 1;
+        }
         changed = true;
     }
     
@@ -319,4 +372,19 @@ void LineEdit::updateCursor()
     
     // Restart blinking
     mCursorBlinkTimer = 0.0f;
+}
+
+unsigned LineEdit::getCharIndex(const IntVector2& position)
+{
+    IntVector2 screenPosition = elementToScreen(position);
+    IntVector2 textPosition = mText->screenToElement(screenPosition);
+    const std::vector<IntVector2>& charPositions = mText->getCharPositions();
+    
+    for (unsigned i = charPositions.size() - 1; i < charPositions.size(); --i)
+    {
+        if (textPosition.mX >= charPositions[i].mX)
+            return i;
+    }
+    
+    return M_MAX_UNSIGNED;
 }

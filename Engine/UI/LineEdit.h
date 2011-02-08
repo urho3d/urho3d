@@ -46,6 +46,10 @@ public:
     
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    //! React to mouse drag start
+    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    //! React to mouse drag motion
+    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character
@@ -86,6 +90,8 @@ protected:
     void updateText();
     //! Update cursor position and restart cursor blinking
     void updateCursor();
+    //! Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found
+    unsigned getCharIndex(const IntVector2& position);
     
     //! Text element
     SharedPtr<Text> mText;
@@ -99,6 +105,8 @@ protected:
     int mLastFontSize;
     //! Cursor position
     unsigned mCursorPosition;
+    //! Drag start cursor position
+    unsigned mDragStartPosition;
     //! Cursor blink rate
     float mCursorBlinkRate;
     //! Cursor blink timer
