@@ -293,6 +293,9 @@ protected:
     //! Userdata
     Variant mUserData;
     
+    //! Clipboard data
+    static std::string sClipBoard;
+    
 private:
     //! Return child elements recursively
     void getChildrenRecursive(std::vector<UIElement*>& dest) const;

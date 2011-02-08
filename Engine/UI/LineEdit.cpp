@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Input.h"
 #include "LineEdit.h"
+#include "Log.h"
 #include "Text.h"
 #include "UIEvents.h"
 
@@ -34,12 +35,15 @@ LineEdit::LineEdit(const std::string& name, const std::string& text) :
     mLastFont(0),
     mLastFontSize(0),
     mCursorPosition(0),
-    mDragStartPosition(0),
+    mDragStartPosition(M_MAX_UNSIGNED),
     mCursorBlinkRate(1.0f),
     mCursorBlinkTimer(0.0f),
     mMaxLength(0),
     mEchoCharacter(0),
     mDefocusable(true),
+    mCursorMovable(true),
+    mTextSelectable(true),
+    mTextCopyable(true),
     mDefocus(false)
 {
     mClipChildren = true;
@@ -65,6 +69,14 @@ void LineEdit::setStyle(const XMLElement& element, ResourceCache* cache)
     
     if (element.hasChildElement("maxlength"))
         setMaxLength(element.getChildElement("maxlength").getInt("value"));
+    if (element.hasChildElement("defocusable"))
+        setDefocusable(element.getChildElement("defocusable").getBool("enable"));
+    if (element.hasChildElement("cursormovable"))
+        setCursorMovable(element.getChildElement("cursormovable").getBool("enable"));
+    if (element.hasChildElement("textselectable"))
+        setTextSelectable(element.getChildElement("textselectable").getBool("enable"));
+    if (element.hasChildElement("textcopyable"))
+        setTextCopyable(element.getChildElement("textcopyable").getBool("enable"));
     
     XMLElement textElem = element.getChildElement("text");
     if (textElem)
@@ -119,7 +131,7 @@ void LineEdit::update(float timeStep)
 
 void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
-    if (buttons & MOUSEB_LEFT)
+    if ((buttons & MOUSEB_LEFT) && (mCursorMovable))
     {
         unsigned pos = getCharIndex(position);
         if (pos != M_MAX_UNSIGNED)
@@ -137,19 +149,17 @@ void LineEdit::onDragStart(const IntVector2& position, const IntVector2& screenP
 
 void LineEdit::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
-    unsigned start = mDragStartPosition;
-    unsigned current = getCharIndex(position);
-    if ((start != M_MAX_UNSIGNED) && (current != M_MAX_UNSIGNED))
+    if ((mCursorMovable) && (mTextSelectable))
     {
-        if (start < current)
+        unsigned start = mDragStartPosition;
+        unsigned current = getCharIndex(position);
+        if ((start != M_MAX_UNSIGNED) && (current != M_MAX_UNSIGNED))
         {
-            mText->setSelection(start, current - start);
+            if (start < current)
+                mText->setSelection(start, current - start);
+            else
+                mText->setSelection(current, start - current);
             setCursorPosition(current);
-        }
-        else
-        {
-            mText->setSelection(current, start - current);
-            setCursorPosition(start);
         }
     }
 }
@@ -161,21 +171,93 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
     
     switch (key)
     {
-    case KEY_LEFT:
-        mText->setSelection(0, 0);
-        if (mCursorPosition > 0)
+    case 'X':
+    case 'C':
+        if ((mTextCopyable) && (qualifiers & QUAL_CTRL))
         {
-            --mCursorPosition;
+            unsigned start = mText->getSelectionStart();
+            unsigned length = mText->getSelectionLength();
+            
+            if (mText->getSelectionLength())
+                sClipBoard = mLine.substr(start, length);
+            
+            if (key == 'X')
+            {
+                if (start + length < mLine.length())
+                    mLine = mLine.substr(0, start) + mLine.substr(start + length);
+                else
+                    mLine = mLine.substr(0, start);
+                mText->setSelection(0, 0);
+                mCursorPosition = start;
+                changed = true;
+            }
+        }
+        break;
+        
+    case 'V':
+        if ((mTextCopyable) && (qualifiers & QUAL_CTRL))
+        {
+            if (sClipBoard.length())
+            {
+                if (mCursorPosition < mLine.length())
+                    mLine = mLine.substr(0, mCursorPosition) + sClipBoard + mLine.substr(mCursorPosition);
+                else
+                    mLine += sClipBoard;
+                mCursorPosition += sClipBoard.length();
+                changed = true;
+            }
+        }
+        break;
+        
+    case KEY_LEFT:
+        if (!(qualifiers & QUAL_SHIFT))
+            mText->setSelection(0, 0);
+        if ((mCursorMovable) && (mCursorPosition > 0))
+        {
+            if ((mTextSelectable) && (qualifiers & QUAL_SHIFT) && (!mText->getSelectionLength()))
+                mDragStartPosition = mCursorPosition;
+            
+            if (qualifiers & QUAL_CTRL)
+                mCursorPosition = 0;
+            else
+                --mCursorPosition;
             cursorMoved = true;
+            
+            if ((mTextSelectable) && (qualifiers & QUAL_SHIFT))
+            {
+                unsigned start = mDragStartPosition;
+                unsigned current = mCursorPosition;
+                if (start < current)
+                    mText->setSelection(start, current - start);
+                else
+                    mText->setSelection(current, start - current);
+            }
         }
         break;
         
     case KEY_RIGHT:
-        mText->setSelection(0, 0);
-        if (mCursorPosition < mLine.length())
+        if (!(qualifiers & QUAL_SHIFT))
+            mText->setSelection(0, 0);
+        if ((mCursorMovable) && (mCursorPosition < mLine.length()))
         {
-            ++mCursorPosition;
+            if ((mTextSelectable) && (qualifiers & QUAL_SHIFT) && (!mText->getSelectionLength()))
+                mDragStartPosition = mCursorPosition;
+            
+            if (qualifiers & QUAL_CTRL)
+                mCursorPosition = mLine.length();
+            else
+                ++mCursorPosition;
             cursorMoved = true;
+            
+            if ((mTextSelectable) && (qualifiers & QUAL_SHIFT))
+            {
+                unsigned start = mDragStartPosition;
+                unsigned current = mCursorPosition;
+                if (start < current)
+                    mText->setSelection(start, current - start);
+                else
+                    mText->setSelection(current, start - current);
+            }
         }
         break;
         
@@ -223,6 +305,9 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
 {
     bool changed = false;
     
+    if (qualifiers & QUAL_CTRL)
+        return;
+    
     if (c == '\b')
     {
         if ((mLine.length()) && (mCursorPosition))
@@ -242,11 +327,16 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         sendEvent(EVENT_TEXTFINISHED, eventData);
+        
+        mText->setSelection(0, 0);
     }
     else if (c == 27)
     {
         if (mDefocusable)
+        {
+            mText->setSelection(0, 0);
             mDefocus = true;
+        }
     }
     else if ((c >= 0x20) && ((!mMaxLength) || (mLine.length() < mMaxLength)))
     {
@@ -271,7 +361,6 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
                 mLine = mLine.substr(0, start) + charStr + mLine.substr(start + length);
             else
                 mLine = mLine.substr(0, start) + charStr;
-            mText->setSelection(0, 0);
             mCursorPosition = start + 1;
         }
         changed = true;
@@ -279,6 +368,7 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
     
     if (changed)
     {
+        mText->setSelection(0, 0);
         updateText();
         updateCursor();
         
@@ -295,12 +385,15 @@ void LineEdit::setText(const std::string& text)
 {
     mLine = text;
     mText->setText(text);
+    // If cursor is not movable, make sure it's at the text end
+    if (!mCursorMovable)
+        setCursorPosition(mLine.length());
     updateText();
 }
 
 void LineEdit::setCursorPosition(unsigned position)
 {
-    if (position > mLine.length())
+    if ((position > mLine.length()) || (!mCursorMovable))
         position = mLine.length();
     
     if (position != mCursorPosition)
@@ -329,6 +422,21 @@ void LineEdit::setEchoCharacter(char c)
 void LineEdit::setDefocusable(bool enable)
 {
     mDefocusable = enable;
+}
+
+void LineEdit::setCursorMovable(bool enable)
+{
+    mCursorMovable = enable;
+}
+
+void LineEdit::setTextSelectable(bool enable)
+{
+    mTextSelectable = enable;
+}
+
+void LineEdit::setTextCopyable(bool enable)
+{
+    mTextCopyable = enable;
 }
 
 void LineEdit::updateText()

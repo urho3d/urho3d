@@ -29,6 +29,8 @@
 
 #include "DebugNew.h"
 
+std::string UIElement::sClipBoard;
+
 UIElement::UIElement(const std::string& name) :
     mName(name),
     mParent(0),

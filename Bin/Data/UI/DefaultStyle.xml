@@ -75,6 +75,5 @@
     </element>
     <element type="Text">
         <font name="Cour.ttf" size="10" />
-        <selectioncolor value="1.0 0.5 0.5" />
     </element>
 </elements>

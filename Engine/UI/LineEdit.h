@@ -67,6 +67,12 @@ public:
     void setEchoCharacter(char c);
     //! Set whether can defocus with ESC, default true
     void setDefocusable(bool enable);
+    //! Set whether can move cursor with arrows or mouse, default true
+    void setCursorMovable(bool enable);
+    //! Set whether selections are allowed, default true
+    void setTextSelectable(bool enable);
+    //! Set whether copy-paste operations are allowed, default true
+    void setTextCopyable(bool enable);
     
     //! Return text
     const std::string& getText() const { return mLine; }
@@ -80,6 +86,12 @@ public:
     char getEchoCharacter() const { return mEchoCharacter; }
     //! Return whether can defocus with ESC
     bool isDefocusable() const { return mDefocusable; }
+    //! Return whether can move cursor with arrows or mouse
+    bool isCursorMovable() const { return mCursorMovable; }
+    //! Return whether selections are allowed
+    bool isTextSelectable() const { return mTextSelectable; }
+    //! Return whether copy-paste operations are allowed
+    bool isTextCopyable() const { return mTextCopyable; }
     //! Return text element
     Text* getTextElement() const { return mText; }
     //! Return cursor element
@@ -117,6 +129,12 @@ protected:
     char mEchoCharacter;
     //! ESC defocus flag
     bool mDefocusable;
+    //! Cursor movable flag
+    bool mCursorMovable;
+    //! Text selectable flag
+    bool mTextSelectable;
+    //! Copy-paste enable flag
+    bool mTextCopyable;
     //! Defocus flag (defocus on next update)
     bool mDefocus;
 };
