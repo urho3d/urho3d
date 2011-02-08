@@ -137,7 +137,7 @@ void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosit
         if (pos != M_MAX_UNSIGNED)
         {
             setCursorPosition(pos);
-            mText->setSelection(0, 0);
+            mText->clearSelection();
         }
     }
 }
@@ -187,7 +187,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
                     mLine = mLine.substr(0, start) + mLine.substr(start + length);
                 else
                     mLine = mLine.substr(0, start);
-                mText->setSelection(0, 0);
+                mText->clearSelection();
                 mCursorPosition = start;
                 changed = true;
             }
@@ -211,7 +211,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
         
     case KEY_LEFT:
         if (!(qualifiers & QUAL_SHIFT))
-            mText->setSelection(0, 0);
+            mText->clearSelection();
         if ((mCursorMovable) && (mCursorPosition > 0))
         {
             if ((mTextSelectable) && (qualifiers & QUAL_SHIFT) && (!mText->getSelectionLength()))
@@ -237,7 +237,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
         
     case KEY_RIGHT:
         if (!(qualifiers & QUAL_SHIFT))
-            mText->setSelection(0, 0);
+            mText->clearSelection();
         if ((mCursorMovable) && (mCursorPosition < mLine.length()))
         {
             if ((mTextSelectable) && (qualifiers & QUAL_SHIFT) && (!mText->getSelectionLength()))
@@ -279,7 +279,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
                 mLine = mLine.substr(0, start) + mLine.substr(start + length);
             else
                 mLine = mLine.substr(0, start);
-            mText->setSelection(0, 0);
+            mText->clearSelection();
             changed = true;
         }
         break;
@@ -328,13 +328,13 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         eventData[P_ELEMENT] = (void*)this;
         sendEvent(EVENT_TEXTFINISHED, eventData);
         
-        mText->setSelection(0, 0);
+        mText->clearSelection();
     }
     else if (c == 27)
     {
         if (mDefocusable)
         {
-            mText->setSelection(0, 0);
+            mText->clearSelection();
             mDefocus = true;
         }
     }
@@ -368,7 +368,7 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
     
     if (changed)
     {
-        mText->setSelection(0, 0);
+        mText->clearSelection();
         updateText();
         updateCursor();
         
@@ -379,6 +379,16 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         eventData[P_TEXT] = mLine;
         sendEvent(EVENT_TEXTCHANGED, eventData);
     }
+}
+
+void LineEdit::onFocus()
+{
+    updateCursor();
+}
+
+void LineEdit::onDefocus()
+{
+    mText->clearSelection();
 }
 
 void LineEdit::setText(const std::string& text)

@@ -151,6 +151,12 @@ void Text::setSelection(unsigned start, unsigned length)
     validateSelection();
 }
 
+void Text::clearSelection()
+{
+    mSelectionStart = 0;
+    mSelectionLength = 0;
+}
+
 void Text::setSelectionColor(const Color& color)
 {
     mSelectionColor = color;

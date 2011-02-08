@@ -102,6 +102,10 @@ public:
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character
     virtual void onChar(unsigned char c, int buttons, int qualifiers);
+    //! React to gaining focus
+    virtual void onFocus();
+    //! React to losing focus
+    virtual void onDefocus();
     
     //! Set name
     void setName(const std::string& name);

@@ -58,6 +58,8 @@ public:
     void setRowSpacing(float spacing);
     //! Set selection
     void setSelection(unsigned start, unsigned length);
+    //! Clear selection
+    void clearSelection();
     //! Set selection background color. Color with 0 alpha (default) disables
     void setSelectionColor(const Color& color);
     //! Set hover background color. Color with 0 alpha (default) disables

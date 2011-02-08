@@ -146,6 +146,7 @@ static void registerText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "void setTextAlignment(HorizontalAlignment)", asMETHOD(Text, setTextAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setRowSpacing(float)", asMETHOD(Text, setRowSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setSelection(uint, uint)", asMETHOD(Text, setSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void clearSelection()", asMETHOD(Text, clearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setSelectionColor(const Color& in)", asMETHOD(Text, setSelectionColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setHoverColor(const Color& in)", asMETHOD(Text, setHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "Font@+ getFont() const", asMETHOD(Text, getFont), asCALL_THISCALL);

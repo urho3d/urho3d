@@ -258,6 +258,14 @@ void UIElement::onChar(unsigned char c, int buttons, int qualifiers)
 {
 }
 
+void UIElement::onFocus()
+{
+}
+
+void UIElement::onDefocus()
+{
+}
+
 void UIElement::setName(const std::string& name)
 {
     mName = name;
@@ -397,6 +405,11 @@ void UIElement::setFocus(bool enable)
     if (enable != mFocus)
     {
         mFocus = enable;
+        
+        if (enable)
+            onFocus();
+        else
+            onDefocus();
         
         using namespace Focused;
         

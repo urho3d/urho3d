@@ -500,10 +500,39 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
     
     mMouseButtons = eventData[P_BUTTONS].getInt();
     mQualifiers = eventData[P_QUALIFIERS].getInt();
+    int key = eventData[P_KEY].getInt();
     
     UIElement* element = getFocusElement();
     if (element)
-        element->onKey(eventData[P_KEY].getInt(), mMouseButtons, mQualifiers);
+    {
+        if (key == KEY_TAB)
+        {
+            // Switch focus between focusable sibling elements
+            UIElement* parent = element->getParent();
+            if (parent)
+            {
+                std::vector<UIElement*> children = parent->getChildren();
+                for (std::vector<UIElement*>::iterator i = children.begin(); i != children.end();)
+                {
+                    if (!(*i)->isFocusable())
+                        i = children.erase(i);
+                    else
+                        ++i;
+                }
+                for (unsigned i = 0; i < children.size(); ++i)
+                {
+                    if (children[i] == element)
+                    {
+                        UIElement* next = children[(i + 1) % children.size()];
+                        setFocusElement(next);
+                        return;
+                    }
+                }
+            }
+        }
+        else
+            element->onKey(key, mMouseButtons, mQualifiers);
+    }
 }
 
 void UI::handleChar(StringHash eventType, VariantMap& eventData)
