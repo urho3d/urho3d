@@ -25,7 +25,6 @@
 #define SCENE_SCENE_H
 
 #include "BoundingBox.h"
-#include "DelayedEventQueue.h"
 #include "Entity.h"
 #include "RemoteEvent.h"
 #include "VectorBuffer.h"
@@ -44,7 +43,7 @@ class Serializer;
 class XMLFile;
 
 //! A simulated world consisting of entities
-class Scene : public RefCounted, public EventListener, public DelayedEventQueue
+class Scene : public RefCounted, public EventListener
 {
 public:
     //! Construct with resource cache pointer and name
@@ -118,9 +117,9 @@ public:
     //! Set visual smoothing position snap threshold
     void setInterpolationSnapThreshold(float threshold);
     //! Queue a remote event to be sent
-    bool sendRemoteEvent(StringHash eventType, const VariantMap& eventData = VariantMap(), Connection* receiver = 0, float delay = 0.0f, unsigned short timeToLive = 0);
+    bool sendRemoteEvent(StringHash eventType, const VariantMap& eventData = VariantMap(), Connection* receiver = 0, unsigned short timeToLive = 0);
     //! Queue a remote entity event to be sent
-    bool sendRemoteEvent(Entity* entity, StringHash eventType, const VariantMap& eventData = VariantMap(), Connection* receiver = 0, float delay = 0.0f, unsigned short timeToLive = 0);
+    bool sendRemoteEvent(Entity* entity, StringHash eventType, const VariantMap& eventData = VariantMap(), Connection* receiver = 0, unsigned short timeToLive = 0);
     //! Clear all queued remote events
     void clearQueuedRemoteEvents();
     //! Mark a package file as required (server only)
@@ -203,8 +202,6 @@ public:
 private:
     //! Remove an entity by iterator
     void removeEntity(std::map<EntityID, SharedPtr<Entity> >::iterator i);
-    //! Update remote events' delay timers
-    void processRemoteEvents(float timeStep);
     //! Update asynchronous loading. Load entities until a set time has passed
     void updateAsyncLoading();
     //! Load an entity from a stream

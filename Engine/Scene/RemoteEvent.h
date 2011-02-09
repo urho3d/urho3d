@@ -41,23 +41,21 @@ struct RemoteEvent
     }
     
     //! Construct with parameters
-    RemoteEvent(StringHash eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive) :
+    RemoteEvent(StringHash eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive) :
         mEntityID(0),
         mEventType(eventType),
         mEventData(eventData),
         mReceiver(receiver),
-        mDelay(delay),
         mTimeToLive(timeToLive)
     {
     }
     
     //! Construct with target entity and parameters
-    RemoteEvent(EntityID entityID, StringHash eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive) :
+    RemoteEvent(EntityID entityID, StringHash eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive) :
         mEntityID(entityID),
         mEventType(eventType),
         mEventData(eventData),
         mReceiver(receiver),
-        mDelay(delay),
         mTimeToLive(timeToLive)
     {
     }
@@ -79,8 +77,6 @@ struct RemoteEvent
     EntityID mEntityID;
     //! Receiving connection. If null on the server, broadcast to all. On client has no significance
     Connection* mReceiver;
-    //! Delay until sending
-    float mDelay;
     //! Time to live in network frames. If not acked when expires, will no longer be sent. 0 is infinite
     unsigned short mTimeToLive;
 };

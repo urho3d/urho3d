@@ -924,14 +924,9 @@ void Client::sendClientUpdate()
     std::vector<RemoteEvent>& outEvents = mScene->getQueuedRemoteEvents();
     for (std::vector<RemoteEvent>::iterator i = outEvents.begin(); i != outEvents.end();)
     {
-        if (i->mDelay <= 0.0f)
-        {
-            i->mFrameNumber = mFrameNumber;
-            mServerConnection->addRemoteEvent(*i);
-            i = outEvents.erase(i);
-        }
-        else
-            ++i;
+        i->mFrameNumber = mFrameNumber;
+        mServerConnection->addRemoteEvent(*i);
+        i = outEvents.erase(i);
     }
     
     static VectorBuffer packet;

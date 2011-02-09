@@ -614,32 +614,27 @@ void Server::checkRemoteEvents()
         std::vector<RemoteEvent>& outEvents = scene->getQueuedRemoteEvents();
         for (std::vector<RemoteEvent>::iterator j = outEvents.begin(); j != outEvents.end();)
         {
-            if (j->mDelay <= 0.0f)
+            j->mFrameNumber = mFrameNumber;
+            
+            // Check for broadcast event
+            if (!j->mReceiver)
             {
-                j->mFrameNumber = mFrameNumber;
-                
-                // Check for broadcast event
-                if (!j->mReceiver)
+                for (unsigned k = 0; k < mConnections.size(); ++k)
                 {
-                    for (unsigned k = 0; k < mConnections.size(); ++k)
-                    {
-                        Connection* connection = mConnections[k];
-                        if (connection->getScene() == scene)
-                            connection->addRemoteEvent(*j);
-                    }
-                }
-                else
-                {
-                    // The connection stored in the event might not be valid by now, so verify it
-                    Connection* connection = verifyConnection(j->mReceiver);
-                    if (connection)
+                    Connection* connection = mConnections[k];
+                    if (connection->getScene() == scene)
                         connection->addRemoteEvent(*j);
                 }
-                
-                j = outEvents.erase(j);
             }
             else
-                ++j;
+            {
+                // The connection stored in the event might not be valid by now, so verify it
+                Connection* connection = verifyConnection(j->mReceiver);
+                if (connection)
+                    connection->addRemoteEvent(*j);
+            }
+            
+            j = outEvents.erase(j);
         }
     }
 }

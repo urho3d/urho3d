@@ -82,10 +82,6 @@ void Scene::update(float timeStep)
     sceneUpdateData[P_TIMESTEP] = timeStep;
     sendEvent(EVENT_SCENEUPDATE, sceneUpdateData);
     
-    // Update delayed events & delayed remote events
-    processDelayedEvents(timeStep);
-    processRemoteEvents(timeStep);
-    
     // Update extensions
     for (std::map<ShortStringHash, SharedPtr<SceneExtension> >::iterator i = mExtensions.begin(); i != mExtensions.end(); ++i)
         i->second->update(timeStep);
@@ -714,7 +710,7 @@ void Scene::setInterpolationSnapThreshold(float threshold)
     mInterpolationSnapThreshold = threshold * threshold;
 }
 
-bool Scene::sendRemoteEvent(StringHash eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive)
+bool Scene::sendRemoteEvent(StringHash eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive)
 {
     if (!checkRemoteEvent(eventType))
     {
@@ -723,11 +719,11 @@ bool Scene::sendRemoteEvent(StringHash eventType, const VariantMap& eventData, C
     }
     
     // Put to outgoing queue. Server or Client will later assign framenumber and actually send
-    mRemoteEvents.push_back(RemoteEvent(eventType, eventData, receiver, delay, timeToLive));
+    mRemoteEvents.push_back(RemoteEvent(eventType, eventData, receiver, timeToLive));
     return true;
 }
 
-bool Scene::sendRemoteEvent(Entity* entity, StringHash eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive)
+bool Scene::sendRemoteEvent(Entity* entity, StringHash eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive)
 {
     if (!entity)
     {
@@ -746,7 +742,7 @@ bool Scene::sendRemoteEvent(Entity* entity, StringHash eventType, const VariantM
     }
     
     // Put to outgoing queue. Server or Client will later assign framenumber and actually send
-    mRemoteEvents.push_back(RemoteEvent(entity->getID(), eventType, eventData, receiver, delay, timeToLive));
+    mRemoteEvents.push_back(RemoteEvent(entity->getID(), eventType, eventData, receiver, timeToLive));
     return true;
 }
 
@@ -953,15 +949,6 @@ void Scene::removeEntity(std::map<EntityID, SharedPtr<Entity> >::iterator i)
 {
     i->second->mScene = 0;
     mEntities.erase(i);
-}
-
-void Scene::processRemoteEvents(float timeStep)
-{
-    for (std::vector<RemoteEvent>::iterator i = mRemoteEvents.begin(); i != mRemoteEvents.end(); ++i)
-    {
-        if (i->mDelay > 0.0f)
-            i->mDelay -= timeStep;
-    }
 }
 
 void Scene::updateAsyncLoading()

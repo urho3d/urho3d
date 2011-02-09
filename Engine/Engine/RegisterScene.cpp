@@ -485,38 +485,6 @@ static CScriptArray* SceneGetScriptedEntitiesWithClass(const std::string& classN
     return vectorToHandleArray<Entity>(result, "array<Entity@>");
 }
 
-static void SendDelayedEvent(const std::string& eventType, const VariantMap& eventData, float delay)
-{
-    Scene* scene = getScriptContextScene();
-    if (scene)
-        scene->sendDelayedEvent(StringHash(eventType), eventData, delay);
-}
-
-static void SendDelayedEntityEvent(Entity* entity, const std::string& eventType, const VariantMap& eventData, float delay)
-{
-    Scene* scene = getScriptContextScene();
-    if (scene)
-        scene->sendDelayedEvent(entity, StringHash(eventType), eventData, delay);
-}
-
-static void SendDelayedComponentEvent(Component* component, const std::string& eventType, const VariantMap& eventData, float delay)
-{
-    Scene* scene = getScriptContextScene();
-    if (scene)
-    {
-        EventListener* listener = dynamic_cast<EventListener*>(component);
-        if (listener)
-            scene->sendDelayedEvent(listener, StringHash(eventType), eventData, delay);
-    }
-}
-
-static void ClearDelayedEvents()
-{
-    Scene* scene = getScriptContextScene();
-    if (scene)
-        scene->clearDelayedEvents();
-}
-
 static void registerScene(asIScriptEngine* engine)
 {
     engine->RegisterObjectBehaviour("Scene", asBEHAVE_ADDREF, "void f()", asMETHOD(Scene, addRef), asCALL_THISCALL);
@@ -563,12 +531,6 @@ static void registerScene(asIScriptEngine* engine)
     
     engine->RegisterGlobalFunction("Scene@+ getScene()", asFUNCTION(GetScene), asCALL_CDECL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScene), asCALL_CDECL);
-    
-    // Add delayed event functionality as global functions because the Scene can be found out through the context
-    engine->RegisterGlobalFunction("void sendDelayedEvent(const string& in, const VariantMap& in, float)", asFUNCTION(SendDelayedEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void sendDelayedEvent(Entity@+, const string& in, const VariantMap& in, float)", asFUNCTION(SendDelayedEntityEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void sendDelayedEvent(Component@+, const string& in, const VariantMap& in, float)", asFUNCTION(SendDelayedComponentEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void clearDelayedEvents()", asFUNCTION(ClearDelayedEvents), asCALL_CDECL);
     
     // Register Variant getPtr() for Scene
     engine->RegisterObjectMethod("Variant", "Scene@+ getScene() const", asFUNCTION(getVariantPtr<Scene>), asCALL_CDECL_OBJLAST);

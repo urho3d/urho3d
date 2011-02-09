@@ -48,11 +48,11 @@ static void SendRemoteEvent(const std::string& eventType, const VariantMap& even
         scene->sendRemoteEvent(StringHash(eventType), eventData, receiver);
 }
 
-static void SendRemoteEventDelayTTL(const std::string& eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive)
+static void SendRemoteEventTTL(const std::string& eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive)
 {
     Scene* scene = getScriptContextScene();
     if (scene)
-        scene->sendRemoteEvent(StringHash(eventType), eventData, receiver, delay, timeToLive);
+        scene->sendRemoteEvent(StringHash(eventType), eventData, receiver, timeToLive);
 }
 
 static void SendRemoteEntityEventToAll(Entity* entity, const std::string& eventType, const VariantMap& eventData)
@@ -69,11 +69,11 @@ static void SendRemoteEntityEvent(Entity* entity, const std::string& eventType, 
         scene->sendRemoteEvent(entity, StringHash(eventType), eventData, receiver);
 }
 
-static void SendRemoteEntityEventDelayTTL(Entity* entity, const std::string& eventType, const VariantMap& eventData, Connection* receiver, float delay, unsigned short timeToLive)
+static void SendRemoteEntityEventTTL(Entity* entity, const std::string& eventType, const VariantMap& eventData, Connection* receiver, unsigned short timeToLive)
 {
     Scene* scene = getScriptContextScene();
     if (scene)
-        scene->sendRemoteEvent(entity, StringHash(eventType), eventData, receiver, delay, timeToLive);
+        scene->sendRemoteEvent(entity, StringHash(eventType), eventData, receiver, timeToLive);
 }
 
 static void ConstructNetUpdateInfo(NetUpdateInfo* ptr)
@@ -135,10 +135,10 @@ static void registerConnection(asIScriptEngine* engine)
     // Add remote event functionality as global functions because the Scene can be found out through the context
     engine->RegisterGlobalFunction("void sendRemoteEvent(const string& in, const VariantMap& in)", asFUNCTION(SendRemoteEventToAll), asCALL_CDECL);
     engine->RegisterGlobalFunction("void sendRemoteEvent(const string& in, const VariantMap& in, Connection@+)", asFUNCTION(SendRemoteEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void sendRemoteEvent(const string& in, const VariantMap& in, Connection@+, float, uint16)", asFUNCTION(SendRemoteEventDelayTTL), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void sendRemoteEvent(const string& in, const VariantMap& in, Connection@+, uint16)", asFUNCTION(SendRemoteEventTTL), asCALL_CDECL);
     engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in)", asFUNCTION(SendRemoteEntityEventToAll), asCALL_CDECL);
     engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in, Connection@+)", asFUNCTION(SendRemoteEntityEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in, Connection@+, float, uint16)", asFUNCTION(SendRemoteEntityEventDelayTTL), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void sendRemoteEvent(Entity@+, const string& in, const VariantMap& in, Connection@+, uint16)", asFUNCTION(SendRemoteEntityEventTTL), asCALL_CDECL);
     engine->RegisterGlobalFunction("void registerLocalOnlyEvent(const string& in)", asFUNCTIONPR(registerLocalOnlyEvent, (const std::string&), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("Connection@+ getRemoteEventSender()", asFUNCTION(getRemoteEventSender), asCALL_CDECL);
 }
