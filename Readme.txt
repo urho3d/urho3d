@@ -90,3 +90,7 @@ Additionally, entering -w into Debugging -> Command Arguments is highly
 recommended. This enables startup in windowed mode: without it running into an
 exception or breakpoint will be obnoxious as the mouse cursor will most probably
 be hidden.
+
+Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction 
+count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At
+least the March 2009 SDK is known to work.

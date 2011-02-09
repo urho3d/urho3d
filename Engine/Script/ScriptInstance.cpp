@@ -92,6 +92,17 @@ void ScriptInstance::save(Serializer& dest)
     dest.writeInt(mFixedUpdateFps);
     dest.writeFloat(mFixedUpdateTimer);
     
+    dest.writeVLE(mDelayedMethodCalls.size());
+    for (unsigned i = 0; i < mDelayedMethodCalls.size(); ++i)
+    {
+        const DelayedMethodCall& call = mDelayedMethodCalls[i];
+        dest.writeFloat(call.mDelay);
+        dest.writeString(call.mDeclaration);
+        dest.writeVLE(call.mParameters.size());
+        for (unsigned j = 0; j < call.mParameters.size(); ++j)
+            dest.writeVariant(call.mParameters[j]);
+    }
+    
     // Save script's data into a separate buffer for safety
     static VectorBuffer scriptBuffer;
     scriptBuffer.clear();
@@ -116,6 +127,19 @@ void ScriptInstance::load(Deserializer& source, ResourceCache* cache)
     mFixedUpdateFps = source.readInt();
     mFixedUpdateTimer = mFixedPostUpdateTimer = source.readFloat();
     mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
+    
+    clearDelayedExecute();
+    unsigned numCalls = source.readVLE();
+    for (unsigned i = 0; i < numCalls; ++i)
+    {
+        DelayedMethodCall call;
+        call.mDelay = source.readFloat();
+        call.mDeclaration = source.readString();
+        unsigned numParameters = source.readVLE();
+        for (unsigned j = 0; j < numParameters; ++j)
+            call.mParameters.push_back(source.readVariant());
+        mDelayedMethodCalls.push_back(call);
+    }
     
     static VectorBuffer scriptBuffer;
     unsigned scriptDataSize = source.readVLE();
@@ -145,6 +169,19 @@ void ScriptInstance::saveXML(XMLElement& dest)
     scriptElem.setInt("fps", mFixedUpdateFps);
     scriptElem.setFloat("timeacc", mFixedUpdateTimer);
     
+    for (unsigned i = 0; i < mDelayedMethodCalls.size(); ++i)
+    {
+        const DelayedMethodCall& call = mDelayedMethodCalls[i];
+        XMLElement callElem = dest.createChildElement("call");
+        callElem.setFloat("delay", call.mDelay);
+        callElem.setString("method", call.mDeclaration);
+        for (unsigned j = 0; j < call.mParameters.size(); ++j)
+        {
+            XMLElement paramElem = callElem.createChildElement("parameter");
+            paramElem.setVariant(call.mParameters[j]);
+        }
+    }
+    
     if (mMethods[METHOD_SAVEXML])
     {
         XMLElement dataElem = dest.createChildElement("data");
@@ -164,6 +201,23 @@ void ScriptInstance::loadXML(const XMLElement& source, ResourceCache* cache)
     mFixedUpdateFps = scriptElem.getInt("fps");
     mFixedUpdateTimer = mFixedPostUpdateTimer = scriptElem.getFloat("timeacc");
     mFixedUpdateInterval = mFixedUpdateFps ? (1.0f / mFixedUpdateFps) : 0.0f;
+    
+    clearDelayedExecute();
+    XMLElement callElem = source.getChildElement("call");
+    while (callElem)
+    {
+        DelayedMethodCall call;
+        call.mDelay = callElem.getFloat("delay");
+        call.mDeclaration = callElem.getString("method");
+        XMLElement paramElem = callElem.getChildElement("parameter");
+        while (paramElem)
+        {
+            call.mParameters.push_back(paramElem.getVariant());
+            paramElem = paramElem.getNextElement("parameter");
+        }
+        mDelayedMethodCalls.push_back(call);
+        callElem = callElem.getNextElement("call");
+    }
     
     if (mMethods[METHOD_LOADXML])
     {
@@ -343,6 +397,27 @@ bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Varian
     return mScriptFile->execute(mScriptObject, method, parameters);
 }
 
+void ScriptInstance::delayedExecute(float delay, const std::string& declaration, const std::vector<Variant>& parameters)
+{
+    if (!mScriptObject)
+        return;
+    
+    DelayedMethodCall call;
+    call.mDelay = max(delay, 0.0f);
+    call.mDeclaration = declaration;
+    call.mParameters = parameters;
+    mDelayedMethodCalls.push_back(call);
+    
+    // Make sure we are registered to the scene update event, because delayed calls are executed there
+    if ((!mMethods[METHOD_UPDATE]) && (!hasSubscribedToEvent(EVENT_SCENEUPDATE)))
+        subscribeToEvent(EVENT_SCENEUPDATE, EVENT_HANDLER(ScriptInstance, handleSceneUpdate));
+}
+
+void ScriptInstance::clearDelayedExecute()
+{
+    mDelayedMethodCalls.clear();
+}
+
 void ScriptInstance::addEventHandler(StringHash eventType, const std::string& handlerName)
 {
     if (!mScriptObject)
@@ -400,6 +475,7 @@ void ScriptInstance::releaseObject()
         removeAllEventHandlers();
         unsubscribeFromAllEvents();
         clearMethods();
+        clearDelayedExecute();
         
         mScriptObject->Release();
         mScriptObject = 0;
@@ -414,6 +490,8 @@ void ScriptInstance::clearMethods()
 {
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         mMethods[i] = 0;
+    
+    mDelayedMethodCalls.clear();
 }
 
 void ScriptInstance::getSupportedMethods()
@@ -439,13 +517,31 @@ void ScriptInstance::handleSceneUpdate(StringHash eventType, VariantMap& eventDa
     
     using namespace SceneUpdate;
     
+    float timeStep = eventData[P_TIMESTEP].getFloat();
+    
     // Check that the scene matches
     Scene* scene = mEntity ? mEntity->getScene() : 0;
     if (eventData[P_SCENE].getPtr() == (void*)scene)
     {
-        std::vector<Variant> parameters;
-        parameters.push_back(eventData[P_TIMESTEP]);
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATE], parameters);
+        // Execute delayed method calls
+        for (std::vector<DelayedMethodCall>::iterator i = mDelayedMethodCalls.begin(); i != mDelayedMethodCalls.end();)
+        {
+            i->mDelay -= timeStep;
+            if (i->mDelay <= 0.0f)
+            {
+                execute(i->mDeclaration, i->mParameters);
+                i = mDelayedMethodCalls.erase(i);
+            }
+            else
+                ++i;
+        }
+        
+        if (mMethods[METHOD_UPDATE])
+        {
+            std::vector<Variant> parameters;
+            parameters.push_back(timeStep);
+            mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATE], parameters);
+        }
     }
 }
 
@@ -545,7 +641,7 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     mScriptFile->execute(mScriptObject, i->second, parameters);
 }
 
-ScriptInstance* getScriptContextComponent()
+ScriptInstance* getScriptContextInstance()
 {
     void* object = asGetActiveContext()->GetThisPointer();
     std::map<void*, ScriptInstance*>::const_iterator i = objectToInstance.find(object);
@@ -557,6 +653,6 @@ ScriptInstance* getScriptContextComponent()
 
 Entity* getScriptContextEntity()
 {
-    ScriptInstance* instance = getScriptContextComponent();
+    ScriptInstance* instance = getScriptContextInstance();
     return instance ? instance->getEntity() : 0;
 }

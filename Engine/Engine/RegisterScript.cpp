@@ -29,7 +29,7 @@
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
-static bool ScriptFileExecute(const std::string& functionName, CScriptArray* srcParams, ScriptFile* ptr)
+static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)
         return false;
@@ -41,7 +41,7 @@ static bool ScriptFileExecute(const std::string& functionName, CScriptArray* src
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
     
-    return ptr->execute(functionName, destParams);
+    return ptr->execute(declaration, destParams);
 }
 
 static void registerScriptFile(asIScriptEngine* engine)
@@ -52,7 +52,7 @@ static void registerScriptFile(asIScriptEngine* engine)
     registerRefCasts<Resource, ScriptFile>(engine, "Resource", "ScriptFile");
 }
 
-static bool ScriptInstanceExecute(const std::string& methodName, CScriptArray* srcParams, ScriptInstance* ptr)
+static bool ScriptInstanceExecute(const std::string& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
 {
     if (!srcParams)
         return false;
@@ -64,12 +64,71 @@ static bool ScriptInstanceExecute(const std::string& methodName, CScriptArray* s
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
     
-    return ptr->execute(methodName, destParams);
+    return ptr->execute(declaration, destParams);
+}
+
+static bool ScriptInstanceExecuteNoParams(const std::string& declaration, ScriptInstance* ptr)
+{
+    return ptr->execute(declaration);
+}
+
+static void ScriptInstanceDelayedExecute(float delay, const std::string& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
+{
+    if (!srcParams)
+        return;
+    
+    unsigned numParams = srcParams->GetSize();
+    std::vector<Variant> destParams;
+    destParams.resize(numParams);
+    
+    for (unsigned i = 0; i < numParams; ++i)
+        destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
+    
+    ptr->delayedExecute(delay, declaration, destParams);
+}
+
+static void ScriptInstanceDelayedExecuteNoParams(float delay, const std::string& declaration, ScriptInstance* ptr)
+{
+    ptr->delayedExecute(delay, declaration);
 }
 
 static ScriptInstance* GetSelf()
 {
-    return getScriptContextComponent();
+    return getScriptContextInstance();
+}
+
+static void SelfDelayedExecute(float delay, const std::string& declaration, CScriptArray* srcParams)
+{
+    ScriptInstance* ptr = getScriptContextInstance();
+    if ((!ptr) || (!srcParams))
+        return;
+    
+    unsigned numParams = srcParams->GetSize();
+    std::vector<Variant> destParams;
+    destParams.resize(numParams);
+    
+    for (unsigned i = 0; i < numParams; ++i)
+        destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
+    
+    ptr->delayedExecute(delay, declaration, destParams);
+}
+
+static void SelfDelayedExecuteNoParams(float delay, const std::string& declaration)
+{
+    ScriptInstance* ptr = getScriptContextInstance();
+    if (!ptr)
+        return;
+    
+    ptr->delayedExecute(delay, declaration);
+}
+
+static void SelfClearDelayedExecute()
+{
+    ScriptInstance* ptr = getScriptContextInstance();
+    if (!ptr)
+        return;
+    
+    ptr->clearDelayedExecute();
 }
 
 static void registerScriptInstance(asIScriptEngine* engine)
@@ -79,16 +138,22 @@ static void registerScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "void setEnabled(bool)", asMETHOD(ScriptInstance, setEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void setFixedUpdateFps(int)", asMETHOD(ScriptInstance, setFixedUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool execute(const string& in, const array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "bool execute(const string& in)", asFUNCTION(ScriptInstanceExecuteNoParams), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void delayedExecute(float, const string& in, const array<Variant>@+)", asFUNCTION(ScriptInstanceDelayedExecute), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void delayedExecute(float, const string& in)", asFUNCTION(ScriptInstanceDelayedExecuteNoParams), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ScriptInstance", "void clearDelayedExecute()", asMETHOD(ScriptInstance, clearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "ScriptFile@+ getScriptFile() const", asMETHOD(ScriptInstance, getScriptFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ getScriptObject() const", asMETHOD(ScriptInstance, getScriptObject), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const string& getClassName() const", asMETHOD(ScriptInstance, getClassName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScriptInstance", "bool isRunning() const", asMETHOD(ScriptInstance, isRunning), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool isEnabled() const", asMETHOD(ScriptInstance, isEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "int getFixedUpdateFps() const", asMETHOD(ScriptInstance, getFixedUpdateFps), asCALL_THISCALL);
     registerRefCasts<Component, ScriptInstance>(engine, "Component", "ScriptInstance");
     
     engine->RegisterGlobalFunction("ScriptInstance@+ getSelf()", asFUNCTION(GetSelf), asCALL_CDECL);
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void delayedExecute(float, const string& in, const array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void delayedExecute(float, const string& in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void clearDelayedExecute()", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);
 }
 
 static bool ScriptEngineExecute(const std::string& line)

@@ -37,12 +37,12 @@ void SendEvent(const std::string& eventType, VariantMap& parameters)
 void SubscribeToEvent(const std::string& eventType, const std::string& handlerName)
 {
     // Try to subscribe to an instance event first, then to a script file event if not found
-    ScriptInstance* instance = getScriptContextComponent();
+    ScriptInstance* instance = getScriptContextInstance();
     if (instance)
         instance->addEventHandler(StringHash(eventType), handlerName);
     else
     {
-        ScriptFile* file = getLastScriptFile();
+        ScriptFile* file = getScriptContextFile();
         if (file)
             file->addEventHandler(StringHash(eventType), handlerName);
     }
@@ -51,12 +51,12 @@ void SubscribeToEvent(const std::string& eventType, const std::string& handlerNa
 void UnsubscribeFromEvent(const std::string& eventType)
 {
     // Try to unsubscribe from an instance event first, then from a script file event if not found
-    ScriptInstance* instance = getScriptContextComponent();
+    ScriptInstance* instance = getScriptContextInstance();
     if (instance)
         instance->removeEventHandler(StringHash(eventType));
     else
     {
-        ScriptFile* file = getLastScriptFile();
+        ScriptFile* file = getScriptContextFile();
         if (file)
             file->removeEventHandler(StringHash(eventType));
     }
@@ -65,12 +65,12 @@ void UnsubscribeFromEvent(const std::string& eventType)
 void UnsubscribeFromAllEvents()
 {
     // Try to unsubscribe from instance events first, then from script file events if not found
-    ScriptInstance* instance = getScriptContextComponent();
+    ScriptInstance* instance = getScriptContextInstance();
     if (instance)
         instance->removeAllEventHandlers();
     else
     {
-        ScriptFile* file = getLastScriptFile();
+        ScriptFile* file = getScriptContextFile();
         if (file)
             file->removeAllEventHandlers();
     }

@@ -93,6 +93,8 @@ private:
     void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
     //! Handle an event with a handler in script
     void handleScriptEvent(StringHash eventType, VariantMap& eventData);
+    //! Clear function-to-file mappings when script module is discarded
+    void clearFunctionToFileMappings();
     
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;
@@ -112,8 +114,8 @@ private:
     std::vector<ScriptInstance*> mScriptInstances;
 };
 
-//! Get last script file that is executing or has executed script functions
-ScriptFile* getLastScriptFile();
+//! Get currently executing script file
+ScriptFile* getScriptContextFile();
 //! Get current script execution nesting level
 unsigned getScriptNestingLevel();
 //! Return highest script execution nesting level, optionally reset it

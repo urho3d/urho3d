@@ -61,6 +61,17 @@ enum ScriptInstanceMethod
     MAX_SCRIPT_METHODS
 };
 
+//! Delay-executed method call
+struct DelayedMethodCall
+{
+    //! Delay time remaining until execution
+    float mDelay;
+    //! Method declaration
+    std::string mDeclaration;
+    //! Parameters
+    std::vector<Variant> mParameters;
+};
+
 //! A scripted component
 class ScriptInstance : public Component, public ScriptEventListener
 {
@@ -107,6 +118,10 @@ public:
     bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
     //! Execute a method
     bool execute(asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Add a delay-executed method call
+    void delayedExecute(float delay, const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
+    //! Clear pending delay-executed method calls
+    void clearDelayedExecute();
     
     //! Return script engine
     ScriptEngine* getScriptEngine() const { return mScriptEngine; }
@@ -116,8 +131,6 @@ public:
     asIScriptObject* getScriptObject() const { return mScriptObject; }
     //! Return class name
     const std::string& getClassName() const { return mClassName; }
-    //! Return whether object created and running
-    bool isRunning() const { return mScriptObject != 0; }
     //! Return whether scripted updates and event handlers are enabled
     bool isEnabled() const { return mEnabled; }
     //! Return fixed updates per second
@@ -164,10 +177,12 @@ private:
     float mFixedUpdateTimer;
     //! Fixed post update time accumulator
     float mFixedPostUpdateTimer;
+    //! Delayed method calls
+    std::vector<DelayedMethodCall> mDelayedMethodCalls;
 };
 
 //! Return the ScriptInstance of the active context
-ScriptInstance* getScriptContextComponent();
+ScriptInstance* getScriptContextInstance();
 //! Return the entity of the active context
 Entity* getScriptContextEntity();
 

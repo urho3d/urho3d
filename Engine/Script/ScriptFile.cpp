@@ -41,6 +41,8 @@ static unsigned scriptNestingLevel = 0;
 static unsigned highestScriptNestingLevel = 0;
 ScriptFile* lastScriptFile = 0;
 
+std::map<asIScriptFunction*, ScriptFile*> functionToFile;
+
 ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
     Resource(name),
     mScriptEngine(scriptEngine),
@@ -63,6 +65,8 @@ ScriptFile::~ScriptFile()
         // Perform a full garbage collection cycle, also clean up contexts which might still refer to the module's functions
         mScriptEngine->garbageCollect(true);
         
+        clearFunctionToFileMappings();
+        
         // Remove the module
         asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
         engine->DiscardModule(getName().c_str());
@@ -82,7 +86,7 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
         (*i)->releaseObject();
     
-    // Clear search caches
+    // Clear search caches, event handlers and function-to-file mappings
     mCompiled = false;
     mAllIncludeFiles.clear();
     mCheckedClasses.clear();
@@ -90,6 +94,7 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     mMethods.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
+    clearFunctionToFileMappings();
     
     // Create the module. Discard previous module if there was one
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
@@ -296,6 +301,7 @@ asIScriptFunction* ScriptFile::getFunction(const std::string& declaration)
     
     int id = mScriptModule->GetFunctionIdByDecl(declaration.c_str());
     asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
+    functionToFile[function] = this;
     mFunctions[declaration] = function;
     return function;
 }
@@ -318,6 +324,7 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     
     int id = type->GetMethodIdByDecl(declaration.c_str());
     asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
+    functionToFile[function] = this;
     mMethods[type][declaration] = function;
     return function;
 }
@@ -526,9 +533,25 @@ void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
     execute(i->second, parameters);
 }
 
-ScriptFile* getLastScriptFile()
+void ScriptFile::clearFunctionToFileMappings()
 {
-    return lastScriptFile;
+    for (std::map<asIScriptFunction*, ScriptFile*>::iterator i = functionToFile.begin(); i != functionToFile.end(); )
+    {
+        std::map<asIScriptFunction*, ScriptFile*>::iterator current = i;
+        ++i;
+        if (current->second == this)
+            functionToFile.erase(current);
+    }
+}
+
+ScriptFile* getScriptContextFile()
+{
+    asIScriptFunction* function = asGetActiveContext()->GetFunction();
+    std::map<asIScriptFunction*, ScriptFile*>::const_iterator i = functionToFile.find(function);
+    if (i != functionToFile.end())
+        return i->second;
+    else
+        return 0;
 }
 
 unsigned getScriptNestingLevel()
