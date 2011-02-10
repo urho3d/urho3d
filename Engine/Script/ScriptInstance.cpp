@@ -435,6 +435,23 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
     mEventHandlers[eventType] = method;
 }
 
+void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName)
+{
+    if ((!mScriptObject) || (!sender))
+        return;
+    
+    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
+    if (!method)
+    {
+        LOGERROR("Event handler method " + declaration + " not found in " + mScriptFile->getName());
+        return;
+    }
+    
+    subscribeToEvent(sender, eventType, EVENT_HANDLER(ScriptInstance, handleSpecificScriptEvent));
+    mSpecificEventHandlers[std::make_pair(sender, eventType)] = method;
+}
+
 bool ScriptInstance::createObject()
 {
     if (!mScriptFile)
@@ -633,6 +650,22 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     
     std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.find(eventType);
     if (i == mEventHandlers.end())
+        return;
+    
+    std::vector<Variant> parameters;
+    parameters.push_back(Variant((void*)&eventType));
+    parameters.push_back(Variant((void*)&eventData));
+    mScriptFile->execute(mScriptObject, i->second, parameters);
+}
+
+void ScriptInstance::handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData)
+{
+    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
+        return;
+    
+    std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.find(std::make_pair(
+        getEventSender(), eventType));
+    if (i == mSpecificEventHandlers.end())
         return;
     
     std::vector<Variant> parameters;

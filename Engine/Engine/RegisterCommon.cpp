@@ -643,11 +643,25 @@ static void SendEvent(const std::string& eventType, VariantMap& parameters)
         sender->sendEvent(StringHash(eventType), parameters);
 }
 
+static void SendTargetedEvent(EventListener* receiver, const std::string& eventType, VariantMap& parameters)
+{
+    ScriptEventListener* sender = getScriptContextEventListener();
+    if (sender)
+        sender->sendEvent(receiver, StringHash(eventType), parameters);
+}
+
 static void SubscribeToEvent(const std::string& eventType, const std::string& handlerName)
 {
     ScriptEventListener* listener = getScriptContextEventListener();
     if (listener)
         listener->addEventHandler(StringHash(eventType), handlerName);
+}
+
+static void SubscribeToSenderEvent(EventListener* sender, const std::string& eventType, const std::string& handlerName)
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->addEventHandler(sender, StringHash(eventType), handlerName);
 }
 
 static void UnsubscribeFromEvent(const std::string& eventType)
@@ -657,6 +671,20 @@ static void UnsubscribeFromEvent(const std::string& eventType)
         listener->removeEventHandler(StringHash(eventType));
 }
 
+static void UnsubscribeFromSenderEvent(EventListener* sender, const std::string& eventType)
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->removeEventHandler(sender, StringHash(eventType));
+}
+
+static void UnsubscribeFromSenderEvents(EventListener* sender)
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->removeEventHandlers(sender);
+}
+
 static void UnsubscribeFromAllEvents()
 {
     ScriptEventListener* listener = getScriptContextEventListener();
@@ -664,12 +692,22 @@ static void UnsubscribeFromAllEvents()
         listener->removeAllEventHandlers();
 }
 
-void registerEvents(asIScriptEngine* engine)
+void registerEventListener(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("EventListener", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("EventListener", asBEHAVE_ADDREF, "void f()", asFUNCTION(optionalAddRef<EventListener>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("EventListener", asBEHAVE_RELEASE, "void f()", asFUNCTION(optionalReleaseRef<EventListener>), asCALL_CDECL_OBJLAST);
+    
     engine->RegisterGlobalFunction("void sendEvent(const string& in, VariantMap&)", asFUNCTION(SendEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void sendEvent(EventListener@+, const string& in, VariantMap&)", asFUNCTION(SendTargetedEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void subscribeToEvent(const string& in, const string& in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void subscribeToEvent(EventListener@+, const string& in, const string& in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void unsubscribeFromEvent(const string& in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void unsubscribeFromEvent(EventListener@+, const string& in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void unsubscribeFromEvents(EventListener@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void unsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
+    
+    engine->RegisterGlobalFunction("EventListener@+ getEventSender()", asFUNCTION(getEventSender), asCALL_CDECL);
 }
 
 void registerCommonLibrary(asIScriptEngine* engine)
@@ -683,5 +721,5 @@ void registerCommonLibrary(asIScriptEngine* engine)
     registerPackageFile(engine);
     registerTimer(engine);
     registerProcessUtils(engine);
-    registerEvents(engine);
+    registerEventListener(engine);
 }

@@ -115,6 +115,7 @@ static void registerConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "float getRoundTripTime() const", asMETHOD(Connection, getRoundTripTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Controls& getControls() const", asMETHOD(Connection, getControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Vector3& getPosition() const", asMETHOD(Connection, getPosition), asCALL_THISCALL);
+    registerRefCasts<EventListener, Connection>(engine, "EventListener", "Connection");
     
     // Register Variant getPtr() for Connection
     engine->RegisterObjectMethod("Variant", "Connection@+ getConnection() const", asFUNCTION(getVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
@@ -236,6 +237,7 @@ static void registerClient(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Client", "const string& getDownloadDirectory() const", asMETHOD(Client, getDownloadDirectory), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "string getFileTransferStatus() const", asMETHOD(Client, getFileTransferStatus), asCALL_THISCALL);
     engine->RegisterObjectMethod("Client", "const SceneInfo& getSceneInfo() const", asMETHOD(Client, getSceneInfo), asCALL_THISCALL);
+    registerRefCasts<EventListener, Client>(engine, "EventListener", "Client");
     
     engine->RegisterGlobalFunction("Client@+ getClient()", asFUNCTION(GetClient), asCALL_CDECL);
     engine->RegisterGlobalFunction("Client@+ get_client()", asFUNCTION(GetClient), asCALL_CDECL);
@@ -285,6 +287,7 @@ static void registerServer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Server", "array<Scene@>@ getScenes() const", asFUNCTION(ServerGetScenes), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "array<Connection@>@ getConnections() const", asFUNCTION(ServerGetConnections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Server", "uint getNumUsersInScene(Scene@+) const", asMETHOD(Server, getNumUsersInScene), asCALL_THISCALL);
+    registerRefCasts<EventListener, Server>(engine, "EventListener", "Server");
     
     engine->RegisterGlobalFunction("Server@+ getServer()", asFUNCTION(GetServer), asCALL_CDECL);
     engine->RegisterGlobalFunction("Server@+ get_server()", asFUNCTION(GetServer), asCALL_CDECL);
@@ -377,8 +380,8 @@ static void registerConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "void setFont(Font@+, int)", asMETHOD(Console, setFont), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "BorderImage@+ getBackgroundElement() const", asMETHOD(Console, getBackgroundElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEditElement() const", asMETHOD(Console, getLineEditElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "BorderImage@+ getBackground() const", asMETHOD(Console, getBackground), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEdit() const", asMETHOD(Console, getLineEdit), asCALL_THISCALL);
     
     engine->RegisterGlobalFunction("Console@+ getConsole()", asFUNCTION(GetConsole), asCALL_CDECL);
     engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
@@ -460,6 +463,7 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "void render()", asMETHOD(Engine, render), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Engine@+ getEngine()", asFUNCTION(getEngine), asCALL_CDECL);
     engine->RegisterGlobalFunction("Engine@+ get_engine()", asFUNCTION(getEngine), asCALL_CDECL);
+    registerRefCasts<EventListener, Engine>(engine, "EventListener", "Engine");
 }
 
 void registerEngineLibrary(asIScriptEngine* engine)

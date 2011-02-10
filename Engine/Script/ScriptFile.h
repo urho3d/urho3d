@@ -57,6 +57,8 @@ public:
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
     //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
+    //! Add an event handler for a specific sender. Called by script exposed version of subscribeToEvent()
+    virtual void addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName);
     
     //! Query for a function by declaration and execute if found
     bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
@@ -91,10 +93,10 @@ private:
     void addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache);
     //! Set parameters for a function or method
     void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
-    //! Handle an event with a handler in script
+    //! Handle an event in script
     void handleScriptEvent(StringHash eventType, VariantMap& eventData);
-    //! Clear function-to-file mappings when script module is discarded
-    void clearFunctionToFileMappings();
+    //! Handle a specific sender's event in script
+    void handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData);
     
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;

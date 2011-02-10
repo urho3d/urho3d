@@ -59,10 +59,10 @@ public:
     bool isVisible() const;
     //! Return number of rows
     unsigned getNumRows() const { return mRows.size(); }
-    //! Return background element
-    BorderImage* getBackgroundElement() const { return mBackground; }
-    //! Return line edit element
-    LineEdit* getLineEditElement() const { return mLineEdit; }
+    //! Return the background element
+    BorderImage* getBackground() const { return mBackground; }
+    //! Return the line edit element
+    LineEdit* getLineEdit() const { return mLineEdit; }
     
 private:
     //! Update layout

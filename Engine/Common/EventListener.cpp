@@ -36,6 +36,8 @@ static VariantMap noEventData;
 std::map<StringHash, std::vector<EventListener*> > EventListener::sEventListeners;
 std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > EventListener::sSpecificEventListeners;
 
+EventListener* eventSender = 0;
+
 EventListener::EventListener()
 {
 }
@@ -199,6 +201,7 @@ void EventListener::unsubscribeFromAllEvents()
         removeEventListener(i->first.first, i->first.second);
         delete i->second;
     }
+    
     mSpecificEventHandlers.clear();
     
     for (std::map<StringHash, EventHandlerInvoker*>::iterator i = mEventHandlers.begin(); i != mEventHandlers.end(); ++i)
@@ -206,6 +209,7 @@ void EventListener::unsubscribeFromAllEvents()
         removeEventListener(i->first);
         delete i->second;
     }
+    
     mEventHandlers.clear();
 }
 
@@ -216,6 +220,8 @@ void EventListener::sendEvent(StringHash eventType)
 
 void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
 {
+    eventSender = this;
+    
     std::set<EventListener*> processed;
     
     // Check first the specific event listeners
@@ -235,7 +241,10 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
     // Then the non-specific listeners
     std::map<StringHash, std::vector<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
     if (j == sEventListeners.end())
+    {
+        eventSender = 0;
         return;
+    }
     const std::vector<EventListener*>& listeners = j->second;
     if (processed.empty())
     {
@@ -251,6 +260,8 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
                 listeners[k]->onEvent(this, eventType, eventData);
         }
     }
+    
+    eventSender = 0;
 }
 
 void EventListener::sendEvent(EventListener* receiver, StringHash eventType)
@@ -314,4 +325,9 @@ void EventListener::removeEventListener(EventListener* sender, StringHash eventT
             return;
         }
     }
+}
+
+EventListener* getEventSender()
+{
+    return eventSender;
 }

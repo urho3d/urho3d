@@ -102,6 +102,7 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "float getCFM() const", asMETHOD(PhysicsWorld, getCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "float getContactSurfaceLayer() const", asMETHOD(PhysicsWorld, getContactSurfaceLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ getPhysicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
+    registerRefCasts<EventListener, PhysicsWorld>(engine, "EventListener", "PhysicsWorld");
     
     engine->RegisterGlobalFunction("PhysicsWorld@+ getPhysicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);

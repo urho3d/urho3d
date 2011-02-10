@@ -83,6 +83,7 @@ DEFINE_EVENT(EVENT_TEXTCHANGED, TextChanged)
 DEFINE_EVENT(EVENT_TEXTFINISHED, TextFinished)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_TEXT, Text);                  // string
 }
 
 //! Menu item selected

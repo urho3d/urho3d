@@ -331,6 +331,7 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
+        eventData[P_TEXT] = mLine;
         sendEvent(EVENT_TEXTFINISHED, eventData);
         
         mText->clearSelection();

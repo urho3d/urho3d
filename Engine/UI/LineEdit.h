@@ -95,7 +95,7 @@ public:
     //! Return text element
     Text* getTextElement() const { return mText; }
     //! Return cursor element
-    BorderImage* getCursorElement() const { return mCursor; }
+    BorderImage* getCursor() const { return mCursor; }
     
 protected:
     //! Update displayed text

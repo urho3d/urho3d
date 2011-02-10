@@ -188,7 +188,7 @@ static void registerLineEdit(asIScriptEngine* engine)
     engine->RegisterObjectMethod("LineEdit", "bool isTextSelectable() const", asMETHOD(LineEdit, isTextSelectable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "bool isTextCopyable() const", asMETHOD(LineEdit, isTextCopyable), asCALL_THISCALL);
     engine->RegisterObjectMethod("LineEdit", "Text@+ getTextElement() const", asMETHOD(LineEdit, getTextElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("LineEdit", "BorderImage@+ getCursorElement() const", asMETHOD(LineEdit, getCursorElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("LineEdit", "BorderImage@+ getCursor() const", asMETHOD(LineEdit, getCursor), asCALL_THISCALL);
     registerRefCasts<UIElement, LineEdit>(engine, "UIElement", "LineEdit");
 }
 
@@ -303,6 +303,7 @@ static void registerUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "UIElement@+ getElementAt(int, int, bool)", asMETHODPR(UI, getElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ getFocusElement()", asMETHOD(UI, getFocusElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 getCursorPosition()", asMETHOD(UI, getCursorPosition), asCALL_THISCALL);
+    registerRefCasts<EventListener, UI>(engine, "EventListener", "UI");
     
     engine->RegisterGlobalFunction("UI@+ getUI()", asFUNCTION(GetUI), asCALL_CDECL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);

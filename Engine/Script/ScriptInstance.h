@@ -107,6 +107,8 @@ public:
     virtual void getResourceRefs(std::vector<Resource*>& dest);
     //! Add an event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName);
+    //! Add an event handler for a specific sender. Called by script exposed version of subscribeToEvent()
+    virtual void addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName);
     
     //! Set script file and class
     bool setScriptClass(ScriptFile* scriptFile, const std::string& className);
@@ -154,8 +156,10 @@ private:
     void handlePhysicsPreStep(StringHash eventType, VariantMap& eventData);
     //! Handle physics post-step event
     void handlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
-    //! Handle an event with a handler in script
+    //! Handle an event in script
     void handleScriptEvent(StringHash eventType, VariantMap& eventData);
+    //! Handle a specific sender's event in script
+    void handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData);
     
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;

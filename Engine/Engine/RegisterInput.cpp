@@ -25,6 +25,7 @@
 #include "Controls.h"
 #include "Engine.h"
 #include "Input.h"
+#include "RegisterTemplates.h"
 
 #include <angelscript.h>
 
@@ -210,6 +211,7 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool getToggleFullscreen() const", asMETHOD(Input, getToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isActive() const", asMETHOD(Input, isActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isMinimized() const", asMETHOD(Input, isMinimized), asCALL_THISCALL);
+    registerRefCasts<EventListener, Input>(engine, "EventListener", "Input");
     
     engine->RegisterGlobalFunction("Input@+ getInput()", asFUNCTION(GetInput), asCALL_CDECL);
     engine->RegisterGlobalFunction("Input@+ get_input()", asFUNCTION(GetInput), asCALL_CDECL);

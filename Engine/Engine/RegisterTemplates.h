@@ -37,6 +37,22 @@
 
 #include <angelscript.h>
 
+//! Template function for optional addRef, when a derived class might derive from RefCounted
+template <class T> void optionalAddRef(T* t)
+{
+    RefCounted* ptr = dynamic_cast<RefCounted*>(t);
+    if (ptr)
+        ptr->addRef();
+}
+
+//! Template function for optional releaseRef, when a derived class might derive from RefCounted
+template <class T> void optionalReleaseRef(T* t)
+{
+    RefCounted* ptr = dynamic_cast<RefCounted*>(t);
+    if (ptr)
+        ptr->releaseRef();
+}
+
 //! Template function for dynamic cast between two script classes
 template <class T, class U> U* refCast(T* t)
 {
@@ -460,6 +476,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isInside(IntVector2, bool)", asMETHOD(T, isInside), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isInsideCombined(IntVector2, bool)", asMETHOD(T, isInsideCombined), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect getCombinedScreenRect()", asMETHOD(T, getCombinedScreenRect), asCALL_THISCALL);
+    registerRefCasts<EventListener, T>(engine, "EventListener", className);
 }
 
 //! Template function for registering a class derived from BorderImage

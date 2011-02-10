@@ -141,6 +141,9 @@ protected:
     //! Event handlers for specific senders' events
     std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*> mSpecificEventHandlers;
     
+    //! Event sender. Only non-null during event handling
+    static EventListener* sSender;
+    
 private:
     //! Prevent copy construction
     EventListener(const EventListener& rhs);
@@ -152,5 +155,8 @@ private:
     //! Event listeners for specific senders' events
     static std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > sSpecificEventListeners;
 };
+
+//! Return event sender. Only non-null during the event handling
+EventListener* getEventSender();
 
 #endif // EVENT_EVENTLISTENER_H

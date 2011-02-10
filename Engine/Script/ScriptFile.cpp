@@ -41,7 +41,7 @@ static unsigned scriptNestingLevel = 0;
 static unsigned highestScriptNestingLevel = 0;
 ScriptFile* lastScriptFile = 0;
 
-std::map<asIScriptFunction*, ScriptFile*> functionToFile;
+std::map<asIScriptModule*, ScriptFile*> moduleToFile;
 
 ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
     Resource(name),
@@ -65,9 +65,8 @@ ScriptFile::~ScriptFile()
         // Perform a full garbage collection cycle, also clean up contexts which might still refer to the module's functions
         mScriptEngine->garbageCollect(true);
         
-        clearFunctionToFileMappings();
-        
         // Remove the module
+        moduleToFile.erase(mScriptModule);
         asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
@@ -94,9 +93,10 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     mMethods.clear();
     setMemoryUse(0);
     removeAllEventHandlers();
-    clearFunctionToFileMappings();
     
     // Create the module. Discard previous module if there was one
+    if (mScriptModule)
+        moduleToFile.erase(mScriptModule);
     asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
     mScriptModule = engine->GetModule(getName().c_str(), asGM_ALWAYS_CREATE);
     if (!mScriptModule)
@@ -118,6 +118,7 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     
     LOGINFO("Compiled script module " + getName());
     mCompiled = true;
+    moduleToFile[mScriptModule] = this;
     
     // Now let the script instances recreate their objects
     for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
@@ -139,6 +140,23 @@ void ScriptFile::addEventHandler(StringHash eventType, const std::string& handle
     
     subscribeToEvent(eventType, EVENT_HANDLER(ScriptFile, handleScriptEvent));
     mEventHandlers[eventType] = function;
+}
+
+void ScriptFile::addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName)
+{
+    if ((!mCompiled) || (!sender))
+        return;
+    
+    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    asIScriptFunction* function = getFunction(declaration);
+    if (!function)
+    {
+        LOGERROR("Event handler function " + declaration + " not found in " + getName());
+        return;
+    }
+    
+    subscribeToEvent(sender, eventType, EVENT_HANDLER(ScriptFile, handleSpecificScriptEvent));
+    mSpecificEventHandlers[std::make_pair(sender, eventType)] = function;
 }
 
 bool ScriptFile::execute(const std::string& declaration, const std::vector<Variant>& parameters)
@@ -301,7 +319,6 @@ asIScriptFunction* ScriptFile::getFunction(const std::string& declaration)
     
     int id = mScriptModule->GetFunctionIdByDecl(declaration.c_str());
     asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
-    functionToFile[function] = this;
     mFunctions[declaration] = function;
     return function;
 }
@@ -324,7 +341,6 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     
     int id = type->GetMethodIdByDecl(declaration.c_str());
     asIScriptFunction* function = mScriptModule->GetFunctionDescriptorById(id);
-    functionToFile[function] = this;
     mMethods[type][declaration] = function;
     return function;
 }
@@ -533,22 +549,28 @@ void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
     execute(i->second, parameters);
 }
 
-void ScriptFile::clearFunctionToFileMappings()
+void ScriptFile::handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    for (std::map<asIScriptFunction*, ScriptFile*>::iterator i = functionToFile.begin(); i != functionToFile.end(); )
-    {
-        std::map<asIScriptFunction*, ScriptFile*>::iterator current = i;
-        ++i;
-        if (current->second == this)
-            functionToFile.erase(current);
-    }
+    if (!mCompiled)
+        return;
+    
+    std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.find(std::make_pair(
+        getEventSender(), eventType));
+    if (i == mSpecificEventHandlers.end())
+        return;
+    
+    std::vector<Variant> parameters;
+    parameters.push_back(Variant((void*)&eventType));
+    parameters.push_back(Variant((void*)&eventData));
+    execute(i->second, parameters);
 }
 
 ScriptFile* getScriptContextFile()
 {
     asIScriptFunction* function = asGetActiveContext()->GetFunction();
-    std::map<asIScriptFunction*, ScriptFile*>::const_iterator i = functionToFile.find(function);
-    if (i != functionToFile.end())
+    asIScriptModule* module = function->GetEngine()->GetModule(function->GetModuleName());
+    std::map<asIScriptModule*, ScriptFile*>::const_iterator i = moduleToFile.find(module);
+    if (i != moduleToFile.end())
         return i->second;
     else
         return 0;

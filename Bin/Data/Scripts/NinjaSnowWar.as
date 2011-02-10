@@ -83,7 +83,7 @@ void initConsole()
     Console@ console = engine.createConsole();
     console.setNumRows(16);
     console.setFont(cache.getResource("Font", "cour.ttf"), 12);
-    BorderImage@ cursor = console.getLineEditElement().getCursorElement();
+    BorderImage@ cursor = console.getLineEdit().getCursor();
     cursor.setWidth(4);
     cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
     cursor.setImageRect(112, 0, 116, 16);

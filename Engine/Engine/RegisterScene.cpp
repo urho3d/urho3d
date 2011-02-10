@@ -47,27 +47,6 @@ static void DestructComponentRef(ComponentRef* ptr)
     ptr->~ComponentRef();
 }
 
-static void SendTargetedEvent(EventListener* listener, const std::string& eventType, VariantMap& parameters)
-{
-    // Try to send through the instance first, then through the script file event if not found
-    ScriptInstance* instance = getScriptContextInstance();
-    if (instance)
-        instance->sendEvent(listener, StringHash(eventType), parameters);
-    else
-    {
-        ScriptFile* file = getScriptContextFile();
-        if (file)
-            file->sendEvent(listener, StringHash(eventType), parameters);
-    }
-}
-
-static void SendComponentEvent(Component* component, const std::string& eventType, VariantMap& eventData)
-{
-    EventListener* listener = dynamic_cast<EventListener*>(component);
-    if (listener)
-        SendTargetedEvent(listener, eventType, eventData);
-}
-
 static void registerComponent(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint8 NET_NONE", (void*)&NET_NONE);
@@ -85,8 +64,6 @@ static void registerComponent(asIScriptEngine* engine)
     
     engine->RegisterObjectType("Entity", 0, asOBJ_REF);
     registerComponent<Component>(engine, "Component");
-    
-    engine->RegisterGlobalFunction("void sendEvent(Component@+, const string& in, VariantMap&)", asFUNCTION(SendComponentEvent), asCALL_CDECL);
 }
 
 static void registerComponentRef(asIScriptEngine* engine)
@@ -268,11 +245,6 @@ static Entity* GetEntity()
     return getScriptContextEntity();
 }
 
-static void SendEntityEvent(Entity* entity, const std::string& eventType, VariantMap& eventData)
-{
-    SendTargetedEvent(entity, eventType, eventData);
-}
-
 static void registerEntity(asIScriptEngine* engine)
 {
     engine->RegisterInterface("ScriptObject");
@@ -320,10 +292,10 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "bool isOwnerPredicted() const", asMETHOD(Entity, isOwnerPredicted), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isTransientPredicted() const", asMETHOD(Entity, isTransientPredicted), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isPlayback() const", asMETHOD(Entity, isPlayback), asCALL_THISCALL);
+    registerRefCasts<EventListener, Entity>(engine, "EventListener", "Entity");
     
     engine->RegisterGlobalFunction("Entity@+ getEntity()", asFUNCTION(GetEntity), asCALL_CDECL);
     engine->RegisterGlobalFunction("Entity@+ get_entity()", asFUNCTION(GetEntity), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void sendEvent(Entity@+, const string& in, VariantMap&)", asFUNCTION(SendEntityEvent), asCALL_CDECL);
     
     // Register Variant getPtr() for Entity
     engine->RegisterObjectMethod("Variant", "Entity@+ getEntity() const", asFUNCTION(getVariantPtr<Entity>), asCALL_CDECL_OBJLAST);
@@ -542,6 +514,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool isProxy() const", asMETHOD(Scene, isProxy), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool isPlayback() const", asMETHOD(Scene, isPlayback), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool isAsyncLoading() const", asMETHOD(Scene, isAsyncLoading), asCALL_THISCALL);
+    registerRefCasts<EventListener, Scene>(engine, "EventListener", "Scene");
     
     engine->RegisterGlobalFunction("Scene@+ getScene()", asFUNCTION(GetScene), asCALL_CDECL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScene), asCALL_CDECL);
