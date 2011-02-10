@@ -73,7 +73,7 @@ Console::Console(Engine* engine) :
         
         updateElements();
         
-        subscribeToEvent(EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
+        subscribeToEvent(mLineEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
         subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
     }
 }
@@ -187,14 +187,11 @@ void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
     
-    if (eventData[P_ELEMENT].getPtr() == (void*)mLineEdit)
-    {
-        std::string line = mLineEdit->getText();
-        ScriptEngine* scriptEngine = mEngine->getScriptEngine();
-        if (scriptEngine)
-            scriptEngine->execute(line);
-        mLineEdit->setText(std::string());
-    }
+    std::string line = mLineEdit->getText();
+    ScriptEngine* scriptEngine = mEngine->getScriptEngine();
+    if (scriptEngine)
+        scriptEngine->execute(line);
+    mLineEdit->setText(std::string());
 }
 
 void Console::handleWindowResized(StringHash eventType, VariantMap& eventData)

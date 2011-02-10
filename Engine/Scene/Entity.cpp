@@ -46,13 +46,13 @@ Entity::~Entity()
     removeAllComponents();
 }
 
-void Entity::handleEvent(StringHash eventType, VariantMap& eventData)
+void Entity::onEvent(EventListener* sender, StringHash eventType, VariantMap& eventData)
 {
     // Special-case event handling: send to all components that are event listeners
     for (std::vector<EventListener*>::const_iterator i = mEventListeners.begin(); i != mEventListeners.end(); ++i)
     {
-        // Note: we do not check if the component actually subscribes to the event, because handleEvent() does this check
-        (*i)->handleEvent(eventType, eventData);
+        // Note: we do not check if the component actually subscribes to the event, because onEvent() does this check
+        (*i)->onEvent(sender, eventType, eventData);
     }
 }
 

@@ -95,9 +95,6 @@ Engine::Engine(const std::string& windowTitle, const std::string& logFileName, b
     
     mCache = new ResourceCache();
     
-    // Register the engine and library events as local only
-    resetLocalOnlyEvents();
-    
     sInstance = this;
 }
 
@@ -366,24 +363,6 @@ DebugHud* Engine::createDebugHud()
     return mDebugHud;
 }
 
-void Engine::resetLocalOnlyEvents()
-{
-    static const std::string inbuiltEvents[] = {
-        "Update", "PostUpdate", "PostRenderUpdate", "ClientIdentity", "ClientJoinedScene", "ClientLeftScene", "ClientControls",
-        "ClientDisconnected", "GotSceneInfoList", "JoinedScene", "JoinSceneFailed", "FileTransferCompleted", "FileTransferFailed",
-        "ControlsUpdate", "ControlsPlayback", "MouseButtonDown", "MouseButtonUp", "MouseMove", "KeyDown", "KeyUp", "Char",
-        "PeerConnected", "NetworkPacket", "PeerDisconnected", "PhysicsPreStep", "PhysicsPostStep", "PhysicsCollision",
-        "EntityCollision", "WindowMessage", "WindowResized", "BeginFrame", "EndFrame", "SceneUpdate", "ScenePostUpdate",
-        "AsyncLoadProgress", "AsyncLoadFinished", "TryFocus", "Focused", "Defocused", "Pressed", "Toggled", "SliderChanged",
-        "ViewChanged", "TextChanged", "TextFinished", "ItemSelected", ""
-    };
-    
-    // First clear existing registrations, then register the inbuild events
-    removeAllLocalOnlyEvents();
-    for (unsigned i = 0; inbuiltEvents[i].length(); ++i)
-        registerLocalOnlyEvent(inbuiltEvents[i]);
-}
-
 void Engine::setDefaultScene(Scene* scene)
 {
     mDefaultScene = scene;
@@ -630,9 +609,6 @@ void Engine::registerScriptAPI()
     
     LOGDEBUG("Registering Common library");
     registerCommonLibrary(engine);
-    
-    LOGDEBUG("Registering Event library");
-    registerEventLibrary(engine);
     
     LOGDEBUG("Registering Resource library");
     registerResourceLibrary(engine);

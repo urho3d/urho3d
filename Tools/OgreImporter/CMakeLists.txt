@@ -8,8 +8,8 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../../Engine/Common ../../Engine/Event ../../Engine/Math ../../Engine/Physics ../../Engine/Renderer
-    ../../Engine/Resource ../../ThirdParty/TinyXML
+    ../../Engine/Common ../../Engine/Math ../../Engine/Physics ../../Engine/Renderer ../../Engine/Resource
+    ../../ThirdParty/TinyXML
 )
 
 # Define target & libraries to link

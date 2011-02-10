@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 //
 
-#ifndef EVENT_EVENTLISTENER_H
-#define EVENT_EVENTLISTENER_H
+#ifndef COMMON_EVENTLISTENER_H
+#define COMMON_EVENTLISTENER_H
 
 #include "Event.h"
 
@@ -93,9 +93,6 @@ private:
 //! Event listener
 class EventListener
 {
-    friend void sendEvent(StringHash eventType, VariantMap& eventData);
-    friend void sendEvent(EventListener* receiver, StringHash eventType, VariantMap& eventData, bool direct);
-    
 public:
     //! Construct
     EventListener();
@@ -103,20 +100,46 @@ public:
     virtual ~EventListener();
     
     //! Handle an event
-    virtual void handleEvent(StringHash eventType, VariantMap& eventData);
+    virtual void onEvent(EventListener* sender, StringHash eventType, VariantMap& eventData);
     
-    //! Subscribe to an event with a specified handler function
+    //! Subscribe to an event that can be sent by any sender
     void subscribeToEvent(StringHash eventType, EventHandlerInvoker* handler);
+    //! Subscribe to a specific sender's event
+    void subscribeToEvent(EventListener* sender, StringHash eventType, EventHandlerInvoker* handler);
     //! Unsubscribe from an event
     void unsubscribeFromEvent(StringHash eventType);
+    //! Unsubscribe from a specific sender's event
+    void unsubscribeFromEvent(EventListener* sender, StringHash eventType);
+    //! Unsubscribe from a specific sender's events
+    void unsubscribeFromEvents(EventListener* sender);
     //! Unsubscribe from all events
     void unsubscribeFromAllEvents();
-    //! Return whether has subscribed to a specific event
+    //! Send event to all subscribers
+    void sendEvent(StringHash eventType);
+    //! Send event with parameters to all subscribers
+    void sendEvent(StringHash eventType, VariantMap& eventData);
+    //! Send event to a specific receiver
+    void sendEvent(EventListener* receiver, StringHash eventType);
+    //! Send event with parameters to a specific receiver
+    void sendEvent(EventListener* receiver, StringHash eventType, VariantMap& eventData);
+    
+    //! Return whether has subscribed to an event
     bool hasSubscribedToEvent(StringHash eventType) const;
+    //! Return whether has subscribed to a specific sender & event
+    bool hasSubscribedToEvent(EventListener* sender, StringHash eventType) const;
+    
+    //! Remove event handlers related to a specific sender
+    void removeSpecificEventHandlers(EventListener* sender);
+    //! Remove event listener from specific events
+    void removeEventListener(EventListener* sender, StringHash eventType);
+    //! Remove event listener from non-specific events
+    void removeEventListener(StringHash eventType);
     
 protected:
-    //! Event handlers
+    //! Event handlers for non-specific events
     std::map<StringHash, EventHandlerInvoker*> mEventHandlers;
+    //! Event handlers for specific senders' events
+    std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*> mSpecificEventHandlers;
     
 private:
     //! Prevent copy construction
@@ -124,8 +147,10 @@ private:
     //! Prevent assignment
     EventListener& operator = (const EventListener& rhs);
     
-    //! Event listeners per event
+    //! Event listeners for non-specific events
     static std::map<StringHash, std::vector<EventListener*> > sEventListeners;
+    //! Event listeners for specific senders' events
+    static std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > sSpecificEventListeners;
 };
 
 #endif // EVENT_EVENTLISTENER_H

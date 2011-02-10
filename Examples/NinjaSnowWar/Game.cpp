@@ -122,13 +122,7 @@ Game::Game() :
     subscribeToEvent(EVENT_CLIENTLEFTSCENE, EVENT_HANDLER(Game, handleClientLeft));
     subscribeToEvent(EVENT_PLAYERSPAWNED, EVENT_HANDLER(Game, handlePlayerSpawned));
     
-    // Register the inbuilt game events as local only; only EVENT_PLAYERSPAWNED is to be sent remote
-    static const std::string inbuiltEvents[] = {
-        "Create", "Remove", "Damage", "Heal", "Die", ""
-    };
-    
-    for (unsigned i = 0; inbuiltEvents[i].length(); ++i)
-        registerLocalOnlyEvent(inbuiltEvents[i]);
+    registerRemoteEvent(EVENT_PLAYERSPAWNED);
 }
 
 Game::~Game()

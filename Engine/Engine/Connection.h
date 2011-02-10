@@ -47,7 +47,7 @@ enum JoinState
 };
 
 //! A remote connection in the high-level networking protocol
-class Connection : public RefCounted
+class Connection : public RefCounted, public EventListener
 {
 public:
     //! Construct with a pointer to the network peer

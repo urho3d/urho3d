@@ -21,23 +21,12 @@
 // THE SOFTWARE.
 //
 
-#ifndef EVENT_EVENT_H
-#define EVENT_EVENT_H
+#ifndef COMMON_EVENT_H
+#define COMMON_EVENT_H
 
 #include "Variant.h"
 
 #define DEFINE_EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
 #define EVENT_PARAM(paramID, paramName) static const ShortStringHash paramID(#paramName)
 
-class EventListener;
-
-//! Send event to all subscribers
-void sendEvent(StringHash eventType);
-//! Send event with parameters to all subscribers
-void sendEvent(StringHash eventType, VariantMap& eventData);
-//! Send event to a specified receiver. Optionally check if the receiver is a valid (by default not)
-void sendEvent(EventListener* receiver, StringHash eventType, bool direct = true);
-//! Send event with parameters to a specified receiver. Optionally check if the receiver is valid (by default not)
-void sendEvent(EventListener* receiver, StringHash eventType, VariantMap& eventData, bool direct = true);
-
-#endif // EVENT_EVENT_H
+#endif // COMMON_EVENT_H

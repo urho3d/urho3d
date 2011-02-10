@@ -185,5 +185,7 @@ private:
 ScriptInstance* getScriptContextInstance();
 //! Return the entity of the active context
 Entity* getScriptContextEntity();
+//! Return the event listener of the active context
+ScriptEventListener* getScriptContextEventListener();
 
 #endif // SCRIPT_SCRIPTINSTANCE_H

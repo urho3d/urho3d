@@ -81,12 +81,16 @@ struct RemoteEvent
     unsigned short mTimeToLive;
 };
 
-//! Register an event to be only sent locally
-void registerLocalOnlyEvent(StringHash eventType);
-//! Register an event to be only sent locally
-void registerLocalOnlyEvent(const std::string& name);
-//! Remove all registered local only events
-void removeAllLocalOnlyEvents();
+//! Register an event to be sent/received remotely
+void registerRemoteEvent(StringHash eventType);
+//! Register an event to be sent/received remotely
+void registerRemoteEvent(const std::string& name);
+//! Unregister an event from being sent/received remotely
+void unregisterRemoteEvent(StringHash eventType);
+//! Unregister an event from being sent/received remotely
+void unregisterRemoteEvent(const std::string& name);
+//! Unregister all remote events
+void unregisterAllRemoteEvents();
 //! Check if an event is allowed to be sent remotely
 bool checkRemoteEvent(StringHash eventType);
 //! Return remote event sender connection. Only non-null during the event handling

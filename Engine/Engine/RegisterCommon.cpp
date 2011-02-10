@@ -26,6 +26,7 @@
 #include "PackageFile.h"
 #include "ProcessUtils.h"
 #include "RegisterTemplates.h"
+#include "ScriptInstance.h"
 #include "StringUtils.h"
 #include "VectorBuffer.h"
 
@@ -635,6 +636,42 @@ static void registerProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint getNumLogicalProcessors()", asFUNCTION(getNumLogicalProcessors), asCALL_CDECL);
 }
 
+static void SendEvent(const std::string& eventType, VariantMap& parameters)
+{
+    ScriptEventListener* sender = getScriptContextEventListener();
+    if (sender)
+        sender->sendEvent(StringHash(eventType), parameters);
+}
+
+static void SubscribeToEvent(const std::string& eventType, const std::string& handlerName)
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->addEventHandler(StringHash(eventType), handlerName);
+}
+
+static void UnsubscribeFromEvent(const std::string& eventType)
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->removeEventHandler(StringHash(eventType));
+}
+
+static void UnsubscribeFromAllEvents()
+{
+    ScriptEventListener* listener = getScriptContextEventListener();
+    if (listener)
+        listener->removeAllEventHandlers();
+}
+
+void registerEvents(asIScriptEngine* engine)
+{
+    engine->RegisterGlobalFunction("void sendEvent(const string& in, VariantMap&)", asFUNCTION(SendEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void subscribeToEvent(const string& in, const string& in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void unsubscribeFromEvent(const string& in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void unsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
+}
+
 void registerCommonLibrary(asIScriptEngine* engine)
 {
     registerColor(engine);
@@ -646,4 +683,5 @@ void registerCommonLibrary(asIScriptEngine* engine)
     registerPackageFile(engine);
     registerTimer(engine);
     registerProcessUtils(engine);
+    registerEvents(engine);
 }

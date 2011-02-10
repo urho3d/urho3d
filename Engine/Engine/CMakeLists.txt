@@ -8,13 +8,13 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Audio ../Common ../Event ../Input ../Math ../Network ../Physics ../Renderer ../Resource ../Scene
-    ../Script ../UI ../../ThirdParty/AngelScript/include
+    ../Audio ../Common ../Input ../Math ../Network ../Physics ../Renderer ../Resource ../Scene ../Script
+    ../UI ../../ThirdParty/AngelScript/include
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Audio Common Event Input Math Network Physics Renderer Resource
+target_link_libraries (${TARGET_NAME} Audio Common Input Math Network Physics Renderer Resource
     Scene Script UI)
 enable_pch ()
 finalize_lib ()

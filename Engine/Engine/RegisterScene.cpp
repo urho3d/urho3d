@@ -47,11 +47,25 @@ static void DestructComponentRef(ComponentRef* ptr)
     ptr->~ComponentRef();
 }
 
+static void SendTargetedEvent(EventListener* listener, const std::string& eventType, VariantMap& parameters)
+{
+    // Try to send through the instance first, then through the script file event if not found
+    ScriptInstance* instance = getScriptContextInstance();
+    if (instance)
+        instance->sendEvent(listener, StringHash(eventType), parameters);
+    else
+    {
+        ScriptFile* file = getScriptContextFile();
+        if (file)
+            file->sendEvent(listener, StringHash(eventType), parameters);
+    }
+}
+
 static void SendComponentEvent(Component* component, const std::string& eventType, VariantMap& eventData)
 {
     EventListener* listener = dynamic_cast<EventListener*>(component);
     if (listener)
-        sendEvent(listener, StringHash(eventType), eventData);
+        SendTargetedEvent(listener, eventType, eventData);
 }
 
 static void registerComponent(asIScriptEngine* engine)
@@ -256,7 +270,7 @@ static Entity* GetEntity()
 
 static void SendEntityEvent(Entity* entity, const std::string& eventType, VariantMap& eventData)
 {
-    sendEvent(entity, StringHash(eventType), eventData);
+    SendTargetedEvent(entity, eventType, eventData);
 }
 
 static void registerEntity(asIScriptEngine* engine)

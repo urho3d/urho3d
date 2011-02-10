@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Common ../Event ../Math ../../ThirdParty/ENet/include
+    ../Common ../Math ../../ThirdParty/ENet/include
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Common ENet Event Math)
+target_link_libraries (${TARGET_NAME} Common ENet Math)
 enable_pch ()
 finalize_lib ()

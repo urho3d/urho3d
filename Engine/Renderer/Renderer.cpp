@@ -60,8 +60,10 @@ static const D3DCMPFUNC d3dCmpFunc[] =
 };
 
 // These are for optimizing the case where user supplies a single vertex buffer in setVertexBuffer()
-static std::vector<VertexBuffer*> vertexBuffers;
-static std::vector<unsigned> elementMasks;
+std::vector<VertexBuffer*> vertexBuffers;
+std::vector<unsigned> elementMasks;
+
+std::map<HWND, Renderer*> renderers;
 
 static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -137,6 +139,7 @@ Renderer::~Renderer()
     if (mImpl->mWindow)
     {
         DestroyWindow(mImpl->mWindow);
+        renderers.erase(mImpl->mWindow);
         mImpl->mWindow = 0;
     }
     
@@ -372,6 +375,7 @@ void Renderer::close()
         mImmediateVertexBuffers.clear();
         
         DestroyWindow(mImpl->mWindow);
+        renderers.erase(mImpl->mWindow);
         mImpl->mWindow = 0;
         mClosed = true;
     }
@@ -1894,6 +1898,8 @@ void Renderer::createWindow(int width, int height)
         mWindowPosX = wndpl.rcNormalPosition.left;
         mWindowPosY = wndpl.rcNormalPosition.top;
     }
+    
+    renderers[mImpl->mWindow] = this;
 }
 
 void Renderer::createInterface()
@@ -2222,16 +2228,20 @@ LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     using namespace WindowMessage;
     
-    VariantMap eventData;
-    eventData[P_WINDOW] = (int)hwnd;
-    eventData[P_MSG] = (int)msg;
-    eventData[P_WPARAM] = (int)wParam;
-    eventData[P_LPARAM] = (int)lParam;
-    eventData[P_HANDLED] = false;
-    
-    sendEvent(EVENT_WINDOWMESSAGE, eventData);
-    if (eventData[P_HANDLED].getBool())
-        return 0;
+    std::map<HWND, Renderer*>::const_iterator i = renderers.find(hwnd);
+    if (i != renderers.end())
+    {
+        VariantMap eventData;
+        eventData[P_WINDOW] = (int)hwnd;
+        eventData[P_MSG] = (int)msg;
+        eventData[P_WPARAM] = (int)wParam;
+        eventData[P_LPARAM] = (int)lParam;
+        eventData[P_HANDLED] = false;
+        
+        i->second->sendEvent(EVENT_WINDOWMESSAGE, eventData);
+        if (eventData[P_HANDLED].getBool())
+            return 0;
+    }
     
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }

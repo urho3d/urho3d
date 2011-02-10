@@ -8,15 +8,15 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../../Engine/Audio ../../Engine/Common ../../Engine/Engine ../../Engine/Event ../../Engine/Input
-    ../../Engine/Math ../../Engine/Network ../../Engine/Physics ../../Engine/Renderer ../../Engine/Resource
+    ../../Engine/Audio ../../Engine/Common ../../Engine/Engine ../../Engine/Input ../../Engine/Math
+    ../../Engine/Network ../../Engine/Physics ../../Engine/Renderer ../../Engine/Resource 
     ../../Engine/Scene ../../Engine/Script ../../Engine/UI ../../ThirdParty/TinyXML
 )
 
 # Define target & libraries to link
 add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
 set_target_properties (${TARGET_NAME} PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries (${TARGET_NAME} Audio Common Engine Event Input Math Network Physics Renderer
-    Resource Scene TinyXML UI)
+target_link_libraries (${TARGET_NAME} Audio Common Engine Input Math Network Physics Renderer Resource
+    Scene TinyXML UI)
 enable_pch ()
 finalize_exe ()

@@ -656,3 +656,13 @@ Entity* getScriptContextEntity()
     ScriptInstance* instance = getScriptContextInstance();
     return instance ? instance->getEntity() : 0;
 }
+
+ScriptEventListener* getScriptContextEventListener()
+{
+    // First try to get the script instance. If not found, get the script file for procedural event handling
+    ScriptInstance* instance = getScriptContextInstance();
+    if (instance)
+        return instance;
+    ScriptFile* file = getScriptContextFile();
+    return file;
+}

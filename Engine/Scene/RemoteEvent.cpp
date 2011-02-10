@@ -31,7 +31,7 @@
 
 #include "DebugNew.h"
 
-static std::set<StringHash> localOnlyEvents;
+static std::set<StringHash> remoteEvents;
 Connection* remoteEventSender = 0;
 
 void RemoteEvent::write(Serializer& dest) const
@@ -56,7 +56,7 @@ void RemoteEvent::read(Deserializer& source, bool hasEntity)
 
 bool RemoteEvent::dispatch(Connection* sender, Scene* scene)
 {
-    if (!sender)
+    if ((!sender) || (!scene))
         return false;
     
     if (!checkRemoteEvent(mEventType))
@@ -65,45 +65,52 @@ bool RemoteEvent::dispatch(Connection* sender, Scene* scene)
         return false;
     }
     
+    // Note: because the Connection object is not known in the Scene library, we must use Scene as the sender
+    
     remoteEventSender = sender;
     if (!mEntityID)
-        sendEvent(mEventType, mEventData);
+        scene->sendEvent(mEventType, mEventData);
     else
     {
-        if (scene)
-        {
-            Entity* entity = scene->getEntity(mEntityID);
-            if (!entity)
-                LOGWARNING("Entity ID " + toString(mEntityID) + " not found for remote event " + toString(mEventType));
-            else
-                sendEvent(entity, mEventType, mEventData);
-        }
+        Entity* entity = scene->getEntity(mEntityID);
+        if (!entity)
+            LOGWARNING("Entity ID " + toString(mEntityID) + " not found for remote event " + toString(mEventType));
         else
-            LOGERROR("No scene for entity event");
+            scene->sendEvent(entity, mEventType, mEventData);
     }
     remoteEventSender = 0;
     return true;
 }
 
-void registerLocalOnlyEvent(StringHash eventType)
+void registerRemoteEvent(StringHash eventType)
 {
-    localOnlyEvents.insert(eventType);
+    remoteEvents.insert(eventType);
 }
 
-void registerLocalOnlyEvent(const std::string& name)
+void registerRemoteEvent(const std::string& name)
 {
     registerHash(name, false);
-    localOnlyEvents.insert(StringHash(name));
+    remoteEvents.insert(StringHash(name));
 }
 
-void removeAllLocalOnlyEvents()
+void unregisterRemoteEvent(StringHash eventType)
 {
-    localOnlyEvents.clear();
+    remoteEvents.erase(eventType);
+}
+
+void unregisterRemoteEvent(const std::string& name)
+{
+    remoteEvents.erase(StringHash(name));
+}
+
+void unregisterAllRemoteEvents()
+{
+    remoteEvents.clear();
 }
 
 bool checkRemoteEvent(StringHash eventType)
 {
-    return localOnlyEvents.find(eventType) == localOnlyEvents.end();
+    return remoteEvents.find(eventType) != remoteEvents.end();
 }
 
 Connection* getRemoteEventSender()

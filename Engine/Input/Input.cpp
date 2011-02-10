@@ -44,7 +44,7 @@ Input::Input(Renderer* renderer) :
     
     makeActive();
     
-    subscribeToEvent(EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
+    subscribeToEvent(mRenderer, EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
 }
 
 Input::~Input()
@@ -190,7 +190,7 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowMessage;
     
-    if ((!mRenderer) || (eventData[P_WINDOW].getInt() != mRenderer->getWindowHandle()))
+    if (!mRenderer)
         return;
     
     int msg = eventData[P_MSG].getInt();

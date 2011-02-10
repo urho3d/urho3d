@@ -67,7 +67,8 @@ public:
     virtual ~Entity();
     
     //! Pass event to components who have subscribed to it if any
-    virtual void handleEvent(StringHash eventType, VariantMap& eventData);
+    virtual void onEvent(EventListener* sender, StringHash eventType, VariantMap& eventData);
+    
     //! Write properties and components to a stream
     void save(Serializer& dest);
     //! Read properties and components from a stream

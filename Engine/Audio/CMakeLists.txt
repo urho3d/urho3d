@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Common ../Event ../Math ../Resource ../Scene ../../ThirdParty/STB
+    ../Common ../Math ../Resource ../Scene ../../ThirdParty/STB
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Common Event Math Resource Scene STB dsound.lib)
+target_link_libraries (${TARGET_NAME} Common Math Resource Scene STB dsound.lib)
 enable_pch ()
 finalize_lib ()

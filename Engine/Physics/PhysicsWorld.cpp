@@ -587,7 +587,7 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     
     // Send collision events
     collisionData[PhysicsCollision::P_CONTACTS] = contactsA.getBuffer();
-    sendEvent(EVENT_PHYSICSCOLLISION, collisionData);
+    world->sendEvent(EVENT_PHYSICSCOLLISION, collisionData);
     
     if (entityA)
     {
@@ -595,7 +595,7 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
         entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyB;
         entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityB;
         entityCollisionData[EntityCollision::P_CONTACTS] = contactsA.getBuffer();
-        sendEvent(entityA, EVENT_ENTITYCOLLISION, entityCollisionData);
+        world->sendEvent(entityA, EVENT_ENTITYCOLLISION, entityCollisionData);
     }
     if (entityB)
     {
@@ -603,7 +603,7 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
         entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyA;
         entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityA;
         entityCollisionData[EntityCollision::P_CONTACTS] = contactsB.getBuffer();
-        sendEvent(entityB, EVENT_ENTITYCOLLISION, entityCollisionData);
+        world->sendEvent(entityB, EVENT_ENTITYCOLLISION, entityCollisionData);
     }
     
     // Propagate transient prediction based on physics interactions

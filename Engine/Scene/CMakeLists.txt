@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Common ../Event ../Math ../Resource ../../ThirdParty/TinyXML
+    ../Common ../Math ../Resource ../../ThirdParty/TinyXML
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Common Event Math Resource TinyXML)
+target_link_libraries (${TARGET_NAME} Common Math Resource TinyXML)
 enable_pch ()
 finalize_lib ()

@@ -8,10 +8,10 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Common ../Event ../Math ../Renderer ../Resource
+    ../Common ../Math ../Renderer ../Resource
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Common Event Math Renderer Resource)
+target_link_libraries (${TARGET_NAME} Common Math Renderer Resource)
 finalize_lib ()

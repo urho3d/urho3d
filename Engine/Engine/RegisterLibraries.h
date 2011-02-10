@@ -30,8 +30,6 @@ class asIScriptEngine;
 void registerMathLibrary(asIScriptEngine* engine);
 //! Register the Common library to script
 void registerCommonLibrary(asIScriptEngine* engine);
-//! Register the Event library to script
-void registerEventLibrary(asIScriptEngine* engine);
 //! Register the Resource library to script
 void registerResourceLibrary(asIScriptEngine* engine);
 //! Register the Scene library to script

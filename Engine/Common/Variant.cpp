@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Deserializer.h"
 #include "Exception.h"
+#include "Log.h"
 #include "Serializer.h"
 #include "StringUtils.h"
 
@@ -64,7 +65,10 @@ void Variant::fromString(const std::string& type, const std::string& value)
         *this = buffer;
     }
     else if (typeLower == "pointer")
-        *this = (void*)toInt(value);
+    {
+        LOGWARNING("Deserialized pointer Variant set to null");
+        *this = (void*)0;
+    }
     else
         clear();
 }
@@ -121,7 +125,8 @@ void Variant::write(Serializer& dest) const
         break;
         
     case VAR_PTR:
-        dest.writeUInt((unsigned)mValue.mPtr);
+        LOGWARNING("Serialized pointer Variant set to null");
+        dest.writeUInt(0);
         break;
     }
 }
@@ -178,7 +183,9 @@ void Variant::read(Deserializer& source)
         break;
         
     case VAR_PTR:
-        mValue.mPtr = (void*)source.readUInt();
+        LOGWARNING("Deserialized pointer Variant set to null");
+        source.readUInt();
+        mValue.mPtr = 0;
         break;
         
     default:
@@ -248,7 +255,8 @@ std::string Variant::toString() const
             return ret;
         }
     case VAR_PTR:
-        return ::toString((unsigned)mValue.mPtr);
+        LOGWARNING("Serialized pointer Variant set to null");
+        return ::toString((unsigned)0);
     }
     
     return std::string();
