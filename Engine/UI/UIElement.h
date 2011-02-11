@@ -102,6 +102,8 @@ public:
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character
     virtual void onChar(unsigned char c, int buttons, int qualifiers);
+    //! React to resize. The widget should not be further resized inside this function
+    virtual void onResize();
     //! React to gaining focus
     virtual void onFocus();
     //! React to losing focus
@@ -113,14 +115,30 @@ public:
     void setPosition(const IntVector2& position);
     //! Set position
     void setPosition(int x, int y);
-    //! Set width and height
+    //! Set size
     void setSize(const IntVector2& size);
-    //! Set width and height
+    //! Set size
     void setSize(int width, int height);
-    //! Set width
+    //! Set width only
     void setWidth(int width);
-    //! Set height
+    //! Set height only
     void setHeight(int height);
+    //! Set minimum size
+    void setMinSize(const IntVector2& minSize);
+    //! Set minimum size
+    void setMinSize(int width, int height);
+    //! Set minimum width
+    void setMinWidth(int width);
+    //! Set minimum height
+    void setMinHeight(int height);
+    //! Set maximum size
+    void setMaxSize(const IntVector2& maxSize);
+    //! Set maximum size
+    void setMaxSize(int width, int height);
+    //! Set maximum width
+    void setMaxWidth(int width);
+    //! Set maximum height
+    void setMaxHeight(int height);
     //! Set horizontal and vertical alignment
     void setAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     //! Set horizontal alignment
@@ -184,6 +202,18 @@ public:
     int getWidth() const { return mSize.mX; }
     //! Return height
     int getHeight() const { return mSize.mY; }
+    //! Return minimum size
+    const IntVector2& getMinSize() const { return mMinSize; }
+    //! Return minimum width
+    int getMinWidth() const { return mMinSize.mX; }
+    //! Return minimum height
+    int getMinHeight() const { return mMinSize.mY; }
+    //! Return maximum size
+    const IntVector2& getMaxSize() const { return mMaxSize; }
+    //! Return minimum width
+    int getMaxWidth() const { return mMaxSize.mX; }
+    //! Return minimum height
+    int getMaxHeight() const { return mMaxSize.mY; }
     //! Return child element offset
     const IntVector2& getChildOffset() const { return mChildOffset; }
     //! Return horizontal alignment
@@ -311,6 +341,8 @@ private:
     void getChildrenRecursive(std::vector<UIElement*>& dest) const;
     //! Adjust size after laying out the child elements
     void adjustSize(const IntVector2& neededSize, bool expand, bool contract);
+    //! Validate size against min & max size
+    void validateSize();
     
     //! Position
     IntVector2 mPosition;
@@ -318,6 +350,10 @@ private:
     IntVector2 mScreenPosition;
     //! Size
     IntVector2 mSize;
+    //! Minimum size
+    IntVector2 mMinSize;
+    //! Maximum size
+    IntVector2 mMaxSize;
     //! Child elements' offset. Used internally
     IntVector2 mChildOffset;
     //! Horizontal alignment

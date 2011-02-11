@@ -65,14 +65,6 @@ public:
     void setMovable(bool enable);
     //! Set whether can be resized
     void setResizable(bool enable);
-    //! Set minimum size
-    void setMinSize(const IntVector2& minSize);
-    //! Set minimum size
-    void setMinSize(int width, int height);
-    //! Set maximum size
-    void setMaxSize(const IntVector2& maxSize);
-    //! Set maximum size
-    void setMaxSize(int width, int height);
     //! Set resize area width at edges
     void setResizeBorder(const IntRect& rect);
     //! Set resize area width at edges
@@ -82,16 +74,10 @@ public:
     bool isMovable() const { return mMovable; }
     //! Return whether is resizable
     bool isResizable() const { return mResizable; }
-    //! Return minimum size
-    const IntVector2& getMinSize() const { return mMinSize; }
-    //! Return maximum size
-    const IntVector2& getMaxSize() const { return mMaxSize; }
     //! Return resize area width at edges
     const IntRect& getResizeBorder() const { return mResizeBorder; }
     
 protected:
-    //! Validate window size
-    void validateSize();
     //! Validate window position
     void validatePosition();
     //! Check whether alignment supports moving and resizing
@@ -101,10 +87,6 @@ protected:
     bool mMovable;
     //! Resizable flag
     bool mResizable;
-    //! Minimum size
-    IntVector2 mMinSize;
-    //! Maximum size
-    IntVector2 mMaxSize;
     //! Resize area width at edges
     IntRect mResizeBorder;
     //! Current drag mode

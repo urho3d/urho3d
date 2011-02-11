@@ -415,6 +415,14 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setSize(int, int)", asMETHODPR(T, setSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setWidth(int)", asMETHOD(T, setWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setHeight(int)", asMETHOD(T, setHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMinSize(const IntVector2& in)", asMETHODPR(T, setMinSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMinSize(int, int)", asMETHODPR(T, setMinSize, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMinWidth(int)", asMETHOD(T, setMinWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMinHeight(int)", asMETHOD(T, setMinHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMaxSize(const IntVector2& in)", asMETHODPR(T, setMaxSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMaxSize(int, int)", asMETHODPR(T, setMaxSize, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMaxWidth(int)", asMETHOD(T, setMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setMaxHeight(int)", asMETHOD(T, setMaxHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(T, setAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setHorizontalAlignment(HorizontalAlignment)", asMETHOD(T, setHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVerticalAlignment(VerticalAlignment)", asMETHOD(T, setVerticalAlignment), asCALL_THISCALL);
@@ -446,6 +454,12 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "const IntVector2& getSize() const", asMETHOD(T, getSize), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getWidth() const", asMETHOD(T, getWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getHeight() const", asMETHOD(T, getHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& getMinSize() const", asMETHOD(T, getMinSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int getMinWidth() const", asMETHOD(T, getMinWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int getMinHeight() const", asMETHOD(T, getMinHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& getMaxSize() const", asMETHOD(T, getMaxSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int getMaxWidth() const", asMETHOD(T, getMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int getMaxHeight() const", asMETHOD(T, getMaxHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& getChildOffset() const", asMETHOD(T, getChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "HorizontalAlignment getHorizontalAlignment() const", asMETHOD(T, getHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment getVerticalAlignment() const", asMETHOD(T, getVerticalAlignment), asCALL_THISCALL);

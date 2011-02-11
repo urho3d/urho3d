@@ -437,8 +437,14 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
 
 void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName)
 {
-    if ((!mScriptObject) || (!sender))
+    if (!mScriptObject)
         return;
+
+    if (!sender)
+    {
+        LOGERROR("Null event sender for event " + toString(eventType));
+        return;
+    }
     
     std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);

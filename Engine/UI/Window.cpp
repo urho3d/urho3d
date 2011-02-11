@@ -33,15 +33,11 @@ Window::Window(const std::string& name) :
     BorderImage(name),
     mMovable(false),
     mResizable(false),
-    mMinSize(0, 0),
-    mMaxSize(M_MAX_INT, M_MAX_INT),
     mResizeBorder(DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER, DEFAULT_RESIZE_BORDER),
     mDragMode(DRAG_NONE)
 {
     mBringToFront = true;
     mEnabled = true;
-    
-    validateSize();
 }
 
 Window::~Window()
@@ -52,10 +48,6 @@ void Window::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     BorderImage::setStyle(element, cache);
     
-    if (element.hasChildElement("minsize"))
-        setMinSize(element.getChildElement("minsize").getIntVector2("value"));
-    if (element.hasChildElement("maxsize"))
-        setMaxSize(element.getChildElement("maxsize").getIntVector2("value"));
     if (element.hasChildElement("resizeborder"))
         setResizeBorder(element.getChildElement("resizeborder").getIntRect("value"));
     if (element.hasChildElement("movable"))
@@ -171,7 +163,6 @@ void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosi
         break;
     }
     
-    validateSize();
     validatePosition();
 }
 
@@ -190,28 +181,6 @@ void Window::setResizable(bool enable)
     mResizable = enable;
 }
 
-void Window::setMinSize(const IntVector2& minSize)
-{
-    mMinSize = minSize;
-    validateSize();
-}
-
-void Window::setMinSize(int width, int height)
-{
-    setMinSize(IntVector2(width, height));
-}
-
-void Window::setMaxSize(const IntVector2& maxSize)
-{
-    mMaxSize = maxSize;
-    validateSize();
-}
-
-void Window::setMaxSize(int width, int height)
-{
-    setMaxSize(IntVector2(width, height));
-}
-
 void Window::setResizeBorder(const IntRect& rect)
 {
     mResizeBorder.mLeft = max(rect.mLeft, 0);
@@ -223,19 +192,6 @@ void Window::setResizeBorder(const IntRect& rect)
 void Window::setResizeBorder(int left, int top, int right, int bottom)
 {
     setResizeBorder(IntRect(left, top, right, bottom));
-}
-
-void Window::validateSize()
-{
-    mMinSize.mX = max(mMinSize.mX, 0);
-    mMinSize.mY = max(mMinSize.mY, 0);
-    mMaxSize.mX = max(mMaxSize.mX, mMinSize.mX);
-    mMaxSize.mY = max(mMaxSize.mY, mMinSize.mX);
-    
-    IntVector2 size = getSize();
-    size.mX = clamp(size.mX, mMinSize.mX, mMaxSize.mX);
-    size.mY = clamp(size.mY, mMinSize.mY, mMaxSize.mY);
-    setSize(size);
 }
 
 void Window::validatePosition()

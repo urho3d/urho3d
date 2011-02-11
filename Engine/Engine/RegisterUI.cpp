@@ -210,16 +210,10 @@ static void registerWindow(asIScriptEngine* engine)
     registerBorderImage<Window>(engine, "Window");
     engine->RegisterObjectMethod("Window", "void setMovable(bool)", asMETHOD(Window, setMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void setResizable(bool)", asMETHOD(Window, setResizable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void setMinSize(const IntVector2& in)", asMETHODPR(Window, setMinSize, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void setMinSize(int, int)", asMETHODPR(Window, setMinSize, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void setMaxSize(const IntVector2& in)", asMETHODPR(Window, setMaxSize, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "void setMaxSize(int, int)", asMETHODPR(Window, setMaxSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void setResizeBorder(const IntRect& in)", asMETHODPR(Window, setResizeBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "void setResizeBorder(int, int, int, int)", asMETHODPR(Window, setResizeBorder, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "bool isMovable() const", asMETHOD(Window, isMovable), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "bool isResizable() const", asMETHOD(Window, isResizable), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const IntVector2& getMinSize() const", asMETHOD(Window, getMinSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Window", "const IntVector2& getMaxSize() const", asMETHOD(Window, getMaxSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Window", "const IntRect& getResizeBorder() const", asMETHOD(Window, getResizeBorder), asCALL_THISCALL);
     registerRefCasts<UIElement, Window>(engine, "UIElement", "Window");
 }

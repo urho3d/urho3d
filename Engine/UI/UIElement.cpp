@@ -50,6 +50,8 @@ UIElement::UIElement(const std::string& name) :
     mHovering(false),
     mPosition(IntVector2::sZero),
     mSize(IntVector2::sZero),
+    mMinSize(IntVector2::sZero),
+    mMaxSize(M_MAX_INT, M_MAX_INT),
     mChildOffset(IntVector2::sZero),
     mHorizontalAlignment(HA_LEFT),
     mVerticalAlignment(VA_TOP),
@@ -85,6 +87,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setPosition(element.getChildElement("position").getIntVector2("value"));
     if (element.hasChildElement("size"))
         setSize(element.getChildElement("size").getIntVector2("value"));
+    if (element.hasChildElement("minsize"))
+        setMinSize(element.getChildElement("minsize").getIntVector2("value"));
+    if (element.hasChildElement("maxsize"))
+        setMaxSize(element.getChildElement("maxsize").getIntVector2("value"));
     if (element.hasChildElement("alignment"))
     {
         XMLElement alignElem = element.getChildElement("alignment");
@@ -261,6 +267,10 @@ void UIElement::onChar(unsigned char c, int buttons, int qualifiers)
 {
 }
 
+void UIElement::onResize()
+{
+}
+
 void UIElement::onFocus()
 {
 }
@@ -290,11 +300,21 @@ void UIElement::setPosition(int x, int y)
 
 void UIElement::setSize(const IntVector2& size)
 {
-    if (size != mSize)
+    IntVector2 validatedSize;
+    validatedSize.mX = clamp(size.mX, mMinSize.mX, mMaxSize.mX);
+    validatedSize.mY = clamp(size.mY, mMinSize.mY, mMaxSize.mY);
+    
+    if (validatedSize != mSize)
     {
-        mSize.mX = max(size.mX, 0);
-        mSize.mY = max(size.mY, 0);
+        mSize = validatedSize;
         markDirty();
+        onResize();
+        
+        using namespace Resized;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        sendEvent(mFocus ? EVENT_FOCUSED : EVENT_DEFOCUSED, eventData);	
     }
 }
 
@@ -311,6 +331,53 @@ void UIElement::setWidth(int width)
 void UIElement::setHeight(int height)
 {
     setSize(IntVector2(mSize.mX, height));
+}
+
+
+void UIElement::setMinSize(const IntVector2& minSize)
+{
+    mMinSize.mX = max(minSize.mX, 0);
+    mMinSize.mY = max(minSize.mY, 0);
+    mMaxSize.mX = max(minSize.mX, mMaxSize.mX);
+    mMaxSize.mY = max(minSize.mY, mMaxSize.mY);
+    setSize(mSize);
+}
+
+void UIElement::setMinSize(int width, int height)
+{
+    setMinSize(IntVector2(width, height));
+}
+
+void UIElement::setMinWidth(int width)
+{
+    setMaxSize(IntVector2(width, mMinSize.mY));
+}
+
+void UIElement::setMinHeight(int height)
+{
+    setMaxSize(IntVector2(mMinSize.mX, height));
+}
+
+void UIElement::setMaxSize(const IntVector2& maxSize)
+{
+    mMaxSize.mX = max(mMinSize.mX, maxSize.mX);
+    mMaxSize.mY = max(mMinSize.mY, maxSize.mY);
+    setSize(mSize);
+}
+
+void UIElement::setMaxSize(int width, int height)
+{
+    setMaxSize(IntVector2(width, height));
+}
+
+void UIElement::setMaxWidth(int width)
+{
+    setMaxSize(IntVector2(width, mMaxSize.mY));
+}
+
+void UIElement::setMaxHeight(int height)
+{
+    setMaxSize(IntVector2(mMaxSize.mX, height));
 }
 
 void UIElement::setAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
