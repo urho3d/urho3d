@@ -49,6 +49,8 @@ public:
     virtual void onFocus();
     //! React to losing focus
     virtual void onDefocus();
+    //! React to resize
+    virtual void onResize();
     
     //! Set view offset from the top-left corner
     void setViewPosition(const IntVector2& position);
@@ -96,8 +98,6 @@ protected:
     IntVector2 mViewPosition;
     //! Total view size
     IntVector2 mViewSize;
-    //! Last known own size
-    IntVector2 mLastSize;
     //! Arrow key scroll step
     float mScrollStep;
     //! Arrow key page step

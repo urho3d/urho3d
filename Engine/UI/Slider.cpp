@@ -131,6 +131,11 @@ void Slider::onDragEnd(const IntVector2& position, const IntVector2& screenPosit
     mDragSlider = false;
 }
 
+void Slider::onResize()
+{
+    updateSlider();
+}
+
 void Slider::setOrientation(UIElementOrientation orientation)
 {
     mOrientation = orientation;

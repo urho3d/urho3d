@@ -33,7 +33,6 @@ ScrollView::ScrollView(const std::string& name) :
     BorderImage(name),
     mViewPosition(IntVector2::sZero),
     mViewSize(IntVector2::sZero),
-    mLastSize(IntVector2::sZero),
     mScrollStep(0.25f),
     mPageStep(1.0f)
 {
@@ -71,17 +70,7 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
 
 void ScrollView::update(float timeStep)
 {
-    // If element size has changed, update view and sliders to reflect the new size. Otherwise get position from sliders
-    if (getSize() != mLastSize)
-    {
-        mLastSize = getSize();
-        mViewSize.mX = max(mViewSize.mX, mLastSize.mX);
-        mViewSize.mY = max(mViewSize.mY, mLastSize.mY);
-        updateView(mViewPosition);
-        updateSliders();
-    }
-    else
-        updateViewFromSliders();
+    updateViewFromSliders();
 }
 
 void ScrollView::onKey(int key, int buttons, int qualifiers)
@@ -167,6 +156,12 @@ void ScrollView::onDefocus()
         mVerticalSlider->setSelected(false);
 }
 
+void ScrollView::onResize()
+{
+    // This will grow the view size if it is smaller than current size
+    setViewSize(mViewSize);
+}
+
 void ScrollView::setViewPosition(const IntVector2& position)
 {
     updateView(position);
@@ -180,7 +175,6 @@ void ScrollView::setViewPosition(int x, int y)
 
 void ScrollView::setViewSize(const IntVector2& size)
 {
-    mLastSize = getSize();
     mViewSize.mX = max(size.mX, getWidth());
     mViewSize.mY = max(size.mY, getHeight());
     updateView(mViewPosition);

@@ -49,6 +49,8 @@ public:
     virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
+    //! React to resize
+    virtual void onResize();
     
     //! Set orientation
     void setOrientation(UIElementOrientation orientation);
