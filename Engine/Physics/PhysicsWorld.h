@@ -34,6 +34,7 @@
 
 class DebugRenderer;
 class Deserializer;
+class Entity;
 class Ray;
 class RigidBody;
 class Scene;
@@ -51,6 +52,36 @@ struct PhysicsRaycastResult
     float mDistance;
     //! Rigid body
     RigidBody* mBody;
+};
+
+//! Internal physics contact info
+struct PhysicsContactInfo
+{
+    //! World position
+    Vector3 mPosition;
+    //! World normal from perspective of first rigid body
+    Vector3 mNormal;
+    //! Penetration depth
+    float mDepth;
+    //! Velocity
+    float mVelocity;
+};
+
+//! Internal physics collision info
+struct PhysicsCollisionInfo
+{
+    //! First entity
+    WeakPtr<Entity> mEntityA;
+    //! Second entity
+    WeakPtr<Entity> mEntityB;
+    //! First rigid body
+    WeakPtr<RigidBody> mRigidBodyA;
+    //! Second rigid body
+    WeakPtr<RigidBody> mRigidBodyB;
+    //! New collision flag
+    bool mNewCollision;
+    //! Contacts
+    std::vector<PhysicsContactInfo> mContacts;
 };
 
 static const float PHYSICS_MIN_TIMESTEP = 0.001f;
@@ -154,6 +185,8 @@ public:
     void removeRigidBody(RigidBody* body);
     //! Draw debug geometry. Called by Engine
     void drawDebugGeometry(DebugRenderer* debug);
+    //! Send accumulated collision events
+    void sendCollisionEvents();
     
 private:
     //! ODE collision callback
@@ -186,9 +219,11 @@ private:
     //! Rigid bodies
     std::vector<RigidBody*> mRigidBodies;
     //! Collision pairs on this frame
-    std::set<std::pair<RigidBody*, RigidBody*> > mCollisions;
+    std::set<std::pair<RigidBody*, RigidBody*> > mCurrentCollisions;
     //! Collision pairs on the previous frame. Used to check if a collision is "new"
     std::set<std::pair<RigidBody*, RigidBody*> > mPreviousCollisions;
+    //! Collision infos to be sent as events
+    std::vector<PhysicsCollisionInfo> mCollisionInfos;
 };
 
 #endif // PHYSICS_PHYSICSWORLD_H

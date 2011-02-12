@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_config.h
@@ -796,6 +797,10 @@
 	#define AS_NO_THREADS
 #endif
 
+// Urho3D: modified to disable threading
+#ifndef AS_NO_THREADS
+#define AS_NO_THREADS
+#endif
 
 // The assert macro
 #if defined(ANDROID)

@@ -248,9 +248,12 @@ void PhysicsWorld::update(float timeStep)
                 PROFILE(Physics_Step);
                 dWorldQuickStep(mWorld, internalTimeStep);
                 dJointGroupEmpty(mContactJoints);
-                mPreviousCollisions = mCollisions;
-                mCollisions.clear();
+                mPreviousCollisions = mCurrentCollisions;
+                mCurrentCollisions.clear();
             }
+            
+            // Send accumulated collision events
+            sendCollisionEvents();
             
             // Interpolate transforms of physics objects
             float t = clamp(mTimeAcc / internalTimeStep, 0.0f, 1.0f);
@@ -427,14 +430,6 @@ float PhysicsWorld::getContactSurfaceLayer() const
     return dWorldGetContactSurfaceLayer(mWorld);
 }
 
-void PhysicsWorld::drawDebugGeometry(DebugRenderer* debug)
-{
-    PROFILE(Physics_DrawDebugGeometry);
-    
-    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
-        (*i)->drawDebugGeometry(debug);
-}
-
 void PhysicsWorld::addRigidBody(RigidBody* body)
 {
     mRigidBodies.push_back(body);
@@ -450,6 +445,83 @@ void PhysicsWorld::removeRigidBody(RigidBody* body)
             return;
         }
     }
+}
+
+void PhysicsWorld::drawDebugGeometry(DebugRenderer* debug)
+{
+    PROFILE(Physics_DrawDebugGeometry);
+    
+    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
+        (*i)->drawDebugGeometry(debug);
+}
+
+void PhysicsWorld::sendCollisionEvents()
+{
+    PROFILE(Physics_SendCollisionEvents);
+    
+    static VariantMap physicsCollisionData;
+    static VariantMap entityCollisionData;
+    static VectorBuffer contacts;
+    
+    physicsCollisionData[PhysicsCollision::P_WORLD] = (void*)this;
+    physicsCollisionData[PhysicsCollision::P_SCENE] = (void*)mScene;
+    
+    for (std::vector<PhysicsCollisionInfo>::const_iterator i = mCollisionInfos.begin(); i != mCollisionInfos.end(); ++i)
+    {
+        // Skip event if either of the bodies has been removed
+        if ((!i->mRigidBodyA) || (!i->mRigidBodyB))
+            continue;
+        
+        physicsCollisionData[PhysicsCollision::P_BODYA] = (void*)i->mRigidBodyA;
+        physicsCollisionData[PhysicsCollision::P_BODYB] = (void*)i->mRigidBodyB;
+        physicsCollisionData[PhysicsCollision::P_NEWCOLLISION] = i->mNewCollision;
+        
+        contacts.clear();
+        for (unsigned j = 0; j < i->mContacts.size(); ++j)
+        {
+            contacts.writeVector3(i->mContacts[j].mPosition);
+            contacts.writeVector3(i->mContacts[j].mNormal);
+            contacts.writeFloat(i->mContacts[j].mDepth);
+            contacts.writeFloat(i->mContacts[j].mVelocity);
+        }
+        physicsCollisionData[PhysicsCollision::P_CONTACTS] = contacts.getBuffer();
+        
+        sendEvent(EVENT_PHYSICSCOLLISION, physicsCollisionData);
+        
+        // Skip if either of the bodies or entities has been removed as a response to the just sent event
+        if ((!i->mRigidBodyA) || (!i->mRigidBodyB) || (!i->mEntityA) || (!i->mEntityB))
+            continue;
+        
+        entityCollisionData[EntityCollision::P_BODY] = (void*)i->mRigidBodyA;
+        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)i->mRigidBodyB;
+        entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)i->mEntityB;
+        entityCollisionData[EntityCollision::P_NEWCOLLISION] = i->mNewCollision;
+        entityCollisionData[EntityCollision::P_CONTACTS] = contacts.getBuffer();
+        
+        sendEvent(i->mEntityA, EVENT_ENTITYCOLLISION, entityCollisionData);
+        
+        // Skip if either of the bodies or entities has been removed as a response to the just sent event
+        if ((!i->mRigidBodyA) || (!i->mRigidBodyB) || (!i->mEntityA) || (!i->mEntityB))
+            continue;
+        
+        contacts.clear();
+        for (unsigned j = 0; j < i->mContacts.size(); ++j)
+        {
+            contacts.writeVector3(i->mContacts[j].mPosition);
+            contacts.writeVector3(-i->mContacts[j].mNormal);
+            contacts.writeFloat(i->mContacts[j].mDepth);
+            contacts.writeFloat(i->mContacts[j].mVelocity);
+        }
+        
+        entityCollisionData[EntityCollision::P_BODY] = (void*)i->mRigidBodyB;
+        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)i->mRigidBodyA;
+        entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)i->mEntityA;
+        entityCollisionData[EntityCollision::P_CONTACTS] = contacts.getBuffer();
+        
+        sendEvent(i->mEntityB, EVENT_ENTITYCOLLISION, entityCollisionData);
+    }
+    
+    mCollisionInfos.clear();
 }
 
 void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
@@ -514,23 +586,14 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     else
         bodyPair = std::make_pair(rigidBodyB, rigidBodyA);
     
-    static VariantMap collisionData;
-    static VariantMap entityCollisionData;
-    static VectorBuffer contactsA;
-    static VectorBuffer contactsB;
-    
-    collisionData[PhysicsCollision::P_WORLD] = (void*)world;
-    collisionData[PhysicsCollision::P_SCENE] = (void*)world->mScene;
-    collisionData[PhysicsCollision::P_BODYA] = (void*)rigidBodyA;
-    collisionData[PhysicsCollision::P_BODYB] = (void*)rigidBodyB;
-    
-    // Check if the same pair already collided on the last step
-    entityCollisionData[EntityCollision::P_NEWCOLLISION] = collisionData[PhysicsCollision::P_NEWCOLLISION] =
-        world->mPreviousCollisions.find(bodyPair) == world->mPreviousCollisions.end();
-    world->mCollisions.insert(bodyPair);
-    
-    contactsA.clear();
-    contactsB.clear();
+    static PhysicsCollisionInfo collisionInfo;
+    collisionInfo.mEntityA = entityA;
+    collisionInfo.mEntityB = entityB;
+    collisionInfo.mRigidBodyA = rigidBodyA;
+    collisionInfo.mRigidBodyB = rigidBodyB;
+    collisionInfo.mNewCollision = world->mPreviousCollisions.find(bodyPair) == world->mPreviousCollisions.end();
+    collisionInfo.mContacts.clear();
+    world->mCurrentCollisions.insert(bodyPair);
     
     for (unsigned i = 0; i < numContacts; ++i)
     {
@@ -569,42 +632,17 @@ void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
         dJointID contact = dJointCreateContact(world->mWorld, world->mContactJoints, &contacts[i]);
         dJointAttach(contact, bodyA, bodyB);
         
-        // Write contact data to the contact buffers: position, normal, depth, velocity
-        Vector3 position(contacts[i].geom.pos[0], contacts[i].geom.pos[1], contacts[i].geom.pos[2]);
-        Vector3 normal(contacts[i].geom.normal[0], contacts[i].geom.normal[1], contacts[i].geom.normal[2]);
-        contactsA.writeVector3(position);
-        contactsA.writeVector3(normal);
-        contactsA.writeFloat(contacts[i].geom.depth);
-        contactsA.writeFloat(length);
-        if (entityB)
-        {
-            contactsB.writeVector3(position);
-            contactsB.writeVector3(-normal);
-            contactsB.writeFloat(contacts[i].geom.depth);
-            contactsB.writeFloat(length);
-        }
+        // Store contact info
+        static PhysicsContactInfo contactInfo;
+        contactInfo.mPosition =  Vector3(contacts[i].geom.pos[0], contacts[i].geom.pos[1], contacts[i].geom.pos[2]);
+        contactInfo.mNormal = Vector3(contacts[i].geom.normal[0], contacts[i].geom.normal[1], contacts[i].geom.normal[2]);
+        contactInfo.mDepth = contacts[i].geom.depth;
+        contactInfo.mVelocity = length;
+        collisionInfo.mContacts.push_back(contactInfo);
     }
     
-    // Send collision events
-    collisionData[PhysicsCollision::P_CONTACTS] = contactsA.getBuffer();
-    world->sendEvent(EVENT_PHYSICSCOLLISION, collisionData);
-    
-    if (entityA)
-    {
-        entityCollisionData[EntityCollision::P_BODY] = (void*)rigidBodyA;
-        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyB;
-        entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityB;
-        entityCollisionData[EntityCollision::P_CONTACTS] = contactsA.getBuffer();
-        world->sendEvent(entityA, EVENT_ENTITYCOLLISION, entityCollisionData);
-    }
-    if (entityB)
-    {
-        entityCollisionData[EntityCollision::P_BODY] = (void*)rigidBodyB;
-        entityCollisionData[EntityCollision::P_OTHERBODY] = (void*)rigidBodyA;
-        entityCollisionData[EntityCollision::P_OTHERENTITY] = (void*)entityA;
-        entityCollisionData[EntityCollision::P_CONTACTS] = contactsB.getBuffer();
-        world->sendEvent(entityB, EVENT_ENTITYCOLLISION, entityCollisionData);
-    }
+    // Store collision info to be sent later
+    world->mCollisionInfos.push_back(collisionInfo);
     
     // Propagate transient prediction based on physics interactions
     // Note: during the actual rewind/replay phase this works poorly, because most bodies are disabled and

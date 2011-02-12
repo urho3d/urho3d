@@ -449,7 +449,7 @@ bool Ninja::onUpdate(float time)
             obj->setOrigin(getEntity()->getID());
             obj->getBody()->setLinearVelocity(projectileVel);
             
-            //! \todo the throw sound should be instant, and therefore predicted on client
+            //! \todo The throw sound should be instant, and therefore predicted on client
             playSound("Sounds/NutThrow.wav");
         }
         

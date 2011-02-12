@@ -273,6 +273,9 @@ void BillboardSet::updateDistance(const FrameInfo& frame)
     // Calculate scaled distance for animation LOD
     static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
     float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
+    // If there are no billboards, the size becomes zero, and updates no longer happen. Prevent this
+    if (scale < M_EPSILON)
+        scale = 1.0f;
     mLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
 }
 
@@ -414,7 +417,7 @@ void BillboardSet::onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox)
         else
             worldBoundingBox.merge(Sphere(worldTransform * mBillboards[i].mPosition, maxSize));
         
-        enabledBillboards++;
+        ++enabledBillboards;
     }
     
     // If no billboards enabled, the bounding box is just the node's world position
@@ -507,7 +510,7 @@ void BillboardSet::updateVertexBuffer(const FrameInfo& frame)
         for (unsigned i = 0; i < numBillboards; ++i)
         {
             if (mBillboards[i].mEnabled)
-                enabledBillboards++;
+                ++enabledBillboards;
         }
     }
     

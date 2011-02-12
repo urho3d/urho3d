@@ -267,10 +267,6 @@ void Engine::runFrame(Scene* scene, Camera* camera, bool updateScene)
         float timeStep = getNextTimeStep();
         update(timeStep, scene, camera, updateScene);
         render();
-        
-        // Perform script garbage collection outside everything else
-        if (mScriptEngine)
-            mScriptEngine->garbageCollect(false);
     }
     
     mProfiler->endFrame();
@@ -537,6 +533,10 @@ void Engine::update(float timeStep, Scene* scene, Camera* camera, bool updateSce
     
     // Application post-update
     sendEvent(EVENT_POSTUPDATE, updateData);
+    
+    // Perform script garbage collection at this point to make sure there are no "ghost" objects rendered
+    if (mScriptEngine)
+        mScriptEngine->garbageCollect(false);
     
     // Rendering and debug geometry update
     if (mPipeline)
