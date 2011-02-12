@@ -227,9 +227,6 @@ static const unsigned MASK_DEFAULT = 0xffffffff;
 static const unsigned NO_ELEMENT = 0xffffffff;
 
 static const float ANIMATION_LOD_BASESCALE = 2000.0f;
-static const float ANIMATION_LOD_INVISIBLE_FACTOR = 3.0f;
-
-static const unsigned MAX_VERTEX_LIGHTS = 4;
 
 static const unsigned MAX_CONSTANT_REGISTERS = 256;
 

@@ -55,10 +55,11 @@ AnimatedModel::AnimatedModel(Octant* octant, const std::string& name) :
     mAnimationLodBias(1.0f),
     mAnimationLodTimer(-1.0f),
     mAnimationLodDistance(0.0f),
+    mInvisibleLodFactor(0.0f),
+    mLocalAnimation(false),
     mAnimationDirty(true),
     mAnimationOrderDirty(true),
-    mMorphsDirty(true),
-    mLocalAnimation(false)
+    mMorphsDirty(true)
 {
 }
 
@@ -81,6 +82,8 @@ void AnimatedModel::save(Serializer& dest)
     
     // Write skeletal animation properties
     dest.writeFloat(mAnimationLodBias);
+    dest.writeFloat(mInvisibleLodFactor);
+    dest.writeBool(mLocalAnimation);
     // If this is the predicted component save, and local animation is enabled, do not store animation data
     bool localAnimation = (isProxy()) && (mLocalAnimation) && (checkPrediction());
     if (!localAnimation)
@@ -119,8 +122,10 @@ void AnimatedModel::load(Deserializer& source, ResourceCache* cache)
     
     // Read skeletal animation properties
     // If this is the predicted component load, and local animation is enabled, do not overwrite the animations
-    bool localAnimation = (isProxy()) && (mLocalAnimation) && (checkPrediction());
     mAnimationLodBias = source.readFloat();
+    mInvisibleLodFactor = source.readFloat();
+    mLocalAnimation = source.readBool();
+    bool localAnimation = (isProxy()) && (mLocalAnimation) && (checkPrediction());
     std::set<StringHash> processed;
     unsigned numAnimationStates = source.readVLE();
     for (unsigned i = 0; i < numAnimationStates; ++i)
@@ -158,6 +163,8 @@ void AnimatedModel::saveXML(XMLElement& dest)
     // Write skeletal animation properties
     XMLElement lodElem = dest.getChildElement("lod");
     lodElem.setFloat("animlodbias", mAnimationLodBias);
+    lodElem.setFloat("invisiblelodfactor", mInvisibleLodFactor);
+    lodElem.setBool("localanimation", mLocalAnimation);
     for (unsigned i = 0; i < mAnimationStates.size(); ++i)
     {
         XMLElement animationElem = dest.createChildElement("animation");
@@ -194,6 +201,8 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     // Read skeletal animation properties
     XMLElement lodElem = source.getChildElement("lod");
     mAnimationLodBias = lodElem.getFloat("animlodbias");
+    mInvisibleLodFactor = lodElem.getFloat("invisiblelodfactor");
+    mLocalAnimation = lodElem.getBool("localanimation");
     removeAllAnimationStates();
     XMLElement animationElem = source.getChildElement("animation");
     while (animationElem)
@@ -233,8 +242,9 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
         else
             baseRevision.readStringHash();
     }
-    // Animation LOD bias
-    checkFloat(mAnimationLodBias, baseRevision, bits, 4);
+    // Animation LOD bias and invisible animation LOD distance factor
+    checkFloat(mAnimationLodBias, 1.0f, baseRevision, bits, 4);
+    checkFloat(mInvisibleLodFactor, 0.0f, baseRevision, bits, 4);
     // Animations
     unsigned numBaseAnimations = baseRevision.getSize() ? baseRevision.readVLE() : 0;
     if (mAnimationStates.size() != numBaseAnimations)
@@ -311,6 +321,7 @@ bool AnimatedModel::writeNetUpdate(Serializer& dest, Serializer& destRevision, D
     for (unsigned i = 0; i < mMaterials.size(); ++i)
         writeStringHashDelta(getResourceHash(mMaterials[i]), dest, destRevision, bits & 2);
     writeFloatDelta(mAnimationLodBias, dest, destRevision, bits & 4);
+    writeFloatDelta(mInvisibleLodFactor, dest, destRevision, bits & 4);
     // Write all animations to the base replication state
     destRevision.writeVLE(mAnimationStates.size());
     for (unsigned i = 0; i < mAnimationStates.size(); ++i)
@@ -369,7 +380,11 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
         for (unsigned i = 0; i < numMaterials; ++i)
             setMaterial(i, cache->getResource<Material>(source.readStringHash()));
     }
-    readFloatDelta(mAnimationLodBias, source, bits & 4);
+    if (bits & 4)
+    {
+        mAnimationLodBias = source.readFloat();
+        mInvisibleLodFactor = source.readFloat();
+    }
     if (bits & 8)
     {
         unsigned numAnimations = source.readVLE();
@@ -434,8 +449,7 @@ void AnimatedModel::readNetUpdate(Deserializer& source, ResourceCache* cache, co
         for (unsigned i = 0; i < numMorphs; ++i)
             setMorphWeight(i, source.readUByte() / 255.0f);
     }
-    if (bits & 32)
-        mLocalAnimation = source.readBool();
+    readBoolDelta(mLocalAnimation, source, bits & 32);
 }
 
 void AnimatedModel::interpolate(bool snapToEnd)
@@ -536,6 +550,8 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
     // If headless, retain the current animation distance (should be 0)
     if ((frame.mCamera) && (abs((int)frame.mFrameNumber - (int)mAnimationLodFrameNumber) > 1))
     {
+        if (mInvisibleLodFactor == 0.0f)
+            return;
         float distance = frame.mCamera->getDistance(getWorldPosition());
         // If distance is greater than draw distance, no need to update at all
         if ((mDrawDistance != 0.0f) && (distance > mDrawDistance))
@@ -543,7 +559,7 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
         // Multiply the distance by a constant so that invisible nodes don't update that often
         static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
         float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
-        mAnimationLodDistance = frame.mCamera->getLodDistance(distance, scale, mLodBias) * ANIMATION_LOD_INVISIBLE_FACTOR;
+        mAnimationLodDistance = frame.mCamera->getLodDistance(distance, scale, mLodBias) * mInvisibleLodFactor;
     }
     
     updateAnimation(frame);
@@ -751,6 +767,20 @@ void AnimatedModel::setAnimationLodBias(float bias)
     mAnimationLodBias = max(bias, 0.0f);
 }
 
+void AnimatedModel::setInvisibleLodFactor(float factor)
+{
+    if (factor < 0.0f)
+        factor = 0.0f;
+    else if ((factor != 0.0f) && (factor < 1.0f))
+        factor = 1.0f;
+    mInvisibleLodFactor = factor;
+}
+
+void AnimatedModel::setLocalAnimation(bool enable)
+{
+    mLocalAnimation = enable;
+}
+
 void AnimatedModel::setMorphWeight(unsigned index, float weight)
 {
     if (index >= mMorphs.size())
@@ -853,11 +883,6 @@ void AnimatedModel::syncMorphs(AnimatedModel* srcNode)
         float srcWeight = srcNode->getMorphWeight(mMorphs[i].mName);
         setMorphWeight(i, srcWeight);
     }
-}
-
-void AnimatedModel::setLocalAnimation(bool enable)
-{
-    mLocalAnimation = enable;
 }
 
 float AnimatedModel::getMorphWeight(unsigned index) const

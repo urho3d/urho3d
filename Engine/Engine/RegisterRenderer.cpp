@@ -680,22 +680,24 @@ static void registerAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "void removeAnimationState(AnimationState@+)", asMETHODPR(AnimatedModel, removeAnimationState, (AnimationState*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void removeAllAnimationStates()", asMETHOD(AnimatedModel, removeAllAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void setAnimationLodBias(float)", asMETHOD(AnimatedModel, setAnimationLodBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void setInvisibleLodFactor(float)", asMETHOD(AnimatedModel, setInvisibleLodFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void setLocalAnimation(bool)", asMETHOD(AnimatedModel, setLocalAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void setMorphWeight(uint, float)", asMETHODPR(AnimatedModel, setMorphWeight, (unsigned, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void setMorphWeight(const string& in, float)", asMETHODPR(AnimatedModel, setMorphWeight, (const std::string&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void resetMorphWeights()", asMETHOD(AnimatedModel, resetMorphWeights), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void syncAnimation(AnimatedModel@+)", asMETHOD(AnimatedModel, syncAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void syncMorphs(AnimatedModel@+)", asMETHOD(AnimatedModel, syncMorphs), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void setLocalAnimation(bool)", asMETHOD(AnimatedModel, setLocalAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ getSkeleton() const", asMETHOD(AnimatedModel, getSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint getNumAnimationStates() const", asMETHOD(AnimatedModel, getNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(Animation@+) const", asMETHODPR(AnimatedModel, getAnimationState, (Animation*) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(const string& in) const", asMETHODPR(AnimatedModel, getAnimationState, (const std::string&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ getAnimationState(uint) const", asMETHODPR(AnimatedModel, getAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float getAnimationLodBias() const", asMETHOD(AnimatedModel, getAnimationLodBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float getInvisibleLodFactor() const", asMETHOD(AnimatedModel, getInvisibleLodFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "bool getLocalAnimation() const", asMETHOD(AnimatedModel, getLocalAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint getNumMorphs() const", asMETHOD(AnimatedModel, getNumMorphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(uint) const", asMETHODPR(AnimatedModel, getMorphWeight, (unsigned) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(const string& in) const", asMETHODPR(AnimatedModel, getMorphWeight, (const std::string&) const, float), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "bool getLocalAnimation() const", asMETHOD(AnimatedModel, getLocalAnimation), asCALL_THISCALL);
     registerRefCasts<Component, AnimatedModel>(engine, "Component", "AnimatedModel");
     registerRefCasts<Node, AnimatedModel>(engine, "Node", "AnimatedModel");
 }

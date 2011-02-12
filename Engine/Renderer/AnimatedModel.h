@@ -94,6 +94,10 @@ public:
     void removeAllAnimationStates();
     //! Set animation LOD bias
     void setAnimationLodBias(float bias);
+    //! Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible)
+    void setInvisibleLodFactor(float factor);
+    //! Set animation & morphs local mode. If enabled, and client prediction is active, they will not be sent over network
+    void setLocalAnimation(bool enable);
     //! Set vertex morph weight by index
     void setMorphWeight(unsigned index, float weight);
     //! Set vertex morph weight by name
@@ -106,8 +110,7 @@ public:
     void syncAnimation(AnimatedModel* srcNode);
     //! Sync morphs from another animated model
     void syncMorphs(AnimatedModel* srcNode);
-    //! Set animation & morphs local mode. If enabled, and prediction is active, they will not be sent over network
-    void setLocalAnimation(bool enable);
+    
     //! Return skeleton
     const Skeleton& getSkeleton() const { return mSkeleton; }
     //! Return all animation states
@@ -124,6 +127,10 @@ public:
     AnimationState* getAnimationState(unsigned index) const;
     //! Return animation LOD bias
     float getAnimationLodBias() const { return mAnimationLodBias; }
+    //! Return animation LOD distance factor when not visible
+    float getInvisibleLodFactor() const { return mInvisibleLodFactor; }
+    //! Return whether animation is local when client prediction is on
+    bool getLocalAnimation() const { return mLocalAnimation; }
     //! Return all vertex morphs
     const std::vector<ModelMorph>& getMorphs() const { return mMorphs; }
     //! Return all morph vertex buffers
@@ -136,8 +143,6 @@ public:
     float getMorphWeight(const std::string& name) const;
     //! Return vertex morph weight by name hash
     float getMorphWeight(StringHash nameHash) const;
-    //! Return whether animation is local when prediction is on
-    bool getLocalAnimation() const { return mLocalAnimation; }
     
 protected:
     //! Update world-space bounding box
@@ -191,14 +196,16 @@ private:
     float mAnimationLodTimer;
     //! Animation LOD distance, the minimum of all LOD view distances last frame
     float mAnimationLodDistance;
+    //! Animation LOD distance factor when not visible
+    float mInvisibleLodFactor;
+    //! Local animation flag
+    bool mLocalAnimation;
     //! Animation dirty flag
     bool mAnimationDirty;
     //! Animation order dirty flag
     bool mAnimationOrderDirty;
     //! Vertex morphs dirty flag
     bool mMorphsDirty;
-    //! Local animation flag
-    bool mLocalAnimation;
 };
 
 #endif // RENDERER_ANIMATEDMODEL_H

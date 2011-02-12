@@ -63,6 +63,7 @@ class Ninja : GameObject
         model.setMaterial(cache.getResource("Material", "Materials/Ninja.xml"));
         model.setDrawDistance(ninjaDrawDistance);
         model.setCastShadows(true);
+        model.setInvisibleLodFactor(3.0f);
 
         // Create animation controller
         AnimationController@ controller = entity.createComponent("AnimationController");
@@ -233,7 +234,7 @@ class Ninja : GameObject
             if (inAirTime > 0.01f)
                 controller.setAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 1.0, 1.0, 0.2, 0.0, true);
         }
-        
+
         // Shooting
         if (throwTime >= 0)
             throwTime -= timeStep;

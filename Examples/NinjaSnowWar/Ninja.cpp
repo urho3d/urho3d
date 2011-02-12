@@ -254,6 +254,7 @@ void Ninja::onCreate(const Vector3& position, const Quaternion& orientation)
     model->setMaterial(cache->getResource<Material>("Materials/Ninja.xml"));
     model->setDrawDistance(tRenderDistance);
     model->setCastShadows(true);
+    model->setInvisibleLodFactor(3.0f);
     
     // Create animation controller
     AnimationController* controller = createComponent<AnimationController>();
