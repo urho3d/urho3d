@@ -769,7 +769,10 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
                         
                         // Update geometry now if not updated yet
                         if (!geom->isInView(mFrame))
+                        {
+                            geom->markInShadowView(mFrame);
                             geom->updateGeometry(mFrame, renderer);
+                        }
                         sShadowCasters[index].push_back(geom);
                     }
                     break;

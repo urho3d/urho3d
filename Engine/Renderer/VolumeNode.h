@@ -119,6 +119,8 @@ public:
     void setSortValue(float value);
     //! Mark in view this frame. Called by View
     void markInView(const FrameInfo& frame);
+    //! Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View
+    void markInShadowView(const FrameInfo& frame);
     //! Return distance from camera
     float getDistance() const { return mDistance; }
     //! Return sorting value

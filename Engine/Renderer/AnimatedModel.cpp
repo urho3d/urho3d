@@ -548,7 +548,7 @@ void AnimatedModel::updateNode(const FrameInfo& frame)
     
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
-    if ((frame.mCamera) && (abs((int)frame.mFrameNumber - (int)mAnimationLodFrameNumber) > 1))
+    if ((frame.mCamera) && (abs((int)frame.mFrameNumber - (int)mViewFrameNumber) > 1))
     {
         if (mInvisibleLodFactor == 0.0f)
             return;

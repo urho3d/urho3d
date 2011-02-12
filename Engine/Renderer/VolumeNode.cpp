@@ -305,6 +305,15 @@ void VolumeNode::markInView(const FrameInfo& frame)
     mViewCamera = frame.mCamera;
 }
 
+void VolumeNode::markInShadowView(const FrameInfo& frame)
+{
+    if (mViewFrameNumber != frame.mFrameNumber)
+    {
+        mViewFrameNumber = frame.mFrameNumber;
+        mViewCamera = 0;
+    }
+}
+
 void VolumeNode::setSortValue(float value)
 {
     mSortValue = value;
