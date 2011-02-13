@@ -176,8 +176,7 @@ void ResourceCache::releaseResources(ShortStringHash type, bool force)
             for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.mResources.begin();
                 j != i->second.mResources.end();)
             {
-                std::map<StringHash, SharedPtr<Resource> >::iterator current = j;
-                ++j;
+                std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
                 // If other references exist, do not release, unless forced
                 if ((current->second.getRefCount() == 1) || (force))
                 {
@@ -205,8 +204,7 @@ void ResourceCache::releaseResources(ShortStringHash type, const std::string& pa
             for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.mResources.begin();
                 j != i->second.mResources.end();)
             {
-                std::map<StringHash, SharedPtr<Resource> >::iterator current = j;
-                ++j;
+                std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
                 if (current->second->getName().find(partialNameLower) != std::string::npos)
                 {
                     // If other references exist, do not release, unless forced

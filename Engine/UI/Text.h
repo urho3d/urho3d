@@ -45,17 +45,19 @@ public:
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
+    //! React to resize
+    virtual void onResize();
     
     //! Set font and font size
     bool setFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    //! Set maximum row width. If not 0, also fixes the element width to this value
-    void setMaxWidth(int maxWidth);
     //! Set text
     void setText(const std::string& text);
     //! Set row alignment
     void setTextAlignment(HorizontalAlignment align);
     //! Set row spacing, 1.0 for original font spacing
     void setRowSpacing(float spacing);
+    //! Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely
+    void setWordwrap(bool enable);
     //! Set selection
     void setSelection(unsigned start, unsigned length);
     //! Clear selection
@@ -69,14 +71,14 @@ public:
     Font* getFont() const { return mFont; }
     //! Return font size
     int getFontSize() const { return mFontSize; }
-    //! Return maximum row width
-    int getMaxWidth() const { return mMaxWidth; }
     //! Return text
     const std::string& getText() const { return mText; }
     //! Return row alignment
     HorizontalAlignment getTextAlignment() const { return mTextAlignment; }
     //! Return row spacing
     float getRowSpacing() const { return mRowSpacing; }
+    //! Return wordwrap mode
+    bool getWordwrap() const { return mWordwrap; }
     //! Return selection start
     unsigned getSelectionStart() const { return mSelectionStart; }
     //! Return selection length
@@ -98,7 +100,7 @@ public:
     
 protected:
     //! Update text when text, font or spacing changed
-    void updateText();
+    void updateText(bool inResize = false);
     //! Validate text selection to be within the text
     void validateSelection();
     //! Return row start X position
@@ -108,8 +110,6 @@ protected:
     SharedPtr<Font> mFont;
     //! Font size
     int mFontSize;
-    //! Maximum row width
-    int mMaxWidth;
     //! Text
     std::string mText;
     //! Text modified into printed form
@@ -118,6 +118,8 @@ protected:
     HorizontalAlignment mTextAlignment;
     //! Row spacing
     float mRowSpacing;
+    //! Wordwrap mode
+    bool mWordwrap;
     //! Selection start
     unsigned mSelectionStart;
     //! Selection length

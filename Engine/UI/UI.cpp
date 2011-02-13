@@ -345,19 +345,56 @@ void UI::update(float timeStep, UIElement* element)
 
 void UI::getBatches(UIElement* element, IntRect currentScissor)
 {
-    // If hidden, do not draw this element or its children
-    if (!element->isVisible())
+    // Set clipping scissor for child elements. No need to draw if zero size
+    element->adjustScissor(currentScissor);
+    if ((currentScissor.mLeft == currentScissor.mRight) || (currentScissor.mTop == currentScissor.mBottom))
         return;
     
-    element->getBatches(mBatches, mQuads, currentScissor);
-    
-    // Set clipping scissor for child elements, then get child element batches in low-to-high priority order
-    element->adjustScissor(currentScissor);
     std::vector<UIElement*> children = element->getChildren();
+    if (children.empty())
+        return;
+    
     std::sort(children.begin(), children.end(), compareUIElements);
     
-    for (std::vector<UIElement*>::const_iterator i = children.begin(); i != children.end(); ++i)
-        getBatches(*i, currentScissor);
+    // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
+    // same renderstate
+    std::vector<UIElement*>::const_iterator i = children.begin();
+    if (element != mRootElement)
+    {
+        std::vector<UIElement*>::const_iterator j = i;
+        int currentPriority = children.front()->getPriority();
+        while (i != children.end())
+        {
+            while ((j != children.end()) && ((*j)->getPriority() == currentPriority))
+            {
+                if ((*j)->isVisible())
+                    (*j)->getBatches(mBatches, mQuads, currentScissor);
+                ++j;
+            }
+            // Now recurse into the children
+            while (i != j)
+            {
+                if ((*i)->isVisible())
+                    getBatches(*i, currentScissor);
+                ++i;
+            }
+            if (i != children.end())
+                currentPriority = (*i)->getPriority();
+        }
+    }
+    // On the root level draw each element and its children immediately after to avoid artifacts
+    else
+    {
+        while (i != children.end())
+        {
+            if ((*i)->isVisible())
+            {
+                (*i)->getBatches(mBatches, mQuads, currentScissor);
+                getBatches(*i, currentScissor);
+            }
+            ++i;
+        }
+    }
 }
 
 void UI::getElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly)

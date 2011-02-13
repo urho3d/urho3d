@@ -273,10 +273,11 @@ void BillboardSet::updateDistance(const FrameInfo& frame)
     // Calculate scaled distance for animation LOD
     static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
     float scale = getWorldBoundingBox().getSize().dotProduct(dotScale);
-    // If there are no billboards, the size becomes zero, and updates no longer happen. Prevent this
-    if (scale < M_EPSILON)
-        scale = 1.0f;
-    mLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
+    // If there are no billboards, the size becomes zero, and LOD'ed updates no longer happen. Disable LOD in that case
+    if (scale > M_EPSILON)
+        mLodDistance = frame.mCamera->getLodDistance(mDistance, scale, mLodBias);
+    else
+        mLodDistance = 0.0f;
 }
 
 void BillboardSet::updateGeometry(const FrameInfo& frame, Renderer* renderer)

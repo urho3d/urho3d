@@ -750,8 +750,7 @@ void CollisionShape::cleanupCaches()
     for (std::map<std::string, SharedPtr<TriangleMeshData> >::iterator i = sTriangleMeshCache.begin();
         i != sTriangleMeshCache.end();)
     {
-        std::map<std::string, SharedPtr<TriangleMeshData> >::iterator current = i;
-        ++i;
+        std::map<std::string, SharedPtr<TriangleMeshData> >::iterator current = i++;
         if (current->second.getRefCount() == 1)
             sTriangleMeshCache.erase(current);
     }
@@ -759,8 +758,7 @@ void CollisionShape::cleanupCaches()
     for (std::map<std::string, SharedPtr<HeightfieldData> >::iterator i = sHeightfieldCache.begin();
         i != sHeightfieldCache.end();)
     {
-        std::map<std::string, SharedPtr<HeightfieldData> >::iterator current = i;
-        ++i;
+        std::map<std::string, SharedPtr<HeightfieldData> >::iterator current = i++;
         if (current->second.getRefCount() == 1)
             sHeightfieldCache.erase(current);
     }

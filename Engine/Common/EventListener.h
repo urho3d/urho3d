@@ -26,6 +26,8 @@
 
 #include "Event.h"
 
+#include <list>
+
 class EventListener;
 
 //! Internal helper class for invoking event handler functions
@@ -141,9 +143,6 @@ protected:
     //! Event handlers for specific senders' events
     std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*> mSpecificEventHandlers;
     
-    //! Event sender. Only non-null during event handling
-    static EventListener* sSender;
-    
 private:
     //! Prevent copy construction
     EventListener(const EventListener& rhs);
@@ -151,9 +150,9 @@ private:
     EventListener& operator = (const EventListener& rhs);
     
     //! Event listeners for non-specific events
-    static std::map<StringHash, std::vector<EventListener*> > sEventListeners;
+    static std::map<StringHash, std::list<EventListener*> > sEventListeners;
     //! Event listeners for specific senders' events
-    static std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > sSpecificEventListeners;
+    static std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> > sSpecificEventListeners;
 };
 
 //! Return event sender. Only non-null during the event handling

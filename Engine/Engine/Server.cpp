@@ -199,8 +199,7 @@ void Server::update(float timeStep)
     // Close file transfers that have been unused for some time
     for (std::map<StringHash, ServerFileTransfer>::iterator i = mFileTransfers.begin(); i != mFileTransfers.end();)
     {
-        std::map<StringHash, ServerFileTransfer>::iterator current = i;
-        ++i;
+        std::map<StringHash, ServerFileTransfer>::iterator current = i++;
         if (current->second.mCloseTimer.getMSec(false) > FILE_TIMEOUT)
             mFileTransfers.erase(current);
     }

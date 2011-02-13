@@ -48,7 +48,7 @@ enum VerticalAlignment
 };
 
 //! UI element corners
-enum UIElementCorner
+enum Corner
 {
     C_TOPLEFT = 0,
     C_TOPRIGHT,
@@ -58,10 +58,18 @@ enum UIElementCorner
 };
 
 //! UI element orientation
-enum UIElementOrientation
+enum Orientation
 {
     O_HORIZONTAL = 0,
     O_VERTICAL
+};
+
+//! Layout operation mode
+enum LayoutMode
+{
+    LM_FREE = 0,
+    LM_RESIZECHILDREN,
+    LM_RESIZEELEMENT
 };
 
 class ResourceCache;
@@ -69,7 +77,7 @@ class ResourceCache;
 //! Base class for UI elements
 class UIElement : public HashedType, public EventListener
 {
-    DEFINE_TYPE(UIElement);
+    DEFINE_TYPE(Element);
     
 public:
     //! Construct with name
@@ -102,7 +110,7 @@ public:
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character
     virtual void onChar(unsigned char c, int buttons, int qualifiers);
-    //! React to resize. The widget should not be further resized inside this function
+    //! React to resize
     virtual void onResize();
     //! React to gaining focus
     virtual void onFocus();
@@ -139,6 +147,14 @@ public:
     void setMaxWidth(int width);
     //! Set maximum height
     void setMaxHeight(int height);
+    //! Set fixed size
+    void setFixedSize(const IntVector2& size);
+    //! Set fixed size
+    void setFixedSize(int width, int height);
+    //! Set fixed width
+    void setFixedWidth(int width);
+    //! Set fixed height
+    void setFixedHeight(int height);
     //! Set horizontal and vertical alignment
     void setAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     //! Set horizontal alignment
@@ -152,7 +168,7 @@ public:
     //! Set color on all corners
     void setColor(const Color& color);
     //! Set color on one corner
-    void setColor(UIElementCorner corner, const Color& color);
+    void setColor(Corner corner, const Color& color);
     //! Set priority
     void setPriority(int priority);
     //! Set opacity
@@ -179,6 +195,11 @@ public:
     void setUserData(const Variant& userData);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
+    //! Set layout
+    void setLayout(Orientation layoutOrientation, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
+        const IntRect& border = IntRect::sZero);
+    //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
+    void updateLayout();
     //! Bring UI element to front
     void bringToFront();
     //! Add a child element
@@ -187,10 +208,6 @@ public:
     void removeChild(UIElement* element);
     //! Remove all child elements
     void removeAllChildren();
-    //! Layout child elements horizontally. Expand/contract the element optionally
-    void layoutHorizontal(int spacing = 0, const IntRect& border = IntRect::sZero, bool expand = true, bool contract = true);
-    //! Layout child elements vertically. Expand/contract the element optionally
-    void layoutVertical(int spacing = 0, const IntRect& border = IntRect::sZero, bool expand = true, bool contract = true);
     
     //! Return name
     const std::string& getName() const { return mName; }
@@ -223,7 +240,7 @@ public:
     //! Return child element clipping border
     const IntRect& getClipBorder() const { return mClipBorder; }
     //! Return corner color
-    const Color& getColor(UIElementCorner corner) const { return mColor[corner]; }
+    const Color& getColor(Corner corner) const { return mColor[corner]; }
     //! Return priority
     int getPriority() const { return mPriority; }
     //! Return opacity
@@ -252,6 +269,16 @@ public:
     bool hasColorGradient() const { return mHasColorGradient; }
     //! Return userdata
     Variant getUserData() const { return mUserData; }
+    //! Return layout orientation
+    Orientation getLayoutOrientation() const { return mLayoutOrientation; }
+    //! Return horizontal layout mode
+    LayoutMode getHorizontalLayoutMode() const { return mHorizontalLayoutMode; }
+    //! Return vertical layout mode
+    LayoutMode getVerticalLayoutMode() const { return mVerticalLayoutMode; }
+    //! Return layout spacing
+    int getLayoutSpacing() const { return mLayoutSpacing; }
+    //! Return layout border
+    const IntRect& getLayoutBorder() const { return mLayoutBorder; }
     //! Return number of child elements
     unsigned getNumChildren(bool recursive = false) const;
     //! Return child element by index
@@ -332,6 +359,16 @@ protected:
     bool mHovering;
     //! Userdata
     Variant mUserData;
+    //! Layout orientation
+    Orientation mLayoutOrientation;
+    //! Horizontal layout mode
+    LayoutMode mHorizontalLayoutMode;
+    //! Vertical layout mode
+    LayoutMode mVerticalLayoutMode;
+    //! Layout spacing
+    int mLayoutSpacing;
+    //! Layout borders
+    IntRect mLayoutBorder;
     
     //! Clipboard data
     static std::string sClipBoard;
@@ -339,10 +376,11 @@ protected:
 private:
     //! Return child elements recursively
     void getChildrenRecursive(std::vector<UIElement*>& dest) const;
-    //! Adjust size after laying out the child elements
-    void adjustSize(const IntVector2& neededSize, bool expand, bool contract);
-    //! Validate size against min & max size
-    void validateSize();
+    //! Calculate layout width for resizing the parent element
+    int calculateLayoutParentSize(const std::vector<int>& sizes, int begin, int end, int spacing);
+    //! Calculate child widths/positions in the layout
+    void calculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
+        const std::vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
     
     //! Position
     IntVector2 mPosition;
@@ -370,6 +408,10 @@ private:
     bool mDerivedOpacityDirty;
     //! Has color gradient flag
     bool mHasColorGradient;
+    //! Resize nesting level to prevent multiple events and endless loop
+    unsigned mResizeNestingLevel;
+    //! Layout update nesting level to prevent endless loop
+    unsigned mUpdateLayoutNestingLevel;
 };
 
 #endif // UI_UIELEMENT_H

@@ -223,8 +223,6 @@ void Engine::init(const std::vector<std::string>& arguments)
     
     mInput = new Input(mRenderer);
     
-    mNetwork = new Network();
-    
     // If no resource paths or packages already defined, add the default resource path
     if ((mCache->getPackageFiles().empty()) && (mCache->getResourcePaths().empty()))
         mCache->addResourcePath("Data");
@@ -237,12 +235,14 @@ void Engine::init(const std::vector<std::string>& arguments)
     
     if (!mHeadless)
     {
-        mDebugRenderer = new DebugRenderer(mRenderer, mCache);
         mPipeline = new Pipeline(mRenderer, mCache);
+        mDebugRenderer = new DebugRenderer(mRenderer, mCache);
         mUI = new UI(mRenderer, mCache);
         if (!shadows)
             mPipeline->setDrawShadows(false);
     }
+    
+    mNetwork = new Network();
     
     mInitialized = true;
 }

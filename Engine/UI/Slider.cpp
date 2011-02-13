@@ -136,7 +136,7 @@ void Slider::onResize()
     updateSlider();
 }
 
-void Slider::setOrientation(UIElementOrientation orientation)
+void Slider::setOrientation(Orientation orientation)
 {
     mOrientation = orientation;
     updateSlider();

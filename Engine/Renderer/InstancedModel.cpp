@@ -994,8 +994,7 @@ void InstancedModel::cleanupInstanceBuffers()
     for (std::map<const VertexBuffer*, SharedPtr<VertexBuffer> >::iterator i = sInstanceVertexBuffers.begin();
         i != sInstanceVertexBuffers.end();)
     {
-        std::map<const VertexBuffer*, SharedPtr<VertexBuffer> >::iterator current = i;
-        ++i;
+        std::map<const VertexBuffer*, SharedPtr<VertexBuffer> >::iterator current = i++;
         if (current->second.getRefCount() == 1)
             sInstanceVertexBuffers.erase(current);
     }
@@ -1003,8 +1002,7 @@ void InstancedModel::cleanupInstanceBuffers()
     for (std::map<std::pair<const IndexBuffer*, unsigned>, SharedPtr<IndexBuffer> >::iterator i = sInstanceIndexBuffers.begin();
         i != sInstanceIndexBuffers.end();)
     {
-        std::map<std::pair<const IndexBuffer*, unsigned>, SharedPtr<IndexBuffer> >::iterator current = i;
-        ++i;
+        std::map<std::pair<const IndexBuffer*, unsigned>, SharedPtr<IndexBuffer> >::iterator current = i++;
         if (current->second.getRefCount() == 1)
             sInstanceIndexBuffers.erase(current);
     }

@@ -1109,13 +1109,15 @@ void Game::updateCamera()
     dir = dir * Quaternion(mControls.mYaw, Vector3::sUp);
     dir = dir * Quaternion(mControls.mPitch, Vector3::sRight);
     // Force the player character rotation, so that there is no stuttering
-    bool alive = player->getHealth() > 0;
-    if (alive)
+    if (mClient)
     {
-        Quaternion rot(mControls.mYaw, Vector3::sUp);
-        body->setRotation(rot);
-        if (mClient)
+        bool alive = player->getHealth() > 0;
+        if (alive)
+        {
+            Quaternion rot(mControls.mYaw, Vector3::sUp);
+            body->setRotation(rot);
             body->Node::setRotation(rot); // This disables client-side rotation smoothing
+        }
     }
     
     Vector3 aimPoint = pos + Vector3(0,100,0);

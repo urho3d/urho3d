@@ -63,6 +63,7 @@ Console::Console(Engine* engine) :
         mBackground->setEnabled(true);
         mBackground->setVisible(false);
         mBackground->setPriority(200); // Show on top of the debug HUD
+        mBackground->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT, 0, IntRect(4, 4, 4, 4));
         
         mLineEdit = new LineEdit();
         mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
@@ -130,10 +131,8 @@ void Console::setNumRows(unsigned rows)
     if (!mBackground)
         return;
     
-    for (unsigned i = 0; i < mRows.size(); ++i)
-        mBackground->removeChild(mRows[i]);
+    mBackground->removeAllChildren();
     mRows.clear();
-    mBackground->removeChild(mLineEdit);
     
     mRows.resize(rows);
     for (unsigned i = 0; i < mRows.size(); ++i)
@@ -175,12 +174,8 @@ void Console::updateElements()
         mLineEdit->getTextElement()->setFont(mFont, mFontSize);
     }
     
-    mLineEdit->setWidth(width - 8);
     mLineEdit->setHeight(mLineEdit->getTextElement()->getRowHeight());
-    mBackground->layoutVertical(0, IntRect(4, 4, 4, 4), true, true);
-    
-    if (mBackground->getWidth() > width)
-        mBackground->setWidth(width);
+    mBackground->setWidth(width);
 }
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)

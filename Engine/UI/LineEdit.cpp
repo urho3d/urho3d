@@ -285,6 +285,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
             else
                 mLine = mLine.substr(0, start);
             mText->clearSelection();
+            mCursorPosition = start;
             changed = true;
         }
         break;
@@ -315,13 +316,29 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
     
     if (c == '\b')
     {
-        if ((mLine.length()) && (mCursorPosition))
+        if (!mText->getSelectionLength())
         {
-            if (mCursorPosition < mLine.length())
-                mLine = mLine.substr(0, mCursorPosition - 1) + mLine.substr(mCursorPosition);
+            if ((mLine.length()) && (mCursorPosition))
+            {
+                if (mCursorPosition < mLine.length())
+                    mLine = mLine.substr(0, mCursorPosition - 1) + mLine.substr(mCursorPosition);
+                else
+                    mLine = mLine.substr(0, mCursorPosition - 1);
+                --mCursorPosition;
+                changed = true;
+            }
+        }
+        else
+        {
+            // If a selection exists, erase it
+            unsigned start = mText->getSelectionStart();
+            unsigned length = mText->getSelectionLength();
+            if (start + length < mLine.length())
+                mLine = mLine.substr(0, start) + mLine.substr(start + length);
             else
-                mLine = mLine.substr(0, mCursorPosition - 1);
-            --mCursorPosition;
+                mLine = mLine.substr(0, start);
+            mText->clearSelection();
+            mCursorPosition = start;
             changed = true;
         }
     }

@@ -54,15 +54,20 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("VerticalAlignment", "VA_CENTER", VA_CENTER);
     engine->RegisterEnumValue("VerticalAlignment", "VA_BOTTOM", VA_BOTTOM);
     
-    engine->RegisterEnum("UIElementCorner");
-    engine->RegisterEnumValue("UIElementCorner", "C_TOPLEFT", C_TOPLEFT);
-    engine->RegisterEnumValue("UIElementCorner", "C_TOPRIGHT", C_TOPRIGHT);
-    engine->RegisterEnumValue("UIElementCorner", "C_BOTTOMLEFT", C_BOTTOMLEFT);
-    engine->RegisterEnumValue("UIElementCorner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
+    engine->RegisterEnum("Corner");
+    engine->RegisterEnumValue("Corner", "C_TOPLEFT", C_TOPLEFT);
+    engine->RegisterEnumValue("Corner", "C_TOPRIGHT", C_TOPRIGHT);
+    engine->RegisterEnumValue("Corner", "C_BOTTOMLEFT", C_BOTTOMLEFT);
+    engine->RegisterEnumValue("Corner", "C_BOTTOMRIGHT", C_BOTTOMRIGHT);
     
-    engine->RegisterEnum("UIElementOrientation");
-    engine->RegisterEnumValue("UIElementOrientation", "O_HORIZONTAL", O_HORIZONTAL);
-    engine->RegisterEnumValue("UIElementOrientation", "O_VERTICAL", O_VERTICAL);
+    engine->RegisterEnum("Orientation");
+    engine->RegisterEnumValue("Orientation", "O_HORIZONTAL", O_HORIZONTAL);
+    engine->RegisterEnumValue("Orientation", "O_VERTICAL", O_VERTICAL);
+    
+    engine->RegisterEnum("LayoutMode");
+    engine->RegisterEnumValue("LayoutMode", "LM_FREE", LM_FREE);
+    engine->RegisterEnumValue("LayoutMode", "LM_RESIZECHILDREN", LM_RESIZECHILDREN);
+    engine->RegisterEnumValue("LayoutMode", "LM_RESIZEELEMENT", LM_RESIZEELEMENT);
     
     registerUIElement<UIElement>(engine, "UIElement");
     
@@ -111,10 +116,10 @@ static void registerCheckBox(asIScriptEngine* engine)
 static void registerSlider(asIScriptEngine* engine)
 {
     registerBorderImage<Slider>(engine, "Slider");
-    engine->RegisterObjectMethod("Slider", "void setOrientation(UIElementOrientation)", asMETHOD(Slider, setOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "void setOrientation(Orientation)", asMETHOD(Slider, setOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "void setRange(float)", asMETHOD(Slider, setRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "void setValue(float)", asMETHOD(Slider, setValue), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Slider", "UIElementOrientation getOrientation() const", asMETHOD(Slider, getOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "Orientation getOrientation() const", asMETHOD(Slider, getOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getRange() const", asMETHOD(Slider, getRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getValue() const", asMETHOD(Slider, getValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "BorderImage@+ getSliderElement() const", asMETHOD(Slider, getSliderElement), asCALL_THISCALL);
@@ -145,10 +150,10 @@ static void registerText(asIScriptEngine* engine)
 {
     registerUIElement<Text>(engine, "Text");
     engine->RegisterObjectMethod("Text", "bool setFont(Font@+, int)", asMETHOD(Text, setFont), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "void setMaxWidth(int)", asMETHOD(Text, setMaxWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setText(const string& in)", asMETHOD(Text, setText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setTextAlignment(HorizontalAlignment)", asMETHOD(Text, setTextAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setRowSpacing(float)", asMETHOD(Text, setRowSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void setWordwrap(bool)", asMETHOD(Text, setWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setSelection(uint, uint)", asMETHOD(Text, setSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void clearSelection()", asMETHOD(Text, clearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void setSelectionColor(const Color& in)", asMETHOD(Text, setSelectionColor), asCALL_THISCALL);
@@ -159,6 +164,7 @@ static void registerText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "const string& getText() const", asMETHOD(Text, getText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "HorizontalAlignment getTextAlignment() const", asMETHOD(Text, getTextAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "float getRowSpacing() const", asMETHOD(Text, getRowSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool getWordwrap() const", asMETHOD(Text, getWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint getSelectionStart() const", asMETHOD(Text, getSelectionStart), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint getSelectionLength() const", asMETHOD(Text, getSelectionLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const Color& getSelectionColor() const", asMETHOD(Text, getSelectionColor), asCALL_THISCALL);

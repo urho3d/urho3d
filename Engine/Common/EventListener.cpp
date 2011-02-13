@@ -33,8 +33,8 @@
 
 static VariantMap noEventData;
 
-std::map<StringHash, std::vector<EventListener*> > EventListener::sEventListeners;
-std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > EventListener::sSpecificEventListeners;
+std::map<StringHash, std::list<EventListener*> > EventListener::sEventListeners;
+std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> > EventListener::sSpecificEventListeners;
 
 EventListener* eventSender = 0;
 
@@ -47,15 +47,14 @@ EventListener::~EventListener()
     unsubscribeFromAllEvents();
     
     // Remove from all specific event listeners
-    for (std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::iterator i = sSpecificEventListeners.begin();
+    for (std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::iterator i = sSpecificEventListeners.begin();
         i != sSpecificEventListeners.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::iterator current = i++;
         if (current->first.first == this)
         {
-            std::vector<EventListener*>& listeners = current->second;
-            for (std::vector<EventListener*>::iterator j = listeners.begin(); j != listeners.end(); ++j)
+            std::list<EventListener*>& listeners = current->second;
+            for (std::list<EventListener*>::iterator j = listeners.begin(); j != listeners.end(); ++j)
                 (*j)->removeSpecificEventHandlers(this);
             sSpecificEventListeners.erase(current);
         }
@@ -93,8 +92,8 @@ void EventListener::subscribeToEvent(StringHash eventType, EventHandlerInvoker* 
     
     mEventHandlers[eventType] = handler;
     
-    std::vector<EventListener*>& listeners = sEventListeners[eventType];
-    for (std::vector<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
+    std::list<EventListener*>& listeners = sEventListeners[eventType];
+    for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
     {
         // Check if already registered
         if (*j == this)
@@ -127,8 +126,8 @@ void EventListener::subscribeToEvent(EventListener* sender, StringHash eventType
     
     mSpecificEventHandlers[combination] = handler;
     
-    std::vector<EventListener*>& listeners = sSpecificEventListeners[combination];
-    for (std::vector<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
+    std::list<EventListener*>& listeners = sSpecificEventListeners[combination];
+    for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
     {
         // Check if already registered
         if (*j == this)
@@ -144,8 +143,7 @@ void EventListener::unsubscribeFromEvent(StringHash eventType)
     for (std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator i = mSpecificEventHandlers.begin();
         i != mSpecificEventHandlers.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i++;
         if (current->first.second == eventType)
         {
             removeEventListener(current->first.first, current->first.second);
@@ -182,8 +180,7 @@ void EventListener::unsubscribeFromEvents(EventListener* sender)
     for (std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator i = mSpecificEventHandlers.begin();
         i != mSpecificEventHandlers.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i++;
         if (current->first.first == sender)
         {
             removeEventListener(current->first.first, current->first.second);
@@ -220,44 +217,54 @@ void EventListener::sendEvent(StringHash eventType)
 
 void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
 {
-    eventSender = this;
-    
     std::set<EventListener*> processed;
     
     // Check first the specific event listeners
-    std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::const_iterator i = sSpecificEventListeners.find(
+    std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::const_iterator i = sSpecificEventListeners.find(
         std::make_pair(this, eventType));
     if (i != sSpecificEventListeners.end())
     {
-        const std::vector<EventListener*>& listeners = i->second;
-        // Iterate in reverse direction in case listeners remove themselves as a response
-        for (unsigned j = listeners.size() - 1; j < listeners.size(); --j)
+        const std::list<EventListener*>& listeners = i->second;
+        for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end();)
         {
-            listeners[j]->onEvent(this, eventType, eventData);
-            processed.insert(listeners[j]);
+            // Make a copy of the iterator, because the listener might remove itself as a response
+            std::list<EventListener*>::const_iterator current = j++;
+            processed.insert(*current);
+            eventSender = this;
+            (*current)->onEvent(this, eventType, eventData);
         }
     }
     
     // Then the non-specific listeners
-    std::map<StringHash, std::vector<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
+    std::map<StringHash, std::list<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
     if (j == sEventListeners.end())
     {
         eventSender = 0;
         return;
     }
-    const std::vector<EventListener*>& listeners = j->second;
+    const std::list<EventListener*>& listeners = j->second;
     if (processed.empty())
     {
-        for (unsigned k = listeners.size() - 1; k < listeners.size(); --k)
-            listeners[k]->onEvent(this, eventType, eventData);
+        for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
+        {
+            std::list<EventListener*>::const_iterator current = k++;
+            eventSender = this;
+            (*current)->onEvent(this, eventType, eventData);
+        }
     }
     else
     {
         // If there were specific listeners, check that the event is not sent doubly to them
-        for (unsigned k = listeners.size() - 1; k < listeners.size(); --k)
+        for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
         {
-            if (processed.find(listeners[k]) == processed.end())
-                listeners[k]->onEvent(this, eventType, eventData);
+            if (processed.find(*k) == processed.end())
+            {
+                std::list<EventListener*>::const_iterator current = k++;
+                eventSender = this;
+                (*current)->onEvent(this, eventType, eventData);
+            }
+            else
+                ++k;
         }
     }
     
@@ -267,13 +274,21 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
 void EventListener::sendEvent(EventListener* receiver, StringHash eventType)
 {
     if (receiver)
+    {
+        eventSender = this;
         receiver->onEvent(this, eventType, noEventData);
+        eventSender = 0;
+    }
 }
 
 void EventListener::sendEvent(EventListener* receiver, StringHash eventType, VariantMap& eventData)
 {
     if (receiver)
+    {
+        eventSender = this;
         receiver->onEvent(this, eventType, eventData);
+        eventSender = 0;
+    }
 }
 
 bool EventListener::hasSubscribedToEvent(StringHash eventType) const
@@ -291,8 +306,7 @@ void EventListener::removeSpecificEventHandlers(EventListener* sender)
     for (std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator i = mSpecificEventHandlers.begin();
         i != mSpecificEventHandlers.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i++;
         if (current->first.first == sender)
         {
             delete current->second;
@@ -303,8 +317,8 @@ void EventListener::removeSpecificEventHandlers(EventListener* sender)
 
 void EventListener::removeEventListener(StringHash eventType)
 {
-    std::vector<EventListener*>& listeners = sEventListeners[eventType];
-    for (std::vector<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
+    std::list<EventListener*>& listeners = sEventListeners[eventType];
+    for (std::list<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
     {
         if (*i == this)
         {
@@ -316,8 +330,8 @@ void EventListener::removeEventListener(StringHash eventType)
 
 void EventListener::removeEventListener(EventListener* sender, StringHash eventType)
 {
-    std::vector<EventListener*>& listeners = sSpecificEventListeners[std::make_pair(sender, eventType)];
-    for (std::vector<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
+    std::list<EventListener*>& listeners = sSpecificEventListeners[std::make_pair(sender, eventType)];
+    for (std::list<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
     {
         if (*i == this)
         {

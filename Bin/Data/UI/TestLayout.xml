@@ -42,9 +42,10 @@
             <verticalslider name="ViewSliderV" />
             <element type="Text">
                 <position value="1 1" />
+                <size value="200 150" />
                 <font name="times.ttf" size="15" />
                 <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
-                <maxwidth value="200" />
+                <wordwrap enable="true" />
             </element>
         </element>
         <element type="LineEdit">

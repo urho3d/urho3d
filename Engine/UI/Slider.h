@@ -53,14 +53,14 @@ public:
     virtual void onResize();
     
     //! Set orientation
-    void setOrientation(UIElementOrientation orientation);
+    void setOrientation(Orientation orientation);
     //! Set slider range maximum value (minimum value is always 0)
     void setRange(float range);
     //! Set slider current value
     void setValue(float value);
     
     //! Return orientation
-    UIElementOrientation getOrientation() const { return mOrientation; }
+    Orientation getOrientation() const { return mOrientation; }
     //! Return slider range
     float getRange() const { return mRange; }
     //! Return slider current value
@@ -75,7 +75,7 @@ protected:
     //! Slider image
     SharedPtr<BorderImage> mSlider;
     //! Orientation
-    UIElementOrientation mOrientation;
+    Orientation mOrientation;
     //! Slider range
     float mRange;
     //! Slider current value

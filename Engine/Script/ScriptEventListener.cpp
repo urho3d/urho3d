@@ -29,8 +29,7 @@ void ScriptEventListener::removeEventHandler(StringHash eventType)
     for (std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.begin(); i !=
         mSpecificEventHandlers.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i++;
         if (current->first.second == eventType)
             mSpecificEventHandlers.erase(current);
     }
@@ -59,8 +58,7 @@ void ScriptEventListener::removeEventHandlers(EventListener* sender)
     for (std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.begin(); i !=
         mSpecificEventHandlers.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i;
-        ++i;
+        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i++;
         if (current->first.first == sender)
             mSpecificEventHandlers.erase(current);
     }

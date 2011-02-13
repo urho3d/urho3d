@@ -177,32 +177,32 @@ private:
     SharedPtr<Log> mLog;
     //! Profiler
     SharedPtr<Profiler> mProfiler;
+    //! Renderer subsystem
+    SharedPtr<Renderer> mRenderer;
     //! Audio subsystem
     SharedPtr<Audio> mAudio;
-    //! Resource cache
-    SharedPtr<ResourceCache> mCache;
-    //! Console
-    SharedPtr<Console> mConsole;
-    //! Debug hud
-    SharedPtr<DebugHud> mDebugHud;
-    //! Debug renderer
-    SharedPtr<DebugRenderer> mDebugRenderer;
     //! Input subsystem
     SharedPtr<Input> mInput;
+    //! Resource cache
+    SharedPtr<ResourceCache> mCache;
+    //! High-level rendering pipeline
+    SharedPtr<Pipeline> mPipeline;
+    //! Debug renderer
+    SharedPtr<DebugRenderer> mDebugRenderer;
+    //! UI subsystem
+    SharedPtr<UI> mUI;
     //! Network subsystem
     SharedPtr<Network> mNetwork;
     //! Client subsystem
     SharedPtr<Client> mClient;
     //! Server subsystem
     SharedPtr<Server> mServer;
-    //! High-level rendering pipeline
-    SharedPtr<Pipeline> mPipeline;
-    //! Renderer subsystem
-    SharedPtr<Renderer> mRenderer;
+    //! Console
+    SharedPtr<Console> mConsole;
+    //! Debug hud
+    SharedPtr<DebugHud> mDebugHud;
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;
-    //! UI subsystem
-    SharedPtr<UI> mUI;
     //! Default scene
     WeakPtr<Scene> mDefaultScene;
     //! Window title

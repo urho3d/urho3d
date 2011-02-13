@@ -35,10 +35,10 @@
 Text::Text(const std::string& name, const std::string& text) :
     UIElement(name),
     mFontSize(DEFAULT_FONT_SIZE),
-    mMaxWidth(0),
     mText(text),
     mTextAlignment(HA_LEFT),
     mRowSpacing(1.0f),
+    mWordwrap(false),
     mSelectionStart(0),
     mSelectionLength(0),
     mSelectionColor(Color(0.0f, 0.0f, 0.0f, 0.0f)),
@@ -55,18 +55,13 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     UIElement::setStyle(element, cache);
     
+    // Set word wrap first to preserve any pre-defined width
+    if (element.hasChildElement("wordwrap"))
+        setWordwrap(element.getChildElement("wordwrap").getBool("enable"));
     if (element.hasChildElement("font"))
     {
         XMLElement fontElem = element.getChildElement("font");
         setFont(cache->getResource<Font>(fontElem.getString("name")), fontElem.getInt("size"));
-    }
-    if (element.hasChildElement("maxwidth"))
-        setMaxWidth(element.getChildElement("maxwidth").getInt("value"));
-    if (element.hasChildElement("text"))
-    {
-        std::string text = element.getChildElement("text").getString("value");
-        replaceInPlace(text, "\\n", "\n");
-        setText(text);
     }
     if (element.hasChildElement("textalignment"))
     {
@@ -89,82 +84,12 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
         setSelectionColor(element.getChildElement("selectioncolor").getColor("value"));
     if (element.hasChildElement("hovercolor"))
         setHoverColor(element.getChildElement("hovercolor").getColor("value"));
-}
-
-bool Text::setFont(Font* font, int size)
-{
-    if (!font)
+    if (element.hasChildElement("text"))
     {
-        LOGERROR("Null font for Text");
-        return false;
+        std::string text = element.getChildElement("text").getString("value");
+        replaceInPlace(text, "\\n", "\n");
+        setText(text);
     }
-    
-    if ((font != mFont) || (size != mFontSize))
-    {
-        mFont = font;
-        mFontSize = max(size, 1);
-        updateText();
-    }
-    
-    return true;
-}
-
-void Text::setMaxWidth(int maxWidth)
-{
-    if (maxWidth != mMaxWidth)
-    {
-        mMaxWidth = max(maxWidth, 0);
-        updateText();
-    }
-}
-
-void Text::setText(const std::string& text)
-{
-    mText = text;
-    
-    validateSelection();
-    updateText();
-}
-
-void Text::setTextAlignment(HorizontalAlignment align)
-{
-    if (align != mTextAlignment)
-    {
-        mTextAlignment = align;
-        updateText();
-    }
-}
-
-void Text::setRowSpacing(float spacing)
-{
-    if (spacing != mRowSpacing)
-    {
-        mRowSpacing = max(spacing, 0.5f);
-        updateText();
-    }
-}
-
-void Text::setSelection(unsigned start, unsigned length)
-{
-    mSelectionStart = start;
-    mSelectionLength = length;
-    validateSelection();
-}
-
-void Text::clearSelection()
-{
-    mSelectionStart = 0;
-    mSelectionLength = 0;
-}
-
-void Text::setSelectionColor(const Color& color)
-{
-    mSelectionColor = color;
-}
-
-void Text::setHoverColor(const Color& color)
-{
-    mHoverColor = color;
 }
 
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -261,7 +186,89 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
     mHovering = false;
 }
 
-void Text::updateText()
+void Text::onResize()
+{
+    if (mWordwrap)
+        updateText();
+}
+
+bool Text::setFont(Font* font, int size)
+{
+    if (!font)
+    {
+        LOGERROR("Null font for Text");
+        return false;
+    }
+    
+    if ((font != mFont) || (size != mFontSize))
+    {
+        mFont = font;
+        mFontSize = max(size, 1);
+        updateText();
+    }
+    
+    return true;
+}
+
+void Text::setText(const std::string& text)
+{
+    mText = text;
+    
+    validateSelection();
+    updateText();
+}
+
+void Text::setTextAlignment(HorizontalAlignment align)
+{
+    if (align != mTextAlignment)
+    {
+        mTextAlignment = align;
+        updateText();
+    }
+}
+
+void Text::setRowSpacing(float spacing)
+{
+    if (spacing != mRowSpacing)
+    {
+        mRowSpacing = max(spacing, 0.5f);
+        updateText();
+    }
+}
+
+void Text::setWordwrap(bool enable)
+{
+    if (enable != mWordwrap)
+    {
+        mWordwrap = enable;
+        updateText();
+    }
+}
+
+void Text::setSelection(unsigned start, unsigned length)
+{
+    mSelectionStart = start;
+    mSelectionLength = length;
+    validateSelection();
+}
+
+void Text::clearSelection()
+{
+    mSelectionStart = 0;
+    mSelectionLength = 0;
+}
+
+void Text::setSelectionColor(const Color& color)
+{
+    mSelectionColor = color;
+}
+
+void Text::setHoverColor(const Color& color)
+{
+    mHoverColor = color;
+}
+
+void Text::updateText(bool inResize)
 {
     int width = 0;
     int height = 0;
@@ -280,7 +287,7 @@ void Text::updateText()
         int rowHeight = (int)(mRowSpacing * mRowHeight);
         
         // First see if the text must be split up
-        if (!mMaxWidth)
+        if (!mWordwrap)
         {
             mPrintText = mText;
             printToText.resize(mText.length());
@@ -289,6 +296,7 @@ void Text::updateText()
         }
         else
         {
+            int maxWidth = getWidth();
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
             for (unsigned i = 0; i < mText.length(); ++i)
@@ -309,12 +317,12 @@ void Text::updateText()
                                 break;
                             }
                             futureRowWidth += face->mGlyphs[face->mGlyphIndex[mText[j]]].mAdvanceX;
-                            if ((mText[j] == '-') && (futureRowWidth <= mMaxWidth))
+                            if ((mText[j] == '-') && (futureRowWidth <= maxWidth))
                             {
                                 nextBreak = j + 1;
                                 break;
                             }
-                            if (futureRowWidth > mMaxWidth)
+                            if (futureRowWidth > maxWidth)
                             {
                                 ok = false;
                                 break;
@@ -336,7 +344,7 @@ void Text::updateText()
                             }
                         }
                         mPrintText += '\n';
-                        printToText.push_back(i);
+                        printToText.push_back(min((int)i, (int)mText.length() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -345,7 +353,7 @@ void Text::updateText()
                     {
                         // When copying a space, we may be over row width
                         rowWidth += face->mGlyphs[face->mGlyphIndex[mText[i]]].mAdvanceX;
-                        if (rowWidth <= mMaxWidth)
+                        if (rowWidth <= maxWidth)
                         {
                             mPrintText += mText[i];
                             printToText.push_back(i);
@@ -355,7 +363,7 @@ void Text::updateText()
                 else
                 {
                     mPrintText += '\n';
-                    printToText.push_back(i);
+                    printToText.push_back(min((int)i, (int)mText.length() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -422,10 +430,10 @@ void Text::updateText()
         mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
-    // If maxwidth is nonzero, fix the element width
-    if (mMaxWidth)
-        width = mMaxWidth;
-    setSize(width, height);
+    if (mWordwrap)
+        setHeight(height);
+    else
+        setSize(width, height);
 }
 
 void Text::validateSelection()
