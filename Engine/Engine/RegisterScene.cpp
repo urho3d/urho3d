@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Log.h"
 #include "RegisterTemplates.h"
 #include "Scene.h"
 #include "ScriptFile.h"
@@ -112,7 +113,10 @@ static Component* EntityCreateComponentWithName(const std::string& type, const s
 asIScriptObject* EntityCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Entity* ptr)
 {
     if (!file)
+    {
+        LOGERROR("Null script file for createScriptObject");
         return 0;
+    }
     
     try
     {
