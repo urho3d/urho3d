@@ -21,34 +21,26 @@
 // THE SOFTWARE.
 //
 
-#ifndef UI_SLIDER_H
-#define UI_SLIDER_H
+#ifndef UI_SCROLLBAR_H
+#define UI_SCROLLBAR_H
 
-#include "BorderImage.h"
+#include "UIElement.h"
 
-//! An image that contains a slideable knob image
-class Slider : public BorderImage
+class Button;
+class Slider;
+
+class ScrollBar : public UIElement
 {
-    DEFINE_TYPE(Slider);
+    DEFINE_TYPE(ScrollBar);
     
 public:
     //! Construct with name
-    Slider(const std::string& name = std::string());
+    ScrollBar(const std::string& name = std::string());
     //! Destruct
-    virtual ~Slider();
+    virtual ~ScrollBar();
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! Perform UI element update
-    virtual void update(float timeStep);
-    //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
-    //! React to mouse drag start
-    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
-    //! React to mouse drag motion
-    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
-    //! React to mouse drag end
-    virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
     //! React to resize
     virtual void onResize();
     
@@ -58,34 +50,49 @@ public:
     void setRange(float range);
     //! Set slider current value
     void setValue(float value);
+    //! Set button scroll step
+    void setScrollStep(float step);
     
     //! Return orientation type
-    Orientation getOrientation() const { return mOrientation; }
+    Orientation getOrientation() const;
     //! Return slider range
-    float getRange() const { return mRange; }
+    float getRange() const;
     //! Return slider current value
-    float getValue() const { return mValue; }
-    //! Return knob element
-    BorderImage* getKnob() const { return mKnob; }
+    float getValue() const;
+    //! Return button scroll step
+    float getScrollStep() const { return mScrollStep; }
+    //! Return back button element
+    Button* getBackButton() const { return mBackButton; }
+    //! Return forward button element
+    Button* getForwardButton() const { return mForwardButton; }
+    //! Return slider element
+    Slider* getSlider() const { return mSlider; }
     
 protected:
-    //! Update slider knob position & size
-    void updateSlider();
+    //! Store/setup style of a button. Index 0 = back, 1 = forward
+    void setButtonStyle(unsigned index, const XMLElement& buttonElem);
     
-    //! Slider knob
-    SharedPtr<BorderImage> mKnob;
-    //! Orientation
-    Orientation mOrientation;
-    //! Slider range
-    float mRange;
-    //! Slider current value
-    float mValue;
-    //! Internal flag of whether the slider is being dragged
-    bool mDragSlider;
-    //! Original mouse position at drag start
-    IntVector2 mOriginalPosition;
-    //! Original slider position at drag start
-    IntVector2 mOriginalSliderPosition;
+    //! Back button
+    SharedPtr<Button> mBackButton;
+    //! Forward button
+    SharedPtr<Button> mForwardButton;
+    //! Slider
+    SharedPtr<Slider> mSlider;
+    //! Scroll step
+    float mScrollStep;
+    
+    //! Inactive rects for buttons
+    IntRect mInactiveRects[2][2];
+    //! Pressed rects for buttons
+    IntRect mPressedRects[2][2];
+    
+private:
+    //! Handle back button pressed
+    void handleBackButtonPressed(StringHash eventType, VariantMap& eventData);
+    //! Handle forward button pressed
+    void handleForwardButtonPressed(StringHash eventType, VariantMap& eventData);
+    //! Handle slider movement
+    void handleSliderChanged(StringHash eventType, VariantMap& eventData);
 };
 
-#endif // UI_SLIDER_H
+#endif // UI_SCROLLBAR_H

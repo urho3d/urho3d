@@ -44,6 +44,7 @@ UIElement::UIElement(const std::string& name) :
     mEnabled(false),
     mFocusable(false),
     mDefocusable(true),
+    mResetFocus(false),
     mFocus(false),
     mSelected(false),
     mVisible(true),
@@ -159,6 +160,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setFocusable(element.getChildElement("focusable").getBool("enable"));
     if (element.hasChildElement("defocusable"))
         setDefocusable(element.getChildElement("defocusable").getBool("enable"));
+    if (element.hasChildElement("resetfocus"))
+        setResetFocus(element.getChildElement("resetfocus").getBool("enable"));
     if (element.hasChildElement("selected"))
         setSelected(element.getChildElement("selected").getBool("enable"));
     if (element.hasChildElement("visible"))
@@ -166,7 +169,7 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("layout"))
     {
         XMLElement layoutElem = element.getChildElement("layout");
-        std::string orientation = layoutElem.getStringLower("orientation");
+        std::string orientation = layoutElem.getStringLower(orientation);
         if ((orientation == "horizontal") || (orientation == "h"))
             mLayoutOrientation = O_HORIZONTAL;
         if ((orientation == "vertical") || (orientation == "v"))
@@ -557,6 +560,12 @@ void UIElement::setDefocusable(bool enable)
     mDefocusable = enable;
 }
 
+void UIElement::setResetFocus(bool enable)
+{
+    mResetFocus = enable;
+}
+
+
 void UIElement::setFocus(bool enable)
 {
     if (!mFocusable)
@@ -586,7 +595,14 @@ void UIElement::setSelected(bool enable)
 
 void UIElement::setVisible(bool enable)
 {
-    mVisible = enable;
+    if (enable != mVisible)
+    {
+        mVisible = enable;
+        
+        // Parent's layout may change as a result of visibility change
+        if (mParent)
+            mParent->updateLayout();
+    }
 }
 
 void UIElement::setUserData(const Variant& userData)
@@ -600,9 +616,9 @@ void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
     setStyle(element, cache);
 }
 
-void UIElement::setLayout(Orientation orientation, LayoutMode horizontal, LayoutMode vertical, int spacing, const IntRect& border)
+void UIElement::setLayout(Orientation type, LayoutMode horizontal, LayoutMode vertical, int spacing, const IntRect& border)
 {
-    mLayoutOrientation = orientation;
+    mLayoutOrientation = type;
     mHorizontalLayoutMode = horizontal;
     mVerticalLayoutMode = vertical;
     mLayoutSpacing = max(spacing, 0);
@@ -618,10 +634,10 @@ void UIElement::updateLayout()
     
     ++mUpdateLayoutNestingLevel;
     
-    std::vector<int> positions(mChildren.size());
-    std::vector<int> sizes(mChildren.size());
-    std::vector<int> minSizes(mChildren.size());
-    std::vector<int> maxSizes(mChildren.size());
+    std::vector<int> positions;
+    std::vector<int> sizes;
+    std::vector<int> minSizes;
+    std::vector<int> maxSizes;
     
     if (mLayoutOrientation == O_HORIZONTAL)
     {
@@ -631,7 +647,9 @@ void UIElement::updateLayout()
         {
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
-                sizes[i] = mChildren[i]->getWidth();
+                if (!mChildren[i]->isVisible())
+                    continue;
+                sizes.push_back(mChildren[i]->getWidth());
                 maxChildHeight = max(maxChildHeight, mChildren[i]->getHeight());
             }
             
@@ -641,6 +659,8 @@ void UIElement::updateLayout()
             int position = mLayoutBorder.mLeft;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
+                if (!mChildren[i]->isVisible())
+                    continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
                 int y = mChildren[i]->getPosition().mY;
                 if ((mChildren[i]->getVerticalAlignment() == VA_TOP) && (y < mLayoutBorder.mTop))
@@ -659,9 +679,12 @@ void UIElement::updateLayout()
         {
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
-                sizes[i] = mChildren[i]->getWidth();
-                minSizes[i] = mChildren[i]->getMinWidth();
-                maxSizes[i] = mChildren[i]->getMaxWidth();
+                if (!mChildren[i]->isVisible())
+                    continue;
+                positions.push_back(0);
+                sizes.push_back(mChildren[i]->getWidth());
+                minSizes.push_back(mChildren[i]->getMinWidth());
+                maxSizes.push_back(mChildren[i]->getMaxWidth());
                 maxChildHeight = max(maxChildHeight, mChildren[i]->getHeight());
             }
             
@@ -671,17 +694,21 @@ void UIElement::updateLayout()
             calculateLayout(positions, sizes, minSizes, maxSizes, getWidth(), mLayoutBorder.mLeft, mLayoutBorder.mRight,
                 mLayoutSpacing);
             
+            unsigned idx = 0;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
+                if (!mChildren[i]->isVisible())
+                    continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
                 int y = mChildren[i]->getPosition().mY;
                 if ((mChildren[i]->getVerticalAlignment() == VA_TOP) && (y < mLayoutBorder.mTop))
                     y = mLayoutBorder.mTop;
                 if ((mChildren[i]->getVerticalAlignment() == VA_BOTTOM) && (y > -mLayoutBorder.mBottom))
                     y = -mLayoutBorder.mBottom;
-                mChildren[i]->setPosition(positions[i], y);
-                mChildren[i]->setSize(sizes[i], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
+                mChildren[i]->setPosition(positions[idx], y);
+                mChildren[i]->setSize(sizes[idx], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
                     mLayoutBorder.mBottom : mChildren[i]->getHeight());
+                ++idx;
             }
         }
     }
@@ -694,7 +721,9 @@ void UIElement::updateLayout()
         {
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
-                sizes[i] = mChildren[i]->getHeight();
+                if (!mChildren[i]->isVisible())
+                    continue;
+                sizes.push_back(mChildren[i]->getHeight());
                 maxChildWidth = max(maxChildWidth, mChildren[i]->getWidth());
             }
             
@@ -704,6 +733,8 @@ void UIElement::updateLayout()
             int position = mLayoutBorder.mTop;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
+                if (!mChildren[i]->isVisible())
+                    continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
                 int x = mChildren[i]->getPosition().mX;
                 if ((mChildren[i]->getHorizontalAlignment() == HA_LEFT) && (x < mLayoutBorder.mLeft))
@@ -721,9 +752,12 @@ void UIElement::updateLayout()
         {
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
-                sizes[i] = mChildren[i]->getHeight();
-                minSizes[i] = mChildren[i]->getMinHeight();
-                maxSizes[i] = mChildren[i]->getMaxHeight();
+                if (!mChildren[i]->isVisible())
+                    continue;
+                positions.push_back(0);
+                sizes.push_back(mChildren[i]->getHeight());
+                minSizes.push_back(mChildren[i]->getMinHeight());
+                maxSizes.push_back(mChildren[i]->getMaxHeight());
                 maxChildWidth = max(maxChildWidth, mChildren[i]->getWidth());
             }
             
@@ -733,17 +767,21 @@ void UIElement::updateLayout()
             calculateLayout(positions, sizes, minSizes, maxSizes, getHeight(), mLayoutBorder.mTop, mLayoutBorder.mBottom,
                 mLayoutSpacing);
             
+            unsigned idx = 0;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
+                if (!mChildren[i]->isVisible())
+                    continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
                 int x = mChildren[i]->getPosition().mX;
                 if ((mChildren[i]->getHorizontalAlignment() == HA_LEFT) && (x < mLayoutBorder.mLeft))
                     x = mLayoutBorder.mLeft;
                 if ((mChildren[i]->getHorizontalAlignment() == HA_RIGHT) && (x > -mLayoutBorder.mRight))
                     x = -mLayoutBorder.mRight;
-                mChildren[i]->setPosition(x, positions[i]);
+                mChildren[i]->setPosition(x, positions[idx]);
                 mChildren[i]->setSize(mHorizontalLayoutMode == LM_RESIZECHILDREN ? getWidth() - mLayoutBorder.mLeft -
-                    mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[i]);
+                    mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[idx]);
+                ++idx;
             }
         }
     }

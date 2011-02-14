@@ -23,8 +23,8 @@
 
 #include "Precompiled.h"
 #include "InputEvents.h"
+#include "ScrollBar.h"
 #include "ScrollView.h"
-#include "Slider.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
@@ -33,7 +33,7 @@ ScrollView::ScrollView(const std::string& name) :
     BorderImage(name),
     mViewPosition(IntVector2::sZero),
     mViewSize(IntVector2::sZero),
-    mScrollStep(0.25f),
+    mScrollStep(0.1f),
     mPageStep(1.0f)
 {
     mClipChildren = true;
@@ -61,16 +61,11 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
     UIElement* root = getRootElement();
     if (root)
     {
-        if (element.hasChildElement("horizontalslider"))
-            setHorizontalSlider(dynamic_cast<Slider*>(root->getChild(element.getChildElement("horizontalslider").getString("name"), true)));
-        if (element.hasChildElement("verticalslider"))
-            setVerticalSlider(dynamic_cast<Slider*>(root->getChild(element.getChildElement("verticalslider").getString("name"), true)));
+        if (element.hasChildElement("horizontalscrollbar"))
+            setHorizontalScrollBar(dynamic_cast<ScrollBar*>(root->getChild(element.getChildElement("horizontalscrollbar").getString("name"), true)));
+        if (element.hasChildElement("verticalscrollbar"))
+            setVerticalScrollBar(dynamic_cast<ScrollBar*>(root->getChild(element.getChildElement("verticalscrollbar").getString("name"), true)));
     }
-}
-
-void ScrollView::update(float timeStep)
-{
-    updateViewFromSliders();
 }
 
 void ScrollView::onKey(int key, int buttons, int qualifiers)
@@ -78,82 +73,82 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
     switch (key)
     {
     case KEY_LEFT:
-        if (mHorizontalSlider)
+        if (mHorizontalScrollBar)
         {
             if (qualifiers & QUAL_CTRL)
-                mHorizontalSlider->setValue(0.0f);
+                mHorizontalScrollBar->setValue(0.0f);
             else
-                mHorizontalSlider->setValue(mHorizontalSlider->getValue() - mScrollStep);
+                mHorizontalScrollBar->setValue(mHorizontalScrollBar->getValue() - mScrollStep);
         }
         break;
         
     case KEY_RIGHT:
-        if (mHorizontalSlider)
+        if (mHorizontalScrollBar)
         {
             if (qualifiers & QUAL_CTRL)
-                mHorizontalSlider->setValue(mHorizontalSlider->getRange());
+                mHorizontalScrollBar->setValue(mHorizontalScrollBar->getRange());
             else
-                mHorizontalSlider->setValue(mHorizontalSlider->getValue() + mScrollStep);
+                mHorizontalScrollBar->setValue(mHorizontalScrollBar->getValue() + mScrollStep);
         }
         break;
         
     case KEY_UP:
-        if (mVerticalSlider)
+        if (mVerticalScrollBar)
         {
             if (qualifiers & QUAL_CTRL)
-                mVerticalSlider->setValue(0.0f);
+                mVerticalScrollBar->setValue(0.0f);
             else
-                mVerticalSlider->setValue(mVerticalSlider->getValue() - mScrollStep);
+                mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() - mScrollStep);
         }
         break;
         
     case KEY_DOWN:
-        if (mVerticalSlider)
+        if (mVerticalScrollBar)
         {
             if (qualifiers & QUAL_CTRL)
-                mVerticalSlider->setValue(mVerticalSlider->getRange());
+                mVerticalScrollBar->setValue(mVerticalScrollBar->getRange());
             else
-                mVerticalSlider->setValue(mVerticalSlider->getValue() + mScrollStep);
+                mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() + mScrollStep);
         }
         break;
         
     case KEY_PAGEUP:
-        if (mVerticalSlider)
-            mVerticalSlider->setValue(mVerticalSlider->getValue() - mPageStep);
+        if (mVerticalScrollBar)
+            mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() - mPageStep);
         break;
         
     case KEY_PAGEDOWN:
-        if (mVerticalSlider)
-            mVerticalSlider->setValue(mVerticalSlider->getValue() + mPageStep);
+        if (mVerticalScrollBar)
+            mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() + mPageStep);
         break;
     
     case KEY_HOME:
-        if (mVerticalSlider)
-            mVerticalSlider->setValue(0.0f);
+        if (mVerticalScrollBar)
+            mVerticalScrollBar->setValue(0.0f);
         break;
     
     case KEY_END:
-        if (mVerticalSlider)
-            mVerticalSlider->setValue(mVerticalSlider->getRange());
+        if (mVerticalScrollBar)
+            mVerticalScrollBar->setValue(mVerticalScrollBar->getRange());
         break;
     }
 }
 
 void ScrollView::onFocus()
 {
-    // Set selected state (constant hover) on the sliders to show they are now under key control
-    if (mHorizontalSlider)
-        mHorizontalSlider->setSelected(true);
-    if (mVerticalSlider)
-        mVerticalSlider->setSelected(true);
+    // Set selected state (constant hover) on the scroll bars to show they are now under key control
+    if (mHorizontalScrollBar)
+        mHorizontalScrollBar->setSelected(true);
+    if (mVerticalScrollBar)
+        mVerticalScrollBar->setSelected(true);
 }
 
 void ScrollView::onDefocus()
 {
-    if (mHorizontalSlider)
-        mHorizontalSlider->setSelected(false);
-    if (mVerticalSlider)
-        mVerticalSlider->setSelected(false);
+    if (mHorizontalScrollBar)
+        mHorizontalScrollBar->setSelected(false);
+    if (mVerticalScrollBar)
+        mVerticalScrollBar->setSelected(false);
 }
 
 void ScrollView::onResize()
@@ -165,7 +160,7 @@ void ScrollView::onResize()
 void ScrollView::setViewPosition(const IntVector2& position)
 {
     updateView(position);
-    updateSliders();
+    updateScrollBars();
 }
 
 void ScrollView::setViewPosition(int x, int y)
@@ -178,7 +173,7 @@ void ScrollView::setViewSize(const IntVector2& size)
     mViewSize.mX = max(size.mX, getWidth());
     mViewSize.mY = max(size.mY, getHeight());
     updateView(mViewPosition);
-    updateSliders();
+    updateScrollBars();
 }
 
 void ScrollView::setViewSize(int x, int y)
@@ -186,16 +181,28 @@ void ScrollView::setViewSize(int x, int y)
     setViewSize(IntVector2(x, y));
 }
 
-void ScrollView::setHorizontalSlider(Slider* slider)
+void ScrollView::setHorizontalScrollBar(ScrollBar* scrollBar)
 {
-    mHorizontalSlider = slider;
-    updateSliders();
+    if (mHorizontalScrollBar)
+        unsubscribeFromEvent(mHorizontalScrollBar, EVENT_SCROLLBARCHANGED);
+    
+    mHorizontalScrollBar = scrollBar;
+    if (mHorizontalScrollBar)
+        subscribeToEvent(mHorizontalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
+    
+    updateScrollBars();
 }
 
-void ScrollView::setVerticalSlider(Slider* slider)
+void ScrollView::setVerticalScrollBar(ScrollBar* scrollBar)
 {
-    mVerticalSlider = slider;
-    updateSliders();
+    if (mVerticalScrollBar)
+        unsubscribeFromEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED);
+    
+    mVerticalScrollBar = scrollBar;
+    if (mVerticalScrollBar)
+        subscribeToEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
+    
+    updateScrollBars();
 }
 
 void ScrollView::setScrollStep(float step)
@@ -208,21 +215,50 @@ void ScrollView::setPageStep(float step)
     mPageStep = max(step, 0.0f);
 }
 
-void ScrollView::updateViewFromSliders()
+void ScrollView::updateViewFromScrollBars()
 {
-    if ((!mHorizontalSlider) && (!mVerticalSlider))
+    if ((!mHorizontalScrollBar) && (!mVerticalScrollBar))
         return;
     
     IntVector2 oldPosition = mViewPosition;
     IntVector2 newPosition = mViewPosition;
     const IntVector2& size = getSize();
     
-    if (mHorizontalSlider)
-        newPosition.mX = (int)(mHorizontalSlider->getValue() * (float)size.mX);
-    if (mVerticalSlider)
-        newPosition.mY = (int)(mVerticalSlider->getValue() * (float)size.mY);
+    if (mHorizontalScrollBar)
+        newPosition.mX = (int)(mHorizontalScrollBar->getValue() * (float)size.mX);
+    if (mVerticalScrollBar)
+        newPosition.mY = (int)(mVerticalScrollBar->getValue() * (float)size.mY);
     
     updateView(newPosition);
+}
+
+void ScrollView::updateScrollBars()
+{
+    mIgnoreEvents = true;
+    
+    const IntVector2& size = getSize();
+    
+    if ((mHorizontalScrollBar) && (size.mX > 0) && (mViewSize.mX > 0))
+    {
+        mHorizontalScrollBar->setRange((float)mViewSize.mX / (float)size.mX - 1.0f);
+        mHorizontalScrollBar->setValue((float)mViewPosition.mX / (float)size.mX);
+    }
+    if ((mVerticalScrollBar) && (size.mY > 0) && (mViewSize.mY > 0))
+    {
+        mVerticalScrollBar->setRange((float)mViewSize.mY / (float)size.mY - 1.0f);
+        mVerticalScrollBar->setValue((float)mViewPosition.mY / (float)size.mY);
+    }
+    
+    mIgnoreEvents = false;
+}
+
+void ScrollView::updateView(const IntVector2& position)
+{
+    IntVector2 oldPosition = mViewPosition;
+    
+    mViewPosition.mX = clamp(position.mX, 0, mViewSize.mX - getWidth());
+    mViewPosition.mY = clamp(position.mY, 0, mViewSize.mY - getHeight());
+    setChildOffset(-mViewPosition);
     
     if (mViewPosition != oldPosition)
     {
@@ -236,25 +272,8 @@ void ScrollView::updateViewFromSliders()
     }
 }
 
-void ScrollView::updateSliders()
+void ScrollView::handleScrollBarChanged(StringHash eventType, VariantMap& eventData)
 {
-    const IntVector2& size = getSize();
-    
-    if ((mHorizontalSlider) && (size.mX > 0) && (mViewSize.mX > 0))
-    {
-        mHorizontalSlider->setRange((float)mViewSize.mX / (float)size.mX - 1.0f);
-        mHorizontalSlider->setValue((float)mViewPosition.mX / (float)size.mX);
-    }
-    if ((mVerticalSlider) && (size.mY > 0) && (mViewSize.mY > 0))
-    {
-        mVerticalSlider->setRange((float)mViewSize.mY / (float)size.mY - 1.0f);
-        mVerticalSlider->setValue((float)mViewPosition.mY / (float)size.mY);
-    }
-}
-
-void ScrollView::updateView(const IntVector2& position)
-{
-    mViewPosition.mX = clamp(position.mX, 0, mViewSize.mX - getWidth());
-    mViewPosition.mY = clamp(position.mY, 0, mViewSize.mY - getHeight());
-    setChildOffset(-mViewPosition);
+    if (!mIgnoreEvents)
+        updateViewFromScrollBars();
 }

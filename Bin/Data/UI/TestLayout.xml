@@ -24,12 +24,12 @@
         <element type="CheckBox">
             <position value="40 130" />
         </element>
-        <element type="Slider" name="ViewSliderV">
+        <element type="ScrollBar" name="ScrollV" >
             <position value="350 100" />
             <size value="10 100" />
             <orientation value="vertical" />
         </element>
-        <element type="Slider" name="ViewSliderH">
+        <element type="ScrollBar" name="ScrollH" >
             <position value="150 200" />
             <size value="200 10" />
             <orientation value="horizontal" />
@@ -38,8 +38,8 @@
             <position value="150 100" />
             <size value="200 100" />
             <viewsize value="200 150" />
-            <horizontalslider name="ViewSliderH" />
-            <verticalslider name="ViewSliderV" />
+            <horizontalscrollbar name="ScrollH" />
+            <verticalscrollbar name="ScrollV" />
             <element type="Text">
                 <position value="1 1" />
                 <size value="200 150" />
@@ -56,72 +56,9 @@
             <position value="150 260" />
             <size value="200 16" />
         </element>
-        <element type="Window" name="TestPopup3">
-            <size value="100 80" />
-            <element type="MenuItem">
-                <position value="10 10" />
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem9" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <position value="10 30" />
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem10" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <position value="10 50" />
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem11" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-        </element>
-        <element type="Window" name="TestPopup2">
-            <size value="100 80" />
-            <element type="MenuItem">
-                <position value="10 10" />
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem6" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <position value="10 30" />
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem7" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <position value="10 50" />
-                <size value="80 16" />
-                <popup name="TestPopup3" />
-                <popupoffset value="90 0" />
-                <element type="Text">
-                    <text value="MenuItem8" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-        </element>
         <element type="Window" name="TestPopup">
-            <size value="100 80" />
+            <layout orientation="vertical" horizontal="resizeelement" vertical="resizeelement" spacing="4" border="8 8 8 8" />
             <element type="MenuItem">
-                <position value="10 10" />
                 <size value="80 16" />
                 <element type="Text">
                     <text value="MenuItem3" />
@@ -130,7 +67,6 @@
                 </element>
             </element>
             <element type="MenuItem">
-                <position value="10 30" />
                 <size value="80 16" />
                 <element type="Text">
                     <text value="MenuItem4" />
@@ -139,10 +75,7 @@
                 </element>
             </element>
             <element type="MenuItem">
-                <position value="10 50" />
                 <size value="80 16" />
-                <popup name="TestPopup2" />
-                <popupoffset value="90 0" />
                 <element type="Text">
                     <text value="MenuItem5" />
                     <font name="cour.ttf" size="12" />

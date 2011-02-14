@@ -46,6 +46,38 @@
         <border value="2 2 2 2" />
         <hoveroffset value="0 16" />
     </element>
+    <element type="ScrollBar">
+        <backbutton>
+            <size value="16 16" />
+            <texture name="Textures/UI.png" />
+            <inactiverect vertical="0 32 16 48" horizontal="32 32 48 48" />
+            <pressedrect vertical="64 32 80 48" horizontal="96 32 112 48" />
+            <border value="3 3 3 3" />
+            <hoveroffset value="0 16" />
+            <repeat delay="0.4" rate="20" />
+        </backbutton>
+        <forwardbutton>
+            <size value="16 16" />
+            <texture name="Textures/UI.png" />
+            <inactiverect vertical="16 32 32 48" horizontal="48 32 64 48" />
+            <pressedrect vertical="80 32 96 48" horizontal="112 32 128 48" />
+            <border value="3 3 3 3" />
+            <hoveroffset value="0 16" />
+            <repeat delay="0.4" rate="20" />
+        </forwardbutton>
+        <slider>
+            <size value="16 16" />
+            <texture name="Textures/UI.png" />
+            <imagerect value="48 0 64 16" />
+            <border value="3 3 3 3" />
+            <knob>
+                <texture name="Textures/UI.png" />
+                <imagerect value="16 0 32 16" />
+                <border value="4 4 4 4" />
+                <hoveroffset value="0 16" />
+            </knob>
+        </slider>
+    </element>
     <element type="ScrollView">
         <size value="16 16" />
         <texture name="Textures/UI.png" />
@@ -58,12 +90,12 @@
         <texture name="Textures/UI.png" />
         <imagerect value="48 0 64 16" />
         <border value="3 3 3 3" />
-        <slider>
+        <knob>
             <texture name="Textures/UI.png" />
             <imagerect value="16 0 32 16" />
             <border value="4 4 4 4" />
             <hoveroffset value="0 16" />
-        </slider>
+        </knob>
     </element>
     <element type="Window">
         <texture name="Textures/UI.png" />

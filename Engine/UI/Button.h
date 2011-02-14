@@ -60,6 +60,8 @@ public:
     void setLabelOffset(const IntVector2& offset);
     //! Set label offset on press
     void setLabelOffset(int x, int y);
+    //! Set pressed event repeat. Rate 0 (default) disables repeat
+    void setRepeat(float delay, float rate);
     
     //! Return inactive image rectangle
     const IntRect& getInactiveRect() const { return mInactiveRect; }
@@ -67,6 +69,10 @@ public:
     const IntRect& getPressedRect() const { return mPressedRect; }
     //! Return label offset on press
     const IntVector2& getLabelOffset() const { return mLabelOffset; }
+    //! Return repeat delay
+    float getRepeatDelay() const { return mRepeatDelay; }
+    //! Return repeat rate
+    float getRepeatRate() const { return mRepeatRate; }
     
 protected:
     //! Set new pressed state
@@ -78,6 +84,12 @@ protected:
     IntRect mPressedRect;
     //! Label offset on press
     IntVector2 mLabelOffset;
+    //! Repeat delay
+    float mRepeatDelay;
+    //! Repeat rate
+    float mRepeatRate;
+    //! Repeat timer
+    float mRepeatTimer;
     //! Current pressed state
     bool mPressed;
 };

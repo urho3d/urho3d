@@ -28,6 +28,7 @@
 #include "Cursor.h"
 #include "LineEdit.h"
 #include "MenuItem.h"
+#include "ScrollBar.h"
 #include "ScrollView.h"
 #include "Slider.h"
 #include "Text.h"
@@ -47,6 +48,8 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
         return new LineEdit(name);
     if (type == MenuItem::getTypeStatic())
         return new MenuItem(name);
+    if (type == ScrollBar::getTypeStatic())
+        return new ScrollBar(name);
     if (type == ScrollView::getTypeStatic())
         return new ScrollView(name);
     if (type == Slider::getTypeStatic())

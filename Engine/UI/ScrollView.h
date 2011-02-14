@@ -26,7 +26,7 @@
 
 #include "BorderImage.h"
 
-class Slider;
+class ScrollBar;
 
 //! A scrollable view for showing child widgets
 class ScrollView : public BorderImage
@@ -41,8 +41,6 @@ public:
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! Perform UI element update
-    virtual void update(float timeStep);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to gaining focus
@@ -60,10 +58,10 @@ public:
     void setViewSize(const IntVector2& position);
     //! Set total view size
     void setViewSize(int x, int y);
-    //! Set horizontal slider
-    void setHorizontalSlider(Slider* slider);
-    //! Set vertical slider
-    void setVerticalSlider(Slider* slider);
+    //! Set horizontal scroll bar
+    void setHorizontalScrollBar(ScrollBar* scrollBar);
+    //! Set vertical scroll bar
+    void setVerticalScrollBar(ScrollBar* scrollBar);
     //! Set arrow key scroll step
     void setScrollStep(float step);
     //! Set arrow key page step
@@ -73,27 +71,27 @@ public:
     const IntVector2& getViewPosition() const { return mViewPosition; }
     //! Return total view size
     const IntVector2& getViewSize() const { return mViewSize; }
-    //! Return horizontal slider
-    Slider* getHorizontalSlider() const { return mHorizontalSlider; }
-    //! Return vertical slider
-    Slider* getVerticalSlider() const { return mVerticalSlider; }
+    //! Return horizontal scroll bar
+    ScrollBar* getHorizontalScrollBar() const { return mHorizontalScrollBar; }
+    //! Return vertical scroll bar
+    ScrollBar* getVerticalScrollBar() const { return mVerticalScrollBar; }
     //! Return arrow key scroll step
     float getScrollStep() const { return mScrollStep; }
     //! Return arrow key page step
     float getPageStep() const { return mPageStep; }
     
 protected:
-    //! Update the view from sliders if available
-    void updateViewFromSliders();
-    //! Update the sliders' ranges and positions
-    void updateSliders();
+    //! Update the view from scrollbars if available
+    void updateViewFromScrollBars();
+    //! Update the scrollbars' ranges and positions
+    void updateScrollBars();
     //! Limit and update view with a new position
     void updateView(const IntVector2& position);
     
-    //! Horizontal slider
-    WeakPtr<Slider> mHorizontalSlider;
-    //! Vertical slider
-    WeakPtr<Slider> mVerticalSlider;
+    //! Horizontal scroll bar
+    WeakPtr<ScrollBar> mHorizontalScrollBar;
+    //! Vertical scroll bar
+    WeakPtr<ScrollBar> mVerticalScrollBar;
     //! Current view offset from the top-left corner
     IntVector2 mViewPosition;
     //! Total view size
@@ -102,6 +100,12 @@ protected:
     float mScrollStep;
     //! Arrow key page step
     float mPageStep;
+    //! Ignore scrollbar events flag. Used to prevent possible endless loop when setting position
+    bool mIgnoreEvents;
+    
+private:
+    //! Handle scrollbar value changed
+    void handleScrollBarChanged(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_SCROLLVIEW_H

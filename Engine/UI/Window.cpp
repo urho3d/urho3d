@@ -39,6 +39,7 @@ Window::Window(const std::string& name) :
     mBringToFront = true;
     mClipChildren = true;
     mEnabled = true;
+    mResetFocus = true;
 }
 
 Window::~Window()

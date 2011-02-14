@@ -72,7 +72,14 @@ DEFINE_EVENT(EVENT_SLIDERCHANGED, SliderChanged)
     EVENT_PARAM(P_VALUE, Value);                // float
 }
 
-//! ScrollView position changed
+//! UI scrollbar value changed
+DEFINE_EVENT(EVENT_SCROLLBARCHANGED, ScrollBarChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_VALUE, Value);                // float
+}
+
+//! UI scrollview position changed
 DEFINE_EVENT(EVENT_VIEWCHANGED, ViewChanged)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer

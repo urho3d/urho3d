@@ -118,7 +118,11 @@ void UI::setFocusElement(UIElement* element)
     eventData[P_ELEMENT] = (void*)element;
     sendEvent(EVENT_TRYFOCUS, eventData);
     
+    // Return if already has focus
     if ((element) && (element->hasFocus()))
+        return;
+    // Return if element can not be focused, and does not reset the focus either
+    if ((element) && (!element->isFocusable()) && (!element->getResetFocus()))
         return;
     
     std::vector<UIElement*> allChildren = mRootElement->getChildren(true);

@@ -24,12 +24,11 @@
 #include "Precompiled.h"
 #include "Engine.h"
 #include "Entity.h"
+#include "Log.h"
 #include "RegisterTemplates.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
-
-asIScriptObject* EntityCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Entity* ptr);
 
 static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
@@ -46,6 +45,48 @@ static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcP
     return ptr->execute(declaration, destParams);
 }
 
+static asIScriptObject* EntityCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Entity* ptr)
+{
+    if (!file)
+    {
+        LOGERROR("Null script file for createScriptObject");
+        return 0;
+    }
+    
+    try
+    {
+        // Try first to reuse an existing, empty ScriptInstance
+        const std::vector<SharedPtr<Component> >& components = ptr->getComponents();
+        for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
+        {
+            if ((*i)->getType() == ScriptInstance::getTypeStatic())
+            {
+                ScriptInstance* instance = static_cast<ScriptInstance*>(i->getPtr());
+                asIScriptObject* object = instance->getScriptObject();
+                if (!object)
+                {
+                    instance->setScriptClass(file, className);
+                    return instance->getScriptObject();
+                }
+            }
+        }
+        // Then create a new component if not found
+        ScriptInstance* instance = ptr->createComponent<ScriptInstance>(ptr->getUniqueComponentName());
+        instance->setScriptClass(file, className);
+        return instance->getScriptObject();
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
+static asIScriptObject* EntityCreateScriptObject(const std::string& scriptFileName, const std::string& className, Entity* ptr)
+{
+    ResourceCache* cache = getEngine()->getResourceCache();
+    return EntityCreateScriptObjectWithFile(cache->getResource<ScriptFile>(scriptFileName), className, ptr);
+}
+
 static void registerScriptFile(asIScriptEngine* engine)
 {
     registerResource<ScriptFile>(engine, "ScriptFile");
@@ -54,6 +95,7 @@ static void registerScriptFile(asIScriptEngine* engine)
     registerRefCasts<Resource, ScriptFile>(engine, "Resource", "ScriptFile");
     
     engine->RegisterObjectMethod("Entity", "ScriptObject@+ createScriptObject(ScriptFile@+, const string& in)", asFUNCTION(EntityCreateScriptObjectWithFile), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "ScriptObject@+ createScriptObject(const string& in, const string& in)", asFUNCTION(EntityCreateScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("ScriptFile@+ getScriptFile()", asFUNCTION(getScriptContextFile), asCALL_CDECL);
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(getScriptContextFile), asCALL_CDECL);
 }

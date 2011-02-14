@@ -16,6 +16,7 @@
                 </element>
             </element>
             <element type="Button">
+                <visible enable="false" />
                 <element type="Text">
                     <text value="TEST2" />
                     <font name="cour.ttf" size="12" />
@@ -58,13 +59,6 @@
             <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
             <element type="Button">
                 <element type="Text">
-                    <text value="TEST6" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
                     <text value="TEST7" />
                     <font name="cour.ttf" size="12" />
                     <alignment horizontal="center" vertical="center" />
@@ -73,6 +67,13 @@
             <element type="Button">
                 <element type="Text">
                     <text value="TEST8" />
+                    <font name="cour.ttf" size="12" />
+                    <alignment horizontal="center" vertical="center" />
+                </element>
+            </element>
+            <element type="Button">
+                <element type="Text">
+                    <text value="TEST9" />
                     <font name="cour.ttf" size="12" />
                     <alignment horizontal="center" vertical="center" />
                 </element>

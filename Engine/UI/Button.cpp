@@ -33,6 +33,9 @@ Button::Button(const std::string& name) :
     mInactiveRect(IntRect::sZero),
     mPressedRect(IntRect::sZero),
     mLabelOffset(IntVector2::sZero),
+    mRepeatDelay(1.0f),
+    mRepeatRate(0.0f),
+    mRepeatTimer(0.0f),
     mPressed(false)
 {
     mEnabled = true;
@@ -52,12 +55,33 @@ void Button::setStyle(const XMLElement& element, ResourceCache* cache)
         setPressedRect(element.getChildElement("pressedrect").getIntRect("value"));
     if (element.hasChildElement("labeloffset"))
         setLabelOffset(element.getChildElement("labeloffset").getIntVector2("value"));
+    if (element.hasChildElement("repeat"))
+    {
+        XMLElement repeatElem = element.getChildElement("repeat");
+        setRepeat(repeatElem.getFloat("delay"), repeatElem.getFloat("rate"));
+    }
 }
 
 void Button::update(float timeStep)
 {
     if (!mHovering)
         setPressed(false);
+    
+    // Send repeat events if pressed
+    if ((mPressed) && (mRepeatRate > 0.0f))
+    {
+        mRepeatTimer -= timeStep;
+        if (mRepeatTimer <= 0.0f)
+        {
+            mRepeatTimer += 1.0f / mRepeatRate;
+            
+            using namespace Pressed;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            sendEvent(EVENT_PRESSED, eventData);
+        }
+    }
 }
 
 void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -81,6 +105,7 @@ void Button::onClick(const IntVector2& position, const IntVector2& screenPositio
     if (buttons & MOUSEB_LEFT)
     {
         setPressed(true);
+        mRepeatTimer = mRepeatDelay;
         mHovering = true;
         
         using namespace Pressed;
@@ -119,6 +144,12 @@ void Button::setLabelOffset(const IntVector2& offset)
 void Button::setLabelOffset(int x, int y)
 {
     mLabelOffset = IntVector2(x, y);
+}
+
+void Button::setRepeat(float delay, float rate)
+{
+    mRepeatDelay = max(delay, 0.0f);
+    mRepeatRate = max(rate, 0.0f);
 }
 
 void Button::setPressed(bool enable)

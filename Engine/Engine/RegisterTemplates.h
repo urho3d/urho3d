@@ -442,6 +442,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setEnabled(bool)", asMETHOD(T, setEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocusable(bool)", asMETHOD(T, setFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setDefocusable(bool)", asMETHOD(T, setDefocusable), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setResetFocus(bool)", asMETHOD(T, setResetFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocus(bool)", asMETHOD(T, setFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setSelected(bool)", asMETHOD(T, setSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
@@ -477,6 +478,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isEnabled() const", asMETHOD(T, isEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isFocusable() const", asMETHOD(T, isFocusable), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isDefocusable() const", asMETHOD(T, isDefocusable), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool getResetFocus() const", asMETHOD(T, getResetFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasFocus() const", asMETHOD(T, hasFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isSelected() const", asMETHOD(T, isSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isVisible() const", asMETHOD(T, isVisible), asCALL_THISCALL);
@@ -530,9 +532,12 @@ template <class T> void registerButton(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "void setPressedRect(int, int, int, int)", asMETHODPR(T, setPressedRect, (int, int, int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLabelOffset(const IntVector2& in)", asMETHODPR(T, setLabelOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLabelOffset(int, int)", asMETHODPR(T, setLabelOffset, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setRepeat(float, float)", asMETHOD(T, setRepeat), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getInactiveRect() const", asMETHOD(T, getInactiveRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getPressedRect() const", asMETHOD(T, getPressedRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntVector2& getLabelOffset() const", asMETHOD(T, getLabelOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float getRepeatDelay() const", asMETHOD(T, getRepeatDelay), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "float getRepeatRate() const", asMETHOD(T, getRepeatRate), asCALL_THISCALL);
 }
 
 #endif // ENGINE_REGISTERTEMPLATES_H

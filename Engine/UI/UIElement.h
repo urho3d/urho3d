@@ -185,6 +185,8 @@ public:
     void setFocusable(bool enable);
     //! Set whether can be defocused by pressing ESC
     void setDefocusable(bool enable);
+    //! Set whether resets the focus when is clicked and is not focusable
+    void setResetFocus(bool enable);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
     //! Set selected mode. Actual meaning is element dependent, but is visually same as a constant hover
@@ -196,7 +198,7 @@ public:
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
-    void setLayout(Orientation layoutOrientation, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
+    void setLayout(Orientation type, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
         const IntRect& border = IntRect::sZero);
     //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void updateLayout();
@@ -257,6 +259,8 @@ public:
     bool isFocusable() const { return mFocusable; }
     //! Return whether can be defocused with ESC
     bool isDefocusable() const { return mDefocusable; }
+    //! Return whether resets the focus when clicked and is not focusable
+    bool getResetFocus() const { return mResetFocus; }
     //! Return whether has focus
     bool hasFocus() const { return mFocus; }
     //! Return whether is selected. Actual meaning is element dependent
@@ -349,6 +353,8 @@ protected:
     bool mFocusable;
     //! Defocusable flag
     bool mDefocusable;
+    //! Reset focus flag
+    bool mResetFocus;
     //! Focused flag
     bool mFocus;
     //! Selected flag

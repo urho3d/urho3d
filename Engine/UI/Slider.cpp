@@ -37,8 +37,8 @@ Slider::Slider(const std::string& name) :
     mDragSlider(false)
 {
     mEnabled = true;
-    mSlider = new BorderImage();
-    addChild(mSlider);
+    mKnob = new BorderImage();
+    addChild(mKnob);
     
     updateSlider();
 }
@@ -59,14 +59,16 @@ void Slider::setStyle(const XMLElement& element, ResourceCache* cache)
         if ((orientation == "vertical") || (orientation == "v"))
             setOrientation(O_VERTICAL);
     }
-    
-    XMLElement sliderElem = element.getChildElement("slider");
-    if (sliderElem)
+    if (element.hasChildElement("range"))
     {
-        mSlider->setStyle(sliderElem, cache);
-        setRange(sliderElem.getFloat("range"));
-        setValue(sliderElem.getFloat("value"));
+        XMLElement rangeElem = element.getChildElement("range");
+        setRange(rangeElem.getFloat("max"));
+        setValue(rangeElem.getFloat("value"));
     }
+    
+    XMLElement knobElem = element.getChildElement("knob");
+    if (knobElem)
+        mKnob->setStyle(knobElem, cache);
 }
 
 void Slider::update(float timeStep)
@@ -74,22 +76,22 @@ void Slider::update(float timeStep)
     if (mDragSlider)
         mHovering = true;
     
-    // Copy hover and selection effect to the slider button
-    mSlider->setHovering(mHovering);
-    mSlider->setSelected(mSelected);
+    // Copy hover and selection effect to the slider knob
+    mKnob->setHovering(mHovering);
+    mKnob->setSelected(mSelected);
 }
 
 void Slider::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
-    // Show hover effect if inside the slider button
-    mHovering = mSlider->isInside(screenPosition, true);
+    // Show hover effect if inside the slider knob
+    mHovering = mKnob->isInside(screenPosition, true);
 }
 
 void Slider::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     mOriginalPosition = position;
-    mOriginalSliderPosition = mSlider->getPosition();
-    mDragSlider = mSlider->isInside(screenPosition, true);
+    mOriginalSliderPosition = mKnob->getPosition();
+    mDragSlider = mKnob->isInside(screenPosition, true);
 }
 
 void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
@@ -102,28 +104,18 @@ void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosi
     
     if (mOrientation == O_HORIZONTAL)
     {
-        int newX = clamp(mOriginalSliderPosition.mX + delta.mX, 0, getWidth() - mSlider->getWidth());
-        mSlider->setPosition(newX, mOriginalSliderPosition.mY);
+        int newX = clamp(mOriginalSliderPosition.mX + delta.mX, 0, getWidth() - mKnob->getWidth());
+        mKnob->setPosition(newX, mOriginalSliderPosition.mY);
         newValue = clamp((float)newX * (mRange + 1.0f) / (float)getWidth(), 0.0f, mRange);
     }
     else
     {
-        int newY = clamp(mOriginalSliderPosition.mY + delta.mY, 0, getHeight() - mSlider->getHeight());
-        mSlider->setPosition(mOriginalSliderPosition.mX, newY);
+        int newY = clamp(mOriginalSliderPosition.mY + delta.mY, 0, getHeight() - mKnob->getHeight());
+        mKnob->setPosition(mOriginalSliderPosition.mX, newY);
         newValue = clamp((float)newY * (mRange + 1.0f) / (float)getHeight(), 0.0f, mRange);
     }
     
-    if (newValue != mValue)
-    {
-        mValue = newValue;
-        
-        using namespace SliderChanged;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        eventData[P_VALUE] = mValue;
-        sendEvent(EVENT_SLIDERCHANGED, eventData);
-    }
+    setValue(newValue);
 }
 
 void Slider::onDragEnd(const IntVector2& position, const IntVector2& screenPosition)
@@ -136,9 +128,9 @@ void Slider::onResize()
     updateSlider();
 }
 
-void Slider::setOrientation(Orientation orientation)
+void Slider::setOrientation(Orientation type)
 {
-    mOrientation = orientation;
+    mOrientation = type;
     updateSlider();
 }
 
@@ -159,6 +151,13 @@ void Slider::setValue(float value)
     {
         mValue = value;
         updateSlider();
+        
+        using namespace SliderChanged;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_VALUE] = mValue;
+        sendEvent(EVENT_SLIDERCHANGED, eventData);
     }
 }
 
@@ -171,8 +170,8 @@ void Slider::updateSlider()
             return;
         float sliderLength = width / (mRange + 1.0f);
         float sliderPos = width * mValue / (mRange + 1.0f);
-        mSlider->setSize((int)sliderLength, getHeight());
-        mSlider->setPosition(clamp((int)(sliderPos + 0.5f), 0, getWidth() - mSlider->getWidth()), 0);
+        mKnob->setSize((int)sliderLength, getHeight());
+        mKnob->setPosition(clamp((int)(sliderPos + 0.5f), 0, getWidth() - mKnob->getWidth()), 0);
     }
     else
     {
@@ -181,7 +180,7 @@ void Slider::updateSlider()
             return;
         float sliderLength = height / (mRange + 1.0f);
         float sliderPos = height * mValue / (mRange + 1.0f);
-        mSlider->setSize(getWidth(), (int)sliderLength);
-        mSlider->setPosition(0, clamp((int)(sliderPos + 0.5f), 0, getHeight() - mSlider->getHeight()));
+        mKnob->setSize(getWidth(), (int)sliderLength);
+        mKnob->setPosition(0, clamp((int)(sliderPos + 0.5f), 0, getHeight() - mKnob->getHeight()));
     }
 }
