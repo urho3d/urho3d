@@ -53,22 +53,7 @@ ScriptFile::ScriptFile(ScriptEngine* scriptEngine, const std::string& name) :
 
 ScriptFile::~ScriptFile()
 {
-    if (mScriptModule)
-    {
-        // Release script instances if any exist
-        std::vector<ScriptInstance*> instances = mScriptInstances;
-        for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
-            (*i)->releaseObject();
-        
-        // Perform a full garbage collection cycle, also clean up contexts which might still refer to the module's functions
-        mScriptEngine->garbageCollect(true);
-        
-        // Remove the module
-        moduleToFile.erase(mScriptModule);
-        asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
-        engine->DiscardModule(getName().c_str());
-        mScriptModule = 0;
-    }
+    releaseModule();
 }
 
 void ScriptFile::load(Deserializer& source, ResourceCache* cache)
@@ -78,17 +63,8 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     // If script instances have created objects from this file, release them now
     // Make a copy of the vector because the script instances will remove themselves from the member vector
     std::vector<ScriptInstance*> instances = mScriptInstances;
-    for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
-        (*i)->releaseObject();
     
-    // Clear search caches, event handlers and function-to-file mappings
-    mCompiled = false;
-    mAllIncludeFiles.clear();
-    mCheckedClasses.clear();
-    mFunctions.clear();
-    mMethods.clear();
-    setMemoryUse(0);
-    removeAllEventHandlers();
+    releaseModule();
     
     // Create the module. Discard previous module if there was one
     if (mScriptModule)
@@ -532,6 +508,35 @@ void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* fun
             }
             break;
         }
+    }
+}
+
+void ScriptFile::releaseModule()
+{
+    if (mScriptModule)
+    {
+        // Release script instances if any exist
+        std::vector<ScriptInstance*> instances = mScriptInstances;
+        for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
+            (*i)->releaseObject();
+        
+        // Clear search caches, event handlers and function-to-file mappings
+        mAllIncludeFiles.clear();
+        mCheckedClasses.clear();
+        mFunctions.clear();
+        mMethods.clear();
+        removeAllEventHandlers();
+        
+        // Perform a full garbage collection cycle now
+        mScriptEngine->garbageCollect(true);
+        
+        // Remove the module
+        moduleToFile.erase(mScriptModule);
+        asIScriptEngine* engine = mScriptEngine->getAngelScriptEngine();
+        engine->DiscardModule(getName().c_str());
+        mScriptModule = 0;
+        mCompiled = false;
+        setMemoryUse(0);
     }
 }
 

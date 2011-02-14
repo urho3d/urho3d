@@ -94,6 +94,8 @@ private:
     void addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache);
     //! Set parameters for a function or method
     void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
+    //! Release the script module
+    void releaseModule();
     //! Handle an event in script
     void handleScriptEvent(StringHash eventType, VariantMap& eventData);
     //! Handle a specific sender's event in script
