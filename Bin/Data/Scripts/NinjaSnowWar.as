@@ -95,8 +95,9 @@ void initConsole()
 void initScene()
 {
     @gameScene = engine.createScene("NinjaSnowWar", BoundingBox(-100000.0, 100000.0), 8, true);
-    // Make the scene directly accessible from the console
+    // Make the scene & script classes directly accessible from the console
     engine.setDefaultScene(gameScene);
+    engine.setDefaultScriptFile(scriptFile);
 
     File@ levelFile = cache.getFile("TestLevel.xml");
     gameScene.loadXML(levelFile);
@@ -178,7 +179,7 @@ void startGame()
     }
 
     Entity@ playerEntity = gameScene.createEntity("Player");
-    Ninja@ playerNinja = cast<Ninja>(playerEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
+    Ninja@ playerNinja = cast<Ninja>(playerEntity.createScriptObject(scriptFile, "Ninja"));
     playerNinja.create(Vector3(0, 90, 0), Quaternion());
     playerNinja.health = playerNinja.maxHealth = playerHealth;
     playerNinja.side = SIDE_PLAYER;
@@ -283,7 +284,7 @@ void spawnObjects(float timeStep)
 
             Vector3 position(xOffset, 5000, zOffset);
             Entity@ crateEntity = gameScene.createEntity();
-            GameObject@ crateObject = cast<GameObject>(crateEntity.createScriptObject("Scripts/NinjaSnowWar.as", "SnowCrate"));
+            GameObject@ crateObject = cast<GameObject>(crateEntity.createScriptObject(scriptFile, "SnowCrate"));
             crateObject.create(position, Quaternion());
         }
     }
@@ -307,7 +308,7 @@ void spawnObjects(float timeStep)
             Vector3 position(q * Vector3(offset, 1000, -12000));
 
             Entity@ enemyEntity = gameScene.createEntity();
-            Ninja@ enemyNinja = cast<Ninja>(enemyEntity.createScriptObject("Scripts/NinjaSnowWar.as", "Ninja"));
+            Ninja@ enemyNinja = cast<Ninja>(enemyEntity.createScriptObject(scriptFile, "Ninja"));
             enemyNinja.create(position, q);
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();

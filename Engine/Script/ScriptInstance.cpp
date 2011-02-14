@@ -324,13 +324,14 @@ void ScriptInstance::getComponentRefs(std::vector<ComponentRef>& dest)
         asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
         if (!context)
             return;
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS]);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS], std::vector<Variant>(), false);
         CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
         if (arr)
         {
             for (unsigned i = 0; i < arr->GetSize(); ++i)
                 dest.push_back(*(static_cast<ComponentRef*>(arr->At(i))));
         }
+        context->Unprepare();
     }
 }
 
@@ -341,13 +342,14 @@ void ScriptInstance::getResourceRefs(std::vector<Resource*>& dest)
         asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
         if (!context)
             return;
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETRESOURCEREFS]);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETRESOURCEREFS], std::vector<Variant>(), false);
         CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
         if (arr)
         {
             for (unsigned i = 0; i < arr->GetSize(); ++i)
                 dest.push_back(*(static_cast<Resource**>(arr->At(i))));
         }
+        context->Unprepare();
     }
 }
 

@@ -109,14 +109,13 @@ static Component* EntityCreateComponentWithName(const std::string& type, const s
     }
 }
 
-static asIScriptObject* EntityCreateScriptObject(const std::string& scriptFileName, const std::string& className, Entity* ptr)
+asIScriptObject* EntityCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Entity* ptr)
 {
+    if (!file)
+        return 0;
+    
     try
     {
-        ResourceCache* cache = getEngine()->getResourceCache();
-        ScriptFile* file = cache->getResource<ScriptFile>(scriptFileName);
-        if (!file)
-            return 0;
         // Try first to reuse an existing, empty ScriptInstance
         const std::vector<SharedPtr<Component> >& components = ptr->getComponents();
         for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
@@ -141,6 +140,12 @@ static asIScriptObject* EntityCreateScriptObject(const std::string& scriptFileNa
     {
         SAFE_RETHROW_RET(e, 0);
     }
+}
+
+static asIScriptObject* EntityCreateScriptObject(const std::string& scriptFileName, const std::string& className, Entity* ptr)
+{
+    ResourceCache* cache = getEngine()->getResourceCache();
+    return EntityCreateScriptObjectWithFile(cache->getResource<ScriptFile>(scriptFileName), className, ptr);
 }
 
 static void EntityRemoveComponent(const std::string& type, Entity* ptr)

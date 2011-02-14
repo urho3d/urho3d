@@ -61,14 +61,15 @@ public:
     virtual void addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName);
     
     //! Query for a function by declaration and execute if found
-    bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
+    bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>(), bool unprepare = true);
     //! Execute a function
-    bool execute(asIScriptFunction* function, const std::vector<Variant>& parameters = std::vector<Variant>());
+    bool execute(asIScriptFunction* function, const std::vector<Variant>& parameters = std::vector<Variant>(), bool unprepare = true);
     //! Query for an object method by declaration and execute if found
     bool execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters =
-        std::vector<Variant>());
+        std::vector<Variant>(), bool unprepare = true);
     //! Execute an object method
-    bool execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>());
+    bool execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>(),
+        bool unprepare = true);
     //! Create a script object
     asIScriptObject* createObject(const std::string& className);
     
@@ -120,7 +121,5 @@ private:
 ScriptFile* getScriptContextFile();
 //! Get current script execution nesting level
 unsigned getScriptNestingLevel();
-//! Return highest script execution nesting level, optionally reset it
-unsigned getHighestScriptNestingLevel(bool reset = true);
 
 #endif // SCRIPT_SCRIPTFILE_H

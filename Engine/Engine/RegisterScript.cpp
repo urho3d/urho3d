@@ -29,6 +29,8 @@
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 
+asIScriptObject* EntityCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Entity* ptr);
+
 static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)
@@ -50,6 +52,10 @@ static void registerScriptFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptFile", "bool execute(const string& in, const array<Variant>@+)", asFUNCTION(ScriptFileExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptFile", "bool isCompiled() const", asMETHOD(ScriptFile, isCompiled), asCALL_THISCALL);
     registerRefCasts<Resource, ScriptFile>(engine, "Resource", "ScriptFile");
+    
+    engine->RegisterObjectMethod("Entity", "ScriptObject@+ createScriptObject(ScriptFile@+, const string& in)", asFUNCTION(EntityCreateScriptObjectWithFile), asCALL_CDECL_OBJLAST);
+    engine->RegisterGlobalFunction("ScriptFile@+ getScriptFile()", asFUNCTION(getScriptContextFile), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(getScriptContextFile), asCALL_CDECL);
 }
 
 static bool ScriptInstanceExecute(const std::string& declaration, CScriptArray* srcParams, ScriptInstance* ptr)

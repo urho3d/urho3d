@@ -52,6 +52,7 @@ class Renderer;
 class ResourceCache;
 class Scene;
 class ScriptEngine;
+class ScriptFile;
 class Server;
 class UI;
 class UIElement;
@@ -92,6 +93,8 @@ public:
     void removeServer();
     //! Set the default scene. This will always be available as the "scene" global property to scripting
     void setDefaultScene(Scene* scene);
+    //! Set the default script file. This will be used in immediate mode
+    void setDefaultScriptFile(ScriptFile* file);
     //! Set minimum frames per second. If FPS goes lower than this, time will appear to slow down
     void setMinFps(int fps);
     //! Set maximum frames per second. The engine will sleep if FPS is higher than this

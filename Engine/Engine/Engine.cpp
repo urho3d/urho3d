@@ -54,6 +54,7 @@
 #include "Scene.h"
 #include "ScriptComponentFactory.h"
 #include "ScriptEngine.h"
+#include "ScriptFile.h"
 #include "ScriptInstance.h"
 #include "ScriptResourceFactory.h"
 #include "Server.h"
@@ -362,6 +363,12 @@ DebugHud* Engine::createDebugHud()
 void Engine::setDefaultScene(Scene* scene)
 {
     mDefaultScene = scene;
+}
+
+void Engine::setDefaultScriptFile(ScriptFile* file)
+{
+    if (mScriptEngine)
+        mScriptEngine->setImmediateScriptFile(file);
 }
 
 void Engine::setMinFps(int fps)

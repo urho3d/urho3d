@@ -84,7 +84,7 @@ class GameObject : ScriptObject
         Entity@ newEntity = scene.createEntity();
 
         // Create the script object with specified class
-        GameObject@ object = cast<GameObject>(newEntity.createScriptObject("Scripts/NinjaSnowWar.as", className));
+        GameObject@ object = cast<GameObject>(newEntity.createScriptObject(scriptFile, className));
         if (@object != null)
             object.create(position, rotation);
 
@@ -101,7 +101,7 @@ class GameObject : ScriptObject
         emitter.setPosition(position);
 
         // Create a GameObject for managing the effect lifetime
-        GameObject@ object = cast<GameObject>(newEntity.createScriptObject("Scripts/NinjaSnowWar.as", "GameObject"));
+        GameObject@ object = cast<GameObject>(newEntity.createScriptObject(scriptFile, "GameObject"));
         if (@object != null)
             object.duration = duration;
 
@@ -121,7 +121,7 @@ class GameObject : ScriptObject
         channel.play(sound, sound.getFrequency());
 
         // Create a GameObject for managing the sound lifetime
-        GameObject@ object = cast<GameObject>(newEntity.createScriptObject("Scripts/NinjaSnowWar.as", "GameObject"));
+        GameObject@ object = cast<GameObject>(newEntity.createScriptObject(scriptFile, "GameObject"));
         if (@object != null)
             object.duration = duration;
 

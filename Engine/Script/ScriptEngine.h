@@ -24,8 +24,9 @@
 #ifndef SCRIPT_SCRIPTENGINE_H
 #define SCRIPT_SCRIPTENGINE_H
 
-#include "RefCount.h"
+#include "SharedPtr.h"
 
+class ScriptFile;
 class asIScriptEngine;
 class asIScriptContext;
 struct asSMessageInfo;
@@ -49,10 +50,12 @@ public:
     //! Destruct. Release the AngelScript engine
     ~ScriptEngine();
     
-    //! Compile and execute a line of script
+    //! Compile and execute a line of script in immediate mode
     bool execute(const std::string& line);
     //! Perform garbage collection
     void garbageCollect(bool fullCycle);
+    //! Set immediate mode script file
+    void setImmediateScriptFile(ScriptFile* file);
     //! Set script engine logging mode, immediate is default
     void setLogMode(ScriptLogMode mode);
     //! Clear retained mode log messages
@@ -76,6 +79,8 @@ private:
     asIScriptEngine* mAngelScriptEngine;
     //! Immediate execution script context
     asIScriptContext* mImmediateContext;
+    //! Immediate execution script file
+    WeakPtr<ScriptFile> mImmediateScriptFile;
     //! Script function/method execution contexts
     std::vector<asIScriptContext*> mScriptFileContexts;
     //! Script engine logging mode

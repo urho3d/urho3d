@@ -38,8 +38,6 @@
 #include "DebugNew.h"
 
 static unsigned scriptNestingLevel = 0;
-static unsigned highestScriptNestingLevel = 0;
-ScriptFile* lastScriptFile = 0;
 
 std::map<asIScriptModule*, ScriptFile*> moduleToFile;
 
@@ -71,8 +69,6 @@ ScriptFile::~ScriptFile()
         engine->DiscardModule(getName().c_str());
         mScriptModule = 0;
     }
-    if (lastScriptFile == this)
-        lastScriptFile = 0;
 }
 
 void ScriptFile::load(Deserializer& source, ResourceCache* cache)
@@ -165,7 +161,7 @@ void ScriptFile::addEventHandler(EventListener* sender, StringHash eventType, co
     mSpecificEventHandlers[std::make_pair(sender, eventType)] = function;
 }
 
-bool ScriptFile::execute(const std::string& declaration, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(const std::string& declaration, const std::vector<Variant>& parameters, bool unprepare)
 {
     asIScriptFunction* function = getFunction(declaration);
     if (!function)
@@ -174,10 +170,10 @@ bool ScriptFile::execute(const std::string& declaration, const std::vector<Varia
         return false;
     }
     
-    return execute(getFunction(declaration), parameters);
+    return execute(getFunction(declaration), parameters, unprepare);
 }
 
-bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>& parameters, bool unprepare)
 {
     PROFILE(Script_ExecuteFunction);
     
@@ -196,19 +192,18 @@ bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>
     if (context->Prepare(function->GetId()) < 0)
         return false;
     
-    lastScriptFile = this;
     setParameters(context, function, parameters);
     
     ++scriptNestingLevel;
-    if (scriptNestingLevel > highestScriptNestingLevel)
-        highestScriptNestingLevel = scriptNestingLevel;
     bool success = context->Execute() >= 0;
+    if (unprepare)
+        context->Unprepare();
     --scriptNestingLevel;
     
     return success;
 }
 
-bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters, bool unprepare)
 {
     asIScriptFunction* method = getMethod(object, declaration);
     if (!method)
@@ -217,10 +212,10 @@ bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration
         return false;
     }
     
-    return execute(object, method, parameters);
+    return execute(object, method, parameters, unprepare);
 }
 
-bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters)
+bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters, bool unprepare)
 {
     PROFILE(Script_ExecuteMethod);
     
@@ -244,9 +239,9 @@ bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, con
     setParameters(context, method, parameters);
     
     ++scriptNestingLevel;
-    if (scriptNestingLevel > highestScriptNestingLevel)
-        highestScriptNestingLevel = scriptNestingLevel;
     bool success = context->Execute() >= 0;
+    if (unprepare)
+        context->Unprepare();
     --scriptNestingLevel;
     
     return success;
@@ -585,12 +580,4 @@ ScriptFile* getScriptContextFile()
 unsigned getScriptNestingLevel()
 {
     return scriptNestingLevel;
-}
-
-unsigned getHighestScriptNestingLevel(bool reset)
-{
-    unsigned ret = highestScriptNestingLevel;
-    if (reset)
-        highestScriptNestingLevel = 0;
-    return ret;
 }

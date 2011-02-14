@@ -101,8 +101,12 @@ bool ScriptEngine::execute(const std::string& line)
     
     std::string wrappedLine = "void f(){\n" + line + ";\n}";
     
-    // Create a dummy module for compiling the line
-    asIScriptModule* module = mAngelScriptEngine->GetModule("ExecuteImmediate", asGM_ALWAYS_CREATE);
+    // If necessary, create a dummy module for compiling the line
+    asIScriptModule* module = 0;
+    if (mImmediateScriptFile)
+        module = mImmediateScriptFile->getScriptModule();
+    if (!module)
+        module = mAngelScriptEngine->GetModule("ExecuteImmediate", asGM_CREATE_IF_NOT_EXISTS);
     if (!module)
         return false;
     
@@ -120,6 +124,7 @@ bool ScriptEngine::execute(const std::string& line)
     bool success = false;
     
     success = mImmediateContext->Execute() >= 0;
+    mImmediateContext->Unprepare();
     function->Release();
     
     return success;
@@ -128,12 +133,6 @@ bool ScriptEngine::execute(const std::string& line)
 void ScriptEngine::garbageCollect(bool fullCycle)
 {
     PROFILE(Script_GarbageCollect);
-    
-    // Unprepare contexts up to the highest used
-    mImmediateContext->Unprepare();
-    unsigned highest = getHighestScriptNestingLevel();
-    for (unsigned i = 0; i < highest; ++i)
-        mScriptFileContexts[i]->Unprepare();
     
     if (fullCycle)
         mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE);
@@ -144,6 +143,11 @@ void ScriptEngine::garbageCollect(bool fullCycle)
         mAngelScriptEngine->GarbageCollect(asGC_ONE_STEP | asGC_DETECT_GARBAGE);
         mAngelScriptEngine->GarbageCollect(asGC_FULL_CYCLE | asGC_DESTROY_GARBAGE);
     }
+}
+
+void ScriptEngine::setImmediateScriptFile(ScriptFile* file)
+{
+    mImmediateScriptFile = file;
 }
 
 void ScriptEngine::setLogMode(ScriptLogMode mode)
