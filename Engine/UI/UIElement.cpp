@@ -42,9 +42,7 @@ UIElement::UIElement(const std::string& name) :
     mBringToBack(true),
     mClipChildren(false),
     mEnabled(false),
-    mFocusable(false),
-    mDefocusable(true),
-    mResetFocus(false),
+    mFocusMode(FM_NOTFOCUSABLE),
     mFocus(false),
     mSelected(false),
     mVisible(true),
@@ -156,12 +154,18 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setClipChildren(element.getChildElement("clipchildren").getBool("enable"));
     if (element.hasChildElement("enabled"))
         setEnabled(element.getChildElement("enabled").getBool("enable"));
-    if (element.hasChildElement("focusable"))
-        setFocusable(element.getChildElement("focusable").getBool("enable"));
-    if (element.hasChildElement("defocusable"))
-        setDefocusable(element.getChildElement("defocusable").getBool("enable"));
-    if (element.hasChildElement("resetfocus"))
-        setResetFocus(element.getChildElement("resetfocus").getBool("enable"));
+    if (element.hasChildElement("focusmode"))
+    {
+        std::string focusMode = element.getChildElement("focusmode").getStringLower("value");
+        if (focusMode == "notfocusable")
+            setFocusMode(FM_NOTFOCUSABLE);
+        if (focusMode == "resetfocus")
+            setFocusMode(FM_RESETFOCUS);
+        if (focusMode == "focusable")
+            setFocusMode(FM_FOCUSABLE);
+        if ((focusMode == "focusabledefocusable") || (focusMode == "defocusable"))
+            setFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
+    }
     if (element.hasChildElement("selected"))
         setSelected(element.getChildElement("selected").getBool("enable"));
     if (element.hasChildElement("visible"))
@@ -550,25 +554,14 @@ void UIElement::setEnabled(bool enable)
     mEnabled = enable;
 }
 
-void UIElement::setFocusable(bool enable)
+void UIElement::setFocusMode(FocusMode mode)
 {
-    mFocusable = enable;
+    mFocusMode = mode;
 }
-
-void UIElement::setDefocusable(bool enable)
-{
-    mDefocusable = enable;
-}
-
-void UIElement::setResetFocus(bool enable)
-{
-    mResetFocus = enable;
-}
-
 
 void UIElement::setFocus(bool enable)
 {
-    if (!mFocusable)
+    if (mFocusMode < FM_FOCUSABLE)
         enable = false;
     
     if (enable != mFocus)
@@ -662,12 +655,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
-                int y = mChildren[i]->getPosition().mY;
-                if ((mChildren[i]->getVerticalAlignment() == VA_TOP) && (y < mLayoutBorder.mTop))
-                    y = mLayoutBorder.mTop;
-                if ((mChildren[i]->getVerticalAlignment() == VA_BOTTOM) && (y > -mLayoutBorder.mBottom))
-                    y = -mLayoutBorder.mBottom;
-                mChildren[i]->setPosition(position, y);
+                mChildren[i]->setPosition(position, getLayoutChildYPosition(mChildren[i]));
                 if (mVerticalLayoutMode == LM_RESIZECHILDREN)
                     mChildren[i]->setHeight(getHeight() - mLayoutBorder.mTop - mLayoutBorder.mBottom);
                 position += mChildren[i]->getWidth();
@@ -700,12 +688,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
-                int y = mChildren[i]->getPosition().mY;
-                if ((mChildren[i]->getVerticalAlignment() == VA_TOP) && (y < mLayoutBorder.mTop))
-                    y = mLayoutBorder.mTop;
-                if ((mChildren[i]->getVerticalAlignment() == VA_BOTTOM) && (y > -mLayoutBorder.mBottom))
-                    y = -mLayoutBorder.mBottom;
-                mChildren[i]->setPosition(positions[idx], y);
+                mChildren[i]->setPosition(positions[idx], getLayoutChildYPosition(mChildren[i]));
                 mChildren[i]->setSize(sizes[idx], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
                     mLayoutBorder.mBottom : mChildren[i]->getHeight());
                 ++idx;
@@ -736,7 +719,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                mChildren[i]->setPosition(0, position);
+                mChildren[i]->setPosition(getLayoutChildXPosition(mChildren[i]), position);
                 if (mHorizontalLayoutMode == LM_RESIZECHILDREN)
                     mChildren[i]->setWidth(getWidth() - mLayoutBorder.mLeft - mLayoutBorder.mRight);
                 position += mChildren[i]->getHeight();
@@ -768,7 +751,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                mChildren[i]->setPosition(0, positions[idx]);
+                mChildren[i]->setPosition(getLayoutChildXPosition(mChildren[i]), positions[idx]);
                 mChildren[i]->setSize(mHorizontalLayoutMode == LM_RESIZECHILDREN ? getWidth() - mLayoutBorder.mLeft -
                     mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[idx]);
                 ++idx;
@@ -1159,3 +1142,32 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
         position += spacing;
     }
 }
+
+int UIElement::getLayoutChildXPosition(UIElement* child)
+{
+    HorizontalAlignment ha = child->getHorizontalAlignment();
+    switch (ha)
+    {
+    case HA_LEFT:
+        return mLayoutBorder.mLeft;
+        
+    case HA_RIGHT:
+        return -mLayoutBorder.mRight;
+    }
+    return 0;
+}
+
+int UIElement::getLayoutChildYPosition(UIElement* child)
+{
+    VerticalAlignment va = child->getVerticalAlignment();
+    switch (va)
+    {
+    case VA_TOP:
+        return mLayoutBorder.mTop;
+        
+    case VA_BOTTOM:
+        return -mLayoutBorder.mBottom;
+    }
+    return 0;
+}
+

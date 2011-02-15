@@ -122,7 +122,7 @@ void UI::setFocusElement(UIElement* element)
     if ((element) && (element->hasFocus()))
         return;
     // Return if element can not be focused, and does not reset the focus either
-    if ((element) && (!element->isFocusable()) && (!element->getResetFocus()))
+    if ((element) && (element->getFocusMode() == FM_NOTFOCUSABLE))
         return;
     
     std::vector<UIElement*> allChildren = mRootElement->getChildren(true);
@@ -135,7 +135,7 @@ void UI::setFocusElement(UIElement* element)
             other->setFocus(false);
     }
     
-    if ((element) && (element->isFocusable()))
+    if (element)
         element->setFocus(true);
 }
 
@@ -558,7 +558,7 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
                 std::vector<UIElement*> children = parent->getChildren();
                 for (std::vector<UIElement*>::iterator i = children.begin(); i != children.end();)
                 {
-                    if (!(*i)->isFocusable())
+                    if ((*i)->getFocusMode() < FM_FOCUSABLE)
                         i = children.erase(i);
                     else
                         ++i;
@@ -575,7 +575,7 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
             }
         }
         // Defocus the element
-        else if ((key == KEY_ESC) && (element->isDefocusable()))
+        else if ((key == KEY_ESC) && (element->getFocusMode() == FM_FOCUSABLE_DEFOCUSABLE))
             mDefocusElement = element;
         // If none of the special keys, pass the key to the focused element
         else

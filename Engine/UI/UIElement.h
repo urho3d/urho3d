@@ -64,6 +64,19 @@ enum Orientation
     O_VERTICAL
 };
 
+//! UI element focus mode
+enum FocusMode
+{
+    //! Is not focusable and does not affect existing focus
+    FM_NOTFOCUSABLE = 0,
+    //! Resets focus when clicked
+    FM_RESETFOCUS,
+    //! Is focusable
+    FM_FOCUSABLE,
+    //! Is focusable and also defocusable by pressing ESC
+    FM_FOCUSABLE_DEFOCUSABLE
+};
+
 //! Layout operation mode
 enum LayoutMode
 {
@@ -181,12 +194,8 @@ public:
     void setClipChildren(bool enable);
     //! Set whether reacts to input
     void setEnabled(bool enable);
-    //! Set whether can be focused
-    void setFocusable(bool enable);
-    //! Set whether can be defocused by pressing ESC
-    void setDefocusable(bool enable);
-    //! Set whether resets the focus when is clicked and is not focusable
-    void setResetFocus(bool enable);
+    //! Set focus mode
+    void setFocusMode(FocusMode mode);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
     //! Set selected mode. Actual meaning is element dependent, but is visually same as a constant hover
@@ -255,12 +264,8 @@ public:
     bool getClipChildren() const { return mClipChildren; }
     //! Return whether reacts to input
     bool isEnabled() const { return mEnabled; }
-    //! Return whether can be focused
-    bool isFocusable() const { return mFocusable; }
-    //! Return whether can be defocused with ESC
-    bool isDefocusable() const { return mDefocusable; }
-    //! Return whether resets the focus when clicked and is not focusable
-    bool getResetFocus() const { return mResetFocus; }
+    //! Return focus mode
+    FocusMode getFocusMode() const { return mFocusMode; }
     //! Return whether has focus
     bool hasFocus() const { return mFocus; }
     //! Return whether is selected. Actual meaning is element dependent
@@ -349,12 +354,8 @@ protected:
     bool mClipChildren;
     //! Reacts to input flag
     bool mEnabled;
-    //! Focusable flag
-    bool mFocusable;
-    //! Defocusable flag
-    bool mDefocusable;
-    //! Reset focus flag
-    bool mResetFocus;
+    //! Focus mode
+    FocusMode mFocusMode;
     //! Focused flag
     bool mFocus;
     //! Selected flag
@@ -391,6 +392,10 @@ private:
     //! Calculate child widths/positions in the layout
     void calculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
         const std::vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
+    //! Get child element X position in a vertical layout
+    int getLayoutChildXPosition(UIElement* child);
+    //! Get child element Y position in a horizontal layout
+    int getLayoutChildYPosition(UIElement* child);
     
     //! Position
     IntVector2 mPosition;

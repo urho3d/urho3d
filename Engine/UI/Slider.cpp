@@ -76,7 +76,7 @@ void Slider::update(float timeStep)
     if (mDragSlider)
         mHovering = true;
     
-    // Copy hover and selection effect to the slider knob
+    // Propagate hover and selection effect to the slider knob
     mKnob->setHovering(mHovering);
     mKnob->setSelected(mSelected);
 }

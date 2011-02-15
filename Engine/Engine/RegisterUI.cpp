@@ -65,6 +65,12 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("Orientation", "O_HORIZONTAL", O_HORIZONTAL);
     engine->RegisterEnumValue("Orientation", "O_VERTICAL", O_VERTICAL);
     
+    engine->RegisterEnum("FocusMode");
+    engine->RegisterEnumValue("FocusMode", "FM_NOTFOCUSABLE", FM_NOTFOCUSABLE);
+    engine->RegisterEnumValue("FocusMode", "FM_RESETFOCUS", FM_RESETFOCUS);
+    engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE", FM_FOCUSABLE);
+    engine->RegisterEnumValue("FocusMode", "FM_FOCUSABLE_DEFOCUSABLE", FM_FOCUSABLE_DEFOCUSABLE);
+    
     engine->RegisterEnum("LayoutMode");
     engine->RegisterEnumValue("LayoutMode", "LM_FREE", LM_FREE);
     engine->RegisterEnumValue("LayoutMode", "LM_RESIZECHILDREN", LM_RESIZECHILDREN);

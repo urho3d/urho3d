@@ -67,7 +67,7 @@ Console::Console(Engine* engine) :
         
         mLineEdit = new LineEdit();
         mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
-        mLineEdit->setDefocusable(false);
+        mLineEdit->setFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
         mBackground->addChild(mLineEdit);
         
         uiRoot->addChild(mBackground);

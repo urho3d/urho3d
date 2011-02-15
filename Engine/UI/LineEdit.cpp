@@ -45,7 +45,7 @@ LineEdit::LineEdit(const std::string& name, const std::string& text) :
 {
     mClipChildren = true;
     mEnabled = true;
-    mFocusable = true;
+    mFocusMode = FM_FOCUSABLE_DEFOCUSABLE;
     mText = new Text();
     mCursor = new BorderImage();
     addChild(mText);

@@ -38,7 +38,7 @@ ScrollView::ScrollView(const std::string& name) :
 {
     mClipChildren = true;
     mEnabled = true;
-    mFocusable = true;
+    mFocusMode = FM_FOCUSABLE_DEFOCUSABLE;
 }
 
 ScrollView::~ScrollView()

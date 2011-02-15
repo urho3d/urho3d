@@ -440,9 +440,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setBringToBack(bool)", asMETHOD(T, setBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setClipChildren(bool)", asMETHOD(T, setClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setEnabled(bool)", asMETHOD(T, setEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setFocusable(bool)", asMETHOD(T, setFocusable), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setDefocusable(bool)", asMETHOD(T, setDefocusable), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setResetFocus(bool)", asMETHOD(T, setResetFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setFocusMode(FocusMode)", asMETHOD(T, setFocusMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocus(bool)", asMETHOD(T, setFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setSelected(bool)", asMETHOD(T, setSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
@@ -476,9 +474,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool getBringToBack() const", asMETHOD(T, getBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getClipChildren() const", asMETHOD(T, getClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isEnabled() const", asMETHOD(T, isEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool isFocusable() const", asMETHOD(T, isFocusable), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool isDefocusable() const", asMETHOD(T, isDefocusable), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool getResetFocus() const", asMETHOD(T, getResetFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "FocusMode getFocusMode() const", asMETHOD(T, getFocusMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasFocus() const", asMETHOD(T, hasFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isSelected() const", asMETHOD(T, isSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isVisible() const", asMETHOD(T, isVisible), asCALL_THISCALL);
