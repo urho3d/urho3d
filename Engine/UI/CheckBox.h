@@ -46,27 +46,19 @@ public:
     
     //! Set checked state
     void setChecked(bool enable);
-    //! Set unchecked image rectangle
-    void setUncheckedRect(const IntRect& rect);
-    //! Set unchecked image rectangle
-    void setUncheckedRect(int left, int top, int right, int bottom);
-    //! Set checked image rectangle
-    void setCheckedRect(const IntRect& rect);
-    //! Set checked image rectangle
-    void setCheckedRect(int left, int top, int right, int bottom);
+    //! Set checked image offset
+    void setCheckedOffset(const IntVector2& rect);
+    //! Set checked image offset
+    void setCheckedOffset(int x, int y);
     
     //! Return whether is checked
     bool isChecked() const { return mChecked; }
-    //! Return unchecked image rectangle
-    const IntRect& getUncheckedRect() const { return mUncheckedRect; }
-    //! Return checked image rectangle
-    const IntRect& getCheckedRect() const { return mCheckedRect; }
+    //! Return checked image offset
+    const IntVector2& getCheckedOffset() const { return mCheckedOffset; }
     
 protected:
-    //! Unchecked image rectangle
-    IntRect mUncheckedRect;
-    //! Checked image rectangle
-    IntRect mCheckedRect;
+    //! Checked image offset
+    IntVector2 mCheckedOffset;
     //! Current checked state
     bool mChecked;
 };

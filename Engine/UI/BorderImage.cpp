@@ -47,7 +47,11 @@ void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("texture"))
         setTexture(cache->getResource<Texture2D>(element.getChildElement("texture").getString("name")));
     if (element.hasChildElement("imagerect"))
-        setImageRect(element.getChildElement("imagerect").getIntRect("value"));
+    {
+        XMLElement imageElem = element.getChildElement("imagerect");
+        if (imageElem.hasAttribute("value"))
+            setImageRect(imageElem.getIntRect("value"));
+    }
     if (element.hasChildElement("border"))
         setBorder(element.getChildElement("border").getIntRect("value"));
     if (element.hasChildElement("hoveroffset"))
@@ -55,6 +59,61 @@ void BorderImage::setStyle(const XMLElement& element, ResourceCache* cache)
 }
 
 void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+{
+    if ((mHovering) || (mSelected))
+        getBatches(batches, quads, currentScissor, mHoverOffset);
+    else
+        getBatches(batches, quads, currentScissor, IntVector2::sZero);
+}
+
+void BorderImage::setTexture(Texture* texture)
+{
+    mTexture = texture;
+    if (mImageRect == IntRect::sZero)
+        setFullImageRect();
+}
+
+void BorderImage::setImageRect(const IntRect& rect)
+{
+    if (rect != IntRect::sZero)
+        mImageRect = rect;
+}
+
+void BorderImage::setImageRect(int left, int top, int right, int bottom)
+{
+    setImageRect(IntRect(left, top, right, bottom));
+}
+
+void BorderImage::setFullImageRect()
+{
+    if (mTexture)
+        setImageRect(IntRect(0, 0, mTexture->getWidth(), mTexture->getHeight()));
+}
+
+void BorderImage::setBorder(const IntRect& rect)
+{
+    mBorder.mLeft = max(rect.mLeft, 0);
+    mBorder.mTop = max(rect.mTop, 0);
+    mBorder.mRight = max(rect.mRight, 0);
+    mBorder.mBottom = max(rect.mBottom, 0);
+}
+
+void BorderImage::setBorder(int left, int top, int right, int bottom)
+{
+    setBorder(IntRect(left, top, right, bottom));
+}
+
+void BorderImage::setHoverOffset(const IntVector2& offset)
+{
+    mHoverOffset = offset;
+}
+
+void BorderImage::setHoverOffset(int x, int y)
+{
+    mHoverOffset = IntVector2(x, y);
+}
+
+void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
 {
     bool allOpaque = true;
     if ((getDerivedOpacity() < 1.0f) || (mColor[C_TOPLEFT].mA < 1.0f) || (mColor[C_TOPRIGHT].mA < 1.0f) ||
@@ -77,8 +136,7 @@ void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>&
         max(mImageRect.mBottom - mImageRect.mTop - mBorder.mTop - mBorder.mBottom, 0));
     
     IntVector2 topLeft(mImageRect.mLeft, mImageRect.mTop);
-    if ((mHovering) || (mSelected))
-        topLeft += mHoverOffset;
+    topLeft += offset;
     
     // Top
     if (mBorder.mTop)
@@ -126,61 +184,4 @@ void BorderImage::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>&
     
     // Reset hovering for next frame
     mHovering = false;
-}
-
-void BorderImage::setTexture(Texture* texture)
-{
-    mTexture = texture;
-    if (mImageRect == IntRect::sZero)
-        setFullImageRect();
-}
-
-void BorderImage::setImageRect(const IntRect& rect)
-{
-    mImageRect = rect;
-}
-
-void BorderImage::setImageRect(int left, int top, int right, int bottom)
-{
-    mImageRect.mLeft = left;
-    mImageRect.mTop = top;
-    mImageRect.mRight = right;
-    mImageRect.mBottom = bottom;
-}
-
-void BorderImage::setFullImageRect()
-{
-    if (mTexture)
-    {
-        mImageRect.mLeft = 0;
-        mImageRect.mTop = 0;
-        mImageRect.mRight = mTexture->getWidth();
-        mImageRect.mBottom = mTexture->getHeight();
-    }
-}
-
-void BorderImage::setBorder(const IntRect& rect)
-{
-    mBorder.mLeft = max(rect.mLeft, 0);
-    mBorder.mTop = max(rect.mTop, 0);
-    mBorder.mRight = max(rect.mRight, 0);
-    mBorder.mBottom = max(rect.mBottom, 0);
-}
-
-void BorderImage::setBorder(int left, int top, int right, int bottom)
-{
-    mBorder.mLeft = max(left, 0);
-    mBorder.mTop = max(top, 0);
-    mBorder.mRight = max(right, 0);
-    mBorder.mBottom = max(bottom, 0);
-}
-
-void BorderImage::setHoverOffset(const IntVector2& offset)
-{
-    mHoverOffset = offset;
-}
-
-void BorderImage::setHoverOffset(int x, int y)
-{
-    mHoverOffset = IntVector2(x, y);
 }

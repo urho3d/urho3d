@@ -29,7 +29,11 @@
 
 ScrollBar::ScrollBar(const std::string& name) :
     UIElement(name),
-    mScrollStep(0.1f)
+    mScrollStep(0.1f),
+    mLeftRect(IntRect::sZero),
+    mRightRect(IntRect::sZero),
+    mUpRect(IntRect::sZero),
+    mDownRect(IntRect::sZero)
 {
     mEnabled = true;
     mBackButton = new Button();
@@ -59,14 +63,30 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
     XMLElement backButtonElem = element.getChildElement("backbutton");
     if (backButtonElem)
     {
+        XMLElement imageElem = backButtonElem.getChildElement("imagerect");
+        if (imageElem.hasAttribute("horizontal"))
+            mLeftRect = imageElem.getIntRect("horizontal");
+        if (imageElem.hasAttribute("vertical"))
+            mUpRect = imageElem.getIntRect("vertical");
+        if (imageElem.hasAttribute("h"))
+            mLeftRect = imageElem.getIntRect("h");
+        if (imageElem.hasAttribute("v"))
+            mUpRect = imageElem.getIntRect("v");
         mBackButton->setStyle(backButtonElem, cache);
-        setButtonStyle(0, backButtonElem);
     }
     XMLElement forwardButtonElem = element.getChildElement("forwardbutton");
     if (forwardButtonElem)
     {
+        XMLElement imageElem = forwardButtonElem.getChildElement("imagerect");
+        if (imageElem.hasAttribute("horizontal"))
+            mRightRect = imageElem.getIntRect("horizontal");
+        if (imageElem.hasAttribute("vertical"))
+            mDownRect = imageElem.getIntRect("vertical");
+        if (imageElem.hasAttribute("h"))
+            mRightRect = imageElem.getIntRect("h");
+        if (imageElem.hasAttribute("v"))
+            mDownRect = imageElem.getIntRect("v");
         mForwardButton->setStyle(forwardButtonElem, cache);
-        setButtonStyle(1, forwardButtonElem);
     }
     XMLElement sliderElem = element.getChildElement("slider");
     if (sliderElem)
@@ -111,11 +131,16 @@ void ScrollBar::setOrientation(Orientation orientation)
 {
     mSlider->setOrientation(orientation);
     
-    unsigned orient = (unsigned)orientation;
-    mBackButton->setInactiveRect(mInactiveRects[orient][0]);
-    mBackButton->setPressedRect(mPressedRects[orient][0]);
-    mForwardButton->setInactiveRect(mInactiveRects[orient][1]);
-    mForwardButton->setPressedRect(mPressedRects[orient][1]);
+    if (orientation == O_HORIZONTAL)
+    {
+        mBackButton->setImageRect(mLeftRect);
+        mForwardButton->setImageRect(mRightRect);
+    }
+    else
+    {
+        mBackButton->setImageRect(mUpRect);
+        mForwardButton->setImageRect(mDownRect);
+    }
     
     onResize();
     setLayout(orientation, LM_RESIZECHILDREN, LM_RESIZECHILDREN);
@@ -149,35 +174,6 @@ float ScrollBar::getRange() const
 float ScrollBar::getValue() const
 {
     return mSlider->getValue();
-}
-
-void ScrollBar::setButtonStyle(unsigned index, const XMLElement& buttonElem)
-{
-    Button* button = index ? mForwardButton : mBackButton;
-    unsigned orient = (unsigned)getType();
-    
-    XMLElement inactiveRectElem = buttonElem.getChildElement("inactiverect");
-    if (inactiveRectElem.hasAttribute("horizontal"))
-        mInactiveRects[0][index] = inactiveRectElem.getIntRect("horizontal");
-    if (inactiveRectElem.hasAttribute("h"))
-        mInactiveRects[0][index] = inactiveRectElem.getIntRect("h");
-    if (inactiveRectElem.hasAttribute("vertical"))
-        mInactiveRects[1][index] = inactiveRectElem.getIntRect("vertical");
-    if (inactiveRectElem.hasAttribute("v"))
-        mInactiveRects[1][index] = inactiveRectElem.getIntRect("v");
-    
-    XMLElement pressedRectElem = buttonElem.getChildElement("pressedrect");
-    if (pressedRectElem.hasAttribute("horizontal"))
-        mPressedRects[0][index] = pressedRectElem.getIntRect("horizontal");
-    if (pressedRectElem.hasAttribute("h"))
-        mPressedRects[0][index] = pressedRectElem.getIntRect("h");
-    if (inactiveRectElem.hasAttribute("vertical"))
-        mPressedRects[1][index] = pressedRectElem.getIntRect("vertical");
-    if (inactiveRectElem.hasAttribute("v"))
-        mPressedRects[1][index] = pressedRectElem.getIntRect("v");
-    
-    button->setInactiveRect(mInactiveRects[orient][index]);
-    button->setPressedRect(mPressedRects[orient][index]);
 }
 
 void ScrollBar::handleBackButtonPressed(StringHash eventType, VariantMap& eventData)

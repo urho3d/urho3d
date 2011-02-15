@@ -30,8 +30,7 @@
 
 Button::Button(const std::string& name) :
     BorderImage(name),
-    mInactiveRect(IntRect::sZero),
-    mPressedRect(IntRect::sZero),
+    mPressedOffset(IntVector2::sZero),
     mLabelOffset(IntVector2::sZero),
     mRepeatDelay(1.0f),
     mRepeatRate(0.0f),
@@ -49,10 +48,8 @@ void Button::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     BorderImage::setStyle(element, cache);
     
-    if (element.hasChildElement("inactiverect"))
-        setInactiveRect(element.getChildElement("inactiverect").getIntRect("value"));
-    if (element.hasChildElement("pressedrect"))
-        setPressedRect(element.getChildElement("pressedrect").getIntRect("value"));
+    if (element.hasChildElement("pressedoffset"))
+        setPressedOffset(element.getChildElement("pressedoffset").getIntVector2("value"));
     if (element.hasChildElement("labeloffset"))
         setLabelOffset(element.getChildElement("labeloffset").getIntVector2("value"));
     if (element.hasChildElement("repeat"))
@@ -86,12 +83,13 @@ void Button::update(float timeStep)
 
 void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
+    IntVector2 offset(IntVector2::sZero);
+    if ((mHovering) || (mSelected))
+        offset += mHoverOffset;
     if (mPressed)
-        mImageRect = mPressedRect;
-    else
-        mImageRect = mInactiveRect;
+        offset += mPressedOffset;
     
-    BorderImage::getBatches(batches, quads, currentScissor);
+    BorderImage::getBatches(batches, quads, currentScissor, offset);
 }
 
 void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
@@ -116,25 +114,16 @@ void Button::onClick(const IntVector2& position, const IntVector2& screenPositio
     }
 }
 
-void Button::setInactiveRect(const IntRect& rect)
+void Button::setPressedOffset(const IntVector2& offset)
 {
-    mInactiveRect = rect;
+    mPressedOffset = offset;
 }
 
-void Button::setInactiveRect(int left, int top, int right, int bottom)
+void Button::setPressedOffset(int x, int y)
 {
-    mInactiveRect = IntRect(left, top, right, bottom);
+    mPressedOffset = IntVector2(x, y);
 }
 
-void Button::setPressedRect(const IntRect& rect)
-{
-    mPressedRect = rect;
-}
-
-void Button::setPressedRect(int left, int top, int right, int bottom)
-{
-    mPressedRect = IntRect(left, top, right, bottom);
-}
 
 void Button::setLabelOffset(const IntVector2& offset)
 {

@@ -392,10 +392,8 @@ private:
     //! Calculate child widths/positions in the layout
     void calculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
         const std::vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
-    //! Get child element X position in a vertical layout
-    int getLayoutChildXPosition(UIElement* child);
-    //! Get child element Y position in a horizontal layout
-    int getLayoutChildYPosition(UIElement* child);
+    //! Get child element constant position in a layout
+    IntVector2 getLayoutChildPosition(UIElement* child);
     
     //! Position
     IntVector2 mPosition;

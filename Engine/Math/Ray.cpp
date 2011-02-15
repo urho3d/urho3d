@@ -24,6 +24,12 @@
 #include "Precompiled.h"
 #include "Ray.h"
 
+Vector3 Ray::project(const Vector3& point) const
+{
+    Vector3 offset = point - mOrigin;
+    return mOrigin + offset.dotProduct(mDirection) * mDirection;
+}
+
 float Ray::getDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
     // Based on Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore

@@ -48,26 +48,20 @@ public:
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     
-    //! Set inactive image rectangle
-    void setInactiveRect(const IntRect& rect);
-    //! Set inactive image rectangle
-    void setInactiveRect(int left, int top, int right, int bottom);
-    //! Set pressed image rectangle
-    void setPressedRect(const IntRect& rect);
-    //! Set pressed image rectangle
-    void setPressedRect(int left, int top, int right, int bottom);
-    //! Set label offset on press
+    //! Set pressed image offset
+    void setPressedOffset(const IntVector2& offset);
+    //! Set pressed image offset
+    void setPressedOffset(int x, int y);
+    //! Set pressed label offset
     void setLabelOffset(const IntVector2& offset);
-    //! Set label offset on press
+    //! Set pressed label offset
     void setLabelOffset(int x, int y);
     //! Set pressed event repeat. Rate 0 (default) disables repeat
     void setRepeat(float delay, float rate);
     
-    //! Return inactive image rectangle
-    const IntRect& getInactiveRect() const { return mInactiveRect; }
-    //! Return pressed image rectangle
-    const IntRect& getPressedRect() const { return mPressedRect; }
-    //! Return label offset on press
+    //! Return pressed image offset
+    const IntVector2& getPressedOffset() const { return mPressedOffset; }
+    //! Return pressed label offset
     const IntVector2& getLabelOffset() const { return mLabelOffset; }
     //! Return repeat delay
     float getRepeatDelay() const { return mRepeatDelay; }
@@ -78,11 +72,9 @@ protected:
     //! Set new pressed state
     void setPressed(bool enable);
     
-    //! Inactive image rectangle
-    IntRect mInactiveRect;
-    //! Pressed image rectangle
-    IntRect mPressedRect;
-    //! Label offset on press
+    //! Pressed image offset
+    IntVector2 mPressedOffset;
+    //! Pressed label offset
     IntVector2 mLabelOffset;
     //! Repeat delay
     float mRepeatDelay;

@@ -30,8 +30,7 @@
 
 CheckBox::CheckBox(const std::string& name) :
     BorderImage(name),
-    mUncheckedRect(IntRect::sZero),
-    mCheckedRect(IntRect::sZero),
+    mCheckedOffset(IntVector2::sZero),
     mChecked(false)
 {
     mEnabled = true;
@@ -45,27 +44,32 @@ void CheckBox::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     BorderImage::setStyle(element, cache);
     
-    if (element.hasChildElement("uncheckedrect"))
-        setUncheckedRect(element.getChildElement("uncheckedrect").getIntRect("value"));
-    if (element.hasChildElement("checkedrect"))
-        setCheckedRect(element.getChildElement("checkedrect").getIntRect("value"));
+    if (element.hasChildElement("checkedoffset"))
+        setCheckedOffset(element.getChildElement("checkedoffset").getIntVector2("value"));
 }
 
 void CheckBox::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
+    IntVector2 offset(IntVector2::sZero);
+    if ((mHovering) || (mSelected))
+        offset += mHoverOffset;
     if (mChecked)
-        mImageRect = mCheckedRect;
-    else
-        mImageRect = mUncheckedRect;
+        offset += mCheckedOffset;
     
-    BorderImage::getBatches(batches, quads, currentScissor);
+    BorderImage::getBatches(batches, quads, currentScissor, offset);
 }
 
 void CheckBox::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     if (buttons & MOUSEB_LEFT)
+        setChecked(!mChecked);
+}
+
+void CheckBox::setChecked(bool enable)
+{
+    if (enable != mChecked)
     {
-        mChecked = !mChecked;
+        mChecked = enable;
         
         using namespace Toggled;
         
@@ -76,28 +80,12 @@ void CheckBox::onClick(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void CheckBox::setChecked(bool enable)
+void CheckBox::setCheckedOffset(const IntVector2& offset)
 {
-    // Note: event is intentionally not sent when manually set
-    mChecked = enable;
+    mCheckedOffset = offset;
 }
 
-void CheckBox::setUncheckedRect(const IntRect& rect)
+void CheckBox::setCheckedOffset(int x, int y)
 {
-    mUncheckedRect = rect;
-}
-
-void CheckBox::setUncheckedRect(int left, int top, int right, int bottom)
-{
-    mUncheckedRect = IntRect(left, top, right, bottom);
-}
-
-void CheckBox::setCheckedRect(const IntRect& rect)
-{
-    mCheckedRect = rect;
-}
-
-void CheckBox::setCheckedRect(int left, int top, int right, int bottom)
-{
-    mCheckedRect = IntRect(left, top, right, bottom);
+    mCheckedOffset = IntVector2(x, y);
 }

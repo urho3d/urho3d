@@ -72,6 +72,9 @@ public:
     const IntVector2& getHoverOffset() const { return mHoverOffset; }
     
 protected:
+    //! Return UI rendering batches with offset to image rectangle
+    void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset);
+    
     //! Texture
     SharedPtr<Texture> mTexture;
     //! Image rectangle

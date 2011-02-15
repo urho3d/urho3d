@@ -110,13 +110,10 @@ static void registerCheckBox(asIScriptEngine* engine)
 {
     registerBorderImage<CheckBox>(engine, "CheckBox");
     engine->RegisterObjectMethod("CheckBox", "void setChecked(bool)", asMETHOD(CheckBox, setChecked), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(const IntRect& in)", asMETHODPR(CheckBox, setUncheckedRect, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "void setUncheckedRect(int, int, int, int)", asMETHODPR(CheckBox, setUncheckedRect, (int, int, int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "void setCheckedRect(const IntRect& in)", asMETHODPR(CheckBox, setCheckedRect, (const IntRect&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "void setCheckedRect(int, int, int, int)", asMETHODPR(CheckBox, setCheckedRect, (int, int, int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setCheckedOffset(const IntVector2& in)", asMETHODPR(CheckBox, setCheckedOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "void setCheckedOffset(int, int)", asMETHODPR(CheckBox, setCheckedOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("CheckBox", "bool isChecked() const", asMETHOD(CheckBox, isChecked), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "const IntRect& getUncheckedRect() const", asMETHOD(CheckBox, getUncheckedRect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CheckBox", "const IntRect& getCheckedRect() const", asMETHOD(CheckBox, getCheckedRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CheckBox", "const IntVector2& getCheckedOffset() const", asMETHOD(CheckBox, getCheckedOffset), asCALL_THISCALL);
     registerRefCasts<UIElement, CheckBox>(engine, "UIElement", "CheckBox");
 }
 

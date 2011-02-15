@@ -77,6 +77,8 @@ public:
         mDirection = direction.getNormalized();
     }
     
+    //! Project a point on the ray
+    Vector3 project(const Vector3& point) const;
     //! Return minimum distance to a triangle, or infinity if no hit
     float getDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
     //! Return minimum distance to a triangle mesh defined by vertex and index data

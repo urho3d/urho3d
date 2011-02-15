@@ -655,7 +655,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
-                mChildren[i]->setPosition(position, getLayoutChildYPosition(mChildren[i]));
+                mChildren[i]->setPosition(position, getLayoutChildPosition(mChildren[i]).mY);
                 if (mVerticalLayoutMode == LM_RESIZECHILDREN)
                     mChildren[i]->setHeight(getHeight() - mLayoutBorder.mTop - mLayoutBorder.mBottom);
                 position += mChildren[i]->getWidth();
@@ -688,7 +688,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
-                mChildren[i]->setPosition(positions[idx], getLayoutChildYPosition(mChildren[i]));
+                mChildren[i]->setPosition(positions[idx], getLayoutChildPosition(mChildren[i]).mY);
                 mChildren[i]->setSize(sizes[idx], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
                     mLayoutBorder.mBottom : mChildren[i]->getHeight());
                 ++idx;
@@ -719,7 +719,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                mChildren[i]->setPosition(getLayoutChildXPosition(mChildren[i]), position);
+                mChildren[i]->setPosition(getLayoutChildPosition(mChildren[i]).mX, position);
                 if (mHorizontalLayoutMode == LM_RESIZECHILDREN)
                     mChildren[i]->setWidth(getWidth() - mLayoutBorder.mLeft - mLayoutBorder.mRight);
                 position += mChildren[i]->getHeight();
@@ -751,7 +751,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                mChildren[i]->setPosition(getLayoutChildXPosition(mChildren[i]), positions[idx]);
+                mChildren[i]->setPosition(getLayoutChildPosition(mChildren[i]).mX, positions[idx]);
                 mChildren[i]->setSize(mHorizontalLayoutMode == LM_RESIZECHILDREN ? getWidth() - mLayoutBorder.mLeft -
                     mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[idx]);
                 ++idx;
@@ -1143,31 +1143,29 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
     }
 }
 
-int UIElement::getLayoutChildXPosition(UIElement* child)
+IntVector2 UIElement::getLayoutChildPosition(UIElement* child)
 {
+    IntVector2 ret(IntVector2::sZero);
+    
     HorizontalAlignment ha = child->getHorizontalAlignment();
     switch (ha)
     {
     case HA_LEFT:
-        return mLayoutBorder.mLeft;
+        ret.mX = mLayoutBorder.mLeft;
         
     case HA_RIGHT:
-        return -mLayoutBorder.mRight;
+        ret.mX -mLayoutBorder.mRight;
     }
-    return 0;
-}
-
-int UIElement::getLayoutChildYPosition(UIElement* child)
-{
+    
     VerticalAlignment va = child->getVerticalAlignment();
     switch (va)
     {
     case VA_TOP:
-        return mLayoutBorder.mTop;
+        ret.mY = mLayoutBorder.mTop;
         
     case VA_BOTTOM:
-        return -mLayoutBorder.mBottom;
+        ret.mY = mLayoutBorder.mBottom;
     }
-    return 0;
+    return ret;
 }
 

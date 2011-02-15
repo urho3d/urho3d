@@ -69,9 +69,6 @@ public:
     Slider* getSlider() const { return mSlider; }
     
 protected:
-    //! Store/setup style of a button. Index 0 = back, 1 = forward
-    void setButtonStyle(unsigned index, const XMLElement& buttonElem);
-    
     //! Back button
     SharedPtr<Button> mBackButton;
     //! Forward button
@@ -80,11 +77,14 @@ protected:
     SharedPtr<Slider> mSlider;
     //! Scroll step
     float mScrollStep;
-    
-    //! Inactive rects for buttons
-    IntRect mInactiveRects[2][2];
-    //! Pressed rects for buttons
-    IntRect mPressedRects[2][2];
+    //! Left button image rect
+    IntRect mLeftRect;
+    //! Right button image rect
+    IntRect mRightRect;
+    //! Up button image rect
+    IntRect mUpRect;
+    //! Down button image rect
+    IntRect mDownRect;
     
 private:
     //! Handle back button pressed
