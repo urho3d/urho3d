@@ -1154,7 +1154,7 @@ IntVector2 UIElement::getLayoutChildPosition(UIElement* child)
         ret.mX = mLayoutBorder.mLeft;
         
     case HA_RIGHT:
-        ret.mX -mLayoutBorder.mRight;
+        ret.mX = -mLayoutBorder.mRight;
     }
     
     VerticalAlignment va = child->getVerticalAlignment();
@@ -1164,8 +1164,9 @@ IntVector2 UIElement::getLayoutChildPosition(UIElement* child)
         ret.mY = mLayoutBorder.mTop;
         
     case VA_BOTTOM:
-        ret.mY = mLayoutBorder.mBottom;
+        ret.mY = -mLayoutBorder.mBottom;
     }
+    
     return ret;
 }
 
