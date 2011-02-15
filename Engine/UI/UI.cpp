@@ -118,6 +118,9 @@ void UI::setFocusElement(UIElement* element)
     eventData[P_ELEMENT] = (void*)element;
     sendEvent(EVENT_TRYFOCUS, eventData);
     
+    // The event receivers may divert the focus
+    element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    
     // Return if already has focus
     if ((element) && (element->hasFocus()))
         return;

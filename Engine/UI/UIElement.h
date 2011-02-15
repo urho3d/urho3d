@@ -316,6 +316,8 @@ public:
     //! Return combined screen coordinate rect of element and its children
     IntRect getCombinedScreenRect();
     
+    //! Set child offset
+    void setChildOffset(const IntVector2& offset);
     //! Set hovering state
     void setHovering(bool enable);
     //! Set origin element
@@ -329,8 +331,6 @@ public:
 protected:
     //! Mark screen position as needing an update
     void markDirty();
-    //! Set child offset
-    void setChildOffset(const IntVector2& offset);
     
     //! Name
     std::string mName;

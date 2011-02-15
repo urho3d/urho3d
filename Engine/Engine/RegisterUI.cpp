@@ -149,19 +149,19 @@ static void registerScrollBar(asIScriptEngine* engine)
 
 static void registerScrollView(asIScriptEngine* engine)
 {
-    registerBorderImage<ScrollView>(engine, "ScrollView");
+    registerUIElement<ScrollView>(engine, "ScrollView");
     engine->RegisterObjectMethod("ScrollView", "void setViewPosition(const IntVector2& in)", asMETHODPR(ScrollView, setViewPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setViewPosition(int, int)", asMETHODPR(ScrollView, setViewPosition, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "void setViewSize(const IntVector2& in)", asMETHODPR(ScrollView, setViewSize, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "void setViewSize(int, int)", asMETHODPR(ScrollView, setViewSize, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "void setHorizontalScrollBar(ScrollBar@+)", asMETHOD(ScrollView, setHorizontalScrollBar), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "void setVerticalSlider(ScrollBar@+)", asMETHOD(ScrollView, setVerticalScrollBar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ScrollView, setScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setScrollStep(float)", asMETHOD(ScrollView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setPageStep(float)", asMETHOD(ScrollView, setPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewSize() const", asMETHOD(ScrollView, getViewSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "UIElement@+ getElement() const", asMETHOD(ScrollView, getElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ScrollView, getHorizontalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getVerticalScrollBar() const", asMETHOD(ScrollView, getVerticalScrollBar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "BorderImage@+ getScrollPanel() const", asMETHOD(ScrollView, getScrollPanel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool getHorizontalScrollBarVisible() const", asMETHOD(ScrollView, getHorizontalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool getVerticalScrollBarVisible() const", asMETHOD(ScrollView, getVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getScrollStep() const", asMETHOD(ScrollView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getPageStep() const", asMETHOD(ScrollView, getPageStep), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");

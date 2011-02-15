@@ -34,6 +34,13 @@ DEFINE_EVENT(EVENT_RESIZED, Resized)
     EVENT_PARAM(P_Height, Height);              // int
 }
 
+//! UI element visibility changed
+DEFINE_EVENT(EVENT_VISIBLECHANGED, VisibleChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_VISIBLE, Visible);            // bool
+}
+
 //! Trying to focus an UI element. Sent before checking for success. Also sent with 0 pointer for global defocus
 DEFINE_EVENT(EVENT_TRYFOCUS, TryFocus)
 {

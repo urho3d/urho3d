@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "Log.h"
 #include "ResourceCache.h"
 #include "UIElement.h"
 #include "UIEvents.h"
@@ -93,6 +92,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setPosition(element.getChildElement("position").getIntVector2("value"));
     if (element.hasChildElement("size"))
         setSize(element.getChildElement("size").getIntVector2("value"));
+    if (element.hasChildElement("width"))
+        setWidth(element.getChildElement("width").getInt("value"));
+    if (element.hasChildElement("height"))
+        setHeight(element.getChildElement("height").getInt("value"));
     if (element.hasChildElement("minsize"))
         setMinSize(element.getChildElement("minsize").getIntVector2("value"));
     if (element.hasChildElement("maxsize"))
@@ -173,7 +176,7 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("layout"))
     {
         XMLElement layoutElem = element.getChildElement("layout");
-        std::string orientation = layoutElem.getStringLower(orientation);
+        std::string orientation = layoutElem.getStringLower("orientation");
         if ((orientation == "horizontal") || (orientation == "h"))
             mLayoutOrientation = O_HORIZONTAL;
         if ((orientation == "vertical") || (orientation == "v"))
@@ -595,6 +598,13 @@ void UIElement::setVisible(bool enable)
         // Parent's layout may change as a result of visibility change
         if (mParent)
             mParent->updateLayout();
+        
+        using namespace VisibleChanged;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_VISIBLE] = mVisible;
+        sendEvent(EVENT_VISIBLECHANGED, eventData);
     }
 }
 
@@ -970,6 +980,16 @@ IntRect UIElement::getCombinedScreenRect()
     return combined;
 }
 
+void UIElement::setChildOffset(const IntVector2& offset)
+{
+    if (offset != mChildOffset)
+    {
+        mChildOffset = offset;
+        for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+            (*i)->markDirty();
+    }
+}
+
 void UIElement::setHovering(bool enable)
 {
     mHovering = enable;
@@ -1021,16 +1041,6 @@ void UIElement::markDirty()
     
     for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
         (*i)->markDirty();
-}
-
-void UIElement::setChildOffset(const IntVector2& offset)
-{
-    if (offset != mChildOffset)
-    {
-        mChildOffset = offset;
-        for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
-            (*i)->markDirty();
-    }
 }
 
 void UIElement::getChildrenRecursive(std::vector<UIElement*>& dest) const
@@ -1152,9 +1162,11 @@ IntVector2 UIElement::getLayoutChildPosition(UIElement* child)
     {
     case HA_LEFT:
         ret.mX = mLayoutBorder.mLeft;
+        break;
         
     case HA_RIGHT:
         ret.mX = -mLayoutBorder.mRight;
+        break;
     }
     
     VerticalAlignment va = child->getVerticalAlignment();
@@ -1162,9 +1174,11 @@ IntVector2 UIElement::getLayoutChildPosition(UIElement* child)
     {
     case VA_TOP:
         ret.mY = mLayoutBorder.mTop;
+        break;
         
     case VA_BOTTOM:
         ret.mY = -mLayoutBorder.mBottom;
+        break;
     }
     
     return ret;

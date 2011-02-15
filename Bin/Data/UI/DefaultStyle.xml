@@ -79,11 +79,76 @@
         </slider>
     </element>
     <element type="ScrollView">
-        <size value="16 16" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="112 0 128 16" />
-        <border value="2 2 2 2" />
-        <clipborder value="1 1 1 1" />
+        <horizontalscrollbar>
+            <backbutton>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+                <repeat delay="0.4" rate="20" />
+            </backbutton>
+            <forwardbutton>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+                <repeat delay="0.4" rate="20" />
+            </forwardbutton>
+            <slider>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect value="48 0 64 16" />
+                <border value="3 3 3 3" />
+                <knob>
+                    <texture name="Textures/UI.png" />
+                    <imagerect value="16 0 32 16" />
+                    <border value="4 4 4 4" />
+                    <hoveroffset value="0 16" />
+                </knob>
+            </slider>
+        </horizontalscrollbar>
+        <verticalscrollbar>
+            <backbutton>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+                <repeat delay="0.4" rate="20" />
+            </backbutton>
+            <forwardbutton>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+                <repeat delay="0.4" rate="20" />
+            </forwardbutton>
+            <slider>
+                <size value="16 16" />
+                <texture name="Textures/UI.png" />
+                <imagerect value="48 0 64 16" />
+                <border value="3 3 3 3" />
+                <knob>
+                    <texture name="Textures/UI.png" />
+                    <imagerect value="16 0 32 16" />
+                    <border value="4 4 4 4" />
+                    <hoveroffset value="0 16" />
+                </knob>
+            </slider>
+        </verticalscrollbar>
+        <scrollpanel>
+            <texture name="Textures/UI.png" />
+            <imagerect value="112 0 128 16" />
+            <border value="2 2 2 2" />
+            <clipborder value="1 1 1 1" />
+        </scrollpanel>
     </element>
     <element type="Slider">
         <size value="16 16" />

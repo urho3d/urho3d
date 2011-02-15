@@ -24,12 +24,13 @@
 #ifndef UI_SCROLLVIEW_H
 #define UI_SCROLLVIEW_H
 
-#include "BorderImage.h"
+#include "UIElement.h"
 
+class BorderImage;
 class ScrollBar;
 
 //! A scrollable view for showing child widgets
-class ScrollView : public BorderImage
+class ScrollView : public UIElement
 {
     DEFINE_TYPE(ScrollView);
     
@@ -43,25 +44,17 @@ public:
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
-    //! React to gaining focus
-    virtual void onFocus();
-    //! React to losing focus
-    virtual void onDefocus();
     //! React to resize
     virtual void onResize();
     
+    //! Set content element
+    void setElement(UIElement* element);
     //! Set view offset from the top-left corner
     void setViewPosition(const IntVector2& position);
     //! Set view offset from the top-left corner
     void setViewPosition(int x, int y);
-    //! Set total view size
-    void setViewSize(const IntVector2& position);
-    //! Set total view size
-    void setViewSize(int x, int y);
-    //! Set horizontal scroll bar
-    void setHorizontalScrollBar(ScrollBar* scrollBar);
-    //! Set vertical scroll bar
-    void setVerticalScrollBar(ScrollBar* scrollBar);
+    //! Set scrollbars' visibility
+    void setScrollBarsVisible(bool horizontal, bool vertical);
     //! Set arrow key scroll step
     void setScrollStep(float step);
     //! Set arrow key page step
@@ -69,29 +62,39 @@ public:
     
     //! Return view offset from the top-left corner
     const IntVector2& getViewPosition() const { return mViewPosition; }
-    //! Return total view size
-    const IntVector2& getViewSize() const { return mViewSize; }
+    //! Return content element
+    UIElement* getElement() const { return mElement; }
     //! Return horizontal scroll bar
     ScrollBar* getHorizontalScrollBar() const { return mHorizontalScrollBar; }
     //! Return vertical scroll bar
     ScrollBar* getVerticalScrollBar() const { return mVerticalScrollBar; }
+    //! Return scroll panel
+    BorderImage* getScrollPanel() const { return mScrollPanel; }
+    //! Return horizontal scrollbar visibility
+    bool getHorizontalScrollBarVisible() const;
+    //! Return vertical scrollbar visibility
+    bool getVerticalScrollBarVisible() const;
     //! Return arrow key scroll step
     float getScrollStep() const { return mScrollStep; }
     //! Return arrow key page step
     float getPageStep() const { return mPageStep; }
     
 protected:
-    //! Update the view from scrollbars if available
-    void updateViewFromScrollBars();
+    //! Update view size from the content element
+    void updateViewSize();
     //! Update the scrollbars' ranges and positions
     void updateScrollBars();
-    //! Limit and update view with a new position
+    //! Limit and update the view with a new position
     void updateView(const IntVector2& position);
     
+    //! Content element
+    SharedPtr<UIElement> mElement;
     //! Horizontal scroll bar
-    WeakPtr<ScrollBar> mHorizontalScrollBar;
+    SharedPtr<ScrollBar> mHorizontalScrollBar;
     //! Vertical scroll bar
-    WeakPtr<ScrollBar> mVerticalScrollBar;
+    SharedPtr<ScrollBar> mVerticalScrollBar;
+    //! Scroll panel element
+    SharedPtr<BorderImage> mScrollPanel;
     //! Current view offset from the top-left corner
     IntVector2 mViewPosition;
     //! Total view size
@@ -106,6 +109,12 @@ protected:
 private:
     //! Handle scrollbar value changed
     void handleScrollBarChanged(StringHash eventType, VariantMap& eventData);
+    //! Handle scrollbar visibility changed
+    void handleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData);
+    //! Handle content element resized
+    void handleElementResized(StringHash eventType, VariantMap& eventData);
+    //! Handle focus change attempt (check if ScrollView needs to be focused)
+    void handleTryFocus(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_SCROLLVIEW_H

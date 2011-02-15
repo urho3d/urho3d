@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "BorderImage.h"
 #include "InputEvents.h"
 #include "ScrollBar.h"
 #include "ScrollView.h"
@@ -30,15 +31,34 @@
 #include "DebugNew.h"
 
 ScrollView::ScrollView(const std::string& name) :
-    BorderImage(name),
+    UIElement(name),
     mViewPosition(IntVector2::sZero),
     mViewSize(IntVector2::sZero),
     mScrollStep(0.1f),
     mPageStep(1.0f)
 {
-    mClipChildren = true;
     mEnabled = true;
     mFocusMode = FM_FOCUSABLE_DEFOCUSABLE;
+    
+    mHorizontalScrollBar = new ScrollBar();
+    mHorizontalScrollBar->setAlignment(HA_LEFT, VA_BOTTOM);
+    mHorizontalScrollBar->setOrientation(O_HORIZONTAL);
+    mVerticalScrollBar = new ScrollBar();
+    mVerticalScrollBar->setAlignment(HA_RIGHT, VA_TOP);
+    mVerticalScrollBar->setOrientation(O_VERTICAL);
+    mScrollPanel = new BorderImage();
+    mScrollPanel->setEnabled(true);
+    mScrollPanel->setClipChildren(true);
+    
+    addChild(mHorizontalScrollBar);
+    addChild(mVerticalScrollBar);
+    addChild(mScrollPanel);
+    
+    subscribeToEvent(mHorizontalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
+    subscribeToEvent(mHorizontalScrollBar, EVENT_VISIBLECHANGED, EVENT_HANDLER(ScrollView, handleScrollBarVisibleChanged));
+    subscribeToEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
+    subscribeToEvent(mVerticalScrollBar, EVENT_VISIBLECHANGED, EVENT_HANDLER(ScrollView, handleScrollBarVisibleChanged));
+    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(ScrollView, handleTryFocus));
 }
 
 ScrollView::~ScrollView()
@@ -47,25 +67,33 @@ ScrollView::~ScrollView()
 
 void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    BorderImage::setStyle(element, cache);
+    UIElement::setStyle(element, cache);
     
     if (element.hasChildElement("viewposition"))
         setViewPosition(element.getChildElement("viewposition").getIntVector2("value"));
-    if (element.hasChildElement("viewsize"))
-        setViewSize(element.getChildElement("viewsize").getIntVector2("value"));
     if (element.hasChildElement("scrollstep"))
         setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
     if (element.hasChildElement("pagestep"))
         setScrollStep(element.getChildElement("pagestep").getFloat("value"));
     
+    XMLElement horizElem = element.getChildElement("horizontalscrollbar");
+    if (horizElem)
+        mHorizontalScrollBar->setStyle(horizElem, cache);
+    XMLElement vertElem = element.getChildElement("verticalscrollbar");
+    if (vertElem)
+        mVerticalScrollBar->setStyle(vertElem, cache);
+    XMLElement panelElem = element.getChildElement("scrollpanel");
+    if (panelElem)
+        mScrollPanel->setStyle(panelElem, cache);
+    
     UIElement* root = getRootElement();
-    if (root)
-    {
-        if (element.hasChildElement("horizontalscrollbar"))
-            setHorizontalScrollBar(dynamic_cast<ScrollBar*>(root->getChild(element.getChildElement("horizontalscrollbar").getString("name"), true)));
-        if (element.hasChildElement("verticalscrollbar"))
-            setVerticalScrollBar(dynamic_cast<ScrollBar*>(root->getChild(element.getChildElement("verticalscrollbar").getString("name"), true)));
-    }
+    if ((root) && (element.hasChildElement("contentelement")))
+        setElement(root->getChild(element.getChildElement("contentelement").getString("name"), true));
+    
+    // Set the scrollbar orientations again and perform size update now that the style is known
+    mHorizontalScrollBar->setOrientation(O_HORIZONTAL);
+    mVerticalScrollBar->setOrientation(O_VERTICAL);
+    onResize();
 }
 
 void ScrollView::onKey(int key, int buttons, int qualifiers)
@@ -134,27 +162,39 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
     }
 }
 
-void ScrollView::onFocus()
-{
-    // Set selected state (constant hover) on the scroll bars to show they are now under key control
-    if (mHorizontalScrollBar)
-        mHorizontalScrollBar->setSelected(true);
-    if (mVerticalScrollBar)
-        mVerticalScrollBar->setSelected(true);
-}
-
-void ScrollView::onDefocus()
-{
-    if (mHorizontalScrollBar)
-        mHorizontalScrollBar->setSelected(false);
-    if (mVerticalScrollBar)
-        mVerticalScrollBar->setSelected(false);
-}
-
 void ScrollView::onResize()
 {
-    // This will grow the view size if it is smaller than current size
-    setViewSize(mViewSize);
+    IntVector2 panelSize = getSize();
+    if (mVerticalScrollBar->isVisible())
+        panelSize.mX -= mVerticalScrollBar->getWidth();
+    if (mHorizontalScrollBar->isVisible())
+        panelSize.mY -= mHorizontalScrollBar->getHeight();
+    
+    mScrollPanel->setSize(panelSize);
+    mHorizontalScrollBar->setWidth(mScrollPanel->getWidth());
+    mVerticalScrollBar->setHeight(mScrollPanel->getHeight());
+    
+    updateViewSize();
+}
+
+void ScrollView::setElement(UIElement* element)
+{
+    if (element == mElement)
+        return;
+    
+    if (mElement)
+    {
+        mScrollPanel->removeChild(mElement);
+        unsubscribeFromEvent(mElement, EVENT_RESIZED);
+    }
+    mElement = element;
+    if (mElement)
+    {
+        mScrollPanel->addChild(mElement);
+        subscribeToEvent(mElement, EVENT_RESIZED, EVENT_HANDLER(ScrollView, handleElementResized));
+    }
+    
+    updateViewSize();
 }
 
 void ScrollView::setViewPosition(const IntVector2& position)
@@ -168,41 +208,10 @@ void ScrollView::setViewPosition(int x, int y)
     setViewPosition(IntVector2(x, y));
 }
 
-void ScrollView::setViewSize(const IntVector2& size)
+void ScrollView::setScrollBarsVisible(bool horizontal, bool vertical)
 {
-    mViewSize.mX = max(size.mX, getWidth());
-    mViewSize.mY = max(size.mY, getHeight());
-    updateView(mViewPosition);
-    updateScrollBars();
-}
-
-void ScrollView::setViewSize(int x, int y)
-{
-    setViewSize(IntVector2(x, y));
-}
-
-void ScrollView::setHorizontalScrollBar(ScrollBar* scrollBar)
-{
-    if (mHorizontalScrollBar)
-        unsubscribeFromEvent(mHorizontalScrollBar, EVENT_SCROLLBARCHANGED);
-    
-    mHorizontalScrollBar = scrollBar;
-    if (mHorizontalScrollBar)
-        subscribeToEvent(mHorizontalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
-    
-    updateScrollBars();
-}
-
-void ScrollView::setVerticalScrollBar(ScrollBar* scrollBar)
-{
-    if (mVerticalScrollBar)
-        unsubscribeFromEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED);
-    
-    mVerticalScrollBar = scrollBar;
-    if (mVerticalScrollBar)
-        subscribeToEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
-    
-    updateScrollBars();
+    mHorizontalScrollBar->setVisible(horizontal);
+    mVerticalScrollBar->setVisible(vertical);
 }
 
 void ScrollView::setScrollStep(float step)
@@ -215,28 +224,33 @@ void ScrollView::setPageStep(float step)
     mPageStep = max(step, 0.0f);
 }
 
-void ScrollView::updateViewFromScrollBars()
+bool ScrollView::getHorizontalScrollBarVisible() const
 {
-    if ((!mHorizontalScrollBar) && (!mVerticalScrollBar))
-        return;
+    return mHorizontalScrollBar->isVisible();
+}
+
+bool ScrollView::getVerticalScrollBarVisible() const
+{
+    return mVerticalScrollBar->isVisible();
+}
+
+void ScrollView::updateViewSize()
+{
+    IntVector2 size(IntVector2::sZero);
+    if (mElement)
+        size = mElement->getSize();
     
-    IntVector2 oldPosition = mViewPosition;
-    IntVector2 newPosition = mViewPosition;
-    const IntVector2& size = getSize();
-    
-    if (mHorizontalScrollBar)
-        newPosition.mX = (int)(mHorizontalScrollBar->getValue() * (float)size.mX);
-    if (mVerticalScrollBar)
-        newPosition.mY = (int)(mVerticalScrollBar->getValue() * (float)size.mY);
-    
-    updateView(newPosition);
+    mViewSize.mX = max(size.mX, mScrollPanel->getWidth());
+    mViewSize.mY = max(size.mY, mScrollPanel->getHeight());
+    updateView(mViewPosition);
+    updateScrollBars();
 }
 
 void ScrollView::updateScrollBars()
 {
     mIgnoreEvents = true;
     
-    const IntVector2& size = getSize();
+    const IntVector2& size = mScrollPanel->getSize();
     
     if ((mHorizontalScrollBar) && (size.mX > 0) && (mViewSize.mX > 0))
     {
@@ -256,9 +270,9 @@ void ScrollView::updateView(const IntVector2& position)
 {
     IntVector2 oldPosition = mViewPosition;
     
-    mViewPosition.mX = clamp(position.mX, 0, mViewSize.mX - getWidth());
-    mViewPosition.mY = clamp(position.mY, 0, mViewSize.mY - getHeight());
-    setChildOffset(-mViewPosition);
+    mViewPosition.mX = clamp(position.mX, 0, mViewSize.mX - mScrollPanel->getWidth());
+    mViewPosition.mY = clamp(position.mY, 0, mViewSize.mY - mScrollPanel->getHeight());
+    mScrollPanel->setChildOffset(-mViewPosition);
     
     if (mViewPosition != oldPosition)
     {
@@ -275,5 +289,44 @@ void ScrollView::updateView(const IntVector2& position)
 void ScrollView::handleScrollBarChanged(StringHash eventType, VariantMap& eventData)
 {
     if (!mIgnoreEvents)
-        updateViewFromScrollBars();
+    {
+        updateView(IntVector2(
+            (int)(mHorizontalScrollBar->getValue() * (float)mScrollPanel->getWidth()),
+            (int)(mVerticalScrollBar->getValue() * (float)mScrollPanel->getHeight())
+        ));
+    }
+}
+
+void ScrollView::handleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData)
+{
+    // Need to recalculate panel size when scrollbar visibility changes
+    onResize();
+}
+
+void ScrollView::handleElementResized(StringHash eventType, VariantMap& eventData)
+{
+    updateViewSize();
+}
+
+void ScrollView::handleTryFocus(StringHash eventType, VariantMap& eventData)
+{
+    using namespace TryFocus;
+    
+    UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    if ((!focusElement) || (focusElement == this))
+        return;
+    
+    // If the element is a non-focusable child of the ScrollView, divert focus to the ScrollView
+    if (focusElement->getFocusMode() < FM_FOCUSABLE)
+    {
+        while (focusElement)
+        {
+            focusElement = focusElement->getParent();
+            if (focusElement == this)
+            {
+                eventData[P_ELEMENT] = (void*)this;
+                return;
+            }
+        }
+    }
 }

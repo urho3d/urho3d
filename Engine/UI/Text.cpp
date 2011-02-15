@@ -430,9 +430,8 @@ void Text::updateText(bool inResize)
         mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
-    if (mWordwrap)
-        setHeight(height);
-    else
+    // Resize self only when not using wordwrap
+    if (!mWordwrap)
         setSize(width, height);
 }
 

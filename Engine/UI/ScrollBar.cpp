@@ -112,6 +112,7 @@ void ScrollBar::onResize()
 {
     // Disable layout operations while setting the button sizes is incomplete
     mUpdateLayoutNestingLevel++;
+    
     if (mSlider->getOrientation() == O_HORIZONTAL)
     {
         int height = getHeight();
@@ -124,6 +125,7 @@ void ScrollBar::onResize()
         mBackButton->setFixedSize(width, width);
         mForwardButton->setFixedSize(width, width);
     }
+    
     mUpdateLayoutNestingLevel--;
 }
 

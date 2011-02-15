@@ -23,29 +23,23 @@
     <element type="CheckBox">
         <position value="40 130" />
     </element>
-    <element type="ScrollBar" name="ScrollV" >
-        <position value="350 100" />
-        <size value="10 100" />
-        <orientation value="vertical" />
-    </element>
-    <element type="ScrollBar" name="ScrollH" >
-        <position value="150 200" />
-        <size value="200 10" />
-        <orientation value="horizontal" />
+    <element type="Text" name="ScrollViewText" >
+        <position value="1 0" />
+        <size value="200 150" />
+        <font name="times.ttf" size="15" />
+        <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
+        <wordwrap enable="true" />
     </element>
     <element type="ScrollView">
         <position value="150 100" />
-        <size value="200 100" />
-        <viewsize value="200 150" />
-        <horizontalscrollbar name="ScrollH" />
-        <verticalscrollbar name="ScrollV" />
-        <element type="Text">
-            <position value="1 1" />
-            <size value="200 150" />
-            <font name="times.ttf" size="15" />
-            <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
-            <wordwrap enable="true" />
-        </element>
+        <size value="210 110" />
+        <horizontalscrollbar>
+            <height value="10" />
+        </horizontalscrollbar>
+        <verticalscrollbar>
+            <width value="10" />
+        </verticalscrollbar>
+        <contentelement name="ScrollViewText" />
     </element>
     <element type="LineEdit">
         <position value="150 230" />
