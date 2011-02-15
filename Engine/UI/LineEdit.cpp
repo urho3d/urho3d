@@ -295,13 +295,6 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
     {
         updateText();
         updateCursor();
-        
-        using namespace TextChanged;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        eventData[P_TEXT] = mLine;
-        sendEvent(EVENT_TEXTCHANGED, eventData);
     }
     else if (cursorMoved)
         updateCursor();
@@ -386,13 +379,6 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         mText->clearSelection();
         updateText();
         updateCursor();
-        
-        using namespace TextChanged;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        eventData[P_TEXT] = mLine;
-        sendEvent(EVENT_TEXTCHANGED, eventData);
     }
 }
 
@@ -408,12 +394,14 @@ void LineEdit::onDefocus()
 
 void LineEdit::setText(const std::string& text)
 {
-    mLine = text;
-    mText->setText(text);
-    // If cursor is not movable, make sure it's at the text end
-    if (!mCursorMovable)
-        setCursorPosition(mLine.length());
-    updateText();
+    if (text != mLine)
+    {
+        mLine = text;
+        // If cursor is not movable, make sure it's at the text end
+        if (!mCursorMovable)
+            setCursorPosition(mLine.length());
+        updateText();
+    }
 }
 
 void LineEdit::setCursorPosition(unsigned position)
@@ -476,6 +464,13 @@ void LineEdit::updateText()
         mCursorPosition = mLine.length();
         updateCursor();
     }
+    
+    using namespace TextChanged;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_TEXT] = mLine;
+    sendEvent(EVENT_TEXTCHANGED, eventData);
 }
 
 void LineEdit::updateCursor()

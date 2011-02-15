@@ -1,83 +1,81 @@
-<layout>
-    <element type="Window">
-        <position value="50 50" />
-        <size value="400 300" />
-        <resizable enable="true" />
-        <layout orientation="vertical" horizontal="resizechildren" vertical="resizechildren" border="8 8 8 8" spacing="8" />
-        <clipborder value="8 8 8 8" />
-        <minsize value="60 60" />
-        <element type="Element">
-            <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST1" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <visible enable="false" />
-                <element type="Text">
-                    <text value="TEST2" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST3" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
+<element type="Window">
+    <position value="50 50" />
+    <size value="400 300" />
+    <resizable enable="true" />
+    <layout orientation="vertical" horizontal="resizechildren" vertical="resizechildren" border="8 8 8 8" spacing="8" />
+    <clipborder value="8 8 8 8" />
+    <minsize value="60 60" />
+    <element type="Element">
+        <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST1" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
             </element>
         </element>
-        <element type="Element">
-            <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST4" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST5" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST6" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
+        <element type="Button">
+            <visible enable="false" />
+            <element type="Text">
+                <text value="TEST2" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
             </element>
         </element>
-        <element type="Element">
-            <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST7" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST8" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="Button">
-                <element type="Text">
-                    <text value="TEST9" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST3" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
             </element>
         </element>
     </element>
-</layout>
+    <element type="Element">
+        <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST4" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST5" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST6" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+    </element>
+    <element type="Element">
+        <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST7" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST8" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Button">
+            <element type="Text">
+                <text value="TEST9" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+    </element>
+</element>

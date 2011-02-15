@@ -54,6 +54,8 @@ UIElement::UIElement(const std::string& name) :
     mVerticalLayoutMode(LM_FREE),
     mLayoutSpacing(0),
     mLayoutBorder(IntRect::sZero),
+    mResizeNestingLevel(0),
+    mUpdateLayoutNestingLevel(0),
     mPosition(IntVector2::sZero),
     mSize(IntVector2::sZero),
     mMinSize(IntVector2::sZero),
@@ -63,9 +65,7 @@ UIElement::UIElement(const std::string& name) :
     mVerticalAlignment(VA_TOP),
     mScreenPositionDirty(true),
     mDerivedOpacityDirty(true),
-    mHasColorGradient(false),
-    mResizeNestingLevel(0),
-    mUpdateLayoutNestingLevel(0)
+    mHasColorGradient(false)
 {
 }
 
@@ -616,9 +616,9 @@ void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
     setStyle(element, cache);
 }
 
-void UIElement::setLayout(Orientation type, LayoutMode horizontal, LayoutMode vertical, int spacing, const IntRect& border)
+void UIElement::setLayout(Orientation orientation, LayoutMode horizontal, LayoutMode vertical, int spacing, const IntRect& border)
 {
-    mLayoutOrientation = type;
+    mLayoutOrientation = orientation;
     mHorizontalLayoutMode = horizontal;
     mVerticalLayoutMode = vertical;
     mLayoutSpacing = max(spacing, 0);
@@ -736,12 +736,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                int x = mChildren[i]->getPosition().mX;
-                if ((mChildren[i]->getHorizontalAlignment() == HA_LEFT) && (x < mLayoutBorder.mLeft))
-                    x = mLayoutBorder.mLeft;
-                if ((mChildren[i]->getHorizontalAlignment() == HA_RIGHT) && (x > -mLayoutBorder.mRight))
-                    x = -mLayoutBorder.mRight;
-                mChildren[i]->setPosition(x, position);
+                mChildren[i]->setPosition(0, position);
                 if (mHorizontalLayoutMode == LM_RESIZECHILDREN)
                     mChildren[i]->setWidth(getWidth() - mLayoutBorder.mLeft - mLayoutBorder.mRight);
                 position += mChildren[i]->getHeight();
@@ -773,12 +768,7 @@ void UIElement::updateLayout()
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                int x = mChildren[i]->getPosition().mX;
-                if ((mChildren[i]->getHorizontalAlignment() == HA_LEFT) && (x < mLayoutBorder.mLeft))
-                    x = mLayoutBorder.mLeft;
-                if ((mChildren[i]->getHorizontalAlignment() == HA_RIGHT) && (x > -mLayoutBorder.mRight))
-                    x = -mLayoutBorder.mRight;
-                mChildren[i]->setPosition(x, positions[idx]);
+                mChildren[i]->setPosition(0, positions[idx]);
                 mChildren[i]->setSize(mHorizontalLayoutMode == LM_RESIZECHILDREN ? getWidth() - mLayoutBorder.mLeft -
                     mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[idx]);
                 ++idx;

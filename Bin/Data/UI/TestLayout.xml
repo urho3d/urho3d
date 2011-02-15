@@ -1,107 +1,105 @@
-<layout>
-    <element type="Window">
-        <position value="50 50" />
-        <size value="400 300" />
-        <resizable enable="false" />
-        <element type="Button">
-            <position value="10 10" />
-            <size value="100 40" />
-            <element type="Text">
-                <text value="TEST" />
-                <font name="cour.ttf" size="12" />
-                <alignment horizontal="center" vertical="center" />
-            </element>
+<element type="Window">
+    <position value="50 50" />
+    <size value="400 300" />
+    <resizable enable="false" />
+    <element type="Button">
+        <position value="10 10" />
+        <size value="100 40" />
+        <element type="Text">
+            <text value="TEST" />
+            <font name="cour.ttf" size="12" />
+            <alignment horizontal="center" vertical="center" />
         </element>
-        <element type="CheckBox">
-            <position value="10 100" />
+    </element>
+    <element type="CheckBox">
+        <position value="10 100" />
+    </element>
+    <element type="CheckBox">
+        <position value="40 100" />
+    </element>
+    <element type="CheckBox">
+        <position value="10 130" />
+    </element>
+    <element type="CheckBox">
+        <position value="40 130" />
+    </element>
+    <element type="ScrollBar" name="ScrollV" >
+        <position value="350 100" />
+        <size value="10 100" />
+        <orientation value="vertical" />
+    </element>
+    <element type="ScrollBar" name="ScrollH" >
+        <position value="150 200" />
+        <size value="200 10" />
+        <orientation value="horizontal" />
+    </element>
+    <element type="ScrollView">
+        <position value="150 100" />
+        <size value="200 100" />
+        <viewsize value="200 150" />
+        <horizontalscrollbar name="ScrollH" />
+        <verticalscrollbar name="ScrollV" />
+        <element type="Text">
+            <position value="1 1" />
+            <size value="200 150" />
+            <font name="times.ttf" size="15" />
+            <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
+            <wordwrap enable="true" />
         </element>
-        <element type="CheckBox">
-            <position value="40 100" />
-        </element>
-        <element type="CheckBox">
-            <position value="10 130" />
-        </element>
-        <element type="CheckBox">
-            <position value="40 130" />
-        </element>
-        <element type="ScrollBar" name="ScrollV" >
-            <position value="350 100" />
-            <size value="10 100" />
-            <orientation value="vertical" />
-        </element>
-        <element type="ScrollBar" name="ScrollH" >
-            <position value="150 200" />
-            <size value="200 10" />
-            <orientation value="horizontal" />
-        </element>
-        <element type="ScrollView">
-            <position value="150 100" />
-            <size value="200 100" />
-            <viewsize value="200 150" />
-            <horizontalscrollbar name="ScrollH" />
-            <verticalscrollbar name="ScrollV" />
-            <element type="Text">
-                <position value="1 1" />
-                <size value="200 150" />
-                <font name="times.ttf" size="15" />
-                <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
-                <wordwrap enable="true" />
-            </element>
-        </element>
-        <element type="LineEdit">
-            <position value="150 230" />
-            <size value="200 16" />
-        </element>
-        <element type="LineEdit">
-            <position value="150 260" />
-            <size value="200 16" />
-        </element>
-        <element type="Window" name="TestPopup">
-            <layout orientation="vertical" horizontal="resizeelement" vertical="resizeelement" spacing="4" border="8 8 8 8" />
-            <element type="MenuItem">
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem3" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem4" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-            <element type="MenuItem">
-                <size value="80 16" />
-                <element type="Text">
-                    <text value="MenuItem5" />
-                    <font name="cour.ttf" size="12" />
-                    <alignment horizontal="center" vertical="center" />
-                </element>
-            </element>
-        </element>
+    </element>
+    <element type="LineEdit">
+        <position value="150 230" />
+        <size value="200 16" />
+    </element>
+    <element type="LineEdit">
+        <position value="150 260" />
+        <size value="200 16" />
+    </element>
+    <element type="Window" name="TestPopup">
+        <layout orientation="vertical" horizontal="resizeelement" vertical="resizeelement" spacing="4" border="8 8 8 8" />
         <element type="MenuItem">
-            <position value="150 10" />
             <size value="80 16" />
-            <popup name="TestPopup" />
-            <popupoffset value="0 16" />
             <element type="Text">
-                <text value="MenuItem1" />
+                <text value="MenuItem3" />
                 <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
         <element type="MenuItem">
-            <position value="150 40" />
             <size value="80 16" />
             <element type="Text">
-                <text value="MenuItem2" />
+                <text value="MenuItem4" />
+                <font name="cour.ttf" size="12" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="MenuItem">
+            <size value="80 16" />
+            <element type="Text">
+                <text value="MenuItem5" />
                 <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
     </element>
-</layout>
+    <element type="MenuItem">
+        <position value="150 10" />
+        <size value="80 16" />
+        <popup name="TestPopup" />
+        <popupoffset value="0 16" />
+        <element type="Text">
+            <text value="MenuItem1" />
+            <font name="cour.ttf" size="12" />
+            <alignment horizontal="center" vertical="center" />
+        </element>
+    </element>
+    <element type="MenuItem">
+        <position value="150 40" />
+        <size value="80 16" />
+        <element type="Text">
+            <text value="MenuItem2" />
+            <font name="cour.ttf" size="12" />
+            <alignment horizontal="center" vertical="center" />
+        </element>
+    </element>
+</element>

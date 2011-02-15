@@ -280,26 +280,22 @@ SharedPtr<UIElement> UI::loadLayout(XMLFile* file, XMLFile* styleFile)
     
     LOGDEBUG("Loading UI layout " + file->getName());
     
-    XMLElement rootElem = file->getRootElement();
-    XMLElement childElem = rootElem.getChildElement("element");
-    if (!childElem)
+    XMLElement rootElem = file->getRootElement("element");
+    if (!rootElem)
     {
         LOGERROR("No root UI element in " + file->getName());
         return root;
     }
     
-    root = createElement(ShortStringHash(childElem.getString("type")), childElem.getString("name"));
+    root = createElement(ShortStringHash(rootElem.getString("type")), rootElem.getString("name"));
     
     // First set the base style from the style file if exists, then apply UI layout overrides
     if (styleFile)
         root->setStyleAuto(styleFile, mCache);
-    root->setStyle(childElem, mCache);
+    root->setStyle(rootElem, mCache);
     
     // Load rest of the elements recursively
-    loadLayout(root, childElem, styleFile);
-    
-    if (childElem.getNextElement("element"))
-        LOGWARNING("Ignored additional root UI elements in " + file->getName());
+    loadLayout(root, rootElem, styleFile);
     
     return root;
 }

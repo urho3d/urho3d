@@ -37,12 +37,15 @@ ScrollBar::ScrollBar(const std::string& name) :
     mSlider = new Slider();
     
     addChild(mBackButton);
-    addChild(mForwardButton);
     addChild(mSlider);
+    addChild(mForwardButton);
     
     subscribeToEvent(mBackButton, EVENT_PRESSED, EVENT_HANDLER(ScrollBar, handleBackButtonPressed));
     subscribeToEvent(mForwardButton, EVENT_PRESSED, EVENT_HANDLER(ScrollBar, handleForwardButtonPressed));
     subscribeToEvent(mSlider, EVENT_SLIDERCHANGED, EVENT_HANDLER(ScrollBar, handleSliderChanged));
+    
+    // Set default orientation/layout
+    setOrientation(O_HORIZONTAL);
 }
 
 ScrollBar::~ScrollBar()
@@ -51,6 +54,8 @@ ScrollBar::~ScrollBar()
 
 void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
 {
+    UIElement::setStyle(element, cache);
+    
     XMLElement backButtonElem = element.getChildElement("backbutton");
     if (backButtonElem)
     {
@@ -81,45 +86,25 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
         if ((orientation == "vertical") || (orientation == "v"))
             setOrientation(O_VERTICAL);
     }
-    
-    // Setup size last so that orientation and child elements are first setup correctly
-    UIElement::setStyle(element, cache);
 }
 
 void ScrollBar::onResize()
 {
+    // Disable layout operations while setting the button sizes is incomplete
+    mUpdateLayoutNestingLevel++;
     if (mSlider->getOrientation() == O_HORIZONTAL)
     {
         int height = getHeight();
-        
-        mBackButton->setAlignment(HA_LEFT, VA_TOP);
-        mBackButton->setPosition(0, 0);
-        mBackButton->setHeight(height);
-        
-        mSlider->setAlignment(HA_LEFT, VA_TOP);
-        mSlider->setPosition(mBackButton->getWidth(), 0);
-        mSlider->setSize(getWidth() - mBackButton->getWidth() - mForwardButton->getWidth(), height);
-        
-        mForwardButton->setAlignment(HA_LEFT, VA_TOP);
-        mForwardButton->setPosition(mBackButton->getWidth() + mSlider->getWidth(), 0);
-        mForwardButton->setHeight(height);
+        mBackButton->setFixedSize(height, height);
+        mForwardButton->setFixedSize(height, height);
     }
     else
     {
         int width = getWidth();
-        
-        mBackButton->setAlignment(HA_LEFT, VA_TOP);
-        mBackButton->setPosition(0, 0);
-        mBackButton->setWidth(width);
-        
-        mSlider->setAlignment(HA_LEFT, VA_TOP);
-        mSlider->setPosition(0, mBackButton->getHeight());
-        mSlider->setSize(width, getHeight() - mBackButton->getHeight() - mForwardButton->getHeight());
-        
-        mForwardButton->setAlignment(HA_LEFT, VA_TOP);
-        mForwardButton->setPosition(0, mBackButton->getHeight() + mSlider->getHeight());
-        mForwardButton->setWidth(width);
+        mBackButton->setFixedSize(width, width);
+        mForwardButton->setFixedSize(width, width);
     }
+    mUpdateLayoutNestingLevel--;
 }
 
 void ScrollBar::setOrientation(Orientation orientation)
@@ -133,6 +118,7 @@ void ScrollBar::setOrientation(Orientation orientation)
     mForwardButton->setPressedRect(mPressedRects[orient][1]);
     
     onResize();
+    setLayout(orientation, LM_RESIZECHILDREN, LM_RESIZECHILDREN);
 }
 
 void ScrollBar::setRange(float range)

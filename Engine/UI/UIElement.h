@@ -198,7 +198,7 @@ public:
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
-    void setLayout(Orientation type, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
+    void setLayout(Orientation orientation, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
         const IntRect& border = IntRect::sZero);
     //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void updateLayout();
@@ -375,6 +375,10 @@ protected:
     int mLayoutSpacing;
     //! Layout borders
     IntRect mLayoutBorder;
+    //! Resize nesting level to prevent multiple events and endless loop
+    unsigned mResizeNestingLevel;
+    //! Layout update nesting level to prevent endless loop
+    unsigned mUpdateLayoutNestingLevel;
     
     //! Clipboard data
     static std::string sClipBoard;
@@ -414,10 +418,6 @@ private:
     bool mDerivedOpacityDirty;
     //! Has color gradient flag
     bool mHasColorGradient;
-    //! Resize nesting level to prevent multiple events and endless loop
-    unsigned mResizeNestingLevel;
-    //! Layout update nesting level to prevent endless loop
-    unsigned mUpdateLayoutNestingLevel;
 };
 
 #endif // UI_UIELEMENT_H
