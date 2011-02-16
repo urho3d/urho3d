@@ -50,8 +50,16 @@ public:
     void setRange(float range);
     //! Set slider current value
     void setValue(float value);
+    //! Change slider current value by a delta
+    void changeValue(float delta);
     //! Set button scroll step
     void setScrollStep(float step);
+    //! Set whether scroll step is normalized to slider range
+    void setNormalizeScrollStep(bool enable);
+    //! Scroll back one step
+    void stepBack();
+    //! Scroll forward one step
+    void stepForward();
     
     //! Return orientation type
     Orientation getOrientation() const;
@@ -61,6 +69,10 @@ public:
     float getValue() const;
     //! Return button scroll step
     float getScrollStep() const { return mScrollStep; }
+    //! Return effective scroll step, taking possible normalization into account
+    float getEffectiveScrollStep() const;
+    //! Return whether scroll step is normalized to slider range
+    bool getNormalizeScrollStep() const { return mNormalizeScrollStep; }
     //! Return back button element
     Button* getBackButton() const { return mBackButton; }
     //! Return forward button element
@@ -77,6 +89,8 @@ protected:
     SharedPtr<Slider> mSlider;
     //! Scroll step
     float mScrollStep;
+    //! Normalize scroll step flag
+    bool mNormalizeScrollStep;
     //! Left button image rect
     IntRect mLeftRect;
     //! Right button image rect

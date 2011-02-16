@@ -34,9 +34,9 @@ ScrollView::ScrollView(const std::string& name) :
     UIElement(name),
     mViewPosition(IntVector2::sZero),
     mViewSize(IntVector2::sZero),
-    mScrollStep(0.1f),
     mPageStep(1.0f)
 {
+    mClipChildren = true;
     mEnabled = true;
     mFocusMode = FM_FOCUSABLE_DEFOCUSABLE;
     
@@ -58,7 +58,6 @@ ScrollView::ScrollView(const std::string& name) :
     subscribeToEvent(mHorizontalScrollBar, EVENT_VISIBLECHANGED, EVENT_HANDLER(ScrollView, handleScrollBarVisibleChanged));
     subscribeToEvent(mVerticalScrollBar, EVENT_SCROLLBARCHANGED, EVENT_HANDLER(ScrollView, handleScrollBarChanged));
     subscribeToEvent(mVerticalScrollBar, EVENT_VISIBLECHANGED, EVENT_HANDLER(ScrollView, handleScrollBarVisibleChanged));
-    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(ScrollView, handleTryFocus));
 }
 
 ScrollView::~ScrollView()
@@ -75,6 +74,8 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
         setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
     if (element.hasChildElement("pagestep"))
         setScrollStep(element.getChildElement("pagestep").getFloat("value"));
+    if (element.hasChildElement("normalizescrollstep"))
+        setNormalizeScrollStep(element.getChildElement("normalizescrollstep").getBool("enable"));
     
     XMLElement horizElem = element.getChildElement("horizontalscrollbar");
     if (horizElem)
@@ -106,7 +107,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
             if (qualifiers & QUAL_CTRL)
                 mHorizontalScrollBar->setValue(0.0f);
             else
-                mHorizontalScrollBar->setValue(mHorizontalScrollBar->getValue() - mScrollStep);
+                mHorizontalScrollBar->stepBack();
         }
         break;
         
@@ -116,7 +117,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
             if (qualifiers & QUAL_CTRL)
                 mHorizontalScrollBar->setValue(mHorizontalScrollBar->getRange());
             else
-                mHorizontalScrollBar->setValue(mHorizontalScrollBar->getValue() + mScrollStep);
+                mHorizontalScrollBar->stepForward();
         }
         break;
         
@@ -126,7 +127,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
             if (qualifiers & QUAL_CTRL)
                 mVerticalScrollBar->setValue(0.0f);
             else
-                mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() - mScrollStep);
+                mVerticalScrollBar->stepBack();
         }
         break;
         
@@ -136,18 +137,18 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
             if (qualifiers & QUAL_CTRL)
                 mVerticalScrollBar->setValue(mVerticalScrollBar->getRange());
             else
-                mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() + mScrollStep);
+                mVerticalScrollBar->stepForward();
         }
         break;
         
     case KEY_PAGEUP:
         if (mVerticalScrollBar)
-            mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() - mPageStep);
+            mVerticalScrollBar->changeValue(-mPageStep);
         break;
         
     case KEY_PAGEDOWN:
         if (mVerticalScrollBar)
-            mVerticalScrollBar->setValue(mVerticalScrollBar->getValue() + mPageStep);
+            mVerticalScrollBar->changeValue(mPageStep);
         break;
     
     case KEY_HOME:
@@ -216,12 +217,19 @@ void ScrollView::setScrollBarsVisible(bool horizontal, bool vertical)
 
 void ScrollView::setScrollStep(float step)
 {
-    mScrollStep = max(step, 0.0f);
+    mHorizontalScrollBar->setScrollStep(step);
+    mVerticalScrollBar->setScrollStep(step);
 }
 
 void ScrollView::setPageStep(float step)
 {
     mPageStep = max(step, 0.0f);
+}
+
+void ScrollView::setNormalizeScrollStep(bool enable)
+{
+    mHorizontalScrollBar->setNormalizeScrollStep(enable);
+    mVerticalScrollBar->setNormalizeScrollStep(enable);
 }
 
 bool ScrollView::getHorizontalScrollBarVisible() const
@@ -232,6 +240,16 @@ bool ScrollView::getHorizontalScrollBarVisible() const
 bool ScrollView::getVerticalScrollBarVisible() const
 {
     return mVerticalScrollBar->isVisible();
+}
+
+float ScrollView::getScrollStep() const
+{
+    return mHorizontalScrollBar->getScrollStep();
+}
+
+bool ScrollView::getNormalizeScrollStep() const
+{
+    return mHorizontalScrollBar->getNormalizeScrollStep();
 }
 
 void ScrollView::updateViewSize()
@@ -306,27 +324,4 @@ void ScrollView::handleScrollBarVisibleChanged(StringHash eventType, VariantMap&
 void ScrollView::handleElementResized(StringHash eventType, VariantMap& eventData)
 {
     updateViewSize();
-}
-
-void ScrollView::handleTryFocus(StringHash eventType, VariantMap& eventData)
-{
-    using namespace TryFocus;
-    
-    UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
-    if ((!focusElement) || (focusElement == this))
-        return;
-    
-    // If the element is a non-focusable child of the ScrollView, divert focus to the ScrollView
-    if (focusElement->getFocusMode() < FM_FOCUSABLE)
-    {
-        while (focusElement)
-        {
-            focusElement = focusElement->getParent();
-            if (focusElement == this)
-            {
-                eventData[P_ELEMENT] = (void*)this;
-                return;
-            }
-        }
-    }
 }

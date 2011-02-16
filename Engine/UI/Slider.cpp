@@ -161,6 +161,11 @@ void Slider::setValue(float value)
     }
 }
 
+void Slider::changeValue(float delta)
+{
+    setValue(mValue + delta);
+}
+
 void Slider::updateSlider()
 {
     if (mOrientation == O_HORIZONTAL)

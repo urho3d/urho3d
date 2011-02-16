@@ -123,6 +123,7 @@ static void registerSlider(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Slider", "void setOrientation(Orientation)", asMETHOD(Slider, setOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "void setRange(float)", asMETHOD(Slider, setRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "void setValue(float)", asMETHOD(Slider, setValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Slider", "void changeValue(float)", asMETHOD(Slider, changeValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "Orientation getOrientation() const", asMETHOD(Slider, getOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getRange() const", asMETHOD(Slider, getRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("Slider", "float getValue() const", asMETHOD(Slider, getValue), asCALL_THISCALL);
@@ -136,11 +137,16 @@ static void registerScrollBar(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollBar", "void setOrientation(Orientation)", asMETHOD(ScrollBar, setOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void setRange(float)", asMETHOD(ScrollBar, setRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void setValue(float)", asMETHOD(ScrollBar, setValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "void changeValue(float)", asMETHOD(ScrollBar, changeValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void setScrollStep(float)", asMETHOD(ScrollBar, setScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "void setNormalizeScrollStep(bool)", asMETHOD(ScrollBar, setNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "void stepBack()", asMETHOD(ScrollBar, stepBack), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "void stepForward()", asMETHOD(ScrollBar, stepForward), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Orientation getOrientation() const", asMETHOD(ScrollBar, getOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getRange() const", asMETHOD(ScrollBar, getRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getValue() const", asMETHOD(ScrollBar, getValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getScrollStep() const", asMETHOD(ScrollBar, getScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "bool getNormalizeScrollStep() const", asMETHOD(ScrollBar, getNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Button@+ getBackButton() const", asMETHOD(ScrollBar, getBackButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Button@+ getForwardButton() const", asMETHOD(ScrollBar, getForwardButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Slider@+ getSlider() const", asMETHOD(ScrollBar, getSlider), asCALL_THISCALL);
@@ -155,6 +161,7 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ScrollView, setScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setScrollStep(float)", asMETHOD(ScrollView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setPageStep(float)", asMETHOD(ScrollView, setPageStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "void setNormalizeScrollStep(bool)", asMETHOD(ScrollView, setNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "UIElement@+ getElement() const", asMETHOD(ScrollView, getElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ScrollView, getHorizontalScrollBar), asCALL_THISCALL);
@@ -164,6 +171,7 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "bool getVerticalScrollBarVisible() const", asMETHOD(ScrollView, getVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getScrollStep() const", asMETHOD(ScrollView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getPageStep() const", asMETHOD(ScrollView, getPageStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "bool getNormalizeScrollStep() const", asMETHOD(ScrollView, getNormalizeScrollStep), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
 }
 

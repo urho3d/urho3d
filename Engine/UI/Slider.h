@@ -58,6 +58,8 @@ public:
     void setRange(float range);
     //! Set slider current value
     void setValue(float value);
+    //! Change value by a delta
+    void changeValue(float delta);
     
     //! Return orientation type
     Orientation getOrientation() const { return mOrientation; }

@@ -31,8 +31,6 @@
         <wordwrap enable="true" />
     </element>
     <element type="ScrollView">
-        <position value="150 100" />
-        <size value="212 112" />
         <contentelement name="ScrollViewText" />
     </element>
     <element type="LineEdit">

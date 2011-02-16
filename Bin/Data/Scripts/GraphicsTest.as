@@ -487,10 +487,15 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
                 params.maxFilter = 1.0f;
             pipeline.setEdgeFilter(params);
         }
-        
-        if ((input.getKeyPress(KEY_ESC)) && (ui.getFocusElement() is null))
-            engine.exit();
     }
+    
+    if (input.getKeyPress(KEY_ESC))
+	{
+		if (ui.getFocusElement() is null)
+	        engine.exit();
+	    else
+		    console.setVisible(false);
+	}
 }
 
 void handleKeyDown(StringHash eventType, VariantMap& eventData)

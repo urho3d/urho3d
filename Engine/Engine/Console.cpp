@@ -67,6 +67,7 @@ Console::Console(Engine* engine) :
         
         mLineEdit = new LineEdit();
         mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
+        mLineEdit->getTextElement()->setSelectionColor(Color(0.0f, 0.5f, 0.0f, 0.75f));
         mLineEdit->setFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
         mBackground->addChild(mLineEdit);
         

@@ -55,11 +55,13 @@ public:
     void setViewPosition(int x, int y);
     //! Set scrollbars' visibility
     void setScrollBarsVisible(bool horizontal, bool vertical);
-    //! Set arrow key scroll step
+    //! Set arrow key scroll step. Also sets it on the scrollbars
     void setScrollStep(float step);
     //! Set arrow key page step
     void setPageStep(float step);
-    
+    //! Set whether scroll step is normalized to content size
+    void setNormalizeScrollStep(bool enable);
+
     //! Return view offset from the top-left corner
     const IntVector2& getViewPosition() const { return mViewPosition; }
     //! Return content element
@@ -75,9 +77,11 @@ public:
     //! Return vertical scrollbar visibility
     bool getVerticalScrollBarVisible() const;
     //! Return arrow key scroll step
-    float getScrollStep() const { return mScrollStep; }
+    float getScrollStep() const;
     //! Return arrow key page step
     float getPageStep() const { return mPageStep; }
+    //! Return whether scroll step is normalized to content size
+    bool getNormalizeScrollStep() const;
     
 protected:
     //! Update view size from the content element
@@ -99,8 +103,6 @@ protected:
     IntVector2 mViewPosition;
     //! Total view size
     IntVector2 mViewSize;
-    //! Arrow key scroll step
-    float mScrollStep;
     //! Arrow key page step
     float mPageStep;
     //! Ignore scrollbar events flag. Used to prevent possible endless loop when setting position

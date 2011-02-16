@@ -32,6 +32,13 @@
     </element>
     <element type="Element">
         <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
+    	<element type="Text" name="ScrollViewText" >
+	        <position value="1 0" />
+	        <minsize value="300 400" />
+	        <font name="times.ttf" size="15" />
+            <text value="At some point the fire had started.\n  There was total chaos. The locks of the wooden barracks had been blown apart by gunfire from shotguns and assault rifles, and the trainees were pouring out in confusion. But the primary target still lay ahead.\n  The administrative building. Where the identities and evaluations of the trainees were stored.\n  That was first class knowledge. If the Agents could bring that knowledge to the public, and cross-reference the records - mostly boys of young age - with lists of known missing persons, then they could prove the existence of SCEPTRE." />
+	        <wordwrap enable="true" />
+	    </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST4" />
@@ -39,6 +46,12 @@
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
+    	<element type="ScrollView">
+	        <contentelement name="ScrollViewText" />
+	        <scrollpanel>
+	        	<layout orientation="vertical" horizontal="resizechildren" vertical="resizechildren" border="1 1 1 1" spacing="0" />
+	        </scrollpanel>
+	    </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST5" />
@@ -46,6 +59,9 @@
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
+    </element>
+    <element type="Element">
+        <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
         <element type="Button">
             <element type="Text">
                 <text value="TEST6" />
@@ -53,9 +69,6 @@
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
-    </element>
-    <element type="Element">
-        <layout orientation="horizontal" horizontal="resizechildren" vertical="resizechildren" spacing="8" />
         <element type="Button">
             <element type="Text">
                 <text value="TEST7" />
@@ -66,13 +79,6 @@
         <element type="Button">
             <element type="Text">
                 <text value="TEST8" />
-                <font name="cour.ttf" size="12" />
-                <alignment horizontal="center" vertical="center" />
-            </element>
-        </element>
-        <element type="Button">
-            <element type="Text">
-                <text value="TEST9" />
                 <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>

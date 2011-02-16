@@ -59,9 +59,6 @@ void start()
 void runFrame()
 {
     engine.runFrame(gameScene, gameCamera, !paused);
-
-    if (input.getKeyPress(KEY_ESC))
-        engine.exit();
 }
 
 void initAudio()
@@ -215,6 +212,14 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         else
             messageText.setText("");
     }
+
+    if (input.getKeyPress(KEY_ESC))
+	{
+		if (!console.isVisible())
+	        engine.exit();
+	    else
+		    console.setVisible(false);
+	}
 
     if (!paused)
         updateControls();

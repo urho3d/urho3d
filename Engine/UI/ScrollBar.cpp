@@ -27,12 +27,14 @@
 #include "Slider.h"
 #include "UIEvents.h"
 
+static const float DEFAULT_SCROLL_STEP = 0.05f;
 static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
 
 ScrollBar::ScrollBar(const std::string& name) :
     UIElement(name),
-    mScrollStep(0.1f),
+    mScrollStep(DEFAULT_SCROLL_STEP),
+    mNormalizeScrollStep(true),
     mLeftRect(IntRect::sZero),
     mRightRect(IntRect::sZero),
     mUpRect(IntRect::sZero),
@@ -66,6 +68,17 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     UIElement::setStyle(element, cache);
     
+    if (element.hasChildElement("scrollstep"))
+        setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
+    if (element.hasChildElement("normalizescrollstep"))
+        setNormalizeScrollStep(element.getChildElement("normalizescrollstep").getBool("enable"));
+    if (element.hasChildElement("range"))
+    {
+        XMLElement rangeElem = element.getChildElement("range");
+        setRange(rangeElem.getFloat("max"));
+        setValue(rangeElem.getFloat("value"));
+    }
+    
     XMLElement backButtonElem = element.getChildElement("backbutton");
     if (backButtonElem)
     {
@@ -98,12 +111,6 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
     if (sliderElem)
         mSlider->setStyle(sliderElem, cache);
     
-    if (element.hasChildElement("range"))
-    {
-        XMLElement rangeElem = element.getChildElement("range");
-        setRange(rangeElem.getFloat("max"));
-        setValue(rangeElem.getFloat("value"));
-    }
     if (element.hasChildElement("orientation"))
     {
         std::string orientation = element.getChildElement("orientation").getStringLower("value");
@@ -164,9 +171,29 @@ void ScrollBar::setValue(float value)
     mSlider->setValue(value);
 }
 
+void ScrollBar::changeValue(float delta)
+{
+    mSlider->changeValue(delta);
+}
+
 void ScrollBar::setScrollStep(float step)
 {
     mScrollStep = max(step, 0.0f);
+}
+
+void ScrollBar::setNormalizeScrollStep(bool enable)
+{
+    mNormalizeScrollStep = enable;
+}
+
+void ScrollBar::stepBack()
+{
+    mSlider->setValue(mSlider->getValue() - getEffectiveScrollStep());
+}
+
+void ScrollBar::stepForward()
+{
+    mSlider->setValue(mSlider->getValue() + getEffectiveScrollStep());
 }
 
 Orientation ScrollBar::getOrientation() const
@@ -184,14 +211,22 @@ float ScrollBar::getValue() const
     return mSlider->getValue();
 }
 
+float ScrollBar::getEffectiveScrollStep() const
+{
+    if (!mNormalizeScrollStep)
+        return mScrollStep;
+    else
+        return mScrollStep * (mSlider->getRange() + 1.0f);
+}
+
 void ScrollBar::handleBackButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    mSlider->setValue(mSlider->getValue() - mScrollStep);
+    stepBack();
 }
 
 void ScrollBar::handleForwardButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    mSlider->setValue(mSlider->getValue() + mScrollStep);
+    stepForward();
 }
 
 void ScrollBar::handleSliderChanged(StringHash eventType, VariantMap& eventData)

@@ -121,12 +121,22 @@ void UI::setFocusElement(UIElement* element)
     // The event receivers may divert the focus
     element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
     
-    // Return if already has focus
-    if ((element) && (element->hasFocus()))
-        return;
-    // Return if element can not be focused, and does not reset the focus either
-    if ((element) && (element->getFocusMode() == FM_NOTFOCUSABLE))
-        return;
+    if (element)
+    {
+        // Return if already has focus
+        if (element->hasFocus())
+            return;
+        // If element can not be focused, and does not reset the focus either, search toward the parent
+        for (;;)
+        {
+            if (element->getFocusMode() != FM_NOTFOCUSABLE)
+                break;
+            element = element->getParent();
+            // Return if did not find any parent element that changes the focus
+            if (!element)
+                return;
+        }
+    }
     
     std::vector<UIElement*> allChildren = mRootElement->getChildren(true);
     
