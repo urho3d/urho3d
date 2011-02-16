@@ -27,6 +27,9 @@
 #include "Slider.h"
 #include "UIEvents.h"
 
+static const float DEFAULT_REPEAT_DELAY = 0.4f;
+static const float DEFAULT_REPEAT_RATE = 20.0f;
+
 ScrollBar::ScrollBar(const std::string& name) :
     UIElement(name),
     mScrollStep(0.1f),
@@ -36,8 +39,11 @@ ScrollBar::ScrollBar(const std::string& name) :
     mDownRect(IntRect::sZero)
 {
     mEnabled = true;
+    
     mBackButton = new Button();
+    mBackButton->setRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
     mForwardButton = new Button();
+    mForwardButton->setRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
     mSlider = new Slider();
     
     addChild(mBackButton);

@@ -32,13 +32,7 @@
     </element>
     <element type="ScrollView">
         <position value="150 100" />
-        <size value="210 110" />
-        <horizontalscrollbar>
-            <height value="10" />
-        </horizontalscrollbar>
-        <verticalscrollbar>
-            <width value="10" />
-        </verticalscrollbar>
+        <size value="212 112" />
         <contentelement name="ScrollViewText" />
     </element>
     <element type="LineEdit">

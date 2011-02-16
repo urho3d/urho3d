@@ -48,25 +48,23 @@
     </element>
     <element type="ScrollBar">
         <backbutton>
-            <size value="16 16" />
+            <size value="12 12" />
             <texture name="Textures/UI.png" />
             <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
             <border value="3 3 3 3" />
             <pressedoffset value="64 0" />
             <hoveroffset value="0 16" />
-            <repeat delay="0.4" rate="20" />
         </backbutton>
         <forwardbutton>
-            <size value="16 16" />
+            <size value="12 12" />
             <texture name="Textures/UI.png" />
             <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
             <border value="3 3 3 3" />
             <pressedoffset value="64 0" />
             <hoveroffset value="0 16" />
-            <repeat delay="0.4" rate="20" />
         </forwardbutton>
         <slider>
-            <size value="16 16" />
+            <size value="12 12" />
             <texture name="Textures/UI.png" />
             <imagerect value="48 0 64 16" />
             <border value="3 3 3 3" />
@@ -80,26 +78,22 @@
     </element>
     <element type="ScrollView">
         <horizontalscrollbar>
+            <height value="12" />
             <backbutton>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
                 <border value="3 3 3 3" />
                 <pressedoffset value="64 0" />
                 <hoveroffset value="0 16" />
-                <repeat delay="0.4" rate="20" />
             </backbutton>
             <forwardbutton>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
                 <border value="3 3 3 3" />
                 <pressedoffset value="64 0" />
                 <hoveroffset value="0 16" />
-                <repeat delay="0.4" rate="20" />
             </forwardbutton>
             <slider>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect value="48 0 64 16" />
                 <border value="3 3 3 3" />
@@ -112,26 +106,22 @@
             </slider>
         </horizontalscrollbar>
         <verticalscrollbar>
+            <width value="12" />
             <backbutton>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
                 <border value="3 3 3 3" />
                 <pressedoffset value="64 0" />
                 <hoveroffset value="0 16" />
-                <repeat delay="0.4" rate="20" />
             </backbutton>
             <forwardbutton>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
                 <border value="3 3 3 3" />
                 <pressedoffset value="64 0" />
                 <hoveroffset value="0 16" />
-                <repeat delay="0.4" rate="20" />
             </forwardbutton>
             <slider>
-                <size value="16 16" />
                 <texture name="Textures/UI.png" />
                 <imagerect value="48 0 64 16" />
                 <border value="3 3 3 3" />
@@ -151,7 +141,7 @@
         </scrollpanel>
     </element>
     <element type="Slider">
-        <size value="16 16" />
+        <size value="12 12" />
         <texture name="Textures/UI.png" />
         <imagerect value="48 0 64 16" />
         <border value="3 3 3 3" />
