@@ -470,10 +470,11 @@ void Node::addChild(Node* node)
     if ((!node) || (node->mParent == this) || (mParent == node))
         return;
     
+    // Add first, then remove from old parent, to ensure the node does not get deleted
+    mChildren.push_back(SharedPtr<Node>(node));
+    
     if (node->mParent)
         node->mParent->removeChild(node);
-    
-    mChildren.push_back(SharedPtr<Node>(node));
     
     node->mParent = this;
     node->markDirty();

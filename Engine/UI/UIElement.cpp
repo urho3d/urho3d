@@ -826,10 +826,11 @@ void UIElement::addChild(UIElement* element)
     if ((!element) || (element->mParent == this) || (mParent == element))
         return;
     
+    // Add first, then remove from old parent, to ensure the elemen does not get deleted
+    mChildren.push_back(SharedPtr<UIElement>(element));
+    
     if (element->mParent)
         element->mParent->removeChild(element);
-    
-    mChildren.push_back(SharedPtr<UIElement>(element));
     
     element->mParent = this;
     element->markDirty();

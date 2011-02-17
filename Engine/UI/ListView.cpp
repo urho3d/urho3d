@@ -78,7 +78,7 @@ void ListView::onWheel(int delta, int buttons, int qualifiers)
 void ListView::onKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
-    if ((mSelection == M_MAX_UNSIGNED) || (mItems.empty()))
+    if ((mSelection == M_MAX_UNSIGNED) || (!getNumItems()))
         return;
     
     switch (key)
@@ -92,7 +92,7 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         
     case KEY_DOWN:
         if (qualifiers & QUAL_CTRL)
-            setSelection(mItems.size() - 1);
+            setSelection(getNumItems() - 1);
         else
             changeSelection(1);
         break;
@@ -104,7 +104,7 @@ void ListView::onKey(int key, int buttons, int qualifiers)
             unsigned newSelection = mSelection;
             while (newSelection)
             {
-                int height = mItems[newSelection]->getHeight();
+                int height = getItem(newSelection)->getHeight();
                 if (stepPixels < height)
                     break;
                 stepPixels -= height;
@@ -118,9 +118,9 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         {
             int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
             unsigned newSelection = mSelection;
-            while (newSelection < mItems.size() - 1)
+            while (newSelection < getNumItems() - 1)
             {
-                int height = mItems[newSelection]->getHeight();
+                int height = getItem(newSelection)->getHeight();
                 if (stepPixels < height)
                     break;
                 stepPixels -= height;
@@ -135,7 +135,7 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_END:
-        setSelection(mItems.size() - 1);
+        setSelection(getNumItems() - 1);
         break;
     }
 }
@@ -152,78 +152,52 @@ void ListView::onDefocus()
 
 void ListView::addItem(UIElement* item)
 {
-    if ((!item) || (hasItem(item)))
+    if ((!item) || (item->getParent() == mContentElement))
         return;
     
     // Enable input so that clicking the item can be detected
     item->setEnabled(true);
-    mItems.push_back(SharedPtr<UIElement>(item));
     mContentElement->addChild(item);
-}
-
-void ListView::addItem(unsigned index, UIElement* item)
-{
-    if ((!item) || (hasItem(item)))
-        return;
-    if (index > mItems.size())
-        index = mItems.size();
-    
-    // Enable input so that clicking the item can be detected
-    item->setEnabled(true);
-    mItems.insert(mItems.begin() + index, SharedPtr<UIElement>(item));
-    updateList();
-    
-    if (mSelection >= index)
-        setSelection(mSelection + 1);
 }
 
 void ListView::removeItem(UIElement* item)
 {
-    if (!item)
-        return;
-    
-    for (unsigned i = 0; i < mItems.size(); ++i)
+    std::vector<UIElement*> items = mContentElement->getChildren();
+    for (unsigned i = 0; i < items.size(); ++i)
     {
-        if (mItems[i] == item)
+        if (items[i] == item)
         {
-            mItems.erase(mItems.begin() + i);
-            mContentElement->removeChild(item);
-            
             if (mSelection == i)
                 clearSelection();
             else if (mSelection > i)
-                setSelection(mSelection - 1);
-            
-            return;
+                changeSelection(-1);
+            break;
         }
     }
+    mContentElement->removeChild(item);
 }
 
 void ListView::removeItem(unsigned index)
 {
-    if (index >= mItems.size())
+    if (index >= getNumItems())
         return;
-    
-    UIElement* item = mItems[index];
-    mItems.erase(mItems.begin() + index);
-    mContentElement->removeChild(item);
-    
+    UIElement* item = mContentElement->getChild(index);
     if (mSelection == index)
         clearSelection();
     else if (mSelection > index)
-        setSelection(mSelection - 1);
+        changeSelection(-1);
+    mContentElement->removeChild(item);
 }
 
 void ListView::removeAllItems()
 {
-    mItems.clear();
-    updateList();
+    mContentElement->removeAllChildren();
     clearSelection();
 }
 
 void ListView::setSelection(unsigned index)
 {
-    if (index >= mItems.size())
+    if (index >= getNumItems())
         index = M_MAX_UNSIGNED;
     
     mSelection = index;
@@ -236,7 +210,7 @@ void ListView::changeSelection(int delta)
     if (mSelection == M_MAX_UNSIGNED)
         return;
     
-    int newSelection = clamp((int)mSelection + delta, 0, (int)mItems.size() - 1);
+    int newSelection = clamp((int)mSelection + delta, 0, (int)getNumItems() - 1);
     setSelection(newSelection);
 }
 
@@ -250,40 +224,31 @@ void ListView::setShowSelectionAlways(bool enable)
     mShowSelectionAlways = enable;
 }
 
-UIElement* ListView::getItem(unsigned index) const
+unsigned ListView::getNumItems() const
 {
-    if (index >= mItems.size())
-        return 0;
-    
-    return mItems[index];
+    return mContentElement->getNumChildren();
 }
 
-bool ListView::hasItem(UIElement* item) const
+UIElement* ListView::getItem(unsigned index) const
 {
-    for (unsigned i = 0; i < mItems.size(); ++i)
-    {
-        if (mItems[i] == item)
-            return true;
-    }
-    return false;
+    return mContentElement->getChild(index);
+}
+
+std::vector<UIElement*> ListView::getItems() const
+{
+    return mContentElement->getChildren();
 }
 
 UIElement* ListView::getSelectedItem() const
 {
-    return getItem(mSelection);
-}
-
-void ListView::updateList()
-{
-    mContentElement->removeAllChildren();
-    for (unsigned i = 0; i < mItems.size(); ++i)
-        mContentElement->addChild(mItems[i]);
+    return mContentElement->getChild(mSelection);
 }
 
 void ListView::updateSelectionEffect()
 {
-    for (unsigned i = 0; i < mItems.size(); ++i)
-        mItems[i]->setSelected((i == mSelection) && ((mFocus) || (mShowSelectionAlways)));
+    unsigned numItems = getNumItems();
+    for (unsigned i = 0; i < numItems; ++i)
+        getItem(i)->setSelected((i == mSelection) && ((mFocus) || (mShowSelectionAlways)));
 }
 
 void ListView::ensureItemVisibility()
@@ -323,9 +288,10 @@ void ListView::handleTryFocus(StringHash eventType, VariantMap& eventData)
         return;
     }
     
-    for (unsigned i = 0; i < mItems.size(); ++i)
+    unsigned numItems = getNumItems();
+    for (unsigned i = 0; i < numItems; ++i)
     {
-        if (focusElement == mItems[i])
+        if (focusElement == getItem(i))
         {
             setSelection(i);
             return;

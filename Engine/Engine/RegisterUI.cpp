@@ -177,6 +177,12 @@ static void registerScrollView(asIScriptEngine* engine)
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
 }
 
+static CScriptArray* ListViewGetItems(ListView* ptr)
+{
+    std::vector<UIElement*> result = ptr->getItems();
+    return vectorToHandleArray<UIElement>(result, "array<UIElement@>");
+}
+
 static void registerListView(asIScriptEngine* engine)
 {
     registerUIElement<ListView>(engine, "ListView");
@@ -186,8 +192,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void setScrollStep(float)", asMETHOD(ListView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setPageStep(float)", asMETHOD(ListView, setPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setNormalizeScrollStep(bool)", asMETHOD(ListView, setNormalizeScrollStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void addItem(UIElement@+)", asMETHODPR(ListView, addItem, (UIElement*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void addItem(uint, UIElement@+)", asMETHODPR(ListView, addItem, (unsigned, UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void addItem(UIElement@+)", asMETHOD(ListView, addItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(UIElement@+)", asMETHODPR(ListView, removeItem, (UIElement*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(uint)", asMETHODPR(ListView, removeItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeAllItems()", asMETHOD(ListView, removeAllItems), asCALL_THISCALL);
@@ -205,8 +210,9 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "float getScrollStep() const", asMETHOD(ListView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getPageStep() const", asMETHOD(ListView, getPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getNormalizeScrollStep() const", asMETHOD(ListView, getNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "uint getNumItems() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getItem(uint) const", asMETHOD(ListView, getItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "bool hasItem(UIElement@+) const", asMETHOD(ListView, hasItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "array<UIElement@>@ getItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "uint getSelection() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getSelectedItem() const", asMETHOD(ListView, getSelectedItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getShowSelectionAlways() const", asMETHOD(ListView, getShowSelectionAlways), asCALL_THISCALL);

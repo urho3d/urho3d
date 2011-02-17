@@ -49,8 +49,6 @@ public:
     
     //! Add item to the end of the list
     void addItem(UIElement* item);
-    //! Add item at index
-    void addItem(unsigned index, UIElement* item);
     //! Remove specific item
     void removeItem(UIElement* item);
     //! Remove item at index
@@ -66,10 +64,12 @@ public:
     //! Set whether to show selection even when defocused, default false
     void setShowSelectionAlways(bool enable);
     
+    //! Return number of items
+    unsigned getNumItems() const;
     //! Return item at index
     UIElement* getItem(unsigned index) const;
-    //! Return whether has a certain item
-    bool hasItem(UIElement* item) const;
+    //! Return all items
+    std::vector<UIElement*> getItems() const;
     //! Return selection index, or M_MAX_UNSIGNED if none selected
     unsigned getSelection() const { return mSelection; }
     //! Return selected item, or null if none selected
@@ -78,15 +78,11 @@ public:
     bool getShowSelectionAlways() const { return mShowSelectionAlways; }
     
 protected:
-    //! Update content element when list has changed
-    void updateList();
     //! Update selection effect when selection or focus changes
     void updateSelectionEffect();
     //! Ensure full visibility of the selected item
     void ensureItemVisibility();
     
-    //! List items
-    std::vector<SharedPtr<UIElement> > mItems;
     //! Current selection
     unsigned mSelection;
     //! Show selection even when defocused flag
