@@ -48,7 +48,7 @@ public:
     virtual void onResize();
     
     //! Set content element
-    void setElement(UIElement* element);
+    void setContentElement(UIElement* element);
     //! Set view offset from the top-left corner
     void setViewPosition(const IntVector2& position);
     //! Set view offset from the top-left corner
@@ -65,7 +65,7 @@ public:
     //! Return view offset from the top-left corner
     const IntVector2& getViewPosition() const { return mViewPosition; }
     //! Return content element
-    UIElement* getElement() const { return mElement; }
+    UIElement* getContentElement() const { return mContentElement; }
     //! Return horizontal scroll bar
     ScrollBar* getHorizontalScrollBar() const { return mHorizontalScrollBar; }
     //! Return vertical scroll bar
@@ -92,7 +92,7 @@ protected:
     void updateView(const IntVector2& position);
     
     //! Content element
-    SharedPtr<UIElement> mElement;
+    SharedPtr<UIElement> mContentElement;
     //! Horizontal scroll bar
     SharedPtr<ScrollBar> mHorizontalScrollBar;
     //! Vertical scroll bar

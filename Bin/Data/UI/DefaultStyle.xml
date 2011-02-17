@@ -46,6 +46,71 @@
         <pressedoffset value="16 0" />
         <hoveroffset value="0 16" />
     </element>
+    <element type="ListView">
+        <horizontalscrollbar>
+            <height value="12" />
+            <backbutton>
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+            </backbutton>
+            <forwardbutton>
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+            </forwardbutton>
+            <slider>
+                <texture name="Textures/UI.png" />
+                <imagerect value="48 0 64 16" />
+                <border value="3 3 3 3" />
+                <knob>
+                    <texture name="Textures/UI.png" />
+                    <imagerect value="16 0 32 16" />
+                    <border value="4 4 4 4" />
+                    <hoveroffset value="0 16" />
+                </knob>
+            </slider>
+        </horizontalscrollbar>
+        <verticalscrollbar>
+            <width value="12" />
+            <backbutton>
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="32 32 48 48" vertical="0 32 16 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+            </backbutton>
+            <forwardbutton>
+                <texture name="Textures/UI.png" />
+                <imagerect horizontal="48 32 64 48" vertical="16 32 32 48" />
+                <border value="3 3 3 3" />
+                <pressedoffset value="64 0" />
+                <hoveroffset value="0 16" />
+            </forwardbutton>
+            <slider>
+                <texture name="Textures/UI.png" />
+                <imagerect value="48 0 64 16" />
+                <border value="3 3 3 3" />
+                <knob>
+                    <texture name="Textures/UI.png" />
+                    <imagerect value="16 0 32 16" />
+                    <border value="4 4 4 4" />
+                    <hoveroffset value="0 16" />
+                </knob>
+            </slider>
+        </verticalscrollbar>
+        <scrollpanel>
+            <texture name="Textures/UI.png" />
+            <imagerect value="112 0 128 16" />
+            <border value="2 2 2 2" />
+            <clipborder value="1 1 1 1" />
+        </scrollpanel>
+    </element>
+
     <element type="ScrollBar">
         <backbutton>
             <size value="12 12" />

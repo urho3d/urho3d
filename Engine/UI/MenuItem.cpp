@@ -56,20 +56,6 @@ void MenuItem::setStyle(const XMLElement& element, ResourceCache* cache)
         setPopupOffset(element.getChildElement("popupoffset").getIntVector2("value"));
 }
 
-void MenuItem::update(float timeStep)
-{
-    // Keep pressed state if showing the popup
-    if ((!mHovering) && (!mShowPopup))
-        setPressed(false);
-}
-
-void MenuItem::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
-{
-    // Keep pressed state if showing the popup
-    setPressed(((buttons & MOUSEB_LEFT) != 0) || (mShowPopup));
-    mHovering = true;
-}
-
 void MenuItem::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     setPressed(true);
@@ -141,6 +127,7 @@ void MenuItem::showPopup(bool enable)
     }
     
     mShowPopup = enable;
+    mSelected = enable;
 }
 
 void MenuItem::handleTryFocus(StringHash eventType, VariantMap& eventData)

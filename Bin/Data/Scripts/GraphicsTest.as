@@ -64,7 +64,7 @@ void initScene()
     engine.setDefaultScene(testScene);
 
     PhysicsWorld@ world = testScene.getPhysicsWorld();
-    
+
     // Set the physics world parameters
     world.setGravity(Vector3(0.0, -9.81, 0.0));
     world.setFps(100);
@@ -81,7 +81,7 @@ void initScene()
     sunLight.setSpecularIntensity(1.0);
     //sunLight.setCastShadows(true);
     //sunLight.setShadowCascade(CascadeParameters(3, 0.95, 0.2, 500.0));
-    
+
     // Create a zone to control the ambient lighting
     Entity@ zoneEntity = testScene.createEntity();
     Zone@ zone = zoneEntity.createComponent("Zone");
@@ -100,14 +100,14 @@ void initScene()
             body.setCollisionShape(cache.getResource("CollisionShape", "Physics/Box.xml"));
             body.setCollisionGroup(2);
             body.setCollisionMask(1);
-            
+
             StaticModel@ object = newEntity.createComponent("StaticModel");
             object.setModel(cache.getResource("Model", "Models/Box.mdl"));
             object.setMaterial(cache.getResource("Material", "Materials/Test.xml"));
             body.addChild(object);
         }
     }
-    
+
     // Create 2 occluder walls
     for (int x = 0; x < 2; x++)
     {
@@ -119,7 +119,7 @@ void initScene()
         body.setCollisionShape(cache.getResource("CollisionShape", "Physics/Box.xml"));
         body.setCollisionGroup(2);
         body.setCollisionMask(1);
-        
+
         StaticModel@ object = newEntity.createComponent("StaticModel");
         object.setModel(cache.getResource("Model", "Models/Box.mdl"));
         object.setMaterial(cache.getResource("Material", "Materials/Test.xml"));
@@ -137,7 +137,7 @@ void initScene()
         body.setCollisionShape(cache.getResource("CollisionShape", "Physics/Mushroom.xml"));
         body.setCollisionGroup(2);
         body.setCollisionMask(1);
-        
+
         StaticModel@ object = newEntity.createComponent("StaticModel");
         object.setModel(cache.getResource("Model", "Models/Mushroom.mdl"));
         object.setMaterial(cache.getResource("Material", "Materials/Mushroom.xml"));
@@ -336,7 +336,7 @@ void createCamera()
     @camera = cameraEntity.createComponent("Camera");
     camera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
     camera.setPosition(Vector3(-50.0, 2.0, -50.0));
-    
+
     @cameraLight = cameraEntity.createComponent("Light");
     cameraLight.setLightType(LIGHT_SPOT);
     cameraLight.setDirection(Vector3(0.0, 0.0, 1.0));
@@ -374,7 +374,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
             camera.translateRelative(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
         if (input.getKeyDown('D'))
             camera.translateRelative(Vector3(10, 0, 0) * timeStep * speedMultiplier);
-        
+
         if (input.getKeyPress('1'))
         {
             int nextRenderMode = renderer.getRenderMode();
@@ -390,11 +390,11 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
                 if (nextRenderMode > 2)
                     nextRenderMode = 0;
             }
-            
+
             renderer.setMode(RenderMode(nextRenderMode), renderer.getWidth(), renderer.getHeight(), renderer.getFullscreen(),
                 renderer.getVsync(), renderer.getMultiSample());
         }
-        
+
         if (input.getKeyPress('2'))
         {
             texturequality++;
@@ -410,34 +410,34 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
                 materialquality = 0;
             pipeline.setMaterialQuality(materialquality);
         }
-        
+
         if (input.getKeyPress('4'))
         {
             usespecular = !usespecular;
             pipeline.setSpecularLighting(usespecular);
         }
-        
+
         if (input.getKeyPress('5'))
         {
             drawshadows = !drawshadows;
             pipeline.setDrawShadows(drawshadows);
         }
-        
+
         if (input.getKeyPress('6'))
         {
             shadowmapsize *= 2;
             if (shadowmapsize > 2048)
                 shadowmapsize = 512;
-            
+
             pipeline.setShadowMapSize(shadowmapsize);
         }
-        
+
         if (input.getKeyPress('7'))
         {
             hiresshadowmap = !hiresshadowmap;
             pipeline.setShadowMapHiresDepth(hiresshadowmap);
         }
-        
+
         if (input.getKeyPress('8'))
         {
             useocclusion = !useocclusion;
@@ -459,14 +459,14 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
                 camera.removeChild(cameraLight, true);
             }
         }
-        
+
         if (input.getKeyPress(' '))
         {
             drawdebug++;
             if (drawdebug > 2) drawdebug = 0;
             engine.setDebugDrawMode(drawdebug);
         }
-        
+
         if (input.getKeyPress('P'))
         {
             paused = !paused;
@@ -488,14 +488,14 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
             pipeline.setEdgeFilter(params);
         }
     }
-    
+
     if (input.getKeyPress(KEY_ESC))
-	{
-		if (ui.getFocusElement() is null)
-	        engine.exit();
-	    else
-		    console.setVisible(false);
-	}
+    {
+        if (ui.getFocusElement() is null)
+            engine.exit();
+        else
+            console.setVisible(false);
+    }
 }
 
 void handleKeyDown(StringHash eventType, VariantMap& eventData)

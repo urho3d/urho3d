@@ -94,20 +94,20 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    // Hovering batch
-    if (((mHovering) || (mSelected)) && (mHoverColor.mA > 0.0f))
+    // Hovering or whole selection batch
+    if ((mHovering && (mHoverColor.mA > 0.0f)) || (mSelected && (mSelectionColor.mA > 0.0f)))
     {
         UIBatch batch;
         batch.begin(&quads);
         batch.mBlendMode = BLEND_ALPHA;
         batch.mScissor = currentScissor;
         batch.mTexture = 0;
-        batch.addQuad(*this, 0, 0, getWidth(), getHeight(), 0, 0, 0, 0, mHoverColor);
+        batch.addQuad(*this, 0, 0, getWidth(), getHeight(), 0, 0, 0, 0, mSelected ? mSelectionColor : mHoverColor);
         UIBatch::addOrMerge(batch, batches);
     }
     
-    // Selection batch
-    if ((mSelectionLength) && (mCharSizes.size() >= mSelectionStart + mSelectionLength) && (mSelectionColor.mA > 0.0f))
+    // Partial Selection batch
+    if ((!mSelected) && (mSelectionLength) && (mCharSizes.size() >= mSelectionStart + mSelectionLength) && (mSelectionColor.mA > 0.0f))
     {
         UIBatch batch;
         batch.begin(&quads);
@@ -430,9 +430,11 @@ void Text::updateText(bool inResize)
         mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
-    // Resize self only when not using wordwrap
+    // Set minimum size to correspond to the text size
     if (!mWordwrap)
-        setSize(width, height);
+        setMinSize(width, height);
+    else
+        setMinSize(0, height);
 }
 
 void Text::validateSelection()

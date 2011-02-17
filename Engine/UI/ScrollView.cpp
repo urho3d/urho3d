@@ -89,7 +89,7 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
     
     UIElement* root = getRootElement();
     if ((root) && (element.hasChildElement("contentelement")))
-        setElement(root->getChild(element.getChildElement("contentelement").getString("name"), true));
+        setContentElement(root->getChild(element.getChildElement("contentelement").getString("name"), true));
     
     // Set the scrollbar orientations again and perform size update now that the style is known
     mHorizontalScrollBar->setOrientation(O_HORIZONTAL);
@@ -102,7 +102,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
     switch (key)
     {
     case KEY_LEFT:
-        if (mHorizontalScrollBar)
+        if (mHorizontalScrollBar->isVisible())
         {
             if (qualifiers & QUAL_CTRL)
                 mHorizontalScrollBar->setValue(0.0f);
@@ -112,7 +112,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_RIGHT:
-        if (mHorizontalScrollBar)
+        if (mHorizontalScrollBar->isVisible())
         {
             if (qualifiers & QUAL_CTRL)
                 mHorizontalScrollBar->setValue(mHorizontalScrollBar->getRange());
@@ -122,7 +122,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_UP:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
         {
             if (qualifiers & QUAL_CTRL)
                 mVerticalScrollBar->setValue(0.0f);
@@ -132,7 +132,7 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_DOWN:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
         {
             if (qualifiers & QUAL_CTRL)
                 mVerticalScrollBar->setValue(mVerticalScrollBar->getRange());
@@ -142,22 +142,22 @@ void ScrollView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_PAGEUP:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
             mVerticalScrollBar->changeValue(-mPageStep);
         break;
         
     case KEY_PAGEDOWN:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
             mVerticalScrollBar->changeValue(mPageStep);
         break;
     
     case KEY_HOME:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
             mVerticalScrollBar->setValue(0.0f);
         break;
     
     case KEY_END:
-        if (mVerticalScrollBar)
+        if (mVerticalScrollBar->isVisible())
             mVerticalScrollBar->setValue(mVerticalScrollBar->getRange());
         break;
     }
@@ -178,21 +178,21 @@ void ScrollView::onResize()
     updateViewSize();
 }
 
-void ScrollView::setElement(UIElement* element)
+void ScrollView::setContentElement(UIElement* element)
 {
-    if (element == mElement)
+    if (element == mContentElement)
         return;
     
-    if (mElement)
+    if (mContentElement)
     {
-        mScrollPanel->removeChild(mElement);
-        unsubscribeFromEvent(mElement, EVENT_RESIZED);
+        mScrollPanel->removeChild(mContentElement);
+        unsubscribeFromEvent(mContentElement, EVENT_RESIZED);
     }
-    mElement = element;
-    if (mElement)
+    mContentElement = element;
+    if (mContentElement)
     {
-        mScrollPanel->addChild(mElement);
-        subscribeToEvent(mElement, EVENT_RESIZED, EVENT_HANDLER(ScrollView, handleElementResized));
+        mScrollPanel->addChild(mContentElement);
+        subscribeToEvent(mContentElement, EVENT_RESIZED, EVENT_HANDLER(ScrollView, handleElementResized));
     }
     
     updateViewSize();
@@ -255,8 +255,8 @@ bool ScrollView::getNormalizeScrollStep() const
 void ScrollView::updateViewSize()
 {
     IntVector2 size(IntVector2::sZero);
-    if (mElement)
-        size = mElement->getSize();
+    if (mContentElement)
+        size = mContentElement->getSize();
     
     mViewSize.mX = max(size.mX, mScrollPanel->getWidth());
     mViewSize.mY = max(size.mY, mScrollPanel->getHeight());

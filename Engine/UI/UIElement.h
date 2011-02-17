@@ -198,7 +198,7 @@ public:
     void setFocusMode(FocusMode mode);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
-    //! Set selected mode. Actual meaning is element dependent, but is visually same as a constant hover
+    //! Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect
     void setSelected(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);

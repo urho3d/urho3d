@@ -156,6 +156,7 @@ static void registerScrollBar(asIScriptEngine* engine)
 static void registerScrollView(asIScriptEngine* engine)
 {
     registerUIElement<ScrollView>(engine, "ScrollView");
+    engine->RegisterObjectMethod("ScrollView", "void setContentElement(UIElement@+)", asMETHOD(ScrollView, setContentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setViewPosition(const IntVector2& in)", asMETHODPR(ScrollView, setViewPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setViewPosition(int, int)", asMETHODPR(ScrollView, setViewPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ScrollView, setScrollBarsVisible), asCALL_THISCALL);
@@ -163,7 +164,7 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "void setPageStep(float)", asMETHOD(ScrollView, setPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setNormalizeScrollStep(bool)", asMETHOD(ScrollView, setNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "UIElement@+ getElement() const", asMETHOD(ScrollView, getElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollView", "UIElement@+ getContentElement() const", asMETHOD(ScrollView, getContentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ScrollView, getHorizontalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getVerticalScrollBar() const", asMETHOD(ScrollView, getVerticalScrollBar), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "BorderImage@+ getScrollPanel() const", asMETHOD(ScrollView, getScrollPanel), asCALL_THISCALL);

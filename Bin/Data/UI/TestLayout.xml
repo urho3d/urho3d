@@ -23,15 +23,75 @@
     <element type="CheckBox">
         <position value="40 130" />
     </element>
-    <element type="Text" name="ScrollViewText" >
-        <position value="1 0" />
-        <size value="200 150" />
-        <font name="times.ttf" size="15" />
-        <text value="Urho3D - a Win32/Direct3D9 rendering and game engine\nhttp://urho3d.googlecode.com\nLicensed under the MIT license, see License.txt for details." />
-        <wordwrap enable="true" />
-    </element>
-    <element type="ScrollView">
-        <contentelement name="ScrollViewText" />
+	<element type="Text" name="Item1">
+	    <font name="times.ttf" size="15" />
+	    <text value="Audio" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item2">
+	    <font name="times.ttf" size="15" />
+	    <text value="Common" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item3">
+	    <font name="times.ttf" size="15" />
+	    <text value="Engine" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item4">
+	    <font name="times.ttf" size="15" />
+	    <text value="Input" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item5">
+	    <font name="times.ttf" size="15" />
+	    <text value="Math" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item6">
+	    <font name="times.ttf" size="15" />
+	    <text value="Network" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item7">
+	    <font name="times.ttf" size="15" />
+	    <text value="Physics" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item8">
+	    <font name="times.ttf" size="15" />
+	    <text value="Renderer" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item9">
+	    <font name="times.ttf" size="15" />
+	    <text value="Resource" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item10">
+	    <font name="times.ttf" size="15" />
+	    <text value="Scene" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+	<element type="Text" name="Item11">
+	    <font name="times.ttf" size="15" />
+	    <text value="UI" />
+        <selectioncolor value="0.5 0.75 0.5" />
+	</element>
+    <element type="ListView">
+        <position value="150 100" />
+        <size value="212 112" />
+        <listitem name="Item1" />
+        <listitem name="Item2" />
+        <listitem name="Item3" />
+        <listitem name="Item4" />
+        <listitem name="Item5" />
+        <listitem name="Item6" />
+        <listitem name="Item7" />
+        <listitem name="Item8" />
+        <listitem name="Item9" />
+        <listitem name="Item10" />
+        <listitem name="Item11" />
     </element>
     <element type="LineEdit">
         <position value="150 230" />

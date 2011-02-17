@@ -31,7 +31,7 @@ DEFINE_EVENT(EVENT_RESIZED, Resized)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
     EVENT_PARAM(P_WIDTH, Width);                // int
-    EVENT_PARAM(P_Height, Height);              // int
+    EVENT_PARAM(P_HEIGHT, Height);              // int
 }
 
 //! UI element visibility changed

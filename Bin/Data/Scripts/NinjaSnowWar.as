@@ -214,12 +214,12 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (input.getKeyPress(KEY_ESC))
-	{
-		if (!console.isVisible())
-	        engine.exit();
-	    else
-		    console.setVisible(false);
-	}
+    {
+        if (!console.isVisible())
+            engine.exit();
+        else
+        console.setVisible(false);
+    }
 
     if (!paused)
         updateControls();

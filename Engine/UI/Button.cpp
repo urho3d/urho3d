@@ -84,9 +84,9 @@ void Button::update(float timeStep)
 void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::sZero);
-    if ((mHovering) || (mSelected))
+    if (mHovering)
         offset += mHoverOffset;
-    if (mPressed)
+    if ((mPressed) || (mSelected))
         offset += mPressedOffset;
     
     BorderImage::getBatches(batches, quads, currentScissor, offset);

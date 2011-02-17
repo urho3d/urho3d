@@ -376,14 +376,15 @@ void UIElement::setSize(const IntVector2& size)
             
             markDirty();
             onResize();
+            updateLayout();
             
             using namespace Resized;
             
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
-            sendEvent(mFocus ? EVENT_FOCUSED : EVENT_DEFOCUSED, eventData);
-            
-            updateLayout();
+            eventData[P_WIDTH] = mSize.mX;
+            eventData[P_HEIGHT] = mSize.mY;
+            sendEvent(EVENT_RESIZED, eventData);
         }
     }
     
@@ -422,12 +423,12 @@ void UIElement::setMinSize(int width, int height)
 
 void UIElement::setMinWidth(int width)
 {
-    setMaxSize(IntVector2(width, mMinSize.mY));
+    setMinSize(IntVector2(width, mMinSize.mY));
 }
 
 void UIElement::setMinHeight(int height)
 {
-    setMaxSize(IntVector2(mMinSize.mX, height));
+    setMinSize(IntVector2(mMinSize.mX, height));
 }
 
 void UIElement::setMaxSize(const IntVector2& maxSize)
@@ -645,6 +646,7 @@ void UIElement::updateLayout()
     if (mLayoutOrientation == O_HORIZONTAL)
     {
         int maxChildHeight = 0;
+        int maxChildMinHeight = 0;
         
         if (mHorizontalLayoutMode == LM_RESIZEELEMENT)
         {
@@ -654,11 +656,14 @@ void UIElement::updateLayout()
                     continue;
                 sizes.push_back(mChildren[i]->getWidth());
                 maxChildHeight = max(maxChildHeight, mChildren[i]->getHeight());
+                maxChildMinHeight = max(maxChildMinHeight, mChildren[i]->getMinHeight());
             }
             
+            if (mVerticalLayoutMode == LM_RESIZEELEMENT)
+                setMinHeight(maxChildMinHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom);
             setSize(calculateLayoutParentSize(sizes, mLayoutBorder.mLeft, mLayoutBorder.mRight, mLayoutSpacing), mVerticalLayoutMode ==
                 LM_RESIZEELEMENT ? maxChildHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom : getHeight());
-           
+            
             int position = mLayoutBorder.mLeft;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
@@ -684,24 +689,28 @@ void UIElement::updateLayout()
                 minSizes.push_back(mChildren[i]->getMinWidth());
                 maxSizes.push_back(mChildren[i]->getMaxWidth());
                 maxChildHeight = max(maxChildHeight, mChildren[i]->getHeight());
+                maxChildMinHeight = max(maxChildMinHeight, mChildren[i]->getMinHeight());
             }
             
             if (mVerticalLayoutMode == LM_RESIZEELEMENT)
+            {
+                setMinHeight(maxChildMinHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom);
                 setHeight(maxChildHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom);
+            }
             
             calculateLayout(positions, sizes, minSizes, maxSizes, getWidth(), mLayoutBorder.mLeft, mLayoutBorder.mRight,
                 mLayoutSpacing);
             
-            unsigned idx = 0;
+            unsigned j = 0;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setHorizontalAlignment(HA_LEFT);
-                mChildren[i]->setPosition(positions[idx], getLayoutChildPosition(mChildren[i]).mY);
-                mChildren[i]->setSize(sizes[idx], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
+                mChildren[i]->setPosition(positions[j], getLayoutChildPosition(mChildren[i]).mY);
+                mChildren[i]->setSize(sizes[j], mVerticalLayoutMode == LM_RESIZECHILDREN ? getHeight() - mLayoutBorder.mTop -
                     mLayoutBorder.mBottom : mChildren[i]->getHeight());
-                ++idx;
+                ++j;
             }
         }
     }
@@ -709,6 +718,7 @@ void UIElement::updateLayout()
     if (mLayoutOrientation == O_VERTICAL)
     {
         int maxChildWidth = 0;
+        int maxChildMinWidth = 0;
         
         if (mVerticalLayoutMode == LM_RESIZEELEMENT)
         {
@@ -718,8 +728,11 @@ void UIElement::updateLayout()
                     continue;
                 sizes.push_back(mChildren[i]->getHeight());
                 maxChildWidth = max(maxChildWidth, mChildren[i]->getWidth());
+                maxChildMinWidth = max(maxChildMinWidth, mChildren[i]->getMinWidth());
             }
             
+            if (mHorizontalLayoutMode == LM_RESIZEELEMENT)
+                setMinWidth(maxChildMinWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight);
             setSize(mHorizontalLayoutMode == LM_RESIZEELEMENT ? maxChildWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight : getWidth(),
                 calculateLayoutParentSize(sizes, mLayoutBorder.mTop, mLayoutBorder.mBottom, mLayoutSpacing));
             
@@ -747,24 +760,28 @@ void UIElement::updateLayout()
                 minSizes.push_back(mChildren[i]->getMinHeight());
                 maxSizes.push_back(mChildren[i]->getMaxHeight());
                 maxChildWidth = max(maxChildWidth, mChildren[i]->getWidth());
+                maxChildMinWidth = max(maxChildMinWidth, mChildren[i]->getMinWidth());
             }
             
             if (mHorizontalLayoutMode == LM_RESIZEELEMENT)
+            {
+                setMinWidth(maxChildMinWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight);
                 setWidth(maxChildWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight);
+            }
             
             calculateLayout(positions, sizes, minSizes, maxSizes, getHeight(), mLayoutBorder.mTop, mLayoutBorder.mBottom,
                 mLayoutSpacing);
             
-            unsigned idx = 0;
+            unsigned j = 0;
             for (unsigned i = 0; i < mChildren.size(); ++i)
             {
                 if (!mChildren[i]->isVisible())
                     continue;
                 mChildren[i]->setVerticalAlignment(VA_TOP);
-                mChildren[i]->setPosition(getLayoutChildPosition(mChildren[i]).mX, positions[idx]);
+                mChildren[i]->setPosition(getLayoutChildPosition(mChildren[i]).mX, positions[j]);
                 mChildren[i]->setSize(mHorizontalLayoutMode == LM_RESIZECHILDREN ? getWidth() - mLayoutBorder.mLeft -
-                    mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[idx]);
-                ++idx;
+                    mLayoutBorder.mRight : mChildren[i]->getWidth(), sizes[j]);
+                ++j;
             }
         }
     }

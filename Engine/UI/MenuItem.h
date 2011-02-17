@@ -38,10 +38,6 @@ class MenuItem : public Button
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! Perform UI element update
-    virtual void update(float timeStep);
-    //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     
