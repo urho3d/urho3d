@@ -28,6 +28,7 @@
 #include "Engine.h"
 #include "Font.h"
 #include "LineEdit.h"
+#include "ListView.h"
 #include "MenuItem.h"
 #include "RegisterTemplates.h"
 #include "ScrollBar.h"
@@ -174,6 +175,42 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "float getPageStep() const", asMETHOD(ScrollView, getPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "bool getNormalizeScrollStep() const", asMETHOD(ScrollView, getNormalizeScrollStep), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
+}
+
+static void registerListView(asIScriptEngine* engine)
+{
+    registerUIElement<ListView>(engine, "ListView");
+    engine->RegisterObjectMethod("ListView", "void setViewPosition(const IntVector2& in)", asMETHODPR(ListView, setViewPosition, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setViewPosition(int, int)", asMETHODPR(ListView, setViewPosition, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ListView, setScrollBarsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setScrollStep(float)", asMETHOD(ListView, setScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setPageStep(float)", asMETHOD(ListView, setPageStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setNormalizeScrollStep(bool)", asMETHOD(ListView, setNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void addItem(UIElement@+)", asMETHODPR(ListView, addItem, (UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void addItem(uint, UIElement@+)", asMETHODPR(ListView, addItem, (unsigned, UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void removeItem(UIElement@+)", asMETHODPR(ListView, removeItem, (UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void removeItem(uint)", asMETHODPR(ListView, removeItem, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void removeAllItems()", asMETHOD(ListView, removeAllItems), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setSelection(uint)", asMETHOD(ListView, setSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void changeSelection(int)", asMETHOD(ListView, changeSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void clearSelection()", asMETHOD(ListView, clearSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setShowSelectionAlways(bool)", asMETHOD(ListView, setShowSelectionAlways), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "const IntVector2& getViewPosition() const", asMETHOD(ListView, getViewPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "UIElement@+ getContentElement() const", asMETHOD(ListView, getContentElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ListView, getHorizontalScrollBar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "ScrollBar@+ getVerticalScrollBar() const", asMETHOD(ListView, getVerticalScrollBar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "BorderImage@+ getScrollPanel() const", asMETHOD(ListView, getScrollPanel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getHorizontalScrollBarVisible() const", asMETHOD(ListView, getHorizontalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getVerticalScrollBarVisible() const", asMETHOD(ListView, getVerticalScrollBarVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float getScrollStep() const", asMETHOD(ListView, getScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float getPageStep() const", asMETHOD(ListView, getPageStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getNormalizeScrollStep() const", asMETHOD(ListView, getNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "UIElement@+ getItem(uint) const", asMETHOD(ListView, getItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool hasItem(UIElement@+) const", asMETHOD(ListView, hasItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "uint getSelection() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "UIElement@+ getSelectedItem() const", asMETHOD(ListView, getSelectedItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getShowSelectionAlways() const", asMETHOD(ListView, getShowSelectionAlways), asCALL_THISCALL);
+    registerRefCasts<UIElement, ListView>(engine, "UIElement", "ListView");
 }
 
 static void registerText(asIScriptEngine* engine)
@@ -354,6 +391,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerSlider(engine);
     registerScrollBar(engine);
     registerScrollView(engine);
+    registerListView(engine);
     registerText(engine);
     registerLineEdit(engine);
     registerMenuItem(engine);

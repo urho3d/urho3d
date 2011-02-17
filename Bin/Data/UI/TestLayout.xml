@@ -23,61 +23,61 @@
     <element type="CheckBox">
         <position value="40 130" />
     </element>
-	<element type="Text" name="Item1">
-	    <font name="times.ttf" size="15" />
-	    <text value="Audio" />
+    <element type="Text" name="Item1">
+        <font name="cour.ttf" size="12" />
+        <text value="Audio" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item2">
-	    <font name="times.ttf" size="15" />
-	    <text value="Common" />
+    </element>
+    <element type="Text" name="Item2">
+        <font name="cour.ttf" size="12" />
+        <text value="Common" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item3">
-	    <font name="times.ttf" size="15" />
-	    <text value="Engine" />
+    </element>
+    <element type="Text" name="Item3">
+        <font name="cour.ttf" size="12" />
+        <text value="Engine" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item4">
-	    <font name="times.ttf" size="15" />
-	    <text value="Input" />
+    </element>
+    <element type="Text" name="Item4">
+        <font name="cour.ttf" size="12" />
+        <text value="Input" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item5">
-	    <font name="times.ttf" size="15" />
-	    <text value="Math" />
+    </element>
+    <element type="Text" name="Item5">
+        <font name="cour.ttf" size="12" />
+        <text value="Math" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item6">
-	    <font name="times.ttf" size="15" />
-	    <text value="Network" />
+    </element>
+    <element type="Text" name="Item6">
+        <font name="cour.ttf" size="12" />
+        <text value="Network" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item7">
-	    <font name="times.ttf" size="15" />
-	    <text value="Physics" />
+    </element>
+    <element type="Text" name="Item7">
+        <font name="cour.ttf" size="12" />
+        <text value="Physics" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item8">
-	    <font name="times.ttf" size="15" />
-	    <text value="Renderer" />
+    </element>
+    <element type="Text" name="Item8">
+        <font name="cour.ttf" size="12" />
+        <text value="Renderer" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item9">
-	    <font name="times.ttf" size="15" />
-	    <text value="Resource" />
+    </element>
+    <element type="Text" name="Item9">
+        <font name="cour.ttf" size="12" />
+        <text value="Resource" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item10">
-	    <font name="times.ttf" size="15" />
-	    <text value="Scene" />
+    </element>
+    <element type="Text" name="Item10">
+        <font name="cour.ttf" size="12" />
+        <text value="Scene" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
-	<element type="Text" name="Item11">
-	    <font name="times.ttf" size="15" />
-	    <text value="UI" />
+    </element>
+    <element type="Text" name="Item11">
+        <font name="cour.ttf" size="12" />
+        <text value="UI" />
         <selectioncolor value="0.5 0.75 0.5" />
-	</element>
+    </element>
     <element type="ListView">
         <position value="150 100" />
         <size value="212 112" />

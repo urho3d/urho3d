@@ -119,6 +119,8 @@ public:
     virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
+    //! React to mouse wheel
+    virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character

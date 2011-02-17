@@ -25,18 +25,20 @@
 #include "BorderImage.h"
 #include "InputEvents.h"
 #include "ListView.h"
-#include "Log.h"
 #include "UIEvents.h"
 
 ListView::ListView(const std::string& name) :
     ScrollView(name),
-    mSelection(M_MAX_UNSIGNED)
+    mSelection(M_MAX_UNSIGNED),
+    mShowSelectionAlways(false)
 {
     UIElement* container = new UIElement();
     container->setEnabled(true);
     container->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
+    
     mScrollPanel->setLayout(O_HORIZONTAL, LM_RESIZECHILDREN, LM_FREE);
     setContentElement(container);
+    
     subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(ListView, handleTryFocus));
 }
 
@@ -58,6 +60,19 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
             itemElem = itemElem.getNextElement("listitem");
         }
     }
+    
+    if (element.hasChildElement("selection"))
+        setSelection(element.getChildElement("selection").getInt("value"));
+    if (element.hasChildElement("showselectionalways"))
+        setShowSelectionAlways(element.getChildElement("showselectionalways").getBool("enable"));
+}
+
+void ListView::onWheel(int delta, int buttons, int qualifiers)
+{
+    if (delta > 0)
+        changeSelection(-1);
+    if (delta < 0)
+        changeSelection(1);
 }
 
 void ListView::onKey(int key, int buttons, int qualifiers)
@@ -83,21 +98,56 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_PAGEUP:
-        changeSelection((int)-mPageStep);
+        {
+            // Convert page step to pixels and see how many items we have to skip to reach that many pixels
+            int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
+            unsigned newSelection = mSelection;
+            while (newSelection)
+            {
+                int height = mItems[newSelection]->getHeight();
+                if (stepPixels < height)
+                    break;
+                stepPixels -= height;
+                --newSelection;
+            }
+            setSelection(newSelection);
+        }
         break;
         
     case KEY_PAGEDOWN:
-        changeSelection((int)mPageStep);
+        {
+            int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
+            unsigned newSelection = mSelection;
+            while (newSelection < mItems.size() - 1)
+            {
+                int height = mItems[newSelection]->getHeight();
+                if (stepPixels < height)
+                    break;
+                stepPixels -= height;
+                ++newSelection;
+            }
+            setSelection(newSelection);
+        }
         break;
-    
+        
     case KEY_HOME:
         setSelection(0);
         break;
-    
+        
     case KEY_END:
         setSelection(mItems.size() - 1);
         break;
     }
+}
+
+void ListView::onFocus()
+{
+    updateSelectionEffect();
+}
+
+void ListView::onDefocus()
+{
+    updateSelectionEffect();
 }
 
 void ListView::addItem(UIElement* item)
@@ -127,22 +177,6 @@ void ListView::addItem(unsigned index, UIElement* item)
         setSelection(mSelection + 1);
 }
 
-void ListView::setItem(unsigned index, UIElement* item)
-{
-    if (index >= mItems.size())
-    {
-        LOGERROR("Illegal ListView item index");
-        return;
-    }
-    if ((!item) || (hasItem(item)))
-        return;
-    
-    // Enable input so that clicking the item can be detected
-    item->setEnabled(true);
-    mItems[index] = item;
-    updateList();
-}
-
 void ListView::removeItem(UIElement* item)
 {
     if (!item)
@@ -156,7 +190,7 @@ void ListView::removeItem(UIElement* item)
             mContentElement->removeChild(item);
             
             if (mSelection == i)
-                setSelection(M_MAX_UNSIGNED);
+                clearSelection();
             else if (mSelection > i)
                 setSelection(mSelection - 1);
             
@@ -175,16 +209,16 @@ void ListView::removeItem(unsigned index)
     mContentElement->removeChild(item);
     
     if (mSelection == index)
-        setSelection(M_MAX_UNSIGNED);
+        clearSelection();
     else if (mSelection > index)
         setSelection(mSelection - 1);
 }
 
 void ListView::removeAllItems()
 {
-    setSelection(M_MAX_UNSIGNED);
     mItems.clear();
     updateList();
+    clearSelection();
 }
 
 void ListView::setSelection(unsigned index)
@@ -192,10 +226,8 @@ void ListView::setSelection(unsigned index)
     if (index >= mItems.size())
         index = M_MAX_UNSIGNED;
     
-    for (unsigned i = 0; i < mItems.size(); ++i)
-        mItems[i]->setSelected(i == index);
     mSelection = index;
-    
+    updateSelectionEffect();
     ensureItemVisibility();
 }
 
@@ -206,6 +238,16 @@ void ListView::changeSelection(int delta)
     
     int newSelection = clamp((int)mSelection + delta, 0, (int)mItems.size() - 1);
     setSelection(newSelection);
+}
+
+void ListView::clearSelection()
+{
+    setSelection(M_MAX_UNSIGNED);
+}
+
+void ListView::setShowSelectionAlways(bool enable)
+{
+    mShowSelectionAlways = enable;
 }
 
 UIElement* ListView::getItem(unsigned index) const
@@ -236,6 +278,12 @@ void ListView::updateList()
     mContentElement->removeAllChildren();
     for (unsigned i = 0; i < mItems.size(); ++i)
         mContentElement->addChild(mItems[i]);
+}
+
+void ListView::updateSelectionEffect()
+{
+    for (unsigned i = 0; i < mItems.size(); ++i)
+        mItems[i]->setSelected((i == mSelection) && ((mFocus) || (mShowSelectionAlways)));
 }
 
 void ListView::ensureItemVisibility()
@@ -271,7 +319,7 @@ void ListView::handleTryFocus(StringHash eventType, VariantMap& eventData)
     // If the scrollpanel itself was clicked, and not the container / items, clear selection
     if (focusElement == mScrollPanel)
     {
-        setSelection(M_MAX_UNSIGNED);
+        clearSelection();
         return;
     }
     

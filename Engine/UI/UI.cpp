@@ -71,6 +71,7 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     subscribeToEvent(EVENT_MOUSEMOVE, EVENT_HANDLER(UI, handleMouseMove));
     subscribeToEvent(EVENT_MOUSEBUTTONDOWN, EVENT_HANDLER(UI, handleMouseButtonDown));
     subscribeToEvent(EVENT_MOUSEBUTTONUP, EVENT_HANDLER(UI, handleMouseButtonUp));
+    subscribeToEvent(EVENT_MOUSEWHEEL, EVENT_HANDLER(UI, handleMouseWheel));
     subscribeToEvent(EVENT_KEYDOWN, EVENT_HANDLER(UI, handleKeyDown));
     subscribeToEvent(EVENT_CHAR, EVENT_HANDLER(UI, handleChar));
     
@@ -549,6 +550,19 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
             mMouseDragElement = 0;
         }
     }
+}
+
+void UI::handleMouseWheel(StringHash eventType, VariantMap& eventData)
+{
+    using namespace MouseWheel;
+    
+    mMouseButtons = eventData[P_BUTTONS].getInt();
+    mQualifiers = eventData[P_QUALIFIERS].getInt();
+    int delta = eventData[P_WHEEL].getInt();
+    
+    UIElement* element = getFocusElement();
+    if (element)
+        element->onWheel(delta, mMouseButtons, mQualifiers);
 }
 
 void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)

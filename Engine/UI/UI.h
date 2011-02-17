@@ -97,6 +97,8 @@ private:
     void handleMouseButtonDown(StringHash eventType, VariantMap& eventData);
     //! Handle mouse button up event
     void handleMouseButtonUp(StringHash eventType, VariantMap& eventData);
+    //! Handle mouse wheel event
+    void handleMouseWheel(StringHash eventType, VariantMap& eventData);
     //! Handle keypress event
     void handleKeyDown(StringHash eventType, VariantMap& eventData);
     //! Handle character event

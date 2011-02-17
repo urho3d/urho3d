@@ -317,6 +317,10 @@ void UIElement::onDragEnd(const IntVector2& position, const IntVector2& screenPo
 {
 }
 
+void UIElement::onWheel(int delta, int buttons, int qualifiers)
+{
+}
+
 void UIElement::onKey(int key, int buttons, int qualifiers)
 {
 }

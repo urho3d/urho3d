@@ -97,6 +97,14 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
     onResize();
 }
 
+void ScrollView::onWheel(int delta, int buttons, int qualifiers)
+{
+    if (delta > 0)
+        mVerticalScrollBar->stepBack();
+    if (delta < 0)
+        mHorizontalScrollBar->stepForward();
+}
+
 void ScrollView::onKey(int key, int buttons, int qualifiers)
 {
     switch (key)
