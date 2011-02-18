@@ -23,6 +23,36 @@
     <element type="CheckBox">
         <position value="40 130" />
     </element>
+
+    <element type="Text" name="PopupItem1">
+        <font name="cour.ttf" size="12" />
+        <text value="Deferred" />
+        <hovercolor value="0.5 0.75 0.5" />
+    </element>
+    <element type="Text" name="PopupItem2">
+        <font name="cour.ttf" size="12" />
+        <text value="Prepass" />
+        <hovercolor value="0.5 0.75 0.5" />
+    </element>
+    <element type="Text" name="PopupItem3">
+        <font name="cour.ttf" size="12" />
+        <text value="Forward" />
+        <hovercolor value="0.5 0.75 0.5" />
+    </element>
+    <element type="DropDownList">
+        <position value="10 160" />
+        <size value="100 30" />
+        <popupitem name="PopupItem1" />
+        <popupitem name="PopupItem2" />
+        <popupitem name="PopupItem3" />
+        <placeholder>
+            <alignment horizontal="center" vertical="center" />
+        </placeholder>
+        <popup>
+            <layout border="8 8 8 8" />
+        </popup>
+    </element>
+
     <element type="Text" name="Item1">
         <font name="cour.ttf" size="12" />
         <text value="Audio" />
@@ -103,7 +133,7 @@
     </element>
     <element type="Window" name="TestPopup">
         <layout orientation="vertical" horizontal="resizeelement" vertical="resizeelement" spacing="4" border="8 8 8 8" />
-        <element type="MenuItem">
+        <element type="Menu">
             <size value="80 16" />
             <element type="Text">
                 <text value="MenuItem3" />
@@ -111,7 +141,7 @@
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
-        <element type="MenuItem">
+        <element type="Menu">
             <size value="80 16" />
             <element type="Text">
                 <text value="MenuItem4" />
@@ -119,7 +149,7 @@
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
-        <element type="MenuItem">
+        <element type="Menu">
             <size value="80 16" />
             <element type="Text">
                 <text value="MenuItem5" />
@@ -128,7 +158,7 @@
             </element>
         </element>
     </element>
-    <element type="MenuItem">
+    <element type="Menu">
         <position value="150 10" />
         <size value="80 16" />
         <popup name="TestPopup" />
@@ -139,7 +169,7 @@
             <alignment horizontal="center" vertical="center" />
         </element>
     </element>
-    <element type="MenuItem">
+    <element type="Menu">
         <position value="150 40" />
         <size value="80 16" />
         <element type="Text">

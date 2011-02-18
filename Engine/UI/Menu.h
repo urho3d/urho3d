@@ -21,25 +21,27 @@
 // THE SOFTWARE.
 //
 
-#ifndef UI_MENUITEM_H
-#define UI_MENUITEM_H
+#ifndef UI_MENU_H
+#define UI_MENU_H
 
 #include "Button.h"
 
-//! A button that either triggers a menu selection or shows a popup element
-class MenuItem : public Button
+//! A menu element that optionally shows a popup
+class Menu : public Button
 {
-    DEFINE_TYPE(MenuItem);
+    DEFINE_TYPE(Menu);
     
     //! Construct with name
-    MenuItem(const std::string& name = std::string());
+    Menu(const std::string& name = std::string());
     //! Destruct
-    virtual ~MenuItem();
+    virtual ~Menu();
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    //! React to resize
+    virtual void onResize();
     
     //! Set popup element to show on selection
     void setPopup(UIElement* element);
@@ -47,6 +49,8 @@ class MenuItem : public Button
     void setPopupOffset(const IntVector2& offset);
     //! Set popup element offset
     void setPopupOffset(int x, int y);
+    //! Set whether automatically resizes the popup to match width
+    void setResizePopup(bool enable);
     //! Force the popup to show or hide
     void showPopup(bool enable);
     
@@ -56,6 +60,8 @@ class MenuItem : public Button
     const IntVector2& getPopupOffset() const { return mPopupOffset; }
     //! Return whether popup is open
     bool getShowPopup() const { return mShowPopup; }
+    //! Return whether automatically resizes the popup
+    bool getResizePopup() const { return mResizePopup; }
     
 protected:
     //! Popup element
@@ -64,10 +70,12 @@ protected:
     IntVector2 mPopupOffset;
     //! Show popup flag
     bool mShowPopup;
+    //! Resize popup automatically flag
+    bool mResizePopup;
     
 private:
     //! Handle focus change attempt in case the popup needs to be hidden
     void handleTryFocus(StringHash eventType, VariantMap& eventData);
 };
 
-#endif // UI_MENUITEM_H
+#endif // UI_MENU_H

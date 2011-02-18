@@ -1039,6 +1039,27 @@ void UIElement::adjustScissor(IntRect& currentScissor)
     }
 }
 
+void UIElement::getBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
+    currentScissor)
+{
+    unsigned initialSize = quads.size();
+    getBatches(batches, quads, currentScissor);
+    for (unsigned i = initialSize; i < quads.size(); ++i)
+    {
+        quads[i].mLeft += offset.mX;
+        quads[i].mTop += offset.mY;
+        quads[i].mRight += offset.mX;
+        quads[i].mBottom += offset.mY;
+    }
+    
+    adjustScissor(currentScissor);
+    for (std::vector<SharedPtr<UIElement> >::const_iterator i = mChildren.begin(); i != mChildren.end(); ++i)
+    {
+        if ((*i)->isVisible())
+            (*i)->getBatchesWithOffset(offset, batches, quads, currentScissor);
+    }
+}
+
 XMLElement UIElement::getStyleElement(XMLFile* file, const std::string& typeName)
 {
     if (file)

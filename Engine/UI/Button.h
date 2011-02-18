@@ -26,7 +26,7 @@
 
 #include "BorderImage.h"
 
-//! An image that reacts to mouse presses
+//! A pushbutton image
 class Button : public BorderImage
 {
     DEFINE_TYPE(Button);

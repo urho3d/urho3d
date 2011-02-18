@@ -29,7 +29,7 @@
 class Texture;
 class Texture2D;
 
-//! An UI element with an image that optionally has a border
+//! An image UI element with optional border
 class BorderImage : public UIElement
 {
     DEFINE_TYPE(BorderImage);

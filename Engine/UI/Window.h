@@ -41,7 +41,7 @@ enum WindowDragMode
     DRAG_RESIZE_LEFT
 };
 
-//! Window that can optionally by moved or resized
+//! A window that can optionally by moved or resized
 class Window : public BorderImage
 {
     DEFINE_TYPE(Window);

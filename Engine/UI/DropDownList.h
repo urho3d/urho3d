@@ -21,32 +21,27 @@
 // THE SOFTWARE.
 //
 
-#ifndef UI_LISTVIEW_H
-#define UI_LISTVIEW_H
+#include "Menu.h"
 
-#include "ScrollView.h"
+class ListView;
 
-//! A scrollable list
-class ListView : public ScrollView
+//! A menu item which displays a popup list view
+class DropDownList : public Menu
 {
-    DEFINE_TYPE(ListView);
+    DEFINE_TYPE(DropDownList)
     
 public:
     //! Construct with name
-    ListView(const std::string& name = std::string());
+    DropDownList(const std::string& name);
     //! Destruct
-    virtual ~ListView();
+    ~DropDownList();
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! React to mouse wheel
-    virtual void onWheel(int delta, int buttons, int qualifiers);
-    //! React to a key press
-    virtual void onKey(int key, int buttons, int qualifiers);
-    //! React to defocus
-    virtual void onDefocus();
-    //! React to focus
-    virtual void onFocus();
+    //! Return UI rendering batches
+    virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
+    //! React to resize
+    virtual void onResize();
     
     //! Add item to the end of the list
     void addItem(UIElement* item);
@@ -58,12 +53,6 @@ public:
     void removeAllItems();
     //! Set selection
     void setSelection(unsigned index);
-    //! Move selection by a delta and clamp at list ends
-    void changeSelection(int delta);
-    //! Clear selection
-    void clearSelection();
-    //! Set whether to show selection even when defocused, default false
-    void setShowSelectionAlways(bool enable);
     
     //! Return number of items
     unsigned getNumItems() const;
@@ -72,26 +61,21 @@ public:
     //! Return all items
     std::vector<UIElement*> getItems() const;
     //! Return selection index, or M_MAX_UNSIGNED if none selected
-    unsigned getSelection() const { return mSelection; }
+    unsigned getSelection() const;
     //! Return selected item, or null if none selected
     UIElement* getSelectedItem() const;
-    //! Return whether to show selection even when defocused
-    bool getShowSelectionAlways() const { return mShowSelectionAlways; }
+    //! Return listview element
+    ListView* getListView() const { return mListView; }
+    //! Return selected item placeholder element
+    UIElement* getPlaceholder() const { return mPlaceholder; }
     
 protected:
-    //! Update selection effect when selection or focus changes
-    void updateSelectionEffect();
-    //! Ensure full visibility of the selected item
-    void ensureItemVisibility();
-    
-    //! Current selection
-    unsigned mSelection;
-    //! Show selection even when defocused flag
-    bool mShowSelectionAlways;
+    //! Listview element
+    SharedPtr<ListView> mListView;
+    //! Selected item placeholder element
+    SharedPtr<UIElement> mPlaceholder;
     
 private:
-    //! Handle focus change to check for selection change
-    void handleTryFocus(StringHash eventType, VariantMap& eventData);
+    //! Handle listview item selected event
+    void handleItemSelected(StringHash eventType, VariantMap& eventData);
 };
-
-#endif // UI_LISTVIEW_H

@@ -29,7 +29,7 @@
 class BorderImage;
 class ScrollBar;
 
-//! A scrollable view for showing child widgets
+//! A scrollable view for showing a (possibly large) child element
 class ScrollView : public UIElement
 {
     DEFINE_TYPE(ScrollView);

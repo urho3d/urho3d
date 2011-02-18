@@ -326,6 +326,9 @@ public:
     void setOrigin(UIElement* origin);
     //! Adjust scissor for rendering
     void adjustScissor(IntRect& currentScissor);
+    //! Get UI rendering batches with a specified offset. Also recurses to child elements
+    void getBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
+        currentScissor);
     
     //! Return first matching UI style element from an XML file, with freely specified type. If not found, return empty
     static XMLElement getStyleElement(XMLFile* file, const std::string& typeName);

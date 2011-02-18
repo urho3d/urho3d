@@ -23,40 +23,44 @@
 
 #include "Precompiled.h"
 #include "InputEvents.h"
-#include "MenuItem.h"
+#include "Menu.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
 
-MenuItem::MenuItem(const std::string& name) :
+Menu::Menu(const std::string& name) :
     Button(name),
     mPopupOffset(IntVector2::sZero),
     mShowPopup(false)
 {
-    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(MenuItem, handleTryFocus));
+    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(Menu, handleTryFocus));
 }
 
-MenuItem::~MenuItem()
+Menu::~Menu()
 {
     if (mPopup)
         mPopup->setOrigin(0);
 }
 
-void MenuItem::setStyle(const XMLElement& element, ResourceCache* cache)
+void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     Button::setStyle(element, cache);
     
-    if (element.hasChildElement("popup"))
+    XMLElement popupElem = element.getChildElement("popup");
+    if ((popupElem) && (popupElem.hasAttribute("name")))
     {
         UIElement* root = getRootElement();
         if (root)
             setPopup(root->getChild(element.getChildElement("popup").getString("name"), true));
     }
+    
+    if (element.hasChildElement("resizepopup"))
+        setResizePopup(element.getChildElement("resizepopup").getBool("enable"));
     if (element.hasChildElement("popupoffset"))
         setPopupOffset(element.getChildElement("popupoffset").getIntVector2("value"));
 }
 
-void MenuItem::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Menu::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     setPressed(true);
     // Toggle popup visibility if exists
@@ -65,40 +69,59 @@ void MenuItem::onClick(const IntVector2& position, const IntVector2& screenPosit
     // Send event on each click if no popup, or whenever the popup is opened
     if ((!mPopup) || (mShowPopup))
     {
-        using namespace ItemSelected;
+        using namespace MenuSelected;
         
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
-        sendEvent(EVENT_ITEMSELECTED, eventData);
+        sendEvent(EVENT_MENUSELECTED, eventData);
     }
 }
 
-void MenuItem::setPopup(UIElement* popup)
+void Menu::onResize()
+{
+    if ((mPopup) && (mResizePopup))
+        mPopup->setWidth(getWidth());
+}
+
+void Menu::setPopup(UIElement* popup)
 {
     if (popup == this)
         return;
+    
     if ((mPopup) && (!popup))
         showPopup(false);
+    
     mPopup = popup;
+    
     // Detach from current parent (if any) to only show when it is time
     if (mPopup)
     {
         UIElement* parent = mPopup->getParent();
-        parent->removeChild(mPopup);
+        if (parent)
+            parent->removeChild(mPopup);
     }
 }
 
-void MenuItem::setPopupOffset(const IntVector2& offset)
+void Menu::setPopupOffset(const IntVector2& offset)
 {
     mPopupOffset = offset;
 }
 
-void MenuItem::setPopupOffset(int x, int y)
+void Menu::setPopupOffset(int x, int y)
 {
     mPopupOffset = IntVector2(x, y);
 }
 
-void MenuItem::showPopup(bool enable)
+void Menu::setResizePopup(bool enable)
+{
+    if (enable != mResizePopup)
+    {
+        mResizePopup = enable;
+        onResize();
+    }
+}
+
+void Menu::showPopup(bool enable)
 {
     if (!mPopup)
         return;
@@ -130,7 +153,7 @@ void MenuItem::showPopup(bool enable)
     mSelected = enable;
 }
 
-void MenuItem::handleTryFocus(StringHash eventType, VariantMap& eventData)
+void Menu::handleTryFocus(StringHash eventType, VariantMap& eventData)
 {
     if (!mShowPopup)
         return;

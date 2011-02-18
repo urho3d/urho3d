@@ -29,7 +29,7 @@
 #include "Font.h"
 #include "LineEdit.h"
 #include "ListView.h"
-#include "MenuItem.h"
+#include "Menu.h"
 #include "RegisterTemplates.h"
 #include "ScrollBar.h"
 #include "ScrollView.h"
@@ -271,17 +271,17 @@ static void registerLineEdit(asIScriptEngine* engine)
     registerRefCasts<UIElement, LineEdit>(engine, "UIElement", "LineEdit");
 }
 
-static void registerMenuItem(asIScriptEngine* engine)
+static void registerMenu(asIScriptEngine* engine)
 {
-    registerButton<MenuItem>(engine, "MenuItem");
-    engine->RegisterObjectMethod("MenuItem", "void setPopup(UIElement@+)", asMETHOD(MenuItem, setPopup), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "void setPopupOffset(const IntVector2& in)", asMETHODPR(MenuItem, setPopupOffset, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "void setPopupOffset(int, int)", asMETHODPR(MenuItem, setPopupOffset, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "void showPopup(bool)", asMETHOD(MenuItem, showPopup), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "UIElement@+ getPopup() const", asMETHOD(MenuItem, getPopup), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "const IntVector2& getPopupOffset() const", asMETHOD(MenuItem, getPopupOffset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("MenuItem", "bool getShowPopup() const", asMETHOD(MenuItem, getShowPopup), asCALL_THISCALL);
-    registerRefCasts<UIElement, MenuItem>(engine, "UIElement", "MenuItem");
+    registerButton<Menu>(engine, "Menu");
+    engine->RegisterObjectMethod("Menu", "void setPopup(UIElement@+)", asMETHOD(Menu, setPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "void setPopupOffset(const IntVector2& in)", asMETHODPR(Menu, setPopupOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "void setPopupOffset(int, int)", asMETHODPR(Menu, setPopupOffset, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "void showPopup(bool)", asMETHOD(Menu, showPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "UIElement@+ getPopup() const", asMETHOD(Menu, getPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "const IntVector2& getPopupOffset() const", asMETHOD(Menu, getPopupOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "bool getShowPopup() const", asMETHOD(Menu, getShowPopup), asCALL_THISCALL);
+    registerRefCasts<UIElement, Menu>(engine, "UIElement", "Menu");
 }
 
 static void registerWindow(asIScriptEngine* engine)
@@ -400,7 +400,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerListView(engine);
     registerText(engine);
     registerLineEdit(engine);
-    registerMenuItem(engine);
+    registerMenu(engine);
     registerWindow(engine);
     registerUI(engine);
 }

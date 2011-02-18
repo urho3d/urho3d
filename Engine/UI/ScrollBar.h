@@ -29,6 +29,7 @@
 class Button;
 class Slider;
 
+//! A slider bar with forward and back buttons
 class ScrollBar : public UIElement
 {
     DEFINE_TYPE(ScrollBar);

@@ -27,6 +27,8 @@
 #include "ListView.h"
 #include "UIEvents.h"
 
+#include "DebugNew.h"
+
 ListView::ListView(const std::string& name) :
     ScrollView(name),
     mSelection(M_MAX_UNSIGNED),
@@ -56,7 +58,8 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
     {
         while (itemElem)
         {
-            addItem(root->getChild(itemElem.getString("name"), true));
+            if (itemElem.hasAttribute("name"))
+                addItem(root->getChild(itemElem.getString("name"), true));
             itemElem = itemElem.getNextElement("listitem");
         }
     }
@@ -200,9 +203,21 @@ void ListView::setSelection(unsigned index)
     if (index >= getNumItems())
         index = M_MAX_UNSIGNED;
     
+    bool changed = index != mSelection;
+    
     mSelection = index;
     updateSelectionEffect();
     ensureItemVisibility();
+    
+    if (changed)
+    {
+        using namespace ItemSelected;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        eventData[P_SELECTION] = mSelection;
+        sendEvent(EVENT_ITEMSELECTED, eventData);
+    }
 }
 
 void ListView::changeSelection(int delta)
@@ -280,13 +295,6 @@ void ListView::handleTryFocus(StringHash eventType, VariantMap& eventData)
     using namespace TryFocus;
     
     UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
-    
-    // If the scrollpanel itself was clicked, and not the container / items, clear selection
-    if (focusElement == mScrollPanel)
-    {
-        clearSelection();
-        return;
-    }
     
     unsigned numItems = getNumItems();
     for (unsigned i = 0; i < numItems; ++i)

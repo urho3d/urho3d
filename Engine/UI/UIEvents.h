@@ -108,10 +108,17 @@ DEFINE_EVENT(EVENT_TEXTFINISHED, TextFinished)
     EVENT_PARAM(P_TEXT, Text);                  // string
 }
 
-//! Menu item selected
+//! Menu selected
+DEFINE_EVENT(EVENT_MENUSELECTED, MenuSelected)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
+
+//! Listview or DropDownList item selected
 DEFINE_EVENT(EVENT_ITEMSELECTED, ItemSelected)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_SELECTION, Selection);        // int
 }
 
 #endif // UI_UIEVENTS_H

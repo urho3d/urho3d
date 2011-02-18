@@ -26,7 +26,7 @@
 
 #include "BorderImage.h"
 
-//! An image that contains a slideable knob image
+//! A slider bar
 class Slider : public BorderImage
 {
     DEFINE_TYPE(Slider);

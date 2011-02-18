@@ -26,9 +26,10 @@
 #include "Button.h"
 #include "CheckBox.h"
 #include "Cursor.h"
+#include "DropDownList.h"
 #include "LineEdit.h"
 #include "ListView.h"
-#include "MenuItem.h"
+#include "Menu.h"
 #include "ScrollBar.h"
 #include "ScrollView.h"
 #include "Slider.h"
@@ -45,12 +46,14 @@ UIElement* BaseUIElementFactory::createElement(ShortStringHash type, const std::
         return new CheckBox(name);
     if (type == Cursor::getTypeStatic())
         return new Cursor(name);
+    if (type == DropDownList::getTypeStatic())
+        return new DropDownList(name);
     if (type == LineEdit::getTypeStatic())
         return new LineEdit(name);
     if (type == ListView::getTypeStatic())
         return new ListView(name);
-    if (type == MenuItem::getTypeStatic())
-        return new MenuItem(name);
+    if (type == Menu::getTypeStatic())
+        return new Menu(name);
     if (type == ScrollBar::getTypeStatic())
         return new ScrollBar(name);
     if (type == ScrollView::getTypeStatic())
