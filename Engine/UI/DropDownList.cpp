@@ -39,6 +39,7 @@ DropDownList::DropDownList(const std::string& name) :
     // By default grow the popup and listview according to the items
     mListView->getScrollPanel()->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
     mListView->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
+    mListView->setFocusMode(FM_RESETFOCUS);
     mPopup->addChild(mListView);
     mPopup->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
     mPlaceholder = new UIElement();
