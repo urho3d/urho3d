@@ -42,12 +42,11 @@
     <element type="DropDownList">
         <position value="10 160" />
         <size value="100 30" />
+        <resizepopup enable="true" />
+        <layout mode="horizontal" border="8 8 8 8" />
         <popupitem name="PopupItem1" />
         <popupitem name="PopupItem2" />
         <popupitem name="PopupItem3" />
-        <placeholder>
-            <alignment horizontal="center" vertical="center" />
-        </placeholder>
         <popup>
             <layout border="8 8 8 8" />
         </popup>
@@ -132,9 +131,9 @@
         <size value="200 16" />
     </element>
     <element type="Window" name="TestPopup">
-        <layout orientation="vertical" horizontal="resizeelement" vertical="resizeelement" spacing="4" border="8 8 8 8" />
+        <layout mode="vertical" spacing="4" border="8 8 8 8" />
         <element type="Menu">
-            <size value="80 16" />
+            <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem3" />
                 <font name="cour.ttf" size="12" />
@@ -142,7 +141,7 @@
             </element>
         </element>
         <element type="Menu">
-            <size value="80 16" />
+            <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem4" />
                 <font name="cour.ttf" size="12" />
@@ -150,7 +149,7 @@
             </element>
         </element>
         <element type="Menu">
-            <size value="80 16" />
+            <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem5" />
                 <font name="cour.ttf" size="12" />

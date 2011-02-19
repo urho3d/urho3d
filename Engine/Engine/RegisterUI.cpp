@@ -25,6 +25,7 @@
 #include "Button.h"
 #include "CheckBox.h"
 #include "Cursor.h"
+#include "DropDownList.h"
 #include "Engine.h"
 #include "Font.h"
 #include "LineEdit.h"
@@ -74,8 +75,8 @@ static void registerUIElement(asIScriptEngine* engine)
     
     engine->RegisterEnum("LayoutMode");
     engine->RegisterEnumValue("LayoutMode", "LM_FREE", LM_FREE);
-    engine->RegisterEnumValue("LayoutMode", "LM_RESIZECHILDREN", LM_RESIZECHILDREN);
-    engine->RegisterEnumValue("LayoutMode", "LM_RESIZEELEMENT", LM_RESIZEELEMENT);
+    engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
+    engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
     
     registerUIElement<UIElement>(engine, "UIElement");
     
@@ -284,6 +285,35 @@ static void registerMenu(asIScriptEngine* engine)
     registerRefCasts<UIElement, Menu>(engine, "UIElement", "Menu");
 }
 
+static CScriptArray* DropDownListGetItems(DropDownList* ptr)
+{
+    std::vector<UIElement*> result = ptr->getItems();
+    return vectorToHandleArray<UIElement>(result, "array<UIElement@>");
+}
+
+static void registerDropDownList(asIScriptEngine* engine)
+{
+    registerButton<DropDownList>(engine, "DropDownList");
+    engine->RegisterObjectMethod("DropDownList", "void showPopup(bool)", asMETHOD(DropDownList, showPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void addItem(UIElement@+)", asMETHOD(DropDownList, addItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void removeItem(UIElement@+)", asMETHODPR(DropDownList, removeItem, (UIElement*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void removeItem(uint)", asMETHODPR(DropDownList, removeItem, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void removeAllItems()", asMETHOD(DropDownList, removeAllItems), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void setSelection(uint)", asMETHOD(DropDownList, setSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void setResizePopup(bool)", asMETHOD(DropDownList, setResizePopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "UIElement@+ getPopup() const", asMETHOD(DropDownList, getPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool getShowPopup() const", asMETHOD(DropDownList, getShowPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "uint getNumItems() const", asMETHOD(DropDownList, getSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "UIElement@+ getItem(uint) const", asMETHOD(DropDownList, getItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "array<UIElement@>@ getItems() const", asFUNCTION(DropDownListGetItems), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("DropDownList", "uint getSelection() const", asMETHOD(DropDownList, getSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "UIElement@+ getSelectedItem() const", asMETHOD(DropDownList, getSelectedItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "ListView@+ getListView() const", asMETHOD(DropDownList, getListView), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "UIElement@+ getPlaceholder() const", asMETHOD(DropDownList, getPlaceholder), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "bool getResizePopup() const", asMETHOD(DropDownList, getResizePopup), asCALL_THISCALL);
+    registerRefCasts<UIElement, DropDownList>(engine, "UIElement", "DropDownList");
+}
+
 static void registerWindow(asIScriptEngine* engine)
 {
     registerBorderImage<Window>(engine, "Window");
@@ -401,6 +431,7 @@ void registerUILibrary(asIScriptEngine* engine)
     registerText(engine);
     registerLineEdit(engine);
     registerMenu(engine);
+    registerDropDownList(engine);
     registerWindow(engine);
     registerUI(engine);
 }

@@ -40,8 +40,8 @@ class Menu : public Button
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! React to mouse click
     virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
-    //! React to resize
-    virtual void onResize();
+    //! React to the popup being shown
+    virtual void onShowPopup();
     
     //! Set popup element to show on selection
     void setPopup(UIElement* element);
@@ -49,8 +49,6 @@ class Menu : public Button
     void setPopupOffset(const IntVector2& offset);
     //! Set popup element offset
     void setPopupOffset(int x, int y);
-    //! Set whether automatically resizes the popup to match width
-    void setResizePopup(bool enable);
     //! Force the popup to show or hide
     void showPopup(bool enable);
     
@@ -60,8 +58,6 @@ class Menu : public Button
     const IntVector2& getPopupOffset() const { return mPopupOffset; }
     //! Return whether popup is open
     bool getShowPopup() const { return mShowPopup; }
-    //! Return whether automatically resizes the popup
-    bool getResizePopup() const { return mResizePopup; }
     
 protected:
     //! Popup element
@@ -70,8 +66,6 @@ protected:
     IntVector2 mPopupOffset;
     //! Show popup flag
     bool mShowPopup;
-    //! Resize popup automatically flag
-    bool mResizePopup;
     
 private:
     //! Handle focus change attempt in case the popup needs to be hidden

@@ -54,16 +54,17 @@ Console::Console(Engine* engine) :
             log->addListener(this);
         
         mBackground = new BorderImage();
-        mBackground->setWidth(uiRoot->getWidth());
+        mBackground->setFixedWidth(uiRoot->getWidth());
         mBackground->setColor(C_TOPLEFT, Color(0.0f, 0.25f, 0.0f, 0.75f));
         mBackground->setColor(C_TOPRIGHT, Color(0.0f, 0.25f, 0.0f, 0.75f));
         mBackground->setColor(C_BOTTOMLEFT, Color(0.25f, 0.75f, 0.25f, 0.75f));
         mBackground->setColor(C_BOTTOMRIGHT, Color(0.25f, 0.75f, 0.25f, 0.75f));
         mBackground->setBringToBack(false);
+        mBackground->setClipChildren(true);
         mBackground->setEnabled(true);
         mBackground->setVisible(false);
         mBackground->setPriority(200); // Show on top of the debug HUD
-        mBackground->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT, 0, IntRect(4, 4, 4, 4));
+        mBackground->setLayout(LM_VERTICAL, 0, IntRect(4, 4, 4, 4));
         
         mLineEdit = new LineEdit();
         mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
@@ -175,8 +176,8 @@ void Console::updateElements()
         mLineEdit->getTextElement()->setFont(mFont, mFontSize);
     }
     
-    mLineEdit->setHeight(mLineEdit->getTextElement()->getRowHeight());
-    mBackground->setWidth(width);
+    mLineEdit->setFixedHeight(mLineEdit->getTextElement()->getRowHeight());
+    mBackground->setFixedWidth(width);
 }
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)

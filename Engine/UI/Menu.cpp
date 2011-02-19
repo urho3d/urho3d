@@ -54,8 +54,6 @@ void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
             setPopup(root->getChild(element.getChildElement("popup").getString("name"), true));
     }
     
-    if (element.hasChildElement("resizepopup"))
-        setResizePopup(element.getChildElement("resizepopup").getBool("enable"));
     if (element.hasChildElement("popupoffset"))
         setPopupOffset(element.getChildElement("popupoffset").getIntVector2("value"));
 }
@@ -77,10 +75,8 @@ void Menu::onClick(const IntVector2& position, const IntVector2& screenPosition,
     }
 }
 
-void Menu::onResize()
+void Menu::onShowPopup()
 {
-    if ((mPopup) && (mResizePopup))
-        mPopup->setWidth(getWidth());
 }
 
 void Menu::setPopup(UIElement* popup)
@@ -112,15 +108,6 @@ void Menu::setPopupOffset(int x, int y)
     mPopupOffset = IntVector2(x, y);
 }
 
-void Menu::setResizePopup(bool enable)
-{
-    if (enable != mResizePopup)
-    {
-        mResizePopup = enable;
-        onResize();
-    }
-}
-
 void Menu::showPopup(bool enable)
 {
     if (!mPopup)
@@ -133,6 +120,8 @@ void Menu::showPopup(bool enable)
     
     if (enable)
     {
+        onShowPopup();
+        
         mPopup->setPosition(getScreenPosition() + mPopupOffset);
         mPopup->setVisible(true);
         mPopup->setOrigin(this);

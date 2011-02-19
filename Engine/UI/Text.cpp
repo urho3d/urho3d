@@ -102,11 +102,12 @@ void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads,
         batch.mBlendMode = BLEND_ALPHA;
         batch.mScissor = currentScissor;
         batch.mTexture = 0;
-        batch.addQuad(*this, 0, 0, getWidth(), getHeight(), 0, 0, 0, 0, mSelected ? mSelectionColor : mHoverColor);
+        batch.addQuad(*this, 0, 0, getWidth(), getHeight(), 0, 0, 0, 0, (mSelected && (mSelectionColor.mA > 0.0f)) ? mSelectionColor :
+            mHoverColor);
         UIBatch::addOrMerge(batch, batches);
     }
     
-    // Partial Selection batch
+    // Partial selection batch
     if ((!mSelected) && (mSelectionLength) && (mCharSizes.size() >= mSelectionStart + mSelectionLength) && (mSelectionColor.mA > 0.0f))
     {
         UIBatch batch;
@@ -434,7 +435,7 @@ void Text::updateText(bool inResize)
     if (!mWordwrap)
         setMinSize(width, height);
     else
-        setMinSize(0, height);
+        setMinHeight(height);
 }
 
 void Text::validateSelection()

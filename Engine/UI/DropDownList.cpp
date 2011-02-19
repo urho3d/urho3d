@@ -27,21 +27,20 @@
 #include "UIEvents.h"
 #include "Window.h"
 
+#include "DebugNew.h"
+
 DropDownList::DropDownList(const std::string& name) :
-    Menu(name)
+    Menu(name),
+    mResizePopup(false)
 {
     Window* window = new Window();
     setPopup(window);
-    setResizePopup(true);
     
     mListView = new ListView();
     mListView->setScrollBarsVisible(false, false);
-    // By default grow the popup and listview according to the items
-    mListView->getScrollPanel()->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
-    mListView->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
     mListView->setFocusMode(FM_RESETFOCUS);
+    mPopup->setLayout(LM_VERTICAL);
     mPopup->addChild(mListView);
-    mPopup->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
     mPlaceholder = new UIElement();
     addChild(mPlaceholder);
     
@@ -79,6 +78,8 @@ void DropDownList::setStyle(const XMLElement& element, ResourceCache* cache)
     }
     if (element.hasChildElement("selection"))
         setSelection(element.getChildElement("selection").getInt("value"));
+    if (element.hasChildElement("resizepopup"))
+        setResizePopup(element.getChildElement("resizepopup").getBool("enable"));
 }
 
 void DropDownList::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -101,10 +102,29 @@ void DropDownList::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>
     }
 }
 
-void DropDownList::onResize()
+void DropDownList::onShowPopup()
 {
-    Menu::onResize();
-    setPopupOffset(0, getHeight());
+    // Resize the popup to match the size of the list content, and optionally match the button width
+    UIElement* content = mListView->getContentElement();
+    content->updateLayout();
+    const IntVector2& contentSize = content->getSize();
+    const IntRect& border = mPopup->getLayoutBorder();
+    mPopup->setSize(mResizePopup ? getWidth() : contentSize.mX + border.mLeft + border.mRight, contentSize.mY + border.mTop + 
+        border.mBottom);
+    
+    // Check if popup fits below the button. If not, show above instead
+    bool showAbove = false;
+    UIElement* root = getRootElement();
+    if (root)
+    {
+        const IntVector2& screenPos = getScreenPosition();
+        if ((screenPos.mY + getHeight() + mPopup->getHeight() > root->getHeight()) && (screenPos.mY - mPopup->getHeight() >= 0))
+            showAbove = true;
+    }
+    if (!showAbove)
+        setPopupOffset(0, getHeight());
+    else
+        setPopupOffset(0, -mPopup->getHeight());
 }
 
 void DropDownList::addItem(UIElement* item)
@@ -138,6 +158,11 @@ void DropDownList::setSelection(unsigned index)
     if (index >= numItems)
         index = numItems - 1;
     mListView->setSelection(index);
+}
+
+void DropDownList::setResizePopup(bool enable)
+{
+    mResizePopup = enable;
 }
 
 unsigned DropDownList::getNumItems() const

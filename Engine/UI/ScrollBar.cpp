@@ -158,7 +158,10 @@ void ScrollBar::setOrientation(Orientation orientation)
     }
     
     onResize();
-    setLayout(orientation, LM_RESIZECHILDREN, LM_RESIZECHILDREN);
+    if (orientation == O_HORIZONTAL)
+        setLayout(LM_HORIZONTAL);
+    else
+        setLayout(LM_VERTICAL);
 }
 
 void ScrollBar::setRange(float range)

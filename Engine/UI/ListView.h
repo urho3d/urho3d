@@ -43,6 +43,8 @@ public:
     virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
+    //! React to resize
+    virtual void onResize();
     //! React to defocus
     virtual void onDefocus();
     //! React to focus

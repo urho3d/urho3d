@@ -36,9 +36,7 @@ ListView::ListView(const std::string& name) :
 {
     UIElement* container = new UIElement();
     container->setEnabled(true);
-    container->setLayout(O_VERTICAL, LM_RESIZECHILDREN, LM_RESIZEELEMENT);
-    
-    mScrollPanel->setLayout(O_HORIZONTAL, LM_RESIZECHILDREN, LM_FREE);
+    container->setLayout(LM_VERTICAL);
     setContentElement(container);
     
     subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(ListView, handleTryFocus));
@@ -141,6 +139,15 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         setSelection(getNumItems() - 1);
         break;
     }
+}
+
+void ListView::onResize()
+{
+    ScrollView::onResize();
+    
+    // Set the content element width to match the scrollpanel
+    const IntRect& clipBorder = mScrollPanel->getClipBorder();
+    mContentElement->setWidth(mScrollPanel->getWidth() - clipBorder.mLeft - clipBorder.mRight);
 }
 
 void ListView::onFocus()

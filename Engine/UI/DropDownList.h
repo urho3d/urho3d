@@ -32,7 +32,7 @@ class DropDownList : public Menu
     
 public:
     //! Construct with name
-    DropDownList(const std::string& name);
+    DropDownList(const std::string& name = std::string());
     //! Destruct
     ~DropDownList();
     
@@ -40,8 +40,8 @@ public:
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
-    //! React to resize
-    virtual void onResize();
+    //! React to the popup being shown
+    virtual void onShowPopup();
     
     //! Add item to the end of the list
     void addItem(UIElement* item);
@@ -53,6 +53,8 @@ public:
     void removeAllItems();
     //! Set selection
     void setSelection(unsigned index);
+    //! Set whether popup should be automatically resized to match the dropdown button width
+    void setResizePopup(bool enable);
     
     //! Return number of items
     unsigned getNumItems() const;
@@ -68,12 +70,16 @@ public:
     ListView* getListView() const { return mListView; }
     //! Return selected item placeholder element
     UIElement* getPlaceholder() const { return mPlaceholder; }
+    //! Return whether popup should be automatically resized
+    bool getResizePopup() const { return mResizePopup; }
     
 protected:
     //! Listview element
     SharedPtr<ListView> mListView;
     //! Selected item placeholder element
     SharedPtr<UIElement> mPlaceholder;
+    //! Resize popup flag
+    bool mResizePopup;
     
 private:
     //! Handle listview item selected event

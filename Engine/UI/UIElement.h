@@ -80,9 +80,12 @@ enum FocusMode
 //! Layout operation mode
 enum LayoutMode
 {
+    //! No layout operations will be performed
     LM_FREE = 0,
-    LM_RESIZECHILDREN,
-    LM_RESIZEELEMENT
+    //! Layout child elements horizontally and resize them to fit. Resize element if necessary
+    LM_HORIZONTAL,
+    //! Layout child elements vertically and resize them to fit. Resize element if necessary
+    LM_VERTICAL
 };
 
 class ResourceCache;
@@ -209,8 +212,11 @@ public:
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
-    void setLayout(Orientation orientation, LayoutMode horizontal, LayoutMode vertical, int spacing = 0,
-        const IntRect& border = IntRect::sZero);
+    void setLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::sZero);
+    //! Set layout spacing
+    void setLayoutSpacing(int spacing);
+    //! Set layout border
+    void setLayoutBorder(const IntRect& border);
     //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void updateLayout();
     //! Bring UI element to front
@@ -280,12 +286,8 @@ public:
     bool hasColorGradient() const { return mHasColorGradient; }
     //! Return userdata
     Variant getUserData() const { return mUserData; }
-    //! Return layout orientation
-    Orientation getLayoutOrientation() const { return mLayoutOrientation; }
-    //! Return horizontal layout mode
-    LayoutMode getHorizontalLayoutMode() const { return mHorizontalLayoutMode; }
-    //! Return vertical layout mode
-    LayoutMode getVerticalLayoutMode() const { return mVerticalLayoutMode; }
+    //! Return layout mode
+    LayoutMode getLayoutMode() const { return mLayoutMode; }
     //! Return layout spacing
     int getLayoutSpacing() const { return mLayoutSpacing; }
     //! Return layout border
@@ -371,12 +373,8 @@ protected:
     bool mHovering;
     //! Userdata
     Variant mUserData;
-    //! Layout orientation
-    Orientation mLayoutOrientation;
-    //! Horizontal layout mode
-    LayoutMode mHorizontalLayoutMode;
-    //! Vertical layout mode
-    LayoutMode mVerticalLayoutMode;
+    //! Layout mode
+    LayoutMode mLayoutMode;
     //! Layout spacing
     int mLayoutSpacing;
     //! Layout borders
