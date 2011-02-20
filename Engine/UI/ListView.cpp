@@ -32,7 +32,9 @@
 ListView::ListView(const std::string& name) :
     ScrollView(name),
     mSelection(M_MAX_UNSIGNED),
-    mShowSelectionAlways(false)
+    mShowSelectionAlways(false),
+    mDoubleClickInterval(0.5f),
+    mDoubleClickTimer(0.0f)
 {
     UIElement* container = new UIElement();
     container->setEnabled(true);
@@ -66,6 +68,14 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         setSelection(element.getChildElement("selection").getInt("value"));
     if (element.hasChildElement("showselectionalways"))
         setShowSelectionAlways(element.getChildElement("showselectionalways").getBool("enable"));
+    if (element.hasChildElement("doubleclickinterval"))
+        setDoubleClickInterval(element.getChildElement("doubleclickinterval").getFloat("value"));
+}
+
+void ListView::update(float timeStep)
+{
+    if (mDoubleClickTimer > 0.0f)
+        mDoubleClickTimer = max(mDoubleClickTimer - timeStep, 0.0f);
 }
 
 void ListView::onWheel(int delta, int buttons, int qualifiers)
@@ -210,21 +220,16 @@ void ListView::setSelection(unsigned index)
     if (index >= getNumItems())
         index = M_MAX_UNSIGNED;
     
-    bool changed = index != mSelection;
-    
     mSelection = index;
     updateSelectionEffect();
     ensureItemVisibility();
     
-    if (changed)
-    {
-        using namespace ItemSelected;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        eventData[P_SELECTION] = mSelection;
-        sendEvent(EVENT_ITEMSELECTED, eventData);
-    }
+    using namespace ItemSelected;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_SELECTION] = mSelection;
+    sendEvent(EVENT_ITEMSELECTED, eventData);
 }
 
 void ListView::changeSelection(int delta)
@@ -244,6 +249,11 @@ void ListView::clearSelection()
 void ListView::setShowSelectionAlways(bool enable)
 {
     mShowSelectionAlways = enable;
+}
+
+void ListView::setDoubleClickInterval(float interval)
+{
+    mDoubleClickInterval = interval;
 }
 
 unsigned ListView::getNumItems() const
@@ -299,16 +309,32 @@ void ListView::ensureItemVisibility()
 
 void ListView::handleTryFocus(StringHash eventType, VariantMap& eventData)
 {
-    using namespace TryFocus;
-    
-    UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    UIElement* focusElement = static_cast<UIElement*>(eventData[TryFocus::P_ELEMENT].getPtr());
     
     unsigned numItems = getNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {
         if (focusElement == getItem(i))
         {
+            bool isDoubleClick = false;
+            if ((mDoubleClickTimer > 0.0f) && (mSelection == i))
+            {
+                isDoubleClick = true;
+                mDoubleClickTimer = 0.0f;
+            }
+            else
+                mDoubleClickTimer = mDoubleClickInterval;
+            
             setSelection(i);
+            
+            if (isDoubleClick)
+            {
+                VariantMap eventData;
+                eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
+                eventData[ItemDoubleClicked::P_SELECTION] = mSelection;
+                sendEvent(EVENT_ITEMDOUBLECLICKED, eventData);
+            }
+            
             return;
         }
     }

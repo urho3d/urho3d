@@ -39,6 +39,8 @@ public:
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
+    //! Perform UI element update
+    virtual void update(float timeStep);
     //! React to mouse wheel
     virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
@@ -66,6 +68,8 @@ public:
     void clearSelection();
     //! Set whether to show selection even when defocused, default false
     void setShowSelectionAlways(bool enable);
+    //! Set item doubleclick interval in seconds
+    void setDoubleClickInterval(float interval);
     
     //! Return number of items
     unsigned getNumItems() const;
@@ -79,6 +83,8 @@ public:
     UIElement* getSelectedItem() const;
     //! Return whether to show selection even when defocused
     bool getShowSelectionAlways() const { return mShowSelectionAlways; }
+    //! Return item doubleclick interval in seconds
+    float getDoubleClickInterval() const { return mDoubleClickInterval; }
     
 protected:
     //! Update selection effect when selection or focus changes
@@ -90,6 +96,10 @@ protected:
     unsigned mSelection;
     //! Show selection even when defocused flag
     bool mShowSelectionAlways;
+    //! Doubleclick interval
+    float mDoubleClickInterval;
+    //! Doubleclick timer
+    float mDoubleClickTimer;
     
 private:
     //! Handle focus change to check for selection change

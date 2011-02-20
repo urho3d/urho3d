@@ -201,6 +201,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void changeSelection(int)", asMETHOD(ListView, changeSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void clearSelection()", asMETHOD(ListView, clearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setShowSelectionAlways(bool)", asMETHOD(ListView, setShowSelectionAlways), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setDoubleClickInterval(float)", asMETHOD(ListView, setDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "const IntVector2& getViewPosition() const", asMETHOD(ListView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getContentElement() const", asMETHOD(ListView, getContentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ListView, getHorizontalScrollBar), asCALL_THISCALL);
@@ -217,6 +218,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "uint getSelection() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getSelectedItem() const", asMETHOD(ListView, getSelectedItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getShowSelectionAlways() const", asMETHOD(ListView, getShowSelectionAlways), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "float getDoubleClickInterval() const", asMETHOD(ListView, getDoubleClickInterval), asCALL_THISCALL);
     registerRefCasts<UIElement, ListView>(engine, "UIElement", "ListView");
 }
 
