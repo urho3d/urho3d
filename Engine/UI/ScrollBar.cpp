@@ -27,14 +27,14 @@
 #include "Slider.h"
 #include "UIEvents.h"
 
-static const float DEFAULT_SCROLL_STEP = 0.05f;
+static const float DEFAULT_SCROLL_STEP = 0.1f;
 static const float DEFAULT_REPEAT_DELAY = 0.4f;
 static const float DEFAULT_REPEAT_RATE = 20.0f;
 
 ScrollBar::ScrollBar(const std::string& name) :
     UIElement(name),
     mScrollStep(DEFAULT_SCROLL_STEP),
-    mNormalizeScrollStep(true),
+    mStepFactor(1.0f),
     mLeftRect(IntRect::sZero),
     mRightRect(IntRect::sZero),
     mUpRect(IntRect::sZero),
@@ -70,8 +70,8 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
     
     if (element.hasChildElement("scrollstep"))
         setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
-    if (element.hasChildElement("normalizescrollstep"))
-        setNormalizeScrollStep(element.getChildElement("normalizescrollstep").getBool("enable"));
+    if (element.hasChildElement("stepfactor"))
+        setStepFactor(element.getChildElement("stepfactor").getFloat("value"));
     if (element.hasChildElement("range"))
     {
         XMLElement rangeElem = element.getChildElement("range");
@@ -93,6 +93,7 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
             mUpRect = imageElem.getIntRect("v");
         mBackButton->setStyle(backButtonElem, cache);
     }
+    
     XMLElement forwardButtonElem = element.getChildElement("forwardbutton");
     if (forwardButtonElem)
     {
@@ -107,6 +108,7 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
             mDownRect = imageElem.getIntRect("v");
         mForwardButton->setStyle(forwardButtonElem, cache);
     }
+    
     XMLElement sliderElem = element.getChildElement("slider");
     if (sliderElem)
         mSlider->setStyle(sliderElem, cache);
@@ -184,9 +186,9 @@ void ScrollBar::setScrollStep(float step)
     mScrollStep = max(step, 0.0f);
 }
 
-void ScrollBar::setNormalizeScrollStep(bool enable)
+void ScrollBar::setStepFactor(float factor)
 {
-    mNormalizeScrollStep = enable;
+    mStepFactor = max(factor, M_EPSILON);
 }
 
 void ScrollBar::stepBack()
@@ -216,10 +218,7 @@ float ScrollBar::getValue() const
 
 float ScrollBar::getEffectiveScrollStep() const
 {
-    if (!mNormalizeScrollStep)
-        return mScrollStep;
-    else
-        return mScrollStep * (mSlider->getRange() + 1.0f);
+    return mScrollStep * mStepFactor;
 }
 
 void ScrollBar::handleBackButtonPressed(StringHash eventType, VariantMap& eventData)

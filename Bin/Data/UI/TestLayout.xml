@@ -124,11 +124,11 @@
     </element>
     <element type="LineEdit">
         <position value="150 230" />
-        <size value="200 16" />
+        <size value="200 18" />
     </element>
     <element type="LineEdit">
         <position value="150 260" />
-        <size value="200 16" />
+        <size value="200 18" />
     </element>
     <element type="Window" name="TestPopup">
         <layout mode="vertical" spacing="4" border="8 8 8 8" />

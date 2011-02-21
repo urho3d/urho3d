@@ -724,7 +724,7 @@ unsigned Client::checkPackages()
     
     // To avoid resource version conflicts and to keep the amount of open packages reasonable, remove all existing
     // downloaded packages from the resource cache first
-    std::vector<std::string> downloadedPackages = scanDirectory(mDownloadDirectory, "*.pak", false, false, false);
+    std::vector<std::string> downloadedPackages = scanDirectory(mDownloadDirectory, "*.pak", SCAN_FILES, false);
     std::vector<SharedPtr<PackageFile> > registeredPackages = mCache->getPackageFiles();
     for (std::vector<SharedPtr<PackageFile> >::iterator i = registeredPackages.begin(); i != registeredPackages.end();)
     {

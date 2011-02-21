@@ -131,39 +131,47 @@ void FileSelector::setStyle(XMLFile* style)
     XMLElement windowElem = UIElement::getStyleElement(style, "Window");
     if (windowElem)
         mWindow->setStyle(windowElem, cache);
+    
     windowElem = UIElement::getStyleElement(style, "FileSelector");
     if (windowElem)
         mWindow->setStyle(windowElem, cache);
+    
     XMLElement titleElem = UIElement::getStyleElement(style, "FileSelectorTitleText");
     if (titleElem)
         mTitleText->setStyle(titleElem, cache);
+    
     XMLElement textElem = UIElement::getStyleElement(style, "FileSelectorButtonText");
     if (textElem)
     {
         mOKButtonText->setStyle(textElem, cache);
         mCancelButtonText->setStyle(textElem, cache);
     }
+    
     XMLElement layoutElem = UIElement::getStyleElement(style, "FileSelectorLayout");
     if (layoutElem)
     {
         mFileNameLayout->setStyle(layoutElem, cache);
         mButtonLayout->setStyle(layoutElem, cache);
     }
+    
     XMLElement listViewElem = UIElement::getStyleElement(style, "ListView");
     if (listViewElem)
         mFileList->setStyle(listViewElem, cache);
+    
     XMLElement lineEditElem = UIElement::getStyleElement(style, "LineEdit");
     if (lineEditElem)
     {
         mFileNameEdit->setStyle(lineEditElem, cache);
         mPathEdit->setStyle(lineEditElem, cache);
     }
+    
     XMLElement dropDownElem = UIElement::getStyleElement(style, "DropDownList");
     if (dropDownElem)
         mFilterList->setStyle(dropDownElem, cache);
     dropDownElem = UIElement::getStyleElement(style, "FileSelectorFilterList");
     if (dropDownElem)
         mFilterList->setStyle(dropDownElem, cache);
+    
     XMLElement buttonElem = UIElement::getStyleElement(style, "Button");
     if (buttonElem)
     {
@@ -176,6 +184,7 @@ void FileSelector::setStyle(XMLFile* style)
         mOKButton->setStyle(buttonElem, cache);
         mCancelButton->setStyle(buttonElem, cache);
     }
+    
     textElem = UIElement::getStyleElement(style, "FileSelectorFilterText");
     if (textElem)
     {
@@ -183,6 +192,7 @@ void FileSelector::setStyle(XMLFile* style)
         for (unsigned i = 0; i < listTexts.size(); ++i)
             listTexts[i]->setStyle(textElem, cache);
     }
+    
     textElem = UIElement::getStyleElement(style, "FileSelectorListText");
     if (textElem)
     {
@@ -257,7 +267,6 @@ void FileSelector::setFilters(const std::vector<std::string>& filters, unsigned 
         refreshFiles();
 }
 
-
 void FileSelector::updateElements()
 {
     {
@@ -301,8 +310,8 @@ void FileSelector::refreshFiles()
     
     try
     {
-        std::vector<std::string> directories = scanDirectory(mPath, "*.*", false, true, false);
-        std::vector<std::string> files = scanDirectory(mPath, getFilter(), false, false, false);
+        std::vector<std::string> directories = scanDirectory(mPath, "*.*", SCAN_DIRECTORIES, false);
+        std::vector<std::string> files = scanDirectory(mPath, getFilter(), SCAN_FILES, false);
         
         for (unsigned i = 0; i < directories.size(); ++i)
         {
@@ -311,7 +320,7 @@ void FileSelector::refreshFiles()
             newEntry.mDirectory = true;
             mFileEntries.push_back(newEntry);
         }
-
+        
         for (unsigned i = 0; i < files.size(); ++i)
         {
             FileSelectorEntry newEntry;
@@ -325,6 +334,7 @@ void FileSelector::refreshFiles()
     }
     
     // Sort and add to the list view
+    // While items are being added, disable layout update for performance optimization
     std::sort(mFileEntries.begin(), mFileEntries.end(), compareEntries);
     UIElement* listContent = mFileList->getContentElement();
     listContent->disableLayoutUpdate();
@@ -348,9 +358,9 @@ void FileSelector::refreshFiles()
     
     mIgnoreEvents = false;
     
-    // Clear filename from the previous dir
+    // Clear filename from the previous dir so that there is no confusion
     setFileName(std::string());
-    mFileList->setSelection(0);
+    mLastUsedFilter = getFilter();
 }
 
 void FileSelector::handleFilterChanged(StringHash eventType, VariantMap& eventData)
@@ -385,13 +395,14 @@ void FileSelector::handleFileDoubleClicked(StringHash eventType, VariantMap& eve
 {
     if (mIgnoreEvents)
         return;
+    
     unsigned index = mFileList->getSelection();
     if (index >= mFileEntries.size())
         return;
-    // If a directory doubleclicked, enter it
+    
     if (mFileEntries[index].mDirectory)
     {
-        // Recognize . and .. as a special case
+        // If a directory doubleclicked, enter it. Recognize . and .. as a special case
         const std::string& newPath = mFileEntries[index].mName;
         if ((newPath != ".") &&  (newPath != ".."))
             setPath(mPath + newPath);
@@ -404,6 +415,7 @@ void FileSelector::handleFileDoubleClicked(StringHash eventType, VariantMap& eve
     }
     else
     {
+        // Doubleclicking a file is the same as pressing OK
         using namespace FileSelected;
         
         VariantMap eventData;

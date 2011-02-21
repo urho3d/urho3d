@@ -503,6 +503,9 @@ unsigned LineEdit::getCharIndex(const IntVector2& position)
     IntVector2 textPosition = mText->screenToElement(screenPosition);
     const std::vector<IntVector2>& charPositions = mText->getCharPositions();
     
+    if (textPosition.mX < 0)
+        return 0;
+    
     for (unsigned i = charPositions.size() - 1; i < charPositions.size(); --i)
     {
         if (textPosition.mX >= charPositions[i].mX)

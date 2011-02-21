@@ -85,16 +85,8 @@ public:
     DropDownList* getFilterList() const { return mFilterList; }
     //! Return OK button
     Button* getOKButton() const { return mOKButton; }
-    //! Return OK button text
-    Text* getOKButtonText() const { return mOKButtonText; }
     //! Return cancel button
     Button* getCancelButton() const { return mCancelButton; }
-    //! Return cancel button text
-    Text* getCancelButtonText() const { return mCancelButtonText; }
-    //! Return filename & filter layout
-    UIElement* getFileNameLayout() const { return mFileNameLayout; }
-    //! Return button layout
-    UIElement* getButtonLayout() const { return mButtonLayout; }
     //! Return current path
     const std::string& getPath() const { return mPath; }
     //! Return current filename

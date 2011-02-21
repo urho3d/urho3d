@@ -30,6 +30,8 @@
 
 #include "DebugNew.h"
 
+static const float STEP_FACTOR = 300.0f;
+
 ScrollView::ScrollView(const std::string& name) :
     UIElement(name),
     mViewPosition(IntVector2::sZero),
@@ -74,8 +76,6 @@ void ScrollView::setStyle(const XMLElement& element, ResourceCache* cache)
         setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
     if (element.hasChildElement("pagestep"))
         setScrollStep(element.getChildElement("pagestep").getFloat("value"));
-    if (element.hasChildElement("normalizescrollstep"))
-        setNormalizeScrollStep(element.getChildElement("normalizescrollstep").getBool("enable"));
     
     XMLElement horizElem = element.getChildElement("horizontalscrollbar");
     if (horizElem)
@@ -234,12 +234,6 @@ void ScrollView::setPageStep(float step)
     mPageStep = max(step, 0.0f);
 }
 
-void ScrollView::setNormalizeScrollStep(bool enable)
-{
-    mHorizontalScrollBar->setNormalizeScrollStep(enable);
-    mVerticalScrollBar->setNormalizeScrollStep(enable);
-}
-
 bool ScrollView::getHorizontalScrollBarVisible() const
 {
     return mHorizontalScrollBar->isVisible();
@@ -253,11 +247,6 @@ bool ScrollView::getVerticalScrollBarVisible() const
 float ScrollView::getScrollStep() const
 {
     return mHorizontalScrollBar->getScrollStep();
-}
-
-bool ScrollView::getNormalizeScrollStep() const
-{
-    return mHorizontalScrollBar->getNormalizeScrollStep();
 }
 
 void ScrollView::updateViewSize()
@@ -282,11 +271,13 @@ void ScrollView::updateScrollBars()
     {
         mHorizontalScrollBar->setRange((float)mViewSize.mX / (float)size.mX - 1.0f);
         mHorizontalScrollBar->setValue((float)mViewPosition.mX / (float)size.mX);
+        mHorizontalScrollBar->setStepFactor(STEP_FACTOR / (float)size.mX);
     }
     if ((mVerticalScrollBar) && (size.mY > 0) && (mViewSize.mY > 0))
     {
         mVerticalScrollBar->setRange((float)mViewSize.mY / (float)size.mY - 1.0f);
         mVerticalScrollBar->setValue((float)mViewPosition.mY / (float)size.mY);
+        mVerticalScrollBar->setStepFactor(STEP_FACTOR / (float)size.mY);
     }
     
     mIgnoreEvents = false;

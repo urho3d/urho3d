@@ -78,14 +78,6 @@ void ListView::update(float timeStep)
         mDoubleClickTimer = max(mDoubleClickTimer - timeStep, 0.0f);
 }
 
-void ListView::onWheel(int delta, int buttons, int qualifiers)
-{
-    if (delta > 0)
-        changeSelection(-1);
-    if (delta < 0)
-        changeSelection(1);
-}
-
 void ListView::onKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
@@ -147,6 +139,16 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         
     case KEY_END:
         setSelection(getNumItems() - 1);
+        break;
+    
+    case KEY_RETURN:
+        if (mSelection != M_MAX_UNSIGNED)
+        {
+            VariantMap eventData;
+            eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
+            eventData[ItemDoubleClicked::P_SELECTION] = mSelection;
+            sendEvent(EVENT_ITEMDOUBLECLICKED, eventData);
+        }
         break;
     }
 }

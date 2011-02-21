@@ -34,7 +34,7 @@
 
 static std::set<std::string> allowedDirectories;
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive, bool directories, bool hidden);
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, unsigned flags, bool recursive);
 
 File::File(const std::string& fileName, FileMode mode) :
     mHandle(0),
@@ -221,7 +221,7 @@ std::string getWorkingDirectory()
     return fixPath(std::string(currentDir));
 }
 
-std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden)
+std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
 {
     std::vector<std::string> ret;
     
@@ -234,7 +234,7 @@ std::vector<std::string> scanDirectory(const std::string& pathName, const std::s
     if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
         return ret;
     
-    scanDirectoryInternal(ret, "", filter, recursive, directories, hidden);
+    scanDirectoryInternal(ret, "", filter, flags, recursive);
     SetCurrentDirectory(oldDir);
     
     return ret;
@@ -372,7 +372,7 @@ std::string getOSPath(const std::string& pathName, bool forNativeApi)
         return pathName;
 }
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive, bool directories, bool hidden)
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, unsigned flags, bool recursive)
 {
     path = fixPath(path);
     std::string pathAndFilter = getOSPath(path + filter, true);
@@ -386,16 +386,16 @@ void scanDirectoryInternal(std::vector<std::string>& result, std::string path, c
             std::string fileName((const char*)&info.cFileName[0]);
             if (!fileName.empty())
             {
-                if ((info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && (!hidden))
+                if ((info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && (!(flags & SCAN_HIDDEN)))
                     continue;
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
-                    if (directories)
+                    if (flags & SCAN_DIRECTORIES)
                         result.push_back(path + fileName);
                     if ((recursive) && (fileName != ".") && (fileName != ".."))
-                        scanDirectoryInternal(result, path + fileName, filter, recursive, directories, hidden);
+                        scanDirectoryInternal(result, path + fileName, filter, flags, recursive);
                 }
-                else if (!directories)
+                else if (flags & SCAN_FILES)
                     result.push_back(path + fileName);
             }
         } 

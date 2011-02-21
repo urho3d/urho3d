@@ -522,9 +522,9 @@ static bool VariantEqualsBuffer(const VectorBuffer& buffer, Variant* ptr)
     return (*ptr) == buffer.getBuffer();
 }
 
-static CScriptArray* ScanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden)
+static CScriptArray* ScanDirectory(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
 {
-    std::vector<std::string> result = scanDirectory(pathName, filter, recursive, directories, hidden);
+    std::vector<std::string> result = scanDirectory(pathName, filter, flags, recursive);
     return vectorToArray<std::string>(result, "array<string>");
 }
 
@@ -545,6 +545,10 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterEnumValue("FileMode", "FILE_WRITE", FILE_WRITE);
     engine->RegisterEnumValue("FileMode", "FILE_READWRITE", FILE_READWRITE);
     
+    engine->RegisterGlobalProperty("const uint SCAN_FILES", (void*)&SCAN_FILES);
+    engine->RegisterGlobalProperty("const uint SCAN_DIRECTORIES", (void*)&SCAN_DIRECTORIES);
+    engine->RegisterGlobalProperty("const uint SCAN_HIDDEN", (void*)&SCAN_HIDDEN);
+    
     engine->RegisterObjectType("File", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(string& in, FileMode)", asFUNCTION(ConstructFile), asCALL_CDECL);
     engine->RegisterObjectBehaviour("File", asBEHAVE_ADDREF, "void f()", asMETHOD(File, addRef), asCALL_THISCALL);
@@ -558,7 +562,7 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool fileExists(const string& in)", asFUNCTION(fileExists), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool directoryExists(const string& in)", asFUNCTION(directoryExists), asCALL_CDECL);
     engine->RegisterGlobalFunction("void createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
-    engine->RegisterGlobalFunction("array<string>@ scanDirectory(const string& in, const string& in, bool, bool, bool)", asFUNCTION(ScanDirectory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("array<string>@ scanDirectory(const string& in, const string& in, uint, bool)", asFUNCTION(ScanDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getExtension(const string& in, bool)", asFUNCTION(getExtension), asCALL_CDECL);

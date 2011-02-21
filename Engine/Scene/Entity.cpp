@@ -48,11 +48,16 @@ Entity::~Entity()
 
 void Entity::onEvent(EventListener* sender, StringHash eventType, VariantMap& eventData)
 {
+    WeakPtr<Entity> self(this);
+    
     // Special-case event handling: send to all components that are event listeners
-    for (std::vector<EventListener*>::const_iterator i = mEventListeners.begin(); i != mEventListeners.end(); ++i)
+    for (unsigned i = 0; i < mEventListeners.size(); ++i)
     {
-        // Note: we do not check if the component actually subscribes to the event, because onEvent() does this check
-        (*i)->onEvent(sender, eventType, eventData);
+        // Do not check if the component actually subscribes to the event, because its onEvent() does that check
+        mEventListeners[i]->onEvent(sender, eventType, eventData);
+        // Exit if entity was removed as a response to the event
+        if (self.isExpired())
+            return;
     }
 }
 

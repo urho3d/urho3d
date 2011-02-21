@@ -38,7 +38,7 @@ DropDownList::DropDownList(const std::string& name) :
     
     mListView = new ListView();
     mListView->setScrollBarsVisible(false, false);
-    mListView->setFocusMode(FM_RESETFOCUS);
+    mListView->setFocusMode(FM_NOTFOCUSABLE);
     mPopup->setLayout(LM_VERTICAL);
     mPopup->addChild(mListView);
     mPlaceholder = new UIElement();
@@ -58,9 +58,11 @@ void DropDownList::setStyle(const XMLElement& element, ResourceCache* cache)
     XMLElement listElem = element.getChildElement("listview");
     if (listElem)
         mListView->setStyle(listElem, cache);
+    
     XMLElement popupElem = element.getChildElement("popup");
     if (popupElem)
         mPopup->setStyle(popupElem, cache);
+    
     XMLElement placeholderElem = element.getChildElement("placeholder");
     if (placeholderElem)
         mPlaceholder->setStyle(placeholderElem, cache);
@@ -76,6 +78,7 @@ void DropDownList::setStyle(const XMLElement& element, ResourceCache* cache)
             itemElem = itemElem.getNextElement("popupitem");
         }
     }
+    
     if (element.hasChildElement("selection"))
         setSelection(element.getChildElement("selection").getInt("value"));
     if (element.hasChildElement("resizepopup"))

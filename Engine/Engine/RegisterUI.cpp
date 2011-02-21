@@ -142,14 +142,15 @@ static void registerScrollBar(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollBar", "void setValue(float)", asMETHOD(ScrollBar, setValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void changeValue(float)", asMETHOD(ScrollBar, changeValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void setScrollStep(float)", asMETHOD(ScrollBar, setScrollStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollBar", "void setNormalizeScrollStep(bool)", asMETHOD(ScrollBar, setNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "void setStepFactor(bool)", asMETHOD(ScrollBar, setStepFactor), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void stepBack()", asMETHOD(ScrollBar, stepBack), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "void stepForward()", asMETHOD(ScrollBar, stepForward), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Orientation getOrientation() const", asMETHOD(ScrollBar, getOrientation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getRange() const", asMETHOD(ScrollBar, getRange), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getValue() const", asMETHOD(ScrollBar, getValue), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "float getScrollStep() const", asMETHOD(ScrollBar, getScrollStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollBar", "bool getNormalizeScrollStep() const", asMETHOD(ScrollBar, getNormalizeScrollStep), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "float getStepFactor() const", asMETHOD(ScrollBar, getStepFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScrollBar", "float getEffectiveScrollStep() const", asMETHOD(ScrollBar, getEffectiveScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Button@+ getBackButton() const", asMETHOD(ScrollBar, getBackButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Button@+ getForwardButton() const", asMETHOD(ScrollBar, getForwardButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollBar", "Slider@+ getSlider() const", asMETHOD(ScrollBar, getSlider), asCALL_THISCALL);
@@ -165,7 +166,6 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ScrollView, setScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setScrollStep(float)", asMETHOD(ScrollView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "void setPageStep(float)", asMETHOD(ScrollView, setPageStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "void setNormalizeScrollStep(bool)", asMETHOD(ScrollView, setNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "const IntVector2& getViewPosition() const", asMETHOD(ScrollView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "UIElement@+ getContentElement() const", asMETHOD(ScrollView, getContentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ScrollView, getHorizontalScrollBar), asCALL_THISCALL);
@@ -175,7 +175,6 @@ static void registerScrollView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScrollView", "bool getVerticalScrollBarVisible() const", asMETHOD(ScrollView, getVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getScrollStep() const", asMETHOD(ScrollView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScrollView", "float getPageStep() const", asMETHOD(ScrollView, getPageStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ScrollView", "bool getNormalizeScrollStep() const", asMETHOD(ScrollView, getNormalizeScrollStep), asCALL_THISCALL);
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
 }
 
@@ -193,7 +192,6 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void setScrollBarsVisible(bool, bool)", asMETHOD(ListView, setScrollBarsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setScrollStep(float)", asMETHOD(ListView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setPageStep(float)", asMETHOD(ListView, setPageStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void setNormalizeScrollStep(bool)", asMETHOD(ListView, setNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void addItem(UIElement@+)", asMETHOD(ListView, addItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(UIElement@+)", asMETHODPR(ListView, removeItem, (UIElement*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(uint)", asMETHODPR(ListView, removeItem, (unsigned), void), asCALL_THISCALL);
@@ -212,7 +210,6 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "bool getVerticalScrollBarVisible() const", asMETHOD(ListView, getVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getScrollStep() const", asMETHOD(ListView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getPageStep() const", asMETHOD(ListView, getPageStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "bool getNormalizeScrollStep() const", asMETHOD(ListView, getNormalizeScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "uint getNumItems() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getItem(uint) const", asMETHOD(ListView, getItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "array<UIElement@>@ getItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
@@ -369,7 +366,16 @@ static void registerFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "void setPath(const string& in)", asMETHOD(FileSelector, setPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void setFileName(const string& in)", asMETHOD(FileSelector, setFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void setFilters(array<string>@+, uint)", asFUNCTION(FileSelectorSetFilters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSelector", "void updateElements()", asMETHOD(FileSelector, updateElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "XMLFile@+ getStyle() const", asMETHOD(FileSelector, getStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Window@+ getWindow() const", asMETHOD(FileSelector, getWindow), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Text@+ getTitleText() const", asMETHOD(FileSelector, getTitleText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "ListView@+ getFileList() const", asMETHOD(FileSelector, getFileList), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ getPathEdit() const", asMETHOD(FileSelector, getPathEdit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "LineEdit@+ getFileNameEdit() const", asMETHOD(FileSelector, getFileNameEdit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "DropDownList@+ getFilterList() const", asMETHOD(FileSelector, getFilterList), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Button@+ getOKButton() const", asMETHOD(FileSelector, getOKButton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "Button@+ getCancelButton() const", asMETHOD(FileSelector, getCancelButton), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getPath() const", asMETHOD(FileSelector, getPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getFileName() const", asMETHOD(FileSelector, getFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getFilter() const", asMETHOD(FileSelector, getFilter), asCALL_THISCALL);

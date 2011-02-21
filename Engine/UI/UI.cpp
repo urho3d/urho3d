@@ -125,8 +125,9 @@ void UI::setFocusElement(UIElement* element)
     // The event receivers may optionally divert the focus
     element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
     // If element is unchanged, check that it did not expire (the event may have caused its deletion)
-    if ((element == originalElement) && (elementWeak.isExpired()))
-        element = 0;
+    // In that case it is better to not touch focus at all
+    if ((element) && (element == originalElement) && (elementWeak.isExpired()))
+        return;
     
     if (element)
     {
@@ -533,7 +534,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         else
         {
             // If clicked over no element, or a disabled element, try to lose focus
-            setFocusElement(0);
+            mDefocusElement = getFocusElement();
         }
     }
 }

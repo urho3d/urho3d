@@ -55,8 +55,8 @@ public:
     void changeValue(float delta);
     //! Set button scroll step
     void setScrollStep(float step);
-    //! Set whether scroll step is normalized to slider range
-    void setNormalizeScrollStep(bool enable);
+    //! Set button step factor, can be used to adjust the step for constant pixel size
+    void setStepFactor(float factor);
     //! Scroll back one step
     void stepBack();
     //! Scroll forward one step
@@ -70,10 +70,10 @@ public:
     float getValue() const;
     //! Return button scroll step
     float getScrollStep() const { return mScrollStep; }
-    //! Return effective scroll step, taking possible normalization into account
+    //! Return button step factor
+    float getStepFactor() const { return mStepFactor; }
+    //! Return scroll step multiplied by factor
     float getEffectiveScrollStep() const;
-    //! Return whether scroll step is normalized to slider range
-    bool getNormalizeScrollStep() const { return mNormalizeScrollStep; }
     //! Return back button element
     Button* getBackButton() const { return mBackButton; }
     //! Return forward button element
@@ -90,8 +90,8 @@ protected:
     SharedPtr<Slider> mSlider;
     //! Scroll step
     float mScrollStep;
-    //! Normalize scroll step flag
-    bool mNormalizeScrollStep;
+    //! Step factor
+    float mStepFactor;
     //! Left button image rect
     IntRect mLeftRect;
     //! Right button image rect

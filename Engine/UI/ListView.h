@@ -41,8 +41,6 @@ public:
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! Perform UI element update
     virtual void update(float timeStep);
-    //! React to mouse wheel
-    virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to resize

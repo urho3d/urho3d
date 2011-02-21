@@ -39,6 +39,13 @@ enum FileMode
     FILE_READWRITE
 };
 
+//! Return files
+static const unsigned SCAN_FILES = 1;
+//! Return directories
+static const unsigned SCAN_DIRECTORIES = 2;
+//! Return also hidden files
+static const unsigned SCAN_HIDDEN = 4;
+
 class PackageFile;
 
 //! A file opened either through the filesystem or from within a package file
@@ -95,7 +102,7 @@ void createDirectory(const std::string& pathName);
 //! Return the absolute working directory
 std::string getWorkingDirectory();
 //! Scan a directory for specified files
-std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden);
+std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed

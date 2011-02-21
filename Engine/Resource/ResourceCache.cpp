@@ -61,7 +61,7 @@ void ResourceCache::addResourcePath(const std::string& path)
     mResourcePaths.push_back(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
-    std::vector<std::string> fileNames = scanDirectory(fixedPath, "*.*", true, false, false);
+    std::vector<std::string> fileNames = scanDirectory(fixedPath, "*.*", SCAN_FILES, true);
     for (unsigned i = 0; i < fileNames.size(); ++i)
         registerHash(fileNames[i]);
     

@@ -61,9 +61,7 @@ public:
     void setScrollStep(float step);
     //! Set arrow key page step
     void setPageStep(float step);
-    //! Set whether scroll step is normalized to content size
-    void setNormalizeScrollStep(bool enable);
-
+    
     //! Return view offset from the top-left corner
     const IntVector2& getViewPosition() const { return mViewPosition; }
     //! Return content element
@@ -82,8 +80,6 @@ public:
     float getScrollStep() const;
     //! Return arrow key page step
     float getPageStep() const { return mPageStep; }
-    //! Return whether scroll step is normalized to content size
-    bool getNormalizeScrollStep() const;
     
 protected:
     //! Update view size from the content element
