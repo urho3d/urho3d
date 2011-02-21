@@ -105,7 +105,8 @@
         <text>
             <position value="1 1" />
             <font name="Cour.ttf" size="12" />
-            <selectioncolor value="1.0 0.5 0.5" />
+            <hovercolor value="0.5 0.75 0.5" />
+            <selectioncolor value="0.75 0.75 0.75" />
         </text>
         <cursor>
             <size value="4 16" />
@@ -354,7 +355,8 @@
     </element>
     <element type="FileSelectorListText">
         <font name="Cour.ttf" size="12" />
-        <selectioncolor value="0.5 0.75 0.5" />
+        <hovercolor value="0.5 0.75 0.5" />
+        <selectioncolor value="0.75 0.75 0.75" />
     </element>
     <element type="FileSelectorTitleText">
         <font name="Cour.ttf" size="15" />

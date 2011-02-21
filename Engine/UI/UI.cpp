@@ -114,6 +114,9 @@ void UI::setCursor(Cursor* cursor)
 void UI::setFocusElement(UIElement* element)
 {
     using namespace TryFocus;
+   
+    UIElement* originalElement = element;
+    WeakPtr<UIElement> elementWeak(element);
     
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)element;
@@ -121,6 +124,9 @@ void UI::setFocusElement(UIElement* element)
     
     // The event receivers may optionally divert the focus
     element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    // If element is unchanged, check that it did not expire (the event may have caused its deletion)
+    if ((element == originalElement) && (elementWeak.isExpired()))
+        element = 0;
     
     if (element)
     {
@@ -579,13 +585,15 @@ void UI::handleKeyDown(StringHash eventType, VariantMap& eventData)
     UIElement* element = getFocusElement();
     if (element)
     {
-        // Switch focus between focusable sibling elements
+        // Switch focus between focusable elements in the same top level window
         if (key == KEY_TAB)
         {
-            UIElement* parent = element->getParent();
-            if (parent)
+            UIElement* topLevel = element->getParent();
+            while ((topLevel) && (topLevel->getParent() != mRootElement))
+                topLevel = topLevel->getParent();
+            if (topLevel)
             {
-                std::vector<UIElement*> children = parent->getChildren();
+                std::vector<UIElement*> children = topLevel->getChildren(true);
                 for (std::vector<UIElement*>::iterator i = children.begin(); i != children.end();)
                 {
                     if ((*i)->getFocusMode() < FM_FOCUSABLE)

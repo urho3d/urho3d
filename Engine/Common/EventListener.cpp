@@ -36,7 +36,7 @@ static VariantMap noEventData;
 std::map<StringHash, std::list<EventListener*> > EventListener::sEventListeners;
 std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> > EventListener::sSpecificEventListeners;
 
-EventListener* eventSender = 0;
+std::vector<EventListener*> eventSender;
 
 EventListener::EventListener()
 {
@@ -44,6 +44,13 @@ EventListener::EventListener()
 
 EventListener::~EventListener()
 {
+    // Check if event sender is destroyed during event handling
+    for (unsigned i = 0; i < eventSender.size(); ++i)
+    {
+        if (eventSender[i] == this)
+            eventSender[i] = 0;
+    }
+    
     unsubscribeFromAllEvents();
     
     // Remove from all specific event listeners
@@ -219,6 +226,8 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
 {
     std::set<EventListener*> processed;
     
+    eventSender.push_back(this);
+    
     // Check first the specific event listeners
     std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::const_iterator i = sSpecificEventListeners.find(
         std::make_pair(this, eventType));
@@ -230,54 +239,65 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
             // Make a copy of the iterator, because the listener might remove itself as a response
             std::list<EventListener*>::const_iterator current = j++;
             processed.insert(*current);
-            eventSender = this;
             (*current)->onEvent(this, eventType, eventData);
+            // If sending the event caused self to be destroyed, exit immediately!
+            if (getEventSender() != this)
+            {
+                eventSender.pop_back();
+                return;
+            }
         }
     }
     
     // Then the non-specific listeners
     std::map<StringHash, std::list<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
-    if (j == sEventListeners.end())
+    if (j != sEventListeners.end())
     {
-        eventSender = 0;
-        return;
-    }
-    const std::list<EventListener*>& listeners = j->second;
-    if (processed.empty())
-    {
-        for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
+        const std::list<EventListener*>& listeners = j->second;
+        if (processed.empty())
         {
-            std::list<EventListener*>::const_iterator current = k++;
-            eventSender = this;
-            (*current)->onEvent(this, eventType, eventData);
-        }
-    }
-    else
-    {
-        // If there were specific listeners, check that the event is not sent doubly to them
-        for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
-        {
-            if (processed.find(*k) == processed.end())
+            for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
             {
                 std::list<EventListener*>::const_iterator current = k++;
-                eventSender = this;
                 (*current)->onEvent(this, eventType, eventData);
+                if (getEventSender() != this)
+                {
+                    eventSender.pop_back();
+                    return;
+                }
             }
-            else
-                ++k;
+        }
+        else
+        {
+            // If there were specific listeners, check that the event is not sent doubly to them
+            for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
+            {
+                if (processed.find(*k) == processed.end())
+                {
+                    std::list<EventListener*>::const_iterator current = k++;
+                    (*current)->onEvent(this, eventType, eventData);
+                    if (getEventSender() != this)
+                    {
+                        eventSender.pop_back();
+                        return;
+                    }
+                }
+                else
+                    ++k;
+            }
         }
     }
     
-    eventSender = 0;
+    eventSender.pop_back();
 }
 
 void EventListener::sendEvent(EventListener* receiver, StringHash eventType)
 {
     if (receiver)
     {
-        eventSender = this;
+        eventSender.push_back(this);
         receiver->onEvent(this, eventType, noEventData);
-        eventSender = 0;
+        eventSender.pop_back();
     }
 }
 
@@ -285,9 +305,9 @@ void EventListener::sendEvent(EventListener* receiver, StringHash eventType, Var
 {
     if (receiver)
     {
-        eventSender = this;
+        eventSender.push_back(this);
         receiver->onEvent(this, eventType, eventData);
-        eventSender = 0;
+        eventSender.pop_back();
     }
 }
 
@@ -343,5 +363,8 @@ void EventListener::removeEventListener(EventListener* sender, StringHash eventT
 
 EventListener* getEventSender()
 {
-    return eventSender;
+    if (eventSender.size())
+        return eventSender.back();
+    else
+        return 0;
 }
