@@ -433,8 +433,7 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
         return;
     }
     
-    subscribeToEvent(eventType, EVENT_HANDLER(ScriptInstance, handleScriptEvent));
-    mEventHandlers[eventType] = method;
+    subscribeToEvent(eventType, EVENT_HANDLER_USERDATA(ScriptInstance, handleScriptEvent, (void*)method));
 }
 
 void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName)
@@ -456,8 +455,7 @@ void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType
         return;
     }
     
-    subscribeToEvent(sender, eventType, EVENT_HANDLER(ScriptInstance, handleSpecificScriptEvent));
-    mSpecificEventHandlers[std::make_pair(sender, eventType)] = method;
+    subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptInstance, handleSpecificScriptEvent, (void*)method));
 }
 
 bool ScriptInstance::createObject()
@@ -656,14 +654,10 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
         return;
     
-    std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.find(eventType);
-    if (i == mEventHandlers.end())
-        return;
-    
     std::vector<Variant> parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
-    mScriptFile->execute(mScriptObject, i->second, parameters);
+    mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
 }
 
 void ScriptInstance::handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData)
@@ -671,15 +665,10 @@ void ScriptInstance::handleSpecificScriptEvent(StringHash eventType, VariantMap&
     if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
         return;
     
-    std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.find(std::make_pair(
-        getEventSender(), eventType));
-    if (i == mSpecificEventHandlers.end())
-        return;
-    
     std::vector<Variant> parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
-    mScriptFile->execute(mScriptObject, i->second, parameters);
+    mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
 }
 
 ScriptInstance* getScriptContextInstance()

@@ -24,60 +24,21 @@
 #include "Precompiled.h"
 #include "ScriptEventListener.h"
 
-void ScriptEventListener::removeEventHandler(StringHash eventType)
-{
-    for (std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.begin(); i !=
-        mSpecificEventHandlers.end();)
-    {
-        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i++;
-        if (current->first.second == eventType)
-            mSpecificEventHandlers.erase(current);
-    }
-    
-    std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.find(eventType);
-    if (i != mEventHandlers.end())
-        mEventHandlers.erase(i);
-    
-    unsubscribeFromEvent(eventType);
-}
-
-void ScriptEventListener::removeEventHandler(EventListener* sender, StringHash eventType)
-{
-    std::pair<EventListener*, StringHash> combination = std::make_pair(sender, eventType);
-    
-    std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.find(combination);
-    if (i != mSpecificEventHandlers.end())
-    {
-        mSpecificEventHandlers.erase(i);
-        unsubscribeFromEvent(sender, eventType);
-    }
-}
-
-void ScriptEventListener::removeEventHandlers(EventListener* sender)
-{
-    for (std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.begin(); i !=
-        mSpecificEventHandlers.end();)
-    {
-        std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator current = i++;
-        if (current->first.first == sender)
-            mSpecificEventHandlers.erase(current);
-    }
-    
-    unsubscribeFromEvents(sender);
-}
-
 void ScriptEventListener::removeAllEventHandlers()
 {
-    // Note: we can not simply call unsubscribeFromAllEvents(), as for example ScriptInstance has its own internal
-    // scene update event handlers, which must not be unsubscribed
-    for (std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*>::iterator i = mSpecificEventHandlers.begin(); i !=
-        mSpecificEventHandlers.end(); ++i)
-        unsubscribeFromEvent(i->first.first, i->first.second);
+    // If event handlers have userdata defined, they should be scripted and thus can be removed
+    // Do not remove internal event handlers, such as ScriptInstance's update handlers
+    for (std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator i = mSpecificEventHandlers.begin(); i != mSpecificEventHandlers.end();)
+    {
+        std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*>::iterator current = i++;
+        if (current->second->getUserData())
+            unsubscribeFromEvent(current->first.first, current->first.second);
+    }
     
-    mSpecificEventHandlers.clear();
-    
-    for (std::map<StringHash, asIScriptFunction*>::iterator i = mEventHandlers.begin(); i != mEventHandlers.end(); ++i)
-        unsubscribeFromEvent(i->first);
-    
-    mEventHandlers.clear();
+    for (std::map<StringHash, EventHandlerInvoker*>::iterator i = mEventHandlers.begin(); i != mEventHandlers.end();)
+    {
+        std::map<StringHash, EventHandlerInvoker*>::iterator current = i++;
+        if (current->second->getUserData())
+            unsubscribeFromEvent(current->first);
+    }
 }

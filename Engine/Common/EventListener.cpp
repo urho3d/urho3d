@@ -33,10 +33,13 @@
 
 static VariantMap noEventData;
 
-std::map<StringHash, std::list<EventListener*> > EventListener::sEventListeners;
-std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> > EventListener::sSpecificEventListeners;
+std::map<StringHash, std::vector<EventListener*> > EventListener::sEventListeners;
+std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > EventListener::sSpecificEventListeners;
 
-std::vector<EventListener*> eventSender;
+std::vector<EventListener*> eventSenders;
+std::set<StringHash> dirtyEventListeners;
+std::set<std::pair<EventListener*, StringHash> > dirtySpecificEventListeners;
+EventHandlerInvoker* invoker = 0;
 
 EventListener::EventListener()
 {
@@ -45,24 +48,27 @@ EventListener::EventListener()
 EventListener::~EventListener()
 {
     // Check if event sender is destroyed during event handling
-    for (unsigned i = 0; i < eventSender.size(); ++i)
+    for (unsigned i = 0; i < eventSenders.size(); ++i)
     {
-        if (eventSender[i] == this)
-            eventSender[i] = 0;
+        if (eventSenders[i] == this)
+            eventSenders[i] = 0;
     }
     
     unsubscribeFromAllEvents();
     
     // Remove from all specific event listeners
-    for (std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::iterator i = sSpecificEventListeners.begin();
+    for (std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::iterator i = sSpecificEventListeners.begin();
         i != sSpecificEventListeners.end();)
     {
-        std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::iterator current = i++;
+        std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::iterator current = i++;
         if (current->first.first == this)
         {
-            std::list<EventListener*>& listeners = current->second;
-            for (std::list<EventListener*>::iterator j = listeners.begin(); j != listeners.end(); ++j)
-                (*j)->removeSpecificEventHandlers(this);
+            std::vector<EventListener*>& listeners = current->second;
+            for (std::vector<EventListener*>::iterator j = listeners.begin(); j != listeners.end(); ++j)
+            {
+                if (*j)
+                    (*j)->removeSpecificEventHandlers(this);
+            }
             sSpecificEventListeners.erase(current);
         }
     }
@@ -75,13 +81,17 @@ void EventListener::onEvent(EventListener* sender, StringHash eventType, Variant
         std::make_pair(sender, eventType));
     if (i != mSpecificEventHandlers.end())
     {
+        invoker = i->second;
         i->second->invoke(eventType, eventData);
         return;
     }
     
     std::map<StringHash, EventHandlerInvoker*>::const_iterator j = mEventHandlers.find(eventType);
     if (j != mEventHandlers.end())
+    {
+        invoker = j->second;
         j->second->invoke(eventType, eventData);
+    }
 }
 
 void EventListener::subscribeToEvent(StringHash eventType, EventHandlerInvoker* handler)
@@ -99,8 +109,8 @@ void EventListener::subscribeToEvent(StringHash eventType, EventHandlerInvoker* 
     
     mEventHandlers[eventType] = handler;
     
-    std::list<EventListener*>& listeners = sEventListeners[eventType];
-    for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
+    std::vector<EventListener*>& listeners = sEventListeners[eventType];
+    for (std::vector<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
     {
         // Check if already registered
         if (*j == this)
@@ -133,8 +143,8 @@ void EventListener::subscribeToEvent(EventListener* sender, StringHash eventType
     
     mSpecificEventHandlers[combination] = handler;
     
-    std::list<EventListener*>& listeners = sSpecificEventListeners[combination];
-    for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
+    std::vector<EventListener*>& listeners = sSpecificEventListeners[combination];
+    for (std::vector<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end(); ++j)
     {
         // Check if already registered
         if (*j == this)
@@ -226,78 +236,81 @@ void EventListener::sendEvent(StringHash eventType, VariantMap& eventData)
 {
     std::set<EventListener*> processed;
     
-    eventSender.push_back(this);
+    beginSendEvent();
     
     // Check first the specific event listeners
-    std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> >::const_iterator i = sSpecificEventListeners.find(
+    std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> >::const_iterator i = sSpecificEventListeners.find(
         std::make_pair(this, eventType));
     if (i != sSpecificEventListeners.end())
     {
-        const std::list<EventListener*>& listeners = i->second;
-        for (std::list<EventListener*>::const_iterator j = listeners.begin(); j != listeners.end();)
+        const std::vector<EventListener*>& listeners = i->second;
+        for (unsigned j = 0; j < listeners.size(); ++j)
         {
-            // Make a copy of the iterator, because the listener might remove itself as a response
-            std::list<EventListener*>::const_iterator current = j++;
-            processed.insert(*current);
-            (*current)->onEvent(this, eventType, eventData);
-            // If sending the event caused self to be destroyed, exit immediately!
-            if (getEventSender() != this)
+            EventListener* listener = listeners[j];
+            if (listener)
             {
-                eventSender.pop_back();
-                return;
+                processed.insert(listener);
+                listener->onEvent(this, eventType, eventData);
+                // If handling the event caused self to be destroyed, exit immediately!
+                if (getEventSender() != this)
+                {
+                    endSendEvent();
+                    return;
+                }
             }
         }
     }
     
     // Then the non-specific listeners
-    std::map<StringHash, std::list<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
+    std::map<StringHash, std::vector<EventListener*> >::const_iterator j = sEventListeners.find(eventType);
     if (j != sEventListeners.end())
     {
-        const std::list<EventListener*>& listeners = j->second;
+        const std::vector<EventListener*>& listeners = j->second;
         if (processed.empty())
         {
-            for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
+            for (unsigned k = 0; k < listeners.size(); ++k)
             {
-                std::list<EventListener*>::const_iterator current = k++;
-                (*current)->onEvent(this, eventType, eventData);
-                if (getEventSender() != this)
+                EventListener* listener = listeners[k];
+                if (listener)
                 {
-                    eventSender.pop_back();
-                    return;
+                    listener->onEvent(this, eventType, eventData);
+                    if (getEventSender() != this)
+                    {
+                        endSendEvent();
+                        return;
+                    }
                 }
             }
         }
         else
         {
             // If there were specific listeners, check that the event is not sent doubly to them
-            for (std::list<EventListener*>::const_iterator k = listeners.begin(); k != listeners.end();)
+            for (unsigned k = 0; k < listeners.size(); ++k)
             {
-                if (processed.find(*k) == processed.end())
+                EventListener* listener = listeners[k];
+                if ((listener) && (processed.find(listener) == processed.end()))
                 {
-                    std::list<EventListener*>::const_iterator current = k++;
-                    (*current)->onEvent(this, eventType, eventData);
+                    listener->onEvent(this, eventType, eventData);
                     if (getEventSender() != this)
                     {
-                        eventSender.pop_back();
+                        endSendEvent();
                         return;
                     }
                 }
-                else
-                    ++k;
             }
         }
     }
     
-    eventSender.pop_back();
+    endSendEvent();
 }
 
 void EventListener::sendEvent(EventListener* receiver, StringHash eventType)
 {
     if (receiver)
     {
-        eventSender.push_back(this);
+        beginSendEvent();
         receiver->onEvent(this, eventType, noEventData);
-        eventSender.pop_back();
+        endSendEvent();
     }
 }
 
@@ -305,9 +318,9 @@ void EventListener::sendEvent(EventListener* receiver, StringHash eventType, Var
 {
     if (receiver)
     {
-        eventSender.push_back(this);
+        beginSendEvent();
         receiver->onEvent(this, eventType, eventData);
-        eventSender.pop_back();
+        endSendEvent();
     }
 }
 
@@ -337,12 +350,19 @@ void EventListener::removeSpecificEventHandlers(EventListener* sender)
 
 void EventListener::removeEventListener(StringHash eventType)
 {
-    std::list<EventListener*>& listeners = sEventListeners[eventType];
-    for (std::list<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
+    std::vector<EventListener*>& listeners = sEventListeners[eventType];
+    for (std::vector<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
     {
         if (*i == this)
         {
-            listeners.erase(i);
+            // If no event handling going on, can erase the listener. Otherwise reset the pointer and clean up later
+            if (eventSenders.empty())
+                listeners.erase(i);
+            else
+            {
+                *i = 0;
+                dirtyEventListeners.insert(eventType);
+            }
             return;
         }
     }
@@ -350,21 +370,82 @@ void EventListener::removeEventListener(StringHash eventType)
 
 void EventListener::removeEventListener(EventListener* sender, StringHash eventType)
 {
-    std::list<EventListener*>& listeners = sSpecificEventListeners[std::make_pair(sender, eventType)];
-    for (std::list<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
+    std::pair<EventListener*, StringHash> combination(sender, eventType);
+    std::vector<EventListener*>& listeners = sSpecificEventListeners[combination];
+    for (std::vector<EventListener*>::iterator i = listeners.begin(); i != listeners.end(); ++i)
     {
         if (*i == this)
         {
-            listeners.erase(i);
+            if (eventSenders.empty())
+                listeners.erase(i);
+            else
+            {
+                *i = 0;
+                dirtySpecificEventListeners.insert(combination);
+            }
             return;
         }
     }
 }
 
+EventHandlerInvoker* EventListener::getInvoker()
+{
+    return invoker;
+}
+
+void EventListener::beginSendEvent()
+{
+    eventSenders.push_back(this);
+}
+
+void EventListener::endSendEvent()
+{
+    eventSenders.pop_back();
+    
+    // If event handling has ended, clean up listeners that were removed during event handling
+    if (eventSenders.empty())
+        cleanupEventListeners();
+}
+
+void EventListener::cleanupEventListeners()
+{
+    if (!dirtySpecificEventListeners.empty())
+    {
+        for (std::set<std::pair<EventListener*, StringHash> >::iterator i = dirtySpecificEventListeners.begin(); i != dirtySpecificEventListeners.end(); ++i)
+        {
+            std::vector<EventListener*>& listeners = sSpecificEventListeners[*i];
+            for (std::vector<EventListener*>::iterator j = listeners.begin(); j != listeners.end();)
+            {
+                if (*j == 0)
+                    j = listeners.erase(j);
+                else
+                    ++j;
+            }
+        }
+        dirtySpecificEventListeners.clear();
+    }
+    
+    if (!dirtyEventListeners.empty())
+    {
+        for (std::set<StringHash>::iterator i = dirtyEventListeners.begin(); i != dirtyEventListeners.end(); ++i)
+        {
+            std::vector<EventListener*>& listeners = sEventListeners[*i];
+            for (std::vector<EventListener*>::iterator j = listeners.begin(); j != listeners.end();)
+            {
+                if (*j == 0)
+                    j = listeners.erase(j);
+                else
+                    ++j;
+            }
+        }
+        dirtyEventListeners.clear();
+    }
+}
+
 EventListener* getEventSender()
 {
-    if (eventSender.size())
-        return eventSender.back();
+    if (eventSenders.size())
+        return eventSenders.back();
     else
         return 0;
 }

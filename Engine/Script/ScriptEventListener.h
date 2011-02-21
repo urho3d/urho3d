@@ -31,24 +31,12 @@ class asIScriptFunction;
 class ScriptEventListener : public EventListener
 {
 public:
-    //! Add an event handler. Called by script exposed version of subscribeToEvent()
+    //! Add a scripted event handler. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(StringHash eventType, const std::string& handlerName) = 0;
-    //! Add an event handler for a specific sender. Called by script exposed version of subscribeToEvent()
+    //! Add a scripted event handler for a specific sender. Called by script exposed version of subscribeToEvent()
     virtual void addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName) = 0;
-    //! Remove an event handler. Called by script exposed version of unsubcribeFromEvent()
-    void removeEventHandler(StringHash eventType);
-    //! Remove an event handler for a specific sender. Called by script exposed version of unsubscribeFromEvent();
-    void removeEventHandler(EventListener* sender, StringHash eventType);
-    //! Remove all event handlers for a specific sender. Called by script exposed version of unsubscribeFromEvents();
-    void removeEventHandlers(EventListener* sender);
-    //! Remove all event handlers. Called by script exposed version of unsubscribeFromAllEvents()
+    //! Remove all scripted event handlers. Called by script exposed version of unsubscribeFromAllEvents()
     void removeAllEventHandlers();
-    
-protected:
-    //! Pointers to event handler functions
-    std::map<StringHash, asIScriptFunction*> mEventHandlers;
-    //! Pointers to event handler functions for specific event senders
-    std::map<std::pair<EventListener*, StringHash>, asIScriptFunction*> mSpecificEventHandlers;
 };
 
 #endif // SCRIPT_SCRIPTEVENTLISTENER_H

@@ -670,21 +670,21 @@ static void UnsubscribeFromEvent(const std::string& eventType)
 {
     ScriptEventListener* listener = getScriptContextEventListener();
     if (listener)
-        listener->removeEventHandler(StringHash(eventType));
+        listener->unsubscribeFromEvent(StringHash(eventType));
 }
 
 static void UnsubscribeFromSenderEvent(EventListener* sender, const std::string& eventType)
 {
     ScriptEventListener* listener = getScriptContextEventListener();
     if (listener)
-        listener->removeEventHandler(sender, StringHash(eventType));
+        listener->unsubscribeFromEvent(sender, StringHash(eventType));
 }
 
 static void UnsubscribeFromSenderEvents(EventListener* sender)
 {
     ScriptEventListener* listener = getScriptContextEventListener();
     if (listener)
-        listener->removeEventHandlers(sender);
+        listener->unsubscribeFromEvents(sender);
 }
 
 static void UnsubscribeFromAllEvents()

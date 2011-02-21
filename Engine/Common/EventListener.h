@@ -36,7 +36,15 @@ class EventHandlerInvoker
 public:
     //! Construct with specified listener
     EventHandlerInvoker(EventListener* listener) :
-        mListener(listener)
+        mListener(listener),
+        mUserData(0)
+    {
+    }
+    
+    //! Construct with specified listener and userdata
+    EventHandlerInvoker(EventListener* listener, void* userData) :
+        mListener(listener),
+        mUserData(userData)
     {
     }
     
@@ -48,10 +56,14 @@ public:
     
     //! Return event listener
     EventListener* getListener() const { return mListener; }
+    //! Return userdata
+    void* getUserData() const { return mUserData; }
     
 protected:
     //! Event listener
     EventListener* mListener;
+    //! Userdata
+    void* mUserData;
     
 private:
     //! Prevent copy construction
@@ -69,6 +81,13 @@ public:
     //! Construct with listener and function pointers
     EventHandlerInvokerImpl(T* listener, HandlerFunctionPtr handler) :
         EventHandlerInvoker(listener),
+        mHandler(handler)
+    {
+    }
+    
+    //! Construct with listener and function pointers and userdata
+    EventHandlerInvokerImpl(T* listener, HandlerFunctionPtr handler, void* userData) :
+        EventHandlerInvoker(listener, userData),
         mHandler(handler)
     {
     }
@@ -91,6 +110,7 @@ private:
 };
 
 #define EVENT_HANDLER(classname, function) (new EventHandlerInvokerImpl<classname>(this, &classname::function))
+#define EVENT_HANDLER_USERDATA(classname, function, userdata) (new EventHandlerInvokerImpl<classname>(this, &classname::function, userdata))
 
 //! Event listener
 class EventListener
@@ -143,16 +163,26 @@ protected:
     //! Event handlers for specific senders' events
     std::map<std::pair<EventListener*, StringHash>, EventHandlerInvoker*> mSpecificEventHandlers;
     
+    //! Return last event handler invoker. Only valid during onEvent()
+    static EventHandlerInvoker* getInvoker();
+    
 private:
+    //! Begin event handling. Save self as sender
+    void beginSendEvent();
+    //! End event handling. Remove self and clean up event listeners if possible and necessary
+    void endSendEvent();
+    //! Cleanup event listeners removed while handling an event
+    void cleanupEventListeners();
+    
     //! Prevent copy construction
     EventListener(const EventListener& rhs);
     //! Prevent assignment
     EventListener& operator = (const EventListener& rhs);
-    
+
     //! Event listeners for non-specific events
-    static std::map<StringHash, std::list<EventListener*> > sEventListeners;
+    static std::map<StringHash, std::vector<EventListener*> > sEventListeners;
     //! Event listeners for specific senders' events
-    static std::map<std::pair<EventListener*, StringHash>, std::list<EventListener*> > sSpecificEventListeners;
+    static std::map<std::pair<EventListener*, StringHash>, std::vector<EventListener*> > sSpecificEventListeners;
 };
 
 //! Return event sender. Only non-null during the event handling
