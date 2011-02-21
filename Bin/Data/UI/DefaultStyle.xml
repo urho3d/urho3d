@@ -104,7 +104,7 @@
         <hoveroffset value="0 16" />
         <text>
             <position value="1 1" />
-            <font name="Cour.ttf" size="10" />
+            <font name="Cour.ttf" size="12" />
             <selectioncolor value="1.0 0.5 0.5" />
         </text>
         <cursor>
@@ -299,6 +299,64 @@
         <resizable enable="true" />
     </element>
     <element type="Text">
-        <font name="Cour.ttf" size="10" />
+        <font name="Cour.ttf" size="12" />
+    </element>
+    <element type="DebugHudText">
+        <font name="Cour.ttf" size="12" />
+    </element>
+    <element type="ConsoleBackground">
+        <layout spacing="0" border="4 4 4 4" />
+        <color topleft="0 0.25 0 0.75" topright="0 0.25 0 0.75" bottomleft="0.25 0.75 0.25 0.75" bottomright="0.25 0.75 0.25 0.75" />
+    </element>
+    <element type="ConsoleText">
+        <font name="Cour.ttf" size="12" />
+    </element>
+    <element type="ConsoleLineEdit">
+        <color value="0 0 0 0.5" />
+        <text>
+            <font name="Cour.ttf" size="12" />
+            <selectioncolor value="0 0.5 0 0.75" />
+        </text>
+        <cursor>
+            <size value="4 16" />
+            <texture name="Textures/UI.png" />
+            <imagerect value="12 0 16 16" />
+        </cursor>
+    </element>
+    <element type="FileSelector">
+        <size value="400 300" />
+        <minsize value="400 300" />
+        <movable enable="true" />
+        <resizable enable="true" />
+        <resizeborder value="8 8 8 8" />
+        <layout spacing="4" border="8 8 8 8" />
+    </element>
+    <element type="FileSelectorButton">
+        <fixedsize value="96 24" />
+    </element>
+    <element type="FileSelectorButtonText">
+        <font name="Cour.ttf" size="12" />
+    </element>
+    <element type="FileSelectorFilterList">
+        <fixedwidth value="64" />
+        <layout mode="horizontal" border="4 0 4 0" />
+        <resizepopup enable="true" />
+        <popup>
+            <layout border="4 4 4 4" />
+        </popup>
+    </element>
+    <element type="FileSelectorFilterText">
+        <font name="Cour.ttf" size="12" />
+        <hovercolor value="0.5 0.75 0.5" />
+    </element>
+    <element type="FileSelectorLayout">
+        <layout spacing="4" />
+    </element>
+    <element type="FileSelectorListText">
+        <font name="Cour.ttf" size="12" />
+        <selectioncolor value="0.5 0.75 0.5" />
+    </element>
+    <element type="FileSelectorTitleText">
+        <font name="Cour.ttf" size="15" />
     </element>
 </elements>

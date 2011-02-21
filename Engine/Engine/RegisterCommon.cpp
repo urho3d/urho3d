@@ -522,9 +522,9 @@ static bool VariantEqualsBuffer(const VectorBuffer& buffer, Variant* ptr)
     return (*ptr) == buffer.getBuffer();
 }
 
-static CScriptArray* ScanDirectory(const std::string& pathName, const std::string& filter, bool recursive)
+static CScriptArray* ScanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden)
 {
-    std::vector<std::string> result = scanDirectory(pathName, filter, recursive);
+    std::vector<std::string> result = scanDirectory(pathName, filter, recursive, directories, hidden);
     return vectorToArray<std::string>(result, "array<string>");
 }
 
@@ -556,13 +556,15 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "uint getChecksum()", asMETHOD(File, getChecksum), asCALL_THISCALL);
     
     engine->RegisterGlobalFunction("bool fileExists(const string& in)", asFUNCTION(fileExists), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool directoryExists(const string& in)", asFUNCTION(directoryExists), asCALL_CDECL);
     engine->RegisterGlobalFunction("void createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
-    engine->RegisterGlobalFunction("array<string>@ scanDirectory(const string& in, const string& in, bool)", asFUNCTION(ScanDirectory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("array<string>@ scanDirectory(const string& in, const string& in, bool, bool, bool)", asFUNCTION(ScanDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getExtension(const string& in, bool)", asFUNCTION(getExtension), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileNameAndExtension(const string& in, bool)", asFUNCTION(getFileNameAndExtension), asCALL_CDECL);
     engine->RegisterGlobalFunction("string fixPath(const string& in)", asFUNCTION(fixPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string unfixPath(const string& in)", asFUNCTION(unfixPath), asCALL_CDECL);
     
     engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);

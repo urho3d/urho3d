@@ -27,6 +27,7 @@
 #include "Cursor.h"
 #include "DropDownList.h"
 #include "Engine.h"
+#include "FileSelector.h"
 #include "Font.h"
 #include "LineEdit.h"
 #include "ListView.h"
@@ -329,6 +330,52 @@ static void registerWindow(asIScriptEngine* engine)
     registerRefCasts<UIElement, Window>(engine, "UIElement", "Window");
 }
 
+static FileSelector* ConstructFileSelector()
+{
+    try
+    {
+        return new FileSelector(getEngine()->getUI());
+    }
+    catch (Exception& e)
+    {
+        // Rethrow after FileSelector has been deallocated
+        SAFE_RETHROW_RET(e, 0);
+    }
+}
+
+static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex, FileSelector* ptr)
+{
+    if (!filters)
+        return;
+    
+    unsigned numFilters = filters->GetSize();
+    std::vector<std::string> destFilters(numFilters);
+    
+    for (unsigned i = 0; i < numFilters; ++i)
+        destFilters[i] = *(static_cast<std::string*>(filters->At(i)));
+    
+    ptr->setFilters(destFilters, defaultIndex);
+}
+
+static void registerFileSelector(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("FileSelector", 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_ADDREF, "void f()", asMETHOD(FileSelector, addRef), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_RELEASE, "void f()", asMETHOD(FileSelector, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("FileSelector", asBEHAVE_FACTORY, "FileSelector@+ f()", asFUNCTION(ConstructFileSelector), asCALL_CDECL);
+    engine->RegisterObjectMethod("FileSelector", "void setStyle(XMLFile@+)", asMETHOD(FileSelector, setStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void setTitle(const string& in)", asMETHOD(FileSelector, setTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void setButtonTexts(const string& in, const string& in)", asMETHOD(FileSelector, setButtonTexts), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void setPath(const string& in)", asMETHOD(FileSelector, setPath), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void setFileName(const string& in)", asMETHOD(FileSelector, setFileName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void setFilters(array<string>@+, uint)", asFUNCTION(FileSelectorSetFilters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSelector", "Window@+ getWindow() const", asMETHOD(FileSelector, getWindow), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const string& getPath() const", asMETHOD(FileSelector, getPath), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const string& getFileName() const", asMETHOD(FileSelector, getFileName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const string& getFilter() const", asMETHOD(FileSelector, getFilter), asCALL_THISCALL);
+    registerRefCasts<EventListener, FileSelector>(engine, "EventListener", "FileSelector");
+}
+
 static UI* GetUI()
 {
     return getEngine()->getUI();
@@ -435,5 +482,6 @@ void registerUILibrary(asIScriptEngine* engine)
     registerMenu(engine);
     registerDropDownList(engine);
     registerWindow(engine);
+    registerFileSelector(engine);
     registerUI(engine);
 }

@@ -88,10 +88,14 @@ private:
 
 //! Check if a file exists
 bool fileExists(const std::string& fileName);
+//! Check if a directory exists
+bool directoryExists(const std::string& pathName);
 //! Create a directory
 void createDirectory(const std::string& pathName);
+//! Return the absolute working directory
+std::string getWorkingDirectory();
 //! Scan a directory for specified files
-std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive);
+std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed
@@ -108,6 +112,8 @@ std::string getExtension(const std::string& fullPath, bool lowerCaseExtension = 
 std::string getFileNameAndExtension(const std::string& fullPath, bool lowerCaseExtension = true);
 //! Fix a path so that it contains a slash in the end, and convert backslashes to slashes
 std::string fixPath(const std::string& pathName);
+//! Remove the slash or backslash from the end of a path if exists
+std::string unfixPath(const std::string& pathName);
 //! Convert a path to the format required by the operating system
 std::string getOSPath(const std::string& pathName, bool forNativeApi = false);
 

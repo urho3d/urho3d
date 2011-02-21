@@ -29,6 +29,8 @@ array<Entity@> animatingObjects;
 array<Entity@> billboards;
 array<Entity@> lights;
 
+FileSelector@ fileSelector;
+
 void start()
 {
     if (engine.isHeadless())
@@ -303,31 +305,51 @@ void animateScene(float timeStep)
 
 void initConsole()
 {
+    XMLFile@ uiStyle = cache.getResource("XMLFile", "UI/DefaultStyle.xml");
+
     Console@ console = engine.createConsole();
+    console.setStyle(uiStyle);
     console.setNumRows(16);
-    console.setFont(cache.getResource("Font", "cour.ttf"), 12);
-    BorderImage@ cursor = console.getLineEdit().getCursor();
-    cursor.setWidth(4);
-    cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
-    cursor.setImageRect(12, 0, 16, 16);
 
     engine.createDebugHud();
-    debugHud.setFont(cache.getResource("Font", "cour.ttf"), 12);
+    debugHud.setStyle(uiStyle);
     debugHud.setMode(DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE);
 }
 
 void initUI()
 {
     XMLFile@ uiStyle = cache.getResource("XMLFile", "UI/DefaultStyle.xml");
-    
+
     Cursor@ cursor = Cursor("Cursor");
     cursor.setStyleAuto(uiStyle);
     cursor.setPosition(renderer.getWidth() / 2, renderer.getHeight() / 2);
     ui.setCursor(cursor);
 
-    //XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
-    //UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
-    //uiRoot.addChild(layoutRoot);
+	/*
+    XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
+    UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
+    uiRoot.addChild(layoutRoot);
+
+    @fileSelector = FileSelector();
+    fileSelector.setStyle(uiStyle);
+    fileSelector.setTitle("Load file");
+    fileSelector.setButtonTexts("Load", "Cancel");
+    fileSelector.getWindow().setPosition(200, 100);
+
+    array<string> filters;
+    filters.resize(2);
+    filters[0] = "*.*";
+    filters[1] = "*.exe";
+    fileSelector.setFilters(filters, 0);
+
+    subscribeToEvent(fileSelector, "FileSelected", "handleFileSelected");
+    */
+}
+
+void handleFileSelected(StringHash eventType, VariantMap& eventData)
+{
+	unsubscribeFromEvent(fileSelector, "FileSelected");
+	@fileSelector = null;
 }
 
 void createCamera()

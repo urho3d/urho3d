@@ -156,6 +156,7 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool getBool(const string& in) const", asMETHOD(XMLElement, getBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "BoundingBox getBoundingBox() const", asMETHOD(XMLElement, getBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement getChildElement(const string& in) const", asMETHOD(XMLElement, getChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement getParentElement() const", asMETHOD(XMLElement, getParentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Color getColor(const string& in) const", asMETHOD(XMLElement, getColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "float getFloat(const string& in) const", asMETHOD(XMLElement, getFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "int getInt(const string& in) const", asMETHOD(XMLElement, getInt), asCALL_THISCALL);

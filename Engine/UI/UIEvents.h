@@ -128,4 +128,11 @@ DEFINE_EVENT(EVENT_ITEMDOUBLECLICKED, ItemDoubleClicked)
     EVENT_PARAM(P_SELECTION, Selection);        // int
 }
 
+//! Fileselector choice
+DEFINE_EVENT(EVENT_FILESELECTED, FileSelected)
+{
+    EVENT_PARAM(P_FILENAME, FileName);          // string
+    EVENT_PARAM(P_OK, Ok);                      // bool
+}
+
 #endif // UI_UIEVENTS_H

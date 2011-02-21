@@ -295,10 +295,6 @@ void ListView::ensureItemVisibility()
     IntVector2 windowSize(mScrollPanel->getWidth() - clipBorder.mLeft - clipBorder.mRight, mScrollPanel->getHeight() -
         clipBorder.mTop - clipBorder.mBottom);
     
-    if (currentOffset.mX < 0)
-        newView.mX += currentOffset.mX;
-    if (currentOffset.mX + selected->getWidth() > windowSize.mX)
-        newView.mX += currentOffset.mX + selected->getWidth() - windowSize.mX;
     if (currentOffset.mY < 0)
         newView.mY += currentOffset.mY;
     if (currentOffset.mY + selected->getHeight() > windowSize.mY)

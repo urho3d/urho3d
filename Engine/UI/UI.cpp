@@ -500,21 +500,24 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     if ((mCursor) && (mCursor->isVisible()))
     {
         IntVector2 pos = mCursor->getPosition();
-        UIElement* element = getElementAt(pos);
+        WeakPtr<UIElement> element(getElementAt(pos));
         if (element)
         {
             // Handle focusing & bringing to front
             if (button == MOUSEB_LEFT)
             {
                 setFocusElement(element);
-                element->bringToFront();
+                // Must check the pointer after each operation, because any UI event may trigger its destruction
+                if (element)
+                    element->bringToFront();
             }
             
             // Handle click
-            element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
+            if (element)
+                element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
             
             // Handle start of drag
-            if (!mMouseDrag)
+            if ((element) && (!mMouseDrag))
             {
                 mMouseDrag = true;
                 mMouseDragElement = element;
@@ -523,7 +526,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         }
         else
         {
-            // If clicked over no element, or a disabled element, lose focus
+            // If clicked over no element, or a disabled element, try to lose focus
             setFocusElement(0);
         }
     }

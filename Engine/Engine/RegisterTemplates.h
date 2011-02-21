@@ -450,6 +450,8 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setLayoutSpacing(int)", asMETHOD(T, setLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLayoutBorder(const IntRect&)", asMETHOD(T, setLayoutBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void updateLayout()", asMETHOD(T, updateLayout), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void disableLayoutUpdate()", asMETHOD(T, disableLayoutUpdate), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void enableLayoutUpdate()", asMETHOD(T, enableLayoutUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void bringToFront()", asMETHOD(T, bringToFront), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void addChild(UIElement@+)", asMETHOD(T, addChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void removeChild(UIElement@+)", asMETHOD(T, removeChild), asCALL_THISCALL);

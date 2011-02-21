@@ -363,7 +363,7 @@ void UIElement::setSize(const IntVector2& size)
         
         if (mResizeNestingLevel == 1)
         {
-            // Check if parent element's layout needs to be updated
+            // Check if parent element's layout needs to be updated first
             if (mParent)
                 mParent->updateLayout();
             
@@ -638,7 +638,8 @@ void UIElement::updateLayout()
     if ((mLayoutMode == LM_FREE) || (mUpdateLayoutNestingLevel))
         return;
     
-    ++mUpdateLayoutNestingLevel;
+    // Prevent further updates while this update happens
+    disableLayoutUpdate();
     
     std::vector<int> positions;
     std::vector<int> sizes;
@@ -720,6 +721,16 @@ void UIElement::updateLayout()
         }
     }
     
+    enableLayoutUpdate();
+}
+
+void UIElement::disableLayoutUpdate()
+{
+    ++mUpdateLayoutNestingLevel;
+}
+
+void UIElement::enableLayoutUpdate()
+{
     --mUpdateLayoutNestingLevel;
 }
 
@@ -1043,7 +1054,7 @@ int UIElement::calculateLayoutParentSize(const std::vector<int>& sizes, int begi
 void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
         const std::vector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
 {
-    unsigned numChildren = sizes.size();
+    int numChildren = sizes.size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
@@ -1055,7 +1066,7 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
     float acc = 0.0f;
     
     // Initial pass
-    for (unsigned i = 0; i < numChildren; ++i)
+    for (int i = 0; i < numChildren; ++i)
     {
         int targetSize = targetChildSize;
         if (remainder)
@@ -1075,7 +1086,7 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
     for (;;)
     {
         int actualTotalSize = 0;
-        for (unsigned i = 0; i < numChildren; ++i)
+        for (int i = 0; i < numChildren; ++i)
             actualTotalSize += sizes[i];
         int error = targetTotalSize - actualTotalSize;
         // Break if no error
@@ -1085,7 +1096,7 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
         // Check which of the children can be resized to correct the error. If none, must break
         static std::vector<unsigned> resizable;
         resizable.clear();
-        for (unsigned i = 0; i < numChildren; ++i)
+        for (int i = 0; i < numChildren; ++i)
         {
             if ((error < 0) && (sizes[i] > minSizes[i]))
                 resizable.push_back(i);
@@ -1095,12 +1106,13 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
         if (resizable.empty())
             break;
         
-        int errorPerChild = error / resizable.size();
-        remainder = (abs(error)) % resizable.size();
-        add = (float)remainder / resizable.size();
+        int numResizable = resizable.size();
+        int errorPerChild = error / numResizable;
+        remainder = (abs(error)) % numResizable;
+        add = (float)remainder / numResizable;
         acc = 0.0f;
         
-        for (unsigned i = 0; i < resizable.size(); ++i)
+        for (int i = 0; i < numResizable; ++i)
         {
             unsigned idx = resizable[i];
             int targetSize = sizes[idx] + errorPerChild;
@@ -1121,7 +1133,7 @@ void UIElement::calculateLayout(std::vector<int>& positions, std::vector<int>& s
     
     // Calculate final positions
     int position = begin;
-    for (unsigned i = 0; i < numChildren; ++i)
+    for (int i = 0; i < numChildren; ++i)
     {
         positions[i] = position;
         position += sizes[i];

@@ -431,11 +431,9 @@ void Text::updateText(bool inResize)
         mCharPositions[mText.length()] = IntVector2(x, y);
     }
     
-    // Set minimum size to correspond to the text size
-    if (!mWordwrap)
-        setMinSize(width, height);
-    else
-        setMinHeight(height);
+    // Set minimum size according to the text size
+    setMinWidth(width);
+    setFixedHeight(height);
 }
 
 void Text::validateSelection()

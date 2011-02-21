@@ -36,8 +36,7 @@ static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcP
         return false;
     
     unsigned numParams = srcParams->GetSize();
-    std::vector<Variant> destParams;
-    destParams.resize(numParams);
+    std::vector<Variant> destParams(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));

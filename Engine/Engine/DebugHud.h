@@ -29,6 +29,7 @@
 class Engine;
 class Font;
 class Text;
+class XMLFile;
 
 static const unsigned DEBUGHUD_SHOW_NONE = 0x0;
 static const unsigned DEBUGHUD_SHOW_STATS = 0x1;
@@ -46,8 +47,8 @@ public:
     
     //! Update
     void update(float timeStep);
-    //! Set font to use
-    void setFont(Font* font, int size);
+    //! Set UI elements' style from an XML file
+    void setStyle(XMLFile* style);
     //! Set elements to show
     void setMode(unsigned mode);
     //! Set profiler accumulation interval
@@ -57,6 +58,14 @@ public:
     //! Toggle all elements
     void toggleAll();
     
+    //! Return the UI style file
+    XMLFile* getStyle() const { return mStyle; }
+    //! Return rendering stats text
+    Text* getStatsText() const { return mStatsText; }
+    //! Return rendering mode text
+    Text* getModeText() const { return mModeText; }
+    //! Return profiler text
+    Text* getProfilerText() const { return mProfilerText; }
     //! Return currently shown elements
     unsigned getMode() const;
     //! Return profiler accumulation interval
@@ -65,6 +74,8 @@ public:
 private:
     //! Engine
     Engine* mEngine;
+    //! UI style file
+    SharedPtr<XMLFile> mStyle;
     //! Rendering stats text
     SharedPtr<Text> mStatsText;
     //! Rendering mode text

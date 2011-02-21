@@ -105,6 +105,8 @@ public:
     XMLElement getChildElement(const std::string& name = std::string()) const;
     //! Return next sibling element
     XMLElement getNextElement(const std::string& name = std::string()) const;
+    //! Return parent element
+    XMLElement getParentElement() const;
     //! Return whether has an attribute
     bool hasAttribute(const std::string& name) const;
     //! Return attribute, or empty if missing

@@ -48,8 +48,6 @@ public:
     void setCursor(Cursor* cursor);
     //! Set focused UI element
     void setFocusElement(UIElement* element);
-    //! Bring an UI element to front
-    void bringToFront(UIElement* element);
     //! Clear the UI (excluding the cursor)
     void clear();
     //! Update the UI
@@ -63,6 +61,8 @@ public:
     //! Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element
     SharedPtr<UIElement> loadLayout(XMLFile* file, XMLFile* styleFile = 0);
     
+    //! Return resource cache
+    ResourceCache* getResourceCache() const { return mCache; }
     //! Return root UI elemenet
     UIElement* getRootElement() const { return mRootElement; }
     //! Return cursor

@@ -195,14 +195,20 @@ void DebugHud::update(float timeStep)
     }
 }
 
-void DebugHud::setFont(Font* font, int size)
+void DebugHud::setStyle(XMLFile* style)
 {
-    if ((!mStatsText) || (!mModeText) || (!mProfilerText))
+    if ((!style) || (!mEngine) || (!mStatsText) || (!mModeText) || (!mProfilerText))
         return;
     
-    mStatsText->setFont(font, size);
-    mModeText->setFont(font, size);
-    mProfilerText->setFont(font, size);
+    mStyle = style;
+    ResourceCache* cache = mEngine->getResourceCache();
+    XMLElement textElem = UIElement::getStyleElement(style, "DebugHudText");
+    if (textElem)
+    {
+        mStatsText->setStyle(textElem, cache);
+        mModeText->setStyle(textElem, cache);
+        mProfilerText->setStyle(textElem, cache);
+    }
 }
 
 void DebugHud::setMode(unsigned mode)

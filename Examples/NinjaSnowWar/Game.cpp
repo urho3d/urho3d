@@ -200,7 +200,7 @@ void Game::init()
     mCache->addResourcePath(getSystemFontDirectory());
     
     DebugHud* debugHud = mEngine->createDebugHud();
-    debugHud->setFont(mCache->getResource<Font>("cour.ttf"), 12);
+    debugHud->setStyle(mCache->getResource<XMLFile>("UI/DefaultStyle.xml"));
     
     if (runServer)
     {

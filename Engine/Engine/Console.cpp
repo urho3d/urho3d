@@ -29,6 +29,7 @@
 #include "LineEdit.h"
 #include "Renderer.h"
 #include "RendererEvents.h"
+#include "ResourceCache.h"
 #include "ScriptEngine.h"
 #include "StringUtils.h"
 #include "Text.h"
@@ -37,9 +38,10 @@
 
 #include "DebugNew.h"
 
+static const int DEFAULT_CONSOLE_ROWS = 16;
+
 Console::Console(Engine* engine) :
-    mEngine(engine),
-    mFontSize(DEFAULT_FONT_SIZE)
+    mEngine(engine)
 {
     LOGINFO("Console created");
     
@@ -55,25 +57,20 @@ Console::Console(Engine* engine) :
         
         mBackground = new BorderImage();
         mBackground->setFixedWidth(uiRoot->getWidth());
-        mBackground->setColor(C_TOPLEFT, Color(0.0f, 0.25f, 0.0f, 0.75f));
-        mBackground->setColor(C_TOPRIGHT, Color(0.0f, 0.25f, 0.0f, 0.75f));
-        mBackground->setColor(C_BOTTOMLEFT, Color(0.25f, 0.75f, 0.25f, 0.75f));
-        mBackground->setColor(C_BOTTOMRIGHT, Color(0.25f, 0.75f, 0.25f, 0.75f));
         mBackground->setBringToBack(false);
         mBackground->setClipChildren(true);
         mBackground->setEnabled(true);
-        mBackground->setVisible(false);
+        mBackground->setVisible(false); // Hide by default
         mBackground->setPriority(200); // Show on top of the debug HUD
-        mBackground->setLayout(LM_VERTICAL, 0, IntRect(4, 4, 4, 4));
+        mBackground->setLayout(LM_VERTICAL);
         
         mLineEdit = new LineEdit();
-        mLineEdit->setColor(Color(0.0f, 0.0f, 0.0f, 0.5f));
-        mLineEdit->getTextElement()->setSelectionColor(Color(0.0f, 0.5f, 0.0f, 0.75f));
         mLineEdit->setFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
         mBackground->addChild(mLineEdit);
         
         uiRoot->addChild(mBackground);
         
+        setNumRows(DEFAULT_CONSOLE_ROWS);
         updateElements();
         
         subscribeToEvent(mLineEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
@@ -98,6 +95,9 @@ void Console::write(const std::string& message)
 {
     if (!mRows.size())
         return;
+    // If the rows are not fully initialized yet, do not write the message
+    if (!mRows[mRows.size() - 1])
+        return;
     
     // Be prepared for possible multi-line messages
     std::vector<std::string> rows = split(message, '\n');
@@ -109,6 +109,29 @@ void Console::write(const std::string& message)
         
         mRows[mRows.size() - 1]->setText(rows[i]);
     }
+}
+
+void Console::setStyle(XMLFile* style)
+{
+    if ((!style) || (!mEngine) || (!mBackground) || (!mLineEdit))
+        return;
+    
+    mStyle = style;
+    ResourceCache* cache = mEngine->getResourceCache();
+    XMLElement backgroundElem = UIElement::getStyleElement(style, "ConsoleBackground");
+    if (backgroundElem)
+        mBackground->setStyle(backgroundElem, cache);
+    XMLElement textElem = UIElement::getStyleElement(style, "ConsoleText");
+    if (textElem)
+    {
+        for (unsigned i = 0; i < mRows.size(); ++i)
+            mRows[i]->setStyle(textElem, cache);
+    }
+    XMLElement lineEditElem = UIElement::getStyleElement(style, "ConsoleLineEdit");
+    if (lineEditElem)
+        mLineEdit->setStyle(lineEditElem, cache);
+    
+    updateElements();
 }
 
 void Console::setVisible(bool enable)
@@ -130,16 +153,21 @@ void Console::toggle()
 
 void Console::setNumRows(unsigned rows)
 {
-    if (!mBackground)
+    if ((!mBackground) || (!rows))
         return;
     
     mBackground->removeAllChildren();
-    mRows.clear();
     
     mRows.resize(rows);
     for (unsigned i = 0; i < mRows.size(); ++i)
     {
-        mRows[i] = new Text();
+        if (!mRows[i])
+        {
+            mRows[i] = new Text();
+            XMLElement textElem = UIElement::getStyleElement(mStyle, "ConsoleText");
+            if (textElem)
+                mRows[i]->setStyle(textElem, mEngine->getResourceCache());
+        }
         mBackground->addChild(mRows[i]);
     }
     mBackground->addChild(mLineEdit);
@@ -147,15 +175,11 @@ void Console::setNumRows(unsigned rows)
     updateElements();
 }
 
-void Console::setFont(Font* font, int size)
+void Console::updateElements()
 {
-    if (!mBackground)
-        return;
-    
-    mFont = font;
-    mFontSize = max(size, 1);
-    
-    updateElements();
+    int width = mEngine->getRenderer()->getWidth();
+    mLineEdit->setFixedHeight(mLineEdit->getTextElement()->getRowHeight());
+    mBackground->setFixedWidth(width);
 }
 
 bool Console::isVisible() const
@@ -163,21 +187,6 @@ bool Console::isVisible() const
     if (!mBackground)
         return false;
     return mBackground->isVisible();
-}
-
-void Console::updateElements()
-{
-    int width = mEngine->getRenderer()->getWidth();
-    
-    if (mFont)
-    {
-        for (unsigned i = 0; i < mRows.size(); ++i)
-            mRows[i]->setFont(mFont, mFontSize);
-        mLineEdit->getTextElement()->setFont(mFont, mFontSize);
-    }
-    
-    mLineEdit->setFixedHeight(mLineEdit->getTextElement()->getRowHeight());
-    mBackground->setFixedWidth(width);
 }
 
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)

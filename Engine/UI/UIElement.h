@@ -219,6 +219,10 @@ public:
     void setLayoutBorder(const IntRect& border);
     //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void updateLayout();
+    //! Disable layout update momentarily, usually for performance reasons when adding several child elements
+    void disableLayoutUpdate();
+    //! Enable layout update
+    void enableLayoutUpdate();
     //! Bring UI element to front
     void bringToFront();
     //! Add a child element

@@ -374,14 +374,17 @@ static void registerConsole(asIScriptEngine* engine)
     engine->RegisterObjectType("Console", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Console", asBEHAVE_ADDREF, "void f()", asMETHOD(Console, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Console", asBEHAVE_RELEASE, "void f()", asMETHOD(Console, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void write(const string& in)", asMETHOD(Console, write), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setStyle(XMLFile@+ file)", asMETHOD(Console, setStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setVisible(bool)", asMETHOD(Console, setVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void toggle()", asMETHOD(Console, toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setNumRows(uint)", asMETHOD(Console, setNumRows), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "void setFont(Font@+, int)", asMETHOD(Console, setFont), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void updateElements()", asMETHOD(Console, updateElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "XMLFile@+ getStyle() const", asMETHOD(Console, getStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "BorderImage@+ getBackground() const", asMETHOD(Console, getBackground), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEdit() const", asMETHOD(Console, getLineEdit), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
     
     engine->RegisterGlobalFunction("Console@+ getConsole()", asFUNCTION(GetConsole), asCALL_CDECL);
     engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
@@ -402,11 +405,15 @@ static void registerDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectType("DebugHud", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("DebugHud", asBEHAVE_ADDREF, "void f()", asMETHOD(DebugHud, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("DebugHud", asBEHAVE_RELEASE, "void f()", asMETHOD(DebugHud, releaseRef), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugHud", "void setFont(Font@+, int)", asMETHOD(DebugHud, setFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void setStyle(XMLFile@+)", asMETHOD(DebugHud, setStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void setMode(uint)", asMETHOD(DebugHud, setMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void setProfilerInterval(float)", asMETHOD(DebugHud, setProfilerInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void toggle(uint)", asMETHOD(DebugHud, toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void toggleAll()", asMETHOD(DebugHud, toggleAll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "XMLFile@+ getStyle() const", asMETHOD(DebugHud, getStyle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "Text@+ getStatsText() const", asMETHOD(DebugHud, getStatsText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "Text@+ getModeText() const", asMETHOD(DebugHud, getModeText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "Text@+ getProfilerText() const", asMETHOD(DebugHud, getProfilerText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "uint getMode() const", asMETHOD(DebugHud, getMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "float getProfilerInterval() const", asMETHOD(DebugHud, getProfilerInterval), asCALL_THISCALL);
     

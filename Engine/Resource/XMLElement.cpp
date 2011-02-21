@@ -268,6 +268,14 @@ XMLElement XMLElement::getNextElement(const std::string& name) const
         return XMLElement(mElement->NextSiblingElement(name.c_str()));
 }
 
+XMLElement XMLElement::getParentElement() const
+{
+    if (!mElement)
+        return XMLElement();
+    
+    return XMLElement(dynamic_cast<TiXmlElement*>(mElement->Parent()));
+}
+
 bool XMLElement::hasAttribute(const std::string& name) const
 {
     if (!mElement)

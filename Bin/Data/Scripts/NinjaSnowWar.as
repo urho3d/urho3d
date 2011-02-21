@@ -77,16 +77,14 @@ void initConsole()
     if (engine.isHeadless())
         return;
 
+    XMLFile@ uiStyle = cache.getResource("XMLFile", "UI/DefaultStyle.xml");
+
     Console@ console = engine.createConsole();
+    console.setStyle(uiStyle);
     console.setNumRows(16);
-    console.setFont(cache.getResource("Font", "cour.ttf"), 12);
-    BorderImage@ cursor = console.getLineEdit().getCursor();
-    cursor.setWidth(4);
-    cursor.setTexture(cache.getResource("Texture2D", "Textures/UI.png"));
-    cursor.setImageRect(12, 0, 16, 16);
 
     engine.createDebugHud();
-    debugHud.setFont(cache.getResource("Font", "cour.ttf"), 12);
+    debugHud.setStyle(uiStyle);
 }
 
 void initScene()

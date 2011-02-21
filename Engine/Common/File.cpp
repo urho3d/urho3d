@@ -34,7 +34,7 @@
 
 static std::set<std::string> allowedDirectories;
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive);
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive, bool directories, bool hidden);
 
 File::File(const std::string& fileName, FileMode mode) :
     mHandle(0),
@@ -180,14 +180,25 @@ bool fileExists(const std::string& fileName)
     if (!checkDirectoryAccess(getPath(fileName)))
         return false;
     
-    FILE* file = fopen(getOSPath(fileName).c_str(), "rb");
-    if (file)
-    {
-        fclose(file);
-        return true;
-    }
-    else
+    std::string fixedName = getOSPath(unfixPath(fileName), true);
+    DWORD attributes = GetFileAttributes(fixedName.c_str());
+    if ((attributes == INVALID_FILE_ATTRIBUTES) || (attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
+    
+    return true;
+}
+
+bool directoryExists(const std::string& pathName)
+{
+    if (!checkDirectoryAccess(pathName))
+        return false;
+    
+    std::string fixedName = getOSPath(unfixPath(pathName), true);
+    DWORD attributes = GetFileAttributes(fixedName.c_str());
+    if ((attributes == INVALID_FILE_ATTRIBUTES) || (!(attributes & FILE_ATTRIBUTE_DIRECTORY)))
+        return false;
+    
+    return true;
 }
 
 void createDirectory(const std::string& pathName)
@@ -203,7 +214,14 @@ void createDirectory(const std::string& pathName)
     SAFE_EXCEPTION("Failed to create directory " + pathName);
 }
 
-std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive)
+std::string getWorkingDirectory()
+{
+    char currentDir[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, currentDir);
+    return fixPath(std::string(currentDir));
+}
+
+std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, bool recursive, bool directories, bool hidden)
 {
     std::vector<std::string> ret;
     
@@ -216,7 +234,7 @@ std::vector<std::string> scanDirectory(const std::string& pathName, const std::s
     if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
         return ret;
     
-    scanDirectoryInternal(ret, "", filter, recursive);
+    scanDirectoryInternal(ret, "", filter, recursive, directories, hidden);
     SetCurrentDirectory(oldDir);
     
     return ret;
@@ -329,6 +347,18 @@ std::string fixPath(const std::string& path)
     return replace(ret, '\\', '/');
 }
 
+std::string unfixPath(const std::string& path)
+{
+    if (!path.empty())
+    {
+        char last = path[path.length() - 1];
+        if ((last == '/') || (last == '\\'))
+            return path.substr(0, path.length() - 1);
+    }
+    
+    return path;
+}
+
 std::string getOSPath(const std::string& pathName, bool forNativeApi)
 {
     // On MSVC, replace slash always with backslash. On MinGW only if going to do Win32 native calls
@@ -342,7 +372,7 @@ std::string getOSPath(const std::string& pathName, bool forNativeApi)
         return pathName;
 }
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive)
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, bool recursive, bool directories, bool hidden)
 {
     path = fixPath(path);
     std::string pathAndFilter = getOSPath(path + filter, true);
@@ -354,15 +384,18 @@ void scanDirectoryInternal(std::vector<std::string>& result, std::string path, c
         do
         {
             std::string fileName((const char*)&info.cFileName[0]);
-            // Avoid files like . .. and .svn
-            if ((!fileName.empty()) && (fileName[0] != '.'))
+            if (!fileName.empty())
             {
+                if ((info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && (!hidden))
+                    continue;
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
-                    if (recursive)
-                        scanDirectoryInternal(result, path + fileName, filter, true);
+                    if (directories)
+                        result.push_back(path + fileName);
+                    if ((recursive) && (fileName != ".") && (fileName != ".."))
+                        scanDirectoryInternal(result, path + fileName, filter, recursive, directories, hidden);
                 }
-                else
+                else if (!directories)
                     result.push_back(path + fileName);
             }
         } 

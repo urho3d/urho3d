@@ -124,7 +124,7 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
 void ScrollBar::onResize()
 {
     // Disable layout operations while setting the button sizes is incomplete
-    mUpdateLayoutNestingLevel++;
+    disableLayoutUpdate();
     
     if (mSlider->getOrientation() == O_HORIZONTAL)
     {
@@ -139,7 +139,7 @@ void ScrollBar::onResize()
         mForwardButton->setFixedSize(width, width);
     }
     
-    mUpdateLayoutNestingLevel--;
+    enableLayoutUpdate();
 }
 
 void ScrollBar::setOrientation(Orientation orientation)

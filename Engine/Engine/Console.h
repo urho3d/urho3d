@@ -31,8 +31,9 @@
 class BorderImage;
 class Engine;
 class Font;
-class Text;
 class LineEdit;
+class Text;
+class XMLFile;
 
 //! A console window with log history and AngelScript prompt
 class Console : public RefCounted, public EventListener, public LogListener
@@ -46,27 +47,29 @@ public:
     //! Write a log message
     virtual void write(const std::string& message);
     
+    //! Set UI elements' style from an XML file
+    void setStyle(XMLFile* style);
     //! Show or hide. Showing automatically focuses the line edit
     void setVisible(bool enable);
     //! Toggle visibility
     void toggle();
     //! Set number of rows
     void setNumRows(unsigned rows);
-    //! Set font to use
-    void setFont(Font* font, int size);
+    //! Update elements to layout properly. Call this after manually adjusting the sub-elements
+    void updateElements();
     
-    //! Return whether is visible
-    bool isVisible() const;
-    //! Return number of rows
-    unsigned getNumRows() const { return mRows.size(); }
+    //! Return the UI style file
+    XMLFile* getStyle() const { return mStyle; }
     //! Return the background element
     BorderImage* getBackground() const { return mBackground; }
     //! Return the line edit element
     LineEdit* getLineEdit() const { return mLineEdit; }
+    //! Return whether is visible
+    bool isVisible() const;
+    //! Return number of rows
+    unsigned getNumRows() const { return mRows.size(); }
     
 private:
-    //! Update layout
-    void updateElements();
     //! Handle enter pressed on the line edit
     void handleTextFinished(StringHash eventType, VariantMap& eventData);
     //! Handle rendering window resize
@@ -74,16 +77,14 @@ private:
     
     //! Engine
     Engine* mEngine;
+    //! UI style file
+    SharedPtr<XMLFile> mStyle;
     //! Background
     SharedPtr<BorderImage> mBackground;
-    //! Font
-    SharedPtr<Font> mFont;
     //! Text rows
     std::vector<SharedPtr<Text> > mRows;
     //! Line edit
     SharedPtr<LineEdit> mLineEdit;
-    //! Font size
-    int mFontSize;
 };
 
 #endif // ENGINE_CONSOLE_H
