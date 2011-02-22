@@ -39,38 +39,30 @@ Component::Component(const std::string& name) :
 
 void Component::save(Serializer& dest)
 {
-    // Write type hash & name
+    // Write identification and netflags
     dest.writeShortStringHash(getType());
     dest.writeString(mName);
-    
-    // Write netflags
     dest.writeUByte(mNetFlags);
 }
 
 void Component::load(Deserializer& source, ResourceCache* cache)
 {
-    // Type and name are handled on the Entity level
-    
-    // Read netflags
+    // Entity reads the identification, so do not read here
     mNetFlags = source.readUByte();
 }
 
 void Component::saveXML(XMLElement& dest)
 {
-    // Write typename & name
+    // Write identification and netflags
     dest.setString("type", getTypeName());
     if (!mName.empty())
         dest.setString("name", mName);
-    
-    // Write netflags
     dest.setInt("netflags", mNetFlags);
 }
 
 void Component::loadXML(const XMLElement& source, ResourceCache* cache)
 {
-    // Type and name are handled on the Entity level
-    
-    // Read netflags
+    // Entity reads the identification, so do not read here
     mNetFlags = source.getInt("netflags");
 }
 
@@ -160,8 +152,8 @@ ComponentRef::ComponentRef(Component* component, bool forXML) :
     }
     else
     {
-        // The component does not directly belong to an entity. However, if it is a scene node, check if any of the components
-        // in the parent chain belongs to an entity
+        // The component does not directly belong to an entity. However, if it is a scene node,
+        // check if any of the components in the parent chain belongs to an entity, and use its ID in that case
         Node* node = dynamic_cast<Node*>(component);
         while (node)
         {

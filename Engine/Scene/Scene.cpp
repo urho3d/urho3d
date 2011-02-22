@@ -871,6 +871,20 @@ Entity* Scene::getEntity(StringHash nameHash) const
     return 0;
 }
 
+std::vector<Entity*> Scene::getEntities(unsigned includeFlags, unsigned excludeFlags) const
+{
+    std::vector<Entity*> ret;
+    
+    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = mEntities.begin(); i != mEntities.end(); ++i)
+    {
+        unsigned flags = i->second->getGroupFlags();
+        if ((flags & includeFlags) && (!(flags & excludeFlags)))
+            ret.push_back(i->second);
+    }
+    
+    return ret;
+}
+
 Component* Scene::getComponent(const ComponentRef& ref) const
 {
     if (!ref.mEntityID)

@@ -897,6 +897,7 @@ void Server::writeNetUpdate(Connection* connection, Serializer& dest)
                 dest.writeUShort(entity->getID());
                 dest.writeString(entity->getName());
                 dest.writeUByte(getClientNetFlags(connection, entity, entity->getNetFlags()));
+                dest.writeVLE(entity->getGroupFlags());
                 
                 // Write a full update of entity properties
                 newRevision.seek(0);
@@ -1058,8 +1059,8 @@ void Server::writeNetUpdate(Connection* connection, Serializer& dest)
 
 void Server::getRelevantEntities(Connection* connection, std::set<EntityID>& dest) const
 {
-    // Here we just generate the raw set of relevant entities based on their owner, distance and references. An entity might
-    // need to stay relevant because it has unacked changes, or has time left in its relevancy timer, but that is checked in
+    // Generate just the raw set of relevant entities based on their owner, distance and references. An entity might need
+    // to stay relevant because it has unacked changes, or has time left in its relevancy timer, but that is checked in
     // writeNetUpdate()
     PROFILE(Server_GetRelevantEntities);
     

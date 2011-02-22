@@ -33,6 +33,7 @@ Entity::Entity(EntityID id, const std::string& name) :
     mName(name),
     mNameHash(name),
     mNetFlags(NET_SYNCTOALL),
+    mGroupFlags(0),
     mScene(0),
     mOwner(0),
     mNextComponentName(0x30),
@@ -55,7 +56,8 @@ void Entity::onEvent(EventListener* sender, StringHash eventType, VariantMap& ev
     {
         // Do not check if the component actually subscribes to the event, because its onEvent() does that check
         mEventListeners[i]->onEvent(sender, eventType, eventData);
-        // Exit if entity was removed as a response to the event
+        
+        // Exit immediately if entity was removed as a response to the event
         if (self.isExpired())
             return;
     }
@@ -63,13 +65,12 @@ void Entity::onEvent(EventListener* sender, StringHash eventType, VariantMap& ev
 
 void Entity::save(Serializer& dest)
 {
-    // Write ID & name
+    // Write identification and flags
     dest.writeUInt(mID);
     dest.writeString(mName);
-    
-    // Write netflags and update distance
     dest.writeUByte(mNetFlags);
     dest.writeFloat(mNetUpdateDistance);
+    dest.writeUInt(mGroupFlags);
     
     // Write properties
     dest.writeVLE(mProperties.size());
@@ -88,14 +89,13 @@ void Entity::save(Serializer& dest)
 
 void Entity::load(Deserializer& source, ResourceCache* cache)
 {
-    // ID and name are handled at the Scene level
-    
     // Load should only be called for new entities, but remove components just to be sure
     removeAllComponents();
     
-    // Read netflags and update distance
+    // Scene reads the identification, so do not read here
     mNetFlags = source.readUByte();
     mNetUpdateDistance = source.readFloat();
+    mGroupFlags = source.readUInt();
     
     // Read properties
     mProperties.clear();
@@ -122,14 +122,13 @@ void Entity::load(Deserializer& source, ResourceCache* cache)
 
 void Entity::saveXML(XMLElement& dest)
 {
-    // Write ID & name
+    // Write identification and flags
     dest.setInt("id", mID);
     if (!mName.empty())
         dest.setString("name", mName);
-    
-    // Write netflags & netupdate distance
     dest.setInt("netflags", mNetFlags);
     dest.setFloat("netdistance", mNetUpdateDistance);
+    dest.setInt("groupflags", mGroupFlags);
     
     // Write properties
     for (PropertyMap::const_iterator i = mProperties.begin(); i != mProperties.end(); ++i)
@@ -155,14 +154,13 @@ void Entity::saveXML(XMLElement& dest)
 
 void Entity::loadXML(const XMLElement& source, ResourceCache* cache)
 {
-    // ID and name are handled at the Scene level
-    
     // Load should only be called for new entities, but remove components just to be sure
     removeAllComponents();
     
-    // Read netflags
+    // Scene reads the identification, so do not read here
     mNetFlags = source.getInt("netflags");
     mNetUpdateDistance = source.getFloat("netdistance");
+    mGroupFlags = source.getInt("groupflags");
     
     // Read properties
     mProperties.clear();
@@ -293,6 +291,11 @@ void Entity::setNetFlags(unsigned char flags)
         mNetFlags = (mNetFlags & NET_MODEFLAGS) | (flags & ~NET_MODEFLAGS);
     else
         mNetFlags = flags;
+}
+
+void Entity::setGroupFlags(unsigned flags)
+{
+    mGroupFlags = flags;
 }
 
 void Entity::setOwner(Connection* owner)

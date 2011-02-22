@@ -977,6 +977,7 @@ void Client::readNetUpdateBlock(Deserializer& source, unsigned char msgID, const
                 entity->setOwner(mServerConnection);
             else
                 entity->setOwner(0);
+            entity->setGroupFlags(source.readVLE());
             
             entity->setProperties(source.readVariantMap(), true);
             

@@ -4,7 +4,7 @@
         <linear restthreshold="0.1" dampingthreshold="0" dampingscale="0.001" />
     </physics>
     <interpolation predictiontime="2" constant="50" snapthreshold="200" />
-    <entity id="65536" name="Zone" netflags="0" netdistance="0">
+    <entity id="65536" name="Zone" netflags="0" netdistance="0" groupflags="0">
         <component type="Zone" netflags="0">
             <transform pos="0 0 0" rot="1 0 0 0" scale="1 1 1" />
             <render castshadows="false" occluder="false" visible="true" />
@@ -32,7 +32,7 @@
             <material index="0" name="Materials/CloudPlane.xml" />
         </component>
     </entity>
-    <entity id="65537" name="Static" netflags="0" netdistance="0">
+    <entity id="65537" name="Static" netflags="0" netdistance="0" groupflags="0">
         <component type="StaticModel" netflags="0">
             <transform pos="0 0 0" rot="1 0 0 0" scale="1 1 1" />
             <parent id="65537" type="RigidBody" />
@@ -43,7 +43,7 @@
         </component>
         <component type="RigidBody" netflags="0">
             <transform pos="0 0 0" rot="1 0 0 0" scale="1 1 1" />
-            <body mode="0" mass="1.0" friction="0.5" bounce="0" active="false" />
+            <body mode="static" mass="1.0" friction="0.5" bounce="0" active="false" />
             <collision shape="Physics/Level.xml" group="2" mask="3" />
         </component>
     </entity>

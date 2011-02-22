@@ -161,6 +161,8 @@ public:
     unsigned getNumEntities() const { return mEntities.size(); }
     //! Return all entities
     const std::map<EntityID, SharedPtr<Entity> >& getEntities() const { return mEntities; }
+    //! Return entities by group flags
+    std::vector<Entity*> getEntities(unsigned includeFlags, unsigned excludeFlags) const;
     //! Return a component by component reference, or null if not found
     Component* getComponent(const ComponentRef& ref) const;
     //! Return entity position by going through scene node components it has (RigidBody is preferred)

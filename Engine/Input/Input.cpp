@@ -44,7 +44,8 @@ Input::Input(Renderer* renderer) :
     
     makeActive();
     
-    subscribeToEvent(mRenderer, EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
+    if (mRenderer)
+        subscribeToEvent(mRenderer, EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
 }
 
 Input::~Input()

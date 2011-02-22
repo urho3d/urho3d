@@ -220,6 +220,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Entity", asBEHAVE_RELEASE, "void f()", asMETHOD(Entity, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void setName(const string& in)", asMETHOD(Entity, setName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void setNetFlags(uint8)", asMETHOD(Entity, setNetFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Entity", "void setGroupFlags(uint)", asMETHOD(Entity, setGroupFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void setProperty(const string& in, const Variant& in)", asFUNCTION(EntitySetProperty), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "void setProperty(const string& in, const Variant& in, bool)", asFUNCTION(EntitySetPropertyWithSync), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "void setPropertySync(const string& in, bool)", asFUNCTION(EntitySetPropertySync), asCALL_CDECL_OBJLAST);
@@ -238,6 +239,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "bool isLocal() const", asMETHOD(Entity, isLocal), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "const string& getName() const", asMETHOD(Entity, getName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "uint8 getNetFlags() const", asMETHOD(Entity, getNetFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Entity", "uint getGroupFlags() const", asMETHOD(Entity, getGroupFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "Scene@+ getScene() const", asMETHOD(Entity, getScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "const Variant& getProperty(const string& in)", asFUNCTION(EntityGetProperty), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "bool getPropertySync(const string& in)", asFUNCTION(EntityGetPropertySync), asCALL_CDECL_OBJLAST);
@@ -401,6 +403,12 @@ static CScriptArray* SceneGetEntities(Scene* ptr)
     return vectorToHandleArray<Entity>(result, "array<Entity@>");
 }
 
+static CScriptArray* SceneGetEntitiesWithFlags(unsigned includeFlags, unsigned excludeFlags, Scene* ptr)
+{
+    std::vector<Entity*> result = ptr->getEntities(includeFlags, excludeFlags);
+    return vectorToHandleArray<Entity>(result, "array<Entity@>");
+}
+
 static CScriptArray* SceneGetScriptedEntities(Scene* ptr)
 {
     const std::map<EntityID, SharedPtr<Entity> >& entities = ptr->getEntities();
@@ -466,6 +474,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Entity@+ getEntity(const string& in) const", asMETHODPR(Scene, getEntity, (const std::string&) const, Entity*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "uint getNumEntities() const", asMETHOD(Scene, getNumEntities), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities() const", asFUNCTION(SceneGetEntities), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "array<Entity@>@ getEntities(uint, uint) const", asFUNCTION(SceneGetEntitiesWithFlags), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getScriptedEntities() const", asFUNCTION(SceneGetScriptedEntities), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getScriptedEntities(const string& in) const", asFUNCTION(SceneGetScriptedEntitiesWithClass), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Vector3 getEntityPosition(Entity@+) const", asMETHOD(Scene, getEntityPosition), asCALL_THISCALL);

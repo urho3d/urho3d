@@ -173,4 +173,3 @@ void Menu::handleTryFocus(StringHash eventType, VariantMap& eventData)
     
     showPopup(false);
 }
-

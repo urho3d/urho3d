@@ -91,6 +91,8 @@ public:
     void getResourceRefs(std::vector<Resource*>& dest);
     //! Set name
     void setName(const std::string& name);
+   //! Set group flags
+    void setGroupFlags(unsigned flags);
     //! Set network replication flags
     void setNetFlags(unsigned char flags);
     //! Set network owner
@@ -144,6 +146,8 @@ public:
     const std::string& getName() const { return mName; }
     //! Return name hash
     StringHash getNameHash() const { return mNameHash; }
+    //! Return group flags
+    unsigned getGroupFlags() const { return mGroupFlags; }
     //! Return network replication flags
     unsigned char getNetFlags() const { return mNetFlags; }
     //! Return scene
@@ -244,6 +248,8 @@ private:
     StringHash mNameHash;
     //! Network replication flags
     unsigned char mNetFlags;
+    //! Group flags
+    unsigned mGroupFlags;
     //! Scene
     Scene* mScene;
     //! Network owner
