@@ -602,7 +602,7 @@ void UIElement::setVisible(bool enable)
     }
 }
 
-void UIElement::setUserData(const Variant& userData)
+void UIElement::setUserData(const VariantMap& userData)
 {
     mUserData = userData;
 }

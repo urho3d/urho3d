@@ -29,10 +29,20 @@
 
 #include "DebugNew.h"
 
+static const ShortStringHash indentHash("Indent");
+
+int getItemIndent(UIElement* item)
+{
+    if (!item)
+        return 0;
+    return item->getUserData()[indentHash].getInt();
+}
+
 ListView::ListView(const std::string& name) :
     ScrollView(name),
     mSelection(M_MAX_UNSIGNED),
     mShowSelectionAlways(false),
+    mHierarchyMode(false),
     mDoubleClickInterval(0.5f),
     mDoubleClickTimer(0.0f)
 {
@@ -59,8 +69,13 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         while (itemElem)
         {
             if (itemElem.hasAttribute("name"))
-                addItem(root->getChild(itemElem.getString("name"), true));
-            itemElem = itemElem.getNextElement("listitem");
+            {
+                UIElement* item = root->getChild(itemElem.getString("name"), true);
+                addItem(item);
+                if (itemElem.hasAttribute("indent"))
+                    item->getUserData()[indentHash] = itemElem.getInt("indent");
+                itemElem = itemElem.getNextElement("listitem");
+            }
         }
     }
     
@@ -68,6 +83,8 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         setSelection(element.getChildElement("selection").getInt("value"));
     if (element.hasChildElement("showselectionalways"))
         setShowSelectionAlways(element.getChildElement("showselectionalways").getBool("enable"));
+    if (element.hasChildElement("hierarchymode"))
+        setHierarchyMode(element.getChildElement("hierarchymode").getBool("enable"));
     if (element.hasChildElement("doubleclickinterval"))
         setDoubleClickInterval(element.getChildElement("doubleclickinterval").getFloat("value"));
 }
@@ -81,64 +98,104 @@ void ListView::update(float timeStep)
 void ListView::onKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
-    if ((mSelection != M_MAX_UNSIGNED) && (getNumItems()))
+    unsigned numItems = getNumItems();
+    
+    if ((mSelection != M_MAX_UNSIGNED) && (numItems))
     {
         switch (key)
         {
+        case KEY_LEFT:
+            if (mHierarchyMode)
+            {
+                setChildItemsVisible(false);
+                return;
+            }
+            break;
+            
+        case KEY_RIGHT:
+            if (mHierarchyMode)
+            {
+                setChildItemsVisible(true);
+                return;
+            }
+            break;
+            
+        case KEY_RETURN:
+            if (mHierarchyMode)
+            {
+                toggleChildItemsVisible();
+                return;
+            }
+            break;
+            
         case KEY_UP:
             if (qualifiers & QUAL_CTRL)
-                setSelection(0);
+                changeSelection(-(int)numItems);
             else
                 changeSelection(-1);
-            break;
+            return;
             
         case KEY_DOWN:
             if (qualifiers & QUAL_CTRL)
-                setSelection(getNumItems() - 1);
+                changeSelection(numItems);
             else
                 changeSelection(1);
-            break;
+            return;
             
         case KEY_PAGEUP:
             {
                 // Convert page step to pixels and see how many items we have to skip to reach that many pixels
                 int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
                 unsigned newSelection = mSelection;
-                while (newSelection)
+                unsigned okSelection = mSelection;
+                while (newSelection < numItems)
                 {
-                    int height = getItem(newSelection)->getHeight();
+                    UIElement* item = getItem(newSelection);
+                    int height = 0;
+                    if (item->isVisible())
+                    {
+                        height = item->getHeight();
+                        okSelection = newSelection;
+                    }
                     if (stepPixels < height)
                         break;
                     stepPixels -= height;
                     --newSelection;
                 }
-                setSelection(newSelection);
+                setSelection(okSelection);
             }
-            break;
+            return;
             
         case KEY_PAGEDOWN:
             {
                 int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
                 unsigned newSelection = mSelection;
-                while (newSelection < getNumItems() - 1)
+                unsigned okSelection = mSelection;
+                while (newSelection < numItems)
                 {
-                    int height = getItem(newSelection)->getHeight();
+                    UIElement* item = getItem(newSelection);
+                    int height = 0;
+                    if (item->isVisible())
+                    {
+                        height = item->getHeight();
+                        okSelection = newSelection;
+                    }
                     if (stepPixels < height)
                         break;
                     stepPixels -= height;
                     ++newSelection;
                 }
-                setSelection(newSelection);
+                setSelection(okSelection);
             }
-            break;
+            return;
             
         case KEY_HOME:
-            setSelection(0);
-            break;
+            changeSelection(-(int)getNumItems());
+            return;
             
         case KEY_END:
-            setSelection(getNumItems() - 1);
-            break;
+            changeSelection(getNumItems());
+            return;
         }
     }
     
@@ -220,6 +277,11 @@ void ListView::setSelection(unsigned index)
 {
     if (index >= getNumItems())
         index = M_MAX_UNSIGNED;
+    else
+    {
+        if (!getItem(index)->isVisible())
+            index = M_MAX_UNSIGNED;
+    }
     
     mSelection = index;
     updateSelectionEffect();
@@ -238,8 +300,35 @@ void ListView::changeSelection(int delta)
     if (mSelection == M_MAX_UNSIGNED)
         return;
     
-    int newSelection = clamp((int)mSelection + delta, 0, (int)getNumItems() - 1);
-    setSelection(newSelection);
+    unsigned numItems = getNumItems();
+    unsigned newSelection = mSelection;
+    unsigned okSelection = mSelection;
+    while (delta != 0)
+    {
+        if (delta > 0)
+        {
+            ++newSelection;
+            if (newSelection >= numItems)
+                break;
+        }
+        if (delta < 0)
+        {
+            --newSelection;
+            if (newSelection >= numItems)
+                break;
+        }
+        UIElement* item = getItem(newSelection);
+        if (item->isVisible())
+        {
+            okSelection = newSelection;
+            if (delta > 0)
+                --delta;
+            if (delta < 0)
+                ++delta;
+        }
+    }
+    
+    setSelection(okSelection);
 }
 
 void ListView::clearSelection()
@@ -252,9 +341,50 @@ void ListView::setShowSelectionAlways(bool enable)
     mShowSelectionAlways = enable;
 }
 
+void ListView::setHierarchyMode(bool enable)
+{
+    mHierarchyMode = enable;
+}
+
 void ListView::setDoubleClickInterval(float interval)
 {
     mDoubleClickInterval = interval;
+}
+
+void ListView::setChildItemsVisible(bool enable)
+{
+    if ((!mHierarchyMode) || (mSelection == M_MAX_UNSIGNED))
+        return;
+    
+    unsigned numItems = getNumItems();
+    int baseIndent = getItemIndent(getSelectedItem());
+    
+    for (unsigned i = mSelection + 1; i < numItems; ++i)
+    {
+        UIElement* item = getItem(i);
+        if (getItemIndent(item) > baseIndent)
+            item->setVisible(enable);
+        else
+            break;
+    }
+}
+
+void ListView::toggleChildItemsVisible()
+{
+    if ((!mHierarchyMode) || (mSelection == M_MAX_UNSIGNED))
+        return;
+    
+    unsigned numItems = getNumItems();
+    int baseIndent = getItemIndent(getSelectedItem());
+    
+    for (unsigned i = mSelection + 1; i < numItems; ++i)
+    {
+        UIElement* item = getItem(i);
+        if (getItemIndent(item) > baseIndent)
+            item->setVisible(!item->isVisible());
+        else
+            break;
+    }
 }
 
 unsigned ListView::getNumItems() const
@@ -329,6 +459,9 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
             
             if (isDoubleClick)
             {
+                if (mHierarchyMode)
+                    toggleChildItemsVisible();
+                
                 VariantMap eventData;
                 eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
                 eventData[ItemDoubleClicked::P_SELECTION] = mSelection;

@@ -444,7 +444,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setFocus(bool)", asMETHOD(T, setFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setSelected(bool)", asMETHOD(T, setSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setUserData(const Variant& in)", asMETHOD(T, setUserData), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setUserData(const VariantMap& in)", asMETHOD(T, setUserData), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setLayout(LayoutMode, int, const IntRect&)", asMETHOD(T, setLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLayoutSpacing(int)", asMETHOD(T, setLayoutSpacing), asCALL_THISCALL);
@@ -484,7 +484,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isVisible() const", asMETHOD(T, isVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isHovering() const", asMETHOD(T, isHovering), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool hasColorGradient() const", asMETHOD(T, hasColorGradient), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const Variant& getUserData() const", asMETHOD(T, getUserData), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const VariantMap& getUserData() const", asMETHOD(T, getUserData), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "LayoutMode getLayoutMode() const", asMETHOD(T, getLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getLayoutSpacing() const", asMETHOD(T, getLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getLayoutBorder() const", asMETHOD(T, getLayoutBorder), asCALL_THISCALL);

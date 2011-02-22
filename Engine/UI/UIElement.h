@@ -208,7 +208,7 @@ public:
     //! Set whether is visible
     void setVisible(bool enable);
     //! Set userdata
-    void setUserData(const Variant& userData);
+    void setUserData(const VariantMap& userData);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
@@ -289,7 +289,7 @@ public:
     //! Return whether has different color in at least one corner
     bool hasColorGradient() const { return mHasColorGradient; }
     //! Return userdata
-    Variant getUserData() const { return mUserData; }
+    VariantMap& getUserData() { return mUserData; }
     //! Return layout mode
     LayoutMode getLayoutMode() const { return mLayoutMode; }
     //! Return layout spacing
@@ -376,7 +376,7 @@ protected:
     //! Hovering flag
     bool mHovering;
     //! Userdata
-    Variant mUserData;
+    VariantMap mUserData;
     //! Layout mode
     LayoutMode mLayoutMode;
     //! Layout spacing

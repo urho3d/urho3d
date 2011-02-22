@@ -66,8 +66,14 @@ public:
     void clearSelection();
     //! Set whether to show selection even when defocused, default false
     void setShowSelectionAlways(bool enable);
+    //! Enable hierarchical mode (allows hiding/showing items that have "indent" userdata)
+    void setHierarchyMode(bool enable);
     //! Set item doubleclick interval in seconds
     void setDoubleClickInterval(float interval);
+    //! Show or hide child items starting from the current selection. Only has effect in hierarchical mode
+    void setChildItemsVisible(bool enable);
+    //! Toggle child items visibility. Only has effect in hierarchical mode
+    void toggleChildItemsVisible();
     
     //! Return number of items
     unsigned getNumItems() const;
@@ -81,6 +87,8 @@ public:
     UIElement* getSelectedItem() const;
     //! Return whether to show selection even when defocused
     bool getShowSelectionAlways() const { return mShowSelectionAlways; }
+    //! Return hierarchical operation flag
+    bool getHierarchyMode() const { return mHierarchyMode; }
     //! Return item doubleclick interval in seconds
     float getDoubleClickInterval() const { return mDoubleClickInterval; }
     
@@ -94,6 +102,8 @@ protected:
     unsigned mSelection;
     //! Show selection even when defocused flag
     bool mShowSelectionAlways;
+    //! Hierarchical operation flag
+    bool mHierarchyMode;
     //! Doubleclick interval
     float mDoubleClickInterval;
     //! Doubleclick timer
