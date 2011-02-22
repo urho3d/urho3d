@@ -113,6 +113,9 @@ FileSelector::FileSelector(UI* ui) :
     subscribeToEvent(mFileList, EVENT_ITEMDOUBLECLICKED, EVENT_HANDLER(FileSelector, handleFileDoubleClicked));
     subscribeToEvent(mOKButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleOKPressed));
     subscribeToEvent(mCancelButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleCancelPressed));
+    
+    // Focus the file list initially
+    mUI->setFocusElement(mFileList);
 }
 
 FileSelector::~FileSelector()

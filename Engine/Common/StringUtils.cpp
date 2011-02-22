@@ -130,17 +130,16 @@ void replaceInPlace(std::string& str, char replaceThis, char replaceWith)
 
 void replaceInPlace(std::string& str, const std::string& replaceThis, const std::string& replaceWith)
 {
-    // Check for possibility of infinite loop and terminate in that case
-    if (replaceWith.find(replaceThis) != std::string::npos)
-        return;
+    size_t nextIndex = 0;
     
-    for (;;)
+    while (nextIndex < str.length())
     {
-        size_t index = str.find(replaceThis);
+        size_t index = str.find(replaceThis, nextIndex);
         if (index == std::string::npos)
             break;
         
         str.replace(index, replaceThis.length(), replaceWith);
+        nextIndex = index + replaceWith.length();
     }
 }
 
