@@ -100,8 +100,8 @@ protected:
     float mDoubleClickTimer;
     
 private:
-    //! Handle focus change to check for selection change
-    void handleTryFocus(StringHash eventType, VariantMap& eventData);
+    //! Handle global UI mouseclick to check for selection change
+    void handleUIMouseClick(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_LISTVIEW_H

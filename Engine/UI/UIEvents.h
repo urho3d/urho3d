@@ -26,6 +26,17 @@
 
 #include "Event.h"
 
+//! Mouse click in the UI
+DEFINE_EVENT(EVENT_UIMOUSECLICK, UIMouseClick)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_X, X);                        // int
+    EVENT_PARAM(P_Y, Y);                        // int
+    EVENT_PARAM(P_BUTTON, Button);              // int
+    EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
+}
+
 //! UI element resized
 DEFINE_EVENT(EVENT_RESIZED, Resized)
 {
@@ -39,12 +50,6 @@ DEFINE_EVENT(EVENT_VISIBLECHANGED, VisibleChanged)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
     EVENT_PARAM(P_VISIBLE, Visible);            // bool
-}
-
-//! Trying to focus an UI element. Sent before checking for success. Also sent with 0 pointer for global defocus
-DEFINE_EVENT(EVENT_TRYFOCUS, TryFocus)
-{
-    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
 //! UI element focused
@@ -126,6 +131,15 @@ DEFINE_EVENT(EVENT_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
     EVENT_PARAM(P_SELECTION, Selection);        // int
+}
+
+//! Listview unhandled key pressed
+DEFINE_EVENT(EVENT_LISTVIEWKEY, ListViewKey)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_KEY, Key);                    // int
+    EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
 //! Fileselector choice

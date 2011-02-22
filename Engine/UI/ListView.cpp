@@ -41,7 +41,7 @@ ListView::ListView(const std::string& name) :
     container->setLayout(LM_VERTICAL);
     setContentElement(container);
     
-    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(ListView, handleTryFocus));
+    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(ListView, handleUIMouseClick));
 }
 
 ListView::~ListView()
@@ -81,76 +81,75 @@ void ListView::update(float timeStep)
 void ListView::onKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
-    if ((mSelection == M_MAX_UNSIGNED) || (!getNumItems()))
-        return;
-    
-    switch (key)
+    if ((mSelection != M_MAX_UNSIGNED) && (getNumItems()))
     {
-    case KEY_UP:
-        if (qualifiers & QUAL_CTRL)
+        switch (key)
+        {
+        case KEY_UP:
+            if (qualifiers & QUAL_CTRL)
+                setSelection(0);
+            else
+                changeSelection(-1);
+            break;
+            
+        case KEY_DOWN:
+            if (qualifiers & QUAL_CTRL)
+                setSelection(getNumItems() - 1);
+            else
+                changeSelection(1);
+            break;
+            
+        case KEY_PAGEUP:
+            {
+                // Convert page step to pixels and see how many items we have to skip to reach that many pixels
+                int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
+                unsigned newSelection = mSelection;
+                while (newSelection)
+                {
+                    int height = getItem(newSelection)->getHeight();
+                    if (stepPixels < height)
+                        break;
+                    stepPixels -= height;
+                    --newSelection;
+                }
+                setSelection(newSelection);
+            }
+            break;
+            
+        case KEY_PAGEDOWN:
+            {
+                int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
+                unsigned newSelection = mSelection;
+                while (newSelection < getNumItems() - 1)
+                {
+                    int height = getItem(newSelection)->getHeight();
+                    if (stepPixels < height)
+                        break;
+                    stepPixels -= height;
+                    ++newSelection;
+                }
+                setSelection(newSelection);
+            }
+            break;
+            
+        case KEY_HOME:
             setSelection(0);
-        else
-            changeSelection(-1);
-        break;
-        
-    case KEY_DOWN:
-        if (qualifiers & QUAL_CTRL)
+            break;
+            
+        case KEY_END:
             setSelection(getNumItems() - 1);
-        else
-            changeSelection(1);
-        break;
-        
-    case KEY_PAGEUP:
-        {
-            // Convert page step to pixels and see how many items we have to skip to reach that many pixels
-            int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
-            unsigned newSelection = mSelection;
-            while (newSelection)
-            {
-                int height = getItem(newSelection)->getHeight();
-                if (stepPixels < height)
-                    break;
-                stepPixels -= height;
-                --newSelection;
-            }
-            setSelection(newSelection);
+            break;
         }
-        break;
-        
-    case KEY_PAGEDOWN:
-        {
-            int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
-            unsigned newSelection = mSelection;
-            while (newSelection < getNumItems() - 1)
-            {
-                int height = getItem(newSelection)->getHeight();
-                if (stepPixels < height)
-                    break;
-                stepPixels -= height;
-                ++newSelection;
-            }
-            setSelection(newSelection);
-        }
-        break;
-        
-    case KEY_HOME:
-        setSelection(0);
-        break;
-        
-    case KEY_END:
-        setSelection(getNumItems() - 1);
-        break;
-    
-    case KEY_RETURN:
-        if (mSelection != M_MAX_UNSIGNED)
-        {
-            VariantMap eventData;
-            eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
-            eventData[ItemDoubleClicked::P_SELECTION] = mSelection;
-            sendEvent(EVENT_ITEMDOUBLECLICKED, eventData);
-        }
-        break;
     }
+    
+    using namespace ListViewKey;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)this;
+    eventData[P_KEY] = key;
+    eventData[P_BUTTONS] = buttons;
+    eventData[P_QUALIFIERS] = qualifiers;
+    sendEvent(EVENT_LISTVIEWKEY, eventData);
 }
 
 void ListView::onResize()
@@ -305,14 +304,17 @@ void ListView::ensureItemVisibility()
     setViewPosition(newView);
 }
 
-void ListView::handleTryFocus(StringHash eventType, VariantMap& eventData)
+void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
-    UIElement* focusElement = static_cast<UIElement*>(eventData[TryFocus::P_ELEMENT].getPtr());
+    if (eventData[UIMouseClick::P_BUTTON].getInt() != MOUSEB_LEFT)
+        return;
+    
+    UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].getPtr());
     
     unsigned numItems = getNumItems();
     for (unsigned i = 0; i < numItems; ++i)
     {
-        if (focusElement == getItem(i))
+        if (element == getItem(i))
         {
             bool isDoubleClick = false;
             if ((mDoubleClickTimer > 0.0f) && (mSelection == i))

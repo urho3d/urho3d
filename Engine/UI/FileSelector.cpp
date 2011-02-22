@@ -26,6 +26,7 @@
 #include "Exception.h"
 #include "File.h"
 #include "FileSelector.h"
+#include "InputEvents.h"
 #include "LineEdit.h"
 #include "ListView.h"
 #include "Text.h"
@@ -111,6 +112,7 @@ FileSelector::FileSelector(UI* ui) :
     subscribeToEvent(mPathEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handlePathChanged));
     subscribeToEvent(mFileList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFileSelected));
     subscribeToEvent(mFileList, EVENT_ITEMDOUBLECLICKED, EVENT_HANDLER(FileSelector, handleFileDoubleClicked));
+    subscribeToEvent(mFileList, EVENT_LISTVIEWKEY, EVENT_HANDLER(FileSelector, handleFileListKey));
     subscribeToEvent(mOKButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleOKPressed));
     subscribeToEvent(mCancelButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleCancelPressed));
     
@@ -366,42 +368,11 @@ void FileSelector::refreshFiles()
     mLastUsedFilter = getFilter();
 }
 
-void FileSelector::handleFilterChanged(StringHash eventType, VariantMap& eventData)
+bool FileSelector::enterFile()
 {
-    if (mIgnoreEvents)
-        return;
-    if (getFilter() != mLastUsedFilter)
-        refreshFiles();
-}
-
-void FileSelector::handlePathChanged(StringHash eventType, VariantMap& eventData)
-{
-    if (mIgnoreEvents)
-        return;
-    // Attempt to set path. Restores old if does not exist
-    setPath(mPathEdit->getText());
-}
-
-void FileSelector::handleFileSelected(StringHash eventType, VariantMap& eventData)
-{
-    if (mIgnoreEvents)
-        return;
     unsigned index = mFileList->getSelection();
     if (index >= mFileEntries.size())
-        return;
-    // If a file selected, update the filename edit field
-    if (!mFileEntries[index].mDirectory)
-        setFileName(mFileEntries[index].mName);
-}
-
-void FileSelector::handleFileDoubleClicked(StringHash eventType, VariantMap& eventData)
-{
-    if (mIgnoreEvents)
-        return;
-    
-    unsigned index = mFileList->getSelection();
-    if (index >= mFileEntries.size())
-        return;
+        return false;
     
     if (mFileEntries[index].mDirectory)
     {
@@ -426,10 +397,70 @@ void FileSelector::handleFileDoubleClicked(StringHash eventType, VariantMap& eve
         eventData[P_OK] = true;
         sendEvent(EVENT_FILESELECTED, eventData);
     }
+    
+    return true;
+}
+
+void FileSelector::handleFilterChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (mIgnoreEvents)
+        return;
+    
+    if (getFilter() != mLastUsedFilter)
+        refreshFiles();
+}
+
+void FileSelector::handlePathChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (mIgnoreEvents)
+        return;
+    
+    // Attempt to set path. Restores old if does not exist
+    setPath(mPathEdit->getText());
+}
+
+void FileSelector::handleFileSelected(StringHash eventType, VariantMap& eventData)
+{
+    if (mIgnoreEvents)
+        return;
+    
+    unsigned index = mFileList->getSelection();
+    if (index >= mFileEntries.size())
+        return;
+    // If a file selected, update the filename edit field
+    if (!mFileEntries[index].mDirectory)
+        setFileName(mFileEntries[index].mName);
+}
+
+void FileSelector::handleFileDoubleClicked(StringHash eventType, VariantMap& eventData)
+{
+    if (mIgnoreEvents)
+        return;
+    
+    enterFile();
+}
+
+void FileSelector::handleFileListKey(StringHash eventType, VariantMap& eventData)
+{
+    if (mIgnoreEvents)
+        return;
+    
+    using namespace ListViewKey;
+    
+    if (eventData[P_KEY].getInt() == KEY_RETURN)
+    {
+        bool entered = enterFile();
+        // When a key is used to enter a directory, select the first file if no selection
+        if ((entered) && (!mFileList->getSelectedItem()))
+            mFileList->setSelection(0);
+    }
 }
 
 void FileSelector::handleOKPressed(StringHash eventType, VariantMap& eventData)
 {
+    if (mIgnoreEvents)
+        return;
+    
     const std::string& fileName = getFileName();
     if (!fileName.empty())
     {
@@ -444,6 +475,9 @@ void FileSelector::handleOKPressed(StringHash eventType, VariantMap& eventData)
 
 void FileSelector::handleCancelPressed(StringHash eventType, VariantMap& eventData)
 {
+    if (mIgnoreEvents)
+        return;
+    
     using namespace FileSelected;
     
     VariantMap newEventData;

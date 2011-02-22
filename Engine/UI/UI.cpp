@@ -113,22 +113,6 @@ void UI::setCursor(Cursor* cursor)
 
 void UI::setFocusElement(UIElement* element)
 {
-    using namespace TryFocus;
-   
-    UIElement* originalElement = element;
-    WeakPtr<UIElement> elementWeak(element);
-    
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)element;
-    sendEvent(EVENT_TRYFOCUS, eventData);
-    
-    // The event receivers may optionally divert the focus
-    element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
-    // If element is unchanged, check that it did not expire (the event may have caused its deletion)
-    // In that case it is better to not touch focus at all
-    if ((element) && (element == originalElement) && (elementWeak.isExpired()))
-        return;
-    
     if (element)
     {
         // Return if already has focus
@@ -498,16 +482,27 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
 
 void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
 {
-    using namespace MouseButtonDown;
-    
-    mMouseButtons = eventData[P_BUTTONS].getInt();
-    mQualifiers = eventData[P_QUALIFIERS].getInt();
-    int button = eventData[P_BUTTON].getInt();
+    mMouseButtons = eventData[MouseButtonDown::P_BUTTONS].getInt();
+    mQualifiers = eventData[MouseButtonDown::P_QUALIFIERS].getInt();
+    int button = eventData[MouseButtonDown::P_BUTTON].getInt();
     
     if ((mCursor) && (mCursor->isVisible()))
     {
         IntVector2 pos = mCursor->getPosition();
         WeakPtr<UIElement> element(getElementAt(pos));
+        
+        // First send global click event, with or without an element
+        using namespace UIMouseClick;
+        
+        VariantMap eventData;
+        eventData[UIMouseClick::P_ELEMENT] = (void*)element.getPtr();
+        eventData[UIMouseClick::P_X] = pos.mX;
+        eventData[UIMouseClick::P_Y] = pos.mY;
+        eventData[UIMouseClick::P_BUTTON] = button;
+        eventData[UIMouseClick::P_BUTTONS] = mMouseButtons;
+        eventData[UIMouseClick::P_QUALIFIERS] = mQualifiers;
+        sendEvent(EVENT_UIMOUSECLICK, eventData);
+        
         if (element)
         {
             // Handle focusing & bringing to front

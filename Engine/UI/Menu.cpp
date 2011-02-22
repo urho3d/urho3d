@@ -33,7 +33,7 @@ Menu::Menu(const std::string& name) :
     mPopupOffset(IntVector2::sZero),
     mShowPopup(false)
 {
-    subscribeToEvent(EVENT_TRYFOCUS, EVENT_HANDLER(Menu, handleTryFocus));
+    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleUIMouseClick));
 }
 
 Menu::~Menu()
@@ -142,33 +142,33 @@ void Menu::showPopup(bool enable)
     mSelected = enable;
 }
 
-void Menu::handleTryFocus(StringHash eventType, VariantMap& eventData)
+void Menu::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     if (!mShowPopup)
         return;
     
-    using namespace TryFocus;
+    using namespace UIMouseClick;
     
-    UIElement* focusElement = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
+    UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
     UIElement* root = getRootElement();
     
-    // If global defocus, hide the popup
-    if (!focusElement)
+    // If clicked emptiness, hide the popup
+    if (!element)
     {
         showPopup(false);
         return;
     }
     
-    // Otherwise see if the focused element has either the menu item or the popup in its parent chain.
+    // Otherwise see if the clicked element has either the menu item or the popup in its parent chain.
     // In that case, do not hide
-    while (focusElement)
+    while (element)
     {
-        if ((focusElement == this) || (focusElement == mPopup))
+        if ((element == this) || (element == mPopup))
             return;
-        if (focusElement->getParent() == root)
-            focusElement = focusElement->getOrigin();
+        if (element->getParent() == root)
+            element = element->getOrigin();
         else
-            focusElement = focusElement->getParent();
+            element = element->getParent();
     }
     
     showPopup(false);

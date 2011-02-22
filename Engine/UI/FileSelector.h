@@ -97,6 +97,8 @@ public:
 private:
     //! Refresh the directory listing
     void refreshFiles();
+    //! Enter a directory or confirm a file. Return true if selection valid
+    bool enterFile();
     //! Handle filter changed
     void handleFilterChanged(StringHash eventType, VariantMap& eventData);
     //! Handle path edited
@@ -105,6 +107,8 @@ private:
     void handleFileSelected(StringHash eventType, VariantMap& eventData);
     //! Handle file doubleclicked from the list (enter directory / OK the file selection)
     void handleFileDoubleClicked(StringHash eventType, VariantMap& eventData);
+    //! Handle file list key pressed
+    void handleFileListKey(StringHash eventType, VariantMap& eventData);
     //! Handle OK button pressed
     void handleOKPressed(StringHash eventType, VariantMap& eventData);
     //! Handle cancel button pressed

@@ -68,8 +68,8 @@ protected:
     bool mShowPopup;
     
 private:
-    //! Handle focus change attempt in case the popup needs to be hidden
-    void handleTryFocus(StringHash eventType, VariantMap& eventData);
+    //! Handle global UI mouseclick to check for hiding the popup
+    void handleUIMouseClick(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_MENU_H

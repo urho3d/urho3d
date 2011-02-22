@@ -113,8 +113,6 @@ private:
     void handleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData);
     //! Handle content element resized
     void handleElementResized(StringHash eventType, VariantMap& eventData);
-    //! Handle focus change attempt (check if ScrollView needs to be focused)
-    void handleTryFocus(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_SCROLLVIEW_H
