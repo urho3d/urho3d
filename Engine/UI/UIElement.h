@@ -88,6 +88,13 @@ enum LayoutMode
     LM_VERTICAL
 };
 
+//! Drag and drop disabled
+static const unsigned DD_DISABLED = 0;
+//! Drag and drop source flag
+static const unsigned DD_SOURCE = 1;
+//! Drag and drop target flag
+static const unsigned DD_TARGET = 2;
+
 class ResourceCache;
 
 //! Base class for UI elements
@@ -122,6 +129,8 @@ public:
     virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
     //! React to mouse drag end
     virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
+    //! React to drag and drop finish
+    virtual void onDrop(UIElement* element);
     //! React to mouse wheel
     virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
@@ -207,6 +216,8 @@ public:
     void setSelected(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);
+    //! Set drag and drop flags
+    void setDragDropMode(unsigned mode);
     //! Set userdata
     void setUserData(const VariantMap& userData);
     //! Set style from an XML file. Find the style element automatically
@@ -288,6 +299,8 @@ public:
     bool isHovering() const { return mHovering; }
     //! Return whether has different color in at least one corner
     bool hasColorGradient() const { return mHasColorGradient; }
+    //! Return drag and drop flags
+    unsigned getDragDropMode() const { return mDragDropMode; }
     //! Return userdata
     VariantMap& getUserData() { return mUserData; }
     //! Return layout mode
@@ -375,6 +388,8 @@ protected:
     bool mVisible;
     //! Hovering flag
     bool mHovering;
+    //! Drag and drop flags
+    unsigned mDragDropMode;
     //! Userdata
     VariantMap mUserData;
     //! Layout mode

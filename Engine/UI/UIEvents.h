@@ -37,6 +37,13 @@ DEFINE_EVENT(EVENT_UIMOUSECLICK, UIMouseClick)
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
+//! Drag and drop
+DEFINE_EVENT(EVENT_UIDRAGDROP, UIDragDrop)
+{
+    EVENT_PARAM(P_SOURCE, Source);              // UIElement pointer
+    EVENT_PARAM(P_TARGET, Target);              // UIElement pointer
+};
+
 //! UI element resized
 DEFINE_EVENT(EVENT_RESIZED, Resized)
 {

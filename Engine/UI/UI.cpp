@@ -509,7 +509,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             if (button == MOUSEB_LEFT)
             {
                 setFocusElement(element);
-                // Must check the pointer after each operation, because any UI event may trigger its destruction
+                // Verify existence after each operation, because any calls/events may potentially destroy the element
                 if (element)
                     element->bringToFront();
             }
@@ -547,10 +547,32 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
         
         if ((mMouseDrag) && (!mMouseButtons))
         {
-            UIElement* element = verifyElement(mMouseDragElement);
+            WeakPtr<UIElement> element(verifyElement(mMouseDragElement));
             if ((element) && (element->isEnabled()) && (element->isVisible()))
+            {
                 element->onDragEnd(element->screenToElement(pos), pos);
-            
+                
+                // Check for drag and drop. Verify existence after each operation, because any calls/events may potentially destroy
+                // the elements
+                if ((element) && (element->getDragDropMode() & DD_SOURCE))
+                {
+                    WeakPtr<UIElement> target(getElementAt(pos));
+                    if ((target) && (target != element) && (target->getDragDropMode() & DD_TARGET))
+                    {
+                        target->onDrop(element);
+                        
+                        if ((target) && (element))
+                        {
+                            using namespace UIDragDrop;
+                            
+                            VariantMap eventData;
+                            eventData[P_SOURCE] = element;
+                            eventData[P_TARGET] = target;
+                            sendEvent(EVENT_UIDRAGDROP, eventData);
+                        }
+                    }
+                }
+            }
             mMouseDrag = false;
             mMouseDragElement = 0;
         }

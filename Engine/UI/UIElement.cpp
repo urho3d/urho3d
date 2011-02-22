@@ -46,6 +46,7 @@ UIElement::UIElement(const std::string& name) :
     mSelected(false),
     mVisible(true),
     mHovering(false),
+    mDragDropMode(DD_DISABLED),
     mLayoutMode(LM_FREE),
     mLayoutSpacing(0),
     mLayoutBorder(IntRect::sZero),
@@ -183,6 +184,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setSelected(element.getChildElement("selected").getBool("enable"));
     if (element.hasChildElement("visible"))
         setVisible(element.getChildElement("visible").getBool("enable"));
+    if (element.hasChildElement("dragdropmode"))
+        setDragDropMode(element.getChildElement("dragdropmode").getInt("value"));
+    if (element.hasChildElement("userdata"))
+        setUserData(element.getChildElement("userdat").getVariantMap());
     if (element.hasChildElement("layout"))
     {
         XMLElement layoutElem = element.getChildElement("layout");
@@ -303,6 +308,10 @@ void UIElement::onDragMove(const IntVector2& position, const IntVector2& screenP
 }
 
 void UIElement::onDragEnd(const IntVector2& position, const IntVector2& screenPosition)
+{
+}
+
+void UIElement::onDrop(UIElement* source)
 {
 }
 
@@ -600,6 +609,11 @@ void UIElement::setVisible(bool enable)
         eventData[P_VISIBLE] = mVisible;
         sendEvent(EVENT_VISIBLECHANGED, eventData);
     }
+}
+
+void UIElement::setDragDropMode(unsigned mode)
+{
+    mDragDropMode = mode;
 }
 
 void UIElement::setUserData(const VariantMap& userData)

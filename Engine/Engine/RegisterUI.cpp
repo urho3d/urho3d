@@ -79,6 +79,10 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("LayoutMode", "LM_HORIZONTAL", LM_HORIZONTAL);
     engine->RegisterEnumValue("LayoutMode", "LM_VERTICAL", LM_VERTICAL);
     
+    engine->RegisterGlobalProperty("const uint DD_DISABLED", (void*)&DD_DISABLED);
+    engine->RegisterGlobalProperty("const uint DD_SOURCE", (void*)&DD_SOURCE);
+    engine->RegisterGlobalProperty("const uint DD_TARGET", (void*)&DD_TARGET);
+    
     registerUIElement<UIElement>(engine, "UIElement");
     
     // Register static function for getting UI style XML element
