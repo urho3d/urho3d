@@ -149,14 +149,14 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         
         std::string horiz;
         std::string vert;
-        if (alignElem.hasAttribute("h"))
-            horiz = alignElem.getStringLower("h");
-        if (alignElem.hasAttribute("v"))
-            vert = alignElem.getStringLower("v");
         if (alignElem.hasAttribute("horizontal"))
             horiz = alignElem.getStringLower("horizontal");
         if (alignElem.hasAttribute("vertical"))
             vert = alignElem.getStringLower("vertical");
+        if (alignElem.hasAttribute("h"))
+            horiz = alignElem.getStringLower("h");
+        if (alignElem.hasAttribute("v"))
+            vert = alignElem.getStringLower("v");
         if (!horiz.empty())
             setHorizontalAlignment((HorizontalAlignment)getIndexFromStringList(horiz, horizontalAlignments, 3, 0));
         if (!vert.empty())
@@ -190,6 +190,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         setClipChildren(element.getChildElement("clipchildren").getBool("enable"));
     if (element.hasChildElement("enabled"))
         setEnabled(element.getChildElement("enabled").getBool("enable"));
+    if (element.hasChildElement("selected"))
+        setSelected(element.getChildElement("selected").getBool("enable"));
+    if (element.hasChildElement("visible"))
+        setVisible(element.getChildElement("visible").getBool("enable"));
     if (element.hasChildElement("focusmode"))
     {
         std::string focusMode = element.getChildElement("focusmode").getStringLower("value");
@@ -197,17 +201,11 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         if (focusMode == "defocusable")
             setFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
-    if (element.hasChildElement("selected"))
-        setSelected(element.getChildElement("selected").getBool("enable"));
-    if (element.hasChildElement("visible"))
-        setVisible(element.getChildElement("visible").getBool("enable"));
     if (element.hasChildElement("dragdropmode"))
     {
         std::string dragDropMode = element.getChildElement("dragdropmode").getStringLower("value");
         setDragDropMode(getIndexFromStringList(dragDropMode, dragDropModes, 4, 0));
     }
-    if (element.hasChildElement("userdata"))
-        setUserData(element.getChildElement("userdat").getVariantMap());
     if (element.hasChildElement("layout"))
     {
         XMLElement layoutElem = element.getChildElement("layout");
@@ -226,6 +224,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
         else
             updateLayout();
     }
+    if (element.hasChildElement("userdata"))
+        setUserData(element.getChildElement("userdat").getVariantMap());
 }
 
 void UIElement::update(float timeStep)
@@ -570,11 +570,6 @@ void UIElement::setDragDropMode(unsigned mode)
     mDragDropMode = mode;
 }
 
-void UIElement::setUserData(const VariantMap& userData)
-{
-    mUserData = userData;
-}
-
 void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
 {
     XMLElement element = getStyleElement(file);
@@ -599,6 +594,11 @@ void UIElement::setLayoutBorder(const IntRect& border)
 {
     mLayoutBorder = IntRect(max(border.mLeft, 0), max(border.mTop, 0), max(border.mRight, 0), max(border.mBottom, 0));
     updateLayout();
+}
+
+void UIElement::setUserData(const VariantMap& userData)
+{
+    mUserData = userData;
 }
 
 void UIElement::updateLayout()

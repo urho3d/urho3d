@@ -53,7 +53,7 @@ void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
     {
         UIElement* root = getRootElement();
         if (root)
-            setPopup(root->getChild(element.getChildElement("popup").getString("name"), true));
+            setPopup(root->getChild(popupElem.getString("name"), true));
     }
     
     if (element.hasChildElement("popupoffset"))

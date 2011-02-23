@@ -209,18 +209,16 @@ public:
     void setClipChildren(bool enable);
     //! Set whether reacts to input
     void setEnabled(bool enable);
-    //! Set focus mode
-    void setFocusMode(FocusMode mode);
     //! Set whether is focused. Usually called by UI
     void setFocus(bool enable);
     //! Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect
     void setSelected(bool enable);
     //! Set whether is visible
     void setVisible(bool enable);
+    //! Set focus mode
+    void setFocusMode(FocusMode mode);
     //! Set drag and drop flags
     void setDragDropMode(unsigned mode);
-    //! Set userdata
-    void setUserData(const VariantMap& userData);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
@@ -229,6 +227,8 @@ public:
     void setLayoutSpacing(int spacing);
     //! Set layout border
     void setLayoutBorder(const IntRect& border);
+    //! Set userdata
+    void setUserData(const VariantMap& userData);
     //! Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void updateLayout();
     //! Disable layout update momentarily, usually for performance reasons when adding several child elements
@@ -292,8 +292,6 @@ public:
     bool getClipChildren() const { return mClipChildren; }
     //! Return whether reacts to input
     bool isEnabled() const { return mEnabled; }
-    //! Return focus mode
-    FocusMode getFocusMode() const { return mFocusMode; }
     //! Return whether has focus
     bool hasFocus() const { return mFocus; }
     //! Return whether is selected. Actual meaning is element dependent
@@ -304,16 +302,18 @@ public:
     bool isHovering() const { return mHovering; }
     //! Return whether has different color in at least one corner
     bool hasColorGradient() const { return mHasColorGradient; }
+    //! Return focus mode
+    FocusMode getFocusMode() const { return mFocusMode; }
     //! Return drag and drop flags
     unsigned getDragDropMode() const { return mDragDropMode; }
-    //! Return userdata
-    VariantMap& getUserData() { return mUserData; }
     //! Return layout mode
     LayoutMode getLayoutMode() const { return mLayoutMode; }
     //! Return layout spacing
     int getLayoutSpacing() const { return mLayoutSpacing; }
     //! Return layout border
     const IntRect& getLayoutBorder() const { return mLayoutBorder; }
+    //! Return userdata
+    VariantMap& getUserData() { return mUserData; }
     //! Return number of child elements
     unsigned getNumChildren(bool recursive = false) const;
     //! Return child element by index
@@ -377,8 +377,6 @@ protected:
     bool mClipChildren;
     //! Reacts to input flag
     bool mEnabled;
-    //! Focus mode
-    FocusMode mFocusMode;
     //! Focused flag
     bool mFocus;
     //! Selected flag
@@ -387,6 +385,8 @@ protected:
     bool mVisible;
     //! Hovering flag
     bool mHovering;
+    //! Focus mode
+    FocusMode mFocusMode;
     //! Drag and drop flags
     unsigned mDragDropMode;
     //! Userdata

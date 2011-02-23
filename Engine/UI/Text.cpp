@@ -78,6 +78,12 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
     }
     if (element.hasChildElement("rowspacing"))
         setRowSpacing(element.getChildElement("rowspacing").getFloat("value"));
+    if (element.hasChildElement("text"))
+    {
+        std::string text = element.getChildElement("text").getString("value");
+        replaceInPlace(text, "\\n", "\n");
+        setText(text);
+    }
     if (element.hasChildElement("selection"))
     {
         XMLElement selectionElem = element.getChildElement("selection");
@@ -87,12 +93,6 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
         setSelectionColor(element.getChildElement("selectioncolor").getColor("value"));
     if (element.hasChildElement("hovercolor"))
         setHoverColor(element.getChildElement("hovercolor").getColor("value"));
-    if (element.hasChildElement("text"))
-    {
-        std::string text = element.getChildElement("text").getString("value");
-        replaceInPlace(text, "\\n", "\n");
-        setText(text);
-    }
 }
 
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)

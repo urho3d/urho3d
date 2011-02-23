@@ -68,16 +68,16 @@ void ScrollBar::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     UIElement::setStyle(element, cache);
     
-    if (element.hasChildElement("scrollstep"))
-        setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
-    if (element.hasChildElement("stepfactor"))
-        setStepFactor(element.getChildElement("stepfactor").getFloat("value"));
     if (element.hasChildElement("range"))
     {
         XMLElement rangeElem = element.getChildElement("range");
         setRange(rangeElem.getFloat("max"));
         setValue(rangeElem.getFloat("value"));
     }
+    if (element.hasChildElement("scrollstep"))
+        setScrollStep(element.getChildElement("scrollstep").getFloat("value"));
+    if (element.hasChildElement("stepfactor"))
+        setStepFactor(element.getChildElement("stepfactor").getFloat("value"));
     
     XMLElement backButtonElem = element.getChildElement("backbutton");
     if (backButtonElem)

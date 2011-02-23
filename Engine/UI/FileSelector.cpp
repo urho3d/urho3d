@@ -133,11 +133,8 @@ void FileSelector::setStyle(XMLFile* style)
     mStyle = style;
     ResourceCache* cache = mUI->getResourceCache();
     
-    XMLElement windowElem = UIElement::getStyleElement(style, "Window");
-    if (windowElem)
-        mWindow->setStyle(windowElem, cache);
-    
-    windowElem = UIElement::getStyleElement(style, "FileSelector");
+    mWindow->setStyleAuto(style, cache);
+    XMLElement windowElem = UIElement::getStyleElement(style, "FileSelector");
     if (windowElem)
         mWindow->setStyle(windowElem, cache);
     
@@ -159,31 +156,18 @@ void FileSelector::setStyle(XMLFile* style)
         mButtonLayout->setStyle(layoutElem, cache);
     }
     
-    XMLElement listViewElem = UIElement::getStyleElement(style, "ListView");
-    if (listViewElem)
-        mFileList->setStyle(listViewElem, cache);
+    mFileList->setStyleAuto(style, cache);
+    mFileNameEdit->setStyleAuto(style, cache);
+    mPathEdit->setStyleAuto(style, cache);
     
-    XMLElement lineEditElem = UIElement::getStyleElement(style, "LineEdit");
-    if (lineEditElem)
-    {
-        mFileNameEdit->setStyle(lineEditElem, cache);
-        mPathEdit->setStyle(lineEditElem, cache);
-    }
-    
-    XMLElement dropDownElem = UIElement::getStyleElement(style, "DropDownList");
-    if (dropDownElem)
-        mFilterList->setStyle(dropDownElem, cache);
-    dropDownElem = UIElement::getStyleElement(style, "FileSelectorFilterList");
+    mFilterList->setStyleAuto(style, cache);
+    XMLElement dropDownElem = UIElement::getStyleElement(style, "FileSelectorFilterList");
     if (dropDownElem)
         mFilterList->setStyle(dropDownElem, cache);
     
-    XMLElement buttonElem = UIElement::getStyleElement(style, "Button");
-    if (buttonElem)
-    {
-        mOKButton->setStyle(buttonElem, cache);
-        mCancelButton->setStyle(buttonElem, cache);
-    }
-    buttonElem = UIElement::getStyleElement(style, "FileSelectorButton");
+    mOKButton->setStyleAuto(style, cache);
+    mCancelButton->setStyleAuto(style, cache);
+    XMLElement buttonElem = UIElement::getStyleElement(style, "FileSelectorButton");
     if (buttonElem)
     {
         mOKButton->setStyle(buttonElem, cache);
