@@ -26,6 +26,25 @@
 
 #include "BorderImage.h"
 
+enum CursorShape
+{
+    CS_NORMAL = 0,
+    CS_RESIZEVERTICAL,
+    CS_RESIZEDIAGONAL_TOPRIGHT,
+    CS_RESIZEHORIZONTAL,
+    CS_RESIZEDIAGONAL_TOPLEFT,
+    CS_ACCEPTDROP,
+    CS_REJECTDROP,
+    CS_MAX_SHAPES
+};
+
+struct CursorShapeData
+{
+    SharedPtr<Texture> mTexture;
+    IntRect mImageRect;
+    IntVector2 mHotSpot;
+};
+
 //! An image with hotspot coordinates
 class Cursor : public BorderImage
 {
@@ -39,20 +58,22 @@ public:
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! Return UI element screen position
-    virtual IntVector2 getScreenPosition();
+    //! Return UI rendering batches
+    virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     
-    //! Set hotspot coordinates
-    void setHotspot(const IntVector2& hotspot);
-    //! Set hotspot coordinates
-    void setHotspot(int x, int y);
+    //! Define a shape
+    void defineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot);
+    //! Set shape
+    void setShape(CursorShape shape);
     
-    //! Return hotspot coordinates
-    const IntVector2& getHotspot() const { return mHotspot; }
+    //! Get current shape
+    CursorShape getShape() const { return mShape; }
     
 protected:
-    //! Hotspot coordinates
-    IntVector2 mHotspot;
+    //! Current shape index
+    CursorShape mShape;
+    //! Shape datas
+    CursorShapeData mShapeData[CS_MAX_SHAPES];
 };
 
 #endif // UI_CURSOR_H

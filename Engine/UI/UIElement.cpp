@@ -218,78 +218,6 @@ void UIElement::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& q
     mHovering = false;
 }
 
-IntVector2 UIElement::getScreenPosition()
-{
-    if (mScreenPositionDirty)
-    {
-        IntVector2 pos = mPosition;
-        const UIElement* parent = mParent;
-        const UIElement* current = this;
-        
-        while (parent)
-        {
-            switch (current->mHorizontalAlignment)
-            {
-            case HA_LEFT:
-                pos.mX += parent->mPosition.mX;
-                break;
-                
-            case HA_CENTER:
-                pos.mX += parent->mPosition.mX + parent->mSize.mX / 2 - current->mSize.mX / 2;
-                break;
-                
-            case HA_RIGHT:
-                pos.mX += parent->mPosition.mX + parent->mSize.mX - current->mSize.mX;
-                break;
-            }
-            switch (current->mVerticalAlignment)
-            {
-            case VA_TOP:
-                pos.mY += parent->mPosition.mY;
-                break;
-                
-            case VA_CENTER:
-                pos.mY += parent->mPosition.mY + parent->mSize.mY / 2 - current->mSize.mY / 2;
-                break;
-                
-            case VA_BOTTOM:
-                pos.mY += parent->mPosition.mY + parent->mSize.mY - current->mSize.mY;
-                break;
-            }
-            
-            pos += parent->mChildOffset;
-            
-            current = parent;
-            parent = parent->mParent;
-        }
-        
-        mScreenPosition = pos;
-        mScreenPositionDirty = false;
-    }
-    
-    return mScreenPosition;
-}
-
-float UIElement::getDerivedOpacity()
-{
-    if (mDerivedOpacityDirty)
-    {
-        float opacity = mOpacity;
-        const UIElement* parent = mParent;
-        
-        while (parent)
-        {
-            opacity *= parent->mOpacity;
-            parent = parent->mParent;
-        }
-        
-        mDerivedOpacity = opacity;
-        mDerivedOpacityDirty = false;
-    }
-    
-    return mDerivedOpacity;
-}
-
 void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
 {
     mHovering = true;
@@ -816,6 +744,78 @@ void UIElement::removeAllChildren()
         element->markDirty();
         mChildren.pop_back();
     }
+}
+
+IntVector2 UIElement::getScreenPosition()
+{
+    if (mScreenPositionDirty)
+    {
+        IntVector2 pos = mPosition;
+        const UIElement* parent = mParent;
+        const UIElement* current = this;
+        
+        while (parent)
+        {
+            switch (current->mHorizontalAlignment)
+            {
+            case HA_LEFT:
+                pos.mX += parent->mPosition.mX;
+                break;
+                
+            case HA_CENTER:
+                pos.mX += parent->mPosition.mX + parent->mSize.mX / 2 - current->mSize.mX / 2;
+                break;
+                
+            case HA_RIGHT:
+                pos.mX += parent->mPosition.mX + parent->mSize.mX - current->mSize.mX;
+                break;
+            }
+            switch (current->mVerticalAlignment)
+            {
+            case VA_TOP:
+                pos.mY += parent->mPosition.mY;
+                break;
+                
+            case VA_CENTER:
+                pos.mY += parent->mPosition.mY + parent->mSize.mY / 2 - current->mSize.mY / 2;
+                break;
+                
+            case VA_BOTTOM:
+                pos.mY += parent->mPosition.mY + parent->mSize.mY - current->mSize.mY;
+                break;
+            }
+            
+            pos += parent->mChildOffset;
+            
+            current = parent;
+            parent = parent->mParent;
+        }
+        
+        mScreenPosition = pos;
+        mScreenPositionDirty = false;
+    }
+    
+    return mScreenPosition;
+}
+
+float UIElement::getDerivedOpacity()
+{
+    if (mDerivedOpacityDirty)
+    {
+        float opacity = mOpacity;
+        const UIElement* parent = mParent;
+        
+        while (parent)
+        {
+            opacity *= parent->mOpacity;
+            parent = parent->mParent;
+        }
+        
+        mDerivedOpacity = opacity;
+        mDerivedOpacityDirty = false;
+    }
+    
+    return mDerivedOpacity;
 }
 
 std::vector<UIElement*> UIElement::getChildren(bool recursive) const

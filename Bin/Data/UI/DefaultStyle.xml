@@ -17,10 +17,7 @@
         <hoveroffset value="0 16" />
     </element>
     <element type="Cursor">
-        <size value="12 24" />
-        <texture name="Textures/UI.png" />
-        <imagerect value="0 0 12 24" />
-        <hotspot value="0 0" />
+        <shape name="normal" texture="Textures/UI.png" imagerect="0 0 12 24" hotspot="0 0" />
     </element>
     <element type="DropDownList">
         <texture name="Textures/UI.png" />

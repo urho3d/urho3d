@@ -23,15 +23,36 @@
 
 #include "Precompiled.h"
 #include "Cursor.h"
+#include "ResourceCache.h"
+#include "StringUtils.h"
+#include "Texture2D.h"
 
 #include "DebugNew.h"
 
+static std::string shapeNames[] =
+{
+    "normal",
+    "resizevertical",
+    "resizediagonal_topright",
+    "resizehorizontal",
+    "resizediagonal_topleft",
+    "acceptdrop",
+    "rejectdrop"
+};
+
 Cursor::Cursor(const std::string& name) :
     BorderImage(name),
-    mHotspot(IntVector2::sZero)
+    mShape(CS_NORMAL)
 {
     // Show on top of all other UI elements
     mPriority = M_MAX_INT;
+    
+    for (unsigned i = 0; i < CS_MAX_SHAPES; ++i)
+    {
+        CursorShapeData& data = mShapeData[i];
+        data.mImageRect = IntRect::sZero;
+        data.mHotSpot = IntVector2::sZero;
+    }
 }
 
 Cursor::~Cursor()
@@ -40,25 +61,51 @@ Cursor::~Cursor()
 
 void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    BorderImage::setStyle(element, cache);
+    UIElement::setStyle(element, cache);
     
-    if (element.hasChildElement("hotspot"))
-        setHotspot(element.getChildElement("hotspot").getIntVector2("value"));
+    XMLElement shapeElem = element.getChildElement("shape");
+    while (shapeElem)
+    {
+        CursorShape shape = (CursorShape)getIndexFromStringList(shapeElem.getStringLower("name"), shapeNames, 7, 0);
+        defineShape(shape, cache->getResource<Texture2D>(shapeElem.getString("texture")), shapeElem.getIntRect("imagerect"),
+            shapeElem.getIntVector2("hotspot"));
+        shapeElem = shapeElem.getNextElement("shape");
+    }
 }
 
-IntVector2 Cursor::getScreenPosition()
+void Cursor::defineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot)
 {
-    IntVector2 pos = UIElement::getScreenPosition();
-    pos -= mHotspot;
-    return pos;
+    CursorShapeData& data = mShapeData[shape];
+    data.mTexture = texture;
+    data.mImageRect = imageRect;
+    data.mHotSpot = hotSpot;
+    
+    // Reset current shape if it was edited
+    if (shape == mShape)
+        setShape(mShape);
 }
 
-void Cursor::setHotspot(const IntVector2& hotspot)
+void Cursor::setShape(CursorShape shape)
 {
-    mHotspot = hotspot;
+    mShape = shape;
+    
+    CursorShapeData& data = mShapeData[mShape];
+    mTexture = data.mTexture;
+    mImageRect = data.mImageRect;
+    setSize(data.mImageRect.mRight - data.mImageRect.mLeft, data.mImageRect.mBottom - data.mImageRect.mTop);
 }
 
-void Cursor::setHotspot(int x, int y)
+void Cursor::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    setHotspot(IntVector2(x, y));
+    unsigned initialSize = quads.size();
+    const IntVector2& offset = mShapeData[mShape].mHotSpot;
+    
+    BorderImage::getBatches(batches, quads, currentScissor);
+    for (unsigned i = initialSize; i < quads.size(); ++i)
+    {
+        quads[i].mLeft -= offset.mX;
+        quads[i].mTop -= offset.mY;
+        quads[i].mRight -= offset.mX;
+        quads[i].mBottom -= offset.mY;
+    }
 }

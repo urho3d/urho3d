@@ -114,10 +114,6 @@ public:
     virtual void update(float timeStep);
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
-    //! Return UI element screen position
-    virtual IntVector2 getScreenPosition();
-    //! Return UI element opacity
-    virtual float getDerivedOpacity();
     
     //! React to mouse hover
     virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
@@ -247,6 +243,8 @@ public:
     const std::string& getName() const { return mName; }
     //! Return position
     const IntVector2& getPosition() const { return mPosition; }
+    //! Return screen position
+    IntVector2 getScreenPosition();
     //! Return size
     const IntVector2& getSize() const { return mSize; }
     //! Return width
@@ -279,6 +277,8 @@ public:
     int getPriority() const { return mPriority; }
     //! Return opacity
     float getOpacity() const { return mOpacity; }
+    //! Return derived opacity (affected by parent elements)
+    float getDerivedOpacity();
     //! Return whether should be brought to front when focused
     bool getBringToFront() const { return mBringToFront; }
     //! Return whether should be put to background when another element is focused

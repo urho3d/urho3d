@@ -100,10 +100,19 @@ static void registerBorderImage(asIScriptEngine* engine)
 
 static void registerCursor(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("CursorShape");
+    engine->RegisterEnumValue("CursorShape", "CS_NORMAL", CS_NORMAL);
+    engine->RegisterEnumValue("CursorShape", "CS_RESIZEVERTICAL", CS_RESIZEVERTICAL);
+    engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPRIGHT", CS_RESIZEDIAGONAL_TOPRIGHT);
+    engine->RegisterEnumValue("CursorShape", "CS_RESIZEHORIZONTAL", CS_RESIZEHORIZONTAL);
+    engine->RegisterEnumValue("CursorShape", "CS_RESIZEDIAGONAL_TOPLEFT", CS_RESIZEDIAGONAL_TOPLEFT);
+    engine->RegisterEnumValue("CursorShape", "CS_ACCEPTDROP", CS_ACCEPTDROP);
+    engine->RegisterEnumValue("CursorShape", "CS_REJECTDROP", CS_REJECTDROP);
+    
     registerBorderImage<Cursor>(engine, "Cursor");
-    engine->RegisterObjectMethod("Cursor", "void setHotspot(const IntVector2& in)", asMETHODPR(Cursor, setHotspot, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "void setHotspot(int, int)", asMETHODPR(Cursor, setHotspot, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Cursor", "const IntVector2& getHotspot() const", asMETHOD(Cursor, getHotspot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void defineShape(CursorShape, Texture@+, const IntRect& in, const IntVector2& in)", asMETHOD(Cursor, defineShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "void setShape(CursorShape)", asMETHOD(Cursor, setShape), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Cursor", "CursorShape getShape() const", asMETHOD(Cursor, getShape), asCALL_THISCALL);
     registerRefCasts<UIElement, Cursor>(engine, "UIElement", "Cursor");
 }
 
