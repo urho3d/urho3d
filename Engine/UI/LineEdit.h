@@ -45,11 +45,15 @@ public:
     virtual void update(float timeStep);
     
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag start
-    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag motion
-    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+    //! React to drag and drop test. Return true to signal that the drop is acceptable
+    virtual bool onDragDropTest(UIElement* source);
+    //! React to drag and drop finish. Return true to signal that the drop was accepted
+    virtual bool onDragDropFinish(UIElement* source);
     //! React to a key press
     virtual void onKey(int key, int buttons, int qualifiers);
     //! React to a key press translated to a character

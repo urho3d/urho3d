@@ -39,7 +39,7 @@ class Menu : public Button
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to the popup being shown
     virtual void onShowPopup();
     

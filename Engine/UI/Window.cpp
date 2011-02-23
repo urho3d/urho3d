@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Cursor.h"
 #include "InputEvents.h"
 #include "Window.h"
 
@@ -57,7 +58,18 @@ void Window::setStyle(const XMLElement& element, ResourceCache* cache)
         setResizable(element.getChildElement("resizable").getBool("enable"));
 }
 
-void Window::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Window::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    if (mDragMode == DRAG_NONE)
+    {
+        WindowDragMode mode = identifyDragMode(position);
+        setCursorShape(mode, cursor);
+    }
+    else
+        setCursorShape(mDragMode, cursor);
+}
+
+void Window::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if ((buttons != MOUSEB_LEFT) || (!checkAlignment()))
     {
@@ -68,52 +80,11 @@ void Window::onDragStart(const IntVector2& position, const IntVector2& screenPos
     mDragStartPosition = screenPosition;
     mOriginalPosition = getPosition();
     mOriginalSize = getSize();
-    
-    // Identify drag type
-    // Top row
-    if (position.mY < mResizeBorder.mTop)
-    {
-        if (mMovable)
-            mDragMode = DRAG_MOVE;
-        if (mResizable)
-        {
-            mDragMode = DRAG_RESIZE_TOP;
-            if (position.mX < mResizeBorder.mLeft)
-                mDragMode = DRAG_RESIZE_TOPLEFT;
-            if (position.mX >= mOriginalSize.mX - mResizeBorder.mRight)
-                mDragMode = DRAG_RESIZE_TOPRIGHT;
-        }
-    }
-    // Bottom row
-    else if (position.mY >= mOriginalSize.mY - mResizeBorder.mBottom)
-    {
-        if (mMovable)
-            mDragMode = DRAG_MOVE;
-        if (mResizable)
-        {
-            mDragMode = DRAG_RESIZE_BOTTOM;
-            if (position.mX < mResizeBorder.mLeft)
-                mDragMode = DRAG_RESIZE_BOTTOMLEFT;
-            if (position.mX >= mOriginalSize.mX - mResizeBorder.mRight)
-                mDragMode = DRAG_RESIZE_BOTTOMRIGHT;
-        }
-    }
-    // Middle
-    else
-    {
-        if (mMovable)
-            mDragMode = DRAG_MOVE;
-        if (mResizable)
-        {
-            if (position.mX < mResizeBorder.mLeft)
-                mDragMode = DRAG_RESIZE_LEFT;
-            if (position.mX >= mOriginalSize.mX - mResizeBorder.mRight)
-                mDragMode = DRAG_RESIZE_RIGHT;
-        }
-    }
+    mDragMode = identifyDragMode(position);
+    setCursorShape(mDragMode, cursor);
 }
 
-void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if (mDragMode == DRAG_NONE)
         return;
@@ -165,9 +136,10 @@ void Window::onDragMove(const IntVector2& position, const IntVector2& screenPosi
     }
     
     validatePosition();
+    setCursorShape(mDragMode, cursor);
 }
 
-void Window::onDragEnd(const IntVector2& position, const IntVector2& screenPosition)
+void Window::onDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
 {
     mDragMode = DRAG_NONE;
 }
@@ -193,6 +165,81 @@ void Window::setResizeBorder(const IntRect& rect)
 void Window::setResizeBorder(int left, int top, int right, int bottom)
 {
     setResizeBorder(IntRect(left, top, right, bottom));
+}
+
+WindowDragMode Window::identifyDragMode(const IntVector2& position) const
+{
+    WindowDragMode mode = DRAG_NONE;
+    
+    // Top row
+    if (position.mY < mResizeBorder.mTop)
+    {
+        if (mMovable)
+            mode = DRAG_MOVE;
+        if (mResizable)
+        {
+            mode = DRAG_RESIZE_TOP;
+            if (position.mX < mResizeBorder.mLeft)
+                mode = DRAG_RESIZE_TOPLEFT;
+            if (position.mX >= getWidth() - mResizeBorder.mRight)
+                mode = DRAG_RESIZE_TOPRIGHT;
+        }
+    }
+    // Bottom row
+    else if (position.mY >= getHeight() - mResizeBorder.mBottom)
+    {
+        if (mMovable)
+            mode = DRAG_MOVE;
+        if (mResizable)
+        {
+            mode = DRAG_RESIZE_BOTTOM;
+            if (position.mX < mResizeBorder.mLeft)
+                mode = DRAG_RESIZE_BOTTOMLEFT;
+            if (position.mX >= getWidth() - mResizeBorder.mRight)
+                mode = DRAG_RESIZE_BOTTOMRIGHT;
+        }
+    }
+    // Middle
+    else
+    {
+        if (mMovable)
+            mode = DRAG_MOVE;
+        if (mResizable)
+        {
+            if (position.mX < mResizeBorder.mLeft)
+                mode = DRAG_RESIZE_LEFT;
+            if (position.mX >= getWidth() - mResizeBorder.mRight)
+                mode = DRAG_RESIZE_RIGHT;
+        }
+    }
+    
+    return mode;
+}
+
+void Window::setCursorShape(WindowDragMode mode, Cursor* cursor) const
+{
+    switch (mode)
+    {
+    case DRAG_RESIZE_TOP:
+    case DRAG_RESIZE_BOTTOM:
+        cursor->setShape(CS_RESIZEVERTICAL);
+        break;
+        
+    case DRAG_RESIZE_LEFT:
+    case DRAG_RESIZE_RIGHT:
+        cursor->setShape(CS_RESIZEHORIZONTAL);
+        break;
+
+    case DRAG_RESIZE_TOPRIGHT:
+    case DRAG_RESIZE_BOTTOMLEFT:
+        cursor->setShape(CS_RESIZEDIAGONAL_TOPRIGHT);
+        break;
+        
+    case DRAG_RESIZE_TOPLEFT:
+    case DRAG_RESIZE_BOTTOMRIGHT:
+        cursor->setShape(CS_RESIZEDIAGONAL_TOPLEFT);
+        break;
+    }
 }
 
 void Window::validatePosition()

@@ -32,6 +32,13 @@
 
 #include "DebugNew.h"
 
+static const std::string horizontalAlignments[] =
+{
+    "left",
+    "center",
+    "right"
+};
+
 Text::Text(const std::string& name, const std::string& text) :
     UIElement(name),
     mFontSize(DEFAULT_FONT_SIZE),
@@ -66,12 +73,8 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("textalignment"))
     {
         std::string horiz = element.getChildElement("textalignment").getStringLower("value");
-        if (horiz == "left")
-            setTextAlignment(HA_LEFT);
-        if (horiz == "center")
-            setTextAlignment(HA_CENTER);
-        if (horiz == "right")
-            setTextAlignment(HA_RIGHT);
+        if (!horiz.empty())
+            setTextAlignment((HorizontalAlignment)getIndexFromStringList(horiz, horizontalAlignments, 3, 0));
     }
     if (element.hasChildElement("rowspacing"))
         setRowSpacing(element.getChildElement("rowspacing").getFloat("value"));

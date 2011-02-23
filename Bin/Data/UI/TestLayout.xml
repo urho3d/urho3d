@@ -125,10 +125,12 @@
     <element type="LineEdit">
         <position value="150 230" />
         <size value="200 18" />
+        <dragdropmode value="sourceandtarget" />
     </element>
     <element type="LineEdit">
         <position value="150 260" />
         <size value="200 18" />
+        <dragdropmode value="sourceandtarget" />
     </element>
     <element type="Window" name="TestPopup">
         <layout mode="vertical" spacing="4" border="8 8 8 8" />

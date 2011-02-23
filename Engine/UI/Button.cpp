@@ -92,13 +92,13 @@ void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quad
     BorderImage::getBatches(batches, quads, currentScissor, offset);
 }
 
-void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     setPressed((buttons & MOUSEB_LEFT) != 0);
     mHovering = true;
 }
 
-void Button::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Button::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if (buttons & MOUSEB_LEFT)
     {

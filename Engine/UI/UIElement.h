@@ -94,7 +94,10 @@ static const unsigned DD_DISABLED = 0;
 static const unsigned DD_SOURCE = 1;
 //! Drag and drop target flag
 static const unsigned DD_TARGET = 2;
+//! Drag and drop source and target
+static const unsigned DD_SOURCE_AND_TARGET = 3;
 
+class Cursor;
 class ResourceCache;
 
 //! Base class for UI elements
@@ -116,17 +119,19 @@ public:
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     
     //! React to mouse hover
-    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag start
-    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag motion
-    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag end
-    virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
-    //! React to drag and drop finish
-    virtual void onDrop(UIElement* element);
+    virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
+    //! React to drag and drop test. Return true to signal that the drop is acceptable
+    virtual bool onDragDropTest(UIElement* source);
+    //! React to drag and drop finish. Return true to signal that the drop was accepted
+    virtual bool onDragDropFinish(UIElement* source);
     //! React to mouse wheel
     virtual void onWheel(int delta, int buttons, int qualifiers);
     //! React to a key press
@@ -319,8 +324,6 @@ public:
     std::vector<UIElement*> getChildren(bool recursive = false) const;
     //! Return parent element
     UIElement* getParent() const { return mParent; }
-    //! Return origin element for popups
-    UIElement* getOrigin() const { return mOrigin; }
     //! Return root element
     UIElement* getRootElement() const;
     //! Return first matching UI style element from an XML file. If not found, return empty
@@ -341,8 +344,6 @@ public:
     void setChildOffset(const IntVector2& offset);
     //! Set hovering state
     void setHovering(bool enable);
-    //! Set origin element
-    void setOrigin(UIElement* origin);
     //! Adjust scissor for rendering
     void adjustScissor(IntRect& currentScissor);
     //! Get UI rendering batches with a specified offset. Also recurses to child elements
@@ -362,8 +363,6 @@ protected:
     std::vector<SharedPtr<UIElement> > mChildren;
     //! Parent element
     UIElement* mParent;
-    //! Origin element
-    UIElement* mOrigin;
     //! Child element clipping border
     IntRect mClipBorder;
     //! Colors

@@ -42,7 +42,7 @@ public:
     //! Return UI rendering batches
     virtual void getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
     //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     
     //! Set checked state
     void setChecked(bool enable);

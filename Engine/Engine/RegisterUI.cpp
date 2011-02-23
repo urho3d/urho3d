@@ -82,6 +82,7 @@ static void registerUIElement(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DD_DISABLED", (void*)&DD_DISABLED);
     engine->RegisterGlobalProperty("const uint DD_SOURCE", (void*)&DD_SOURCE);
     engine->RegisterGlobalProperty("const uint DD_TARGET", (void*)&DD_TARGET);
+    engine->RegisterGlobalProperty("const uint DD_SOURCE_AND_TARGET", (void*)&DD_SOURCE_AND_TARGET);
     
     registerUIElement<UIElement>(engine, "UIElement");
     

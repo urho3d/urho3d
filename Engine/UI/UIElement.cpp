@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "ResourceCache.h"
+#include "StringUtils.h"
 #include "UIElement.h"
 #include "UIEvents.h"
 
@@ -30,10 +31,39 @@
 
 std::string UIElement::sClipBoard;
 
+static const std::string horizontalAlignments[] =
+{
+    "left",
+    "center",
+    "right"
+};
+
+static const std::string verticalAlignments[] =
+{
+    "top",
+    "center",
+    "bottom"
+};
+
+static const std::string focusModes[] =
+{
+    "notfocusable",
+    "resetfocus",
+    "focusable",
+    "focusabledefocusable"
+};
+
+static const std::string dragDropModes[] =
+{
+    "disabled",
+    "source",
+    "target",
+    "sourceandtarget"
+};
+
 UIElement::UIElement(const std::string& name) :
     mName(name),
     mParent(0),
-    mOrigin(0),
     mClipBorder(IntRect::sZero),
     mPriority(0),
     mOpacity(1.0f),
@@ -127,18 +157,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
             horiz = alignElem.getStringLower("horizontal");
         if (alignElem.hasAttribute("vertical"))
             vert = alignElem.getStringLower("vertical");
-        if (horiz == "left")
-            setHorizontalAlignment(HA_LEFT);
-        if (horiz == "center")
-            setHorizontalAlignment(HA_CENTER);
-        if (horiz == "right")
-            setHorizontalAlignment(HA_RIGHT);
-        if (vert == "top")
-            setVerticalAlignment(VA_TOP);
-        if (vert == "center")
-            setVerticalAlignment(VA_CENTER);
-        if (vert == "bottom")
-            setVerticalAlignment(VA_BOTTOM);
+        if (!horiz.empty())
+            setHorizontalAlignment((HorizontalAlignment)getIndexFromStringList(horiz, horizontalAlignments, 3, 0));
+        if (!vert.empty())
+            setVerticalAlignment((VerticalAlignment)getIndexFromStringList(vert, verticalAlignments, 3, 0));
     }
     if (element.hasChildElement("clipborder"))
         setClipBorder(element.getChildElement("clipborder").getIntRect("value"));
@@ -171,13 +193,8 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("focusmode"))
     {
         std::string focusMode = element.getChildElement("focusmode").getStringLower("value");
-        if (focusMode == "notfocusable")
-            setFocusMode(FM_NOTFOCUSABLE);
-        if (focusMode == "resetfocus")
-            setFocusMode(FM_RESETFOCUS);
-        if (focusMode == "focusable")
-            setFocusMode(FM_FOCUSABLE);
-        if ((focusMode == "focusabledefocusable") || (focusMode == "defocusable"))
+        setFocusMode((FocusMode)getIndexFromStringList(focusMode, focusModes, 4, 0));
+        if (focusMode == "defocusable")
             setFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
     if (element.hasChildElement("selected"))
@@ -185,7 +202,10 @@ void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("visible"))
         setVisible(element.getChildElement("visible").getBool("enable"));
     if (element.hasChildElement("dragdropmode"))
-        setDragDropMode(element.getChildElement("dragdropmode").getInt("value"));
+    {
+        std::string dragDropMode = element.getChildElement("dragdropmode").getStringLower("value");
+        setDragDropMode(getIndexFromStringList(dragDropMode, dragDropModes, 4, 0));
+    }
     if (element.hasChildElement("userdata"))
         setUserData(element.getChildElement("userdat").getVariantMap());
     if (element.hasChildElement("layout"))
@@ -218,29 +238,35 @@ void UIElement::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& q
     mHovering = false;
 }
 
-void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void UIElement::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     mHovering = true;
 }
 
-void UIElement::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void UIElement::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void UIElement::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void UIElement::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
 }
 
-void UIElement::onDragEnd(const IntVector2& position, const IntVector2& screenPosition)
+void UIElement::onDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
 {
 }
 
-void UIElement::onDrop(UIElement* source)
+bool UIElement::onDragDropTest(UIElement* source)
 {
+    return true;
+}
+
+bool UIElement::onDragDropFinish(UIElement* source)
+{
+    return true;
 }
 
 void UIElement::onWheel(int delta, int buttons, int qualifiers)
@@ -970,11 +996,6 @@ void UIElement::setChildOffset(const IntVector2& offset)
 void UIElement::setHovering(bool enable)
 {
     mHovering = enable;
-}
-
-void UIElement::setOrigin(UIElement* origin)
-{
-    mOrigin = origin;
 }
 
 void UIElement::adjustScissor(IntRect& currentScissor)

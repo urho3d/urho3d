@@ -52,9 +52,6 @@ static bool compareUIElements(const UIElement* lhs, const UIElement* rhs)
 UI::UI(Renderer* renderer, ResourceCache* cache) :
     mRenderer(renderer),
     mCache(cache),
-    mMouseDrag(false),
-    mMouseDragElement(0),
-    mDefocusElement(0),
     mMouseButtons(0),
     mQualifiers(0)
 {
@@ -155,20 +152,46 @@ void UI::update(float timeStep)
 {
     PROFILE(UI_Update);
     
-    // If device lost, do not perform update
     if (mRenderer->isDeviceLost())
         return;
     
     if ((mCursor) && (mCursor->isVisible()))
     {
         IntVector2 pos = mCursor->getPosition();
-        UIElement* element = getElementAt(pos);
+        WeakPtr<UIElement> element(getElementAt(pos));
+        
+        bool dragSource = (mMouseDragElement) && ((mMouseDragElement->getDragDropMode() & DD_SOURCE) != 0);
+        bool dragTarget = (element) && ((element->getDragDropMode() & DD_TARGET) != 0);
+        bool dragDropTest = (dragSource) && (dragTarget) && (element != mMouseDragElement);
+        
+        // Hover effect
+        // If a drag is going on, transmit hover only to the element being dragged, unless it's a drop target
         if (element)
         {
-            // If a drag is going on, transmit hover only to the element being dragged
-            if ((!mMouseDragElement) || (mMouseDragElement == element))
-                element->onHover(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
+            if ((!mMouseDragElement) || (mMouseDragElement == element) || (dragDropTest))
+                element->onHover(element->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
         }
+        
+        // Drag and drop test
+        if (dragDropTest)
+        {
+            bool accept = element->onDragDropTest(mMouseDragElement);
+            if (accept)
+            {
+                using namespace UIDragDropTest;
+                
+                VariantMap eventData;
+                eventData[P_SOURCE] = mMouseDragElement;
+                eventData[P_TARGET] = element;
+                eventData[P_ACCEPT] = accept;
+                sendEvent(EVENT_UIDRAGDROPTEST, eventData);
+                accept = eventData[P_ACCEPT].getBool();
+            }
+                
+            mCursor->setShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
+        }
+        else if (dragSource)
+            mCursor->setShape(mMouseDragElement == element ? CS_ACCEPTDROP : CS_REJECTDROP);
     }
     
     // Defocus element now if should
@@ -177,7 +200,7 @@ void UI::update(float timeStep)
         // Do nothing if the focus element changed in the meanwhile
         if (mDefocusElement == getFocusElement())
             setFocusElement(0);
-        mDefocusElement = 0;
+        mDefocusElement.reset();
     }
     
     {
@@ -194,6 +217,10 @@ void UI::update(float timeStep)
         const IntVector2& rootSize = mRootElement->getSize();
         getBatches(mRootElement, IntRect(0, 0, rootSize.mX, rootSize.mY));
     }
+    
+    // If no drag, reset cursor shape for next frame
+    if (!mMouseDragElement)
+        mCursor->setShape(CS_NORMAL);
 }
 
 void UI::render()
@@ -314,9 +341,7 @@ UIElement* UI::getElementAt(const IntVector2& position, bool enabledOnly)
 
 UIElement* UI::getElementAt(int x, int y, bool enabledOnly)
 {
-    UIElement* result = 0;
-    getElementAt(result, mRootElement, IntVector2(x, y), enabledOnly);
-    return result;
+    return getElementAt(IntVector2(x, y), enabledOnly);
 }
 
 UIElement* UI::getFocusElement()
@@ -430,18 +455,6 @@ void UI::getElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     }
 }
 
-UIElement* UI::verifyElement(UIElement* element)
-{
-    std::vector<UIElement*> allChildren = mRootElement->getChildren(true);
-    for (std::vector<UIElement*>::iterator i = allChildren.begin(); i != allChildren.end(); ++i)
-    {
-        if ((*i) == element)
-            return *i;
-    }
-    
-    return 0;
-}
-
 void UI::handleWindowResized(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowResized;
@@ -466,16 +479,12 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
         mCursor->setPosition(pos);
         
-        if ((mMouseDrag) && (mMouseButtons))
+        if ((mMouseDragElement) && (mMouseButtons))
         {
-            UIElement* element = verifyElement(mMouseDragElement);
-            if ((element) && (element->isEnabled()) && (element->isVisible()))
-                element->onDragMove(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
+            if ((mMouseDragElement->isEnabled()) && (mMouseDragElement->isVisible()))
+                mMouseDragElement->onDragMove(mMouseDragElement->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             else
-            {
-                mMouseDrag = false;
-                mMouseDragElement = 0;
-            }
+                mMouseDragElement.reset();
         }
     }
 }
@@ -509,21 +518,17 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             if (button == MOUSEB_LEFT)
             {
                 setFocusElement(element);
-                // Verify existence after each operation, because any calls/events may potentially destroy the element
-                if (element)
-                    element->bringToFront();
+                element->bringToFront();
             }
             
             // Handle click
-            if (element)
-                element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
+            element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             
-            // Handle start of drag
-            if ((element) && (!mMouseDrag))
+            // Handle start of drag. onClick() may have caused destruction of the element, so check the pointer again
+            if ((element) && (!mMouseDragElement))
             {
-                mMouseDrag = true;
                 mMouseDragElement = element;
-                element->onDragStart(element->screenToElement(pos), pos, mMouseButtons, mQualifiers);
+                element->onDragStart(element->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             }
         }
         else
@@ -545,36 +550,40 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     {
         IntVector2 pos = mCursor->getPosition();
         
-        if ((mMouseDrag) && (!mMouseButtons))
+        if ((mMouseDragElement) && (!mMouseButtons))
         {
-            WeakPtr<UIElement> element(verifyElement(mMouseDragElement));
-            if ((element) && (element->isEnabled()) && (element->isVisible()))
+            if ((mMouseDragElement->isEnabled()) && (mMouseDragElement->isVisible()))
             {
-                element->onDragEnd(element->screenToElement(pos), pos);
+                mMouseDragElement->onDragEnd(mMouseDragElement->screenToElement(pos), pos, mCursor);
                 
-                // Check for drag and drop. Verify existence after each operation, because any calls/events may potentially destroy
-                // the elements
-                if ((element) && (element->getDragDropMode() & DD_SOURCE))
+                // Drag and drop finish
+                bool dragSource = (mMouseDragElement) && ((mMouseDragElement->getDragDropMode() & DD_SOURCE) != 0);
+                if (dragSource)
                 {
                     WeakPtr<UIElement> target(getElementAt(pos));
-                    if ((target) && (target != element) && (target->getDragDropMode() & DD_TARGET))
+                    bool dragTarget = (target) && ((target->getDragDropMode() & DD_TARGET) != 0);
+                    bool dragDropFinish = (dragSource) && (dragTarget) && (target != mMouseDragElement);
+                    
+                    if (dragDropFinish)
                     {
-                        target->onDrop(element);
+                        bool accept = target->onDragDropFinish(mMouseDragElement);
                         
-                        if ((target) && (element))
+                        // onDragDropFinish() may have caused destruction of the elements, so check the pointers again
+                        if ((accept) && (mMouseDragElement) && (target))
                         {
-                            using namespace UIDragDrop;
+                            using namespace UIDragDropFinish;
                             
                             VariantMap eventData;
-                            eventData[P_SOURCE] = element;
+                            eventData[P_SOURCE] = mMouseDragElement;
                             eventData[P_TARGET] = target;
-                            sendEvent(EVENT_UIDRAGDROP, eventData);
+                            eventData[P_ACCEPT] = accept;
+                            sendEvent(EVENT_UIDRAGDROPFINISH, eventData);
                         }
                     }
                 }
             }
-            mMouseDrag = false;
-            mMouseDragElement = 0;
+            
+            mMouseDragElement.reset();
         }
     }
 }

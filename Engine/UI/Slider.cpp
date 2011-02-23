@@ -81,20 +81,20 @@ void Slider::update(float timeStep)
     mKnob->setSelected(mSelected);
 }
 
-void Slider::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Slider::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     // Show hover effect if inside the slider knob
     mHovering = mKnob->isInside(screenPosition, true);
 }
 
-void Slider::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Slider::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     mOriginalPosition = position;
     mOriginalSliderPosition = mKnob->getPosition();
     mDragSlider = mKnob->isInside(screenPosition, true);
 }
 
-void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if (!mDragSlider)
         return;
@@ -118,7 +118,7 @@ void Slider::onDragMove(const IntVector2& position, const IntVector2& screenPosi
     setValue(newValue);
 }
 
-void Slider::onDragEnd(const IntVector2& position, const IntVector2& screenPosition)
+void Slider::onDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor)
 {
     mDragSlider = false;
 }

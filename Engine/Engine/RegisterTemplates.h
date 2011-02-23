@@ -494,7 +494,6 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getParent() const", asMETHOD(T, getParent), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ getOrigin() const", asMETHOD(T, getOrigin), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getRootElement() const", asMETHOD(T, getRootElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLElement getStyleElement(XMLFile@+) const", asMETHODPR(T, getStyleElement, (XMLFile*) const, XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 screenToElement(const IntVector2& in)", asMETHOD(T, screenToElement), asCALL_THISCALL);

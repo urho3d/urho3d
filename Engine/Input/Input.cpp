@@ -42,6 +42,12 @@ Input::Input(Renderer* renderer) :
 {
     LOGINFO("Input created");
     
+    // Zero the initial state so that clearState() does not send any extra events at the start
+    memset(&mKeyDown, 0, sizeof(mKeyDown));
+    memset(&mKeyPress, 0, sizeof(mKeyPress));
+    mMouseButtonDown = 0;
+    mMouseButtonPress = 0;
+    
     makeActive();
     
     if (mRenderer)
@@ -358,13 +364,17 @@ void Input::makeInactive()
 
 void Input::clearState()
 {
+    // Use keyChange() & mouseButtonChange() to reset the state so that events will be sent properly
+    for (unsigned i = 0; i < MAX_KEYS; ++i)
+        keyChange(i, false);
+    mouseButtonChange(MOUSEB_LEFT, false);
+    mouseButtonChange(MOUSEB_RIGHT, false);
+    mouseButtonChange(MOUSEB_MIDDLE, false);
+    
     mMouseMoveX = 0;
     mMouseMoveY = 0;
     mMouseMoveWheel = 0;
-    mMouseButtonDown = 0;
     mMouseButtonPress = 0;
-    
-    memset(&mKeyDown, 0, sizeof(mKeyDown));
     memset(&mKeyPress, 0, sizeof(mKeyPress));
 }
 
@@ -372,12 +382,16 @@ void Input::mouseButtonChange(int button, bool newState)
 {
     if (newState)
     {
-        mMouseButtonDown |= button;
         if (!(mMouseButtonDown & button))
             mMouseButtonPress |= button;
+        
+        mMouseButtonDown |= button;
     }
     else
     {
+        if (!(mMouseButtonDown & button))
+            return;
+        
         mMouseButtonDown &= ~button;
     }
     
@@ -395,8 +409,16 @@ void Input::keyChange(int key, bool newState)
     if ((key < 0) || (key >= MAX_KEYS))
         return;
     
-    if ((newState) && (!mKeyDown[key]))
-        mKeyPress[key] = true;
+    if (newState)
+    {
+        if (!mKeyDown[key])
+            mKeyPress[key] = true;
+    }
+    else
+    {
+        if (!mKeyDown[key])
+            return;
+    }
     
     mKeyDown[key] = newState;
     

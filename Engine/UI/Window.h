@@ -54,12 +54,14 @@ public:
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
+    //! React to mouse hover
+    virtual void onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag start
-    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag motion
-    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers);
+    virtual void onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to mouse drag end
-    virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition);
+    virtual void onDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
     
     //! Set whether can be moved
     void setMovable(bool enable);
@@ -78,6 +80,10 @@ public:
     const IntRect& getResizeBorder() const { return mResizeBorder; }
     
 protected:
+    //! Identify drag mode (move/resize)
+    WindowDragMode identifyDragMode(const IntVector2& position) const;
+    //! Set cursor shape based on drag mode
+    void setCursorShape(WindowDragMode mode, Cursor* cursor) const;
     //! Validate window position
     void validatePosition();
     //! Check whether alignment supports moving and resizing

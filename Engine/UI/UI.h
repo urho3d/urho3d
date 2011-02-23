@@ -87,8 +87,6 @@ private:
     void getElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool enabledOnly);
     //! Switch focus to UI element
     void switchFocusTo(UIElement* element);
-    //! Verify that an UI element belongs to the UI element hierarchy
-    UIElement* verifyElement(UIElement* element);
     //! Handle window resized event
     void handleWindowResized(StringHash eventType, VariantMap& eventData);
     //! Handle mouse move event
@@ -130,12 +128,10 @@ private:
     std::vector<UIBatch> mBatches;
     //! UI rendering quads
     std::vector<UIQuad> mQuads;
-    //! Mouse drag flag
-    bool mMouseDrag;
     //! Mouse drag UI element
-    UIElement* mMouseDragElement;
+    WeakPtr<UIElement> mMouseDragElement;
     //! Element to defocus on the next update
-    UIElement* mDefocusElement;
+    WeakPtr<UIElement> mDefocusElement;
     //! Mouse buttons held down
     int mMouseButtons;
     //! Qualifier keys held down

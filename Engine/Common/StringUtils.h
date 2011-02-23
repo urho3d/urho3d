@@ -107,6 +107,6 @@ std::string toString(const Vector4& value);
 std::string toStringHex(int value);
 //! Return an index to a string list corresponding to the given string, or a default value if not found
 unsigned getIndexFromStringList(const std::string& value, const std::string* strings, unsigned count, unsigned defaultIndex,
-    bool caseSensitive = true);
+    bool caseSensitive = false);
 
 #endif // COMMON_STRINGUTILS_H

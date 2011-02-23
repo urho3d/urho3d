@@ -118,7 +118,7 @@ void LineEdit::update(float timeStep)
     mCursor->setVisible(cursorVisible);
 }
 
-void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if ((buttons & MOUSEB_LEFT) && (mCursorMovable))
     {
@@ -131,12 +131,12 @@ void LineEdit::onClick(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void LineEdit::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void LineEdit::onDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     mDragStartPosition = getCharIndex(position);
 }
 
-void LineEdit::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void LineEdit::onDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     if ((mCursorMovable) && (mTextSelectable))
     {
@@ -151,6 +151,23 @@ void LineEdit::onDragMove(const IntVector2& position, const IntVector2& screenPo
             setCursorPosition(current);
         }
     }
+}
+
+bool LineEdit::onDragDropTest(UIElement* source)
+{
+    return (dynamic_cast<LineEdit*>(source) != 0);
+}
+
+bool LineEdit::onDragDropFinish(UIElement* source)
+{
+    LineEdit* sourceLineEdit = dynamic_cast<LineEdit*>(source);
+    if (sourceLineEdit)
+    {
+        setText(sourceLineEdit->getText());
+        return true;
+    }
+    else
+        return false;
 }
 
 void LineEdit::onKey(int key, int buttons, int qualifiers)

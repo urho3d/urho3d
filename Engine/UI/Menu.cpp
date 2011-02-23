@@ -28,6 +28,8 @@
 
 #include "DebugNew.h"
 
+static const ShortStringHash originHash("origin");
+
 Menu::Menu(const std::string& name) :
     Button(name),
     mPopupOffset(IntVector2::sZero),
@@ -39,7 +41,7 @@ Menu::Menu(const std::string& name) :
 Menu::~Menu()
 {
     if (mPopup)
-        mPopup->setOrigin(0);
+        mPopup->getUserData()[originHash].clear();
 }
 
 void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
@@ -58,7 +60,7 @@ void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
         setPopupOffset(element.getChildElement("popupoffset").getIntVector2("value"));
 }
 
-void Menu::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers)
+void Menu::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
     setPressed(true);
     // Toggle popup visibility if exists
@@ -124,7 +126,7 @@ void Menu::showPopup(bool enable)
         
         mPopup->setPosition(getScreenPosition() + mPopupOffset);
         mPopup->setVisible(true);
-        mPopup->setOrigin(this);
+        mPopup->getUserData()[originHash] = (void*)this;
         root->addChild(mPopup);
         
         // Set fixed high priority
@@ -134,7 +136,7 @@ void Menu::showPopup(bool enable)
     }
     else
     {
-        mPopup->setOrigin(0);
+        mPopup->getUserData()[originHash].clear();
         root->removeChild(mPopup);
     }
     
@@ -166,7 +168,7 @@ void Menu::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
         if ((element == this) || (element == mPopup))
             return;
         if (element->getParent() == root)
-            element = element->getOrigin();
+            element = static_cast<UIElement*>(element->getUserData()[originHash].getPtr());
         else
             element = element->getParent();
     }

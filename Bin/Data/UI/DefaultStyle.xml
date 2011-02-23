@@ -18,6 +18,12 @@
     </element>
     <element type="Cursor">
         <shape name="normal" texture="Textures/UI.png" imagerect="0 0 12 24" hotspot="0 0" />
+        <shape name="resizevertical" texture="Textures/UI.png" imagerect="0 64 20 84" hotspot="9 9" />
+        <shape name="resizediagonal_topright" texture="Textures/UI.png" imagerect="20 64 40 84" hotspot="9 9" />
+        <shape name="resizehorizontal" texture="Textures/UI.png" imagerect="40 64 60 84" hotspot="9 9" />
+        <shape name="resizediagonal_topleft" texture="Textures/UI.png" imagerect="60 64 80 84" hotspot="9 9" />
+        <shape name="rejectdrop" texture="Textures/UI.png" imagerect="80 64 100 84" hotspot="9 9" />
+        <shape name="acceptdrop" texture="Textures/UI.png" imagerect="100 64 128 90" hotspot="0 0" />
     </element>
     <element type="DropDownList">
         <texture name="Textures/UI.png" />
