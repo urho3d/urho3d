@@ -219,7 +219,7 @@ void UI::update(float timeStep)
     }
     
     // If no drag, reset cursor shape for next frame
-    if (!mMouseDragElement)
+    if ((mCursor) && (!mMouseDragElement))
         mCursor->setShape(CS_NORMAL);
 }
 
