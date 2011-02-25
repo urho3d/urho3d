@@ -25,11 +25,20 @@
 #include "BorderImage.h"
 #include "InputEvents.h"
 #include "ListView.h"
+#include "Log.h"
+#include "StringUtils.h"
 #include "UIEvents.h"
 
 #include "DebugNew.h"
 
 static const ShortStringHash indentHash("Indent");
+
+static const std::string highlightModes[] = 
+{
+    "never",
+    "focus"
+    "always"
+};
 
 int getItemIndent(UIElement* item)
 {
@@ -40,11 +49,12 @@ int getItemIndent(UIElement* item)
 
 ListView::ListView(const std::string& name) :
     ScrollView(name),
-    mSelection(M_MAX_UNSIGNED),
-    mShowSelectionAlways(false),
+    mHighlightMode(HM_FOCUS),
+    mMultiselect(false),
     mHierarchyMode(false),
     mDoubleClickInterval(0.5f),
-    mDoubleClickTimer(0.0f)
+    mDoubleClickTimer(0.0f),
+    mLastClickedItem(M_MAX_UNSIGNED)
 {
     UIElement* container = new UIElement();
     container->setEnabled(true);
@@ -79,14 +89,24 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         }
     }
     
-    if (element.hasChildElement("selection"))
-        setSelection(element.getChildElement("selection").getInt("value"));
-    if (element.hasChildElement("showselectionalways"))
-        setShowSelectionAlways(element.getChildElement("showselectionalways").getBool("enable"));
+    if (element.hasChildElement("highlightmode"))
+    {
+        std::string highlightMode = element.getChildElement("highlightmode").getStringLower("value");
+        setHighlightMode((HighlightMode)getIndexFromStringList(highlightMode, highlightModes, 3, 1));
+    }
+    if (element.hasChildElement("multiselect"))
+        setMultiselect(element.getChildElement("multiselect").getBool("enable"));
     if (element.hasChildElement("hierarchymode"))
         setHierarchyMode(element.getChildElement("hierarchymode").getBool("enable"));
     if (element.hasChildElement("doubleclickinterval"))
         setDoubleClickInterval(element.getChildElement("doubleclickinterval").getFloat("value"));
+    
+    XMLElement selectionElem = element.getChildElement("selection");
+    while (selectionElem)
+    {
+        addSelection(selectionElem.getInt("value"));
+        selectionElem = selectionElem.getNextElement("selection");
+    }
 }
 
 void ListView::update(float timeStep)
@@ -99,15 +119,19 @@ void ListView::onKey(int key, int buttons, int qualifiers)
 {
     // If no selection, can not move with keys
     unsigned numItems = getNumItems();
+    unsigned selection = getSelection();
     
-    if ((mSelection != M_MAX_UNSIGNED) && (numItems))
+    if ((selection != M_MAX_UNSIGNED) && (numItems))
     {
+        // If either shift or ctrl held down, add to selection if multiselect enabled
+        bool additive = (mMultiselect) && (qualifiers != 0);
+        
         switch (key)
         {
         case KEY_LEFT:
             if (mHierarchyMode)
             {
-                setChildItemsVisible(false);
+                setChildItemsVisible(selection, false);
                 return;
             }
             break;
@@ -115,7 +139,7 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         case KEY_RIGHT:
             if (mHierarchyMode)
             {
-                setChildItemsVisible(true);
+                setChildItemsVisible(selection, true);
                 return;
             }
             break;
@@ -123,31 +147,25 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         case KEY_RETURN:
             if (mHierarchyMode)
             {
-                toggleChildItemsVisible();
+                toggleChildItemsVisible(selection);
                 return;
             }
             break;
             
         case KEY_UP:
-            if (qualifiers & QUAL_CTRL)
-                changeSelection(-(int)numItems);
-            else
-                changeSelection(-1);
+            changeSelection(-1, additive);
             return;
             
         case KEY_DOWN:
-            if (qualifiers & QUAL_CTRL)
-                changeSelection(numItems);
-            else
-                changeSelection(1);
+            changeSelection(1, additive);
             return;
             
         case KEY_PAGEUP:
             {
                 // Convert page step to pixels and see how many items we have to skip to reach that many pixels
                 int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
-                unsigned newSelection = mSelection;
-                unsigned okSelection = mSelection;
+                unsigned newSelection = selection;
+                unsigned okSelection = selection;
                 while (newSelection < numItems)
                 {
                     UIElement* item = getItem(newSelection);
@@ -162,15 +180,18 @@ void ListView::onKey(int key, int buttons, int qualifiers)
                     stepPixels -= height;
                     --newSelection;
                 }
-                setSelection(okSelection);
+                if (!additive)
+                    setSelection(okSelection);
+                else
+                    addSelection(okSelection);
             }
             return;
             
         case KEY_PAGEDOWN:
             {
                 int stepPixels = ((int)(mPageStep * mScrollPanel->getHeight())) - getSelectedItem()->getHeight();
-                unsigned newSelection = mSelection;
-                unsigned okSelection = mSelection;
+                unsigned newSelection = selection;
+                unsigned okSelection = selection;
                 while (newSelection < numItems)
                 {
                     UIElement* item = getItem(newSelection);
@@ -185,16 +206,19 @@ void ListView::onKey(int key, int buttons, int qualifiers)
                     stepPixels -= height;
                     ++newSelection;
                 }
-                setSelection(okSelection);
+                if (!additive)
+                    setSelection(okSelection);
+                else
+                    addSelection(okSelection);
             }
             return;
             
         case KEY_HOME:
-            changeSelection(-(int)getNumItems());
+            changeSelection(-(int)getNumItems(), additive);
             return;
             
         case KEY_END:
-            changeSelection(getNumItems());
+            changeSelection(getNumItems(), additive);
             return;
         }
     }
@@ -235,20 +259,52 @@ void ListView::addItem(UIElement* item)
     
     // Enable input so that clicking the item can be detected
     item->setEnabled(true);
+    item->setSelected(false);
     mContentElement->addChild(item);
 }
 
 void ListView::removeItem(UIElement* item)
 {
-    std::vector<UIElement*> items = mContentElement->getChildren();
-    for (unsigned i = 0; i < items.size(); ++i)
+    unsigned numItems = getNumItems();
+    
+    for (unsigned i = 0; i < numItems; ++i)
     {
-        if (items[i] == item)
+        if (getItem(i) == item)
         {
-            if (mSelection == i)
-                clearSelection();
-            else if (mSelection > i)
-                changeSelection(-1);
+            item->setSelected(false);
+            mSelections.erase(i);
+            
+            // Remove any child items in hierarchy mode
+            unsigned removed = 1;
+            if (mHierarchyMode)
+            {
+                int baseIndent = getItemIndent(item);
+                for (unsigned j = i + 1; j < numItems; ++j)
+                {
+                    UIElement* childItem = getItem(j);
+                    if (getItemIndent(childItem) > baseIndent)
+                    {
+                        childItem->setSelected(false);
+                        mSelections.erase(j);
+                        mContentElement->removeChild(childItem);
+                        ++removed;
+                    }
+                    else
+                        break;
+                }
+            }
+            
+            // If necessary, shift the following selections
+            std::set<unsigned> prevSelections;
+            mSelections.clear();
+            for (std::set<unsigned>::iterator j = prevSelections.begin(); j != prevSelections.end(); ++j)
+            {
+                if (*j > i)
+                    mSelections.insert(*j - removed);
+                else
+                    mSelections.insert(*j);
+            }
+            updateSelectionEffect();
             break;
         }
     }
@@ -257,52 +313,126 @@ void ListView::removeItem(UIElement* item)
 
 void ListView::removeItem(unsigned index)
 {
-    if (index >= getNumItems())
-        return;
-    UIElement* item = mContentElement->getChild(index);
-    if (mSelection == index)
-        clearSelection();
-    else if (mSelection > index)
-        changeSelection(-1);
-    mContentElement->removeChild(item);
+    removeItem(getItem(index));
 }
 
 void ListView::removeAllItems()
 {
+    unsigned numItems = getNumItems();
+    for (unsigned i = 0; i < numItems; ++i)
+        mContentElement->getChild(i)->setSelected(false);
     mContentElement->removeAllChildren();
     clearSelection();
 }
 
 void ListView::setSelection(unsigned index)
 {
-    if (index >= getNumItems())
-        index = M_MAX_UNSIGNED;
-    else
-    {
-        if (!getItem(index)->isVisible())
-            index = M_MAX_UNSIGNED;
-    }
-    
-    mSelection = index;
-    updateSelectionEffect();
-    ensureItemVisibility();
-    
-    using namespace ItemSelected;
-    
-    VariantMap eventData;
-    eventData[P_ELEMENT] = (void*)this;
-    eventData[P_SELECTION] = mSelection;
-    sendEvent(EVENT_ITEMSELECTED, eventData);
+    std::set<unsigned> indices;
+    indices.insert(index);
+    setSelections(indices);
+    ensureItemVisibility(index);
 }
 
-void ListView::changeSelection(int delta)
+void ListView::setSelections(const std::set<unsigned>& indices)
 {
-    if (mSelection == M_MAX_UNSIGNED)
+    unsigned numItems = getNumItems();
+    
+    // Remove first items that should no longer be selected
+    for (std::set<unsigned>::iterator i = mSelections.begin(); i != mSelections.end();)
+    {
+        unsigned index = *i;
+        if (indices.find(index) == indices.end())
+        {
+            i = mSelections.erase(i);
+            
+            using namespace ItemSelected;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_SELECTION] = index;
+            sendEvent(EVENT_ITEMDESELECTED, eventData);
+        }
+        else
+            ++i;
+    }
+    
+    // Then add missing items
+    for (std::set<unsigned>::const_iterator i = indices.begin(); i != indices.end(); ++i)
+    {
+        unsigned index = *i;
+        if (index < numItems)
+        {
+            if (mSelections.find(index) == mSelections.end())
+            {
+                mSelections.insert(*i);
+                
+                using namespace ItemSelected;
+                
+                VariantMap eventData;
+                eventData[P_ELEMENT] = (void*)this;
+                eventData[P_SELECTION] = *i;
+                sendEvent(EVENT_ITEMSELECTED, eventData);
+            }
+        }
+        // If no multiselect enabled, allow setting only one item
+        if (!mMultiselect)
+            break;
+    }
+    
+    updateSelectionEffect();
+}
+
+void ListView::addSelection(unsigned index)
+{
+    if (!mMultiselect)
+        setSelection(index);
+    else
+    {
+        if (index >= getNumItems())
+            return;
+        
+        std::set<unsigned> newSelections = mSelections;
+        newSelections.insert(index);
+        setSelections(newSelections);
+        ensureItemVisibility(index);
+    }
+}
+
+void ListView::removeSelection(unsigned index)
+{
+    if (index >= getNumItems())
         return;
     
+    std::set<unsigned> newSelections = mSelections;
+    newSelections.erase(index);
+    setSelections(newSelections);
+    ensureItemVisibility(index);
+}
+
+void ListView::toggleSelection(unsigned index)
+{
     unsigned numItems = getNumItems();
-    unsigned newSelection = mSelection;
-    unsigned okSelection = mSelection;
+    if (index >= numItems)
+        return;
+    
+    if (mSelections.find(index) != mSelections.end())
+        removeSelection(index);
+    else
+        addSelection(index);
+}
+
+void ListView::changeSelection(int delta, bool additive)
+{
+    if (mSelections.empty())
+        return;
+    if (!mMultiselect)
+        additive = false;
+    
+    // If going downwards, use the last selection as a base. Otherwise use first
+    unsigned selection = delta > 0 ? *mSelections.rbegin() : *mSelections.begin();
+    unsigned numItems = getNumItems();
+    unsigned newSelection = selection;
+    unsigned okSelection = selection;
     while (delta != 0)
     {
         if (delta > 0)
@@ -328,17 +458,27 @@ void ListView::changeSelection(int delta)
         }
     }
     
-    setSelection(okSelection);
+    if (!additive)
+        setSelection(okSelection);
+    else
+        addSelection(okSelection);
 }
 
 void ListView::clearSelection()
 {
-    setSelection(M_MAX_UNSIGNED);
+    setSelections(std::set<unsigned>());
+    updateSelectionEffect();
 }
 
-void ListView::setShowSelectionAlways(bool enable)
+void ListView::setHighlightMode(HighlightMode mode)
 {
-    mShowSelectionAlways = enable;
+    mHighlightMode = mode;
+    updateSelectionEffect();
+}
+
+void ListView::setMultiselect(bool enable)
+{
+    mMultiselect = enable;
 }
 
 void ListView::setHierarchyMode(bool enable)
@@ -351,15 +491,16 @@ void ListView::setDoubleClickInterval(float interval)
     mDoubleClickInterval = interval;
 }
 
-void ListView::setChildItemsVisible(bool enable)
+void ListView::setChildItemsVisible(unsigned index, bool enable)
 {
-    if ((!mHierarchyMode) || (mSelection == M_MAX_UNSIGNED))
+    unsigned numItems = getNumItems();
+    
+    if ((!mHierarchyMode) || (index >= numItems))
         return;
     
-    unsigned numItems = getNumItems();
-    int baseIndent = getItemIndent(getSelectedItem());
+    int baseIndent = getItemIndent(getItem(index));
     
-    for (unsigned i = mSelection + 1; i < numItems; ++i)
+    for (unsigned i = index + 1; i < numItems; ++i)
     {
         UIElement* item = getItem(i);
         if (getItemIndent(item) > baseIndent)
@@ -369,15 +510,16 @@ void ListView::setChildItemsVisible(bool enable)
     }
 }
 
-void ListView::toggleChildItemsVisible()
+void ListView::toggleChildItemsVisible(unsigned index)
 {
-    if ((!mHierarchyMode) || (mSelection == M_MAX_UNSIGNED))
+    unsigned numItems = getNumItems();
+    
+    if ((!mHierarchyMode) || (index >= numItems))
         return;
     
-    unsigned numItems = getNumItems();
-    int baseIndent = getItemIndent(getSelectedItem());
+    int baseIndent = getItemIndent(getItem(index));
     
-    for (unsigned i = mSelection + 1; i < numItems; ++i)
+    for (unsigned i = index + 1; i < numItems; ++i)
     {
         UIElement* item = getItem(i);
         if (getItemIndent(item) > baseIndent)
@@ -402,25 +544,52 @@ std::vector<UIElement*> ListView::getItems() const
     return mContentElement->getChildren();
 }
 
+unsigned ListView::getSelection() const
+{
+    if (mSelections.empty())
+        return M_MAX_UNSIGNED;
+    else
+        return *mSelections.begin();
+}
+
 UIElement* ListView::getSelectedItem() const
 {
-    return mContentElement->getChild(mSelection);
+    return mContentElement->getChild(getSelection());
+}
+
+std::vector<UIElement*> ListView::getSelectedItems() const
+{
+    std::vector<UIElement*> ret;
+    for (std::set<unsigned>::const_iterator i = mSelections.begin(); i != mSelections.end(); ++i)
+    {
+        UIElement* item = getItem(*i);
+        if (item)
+            ret.push_back(item);
+    }
+    return ret;
 }
 
 void ListView::updateSelectionEffect()
 {
     unsigned numItems = getNumItems();
+    
     for (unsigned i = 0; i < numItems; ++i)
-        getItem(i)->setSelected((i == mSelection) && ((mFocus) || (mShowSelectionAlways)));
+    {
+        UIElement* item = getItem(i);
+        if ((mHighlightMode != HM_NEVER) && (mSelections.find(i) != mSelections.end()))
+            item->setSelected((mFocus) || (mHighlightMode == HM_ALWAYS));
+        else
+            item->setSelected(false);
+    }
 }
 
-void ListView::ensureItemVisibility()
+void ListView::ensureItemVisibility(unsigned index)
 {
-    UIElement* selected = getSelectedItem();
-    if (!selected)
+    UIElement* item = getItem(index);
+    if (!item)
         return;
     
-    IntVector2 currentOffset = selected->getScreenPosition() - mScrollPanel->getScreenPosition() - mContentElement->getPosition();
+    IntVector2 currentOffset = item->getScreenPosition() - mScrollPanel->getScreenPosition() - mContentElement->getPosition();
     IntVector2 newView = getViewPosition();
     const IntRect& clipBorder = mScrollPanel->getClipBorder();
     IntVector2 windowSize(mScrollPanel->getWidth() - clipBorder.mLeft - clipBorder.mRight, mScrollPanel->getHeight() -
@@ -428,8 +597,8 @@ void ListView::ensureItemVisibility()
     
     if (currentOffset.mY < 0)
         newView.mY += currentOffset.mY;
-    if (currentOffset.mY + selected->getHeight() > windowSize.mY)
-        newView.mY += currentOffset.mY + selected->getHeight() - windowSize.mY;
+    if (currentOffset.mY + item->getHeight() > windowSize.mY)
+        newView.mY += currentOffset.mY + item->getHeight() - windowSize.mY;
     
     setViewPosition(newView);
 }
@@ -438,6 +607,7 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     if (eventData[UIMouseClick::P_BUTTON].getInt() != MOUSEB_LEFT)
         return;
+    int qualifiers = eventData[UIMouseClick::P_QUALIFIERS].getInt();
     
     UIElement* element = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].getPtr());
     
@@ -447,24 +617,70 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
         if (element == getItem(i))
         {
             bool isDoubleClick = false;
-            if ((mDoubleClickTimer > 0.0f) && (mSelection == i))
+            if ((!mMultiselect) || (!qualifiers))
             {
-                isDoubleClick = true;
-                mDoubleClickTimer = 0.0f;
+                if ((mDoubleClickTimer > 0.0f) && (mLastClickedItem == i))
+                {
+                    isDoubleClick = true;
+                    mDoubleClickTimer = 0.0f;
+                }
+                else
+                {
+                    mDoubleClickTimer = mDoubleClickInterval;
+                    mLastClickedItem = i;
+                }
+                setSelection(i);
             }
-            else
-                mDoubleClickTimer = mDoubleClickInterval;
             
-            setSelection(i);
+            if (mMultiselect)
+            {
+                if (qualifiers & QUAL_SHIFT)
+                {
+                    if (mSelections.empty())
+                        setSelection(i);
+                    else
+                    {
+                        unsigned first = *mSelections.begin();
+                        unsigned last = *mSelections.rbegin();
+                        std::set<unsigned> newSelections = mSelections;
+                        if (i < first)
+                        {
+                            for (unsigned j = i; j <= first; ++j)
+                                newSelections.insert(j);
+                        }
+                        else if (i <= last)
+                        {
+                            if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
+                            {
+                                for (unsigned j = first; j <= i; ++j)
+                                    newSelections.insert(j);
+                            }
+                            else
+                            {
+                                for (unsigned j = i; j <= last; ++j)
+                                    newSelections.insert(j);
+                            }
+                        }
+                        if (i > last)
+                        {
+                            for (unsigned j = last; j <= i; ++j)
+                                newSelections.insert(j);
+                        }
+                        setSelections(newSelections);
+                    }
+                }
+                else if (qualifiers & QUAL_CTRL)
+                    toggleSelection(i);
+            }
             
             if (isDoubleClick)
             {
                 if (mHierarchyMode)
-                    toggleChildItemsVisible();
+                    toggleChildItemsVisible(i);
                 
                 VariantMap eventData;
                 eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
-                eventData[ItemDoubleClicked::P_SELECTION] = mSelection;
+                eventData[ItemDoubleClicked::P_SELECTION] = i;
                 sendEvent(EVENT_ITEMDOUBLECLICKED, eventData);
             }
             

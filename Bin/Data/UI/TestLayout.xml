@@ -110,6 +110,7 @@
     <element type="ListView">
         <position value="150 100" />
         <size value="212 112" />
+        <multiselect enable="true" />
         <listitem name="Item1" />
         <listitem name="Item2" />
         <listitem name="Item3" />

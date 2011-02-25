@@ -192,14 +192,41 @@ static void registerScrollView(asIScriptEngine* engine)
     registerRefCasts<UIElement, ScrollView>(engine, "UIElement", "ScrollView");
 }
 
+void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
+{
+    unsigned numItems = selections->GetSize();
+    std::set<unsigned> dest;
+    
+    for (unsigned i = 0; i < numItems; ++i)
+        dest.insert(*((unsigned*)selections->At(i)));
+    
+    ptr->setSelections(dest);
+}
+
+static CScriptArray* ListViewGetSelections(ListView* ptr)
+{
+    return setToArray<unsigned>(ptr->getSelections(), "array<uint>");
+}
+
 static CScriptArray* ListViewGetItems(ListView* ptr)
 {
     std::vector<UIElement*> result = ptr->getItems();
     return vectorToHandleArray<UIElement>(result, "array<UIElement@>");
 }
 
+static CScriptArray* ListViewGetSelectedItems(ListView* ptr)
+{
+    std::vector<UIElement*> result = ptr->getSelectedItems();
+    return vectorToHandleArray<UIElement>(result, "array<UIElement@>");
+}
+
 static void registerListView(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("HighlightMode");
+    engine->RegisterEnumValue("HighlightMode", "HM_NEVER", HM_NEVER);
+    engine->RegisterEnumValue("HighlightMode", "HM_FOCUS", HM_FOCUS);
+    engine->RegisterEnumValue("HighlightMode", "HM_ALWAYS", HM_ALWAYS);
+    
     registerUIElement<ListView>(engine, "ListView");
     engine->RegisterObjectMethod("ListView", "void setViewPosition(const IntVector2& in)", asMETHODPR(ListView, setViewPosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setViewPosition(int, int)", asMETHODPR(ListView, setViewPosition, (int, int), void), asCALL_THISCALL);
@@ -211,11 +238,18 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void removeItem(uint)", asMETHODPR(ListView, removeItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeAllItems()", asMETHOD(ListView, removeAllItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setSelection(uint)", asMETHOD(ListView, setSelection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void changeSelection(int)", asMETHOD(ListView, changeSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setSelections(array<uint>@+)", asFUNCTION(ListViewSetSelections), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ListView", "void addSelection(uint)", asMETHOD(ListView, addSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void removeSelection(uint)", asMETHOD(ListView, removeSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void toggleSelection(uint)", asMETHOD(ListView, toggleSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void changeSelection(int, bool)", asMETHOD(ListView, changeSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void clearSelection()", asMETHOD(ListView, clearSelection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void setShowSelectionAlways(bool)", asMETHOD(ListView, setShowSelectionAlways), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setHighlightMode(HighlightMode)", asMETHOD(ListView, setHighlightMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setMultiselect(bool)", asMETHOD(ListView, setMultiselect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setHierarchyMode(bool)", asMETHOD(ListView, setHierarchyMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setDoubleClickInterval(float)", asMETHOD(ListView, setDoubleClickInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setChildItemsVisible(uint, bool)", asMETHOD(ListView, setChildItemsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void toggleChildItemsVisible(uint)", asMETHOD(ListView, toggleChildItemsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "const IntVector2& getViewPosition() const", asMETHOD(ListView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getContentElement() const", asMETHOD(ListView, getContentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "ScrollBar@+ getHorizontalScrollBar() const", asMETHOD(ListView, getHorizontalScrollBar), asCALL_THISCALL);
@@ -229,8 +263,11 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "UIElement@+ getItem(uint) const", asMETHOD(ListView, getItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "array<UIElement@>@ getItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "uint getSelection() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "array<uint>@ getSelections() const", asFUNCTION(ListViewGetSelections), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getSelectedItem() const", asMETHOD(ListView, getSelectedItem), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "bool getShowSelectionAlways() const", asMETHOD(ListView, getShowSelectionAlways), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "array<UIElement@>@ getSelectedItems() const", asFUNCTION(ListViewGetSelectedItems), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ListView", "HighlightMode getHighlightMode() const", asMETHOD(ListView, getHighlightMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getMultiselect() const", asMETHOD(ListView, getMultiselect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getHierarchyMode() const", asMETHOD(ListView, getHierarchyMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getDoubleClickInterval() const", asMETHOD(ListView, getDoubleClickInterval), asCALL_THISCALL);
     registerRefCasts<UIElement, ListView>(engine, "UIElement", "ListView");

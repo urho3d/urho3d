@@ -141,6 +141,30 @@ template <class T> CScriptArray* sharedPtrVectorToHandleArray(const std::vector<
         return 0;
 }
 
+//! Template function for std::set to array conversion
+template <class T> CScriptArray* setToArray(const std::set<T>& set, const char* arrayName)
+{
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIScriptEngine* engine = context->GetEngine();
+        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        CScriptArray* arr = new CScriptArray(set.size(), type);
+        
+        unsigned index = 0;
+        for (std::set<T>::const_iterator i = set.begin(); i != set.end(); ++i)
+        {
+            *(static_cast<T*>(arr->At(index))) = *i;
+            ++index;
+        }
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
+
 //! Template function for registering implicit ref casts between two classes
 template <class T, class U> void registerRefCasts(asIScriptEngine* engine, const char* classNameT, const char* classNameU)
 {
