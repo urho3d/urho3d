@@ -247,6 +247,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void setHighlightMode(HighlightMode)", asMETHOD(ListView, setHighlightMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setMultiselect(bool)", asMETHOD(ListView, setMultiselect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setHierarchyMode(bool)", asMETHOD(ListView, setHierarchyMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setClearSelectionOnDefocus(bool)", asMETHOD(ListView, setClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setDoubleClickInterval(float)", asMETHOD(ListView, setDoubleClickInterval), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setChildItemsVisible(uint, bool)", asMETHOD(ListView, setChildItemsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void toggleChildItemsVisible(uint)", asMETHOD(ListView, toggleChildItemsVisible), asCALL_THISCALL);
@@ -269,6 +270,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "HighlightMode getHighlightMode() const", asMETHOD(ListView, getHighlightMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getMultiselect() const", asMETHOD(ListView, getMultiselect), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "bool getHierarchyMode() const", asMETHOD(ListView, getHierarchyMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "bool getClearSelectionOnDefocus() const", asMETHOD(ListView, getClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getDoubleClickInterval() const", asMETHOD(ListView, getDoubleClickInterval), asCALL_THISCALL);
     registerRefCasts<UIElement, ListView>(engine, "UIElement", "ListView");
 }

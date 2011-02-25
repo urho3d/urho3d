@@ -52,6 +52,7 @@ ListView::ListView(const std::string& name) :
     mHighlightMode(HM_FOCUS),
     mMultiselect(false),
     mHierarchyMode(false),
+    mClearSelectionOnDefocus(false),
     mDoubleClickInterval(0.5f),
     mDoubleClickTimer(0.0f),
     mLastClickedItem(M_MAX_UNSIGNED)
@@ -98,6 +99,8 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         setMultiselect(element.getChildElement("multiselect").getBool("enable"));
     if (element.hasChildElement("hierarchymode"))
         setHierarchyMode(element.getChildElement("hierarchymode").getBool("enable"));
+    if (element.hasChildElement("clearselection"))
+        setClearSelectionOnDefocus(element.getChildElement("clearselection").getBool("enable"));
     if (element.hasChildElement("doubleclickinterval"))
         setDoubleClickInterval(element.getChildElement("doubleclickinterval").getFloat("value"));
     
@@ -249,6 +252,9 @@ void ListView::onFocus()
 
 void ListView::onDefocus()
 {
+    if (mClearSelectionOnDefocus)
+        clearSelection();
+    
     updateSelectionEffect();
 }
 
@@ -485,6 +491,11 @@ void ListView::setMultiselect(bool enable)
 void ListView::setHierarchyMode(bool enable)
 {
     mHierarchyMode = enable;
+}
+
+void ListView::setClearSelectionOnDefocus(bool enable)
+{
+    mClearSelectionOnDefocus = enable;
 }
 
 void ListView::setDoubleClickInterval(float interval)

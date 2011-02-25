@@ -39,7 +39,7 @@ enum HighlightMode
     HM_ALWAYS
 };
 
-//! A scrollable list
+//! A scrollable list of items
 class ListView : public ScrollView
 {
     DEFINE_TYPE(ListView);
@@ -91,6 +91,8 @@ public:
     void setMultiselect(bool enable);
     //! Enable hierarchy mode. Allows hiding/showing items that have "indent" userdata
     void setHierarchyMode(bool enable);
+    //! Enable clearing of selection on defocus
+    void setClearSelectionOnDefocus(bool enable);
     //! Set item doubleclick interval in seconds
     void setDoubleClickInterval(float interval);
     //! Show or hide child items starting from index. Only has effect in hierarchy mode
@@ -116,6 +118,8 @@ public:
     HighlightMode getHighlightMode() const { return mHighlightMode; }
     //! Return whether multiselect enabled
     bool getMultiselect() const { return mMultiselect; }
+    //! Return whether selection is cleared on defocus
+    bool getClearSelectionOnDefocus() const { return mClearSelectionOnDefocus; }
     //! Return whether hierarchy mode enabled
     bool getHierarchyMode() const { return mHierarchyMode; }
     //! Return item doubleclick interval in seconds
@@ -135,6 +139,8 @@ protected:
     bool mMultiselect;
     //! Hierarchy mode flag
     bool mHierarchyMode;
+    //! Clear selection on defocus flag
+    bool mClearSelectionOnDefocus;
     //! Doubleclick interval
     float mDoubleClickInterval;
     //! Doubleclick timer

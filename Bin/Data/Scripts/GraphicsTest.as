@@ -325,7 +325,17 @@ void initUI()
     cursor.setPosition(renderer.getWidth() / 2, renderer.getHeight() / 2);
     ui.setCursor(cursor);
 
-	/*
+    bool uiTest = false;
+    array<string> arguments = getArguments();
+    for (uint i = 0; i < arguments.length(); ++i)
+    {
+        if (arguments[i] == "-uitest")
+            uiTest = true;
+    }
+
+    if (!uiTest)
+        return;
+    
     XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
     UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
     uiRoot.addChild(layoutRoot);
@@ -343,7 +353,7 @@ void initUI()
     fileSelector.setFilters(filters, 0);
 
     subscribeToEvent(fileSelector, "FileSelected", "handleFileSelected");
-    */
+
 }
 
 void handleFileSelected(StringHash eventType, VariantMap& eventData)
