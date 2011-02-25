@@ -362,7 +362,8 @@ void ListView::setSelections(const std::set<unsigned>& indices)
         unsigned index = *i;
         if (index < numItems)
         {
-            if (mSelections.find(index) == mSelections.end())
+            // In singleselect mode, resend the event even for the same selection
+            if ((mSelections.find(index) == mSelections.end()) || (!mMultiselect))
             {
                 mSelections.insert(*i);
                 
@@ -616,6 +617,7 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
     {
         if (element == getItem(i))
         {
+            // Check doubleclick
             bool isDoubleClick = false;
             if ((!mMultiselect) || (!qualifiers))
             {
@@ -632,6 +634,7 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
                 setSelection(i);
             }
             
+            // Check multiselect with shift & ctrl
             if (mMultiselect)
             {
                 if (qualifiers & QUAL_SHIFT)
@@ -643,12 +646,17 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
                         unsigned first = *mSelections.begin();
                         unsigned last = *mSelections.rbegin();
                         std::set<unsigned> newSelections = mSelections;
-                        if (i < first)
+                        if ((i == first) || (i == last))
+                        {
+                            for (unsigned j = first; j <= last; ++j)
+                                newSelections.insert(j);
+                        }
+                        else if (i < first)
                         {
                             for (unsigned j = i; j <= first; ++j)
                                 newSelections.insert(j);
                         }
-                        else if (i <= last)
+                        else if (i < last)
                         {
                             if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
                             {
@@ -661,7 +669,7 @@ void ListView::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
                                     newSelections.insert(j);
                             }
                         }
-                        if (i > last)
+                        else if (i > last)
                         {
                             for (unsigned j = last; j <= i; ++j)
                                 newSelections.insert(j);
