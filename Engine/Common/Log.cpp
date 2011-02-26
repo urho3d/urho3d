@@ -93,8 +93,11 @@ void Log::write(LogLevel level, const std::string& message)
         fflush(mHandle);
     }
     
-    for (std::vector<LogListener*>::const_iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-        (*i)->write(formattedMessage);
+    using namespace LogMessage;
+    
+    VariantMap eventData;
+    eventData[P_MESSAGE] = formattedMessage;
+    sendEvent(EVENT_LOGMESSAGE, eventData);
 }
 
 void Log::writeRaw(const std::string& message)
@@ -109,25 +112,11 @@ void Log::writeRaw(const std::string& message)
         fflush(mHandle);
     }
     
-    for (std::vector<LogListener*>::const_iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-        (*i)->write(message);
-}
-
-void Log::addListener(LogListener* listener)
-{
-    mListeners.push_back(listener);
-}
-
-void Log::removeListener(LogListener* listener)
-{
-    for (std::vector<LogListener*>::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
-    {
-        if ((*i) == listener)
-        {
-            mListeners.erase(i);
-            return;
-        }
-    }
+    using namespace LogMessage;
+    
+    VariantMap eventData;
+    eventData[P_MESSAGE] = message;
+    sendEvent(EVENT_LOGMESSAGE, eventData);
 }
 
 void writeToLog(LogLevel level, const std::string& message)

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -112,6 +112,7 @@
 #define TXT_INVALID_CHAR_LITERAL                "Invalid character literal"
 #define TXT_INVALID_CONTINUE                    "Invalid 'continue'"
 #define TXT_INVALID_ESCAPE_SEQUENCE             "Invalid escape sequence"
+#define TXT_INVALID_REF_PROP_ACCESS             "Invalid reference. Property accessors cannot be used in combined read/write operations"
 #define TXT_INVALID_SCOPE                       "Invalid scope resolution"
 #define TXT_INVALID_TYPE                        "Invalid type"
 #define TXT_INVALID_UNICODE_FORMAT_EXPECTED_d   "Invalid unicode escape sequence, expected %d hex digits"

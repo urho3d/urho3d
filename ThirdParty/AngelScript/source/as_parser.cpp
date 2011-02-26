@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -2721,7 +2721,7 @@ asCScriptNode *asCParser::ParseExprPostOp()
 		GetToken(&t);
 		if( t.type != ttCloseBracket )
 		{
-			ExpectedToken("]");
+			Error(ExpectedToken("]").AddressOf(), &t);
 			return node;
 		}
 

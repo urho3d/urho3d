@@ -67,6 +67,7 @@ public:
 
 	int  Optimize();
 	void ExtractLineNumbers();
+	void ExtractObjectVariableInfo(asCScriptFunction *outFunc);
 	int  ResolveJumpAddresses();
 	int  FindLabel(int label, cByteInstruction *from, cByteInstruction **dest, int *positionDelta);
 
@@ -92,6 +93,8 @@ public:
 
 	void Label(short label);
 	void Line(int line, int column);
+	void ObjInfo(int offset, int info);
+	void Block(bool start);
 	void Call(asEBCInstr bc, int funcID, int pop);
 	void CallPtr(asEBCInstr bc, int funcPtrVar, int pop);
 	void Alloc(asEBCInstr bc, void *objID, int funcID, int pop);

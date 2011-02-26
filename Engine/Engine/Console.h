@@ -25,7 +25,6 @@
 #define ENGINE_CONSOLE_H
 
 #include "EventListener.h"
-#include "Log.h"
 #include "SharedPtr.h"
 
 class BorderImage;
@@ -36,16 +35,13 @@ class Text;
 class XMLFile;
 
 //! A console window with log history and AngelScript prompt
-class Console : public RefCounted, public EventListener, public LogListener
+class Console : public RefCounted, public EventListener
 {
 public:
     //! Construct with an Engine pointer
     Console(Engine* engine);
     //! Destruct
     ~Console();
-    
-    //! Write a log message
-    virtual void write(const std::string& message);
     
     //! Set UI elements' style from an XML file
     void setStyle(XMLFile* style);
@@ -74,6 +70,8 @@ private:
     void handleTextFinished(StringHash eventType, VariantMap& eventData);
     //! Handle rendering window resize
     void handleWindowResized(StringHash eventType, VariantMap& eventData);
+    //! Handle a log message
+    void handleLogMessage(StringHash eventType, VariantMap& eventData);
     
     //! Engine
     Engine* mEngine;

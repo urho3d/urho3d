@@ -266,6 +266,10 @@ void initScene()
         
         lights.insertLast(newEntity);
     }
+    
+    // Save the ready scene for examination
+    scene.saveXML(File("Data/GraphicsTestScene.xml", FILE_WRITE));
+    scene.save(File("Data/GraphicsTestScene.scn", FILE_WRITE));
 }
 
 void animateScene(float timeStep)
@@ -335,7 +339,7 @@ void initUI()
 
     if (!uiTest)
         return;
-    
+
     XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
     UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
     uiRoot.addChild(layoutRoot);

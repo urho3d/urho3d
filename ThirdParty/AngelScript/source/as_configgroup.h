@@ -62,7 +62,7 @@ public:
 	void RefConfigGroup(asCConfigGroup *group);
 
 	bool HasLiveObjects();
-	void RemoveConfiguration(asCScriptEngine *engine);
+	void RemoveConfiguration(asCScriptEngine *engine, bool notUsed = false);
 
 	int SetModuleAccess(const char *module, bool hasAccess);
 	bool HasModuleAccess(const char *module);

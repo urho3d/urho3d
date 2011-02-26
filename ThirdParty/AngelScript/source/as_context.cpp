@@ -333,6 +333,8 @@ int asCContext::Prepare(int funcID)
 		// Set all object variables to 0
 		for( asUINT n = 0; n < currentFunction->objVariablePos.GetLength(); n++ )
 		{
+			if( !currentFunction->objVariableIsOnHeap[n] ) continue;
+
 			int pos = currentFunction->objVariablePos[n];
 			*(size_t*)&regs.stackFramePointer[-pos] = 0;
 		}
@@ -349,8 +351,9 @@ int asCContext::Unprepare()
 	if( status == asEXECUTION_ACTIVE || status == asEXECUTION_SUSPENDED )
 		return asCONTEXT_ACTIVE;
 
-	// Only clean the stack if the context was prepared but not executed
-	if( status != asEXECUTION_UNINITIALIZED )
+	// Only clean the stack if the context was prepared but not executed until the end
+	if( status != asEXECUTION_UNINITIALIZED && 
+		status != asEXECUTION_FINISHED )
 		CleanStack();
 
 	// Release the returned object (if any)
@@ -1107,7 +1110,7 @@ asIScriptFunction *asCContext::GetFunction(asUINT stackLevel)
 
 	if( stackLevel == 0 ) return currentFunction;
 
-	size_t *s = callStack.AddressOf() + (stackLevel - 1)*CALLSTACK_FRAME_SIZE;
+	size_t *s = callStack.AddressOf() + (GetCallstackSize() - stackLevel - 1)*CALLSTACK_FRAME_SIZE;
 	asCScriptFunction *func = (asCScriptFunction*)s[1];
 
 	return func;
@@ -1127,7 +1130,7 @@ int asCContext::GetLineNumber(asUINT stackLevel, int *column, const char **secti
 	}
 	else
 	{
-		size_t *s = callStack.AddressOf() + (stackLevel-1)*CALLSTACK_FRAME_SIZE;
+		size_t *s = callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
 		func = (asCScriptFunction*)s[1];
 		bytePos = (asDWORD*)s[2];
 	}
@@ -1194,9 +1197,12 @@ void asCContext::CallScriptFunction(asCScriptFunction *func)
 	// Update framepointer and programCounter
 	regs.stackFramePointer = regs.stackPointer;
 
+	// TODO: optimize: This can be avoided handling this as is done for value types in the exception handler
 	// Set all object variables to 0
 	for( asUINT n = 0; n < currentFunction->objVariablePos.GetLength(); n++ )
 	{
+		if( !currentFunction->objVariableIsOnHeap[n] ) continue;
+
 		int pos = currentFunction->objVariablePos[n];
 		*(size_t*)&regs.stackFramePointer[-pos] = 0;
 	}
@@ -1246,7 +1252,7 @@ void asCContext::CallInterfaceMethod(asCScriptFunction *func)
 			return;
 		}
 	}
-	else /* if( func->funcType == asFUNC_VIRTUAL ) */
+	else // if( func->funcType == asFUNC_VIRTUAL )
 	{
 		realFunc = objType->virtualFunctionTable[func->vfTableIdx];
 	}
@@ -1802,7 +1808,7 @@ void asCContext::ExecuteNext()
 			// replace the pointer on the stack with the lvalue
 			*(size_t**)l_sp = (size_t*)d;
 		}
-		l_bc++;
+		l_bc += 2;
 		break;
 
 	case asBC_PshC8:
@@ -2994,7 +3000,7 @@ void asCContext::ExecuteNext()
 
 	case asBC_DIVi64:
 		{
-			asQWORD divider = *(asQWORD*)(l_fp - asBC_SWORDARG2(l_bc));
+			asINT64 divider = *(asINT64*)(l_fp - asBC_SWORDARG2(l_bc));
 			if( divider == 0 )
 			{
 				// Need to move the values back to the context
@@ -3006,14 +3012,14 @@ void asCContext::ExecuteNext()
 				SetInternalException(TXT_DIVIDE_BY_ZERO);
 				return;
 			}
-			*(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc)) / divider;
+			*(asINT64*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asINT64*)(l_fp - asBC_SWORDARG1(l_bc)) / divider;
 		}
 		l_bc += 2;
 		break;
 
 	case asBC_MODi64:
 		{
-			asQWORD divider = *(asQWORD*)(l_fp - asBC_SWORDARG2(l_bc));
+			asINT64 divider = *(asINT64*)(l_fp - asBC_SWORDARG2(l_bc));
 			if( divider == 0 )
 			{
 				// Need to move the values back to the context
@@ -3025,7 +3031,7 @@ void asCContext::ExecuteNext()
 				SetInternalException(TXT_DIVIDE_BY_ZERO);
 				return;
 			}
-			*(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc)) % divider;
+			*(asINT64*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asINT64*)(l_fp - asBC_SWORDARG1(l_bc)) % divider;
 		}
 		l_bc += 2;
 		break;
@@ -3205,12 +3211,84 @@ void asCContext::ExecuteNext()
 		l_bc++;
 		break;
 
+	case asBC_DIVu:
+		{
+			asUINT divider = *(asUINT*)(l_fp - asBC_SWORDARG2(l_bc));
+			if( divider == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_DIVIDE_BY_ZERO);
+				return;
+			}
+			*(asUINT*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asUINT*)(l_fp - asBC_SWORDARG1(l_bc)) / divider;
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_MODu:
+		{
+			asUINT divider = *(asUINT*)(l_fp - asBC_SWORDARG2(l_bc));
+			if( divider == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_DIVIDE_BY_ZERO);
+				return;
+			}
+			*(asUINT*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asUINT*)(l_fp - asBC_SWORDARG1(l_bc)) % divider;
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_DIVu64:
+		{
+			asQWORD divider = *(asQWORD*)(l_fp - asBC_SWORDARG2(l_bc));
+			if( divider == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_DIVIDE_BY_ZERO);
+				return;
+			}
+			*(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc)) / divider;
+		}
+		l_bc += 2;
+		break;
+
+	case asBC_MODu64:
+		{
+			asQWORD divider = *(asQWORD*)(l_fp - asBC_SWORDARG2(l_bc));
+			if( divider == 0 )
+			{
+				// Need to move the values back to the context
+				regs.programPointer = l_bc;
+				regs.stackPointer = l_sp;
+				regs.stackFramePointer = l_fp;
+
+				// Raise exception
+				SetInternalException(TXT_DIVIDE_BY_ZERO);
+				return;
+			}
+			*(asQWORD*)(l_fp - asBC_SWORDARG0(l_bc)) = *(asQWORD*)(l_fp - asBC_SWORDARG1(l_bc)) % divider;
+		}
+		l_bc += 2;
+		break;
+
 	// Don't let the optimizer optimize for size,
 	// since it requires extra conditions and jumps
-	case 180: l_bc = (asDWORD*)180; break;
-	case 181: l_bc = (asDWORD*)181; break;
-	case 182: l_bc = (asDWORD*)182; break;
-	case 183: l_bc = (asDWORD*)183; break;
 	case 184: l_bc = (asDWORD*)184; break;
 	case 185: l_bc = (asDWORD*)185; break;
 	case 186: l_bc = (asDWORD*)186; break;
@@ -3386,31 +3464,138 @@ void asCContext::CleanStack()
 	inExceptionHandler = false;
 }
 
+void asCContext::DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLevel)
+{
+	asASSERT( stackLevel < GetCallstackSize() );
+
+	asCScriptFunction *func;
+	asUINT pos;
+
+	if( stackLevel == 0 )
+	{
+		func = currentFunction;
+		pos = asUINT(regs.programPointer - func->byteCode.AddressOf());
+	}
+	else
+	{
+		size_t *s = callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
+		func = (asCScriptFunction*)s[1];
+		pos = asUINT((asDWORD*)s[2] - func->byteCode.AddressOf());
+	}
+
+
+	// Determine which object variables that are really live ones
+	liveObjects.SetLength(func->objVariablePos.GetLength());
+	memset(liveObjects.AddressOf(), 0, sizeof(int)*liveObjects.GetLength());
+	for( int n = 0; n < (int)func->objVariableInfo.GetLength(); n++ )
+	{
+		if( func->objVariableInfo[n].programPos >= pos )
+		{
+			// We've determined how far the execution ran, now determine which variables are alive
+			for( --n; n >= 0; n-- )
+			{
+				switch( func->objVariableInfo[n].option )
+				{
+				case asOBJ_UNINIT: // Object was destroyed
+					{
+						// TODO: optimize: This should have been done by the compiler already
+						// Which variable is this?
+						asUINT var = 0;
+						for( asUINT v = 0; v < func->objVariablePos.GetLength(); v++ )
+							if( func->objVariablePos[v] == func->objVariableInfo[n].variableOffset )
+							{
+								var = v;
+								break;
+							}
+						liveObjects[var] -= 1;
+					}
+					break;
+				case asOBJ_INIT: // Object was created
+					{
+						// Which variable is this?
+						asUINT var = 0;
+						for( asUINT v = 0; v < func->objVariablePos.GetLength(); v++ )
+							if( func->objVariablePos[v] == func->objVariableInfo[n].variableOffset )
+							{
+								var = v;
+								break;
+							}
+						liveObjects[var] += 1;
+					}
+					break;
+				case asBLOCK_BEGIN: // Start block
+					// We should ignore start blocks, since it just means the  
+					// program was within the block when the exception ocurred
+					break;
+				case asBLOCK_END: // End block
+					// We need to skip the entire block, as the objects created
+					// and destroyed inside this block are already out of scope
+					{
+						int nested = 1;
+						while( nested > 0 )
+						{
+							int option = func->objVariableInfo[--n].option;
+							if( option == 3 )
+								nested++;
+							if( option == 2 )
+								nested--;
+						}
+					}
+					break;
+				}
+			}
+
+			// We're done with the investigation
+			break;
+		}
+	}
+}
+
 void asCContext::CleanStackFrame()
 {
 	// Clean object variables
 	if( !isStackMemoryNotAllocated )
 	{
+		// Determine which object variables that are really live ones
+		asCArray<int> liveObjects;
+		DetermineLiveObjects(liveObjects, 0);
+
 		for( asUINT n = 0; n < currentFunction->objVariablePos.GetLength(); n++ )
 		{
 			int pos = currentFunction->objVariablePos[n];
-			if( *(size_t*)&regs.stackFramePointer[-pos] )
+			if( currentFunction->objVariableIsOnHeap[n] )
 			{
-				// Call the object's destructor
-				asSTypeBehaviour *beh = &currentFunction->objVariableTypes[n]->beh;
-				if( beh->release )
+				// Check if the pointer is initialized
+				if( *(size_t*)&regs.stackFramePointer[-pos] )
 				{
-					engine->CallObjectMethod((void*)*(size_t*)&regs.stackFramePointer[-pos], beh->release);
-					*(size_t*)&regs.stackFramePointer[-pos] = 0;
-				}
-				else
-				{
-					if( beh->destruct )
-						engine->CallObjectMethod((void*)*(size_t*)&regs.stackFramePointer[-pos], beh->destruct);
+					// Call the object's destructor
+					asSTypeBehaviour *beh = &currentFunction->objVariableTypes[n]->beh;
+					if( beh->release )
+					{
+						engine->CallObjectMethod((void*)*(size_t*)&regs.stackFramePointer[-pos], beh->release);
+						*(size_t*)&regs.stackFramePointer[-pos] = 0;
+					}
+					else
+					{
+						if( beh->destruct )
+							engine->CallObjectMethod((void*)*(size_t*)&regs.stackFramePointer[-pos], beh->destruct);
 
-					// Free the memory
-					engine->CallFree((void*)*(size_t*)&regs.stackFramePointer[-pos]);
-					*(size_t*)&regs.stackFramePointer[-pos] = 0;
+						// Free the memory
+						engine->CallFree((void*)*(size_t*)&regs.stackFramePointer[-pos]);
+						*(size_t*)&regs.stackFramePointer[-pos] = 0;
+					}
+				}
+			}
+			else
+			{
+				asASSERT( currentFunction->objVariableTypes[n]->GetFlags() & asOBJ_VALUE );
+
+				// Only destroy the object if it is truly alive
+				if( liveObjects[n] > 0 )
+				{
+					asSTypeBehaviour *beh = &currentFunction->objVariableTypes[n]->beh;
+					if( beh->destruct )
+						engine->CallObjectMethod((void*)(size_t*)&regs.stackFramePointer[-pos], beh->destruct);
 				}
 			}
 		}
@@ -3748,7 +3933,7 @@ void *asCContext::GetAddressOfVar(int varIndex, asUINT stackLevel)
 	}
 	else
 	{
-		size_t *s = callStack.AddressOf() + (stackLevel-1)*CALLSTACK_FRAME_SIZE;
+		size_t *s = callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
 		func = (asCScriptFunction*)s[1];
 		sf = (asDWORD*)s[0];
 	}
@@ -3761,7 +3946,36 @@ void *asCContext::GetAddressOfVar(int varIndex, asUINT stackLevel)
 
 	// For object variables it's necessary to dereference the pointer to get the address of the value
 	if( func->variables[varIndex]->type.IsObject() && !func->variables[varIndex]->type.IsObjectHandle() )
-		return *(void**)(sf - func->variables[varIndex]->stackOffset);
+	{
+		// Determine if the object is really on the heap
+		bool onHeap = true;
+		if( func->variables[varIndex]->type.GetObjectType()->GetFlags() & asOBJ_VALUE )
+		{
+			int pos = func->variables[varIndex]->stackOffset;
+			for( asUINT n = 0; n < func->objVariablePos.GetLength(); n++ )
+			{
+				if( func->objVariablePos[n] == pos )
+				{
+					onHeap = func->objVariableIsOnHeap[n];
+
+					if( !onHeap )
+					{
+						// If the object on the stack is not initialized return a null pointer instead
+						asCArray<int> liveObjects;
+						DetermineLiveObjects(liveObjects, stackLevel);
+
+						if( liveObjects[n] <= 0 )
+							return 0;
+					}
+
+					break;
+				}
+			}
+		}
+
+		if( onHeap )
+			return *(void**)(sf - func->variables[varIndex]->stackOffset);
+	}
 
 	return sf - func->variables[varIndex]->stackOffset;
 }
@@ -3801,7 +4015,7 @@ void *asCContext::GetThisPointer(asUINT stackLevel)
 	}
 	else
 	{
-		size_t *s = callStack.AddressOf() + (stackLevel-1)*CALLSTACK_FRAME_SIZE;
+		size_t *s = callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
 		func = (asCScriptFunction*)s[1];
 		sf = (asDWORD*)s[0];
 	}

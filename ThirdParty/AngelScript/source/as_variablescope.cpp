@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2007 Andreas Jonsson
+   Copyright (c) 2003-2010 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -65,7 +65,7 @@ void asCVariableScope::Reset()
 	variables.SetLength(0);
 }
 
-int asCVariableScope::DeclareVariable(const char *name, const asCDataType &type, int stackOffset)
+int asCVariableScope::DeclareVariable(const char *name, const asCDataType &type, int stackOffset, bool onHeap)
 {
 	// TODO: optimize: Improve linear search
 	// See if the variable is already declared
@@ -79,11 +79,12 @@ int asCVariableScope::DeclareVariable(const char *name, const asCDataType &type,
 	}
 
 	sVariable *var = asNEW(sVariable);
-	var->name = name;
-	var->type = type;
-	var->stackOffset = stackOffset;
-	var->isInitialized = false;
+	var->name           = name;
+	var->type           = type;
+	var->stackOffset    = stackOffset;
+	var->isInitialized  = false;
 	var->isPureConstant = false;
+	var->onHeap         = onHeap;
 
 	// Parameters are initialized
 	if( stackOffset <= 0 )

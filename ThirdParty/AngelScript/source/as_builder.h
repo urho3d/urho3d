@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -88,6 +88,7 @@ struct sFuncDef
 	asCScriptCode *script;
 	asCScriptNode *node;
 	asCString name;
+	int idx;
 };
 
 class asCCompiler;
@@ -139,6 +140,7 @@ protected:
 	int RegisterEnum(asCScriptNode *node, asCScriptCode *file);
 	int RegisterTypedef(asCScriptNode *node, asCScriptCode *file);
 	int RegisterFuncDef(asCScriptNode *node, asCScriptCode *file);
+	void CompleteFuncDef(sFuncDef *funcDef);
 	void CompileClasses();
 
 	void GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate);

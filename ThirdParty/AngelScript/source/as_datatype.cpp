@@ -559,6 +559,7 @@ int asCDataType::GetSizeInMemoryDWords() const
 
 int asCDataType::GetSizeOnStackDWords() const
 {
+	// If the type is the variable type then the typeid is stored on the stack too
 	int size = tokenType == ttQuestion ? 1 : 0;
 
 	if( isReference ) return AS_PTR_SIZE + size;

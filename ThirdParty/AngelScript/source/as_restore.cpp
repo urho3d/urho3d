@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -180,11 +180,26 @@ int asCRestore::Save()
 	}
 
 	// usedTypes[]
+	asUINT numValueTypes = 0;
 	count = (asUINT)usedTypes.GetLength();
 	WriteEncodedUInt(count);
 	for( i = 0; i < count; ++i )
 	{
+		if( usedTypes[i]->flags & asOBJ_VALUE )
+			numValueTypes++;
+
 		WriteObjectType(usedTypes[i]);
+	}
+
+	// Write the size of value types so the code can be adjusted if they are not the same when reloading the code
+	WriteEncodedUInt(numValueTypes);
+	for( i = 0; i < count; i++ )
+	{
+		if( usedTypes[i]->flags & asOBJ_VALUE )
+		{
+			WriteEncodedUInt(i);
+			WriteEncodedUInt(usedTypes[i]->GetSize());
+		}
 	}
 
 	// usedTypeIds[]
@@ -355,6 +370,29 @@ int asCRestore::Restore()
 	{
 		asCObjectType *ot = ReadObjectType();
 		usedTypes.PushLast(ot);
+	}
+
+	// Read the size of the value types so we can determine if it is necessary to adjust the code
+	asUINT numValueTypes = ReadEncodedUInt();
+	for( i = 0; i < numValueTypes; ++i )
+	{
+		asUINT idx = ReadEncodedUInt();
+		asUINT size = ReadEncodedUInt();
+
+		if( idx >= usedTypes.GetLength() )
+		{
+			// TODO: Write error message to the callback
+			error = true;
+			continue;
+		}
+
+		if( usedTypes[idx] && size != usedTypes[idx]->GetSize() )
+		{
+			// Keep track of the object types that have changed size 
+			// so the bytecode can be adjusted.
+			SObjChangeSize s = { usedTypes[idx], size };
+			oldObjectSizes.PushLast(s);
+		}
 	}
 
 	// usedTypeIds[]
@@ -613,9 +651,18 @@ void asCRestore::WriteFunction(asCScriptFunction* func)
 		{
 			WriteObjectType(func->objVariableTypes[i]);
 			WriteEncodedUInt(func->objVariablePos[i]);
+			WRITE_NUM(func->objVariableIsOnHeap[i]);
 		}
 
 		WriteEncodedUInt(func->stackNeeded);
+
+		WriteEncodedUInt((asUINT)func->objVariableInfo.GetLength());
+		for( i = 0; i < func->objVariableInfo.GetLength(); ++i )
+		{
+			WriteEncodedUInt(func->objVariableInfo[i].programPos);
+			WriteEncodedUInt(func->objVariableInfo[i].variableOffset); // TODO: should be int
+			WriteEncodedUInt(func->objVariableInfo[i].option);
+		}
 
 		asUINT length = (asUINT)func->lineNumbers.GetLength();
 		WriteEncodedUInt(length);
@@ -658,6 +705,7 @@ asCScriptFunction *asCRestore::ReadFunction(bool addToModule, bool addToEngine)
 			return savedFunctions[index];
 		else
 		{
+			// TODO: Write to message callback
 			error = true;
 			return 0;
 		}
@@ -692,11 +740,22 @@ asCScriptFunction *asCRestore::ReadFunction(bool addToModule, bool addToEngine)
 			func->objVariableTypes.PushLast(ReadObjectType());
 			num = ReadEncodedUInt();
 			func->objVariablePos.PushLast(num);
+			bool b; READ_NUM(b);
+			func->objVariableIsOnHeap.PushLast(b);
 		}
 
 		func->stackNeeded = ReadEncodedUInt();
 
 		int length = ReadEncodedUInt();
+		func->objVariableInfo.SetLength(length);
+		for( i = 0; i < length; ++i )
+		{
+			func->objVariableInfo[i].programPos     = ReadEncodedUInt();
+			func->objVariableInfo[i].variableOffset = ReadEncodedUInt(); // TODO: should be int
+			func->objVariableInfo[i].option         = ReadEncodedUInt();
+		}
+
+		length = ReadEncodedUInt();
 		func->lineNumbers.SetLength(length);
 		for( i = 0; i < length; ++i )
 			func->lineNumbers[i] = ReadEncodedUInt();
@@ -1509,11 +1568,16 @@ void asCRestore::WriteByteCode(asDWORD *bc, int length)
 			*(int*)(tmp+1) = FindTypeIdIdx(*(int*)(tmp+1));
 		}
 		else if( c == asBC_ADDSi ||      // W_DW_ARG
-			     c == asBC_LoadThisR )   // W_DW_ARG
+			     c == asBC_LoadThisR )   // W_DW_ARG	 
 		{
 			// Translate property offsets into indices
 			*(((short*)tmp)+1) = FindObjectPropIndex(*(((short*)tmp)+1), *(int*)(tmp+1));
 
+			// Translate type ids into indices
+			*(int*)(tmp+1) = FindTypeIdIdx(*(int*)(tmp+1));
+		}
+		else if( c == asBC_COPY )        // W_DW_ARG
+		{
 			// Translate type ids into indices
 			*(int*)(tmp+1) = FindTypeIdIdx(*(int*)(tmp+1));
 		}
@@ -1647,7 +1711,6 @@ void asCRestore::WriteByteCode(asDWORD *bc, int length)
 			break;
 		case asBCTYPE_wW_rW_ARG:
 		case asBCTYPE_rW_rW_ARG:
-		case asBCTYPE_W_rW_ARG:
 		case asBCTYPE_wW_W_ARG:
 			{
 				// Write the instruction code
@@ -1839,7 +1902,6 @@ void asCRestore::ReadByteCode(asDWORD *bc, int length)
 			break;
 		case asBCTYPE_wW_rW_ARG:
 		case asBCTYPE_rW_rW_ARG:
-		case asBCTYPE_W_rW_ARG:
 		case asBCTYPE_wW_W_ARG:
 			{
 				*(asBYTE*)(bc) = b;
@@ -2080,8 +2142,8 @@ void asCRestore::ReadUsedGlobalProps()
 
 		if( prop == 0 )
 		{
-			error = true;
 			// TODO: Write error message to the callback
+			error = true;
 		}
 	}
 }
@@ -2116,6 +2178,13 @@ void asCRestore::ReadUsedObjectProps()
 	for( asUINT n = 0; n < c; n++ )
 	{
 		asCObjectType *objType = ReadObjectType();
+		if( objType == 0 )
+		{
+			// TODO: Write error message to callback
+			error = true;
+			break;
+		}
+
 		asCString name;
 		ReadString(&name);
 
@@ -2164,6 +2233,7 @@ short asCRestore::FindObjectPropOffset(asWORD index)
 {
 	if( index >= usedObjectProperties.GetLength() )
 	{
+		// TODO: Write to message callback
 		asASSERT(false);
 		error = true;
 		return 0;
@@ -2190,6 +2260,7 @@ asCScriptFunction *asCRestore::FindFunction(int idx)
 		return usedFunctions[idx];
 	else
 	{
+		// TODO: Write to message callback
 		error = true;
 		return 0;
 	}
@@ -2226,6 +2297,23 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 			// Translate the prop index into the property offset
 			*(((short*)&bc[n])+1) = FindObjectPropOffset(*(((short*)&bc[n])+1));
 		}
+		else if( c == asBC_COPY )
+		{
+			// Translate the index to the type id
+			int *tid = (int*)&bc[n+1];
+			*tid = FindTypeId(*tid);
+
+			// COPY is used to copy POD types that don't have the opAssign method
+			// Update the number of dwords to copy as it may be different on the target platform
+			const asCDataType *dt = engine->GetDataTypeFromTypeId(*tid);
+			if( dt == 0 )
+			{
+				// TODO: Write error to message
+				error = true;
+			}
+			else
+				asBC_SWORDARG0(&bc[n]) = dt->GetSizeInMemoryDWords();
+		}
 		else if( c == asBC_CALL ||
 				 c == asBC_CALLINTF ||
 				 c == asBC_CALLSYS )
@@ -2237,6 +2325,7 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 				*fid = f->id;
 			else
 			{
+				// TODO: Write to message callback
 				error = true;
 				return;
 			}
@@ -2263,6 +2352,7 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 					*fid = f->id;
 				else
 				{
+					// TODO: Write to message callback
 					error = true;
 					return;
 				}
@@ -2277,6 +2367,7 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 				*arg = usedStringConstants[*arg];
 			else
 			{
+				// TODO: Write to message callback
 				error = true;
 				return;
 			}
@@ -2292,12 +2383,14 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 					*fid = bi->importedFunctionSignature->id;
 				else
 				{
+					// TODO: Write to message callback
 					error = true;
 					return;
 				}
 			}
 			else
 			{
+				// TODO: Write to message callback
 				error = true;
 				return;
 			}
@@ -2316,12 +2409,176 @@ void asCRestore::TranslateFunction(asCScriptFunction *func)
 				*(void**)index = usedGlobalProperties[*(asUINT*)index];
 			else
 			{
+				// TODO: Write to message callback
 				error = true;
 				return;
 			}
 		}
 
 		n += asBCTypeSize[asBCInfo[c].type];
+	}
+
+	// As the bytecode may have been generated on a different platform it is necessary
+	// to adjust the bytecode in case any of the value types allocated on the stack has
+	// a different size on this platform.
+	asCArray<int> adjustments;
+	for( n = 0; n < func->objVariableTypes.GetLength(); n++ )
+	{
+		if( func->objVariableTypes[n] &&
+			(func->objVariableTypes[n]->GetFlags() & asOBJ_VALUE) &&
+			!func->objVariableIsOnHeap[n] )
+		{
+			// Check if type has a different size than originally
+			for( asUINT s = 0; s < oldObjectSizes.GetLength(); s++ )
+			{
+				if( oldObjectSizes[s].objType == func->objVariableTypes[n] &&
+					oldObjectSizes[s].oldSize != func->objVariableTypes[n]->GetSize() )
+				{
+					// How much needs to be adjusted? 
+					int newSize = func->objVariableTypes[n]->GetSize();
+					newSize = newSize < 4 ? 1 : newSize/4;
+					int oldSize = oldObjectSizes[s].oldSize;
+					oldSize = oldSize < 4 ? 1 : oldSize/4;
+
+					int adjust = newSize - oldSize;
+					if( adjust != 0 )
+					{
+						adjustments.PushLast(func->objVariablePos[n]);
+						adjustments.PushLast(adjust);
+					}
+				}
+			}
+		}
+	}
+
+	asCArray<int> adjustByPos(func->stackNeeded);
+	if( adjustments.GetLength() )
+	{
+		adjustByPos.SetLength(func->stackNeeded);
+		memset(adjustByPos.AddressOf(), 0, adjustByPos.GetLength()*sizeof(int));
+
+		// Build look-up table with the adjustments for each stack position
+		for( n = 0; n < adjustments.GetLength(); n+=2 )
+		{
+			int pos    = adjustments[n];
+			int adjust = adjustments[n+1];
+
+			for( asUINT i = pos; i < adjustByPos.GetLength(); i++ )
+				adjustByPos[i] += adjust;
+		}
+
+		// Adjust all variable positions
+		asDWORD *bc = func->byteCode.AddressOf();
+		for( n = 0; n < func->byteCode.GetLength(); )
+		{
+			int c = *(asBYTE*)&bc[n];
+			switch( asBCInfo[c].type )
+			{
+			case asBCTYPE_wW_ARG:
+			case asBCTYPE_rW_DW_ARG:
+			case asBCTYPE_wW_QW_ARG:
+			case asBCTYPE_rW_ARG:
+			case asBCTYPE_wW_DW_ARG:
+			case asBCTYPE_wW_W_ARG:
+			case asBCTYPE_rW_QW_ARG:
+				{
+					short var = asBC_SWORDARG0(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG0(&bc[n]) += adjustByPos[var];
+				}
+				break;
+
+			case asBCTYPE_wW_rW_ARG:
+			case asBCTYPE_wW_rW_DW_ARG:
+			case asBCTYPE_rW_rW_ARG:
+				{
+					short var = asBC_SWORDARG0(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG0(&bc[n]) += adjustByPos[var];
+
+					var = asBC_SWORDARG1(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG1(&bc[n]) += adjustByPos[var];
+				}
+				break;
+
+			case asBCTYPE_wW_rW_rW_ARG:
+				{
+					short var = asBC_SWORDARG0(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG0(&bc[n]) += adjustByPos[var];
+
+					var = asBC_SWORDARG1(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG1(&bc[n]) += adjustByPos[var];
+
+					var = asBC_SWORDARG2(&bc[n]);
+					if( var >= (int)adjustByPos.GetLength() ) 
+						error = true;
+					else if( var >= 0 ) 
+						asBC_SWORDARG2(&bc[n]) += adjustByPos[var];
+				}
+				break;
+
+			default:
+				// The other types don't treat variables so won't be modified
+				break;
+			}
+
+			if( c == asBC_PUSH )
+			{
+				// TODO: Maybe the push instruction should be removed, and be kept in 
+				//       the asCScriptFunction as a property instead. CallScriptFunction 
+				//       can immediately reserve the space
+
+				// PUSH is only used to reserve stack space for variables
+				asBC_WORDARG0(&bc[n]) += adjustByPos[adjustByPos.GetLength()-1];
+			}
+
+			n += asBCTypeSize[asBCInfo[c].type];
+		}
+
+		// objVariablePos
+		for( n = 0; n < func->objVariablePos.GetLength(); n++ )
+		{
+			if( func->objVariablePos[n] >= (int)adjustByPos.GetLength() )
+				error = true;
+			else if( func->objVariablePos[n] >= 0 )
+				func->objVariablePos[n] += adjustByPos[func->objVariablePos[n]];
+		}
+
+		// objVariableInfo[x].variableOffset  // TODO: should be an index into the objVariablePos array
+		for( n = 0; n < func->objVariableInfo.GetLength(); n++ )
+		{
+			if( func->objVariableInfo[n].variableOffset >= (int)adjustByPos.GetLength() )
+				error = true;
+			else if( func->objVariableInfo[n].variableOffset >= 0 )
+				func->objVariableInfo[n].variableOffset += adjustByPos[func->objVariableInfo[n].variableOffset];
+		}
+
+		// variables[x].stackOffset
+		for( n = 0; n < func->variables.GetLength(); n++ )
+		{
+			if( func->variables[n]->stackOffset >= (int)adjustByPos.GetLength() )
+				error = true;
+			else if( func->variables[n]->stackOffset >= 0 )
+				func->variables[n]->stackOffset += adjustByPos[func->variables[n]->stackOffset];
+		}
+
+		// The stack needed by the function will be adjusted by the highest variable shift
+		// TODO: When bytecode is adjusted for 32/64bit it is necessary to adjust 
+		//       also for pointers pushed on the stack as function arguments
+		func->stackNeeded += adjustByPos[adjustByPos.GetLength()-1];
 	}
 }
 
@@ -2344,6 +2601,7 @@ int asCRestore::FindTypeId(int idx)
 		return usedTypeIds[idx];
 	else
 	{
+		// TODO: Write to message callback
 		error = true;
 		return 0;
 	}
@@ -2366,6 +2624,7 @@ asCObjectType *asCRestore::FindObjectType(int idx)
 {
 	if( idx < 0 || idx >= (int)usedTypes.GetLength() )
 	{
+		// TODO: Write to message callback
 		error = true;
 		return 0;
 	}

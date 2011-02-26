@@ -131,8 +131,14 @@ protected:
 		asCObjectType *objType;
 		int            offset;
 	};
-
 	asCArray<SObjProp>           usedObjectProperties;
+
+	struct SObjChangeSize
+	{
+		asCObjectType *objType;
+		asUINT         oldSize;
+	};
+	asCArray<SObjChangeSize>     oldObjectSizes;
 };
 
 END_AS_NAMESPACE

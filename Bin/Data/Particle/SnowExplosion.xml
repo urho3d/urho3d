@@ -1,7 +1,7 @@
 <particleemitter>
     <material name="Materials/Particle.xml" />
     <updateinvisible enable="true" />
-    <numparticles value="25" />
+    <numparticles value="10" />
     <activetime value="0.1" />
     <inactivetime value="0" />
     <interval value="0.02" />

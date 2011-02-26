@@ -24,6 +24,7 @@
 #ifndef COMMON_LOG_H
 #define COMMON_LOG_H
 
+#include "EventListener.h"
 #include "RefCount.h"
 
 #include <cstdio>
@@ -40,16 +41,14 @@ enum LogLevel
     LOG_NONE
 };
 
-//! Log message listener
-class LogListener
+//! Log message event
+DEFINE_EVENT(EVENT_LOGMESSAGE, LogMessage)
 {
-public:
-    //! Write a log message
-    virtual void write(const std::string& message) = 0;
-};
+    EVENT_PARAM(P_MESSAGE, Message);        // string
+}
 
 //! Urho3D log file
-class Log : public RefCounted
+class Log : public RefCounted, public EventListener
 {
     friend Log* getLog();
     
@@ -65,10 +64,6 @@ public:
     void writeRaw(const std::string& message);
     //! Set logging level
     void setLevel(LogLevel level);
-    //! Add a log listener
-    void addListener(LogListener* listener);
-    //! Remove a log listener
-    void removeListener(LogListener* listener);
     
     //! Return logging level
     LogLevel getLevel() const { return mLevel; }
@@ -82,8 +77,6 @@ private:
     LogLevel mLevel;
     //! Last log message
     std::string mLastMessage;
-    //! Log listeners
-    std::vector<LogListener*> mListeners;
     
     //! Log instance
     static Log* sInstance;

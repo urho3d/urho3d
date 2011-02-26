@@ -97,7 +97,7 @@ bool asCConfigGroup::HasLiveObjects()
 	return false;
 }
 
-void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine)
+void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine, bool notUsed)
 {
 	asASSERT( refCount == 0 );
 
@@ -115,6 +115,7 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine)
 			engine->registeredGlobalProps[index] = 0;
 		}
 	}
+	globalProps.SetLength(0);
 
 	// Remove global functions
 	for( n = 0; n < scriptFunctions.GetLength(); n++ )
@@ -140,29 +141,34 @@ void asCConfigGroup::RemoveConfiguration(asCScriptEngine *engine)
 		engine->registeredFuncDefs.RemoveValue(funcDefs[n]);
 		funcDefs[n]->Release();
 	}
+	funcDefs.SetLength(0);
 
-	// Remove object types
-	for( n = 0; n < objTypes.GetLength(); n++ )
+	// Remove object types (skip this if it is possible other groups are still using the types)
+	if( !notUsed )
 	{
-		asCObjectType *t = objTypes[n];
-		int idx = engine->objectTypes.IndexOf(t);
-		if( idx >= 0 )
+		for( n = 0; n < objTypes.GetLength(); n++ )
 		{
+			asCObjectType *t = objTypes[n];
+			int idx = engine->objectTypes.IndexOf(t);
+			if( idx >= 0 )
+			{
 #ifdef AS_DEBUG
-			ValidateNoUsage(engine, t);
+				ValidateNoUsage(engine, t);
 #endif
 
-			engine->objectTypes.RemoveIndex(idx);
+				engine->objectTypes.RemoveIndex(idx);
 
-			if( t->flags & asOBJ_TYPEDEF )
-				engine->registeredTypeDefs.RemoveValue(t);
-			else if( t->flags & asOBJ_ENUM )
-				engine->registeredEnums.RemoveValue(t);
-			else
-				engine->registeredObjTypes.RemoveValue(t);
+				if( t->flags & asOBJ_TYPEDEF )
+					engine->registeredTypeDefs.RemoveValue(t);
+				else if( t->flags & asOBJ_ENUM )
+					engine->registeredEnums.RemoveValue(t);
+				else
+					engine->registeredObjTypes.RemoveValue(t);
 
-			asDELETE(t, asCObjectType);
+				asDELETE(t, asCObjectType);
+			}
 		}
+		objTypes.SetLength(0);
 	}
 
 	// Release other config groups

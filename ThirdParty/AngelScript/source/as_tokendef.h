@@ -110,8 +110,8 @@ enum eTokenType
 	ttBitNot,              // ~
 	ttBitXor,              // ^
 	ttBitShiftLeft,        // <<
-	ttBitShiftRight,       // >>
-	ttBitShiftRightArith,  // >>>
+	ttBitShiftRight,       // >>     // TODO: In Java this is the arithmetical shift
+	ttBitShiftRightArith,  // >>>    // TODO: In Java this is the logical shift
 
 	// Compare operators
 	ttEqual,               // ==

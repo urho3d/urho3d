@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_builder.cpp
@@ -159,12 +160,12 @@ asCBuilder::~asCBuilder()
 int asCBuilder::AddCode(const char *name, const char *code, int codeLength, int lineOffset, int sectionIdx, bool makeCopy)
 {
 	asCScriptCode *script = asNEW(asCScriptCode);
-	script->SetCode(name, code, codeLength, makeCopy);
+	int r = script->SetCode(name, code, codeLength, makeCopy);
 	script->lineOffset = lineOffset;
 	script->idx = sectionIdx;
 	scripts.PushLast(script);
 
-	return 0;
+	return r;
 }
 
 int asCBuilder::Build()
@@ -385,6 +386,12 @@ void asCBuilder::ParseScripts()
 			}
 		}
 
+		// Register the complete function definitions
+		for( n = 0; n < funcDefs.GetLength(); n++ )
+		{
+			CompleteFuncDef(funcDefs[n]);
+		}
+
 		// Register script methods found in the interfaces
 		for( n = 0; n < interfaceDeclarations.GetLength(); n++ )
 		{
@@ -599,6 +606,15 @@ int asCBuilder::VerifyProperty(asCDataType *dt, const char *decl, asCString &nam
 
 	type = CreateDataTypeFromNode(dataType, &source);
 	name.Assign(&decl[nameNode->tokenPos], nameNode->tokenLength);
+
+	// Validate that the type really can be a registered property
+	// We cannot use CanBeInstanciated, as it is allowed to register
+	// properties of type that cannot otherwise be instanciated
+	if( type.GetFuncDef() && !type.IsObjectHandle() )
+	{
+		// Function definitions must always be handles
+		return asINVALID_DECLARATION;
+	}
 
 	// Verify property name
 	if( dt )
@@ -990,11 +1006,15 @@ int asCBuilder::RegisterFuncDef(asCScriptNode *node, asCScriptCode *file)
 	fd->name   = name;
 	fd->node   = node;
 	fd->script = file;
+	fd->idx    = module->AddFuncDef(name.AddressOf());
 
 	funcDefs.PushLast(fd);
 
-	// TODO: funcdef: The parameters and return type should only be defined after all global 
-	//                types have been identified
+	return 0;
+}
+
+void asCBuilder::CompleteFuncDef(sFuncDef *funcDef)
+{
 	asCDataType                returnType;
 	asCArray<asCDataType>      parameterTypes;
 	asCArray<asETypeModifiers> inOutFlags;
@@ -1003,19 +1023,18 @@ int asCBuilder::RegisterFuncDef(asCScriptNode *node, asCScriptCode *file)
 	bool                       isDestructor;
 	bool                       isPrivate;
 
-	GetParsedFunctionDetails(node, file, 0, name, returnType, parameterTypes, inOutFlags, isConstMethod, isConstructor, isDestructor, isPrivate);
+	GetParsedFunctionDetails(funcDef->node, funcDef->script, 0, funcDef->name, returnType, parameterTypes, inOutFlags, isConstMethod, isConstructor, isDestructor, isPrivate);
 
-	int i = module->AddFuncDef(name.AddressOf());
-
-	asCScriptFunction *func = module->funcDefs[i];
-	func->returnType = returnType;
-	for( asUINT p = 0; p < parameterTypes.GetLength(); p++ )
+	asCScriptFunction *func = module->funcDefs[funcDef->idx];
+	if( func )
 	{
-		func->parameterTypes.PushLast(parameterTypes[p]);
-		func->inOutFlags.PushLast(inOutFlags[p]);
+		func->returnType = returnType;
+		for( asUINT p = 0; p < parameterTypes.GetLength(); p++ )
+		{
+			func->parameterTypes.PushLast(parameterTypes[p]);
+			func->inOutFlags.PushLast(inOutFlags[p]);
+		}
 	}
-
-	return 0;
 }
 
 int asCBuilder::RegisterGlobalVar(asCScriptNode *node, asCScriptCode *file)
@@ -1791,6 +1810,8 @@ void asCBuilder::CompileClasses()
 	// TODO: The declarations form a graph, all circles in
 	//       the graph must be flagged as potential circles
 
+	// Urho3D: disable garbage collection from script classes
+	/*
 	// Verify potential circular references
 	for( n = 0; n < classDeclarations.GetLength(); n++ )
 	{
@@ -1820,6 +1841,7 @@ void asCBuilder::CompileClasses()
 			}
 		}
 	}
+	*/
 }
 
 int asCBuilder::CreateVirtualFunction(asCScriptFunction *func, int idx)

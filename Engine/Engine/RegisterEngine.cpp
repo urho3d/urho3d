@@ -357,7 +357,7 @@ static void registerParticleEmitter(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter", "float getAnimationLodBias() const", asMETHODPR(ParticleEmitter, getAnimationLodBias, () const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "void loadParameters(XMLFile@+ file)", asFUNCTION(ParticleEmitterLoadParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ParticleEmitter", "void setActive(bool, bool)", asMETHOD(ParticleEmitter, setActive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ getParameterSource() const", asMETHOD(ParticleEmitter, getParameterSource), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter", "XMLFile@+ getParameters() const", asMETHOD(ParticleEmitter, getParameters), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "bool isActive() const", asMETHOD(ParticleEmitter, isActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter", "uint getNumParticles() const", asMETHOD(ParticleEmitter, getNumParticles), asCALL_THISCALL);
     registerRefCasts<Component, ParticleEmitter>(engine, "Component", "ParticleEmitter");
@@ -374,7 +374,6 @@ static void registerConsole(asIScriptEngine* engine)
     engine->RegisterObjectType("Console", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Console", asBEHAVE_ADDREF, "void f()", asMETHOD(Console, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Console", asBEHAVE_RELEASE, "void f()", asMETHOD(Console, releaseRef), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Console", "void write(const string& in)", asMETHOD(Console, write), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setStyle(XMLFile@+ file)", asMETHOD(Console, setStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setVisible(bool)", asMETHOD(Console, setVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void toggle()", asMETHOD(Console, toggle), asCALL_THISCALL);

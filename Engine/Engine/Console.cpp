@@ -27,6 +27,7 @@
 #include "Engine.h"
 #include "Font.h"
 #include "LineEdit.h"
+#include "Log.h"
 #include "Renderer.h"
 #include "RendererEvents.h"
 #include "ResourceCache.h"
@@ -51,10 +52,6 @@ Console::Console(Engine* engine) :
     UIElement* uiRoot = mEngine->getUIRoot();
     if (uiRoot)
     {
-        Log* log = getLog();
-        if (log)
-            log->addListener(this);
-        
         mBackground = new BorderImage();
         mBackground->setFixedWidth(uiRoot->getWidth());
         mBackground->setBringToBack(false);
@@ -75,40 +72,17 @@ Console::Console(Engine* engine) :
         
         subscribeToEvent(mLineEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
         subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
+        subscribeToEvent(EVENT_LOGMESSAGE, EVENT_HANDLER(Console, handleLogMessage));
     }
 }
 
 Console::~Console()
 {
-    Log* log = getLog();
-    if (log)
-        log->removeListener(this);
-    
     UIElement* uiRoot = mEngine->getUIRoot();
     if (uiRoot)
         uiRoot->removeChild(mBackground);
     
     LOGINFO("Console shut down");
-}
-
-void Console::write(const std::string& message)
-{
-    if (!mRows.size())
-        return;
-    // If the rows are not fully initialized yet, do not write the message
-    if (!mRows[mRows.size() - 1])
-        return;
-    
-    // Be prepared for possible multi-line messages
-    std::vector<std::string> rows = split(message, '\n');
-    
-    for (unsigned i = 0; i < rows.size(); ++i)
-    {
-        for (int j = 0; j < (int)mRows.size() - 1; ++j)
-            mRows[j]->setText(mRows[j + 1]->getText());
-        
-        mRows[mRows.size() - 1]->setText(rows[i]);
-    }
 }
 
 void Console::setStyle(XMLFile* style)
@@ -203,4 +177,26 @@ void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
 void Console::handleWindowResized(StringHash eventType, VariantMap& eventData)
 {
     updateElements();
+}
+
+void Console::handleLogMessage(StringHash eventType, VariantMap& eventData)
+{
+    // If the rows are not fully initialized yet, do not write the message
+    if ((!mRows.size()) || (!mRows[mRows.size() - 1]))
+        return;
+    
+    using namespace LogMessage;
+    
+    const std::string& message = eventData[P_MESSAGE].getString();
+    
+    // Be prepared for possible multi-line messages
+    std::vector<std::string> rows = split(message, '\n');
+    
+    for (unsigned i = 0; i < rows.size(); ++i)
+    {
+        for (int j = 0; j < (int)mRows.size() - 1; ++j)
+            mRows[j]->setText(mRows[j + 1]->getText());
+        
+        mRows[mRows.size() - 1]->setText(rows[i]);
+    }
 }

@@ -142,6 +142,7 @@ public:
 	void CleanStack();
 	void CleanStackFrame();
 	void CleanReturnObject();
+	void DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLevel);
 
 	void PushCallState();
 	void PopCallState();

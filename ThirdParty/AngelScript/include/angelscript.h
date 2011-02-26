@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22000
-#define ANGELSCRIPT_VERSION_STRING "2.20.0 WIP"
+#define ANGELSCRIPT_VERSION        22002
+#define ANGELSCRIPT_VERSION_STRING "2.20.2"
 
 // Data types
 
@@ -423,7 +423,7 @@ struct asSMessageInfo
 // ANGELSCRIPT_DLL_MANUAL_IMPORT is defined when manually loading the dll
 // Don't define anything when linking statically to the lib
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN__)
   #if defined(ANGELSCRIPT_EXPORT)
     #define AS_API __declspec(dllexport)
   #elif defined(ANGELSCRIPT_DLL_LIBRARY_IMPORT)
@@ -1279,11 +1279,16 @@ enum asEBCInstr
 	asBC_FuncPtr        = 177,
 	asBC_LoadThisR      = 178,
 	asBC_PshV8          = 179,
+	asBC_DIVu			= 180,
+	asBC_MODu			= 181,
+	asBC_DIVu64			= 182,
+	asBC_MODu64			= 183,
 
-	asBC_MAXBYTECODE	= 180,
+	asBC_MAXBYTECODE	= 184,
 
 	// Temporary tokens. Can't be output to the final program
-	asBC_PSP			= 253,
+	asBC_Block          = 252,
+	asBC_ObjInfo		= 253,
 	asBC_LINE			= 254,
 	asBC_LABEL			= 255
 };
@@ -1306,15 +1311,14 @@ enum asEBCType
 	asBCTYPE_wW_DW_ARG    = 12,
 	asBCTYPE_wW_rW_DW_ARG = 13,
 	asBCTYPE_rW_rW_ARG    = 14,
-	asBCTYPE_W_rW_ARG     = 15,
-	asBCTYPE_wW_W_ARG     = 16,
-	asBCTYPE_QW_DW_ARG    = 17,
-	asBCTYPE_rW_QW_ARG    = 18,
-	asBCTYPE_W_DW_ARG     = 19
+	asBCTYPE_wW_W_ARG     = 15,
+	asBCTYPE_QW_DW_ARG    = 16,
+	asBCTYPE_rW_QW_ARG    = 17,
+	asBCTYPE_W_DW_ARG     = 18
 };
 
 // Instruction type sizes
-const int asBCTypeSize[20] =
+const int asBCTypeSize[19] =
 {
     0, // asBCTYPE_INFO
     1, // asBCTYPE_NO_ARG
@@ -1331,7 +1335,6 @@ const int asBCTypeSize[20] =
     2, // asBCTYPE_wW_DW_ARG
     3, // asBCTYPE_wW_rW_DW_ARG
     2, // asBCTYPE_rW_rW_ARG
-    2, // asBCTYPE_W_rW_ARG
     2, // asBCTYPE_wW_W_ARG
     4, // asBCTYPE_QW_DW_ARG
     3, // asBCTYPE_rW_QW_ARG
@@ -1416,7 +1419,7 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(BSLL,		wW_rW_rW_ARG,	0),
 	asBCINFO(BSRL,		wW_rW_rW_ARG,	0),
 	asBCINFO(BSRA,		wW_rW_rW_ARG,	0),
-	asBCINFO(COPY,		W_ARG,			-AS_PTR_SIZE),
+	asBCINFO(COPY,		W_DW_ARG,		-AS_PTR_SIZE),
 	asBCINFO(PshC8,		QW_ARG,			2),
 	asBCINFO(RDS8,		NO_ARG,			2-AS_PTR_SIZE),
 	asBCINFO(SWAP8,		NO_ARG,			0),
@@ -1550,11 +1553,11 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(FuncPtr,   PTR_ARG,        AS_PTR_SIZE),
 	asBCINFO(LoadThisR, W_DW_ARG,       0),
 	asBCINFO(PshV8,		rW_ARG,			2),
+	asBCINFO(DIVu,		wW_rW_rW_ARG,	0),
+	asBCINFO(MODu,		wW_rW_rW_ARG,	0),
+	asBCINFO(DIVu64,	wW_rW_rW_ARG,	0),
+	asBCINFO(MODu64,	wW_rW_rW_ARG,	0),
 
-	asBCINFO_DUMMY(180),
-	asBCINFO_DUMMY(181),
-	asBCINFO_DUMMY(182),
-	asBCINFO_DUMMY(183),
 	asBCINFO_DUMMY(184),
 	asBCINFO_DUMMY(185),
 	asBCINFO_DUMMY(186),
@@ -1623,11 +1626,11 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO_DUMMY(249),
 	asBCINFO_DUMMY(250),
 	asBCINFO_DUMMY(251),
-	asBCINFO_DUMMY(252),
 
-	asBCINFO(PSP,		W_ARG,			AS_PTR_SIZE),
-	asBCINFO(LINE,		INFO,			0xFFFF),
-	asBCINFO(LABEL,		INFO,			0xFFFF)
+	asBCINFO(Block,     INFO,           0),
+	asBCINFO(ObjInfo,	rW_DW_ARG,		0),
+	asBCINFO(LINE,		INFO,			0),
+	asBCINFO(LABEL,		INFO,			0)
 };
 
 // Macros to access bytecode instruction arguments

@@ -506,6 +506,9 @@ void asCScriptFunction::AddReferences()
 		for( asUINT p = 0; p < parameterTypes.GetLength(); p++ )
 			if( parameterTypes[p].IsObject() )
 				parameterTypes[p].GetObjectType()->AddRef();
+
+		for( asUINT n = 0; n < objVariableTypes.GetLength(); n++ )
+			objVariableTypes[n]->AddRef();
 	}
 
 	// Go through the byte code and add references to all resources used by the function
@@ -607,6 +610,9 @@ void asCScriptFunction::ReleaseReferences()
 		for( asUINT p = 0; p < parameterTypes.GetLength(); p++ )
 			if( parameterTypes[p].IsObject() )
 				parameterTypes[p].GetObjectType()->Release();
+
+		for( asUINT n = 0; n < objVariableTypes.GetLength(); n++ )
+			objVariableTypes[n]->Release();
 	}
 
 	// Go through the byte code and release references to all resources used by the function
@@ -849,6 +855,9 @@ void asCScriptFunction::EnumReferences(asIScriptEngine *)
 		if( parameterTypes[p].IsObject() )
 			engine->GCEnumCallback(parameterTypes[p].GetObjectType());
 
+	for( asUINT t = 0; t < objVariableTypes.GetLength(); t++ )
+		engine->GCEnumCallback(objVariableTypes[t]);
+
 	// Notify the GC of all script functions that is accessed
 	for( asUINT n = 0; n < byteCode.GetLength(); n += asBCTypeSize[asBCInfo[*(asBYTE*)&byteCode[n]].type] )
 	{
@@ -931,6 +940,10 @@ void asCScriptFunction::ReleaseAllHandles(asIScriptEngine *)
 				parameterTypes[p].GetObjectType()->Release();
 				parameterTypes[p] = asCDataType::CreatePrimitive(ttInt, false);
 			}
+
+		for( asUINT n = 0; n < objVariableTypes.GetLength(); n++ )
+			objVariableTypes[n]->Release();
+		objVariableTypes.SetLength(0);
 	}
 
 	// Release all script functions

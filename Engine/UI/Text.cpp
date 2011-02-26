@@ -32,6 +32,8 @@
 
 #include "DebugNew.h"
 
+static const float MIN_ROW_SPACING = 0.5f;
+
 static const std::string horizontalAlignments[] =
 {
     "left",
@@ -62,37 +64,65 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 {
     UIElement::setStyle(element, cache);
     
-    // Set word wrap first to preserve any pre-defined width
-    if (element.hasChildElement("wordwrap"))
-        setWordwrap(element.getChildElement("wordwrap").getBool("enable"));
+    // Recalculating the text is expensive, so do it only once at the end if something changed
+    bool changed = false;
+    
     if (element.hasChildElement("font"))
     {
         XMLElement fontElem = element.getChildElement("font");
-        setFont(cache->getResource<Font>(fontElem.getString("name")), fontElem.getInt("size"));
+        Font* font = cache->getResource<Font>(fontElem.getString("name"));
+        if (!font)
+            LOGERROR("Null font for Text");
+        else
+        {
+            mFont = font;
+            mFontSize = max(fontElem.getInt("size"), 1);
+            changed = true;
+        }
+    }
+    if (element.hasChildElement("text"))
+    {
+        std::string text = element.getChildElement("text").getString("value");
+        replaceInPlace(text, "\\n", "\n");
+        mText = text;
+        changed = true;
     }
     if (element.hasChildElement("textalignment"))
     {
         std::string horiz = element.getChildElement("textalignment").getStringLower("value");
         if (!horiz.empty())
-            setTextAlignment((HorizontalAlignment)getIndexFromStringList(horiz, horizontalAlignments, 3, 0));
+        {
+            mTextAlignment = (HorizontalAlignment)getIndexFromStringList(horiz, horizontalAlignments, 3, 0);
+            changed = true;
+        }
     }
     if (element.hasChildElement("rowspacing"))
-        setRowSpacing(element.getChildElement("rowspacing").getFloat("value"));
-    if (element.hasChildElement("text"))
     {
-        std::string text = element.getChildElement("text").getString("value");
-        replaceInPlace(text, "\\n", "\n");
-        setText(text);
+        mRowSpacing = max(element.getChildElement("rowspacing").getFloat("value"), MIN_ROW_SPACING);
+        changed = true;
+    }
+    if (element.hasChildElement("wordwrap"))
+    {
+        mWordwrap = element.getChildElement("wordwrap").getBool("enable");
+        changed = true;
     }
     if (element.hasChildElement("selection"))
     {
         XMLElement selectionElem = element.getChildElement("selection");
-        setSelection(selectionElem.getInt("start"), selectionElem.getInt("length"));
+        mSelectionStart = selectionElem.getInt("start");
+        mSelectionLength = selectionElem.getInt("length");
+        changed = true;
     }
     if (element.hasChildElement("selectioncolor"))
         setSelectionColor(element.getChildElement("selectioncolor").getColor("value"));
     if (element.hasChildElement("hovercolor"))
         setHoverColor(element.getChildElement("hovercolor").getColor("value"));
+    
+    if (changed)
+    {
+        validateSelection();
+        updateText();
+    }
 }
 
 void Text::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
@@ -235,7 +265,7 @@ void Text::setRowSpacing(float spacing)
 {
     if (spacing != mRowSpacing)
     {
-        mRowSpacing = max(spacing, 0.5f);
+        mRowSpacing = max(spacing, MIN_ROW_SPACING);
         updateText();
     }
 }

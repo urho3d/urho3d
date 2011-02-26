@@ -26,7 +26,7 @@
 
 #include <angelscript.h>
 
-// Adapted from Angelscript's scriptarray add-on
+// Adapted from Angelscript's scriptarray add-on, but with garbage collection disabled
 
 struct SArrayBuffer;
 
@@ -59,13 +59,6 @@ public:
     void RemoveAt(asUINT index);
     void InsertLast(void *value);
     void RemoveLast();
-    
-    // GC methods
-    int  GetRefCount();
-    void SetFlag();
-    bool GetFlag();
-    void EnumReferences(asIScriptEngine* engine);
-    void ReleaseAllHandles(asIScriptEngine* engine);
     
 protected:
     mutable int refCount;

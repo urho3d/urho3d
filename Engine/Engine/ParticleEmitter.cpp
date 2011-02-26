@@ -222,7 +222,7 @@ void ParticleEmitter::readNetUpdate(Deserializer& source, ResourceCache* cache, 
     if (bits & 1)
     {
         StringHash parameters = source.readStringHash();
-        // There is possibility of receiving the same update twice, and this is fairly expensive, so check
+        // There is possibility of receiving the same update twice, and setting the parameters is fairly expensive, so check
         if (parameters != getResourceHash(mParameterSource))
             loadParameters(cache->getResource<XMLFile>(parameters), cache);
     }
@@ -384,14 +384,20 @@ void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
     if (rootElem.hasChildElement("material"))
         setMaterial(cache->getResource<Material>(rootElem.getChildElement("material").getString("name")));
     
+    if (rootElem.hasChildElement("numparticles"))
+        setNumParticles(rootElem.getChildElement("numparticles").getInt("value"));
+    
     if (rootElem.hasChildElement("sorting"))
         mBillboardsSorted = rootElem.getChildElement("sorting").getBool("enable");
-        
+    
     if (rootElem.hasChildElement("updateinvisible"))
         mUpdateInvisible = rootElem.getChildElement("updateinvisible").getBool("enable");
     
     if (rootElem.hasChildElement("relative"))
         mBillboardsRelative = rootElem.getChildElement("relative").getBool("enable");
+    
+    if (rootElem.hasChildElement("animlodbias"))
+        setAnimationLodBias(rootElem.getChildElement("relative").getFloat("value"));
     
     if (rootElem.hasChildElement("emittertype"))
     {
@@ -486,144 +492,25 @@ void ParticleEmitter::loadParameters(XMLFile* file, ResourceCache* cache)
             animations.push_back(animation);
             animElem = animElem.getNextElement("texanim");
         }
-        setParticleTextureAnimation(animations);
+        mTextureAnimation = animations;
     }
 }
 
-void ParticleEmitter::setNumParticles(unsigned num)
+void ParticleEmitter::setActive(bool enable, bool resetPeriod)
 {
+    if ((enable != mActive) || (resetPeriod))
+    {
+        mActive = enable;
+        mPeriodTimer = 0.0f;
+    }
+}
+
+
+void ParticleEmitter::setNumParticles(int num)
+{
+    num = max(num, 0);
     mParticles.resize(num);
     setNumBillboards(num);
-}
-
-void ParticleEmitter::setEmitterType(EmitterType type)
-{
-    mEmitterType = type;
-}
-
-void ParticleEmitter::setEmitterSize(const Vector3& size)
-{
-    mEmitterSize = Vector3(
-        max(size.mX, 0.0f),
-        max(size.mY, 0.0f),
-        max(size.mZ, 0.0f)
-    );
-    
-    mEmitterRadius = max(mEmitterSize.mX, max(mEmitterSize.mY, mEmitterSize.mZ)) * 0.5f;
-}
-
-void ParticleEmitter::setActiveTime(float time)
-{
-    mActiveTime = max(time, 0.0f);
-}
-
-void ParticleEmitter::setInactiveTime(float time)
-{
-    mInactiveTime = max(time, 0.0f);
-}
-
-void ParticleEmitter::setInterval(float minValue, float maxValue)
-{
-    mIntervalMin = max(minValue, M_EPSILON);
-    mIntervalMax = max(maxValue, M_EPSILON);
-}
-
-void ParticleEmitter::setInterval(float value)
-{
-    setInterval(value, value);
-}
-
-void ParticleEmitter::setTimeToLive(float minValue, float maxValue)
-{
-    mTimeToLiveMin = max(minValue, 0.0f);
-    mTimeToLiveMax = max(minValue, 0.0f);
-}
-
-void ParticleEmitter::setTimeToLive(float value)
-{
-    setTimeToLive(value, value);
-}
-
-void ParticleEmitter::setDirection(const Vector3& minValue, const Vector3& maxValue)
-{
-    mDirectionMin = minValue;
-    mDirectionMax = maxValue;
-}
-
-void ParticleEmitter::setDirection(const Vector3& value)
-{
-    setDirection(value, value);
-}
-
-void ParticleEmitter::setConstantForce(const Vector3& force)
-{
-    mConstantForce = force;
-}
-
-void ParticleEmitter::setDampingForce(float force)
-{
-    mDampingForce = force;
-}
-
-void ParticleEmitter::setParticleVelocity(float minValue, float maxValue)
-{
-    mVelocityMin = minValue;
-    mVelocityMax = maxValue;
-}
-
-void ParticleEmitter::setParticleVelocity(float value)
-{
-    setParticleVelocity(value, value);
-}
-
-void ParticleEmitter::setParticleRotation(float minValue, float maxValue)
-{
-    mRotationMin = minValue;
-    mRotationMax = maxValue;
-}
-
-void ParticleEmitter::setParticleRotation(float value)
-{
-    setParticleRotation(value, value);
-}
-
-void ParticleEmitter::setParticleRotationSpeed(float minValue, float maxValue)
-{
-    mRotationSpeedMin = minValue;
-    mRotationSpeedMax = maxValue;
-}
-
-void ParticleEmitter::setParticleRotationSpeed(float value)
-{
-    setParticleRotationSpeed(value, value);
-}
-
-void ParticleEmitter::setParticleSize(const Vector2& minValue, const Vector2& maxValue)
-{
-    mSizeMin = minValue;
-    mSizeMax = maxValue;
-}
-
-void ParticleEmitter::setParticleSize(const Vector2& value)
-{
-    setParticleSize(value, value);
-}
-
-void ParticleEmitter::setParticleSize(float minValue, float maxValue)
-{
-    mSizeMin = Vector2(minValue, minValue);
-    mSizeMax = Vector2(maxValue, maxValue);
-}
-
-void ParticleEmitter::setParticleSize(float value)
-{
-    setParticleSize(value, value);
-}
-
-void ParticleEmitter::setParticleSizeDelta(float addValue, float mulValue)
-{
-    mSizeAdd = addValue;
-    mSizeMul = mulValue;
 }
 
 void ParticleEmitter::setParticleColor(const Color& color)
@@ -642,25 +529,6 @@ void ParticleEmitter::setParticleColors(const std::vector<ColorFade>& colors)
         return;
     
     mColors = colors;
-}
-
-void ParticleEmitter::setParticleTextureAnimation(const std::vector<TextureAnimation>& animation)
-{
-    mTextureAnimation = animation;
-}
-
-void ParticleEmitter::setActive(bool enable, bool resetPeriod)
-{
-    if ((enable != mActive) || (resetPeriod))
-    {
-        mActive = enable;
-        mPeriodTimer = 0.0f;
-    }
-}
-
-void ParticleEmitter::setUpdateInvisible(bool enable)
-{
-    mUpdateInvisible = enable;
 }
 
 void ParticleEmitter::handleScenePostUpdate(StringHash eventType, VariantMap& eventData)

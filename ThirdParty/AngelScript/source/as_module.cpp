@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -99,18 +99,16 @@ int asCModule::AddScriptSection(const char *name, const char *code, size_t codeL
 	if( !builder )
 		builder = asNEW(asCBuilder)(engine, this);
 
-	builder->AddCode(name, code, (int)codeLength, lineOffset, (int)engine->GetScriptSectionNameIndex(name ? name : ""), engine->ep.copyScriptSections);
-
-	return asSUCCESS;
+	return builder->AddCode(name, code, (int)codeLength, lineOffset, (int)engine->GetScriptSectionNameIndex(name ? name : ""), engine->ep.copyScriptSections);
 }
 
 // internal
 void asCModule::JITCompile()
 {
-    for (unsigned int i = 0; i < scriptFunctions.GetLength(); i++)
-    {
-        scriptFunctions[i]->JITCompile();
-    }
+	for (unsigned int i = 0; i < scriptFunctions.GetLength(); i++)
+	{
+		scriptFunctions[i]->JITCompile();
+	}
 }
 
 // interface

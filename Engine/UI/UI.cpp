@@ -500,18 +500,6 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         IntVector2 pos = mCursor->getPosition();
         WeakPtr<UIElement> element(getElementAt(pos));
         
-        // First send global click event, with or without an element
-        using namespace UIMouseClick;
-        
-        VariantMap eventData;
-        eventData[UIMouseClick::P_ELEMENT] = (void*)element.getPtr();
-        eventData[UIMouseClick::P_X] = pos.mX;
-        eventData[UIMouseClick::P_Y] = pos.mY;
-        eventData[UIMouseClick::P_BUTTON] = button;
-        eventData[UIMouseClick::P_BUTTONS] = mMouseButtons;
-        eventData[UIMouseClick::P_QUALIFIERS] = mQualifiers;
-        sendEvent(EVENT_UIMOUSECLICK, eventData);
-        
         if (element)
         {
             // Handle focusing & bringing to front
@@ -536,6 +524,17 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             // If clicked over no element, or a disabled element, try to lose focus
             mDefocusElement = getFocusElement();
         }
+        
+        using namespace UIMouseClick;
+        
+        VariantMap eventData;
+        eventData[UIMouseClick::P_ELEMENT] = (void*)element.getPtr();
+        eventData[UIMouseClick::P_X] = pos.mX;
+        eventData[UIMouseClick::P_Y] = pos.mY;
+        eventData[UIMouseClick::P_BUTTON] = button;
+        eventData[UIMouseClick::P_BUTTONS] = mMouseButtons;
+        eventData[UIMouseClick::P_QUALIFIERS] = mQualifiers;
+        sendEvent(EVENT_UIMOUSECLICK, eventData);
     }
 }
 

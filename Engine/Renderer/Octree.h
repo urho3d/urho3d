@@ -37,9 +37,9 @@ class RayOctreeQuery;
 class Octant
 {
 public:
-    //! Construct with necessary parameters
+    //! Construct
     Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root);
-    //! Destruct. Remove all scene nodes and free child octants
+    //! Destruct. Move scene nodes to root if available (detach if not) and free child octants
     virtual ~Octant();
     
     //! Return or create a child octant
@@ -93,12 +93,15 @@ public:
     //! Return true if there are no nodes in this octant and child octants
     bool isEmpty() { return mNumNodes == 0; }
     
+    //! Reset root pointer recursively. Called when the whole octree is being destroyed
+    void resetRoot();
+    
 protected:
     //! Return scene nodes by a query, called internally
     void getNodesInternal(OctreeQuery& query, unsigned mask) const;
     //! Return scene nodes by a ray query, called internally
     void getNodesInternal(RayOctreeQuery& query) const;
-    //! Remove scene nodes and free child octants
+    //! Free child octants. If scene nodes still exist, move them to root
     void release();
     
     //! Increase scene node count recursively
@@ -145,7 +148,10 @@ class Octree : public SceneExtension, public Octant
     DEFINE_TYPE(Octree);
     
 public:
+    //! Construct
     Octree(const BoundingBox& box, unsigned numLevels, bool headless);
+    //! Destruct
+    ~Octree();
     
     //! Write scene extension properties to a stream
     virtual void save(Serializer& dest);

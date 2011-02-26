@@ -2,7 +2,7 @@
     <material name="Materials/Smoke.xml" />
     <updateinvisible enable="true" />
     <relative enable="false" />
-    <numparticles value="40" />
+    <numparticles value="10" />
     <activetime value="2" />
     <inactivetime value="0" />
     <interval value="0.075" />

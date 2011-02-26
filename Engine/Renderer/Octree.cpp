@@ -51,9 +51,8 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     mRoot(root),
     mNumNodes(0)
 {
-    Vector3 halfSize = mWorldBoundingBox.getSize() * 0.5;
-    
-    mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize); 
+    Vector3 halfSize = mWorldBoundingBox.getSize() * 0.5f;
+    mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize);
     
     for (unsigned x = 0; x < 2; ++x)
     {
@@ -190,6 +189,23 @@ void Octant::getNodes(RayOctreeQuery& query) const
     std::sort(query.mResult.begin(), query.mResult.end(), compareRayQueryResults);
 }
 
+void Octant::resetRoot()
+{
+    mRoot = 0;
+    
+    for (unsigned x = 0; x < 2; ++x)
+    {
+        for (unsigned y = 0; y < 2; ++y)
+        {
+            for (unsigned z = 0; z < 2; ++z)
+            {
+                if (mChildren[x][y][z])
+                    mChildren[x][y][z]->resetRoot();
+            }
+        }
+    }
+}
+
 void Octant::getNodesInternal(OctreeQuery& query, unsigned mask) const
 {
     if (!mNumNodes)
@@ -292,9 +308,21 @@ void Octant::getNodesInternal(RayOctreeQuery& query) const
 
 void Octant::release()
 {
-    // Remove the nodes from this octant, if any
-    for (std::vector<VolumeNode*>::iterator i = mNodes.begin(); i != mNodes.end(); ++i)
-        (*i)->mOctant = 0;
+    if ((mRoot) && (this != mRoot))
+    {
+        // Remove the nodes (if any) from this octant to the root octant
+        for (std::vector<VolumeNode*>::iterator i = mNodes.begin(); i != mNodes.end(); ++i)
+        {
+            (*i)->mOctant = mRoot;
+            mRoot->markNodeForReinsertion(*i);
+        }
+    }
+    else if (!mRoot)
+    {
+        // If the whole octree is being destroyed, just detach the nodes
+        for (std::vector<VolumeNode*>::iterator i = mNodes.begin(); i != mNodes.end(); ++i)
+            (*i)->mOctant = 0;
+    }
     
     mNodes.clear();
     mNumNodes = 0;
@@ -317,6 +345,12 @@ Octree::Octree(const BoundingBox& box, unsigned numLevels, bool headless) :
     mNumLevels(numLevels),
     mHeadless(headless)
 {
+}
+
+Octree::~Octree()
+{
+    // Reset root pointer from all child octants now so that they do not move their scene nodes to root
+    resetRoot();
 }
 
 void Octree::save(Serializer& dest)
@@ -370,13 +404,14 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
     if ((numLevels == mNumLevels) && (box.mMin == mWorldBoundingBox.mMin) && (box.mMax == mWorldBoundingBox.mMax))
         return;
     
-    if (mNumNodes)
-        LOGWARNING("Octree not empty when resizing. Removing all nodes");
-    
+    // If nodes exist, they are temporarily moved to the root
     release();
     
     mWorldBoundingBox = box;
     mNumLevels = numLevels;
+    
+    Vector3 halfSize = mWorldBoundingBox.getSize() * 0.5f;
+    mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize);
     
     LOGINFO("Resized octree to " + toString(box.getSize()) + " with " + toString(numLevels) + " levels");
 }

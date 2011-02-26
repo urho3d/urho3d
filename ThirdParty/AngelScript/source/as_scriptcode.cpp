@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2008 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -60,12 +60,13 @@ asCScriptCode::~asCScriptCode()
 
 int asCScriptCode::SetCode(const char *name, const char *code, bool makeCopy)
 {
-	return SetCode(name, code, strlen(code), makeCopy);
+	return SetCode(name, code, 0, makeCopy);
 }
 
 int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bool makeCopy)
 {
-	this->name = name;
+	if( !code ) return asINVALID_ARG;
+	this->name = name ? name : "";
 	if( !sharedCode && this->code ) 
 	{
 		asDELETEARRAY(this->code);
@@ -92,7 +93,7 @@ int asCScriptCode::SetCode(const char *name, const char *code, size_t length, bo
 		if( code[n] == '\n' ) linePositions.PushLast(n+1);
 	linePositions.PushLast(length);
 
-	return 0;
+	return asSUCCESS;
 }
 
 void asCScriptCode::ConvertPosToRowCol(size_t pos, int *row, int *col)

@@ -130,10 +130,6 @@ void asCByteCode::GetVarsUsed(asCArray<int> &vars)
 			InsertIfNotExists(vars, curr->wArg[0]);
 			InsertIfNotExists(vars, curr->wArg[1]);
 		}
-		else if( asBCInfo[curr->op].type == asBCTYPE_W_rW_ARG )
-		{
-			InsertIfNotExists(vars, curr->wArg[1]);
-		}
 		else if( curr->op == asBC_LoadThisR )
 		{
 			InsertIfNotExists(vars, 0);
@@ -169,11 +165,6 @@ bool asCByteCode::IsVarUsed(int offset)
 				 asBCInfo[curr->op].type == asBCTYPE_wW_rW_DW_ARG )
 		{
 			if( curr->wArg[0] == offset || curr->wArg[1] == offset )
-				return true;
-		}
-		else if( asBCInfo[curr->op].type == asBCTYPE_W_rW_ARG )
-		{
-			if( curr->wArg[1] == offset )
 				return true;
 		}
 		else if( curr->op == asBC_LoadThisR )
@@ -220,11 +211,6 @@ void asCByteCode::ExchangeVar(int oldOffset, int newOffset)
 		{
 			if( curr->wArg[0] == oldOffset )
 				curr->wArg[0] = (short)newOffset;
-			if( curr->wArg[1] == oldOffset )
-				curr->wArg[1] = (short)newOffset;
-		}
-		else if( asBCInfo[curr->op].type == asBCTYPE_W_rW_ARG )
-		{
 			if( curr->wArg[1] == oldOffset )
 				curr->wArg[1] = (short)newOffset;
 		}
@@ -941,8 +927,7 @@ bool asCByteCode::IsTempVarReadByInstr(cByteInstruction *curr, int offset)
 			  curr->wArg[0] == offset )
 		return true;
 	else if( (asBCInfo[curr->op].type == asBCTYPE_wW_rW_ARG ||
-			  asBCInfo[curr->op].type == asBCTYPE_wW_rW_DW_ARG ||
-			  asBCInfo[curr->op].type == asBCTYPE_W_rW_ARG) &&
+			  asBCInfo[curr->op].type == asBCTYPE_wW_rW_DW_ARG) &&
 			 curr->wArg[1] == offset )
 		return true;
 	else if( asBCInfo[curr->op].type == asBCTYPE_rW_rW_ARG &&
@@ -1167,6 +1152,35 @@ void asCByteCode::ExtractLineNumbers()
 	}
 }
 
+void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
+{
+	int pos = 0;
+	cByteInstruction *instr = first;
+	while( instr )
+	{
+		if( instr->op == asBC_Block )
+		{
+			asSObjectVariableInfo info;
+			info.programPos     = pos;
+			info.variableOffset = 0;
+			info.option         = instr->wArg[0] ? asBLOCK_BEGIN : asBLOCK_END;
+			outFunc->objVariableInfo.PushLast(info);
+		}
+		else if( instr->op == asBC_ObjInfo )
+		{
+			asSObjectVariableInfo info;
+			info.programPos     = pos;
+			info.variableOffset = (short)instr->wArg[0];
+			info.option         = *(int*)ARG_DW(instr->arg);
+			outFunc->objVariableInfo.PushLast(info);
+		}
+		else
+			pos += instr->size;
+
+		instr = instr->next;
+	}
+}
+
 int asCByteCode::GetSize()
 {
 	int size = 0;
@@ -1347,6 +1361,31 @@ void asCByteCode::Line(int line, int column)
     InstrWORD(asBC_JitEntry, 0);
 }
 
+void asCByteCode::ObjInfo(int offset, int info)
+{
+	if( AddInstruction() < 0 )
+		return;
+
+	// Add the special instruction that will be used to tell the exception
+	// handler when an object is initialized and deinitialized.
+	last->op                   = asBC_ObjInfo;
+	last->size                 = 0;
+	last->stackInc             = 0;
+	last->wArg[0]              = offset;
+	*((int*)ARG_DW(last->arg)) = info;
+}
+
+void asCByteCode::Block(bool start)
+{
+	if( AddInstruction() < 0 )
+		return;
+
+	last->op       = asBC_Block;
+	last->size     = 0;
+	last->stackInc = 0;
+	last->wArg[0]  = start ? 1 : 0;
+}
+
 int asCByteCode::FindLabel(int label, cByteInstruction *from, cByteInstruction **dest, int *positionDelta)
 {
 	// Search forward
@@ -1486,7 +1525,6 @@ void asCByteCode::Output(asDWORD *array)
 				break;
 			case asBCTYPE_wW_rW_ARG:
 			case asBCTYPE_rW_rW_ARG:
-			case asBCTYPE_W_rW_ARG:
 			case asBCTYPE_wW_W_ARG:
 				*(((asWORD *)ap)+1) = instr->wArg[0];
 				*(((asWORD *)ap)+2) = instr->wArg[1];
@@ -1546,13 +1584,6 @@ void asCByteCode::PostProcess()
 			stackSize += instr->stackInc;
 			if( stackSize > largestStackUsed ) 
 				largestStackUsed = stackSize;
-
-			// PSP -> PSF
-			if( instr->op == asBC_PSP )
-			{
-				instr->op = asBC_PSF;
-				instr->wArg[0] = instr->wArg[0] + (short)instr->stackSize;
-			}
 
 			if( instr->op == asBC_JMP )
 			{
@@ -1739,10 +1770,6 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			fprintf(file, "   %-8s v%d, v%d\n", asBCInfo[instr->op].name, instr->wArg[0], instr->wArg[1]);
 			break;
 
-		case asBCTYPE_W_rW_ARG:
-			fprintf(file, "   %-8s %d, v%d\n", asBCInfo[instr->op].name, instr->wArg[0], instr->wArg[1]);
-			break;
-
 		case asBCTYPE_wW_W_ARG:
 			fprintf(file, "   %-8s v%d, %d\n", asBCInfo[instr->op].name, instr->wArg[0], instr->wArg[1]);
 			break;
@@ -1873,8 +1900,10 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 		case asBCTYPE_INFO:
 			if( instr->op == asBC_LABEL )
 				fprintf(file, "%d:\n", instr->wArg[0]);
-			else
+			else if( instr->op == asBC_LINE )
 				fprintf(file, "   %s\n", asBCInfo[instr->op].name);
+			else if( instr->op == asBC_Block )
+				fprintf(file, "%c\n", instr->wArg[0] ? '{' : '}');
 			break;
 
 		case asBCTYPE_rW_DW_ARG:
@@ -2124,7 +2153,6 @@ int asCByteCode::InstrSHORT_DW(asEBCInstr bc, short a, asDWORD b)
 	asASSERT(asBCInfo[bc].type == asBCTYPE_wW_DW_ARG || 
 	         asBCInfo[bc].type == asBCTYPE_rW_DW_ARG ||
 			 asBCInfo[bc].type == asBCTYPE_W_DW_ARG);
-	asASSERT(asBCInfo[bc].stackInc == 0);
 
 	if( AddInstruction() < 0 )
 		return 0;

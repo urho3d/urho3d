@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2009 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -269,72 +269,30 @@ asQWORD GetReturnedDouble()
 	return d;
 }
 
-int CallSystemFunction(int id, asCContext *context, void *objectPointer)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/)
 {
 	asCScriptEngine *engine = context->engine;
-	asSSystemFunctionInterface *sysFunc = engine->scriptFunctions[id]->sysFuncIntf;
+	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
 	int callConv = sysFunc->callConv;
-	if( callConv == ICC_GENERIC_FUNC || callConv == ICC_GENERIC_METHOD )
-		return context->CallGeneric(id, objectPointer);
 
 	asQWORD retQW = 0;
 
-	asCScriptFunction *descr = engine->scriptFunctions[id];
-
 	void    *func              = (void*)sysFunc->func;
 	int      paramSize         = sysFunc->paramSize;
-	asDWORD *args              = context->regs.stackPointer;
-	void    *retPointer = 0;
-	void    *obj = 0;
 	asDWORD *vftable;
-	int      popSize           = paramSize;
 
-	context->regs.objectType = descr->returnType.GetObjectType();
 	if( descr->returnType.IsObject() && !descr->returnType.IsReference() && !descr->returnType.IsObjectHandle() )
 	{
-		// Allocate the memory for the object
-		retPointer = engine->CallAlloc(descr->returnType.GetObjectType());
 		sh4Args[AS_SH4_MAX_ARGS+1] = (asDWORD) retPointer;
-
-		if( sysFunc->hostReturnInMemory )
-		{
-			// The return is made in memory
-			callConv++;
-		}
 	}
 
-	if( callConv >= ICC_THISCALL )
-	{
-		if( objectPointer )
-		{
-			obj = objectPointer;
-		}
-		else
-		{
-			// The object pointer should be popped from the context stack
-			popSize++;
-
-			// Check for null pointer
-			obj = (void*)*(args + paramSize);
-			if( obj == 0 )
-			{	
-				context->SetInternalException(TXT_NULL_POINTER_ACCESS);
-				if( retPointer )
-					engine->CallFree(retPointer);
-				return 0;
-			}
-
-			// Add the base offset for multiple inheritance
-			obj = (void*)(int(obj) + sysFunc->baseOffset);
-		}
-	}
 	asASSERT(descr->parameterTypes.GetLength() <= 32);
 
 	// mark all float arguments
 	int argBit = 1;
 	int hostFlags = 0;
 	int intArgs = 0;
-	for( int a = 0; a < descr->parameterTypes.GetLength(); a++ ) {
+	for( asUINT a = 0; a < descr->parameterTypes.GetLength(); a++ ) {
 		if (descr->parameterTypes[a].IsFloatType()) {
 			hostFlags |= argBit;
 		} else intArgs++;
@@ -347,7 +305,7 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 		paramSize = 0;
 		int spos = 0;
 		int dpos = 1;
-		for( int n = 0; n < descr->parameterTypes.GetLength(); n++ )
+		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
 		{
 			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
 			{
@@ -414,99 +372,16 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	}
 	context->isCallingSystemFunction = false;
 
-#ifdef COMPLEX_OBJS_PASSED_BY_REF
-	if( sysFunc->takesObjByVal )
+	// If the return is a float value we need to get the value from the FP register
+	if( sysFunc->hostReturnFloat )
 	{
-		// Need to free the complex objects passed by value
-		args = context->regs.stackPointer;
-		if( callConv >= ICC_THISCALL && !objectPointer )
-		    args++;
-
-		int spos = 0;
-		for( int n = 0; n < descr->parameterTypes.GetLength(); n++ )
-		{
-			if( descr->parameterTypes[n].IsObject() && 
-				!descr->parameterTypes[n].IsReference() &&
-				(descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) )
-			{
-				void *obj = (void*)args[spos++];
-				asSTypeBehaviour *beh = &descr->parameterTypes[n].GetObjectType()->beh;
-				if( beh->destruct )
-					engine->CallObjectMethod(obj, beh->destruct);
-
-				engine->CallFree(obj);
-			}
-			else
-				spos += descr->parameterTypes[n].GetSizeInMemoryDWords();
-		}
-	}
-#endif
-
-	// Store the returned value in our stack
-	if( descr->returnType.IsObject() && !descr->returnType.IsReference() )
-	{
-		if( descr->returnType.IsObjectHandle() )
-		{
-			context->regs.objectRegister = (void*)(asDWORD)retQW;
-
-			if( sysFunc->returnAutoHandle && context->regs.objectRegister )
-				engine->CallObjectMethod(context->regs.objectRegister, descr->returnType.GetObjectType()->beh.addref);
-		}
+		if( sysFunc->hostReturnSize == 1 )
+			*(asDWORD*)&retQW = GetReturnedFloat();
 		else
-		{
-			if( !sysFunc->hostReturnInMemory )
-			{
-				// Copy the returned value to the pointer sent by the script engine
-				if( sysFunc->hostReturnSize == 1 )
-					*(asDWORD*)retPointer = (asDWORD)retQW;
-				else
-					*(asQWORD*)retPointer = retQW;
-			}
-
-			// Store the object in the register
-			context->regs.objectRegister = retPointer;
-		}
-	}
-	else
-	{
-		// Store value in valueRegister
-		if( sysFunc->hostReturnFloat )
-		{
-			if( sysFunc->hostReturnSize == 1 )
-				*(asDWORD*)&context->regs.valueRegister = GetReturnedFloat();
-			else
-				context->regs.valueRegister = GetReturnedDouble();
-		}
-		else if( sysFunc->hostReturnSize == 1 )
-			*(asDWORD*)&context->regs.valueRegister = (asDWORD)retQW;
-		else
-			context->regs.valueRegister = retQW;
+			retQW = GetReturnedDouble();
 	}
 
-	if( sysFunc->hasAutoHandles )
-	{
-		args = context->regs.stackPointer;
-		if( callConv >= ICC_THISCALL && !objectPointer )
-			args++;
-
-		int spos = 0;
-		for( int n = 0; n < descr->parameterTypes.GetLength(); n++ )
-		{
-			if( sysFunc->paramAutoHandles[n] && args[spos] )
-			{
-				// Call the release method on the type
-				engine->CallObjectMethod((void*)args[spos], descr->parameterTypes[n].GetObjectType()->beh.release);
-				args[spos] = 0;
-			}
-
-			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
-				spos++;
-			else
-				spos += descr->parameterTypes[n].GetSizeOnStackDWords();
-		}
-	}
-
-	return popSize;
+	return retQW;
 }
 
 END_AS_NAMESPACE
