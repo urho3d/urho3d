@@ -149,14 +149,17 @@ void Texture::loadParameters(ResourceCache* cache)
     
     if (cache->exists(xmlName))
     {
-        XMLFile* xml = cache->getResource<XMLFile>(xmlName);
-        loadParameters(*xml);
+        XMLFile* file = cache->getResource<XMLFile>(xmlName);
+        loadParameters(file);
     }
 }
 
-void Texture::loadParameters(XMLFile& xml)
+void Texture::loadParameters(XMLFile* file)
 {
-    XMLElement rootElem = xml.getRootElement();
+    if (!file)
+        return;
+    
+    XMLElement rootElem = file->getRootElement();
     XMLElement paramElem = rootElem.getChildElement("");
     
     while (paramElem)

@@ -188,7 +188,12 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool setVector3(const string& in, const Vector3& in)", asMETHOD(XMLElement, setVector3), asCALL_THISCALL);
 }
 
-static XMLFile* ConstructXMLFile(const std::string& name)
+static XMLFile* ConstructXMLFile()
+{
+    return new XMLFile();
+}
+
+static XMLFile* ConstructXMLFileWithName(const std::string& name)
 {
     return new XMLFile(name);
 }
@@ -196,7 +201,7 @@ static XMLFile* ConstructXMLFile(const std::string& name)
 static void XMLFileLoad(File* file, XMLFile* ptr)
 {
     if (!file)
-        SAFE_EXCEPTION("Null XML file source");
+        SAFE_EXCEPTION("Null source file");
     try
     {
         ptr->load(*file);
@@ -210,7 +215,7 @@ static void XMLFileLoad(File* file, XMLFile* ptr)
 static void XMLFileSave(File* file, XMLFile* ptr)
 {
     if (!file)
-        SAFE_EXCEPTION("Null XML file for saving");
+        SAFE_EXCEPTION("Null destination file");
     try
     {
         ptr->save(*file);
@@ -224,6 +229,8 @@ static void XMLFileSave(File* file, XMLFile* ptr)
 static void registerXMLFile(asIScriptEngine* engine)
 {
     registerResource<XMLFile>(engine, "XMLFile");
+    engine->RegisterObjectBehaviour("XMLFile", asBEHAVE_FACTORY, "XMLFile@+ f()", asFUNCTION(ConstructXMLFile), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("XMLFile", asBEHAVE_FACTORY, "XMLFile@+ f(const string& in)", asFUNCTION(ConstructXMLFileWithName), asCALL_CDECL);
     engine->RegisterObjectMethod("XMLFile", "void load(File@+)", asFUNCTION(XMLFileLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "void save(File@+)", asFUNCTION(XMLFileSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "XMLElement createRootElement(const string& in)", asMETHOD(XMLFile, createRootElement), asCALL_THISCALL);

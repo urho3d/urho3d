@@ -123,7 +123,7 @@ void TextureCube::load(Deserializer& source, ResourceCache* cache)
     XMLFile xml;
     xml.load(source, cache);
     
-    loadParameters(xml);
+    loadParameters(&xml);
     
     XMLElement textureElem = xml.getRootElement();
     XMLElement faceElem = textureElem.getChildElement("face");

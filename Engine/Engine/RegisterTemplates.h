@@ -164,7 +164,6 @@ template <class T> CScriptArray* setToArray(const std::set<T>& set, const char* 
         return 0;
 }
 
-
 //! Template function for registering implicit ref casts between two classes
 template <class T, class U> void registerRefCasts(asIScriptEngine* engine, const char* classNameT, const char* classNameU)
 {
@@ -204,7 +203,7 @@ template <class T> void registerSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void writeVLE(uint)", asMETHODPR(T, writeVLE, (unsigned), void), asCALL_THISCALL);
 }
 
-//! Template function for registering a class derived from Deerializer
+//! Template function for registering a class derived from Deserializer
 template <class T> void registerDeserializer(asIScriptEngine* engine, const char* className)
 {
     engine->RegisterObjectMethod(className, "int readInt()", asMETHODPR(T, readInt, (), int), asCALL_THISCALL);
@@ -248,10 +247,38 @@ template <class T> void registerHashedType(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "const string& getTypeName() const", asMETHODPR(T, getTypeName, () const, const std::string&), asCALL_THISCALL);
 }
 
+//! Template function for saving a component or an entity to XML
+template <class T> void objectSaveXML(XMLElement& element, T* ptr)
+{
+    try
+    {
+        ptr->saveXML(element);
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW(e);
+    }
+}
+
+//! Template function for loading a component or an entity from XML
+template <class T> void objectLoadXML(const XMLElement& element, T* ptr)
+{
+    try
+    {
+        ptr->loadXML(element, getEngine()->getResourceCache());
+    }
+    catch (Exception& e)
+    {
+        SAFE_RETHROW(e);
+    }
+}
+
 //! Template function for registering a class derived from Component
 template <class T> void registerComponent(asIScriptEngine* engine, const char* className)
 {
     registerHashedType<T>(engine, className);
+    engine->RegisterObjectMethod(className, "void saveXML(XMLElement&)", asFUNCTION(objectSaveXML<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void loadXML(const XMLElement&)", asFUNCTION(objectLoadXML<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setName(const string& in)", asMETHODPR(T, setName, (const std::string&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setNetFlags(uint8)", asMETHODPR(T, setNetFlags, (unsigned char), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const string& getName() const", asMETHODPR(T, getName, () const, const std::string&), asCALL_THISCALL);

@@ -153,10 +153,12 @@ void VertexShader::loadParameters(ResourceCache* cache)
     std::string shaderGroup = shaderName.substr(0, index);
     
     // Load shader information XML file
-    XMLFile* xml = cache->getResource<XMLFile>(shaderPath + shaderGroup + ".xml");
+    XMLFile* file = cache->getResource<XMLFile>(shaderPath + shaderGroup + ".xml");
+    if (!file)
+        return;
     
     // Update (global) parameter register mappings
-    XMLElement shadersElem = xml->getRootElement();
+    XMLElement shadersElem = file->getRootElement();
     XMLElement paramsElem = shadersElem.getChildElement("vsparameters");
     XMLElement paramElem = paramsElem.getChildElement("parameter");
     

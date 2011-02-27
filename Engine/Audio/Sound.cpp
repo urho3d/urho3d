@@ -350,8 +350,11 @@ void Sound::loadParameters(ResourceCache* cache)
     if (!cache->exists(xmlName))
         return;
     
-    XMLFile* xml = cache->getResource<XMLFile>(xmlName);
-    XMLElement rootElem = xml->getRootElement();
+    XMLFile* file = cache->getResource<XMLFile>(xmlName);
+    if (!file)
+        return;
+    
+    XMLElement rootElem = file->getRootElement();
     XMLElement paramElem = rootElem.getChildElement("");
     
     while (paramElem)

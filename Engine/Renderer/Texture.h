@@ -96,7 +96,7 @@ protected:
     //! Load parameters
     void loadParameters(ResourceCache* cache);
     //! Load parameters from an XML file
-    void loadParameters(XMLFile& xml);
+    void loadParameters(XMLFile* xml);
     //! Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references
     void checkTextureBudget(ShortStringHash type, ResourceCache* cache);
     
