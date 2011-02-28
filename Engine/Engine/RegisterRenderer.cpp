@@ -805,7 +805,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "void setNumViewports(uint)", asMETHOD(Pipeline, setNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setViewport(uint, Scene@+, Camera@+, const IntRect& in)", asMETHOD(Pipeline, setViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setViewportCamera(uint, Camera@+)", asMETHOD(Pipeline, setViewportCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void setViewportScreenRect(uint, Camera@+)", asMETHOD(Pipeline, setViewportScreenRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setViewportScreenRect(uint, const IntRect& in)", asMETHOD(Pipeline, setViewportScreenRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setSpecularLighting(bool)", asMETHOD(Pipeline, setSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setDrawShadows(bool)", asMETHOD(Pipeline, setDrawShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setTextureAnisotropy(int)", asMETHOD(Pipeline, setTextureAnisotropy), asCALL_THISCALL);
