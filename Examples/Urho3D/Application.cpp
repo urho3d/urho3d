@@ -66,19 +66,10 @@ void Application::run()
         EXCEPTION("Usage: Urho3D <scriptfile | scenefile> [options]\n\n"
             "Either a script file or a scene file can be specified. The script file should implement the function void start(), "
             "which should in turn subscribe to all necessary events, such as the application update. If a scene is loaded, it "
-            "should contain script objects to implement the application logic.");
+            "should contain script objects to implement the application logic. Refer to the readme for the command line options.");
     
     // Instantiate the engine
     mEngine = new Engine();
-    
-    // Add default resources
-    mCache = mEngine->getResourceCache();
-    if (fileExists("Data.pak"))
-        mCache->addPackageFile(new PackageFile("Data.pak"));
-    else
-        mCache->addResourcePath("Data");
-    
-    mCache->addResourcePath(getSystemFontDirectory());
     
     // Try to open the file before setting screen mode
     File file(fullName);
@@ -86,12 +77,15 @@ void Application::run()
     // Initialize engine & scripting
     mEngine->init(arguments);
     mEngine->createScriptEngine();
+    mCache = mEngine->getResourceCache();
     
-    // If the file has a pathname, add it also as a resource path
+    // Add the file's path also as a resource directory
     std::string pathName, fileName, extension;
     splitPath(fullName, pathName, fileName, extension);
     if (!pathName.empty())
         mCache->addResourcePath(pathName);
+    else
+        mCache->addResourcePath(getCurrentDirectory());
     
     // Script mode: execute the rest of initialization, including scene creation, in script
     if ((extension != ".xml") && (extension != ".scn"))

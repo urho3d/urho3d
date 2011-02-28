@@ -38,6 +38,8 @@ std::string mSection = "";
 void GameConfig::load(const std::string& fileName, ResourceCache* cache)
 {
     XMLFile* file = cache->getResource<XMLFile>(fileName);
+    if (!file)
+        return;
     
     const TiXmlElement* root = file->getRootElement().getElement();
     const TiXmlElement* element = 0;
@@ -75,24 +77,17 @@ void GameConfig::setSection(const std::string& name)
 
 const std::string& GameConfig::get(const std::string& name)
 {
+    static const std::string empty;
     std::map<std::string, std::string>::const_iterator i = mSettings.find(mSection + name);
     if (i != mSettings.end())
         return i->second;
     else
-        EXCEPTION("Can not find setting " + mSection + name);
+        return empty;
 }
 
 bool GameConfig::getBool(const std::string& name)
 {
-    // Allow missing value to act as "false"
-    try
-    {
-        return toBool(get(name));
-    }
-    catch (...)
-    {
-        return false;
-    }
+    return toBool(get(name));
 }
 
 float GameConfig::getReal(const std::string& name)

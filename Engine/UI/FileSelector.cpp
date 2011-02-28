@@ -29,6 +29,7 @@
 #include "InputEvents.h"
 #include "LineEdit.h"
 #include "ListView.h"
+#include "ProcessUtils.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"
@@ -106,7 +107,7 @@ FileSelector::FileSelector(UI* ui) :
     std::vector<std::string> defaultFilters;
     defaultFilters.push_back("*.*");
     setFilters(defaultFilters, 0);
-    setPath(getWorkingDirectory());
+    setPath(getCurrentDirectory());
     
     subscribeToEvent(mFilterList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFilterChanged));
     subscribeToEvent(mPathEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handlePathChanged));

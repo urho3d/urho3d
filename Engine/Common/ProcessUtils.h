@@ -27,8 +27,6 @@
 #include <string>
 #include <vector>
 
-//! Set the executable's location as the working directory
-void setExecutableWorkingDirectory();
 //! Open a console window
 void openConsoleWindow();
 //! Display an error dialog with the specified title and message
@@ -39,6 +37,8 @@ void parseArguments(const char* cmdLine);
 const std::vector<std::string>& getArguments();
 //! Read input from the console window. Return false if there was no input
 bool getConsoleInput(std::string& line);
+//! Return the executable's directory
+std::string getExecutableDirectory();
 //! Return the user's document directory which should have read/write access for writing logs, savegames etc.
 std::string getUserDocumentsDirectory();
 //! Return the number of logical processors

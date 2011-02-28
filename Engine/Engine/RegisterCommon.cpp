@@ -555,8 +555,11 @@ static void registerSerialization(asIScriptEngine* engine)
     
     engine->RegisterGlobalFunction("bool fileExists(const string& in)", asFUNCTION(fileExists), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool directoryExists(const string& in)", asFUNCTION(directoryExists), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("array<string>@ scanDirectory(const string& in, const string& in, uint, bool)", asFUNCTION(ScanDirectory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getCurrentDirectory()", asFUNCTION(getCurrentDirectory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void setCurrentDirectory(const string& in)", asFUNCTION(setCurrentDirectory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
+    
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getExtension(const string& in, bool)", asFUNCTION(getExtension), asCALL_CDECL);
@@ -624,6 +627,7 @@ static void registerProcessUtils(asIScriptEngine* engine)
 {
     engine->RegisterGlobalFunction("array<string>@ getArguments()", asFUNCTION(GetArguments), asCALL_CDECL);
     engine->RegisterGlobalFunction("void errorDialog(const string& in, const string& in)", asFUNCTION(errorDialog), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getExecutableDirectory()", asFUNCTION(getExecutableDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getUserDocumentsDirectory()", asFUNCTION(getUserDocumentsDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint getNumLogicalProcessors()", asFUNCTION(getNumLogicalProcessors), asCALL_CDECL);
 }

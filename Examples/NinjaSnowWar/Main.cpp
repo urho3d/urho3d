@@ -54,7 +54,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 void run(const char* cmdLine)
 {
     parseArguments(cmdLine);
-    setExecutableWorkingDirectory();
     
     #if !defined(_MSC_VER) || !defined(_DEBUG)
     std::string error;

@@ -30,19 +30,17 @@
 
 #include "DebugNew.h"
 
-Exception::Exception(const std::string& what, bool logError) :
+Exception::Exception(const std::string& what) :
     mWhat(what)
 {
-    if (logError)
-        LOGERROR(what);
+    LOGERROR(what);
 }
 
 #ifdef _DEBUG
-Exception::Exception(const std::string& what, const char* file, int line, bool logError)
+Exception::Exception(const std::string& what, const char* file, int line)
 {
     mWhat = what + std::string(" at ") + std::string(file) + std::string(", line ") + toString(line);
-    if (logError)
-        LOGERROR(mWhat);
+    LOGERROR(what);
 }
 #endif
 
@@ -62,8 +60,8 @@ void checkAndThrowException(const std::string& what)
     {
         static std::string lastWhat;
         lastWhat = what;
-        LOGERROR(lastWhat);
         context->SetException(lastWhat.c_str());
+        LOGERROR(what);
     }
     else
         throw Exception(what);
@@ -77,8 +75,8 @@ void checkAndThrowException(const std::string& what, const char* file, int line)
     {
         static std::string lastWhat;
         lastWhat = what + std::string(" at ") + std::string(file) + std::string(", line ") + toString(line);
-        LOGERROR(lastWhat);
         context->SetException(lastWhat.c_str());
+        LOGERROR(what);
     }
     else
         throw Exception(what, file, line);

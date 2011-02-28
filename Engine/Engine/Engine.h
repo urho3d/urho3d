@@ -59,7 +59,7 @@ class Engine : public RefCounted, public EventListener
     
 public:
     //! Construct with window title, log file name and whether to start in headless mode
-    Engine(const std::string& windowTitle = "Urho3D", const std::string& logFileName = "Urho3D.log", bool headless = false);
+    Engine(const std::string& windowTitle = "Urho3D", const std::string& logFileName = std::string(), bool headless = false);
     //! Destruct. Free all subsystems
     virtual ~Engine();
     

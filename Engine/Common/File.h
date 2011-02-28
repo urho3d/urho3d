@@ -97,12 +97,14 @@ private:
 bool fileExists(const std::string& fileName);
 //! Check if a directory exists
 bool directoryExists(const std::string& pathName);
-//! Create a directory. Throw exception on failure
-void createDirectory(const std::string& pathName);
-//! Return the absolute working directory
-std::string getWorkingDirectory();
 //! Scan a directory for specified files
 void scanDirectory(std::vector<std::string>& result, const std::string& pathName, const std::string& filter, unsigned flags, bool recursive);
+//! Return the absolute current directory
+std::string getCurrentDirectory();
+//! Set the current directory
+bool setCurrentDirectory(const std::string& pathName);
+//! Create a directory
+bool createDirectory(const std::string& pathName);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed

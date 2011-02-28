@@ -34,6 +34,7 @@
 #include "DebugRenderer.h"
 #include "Engine.h"
 #include "EngineComponentFactory.h"
+#include "Font.h"
 #include "Input.h"
 #include "Log.h"
 #include "Network.h"
@@ -96,6 +97,20 @@ Engine::Engine(const std::string& windowTitle, const std::string& logFileName, b
     
     mCache = new ResourceCache();
     
+    // Add default resource paths: CoreData package or directory, Data package or directory, system fonts directory
+    std::string exePath = getExecutableDirectory();
+    if (fileExists(exePath + "CoreData.pak"))
+        mCache->addPackageFile(new PackageFile(exePath + "CoreData.pak"));
+    else if (directoryExists(exePath + "CoreData"))
+        mCache->addResourcePath(exePath + "CoreData");
+    
+    if (fileExists(exePath + "Data.pak"))
+        mCache->addPackageFile(new PackageFile(exePath + "Data.pak"));
+    else if (directoryExists(exePath + "Data"))
+        mCache->addResourcePath(exePath + "Data");
+    
+    mCache->addResourcePath(getSystemFontDirectory());
+
     sInstance = this;
 }
 
@@ -223,10 +238,6 @@ void Engine::init(const std::vector<std::string>& arguments)
     }
     
     mInput = new Input(mRenderer);
-    
-    // If no resource paths or packages already defined, add the default resource path
-    if ((mCache->getPackageFiles().empty()) && (mCache->getResourcePaths().empty()))
-        mCache->addResourcePath("Data");
     
     mCache->addResourceFactory(new BaseResourceFactory());
     mCache->addResourceFactory(new AudioResourceFactory(mAudio));

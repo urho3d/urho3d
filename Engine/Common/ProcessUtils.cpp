@@ -50,26 +50,6 @@ bool miniDumpWritten = false;
 std::string currentLine;
 std::vector<std::string> arguments;
 
-void setExecutableWorkingDirectory()
-{
-    // Find out executable path and change directory
-    char path[MAX_PATH];
-    
-    GetModuleFileName(0, path, MAX_PATH);
-    int pathLength = strlen(path);
-    
-    for (int i = pathLength - 1; i >= 0; --i)
-    {
-        if (path[i] == '\\')
-        {
-            path[i + 1] = 0;
-            break;
-        }
-    }
-    
-    SetCurrentDirectory(path);
-}
-
 void openConsoleWindow()
 {
     AllocConsole();
@@ -186,6 +166,13 @@ bool getConsoleInput(std::string& line)
     }
     
     return false;
+}
+
+std::string getExecutableDirectory()
+{
+    char path[MAX_PATH];
+    GetModuleFileName(0, path, MAX_PATH);
+    return getPath(std::string(path));
 }
 
 std::string getUserDocumentsDirectory()

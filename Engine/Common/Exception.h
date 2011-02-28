@@ -46,12 +46,12 @@ class Exception : public std::exception
 {
 public:
     //! Construct with exception reason
-    Exception(const std::string& what, bool logError = true);
+    Exception(const std::string& what);
     //! Destruct
     virtual ~Exception() throw();
     #ifdef _DEBUG
     //! Construct with exception reason and location information
-    Exception(const std::string& what, const char* file, int line, bool logError = true);
+    Exception(const std::string& what, const char* file, int line);
     #endif
     
     //! Return exception reason

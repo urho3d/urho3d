@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Exception.h"
 #include "Log.h"
+#include "ProcessUtils.h"
 #include "StringUtils.h"
 
 #include "DebugNew.h"
@@ -39,14 +40,16 @@ Log::Log(const std::string& fileName, LogLevel level) :
     if (sInstance)
         EXCEPTION("Log already exists");
     
+    // If empty log file name, use a default name in the executable directory. Writing to it may fail depending on access rights.
     if (!fileName.empty())
-    {
         mHandle = fopen(fileName.c_str(), "w");
-        if (mHandle)
-            write(LOG_INFO, "Log file " + fileName + " created");
-        else
-            write(LOG_ERROR, "Failed to create log file " + fileName);
-    }
+    else
+        mHandle = fopen((getExecutableDirectory() + "Urho3D.log").c_str(), "w");
+    
+    if (mHandle)
+        write(LOG_INFO, "Log file " + fileName + " created");
+    else
+        write(LOG_ERROR, "Failed to create log file " + fileName);
     
     sInstance = this;
 }

@@ -94,19 +94,6 @@ Game::Game() :
     mFirstFrame(false),
     mClientEntityID(0)
 {
-    std::string userDir = getUserDocumentsDirectory();
-    applicationDir = userDir + "NinjaSnowWar";
-    
-    // Test the "allowed path" feature. Access outside the working directory, and these paths, should cause an exception
-    registerDirectory("Data");
-    registerDirectory(getSystemFontDirectory());
-    registerDirectory(applicationDir);
-    
-    createDirectory(applicationDir);
-    applicationDir = fixPath(applicationDir); // Add the slash at the end
-    downloadDir = applicationDir + "Cache";
-    createDirectory(downloadDir); // Create package download cache
-    
     subscribeToEvent(EVENT_UPDATE, EVENT_HANDLER(Game, handleUpdate));
     subscribeToEvent(EVENT_POSTUPDATE, EVENT_HANDLER(Game, handlePostUpdate));
     subscribeToEvent(EVENT_PHYSICSPRESTEP, EVENT_HANDLER(Game, handlePreStep));
@@ -152,6 +139,19 @@ void Game::init()
 {
     PROFILE(Game_Init);
     
+    std::string userDir = getUserDocumentsDirectory();
+    applicationDir = userDir + "NinjaSnowWar";
+    
+    // Test the "allowed path" feature. Access outside these paths should cause an exception
+    registerDirectory(getExecutableDirectory());
+    registerDirectory(getSystemFontDirectory());
+    registerDirectory(applicationDir);
+    
+    createDirectory(applicationDir);
+    applicationDir = fixPath(applicationDir); // Add the slash at the end
+    downloadDir = applicationDir + "Cache";
+    createDirectory(downloadDir); // Create package download cache
+    
     bool runServer = false;
     bool runClient = false;
     std::string address;
@@ -184,18 +184,9 @@ void Game::init()
     }
     
     // Initialize the engine. If running the server, use headless mode
-    mEngine = new Engine("NinjaSnowWar", logName, runServer);
-    
-    // Add the resources as a package if available
-    mCache = mEngine->getResourceCache();
-    if (fileExists("Data.pak"))
-        mCache->addPackageFile(new PackageFile("Data.pak"));
-    else
-        mCache->addResourcePath("Data");
-    
+    mEngine = new Engine("NinjaSnowWar", getExecutableDirectory() + logName, runServer);
     mEngine->init(arguments);
-    
-    mCache->addResourcePath(getSystemFontDirectory());
+    mCache = mEngine->getResourceCache();
     
     DebugHud* debugHud = mEngine->createDebugHud();
     debugHud->setStyle(mCache->getResource<XMLFile>("UI/DefaultStyle.xml"));
@@ -215,7 +206,8 @@ void Game::init()
     if ((!runServer) && (!runClient))
     {
         XM* song = mCache->getResource<XM>("Music/NinjaGods.xm");
-        song->play();
+        if (song)
+            song->play();
     }
     
     setupOptions();
@@ -329,13 +321,9 @@ void Game::createCamera()
     Entity* cameraEntity = mScene->createEntity("Camera", true);
     mCamera = cameraEntity->createComponent<Camera>();
     Renderer* renderer = mEngine->getRenderer();
-    // View distance is optional
-    try
-    {
-        mCamera->setNearClip(GameConfig::getReal("Engine/ViewStart"));
-        mCamera->setFarClip(GameConfig::getReal("Engine/ViewEnd"));
-    }
-    catch (...) {}
+    
+    mCamera->setNearClip(GameConfig::getReal("Engine/ViewStart"));
+    mCamera->setFarClip(GameConfig::getReal("Engine/ViewEnd"));
 }
 
 void Game::startGame()

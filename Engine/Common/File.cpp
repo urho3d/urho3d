@@ -34,7 +34,7 @@
 
 static std::set<std::string> allowedDirectories;
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, unsigned flags, bool recursive);
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& startPath, const std::string& filter, unsigned flags, bool recursive);
 
 File::File(const std::string& fileName, FileMode mode) :
     mHandle(0),
@@ -201,26 +201,6 @@ bool directoryExists(const std::string& pathName)
     return true;
 }
 
-void createDirectory(const std::string& pathName)
-{
-    if (!checkDirectoryAccess(pathName))
-        SAFE_EXCEPTION("Access denied to " + pathName);
-    
-    if (CreateDirectory(getOSPath(pathName, true).c_str(), 0))
-        return;
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-        return;
-    
-    SAFE_EXCEPTION("Failed to create directory " + pathName);
-}
-
-std::string getWorkingDirectory()
-{
-    char currentDir[MAX_PATH];
-    GetCurrentDirectory(MAX_PATH, currentDir);
-    return fixPath(std::string(currentDir));
-}
-
 void scanDirectory(std::vector<std::string>& result, const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
 {
     result.clear();
@@ -229,16 +209,50 @@ void scanDirectory(std::vector<std::string>& result, const std::string& pathName
         LOGERROR("Access denied to " + pathName);
     else
     {
-        // Go into the directory to scan the files; this way the file names will be relative to the start path
-        char oldDir[MAX_PATH];
-        GetCurrentDirectory(MAX_PATH, oldDir);
-        if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
-            return;
-        
-        scanDirectoryInternal(result, "", filter, flags, recursive);
-        SetCurrentDirectory(oldDir);
+        std::string initialPath = fixPath(pathName);
+        scanDirectoryInternal(result, initialPath, initialPath, filter, flags, recursive);
     }
 }
+
+std::string getCurrentDirectory()
+{
+    char path[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, path);
+    return fixPath(std::string(path));
+}
+
+bool setCurrentDirectory(const std::string& pathName)
+{
+    if (!checkDirectoryAccess(pathName))
+    {
+        LOGERROR("Access denied to " + pathName);
+        return false;
+    }
+    if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
+    {
+        LOGERROR("Failed to change directory to " + pathName);
+        return false;
+    }
+    return true;
+}
+
+bool createDirectory(const std::string& pathName)
+{
+    if (!checkDirectoryAccess(pathName))
+    {
+        LOGERROR("Access denied to " + pathName);
+        return false;
+    }
+    
+    bool success = (CreateDirectory(getOSPath(pathName, true).c_str(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
+    if (success)
+        LOGDEBUG("Created directory " + pathName);
+    else
+        LOGERROR("Failed to create directory " + pathName);
+    
+    return success;
+}
+
 
 void registerDirectory(const std::string& pathName)
 {
@@ -254,10 +268,6 @@ bool checkDirectoryAccess(const std::string& pathName)
     
     // If no allowed directories defined, succeed always
     if (allowedDirectories.empty())
-        return true;
-    
-    // Access to the working directory is always allowed
-    if ((fixedPath.empty()) || (fixedPath == "./"))
         return true;
     
     // If there is any attempt to go to a parent directory, disallow
@@ -372,10 +382,13 @@ std::string getOSPath(const std::string& pathName, bool forNativeApi)
         return pathName;
 }
 
-void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& filter, unsigned flags, bool recursive)
+void scanDirectoryInternal(std::vector<std::string>& result, std::string path, const std::string& startPath, const std::string& filter, unsigned flags, bool recursive)
 {
     path = fixPath(path);
     std::string pathAndFilter = getOSPath(path + filter, true);
+    std::string deltaPath;
+    if (path.length() > startPath.length())
+        deltaPath = path.substr(startPath.length());
     
     WIN32_FIND_DATA info;
     HANDLE handle = FindFirstFile(pathAndFilter.c_str(), &info);
@@ -393,10 +406,10 @@ void scanDirectoryInternal(std::vector<std::string>& result, std::string path, c
                     if (flags & SCAN_DIRECTORIES)
                         result.push_back(path + fileName);
                     if ((recursive) && (fileName != ".") && (fileName != ".."))
-                        scanDirectoryInternal(result, path + fileName, filter, flags, recursive);
+                        scanDirectoryInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)
-                    result.push_back(path + fileName);
+                    result.push_back(deltaPath + fileName);
             }
         } 
         while (FindNextFile(handle, &info));
