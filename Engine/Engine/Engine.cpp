@@ -309,7 +309,7 @@ SharedPtr<Scene> Engine::createScene(const std::string& name, const BoundingBox&
     // Add debug rendering if not headless
     if (!mHeadless)
     {
-        DebugRenderer* debug = new DebugRenderer(mRenderer, mCache);
+        DebugRenderer* debug = new DebugRenderer();
         scene->addExtension(debug);
     }
     

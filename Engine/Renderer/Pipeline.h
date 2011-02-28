@@ -25,12 +25,10 @@
 #define RENDERER_PIPELINE_H
 
 #include "Batch.h"
-#include "Camera.h"
 #include "Color.h"
 #include "EventListener.h"
+#include "RenderSurface.h"
 #include "ShaderDefs.h"
-#include "Rect.h"
-#include "SharedPtr.h"
 #include "Zone.h"
 
 #include <map>
@@ -46,15 +44,10 @@ class MaterialPass;
 class MaterialTechnique;
 class Octree;
 class Renderer;
-class RenderSurface;
 class ResourceCache;
-class Scene;
 class Skeleton;
 class OcclusionBuffer;
-class Texture;
 class Texture2D;
-class TextureCube;
-class TiXmlElement;
 class View;
 
 static const int SHADOW_MIN_PIXELS = 64;
@@ -90,23 +83,6 @@ struct EdgeFilterParameters
     float mMaxScale;
 };
 
-//! Viewport definition
-struct Viewport
-{
-    //! Construct
-    Viewport() :
-        mScreenRect(IntRect::sZero)
-    {
-    }
-    
-    //! Scene pointer
-    WeakPtr<Scene> mScene;
-    //! Camera pointer
-    WeakPtr<Camera> mCamera;
-    //! Viewport screen rectangle
-    IntRect mScreenRect;
-};
-
 //! High-level rendering pipeline
 class Pipeline : public RefCounted, public EventListener
 {
@@ -121,11 +97,7 @@ public:
     //! Set number of viewports to render
     void setNumViewports(unsigned num);
     //! Set a viewport
-    void setViewport(unsigned index, Scene* scene, Camera* camera, const IntRect& screenRect = IntRect::sZero);
-    //! Set a viewport's camera only
-    void setViewportCamera(unsigned index, Camera* camera);
-    //! Set a viewport's screen rect only
-    void setViewportScreenRect(unsigned index, const IntRect& screenRect);
+    void setViewport(unsigned index, const Viewport& viewport);
     //! Set specular lighting on/off
     void setSpecularLighting(bool enable);
     //! Set shadows on/off
@@ -157,12 +129,8 @@ public:
     
     //! Return number of viewports
     unsigned getNumViewports() const { return mViewports.size(); }
-    //! Return viewport scene
-    Scene* getViewportScene(unsigned index) const;
-    //! Return viewport camera
-    Camera* getViewportCamera(unsigned index) const;
-    //! Return viewport screen rectangle
-    IntRect getViewportScreenRect(unsigned index) const;
+    //! Return viewport
+    const Viewport& getViewport(unsigned index) const;
     //! Return current frame number
     unsigned getFrameNumber() const { return mFrameNumber; }
     //! Return elapsed time
@@ -234,8 +202,8 @@ private:
     void beginFrame(float timeStep);
     //! Clear views from previous frame
     void resetViews();
-    //! Add a view
-    void addView(Octree* octree, Camera* camera, RenderSurface* renderTarget, const IntRect& screenRect);
+    //! Add a view. Return true if successful
+    bool addView(RenderSurface* renderTarget, const Viewport& viewport);
     //! Return an occlusion buffer for use
     OcclusionBuffer* getOrCreateOcclusionBuffer(Camera& camera, int maxOccluderTriangles, bool halfResolution = false);
     //! Return a material technique for a scene node, considering material LOD

@@ -100,9 +100,12 @@ void createCamera()
     gameCamera.setFarClip(16000.0);
     gameCamera.setPosition(Vector3(0, 200, -1000));
 
-    // Set zero screen rect -> follow the window size
     if (!engine.isHeadless())
-        pipeline.setViewport(0, gameScene, gameCamera, IntRect(0, 0, 0, 0));
+    {
+        pipeline.setNumViewports(2);
+        pipeline.setViewport(0, Viewport(gameScene, gameCamera));
+        pipeline.setViewport(1, Viewport(gameScene, gameCamera, IntRect(10, 10, 330, 210)));
+    }
 }
 
 void createOverlays()

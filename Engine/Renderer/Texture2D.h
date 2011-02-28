@@ -37,7 +37,7 @@ class Texture2D : public Texture
     
 public:
     //! Construct with renderer subsystem pointer, texture usage type and name
-    Texture2D(Renderer*, TextureUsage usage, const std::string& name = std::string());
+    Texture2D(Renderer* renderer, TextureUsage usage, const std::string& name = std::string());
     //! Destruct
     virtual ~Texture2D();
     

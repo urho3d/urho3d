@@ -378,9 +378,22 @@ void createCamera()
     cameraLight.setRampTexture(cache.getResource("Texture2D", "Textures/RampWide.png"));
     cameraLight.setSpotTexture(cache.getResource("Texture2D", "Textures/SpotWide.png"));
     camera.addChild(cameraLight);
-    
-    // Set zero screen rect -> follow the window size
-    pipeline.setViewport(0, testScene, camera, IntRect(0, 0, 0, 0));
+
+    pipeline.setViewport(0, Viewport(testScene, camera));
+
+    /*
+    // Auxiliary view test
+    const int D3DFMT_A8R8G8B8 = 21;
+
+    Texture2D@ rtTex = Texture2D(TEXTURE_RENDERTARGET, "RTT");
+    rtTex.setSize(512, 512, D3DFMT_A8R8G8B8);
+    rtTex.getRenderSurface().setViewport(Viewport(testScene, camera));
+    rtTex.setBackupTexture(cache.getResource("Texture2D", "Textures/Diffuse.dds"));
+
+    Material@ mat = cache.getResource("Material", "Materials/Test.xml");
+    MaterialTechnique@ tech = mat.getTechnique(0);
+    tech.setTexture(TU_DIFFUSE, rtTex);
+    */
 }
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
@@ -496,7 +509,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         {
             drawdebug++;
             if (drawdebug > 2) 
-                drawdebug = 0;                        
+                drawdebug = 0;
             pipeline.setDrawDebugGeometry(drawdebug == 1);
             testScene.getPhysicsWorld().setDrawDebugGeometry(drawdebug == 2);
         }

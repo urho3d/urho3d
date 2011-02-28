@@ -52,7 +52,6 @@ Camera::Camera(const std::string& name) :
     mLightDetailLevelOverride(QUALITY_MAX),
     mMaterialQualityOverride(QUALITY_MAX),
     mMaxOccluderTrianglesOverride(M_MAX_INT),
-    mInViewFrameNumber(M_MAX_UNSIGNED),
     mInverseWorldTransformDirty(true),
     mFrustumDirty(true),
     mProjectionDirty(true),
@@ -505,11 +504,6 @@ float Camera::getLodDistance(float distance, float scale, float bias) const
         return distance / d;
     else
         return mOrthoSize / d;
-}
-
-void Camera::markInView(unsigned frameNumber)
-{
-    mInViewFrameNumber = frameNumber;
 }
 
 void Camera::onMarkedDirty()

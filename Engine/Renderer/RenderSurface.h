@@ -24,11 +24,31 @@
 #ifndef RENDERER_RENDERSURFACE_H
 #define RENDERER_RENDERSURFACE_H
 
+#include "Rect.h"
+#include "RendererDefs.h"
 #include "SharedPtr.h"
-#include "Texture.h"
 
 class Camera;
-class Renderer;
+class Scene;
+class Texture;
+
+//! A viewport definition either for a texture or the backbuffer
+struct Viewport
+{
+    //! Construct with defaults
+    Viewport();
+    //! Construct with a full rectangle
+    Viewport(Scene* scene, Camera* camera);
+    //! Construct with a specified rectangle
+    Viewport(Scene* scene, Camera* camera, const IntRect& rect);
+    
+    //! Scene pointer
+    WeakPtr<Scene> mScene;
+    //! Camera pointer
+    WeakPtr<Camera> mCamera;
+    //! Viewport rectangle
+    IntRect mRect;
+};
 
 //! A renderable color or depth stencil surface
 class RenderSurface : public RefCounted
@@ -42,8 +62,8 @@ public:
     //! Destruct
     ~RenderSurface();
     
-    //! Set camera to use in auxiliary view rendering
-    void setCamera(Camera* camera);
+    //! Set viewport for auxiliary view rendering
+    void setViewport(const Viewport& viewport);
     //! Set linked color buffer
     void setLinkedRenderTarget(RenderSurface* renderTarget);
     //! Set linked depth buffer
@@ -61,8 +81,8 @@ public:
     int getHeight() const;
     //! Return usage
     TextureUsage getUsage() const;
-    //! Return camera to use in auxiliary view rendering
-    Camera* getCamera() const { return mCamera; }
+    //! Return auxiliary view rendering viewport
+    const Viewport& getViewport() const { return mViewport; }
     //! Return linked color buffer
     RenderSurface* getLinkedRenderTarget() const { return mLinkedRenderTarget; }
     //! Return linked depth buffer
@@ -73,8 +93,8 @@ private:
     Texture* mParentTexture;
     //! Direct3D surface
     void* mSurface;
-    //! Auxiliary view rendering camera
-    WeakPtr<Camera> mCamera;
+    //! Viewport
+    Viewport mViewport;
     //! Linked color buffer
     WeakPtr<RenderSurface> mLinkedRenderTarget;
     //! Linked depth buffer

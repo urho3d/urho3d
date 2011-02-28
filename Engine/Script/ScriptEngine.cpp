@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "Exception.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "RegisterArray.h"

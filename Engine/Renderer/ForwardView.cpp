@@ -103,7 +103,7 @@ void View::getBatchesForward()
     
     // Go through lights
     {
-        PROFILE_MULTIPLE(Pipeline_GetLightBatches, mLights.size());
+        PROFILE_MULTIPLE(View_GetLightBatches, mLights.size());
         
         unsigned lightQueueCount = 0;
         for (unsigned i = 0; i < mLights.size(); ++i)

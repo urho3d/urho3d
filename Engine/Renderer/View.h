@@ -34,6 +34,7 @@ class GeometryNode;
 class OcclusionBuffer;
 class RenderSurface;
 class Zone;
+struct Viewport;
 
 static const int MAX_LIGHT_SPLITS = 6;
 
@@ -70,8 +71,8 @@ public:
     //! Destruct
     virtual ~View();
     
-    //! Define with octree, camera and render target pointers and a viewport rectangle
-    void define(Octree* octree, Camera* camera, RenderSurface* renderTarget, IntRect screenRect);
+    //! Define with rendertarget and viewport. Return true if successful
+    bool define(RenderSurface* renderTarget, const Viewport& viewport);
     //! Update culling and construct rendering batches
     void update(const FrameInfo& frame);
     //! Render batches
@@ -155,7 +156,7 @@ private:
     RenderSurface* mRenderTarget;
     //! Depth buffer to use
     RenderSurface* mDepthStencil;
-    //! Screen rectangle. For texture render targets it is the full texture size
+    //! Screen rectangle
     IntRect mScreenRect;
     //! Render target width
     int mWidth;

@@ -148,11 +148,6 @@ public:
     //! Return a scene node's LOD scaled distance
     float getLodDistance(float distance, float scale, float bias) const;
     
-    //! Mark in view this frame. Called by View
-    void markInView(unsigned frameNumber);
-    //! Return whether is in view this frame
-    bool isInView(unsigned frameNumber) const { return mInViewFrameNumber == frameNumber; }
-    
 protected:
     //! Transform has changed. Mark frustum and projection to need updating
     virtual void onMarkedDirty();

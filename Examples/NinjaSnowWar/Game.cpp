@@ -230,10 +230,6 @@ void Game::init()
         mClient->connect(address, 1234, mUserName);
     }
     
-    // Configure the viewport
-    if (!runServer)
-        mEngine->getPipeline()->setViewport(0, mScene, mCamera);
-    
     startGame();
 }
 
@@ -324,6 +320,9 @@ void Game::createCamera()
     
     mCamera->setNearClip(GameConfig::getReal("Engine/ViewStart"));
     mCamera->setFarClip(GameConfig::getReal("Engine/ViewEnd"));
+    
+    // Configure the viewport
+    mEngine->getPipeline()->setViewport(0, Viewport(mScene, mCamera));
 }
 
 void Game::startGame()
@@ -1052,25 +1051,16 @@ void Game::updateCamera()
     if (mServer)
         return;
     
-    Camera* camera = 0;
-    if (mCamera.isExpired())
+    if (!mCamera)
     {
-        // Reacquire the camera pointer if necessary
+        // Reacquire the camera pointer if necessary, then reconfigure the viewport
         Entity* cameraEntity = mScene->getEntity("Camera");
         if (cameraEntity)
-        {
             mCamera = cameraEntity->getComponent<Camera>();
-            camera = mCamera.getPtr();
-        }
+        if (!mCamera)
+            return;
+        mEngine->getPipeline()->setViewport(0, Viewport(mScene, mCamera));
     }
-    else
-        camera = mCamera.getPtr();
-    
-    if (!camera)
-        return;
-    
-    // Make sure the pipeline has the updated camera pointer
-    mEngine->getPipeline()->setViewportCamera(0, camera);
     
     // Player tracking
     Entity* playerEntity = 0;
@@ -1115,8 +1105,8 @@ void Game::updateCamera()
     if (result.size())
         rayDistance = min(rayDistance, result[0].mDistance - mCameraSafetyDist);
     
-    camera->setPosition(minDist + rayDir * rayDistance);
-    camera->setRotation(dir);
+    mCamera->setPosition(minDist + rayDir * rayDistance);
+    mCamera->setRotation(dir);
     
     Audio* audio = mEngine->getAudio();
     if (audio)

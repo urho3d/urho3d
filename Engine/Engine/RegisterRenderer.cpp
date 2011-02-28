@@ -27,7 +27,6 @@
 #include "AnimationState.h"
 #include "BillboardSet.h"
 #include "DebugRenderer.h"
-#include "Engine.h"
 #include "InstancedModel.h"
 #include "Light.h"
 #include "Material.h"
@@ -98,7 +97,6 @@ static void registerCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "Vector3 getUpVector()", asMETHOD(Camera, getUpVector), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float getDistance(const Vector3& in)", asMETHOD(Camera, getDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float getDistanceSquared(const Vector3& in)", asMETHOD(Camera, getDistanceSquared), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "bool isInView(uint) const", asMETHOD(Camera, isInView), asCALL_THISCALL);
     registerRefCasts<Component, Camera>(engine, "Component", "Camera");
     registerRefCasts<Node, Camera>(engine, "Node", "Camera");
 }
@@ -125,6 +123,51 @@ static void registerSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "uint getNumBones() const", asMETHOD(Skeleton, getNumBones), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(uint) const", asMETHODPR(Skeleton, getBone, (unsigned) const, Bone*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ getBone(const string& in) const", asMETHODPR(Skeleton, getBone, (const std::string&) const, Bone*), asCALL_THISCALL);
+}
+
+static void ConstructViewport(Viewport* ptr)
+{
+    new(ptr) Viewport();
+}
+
+static void ConstructViewportCopy(const Viewport& viewport, Viewport* ptr)
+{
+    new(ptr) Viewport(viewport);
+}
+
+static void ConstructViewportSceneCamera(Scene* scene, Camera* camera, Viewport* ptr)
+{
+    new(ptr) Viewport(scene, camera);
+}
+
+static void ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, const IntRect& rect, Viewport* ptr)
+{
+    new(ptr) Viewport(scene, camera, rect);
+}
+
+static void DestructViewport(Viewport* ptr)
+{
+    ptr->~Viewport();
+}
+
+static void ViewportSetScene(Scene* scene, Viewport* ptr)
+{
+    ptr->mScene = scene;
+}
+
+static void ViewportSetCamera(Camera* camera, Viewport* ptr)
+{
+    ptr->mCamera = camera;
+}
+
+static Scene* ViewportGetScene(Viewport* ptr)
+{
+    return ptr->mScene;
+}
+
+static Camera* ViewportGetCamera(Viewport* ptr)
+{
+    return ptr->mCamera;
 }
 
 static Texture2D* ConstructTexture2D(TextureUsage usage, const std::string& name)
@@ -194,17 +237,30 @@ static void registerTexture(asIScriptEngine* engine)
     registerTexture<Texture>(engine, "Texture");
     registerRefCasts<Resource, Texture>(engine, "Resource", "Texture");
     
+    engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructViewport), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport& in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect& in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructViewport), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "Viewport &opAssign(const Viewport& in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asFUNCTION(ViewportSetScene), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asFUNCTION(ViewportSetCamera), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asFUNCTION(ViewportGetScene), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Viewport", "Camera@+ get_camera() const", asFUNCTION(ViewportGetCamera), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("Viewport", "IntRect rect", offsetof(Viewport, mRect));
+    
     engine->RegisterObjectType("RenderSurface", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_ADDREF, "void f()", asMETHOD(RenderSurface, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("RenderSurface", asBEHAVE_RELEASE, "void f()", asMETHOD(RenderSurface, releaseRef), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void setCamera(Camera@+)", asMETHOD(RenderSurface, setCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void setViewport(const Viewport& in)", asMETHOD(RenderSurface, setViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void setLinkedRenderTarget(RenderSurface@+)", asMETHOD(RenderSurface, setLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void setLinkedDepthBuffer(RenderSurface@+)", asMETHOD(RenderSurface, setLinkedDepthBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "Texture@+ getParentTexture() const", asMETHOD(RenderSurface, getParentTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int getWidth() const", asMETHOD(RenderSurface, getWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int getHeight() const", asMETHOD(RenderSurface, getHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "TextureUsage getUsage() const", asMETHOD(RenderSurface, getUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "Camera@+ getCamera() const", asMETHOD(RenderSurface, getCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "const Viewport& getViewport() const", asMETHOD(RenderSurface, getViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ getLinkedRenderTarget() const", asMETHOD(RenderSurface, getLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ getLinkedDepthBuffer() const", asMETHOD(RenderSurface, getLinkedDepthBuffer), asCALL_THISCALL);
     
@@ -803,9 +859,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Pipeline", asBEHAVE_ADDREF, "void f()", asMETHOD(Pipeline, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Pipeline", asBEHAVE_RELEASE, "void f()", asMETHOD(Pipeline, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setNumViewports(uint)", asMETHOD(Pipeline, setNumViewports), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void setViewport(uint, Scene@+, Camera@+, const IntRect& in)", asMETHOD(Pipeline, setViewport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void setViewportCamera(uint, Camera@+)", asMETHOD(Pipeline, setViewportCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void setViewportScreenRect(uint, const IntRect& in)", asMETHOD(Pipeline, setViewportScreenRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setViewport(uint, const Viewport& in)", asMETHOD(Pipeline, setViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setSpecularLighting(bool)", asMETHOD(Pipeline, setSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setDrawShadows(bool)", asMETHOD(Pipeline, setDrawShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setTextureAnisotropy(int)", asMETHOD(Pipeline, setTextureAnisotropy), asCALL_THISCALL);
@@ -821,9 +875,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "void setEdgeFilter(const EdgeFilterParameters& in)", asMETHOD(Pipeline, setEdgeFilter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setDrawDebugGeometry(bool)", asMETHOD(Pipeline, setDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViewports() const", asMETHOD(Pipeline, getNumViewports), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "Scene@+ getViewportScene(uint) const", asMETHOD(Pipeline, getViewportScene), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "Camera@+ getViewportCamera(uint) const", asMETHOD(Pipeline, getViewportCamera), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "IntRect getViewportScreenRect(uint) const", asMETHOD(Pipeline, getViewportScreenRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "const Viewport& getViewport(uint) const", asMETHOD(Pipeline, getViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getFrameNumber() const", asMETHOD(Pipeline, getFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "float getElapsedTime() const", asMETHOD(Pipeline, getElapsedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "bool getSpecularLighting() const", asMETHOD(Pipeline, getSpecularLighting), asCALL_THISCALL);

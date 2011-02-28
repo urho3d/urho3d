@@ -71,13 +71,18 @@ View::~View()
 {
 }
 
-void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget, IntRect screenRect)
+bool View::define(RenderSurface* renderTarget, const Viewport& viewport)
 {
-    if ((!octree) || (!camera))
-    {
-        LOGERROR("Null octree or camera for View");
-        return;
-    }
+    if ((!viewport.mScene) || (!viewport.mCamera))
+        return false;
+    
+    // If scene is loading asynchronously, it is incomplete and should not be rendered
+    if (viewport.mScene->isAsyncLoading())
+        return false;
+    
+    Octree* octree = viewport.mScene->getExtension<Octree>();
+    if (!octree)
+        return false;
     
     Renderer* renderer = mPipeline->getRenderer();
     
@@ -91,14 +96,14 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget, I
             if (errorDisplayed.find(renderTarget) == errorDisplayed.end())
             {
                 errorDisplayed.insert(renderTarget);
-                LOGERROR("Render texture is larger than the G-buffer, can not add view");
+                LOGERROR("Render texture is larger than the G-buffer, can not render");
             }
-            return;
+            return false;
         }
     }
     
     mOctree = octree;
-    mCamera = camera;
+    mCamera = viewport.mCamera;
     mRenderTarget = renderTarget;
     
     if (renderTarget)
@@ -107,20 +112,26 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget, I
         mDepthStencil = 0;
     mZone = &sDefaultZone;
     
-    // Validate the rect and calculate size
-    screenRect.mLeft = clamp(screenRect.mLeft, 0, renderer->getWidth() - 1);
-    screenRect.mTop = clamp(screenRect.mTop, 0, renderer->getHeight() - 1);
-    screenRect.mRight = clamp(screenRect.mRight, screenRect.mLeft + 1, renderer->getWidth());
-    screenRect.mBottom = clamp(screenRect.mBottom, screenRect.mTop + 1, renderer->getHeight());
-    mScreenRect = screenRect;
-    mWidth = screenRect.mRight - screenRect.mLeft;
-    mHeight = screenRect.mBottom - screenRect.mTop;
+    // Validate the rect and calculate size. If zero rect, use whole render target size
+    int rtWidth = renderTarget ? renderTarget->getWidth() : renderer->getWidth();
+    int rtHeight = renderTarget ? renderTarget->getHeight() : renderer->getHeight();
+    if (viewport.mRect != IntRect::sZero)
+    {
+        mScreenRect.mLeft = clamp(viewport.mRect.mLeft, 0, rtWidth - 1);
+        mScreenRect.mTop = clamp(viewport.mRect.mTop, 0, rtHeight - 1);
+        mScreenRect.mRight = clamp(viewport.mRect.mRight, mScreenRect.mLeft + 1, rtWidth);
+        mScreenRect.mBottom = clamp(viewport.mRect.mBottom, mScreenRect.mTop + 1, rtHeight);
+    }
+    else
+        mScreenRect = IntRect(0, 0, rtWidth, rtHeight);
+    mWidth = mScreenRect.mRight - mScreenRect.mLeft;
+    mHeight = mScreenRect.mBottom - mScreenRect.mTop;
     
     // Set possible quality overrides from the camera
-    mDrawShadows = mPipeline->getDrawShadows() && (camera->getDrawShadowsOverride());
-    mLightDetailLevel = min(mPipeline->getLightDetailLevel(), camera->getLightDetailLevelOverride());
-    mMaterialQuality = min(mPipeline->getMaterialQuality(), camera->getMaterialQualityOverride());
-    mMaxOccluderTriangles = min(mPipeline->getMaxOccluderTriangles(), camera->getMaxOccluderTrianglesOverride());
+    mDrawShadows = mPipeline->getDrawShadows() && (mCamera->getDrawShadowsOverride());
+    mLightDetailLevel = min(mPipeline->getLightDetailLevel(), mCamera->getLightDetailLevelOverride());
+    mMaterialQuality = min(mPipeline->getMaterialQuality(), mCamera->getMaterialQualityOverride());
+    mMaxOccluderTriangles = min(mPipeline->getMaxOccluderTriangles(), mCamera->getMaxOccluderTrianglesOverride());
     
     // Clear light scissor cache, geometry, light, occluder & batch lists
     mLightScissorCache.clear();
@@ -138,14 +149,14 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget, I
     mPostOpaqueQueue.clear();
     mTransparentQueue.clear();
     mLightQueues.clear();
+    
+    return true;
 }
 
 void View::update(const FrameInfo& frame)
 {
     if ((!mCamera) || (!mOctree))
         return;
-    
-    PROFILE(Pipeline_UpdateView);
     
     mFrame.mCamera = mCamera;
     mFrame.mTimeStep = frame.mTimeStep;
@@ -155,7 +166,6 @@ void View::update(const FrameInfo& frame)
     if (mCamera->getAutoAspectRatio())
         mCamera->setAspectRatio((float)(mScreenRect.mRight - mScreenRect.mLeft) / (float)(mScreenRect.mBottom - mScreenRect.mTop));
     
-    mCamera->markInView(mFrame.mFrameNumber);
     getNodes();
     
     if (mPipeline->getRenderer()->getRenderMode() != RENDER_FORWARD)
@@ -220,7 +230,7 @@ void View::render()
         {
             DebugRenderer* debug = mOctree->getScene()->getExtension<DebugRenderer>();
             if (debug)
-                debug->render(mCamera);
+                debug->render(mPipeline, mCamera);
         }
     }
     
@@ -1215,10 +1225,9 @@ void View::checkTechniqueForAuxView(MaterialTechnique* technique)
                 RenderSurface* target = tex2D->getRenderSurface();
                 if (target)
                 {
-                    // Add the view only if it has not been added already
-                    Camera* camera = target->getCamera();
-                    if ((camera) && (!camera->isInView(mFrame.mFrameNumber)))
-                        mPipeline->addView(mOctree, camera, target, IntRect(0, 0, tex2D->getWidth(), tex2D->getHeight()));
+                    const Viewport& viewport = target->getViewport();
+                    if ((viewport.mScene) && (viewport.mCamera))
+                        mPipeline->addView(target, viewport);
                 }
             }
             else if (texture->getType() == TextureCube::getTypeStatic())
@@ -1229,10 +1238,9 @@ void View::checkTechniqueForAuxView(MaterialTechnique* technique)
                     RenderSurface* target = texCube->getRenderSurface((CubeMapFace)j);
                     if (target)
                     {
-                        // Add the view only if it has not been added already
-                        Camera* camera = target->getCamera();
-                        if ((camera) && (!camera->isInView(mFrame.mFrameNumber)))
-                            mPipeline->addView(mOctree, camera, target, IntRect(0, 0, texCube->getWidth(), texCube->getHeight()));
+                        const Viewport& viewport = target->getViewport();
+                        if ((viewport.mScene) && (viewport.mCamera))
+                            mPipeline->addView(target, viewport);
                     }
                 }
             }

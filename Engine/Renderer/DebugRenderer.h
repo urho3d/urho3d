@@ -38,12 +38,8 @@ class Frustum;
 class GeometryNode;
 class Light;
 class Matrix4x3;
-class PixelShader;
-class Renderer;
-class ResourceCache;
+class Pipeline;
 class Skeleton;
-class Texture;
-class VertexShader;
 
 //! Debug rendering line
 struct DebugLine
@@ -75,10 +71,8 @@ class DebugRenderer : public SceneExtension, public EventListener
     DEFINE_TYPE(DebugRenderer);
     
 public:
-    //! Construct with Renderer and ResourceCache pointers
-    DebugRenderer(Renderer* renderer, ResourceCache* cache);
-    //! Destruct
-    virtual ~DebugRenderer();
+    //! Construct
+    DebugRenderer();
     
     //! Add a line
     void addLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
@@ -91,20 +85,11 @@ public:
     //! Add a skeleton
     void addSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
     //! Render all debug lines from a specific camera. The viewport and rendertarget should be set before
-    void render(Camera* camera);
+    void render(Pipeline* pipeline, Camera* camera);
     
 private:
     //! Handle end of frame. Clear debug geometry
     void handleEndFrame(StringHash eventType, VariantMap& eventData);
-    
-    //! Renderer subsystem
-    SharedPtr<Renderer> mRenderer;
-    //! Resource cache
-    SharedPtr<ResourceCache> mCache;
-    //! Debug geometry vertex shader
-    SharedPtr<VertexShader> mDebugVS;
-    //! Debug geometry pixel shader
-    SharedPtr<PixelShader> mDebugPS;
     
     //! Lines rendered with depth test
     std::vector<DebugLine> mLines;

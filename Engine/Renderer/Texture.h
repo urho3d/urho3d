@@ -34,15 +34,6 @@ static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLFile;
 
-//! Texture usage types
-enum TextureUsage
-{
-    TEXTURE_STATIC = 0,
-    TEXTURE_DYNAMIC,
-    TEXTURE_RENDERTARGET,
-    TEXTURE_DEPTHSTENCIL
-};
-
 //! Base class for texture resources
 class Texture : public Resource, public GPUObject
 {

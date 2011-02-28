@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "BorderImage.h"
 #include "Console.h"
 #include "Engine.h"
 #include "Font.h"

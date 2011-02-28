@@ -27,8 +27,29 @@
 #include "Renderer.h"
 #include "RendererImpl.h"
 #include "RenderSurface.h"
+#include "Scene.h"
+#include "Texture.h"
 
 #include "DebugNew.h"
+
+Viewport::Viewport() :
+    mRect(IntRect::sZero)
+{
+}
+
+Viewport::Viewport(Scene* scene, Camera* camera) :
+    mScene(scene),
+    mCamera(camera),
+    mRect(IntRect::sZero)
+{
+}
+
+Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect) :
+    mScene(scene),
+    mCamera(camera),
+    mRect(rect)
+{
+}
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
     mParentTexture(parentTexture),
@@ -41,9 +62,9 @@ RenderSurface::~RenderSurface()
     release();
 }
 
-void RenderSurface::setCamera(Camera* camera)
+void RenderSurface::setViewport(const Viewport& viewport)
 {
-    mCamera = camera;
+    mViewport = viewport;
 }
 
 void RenderSurface::setLinkedRenderTarget(RenderSurface* renderTarget)

@@ -159,6 +159,15 @@ enum TextureCoordinate
     MAX_COORDS
 };
 
+//! Texture usage types
+enum TextureUsage
+{
+    TEXTURE_STATIC = 0,
+    TEXTURE_DYNAMIC,
+    TEXTURE_RENDERTARGET,
+    TEXTURE_DEPTHSTENCIL
+};
+
 //! Rendering passes
 enum PassType
 {

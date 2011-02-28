@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "DropDownList.h"
-#include "Exception.h"
 #include "File.h"
 #include "FileSelector.h"
 #include "InputEvents.h"

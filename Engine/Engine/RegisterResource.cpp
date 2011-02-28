@@ -22,7 +22,6 @@
 //
 
 #include "Precompiled.h"
-#include "Engine.h"
 #include "Log.h"
 #include "RegisterTemplates.h"
 #include "ScriptInstance.h"

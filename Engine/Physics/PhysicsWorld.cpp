@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "DebugRenderer.h"
-#include "Entity.h"
 #include "Log.h"
 #include "PhysicsEvents.h"
 #include "PhysicsWorld.h"
@@ -33,8 +32,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "StringUtils.h"
-#include "VectorBuffer.h"
-#include "XMLElement.h"
 
 #include <ode/ode.h>
 #include <algorithm>

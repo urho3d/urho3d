@@ -333,7 +333,7 @@ void Pipeline::setNumViewports(unsigned num)
     mViewports.resize(num);
 }
 
-void Pipeline::setViewport(unsigned index, Scene* scene, Camera* camera, const IntRect& screenRect)
+void Pipeline::setViewport(unsigned index, const Viewport& viewport)
 {
     if (index >= mViewports.size())
     {
@@ -341,34 +341,8 @@ void Pipeline::setViewport(unsigned index, Scene* scene, Camera* camera, const I
         return;
     }
     
-    Viewport& viewport = mViewports[index];
-    viewport.mScene = scene;
-    viewport.mCamera = camera;
-    viewport.mScreenRect = screenRect;
+    mViewports[index] = viewport;
 }
-
-void Pipeline::setViewportCamera(unsigned index, Camera* camera)
-{
-    if (index >= mViewports.size())
-    {
-        LOGERROR("Illegal viewport index");
-        return;
-    }
-    
-    mViewports[index].mCamera = camera;
-}
-
-void Pipeline::setViewportScreenRect(unsigned index, const IntRect& screenRect)
-{
-    if (index >= mViewports.size())
-    {
-        LOGERROR("Illegal viewport index");
-        return;
-    }
-    
-    mViewports[index].mScreenRect = screenRect;
-}
-
 
 void Pipeline::setSpecularLighting(bool enable)
 {
@@ -465,28 +439,14 @@ void Pipeline::setDrawDebugGeometry(bool enable)
     mDrawDebugGeometry = enable;
 }
 
-Scene* Pipeline::getViewportScene(unsigned index) const
+const Viewport& Pipeline::getViewport(unsigned index) const
 {
+    static const Viewport emptyViewport;
+    
     if (index >= mViewports.size())
-        return 0;
+        return emptyViewport;
     else
-        return mViewports[index].mScene;
-}
-
-Camera* Pipeline::getViewportCamera(unsigned index) const
-{
-    if (index >= mViewports.size())
-        return 0;
-    else
-        return mViewports[index].mCamera;
-}
-
-IntRect Pipeline::getViewportScreenRect(unsigned index) const
-{
-    if (index >= mViewports.size())
-        return IntRect::sZero;
-    else
-        return mViewports[index].mScreenRect;
+        return mViewports[index];
 }
 
 VertexShader* Pipeline::getVertexShader(const std::string& name, bool checkExists) const
@@ -619,39 +579,22 @@ bool Pipeline::update(float timeStep)
     // view dependencies correctly
     for (unsigned i = mViewports.size() - 1; i < mViewports.size(); --i)
     {
+        unsigned mainView = mNumViews;
         Viewport& viewport = mViewports[i];
-        
-        // Check for valid scene, camera and octree, and that the scene is not asynchronously loading and thus incomplete
-        Scene* scene = viewport.mScene;
-        Camera* camera = viewport.mCamera;
-        if ((!scene) || (!camera) || (scene->isAsyncLoading()))
-            continue;
-        Octree* octree = scene->getExtension<Octree>();
-        if (!octree)
+        if (!addView(0, viewport))
             continue;
         
-        // If viewport has zero size defined, follow the window size
-        IntRect screenRect = viewport.mScreenRect;
-        if (screenRect == IntRect::sZero)
-            screenRect = IntRect(0, 0, mRenderer->getWidth(), mRenderer->getHeight());
-        
-        mFrame.mCamera = camera;
-        
-        // Update octree. Perform early update for nodes which need that, and reinsert moved nodes
+        // Update octree (perform early update for nodes which need that, and reinsert moved nodes.)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
+        Octree* octree = viewport.mScene->getExtension<Octree>();
         if (mUpdatedOctrees.find(octree) == mUpdatedOctrees.end())
         {
             octree->updateOctree(mFrame);
             mUpdatedOctrees.insert(octree);
         }
         
-        // Add and process this viewport's main view
-        unsigned mainView = mNumViews;
-        addView(octree, camera, 0, screenRect);
-        mViews[mainView]->update(mFrame);
-        
-        // Process any auxiliary views that were found during the main view processing
-        for (unsigned i = mainView + 1; i < mNumViews; ++i)
+        // Update the viewport's main view and any auxiliary views it creates
+        for (unsigned i = mainView; i < mNumViews; ++i)
             mViews[i]->update(mFrame);
     }
     
@@ -705,7 +648,7 @@ void Pipeline::drawDebugGeometry()
     {
         // Make sure it's a main view, and process each node only once
         View* view = mViews[i];
-        if ((!view) || (view->getRenderTarget()))
+        if (view->getRenderTarget())
             continue;
         Octree* octree = view->getOctree();
         if (!octree)
@@ -764,15 +707,30 @@ void Pipeline::resetViews()
     mNumViews = 0;
 }
 
-void Pipeline::addView(Octree* octree, Camera* camera, RenderSurface* renderTarget, const IntRect& screenRect)
+bool Pipeline::addView(RenderSurface* renderTarget, const Viewport& viewport)
 {
+    // If using a render target texture, make sure it will not be rendered to multiple times
+    if (renderTarget)
+    {
+        for (unsigned i = 0; i < mNumViews; ++i)
+        {
+            if (mViews[i]->getRenderTarget() == renderTarget)
+                return false;
+        }
+    }
+    
     if (mViews.size() <= mNumViews)
         mViews.resize(mNumViews + 1);
     if (!mViews[mNumViews])
         mViews[mNumViews] = new View(this);
     
-    mViews[mNumViews]->define(octree, camera, renderTarget, screenRect);
-    ++mNumViews;
+    if (mViews[mNumViews]->define(renderTarget, viewport))
+    {
+        ++mNumViews;
+        return true;
+    }
+    else
+        return false;
 }
 
 OcclusionBuffer* Pipeline::getOrCreateOcclusionBuffer(Camera& camera, int maxOccluderTriangles, bool halfResolution)
@@ -1128,7 +1086,7 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
             if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
             {
                 if (allowShadows)
-                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] + 
+                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] +
                         shadowPSVariations[hwShadows]);
                 else
                     pixelShaders[j].reset();

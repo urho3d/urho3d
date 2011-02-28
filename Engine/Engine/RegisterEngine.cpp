@@ -27,7 +27,6 @@
 #include "Console.h"
 #include "Connection.h"
 #include "DebugHud.h"
-#include "Engine.h"
 #include "ParticleEmitter.h"
 #include "RegisterTemplates.h"
 #include "Scene.h"

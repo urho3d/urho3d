@@ -24,62 +24,50 @@
 #include "Precompiled.h"
 #include "AnimatedModel.h"
 #include "DebugRenderer.h"
-#include "Exception.h"
 #include "Light.h"
-#include "Log.h"
 #include "PixelShader.h"
+#include "Pipeline.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "RendererEvents.h"
-#include "RendererImpl.h"
 #include "ResourceCache.h"
 #include "VertexShader.h"
 
 #include "DebugNew.h"
 
-DebugRenderer::DebugRenderer(Renderer* renderer, ResourceCache* cache) :
-    mRenderer(renderer),
-    mCache(cache)
+DebugRenderer::DebugRenderer()
 {
-    if (!mRenderer)
-        EXCEPTION("Null renderer for DebugRenderer");
-    
-    mDebugVS = mCache->getResource<VertexShader>("Shaders/SM2/Basic_VCol.vs2");
-    mDebugPS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
-    
     subscribeToEvent(EVENT_ENDFRAME, EVENT_HANDLER(DebugRenderer, handleEndFrame));
 }
 
-DebugRenderer::~DebugRenderer()
-{
-}
-
-void DebugRenderer::render(Camera* camera)
+void DebugRenderer::render(Pipeline* pipeline, Camera* camera)
 {
     if ((!camera) || ((!mLines.size()) && (!mNoDepthLines.size())))
         return;
     
     PROFILE(DebugGeometry_Render);
     
-    mRenderer->setAlphaTest(false);
-    mRenderer->setBlendMode(BLEND_REPLACE);
-    mRenderer->setColorWrite(true);
-    mRenderer->setCullMode(CULL_NONE);
-    mRenderer->setDepthWrite(true);
-    mRenderer->setDepthTest(CMP_LESSEQUAL);
-    mRenderer->setFillMode(FILL_SOLID);
-    mRenderer->setScissorTest(false);
-    mRenderer->setStencilTest(false);
-    mRenderer->setVertexShader(mDebugVS);
-    mRenderer->setPixelShader(mDebugPS);
-    mRenderer->setVertexShaderConstant(getVSRegister(VSP_MODELVIEWPROJ), camera->getProjection() * camera->getInverseWorldTransform());
-    mRenderer->setPixelShaderConstant(getPSRegister(PSP_MATDIFFCOLOR), Color(1.0f, 1.0f, 1.0f, 1.0f));
+    Renderer* renderer = pipeline->getRenderer();
+    
+    renderer->setAlphaTest(false);
+    renderer->setBlendMode(BLEND_REPLACE);
+    renderer->setColorWrite(true);
+    renderer->setCullMode(CULL_NONE);
+    renderer->setDepthWrite(true);
+    renderer->setDepthTest(CMP_LESSEQUAL);
+    renderer->setFillMode(FILL_SOLID);
+    renderer->setScissorTest(false);
+    renderer->setStencilTest(false);
+    renderer->setVertexShader(pipeline->getVertexShader("Basic_VCol"));
+    renderer->setPixelShader(pipeline->getPixelShader("Basic_VCol"));
+    renderer->setVertexShaderConstant(getVSRegister(VSP_MODELVIEWPROJ), camera->getProjection() * camera->getInverseWorldTransform());
+    renderer->setPixelShaderConstant(getPSRegister(PSP_MATDIFFCOLOR), Color(1.0f, 1.0f, 1.0f, 1.0f));
     
     // Draw all line geometry with depth testing
     if (mLines.size())
     {
-        mRenderer->beginImmediate(LINE_LIST, mLines.size() * 2, MASK_POSITION | MASK_COLOR);
-        float* dest = (float*)mRenderer->getImmediateDataPtr();
+        renderer->beginImmediate(LINE_LIST, mLines.size() * 2, MASK_POSITION | MASK_COLOR);
+        float* dest = (float*)renderer->getImmediateDataPtr();
         
         for (unsigned i = 0; i < mLines.size(); ++i)
         {
@@ -92,15 +80,15 @@ void DebugRenderer::render(Camera* camera)
             *((unsigned*)dest) = line.mColor; dest++;
         }
         
-        mRenderer->endImmediate();
+        renderer->endImmediate();
     }
     
     // Draw all line geometry without depth testing
-    mRenderer->setDepthTest(CMP_ALWAYS);
+    renderer->setDepthTest(CMP_ALWAYS);
     if (mNoDepthLines.size())
     {
-        mRenderer->beginImmediate(LINE_LIST, mNoDepthLines.size() * 2, MASK_POSITION | MASK_COLOR);
-        float* dest = (float*)mRenderer->getImmediateDataPtr();
+        renderer->beginImmediate(LINE_LIST, mNoDepthLines.size() * 2, MASK_POSITION | MASK_COLOR);
+        float* dest = (float*)renderer->getImmediateDataPtr();
         
         for (unsigned i = 0; i < mNoDepthLines.size(); ++i)
         {
@@ -113,7 +101,7 @@ void DebugRenderer::render(Camera* camera)
             *((unsigned*)dest) = line.mColor; dest++;
         }
         
-        mRenderer->endImmediate();
+        renderer->endImmediate();
     }
 }
 
