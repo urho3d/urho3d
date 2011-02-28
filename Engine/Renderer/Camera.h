@@ -76,6 +76,8 @@ public:
     void setLodBias(float bias);
     //! Set orthographic mode enabled/disabled
     void setOrthographic(bool enable);
+    //! Set automatic aspect ratio based on viewport dimensions
+    void setAutoAspectRatio(bool enable);
     //! Set view mask bits
     void setViewMask(unsigned mask);
     //! Override drawing of shadows
@@ -103,6 +105,8 @@ public:
     float getLodBias() const { return mLodBias; }
     //! Return orthographic flag
     bool isOrthographic() const { return mOrthographic; }
+    //! Return auto aspect ratio flag
+    bool getAutoAspectRatio() const { return mAutoAspectRatio; }
     //! Return view mask bits
     unsigned getViewMask() const { return mViewMask; }
     //! Return draw shadows override
@@ -185,6 +189,8 @@ private:
     float mLodBias;
     //! Orthographic mode flag
     bool mOrthographic;
+    //! Auto aspect ratio flag
+    bool mAutoAspectRatio;
     //! View mask bits
     unsigned mViewMask;
     //! Draw shadows override

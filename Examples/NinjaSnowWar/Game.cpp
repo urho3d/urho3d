@@ -91,9 +91,9 @@ Game::Game() :
     mCameraMaxDist(0.0f),
     mCameraSafetyDist(0.0f),
     mCameraRayLength(0.0f),
+    mDrawDebug(false),
     mGameOn(false),
     mFirstFrame(false),
-    mPaused(false),
     mClientEntityID(0)
 {
     std::string userDir = getUserDocumentsDirectory();
@@ -135,7 +135,7 @@ void Game::run()
     
     while (!mEngine->isExiting())
     {
-        mEngine->runFrame(mScene, mCamera, !mPaused);
+        mEngine->runFrame();
         
         // Save/load/exit
         // Check these outside the frame update, so that the engine does not render a black screen
@@ -240,6 +240,10 @@ void Game::init()
         mClient->connect(address, 1234, mUserName);
     }
     
+    // Configure the viewport
+    if (!runServer)
+        mEngine->getPipeline()->setViewport(0, mScene, mCamera);
+    
     startGame();
 }
 
@@ -326,15 +330,12 @@ void Game::createCamera()
     // Note: camera is local, so it will not be affected by net replication
     Entity* cameraEntity = mScene->createEntity("Camera", true);
     mCamera = cameraEntity->createComponent<Camera>();
-    Camera* camera = mCamera.getPtr();
     Renderer* renderer = mEngine->getRenderer();
-    if (renderer)
-        camera->setAspectRatio((float)renderer->getWidth() / (float)renderer->getHeight());
     // View distance is optional
     try
     {
-        camera->setNearClip(GameConfig::getReal("Engine/ViewStart"));
-        camera->setFarClip(GameConfig::getReal("Engine/ViewEnd"));
+        mCamera->setNearClip(GameConfig::getReal("Engine/ViewStart"));
+        mCamera->setFarClip(GameConfig::getReal("Engine/ViewEnd"));
     }
     catch (...) {}
 }
@@ -359,7 +360,7 @@ void Game::startGame()
     AIController::setup();
     
     // Clear all previous game objects
-    std::map<EntityID, SharedPtr<Entity> > entities = mScene->getEntities();
+    std::map<EntityID, SharedPtr<Entity> > entities = mScene->getAllEntities();
     for (std::map<EntityID, SharedPtr<Entity> >::iterator i = entities.begin(); i != entities.end(); ++i)
     {
         if (i->second->getName().find("Obj") != std::string::npos)
@@ -402,7 +403,7 @@ void Game::loadGame()
     if ((mClient) || (mServer))
         return;
     
-    if (mPaused)
+    if (mScene->isPaused())
         return;
     
     if (!fileExists(applicationDir + "Save.dat"))
@@ -449,7 +450,7 @@ void Game::saveGame()
     if ((mClient) || (mServer))
         return;
     
-    if ((mPaused) || (!mGameOn))
+    if ((mScene->isPaused()) || (!mGameOn))
         return;
     
     // Save the scene
@@ -491,9 +492,12 @@ void Game::handlePostUpdate(StringHash eventType, VariantMap& eventData)
     
     // Update camera to player position
     updateCamera();
-    
     // Update status panel
     updateStatus(timeStep);
+    
+    // Draw physics debug geometry if necessary
+    if (mDrawDebug)
+        mScene->getExtension<PhysicsWorld>()->drawDebugGeometry();
 }
 
 void Game::handlePreStep(StringHash eventType, VariantMap& eventData)
@@ -816,7 +820,7 @@ void Game::getControls()
     if (!mServer)
     {
         mControls.set(CTRL_ALL, false);
-        if ((!mFirstFrame) && (!mPaused))
+        if ((!mFirstFrame) && (!mScene->isPaused()))
         {
             if (input->getKeyDown('W')) mControls.set(CTRL_UP);
             if (input->getKeyDown('S')) mControls.set(CTRL_DOWN);
@@ -840,7 +844,7 @@ void Game::toggleDebugOverlay()
 
 void Game::toggleDebugGeometry()
 {
-    mEngine->setDebugDrawMode(mEngine->getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
+    mDrawDebug = !mDrawDebug;
 }
 
 void Game::togglePause()
@@ -849,11 +853,11 @@ void Game::togglePause()
     if ((mClient) || (mServer))
         return;
     
-    mPaused = !mPaused;
+    mScene->setPaused(!mScene->isPaused());
     
     if (mGameOn)
     {
-        if (mPaused)
+        if (mScene->isPaused())
             setMessage("PAUSED");
         else
             setMessage("");
@@ -1074,13 +1078,6 @@ void Game::updateCamera()
         {
             mCamera = cameraEntity->getComponent<Camera>();
             camera = mCamera.getPtr();
-            if (camera)
-            {
-                // Reset aspect ratio, might have changed
-                Renderer* renderer = mEngine->getRenderer();
-                if (renderer)
-                    camera->setAspectRatio((float)renderer->getWidth() / (float)renderer->getHeight());
-            }
         }
     }
     else
@@ -1088,6 +1085,9 @@ void Game::updateCamera()
     
     if (!camera)
         return;
+    
+    // Make sure the pipeline has the updated camera pointer
+    mEngine->getPipeline()->setViewportCamera(0, camera);
     
     // Player tracking
     Entity* playerEntity = 0;
@@ -1128,7 +1128,7 @@ void Game::updateCamera()
     Vector3 rayDir = (maxDist - minDist).getNormalized();
     float rayDistance = mCameraMaxDist - mCameraMinDist + mCameraSafetyDist;
     std::vector<PhysicsRaycastResult> result;
-    mScene->getExtension<PhysicsWorld>()->raycast(Ray(minDist, rayDir), result, rayDistance, 2);
+    mScene->getExtension<PhysicsWorld>()->raycast(result, Ray(minDist, rayDir), rayDistance, 2);
     if (result.size())
         rayDistance = min(rayDistance, result[0].mDistance - mCameraSafetyDist);
     
@@ -1147,7 +1147,7 @@ int Game::getObjectCount(ShortStringHash type, int side)
 {
     int count = 0;
     
-    const std::map<EntityID, SharedPtr<Entity> >& entities = mScene->getEntities();
+    const std::map<EntityID, SharedPtr<Entity> >& entities = mScene->getAllEntities();
     for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
     {
         GameObject* object = i->second->getDerivedComponent<GameObject>();

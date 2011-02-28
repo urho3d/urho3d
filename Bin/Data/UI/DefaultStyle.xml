@@ -16,6 +16,15 @@
         <checkedoffset value="16 0" />
         <hoveroffset value="0 16" />
     </element>
+    <element type="CloseButton">
+        <size value="16 16" />
+        <texture name="Textures/UI.png" />
+        <imagerect value="128 0 144 16" />
+        <border value="4 4 4 4" />
+        <pressedoffset value="16 0" />
+        <hoveroffset value="0 16" />
+        <labeloffset value="-1 1" />
+    </element>
     <element type="Cursor">
         <shape name="normal" texture="Textures/UI.png" imagerect="0 0 12 24" hotspot="0 0" />
         <shape name="resizevertical" texture="Textures/UI.png" imagerect="0 64 20 84" hotspot="9 9" />
@@ -108,8 +117,8 @@
         <text>
             <position value="1 1" />
             <font name="Cour.ttf" size="12" />
-            <hovercolor value="0.5 0.75 0.5" />
-            <selectioncolor value="0.75 0.75 0.75" />
+            <hovercolor value="0.45 0.70 0.45" />
+            <selectioncolor value="0.70 0.70 0.70" />
         </text>
         <cursor>
             <size value="4 16" />
@@ -351,15 +360,15 @@
     </element>
     <element type="FileSelectorFilterText">
         <font name="Cour.ttf" size="12" />
-        <hovercolor value="0.5 0.75 0.5" />
+        <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="FileSelectorLayout">
         <layout spacing="4" />
     </element>
     <element type="FileSelectorListText">
         <font name="Cour.ttf" size="12" />
-        <hovercolor value="0.5 0.75 0.5" />
-        <selectioncolor value="0.75 0.75 0.75" />
+        <hovercolor value="0.45 0.70 0.45" />
+        <selectioncolor value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
         <font name="Cour.ttf" size="15" />

@@ -27,13 +27,19 @@
 #include "HashedType.h"
 
 class Deserializer;
+class Scene;
 class Serializer;
 class XMLElement;
 
 //! Base class for extending Scene functionality
 class SceneExtension : public HashedType
 {
+    friend class Scene;
+    
 public:
+    //! Construct with defaults
+    SceneExtension();
+    
     //! Write properties to a stream
     virtual void save(Serializer& dest) {}
     //! Read properties from a stream
@@ -47,11 +53,17 @@ public:
     //! Set client-side prediction controls playback mode
     virtual void setPlayback(bool enable) {}
     
+    //! Return scene
+    Scene* getScene() const { return mScene; }
+    
 protected:
     //! Write extension type to a stream
     void writeExtensionType(Serializer& dest);
     //! Read extension type from a stream. Throw an extension in case of mismatch
     void checkExtensionType(Deserializer& source);
+    
+    //! Scene
+    Scene* mScene;
 };
 
 #endif // SCENE_SCENEEXTENSION_H

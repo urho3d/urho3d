@@ -173,7 +173,7 @@ public:
     //! Return whether body is active
     bool isActive() const;
     
-    //! Draw debug geometry
+    //! Add debug geometry to the debug renderer
     void drawDebugGeometry(DebugRenderer* debug);
     
 private:

@@ -75,7 +75,7 @@ public:
     virtual GeometryType getGeometryType() { return GEOM_SKINNED; }
     //! Return vertex shader parameter
     virtual bool getVertexShaderParameter(unsigned batchIndex, VSParameter parameter, const float** data, unsigned* count);
-    //! Draw debug geometry
+    //! Add debug geometry to the debug renderer
     virtual void drawDebugGeometry(DebugRenderer* debug);
     
     //! Set model

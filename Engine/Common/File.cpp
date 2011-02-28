@@ -221,23 +221,23 @@ std::string getWorkingDirectory()
     return fixPath(std::string(currentDir));
 }
 
-std::vector<std::string> scanDirectory(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
+void scanDirectory(std::vector<std::string>& result, const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
 {
-    std::vector<std::string> ret;
+    result.clear();
     
     if (!checkDirectoryAccess(pathName))
-        SAFE_EXCEPTION_RET("Access denied to " + pathName, ret);
-    
-    // Go into the directory to scan the files; this way the file names will be relative to the start path
-    char oldDir[MAX_PATH];
-    GetCurrentDirectory(MAX_PATH, oldDir);
-    if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
-        return ret;
-    
-    scanDirectoryInternal(ret, "", filter, flags, recursive);
-    SetCurrentDirectory(oldDir);
-    
-    return ret;
+        LOGERROR("Access denied to " + pathName);
+    else
+    {
+        // Go into the directory to scan the files; this way the file names will be relative to the start path
+        char oldDir[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH, oldDir);
+        if (SetCurrentDirectory(getOSPath(pathName, true).c_str()) == FALSE)
+            return;
+        
+        scanDirectoryInternal(result, "", filter, flags, recursive);
+        SetCurrentDirectory(oldDir);
+    }
 }
 
 void registerDirectory(const std::string& pathName)

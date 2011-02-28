@@ -51,7 +51,7 @@ public:
     //! Destruct
     virtual ~Scene();
     
-    //! Run update. Send update events and update scene extensions
+    //! Run update. Send update events and update scene extensions. Will not update if paused
     void update(float timeStep);
     //! Perform client-side visual smoothing
     void interpolate(float timeStep);
@@ -81,18 +81,19 @@ public:
     void loadAsyncXML(File* file);
     //! Stop asynchronous loading
     void stopAsyncLoading();
-    
     //! Set scene name
     void setName(const std::string& name);
     //! Set network replication flags (only NET_AUTHORITY or NET_PROXY)
     void setNetFlags(unsigned char flags);
+    //! Set pause mode
+    void setPaused(bool enable);
     //! Add a scene extension
     void addExtension(SceneExtension* extension);
     //! Add a component factory
     void addComponentFactory(ComponentFactory* factory);
     //! Create a component. Throw exception if no factory can create
     SharedPtr<Component> createComponent(ShortStringHash type, const std::string& name = std::string());
-    //! Create an entity and assign an ID automatically
+    //! Create an entity and assign an ID automatically. Throw exception if ID range exhausted
     Entity* createEntity(const std::string& name = std::string(), bool local = false);
     //! Create an entity with manually defined ID
     Entity* createEntity(EntityID id, const std::string& name = std::string());
@@ -106,8 +107,10 @@ public:
     void removeEntity(const std::string& name);
     //! Remove an entity by name hash. Needs to search through all entities
     void removeEntity(StringHash nameHash);
+    //! Remove entities based on netflags and groupflags
+    void removeEntities(unsigned char netFlags = NET_NONE, unsigned groupFlags = 0);
     //! Remove all entities
-    void removeAllEntities(unsigned char netFlagsMask = NET_NONE);
+    void removeAllEntities();
     //! Reset a specific network owner from entities. Optionally remove the owned entities
     void resetOwner(Connection* owner, bool removeEntities = false);
     //! Set client-side transient prediction time
@@ -160,9 +163,11 @@ public:
     //! Return number of entities
     unsigned getNumEntities() const { return mEntities.size(); }
     //! Return all entities
-    const std::map<EntityID, SharedPtr<Entity> >& getEntities() const { return mEntities; }
-    //! Return entities by group flags
-    std::vector<Entity*> getEntities(unsigned includeFlags, unsigned excludeFlags) const;
+    const std::map<EntityID, SharedPtr<Entity> >& getAllEntities() const { return mEntities; }
+    //! Return entities by netflags and group flags
+    void getEntities(std::vector<Entity*>& result, unsigned char netFlags = 0, unsigned groupFlags = 0) const;
+    //! Return entities with a specific component
+    void getEntitiesWithComponent(std::vector<Entity*>& result, ShortStringHash type) const;
     //! Return a component by component reference, or null if not found
     Component* getComponent(const ComponentRef& ref) const;
     //! Return entity position by going through scene node components it has (RigidBody is preferred)
@@ -187,14 +192,18 @@ public:
     float getInterpolationSnapThresholdSquared() { return mInterpolationSnapThreshold; }
     //! Return asynchronous loading progress between 0.0 - 1.0
     float getAsyncLoadProgress() const;
-    //! Return whether scene is performing client-side prediction by replaying controls
-    bool isPlayback() const { return mPlayback; }
     //! Return whether is a server scene
     bool isAuthority() const { return (mNetFlags & NET_AUTHORITY) != 0; }
     //! Return whether is a client scene
     bool isProxy() const { return (mNetFlags & NET_PROXY) != 0; }
+    //! Return whether scene is paused
+    bool isPaused() const { return mPaused; }
+    //! Return whether scene is performing client-side prediction by replaying controls
+    bool isPlayback() const { return mPlayback; }
     //! Return whether is loading asynchronously
     bool isAsyncLoading() const { return mAsyncLoading; }
+    //! Template function for returning entities with a specific component
+    template <class T> void getEntitiesWithComponent(std::vector<Entity*>& result) const;
     //! Template function that returns a specific scene extension
     template <class T> T* getExtension() const;
     
@@ -214,6 +223,8 @@ private:
     void updateNextEntityID(EntityID loadedID);
     //! Perform post-load after scene loading has finished
     void finishLoading(Deserializer& source);
+    //! Handle update scenes event
+    void handleUpdateScenes(StringHash eventType, VariantMap& eventData);
     
     //! Scene name
     std::string mName;
@@ -251,6 +262,8 @@ private:
     float mInterpolationSnapThreshold;
     //! Visual smoothing lerp factor, valid only during update()
     float mInterpolationLerpFactor;
+    //! Pause flag
+    bool mPaused;
     //! Client-side prediction controls playback flag
     bool mPlayback;
     
@@ -271,6 +284,11 @@ private:
 template <class T> SharedPtr<T> Scene::createComponent(const std::string& name)
 {
     return staticCast<T>(createComponent(T::getTypeStatic(), name));
+}
+
+template <class T> void Scene::getEntitiesWithComponent(std::vector<Entity*>& result) const
+{
+    return getEntitiesWithComponent(result, T::getTypeStatic());
 }
 
 template <class T> T* Scene::getExtension() const

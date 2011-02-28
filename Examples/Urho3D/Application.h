@@ -29,6 +29,7 @@
 
 class Engine;
 class ResourceCache;
+class Scene;
 class ScriptFile;
 
 //! Urho3D Shell application
@@ -50,6 +51,8 @@ private:
     SharedPtr<ResourceCache> mCache;
     //! Script file
     SharedPtr<ScriptFile> mScriptFile;
+    //! Scene
+    SharedPtr<Scene> mScene;
 };
 
 #endif // URHO3D_APPLICATION_H

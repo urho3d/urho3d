@@ -557,15 +557,12 @@ void InstancedModel::setModel(Model* model)
     
     mModel = model;
     mOriginalGeometries.clear();
-    mOriginalMaterials.clear();
     
     // Copy the subgeometry & LOD level structure
     const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->getGeometries();
+    mOriginalMaterials.resize(geometries.size());
     for (unsigned i = 0; i < geometries.size(); ++i)
-    {
         mOriginalGeometries.push_back(geometries[i]);
-        mOriginalMaterials.push_back(SharedPtr<Material>());
-    }
     
     // Set the bounding box
     setBoundingBox(model->getBoundingBox());
@@ -582,13 +579,13 @@ void InstancedModel::setMaterial(Material* material)
 
 bool InstancedModel::setMaterial(unsigned index, Material* material)
 {
-    if (index >= mMaterials.size())
+    if (index >= mOriginalMaterials.size())
     {
         LOGERROR("Illegal material index");
         return false;
     }
     
-    mMaterials[index] = material;
+    mOriginalMaterials[index] = material;
     markInstancesDirty();
     return true;
 }

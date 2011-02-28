@@ -76,7 +76,7 @@ public:
     virtual void updateDistance(const FrameInfo& frame);
     //! Override model and view transforms for rendering
     virtual void overrideTransforms(unsigned batchIndex, Camera& camera, const Matrix4x3** model, const Matrix4x3** view);
-    //! Draw debug geometry
+    //! Add debug geometry to the debug renderer
     virtual void drawDebugGeometry(DebugRenderer* debug);
     
     //! Set whether casts shadows

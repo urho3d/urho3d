@@ -51,12 +51,6 @@ void start()
     subscribeToEvent("MouseButtonDown", "handleMouseButtonDown");
     subscribeToEvent("MouseButtonUp", "handleMouseButtonUp");
     subscribeToEvent("PostRenderUpdate", "handlePostRenderUpdate");
-    subscribeToEvent("WindowResized", "handleWindowResized");
-}
-
-void runFrame()
-{
-    engine.runFrame(testScene, camera, true);
 }
 
 void initScene()
@@ -370,7 +364,6 @@ void createCamera()
 {
     Entity@ cameraEntity = testScene.createEntity("Camera");
     @camera = cameraEntity.createComponent("Camera");
-    camera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
     camera.setPosition(Vector3(-50.0, 2.0, -50.0));
 
     @cameraLight = cameraEntity.createComponent("Light");
@@ -385,6 +378,9 @@ void createCamera()
     cameraLight.setRampTexture(cache.getResource("Texture2D", "Textures/RampWide.png"));
     cameraLight.setSpotTexture(cache.getResource("Texture2D", "Textures/SpotWide.png"));
     camera.addChild(cameraLight);
+    
+    // Set zero screen rect -> follow the window size
+    pipeline.setViewport(0, testScene, camera, IntRect(0, 0, 0, 0));
 }
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
@@ -500,7 +496,6 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         {
             drawdebug++;
             if (drawdebug > 2) drawdebug = 0;
-            engine.setDebugDrawMode(drawdebug);
         }
 
         if (input.getKeyPress('P'))
@@ -606,18 +601,25 @@ void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
     if (ui.getElementAt(pos, true) is null)
     {
         Ray cameraRay = camera.getScreenRay(float(pos.x) / renderer.getWidth(), float(pos.y) / renderer.getHeight());
-        array<RayQueryResult> result = testScene.getOctree().raycast(cameraRay, NODE_GEOMETRY, NODE_BILLBOARDSET, 250.0f, RAY_TRIANGLE);
+        array<RayQueryResult> result = testScene.getOctree().raycast(cameraRay, NODE_STATICMODEL | NODE_ANIMATEDMODEL |
+            NODE_INSTANCEDMODEL, 250.0f, RAY_TRIANGLE);
         if (result.length() > 0)
         {
             VolumeNode@ node = result[0].node;
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result[0].distance;
-            debugRenderer.addBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos + Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
+            debugRenderer.addBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
+                Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
         }
     }
+    
+    // Draw either renderer or physics debug geometry
+    switch (drawdebug)
+    {
+    case 1:
+        pipeline.drawDebugGeometry();
+        break;
+    case 2:
+        testScene.getPhysicsWorld().drawDebugGeometry();
+        break;
+    }
 }
-
-void handleWindowResized(StringHash eventType, VariantMap& eventData)
-{
-    camera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
-}
-

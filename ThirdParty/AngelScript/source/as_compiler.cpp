@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_compiler.cpp
@@ -6050,7 +6051,12 @@ int asCCompiler::CompileExpressionValue(asCScriptNode *node, asSExprContext *ctx
 			size_t numScanned;
 			float v = float(asStringScanDouble(value.AddressOf(), &numScanned));
 			ctx->type.SetConstantF(asCDataType::CreatePrimitive(ttFloat, true), v);
+			// Urho3D: fix assert if always using floats
+			#ifdef AS_USE_DOUBLE_AS_FLOAT
+			asASSERT((numScanned == vnode->tokenLength - 1) || (numScanned == vnode->tokenLength));
+			#else
 			asASSERT(numScanned == vnode->tokenLength - 1);
+			#endif
 		}
 		else if( vnode->tokenType == ttDoubleConstant )
 		{

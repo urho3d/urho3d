@@ -22,13 +22,12 @@
 //
 
 #include "Precompiled.h"
+#include "DebugRenderer.h"
 #include "Deserializer.h"
-#include "Log.h"
 #include "Profiler.h"
 #include "Octree.h"
 #include "OctreeQuery.h"
 #include "Serializer.h"
-#include "StringUtils.h"
 #include "XMLElement.h"
 
 #include <algorithm>
@@ -38,6 +37,8 @@
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
+
+static unsigned excludeFlags = 0;
 
 inline static bool compareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
@@ -54,16 +55,8 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     Vector3 halfSize = mWorldBoundingBox.getSize() * 0.5f;
     mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize);
     
-    for (unsigned x = 0; x < 2; ++x)
-    {
-        for (unsigned y = 0; y < 2; ++y)
-        {
-            for (unsigned z = 0; z < 2; ++z)
-            {
-                mChildren[x][y][z] = 0;
-            }
-        }
-    }
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        mChildren[i] = 0;
 }
 
 Octant::~Octant()
@@ -71,55 +64,49 @@ Octant::~Octant()
     release();
 }
 
-Octant* Octant::getOrCreateChild(unsigned x, unsigned y, unsigned z)
+Octant* Octant::getOrCreateChild(unsigned index)
 {
-    if (mChildren[x][y][z])
-        return mChildren[x][y][z];
+    if (mChildren[index])
+        return mChildren[index];
     
     Vector3 newMin = mWorldBoundingBox.mMin;
     Vector3 newMax = mWorldBoundingBox.mMax;
     Vector3 oldCenter = mWorldBoundingBox.getCenter();
     
-    if (!x)
-        newMax.mX = oldCenter.mX;
-    else
+    if (index & 1)
         newMin.mX = oldCenter.mX;
-    
-    if (!y)
-        newMax.mY = oldCenter.mY;
     else
+        newMax.mX = oldCenter.mX;
+    
+    if (index & 2)
         newMin.mY = oldCenter.mY;
-    
-    if (!z)
-        newMax.mZ = oldCenter.mZ;
     else
-        newMin.mZ = oldCenter.mZ;
+        newMax.mY = oldCenter.mY;
     
-    mChildren[x][y][z] = new Octant(BoundingBox(newMin, newMax), mLevel + 1, this, mRoot);
-    return mChildren[x][y][z];
+    if (index & 4)
+        newMin.mZ = oldCenter.mZ;
+    else
+        newMax.mZ = oldCenter.mZ;
+    
+    mChildren[index] = new Octant(BoundingBox(newMin, newMax), mLevel + 1, this, mRoot);
+    return mChildren[index];
 }
 
-void Octant::deleteChild(unsigned x, unsigned y, unsigned z)
+void Octant::deleteChild(unsigned index)
 {
-    delete mChildren[x][y][z];
-    mChildren[x][y][z] = 0;
+    delete mChildren[index];
+    mChildren[index] = 0;
 }
 
 void Octant::deleteChild(Octant* octant)
 {
-    for (unsigned x = 0; x < 2; ++x)
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
-        for (unsigned y = 0; y < 2; ++y)
+        if (mChildren[i] == octant)
         {
-            for (unsigned z = 0; z < 2; ++z)
-            {
-                if (mChildren[x][y][z] == octant)
-                {
-                    delete octant;
-                    mChildren[x][y][z] = 0;
-                    break;
-                }
-            }
+            delete octant;
+            mChildren[i] = 0;
+            return;
         }
     }
 }
@@ -140,24 +127,10 @@ void Octant::insertNode(VolumeNode* node)
     
     Vector3 octantCenter = mWorldBoundingBox.getCenter();
     Vector3 nodeCenter = node->getWorldBoundingBox().getCenter();
-    unsigned x, y, z;
-    
-    if (nodeCenter.mX < octantCenter.mX)
-        x = 0;
-    else
-        x = 1;
-    
-    if (nodeCenter.mY < octantCenter.mY)
-        y = 0;
-    else
-        y = 1;
-    
-    if (nodeCenter.mZ < octantCenter.mZ)
-        z = 0;
-    else
-        z = 1;
-    
-    getOrCreateChild(x, y, z)->insertNode(node);
+    unsigned x = nodeCenter.mX < octantCenter.mX ? 0 : 1;
+    unsigned y = nodeCenter.mY < octantCenter.mY ? 0 : 2;
+    unsigned z = nodeCenter.mZ < octantCenter.mZ ? 0 : 4;
+    getOrCreateChild(x + y + z)->insertNode(node);
 }
 
 bool Octant::checkNodeSize(VolumeNode* node) const
@@ -169,40 +142,17 @@ bool Octant::checkNodeSize(VolumeNode* node) const
     Vector3 octantHalfSize = mWorldBoundingBox.getSize() * 0.5;
     Vector3 nodeSize = node->getWorldBoundingBox().getSize();
     
-    return (nodeSize.mX >= octantHalfSize.mX) ||(nodeSize.mY >= octantHalfSize.mY) || (nodeSize.mZ >= octantHalfSize.mZ);
-}
-
-void Octant::getNodes(OctreeQuery& query) const
-{
-    PROFILE(Octree_GetNodes);
-    
-    query.mResult.clear();
-    getNodesInternal(query, 0);
-}
-
-void Octant::getNodes(RayOctreeQuery& query) const
-{
-    PROFILE(Octree_Raycast);
-    
-    query.mResult.clear();
-    getNodesInternal(query);
-    std::sort(query.mResult.begin(), query.mResult.end(), compareRayQueryResults);
+    return (nodeSize.mX >= octantHalfSize.mX) || (nodeSize.mY >= octantHalfSize.mY) || (nodeSize.mZ >= octantHalfSize.mZ);
 }
 
 void Octant::resetRoot()
 {
     mRoot = 0;
     
-    for (unsigned x = 0; x < 2; ++x)
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
-        for (unsigned y = 0; y < 2; ++y)
-        {
-            for (unsigned z = 0; z < 2; ++z)
-            {
-                if (mChildren[x][y][z])
-                    mChildren[x][y][z]->resetRoot();
-            }
-        }
+        if (mChildren[i])
+            mChildren[i]->resetRoot();
     }
 }
 
@@ -228,7 +178,7 @@ void Octant::getNodesInternal(OctreeQuery& query, unsigned mask) const
         VolumeNode* node = *i;
         unsigned nodeFlags = node->getNodeFlags();
         
-        if ((!(nodeFlags & query.mIncludeFlags)) || (nodeFlags & query.mExcludeFlags))
+        if ((!(nodeFlags & query.mNodeFlags)) || (nodeFlags & excludeFlags))
             continue;
         if (!node->isVisible())
             continue;
@@ -241,22 +191,11 @@ void Octant::getNodesInternal(OctreeQuery& query, unsigned mask) const
             query.mResult.push_back(node);
     }
     
-    if (mChildren[0][0][0])
-        mChildren[0][0][0]->getNodesInternal(query, mask);
-    if (mChildren[0][0][1])
-        mChildren[0][0][1]->getNodesInternal(query, mask);
-    if (mChildren[0][1][0])
-        mChildren[0][1][0]->getNodesInternal(query, mask);
-    if (mChildren[0][1][1])
-        mChildren[0][1][1]->getNodesInternal(query, mask);
-    if (mChildren[1][0][0])
-        mChildren[1][0][0]->getNodesInternal(query, mask);
-    if (mChildren[1][0][1])
-        mChildren[1][0][1]->getNodesInternal(query, mask);
-    if (mChildren[1][1][0])
-        mChildren[1][1][0]->getNodesInternal(query, mask);
-    if (mChildren[1][1][1])
-        mChildren[1][1][1]->getNodesInternal(query, mask);
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    {
+        if (mChildren[i])
+            mChildren[i]->getNodesInternal(query, mask);
+    }
 }
 
 void Octant::getNodesInternal(RayOctreeQuery& query) const
@@ -273,7 +212,7 @@ void Octant::getNodesInternal(RayOctreeQuery& query) const
         VolumeNode* node = *i;
         unsigned nodeFlags = node->getNodeFlags();
         
-        if ((!(nodeFlags & query.mIncludeFlags)) || (nodeFlags & query.mExcludeFlags))
+        if ((!(nodeFlags & query.mNodeFlags)) || (nodeFlags & excludeFlags))
             continue;
         if (!node->isVisible())
             continue;
@@ -288,22 +227,11 @@ void Octant::getNodesInternal(RayOctreeQuery& query) const
             node->processRayQuery(query, nodeDist);
     }
     
-    if (mChildren[0][0][0])
-        mChildren[0][0][0]->getNodesInternal(query);
-    if (mChildren[0][0][1])
-        mChildren[0][0][1]->getNodesInternal(query);
-    if (mChildren[0][1][0])
-        mChildren[0][1][0]->getNodesInternal(query);
-    if (mChildren[0][1][1])
-        mChildren[0][1][1]->getNodesInternal(query);
-    if (mChildren[1][0][0])
-        mChildren[1][0][0]->getNodesInternal(query);
-    if (mChildren[1][0][1])
-        mChildren[1][0][1]->getNodesInternal(query);
-    if (mChildren[1][1][0])
-        mChildren[1][1][0]->getNodesInternal(query);
-    if (mChildren[1][1][1])
-        mChildren[1][1][1]->getNodesInternal(query);
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    {
+        if (mChildren[i])
+            mChildren[i]->getNodesInternal(query);
+    }
 }
 
 void Octant::release()
@@ -327,22 +255,14 @@ void Octant::release()
     mNodes.clear();
     mNumNodes = 0;
     
-    for (unsigned x = 0; x < 2; ++x)
-    {
-        for (unsigned y = 0; y < 2; ++y)
-        {
-            for (unsigned z = 0; z < 2; ++z)
-            {
-                delete mChildren[x][y][z];
-                mChildren[x][y][z] = 0;
-            }
-        }
-    }
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        deleteChild(i);
 }
 
 Octree::Octree(const BoundingBox& box, unsigned numLevels, bool headless) :
     Octant(box, 0, 0, this),
-    mNumLevels(numLevels),
+    mNumLevels(max((int)numLevels, 1)),
+    mExcludeFlags(0),
     mHeadless(headless)
 {
 }
@@ -401,6 +321,7 @@ void Octree::update(float timeStep)
 
 void Octree::resize(const BoundingBox& box, unsigned numLevels)
 {
+    numLevels = max((int)numLevels, 1);
     if ((numLevels == mNumLevels) && (box.mMin == mWorldBoundingBox.mMin) && (box.mMax == mWorldBoundingBox.mMax))
         return;
     
@@ -412,28 +333,11 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
     
     Vector3 halfSize = mWorldBoundingBox.getSize() * 0.5f;
     mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize);
-    
-    LOGINFO("Resized octree to " + toString(box.getSize()) + " with " + toString(numLevels) + " levels");
 }
 
-void Octree::markNodeForUpdate(VolumeNode* node)
+void Octree::setExcludeFlags(unsigned nodeFlags)
 {
-    mNodeUpdates.insert(node);
-}
-
-void Octree::clearNodeUpdate(VolumeNode* node)
-{
-    mNodeUpdates.erase(node);
-}
-
-void Octree::markNodeForReinsertion(VolumeNode* node)
-{
-    mNodeReinsertions.insert(node);
-}
-
-void Octree::clearNodeReinsertion(VolumeNode* node)
-{
-    mNodeReinsertions.erase(node);
+    mExcludeFlags = nodeFlags;
 }
 
 void Octree::updateOctree(const FrameInfo& frame)
@@ -492,4 +396,43 @@ void Octree::updateOctree(const FrameInfo& frame)
     
     mNodeUpdates.clear();
     mNodeReinsertions.clear();
+}
+
+void Octree::getNodes(OctreeQuery& query) const
+{
+    PROFILE(Octree_GetNodes);
+    
+    excludeFlags = mExcludeFlags;
+    query.mResult.clear();
+    getNodesInternal(query, 0);
+}
+
+void Octree::getNodes(RayOctreeQuery& query) const
+{
+    PROFILE(Octree_Raycast);
+    
+    excludeFlags = mExcludeFlags;
+    query.mResult.clear();
+    getNodesInternal(query);
+    std::sort(query.mResult.begin(), query.mResult.end(), compareRayQueryResults);
+}
+
+void Octree::markNodeForUpdate(VolumeNode* node)
+{
+    mNodeUpdates.insert(node);
+}
+
+void Octree::clearNodeUpdate(VolumeNode* node)
+{
+    mNodeUpdates.erase(node);
+}
+
+void Octree::markNodeForReinsertion(VolumeNode* node)
+{
+    mNodeReinsertions.insert(node);
+}
+
+void Octree::clearNodeReinsertion(VolumeNode* node)
+{
+    mNodeReinsertions.erase(node);
 }

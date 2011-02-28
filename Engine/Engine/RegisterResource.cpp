@@ -202,28 +202,16 @@ static void XMLFileLoad(File* file, XMLFile* ptr)
 {
     if (!file)
         SAFE_EXCEPTION("Null source file");
-    try
-    {
-        ptr->load(*file);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    
+    TRY_SAFE_RETHROW(ptr->load(*file));
 }
 
 static void XMLFileSave(File* file, XMLFile* ptr)
 {
     if (!file)
         SAFE_EXCEPTION("Null destination file");
-    try
-    {
-        ptr->save(*file);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    
+    TRY_SAFE_RETHROW(ptr->save(*file));
 }
 
 static void registerXMLFile(asIScriptEngine* engine)

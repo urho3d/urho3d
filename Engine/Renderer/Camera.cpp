@@ -46,6 +46,7 @@ Camera::Camera(const std::string& name) :
     mZoom(1.0f),
     mLodBias(1.0f),
     mOrthographic(false),
+    mAutoAspectRatio(true),
     mViewMask(VIEW_MAIN),
     mDrawShadowsOverride(true),
     mLightDetailLevelOverride(QUALITY_MAX),
@@ -77,6 +78,7 @@ void Camera::save(Serializer& dest)
     dest.writeFloat(mZoom);
     dest.writeFloat(mLodBias);
     dest.writeBool(mOrthographic);
+    dest.writeBool(mAutoAspectRatio);
     dest.writeUInt(mViewMask);
     dest.writeBool(mDrawShadowsOverride);
     dest.writeUByte(mLightDetailLevelOverride);
@@ -98,6 +100,7 @@ void Camera::load(Deserializer& source, ResourceCache* cache)
     mZoom = source.readFloat();
     mLodBias = source.readFloat();
     mOrthographic = source.readBool();
+    mAutoAspectRatio = source.readBool();
     mViewMask = source.readUInt();
     mDrawShadowsOverride = source.readBool();
     mLightDetailLevelOverride = source.readUByte();
@@ -120,6 +123,7 @@ void Camera::saveXML(XMLElement& dest)
     projectionElem.setFloat("fov", mFov);
     projectionElem.setFloat("orthosize", mOrthoSize);
     projectionElem.setFloat("aspectratio", mAspectRatio);
+    projectionElem.setBool("autoaspect", mAutoAspectRatio);
     projectionElem.setFloat("zoom", mZoom);
     
     XMLElement lodElem = dest.createChildElement("lod");
@@ -146,6 +150,7 @@ void Camera::loadXML(const XMLElement& source, ResourceCache* cache)
     mFov = projectionElem.getFloat("fov");
     mOrthoSize = projectionElem.getFloat("orthosize");
     mAspectRatio = projectionElem.getFloat("aspectratio");
+    mAutoAspectRatio = projectionElem.getFloat("autoaspectratio");
     mZoom = projectionElem.getFloat("zoom");
     
     XMLElement lodElem = source.getChildElement("lod");
@@ -171,14 +176,15 @@ bool Camera::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deserial
     checkFloat(mFarClip, DEFAULT_FARCLIP, baseRevision, bits, 1);
     checkFloat(mFov, DEFAULT_FOV, baseRevision, bits, 2);
     checkFloat(mOrthoSize, DEFAULT_ORTHOSIZE, baseRevision, bits, 4);
-    checkFloat(mAspectRatio, 1.0f, baseRevision, bits, 4);
     checkBool(mOrthographic, false, baseRevision, bits, 4);
-    checkFloat(mZoom, 1.0f, baseRevision, bits, 8);
-    checkFloat(mLodBias, 1.0f, baseRevision, bits, 16);
-    checkUInt(mViewMask, VIEW_ALL, baseRevision, bits, 32);
-    checkBool(mDrawShadowsOverride, true, baseRevision, bits, 64);
-    checkUByte(qualityOverrides, QUALITY_MAX | (QUALITY_MAX << 4), baseRevision, bits, 64);
-    checkInt(mMaxOccluderTrianglesOverride, M_MAX_INT, baseRevision, bits, 64);
+    checkFloat(mAspectRatio, 1.0f, baseRevision, bits, 8);
+    checkBool(mAutoAspectRatio, true, baseRevision, bits, 8);
+    checkFloat(mZoom, 1.0f, baseRevision, bits, 16);
+    checkFloat(mLodBias, 1.0f, baseRevision, bits, 32);
+    checkUInt(mViewMask, VIEW_ALL, baseRevision, bits, 64);
+    checkBool(mDrawShadowsOverride, true, baseRevision, bits, 128);
+    checkUByte(qualityOverrides, QUALITY_MAX | (QUALITY_MAX << 4), baseRevision, bits, 128);
+    checkInt(mMaxOccluderTrianglesOverride, M_MAX_INT, baseRevision, bits, 128);
     
     // Update replication state fully, and network stream by delta
     dest.writeUByte(bits);
@@ -186,14 +192,15 @@ bool Camera::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deserial
     writeFloatDelta(mFarClip, dest, destRevision, bits & 1);
     writeFloatDelta(mFov, dest, destRevision, bits & 2);
     writeFloatDelta(mOrthoSize, dest, destRevision, bits & 4);
-    writeFloatDelta(mAspectRatio, dest, destRevision, bits & 4);
     writeBoolDelta(mOrthographic, dest, destRevision, bits & 4);
-    writeFloatDelta(mZoom, dest, destRevision, bits & 8);
-    writeFloatDelta(mLodBias, dest, destRevision, bits & 16);
-    writeUIntDelta(mViewMask, dest, destRevision, bits & 32);
-    writeBoolDelta(mDrawShadowsOverride, dest, destRevision, bits & 64);
-    writeUByteDelta(qualityOverrides, dest, destRevision, bits & 64);
-    writeIntDelta(mMaxOccluderTrianglesOverride, dest, destRevision, bits & 64);
+    writeFloatDelta(mAspectRatio, dest, destRevision, bits & 8);
+    writeBoolDelta(mAutoAspectRatio, dest, destRevision, bits & 8);
+    writeFloatDelta(mZoom, dest, destRevision, bits & 16);
+    writeFloatDelta(mLodBias, dest, destRevision, bits & 32);
+    writeUIntDelta(mViewMask, dest, destRevision, bits & 64);
+    writeBoolDelta(mDrawShadowsOverride, dest, destRevision, bits & 128);
+    writeUByteDelta(qualityOverrides, dest, destRevision, bits & 128);
+    writeIntDelta(mMaxOccluderTrianglesOverride, dest, destRevision, bits & 128);
     
     return prevBits || (bits != 0);
 }
@@ -208,12 +215,13 @@ void Camera::readNetUpdate(Deserializer& source, ResourceCache* cache, const Net
     readFloatDelta(mFarClip, source, bits & 1);
     readFloatDelta(mFov, source, bits & 2);
     readFloatDelta(mOrthoSize, source, bits & 4);
-    readFloatDelta(mAspectRatio, source, bits & 4);
     readBoolDelta(mOrthographic, source, bits & 4);
-    readFloatDelta(mZoom, source, bits & 8);
-    readFloatDelta(mLodBias, source, bits & 16);
-    readUIntDelta(mViewMask, source, bits & 32);
-    if (bits & 64)
+    readFloatDelta(mAspectRatio, source, bits & 8);
+    readBoolDelta(mAutoAspectRatio, source, bits & 8);
+    readFloatDelta(mZoom, source, bits & 16);
+    readFloatDelta(mLodBias, source, bits & 32);
+    readUIntDelta(mViewMask, source, bits & 64);
+    if (bits & 128)
     {
         mDrawShadowsOverride = source.readBool();
         unsigned char qualityOverrides = source.readUByte();
@@ -279,6 +287,11 @@ void Camera::setOrthographic(bool enable)
 {
     mOrthographic = enable;
     markProjectionDirty();
+}
+
+void Camera::setAutoAspectRatio(bool enable)
+{
+    mAutoAspectRatio = enable;
 }
 
 void Camera::setViewMask(unsigned mask)

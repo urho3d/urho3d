@@ -45,6 +45,9 @@
 void FakeAddRef(void* ptr);
 void FakeReleaseRef(void* ptr);
 
+static std::vector<RayQueryResult> rayQueryResult;
+static std::vector<VolumeNode*> nodeResult;
+
 static void registerCamera(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint VIEW_NONE", (void*)&VIEW_NONE);
@@ -63,6 +66,7 @@ static void registerCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "void setZoom(float)", asMETHOD(Camera, setZoom), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void setLodBias(float)", asMETHOD(Camera, setLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void setOrthographic(bool)", asMETHOD(Camera, setOrthographic), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void setAutoAspectRatio(bool)", asMETHOD(Camera, setAutoAspectRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void setViewMask(uint)", asMETHOD(Camera, setViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void setDrawShadowsOverride(bool)", asMETHOD(Camera, setDrawShadowsOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void setLightDetailLevelOverride(int)", asMETHOD(Camera, setLightDetailLevelOverride), asCALL_THISCALL);
@@ -76,6 +80,7 @@ static void registerCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "float getZoom() const", asMETHOD(Camera, getZoom), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float getLodBias() const", asMETHOD(Camera, getLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "bool isOrthographic() const", asMETHOD(Camera, isOrthographic), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "bool getAutoAspectRatio() const", asMETHOD(Camera, getAutoAspectRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "uint getViewMask() const", asMETHOD(Camera, getViewMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "bool getDrawShadowsOverride() const", asMETHOD(Camera, getDrawShadowsOverride), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "int getLightDetailLevelOverride() const", asMETHOD(Camera, getLightDetailLevelOverride), asCALL_THISCALL);
@@ -124,74 +129,32 @@ static void registerSkeleton(asIScriptEngine* engine)
 
 static Texture2D* ConstructTexture2D(TextureUsage usage, const std::string& name)
 {
-    try
-    {
-        return new Texture2D(getEngine()->getRenderer(), usage, name);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW_RET(e, 0);
-    }
+    TRY_CONSTRUCT(new Texture2D(getEngine()->getRenderer(), usage, name));
 }
 
 static void Texture2DSetSize(int width, int height, unsigned format, Texture2D* ptr)
 {
-    try
-    {
-        ptr->setSize(width, height, format);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->setSize(width, height, format));
 }
 
 static void Texture2DLoad(Image* image, Texture2D* ptr)
 {
-    try
-    {
-        ptr->load(SharedPtr<Image>(image));
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->load(SharedPtr<Image>(image)));
 }
 
 static TextureCube* ConstructTextureCube(TextureUsage usage, const std::string& name)
 {
-    try
-    {
-        return new TextureCube(getEngine()->getRenderer(), usage, name);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW_RET(e, 0);
-    }
+    TRY_CONSTRUCT(new TextureCube(getEngine()->getRenderer(), usage, name));
 }
 
 static void TextureCubeSetSize(int size, unsigned format, TextureCube* ptr)
 {
-    try
-    {
-        ptr->setSize(size, format);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->setSize(size, format));
 }
 
 static void TextureCubeLoad(CubeMapFace face, Image* image, TextureCube* ptr)
 {
-    try
-    {
-        ptr->load(face, SharedPtr<Image>(image));
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->load(face, SharedPtr<Image>(image)));
 }
 
 static void registerTexture(asIScriptEngine* engine)
@@ -839,6 +802,10 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectType("Pipeline", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Pipeline", asBEHAVE_ADDREF, "void f()", asMETHOD(Pipeline, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Pipeline", asBEHAVE_RELEASE, "void f()", asMETHOD(Pipeline, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setNumViewports(uint)", asMETHOD(Pipeline, setNumViewports), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setViewport(uint, Scene@+, Camera@+, const IntRect& in)", asMETHOD(Pipeline, setViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setViewportCamera(uint, Camera@+)", asMETHOD(Pipeline, setViewportCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setViewportScreenRect(uint, Camera@+)", asMETHOD(Pipeline, setViewportScreenRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setSpecularLighting(bool)", asMETHOD(Pipeline, setSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setDrawShadows(bool)", asMETHOD(Pipeline, setDrawShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setTextureAnisotropy(int)", asMETHOD(Pipeline, setTextureAnisotropy), asCALL_THISCALL);
@@ -852,6 +819,11 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "void setOcclusionBufferSize(int)", asMETHOD(Pipeline, setOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setOccluderSizeThreshold(float)", asMETHOD(Pipeline, setOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setEdgeFilter(const EdgeFilterParameters& in)", asMETHOD(Pipeline, setEdgeFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void drawDebugGeometry()", asMETHOD(Pipeline, drawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "uint getNumViewports() const", asMETHOD(Pipeline, getNumViewports), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "Scene@+ getViewportScene(uint) const", asMETHOD(Pipeline, getViewportScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "Camera@+ getViewportCamera(uint) const", asMETHOD(Pipeline, getViewportCamera), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "IntRect getViewportScreenRect(uint) const", asMETHOD(Pipeline, getViewportScreenRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getFrameNumber() const", asMETHOD(Pipeline, getFrameNumber), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "float getElapsedTime() const", asMETHOD(Pipeline, getElapsedTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "bool getSpecularLighting() const", asMETHOD(Pipeline, getSpecularLighting), asCALL_THISCALL);
@@ -879,7 +851,16 @@ static void registerPipeline(asIScriptEngine* engine)
 
 static DebugRenderer* GetDebugRenderer()
 {
-    return getEngine()->getDebugRenderer();
+    Scene* scene = getScriptContextScene();
+    if (scene)
+        return scene->getExtension<DebugRenderer>();
+    else
+        return 0;
+}
+
+static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
+{
+    return ptr->getExtension<DebugRenderer>();
 }
 
 static void registerDebugRenderer(asIScriptEngine* engine)
@@ -891,6 +872,7 @@ static void registerDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void addBoundingBox(const BoundingBox& in, const Color& in, bool)", asMETHODPR(DebugRenderer, addBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void addFrustum(const Frustum& in, const Color& in, bool)", asMETHOD(DebugRenderer, addFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void addSkeleton(Skeleton@+, const Color& in, bool)", asMETHOD(DebugRenderer, addSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "DebugRenderer@+ getDebugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     
     engine->RegisterGlobalFunction("DebugRenderer@+ getDebugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
@@ -909,44 +891,39 @@ static Node* RayQueryResultGetNode(RayQueryResult* ptr)
     return ptr->mNode;
 }
 
-static CScriptArray* OctreeRaycast(const Ray& ray, unsigned includeFlags, unsigned excludeFlags, float maxDistance, RayQueryLevel level, Octree* ptr)
+static CScriptArray* OctreeRaycast(const Ray& ray, unsigned nodeFlags, float maxDistance, RayQueryLevel level, Octree* ptr)
 {
-    static std::vector<RayQueryResult> result;
-    RayOctreeQuery query(ray, result, includeFlags, excludeFlags, false, false, maxDistance, level);
+    RayOctreeQuery query(rayQueryResult, ray, nodeFlags, false, false, maxDistance, level);
     ptr->getNodes(query);
-    return vectorToArray<RayQueryResult>(result, "array<RayQueryResult>");
+    return vectorToArray<RayQueryResult>(rayQueryResult, "array<RayQueryResult>");
 }
 
-static CScriptArray* OctreeGetNodesPoint(const Vector3& point, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
+static CScriptArray* OctreeGetNodesPoint(const Vector3& point, unsigned nodeFlags, Octree* ptr)
 {
-    static std::vector<VolumeNode*> result;
-    PointOctreeQuery query(point, result, includeFlags, excludeFlags);
+    PointOctreeQuery query(nodeResult, point, nodeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(nodeResult, "array<Node@>");
 }
 
-static CScriptArray* OctreeGetNodesBox(const BoundingBox& box, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
+static CScriptArray* OctreeGetNodesBox(const BoundingBox& box, unsigned nodeFlags, Octree* ptr)
 {
-    static std::vector<VolumeNode*> result;
-    BoxOctreeQuery query(box, result, includeFlags, excludeFlags);
+    BoxOctreeQuery query(nodeResult, box, nodeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(nodeResult, "array<Node@>");
 }
 
-static CScriptArray* OctreeGetNodesFrustum(const Frustum& frustum, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
+static CScriptArray* OctreeGetNodesFrustum(const Frustum& frustum, unsigned nodeFlags, Octree* ptr)
 {
-    static std::vector<VolumeNode*> result;
-    FrustumOctreeQuery query(frustum, result, includeFlags, excludeFlags);
+    FrustumOctreeQuery query(nodeResult, frustum, nodeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(nodeResult, "array<Node@>");
 }
 
-static CScriptArray* OctreeGetNodesSphere(const Sphere& sphere, unsigned includeFlags, unsigned excludeFlags, Octree* ptr)
+static CScriptArray* OctreeGetNodesSphere(const Sphere& sphere, unsigned nodeFlags, Octree* ptr)
 {
-    static std::vector<VolumeNode*> result;
-    SphereOctreeQuery query(sphere, result, includeFlags, excludeFlags);
+    SphereOctreeQuery query(nodeResult, sphere, nodeFlags);
     ptr->getNodes(query);
-    return vectorToHandleArray<VolumeNode>(result, "array<Node@>");
+    return vectorToHandleArray<VolumeNode>(nodeResult, "array<Node@>");
 }
 
 static Octree* SceneGetOctree(Scene* ptr)
@@ -981,14 +958,17 @@ static void registerOctree(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RayQueryResult", "uint subObject", offsetof(RayQueryResult, mSubObject));
     
     registerHashedType<Octree>(engine, "Octree");
+    engine->RegisterObjectMethod("Octree", "void resize(const BoundingBox& in, uint)", asMETHOD(Octree, resize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void setExcludeFlags(uint)", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& getWorldBoundingBox() const", asMETHODPR(Octree, getWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getNumLevels() const", asMETHOD(Octree, getNumLevels), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "uint getExcludeFlags() const", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "bool isHeadless() const", asMETHOD(Octree, isHeadless), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "array<RayQueryResult>@ raycast(const Ray& in, uint, uint, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Vector3& in, uint, uint)", asFUNCTION(OctreeGetNodesPoint), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const BoundingBox& in, uint, uint)", asFUNCTION(OctreeGetNodesBox), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Frustum& in, uint, uint)", asFUNCTION(OctreeGetNodesFrustum), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Sphere& in, uint, uint)", asFUNCTION(OctreeGetNodesSphere), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "array<RayQueryResult>@ raycast(const Ray& in, uint, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Vector3& in, uint)", asFUNCTION(OctreeGetNodesPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const BoundingBox& in, uint)", asFUNCTION(OctreeGetNodesBox), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Frustum& in, uint)", asFUNCTION(OctreeGetNodesFrustum), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Sphere& in, uint)", asFUNCTION(OctreeGetNodesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Octree@+ getOctree() const", asFUNCTION(SceneGetOctree), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool isHeadless() const", asFUNCTION(SceneIsHeadless), asCALL_CDECL_OBJLAST);
     

@@ -296,14 +296,7 @@ static void registerServer(asIScriptEngine* engine)
 
 static void ParticleEmitterLoadParameters(XMLFile* file, ParticleEmitter* ptr)
 {
-    try
-    {
-        ptr->loadParameters(file, getEngine()->getResourceCache());
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    ptr->loadParameters(file, getEngine()->getResourceCache());
 }
 
 static void registerAnimationController(asIScriptEngine* engine)
@@ -431,14 +424,10 @@ static Scene* EngineCreateScene(const std::string& name, const BoundingBox& octr
 
 static void registerEngine(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const int DEBUGDRAW_NONE", (void*)&DEBUGDRAW_NONE);
-    engine->RegisterGlobalProperty("const int DEBUGDRAW_RENDERING", (void*)&DEBUGDRAW_RENDERING);
-    engine->RegisterGlobalProperty("const int DEBUGDRAW_PHYSICS", (void*)&DEBUGDRAW_PHYSICS);
-    
     engine->RegisterObjectType("Engine", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_ADDREF, "void f()", asMETHOD(Engine, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Engine", asBEHAVE_RELEASE, "void f()", asMETHOD(Engine, releaseRef), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "void runFrame(Scene@+, Camera@+, bool)", asMETHOD(Engine, runFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Engine", "void runFrame()", asMETHOD(Engine, runFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Scene@ createScene(const string& in, const BoundingBox& in, uint, bool)", asFUNCTION(EngineCreateScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Engine", "Client@+ createClient(const string& in)", asMETHOD(Engine, createClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "Server@+ createServer()", asMETHOD(Engine, createServer), asCALL_THISCALL);
@@ -451,7 +440,6 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "void setMinFps(int)", asMETHOD(Engine, setMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMaxFps(int)", asMETHOD(Engine, setMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setMaxInactiveFps(int)", asMETHOD(Engine, setMaxInactiveFps), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "void setDebugDrawMode(int)", asMETHOD(Engine, setDebugDrawMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void setFlushGPU(bool)", asMETHOD(Engine, setFlushGPU), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void exit()", asMETHOD(Engine, exit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "void dumpProfilingData()", asMETHOD(Engine, dumpProfilingData), asCALL_THISCALL);
@@ -460,7 +448,6 @@ static void registerEngine(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Engine", "int getMinFps() const", asMETHOD(Engine, getMinFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int getMaxFps() const", asMETHOD(Engine, getMaxFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "int getMaxInactiveFps() const", asMETHOD(Engine, getMaxInactiveFps), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Engine", "int getDebugDrawMode() const", asMETHOD(Engine, getDebugDrawMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool getFlushGPU() const", asMETHOD(Engine, getFlushGPU), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool isInitialized() const", asMETHOD(Engine, isInitialized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Engine", "bool isExiting() const", asMETHOD(Engine, isExiting), asCALL_THISCALL);

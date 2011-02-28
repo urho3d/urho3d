@@ -290,6 +290,7 @@ void View::renderBatchesForward()
         renderer->setStencilTest(false);
         renderer->setRenderTarget(0, mRenderTarget);
         renderer->setDepthStencil(mDepthStencil);
+        renderer->setViewport(mScreenRect);
         renderer->clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, mZone->getFogColor());
         
         for (unsigned i = 0; i < mAmbientQueueSorted.size(); ++i)
@@ -359,6 +360,7 @@ void View::renderBatchesForward()
                 
                 renderer->setRenderTarget(0, mRenderTarget);
                 renderer->setDepthStencil(mDepthStencil);
+                renderer->setViewport(mScreenRect);
                 optimizeLightByScissor(queue.mLight);
                 
                 // If this is a split point or dir. light, mark the split volume to the stencil
@@ -387,6 +389,7 @@ void View::renderBatchesForward()
         renderer->setScissorTest(false);
         renderer->setStencilTest(false);
         renderer->setRenderTarget(0, mRenderTarget);
+        renderer->setViewport(mScreenRect);
         renderer->setDepthStencil(mDepthStencil);
         
         for (unsigned i = 0; i < mPostOpaqueQueueSorted.size(); ++i)

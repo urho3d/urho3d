@@ -624,17 +624,14 @@ Component* Entity::getComponent(unsigned short combinedHash) const
     return 0;
 }
 
-std::vector<Component*> Entity::getComponents(ShortStringHash type) const
+void Entity::getComponents(std::vector<Component*>& result, ShortStringHash type) const
 {
-    std::vector<Component*> ret;
-    
+    result.clear();
     for (std::vector<SharedPtr<Component> >::const_iterator i = mComponents.begin(); i != mComponents.end(); ++i)
     {
         if ((*i)->getType() == type)
-            ret.push_back(*i);
+            result.push_back(*i);
     }
-    
-    return ret;
 }
 
 bool Entity::isPlayback() const

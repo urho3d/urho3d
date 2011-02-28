@@ -138,7 +138,7 @@ private:
     float mCameraSafetyDist;
     float mCameraRayLength;
     float mSensitivity;
-    bool mPaused;
+    bool mDrawDebug;
     bool mGameOn;
     bool mFirstFrame;
     int mEnemies;

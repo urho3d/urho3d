@@ -95,9 +95,9 @@ public:
     Resource* getResource(ShortStringHash type, const std::string& name);
     //! Return a resource by type and name hash. Load if not loaded yet. Return null if fails
     Resource* getResource(ShortStringHash type, StringHash nameHash);
-    //! Return all resources of a specific type
-    std::vector<Resource*> getResources(ShortStringHash type);
-    //! Return all resources
+    //! Return all loaded resources of a specific type
+    void getResources(std::vector<Resource*>& result, ShortStringHash type) const;
+    //! Return all loaded resources
     const std::map<ShortStringHash, ResourceGroup>& getAllResources() const { return mResourceGroups; }
     //! Return added resource load paths
     const std::vector<std::string>& getResourcePaths() const { return mResourcePaths; }
@@ -107,8 +107,8 @@ public:
     template <class T> T* getResource(const std::string& name);
     //! Template version of returning a resource by name hash
     template <class T> T* getResource(StringHash nameHash);
-    //! Template version of returning resources of a specific type
-    template <class T> std::vector<T*> getResources();
+    //! Template version of returning loaded resources of a specific type
+    template <class T> void getResources(std::vector<T*>& result) const;
     //! Return whether a file exists by name
     bool exists(const std::string& name) const;
     //! Return whether a file exists by name hash
@@ -150,16 +150,18 @@ template <class T> T* ResourceCache::getResource(StringHash nameHash)
     return static_cast<T*>(getResource(type, nameHash));
 }
 
-template <class T> std::vector<T*> ResourceCache::getResources()
+template <class T> void ResourceCache::getResources(std::vector<T*>& result) const
 {
+    std::vector<Resource*>& resources = reinterpret_cast<std::vector<Resource*>&>(result);
     ShortStringHash type = T::getTypeStatic();
-    std::vector<Resource*> resources = getResources(type);
-    std::vector<T*> ret;
+    getResources(resources, type);
     
-    for (std::vector<Resource*>::const_iterator i = resources.begin(); i != resources.end(); ++i)
-        ret.push_back(static_cast<T*>(*i));
-    
-    return ret;
+    // Perform conversion of the returned pointers
+    for (unsigned i = 0; i < result.size(); ++i)
+    {
+        Resource* resource = resources[i];
+        result[i] = static_cast<T*>(resource);
+    }
 }
 
 #endif // RESOURCE_RESOURCECACHE_H

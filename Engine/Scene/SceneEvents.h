@@ -26,6 +26,12 @@
 
 #include "Event.h"
 
+//! Update all non-networked scenes. Sent by Engine
+DEFINE_EVENT(EVENT_UPDATESCENES, UpdateScenes)
+{
+    EVENT_PARAM(P_TIMESTEP, TimeStep);          // float
+}
+
 //! Variable timestep scene update
 DEFINE_EVENT(EVENT_SCENEUPDATE, SceneUpdate)
 {

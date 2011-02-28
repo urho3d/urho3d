@@ -92,8 +92,8 @@ class PhysicsWorld : public SceneExtension, public EventListener
     DEFINE_TYPE(PhysicsWorld);
     
 public:
-    //! Construct with scene pointer
-    PhysicsWorld(Scene* scene);
+    //! Construct
+    PhysicsWorld();
     //! Destruct
     virtual ~PhysicsWorld();
     
@@ -139,8 +139,10 @@ public:
     //! Set simulation random seed
     void setRandomSeed(unsigned seed);
     //! Perform a physics world raycast
-    void raycast(const Ray& ray, std::vector<PhysicsRaycastResult>& result, float maxDistance, unsigned collisionMask =
+    void raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
+    //! Add debug geometry to the debug renderer
+    void drawDebugGeometry();
     
     //! Return ODE world ID
     dWorldID getWorld() const { return mWorld; }
@@ -183,8 +185,6 @@ public:
     void addRigidBody(RigidBody* body);
     //! Remove a rigid body. Called by RigidBody
     void removeRigidBody(RigidBody* body);
-    //! Draw debug geometry. Called by Engine
-    void drawDebugGeometry(DebugRenderer* debug);
     //! Send accumulated collision events
     void sendCollisionEvents();
     
@@ -194,8 +194,6 @@ private:
     //! ODE raycast callback
     static void raycastCallback(void *userData, dGeomID geomA, dGeomID geomB);
     
-    //! Scene
-    Scene* mScene;
     //! ODE world ID
     dWorldID mWorld;
     //! ODE space ID

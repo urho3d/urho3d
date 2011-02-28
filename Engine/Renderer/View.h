@@ -61,7 +61,7 @@ struct LightBatchQueue
     bool mLastSplit;
 };
 
-//! A rendering view. Includes the main view and any auxiliary views, but not shadow cameras
+//! A rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras
 class View : public RefCounted
 {
 public:
@@ -70,8 +70,8 @@ public:
     //! Destruct
     virtual ~View();
     
-    //! Define with octree, camera and render target pointers
-    void define(Octree* octree, Camera* camera, RenderSurface* renderTarget);
+    //! Define with octree, camera and render target pointers and a viewport rectangle
+    void define(Octree* octree, Camera* camera, RenderSurface* renderTarget, IntRect screenRect);
     //! Update culling and construct rendering batches
     void update(const FrameInfo& frame);
     //! Render batches
@@ -83,6 +83,10 @@ public:
     Camera* getCamera() const { return mCamera; }
     //! Return zone
     Zone* getZone() const { return mZone; }
+    //! Return the render target. 0 if using the backbuffer
+    RenderSurface* getRenderTarget() const { return mRenderTarget; }
+    //! Return the depth stencil. 0 if using the backbuffer's depth stencil
+    RenderSurface* getDepthStencil() const { return mDepthStencil; }
     //! Return geometry scene nodes
     const std::vector<GeometryNode*>& getGeometries() const { return mGeometries; }
     //! Return occluder scene nodes
@@ -116,7 +120,7 @@ private:
     //! Query for lit geometries and shadow casters for a light
     unsigned processLight(Light* light);
     //! Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
-    void processLightQuery(unsigned index, const std::vector<VolumeNode*>& result, bool getLitGeometries, bool getShadowCasters, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox);
+    void processLightQuery(unsigned splitIndex, const std::vector<VolumeNode*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool getShadowCasters);
     //! Check visibility of one shadow caster
     bool isShadowCasterVisible(GeometryNode* geom, BoundingBox lightViewBox, const Camera& shadowCamera, const Matrix4x3& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     //! Set up initial shadow camera view
@@ -151,6 +155,8 @@ private:
     RenderSurface* mRenderTarget;
     //! Depth buffer to use
     RenderSurface* mDepthStencil;
+    //! Screen rectangle. For texture render targets it is the full texture size
+    IntRect mScreenRect;
     //! Render target width
     int mWidth;
     //! Render target height

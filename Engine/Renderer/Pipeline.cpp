@@ -39,6 +39,7 @@
 #include "RendererEvents.h"
 #include "RendererImpl.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "StringUtils.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -315,6 +316,8 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     if (!createShadowMaps())
         mDrawShadows = false;
     
+    mViewports.resize(1);
+    
     resetViews();
 }
 
@@ -322,6 +325,48 @@ Pipeline::~Pipeline()
 {
     LOGINFO("Rendering pipeline shut down");
 }
+
+void Pipeline::setNumViewports(unsigned num)
+{
+    mViewports.resize(num);
+}
+
+void Pipeline::setViewport(unsigned index, Scene* scene, Camera* camera, const IntRect& screenRect)
+{
+    if (index >= mViewports.size())
+    {
+        LOGERROR("Illegal viewport index");
+        return;
+    }
+    
+    Viewport& viewport = mViewports[index];
+    viewport.mScene = scene;
+    viewport.mCamera = camera;
+    viewport.mScreenRect = screenRect;
+}
+
+void Pipeline::setViewportCamera(unsigned index, Camera* camera)
+{
+    if (index >= mViewports.size())
+    {
+        LOGERROR("Illegal viewport index");
+        return;
+    }
+    
+    mViewports[index].mCamera = camera;
+}
+
+void Pipeline::setViewportScreenRect(unsigned index, const IntRect& screenRect)
+{
+    if (index >= mViewports.size())
+    {
+        LOGERROR("Illegal viewport index");
+        return;
+    }
+    
+    mViewports[index].mScreenRect = screenRect;
+}
+
 
 void Pipeline::setSpecularLighting(bool enable)
 {
@@ -413,91 +458,75 @@ void Pipeline::setEdgeFilter(const EdgeFilterParameters& parameters)
     mEdgeFilter = parameters;
 }
 
-bool Pipeline::update(float timeStep, Octree* octree, Camera* camera)
-{
-    PROFILE(Pipeline_Update);
-    
-    // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
-    // and if the device is lost, the updates queue up, causing memory use to rise constantly
-    if ((mRenderer->isDeviceLost()) || (!camera) || (!octree))
-    {
-        mNumViews = 0;
-        return false;
-    }
-    
-    // Advance frame number & time, set up the frameinfo structure, and reset stats
-    beginFrame(timeStep);
-    
-    // Reload shaders if needed
-    if (mShadersDirty)
-        loadShaders();
-    
-    // Update octree. Perform early update for nodes which need that, and reinsert moved nodes
-    mFrame.mCamera = camera;
-    octree->updateOctree(mFrame);
-    
-    // Add the main view
-    addView(octree, camera, 0);
-    
-    // Get light and geometry nodes for the main view
-    mViews[0]->update(mFrame);
-    
-    // Process any auxiliary views that were found during the main view processing
-    for (unsigned i = 1; i < mNumViews; ++i)
-        mViews[i]->update(mFrame);
-    
-    return true;
-}
-
-bool Pipeline::render()
-{
-    PROFILE(Pipeline_Render);
-    
-    mRenderer->setDefaultTextureFilterMode(mTextureFilterMode);
-    mRenderer->setTextureAnisotropy(mTextureAnisotropy);
-    
-    // If no views, just clear the screen
-    if (!mNumViews)
-    {
-        mRenderer->setAlphaTest(false);
-        mRenderer->setBlendMode(BLEND_REPLACE);
-        mRenderer->setColorWrite(true);
-        mRenderer->setDepthWrite(true);
-        mRenderer->setFillMode(FILL_SOLID);
-        mRenderer->setScissorTest(false);
-        mRenderer->setStencilTest(false);
-        mRenderer->clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
-        return false;
-    }
-    
-    // Render views from last to first (main view is rendered last)
-    for (unsigned i = mNumViews - 1; i < mNumViews; --i)
-        mViews[i]->render();
-    
-    // Disable scissor/stencil tests if left on by lights, and reset stream frequencies
-    mRenderer->setScissorTest(false);
-    mRenderer->setStencilTest(false);
-    mRenderer->resetStreamFrequencies();
-    
-    return true;
-}
-
-void Pipeline::drawDebugGeometry(DebugRenderer* debug)
+void Pipeline::drawDebugGeometry()
 {
     PROFILE(Pipeline_DrawDebugGeometry);
     
-    if (!mNumViews)
-        return;
+    static std::set<GeometryNode*> processedGeometries;
+    static std::set<Light*> processedLights;
+    processedGeometries.clear();
+    processedLights.clear();
     
-    // Only use the main view
-    const std::vector<GeometryNode*>& geometries = mViews[0]->getGeometries();
-    const std::vector<Light*>& lights = mViews[0]->getLights();
-    
-    for (unsigned i = 0; i < geometries.size(); ++i)
-        geometries[i]->drawDebugGeometry(debug);
-    
-    for (unsigned i = 0; i < lights.size(); ++i)
-        lights[i]->drawDebugGeometry(debug);
+    for (unsigned i = 0; i < mNumViews; ++i)
+    {
+        // Make sure it's a main view, and process each node only once
+        View* view = mViews[i];
+        if ((!view) || (view->getRenderTarget()))
+            continue;
+        Octree* octree = view->getOctree();
+        if (!octree)
+            continue;
+        Scene* scene = octree->getScene();
+        if (!scene)
+            continue;
+        DebugRenderer* debug = scene->getExtension<DebugRenderer>();
+        if (!debug)
+            continue;
+        
+        const std::vector<GeometryNode*>& geometries = view->getGeometries();
+        const std::vector<Light*>& lights = view->getLights();
+        
+        for (unsigned i = 0; i < geometries.size(); ++i)
+        {
+            if (processedGeometries.find(geometries[i]) == processedGeometries.end())
+            {
+                geometries[i]->drawDebugGeometry(debug);
+                processedGeometries.insert(geometries[i]);
+            }
+        }
+        for (unsigned i = 0; i < lights.size(); ++i)
+        {
+            if (processedLights.find(lights[i]) == processedLights.end())
+            {
+                lights[i]->drawDebugGeometry(debug);
+                processedLights.insert(lights[i]);
+            }
+        }
+    }
+}
+
+Scene* Pipeline::getViewportScene(unsigned index) const
+{
+    if (index >= mViewports.size())
+        return 0;
+    else
+        return mViewports[index].mScene;
+}
+
+Camera* Pipeline::getViewportCamera(unsigned index) const
+{
+    if (index >= mViewports.size())
+        return 0;
+    else
+        return mViewports[index].mCamera;
+}
+
+IntRect Pipeline::getViewportScreenRect(unsigned index) const
+{
+    if (index >= mViewports.size())
+        return IntRect::sZero;
+    else
+        return mViewports[index].mScreenRect;
 }
 
 VertexShader* Pipeline::getVertexShader(const std::string& name, bool checkExists) const
@@ -607,6 +636,101 @@ const OcclusionBuffer* Pipeline::getOcclusionBuffer(float aspectRatio, bool half
         return 0;
 }
 
+bool Pipeline::update(float timeStep)
+{
+    PROFILE(Pipeline_Update);
+    
+    // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
+    // and if the device is lost, the updates queue up, causing memory use to rise constantly
+    if (mRenderer->isDeviceLost())
+    {
+        mNumViews = 0;
+        return false;
+    }
+    
+    // Advance frame number & time, set up the frameinfo structure, and reset views & stats
+    beginFrame(timeStep);
+    
+    // Reload shaders if needed
+    if (mShadersDirty)
+        loadShaders();
+    
+    // Process all viewports. Use reverse order, because during rendering the order will be reversed again to handle auxiliary
+    // view dependencies correctly
+    for (unsigned i = mViewports.size() - 1; i < mViewports.size(); --i)
+    {
+        Viewport& viewport = mViewports[i];
+        
+        // Check for valid scene, camera and octree, and that the scene is not asynchronously loading and thus incomplete
+        Scene* scene = viewport.mScene;
+        Camera* camera = viewport.mCamera;
+        if ((!scene) || (!camera) || (scene->isAsyncLoading()))
+            continue;
+        Octree* octree = scene->getExtension<Octree>();
+        if (!octree)
+            continue;
+        
+        // If viewport has zero size defined, follow the window size
+        IntRect screenRect = viewport.mScreenRect;
+        if (screenRect == IntRect::sZero)
+            screenRect = IntRect(0, 0, mRenderer->getWidth(), mRenderer->getHeight());
+        
+        mFrame.mCamera = camera;
+        
+        // Update octree. Perform early update for nodes which need that, and reinsert moved nodes
+        // However, if the same scene is viewed from multiple cameras, update the octree only once
+        if (mUpdatedOctrees.find(octree) == mUpdatedOctrees.end())
+        {
+            octree->updateOctree(mFrame);
+            mUpdatedOctrees.insert(octree);
+        }
+        
+        // Add and process this viewport's main view
+        unsigned mainView = mNumViews;
+        addView(octree, camera, 0, screenRect);
+        mViews[mainView]->update(mFrame);
+        
+        // Process any auxiliary views that were found during the main view processing
+        for (unsigned i = mainView + 1; i < mNumViews; ++i)
+            mViews[i]->update(mFrame);
+    }
+    
+    return true;
+}
+
+bool Pipeline::render()
+{
+    PROFILE(Pipeline_Render);
+    
+    mRenderer->setDefaultTextureFilterMode(mTextureFilterMode);
+    mRenderer->setTextureAnisotropy(mTextureAnisotropy);
+    
+    // If no views, just clear the screen
+    if (!mNumViews)
+    {
+        mRenderer->setAlphaTest(false);
+        mRenderer->setBlendMode(BLEND_REPLACE);
+        mRenderer->setColorWrite(true);
+        mRenderer->setDepthWrite(true);
+        mRenderer->setFillMode(FILL_SOLID);
+        mRenderer->setScissorTest(false);
+        mRenderer->setStencilTest(false);
+        mRenderer->clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
+        return false;
+    }
+    
+    // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
+    for (unsigned i = mNumViews - 1; i < mNumViews; --i)
+        mViews[i]->render();
+    
+    // Disable scissor/stencil tests if left on by lights, and reset stream frequencies
+    mRenderer->setScissorTest(false);
+    mRenderer->setStencilTest(false);
+    mRenderer->resetStreamFrequencies();
+    
+    return true;
+}
+
 void Pipeline::beginFrame(float timeStep)
 {
     mElapsedTime += timeStep;
@@ -622,6 +746,8 @@ void Pipeline::beginFrame(float timeStep)
     
     mNumViews = 0;
     mNumSplitLights = 0;
+    
+    mUpdatedOctrees.clear();
 }
 
 void Pipeline::resetViews()
@@ -630,14 +756,14 @@ void Pipeline::resetViews()
     mNumViews = 0;
 }
 
-void Pipeline::addView(Octree* octree, Camera* camera, RenderSurface* renderTarget)
+void Pipeline::addView(Octree* octree, Camera* camera, RenderSurface* renderTarget, const IntRect& screenRect)
 {
     if (mViews.size() <= mNumViews)
         mViews.resize(mNumViews + 1);
     if (!mViews[mNumViews])
         mViews[mNumViews] = new View(this);
     
-    mViews[mNumViews]->define(octree, camera, renderTarget);
+    mViews[mNumViews]->define(octree, camera, renderTarget, screenRect);
     ++mNumViews;
 }
 
@@ -1017,7 +1143,8 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
 
 void Pipeline::releaseMaterialShaders()
 {
-    std::vector<Material*> materials = mCache->getResources<Material>();
+    std::vector<Material*> materials;
+    mCache->getResources<Material>(materials);
     
     for (unsigned i = 0; i < materials.size(); ++i)
     {
@@ -1028,13 +1155,15 @@ void Pipeline::releaseMaterialShaders()
 
 void Pipeline::reloadTextures()
 {
-    std::vector<Texture2D*> textures = mCache->getResources<Texture2D>();
-    std::vector<TextureCube*> cubeTextures = mCache->getResources<TextureCube>();
+    std::vector<Resource*> textures;
     
+    mCache->getResources(textures, Texture2D::getTypeStatic());
     for (unsigned i = 0; i < textures.size(); ++i)
         mCache->reloadResource(textures[i]);
-    for (unsigned i = 0; i < cubeTextures.size(); ++i)
-        mCache->reloadResource(cubeTextures[i]);
+    
+    mCache->getResources(textures, TextureCube::getTypeStatic());
+    for (unsigned i = 0; i < textures.size(); ++i)
+        mCache->reloadResource(textures[i]);
 }
 
 void Pipeline::createGeometries()

@@ -34,6 +34,7 @@
 #include "Zone.h"
 
 #include <map>
+#include <set>
 #include <string>
 
 class DebugRenderer;
@@ -47,6 +48,7 @@ class Octree;
 class Renderer;
 class RenderSurface;
 class ResourceCache;
+class Scene;
 class Skeleton;
 class OcclusionBuffer;
 class Texture;
@@ -88,6 +90,23 @@ struct EdgeFilterParameters
     float mMaxScale;
 };
 
+//! Viewport definition
+struct Viewport
+{
+    //! Construct
+    Viewport() :
+        mScreenRect(IntRect::sZero)
+    {
+    }
+    
+    //! Scene pointer
+    WeakPtr<Scene> mScene;
+    //! Camera pointer
+    WeakPtr<Camera> mCamera;
+    //! Viewport screen rectangle
+    IntRect mScreenRect;
+};
+
 //! High-level rendering pipeline
 class Pipeline : public RefCounted, public EventListener
 {
@@ -99,13 +118,14 @@ public:
     //! Destruct
     virtual ~Pipeline();
     
-    //! Update for rendering
-    bool update(float timeStep, Octree* octree, Camera* camera);
-    //! Render
-    bool render();
-    //! Render debug geometry
-    void drawDebugGeometry(DebugRenderer* debug);
-    
+    //! Set number of viewports to render
+    void setNumViewports(unsigned num);
+    //! Set a viewport
+    void setViewport(unsigned index, Scene* scene, Camera* camera, const IntRect& screenRect = IntRect::sZero);
+    //! Set a viewport's camera only
+    void setViewportCamera(unsigned index, Camera* camera);
+    //! Set a viewport's screen rect only
+    void setViewportScreenRect(unsigned index, const IntRect& screenRect);
     //! Set specular lighting on/off
     void setSpecularLighting(bool enable);
     //! Set shadows on/off
@@ -132,7 +152,17 @@ public:
     void setOccluderSizeThreshold(float screenSize);
     //! Set deferred rendering edge filter parameters. Only has effect if nonzero multisample level is set in Renderer::setMode().
     void setEdgeFilter(const EdgeFilterParameters& parameters);
+    //! Add debug geometry to the debug renderer(s). Call during EVENT_POSTRENDER to get most accurate results
+    void drawDebugGeometry();
     
+    //! Return number of viewports
+    unsigned getNumViewports() const { return mViewports.size(); }
+    //! Return viewport scene
+    Scene* getViewportScene(unsigned index) const;
+    //! Return viewport camera
+    Camera* getViewportCamera(unsigned index) const;
+    //! Return viewport screen rectangle
+    IntRect getViewportScreenRect(unsigned index) const;
     //! Return current frame number
     unsigned getFrameNumber() const { return mFrameNumber; }
     //! Return elapsed time
@@ -190,13 +220,18 @@ public:
     //! Return the renderer subsystem
     Renderer* getRenderer() const { return mRenderer; }
     
+    //! Update for rendering. Called by Engine
+    bool update(float timeStep);
+    //! Render. Called by Engine
+    bool render();
+    
 private:
     //! Begin new frame
     void beginFrame(float timeStep);
     //! Clear views from previous frame
     void resetViews();
     //! Add a view
-    void addView(Octree* octree, Camera* camera, RenderSurface* renderTarget);
+    void addView(Octree* octree, Camera* camera, RenderSurface* renderTarget, const IntRect& screenRect);
     //! Return an occlusion buffer for use
     OcclusionBuffer* getOrCreateOcclusionBuffer(Camera& camera, int maxOccluderTriangles, bool halfResolution = false);
     //! Return a material technique for a scene node, considering material LOD
@@ -326,10 +361,14 @@ private:
     std::string mShaderPath;
     //! Light shader base name (deferred and prepass have different light shaders)
     std::string mLightShaderName;
+    //! Viewports
+    std::vector<Viewport> mViewports;
     //! Views
     std::vector<SharedPtr<View> > mViews;
     //! Frame info for rendering
     FrameInfo mFrame;
+    //! Octrees that have been updated during the frame
+    std::set<Octree*> mUpdatedOctrees;
 };
 
 #endif // RENDERER_PIPELINE_H

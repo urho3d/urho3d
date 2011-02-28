@@ -50,10 +50,13 @@ Scene::Scene(ResourceCache* cache, const std::string& name) :
     mInterpolationConstant(50.0f),
     mInterpolationSnapThreshold(1.0f),
     mInterpolationLerpFactor(1.0f),
+    mPaused(false),
     mPlayback(false),
     mAsyncLoading(false)
 {
     LOGINFO("Scene " + mName + " created");
+    
+    subscribeToEvent(EVENT_UPDATESCENES, EVENT_HANDLER(Scene, handleUpdateScenes));
 }
 
 Scene::~Scene()
@@ -71,6 +74,9 @@ void Scene::update(float timeStep)
         updateAsyncLoading();
         return;
     }
+    
+    if (mPaused)
+        return;
     
     PROFILE(Scene_Update);
     
@@ -241,9 +247,6 @@ void Scene::saveProperties(Serializer& dest)
 
 void Scene::loadProperties(Deserializer& source)
 {
-    if (!mEntities.empty())
-        EXCEPTION("Scene must be empty when loading properties");
-    
     // Read network interpolation properties
     mTransientPredictionTime = source.readFloat();
     mInterpolationConstant = source.readFloat();
@@ -269,9 +272,6 @@ void Scene::savePropertiesXML(XMLElement& dest)
 
 void Scene::loadPropertiesXML(const XMLElement& source)
 {
-    if (!mEntities.empty())
-        EXCEPTION("Scene must be empty when loading properties");
-    
     // Read network interpolation properties
     if (source.hasChildElement("interpolation"))
     {
@@ -412,14 +412,11 @@ void Scene::loadAsync(File* file)
     stopAsyncLoading();
     removeAllEntities();
     
-    // Read scene name
+    // Read scene name and extension properties, then begin async loading of entities
     file->seek(0);
     mName = file->readString();
-    
-    // Read extension properties
     loadProperties(*file);
     
-    // Begin async loading
     mAsyncTotalEntities = file->readUInt();
     mAsyncLoadedEntities = 0;
     mAsyncFile = file;
@@ -445,10 +442,8 @@ void Scene::loadAsyncXML(File* file)
     stopAsyncLoading();
     removeAllEntities();
     
-    // Read scene name
+    // Read scene name and extension properties
     mName = sceneElem.getString("name");
-    
-    // Read extension properties
     loadPropertiesXML(sceneElem);
     
     // Count entities
@@ -461,7 +456,7 @@ void Scene::loadAsyncXML(File* file)
         mAsyncXMLElement = mAsyncXMLElement.getNextElement("entity");
     }
     
-    // Begin async loading
+    // Begin async loading of entities
     mAsyncFile = file;
     mAsyncXMLFile = xml;
     mAsyncXMLElement = sceneElem.getChildElement("entity");
@@ -488,11 +483,17 @@ void Scene::setNetFlags(unsigned char flags)
     mNetFlags = flags & NET_MODEFLAGS;
 }
 
+void Scene::setPaused(bool enable)
+{
+    mPaused = enable;
+}
+
 void Scene::addExtension(SceneExtension* extension)
 {
     if (!extension)
         return;
     
+    extension->mScene = this;
     mExtensions[extension->getType()] = extension;
 }
 
@@ -658,20 +659,23 @@ void Scene::removeEntity(StringHash nameHash)
     LOGWARNING("Entity " + toString(nameHash) + " not found in scene");
 }
 
-void Scene::removeAllEntities(unsigned char netFlagsMask)
+void Scene::removeEntities(unsigned char netFlags, unsigned groupFlags)
 {
-    // Remove all entities with matching netflags
     for (std::map<EntityID, SharedPtr<Entity> >::iterator i = mEntities.begin(); i != mEntities.end();)
     {
-        std::map<EntityID, SharedPtr<Entity> >::iterator entity = i;
-        ++i;
-        if (!netFlagsMask)
-            removeEntity(entity);
-        else
-        {
-            if (entity->second->getNetFlags() & netFlagsMask)
-                removeEntity(entity);
-        }
+        std::map<EntityID, SharedPtr<Entity> >::iterator current = i++;
+        if (((!netFlags) || (current->second->getNetFlags() & netFlags)) && ((!groupFlags) ||
+            (current->second->getGroupFlags() & groupFlags)))
+            removeEntity(current);
+    }
+}
+
+void Scene::removeAllEntities()
+{
+    for (std::map<EntityID, SharedPtr<Entity> >::iterator i = mEntities.begin(); i != mEntities.end();)
+    {
+        std::map<EntityID, SharedPtr<Entity> >::iterator current = i++;
+        removeEntity(current);
     }
 }
 
@@ -871,18 +875,25 @@ Entity* Scene::getEntity(StringHash nameHash) const
     return 0;
 }
 
-std::vector<Entity*> Scene::getEntities(unsigned includeFlags, unsigned excludeFlags) const
+void Scene::getEntities(std::vector<Entity*>& result, unsigned char netFlags, unsigned groupFlags) const
 {
-    std::vector<Entity*> ret;
-    
+    result.clear();
     for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = mEntities.begin(); i != mEntities.end(); ++i)
     {
-        unsigned flags = i->second->getGroupFlags();
-        if ((flags & includeFlags) && (!(flags & excludeFlags)))
-            ret.push_back(i->second);
+        if (((!netFlags) || (i->second->getNetFlags() & netFlags)) && ((!groupFlags) || (i->second->getGroupFlags() &
+            groupFlags)))
+            result.push_back(i->second);
     }
-    
-    return ret;
+}
+
+void Scene::getEntitiesWithComponent(std::vector<Entity*>& result, ShortStringHash type) const
+{
+    result.clear();
+    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = mEntities.begin(); i != mEntities.end(); ++i)
+    {
+        if (i->second->hasComponent(type))
+            result.push_back(i->second);
+    }
 }
 
 Component* Scene::getComponent(const ComponentRef& ref) const
@@ -1102,4 +1113,16 @@ void Scene::finishLoading(Deserializer& source)
         mChecksum = file->getChecksum();
     else
         mChecksum = 0;
+}
+
+void Scene::handleUpdateScenes(StringHash eventType, VariantMap& eventData)
+{
+    // Update only if not networked. Otherwise the Client or Server should handle the updating
+    if ((!isAuthority()) && (!isProxy()))
+    {
+        using namespace UpdateScenes;
+        
+        float timeStep = eventData[P_TIMESTEP].getFloat();
+        update(timeStep);
+    }
 }

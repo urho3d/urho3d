@@ -30,6 +30,7 @@
 #include "PackageFile.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
+#include "Scene.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
 #include "StringUtils.h"
@@ -56,19 +57,21 @@ void Application::run()
     std::string applicationDir = getUserDocumentsDirectory() + "Urho3D";
     createDirectory(applicationDir);
     
-    // Parse script file name from the command line
+    // Parse scene or script file name from the command line
     const std::vector<std::string>& arguments = getArguments();
-    std::string scriptFileName;
+    std::string fullName;
     if ((arguments.size()) && (arguments[0][0] != '-'))
-        scriptFileName = replace(arguments[0], '\\', '/');
-    if (scriptFileName.empty())
-        EXCEPTION("Usage: Urho3D <scriptfile> [options]\n\n"
-            "The script file should implement the functions void start() and void runFrame(). See the readme for options.\n");
+        fullName = replace(arguments[0], '\\', '/');
+    if (fullName.empty())
+        EXCEPTION("Usage: Urho3D <scriptfile | scenefile> [options]\n\n"
+            "Either a script file or a scene file can be specified. The script file should implement the function void start(), "
+            "which should in turn subscribe to all necessary events, such as the application update. If a scene is loaded, it "
+            "should contain script objects to implement the application logic.");
     
     // Instantiate the engine
     mEngine = new Engine();
     
-    // Add resources
+    // Add default resources
     mCache = mEngine->getResourceCache();
     if (fileExists("Data.pak"))
         mCache->addPackageFile(new PackageFile("Data.pak"));
@@ -77,21 +80,40 @@ void Application::run()
     
     mCache->addResourcePath(getSystemFontDirectory());
     
+    // Try to open the file before setting screen mode
+    File file(fullName);
+    
     // Initialize engine & scripting
     mEngine->init(arguments);
     mEngine->createScriptEngine();
     
-    // Execute the rest of initialization, including scene creation, in script
-    mScriptFile = mCache->getResource<ScriptFile>(scriptFileName);
-    if (!mScriptFile)
-        throw Exception(getLog()->getLastMessage(), false);
-    if (!mScriptFile->execute("void start()"))
-        EXCEPTION("Failed to execute the start() function");
+    // If the file has a pathname, add it also as a resource path
+    std::string pathName, fileName, extension;
+    splitPath(fullName, pathName, fileName, extension);
+    if (!pathName.empty())
+        mCache->addResourcePath(pathName);
+    
+    // Script mode: execute the rest of initialization, including scene creation, in script
+    if ((extension != ".xml") && (extension != ".scn"))
+    {
+        mScriptFile = new ScriptFile(mEngine->getScriptEngine(), fileName + extension);
+        mScriptFile->load(file, mCache);
+        if (!mScriptFile->execute("void start()"))
+            EXCEPTION("Failed to execute the start() function");
+    }
+    // Scene mode: create and load a scene, then let it run
+    else
+    {
+        mScene = mEngine->createScene("Urho3D");
+        File sceneFile(fullName);
+        
+        if (extension == ".xml")
+            mScene->loadXML(sceneFile);
+        else
+            mScene->load(sceneFile);
+    }
     
     // Run until exited
     while (!mEngine->isExiting())
-    {
-        if (!mScriptFile->execute("void runFrame()"))
-            EXCEPTION("Failed to execute the runFrame() function");
-    }
+        mEngine->runFrame();
 }

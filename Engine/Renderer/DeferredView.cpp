@@ -378,7 +378,8 @@ void View::renderBatchesDeferred()
     int gBufferHeight = diffBuffer->getHeight();
     float widthRange = 0.5f * mWidth / gBufferWidth;
     float heightRange = 0.5f * mHeight / gBufferHeight;
-    Vector4 bufferUVOffset(0.5f / gBufferWidth, 0.5f / gBufferHeight, widthRange, heightRange);
+    Vector4 bufferUVOffset((0.5f + (float)mScreenRect.mLeft) / gBufferWidth, (0.5f + (float)mScreenRect.mTop) / gBufferHeight,
+        widthRange, heightRange);
     renderer->setVertexShaderConstant(getVSRegister(VSP_GBUFFEROFFSETS), bufferUVOffset);
     
     {
@@ -394,7 +395,6 @@ void View::renderBatchesDeferred()
         renderer->setScissorTest(false);
         renderer->setStencilTest(false);
         renderer->resetDepthStencil();
-        renderer->setViewport(IntRect(0, 0, mWidth, mHeight));
         if (deferred)
         {
             renderer->setRenderTarget(0, diffBuffer);
@@ -408,6 +408,7 @@ void View::renderBatchesDeferred()
             if (!hwDepth)
                 renderer->setRenderTarget(1, depthBuffer);
         }
+        renderer->setViewport(mScreenRect);
         
         // Clear only depth and stencil at first, render the G-buffer batches
         renderer->clear(CLEAR_DEPTH | CLEAR_STENCIL);
@@ -434,6 +435,7 @@ void View::renderBatchesDeferred()
         {
             renderer->resetRenderTarget(1);
             renderer->setRenderTarget(0, depthBuffer);
+            renderer->setViewport(mScreenRect);
             
             // The stencil shader writes color 1.0, which equals far depth
             mPipeline->drawFullScreenQuad(*mCamera, mPipeline->getVertexShader("Stencil"),
@@ -452,6 +454,7 @@ void View::renderBatchesDeferred()
         renderer->resetRenderTarget(2);
         renderer->setTexture(TU_DIFFBUFFER, diffBuffer);
         renderer->setTexture(TU_DEPTHBUFFER, depthBuffer);
+        renderer->setViewport(mScreenRect);
         
         // Use depth reconstruction only if necessary
         bool linear = mCamera->isOrthographic() || (!hwDepth);
@@ -463,6 +466,7 @@ void View::renderBatchesDeferred()
         // Light prepass: reset the light accumulation buffer with ambient light (half intensity to allow 2x "overburn")
         renderer->setRenderTarget(0, diffBuffer);
         renderer->resetRenderTarget(1);
+        renderer->setViewport(mScreenRect);
         renderer->clear(CLEAR_COLOR, mZone->getAmbientColor() * 0.5f);
     }
     
@@ -550,6 +554,7 @@ void View::renderBatchesDeferred()
                 renderer->setTexture(TU_NORMALBUFFER, normalBuffer);
                 renderer->setTexture(TU_DEPTHBUFFER, depthBuffer);
                 renderer->resetDepthStencil();
+                renderer->setViewport(mScreenRect);
                 
                 for (unsigned j = 0; j < queue.mBatches.size(); ++j)
                 {
@@ -579,6 +584,7 @@ void View::renderBatchesDeferred()
             renderer->setTexture(TU_NORMALBUFFER, normalBuffer);
             renderer->setTexture(TU_DEPTHBUFFER, depthBuffer);
             renderer->resetDepthStencil();
+            renderer->setViewport(mScreenRect);
             
             for (unsigned i = 0; i < mNoShadowLightQueueSorted.size(); ++i)
             {
@@ -598,6 +604,8 @@ void View::renderBatchesDeferred()
         renderer->setTexture(TU_DIFFBUFFER, 0);
         renderer->setTexture(TU_NORMALBUFFER, 0);
         renderer->setTexture(TU_DEPTHBUFFER, 0);
+        renderer->setViewport(mScreenRect);
+        
         if (!deferred)
             renderer->clear(CLEAR_COLOR, mZone->getFogColor());
         
@@ -654,6 +662,7 @@ void View::renderBatchesDeferred()
         renderer->setPixelShaderConstant(getPSRegister(PSP_SAMPLEOFFSETS), Vector4(invWidth, -invWidth, invHeight, -invHeight));
         renderer->setPixelShaderConstant(getPSRegister(PSP_EDGEFILTERPARAMS), Vector4(filterParams.mThreshold,
             filterParams.mFilterStep, filterParams.mMaxFilter, filterParams.mMaxScale));
+        renderer->setViewport(mScreenRect);
         
         mPipeline->drawFullScreenQuad(*mCamera, mPipeline->getVertexShader("EdgeFilter"),
             mPipeline->getPixelShader("EdgeFilter"), false);

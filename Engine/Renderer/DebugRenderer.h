@@ -25,7 +25,9 @@
 #define RENDERER_DEBUGRENDERER_H
 
 #include "Color.h"
+#include "EventListener.h"
 #include "Matrix4.h"
+#include "SceneExtension.h"
 #include "SharedPtr.h"
 
 #include <vector>
@@ -68,18 +70,16 @@ struct DebugLine
 };
 
 //! Debug geometry renderer
-class DebugRenderer : public RefCounted
+class DebugRenderer : public SceneExtension, public EventListener
 {
+    DEFINE_TYPE(DebugRenderer);
+    
 public:
     //! Construct with Renderer and ResourceCache pointers
     DebugRenderer(Renderer* renderer, ResourceCache* cache);
     //! Destruct
     virtual ~DebugRenderer();
     
-    //! Clear debug geometry
-    void clear();
-    //! Set camera view to render from
-    void setView(Camera* camera);
     //! Add a line
     void addLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
     //! Add a bounding box
@@ -90,10 +90,13 @@ public:
     void addFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     //! Add a skeleton
     void addSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
-    //! Render all debug lines
-    void render();
+    //! Render all debug lines from a specific camera. The viewport and rendertarget should be set before
+    void render(Camera* camera);
     
 private:
+    //! Handle end of frame. Clear debug geometry
+    void handleEndFrame(StringHash eventType, VariantMap& eventData);
+    
     //! Renderer subsystem
     SharedPtr<Renderer> mRenderer;
     //! Resource cache
@@ -103,14 +106,10 @@ private:
     //! Debug geometry pixel shader
     SharedPtr<PixelShader> mDebugPS;
     
-    //! View transform matrix
-    Matrix4 mViewProj;
     //! Lines rendered with depth test
     std::vector<DebugLine> mLines;
     //! Lines rendered without depth test
     std::vector<DebugLine> mNoDepthLines;
 };
-
-DebugRenderer* getDebugRenderer();
 
 #endif // RENDERR_DEBUGGEOMETRY_H

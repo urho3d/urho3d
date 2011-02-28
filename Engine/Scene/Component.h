@@ -113,6 +113,8 @@ public:
     ShortStringHash getCombinedHash() const { return getType() + ShortStringHash(mNameHash); }
     //! Return network replication flags
     unsigned char getNetFlags() const { return mNetFlags; }
+    //! Return the entity's groupflags, or 0 if no entity
+    unsigned getGroupFlags() const;
     //! Return entity
     Entity* getEntity() const { return mEntity; }
     //! Return whether is in a server scene

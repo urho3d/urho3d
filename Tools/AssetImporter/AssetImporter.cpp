@@ -1064,7 +1064,7 @@ void buildAndSaveScene(ExportScene& scene)
     if (!scene.mNoExtensions)
     {
         //! \todo Make the physics properties configurable
-        PhysicsWorld* physicsWorld = new PhysicsWorld(outScene);
+        PhysicsWorld* physicsWorld = new PhysicsWorld();
         physicsWorld->setGravity(Vector3(0.0f, -9.81f, 0.0f));
         outScene->addExtension(physicsWorld);
         

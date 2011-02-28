@@ -1,7 +1,10 @@
 This is a shell for running script-based Urho3D examples. Usage:
-Urho3D <scriptfile> [options]
+Urho3D <scriptfile | scenefile> [options]
 
-The script file should implement the functions void start() and void runFrame().
+Either a script file or a scene file can be specified. The script file should
+implement the function void start(), which should in turn subscribe to all 
+necessary events, such as the application update. If a scene is loaded, it 
+should contain script objects to implement the application logic.
 
 
 Commandline options:

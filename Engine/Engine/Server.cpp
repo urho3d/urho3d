@@ -794,7 +794,7 @@ void Server::writeNetUpdate(Connection* connection, Serializer& dest)
     
     {
         // Go through the scene and see which entities are new and which have been removed
-        const std::map<EntityID, SharedPtr<Entity> >& entities = scene->getEntities();
+        const std::map<EntityID, SharedPtr<Entity> >& entities = scene->getAllEntities();
         std::set<EntityID> processedEntities;
         for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
         {
@@ -1067,7 +1067,7 @@ void Server::getRelevantEntities(Connection* connection, std::set<EntityID>& des
     dest.clear();
     
     Scene* scene = connection->getScene();
-    const std::map<EntityID, SharedPtr<Entity> >& entities = scene->getEntities();
+    const std::map<EntityID, SharedPtr<Entity> >& entities = scene->getAllEntities();
     const Vector3& clientPos = connection->getPosition();
     
     for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)

@@ -86,7 +86,8 @@ void run(const std::vector<std::string>& arguments)
         gBasePath = fixPath(arguments[2]);
     
    // Get the file list recursively
-    std::vector<std::string> fileNames = scanDirectory(dirName, "*.*", SCAN_FILES, true);
+    std::vector<std::string> fileNames;
+    scanDirectory(fileNames, dirName, "*.*", SCAN_FILES, true);
     if (!fileNames.size())
         errorExit("No files found");
     for (unsigned i = 0; i < fileNames.size(); ++i)

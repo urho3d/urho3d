@@ -27,6 +27,11 @@
 #include "SceneExtension.h"
 #include "Serializer.h"
 
+SceneExtension::SceneExtension() :
+    mScene(0)
+{
+}
+
 void SceneExtension::writeExtensionType(Serializer& dest)
 {
     dest.writeShortStringHash(getType());
@@ -36,5 +41,5 @@ void SceneExtension::checkExtensionType(Deserializer& source)
 {
     ShortStringHash type = source.readShortStringHash();
     if (type != getType())
-        SAFE_EXCEPTION("Scene extension data mismatch in " + source.getName());
+        EXCEPTION("Scene extension data mismatch in " + source.getName());
 }

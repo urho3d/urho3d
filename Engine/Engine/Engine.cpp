@@ -49,9 +49,11 @@
 #include "RegisterLibraries.h"
 #include "Renderer.h"
 #include "RendererComponentFactory.h"
+#include "RendererEvents.h"
 #include "RendererResourceFactory.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "ScriptComponentFactory.h"
 #include "ScriptEngine.h"
 #include "ScriptFile.h"
@@ -73,7 +75,6 @@ Engine::Engine(const std::string& windowTitle, const std::string& logFileName, b
     mMinFps(10),
     mMaxFps(200),
     mMaxInactiveFps(50),
-    mDebugDrawMode(DEBUGDRAW_NONE),
     mFlushGPU(true),
     mInitialized(false),
     mExiting(false),
@@ -237,7 +238,6 @@ void Engine::init(const std::vector<std::string>& arguments)
     if (!mHeadless)
     {
         mPipeline = new Pipeline(mRenderer, mCache);
-        mDebugRenderer = new DebugRenderer(mRenderer, mCache);
         mUI = new UI(mRenderer, mCache);
         if (!shadows)
             mPipeline->setDrawShadows(false);
@@ -248,7 +248,7 @@ void Engine::init(const std::vector<std::string>& arguments)
     mInitialized = true;
 }
 
-void Engine::runFrame(Scene* scene, Camera* camera, bool updateScene)
+void Engine::runFrame()
 {
     if ((!mInitialized) || (mExiting))
         return;
@@ -264,9 +264,8 @@ void Engine::runFrame(Scene* scene, Camera* camera, bool updateScene)
     {
         PROFILE(Engine_RunFrame);
         
-        // Get frame timestep / update / render / garbage collect one step
         float timeStep = getNextTimeStep();
-        update(timeStep, scene, camera, updateScene);
+        update(timeStep);
         render();
         if (mScriptEngine)
             mScriptEngine->garbageCollect(false);
@@ -292,9 +291,16 @@ SharedPtr<Scene> Engine::createScene(const std::string& name, const BoundingBox&
     // Enable physics as necessary
     if (usePhysics)
     {
-        PhysicsWorld* world = new PhysicsWorld(scene);
+        PhysicsWorld* world = new PhysicsWorld();
         scene->addExtension(world);
         scene->addComponentFactory(new PhysicsComponentFactory(world));
+    }
+    
+    // Add debug rendering if not headless
+    if (!mHeadless)
+    {
+        DebugRenderer* debug = new DebugRenderer(mRenderer, mCache);
+        scene->addExtension(debug);
     }
     
     return scene;
@@ -386,11 +392,6 @@ void Engine::setMaxFps(int fps)
 void Engine::setMaxInactiveFps(int fps)
 {
     mMaxInactiveFps = max(fps, 0);
-}
-
-void Engine::setDebugDrawMode(int mode)
-{
-    mDebugDrawMode = mode;
 }
 
 void Engine::setFlushGPU(bool enable)
@@ -494,27 +495,12 @@ float Engine::getNextTimeStep()
     return timeAcc / 1000.0f;
 }
 
-void Engine::update(float timeStep, Scene* scene, Camera* camera, bool updateScene)
+void Engine::update(float timeStep)
 {
     PROFILE(Engine_Update);
     
     if (!mInitialized)
         return;
-    
-    // If client or server exist, they are assumed to update the scene on their own.
-    // In those cases set updateScene = false
-    if ((mClient) && (mClient->getScene() == scene))
-        updateScene = false;
-    if ((mServer) && (mServer->hasScene(scene)))
-        updateScene = false;
-    
-    // Make weak pointers of the scene & camera, in case update logic destroys them
-    WeakPtr<Scene> sceneWeak(scene);
-    WeakPtr<Camera> cameraWeak(camera);
-    
-    // Clear debug rendering output from last frame
-    if (mDebugRenderer)
-        mDebugRenderer->clear();
     
     // Input update
     mInput->update();
@@ -536,37 +522,15 @@ void Engine::update(float timeStep, Scene* scene, Camera* camera, bool updateSce
     if (mServer)
         mServer->update(timeStep);
     
-    // Scene update
-    if ((sceneWeak) && (updateScene))
-        scene->update(timeStep);
+    // Non-networked scenes update
+    sendEvent(EVENT_UPDATESCENES, updateData);
     
     // Application post-update
     sendEvent(EVENT_POSTUPDATE, updateData);
     
-    // Rendering and debug geometry update
+    // Rendering update
     if (mPipeline)
-    {
-        // Do not render if the scene is loading asynchronously, and thus incomplete
-        if ((sceneWeak) && (cameraWeak) && (!sceneWeak->isAsyncLoading()))
-        {
-            mPipeline->update(timeStep, scene->getExtension<Octree>(), camera);
-            
-            if (mDebugRenderer)
-            {
-                mDebugRenderer->setView(camera);
-                if (mDebugDrawMode & DEBUGDRAW_RENDERING)
-                    mPipeline->drawDebugGeometry(mDebugRenderer);
-                if (mDebugDrawMode & DEBUGDRAW_PHYSICS)
-                {
-                    PhysicsWorld* world = scene->getExtension<PhysicsWorld>();
-                    if (world)
-                        world->drawDebugGeometry(mDebugRenderer);
-                }
-            }
-        }
-        else
-            mPipeline->update(timeStep, 0, 0);
-    }
+        mPipeline->update(timeStep);
     
     if (mDebugHud)
         mDebugHud->update(timeStep);
@@ -589,12 +553,14 @@ void Engine::render()
     if (!mRenderer)
         return;
     
-    // Do not render if device lost
+    // Do not render if device lost. However send end frame event so that debug geometry is cleared
     if (!mRenderer->beginFrame())
+    {
+        sendEvent(EVENT_ENDFRAME);
         return;
+    }
     
     mPipeline->render();
-    mDebugRenderer->render();
     mUI->render();
     
     mRenderer->endFrame(mFlushGPU);

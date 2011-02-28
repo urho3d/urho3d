@@ -33,6 +33,8 @@ class Octree;
 class OctreeQuery;
 class RayOctreeQuery;
 
+static const unsigned NUM_OCTANTS = 8;
+
 //! Octree octant
 class Octant
 {
@@ -43,9 +45,9 @@ public:
     virtual ~Octant();
     
     //! Return or create a child octant
-    Octant* getOrCreateChild(unsigned x, unsigned y, unsigned z);
+    Octant* getOrCreateChild(unsigned index);
     //! Delete child octant
-    void deleteChild(unsigned x, unsigned y, unsigned z);
+    void deleteChild(unsigned index);
     //! Delete child octant by pointer
     void deleteChild(Octant* octant);
     //! Insert scene node by checking for fit recursively
@@ -76,10 +78,6 @@ public:
         }
     }
     
-    //! Return scene nodes by a query
-    void getNodes(OctreeQuery& query) const;
-    //! Return scene nodes by a ray query
-    void getNodes(RayOctreeQuery& query) const;
     //! Return world bounding box
     const BoundingBox& getWorldBoundingBox() const { return mWorldBoundingBox; }
     //! Return bounding box used for fitting nodes
@@ -129,7 +127,7 @@ protected:
     //! Parent octant
     Octant* mParent;
     //! Child octants
-    Octant* mChildren[2][2][2];
+    Octant* mChildren[NUM_OCTANTS];
     //! Octree root
     Octree* mRoot;
     //! Scene nodes
@@ -164,8 +162,24 @@ public:
     //! Scene extension update. Update octree when in headless mode
     virtual void update(float timeStep);
     
-    //! Resize octree. Should be empty at this point; any nodes will be removed
+    //! Resize octree. If octree is not empty, scene nodes will be temporarily moved to the root
     void resize(const BoundingBox& box, unsigned numLevels);
+    //! Set global exclude node flags for queries. For debugging/editing purposes only, will not be saved
+    void setExcludeFlags(unsigned nodeFlags);
+    //! Update and reinsert scene nodes. Called by Pipeline, or by update() if in headless mode
+    void updateOctree(const FrameInfo& frame);
+    
+    //! Return scene nodes by a query
+    void getNodes(OctreeQuery& query) const;
+    //! Return scene nodes by a ray query
+    void getNodes(RayOctreeQuery& query) const;
+    //! Return subdivision levels
+    unsigned getNumLevels() const { return mNumLevels; }
+    //! Return global exclude node flags
+    unsigned getExcludeFlags() const { return mExcludeFlags; }
+    //! Return whether is in headless mode
+    bool isHeadless() const { return mHeadless; }
+    
     //! Mark scene node as requiring an update
     void markNodeForUpdate(VolumeNode* node);
     //! Remove scene node from update list
@@ -174,13 +188,6 @@ public:
     void markNodeForReinsertion(VolumeNode* node);
     //! Remove scene node from reinsertion list
     void clearNodeReinsertion(VolumeNode* node);
-    //! Update and reinsert scene nodes
-    void updateOctree(const FrameInfo& frame);
-    
-    //! Return subdivision levels
-    unsigned getNumLevels() const { return mNumLevels; }
-    //! Return whether is in headless mode
-    bool isHeadless() const { return mHeadless; }
     
 private:
     //! Set of scene nodes that require update
@@ -189,6 +196,8 @@ private:
     std::set<VolumeNode*> mNodeReinsertions;
     //! Subdivision level
     unsigned mNumLevels;
+    //! Global query exclude flags
+    unsigned mExcludeFlags;
     //! Headless mode flag
     bool mHeadless;
 };

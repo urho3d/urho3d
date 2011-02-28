@@ -35,6 +35,7 @@
 #include "PixelShader.h"
 #include "Profiler.h"
 #include "Renderer.h"
+#include "Scene.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "VertexShader.h"
@@ -46,6 +47,8 @@ Zone View::sDefaultZone;
 Light* View::sSplitLights[MAX_LIGHT_SPLITS];
 std::vector<GeometryNode*> View::sLitGeometries[MAX_LIGHT_SPLITS];
 std::vector<GeometryNode*> View::sShadowCasters[MAX_LIGHT_SPLITS];
+
+static std::vector<VolumeNode*> tempNodes;
 
 static bool compareNodes(const VolumeNode* lhs, const VolumeNode* rhs)
 {
@@ -68,7 +71,7 @@ View::~View()
 {
 }
 
-void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget)
+void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget, IntRect screenRect)
 {
     if ((!octree) || (!camera))
     {
@@ -104,17 +107,14 @@ void View::define(Octree* octree, Camera* camera, RenderSurface* renderTarget)
         mDepthStencil = 0;
     mZone = &sDefaultZone;
     
-    // If there is a specified render texture, use its dimensions, else the main view size
-    if (renderTarget)
-    {
-        mWidth = renderTarget->getWidth();
-        mHeight = renderTarget->getHeight();
-    }
-    else
-    {
-        mWidth = renderer->getWidth();
-        mHeight = renderer->getHeight();
-    }
+    // Validate the rect and calculate size
+    screenRect.mLeft = clamp(screenRect.mLeft, 0, renderer->getWidth() - 1);
+    screenRect.mTop = clamp(screenRect.mTop, 0, renderer->getHeight() - 1);
+    screenRect.mRight = clamp(screenRect.mRight, screenRect.mLeft + 1, renderer->getWidth());
+    screenRect.mBottom = clamp(screenRect.mBottom, screenRect.mTop + 1, renderer->getHeight());
+    mScreenRect = screenRect;
+    mWidth = screenRect.mRight - screenRect.mLeft;
+    mHeight = screenRect.mBottom - screenRect.mTop;
     
     // Set possible quality overrides from the camera
     mDrawShadows = mPipeline->getDrawShadows() && (camera->getDrawShadowsOverride());
@@ -145,9 +145,15 @@ void View::update(const FrameInfo& frame)
     if ((!mCamera) || (!mOctree))
         return;
     
+    PROFILE(Pipeline_UpdateView);
+    
     mFrame.mCamera = mCamera;
     mFrame.mTimeStep = frame.mTimeStep;
     mFrame.mFrameNumber = frame.mFrameNumber;
+    
+    // Set automatic aspect ratio if required
+    if (mCamera->getAutoAspectRatio())
+        mCamera->setAspectRatio((float)(mScreenRect.mRight - mScreenRect.mLeft) / (float)(mScreenRect.mBottom - mScreenRect.mTop));
     
     mCamera->markInView(mFrame.mFrameNumber);
     getNodes();
@@ -164,6 +170,11 @@ void View::render()
         return;
     
     Renderer* renderer = mPipeline->getRenderer();
+    
+    // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
+    // again to ensure the correct projection will be used
+    if (mCamera->getAutoAspectRatio())
+        mCamera->setAspectRatio((float)(mScreenRect.mRight - mScreenRect.mLeft) / (float)(mScreenRect.mBottom - mScreenRect.mTop));
     
     // Set the "view texture" to ensure the rendertarget will not be bound as a texture during G-buffer rendering
     if (mRenderTarget)
@@ -201,6 +212,18 @@ void View::render()
     else
         renderBatchesForward();
     
+    // If this is a main view, draw the associated debug geometry
+    if (!mRenderTarget)
+    {
+        Scene* scene = mOctree->getScene();
+        if (scene)
+        {
+            DebugRenderer* debug = mOctree->getScene()->getExtension<DebugRenderer>();
+            if (debug)
+                debug->render(mCamera);
+        }
+    }
+    
     // "Forget" the camera, octree and zone after rendering
     mCamera = 0;
     mOctree = 0;
@@ -216,7 +239,7 @@ void View::getNodes()
     
     // Get zones & find the zone camera is in
     static std::vector<Zone*> zones;
-    PointOctreeQuery query(mCamera->getWorldPosition(), reinterpret_cast<std::vector<VolumeNode*>& >(zones), NODE_ZONE);
+    PointOctreeQuery query(reinterpret_cast<std::vector<VolumeNode*>& >(zones), mCamera->getWorldPosition(), NODE_ZONE);
     mOctree->getNodes(query);
     
     int highestZonePriority = M_MIN_INT;
@@ -237,8 +260,8 @@ void View::getNodes()
     
     if (mMaxOccluderTriangles > 0)
     {
-        FrustumOctreeQuery query(mCamera->getFrustum(), reinterpret_cast<std::vector<VolumeNode*>& >(mOccluders),
-            NODE_GEOMETRY, 0, true, false);
+        FrustumOctreeQuery query(reinterpret_cast<std::vector<VolumeNode*>& >(mOccluders), mCamera->getFrustum(),
+            NODE_GEOMETRY, true, false);
         
         mOctree->getNodes(query);
         updateOccluders(mOccluders, *mCamera);
@@ -253,18 +276,16 @@ void View::getNodes()
         }
     }
     
-    static std::vector<VolumeNode*> tempNodes;
-    
     if (!useOcclusion)
     {
         // Get geometries & lights without occlusion
-        FrustumOctreeQuery query(mCamera->getFrustum(), tempNodes, NODE_GEOMETRY | NODE_LIGHT);
+        FrustumOctreeQuery query(tempNodes, mCamera->getFrustum(), NODE_GEOMETRY | NODE_LIGHT);
         mOctree->getNodes(query);
     }
     else
     {
         // Get geometries & lights using occlusion
-        OccludedFrustumOctreeQuery query(mCamera->getFrustum(), buffer, tempNodes, NODE_GEOMETRY | NODE_LIGHT);
+        OccludedFrustumOctreeQuery query(tempNodes, mCamera->getFrustum(), buffer, NODE_GEOMETRY | NODE_LIGHT);
         mOctree->getNodes(query);
     }
     
@@ -462,8 +483,8 @@ unsigned View::processLight(Light* light)
         Camera& shadowCamera = light->getShadowCamera();
         
         // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery query(shadowCamera.getFrustum(), reinterpret_cast<std::vector<VolumeNode*>& >(mShadowOccluders),
-            NODE_GEOMETRY, 0, true, true);
+        FrustumOctreeQuery query(reinterpret_cast<std::vector<VolumeNode*>& >(mShadowOccluders), shadowCamera.getFrustum(),
+            NODE_GEOMETRY, true, true);
         mOctree->getNodes(query);
         
         updateOccluders(mShadowOccluders, shadowCamera);
@@ -502,8 +523,6 @@ unsigned View::processLight(Light* light)
         
         BoundingBox geometryBox;
         BoundingBox shadowCasterBox;
-        
-        static std::vector<VolumeNode*> tempLitNodes;
         
         switch (type)
         {
@@ -561,38 +580,36 @@ unsigned View::processLight(Light* light)
                 if (!useOcclusion)
                 {
                     // Get potential shadow casters without occlusion
-                    FrustumOctreeQuery query(shadowCamera.getFrustum(), tempLitNodes, NODE_GEOMETRY);
+                    FrustumOctreeQuery query(tempNodes, shadowCamera.getFrustum(), NODE_GEOMETRY);
                     mOctree->getNodes(query);
                 }
                 else
                 {
                     // Get potential shadow casters with occlusion
-                    OccludedFrustumOctreeQuery query(shadowCamera.getFrustum(), buffer, tempLitNodes,
+                    OccludedFrustumOctreeQuery query(tempNodes, shadowCamera.getFrustum(), buffer, 
                         NODE_GEOMETRY);
                     mOctree->getNodes(query);
                 }
                 
-                processLightQuery(i, tempLitNodes, false, isSplitShadowed, geometryBox, shadowCasterBox);
+                processLightQuery(i, tempNodes, geometryBox, shadowCasterBox, false, isSplitShadowed);
             }
             break;
             
         case LIGHT_POINT:
             {
-                SphereOctreeQuery query(Sphere(sSplitLights[i]->getWorldPosition(), sSplitLights[i]->getRange()),
-                    tempLitNodes, NODE_GEOMETRY);
+                SphereOctreeQuery query(tempNodes, Sphere(sSplitLights[i]->getWorldPosition(), sSplitLights[i]->getRange()),
+                    NODE_GEOMETRY);
                 mOctree->getNodes(query);
-                
-                processLightQuery(i, tempLitNodes, true, false, geometryBox, shadowCasterBox);
+                processLightQuery(i, tempNodes, geometryBox, shadowCasterBox, true, false);
             }
             break;
             
         case LIGHT_SPOT:
         case LIGHT_SPLITPOINT:
             {
-                FrustumOctreeQuery query(sSplitLights[i]->getFrustum(), tempLitNodes, NODE_GEOMETRY);
+                FrustumOctreeQuery query(tempNodes, sSplitLights[i]->getFrustum(), NODE_GEOMETRY);
                 mOctree->getNodes(query);
-                
-                processLightQuery(i, tempLitNodes, true, isSplitShadowed, geometryBox, shadowCasterBox);
+                processLightQuery(i, tempNodes, geometryBox, shadowCasterBox, true, isSplitShadowed);
             }
             break;
         }
@@ -651,13 +668,14 @@ unsigned View::processLight(Light* light)
     return splitLights;
 }
 
-void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& result,
-    bool getLitGeometries, bool getShadowCasters, BoundingBox& geometryBox, BoundingBox& shadowCasterBox)
+void View::processLightQuery(unsigned splitIndex, const std::vector<VolumeNode*>& result, BoundingBox& geometryBox,
+    BoundingBox& shadowCasterBox, bool getLitGeometries, bool getShadowCasters)
 {
     Renderer* renderer = mPipeline->getRenderer();
+    Light* light = sSplitLights[splitIndex];
     
     // Transform scene frustum into shadow camera's view space for shadow caster visibility check
-    Camera& shadowCamera = sSplitLights[index]->getShadowCamera();
+    Camera& shadowCamera = light->getShadowCamera();
     const Matrix4x3& lightView = shadowCamera.getInverseWorldTransform();
     const Matrix4& lightProj = shadowCamera.getProjection();
     
@@ -665,7 +683,7 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
     // intersection of the scene frustum and the split frustum, so that shadow casters do not get
     // rendered into unnecessary splits
     Frustum lightViewFrustum;
-    if (sSplitLights[index]->getLightType() != LIGHT_DIRECTIONAL)
+    if (light->getLightType() != LIGHT_DIRECTIONAL)
     {
         lightViewFrustum = mCamera->getSplitFrustum(
             mSceneViewBox.mMin.mZ, mSceneViewBox.mMax.mZ).getTransformed(lightView);
@@ -673,8 +691,8 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
     else
     {
         lightViewFrustum = mCamera->getSplitFrustum(
-            max(mSceneViewBox.mMin.mZ, sSplitLights[index]->getNearSplit() - sSplitLights[index]->getNearFadeRange()),
-            min(mSceneViewBox.mMax.mZ, sSplitLights[index]->getFarSplit())
+            max(mSceneViewBox.mMin.mZ, light->getNearSplit() - light->getNearFadeRange()),
+            min(mSceneViewBox.mMax.mZ, light->getFarSplit())
         ).getTransformed(lightView);
     }
     BoundingBox lightViewFrustumBox;
@@ -685,13 +703,12 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
         getShadowCasters = false;
     
     // Generate merged light view geometry/shadowcaster bounding boxes box for shadow focusing
-    bool mergeBoxes = (sSplitLights[index]->getLightType() != LIGHT_SPLITPOINT) && (sSplitLights[index]->getShadowMap()) &&
-        (sSplitLights[index]->getShadowFocus().mFocus);
+    bool mergeBoxes = (light->getLightType() != LIGHT_SPLITPOINT) && (light->getShadowMap()) && (light->getShadowFocus().mFocus);
     bool projectBoxes = !shadowCamera.isOrthographic();
     
     BoundingBox lightViewBox;
     BoundingBox lightProjBox;
-    unsigned lightMask = sSplitLights[index]->getLightMask();
+    unsigned lightMask = light->getLightMask();
     
     for (unsigned i = 0; i < result.size(); ++i)
     {
@@ -729,7 +746,7 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
                     boxGenerated = true;
                 }
                 
-                sLitGeometries[index].push_back(geom);
+                sLitGeometries[splitIndex].push_back(geom);
             }
         }
         
@@ -773,7 +790,7 @@ void View::processLightQuery(unsigned index, const std::vector<VolumeNode*>& res
                             geom->markInShadowView(mFrame);
                             geom->updateGeometry(mFrame, renderer);
                         }
-                        sShadowCasters[index].push_back(geom);
+                        sShadowCasters[splitIndex].push_back(geom);
                     }
                     break;
                 }
@@ -1201,7 +1218,7 @@ void View::checkTechniqueForAuxView(MaterialTechnique* technique)
                     // Add the view only if it has not been added already
                     Camera* camera = target->getCamera();
                     if ((camera) && (!camera->isInView(mFrame.mFrameNumber)))
-                        mPipeline->addView(mOctree, camera, target);
+                        mPipeline->addView(mOctree, camera, target, IntRect(0, 0, tex2D->getWidth(), tex2D->getHeight()));
                 }
             }
             else if (texture->getType() == TextureCube::getTypeStatic())
@@ -1215,7 +1232,7 @@ void View::checkTechniqueForAuxView(MaterialTechnique* technique)
                         // Add the view only if it has not been added already
                         Camera* camera = target->getCamera();
                         if ((camera) && (!camera->isInView(mFrame.mFrameNumber)))
-                            mPipeline->addView(mOctree, camera, target);
+                            mPipeline->addView(mOctree, camera, target, IntRect(0, 0, texCube->getWidth(), texCube->getHeight()));
                     }
                 }
             }

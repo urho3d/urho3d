@@ -110,19 +110,25 @@ void Component::setNetFlags(unsigned char flags)
         mNetFlags = flags;
 }
 
+unsigned Component::getGroupFlags() const
+{
+    if (!mEntity)
+        return 0;
+    
+    return mEntity->getGroupFlags();
+}
+
 bool Component::isPlayback() const
 {
     if (!mEntity)
         return false;
+    
     return mEntity->isPlayback();
 }
 
 bool Component::checkSync(Connection* connection) const
 {
-    if (!mEntity)
-        return false;
-    
-    if ((mNetFlags & NET_SYNCTONONE) || (mEntity->getNetFlags() & NET_SYNCTONONE))
+    if ((!mEntity) || (mNetFlags & NET_SYNCTONONE) || (mEntity->getNetFlags() & NET_SYNCTONONE))
         return false;
     
     if ((mNetFlags & NET_SYNCTOOWNER) || (mEntity->getNetFlags() & NET_SYNCTOOWNER))
@@ -135,6 +141,7 @@ bool Component::checkPrediction(Connection* connection) const
 {
     if ((!mEntity) || (!(mNetFlags & NET_PREDICTIONFLAGS)))
         return false;
+    
     return mEntity->checkPrediction(connection);
 }
 

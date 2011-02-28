@@ -574,7 +574,7 @@ void Client::handleServerUpdate(VectorBuffer& packet, bool initial)
     else
     {
         // If initial/full update, remove all old proxy entities
-        mScene->removeAllEntities(NET_PROXY);
+        mScene->removeEntities(NET_PROXY);
         LOGINFO("Initial scene: " + toString(packet.getSize()) + " bytes");
     }
     
@@ -724,8 +724,10 @@ unsigned Client::checkPackages()
     
     // To avoid resource version conflicts and to keep the amount of open packages reasonable, remove all existing
     // downloaded packages from the resource cache first
-    std::vector<std::string> downloadedPackages = scanDirectory(mDownloadDirectory, "*.pak", SCAN_FILES, false);
+    std::vector<std::string> downloadedPackages;
     std::vector<SharedPtr<PackageFile> > registeredPackages = mCache->getPackageFiles();
+    scanDirectory(downloadedPackages, mDownloadDirectory, "*.pak", SCAN_FILES, false);
+    
     for (std::vector<SharedPtr<PackageFile> >::iterator i = registeredPackages.begin(); i != registeredPackages.end();)
     {
         if ((*i)->getName().find(mDownloadDirectory) != std::string::npos)

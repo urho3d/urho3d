@@ -39,10 +39,9 @@ class OctreeQuery
 {
 public:
     //! Construct with result vector, include/exclude flags and whether to get only occluders or shadowcasters
-    OctreeQuery(std::vector<VolumeNode*>& result, unsigned includeFlags, unsigned excludeFlags, bool occludersOnly, bool shadowCastersOnly) :
+    OctreeQuery(std::vector<VolumeNode*>& result, unsigned nodeFlags, bool occludersOnly, bool shadowCastersOnly) :
         mResult(result),
-        mIncludeFlags(includeFlags),
-        mExcludeFlags(excludeFlags),
+        mNodeFlags(nodeFlags),
         mOccludersOnly(occludersOnly),
         mShadowCastersOnly(shadowCastersOnly)
     {
@@ -61,9 +60,7 @@ public:
     //! Result vector reference
     std::vector<VolumeNode*>& mResult;
     //! Scene node flags to include
-    unsigned mIncludeFlags;
-    //! Scene node flags to exclude
-    unsigned mExcludeFlags;
+    unsigned mNodeFlags;
     //! Get occluders only flag
     bool mOccludersOnly;
     //! Get shadowcasters only flag
@@ -75,8 +72,9 @@ class PointOctreeQuery : public OctreeQuery
 {
 public:
     //! Construct with point and query parameters
-    PointOctreeQuery(const Vector3& point, std::vector<VolumeNode*>& result, unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, includeFlags, excludeFlags, occludersOnly, shadowCastersOnly),
+    PointOctreeQuery(std::vector<VolumeNode*>& result, const Vector3& point, unsigned nodeFlags, bool occludersOnly = false,
+        bool shadowCastersOnly = false) :
+        OctreeQuery(result, nodeFlags, occludersOnly, shadowCastersOnly),
         mPoint(point)
     {
     }
@@ -95,8 +93,9 @@ class SphereOctreeQuery : public OctreeQuery
 {
 public:
     //! Construct with sphere and query parameters
-    SphereOctreeQuery(const Sphere& sphere, std::vector<VolumeNode*>& result, unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, includeFlags, excludeFlags, occludersOnly, shadowCastersOnly),
+    SphereOctreeQuery(std::vector<VolumeNode*>& result, const Sphere& sphere, unsigned nodeFlags, bool occludersOnly = false,
+        bool shadowCastersOnly = false) :
+        OctreeQuery(result, nodeFlags, occludersOnly, shadowCastersOnly),
         mSphere(sphere)
     {
     }
@@ -115,8 +114,9 @@ class BoxOctreeQuery : public OctreeQuery
 {
 public:
     //! Construct with bounding box and query parameters
-    BoxOctreeQuery(const BoundingBox& box, std::vector<VolumeNode*>& result, unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, includeFlags, excludeFlags, occludersOnly, shadowCastersOnly),
+    BoxOctreeQuery(std::vector<VolumeNode*>& result, const BoundingBox& box, unsigned nodeFlags, bool occludersOnly = false,
+        bool shadowCastersOnly = false) :
+        OctreeQuery(result, nodeFlags, occludersOnly, shadowCastersOnly),
         mBox(box)
     {
     }
@@ -135,8 +135,9 @@ class FrustumOctreeQuery : public OctreeQuery
 {
 public:
     //! Construct with frustum and query parameters
-    FrustumOctreeQuery(const Frustum& frustum, std::vector<VolumeNode*>& result, unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, includeFlags, excludeFlags, occludersOnly, shadowCastersOnly),
+    FrustumOctreeQuery(std::vector<VolumeNode*>& result, const Frustum& frustum, unsigned nodeFlags, bool occludersOnly = false,
+        bool shadowCastersOnly = false) :
+        OctreeQuery(result, nodeFlags, occludersOnly, shadowCastersOnly),
         mFrustum(frustum)
     {
     }
@@ -155,9 +156,9 @@ class OccludedFrustumOctreeQuery : public OctreeQuery
 {
 public:
     //! Construct with frustum, occlusion buffer pointer and query parameters
-    OccludedFrustumOctreeQuery(const Frustum& frustum, OcclusionBuffer* buffer, std::vector<VolumeNode*>& result,
-            unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, includeFlags, excludeFlags, occludersOnly, shadowCastersOnly),
+    OccludedFrustumOctreeQuery(std::vector<VolumeNode*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
+            unsigned nodeFlags, bool occludersOnly = false, bool shadowCastersOnly = false) :
+        OctreeQuery(result, nodeFlags, occludersOnly, shadowCastersOnly),
         mFrustum(frustum),
         mBuffer(buffer)
     {
@@ -205,11 +206,11 @@ class RayOctreeQuery
 {
 public:
     //! Construct with ray and query parameters
-    RayOctreeQuery(const Ray& ray, std::vector<RayQueryResult>& result, unsigned includeFlags, unsigned excludeFlags = 0, bool occludersOnly = false, bool shadowCastersOnly = false, float maxDistance = M_INFINITY, RayQueryLevel level = RAY_TRIANGLE) :
+    RayOctreeQuery(std::vector<RayQueryResult>& result, const Ray& ray, unsigned nodeFlags, bool occludersOnly = false,
+        bool shadowCastersOnly = false, float maxDistance = M_INFINITY, RayQueryLevel level = RAY_TRIANGLE) :
         mRay(ray),
         mResult(result),
-        mIncludeFlags(includeFlags),
-        mExcludeFlags(excludeFlags),
+        mNodeFlags(nodeFlags),
         mOccludersOnly(occludersOnly),
         mShadowCastersOnly(shadowCastersOnly),
         mMaxDistance(maxDistance),
@@ -222,9 +223,7 @@ public:
     //! Result vector reference
     std::vector<RayQueryResult>& mResult;
     //! Scene node flags to include
-    unsigned mIncludeFlags;
-    //! Scene node flags to exclude
-    unsigned mExcludeFlags;
+    unsigned mNodeFlags;
     //! Get occluders only flag
     bool mOccludersOnly;
     //! Get shadowcasters only flag

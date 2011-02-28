@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_config.h
@@ -828,6 +829,11 @@
 #if !defined(AS_POSIX_THREADS) && !defined(AS_WINDOWS_THREADS)
 	#define AS_NO_THREADS
 #endif
+
+
+// Urho3D: disable threading, always use float type
+#define AS_NO_THREADS
+#define AS_USE_DOUBLE_AS_FLOAT
 
 
 // The assert macro

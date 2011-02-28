@@ -101,13 +101,15 @@ void AIController::makeHarder()
 void AIController::control(Ninja* ninja, float time)
 {
     // Get closest ninja on the players' side
+    static std::vector<Entity*> entities;
+    ninja->getScene()->getEntitiesWithComponent<Ninja>(entities);
+    
     Ninja* target = 0;
     float closestDistance = M_INFINITY;
-    Scene* scene = ninja->getScene();
-    const std::map<EntityID, SharedPtr<Entity> >& entities = scene->getEntities();
-    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = entities.begin(); i != entities.end(); ++i)
+    
+    for (unsigned i = 0; i < entities.size(); ++i)
     {
-        Entity* entity = i->second;
+        Entity* entity = entities[i];
         Ninja* testTarget = entity->getComponent<Ninja>();
         if (testTarget)
         {

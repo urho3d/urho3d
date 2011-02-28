@@ -32,17 +32,12 @@
 #include <string>
 #include <vector>
 
-static const int DEBUGDRAW_NONE = 0;
-static const int DEBUGDRAW_RENDERING = 1;
-static const int DEBUGDRAW_PHYSICS = 2;
-
 class Audio;
 class Camera;
 class Client;
 class Console;
 class Cursor;
 class DebugHud;
-class DebugRenderer;
 class Input;
 class Log;
 class Network;
@@ -70,8 +65,8 @@ public:
     
     //! Initialize and show the application window
     void init(const std::vector<std::string>& arguments = std::vector<std::string>());
-    //! Run one frame with the scene and camera given
-    void runFrame(Scene* scene, Camera* camera, bool updateScene = true);
+    //! Run one frame
+    void runFrame();
     //! Create a scene
     SharedPtr<Scene> createScene(const std::string& name = "Default", const BoundingBox& octreeSize =
         BoundingBox(-1000.0f, 1000.0f), unsigned octreeLevels = 8, bool usePhysics = true);
@@ -101,8 +96,6 @@ public:
     void setMaxFps(int fps);
     //! Set maximum frames per second when the application is inactive
     void setMaxInactiveFps(int fps);
-    //! Set debug draw mode: whether to draw rendering or physics debug information, or both
-    void setDebugDrawMode(int mode);
     //! Set whether the GPU is flushed after each frame. Can prevent mouse latency and frame rate jitter, but reduces CPU/GPU parallelism
     void setFlushGPU(bool enable);
     //! Close the application window and set the exit flag
@@ -120,8 +113,6 @@ public:
     Console* getConsole() const { return mConsole; }
     //! Return debug hud if created
     DebugHud* getDebugHud() const { return mDebugHud; }
-    //! Return debug renderer
-    DebugRenderer* getDebugRenderer() const { return mDebugRenderer; }
     //! Return input subsystem
     Input* getInput() const { return mInput; }
     //! Return log
@@ -154,8 +145,6 @@ public:
     int getMaxFps() const { return mMaxFps; }
     //! Return the maximum frames per second when the application is inactive
     int getMaxInactiveFps() const { return mMaxInactiveFps; }
-    //! Return the debug draw mode
-    int getDebugDrawMode() const { return mDebugDrawMode; }
     //! Return the GPU flush flag
     bool getFlushGPU() const { return mFlushGPU; }
     //! Return whether engine has been initialized
@@ -168,7 +157,7 @@ public:
     //! Return the timestep for the next frame and sleep for frame limiting if necessary
     float getNextTimeStep();
     //! Run the update for one frame
-    void update(float timeStep, Scene* scene, Camera* camera, bool updateScene = true);
+    void update(float timeStep);
     //! Run the rendering for one frame
     void render();
     
@@ -190,8 +179,6 @@ private:
     SharedPtr<ResourceCache> mCache;
     //! High-level rendering pipeline
     SharedPtr<Pipeline> mPipeline;
-    //! Debug renderer
-    SharedPtr<DebugRenderer> mDebugRenderer;
     //! UI subsystem
     SharedPtr<UI> mUI;
     //! Network subsystem
@@ -218,8 +205,6 @@ private:
     unsigned mMaxFps;
     //! Maximum frames per second when the application is inactive
     unsigned mMaxInactiveFps;
-    //! Debug draw mode
-    unsigned mDebugDrawMode;
     //! Flush GPU flag
     bool mFlushGPU;
     //! Initialized flag

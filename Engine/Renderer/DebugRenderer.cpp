@@ -24,11 +24,13 @@
 #include "Precompiled.h"
 #include "AnimatedModel.h"
 #include "DebugRenderer.h"
+#include "Exception.h"
 #include "Light.h"
 #include "Log.h"
 #include "PixelShader.h"
 #include "Profiler.h"
 #include "Renderer.h"
+#include "RendererEvents.h"
 #include "RendererImpl.h"
 #include "ResourceCache.h"
 #include "VertexShader.h"
@@ -39,40 +41,25 @@ DebugRenderer::DebugRenderer(Renderer* renderer, ResourceCache* cache) :
     mRenderer(renderer),
     mCache(cache)
 {
-    LOGINFO("Debug renderer created");
+    if (!mRenderer)
+        EXCEPTION("Null renderer for DebugRenderer");
     
     mDebugVS = mCache->getResource<VertexShader>("Shaders/SM2/Basic_VCol.vs2");
     mDebugPS = mCache->getResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
+    
+    subscribeToEvent(EVENT_ENDFRAME, EVENT_HANDLER(DebugRenderer, handleEndFrame));
 }
 
 DebugRenderer::~DebugRenderer()
 {
-    LOGINFO("Debug renderer shut down");
 }
 
-void DebugRenderer::clear()
+void DebugRenderer::render(Camera* camera)
 {
-    mLines.clear();
-    mNoDepthLines.clear();
-}
-
-void DebugRenderer::setView(Camera* camera)
-{
-    if (camera)
-        mViewProj = camera->getProjection() * camera->getInverseWorldTransform();
-    else
-        mViewProj = Matrix4::sIdentity;
-}
-
-void DebugRenderer::render()
-{
+    if ((!camera) || ((!mLines.size()) && (!mNoDepthLines.size())))
+        return;
+    
     PROFILE(DebugGeometry_Render);
-    
-    if (!mRenderer)
-        return;
-    
-    if ((!mLines.size()) && (!mNoDepthLines.size()))
-        return;
     
     mRenderer->setAlphaTest(false);
     mRenderer->setBlendMode(BLEND_REPLACE);
@@ -85,7 +72,7 @@ void DebugRenderer::render()
     mRenderer->setStencilTest(false);
     mRenderer->setVertexShader(mDebugVS);
     mRenderer->setPixelShader(mDebugPS);
-    mRenderer->setVertexShaderConstant(getVSRegister(VSP_MODELVIEWPROJ), mViewProj);
+    mRenderer->setVertexShaderConstant(getVSRegister(VSP_MODELVIEWPROJ), camera->getProjection() * camera->getInverseWorldTransform());
     mRenderer->setPixelShaderConstant(getPSRegister(PSP_MATDIFFCOLOR), Color(1.0f, 1.0f, 1.0f, 1.0f));
     
     // Draw all line geometry with depth testing
@@ -256,4 +243,10 @@ void DebugRenderer::addSkeleton(const Skeleton& skeleton, const Color& color, bo
         
         dest->push_back(newLine);
     }
+}
+
+void DebugRenderer::handleEndFrame(StringHash eventType, VariantMap& eventData)
+{
+    mLines.clear();
+    mNoDepthLines.clear();
 }

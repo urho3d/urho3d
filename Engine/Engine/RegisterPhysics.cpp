@@ -58,7 +58,7 @@ static RigidBody* PhysicsRaycastResultGetBody(PhysicsRaycastResult* ptr)
 static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
 {
     static std::vector<PhysicsRaycastResult> result;
-    ptr->raycast(ray, result, maxDistance, collisionMask);
+    ptr->raycast(result, ray, maxDistance, collisionMask);
     return vectorToArray<PhysicsRaycastResult>(result, "array<PhysicsRaycastResult>");
 }
 
@@ -74,6 +74,7 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsRaycastResult", "RigidBody@+ get_body() const", asFUNCTION(PhysicsRaycastResultGetBody), asCALL_CDECL_OBJLAST);
     
     registerHashedType<PhysicsWorld>(engine, "PhysicsWorld");
+    engine->RegisterObjectMethod("PhysicsWorld", "void update(float)", asMETHOD(PhysicsWorld, update), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setGravity(const Vector3& in)", asMETHOD(PhysicsWorld, setGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setFps(int)", asMETHOD(PhysicsWorld, setFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setMaxContacts(uint)", asMETHOD(PhysicsWorld, setMaxContacts), asCALL_THISCALL);
@@ -87,6 +88,7 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void setCFM(float)", asMETHOD(PhysicsWorld, setCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setContactSurfaceLayer(float)", asMETHOD(PhysicsWorld, setContactSurfaceLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "array<PhysicsRaycastResult>@ raycast(const Ray& in, float, uint)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "void drawDebugGeometry()", asMETHOD(PhysicsWorld, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 getGravity() const", asMETHOD(PhysicsWorld, getGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int getFps() const", asMETHOD(PhysicsWorld, getFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "uint getMaxContacts() const", asMETHOD(PhysicsWorld, getMaxContacts), asCALL_THISCALL);
@@ -118,38 +120,17 @@ static CollisionShape* ConstructCollisionShape(const std::string& name)
 
 static void CollisionShapeAddTriangleMesh(const Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation, CollisionShape* ptr)
 {
-    try
-    {
-        ptr->addTriangleMesh(model, lodLevel, position, rotation);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->addTriangleMesh(model, lodLevel, position, rotation));
 }
 
 static void CollisionShapeAddHeightfield(const Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation, CollisionShape* ptr)
 {
-    try
-    {
-        ptr->addHeightfield(model, xPoints, zPoints, thickness, lodLevel, position, rotation);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->addHeightfield(model, xPoints, zPoints, thickness, lodLevel, position, rotation));
 }
 
 static void CollisionShapeAddConvexHull(const Model* model, float skinWidth, unsigned lodLevel, const Vector3& position, const Quaternion& rotation, CollisionShape* ptr)
 {
-    try
-    {
-        ptr->addConvexHull(model, skinWidth, lodLevel, position, rotation);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->addConvexHull(model, skinWidth, lodLevel, position, rotation));
 }
 
 static void registerCollisionShape(asIScriptEngine* engine)

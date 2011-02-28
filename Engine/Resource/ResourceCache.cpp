@@ -55,13 +55,29 @@ void ResourceCache::addResourceFactory(ResourceFactory* factory)
 
 void ResourceCache::addResourcePath(const std::string& path)
 {
+    std::string fixedPath = fixPath(path);
+    std::string pathLower = toLower(fixedPath);
+    // Check that the same path does not already exist
+    for (unsigned i = 0; i < mResourcePaths.size(); ++i)
+    {
+        if (toLower(mResourcePaths[i]) == pathLower)
+            return;
+    }
+    
+    if (!directoryExists(path))
+    {
+        LOGERROR("Could not open directory " + path);
+        return;
+    }
+    
     checkDirectoryAccess(path);
     
-    std::string fixedPath = fixPath(path);
+
     mResourcePaths.push_back(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
-    std::vector<std::string> fileNames = scanDirectory(fixedPath, "*.*", SCAN_FILES, true);
+    std::vector<std::string> fileNames;
+    scanDirectory(fileNames, fixedPath, "*.*", SCAN_FILES, true);
     for (unsigned i = 0; i < fileNames.size(); ++i)
         registerHash(fileNames[i]);
     
@@ -327,19 +343,16 @@ Resource* ResourceCache::getResource(ShortStringHash type, StringHash nameHash)
     }
 }
 
-std::vector<Resource*> ResourceCache::getResources(ShortStringHash type)
+void ResourceCache::getResources(std::vector<Resource*>& result, ShortStringHash type) const
 {
-    std::vector<Resource*> ret;
-    
+    result.clear();
     std::map<ShortStringHash, ResourceGroup>::const_iterator i = mResourceGroups.find(type);
     if (i != mResourceGroups.end())
     {
         for (std::map<StringHash, SharedPtr<Resource> >::const_iterator j = i->second.mResources.begin();
             j != i->second.mResources.end(); ++j)
-            ret.push_back(j->second);
+            result.push_back(j->second);
     }
-    
-    return ret;
 }
 
 bool ResourceCache::exists(const std::string& name) const

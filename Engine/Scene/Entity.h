@@ -86,9 +86,9 @@ public:
     //! Let each component perform network client-side visual smoothing
     void interpolate(bool snapToEnd = false);
     //! Let each component list component references
-    void getComponentRefs(std::vector<ComponentRef>& dest);
+    void getComponentRefs(std::vector<ComponentRef>& result);
     //! Let each component list resource references
-    void getResourceRefs(std::vector<Resource*>& dest);
+    void getResourceRefs(std::vector<Resource*>& result);
     //! Set name
     void setName(const std::string& name);
    //! Set group flags
@@ -189,7 +189,7 @@ public:
     //! Return all components
     const std::vector<SharedPtr<Component> >& getComponents() const { return mComponents; }
     //! Return components of a specific type
-    std::vector<Component*> getComponents(ShortStringHash type) const;
+    void getComponents(std::vector<Component*>& result, ShortStringHash type) const;
     //! Return whether is in a server scene
     bool isAuthority() const { return (mNetFlags & NET_AUTHORITY) != 0; }
     //! Return whether is in a client scene
@@ -230,9 +230,9 @@ public:
     //! Return component derived from class with specific name hash
     template <class T> T* getDerivedComponent(StringHash nameHash) const;
     //! Template version of returning components of specific type
-    template <class T> std::vector<T*> getComponents() const;
+    template <class T> void getComponents(std::vector<T*>& result) const;
     //! Return all components derived from class
-    template <class T> std::vector<T*> getDerivedComponents() const;
+    template <class T> void getDerivedComponents(std::vector<T*>& result) const;
     
 private:
     //! Remove a component by iterator
@@ -411,34 +411,25 @@ template <class T> T* Entity::getDerivedComponent(StringHash nameHash) const
     return 0;
 }
 
-template <class T> std::vector<T*> Entity::getComponents() const
+template <class T> void Entity::getComponents(std::vector<T*>& result) const
 {
-    std::vector<T*> components;
-    ShortStringHash type = T::getTypeStatic();
-    
+    result.clear();
     for (std::vector<SharedPtr<Component> >::const_iterator i = mComponents.begin(); i != mComponents.end(); ++i)
     {
-        if ((*i)->getType() == type)
-            components.push_back(static_cast<T*>(i->getPtr()));
+        if ((*i)->getType() == T::getTypeStatic())
+            result.push_back(static_cast<T*>(i->getPtr()));
     }
-    
-    return components;
 }
 
-template <class T> std::vector<T*> Entity::getDerivedComponents() const
+template <class T> void Entity::getDerivedComponents(std::vector<T*>& result) const
 {
-    std::vector<T*> components;
-    
-    std::vector<SharedPtr<Component> >::const_iterator i = mComponents.begin();
-    while (i != mComponents.end())
+    result.clear();
+    for (std::vector<SharedPtr<Component> >::const_iterator i = mComponents.begin(); i != mComponents.end(); ++i)
     {
         T* ptr = dynamic_cast<T*>(i->getPtr());
         if (ptr)
-            components.push_back(ptr);
-        ++i;
+            result.push_back(ptr);
     }
-    
-    return components;
 }
 
 #endif // SCENE_ENTITY_H

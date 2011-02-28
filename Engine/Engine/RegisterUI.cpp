@@ -384,15 +384,7 @@ static void registerWindow(asIScriptEngine* engine)
 
 static FileSelector* ConstructFileSelector()
 {
-    try
-    {
-        return new FileSelector(getEngine()->getUI());
-    }
-    catch (Exception& e)
-    {
-        // Rethrow after FileSelector has been deallocated
-        SAFE_RETHROW_RET(e, 0);
-    }
+    TRY_CONSTRUCT(new FileSelector(getEngine()->getUI()));
 }
 
 static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex, FileSelector* ptr)

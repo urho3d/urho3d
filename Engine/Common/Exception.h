@@ -38,6 +38,8 @@
 #endif
 #define SAFE_RETHROW(e) { checkAndRethrowException(e); return; }
 #define SAFE_RETHROW_RET(e, ret) { checkAndRethrowException(e); return ret; }
+#define TRY_SAFE_RETHROW(operation) try { operation; } catch (Exception& e) { checkAndRethrowException(e); return; }
+#define TRY_CONSTRUCT(operation) try { return operation; } catch (Exception& e) { checkAndRethrowException(e); return 0; }
 
 //! Urho3D exception class
 class Exception : public std::exception

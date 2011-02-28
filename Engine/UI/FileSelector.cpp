@@ -293,30 +293,26 @@ void FileSelector::refreshFiles()
     
     mFileList->removeAllItems();
     mFileEntries.clear();
+
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+    scanDirectory(directories, mPath, "*.*", SCAN_DIRECTORIES, false);
+    scanDirectory(files, mPath, getFilter(), SCAN_FILES, false);
     
-    try
+    for (unsigned i = 0; i < directories.size(); ++i)
     {
-        std::vector<std::string> directories = scanDirectory(mPath, "*.*", SCAN_DIRECTORIES, false);
-        std::vector<std::string> files = scanDirectory(mPath, getFilter(), SCAN_FILES, false);
-        
-        for (unsigned i = 0; i < directories.size(); ++i)
-        {
-            FileSelectorEntry newEntry;
-            newEntry.mName = directories[i];
-            newEntry.mDirectory = true;
-            mFileEntries.push_back(newEntry);
-        }
-        
-        for (unsigned i = 0; i < files.size(); ++i)
-        {
-            FileSelectorEntry newEntry;
-            newEntry.mName = files[i];
-            newEntry.mDirectory = false;
-            mFileEntries.push_back(newEntry);
-        }
+        FileSelectorEntry newEntry;
+        newEntry.mName = directories[i];
+        newEntry.mDirectory = true;
+        mFileEntries.push_back(newEntry);
     }
-    catch (...)
+    
+    for (unsigned i = 0; i < files.size(); ++i)
     {
+        FileSelectorEntry newEntry;
+        newEntry.mName = files[i];
+        newEntry.mDirectory = false;
+        mFileEntries.push_back(newEntry);
     }
     
     // Sort and add to the list view

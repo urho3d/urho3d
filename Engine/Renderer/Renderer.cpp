@@ -1113,6 +1113,7 @@ void Renderer::resetRenderTargets()
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         setRenderTarget(i, (RenderSurface*)0);
     setDepthStencil((RenderSurface*)0);
+    setViewport(IntRect(0, 0, mWidth, mHeight));
 }
 
 void Renderer::resetRenderTarget(unsigned index)

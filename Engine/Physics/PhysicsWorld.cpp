@@ -30,6 +30,7 @@
 #include "Profiler.h"
 #include "Ray.h"
 #include "RigidBody.h"
+#include "Scene.h"
 #include "StringUtils.h"
 #include "VectorBuffer.h"
 #include "XMLElement.h"
@@ -46,8 +47,7 @@ static bool compareRaycastResults(const PhysicsRaycastResult& lhs, const Physics
     return lhs.mDistance < rhs.mDistance;
 }
 
-PhysicsWorld::PhysicsWorld(Scene* scene) :
-    mScene(scene),
+PhysicsWorld::PhysicsWorld() :
     mWorld(0),
     mSpace(0),
     mRayGeometry(0),
@@ -360,7 +360,7 @@ void PhysicsWorld::setRandomSeed(unsigned seed)
     dRandSetSeed(seed);
 }
 
-void PhysicsWorld::raycast(const Ray& ray, std::vector<PhysicsRaycastResult>& result, float maxDistance, unsigned collisionMask)
+void PhysicsWorld::raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(Physics_Raycast);
     
@@ -371,6 +371,18 @@ void PhysicsWorld::raycast(const Ray& ray, std::vector<PhysicsRaycastResult>& re
     dSpaceCollide2(mRayGeometry, (dGeomID)mSpace, &result, raycastCallback);
     
     std::sort(result.begin(), result.end(), compareRaycastResults);
+}
+
+void PhysicsWorld::drawDebugGeometry()
+{
+    DebugRenderer* debug = mScene->getExtension<DebugRenderer>();
+    if (!debug)
+        return;
+    
+    PROFILE(Physics_DrawDebugGeometry);
+    
+    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
+        (*i)->drawDebugGeometry(debug);
 }
 
 unsigned PhysicsWorld::getRandomSeed() const
@@ -445,14 +457,6 @@ void PhysicsWorld::removeRigidBody(RigidBody* body)
             return;
         }
     }
-}
-
-void PhysicsWorld::drawDebugGeometry(DebugRenderer* debug)
-{
-    PROFILE(Physics_DrawDebugGeometry);
-    
-    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
-        (*i)->drawDebugGeometry(debug);
 }
 
 void PhysicsWorld::sendCollisionEvents()

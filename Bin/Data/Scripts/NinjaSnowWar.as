@@ -29,8 +29,8 @@ BorderImage@ sight;
 
 Controls playerControls;
 Controls prevPlayerControls;
-bool paused = false;
 bool gameOn = false;
+bool drawDebug = false;
 int score = 0;
 int hiscore = 0;
 int maxEnemies = 0;
@@ -48,17 +48,12 @@ void start()
     startGame();
 
     subscribeToEvent("Update", "handleUpdate");
-    subscribeToEvent("PhysicsPreStep", "handleFixedUpdate");
+    subscribeToEvent(gameScene.getPhysicsWorld(), "PhysicsPreStep", "handleFixedUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
     subscribeToEvent("Points", "handlePoints");
     subscribeToEvent("Kill", "handleKill");
     subscribeToEvent("KeyDown", "handleKeyDown");
     subscribeToEvent("WindowResized", "handleWindowResized");
-}
-
-void runFrame()
-{
-    engine.runFrame(gameScene, gameCamera, !paused);
 }
 
 void initAudio()
@@ -102,11 +97,13 @@ void createCamera()
 {
     Entity@ cameraEntity = gameScene.createEntity("Camera");
     @gameCamera = cameraEntity.createComponent("Camera");
-    if (!engine.isHeadless())
-        gameCamera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
     gameCamera.setNearClip(10.0);
     gameCamera.setFarClip(16000.0);
     gameCamera.setPosition(Vector3(0, 200, -1000));
+
+    // Set zero screen rect -> follow the window size
+    if (!engine.isHeadless())
+        pipeline.setViewport(0, gameScene, gameCamera, IntRect(0, 0, 0, 0));
 }
 
 void createOverlays()
@@ -197,15 +194,17 @@ void startGame()
 
 void handleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    float timeStep = eventData["TimeStep"].getFloat();
+
     if (input.getKeyPress(KEY_F1))
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
-        engine.setDebugDrawMode(engine.getDebugDrawMode() ^ DEBUGDRAW_PHYSICS);
+        drawDebug = !drawDebug;
 
     if ((!console.isVisible()) && (input.getKeyPress('P')) && (gameOn))
     {
-        paused = !paused;
-        if (paused)
+        gameScene.setPaused(!gameScene.isPaused());
+        if (gameScene.isPaused())
             messageText.setText("PAUSED");
         else
             messageText.setText("");
@@ -219,16 +218,12 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         console.setVisible(false);
     }
 
-    if (!paused)
+    if (!gameScene.isPaused())
         updateControls();
 }
 
 void handleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
-    // Check that scene being updated matches (we have only one scene, but for completeness...)
-    if (eventData["Scene"].getScene() !is gameScene)
-        return;
-
     float timeStep = eventData["TimeStep"].getFloat();
 
     // Spawn new objects and check for end/restart of game
@@ -240,6 +235,9 @@ void handlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     updateCamera();
     updateStatus();
+    
+    if (drawDebug)
+        gameScene.getPhysicsWorld().drawDebugGeometry();
 }
 
 void handlePoints(StringHash eventType, VariantMap& eventData)
@@ -430,8 +428,6 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
 
 void handleWindowResized(StringHash eventType, VariantMap& eventData)
 {
-    gameCamera.setAspectRatio(float(renderer.getWidth()) / float(renderer.getHeight()));
-    
     int height = renderer.getHeight() / 22;
     if (height > 64)
         height = 64;

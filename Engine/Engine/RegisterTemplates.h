@@ -250,27 +250,13 @@ template <class T> void registerHashedType(asIScriptEngine* engine, const char* 
 //! Template function for saving a component or an entity to XML
 template <class T> void objectSaveXML(XMLElement& element, T* ptr)
 {
-    try
-    {
-        ptr->saveXML(element);
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->saveXML(element));
 }
 
 //! Template function for loading a component or an entity from XML
 template <class T> void objectLoadXML(const XMLElement& element, T* ptr)
 {
-    try
-    {
-        ptr->loadXML(element, getEngine()->getResourceCache());
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    TRY_SAFE_RETHROW(ptr->loadXML(element, getEngine()->getResourceCache()));
 }
 
 //! Template function for registering a class derived from Component
@@ -426,27 +412,13 @@ template <class T> T* ConstructUIElementWithName(const std::string& name)
 //! Template function for setting UI element style from an XML element
 template <class T> void UIElementSetStyle(const XMLElement& element, T* ptr)
 {
-    try
-    {
-        ptr->setStyle(element, getEngine()->getResourceCache());
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    ptr->setStyle(element, getEngine()->getResourceCache());
 }
 
 //! Template function for setting UI element style from an XML file
 template <class T> void UIElementSetStyleAuto(XMLFile* file, T* ptr)
 {
-    try
-    {
-        ptr->setStyleAuto(file, getEngine()->getResourceCache());
-    }
-    catch (Exception& e)
-    {
-        SAFE_RETHROW(e);
-    }
+    ptr->setStyleAuto(file, getEngine()->getResourceCache());
 }
 
 //! Template function for registering a class derived from UIElement

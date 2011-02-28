@@ -457,15 +457,7 @@ static void registerStringUtils(asIScriptEngine* engine)
 
 static File* ConstructFile(const std::string& fileName, FileMode mode)
 {
-    try
-    {
-        return new File(fileName, mode);
-    }
-    catch (Exception& e)
-    {
-        // Rethrow after File has been deallocated
-        SAFE_RETHROW_RET(e, 0);
-    }
+    TRY_CONSTRUCT(new File(fileName, mode));
 }
 
 static void ConstructVectorBuffer(VectorBuffer* ptr)
@@ -503,6 +495,7 @@ static unsigned char* VectorBufferAt(unsigned index, VectorBuffer* ptr)
 {
     if (index >= ptr->getSize())
         SAFE_EXCEPTION_RET("Index out of bounds", 0);
+    
     return ptr->getModifiableData() + index;
 }
 
@@ -524,7 +517,8 @@ static bool VariantEqualsBuffer(const VectorBuffer& buffer, Variant* ptr)
 
 static CScriptArray* ScanDirectory(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
 {
-    std::vector<std::string> result = scanDirectory(pathName, filter, flags, recursive);
+    std::vector<std::string> result;
+    scanDirectory(result, pathName, filter, flags, recursive);
     return vectorToArray<std::string>(result, "array<string>");
 }
 
@@ -592,15 +586,7 @@ static void registerSerialization(asIScriptEngine* engine)
 
 static PackageFile* ConstructPackageFile(const std::string& fileName)
 {
-    try
-    {
-        return new PackageFile(fileName);
-    }
-    catch (Exception& e)
-    {
-        // Rethrow after PackageFile has been deallocated
-        SAFE_RETHROW_RET(e, 0);
-    }
+    TRY_CONSTRUCT(new PackageFile(fileName));
 }
 
 static void registerPackageFile(asIScriptEngine* engine)
