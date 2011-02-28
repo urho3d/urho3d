@@ -87,8 +87,9 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void setERP(float)", asMETHOD(PhysicsWorld, setERP), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setCFM(float)", asMETHOD(PhysicsWorld, setCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setContactSurfaceLayer(float)", asMETHOD(PhysicsWorld, setContactSurfaceLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void setRandomSeed(uint)", asMETHOD(PhysicsWorld, setRandomSeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void setDrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, setDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "array<PhysicsRaycastResult>@ raycast(const Ray& in, float, uint)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PhysicsWorld", "void drawDebugGeometry()", asMETHOD(PhysicsWorld, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 getGravity() const", asMETHOD(PhysicsWorld, getGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int getFps() const", asMETHOD(PhysicsWorld, getFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "uint getMaxContacts() const", asMETHOD(PhysicsWorld, getMaxContacts), asCALL_THISCALL);
@@ -103,6 +104,8 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "float getERP() const", asMETHOD(PhysicsWorld, getERP), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "float getCFM() const", asMETHOD(PhysicsWorld, getCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "float getContactSurfaceLayer() const", asMETHOD(PhysicsWorld, getContactSurfaceLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "uint getRandomSeed() const", asMETHOD(PhysicsWorld, getRandomSeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "bool getDrawDebugGeometry() const", asMETHOD(PhysicsWorld, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ getPhysicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     registerRefCasts<EventListener, PhysicsWorld>(engine, "EventListener", "PhysicsWorld");
     

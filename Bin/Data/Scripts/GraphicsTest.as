@@ -495,7 +495,10 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.getKeyPress(' '))
         {
             drawdebug++;
-            if (drawdebug > 2) drawdebug = 0;
+            if (drawdebug > 2) 
+                drawdebug = 0;                        
+            pipeline.setDrawDebugGeometry(drawdebug == 1);
+            testScene.getPhysicsWorld().setDrawDebugGeometry(drawdebug == 2);
         }
 
         if (input.getKeyPress('P'))
@@ -610,16 +613,5 @@ void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
             debugRenderer.addBoundingBox(BoundingBox(rayHitPos + Vector3(-0.01, -0.01, -0.01), rayHitPos +
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
         }
-    }
-    
-    // Draw either renderer or physics debug geometry
-    switch (drawdebug)
-    {
-    case 1:
-        pipeline.drawDebugGeometry();
-        break;
-    case 2:
-        testScene.getPhysicsWorld().drawDebugGeometry();
-        break;
     }
 }

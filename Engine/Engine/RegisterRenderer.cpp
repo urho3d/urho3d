@@ -819,7 +819,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "void setOcclusionBufferSize(int)", asMETHOD(Pipeline, setOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setOccluderSizeThreshold(float)", asMETHOD(Pipeline, setOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setEdgeFilter(const EdgeFilterParameters& in)", asMETHOD(Pipeline, setEdgeFilter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void drawDebugGeometry()", asMETHOD(Pipeline, drawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void setDrawDebugGeometry(bool)", asMETHOD(Pipeline, setDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViewports() const", asMETHOD(Pipeline, getNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "Scene@+ getViewportScene(uint) const", asMETHOD(Pipeline, getViewportScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "Camera@+ getViewportCamera(uint) const", asMETHOD(Pipeline, getViewportCamera), asCALL_THISCALL);
@@ -838,6 +838,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "int getOcclusionBufferSize() const", asMETHOD(Pipeline, getOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "float getOccluderSizeThreshold() const", asMETHOD(Pipeline, getOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "const EdgeFilterParameters& getEdgeFilter() const", asMETHOD(Pipeline, getEdgeFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "bool getDrawDebugGeometry() const", asMETHOD(Pipeline, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViews() const", asMETHOD(Pipeline, getNumViews), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumGeometries(bool) const", asMETHOD(Pipeline, getNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumLights(bool) const", asMETHOD(Pipeline, getNumLights), asCALL_THISCALL);

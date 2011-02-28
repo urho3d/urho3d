@@ -152,8 +152,8 @@ public:
     void setOccluderSizeThreshold(float screenSize);
     //! Set deferred rendering edge filter parameters. Only has effect if nonzero multisample level is set in Renderer::setMode().
     void setEdgeFilter(const EdgeFilterParameters& parameters);
-    //! Add debug geometry to the debug renderer(s). Call during EVENT_POSTRENDER to get most accurate results
-    void drawDebugGeometry();
+    //! Set whether to draw debug geometry for all viewports
+    void setDrawDebugGeometry(bool enable);
     
     //! Return number of viewports
     unsigned getNumViewports() const { return mViewports.size(); }
@@ -193,6 +193,8 @@ public:
     float getOccluderSizeThreshold() const { return mOccluderSizeThreshold; }
     //! Return deferred rendering edge filter parameters
     const EdgeFilterParameters& getEdgeFilter() const { return mEdgeFilter; }
+    //! Return whether to draw debug geometry
+    bool getDrawDebugGeometry() const { return mDrawDebugGeometry; }
     //! Return number of views rendered
     unsigned getNumViews() const { return mNumViews; }
     //! Return number of geometries rendered
@@ -224,6 +226,8 @@ public:
     bool update(float timeStep);
     //! Render. Called by Engine
     bool render();
+    //! Add debug geometry to the debug renderer(s)
+    void drawDebugGeometry();
     
 private:
     //! Begin new frame
@@ -270,6 +274,8 @@ private:
     void drawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     //! Handle window resized event
     void handleWindowResized(StringHash eventType, VariantMap& eventData);
+    //! Handle post render update event. Draw debug geometry here if enabled
+    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     //! Return light vertex shaders
     const std::vector<SharedPtr<VertexShader> >& getLightVS() const { return mLightVS; }
     //! Return light pixel shaders
@@ -315,6 +321,10 @@ private:
     std::vector<SharedPtr<Light> > mSplitLightStore;
     //! Occlusion buffers
     std::map<int, SharedPtr<OcclusionBuffer> > mOcclusionBuffers;
+    //! Viewports
+    std::vector<Viewport> mViewports;
+    //! Views
+    std::vector<SharedPtr<View> > mViews;
     //! Frame number
     unsigned mFrameNumber;
     //! Number of views
@@ -349,6 +359,8 @@ private:
     float mOccluderSizeThreshold;
     //! Deferred rendering edge filter parameters
     EdgeFilterParameters mEdgeFilter;
+    //! Debug draw flag
+    bool mDrawDebugGeometry;
     //! Frame number on which shaders last changed
     unsigned mShadersChangedFrameNumber;
     //! Shaders need reloading flag
@@ -361,10 +373,6 @@ private:
     std::string mShaderPath;
     //! Light shader base name (deferred and prepass have different light shaders)
     std::string mLightShaderName;
-    //! Viewports
-    std::vector<Viewport> mViewports;
-    //! Views
-    std::vector<SharedPtr<View> > mViews;
     //! Frame info for rendering
     FrameInfo mFrame;
     //! Octrees that have been updated during the frame

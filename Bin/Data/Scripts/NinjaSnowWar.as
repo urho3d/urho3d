@@ -30,7 +30,6 @@ BorderImage@ sight;
 Controls playerControls;
 Controls prevPlayerControls;
 bool gameOn = false;
-bool drawDebug = false;
 int score = 0;
 int hiscore = 0;
 int maxEnemies = 0;
@@ -199,7 +198,10 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.getKeyPress(KEY_F1))
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
-        drawDebug = !drawDebug;
+    {
+        PhysicsWorld@ world = gameScene.getPhysicsWorld();
+        world.setDrawDebugGeometry(!world.getDrawDebugGeometry());
+    }
 
     if ((!console.isVisible()) && (input.getKeyPress('P')) && (gameOn))
     {
@@ -235,9 +237,6 @@ void handlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     updateCamera();
     updateStatus();
-    
-    if (drawDebug)
-        gameScene.getPhysicsWorld().drawDebugGeometry();
 }
 
 void handlePoints(StringHash eventType, VariantMap& eventData)

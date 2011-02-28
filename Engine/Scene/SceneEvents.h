@@ -26,8 +26,26 @@
 
 #include "Event.h"
 
+//! Application-wide update. Sent by Engine
+DEFINE_EVENT(EVENT_UPDATE, Update)
+{
+    EVENT_PARAM(P_TIMESTEP, TimeStep);          // float
+}
+
 //! Update all non-networked scenes. Sent by Engine
 DEFINE_EVENT(EVENT_UPDATESCENES, UpdateScenes)
+{
+    EVENT_PARAM(P_TIMESTEP, TimeStep);          // float
+}
+
+//! Application-wide post-update. Sent by Engine
+DEFINE_EVENT(EVENT_POSTUPDATE, PostUpdate)
+{
+    EVENT_PARAM(P_TIMESTEP, TimeStep);          // float
+}
+
+//! Post-rendering pipeline update. Sent by Engine
+DEFINE_EVENT(EVENT_POSTRENDERUPDATE, PostRenderUpdate)
 {
     EVENT_PARAM(P_TIMESTEP, TimeStep);          // float
 }

@@ -31,7 +31,6 @@
 #include "Connection.h"
 #include "DebugHud.h"
 #include "Engine.h"
-#include "EngineEvents.h"
 #include "Exception.h"
 #include "File.h"
 #include "Font.h"
@@ -91,7 +90,6 @@ Game::Game() :
     mCameraMaxDist(0.0f),
     mCameraSafetyDist(0.0f),
     mCameraRayLength(0.0f),
-    mDrawDebug(false),
     mGameOn(false),
     mFirstFrame(false),
     mClientEntityID(0)
@@ -494,10 +492,6 @@ void Game::handlePostUpdate(StringHash eventType, VariantMap& eventData)
     updateCamera();
     // Update status panel
     updateStatus(timeStep);
-    
-    // Draw physics debug geometry if necessary
-    if (mDrawDebug)
-        mScene->getExtension<PhysicsWorld>()->drawDebugGeometry();
 }
 
 void Game::handlePreStep(StringHash eventType, VariantMap& eventData)
@@ -844,7 +838,8 @@ void Game::toggleDebugOverlay()
 
 void Game::toggleDebugGeometry()
 {
-    mDrawDebug = !mDrawDebug;
+    PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();
+    world->setDrawDebugGeometry(!world->getDrawDebugGeometry());
 }
 
 void Game::togglePause()

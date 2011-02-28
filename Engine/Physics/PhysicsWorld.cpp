@@ -31,6 +31,7 @@
 #include "Ray.h"
 #include "RigidBody.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "StringUtils.h"
 #include "VectorBuffer.h"
 #include "XMLElement.h"
@@ -57,7 +58,7 @@ PhysicsWorld::PhysicsWorld() :
     mBounceThreshold(0.1f),
     mAngularMaxNetVelocity(256.0f),
     mTimeAcc(0.0f),
-    mDebugDraw(false)
+    mDrawDebugGeometry(false)
 {
     if (!numWorlds)
         dInitODE();
@@ -72,6 +73,8 @@ PhysicsWorld::PhysicsWorld() :
     
     // Enable automatic resting of rigid bodies
     dWorldSetAutoDisableFlag(mWorld, 1);
+    
+    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(PhysicsWorld, handlePostRenderUpdate));
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -360,6 +363,11 @@ void PhysicsWorld::setRandomSeed(unsigned seed)
     dRandSetSeed(seed);
 }
 
+void PhysicsWorld::setDrawDebugGeometry(bool enable)
+{
+    mDrawDebugGeometry = enable;
+}
+
 void PhysicsWorld::raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(Physics_Raycast);
@@ -371,18 +379,6 @@ void PhysicsWorld::raycast(std::vector<PhysicsRaycastResult>& result, const Ray&
     dSpaceCollide2(mRayGeometry, (dGeomID)mSpace, &result, raycastCallback);
     
     std::sort(result.begin(), result.end(), compareRaycastResults);
-}
-
-void PhysicsWorld::drawDebugGeometry()
-{
-    DebugRenderer* debug = mScene->getExtension<DebugRenderer>();
-    if (!debug)
-        return;
-    
-    PROFILE(Physics_DrawDebugGeometry);
-    
-    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
-        (*i)->drawDebugGeometry(debug);
 }
 
 unsigned PhysicsWorld::getRandomSeed() const
@@ -526,6 +522,18 @@ void PhysicsWorld::sendCollisionEvents()
     }
     
     mCollisionInfos.clear();
+}
+
+void PhysicsWorld::drawDebugGeometry()
+{
+    DebugRenderer* debug = mScene->getExtension<DebugRenderer>();
+    if (!debug)
+        return;
+    
+    PROFILE(Physics_DrawDebugGeometry);
+    
+    for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
+        (*i)->drawDebugGeometry(debug);
 }
 
 void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
@@ -682,4 +690,10 @@ void PhysicsWorld::raycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
         newResult.mNormal = Vector3(contact.geom.normal[0], contact.geom.normal[1], contact.geom.normal[2]);
         result->push_back(newResult);
     }
+}
+
+void PhysicsWorld::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (mDrawDebugGeometry)
+        drawDebugGeometry();
 }

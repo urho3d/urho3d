@@ -40,6 +40,7 @@
 #include "RendererImpl.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "StringUtils.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -281,6 +282,7 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     mOcclusionBufferSize(256),
     mOccluderSizeThreshold(0.1f),
     mEdgeFilter(EdgeFilterParameters(0.25f, 0.25f, 0.50f, 10.0f)),
+    mDrawDebugGeometry(false),
     mShadersChangedFrameNumber(M_MAX_UNSIGNED),
     mShadersDirty(true)
 {
@@ -288,8 +290,6 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
         EXCEPTION("Null renderer for Pipeline");
     
     LOGINFO("Rendering pipeline created");
-    
-    subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Pipeline, handleWindowResized));
     
     // Check shader model support
     if (mRenderer->getSM3Support())
@@ -317,8 +317,10 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
         mDrawShadows = false;
     
     mViewports.resize(1);
-    
     resetViews();
+    
+    subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Pipeline, handleWindowResized));
+    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(Pipeline, handlePostRenderUpdate));
 }
 
 Pipeline::~Pipeline()
@@ -458,51 +460,9 @@ void Pipeline::setEdgeFilter(const EdgeFilterParameters& parameters)
     mEdgeFilter = parameters;
 }
 
-void Pipeline::drawDebugGeometry()
+void Pipeline::setDrawDebugGeometry(bool enable)
 {
-    PROFILE(Pipeline_DrawDebugGeometry);
-    
-    static std::set<GeometryNode*> processedGeometries;
-    static std::set<Light*> processedLights;
-    processedGeometries.clear();
-    processedLights.clear();
-    
-    for (unsigned i = 0; i < mNumViews; ++i)
-    {
-        // Make sure it's a main view, and process each node only once
-        View* view = mViews[i];
-        if ((!view) || (view->getRenderTarget()))
-            continue;
-        Octree* octree = view->getOctree();
-        if (!octree)
-            continue;
-        Scene* scene = octree->getScene();
-        if (!scene)
-            continue;
-        DebugRenderer* debug = scene->getExtension<DebugRenderer>();
-        if (!debug)
-            continue;
-        
-        const std::vector<GeometryNode*>& geometries = view->getGeometries();
-        const std::vector<Light*>& lights = view->getLights();
-        
-        for (unsigned i = 0; i < geometries.size(); ++i)
-        {
-            if (processedGeometries.find(geometries[i]) == processedGeometries.end())
-            {
-                geometries[i]->drawDebugGeometry(debug);
-                processedGeometries.insert(geometries[i]);
-            }
-        }
-        for (unsigned i = 0; i < lights.size(); ++i)
-        {
-            if (processedLights.find(lights[i]) == processedLights.end())
-            {
-                lights[i]->drawDebugGeometry(debug);
-                processedLights.insert(lights[i]);
-            }
-        }
-    }
+    mDrawDebugGeometry = enable;
 }
 
 Scene* Pipeline::getViewportScene(unsigned index) const
@@ -729,6 +689,54 @@ bool Pipeline::render()
     mRenderer->resetStreamFrequencies();
     
     return true;
+}
+
+void Pipeline::drawDebugGeometry()
+{
+    PROFILE(Pipeline_DrawDebugGeometry);
+    
+    //! \todo Because debug geometry is per-scene, if two cameras show views of the same area, occlusion is not shown correctly
+    static std::set<GeometryNode*> processedGeometries;
+    static std::set<Light*> processedLights;
+    processedGeometries.clear();
+    processedLights.clear();
+    
+    for (unsigned i = 0; i < mNumViews; ++i)
+    {
+        // Make sure it's a main view, and process each node only once
+        View* view = mViews[i];
+        if ((!view) || (view->getRenderTarget()))
+            continue;
+        Octree* octree = view->getOctree();
+        if (!octree)
+            continue;
+        Scene* scene = octree->getScene();
+        if (!scene)
+            continue;
+        DebugRenderer* debug = scene->getExtension<DebugRenderer>();
+        if (!debug)
+            continue;
+        
+        const std::vector<GeometryNode*>& geometries = view->getGeometries();
+        const std::vector<Light*>& lights = view->getLights();
+        
+        for (unsigned i = 0; i < geometries.size(); ++i)
+        {
+            if (processedGeometries.find(geometries[i]) == processedGeometries.end())
+            {
+                geometries[i]->drawDebugGeometry(debug);
+                processedGeometries.insert(geometries[i]);
+            }
+        }
+        for (unsigned i = 0; i < lights.size(); ++i)
+        {
+            if (processedLights.find(lights[i]) == processedLights.end())
+            {
+                lights[i]->drawDebugGeometry(debug);
+                processedLights.insert(lights[i]);
+            }
+        }
+    }
 }
 
 void Pipeline::beginFrame(float timeStep)
@@ -1527,4 +1535,10 @@ void Pipeline::handleWindowResized(StringHash eventType, VariantMap& eventData)
     mShadersDirty = true;
     mOcclusionBuffers.clear();
     resetViews();
+}
+
+void Pipeline::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (mDrawDebugGeometry)
+        drawDebugGeometry();
 }
