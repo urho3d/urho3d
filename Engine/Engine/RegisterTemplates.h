@@ -75,17 +75,17 @@ template <class T> T* getVariantPtr(Variant* ptr)
 }
 
 //! Template function for std::vector to array conversion
-template <class T> CScriptArray* vectorToArray(const std::vector<T>& vector, const char* arrayName)
+template <class T> CScriptArray* vectorToArray(const std::vector<T>& src, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIScriptEngine* engine = context->GetEngine();
         asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(src.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
-            *(static_cast<T*>(arr->At(i))) = vector[i];
+            *(static_cast<T*>(arr->At(i))) = src[i];
         
         return arr;
     }
@@ -94,21 +94,21 @@ template <class T> CScriptArray* vectorToArray(const std::vector<T>& vector, con
 }
 
 //! Template function for std::vector to handle array conversion
-template <class T> CScriptArray* vectorToHandleArray(const std::vector<T*>& vector, const char* arrayName)
+template <class T> CScriptArray* vectorToHandleArray(const std::vector<T*>& src, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIScriptEngine* engine = context->GetEngine();
         asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(src.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i])
-                vector[i]->addRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i];
+            if (src[i])
+                src[i]->addRef();
+            *(static_cast<T**>(arr->At(i))) = src[i];
         }
         
         return arr;
@@ -118,21 +118,21 @@ template <class T> CScriptArray* vectorToHandleArray(const std::vector<T*>& vect
 }
 
 //! Template function for shared pointer std::vector to handle array conversion
-template <class T> CScriptArray* sharedPtrVectorToHandleArray(const std::vector<SharedPtr<T> >& vector, const char* arrayName)
+template <class T> CScriptArray* sharedPtrVectorToHandleArray(const std::vector<SharedPtr<T> >& src, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIScriptEngine* engine = context->GetEngine();
         asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(src.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i].getPtr())
-                vector[i]->addRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i].getPtr();
+            if (src[i].getPtr())
+                src[i]->addRef();
+            *(static_cast<T**>(arr->At(i))) = src[i].getPtr();
         }
         
         return arr;
@@ -142,17 +142,17 @@ template <class T> CScriptArray* sharedPtrVectorToHandleArray(const std::vector<
 }
 
 //! Template function for std::set to array conversion
-template <class T> CScriptArray* setToArray(const std::set<T>& set, const char* arrayName)
+template <class T> CScriptArray* setToArray(const std::set<T>& src, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIScriptEngine* engine = context->GetEngine();
         asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
-        CScriptArray* arr = new CScriptArray(set.size(), type);
+        CScriptArray* arr = new CScriptArray(src.size(), type);
         
         unsigned index = 0;
-        for (std::set<T>::const_iterator i = set.begin(); i != set.end(); ++i)
+        for (typename std::set<T>::const_iterator i = src.begin(); i != src.end(); ++i)
         {
             *(static_cast<T*>(arr->At(index))) = *i;
             ++index;

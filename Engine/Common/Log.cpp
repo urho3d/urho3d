@@ -41,15 +41,13 @@ Log::Log(const std::string& fileName, LogLevel level) :
         EXCEPTION("Log already exists");
     
     // If empty log file name, use a default name in the executable directory. Writing to it may fail depending on access rights.
-    if (!fileName.empty())
-        mHandle = fopen(fileName.c_str(), "w");
-    else
-        mHandle = fopen((getExecutableDirectory() + "Urho3D.log").c_str(), "w");
+    std::string useFileName = fileName.empty() ? getExecutableDirectory() + "Urho3D.log" : fileName;
     
+    mHandle = fopen(useFileName.c_str(), "w");
     if (mHandle)
-        write(LOG_INFO, "Log file " + fileName + " created");
+        write(LOG_INFO, "Log file " + useFileName + " created");
     else
-        write(LOG_ERROR, "Failed to create log file " + fileName);
+        write(LOG_ERROR, "Failed to create log file " + useFileName);
     
     sInstance = this;
 }

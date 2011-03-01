@@ -181,8 +181,8 @@ void UI::update(float timeStep)
                 using namespace UIDragDropTest;
                 
                 VariantMap eventData;
-                eventData[P_SOURCE] = mMouseDragElement;
-                eventData[P_TARGET] = element;
+                eventData[P_SOURCE] = (void*)mMouseDragElement.getPtr();
+                eventData[P_TARGET] = (void*)element.getPtr();
                 eventData[P_ACCEPT] = accept;
                 sendEvent(EVENT_UIDRAGDROPTEST, eventData);
                 accept = eventData[P_ACCEPT].getBool();
@@ -573,8 +573,8 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
                             using namespace UIDragDropFinish;
                             
                             VariantMap eventData;
-                            eventData[P_SOURCE] = mMouseDragElement;
-                            eventData[P_TARGET] = target;
+                            eventData[P_SOURCE] = (void*)mMouseDragElement.getPtr();
+                            eventData[P_TARGET] = (void*)target.getPtr();
                             eventData[P_ACCEPT] = accept;
                             sendEvent(EVENT_UIDRAGDROPFINISH, eventData);
                         }

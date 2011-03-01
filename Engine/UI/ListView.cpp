@@ -33,7 +33,7 @@
 
 static const ShortStringHash indentHash("Indent");
 
-static const std::string highlightModes[] = 
+static const std::string highlightModes[] =
 {
     "never",
     "focus"
@@ -349,7 +349,8 @@ void ListView::setSelections(const std::set<unsigned>& indices)
         unsigned index = *i;
         if (indices.find(index) == indices.end())
         {
-            i = mSelections.erase(i);
+            std::set<unsigned>::iterator current = i++;
+            mSelections.erase(current);
             
             using namespace ItemSelected;
             
