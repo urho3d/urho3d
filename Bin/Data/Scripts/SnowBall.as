@@ -51,10 +51,12 @@ class SnowBall : GameObject
     {
         // Apply damping when rolling on the ground, or near disappearing
         RigidBody@ body = entity.getComponent("RigidBody");
-        Vector3 vel = body.getLinearVelocity();
         if ((onGround) || (duration < snowballGroundHitDuration))
+        {
+            Vector3 vel = body.getLinearVelocity();
             body.applyForce(Vector3(-snowballDampingForce * vel.x, 0, -snowballDampingForce * vel.z));
-            
+        }
+
         // Disappear when duration expired
         if (duration >= 0)
         {

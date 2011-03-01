@@ -101,11 +101,7 @@ void createCamera()
     gameCamera.setPosition(Vector3(0, 200, -1000));
 
     if (!engine.isHeadless())
-    {
-        pipeline.setNumViewports(2);
         pipeline.setViewport(0, Viewport(gameScene, gameCamera));
-        pipeline.setViewport(1, Viewport(gameScene, gameCamera, IntRect(10, 10, 330, 210)));
-    }
 }
 
 void createOverlays()
@@ -276,8 +272,7 @@ void spawnObjects(float timeStep)
     if (powerupSpawnTimer >= powerupSpawnRate)
     {
         powerupSpawnTimer = 0;
-        //int numPowerups = gameScene.getScriptedEntities("SnowCrate").length() + gameScene.getScriptedEntities("Potion").length();
-        int numPowerups = 0;
+        int numPowerups = gameScene.getScriptedEntities("SnowCrate").length() + gameScene.getScriptedEntities("Potion").length();
 
         if (numPowerups < maxPowerups)
         {
