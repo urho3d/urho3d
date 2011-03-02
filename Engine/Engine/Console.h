@@ -95,6 +95,8 @@ private:
     SharedPtr<LineEdit> mLineEdit;
     //! Command history
     std::vector<std::string> mHistory;
+    //! Current row being edited
+    std::string mCurrentRow;
     //! Command history maximum rows
     unsigned mHistoryRows;
     //! Command history current position

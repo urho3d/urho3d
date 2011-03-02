@@ -198,7 +198,9 @@ void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
         if (mHistory.size() > mHistoryRows)
             mHistory.erase(mHistory.begin());
         mHistoryPosition = mHistory.size();
-        mLineEdit->setText(std::string());
+        
+        mCurrentRow = std::string();
+        mLineEdit->setText(mCurrentRow);
     }
 }
 
@@ -216,6 +218,8 @@ void Console::handleLineEditKey(StringHash eventType, VariantMap& eventData)
     case KEY_UP:
         if (mHistoryPosition > 0)
         {
+            if (mHistoryPosition == mHistory.size())
+                mCurrentRow = mLineEdit->getText();
             --mHistoryPosition;
             changed = true;
         }
@@ -235,7 +239,7 @@ void Console::handleLineEditKey(StringHash eventType, VariantMap& eventData)
         if (mHistoryPosition < mHistory.size())
             mLineEdit->setText(mHistory[mHistoryPosition]);
         else
-            mLineEdit->setText(std::string());
+            mLineEdit->setText(mCurrentRow);
     }
 }
 
