@@ -165,6 +165,14 @@ void Serializer::writeVariant(const Variant& value)
     value.write(*this);
 }
 
+void Serializer::writeVariantVector(const VariantVector& value)
+{
+    writeVLE(value.size());
+    
+    for (VariantVector::const_iterator i = value.begin(); i != value.end(); ++i)
+        writeVariant(*i);
+}
+
 void Serializer::writeVariantMap(const VariantMap& value)
 {
     writeVLE(value.size());

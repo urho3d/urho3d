@@ -108,6 +108,8 @@ public:
     ShortStringHash readShortStringHash();
     //! Read a Variant
     Variant readVariant();
+    //! Read a vector of Variants
+    VariantVector readVariantVector();
     //! Read a map of Variants
     VariantMap readVariantMap();
     //! Read a variable-length encoded unsigned integer, which can use 29 bits maximum

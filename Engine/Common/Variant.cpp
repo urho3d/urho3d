@@ -32,12 +32,92 @@
 
 #include "DebugNew.h"
 
+Variant& Variant::operator = (const Variant& rhs)
+{
+    setType(rhs.getType());
+    
+    switch (mType)
+    {
+    case VAR_STRING:
+        *(reinterpret_cast<std::string*>(mValue.mPtr)) = *(reinterpret_cast<const std::string*>(rhs.mValue.mPtr));
+        break;
+        
+    case VAR_BUFFER:
+        *(reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr)) = *(reinterpret_cast<const std::vector<unsigned char>*>(rhs.mValue.mPtr));
+        break;
+    
+    case VAR_VARIANTVECTOR:
+        *(reinterpret_cast<VariantVector*>(mValue.mPtr)) = *(reinterpret_cast<VariantVector*>(rhs.mValue.mPtr));
+        break;
+        
+    case VAR_VARIANTMAP:
+        *(reinterpret_cast<VariantMap*>(mValue.mPtr)) = *(reinterpret_cast<VariantMap*>(rhs.mValue.mPtr));
+        break;
+        
+    default:
+        mValue = rhs.mValue;
+        break;
+    }
+    
+    return *this;
+}
+
+bool Variant::operator == (const Variant& rhs) const
+{
+    if (mType != rhs.mType)
+        return false;
+    
+    switch (mType)
+    {
+    case VAR_INT:
+        return mValue.mInt == rhs.mValue.mInt;
+        
+    case VAR_BOOL:
+        return mValue.mBool == rhs.mValue.mBool;
+        
+    case VAR_FLOAT:
+        return mValue.mFloat == rhs.mValue.mFloat;
+        
+    case VAR_VECTOR2:
+        return *(reinterpret_cast<const Vector2*>(&mValue)) == *(reinterpret_cast<const Vector2*>(&rhs.mValue));
+        
+    case VAR_VECTOR3:
+        return *(reinterpret_cast<const Vector3*>(&mValue)) == *(reinterpret_cast<const Vector3*>(&rhs.mValue));
+        
+    case VAR_VECTOR4:
+        return *(reinterpret_cast<const Vector4*>(&mValue)) == *(reinterpret_cast<const Vector4*>(&rhs.mValue));
+        
+    case VAR_QUATERNION:
+        return *(reinterpret_cast<const Quaternion*>(&mValue)) == *(reinterpret_cast<const Quaternion*>(&rhs.mValue));
+        
+    case VAR_COLOR:
+        return *(reinterpret_cast<const Color*>(&mValue)) == *(reinterpret_cast<const Color*>(&rhs.mValue));
+        
+    case VAR_STRING:
+        return *(reinterpret_cast<const std::string*>(mValue.mPtr)) == *(reinterpret_cast<const std::string*>(rhs.mValue.mPtr));
+        
+    case VAR_BUFFER:
+        return *(reinterpret_cast<const std::vector<unsigned char>*>(mValue.mPtr)) == *(reinterpret_cast<const std::vector<unsigned char>*>(rhs.mValue.mPtr));
+        
+    case VAR_PTR:
+        return mValue.mPtr == rhs.mValue.mPtr;
+        
+    case VAR_VARIANTVECTOR:
+        return *(reinterpret_cast<const VariantVector*>(mValue.mPtr)) == *(reinterpret_cast<const VariantVector*>(rhs.mValue.mPtr));
+        
+    case VAR_VARIANTMAP:
+        return *(reinterpret_cast<const VariantMap*>(mValue.mPtr)) == *(reinterpret_cast<const VariantMap*>(rhs.mValue.mPtr));
+    }
+    
+    return true;
+}
+
 void Variant::fromString(const std::string& type, const std::string& value)
 {
     std::string typeLower = toLower(type);
     
     if (typeLower == "none")
-        mType = VAR_NONE;
+        setType(VAR_NONE);
     else if (typeLower == "int")
         *this = toInt(value);
     else if (typeLower == "bool")
@@ -58,19 +138,38 @@ void Variant::fromString(const std::string& type, const std::string& value)
         *this = value;
     else if (typeLower == "buffer")
     {
+        setType(VAR_BUFFER);
+        std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr));
         std::vector<std::string> values = split(value, ' ');
-        std::vector<unsigned char> buffer;
-        for (std::vector<std::string>::const_iterator i = values.begin(); i != values.end(); ++i)
-            buffer.push_back(toInt(*i));
-        *this = buffer;
+        buffer.resize(values.size());
+        for (unsigned i = 0; i < values.size(); ++i)
+            buffer[i] = toInt(values[i]);
     }
     else if (typeLower == "pointer")
     {
         LOGWARNING("Deserialized pointer Variant set to null");
         *this = (void*)0;
     }
+    else if (typeLower == "variantvector")
+    {
+        setType(VAR_VARIANTVECTOR);
+        VariantVector& dest = *(reinterpret_cast<VariantVector*>(mValue.mPtr));
+        std::vector<std::string> values = split(value, '#');
+        dest.resize(values.size() >> 1);
+        for (unsigned i = 0; i < values.size() - 1; i += 2)
+            dest[i >> 1].fromString(values[i], values[i + 1]);
+    }
+    else if (typeLower == "variantmap")
+    {
+        setType(VAR_VARIANTMAP);
+        VariantMap& dest = *(reinterpret_cast<VariantMap*>(mValue.mPtr));
+        dest.clear();
+        std::vector<std::string> values = split(value, '#');
+        for (unsigned i = 0; i < values.size() - 2; i += 3)
+            dest[ShortStringHash(values[i])].fromString(values[i + 1], values[i + 2]);
+    }
     else
-        clear();
+        setType(VAR_NONE);
 }
 
 void Variant::write(Serializer& dest) const
@@ -95,97 +194,144 @@ void Variant::write(Serializer& dest) const
         break;
         
     case VAR_VECTOR2:
-        dest.writeVector2(*(reinterpret_cast<const Vector2*>(&mValue.mVector4)));
+        dest.writeVector2(*(reinterpret_cast<const Vector2*>(&mValue)));
         break;
         
     case VAR_VECTOR3:
-        dest.writeVector3(*(reinterpret_cast<const Vector3*>(&mValue.mVector4)));
+        dest.writeVector3(*(reinterpret_cast<const Vector3*>(&mValue)));
         break;
         
     case VAR_VECTOR4:
-        dest.writeVector4(mValue.mVector4);
+        dest.writeVector4(*(reinterpret_cast<const Vector4*>(&mValue)));
         break;
         
     case VAR_QUATERNION:
-        dest.writeQuaternion(*(reinterpret_cast<const Quaternion*>(&mValue.mVector4)));
+        dest.writeQuaternion(*(reinterpret_cast<const Quaternion*>(&mValue)));
         break;
         
     case VAR_COLOR:
-        dest.writeColor(*(reinterpret_cast<const Color*>(&mValue.mVector4)));
+        dest.writeColor(*(reinterpret_cast<const Color*>(&mValue)));
         break;
         
     case VAR_STRING:
-        dest.writeString(mValue.mString);
+        dest.writeString(*(reinterpret_cast<const std::string*>(mValue.mPtr)));
         break;
         
     case VAR_BUFFER:
-        dest.writeVLE(mValue.mBuffer.size());
-        if (mValue.mBuffer.size())
-            dest.write(&mValue.mBuffer[0], mValue.mBuffer.size());
+        {
+            const std::vector<unsigned char>& buffer = *(reinterpret_cast<const std::vector<unsigned char>*>(mValue.mPtr));
+            dest.writeVLE(buffer.size());
+            if (buffer.size())
+                dest.write(&buffer[0], buffer.size());
+        }
         break;
         
     case VAR_PTR:
         LOGWARNING("Serialized pointer Variant set to null");
         dest.writeUInt(0);
         break;
+        
+    case VAR_VARIANTVECTOR:
+        {
+            const VariantVector& src = *(reinterpret_cast<VariantVector*>(mValue.mPtr));
+            dest.writeVariantVector(src);
+        }
+        break;
+        
+    case VAR_VARIANTMAP:
+        {
+            const VariantMap& src = *(reinterpret_cast<VariantMap*>(mValue.mPtr));
+            dest.writeVariantMap(src);
+        }
+        break;
     }
 }
 
 void Variant::read(Deserializer& source)
 {
-    mType = (VariantType)source.readUByte();
+    VariantType type = (VariantType)source.readUByte();
     
-    switch (mType)
+    switch (type)
     {
     case VAR_NONE:
+        setType(VAR_NONE);
         break;
         
     case VAR_INT:
-        mValue.mInt = source.readInt();
+        *this = source.readInt();
         break;
         
     case VAR_BOOL:
-        mValue.mBool = source.readBool();
+        *this = source.readBool();
         break;
         
     case VAR_FLOAT:
-        mValue.mFloat = source.readFloat();
+        *this = source.readFloat();
         break;
         
     case VAR_VECTOR2:
-        *(reinterpret_cast<Vector2*>(&mValue.mVector4)) = source.readVector2();
+        *this = source.readVector2();
         break;
         
     case VAR_VECTOR3:
-        *(reinterpret_cast<Vector3*>(&mValue.mVector4)) = source.readVector3();
+        *this = source.readVector3();
         break;
         
     case VAR_VECTOR4:
-        mValue.mVector4 = source.readVector4();
+        *this = source.readVector4();
         break;
         
     case VAR_QUATERNION:
-        *(reinterpret_cast<Quaternion*>(&mValue.mVector4)) = source.readQuaternion();
+        *this = source.readQuaternion();
         break;
         
     case VAR_COLOR:
-        *(reinterpret_cast<Color*>(&mValue.mVector4)) = source.readColor();
+        *this = source.readColor();
         break;
         
     case VAR_STRING:
-        mValue.mString = source.readString();
+        *this = source.readString();
         break;
         
     case VAR_BUFFER:
-        mValue.mBuffer.resize(source.readVLE());
-        if (mValue.mBuffer.size())
-            source.read(&mValue.mBuffer[0], mValue.mBuffer.size());
+        {
+            setType(VAR_BUFFER);
+            std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr));
+            buffer.resize(source.readVLE());
+            if (buffer.size())
+                source.read(&buffer[0], buffer.size());
+        }
         break;
         
     case VAR_PTR:
         LOGWARNING("Deserialized pointer Variant set to null");
         source.readUInt();
-        mValue.mPtr = 0;
+        *this = (void*)0;
+        break;
+        
+    case VAR_VARIANTVECTOR:
+        {
+            setType(VAR_VARIANTVECTOR);
+            VariantVector& dest = *(reinterpret_cast<VariantVector*>(mValue.mPtr));
+            unsigned num = source.readVLE();
+            dest.resize(num);
+            for (unsigned i = 0; i < num; ++i)
+                dest[i].read(source);
+        }
+        break;
+        
+    case VAR_VARIANTMAP:
+        {
+            setType(VAR_VARIANTMAP);
+            VariantMap& dest = *(reinterpret_cast<VariantMap*>(mValue.mPtr));
+            dest.clear();
+            unsigned num = source.readVLE();
+            for (unsigned i = 0; i < num; ++i)
+            {
+                ShortStringHash key = source.readShortStringHash();
+                dest[key].read(source);
+            }
+        }
         break;
         
     default:
@@ -198,10 +344,11 @@ void Variant::setBuffer(const void* data, unsigned size)
     if ((size) && (!data))
         SAFE_EXCEPTION("Null Variant buffer source");
     
-    mType = VAR_BUFFER;
-    mValue.mBuffer.resize(size);
-    if (size)
-        memcpy(&mValue.mBuffer[0], data, size);
+    setType(VAR_BUFFER);
+    std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr));
+    buffer.resize(size);
+    if (buffer.size())
+        memcpy(&buffer[0], data, size);
 }
 
 const std::string& Variant::getTypeName() const
@@ -219,7 +366,9 @@ const std::string& Variant::getTypeName() const
         "Color",
         "String",
         "Buffer",
-        "Pointer"
+        "Pointer",
+        "VariantVector",
+        "VariantMap"
     };
     
     return typeNames[mType];
@@ -231,33 +380,123 @@ std::string Variant::toString() const
     {
     case VAR_INT:
         return ::toString(mValue.mInt);
+        
     case VAR_BOOL:
         return ::toString(mValue.mBool);
+        
     case VAR_FLOAT:
         return ::toString(mValue.mFloat);
+        
     case VAR_VECTOR2:
-        return ::toString(*(reinterpret_cast<const Vector2*>(&mValue.mVector4)));
+        return ::toString(*(reinterpret_cast<const Vector2*>(&mValue)));
+        
     case VAR_VECTOR3:
-        return ::toString(*(reinterpret_cast<const Vector3*>(&mValue.mVector4)));
+        return ::toString(*(reinterpret_cast<const Vector3*>(&mValue)));
+        
     case VAR_VECTOR4:
-        return ::toString(mValue.mVector4);
+        return ::toString(*(reinterpret_cast<const Vector4*>(&mValue)));
+        
     case VAR_QUATERNION:
-        return ::toString(*(reinterpret_cast<const Quaternion*>(&mValue.mVector4)));
+        return ::toString(*(reinterpret_cast<const Quaternion*>(&mValue)));
+        
     case VAR_COLOR:
-        return ::toString(*(reinterpret_cast<const Color*>(&mValue.mVector4)));
+        return ::toString(*(reinterpret_cast<const Color*>(&mValue)));
+        
     case VAR_STRING:
-        return mValue.mString;
+        return *(reinterpret_cast<const std::string*>(mValue.mPtr));
+        
     case VAR_BUFFER:
         {
+            const std::vector<unsigned char>& buffer = *(reinterpret_cast<const std::vector<unsigned char>*>(mValue.mPtr));
             std::string ret;
-            for (std::vector<unsigned char>::const_iterator i = mValue.mBuffer.begin(); i != mValue.mBuffer.end(); ++i)
-                ret += ::toString(*i) + " ";
+            for (std::vector<unsigned char>::const_iterator i = buffer.begin(); i != buffer.end(); ++i)
+            {
+                if (i != buffer.begin())
+                    ret += " ";
+                ret += ::toString(*i);
+            }
             return ret;
         }
+        
     case VAR_PTR:
         LOGWARNING("Serialized pointer Variant set to null");
         return ::toString((unsigned)0);
+        
+    case VAR_VARIANTVECTOR:
+        {
+            const VariantVector& src = *(reinterpret_cast<const VariantVector*>(mValue.mPtr));
+            std::string ret;
+            for (VariantVector::const_iterator i = src.begin(); i != src.end(); ++i)
+            {
+                if (i != src.begin())
+                    ret += "#";
+                ret += i->getTypeName() + "#";
+                ret += i->toString();
+            }
+            return ret;
+        }
+        
+    case VAR_VARIANTMAP:
+        {
+            const VariantMap& src = *(reinterpret_cast<const VariantMap*>(mValue.mPtr));
+            std::string ret;
+            for (VariantMap::const_iterator i = src.begin(); i != src.end(); ++i)
+            {
+                if (i != src.begin())
+                    ret += "#";
+                ret += ::toString(i->first.mData) + "#";
+                ret += i->second.getTypeName() + "#";
+                ret += i->second.toString();
+            }
+            return ret;
+        }
     }
     
     return std::string();
+}
+
+void Variant::setType(VariantType newType)
+{
+    if (mType == newType)
+        return;
+    
+    switch (mType)
+    {
+    case VAR_STRING:
+        delete reinterpret_cast<std::string*>(mValue.mPtr);
+        break;
+        
+    case VAR_BUFFER:
+        delete reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr);
+        break;
+        
+    case VAR_VARIANTVECTOR:
+        delete reinterpret_cast<VariantVector*>(mValue.mPtr);
+        break;
+        
+    case VAR_VARIANTMAP:
+        delete reinterpret_cast<VariantMap*>(mValue.mPtr);
+        break;
+    }
+    
+    mType = newType;
+    
+    switch (mType)
+    {
+    case VAR_STRING:
+        *reinterpret_cast<std::string**>(&mValue.mPtr) = new std::string();
+        break;
+        
+    case VAR_BUFFER:
+        *reinterpret_cast<std::vector<unsigned char>**>(&mValue.mPtr) = new std::vector<unsigned char>();
+        break;
+        
+    case VAR_VARIANTVECTOR:
+        *reinterpret_cast<VariantVector**>(&mValue.mPtr) = new VariantVector();
+        break;
+        
+    case VAR_VARIANTMAP:
+        *reinterpret_cast<VariantMap**>(&mValue.mPtr) = new VariantMap();
+        break;
+    }
 }

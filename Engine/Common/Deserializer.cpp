@@ -242,17 +242,27 @@ Variant Deserializer::readVariant()
     return ret;
 }
 
+VariantVector Deserializer::readVariantVector()
+{
+    VariantVector ret;
+    
+    unsigned num = readVLE();
+    ret.resize(num);
+    for (unsigned i = 0; i < num; ++i)
+        ret[i].read(*this);
+    
+    return ret;
+}
+
 VariantMap Deserializer::readVariantMap()
 {
     VariantMap ret;
     
     unsigned num = readVLE();
-    while (num)
+    for (unsigned i = 0; i < num; ++i)
     {
         ShortStringHash key = readShortStringHash();
-        Variant value = readVariant();
-        ret[key] = value;
-        --num;
+        ret[key].read(*this);
     }
     
     return ret;

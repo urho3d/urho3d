@@ -27,6 +27,7 @@
 #include "StringHash.h"
 
 #include <map>
+#include <vector>
 
 class Color;
 class IntRect;
@@ -38,6 +39,7 @@ class Vector2;
 class Vector3;
 class Vector4;
 
+typedef std::vector<Variant> VariantVector;
 typedef std::map<ShortStringHash, Variant> VariantMap;
 
 //! An abstract stream for writing
@@ -96,7 +98,9 @@ public:
     void writeShortStringHash(const ShortStringHash& value);
     //! Write a Variant
     void writeVariant(const Variant& value);
-    //! Write a map of Variants
+    //! Write a variant vector
+    void writeVariantVector(const VariantVector& value);
+    //! Write a variant map
     void writeVariantMap(const VariantMap& value);
     //! Write a variable-length encoded unsigned integer, which can use 29 bits maximum
     void writeVLE(unsigned value);

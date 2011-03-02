@@ -46,7 +46,9 @@ enum VariantType
     VAR_COLOR,
     VAR_STRING,
     VAR_BUFFER,
-    VAR_PTR
+    VAR_PTR,
+    VAR_VARIANTVECTOR,
+    VAR_VARIANTMAP
 };
 
 //! Union for holding all the possible Variant values
@@ -60,13 +62,19 @@ struct VariantValue
         void* mPtr;
     };
     
-    Vector4 mVector4;
-    std::string mString;
-    std::vector<unsigned char> mBuffer;
+    float mY;
+    float mZ;
+    float mW;
 };
 
 class Deserializer;
 class Serializer;
+class Variant;
+
+//! Vector of variants
+typedef std::vector<Variant> VariantVector;
+//! Map of variants
+typedef std::map<ShortStringHash, Variant> VariantMap;
 
 //! A varying type with support for a fixed set of types
 class Variant
@@ -79,93 +87,135 @@ public:
     }
     
     //! Construct from integer
-    Variant(int value)
+    Variant(int value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from unsigned integer
-    Variant(unsigned value)
+    Variant(unsigned value) :
+        mType(VAR_NONE)
     {
         *this = (int)value;
     }
     
     //! Construct from a StringHash (convert to integer)
-    Variant(const StringHash& value)
+    Variant(const StringHash& value) :
+        mType(VAR_NONE)
     {
         *this = (int)value.mData;
     }
     
     //! Construct from a ShortStringHash (convert to integer)
-    Variant(const ShortStringHash& value)
+    Variant(const ShortStringHash& value) :
+        mType(VAR_NONE)
     {
         *this = (int)value.mData;
     }
     
     //! Construct from a bool
-    Variant(bool value)
+    Variant(bool value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a float
-    Variant(float value)
+    Variant(float value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a Vector2
-    Variant(const Vector2& value)
+    Variant(const Vector2& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a Vector3
-    Variant(const Vector3& value)
+    Variant(const Vector3& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a Vector4
-    Variant(const Vector4& value)
+    Variant(const Vector4& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a Quaternion
-    Variant(const Quaternion& value)
+    Variant(const Quaternion& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a Color
-    Variant(const Color& value)
+    Variant(const Color& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a string
-    Variant(const std::string& value)
+    Variant(const std::string& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a buffer
-    Variant(const std::vector<unsigned char>& value)
+    Variant(const std::vector<unsigned char>& value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
     //! Construct from a pointer
-    Variant(void* value)
+    Variant(void* value) :
+        mType(VAR_NONE)
     {
         *this = value;
     }
     
-    //! Copy-construct from another variant
-    Variant(const Variant& value)
+    //! Construct from a variant vector
+    Variant(const VariantVector& value) :
+        mType(VAR_NONE)
     {
         *this = value;
+    }
+    
+    //! Construct from a variant vector
+    Variant(const VariantMap& value) :
+        mType(VAR_NONE)
+    {
+        *this = value;
+    }
+    
+    //! Construct from type and value
+    Variant(const std::string& type, const std::string& value) :
+        mType(VAR_NONE)
+    {
+        fromString(type, value);
+    }
+    
+    //! Copy-construct from another variant
+    Variant(const Variant& value) :
+        mType(VAR_NONE)
+    {
+        *this = value;
+    }
+    
+    //! Destruct
+    ~Variant()
+    {
+        setType(VAR_NONE);
     }
     
     //! Reset to none type
@@ -175,12 +225,7 @@ public:
     }
     
     //! Assign from another variant
-    Variant& operator = (const Variant& rhs)
-    {
-        setType(rhs.mType);
-        mValue = rhs.mValue;
-        return *this;
-    }
+    Variant& operator = (const Variant& rhs);
     
     //! Assign from an integer
     Variant& operator = (int rhs)
@@ -234,7 +279,7 @@ public:
     Variant& operator = (const Vector2& rhs)
     {
         setType(VAR_VECTOR2);
-        *(reinterpret_cast<Vector2*>(&mValue.mVector4)) = rhs;
+        *(reinterpret_cast<Vector2*>(&mValue)) = rhs;
         return *this;
     }
     
@@ -242,7 +287,7 @@ public:
     Variant& operator = (const Vector3& rhs)
     {
         setType(VAR_VECTOR3);
-        *(reinterpret_cast<Vector3*>(&mValue.mVector4)) = rhs;
+        *(reinterpret_cast<Vector3*>(&mValue)) = rhs;
         return *this;
     }
     
@@ -250,7 +295,7 @@ public:
     Variant& operator = (const Vector4& rhs)
     {
         setType(VAR_VECTOR4);
-        mValue.mVector4 = rhs;
+        *(reinterpret_cast<Vector4*>(&mValue)) = rhs;
         return *this;
     }
     
@@ -258,7 +303,7 @@ public:
     Variant& operator = (const Quaternion& rhs)
     {
         setType(VAR_QUATERNION);
-        *(reinterpret_cast<Quaternion*>(&mValue.mVector4)) = rhs;
+        *(reinterpret_cast<Quaternion*>(&mValue)) = rhs;
         return *this;
     }
     
@@ -266,7 +311,7 @@ public:
     Variant& operator = (const Color& rhs)
     {
         setType(VAR_COLOR);
-        *(reinterpret_cast<Color*>(&mValue.mVector4)) = rhs;
+        *(reinterpret_cast<Color*>(&mValue)) = rhs;
         return *this;
     }
     
@@ -274,7 +319,7 @@ public:
     Variant& operator = (const std::string& rhs)
     {
         setType(VAR_STRING);
-        mValue.mString = rhs;
+        *(reinterpret_cast<std::string*>(mValue.mPtr)) = rhs;
         return *this;
     }
     
@@ -282,7 +327,7 @@ public:
     Variant& operator = (const std::vector<unsigned char>& rhs)
     {
         setType(VAR_BUFFER);
-        mValue.mBuffer = rhs;
+        *(reinterpret_cast<std::vector<unsigned char>*>(mValue.mPtr)) = rhs;
         return *this;
     }
     
@@ -294,40 +339,24 @@ public:
         return *this;
     }
     
-    //! Test for equality with another variant
-    bool operator == (const Variant& rhs) const
+    //! Assign from a variant vector
+    Variant& operator = (const VariantVector& rhs)
     {
-        if (mType != rhs.mType)
-            return false;
-        
-        switch (mType)
-        {
-        case VAR_INT:
-            return mValue.mInt == rhs.mValue.mInt;
-        case VAR_BOOL:
-            return mValue.mBool == rhs.mValue.mBool;
-        case VAR_FLOAT:
-            return mValue.mFloat == rhs.mValue.mFloat;
-        case VAR_VECTOR2:
-            return *(reinterpret_cast<const Vector2*>(&mValue.mVector4)) == *(reinterpret_cast<const Vector2*>(&rhs.mValue.mVector4));
-        case VAR_VECTOR3:
-            return *(reinterpret_cast<const Vector3*>(&mValue.mVector4)) == *(reinterpret_cast<const Vector3*>(&rhs.mValue.mVector4));
-        case VAR_VECTOR4:
-            return mValue.mVector4 == rhs.mValue.mVector4;
-        case VAR_QUATERNION:
-            return *(reinterpret_cast<const Quaternion*>(&mValue.mVector4)) == *(reinterpret_cast<const Quaternion*>(&rhs.mValue.mVector4));
-        case VAR_COLOR:
-            return *(reinterpret_cast<const Color*>(&mValue.mVector4)) == *(reinterpret_cast<const Color*>(&rhs.mValue.mVector4));
-        case VAR_STRING:
-            return mValue.mString == rhs.mValue.mString;
-        case VAR_BUFFER:
-            return mValue.mBuffer == rhs.mValue.mBuffer;
-        case VAR_PTR:
-            return mValue.mPtr == rhs.mValue.mPtr;
-        }
-        
-        return true;
+        setType(VAR_VARIANTVECTOR);
+        *(reinterpret_cast<VariantVector*>(mValue.mPtr)) = rhs;
+        return *this;
     }
+    
+    //! Assign from a variant map
+    Variant& operator = (const VariantMap& rhs)
+    {
+        setType(VAR_VARIANTMAP);
+        *(reinterpret_cast<VariantMap*>(mValue.mPtr)) = rhs;
+        return *this;
+    }
+    
+    //! Test for equality with another variant
+    bool operator == (const Variant& rhs) const;
     
     //! Test for inequality with another variant
     bool operator != (const Variant& rhs) const
@@ -375,7 +404,7 @@ public:
     bool operator == (const Vector2& rhs) const
     {
         if (mType == VAR_VECTOR2)
-            return *(reinterpret_cast<const Vector2*>(&mValue.mVector4)) == rhs;
+            return *(reinterpret_cast<const Vector2*>(&mValue)) == rhs;
         else
             return false;
     }
@@ -384,7 +413,7 @@ public:
     bool operator == (const Vector3& rhs) const
     {
         if (mType == VAR_VECTOR3)
-            return *(reinterpret_cast<const Vector3*>(&mValue.mVector4)) == rhs;
+            return *(reinterpret_cast<const Vector3*>(&mValue)) == rhs;
         else
             return false;
     }
@@ -393,7 +422,7 @@ public:
     bool operator == (const Vector4& rhs) const
     {
         if (mType == VAR_VECTOR4)
-            return mValue.mVector4 == rhs;
+            return *(reinterpret_cast<const Vector4*>(&mValue)) == rhs;
         else
             return false;
     }
@@ -402,7 +431,7 @@ public:
     bool operator == (const Quaternion& rhs) const
     {
         if (mType == VAR_QUATERNION)
-            return *(reinterpret_cast<const Quaternion*>(&mValue.mVector4)) == rhs;
+            return *(reinterpret_cast<const Quaternion*>(&mValue)) == rhs;
         else
             return false;
     }
@@ -411,7 +440,7 @@ public:
     bool operator == (const Color& rhs) const
     {
         if (mType == VAR_COLOR)
-            return *(reinterpret_cast<const Color*>(&mValue.mVector4)) == rhs;
+            return *(reinterpret_cast<const Color*>(&mValue)) == rhs;
         else
             return false;
     }
@@ -420,7 +449,7 @@ public:
     bool operator == (const std::string& rhs) const
     {
         if (mType == VAR_STRING)
-            return mValue.mString == rhs;
+            return *(reinterpret_cast<const std::string*>(mValue.mPtr)) == rhs;
         else
             return false;
     }
@@ -429,7 +458,7 @@ public:
     bool operator == (const std::vector<unsigned char>& rhs) const
     {
         if (mType == VAR_BUFFER)
-            return mValue.mBuffer == rhs;
+            return *(reinterpret_cast<const std::vector<unsigned char>*>(mValue.mPtr)) == rhs;
         else
             return false;
     }
@@ -439,6 +468,24 @@ public:
     {
         if (mType == VAR_PTR)
             return mValue.mPtr == rhs;
+        else
+            return false;
+    }
+    
+    //! Test for equality with a variant vector. To return true, both the type and value must match
+    bool operator == (const VariantVector& rhs) const
+    {
+        if (mType == VAR_VARIANTVECTOR)
+            return *(reinterpret_cast<VariantVector*>(mValue.mPtr)) == rhs;
+        else
+            return false;
+    }
+    
+    //! Test for equality with a variant map. To return true, both the type and value must match
+    bool operator == (const VariantMap& rhs) const
+    {
+        if (mType == VAR_VARIANTMAP)
+            return *(reinterpret_cast<VariantMap*>(mValue.mPtr)) == rhs;
         else
             return false;
     }
@@ -521,6 +568,18 @@ public:
         return !(*this == rhs);
     }
     
+    //! Test for inequality with a variant vector
+    bool operator != (const VariantVector& rhs) const
+    {
+        return !(*this == rhs);
+    }
+    
+    //! Test for inequality with a variant map
+    bool operator != (const VariantMap& rhs) const
+    {
+        return !(*this == rhs);
+    }
+    
     //! Test for inequality with a StringHash
     bool operator != (const StringHash& rhs) const
     {
@@ -594,7 +653,7 @@ public:
     {
         if (mType != VAR_VECTOR2)
             return Vector2::sZero;
-        return *reinterpret_cast<const Vector2*>(&mValue.mVector4);
+        return *reinterpret_cast<const Vector2*>(&mValue);
     }
     
     //! Return a Vector3, zero vector if type mismatch
@@ -602,7 +661,7 @@ public:
     {
         if (mType != VAR_VECTOR3)
             return Vector3::sZero;
-        return *reinterpret_cast<const Vector3*>(&mValue.mVector4);
+        return *reinterpret_cast<const Vector3*>(&mValue);
     }
     
     //! Return a Vector4, zero vector if type mismatch
@@ -610,7 +669,7 @@ public:
     {
         if (mType != VAR_VECTOR4)
             return Vector4::sZero;
-        return mValue.mVector4;
+        return *reinterpret_cast<const Vector4*>(&mValue);
     }
     
     //! Return a Quaternion, identity if type mismatch
@@ -618,7 +677,7 @@ public:
     {
         if (mType != VAR_QUATERNION)
             return Quaternion::sIdentity;
-        return *reinterpret_cast<const Quaternion*>(&mValue.mVector4);
+        return *reinterpret_cast<const Quaternion*>(&mValue);
     }
     
     //! Return a Color, default if type mismatch
@@ -628,7 +687,7 @@ public:
         
         if (mType != VAR_COLOR)
             return noColor;
-        return *reinterpret_cast<const Color*>(&mValue.mVector4);
+        return *reinterpret_cast<const Color*>(&mValue);
     }
     
     //! Return a string, empty if type mismatch
@@ -638,7 +697,7 @@ public:
         
         if (mType != VAR_STRING)
             return noString;
-        return mValue.mString;
+        return *reinterpret_cast<const std::string*>(mValue.mPtr);
     }
     
     //! Return a buffer, empty if type mismatch
@@ -648,7 +707,27 @@ public:
         
         if (mType != VAR_BUFFER)
             return noBuffer;
-        return mValue.mBuffer;
+        return *reinterpret_cast<const std::vector<unsigned char>*>(mValue.mPtr);
+    }
+    
+    //! Return a variant vector, empty if type mismatch
+    const VariantVector& getVariantVector() const
+    {
+        static const VariantVector noVector;
+        
+        if (mType != VAR_VARIANTVECTOR)
+            return noVector;
+        return *reinterpret_cast<VariantVector*>(mValue.mPtr);
+    }
+    
+    //! Return a variant map, empty if type mismatch
+    const VariantMap& getVariantMap() const
+    {
+        static const VariantMap noMap;
+        
+        if (mType != VAR_VARIANTMAP)
+            return noMap;
+        return *reinterpret_cast<VariantMap*>(mValue.mPtr);
     }
     
     //! Return a pointer, null if type mismatch
@@ -676,25 +755,13 @@ public:
     std::string toString() const;
     
 private:
-    //! Set type and clean up if necessary
-    void setType(VariantType newType)
-    {
-        // Clean up the space-consuming storage if no longer needed
-        if ((mType == VAR_STRING) && (newType != VAR_STRING) && (mValue.mString.length()))
-            mValue.mString = std::string();
-        if ((mType == VAR_BUFFER) && (newType != VAR_BUFFER) && (mValue.mBuffer.size()))
-            mValue.mBuffer = std::vector<unsigned char>();
-        
-        mType = newType;
-    }
+    //! Set new type and allocate/deallocate memory as necessary
+    void Variant::setType(VariantType newType);
     
     //! Variant type
     VariantType mType;
     //! Variant value
     VariantValue mValue;
 };
-
-//! Map of variants
-typedef std::map<ShortStringHash, Variant> VariantMap;
 
 #endif // COMMON_VARIANT_H
