@@ -29,7 +29,8 @@
 
 #include "DebugNew.h"
 
-// Adapted from Angelscript's scriptarray add-on, but with garbage collection disabled
+// Adapted from Angelscript's scriptarray add-on, but with garbage collection disabled, and method names changed
+// to a kind of a C++ / JavaScript hybrid
 
 //! Script array buffer
 struct SArrayBuffer
@@ -539,11 +540,11 @@ void registerArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("array<T>", "T& opIndex(uint)", asMETHOD(CScriptArray, At), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "const T& opIndex(uint) const", asMETHOD(CScriptArray, At), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "array<T> &opAssign(const array<T>& in)", asMETHOD(CScriptArray, operator=), asCALL_THISCALL);
-    engine->RegisterObjectMethod("array<T>", "void insertAt(uint, const T& in)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("array<T>", "void removeAt(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("array<T>", "void insertLast(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
-    engine->RegisterObjectMethod("array<T>", "void removeLast()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
-    engine->RegisterObjectMethod("array<T>", "uint length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "void insert(uint, const T& in)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "void remove(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "void push(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "void pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "uint size() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("array<T>");
 }

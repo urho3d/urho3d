@@ -26,7 +26,8 @@
 
 #include <angelscript.h>
 
-// Adapted from Angelscript's scriptarray add-on, but with garbage collection disabled
+// Adapted from Angelscript's scriptarray add-on, but with garbage collection disabled, and method names changed
+// to a kind of a C++ / JavaScript hybrid
 
 struct SArrayBuffer;
 

@@ -52,6 +52,8 @@ public:
     XMLElement createChildElement(const std::string& name);
     //! Remove a child element, either first or last of them if several exist
     bool removeChildElement(const std::string& name, bool last = true);
+    //! Remove child elements of certain name, or all child elements if name is empty
+    bool removeChildElements(const std::string& name);
     //! Set an attribute
     bool setAttribute(const std::string& name, const std::string& value);
     //! Set a bool attribute
@@ -80,7 +82,9 @@ public:
     bool setString(const std::string& name, const std::string& value);
     //! Set a Variant attribute
     bool setVariant(const Variant& value);
-    //! Set a VariantMap attribute
+    //! Set a VariantVector attribute. Creates child elements as necessary
+    bool setVariantVector(const VariantVector& value);
+    //! Set a VariantMap attribute. Creates child elements as necessary
     bool setVariantMap(const VariantMap& value);
     //! Set a Vector2 attribute
     bool setVector2(const std::string& name, const Vector2& value);
@@ -141,6 +145,8 @@ public:
     std::string getStringUpper(const std::string& name) const;
     //! Return a Variant attribute, or empty if missing
     Variant getVariant() const;
+    //! Return a VariantVector attribute, or empty if missing
+    VariantVector getVariantVector() const;
     //! Return a VariantMap attribute, or empty if missing
     VariantMap getVariantMap() const;
     //! Return a Vector2 attribute, or default if missing

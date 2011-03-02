@@ -47,7 +47,7 @@ class AIController
         RigidBody@ targetBody;
         array<Entity@> entities = scene.getScriptedEntities("Ninja");
         float closestDistance = M_INFINITY;
-        for (uint i = 0; i < entities.length(); ++i)
+        for (uint i = 0; i < entities.size(); ++i)
         {
             Ninja@ otherNinja = cast<Ninja>(entities[i].getScriptObject());
             RigidBody@ otherBody = entities[i].getComponent("RigidBody");

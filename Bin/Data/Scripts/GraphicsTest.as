@@ -192,7 +192,7 @@ void initScene()
         anim.setLooped(true);
         anim.setWeight(1.0f);
 
-        animatingObjects.insertLast(newEntity);
+        animatingObjects.push(newEntity);
     }
     
     // Create floating smoke clouds
@@ -217,7 +217,7 @@ void initScene()
         
         billboard.updated();
         
-        billboards.insertLast(newEntity);
+        billboards.push(newEntity);
     }
     
     // Create lights
@@ -258,7 +258,7 @@ void initScene()
         // for better shadow depth resolution
         light.setShadowNearFarRatio(0.01);
         
-        lights.insertLast(newEntity);
+        lights.push(newEntity);
     }
     
     // Save the ready scene for examination
@@ -270,13 +270,13 @@ void animateScene(float timeStep)
 {
     objectangle += 10.0f * timeStep;
     
-    for (uint i = 0; i < lights.length(); ++i)
+    for (uint i = 0; i < lights.size(); ++i)
     {
         Light@ light = lights[i].getComponent("Light");
         light.setRotation(Quaternion(0, objectangle * 2, 0));
     }
     
-    for (uint i = 0; i < animatingObjects.length(); ++i)
+    for (uint i = 0; i < animatingObjects.size(); ++i)
     {
         AnimatedModel@ model = animatingObjects[i].getComponent("AnimatedModel");
         uint numAnims = model.getNumAnimationStates();
@@ -287,7 +287,7 @@ void animateScene(float timeStep)
         }
     }
     
-    for (uint i = 0; i < billboards.length(); ++i)
+    for (uint i = 0; i < billboards.size(); ++i)
     {
         BillboardSet@ billboard = billboards[i].getComponent("BillboardSet");
         uint numBB = billboard.getNumBillboards();
@@ -325,7 +325,7 @@ void initUI()
 
     bool uiTest = false;
     array<string> arguments = getArguments();
-    for (uint i = 0; i < arguments.length(); ++i)
+    for (uint i = 0; i < arguments.size(); ++i)
     {
         if (arguments[i] == "-uitest")
             uiTest = true;
@@ -619,7 +619,7 @@ void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
         Ray cameraRay = camera.getScreenRay(float(pos.x) / renderer.getWidth(), float(pos.y) / renderer.getHeight());
         array<RayQueryResult> result = testScene.getOctree().raycast(cameraRay, NODE_STATICMODEL | NODE_ANIMATEDMODEL |
             NODE_INSTANCEDMODEL, 250.0f, RAY_TRIANGLE);
-        if (result.length() > 0)
+        if (result.size() > 0)
         {
             VolumeNode@ node = result[0].node;
             Vector3 rayHitPos = cameraRay.origin + cameraRay.direction * result[0].distance;

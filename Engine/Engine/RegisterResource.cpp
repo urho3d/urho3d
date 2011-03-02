@@ -27,6 +27,8 @@
 #include "ScriptInstance.h"
 #include "Scene.h"
 
+void arrayToVariantVector(CScriptArray* arr, VariantVector& dest);
+
 void registerResource(asIScriptEngine* engine)
 {
     registerResource<Resource>(engine, "Resource");
@@ -143,14 +145,41 @@ static void ConstructXMLElementCopy(const XMLElement& element, XMLElement* ptr)
     new(ptr) XMLElement(element);
 }
 
+static CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)
+{
+    return vectorToArray<Variant>(ptr->getVariantVector(), "array<Variant>");
+}
+
+static void XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
+{
+    VariantVector src;
+    arrayToVariantVector(value, src);
+    ptr->setVariantVector(src);
+}
+
 static void registerXMLElement(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("XMLElement", sizeof(XMLElement), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXMLElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f(const XMLElement& in)", asFUNCTION(ConstructXMLElementCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement createChildElement(const string& in)", asMETHOD(XMLElement, createChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool removeChildElement(const string& in, bool)", asMETHOD(XMLElement,removeChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool removeChildElements(const string& in)", asMETHOD(XMLElement,removeChildElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setAttribute(const string& in, const string& in)", asMETHOD(XMLElement,setAttribute), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setBool(const string& in, bool)", asMETHOD(XMLElement,setBool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setBoundingBox(const BoundingBox& in)", asMETHOD(XMLElement,setBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setColor(const string& in, const Color& in)", asMETHOD(XMLElement, setColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setFloat(const string& in, float)", asMETHOD(XMLElement, setFloat), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setInt(const string& in, int)", asMETHOD(XMLElement, setInt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setQuaternion(const string& in, const Quaternion& in)", asMETHOD(XMLElement, setQuaternion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setString(const string& in, const string& in)", asMETHOD(XMLElement, setString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setVariant(const Variant& in)", asMETHOD(XMLElement, setVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setVariantVector(array<Variant>@+)", asFUNCTION(XMLElementSetVariantVector), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLElement", "bool setVariantMap(const VariantMap& in)", asMETHOD(XMLElement, setVariantMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setVector2(const string& in, const Vector2& in)", asMETHOD(XMLElement, setVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool setVector3(const string& in, const Vector3& in)", asMETHOD(XMLElement, setVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool isNull() const", asMETHOD(XMLElement, isNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool notNull() const", asMETHOD(XMLElement, notNull), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement createChildElement(const string& in)", asMETHOD(XMLElement, createChildElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getAttribute(const string& in) const", asMETHOD(XMLElement, getAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool getBool(const string& in) const", asMETHOD(XMLElement, getBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "BoundingBox getBoundingBox() const", asMETHOD(XMLElement, getBoundingBox), asCALL_THISCALL);
@@ -167,24 +196,12 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "string getStringUpper(const string& in) const", asMETHOD(XMLElement, getStringUpper), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getText() const", asMETHOD(XMLElement, getText), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Variant getVariant() const", asMETHOD(XMLElement, getVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "array<Variant>@ getVariantVector() const", asFUNCTION(XMLElementGetVariantVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "VariantMap getVariantMap() const", asMETHOD(XMLElement, getVariantMap), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector2 getVector2(const string& in) const", asMETHOD(XMLElement, getVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector3 getVector3(const string& in) const", asMETHOD(XMLElement, getVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool hasAttribute(const string& in) const", asMETHOD(XMLElement, hasAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool hasChildElement(const string& in) const", asMETHOD(XMLElement, hasChildElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool removeChildElement(const string& in, bool)", asMETHOD(XMLElement,removeChildElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setAttribute(const string& in, const string& in)", asMETHOD(XMLElement,setAttribute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setBool(const string& in, bool)", asMETHOD(XMLElement,setBool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setBoundingBox(const BoundingBox& in)", asMETHOD(XMLElement,setBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setColor(const string& in, const Color& in)", asMETHOD(XMLElement, setColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setFloat(const string& in, float)", asMETHOD(XMLElement, setFloat), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setInt(const string& in, int)", asMETHOD(XMLElement, setInt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setQuaternion(const string& in, const Quaternion& in)", asMETHOD(XMLElement, setQuaternion), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setString(const string& in, const string& in)", asMETHOD(XMLElement, setString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setVariant(const Variant& in)", asMETHOD(XMLElement, setVariant), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setVariantMap(const VariantMap& in)", asMETHOD(XMLElement, setVariantMap), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setVector2(const string& in, const Vector2& in)", asMETHOD(XMLElement, setVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool setVector3(const string& in, const Vector3& in)", asMETHOD(XMLElement, setVector3), asCALL_THISCALL);
 }
 
 static XMLFile* ConstructXMLFile()

@@ -233,15 +233,15 @@ void Variant::write(Serializer& dest) const
         
     case VAR_VARIANTVECTOR:
         {
-            const VariantVector& src = *(reinterpret_cast<VariantVector*>(mValue.mPtr));
-            dest.writeVariantVector(src);
+            const VariantVector& vector = *(reinterpret_cast<VariantVector*>(mValue.mPtr));
+            dest.writeVariantVector(vector);
         }
         break;
         
     case VAR_VARIANTMAP:
         {
-            const VariantMap& src = *(reinterpret_cast<VariantMap*>(mValue.mPtr));
-            dest.writeVariantMap(src);
+            const VariantMap& map = *(reinterpret_cast<VariantMap*>(mValue.mPtr));
+            dest.writeVariantMap(map);
         }
         break;
     }
@@ -424,11 +424,11 @@ std::string Variant::toString() const
         
     case VAR_VARIANTVECTOR:
         {
-            const VariantVector& src = *(reinterpret_cast<const VariantVector*>(mValue.mPtr));
+            const VariantVector& vector = *(reinterpret_cast<const VariantVector*>(mValue.mPtr));
             std::string ret;
-            for (VariantVector::const_iterator i = src.begin(); i != src.end(); ++i)
+            for (VariantVector::const_iterator i = vector.begin(); i != vector.end(); ++i)
             {
-                if (i != src.begin())
+                if (i != vector.begin())
                     ret += "#";
                 ret += i->getTypeName() + "#";
                 ret += i->toString();
@@ -438,11 +438,11 @@ std::string Variant::toString() const
         
     case VAR_VARIANTMAP:
         {
-            const VariantMap& src = *(reinterpret_cast<const VariantMap*>(mValue.mPtr));
+            const VariantMap& map = *(reinterpret_cast<const VariantMap*>(mValue.mPtr));
             std::string ret;
-            for (VariantMap::const_iterator i = src.begin(); i != src.end(); ++i)
+            for (VariantMap::const_iterator i = map.begin(); i != map.end(); ++i)
             {
-                if (i != src.begin())
+                if (i != map.begin())
                     ret += "#";
                 ret += ::toString(i->first.mData) + "#";
                 ret += i->second.getTypeName() + "#";

@@ -90,6 +90,26 @@ bool XMLElement::removeChildElement(const std::string& name, bool last)
     return false;
 }
 
+bool XMLElement::removeChildElements(const std::string& name)
+{
+    if (!mElement)
+        return false;
+    
+    TiXmlNode* element;
+    if (name.empty())
+    {
+        while (element = mElement->LastChild())
+            mElement->RemoveChild(element);
+    }
+    else
+    {
+        while (element = mElement->LastChild(name.c_str()))
+            mElement->RemoveChild(element);
+    }
+    
+    return true;
+}
+
 bool XMLElement::setAttribute(const std::string& name, const std::string& value)
 {
     if (!mElement)
@@ -177,11 +197,42 @@ bool XMLElement::setVariant(const Variant& value)
 {
     if (!setAttribute("type", value.getTypeName()))
         return false;
-    return setAttribute("value", value.toString());
+    
+    switch (value.getType())
+    {
+    case VAR_VARIANTVECTOR:
+        return setVariantVector(value.getVariantVector());
+        
+    case VAR_VARIANTMAP:
+        return setVariantMap(value.getVariantMap());
+        
+    default:
+        return setAttribute("value", value.toString());
+    }
+}
+
+bool XMLElement::setVariantVector(const VariantVector& value)
+{
+    // Must remove all existing variant child elements (if they exist) to not cause confusion
+    if (!removeChildElements("variant"))
+        return false;
+    
+    for (VariantVector::const_iterator i = value.begin(); i != value.end(); ++i)
+    {
+        XMLElement variantElem = createChildElement("variant");
+        if (!variantElem)
+            return false;
+        variantElem.setVariant(*i);
+    }
+    
+    return true;
 }
 
 bool XMLElement::setVariantMap(const VariantMap& value)
 {
+    if (!removeChildElements("variant"))
+        return false;
+    
     for (VariantMap::const_iterator i = value.begin(); i != value.end(); ++i)
     {
         XMLElement variantElem = createChildElement("variant");
@@ -394,10 +445,29 @@ std::string XMLElement::getStringUpper(const std::string& name) const
 Variant XMLElement::getVariant() const
 {
     Variant ret;
-    std::string type = getAttribute("type");
-    std::string value = getAttribute("value");
     
-    ret.fromString(type, value);
+    std::string type = toLower(getAttribute("type"));
+    if (type == "variantvector")
+        ret = getVariantVector();
+    else if (type == "variantmap")
+        ret = getVariantMap();
+    else
+        ret.fromString(type, getAttribute("value"));
+    
+    return ret;
+}
+
+VariantVector XMLElement::getVariantVector() const
+{
+    VariantVector ret;
+    
+    XMLElement variantElem = getChildElement("variant");
+    while (variantElem)
+    {
+        ret.push_back(variantElem.getVariant());
+        variantElem = variantElem.getNextElement("variant");
+    }
+    
     return ret;
 }
 

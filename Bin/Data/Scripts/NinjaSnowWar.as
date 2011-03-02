@@ -164,7 +164,7 @@ void startGame()
     // Clear the scene of all existing scripted entities
     {
         array<Entity@> scriptedEntities = gameScene.getScriptedEntities();
-        for (uint i = 0; i < scriptedEntities.length(); ++i)
+        for (uint i = 0; i < scriptedEntities.size(); ++i)
             gameScene.removeEntity(scriptedEntities[i]);
     }
 
@@ -272,7 +272,7 @@ void spawnObjects(float timeStep)
     if (powerupSpawnTimer >= powerupSpawnRate)
     {
         powerupSpawnTimer = 0;
-        int numPowerups = gameScene.getScriptedEntities("SnowCrate").length() + gameScene.getScriptedEntities("Potion").length();
+        int numPowerups = gameScene.getScriptedEntities("SnowCrate").size() + gameScene.getScriptedEntities("Potion").size();
 
         if (numPowerups < maxPowerups)
         {
@@ -293,7 +293,7 @@ void spawnObjects(float timeStep)
     {
         enemySpawnTimer = 0;
         // Take the player ninja into account
-        int numEnemies = gameScene.getScriptedEntities("Ninja").length() - 1;
+        int numEnemies = gameScene.getScriptedEntities("Ninja").size() - 1;
 
         if (numEnemies < maxEnemies)
         {
@@ -387,7 +387,7 @@ void updateCamera()
     Vector3 rayDir = (maxDist - minDist).getNormalized();
     float rayDistance = cameraMaxDist - cameraMinDist + cameraSafetyDist;
     array<PhysicsRaycastResult>@ result = gameScene.getPhysicsWorld().raycast(Ray(minDist, rayDir), rayDistance, 2);
-    if (result.length() > 0)
+    if (result.size() > 0)
         rayDistance = min(rayDistance, result[0].distance - cameraSafetyDist);
 
     gameCamera.setPosition(minDist + rayDir * rayDistance);
