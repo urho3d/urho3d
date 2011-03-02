@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Öörni for Urho3D
 
 //
 // as_datatype.cpp
@@ -53,6 +54,8 @@ asCDataType::asCDataType()
 	isObjectHandle = false;
 	isConstHandle  = false;
 	funcDef        = 0;
+	// Urho3D: reset cached type ID
+	cachedTypeId   = 0;
 }
 
 asCDataType::asCDataType(const asCDataType &dt)
@@ -64,6 +67,8 @@ asCDataType::asCDataType(const asCDataType &dt)
 	isObjectHandle = dt.isObjectHandle;
 	isConstHandle  = dt.isConstHandle;
 	funcDef        = dt.funcDef;
+	// Urho3D: copy cached type ID
+	cachedTypeId   = dt.cachedTypeId;
 }
 
 asCDataType::~asCDataType()
@@ -180,7 +185,7 @@ asCString asCDataType::Format() const
 			str += "const";
 	}
 
-    if( isReference )
+	if( isReference )
 		str += "&";
 
 	return str;
@@ -196,12 +201,17 @@ asCDataType &asCDataType::operator =(const asCDataType &dt)
 	isObjectHandle   = dt.isObjectHandle;
 	isConstHandle    = dt.isConstHandle;
 	funcDef          = dt.funcDef;
+	// Urho3D: copy cached type id
+	cachedTypeId     = dt.cachedTypeId;
 
 	return (asCDataType &)*this;
 }
 
 int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 {
+	// Urho3D: reset cached type ID
+	cachedTypeId = 0;
+
 	if( !b )
 	{
 		isObjectHandle = b;
@@ -228,6 +238,9 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 
 int asCDataType::MakeArray(asCScriptEngine *engine)
 {
+	// Urho3D: reset cached type ID
+	cachedTypeId = 0;
+
 	if( engine->defaultArrayObjectType == 0 )
 		return asINVALID_TYPE;
 
@@ -247,6 +260,9 @@ int asCDataType::MakeArray(asCScriptEngine *engine)
 
 int asCDataType::MakeReference(bool b)
 {
+	// Urho3D: reset cached type ID
+	cachedTypeId = 0;
+
 	isReference = b;
 
 	return 0;
@@ -254,6 +270,9 @@ int asCDataType::MakeReference(bool b)
 
 int asCDataType::MakeReadOnly(bool b)
 {
+	// Urho3D: reset cached type ID
+	cachedTypeId = 0;
+
 	if( isObjectHandle )
 	{
 		isConstHandle = b;
@@ -266,6 +285,9 @@ int asCDataType::MakeReadOnly(bool b)
 
 int asCDataType::MakeHandleToConst(bool b)
 {
+	// Urho3D: reset cached type ID
+	cachedTypeId = 0;
+
 	if( !isObjectHandle ) return -1;
 
 	isReadOnly = b;

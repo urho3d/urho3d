@@ -3219,13 +3219,21 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dt) const
 {
 	if( dt.IsNullHandle() ) return 0;
 
+	// Urho3D: check first for cached id in the type itself
+	int typeId = dt.GetCachedTypeId();
+	if( typeId ) return typeId;
+	
 	// Find the existing type id
 	asSMapNode<int,asCDataType*> *cursor = 0;
 	mapTypeIdToDataType.MoveFirst(&cursor);
 	while( cursor )
 	{
 		if( mapTypeIdToDataType.GetValue(cursor)->IsEqualExceptRefAndConst(dt) )
-			return mapTypeIdToDataType.GetKey(cursor);
+		{
+			typeId = mapTypeIdToDataType.GetKey(cursor);
+			dt.SetCachedTypeId(typeId);
+			return typeId;
+		}
 
 		mapTypeIdToDataType.MoveNext(&cursor, cursor);
 	}
@@ -3233,7 +3241,7 @@ int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dt) const
 	// The type id doesn't exist, create it
 
 	// Setup the basic type id
-	int typeId = typeIdSeqNbr++;
+	typeId = typeIdSeqNbr++;
 	if( dt.GetObjectType() )
 	{
 		if( dt.GetObjectType()->flags & asOBJ_SCRIPT_OBJECT ) typeId |= asTYPEID_SCRIPTOBJECT;
