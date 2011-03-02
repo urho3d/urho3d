@@ -358,6 +358,13 @@ static void SceneLoadAsyncXML(File* file, Scene* ptr)
     TRY_SAFE_RETHROW(ptr->loadAsyncXML(file));
 }
 
+static CScriptArray* SceneGetComponentTypes(Scene* ptr)
+{
+    std::vector<std::string> result;
+    ptr->getComponentTypes(result);
+    return vectorToArray(result, "array<string>");
+}
+
 static CScriptArray* SceneGetAllEntities(Scene* ptr)
 {
     const std::map<EntityID, SharedPtr<Entity> >& entities = ptr->getAllEntities();
@@ -441,6 +448,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void setInterpolationSnapThreshold(float)", asMETHOD(Scene, setInterpolationSnapThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const string& getName() const", asMETHOD(Scene, getName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "uint8 getNetFlags() const", asMETHOD(Scene, getNetFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "array<string>@ getComponentTypes() const", asFUNCTION(SceneGetComponentTypes), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool hasEntity(uint) const", asMETHODPR(Scene, hasEntity, (EntityID) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool hasEntity(Entity@+) const", asMETHODPR(Scene, hasEntity, (Entity*) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool hasEntity(const string& in) const", asMETHODPR(Scene, hasEntity, (const std::string&) const, bool), asCALL_THISCALL);

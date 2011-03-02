@@ -34,3 +34,8 @@ Component* BaseComponentFactory::createComponent(ShortStringHash type, const std
     
     return 0;
 }
+
+void BaseComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(Node::getTypeNameStatic());
+}

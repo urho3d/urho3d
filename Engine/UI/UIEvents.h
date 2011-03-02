@@ -156,8 +156,8 @@ DEFINE_EVENT(EVENT_ITEMDOUBLECLICKED, ItemDoubleClicked)
     EVENT_PARAM(P_SELECTION, Selection);        // int
 }
 
-//! Listview unhandled key pressed
-DEFINE_EVENT(EVENT_LISTVIEWKEY, ListViewKey)
+//! LineEdit or Listview unhandled key pressed
+DEFINE_EVENT(EVENT_UNHANDLEDKEY, UnhandledKey)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
     EVENT_PARAM(P_KEY, Key);                    // int

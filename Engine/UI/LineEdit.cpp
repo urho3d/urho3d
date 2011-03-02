@@ -306,6 +306,22 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
             changed = true;
         }
         break;
+        
+    case KEY_UP:
+    case KEY_DOWN:
+    case KEY_PAGEUP:
+    case KEY_PAGEDOWN:
+        {
+            using namespace UnhandledKey;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_KEY] = key;
+            eventData[P_BUTTONS] = buttons;
+            eventData[P_QUALIFIERS] = qualifiers;
+            sendEvent(EVENT_UNHANDLEDKEY, eventData);
+        }
+        break;
     }
     
     if (changed)
@@ -414,10 +430,9 @@ void LineEdit::setText(const std::string& text)
     if (text != mLine)
     {
         mLine = text;
-        // If cursor is not movable, make sure it's at the text end
-        if (!mCursorMovable)
-            setCursorPosition(mLine.length());
+        mCursorPosition = mLine.length();
         updateText();
+        updateCursor();
     }
 }
 

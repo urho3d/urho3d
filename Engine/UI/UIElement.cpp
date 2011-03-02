@@ -879,10 +879,7 @@ unsigned UIElement::getNumChildren(bool recursive) const
 
 UIElement* UIElement::getChild(unsigned index) const
 {
-    if (index >= mChildren.size())
-        return 0;
-    
-    return mChildren[index];
+    return index < mChildren.size() ? mChildren[index] : (UIElement*)0;
 }
 
 UIElement* UIElement::getChild(const std::string& name, bool recursive) const

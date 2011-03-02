@@ -38,8 +38,15 @@ Component* EngineComponentFactory::createComponent(ShortStringHash type, const s
 {
     if (type == AnimationController::getTypeStatic())
         return new AnimationController(name);
+    
     if (type == ParticleEmitter::getTypeStatic())
         return new ParticleEmitter(mOctree, name);
     
     return 0;
+}
+
+void EngineComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(AnimationController::getTypeNameStatic());
+    dest.push_back(ParticleEmitter::getTypeNameStatic());
 }

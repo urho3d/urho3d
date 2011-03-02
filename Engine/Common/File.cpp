@@ -404,7 +404,7 @@ void scanDirectoryInternal(std::vector<std::string>& result, std::string path, c
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
                     if (flags & SCAN_DIRECTORIES)
-                        result.push_back(path + fileName);
+                        result.push_back(deltaPath + fileName);
                     if ((recursive) && (fileName != ".") && (fileName != ".."))
                         scanDirectoryInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }

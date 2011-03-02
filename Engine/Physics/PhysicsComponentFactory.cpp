@@ -44,3 +44,9 @@ Component* PhysicsComponentFactory::createComponent(ShortStringHash type, const 
     
     return 0;
 }
+
+void PhysicsComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(RigidBody::getTypeNameStatic());
+    dest.push_back(Joint::getTypeNameStatic());
+}

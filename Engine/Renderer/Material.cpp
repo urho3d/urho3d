@@ -675,10 +675,7 @@ SharedPtr<Material> Material::clone(const std::string& cloneName) const
 
 MaterialTechnique* Material::getTechnique(unsigned index)
 {
-    if (index >= mTechniques.size())
-        return 0;
-    
-    return &mTechniques[index];
+    return index < mTechniques.size() ? &mTechniques[index] : 0;
 }
 
 MaterialPass* Material::getPass(unsigned technique, PassType pass)

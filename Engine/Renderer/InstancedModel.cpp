@@ -620,18 +620,12 @@ void InstancedModel::updated()
 
 Material* InstancedModel::getMaterial(unsigned index) const
 {
-    if (index >= mOriginalMaterials.size())
-        return 0;
-    
-    return mOriginalMaterials[index];
+    return index < mOriginalMaterials.size() ? mOriginalMaterials[index] : (Material*)0;
 }
 
 Instance* InstancedModel::getInstance(unsigned index)
 {
-    if (index >= mInstances.size())
-        return 0;
-    
-    return &mInstances[index];
+    return index < mInstances.size() ? &mInstances[index] : (Instance*)0;
 }
 
 void InstancedModel::onMarkedDirty()

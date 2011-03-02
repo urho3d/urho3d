@@ -481,18 +481,12 @@ void CustomObject::setOptimization(bool enable)
 
 const CustomGeometry* CustomObject::getGeometry(unsigned index) const
 {
-    if (index >= mCustomGeometries.size())
-        return 0;
-    
-    return &mCustomGeometries[index];
+    return index < mCustomGeometries.size() ? &mCustomGeometries[index] : (CustomGeometry*)0;
 }
 
 Material* CustomObject::getMaterial(unsigned index) const
 {
-    if (index >= mCustomGeometries.size())
-        return 0;
-    
-    return mCustomGeometries[index].mMaterial;
+    return index < mCustomGeometries.size() ? mCustomGeometries[index].mMaterial : (Material*)0;
 }
 
 void CustomObject::onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox)

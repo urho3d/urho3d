@@ -25,6 +25,7 @@
 #include "Console.h"
 #include "Engine.h"
 #include "Font.h"
+#include "InputEvents.h"
 #include "LineEdit.h"
 #include "Log.h"
 #include "Renderer.h"
@@ -39,9 +40,12 @@
 #include "DebugNew.h"
 
 static const int DEFAULT_CONSOLE_ROWS = 16;
+static const int DEFAULT_HISTORY_SIZE = 16;
 
 Console::Console(Engine* engine) :
-    mEngine(engine)
+    mEngine(engine),
+    mHistoryRows(DEFAULT_HISTORY_SIZE),
+    mHistoryPosition(0)
 {
     LOGINFO("Console created");
     
@@ -70,6 +74,7 @@ Console::Console(Engine* engine) :
         updateElements();
         
         subscribeToEvent(mLineEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
+        subscribeToEvent(mLineEdit, EVENT_UNHANDLEDKEY, EVENT_HANDLER(Console, handleLineEditKey));
         subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
         subscribeToEvent(EVENT_LOGMESSAGE, EVENT_HANDLER(Console, handleLogMessage));
     }
@@ -148,6 +153,15 @@ void Console::setNumRows(unsigned rows)
     updateElements();
 }
 
+void Console::setNumHistoryRows(unsigned rows)
+{
+    mHistoryRows = rows;
+    if (mHistory.size() > rows)
+        mHistory.resize(rows);
+    if (mHistoryPosition > rows)
+        mHistoryPosition = rows;
+}
+
 void Console::updateElements()
 {
     int width = mEngine->getRenderer()->getWidth();
@@ -162,15 +176,67 @@ bool Console::isVisible() const
     return mBackground->isVisible();
 }
 
+const std::string& Console::getHistoryRow(unsigned index) const
+{
+    static const std::string noRow;
+    return index < mHistory.size() ? mHistory[index] : noRow;
+}
+
 void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
     
     std::string line = mLineEdit->getText();
-    ScriptEngine* scriptEngine = mEngine->getScriptEngine();
-    if (scriptEngine)
-        scriptEngine->execute(line);
-    mLineEdit->setText(std::string());
+    if (!line.empty())
+    {
+        ScriptEngine* scriptEngine = mEngine->getScriptEngine();
+        if (scriptEngine)
+            scriptEngine->execute(line);
+        
+        // Store to history, then clear the lineedit
+        mHistory.push_back(line);
+        if (mHistory.size() > mHistoryRows)
+            mHistory.erase(mHistory.begin());
+        mHistoryPosition = mHistory.size();
+        mLineEdit->setText(std::string());
+    }
+}
+
+void Console::handleLineEditKey(StringHash eventType, VariantMap& eventData)
+{
+    if (!mHistoryRows)
+        return;
+    
+    using namespace UnhandledKey;
+    
+    bool changed = false;
+    
+    switch(eventData[P_KEY].getInt())
+    {
+    case KEY_UP:
+        if (mHistoryPosition > 0)
+        {
+            --mHistoryPosition;
+            changed = true;
+        }
+        break;
+    
+    case KEY_DOWN:
+        if (mHistoryPosition < mHistory.size())
+        {
+            ++mHistoryPosition;
+            changed = true;
+        }
+        break;
+    }
+    
+    if (changed)
+    {
+        if (mHistoryPosition < mHistory.size())
+            mLineEdit->setText(mHistory[mHistoryPosition]);
+        else
+            mLineEdit->setText(std::string());
+    }
 }
 
 void Console::handleWindowResized(StringHash eventType, VariantMap& eventData)

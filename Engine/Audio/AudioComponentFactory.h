@@ -38,6 +38,8 @@ public:
     
     //! Create a component of the specified type. Return null if can not create
     virtual Component* createComponent(ShortStringHash type, const std::string& name = std::string());
+    //! Return type names of components that can be created
+    virtual void getComponentTypes(std::vector<std::string>& dest);
     
 private:
     //! Audio subsystem

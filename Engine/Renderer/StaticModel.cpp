@@ -352,10 +352,7 @@ bool StaticModel::setMaterial(unsigned index, Material* material)
 
 Material* StaticModel::getMaterial(unsigned index) const
 {
-    if (index >= mMaterials.size())
-        return 0;
-    
-    return mMaterials[index];
+    return index < mMaterials.size() ? mMaterials[index] : (Material*)0;
 }
 
 void StaticModel::setBoundingBox(const BoundingBox& box)

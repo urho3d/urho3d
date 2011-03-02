@@ -887,10 +887,7 @@ void AnimatedModel::syncMorphs(AnimatedModel* srcNode)
 
 float AnimatedModel::getMorphWeight(unsigned index) const
 {
-    if (index >= mMorphs.size())
-        return 0.0f;
-    
-    return mMorphs[index].mWeight;
+    return index < mMorphs.size() ? mMorphs[index].mWeight : 0.0f;
 }
 
 float AnimatedModel::getMorphWeight(const std::string& name) const
@@ -956,9 +953,7 @@ AnimationState* AnimatedModel::getAnimationState(StringHash animationNameHash) c
 
 AnimationState* AnimatedModel::getAnimationState(unsigned index) const
 {
-    if (index >= mAnimationStates.size())
-        return 0;
-    return mAnimationStates[index];
+    return index < mAnimationStates.size() ? mAnimationStates[index] : 0;
 }
 
 void AnimatedModel::setSkeleton(const Skeleton& skeleton)

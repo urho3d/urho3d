@@ -1802,34 +1802,22 @@ std::vector<int> Renderer::getMultiSampleSupport() const
 
 VertexBuffer* Renderer::getVertexBuffer(unsigned index) const
 {
-    if (index >= MAX_VERTEX_STREAMS)
-        return 0;
-    
-    return mVertexBuffer[index];
+    return index < MAX_VERTEX_STREAMS ? mVertexBuffer[index] : 0;
 }
 
 Texture* Renderer::getTexture(unsigned index) const
 {
-    if (index >= MAX_TEXTURE_UNITS)
-        return 0;
-    
-    return mTexture[index];
+    return index < MAX_TEXTURE_UNITS ? mTexture[index] : 0;
 }
 
 RenderSurface* Renderer::getRenderTarget(unsigned index) const
 {
-    if (index >= MAX_RENDERTARGETS)
-        return 0;
-    
-    return mRenderTarget[index];
+    return index < MAX_RENDERTARGETS ? mRenderTarget[index] : 0;
 }
 
 unsigned Renderer::getStreamFrequency(unsigned index) const
 {
-    if (index >= MAX_VERTEX_STREAMS)
-        return 0;
-    
-    return mStreamFrequency[index];
+    return index < MAX_VERTEX_STREAMS ? mStreamFrequency[index] : 0;
 }
 
 IntVector2 Renderer::getRenderTargetDimensions() const

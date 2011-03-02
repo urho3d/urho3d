@@ -441,12 +441,8 @@ void Pipeline::setDrawDebugGeometry(bool enable)
 
 const Viewport& Pipeline::getViewport(unsigned index) const
 {
-    static const Viewport emptyViewport;
-    
-    if (index >= mViewports.size())
-        return emptyViewport;
-    else
-        return mViewports[index];
+    static const Viewport noViewport;
+    return index < mViewports.size() ? mViewports[index] : noViewport;
 }
 
 VertexShader* Pipeline::getVertexShader(const std::string& name, bool checkExists) const

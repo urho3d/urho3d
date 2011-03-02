@@ -380,10 +380,7 @@ void BillboardSet::updated()
 
 Billboard* BillboardSet::getBillboard(unsigned index)
 {
-    if (index >= mBillboards.size())
-        return 0;
-    
-    return &mBillboards[index];
+    return index < mBillboards.size() ? &mBillboards[index] : (Billboard*)0;
 }
 
 void BillboardSet::onMarkedDirty()

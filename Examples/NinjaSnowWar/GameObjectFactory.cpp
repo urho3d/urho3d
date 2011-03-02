@@ -50,3 +50,12 @@ Component* GameObjectFactory::createComponent(ShortStringHash type, const std::s
     
     return 0;
 }
+
+void GameObjectFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(GameObject::getTypeNameStatic());
+    dest.push_back(Ninja::getTypeNameStatic());
+    dest.push_back(SnowBall::getTypeNameStatic());
+    dest.push_back(SnowCrate::getTypeNameStatic());
+    dest.push_back(Potion::getTypeNameStatic());
+}

@@ -29,6 +29,7 @@
 class GameObjectFactory : public ComponentFactory
 {
     virtual Component* createComponent(ShortStringHash type, const std::string& name = std::string());
+    virtual void getComponentTypes(std::vector<std::string>& dest);
 };
 
 #endif // GAMEOBJECTFACTORY_H

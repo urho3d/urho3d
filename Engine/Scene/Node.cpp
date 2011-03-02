@@ -541,10 +541,7 @@ unsigned Node::getNumChildren(bool recursive) const
 
 Node* Node::getChild(unsigned index) const
 {
-    if (index >= mChildren.size())
-        return 0;
-    
-    return mChildren[index];
+    return index < mChildren.size() ? mChildren[index] : (Node*)0;
 }
 
 Node* Node::getChild(const std::string& name, bool recursive) const

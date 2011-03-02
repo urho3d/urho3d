@@ -198,10 +198,7 @@ void Skeleton::reset(bool force)
 
 Bone* Skeleton::getBone(unsigned index) const
 {
-    if (index >= mBones.size())
-        return 0;
-    
-    return mBones[index];
+    return index < mBones.size() ? mBones[index] : (Bone*)0;
 }
 
 Bone* Skeleton::getBone(const std::string& name) const

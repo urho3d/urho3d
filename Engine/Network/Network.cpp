@@ -276,10 +276,7 @@ void Network::stopClient()
 
 Peer* Network::getPeer(unsigned index) const
 {
-    if (index >= mPeers.size())
-        return 0;
-    
-    return mPeers[index];
+    return index < mPeers.size() ? mPeers[index] : (Peer*)0;
 }
 
 Peer* Network::getServerPeer() const

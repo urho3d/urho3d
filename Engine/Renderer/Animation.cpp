@@ -149,10 +149,7 @@ unsigned Animation::getNumTracks() const
 
 const AnimationTrack* Animation::getTrack(unsigned index) const
 {
-    if (index >= mTracks.size())
-        return 0;
-    
-    return &mTracks[index];
+    return index < mTracks.size() ? &mTracks[index] : 0;
 }
 
 const AnimationTrack* Animation::getTrack(const std::string& name) const

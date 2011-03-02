@@ -38,8 +38,15 @@ Component* AudioComponentFactory::createComponent(ShortStringHash type, const st
 {
     if (type == StereoChannel::getTypeStatic())
         return new StereoChannel(mAudio, name);
+    
     if (type == PositionalChannel::getTypeStatic())
         return new PositionalChannel(mAudio, name);
     
     return 0;
+}
+
+void AudioComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(StereoChannel::getTypeNameStatic());
+    dest.push_back(PositionalChannel::getTypeNameStatic());
 }

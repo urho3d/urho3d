@@ -226,14 +226,14 @@ void ListView::onKey(int key, int buttons, int qualifiers)
         }
     }
     
-    using namespace ListViewKey;
+    using namespace UnhandledKey;
     
     VariantMap eventData;
     eventData[P_ELEMENT] = (void*)this;
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = buttons;
     eventData[P_QUALIFIERS] = qualifiers;
-    sendEvent(EVENT_LISTVIEWKEY, eventData);
+    sendEvent(EVENT_UNHANDLEDKEY, eventData);
 }
 
 void ListView::onResize()

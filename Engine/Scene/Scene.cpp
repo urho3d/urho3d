@@ -509,9 +509,9 @@ SharedPtr<Component> Scene::createComponent(ShortStringHash type, const std::str
 {
     SharedPtr<Component> component;
     
-    for (unsigned i = 0; i < mFactories.size(); ++i)
+    for (std::vector<SharedPtr<ComponentFactory> >::iterator i = mFactories.begin(); i != mFactories.end(); ++i)
     {
-        component = mFactories[i]->createComponent(type, name);
+        component = (*i)->createComponent(type, name);
         if (component)
         {
             // Set the authority flag to differentiate between singleplayer & server components
@@ -804,6 +804,13 @@ EntityID Scene::getNextLocalEntityID()
         mNextLocalEntityID = LOCAL_ENTITY;
     
     return current;
+}
+
+void Scene::getComponentTypes(std::vector<std::string>& dest) const
+{
+    dest.clear();
+    for (std::vector<SharedPtr<ComponentFactory> >::const_iterator i = mFactories.begin(); i != mFactories.end(); ++i)
+        (*i)->getComponentTypes(dest);
 }
 
 bool Scene::hasEntity(EntityID id) const

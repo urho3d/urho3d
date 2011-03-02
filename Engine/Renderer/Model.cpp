@@ -400,9 +400,7 @@ void Model::setOcclusionLodLevel(unsigned lodLevel)
 
 unsigned Model::getNumGeometryLodLevels(unsigned index) const
 {
-    if (index >= mGeometries.size())
-        return 0;
-    return mGeometries[index].size();
+    return index < mGeometries.size() ? mGeometries[index].size() : 0;
 }
 
 Geometry* Model::getGeometry(unsigned index, unsigned lodLevel) const
@@ -415,9 +413,7 @@ Geometry* Model::getGeometry(unsigned index, unsigned lodLevel) const
 
 const ModelMorph* Model::getMorph(unsigned index) const
 {
-    if (index >= mMorphs.size())
-        return 0;
-    return &mMorphs[index];
+    return index < mMorphs.size() ? &mMorphs[index] : 0;
 }
 
 const ModelMorph* Model::getMorph(const std::string& name) const

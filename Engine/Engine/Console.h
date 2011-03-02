@@ -49,8 +49,10 @@ public:
     void setVisible(bool enable);
     //! Toggle visibility
     void toggle();
-    //! Set number of rows
+    //! Set number of displayed rows
     void setNumRows(unsigned rows);
+    //! Set command history maximum size, 0 disables history
+    void setNumHistoryRows(unsigned rows);
     //! Update elements to layout properly. Call this after manually adjusting the sub-elements
     void updateElements();
     
@@ -62,12 +64,20 @@ public:
     LineEdit* getLineEdit() const { return mLineEdit; }
     //! Return whether is visible
     bool isVisible() const;
-    //! Return number of rows
+    //! Return number of displayed rows
     unsigned getNumRows() const { return mRows.size(); }
+    //! Return history maximum size
+    unsigned getNumHistoryRows() const { return mHistoryRows; }
+    //! Return current history position
+    unsigned getHistoryPosition() const { return mHistoryPosition; }
+    //! Return history row at index
+    const std::string& getHistoryRow(unsigned index) const;
     
 private:
     //! Handle enter pressed on the line edit
     void handleTextFinished(StringHash eventType, VariantMap& eventData);
+    //! Handle unhandled key on the line edit for scrolling the history
+    void handleLineEditKey(StringHash eventType, VariantMap& eventData);
     //! Handle rendering window resize
     void handleWindowResized(StringHash eventType, VariantMap& eventData);
     //! Handle a log message
@@ -83,6 +93,12 @@ private:
     std::vector<SharedPtr<Text> > mRows;
     //! Line edit
     SharedPtr<LineEdit> mLineEdit;
+    //! Command history
+    std::vector<std::string> mHistory;
+    //! Command history maximum rows
+    unsigned mHistoryRows;
+    //! Command history current position
+    unsigned mHistoryPosition;
 };
 
 #endif // ENGINE_CONSOLE_H

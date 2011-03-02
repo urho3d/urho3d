@@ -40,3 +40,8 @@ Component* ScriptComponentFactory::createComponent(ShortStringHash type, const s
     
     return 0;
 }
+
+void ScriptComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(ScriptInstance::getTypeNameStatic());
+}

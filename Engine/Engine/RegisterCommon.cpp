@@ -476,8 +476,8 @@ static void registerVariant(asIScriptEngine* engine)
 
 static CScriptArray* Split(char separator, const std::string* str)
 {
-    std::vector<std::string> ret = split(*str, separator);
-    return vectorToArray<std::string>(ret, "array<string>");
+    std::vector<std::string> result = split(*str, separator);
+    return vectorToArray<std::string>(result, "array<string>");
 }
 
 static void registerStringUtils(asIScriptEngine* engine)

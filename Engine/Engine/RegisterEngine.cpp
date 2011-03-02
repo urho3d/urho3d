@@ -370,13 +370,16 @@ static void registerConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "void setVisible(bool)", asMETHOD(Console, setVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void toggle()", asMETHOD(Console, toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void setNumRows(uint)", asMETHOD(Console, setNumRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void setNumHistoryRows(uint)", asMETHOD(Console, setNumHistoryRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "void updateElements()", asMETHOD(Console, updateElements), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "XMLFile@+ getStyle() const", asMETHOD(Console, getStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "BorderImage@+ getBackground() const", asMETHOD(Console, getBackground), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "LineEdit@+ getLineEdit() const", asMETHOD(Console, getLineEdit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "bool isVisible() const", asMETHOD(Console, isVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "uint getNumRows() const", asMETHOD(Console, getNumRows), asCALL_THISCALL);
-    
+    engine->RegisterObjectMethod("Console", "uint getNumHistoryRows() const", asMETHOD(Console, getNumHistoryRows), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "uint getHistoryPosition() const", asMETHOD(Console, getHistoryPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "const string& getHistoryRow(uint) const", asMETHOD(Console, getHistoryRow), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Console@+ getConsole()", asFUNCTION(GetConsole), asCALL_CDECL);
     engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
 }

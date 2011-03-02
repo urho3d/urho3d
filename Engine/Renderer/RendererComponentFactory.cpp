@@ -74,3 +74,17 @@ Component* RendererComponentFactory::createComponent(ShortStringHash type, const
     
     return 0;
 }
+
+void RendererComponentFactory::getComponentTypes(std::vector<std::string>& dest)
+{
+    dest.push_back(Camera::getTypeNameStatic());
+    dest.push_back(Bone::getTypeNameStatic());
+    dest.push_back(Light::getTypeNameStatic());
+    dest.push_back(StaticModel::getTypeNameStatic());
+    dest.push_back(AnimatedModel::getTypeNameStatic());
+    dest.push_back(InstancedModel::getTypeNameStatic());
+    dest.push_back(BillboardSet::getTypeNameStatic());
+    dest.push_back(CustomObject::getTypeNameStatic());
+    dest.push_back(Skybox::getTypeNameStatic());
+    dest.push_back(Zone::getTypeNameStatic());
+}

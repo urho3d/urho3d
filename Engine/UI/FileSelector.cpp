@@ -112,7 +112,7 @@ FileSelector::FileSelector(UI* ui) :
     subscribeToEvent(mPathEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handlePathChanged));
     subscribeToEvent(mFileList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFileSelected));
     subscribeToEvent(mFileList, EVENT_ITEMDOUBLECLICKED, EVENT_HANDLER(FileSelector, handleFileDoubleClicked));
-    subscribeToEvent(mFileList, EVENT_LISTVIEWKEY, EVENT_HANDLER(FileSelector, handleFileListKey));
+    subscribeToEvent(mFileList, EVENT_UNHANDLEDKEY, EVENT_HANDLER(FileSelector, handleFileListKey));
     subscribeToEvent(mOKButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleOKPressed));
     subscribeToEvent(mCancelButton, EVENT_PRESSED, EVENT_HANDLER(FileSelector, handleCancelPressed));
 }
@@ -422,7 +422,7 @@ void FileSelector::handleFileListKey(StringHash eventType, VariantMap& eventData
     if (mIgnoreEvents)
         return;
     
-    using namespace ListViewKey;
+    using namespace UnhandledKey;
     
     if (eventData[P_KEY].getInt() == KEY_RETURN)
     {

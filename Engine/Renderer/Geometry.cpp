@@ -184,18 +184,12 @@ void Geometry::draw(Renderer* renderer)
 
 VertexBuffer* Geometry::getVertexBuffer(unsigned index) const
 {
-    if (index >= mVertexBuffers.size())
-        return 0;
-    
-    return mVertexBuffers[index];
+    return index < mVertexBuffers.size() ? mVertexBuffers[index] : (VertexBuffer*)0;
 }
 
 unsigned Geometry::getVertexElementMask(unsigned index) const
 {
-    if (index >= mVertexElementMasks.size())
-        return 0;
-    
-    return mVertexElementMasks[index];
+    return index < mVertexElementMasks.size() ? mVertexElementMasks[index] : 0;
 }
 
 unsigned short Geometry::getBufferHash() const
