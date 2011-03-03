@@ -27,6 +27,7 @@
 #include "PackageFile.h"
 #include "StringUtils.h"
 
+#include <cstdlib>
 #include <direct.h>
 #include <windows.h>
 
@@ -253,6 +254,16 @@ bool createDirectory(const std::string& pathName)
     return success;
 }
 
+int systemCommand(const std::string& commandLine)
+{
+    if (allowedDirectories.empty())
+        return system(commandLine.c_str());
+    else
+    {
+        LOGERROR("Executing an external command is not allowed");
+        return -1;
+    }
+}
 
 void registerDirectory(const std::string& pathName)
 {

@@ -105,6 +105,8 @@ std::string getCurrentDirectory();
 bool setCurrentDirectory(const std::string& pathName);
 //! Create a directory
 bool createDirectory(const std::string& pathName);
+//! Execute an external command, block until it exists and return the exit code. Will fail if any allowed paths are defined
+int systemCommand(const std::string& commandLine);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed

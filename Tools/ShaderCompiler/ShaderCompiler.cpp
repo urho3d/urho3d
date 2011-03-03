@@ -26,14 +26,9 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <map>
 
 #include "DebugNew.h"
 
@@ -570,24 +565,21 @@ bool compile(ShaderType type, const std::string& input, const std::string& outpu
 {
     bool compiled = false;
     
+    std::string allDefines;
+    for (unsigned i = 0; i < defines.size(); ++i)
+        allDefines += "/D" + defines[i] + " ";
+    for (unsigned i = 0; i < gDefines.size(); ++i)
+        allDefines += "/D" + gDefines[i] + " ";
+    
     if (type == VS)
     {
         if (!gUseSM3)
         {
             std::string outFile = output + ".vs2";
-            std::string command = "fxc /Tvs_2_0 /O3 /Evs /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt ";
-            for (unsigned i = 0; i < defines.size(); ++i)
-            {
-                command += "/D" + defines[i] + " ";
-            }
-            for (unsigned i = 0; i < gDefines.size(); ++i)
-            {
-                command += "/D" + gDefines[i] + " ";
-            }
+            std::string command = "fxc /Tvs_2_0 /O3 /Evs /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt " + allDefines +
+                gInDir + input + ".hlsl";
             
-            command += gInDir + input + ".hlsl";
-            
-            if (system(command.c_str()))
+            if (systemCommand(command))
                 errorExit("Failed to compile shader " + outFile);
             
             compiled = true;
@@ -595,20 +587,10 @@ bool compile(ShaderType type, const std::string& input, const std::string& outpu
         else
         {
             std::string outFile = output + ".vs3";
-            std::string command = "fxc /Tvs_3_0 /O3 /Evs /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt ";
-            for (unsigned i = 0; i < defines.size(); ++i)
-            {
-                command += "/D" + defines[i] + " ";
-            }
-            for (unsigned i = 0; i < gDefines.size(); ++i)
-            {
-                command += "/D" + gDefines[i] + " ";
-            }
+            std::string command = "fxc /Tvs_3_0 /O3 /Evs /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt " + allDefines +
+                gInDir + input + ".hlsl";
             
-            
-            command += gInDir + input + ".hlsl";
-            
-            if (system(command.c_str()))
+            if (systemCommand(command))
                 errorExit("Failed to compile shader " + outFile);
             
             compiled = true;
@@ -620,20 +602,11 @@ bool compile(ShaderType type, const std::string& input, const std::string& outpu
         if (!gUseSM3)
         {
             std::string outFile = output + ".ps2";
-            std::string command = "fxc /Tps_2_0 /O3 /Eps /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt ";
-            for (unsigned i = 0; i < defines.size(); ++i)
-            {
-                command += "/D" + defines[i] + " ";
-            }
-            for (unsigned i = 0; i < gDefines.size(); ++i)
-            {
-                command += "/D" + gDefines[i] + " ";
-            }
-            
-            command += gInDir + input + ".hlsl";
+            std::string command = "fxc /Tps_2_0 /O3 /Eps /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt " + allDefines +
+                gInDir + input + ".hlsl";
             
             std::cout << command << std::endl;
-            if (system(command.c_str()))
+            if (systemCommand(command))
                 errorExit("Failed to compile shader " + outFile);
             
             compiled = true;
@@ -641,20 +614,11 @@ bool compile(ShaderType type, const std::string& input, const std::string& outpu
         else
         {
             std::string outFile = output + ".ps3";
-            std::string command = "fxc /Tps_3_0 /O3 /Gfp /Eps /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt ";
-            for (unsigned i = 0; i < defines.size(); ++i)
-            {
-                command += "/D" + defines[i] + " ";
-            }
-            for (unsigned i = 0; i < gDefines.size(); ++i)
-            {
-                command += "/D" + gDefines[i] + " ";
-            }
-            
-            command += gInDir + input + ".hlsl";
+            std::string command = "fxc /Tps_3_0 /O3 /Gfp /Eps /Fo" + gOutDir + gInDir + outFile + " /Fcoutput.txt " + allDefines +
+                gInDir + input + ".hlsl";
             
             std::cout << command << std::endl;
-            if (system(command.c_str()))
+            if (systemCommand(command))
                 errorExit("Failed to compile shader" + outFile);
             
             compiled = true;

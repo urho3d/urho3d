@@ -55,6 +55,12 @@ std::string gBasePath;
 std::vector<FileEntry> gEntries;
 unsigned gChecksum = 0;
 
+std::string ignoreExtensions[] = {
+    ".bak",
+    ".rule",
+    ""
+};
+
 int main(int argc, char** argv)
 {
     std::vector<std::string> arguments;
@@ -90,6 +96,21 @@ void run(const std::vector<std::string>& arguments)
     scanDirectory(fileNames, dirName, "*.*", SCAN_FILES, true);
     if (!fileNames.size())
         errorExit("No files found");
+    
+    // Check for extensions to ignore
+    for (unsigned i = fileNames.size() - 1; i < fileNames.size(); --i)
+    {
+        std::string extension = getExtension(fileNames[i]);
+        for (unsigned j = 0; ignoreExtensions[j].length(); ++j)
+        {
+            if (extension == ignoreExtensions[j])
+            {
+                fileNames.erase(fileNames.begin() + i);
+                break;
+            }
+        }
+    }
+    
     for (unsigned i = 0; i < fileNames.size(); ++i)
         processFile(fileNames[i], dirName);
     

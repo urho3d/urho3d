@@ -268,9 +268,10 @@ void Console::handleLogMessage(StringHash eventType, VariantMap& eventData)
     
     for (unsigned i = 0; i < rows.size(); ++i)
     {
-        for (int j = 0; j < (int)mRows.size() - 1; ++j)
-            mRows[j]->setText(mRows[j + 1]->getText());
-        
-        mRows[mRows.size() - 1]->setText(rows[i]);
+        // Remove the first row, change its text and re-add to the bottom
+        Text* text = static_cast<Text*>(mRowContainer->getChild(0));
+        mRowContainer->removeChild(text);
+        text->setText(rows[i]);
+        mRowContainer->addChild(text);
     }
 }
