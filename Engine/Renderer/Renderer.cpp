@@ -165,23 +165,17 @@ void Renderer::messagePump()
 
 void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
 {
-    // Find out the desktop defaults and the full screen mode display format (match desktop color depth)
-    D3DFORMAT fullscreenFormat = D3DFMT_X8R8G8B8;
-    DEVMODE settings;
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &settings);
-    int desktopWidth = settings.dmPelsWidth;
-    int desktopHeight = settings.dmPelsHeight;
-    int desktopDepth = settings.dmBitsPerPel;
-    if (desktopDepth <= 16)
-        fullscreenFormat = D3DFMT_R5G6B5;
+    // Find out the full screen mode display format (match desktop color depth)
+    D3DFORMAT fullscreenFormat = mImpl->getDesktopFormat();
     
     // If zero dimensions, use the desktop default
     if ((width <= 0) || (height <= 0))
     {
         if (fullscreen)
         {
-            width = desktopWidth;
-            height = desktopHeight;
+            IntVector2 desktopResolution = mImpl->getDesktopResolution();
+            width = desktopResolution.mX;
+            height = desktopResolution.mY;
         }
         else
         {
@@ -221,27 +215,16 @@ void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Check fullscreen mode validity. If not valid, revert to windowed
     if (fullscreen)
     {
-        unsigned numModes = mImpl->mInterface->GetAdapterModeCount(mImpl->mAdapter, fullscreenFormat);
-        bool match = false;
-        D3DDISPLAYMODE screenMode;
-        
-        for (unsigned i = 0; i < numModes; ++i)
+        std::vector<IntVector2> resolutions = getResolutions();
+        fullscreen = false;
+        for (unsigned i = 0; i < resolutions.size(); ++i)
         {
-            if (FAILED(mImpl->mInterface->EnumAdapterModes(mImpl->mAdapter, fullscreenFormat, i, &screenMode)))
-                continue;
-                
-            if (screenMode.Format != fullscreenFormat)
-                continue;
-                
-            if ((screenMode.Width == width) && (screenMode.Height == height))
+            if ((width == resolutions[i].mX) && (height == resolutions[i].mY))
             {
-                match = true;
+                fullscreen = true;
                 break;
             }
         }
-        
-        if (!match)
-            fullscreen = false;
     }
     
     // Fall back to non-multisampled if unsupported multisampling mode
@@ -1781,7 +1764,42 @@ unsigned Renderer::getWindowHandle() const
     return (unsigned)mImpl->mWindow;
 }
 
-std::vector<int> Renderer::getMultiSampleSupport() const
+std::vector<IntVector2> Renderer::getResolutions() const
+{
+    std::vector<IntVector2> ret;
+    if (!mImpl->mInterface)
+        return ret;
+    
+    D3DFORMAT fullscreenFormat = mImpl->getDesktopFormat();
+    unsigned numModes = mImpl->mInterface->GetAdapterModeCount(mImpl->mAdapter, fullscreenFormat);
+    D3DDISPLAYMODE displayMode;
+    
+    for (unsigned i = 0; i < numModes; ++i)
+    {
+        if (FAILED(mImpl->mInterface->EnumAdapterModes(mImpl->mAdapter, fullscreenFormat, i, &displayMode)))
+            continue;
+        if (displayMode.Format != fullscreenFormat)
+            continue;
+        IntVector2 newMode(displayMode.Width, displayMode.Height);
+        
+        // Check for duplicate before storing
+        bool unique = true;
+        for (unsigned j = 0; j < ret.size(); ++j)
+        {
+            if (ret[j] == newMode)
+            {
+                unique = false;
+                break;
+            }
+        }
+        if (unique)
+            ret.push_back(newMode);
+    }
+    
+    return ret;
+}
+
+std::vector<int> Renderer::getMultiSampleLevels() const
 {
     std::vector<int> ret;
     // No multisampling always supported

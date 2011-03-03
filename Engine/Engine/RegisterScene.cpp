@@ -360,9 +360,7 @@ static void SceneLoadAsyncXML(File* file, Scene* ptr)
 
 static CScriptArray* SceneGetComponentTypes(Scene* ptr)
 {
-    std::vector<std::string> result;
-    ptr->getComponentTypes(result);
-    return vectorToArray(result, "array<string>");
+    return vectorToArray(ptr->getComponentTypes(), "array<string>");
 }
 
 static CScriptArray* SceneGetAllEntities(Scene* ptr)

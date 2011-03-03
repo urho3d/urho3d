@@ -48,6 +48,10 @@ public:
     const D3DADAPTER_IDENTIFIER9& getAdapterIdentifier() const { return mAdapterIdentifier; }
     //! Return whether a texture format and usage is supported
     bool checkFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
+    //! Return desktop texture format
+    D3DFORMAT getDesktopFormat();
+    //! Return desktop width/height
+    IntVector2 getDesktopResolution();
     
 private:
     //! Direct3D interface

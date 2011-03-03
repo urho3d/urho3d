@@ -778,6 +778,16 @@ static void registerInstancedModel(asIScriptEngine* engine)
     registerRefCasts<Node, InstancedModel>(engine, "Node", "InstancedModel");
 }
 
+static CScriptArray* RendererGetResolutions(Renderer* ptr)
+{
+    return vectorToArray<IntVector2>(ptr->getResolutions(), "array<IntVector2>");
+}
+
+static CScriptArray* RendererGetMultiSampleLevels(Renderer* ptr)
+{
+    return vectorToArray<int>(ptr->getMultiSampleLevels(), "array<int>");
+}
+
 static Renderer* GetRenderer()
 {
     return getEngine()->getRenderer();
@@ -815,7 +825,8 @@ static void registerRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "bool getHardwareDepthSupport() const", asMETHOD(Renderer, getHardwareDepthSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool getHardwareShadowSupport() const", asMETHOD(Renderer, getHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool getHiresShadowSupport() const", asMETHOD(Renderer, getHiresShadowSupport), asCALL_THISCALL);
-    
+    engine->RegisterObjectMethod("Renderer", "array<IntVector2>@ getResolutions() const", asFUNCTION(RendererGetResolutions), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Renderer", "array<int>@ getMultiSampleLevels() const", asFUNCTION(RendererGetMultiSampleLevels), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Renderer@+ getRenderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
     engine->RegisterGlobalFunction("Renderer@+ get_renderer()", asFUNCTION(GetRenderer), asCALL_CDECL);
 }

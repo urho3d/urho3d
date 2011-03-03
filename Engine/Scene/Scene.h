@@ -147,7 +147,7 @@ public:
     //! Return component factories
     const std::vector<SharedPtr<ComponentFactory> >& getComponentFactories() const { return mFactories; }
     //! Return component types supported by the factories
-    void getComponentTypes(std::vector<std::string>& dest) const;
+    std::vector<std::string> getComponentTypes() const;
     //! Return whether has an entity by ID. This is preferred for performance
     bool hasEntity(EntityID id) const;
     //! Return whether has an entity by pointer. Needs to search through all entities

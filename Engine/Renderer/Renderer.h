@@ -249,8 +249,10 @@ public:
     bool getHardwareShadowSupport() const { return mHardwareShadowSupport; }
     //! Return whether 24-bit shadow maps are supported
     bool getHiresShadowSupport() const { return mHiresShadowSupport; }
+    //! Return supported fullscreen resolutions
+    std::vector<IntVector2> getResolutions() const;
     //! Return supported multisampling levels
-    std::vector<int> getMultiSampleSupport() const;
+    std::vector<int> getMultiSampleLevels() const;
     //! Return vertex buffer by index
     VertexBuffer* getVertexBuffer(unsigned index) const;
     //! Return index buffer

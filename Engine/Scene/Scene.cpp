@@ -34,6 +34,8 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
+#include <algorithm>
+
 #include "DebugNew.h"
 
 static const int ASYNC_MIN_FPS = 50;
@@ -806,11 +808,13 @@ EntityID Scene::getNextLocalEntityID()
     return current;
 }
 
-void Scene::getComponentTypes(std::vector<std::string>& dest) const
+std::vector<std::string> Scene::getComponentTypes() const
 {
-    dest.clear();
+    std::vector<std::string> ret;
     for (std::vector<SharedPtr<ComponentFactory> >::const_iterator i = mFactories.begin(); i != mFactories.end(); ++i)
-        (*i)->getComponentTypes(dest);
+        (*i)->getComponentTypes(ret);
+    std::sort(ret.begin(), ret.end());
+    return ret;
 }
 
 bool Scene::hasEntity(EntityID id) const
