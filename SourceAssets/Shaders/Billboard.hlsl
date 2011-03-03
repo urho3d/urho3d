@@ -50,25 +50,26 @@ void ps(float4 iColor : COLOR,
     #endif
     
     #if (!defined(UNLIT)) && (!defined(ADDITIVE)) && (!defined(AMBIENT))
-        float3 lightDir;
         float3 lightVec;
         float diff;
 
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDirVolumetric() * evaluateSplitFade(iWorldPos.w);
+        #else
+            diff = evaluateDiffusePointOrSpotVolumetric(iWorldPos.xyz, lightVec);
         #endif
-        #ifdef POINTLIGHT
-            diff = evaluateDiffusePointVolumetric(iWorldPos.xyz, lightDir, lightVec);
-        #endif
+
         #ifdef SPOTLIGHT
-            diff = evaluateDiffuseSpotVolumetric(iWorldPos.xyz, iSpotPos, lightDir, lightVec);
+            float3 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+        #else
+            float3 lightColor = cLightColor.rgb;
         #endif
 
         #ifndef NEGATIVE
-            float3 finalColor = diff * cLightColor.rgb * diffColor.rgb;
+            float3 finalColor = diff * lightColor * diffColor.rgb;
             oColor = float4(evaluateLitFog(finalColor, iWorldPos.w), diffColor.a);
         #else
-            float3 finalColor = 1.0 + diff * diffColor.a * evaluateReverseFogFactor(iWorldPos.w) * cLightColor.rgb;
+            float3 finalColor = 1.0 + diff * diffColor.a * evaluateReverseFogFactor(iWorldPos.w) * lightColor;
             oColor = float4(finalColor, 1.0);
         #endif
     #endif

@@ -253,7 +253,7 @@ float evaluateDiffuseDir(float3 normal, out float3 lightDir)
     return NdotL;
 }
 
-float evaluateDiffusePoint(float3 normal, float3 worldPos, out float3 lightDir, out float3 lightVec)
+float evaluateDiffusePointOrSpot(float3 normal, float3 worldPos, out float3 lightDir, out float3 lightVec)
 {
     lightVec = (cLightPos - worldPos) * cLightAtten.x;
     float lightDist = length(lightVec);
@@ -262,36 +262,16 @@ float evaluateDiffusePoint(float3 normal, float3 worldPos, out float3 lightDir, 
     return NdotL * tex1D(sLightRampMap, lightDist).r;
 }
 
-float evaluateDiffuseSpot(float3 normal, float3 worldPos, float4 spotPos, out float3 lightDir, out float3 lightVec)
-{
-    lightVec = (cLightPos - worldPos) * cLightAtten.x;
-    float lightDist = length(lightVec);
-    lightDir = lightVec / lightDist;
-    float NdotL = max(dot(normal, lightDir), 0.0);
-    float spotAtt = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).r : 0.0;
-    return NdotL * spotAtt * tex1D(sLightRampMap, lightDist).r;
-}
-
 float evaluateDiffuseDirVolumetric()
 {
     return 1.0;
 }
 
-float evaluateDiffusePointVolumetric(float3 worldPos, out float3 lightDir, out float3 lightVec)
+float evaluateDiffusePointOrSpotVolumetric(float3 worldPos, out float3 lightVec)
 {
     lightVec = (cLightPos - worldPos) * cLightAtten.x;
     float lightDist = length(lightVec);
-    lightDir = lightVec / lightDist;
     return tex1D(sLightRampMap, lightDist).r;
-}
-
-float evaluateDiffuseSpotVolumetric(float3 worldPos, float4 spotPos, out float3 lightDir, out float3 lightVec)
-{
-    lightVec = (cLightPos - worldPos) * cLightAtten.x;
-    float lightDist = length(lightVec);
-    lightDir = lightVec / lightDist;
-    float spotAtt = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).r : 0.0;
-    return spotAtt * tex1D(sLightRampMap, lightDist).r;
 }
 
 float evaluateSplitFade(float depth)

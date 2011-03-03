@@ -85,36 +85,37 @@ void ps(
         
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDir(normal, lightDir) * evaluateSplitFade(depth);
-        #endif
-        #ifdef POINTLIGHT
+        #else
             float3 lightVec;
-            diff = evaluateDiffusePoint(normal, worldPos, lightDir, lightVec);
+            diff = evaluateDiffusePointOrSpot(normal, worldPos, lightDir, lightVec);
         #endif
-        #ifdef SPOTLIGHT
-            float3 lightVec;
-            float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            diff = evaluateDiffuseSpot(normal, worldPos, spotPos, lightDir, lightVec);
-        #endif
-        
+
         #ifdef SM3
         if (diff != 0.0)
         {
         #endif
-        
+
         #ifdef SHADOW
             float4 shadowPos = mul(float4(worldPos, 1.0), cShadowProjPS);
             diff *= evaluateShadow(shadowPos);
         #endif
-        
+
+        #ifdef SPOTLIGHT
+            float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
+            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+        #else
+            float3 lightColor = cLightColor.rgb;
+        #endif
+
         #ifdef SPECULAR
             float spec = evaluateSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
-            float3 finalColor = diff * cLightColor.rgb * (diffInput.rgb + spec * diffInput.a * cLightColor.a);
+            float3 finalColor = diff * lightColor * (diffInput.rgb + spec * diffInput.a * cLightColor.a);
             oColor = float4(finalColor, 0.0);
         #else
-            float3 finalColor = diff * diffInput.rgb * cLightColor.rgb;
+            float3 finalColor = diff * diffInput.rgb * lightColor;
             oColor = float4(finalColor, 0.0);
         #endif
-        
+
         #ifdef SM3
         }
         else
@@ -122,23 +123,23 @@ void ps(
         #endif
     #else
         // Negative lights are a lot simpler than normal lights: only depth input needed
-        float3 lightDir;
         float diff;
         
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDirVolumetric() * evaluateSplitFade(depth);
-        #endif
-        #ifdef POINTLIGHT
+        #else
             float3 lightVec;
-            diff = evaluateDiffusePointVolumetric(worldPos, lightDir, lightVec);
+            diff = evaluateDiffusePointOrSpotVolumetric(worldPos, lightVec);
         #endif
+
         #ifdef SPOTLIGHT
-            float3 lightVec;
             float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            diff = evaluateDiffuseSpotVolumetric(worldPos, spotPos, lightDir, lightVec);
+            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+        #else
+            float3 lightColor = cLightColor.rgb;
         #endif
         
-        float3 finalColor = 1.0 + diff * evaluateReverseFogFactor(depth) * cLightColor.rgb;
+        float3 finalColor = 1.0 + diff * evaluateReverseFogFactor(depth) * lightColor;
         oColor = float4(finalColor, 1.0);
     #endif
 }

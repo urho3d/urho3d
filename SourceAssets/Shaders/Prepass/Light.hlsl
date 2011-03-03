@@ -68,7 +68,7 @@ void ps(
         #endif
         float4 normalInput = tex2Dproj(sNormalBuffer, iScreenPos);
     #endif
-
+        
     #ifndef NEGATIVE
         // With specular, normalization greatly improves stability of reflections,
         // considering input is only 8 bits per axis
@@ -77,41 +77,42 @@ void ps(
         #else
             float3 normal = normalInput.rgb * 2.0 - 1.0;
         #endif
-
+        
         float3 lightDir;
         float diff;
-
+        
         // Accumulate lights at half intensity to allow 2x "overburn"
         #ifdef DIRLIGHT
             diff = 0.5 * evaluateDiffuseDir(normal, lightDir) * evaluateSplitFade(depth);
-        #endif
-        #ifdef POINTLIGHT
+        #else
             float3 lightVec;
-            diff = 0.5 * evaluateDiffusePoint(normal, worldPos, lightDir, lightVec);
+            diff = 0.5 * evaluateDiffusePointOrSpot(normal, worldPos, lightDir, lightVec);
         #endif
-        #ifdef SPOTLIGHT
-            float3 lightVec;
-            float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            diff = 0.5 * evaluateDiffuseSpot(normal, worldPos, spotPos, lightDir, lightVec);
-        #endif
-
+        
         #ifdef SM3
         if (diff != 0.0)
         {
         #endif
-
+        
         #ifdef SHADOW
             float4 shadowPos = mul(float4(worldPos, 1.0), cShadowProjPS);
             diff *= evaluateShadow(shadowPos);
         #endif
-
+        
+        #ifdef SPOTLIGHT
+            float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
+            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+        #else
+            float3 lightColor = cLightColor.rgb;
+        #endif
+        
         #ifdef SPECULAR
             float spec = evaluateSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
             oColor = diff * float4(cLightColor.rgb, spec * cLightColor.a);
         #else
             oColor = float4(diff * cLightColor.rgb, 0.0);
         #endif
-
+        
         #ifdef SM3
         }
         else
@@ -119,23 +120,23 @@ void ps(
         #endif
     #else
         // Negative lights are a lot simpler than normal lights: only depth input needed
-        float3 lightDir;
         float diff;
-
+        
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDirVolumetric() * evaluateSplitFade(depth);
-        #endif
-        #ifdef POINTLIGHT
+        #else
             float3 lightVec;
-            diff = evaluateDiffusePointVolumetric(worldPos, lightDir, lightVec);
+            diff = evaluateDiffusePointOrSpotVolumetric(worldPos, lightVec);
         #endif
+        
         #ifdef SPOTLIGHT
-            float3 lightVec;
             float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            diff = evaluateDiffuseSpotVolumetric(worldPos, spotPos, lightDir, lightVec);
+            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+        #else
+            float3 lightColor = cLightColor.rgb;
         #endif
-
-        float3 finalColor = 1.0 + diff * evaluateReverseFogFactor(depth) * cLightColor.rgb;
+        
+        float3 finalColor = 1.0 + diff * evaluateReverseFogFactor(depth) * lightColor.rgb;
         oColor = float4(finalColor, 1.0);
     #endif
 }
