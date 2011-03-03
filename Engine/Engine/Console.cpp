@@ -56,13 +56,17 @@ Console::Console(Engine* engine) :
     if (uiRoot)
     {
         mBackground = new BorderImage();
-        mBackground->setFixedWidth(uiRoot->getWidth());
         mBackground->setBringToBack(false);
         mBackground->setClipChildren(true);
         mBackground->setEnabled(true);
         mBackground->setVisible(false); // Hide by default
         mBackground->setPriority(200); // Show on top of the debug HUD
         mBackground->setLayout(LM_VERTICAL);
+        
+        mRowContainer = new UIElement();
+        mRowContainer->setClipChildren(true);
+        mRowContainer->setLayout(LM_VERTICAL);
+        mBackground->addChild(mRowContainer);
         
         mLineEdit = new LineEdit();
         mLineEdit->setFocusMode(FM_FOCUSABLE); // Do not allow defocus with ESC
@@ -134,7 +138,7 @@ void Console::setNumRows(unsigned rows)
     if ((!mBackground) || (!rows))
         return;
     
-    mBackground->removeAllChildren();
+    mRowContainer->removeAllChildren();
     
     mRows.resize(rows);
     for (unsigned i = 0; i < mRows.size(); ++i)
@@ -146,9 +150,8 @@ void Console::setNumRows(unsigned rows)
             if (textElem)
                 mRows[i]->setStyle(textElem, mEngine->getResourceCache());
         }
-        mBackground->addChild(mRows[i]);
+        mRowContainer->addChild(mRows[i]);
     }
-    mBackground->addChild(mLineEdit);
     
     updateElements();
 }
@@ -165,8 +168,10 @@ void Console::setNumHistoryRows(unsigned rows)
 void Console::updateElements()
 {
     int width = mEngine->getRenderer()->getWidth();
-    mLineEdit->setFixedHeight(mLineEdit->getTextElement()->getRowHeight());
+    const IntRect& border = mBackground->getLayoutBorder();
     mBackground->setFixedWidth(width);
+    mRowContainer->setFixedWidth(width - border.mLeft - border.mRight);
+    mLineEdit->setFixedHeight(mLineEdit->getTextElement()->getRowHeight());
 }
 
 bool Console::isVisible() const

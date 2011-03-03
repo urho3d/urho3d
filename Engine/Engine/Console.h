@@ -32,6 +32,7 @@ class Engine;
 class Font;
 class LineEdit;
 class Text;
+class UIElement;
 class XMLFile;
 
 //! A console window with log history and AngelScript prompt
@@ -89,6 +90,8 @@ private:
     SharedPtr<XMLFile> mStyle;
     //! Background
     SharedPtr<BorderImage> mBackground;
+    //! Container for text rows
+    SharedPtr<UIElement> mRowContainer;
     //! Text rows
     std::vector<SharedPtr<Text> > mRows;
     //! Line edit
