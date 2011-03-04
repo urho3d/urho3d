@@ -237,6 +237,7 @@ void PixelShader::initializeParameters()
     sParameters["LightDir"] = PSP_LIGHTDIR;
     sParameters["LightPos"] = PSP_LIGHTPOS;
     sParameters["LightSplits"] = PSP_LIGHTSPLITS;
+    sParameters["LightVecRot"] = PSP_LIGHTVECROT;
     sParameters["MatDiffColor"] = PSP_MATDIFFCOLOR;
     sParameters["MatEmissiveColor"] = PSP_MATEMISSIVECOLOR;
     sParameters["MatSpecProperties"] = PSP_MATSPECPROPERTIES;

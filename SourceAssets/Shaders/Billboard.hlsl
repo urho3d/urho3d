@@ -50,6 +50,7 @@ void ps(float4 iColor : COLOR,
     #endif
     
     #if (!defined(UNLIT)) && (!defined(ADDITIVE)) && (!defined(AMBIENT))
+        float3 lightColor;
         float3 lightVec;
         float diff;
 
@@ -60,9 +61,13 @@ void ps(float4 iColor : COLOR,
         #endif
 
         #ifdef SPOTLIGHT
-            float3 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #else
-            float3 lightColor = cLightColor.rgb;
+            #ifdef CUBEMASK
+                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+            #else
+                lightColor = cLightColor.rgb;
+            #endif
         #endif
 
         #ifndef NEGATIVE

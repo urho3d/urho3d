@@ -6,33 +6,24 @@
     <shader name="Light" type="ps">
         <option name="Ortho" define="ORTHO" exclude="Linear" />
         <option name="Linear" define="LINEAR" exclude="Ortho" />
-        <variation name="Dir" define="DIRLIGHT" />
-        <variation name="DirShadow">
+        <variation name="Dir">
             <define name="DIRLIGHT" />
-            <define name="SHADOW" />
+            <define name="LIGHT" />
         </variation>
-        <variation name="DirNegative" exclude="Spec">
-            <define name="DIRLIGHT" />
-            <define name="NEGATIVE" />
-        </variation>
-        <variation name="Point" define="POINTLIGHT" />
-        <variation name="PointShadow">
-            <define name="POINTLIGHT" />
-            <define name="SHADOW" />
-        </variation>
-        <variation name="PointNegative" exclude="Spec">
-            <define name="POINTLIGHT" />
-            <define name="NEGATIVE" />
-        </variation>
-        <variation name="Spot" define="SPOTLIGHT" />
-        <variation name="SpotShadow">
+        <variation name="Spot">
             <define name="SPOTLIGHT" />
-            <define name="SHADOW" />
+            <define name="LIGHT" />
         </variation>
-        <variation name="SpotNegative" exclude="Spec">
-            <define name="SPOTLIGHT" />
-            <define name="NEGATIVE" />
+        <variation name="Point">
+            <define name="POINTLIGHT" />
+            <define name="LIGHT" />
         </variation>
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Shadow" define="SHADOW" require="LIGHT" />
+        <option name="Negative" define="NEGATIVE">
+            <exclude name="Shadow" />
+            <exclude name="Spec" />
+        </option>
         <option name="Spec" define="SPECULAR" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />
     </shader>

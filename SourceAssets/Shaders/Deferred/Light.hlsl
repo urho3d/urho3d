@@ -80,9 +80,10 @@ void ps(
             float3 normal = normalInput.rgb * 2.0 - 1.0;
         #endif
 
+        float3 lightColor;
         float3 lightDir;
         float diff;
-        
+
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDir(normal, lightDir) * evaluateSplitFade(depth);
         #else
@@ -102,9 +103,13 @@ void ps(
 
         #ifdef SPOTLIGHT
             float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
         #else
-            float3 lightColor = cLightColor.rgb;
+            #ifdef CUBEMASK
+                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+            #else
+                lightColor = cLightColor.rgb;
+            #endif
         #endif
 
         #ifdef SPECULAR
@@ -124,6 +129,7 @@ void ps(
     #else
         // Negative lights are a lot simpler than normal lights: only depth input needed
         float diff;
+        float3 lightColor;
         
         #ifdef DIRLIGHT
             diff = evaluateDiffuseDirVolumetric() * evaluateSplitFade(depth);
@@ -134,11 +140,15 @@ void ps(
 
         #ifdef SPOTLIGHT
             float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
-            float3 lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
+            lightColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : 0.0;
         #else
-            float3 lightColor = cLightColor.rgb;
+            #ifdef CUBEMASK
+                lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+            #else
+                lightColor = cLightColor.rgb;
+            #endif
         #endif
-        
+
         float3 finalColor = 1.0 + diff * evaluateReverseFogFactor(depth) * lightColor;
         oColor = float4(finalColor, 1.0);
     #endif

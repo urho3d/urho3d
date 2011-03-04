@@ -467,10 +467,10 @@ unsigned View::processLight(Light* light)
         isShadowed = false;
     
     // If light has no ramp textures defined, set defaults
-    if (!light->getRampTexture())
+    if ((light->getLightType() != LIGHT_DIRECTIONAL) && (!light->getRampTexture()))
         light->setRampTexture(mPipeline->getDefaultLightRamp());
-    if (!light->getSpotTexture())
-        light->setSpotTexture(mPipeline->getDefaultLightSpot());
+    if ((light->getLightType() == LIGHT_SPOT) && (!light->getShapeTexture()))
+        light->setShapeTexture(mPipeline->getDefaultLightSpot());
     
     // Split the light if necessary
     if (isShadowed)
@@ -904,10 +904,9 @@ void View::setupShadowCamera(Light* light, bool shadowOcclusion)
     case LIGHT_SPOT:
     case LIGHT_SPLITPOINT:
         {
-            Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), light->getDirection());
+            Quaternion rotation(Vector3::sForward, light->getDirection());
             shadowCamera.setPosition(light->getWorldPosition());
             shadowCamera.setRotation(light->getWorldRotation() * rotation);
-            
             shadowCamera.setNearClip(light->getShadowNearFarRatio() * light->getRange());
             shadowCamera.setFarClip(light->getRange());
             shadowCamera.setOrthographic(false);
@@ -1148,7 +1147,7 @@ unsigned View::splitLight(Light* light)
     
     if (type == LIGHT_POINT)
     {
-        static const Vector3 directions[] = 
+        static const Vector3 directions[] =
         {
             Vector3::sRight,
             Vector3::sLeft,

@@ -191,61 +191,76 @@ static const std::string lightVSVariations[] =
     "SpotShadow"
 };
 
-static const std::string deferredLightVSVariations[] =
-{
-    "",
-    "Dir",
-    "Ortho",
-    "OrthoDir"
-};
-
-static const std::string deferredLightPSVariations[] = 
+static const std::string lightPSVariations[] = 
 {
     "Dir",
     "DirSpec",
     "DirShadow",
     "DirShadowSpec",
     "DirNegative",
-    "Point",
-    "PointSpec",
-    "PointShadow",
-    "PointShadowSpec",
-    "PointNegative",
     "Spot",
     "SpotSpec",
     "SpotShadow",
     "SpotShadowSpec",
     "SpotNegative",
+    "Point",
+    "PointSpec",
+    "PointShadow",
+    "PointShadowSpec",
+    "PointNegative",
+    "PointMask",
+    "PointMaskSpec",
+    "PointMaskShadow",
+    "PointMaskShadowSpec",
+    "PointMaskNegative",
     "OrthoDir",
     "OrthoDirSpec",
     "OrthoDirShadow",
     "OrthoDirShadowSpec",
     "OrthoDirNegative",
-    "OrthoPoint",
-    "OrthoPointSpec",
-    "OrthoPointShadow",
-    "OrthoPointShadowSpec",
-    "OrthoPointNegative",
     "OrthoSpot",
     "OrthoSpotSpec",
     "OrthoSpotShadow",
     "OrthoSpotShadowSpec",
     "OrthoSpotNegative",
+    "OrthoPoint",
+    "OrthoPointSpec",
+    "OrthoPointShadow",
+    "OrthoPointShadowSpec",
+    "OrthoPointNegative",
+    "OrthoPointMask",
+    "OrthoPointMaskSpec",
+    "OrthoPointMaskShadow",
+    "OrthoPointMaskShadowSpec",
+    "OrthoPointMaskNegative",
     "LinearDir",
     "LinearDirSpec",
     "LinearDirShadow",
     "LinearDirShadowSpec",
     "LinearDirNegative",
+    "LinearSpot",
+    "LinearSpotSpec",
+    "LinearSpotShadow",
+    "LinearSpotShadowSpec",
+    "LinearSpotNegative",
     "LinearPoint",
     "LinearPointSpec",
     "LinearPointShadow",
     "LinearPointShadowSpec",
     "LinearPointNegative",
-    "LinearSpot",
-    "LinearSpotSpec",
-    "LinearSpotShadow",
-    "LinearSpotShadowSpec",
-    "LinearSpotNegative"
+    "LinearPointMask",
+    "LinearPointMaskSpec",
+    "LinearPointMaskShadow",
+    "LinearPointMaskShadowSpec",
+    "LinearPointMaskNegative"
+};
+
+static const std::string deferredLightVSVariations[] =
+{
+    "",
+    "Dir",
+    "Ortho",
+    "OrthoDir"
 };
 
 static const std::string shadowPSVariations[] =
@@ -850,7 +865,10 @@ void Pipeline::setBatchShaders(Batch& batch, MaterialTechnique* technique, Mater
             {
             case LIGHT_POINT:
             case LIGHT_SPLITPOINT:
-                psi += LPS_POINT;
+                if (light->getShapeTexture())
+                    psi += DLPS_POINTMASK;
+                else
+                    psi += DLPS_POINT;
                 break;
                 
             case LIGHT_SPOT:
@@ -890,7 +908,10 @@ void Pipeline::setLightVolumeShaders(Batch& batch)
         
     case LIGHT_POINT:
     case LIGHT_SPLITPOINT:
-        psi += DLPS_POINT;
+        if (light->getShapeTexture())
+            psi += DLPS_POINTMASK;
+        else
+            psi += DLPS_POINT;
         break;
         
     case LIGHT_SPOT:
@@ -927,9 +948,9 @@ void Pipeline::setLightVolumeShaders(Batch& batch)
     {
         unsigned variation = psi % 5;
         if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
-            mLightPS[psi] = getPixelShader(mLightShaderName + deferredLightPSVariations[psi] + shadowPSVariations[hwShadows]);
+            mLightPS[psi] = getPixelShader(mLightShaderName + lightPSVariations[psi] + shadowPSVariations[hwShadows]);
         else
-            mLightPS[psi] = getPixelShader(mLightShaderName + deferredLightPSVariations[psi]);
+            mLightPS[psi] = getPixelShader(mLightShaderName + lightPSVariations[psi]);
     }
     
     batch.mVertexShader = mLightVS[vsi];
@@ -1082,7 +1103,7 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
             if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
             {
                 if (allowShadows)
-                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j] +
+                    pixelShaders[j] = getPixelShader(pixelShaderName + lightPSVariations[j] +
                         shadowPSVariations[hwShadows]);
                 else
                     pixelShaders[j].reset();
@@ -1092,7 +1113,7 @@ void Pipeline::loadMaterialPassShaders(MaterialTechnique* technique, PassType pa
                 // For the negative pass, load only the negative version of the shader
                 bool needed = (pass == PASS_LIGHT) ? (variation != LPS_NEGATIVE) : (variation == LPS_NEGATIVE);
                 if (needed)
-                    pixelShaders[j] = getPixelShader(pixelShaderName + deferredLightPSVariations[j]);
+                    pixelShaders[j] = getPixelShader(pixelShaderName + lightPSVariations[j]);
                 else
                     pixelShaders[j].reset();
             }

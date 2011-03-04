@@ -138,9 +138,9 @@ void Light::save(Serializer& dest)
     dest.writeStringHash(getResourceHash(mRampTexture));
     if (mRampTexture)
         dest.writeBool(mRampTexture->getType() == TextureCube::getTypeStatic());
-    dest.writeStringHash(getResourceHash(mSpotTexture));
-    if (mSpotTexture)
-        dest.writeBool(mSpotTexture->getType() == TextureCube::getTypeStatic());
+    dest.writeStringHash(getResourceHash(mShapeTexture));
+    if (mShapeTexture)
+        dest.writeBool(mShapeTexture->getType() == TextureCube::getTypeStatic());
 }
 
 void Light::load(Deserializer& source, ResourceCache* cache)
@@ -183,13 +183,13 @@ void Light::load(Deserializer& source, ResourceCache* cache)
         else
             mRampTexture = cache->getResource<TextureCube>(rampTexture);
     }
-    StringHash spotTexture = source.readStringHash();
-    if (spotTexture)
+    StringHash shapeTexture = source.readStringHash();
+    if (shapeTexture)
     {
         if (!source.readBool())
-            mSpotTexture = cache->getResource<Texture2D>(spotTexture);
+            mShapeTexture = cache->getResource<Texture2D>(shapeTexture);
         else
-            mSpotTexture = cache->getResource<TextureCube>(spotTexture);
+            mShapeTexture = cache->getResource<TextureCube>(shapeTexture);
     }
     
     mShadowBias.validate();
@@ -244,7 +244,7 @@ void Light::saveXML(XMLElement& dest)
     rampElem.setString("name", getResourceName(mRampTexture));
     
     XMLElement spotElem = dest.createChildElement("spottexture");
-    spotElem.setString("name", getResourceName(mSpotTexture));
+    spotElem.setString("name", getResourceName(mShapeTexture));
 }
 
 void Light::loadXML(const XMLElement& source, ResourceCache* cache)
@@ -300,9 +300,9 @@ void Light::loadXML(const XMLElement& source, ResourceCache* cache)
     XMLElement spotElem = source.getChildElement("spottexture");
     name = spotElem.getString("name");
     if (getExtension(name) == ".xml")
-        mSpotTexture = cache->getResource<TextureCube>(name);
+        mShapeTexture = cache->getResource<TextureCube>(name);
     else
-        mSpotTexture = cache->getResource<Texture2D>(name);
+        mShapeTexture = cache->getResource<Texture2D>(name);
     
     mShadowBias.validate();
     mShadowCascade.validate();
@@ -328,7 +328,7 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     checkFloat(mAspectRatio, 1.0f, baseRevision, bits, 16);
     checkFloat(mFadeDistance, 0.0f, baseRevision, bits, 32);
     checkStringHash(getResourceHash(mRampTexture), StringHash(), baseRevision, bits, 64);
-    checkStringHash(getResourceHash(mSpotTexture), StringHash(), baseRevision, bits, 128);
+    checkStringHash(getResourceHash(mShapeTexture), StringHash(), baseRevision, bits, 128);
     checkFloat(mShadowBias.mConstantBias, DEFAULT_CONSTANTBIAS, baseRevision, bits2, 1);
     checkFloat(mShadowBias.mSlopeScaledBias, DEFAULT_SLOPESCALEDBIAS, baseRevision, bits2, 1);
     checkFloat(mShadowCascade.mLambda, DEFAULT_LAMBDA, baseRevision, bits2, 2);
@@ -369,9 +369,9 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     writeStringHashDelta(getResourceHash(mRampTexture), dest, destRevision, bits & 64);
     if ((bits & 64) && (mRampTexture))
         dest.writeBool(mRampTexture->getType() == TextureCube::getTypeStatic());
-    writeStringHashDelta(getResourceHash(mSpotTexture), dest, destRevision, bits & 128);
-    if ((bits & 128) && (mSpotTexture))
-        dest.writeBool(mSpotTexture->getType() == TextureCube::getTypeStatic());
+    writeStringHashDelta(getResourceHash(mShapeTexture), dest, destRevision, bits & 128);
+    if ((bits & 128) && (mShapeTexture))
+        dest.writeBool(mShapeTexture->getType() == TextureCube::getTypeStatic());
     writeFloatDelta(mShadowBias.mConstantBias, dest, destRevision, bits2 & 1);
     writeFloatDelta(mShadowBias.mSlopeScaledBias, dest, destRevision, bits2 & 1);
     writeFloatDelta(mShadowCascade.mLambda, dest, destRevision, bits2 & 2);
@@ -425,13 +425,13 @@ void Light::readNetUpdate(Deserializer& source, ResourceCache* cache, const NetU
     }
     if (bits & 128)
     {
-        StringHash spotTexture = source.readStringHash();
-        if (spotTexture)
+        StringHash shapeTexture = source.readStringHash();
+        if (shapeTexture)
         {
             if (!source.readBool())
-                mSpotTexture = cache->getResource<Texture2D>(spotTexture);
+                mShapeTexture = cache->getResource<Texture2D>(shapeTexture);
             else
-                mSpotTexture = cache->getResource<TextureCube>(spotTexture);
+                mShapeTexture = cache->getResource<TextureCube>(shapeTexture);
         }
     }
     readFloatDelta(mShadowBias.mConstantBias, source, bits2 & 1);
@@ -466,8 +466,8 @@ void Light::getResourceRefs(std::vector<Resource*>& dest)
 {
     if (mRampTexture)
         dest.push_back(mRampTexture);
-    if (mSpotTexture)
-        dest.push_back(mSpotTexture);
+    if (mShapeTexture)
+        dest.push_back(mShapeTexture);
 }
 
 void Light::updateDistance(const FrameInfo& frame)
@@ -508,14 +508,14 @@ void Light::overrideTransforms(unsigned batchIndex, Camera& camera, const Matrix
         {
             float yScale = tan(mFov * M_DEGTORAD * 0.5f) * mRange;
             float xScale = mAspectRatio * yScale;
-            Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), mDirection);
+            Quaternion rotation(Vector3::sForward, mDirection);
             lightModel.define(getWorldPosition(), getWorldRotation() * rotation, Vector3(xScale, yScale, mRange));
         }
         break;
         
     case LIGHT_SPLITPOINT:
         {
-            Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), mDirection);
+            Quaternion rotation(Vector3::sForward, mDirection);
             lightModel.define(getWorldPosition(), getWorldRotation() * rotation, mRange);
         }
         break;
@@ -539,6 +539,12 @@ void Light::drawDebugGeometry(DebugRenderer* debug)
 void Light::setLightType(LightType type)
 {
     mLightType = type;
+    
+    // Validate shape texture type: 2D for spot lights, cube for point lights. Change to null if wrong
+    if ((mLightType == LIGHT_SPOT) && (mShapeTexture) && (mShapeTexture->getType() != Texture2D::getTypeStatic()))
+        mShapeTexture = 0;
+    if ((mLightType == LIGHT_POINT) && (mShapeTexture) && (mShapeTexture->getType() != TextureCube::getTypeStatic()))
+        mShapeTexture = 0;
     
     if (!isDirty())
         markDirty();
@@ -640,9 +646,9 @@ void Light::setRampTexture(Texture* texture)
     mRampTexture = texture;
 }
 
-void Light::setSpotTexture(Texture* texture)
+void Light::setShapeTexture(Texture* texture)
 {
-    mSpotTexture = texture;
+    mShapeTexture = texture;
 }
 
 void Light::copyFrom(Light* original)
@@ -671,7 +677,7 @@ void Light::copyFrom(Light* original)
     mShadowIntensity = original->mShadowIntensity;
     mShadowResolution = original->mShadowResolution;
     mRampTexture = original->mRampTexture;
-    mSpotTexture = original->mSpotTexture;
+    mShapeTexture = original->mShapeTexture;
 }
 
 bool Light::isNegative() const
@@ -685,7 +691,7 @@ const Frustum& Light::getFrustum()
     if (mFrustumDirty)
     {
         Matrix4x3 transform;
-        Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), mDirection);
+        Quaternion rotation(Vector3::sForward, mDirection);
         transform.define(getWorldPosition(), getWorldRotation() * rotation, 1.0f);
         // Set a small near clip distance, so that the near plane can be calculated
         // Note: this is not necessarily the same near clip as on the actual shadow camera

@@ -201,7 +201,7 @@ public:
     //! Set range attenuation texture
     void setRampTexture(Texture* texture);
     //! Set spotlight attenuation texture
-    void setSpotTexture(Texture* texture);
+    void setShapeTexture(Texture* texture);
     
     //! Return light type
     LightType getLightType() const { return mLightType; }
@@ -242,7 +242,7 @@ public:
     //! Return range attenuation texture
     Texture* getRampTexture() const { return mRampTexture; }
     //! Return spotlight attenuation texture
-    Texture* getSpotTexture() const { return mSpotTexture; }
+    Texture* getShapeTexture() const { return mShapeTexture; }
     //! Return spotlight frustum
     const Frustum& getFrustum();
     
@@ -335,7 +335,7 @@ private:
     //! Range attenuation texture
     SharedPtr<Texture> mRampTexture;
     //! Spotlight attenuation texture
-    SharedPtr<Texture> mSpotTexture;
+    SharedPtr<Texture> mShapeTexture;
 };
 
 #endif // RENDERER_LIGHT_H

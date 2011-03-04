@@ -26,7 +26,26 @@
             <exclude name="Spec" />
             <exclude name="SpecMap" />
         </variation>
-        <variation name="Dir" define="DIRLIGHT" />
+        <variation name="Dir">
+            <define name="DIRLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <variation name="Spot">
+            <define name="SPOTLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <variation name="Point">
+            <define name="POINTLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Shadow" define="SHADOW" require="LIGHT" />
+        <option name="Negative" define="NEGATIVE">
+            <exclude name="Normal" />
+            <exclude name="Shadow" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </option>
         <variation name="DirShadow">
             <define name="DIRLIGHT" />
             <define name="SHADOW" />
@@ -34,33 +53,6 @@
         <variation name="DirNegative">
             <define name="DIRLIGHT" />
             <define name="NEGATIVE" />
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </variation>
-        <variation name="Point" define="POINTLIGHT" />
-        <variation name="PointShadow">
-            <define name="POINTLIGHT" />
-            <define name="SHADOW" />
-        </variation>
-        <variation name="PointNegative">
-            <define name="POINTLIGHT" />
-            <define name="NEGATIVE" />
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
-        </variation>
-        <variation name="Spot" define="SPOTLIGHT" />
-        <variation name="SpotShadow">
-            <define name="SPOTLIGHT" />
-            <define name="SHADOW" />
-        </variation>
-        <variation name="SpotNegative">
-            <define name="SPOTLIGHT" />
-            <define name="NEGATIVE" />
-            <exclude name="Normal" />
-            <exclude name="Spec" />
-            <exclude name="SpecMap" />
         </variation>
         <option name="Spec" define="SPECULAR" />
         <option name="HW" define="HWSHADOW" require="SHADOW" />

@@ -589,7 +589,7 @@ static void registerLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "void setShadowResolution(float)", asMETHOD(Light, setShadowResolution), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShadowNearFarRatio(float)", asMETHOD(Light, setShadowNearFarRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setRampTexture(Texture@+)", asMETHOD(Light, setRampTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void setSpotTexture(Texture@+)", asMETHOD(Light, setSpotTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void setShapeTexture(Texture@+)", asMETHOD(Light, setShapeTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "LightType getLightType() const", asMETHOD(Light, getLightType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Vector3& getDirection() const", asMETHOD(Light, getDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Color& getColor() const", asMETHOD(Light, getColor), asCALL_THISCALL);
@@ -609,7 +609,7 @@ static void registerLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "float getShadowResolution() const", asMETHOD(Light, getShadowResolution), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float getShadowNearFarRatio() const", asMETHOD(Light, getShadowNearFarRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "Texture@+ getRampTexture() const", asMETHOD(Light, getRampTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "Texture@+ getSpotTexture() const", asMETHOD(Light, getSpotTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "Texture@+ getShapeTexture() const", asMETHOD(Light, getShapeTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Frustum& getFrustum()", asMETHOD(Light, getFrustum), asCALL_THISCALL);
     registerRefCasts<Component, Light>(engine, "Component", "Light");
     registerRefCasts<Node, Light>(engine, "Node", "Light");

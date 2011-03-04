@@ -7,21 +7,20 @@
         <variation name="Unlit" define="UNLIT" exclude="Spec" />
         <variation name="Additive" define="ADDITIVE" exclude="Spec" />
         <variation name="Ambient" define="AMBIENT" exclude="Spec" />
-        <variation name="Dir" define="DIRLIGHT" />
-        <variation name="Point" define="POINTLIGHT" />
-        <variation name="Spot" define="SPOTLIGHT" />
-        <variation name="DirNegative" exclude="Spec">
+        <variation name="Dir">
             <define name="DIRLIGHT" />
-            <define name="NEGATIVE" />
+            <define name="LIGHT" />
         </variation>
-        <variation name="PointNegative" exclude="Spec">
-            <define name="POINTLIGHT" />
-            <define name="NEGATIVE" />
-        </variation>
-        <variation name="SpotNegative" exclude="Spec">
+        <variation name="Spot">
             <define name="SPOTLIGHT" />
-            <define name="NEGATIVE" />
+            <define name="LIGHT" />
         </variation>
+        <variation name="Point">
+            <define name="POINTLIGHT" />
+            <define name="LIGHT" />
+        </variation>
+        <option name="Mask" define="CUBEMASK" require="POINTLIGHT" />
+        <option name="Negative" define="NEGATIVE" exclude="Spec" />
         <option name="Spec" define="SPECULAR" />
     </shader>
 </shaders>

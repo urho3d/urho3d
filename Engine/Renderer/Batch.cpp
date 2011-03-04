@@ -136,7 +136,7 @@ void Batch::draw(Renderer* renderer) const
         if (ps->hasTextureUnit(TU_LIGHTRAMP))
             renderer->setTexture(TU_LIGHTRAMP, light->getRampTexture());
         if (ps->hasTextureUnit(TU_LIGHTSPOT))
-            renderer->setTexture(TU_LIGHTSPOT, light->getSpotTexture());
+            renderer->setTexture(TU_LIGHTSPOT, light->getShapeTexture());
     }
     
     // Set shaders
@@ -202,7 +202,7 @@ void Batch::draw(Renderer* renderer) const
         if ((light) && (vs->needParameterUpdate(VSP_SPOTPROJ, light)))
         {
             Matrix4x3 spotView;
-            Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), light->getDirection());
+            Quaternion rotation(Vector3::sForward, light->getDirection());
             spotView.define(light->getWorldPosition(), light->getWorldRotation() * rotation, 1.0f);
             
             Matrix4 spotProj;
@@ -312,6 +312,15 @@ void Batch::draw(Renderer* renderer) const
                 Vector4(nearFadeStart / depthRange, 1.0f / (nearFadeRange / depthRange),
                 farFadeStart / depthRange, 1.0f / (farFadeRange / depthRange)));
         }
+        
+        if (ps->needParameterUpdate(PSP_LIGHTVECROT, light))
+        {
+            Matrix4x3 lightVecRot;
+            Quaternion rotation = light->getWorldRotation() * Quaternion(Vector3::sForward, light->getDirection());
+            lightVecRot.define(Vector3::sZero, rotation, Vector3::sUnity);
+            
+            renderer->setPixelShaderConstant(getPSRegister(PSP_LIGHTVECROT), lightVecRot);
+        }
     }
     
     // Set material's pixel shader parameters
@@ -368,7 +377,7 @@ void Batch::draw(Renderer* renderer) const
     if ((light) && (ps->needParameterUpdate(PSP_SPOTPROJ, light)))
     {
         Matrix4x3 spotView;
-        Quaternion rotation(Vector3(0.0f, 0.0f, 1.0f), light->getDirection());
+        Quaternion rotation(Vector3::sForward, light->getDirection());
         spotView.define(light->getWorldPosition(), light->getWorldRotation() * rotation, 1.0f);
         
         Matrix4 spotProj;

@@ -122,6 +122,7 @@ void ps(float2 iTexCoord : TEXCOORD0,
     #endif
     
     #if (defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT))
+        float3 lightColor;
         float3 lightDir;
         float3 lightVec;
         float diff;
@@ -151,11 +152,15 @@ void ps(float2 iTexCoord : TEXCOORD0,
             #endif
 
             #ifdef SPOTLIGHT
-                float3 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+                lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
             #else
-                float3 lightColor = cLightColor.rgb;
+                #ifdef CUBEMASK
+                    lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+                #else
+                    lightColor = cLightColor.rgb;
+                #endif
             #endif
-
+            
             #ifdef SPECULAR
                 #ifdef SPECMAP
                     float specStrength = cMatSpecProperties.x * tex2D(sSpecMap, iTexCoord).r;
@@ -185,9 +190,13 @@ void ps(float2 iTexCoord : TEXCOORD0,
             #endif
 
             #ifdef SPOTLIGHT
-                float3 lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
+                lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
             #else
-                float3 lightColor = cLightColor.rgb;
+                #ifdef CUBEMASK
+                    lightColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb * cLightColor.rgb;
+                #else
+                    lightColor = cLightColor.rgb;
+                #endif
             #endif
             
             float3 finalColor = 1.0 + diff * diffColor.a * evaluateReverseFogFactor(iWorldPos.w) * lightColor;

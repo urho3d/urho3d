@@ -32,13 +32,14 @@ uniform float4 cLightColor : register(C7);
 uniform float3 cLightDir : register(C8);
 uniform float3 cLightPos : register(C9);
 uniform float4 cLightSplits : register(C10);
-uniform float4 cMatDiffColor : register(C11);
-uniform float3 cMatEmissiveColor : register(C12);
-uniform float2 cMatSpecProperties : register(C13);
-uniform float4 cSampleOffsets : register(C14);
-uniform float2 cShadowIntensity : register(C15);
-uniform float4x4 cShadowProjPS : register(C16);
-uniform float4x4 cSpotProjPS : register(C20);
+uniform float3x3 cLightVecRot: register(C11);
+uniform float4 cMatDiffColor : register(C14);
+uniform float3 cMatEmissiveColor : register(C15);
+uniform float2 cMatSpecProperties : register(C16);
+uniform float4 cSampleOffsets : register(C17);
+uniform float2 cShadowIntensity : register(C18);
+uniform float4x4 cShadowProjPS : register(C19);
+uniform float4x4 cSpotProjPS : register(C23);
 
 // Material map samplers
 sampler2D sDiffMap : register(S0);
