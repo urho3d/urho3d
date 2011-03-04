@@ -37,8 +37,8 @@ class TextureCube;
 enum LightType
 {
     LIGHT_DIRECTIONAL = 0,
-    LIGHT_POINT,
     LIGHT_SPOT,
+    LIGHT_POINT,
     LIGHT_SPLITPOINT
 };
 
@@ -168,8 +168,6 @@ public:
     
     //! Set light type
     void setLightType(LightType type);
-    //! Set direction
-    void setDirection(const Vector3& direction);
     //! Set color
     void setColor(const Color& color);
     //! Set specular intensity
@@ -205,8 +203,6 @@ public:
     
     //! Return light type
     LightType getLightType() const { return mLightType; }
-    //! Return direction
-    const Vector3& getDirection() const { return mDirection; }
     //! Return color
     const Color& getColor() const { return mColor; }
     //! Return specular intensity
@@ -270,6 +266,8 @@ public:
     Camera& getShadowCamera() { return mShadowCamera; }
     //! Return shadow map
     Texture2D* getShadowMap() const { return mShadowMap; }
+    //! Return original light (split lights only)
+    Light* getOriginalLight() const { return mOriginalLight; }
     //! Return volume safety extent of spot or point light
     float getVolumeExtent() const;
     //! Return directional light near or far quad transform
@@ -284,8 +282,6 @@ protected:
 private:
     //! Light type
     LightType mLightType;
-    //! Direction
-    Vector3 mDirection;
     //! Color
     Color mColor;
     //! Specular intensity
@@ -330,12 +326,14 @@ private:
     Frustum mFrustum;
     //! Shadow camera
     Camera mShadowCamera;
-    //! Shadow map
-    Texture2D* mShadowMap;
     //! Range attenuation texture
     SharedPtr<Texture> mRampTexture;
     //! Spotlight attenuation texture
     SharedPtr<Texture> mShapeTexture;
+    //! Shadow map
+    Texture2D* mShadowMap;
+    //! Original light for splitting
+    Light* mOriginalLight;
 };
 
 #endif // RENDERER_LIGHT_H

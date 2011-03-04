@@ -37,6 +37,9 @@ PackageFile::PackageFile(const std::string& fileName) :
     registerHash(mFileName);
     
     // Read the directory
+    if (file.readID() != "UPAK")
+        EXCEPTION(file.getName() + " is not a valid package file");
+    
     unsigned numFiles = file.readUInt();
     mChecksum = file.readUInt();
     

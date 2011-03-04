@@ -102,6 +102,8 @@ public:
     BoundingBox readBoundingBox();
     //! Read a null-terminated string
     std::string readString();
+    //! Read a four-letter ID
+    std::string readID();
     //! Read a 32-bit StringHash
     StringHash readStringHash();
     //! Read a 16-bit ShortStringHash

@@ -184,7 +184,6 @@ void initScene()
         object.setScale(1.0 + random() * 0.25);
         object.setModel(cache.getResource("Model", "Models/Jack.mdl"));
         object.setMaterial(cache.getResource("Material", "Materials/Jack.xml"));
-        object.setShadowDistance(200.0);
         object.setDrawDistance(300.0);
         
         AnimationState@ anim = object.addAnimationState(cache.getResource("Animation", "Models/Jack_Walk.ani"));
@@ -253,11 +252,16 @@ void initScene()
         light.setSpecularIntensity(1.0f);
         light.setCastShadows(true);
         light.setShadowBias(BiasParameters(0.00002, 0.0));
+        light.setShadowDistance(200.0f);
+        light.setShadowFadeDistance(150.0f);
         light.setShadowResolution(0.5);
         // The spot lights will not have anything near them, so move the near plane of the shadow camera farther
         // for better shadow depth resolution
         light.setShadowNearFarRatio(0.01);
         
+        // Store the original rotation as an entity property
+        newEntity.setProperty("rotation", Variant(light.getRotation()));
+
         lights.push(newEntity);
     }
     
@@ -273,7 +277,7 @@ void animateScene(float timeStep)
     for (uint i = 0; i < lights.size(); ++i)
     {
         Light@ light = lights[i].getComponent("Light");
-        light.setRotation(Quaternion(0, objectangle * 2, 0));
+        light.setRotation(Quaternion(0, objectangle * 2, 0) * lights[i].getProperty("rotation").getQuaternion());
     }
     
     for (uint i = 0; i < animatingObjects.size(); ++i)
@@ -356,8 +360,8 @@ void initUI()
 
 void handleFileSelected(StringHash eventType, VariantMap& eventData)
 {
-	unsubscribeFromEvent(fileSelector, "FileSelected");
-	@fileSelector = null;
+    unsubscribeFromEvent(fileSelector, "FileSelected");
+    @fileSelector = null;
 }
 
 void createCamera()
@@ -373,10 +377,12 @@ void createCamera()
     cameraLight.setColor(Color(2.0, 2.0, 2.0));
     cameraLight.setSpecularIntensity(2.0);
     cameraLight.setCastShadows(true);
+    cameraLight.setShadowDistance(200.0f);
+    cameraLight.setShadowFadeDistance(150.0f);
     cameraLight.setShadowResolution(0.5);
     cameraLight.setShadowFocus(FocusParameters(false, false, false, 0.5, 3.0));
     cameraLight.setRampTexture(cache.getResource("Texture2D", "Textures/RampWide.png"));
-    cameraLight.setSpotTexture(cache.getResource("Texture2D", "Textures/SpotWide.png"));
+    cameraLight.setShapeTexture(cache.getResource("Texture2D", "Textures/SpotWide.png"));
     camera.addChild(cameraLight);
 
     pipeline.setViewport(0, Viewport(testScene, camera));

@@ -59,6 +59,11 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
 {
     unsigned memoryUse = 0;
     
+    // Check ID
+    if (source.readID() != "UANI")
+        EXCEPTION(source.getName() + " is not a valid animation file");
+    
+    // Read name and length
     mAnimationName = source.readString();
     mAnimationNameHash = StringHash(mAnimationName);
     mLength = source.readFloat();
@@ -99,6 +104,8 @@ void Animation::load(Deserializer& source, ResourceCache* cache)
 
 void Animation::save(Serializer& dest)
 {
+    // Write ID, name and length
+    dest.writeID("UANI");
     dest.writeString(mAnimationName);
     dest.writeFloat(mLength);
     

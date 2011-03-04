@@ -34,7 +34,6 @@
 #include "DebugNew.h"
 
 static LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
-static const Vector3 DEFAULT_DIRECTION = Vector3::sDown;
 static const float DEFAULT_FOV = 30.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0001f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.0001f;
@@ -47,8 +46,8 @@ static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 static const std::string typeNames[] =
 {
     "directional",
-    "point",
     "spot",
+    "point",
     "splitpoint"
 };
 
@@ -75,7 +74,6 @@ void FocusParameters::validate()
 Light::Light(Octant* octant, const std::string& name) :
     VolumeNode(NODE_LIGHT, octant, name),
     mLightType(DEFAULT_LIGHTTYPE),
-    mDirection(DEFAULT_DIRECTION),
     mSpecularIntensity(0.0f),
     mRange(0.0f),
     mFov(DEFAULT_FOV),
@@ -95,7 +93,8 @@ Light::Light(Octant* octant, const std::string& name) :
     mNearFadeRange(M_EPSILON),
     mFarFadeRange(M_EPSILON),
     mFrustumDirty(true),
-    mShadowMap(0)
+    mShadowMap(0),
+    mOriginalLight(0)
 {
 }
 
@@ -110,7 +109,6 @@ void Light::save(Serializer& dest)
     
     // Write Light properties
     dest.writeUByte((unsigned char)mLightType);
-    dest.writeVector3(mDirection);
     dest.writeColor(mColor);
     dest.writeFloat(mSpecularIntensity);
     dest.writeFloat(mRange);
@@ -150,7 +148,6 @@ void Light::load(Deserializer& source, ResourceCache* cache)
     
     // Read Light properties
     mLightType = (LightType)source.readUByte();
-    mDirection = source.readVector3();
     mColor = source.readColor();
     mSpecularIntensity = source.readFloat();
     mRange = source.readFloat();
@@ -205,7 +202,6 @@ void Light::saveXML(XMLElement& dest)
     // Write Light properties
     XMLElement lightElem = dest.createChildElement("light");
     lightElem.setString("type", typeNames[mLightType]);
-    lightElem.setVector3("direction", mDirection);
     lightElem.setColor("color", mColor);
     lightElem.setFloat("specular", mSpecularIntensity);
     lightElem.setFloat("range", mRange);
@@ -255,7 +251,6 @@ void Light::loadXML(const XMLElement& source, ResourceCache* cache)
     // Read Light properties
     XMLElement lightElem = source.getChildElement("light");
     mLightType = (LightType)getIndexFromStringList(lightElem.getStringLower("type"), typeNames, 3, 0);
-    mDirection = lightElem.getVector3("direction");
     mColor = lightElem.getColor("color");
     mSpecularIntensity = lightElem.getFloat("specular");
     mRange = lightElem.getFloat("range");
@@ -320,11 +315,10 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     unsigned char detailLevels = mDetailLevel | (mShadowDetailLevel << 4);
     checkUByte((unsigned char)mLightType, DEFAULT_LIGHTTYPE, baseRevision, bits, 1);
     checkUByte(detailLevels, 0, baseRevision, bits, 1);
-    checkVector3(mDirection, DEFAULT_DIRECTION, baseRevision, bits, 2);
-    checkColor(mColor, Color(), baseRevision, bits, 4);
-    checkFloat(mSpecularIntensity, 0.0f, baseRevision, bits, 4);
-    checkFloat(mRange, 0.0f, baseRevision, bits, 8);
-    checkFloat(mFov, DEFAULT_FOV, baseRevision, bits, 16);
+    checkColor(mColor, Color(), baseRevision, bits, 2);
+    checkFloat(mSpecularIntensity, 0.0f, baseRevision, bits, 2);
+    checkFloat(mRange, 0.0f, baseRevision, bits, 4);
+    checkFloat(mFov, DEFAULT_FOV, baseRevision, bits, 8);
     checkFloat(mAspectRatio, 1.0f, baseRevision, bits, 16);
     checkFloat(mFadeDistance, 0.0f, baseRevision, bits, 32);
     checkStringHash(getResourceHash(mRampTexture), StringHash(), baseRevision, bits, 64);
@@ -346,12 +340,10 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     checkFloat(mShadowNearFarRatio, DEFAULT_SHADOWNEARFARRATIO, baseRevision, bits2, 64);
     
     // Send only information necessary for the light type, and shadow data only for shadowed lights
-    if (mLightType == LIGHT_POINT)
-        bits &= ~2;
     if (mLightType == LIGHT_DIRECTIONAL)
-        bits &= ~(8 | 32);
+        bits &= ~(4 | 32);
     if (mLightType != LIGHT_SPOT)
-        bits &= ~16;
+        bits &= ~(8 | 16);
     if (!mCastShadows)
         bits2 = 0;
     
@@ -359,11 +351,10 @@ bool Light::writeNetUpdate(Serializer& dest, Serializer& destRevision, Deseriali
     dest.writeUByte(bits2);
     writeUByteDelta((unsigned char)mLightType, dest, destRevision, bits & 1);
     writeUByteDelta(detailLevels, dest, destRevision, bits & 1);
-    writeVector3Delta(mDirection, dest, destRevision, bits & 2);
-    writeColorDelta(mColor, dest, destRevision, bits & 4);
-    writeFloatDelta(mSpecularIntensity, dest, destRevision, bits & 4);
-    writeFloatDelta(mRange, dest, destRevision, bits & 8);
-    writeFloatDelta(mFov, dest, destRevision, bits & 16);
+    writeColorDelta(mColor, dest, destRevision, bits & 2);
+    writeFloatDelta(mSpecularIntensity, dest, destRevision, bits & 2);
+    writeFloatDelta(mRange, dest, destRevision, bits & 4);
+    writeFloatDelta(mFov, dest, destRevision, bits & 8);
     writeFloatDelta(mAspectRatio, dest, destRevision, bits & 16);
     writeFloatDelta(mFadeDistance, dest, destRevision, bits & 32);
     writeStringHashDelta(getResourceHash(mRampTexture), dest, destRevision, bits & 64);
@@ -405,11 +396,10 @@ void Light::readNetUpdate(Deserializer& source, ResourceCache* cache, const NetU
         mDetailLevel = detailLevels & 15;
         mShadowDetailLevel = detailLevels >> 4;
     }
-    readVector3Delta(mDirection, source, bits & 2);
-    readColorDelta(mColor, source, bits & 4);
-    readFloatDelta(mSpecularIntensity, source, bits & 4);
-    readFloatDelta(mRange, source, bits & 8);
-    readFloatDelta(mFov, source, bits & 16);
+    readColorDelta(mColor, source, bits & 2);
+    readFloatDelta(mSpecularIntensity, source, bits & 2);
+    readFloatDelta(mRange, source, bits & 4);
+    readFloatDelta(mFov, source, bits & 8);
     readFloatDelta(mAspectRatio, source, bits & 16);
     readFloatDelta(mFadeDistance, source, bits & 32);
     if (bits & 64)
@@ -508,16 +498,12 @@ void Light::overrideTransforms(unsigned batchIndex, Camera& camera, const Matrix
         {
             float yScale = tan(mFov * M_DEGTORAD * 0.5f) * mRange;
             float xScale = mAspectRatio * yScale;
-            Quaternion rotation(Vector3::sForward, mDirection);
-            lightModel.define(getWorldPosition(), getWorldRotation() * rotation, Vector3(xScale, yScale, mRange));
+            lightModel.define(getWorldPosition(), getWorldRotation(), Vector3(xScale, yScale, mRange));
         }
         break;
         
     case LIGHT_SPLITPOINT:
-        {
-            Quaternion rotation(Vector3::sForward, mDirection);
-            lightModel.define(getWorldPosition(), getWorldRotation() * rotation, mRange);
-        }
+        lightModel.define(getWorldPosition(), getWorldRotation(), mRange);
         break;
     }
 }
@@ -545,14 +531,6 @@ void Light::setLightType(LightType type)
         mShapeTexture = 0;
     if ((mLightType == LIGHT_POINT) && (mShapeTexture) && (mShapeTexture->getType() != TextureCube::getTypeStatic()))
         mShapeTexture = 0;
-    
-    if (!isDirty())
-        markDirty();
-}
-
-void Light::setDirection(const Vector3& direction)
-{
-    mDirection = direction.getNormalized();
     
     if (!isDirty())
         markDirty();
@@ -653,6 +631,7 @@ void Light::setShapeTexture(Texture* texture)
 
 void Light::copyFrom(Light* original)
 {
+    mOriginalLight = original;
     setPosition(original->getWorldPosition());
     setRotation(original->getWorldRotation());
     setScale(original->getWorldScale());
@@ -662,7 +641,6 @@ void Light::copyFrom(Light* original)
     mViewMask = original->mViewMask;
     mLightMask = original->mLightMask;
     mDistance = original->mDistance;
-    mDirection = original->mDirection;
     mLightType = original->mLightType;
     mRange = original->mRange;
     mFov = original->mFov;
@@ -691,8 +669,7 @@ const Frustum& Light::getFrustum()
     if (mFrustumDirty)
     {
         Matrix4x3 transform;
-        Quaternion rotation(Vector3::sForward, mDirection);
-        transform.define(getWorldPosition(), getWorldRotation() * rotation, 1.0f);
+        transform.define(getWorldPosition(), getWorldRotation(), 1.0f);
         // Set a small near clip distance, so that the near plane can be calculated
         // Note: this is not necessarily the same near clip as on the actual shadow camera
         mFrustum.define(mFov, mAspectRatio, 1.0f, M_MIN_NEARCLIP, mRange, transform);

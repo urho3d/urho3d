@@ -138,7 +138,8 @@ void writePackageFile(const std::string& fileName, const std::string& rootDir)
     
     File dest(fileName, FILE_WRITE);
     
-    // Write number of files & placeholder for checksum
+    // Write ID, number of files & placeholder for checksum
+    dest.writeID("UPAK");
     dest.writeUInt(gEntries.size());
     dest.writeUInt(gChecksum);
     
@@ -175,6 +176,7 @@ void writePackageFile(const std::string& fileName, const std::string& rootDir)
     
     // Write header again with correct offsets & checksums
     dest.seek(0);
+    dest.writeID("UPAK");
     dest.writeUInt(gEntries.size());
     dest.writeUInt(gChecksum);
     

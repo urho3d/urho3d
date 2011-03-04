@@ -902,6 +902,9 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
     // Begin serialization
     File dest(outputFileName, FILE_WRITE);
     
+    // ID
+    dest.writeID("UMDL");
+    
     // Vertexbuffers
     dest.writeUInt(vertexBuffers.size());
     for (unsigned i = 0; i < vertexBuffers.size(); ++i)
@@ -1053,6 +1056,7 @@ void writeOutput(const std::string& outputFileName, bool exportAnimations, bool 
                 // Write each animation into a separate file
                 std::string animationFileName = replace(outputFileName, ".mdl", "") + "_" + newAnimation.mName + ".ani";
                 File dest(animationFileName, FILE_WRITE);
+                dest.writeID("UANI");
                 dest.writeString(newAnimation.mName);
                 dest.writeFloat(newAnimation.mLength);
                 dest.writeUInt(newAnimation.mTracks.size());

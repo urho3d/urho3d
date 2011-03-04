@@ -70,6 +70,8 @@ struct TriangleMeshData : public CollisionGeometryData
     unsigned mVertexCount;
     //! Number of indices
     unsigned mIndexCount;
+    //! Skin width (for convex hulls)
+    float mSkinWidth;
     //! Vertex data
     SharedArrayPtr<Vector3> mVertexData;
     //! Index data

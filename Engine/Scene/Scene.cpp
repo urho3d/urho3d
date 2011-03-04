@@ -121,7 +121,8 @@ void Scene::interpolate(float timeStep)
 
 void Scene::save(Serializer& dest)
 {
-    // Write scene name
+    // Write ID and scene name
+    dest.writeID("USCN");
     dest.writeString(mName);
     
     // Write extension properties
@@ -155,15 +156,17 @@ void Scene::load(Deserializer& source)
     if (!mCache)
         return;
     
+    // Check ID
+    if (source.readID() != "USCN")
+        EXCEPTION(source.getName() + " is not a valid binary scene file");
+    
     LOGINFO("Loading scene from " + source.getName());
     
     stopAsyncLoading();
     removeAllEntities();
     
-    // Read scene name
+    // Read scene name and extension properties
     mName = source.readString();
-    
-    // Read extension properties
     loadProperties(source);
     
     // Read entities
@@ -221,10 +224,8 @@ void Scene::loadXML(Deserializer& source)
     stopAsyncLoading();
     removeAllEntities();
     
-    // Read scene name
+    // Read scene name and extension properties
     mName = sceneElem.getString("name");
-    
-    // Read extension properties
     loadPropertiesXML(sceneElem);
     
     // Read entities

@@ -75,6 +75,10 @@ void Model::load(Deserializer& source, ResourceCache* cache)
 {
     PROFILE(Model_Load);
     
+    // Check ID
+    if (source.readID() != "UMDL")
+        EXCEPTION(source.getName() + " is not a valid model file");
+    
     mGeometries.clear();
     mGeometryBoneMappings.clear();
     mMorphs.clear();
@@ -234,6 +238,9 @@ void Model::save(Serializer& dest)
             storeOrLookupIndexBuffer(mGeometries[i][j]->getIndexBuffer(), indexBuffers);
         }
     }
+    
+    // Write ID
+    dest.writeID("UMDL");
     
     // Write vertex buffers
     dest.writeUInt(vertexBuffers.size());

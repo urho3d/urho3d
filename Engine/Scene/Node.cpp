@@ -341,6 +341,11 @@ void Node::setRotation(const Quaternion& rotation)
         markDirty();
 }
 
+void Node::setDirection(const Vector3& direction)
+{
+    setRotation(Quaternion(Vector3::sForward, direction));
+}
+
 void Node::setScale(float scale)
 {
     mScale = Vector3(scale, scale, scale);

@@ -94,6 +94,8 @@ public:
     void setPosition(const Vector3& position);
     //! Set rotation
     void setRotation(const Quaternion& rotation);
+    //! Set direction. Positive Z equals identity
+    void setDirection(const Vector3& direction);
     //! Set uniform scale
     void setScale(float scale);
     //! Set scale
@@ -133,6 +135,8 @@ public:
     const Vector3& getPosition() const { return mPosition; }
     //! Return rotation
     const Quaternion& getRotation() const { return mRotation; }
+    //! Return direction. Identity rotation equals positive Z
+    Vector3 getDirection() const { return mRotation * Vector3::sForward; }
     //! Return scale
     const Vector3& getScale() const { return mScale; }
     
@@ -141,7 +145,7 @@ public:
     {
         if (mDirty)
             updateWorldPosition();
-    
+        
         return mWorldPosition;
     }
     
@@ -150,8 +154,17 @@ public:
     {
         if (mDirty)
             updateWorldPosition();
-    
+        
         return mWorldRotation;
+    }
+    
+    //! Return world-space direction
+    Vector3 getWorldDirection()
+    {
+        if (mDirty)
+            updateWorldPosition();
+        
+        return mWorldRotation * Vector3::sForward;
     }
     
     //! Return world-space scale

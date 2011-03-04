@@ -150,6 +150,13 @@ void Serializer::writeString(const std::string& value)
     write(value.c_str(), value.length() + 1);
 }
 
+void Serializer::writeID(const std::string& value)
+{
+    write(value.c_str(), min((int)value.length(), 4));
+    for (unsigned i = value.length(); i < 4; ++i)
+        writeByte(' ');
+}
+
 void Serializer::writeStringHash(const StringHash& value)
 {
     write(value.getData(), sizeof(unsigned));

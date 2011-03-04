@@ -202,8 +202,7 @@ void Batch::draw(Renderer* renderer) const
         if ((light) && (vs->needParameterUpdate(VSP_SPOTPROJ, light)))
         {
             Matrix4x3 spotView;
-            Quaternion rotation(Vector3::sForward, light->getDirection());
-            spotView.define(light->getWorldPosition(), light->getWorldRotation() * rotation, 1.0f);
+            spotView.define(light->getWorldPosition(), light->getWorldRotation(), 1.0f);
             
             Matrix4 spotProj;
             memset(&spotProj, 0, sizeof(spotProj));
@@ -295,7 +294,7 @@ void Batch::draw(Renderer* renderer) const
         }
         
         if (ps->needParameterUpdate(PSP_LIGHTDIR, light))
-            renderer->setPixelShaderConstant(getPSRegister(PSP_LIGHTDIR), -(light->getWorldRotation() * light->getDirection()));
+            renderer->setPixelShaderConstant(getPSRegister(PSP_LIGHTDIR), -light->getWorldDirection());
         
         if (ps->needParameterUpdate(PSP_LIGHTPOS, light))
             renderer->setPixelShaderConstant(getPSRegister(PSP_LIGHTPOS), light->getWorldPosition() - mCamera->getWorldPosition());
@@ -316,8 +315,12 @@ void Batch::draw(Renderer* renderer) const
         if (ps->needParameterUpdate(PSP_LIGHTVECROT, light))
         {
             Matrix4x3 lightVecRot;
-            Quaternion rotation = light->getWorldRotation() * Quaternion(Vector3::sForward, light->getDirection());
-            lightVecRot.define(Vector3::sZero, rotation, Vector3::sUnity);
+            // Use original light if available (split lights)
+            Light* original = light->getOriginalLight();
+            if (!original)
+                lightVecRot.define(Vector3::sZero, light->getWorldRotation(), Vector3::sUnity);
+            else
+                lightVecRot.define(Vector3::sZero, original->getWorldRotation(), Vector3::sUnity);
             
             renderer->setPixelShaderConstant(getPSRegister(PSP_LIGHTVECROT), lightVecRot);
         }
@@ -377,8 +380,7 @@ void Batch::draw(Renderer* renderer) const
     if ((light) && (ps->needParameterUpdate(PSP_SPOTPROJ, light)))
     {
         Matrix4x3 spotView;
-        Quaternion rotation(Vector3::sForward, light->getDirection());
-        spotView.define(light->getWorldPosition(), light->getWorldRotation() * rotation, 1.0f);
+        spotView.define(light->getWorldPosition(), light->getWorldRotation(), 1.0f);
         
         Matrix4 spotProj;
         memset(&spotProj, 0, sizeof(spotProj));

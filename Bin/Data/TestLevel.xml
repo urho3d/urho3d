@@ -13,10 +13,10 @@
             <fog color="0.2 0.2 0.7 0" start="5000" end="15000" />
         </component>
         <component type="Light" netflags="0">
-            <transform pos="0 0 0" rot="1 0 0 0" scale="1 1 1" />
+            <transform pos="0 0 0" rot="0.888074 0.325058 -0.325058 0" scale="1 1 1" />
             <render castshadows="true" occluder="false" visible="true" />
             <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" fadedistance="0" detail="0" shadowdetail="0" />
-            <light type="directional" direction="-0.57735 -0.57735 0.57735" color="1 1 1 1" specular="0" range="0" fov="30" aspectratio="1" />
+            <light type="directional" color="1 1 1 1" specular="0" range="0" fov="30" aspectratio="1" />
             <shadows fadedistance="0" intensity="0" resolution="1" nearfarratio="0.002" />
             <shadowbias constant="0.00025" slopescaled="0.001" />
             <shadowcascade lambda="0.5" maxrange="5000" faderange="0.2" splits="2" />

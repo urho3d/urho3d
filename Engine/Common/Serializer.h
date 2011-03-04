@@ -92,6 +92,8 @@ public:
     void writeBoundingBox(const BoundingBox& value);
     //! Write a null-terminated string
     void writeString(const std::string& value);
+    //! Write a four-letter ID. If the string is not long enough, spaces will be appended
+    void writeID(const std::string& value);
     //! Write a 32-bit StringHash
     void writeStringHash(const StringHash& value);
     //! Write a 16-bit ShortStringHash

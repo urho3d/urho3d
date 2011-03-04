@@ -218,6 +218,15 @@ std::string Deserializer::readString()
     return ret;
 }
 
+std::string Deserializer::readID()
+{
+    std::string ret;
+    
+    ret.resize(4);
+    read(&ret[0], 4);
+    return ret;
+}
+
 StringHash Deserializer::readStringHash()
 {
     StringHash ret;

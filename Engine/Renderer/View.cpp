@@ -865,7 +865,7 @@ void View::setupShadowCamera(Light* light, bool shadowOcclusion)
             float extrusionDistance = mCamera->getFarClip();
             
             // Calculate initial position & rotation
-            Vector3 lightWorldDirection = light->getWorldRotation() * light->getDirection();
+            Vector3 lightWorldDirection = light->getWorldDirection();
             Vector3 pos = mCamera->getWorldPosition() - extrusionDistance * lightWorldDirection;
             Quaternion rot(Vector3::sForward, lightWorldDirection);
             shadowCamera.setPosition(pos);
@@ -904,9 +904,8 @@ void View::setupShadowCamera(Light* light, bool shadowOcclusion)
     case LIGHT_SPOT:
     case LIGHT_SPLITPOINT:
         {
-            Quaternion rotation(Vector3::sForward, light->getDirection());
             shadowCamera.setPosition(light->getWorldPosition());
-            shadowCamera.setRotation(light->getWorldRotation() * rotation);
+            shadowCamera.setRotation(light->getWorldRotation());
             shadowCamera.setNearClip(light->getShadowNearFarRatio() * light->getRange());
             shadowCamera.setFarClip(light->getRange());
             shadowCamera.setOrthographic(false);
@@ -1163,7 +1162,7 @@ unsigned View::splitLight(Light* light)
             sSplitLights[i] = splitLight;
             
             splitLight->setLightType(LIGHT_SPLITPOINT);
-            splitLight->setRotation(Quaternion::sIdentity);
+            // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
             splitLight->setDirection(directions[i]);
             splitLight->setFov(90.0f);
             splitLight->setAspectRatio(1.0f);

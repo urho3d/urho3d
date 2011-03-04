@@ -283,6 +283,7 @@ template <class T> void registerNode(asIScriptEngine* engine, const char* classN
     registerComponent<T>(engine, className);
     engine->RegisterObjectMethod(className, "void setPosition(const Vector3& in)", asMETHODPR(T, setPosition, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setRotation(const Quaternion& in)", asMETHODPR(T, setRotation, (const Quaternion&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setDirection(const Vector3& in)", asMETHODPR(T, setDirection, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setScale(float)", asMETHODPR(T, setScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setScale(const Vector3& in)", asMETHODPR(T, setScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setTransform(const Vector3& in, const Quaternion& in)", asMETHODPR(T, setTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
@@ -301,9 +302,11 @@ template <class T> void registerNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void removeAllChildren(bool)", asMETHODPR(T, removeAllChildren, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& getPosition() const", asMETHODPR(T, getPosition, () const, const Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Quaternion& getRotation() const", asMETHODPR(T, getRotation, () const, const Quaternion&), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 getDirection() const", asMETHODPR(T, getDirection, () const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& getScale() const", asMETHODPR(T, getScale, () const, const Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& getWorldPosition()", asMETHODPR(T, getWorldPosition, (), const Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Quaternion& getWorldRotation()", asMETHODPR(T, getWorldRotation, (), const Quaternion&), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 getWorldDirection()", asMETHODPR(T, getWorldDirection, (), Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& getWorldScale()", asMETHODPR(T, getWorldScale, (), const Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint getNodeFlags() const", asMETHODPR(T, getNodeFlags, () const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ getParent() const", asMETHODPR(T, getParent, () const, Node*), asCALL_THISCALL);

@@ -542,8 +542,8 @@ static void registerLight(asIScriptEngine* engine)
 {
     engine->RegisterEnum("LightType");
     engine->RegisterEnumValue("LightType", "LIGHT_DIRECTIONAL", LIGHT_DIRECTIONAL);
-    engine->RegisterEnumValue("LightType", "LIGHT_POINT", LIGHT_POINT);
     engine->RegisterEnumValue("LightType", "LIGHT_SPOT", LIGHT_SPOT);
+    engine->RegisterEnumValue("LightType", "LIGHT_POINT", LIGHT_POINT);
     
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBiasParameters), asCALL_CDECL_OBJLAST);
@@ -573,7 +573,6 @@ static void registerLight(asIScriptEngine* engine)
     
     registerVolumeNode<Light>(engine, "Light");
     engine->RegisterObjectMethod("Light", "void setLightType(LightType)", asMETHOD(Light, setLightType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void setDirection(const Vector3& in)", asMETHOD(Light, setDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setColor(const Color& in)", asMETHOD(Light, setColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setSpecularIntensity(float)", asMETHOD(Light, setSpecularIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setRange(float)", asMETHOD(Light, setRange), asCALL_THISCALL);
@@ -591,7 +590,6 @@ static void registerLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "void setRampTexture(Texture@+)", asMETHOD(Light, setRampTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void setShapeTexture(Texture@+)", asMETHOD(Light, setShapeTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "LightType getLightType() const", asMETHOD(Light, getLightType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "const Vector3& getDirection() const", asMETHOD(Light, getDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Color& getColor() const", asMETHOD(Light, getColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float getSpecularIntensity() const", asMETHOD(Light, getSpecularIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "bool isNegative() const", asMETHOD(Light, isNegative), asCALL_THISCALL);

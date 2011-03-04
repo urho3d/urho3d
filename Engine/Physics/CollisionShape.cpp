@@ -135,7 +135,8 @@ void getVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
 TriangleMeshData::TriangleMeshData(const Model* model, bool makeConvexHull, float skinWidth, unsigned lodLevel) :
     mTriMesh(0),
     mVertexCount(0),
-    mIndexCount(0)
+    mIndexCount(0),
+    mSkinWidth(skinWidth)
 {
     if (!model)
         EXCEPTION("Null model for TriangleMeshData");
