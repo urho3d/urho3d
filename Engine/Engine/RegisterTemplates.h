@@ -196,6 +196,7 @@ template <class T> void registerSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void writeColor(const Color& in)", asMETHODPR(T, writeColor, (const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeBoundingBox(const BoundingBox& in)", asMETHODPR(T, writeBoundingBox, (const BoundingBox&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeString(const string& in)", asMETHODPR(T, writeString, (const std::string&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void writeID(const string& in)", asMETHODPR(T, writeID, (const std::string&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeStringHash(const StringHash& in)", asMETHODPR(T, writeStringHash, (const StringHash&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeShortStringHash(const ShortStringHash& in)", asMETHODPR(T, writeShortStringHash, (const ShortStringHash&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeVariant(const Variant& in)", asMETHODPR(T, writeVariant, (const Variant&), void), asCALL_THISCALL);
@@ -225,6 +226,7 @@ template <class T> void registerDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Color readColor()", asMETHODPR(T, readColor, (), Color), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "BoundingBox readBoundingBox()", asMETHODPR(T, readBoundingBox, (), BoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "string readString()", asMETHODPR(T, readString, (), std::string), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "string readID()", asMETHODPR(T, readID, (), std::string), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "StringHash readStringHash()", asMETHODPR(T, readStringHash, (), StringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "ShortStringHash readShortStringHash()", asMETHODPR(T, readShortStringHash, (), ShortStringHash), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant readVariant()", asMETHODPR(T, readVariant, (), Variant), asCALL_THISCALL);
