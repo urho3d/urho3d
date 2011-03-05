@@ -48,8 +48,14 @@ enum ShapeType
 //! Base class for collision subshape geometry data
 struct CollisionGeometryData : public RefCounted
 {
-    //! Identifier (model name)
+    //! Identifier (model name with postfixes to describe lod and scale)
     std::string mID;
+    //! Original model name
+    std::string mModelName;
+    //! Thickness or skin width (heightfields and convex hulls only)
+    float mThickness;
+    //! Lod level
+    unsigned mLodLevel;
     //! Memory use in bytes
     unsigned mMemoryUse;
 };
@@ -70,8 +76,8 @@ struct TriangleMeshData : public CollisionGeometryData
     unsigned mVertexCount;
     //! Number of indices
     unsigned mIndexCount;
-    //! Skin width (for convex hulls)
-    float mSkinWidth;
+    //! Convex hull flag
+    bool mIsConvexHull;
     //! Vertex data
     SharedArrayPtr<Vector3> mVertexData;
     //! Index data
@@ -94,8 +100,6 @@ struct HeightfieldData : public CollisionGeometryData
     unsigned mXPoints;
     //! Number of points along the Z-axis
     unsigned mZPoints;
-    //! Thickness below the heightfield
-    float mThickness;
     //! Bounding box
     BoundingBox mBoundingBox;
     //! Height values
@@ -130,6 +134,8 @@ public:
     
     //! Load resource. Throw exception on error
     virtual void load(Deserializer& source, ResourceCache* cache = 0);
+    //! Save resource. Throw exception on error
+    virtual void save(Serializer& dest);
     
     //! Add a sphere subshape
     void addSphere(float radius, const Vector3& position = Vector3::sZero, const Quaternion& rotation = Quaternion::sIdentity);

@@ -59,7 +59,7 @@ void Application::run()
     
     // Parse scene or script file name from the command line
     const std::vector<std::string>& arguments = getArguments();
-    std::string fullName;
+    std::string fullName, pathName, fileName, extension;
     if ((arguments.size()) && (arguments[0][0] != '-'))
         fullName = replace(arguments[0], '\\', '/');
     if (fullName.empty())
@@ -67,31 +67,36 @@ void Application::run()
             "Either a script file or a scene file can be specified. The script file should implement the function void start(), "
             "which should in turn subscribe to all necessary events, such as the application update. If a scene is loaded, it "
             "should contain script objects to implement the application logic. Refer to the readme for the command line options.");
+    splitPath(fullName, pathName, fileName, extension);
     
     // Instantiate the engine
     mEngine = new Engine();
     
     // Try to open the file before setting screen mode
-    File file(fullName);
+    // Check first the resource cache
+    SharedPtr<File> file;
+    mCache = mEngine->getResourceCache();
+    if (mCache->exists(fullName))
+        file = mCache->getFile(fullName);
+    // If not found, open using the full filename, and add the path as a resource directory
+    else
+    {
+        file = new File(fullName);
+        if (!pathName.empty())
+            mCache->addResourcePath(pathName);
+        else
+            mCache->addResourcePath(getCurrentDirectory());
+    }
     
     // Initialize engine & scripting
     mEngine->init(arguments);
     mEngine->createScriptEngine();
-    mCache = mEngine->getResourceCache();
-    
-    // Add the file's path also as a resource directory
-    std::string pathName, fileName, extension;
-    splitPath(fullName, pathName, fileName, extension);
-    if (!pathName.empty())
-        mCache->addResourcePath(pathName);
-    else
-        mCache->addResourcePath(getCurrentDirectory());
     
     // Script mode: execute the rest of initialization, including scene creation, in script
     if ((extension != ".xml") && (extension != ".scn"))
     {
         mScriptFile = new ScriptFile(mEngine->getScriptEngine(), fileName + extension);
-        mScriptFile->load(file, mCache);
+        mScriptFile->load(*file, mCache);
         if (!mScriptFile->execute("void start()"))
             EXCEPTION("Failed to execute the start() function");
     }
@@ -99,12 +104,10 @@ void Application::run()
     else
     {
         mScene = mEngine->createScene("Urho3D");
-        File sceneFile(fullName);
-        
         if (extension == ".xml")
-            mScene->loadXML(sceneFile);
+            mScene->loadXML(*file);
         else
-            mScene->load(sceneFile);
+            mScene->load(*file);
     }
     
     // Run until exited

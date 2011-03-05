@@ -27,6 +27,8 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://chrishecker.com/Miscellaneous_Technical_Articles
 - Networked Physics by Glenn Fiedler
   http://gafferongames.com/game-physics/networked-physics/
+- Euler Angle Formulas by David Eberly
+  http://www.geometrictools.com/Documentation/EulerAngles.pdf
 
 Urho3D uses the following third-party libraries:
 - AngelScript (2.20.2)

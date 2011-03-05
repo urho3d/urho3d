@@ -34,6 +34,7 @@
 #define DEFINE_PROPERTY(propertyID, propertyName) static const ShortStringHash propertyID(#propertyName)
 
 class Scene;
+class asIScriptEngine;
 
 static const EntityID LOCAL_ENTITY = 0x10000;
 
@@ -59,6 +60,7 @@ typedef std::map<ShortStringHash, Property> PropertyMap;
 class Entity : public RefCounted, public EventListener
 {
     friend class Scene;
+    friend void registerEntity(asIScriptEngine* engine);
     
 public:
     //! Construct with ID and name

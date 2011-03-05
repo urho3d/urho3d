@@ -136,19 +136,23 @@ TriangleMeshData::TriangleMeshData(const Model* model, bool makeConvexHull, floa
     mTriMesh(0),
     mVertexCount(0),
     mIndexCount(0),
-    mSkinWidth(skinWidth)
+    mIsConvexHull(makeConvexHull)
 {
     if (!model)
         EXCEPTION("Null model for TriangleMeshData");
     
+    mModelName = model->getName();
+    mThickness = skinWidth;
+    mLodLevel = lodLevel;
+    
     if (!makeConvexHull)
     {
-        mID = model->getName() + toString(lodLevel);
+        mID = mModelName + toString(lodLevel);
         getVertexAndIndexData(model, lodLevel, mVertexData, mVertexCount, mIndexData, mIndexCount);
     }
     else
     {
-        mID = model->getName() + toString(lodLevel) + "hull" + toString(skinWidth);
+        mID = mModelName + toString(lodLevel) + "hull" + toString(skinWidth);
         
         SharedArrayPtr<Vector3> originalVertices;
         SharedArrayPtr<unsigned> originalIndices;
@@ -163,6 +167,7 @@ TriangleMeshData::TriangleMeshData(const Model* model, bool makeConvexHull, floa
         desc.mVcount = originalVertexCount;
         desc.mVertices = (float*)originalVertices.getPtr();
         desc.mVertexStride = 3 * sizeof(float);
+        desc.mSkinWidth = skinWidth;
         
         StanHull::HullLibrary lib;
         StanHull::HullResult result;
@@ -195,7 +200,10 @@ TriangleMeshData::TriangleMeshData(const TriangleMeshData* source, const Vector3
         EXCEPTION("Null TriangleMeshData source");
     
     mID = source->mID + toString(scale);
-    
+    mModelName = source->mModelName;
+    mThickness = source->mThickness;
+    mLodLevel = source->mLodLevel;
+    mIsConvexHull = source->mIsConvexHull;
     mVertexCount = source->mVertexCount;
     mIndexCount = source->mIndexCount;
     mVertexData = new Vector3[mVertexCount];
@@ -224,13 +232,15 @@ TriangleMeshData::~TriangleMeshData()
 }
 
 HeightfieldData::HeightfieldData(const Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel) :
-    mHeightfield(0),
-    mThickness(thickness)
+    mHeightfield(0)
 {
     if (!model)
         EXCEPTION("Null model for HeightfieldData");
     
-    mID = model->getName() + toString(mThickness) + toString(lodLevel);
+    mModelName = model->getName();
+    mID = mModelName + toString(mThickness) + toString(lodLevel);
+    mThickness = thickness;
+    mLodLevel = lodLevel;
     
     const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->getGeometries();
     
@@ -309,10 +319,11 @@ HeightfieldData::HeightfieldData(const HeightfieldData* source, const Vector3& s
         EXCEPTION("Null HeightfieldData source");
     
     mID = source->mID + toString(scale);
-    
+    mModelName = source->mModelName;
+    mThickness = source->mThickness * scale.mY;
+    mLodLevel = source->mLodLevel;
     mXPoints = source->mXPoints;
     mZPoints = source->mZPoints;
-    mThickness = source->mThickness * scale.mY;
     mBoundingBox = source->mBoundingBox;
     mHeightData = new float[mXPoints * mZPoints];
     
@@ -413,10 +424,10 @@ void CollisionShape::load(Deserializer& source, ResourceCache* cache)
                 xSize = shapeElem.getInt("xpoints");
             if (shapeElem.hasAttribute("zpoints"))
                 zSize = shapeElem.getInt("zpoints");
-            if (shapeElem.hasAttribute("lodlevel"))
-                lodLevel = shapeElem.getInt("lodlevel");
             if (shapeElem.hasAttribute("thickness"))
                 thickness = shapeElem.getFloat("thickness");
+            if (shapeElem.hasAttribute("lodlevel"))
+                lodLevel = shapeElem.getInt("lodlevel");
             addHeightfield(model, xSize, zSize, thickness, lodLevel, position, rotation);
         }
         
@@ -434,6 +445,92 @@ void CollisionShape::load(Deserializer& source, ResourceCache* cache)
         
         shapeElem = shapeElem.getNextElement();
     }
+}
+
+void CollisionShape::save(Serializer& dest)
+{
+    XMLFile xml;
+    XMLElement rootElem = xml.createRootElement("collisionshape");
+    
+    for (unsigned i = 0; i < mSubShapes.size(); ++i)
+    {
+        XMLElement shapeElem;
+        const CollisionSubShape& shape = mSubShapes[i];
+        
+        switch (shape.mType)
+        {
+        case SHAPE_SPHERE:
+            shapeElem = rootElem.createChildElement("sphere");
+            shapeElem.setFloat("radius", shape.mSize.mX);
+            break;
+        
+        case SHAPE_BOX:
+            shapeElem = rootElem.createChildElement("box");
+            shapeElem.setVector3("size", shape.mSize);
+            break;
+        
+        case SHAPE_CAPSULE:
+            shapeElem = rootElem.createChildElement("capsule");
+            shapeElem.setFloat("radius", shape.mSize.mX);
+            shapeElem.setFloat("height", shape.mSize.mZ);
+            break;
+            
+        case SHAPE_CYLINDER:
+            shapeElem = rootElem.createChildElement("cylinder");
+            shapeElem.setFloat("radius", shape.mSize.mX);
+            shapeElem.setFloat("height", shape.mSize.mZ);
+            break;
+        
+        case SHAPE_TRIANGLEMESH:
+            {
+                TriangleMeshData* data = dynamic_cast<TriangleMeshData*>(shape.mGeometryData.getPtr());
+                if (data)
+                {
+                    if (data->mIsConvexHull)
+                    {
+                        shapeElem = rootElem.createChildElement("convexhull");
+                        shapeElem.setFloat("skinwidth", data->mThickness);
+                    }
+                    else
+                        shapeElem = rootElem.createChildElement("trianglemesh");
+                    
+                    shapeElem.setString("name", data->mModelName);
+                    if (data->mLodLevel != M_MAX_UNSIGNED)
+                        shapeElem.setInt("lodlevel", data->mLodLevel);
+                }
+            }
+            break;
+            
+        case SHAPE_HEIGHTFIELD:
+            {
+                HeightfieldData* data = dynamic_cast<HeightfieldData*>(shape.mGeometryData.getPtr());
+                if (data)
+                {
+                    shapeElem = rootElem.createChildElement("heightfield");
+                    shapeElem.setString("name", data->mModelName);
+                    shapeElem.setInt("xpoints", data->mXPoints);
+                    shapeElem.setInt("zpoints", data->mZPoints);
+                    shapeElem.setFloat("thickness", data->mThickness);
+                    if (data->mLodLevel != M_MAX_UNSIGNED)
+                        shapeElem.setInt("lodlevel", data->mLodLevel);
+                }
+            }
+            break;
+        }
+        
+        if (!shapeElem)
+        {
+            LOGWARNING("Unrecognized or empty collision subshape, not saved");
+            continue;
+        }
+        
+        if (shape.mPosition != Vector3::sZero)
+            shapeElem.setVector3("position", shape.mPosition);
+        if (shape.mRotation != Quaternion::sIdentity)
+            shapeElem.setVector3("rotation", shape.mRotation.getEulerAngles());
+    }
+    
+    xml.save(dest);
 }
 
 void CollisionShape::addSphere(float radius, const Vector3& position, const Quaternion& rotation)
@@ -720,15 +817,19 @@ void CollisionShape::calculateMass(void* dest, const std::vector<dGeomID>& geoms
         case SHAPE_BOX:
             dMassSetBox(&subMass, density, size.mX, size.mY, size.mZ);
             break;
+            
         case SHAPE_SPHERE:
             dMassSetSphere(&subMass, density, size.mX);
             break;
+            
         case SHAPE_CYLINDER:
             dMassSetCylinder(&subMass, density, 2, size.mX, size.mZ);
             break;
+            
         case SHAPE_CAPSULE:
             dMassSetCapsule(&subMass, density, 2, size.mX, size.mZ);
             break;
+            
         case SHAPE_TRIANGLEMESH:
             dMassSetBox(&subMass, density, size.mX, size.mY, size.mZ);
             break;

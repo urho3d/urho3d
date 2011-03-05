@@ -517,7 +517,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "LayoutMode getLayoutMode() const", asMETHOD(T, getLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int getLayoutSpacing() const", asMETHOD(T, getLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& getLayoutBorder() const", asMETHOD(T, getLayoutBorder), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "const VariantMap& getUserData() const", asMETHOD(T, getUserData), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "VariantMap& getUserData()", asMETHOD(T, getUserData), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint getNumChildren(bool) const", asMETHOD(T, getNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, UIElement*), asCALL_THISCALL);
@@ -529,6 +529,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isInside(IntVector2, bool)", asMETHOD(T, isInside), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isInsideCombined(IntVector2, bool)", asMETHOD(T, isInsideCombined), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect getCombinedScreenRect()", asMETHOD(T, getCombinedScreenRect), asCALL_THISCALL);
+    engine->RegisterObjectProperty(className, "VariantMap userData", offsetof(T, mUserData));
     registerRefCasts<EventListener, T>(engine, "EventListener", className);
 }
 

@@ -121,6 +121,14 @@ static CollisionShape* ConstructCollisionShape(const std::string& name)
     return new CollisionShape(name);
 }
 
+static void CollisionShapeSave(File* file, CollisionShape* ptr)
+{
+    if (!file)
+        SAFE_EXCEPTION("Null destination file");
+    
+    TRY_SAFE_RETHROW(ptr->save(*file));
+}
+
 static void CollisionShapeAddTriangleMesh(const Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation, CollisionShape* ptr)
 {
     TRY_SAFE_RETHROW(ptr->addTriangleMesh(model, lodLevel, position, rotation));
@@ -140,6 +148,7 @@ static void registerCollisionShape(asIScriptEngine* engine)
 {
     registerResource<CollisionShape>(engine, "CollisionShape");
     engine->RegisterObjectBehaviour("CollisionShape", asBEHAVE_FACTORY, "CollisionShape@+ f(const string& in)", asFUNCTION(ConstructCollisionShape), asCALL_CDECL);
+    engine->RegisterObjectMethod("CollisionShape", "void save(File@+)", asFUNCTION(CollisionShapeSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("CollisionShape", "void addSphere(float, const Vector3& in, const Quaternion& in)", asMETHOD(CollisionShape, addSphere), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void addBox(const Vector3& in, const Vector3& in, const Quaternion& in)", asMETHOD(CollisionShape, addBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void addCylinder(float, float, const Vector3& in, const Quaternion& in)", asMETHOD(CollisionShape, addCylinder), asCALL_THISCALL);

@@ -69,6 +69,8 @@ public:
     //! Construct from an angle (in degrees) and axis
     Quaternion(float angle, const Vector3& axis);
     //! Construct from Euler angles (in degrees)
+    Quaternion(const Vector3& euler);
+    //! Construct from Euler angles (in degrees)
     Quaternion(float angleX, float angleY, float angleZ);
     //! Construct from the rotation difference between two vectors
     Quaternion(const Vector3& start, const Vector3& end);
@@ -180,7 +182,7 @@ public:
     //! Set from an angle (in degrees) and axis
     void fromAngleAxis(float angle, const Vector3& axis);
     //! Set from Euler angles (in degrees)
-    void fromEulerAngles(float angleX, float angleY, float angleZ);
+    void fromEulerAngles(const Vector3& euler);
     //! Set from the rotation difference between two vectors
     void fromRotationTo(const Vector3& start, const Vector3& end);
     
@@ -243,7 +245,7 @@ public:
     }
     
     //! Return Euler angles (in degrees)
-    void getEulerAngles(float& angleX, float& angleY, float& angleZ) const;
+    Vector3 getEulerAngles() const;
     //! Return yaw angle in degrees
     float getYaw() const;
     //! Return pitch angle in degrees

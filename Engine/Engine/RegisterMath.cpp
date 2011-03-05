@@ -323,6 +323,11 @@ static void ConstructQuaternionAngleAxis(float angle, const Vector3& axis, Quate
     new(ptr) Quaternion(angle, axis);
 }
 
+static void ConstructQuaternionEulerVector(const Vector3& euler, Quaternion* ptr)
+{
+    new(ptr) Quaternion(euler);
+}
+
 static void ConstructQuaternionEuler(float angleX, float angleY, float angleZ, Quaternion* ptr)
 {
     new(ptr) Quaternion(angleX, angleY, angleZ);
@@ -340,6 +345,7 @@ static void registerQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Quaternion& in)", asFUNCTION(ConstructQuaternionCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructQuaternionInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, const Vector3& in)", asFUNCTION(ConstructQuaternionAngleAxis), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3& in)", asFUNCTION(ConstructQuaternionEulerVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructQuaternionEuler), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3& in, const Vector3& in)", asFUNCTION(ConstructQuaternionRotation), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Quaternion", "Quaternion &opAssign(const Quaternion& in)", asMETHOD(Quaternion, operator =), asCALL_THISCALL);
@@ -353,13 +359,13 @@ static void registerQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "Quaternion opMul(const Quaternion& in) const", asMETHODPR(Quaternion, operator *, (const Quaternion&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void normalize()", asMETHOD(Quaternion, normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void fromAngleAxis(float, const Vector3& in)", asMETHOD(Quaternion, fromAngleAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void fromEulerAngles(float, float, float)", asMETHOD(Quaternion, fromEulerAngles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void fromEulerAngles(const Vector3& in)", asMETHOD(Quaternion, fromEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void fromRotation(const Vector3& in, const Vector3& in)", asMETHOD(Quaternion, fromRotationTo), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion getNormalized() const", asMETHOD(Quaternion, getNormalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion getInverse() const", asMETHOD(Quaternion, getInverse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float dotProduct(const Quaternion& in) const", asMETHOD(Quaternion, dotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion nlerp(const Quaternion& in, float) const", asMETHOD(Quaternion, nlerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void getEulerAngles(float &out, float &out, float &out) const", asMETHOD(Quaternion, getEulerAngles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Vector3 getEulerAngles() const", asMETHOD(Quaternion, getEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float getYaw() const", asMETHOD(Quaternion, getYaw), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float getPitch() const", asMETHOD(Quaternion, getPitch), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float getRoll() const", asMETHOD(Quaternion, getRoll), asCALL_THISCALL);

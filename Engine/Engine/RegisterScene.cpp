@@ -88,6 +88,46 @@ static void registerComponentRef(asIScriptEngine* engine)
     engine->RegisterObjectProperty("ComponentRef", "bool dirty", offsetof(ComponentRef, mDirty));
 }
 
+static void ConstructPropertyMap(PropertyMap* ptr)
+{
+    new(ptr) PropertyMap();
+}
+
+static void ConstructPropertyMapCopy(const PropertyMap& map, PropertyMap* ptr)
+{
+    new(ptr) PropertyMap(map);
+}
+
+static void DestructPropertyMap(PropertyMap* ptr)
+{
+    ptr->~PropertyMap();
+}
+
+static Variant& PropertyMapAt(const std::string& key, PropertyMap& map)
+{
+    return map[ShortStringHash(key)].mValue;
+}
+
+static void PropertyMapSetSync(const std::string& key, bool enable, PropertyMap& map)
+{
+    map[ShortStringHash(key)].mSync = enable;
+}
+
+static bool PropertyMapGetSync(const std::string& key, PropertyMap& map)
+{
+    return map[ShortStringHash(key)].mSync;
+}
+
+static bool PropertyMapContains(const std::string& key, PropertyMap& map)
+{
+    return map.find(ShortStringHash(key)) != map.end();
+}
+
+static void PropertyMapErase(const std::string& key, PropertyMap& map)
+{
+    map.erase(ShortStringHash(key));
+}
+
 Component* EntityCreateComponent(const std::string& type, Entity* ptr)
 {
     TRY_CONSTRUCT(ptr->createComponent(ShortStringHash(type)));
@@ -208,6 +248,20 @@ static Entity* GetEntity()
 
 static void registerEntity(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("PropertyMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPropertyMap), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructPropertyMapCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPropertyMap), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "PropertyMap& opAssign(const PropertyMap& in)", asMETHOD(PropertyMap, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PropertyMap", "Variant& opIndex(const string& in)", asFUNCTION(PropertyMapAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "const Variant& opIndex(const string& in) const", asFUNCTION(PropertyMapAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "void setSync(const string& in, bool enable)", asFUNCTION(PropertyMapSetSync), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "bool getSync(const string& in) const", asFUNCTION(PropertyMapGetSync), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "uint size() const", asMETHOD(PropertyMap, size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PropertyMap", "bool contains(const string& in) const", asFUNCTION(PropertyMapContains), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "void erase(const string& in)", asFUNCTION(PropertyMapErase), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PropertyMap", "void clear()", asMETHOD(PropertyMap, clear), asCALL_THISCALL);
+    
     engine->RegisterInterface("ScriptObject");
     engine->RegisterGlobalProperty("const uint LOCAL_ENTITY", (void*)&LOCAL_ENTITY);
     engine->RegisterObjectType("Scene", 0, asOBJ_REF);
@@ -238,8 +292,8 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "uint8 getNetFlags() const", asMETHOD(Entity, getNetFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "uint getGroupFlags() const", asMETHOD(Entity, getGroupFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "Scene@+ getScene() const", asMETHOD(Entity, getScene), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Entity", "const Variant& getProperty(const string& in)", asFUNCTION(EntityGetProperty), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Entity", "bool getPropertySync(const string& in)", asFUNCTION(EntityGetPropertySync), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "Variant& getProperty(const string& in) const", asFUNCTION(EntityGetProperty), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "bool getPropertySync(const string& in) const", asFUNCTION(EntityGetPropertySync), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "float getNetUpdateDistance() const", asMETHOD(Entity, getNetUpdateDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "float getPredictionTimer() const", asMETHOD(Entity, getPredictionTimer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "string getUniqueComponentName()", asMETHOD(Entity, getUniqueComponentName), asCALL_THISCALL);
@@ -257,6 +311,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Entity", "bool isOwnerPredicted() const", asMETHOD(Entity, isOwnerPredicted), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isTransientPredicted() const", asMETHOD(Entity, isTransientPredicted), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "bool isPlayback() const", asMETHOD(Entity, isPlayback), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Entity", "PropertyMap properties", offsetof(Entity, mProperties));
     registerRefCasts<EventListener, Entity>(engine, "EventListener", "Entity");
     
     engine->RegisterGlobalFunction("Entity@+ getEntity()", asFUNCTION(GetEntity), asCALL_CDECL);

@@ -31,9 +31,14 @@ Quaternion::Quaternion(float angle, const Vector3& Axis)
     fromAngleAxis(angle, Axis);
 }
 
+Quaternion::Quaternion(const Vector3& euler)
+{
+    fromEulerAngles(euler);
+}
+
 Quaternion::Quaternion(float angleX, float angleY, float angleZ)
 {
-    fromEulerAngles(angleX, angleY, angleZ);
+    fromEulerAngles(Vector3(angleX, angleY, angleZ));
 }
 
 Quaternion::Quaternion(const Vector3& start, const Vector3& end)
@@ -53,15 +58,15 @@ void Quaternion::fromAngleAxis(float angle, const Vector3& axis)
     mZ = normAxis.mZ * sinAngle;
 }
 
-void Quaternion::fromEulerAngles(float angleX, float angleY, float angleZ)
+void Quaternion::fromEulerAngles(const Vector3& euler)
 {
     // Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
-    float sinX = sinf((angleX * M_DEGTORAD) * 0.5f);
-    float cosX = cosf((angleX * M_DEGTORAD) * 0.5f);
-    float sinY = sinf((angleY * M_DEGTORAD) * 0.5f);
-    float cosY = cosf((angleY * M_DEGTORAD) * 0.5f);
-    float sinZ = sinf((angleZ * M_DEGTORAD) * 0.5f);
-    float cosZ = cosf((angleZ * M_DEGTORAD) * 0.5f);
+    float sinX = sinf((euler.mX * M_DEGTORAD) * 0.5f);
+    float cosX = cosf((euler.mX * M_DEGTORAD) * 0.5f);
+    float sinY = sinf((euler.mY * M_DEGTORAD) * 0.5f);
+    float cosY = cosf((euler.mY * M_DEGTORAD) * 0.5f);
+    float sinZ = sinf((euler.mZ * M_DEGTORAD) * 0.5f);
+    float cosZ = cosf((euler.mZ * M_DEGTORAD) * 0.5f);
     
     mW = cosY * cosX * cosZ + sinY * sinX * sinZ;
     mX = cosY * sinX * cosZ + sinY * cosX * sinZ;
@@ -97,53 +102,51 @@ void Quaternion::fromRotationTo(const Vector3& start, const Vector3& end)
     }
 }
 
-void Quaternion::getEulerAngles(float& angleX, float& angleY, float& angleZ) const
+Vector3 Quaternion::getEulerAngles() const
 {
-    // Check for singularities
-    float check = mX * mY + mZ * mW;
-    if (check > 0.499f)
-    {
-        angleX = 2.0f * atan2f(mX, mW) * M_RADTODEG;
-        angleY = 90.0f;
-        angleZ = 0.0f;
-        return;
-    }
-    if (check < -0.499f)
-    {
-        angleX = -2.0f * atan2f(mX, mW) * M_RADTODEG;
-        angleY = -90.0f;
-        angleZ = 0.0f;
-        return;
-    }
+    // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
     
-    float xSquared = mX * mX;
-    float ySquared = mY * mY;
-    float zSquared = mZ * mZ;
+    float check = 2.0f * (-mY * mZ + mW * mX);
     
-    angleX = atan2f(2.0f * mY * mW - 2.0f * mX * mZ, 1.0f - 2.0f * ySquared - 2.0f * zSquared) * M_RADTODEG;
-    angleY = asinf(2.0f * check) * M_RADTODEG;
-    angleZ = atan2f(2.0f * mX * mW - 2.0f * mY * mZ, 1.0f - 2.0f * xSquared - 2.0f * zSquared) * M_RADTODEG;
+    if (check < -0.995f)
+    {
+        return Vector3(
+            -90.0f,
+            0.0f,
+            -atan2f(2.0f * (mX * mZ - mW * mY), 1.0f - 2.0f * (mY * mY + mZ * mZ)) * M_RADTODEG
+        );
+    }
+    else if (check > 0.995f)
+    {
+        return Vector3(
+            90.0f,
+            0.0f,
+            atan2f(2.0f * (mX * mZ - mW * mY), 1.0f - 2.0f * (mY * mY + mZ * mZ)) * M_RADTODEG
+        );
+    }
+    else
+    {
+        return Vector3(
+            asinf(check) * M_RADTODEG,
+            atan2f(2.0f * (mX * mZ + mW * mY), 1.0f - 2.0f * (mX * mX + mY * mY)) * M_RADTODEG,
+            atan2f(2.0f * (mX * mY + mW * mZ), 1.0f - 2.0f * (mX * mX + mZ * mZ)) * M_RADTODEG
+        );
+    }
 }
 
 float Quaternion::getYaw() const
 {
-    float x, y, z;
-    getEulerAngles(x, y, z);
-    return x;
+    return getEulerAngles().mY;
 }
 
 float Quaternion::getPitch() const
 {
-    float x, y, z;
-    getEulerAngles(x, y, z);
-    return y;
+    return getEulerAngles().mX;
 }
 
 float Quaternion::getRoll() const
 {
-    float x, y, z;
-    getEulerAngles(x, y, z);
-    return z;
+    return getEulerAngles().mZ;
 }
 
 Matrix3 Quaternion::getRotationMatrix() const

@@ -1,1 +1,1 @@
-Urho3D Data/Scripts/NinjaSnowWar.as %1 %2 %3 %4 %5 %6 %7 %8
+Urho3D Scripts/NinjaSnowWar.as %1 %2 %3 %4 %5 %6 %7 %8

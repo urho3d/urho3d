@@ -306,6 +306,14 @@ static Material* ConstructMaterial(const std::string& name)
     return new Material(name);
 }
 
+static void MaterialSave(File* file, Material* ptr)
+{
+    if (!file)
+        SAFE_EXCEPTION("Null destination file");
+    
+    TRY_SAFE_RETHROW(ptr->save(*file));
+}
+
 static Material* MaterialClone(const std::string& cloneName, Material* ptr)
 {
     SharedPtr<Material> clonedMaterial = ptr->clone(cloneName);
@@ -347,6 +355,7 @@ static void registerMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("PSParameter", "PSP_LIGHTDIR", PSP_LIGHTDIR);
     engine->RegisterEnumValue("PSParameter", "PSP_LIGHTPOS", PSP_LIGHTPOS);
     engine->RegisterEnumValue("PSParameter", "PSP_LIGHTSPLITS", PSP_LIGHTSPLITS);
+    engine->RegisterEnumValue("PSParameter", "PSP_LIGHTVECROT", PSP_LIGHTVECROT);
     engine->RegisterEnumValue("PSParameter", "PSP_MATDIFFCOLOR", PSP_MATDIFFCOLOR);
     engine->RegisterEnumValue("PSParameter", "PSP_MATEMISSIVECOLOR", PSP_MATEMISSIVECOLOR);
     engine->RegisterEnumValue("PSParameter", "PSP_MATSPECPROPERTIES", PSP_MATSPECPROPERTIES);
@@ -440,6 +449,7 @@ static void registerMaterial(asIScriptEngine* engine)
     
     registerResource<Material>(engine, "Material");
     engine->RegisterObjectBehaviour("Material", asBEHAVE_FACTORY, "Material@+ f(const string& in)", asFUNCTION(ConstructMaterial), asCALL_CDECL);
+    engine->RegisterObjectMethod("Material", "void save(File@+ file)", asFUNCTION(MaterialSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void setNumTechniques(uint)", asMETHOD(Material, setNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void setVertexShaderParameter(VSParameter, const Vector4& in)", asMETHOD(Material, setVertexShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void setPixelShaderParameter(PSParameter, const Vector4& in)", asMETHOD(Material, setPixelShaderParameter), asCALL_THISCALL);

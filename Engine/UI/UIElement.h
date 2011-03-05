@@ -99,10 +99,13 @@ static const unsigned DD_SOURCE_AND_TARGET = 3;
 
 class Cursor;
 class ResourceCache;
+class asIScriptEngine;
 
 //! Base class for UI elements
 class UIElement : public HashedType, public EventListener
 {
+    template <class T> friend void registerUIElement(asIScriptEngine* engine, const char* className);
+    
     DEFINE_TYPE(Element);
     
 public:

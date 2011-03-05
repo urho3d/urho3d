@@ -354,11 +354,6 @@ static void DestructVariantMap(VariantMap* ptr)
     ptr->~VariantMap();
 }
 
-static void VariantMapAssign(const VariantMap& map, VariantMap* ptr)
-{
-    *ptr = map;
-}
-
 static Variant& VariantMapAt(const std::string& key, VariantMap& map)
 {
     return map[ShortStringHash(key)];
@@ -372,11 +367,6 @@ static bool VariantMapContains(const std::string& key, VariantMap& map)
 static void VariantMapErase(const std::string& key, VariantMap& map)
 {
     map.erase(ShortStringHash(key));
-}
-
-static void VariantMapClear(VariantMap& map)
-{
-    map.clear();
 }
 
 static void registerVariant(asIScriptEngine* engine)
@@ -465,13 +455,13 @@ static void registerVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVariantMap), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap& in)", asFUNCTION(VariantMapAssign), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap& in)", asMETHOD(VariantMap, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const string& in)", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const string& in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "uint size() const", asMETHOD(VariantMap, size), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "bool contains(const string& in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void erase(const string& in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "void clear()", asFUNCTION(VariantMapClear), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "void clear()", asMETHOD(VariantMap, clear), asCALL_THISCALL);
 }
 
 static CScriptArray* Split(char separator, const std::string* str)
