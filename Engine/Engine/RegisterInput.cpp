@@ -195,7 +195,10 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectType("Input", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Input", asBEHAVE_ADDREF, "void f()", asMETHOD(Input, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Input", asBEHAVE_RELEASE, "void f()", asMETHOD(Input, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void setClipCursor(bool)", asMETHOD(Input, setClipCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void setToggleFullscreen(bool)", asMETHOD(Input, setToggleFullscreen), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void setMousePosition(const IntVector2& in)", asMETHODPR(Input, setMousePosition, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void setMousePosition(int, int)", asMETHODPR(Input, setMousePosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void suppressNextChar()", asMETHOD(Input, suppressNextChar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getKeyDown(int) const", asMETHOD(Input, getKeyDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getKeyPress(int) const", asMETHOD(Input, getKeyPress), asCALL_THISCALL);
@@ -204,9 +207,12 @@ static void registerInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool getQualifierDown(int) const", asMETHOD(Input, getQualifierDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getQualifierPress(int) const", asMETHOD(Input, getQualifierPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getQualifiers() const", asMETHOD(Input, getQualifiers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "IntVector2 getMousePosition() const", asMETHOD(Input, getMousePosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "const IntVector2& getMouseMove() const", asMETHOD(Input, getMouseMove), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveX() const", asMETHOD(Input, getMouseMoveX), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveY() const", asMETHOD(Input, getMouseMoveY), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "int getMouseMoveWheel() const", asMETHOD(Input, getMouseMoveWheel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "bool getClipCursor() const", asMETHOD(Input, getClipCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool getToggleFullscreen() const", asMETHOD(Input, getToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isActive() const", asMETHOD(Input, isActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool isMinimized() const", asMETHOD(Input, isMinimized), asCALL_THISCALL);

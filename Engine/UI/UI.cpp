@@ -66,6 +66,7 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mRootElement->setSize(mRenderer->getWidth(), mRenderer->getHeight());
     subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(UI, handleWindowResized));
     subscribeToEvent(EVENT_MOUSEMOVE, EVENT_HANDLER(UI, handleMouseMove));
+    subscribeToEvent(EVENT_MOUSEPOS, EVENT_HANDLER(UI, handleMouseMove));
     subscribeToEvent(EVENT_MOUSEBUTTONDOWN, EVENT_HANDLER(UI, handleMouseButtonDown));
     subscribeToEvent(EVENT_MOUSEBUTTONUP, EVENT_HANDLER(UI, handleMouseButtonUp));
     subscribeToEvent(EVENT_MOUSEWHEEL, EVENT_HANDLER(UI, handleMouseWheel));
@@ -469,18 +470,31 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
     mMouseButtons = eventData[P_BUTTONS].getInt();
     mQualifiers = eventData[P_QUALIFIERS].getInt();
     
-    if ((mCursor) && (mCursor->isVisible()))
+    if (mCursor)
     {
-        IntVector2 pos = mCursor->getPosition();
-        pos.mX += eventData[P_X].getInt();
-        pos.mY += eventData[P_Y].getInt();
-        const IntVector2& rootSize = mRootElement->getSize();
-        pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
-        pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
-        mCursor->setPosition(pos);
+        if (eventType == EVENT_MOUSEMOVE)
+        {
+            // When deltas are sent, move the cursor only when visible
+            if (mCursor->isVisible())
+            {
+                IntVector2 pos = mCursor->getPosition();
+                pos.mX += eventData[P_X].getInt();
+                pos.mY += eventData[P_Y].getInt();
+                const IntVector2& rootSize = mRootElement->getSize();
+                pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
+                pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
+                mCursor->setPosition(pos);
+            }
+        }
+        else
+        {
+            // When absolute positions are sent, the cursor is not confined, so do not clamp the on-screen cursor's position
+            mCursor->setPosition(eventData[P_X].getInt(), eventData[P_Y].getInt());
+        }
         
         if ((mMouseDragElement) && (mMouseButtons))
         {
+            IntVector2 pos = mCursor->getPosition();
             if ((mMouseDragElement->isEnabled()) && (mMouseDragElement->isVisible()))
                 mMouseDragElement->onDragMove(mMouseDragElement->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             else

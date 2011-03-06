@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <direct.h>
 #include <windows.h>
+#include <shellapi.h>
 
 #include "DebugNew.h"
 
@@ -262,6 +263,25 @@ int systemCommand(const std::string& commandLine)
     {
         LOGERROR("Executing an external command is not allowed");
         return -1;
+    }
+}
+
+bool systemOpenFile(const std::string& fileName, const std::string& mode)
+{
+    if (allowedDirectories.empty())
+    {
+        if ((!fileExists(fileName)) && (!directoryExists(fileName)))
+        {
+            LOGERROR("File or directory " + fileName + " not found");
+            return false;
+        }
+        
+        return (int)ShellExecute(0, !mode.empty() ? (char*)mode.c_str() : 0, (char*)getOSPath(fileName, true).c_str(), 0, 0, SW_SHOW) > 32;
+    }
+    else
+    {
+        LOGERROR("Opening a file externally is not allowed");
+        return false;
     }
 }
 

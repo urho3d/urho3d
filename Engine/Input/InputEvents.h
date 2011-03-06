@@ -51,6 +51,15 @@ DEFINE_EVENT(EVENT_MOUSEMOVE, MouseMove)
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
+//! Mouse moved when in non-confined mode
+DEFINE_EVENT(EVENT_MOUSEPOS, MousePos)
+{
+    EVENT_PARAM(P_X, X);                        // int
+    EVENT_PARAM(P_Y, Y);                        // int
+    EVENT_PARAM(P_BUTTONS, Buttons);            // int
+    EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
+}
+
 //! Mouse wheel moved
 DEFINE_EVENT(EVENT_MOUSEWHEEL, MouseWheel)
 {

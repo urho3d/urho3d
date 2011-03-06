@@ -41,10 +41,16 @@ public:
     //! Destruct
     virtual ~Input();
     
-    //! Poll for window messages through the Renderer
+    //! Poll for window messages. Called by Engine each frame
     void update();
+    //! Set whether mouse cursor is confined inside the window. Mouse delta movement is sent only when enabled, which is default.
+    void setClipCursor(bool enable);
     //! Set whether ALT-ENTER fullscreen toggle is enabled
     void setToggleFullscreen(bool enable);
+    //! Set absolute mouse cursor position within the window. Only useful when the cursor is not confined
+    void setMousePosition(const IntVector2& position);
+    //! Set absolute mouse cursor position within the window. Only useful when the cursor is not confined
+    void setMousePosition(int x, int y);
     //! Suppress the next char message
     void suppressNextChar();
     
@@ -62,12 +68,18 @@ public:
     bool getQualifierPress(int qualifier) const;
     //! Return the currently held down qualifiers
     int getQualifiers() const;
-    //! Return horizontal mouse movement since last frame
-    int getMouseMoveX() const { return mMouseMoveX; }
-    //! Return vertical mouse movement since last frame
-    int getMouseMoveY() const { return mMouseMoveY; }
+    //! Return absolute mouse cursor position within the window. Only useful when the cursor is not confined
+    IntVector2 getMousePosition() const;
+    //! Return mouse movement since last frame. When mouse is not confined, returns always zero
+    const IntVector2& getMouseMove() const { return mMouseMove; }
+    //! Return horizontal mouse movement since last frame. When mouse is not confined, returns always zero
+    int getMouseMoveX() const { return mMouseMove.mX; }
+    //! Return vertical mouse movement since last frame. When mouse is not confined, returns always zero
+    int getMouseMoveY() const { return mMouseMove.mY; }
     //! Return mouse wheel movement since last frame
     int getMouseMoveWheel() const { return mMouseMoveWheel; }
+    //! Return whether mouse cursor is confined inside the window
+    bool getClipCursor() const { return mClipCursor; }
     //! Return whether fullscreen toggle is enabled
     bool getToggleFullscreen() const { return mToggleFullscreen; }
     //! Return whether application window is active
@@ -99,12 +111,14 @@ private:
     unsigned mMouseButtonDown;
     //! Mouse buttons' pressed state
     unsigned mMouseButtonPress;
-    //! Horizontal mouse movement since last frame
-    int mMouseMoveX;
-    //! Vertical mouse movement since last frame
-    int mMouseMoveY;
+    //! Last mouse position for non-confined mode
+    IntVector2 mLastMousePosition;
+    //! Mouse movement since last frame
+    IntVector2 mMouseMove;
     //! Mouse wheel movement since last frame
     int mMouseMoveWheel;
+    //! Mouse cursor confine flag
+    bool mClipCursor;
     //! Fullscreen toggle flag
     bool mToggleFullscreen;
     //! Active flag

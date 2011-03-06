@@ -34,10 +34,11 @@
 
 Input::Input(Renderer* renderer) :
     mRenderer(renderer),
+    mClipCursor(true),
     mToggleFullscreen(true),
     mActive(false),
     mMinimized(false),
-    mActivated(false),
+    mActivated(true),
     mSuppressNextChar(false)
 {
     LOGINFO("Input created");
@@ -47,11 +48,13 @@ Input::Input(Renderer* renderer) :
     memset(&mKeyPress, 0, sizeof(mKeyPress));
     mMouseButtonDown = 0;
     mMouseButtonPress = 0;
-    
-    makeActive();
+    mLastMousePosition = IntVector2::sZero;
     
     if (mRenderer)
         subscribeToEvent(mRenderer, EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
+    
+    // Perform the initial update immediately so that the mouse cursor gets hidden
+    update();
 }
 
 Input::~Input()
@@ -76,62 +79,109 @@ void Input::update()
     
     if (mActive)
     {
-        if (mRenderer->getFullscreen())
+        IntVector2 mousePos = getMousePosition();
+        
+        if (mClipCursor)
         {
-            POINT mouse;
-            GetCursorPos(&mouse);
-            mMouseMoveX = mouse.x - mRenderer->getWidth() / 2;
-            mMouseMoveY = mouse.y - mRenderer->getHeight() / 2;
-            SetCursorPos(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
+            IntVector2 center(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
+            mMouseMove = mousePos - center;
+            setMousePosition(center);
         }
         else
         {
-            POINT mouse;
-            POINT point;
+            mMouseMove = mousePos - mLastMousePosition;
+            mLastMousePosition = mousePos;
+        }
+        
+        if (mMouseMove != IntVector2::sZero)
+        {
+            if (mClipCursor)
+            {
+                using namespace MouseMove;
+                
+                VariantMap eventData;
+                eventData[P_X] = mMouseMove.mX;
+                eventData[P_Y] = mMouseMove.mY;
+                eventData[P_BUTTONS] = mMouseButtonDown;
+                eventData[P_QUALIFIERS] = getQualifiers();
+                sendEvent(EVENT_MOUSEMOVE, eventData);
+            }
+            else
+            {
+                // Set movement as zero and send only the absolute position
+                mMouseMove = IntVector2::sZero;
+                
+                using namespace MousePos;
+                
+                VariantMap eventData;
+                eventData[P_X] = mousePos.mX;
+                eventData[P_Y] = mousePos.mY;
+                eventData[P_BUTTONS] = mMouseButtonDown;
+                eventData[P_QUALIFIERS] = getQualifiers();
+                sendEvent(EVENT_MOUSEPOS, eventData);
+            }
+        }
+        if (mMouseMoveWheel)
+        {
+            using namespace MouseWheel;
             
-            GetCursorPos(&mouse);
-            point.x = mRenderer->getWidth() / 2;
-            point.y = mRenderer->getHeight() / 2;
-            ClientToScreen((HWND)mRenderer->getWindowHandle(), &point);
-            mMouseMoveX = mouse.x - point.x;
-            mMouseMoveY = mouse.y - point.y;
-            SetCursorPos(point.x, point.y);
+            VariantMap eventData;
+            eventData[P_WHEEL] = mMouseMoveWheel;
+            eventData[P_BUTTONS] = mMouseButtonDown;
+            eventData[P_QUALIFIERS] = getQualifiers();
+            sendEvent(EVENT_MOUSEWHEEL, eventData);
         }
     }
     else
     {
-        mMouseMoveX = 0;
-        mMouseMoveY = 0;
+        mMouseMove = IntVector2::sZero;
         mMouseMoveWheel = 0;
     }
+}
+
+void Input::setClipCursor(bool enable)
+{
+    mClipCursor = enable;
+    if (!mRenderer)
+        return;
     
-    if ((mMouseMoveX) || (mMouseMoveY))
+    if ((!mRenderer->getFullscreen()) && (mActive) && (mClipCursor))
     {
-        using namespace MouseMove;
+        HWND window = (HWND)mRenderer->getWindowHandle();
+        RECT clipRect;
         
-        VariantMap eventData;
-        eventData[P_X] = mMouseMoveX;
-        eventData[P_Y] = mMouseMoveY;
-        eventData[P_BUTTONS] = mMouseButtonDown;
-        eventData[P_QUALIFIERS] = getQualifiers();
-        sendEvent(EVENT_MOUSEMOVE, eventData);
+        setMousePosition(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
+        GetWindowRect(window, &clipRect);
+        ClipCursor(&clipRect);
     }
-    if (mMouseMoveWheel)
+    else
     {
-        using namespace MouseWheel;
+        if ((mRenderer->getFullscreen()) && (mActive) && (mClipCursor))
+            setMousePosition(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
         
-        VariantMap eventData;
-        eventData[P_WHEEL] = mMouseMoveWheel;
-        eventData[P_BUTTONS] = mMouseButtonDown;
-        eventData[P_QUALIFIERS] = getQualifiers();
-        sendEvent(EVENT_MOUSEWHEEL, eventData);
+        ClipCursor(0);
     }
     
+    mMouseMove = IntVector2::sZero;
 }
 
 void Input::setToggleFullscreen(bool enable)
 {
     mToggleFullscreen = enable;
+}
+
+void Input::setMousePosition(const IntVector2& position)
+{
+    POINT point;
+    point.x = position.mX;
+    point.y = position.mY;
+    ClientToScreen((HWND)mRenderer->getWindowHandle(), &point);
+    SetCursorPos(point.x, point.y);
+}
+
+void Input::setMousePosition(int x, int y)
+{
+    setMousePosition(IntVector2(x, y));
 }
 
 void Input::suppressNextChar()
@@ -153,6 +203,14 @@ bool Input::getKeyPress(int key) const
         return false;
     
     return mKeyPress[key];
+}
+
+IntVector2 Input::getMousePosition() const
+{
+    POINT mouse;
+    GetCursorPos(&mouse);
+    ScreenToClient((HWND)mRenderer->getWindowHandle(), &mouse);
+    return IntVector2(mouse.x, mouse.y);
 }
 
 bool Input::getMouseButtonDown(int button) const
@@ -281,6 +339,8 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         keyChange(wParam, true);
         if ((wParam == KEY_RETURN) && (mToggleFullscreen))
             mRenderer->toggleFullscreen();
+        if (wParam != KEY_F4)
+            eventData[P_HANDLED] = true;
         break;
         
     case WM_KEYUP:
@@ -290,8 +350,9 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         
     case WM_SYSKEYUP:
         keyChange(wParam, false);
+        eventData[P_HANDLED] = true;
         break;
-
+        
     case WM_CHAR:
         if (!mSuppressNextChar)
         {
@@ -322,25 +383,11 @@ void Input::makeActive()
     if (!mActive)
         ShowCursor(FALSE);
     
-    if (mRenderer->getFullscreen())
-        SetCursorPos(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
-    else
-    {
-        HWND window = (HWND)mRenderer->getWindowHandle();
-        
-        POINT point;
-        point.x = mRenderer->getWidth() / 2;
-        point.y = mRenderer->getHeight() / 2;
-        ClientToScreen(window, &point);
-        SetCursorPos(point.x, point.y);
-        
-        RECT clipRect;
-        GetWindowRect(window, &clipRect);
-        ClipCursor(&clipRect);
-    }
-    
     mActive = true;
     mActivated = false;
+    
+    // Re-establish mouse cursor clipping if necessary
+    setClipCursor(mClipCursor);
 }
 
 void Input::makeInactive()
@@ -371,8 +418,7 @@ void Input::clearState()
     mouseButtonChange(MOUSEB_RIGHT, false);
     mouseButtonChange(MOUSEB_MIDDLE, false);
     
-    mMouseMoveX = 0;
-    mMouseMoveY = 0;
+    mMouseMove = IntVector2::sZero;
     mMouseMoveWheel = 0;
     mMouseButtonPress = 0;
     memset(&mKeyPress, 0, sizeof(mKeyPress));
