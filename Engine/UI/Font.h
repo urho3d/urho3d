@@ -35,6 +35,7 @@ class Texture;
 static const int MAX_FONT_CHARS = 256;
 static const unsigned FONT_TEXTURE_MIN_SIZE = 128;
 static const unsigned FONT_TEXTURE_MAX_SIZE = 2048;
+static const unsigned FONT_DPI = 96;
 
 //! Font glyph description
 struct FontGlyph

@@ -42,6 +42,8 @@
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
 
+bool inLogMessage = false;
+
 Console::Console(Engine* engine) :
     mEngine(engine),
     mHistoryRows(DEFAULT_HISTORY_SIZE),
@@ -248,17 +250,16 @@ void Console::handleScreenMode(StringHash eventType, VariantMap& eventData)
 
 void Console::handleLogMessage(StringHash eventType, VariantMap& eventData)
 {
-    // If the rows are not fully initialized yet, do not write the message
-    if ((!mRows.size()) || (!mRows[mRows.size() - 1]))
+    // If the rows are not fully initialized yet, or we are recursing here, do not write the message
+    if ((inLogMessage) || (!mRows.size()) || (!mRows[mRows.size() - 1]))
         return;
+    
+    inLogMessage = true;
     
     using namespace LogMessage;
     
-    const std::string& message = eventData[P_MESSAGE].getString();
-    
     // Be prepared for possible multi-line messages
-    std::vector<std::string> rows = split(message, '\n');
-    
+    std::vector<std::string> rows = split(eventData[P_MESSAGE].getString(), '\n');
     for (unsigned i = 0; i < rows.size(); ++i)
     {
         // Remove the first row, change its text and re-add to the bottom
@@ -267,4 +268,6 @@ void Console::handleLogMessage(StringHash eventType, VariantMap& eventData)
         text->setText(rows[i]);
         mRowContainer->addChild(text);
     }
+    
+    inLogMessage = false;
 }

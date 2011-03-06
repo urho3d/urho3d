@@ -24,27 +24,40 @@
 #include "Precompiled.h"
 #include "Deserializer.h"
 #include "Font.h"
+#include "Log.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "RendererImpl.h"
+#include "StringUtils.h"
 #include "Texture2D.h"
 
-#include <stb_truetype.h>
+#include "ft2build.h"
+#include FT_FREETYPE_H
 
 #include "DebugNew.h"
 
-static const float DEFAULT_DPI = 96.0f;
-static const float DEFAULT_PPI = 72.0f;
+bool freeTypeInitialized = false;
+unsigned numFonts = 0;
+static FT_Library library;
 
 Font::Font(Renderer* renderer, const std::string& name) :
     Resource(name),
     mRenderer(renderer),
     mFontDataSize(0)
 {
+    ++numFonts;
 }
 
 Font::~Font()
 {
+    --numFonts;
+    
+    // Uninitialize FreeType when no more fonts in existence
+    if ((!numFonts) && (freeTypeInitialized))
+    {
+        FT_Done_FreeType(library);
+        freeTypeInitialized = false;
+    }
 }
 
 void Font::load(Deserializer& source, ResourceCache* cache)
@@ -69,58 +82,79 @@ const FontFace* Font::getFace(int pointSize)
     if (i != mFaces.end())
         return &i->second;
     
+    FT_Face face;
+    FT_Error error;
+    
     try
     {
         PROFILE(Font_GetFace);
         
         if (pointSize <= 0)
-            EXCEPTION("Zero or negative font point size");
+            EXCEPTION("Zero or negative point size");
         
-        if (!mFontData)
+        if (!mFontDataSize)
             EXCEPTION("Font not loaded");
+        
+        if (!freeTypeInitialized)
+        {
+            error = FT_Init_FreeType(&library);
+            if (error)
+                EXCEPTION("Could not initialize FreeType library");
+            freeTypeInitialized = true;
+        }
+        
+        error = FT_New_Memory_Face(library, &mFontData[0], mFontDataSize, 0, &face);
+        if (error)
+            EXCEPTION("Could not create font face");
+        error = FT_Set_Char_Size(face, 0, pointSize * 64, FONT_DPI, FONT_DPI);
+        if (error)
+        {
+            FT_Done_Face(face);
+            EXCEPTION("Could not set font point size " + toString(pointSize));
+        }
         
         FontFace newFace;
         
-        stbtt_fontinfo fontInfo;
+        FT_GlyphSlot slot = face->glyph;
+        unsigned freeIndex = 0;
+        std::map<unsigned, unsigned> toRemapped;
+        std::vector<unsigned> toOriginal;
         
-        // Assume 1 font per file for now
-        if (!stbtt_InitFont(&fontInfo, &mFontData[0], 0))
-            EXCEPTION("Could not initialize font");
-        
-        std::vector<bool> glyphUsed;
-        glyphUsed.resize(fontInfo.numGlyphs);
-        for (int i = 0; i < fontInfo.numGlyphs; ++i)
-            glyphUsed[i] = false;
-        
-        // Build glyph mapping and mark used glyphs
-        for (int i = 0; i < MAX_FONT_CHARS; ++i)
+        // Build glyph mapping. Only render the glyphs needed by the charset
+        for (unsigned i = 0; i < MAX_FONT_CHARS; ++i)
         {
-            newFace.mGlyphIndex[i] = stbtt_FindGlyphIndex(&fontInfo, i);
-            glyphUsed[newFace.mGlyphIndex[i]] = true;
+            unsigned index = FT_Get_Char_Index(face, i);
+            if (toRemapped.find(index) == toRemapped.end())
+            {
+                newFace.mGlyphIndex[i] = freeIndex;
+                toRemapped[index] = freeIndex;
+                toOriginal.push_back(index);
+                ++freeIndex;
+            }
+            else
+                newFace.mGlyphIndex[i] = toRemapped[index];
         }
         
-        // Get row height at 96 DPI
-        int ascent, descent, lineGap;
-        stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
-        float scale = (float)pointSize * (DEFAULT_DPI / DEFAULT_PPI) / (ascent - descent);
+        // Load each of the glyphs to see the sizes & store other information
+        int maxOffsetY = 0;
+        int maxHeight = 0;
         
-        // Go through glyphs to get their dimensions & offsets
-        for (int i = 0; i < fontInfo.numGlyphs; ++i)
+        for (unsigned i = 0; i < toOriginal.size(); ++i)
         {
             FontGlyph newGlyph;
             
-            int ix0, iy0, ix1, iy1;
-            int advanceWidth, leftSideBearing;
-            
-            if (glyphUsed[i])
+            error = FT_Load_Glyph(face, toOriginal[i], FT_LOAD_DEFAULT);
+            if (!error)
             {
-                stbtt_GetGlyphBitmapBox(&fontInfo, i, scale, scale, &ix0, &iy0, &ix1, &iy1);
-                stbtt_GetGlyphHMetrics(&fontInfo, i, &advanceWidth, &leftSideBearing);
-                newGlyph.mWidth = ix1 - ix0;
-                newGlyph.mHeight = iy1 - iy0;
-                newGlyph.mOffsetX = (int)(leftSideBearing * scale);
-                newGlyph.mOffsetY = iy0;
-                newGlyph.mAdvanceX = (int)(advanceWidth * scale);
+                // Note: position within texture will be filled later
+                newGlyph.mWidth = (short)((slot->metrics.width) >> 6);
+                newGlyph.mHeight = (short)((slot->metrics.height) >> 6);
+                newGlyph.mOffsetX = (short)((slot->metrics.horiBearingX) >> 6);
+                newGlyph.mOffsetY = (short)((face->size->metrics.ascender - slot->metrics.horiBearingY) >> 6);
+                newGlyph.mAdvanceX = (short)((slot->metrics.horiAdvance) >> 6);
+                
+                maxOffsetY = max(maxOffsetY, newGlyph.mOffsetY);
+                maxHeight = max(maxHeight, newGlyph.mHeight);
             }
             else
             {
@@ -134,60 +168,31 @@ const FontFace* Font::getFace(int pointSize)
             newFace.mGlyphs.push_back(newGlyph);
         }
         
-        // Adjust the Y-offset so that the glyphs are top-aligned
-        int scaledAscent = (int)(scale * ascent);
-        int minY = M_MAX_INT;
-        int maxY = 0;
-        
-        for (int i = 0; i < fontInfo.numGlyphs; ++i)
-        {
-            if (glyphUsed[i])
-            {
-                newFace.mGlyphs[i].mOffsetY += scaledAscent;
-                minY = min(minY, newFace.mGlyphs[i].mOffsetY);
-                maxY = max(maxY, newFace.mGlyphs[i].mOffsetY + newFace.mGlyphs[i].mHeight);
-            }
-        }
-        
-        // Calculate row advance
-        newFace.mRowHeight = (int)(scale * (ascent - descent + lineGap));
-        
-        // If font is not yet top-aligned, center it vertically if there is room
-        if (minY > 0)
-        {
-            int actualHeight = maxY - minY;
-            int adjust = max((newFace.mRowHeight - actualHeight) / 2, 0);
-            for (int i = 0; i < fontInfo.numGlyphs; ++i)
-            {
-                if (glyphUsed[i])
-                    newFace.mGlyphs[i].mOffsetY -= adjust;
-            }
-        }
+        // Store the height of a row
+        newFace.mRowHeight = (face->size->metrics.height + 63) >> 6;
         
         // Now try to pack into the smallest possible texture
         int texWidth = FONT_TEXTURE_MIN_SIZE;
         int texHeight = FONT_TEXTURE_MIN_SIZE;
         bool doubleHorizontal = true;
+        
         for (;;)
         {
+            PROFILE(Font_PackToTexture);
+            
             bool success = true;
             
             // Check first for theoretical possible fit. If it fails, there is no need to try to fit
             int totalArea = 0;
-            for (int i = 0; i < fontInfo.numGlyphs; ++i)
-            {
-                if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
-                    totalArea += (newFace.mGlyphs[i].mWidth + 1) * (newFace.mGlyphs[i].mHeight + 1);
-            }
+            for (unsigned i = 0; i < newFace.mGlyphs.size(); ++i)
+                totalArea += (newFace.mGlyphs[i].mWidth + 1) * (newFace.mGlyphs[i].mHeight + 1);
             
             if (totalArea > texWidth * texHeight)
                 success = false;
             else
             {
-                PROFILE(Font_FitToTexture);
-                
                 AreaAllocator allocator(texWidth, texHeight);
-                for (int i = 0; i < fontInfo.numGlyphs; ++i)
+                for (unsigned i = 0; i < newFace.mGlyphs.size(); ++i)
                 {
                     if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
                     {
@@ -221,8 +226,10 @@ const FontFace* Font::getFace(int pointSize)
                     texHeight <<= 1;
                 
                 if ((texWidth > FONT_TEXTURE_MAX_SIZE) || (texHeight > FONT_TEXTURE_MAX_SIZE))
+                {
+                    FT_Done_Face(face);
                     EXCEPTION("Font face could not be fit into the largest possible texture");
-                
+                }
                 doubleHorizontal = !doubleHorizontal;
             }
             else
@@ -230,9 +237,10 @@ const FontFace* Font::getFace(int pointSize)
         }
         
         // Create the texture
-        if (mRenderer)
+        SharedPtr<Texture2D> texture(new Texture2D(mRenderer, TEXTURE_STATIC));
+        try
         {
-            SharedPtr<Texture2D> texture(new Texture2D(mRenderer, TEXTURE_STATIC));
+            PROFILE(Font_RenderToTexture);
             
             texture->setNumLevels(1); // No mipmaps
             texture->setAddressMode(COORD_U, ADDRESS_BORDER);
@@ -251,38 +259,42 @@ const FontFace* Font::getFace(int pointSize)
             }
             
             // Render glyphs into texture, and find out a scaling value in case font uses less than full opacity (thin outlines)
-            int sumOpacity = 0;
-            int nonEmptyGlyphs = 0;
-            for (int i = 0; i < fontInfo.numGlyphs; ++i)
+            unsigned char avgMaxOpacity = 255;
+            unsigned sumMaxOpacity = 0;
+            unsigned samples = 0;
+            for (unsigned i = 0; i < newFace.mGlyphs.size(); ++i)
             {
-                if ((newFace.mGlyphs[i].mWidth) && (newFace.mGlyphs[i].mHeight))
+                FT_Load_Glyph(face, toOriginal[i], FT_LOAD_DEFAULT);
+                FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
+                
+                unsigned char glyphOpacity = 0;
+                for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
                 {
-                    stbtt_MakeGlyphBitmap(&fontInfo, (unsigned char*)hwRect.pBits + hwRect.Pitch * newFace.mGlyphs[i].mY + newFace.mGlyphs[i].mX, newFace.mGlyphs[i].mWidth, newFace.mGlyphs[i].mHeight, hwRect.Pitch, scale, scale, i);
+                    unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
+                    unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
                     
-                    int glyphMaxOpacity = 0;
-                    for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
+                    for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
                     {
-                        unsigned char* pixels = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.mGlyphs[i].mY) + newFace.mGlyphs[i].mX;
-                        
-                        for (int x = 0; x < newFace.mGlyphs[i].mWidth; ++x)
-                            glyphMaxOpacity = max(glyphMaxOpacity, pixels[x]);
+                        dest[x] = src[x];
+                        glyphOpacity = max(glyphOpacity, src[x]);
                     }
-                    
-                    if (glyphMaxOpacity > 0)
-                    {
-                        sumOpacity += glyphMaxOpacity;
-                        ++nonEmptyGlyphs;
-                    }
+                }
+                if (glyphOpacity)
+                {
+                    sumMaxOpacity += glyphOpacity;
+                    ++samples;
                 }
             }
             
-            // Apply the scaling if necessary
-            int avgOpacity = nonEmptyGlyphs ? sumOpacity / nonEmptyGlyphs : 255;
-            if (avgOpacity < 255)
+            // Clamp the minimum possible value to avoid overbrightening
+            if (samples)
+                avgMaxOpacity = max(sumMaxOpacity / samples, 128);
+            
+            if (avgMaxOpacity < 255)
             {
-                float scale = 255.0f / avgOpacity;
-                
-                for (int i = 0; i < fontInfo.numGlyphs; ++i)
+                // Apply the scaling value if necessary
+                float scale = 255.0f / avgMaxOpacity;
+                for (unsigned i = 0; i < newFace.mGlyphs.size(); ++i)
                 {
                     for (int y = 0; y < newFace.mGlyphs[i].mHeight; ++y)
                     {
@@ -297,10 +309,16 @@ const FontFace* Font::getFace(int pointSize)
             }
             
             texture->unlock();
+            FT_Done_Face(face);
             setMemoryUse(getMemoryUse() + texWidth * texHeight);
-            newFace.mTexture = staticCast<Texture>(texture);
+        }
+        catch (...)
+        {
+            FT_Done_Face(face);
+            throw;
         }
         
+        newFace.mTexture = staticCast<Texture>(texture);
         mFaces[pointSize] = newFace;
         return &mFaces[pointSize];
     }

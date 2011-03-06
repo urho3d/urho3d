@@ -116,7 +116,7 @@
         <hoveroffset value="0 16" />
         <text>
             <position value="1 1" />
-            <font name="Cour.ttf" size="12" />
+            <font name="Cour.ttf" size="10" />
             <hovercolor value="0.45 0.70 0.45" />
             <selectioncolor value="0.70 0.70 0.70" />
         </text>
@@ -310,22 +310,22 @@
         <resizeborder value="8 8 8 8" />
     </element>
     <element type="Text">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
     </element>
     <element type="DebugHudText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
     </element>
     <element type="ConsoleBackground">
         <color topleft="0 0.25 0 0.75" topright="0 0.25 0 0.75" bottomleft="0.25 0.75 0.25 0.75" bottomright="0.25 0.75 0.25 0.75" />
         <layout spacing="0" border="4 4 4 4" />
     </element>
     <element type="ConsoleText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
     </element>
     <element type="ConsoleLineEdit">
         <color value="0 0 0 0.5" />
         <text>
-            <font name="Cour.ttf" size="12" />
+            <font name="Cour.ttf" size="10" />
             <selectioncolor value="0 0.5 0 0.75" />
         </text>
         <cursor>
@@ -346,7 +346,7 @@
         <fixedsize value="96 24" />
     </element>
     <element type="FileSelectorButtonText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
     </element>
     <element type="FileSelectorFilterList">
         <fixedwidth value="64" />
@@ -357,19 +357,19 @@
         </popup>
     </element>
     <element type="FileSelectorFilterText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="FileSelectorLayout">
         <layout spacing="4" />
     </element>
     <element type="FileSelectorListText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
         <hovercolor value="0.45 0.70 0.45" />
         <selectioncolor value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
-        <font name="Cour.ttf" size="14" />
+        <font name="Cour.ttf" size="12" />
     </element>
     <element type="EditorMenuBar">
         <texture name="Textures/UI.png" />
@@ -377,7 +377,6 @@
         <border value="2 2 2 2" />
     </element>
     <element type="EditorMenuText">
-        <font name="segoeui.ttf" size="15" />
-        <fallbackfont name="courier.ttf" size="12" />
+        <font name="cour.ttf" size="12" />
     </element>
 </elements>
