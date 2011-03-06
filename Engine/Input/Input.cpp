@@ -51,7 +51,10 @@ Input::Input(Renderer* renderer) :
     mLastMousePosition = IntVector2::sZero;
     
     if (mRenderer)
+    {
         subscribeToEvent(mRenderer, EVENT_WINDOWMESSAGE, EVENT_HANDLER(Input, handleWindowMessage));
+        subscribeToEvent(mRenderer, EVENT_SCREENMODE, EVENT_HANDLER(Input, handleScreenMode));
+    }
     
     // Perform the initial update immediately so that the mouse cursor gets hidden
     update();
@@ -71,58 +74,15 @@ void Input::update()
     
     memset(mKeyPress, 0, sizeof(mKeyPress));
     mMouseButtonPress = 0;
+    mMouseMove = IntVector2::sZero;
     mMouseMoveWheel = 0;
+    
     mRenderer->messagePump();
     
     if (mActivated)
         makeActive();
     
-    if (mActive)
-    {
-        IntVector2 mousePos = getMousePosition();
-        
-        if (mClipCursor)
-        {
-            IntVector2 center(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
-            mMouseMove = mousePos - center;
-            setMousePosition(center);
-        }
-        else
-        {
-            mMouseMove = mousePos - mLastMousePosition;
-            mLastMousePosition = mousePos;
-        }
-        
-        if (mMouseMove != IntVector2::sZero)
-        {
-            using namespace MouseMove;
-            
-            VariantMap eventData;
-            eventData[P_X] = mMouseMove.mX;
-            eventData[P_Y] = mMouseMove.mY;
-            eventData[P_POSX] = mousePos.mX;
-            eventData[P_POSY] = mousePos.mY;
-            eventData[P_BUTTONS] = mMouseButtonDown;
-            eventData[P_QUALIFIERS] = getQualifiers();
-            eventData[P_CLIPCURSOR] = mClipCursor;
-            sendEvent(EVENT_MOUSEMOVE, eventData);
-        }
-        if (mMouseMoveWheel)
-        {
-            using namespace MouseWheel;
-            
-            VariantMap eventData;
-            eventData[P_WHEEL] = mMouseMoveWheel;
-            eventData[P_BUTTONS] = mMouseButtonDown;
-            eventData[P_QUALIFIERS] = getQualifiers();
-            sendEvent(EVENT_MOUSEWHEEL, eventData);
-        }
-    }
-    else
-    {
-        mMouseMove = IntVector2::sZero;
-        mMouseMoveWheel = 0;
-    }
+    checkMouseMove();
 }
 
 void Input::setClipCursor(bool enable)
@@ -137,14 +97,17 @@ void Input::setClipCursor(bool enable)
         RECT clipRect;
         
         setMousePosition(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
+        mLastMousePosition = getMousePosition();
         GetWindowRect(window, &clipRect);
         ClipCursor(&clipRect);
     }
     else
     {
         if ((mRenderer->getFullscreen()) && (mActive) && (mClipCursor))
+        {
             setMousePosition(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
-        
+            mLastMousePosition = getMousePosition();
+        }
         ClipCursor(0);
     }
 }
@@ -281,7 +244,7 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_MOUSEWHEEL:
-        mMouseMoveWheel += (wParam >> 16);
+        mouseWheelChange(wParam >> 16);
         eventData[P_HANDLED] = true;
         break;
         
@@ -352,26 +315,13 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         eventData[P_HANDLED] = true;
         break;
     }
-    
-    // If we are going to activate, in non-confined mode, make sure the rest of the application has accurate mouse position,
-    // by sending an extra mousemove event
-    if ((!mClipCursor) && (mActivated) && (!mActive))
-    {
-        mMouseMove = IntVector2::sZero;
-        IntVector2 mousePos = getMousePosition();
-        
-        using namespace MouseMove;
-        
-        VariantMap eventData;
-        eventData[P_X] = mMouseMove.mX;
-        eventData[P_Y] = mMouseMove.mY;
-        eventData[P_POSX] = mousePos.mX;
-        eventData[P_POSY] = mousePos.mY;
-        eventData[P_BUTTONS] = mMouseButtonDown;
-        eventData[P_QUALIFIERS] = getQualifiers();
-        eventData[P_CLIPCURSOR] = mClipCursor;
-        sendEvent(EVENT_MOUSEMOVE, eventData);
-    }
+}
+
+void Input::handleScreenMode(StringHash eventType, VariantMap& eventData)
+{
+    // Screen mode change may affect the cursor clipping behaviour. Also re-center the cursor (if needed) to the
+    // new screen size, so that there is no erroneous mouse move event
+    setClipCursor(mClipCursor);
 }
 
 void Input::makeActive()
@@ -437,6 +387,13 @@ void Input::clearState()
 
 void Input::mouseButtonChange(int button, bool newState)
 {
+    // If we are not active yet, do not react to the mouse button down
+    if ((newState) && (!mActive))
+        return;
+    
+    // Check mouse move before sending the button up/down so that the click will be interpreted correctly
+    //checkMouseMove();
+    
     if (newState)
     {
         if (!(mMouseButtonDown & button))
@@ -495,4 +452,57 @@ void Input::keyChange(int key, bool newState)
     eventData[P_BUTTONS] = mMouseButtonDown;
     eventData[P_QUALIFIERS] = getQualifiers();
     sendEvent(newState ? EVENT_KEYDOWN : EVENT_KEYUP, eventData);
+}
+
+void Input::mouseWheelChange(int delta)
+{
+    if (!mActive)
+        return;
+    
+    if (delta)
+    {
+        mMouseMoveWheel += delta;
+        
+        using namespace MouseWheel;
+        
+        VariantMap eventData;
+        eventData[P_WHEEL] = delta;
+        eventData[P_BUTTONS] = mMouseButtonDown;
+        eventData[P_QUALIFIERS] = getQualifiers();
+        sendEvent(EVENT_MOUSEWHEEL, eventData);
+    }
+}
+void Input::checkMouseMove()
+{
+    if (!mActive)
+        return;
+    
+    IntVector2 mousePos = getMousePosition();
+    IntVector2 mouseMove = mousePos - mLastMousePosition;
+    
+    if ((mClipCursor) && (mouseMove != IntVector2::sZero))
+    {
+        IntVector2 center(mRenderer->getWidth() / 2, mRenderer->getHeight() / 2);
+        setMousePosition(center);
+        mLastMousePosition = getMousePosition();
+    }
+    else
+        mLastMousePosition = mousePos;
+    
+    if (mouseMove != IntVector2::sZero)
+    {
+        mMouseMove += mouseMove;
+        
+        using namespace MouseMove;
+        
+        VariantMap eventData;
+        eventData[P_X] = mLastMousePosition.mX;
+        eventData[P_Y] = mLastMousePosition.mY;
+        eventData[P_DX] = mouseMove.mX;
+        eventData[P_DY] = mouseMove.mY;
+        eventData[P_BUTTONS] = mMouseButtonDown;
+        eventData[P_QUALIFIERS] = getQualifiers();
+        eventData[P_CLIPCURSOR] = mClipCursor;
+        sendEvent(EVENT_MOUSEMOVE, eventData);
+    }
 }

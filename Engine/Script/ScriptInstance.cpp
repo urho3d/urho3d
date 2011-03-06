@@ -108,7 +108,7 @@ void ScriptInstance::save(Serializer& dest)
     scriptBuffer.clear();
     if (mMethods[METHOD_SAVE])
     {
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(Variant((void*)static_cast<Serializer*>(&scriptBuffer)));
         mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVE], parameters);
     }
@@ -146,7 +146,7 @@ void ScriptInstance::load(Deserializer& source, ResourceCache* cache)
     scriptBuffer.setData(source, scriptDataSize);
     if (mMethods[METHOD_LOAD])
     {
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(Variant((void*)static_cast<Deserializer*>(&scriptBuffer)));
         mScriptFile->execute(mScriptObject, mMethods[METHOD_LOAD], parameters);
     }
@@ -185,7 +185,7 @@ void ScriptInstance::saveXML(XMLElement& dest)
     if (mMethods[METHOD_SAVEXML])
     {
         XMLElement dataElem = dest.createChildElement("data");
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(Variant((void*)&dataElem));
         mScriptFile->execute(mScriptObject, mMethods[METHOD_SAVEXML], parameters);
     }
@@ -224,7 +224,7 @@ void ScriptInstance::loadXML(const XMLElement& source, ResourceCache* cache)
         XMLElement dataElem = source.getChildElement("data");
         if (dataElem)
         {
-            std::vector<Variant> parameters;
+            VariantVector parameters;
             parameters.push_back(Variant((void*)&dataElem));
             mScriptFile->execute(mScriptObject, mMethods[METHOD_LOADXML], parameters);
         }
@@ -247,7 +247,7 @@ bool ScriptInstance::writeNetUpdate(Serializer& dest, Serializer& destRevision, 
     // Write update only if enabled
     if ((mEnabled) && (mMethods[METHOD_WRITENETUPDATE]))
     {
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(Variant((void*)static_cast<Serializer*>(&scriptBuffer)));
         parameters.push_back(Variant((void*)&info));
         mScriptFile->execute(mScriptObject, mMethods[METHOD_WRITENETUPDATE], parameters);
@@ -293,7 +293,7 @@ void ScriptInstance::readNetUpdate(Deserializer& source, ResourceCache* cache, c
         scriptBuffer.setData(source, scriptDataSize);
         if (mMethods[METHOD_READNETUPDATE])
         {
-            std::vector<Variant> parameters;
+            VariantVector parameters;
             parameters.push_back(Variant((void*)static_cast<Deserializer*>(&scriptBuffer)));
             parameters.push_back(Variant((void*)&info));
             mScriptFile->execute(mScriptObject, mMethods[METHOD_READNETUPDATE], parameters);
@@ -311,7 +311,7 @@ void ScriptInstance::interpolate(bool snapToEnd)
 {
     if ((mEnabled) && (mMethods[METHOD_INTERPOLATE]))
     {
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(Variant(snapToEnd));
         mScriptFile->execute(mScriptObject, mMethods[METHOD_INTERPOLATE], parameters);
     }
@@ -324,7 +324,7 @@ void ScriptInstance::getComponentRefs(std::vector<ComponentRef>& dest)
         asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
         if (!context)
             return;
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS], std::vector<Variant>(), false);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETCOMPONENTREFS], VariantVector(), false);
         CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
         if (arr)
         {
@@ -342,7 +342,7 @@ void ScriptInstance::getResourceRefs(std::vector<Resource*>& dest)
         asIScriptContext* context = mScriptEngine->getScriptFileContext(getScriptNestingLevel());
         if (!context)
             return;
-        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETRESOURCEREFS], std::vector<Variant>(), false);
+        mScriptFile->execute(mScriptObject, mMethods[METHOD_GETRESOURCEREFS], VariantVector(), false);
         CScriptArray* arr = static_cast<CScriptArray*>(context->GetAddressOfReturnValue());
         if (arr)
         {
@@ -382,7 +382,7 @@ void ScriptInstance::setFixedUpdateFps(int fps)
     mFixedPostUpdateTimer = 0.0f;
 }
 
-bool ScriptInstance::execute(const std::string& declaration, const std::vector<Variant>& parameters)
+bool ScriptInstance::execute(const std::string& declaration, const VariantVector& parameters)
 {
     if (!mScriptObject)
         return false;
@@ -391,7 +391,7 @@ bool ScriptInstance::execute(const std::string& declaration, const std::vector<V
     return mScriptFile->execute(mScriptObject, method, parameters);
 }
 
-bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Variant>& parameters)
+bool ScriptInstance::execute(asIScriptFunction* method, const VariantVector& parameters)
 {
     if ((!method) || (!mScriptObject))
         return false;
@@ -399,7 +399,7 @@ bool ScriptInstance::execute(asIScriptFunction* method, const std::vector<Varian
     return mScriptFile->execute(mScriptObject, method, parameters);
 }
 
-void ScriptInstance::delayedExecute(float delay, const std::string& declaration, const std::vector<Variant>& parameters)
+void ScriptInstance::delayedExecute(float delay, const std::string& declaration, const VariantVector& parameters)
 {
     if (!mScriptObject)
         return;
@@ -561,7 +561,7 @@ void ScriptInstance::handleSceneUpdate(StringHash eventType, VariantMap& eventDa
         
         if (mMethods[METHOD_UPDATE])
         {
-            std::vector<Variant> parameters;
+            VariantVector parameters;
             parameters.push_back(timeStep);
             mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATE], parameters);
         }
@@ -579,7 +579,7 @@ void ScriptInstance::handleScenePostUpdate(StringHash eventType, VariantMap& eve
     Scene* scene = mEntity ? mEntity->getScene() : 0;
     if (eventData[P_SCENE].getPtr() == (void*)scene)
     {
-        std::vector<Variant> parameters;
+        VariantVector parameters;
         parameters.push_back(eventData[P_TIMESTEP]);
         mScriptFile->execute(mScriptObject, mMethods[METHOD_POSTUPDATE], parameters);
     }
@@ -598,7 +598,7 @@ void ScriptInstance::handlePhysicsPreStep(StringHash eventType, VariantMap& even
     {
         if (!mFixedUpdateFps)
         {
-            std::vector<Variant> parameters;
+            VariantVector parameters;
             parameters.push_back(eventData[P_TIMESTEP]);
             mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
         }
@@ -609,7 +609,7 @@ void ScriptInstance::handlePhysicsPreStep(StringHash eventType, VariantMap& even
             if (mFixedUpdateTimer >= mFixedUpdateInterval)
             {
                 mFixedUpdateTimer = fmodf(mFixedUpdateTimer, mFixedUpdateInterval);
-                std::vector<Variant> parameters;
+                VariantVector parameters;
                 parameters.push_back(mFixedUpdateInterval);
                 mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
             }
@@ -630,7 +630,7 @@ void ScriptInstance::handlePhysicsPostStep(StringHash eventType, VariantMap& eve
     {
         if (!mFixedUpdateFps)
         {
-            std::vector<Variant> parameters;
+            VariantVector parameters;
             parameters.push_back(eventData[P_TIMESTEP]);
             mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
         }
@@ -641,7 +641,7 @@ void ScriptInstance::handlePhysicsPostStep(StringHash eventType, VariantMap& eve
             if (mFixedPostUpdateTimer >= mFixedUpdateInterval)
             {
                 mFixedPostUpdateTimer = fmodf(mFixedPostUpdateTimer, mFixedUpdateInterval);
-                std::vector<Variant> parameters;
+                VariantVector parameters;
                 parameters.push_back(mFixedUpdateInterval);
                 mScriptFile->execute(mScriptObject, mMethods[METHOD_UPDATEFIXED], parameters);
             }
@@ -654,7 +654,7 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
         return;
     
-    std::vector<Variant> parameters;
+    VariantVector parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
     mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
@@ -665,7 +665,7 @@ void ScriptInstance::handleSpecificScriptEvent(StringHash eventType, VariantMap&
     if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
         return;
     
-    std::vector<Variant> parameters;
+    VariantVector parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
     mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);

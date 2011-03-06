@@ -221,6 +221,8 @@ void run(const std::vector<std::string>& arguments)
     File source(arguments[0]);
     doc.load(source);
     XMLElement shaders = doc.getRootElement("shaders");
+    if (!shaders)
+        errorExit("No shaders element in " + source.getName());
     
     XMLFile outDoc;
     XMLElement outShaders = outDoc.createRootElement("shaders");

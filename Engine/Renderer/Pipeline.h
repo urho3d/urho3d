@@ -241,7 +241,7 @@ private:
     //! Draw a split light to stencil buffer
     void drawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     //! Handle window resized event
-    void handleWindowResized(StringHash eventType, VariantMap& eventData);
+    void handleScreenMode(StringHash eventType, VariantMap& eventData);
     //! Handle post render update event. Draw debug geometry here if enabled
     void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     //! Return light vertex shaders

@@ -565,8 +565,8 @@ void handleMouseMove(StringHash eventType, VariantMap& eventData)
 {
     if (eventData["Buttons"].getInt() & MOUSEB_RIGHT != 0)
     {
-        int mousedx = eventData["X"].getInt();
-        int mousedy = eventData["Y"].getInt();
+        int mousedx = eventData["DX"].getInt();
+        int mousedy = eventData["DY"].getInt();
         yaw += mousedx / 10.0f;
         pitch += mousedy / 10.0f;
         if (pitch < -90.0f)

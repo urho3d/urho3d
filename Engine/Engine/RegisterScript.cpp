@@ -35,7 +35,7 @@ static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcP
         return false;
     
     unsigned numParams = srcParams->GetSize();
-    std::vector<Variant> destParams(numParams);
+    VariantVector destParams(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
@@ -104,7 +104,7 @@ static bool ScriptInstanceExecute(const std::string& declaration, CScriptArray* 
         return false;
     
     unsigned numParams = srcParams->GetSize();
-    std::vector<Variant> destParams;
+    VariantVector destParams;
     destParams.resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
@@ -124,7 +124,7 @@ static void ScriptInstanceDelayedExecute(float delay, const std::string& declara
         return;
     
     unsigned numParams = srcParams->GetSize();
-    std::vector<Variant> destParams;
+    VariantVector destParams;
     destParams.resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
@@ -150,7 +150,7 @@ static void SelfDelayedExecute(float delay, const std::string& declaration, CScr
         return;
     
     unsigned numParams = srcParams->GetSize();
-    std::vector<Variant> destParams;
+    VariantVector destParams;
     destParams.resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)

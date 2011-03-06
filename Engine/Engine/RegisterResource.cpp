@@ -146,9 +146,14 @@ static void ConstructXMLElementCopy(const XMLElement& element, XMLElement* ptr)
     new(ptr) XMLElement(element);
 }
 
-static CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)
+static void XMLElementRemoveChildElementDefault(XMLElement* ptr)
 {
-    return vectorToArray<Variant>(ptr->getVariantVector(), "array<Variant>");
+    ptr->removeChildElement();
+}
+
+static void XMLElementRemoveChildElementsDefault(XMLElement* ptr)
+{
+    ptr->removeChildElements();
 }
 
 static void XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
@@ -158,13 +163,35 @@ static void XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
     ptr->setVariantVector(src);
 }
 
+static XMLElement XMLElementGetChildElementDefault(XMLElement* ptr)
+{
+    return ptr->getChildElement();
+}
+
+static XMLElement XMLElementGetNextElementDefault(XMLElement* ptr)
+{
+    return ptr->getNextElement();
+}
+
+static CScriptArray* XMLElementGetAttributeNames(XMLElement* ptr)
+{
+    return vectorToArray<std::string>(ptr->getAttributeNames(), "array<string>");
+}
+
+static CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)
+{
+    return vectorToArray<Variant>(ptr->getVariantVector(), "array<Variant>");
+}
+
 static void registerXMLElement(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("XMLElement", sizeof(XMLElement), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructXMLElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_CONSTRUCT, "void f(const XMLElement& in)", asFUNCTION(ConstructXMLElementCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "XMLElement createChildElement(const string& in)", asMETHOD(XMLElement, createChildElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool removeChildElement(const string& in, bool)", asMETHOD(XMLElement,removeChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool removeChildElement()", asFUNCTION(XMLElementRemoveChildElementDefault), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLElement", "bool removeChildElement(const string& in, bool)", asMETHOD(XMLElement, removeChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool removeChildElements()", asFUNCTION(XMLElementRemoveChildElementsDefault), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "bool removeChildElements(const string& in)", asMETHOD(XMLElement,removeChildElements), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool setAttribute(const string& in, const string& in)", asMETHOD(XMLElement,setAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool setBool(const string& in, bool)", asMETHOD(XMLElement,setBool), asCALL_THISCALL);
@@ -181,16 +208,21 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool setVector3(const string& in, const Vector3& in)", asMETHOD(XMLElement, setVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool isNull() const", asMETHOD(XMLElement, isNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool notNull() const", asMETHOD(XMLElement, notNull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool hasAttribute(const string& in) const", asMETHOD(XMLElement, hasAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getAttribute(const string& in) const", asMETHOD(XMLElement, getAttribute), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "array<string>@ getAttributeNames() const", asFUNCTION(XMLElementGetAttributeNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "bool getBool(const string& in) const", asMETHOD(XMLElement, getBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "BoundingBox getBoundingBox() const", asMETHOD(XMLElement, getBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool hasChildElement(const string& in) const", asMETHOD(XMLElement, hasChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement getChildElement() const", asFUNCTION(XMLElementGetChildElementDefault), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "XMLElement getChildElement(const string& in) const", asMETHOD(XMLElement, getChildElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement getNextElement() const", asFUNCTION(XMLElementGetNextElementDefault), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement getNextElement(const string& in) const", asMETHOD(XMLElement, getNextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement getParentElement() const", asMETHOD(XMLElement, getParentElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Color getColor(const string& in) const", asMETHOD(XMLElement, getColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "float getFloat(const string& in) const", asMETHOD(XMLElement, getFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "int getInt(const string& in) const", asMETHOD(XMLElement, getInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getName() const", asMETHOD(XMLElement, getName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement getNextElement(const string& in) const", asMETHOD(XMLElement, getNextElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Quaternion getQuaternion(const string& in) const", asMETHOD(XMLElement, getQuaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getString(const string& in) const", asMETHOD(XMLElement, getString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getStringLower(const string& in) const", asMETHOD(XMLElement, getStringLower), asCALL_THISCALL);
@@ -201,8 +233,6 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "VariantMap getVariantMap() const", asMETHOD(XMLElement, getVariantMap), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector2 getVector2(const string& in) const", asMETHOD(XMLElement, getVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Vector3 getVector3(const string& in) const", asMETHOD(XMLElement, getVector3), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool hasAttribute(const string& in) const", asMETHOD(XMLElement, hasAttribute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool hasChildElement(const string& in) const", asMETHOD(XMLElement, hasChildElement), asCALL_THISCALL);
 }
 
 static XMLFile* ConstructXMLFile()
@@ -231,6 +261,11 @@ static void XMLFileSave(File* file, XMLFile* ptr)
     TRY_SAFE_RETHROW(ptr->save(*file));
 }
 
+static XMLElement XMLFileGetRootElementDefault(XMLFile* ptr)
+{
+    return ptr->getRootElement();
+}
+
 static void registerXMLFile(asIScriptEngine* engine)
 {
     registerResource<XMLFile>(engine, "XMLFile");
@@ -239,7 +274,8 @@ static void registerXMLFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLFile", "void load(File@+)", asFUNCTION(XMLFileLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "void save(File@+)", asFUNCTION(XMLFileSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "XMLElement createRootElement(const string& in)", asMETHOD(XMLFile, createRootElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLFile", "XMLElement getRootElement(const string& in, bool)", asMETHOD(XMLFile, getRootElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLFile", "XMLElement getRootElement()", asFUNCTION(XMLFileGetRootElementDefault), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("XMLFile", "XMLElement getRootElement(const string& in)", asMETHOD(XMLFile, getRootElement), asCALL_THISCALL);
     registerRefCasts<Resource, XMLFile>(engine, "Resource", "XMLFile");
 }
 

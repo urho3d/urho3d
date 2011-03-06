@@ -79,7 +79,7 @@ Console::Console(Engine* engine) :
         
         subscribeToEvent(mLineEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(Console, handleTextFinished));
         subscribeToEvent(mLineEdit, EVENT_UNHANDLEDKEY, EVENT_HANDLER(Console, handleLineEditKey));
-        subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Console, handleWindowResized));
+        subscribeToEvent(EVENT_SCREENMODE, EVENT_HANDLER(Console, handleScreenMode));
         subscribeToEvent(EVENT_LOGMESSAGE, EVENT_HANDLER(Console, handleLogMessage));
     }
 }
@@ -248,7 +248,7 @@ void Console::handleLineEditKey(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Console::handleWindowResized(StringHash eventType, VariantMap& eventData)
+void Console::handleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     updateElements();
 }

@@ -88,7 +88,7 @@ private:
     //! Switch focus to UI element
     void switchFocusTo(UIElement* element);
     //! Handle window resized event
-    void handleWindowResized(StringHash eventType, VariantMap& eventData);
+    void handleScreenMode(StringHash eventType, VariantMap& eventData);
     //! Handle mouse move event
     void handleMouseMove(StringHash eventType, VariantMap& eventData);
     //! Handle mouse button down event

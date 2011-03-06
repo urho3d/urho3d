@@ -36,11 +36,12 @@ DEFINE_EVENT(EVENT_WINDOWMESSAGE, WindowMessage)
     EVENT_PARAM(P_HANDLED, Handled);            // bool
 }
 
-//! Window resized
-DEFINE_EVENT(EVENT_WINDOWRESIZED, WindowResized)
+//! New screen mode set
+DEFINE_EVENT(EVENT_SCREENMODE, ScreenMode)
 {
     EVENT_PARAM(P_WIDTH, Width);                // int
     EVENT_PARAM(P_HEIGHT, Height);              // int
+    EVENT_PARAM(P_FULLSCREEN, Fullscreen);      // bool
 }
 
 //! Frame rendering started

@@ -64,7 +64,7 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     
     mRootElement = new UIElement();
     mRootElement->setSize(mRenderer->getWidth(), mRenderer->getHeight());
-    subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(UI, handleWindowResized));
+    subscribeToEvent(mRenderer, EVENT_SCREENMODE, EVENT_HANDLER(UI, handleScreenMode));
     subscribeToEvent(EVENT_MOUSEMOVE, EVENT_HANDLER(UI, handleMouseMove));
     subscribeToEvent(EVENT_MOUSEBUTTONDOWN, EVENT_HANDLER(UI, handleMouseButtonDown));
     subscribeToEvent(EVENT_MOUSEBUTTONUP, EVENT_HANDLER(UI, handleMouseButtonUp));
@@ -455,11 +455,11 @@ void UI::getElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     }
 }
 
-void UI::handleWindowResized(StringHash eventType, VariantMap& eventData)
+void UI::handleScreenMode(StringHash eventType, VariantMap& eventData)
 {
-    using namespace WindowResized;
+    using namespace ScreenMode;
     
-    mRootElement->setSize(eventData[P_WIDTH].getInt(), eventData[P_HEIGHT].getInt());
+    mRootElement->setSize(mRenderer->getWidth(), mRenderer->getHeight());
 }
 
 void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
@@ -477,8 +477,8 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
             if (mCursor->isVisible())
             {
                 IntVector2 pos = mCursor->getPosition();
-                pos.mX += eventData[P_X].getInt();
-                pos.mY += eventData[P_Y].getInt();
+                pos.mX += eventData[P_DX].getInt();
+                pos.mY += eventData[P_DY].getInt();
                 const IntVector2& rootSize = mRootElement->getSize();
                 pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
                 pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
@@ -488,7 +488,7 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         else
         {
             // When in non-confined mode, move cursor always to ensure accurate position, and do not clamp
-            mCursor->setPosition(eventData[P_POSX].getInt(), eventData[P_POSY].getInt());
+            mCursor->setPosition(eventData[P_X].getInt(), eventData[P_Y].getInt());
         }
         
         if ((mMouseDragElement) && (mMouseButtons))

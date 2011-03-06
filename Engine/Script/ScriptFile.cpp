@@ -135,7 +135,7 @@ void ScriptFile::addEventHandler(EventListener* sender, StringHash eventType, co
     subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptFile, handleSpecificScriptEvent, (void*)function));
 }
 
-bool ScriptFile::execute(const std::string& declaration, const std::vector<Variant>& parameters, bool unprepare)
+bool ScriptFile::execute(const std::string& declaration, const VariantVector& parameters, bool unprepare)
 {
     asIScriptFunction* function = getFunction(declaration);
     if (!function)
@@ -147,7 +147,7 @@ bool ScriptFile::execute(const std::string& declaration, const std::vector<Varia
     return execute(getFunction(declaration), parameters, unprepare);
 }
 
-bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>& parameters, bool unprepare)
+bool ScriptFile::execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
     PROFILE(Script_ExecuteFunction);
     
@@ -177,7 +177,7 @@ bool ScriptFile::execute(asIScriptFunction* function, const std::vector<Variant>
     return success;
 }
 
-bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters, bool unprepare)
+bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration, const VariantVector& parameters, bool unprepare)
 {
     asIScriptFunction* method = getMethod(object, declaration);
     if (!method)
@@ -189,7 +189,7 @@ bool ScriptFile::execute(asIScriptObject* object, const std::string& declaration
     return execute(object, method, parameters, unprepare);
 }
 
-bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters, bool unprepare)
+bool ScriptFile::execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
     PROFILE(Script_ExecuteMethod);
     
@@ -447,7 +447,7 @@ void ScriptFile::addScriptSection(asIScriptEngine* engine, Deserializer& source,
     setMemoryUse(getMemoryUse() + dataSize);
 }
 
-void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters)
+void ScriptFile::setParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters)
 {
     unsigned paramCount = function->GetParamCount();
     for (unsigned i = 0; (i < parameters.size()) && (i < paramCount); ++i)
@@ -543,7 +543,7 @@ void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
     if (!mCompiled)
         return;
     
-    std::vector<Variant> parameters;
+    VariantVector parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
     execute(static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
@@ -554,7 +554,7 @@ void ScriptFile::handleSpecificScriptEvent(StringHash eventType, VariantMap& eve
     if (!mCompiled)
         return;
     
-    std::vector<Variant> parameters;
+    VariantVector parameters;
     parameters.push_back(Variant((void*)&eventType));
     parameters.push_back(Variant((void*)&eventData));
     execute(static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);

@@ -338,7 +338,6 @@ bool XMLElement::hasAttribute(const std::string& name) const
         return false;
 }
 
-
 std::string XMLElement::getAttribute(const std::string& name) const
 {
     if (!mElement)
@@ -352,6 +351,23 @@ std::string XMLElement::getAttribute(const std::string& name) const
         else
             return std::string(data);
     }
+}
+
+std::vector<std::string> XMLElement::getAttributeNames() const
+{
+    std::vector<std::string> ret;
+    
+    if (mElement)
+    {
+        const TiXmlAttribute* attribute = mElement->FirstAttribute();
+        while (attribute)
+        {
+            ret.push_back(std::string(attribute->Name()));
+            attribute = attribute->Next();
+        }
+    }
+    
+    return ret;
 }
 
 bool XMLElement::getBool(const std::string& name) const

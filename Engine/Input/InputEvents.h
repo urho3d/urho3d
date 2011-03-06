@@ -57,8 +57,8 @@ DEFINE_EVENT(EVENT_MOUSEMOVE, MouseMove)
 {
     EVENT_PARAM(P_X, X);                        // int
     EVENT_PARAM(P_Y, Y);                        // int
-    EVENT_PARAM(P_POSX, PosX);                  // int
-    EVENT_PARAM(P_POSY, PosY);                  // int
+    EVENT_PARAM(P_DX, DX);                      // int
+    EVENT_PARAM(P_DY, DY);                      // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
     EVENT_PARAM(P_CLIPCURSOR, ClipCursor);      // bool

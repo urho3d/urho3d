@@ -109,9 +109,8 @@ bool ScriptEngine::execute(const std::string& line)
     if (!module)
         return false;
     
-    // Use the line as the function name to get an easy to understand error message in case of failure
     asIScriptFunction *function = 0;
-    if (module->CompileFunction(line.c_str(), wrappedLine.c_str(), -1, 0, &function) < 0)
+    if (module->CompileFunction("", wrappedLine.c_str(), -1, 0, &function) < 0)
         return false;
     
     if (mImmediateContext->Prepare(function->GetId()) < 0)

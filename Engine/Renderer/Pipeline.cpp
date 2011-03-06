@@ -334,7 +334,7 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     mViewports.resize(1);
     resetViews();
     
-    subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(Pipeline, handleWindowResized));
+    subscribeToEvent(EVENT_SCREENMODE, EVENT_HANDLER(Pipeline, handleScreenMode));
     subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(Pipeline, handlePostRenderUpdate));
 }
 
@@ -1504,7 +1504,7 @@ void Pipeline::drawSplitLightToStencil(Camera& camera, Light* light, bool clear)
     }
 }
 
-void Pipeline::handleWindowResized(StringHash eventType, VariantMap& eventData)
+void Pipeline::handleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     // When screen mode changes, reload shaders and purge old views and occlusion buffers
     mShadersDirty = true;

@@ -88,8 +88,10 @@ public:
     bool isMinimized() { return mMinimized; }
     
 private:
-    //! Handle a window message event
+    //! Handle a window message
     void handleWindowMessage(StringHash eventType, VariantMap& eventData);
+    //! Handle screen mode change
+    void handleScreenMode(StringHash eventType, VariantMap& eventData);
     //! Activate the application
     void makeActive();
     //! Deactivate the application
@@ -100,6 +102,10 @@ private:
     void mouseButtonChange(int button, bool newState);
     //! Handle a key change
     void keyChange(int key, bool newState);
+    //! Handle mousewheel change
+    void mouseWheelChange(int delta);
+    //! Check for mouse move and send event if moved
+    void checkMouseMove();
     
     //! Renderer subsystem
     SharedPtr<Renderer> mRenderer;
@@ -111,7 +117,7 @@ private:
     unsigned mMouseButtonDown;
     //! Mouse buttons' pressed state
     unsigned mMouseButtonPress;
-    //! Last mouse position for non-confined mode
+    //! Last mouse position for calculating deltas
     IntVector2 mLastMousePosition;
     //! Mouse movement since last frame
     IntVector2 mMouseMove;

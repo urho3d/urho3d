@@ -80,7 +80,7 @@ private:
     //! Handle unhandled key on the line edit for scrolling the history
     void handleLineEditKey(StringHash eventType, VariantMap& eventData);
     //! Handle rendering window resize
-    void handleWindowResized(StringHash eventType, VariantMap& eventData);
+    void handleScreenMode(StringHash eventType, VariantMap& eventData);
     //! Handle a log message
     void handleLogMessage(StringHash eventType, VariantMap& eventData);
     

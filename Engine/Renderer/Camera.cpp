@@ -149,7 +149,7 @@ void Camera::loadXML(const XMLElement& source, ResourceCache* cache)
     mFov = projectionElem.getFloat("fov");
     mOrthoSize = projectionElem.getFloat("orthosize");
     mAspectRatio = projectionElem.getFloat("aspectratio");
-    mAutoAspectRatio = projectionElem.getFloat("autoaspectratio");
+    mAutoAspectRatio = projectionElem.getBool("autoaspect");
     mZoom = projectionElem.getFloat("zoom");
     
     XMLElement lodElem = source.getChildElement("lod");

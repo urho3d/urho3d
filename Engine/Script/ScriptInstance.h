@@ -69,7 +69,7 @@ struct DelayedMethodCall
     //! Method declaration
     std::string mDeclaration;
     //! Parameters
-    std::vector<Variant> mParameters;
+    VariantVector mParameters;
 };
 
 //! A scripted component
@@ -117,11 +117,11 @@ public:
     //! Set fixed updates per second. 0 (default) uses the physics frame rate
     void setFixedUpdateFps(int fps);
     //! Query for a method by declaration and execute if found
-    bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
+    bool execute(const std::string& declaration, const VariantVector& parameters = VariantVector());
     //! Execute a method
-    bool execute(asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>());
+    bool execute(asIScriptFunction* method, const VariantVector& parameters = VariantVector());
     //! Add a delay-executed method call
-    void delayedExecute(float delay, const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>());
+    void delayedExecute(float delay, const std::string& declaration, const VariantVector& parameters = VariantVector());
     //! Clear pending delay-executed method calls
     void clearDelayedExecute();
     

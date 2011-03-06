@@ -23,6 +23,7 @@
 
 #include "PreCompiled.h"
 #include "Exception.h"
+#include "Log.h"
 #include "RefCount.h"
 
 RefCount::RefCount() :
@@ -41,13 +42,14 @@ RefCounted::RefCounted() :
 
 RefCounted::~RefCounted()
 {
+    // The errors here should be exceptions instead. However it is not a good practice to throw from destructors
     if (mRefCount)
     {
         #ifdef ENABLE_REFCOUNTED_CHECKS
         if (mRefCount->mRefs)
-            EXCEPTION("Destructor called when references still exist");
+            LOGERROR("Destructor called when references still exist");
         if (!mRefCount->mWeakRefs)
-            EXCEPTION("Weak reference count mismatch on destruction");
+            LOGERROR("Weak reference count mismatch on destruction");
         #endif
         
         // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
@@ -58,6 +60,8 @@ RefCounted::~RefCounted()
         
         mRefCount = 0;
     }
+    else
+        LOGERROR("Destructor called multiple times");
 }
 
 void RefCounted::addRef()
@@ -69,7 +73,7 @@ void RefCounted::releaseRef()
 {
     #ifdef ENABLE_REFCOUNTED_CHECKS
     if (!mRefCount->mRefs)
-        EXCEPTION("releaseRef() called when reference count is already zero");
+        EXCEPTION("releaseRef() called when object already destroyed");
     #endif
     
     --(mRefCount->mRefs);

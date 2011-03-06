@@ -329,12 +329,13 @@ void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, 
         InvalidateRect(0, 0, true);
     }
     
-    using namespace WindowResized;
+    using namespace ScreenMode;
     
     VariantMap eventData;
     eventData[P_WIDTH] = mWidth;
     eventData[P_HEIGHT] = mHeight;
-    sendEvent(EVENT_WINDOWRESIZED, eventData);
+    eventData[P_FULLSCREEN] = mFullscreen;
+    sendEvent(EVENT_SCREENMODE, eventData);
     
     if (!multiSample)
         LOGINFO("Set screen mode " + toString(mWidth) + "x" + toString(mHeight) + " " + (mFullscreen ? "fullscreen" : "windowed"));

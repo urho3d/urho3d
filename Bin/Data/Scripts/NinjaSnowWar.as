@@ -52,7 +52,7 @@ void start()
     subscribeToEvent("Points", "handlePoints");
     subscribeToEvent("Kill", "handleKill");
     subscribeToEvent("KeyDown", "handleKeyDown");
-    subscribeToEvent("WindowResized", "handleWindowResized");
+    subscribeToEvent("ScreenMode", "handleScreenMode");
 }
 
 void initAudio()
@@ -423,7 +423,7 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void handleWindowResized(StringHash eventType, VariantMap& eventData)
+void handleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     int height = renderer.getHeight() / 22;
     if (height > 64)

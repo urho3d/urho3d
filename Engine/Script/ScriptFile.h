@@ -61,14 +61,14 @@ public:
     virtual void addEventHandler(EventListener* sender, StringHash eventType, const std::string& handlerName);
     
     //! Query for a function by declaration and execute if found
-    bool execute(const std::string& declaration, const std::vector<Variant>& parameters = std::vector<Variant>(), bool unprepare = true);
+    bool execute(const std::string& declaration, const VariantVector& parameters = VariantVector(), bool unprepare = true);
     //! Execute a function
-    bool execute(asIScriptFunction* function, const std::vector<Variant>& parameters = std::vector<Variant>(), bool unprepare = true);
+    bool execute(asIScriptFunction* function, const VariantVector& parameters = VariantVector(), bool unprepare = true);
     //! Query for an object method by declaration and execute if found
-    bool execute(asIScriptObject* object, const std::string& declaration, const std::vector<Variant>& parameters =
-        std::vector<Variant>(), bool unprepare = true);
+    bool execute(asIScriptObject* object, const std::string& declaration, const VariantVector& parameters =
+        VariantVector(), bool unprepare = true);
     //! Execute an object method
-    bool execute(asIScriptObject* object, asIScriptFunction* method, const std::vector<Variant>& parameters = std::vector<Variant>(),
+    bool execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = VariantVector(),
         bool unprepare = true);
     //! Create a script object
     asIScriptObject* createObject(const std::string& className);
@@ -93,7 +93,7 @@ private:
     //! Add a script section, checking for includes recursively
     void addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache);
     //! Set parameters for a function or method
-    void setParameters(asIScriptContext* context, asIScriptFunction* function, const std::vector<Variant>& parameters);
+    void setParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters);
     //! Release the script module
     void releaseModule();
     //! Handle an event in script
