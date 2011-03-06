@@ -66,7 +66,6 @@ UI::UI(Renderer* renderer, ResourceCache* cache) :
     mRootElement->setSize(mRenderer->getWidth(), mRenderer->getHeight());
     subscribeToEvent(EVENT_WINDOWRESIZED, EVENT_HANDLER(UI, handleWindowResized));
     subscribeToEvent(EVENT_MOUSEMOVE, EVENT_HANDLER(UI, handleMouseMove));
-    subscribeToEvent(EVENT_MOUSEPOS, EVENT_HANDLER(UI, handleMouseMove));
     subscribeToEvent(EVENT_MOUSEBUTTONDOWN, EVENT_HANDLER(UI, handleMouseButtonDown));
     subscribeToEvent(EVENT_MOUSEBUTTONUP, EVENT_HANDLER(UI, handleMouseButtonUp));
     subscribeToEvent(EVENT_MOUSEWHEEL, EVENT_HANDLER(UI, handleMouseWheel));
@@ -472,9 +471,9 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
     
     if (mCursor)
     {
-        if (eventType == EVENT_MOUSEMOVE)
+        if (eventData[P_CLIPCURSOR].getBool())
         {
-            // When deltas are sent, move the cursor only when visible
+            // When in confined cursor mode, move cursor only when visible
             if (mCursor->isVisible())
             {
                 IntVector2 pos = mCursor->getPosition();
@@ -488,8 +487,8 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         }
         else
         {
-            // When absolute positions are sent, the cursor is not confined, so do not clamp the on-screen cursor's position
-            mCursor->setPosition(eventData[P_X].getInt(), eventData[P_Y].getInt());
+            // When in non-confined mode, move cursor always to ensure accurate position, and do not clamp
+            mCursor->setPosition(eventData[P_POSX].getInt(), eventData[P_POSY].getInt());
         }
         
         if ((mMouseDragElement) && (mMouseButtons))

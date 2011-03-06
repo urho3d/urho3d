@@ -70,11 +70,11 @@ public:
     int getQualifiers() const;
     //! Return absolute mouse cursor position within the window. Only useful when the cursor is not confined
     IntVector2 getMousePosition() const;
-    //! Return mouse movement since last frame. When mouse is not confined, returns always zero
+    //! Return mouse movement since last frame
     const IntVector2& getMouseMove() const { return mMouseMove; }
-    //! Return horizontal mouse movement since last frame. When mouse is not confined, returns always zero
+    //! Return horizontal mouse movement since last frame
     int getMouseMoveX() const { return mMouseMove.mX; }
-    //! Return vertical mouse movement since last frame. When mouse is not confined, returns always zero
+    //! Return vertical mouse movement since last frame
     int getMouseMoveY() const { return mMouseMove.mY; }
     //! Return mouse wheel movement since last frame
     int getMouseMoveWheel() const { return mMouseMoveWheel; }

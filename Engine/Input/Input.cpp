@@ -95,31 +95,17 @@ void Input::update()
         
         if (mMouseMove != IntVector2::sZero)
         {
-            if (mClipCursor)
-            {
-                using namespace MouseMove;
-                
-                VariantMap eventData;
-                eventData[P_X] = mMouseMove.mX;
-                eventData[P_Y] = mMouseMove.mY;
-                eventData[P_BUTTONS] = mMouseButtonDown;
-                eventData[P_QUALIFIERS] = getQualifiers();
-                sendEvent(EVENT_MOUSEMOVE, eventData);
-            }
-            else
-            {
-                // Set movement as zero and send only the absolute position
-                mMouseMove = IntVector2::sZero;
-                
-                using namespace MousePos;
-                
-                VariantMap eventData;
-                eventData[P_X] = mousePos.mX;
-                eventData[P_Y] = mousePos.mY;
-                eventData[P_BUTTONS] = mMouseButtonDown;
-                eventData[P_QUALIFIERS] = getQualifiers();
-                sendEvent(EVENT_MOUSEPOS, eventData);
-            }
+            using namespace MouseMove;
+            
+            VariantMap eventData;
+            eventData[P_X] = mMouseMove.mX;
+            eventData[P_Y] = mMouseMove.mY;
+            eventData[P_POSX] = mousePos.mX;
+            eventData[P_POSY] = mousePos.mY;
+            eventData[P_BUTTONS] = mMouseButtonDown;
+            eventData[P_QUALIFIERS] = getQualifiers();
+            eventData[P_CLIPCURSOR] = mClipCursor;
+            sendEvent(EVENT_MOUSEMOVE, eventData);
         }
         if (mMouseMoveWheel)
         {
@@ -401,7 +387,10 @@ void Input::makeInactive()
     }
     
     if (mActive)
+    {
         ShowCursor(TRUE);
+        ReleaseCapture();
+    }
     
     ClipCursor(0);
     
@@ -448,6 +437,15 @@ void Input::mouseButtonChange(int button, bool newState)
     eventData[P_BUTTONS] = mMouseButtonDown;
     eventData[P_QUALIFIERS] = getQualifiers();
     sendEvent(newState ? EVENT_MOUSEBUTTONDOWN : EVENT_MOUSEBUTTONUP, eventData);
+    
+    // In non-confined mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
+    if ((mRenderer) && (!mClipCursor))
+    {
+        if (mMouseButtonDown)
+            SetCapture((HWND)mRenderer->getWindowHandle());
+        else
+            ReleaseCapture();
+    }
 }
 
 void Input::keyChange(int key, bool newState)
