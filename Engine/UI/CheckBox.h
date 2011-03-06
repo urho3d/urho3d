@@ -31,6 +31,8 @@ class CheckBox : public BorderImage
 {
     DEFINE_TYPE(CheckBox);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     CheckBox(const std::string& name = std::string());

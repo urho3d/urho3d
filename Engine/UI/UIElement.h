@@ -222,6 +222,8 @@ public:
     void setFocusMode(FocusMode mode);
     //! Set drag and drop flags
     void setDragDropMode(unsigned mode);
+    //! Set style from an XML file. Find the style element by name
+    void setStyle(XMLFile* file, const std::string& typeName, ResourceCache* cache);
     //! Set style from an XML file. Find the style element automatically
     void setStyleAuto(XMLFile* file, ResourceCache* cache);
     //! Set layout
@@ -329,8 +331,6 @@ public:
     UIElement* getParent() const { return mParent; }
     //! Return root element
     UIElement* getRootElement() const;
-    //! Return first matching UI style element from an XML file. If not found, return empty
-    XMLElement getStyleElement(XMLFile* file) const;
     
     //! Convert screen coordinates to element coordinates
     IntVector2 screenToElement(const IntVector2& screenPosition);
@@ -352,9 +352,6 @@ public:
     //! Get UI rendering batches with a specified offset. Also recurses to child elements
     void getBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
         currentScissor);
-    
-    //! Return first matching UI style element from an XML file, with freely specified type. If not found, return empty
-    static XMLElement getStyleElement(XMLFile* file, const std::string& typeName);
     
 protected:
     //! Mark screen position as needing an update

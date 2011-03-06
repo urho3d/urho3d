@@ -46,6 +46,8 @@ class Window : public BorderImage
 {
     DEFINE_TYPE(Window);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     Window(const std::string& name = std::string());

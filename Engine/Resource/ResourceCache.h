@@ -65,7 +65,7 @@ public:
     //! Add a resource factory
     void addResourceFactory(ResourceFactory* factory);
     //! Add a resource load path
-    void addResourcePath(const std::string& path);
+    bool addResourcePath(const std::string& path);
     //! Add a package file for loading resources from
     void addPackageFile(PackageFile* package, bool addAsFirst = false);
     //! Add a manually created resource. Must be uniquely named
@@ -84,6 +84,8 @@ public:
     void releaseResources(ShortStringHash type, bool force = false);
     //! Release resources of a specific type and partial name
     void releaseResources(ShortStringHash type, const std::string& partialName, bool force = false);
+    //! Release all resources
+    void releaseAllResources(bool force = false);
     //! Reload a resource. Return false and release it if fails
     bool reloadResource(Resource* resource);
     //! Set memory budget for a specific resource type, default 0 is unlimited

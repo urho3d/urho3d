@@ -82,9 +82,6 @@ static void registerUIElement(asIScriptEngine* engine)
     
     registerUIElement<UIElement>(engine, "UIElement");
     
-    // Register static function for getting UI style XML element
-    engine->RegisterGlobalFunction("XMLElement getStyleElement(XMLFile@+, const string& in)", asFUNCTIONPR(UIElement::getStyleElement, (XMLFile*, const std::string&), XMLElement), asCALL_CDECL);
-    
     // Register Variant getPtr() for UIElement
     engine->RegisterObjectMethod("Variant", "UIElement@+ getUIElement() const", asFUNCTION(getVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
 }

@@ -112,9 +112,6 @@ UIElement::~UIElement()
 
 void UIElement::setStyle(const XMLElement& element, ResourceCache* cache)
 {
-    if (!cache)
-        return;
-    
     if (element.hasAttribute("name"))
         mName = element.getString("name");
     if (element.hasChildElement("position"))
@@ -567,10 +564,27 @@ void UIElement::setDragDropMode(unsigned mode)
     mDragDropMode = mode;
 }
 
+void UIElement::setStyle(XMLFile* file, const std::string& typeName, ResourceCache* cache)
+{
+    if (!file)
+        return;
+    
+    XMLElement rootElem = file->getRootElement();
+    XMLElement childElem = rootElem.getChildElement("element");
+    while (childElem)
+    {
+        if (childElem.getString("type") == typeName)
+        {
+            setStyle(childElem, cache);
+            return;
+        }
+        childElem = childElem.getNextElement("element");
+    }
+}
+
 void UIElement::setStyleAuto(XMLFile* file, ResourceCache* cache)
 {
-    XMLElement element = getStyleElement(file);
-    setStyle(element, cache);
+    setStyle(file, getTypeName(), cache);
 }
 
 void UIElement::setLayout(LayoutMode mode, int spacing, const IntRect& border)
@@ -915,23 +929,6 @@ UIElement* UIElement::getRootElement() const
     return root;
 }
 
-XMLElement UIElement::getStyleElement(XMLFile* file) const
-{
-    if (file)
-    {
-        XMLElement rootElem = file->getRootElement();
-        XMLElement childElem = rootElem.getChildElement("element");
-        while (childElem)
-        {
-            if (childElem.getString("type") == getTypeName())
-                return childElem;
-            childElem = childElem.getNextElement("element");
-        }
-    }
-    
-    return XMLElement();
-}
-
 IntVector2 UIElement::screenToElement(const IntVector2& screenPosition)
 {
     return screenPosition - getScreenPosition();
@@ -1036,23 +1033,6 @@ void UIElement::getBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& b
         if ((*i)->isVisible())
             (*i)->getBatchesWithOffset(offset, batches, quads, currentScissor);
     }
-}
-
-XMLElement UIElement::getStyleElement(XMLFile* file, const std::string& typeName)
-{
-    if (file)
-    {
-        XMLElement rootElem = file->getRootElement();
-        XMLElement childElem = rootElem.getChildElement("element");
-        while (childElem)
-        {
-            if (childElem.getString("type") == typeName)
-                return childElem;
-            childElem = childElem.getNextElement("element");
-        }
-    }
-    
-    return XMLElement();
 }
 
 void UIElement::markDirty()

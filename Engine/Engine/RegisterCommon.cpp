@@ -604,10 +604,12 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool systemOpenFile(const string& in, const string& in)", asFUNCTION(systemOpenFile), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
-    engine->RegisterGlobalFunction("string getExtension(const string& in, bool)", asFUNCTION(getExtension), asCALL_CDECL);
-    engine->RegisterGlobalFunction("string getFileNameAndExtension(const string& in, bool)", asFUNCTION(getFileNameAndExtension), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getExtension(const string& in)", asFUNCTION(getExtension), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getFileNameAndExtension(const string& in)", asFUNCTION(getFileNameAndExtension), asCALL_CDECL);
     engine->RegisterGlobalFunction("string fixPath(const string& in)", asFUNCTION(fixPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string unfixPath(const string& in)", asFUNCTION(unfixPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getParentPath(const string& in)", asFUNCTION(getParentPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("string getAbsoluteFileName(const string& in)", asFUNCTION(getAbsoluteFileName), asCALL_CDECL);
     
     engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);

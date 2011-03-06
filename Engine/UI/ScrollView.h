@@ -34,6 +34,8 @@ class ScrollView : public UIElement
 {
     DEFINE_TYPE(ScrollView);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     ScrollView(const std::string& name = std::string());

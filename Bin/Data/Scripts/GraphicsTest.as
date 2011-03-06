@@ -39,7 +39,7 @@ void start()
         engine.exit();
         return;
     }
-
+         
     initConsole();
     initScene();
     initUI();
@@ -411,11 +411,11 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
 
     if (ui.getFocusElement() is null)
     {
-        float speedMultiplier = 1.0f;
+        float speedMultiplier = 1.0;
         if (input.getKeyDown(KEY_SHIFT))
-            speedMultiplier = 5.0f;
+            speedMultiplier = 5.0;
         if (input.getKeyDown(KEY_CTRL))
-            speedMultiplier = 0.1f;
+            speedMultiplier = 0.1;
 
         if (input.getKeyDown('W'))
             camera.translateRelative(Vector3(0, 0, 10) * timeStep * speedMultiplier);

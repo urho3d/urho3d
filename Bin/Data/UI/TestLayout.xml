@@ -1,13 +1,12 @@
 <element type="Window">
     <position value="50 50" />
     <size value="400 300" />
-    <resizable enable="false" />
+    <movable enable="true" />
     <element type="Button">
         <position value="10 10" />
         <size value="100 40" />
         <element type="Text">
             <text value="TEST" />
-            <font name="cour.ttf" size="12" />
             <alignment horizontal="center" vertical="center" />
         </element>
     </element>
@@ -23,19 +22,15 @@
     <element type="CheckBox">
         <position value="40 130" />
     </element>
-
     <element type="Text" name="PopupItem1">
-        <font name="cour.ttf" size="12" />
         <text value="Deferred" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="PopupItem2">
-        <font name="cour.ttf" size="12" />
         <text value="Prepass" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="PopupItem3">
-        <font name="cour.ttf" size="12" />
         <text value="Forward" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
@@ -51,59 +46,47 @@
             <layout border="8 8 8 8" />
         </popup>
     </element>
-
     <element type="Text" name="Item1">
-        <font name="cour.ttf" size="12" />
         <text value="Audio" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item2">
-        <font name="cour.ttf" size="12" />
         <text value="Common" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item3">
-        <font name="cour.ttf" size="12" />
         <text value="Engine" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item4">
-        <font name="cour.ttf" size="12" />
         <text value="Input" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item5">
-        <font name="cour.ttf" size="12" />
         <text value="Math" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item6">
-        <font name="cour.ttf" size="12" />
         <text value="Network" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item7">
-        <font name="cour.ttf" size="12" />
         <text value="Physics" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item8">
-        <font name="cour.ttf" size="12" />
         <text value="Renderer" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item9">
-        <font name="cour.ttf" size="12" />
         <text value="Resource" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item10">
-        <font name="cour.ttf" size="12" />
         <text value="Scene" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
     <element type="Text" name="Item11">
-        <font name="cour.ttf" size="12" />
         <text value="UI" />
         <selectioncolor value="0.45 0.70 0.45" />
     </element>
@@ -139,7 +122,6 @@
             <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem3" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -147,7 +129,6 @@
             <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem4" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -155,7 +136,6 @@
             <layout mode="vertical" />
             <element type="Text">
                 <text value="MenuItem5" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -167,7 +147,6 @@
         <popupoffset value="0 16" />
         <element type="Text">
             <text value="MenuItem1" />
-            <font name="cour.ttf" size="12" />
             <alignment horizontal="center" vertical="center" />
         </element>
     </element>
@@ -176,7 +155,6 @@
         <size value="80 16" />
         <element type="Text">
             <text value="MenuItem2" />
-            <font name="cour.ttf" size="12" />
             <alignment horizontal="center" vertical="center" />
         </element>
     </element>

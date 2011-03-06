@@ -196,7 +196,9 @@ void registerStdString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("string", "bool opEquals(const string& in) const", asFUNCTIONPR(std::operator ==, (const std::string&, const std::string&), bool), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("string", "int opCmp(const string& in) const", asFUNCTION(StringCmp), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("string", "string opAdd(const string& in) const", asFUNCTIONPR(std::operator +, (const std::string&, const std::string&), std::string), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("string", "uint length() const", asMETHOD(std::string, size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("string", "uint length() const", asMETHOD(std::string, length), asCALL_THISCALL);
+    engine->RegisterObjectMethod("string", "uint size() const", asMETHOD(std::string, size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("string", "bool empty() const", asMETHOD(std::string, empty), asCALL_THISCALL);
     engine->RegisterObjectMethod("string", "void resize(uint)", asMETHODPR(std::string, resize, (size_t), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("string", "uint8 &opIndex(uint)", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);

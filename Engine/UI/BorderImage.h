@@ -34,6 +34,8 @@ class BorderImage : public UIElement
 {
     DEFINE_TYPE(BorderImage);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     BorderImage(const std::string& name = std::string());

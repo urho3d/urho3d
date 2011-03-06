@@ -50,6 +50,8 @@ class Cursor : public BorderImage
 {
     DEFINE_TYPE(Cursor);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     Cursor(const std::string& name = std::string());

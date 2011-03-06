@@ -44,6 +44,8 @@ class ListView : public ScrollView
 {
     DEFINE_TYPE(ListView);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     ListView(const std::string& name = std::string());

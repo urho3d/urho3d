@@ -421,6 +421,12 @@ template <class T> void UIElementSetStyle(const XMLElement& element, T* ptr)
 }
 
 //! Template function for setting UI element style from an XML file
+template <class T> void UIElementSetStyleName(XMLFile* file, const std::string& typeName, T* ptr)
+{
+    ptr->setStyle(file, typeName, getEngine()->getResourceCache());
+}
+
+//! Template function for setting UI element style from an XML file
 template <class T> void UIElementSetStyleAuto(XMLFile* file, T* ptr)
 {
     ptr->setStyleAuto(file, getEngine()->getResourceCache());
@@ -473,6 +479,7 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void setVisible(bool)", asMETHOD(T, setVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setFocusMode(FocusMode)", asMETHOD(T, setFocusMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setDragDropMode(uint)", asMETHOD(T, setDragDropMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setStyle(XMLFile@+, const string& in)", asFUNCTION(UIElementSetStyleName<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setStyleAuto(XMLFile@+)", asFUNCTION(UIElementSetStyleAuto<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setLayout(LayoutMode, int, const IntRect&)", asMETHOD(T, setLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLayoutSpacing(int)", asMETHOD(T, setLayoutSpacing), asCALL_THISCALL);
@@ -523,7 +530,6 @@ template <class T> void registerUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getParent() const", asMETHOD(T, getParent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ getRootElement() const", asMETHOD(T, getRootElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "XMLElement getStyleElement(XMLFile@+) const", asMETHODPR(T, getStyleElement, (XMLFile*) const, XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 screenToElement(const IntVector2& in)", asMETHOD(T, screenToElement), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 elementToScreen(const IntVector2& in)", asMETHOD(T, elementToScreen), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isInside(IntVector2, bool)", asMETHOD(T, isInside), asCALL_THISCALL);

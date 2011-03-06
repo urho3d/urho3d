@@ -35,6 +35,7 @@
 Input::Input(Renderer* renderer) :
     mRenderer(renderer),
     mClipCursor(true),
+    mShowCursor(true),
     mToggleFullscreen(true),
     mActive(false),
     mMinimized(false),
@@ -207,6 +208,7 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
     
     int msg = eventData[P_MSG].getInt();
     int wParam = eventData[P_WPARAM].getInt();
+    int lParam = eventData[P_LPARAM].getInt();
     
     switch (msg)
     {
@@ -314,6 +316,16 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         mSuppressNextChar = false;
         eventData[P_HANDLED] = true;
         break;
+        
+    case WM_SETCURSOR:
+        if ((lParam & 0xffff) == HTCLIENT)
+        {
+            setCursorVisible(false);
+            eventData[P_HANDLED] = true;
+        }
+        else
+            setCursorVisible(true);
+        break;
     }
 }
 
@@ -334,14 +346,12 @@ void Input::makeActive()
         return;
     }
     
-    if (!mActive)
-        ShowCursor(FALSE);
-    
     mActive = true;
     mActivated = false;
     
     // Re-establish mouse cursor clipping if necessary
     setClipCursor(mClipCursor);
+    setCursorVisible(false);
     
     sendEvent(EVENT_ACTIVATED);
 }
@@ -356,16 +366,13 @@ void Input::makeInactive()
         return;
     }
     
-    if (mActive)
-    {
-        ShowCursor(TRUE);
-        ReleaseCapture();
-    }
-    
-    ClipCursor(0);
-    
     mActive = false;
     mActivated = false;
+    
+    // Free and show the mouse cursor
+    ReleaseCapture();
+    ClipCursor(0);
+    setCursorVisible(true);
     
     sendEvent(EVENT_INACTIVATED);
 }
@@ -505,4 +512,17 @@ void Input::checkMouseMove()
         eventData[P_CLIPCURSOR] = mClipCursor;
         sendEvent(EVENT_MOUSEMOVE, eventData);
     }
+}
+
+void Input::setCursorVisible(bool enable)
+{
+    // When inactive, always show the cursor
+    if (!mActive)
+        enable = true;
+    
+    if (mShowCursor == enable)
+        return;
+    
+    ShowCursor(enable ? TRUE : FALSE);
+    mShowCursor = enable;
 }

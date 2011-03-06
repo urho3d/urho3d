@@ -53,26 +53,66 @@ void ResourceCache::addResourceFactory(ResourceFactory* factory)
     mFactories.push_back(SharedPtr<ResourceFactory>(factory));
 }
 
-void ResourceCache::addResourcePath(const std::string& path)
+bool ResourceCache::addResourcePath(const std::string& path)
 {
+    if (!directoryExists(path))
+    {
+        LOGERROR("Could not open directory " + path);
+        return false;
+    }
+    
     std::string fixedPath = fixPath(path);
+    
+    // Check for the existence of some known resource subdirectories to decide if we should add the parent directory instead
+    static const std::string checkDirs[] = {
+        "Fonts",
+        "Materials",
+        "Models",
+        "Music",
+        "Particle",
+        "Physics",
+        "Scripts",
+        "Sounds",
+        "Shaders",
+        "Textures",
+        "UI",
+        ""
+    };
+    
+    bool pathHasKnownDirs = false;
+    for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+    {
+        if (directoryExists(fixedPath + checkDirs[i]))
+        {
+            pathHasKnownDirs = true;
+            break;
+        }
+    }
+    if (!pathHasKnownDirs)
+    {
+        std::string parentPath = getParentPath(fixedPath);
+        bool parentHasKnownDirs = false;
+        for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+        {
+            if (directoryExists(parentPath + checkDirs[i]))
+            {
+                parentHasKnownDirs = true;
+                break;
+            }
+        }
+        // If path does not have known subdirectories, but the parent path has, use the parent instead
+        if (parentHasKnownDirs)
+            fixedPath = parentPath;
+    }
+    
     std::string pathLower = toLower(fixedPath);
     // Check that the same path does not already exist
     for (unsigned i = 0; i < mResourcePaths.size(); ++i)
     {
         if (toLower(mResourcePaths[i]) == pathLower)
-            return;
+            return true;
     }
     
-    if (!directoryExists(path))
-    {
-        LOGERROR("Could not open directory " + path);
-        return;
-    }
-    
-    checkDirectoryAccess(path);
-    
-
     mResourcePaths.push_back(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
@@ -82,6 +122,7 @@ void ResourceCache::addResourcePath(const std::string& path)
         registerHash(fileNames[i]);
     
     LOGINFO("Added resource path " + fixedPath);
+    return true;
 }
 
 void ResourceCache::addPackageFile(PackageFile* package, bool addAsFirst)
@@ -124,12 +165,14 @@ bool ResourceCache::addManualResource(Resource* resource)
 
 void ResourceCache::removeResourcePath(const std::string& path)
 {
+    std::string fixedPath = toLower(fixPath(path));
     for (std::vector<std::string>::iterator i = mResourcePaths.begin(); i != mResourcePaths.end();)
     {
-        if (i->find(path) == 0)
+        if (toLower(*i) == fixedPath)
+        {
             i = mResourcePaths.erase(i);
-        else
-            ++i;
+            return;
+        }
     }
 }
 
@@ -149,9 +192,11 @@ void ResourceCache::removePackageFile(PackageFile* package, bool releaseResource
 
 void ResourceCache::removePackageFile(const std::string& fileName, bool releaseResources, bool forceRelease)
 {
+    std::string fileNameLower = toLower(fileName);
+    
     for (std::vector<SharedPtr<PackageFile> >::iterator i = mPackages.begin(); i != mPackages.end(); ++i)
     {
-        if ((*i)->getName() == fileName)
+        if (toLower((*i)->getName()) == fileNameLower)
         {
             if (releaseResources)
                 releasePackageResources(*i, forceRelease);
@@ -236,6 +281,29 @@ void ResourceCache::releaseResources(ShortStringHash type, const std::string& pa
     
     if (released)
         updateResourceGroup(type);
+}
+
+void ResourceCache::releaseAllResources(bool force)
+{
+    for (std::map<ShortStringHash, ResourceGroup>::iterator i = mResourceGroups.begin();
+        i != mResourceGroups.end(); ++i)
+    {
+        bool released = false;
+        
+        for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.mResources.begin();
+            j != i->second.mResources.end();)
+        {
+            std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
+            // If other references exist, do not release, unless forced
+            if ((current->second.getRefCount() == 1) || (force))
+            {
+                i->second.mResources.erase(current);
+                released = true;
+            }
+        }
+        if (released)
+            updateResourceGroup(i->first);
+    }
 }
 
 bool ResourceCache::reloadResource(Resource* resource)

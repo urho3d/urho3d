@@ -113,20 +113,24 @@ bool systemOpenFile(const std::string& fileName, const std::string& mode = std::
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed
 bool checkDirectoryAccess(const std::string& pathName);
-//! Split a full path to path, filename and extension. Optionally convert the extension to lowercase
-void splitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension, bool lowerCaseExtension = true);
+//! Split a full path to path, filename and extension. The extension will be converted to lowercase
+void splitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension);
 //! Return the path from a full path
 std::string getPath(const std::string& fullPath);
 //! Return the filename from a full path
 std::string getFileName(const std::string& fullPath);
-//! Return the extension from a full path and optionally convert to lowercase
-std::string getExtension(const std::string& fullPath, bool lowerCaseExtension = true);
-//! Return the filename and extension from a full path. Optionally convert the extension to lowercase
-std::string getFileNameAndExtension(const std::string& fullPath, bool lowerCaseExtension = true);
+//! Return the extension from a full path, converted to lowercase
+std::string getExtension(const std::string& fullPath);
+//! Return the filename and extension from a full path. The extension will be converted to lowercase
+std::string getFileNameAndExtension(const std::string& fullPath);
 //! Fix a path so that it contains a slash in the end, and convert backslashes to slashes
 std::string fixPath(const std::string& pathName);
 //! Remove the slash or backslash from the end of a path if exists
 std::string unfixPath(const std::string& pathName);
+//! Return the parent path, or the path itself if not available
+std::string getParentPath(const std::string& pathName);
+//! Return the absolute filename using the current working directory
+std::string getAbsoluteFileName(const std::string& fileName);
 //! Convert a path to the format required by the operating system
 std::string getOSPath(const std::string& pathName, bool forNativeApi = false);
 

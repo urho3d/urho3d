@@ -30,6 +30,8 @@ class DropDownList : public Menu
 {
     DEFINE_TYPE(DropDownList)
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     DropDownList(const std::string& name = std::string());

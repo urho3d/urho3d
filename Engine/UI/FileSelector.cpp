@@ -131,61 +131,35 @@ void FileSelector::setStyle(XMLFile* style)
     ResourceCache* cache = mUI->getResourceCache();
     
     mWindow->setStyleAuto(style, cache);
-    XMLElement windowElem = UIElement::getStyleElement(style, "FileSelector");
-    if (windowElem)
-        mWindow->setStyle(windowElem, cache);
+    mWindow->setStyle(style, "FileSelector", cache);
     
-    XMLElement titleElem = UIElement::getStyleElement(style, "FileSelectorTitleText");
-    if (titleElem)
-        mTitleText->setStyle(titleElem, cache);
+    mTitleText->setStyle(style, "FileSelectorTitleText", cache);
     
-    XMLElement textElem = UIElement::getStyleElement(style, "FileSelectorButtonText");
-    if (textElem)
-    {
-        mOKButtonText->setStyle(textElem, cache);
-        mCancelButtonText->setStyle(textElem, cache);
-    }
+    mOKButtonText->setStyle(style, "FileSelectorButtonText", cache);
+    mCancelButtonText->setStyle(style, "FileSelectorButtonText", cache);
     
-    XMLElement layoutElem = UIElement::getStyleElement(style, "FileSelectorLayout");
-    if (layoutElem)
-    {
-        mFileNameLayout->setStyle(layoutElem, cache);
-        mButtonLayout->setStyle(layoutElem, cache);
-    }
+    mFileNameLayout->setStyle(style, "FileSelectorLayout", cache);
+    mButtonLayout->setStyle(style, "FileSelectorLayout", cache);
     
     mFileList->setStyleAuto(style, cache);
     mFileNameEdit->setStyleAuto(style, cache);
     mPathEdit->setStyleAuto(style, cache);
     
     mFilterList->setStyleAuto(style, cache);
-    XMLElement dropDownElem = UIElement::getStyleElement(style, "FileSelectorFilterList");
-    if (dropDownElem)
-        mFilterList->setStyle(dropDownElem, cache);
+    mFilterList->setStyle(style, "FileSelectorFilterList", cache);
     
     mOKButton->setStyleAuto(style, cache);
     mCancelButton->setStyleAuto(style, cache);
-    XMLElement buttonElem = UIElement::getStyleElement(style, "FileSelectorButton");
-    if (buttonElem)
-    {
-        mOKButton->setStyle(buttonElem, cache);
-        mCancelButton->setStyle(buttonElem, cache);
-    }
+    mOKButton->setStyle(style, "FileSelectorButton", cache);
+    mCancelButton->setStyle(style, "FileSelectorButton", cache);
     
-    textElem = UIElement::getStyleElement(style, "FileSelectorFilterText");
-    if (textElem)
-    {
-        std::vector<UIElement*> listTexts = mFilterList->getListView()->getContentElement()->getChildren();
-        for (unsigned i = 0; i < listTexts.size(); ++i)
-            listTexts[i]->setStyle(textElem, cache);
-    }
+    std::vector<UIElement*> filterTexts = mFilterList->getListView()->getContentElement()->getChildren();
+    for (unsigned i = 0; i < filterTexts.size(); ++i)
+        filterTexts[i]->setStyle(style, "FileSelectorFilterText", cache);
     
-    textElem = UIElement::getStyleElement(style, "FileSelectorListText");
-    if (textElem)
-    {
-        std::vector<UIElement*> listTexts = mFileList->getContentElement()->getChildren();
-        for (unsigned i = 0; i < listTexts.size(); ++i)
-            listTexts[i]->setStyle(textElem, cache);
-    }
+    std::vector<UIElement*> listTexts = mFileList->getContentElement()->getChildren();
+    for (unsigned i = 0; i < listTexts.size(); ++i)
+        listTexts[i]->setStyle(style, "FileSelectorListText", cache);
     
     updateElements();
 }
@@ -242,9 +216,7 @@ void FileSelector::setFilters(const std::vector<std::string>& filters, unsigned 
     {
         Text* filterText = new Text();
         filterText->setText(mFilters[i]);
-        XMLElement textElem = UIElement::getStyleElement(mStyle, "FileSelectorFilterText");
-        if (textElem)
-            filterText->setStyle(textElem, mUI->getResourceCache());
+        filterText->setStyle(mStyle, "FileSelectorFilterText", mUI->getResourceCache());
         mFilterList->addItem(filterText);
     }
     mFilterList->setSelection(defaultIndex);
@@ -330,9 +302,7 @@ void FileSelector::refreshFiles()
         
         Text* entryText = new Text();
         entryText->setText(displayName);
-        XMLElement textElem = UIElement::getStyleElement(mStyle, "FileSelectorListText");
-        if (textElem)
-            entryText->setStyle(textElem, mUI->getResourceCache());
+        entryText->setStyle(mStyle, "FileSelectorListText", mUI->getResourceCache());
         mFileList->addItem(entryText);
     }
     listContent->enableLayoutUpdate();
@@ -359,9 +329,8 @@ bool FileSelector::enterFile()
             setPath(mPath + newPath);
         else if (newPath == "..")
         {
-            unsigned pos = unfixPath(mPath).rfind('/');
-            if (pos != std::string::npos)
-                setPath(mPath.substr(0, pos));
+            std::string parentPath = getParentPath(mPath);
+            setPath(parentPath);
         }
     }
     else

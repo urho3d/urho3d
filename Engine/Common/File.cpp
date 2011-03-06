@@ -316,18 +316,18 @@ bool checkDirectoryAccess(const std::string& pathName)
     return false;
 }
 
-void splitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension, bool lowerCaseExtension)
+void splitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension)
 {
     std::string fullPathCopy = replace(fullPath, '\\', '/');
     
     size_t extPos = fullPathCopy.rfind('.');
     if (extPos != std::string::npos)
     {
-        extension = fullPathCopy.substr(extPos);
+        extension = toLower(fullPathCopy.substr(extPos));
         fullPathCopy = fullPathCopy.substr(0, extPos);
     }
     else
-        extension = "";
+        extension.clear();
     
     size_t pathPos = fullPathCopy.rfind('/');
     if (pathPos != std::string::npos)
@@ -338,11 +338,8 @@ void splitPath(const std::string& fullPath, std::string& pathName, std::string& 
     else
     {
         fileName = fullPathCopy;
-        pathName = "";
+        pathName.clear();
     }
-    
-    if (lowerCaseExtension)
-        extension = toLower(extension);
 }
 
 std::string getPath(const std::string& fullPath)
@@ -359,17 +356,17 @@ std::string getFileName(const std::string& fullPath)
     return file;
 }
 
-std::string getExtension(const std::string& fullPath, bool lowerCaseExtension)
+std::string getExtension(const std::string& fullPath)
 {
     std::string path, file, extension;
-    splitPath(fullPath, path, file, extension, lowerCaseExtension);
+    splitPath(fullPath, path, file, extension);
     return extension;
 }
 
-std::string getFileNameAndExtension(const std::string& fileName, bool lowerCaseExtension)
+std::string getFileNameAndExtension(const std::string& fileName)
 {
     std::string path, file, extension;
-    splitPath(fileName, path, file, extension, lowerCaseExtension);
+    splitPath(fileName, path, file, extension);
     return file + extension;
 }
 
@@ -398,6 +395,49 @@ std::string unfixPath(const std::string& path)
     }
     
     return path;
+}
+
+std::string getParentPath(const std::string& path)
+{
+    unsigned pos = unfixPath(path).rfind('/');
+    if (pos != std::string::npos)
+        return path.substr(0, pos);
+    else
+        return path;
+}
+
+std::string getAbsoluteFileName(const std::string& fileName)
+{
+    //! \todo Though this routine does not use Win32 API calls, it assumes Win32 filename structure
+    if (fileName.empty())
+        return fileName;
+    
+    std::string fixedPath = replace(fileName, '\\', '/');
+    // Check for a network path or a drive letter, in this case we do not have to do anything
+    if (fixedPath.length() >= 2)
+    {
+        if ((fixedPath[1] == ':') || (fixedPath.substr(0, 2) == "//"))
+            return fixedPath;
+        // Remove redundant ./ if exists
+        if (fixedPath.substr(0, 2) == "./")
+            fixedPath = fixedPath.substr(2);
+    }
+    
+    std::string workingDir = getCurrentDirectory();
+    
+    // If path is absolute in relation to current drive letter, just add it
+    if (fixedPath[0] == '/')
+        return workingDir.substr(0, 2) + fixedPath;
+    
+    // Navigate any ../ in the filename
+    //! \todo Only supported in the beginning
+    while ((fixedPath.length() >= 3) && (fixedPath.substr(0,3) == "../"))
+    {
+        fixedPath = fixedPath.substr(3);
+        workingDir = getParentPath(workingDir);
+    }
+    
+    return workingDir + fixedPath;
 }
 
 std::string getOSPath(const std::string& pathName, bool forNativeApi)

@@ -62,6 +62,9 @@ Text::~Text()
 
 void Text::setStyle(const XMLElement& element, ResourceCache* cache)
 {
+    if (!cache)
+        return;
+    
     UIElement::setStyle(element, cache);
     
     // Recalculating the text is expensive, so do it only once at the end if something changed
@@ -70,14 +73,29 @@ void Text::setStyle(const XMLElement& element, ResourceCache* cache)
     if (element.hasChildElement("font"))
     {
         XMLElement fontElem = element.getChildElement("font");
-        Font* font = cache->getResource<Font>(fontElem.getString("name"));
-        if (!font)
-            LOGERROR("Null font for Text");
-        else
+        std::string fontName = fontElem.getString("name");
+        
+        if (cache->exists(fontName))
         {
-            mFont = font;
-            mFontSize = max(fontElem.getInt("size"), 1);
-            changed = true;
+            Font* font = cache->getResource<Font>(fontName);
+            if (font)
+            {
+                mFont = font;
+                mFontSize = max(fontElem.getInt("size"), 1);
+                changed = true;
+            }
+        }
+        else if (element.hasChildElement("fallbackfont"))
+        {
+            fontElem = element.getChildElement("fallbackfont");
+            std::string fontName = fontElem.getString("name");
+            Font* font = cache->getResource<Font>(fontName);
+            if (font)
+            {
+                mFont = font;
+                mFontSize = max(fontElem.getInt("size"), 1);
+                changed = true;
+            }
         }
     }
     if (element.hasChildElement("text"))

@@ -30,9 +30,11 @@
 #include "Texture2D.h"
 
 #include <stb_truetype.h>
-#include <windows.h>
 
 #include "DebugNew.h"
+
+static const float DEFAULT_DPI = 96.0f;
+static const float DEFAULT_PPI = 72.0f;
 
 Font::Font(Renderer* renderer, const std::string& name) :
     Resource(name),
@@ -97,12 +99,10 @@ const FontFace* Font::getFace(int pointSize)
             glyphUsed[newFace.mGlyphIndex[i]] = true;
         }
         
-        // Get row height
+        // Get row height at 96 DPI
         int ascent, descent, lineGap;
         stbtt_GetFontVMetrics(&fontInfo, &ascent, &descent, &lineGap);
-        
-        // Calculate scale (use ascent only)
-        float scale = (float)pointSize / ascent;
+        float scale = (float)pointSize * (DEFAULT_DPI / DEFAULT_PPI) / (ascent - descent);
         
         // Go through glyphs to get their dimensions & offsets
         for (int i = 0; i < fontInfo.numGlyphs; ++i)
@@ -134,16 +134,35 @@ const FontFace* Font::getFace(int pointSize)
             newFace.mGlyphs.push_back(newGlyph);
         }
         
-        // Adjust the Y-offset so that the fonts are top-aligned
+        // Adjust the Y-offset so that the glyphs are top-aligned
         int scaledAscent = (int)(scale * ascent);
+        int minY = M_MAX_INT;
+        int maxY = 0;
+        
         for (int i = 0; i < fontInfo.numGlyphs; ++i)
         {
             if (glyphUsed[i])
+            {
                 newFace.mGlyphs[i].mOffsetY += scaledAscent;
+                minY = min(minY, newFace.mGlyphs[i].mOffsetY);
+                maxY = max(maxY, newFace.mGlyphs[i].mOffsetY + newFace.mGlyphs[i].mHeight);
+            }
         }
         
         // Calculate row advance
         newFace.mRowHeight = (int)(scale * (ascent - descent + lineGap));
+        
+        // If font is not yet top-aligned, center it vertically if there is room
+        if (minY > 0)
+        {
+            int actualHeight = maxY - minY;
+            int adjust = max((newFace.mRowHeight - actualHeight) / 2, 0);
+            for (int i = 0; i < fontInfo.numGlyphs; ++i)
+            {
+                if (glyphUsed[i])
+                    newFace.mGlyphs[i].mOffsetY -= adjust;
+            }
+        }
         
         // Now try to pack into the smallest possible texture
         int texWidth = FONT_TEXTURE_MIN_SIZE;

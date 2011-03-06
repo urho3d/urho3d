@@ -106,6 +106,8 @@ private:
     void mouseWheelChange(int delta);
     //! Check for mouse move and send event if moved
     void checkMouseMove();
+    //! Internal function to show/hide the operating system mouse cursor
+    void setCursorVisible(bool enable);
     
     //! Renderer subsystem
     SharedPtr<Renderer> mRenderer;
@@ -125,6 +127,8 @@ private:
     int mMouseMoveWheel;
     //! Mouse cursor confine flag
     bool mClipCursor;
+    //! Mouse cursor show/hide flag
+    bool mShowCursor;
     //! Fullscreen toggle flag
     bool mToggleFullscreen;
     //! Active flag

@@ -61,6 +61,9 @@ Cursor::~Cursor()
 
 void Cursor::setStyle(const XMLElement& element, ResourceCache* cache)
 {
+    if (!cache)
+        return;
+    
     UIElement::setStyle(element, cache);
     
     XMLElement shapeElem = element.getChildElement("shape");

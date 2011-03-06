@@ -308,8 +308,6 @@
         <imagerect value="48 0 64 16" />
         <border value="3 3 3 3" />
         <resizeborder value="8 8 8 8" />
-        <movable enable="true" />
-        <resizable enable="true" />
     </element>
     <element type="Text">
         <font name="Cour.ttf" size="12" />
@@ -371,6 +369,15 @@
         <selectioncolor value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
-        <font name="Cour.ttf" size="15" />
+        <font name="Cour.ttf" size="14" />
+    </element>
+    <element type="EditorMenuBar">
+        <texture name="Textures/UI.png" />
+        <imagerect value="96 0 112 16" />
+        <border value="2 2 2 2" />
+    </element>
+    <element type="EditorMenuText">
+        <font name="segoeui.ttf" size="15" />
+        <fallbackfont name="courier.ttf" size="12" />
     </element>
 </elements>

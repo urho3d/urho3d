@@ -544,6 +544,7 @@ void registerArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("array<T>", "void remove(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void push(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "uint length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "uint size() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("array<T>");

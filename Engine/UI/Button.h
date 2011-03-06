@@ -31,6 +31,8 @@ class Button : public BorderImage
 {
     DEFINE_TYPE(Button);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     Button(const std::string& name = std::string());

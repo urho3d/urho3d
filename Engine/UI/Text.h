@@ -35,6 +35,8 @@ class Text : public UIElement
 {
     DEFINE_TYPE(Text);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name and initial text
     Text(const std::string& name = std::string(), const std::string& text = std::string());

@@ -33,6 +33,8 @@ class LineEdit : public BorderImage
 {
     DEFINE_TYPE(LineEdit);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name and initial text
     LineEdit(const std::string& name = std::string(), const std::string& text = std::string());

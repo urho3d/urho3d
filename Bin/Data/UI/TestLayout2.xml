@@ -1,6 +1,7 @@
 <element type="Window">
     <position value="50 50" />
     <size value="400 300" />
+    <movable enable="true" />
     <resizable enable="true" />
     <layout mode="vertical" border="4 4 4 4" spacing="2" />
     <clipborder value="4 4 4 4" />
@@ -8,7 +9,7 @@
         <clipchildren enable="true" />
         <layout mode="vertical" />
         <element type="Text">
-            <font name="courier.ttf" size="15" />
+            <font name="courier.ttf" size="12" />
             <text value="At some point the fire had started.\n  There was total chaos. The locks of the wooden barracks had been blown apart by gunfire from shotguns and assault rifles, and the trainees were pouring out in confusion. But the primary target still lay ahead.\n  The administrative building. Where the identities and evaluations of the trainees were stored.\n  That was first class knowledge. If the Agents could bring that knowledge to the public, and cross-reference the records - mostly boys of young age - with lists of known missing persons, then they could prove the existence of SCEPTRE." />
             <wordwrap enable="true" />
         </element>
@@ -18,7 +19,6 @@
         <alignment horizontal="center" />
         <element type="Text">
             <text value="TEST" />
-            <font name="cour.ttf" size="12" />
             <alignment horizontal="center" vertical="center" />
         </element>
     </element>

@@ -31,6 +31,9 @@ class Menu : public Button
 {
     DEFINE_TYPE(Menu);
     
+    using UIElement::setStyle;
+    
+public:
     //! Construct with name
     Menu(const std::string& name = std::string());
     //! Destruct

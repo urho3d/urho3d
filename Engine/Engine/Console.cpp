@@ -100,18 +100,13 @@ void Console::setStyle(XMLFile* style)
     
     mStyle = style;
     ResourceCache* cache = mEngine->getResourceCache();
-    XMLElement backgroundElem = UIElement::getStyleElement(style, "ConsoleBackground");
-    if (backgroundElem)
-        mBackground->setStyle(backgroundElem, cache);
-    XMLElement textElem = UIElement::getStyleElement(style, "ConsoleText");
-    if (textElem)
-    {
-        for (unsigned i = 0; i < mRows.size(); ++i)
-            mRows[i]->setStyle(textElem, cache);
-    }
-    XMLElement lineEditElem = UIElement::getStyleElement(style, "ConsoleLineEdit");
-    if (lineEditElem)
-        mLineEdit->setStyle(lineEditElem, cache);
+    
+    mBackground->setStyle(style, "ConsoleBackground", cache);
+    
+    for (unsigned i = 0; i < mRows.size(); ++i)
+        mRows[i]->setStyle(style, "ConsoleText", cache);
+    
+    mLineEdit->setStyle(style, "ConsoleLineEdit", cache);
     
     updateElements();
 }
@@ -146,9 +141,7 @@ void Console::setNumRows(unsigned rows)
         if (!mRows[i])
         {
             mRows[i] = new Text();
-            XMLElement textElem = UIElement::getStyleElement(mStyle, "ConsoleText");
-            if (textElem)
-                mRows[i]->setStyle(textElem, mEngine->getResourceCache());
+            mRows[i]->setStyle(mStyle, "ConsoleText", mEngine->getResourceCache());
         }
         mRowContainer->addChild(mRows[i]);
     }
@@ -204,7 +197,7 @@ void Console::handleTextFinished(StringHash eventType, VariantMap& eventData)
             mHistory.erase(mHistory.begin());
         mHistoryPosition = mHistory.size();
         
-        mCurrentRow = std::string();
+        mCurrentRow.clear();
         mLineEdit->setText(mCurrentRow);
     }
 }

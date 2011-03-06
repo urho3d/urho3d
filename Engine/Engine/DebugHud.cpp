@@ -202,13 +202,9 @@ void DebugHud::setStyle(XMLFile* style)
     
     mStyle = style;
     ResourceCache* cache = mEngine->getResourceCache();
-    XMLElement textElem = UIElement::getStyleElement(style, "DebugHudText");
-    if (textElem)
-    {
-        mStatsText->setStyle(textElem, cache);
-        mModeText->setStyle(textElem, cache);
-        mProfilerText->setStyle(textElem, cache);
-    }
+    mStatsText->setStyle(style, "DebugHudText", cache);
+    mModeText->setStyle(style, "DebugHudText", cache);
+    mProfilerText->setStyle(style, "DebugHudText", cache);
 }
 
 void DebugHud::setMode(unsigned mode)

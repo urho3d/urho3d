@@ -34,6 +34,8 @@ class ScrollBar : public UIElement
 {
     DEFINE_TYPE(ScrollBar);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     ScrollBar(const std::string& name = std::string());

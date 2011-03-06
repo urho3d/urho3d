@@ -487,8 +487,12 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         }
         else
         {
-            // When in non-confined mode, move cursor always to ensure accurate position, and do not clamp
-            mCursor->setPosition(eventData[P_X].getInt(), eventData[P_Y].getInt());
+            // When in non-confined mode, move cursor always to ensure accurate position
+            // Do not clamp, but hide the cursor when not in the window's client area
+            int x = eventData[P_X].getInt();
+            int y = eventData[P_Y].getInt();
+            mCursor->setPosition(x, y);
+            mCursor->setVisible((x >= 0) && (y >= 0) && (x < mRenderer->getWidth()) && (y < mRenderer->getHeight()));
         }
         
         if ((mMouseDragElement) && (mMouseButtons))

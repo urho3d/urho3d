@@ -31,6 +31,8 @@ class Slider : public BorderImage
 {
     DEFINE_TYPE(Slider);
     
+    using UIElement::setStyle;
+    
 public:
     //! Construct with name
     Slider(const std::string& name = std::string());

@@ -1,6 +1,7 @@
 <element type="Window">
     <position value="50 50" />
     <size value="400 300" />
+    <movable enable="true" />
     <resizable enable="true" />
     <layout mode="vertical" border="8 8 8 8" spacing="8" />
     <clipborder value="8 8 8 8" />
@@ -10,7 +11,6 @@
         <element type="Button">
             <element type="Text">
                 <text value="TEST1" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -18,14 +18,12 @@
             <visible enable="false" />
             <element type="Text">
                 <text value="TEST2" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST3" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -35,14 +33,13 @@
     	<element type="Text" name="ScrollViewText">
 	        <position value="1 0" />
 	        <fixedwidth value="400" />
-	        <font name="times.ttf" size="15" />
+	        <font name="times.ttf" size="12" />
             <text value="At some point the fire had started.\n  There was total chaos. The locks of the wooden barracks had been blown apart by gunfire from shotguns and assault rifles, and the trainees were pouring out in confusion. But the primary target still lay ahead.\n  The administrative building. Where the identities and evaluations of the trainees were stored.\n  That was first class knowledge. If the Agents could bring that knowledge to the public, and cross-reference the records - mostly boys of young age - with lists of known missing persons, then they could prove the existence of SCEPTRE." />
 	        <wordwrap enable="true" />
 	    </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST4" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -52,7 +49,6 @@
         <element type="Button">
             <element type="Text">
                 <text value="TEST5" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
@@ -62,21 +58,18 @@
         <element type="Button">
             <element type="Text">
                 <text value="TEST6" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST7" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
         <element type="Button">
             <element type="Text">
                 <text value="TEST8" />
-                <font name="cour.ttf" size="12" />
                 <alignment horizontal="center" vertical="center" />
             </element>
         </element>
