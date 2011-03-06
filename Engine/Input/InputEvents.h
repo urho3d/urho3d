@@ -26,6 +26,16 @@
 
 #include "Event.h"
 
+//! Application activated
+DEFINE_EVENT(EVENT_ACTIVATED, Activated)
+{
+}
+
+//! Application inactivated
+DEFINE_EVENT(EVENT_INACTIVATED, Inactivated)
+{
+}
+
 //! Mouse button pressed
 DEFINE_EVENT(EVENT_MOUSEBUTTONDOWN, MouseButtonDown)
 {

@@ -147,8 +147,6 @@ void Input::setClipCursor(bool enable)
         
         ClipCursor(0);
     }
-    
-    mMouseMove = IntVector2::sZero;
 }
 
 void Input::setToggleFullscreen(bool enable)
@@ -354,6 +352,26 @@ void Input::handleWindowMessage(StringHash eventType, VariantMap& eventData)
         eventData[P_HANDLED] = true;
         break;
     }
+    
+    // If we are going to activate, in non-confined mode, make sure the rest of the application has accurate mouse position,
+    // by sending an extra mousemove event
+    if ((!mClipCursor) && (mActivated) && (!mActive))
+    {
+        mMouseMove = IntVector2::sZero;
+        IntVector2 mousePos = getMousePosition();
+        
+        using namespace MouseMove;
+        
+        VariantMap eventData;
+        eventData[P_X] = mMouseMove.mX;
+        eventData[P_Y] = mMouseMove.mY;
+        eventData[P_POSX] = mousePos.mX;
+        eventData[P_POSY] = mousePos.mY;
+        eventData[P_BUTTONS] = mMouseButtonDown;
+        eventData[P_QUALIFIERS] = getQualifiers();
+        eventData[P_CLIPCURSOR] = mClipCursor;
+        sendEvent(EVENT_MOUSEMOVE, eventData);
+    }
 }
 
 void Input::makeActive()
@@ -374,6 +392,8 @@ void Input::makeActive()
     
     // Re-establish mouse cursor clipping if necessary
     setClipCursor(mClipCursor);
+    
+    sendEvent(EVENT_ACTIVATED);
 }
 
 void Input::makeInactive()
@@ -396,6 +416,8 @@ void Input::makeInactive()
     
     mActive = false;
     mActivated = false;
+    
+    sendEvent(EVENT_INACTIVATED);
 }
 
 void Input::clearState()

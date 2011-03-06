@@ -187,7 +187,7 @@ void UI::update(float timeStep)
                 sendEvent(EVENT_UIDRAGDROPTEST, eventData);
                 accept = eventData[P_ACCEPT].getBool();
             }
-                
+            
             mCursor->setShape(accept ? CS_ACCEPTDROP : CS_REJECTDROP);
         }
         else if (dragSource)
