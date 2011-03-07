@@ -1,0 +1,64 @@
+<element type="Window" name="CameraDialog">
+    <fixedsize value="250 150" />
+    <movable enable="true" />
+    <resizeborder value="6 6 6 6" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element type="Text">
+        <fixedheight value="20" />
+        <text value="Editor camera settings" />
+    </element>
+    <element type="Element" />
+    <element type="Element">
+        <fixedheight value="20" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Text">
+            <text value="Near clip distance" />
+        </element>
+        <element type="LineEdit" name="NearClipEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element type="Element">
+        <fixedheight value="20" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Text">
+            <text value="Far clip distance" />
+        </element>
+       <element type="LineEdit" name="FarClipEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element type="Element">
+        <fixedheight value="20" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Text">
+            <text value="Field of view" />
+        </element>
+       <element type="LineEdit" name="FOVEdit">
+            <fixedwidth value="80" />
+       </element>
+    </element>
+    <element type="Element">
+        <fixedheight value="20" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Text">
+            <text value="Movement speed" />
+        </element>
+       <element type="LineEdit" name="SpeedEdit">
+            <fixedwidth value="80" />
+       </element>
+    </element>
+    <element type="Element" />
+    <element type="Element">
+        <layout mode="horizontal" spacing="4" />
+        <element type="Element" />
+        <element type="Button" name="CloseButton">
+            <fixedsize value="80 22" />
+            <element type="Text">
+                <text value="Close" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Element" />
+    </element>
+</element>
