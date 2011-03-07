@@ -7,7 +7,7 @@ XMLFile@ uiStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
-array<string> uiSceneFilters = {"*.xml", "*.scn", "*.*"};
+array<string> uiSceneFilters = {"*.xml", "*.bin", "*.sav", "*.*"};
 uint uiSceneFilter = 0;
 
 void createUI()
@@ -39,11 +39,11 @@ void createMenuBar(XMLFile@ uiStyle)
     {
         Menu@ fileMenu = createMenu(uiStyle, "File");
         Window@ filePopup = fileMenu.getPopup();
-        filePopup.addChild(createMenuItem(uiStyle, "Load scene"));
-        filePopup.addChild(createMenuItem(uiStyle, "Save scene"));
-        filePopup.addChild(createMenuItem(uiStyle, "Save scene as"));
+        filePopup.addChild(createMenuItem(uiStyle, "Open scene", 'O', QUAL_CTRL));
+        filePopup.addChild(createMenuItem(uiStyle, "Save scene", 'S', QUAL_CTRL));
+        filePopup.addChild(createMenuItem(uiStyle, "Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.addChild(createMenuSpacer(uiStyle));
-        filePopup.addChild(createMenuItem(uiStyle, "Exit"));
+        filePopup.addChild(createMenuItem(uiStyle, "Exit", 'X', QUAL_CTRL));
         uiMenuBar.addChild(fileMenu);
     }
 
@@ -53,11 +53,13 @@ void createMenuBar(XMLFile@ uiStyle)
     resizeUI();
 }
 
-Menu@ createMenuItem(XMLFile@ uiStyle, string title)
+Menu@ createMenuItem(XMLFile@ uiStyle, string title, int accelKey, int accelQual)
 {
     Menu@ menu = Menu(title);
     menu.setStyleAuto(uiStyle);
     menu.setLayout(LM_HORIZONTAL, 0, IntRect(uiSpacing, 0, uiSpacing, 0));
+    if (accelKey != 0)
+        menu.setAccelerator(accelKey, accelQual);
 
     Text@ menuText = Text(title + "_Text");
     menuText.setStyle(uiStyle, "EditorMenuText");
@@ -92,7 +94,7 @@ Window@ createPopup(XMLFile@ uiStyle, Menu@ baseMenu)
 
 Menu@ createMenu(XMLFile@ uiStyle, string title)
 {
-    Menu@ menu = createMenuItem(uiStyle, title);
+    Menu@ menu = createMenuItem(uiStyle, title, 0, 0);
     menu.setFixedWidth(menu.getWidth());
     createPopup(uiStyle, menu);
 
@@ -126,16 +128,42 @@ void resizeUI()
     uiMenuBar.setFixedWidth(renderer.getWidth());
 }
 
+void updateWindowTitle()
+{
+    string sceneName = sceneFileName.empty() ? "Untitled" : getFileNameAndExtension(sceneFileName);
+    if (sceneUnsaved)
+        sceneName += "*";
+    renderer.setWindowTitle("Urho3D editor - " + sceneName);
+}
+
 void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 {
     Menu@ menu = eventData["Element"].getUIElement();
     if (menu is null)
         return;
 
-    if ((menu.getName() == "Load scene") && (uiFileSelector is null))
+    string action = menu.getName();
+
+    if (uiFileSelector is null)
     {
-        createFileSelector("Load scene", "Load", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
-        subscribeToEvent(uiFileSelector, "FileSelected", "handleLoadSceneFile");
+        if (action == "Open scene")
+        {
+            createFileSelector("Open scene", "Open", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleOpenSceneFile");
+        }
+
+        if (action == "Save scene")
+        {
+            saveScene(sceneFileName);
+            ui.setFocusElement(null); // Close the menu
+        }
+
+        if (action == "Save scene as")
+        {
+            createFileSelector("Save scene as", "Save", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
+            uiFileSelector.setFileName(getFileNameAndExtension(sceneFileName));
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
+        }
     }
 
     if (menu.getName() == "Exit")
@@ -147,7 +175,7 @@ void handleScreenMode(StringHash eventType, VariantMap& eventData)
     resizeUI();
 }
 
-void handleLoadSceneFile(StringHash eventType, VariantMap& eventData)
+void handleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 {
     // Save filter for next time
     uiSceneFilter = uiFileSelector.getFilterIndex();
@@ -159,4 +187,18 @@ void handleLoadSceneFile(StringHash eventType, VariantMap& eventData)
 
     string fileName = eventData["FileName"].getString();
     loadScene(fileName);
+}
+
+void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
+{
+    // Save filter for next time
+    uiSceneFilter = uiFileSelector.getFilterIndex();
+    closeFileSelector();
+
+    // Check for cancel
+    if (!eventData["OK"].getBool())
+        return;
+
+    string fileName = eventData["FileName"].getString();
+    saveScene(fileName);
 }

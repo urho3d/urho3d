@@ -5,7 +5,6 @@ Camera@ camera;
 float cameraBaseSpeed = 10.0;
 float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5.0;
-float cameraCtrlSpeedMultiplier = 0.1;
 float cameraYaw = 0.0;
 float cameraPitch = 0.0;
 
@@ -19,13 +18,11 @@ void createCamera()
 
 void moveCamera(float timeStep)
 {
-    if (ui.getFocusElement() is null)
+    if ((ui.getFocusElement() is null) && (!input.getKeyDown(KEY_CTRL)))
     {
         float speedMultiplier = 1.0f;
         if (input.getKeyDown(KEY_SHIFT))
             speedMultiplier = cameraShiftSpeedMultiplier;
-        if (input.getKeyDown(KEY_CTRL))
-            speedMultiplier = cameraCtrlSpeedMultiplier;
 
         if ((input.getKeyDown('W')) || (input.getKeyDown(KEY_UP)))
             camera.translateRelative(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);

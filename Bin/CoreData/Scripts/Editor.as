@@ -21,6 +21,7 @@ void start()
     createScene();
     createCamera();
     createUI();
+    updateWindowTitle();
     parseArguments();
 }
 

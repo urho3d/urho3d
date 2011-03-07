@@ -439,10 +439,14 @@ void Input::keyChange(int key, bool newState)
     if ((key < 0) || (key >= MAX_KEYS))
         return;
     
+    bool repeat = false;
+    
     if (newState)
     {
         if (!mKeyDown[key])
             mKeyPress[key] = true;
+        else
+            repeat = true;
     }
     else
     {
@@ -458,6 +462,8 @@ void Input::keyChange(int key, bool newState)
     eventData[P_KEY] = key;
     eventData[P_BUTTONS] = mMouseButtonDown;
     eventData[P_QUALIFIERS] = getQualifiers();
+    if (newState)
+        eventData[P_REPEAT] = repeat;
     sendEvent(newState ? EVENT_KEYDOWN : EVENT_KEYUP, eventData);
 }
 

@@ -122,7 +122,10 @@ FileSelector::FileSelector(UI* ui) :
 
 FileSelector::~FileSelector()
 {
-    mUI->getRootElement()->removeChild(mWindow);
+    UIElement* root = mUI->getRootElement();
+    //! \todo This should not be necessary
+    root->removeChild(mFilterList->getPopup());
+    root->removeChild(mWindow);
 }
 
 void FileSelector::setStyle(XMLFile* style)

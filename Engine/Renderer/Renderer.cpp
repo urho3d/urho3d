@@ -69,7 +69,7 @@ static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 Renderer::Renderer(const std::string& windowTitle) :
     mImpl(new RendererImpl()),
-    mTitle(windowTitle),
+    mWindowTitle(windowTitle),
     mMode(RENDER_FORWARD),
     mWidth(0),
     mHeight(0),
@@ -161,6 +161,13 @@ void Renderer::messagePump()
         if (msg.message == WM_QUIT)
             mClosed = true;
     }
+}
+
+void Renderer::setWindowTitle(const std::string& windowTitle)
+{
+    mWindowTitle = windowTitle;
+    if (mImpl->mWindow)
+        SetWindowText(mImpl->mWindow, mWindowTitle.c_str());
 }
 
 void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
@@ -1892,7 +1899,7 @@ void Renderer::createWindow(int width, int height)
     
     RECT rect = {0, 0, width, height};
     AdjustWindowRect(&rect, windowStyle, false);
-    mImpl->mWindow = CreateWindow("D3DWindow", mTitle.c_str(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, 
+    mImpl->mWindow = CreateWindow("D3DWindow", mWindowTitle.c_str(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, 
         rect.right, rect.bottom, 0, 0, mImpl->mInstance, 0); 
     
     if (!mImpl->mWindow)

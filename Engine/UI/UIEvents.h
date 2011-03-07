@@ -37,6 +37,12 @@ DEFINE_EVENT(EVENT_UIMOUSECLICK, UIMouseClick)
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
+//! Focus element changed
+DEFINE_EVENT(EVENT_FOCUSCHANGED, FocusChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
+
 //! Drag and drop test
 DEFINE_EVENT(EVENT_UIDRAGDROPTEST, UIDragDropTest)
 {

@@ -3,6 +3,7 @@
 Scene@ editorScene;
 string sceneFileName;
 string sceneResourcePath;
+bool sceneUnsaved = false;
 
 void createScene()
 {
@@ -41,10 +42,30 @@ void loadScene(string fileName)
     setResourcePath(getPath(fileName));
 
     File file(fileName, FILE_READ);
-    if (getExtension(fileName) == ".xml")
-        editorScene.loadXML(file);
-    else
+    string extension = getExtension(fileName);
+    if ((extension == ".bin") || (extension == ".sav"))
         editorScene.load(file);
+    else
+        editorScene.loadXML(file);
         
     sceneFileName = fileName;
+    sceneUnsaved = false;
+    updateWindowTitle();
+}
+
+void saveScene(string fileName)
+{
+    if ((fileName.empty()) || (getFileName(fileName).empty()))
+        return;
+
+    File file(fileName, FILE_WRITE);
+    string extension = getExtension(fileName);
+    if ((extension == ".bin") || (extension == ".sav"))
+        editorScene.save(file);
+    else
+        editorScene.saveXML(file);
+
+    sceneFileName = fileName;
+    sceneUnsaved = false;
+    updateWindowTitle();
 }

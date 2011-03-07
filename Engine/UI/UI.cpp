@@ -139,6 +139,12 @@ void UI::setFocusElement(UIElement* element)
     
     if (element)
         element->setFocus(true);
+    
+    using namespace FocusChanged;
+    
+    VariantMap eventData;
+    eventData[P_ELEMENT] = (void*)element;
+    sendEvent(EVENT_FOCUSCHANGED, eventData);
 }
 
 void UI::clear()

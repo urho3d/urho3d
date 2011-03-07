@@ -33,16 +33,18 @@ static const ShortStringHash originHash("origin");
 Menu::Menu(const std::string& name) :
     Button(name),
     mPopupOffset(IntVector2::sZero),
-    mShowPopup(false)
+    mShowPopup(false),
+    mAcceleratorKey(0),
+    mAcceleratorQualifiers(0)
 {
-    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleFocusChange));
-    subscribeToEvent(EVENT_FOCUSED, EVENT_HANDLER(Menu, handleFocusChange));
+    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleFocusChanged));
+    subscribeToEvent(EVENT_FOCUSCHANGED, EVENT_HANDLER(Menu, handleFocusChanged));
 }
 
 Menu::~Menu()
 {
     if (mPopup)
-        mPopup->getUserData()[originHash].clear();
+        showPopup(false);
 }
 
 void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
@@ -116,8 +118,10 @@ void Menu::showPopup(bool enable)
     if (!mPopup)
         return;
     
-    // Find the UI root element for showing the popup
+    // Find the UI root element for showing the popup. If we are already detached, try to find it through the popup
     UIElement* root = getRootElement();
+    if (!root)
+        root = mPopup->getRootElement();
     if (!root)
         return;
     
@@ -145,12 +149,23 @@ void Menu::showPopup(bool enable)
     mSelected = enable;
 }
 
-void Menu::handleFocusChange(StringHash eventType, VariantMap& eventData)
+void Menu::setAccelerator(int key, int qualifiers)
+{
+    mAcceleratorKey = key;
+    mAcceleratorQualifiers = qualifiers;
+    
+    if (key)
+        subscribeToEvent(EVENT_KEYDOWN, EVENT_HANDLER(Menu, handleKeyDown));
+    else
+        unsubscribeFromEvent(EVENT_KEYDOWN);
+}
+
+void Menu::handleFocusChanged(StringHash eventType, VariantMap& eventData)
 {
     if (!mShowPopup)
         return;
     
-    using namespace UIMouseClick;
+    using namespace FocusChanged;
     
     UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
     UIElement* root = getRootElement();
@@ -175,4 +190,17 @@ void Menu::handleFocusChange(StringHash eventType, VariantMap& eventData)
     }
     
     showPopup(false);
+}
+
+void Menu::handleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    if ((!mEnabled) || (!mVisible))
+        return;
+    
+    using namespace KeyDown;
+    
+    // Simulate a click if accelerator key pressed
+    if ((eventData[P_KEY].getInt() == mAcceleratorKey) && (eventData[P_QUALIFIERS].getInt() == mAcceleratorQualifiers) &&
+        (eventData[P_REPEAT].getBool() == false))
+        onClick(getPosition(), getScreenPosition(), eventData[P_BUTTONS].getInt(), eventData[P_QUALIFIERS].getInt(), 0);
 }

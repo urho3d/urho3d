@@ -65,6 +65,8 @@ public:
     
     //! Pump operating system messages
     void messagePump();
+    //! Set window title text
+    void setWindowTitle(const std::string& windowTitle);
     //! Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
     void setMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
     //! Toggle between full screen and windowed mode
@@ -206,7 +208,7 @@ public:
     //! Return renderer implementation, which holds the actual Direct3D resources
     RendererImpl* getImpl() const { return mImpl; }
     //! Return window title
-    const std::string& getWindowTitle() const { return mTitle; }
+    const std::string& getWindowTitle() const { return mWindowTitle; }
     //! Return rendering mode
     RenderMode getRenderMode() const { return mMode; }
     //! Return window width
@@ -358,7 +360,7 @@ private:
     //! Implementation
     RendererImpl* mImpl;
     //! Window title
-    std::string mTitle;
+    std::string mWindowTitle;
     //! Rendering mode
     RenderMode mMode;
     //! Window width

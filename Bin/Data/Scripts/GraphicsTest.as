@@ -267,7 +267,7 @@ void initScene()
     
     // Save the ready scene for examination
     scene.saveXML(File("Data/GraphicsTestScene.xml", FILE_WRITE));
-    scene.save(File("Data/GraphicsTestScene.scn", FILE_WRITE));
+    scene.save(File("Data/GraphicsTestScene.bin", FILE_WRITE));
 }
 
 void animateScene(float timeStep)

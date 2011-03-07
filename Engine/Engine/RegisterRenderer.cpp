@@ -811,6 +811,7 @@ static void registerRenderer(asIScriptEngine* engine)
     engine->RegisterObjectType("Renderer", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Renderer", asBEHAVE_ADDREF, "void f()", asMETHOD(Renderer, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("Renderer", asBEHAVE_RELEASE, "void f()", asMETHOD(Renderer, releaseRef), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void setWindowTitle(const string& in)", asMETHOD(Renderer, setWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void setMode(RenderMode, int, int, bool, bool, int)", asMETHOD(Renderer, setMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void toggleFullscreen()", asMETHOD(Renderer, toggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void close()", asMETHOD(Renderer, close), asCALL_THISCALL);

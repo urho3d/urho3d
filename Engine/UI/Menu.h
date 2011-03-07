@@ -54,6 +54,8 @@ public:
     void setPopupOffset(int x, int y);
     //! Force the popup to show or hide
     void showPopup(bool enable);
+    //! Set accelerator key (set zero key code to disable)
+    void setAccelerator(int key, int qualifiers);
     
     //! Return popup element
     UIElement* getPopup() const { return mPopup; }
@@ -61,6 +63,10 @@ public:
     const IntVector2& getPopupOffset() const { return mPopupOffset; }
     //! Return whether popup is open
     bool getShowPopup() const { return mShowPopup; }
+    //! Return accelerator key code, 0 if disabled
+    int getAcceleratorKey() const { return mAcceleratorKey; }
+    //! Return accelerator qualifiers
+    int getAcceleratorQualifiers() const { return mAcceleratorQualifiers; }
     
 protected:
     //! Popup element
@@ -69,10 +75,16 @@ protected:
     IntVector2 mPopupOffset;
     //! Show popup flag
     bool mShowPopup;
+    //! Accelerator key code
+    int mAcceleratorKey;
+    //! Accelerator qualifiers
+    int mAcceleratorQualifiers;
     
 private:
-    //! Handle global UI mouseclick or focus change to check for hiding the popup
-    void handleFocusChange(StringHash eventType, VariantMap& eventData);
+    //! Handle UI focus change to check for hiding the popup
+    void handleFocusChanged(StringHash eventType, VariantMap& eventData);
+    //! Handle keypress for checking accelerator
+    void handleKeyDown(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // UI_MENU_H

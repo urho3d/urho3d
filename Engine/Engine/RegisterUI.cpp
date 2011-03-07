@@ -327,9 +327,12 @@ static void registerMenu(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Menu", "void setPopupOffset(const IntVector2& in)", asMETHODPR(Menu, setPopupOffset, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "void setPopupOffset(int, int)", asMETHODPR(Menu, setPopupOffset, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "void showPopup(bool)", asMETHOD(Menu, showPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "void setAccelerator(int, int)", asMETHOD(Menu, setAccelerator), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "UIElement@+ getPopup() const", asMETHOD(Menu, getPopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "const IntVector2& getPopupOffset() const", asMETHOD(Menu, getPopupOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Menu", "bool getShowPopup() const", asMETHOD(Menu, getShowPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "int getAcceleratorKey() const", asMETHOD(Menu, getAcceleratorKey), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Menu", "int setAcceleratorQualifiers() const", asMETHOD(Menu, getAcceleratorQualifiers), asCALL_THISCALL);
     registerRefCasts<UIElement, Menu>(engine, "UIElement", "Menu");
 }
 
@@ -343,6 +346,7 @@ static void registerDropDownList(asIScriptEngine* engine)
 {
     registerButton<DropDownList>(engine, "DropDownList");
     engine->RegisterObjectMethod("DropDownList", "void showPopup(bool)", asMETHOD(DropDownList, showPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void setAccelerator(int, int)", asMETHOD(DropDownList, setAccelerator), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void addItem(UIElement@+)", asMETHOD(DropDownList, addItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void removeItem(UIElement@+)", asMETHODPR(DropDownList, removeItem, (UIElement*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void removeItem(uint)", asMETHODPR(DropDownList, removeItem, (unsigned), void), asCALL_THISCALL);
@@ -351,6 +355,8 @@ static void registerDropDownList(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "void setResizePopup(bool)", asMETHOD(DropDownList, setResizePopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ getPopup() const", asMETHOD(DropDownList, getPopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "bool getShowPopup() const", asMETHOD(DropDownList, getShowPopup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "int getAcceleratorKey() const", asMETHOD(DropDownList, getAcceleratorKey), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "int setAcceleratorQualifiers() const", asMETHOD(DropDownList, getAcceleratorQualifiers), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "uint getNumItems() const", asMETHOD(DropDownList, getSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ getItem(uint) const", asMETHOD(DropDownList, getItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "array<UIElement@>@ getItems() const", asFUNCTION(DropDownListGetItems), asCALL_CDECL_OBJLAST);

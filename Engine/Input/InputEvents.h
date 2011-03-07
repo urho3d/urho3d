@@ -78,6 +78,7 @@ DEFINE_EVENT(EVENT_KEYDOWN, KeyDown)
     EVENT_PARAM(P_KEY, Key);                    // int
     EVENT_PARAM(P_BUTTONS, Buttons);            // int
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
+    EVENT_PARAM(P_REPEAT, Repeat);              // bool
 }
 
 //! Key released
