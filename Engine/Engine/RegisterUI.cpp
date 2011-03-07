@@ -227,6 +227,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void setScrollStep(float)", asMETHOD(ListView, setScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setPageStep(float)", asMETHOD(ListView, setPageStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void addItem(UIElement@+)", asMETHOD(ListView, addItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void insertItem(uint, UIElement@+)", asMETHOD(ListView, insertItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(UIElement@+)", asMETHODPR(ListView, removeItem, (UIElement*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeItem(uint)", asMETHODPR(ListView, removeItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void removeAllItems()", asMETHOD(ListView, removeAllItems), asCALL_THISCALL);
@@ -348,6 +349,7 @@ static void registerDropDownList(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "void showPopup(bool)", asMETHOD(DropDownList, showPopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void setAccelerator(int, int)", asMETHOD(DropDownList, setAccelerator), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void addItem(UIElement@+)", asMETHOD(DropDownList, addItem), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "void insertItem(uint, UIElement@+)", asMETHOD(DropDownList, insertItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void removeItem(UIElement@+)", asMETHODPR(DropDownList, removeItem, (UIElement*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void removeItem(uint)", asMETHODPR(DropDownList, removeItem, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "void removeAllItems()", asMETHOD(DropDownList, removeAllItems), asCALL_THISCALL);

@@ -752,11 +752,19 @@ void UIElement::bringToFront()
 
 void UIElement::addChild(UIElement* element)
 {
+    insertChild(mChildren.size(), element);
+}
+
+void UIElement::insertChild(unsigned index, UIElement* element)
+{
     if ((!element) || (element->mParent == this) || (mParent == element))
         return;
     
-    // Add first, then remove from old parent, to ensure the elemen does not get deleted
-    mChildren.push_back(SharedPtr<UIElement>(element));
+    // Add first, then remove from old parent, to ensure the element does not get deleted
+    if (index >= mChildren.size())
+        mChildren.push_back(SharedPtr<UIElement>(element));
+    else
+        mChildren.insert(mChildren.begin() + index, SharedPtr<UIElement>(element));
     
     if (element->mParent)
         element->mParent->removeChild(element);

@@ -1032,10 +1032,12 @@ static void registerOctree(asIScriptEngine* engine)
     
     registerHashedType<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void resize(const BoundingBox& in, uint)", asMETHOD(Octree, resize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "void setExcludeFlags(uint)", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void setExcludeFlags(uint)", asMETHOD(Octree, setExcludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void setDrawDebugGeometry(bool)", asMETHOD(Octree, setDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& getWorldBoundingBox() const", asMETHODPR(Octree, getWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getNumLevels() const", asMETHOD(Octree, getNumLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getExcludeFlags() const", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "bool getDrawDebugGeometry() const", asMETHOD(Octree, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "bool isHeadless() const", asMETHOD(Octree, isHeadless), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "array<RayQueryResult>@ raycast(const Ray& in, uint, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Vector3& in, uint)", asFUNCTION(OctreeGetNodesPoint), asCALL_CDECL_OBJLAST);

@@ -260,13 +260,30 @@ void ListView::onDefocus()
 
 void ListView::addItem(UIElement* item)
 {
+    insertItem(mContentElement->getNumChildren(), item);
+}
+
+void ListView::insertItem(unsigned index, UIElement* item)
+{
     if ((!item) || (item->getParent() == mContentElement))
         return;
     
     // Enable input so that clicking the item can be detected
     item->setEnabled(true);
     item->setSelected(false);
-    mContentElement->addChild(item);
+    mContentElement->insertChild(index, item);
+    
+    // If necessary, shift the following selections
+    std::set<unsigned> prevSelections;
+    mSelections.clear();
+    for (std::set<unsigned>::iterator j = prevSelections.begin(); j != prevSelections.end(); ++j)
+    {
+        if (*j >= index)
+            mSelections.insert(*j + 1);
+        else
+            mSelections.insert(*j);
+    }
+    updateSelectionEffect();
 }
 
 void ListView::removeItem(UIElement* item)

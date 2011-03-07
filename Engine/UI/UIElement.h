@@ -244,6 +244,8 @@ public:
     void bringToFront();
     //! Add a child element
     void addChild(UIElement* element);
+    //! Insert a child element into a specific position in the child list
+    void insertChild(unsigned index, UIElement* element);
     //! Remove a child element
     void removeChild(UIElement* element);
     //! Remove all child elements

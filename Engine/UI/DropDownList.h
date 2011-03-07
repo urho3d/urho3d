@@ -47,6 +47,8 @@ public:
     
     //! Add item to the end of the list
     void addItem(UIElement* item);
+    //! Insert item to a specific position
+    void insertItem(unsigned index, UIElement* item);
     //! Remove specific item
     void removeItem(UIElement* item);
     //! Remove item at index

@@ -132,7 +132,12 @@ void DropDownList::onShowPopup()
 
 void DropDownList::addItem(UIElement* item)
 {
-    mListView->addItem(item);
+    insertItem(mListView->getNumItems(), item);
+}
+
+void DropDownList::insertItem(unsigned index, UIElement* item)
+{
+    mListView->insertItem(index, item);
     
     // If there was no selection, set to the first
     if (mListView->getSelection() == M_MAX_UNSIGNED)

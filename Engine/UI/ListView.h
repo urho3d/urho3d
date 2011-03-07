@@ -67,6 +67,8 @@ public:
     
     //! Add item to the end of the list
     void addItem(UIElement* item);
+    //! Insert item at a specific position
+    void insertItem(unsigned index, UIElement* item);
     //! Remove specific item. In hierarchy mode will also remove any children
     void removeItem(UIElement* item);
     //! Remove item at index. In hierarchy mode will also remove any children

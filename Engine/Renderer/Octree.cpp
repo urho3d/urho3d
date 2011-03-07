@@ -27,6 +27,8 @@
 #include "Profiler.h"
 #include "Octree.h"
 #include "OctreeQuery.h"
+#include "Scene.h"
+#include "SceneEvents.h"
 #include "Serializer.h"
 #include "XMLElement.h"
 
@@ -156,6 +158,17 @@ void Octant::resetRoot()
     }
 }
 
+void Octant::drawDebugGeometry(DebugRenderer* debug)
+{
+    debug->addBoundingBox(mWorldBoundingBox, Color(0.25f, 0.25f, 0.25f));
+    
+    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    {
+        if (mChildren[i])
+            mChildren[i]->drawDebugGeometry(debug);
+    }
+}
+
 void Octant::getNodesInternal(OctreeQuery& query, unsigned mask) const
 {
     if (!mNumNodes)
@@ -263,8 +276,10 @@ Octree::Octree(const BoundingBox& box, unsigned numLevels, bool headless) :
     Octant(box, 0, 0, this),
     mNumLevels(max((int)numLevels, 1)),
     mExcludeFlags(0),
+    mDrawDebugGeometry(false),
     mHeadless(headless)
 {
+    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(Octree, handlePostRenderUpdate));
 }
 
 Octree::~Octree()
@@ -338,6 +353,11 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
 void Octree::setExcludeFlags(unsigned nodeFlags)
 {
     mExcludeFlags = nodeFlags;
+}
+
+void Octree::setDrawDebugGeometry(bool enable)
+{
+    mDrawDebugGeometry = enable;
 }
 
 void Octree::updateOctree(const FrameInfo& frame)
@@ -435,4 +455,21 @@ void Octree::markNodeForReinsertion(VolumeNode* node)
 void Octree::clearNodeReinsertion(VolumeNode* node)
 {
     mNodeReinsertions.erase(node);
+}
+
+void Octree::drawDebugGeometry()
+{
+    DebugRenderer* debug = mScene->getExtension<DebugRenderer>();
+    if (!debug)
+        return;
+    
+    PROFILE(Octree_DrawDebugGeometry);
+    
+    Octant::drawDebugGeometry(debug);
+}
+
+void Octree::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (mDrawDebugGeometry)
+        drawDebugGeometry();
 }
