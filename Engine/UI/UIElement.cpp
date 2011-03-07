@@ -731,22 +731,23 @@ void UIElement::bringToFront()
     if ((!ptr) || (!ptr->getBringToFront()))
         return;
     
-    // Get the highest priority used by all other top level elements, decrease their priority by one,
-    // and assign that to new front element. However, take into account only active (enabled) elements
+    // Get the highest priority used by all other top level elements, assign that to the new front element
+    // and decrease others' priority by one. However, take into account only active (enabled) elements
     // and those which have the BringToBack flag set
     int maxPriority = M_MIN_INT;
     std::vector<UIElement*> topLevelElements = root->getChildren();
     for (std::vector<UIElement*>::iterator i = topLevelElements.begin(); i != topLevelElements.end(); ++i)
     {
         UIElement* other = *i;
-        if ((other->isEnabled()) && (other->getBringToBack()) && (other != ptr))
+        if ((other->isEnabled()) && (other->mBringToBack) && (other != ptr))
         {
             int priority = other->getPriority();
             maxPriority = max(priority, maxPriority);
             other->setPriority(priority - 1);
         }
     }
-    ptr->setPriority(maxPriority);
+    if (maxPriority != M_MIN_INT)
+        ptr->setPriority(maxPriority);
 }
 
 void UIElement::addChild(UIElement* element)

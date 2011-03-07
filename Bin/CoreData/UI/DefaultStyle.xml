@@ -339,8 +339,8 @@
         <minsize value="400 300" />
         <movable enable="true" />
         <resizable enable="true" />
-        <resizeborder value="8 8 8 8" />
-        <layout spacing="4" border="8 8 8 8" />
+        <resizeborder value="6 6 6 6" />
+        <layout spacing="4" border="6 6 6 6" />
     </element>
     <element type="FileSelectorButton">
         <fixedsize value="96 24" />
@@ -369,7 +369,7 @@
         <selectioncolor value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
-        <font name="Cour.ttf" size="12" />
+        <font name="Cour.ttf" size="10" />
     </element>
     <element type="EditorMenuBar">
         <texture name="Textures/UI.png" />

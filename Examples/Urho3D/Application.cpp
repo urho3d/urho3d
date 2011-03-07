@@ -86,10 +86,10 @@ void Application::run()
         mCache->addResourcePath(getPath(fileName));
     }
     
-    // Initialize engine & scripting. Render once to avoid the white screen (in case init takes a long time)
+    // Initialize engine & scripting. Render once first to avoid a white screen in case init takes a long time
+    mEngine->createScriptEngine();
     mEngine->init(arguments);
     mEngine->render();
-    mEngine->createScriptEngine();
     
     // Script mode: execute the rest of initialization, including scene creation, in script
     std::string extension = getExtension(fileName);
