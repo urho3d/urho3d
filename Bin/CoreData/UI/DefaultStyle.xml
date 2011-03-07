@@ -336,14 +336,13 @@
     </element>
     <element type="FileSelector">
         <size value="400 300" />
-        <minsize value="400 300" />
         <movable enable="true" />
         <resizable enable="true" />
         <resizeborder value="6 6 6 6" />
-        <layout spacing="4" border="6 6 6 6" />
+        <layout mode="vertical" spacing="4" border="6 6 6 6" />
     </element>
     <element type="FileSelectorButton">
-        <fixedsize value="96 24" />
+        <fixedsize value="80 22" />
     </element>
     <element type="FileSelectorButtonText">
         <font name="Cour.ttf" size="10" />

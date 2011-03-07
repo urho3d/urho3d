@@ -47,6 +47,13 @@ void createMenuBar(XMLFile@ uiStyle)
         uiMenuBar.addChild(fileMenu);
     }
 
+    {
+        Menu@ fileMenu = createMenu(uiStyle, "Settings");
+        Window@ filePopup = fileMenu.getPopup();
+        filePopup.addChild(createMenuItem(uiStyle, "Editor camera", 0, 0));
+        uiMenuBar.addChild(fileMenu);
+    }
+
     UIElement@ spacer = UIElement("MenuBarSpacer");
     uiMenuBar.addChild(spacer);
 
@@ -57,7 +64,7 @@ Menu@ createMenuItem(XMLFile@ uiStyle, string title, int accelKey, int accelQual
 {
     Menu@ menu = Menu(title);
     menu.setStyleAuto(uiStyle);
-    menu.setLayout(LM_HORIZONTAL, 0, IntRect(uiSpacing, 0, uiSpacing, 0));
+    menu.setLayout(LM_HORIZONTAL, 0, IntRect(4, 0, 4, 0));
     if (accelKey != 0)
         menu.setAccelerator(accelKey, accelQual);
 
@@ -114,13 +121,18 @@ void createFileSelector(string title, string ok, string cancel, string initialPa
     uiFileSelector.setFilters(filters, initialFilter);
     
     Window@ window = uiFileSelector.getWindow();
-    IntVector2 size = window.getSize();
-    window.setPosition((renderer.getWidth() - size.x) / 2, (renderer.getHeight() - size.y) / 2);
+    centerDialog(window);
 }
 
 void closeFileSelector()
 {
     @uiFileSelector = null;
+}
+
+void centerDialog(UIElement@ element)
+{
+    IntVector2 size = element.getSize();
+    element.setPosition((renderer.getWidth() - size.x) / 2, (renderer.getHeight() - size.y) / 2);
 }
 
 void resizeUI()
@@ -154,8 +166,8 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
         if (action == "Save scene")
         {
-            saveScene(sceneFileName);
             ui.setFocusElement(null); // Close the menu
+            saveScene(sceneFileName);
         }
 
         if (action == "Save scene as")
@@ -165,7 +177,12 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
     }
-
+    
+    if (action == "Editor camera")
+    {
+        ui.setFocusElement(null); // Close the menu
+        createCameraDialog();
+    }
     if (menu.getName() == "Exit")
         engine.exit();
 }
