@@ -35,7 +35,8 @@ Menu::Menu(const std::string& name) :
     mPopupOffset(IntVector2::sZero),
     mShowPopup(false)
 {
-    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleUIMouseClick));
+    subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleFocusChange));
+    subscribeToEvent(EVENT_FOCUSED, EVENT_HANDLER(Menu, handleFocusChange));
 }
 
 Menu::~Menu()
@@ -144,7 +145,7 @@ void Menu::showPopup(bool enable)
     mSelected = enable;
 }
 
-void Menu::handleUIMouseClick(StringHash eventType, VariantMap& eventData)
+void Menu::handleFocusChange(StringHash eventType, VariantMap& eventData)
 {
     if (!mShowPopup)
         return;

@@ -1,6 +1,7 @@
 // Urho3D editor scene handling
 
 Scene@ editorScene;
+string sceneFileName;
 string sceneResourcePath;
 
 void createScene()
@@ -44,4 +45,6 @@ void loadScene(string fileName)
         editorScene.loadXML(file);
     else
         editorScene.load(file);
+        
+    sceneFileName = fileName;
 }

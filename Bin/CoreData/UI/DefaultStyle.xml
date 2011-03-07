@@ -377,6 +377,6 @@
         <border value="2 2 2 2" />
     </element>
     <element type="EditorMenuText">
-        <font name="cour.ttf" size="12" />
+        <font name="cour.ttf" size="10" />
     </element>
 </elements>

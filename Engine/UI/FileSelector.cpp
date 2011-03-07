@@ -101,12 +101,15 @@ FileSelector::FileSelector(UI* ui) :
     mWindow->addChild(mButtonLayout);
     
     mUI->getRootElement()->addChild(mWindow);
-    mWindow->bringToFront();
     
     std::vector<std::string> defaultFilters;
     defaultFilters.push_back("*.*");
     setFilters(defaultFilters, 0);
     setPath(getCurrentDirectory());
+    
+    // Focus the fileselector's filelist initially when created, and bring to front
+    mUI->setFocusElement(mFileList);
+    mWindow->bringToFront();
     
     subscribeToEvent(mFilterList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFilterChanged));
     subscribeToEvent(mPathEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handlePathChanged));
@@ -219,6 +222,8 @@ void FileSelector::setFilters(const std::vector<std::string>& filters, unsigned 
         filterText->setStyle(mStyle, "FileSelectorFilterText", mUI->getResourceCache());
         mFilterList->addItem(filterText);
     }
+    if (defaultIndex > filters.size())
+        defaultIndex = 0;
     mFilterList->setSelection(defaultIndex);
     mIgnoreEvents = false;
     if (getFilter() != mLastUsedFilter)
@@ -257,6 +262,11 @@ const std::string& FileSelector::getFilter() const
         return selectedFilter->getText();
     
     return emptyFilter;
+}
+
+unsigned FileSelector::getFilterIndex() const
+{
+    return mFilterList->getSelection();
 }
 
 void FileSelector::refreshFiles()
@@ -332,6 +342,8 @@ bool FileSelector::enterFile()
             std::string parentPath = getParentPath(mPath);
             setPath(parentPath);
         }
+        
+        return true;
     }
     else
     {
@@ -344,7 +356,7 @@ bool FileSelector::enterFile()
         sendEvent(EVENT_FILESELECTED, eventData);
     }
     
-    return true;
+    return false;
 }
 
 void FileSelector::handleFilterChanged(StringHash eventType, VariantMap& eventData)

@@ -419,6 +419,7 @@ static void registerFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "const string& getPath() const", asMETHOD(FileSelector, getPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getFileName() const", asMETHOD(FileSelector, getFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getFilter() const", asMETHOD(FileSelector, getFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "uint getFilterIndex() const", asMETHOD(FileSelector, getFilterIndex), asCALL_THISCALL);
     registerRefCasts<EventListener, FileSelector>(engine, "EventListener", "FileSelector");
 }
 

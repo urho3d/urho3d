@@ -93,11 +93,13 @@ public:
     const std::string& getFileName() const;
     //! Return current filter
     const std::string& getFilter() const;
+    //! Return current filter index
+    unsigned getFilterIndex() const;
     
 private:
     //! Refresh the directory listing
     void refreshFiles();
-    //! Enter a directory or confirm a file. Return true if selection valid
+    //! Enter a directory or confirm a file. Return true if a directory entered
     bool enterFile();
     //! Handle filter changed
     void handleFilterChanged(StringHash eventType, VariantMap& eventData);
