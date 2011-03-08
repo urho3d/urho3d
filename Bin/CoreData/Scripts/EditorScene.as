@@ -58,7 +58,8 @@ void loadScene(string fileName)
     sceneFileName = fileName;
     sceneUnsaved = false;
     updateWindowTitle();
-    refillSceneWindow();
+    updateSceneWindow();
+    resetCamera();
 }
 
 void saveScene(string fileName)
@@ -87,10 +88,10 @@ void createSceneWindow()
     uiRoot.addChild(sceneWindow);
     sceneWindow.setPosition(40, 40);
     sceneWindow.setSize(250, 400);
-    refillSceneWindow();
+    updateSceneWindow();
 }
 
-void refillSceneWindow()
+void updateSceneWindow()
 {
     ListView@ list = sceneWindow.getChild("EntityList", true);
     list.removeAllItems();
@@ -101,11 +102,10 @@ void refillSceneWindow()
         uint itemIndex = list.getNumItems();
 
         Entity@ entity = entities[i];
-        uint id = entity.getID();
         Text@ text = Text();
         text.setStyle(uiStyle, "FileSelectorListText");
         text.userData["Type"] = ITEM_ENTITY;
-        text.userData["EntityID"] = id;
+        text.userData["EntityID"] = entity.getID();
         text.userData["Indent"] = 0;
         text.setText(getEntityTitle(entity));
         list.addItem(text);
@@ -113,23 +113,53 @@ void refillSceneWindow()
         array<Component@> components = entity.getComponents();
         for (uint j = 0; j < components.size(); ++j)
         {
-            Component@ component = components[j];
-            Text@ text = Text();
-            text.setStyle(uiStyle, "FileSelectorListText");
-            text.userData["Type"] = ITEM_COMPONENT;
-            text.userData["EntityID"] = id;
-            // Note: must remember to update indices whenever components are added/removed.
-            // Should have direct unique identification for components in the scene model
-            text.userData["ComponentID"] = j;
-            text.userData["Indent"] = 1;
-            text.setText(" " + getComponentTitle(component));
-            list.addItem(text);
-
-            //! \todo recurse child scene nodes here if the component is a scene node
+            Node@ node = cast<Node@>(components[j]);
+            // If is a scenenode, only add root-level node or node parented to a node in another entity
+            if ((node is null) || (node.getParent() is null) || (!(node.getParent().getEntity() is entity)))
+                addComponentToSceneWindow(entity, components, j, 1);
         }
-
         // Collapse components by default
         list.setChildItemsVisible(itemIndex, false);
+    }
+}
+
+void addComponentToSceneWindow(Entity@ entity, array<Component@> components, uint index, int indent)
+{
+    ListView@ list = sceneWindow.getChild("EntityList", true);
+
+    Component@ component = components[index];
+    Text@ text = Text();
+    text.setStyle(uiStyle, "FileSelectorListText");
+    text.userData["Type"] = ITEM_COMPONENT;
+    text.userData["EntityID"] = entity.getID();
+    // Note: must remember to update indices whenever components are added/removed.
+    // Should have direct unique identification for components in the scene model
+    text.userData["ComponentID"] = index;
+    text.userData["Indent"] = indent;
+    text.setText(getComponentTitle(component, indent));
+    list.addItem(text);
+    
+    // Check child scenenodes in the same entity and add them with increased indent
+    Node@ node = cast<Node@>(component);
+    if (!(node is null))
+    {
+        array<Node@> childNodes = node.getChildren(NODE_ANY, false);
+        for (uint i = 0; i < childNodes.size(); ++i)
+        {
+            Node@ childNode = childNodes[i];
+            if (childNode.getEntity() is entity)
+            {
+                // Must find the corresponding component index
+                for (uint j = 0; j < components.size(); ++j)
+                {
+                    if (components[j] is childNode)
+                    {
+                        addComponentToSceneWindow(entity, components, j, indent + 1);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -142,11 +172,16 @@ string getEntityTitle(Entity@ entity)
         return name + " (" + entity.getID() + ")";
 }
 
-string getComponentTitle(Component@ component)
+string getComponentTitle(Component@ component, int indent)
 {
+    string indentStr;
+    indentStr.resize(indent);
+    for (int i = 0; i < indent; ++i)
+        indentStr[i] = ' ';
+
     string name = component.getName();
     if (name.empty())
-        return component.getTypeName();
+        return indentStr + component.getTypeName();
     else
-        return component.getTypeName() + " (" + name + ")";
+        return indentStr + component.getTypeName() + " (" + name + ")";
 }

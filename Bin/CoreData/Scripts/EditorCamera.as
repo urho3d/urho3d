@@ -13,6 +13,7 @@ void createCamera()
 {
     // Note: this camera will not be bound into a scene entity, so that it does not get listed in the editor UI
     @camera = editorScene.createComponent("Camera");
+    resetCamera();
 
     pipeline.setViewport(0, Viewport(editorScene, camera));
 }
@@ -50,6 +51,12 @@ void moveCamera(float timeStep)
             camera.setRotation(Quaternion(cameraPitch, cameraYaw, 0));
         }
     }
+}
+
+void resetCamera()
+{
+	camera.setPosition(Vector3(0, 10, 0));
+	camera.setRotation(Quaternion());
 }
 
 void createCameraDialog()

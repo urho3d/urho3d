@@ -279,6 +279,12 @@ template <class T> void registerComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool isPlayback() const", asMETHODPR(T, isPlayback, () const, bool), asCALL_THISCALL);
 }
 
+template <class T> static CScriptArray* NodeGetChildren(unsigned nodeFlags, bool recursive, T* ptr)
+{
+    static std::vector<Node*> nodes;
+    return vectorToHandleArray<Node>(ptr->getChildren(nodeFlags, recursive), "array<Node@>");
+}
+
 //! Template function for registering a class derived from Node
 template <class T> void registerNode(asIScriptEngine* engine, const char* className)
 {
@@ -314,6 +320,7 @@ template <class T> void registerNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Node@+ getParent() const", asMETHODPR(T, getParent, () const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isDirty() const", asMETHODPR(T, isDirty, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint getNumChildren(bool) const", asMETHODPR(T, getNumChildren, (bool) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "array<Node@>@ getChildren(uint, bool) const", asFUNCTION(NodeGetChildren<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ getChild(uint) const", asMETHODPR(T, getChild, (unsigned) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ getChild(const string& in, bool) const", asMETHODPR(T, getChild, (const std::string&, bool) const, Node*), asCALL_THISCALL);
 }
