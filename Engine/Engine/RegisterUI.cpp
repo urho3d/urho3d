@@ -254,7 +254,7 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "bool getVerticalScrollBarVisible() const", asMETHOD(ListView, getVerticalScrollBarVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getScrollStep() const", asMETHOD(ListView, getScrollStep), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "float getPageStep() const", asMETHOD(ListView, getPageStep), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "uint getNumItems() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "uint getNumItems() const", asMETHOD(ListView, getNumItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getItem(uint) const", asMETHOD(ListView, getItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "array<UIElement@>@ getItems() const", asFUNCTION(ListViewGetItems), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ListView", "uint getSelection() const", asMETHOD(ListView, getSelection), asCALL_THISCALL);

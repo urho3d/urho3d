@@ -1,7 +1,6 @@
 <element type="Window" name="CameraDialog">
     <fixedsize value="250 150" />
     <movable enable="true" />
-    <resizeborder value="6 6 6 6" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element type="Text">
         <fixedheight value="20" />

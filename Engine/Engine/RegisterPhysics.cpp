@@ -187,6 +187,7 @@ static void registerRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void applyForceAtPosition(const Vector3& in, const Vector3& in)", asMETHOD(RigidBody, applyForceAtPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void applyTorque(const Vector3& in)", asMETHOD(RigidBody, applyTorque), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void resetForces()", asMETHOD(RigidBody, resetForces), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void drawDebugGeometry(DebugRenderer@+)", asMETHOD(RigidBody, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "PhysicsWorld@+ getPhysicsWorld() const", asMETHOD(RigidBody, getPhysicsWorld), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "CollisionShape@+ getCollisionShape() const", asMETHOD(RigidBody, getCollisionShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "PhysicsMode getMode() const", asMETHOD(RigidBody, getMode), asCALL_THISCALL);

@@ -1,0 +1,35 @@
+<element type="Window" name="SceneWindow">
+    <movable enable="true" />
+    <resizable enable="true" />
+    <resizeborder value="6 6 6 6" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element type="Text">
+        <fixedheight value="20" />
+        <text value="Scene hierarchy" />
+    </element>
+    <element type="ListView" name="EntityList">
+        <hierarchy enable="true" />
+        <highlight value="always" />
+    </element>
+    <element type="Element">
+        <fixedheight value="22" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Element" />
+        <element type="Button" name="NewEntityButton">
+            <fixedwidth value="90" />
+            <element type="Text">
+                <text value="New Entity" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Element" />
+        <element type="Button" name="NewComponentButton">
+            <fixedwidth value="90" />
+            <element type="Text">
+                <text value="New Comp" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Element" />
+    </element>
+</element>

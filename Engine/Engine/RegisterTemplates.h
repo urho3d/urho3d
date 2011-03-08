@@ -351,6 +351,7 @@ template <class T> void registerVolumeNode(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void setShadowDistance(float)", asMETHODPR(T, setShadowDistance, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setViewMask(uint)", asMETHODPR(T, setViewMask, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLightMask(uint)", asMETHODPR(T, setLightMask, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void drawDebugGeometry(DebugRenderer@+)", asMETHODPR(T, drawDebugGeometry, (DebugRenderer*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float calculateDrawDistance(Camera@+, float)", asMETHODPR(T, calculateDrawDistance, (const Camera&, float), float), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getCastShadows() const", asMETHODPR(T, getCastShadows, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isOccluder() const", asMETHODPR(T, isOccluder, () const, bool), asCALL_THISCALL);

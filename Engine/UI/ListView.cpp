@@ -36,7 +36,7 @@ static const ShortStringHash indentHash("Indent");
 static const std::string highlightModes[] =
 {
     "never",
-    "focus"
+    "focus",
     "always"
 };
 
@@ -90,15 +90,15 @@ void ListView::setStyle(const XMLElement& element, ResourceCache* cache)
         }
     }
     
-    if (element.hasChildElement("highlightmode"))
+    if (element.hasChildElement("highlight"))
     {
-        std::string highlightMode = element.getChildElement("highlightmode").getStringLower("value");
-        setHighlightMode((HighlightMode)getIndexFromStringList(highlightMode, highlightModes, 3, 1));
+        std::string highlight = element.getChildElement("highlight").getStringLower("value");
+        setHighlightMode((HighlightMode)getIndexFromStringList(highlight, highlightModes, 3, 1));
     }
     if (element.hasChildElement("multiselect"))
         setMultiselect(element.getChildElement("multiselect").getBool("enable"));
-    if (element.hasChildElement("hierarchymode"))
-        setHierarchyMode(element.getChildElement("hierarchymode").getBool("enable"));
+    if (element.hasChildElement("hierarchy"))
+        setHierarchyMode(element.getChildElement("hierarchy").getBool("enable"));
     if (element.hasChildElement("clearselection"))
         setClearSelectionOnDefocus(element.getChildElement("clearselection").getBool("enable"));
     if (element.hasChildElement("doubleclickinterval"))

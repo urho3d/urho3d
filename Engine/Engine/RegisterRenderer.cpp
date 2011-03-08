@@ -491,6 +491,8 @@ static void registerAnimation(asIScriptEngine* engine)
 
 static void registerVolumeNode(asIScriptEngine* engine)
 {
+    engine->RegisterObjectType("DebugRenderer", 0, asOBJ_REF);
+    
     registerVolumeNode<VolumeNode>(engine, "VolumeNode");
     registerRefCasts<Component, VolumeNode>(engine, "Component", "VolumeNode");
     registerRefCasts<Node, VolumeNode>(engine, "Node", "VolumeNode");
@@ -938,7 +940,6 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 
 static void registerDebugRenderer(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("DebugRenderer", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("DebugRenderer", asBEHAVE_ADDREF, "void f()", asMETHOD(DebugRenderer, addRef), asCALL_THISCALL);
     engine->RegisterObjectBehaviour("DebugRenderer", asBEHAVE_RELEASE, "void f()", asMETHOD(DebugRenderer, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void addLine(const Vector3& in, const Vector3& in, const Color& in, bool)", asMETHOD(DebugRenderer, addLine), asCALL_THISCALL);

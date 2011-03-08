@@ -14,14 +14,15 @@ void createUI()
 {
     @uiStyle = cache.getResource("XMLFile", "UI/DefaultStyle.xml");
 
-    createCursor(uiStyle);
-    createMenuBar(uiStyle);
+    createCursor();
+    createMenuBar();
+    createSceneWindow();
     
     subscribeToEvent("ScreenMode", "handleScreenMode");
     subscribeToEvent("MenuSelected", "handleMenuSelected");
 }
 
-void createCursor(XMLFile@ uiStyle)
+void createCursor()
 {
     Cursor@ cursor = Cursor("Cursor");
     cursor.setStyleAuto(uiStyle);
@@ -29,7 +30,7 @@ void createCursor(XMLFile@ uiStyle)
     ui.setCursor(cursor);
 }
 
-void createMenuBar(XMLFile@ uiStyle)
+void createMenuBar()
 {
     @uiMenuBar = BorderImage("MenuBar");
     uiMenuBar.setStyle(uiStyle, "EditorMenuBar");
@@ -37,20 +38,20 @@ void createMenuBar(XMLFile@ uiStyle)
     uiRoot.addChild(uiMenuBar);
 
     {
-        Menu@ fileMenu = createMenu(uiStyle, "File");
+        Menu@ fileMenu = createMenu("File");
         Window@ filePopup = fileMenu.getPopup();
-        filePopup.addChild(createMenuItem(uiStyle, "Open scene", 'O', QUAL_CTRL));
-        filePopup.addChild(createMenuItem(uiStyle, "Save scene", 'S', QUAL_CTRL));
-        filePopup.addChild(createMenuItem(uiStyle, "Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
-        filePopup.addChild(createMenuSpacer(uiStyle));
-        filePopup.addChild(createMenuItem(uiStyle, "Exit", 'X', QUAL_CTRL));
+        filePopup.addChild(createMenuItem("Open scene", 'O', QUAL_CTRL));
+        filePopup.addChild(createMenuItem("Save scene", 'S', QUAL_CTRL));
+        filePopup.addChild(createMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
+        filePopup.addChild(createMenuSpacer());
+        filePopup.addChild(createMenuItem("Exit", 'X', QUAL_CTRL));
         uiMenuBar.addChild(fileMenu);
     }
 
     {
-        Menu@ fileMenu = createMenu(uiStyle, "Settings");
+        Menu@ fileMenu = createMenu("Settings");
         Window@ filePopup = fileMenu.getPopup();
-        filePopup.addChild(createMenuItem(uiStyle, "Editor camera", 0, 0));
+        filePopup.addChild(createMenuItem("Editor camera", 0, 0));
         uiMenuBar.addChild(fileMenu);
     }
 
@@ -60,7 +61,7 @@ void createMenuBar(XMLFile@ uiStyle)
     resizeUI();
 }
 
-Menu@ createMenuItem(XMLFile@ uiStyle, string title, int accelKey, int accelQual)
+Menu@ createMenuItem(string title, int accelKey, int accelQual)
 {
     Menu@ menu = Menu(title);
     menu.setStyleAuto(uiStyle);
@@ -76,9 +77,9 @@ Menu@ createMenuItem(XMLFile@ uiStyle, string title, int accelKey, int accelQual
     return menu;
 }
 
-Menu@ createMenuSpacer(XMLFile@ uiStyle)
+Menu@ createMenuSpacer()
 {
-    Menu@ spacer = Menu("");
+    Menu@ spacer = Menu();
     spacer.setStyleAuto(uiStyle);
     spacer.setFixedHeight(2);
     // Disable input, but set permanent selection to get a nice indentation effect
@@ -88,7 +89,7 @@ Menu@ createMenuSpacer(XMLFile@ uiStyle)
     return spacer;
 }
 
-Window@ createPopup(XMLFile@ uiStyle, Menu@ baseMenu)
+Window@ createPopup(Menu@ baseMenu)
 {
     Window@ popup = Window(baseMenu.getName() + "_Popup");
     popup.setStyleAuto(uiStyle);
@@ -99,11 +100,11 @@ Window@ createPopup(XMLFile@ uiStyle, Menu@ baseMenu)
     return popup;
 }
 
-Menu@ createMenu(XMLFile@ uiStyle, string title)
+Menu@ createMenu(string title)
 {
-    Menu@ menu = createMenuItem(uiStyle, title, 0, 0);
+    Menu@ menu = createMenuItem(title, 0, 0);
     menu.setFixedWidth(menu.getWidth());
-    createPopup(uiStyle, menu);
+    createPopup(menu);
 
     return menu;
 }
