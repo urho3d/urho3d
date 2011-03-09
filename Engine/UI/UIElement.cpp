@@ -761,7 +761,7 @@ void UIElement::addChild(UIElement* element)
 
 void UIElement::insertChild(unsigned index, UIElement* element)
 {
-    if ((!element) || (element->mParent == this) || (mParent == element))
+    if ((!element) || (element == this) || (element->mParent == this) || (mParent == element))
         return;
     
     // Add first, then remove from old parent, to ensure the element does not get deleted

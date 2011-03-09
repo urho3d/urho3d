@@ -21,9 +21,11 @@ void createComponentWindow()
 
     @componentWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/ComponentWindow.xml"), uiStyle);
     uiRoot.addChild(componentWindow);
-    componentWindow.setPosition(400, 50);
-    componentWindow.setSize(350, 400);
-    componentWindow.setVisible(false);
+    int height = (uiRoot.getHeight() - 80) / 2;
+    componentWindow.setPosition(20, 40 + height);
+    componentWindow.setSize(300, height);
+    componentWindow.setVisible(true);
+    updateComponentWindow();
     
     subscribeToEvent(componentWindow.getChild("CloseButton", true), "Released", "hideComponentWindow");
     subscribeToEvent(componentWindow.getChild("NameEdit", true), "TextFinished", "editComponentName");
@@ -37,6 +39,7 @@ void hideComponentWindow()
 void showComponentWindow()
 {
     componentWindow.setVisible(true);
+    componentWindow.bringToFront();
 }
 
 void updateComponentWindow()
@@ -47,7 +50,7 @@ void updateComponentWindow()
     list.removeAllItems();
     lastAttributeCount = 0;
 
-    if ((selectedComponent is null) || (selectedEntity is null))
+    if (selectedComponent is null)
     {
         title.setText("No component");
         nameEdit.setText("");
@@ -55,22 +58,21 @@ void updateComponentWindow()
         return;
     }
 
-    title.setText(selectedComponent.getTypeName() + " in " + getEntityTitle(selectedEntity));
+    title.setText(selectedComponent.getTypeName() + " in " + getEntityTitle(selectedComponent.getEntity()));
     nameEdit.setText(selectedComponent.getName());
     nameEdit.setEnabled(true);
     
     updateComponentAttributes();
-    showComponentWindow();
 }
 
 void editComponentName()
 {
-    if ((selectedComponent is null) || (selectedEntity is null))
+    if (selectedComponent is null)
         return;
 
     LineEdit@ nameEdit = componentWindow.getChild("NameEdit", true);
     selectedComponent.setName(nameEdit.getText());
-    updateSceneWindowEntity(selectedEntity);
+    updateSceneWindowEntity(selectedComponent.getEntity());
 }
 
 void updateComponentAttributes()
@@ -117,26 +119,47 @@ void updateComponentAttributes()
 
             array<string> attrs = categoryElem.getAttributeNames();
 
-            for (uint i = 0; i < attrs.size(); ++i)
+            // Do not make the parent node reference editable. It is handled via scene window drag and drop instead
+            if (category == "parent")
             {
-                string name = attrs[i];
-                if (name.length() > MAX_ATTRNAME_LENGTH)
-                    name.resize(MAX_ATTRNAME_LENGTH);
+                Node@ node = cast<Node>(selectedComponent);
+                if (node !is null)
+                {
+                    Node@ parentNode = node.getParent();
 
-                UIElement@ bar = UIElement();
-                bar.setLayout(LM_HORIZONTAL, 4, IntRect(0, 0, 0, 0));
-                bar.setFixedHeight(18);
-                list.addItem(bar);
+                    Text@ attrName = Text();
+                    attrName.setStyle(uiStyle, "EditorAttributeText");
+                    if (parentNode !is null)
+                        attrName.setText(" " + parentNode.getTypeName() + " in " + getEntityTitle(parentNode.getEntity()));
+                    else
+                        attrName.setText(" No parent");
+                       
+                    list.addItem(attrName);
+                }
+            }
+            else
+            {
+                for (uint i = 0; i < attrs.size(); ++i)
+                {
+                    string name = attrs[i];
+                    if (name.length() > MAX_ATTRNAME_LENGTH)
+                        name.resize(MAX_ATTRNAME_LENGTH);
+    
+                    UIElement@ bar = UIElement();
+                    bar.setLayout(LM_HORIZONTAL, 4, IntRect(0, 0, 0, 0));
+                    bar.setFixedHeight(18);
+                    list.addItem(bar);
 
-                Text@ attrName = Text();
-                attrName.setStyle(uiStyle, "EditorAttributeText");
-                attrName.setText(" " + name);
-                attrName.setFixedWidth(120);
-                bar.addChild(attrName);
-
-                uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
-                createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
-                readAttributeEditor(type, categoryElem, index, attrs[i]);
+                    Text@ attrName = Text();
+                    attrName.setStyle(uiStyle, "EditorAttributeText");
+                    attrName.setText(" " + name);
+                    attrName.setFixedWidth(120);
+                    bar.addChild(attrName);
+    
+                    uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
+                    createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
+                    readAttributeEditor(type, categoryElem, index, attrs[i]);
+                }
             }
 
             {
@@ -176,7 +199,7 @@ void updateComponentAttributes()
 
 void editComponentAttribute(StringHash eventType, VariantMap& eventData)
 {
-    if ((selectedComponent is null) || (selectedEntity is null))
+    if (selectedComponent is null)
         return;
         
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
@@ -193,7 +216,7 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
         {
             writeAttributeEditor(attrEdit.userData["Type"].getInt(), categoryElem, index, attrEdit.userData["Attribute"].getString());
 
-            uint id = selectedEntity.getID();
+            uint id = selectedComponent.getEntity().getID();
             beginModify(id);
             selectedComponent.loadXML(rootElem);
             selectedComponent.postLoad();

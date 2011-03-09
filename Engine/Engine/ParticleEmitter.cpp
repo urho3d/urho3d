@@ -141,15 +141,15 @@ void ParticleEmitter::saveXML(XMLElement& dest)
     emitterElem.setFloat("emissiontimer", mEmissionTimer);
     emitterElem.setBool("active", mActive);
     
+    XMLElement particleElem = dest.getChildElement("billboard");
     for (unsigned i = 0; i < mParticles.size(); ++i)
     {
-        XMLElement particleElem = dest.createChildElement("particle");
         // Optimization: write only enabled particles
         if (mBillboards[i].mEnabled)
         {
             const Particle& particle = mParticles[i];
             particleElem.setVector3("velocity", particle.mVelocity);
-            particleElem.setVector2("size", particle.mSize);
+            particleElem.setVector2("basesize", particle.mSize);
             particleElem.setFloat("timer", particle.mTimer);
             particleElem.setFloat("ttl", particle.mTimeToLive);
             particleElem.setFloat("scale", particle.mScale);
@@ -157,6 +157,7 @@ void ParticleEmitter::saveXML(XMLElement& dest)
             particleElem.setInt("color", particle.mColorIndex);
             particleElem.setInt("tex", particle.mTexIndex);
         }
+        particleElem = particleElem.getNextElement("billboard");
     }
 }
 
@@ -173,20 +174,20 @@ void ParticleEmitter::loadXML(const XMLElement& source, ResourceCache* cache)
     mActive = emitterElem.getBool("active");
     setNumParticles(getNumBillboards());
     
-    XMLElement particleElem = source.getChildElement("particle");
+    XMLElement particleElem = source.getChildElement("billboard");
     unsigned index = 0;
     while ((particleElem) && (index < mParticles.size()))
     {
         Particle& particle = mParticles[index];
         particle.mVelocity = particleElem.getVector3("velocity");
-        particle.mSize = particleElem.getVector2("size");
+        particle.mSize = particleElem.getVector2("basesize");
         particle.mTimer = particleElem.getFloat("timer");
         particle.mTimeToLive = particleElem.getFloat("ttl");
         particle.mScale = particleElem.getFloat("scale");
         particle.mRotationSpeed = particleElem.getFloat("rotspeed");
         particle.mColorIndex = particleElem.getInt("color");
         particle.mTexIndex = particleElem.getInt("tex");
-        particleElem = particleElem.getNextElement("particle");
+        particleElem = particleElem.getNextElement("billboard");
         ++index;
     }
 }

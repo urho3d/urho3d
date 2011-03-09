@@ -416,7 +416,7 @@ void Entity::addComponent(Component* component)
             // The more common cause is adding several components with the same type and name
             else
             {
-                LOGERROR("Component with type " + component->getTypeName() + " name " + component->getName() +
+                LOGWARNING("Component with type " + component->getTypeName() + " name " + component->getName() +
                     "already exists in entity " + mName);
             }
         }

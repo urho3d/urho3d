@@ -37,14 +37,8 @@ DEFINE_EVENT(EVENT_UIMOUSECLICK, UIMouseClick)
     EVENT_PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-//! Focus element changed
-DEFINE_EVENT(EVENT_FOCUSCHANGED, FocusChanged)
-{
-    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
-}
-
 //! Drag and drop test
-DEFINE_EVENT(EVENT_UIDRAGDROPTEST, UIDragDropTest)
+DEFINE_EVENT(EVENT_DRAGDROPTEST, DragDropTest)
 {
     EVENT_PARAM(P_SOURCE, Source);              // UIElement pointer
     EVENT_PARAM(P_TARGET, Target);              // UIElement pointer
@@ -52,12 +46,18 @@ DEFINE_EVENT(EVENT_UIDRAGDROPTEST, UIDragDropTest)
 };
 
 //! Drag and drop finish
-DEFINE_EVENT(EVENT_UIDRAGDROPFINISH, UIDragDropFinish)
+DEFINE_EVENT(EVENT_DRAGDROPFINISH, DragDropFinish)
 {
     EVENT_PARAM(P_SOURCE, Source);              // UIElement pointer
     EVENT_PARAM(P_TARGET, Target);              // UIElement pointer
     EVENT_PARAM(P_ACCEPT, Accept);              // bool
 };
+
+//! Focus element changed
+DEFINE_EVENT(EVENT_FOCUSCHANGED, FocusChanged)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
 
 //! UI element resized
 DEFINE_EVENT(EVENT_RESIZED, Resized)

@@ -14,8 +14,9 @@ void createSceneWindow()
 
     @sceneWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/SceneWindow.xml"), uiStyle);
     uiRoot.addChild(sceneWindow);
-    sceneWindow.setPosition(50, 50);
-    sceneWindow.setSize(250, 400);
+    sceneWindow.setPosition(20, 40);
+    int height = (uiRoot.getHeight() - 80) / 2;
+    sceneWindow.setSize(300, height);
     updateSceneWindow(false);
 
     subscribeToEvent(sceneWindow.getChild("CloseButton", true), "Released", "hideSceneWindow");
@@ -23,8 +24,9 @@ void createSceneWindow()
     subscribeToEvent(sceneWindow.getChild("CollapseAllButton", true), "Released", "collapseSceneHierarchy");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "ItemSelected", "handleEntityListSelectionChange");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "ItemDeselected", "handleEntityListSelectionChange");
-    subscribeToEvent(sceneWindow.getChild("EntityList", true), "ItemDoubleClicked", "handleEntityListDoubleClick");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "UnhandledKey", "handleEntityListKey");
+    subscribeToEvent("DragDropTest", "handleDragDropTest");
+    subscribeToEvent("DragDropFinish", "handleDragDropFinish");
 }
 
 void showSceneWindow()
@@ -82,6 +84,7 @@ void updateSceneWindowEntity(uint itemIndex, Entity@ entity)
     text.userData["EntityID"] = entity.getID();
     text.userData["Indent"] = 0;
     text.setText(getEntityTitle(entity));
+    text.setDragDropMode(DD_TARGET);
 
     list.insertItem(itemIndex, text);
 
@@ -117,6 +120,7 @@ void addComponentToSceneWindow(Entity@ entity, array<Component@>@ components, ui
     text.userData["ComponentID"] = componentID;
     text.userData["Indent"] = indent;
     text.setText(getComponentTitle(component, indent));
+    text.setDragDropMode(DD_SOURCE_AND_TARGET);
     list.insertItem(listAddIndex, text);
     ++listAddIndex;
     
@@ -196,16 +200,21 @@ Component@ getListComponent(uint index)
 {
     ListView@ list = sceneWindow.getChild("EntityList", true);
     UIElement@ item = list.getItem(index);
+    return getListComponent(item);
+}
+
+Component@ getListComponent(UIElement@ item)
+{
     if (item is null)
         return null;
-    if (item.userData["Type"] != ITEM_COMPONENT)
+    if (item.userData["Type"].getInt() != ITEM_COMPONENT)
         return null;
 
     Entity@ entity = editorScene.getEntity(uint(item.userData["EntityID"].getInt()));
     if (entity is null)
         return null;
 
-    array<Component@>@ components = selectedEntity.getComponents();
+    array<Component@>@ components = entity.getComponents();
     uint componentID = uint(item.userData["ComponentID"].getInt());
     if (componentID < components.size())
         return components[componentID];
@@ -276,8 +285,11 @@ void selectComponent(Component@ component)
     {
         // Make sure the selected entity is expanded
         list.setChildItemsVisible(entityItem, true);
-       // This causes an event to be sent, in response we set selectedComponent & selectedEntity, and refresh editors
+        // This causes an event to be sent, in response we set selectedComponent & selectedEntity, and refresh editors
         list.setSelection(componentItem);
+        // Focus the list if visible
+        if (sceneWindow.isVisible())
+            ui.setFocusElement(list);
     }
     else
         list.clearSelection();
@@ -292,18 +304,6 @@ void handleEntityListSelectionChange()
     @selectedComponent = getListComponent(index);
 
     updateComponentWindow();
-}
-
-void handleEntityListDoubleClick()
-{
-    //! \todo Doubleclick is problematic, because it also collapses/expands list items
-
-    /*
-    ListView@ list = sceneWindow.getChild("EntityList", true);
-    UIElement@ item = list.getSelectedItem();
-    if ((item !is null) && (item.userData["Type"] == ITEM_COMPONENT))
-        showComponentWindow();
-    */
 }
 
 void handleEntityListKey(StringHash eventType, VariantMap& eventData)
@@ -353,4 +353,176 @@ void handleEntityListKey(StringHash eventType, VariantMap& eventData)
             list.setSelection(index);
         }
     }
+}
+
+void handleDragDropTest(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ source = eventData["Source"].getUIElement();
+    UIElement@ target = eventData["Target"].getUIElement();
+    eventData["Accept"] = testSceneWindowElements(source, target);
+}
+
+void handleDragDropFinish(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ source = eventData["Source"].getUIElement();
+    UIElement@ target = eventData["Target"].getUIElement();
+    bool accept =  testSceneWindowElements(source, target);
+    eventData["Accept"] = accept;
+    if (!accept)
+        return;
+
+    // Now perform the action
+    Entity@ sourceEntity = editorScene.getEntity(uint(source.userData["EntityID"].getInt()));
+    Entity@ targetEntity = editorScene.getEntity(uint(target.userData["EntityID"].getInt()));
+    Component@ sourceComponent = getListComponent(source);
+
+    // Move component into another entity, and/or make unparented
+    if (target.userData["Type"].getInt() == ITEM_ENTITY)
+    {
+        // Within same entity
+        if (sourceEntity is targetEntity)
+        {
+            beginModify(sourceEntity.getID());
+
+            Node@ sourceNode = cast<Node>(sourceComponent);
+            if ((sourceNode !is null) && (sourceNode.getParent() !is null))
+                sourceNode.getParent().removeChild(sourceNode, true);
+
+            updateSceneWindowEntity(sourceEntity);
+            endModify(sourceEntity.getID());
+        }
+        // Move to different entity
+        else
+        {
+            beginModify(sourceEntity.getID());
+            beginModify(targetEntity.getID());
+
+            sourceEntity.removeComponent(sourceComponent);
+            targetEntity.addComponent(sourceComponent);
+
+            Node@ sourceNode = cast<Node>(sourceComponent);
+            
+            if (sourceNode !is null)
+            {
+                if (sourceNode.getParent() !is null)
+                    sourceNode.getParent().removeChild(sourceNode, true);
+
+                // Move also all children of the source node to the target entity to keep the hierarchy consistent
+                // (note: under the current scene model, programmatically such limitation does not exist)
+                array<Node@> allChildren = sourceNode.getChildren(NODE_ANY, true);
+                for (uint i = 0; i < allChildren.size(); ++i)
+                {
+                    sourceEntity.removeComponent(allChildren[i]);
+                    targetEntity.addComponent(allChildren[i]);
+                }
+            }
+
+            updateSceneWindowEntity(sourceEntity);
+            updateSceneWindowEntity(targetEntity);
+
+            endModify(targetEntity.getID());
+            endModify(sourceEntity.getID());
+        }
+    }
+    else
+    {
+        Node@ sourceNode = getListComponent(source);
+        Node@ targetNode = getListComponent(target);
+
+        // Reparent a node
+        // Entity is different: also move to different entity
+        if (targetEntity !is sourceEntity)
+        {
+            beginModify(sourceEntity.getID());
+            beginModify(targetEntity.getID());
+
+            sourceEntity.removeComponent(sourceNode);
+            targetEntity.addComponent(sourceNode);
+
+            // Move also all children of the source node to the target entity to keep the hierarchy consistent
+            // (note: under the current scene model, programmatically such limitation does not exist)
+            array<Node@> allChildren = sourceNode.getChildren(NODE_ANY, true);
+            for (uint i = 0; i < allChildren.size(); ++i)
+            {
+                sourceEntity.removeComponent(allChildren[i]);
+                targetEntity.addComponent(allChildren[i]);
+            }
+
+            // Set transform so that the world transform stays through the parent change
+            Vector3 newPos;
+            Quaternion newRot;
+            Vector3 newScale;
+            calculateNewTransform(sourceNode, targetNode, newPos, newRot, newScale);
+            targetNode.addChild(sourceNode);
+            sourceNode.setTransform(newPos, newRot, newScale);
+
+            updateSceneWindowEntity(sourceEntity);
+            updateSceneWindowEntity(targetEntity);
+
+            endModify(targetEntity.getID());
+            endModify(sourceEntity.getID());
+        }
+        // Entity is same: only need to reparent
+        else
+        {
+            beginModify(sourceEntity.getID());
+            
+            Vector3 newPos;
+            Quaternion newRot;
+            Vector3 newScale;
+            calculateNewTransform(sourceNode, targetNode, newPos, newRot, newScale);
+            targetNode.addChild(sourceNode);
+            sourceNode.setTransform(newPos, newRot, newScale);
+
+            updateSceneWindowEntity(sourceEntity);
+            endModify(sourceEntity.getID());
+        }
+    }
+
+    selectComponent(sourceComponent);
+}
+
+bool testSceneWindowElements(UIElement@ source, UIElement@ target)
+{
+    Entity@ sourceEntity = editorScene.getEntity(uint(source.userData["EntityID"].getInt()));
+    Entity@ targetEntity = editorScene.getEntity(uint(target.userData["EntityID"].getInt()));
+    Node@ sourceNode = getListComponent(source);
+
+    // Move component into another entity, or make unparented
+    if (target.userData["Type"].getInt() == ITEM_ENTITY)
+    {
+        if (sourceEntity !is targetEntity)
+            return true;
+        if ((sourceNode !is null) && (sourceNode.getParent() !is null))
+            return true;
+        return false;
+    }
+
+    // Reparent a node
+    Node@ targetNode = getListComponent(target);
+    if ((sourceNode is null) || (targetNode is null))
+        return false;
+    if (sourceNode.getParent() is targetNode)
+        return false;
+    // Check for looped parent-child assignment
+    array<Node@> allChildren = sourceNode.getChildren(NODE_ANY, true);
+    for (uint i = 0; i < allChildren.size(); ++i)
+    {
+        if (allChildren[i] is targetNode)
+            return false;
+    }
+    return true;
+}
+
+void calculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion& rot, Vector3& scale)
+{
+    Vector3 sourceWorldPos = source.getWorldPosition();
+    Quaternion sourceWorldRot = source.getWorldRotation();
+    Vector3 sourceWorldScale = source.getWorldScale();
+
+    Quaternion inverseTargetWorldRot = target.getWorldRotation().getInverse();
+    Vector3 inverseTargetWorldScale = Vector3(1, 1, 1) / target.getWorldScale();
+    scale = inverseTargetWorldScale * sourceWorldScale;
+    rot = inverseTargetWorldRot * sourceWorldRot;
+    pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.getWorldPosition()));
 }

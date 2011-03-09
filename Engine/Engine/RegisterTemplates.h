@@ -303,7 +303,7 @@ template <class T> void registerNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void setScale(const Vector3& in)", asMETHODPR(T, setScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setTransform(const Vector3& in, const Quaternion& in)", asMETHODPR(T, setTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setTransform(const Vector3& in, const Quaternion& in, float)", asMETHODPR(T, setTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void setTransform(const Vector3& in, const Quaternion& in, const Quaternion& in)", asMETHODPR(T, setTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void setTransform(const Vector3& in, const Quaternion& in, const Vector3& in)", asMETHODPR(T, setTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void translate(const Vector3& in)", asMETHODPR(T, translate, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void translateRelative(const Vector3& in)", asMETHODPR(T, translateRelative, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void rotate(const Quaternion& in, bool)", asMETHODPR(T, rotate, (const Quaternion&, bool), void), asCALL_THISCALL);

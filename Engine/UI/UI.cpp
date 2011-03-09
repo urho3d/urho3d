@@ -184,13 +184,13 @@ void UI::update(float timeStep)
             bool accept = element->onDragDropTest(mMouseDragElement);
             if (accept)
             {
-                using namespace UIDragDropTest;
+                using namespace DragDropTest;
                 
                 VariantMap eventData;
                 eventData[P_SOURCE] = (void*)mMouseDragElement.getPtr();
                 eventData[P_TARGET] = (void*)element.getPtr();
                 eventData[P_ACCEPT] = accept;
-                sendEvent(EVENT_UIDRAGDROPTEST, eventData);
+                sendEvent(EVENT_DRAGDROPTEST, eventData);
                 accept = eventData[P_ACCEPT].getBool();
             }
             
@@ -556,7 +556,7 @@ void UI::handleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             element->onClick(element->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             
             // Handle start of drag. onClick() may have caused destruction of the element, so check the pointer again
-            if ((element) && (!mMouseDragElement))
+            if ((element) && (!mMouseDragElement) && (mMouseButtons == MOUSEB_LEFT))
             {
                 mMouseDragElement = element;
                 element->onDragStart(element->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
@@ -613,13 +613,13 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
                         // onDragDropFinish() may have caused destruction of the elements, so check the pointers again
                         if ((accept) && (mMouseDragElement) && (target))
                         {
-                            using namespace UIDragDropFinish;
+                            using namespace DragDropFinish;
                             
                             VariantMap eventData;
                             eventData[P_SOURCE] = (void*)mMouseDragElement.getPtr();
                             eventData[P_TARGET] = (void*)target.getPtr();
                             eventData[P_ACCEPT] = accept;
-                            sendEvent(EVENT_UIDRAGDROPFINISH, eventData);
+                            sendEvent(EVENT_DRAGDROPFINISH, eventData);
                         }
                     }
                 }

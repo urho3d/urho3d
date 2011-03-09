@@ -474,7 +474,7 @@ void Node::setNodeFlags(unsigned flags)
 
 void Node::addChild(Node* node)
 {
-    if ((!node) || (node->mParent == this) || (mParent == node))
+    if ((!node) || (node == this) || (node->mParent == this) || (mParent == node))
         return;
     
     // Add first, then remove from old parent, to ensure the node does not get deleted
