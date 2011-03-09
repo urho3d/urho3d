@@ -19,9 +19,11 @@ void createUI()
     createSceneWindow();
     createComponentWindow();
     createCameraDialog();
+    createConsole();
     
     subscribeToEvent("ScreenMode", "resizeUI");
     subscribeToEvent("MenuSelected", "handleMenuSelected");
+	subscribeToEvent("KeyDown", "handleKeyDown");
 }
 
 void resizeUI()
@@ -139,6 +141,13 @@ void closeFileSelector()
     @uiFileSelector = null;
 }
 
+void createConsole()
+{
+    Console@ console = engine.createConsole();
+    console.setStyle(uiStyle);
+    console.setNumRows(16);
+}
+
 void centerDialog(UIElement@ element)
 {
     IntVector2 size = element.getSize();
@@ -228,4 +237,14 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 
     string fileName = eventData["FileName"].getString();
     saveScene(fileName);
+}
+
+void handleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    // Check for toggling the console
+    if (eventData["Key"].getInt() == 220)
+    {
+        console.toggle();
+        input.suppressNextChar();
+    }
 }

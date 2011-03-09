@@ -480,6 +480,8 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
     
     if (mCursor)
     {
+        const IntVector2& rootSize = mRootElement->getSize();
+        
         if (eventData[P_CLIPCURSOR].getBool())
         {
             // When in confined cursor mode, move cursor only when visible
@@ -488,7 +490,6 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
                 IntVector2 pos = mCursor->getPosition();
                 pos.mX += eventData[P_DX].getInt();
                 pos.mY += eventData[P_DY].getInt();
-                const IntVector2& rootSize = mRootElement->getSize();
                 pos.mX = clamp(pos.mX, 0, rootSize.mX - 1);
                 pos.mY = clamp(pos.mY, 0, rootSize.mY - 1);
                 mCursor->setPosition(pos);
@@ -497,11 +498,24 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
         else
         {
             // When in non-confined mode, move cursor always to ensure accurate position
-            // Do not clamp, but hide the cursor when not in the window's client area
-            int x = eventData[P_X].getInt();
-            int y = eventData[P_Y].getInt();
-            mCursor->setPosition(x, y);
-            mCursor->setVisible((x >= 0) && (y >= 0) && (x < mRenderer->getWidth()) && (y < mRenderer->getHeight()));
+            IntVector2 pos(eventData[P_X].getInt(), eventData[P_Y].getInt());
+            bool inside = (pos.mX >= 0) && (pos.mX < rootSize.mX) && (pos.mY >= 0) && (pos.mY < rootSize.mY);
+            
+            // Hide by moving completely outside if outside
+            // (do not use setVisible(), so that actual visibility remains under application control)
+            if (pos.mX < 0)
+                pos.mX = -mCursor->getWidth() * 2;
+            if (pos.mX >= rootSize.mX)
+                pos.mX = rootSize.mX + mCursor->getWidth() * 2;
+            if (pos.mY < 0)
+                pos.mY = -mCursor->getHeight() * 2;
+            if (pos.mY >= rootSize.mY)
+                pos.mY = rootSize.mY + mCursor->getHeight() * 2;
+            mCursor->setPosition(pos);
+            
+            // Do not drag when outside
+            if (!inside)
+                return;
         }
         
         if ((mMouseDragElement) && (mMouseButtons))
@@ -510,7 +524,10 @@ void UI::handleMouseMove(StringHash eventType, VariantMap& eventData)
             if ((mMouseDragElement->isEnabled()) && (mMouseDragElement->isVisible()))
                 mMouseDragElement->onDragMove(mMouseDragElement->screenToElement(pos), pos, mMouseButtons, mQualifiers, mCursor);
             else
+            {
+                mMouseDragElement->onDragEnd(mMouseDragElement->screenToElement(pos), pos, mCursor);
                 mMouseDragElement.reset();
+            }
         }
     }
 }
@@ -571,7 +588,7 @@ void UI::handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     mMouseButtons = eventData[P_BUTTONS].getInt();
     mQualifiers = eventData[P_QUALIFIERS].getInt();
     
-    if ((mCursor) && (mCursor->isVisible()))
+    if ((mCursor) && ((mCursor->isVisible()) || (mMouseDragElement)))
     {
         IntVector2 pos = mCursor->getPosition();
         

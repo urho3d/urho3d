@@ -398,9 +398,6 @@ void Input::mouseButtonChange(int button, bool newState)
     if ((newState) && (!mActive))
         return;
     
-    // Check mouse move before sending the button up/down so that the click will be interpreted correctly
-    //checkMouseMove();
-    
     if (newState)
     {
         if (!(mMouseButtonDown & button))
