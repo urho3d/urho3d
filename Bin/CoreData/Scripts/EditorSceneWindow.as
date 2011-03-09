@@ -325,7 +325,11 @@ void handleEntityListKey(StringHash eventType, VariantMap& eventData)
             if (selectedComponent is component)
                 @selectedComponent = null;
 
+            uint id = entity.getID();
+            beginModify(id);
             entity.removeComponent(component);
+            endModify(id);
+
             // If component is a node, also remove it from the parent node
             Node@ node = cast<Node>(component);
             if ((node !is null) && (node.getParent() !is null))
@@ -340,7 +344,11 @@ void handleEntityListKey(StringHash eventType, VariantMap& eventData)
             if (selectedEntity is entity)
                 @selectedEntity = null;
 
+            uint id = entity.getID();
+            beginModify(id);
             editorScene.removeEntity(entity);
+            endModify(id);
+            
             updateSceneWindowEntity(entityItem, null);
             list.setSelection(index);
         }

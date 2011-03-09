@@ -176,7 +176,7 @@ void updateComponentAttributes()
 
 void editComponentAttribute(StringHash eventType, VariantMap& eventData)
 {
-    if (selectedComponent is null)
+    if ((selectedComponent is null) || (selectedEntity is null))
         return;
         
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
@@ -192,8 +192,13 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
         if (index == uint(attrEdit.userData["Index"].getInt()))
         {
             writeAttributeEditor(attrEdit.userData["Type"].getInt(), categoryElem, index, attrEdit.userData["Attribute"].getString());
+
+            uint id = selectedEntity.getID();
+            beginModify(id);
             selectedComponent.loadXML(rootElem);
             selectedComponent.postLoad();
+            endModify(id);
+
             updateComponentAttributes();
             return;
         }

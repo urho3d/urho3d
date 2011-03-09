@@ -6,7 +6,7 @@
 Scene@ editorScene;
 string sceneFileName;
 string sceneResourcePath;
-bool sceneUnsaved = false;
+bool sceneModified = false;
 
 Component@ selectedComponent;
 Entity@ selectedEntity;
@@ -62,7 +62,7 @@ void loadScene(string fileName)
         editorScene.loadXML(file);
         
     sceneFileName = fileName;
-    sceneUnsaved = false;
+    sceneModified = false;
     updateWindowTitle();
     updateSceneWindow(false);
     resetCamera();
@@ -81,8 +81,24 @@ void saveScene(string fileName)
         editorScene.saveXML(file);
 
     sceneFileName = fileName;
-    sceneUnsaved = false;
+    sceneModified = false;
     updateWindowTitle();
+}
+
+void beginModify(uint entityID)
+{
+    // Undo/Redo can be implemented here
+}
+
+void endModify(uint entityID)
+{
+    // Undo/Redo can be implemented here
+
+    if (!sceneModified)
+    {
+        sceneModified = true;
+        updateWindowTitle();
+    }
 }
 
 string getEntityTitle(Entity@ entity)

@@ -148,7 +148,7 @@ void centerDialog(UIElement@ element)
 void updateWindowTitle()
 {
     string sceneName = sceneFileName.empty() ? "Untitled" : getFileNameAndExtension(sceneFileName);
-    if (sceneUnsaved)
+    if (sceneModified)
         sceneName += "*";
     renderer.setWindowTitle("Urho3D editor - " + sceneName);
 }
