@@ -96,7 +96,7 @@ public:
     //! Reset root pointer recursively. Called when the whole octree is being destroyed
     void resetRoot();
     //! Draw bounds to the debug renderer recursively
-    void drawDebugGeometry(DebugRenderer* debug);
+    void drawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
     //! Return scene nodes by a query, called internally
@@ -170,8 +170,6 @@ public:
     void resize(const BoundingBox& box, unsigned numLevels);
     //! Set global exclude node flags for queries. For debugging/editing purposes only, will not be saved
     void setExcludeFlags(unsigned nodeFlags);
-    //! Set whether to draw debug geometry
-    void setDrawDebugGeometry(bool enable);
     //! Update and reinsert scene nodes. Called by Pipeline, or by update() if in headless mode
     void updateOctree(const FrameInfo& frame);
     
@@ -183,8 +181,6 @@ public:
     unsigned getNumLevels() const { return mNumLevels; }
     //! Return global exclude node flags
     unsigned getExcludeFlags() const { return mExcludeFlags; }
-    //! Return whether to draw debug geometry
-    bool getDrawDebugGeometry() const { return mDrawDebugGeometry; }
     //! Return whether is in headless mode
     bool isHeadless() const { return mHeadless; }
     
@@ -197,12 +193,9 @@ public:
     //! Remove scene node from reinsertion list
     void clearNodeReinsertion(VolumeNode* node);
     //! Add debug geometry to the debug renderer
-    void drawDebugGeometry();
+    void drawDebugGeometry(bool depthTest);
     
 private:
-    //! Handle post render update event. Draw debug geometry here if enabled
-    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
-    
     //! Set of scene nodes that require update
     std::set<VolumeNode*> mNodeUpdates;
     //! Set of scene nodes that require reinsertion

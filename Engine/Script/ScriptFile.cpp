@@ -106,8 +106,13 @@ void ScriptFile::addEventHandler(StringHash eventType, const std::string& handle
     asIScriptFunction* function = getFunction(declaration);
     if (!function)
     {
-        LOGERROR("Event handler function " + declaration + " not found in " + getName());
-        return;
+        declaration = "void " + handlerName + "()";
+        function = getFunction(declaration);
+        if (!function)
+        {
+            LOGERROR("Event handler function " + handlerName + " not found in " + getName());
+            return;
+        }
     }
     
     subscribeToEvent(eventType, EVENT_HANDLER_USERDATA(ScriptFile, handleScriptEvent, (void*)function));
@@ -120,7 +125,7 @@ void ScriptFile::addEventHandler(EventListener* sender, StringHash eventType, co
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + toString(eventType));
+        LOGERROR("Null event sender for event " + toString(eventType) + ", handler " + handlerName);
         return;
     }
     
@@ -128,11 +133,16 @@ void ScriptFile::addEventHandler(EventListener* sender, StringHash eventType, co
     asIScriptFunction* function = getFunction(declaration);
     if (!function)
     {
-        LOGERROR("Event handler function " + declaration + " not found in " + getName());
-        return;
+        declaration = "void " + handlerName + "()";
+        function = getFunction(declaration);
+        if (!function)
+        {
+            LOGERROR("Event handler function " + handlerName + " not found in " + getName());
+            return;
+        }
     }
     
-    subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptFile, handleSpecificScriptEvent, (void*)function));
+    subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptFile, handleScriptEvent, (void*)function));
 }
 
 bool ScriptFile::execute(const std::string& declaration, const VariantVector& parameters, bool unprepare)
@@ -543,21 +553,16 @@ void ScriptFile::handleScriptEvent(StringHash eventType, VariantMap& eventData)
     if (!mCompiled)
         return;
     
-    VariantVector parameters;
-    parameters.push_back(Variant((void*)&eventType));
-    parameters.push_back(Variant((void*)&eventData));
-    execute(static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
-}
-
-void ScriptFile::handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData)
-{
-    if (!mCompiled)
-        return;
+    asIScriptFunction* function = static_cast<asIScriptFunction*>(getInvoker()->getUserData());
     
     VariantVector parameters;
-    parameters.push_back(Variant((void*)&eventType));
-    parameters.push_back(Variant((void*)&eventData));
-    execute(static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
+    if (function->GetParamCount() > 0)
+    {
+        parameters.push_back(Variant((void*)&eventType));
+        parameters.push_back(Variant((void*)&eventData));
+    }
+    
+    execute(function, parameters);
 }
 
 ScriptFile* getScriptContextFile()

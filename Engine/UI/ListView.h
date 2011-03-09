@@ -101,6 +101,8 @@ public:
     void setDoubleClickInterval(float interval);
     //! Show or hide child items starting from index. Only has effect in hierarchy mode
     void setChildItemsVisible(unsigned index, bool enable);
+    //! Show or hide all child items. Only has effect in hierarchy mode
+    void setChildItemsVisible(bool enable);
     //! Toggle child items' visibility starting from index. Only has effect in hierarchy mode
     void toggleChildItemsVisible(unsigned index);
     

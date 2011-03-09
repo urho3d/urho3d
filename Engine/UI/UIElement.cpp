@@ -645,14 +645,13 @@ void UIElement::updateLayout()
         
         int width = calculateLayoutParentSize(sizes, mLayoutBorder.mLeft, mLayoutBorder.mRight, mLayoutSpacing);
         int height = max(getHeight(), minChildHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom);
-        // Make sure the minimum size we are going to set is not higher than current maximum size
-        // If we already have a fixed size, respect that
-        if (mMinSize != mMaxSize)
-        {
-            int minWidth = min(calculateLayoutParentSize(minSizes, mLayoutBorder.mLeft, mLayoutBorder.mRight, mLayoutSpacing), mMaxSize.mX);
-            int minHeight = min(minChildHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom, mMaxSize.mY);
-            setMinSize(minWidth, minHeight);
-        }
+        int minWidth = min(calculateLayoutParentSize(minSizes, mLayoutBorder.mLeft, mLayoutBorder.mRight, mLayoutSpacing), mMaxSize.mX);
+        int minHeight = min(minChildHeight + mLayoutBorder.mTop + mLayoutBorder.mBottom, mMaxSize.mY);
+        // Respect fixed size if already set
+        if (mMinSize.mX != mMaxSize.mX)
+            mMinSize.mX = minWidth;
+        if (mMinSize.mY != mMaxSize.mY)
+            mMinSize.mY = minHeight;
         setSize(width, height);
         // Validate the size before resizing child elements, in case of min/max limits
         width = mSize.mX;
@@ -691,12 +690,12 @@ void UIElement::updateLayout()
         
         int height = calculateLayoutParentSize(sizes, mLayoutBorder.mTop, mLayoutBorder.mBottom, mLayoutSpacing);
         int width = max(getWidth(), minChildWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight);
-        if (mMinSize != mMaxSize)
-        {
-            int minHeight = min(calculateLayoutParentSize(minSizes, mLayoutBorder.mTop, mLayoutBorder.mBottom, mLayoutSpacing), mMaxSize.mY);
-            int minWidth = min(minChildWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight, mMaxSize.mX);
-            setMinSize(minWidth, minHeight);
-        }
+        int minHeight = min(calculateLayoutParentSize(minSizes, mLayoutBorder.mTop, mLayoutBorder.mBottom, mLayoutSpacing), mMaxSize.mY);
+        int minWidth = min(minChildWidth + mLayoutBorder.mLeft + mLayoutBorder.mRight, mMaxSize.mX);
+        if (mMinSize.mX != mMaxSize.mX)
+            mMinSize.mX = minWidth;
+        if (mMinSize.mY != mMaxSize.mY)
+            mMinSize.mY = minHeight;
         setSize(width, height);
         width = mSize.mX;
         height = mSize.mY;

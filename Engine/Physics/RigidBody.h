@@ -174,7 +174,7 @@ public:
     bool isActive() const;
     
     //! Add debug geometry to the debug renderer
-    void drawDebugGeometry(DebugRenderer* debug);
+    void drawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 private:
     //! Store previous transform for rendering interpolation

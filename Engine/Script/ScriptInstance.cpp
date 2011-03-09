@@ -429,8 +429,13 @@ void ScriptInstance::addEventHandler(StringHash eventType, const std::string& ha
     asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
     if (!method)
     {
-        LOGERROR("Event handler method " + declaration + " not found in " + mScriptFile->getName());
-        return;
+        declaration = "void " + handlerName + "()";
+        method = mScriptFile->getMethod(mScriptObject, declaration);
+        if (!method)
+        {
+            LOGERROR("Event handler method " + handlerName + " not found in " + mScriptFile->getName());
+            return;
+        }
     }
     
     subscribeToEvent(eventType, EVENT_HANDLER_USERDATA(ScriptInstance, handleScriptEvent, (void*)method));
@@ -443,7 +448,7 @@ void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + toString(eventType));
+        LOGERROR("Null event sender for event " + toString(eventType) + ", handler " + handlerName);
         return;
     }
     
@@ -451,11 +456,16 @@ void ScriptInstance::addEventHandler(EventListener* sender, StringHash eventType
     asIScriptFunction* method = mScriptFile->getMethod(mScriptObject, declaration);
     if (!method)
     {
-        LOGERROR("Event handler method " + declaration + " not found in " + mScriptFile->getName());
-        return;
+        declaration = "void " + handlerName + "()";
+        method = mScriptFile->getMethod(mScriptObject, declaration);
+        if (!method)
+        {
+            LOGERROR("Event handler method " + handlerName + " not found in " + mScriptFile->getName());
+            return;
+        }
     }
     
-    subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptInstance, handleSpecificScriptEvent, (void*)method));
+    subscribeToEvent(sender, eventType, EVENT_HANDLER_USERDATA(ScriptInstance, handleScriptEvent, (void*)method));
 }
 
 bool ScriptInstance::createObject()
@@ -654,21 +664,16 @@ void ScriptInstance::handleScriptEvent(StringHash eventType, VariantMap& eventDa
     if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
         return;
     
-    VariantVector parameters;
-    parameters.push_back(Variant((void*)&eventType));
-    parameters.push_back(Variant((void*)&eventData));
-    mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
-}
-
-void ScriptInstance::handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData)
-{
-    if ((!mEnabled) || (!mScriptFile) || (!mScriptObject))
-        return;
+    asIScriptFunction* method = static_cast<asIScriptFunction*>(getInvoker()->getUserData());
     
     VariantVector parameters;
-    parameters.push_back(Variant((void*)&eventType));
-    parameters.push_back(Variant((void*)&eventData));
-    mScriptFile->execute(mScriptObject, static_cast<asIScriptFunction*>(getInvoker()->getUserData()), parameters);
+    if (method->GetParamCount() > 0)
+    {
+        parameters.push_back(Variant((void*)&eventType));
+        parameters.push_back(Variant((void*)&eventData));
+    }
+    
+    mScriptFile->execute(mScriptObject, method, parameters);
 }
 
 ScriptInstance* getScriptContextInstance()

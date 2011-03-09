@@ -158,8 +158,6 @@ private:
     void handlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
     //! Handle an event in script
     void handleScriptEvent(StringHash eventType, VariantMap& eventData);
-    //! Handle a specific sender's event in script
-    void handleSpecificScriptEvent(StringHash eventType, VariantMap& eventData);
     
     //! Script engine
     SharedPtr<ScriptEngine> mScriptEngine;

@@ -1,13 +1,15 @@
 // Urho3D editor scene handling
 
-const int ITEM_ENTITY = 1;
-const int ITEM_COMPONENT = 2;
+#include "Scripts/EditorSceneWindow.as"
+#include "Scripts/EditorComponentWindow.as"
 
 Scene@ editorScene;
-Window@ sceneWindow;
 string sceneFileName;
 string sceneResourcePath;
 bool sceneUnsaved = false;
+
+Component@ selectedComponent;
+Entity@ selectedEntity;
 
 void createScene()
 {
@@ -16,6 +18,8 @@ void createScene()
     
     // Always pause the scene for now
     editorScene.setPaused(true);
+    
+    subscribeToEvent("PostRenderUpdate", "sceneRaycast");
 }
 
 void setResourcePath(string newPath)
@@ -43,6 +47,8 @@ void loadScene(string fileName)
     }
 
     // Clear the old scene
+    @selectedComponent = null;
+    @selectedEntity = null;
     editorScene.removeAllEntities();
 
     // Add the new resource path
@@ -58,7 +64,7 @@ void loadScene(string fileName)
     sceneFileName = fileName;
     sceneUnsaved = false;
     updateWindowTitle();
-    updateSceneWindow();
+    updateSceneWindow(false);
     resetCamera();
 }
 
@@ -77,90 +83,6 @@ void saveScene(string fileName)
     sceneFileName = fileName;
     sceneUnsaved = false;
     updateWindowTitle();
-}
-
-void createSceneWindow()
-{
-    if (!(sceneWindow is null))
-        return;
-    
-    @sceneWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/SceneWindow.xml"), uiStyle);
-    uiRoot.addChild(sceneWindow);
-    sceneWindow.setPosition(40, 40);
-    sceneWindow.setSize(250, 400);
-    updateSceneWindow();
-}
-
-void updateSceneWindow()
-{
-    ListView@ list = sceneWindow.getChild("EntityList", true);
-    list.removeAllItems();
-
-    array<Entity@> entities = editorScene.getAllEntities();
-    for (uint i = 0; i < entities.size(); ++i)
-    {
-        uint itemIndex = list.getNumItems();
-
-        Entity@ entity = entities[i];
-        Text@ text = Text();
-        text.setStyle(uiStyle, "FileSelectorListText");
-        text.userData["Type"] = ITEM_ENTITY;
-        text.userData["EntityID"] = entity.getID();
-        text.userData["Indent"] = 0;
-        text.setText(getEntityTitle(entity));
-        list.addItem(text);
-
-        array<Component@> components = entity.getComponents();
-        for (uint j = 0; j < components.size(); ++j)
-        {
-            Node@ node = cast<Node@>(components[j]);
-            // If is a scenenode, only add root-level node or node parented to a node in another entity
-            if ((node is null) || (node.getParent() is null) || (!(node.getParent().getEntity() is entity)))
-                addComponentToSceneWindow(entity, components, j, 1);
-        }
-        // Collapse components by default
-        list.setChildItemsVisible(itemIndex, false);
-    }
-}
-
-void addComponentToSceneWindow(Entity@ entity, array<Component@> components, uint index, int indent)
-{
-    ListView@ list = sceneWindow.getChild("EntityList", true);
-
-    Component@ component = components[index];
-    Text@ text = Text();
-    text.setStyle(uiStyle, "FileSelectorListText");
-    text.userData["Type"] = ITEM_COMPONENT;
-    text.userData["EntityID"] = entity.getID();
-    // Note: must remember to update indices whenever components are added/removed.
-    // Should have direct unique identification for components in the scene model
-    text.userData["ComponentID"] = index;
-    text.userData["Indent"] = indent;
-    text.setText(getComponentTitle(component, indent));
-    list.addItem(text);
-    
-    // Check child scenenodes in the same entity and add them with increased indent
-    Node@ node = cast<Node@>(component);
-    if (!(node is null))
-    {
-        array<Node@> childNodes = node.getChildren(NODE_ANY, false);
-        for (uint i = 0; i < childNodes.size(); ++i)
-        {
-            Node@ childNode = childNodes[i];
-            if (childNode.getEntity() is entity)
-            {
-                // Must find the corresponding component index
-                for (uint j = 0; j < components.size(); ++j)
-                {
-                    if (components[j] is childNode)
-                    {
-                        addComponentToSceneWindow(entity, components, j, indent + 1);
-                        break;
-                    }
-                }
-            }
-        }
-    }
 }
 
 string getEntityTitle(Entity@ entity)
@@ -185,3 +107,39 @@ string getComponentTitle(Component@ component, int indent)
     else
         return indentStr + component.getTypeName() + " (" + name + ")";
 }
+
+void sceneRaycast()
+{
+    DebugRenderer@ debug = editorScene.getDebugRenderer();
+    IntVector2 pos = ui.getCursorPosition();
+
+    // Visualize current selection (either renderables or rigidbodies can be visualized)
+    if (selectedComponent !is null)
+    {
+        VolumeNode@ node = cast<VolumeNode>(selectedComponent);
+        if (node !is null)
+            node.drawDebugGeometry(debug, false);
+        else
+        {
+            RigidBody@ body = cast<RigidBody>(selectedComponent);
+            if (body !is null)
+                body.drawDebugGeometry(debug, false);
+        }
+    }
+
+    //! \todo allow to switch between renderer and physics raycast
+    if (ui.getElementAt(pos, true) is null)
+    {
+        Ray cameraRay = camera.getScreenRay(float(pos.x) / renderer.getWidth(), float(pos.y) / renderer.getHeight());
+        array<RayQueryResult> result = editorScene.getOctree().raycast(cameraRay, NODE_GEOMETRY, camera.getFarClip(), RAY_TRIANGLE);
+        GeometryNode@ node;
+        if (!result.empty())
+        {
+            @node = result[0].node;
+            node.drawDebugGeometry(debug, false);
+        }
+        if (input.getMouseButtonPress(MOUSEB_LEFT))
+            selectComponent(node);
+    }
+}
+

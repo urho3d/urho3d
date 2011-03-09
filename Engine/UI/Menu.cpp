@@ -37,6 +37,7 @@ Menu::Menu(const std::string& name) :
     mAcceleratorKey(0),
     mAcceleratorQualifiers(0)
 {
+    subscribeToEvent(this, EVENT_RELEASED, EVENT_HANDLER(Menu, handleReleased));
     subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleFocusChanged));
     subscribeToEvent(EVENT_FOCUSCHANGED, EVENT_HANDLER(Menu, handleFocusChanged));
 }
@@ -61,23 +62,6 @@ void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
     
     if (element.hasChildElement("popupoffset"))
         setPopupOffset(element.getChildElement("popupoffset").getIntVector2("value"));
-}
-
-void Menu::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
-{
-    setPressed(true);
-    // Toggle popup visibility if exists
-    showPopup(!mShowPopup);
-    
-    // Send event on each click if no popup, or whenever the popup is opened
-    if ((!mPopup) || (mShowPopup))
-    {
-        using namespace MenuSelected;
-        
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        sendEvent(EVENT_MENUSELECTED, eventData);
-    }
 }
 
 void Menu::onShowPopup()
@@ -158,6 +142,22 @@ void Menu::setAccelerator(int key, int qualifiers)
         subscribeToEvent(EVENT_KEYDOWN, EVENT_HANDLER(Menu, handleKeyDown));
     else
         unsubscribeFromEvent(EVENT_KEYDOWN);
+}
+
+void Menu::handleReleased(StringHash eventType, VariantMap& eventData)
+{
+    // Toggle popup visibility if exists
+    showPopup(!mShowPopup);
+    
+    // Send event on each click if no popup, or whenever the popup is opened
+    if ((!mPopup) || (mShowPopup))
+    {
+        using namespace MenuSelected;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        sendEvent(EVENT_MENUSELECTED, eventData);
+    }
 }
 
 void Menu::handleFocusChanged(StringHash eventType, VariantMap& eventData)

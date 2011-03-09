@@ -92,6 +92,12 @@ DEFINE_EVENT(EVENT_PRESSED, Pressed)
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
+//! UI button was pressed, then released
+DEFINE_EVENT(EVENT_RELEASED, Released)
+{
+    EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+}
+
 //! UI checkbox toggled
 DEFINE_EVENT(EVENT_TOGGLED, Toggled)
 {

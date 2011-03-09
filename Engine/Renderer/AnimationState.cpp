@@ -101,7 +101,7 @@ void AnimationState::load(Deserializer& source)
 void AnimationState::saveXML(XMLElement& element)
 {
     element.setString("name", mAnimation->getName());
-    element.setString("startbone", mAnimation->getName());
+    element.setString("startbone", mStartBone->getName());
     element.setBool("looped", isLooped());
     element.setFloat("weight", getWeight());
     element.setFloat("time", getTime());

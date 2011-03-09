@@ -88,6 +88,7 @@ private:
     void handleUpdate(StringHash eventType, VariantMap& eventData);
     void handlePreStep(StringHash eventType, VariantMap& eventData);
     void handlePostUpdate(StringHash eventType, VariantMap& eventData);
+    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     void handleGameEvent(StringHash eventType, VariantMap& eventData);
     void handleClientIdentity(StringHash eventType, VariantMap& eventData);
     void handleJoinedScene(StringHash eventType, VariantMap& eventData);

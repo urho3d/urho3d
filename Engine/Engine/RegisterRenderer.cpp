@@ -895,7 +895,7 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "void setOcclusionBufferSize(int)", asMETHOD(Pipeline, setOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setOccluderSizeThreshold(float)", asMETHOD(Pipeline, setOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "void setEdgeFilter(const EdgeFilterParameters& in)", asMETHOD(Pipeline, setEdgeFilter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "void setDrawDebugGeometry(bool)", asMETHOD(Pipeline, setDrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "void drawDebugGeometry(bool) const", asMETHOD(Pipeline, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViewports() const", asMETHOD(Pipeline, getNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "const Viewport& getViewport(uint) const", asMETHOD(Pipeline, getViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getFrameNumber() const", asMETHOD(Pipeline, getFrameNumber), asCALL_THISCALL);
@@ -912,7 +912,6 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "int getOcclusionBufferSize() const", asMETHOD(Pipeline, getOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "float getOccluderSizeThreshold() const", asMETHOD(Pipeline, getOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "const EdgeFilterParameters& getEdgeFilter() const", asMETHOD(Pipeline, getEdgeFilter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pipeline", "bool getDrawDebugGeometry() const", asMETHOD(Pipeline, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViews() const", asMETHOD(Pipeline, getNumViews), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumGeometries(bool) const", asMETHOD(Pipeline, getNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumLights(bool) const", asMETHOD(Pipeline, getNumLights), asCALL_THISCALL);
@@ -1034,11 +1033,10 @@ static void registerOctree(asIScriptEngine* engine)
     registerHashedType<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void resize(const BoundingBox& in, uint)", asMETHOD(Octree, resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void setExcludeFlags(uint)", asMETHOD(Octree, setExcludeFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "void setDrawDebugGeometry(bool)", asMETHOD(Octree, setDrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void drawDebugGeometry(bool) const", asMETHOD(Octree, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& getWorldBoundingBox() const", asMETHODPR(Octree, getWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getNumLevels() const", asMETHOD(Octree, getNumLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getExcludeFlags() const", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "bool getDrawDebugGeometry() const", asMETHOD(Octree, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "bool isHeadless() const", asMETHOD(Octree, isHeadless), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "array<RayQueryResult>@ raycast(const Ray& in, uint, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Vector3& in, uint)", asFUNCTION(OctreeGetNodesPoint), asCALL_CDECL_OBJLAST);

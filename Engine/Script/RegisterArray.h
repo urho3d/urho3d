@@ -49,6 +49,7 @@ public:
     
     void Resize(asUINT numElements);
     asUINT GetSize() const;
+    bool IsEmpty() const;
     
     // Get a pointer to an element. Returns 0 if out of bounds
     void* At(asUINT index);

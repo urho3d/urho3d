@@ -119,7 +119,6 @@ void InstancedModel::saveXML(XMLElement& dest)
     for (unsigned i = 0; i < mOriginalMaterials.size(); ++i)
     {
         XMLElement materialElem = dest.createChildElement("material");
-        materialElem.setInt("index", i);
         materialElem.setString("name", getResourceName(mOriginalMaterials[i]));
     }
     
@@ -132,7 +131,7 @@ void InstancedModel::saveXML(XMLElement& dest)
         XMLElement instanceElem = dest.createChildElement("instance");
         const Instance& instance = mInstances[i];
         instanceElem.setVector3("pos", instance.mPosition);
-        instanceElem.setQuaternion("rot", instance.mRotation);
+        instanceElem.setVector3("rot", instance.mRotation.getEulerAngles());
         instanceElem.setVector3("scale", instance.mScale);
     }
 }
@@ -147,10 +146,11 @@ void InstancedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     setModel(cache->getResource<Model>(modelElem.getString("name")));
     
     XMLElement materialElem = source.getChildElement("material");
+    unsigned index = 0;
     while (materialElem)
     {
-        unsigned index = materialElem.getInt("index");
         setMaterial(index, cache->getResource<Material>(materialElem.getString("name")));
+        ++index;
         materialElem = materialElem.getNextElement("material");
     }
     
@@ -159,7 +159,7 @@ void InstancedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     setNumInstances(instancesElem.getInt("count"));
     
     XMLElement instanceElem = source.getChildElement("instance");
-    unsigned index = 0;
+    index = 0;
     while ((instanceElem) && (index < mInstances.size()))
     {
         Instance& instance = mInstances[index];

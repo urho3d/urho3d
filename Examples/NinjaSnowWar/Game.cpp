@@ -81,6 +81,7 @@
 
 int simulatePacketLoss = 0;
 int simulateLatency = 0;
+bool drawDebug = false;
 std::string applicationDir;
 std::string downloadDir;
 
@@ -96,6 +97,7 @@ Game::Game() :
 {
     subscribeToEvent(EVENT_UPDATE, EVENT_HANDLER(Game, handleUpdate));
     subscribeToEvent(EVENT_POSTUPDATE, EVENT_HANDLER(Game, handlePostUpdate));
+    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(Game, handlePostRenderUpdate));
     subscribeToEvent(EVENT_PHYSICSPRESTEP, EVENT_HANDLER(Game, handlePreStep));
     subscribeToEvent(EVENT_DIE, EVENT_HANDLER(Game, handleGameEvent));
     subscribeToEvent(EVENT_REMOVE, EVENT_HANDLER(Game, handleGameEvent));
@@ -481,6 +483,12 @@ void Game::handlePostUpdate(StringHash eventType, VariantMap& eventData)
     updateStatus(timeStep);
 }
 
+void Game::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (drawDebug)
+        mScene->getExtension<PhysicsWorld>()->drawDebugGeometry(true);
+}
+
 void Game::handlePreStep(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
@@ -826,7 +834,7 @@ void Game::toggleDebugOverlay()
 void Game::toggleDebugGeometry()
 {
     PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();
-    world->setDrawDebugGeometry(!world->getDrawDebugGeometry());
+    drawDebug = !drawDebug;
 }
 
 void Game::togglePause()

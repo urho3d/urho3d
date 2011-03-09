@@ -76,7 +76,7 @@ public:
     //! Return vertex shader parameter
     virtual bool getVertexShaderParameter(unsigned batchIndex, VSParameter parameter, const float** data, unsigned* count);
     //! Add debug geometry to the debug renderer
-    virtual void drawDebugGeometry(DebugRenderer* debug);
+    virtual void drawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     //! Set model
     void setModel(Model* model);

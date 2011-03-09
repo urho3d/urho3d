@@ -222,8 +222,7 @@ void ComponentRef::writeXML(XMLElement& dest) const
     
     dest.setInt("id", mEntityID);
     dest.setString("type", mTypeName);
-    if (!mName.empty())
-        dest.setString("name", mName);
+    dest.setString("name", mName);
 }
 
 void ComponentRef::readXML(const XMLElement& source)

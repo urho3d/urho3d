@@ -77,7 +77,7 @@ public:
     //! Override model and view transforms for rendering
     virtual void overrideTransforms(unsigned batchIndex, Camera& camera, const Matrix4x3** model, const Matrix4x3** view);
     //! Add debug geometry to the debug renderer
-    virtual void drawDebugGeometry(DebugRenderer* debug);
+    virtual void drawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
     //! Set whether casts shadows
     void setCastShadows(bool enable);

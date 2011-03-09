@@ -156,7 +156,6 @@ void AnimatedModel::saveXML(XMLElement& dest)
     for (unsigned i = 0; i < mMaterials.size(); ++i)
     {
         XMLElement materialElem = dest.createChildElement("material");
-        materialElem.setInt("index", i);
         materialElem.setString("name", getResourceName(mMaterials[i]));
     }
     
@@ -175,7 +174,6 @@ void AnimatedModel::saveXML(XMLElement& dest)
     for (unsigned i = 0; i < mMorphs.size(); ++i)
     {
         XMLElement morphElem = dest.createChildElement("morph");
-        morphElem.setInt("index", i);
         morphElem.setFloat("weight", mMorphs[i].mWeight);
     }
 }
@@ -191,10 +189,11 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     setModel(cache->getResource<Model>(modelElem.getString("name")));
     
     XMLElement materialElem = source.getChildElement("material");
+    unsigned index = 0;
     while (materialElem)
     {
-        unsigned index = materialElem.getInt("index");
         setMaterial(index, cache->getResource<Material>(materialElem.getString("name")));
+        ++index;
         materialElem = materialElem.getNextElement("material");
     }
     
@@ -214,10 +213,11 @@ void AnimatedModel::loadXML(const XMLElement& source, ResourceCache* cache)
     
     // Read morph properties
     XMLElement morphElem = source.getChildElement("morph");
+    index = 0;
     while (morphElem)
     {
-        unsigned index = morphElem.getInt("index");
         setMorphWeight(index, morphElem.getFloat("weight"));
+        ++index;
         morphElem = morphElem.getNextElement("morph");
     }
 }
@@ -624,10 +624,10 @@ bool AnimatedModel::getVertexShaderParameter(unsigned batchIndex, VSParameter pa
     return false;
 }
 
-void AnimatedModel::drawDebugGeometry(DebugRenderer* debug)
+void AnimatedModel::drawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    debug->addBoundingBox(getWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), false);
-    debug->addSkeleton(mSkeleton, Color(0.75f, 0.75f, 0.75f), false);
+    debug->addBoundingBox(getWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
+    debug->addSkeleton(mSkeleton, Color(0.75f, 0.75f, 0.75f), depthTest);
 }
 
 void AnimatedModel::setModel(Model* model)

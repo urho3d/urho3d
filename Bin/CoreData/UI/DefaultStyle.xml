@@ -349,7 +349,7 @@
     </element>
     <element type="FileSelectorFilterList">
         <fixedwidth value="64" />
-        <layout mode="horizontal" border="4 0 4 0" />
+        <layout mode="horizontal" border="4 2 4 2" />
         <resizepopup enable="true" />
         <popup>
             <layout border="4 4 4 4" />
@@ -377,5 +377,26 @@
     </element>
     <element type="EditorMenuText">
         <font name="cour.ttf" size="10" />
+    </element>
+    <element type="EditorAttributeText">
+        <font name="cour.ttf" size="9" />
+    </element>
+    <element type="EditorAttributeEdit">
+        <texture name="Textures/UI.png" />
+        <imagerect value="112 0 128 16" />
+        <border value="2 2 2 2" />
+        <clipborder value="1 1 1 1" />
+        <hoveroffset value="0 16" />
+        <text>
+            <position value="1 1" />
+            <font name="Cour.ttf" size="9" />
+            <hovercolor value="0.45 0.70 0.45" />
+            <selectioncolor value="0.70 0.70 0.70" />
+        </text>
+        <cursor>
+            <size value="4 16" />
+            <texture name="Textures/UI.png" />
+            <imagerect value="12 0 16 16" />
+        </cursor>
     </element>
 </elements>

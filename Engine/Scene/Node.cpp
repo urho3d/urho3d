@@ -136,16 +136,13 @@ void Node::saveXML(XMLElement& dest)
     // Write transform
     XMLElement transformElem = dest.createChildElement("transform");
     transformElem.setVector3("pos", mPosition);
-    transformElem.setQuaternion("rot", mRotation);
+    transformElem.setVector3("rot", mRotation.getEulerAngles());
     transformElem.setVector3("scale", mScale);
     
     // Write parent node reference
     ComponentRef parentRef(mParent, true);
-    if (parentRef.mEntityID)
-    {
-        XMLElement parentElem = dest.createChildElement("parent");
-        parentRef.writeXML(parentElem);
-    }
+    XMLElement parentElem = dest.createChildElement("parent");
+    parentRef.writeXML(parentElem);
 }
 
 void Node::loadXML(const XMLElement& source, ResourceCache* cache)

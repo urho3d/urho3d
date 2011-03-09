@@ -1,0 +1,26 @@
+<element type="Window" name="ComponentWindow">
+    <movable enable="true" />
+    <resizable enable="true" />
+    <resizeborder value="6 6 6 6" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element>
+        <fixedheight value="20" />
+        <layout mode="horizontal" />
+        <element type="Text" name="WindowTitle" />
+        <element type="Button" style="CloseButton" name="CloseButton">
+            <fixedsize value="16 16" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <fixedwidth value="50" />
+            <text value="Name" />
+        </element>
+        <element type="LineEdit" name="NameEdit" />
+    </element>
+    <element type="ListView" name="AttributeList">
+        <highlight value="always" />
+    </element>
+</element>

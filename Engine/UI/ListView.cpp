@@ -302,9 +302,12 @@ void ListView::removeItem(UIElement* item)
             if (mHierarchyMode)
             {
                 int baseIndent = getItemIndent(item);
-                for (unsigned j = i + 1; j < numItems; ++j)
+                int j = i + 1;
+                for (;;)
                 {
-                    UIElement* childItem = getItem(j);
+                    UIElement* childItem = getItem(i + 1);
+                    if (!childItem)
+                        break;
                     if (getItemIndent(childItem) > baseIndent)
                     {
                         childItem->setSelected(false);
@@ -314,6 +317,7 @@ void ListView::removeItem(UIElement* item)
                     }
                     else
                         break;
+                    ++j;
                 }
             }
             
@@ -540,6 +544,20 @@ void ListView::setChildItemsVisible(unsigned index, bool enable)
     }
 }
 
+void ListView::setChildItemsVisible(bool enable)
+{
+    unsigned numItems = getNumItems();
+    
+    for (unsigned i = 0; i < numItems; ++i)
+    {
+        if (!getItemIndent(getItem(i)))
+            setChildItemsVisible(i, enable);
+    }
+    
+    if (getSelections().size() == 1)
+        ensureItemVisibility(getSelection());
+}
+
 void ListView::toggleChildItemsVisible(unsigned index)
 {
     unsigned numItems = getNumItems();
@@ -616,7 +634,7 @@ void ListView::updateSelectionEffect()
 void ListView::ensureItemVisibility(unsigned index)
 {
     UIElement* item = getItem(index);
-    if (!item)
+    if ((!item) || (!item->isVisible()))
         return;
     
     IntVector2 currentOffset = item->getScreenPosition() - mScrollPanel->getScreenPosition() - mContentElement->getPosition();

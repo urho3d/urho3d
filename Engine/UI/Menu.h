@@ -41,8 +41,6 @@ public:
     
     //! Set UI element style from XML data
     virtual void setStyle(const XMLElement& element, ResourceCache* cache);
-    //! React to mouse click
-    virtual void onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     //! React to the popup being shown
     virtual void onShowPopup();
     
@@ -81,6 +79,8 @@ protected:
     int mAcceleratorQualifiers;
     
 private:
+    //! Handle press-release for confirming the selection
+    void handleReleased(StringHash eventType, VariantMap& eventData);
     //! Handle UI focus change to check for hiding the popup
     void handleFocusChanged(StringHash eventType, VariantMap& eventData);
     //! Handle keypress for checking accelerator

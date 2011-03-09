@@ -88,7 +88,7 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void setCFM(float)", asMETHOD(PhysicsWorld, setCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setContactSurfaceLayer(float)", asMETHOD(PhysicsWorld, setContactSurfaceLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void setRandomSeed(uint)", asMETHOD(PhysicsWorld, setRandomSeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "void setDrawDebugGeometry(bool)", asMETHOD(PhysicsWorld, setDrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void drawDebugGeometry(bool)", asMETHOD(PhysicsWorld, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "array<PhysicsRaycastResult>@ raycast(const Ray& in, float, uint)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Vector3 getGravity() const", asMETHOD(PhysicsWorld, getGravity), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int getFps() const", asMETHOD(PhysicsWorld, getFps), asCALL_THISCALL);
@@ -105,7 +105,6 @@ static void registerPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "float getCFM() const", asMETHOD(PhysicsWorld, getCFM), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "float getContactSurfaceLayer() const", asMETHOD(PhysicsWorld, getContactSurfaceLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "uint getRandomSeed() const", asMETHOD(PhysicsWorld, getRandomSeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PhysicsWorld", "bool getDrawDebugGeometry() const", asMETHOD(PhysicsWorld, getDrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ getPhysicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     registerRefCasts<EventListener, PhysicsWorld>(engine, "EventListener", "PhysicsWorld");
     
@@ -187,7 +186,7 @@ static void registerRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void applyForceAtPosition(const Vector3& in, const Vector3& in)", asMETHOD(RigidBody, applyForceAtPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void applyTorque(const Vector3& in)", asMETHOD(RigidBody, applyTorque), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "void resetForces()", asMETHOD(RigidBody, resetForces), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RigidBody", "void drawDebugGeometry(DebugRenderer@+)", asMETHOD(RigidBody, drawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody", "void drawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(RigidBody, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "PhysicsWorld@+ getPhysicsWorld() const", asMETHOD(RigidBody, getPhysicsWorld), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "CollisionShape@+ getCollisionShape() const", asMETHOD(RigidBody, getCollisionShape), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "PhysicsMode getMode() const", asMETHOD(RigidBody, getMode), asCALL_THISCALL);

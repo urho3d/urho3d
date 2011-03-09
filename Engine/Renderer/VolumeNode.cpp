@@ -239,9 +239,9 @@ void VolumeNode::processRayQuery(RayOctreeQuery& query, float initialDistance)
     query.mResult.push_back(result);
 }
 
-void VolumeNode::drawDebugGeometry(DebugRenderer* debug)
+void VolumeNode::drawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
-    debug->addBoundingBox(getWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), false);
+    debug->addBoundingBox(getWorldBoundingBox(), Color(0.0f, 1.0f, 0.0f), depthTest);
 }
 
 void VolumeNode::setCastShadows(bool enable)

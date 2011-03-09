@@ -71,37 +71,37 @@ void createCameraDialog()
     // Fill the current values and subscribe to changes
     LineEdit@ nearClipEdit = cameraDialog.getChild("NearClipEdit", true);
     nearClipEdit.setText(toString(camera.getNearClip()));
-    subscribeToEvent(nearClipEdit, "TextFinished", "handleCameraDialogNearClip");
+    subscribeToEvent(nearClipEdit, "TextFinished", "editCameraNearClip");
 
     LineEdit@ farClipEdit = cameraDialog.getChild("FarClipEdit", true);
     farClipEdit.setText(toString(camera.getFarClip()));
-    subscribeToEvent(farClipEdit, "TextFinished", "handleCameraDialogFarClip");
+    subscribeToEvent(farClipEdit, "TextFinished", "editCameraFarClip");
 
     LineEdit@ fovEdit = cameraDialog.getChild("FOVEdit", true);
     fovEdit.setText(toString(camera.getFov()));
-    subscribeToEvent(fovEdit, "TextFinished", "handleCameraDialogFOV");
+    subscribeToEvent(fovEdit, "TextFinished", "editCameraFOV");
 
     LineEdit@ speedEdit = cameraDialog.getChild("SpeedEdit", true);
     speedEdit.setText(toString(cameraBaseSpeed));
-    subscribeToEvent(speedEdit, "TextFinished", "handleCameraDialogSpeed");
+    subscribeToEvent(speedEdit, "TextFinished", "editCameraSpeed");
 
-    subscribeToEvent(cameraDialog.getChild("CloseButton", true), "Pressed", "handleCameraDialogClose");
+    subscribeToEvent(cameraDialog.getChild("CloseButton", true), "Released", "hideCameraDialog");
+
+    hideCameraDialog();
 }
 
-void closeCameraDialog()
+void showCameraDialog()
 {
-    if (cameraDialog is null)
-        return;
-    uiRoot.removeChild(cameraDialog);
-    @cameraDialog = null;
+    cameraDialog.setVisible(true);
+    cameraDialog.bringToFront();
 }
 
-void handleCameraDialogClose(StringHash eventType, VariantMap& eventData)
+void hideCameraDialog()
 {
-    closeCameraDialog();
+    cameraDialog.setVisible(false);
 }
 
-void handleCameraDialogNearClip(StringHash eventType, VariantMap& eventData)
+void editCameraNearClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
     // Set to camera and then back to lineedit
@@ -109,7 +109,7 @@ void handleCameraDialogNearClip(StringHash eventType, VariantMap& eventData)
     edit.setText(toString(camera.getNearClip()));
 }
 
-void handleCameraDialogFarClip(StringHash eventType, VariantMap& eventData)
+void editCameraFarClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
     // Set to camera and then back to lineedit; watch for ridiculously low values
@@ -117,7 +117,7 @@ void handleCameraDialogFarClip(StringHash eventType, VariantMap& eventData)
     edit.setText(toString(camera.getFarClip()));
 }
 
-void handleCameraDialogFOV(StringHash eventType, VariantMap& eventData)
+void editCameraFOV(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
     // Set to camera and then back to lineedit
@@ -125,7 +125,7 @@ void handleCameraDialogFOV(StringHash eventType, VariantMap& eventData)
     edit.setText(toString(camera.getFov()));
 }
 
-void handleCameraDialogSpeed(StringHash eventType, VariantMap& eventData)
+void editCameraSpeed(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
     cameraBaseSpeed = max(edit.getText().toFloat(), 1);

@@ -269,6 +269,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Entity", asBEHAVE_RELEASE, "void f()", asMETHOD(Entity, releaseRef), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void saveXML(XMLElement&)", asFUNCTION(objectSaveXML<Entity>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "void loadXML(const XMLElement&)", asFUNCTION(objectLoadXML<Entity>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Entity", "void postLoad()", asFUNCTION(objectPostLoad<Entity>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Entity", "void setName(const string& in)", asMETHOD(Entity, setName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void setNetFlags(uint8)", asMETHOD(Entity, setNetFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Entity", "void setGroupFlags(uint)", asMETHOD(Entity, setGroupFlags), asCALL_THISCALL);

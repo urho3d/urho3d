@@ -154,16 +154,13 @@ void RigidBody::saveXML(XMLElement& dest)
     // Write transform
     XMLElement transformElem = dest.createChildElement("transform");
     transformElem.setVector3("pos", getPosition());
-    transformElem.setQuaternion("rot", getRotation());
+    transformElem.setVector3("rot", getRotation().getEulerAngles());
     transformElem.setVector3("scale", getScale());
     
     // Write parent node reference
     ComponentRef parentRef(mParent, true);
-    if (parentRef.mEntityID)
-    {
-        XMLElement parentElem = dest.createChildElement("parent");
-        parentRef.writeXML(parentElem);
-    }
+    XMLElement parentElem = dest.createChildElement("parent");
+    parentRef.writeXML(parentElem);
     
     // Write the RigidBody properties
     XMLElement bodyElem = dest.createChildElement("body");
@@ -804,7 +801,7 @@ bool RigidBody::isActive() const
         return false;
 }
 
-void RigidBody::drawDebugGeometry(DebugRenderer* debug)
+void RigidBody::drawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     Color color;
     if (!isActive())
@@ -838,13 +835,13 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     
                     start = transform * Vector3(a, b, 0.0f);
                     end = transform * Vector3(c, d, 0.0f);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     start = transform * Vector3(a, 0.0f, b);
                     end = transform * Vector3(c, 0.0f, d);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     start = transform * Vector3(0.0f, a, b);
                     end = transform * Vector3(0.0f, c, d);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                 }
             }
             break;
@@ -854,7 +851,7 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                 dVector3 size;
                 dGeomBoxGetLengths(geom, size);
                 BoundingBox box(0.5f * Vector3(size[0], size[1], size[2]), 0.5f * Vector3(-size[0], -size[1], -size[2]));
-                debug->addBoundingBox(box, transform, color);
+                debug->addBoundingBox(box, transform, color, depthTest);
             }
             break;
             
@@ -875,30 +872,30 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     
                     start = transform * Vector3(a, b, 0.5f * length);
                     end = transform * Vector3(c, d, 0.5f * length);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     start = transform * Vector3(a, b, -0.5f * length);
                     end = transform * Vector3(c, d, -0.5f * length);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     if (!(i & 1))
                     {
                         start = transform * Vector3(a, b, 0.5f * length);
                         end = transform * Vector3(a, b, -0.5f * length);
-                        debug->addLine(start, end, color);
+                        debug->addLine(start, end, color, depthTest);
                     }
                     if (b > -M_EPSILON)
                     {
                         start = transform * Vector3(a, 0.0f, b + 0.5f * length);
                         end = transform * Vector3(c, 0.0f, d + 0.5f * length);
-                        debug->addLine(start, end, color);
+                        debug->addLine(start, end, color, depthTest);
                         start = transform * Vector3(0.0f, a, b + 0.5f * length);
                         end = transform * Vector3(0.0f, c, d + 0.5f * length);
-                        debug->addLine(start, end, color);
+                        debug->addLine(start, end, color, depthTest);
                         start = transform * Vector3(a, 0.0f, -b - 0.5f * length);
                         end = transform * Vector3(c, 0.0f, -d - 0.5f * length);
-                        debug->addLine(start, end, color);
+                        debug->addLine(start, end, color, depthTest);
                         start = transform * Vector3(0.0f, a, -b - 0.5f * length);
                         end = transform * Vector3(0.0f, c, -d - 0.5f * length);
-                        debug->addLine(start, end, color);
+                        debug->addLine(start, end, color, depthTest);
                     }
                 }
             }
@@ -920,13 +917,13 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     
                     start = transform * Vector3(a, b, 0.5f * length);
                     end = transform * Vector3(c, d, 0.5f * length);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     start = transform * Vector3(a, b, -0.5f * length);
                     end = transform * Vector3(c, d, -0.5f * length);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                     start = transform * Vector3(a, b, 0.5f * length);
                     end = transform * Vector3(a, b, -0.5f * length);
-                    debug->addLine(start, end, color);
+                    debug->addLine(start, end, color, depthTest);
                 }
             }
             break;
@@ -945,9 +942,9 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     Vector3 a(v0[0], v0[1], v0[2]);
                     Vector3 b(v1[0], v1[1], v1[2]);
                     Vector3 c(v2[0], v2[1], v2[2]);
-                    debug->addLine(a, b, color);
-                    debug->addLine(b, c, color);
-                    debug->addLine(c, a, color);
+                    debug->addLine(a, b, color, depthTest);
+                    debug->addLine(b, c, color, depthTest);
+                    debug->addLine(c, a, color, depthTest);
                 }
             }
             break;
@@ -971,8 +968,8 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                         Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                         Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
                         Vector3 c = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
-                        debug->addLine(a, b, color);
-                        debug->addLine(a, c, color);
+                        debug->addLine(a, b, color, depthTest);
+                        debug->addLine(a, c, color, depthTest);
                     }
                 }
                 for (unsigned z = 0; z < zPoints - 1; ++z)
@@ -981,7 +978,7 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     
                     Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                     Vector3 b = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
-                    debug->addLine(a, b, color);
+                    debug->addLine(a, b, color, depthTest);
                 }
                 for (unsigned x = 0; x < xPoints - 1; ++x)
                 {
@@ -989,7 +986,7 @@ void RigidBody::drawDebugGeometry(DebugRenderer* debug)
                     
                     Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                     Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
-                    debug->addLine(a, b, color);
+                    debug->addLine(a, b, color, depthTest);
                 }
             }
             break;

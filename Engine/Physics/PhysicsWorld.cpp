@@ -54,8 +54,7 @@ PhysicsWorld::PhysicsWorld() :
     mMaxContacts(20),
     mBounceThreshold(0.1f),
     mAngularMaxNetVelocity(256.0f),
-    mTimeAcc(0.0f),
-    mDrawDebugGeometry(false)
+    mTimeAcc(0.0f)
 {
     if (!numWorlds)
         dInitODE();
@@ -70,8 +69,6 @@ PhysicsWorld::PhysicsWorld() :
     
     // Enable automatic resting of rigid bodies
     dWorldSetAutoDisableFlag(mWorld, 1);
-    
-    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(PhysicsWorld, handlePostRenderUpdate));
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -360,11 +357,6 @@ void PhysicsWorld::setRandomSeed(unsigned seed)
     dRandSetSeed(seed);
 }
 
-void PhysicsWorld::setDrawDebugGeometry(bool enable)
-{
-    mDrawDebugGeometry = enable;
-}
-
 void PhysicsWorld::raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(Physics_Raycast);
@@ -521,7 +513,7 @@ void PhysicsWorld::sendCollisionEvents()
     mCollisionInfos.clear();
 }
 
-void PhysicsWorld::drawDebugGeometry()
+void PhysicsWorld::drawDebugGeometry(bool depthTest)
 {
     DebugRenderer* debug = mScene->getExtension<DebugRenderer>();
     if (!debug)
@@ -530,7 +522,7 @@ void PhysicsWorld::drawDebugGeometry()
     PROFILE(Physics_DrawDebugGeometry);
     
     for (std::vector<RigidBody*>::iterator i = mRigidBodies.begin(); i != mRigidBodies.end(); ++i)
-        (*i)->drawDebugGeometry(debug);
+        (*i)->drawDebugGeometry(debug, depthTest);
 }
 
 void PhysicsWorld::nearCallback(void *userData, dGeomID geomA, dGeomID geomB)
@@ -687,10 +679,4 @@ void PhysicsWorld::raycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
         newResult.mNormal = Vector3(contact.geom.normal[0], contact.geom.normal[1], contact.geom.normal[2]);
         result->push_back(newResult);
     }
-}
-
-void PhysicsWorld::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (mDrawDebugGeometry)
-        drawDebugGeometry();
 }

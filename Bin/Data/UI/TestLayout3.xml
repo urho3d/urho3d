@@ -6,7 +6,7 @@
     <layout mode="vertical" border="8 8 8 8" spacing="8" />
     <clipborder value="8 8 8 8" />
     <minsize value="60 60" />
-    <element type="Element">
+    <element>
         <layout mode="horizontal" spacing="8" />
         <element type="Button">
             <element type="Text">
@@ -28,7 +28,7 @@
             </element>
         </element>
     </element>
-    <element type="Element">
+    <element>
         <layout mode="horizontal" spacing="8" />
     	<element type="Text" name="ScrollViewText">
 	        <position value="1 0" />
@@ -53,7 +53,7 @@
             </element>
         </element>
     </element>
-    <element type="Element">
+    <element>
         <layout mode="horizontal" spacing="8" />
         <element type="Button">
             <element type="Text">

@@ -89,7 +89,6 @@ void StaticModel::saveXML(XMLElement& dest)
     for (unsigned i = 0; i < mMaterials.size(); ++i)
     {
         XMLElement materialElem = dest.createChildElement("material");
-        materialElem.setInt("index", i);
         materialElem.setString("name", getResourceName(mMaterials[i]));
     }
 }
@@ -104,10 +103,11 @@ void StaticModel::loadXML(const XMLElement& source, ResourceCache* cache)
     setModel(cache->getResource<Model>(modelElem.getString("name")));
     
     XMLElement materialElem = source.getChildElement("material");
+    unsigned index = 0;
     while (materialElem)
     {
-        unsigned index = materialElem.getInt("index");
         setMaterial(index, cache->getResource<Material>(materialElem.getString("name")));
+        ++index;
         materialElem = materialElem.getNextElement("material");
     }
 }

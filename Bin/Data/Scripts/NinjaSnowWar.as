@@ -30,6 +30,7 @@ BorderImage@ sight;
 Controls playerControls;
 Controls prevPlayerControls;
 bool gameOn = false;
+bool drawDebug = false;
 int score = 0;
 int hiscore = 0;
 int maxEnemies = 0;
@@ -49,6 +50,7 @@ void start()
     subscribeToEvent("Update", "handleUpdate");
     subscribeToEvent(gameScene.getPhysicsWorld(), "PhysicsPreStep", "handleFixedUpdate");
     subscribeToEvent("PostUpdate", "handlePostUpdate");
+    subscribeToEvent("PostRenderUpdate", "handlePostRenderUpdate");
     subscribeToEvent("Points", "handlePoints");
     subscribeToEvent("Kill", "handleKill");
     subscribeToEvent("KeyDown", "handleKeyDown");
@@ -197,10 +199,7 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.getKeyPress(KEY_F1))
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
-    {
-        PhysicsWorld@ world = gameScene.getPhysicsWorld();
-        world.setDrawDebugGeometry(!world.getDrawDebugGeometry());
-    }
+        drawDebug = !drawDebug;
 
     if ((!console.isVisible()) && (input.getKeyPress('P')) && (gameOn))
     {
@@ -232,10 +231,16 @@ void handleFixedUpdate(StringHash eventType, VariantMap& eventData)
     checkEndAndRestart();
 }
 
-void handlePostUpdate(StringHash eventType, VariantMap& eventData)
+void handlePostUpdate()
 {
     updateCamera();
     updateStatus();
+}
+
+void handlePostRenderUpdate()
+{
+    if (drawDebug)
+        gameScene.getPhysicsWorld().drawDebugGeometry(true);
 }
 
 void handlePoints(StringHash eventType, VariantMap& eventData)
@@ -423,7 +428,7 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void handleScreenMode(StringHash eventType, VariantMap& eventData)
+void handleScreenMode()
 {
     int height = renderer.getHeight() / 22;
     if (height > 64)

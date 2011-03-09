@@ -138,8 +138,6 @@ public:
     void setTimeAccumulator(float time);
     //! Set simulation random seed
     void setRandomSeed(unsigned seed);
-    //! Set whether to draw debug geometry
-    void setDrawDebugGeometry(bool enable);
     //! Perform a physics world raycast
     void raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
@@ -180,8 +178,6 @@ public:
     float getTimeAccumulator() const { return mTimeAcc; }
     //! Return simulation random seed
     unsigned getRandomSeed() const;
-    //! Return whether to draw debug geometry
-    bool getDrawDebugGeometry() const { return mDrawDebugGeometry; }
     
     //! Add a rigid body to keep track of. Called by RigidBody
     void addRigidBody(RigidBody* body);
@@ -190,15 +186,13 @@ public:
     //! Send accumulated collision events
     void sendCollisionEvents();
     //! Add debug geometry to the debug renderer
-    void drawDebugGeometry();
+    void drawDebugGeometry(bool depthTest);
     
 private:
     //! ODE collision callback
     static void nearCallback(void *userData, dGeomID geomA, dGeomID geomB);
     //! ODE raycast callback
     static void raycastCallback(void *userData, dGeomID geomA, dGeomID geomB);
-    //! Handle post render update event. Draw debug geometry here if enabled
-    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     
     //! ODE world ID
     dWorldID mWorld;
@@ -218,8 +212,6 @@ private:
     float mAngularMaxNetVelocity;
     //! Simulation step time accumulator
     float mTimeAcc;
-    //! Debug draw flag
-    bool mDrawDebugGeometry;
     //! Rigid bodies
     std::vector<RigidBody*> mRigidBodies;
     //! Collision pairs on this frame

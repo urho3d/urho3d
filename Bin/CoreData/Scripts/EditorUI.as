@@ -17,9 +17,16 @@ void createUI()
     createCursor();
     createMenuBar();
     createSceneWindow();
+    createComponentWindow();
+    createCameraDialog();
     
-    subscribeToEvent("ScreenMode", "handleScreenMode");
+    subscribeToEvent("ScreenMode", "resizeUI");
     subscribeToEvent("MenuSelected", "handleMenuSelected");
+}
+
+void resizeUI()
+{
+    uiMenuBar.setFixedWidth(renderer.getWidth());
 }
 
 void createCursor()
@@ -49,9 +56,11 @@ void createMenuBar()
     }
 
     {
-        Menu@ fileMenu = createMenu("Settings");
+        Menu@ fileMenu = createMenu("View");
         Window@ filePopup = fileMenu.getPopup();
-        filePopup.addChild(createMenuItem("Editor camera", 0, 0));
+        filePopup.addChild(createMenuItem("Scene hierarchy", 0, 0));
+        filePopup.addChild(createMenuItem("Component edit", 0, 0));
+        filePopup.addChild(createMenuItem("Camera settings", 0, 0));
         uiMenuBar.addChild(fileMenu);
     }
 
@@ -136,11 +145,6 @@ void centerDialog(UIElement@ element)
     element.setPosition((renderer.getWidth() - size.x) / 2, (renderer.getHeight() - size.y) / 2);
 }
 
-void resizeUI()
-{
-    uiMenuBar.setFixedWidth(renderer.getWidth());
-}
-
 void updateWindowTitle()
 {
     string sceneName = sceneFileName.empty() ? "Untitled" : getFileNameAndExtension(sceneFileName);
@@ -179,18 +183,23 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
         }
     }
     
-    if (action == "Editor camera")
+    if (action == "Scene hierarchy")
     {
         ui.setFocusElement(null); // Close the menu
-        createCameraDialog();
+        showSceneWindow();
+    }
+    if (action == "Component edit")
+    {
+        ui.setFocusElement(null); // Close the menu
+        showComponentWindow();
+    }
+    if (action == "Camera settings")
+    {
+        ui.setFocusElement(null); // Close the menu
+        showCameraDialog();
     }
     if (menu.getName() == "Exit")
         engine.exit();
-}
-
-void handleScreenMode(StringHash eventType, VariantMap& eventData)
-{
-    resizeUI();
 }
 
 void handleOpenSceneFile(StringHash eventType, VariantMap& eventData)

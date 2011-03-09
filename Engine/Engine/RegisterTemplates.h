@@ -261,12 +261,19 @@ template <class T> void objectLoadXML(const XMLElement& element, T* ptr)
     TRY_SAFE_RETHROW(ptr->loadXML(element, getEngine()->getResourceCache()));
 }
 
+//! Template function for post-loading an entity or a component
+template <class T> void objectPostLoad(T* ptr)
+{
+    TRY_SAFE_RETHROW(ptr->postLoad(getEngine()->getResourceCache()));
+}
+
 //! Template function for registering a class derived from Component
 template <class T> void registerComponent(asIScriptEngine* engine, const char* className)
 {
     registerHashedType<T>(engine, className);
     engine->RegisterObjectMethod(className, "void saveXML(XMLElement&)", asFUNCTION(objectSaveXML<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void loadXML(const XMLElement&)", asFUNCTION(objectLoadXML<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void postLoad()", asFUNCTION(objectPostLoad<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void setName(const string& in)", asMETHODPR(T, setName, (const std::string&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setNetFlags(uint8)", asMETHODPR(T, setNetFlags, (unsigned char), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const string& getName() const", asMETHODPR(T, getName, () const, const std::string&), asCALL_THISCALL);
@@ -358,7 +365,7 @@ template <class T> void registerVolumeNode(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void setShadowDistance(float)", asMETHODPR(T, setShadowDistance, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setViewMask(uint)", asMETHODPR(T, setViewMask, (unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void setLightMask(uint)", asMETHODPR(T, setLightMask, (unsigned), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void drawDebugGeometry(DebugRenderer@+)", asMETHODPR(T, drawDebugGeometry, (DebugRenderer*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void drawDebugGeometry(DebugRenderer@+, bool)", asMETHODPR(T, drawDebugGeometry, (DebugRenderer*, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float calculateDrawDistance(Camera@+, float)", asMETHODPR(T, calculateDrawDistance, (const Camera&, float), float), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool getCastShadows() const", asMETHODPR(T, getCastShadows, () const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool isOccluder() const", asMETHODPR(T, isOccluder, () const, bool), asCALL_THISCALL);

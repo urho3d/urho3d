@@ -124,8 +124,6 @@ public:
     void setOccluderSizeThreshold(float screenSize);
     //! Set deferred rendering edge filter parameters. Only has effect if nonzero multisample level is set in Renderer::setMode().
     void setEdgeFilter(const EdgeFilterParameters& parameters);
-    //! Set whether to draw debug geometry for all viewports
-    void setDrawDebugGeometry(bool enable);
     
     //! Return number of viewports
     unsigned getNumViewports() const { return mViewports.size(); }
@@ -161,8 +159,6 @@ public:
     float getOccluderSizeThreshold() const { return mOccluderSizeThreshold; }
     //! Return deferred rendering edge filter parameters
     const EdgeFilterParameters& getEdgeFilter() const { return mEdgeFilter; }
-    //! Return whether to draw debug geometry
-    bool getDrawDebugGeometry() const { return mDrawDebugGeometry; }
     //! Return number of views rendered
     unsigned getNumViews() const { return mNumViews; }
     //! Return number of geometries rendered
@@ -195,7 +191,7 @@ public:
     //! Render. Called by Engine
     bool render();
     //! Add debug geometry to the debug renderer(s)
-    void drawDebugGeometry();
+    void drawDebugGeometry(bool depthTest);
     
 private:
     //! Begin new frame
@@ -242,8 +238,6 @@ private:
     void drawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     //! Handle window resized event
     void handleScreenMode(StringHash eventType, VariantMap& eventData);
-    //! Handle post render update event. Draw debug geometry here if enabled
-    void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
     //! Return light vertex shaders
     const std::vector<SharedPtr<VertexShader> >& getLightVS() const { return mLightVS; }
     //! Return light pixel shaders
@@ -327,8 +321,6 @@ private:
     float mOccluderSizeThreshold;
     //! Deferred rendering edge filter parameters
     EdgeFilterParameters mEdgeFilter;
-    //! Debug draw flag
-    bool mDrawDebugGeometry;
     //! Frame number on which shaders last changed
     unsigned mShadersChangedFrameNumber;
     //! Shaders need reloading flag

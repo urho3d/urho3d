@@ -61,7 +61,7 @@ void Button::setStyle(const XMLElement& element, ResourceCache* cache)
 
 void Button::update(float timeStep)
 {
-    if (!mHovering)
+    if ((!mHovering) && (mPressed == true))
         setPressed(false);
     
     // Send repeat events if pressed
@@ -94,7 +94,18 @@ void Button::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quad
 
 void Button::onHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
+    bool oldPressed = mPressed;
     setPressed((buttons & MOUSEB_LEFT) != 0);
+    
+    if ((oldPressed) && (!mPressed))
+    {
+        using namespace Released;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        sendEvent(EVENT_RELEASED, eventData);
+    }
+    
     mHovering = true;
 }
 

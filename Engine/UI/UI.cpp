@@ -294,6 +294,9 @@ SharedPtr<UIElement> UI::createElement(ShortStringHash type, const std::string& 
 {
     SharedPtr<UIElement> element;
     
+    if (!type)
+        type = UIElement::getTypeStatic();
+    
     for (unsigned i = 0; i < mFactories.size(); ++i)
     {
         element = mFactories[i]->createElement(type, name);
@@ -326,10 +329,10 @@ SharedPtr<UIElement> UI::loadLayout(XMLFile* file, XMLFile* styleFile)
     }
     
     root = createElement(ShortStringHash(rootElem.getString("type")), rootElem.getString("name"));
-    
+    std::string styleName = rootElem.hasAttribute("style") ? rootElem.getString("style") : rootElem.getString("type");
     // First set the base style from the style file if exists, then apply UI layout overrides
     if (styleFile)
-        root->setStyleAuto(styleFile, mCache);
+        root->setStyle(styleFile, styleName, mCache);
     root->setStyle(rootElem, mCache);
     
     // Load rest of the elements recursively
@@ -692,8 +695,9 @@ void UI::loadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
         current->addChild(child);
         
         // First set the base style from the style file if exists, then apply UI layout overrides
+        std::string styleName = childElem.hasAttribute("style") ? childElem.getString("style") : childElem.getString("type");
         if (styleFile)
-            child->setStyleAuto(styleFile, mCache);
+            child->setStyle(styleFile, styleName, mCache);
         child->setStyle(childElem, mCache);
         
         // Load the children recursively

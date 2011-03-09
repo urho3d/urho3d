@@ -1,15 +1,22 @@
 <element type="Window" name="CameraDialog">
-    <fixedsize value="250 150" />
     <movable enable="true" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
-    <element type="Text">
+    <element>
         <fixedheight value="20" />
-        <text value="Editor camera settings" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <text value="Editor camera settings" />
+        </element>
+        <element type="Button" style="CloseButton" name="CloseButton">
+            <fixedsize value="16 16" />
+        </element>
     </element>
-    <element type="Element" />
-    <element type="Element">
+    <element>
+        <minheight value="10" />
+    </element>
+    <element>
         <fixedheight value="20" />
-        <layout mode="horizontal" spacing="4" />
+        <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Near clip distance" />
         </element>
@@ -17,9 +24,9 @@
             <fixedwidth value="80" />
         </element>
     </element>
-    <element type="Element">
+    <element>
         <fixedheight value="20" />
-        <layout mode="horizontal" spacing="4" />
+        <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Far clip distance" />
         </element>
@@ -27,9 +34,9 @@
             <fixedwidth value="80" />
         </element>
     </element>
-    <element type="Element">
+    <element>
         <fixedheight value="20" />
-        <layout mode="horizontal" spacing="4" />
+        <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Field of view" />
         </element>
@@ -37,27 +44,14 @@
             <fixedwidth value="80" />
        </element>
     </element>
-    <element type="Element">
+    <element>
         <fixedheight value="20" />
-        <layout mode="horizontal" spacing="4" />
+        <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Movement speed" />
         </element>
        <element type="LineEdit" name="SpeedEdit">
             <fixedwidth value="80" />
        </element>
-    </element>
-    <element type="Element" />
-    <element type="Element">
-        <layout mode="horizontal" spacing="4" />
-        <element type="Element" />
-        <element type="Button" name="CloseButton">
-            <fixedsize value="80 22" />
-            <element type="Text">
-                <text value="Close" />
-                <alignment horizontal="center" vertical="center" />
-            </element>
-        </element>
-        <element type="Element" />
     </element>
 </element>

@@ -243,7 +243,8 @@ static void registerListView(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ListView", "void setHierarchyMode(bool)", asMETHOD(ListView, setHierarchyMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setClearSelectionOnDefocus(bool)", asMETHOD(ListView, setClearSelectionOnDefocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void setDoubleClickInterval(float)", asMETHOD(ListView, setDoubleClickInterval), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ListView", "void setChildItemsVisible(uint, bool)", asMETHOD(ListView, setChildItemsVisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setChildItemsVisible(uint, bool)", asMETHODPR(ListView, setChildItemsVisible, (unsigned, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ListView", "void setChildItemsVisible(bool)", asMETHODPR(ListView, setChildItemsVisible, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "void toggleChildItemsVisible(uint)", asMETHOD(ListView, toggleChildItemsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "const IntVector2& getViewPosition() const", asMETHOD(ListView, getViewPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("ListView", "UIElement@+ getContentElement() const", asMETHOD(ListView, getContentElement), asCALL_THISCALL);

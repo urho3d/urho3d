@@ -297,7 +297,6 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     mOcclusionBufferSize(256),
     mOccluderSizeThreshold(0.1f),
     mEdgeFilter(EdgeFilterParameters(0.25f, 0.25f, 0.50f, 10.0f)),
-    mDrawDebugGeometry(false),
     mShadersChangedFrameNumber(M_MAX_UNSIGNED),
     mShadersDirty(true)
 {
@@ -335,7 +334,6 @@ Pipeline::Pipeline(Renderer* renderer, ResourceCache* cache) :
     resetViews();
     
     subscribeToEvent(EVENT_SCREENMODE, EVENT_HANDLER(Pipeline, handleScreenMode));
-    subscribeToEvent(EVENT_POSTRENDERUPDATE, EVENT_HANDLER(Pipeline, handlePostRenderUpdate));
 }
 
 Pipeline::~Pipeline()
@@ -447,11 +445,6 @@ void Pipeline::setOccluderSizeThreshold(float screenSize)
 void Pipeline::setEdgeFilter(const EdgeFilterParameters& parameters)
 {
     mEdgeFilter = parameters;
-}
-
-void Pipeline::setDrawDebugGeometry(bool enable)
-{
-    mDrawDebugGeometry = enable;
 }
 
 const Viewport& Pipeline::getViewport(unsigned index) const
@@ -645,7 +638,7 @@ bool Pipeline::render()
     return true;
 }
 
-void Pipeline::drawDebugGeometry()
+void Pipeline::drawDebugGeometry(bool depthTest)
 {
     PROFILE(Pipeline_DrawDebugGeometry);
     
@@ -678,7 +671,7 @@ void Pipeline::drawDebugGeometry()
         {
             if (processedGeometries.find(geometries[i]) == processedGeometries.end())
             {
-                geometries[i]->drawDebugGeometry(debug);
+                geometries[i]->drawDebugGeometry(debug, depthTest);
                 processedGeometries.insert(geometries[i]);
             }
         }
@@ -686,7 +679,7 @@ void Pipeline::drawDebugGeometry()
         {
             if (processedLights.find(lights[i]) == processedLights.end())
             {
-                lights[i]->drawDebugGeometry(debug);
+                lights[i]->drawDebugGeometry(debug, depthTest);
                 processedLights.insert(lights[i]);
             }
         }
@@ -1510,10 +1503,4 @@ void Pipeline::handleScreenMode(StringHash eventType, VariantMap& eventData)
     mShadersDirty = true;
     mOcclusionBuffers.clear();
     resetViews();
-}
-
-void Pipeline::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (mDrawDebugGeometry)
-        drawDebugGeometry();
 }

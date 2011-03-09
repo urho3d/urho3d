@@ -516,8 +516,6 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
             drawdebug++;
             if (drawdebug > 2) 
                 drawdebug = 0;
-            pipeline.setDrawDebugGeometry(drawdebug == 1);
-            testScene.getPhysicsWorld().setDrawDebugGeometry(drawdebug == 2);
         }
 
         if (input.getKeyPress('P'))
@@ -617,8 +615,14 @@ void handleMouseButtonUp(StringHash eventType, VariantMap& eventData)
         uiCursor.setVisible(true);
 }
 
-void handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void handlePostRenderUpdate()
 {
+    // Draw rendering debug geometry without depth test to see the effect of occlusion
+    if (drawdebug == 1)
+        pipeline.drawDebugGeometry(false);
+    if (drawdebug == 2)
+        testScene.getPhysicsWorld().drawDebugGeometry(true);
+
     IntVector2 pos = ui.getCursorPosition();
     if (ui.getElementAt(pos, true) is null)
     {

@@ -250,6 +250,11 @@ asUINT CScriptArray::GetSize() const
     return buffer->numElements;
 }
 
+bool CScriptArray::IsEmpty() const
+{
+    return buffer->numElements == 0;
+}
+
 void CScriptArray::Resize(asUINT numElements)
 {
     if (numElements & 0x80000000)
@@ -546,6 +551,7 @@ void registerArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("array<T>", "void pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "uint length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "uint size() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("array<T>", "bool empty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL);
     engine->RegisterObjectMethod("array<T>", "void resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("array<T>");
 }

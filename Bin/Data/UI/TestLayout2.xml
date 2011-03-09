@@ -5,7 +5,7 @@
     <resizable enable="true" />
     <layout mode="vertical" border="4 4 4 4" spacing="2" />
     <clipborder value="4 4 4 4" />
-    <element type="Element">
+    <element>
         <clipchildren enable="true" />
         <layout mode="vertical" />
         <element type="Text">

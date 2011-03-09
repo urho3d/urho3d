@@ -508,16 +508,16 @@ void Light::overrideTransforms(unsigned batchIndex, Camera& camera, const Matrix
     }
 }
 
-void Light::drawDebugGeometry(DebugRenderer* debug)
+void Light::drawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     switch (mLightType)
     {
     case LIGHT_SPOT:
-        debug->addFrustum(getFrustum(), mColor, false);
+        debug->addFrustum(getFrustum(), mColor, depthTest);
         break;
         
     case LIGHT_POINT:
-        debug->addBoundingBox(getWorldBoundingBox(), getColor(), false);
+        debug->addBoundingBox(getWorldBoundingBox(), getColor(), depthTest);
         break;
     }
 }
