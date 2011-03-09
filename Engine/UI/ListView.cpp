@@ -566,14 +566,25 @@ void ListView::toggleChildItemsVisible(unsigned index)
         return;
     
     int baseIndent = getItemIndent(getItem(index));
-    
+    bool firstChild = true;
+    UIElement* prevItem = 0;
     for (unsigned i = index + 1; i < numItems; ++i)
     {
         UIElement* item = getItem(i);
         if (getItemIndent(item) > baseIndent)
-            item->setVisible(!item->isVisible());
+        {
+            if (firstChild)
+            {
+                item->setVisible(!item->isVisible());
+                firstChild = false;
+            }
+            else
+                item->setVisible(prevItem->isVisible());
+        }
         else
             break;
+        
+        prevItem = item;
     }
 }
 
