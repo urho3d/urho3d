@@ -209,6 +209,7 @@ static void registerXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool setVector3(const string& in, const Vector3& in)", asMETHOD(XMLElement, setVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool isNull() const", asMETHOD(XMLElement, isNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool notNull() const", asMETHOD(XMLElement, notNull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "uint getNumAttributes() const", asMETHOD(XMLElement, getNumAttributes), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool hasAttribute(const string& in) const", asMETHOD(XMLElement, hasAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "string getAttribute(const string& in) const", asMETHOD(XMLElement, getAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "array<string>@ getAttributeNames() const", asFUNCTION(XMLElementGetAttributeNames), asCALL_CDECL_OBJLAST);

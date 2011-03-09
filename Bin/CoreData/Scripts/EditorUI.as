@@ -70,7 +70,7 @@ void createMenuBar()
     resizeUI();
 }
 
-Menu@ createMenuItem(string title, int accelKey, int accelQual)
+Menu@ createMenuItem(const string& in title, int accelKey, int accelQual)
 {
     Menu@ menu = Menu(title);
     menu.setStyleAuto(uiStyle);
@@ -109,7 +109,7 @@ Window@ createPopup(Menu@ baseMenu)
     return popup;
 }
 
-Menu@ createMenu(string title)
+Menu@ createMenu(const string& in title)
 {
     Menu@ menu = createMenuItem(title, 0, 0);
     menu.setFixedWidth(menu.getWidth());
@@ -118,7 +118,7 @@ Menu@ createMenu(string title)
     return menu;
 }
 
-void createFileSelector(string title, string ok, string cancel, string initialPath, array<string>@ filters,
+void createFileSelector(const string& in title, const string& in ok, const string& in cancel, const string& in initialPath, array<string>@ filters,
     uint initialFilter)
 {
     // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also 

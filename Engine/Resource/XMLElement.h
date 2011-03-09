@@ -111,6 +111,8 @@ public:
     XMLElement getNextElement(const std::string& name = std::string()) const;
     //! Return parent element
     XMLElement getParentElement() const;
+    //! Return number of attributes
+    unsigned getNumAttributes() const;
     //! Return whether has an attribute
     bool hasAttribute(const std::string& name) const;
     //! Return attribute, or empty if missing

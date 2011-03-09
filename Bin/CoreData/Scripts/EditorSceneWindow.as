@@ -297,7 +297,7 @@ void handleEntityListSelectionChange()
 void handleEntityListDoubleClick()
 {
     //! \todo Doubleclick is problematic, because it also collapses/expands list items
-    
+
     /*
     ListView@ list = sceneWindow.getChild("EntityList", true);
     UIElement@ item = list.getSelectedItem();

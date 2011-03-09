@@ -44,7 +44,7 @@
         <component type="RigidBody" netflags="0">
             <transform pos="0 0 0" rot="1 0 0 0" scale="1 1 1" />
             <body mode="static" mass="1.0" friction="0.5" bounce="0" active="false" />
-            <collision shape="Physics/Level.xml" group="2" mask="3" />
+            <collision name="Physics/Level.xml" group="2" mask="3" />
         </component>
     </entity>
 </scene>

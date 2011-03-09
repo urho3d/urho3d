@@ -12,6 +12,7 @@ const uint ATTR_EDITOR_VECTOR4 = 4;
 const uint MAX_ATTRNAME_LENGTH = 15;
 
 bool inReadAttributeEditor = false;
+uint lastAttributeCount = 0;
 
 void createComponentWindow()
 {
@@ -44,6 +45,7 @@ void updateComponentWindow()
     LineEdit@ nameEdit = componentWindow.getChild("NameEdit", true);
     ListView@ list = componentWindow.getChild("AttributeList", true);
     list.removeAllItems();
+    lastAttributeCount = 0;
 
     if ((selectedComponent is null) || (selectedEntity is null))
     {
@@ -57,7 +59,7 @@ void updateComponentWindow()
     nameEdit.setText(selectedComponent.getName());
     nameEdit.setEnabled(true);
     
-    fillComponentAttributes();
+    updateComponentAttributes();
     showComponentWindow();
 }
 
@@ -71,7 +73,7 @@ void editComponentName()
     updateSceneWindowEntity(selectedEntity);
 }
 
-void fillComponentAttributes()
+void updateComponentAttributes()
 {
     ListView@ list = componentWindow.getChild("AttributeList", true);
 
@@ -79,71 +81,96 @@ void fillComponentAttributes()
     XMLElement rootElem = componentData.createRootElement("component");
     selectedComponent.saveXML(rootElem);
 
+    // Check amount of attributes. If has changed, do full refresh. Otherwise just refresh values
     XMLElement categoryElem = rootElem.getChildElement();
-    uint index = 0;
+    uint attributeCount = 0;
     while (categoryElem.notNull())
     {
-        string category = categoryElem.getName();
-
-        Text@ text = Text();
-        text.setStyleAuto(uiStyle);
-        text.setText(category);
-        list.addItem(text);
-
-        array<string> attrs = categoryElem.getAttributeNames();
-
-        for (uint i = 0; i < attrs.size(); ++i)
-        {
-            string name = attrs[i];
-            if (name.length() > MAX_ATTRNAME_LENGTH)
-                name.resize(MAX_ATTRNAME_LENGTH);
-
-            UIElement@ bar = UIElement();
-            bar.setLayout(LM_HORIZONTAL, 4, IntRect(0, 0, 0, 0));
-            bar.setFixedHeight(18);
-            list.addItem(bar);
-
-            Text@ attrName = Text();
-            attrName.setStyle(uiStyle, "EditorAttributeText");
-            attrName.setText(" " + name);
-            attrName.setFixedWidth(120);
-            bar.addChild(attrName);
-
-            uint type = getAttributeEditorType(selectedComponent, category, attrs[i]);
-            createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
-            readAttributeEditor(type, categoryElem, index, attrs[i]);
-        }
-        
-        UIElement@ spacer = UIElement();
-        spacer.setFixedHeight(4);
-        list.addItem(spacer);
-
+        attributeCount += categoryElem.getNumAttributes();
         categoryElem = categoryElem.getNextElement();
-        ++index;
     }
-}
 
-void refreshComponentAttributes()
-{
-    ListView@ list = componentWindow.getChild("AttributeList", true);
-
-    XMLElement rootElem = componentData.createRootElement("component");
-    selectedComponent.saveXML(rootElem);
-
-    XMLElement categoryElem = rootElem.getChildElement();
+    categoryElem = rootElem.getChildElement();
     uint index = 0;
-    while (categoryElem.notNull())
+
+    if (attributeCount != lastAttributeCount)
     {
-        array<string> attrs = categoryElem.getAttributeNames();
+        IntVector2 listOldPos = list.getViewPosition();
 
-        for (uint i = 0; i < attrs.size(); ++i)
+        list.removeAllItems();
+
+        attributeCount = 0;
+        while (categoryElem.notNull())
         {
-            uint type = getAttributeEditorType(selectedComponent, categoryElem.getName(), attrs[i]);
-            readAttributeEditor(type, categoryElem, index, attrs[i]);
-        }
+            string category = categoryElem.getName();
 
-        categoryElem = categoryElem.getNextElement();
-        ++index;
+            Text@ text = Text();
+            text.setStyleAuto(uiStyle);
+            text.setText(category);
+            list.addItem(text);
+
+            {
+                UIElement@ spacer = UIElement();
+                spacer.setFixedHeight(4);
+                list.addItem(spacer);
+            }
+
+            array<string> attrs = categoryElem.getAttributeNames();
+
+            for (uint i = 0; i < attrs.size(); ++i)
+            {
+                string name = attrs[i];
+                if (name.length() > MAX_ATTRNAME_LENGTH)
+                    name.resize(MAX_ATTRNAME_LENGTH);
+
+                UIElement@ bar = UIElement();
+                bar.setLayout(LM_HORIZONTAL, 4, IntRect(0, 0, 0, 0));
+                bar.setFixedHeight(18);
+                list.addItem(bar);
+
+                Text@ attrName = Text();
+                attrName.setStyle(uiStyle, "EditorAttributeText");
+                attrName.setText(" " + name);
+                attrName.setFixedWidth(120);
+                bar.addChild(attrName);
+
+                uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
+                createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
+                readAttributeEditor(type, categoryElem, index, attrs[i]);
+            }
+
+            {
+                UIElement@ spacer = UIElement();
+                spacer.setFixedHeight(4);
+                list.addItem(spacer);
+            }
+
+            categoryElem = categoryElem.getNextElement();
+            attributeCount += attrs.size();
+            ++index;
+        }
+    
+        lastAttributeCount = attributeCount;
+        
+        // Try to reset to old view position
+        list.setViewPosition(listOldPos);
+    }
+    else
+    {
+        while (categoryElem.notNull())
+        {
+            array<string> attrs = categoryElem.getAttributeNames();
+        
+            for (uint i = 0; i < attrs.size(); ++i)
+            {
+                string category = categoryElem.getName();
+                uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
+                readAttributeEditor(type, categoryElem, index, attrs[i]);
+            }
+        
+            categoryElem = categoryElem.getNextElement();
+            ++index;
+        }
     }
 }
 
@@ -167,7 +194,7 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
             writeAttributeEditor(attrEdit.userData["Type"].getInt(), categoryElem, index, attrEdit.userData["Attribute"].getString());
             selectedComponent.loadXML(rootElem);
             selectedComponent.postLoad();
-            refreshComponentAttributes();
+            updateComponentAttributes();
             return;
         }
         categoryElem = categoryElem.getNextElement();
@@ -175,40 +202,38 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
     }
 }
 
-int getAttributeEditorType(Component@ component, string category, string attribute)
+int getAttributeEditorType(Component@ component, const string& in category, const string& in attribute, const string& in value)
 {
+    // Note: we always use valid, ie. just serialized data for this
     if (cast<Node>(component) !is null)
     {
-        if (category == "transform")
-            return ATTR_EDITOR_VECTOR3;
-        if (category == "render")
+        if (attribute.find("name") >= 0)
+            return ATTR_EDITOR_STRING;
+        else if ((category == "animation") && (attribute == "startbone"))
+            return ATTR_EDITOR_STRING;
+        else if (category == "parent")
+            return ATTR_EDITOR_STRING; //! \todo Parent node selector needs to be done separately
+        else if ((value == "true") || (value == "false"))
             return ATTR_EDITOR_BOOL;
-        if ((category == "light") && (attribute == "color"))
+
+        uint coords = value.split(' ').size();
+        if (coords == 2)
+            return ATTR_EDITOR_VECTOR2;
+        else if (coords == 3)
+            return ATTR_EDITOR_VECTOR3;
+        else if (coords == 4)
             return ATTR_EDITOR_VECTOR4;
-        if ((category == "body") && (attribute == "active"))
-            return ATTR_EDITOR_BOOL;
-        if (attribute == "velocity")
-            return ATTR_EDITOR_VECTOR3;
-        if (category == "billboard")
-        {
-            if (attribute == "pos")
-                return ATTR_EDITOR_VECTOR3;
-            if (attribute == "size")
-                return ATTR_EDITOR_VECTOR2;
-            if (attribute == "uv")
-                return ATTR_EDITOR_VECTOR4;
-        }
     }
 
     return ATTR_EDITOR_STRING;
 }
 
-string getAttributeEditorName(uint index, string attribute)
+string getAttributeEditorName(uint index, const string& in attribute)
 {
     return "Attr_" + toString(index) + "_" + attribute;
 }
 
-void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, uint index, string attribute)
+void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, uint index, const string& in attribute)
 {
     switch (type)
     {
@@ -256,7 +281,7 @@ void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, u
     }
 }
 
-void readAttributeEditor(uint type, XMLElement categoryElem, int index, string attribute)
+void readAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
 {
     inReadAttributeEditor = true;
 
@@ -299,7 +324,7 @@ void readAttributeEditor(uint type, XMLElement categoryElem, int index, string a
     inReadAttributeEditor = false;
 }
 
-void writeAttributeEditor(uint type, XMLElement categoryElem, int index, string attribute)
+void writeAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
 {
     ListView@ list = componentWindow.getChild("AttributeList", true);
     

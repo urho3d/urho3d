@@ -327,6 +327,23 @@ XMLElement XMLElement::getParentElement() const
     return XMLElement(dynamic_cast<TiXmlElement*>(mElement->Parent()));
 }
 
+unsigned XMLElement::getNumAttributes() const
+{
+    unsigned ret = 0;
+    
+    if (mElement)
+    {
+        const TiXmlAttribute* attribute = mElement->FirstAttribute();
+        while (attribute)
+        {
+            ++ret;
+            attribute = attribute->Next();
+        }
+    }
+    
+    return ret;
+}
+
 bool XMLElement::hasAttribute(const std::string& name) const
 {
     if (!mElement)

@@ -154,7 +154,8 @@ void BillboardSet::saveXML(XMLElement& dest)
         XMLElement billboardElem = dest.createChildElement("billboard");
         const Billboard& billboard = mBillboards[i];
         
-        // Optimization: write only enabled billboards
+        billboardElem.setBool("enabled", billboard.mEnabled);
+        
         if (billboard.mEnabled)
         {
             billboardElem.setVector3("pos", billboard.mPosition);
@@ -187,7 +188,7 @@ void BillboardSet::loadXML(const XMLElement& source, ResourceCache* cache)
     while ((billboardElem) && (index < mBillboards.size()))
     {
         Billboard& billboard = mBillboards[index];
-        billboard.mEnabled = billboardElem.hasAttribute("pos");
+        billboard.mEnabled = billboardElem.getBool("enabled");
         if (billboard.mEnabled)
         {
             billboard.mPosition = billboardElem.getVector3("pos");

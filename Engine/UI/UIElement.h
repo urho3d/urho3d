@@ -31,6 +31,9 @@
 #include "Vector2.h"
 #include "XMLFile.h"
 
+//! Helper macro to send an event and check if we were deleted as a result
+#define SAFE_SEND_EVENT(type, data) { WeakPtr<UIElement> self(static_cast<UIElement*>(this)); sendEvent(type, data); if (!self) return; }
+
 //! UI element horizontal alignment
 enum HorizontalAlignment
 {

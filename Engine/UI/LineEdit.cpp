@@ -375,9 +375,8 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_TEXT] = mLine;
-        sendEvent(EVENT_TEXTFINISHED, eventData);
-        
-        mText->clearSelection();
+        // This event may potentially cause deletion
+        SAFE_SEND_EVENT(EVENT_TEXTFINISHED, eventData);
     }
     else if ((c >= 0x20) && ((!mMaxLength) || (mLine.length() < mMaxLength)))
     {

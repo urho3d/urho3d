@@ -171,7 +171,7 @@ void RigidBody::saveXML(XMLElement& dest)
     bodyElem.setBool("active", isActive());
     
     XMLElement collisionElem = dest.createChildElement("collision");
-    collisionElem.setString("shape", getResourceName(mCollisionShape));
+    collisionElem.setString("name", getResourceName(mCollisionShape));
     collisionElem.setInt("group", mCollisionGroup);
     collisionElem.setInt("mask", mCollisionMask);
     
@@ -217,7 +217,7 @@ void RigidBody::loadXML(const XMLElement& source, ResourceCache* cache)
     mBounce = bodyElem.getFloat("bounce");
     
     XMLElement collisionElem = source.getChildElement("collision");
-    setCollisionShape(cache->getResource<CollisionShape>(collisionElem.getString("shape")));
+    setCollisionShape(cache->getResource<CollisionShape>(collisionElem.getString("name")));
     setCollisionGroup(collisionElem.getInt("group"));
     setCollisionMask(collisionElem.getInt("mask"));
     
