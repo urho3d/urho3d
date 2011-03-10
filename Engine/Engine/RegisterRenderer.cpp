@@ -370,6 +370,7 @@ static void registerMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "TU_DETAIL", TU_DETAIL);
     engine->RegisterEnumValue("TextureUnit", "TU_ENVIRONMENT", TU_ENVIRONMENT);
     engine->RegisterEnumValue("TextureUnit", "TU_EMISSIVE", TU_EMISSIVE);
+    engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     
     engine->RegisterEnum("PassType");
     engine->RegisterEnumValue("PassType", "PASS_DEFERRED", PASS_DEFERRED);

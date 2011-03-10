@@ -49,7 +49,8 @@ static bool compareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry
 
 FileSelector::FileSelector(UI* ui) :
     mUI(ui),
-    mIgnoreEvents(false)
+    mIgnoreEvents(false),
+    mDirectoryMode(false)
 {
     if (!mUI)
         EXCEPTION("Null UI for FileSelector");
@@ -233,6 +234,11 @@ void FileSelector::setFilters(const std::vector<std::string>& filters, unsigned 
         refreshFiles();
 }
 
+void FileSelector::setDirectoryMode(bool enable)
+{
+    mDirectoryMode = enable;
+}
+
 void FileSelector::updateElements()
 {
     {
@@ -351,12 +357,15 @@ bool FileSelector::enterFile()
     else
     {
         // Doubleclicking a file is the same as pressing OK
-        using namespace FileSelected;
+        if (!mDirectoryMode)
+        {
+            using namespace FileSelected;
         
-        VariantMap eventData;
-        eventData[P_FILENAME] = mPath + mFileEntries[index].mName;
-        eventData[P_OK] = true;
-        sendEvent(EVENT_FILESELECTED, eventData);
+            VariantMap eventData;
+            eventData[P_FILENAME] = mPath + mFileEntries[index].mName;
+            eventData[P_OK] = true;
+            sendEvent(EVENT_FILESELECTED, eventData);
+        }
     }
     
     return false;
@@ -423,12 +432,25 @@ void FileSelector::handleOKPressed(StringHash eventType, VariantMap& eventData)
         return;
     
     const std::string& fileName = getFileName();
-    if (!fileName.empty())
+    
+    if (!mDirectoryMode)
+    {
+        if (!fileName.empty())
+        {
+            using namespace FileSelected;
+            
+            VariantMap newEventData;
+            newEventData[P_FILENAME] = mPath + getFileName();
+            newEventData[P_OK] = true;
+            sendEvent(EVENT_FILESELECTED, newEventData);
+        }
+    }
+    else if (!mPath.empty())
     {
         using namespace FileSelected;
         
         VariantMap newEventData;
-        newEventData[P_FILENAME] = mPath + getFileName();
+        newEventData[P_FILENAME] = mPath;
         newEventData[P_OK] = true;
         sendEvent(EVENT_FILESELECTED, newEventData);
     }

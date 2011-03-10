@@ -415,6 +415,7 @@ static void registerFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "void setPath(const string& in)", asMETHOD(FileSelector, setPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void setFileName(const string& in)", asMETHOD(FileSelector, setFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void setFilters(array<string>@+, uint)", asFUNCTION(FileSelectorSetFilters), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSelector", "void setDirectoryMode(bool)", asMETHOD(FileSelector, setDirectoryMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void updateElements()", asMETHOD(FileSelector, updateElements), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "XMLFile@+ getStyle() const", asMETHOD(FileSelector, getStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "Window@+ getWindow() const", asMETHOD(FileSelector, getWindow), asCALL_THISCALL);
@@ -429,6 +430,7 @@ static void registerFileSelector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSelector", "const string& getFileName() const", asMETHOD(FileSelector, getFileName), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const string& getFilter() const", asMETHOD(FileSelector, getFilter), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "uint getFilterIndex() const", asMETHOD(FileSelector, getFilterIndex), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "bool getDirectoryMode() const", asMETHOD(FileSelector, getDirectoryMode), asCALL_THISCALL);
     registerRefCasts<EventListener, FileSelector>(engine, "EventListener", "FileSelector");
 }
 

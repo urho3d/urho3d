@@ -471,6 +471,13 @@ static CScriptArray* SceneGetScriptedEntitiesWithClass(const std::string& classN
     return vectorToHandleArray<Entity>(entityResult, "array<Entity@>");
 }
 
+static CScriptArray* SceneGetResourceRefs(Scene* ptr)
+{
+    std::vector<Resource*> result;
+    ptr->getResourceRefs(result);
+    return vectorToHandleArray<Resource>(result, "array<Resource@>");
+}
+
 static void registerScene(asIScriptEngine* engine)
 {
     engine->RegisterObjectBehaviour("Scene", asBEHAVE_ADDREF, "void f()", asMETHOD(Scene, addRef), asCALL_THISCALL);
@@ -515,6 +522,7 @@ static void registerScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getScriptedEntities() const", asFUNCTION(SceneGetScriptedEntities), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "array<Entity@>@ getScriptedEntities(const string& in) const", asFUNCTION(SceneGetScriptedEntitiesWithClass), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "Vector3 getEntityPosition(Entity@+) const", asMETHOD(Scene, getEntityPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "array<Resource@>@ getResourceRefs() const", asFUNCTION(SceneGetResourceRefs), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "float getTransientPredictionTime() const", asMETHOD(Scene, getTransientPredictionTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float getInterpolationConstant() const" ,asMETHOD(Scene, getInterpolationConstant), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float getInterpolationLerpFactor() const" ,asMETHOD(Scene, getInterpolationLerpFactor), asCALL_THISCALL);

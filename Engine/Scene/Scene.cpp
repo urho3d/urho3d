@@ -966,6 +966,27 @@ Vector3 Scene::getEntityPosition(Entity* entity) const
     return Vector3::sZero;
 }
 
+void Scene::getResourceRefs(std::vector<Resource*>& result) const
+{
+    result.clear();
+    std::vector<Resource*> entityResult;
+    std::set<Resource*> sceneResult;
+    
+    for (std::map<EntityID, SharedPtr<Entity> >::const_iterator i = mEntities.begin(); i != mEntities.end(); ++i)
+    {
+        // Note: entity clears the result vector
+        i->second->getResourceRefs(entityResult);
+        for (std::vector<Resource*>::const_iterator j = entityResult.begin(); j != entityResult.end(); ++j)
+            sceneResult.insert(*j);
+    }
+    
+    for (std::set<Resource*>::const_iterator i = sceneResult.begin(); i != sceneResult.end(); ++i)
+    {
+        if (*i != 0)
+            result.push_back(*i);
+    }
+}
+
 float Scene::getAsyncLoadProgress() const
 {
     if ((!mAsyncLoading) || (!mAsyncTotalEntities))

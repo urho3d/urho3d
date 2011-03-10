@@ -66,6 +66,8 @@ public:
     void setFileName(const std::string& fileName);
     //! Set filters
     void setFilters(const std::vector<std::string>& filters, unsigned defaultIndex);
+    //! Set directory selection mode. Default false
+    void setDirectoryMode(bool enable);
     //! Update elements to layout properly. Call this after manually adjusting the sub-elements
     void updateElements();
     
@@ -95,6 +97,8 @@ public:
     const std::string& getFilter() const;
     //! Return current filter index
     unsigned getFilterIndex() const;
+    //! Return directory mode flag
+    bool getDirectoryMode() const { return mDirectoryMode; }
     
 private:
     //! Refresh the directory listing
@@ -152,6 +156,8 @@ private:
     std::vector<FileSelectorEntry> mFileEntries;
     //! Filter used to get the file list
     std::string mLastUsedFilter;
+    //! Directory mode flag
+    bool mDirectoryMode;
     //! Ignore event flag (used when changing the edit fields programmatically)
     bool mIgnoreEvents;
 };

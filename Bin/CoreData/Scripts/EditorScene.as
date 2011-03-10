@@ -37,6 +37,47 @@ void setResourcePath(string newPath)
     sceneResourcePath = newPath;
 }
 
+void reloadResources()
+{
+    array<Resource@> sceneResources = editorScene.getResourceRefs();
+    uint numResources = sceneResources.size();
+    for (uint i = 0; i < numResources; ++i)
+    {
+        // Material textures are not listed by getResourceRefs(), so have to handle them manually
+        Material@ mat = cast<Material>(sceneResources[i]);
+        if (mat !is null)
+        {
+            for (uint j = 0; j < mat.getNumTechniques(); ++j)
+            {
+                MaterialTechnique@ tech = mat.getTechnique(j);
+                for (int k = 0; k < MAX_MATERIAL_TEXTURE_UNITS; ++k)
+                {
+                    Texture@ tex = tech.getTexture(TextureUnit(k));
+                    if (tex !is null)
+                    {
+                        bool found = false;
+                        for (uint l = numResources; l < sceneResources.size(); ++l)
+                        {
+                            if (sceneResources[l] is tex)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                            sceneResources.push(tex);
+                    }
+                }
+            }
+        }
+    }
+
+    print("Reloading resources");
+    for (uint i = 0; i < sceneResources.size(); ++i)
+        cache.reloadResource(sceneResources[i]);
+}
+
+
 void loadScene(string fileName)
 {
     // Always load the scene from the filesystem, not from resource paths

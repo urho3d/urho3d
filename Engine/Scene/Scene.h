@@ -174,6 +174,8 @@ public:
     Component* getComponent(const ComponentRef& ref) const;
     //! Return entity position by going through scene node components it has (RigidBody is preferred)
     Vector3 getEntityPosition(Entity* entity) const;
+    //! Return resource references from the whole scene
+    void getResourceRefs(std::vector<Resource*>& result) const;
     //! Return queued remote events
     std::vector<RemoteEvent>& getQueuedRemoteEvents() { return mRemoteEvents; }
     //! Return required package files

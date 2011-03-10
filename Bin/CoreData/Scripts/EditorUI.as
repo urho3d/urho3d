@@ -8,6 +8,7 @@ UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
 array<string> uiSceneFilters = {"*.xml", "*.bin", "*.sav", "*.*"};
+array<string> uiAllFilter = {"*.*"};
 uint uiSceneFilter = 0;
 
 void createUI()
@@ -53,6 +54,8 @@ void createMenuBar()
         filePopup.addChild(createMenuItem("Save scene", 'S', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.addChild(createMenuSpacer());
+        filePopup.addChild(createMenuItem("Set resource path", 0, 0));
+        filePopup.addChild(createMenuItem("Reload resources", 'R', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Exit", 'X', QUAL_CTRL));
         uiMenuBar.addChild(fileMenu);
     }
@@ -190,6 +193,19 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
             uiFileSelector.setFileName(getFileNameAndExtension(sceneFileName));
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
+        
+        if (action == "Set resource path")
+        {
+            createFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilter, 0);
+            uiFileSelector.setDirectoryMode(true);
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleResourcePath");
+        }
+
+        if (action == "Reload resources")
+        {
+            ui.setFocusElement(null); // Close the menu
+            reloadResources();
+        }
     }
     
     if (action == "Scene hierarchy")
@@ -237,6 +253,17 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 
     string fileName = eventData["FileName"].getString();
     saveScene(fileName);
+}
+
+void handleResourcePath(StringHash eventType, VariantMap& eventData)
+{
+    closeFileSelector();
+ 
+    // Check for cancel
+    if (!eventData["OK"].getBool())
+        return;
+
+    setResourcePath(eventData["FileName"].getString());
 }
 
 void handleKeyDown(StringHash eventType, VariantMap& eventData)

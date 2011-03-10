@@ -154,9 +154,9 @@ void Menu::handleReleased(StringHash eventType, VariantMap& eventData)
     {
         using namespace MenuSelected;
         
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        sendEvent(EVENT_MENUSELECTED, eventData);
+        VariantMap newEventData;
+        newEventData[P_ELEMENT] = (void*)this;
+        sendEvent(EVENT_MENUSELECTED, newEventData);
     }
 }
 
@@ -194,13 +194,13 @@ void Menu::handleFocusChanged(StringHash eventType, VariantMap& eventData)
 
 void Menu::handleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    if ((!mEnabled) || (!mVisible))
+    if (!mEnabled)
         return;
     
     using namespace KeyDown;
     
-    // Simulate a click if accelerator key pressed
+    // Activate if accelerator key pressed
     if ((eventData[P_KEY].getInt() == mAcceleratorKey) && (eventData[P_QUALIFIERS].getInt() == mAcceleratorQualifiers) &&
         (eventData[P_REPEAT].getBool() == false))
-        onClick(getPosition(), getScreenPosition(), eventData[P_BUTTONS].getInt(), eventData[P_QUALIFIERS].getInt(), 0);
+        handleReleased(eventType, eventData);
 }
