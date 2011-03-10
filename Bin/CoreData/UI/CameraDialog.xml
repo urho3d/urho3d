@@ -2,7 +2,7 @@
     <movable enable="true" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="16" />
         <layout mode="horizontal" />
         <element type="Text">
             <text value="Editor camera settings" />
@@ -11,11 +11,11 @@
             <fixedsize value="16 16" />
         </element>
     </element>
-    <element>
-        <minheight value="10" />
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
     </element>
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="17" />
         <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Near clip distance" />
@@ -25,7 +25,7 @@
         </element>
     </element>
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="17" />
         <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Far clip distance" />
@@ -35,7 +35,7 @@
         </element>
     </element>
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="17" />
         <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Field of view" />
@@ -45,7 +45,7 @@
        </element>
     </element>
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="17" />
         <layout mode="horizontal" spacing="20" />
         <element type="Text">
             <text value="Movement speed" />

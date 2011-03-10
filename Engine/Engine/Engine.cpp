@@ -538,6 +538,10 @@ void Engine::update(float timeStep)
     // Application post-update
     sendEvent(EVENT_POSTUPDATE, updateData);
     
+    // UI logic update
+    if (mUI)
+        mUI->update(timeStep);
+    
     // Rendering update
     if (mPipeline)
         mPipeline->update(timeStep);
@@ -545,12 +549,12 @@ void Engine::update(float timeStep)
     if (mDebugHud)
         mDebugHud->update(timeStep);
     
-    // Application post-render update
-    sendEvent(EVENT_POSTRENDERUPDATE, updateData);
-    
     // UI rendering update
     if (mUI)
-        mUI->update(timeStep);
+        mUI->renderUpdate();
+    
+    // Application post-render update
+    sendEvent(EVENT_POSTRENDERUPDATE, updateData);
     
     // Audio update
     mAudio->update(timeStep);

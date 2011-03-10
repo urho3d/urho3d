@@ -55,8 +55,8 @@ void moveCamera(float timeStep)
 
 void resetCamera()
 {
-	camera.setPosition(Vector3(0, 10, 0));
-	camera.setRotation(Quaternion());
+    camera.setPosition(Vector3(0, 10, 0));
+    camera.setRotation(Quaternion());
 }
 
 void createCameraDialog()

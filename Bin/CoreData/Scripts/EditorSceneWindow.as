@@ -1,11 +1,16 @@
 // Urho3D editor scene hierarchy window handling
 
+const int ITEM_NONE = 0;
 const int ITEM_ENTITY = 1;
 const int ITEM_COMPONENT = 2;
 const uint NO_ITEM = 0xffffffff;
 
 Window@ sceneWindow;
 uint listAddIndex;
+uint copyBufferEntityID = 0;
+XMLFile copyBuffer;
+
+array<string> newEntityChoices = {"Replicated", "Local"};
 
 void createSceneWindow()
 {
@@ -19,12 +24,33 @@ void createSceneWindow()
     sceneWindow.setPosition(20, 40);
     updateSceneWindow(false);
 
+    DropDownList@ newEntityList = sceneWindow.getChild("NewEntityList", true);
+    for (uint i = 0; i < newEntityChoices.size(); ++i)
+    {
+        Text@ choice = Text();
+        choice.setStyle(uiStyle, "FileSelectorFilterText");
+        choice.setText(newEntityChoices[i]);
+        newEntityList.addItem(choice);
+    }
+
+    DropDownList@ newComponentList = sceneWindow.getChild("NewComponentList", true);
+    array<string> componentTypes = editorScene.getComponentTypes();
+    for (uint i = 0; i < componentTypes.size(); ++i)
+    {
+        Text@ choice = Text();
+        choice.setStyle(uiStyle, "FileSelectorFilterText");
+        choice.setText(componentTypes[i]);
+        newComponentList.addItem(choice);
+    }
+
     subscribeToEvent(sceneWindow.getChild("CloseButton", true), "Released", "hideSceneWindow");
     subscribeToEvent(sceneWindow.getChild("ExpandAllButton", true), "Released", "expandSceneHierarchy");
     subscribeToEvent(sceneWindow.getChild("CollapseAllButton", true), "Released", "collapseSceneHierarchy");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "ItemSelected", "handleEntityListSelectionChange");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "ItemDeselected", "handleEntityListSelectionChange");
     subscribeToEvent(sceneWindow.getChild("EntityList", true), "UnhandledKey", "handleEntityListKey");
+    subscribeToEvent(newEntityList, "ItemSelected", "handleCreateEntity");
+    subscribeToEvent(newComponentList, "ItemSelected", "handleCreateComponent");
     subscribeToEvent("DragDropTest", "handleDragDropTest");
     subscribeToEvent("DragDropFinish", "handleDragDropFinish");
 }
@@ -66,6 +92,9 @@ void updateSceneWindow(bool showComponents)
         updateSceneWindowEntity(itemIndex, entity);
         list.setChildItemsVisible(itemIndex, showComponents);
     }
+    
+    // Clear copybuffer when whole window refreshed
+    copyBuffer.createRootElement("none");
 }
 
 void updateSceneWindowEntity(uint itemIndex, Entity@ entity)
@@ -73,10 +102,24 @@ void updateSceneWindowEntity(uint itemIndex, Entity@ entity)
     ListView@ list = sceneWindow.getChild("EntityList", true);
 
     // Remove old item if exists
-    if (itemIndex < list.getNumItems())
+    uint numItems = list.getNumItems();
+    if (itemIndex < numItems)
         list.removeItem(itemIndex);
+        
     if (entity is null)
         return;
+
+    if (itemIndex >= numItems)
+    {
+        // Scan for correct place to insert at
+        uint entityID = entity.getID();
+        for (itemIndex = 0; itemIndex < numItems; ++itemIndex)
+        {
+            UIElement@ item = list.getItem(itemIndex);
+            if (uint(item.userData["EntityID"].getInt()) > entityID)
+                break;
+        }
+    }
 
     Text@ text = Text();
     text.setStyle(uiStyle, "FileSelectorListText");
@@ -306,50 +349,13 @@ void handleEntityListSelectionChange()
 void handleEntityListKey(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].getInt();
-
+    
     ListView@ list = sceneWindow.getChild("EntityList", true);
-
+    
     uint index = list.getSelection();
     Entity@ entity = getListEntity(index);
     Component@ component = getListComponent(index);
     uint entityItem = getEntityListIndex(entity, index);
-
-    if (key == KEY_DELETE)
-    {
-        // Remove component
-        if ((entity !is null) && (component !is null))
-        {
-            if (selectedComponent is component)
-                @selectedComponent = null;
-
-            uint id = entity.getID();
-            beginModify(id);
-            entity.removeComponent(component);
-            endModify(id);
-
-            // If component is a node, also remove it from the parent node
-            Node@ node = cast<Node>(component);
-            if ((node !is null) && (node.getParent() !is null))
-                node.getParent().removeChild(node, true);
-            updateSceneWindowEntity(entityItem, entity);
-            // Select the next item in the same index
-            list.setSelection(index);
-        }
-        // Remove entity
-        if ((entity !is null) && (component is null))
-        {
-            if (selectedEntity is entity)
-                @selectedEntity = null;
-
-            uint id = entity.getID();
-            beginModify(id);
-            editorScene.removeEntity(entity);
-            endModify(id);
-            
-            updateSceneWindowEntity(entityItem, null);
-            list.setSelection(index);
-        }
-    }
 }
 
 void handleDragDropTest(StringHash eventType, VariantMap& eventData)
@@ -522,4 +528,209 @@ void calculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion&
     scale = inverseTargetWorldScale * sourceWorldScale;
     rot = inverseTargetWorldRot * sourceWorldRot;
     pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.getWorldPosition()));
+}
+
+void handleCreateEntity(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ list = eventData["Element"].getUIElement();
+    uint mode = list.getSelection();
+    if (mode > list.getNumItems())
+        return;
+    bool local = (mode == 1);
+    
+    Entity@ newEntity = editorScene.createEntity("", local);
+    updateSceneWindowEntity(newEntity);
+    uint index = getEntityListIndex(newEntity);
+
+    ListView@ entityList = sceneWindow.getChild("EntityList", true);
+    entityList.setSelection(index);
+}
+
+void handleCreateComponent(StringHash eventType, VariantMap& eventData)
+{
+    if (selectedEntity is null)
+        return;
+
+    DropDownList@ list = eventData["Element"].getUIElement();
+    Text@ text = list.getSelectedItem();
+    if (text is null)
+        return;
+
+    selectedEntity.createComponent(text.getText(), "");
+    updateSceneWindowEntity(selectedEntity);
+}
+
+bool checkSceneWindowFocus(bool allowNoElement)
+{
+    // Allow scene edits only when either no item focused, or the 
+    ListView@ list = sceneWindow.getChild("EntityList", true);
+    UIElement@ focusElement = ui.getFocusElement();
+    if (focusElement is list)
+        return true;
+    if (focusElement !is null)
+        return false;
+    return allowNoElement;
+}
+
+void sceneDelete()
+{
+    ListView@ list = sceneWindow.getChild("EntityList", true);
+    uint index = list.getSelection();
+    uint entityIndex = getEntityListIndex(selectedEntity);
+    
+    // Remove component
+    if ((selectedEntity !is null) && (selectedComponent !is null))
+    {
+        if (!checkSceneWindowFocus(true))
+            return;
+        
+        uint id = selectedEntity.getID();
+        beginModify(id);
+        selectedEntity.removeComponent(selectedComponent);
+        endModify(id);
+        
+        // If component is a node, remove it from the parent node
+        Node@ node = cast<Node>(selectedComponent);
+        if ((node !is null) && (node.getParent() !is null))
+            node.getParent().removeChild(node, true);
+        
+        @selectedComponent = null;
+        
+        updateSceneWindowEntity(entityIndex, entity);
+        
+        // Select the next item in the same index
+        list.setSelection(index);
+    }
+    // Remove entity
+    if ((selectedEntity !is null) && (selectedComponent is null))
+    {
+        // Entity operations are dangerous. Require the scene hierarchy to be focused
+        if (!checkSceneWindowFocus(false))
+            return;
+         
+        uint id = selectedEntity.getID();
+        beginModify(id);
+        editorScene.removeEntity(selectedEntity);
+        endModify(id);
+        
+        @selectedComponent = null;
+        @selectedEntity = null;
+        
+        updateSceneWindowEntity(entityIndex, null);
+        
+        // Select the next item in the same index
+        list.setSelection(index);
+    }
+}
+
+void sceneCut()
+{
+    sceneCopy();
+    sceneDelete();
+}
+
+void sceneCopy()
+{
+    // Copy component
+    if ((selectedEntity !is null) && (selectedComponent !is null))
+    {
+        if (!checkSceneWindowFocus(true))
+            return;
+        
+        XMLElement rootElem = copyBuffer.createRootElement("component");
+        selectedComponent.saveXML(rootElem);
+        
+        // If component is a node, save the world transform instead, and delete the parent reference
+        Node@ node = cast<Node>(selectedComponent);
+        if (node !is null)
+        {
+            XMLElement transformElem = rootElem.getChildElement("transform");
+            transformElem.setVector3("pos", node.getWorldPosition());
+            transformElem.setVector3("rot", node.getWorldRotation().getEulerAngles());
+            transformElem.setVector3("scale", node.getWorldScale());
+            rootElem.removeChildElement("parent", false);
+        }
+        
+        copyBufferEntityID = selectedEntity.getID();
+    }
+    // Copy entity
+    if ((selectedEntity !is null) && (selectedComponent is null))
+    {
+        if (!checkSceneWindowFocus(false))
+            return;
+        
+        XMLElement rootElem = copyBuffer.createRootElement("entity");
+        selectedEntity.saveXML(rootElem);
+        copyBufferEntityID = selectedEntity.getID();
+    }
+}
+
+void scenePaste()
+{
+    XMLElement rootElem = copyBuffer.getRootElement();
+    string mode = rootElem.getName();
+    
+    if ((mode == "component") && (selectedEntity !is null))
+    {
+        if (!checkSceneWindowFocus(true))
+            return;
+        
+        Component@ newComponent = selectedEntity.createComponent(rootElem.getAttribute("type"), rootElem.getAttribute("name"));
+        if (newComponent is null)
+            return;
+        newComponent.loadXML(rootElem);
+        newComponent.postLoad();
+        
+        // If component is a scene node, parent it to the selected component if exists
+        Node@ selectedNode = cast<Node>(selectedComponent);
+        Node@ newNode = cast<Node>(newComponent);
+        if ((newNode !is null) && (selectedNode !is null))
+        {
+            Vector3 pos;
+            Quaternion rot;
+            Vector3 scale;
+            calculateNewTransform(newNode, selectedNode, pos, rot, scale);
+            newNode.setTransform(pos, rot, scale);
+            selectedNode.addChild(newNode);
+        }
+        
+        updateSceneWindowEntity(selectedEntity);
+    }
+    
+    if (mode == "entity")
+    {
+        if (!checkSceneWindowFocus(false))
+            return;
+        
+        // If copied entity was local, make the new local too
+        Entity@ newEntity = editorScene.createEntity(rootElem.getAttribute("name"), copyBufferEntityID >= 65536);
+        uint newEntityID = newEntity.getID();
+        
+        // Before loading, rewrite scene node references to the copied entity
+        XMLElement compElem = rootElem.getChildElement("component");
+        bool rewrite = false;
+        while (compElem.notNull())
+        {
+            XMLElement parentElem = compElem.getChildElement("parent");
+            if ((parentElem.notNull()) && (uint(parentElem.getInt("id")) == copyBufferEntityID))
+            {
+                parentElem.setInt("id", newEntityID);
+                rewrite = true;
+            }
+            compElem = compElem.getNextElement("component");
+        }
+        
+        // If we modified the copybuffer, change the "stored ID" value to reflect the change
+        if (rewrite)
+            copyBufferEntityID = newEntity.getID();
+        
+        newEntity.loadXML(rootElem);
+        newEntity.postLoad();
+        
+        updateSceneWindowEntity(newEntity);
+        uint index = getEntityListIndex(newEntity);
+        
+        ListView@ list = sceneWindow.getChild("EntityList", true);
+        list.setSelection(index);
+    }
 }

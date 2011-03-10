@@ -4,7 +4,7 @@
     <resizeborder value="6 6 6 6" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element>
-        <fixedheight value="20" />
+        <fixedheight value="16" />
         <layout mode="horizontal" />
         <element type="Text">
             <text value="Scene hierarchy" />
@@ -12,6 +12,9 @@
         <element type="Button" style="CloseButton" name="CloseButton">
             <fixedsize value="16 16" />
         </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
     </element>
     <element>
         <fixedheight value="18" />
@@ -42,20 +45,34 @@
         <fixedheight value="22" />
         <layout mode="horizontal" spacing="4" />
         <element type="Element" />
-        <element type="Button" name="NewEntityButton">
+        <element type="DropDownList" name="NewEntityList">
             <fixedwidth value="90" />
+            <layout border="4 5 4 4" />
+            <placeholder>
+                <visible enable="false" />
+            </placeholder>
             <element type="Text">
                 <text value="New Entity" />
-                <alignment horizontal="center" vertical="center" />
+                <textalignment value="center" />
             </element>
+            <popup>
+                <layout border="4 4 4 4" />   
+            </popup>         
         </element>
         <element />
-        <element type="Button" name="NewComponentButton">
+        <element type="DropDownList" name="NewComponentList">
             <fixedwidth value="90" />
+            <layout border="4 5 4 4" />
+            <placeholder>
+                <visible enable="false" />
+            </placeholder>
             <element type="Text">
                 <text value="New Comp" />
-                <alignment horizontal="center" vertical="center" />
+                <textalignment value="center" />
             </element>
+            <popup>
+                <layout border="4 4 4 4" />   
+            </popup>
         </element>
         <element />
     </element>

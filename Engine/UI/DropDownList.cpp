@@ -89,6 +89,9 @@ void DropDownList::getBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>
 {
     Button::getBatches(batches, quads, currentScissor);
     
+    if (!mPlaceholder->isVisible())
+        return;
+    
     UIElement* selectedItem = getSelectedItem();
     if (selectedItem)
     {
@@ -161,10 +164,6 @@ void DropDownList::removeAllItems()
 
 void DropDownList::setSelection(unsigned index)
 {
-    // The list should always show a selection if possible, so clamp the selection
-    unsigned numItems = getNumItems();
-    if (index >= numItems)
-        index = numItems - 1;
     mListView->setSelection(index);
 }
 

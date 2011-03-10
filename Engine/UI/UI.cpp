@@ -160,9 +160,6 @@ void UI::update(float timeStep)
 {
     PROFILE(UI_Update);
     
-    if (mRenderer->isDeviceLost())
-        return;
-    
     if ((mCursor) && (mCursor->isVisible()))
     {
         IntVector2 pos = mCursor->getPosition();
@@ -216,7 +213,13 @@ void UI::update(float timeStep)
         
         update(timeStep, mRootElement);
     }
+}
 
+void UI::renderUpdate()
+{
+    if (mRenderer->isDeviceLost())
+        return;
+    
     {
         PROFILE(UI_GetBatches);
         

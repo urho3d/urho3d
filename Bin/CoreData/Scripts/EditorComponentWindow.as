@@ -5,10 +5,11 @@ Window@ componentWindow;
 XMLFile componentData;
 
 const uint ATTR_EDITOR_STRING = 0;
-const uint ATTR_EDITOR_BOOL = 1;
+const uint ATTR_EDITOR_FLOAT = 1;
 const uint ATTR_EDITOR_VECTOR2 = 2;
 const uint ATTR_EDITOR_VECTOR3 = 3;
 const uint ATTR_EDITOR_VECTOR4 = 4;
+const uint ATTR_EDITOR_BOOL = 5;
 const uint ATTR_EDITOR_ENUM = 64;
 const uint ATTR_EDITOR_RESOURCE = 128;
 const uint MAX_ATTRNAME_LENGTH = 15;
@@ -84,7 +85,8 @@ void createComponentWindow()
     resourceEditors.push(ResourceEditorData("ParticleEmitter", "emitter", "name", "XMLFile", ".xml"));
 
     subscribeToEvent(componentWindow.getChild("CloseButton", true), "Released", "hideComponentWindow");
-    subscribeToEvent(componentWindow.getChild("NameEdit", true), "TextFinished", "editComponentName");
+    subscribeToEvent(componentWindow.getChild("EntityNameEdit", true), "TextFinished", "editEntityName");
+    subscribeToEvent(componentWindow.getChild("ComponentNameEdit", true), "TextFinished", "editComponentName");
 }
 
 void hideComponentWindow()
@@ -103,25 +105,51 @@ void updateComponentWindow()
     // If a resource pick was in progress, it cannot be completed now, as component was changed
     pickResourceCanceled();
 
-    Text@ title = componentWindow.getChild("WindowTitle", true);
-    LineEdit@ nameEdit = componentWindow.getChild("NameEdit", true);
+    Text@ entityTitle = componentWindow.getChild("EntityTitle", true);
+    Text@ componentTitle = componentWindow.getChild("ComponentTitle", true);
+    LineEdit@ entityNameEdit = componentWindow.getChild("EntityNameEdit", true);
+    LineEdit@ componentNameEdit = componentWindow.getChild("ComponentNameEdit", true);
     ListView@ list = componentWindow.getChild("AttributeList", true);
     list.removeAllItems();
     lastAttributeCount = 0;
 
-    if (selectedComponent is null)
+    if (selectedEntity is null)
     {
-        title.setText("No component");
-        nameEdit.setText("");
-        nameEdit.setEnabled(false);
-        return;
+        entityTitle.setText("No entity");
+        entityNameEdit.setText("");
+        entityNameEdit.setEnabled(false);
+    }
+    else
+    {
+        uint entityID = selectedEntity.getID();
+        entityTitle.setText("Entity ID " + entityID + " " + (entityID < 65536 ? "(Replicated)" : "(Local)"));
+        entityNameEdit.setText(selectedEntity.getName());
+        entityNameEdit.setEnabled(true);
     }
 
-    title.setText(selectedComponent.getTypeName() + " in " + getEntityTitle(selectedComponent.getEntity()));
-    nameEdit.setText(selectedComponent.getName());
-    nameEdit.setEnabled(true);
-    
-    updateComponentAttributes();
+    if (selectedComponent is null)
+    {
+        componentTitle.setText("No component");
+        componentNameEdit.setText("");
+        componentNameEdit.setEnabled(false);
+    }
+    else
+    {
+        componentTitle.setText("Component " + selectedComponent.getTypeName());
+        componentNameEdit.setText(selectedComponent.getName());
+        componentNameEdit.setEnabled(true);
+        updateComponentAttributes();
+    }
+}
+
+void editEntityName()
+{
+    if (selectedEntity is null)
+        return;
+
+    LineEdit@ nameEdit = componentWindow.getChild("EntityNameEdit", true);
+    selectedEntity.setName(nameEdit.getText());
+    updateSceneWindowEntity(selectedEntity);
 }
 
 void editComponentName()
@@ -129,7 +157,7 @@ void editComponentName()
     if (selectedComponent is null)
         return;
 
-    LineEdit@ nameEdit = componentWindow.getChild("NameEdit", true);
+    LineEdit@ nameEdit = componentWindow.getChild("ComponentNameEdit", true);
     selectedComponent.setName(nameEdit.getText());
     updateSceneWindowEntity(selectedComponent.getEntity());
 }
@@ -272,10 +300,10 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
         return;
 
     UIElement@ attrEdit = eventData["Element"].getUIElement();
-    editComponentAttribute(attrEdit);
+    editComponentAttribute(attrEdit, eventType == StringHash("TextChanged"));
 }
 
-void editComponentAttribute(UIElement@ attrEdit)
+void editComponentAttribute(UIElement@ attrEdit, bool intermediateEdit)
 {
     if ((selectedComponent is null) || (inLoadAttributeEditor))
         return;
@@ -295,7 +323,9 @@ void editComponentAttribute(UIElement@ attrEdit)
             selectedComponent.postLoad();
             endModify(id);
 
-            updateComponentAttributes();
+            // If intermediate edit on a numeric field, do not refresh value back from the component to the edit field
+            if (!intermediateEdit)
+                updateComponentAttributes();
             return;
         }
         categoryElem = categoryElem.getNextElement();
@@ -368,7 +398,7 @@ void pickResourceDone(StringHash eventType, VariantMap& eventData)
         return;
 
     attrEdit.setText(resourceName);
-    editComponentAttribute(attrEdit);
+    editComponentAttribute(attrEdit, false);
 }
 
 void pickResourceCanceled()
@@ -405,13 +435,15 @@ int getAttributeEditorType(Component@ component, const string& in category, cons
         return ATTR_EDITOR_BOOL;
 
     uint coords = value.split(' ').size();
+    if (coords == 1)
+        return ATTR_EDITOR_FLOAT;
     if (coords == 2)
         return ATTR_EDITOR_VECTOR2;
     else if (coords == 3)
         return ATTR_EDITOR_VECTOR3;
     else if (coords == 4)
         return ATTR_EDITOR_VECTOR4;
-
+    
     return ATTR_EDITOR_STRING;
 }
 
@@ -446,7 +478,7 @@ void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, u
         subscribeToEvent(attrEdit, "Toggled", "editComponentAttribute");
     }
 
-    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
     {
         for (uint i = 0; i < type; ++i)
         {
@@ -457,6 +489,8 @@ void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, u
             attrEdit.userData["Attribute"] = attribute;
             attrEdit.setFixedHeight(16);
             bar.addChild(attrEdit);
+            // For the numeric style editors, subscribe to every change
+            subscribeToEvent(attrEdit, "TextChanged", "editComponentAttribute");
             subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
         }
     }
@@ -544,11 +578,11 @@ void loadAttributeEditor(uint type, XMLElement categoryElem, int index, const st
     {
         CheckBox@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
         if (attrEdit is null)
-            return;            
+            return;
         attrEdit.setChecked(value.toBool());
     }
 
-    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
     {
         string baseName = getAttributeEditorName(index, attribute);
         array<string> coords = value.split(' ');
@@ -598,7 +632,7 @@ void storeAttributeEditor(uint type, XMLElement categoryElem, int index, const s
         categoryElem.setAttribute(attribute, toString(attrEdit.isChecked()));
     }
 
-    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    if ((type >= ATTR_EDITOR_FLOAT) && (type <= ATTR_EDITOR_VECTOR4))
     {
         string baseName = getAttributeEditorName(index, attribute);
         string value;

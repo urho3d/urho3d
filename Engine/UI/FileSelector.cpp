@@ -114,6 +114,7 @@ FileSelector::FileSelector(UI* ui) :
     
     subscribeToEvent(mFilterList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFilterChanged));
     subscribeToEvent(mPathEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handlePathChanged));
+    subscribeToEvent(mFileNameEdit, EVENT_TEXTFINISHED, EVENT_HANDLER(FileSelector, handleOKPressed));
     subscribeToEvent(mFileList, EVENT_ITEMSELECTED, EVENT_HANDLER(FileSelector, handleFileSelected));
     subscribeToEvent(mFileList, EVENT_ITEMDOUBLECLICKED, EVENT_HANDLER(FileSelector, handleFileDoubleClicked));
     subscribeToEvent(mFileList, EVENT_UNHANDLEDKEY, EVENT_HANDLER(FileSelector, handleFileListKey));
@@ -445,7 +446,7 @@ void FileSelector::handleOKPressed(StringHash eventType, VariantMap& eventData)
             sendEvent(EVENT_FILESELECTED, newEventData);
         }
     }
-    else if (!mPath.empty())
+    else if ((eventType == EVENT_PRESSED) && (!mPath.empty()))
     {
         using namespace FileSelected;
         

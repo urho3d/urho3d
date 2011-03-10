@@ -50,8 +50,10 @@ public:
     void setFocusElement(UIElement* element);
     //! Clear the UI (excluding the cursor)
     void clear();
-    //! Update the UI
+    //! Update the UI logic
     void update(float timeStep);
+    //! Update the UI for rendering
+    void renderUpdate();
     //! Render the UI
     void render();
     //! Add a UI element factory

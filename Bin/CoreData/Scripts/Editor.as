@@ -19,9 +19,7 @@ void start()
     subscribeToEvent("Update", "handleUpdate");
 
     createScene();
-    createCamera();
     createUI();
-    updateWindowTitle();
     parseArguments();
 }
 

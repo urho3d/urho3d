@@ -368,6 +368,11 @@
     <element type="FileSelectorTitleText">
         <font name="Cour.ttf" size="10" />
     </element>
+    <element type="EditorDivider">
+        <texture name="Textures/UI.png" />
+        <imagerect value="112 0 128 16" />
+        <border value="2 2 2 2" />
+    </element>
     <element type="EditorMenuBar">
         <texture name="Textures/UI.png" />
         <imagerect value="96 0 112 16" />

@@ -680,6 +680,9 @@ void Scene::removeAllEntities()
         std::map<EntityID, SharedPtr<Entity> >::iterator current = i++;
         removeEntity(current);
     }
+    
+    mNextEntityID = 1;
+    mNextLocalEntityID = LOCAL_ENTITY;
 }
 
 void Scene::resetOwner(Connection* owner, bool removeEntities)

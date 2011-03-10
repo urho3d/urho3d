@@ -1,8 +1,5 @@
 // Urho3D editor user interface
 
-const int uiSpacing = 2;
-const IntRect uiSpacingRect(uiSpacing, uiSpacing, uiSpacing, uiSpacing);
-
 XMLFile@ uiStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
@@ -44,22 +41,34 @@ void createMenuBar()
 {
     @uiMenuBar = BorderImage("MenuBar");
     uiMenuBar.setStyle(uiStyle, "EditorMenuBar");
-    uiMenuBar.setLayout(LM_HORIZONTAL, uiSpacing, uiSpacingRect);
+    uiMenuBar.setLayout(LM_HORIZONTAL, 2, IntRect(2, 2, 2, 2));
     uiRoot.addChild(uiMenuBar);
 
     {
         Menu@ fileMenu = createMenu("File");
         Window@ filePopup = fileMenu.getPopup();
+        filePopup.addChild(createMenuItem("New scene", 0, 0));
         filePopup.addChild(createMenuItem("Open scene", 'O', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene", 'S', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
-        filePopup.addChild(createMenuSpacer());
+        filePopup.addChild(createMenuDivider());
         filePopup.addChild(createMenuItem("Set resource path", 0, 0));
         filePopup.addChild(createMenuItem("Reload resources", 'R', QUAL_CTRL));
+        filePopup.addChild(createMenuDivider());
         filePopup.addChild(createMenuItem("Exit", 'X', QUAL_CTRL));
         uiMenuBar.addChild(fileMenu);
     }
 
+    {
+        Menu@ editMenu = createMenu("Edit");
+        Window@ editPopup = editMenu.getPopup();
+        editPopup.addChild(createMenuItem("Cut", 'X', QUAL_CTRL));
+        editPopup.addChild(createMenuItem("Copy", 'C', QUAL_CTRL));
+        editPopup.addChild(createMenuItem("Paste", 'V', QUAL_CTRL));
+        editPopup.addChild(createMenuItem("Delete", KEY_DELETE, 0));
+        uiMenuBar.addChild(editMenu);
+    }
+    
     {
         Menu@ fileMenu = createMenu("View");
         Window@ filePopup = fileMenu.getPopup();
@@ -91,23 +100,20 @@ Menu@ createMenuItem(const string& in title, int accelKey, int accelQual)
     return menu;
 }
 
-Menu@ createMenuSpacer()
+BorderImage@ createMenuDivider()
 {
-    Menu@ spacer = Menu();
-    spacer.setStyleAuto(uiStyle);
-    spacer.setFixedHeight(2);
-    // Disable input, but set permanent selection to get a nice indentation effect
-    spacer.setEnabled(false);
-    spacer.setSelected(true);
+    BorderImage@ divider = BorderImage();
+    divider.setStyle(uiStyle, "EditorDivider");
+    divider.setFixedHeight(4);
 
-    return spacer;
+    return divider;
 }
 
 Window@ createPopup(Menu@ baseMenu)
 {
     Window@ popup = Window();
     popup.setStyleAuto(uiStyle);
-    popup.setLayout(LM_VERTICAL, uiSpacing, uiSpacingRect);
+    popup.setLayout(LM_VERTICAL, 4, IntRect(4, 4, 4, 4));
     baseMenu.setPopup(popup);
     baseMenu.setPopupOffset(0, baseMenu.getHeight());
 
@@ -184,6 +190,9 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (uiFileSelector is null)
     {
+        if (action == "New scene")
+            createScene();
+            
         if (action == "Open scene")
         {
             createFileSelector("Open scene", "Open", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
@@ -219,7 +228,19 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
     if (action == "Camera settings")
         showCameraDialog();
-        
+    
+    if (action == "Cut")
+        sceneCut();
+    
+    if (action == "Copy")
+        sceneCopy();
+    
+    if (action == "Paste")
+        scenePaste();
+    
+    if (action == "Delete")
+        sceneDelete();
+    
     if (menu.getName() == "Exit")
         engine.exit();
 }

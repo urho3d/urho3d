@@ -13,12 +13,25 @@ Entity@ selectedEntity;
 
 void createScene()
 {
+    @selectedComponent = null;
+    @selectedEntity = null;
+
     // Create a scene with default values, these will be overridden when loading scenes
-    @editorScene = engine.createScene("GraphicsTest", BoundingBox(-1000.0, 1000.0), 8, true);
-    
+    @editorScene = engine.createScene("Urho3D Editor", BoundingBox(-1000.0, 1000.0), 8, true);
+
     // Always pause the scene for now
     editorScene.setPaused(true);
-    
+
+    if (sceneWindow !is null)
+    {
+        updateSceneWindow(false);
+        updateComponentWindow();
+    }
+
+    sceneFileName = "";
+    updateWindowTitle();
+    createCamera();
+
     subscribeToEvent("PostRenderUpdate", "sceneRaycast");
     subscribeToEvent("UIMouseClick", "sceneRaycast");
 }
@@ -107,6 +120,7 @@ void loadScene(string fileName)
     sceneModified = false;
     updateWindowTitle();
     updateSceneWindow(false);
+    updateComponentWindow();
     resetCamera();
 }
 
@@ -114,6 +128,8 @@ void saveScene(string fileName)
 {
     if ((fileName.empty()) || (getFileName(fileName).empty()))
         return;
+
+    editorScene.setName(getFileName(fileName));
 
     File file(fileName, FILE_WRITE);
     string extension = getExtension(fileName);
@@ -147,9 +163,9 @@ string getEntityTitle(Entity@ entity)
 {
     string name = entity.getName();
     if (name.empty())
-        return "Entity (" + entity.getID() + ")";
+        return "Entity (ID " + entity.getID() + ")";
     else
-        return name + " (" + entity.getID() + ")";
+        return name + " (ID " + entity.getID() + ")";
 }
 
 string getComponentTitle(Component@ component, int indent)
@@ -163,7 +179,7 @@ string getComponentTitle(Component@ component, int indent)
     if (name.empty())
         return indentStr + component.getTypeName();
     else
-        return indentStr + component.getTypeName() + " (" + name + ")";
+        return indentStr + name + " (" + component.getTypeName() + ")";
 }
 
 void sceneRaycast(StringHash eventType, VariantMap& eventData)
