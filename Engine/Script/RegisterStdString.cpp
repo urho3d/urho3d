@@ -72,6 +72,15 @@ static int StringFind(const std::string& rhs, const std::string& str)
     return str.find(rhs);
 }
 
+void StringResize(unsigned newSize, std::string& str)
+{
+    unsigned oldSize = str.length();
+    str.resize(newSize);
+    for (unsigned i = oldSize; i < newSize; ++i)
+        str[i] = ' ';
+}
+
+
 std::string StringSubString1Param(unsigned start, const std::string& str)
 {
     try
@@ -223,7 +232,7 @@ void registerStdString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("string", "uint length() const", asMETHOD(std::string, length), asCALL_THISCALL);
     engine->RegisterObjectMethod("string", "uint size() const", asMETHOD(std::string, size), asCALL_THISCALL);
     engine->RegisterObjectMethod("string", "bool empty() const", asMETHOD(std::string, empty), asCALL_THISCALL);
-    engine->RegisterObjectMethod("string", "void resize(uint)", asMETHODPR(std::string, resize, (size_t), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("string", "void resize(uint)", asFUNCTION(StringResize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "uint8 &opIndex(uint)", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "int find(const string& in) const", asFUNCTION(StringFind), asCALL_CDECL_OBJLAST);

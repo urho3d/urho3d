@@ -93,7 +93,7 @@ void Application::run()
     
     // Script mode: execute the rest of initialization, including scene creation, in script
     std::string extension = getExtension(fileName);
-    if ((extension != ".xml") && (extension != ".bin") && (extension != ".sav"))
+    if ((extension != ".xml") && (extension != ".bin") && (extension != ".dat"))
     {
         mScriptFile = new ScriptFile(mEngine->getScriptEngine(), fileName);
         mScriptFile->load(*file, mCache);

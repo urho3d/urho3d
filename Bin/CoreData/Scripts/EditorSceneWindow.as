@@ -609,6 +609,7 @@ void sceneDelete()
             return;
          
         uint id = selectedEntity.getID();
+        
         beginModify(id);
         editorScene.removeEntity(selectedEntity);
         endModify(id);
@@ -675,6 +676,8 @@ void scenePaste()
         if (!checkSceneWindowFocus(true))
             return;
         
+        beginModify(selectedEntity.getID());
+        
         Component@ newComponent = selectedEntity.createComponent(rootElem.getAttribute("type"), rootElem.getAttribute("name"));
         if (newComponent is null)
             return;
@@ -694,6 +697,8 @@ void scenePaste()
             selectedNode.addChild(newNode);
         }
         
+        endModify(selectedEntity.getID());
+        
         updateSceneWindowEntity(selectedEntity);
     }
     
@@ -705,6 +710,8 @@ void scenePaste()
         // If copied entity was local, make the new local too
         Entity@ newEntity = editorScene.createEntity(rootElem.getAttribute("name"), copyBufferEntityID >= 65536);
         uint newEntityID = newEntity.getID();
+        
+        beginModify(newEntityID);
         
         // Before loading, rewrite scene node references to the copied entity
         XMLElement compElem = rootElem.getChildElement("component");
@@ -726,6 +733,8 @@ void scenePaste()
         
         newEntity.loadXML(rootElem);
         newEntity.postLoad();
+        
+        endModify(newEntityID);
         
         updateSceneWindowEntity(newEntity);
         uint index = getEntityListIndex(newEntity);

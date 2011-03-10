@@ -4,9 +4,15 @@
 #include "Scripts/EditorComponentWindow.as"
 
 Scene@ editorScene;
+Window@ sceneSettingsDialog;
+
 string sceneFileName;
 string sceneResourcePath;
 bool sceneModified = false;
+bool runPhysics = false;
+bool subscribedToSceneSettingsEdits = false;
+bool octreeDebug = false;
+int debugGeometryMode = 0;
 
 Component@ selectedComponent;
 Entity@ selectedEntity;
@@ -28,12 +34,106 @@ void createScene()
         updateComponentWindow();
     }
 
+    runPhysics = false;
     sceneFileName = "";
     updateWindowTitle();
     createCamera();
 
-    subscribeToEvent("PostRenderUpdate", "sceneRaycast");
-    subscribeToEvent("UIMouseClick", "sceneRaycast");
+    subscribeToEvent("PostRenderUpdate", "scenePostRenderUpdate");
+    subscribeToEvent("UIMouseClick", "sceneMouseClick");
+    
+    engine.setDefaultScene(editorScene);
+    
+    updateSceneSettingsDialog();
+}
+
+void createSceneSettingsDialog()
+{
+    if (sceneSettingsDialog !is null)
+        return;
+    
+    @sceneSettingsDialog = ui.loadLayout(cache.getResource("XMLFile", "UI/SceneSettingsDialog.xml"), uiStyle);
+    uiRoot.addChild(sceneSettingsDialog);
+    centerDialog(sceneSettingsDialog);
+    updateSceneSettingsDialog();
+    hideSceneSettingsDialog();
+}
+
+void updateSceneSettingsDialog()
+{
+    if (sceneSettingsDialog is null)
+        return;
+        
+    // Fill the current values and subscribe to changes
+    LineEdit@ octreeMinEdit = sceneSettingsDialog.getChild("OctreeMinEdit", true);
+    octreeMinEdit.setText(editorScene.getOctree().getWorldBoundingBox().min.toString());
+    
+    LineEdit@ octreeMaxEdit = sceneSettingsDialog.getChild("OctreeMaxEdit", true);
+    octreeMaxEdit.setText(editorScene.getOctree().getWorldBoundingBox().max.toString());
+    
+    LineEdit@ octreeLevelsEdit = sceneSettingsDialog.getChild("OctreeLevelsEdit", true);
+    octreeLevelsEdit.setText(toString(editorScene.getOctree().getNumLevels()));
+    
+    LineEdit@ gravityEdit = sceneSettingsDialog.getChild("GravityEdit", true);
+    gravityEdit.setText(editorScene.getPhysicsWorld().getGravity().toString());
+    
+    if (!subscribedToSceneSettingsEdits)
+    {
+        subscribeToEvent(octreeMinEdit, "TextFinished", "editOctreeMin");
+        subscribeToEvent(octreeMaxEdit, "TextFinished", "editOctreeMax");
+        subscribeToEvent(octreeLevelsEdit, "TextFinished", "editOctreeLevels");
+        subscribeToEvent(gravityEdit, "TextFinished", "editGravity");
+        subscribeToEvent(sceneSettingsDialog.getChild("CloseButton", true), "Released", "hideSceneSettingsDialog");
+        subscribedToSceneSettingsEdits = true;
+    }
+}
+
+void showSceneSettingsDialog()
+{
+    sceneSettingsDialog.setVisible(true);
+    sceneSettingsDialog.bringToFront();
+}
+
+void hideSceneSettingsDialog()
+{
+    sceneSettingsDialog.setVisible(false);
+}
+
+void editOctreeMin(StringHash eventType, VariantMap& eventData)
+{
+    Octree@ octree = editorScene.getOctree();
+    LineEdit@ edit = eventData["Element"].getUIElement();
+    BoundingBox box = octree.getWorldBoundingBox();
+    box.min = edit.getText().toVector3();
+    edit.setText(box.min.toString());
+    
+    octree.resize(box, octree.getNumLevels());
+}
+
+void editOctreeMax(StringHash eventType, VariantMap& eventData)
+{
+    Octree@ octree = editorScene.getOctree();
+    LineEdit@ edit = eventData["Element"].getUIElement();
+    BoundingBox box = octree.getWorldBoundingBox();
+    box.max = edit.getText().toVector3();
+    edit.setText(box.max.toString());
+    
+    octree.resize(box, octree.getNumLevels());
+}
+
+void editOctreeLevels(StringHash eventType, VariantMap& eventData)
+{
+    Octree@ octree = editorScene.getOctree();
+    LineEdit@ edit = eventData["Element"].getUIElement();
+    octree.resize(octree.getWorldBoundingBox(), edit.getText().toInt());
+    edit.setText(toString(octree.getNumLevels()));
+}
+
+void editGravity(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].getUIElement();
+    editorScene.getPhysicsWorld().setGravity(edit.getText().toVector3());
+    edit.setText(editorScene.getPhysicsWorld().getGravity().toString());
 }
 
 void setResourcePath(string newPath)
@@ -111,14 +211,16 @@ void loadScene(string fileName)
 
     File file(fileName, FILE_READ);
     string extension = getExtension(fileName);
-    if ((extension == ".bin") || (extension == ".sav"))
+    if ((extension == ".bin") || (extension == ".dat"))
         editorScene.load(file);
     else
         editorScene.loadXML(file);
-        
+    
     sceneFileName = fileName;
     sceneModified = false;
+    runPhysics = false;
     updateWindowTitle();
+    updateSceneSettingsDialog();
     updateSceneWindow(false);
     updateComponentWindow();
     resetCamera();
@@ -182,11 +284,10 @@ string getComponentTitle(Component@ component, int indent)
         return indentStr + name + " (" + component.getTypeName() + ")";
 }
 
-void sceneRaycast(StringHash eventType, VariantMap& eventData)
+void scenePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.getDebugRenderer();
-    IntVector2 pos = ui.getCursorPosition();
-
+    
     // Visualize current selection (either renderables or rigidbodies can be visualized)
     if (selectedComponent !is null)
     {
@@ -200,6 +301,36 @@ void sceneRaycast(StringHash eventType, VariantMap& eventData)
                 body.drawDebugGeometry(debug, false);
         }
     }
+    
+    switch (debugGeometryMode)
+    {
+        // Draw all renderer debug geometry
+    case 1:
+        pipeline.drawDebugGeometry(false);
+        break;
+        
+        // Draw all physics debug geometry
+    case 2:
+        editorScene.getPhysicsWorld().drawDebugGeometry(true);
+        break;
+    }
+    
+    // Additionally, draw octree debug
+    if (octreeDebug)
+        editorScene.getOctree().drawDebugGeometry(true);
+    
+    sceneRaycast(false);
+}
+
+void sceneMouseClick()
+{
+    sceneRaycast(true);
+}
+
+void sceneRaycast(bool mouseClick)
+{
+    DebugRenderer@ debug = editorScene.getDebugRenderer();
+    IntVector2 pos = ui.getCursorPosition();
 
     //! \todo allow to switch between renderer and physics raycast
     if (ui.getElementAt(pos, true) is null)
@@ -212,8 +343,25 @@ void sceneRaycast(StringHash eventType, VariantMap& eventData)
             @node = result[0].node;
             node.drawDebugGeometry(debug, false);
         }
-        if ((eventType == StringHash("UIMouseClick")) && (eventData["Buttons"].getInt() == MOUSEB_LEFT))
+        if ((mouseClick) && (input.getMouseButtonPress(MOUSEB_LEFT)))
             selectComponent(node);
     }
+}
+
+void toggleDebugGeometry()
+{
+    ++debugGeometryMode;
+    if (debugGeometryMode == 3)
+        debugGeometryMode = 0;
+}
+
+void toggleOctreeDebug()
+{
+    octreeDebug = !octreeDebug;
+}
+
+void togglePhysics()
+{
+    runPhysics = !runPhysics;
 }
 

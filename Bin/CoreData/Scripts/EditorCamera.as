@@ -3,11 +3,16 @@
 Camera@ camera;
 Window@ cameraDialog;
 
-float cameraBaseSpeed = 10.0;
+float cameraBaseSpeed = 10;
 float cameraBaseRotationSpeed = 0.2;
-float cameraShiftSpeedMultiplier = 5.0;
-float cameraYaw = 0.0;
-float cameraPitch = 0.0;
+float cameraShiftSpeedMultiplier = 5;
+float cameraYaw = 0;
+float cameraPitch = 0;
+float updateStatsAcc = 0;
+
+Text@ renderStatsText;
+Text@ cameraPosText;
+bool subscribedToCameraEdits = false;
 
 void createCamera()
 {
@@ -67,31 +72,45 @@ void createCameraDialog()
     @cameraDialog = ui.loadLayout(cache.getResource("XMLFile", "UI/CameraDialog.xml"), uiStyle);
     uiRoot.addChild(cameraDialog);
     centerDialog(cameraDialog);
+    updateCameraDialog();
+    hideCameraDialog();
+}
 
-    // Fill the current values and subscribe to changes
+void updateCameraDialog()
+{
+    if (cameraDialog is null)
+        return;
+    
     LineEdit@ nearClipEdit = cameraDialog.getChild("NearClipEdit", true);
     nearClipEdit.setText(toString(camera.getNearClip()));
-    subscribeToEvent(nearClipEdit, "TextFinished", "editCameraNearClip");
-
+    
     LineEdit@ farClipEdit = cameraDialog.getChild("FarClipEdit", true);
     farClipEdit.setText(toString(camera.getFarClip()));
-    subscribeToEvent(farClipEdit, "TextFinished", "editCameraFarClip");
-
+    
     LineEdit@ fovEdit = cameraDialog.getChild("FOVEdit", true);
     fovEdit.setText(toString(camera.getFov()));
-    subscribeToEvent(fovEdit, "TextFinished", "editCameraFOV");
 
     LineEdit@ speedEdit = cameraDialog.getChild("SpeedEdit", true);
     speedEdit.setText(toString(cameraBaseSpeed));
-    subscribeToEvent(speedEdit, "TextFinished", "editCameraSpeed");
 
-    subscribeToEvent(cameraDialog.getChild("CloseButton", true), "Released", "hideCameraDialog");
-
-    hideCameraDialog();
+    if (!subscribedToCameraEdits)
+    {
+        subscribeToEvent(nearClipEdit, "TextChanged", "editCameraNearClip");
+        subscribeToEvent(nearClipEdit, "TextFinished", "editCameraNearClip");
+        subscribeToEvent(farClipEdit, "TextChanged", "editCameraFarClip");
+        subscribeToEvent(farClipEdit, "TextFinished", "editCameraFarClip");
+        subscribeToEvent(fovEdit, "TextChanged", "editCameraFOV");
+        subscribeToEvent(fovEdit, "TextFinished", "editCameraFOV");
+        subscribeToEvent(fovEdit, "TextChanged", "editCameraSpeed");
+        subscribeToEvent(speedEdit, "TextFinished", "editCameraSpeed");
+        subscribeToEvent(cameraDialog.getChild("CloseButton", true), "Released", "hideCameraDialog");
+        subscribedToCameraEdits = true;
+    }
 }
 
 void showCameraDialog()
 {
+    updateCameraDialog();
     cameraDialog.setVisible(true);
     cameraDialog.bringToFront();
 }
@@ -104,30 +123,76 @@ void hideCameraDialog()
 void editCameraNearClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
-    // Set to camera and then back to lineedit
     camera.setNearClip(edit.getText().toFloat());
-    edit.setText(toString(camera.getNearClip()));
+    if (eventType == StringHash("TextFinished"))
+        edit.setText(toString(camera.getNearClip()));
 }
 
 void editCameraFarClip(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
-    // Set to camera and then back to lineedit; watch for ridiculously low values
     camera.setFarClip(max(edit.getText().toFloat(), 10));
-    edit.setText(toString(camera.getFarClip()));
+    if (eventType == StringHash("TextFinished"))
+        edit.setText(toString(camera.getFarClip()));
 }
 
 void editCameraFOV(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
-    // Set to camera and then back to lineedit
     camera.setFov(edit.getText().toFloat());
-    edit.setText(toString(camera.getFov()));
+    if (eventType == StringHash("TextFinished"))
+        edit.setText(toString(camera.getFov()));
 }
 
 void editCameraSpeed(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].getUIElement();
     cameraBaseSpeed = max(edit.getText().toFloat(), 1);
-    edit.setText(toString(cameraBaseSpeed));
+    if (eventType == StringHash("TextFinished"))
+        edit.setText(toString(cameraBaseSpeed));
+}
+
+void createStatsBar()
+{
+    Font@ font = cache.getResource("Font", "cour.ttf");
+    
+    @renderStatsText = Text();
+    @cameraPosText = Text();
+    
+    setupStatsBarText(renderStatsText, font, 0, HA_LEFT);
+    setupStatsBarText(cameraPosText, font, 0, HA_RIGHT);
+}
+
+void setupStatsBarText(Text@ text, Font@ font, int xPos, HorizontalAlignment align)
+{
+    text.setPosition(xPos, 20);
+    text.setHorizontalAlignment(align);
+    text.setFont(font, 9);
+    text.setColor(Color(1, 1, 0));
+    text.setPriority(-10);
+    uiRoot.addChild(text);
+}
+
+void updateStats(float timeStep)
+{
+    renderStatsText.setText(
+        "Tris: " + renderer.getNumPrimitives() +
+        " Batches: " + renderer.getNumBatches() +
+        " Lights: " + pipeline.getNumLights(true) +
+        " Shadowmaps: " + pipeline.getNumShadowMaps(true) +
+        " Occluders: " + (pipeline.getNumOccluders(true) + pipeline.getNumShadowOccluders(true))
+    );
+    
+    Vector3 cameraPos = camera.getPosition();
+    string xText = toString(cameraPos.x);
+    string yText = toString(cameraPos.y);
+    string zText = toString(cameraPos.z);
+    xText.resize(10);
+    yText.resize(10);
+    zText.resize(10);
+    
+    cameraPosText.setText("Physics: " + (runPhysics ? "Running   " : "Paused    ") + " Camera pos: " + xText + " " + yText + " " + zText);
+    
+    renderStatsText.setSize(renderStatsText.getMinSize());
+    cameraPosText.setSize(cameraPosText.getMinSize());
 }

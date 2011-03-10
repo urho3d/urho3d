@@ -148,7 +148,11 @@ void editEntityName()
         return;
 
     LineEdit@ nameEdit = componentWindow.getChild("EntityNameEdit", true);
+    
+    beginModify(selectedEntity.getID());
     selectedEntity.setName(nameEdit.getText());
+    endModify(selectedEntity.getID());
+    
     updateSceneWindowEntity(selectedEntity);
 }
 
@@ -158,7 +162,11 @@ void editComponentName()
         return;
 
     LineEdit@ nameEdit = componentWindow.getChild("ComponentNameEdit", true);
+    
+    beginModify(selectedComponent.getEntity().getID());
     selectedComponent.setName(nameEdit.getText());
+    endModify(selectedComponent.getEntity().getID());
+    
     updateSceneWindowEntity(selectedComponent.getEntity());
 }
 

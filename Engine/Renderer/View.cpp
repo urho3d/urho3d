@@ -1082,7 +1082,7 @@ unsigned View::splitLight(Light* light)
             splits = MAX_LIGHT_SPLITS;
         
         // Orthographic view actually has near clip 0, but clamp it to a theoretical minimum
-        float farClip = cascade.mShadowRange; // Shadow range end
+        float farClip = min(cascade.mShadowRange, mCamera->getFarClip()); // Shadow range end
         float nearClip = max(mCamera->getNearClip(), M_MIN_NEARCLIP); // Shadow range start
         bool createExtraSplit = farClip < mCamera->getFarClip();
         

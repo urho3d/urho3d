@@ -200,6 +200,9 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
         drawDebug = !drawDebug;
+        
+    if (input.getKeyPress(KEY_F5))
+        gameScene.save(File(getExecutableDirectory() + "Data/Save.dat", FILE_WRITE));
 
     if ((!console.isVisible()) && (input.getKeyPress('P')) && (gameOn))
     {

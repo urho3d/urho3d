@@ -4,7 +4,7 @@ XMLFile@ uiStyle;
 UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
-array<string> uiSceneFilters = {"*.xml", "*.bin", "*.sav", "*.*"};
+array<string> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
 array<string> uiAllFilter = {"*.*"};
 uint uiSceneFilter = 0;
 
@@ -17,11 +17,13 @@ void createUI()
     createSceneWindow();
     createComponentWindow();
     createCameraDialog();
+    createSceneSettingsDialog();
+    createStatsBar();
     createConsole();
     
     subscribeToEvent("ScreenMode", "resizeUI");
     subscribeToEvent("MenuSelected", "handleMenuSelected");
-	subscribeToEvent("KeyDown", "handleKeyDown");
+    subscribeToEvent("KeyDown", "handleKeyDown");
 }
 
 void resizeUI()
@@ -42,6 +44,7 @@ void createMenuBar()
     @uiMenuBar = BorderImage("MenuBar");
     uiMenuBar.setStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.setLayout(LM_HORIZONTAL, 2, IntRect(2, 2, 2, 2));
+    uiMenuBar.setPriority(10);
     uiRoot.addChild(uiMenuBar);
 
     {
@@ -66,6 +69,8 @@ void createMenuBar()
         editPopup.addChild(createMenuItem("Copy", 'C', QUAL_CTRL));
         editPopup.addChild(createMenuItem("Paste", 'V', QUAL_CTRL));
         editPopup.addChild(createMenuItem("Delete", KEY_DELETE, 0));
+        editPopup.addChild(createMenuDivider());
+        editPopup.addChild(createMenuItem("Toggle physics", 'P', QUAL_CTRL));
         uiMenuBar.addChild(editMenu);
     }
     
@@ -73,7 +78,8 @@ void createMenuBar()
         Menu@ fileMenu = createMenu("View");
         Window@ filePopup = fileMenu.getPopup();
         filePopup.addChild(createMenuItem("Scene hierarchy", 0, 0));
-        filePopup.addChild(createMenuItem("Component edit", 0, 0));
+        filePopup.addChild(createMenuItem("Entity / component edit", 0, 0));
+        filePopup.addChild(createMenuItem("Global scene settings", 0, 0));
         filePopup.addChild(createMenuItem("Camera settings", 0, 0));
         uiMenuBar.addChild(fileMenu);
     }
@@ -223,7 +229,10 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
     if (action == "Scene hierarchy")
         showSceneWindow();
 
-    if (action == "Component edit")
+    if (action == "Global scene settings")
+        showSceneSettingsDialog();
+        
+    if (action == "Entity / component edit")
         showComponentWindow();
 
     if (action == "Camera settings")
@@ -240,6 +249,9 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
     
     if (action == "Delete")
         sceneDelete();
+    
+    if (action == "Toggle physics")
+        togglePhysics();
     
     if (menu.getName() == "Exit")
         engine.exit();
@@ -276,7 +288,7 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 void handleResourcePath(StringHash eventType, VariantMap& eventData)
 {
     closeFileSelector();
- 
+
     // Check for cancel
     if (!eventData["OK"].getBool())
         return;
@@ -286,10 +298,16 @@ void handleResourcePath(StringHash eventType, VariantMap& eventData)
 
 void handleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-    // Check for toggling the console
-    if (eventData["Key"].getInt() == 220)
+    int key = eventData["Key"].getInt();
+    
+    if (key == 220)
     {
         console.toggle();
         input.suppressNextChar();
     }
+    
+    if (key == KEY_F1)
+        toggleDebugGeometry();
+    if (key == KEY_F2)
+        toggleOctreeDebug();
 }

@@ -43,4 +43,8 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
     float timeStep = eventData["TimeStep"].getFloat();
 
     moveCamera(timeStep);
+    updateStats(timeStep);
+    
+    if (runPhysics)
+        editorScene.getPhysicsWorld().update(timeStep);
 }

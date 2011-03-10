@@ -540,6 +540,9 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         }
     }
 
+    if (input.getKeyPress(KEY_F5))
+        testScene.save(File(getExecutableDirectory() + "Data/Save.dat", FILE_WRITE));
+
     if (input.getKeyPress(KEY_ESC))
     {
         if (ui.getFocusElement() is null)

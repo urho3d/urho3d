@@ -255,8 +255,11 @@ void Octant::release()
         for (std::vector<VolumeNode*>::iterator i = mNodes.begin(); i != mNodes.end(); ++i)
         {
             (*i)->mOctant = mRoot;
+            mRoot->mNodes.push_back(*i);
             mRoot->markNodeForReinsertion(*i);
         }
+        mNodes.clear();
+        mNumNodes = 0;
     }
     else if (!mRoot)
     {
@@ -264,9 +267,6 @@ void Octant::release()
         for (std::vector<VolumeNode*>::iterator i = mNodes.begin(); i != mNodes.end(); ++i)
             (*i)->mOctant = 0;
     }
-    
-    mNodes.clear();
-    mNumNodes = 0;
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
         deleteChild(i);
@@ -341,6 +341,7 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
     
     // If nodes exist, they are temporarily moved to the root
     release();
+    mNumNodes = mNodes.size();
     
     mWorldBoundingBox = box;
     mNumLevels = numLevels;
