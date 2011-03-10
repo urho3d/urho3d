@@ -20,6 +20,7 @@ void createScene()
     editorScene.setPaused(true);
     
     subscribeToEvent("PostRenderUpdate", "sceneRaycast");
+    subscribeToEvent("UIMouseClick", "sceneRaycast");
 }
 
 void setResourcePath(string newPath)
@@ -165,7 +166,7 @@ string getComponentTitle(Component@ component, int indent)
         return indentStr + component.getTypeName() + " (" + name + ")";
 }
 
-void sceneRaycast()
+void sceneRaycast(StringHash eventType, VariantMap& eventData)
 {
     DebugRenderer@ debug = editorScene.getDebugRenderer();
     IntVector2 pos = ui.getCursorPosition();
@@ -195,7 +196,7 @@ void sceneRaycast()
             @node = result[0].node;
             node.drawDebugGeometry(debug, false);
         }
-        if (input.getMouseButtonPress(MOUSEB_LEFT))
+        if ((eventType == StringHash("UIMouseClick")) && (eventData["Buttons"].getInt() == MOUSEB_LEFT))
             selectComponent(node);
     }
 }

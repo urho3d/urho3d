@@ -215,5 +215,5 @@ void DropDownList::handleItemSelected(StringHash eventType, VariantMap& eventDat
     VariantMap newEventData;
     newEventData[P_ELEMENT] = (void*)this;
     newEventData[P_SELECTION] = getSelection();
-    sendEvent(EVENT_ITEMSELECTED, eventData);
+    sendEvent(EVENT_ITEMSELECTED, newEventData);
 }

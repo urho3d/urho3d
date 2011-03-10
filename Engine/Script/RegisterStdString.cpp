@@ -72,6 +72,30 @@ static int StringFind(const std::string& rhs, const std::string& str)
     return str.find(rhs);
 }
 
+std::string StringSubString1Param(unsigned start, const std::string& str)
+{
+    try
+    {
+        return str.substr(start);
+    }
+    catch (...)
+    {
+        return std::string();
+    }
+}
+
+std::string StringSubString2Params(unsigned start, unsigned length, const std::string& str)
+{
+    try
+    {
+        return str.substr(start, length);
+    }
+    catch (...)
+    {
+        return std::string();
+    }
+}
+
 static void ConstructStringInt(int value, std::string* ptr)
 {
     new(ptr) std::string();
@@ -203,6 +227,8 @@ void registerStdString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("string", "uint8 &opIndex(uint)", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "int find(const string& in) const", asFUNCTION(StringFind), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("string", "string substr(uint) const", asFUNCTION(StringSubString1Param), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("string", "string substr(uint, uint) const", asFUNCTION(StringSubString2Params), asCALL_CDECL_OBJLAST);
     
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("string", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);

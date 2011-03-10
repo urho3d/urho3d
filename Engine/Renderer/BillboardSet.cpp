@@ -139,8 +139,10 @@ void BillboardSet::saveXML(XMLElement& dest)
     GeometryNode::saveXML(dest);
     
     // Write BillboardSet properties
+    XMLElement materialElem = dest.createChildElement("material");
+    materialElem.setString("name", getResourceName(mMaterial));
+    
     XMLElement billboardsElem = dest.createChildElement("billboards");
-    billboardsElem.setString("materialname", getResourceName(mMaterial));
     billboardsElem.setBool("relative", mBillboardsRelative);
     billboardsElem.setBool("sort", mBillboardsSorted);
     billboardsElem.setBool("scale", mScaleBillboards);
@@ -173,8 +175,10 @@ void BillboardSet::loadXML(const XMLElement& source, ResourceCache* cache)
     GeometryNode::loadXML(source, cache);
     
     // Read BillboardSet properties
+    XMLElement materialElem = source.getChildElement("material");
+    mMaterial = cache->getResource<Material>(materialElem.getString("name"));
+    
     XMLElement billboardsElem = source.getChildElement("billboards");
-    mMaterial = cache->getResource<Material>(billboardsElem.getString("materialname"));
     mBillboardsRelative = billboardsElem.getBool("relative");
     mBillboardsSorted = billboardsElem.getBool("sort");
     mScaleBillboards = billboardsElem.getBool("scale");

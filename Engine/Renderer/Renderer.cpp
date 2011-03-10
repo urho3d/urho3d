@@ -351,6 +351,11 @@ void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, 
         " multisample " + toString(multiSample));
 }
 
+void Renderer::setMode(int width, int height)
+{
+    setMode(mMode, width, height, mFullscreen, mVsync, mMultiSample);
+}
+
 void Renderer::toggleFullscreen()
 {
     setMode(mMode, mWidth, mHeight, !mFullscreen, mVsync, mMultiSample);

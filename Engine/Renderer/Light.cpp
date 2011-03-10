@@ -189,6 +189,9 @@ void Light::load(Deserializer& source, ResourceCache* cache)
             mShapeTexture = cache->getResource<TextureCube>(shapeTexture);
     }
     
+    // Validate textures by setting light type again
+    setLightType(mLightType);
+    
     mShadowBias.validate();
     mShadowCascade.validate();
     mShadowFocus.validate();
@@ -239,7 +242,7 @@ void Light::saveXML(XMLElement& dest)
     XMLElement rampElem = dest.createChildElement("ramptexture");
     rampElem.setString("name", getResourceName(mRampTexture));
     
-    XMLElement spotElem = dest.createChildElement("spottexture");
+    XMLElement spotElem = dest.createChildElement("shapetexture");
     spotElem.setString("name", getResourceName(mShapeTexture));
 }
 
@@ -292,12 +295,15 @@ void Light::loadXML(const XMLElement& source, ResourceCache* cache)
     else
         mRampTexture = cache->getResource<Texture2D>(name);
     
-    XMLElement spotElem = source.getChildElement("spottexture");
+    XMLElement spotElem = source.getChildElement("shapetexture");
     name = spotElem.getString("name");
     if (getExtension(name) == ".xml")
         mShapeTexture = cache->getResource<TextureCube>(name);
     else
         mShapeTexture = cache->getResource<Texture2D>(name);
+    
+    // Validate textures by setting light type again
+    setLightType(mLightType);
     
     mShadowBias.validate();
     mShadowCascade.validate();
@@ -447,6 +453,10 @@ void Light::readNetUpdate(Deserializer& source, ResourceCache* cache, const NetU
         mShadowResolution = shadowResolution / 100.0f;
     }
     readFloatDelta(mShadowNearFarRatio, source, bits2 & 64);
+    
+    // Validate textures by setting light type again
+    if (bits & 1)
+        setLightType(mLightType);
     
     if (bits)
         markDirty();

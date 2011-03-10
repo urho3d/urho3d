@@ -57,6 +57,7 @@ DEFINE_EVENT(EVENT_DRAGDROPFINISH, DragDropFinish)
 DEFINE_EVENT(EVENT_FOCUSCHANGED, FocusChanged)
 {
     EVENT_PARAM(P_ELEMENT, Element);            // UIElement pointer
+    EVENT_PARAM(P_ORIGINALELEMENT, Element);    // UIElement pointer
 }
 
 //! UI element resized

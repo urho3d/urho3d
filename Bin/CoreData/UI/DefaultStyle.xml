@@ -41,10 +41,12 @@
         <pressedoffset value="16 0" />
         <hoveroffset value="0 16" />
         <labeloffset value="-1 1" />
+        <layout mode="horizontal" border="4 2 4 2" />
         <popup>
             <texture name="Textures/UI.png" />
             <imagerect value="48 0 64 16" />
             <border value="3 3 3 3" />
+            <layout border="4 2 4 2" />
         </popup>
         <listview>
             <horizontalscrollbar>
@@ -349,11 +351,7 @@
     </element>
     <element type="FileSelectorFilterList">
         <fixedwidth value="64" />
-        <layout mode="horizontal" border="4 2 4 2" />
         <resizepopup enable="true" />
-        <popup>
-            <layout border="4 4 4 4" />
-        </popup>
     </element>
     <element type="FileSelectorFilterText">
         <font name="Cour.ttf" size="10" />
@@ -380,6 +378,10 @@
     </element>
     <element type="EditorAttributeText">
         <font name="cour.ttf" size="9" />
+    </element>
+    <element type="EditorEnumAttributeText">
+        <font name="Cour.ttf" size="9" />
+        <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="EditorAttributeEdit">
         <texture name="Textures/UI.png" />

@@ -28,7 +28,7 @@
 
 #include "DebugNew.h"
 
-static const ShortStringHash originHash("origin");
+static const ShortStringHash originHash("Origin");
 
 Menu::Menu(const std::string& name) :
     Button(name),
@@ -170,7 +170,11 @@ void Menu::handleFocusChanged(StringHash eventType, VariantMap& eventData)
     UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].getPtr());
     UIElement* root = getRootElement();
     
-    // If clicked emptiness, hide the popup
+    // If another element was focused due to the menu button being clicked, do not hide the popup
+    if ((eventType == EVENT_FOCUSCHANGED) && (static_cast<UIElement*>(eventData[P_ORIGINALELEMENT].getPtr())))
+        return;
+    
+    // If clicked emptiness or defocused, hide the popup
     if (!element)
     {
         showPopup(false);

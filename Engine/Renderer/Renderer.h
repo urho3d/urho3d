@@ -69,6 +69,8 @@ public:
     void setWindowTitle(const std::string& windowTitle);
     //! Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
     void setMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
+    //! Set screen resolution only
+    void setMode(int width, int height);
     //! Toggle between full screen and windowed mode
     void toggleFullscreen();
     //! Close the window

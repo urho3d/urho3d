@@ -9,10 +9,53 @@ const uint ATTR_EDITOR_BOOL = 1;
 const uint ATTR_EDITOR_VECTOR2 = 2;
 const uint ATTR_EDITOR_VECTOR3 = 3;
 const uint ATTR_EDITOR_VECTOR4 = 4;
+const uint ATTR_EDITOR_ENUM = 64;
+const uint ATTR_EDITOR_RESOURCE = 128;
 const uint MAX_ATTRNAME_LENGTH = 15;
 
-bool inReadAttributeEditor = false;
+class EnumEditorData
+{
+    string componentType;
+    string categoryName;
+    string attributeName;
+    array<string>@ choices;
+
+    EnumEditorData(const string& in componentType_, const string& in categoryName_, const string& in attributeName_, array<string>@ choices_)
+    {
+        componentType = componentType_;
+        categoryName = categoryName_;
+        attributeName = attributeName_;
+        @choices = choices_;
+    }
+}
+
+class ResourceEditorData
+{
+    string componentType;
+    string categoryName;
+    string attributeName;
+    string resourceType;
+    string fileExtension;
+    string lastPath;
+
+    ResourceEditorData(const string& in componentType_, const string& in categoryName_, const string& in attributeName_, const string& in resourceType_, const string& in fileExtension_)
+    {
+        componentType = componentType_;
+        categoryName = categoryName_;
+        attributeName = attributeName_;
+        resourceType = resourceType_;
+        fileExtension = fileExtension_;
+    }
+}
+
+array<EnumEditorData@> enumEditors;
+array<ResourceEditorData@> resourceEditors;
+
+bool inLoadAttributeEditor = false;
 uint lastAttributeCount = 0;
+
+uint resourcePickType = 0;
+string resourcePickEditorName;
 
 void createComponentWindow()
 {
@@ -21,12 +64,25 @@ void createComponentWindow()
 
     @componentWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/ComponentWindow.xml"), uiStyle);
     uiRoot.addChild(componentWindow);
-    int height = (uiRoot.getHeight() - 80) / 2;
-    componentWindow.setPosition(20, 40 + height);
+    int height = min(uiRoot.getHeight() - 60, 500);
     componentWindow.setSize(300, height);
+    componentWindow.setPosition(uiRoot.getWidth() - 20 - componentWindow.getWidth(), 40);
     componentWindow.setVisible(true);
     updateComponentWindow();
     
+    // Fill enum & resource editor data
+    array<string> lightTypes = {"directional", "spot", "point"};
+    array<string> bodyTypes = {"static", "dynamic", "kinematic"};
+    enumEditors.push(EnumEditorData("Light", "light", "type", lightTypes));
+    enumEditors.push(EnumEditorData("RigidBody", "body", "mode", bodyTypes));
+
+    resourceEditors.push(ResourceEditorData("", "material", "name", "Material", ".xml"));
+    resourceEditors.push(ResourceEditorData("", "model", "name", "Model", ".mdl"));
+    resourceEditors.push(ResourceEditorData("", "animation", "name", "Animation", ".ani"));
+    resourceEditors.push(ResourceEditorData("RigidBody", "collision", "name", "CollisionShape", ".xml"));
+    resourceEditors.push(ResourceEditorData("ScriptInstance", "script", "name", "ScriptFile", ".as"));
+    resourceEditors.push(ResourceEditorData("ParticleEmitter", "emitter", "name", "XMLFile", ".xml"));
+
     subscribeToEvent(componentWindow.getChild("CloseButton", true), "Released", "hideComponentWindow");
     subscribeToEvent(componentWindow.getChild("NameEdit", true), "TextFinished", "editComponentName");
 }
@@ -44,6 +100,9 @@ void showComponentWindow()
 
 void updateComponentWindow()
 {
+    // If a resource pick was in progress, it cannot be completed now, as component was changed
+    pickResourceCanceled();
+
     Text@ title = componentWindow.getChild("WindowTitle", true);
     LineEdit@ nameEdit = componentWindow.getChild("NameEdit", true);
     ListView@ list = componentWindow.getChild("AttributeList", true);
@@ -82,6 +141,7 @@ void updateComponentAttributes()
     // Save component to XML, then inspect the result
     XMLElement rootElem = componentData.createRootElement("component");
     selectedComponent.saveXML(rootElem);
+    Node@ node = cast<Node>(selectedComponent);
 
     // Check amount of attributes. If has changed, do full refresh. Otherwise just refresh values
     XMLElement categoryElem = rootElem.getChildElement();
@@ -97,6 +157,9 @@ void updateComponentAttributes()
 
     if (attributeCount != lastAttributeCount)
     {
+        // If a resource pick was in progress, it cannot be completed now, as component structure was changed
+        pickResourceCanceled();
+
         IntVector2 listOldPos = list.getViewPosition();
 
         list.removeAllItems();
@@ -120,22 +183,18 @@ void updateComponentAttributes()
             array<string> attrs = categoryElem.getAttributeNames();
 
             // Do not make the parent node reference editable. It is handled via scene window drag and drop instead
-            if (category == "parent")
+            if ((category == "parent") && (node !is null))
             {
-                Node@ node = cast<Node>(selectedComponent);
-                if (node !is null)
-                {
-                    Node@ parentNode = node.getParent();
+                Node@ parentNode = node.getParent();
 
-                    Text@ attrName = Text();
-                    attrName.setStyle(uiStyle, "EditorAttributeText");
-                    if (parentNode !is null)
-                        attrName.setText(" " + parentNode.getTypeName() + " in " + getEntityTitle(parentNode.getEntity()));
-                    else
-                        attrName.setText(" No parent");
-                       
-                    list.addItem(attrName);
-                }
+                Text@ attrName = Text();
+                attrName.setStyle(uiStyle, "EditorAttributeText");
+                if (parentNode !is null)
+                    attrName.setText(" " + parentNode.getTypeName() + " in " + getEntityTitle(parentNode.getEntity()));
+                else
+                    attrName.setText(" No parent");
+
+                list.addItem(attrName);
             }
             else
             {
@@ -150,15 +209,24 @@ void updateComponentAttributes()
                     bar.setFixedHeight(18);
                     list.addItem(bar);
 
-                    Text@ attrName = Text();
-                    attrName.setStyle(uiStyle, "EditorAttributeText");
-                    attrName.setText(" " + name);
-                    attrName.setFixedWidth(120);
-                    bar.addChild(attrName);
-    
                     uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
+
+                    UIElement@ spacer = UIElement();
+                    spacer.setFixedWidth(8);
+                    bar.addChild(spacer);
+
+                    // Do not create the name for resource editors
+                    if (type < ATTR_EDITOR_RESOURCE)
+                    {
+                        Text@ attrName = Text();
+                        attrName.setStyle(uiStyle, "EditorAttributeText");
+                        attrName.setText(name);
+                        attrName.setFixedWidth(110);
+                        bar.addChild(attrName);
+                    }
+
                     createAttributeEditor(bar, type, categoryElem, index, attrs[i]);
-                    readAttributeEditor(type, categoryElem, index, attrs[i]);
+                    loadAttributeEditor(type, categoryElem, index, attrs[i]);
                 }
             }
 
@@ -188,9 +256,9 @@ void updateComponentAttributes()
             {
                 string category = categoryElem.getName();
                 uint type = getAttributeEditorType(selectedComponent, category, attrs[i], categoryElem.getAttribute(attrs[i]));
-                readAttributeEditor(type, categoryElem, index, attrs[i]);
+                loadAttributeEditor(type, categoryElem, index, attrs[i]);
             }
-        
+
             categoryElem = categoryElem.getNextElement();
             ++index;
         }
@@ -199,14 +267,19 @@ void updateComponentAttributes()
 
 void editComponentAttribute(StringHash eventType, VariantMap& eventData)
 {
-    if (selectedComponent is null)
-        return;
-        
     // Changing elements programmatically may cause events to be sent. Stop possible infinite loop in that case.
-    if (inReadAttributeEditor)
+    if ((selectedComponent is null) || (inLoadAttributeEditor))
         return;
 
     UIElement@ attrEdit = eventData["Element"].getUIElement();
+    editComponentAttribute(attrEdit);
+}
+
+void editComponentAttribute(UIElement@ attrEdit)
+{
+    if ((selectedComponent is null) || (inLoadAttributeEditor))
+        return;
+
     XMLElement rootElem = componentData.getRootElement();
     XMLElement categoryElem = rootElem.getChildElement();
     uint index = 0;
@@ -214,7 +287,7 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
     {
         if (index == uint(attrEdit.userData["Index"].getInt()))
         {
-            writeAttributeEditor(attrEdit.userData["Type"].getInt(), categoryElem, index, attrEdit.userData["Attribute"].getString());
+            storeAttributeEditor(attrEdit.userData["Type"].getInt(), categoryElem, index, attrEdit.userData["Attribute"].getString());
 
             uint id = selectedComponent.getEntity().getID();
             beginModify(id);
@@ -230,28 +303,114 @@ void editComponentAttribute(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void pickResource(StringHash eventType, VariantMap& eventData)
+{
+    if (uiFileSelector !is null)
+        return;
+
+    UIElement@ button = eventData["Element"].getUIElement();
+    LineEdit@ attrEdit = button.getParent().getChild(1);
+    uint type = uint(attrEdit.userData["Type"].getInt());
+
+    ResourceEditorData@ data = resourceEditors[type - ATTR_EDITOR_RESOURCE];
+
+    array<string> filters;
+    filters.push("*" + data.fileExtension);
+    string lastPath = data.lastPath;
+    if (lastPath.empty())
+        lastPath = sceneResourcePath;
+    createFileSelector("Pick " + data.resourceType, "OK", "Cancel", lastPath, filters, 0);
+    subscribeToEvent(uiFileSelector, "FileSelected", "pickResourceDone");
+
+    resourcePickType = type;
+    resourcePickEditorName = attrEdit.getName();
+}
+
+void openResource(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ button = eventData["Element"].getUIElement();
+    LineEdit@ attrEdit = button.getParent().getChild(1);
+    systemOpenFile(sceneResourcePath + attrEdit.getText(), "edit");
+}
+
+void pickResourceDone(StringHash eventType, VariantMap& eventData)
+{
+    closeFileSelector();
+
+    if (!eventData["OK"].getBool())
+    {
+        resourcePickType = 0;
+        return;
+    }
+
+    // Check if another component was selected in the meanwhile
+    if (resourcePickType == 0)
+        return;
+
+    ResourceEditorData@ data = resourceEditors[resourcePickType - ATTR_EDITOR_RESOURCE];
+    resourcePickType = 0;
+
+    ListView@ list = componentWindow.getChild("AttributeList", true);
+    LineEdit@ attrEdit = list.getChild(resourcePickEditorName, true);
+    if (attrEdit is null)
+        return;
+
+    // Validate the resource. It must come from within the scene resource directory, and be loaded successfully
+    string resourceName = eventData["FileName"].getString();
+    if (resourceName.find(sceneResourcePath) != 0)
+        return;
+    data.lastPath = getPath(resourceName);
+
+    resourceName = resourceName.substr(sceneResourcePath.length());
+
+    Resource@ res = cache.getResource(data.resourceType, resourceName);
+    if (res is null)
+        return;
+
+    attrEdit.setText(resourceName);
+    editComponentAttribute(attrEdit);
+}
+
+void pickResourceCanceled()
+{
+    if (resourcePickType != 0)
+    {
+        resourcePickType = 0;
+        closeFileSelector();
+    }
+}
+
 int getAttributeEditorType(Component@ component, const string& in category, const string& in attribute, const string& in value)
 {
-    // Note: we always use valid, ie. just serialized data for this
-    if (cast<Node>(component) !is null)
+    for (uint i = 0; i < enumEditors.size(); ++i)
     {
-        if (attribute.find("name") >= 0)
-            return ATTR_EDITOR_STRING;
-        else if ((category == "animation") && (attribute == "startbone"))
-            return ATTR_EDITOR_STRING;
-        else if (category == "parent")
-            return ATTR_EDITOR_STRING; //! \todo Parent node selector needs to be done separately
-        else if ((value == "true") || (value == "false"))
-            return ATTR_EDITOR_BOOL;
-
-        uint coords = value.split(' ').size();
-        if (coords == 2)
-            return ATTR_EDITOR_VECTOR2;
-        else if (coords == 3)
-            return ATTR_EDITOR_VECTOR3;
-        else if (coords == 4)
-            return ATTR_EDITOR_VECTOR4;
+        if ((category == enumEditors[i].categoryName) && (attribute == enumEditors[i].attributeName) && ((enumEditors[i].componentType.empty())
+            || (component.getTypeName() == enumEditors[i].componentType)))
+            return ATTR_EDITOR_ENUM + i;
     }
+
+    for (uint i = 0; i < resourceEditors.size(); ++i)
+    {
+        if ((category == resourceEditors[i].categoryName) && (attribute == resourceEditors[i].attributeName) && 
+            ((resourceEditors[i].componentType.empty()) || (component.getTypeName() == resourceEditors[i].componentType)))
+            return ATTR_EDITOR_RESOURCE + i;
+    }
+
+    // Note: we always use valid, ie. just serialized data for this, not own edited values
+    if ((category == "animation") && (attribute == "startbone"))
+        return ATTR_EDITOR_STRING;
+    else if ((category == "script") && (attribute == "class"))
+        return ATTR_EDITOR_STRING;
+    else if ((value == "true") || (value == "false"))
+        return ATTR_EDITOR_BOOL;
+
+    uint coords = value.split(' ').size();
+    if (coords == 2)
+        return ATTR_EDITOR_VECTOR2;
+    else if (coords == 3)
+        return ATTR_EDITOR_VECTOR3;
+    else if (coords == 4)
+        return ATTR_EDITOR_VECTOR4;
 
     return ATTR_EDITOR_STRING;
 }
@@ -263,37 +422,32 @@ string getAttributeEditorName(uint index, const string& in attribute)
 
 void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, uint index, const string& in attribute)
 {
-    switch (type)
+    if (type == ATTR_EDITOR_STRING)
     {
-    case ATTR_EDITOR_STRING:
-        {
-            LineEdit@ attrEdit = LineEdit(getAttributeEditorName(index, attribute));
-            attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.userData["Type"] = type;
-            attrEdit.userData["Index"] = index;
-            attrEdit.userData["Attribute"] = attribute;
-            attrEdit.setFixedHeight(16);
-            bar.addChild(attrEdit);
-            subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
-        }
-        break;
+        LineEdit@ attrEdit = LineEdit(getAttributeEditorName(index, attribute));
+        attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
+        attrEdit.userData["Type"] = type;
+        attrEdit.userData["Index"] = index;
+        attrEdit.userData["Attribute"] = attribute;
+        attrEdit.setFixedHeight(16);
+        bar.addChild(attrEdit);
+        subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
+    }
 
-    case ATTR_EDITOR_BOOL:
-        {
-            CheckBox@ attrEdit = CheckBox(getAttributeEditorName(index, attribute));
-            attrEdit.setStyleAuto(uiStyle);
-            attrEdit.userData["Type"] = type;
-            attrEdit.userData["Index"] = index;
-            attrEdit.userData["Attribute"] = attribute;
-            attrEdit.setFixedSize(16, 16);
-            bar.addChild(attrEdit);
-            subscribeToEvent(attrEdit, "Toggled", "editComponentAttribute");
-        }
-        break;
+    if (type == ATTR_EDITOR_BOOL)
+    {
+        CheckBox@ attrEdit = CheckBox(getAttributeEditorName(index, attribute));
+        attrEdit.setStyleAuto(uiStyle);
+        attrEdit.userData["Type"] = type;
+        attrEdit.userData["Index"] = index;
+        attrEdit.userData["Attribute"] = attribute;
+        attrEdit.setFixedSize(16, 16);
+        bar.addChild(attrEdit);
+        subscribeToEvent(attrEdit, "Toggled", "editComponentAttribute");
+    }
 
-    case ATTR_EDITOR_VECTOR2:
-    case ATTR_EDITOR_VECTOR3:
-    case ATTR_EDITOR_VECTOR4:
+    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    {
         for (uint i = 0; i < type; ++i)
         {
             LineEdit@ attrEdit = LineEdit(getAttributeEditorName(index, attribute) + "_" + toString(i));
@@ -305,90 +459,165 @@ void createAttributeEditor(UIElement@ bar, uint type, XMLElement categoryElem, u
             bar.addChild(attrEdit);
             subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
         }
-        break;
+    }
+    
+    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
+    {
+        DropDownList@ attrEdit = DropDownList(getAttributeEditorName(index, attribute));
+        attrEdit.setStyleAuto(uiStyle);
+        attrEdit.userData["Type"] = type;
+        attrEdit.userData["Index"] = index;
+        attrEdit.userData["Attribute"] = attribute;
+        attrEdit.setFixedHeight(16);
+        attrEdit.setResizePopup(true);
+        
+        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
+        for (uint i = 0; i < data.choices.size(); ++i)
+        {
+            Text@ choice = Text();
+            choice.setStyle(uiStyle, "EditorEnumAttributeText");
+            choice.setText(data.choices[i]);
+            attrEdit.addItem(choice);
+        }
+        bar.addChild(attrEdit);
+        
+        subscribeToEvent(attrEdit, "ItemSelected", "editComponentAttribute");
+    }
+    
+    if (type >= ATTR_EDITOR_RESOURCE)
+    {
+        LineEdit@ attrEdit = LineEdit(getAttributeEditorName(index, attribute));
+        attrEdit.setStyle(uiStyle, "EditorAttributeEdit");
+        attrEdit.userData["Type"] = type;
+        attrEdit.userData["Index"] = index;
+        attrEdit.userData["Attribute"] = attribute;
+        attrEdit.setFixedHeight(16);
+        bar.addChild(attrEdit);
+        subscribeToEvent(attrEdit, "TextFinished", "editComponentAttribute");
+
+        Button@ pickButton = Button(getAttributeEditorName(index, attribute) + "_Pick");
+        pickButton.setStyleAuto(uiStyle);
+        pickButton.userData["Type"] = type;
+        pickButton.userData["Index"] = index;
+        pickButton.userData["Attribute"] = attribute;
+        pickButton.setFixedSize(36, 16);
+        Text@ pickButtonText = Text();
+        pickButtonText.setStyle(uiStyle, "EditorAttributeText");
+        pickButtonText.setAlignment(HA_CENTER, VA_CENTER);
+        pickButtonText.setText("Pick");
+        pickButton.addChild(pickButtonText);
+        bar.addChild(pickButton);
+        subscribeToEvent(pickButton, "Released", "pickResource");
+
+        Button@ openButton = Button(getAttributeEditorName(index, attribute) + "_Edit");
+        openButton.setStyleAuto(uiStyle);
+        openButton.userData["Type"] = type;
+        openButton.userData["Index"] = index;
+        openButton.userData["Attribute"] = attribute;
+        openButton.setFixedSize(36, 16);
+        Text@ openButtonText = Text();
+        openButtonText.setStyle(uiStyle, "EditorAttributeText");
+        openButtonText.setAlignment(HA_CENTER, VA_CENTER);
+        openButtonText.setText("Open");
+        openButton.addChild(openButtonText);
+        bar.addChild(openButton);
+        subscribeToEvent(openButton, "Released", "openResource");
     }
 }
 
-void readAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
+void loadAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
 {
-    inReadAttributeEditor = true;
+    inLoadAttributeEditor = true;
 
     ListView@ list = componentWindow.getChild("AttributeList", true);
-    
-    switch (type)
+    string value = categoryElem.getAttribute(attribute);
+
+    if ((type == ATTR_EDITOR_STRING) || (type >= ATTR_EDITOR_RESOURCE))
     {
-    case ATTR_EDITOR_STRING:
-        {
-            LineEdit@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
-            attrEdit.setText(categoryElem.getAttribute(attribute));
-        }
-        break;
+        LineEdit@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        if (attrEdit is null)
+            return;
+        attrEdit.setText(value);
+    }
 
-    case ATTR_EDITOR_BOOL:
-        {
-            CheckBox@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
-            attrEdit.setChecked(categoryElem.getAttribute(attribute).toBool());
-        }
-        break;
+    if (type == ATTR_EDITOR_BOOL)
+    {
+        CheckBox@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        if (attrEdit is null)
+            return;            
+        attrEdit.setChecked(value.toBool());
+    }
 
-    case ATTR_EDITOR_VECTOR2:
-    case ATTR_EDITOR_VECTOR3:
-    case ATTR_EDITOR_VECTOR4:
+    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    {
+        string baseName = getAttributeEditorName(index, attribute);
+        array<string> coords = value.split(' ');
+        for (uint i = 0; (i < coords.size()) && (i < type); ++i)
         {
-            string baseName = getAttributeEditorName(index, attribute);
-            array<string> coords = categoryElem.getAttribute(attribute).split(' ');
-            for (uint i = 0; (i < coords.size()) && (i < type); ++i)
+            LineEdit@ attrEdit = list.getChild(baseName + "_" + toString(i), true);
+            if (attrEdit !is null)
+                attrEdit.setText(coords[i]);
+            else
+                break;
+        }
+    }
+
+    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
+    {
+        DropDownList@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        if (attrEdit is null)
+            return;
+        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
+        string value = categoryElem.getAttribute(attribute);
+        for (uint i = 0; i < data.choices.size(); ++i)
+        {
+            if (value.toLower() == data.choices[i])
             {
-                LineEdit@ attrEdit = list.getChild(baseName + "_" + toString(i), true);
-                if (attrEdit !is null)
-                    attrEdit.setText(coords[i]);
-                else
-                    break;
+                attrEdit.setSelection(i);
+                break;
             }
         }
-        break;
     }
-    
-    inReadAttributeEditor = false;
+
+    inLoadAttributeEditor = false;
 }
 
-void writeAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
+void storeAttributeEditor(uint type, XMLElement categoryElem, int index, const string& in attribute)
 {
     ListView@ list = componentWindow.getChild("AttributeList", true);
-    
-    switch (type)
+
+    if ((type == ATTR_EDITOR_STRING) || (type >= ATTR_EDITOR_RESOURCE))
     {
-    case ATTR_EDITOR_STRING:
-        {
-            LineEdit@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
-            categoryElem.setAttribute(attribute, attrEdit.getText());
-        }
-        break;
+        LineEdit@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        categoryElem.setAttribute(attribute, attrEdit.getText());
+    }
 
-    case ATTR_EDITOR_BOOL:
-        {
-            CheckBox@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
-            categoryElem.setAttribute(attribute, toString(attrEdit.isChecked()));
-        }
-        break;
+    if (type == ATTR_EDITOR_BOOL)
+    {
+        CheckBox@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        categoryElem.setAttribute(attribute, toString(attrEdit.isChecked()));
+    }
 
-    case ATTR_EDITOR_VECTOR2:
-    case ATTR_EDITOR_VECTOR3:
-    case ATTR_EDITOR_VECTOR4:
+    if ((type >= ATTR_EDITOR_VECTOR2) && (type <= ATTR_EDITOR_VECTOR4))
+    {
+        string baseName = getAttributeEditorName(index, attribute);
+        string value;
+        for (uint i = 0; i < type; ++i)
         {
-            string baseName = getAttributeEditorName(index, attribute);
-            string value;
-            for (uint i = 0; i < type; ++i)
-            {
-                LineEdit@ attrEdit = list.getChild(baseName + "_" + toString(i), true);
-                if (attrEdit is null)
-                    break;
-                if (i != 0)
-                    value += " ";
-                value += attrEdit.getText();
-            }
-            categoryElem.setAttribute(attribute, value);
+            LineEdit@ attrEdit = list.getChild(baseName + "_" + toString(i), true);
+            if (attrEdit is null)
+                break;
+            if (i != 0)
+                value += " ";
+            value += attrEdit.getText();
         }
-        break;
+        categoryElem.setAttribute(attribute, value);
+    }
+    
+    if ((type >= ATTR_EDITOR_ENUM) && (type < ATTR_EDITOR_RESOURCE))
+    {
+        DropDownList@ attrEdit = list.getChild(getAttributeEditorName(index, attribute), true);
+        EnumEditorData@ data = enumEditors[type - ATTR_EDITOR_ENUM];
+        categoryElem.setAttribute(attribute, data.choices[attrEdit.getSelection()]);
     }
 }

@@ -22,7 +22,7 @@
             <shadowcascade lambda="0.5" maxrange="5000" faderange="0.2" splits="2" />
             <shadowfocus enable="true" nonuniform="true" zoomout="true" quantize="50" minview="900" />
             <ramptexture name="" />
-            <spottexture name="" />
+            <shapetexture name="" />
         </component>
         <component type="Skybox" netflags="0">
             <transform pos="0 3000 0" rot="1 0 0 0" scale="30000 1 30000" />

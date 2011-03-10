@@ -83,7 +83,7 @@ Menu@ createMenuItem(const string& in title, int accelKey, int accelQual)
     if (accelKey != 0)
         menu.setAccelerator(accelKey, accelQual);
 
-    Text@ menuText = Text(title + "_Text");
+    Text@ menuText = Text();
     menuText.setStyle(uiStyle, "EditorMenuText");
     menuText.setText(title);
     menu.addChild(menuText);
@@ -105,7 +105,7 @@ Menu@ createMenuSpacer()
 
 Window@ createPopup(Menu@ baseMenu)
 {
-    Window@ popup = Window(baseMenu.getName() + "_Popup");
+    Window@ popup = Window();
     popup.setStyleAuto(uiStyle);
     popup.setLayout(LM_VERTICAL, uiSpacing, uiSpacingRect);
     baseMenu.setPopup(popup);
@@ -117,6 +117,7 @@ Window@ createPopup(Menu@ baseMenu)
 Menu@ createMenu(const string& in title)
 {
     Menu@ menu = createMenuItem(title, 0, 0);
+    menu.setName("");
     menu.setFixedWidth(menu.getWidth());
     createPopup(menu);
 
@@ -172,6 +173,14 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
         return;
 
     string action = menu.getName();
+    if (action.empty())
+        return;
+        
+    // Close the menu now
+    UIElement@ menuParent = menu.getParent();
+    Menu@ topLevelMenu = menuParent.userData["Origin"].getUIElement();
+    if (topLevelMenu !is null)
+        topLevelMenu.showPopup(false);
 
     if (uiFileSelector is null)
     {
@@ -182,10 +191,7 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
         }
 
         if (action == "Save scene")
-        {
-            ui.setFocusElement(null); // Close the menu
             saveScene(sceneFileName);
-        }
 
         if (action == "Save scene as")
         {
@@ -193,36 +199,27 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
             uiFileSelector.setFileName(getFileNameAndExtension(sceneFileName));
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
-        
+
         if (action == "Set resource path")
         {
             createFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilter, 0);
             uiFileSelector.setDirectoryMode(true);
             subscribeToEvent(uiFileSelector, "FileSelected", "handleResourcePath");
         }
+    }
 
-        if (action == "Reload resources")
-        {
-            ui.setFocusElement(null); // Close the menu
-            reloadResources();
-        }
-    }
-    
+    if (action == "Reload resources")
+        reloadResources();
+
     if (action == "Scene hierarchy")
-    {
-        ui.setFocusElement(null); // Close the menu
         showSceneWindow();
-    }
+
     if (action == "Component edit")
-    {
-        ui.setFocusElement(null); // Close the menu
         showComponentWindow();
-    }
+
     if (action == "Camera settings")
-    {
-        ui.setFocusElement(null); // Close the menu
         showCameraDialog();
-    }
+        
     if (menu.getName() == "Exit")
         engine.exit();
 }

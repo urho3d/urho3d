@@ -14,9 +14,9 @@ void createSceneWindow()
 
     @sceneWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/SceneWindow.xml"), uiStyle);
     uiRoot.addChild(sceneWindow);
-    sceneWindow.setPosition(20, 40);
-    int height = (uiRoot.getHeight() - 80) / 2;
+    int height = min(uiRoot.getHeight() - 60, 500);
     sceneWindow.setSize(300, height);
+    sceneWindow.setPosition(20, 40);
     updateSceneWindow(false);
 
     subscribeToEvent(sceneWindow.getChild("CloseButton", true), "Released", "hideSceneWindow");
@@ -287,9 +287,6 @@ void selectComponent(Component@ component)
         list.setChildItemsVisible(entityItem, true);
         // This causes an event to be sent, in response we set selectedComponent & selectedEntity, and refresh editors
         list.setSelection(componentItem);
-        // Focus the list if visible
-        if (sceneWindow.isVisible())
-            ui.setFocusElement(list);
     }
     else
         list.clearSelection();

@@ -163,9 +163,9 @@ void ScriptInstance::saveXML(XMLElement& dest)
     Component::saveXML(dest);
     
     XMLElement scriptElem = dest.createChildElement("script");
-    scriptElem.setBool("enabled", mEnabled);
     scriptElem.setString("name", getResourceName(mScriptFile));
     scriptElem.setString("class", mClassName);
+    scriptElem.setBool("enabled", mEnabled);
     scriptElem.setInt("fps", mFixedUpdateFps);
     scriptElem.setFloat("timeacc", mFixedUpdateTimer);
     
