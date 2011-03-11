@@ -121,6 +121,8 @@ public:
     unsigned getMemoryUse(ShortStringHash type) const;
     //! Return total memory use for all resources
     unsigned getTotalMemoryUse() const;
+    //! Return a "preferred resource path" ie. either the path itself or its parent, based on which of them has known subdirectories
+    std::string getPreferredResourcePath(const std::string& path);
     
 private:
     //! Find a resource

@@ -207,7 +207,7 @@ void loadScene(string fileName)
     editorScene.removeAllEntities();
 
     // Add the new resource path
-    setResourcePath(getPath(fileName));
+    setResourcePath(cache.getPreferredResourcePath(getPath(fileName)));
 
     File file(fileName, FILE_READ);
     string extension = getExtension(fileName);

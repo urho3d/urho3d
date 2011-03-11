@@ -3,6 +3,7 @@
 #include "Scripts/EditorCamera.as"
 #include "Scripts/EditorScene.as"
 #include "Scripts/EditorUI.as"
+#include "Scripts/EditorImportTundra.as"
 
 void start()
 {
@@ -16,6 +17,9 @@ void start()
     // Free the mouse cursor
     input.setClipCursor(false);
 
+    // Enable console commands from the editor script
+    engine.setDefaultScriptFile(scriptFile);
+    
     subscribeToEvent("Update", "handleUpdate");
 
     createScene();

@@ -5,6 +5,7 @@ UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
 array<string> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
+array<string> tundraSceneFilter = {"*.txml"};
 array<string> uiAllFilter = {"*.*"};
 uint uiSceneFilter = 0;
 
@@ -54,6 +55,8 @@ void createMenuBar()
         filePopup.addChild(createMenuItem("Open scene", 'O', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene", 'S', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
+        filePopup.addChild(createMenuDivider());
+        filePopup.addChild(createMenuItem("Import Tundra scene", 0, 0));
         filePopup.addChild(createMenuDivider());
         filePopup.addChild(createMenuItem("Set resource path", 0, 0));
         filePopup.addChild(createMenuItem("Reload resources", 'R', QUAL_CTRL));
@@ -210,11 +213,17 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
         if (action == "Save scene as")
         {
-            createFileSelector("Save scene as", "Save", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
+            createFileSelector("Save scene as", "Save", "Cancel", sceneFileName.empty() ? sceneResourcePath : getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
             uiFileSelector.setFileName(getFileNameAndExtension(sceneFileName));
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
 
+        if (action == "Import Tundra scene")
+        {
+            createFileSelector("Import Tundra scene", "Import", "Cancel", "", tundraSceneFilter, 0);
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleImportTundraFile");
+        }
+        
         if (action == "Set resource path")
         {
             createFileSelector("Set resource path", "Set", "Cancel", sceneResourcePath, uiAllFilter, 0);
@@ -283,6 +292,18 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 
     string fileName = eventData["FileName"].getString();
     saveScene(fileName);
+}
+
+void handleImportTundraFile(StringHash eventType, VariantMap& eventData)
+{
+    closeFileSelector();
+
+    // Check for cancel
+    if (!eventData["OK"].getBool())
+        return;
+
+    string fileName = eventData["FileName"].getString();
+    importTundraScene(fileName);
 }
 
 void handleResourcePath(StringHash eventType, VariantMap& eventData)

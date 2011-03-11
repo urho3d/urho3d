@@ -1,0 +1,7 @@
+<material>
+    <base name="Materials/DefaultDiff.xml" />
+    <technique>
+        <texture unit="diffuse" name="Textures/Jack_body_color.jpg" />
+        <parameter name="MatSpecProperties" value="0.1 16" />
+    </technique>
+</material>

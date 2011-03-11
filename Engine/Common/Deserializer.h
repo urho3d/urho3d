@@ -116,6 +116,8 @@ public:
     VariantMap readVariantMap();
     //! Read a variable-length encoded unsigned integer, which can use 29 bits maximum
     unsigned readVLE();
+    //! Read a text line
+    std::string readLine();
     
 protected:
     //! Stream position

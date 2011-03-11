@@ -25,6 +25,7 @@
 #include "Hash.h"
 #include "Log.h"
 #include "PackageFile.h"
+#include "SharedArrayPtr.h"
 #include "StringUtils.h"
 
 #include <cstdlib>
@@ -258,7 +259,10 @@ bool createDirectory(const std::string& pathName)
 int systemCommand(const std::string& commandLine)
 {
     if (allowedDirectories.empty())
+    {
+        LOGINFO("Executing system command: " + commandLine);
         return system(commandLine.c_str());
+    }
     else
     {
         LOGERROR("Executing an external command is not allowed");
@@ -283,6 +287,37 @@ bool systemOpenFile(const std::string& fileName, const std::string& mode)
         LOGERROR("Opening a file externally is not allowed");
         return false;
     }
+}
+
+bool copyFile(const std::string& srcFileName, const std::string& destFileName)
+{
+    if (!checkDirectoryAccess(getPath(srcFileName)))
+    {
+        LOGERROR("Access denied to " + srcFileName);
+        return false;
+    }
+    if (!checkDirectoryAccess(getPath(destFileName)))
+    {
+        LOGERROR("Access denied to " + destFileName);
+        return false;
+    }
+    try
+    {
+        File srcFile(srcFileName, FILE_READ);
+        File destFile(destFileName, FILE_WRITE);
+        
+        SharedArrayPtr<unsigned char> buffer(new unsigned char[srcFile.getSize()]);
+        srcFile.read(buffer.getPtr(), srcFile.getSize());
+        srcFile.close();
+        destFile.write(buffer.getPtr(), srcFile.getSize());
+        destFile.close();
+    }
+    catch (...)
+    {
+        return false;
+    }
+    
+    return true;
 }
 
 void registerDirectory(const std::string& pathName)
@@ -401,7 +436,7 @@ std::string getParentPath(const std::string& path)
 {
     unsigned pos = unfixPath(path).rfind('/');
     if (pos != std::string::npos)
-        return path.substr(0, pos);
+        return path.substr(0, pos + 1);
     else
         return path;
 }

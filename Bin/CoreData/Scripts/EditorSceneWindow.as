@@ -81,6 +81,7 @@ void collapseSceneHierarchy()
 void updateSceneWindow(bool showComponents)
 {
     ListView@ list = sceneWindow.getChild("EntityList", true);
+    list.getContentElement().disableLayoutUpdate();
     list.removeAllItems();
 
     array<Entity@> entities = editorScene.getAllEntities();
@@ -92,6 +93,9 @@ void updateSceneWindow(bool showComponents)
         updateSceneWindowEntity(itemIndex, entity);
         list.setChildItemsVisible(itemIndex, showComponents);
     }
+    
+    list.getContentElement().enableLayoutUpdate();
+    list.getContentElement().updateLayout();
     
     // Clear copybuffer when whole window refreshed
     copyBuffer.createRootElement("none");

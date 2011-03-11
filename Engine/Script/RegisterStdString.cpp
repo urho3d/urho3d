@@ -105,6 +105,28 @@ std::string StringSubString2Params(unsigned start, unsigned length, const std::s
     }
 }
 
+std::string StringTrim(const std::string& str)
+{
+    unsigned trimStart = 0;
+    unsigned trimEnd = str.length();
+    while (trimStart < trimEnd)
+    {
+        char c = str[trimStart];
+        if ((c != ' ') && (c != 9))
+            break;
+        ++trimStart;
+    }
+    while (trimEnd > trimStart)
+    {
+        char c = str[trimEnd - 1];
+        if ((c != ' ') && (c != 9))
+            break;
+        --trimEnd;
+    }
+    
+    return str.substr(trimStart, trimEnd - trimStart);
+}
+
 static void ConstructStringInt(int value, std::string* ptr)
 {
     new(ptr) std::string();
@@ -238,6 +260,7 @@ void registerStdString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("string", "int find(const string& in) const", asFUNCTION(StringFind), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "string substr(uint) const", asFUNCTION(StringSubString1Param), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("string", "string substr(uint, uint) const", asFUNCTION(StringSubString2Params), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("string", "string trim() const", asFUNCTION(StringTrim), asCALL_CDECL_OBJLAST);
     
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("string", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);

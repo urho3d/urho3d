@@ -109,6 +109,8 @@ bool createDirectory(const std::string& pathName);
 int systemCommand(const std::string& commandLine);
 //! Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined
 bool systemOpenFile(const std::string& fileName, const std::string& mode = std::string());
+//! Copy a file. Return true if successful
+bool copyFile(const std::string& srcFileName, const std::string& destFileName);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed

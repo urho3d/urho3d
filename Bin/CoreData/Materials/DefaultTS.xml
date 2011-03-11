@@ -1,0 +1,12 @@
+<material>
+    <technique>
+        <parameter name="MatSpecProperties" value="0.5 16" />
+        <pass name="deferred" vs="Deferred/GBuffer" ps="Deferred/GBuffer" cull="none" />
+        <pass name="prepass" vs="Prepass/GBuffer" ps="Prepass/GBuffer" cull="none" />
+        <pass name="material" vs="Prepass/Material" ps="Prepass/Material" depthwrite="false" depthtest="equal" cull="none" />
+        <pass name="ambient" vs="Forward" ps="Forward_Ambient" cull="none" />
+        <pass name="light" vs="Forward" ps="Forward" depthwrite="false" depthtest="equal" blend="add" cull="none" />
+        <pass name="negative" vs="Forward" ps="Forward" depthwrite="false" depthtest="equal" blend="multiply" cull="none" />
+        <pass name="shadow" vs="Shadow" ps="Shadow" cull="none" />
+    </technique>
+</material>

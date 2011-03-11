@@ -232,6 +232,7 @@ template <class T> void registerDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "Variant readVariant()", asMETHODPR(T, readVariant, (), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap readVariantMap()", asMETHODPR(T, readVariantMap, (), VariantMap), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint readVLE()", asMETHODPR(T, readVLE, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "string readLine()", asMETHODPR(T, readLine, (), std::string), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint seek(uint)", asMETHODPR(T, seek, (unsigned), unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const string& getName() const", asMETHODPR(T, getName, () const, const std::string&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint getPosition() const", asMETHODPR(T, getPosition, () const, unsigned), asCALL_THISCALL);

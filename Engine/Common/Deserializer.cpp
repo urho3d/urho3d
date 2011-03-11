@@ -301,3 +301,30 @@ unsigned Deserializer::readVLE()
     ret |= ((unsigned)byte) << 21;
     return ret;
 }
+
+std::string Deserializer::readLine()
+{
+    std::string ret;
+    
+    while (!isEof())
+    {
+        char c = readByte();
+        if (c == 10)
+            break;
+        if (c == 13)
+        {
+            // Peek next char to see if it's 10, and skip it too
+            if (!isEof())
+            {
+                char next = readByte();
+                if (next != 10)
+                    seek(mPosition - 1);
+            }
+            break;
+        }
+        
+        ret += c;
+    }
+    
+    return ret;
+}

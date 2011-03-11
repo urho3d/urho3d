@@ -446,7 +446,7 @@ void FileSelector::handleOKPressed(StringHash eventType, VariantMap& eventData)
             sendEvent(EVENT_FILESELECTED, newEventData);
         }
     }
-    else if ((eventType == EVENT_PRESSED) && (!mPath.empty()))
+    else if ((eventType == EVENT_RELEASED) && (!mPath.empty()))
     {
         using namespace FileSelected;
         

@@ -602,6 +602,7 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("int systemCommand(const string& in)", asFUNCTION(systemCommand), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool systemOpenFile(const string& in, const string& in)", asFUNCTION(systemOpenFile), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool copyFile(const string& in, const string& in)", asFUNCTION(copyFile), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getExtension(const string& in)", asFUNCTION(getExtension), asCALL_CDECL);

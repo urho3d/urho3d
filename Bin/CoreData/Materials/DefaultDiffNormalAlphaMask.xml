@@ -7,6 +7,6 @@
         <pass name="ambient" vs="Forward" ps="Forward_DiffAmbient" alphatest="true" />
         <pass name="light" vs="Forward_Normal" ps="Forward_DiffNormal" alphatest="true" depthwrite="false" depthtest="equal" blend="add" />
         <pass name="negative" vs="Forward" ps="Forward_Diff" alphatest="true" depthwrite="false" depthtest="equal" blend="multiply" />
-        <pass name="shadow" vs="Shadow" ps="Shadow_Mask" alphamask="true" />
+        <pass name="shadow" vs="Shadow_Mask" ps="Shadow_Mask" alphamask="true" />
     </technique>
 </material>

@@ -1,0 +1,3 @@
+<collisionshape>
+    <capsule radius="0.35" height="1.2" rotation="90 0 0" />
+</collisionshape>
