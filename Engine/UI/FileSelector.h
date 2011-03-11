@@ -89,6 +89,8 @@ public:
     Button* getOKButton() const { return mOKButton; }
     //! Return cancel button
     Button* getCancelButton() const { return mCancelButton; }
+    //! Return close button
+    Button* getCloseButton() const { return mCloseButton; }
     //! Return current path
     const std::string& getPath() const { return mPath; }
     //! Return current filename
@@ -126,6 +128,8 @@ private:
     SharedPtr<XMLFile> mStyle;
     //! Fileselector window
     SharedPtr<Window> mWindow;
+    //! Title layout
+    SharedPtr<UIElement> mTitleLayout;
     //! Window title text
     SharedPtr<Text> mTitleText;
     //! File list
@@ -144,6 +148,8 @@ private:
     SharedPtr<Button> mCancelButton;
     //! Cancel button text
     SharedPtr<Text> mCancelButtonText;
+    //! Close button
+    SharedPtr<Button> mCloseButton;
     //! Filename and filter layout
     SharedPtr<UIElement> mFileNameLayout;
     //! Button layout

@@ -8,6 +8,7 @@ array<string> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
 array<string> tundraSceneFilter = {"*.txml"};
 array<string> uiAllFilter = {"*.*"};
 uint uiSceneFilter = 0;
+string uiScenePath;
 
 void createUI()
 {
@@ -43,9 +44,9 @@ void createCursor()
 void createMenuBar()
 {
     @uiMenuBar = BorderImage("MenuBar");
+    uiMenuBar.setEnabled(true);
     uiMenuBar.setStyle(uiStyle, "EditorMenuBar");
-    uiMenuBar.setLayout(LM_HORIZONTAL, 2, IntRect(2, 2, 2, 2));
-    uiMenuBar.setPriority(10);
+    uiMenuBar.setLayout(LM_HORIZONTAL, 4, IntRect(2, 2, 2, 2));
     uiRoot.addChild(uiMenuBar);
 
     {
@@ -204,7 +205,7 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
             
         if (action == "Open scene")
         {
-            createFileSelector("Open scene", "Open", "Cancel", getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
+            createFileSelector("Open scene", "Open", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
             subscribeToEvent(uiFileSelector, "FileSelected", "handleOpenSceneFile");
         }
 
@@ -213,7 +214,7 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
         if (action == "Save scene as")
         {
-            createFileSelector("Save scene as", "Save", "Cancel", sceneFileName.empty() ? sceneResourcePath : getPath(sceneFileName), uiSceneFilters, uiSceneFilter);
+            createFileSelector("Save scene as", "Save", "Cancel", uiScenePath, uiSceneFilters, uiSceneFilter);
             uiFileSelector.setFileName(getFileNameAndExtension(sceneFileName));
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
@@ -268,8 +269,9 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
 
 void handleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 {
-    // Save filter for next time
+    // Save filter & path for next time
     uiSceneFilter = uiFileSelector.getFilterIndex();
+    uiScenePath = uiFileSelector.getPath();
     closeFileSelector();
 
     // Check for cancel
@@ -284,6 +286,7 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
 {
     // Save filter for next time
     uiSceneFilter = uiFileSelector.getFilterIndex();
+    uiScenePath = uiFileSelector.getPath();
     closeFileSelector();
 
     // Check for cancel

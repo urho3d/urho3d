@@ -326,42 +326,6 @@ void initUI()
     cursor.setStyleAuto(uiStyle);
     cursor.setPosition(renderer.getWidth() / 2, renderer.getHeight() / 2);
     ui.setCursor(cursor);
-
-    bool uiTest = false;
-    array<string> arguments = getArguments();
-    for (uint i = 0; i < arguments.size(); ++i)
-    {
-        if (arguments[i] == "-uitest")
-            uiTest = true;
-    }
-
-    if (!uiTest)
-        return;
-
-    XMLFile@ uiLayout = cache.getResource("XMLFile", "UI/TestLayout.xml");
-    UIElement@ layoutRoot = ui.loadLayout(uiLayout, uiStyle);
-    uiRoot.addChild(layoutRoot);
-
-    @fileSelector = FileSelector();
-    fileSelector.setStyle(uiStyle);
-    fileSelector.setTitle("Load file");
-    fileSelector.setButtonTexts("Load", "Cancel");
-    fileSelector.getWindow().setPosition(200, 100);
-
-    array<string> filters;
-    filters.resize(2);
-    filters[0] = "*.*";
-    filters[1] = "*.exe";
-    fileSelector.setFilters(filters, 0);
-
-    subscribeToEvent(fileSelector, "FileSelected", "handleFileSelected");
-
-}
-
-void handleFileSelected(StringHash eventType, VariantMap& eventData)
-{
-    unsubscribeFromEvent(fileSelector, "FileSelected");
-    @fileSelector = null;
 }
 
 void createCamera()

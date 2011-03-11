@@ -159,17 +159,25 @@ void createStatsBar()
     @renderStatsText = Text();
     @cameraPosText = Text();
     
-    setupStatsBarText(renderStatsText, font, 0, HA_LEFT);
-    setupStatsBarText(cameraPosText, font, 0, HA_RIGHT);
+    if (uiRoot.getWidth() >= 1024)
+    {
+        setupStatsBarText(renderStatsText, font, 0, 20, HA_LEFT);
+        setupStatsBarText(cameraPosText, font, 0, 20, HA_RIGHT);
+    }
+    else
+    {
+        setupStatsBarText(renderStatsText, font, 0, 20, HA_LEFT);
+        setupStatsBarText(cameraPosText, font, 0, 32, HA_LEFT);
+    }
 }
 
-void setupStatsBarText(Text@ text, Font@ font, int xPos, HorizontalAlignment align)
+void setupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment align)
 {
-    text.setPosition(xPos, 20);
+    text.setPosition(x, y);
     text.setHorizontalAlignment(align);
     text.setFont(font, 9);
     text.setColor(Color(1, 1, 0));
-    text.setPriority(-10);
+    text.setPriority(-100);
     uiRoot.addChild(text);
 }
 
@@ -187,11 +195,11 @@ void updateStats(float timeStep)
     string xText = toString(cameraPos.x);
     string yText = toString(cameraPos.y);
     string zText = toString(cameraPos.z);
-    xText.resize(10);
-    yText.resize(10);
-    zText.resize(10);
+    xText.resize(8);
+    yText.resize(8);
+    zText.resize(8);
     
-    cameraPosText.setText("Physics: " + (runPhysics ? "Running   " : "Paused    ") + " Camera pos: " + xText + " " + yText + " " + zText);
+    cameraPosText.setText("Physics: " + (runPhysics ? "Running " : "Paused  ") + " Camera pos: " + xText + " " + yText + " " + zText + " ");
     
     renderStatsText.setSize(renderStatsText.getMinSize());
     cameraPosText.setSize(cameraPosText.getMinSize());

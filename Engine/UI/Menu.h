@@ -79,8 +79,8 @@ protected:
     int mAcceleratorQualifiers;
     
 private:
-    //! Handle press-release for confirming the selection
-    void handleReleased(StringHash eventType, VariantMap& eventData);
+    //! Handle press and release for selection and toggling popup visibility
+    void handlePressedReleased(StringHash eventType, VariantMap& eventData);
     //! Handle UI focus change to check for hiding the popup
     void handleFocusChanged(StringHash eventType, VariantMap& eventData);
     //! Handle keypress for checking accelerator

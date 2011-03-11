@@ -186,8 +186,8 @@ void Renderer::setMode(RenderMode mode, int width, int height, bool fullscreen, 
         }
         else
         {
-            width = 640;
-            height = 480;
+            width = 800;
+            height = 600;
         }
     }
     

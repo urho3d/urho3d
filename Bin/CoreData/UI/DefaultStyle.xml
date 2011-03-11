@@ -17,7 +17,7 @@
         <hoveroffset value="0 16" />
     </element>
     <element type="CloseButton">
-        <size value="16 16" />
+        <fixedsize value="16 16" />
         <texture name="Textures/UI.png" />
         <imagerect value="128 0 144 16" />
         <border value="4 4 4 4" />
@@ -356,6 +356,10 @@
     <element type="FileSelectorFilterText">
         <font name="Cour.ttf" size="10" />
         <hovercolor value="0.45 0.70 0.45" />
+    </element>
+    <element type="FileSelectorTitleLayout">
+        <fixedheight value="16" />
+        <layout spacing="4" />
     </element>
     <element type="FileSelectorLayout">
         <layout spacing="4" />

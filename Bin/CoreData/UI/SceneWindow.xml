@@ -9,9 +9,7 @@
         <element type="Text">
             <text value="Scene hierarchy" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton">
-            <fixedsize value="16 16" />
-        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />
@@ -46,8 +44,8 @@
         <layout mode="horizontal" spacing="4" />
         <element type="Element" />
         <element type="DropDownList" name="NewEntityList">
-            <fixedwidth value="90" />
-            <layout border="4 5 4 4" />
+            <fixedsize value="90 22" />
+            <layout border="4 4 4 4" />
             <placeholder>
                 <visible enable="false" />
             </placeholder>
@@ -61,8 +59,8 @@
         </element>
         <element />
         <element type="DropDownList" name="NewComponentList">
-            <fixedwidth value="90" />
-            <layout border="4 5 4 4" />
+            <fixedsize value="90 22" />
+            <layout border="4 4 4 4" />
             <placeholder>
                 <visible enable="false" />
             </placeholder>

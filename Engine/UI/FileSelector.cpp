@@ -58,8 +58,15 @@ FileSelector::FileSelector(UI* ui) :
     mWindow = new Window();
     mWindow->setLayout(LM_VERTICAL);
     
+    mTitleLayout = new UIElement();
+    mTitleLayout->setLayout(LM_HORIZONTAL);
+    mWindow->addChild(mTitleLayout);
+    
     mTitleText = new Text();
-    mWindow->addChild(mTitleText);
+    mTitleLayout->addChild(mTitleText);
+    
+    mCloseButton = new Button();
+    mTitleLayout->addChild(mCloseButton);
     
     mPathEdit = new LineEdit();
     mWindow->addChild(mPathEdit);
@@ -120,6 +127,7 @@ FileSelector::FileSelector(UI* ui) :
     subscribeToEvent(mFileList, EVENT_UNHANDLEDKEY, EVENT_HANDLER(FileSelector, handleFileListKey));
     subscribeToEvent(mOKButton, EVENT_RELEASED, EVENT_HANDLER(FileSelector, handleOKPressed));
     subscribeToEvent(mCancelButton, EVENT_RELEASED, EVENT_HANDLER(FileSelector, handleCancelPressed));
+    subscribeToEvent(mCloseButton, EVENT_RELEASED, EVENT_HANDLER(FileSelector, handleCancelPressed));
 }
 
 FileSelector::~FileSelector()
@@ -142,10 +150,12 @@ void FileSelector::setStyle(XMLFile* style)
     mWindow->setStyle(style, "FileSelector", cache);
     
     mTitleText->setStyle(style, "FileSelectorTitleText", cache);
+    mCloseButton->setStyle(style, "CloseButton", cache);
     
     mOKButtonText->setStyle(style, "FileSelectorButtonText", cache);
     mCancelButtonText->setStyle(style, "FileSelectorButtonText", cache);
     
+    mTitleLayout->setStyle(style, "FileSelectorTitleLayout", cache);
     mFileNameLayout->setStyle(style, "FileSelectorLayout", cache);
     mButtonLayout->setStyle(style, "FileSelectorLayout", cache);
     

@@ -7,9 +7,7 @@
         <element type="Text">
             <text value="Editor camera settings" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton">
-            <fixedsize value="16 16" />
-        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />

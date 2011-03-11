@@ -9,9 +9,7 @@
         <element type="Text" name="WindowTitle">
             <text value="Entity / component edit" />
         </element>
-        <element type="Button" style="CloseButton" name="CloseButton">
-            <fixedsize value="16 16" />
-        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />

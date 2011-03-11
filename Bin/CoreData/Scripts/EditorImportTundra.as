@@ -121,7 +121,6 @@ void importTundraScene(string fileName)
                 // Fix coordinate system
                 pos = Vector3(pos.x, pos.z, pos.y);
                 rot = Vector3(rot.x, -rot.z + 180, rot.y);
-                //scale = Vector3(scale.x, scale.y, scale.z);
             }
             
             compElem = compElem.getNextElement("component");

@@ -37,7 +37,8 @@ Menu::Menu(const std::string& name) :
     mAcceleratorKey(0),
     mAcceleratorQualifiers(0)
 {
-    subscribeToEvent(this, EVENT_RELEASED, EVENT_HANDLER(Menu, handleReleased));
+    subscribeToEvent(this, EVENT_PRESSED, EVENT_HANDLER(Menu, handlePressedReleased));
+    subscribeToEvent(this, EVENT_RELEASED, EVENT_HANDLER(Menu, handlePressedReleased));
     subscribeToEvent(EVENT_UIMOUSECLICK, EVENT_HANDLER(Menu, handleFocusChanged));
     subscribeToEvent(EVENT_FOCUSCHANGED, EVENT_HANDLER(Menu, handleFocusChanged));
 }
@@ -144,8 +145,20 @@ void Menu::setAccelerator(int key, int qualifiers)
         unsubscribeFromEvent(EVENT_KEYDOWN);
 }
 
-void Menu::handleReleased(StringHash eventType, VariantMap& eventData)
+void Menu::handlePressedReleased(StringHash eventType, VariantMap& eventData)
 {
+    // If this menu shows a sublevel popup, react to button press. Else react to release
+    if (eventType == EVENT_PRESSED)
+    {
+        if (!mPopup)
+            return;
+    }
+    if (eventType == EVENT_RELEASED)
+    {
+        if (mPopup)
+            return;
+    }
+    
     // Toggle popup visibility if exists
     showPopup(!mShowPopup);
     
@@ -206,5 +219,5 @@ void Menu::handleKeyDown(StringHash eventType, VariantMap& eventData)
     // Activate if accelerator key pressed
     if ((eventData[P_KEY].getInt() == mAcceleratorKey) && (eventData[P_QUALIFIERS].getInt() == mAcceleratorQualifiers) &&
         (eventData[P_REPEAT].getBool() == false))
-        handleReleased(eventType, eventData);
+        handlePressedReleased(eventType, eventData);
 }

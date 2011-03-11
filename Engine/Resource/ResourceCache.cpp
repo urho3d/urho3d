@@ -124,11 +124,11 @@ bool ResourceCache::addManualResource(Resource* resource)
 void ResourceCache::removeResourcePath(const std::string& path)
 {
     std::string fixedPath = toLower(fixPath(path));
-    for (std::vector<std::string>::iterator i = mResourcePaths.begin(); i != mResourcePaths.end();)
+    for (std::vector<std::string>::iterator i = mResourcePaths.begin(); i != mResourcePaths.end(); ++i)
     {
         if (toLower(*i) == fixedPath)
         {
-            i = mResourcePaths.erase(i);
+            mResourcePaths.erase(i);
             return;
         }
     }
