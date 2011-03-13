@@ -96,6 +96,7 @@ void Button::onHover(const IntVector2& position, const IntVector2& screenPositio
 {
     bool oldPressed = mPressed;
     setPressed((buttons & MOUSEB_LEFT) != 0);
+    mHovering = true;
     
     if ((oldPressed) && (!mPressed))
     {
@@ -105,8 +106,6 @@ void Button::onHover(const IntVector2& position, const IntVector2& screenPositio
         eventData[P_ELEMENT] = (void*)this;
         sendEvent(EVENT_RELEASED, eventData);
     }
-    
-    mHovering = true;
 }
 
 void Button::onClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

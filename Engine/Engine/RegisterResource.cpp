@@ -114,10 +114,11 @@ static void registerResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "uint getMemoryBudget(const string& in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint getMemoryUse(const string& in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint getTotalMemoryUse() const", asMETHOD(ResourceCache, getTotalMemoryUse), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "string getPreferredResourcePath(const string& in) const", asMETHOD(ResourceCache, getPreferredResourcePath), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ResourceCache@+ getResourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
+    
+    engine->RegisterGlobalFunction("string getPreferredResourcePath(const string& in)", asFUNCTION(getPreferredResourcePath), asCALL_CDECL);
 }
 
 static Image* ConstructImage(const std::string& name)

@@ -430,56 +430,6 @@ unsigned ResourceCache::getTotalMemoryUse() const
     return total;
 }
 
-std::string ResourceCache::getPreferredResourcePath(const std::string& path)
-{
-    std::string fixedPath = fixPath(path);
-    
-    // Check for the existence of some known resource subdirectories to decide if we should add the parent directory instead
-    static const std::string checkDirs[] = {
-        "Fonts",
-        "Materials",
-        "Models",
-        "Music",
-        "Particle",
-        "Physics",
-        "Scripts",
-        "Sounds",
-        "Shaders",
-        "Textures",
-        "UI",
-        ""
-    };
-    
-    bool pathHasKnownDirs = false;
-    bool parentHasKnownDirs = false;
-    
-    for (unsigned i = 0; !checkDirs[i].empty(); ++i)
-    {
-        if (directoryExists(fixedPath + checkDirs[i]))
-        {
-            pathHasKnownDirs = true;
-            break;
-        }
-    }
-    if (!pathHasKnownDirs)
-    {
-        std::string parentPath = getParentPath(fixedPath);
-        for (unsigned i = 0; !checkDirs[i].empty(); ++i)
-        {
-            if (directoryExists(parentPath + checkDirs[i]))
-            {
-                parentHasKnownDirs = true;
-                break;
-            }
-        }
-        // If path does not have known subdirectories, but the parent path has, use the parent instead
-        if (parentHasKnownDirs)
-            fixedPath = parentPath;
-    }
-    
-    return fixedPath;
-}
-
 const SharedPtr<Resource>& ResourceCache::findResource(ShortStringHash type, StringHash nameHash)
 {
     static const SharedPtr<Resource> noResource;
@@ -563,4 +513,54 @@ void ResourceCache::updateResourceGroup(ShortStringHash type)
         else
             break;
     }
+}
+
+std::string getPreferredResourcePath(const std::string& path)
+{
+    std::string fixedPath = fixPath(path);
+    
+    // Check for the existence of known resource subdirectories to decide if we should add the parent directory instead
+    static const std::string checkDirs[] = {
+        "Fonts",
+        "Materials",
+        "Models",
+        "Music",
+        "Particle",
+        "Physics",
+        "Scripts",
+        "Sounds",
+        "Shaders",
+        "Textures",
+        "UI",
+        ""
+    };
+    
+    bool pathHasKnownDirs = false;
+    bool parentHasKnownDirs = false;
+    
+    for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+    {
+        if (directoryExists(fixedPath + checkDirs[i]))
+        {
+            pathHasKnownDirs = true;
+            break;
+        }
+    }
+    if (!pathHasKnownDirs)
+    {
+        std::string parentPath = getParentPath(fixedPath);
+        for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+        {
+            if (directoryExists(parentPath + checkDirs[i]))
+            {
+                parentHasKnownDirs = true;
+                break;
+            }
+        }
+        // If path does not have known subdirectories, but the parent path has, use the parent instead
+        if (parentHasKnownDirs)
+            fixedPath = parentPath;
+    }
+    
+    return fixedPath;
 }

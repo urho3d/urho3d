@@ -28,6 +28,7 @@
 
 class asIScriptFunction;
 
+//! Base class for event listeners that forward events to script
 class ScriptEventListener : public EventListener
 {
 public:

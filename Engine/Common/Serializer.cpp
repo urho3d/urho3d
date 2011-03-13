@@ -216,3 +216,10 @@ void Serializer::writeVLE(unsigned value)
         writeUByte(value >> 21);
     }
 }
+
+void Serializer::writeLine(const std::string& value)
+{
+    write(value.c_str(), value.length());
+    writeUByte(13);
+    writeUByte(10);
+}

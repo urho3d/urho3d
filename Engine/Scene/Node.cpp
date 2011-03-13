@@ -467,11 +467,6 @@ void Node::scale(const Vector3& scale)
         markDirty();
 }
 
-void Node::setNodeFlags(unsigned flags)
-{
-    mNodeFlags = (mNodeFlags & NODE_PREDEFINEDFLAGS) | (flags & NODE_CUSTOMFLAGS);
-}
-
 void Node::addChild(Node* node)
 {
     if ((!node) || (node == this) || (node->mParent == this) || (mParent == node))

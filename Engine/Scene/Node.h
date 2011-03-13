@@ -48,8 +48,6 @@ static const unsigned NODE_ZONE = 0x800;
 static const unsigned NODE_RIGIDBODY = 0x1000;
 static const unsigned NODE_POSITIONALCHANNEL = 0x2000;
 static const unsigned NODE_ANY = 0xffffffff;
-static const unsigned NODE_PREDEFINEDFLAGS = 0x0000ffff;
-static const unsigned NODE_CUSTOMFLAGS = 0xffff0000;
 
 static const unsigned INTERP_NONE = 0x0;
 static const unsigned INTERP_POS = 0x1;
@@ -122,8 +120,6 @@ public:
     void scale(float scale);
     //! Modify scale
     void scale(const Vector3& scale);
-    //! Set custom node flags (high 16 bits.) For editing use only, these will not be saved or replicated
-    void setNodeFlags(unsigned flags);
     //! Add a child scene node
     void addChild(Node* node);
     //! Remove a child scene node. Optionally set its transform to match the last world position it was in

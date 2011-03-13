@@ -563,6 +563,22 @@ static CScriptArray* ScanDirectory(const std::string& pathName, const std::strin
     return vectorToArray<std::string>(result, "array<string>");
 }
 
+static int SystemRun(const std::string& fileName, CScriptArray* srcArguments)
+{
+    if (!srcArguments)
+        return -1;
+    
+    unsigned numArguments = srcArguments->GetSize();
+    std::vector<std::string> destArguments(numArguments);
+    for (unsigned i = 0; i < numArguments; ++i)
+        destArguments[i] = *(static_cast<std::string*>(srcArguments->At(i)));
+    
+    LOGINFO("Systemrun: " + fileName);
+    for (unsigned i = 0; i < destArguments.size(); ++i)
+        LOGINFO(destArguments[i]);
+    return systemRun(fileName, destArguments);
+}
+
 static void registerSerialization(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Serializer", 0, asOBJ_REF);
@@ -601,8 +617,11 @@ static void registerSerialization(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void setCurrentDirectory(const string& in)", asFUNCTION(setCurrentDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool createDirectory(const string& in)", asFUNCTION(createDirectory), asCALL_CDECL);
     engine->RegisterGlobalFunction("int systemCommand(const string& in)", asFUNCTION(systemCommand), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int systemRun(const string& in, array<string>@+)", asFUNCTION(SystemRun), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool systemOpenFile(const string& in, const string& in)", asFUNCTION(systemOpenFile), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool copyFile(const string& in, const string& in)", asFUNCTION(copyFile), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool renameFile(const string& in, const string& in)", asFUNCTION(renameFile), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool deleteFile(const string& in)", asFUNCTION(deleteFile), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getPath(const string& in)", asFUNCTION(getPath), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getFileName(const string& in)", asFUNCTION(getFileName), asCALL_CDECL);
     engine->RegisterGlobalFunction("string getExtension(const string& in)", asFUNCTION(getExtension), asCALL_CDECL);

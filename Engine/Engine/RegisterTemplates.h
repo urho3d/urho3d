@@ -202,6 +202,7 @@ template <class T> void registerSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void writeVariant(const Variant& in)", asMETHODPR(T, writeVariant, (const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeVariantMap(const VariantMap& in)", asMETHODPR(T, writeVariantMap, (const VariantMap&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void writeVLE(uint)", asMETHODPR(T, writeVLE, (unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void writeLine(const string& in)", asMETHODPR(T, writeLine, (const std::string&), void), asCALL_THISCALL);
 }
 
 //! Template function for registering a class derived from Deserializer

@@ -3,7 +3,7 @@
 #include "Scripts/EditorCamera.as"
 #include "Scripts/EditorScene.as"
 #include "Scripts/EditorUI.as"
-#include "Scripts/EditorImportTundra.as"
+#include "Scripts/EditorImport.as"
 
 void start()
 {

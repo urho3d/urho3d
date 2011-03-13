@@ -511,7 +511,8 @@ static void registerUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "Cursor@+ getCursor() const", asMETHOD(UI, getCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ getElementAt(const IntVector2& in, bool)", asMETHODPR(UI, getElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ getElementAt(int, int, bool)", asMETHODPR(UI, getElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "UIElement@+ getFocusElement()", asMETHOD(UI, getFocusElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ getFocusElement() const", asMETHOD(UI, getFocusElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "UIElement@+ getFrontElement() const", asMETHOD(UI, getFrontElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "IntVector2 getCursorPosition()", asMETHOD(UI, getCursorPosition), asCALL_THISCALL);
     registerRefCasts<EventListener, UI>(engine, "EventListener", "UI");
     

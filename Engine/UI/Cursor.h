@@ -38,6 +38,7 @@ enum CursorShape
     CS_MAX_SHAPES
 };
 
+//! Cursor image and hotspot information
 struct CursorShapeData
 {
     SharedPtr<Texture> mTexture;

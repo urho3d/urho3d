@@ -74,7 +74,9 @@ public:
     //! Return UI element at screen coordinates
     UIElement* getElementAt(int x, int y, bool enabledOnly = true);
     //! Return focused element
-    UIElement* getFocusElement();
+    UIElement* getFocusElement() const;
+    //! Return topmost enabled root-level element
+    UIElement* getFrontElement() const;
     //! Return cursor position
     IntVector2 getCursorPosition();
     //! Return UI element factories

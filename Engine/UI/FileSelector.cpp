@@ -55,7 +55,7 @@ FileSelector::FileSelector(UI* ui) :
     if (!mUI)
         EXCEPTION("Null UI for FileSelector");
     
-    mWindow = new Window();
+    mWindow = new Window("FileSelector");
     mWindow->setLayout(LM_VERTICAL);
     
     mTitleLayout = new UIElement();
@@ -133,8 +133,6 @@ FileSelector::FileSelector(UI* ui) :
 FileSelector::~FileSelector()
 {
     UIElement* root = mUI->getRootElement();
-    //! \todo This should not be necessary
-    root->removeChild(mFilterList->getPopup());
     root->removeChild(mWindow);
 }
 

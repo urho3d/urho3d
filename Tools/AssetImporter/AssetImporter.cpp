@@ -26,6 +26,7 @@
 #include "File.h"
 #include "Geometry.h"
 #include "IndexBuffer.h"
+#include "Light.h"
 #include "Material.h"
 #include "Model.h"
 #include "Octree.h"
@@ -37,6 +38,7 @@
 #include "Vector3.h"
 #include "VertexBuffer.h"
 #include "XMLFile.h"
+#include "Zone.h"
 
 #include <algorithm>
 #include <cstring>
@@ -50,6 +52,15 @@
 
 #include "DebugNew.h"
 
+enum Command
+{
+    CMD_NONE = 0,
+    CMD_MODEL,
+    CMD_SCENE,
+    CMD_DUMP,
+    CMD_LOD
+};
+
 struct ExportModel
 {
     ExportModel() :
@@ -60,7 +71,6 @@ struct ExportModel
     }
     
     std::string mOutName;
-    const aiScene* mScene;
     aiNode* mRootNode;
     std::set<unsigned> mMeshIndices;
     std::vector<aiMesh*> mMeshes;
@@ -77,22 +87,28 @@ struct ExportModel
 struct ExportScene
 {
     std::string mOutName;
-    std::string mResourcePath;
-    bool mLocalIDs;
-    bool mNoExtensions;
-    bool mSaveBinary;
-    const aiScene* mScene;
     aiNode* mRootNode;
     std::vector<ExportModel> mModels;
     std::vector<aiNode*> mNodes;
     std::vector<unsigned> mNodeModelIndices;
 };
 
+Command gCommand = CMD_NONE;
+const aiScene* gScene = 0;
+aiNode* gRootNode = 0;
+std::string gMaterialListName;
+std::string gResourcePath;
+bool gUseSubdirs = true;
+bool gLocalIDs = false;
+bool gSaveBinary = false;
+bool gCreateZone = true;
+bool gNoAnimations = false;
+
 int main(int argc, char** argv);
 void run(const std::vector<std::string>& arguments);
-void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level);
+void dumpNodes(aiNode* rootNode, unsigned level);
 
-void exportModel(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool noAnimations);
+void exportModel(const std::string& outName);
 void collectMeshes(ExportModel& model, aiNode* node);
 void collectBones(ExportModel& model);
 void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node);
@@ -101,26 +117,25 @@ void buildBoneCollisionInfo(ExportModel& model);
 void buildAndSaveModel(ExportModel& model);
 void buildAndSaveAnimations(ExportModel& model);
 
-void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath,
-    bool localIDs, bool noExtensions, bool saveBinary);
+void exportScene(const std::string& outName);
 void collectSceneModels(ExportScene& scene, aiNode* node);
-void collectSceneNodes(ExportScene& scene, aiNode* node);
 void buildAndSaveScene(ExportScene& scene);
 
-void exportMaterials(const aiScene* scene, const std::string& outName, const std::string& resourcePath);
-void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, const std::string& resourcePath);
+void exportMaterials(std::set<std::string>& usedTextures);
+void buildAndSaveMaterial(aiMaterial* material, std::set<std::string>& usedTextures);
+void copyTextures(const std::set<std::string>& usedTextures, const std::string& sourcePath);
 
 void combineLods(const std::vector<float>& lodDistances, const std::vector<std::string>& modelNames, const std::string& outName,
     unsigned collisionLodLevel, unsigned raycastLodLevel, unsigned occlusionLodLevel);
 
-std::set<unsigned> getMeshesUnderNodeSet(aiNode* node);
-std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node);
-unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh);
+void getMeshesUnderNode(std::vector<std::pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
+unsigned getMeshIndex(aiMesh* mesh);
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName);
 aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
 Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName, bool useMeshTransform);
 void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
     blendIndices, std::vector<std::vector<float> >& blendWeights);
+std::string getMeshMaterialName(aiMesh* mesh);
 
 void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void writeLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
@@ -138,6 +153,8 @@ std::string toStdString(const aiString& str);
 Vector3 toVector3(const aiVector3D& vec);
 Vector2 toVector2(const aiVector2D& vec);
 Quaternion toQuaternion(const aiQuaternion& quat);
+std::string sanitateAssetName(const std::string& name);
+
 void errorExit(const std::string& error);
 
 int main(int argc, char** argv)
@@ -145,7 +162,7 @@ int main(int argc, char** argv)
     std::vector<std::string> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(replace(std::string(argv[i]), '/', '\\'));
+        arguments.push_back(argv[i]);
     
     try
     {
@@ -168,36 +185,33 @@ void run(const std::vector<std::string>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model     Export a model and animations\n"
-            "scene     Export a scene and its models\n"
-            "dumpnodes Dump scene node structure. No output file is generated\n"
-            "lod       Combine several Urho3D models as LOD levels of the output model\n"
-            "          Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model Export a model\n"
+            "scene Export a scene\n"
+            "dump  Dump scene node structure. No output file is generated\n"
+            "lod   Combine several Urho3D models as LOD levels of the output model\n"
+            "      Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
-            "-b        Save scene in binary format, default format is XML\n"
-            "-i        Use local ID's for scene entities\n"
-            "-lcX      Use LOD level X for collision mesh, default is middle LOD\n"
-            "-lrX      Use LOD level X for raycast, default is same as visible\n"
-            "-loX      Use LOD level X for occlusion, default is same as visible\n"
-            "-na       Do not export animations\n"
-            "-ne       Do not create Octree & PhysicsWorld extensions to the scene\n"
-            "-nm       Do not export materials\n"
-            "-pX       Use base path X for resources in the scene file\n"
-            "-rX       Use scene node X as root node\n"
-            "-t        Generate tangents to model(s)"
+            "-b    Save scene in binary format, default format is XML\n"
+            "-i    Use local ID's for scene entities\n"
+            "-lcX  Use LOD level X for collision mesh, default is middle LOD\n"
+            "-lrX  Use LOD level X for raycast, default is same as visible\n"
+            "-loX  Use LOD level X for occlusion, default is same as visible\n"
+            "-mX   Output a material list file X (model mode only)\n"
+            "-na   Do not export animations\n"
+            "-nm   Do not export materials\n"
+            "-ns   Do not create subdirectories for resources\n"
+            "-nz   Do not create a zone and a directional light (scene mode only)\n"
+            "-pX   Set path X for scene resources. Default is output file path\n"
+            "-rX   Use scene node X as root node\n"
+            "-t    Generate tangents to model(s)"
         );
     }
     
     std::string command = toLower(arguments[0]);
     std::string rootNodeName;
-    std::string resourcePath;
     
     bool noMaterials = false;
-    bool noAnimations = false;
-    bool noExtensions = false;
-    bool localIDs = false;
-    bool saveBinary = false;
     
     unsigned flags = 
         aiProcess_ConvertToLeftHanded |
@@ -215,7 +229,7 @@ void run(const std::vector<std::string>& arguments)
     unsigned raycastLodLevel = M_MAX_UNSIGNED;
     unsigned occlusionLodLevel = M_MAX_UNSIGNED;
     
-    for (unsigned i = 3; i < arguments.size(); ++i)
+    for (unsigned i = 2; i < arguments.size(); ++i)
     {
         if ((arguments[i].length() >= 2) && (arguments[i][0] == '-'))
         {
@@ -226,11 +240,13 @@ void run(const std::vector<std::string>& arguments)
             switch (tolower(arguments[i][1]))
             {
             case 'b':
-                saveBinary = true;
+                gSaveBinary = true;
                 break;
+                
             case 'i':
-                localIDs = true;
+                gLocalIDs = true;
                 break;
+                
             case 'l':
                 if (parameter.length() > 1)
                 {
@@ -250,28 +266,42 @@ void run(const std::vector<std::string>& arguments)
                     }
                 }
                 break;
-            case 'p':
-                resourcePath = parameter;
+                
+            case 'm':
+                gMaterialListName = replace(parameter, '\\', '/');
                 break;
+                
+            case 'p':
+                gResourcePath = fixPath(parameter);
+                break;
+                
             case 'r':
                 rootNodeName = parameter;
                 break;
+                
             case 't':
                 flags |= aiProcess_CalcTangentSpace;
                 break;
+                
             case 'n':
                 if (!parameter.empty())
                 {
                     switch (tolower(parameter[0]))
                     {
                     case 'a':
-                        noAnimations = true;
+                        gNoAnimations = true;
                         break;
-                    case 'e':
-                        noExtensions = true;
-                        break;
+                        
                     case 'm':
                         noMaterials = true;
+                        break;
+                        
+                    case 's':
+                        gUseSubdirs = false;
+                        break;
+                        
+                    case 'z':
+                        gCreateZone = false;
                         break;
                     }
                 }
@@ -280,40 +310,77 @@ void run(const std::vector<std::string>& arguments)
         }
     }
     
-    if ((command == "model") || (command == "scene") || (command == "dumpnodes"))
+    if (command == "model")
+        gCommand = CMD_MODEL;
+    else if (command == "scene")
+        gCommand = CMD_SCENE;
+    else if (command == "dump")
+        gCommand = CMD_DUMP;
+    else if (command == "lod")
+        gCommand = CMD_LOD;
+    else
+        errorExit("Unrecognized command " + command);
+        
+    if (gCommand != CMD_LOD)
     {
         std::string inFile = arguments[1];
         std::string outFile;
-        if (arguments.size() > 2)
-            outFile = arguments[2];
+        if ((arguments.size() > 2) && (arguments[2][0] != '-'))
+            outFile = replace(arguments[2], '\\', '/');
+        
+        if (gResourcePath.empty())
+        {
+            gResourcePath = getPath(outFile);
+            // If output file already has the Models/ path (model mode), do not take it into the resource path
+            if (gCommand == CMD_MODEL)
+            {
+                std::string resPathLower = toLower(gResourcePath);
+                if (resPathLower.rfind("models/") == resPathLower.length() - 7)
+                    gResourcePath = gResourcePath.substr(0, gResourcePath.length() - 7);
+            }
+            if (gResourcePath.empty())
+                gResourcePath = "./";
+        }
+        
+        gResourcePath = fixPath(gResourcePath);
         
         Assimp::Importer importer;
         std::cout << "Reading file " << inFile << std::endl;
-        const aiScene* scene = importer.ReadFile(inFile.c_str(), flags);
-        if (!scene)
+        gScene = importer.ReadFile(getOSPath(inFile).c_str(), flags);
+        if (!gScene)
             errorExit("Could not open or parse input file " + inFile);
         
-        aiNode* rootNode = scene->mRootNode;
+        gRootNode = gScene->mRootNode;
         if (!rootNodeName.empty())
         {
-            rootNode = findNode(rootNodeName, scene->mRootNode, false);
-            if (!rootNode)
+            gRootNode = findNode(rootNodeName, gRootNode, false);
+            if (!gRootNode)
                 errorExit("Could not find scene node " + rootNodeName);
         }
         
-        if (!resourcePath.empty())
-            resourcePath = fixPath(resourcePath);
+        switch (gCommand)
+        {
+        case CMD_DUMP:
+            dumpNodes(gRootNode, 0);
+            return;
         
-        if (command == "model")
-            exportModel(scene, rootNode, outFile, noAnimations);
-        if (command == "scene")
-            exportScene(scene, rootNode, outFile, resourcePath, localIDs, noExtensions, saveBinary);
-        if ((!noMaterials) && ((command == "model") || (command == "scene")))
-            exportMaterials(scene, outFile, resourcePath);
-        if (command == "dumpnodes")
-            dumpNodes(scene, rootNode, 0);
+        case CMD_MODEL:
+            exportModel(outFile);
+            break;
+            
+        case CMD_SCENE:
+            exportScene(outFile);
+            break;
+        }
+        
+        if (!noMaterials)
+        {
+            std::set<std::string> usedTextures;
+            exportMaterials(usedTextures);
+            copyTextures(usedTextures, getPath(inFile));
+        }
     }
-    else if (command == "lod")
+    else
     {
         std::vector<float> lodDistances;
         std::vector<std::string> modelNames;
@@ -334,13 +401,13 @@ void run(const std::vector<std::string>& arguments)
         for (unsigned i = 1; i < numLodArguments + 1; ++i)
         {
             if (i == numLodArguments)
-                outFile = arguments[i];
+                outFile = replace(arguments[i], '\\', '/');
             else
             {
                 if (i & 1)
                     lodDistances.push_back(max(toFloat(arguments[i]), 0.0f));
                 else
-                    modelNames.push_back(arguments[i]);
+                    modelNames.push_back(replace(arguments[i], '\\', '/'));
             }
         }
         
@@ -359,11 +426,9 @@ void run(const std::vector<std::string>& arguments)
         
         combineLods(lodDistances, modelNames, outFile, collisionLodLevel, raycastLodLevel, occlusionLodLevel);
     }
-    else
-        errorExit("Unrecognized command " + command);
 }
 
-void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level)
+void dumpNodes(aiNode* rootNode, unsigned level)
 {
     if (!rootNode)
         return;
@@ -386,27 +451,34 @@ void dumpNodes(const aiScene* scene, aiNode* rootNode, unsigned level)
         std::cout << indent << "  " << rootNode->mNumMeshes << " geometries" << std::endl;
     
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
-        dumpNodes(scene, rootNode->mChildren[i], level + 1);
+        dumpNodes(rootNode->mChildren[i], level + 1);
 }
 
-void exportModel(const aiScene* scene, aiNode* rootNode, const std::string& outName, bool noAnimations)
+void exportModel(const std::string& outName)
 {
     if (outName.empty())
         errorExit("No output file defined");
     
     ExportModel model;
-    model.mScene = scene;
-    model.mRootNode = rootNode;
+    model.mRootNode = gRootNode;
     model.mOutName = outName;
     
     collectMeshes(model, model.mRootNode);
     collectBones(model);
     buildBoneCollisionInfo(model);
     buildAndSaveModel(model);
-    if (!noAnimations)
+    if (!gNoAnimations)
     {
         collectAnimations(model);
         buildAndSaveAnimations(model);
+    }
+    
+    // Write material references if requested
+    if (!gMaterialListName.empty())
+    {
+        File listFile(gMaterialListName, FILE_WRITE);
+        for (unsigned i = 0; i < model.mMeshes.size(); ++i)
+            listFile.writeLine(getMeshMaterialName(model.mMeshes[i]));
     }
 }
 
@@ -414,7 +486,7 @@ void collectMeshes(ExportModel& model, aiNode* node)
 {
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
     {
-        aiMesh* mesh = model.mScene->mMeshes[node->mMeshes[i]];
+        aiMesh* mesh = gScene->mMeshes[node->mMeshes[i]];
         for (unsigned j = 0; j < model.mMeshes.size(); ++j)
         {
             if (mesh == model.mMeshes[j])
@@ -451,7 +523,7 @@ void collectBones(ExportModel& model)
         {
             aiBone* bone = mesh->mBones[j];
             std::string boneName(toStdString(bone->mName));
-            aiNode* boneNode = findNode(boneName, model.mScene->mRootNode, true);
+            aiNode* boneNode = findNode(boneName, gScene->mRootNode, true);
             if (!boneNode)
                 errorExit("Could not find scene node for bone " + boneName);
             necessary.insert(boneNode);
@@ -488,6 +560,9 @@ void collectBones(ExportModel& model)
         necessary.insert(commonParent);
     }
     
+    if (rootNodes.empty())
+        return;
+    
     model.mRootBone = *rootNodes.begin();
     collectBonesFinal(model.mBones, necessary, model.mRootBone);
     // Initialize the bone collision info
@@ -512,7 +587,7 @@ void collectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& nece
 
 void collectAnimations(ExportModel& model)
 {
-    const aiScene* scene = model.mScene;
+    const aiScene* scene = gScene;
     for (unsigned i = 0; i < scene->mNumAnimations; ++i)
     {
         aiAnimation* anim = scene->mAnimations[i];
@@ -539,7 +614,6 @@ void buildBoneCollisionInfo(ExportModel& model)
     for (unsigned i = 0; i < model.mMeshes.size(); ++i)
     {
         aiMesh* mesh = model.mMeshes[i];
-        aiMatrix4x4 meshWorldTransform = getDerivedTransform(model.mMeshNodes[i], 0);
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
@@ -548,9 +622,6 @@ void buildBoneCollisionInfo(ExportModel& model)
             if (boneIndex == M_MAX_UNSIGNED)
                 continue;
             aiNode* boneNode = model.mBones[boneIndex];
-            aiMatrix4x4 boneWorldTransform = getDerivedTransform(boneNode, 0);
-            aiMatrix4x4 boneInverse = boneWorldTransform;
-            boneInverse.Inverse();
             for (unsigned k = 0; k < bone->mNumWeights; ++k)
             {
                 float weight = bone->mWeights[k].mWeight;
@@ -577,12 +648,6 @@ void buildAndSaveModel(ExportModel& model)
         errorExit("No geometries found starting from node " + rootNodeName);
     
     std::cout << "Writing model " << rootNodeName << std::endl;
-    
-    if (model.mBones.size())
-    {
-        std::cout << "Model has a skeleton with " << model.mBones.size() << " bones, rootbone " +
-            toStdString(model.mRootBone->mName) << std::endl;
-    }
     
     SharedPtr<Model> outModel(new Model(0));
     outModel->setNumGeometries(model.mMeshes.size());
@@ -615,15 +680,17 @@ void buildAndSaveModel(ExportModel& model)
     
     if (!combineBuffers)
     {
-        std::cout << "Using separate buffers" << std::endl;
+        std::cout << "Writing separate buffers" << std::endl;
         for (unsigned i = 0; i < model.mMeshes.size(); ++i)
         {
-            // Get the world transform of the mesh for baking into the vertices
-            Vector3 pos, scale;
-            Quaternion rot;
-            getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            // Get the world transform of the mesh for baking into the vertices (model mode only)
             Matrix4x3 vertexTransform;
             Matrix3 normalTransform;
+            Vector3 pos(Vector3::sZero);
+            Quaternion rot(Quaternion::sIdentity);
+            Vector3 scale(Vector3::sUnity);
+            if (gCommand == CMD_MODEL)
+                getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
             vertexTransform.define(pos, rot, scale);
             normalTransform = rot.getRotationMatrix();
             
@@ -632,8 +699,8 @@ void buildAndSaveModel(ExportModel& model)
             SharedPtr<Geometry> geom(new Geometry());
             
             aiMesh* mesh = model.mMeshes[i];
-            std::cout << "Geometry " << i << " has " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
-                << std::endl;
+            std::cout << "Writing geometry " << i << " with " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 
+                << " indices" << std::endl;
             
             bool largeIndices = mesh->mNumVertices > 65535;
             unsigned elementMask = getElementMask(mesh);
@@ -684,7 +751,6 @@ void buildAndSaveModel(ExportModel& model)
     }
     else
     {
-        std::cout << "Using combined buffers" << std::endl;
         SharedPtr<IndexBuffer> ib(new IndexBuffer(0));
         SharedPtr<VertexBuffer> vb(new VertexBuffer(0));
         
@@ -702,20 +768,22 @@ void buildAndSaveModel(ExportModel& model)
         
         for (unsigned i = 0; i < model.mMeshes.size(); ++i)
         {
-            // Get the world transform of the mesh for baking into the vertices
-            Vector3 pos, scale;
-            Quaternion rot;
-            getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            // Get the world transform of the mesh for baking into the vertices (model mode only)
             Matrix4x3 vertexTransform;
             Matrix3 normalTransform;
+            Vector3 pos(Vector3::sZero);
+            Quaternion rot(Quaternion::sIdentity);
+            Vector3 scale(Vector3::sUnity);
+            if (gCommand == CMD_MODEL)
+                getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
             vertexTransform.define(pos, rot, scale);
             normalTransform = rot.getRotationMatrix();
             
             SharedPtr<Geometry> geom(new Geometry());
             
             aiMesh* mesh = model.mMeshes[i];
-            std::cout << "Geometry " << i << " has " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 << " indices"
-                << std::endl;
+            std::cout << "Writing geometry " << i << " with " << mesh->mNumVertices << " vertices " << mesh->mNumFaces * 3 
+                << " indices" << std::endl;
             
             // Build the index data
             if (!largeIndices)
@@ -760,8 +828,11 @@ void buildAndSaveModel(ExportModel& model)
     outModel->setBoundingBox(box);
     
     // Build skeleton if necessary
-    if (model.mBones.size())
+    if ((model.mBones.size()) && (model.mRootBone))
     {
+        std::cout << "Writing skeleton with " << model.mBones.size() << " bones, rootbone " +
+            toStdString(model.mRootBone->mName) << std::endl;
+        
         Skeleton skeleton;
         std::vector<SharedPtr<Bone> > srcBones;
         
@@ -773,19 +844,17 @@ void buildAndSaveModel(ExportModel& model)
             srcBones.push_back(SharedPtr<Bone>(new Bone(0, boneName)));
             srcBones[i]->setRootBone(srcBones[0]);
             
-            aiMatrix4x4 transform;
-            Vector3 pos, scale;
-            Quaternion rot;
-            transform = boneNode->mTransformation;
-            
-            // Get offset information if exists
-            srcBones[i]->setOffsetMatrix(getOffsetMatrix(model, boneName, true));
-            
+            aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
             if (boneNode == model.mRootBone)
-                transform = getDerivedTransform(transform, boneNode, model.mRootNode);
+                transform = getDerivedTransform(boneNode, model.mRootNode);
             
+            Vector3 pos, scale;
+            Quaternion rot;
             getPosRotScale(transform, pos, rot, scale);
+            
+            // Get offset information if exists
+            srcBones[i]->setOffsetMatrix(getOffsetMatrix(model, boneName, gCommand == CMD_MODEL));
             
             srcBones[i]->setInitialTransform(pos, rot, scale);
             srcBones[i]->setRadius(model.mBoneRadii[i]);
@@ -823,7 +892,7 @@ void buildAndSaveAnimations(ExportModel& model)
         std::string animName = toStdString(anim->mName);
         if (animName.empty())
             animName = "Anim" + toString(i + 1);
-        std::string animOutName = getPath(model.mOutName) + getFileName(model.mOutName) + "_" + animName + ".ani";
+        std::string animOutName = getPath(model.mOutName) + getFileName(model.mOutName) + "_" + sanitateAssetName(animName) + ".ani";
         
         SharedPtr<Animation> outAnim(new Animation());
         float tickConversion = 1.0f / (float)anim->mTicksPerSecond;
@@ -956,23 +1025,16 @@ void buildAndSaveAnimations(ExportModel& model)
     }
 }
 
-void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outName, const std::string& resourcePath, bool localIDs,
-    bool noExtensions, bool saveBinary)
+void exportScene(const std::string& outName)
 {
-    if (outName.empty())
-        errorExit("No output file defined");
-    
     ExportScene outScene;
     outScene.mOutName = outName;
-    outScene.mResourcePath = resourcePath;
-    outScene.mLocalIDs = localIDs;
-    outScene.mNoExtensions = noExtensions;
-    outScene.mSaveBinary = saveBinary;
-    outScene.mScene = scene;
-    outScene.mRootNode = rootNode;
+    outScene.mRootNode = gRootNode;
     
-    collectSceneModels(outScene, rootNode);
-    collectSceneNodes(outScene, rootNode);
+    if (gUseSubdirs)
+        createDirectory(gResourcePath + "Models");
+    
+    collectSceneModels(outScene, gRootNode);
     
     // Save models
     try
@@ -980,8 +1042,9 @@ void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outN
         for (unsigned i = 0; i < outScene.mModels.size(); ++i)
             buildAndSaveModel(outScene.mModels[i]);
     }
-    catch (...)
+    catch (Exception &e)
     {
+        std::cout << e.whatStr() << std::endl;
     }
     
     // Save scene
@@ -990,19 +1053,18 @@ void exportScene(const aiScene* scene, aiNode* rootNode, const std::string& outN
 
 void collectSceneModels(ExportScene& scene, aiNode* node)
 {
-    std::vector<std::pair<aiNode*, aiMesh*> > meshes = getMeshesUnderNode(scene.mScene, node);
-    // If meshes encountered, do not recurse further, but build a model for export
+    std::vector<std::pair<aiNode*, aiMesh*> > meshes;
+    getMeshesUnderNode(meshes, node);
+    
     if (meshes.size())
     {
         ExportModel model;
-        model.mScene = scene.mScene;
         model.mRootNode = node;
-        model.mOutName = getPath(scene.mOutName) + toStdString(node->mName) + ".mdl";
-        std::cout << "Found model " << model.mOutName << std::endl;
+        model.mOutName = gResourcePath + (gUseSubdirs ? "Models/" : "") + sanitateAssetName(toStdString(node->mName)) + ".mdl";
         for (unsigned i = 0; i < meshes.size(); ++i)
         {
             aiMesh* mesh = meshes[i].second;
-            unsigned meshIndex = getMeshIndex(scene.mScene, mesh);
+            unsigned meshIndex = getMeshIndex(mesh);
             model.mMeshIndices.insert(meshIndex);
             model.mMeshes.push_back(mesh);
             model.mMeshNodes.push_back(meshes[i].first);
@@ -1016,44 +1078,33 @@ void collectSceneModels(ExportScene& scene, aiNode* node)
         {
             if (scene.mModels[i].mMeshIndices == model.mMeshIndices)
             {
+                std::cout << "Added node " << toStdString(node->mName) << std::endl;
+                scene.mNodes.push_back(node);
+                scene.mNodeModelIndices.push_back(i);
                 unique = false;
                 break;
             }
         }
         if (unique)
         {
+            std::cout << "Added model " << model.mOutName << std::endl;
+            std::cout << "Added node " << toStdString(node->mName) << std::endl;
             collectBones(model);
             buildBoneCollisionInfo(model);
+            if (!gNoAnimations)
+            {
+                collectAnimations(model);
+                buildAndSaveAnimations(model);
+            }
+            
             scene.mModels.push_back(model);
+            scene.mNodes.push_back(node);
+            scene.mNodeModelIndices.push_back(scene.mModels.size() - 1);
         }
-        return;
     }
-    // If no meshes found, recurse to child nodes
+    
     for (unsigned i = 0; i < node->mNumChildren; ++i)
         collectSceneModels(scene, node->mChildren[i]);
-}
-
-void collectSceneNodes(ExportScene& scene, aiNode* node)
-{
-    std::set<unsigned> meshIndices = getMeshesUnderNodeSet(node);;
-    if (meshIndices.size())
-    {
-        // Check if a matching set of mesh indices is found from the models we are going to write (should be)
-        for (unsigned i = 0; i < scene.mModels.size(); ++i)
-        {
-            if (scene.mModels[i].mMeshIndices == meshIndices)
-            {
-                std::cout << "Found node " << toStdString(node->mName) << std::endl;
-                scene.mNodes.push_back(node);
-                scene.mNodeModelIndices.push_back(i);
-                break;
-            }
-        }
-        return;
-    }
-    // If no meshes found, recurse to child nodes
-    for (unsigned i = 0; i < node->mNumChildren; ++i)
-        collectSceneNodes(scene, node->mChildren[i]);
 }
 
 void buildAndSaveScene(ExportScene& scene)
@@ -1061,16 +1112,29 @@ void buildAndSaveScene(ExportScene& scene)
     std::cout << "Writing scene" << std::endl;
     
     SharedPtr<Scene> outScene(new Scene(0, getFileName(scene.mOutName)));
-    if (!scene.mNoExtensions)
+    
+    //! \todo Make the physics properties configurable
+    PhysicsWorld* physicsWorld = new PhysicsWorld();
+    physicsWorld->setGravity(Vector3(0.0f, -9.81f, 0.0f));
+    outScene->addExtension(physicsWorld);
+    
+    //! \todo Make the octree properties configurable, or detect from the scene contents
+    Octree* octree = new Octree(BoundingBox(-1000.0f, 1000.0f), 8, true);
+    outScene->addExtension(octree);
+    
+    if (gCreateZone)
     {
-        //! \todo Make the physics properties configurable
-        PhysicsWorld* physicsWorld = new PhysicsWorld();
-        physicsWorld->setGravity(Vector3(0.0f, -9.81f, 0.0f));
-        outScene->addExtension(physicsWorld);
+        Entity* entity = outScene->createEntity("Zone", gLocalIDs);
         
-        //! \todo Make the octree properties configurable, or detect from the scene contents
-        Octree* octree = new Octree(BoundingBox(-1000.0f, 1000.0f), 8, true);
-        outScene->addExtension(octree);
+        Zone* zone = new Zone();
+        entity->addComponent(zone);
+        zone->setBoundingBox(BoundingBox(-1000.0f, 1000.f));
+        zone->setAmbientColor(Color(0.25f, 0.25f, 0.25f));
+        
+        Light* light = new Light();
+        entity->addComponent(light);
+        light->setLightType(LIGHT_DIRECTIONAL);
+        light->setRotation(Vector3(60.0f, 30.0f, 0.0f));
     }
     
     std::map<std::string, SharedPtr<Material> > dummyMaterials;
@@ -1080,11 +1144,11 @@ void buildAndSaveScene(ExportScene& scene)
         const ExportModel& model = scene.mModels[scene.mNodeModelIndices[i]];
         
         // Create a simple entity and static model component for each node
-        Entity* entity = outScene->createEntity(toStdString(scene.mNodes[i]->mName), scene.mLocalIDs);
+        Entity* entity = outScene->createEntity(toStdString(scene.mNodes[i]->mName), gLocalIDs);
         StaticModel* staticModel = new StaticModel();
         entity->addComponent(staticModel);
         // Create a dummy model so that the reference can be stored
-        std::string modelPath = scene.mResourcePath + getFileNameAndExtension(model.mOutName);
+        std::string modelPath = (gUseSubdirs ? "Models/" : "") + getFileNameAndExtension(model.mOutName);
         SharedPtr<Model> dummyModel(new Model(0, modelPath));
         dummyModel->setNumGeometries(model.mMeshes.size());
         staticModel->setModel(dummyModel);
@@ -1096,48 +1160,48 @@ void buildAndSaveScene(ExportScene& scene)
         // Set materials if they are known
         for (unsigned j = 0; j < model.mMeshes.size(); ++j)
         {
-            aiMaterial* material = scene.mScene->mMaterials[model.mMeshes[j]->mMaterialIndex];
-            aiString matNameStr;
-            material->Get(AI_MATKEY_NAME, matNameStr);
-            std::string matName = toStdString(matNameStr);
+            std::string matName = getMeshMaterialName(model.mMeshes[j]);
             if (!matName.empty())
             {
-                std::string matPath = scene.mResourcePath + matName + ".xml";
                 // Create a dummy material so that the reference can be stored
                 if (dummyMaterials.find(matName) == dummyMaterials.end())
-                    dummyMaterials[matName] = new Material(matPath);
+                    dummyMaterials[matName] = new Material(matName);
                 staticModel->setMaterial(j, dummyMaterials[matName]);
             }
         }
     }
     
     File file(scene.mOutName, FILE_WRITE);
-    if (!scene.mSaveBinary)
+    if (!gSaveBinary)
         outScene->saveXML(file);
     else
         outScene->save(file);
 }
 
-void exportMaterials(const aiScene* scene, const std::string& outName, const std::string& resourcePath)
+void exportMaterials(std::set<std::string>& usedTextures)
 {
-    for (unsigned i = 0; i < scene->mNumMaterials; ++i)
+    if (gUseSubdirs)
+        createDirectory(gResourcePath + "Materials");
+    
+    for (unsigned i = 0; i < gScene->mNumMaterials; ++i)
     {
         try
         {
-            buildAndSaveMaterial(scene->mMaterials[i], outName, resourcePath);
+            buildAndSaveMaterial(gScene->mMaterials[i], usedTextures);
         }
-        catch (...)
+        catch (Exception& e)
         {
+            std::cout << e.whatStr() << std::endl;
         }
     }
 }
 
-void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, const std::string& resourcePath)
+void buildAndSaveMaterial(aiMaterial* material, std::set<std::string>& usedTextures)
 {
     // Material must have name so it can be successfully saved
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
-    std::string matName = toStdString(matNameStr);
+    std::string matName = sanitateAssetName(toStdString(matNameStr));
     if (matName.empty())
         return;
     
@@ -1151,11 +1215,13 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
     std::string normalTexName;
     Color diffuseColor;
     bool hasAlpha = false;
+    bool twoSided = false;
     float specIntensity = 0.0f;
     float specPower = 1.0f;
     
     aiString stringVal;
     float floatVal;
+    int intVal;
     aiColor3D colorVal;
     
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
@@ -1174,6 +1240,8 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
         specPower = floatVal;
     if (material->Get(AI_MATKEY_SHININESS_STRENGTH, floatVal) == AI_SUCCESS)
         specIntensity = floatVal;
+    if (material->Get(AI_MATKEY_TWOSIDED, intVal) == AI_SUCCESS)
+        twoSided = (intVal != 0);
     
     std::string baseMatName = "Materials/Default";
     if (!diffuseTexName.empty())
@@ -1184,6 +1252,9 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
     }
     if (hasAlpha)
         baseMatName += "Alpha";
+    if (twoSided)
+        baseMatName += "TS";
+    
     XMLElement baseElem = materialElem.createChildElement("base");
     baseElem.setString("name", baseMatName + ".xml");
     
@@ -1192,13 +1263,15 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
     {
         XMLElement diffuseElem = techniqueElem.createChildElement("texture");
         diffuseElem.setString("unit", "diffuse");
-        diffuseElem.setString("name", resourcePath + diffuseTexName);
+        diffuseElem.setString("name", (gUseSubdirs ? "Textures/" : "") + diffuseTexName);
+        usedTextures.insert(diffuseTexName);
     }
     if (!normalTexName.empty())
     {
         XMLElement normalElem = techniqueElem.createChildElement("texture");
         normalElem.setString("unit", "diffuse");
-        normalElem.setString("name", resourcePath + normalTexName);
+        normalElem.setString("name", (gUseSubdirs ? "Textures/" : "") + normalTexName);
+        usedTextures.insert(normalTexName);
     }
     XMLElement diffuseColorElem = techniqueElem.createChildElement("parameter");
     diffuseColorElem.setString("name", "MatDiffColor");
@@ -1207,8 +1280,20 @@ void buildAndSaveMaterial(aiMaterial* material, const std::string& outName, cons
     specularElem.setString("name", "MatSpecProperties");
     specularElem.setVector2("value", Vector2(specIntensity, specPower));
     
-    File outFile(getPath(outName) + matName + ".xml", FILE_WRITE);
+    File outFile(gResourcePath + (gUseSubdirs ? "Materials/" : "" ) + matName + ".xml", FILE_WRITE);
     outMaterial.save(outFile);
+}
+
+void copyTextures(const std::set<std::string>& usedTextures, const std::string& sourcePath)
+{
+    if (gUseSubdirs)
+        createDirectory(gResourcePath + "Textures");
+    
+    for (std::set<std::string>::const_iterator i = usedTextures.begin(); i != usedTextures.end(); ++i)
+    {
+        std::cout << "Copying texture " << *i << std::endl;
+        copyFile(sourcePath + *i, gResourcePath + (gUseSubdirs ? "Textures/" : "") + *i);
+    }
 }
 
 void combineLods(const std::vector<float>& lodDistances, const std::vector<std::string>& modelNames, const std::string& outName,
@@ -1283,41 +1368,17 @@ void combineLods(const std::vector<float>& lodDistances, const std::vector<std::
     outModel->save(outFile);
 }
 
-std::set<unsigned> getMeshesUnderNodeSet(aiNode* node)
+void getMeshesUnderNode(std::vector<std::pair<aiNode*, aiMesh*> >& dest, aiNode* node)
 {
-    std::set<unsigned> ret;
-    
-    // Do not check this model directly, but rather check if there are meshes in the immediate children
-    for (unsigned i = 0; i < node->mNumChildren; ++i)
-    {
-        aiNode* childNode = node->mChildren[i];
-        for (unsigned j = 0; j < childNode->mNumMeshes; ++j)
-            ret.insert(childNode->mMeshes[j]);
-    }
-    
-    return ret;
+    for (unsigned i = 0; i < node->mNumMeshes; ++i)
+        dest.push_back(std::make_pair(node, gScene->mMeshes[node->mMeshes[i]]));
 }
 
-std::vector<std::pair<aiNode*, aiMesh*> > getMeshesUnderNode(const aiScene* scene, aiNode* node)
+unsigned getMeshIndex(aiMesh* mesh)
 {
-    std::vector<std::pair<aiNode*, aiMesh*> > ret;
-    
-    // Do not check this model directly, but rather check if there are meshes in the immediate children
-    for (unsigned i = 0; i < node->mNumChildren; ++i)
+    for (unsigned i = 0; i < gScene->mNumMeshes; ++i)
     {
-        aiNode* childNode = node->mChildren[i];
-        for (unsigned j = 0; j < childNode->mNumMeshes; ++j)
-            ret.push_back(std::make_pair(childNode, scene->mMeshes[childNode->mMeshes[j]]));
-    }
-    
-    return ret;
-}
-
-unsigned getMeshIndex(const aiScene* scene, aiMesh* mesh)
-{
-    for (unsigned i = 0; i < scene->mNumMeshes; ++i)
-    {
-        if (scene->mMeshes[i] == mesh)
+        if (gScene->mMeshes[i] == mesh)
             return i;
     }
     return M_MAX_UNSIGNED;
@@ -1425,6 +1486,18 @@ void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneM
             }
         }
     }
+}
+
+std::string getMeshMaterialName(aiMesh* mesh)
+{
+    aiMaterial* material = gScene->mMaterials[mesh->mMaterialIndex];
+    aiString matNameStr;
+    material->Get(AI_MATKEY_NAME, matNameStr);
+    std::string matName = sanitateAssetName(toStdString(matNameStr));
+    if (matName.empty())
+        return matName;
+    else
+        return (gUseSubdirs ? "Materials/" : "") + matName + ".xml";
 }
 
 void writeShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset)
@@ -1557,23 +1630,17 @@ aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive)
 
 aiMatrix4x4 getDerivedTransform(aiNode* node, aiNode* rootNode)
 {
-    aiMatrix4x4 current = node->mTransformation;
-    // If basenode is defined, go only up to it in the parent chain
-    while ((node->mParent) && (node != rootNode))
-    {
-        node = node->mParent;
-        current = node->mTransformation * current;
-    }
-    return current;
+    return getDerivedTransform(node->mTransformation, node, rootNode);
 }
 
 aiMatrix4x4 getDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode)
 {
     // If basenode is defined, go only up to it in the parent chain
-    while ((node->mParent) && (node != rootNode))
+    while ((node) && (node != rootNode))
     {
         node = node->mParent;
-        transform = node->mTransformation * transform;
+        if (node)
+            transform = node->mTransformation * transform;
     }
     return transform;
 }
@@ -1611,6 +1678,22 @@ Vector2 toVector2(const aiVector2D& vec)
 Quaternion toQuaternion(const aiQuaternion& quat)
 {
     return Quaternion(quat.w, quat.x, quat.y, quat.z);
+}
+
+std::string sanitateAssetName(const std::string& name)
+{
+    std::string fixedName = name;
+    replaceInPlace(fixedName, "<", "");
+    replaceInPlace(fixedName, ">", "");
+    replaceInPlace(fixedName, "?", "");
+    replaceInPlace(fixedName, "*", "");
+    replaceInPlace(fixedName, ":", "");
+    replaceInPlace(fixedName, "\"", "");
+    replaceInPlace(fixedName, "/", "");
+    replaceInPlace(fixedName, "\\", "");
+    replaceInPlace(fixedName, "|", "");
+    
+    return fixedName;
 }
 
 void errorExit(const std::string& error)

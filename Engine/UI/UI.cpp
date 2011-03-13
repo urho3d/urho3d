@@ -358,7 +358,7 @@ UIElement* UI::getElementAt(int x, int y, bool enabledOnly)
     return getElementAt(IntVector2(x, y), enabledOnly);
 }
 
-UIElement* UI::getFocusElement()
+UIElement* UI::getFocusElement() const
 {
     std::vector<UIElement*> allChildren = mRootElement->getChildren(true);
     for (std::vector<UIElement*>::iterator i = allChildren.begin(); i != allChildren.end(); ++i)
@@ -368,6 +368,29 @@ UIElement* UI::getFocusElement()
     }
     
     return 0;
+}
+
+UIElement* UI::getFrontElement() const
+{
+    std::vector<UIElement*> rootChildren = mRootElement->getChildren(false);
+    int maxPriority = M_MIN_INT;
+    UIElement* front = 0;
+    
+    for (unsigned i = 0; i < rootChildren.size(); ++i)
+    {
+        // Do not take into account input-disabled elements, hidden elements or those that are always in the front
+        if ((!rootChildren[i]->isEnabled()) || (!rootChildren[i]->isVisible()) || (!rootChildren[i]->getBringToBack()))
+            continue;
+        
+        int priority = rootChildren[i]->getPriority();
+        if (priority > maxPriority)
+        {
+            maxPriority = priority;
+            front = rootChildren[i];
+        }
+    }
+    
+    return front;
 }
 
 IntVector2 UI::getCursorPosition()

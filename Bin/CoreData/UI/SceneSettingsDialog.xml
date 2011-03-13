@@ -52,4 +52,14 @@
             <fixedwidth value="160" />
        </element>
     </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Physics FPS" />
+        </element>
+       <element type="LineEdit" name="PhysicsFPSEdit">
+            <fixedwidth value="160" />
+       </element>
+    </element>
 </element>

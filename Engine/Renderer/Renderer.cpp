@@ -356,6 +356,11 @@ void Renderer::setMode(int width, int height)
     setMode(mMode, width, height, mFullscreen, mVsync, mMultiSample);
 }
 
+void Renderer::setMode(RenderMode mode)
+{
+    setMode(mode, mWidth, mHeight, mFullscreen, mVsync, mMultiSample);
+}
+
 void Renderer::toggleFullscreen()
 {
     setMode(mMode, mWidth, mHeight, !mFullscreen, mVsync, mMultiSample);

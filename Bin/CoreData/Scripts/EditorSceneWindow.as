@@ -147,10 +147,26 @@ void updateSceneWindowEntity(uint itemIndex, Entity@ entity)
     }
 }
 
+void updateSceneWindowEntityOnly(uint itemIndex, Entity@ entity)
+{
+    ListView@ list = sceneWindow.getChild("EntityList", true);
+
+    Text@ text = list.getItem(itemIndex);
+    if (text is null)
+        return;
+    text.setText(getEntityTitle(entity));
+}
+
 void updateSceneWindowEntity(Entity@ entity)
 {
     uint index = getEntityListIndex(entity);
     updateSceneWindowEntity(index, entity);
+}
+
+void updateSceneWindowEntityOnly(Entity@ entity)
+{
+    uint index = getEntityListIndex(entity);
+    updateSceneWindowEntityOnly(index, entity);
 }
 
 void addComponentToSceneWindow(Entity@ entity, array<Component@>@ components, uint componentID, int indent)
@@ -534,6 +550,14 @@ void calculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion&
     pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.getWorldPosition()));
 }
 
+void updateAndFocusNewEntity(Entity@ newEntity)
+{
+    updateSceneWindowEntity(newEntity);
+    uint index = getEntityListIndex(newEntity);
+    ListView@ list = sceneWindow.getChild("EntityList", true);
+    list.setSelection(index);
+}
+
 void handleCreateEntity(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ list = eventData["Element"].getUIElement();
@@ -543,11 +567,7 @@ void handleCreateEntity(StringHash eventType, VariantMap& eventData)
     bool local = (mode == 1);
     
     Entity@ newEntity = editorScene.createEntity("", local);
-    updateSceneWindowEntity(newEntity);
-    uint index = getEntityListIndex(newEntity);
-
-    ListView@ entityList = sceneWindow.getChild("EntityList", true);
-    entityList.setSelection(index);
+    updateAndFocusNewEntity(newEntity);
 }
 
 void handleCreateComponent(StringHash eventType, VariantMap& eventData)
@@ -600,29 +620,29 @@ void sceneDelete()
         
         @selectedComponent = null;
         
-        updateSceneWindowEntity(entityIndex, entity);
+        updateSceneWindowEntity(entityIndex, selectedEntity);
         
         // Select the next item in the same index
         list.setSelection(index);
     }
     // Remove entity
-    if ((selectedEntity !is null) && (selectedComponent is null))
+    else if ((selectedEntity !is null) && (selectedComponent is null))
     {
         // Entity operations are dangerous. Require the scene hierarchy to be focused
         if (!checkSceneWindowFocus(false))
             return;
-         
+
         uint id = selectedEntity.getID();
-        
+
         beginModify(id);
         editorScene.removeEntity(selectedEntity);
         endModify(id);
-        
+
         @selectedComponent = null;
         @selectedEntity = null;
-        
+
         updateSceneWindowEntity(entityIndex, null);
-        
+
         // Select the next item in the same index
         list.setSelection(index);
     }
@@ -659,7 +679,7 @@ void sceneCopy()
         copyBufferEntityID = selectedEntity.getID();
     }
     // Copy entity
-    if ((selectedEntity !is null) && (selectedComponent is null))
+    else if ((selectedEntity !is null) && (selectedComponent is null))
     {
         if (!checkSceneWindowFocus(false))
             return;
@@ -705,8 +725,7 @@ void scenePaste()
         
         updateSceneWindowEntity(selectedEntity);
     }
-    
-    if (mode == "entity")
+    else if (mode == "entity")
     {
         if (!checkSceneWindowFocus(false))
             return;
@@ -716,7 +735,7 @@ void scenePaste()
         uint newEntityID = newEntity.getID();
         
         beginModify(newEntityID);
-        
+
         // Before loading, rewrite scene node references to the copied entity
         XMLElement compElem = rootElem.getChildElement("component");
         bool rewrite = false;
@@ -740,10 +759,7 @@ void scenePaste()
         
         endModify(newEntityID);
         
-        updateSceneWindowEntity(newEntity);
-        uint index = getEntityListIndex(newEntity);
-        
-        ListView@ list = sceneWindow.getChild("EntityList", true);
-        list.setSelection(index);
+        updateAndFocusNewEntity(newEntity);
     }
 }
+

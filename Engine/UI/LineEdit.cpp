@@ -321,7 +321,7 @@ void LineEdit::onKey(int key, int buttons, int qualifiers)
             eventData[P_QUALIFIERS] = qualifiers;
             sendEvent(EVENT_UNHANDLEDKEY, eventData);
         }
-        break;
+        return;
     }
     
     if (changed)
@@ -375,8 +375,8 @@ void LineEdit::onChar(unsigned char c, int buttons, int qualifiers)
         VariantMap eventData;
         eventData[P_ELEMENT] = (void*)this;
         eventData[P_TEXT] = mLine;
-        // This event may potentially cause deletion
-        SAFE_SEND_EVENT(EVENT_TEXTFINISHED, eventData);
+        sendEvent(EVENT_TEXTFINISHED, eventData);
+        return;
     }
     else if ((c >= 0x20) && ((!mMaxLength) || (mLine.length() < mMaxLength)))
     {

@@ -8,11 +8,13 @@ Window@ sceneSettingsDialog;
 
 string sceneFileName;
 string sceneResourcePath;
+float newNodeDistance = 20;
 bool sceneModified = false;
 bool runPhysics = false;
-bool subscribedToSceneSettingsEdits = false;
+bool renderingDebug = false;
+bool physicsDebug = false;
 bool octreeDebug = false;
-int debugGeometryMode = 0;
+bool subscribedToSceneSettingsEdits = false;
 
 Component@ selectedComponent;
 Entity@ selectedEntity;
@@ -41,7 +43,7 @@ void createScene()
 
     subscribeToEvent("PostRenderUpdate", "scenePostRenderUpdate");
     subscribeToEvent("UIMouseClick", "sceneMouseClick");
-    
+
     engine.setDefaultScene(editorScene);
     
     updateSceneSettingsDialog();
@@ -76,13 +78,17 @@ void updateSceneSettingsDialog()
     
     LineEdit@ gravityEdit = sceneSettingsDialog.getChild("GravityEdit", true);
     gravityEdit.setText(editorScene.getPhysicsWorld().getGravity().toString());
-    
+
+    LineEdit@ physicsFPSEdit = sceneSettingsDialog.getChild("PhysicsFPSEdit", true);
+    physicsFPSEdit.setText(toString(editorScene.getPhysicsWorld().getFps()));
+
     if (!subscribedToSceneSettingsEdits)
     {
         subscribeToEvent(octreeMinEdit, "TextFinished", "editOctreeMin");
         subscribeToEvent(octreeMaxEdit, "TextFinished", "editOctreeMax");
         subscribeToEvent(octreeLevelsEdit, "TextFinished", "editOctreeLevels");
         subscribeToEvent(gravityEdit, "TextFinished", "editGravity");
+        subscribeToEvent(physicsFPSEdit, "TextFinished", "editPhysicsFPS");
         subscribeToEvent(sceneSettingsDialog.getChild("CloseButton", true), "Released", "hideSceneSettingsDialog");
         subscribedToSceneSettingsEdits = true;
     }
@@ -136,8 +142,17 @@ void editGravity(StringHash eventType, VariantMap& eventData)
     edit.setText(editorScene.getPhysicsWorld().getGravity().toString());
 }
 
+void editPhysicsFPS(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].getUIElement();
+    editorScene.getPhysicsWorld().setFps(edit.getText().toInt());
+    edit.setText(toString(editorScene.getPhysicsWorld().getFps()));
+}
+
 void setResourcePath(string newPath)
 {
+    newPath = fixPath(newPath);
+
     if (newPath == sceneResourcePath)
         return;
 
@@ -149,6 +164,10 @@ void setResourcePath(string newPath)
 
     cache.addResourcePath(newPath);
     sceneResourcePath = newPath;
+    
+    // If scenes were not loaded yet, default load/save to the resource path
+    if (uiScenePath.empty())
+        uiScenePath = newPath;
 }
 
 void reloadResources()
@@ -212,7 +231,7 @@ void loadScene(string fileName)
     editorScene.removeAllEntities();
 
     // Add the new resource path
-    setResourcePath(cache.getPreferredResourcePath(getPath(fileName)));
+    setResourcePath(getPreferredResourcePath(getPath(fileName)));
 
     File file(fileName, FILE_READ);
     string extension = getExtension(fileName);
@@ -307,20 +326,10 @@ void scenePostRenderUpdate()
         }
     }
     
-    switch (debugGeometryMode)
-    {
-        // Draw all renderer debug geometry
-    case 1:
+    if (renderingDebug)
         pipeline.drawDebugGeometry(false);
-        break;
-        
-        // Draw all physics debug geometry
-    case 2:
+    if (physicsDebug)
         editorScene.getPhysicsWorld().drawDebugGeometry(true);
-        break;
-    }
-    
-    // Additionally, draw octree debug
     if (octreeDebug)
         editorScene.getOctree().drawDebugGeometry(true);
     
@@ -353,11 +362,14 @@ void sceneRaycast(bool mouseClick)
     }
 }
 
-void toggleDebugGeometry()
+void toggleRenderingDebug()
 {
-    ++debugGeometryMode;
-    if (debugGeometryMode == 3)
-        debugGeometryMode = 0;
+    renderingDebug = !renderingDebug;
+}
+
+void togglePhysicsDebug()
+{
+    physicsDebug = !physicsDebug;
 }
 
 void toggleOctreeDebug()

@@ -40,8 +40,6 @@
 #pragma warning(disable:4355)
 #endif
 
-static unsigned excludeFlags = 0;
-
 inline static bool compareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
     return lhs.mDistance < rhs.mDistance;
@@ -120,9 +118,11 @@ void Octant::insertNode(VolumeNode* node)
     {
         if (node->mOctant != this)
         {
-            if (node->mOctant)
-                node->mOctant->removeNode(node);
+            // Add first, then remove, because node count going to zero deletes the octree branch in question
+            Octant* oldOctant = node->mOctant;
             addNode(node);
+            if (oldOctant)
+                oldOctant->removeNode(node);
         }
         return;
     }
@@ -191,9 +191,7 @@ void Octant::getNodesInternal(OctreeQuery& query, unsigned mask) const
         VolumeNode* node = *i;
         unsigned nodeFlags = node->getNodeFlags();
         
-        if ((!(nodeFlags & query.mNodeFlags)) || (nodeFlags & excludeFlags))
-            continue;
-        if (!node->isVisible())
+        if ((!(nodeFlags & query.mNodeFlags)) || (!node->isVisible()))
             continue;
         if ((query.mOccludersOnly) && (!node->isOccluder()))
             continue;
@@ -225,9 +223,7 @@ void Octant::getNodesInternal(RayOctreeQuery& query) const
         VolumeNode* node = *i;
         unsigned nodeFlags = node->getNodeFlags();
         
-        if ((!(nodeFlags & query.mNodeFlags)) || (nodeFlags & excludeFlags))
-            continue;
-        if (!node->isVisible())
+        if ((!(nodeFlags & query.mNodeFlags)) || (!node->isVisible()))
             continue;
         if ((query.mOccludersOnly) && (!node->isOccluder()))
             continue;
@@ -275,7 +271,6 @@ void Octant::release()
 Octree::Octree(const BoundingBox& box, unsigned numLevels, bool headless) :
     Octant(box, 0, 0, this),
     mNumLevels(max((int)numLevels, 1)),
-    mExcludeFlags(0),
     mDrawDebugGeometry(false),
     mHeadless(headless)
 {
@@ -350,11 +345,6 @@ void Octree::resize(const BoundingBox& box, unsigned numLevels)
     mCullingBox = BoundingBox(mWorldBoundingBox.mMin - halfSize, mWorldBoundingBox.mMax + halfSize);
 }
 
-void Octree::setExcludeFlags(unsigned nodeFlags)
-{
-    mExcludeFlags = nodeFlags;
-}
-
 void Octree::updateOctree(const FrameInfo& frame)
 {
     {
@@ -392,17 +382,7 @@ void Octree::updateOctree(const FrameInfo& frame)
                 }
                 
                 if (reinsert)
-                {
                     insertNode(node);
-                    
-                    // If old octant (not root) has become empty, delete it
-                    while ((octant != this) && (octant->isEmpty()))
-                    {
-                        Octant* parent = octant->getParent();
-                        parent->deleteChild(octant);
-                        octant = parent;
-                    }
-                }
             }
             else
                 insertNode(node);
@@ -417,7 +397,6 @@ void Octree::getNodes(OctreeQuery& query) const
 {
     PROFILE(Octree_GetNodes);
     
-    excludeFlags = mExcludeFlags;
     query.mResult.clear();
     getNodesInternal(query, 0);
 }
@@ -426,7 +405,6 @@ void Octree::getNodes(RayOctreeQuery& query) const
 {
     PROFILE(Octree_Raycast);
     
-    excludeFlags = mExcludeFlags;
     query.mResult.clear();
     getNodesInternal(query);
     std::sort(query.mResult.begin(), query.mResult.end(), compareRayQueryResults);

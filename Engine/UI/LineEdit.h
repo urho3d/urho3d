@@ -29,6 +29,7 @@
 class Font;
 class Text;
 
+//! A single-line text editor
 class LineEdit : public BorderImage
 {
     DEFINE_TYPE(LineEdit);

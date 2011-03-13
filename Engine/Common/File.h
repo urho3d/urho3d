@@ -105,12 +105,18 @@ std::string getCurrentDirectory();
 bool setCurrentDirectory(const std::string& pathName);
 //! Create a directory
 bool createDirectory(const std::string& pathName);
-//! Execute an external command, block until it exists and return the exit code. Will fail if any allowed paths are defined
+//! Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined
 int systemCommand(const std::string& commandLine);
+//! Run a specific program, block until it exists and return the exit code. Will fail if any allowed paths are defined
+int systemRun(const std::string& fileName, const std::vector<std::string>& arguments);
 //! Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined
 bool systemOpenFile(const std::string& fileName, const std::string& mode = std::string());
 //! Copy a file. Return true if successful
 bool copyFile(const std::string& srcFileName, const std::string& destFileName);
+//! Rename a file. Return true if successful
+bool renameFile(const std::string& srcFileName, const std::string& destFileName);
+//! Delete a file. Return true if successful
+bool deleteFile(const std::string& fileName);
 //! Register a path as being allowed to access
 void registerDirectory(const std::string& pathName);
 //! Check if a path is allowed to be accessed. If no paths defined, all are allowed

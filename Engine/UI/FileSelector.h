@@ -36,7 +36,7 @@ class UIElement;
 class Window;
 class XMLFile;
 
-//! File selector entry
+//! File selector's list entry (file or directory)
 struct FileSelectorEntry
 {
     //! Name

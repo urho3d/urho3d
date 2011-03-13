@@ -817,6 +817,7 @@ static void registerRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void setWindowTitle(const string& in)", asMETHOD(Renderer, setWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void setMode(RenderMode, int, int, bool, bool, int)", asMETHODPR(Renderer, setMode, (RenderMode, int, int, bool, bool, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void setMode(int, int)", asMETHODPR(Renderer, setMode, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void setMode(RenderMode)", asMETHODPR(Renderer, setMode, (RenderMode), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void toggleFullscreen()", asMETHOD(Renderer, toggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void close()", asMETHOD(Renderer, close), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool takeScreenShot(Image@+)", asMETHOD(Renderer, takeScreenShot), asCALL_THISCALL);
@@ -1034,11 +1035,9 @@ static void registerOctree(asIScriptEngine* engine)
     
     registerHashedType<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void resize(const BoundingBox& in, uint)", asMETHOD(Octree, resize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "void setExcludeFlags(uint)", asMETHOD(Octree, setExcludeFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void drawDebugGeometry(bool) const", asMETHOD(Octree, drawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& getWorldBoundingBox() const", asMETHODPR(Octree, getWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint getNumLevels() const", asMETHOD(Octree, getNumLevels), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "uint getExcludeFlags() const", asMETHOD(Octree, getExcludeFlags), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "bool isHeadless() const", asMETHOD(Octree, isHeadless), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "array<RayQueryResult>@ raycast(const Ray& in, uint, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "array<Node@>@ getNodes(const Vector3& in, uint)", asFUNCTION(OctreeGetNodesPoint), asCALL_CDECL_OBJLAST);

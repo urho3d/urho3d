@@ -32,7 +32,7 @@ class IndexBuffer;
 class Renderer;
 class VertexBuffer;
 
-//! Billboard state
+//! One billboard in the billboard set
 struct Billboard
 {
     //! Position

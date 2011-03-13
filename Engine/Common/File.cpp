@@ -30,6 +30,7 @@
 
 #include <cstdlib>
 #include <direct.h>
+#include <process.h>
 #include <windows.h>
 #include <shellapi.h>
 
@@ -247,7 +248,7 @@ bool createDirectory(const std::string& pathName)
         return false;
     }
     
-    bool success = (CreateDirectory(getOSPath(pathName, true).c_str(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
+    bool success = (CreateDirectory(getOSPath(unfixPath(pathName), true).c_str(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
     if (success)
         LOGDEBUG("Created directory " + pathName);
     else
@@ -259,9 +260,27 @@ bool createDirectory(const std::string& pathName)
 int systemCommand(const std::string& commandLine)
 {
     if (allowedDirectories.empty())
-    {
-        LOGINFO("Executing system command: " + commandLine);
         return system(commandLine.c_str());
+    else
+    {
+        LOGERROR("Executing an external command is not allowed");
+        return -1;
+    }
+}
+
+int systemRun(const std::string& fileName, const std::vector<std::string>& arguments)
+{
+    if (allowedDirectories.empty())
+    {
+        std::string fixedFileName = getOSPath(fileName, true);
+        
+        std::vector<const char*> argPtrs;
+        argPtrs.push_back(fixedFileName.c_str());
+        for (unsigned i = 0; i < arguments.size(); ++i)
+            argPtrs.push_back(arguments[i].c_str());
+        argPtrs.push_back(0);
+        
+        return _spawnv(_P_WAIT, fixedFileName.c_str(), &argPtrs[0]);
     }
     else
     {
@@ -280,7 +299,10 @@ bool systemOpenFile(const std::string& fileName, const std::string& mode)
             return false;
         }
         
-        return (int)ShellExecute(0, !mode.empty() ? (char*)mode.c_str() : 0, (char*)getOSPath(fileName, true).c_str(), 0, 0, SW_SHOW) > 32;
+        bool success = (int)ShellExecute(0, !mode.empty() ? (char*)mode.c_str() : 0, (char*)getOSPath(fileName, true).c_str(), 0, 0, SW_SHOW) > 32;
+        if (!success)
+            LOGERROR("Failed to open " + fileName + " externally");
+        return success;
     }
     else
     {
@@ -301,6 +323,7 @@ bool copyFile(const std::string& srcFileName, const std::string& destFileName)
         LOGERROR("Access denied to " + destFileName);
         return false;
     }
+    
     try
     {
         File srcFile(srcFileName, FILE_READ);
@@ -318,6 +341,33 @@ bool copyFile(const std::string& srcFileName, const std::string& destFileName)
     }
     
     return true;
+}
+
+bool renameFile(const std::string& srcFileName, const std::string& destFileName)
+{
+    if (!checkDirectoryAccess(getPath(srcFileName)))
+    {
+        LOGERROR("Access denied to " + srcFileName);
+        return false;
+    }
+    if (!checkDirectoryAccess(getPath(destFileName)))
+    {
+        LOGERROR("Access denied to " + destFileName);
+        return false;
+    }
+    
+    return rename(getOSPath(srcFileName).c_str(), getOSPath(destFileName).c_str()) == 0;
+}
+
+bool deleteFile(const std::string& fileName)
+{
+    if (!checkDirectoryAccess(getPath(fileName)))
+    {
+        LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+    
+    return remove(getOSPath(fileName).c_str()) == 0;
 }
 
 void registerDirectory(const std::string& pathName)

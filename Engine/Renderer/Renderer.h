@@ -71,6 +71,8 @@ public:
     void setMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
     //! Set screen resolution only
     void setMode(int width, int height);
+    //! Set rendering mode only
+    void setMode(RenderMode mode);
     //! Toggle between full screen and windowed mode
     void toggleFullscreen();
     //! Close the window

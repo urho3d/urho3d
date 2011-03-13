@@ -46,7 +46,17 @@ Menu::Menu(const std::string& name) :
 Menu::~Menu()
 {
     if (mPopup)
+    {
         showPopup(false);
+        
+        // Make sure the popup is removed from hierarchy if still visible
+        UIElement* parent = mPopup->getParent();
+        if (parent)
+        {
+            mPopup->getUserData()[originHash].clear();
+            parent->removeChild(mPopup);
+        }
+    }
 }
 
 void Menu::setStyle(const XMLElement& element, ResourceCache* cache)
@@ -103,10 +113,8 @@ void Menu::showPopup(bool enable)
     if (!mPopup)
         return;
     
-    // Find the UI root element for showing the popup. If we are already detached, try to find it through the popup
+    // Find the UI root element for showing the popup
     UIElement* root = getRootElement();
-    if (!root)
-        root = mPopup->getRootElement();
     if (!root)
         return;
     

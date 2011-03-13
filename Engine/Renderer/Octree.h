@@ -72,7 +72,6 @@ public:
         {
             if (*i == node)
             {
-                node->mOctant = 0;
                 mNodes.erase(i);
                 decNodeCount();
                 return;
@@ -114,12 +113,20 @@ protected:
             mParent->incNodeCount();
     }
     
-    //! Decrease scene node count recursively
+    //! Decrease scene node count recursively and remove octant if it became empty
     void decNodeCount()
     {
+        Octant* parent = mParent;
+        
         mNumNodes--;
-        if (mParent)
-            mParent->decNodeCount();
+        if (!mNumNodes)
+        {
+            if (parent)
+                parent->deleteChild(this);
+        }
+        
+        if (parent)
+            parent->decNodeCount();
     }
     
     //! World bounding box
@@ -168,8 +175,7 @@ public:
     
     //! Resize octree. If octree is not empty, scene nodes will be temporarily moved to the root
     void resize(const BoundingBox& box, unsigned numLevels);
-    //! Set global exclude node flags for queries. For debugging/editing purposes only, will not be saved
-    void setExcludeFlags(unsigned nodeFlags);
+
     //! Update and reinsert scene nodes. Called by Pipeline, or by update() if in headless mode
     void updateOctree(const FrameInfo& frame);
     
@@ -179,8 +185,6 @@ public:
     void getNodes(RayOctreeQuery& query) const;
     //! Return subdivision levels
     unsigned getNumLevels() const { return mNumLevels; }
-    //! Return global exclude node flags
-    unsigned getExcludeFlags() const { return mExcludeFlags; }
     //! Return whether is in headless mode
     bool isHeadless() const { return mHeadless; }
     
@@ -202,8 +206,6 @@ private:
     std::set<VolumeNode*> mNodeReinsertions;
     //! Subdivision level
     unsigned mNumLevels;
-    //! Global query exclude flags
-    unsigned mExcludeFlags;
     //! Headless mode flag
     bool mHeadless;
     //! Debug draw flag

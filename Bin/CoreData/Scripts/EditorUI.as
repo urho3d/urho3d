@@ -5,10 +5,10 @@ UIElement@ uiMenuBar;
 FileSelector@ uiFileSelector;
 
 array<string> uiSceneFilters = {"*.xml", "*.bin", "*.dat", "*.*"};
-array<string> tundraSceneFilter = {"*.txml"};
 array<string> uiAllFilter = {"*.*"};
 uint uiSceneFilter = 0;
 string uiScenePath;
+string uiImportPath;
 
 void createUI()
 {
@@ -57,12 +57,13 @@ void createMenuBar()
         filePopup.addChild(createMenuItem("Save scene", 'S', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Save scene as", 'S', QUAL_SHIFT | QUAL_CTRL));
         filePopup.addChild(createMenuDivider());
-        filePopup.addChild(createMenuItem("Import Tundra scene", 0, 0));
+        filePopup.addChild(createMenuItem("Import model", 0, 0));
+        filePopup.addChild(createMenuItem("Import scene", 0, 0));
         filePopup.addChild(createMenuDivider());
         filePopup.addChild(createMenuItem("Set resource path", 0, 0));
         filePopup.addChild(createMenuItem("Reload resources", 'R', QUAL_CTRL));
         filePopup.addChild(createMenuDivider());
-        filePopup.addChild(createMenuItem("Exit", 'X', QUAL_CTRL));
+        filePopup.addChild(createMenuItem("Exit", 0, 0));
         uiMenuBar.addChild(fileMenu);
     }
 
@@ -81,8 +82,8 @@ void createMenuBar()
     {
         Menu@ fileMenu = createMenu("View");
         Window@ filePopup = fileMenu.getPopup();
-        filePopup.addChild(createMenuItem("Scene hierarchy", 0, 0));
-        filePopup.addChild(createMenuItem("Entity / component edit", 0, 0));
+        filePopup.addChild(createMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
+        filePopup.addChild(createMenuItem("Entity / component edit", 'E', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Global scene settings", 0, 0));
         filePopup.addChild(createMenuItem("Camera settings", 0, 0));
         uiMenuBar.addChild(fileMenu);
@@ -219,10 +220,16 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
             subscribeToEvent(uiFileSelector, "FileSelected", "handleSaveSceneFile");
         }
 
-        if (action == "Import Tundra scene")
+        if (action == "Import model")
         {
-            createFileSelector("Import Tundra scene", "Import", "Cancel", "", tundraSceneFilter, 0);
-            subscribeToEvent(uiFileSelector, "FileSelected", "handleImportTundraFile");
+            createFileSelector("Import model", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleImportModel");
+        }
+
+        if (action == "Import scene")
+        {
+            createFileSelector("Import scene", "Import", "Cancel", uiImportPath, uiAllFilter, 0);
+            subscribeToEvent(uiFileSelector, "FileSelected", "handleImportScene");
         }
         
         if (action == "Set resource path")
@@ -297,8 +304,10 @@ void handleSaveSceneFile(StringHash eventType, VariantMap& eventData)
     saveScene(fileName);
 }
 
-void handleImportTundraFile(StringHash eventType, VariantMap& eventData)
+void handleImportModel(StringHash eventType, VariantMap& eventData)
 {
+    // Save path for next time
+    uiImportPath = uiFileSelector.getPath();
     closeFileSelector();
 
     // Check for cancel
@@ -306,7 +315,21 @@ void handleImportTundraFile(StringHash eventType, VariantMap& eventData)
         return;
 
     string fileName = eventData["FileName"].getString();
-    importTundraScene(fileName);
+    importModel(fileName);
+}
+
+void handleImportScene(StringHash eventType, VariantMap& eventData)
+{
+    // Save path for next time
+    uiImportPath = uiFileSelector.getPath();
+    closeFileSelector();
+
+    // Check for cancel
+    if (!eventData["OK"].getBool())
+        return;
+
+    string fileName = eventData["FileName"].getString();
+    importScene(fileName);
 }
 
 void handleResourcePath(StringHash eventType, VariantMap& eventData)
@@ -329,9 +352,19 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
         console.toggle();
         input.suppressNextChar();
     }
-    
+    if (key == KEY_ESC)
+    {
+        UIElement@ front = ui.getFrontElement();
+        if ((uiFileSelector !is null) && (front is uiFileSelector.getWindow()))
+            closeFileSelector();
+        else if ((front is sceneSettingsDialog) || (front is cameraDialog) || (front is sceneWindow) || (front is componentWindow))
+            front.setVisible(false);
+    }
+
     if (key == KEY_F1)
-        toggleDebugGeometry();
+        toggleRenderingDebug();
     if (key == KEY_F2)
+        togglePhysicsDebug();
+    if (key == KEY_F3)
         toggleOctreeDebug();
 }

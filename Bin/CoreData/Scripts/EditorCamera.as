@@ -62,6 +62,8 @@ void resetCamera()
 {
     camera.setPosition(Vector3(0, 10, 0));
     camera.setRotation(Quaternion());
+    cameraPitch = 0;
+    cameraYaw = 0;
 }
 
 void createCameraDialog()

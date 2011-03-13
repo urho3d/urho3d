@@ -152,8 +152,8 @@ void editEntityName()
     beginModify(selectedEntity.getID());
     selectedEntity.setName(nameEdit.getText());
     endModify(selectedEntity.getID());
-    
-    updateSceneWindowEntity(selectedEntity);
+
+    updateSceneWindowEntityOnly(selectedEntity);
 }
 
 void editComponentName()
@@ -368,7 +368,7 @@ void openResource(StringHash eventType, VariantMap& eventData)
 {
     UIElement@ button = eventData["Element"].getUIElement();
     LineEdit@ attrEdit = button.getParent().getChild(1);
-    systemOpenFile(sceneResourcePath + attrEdit.getText(), "edit");
+    systemOpenFile(sceneResourcePath + attrEdit.getText(), "");
 }
 
 void pickResourceDone(StringHash eventType, VariantMap& eventData)

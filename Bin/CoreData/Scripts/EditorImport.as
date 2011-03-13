@@ -1,9 +1,73 @@
-//Import realXtend Tundra scene file (Much missing features. Handles only everything in the same path)
+// Urho3D editor import functions
+
+void importModel(const string& in fileName)
+{
+    string modelName = "Models/" + getFileName(fileName) + ".mdl";
+    string outFileName = sceneResourcePath + modelName;
+    string materialListName = sceneResourcePath + "_tempmatlist_.txt";
+
+    array<string> args;
+    args.push("model");
+    args.push("\"" + fileName + "\"");
+    args.push("\"" + outFileName + "\"");
+    args.push("-p\"" + sceneResourcePath + "\"");
+    args.push("-m\"" + materialListName + "\"");
+
+    if (systemRun(getExecutableDirectory() + "AssetImporter.exe", args) == 0)
+    {
+        Entity@ newEntity = editorScene.createEntity(getFileName(fileName));
+        StaticModel@ newModel = newEntity.createComponent("StaticModel");
+        newModel.setPosition(camera.getWorldPosition() + camera.getWorldRotation() * Vector3(0, 0, newNodeDistance));
+        newModel.setModel(cache.getResource("Model", modelName));
+
+        if (fileExists(materialListName))
+        {
+            File list(materialListName, FILE_READ);
+            for (uint i = 0; i < newModel.getNumGeometries(); ++i)
+            {
+                if (!list.isEof())
+                    newModel.setMaterial(i, cache.getResource("Material", list.readLine()));
+                else
+                    break;
+            }
+            list.close();
+            deleteFile(materialListName);
+        }
+
+        updateAndFocusNewEntity(newEntity);
+    }
+}
+
+void importScene(const string& in fileName)
+{
+    // Handle Tundra scene files here in code, otherwise via AssetImporter
+    if (getExtension(fileName) == ".txml")
+        importTundraScene(fileName);
+    else
+    {
+        // Export scene to a temp file, then load and delete it if successful
+        string tempSceneName = sceneResourcePath + "_tempscene_.xml";
+        array<string> args;
+        args.push("scene");
+        args.push("\"" + fileName + "\"");
+        args.push("\"" + tempSceneName + "\"");
+        args.push("-p\"" + sceneResourcePath + "\"");
+        
+        if (systemRun(getExecutableDirectory() + "AssetImporter.exe", args) == 0)
+        {
+            string currentFileName = sceneFileName;
+            loadScene(tempSceneName);
+            deleteFile(tempSceneName);
+            sceneFileName = currentFileName;
+            updateWindowTitle();
+        }
+    }
+}
 
 void autoCollisionMesh()
 {
     array<string> createdCollisions;
-    
+
     array<Entity@> entities = editorScene.getAllEntities();
     for (uint i = 0; i < entities.size(); ++i)
     {
@@ -52,7 +116,7 @@ void autoCollisionMesh()
     }
 }
 
-void importTundraScene(string fileName)
+void importTundraScene(const string& in fileName)
 {
     createDirectory(sceneResourcePath + "Materials");
     createDirectory(sceneResourcePath + "Models");
@@ -70,7 +134,8 @@ void importTundraScene(string fileName)
     array<string> convertedMeshes;
     
     // Clear old scene, then create a zone and a directional light first
-    editorScene.removeAllEntities();
+    createScene();
+
     Entity@ zoneEntity = editorScene.createEntity();
     Zone@ zone = zoneEntity.createComponent("Zone");
     Light@ sunLight = zoneEntity.createComponent("Light");
@@ -177,7 +242,7 @@ void importTundraScene(string fileName)
     }
 }
 
-string getComponentAttribute(XMLElement compElem, string name)
+string getComponentAttribute(XMLElement compElem, const string& in name)
 {
     XMLElement attrElem = compElem.getChildElement("attribute");
     while (attrElem.notNull())
@@ -204,13 +269,16 @@ void processRef(string& ref)
 
 void convertModel(const string& in modelName, const string& in filePath)
 {
-    string cmdLine1 = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + filePath + modelName + ".xml\"";
-    string cmdLine2 = getExecutableDirectory() + "OgreImporter.exe \"" + filePath + modelName + ".xml\" \"" + sceneResourcePath + "Models/" + modelName.replace(".mesh", ".mdl") + "\" -a -t";
-    
-    if (!fileExists(filePath + modelName + ".xml"))
-        systemCommand(cmdLine1.replace('/', '\\'));
-    if (!fileExists(sceneResourcePath + "Models/" + modelName.replace(".mesh", ".mdl")))
-        systemCommand(cmdLine2.replace('/', '\\'));
+    // Convert .mesh to .mesh.xml
+    string cmdLine = "ogrexmlconverter.exe \"" + filePath + modelName + "\" \"" + filePath + modelName + ".xml\"";
+    systemCommand(cmdLine.replace('/', '\\'));
+
+    // Convert .mesh.xml to .mdl
+    array<string> args;
+    args.push("\"" + filePath + modelName + ".xml\"");
+    args.push("\"" + sceneResourcePath + "Models/" + modelName.replace(".mesh", ".mdl") + "\"");
+    args.push("-a");
+    systemRun(getExecutableDirectory() + "OgreImporter.exe", args);
 }
 
 void convertMaterial(const string& in materialName, const string& in filePath)
@@ -248,8 +316,7 @@ void convertMaterial(const string& in materialName, const string& in filePath)
     if (twoSided)
         baseName = baseName.replace(".xml", "TS.xml");
     baseElem.setAttribute("name", baseName);
-    
-    
+
     XMLElement techniqueElem = rootElem.createChildElement("technique");
     
     if (!textureName.empty())

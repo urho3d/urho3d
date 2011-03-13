@@ -121,8 +121,6 @@ public:
     unsigned getMemoryUse(ShortStringHash type) const;
     //! Return total memory use for all resources
     unsigned getTotalMemoryUse() const;
-    //! Return a "preferred resource path" ie. either the path itself or its parent, based on which of them has known subdirectories
-    std::string getPreferredResourcePath(const std::string& path);
     
 private:
     //! Find a resource
@@ -167,5 +165,8 @@ template <class T> void ResourceCache::getResources(std::vector<T*>& result) con
         result[i] = static_cast<T*>(resource);
     }
 }
+
+//! Return either the path itself or its parent, based on which of them has recognized resource subdirectories
+std::string getPreferredResourcePath(const std::string& path);
 
 #endif // RESOURCE_RESOURCECACHE_H

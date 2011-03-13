@@ -24,8 +24,6 @@
 #include "Application.h"
 #include "Engine.h"
 #include "Exception.h"
-#include "Font.h"
-#include "Input.h"
 #include "Log.h"
 #include "PackageFile.h"
 #include "ProcessUtils.h"
@@ -83,7 +81,7 @@ void Application::run()
     {
         fileName = getAbsoluteFileName(fileName);
         file = new File(fileName);
-        mCache->addResourcePath(mCache->getPreferredResourcePath(getPath(fileName)));
+        mCache->addResourcePath(getPreferredResourcePath(getPath(fileName)));
     }
     
     // Initialize engine & scripting. Render once first to avoid a white screen in case init takes a long time

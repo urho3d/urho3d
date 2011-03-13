@@ -106,6 +106,8 @@ public:
     void writeVariantMap(const VariantMap& value);
     //! Write a variable-length encoded unsigned integer, which can use 29 bits maximum
     void writeVLE(unsigned value);
+    //! Write a text line. Char codes 13 & 10 will be automatically appended.
+    void writeLine(const std::string& value);
 };
 
 #endif // COMMON_SERIALIZER_H
