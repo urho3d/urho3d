@@ -10,24 +10,31 @@ Urho3D.exe Scripts/Editor.as
 Controls
 --------
 
-Left mouse     - Select renderable components
-Right mouse    - Hold down and move mouse to rotate camera
+Left mouse      - Select renderable objects (components)
+Right mouse     - Hold down and move mouse to rotate camera
 
-WSAD or arrows - Move
-Shift+WSAD     - Move faster
-Ctrl+O         - Open scene
-Ctrl+S         - Save scene
-Ctrl+Shift+S   - Save scene as
-Ctrl+X,C,V     - Cut/copy/paste entity or component
-Ctrl+E	       - Open the Entity / component edit window
-Ctrl+H	       - Open the Scene hierarchy window
-Ctrl+P         - Toggle physics on/off
-Ctrl+R         - Reload resources
-ESC            - Close the topmost window
-DEL            - Delete entity or component
-F1             - Toggle rendering debug geometry
-F2             - Toggle physics debug geometry
-F3             - Toggle octree debug geometry
+WSAD or arrows  - Move
+Shift+WSAD      - Move faster
+Ctrl+1,2,3      - Select manipulation mode: move/rotate/scale
+Ctrl+arrows     - Manipulate object in X & Z directions
+Ctrl+pgup/pgdn  - Manipulate object in Y direction
+Ctrl+plus/minus - Scale object uniformly (scale mode only)
+Ctrl+O          - Open scene
+Ctrl+S          - Save scene
+Ctrl+Shift+S    - Save scene as
+Ctrl+X,C,V      - Cut/copy/paste entity or component
+Ctrl+E	        - Open the Entity / component edit window
+Ctrl+H	        - Open the Scene hierarchy window
+Ctrl+P          - Toggle physics on/off
+Ctrl+R          - Reload resources
+ESC             - Close the topmost window
+DEL             - Delete entity or component
+F1              - Toggle rendering debug geometry
+F2              - Toggle physics debug geometry
+F3              - Toggle octree debug geometry
+
+Press right mouse button in the 3D view if you want to defocus the active
+window without changing the object selection.
 
 
 Workflow

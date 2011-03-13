@@ -8,7 +8,6 @@ Window@ sceneSettingsDialog;
 
 string sceneFileName;
 string sceneResourcePath;
-float newNodeDistance = 20;
 bool sceneModified = false;
 bool runPhysics = false;
 bool renderingDebug = false;

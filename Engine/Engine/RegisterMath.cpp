@@ -86,6 +86,9 @@ static void registerMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float max(float, float)", asFUNCTIONPR(max, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float clamp(float, float, float)", asFUNCTIONPR(clamp, (float, float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float lerp(float, float, float)", asFUNCTIONPR(lerp, (float, float, float), float), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float mod(float, float)", asFUNCTION(fmodf), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float floor(float)", asFUNCTION(floorf), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float ceil(float)", asFUNCTION(ceilf), asCALL_CDECL);
 }
 
 static void ConstructIntRect(IntRect* ptr)
@@ -111,7 +114,7 @@ static void registerIntRect(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(const IntRect& in)", asFUNCTION(ConstructIntRectCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("IntRect", asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(ConstructIntRectInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("IntRect", "IntRect &opAssign(const IntRect& in)", asMETHOD(IntRect, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntRect", "bool &opEquals(const IntRect& in) const", asMETHOD(IntRect, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntRect", "bool opEquals(const IntRect& in) const", asMETHOD(IntRect, operator ==), asCALL_THISCALL);
     engine->RegisterObjectProperty("IntRect", "int left", offsetof(IntRect, mLeft));
     engine->RegisterObjectProperty("IntRect", "int top", offsetof(IntRect, mTop));
     engine->RegisterObjectProperty("IntRect", "int right", offsetof(IntRect, mRight));
@@ -145,7 +148,7 @@ static void registerIntVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IntVector2", "IntVector2 &opSubAssign(const IntVector2& in)", asMETHOD(IntVector2, operator -=), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 &opMulAssign(int)", asMETHODPR(IntVector2, operator *=, (int), IntVector2&), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 &opDivAssign(int)", asMETHODPR(IntVector2, operator /=, (int), IntVector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntVector2", "bool &opEquals(const IntVector2& in) const", asMETHOD(IntVector2, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "bool opEquals(const IntVector2& in) const", asMETHOD(IntVector2, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opNeg() const", asMETHODPR(IntVector2, operator -, () const, IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opAdd(const IntVector2& in) const", asMETHOD(IntVector2, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2& in) const", asMETHODPR(IntVector2, operator -, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
@@ -185,7 +188,7 @@ static void registerVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "Vector2 &opMulAssign(float)", asMETHODPR(Vector2, operator *=, (float), Vector2&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 &opDivAssign(const Vector2& in)", asMETHODPR(Vector2, operator /=, (const Vector2&), Vector2&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 &opDivAssign(float)", asMETHODPR(Vector2, operator /=, (float), Vector2&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "bool &opEquals(const Vector2& in) const", asMETHOD(Vector2, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "bool opEquals(const Vector2& in) const", asMETHOD(Vector2, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 opNeg() const", asMETHODPR(Vector2, operator -, () const, Vector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 opAdd(const Vector2& in) const", asMETHOD(Vector2, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 opSub(const Vector2& in) const", asMETHODPR(Vector2, operator -, (const Vector2&) const, Vector2), asCALL_THISCALL);
@@ -234,7 +237,7 @@ static void registerVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "Vector3 &opMulAssign(float)", asMETHODPR(Vector3, operator *=, (float), Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 &opDivAssign(const Vector3& in)", asMETHODPR(Vector3, operator /=, (const Vector3&), Vector3&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 &opDivAssign(float)", asMETHODPR(Vector3, operator /=, (float), Vector3&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "bool &opEquals(const Vector3& in) const", asMETHOD(Vector3, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "bool opEquals(const Vector3& in) const", asMETHOD(Vector3, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 opNeg() const", asMETHODPR(Vector3, operator -, () const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 opAdd(const Vector3& in) const", asMETHOD(Vector3, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 opSub(const Vector3& in) const", asMETHODPR(Vector3, operator -, (const Vector3&) const, Vector3), asCALL_THISCALL);
@@ -401,7 +404,7 @@ static void registerRay(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f(const Ray& in)", asFUNCTION(ConstructRayCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Ray", asBEHAVE_CONSTRUCT, "void f(const Vector3& in, const Vector3& in)", asFUNCTION(ConstructRayInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Ray", "Ray &opAssign(const Ray& in)", asMETHOD(Ray, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Ray", "bool &opEquals(const Ray& in) const", asMETHOD(Ray, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "bool opEquals(const Ray& in) const", asMETHOD(Ray, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "void define(const Vector3& in, const Vector3& in)", asMETHOD(Ray, define), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "float getDistance(const Vector3& in, const Vector3& in, const Vector3& in) const", asMETHODPR(Ray, getDistance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);
     engine->RegisterObjectProperty("Ray", "Vector3 origin", offsetof(Ray, mOrigin));
@@ -437,7 +440,7 @@ static void registerRect(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructRectInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Rect", asBEHAVE_CONSTRUCT, "void f(const Vector2& in, const Vector2& in)", asFUNCTION(ConstructRectInitVec), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Rect", "Rect &opAssign(const Rect& in)", asMETHOD(Rect, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Rect", "bool &opEquals(const Rect& in) const", asMETHOD(Rect, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Rect", "bool opEquals(const Rect& in) const", asMETHOD(Rect, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void define(const Vector2& in, const Vector2& in)", asMETHODPR(Rect, define, (const Vector2&, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void define(const Vector2& in)", asMETHODPR(Rect, define, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Rect", "void merge(const Vector2& in)", asMETHODPR(Rect, merge, (const Vector2&), void), asCALL_THISCALL);
@@ -524,7 +527,7 @@ static void registerVolumes(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(const Vector3& in, const Vector3& in)", asFUNCTION(ConstructBoundingBoxInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BoundingBox", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBoundingBoxFloat), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("BoundingBox", "BoundingBox &opAssign(const BoundingBox& in)", asMETHODPR(BoundingBox, operator =, (const BoundingBox&), BoundingBox&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "bool &opEquals(const BoundingBox& in) const", asMETHOD(BoundingBox, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "bool opEquals(const BoundingBox& in) const", asMETHOD(BoundingBox, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void define(const Vector3& in, const Vector3& in)", asMETHODPR(BoundingBox, define, (const Vector3&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void define(float, float)", asMETHODPR(BoundingBox, define, (float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "void define(const Frustum& in)", asMETHODPR(BoundingBox, define, (const Frustum&), void), asCALL_THISCALL);

@@ -565,8 +565,11 @@ void RigidBody::setTransform(const Vector3& position, const Quaternion& rotation
 
 void RigidBody::setTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 {
+    // Note: here we always update geometries. This form is called from the editor, which actually changes the Node scale first,
+    // so the usual check for changed scale would fail. Is slow and not to be called from any game loop logic or network code
     setTransform(position, rotation);
-    setScale(scale);
+    Node::setScale(scale);
+    updateGeometries();
 }
 
 void RigidBody::scale(float scale)

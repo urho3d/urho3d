@@ -1,5 +1,7 @@
 // Urho3D editor import functions
 
+bool useLocalIDs = false;
+
 void importModel(const string& in fileName)
 {
     string modelName = "Models/" + getFileName(fileName) + ".mdl";
@@ -52,6 +54,9 @@ void importScene(const string& in fileName)
         args.push("\"" + fileName + "\"");
         args.push("\"" + tempSceneName + "\"");
         args.push("-p\"" + sceneResourcePath + "\"");
+        
+        if (useLocalIDs)
+            args.push("-i");
         
         if (systemRun(getExecutableDirectory() + "AssetImporter.exe", args) == 0)
         {
@@ -136,7 +141,7 @@ void importTundraScene(const string& in fileName)
     // Clear old scene, then create a zone and a directional light first
     createScene();
 
-    Entity@ zoneEntity = editorScene.createEntity();
+    Entity@ zoneEntity = editorScene.createEntity("", useLocalIDs);
     Zone@ zone = zoneEntity.createComponent("Zone");
     Light@ sunLight = zoneEntity.createComponent("Light");
     sunLight.setLightType(LIGHT_DIRECTIONAL);
@@ -226,7 +231,7 @@ void importTundraScene(const string& in fileName)
         if (!found)
             convertModel(meshName, filePath);
 
-        Entity@ newEntity = editorScene.createEntity(entityName);
+        Entity@ newEntity = editorScene.createEntity(entityName, useLocalIDs);
         StaticModel@ model = newEntity.createComponent("StaticModel");
         
         model.setTransform(pos, Quaternion(rot), scale);

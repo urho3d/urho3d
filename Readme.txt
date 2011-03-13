@@ -41,9 +41,6 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis (0.99996)
 - TinyXML (2.6.1)
 
-See ThirdParty/<libraryname> for third-party license information where
-available.
-
 Ninja model, BlueHighway font and smoke/flare/status bar textures are from OGRE.
 
 Jack and mushroom models are from the realXtend project. (http://www.realxtend.org)

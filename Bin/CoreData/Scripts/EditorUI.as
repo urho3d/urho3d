@@ -18,8 +18,8 @@ void createUI()
     createMenuBar();
     createSceneWindow();
     createComponentWindow();
-    createCameraDialog();
     createSceneSettingsDialog();
+    createEditorSettingsDialog();
     createStatsBar();
     createConsole();
     
@@ -85,7 +85,7 @@ void createMenuBar()
         filePopup.addChild(createMenuItem("Scene hierarchy", 'H', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Entity / component edit", 'E', QUAL_CTRL));
         filePopup.addChild(createMenuItem("Global scene settings", 0, 0));
-        filePopup.addChild(createMenuItem("Camera settings", 0, 0));
+        filePopup.addChild(createMenuItem("Editor settings", 0, 0));
         uiMenuBar.addChild(fileMenu);
     }
 
@@ -252,8 +252,8 @@ void handleMenuSelected(StringHash eventType, VariantMap& eventData)
     if (action == "Entity / component edit")
         showComponentWindow();
 
-    if (action == "Camera settings")
-        showCameraDialog();
+    if (action == "Editor settings")
+        showEditorSettingsDialog();
     
     if (action == "Cut")
         sceneCut();
@@ -357,7 +357,7 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
         UIElement@ front = ui.getFrontElement();
         if ((uiFileSelector !is null) && (front is uiFileSelector.getWindow()))
             closeFileSelector();
-        else if ((front is sceneSettingsDialog) || (front is cameraDialog) || (front is sceneWindow) || (front is componentWindow))
+        else if ((front is sceneSettingsDialog) || (front is editorSettingsDialog) || (front is sceneWindow) || (front is componentWindow))
             front.setVisible(false);
     }
 
@@ -367,4 +367,16 @@ void handleKeyDown(StringHash eventType, VariantMap& eventData)
         togglePhysicsDebug();
     if (key == KEY_F3)
         toggleOctreeDebug();
+        
+    if (eventData["Qualifiers"].getInt() == QUAL_CTRL)
+    {
+        if (key == '1')
+            moveMode = OBJ_MOVE;
+        else if (key == '2')
+            moveMode = OBJ_ROTATE;
+        else if (key == '3')
+            moveMode = OBJ_SCALE;
+        else
+            steppedObjectManipulation(key);
+    }
 }
