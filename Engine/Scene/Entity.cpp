@@ -417,7 +417,7 @@ void Entity::addComponent(Component* component)
             else
             {
                 LOGWARNING("Component with type " + component->getTypeName() + " name " + component->getName() +
-                    "already exists in entity " + mName);
+                    " already exists in entity " + mName);
             }
         }
     }

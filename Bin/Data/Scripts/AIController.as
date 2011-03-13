@@ -86,7 +86,7 @@ class AIController
 
             // Add distance/height compensation
             float compensation = max(targetAim.getLength() - 1500, 0);
-            targetAim += Vector3(0, 0.005, 0) * (compensation * compensation);
+            targetAim += Vector3(0, 0.6, 0) * compensation;
 
             // X-aiming
             targetAim.normalize();

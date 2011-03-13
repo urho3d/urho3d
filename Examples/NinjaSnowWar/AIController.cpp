@@ -147,7 +147,7 @@ void AIController::control(Ninja* ninja, float time)
         
         // Add distance/height compensation
         float compensation = max(targetAim.getLength() - 1500, 0.0f);
-        targetAim += compensation * compensation * Vector3(0,0.005f,0);
+        targetAim += compensation * Vector3(0.0f, 0.6f, 0.0f);
         
         // X-aiming
         targetAim.normalize();
