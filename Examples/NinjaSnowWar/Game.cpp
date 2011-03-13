@@ -45,6 +45,7 @@
 #include "Material.h"
 #include "MemoryBuffer.h"
 #include "Ninja.h"
+#include "Octree.h"
 #include "PackageFile.h"
 #include "PositionalChannel.h"
 #include "Potion.h"
@@ -82,6 +83,7 @@
 int simulatePacketLoss = 0;
 int simulateLatency = 0;
 bool drawDebug = false;
+bool drawOctreeDebug = false;
 std::string applicationDir;
 std::string downloadDir;
 
@@ -487,6 +489,8 @@ void Game::handlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (drawDebug)
         mScene->getExtension<PhysicsWorld>()->drawDebugGeometry(true);
+    if (drawOctreeDebug)
+        mScene->getExtension<Octree>()->drawDebugGeometry(true);
 }
 
 void Game::handlePreStep(StringHash eventType, VariantMap& eventData)
@@ -755,9 +759,11 @@ void Game::getControls()
     Input* input = mEngine->getInput();
     
     if (input->getKeyPress(KEY_F1))
-        toggleDebugOverlay();
+        mEngine->getDebugHud()->toggleAll();
     if (input->getKeyPress(KEY_F2))
-        toggleDebugGeometry();
+        drawDebug = !drawDebug;
+    if (input->getKeyPress(KEY_F3))
+        drawOctreeDebug = !drawOctreeDebug;
     
     // Toggle edge filter (deferred only)
     if (input->getKeyPress('F'))
@@ -824,17 +830,6 @@ void Game::getControls()
             mControls.mPitch = clamp(mControls.mPitch, -60.0f, 60.0f);
         }
     }
-}
-
-void Game::toggleDebugOverlay()
-{
-    mEngine->getDebugHud()->toggleAll();
-}
-
-void Game::toggleDebugGeometry()
-{
-    PhysicsWorld* world = mScene->getExtension<PhysicsWorld>();
-    drawDebug = !drawDebug;
 }
 
 void Game::togglePause()

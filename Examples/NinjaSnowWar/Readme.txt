@@ -27,6 +27,7 @@ X           - Cycle packet loss test mode 0% - 33% - 66% (multiplayer only)
 Z           - Cycle lag test mode 0 ms - 150 ms - 500 ms (multiplayer only)
 F1          - Toggle profiler
 F2          - Toggle physics debug geometry
+F3          - Toggle octree debug geometry
 F5          - Quicksave (singleplayer only)
 F7          - Quickload (singleplayer only)
 Alt-Enter   - Toggle fullscreen/windowed

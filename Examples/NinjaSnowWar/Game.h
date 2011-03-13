@@ -102,8 +102,6 @@ private:
     void handleScore(StringHash eventType, VariantMap& eventData);
     void handleHiScore(StringHash eventType, VariantMap& eventData);
     void getControls();
-    void toggleDebugOverlay();
-    void toggleDebugGeometry();
     void togglePause();
     void makeHarder();
     void spawnObjects(float timeStep);

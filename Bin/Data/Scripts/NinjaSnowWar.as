@@ -31,6 +31,7 @@ Controls playerControls;
 Controls prevPlayerControls;
 bool gameOn = false;
 bool drawDebug = false;
+bool drawOctreeDebug = false;
 int score = 0;
 int hiscore = 0;
 int maxEnemies = 0;
@@ -200,6 +201,8 @@ void handleUpdate(StringHash eventType, VariantMap& eventData)
         debugHud.toggleAll();
     if (input.getKeyPress(KEY_F2))
         drawDebug = !drawDebug;
+    if (input.getKeyPress(KEY_F3))
+        drawOctreeDebug = !drawOctreeDebug;
         
     if (input.getKeyPress(KEY_F5))
         gameScene.save(File(getExecutableDirectory() + "Data/Save.dat", FILE_WRITE));
@@ -244,6 +247,8 @@ void handlePostRenderUpdate()
 {
     if (drawDebug)
         gameScene.getPhysicsWorld().drawDebugGeometry(true);
+    if (drawOctreeDebug)
+        gameScene.getOctree().drawDebugGeometry(true);
 }
 
 void handlePoints(StringHash eventType, VariantMap& eventData)

@@ -1,5 +1,5 @@
 <scene name="NinjaSnowWar">
-    <octree min="-100000 -100000 -100000" max="100000 100000 100000" levels="8" />
+    <octree min="-20000 -20000 -20000" max="20000 20000 20000" levels="7" />
     <physics gravity="0 -981 0" fps="200">
         <linear restthreshold="0.1" dampingthreshold="0" dampingscale="0.001" />
     </physics>
