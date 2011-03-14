@@ -111,4 +111,12 @@ void Application::run()
     // Run until exited
     while (!mEngine->isExiting())
         mEngine->runFrame();
+    
+    // Run the "stop" function from script if it has any
+    if (mScriptFile)
+    {
+        asIScriptFunction* stop = mScriptFile->getFunction("void stop()");
+        if (stop)
+            mScriptFile->execute(stop);
+    }
 }

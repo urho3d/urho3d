@@ -580,7 +580,12 @@ void handleCreateComponent(StringHash eventType, VariantMap& eventData)
     if (text is null)
         return;
 
-    selectedEntity.createComponent(text.getText(), "");
+    Component@ newComponent = selectedEntity.createComponent(text.getText(), "");
+    // If component is a scene node, set it to a certain distance from camera
+    Node@ newNode = cast<Node>(newComponent);
+    if (newNode !is null)
+        newNode.setPosition(getNewNodePosition());
+
     updateSceneWindowEntity(selectedEntity);
 }
 

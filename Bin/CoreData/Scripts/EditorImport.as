@@ -19,7 +19,7 @@ void importModel(const string& in fileName)
     {
         Entity@ newEntity = editorScene.createEntity(getFileName(fileName));
         StaticModel@ newModel = newEntity.createComponent("StaticModel");
-        newModel.setPosition(camera.getWorldPosition() + camera.getWorldRotation() * Vector3(0, 0, newNodeDistance));
+        newModel.setPosition(getNewNodePosition());
         newModel.setModel(cache.getResource("Model", modelName));
 
         if (fileExists(materialListName))

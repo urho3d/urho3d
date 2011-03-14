@@ -15,7 +15,6 @@ float cameraBaseRotationSpeed = 0.2;
 float cameraShiftSpeedMultiplier = 5;
 float cameraYaw = 0;
 float cameraPitch = 0;
-
 float newNodeDistance = 20;
 float moveStep = 0.5;
 float rotateStep = 5;
@@ -512,4 +511,9 @@ void steppedObjectManipulation(int key)
         body.setTransform(node.getPosition(), node.getRotation(), node.getScale());
 
     updateComponentAttributes();
+}
+
+Vector3 getNewNodePosition()
+{
+    return camera.getWorldPosition() + camera.getWorldRotation() * Vector3(0, 0, newNodeDistance);
 }
