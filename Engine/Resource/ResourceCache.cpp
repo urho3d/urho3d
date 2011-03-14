@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "PackageFile.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "ResourceFactory.h"
 #include "StringUtils.h"
 
@@ -269,16 +270,29 @@ bool ResourceCache::reloadResource(Resource* resource)
     if (!resource)
         return false;
     
+    // Some resources are event senders/listeners, and can notify that they are being reloaded
+    EventListener* listener = dynamic_cast<EventListener*>(resource);
+    
     try
     {
+        if (listener)
+            listener->sendEvent(EVENT_RELOADSTARTED);
+        
         SharedPtr<File> file = getFile(resource->getName());
         resource->load(*(file.getPtr()), this);
         resource->resetUseTimer();
         updateResourceGroup(resource->getType());
+        
+        if (listener)
+            listener->sendEvent(EVENT_RELOADFINISHED);
+        
         return true;
     }
     catch (...)
     {
+        if (listener)
+            listener->sendEvent(EVENT_RELOADFAILED);
+        
         releaseResource(resource->getType(), resource->getNameHash());
         return false;
     }

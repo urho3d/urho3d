@@ -260,8 +260,8 @@ void setupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 void updateStats(float timeStep)
 {
     renderStatsText.setText(
-        "Tris: " + renderer.getNumPrimitives() +
-        " Batches: " + renderer.getNumBatches() +
+        "Tris: " + pipeline.getNumPrimitives() +
+        " Batches: " + pipeline.getNumBatches() +
         " Lights: " + pipeline.getNumLights(true) +
         " Shadowmaps: " + pipeline.getNumShadowMaps(true) +
         " Occluders: " + (pipeline.getNumOccluders(true) + pipeline.getNumShadowOccluders(true))

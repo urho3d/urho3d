@@ -402,6 +402,7 @@ static void registerDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "void setStyle(XMLFile@+)", asMETHOD(DebugHud, setStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void setMode(uint)", asMETHOD(DebugHud, setMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void setProfilerInterval(float)", asMETHOD(DebugHud, setProfilerInterval), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "void setUsePipelineStats(bool)", asMETHOD(DebugHud, setUsePipelineStats), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void toggle(uint)", asMETHOD(DebugHud, toggle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void toggleAll()", asMETHOD(DebugHud, toggleAll), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "XMLFile@+ getStyle() const", asMETHOD(DebugHud, getStyle), asCALL_THISCALL);

@@ -161,6 +161,10 @@ public:
     const EdgeFilterParameters& getEdgeFilter() const { return mEdgeFilter; }
     //! Return number of views rendered
     unsigned getNumViews() const { return mNumViews; }
+    //! Return number of primitives rendered
+    unsigned getNumPrimitives() const { return mNumPrimitives; }
+    //! Return number of batches rendered
+    unsigned getNumBatches() const { return mNumBatches; }
     //! Return number of geometries rendered
     unsigned getNumGeometries(bool allViews = false) const;
     //! Return number of lights rendered
@@ -293,6 +297,10 @@ private:
     unsigned mNumViews;
     //! Number of split lights
     unsigned mNumSplitLights;
+    //! Number of primitives (3D geometry only)
+    unsigned mNumPrimitives;
+    //! Number of batches (3D geometry only)
+    unsigned mNumBatches;
     //! Elapsed time
     float mElapsedTime;
     //! Specular lighting flag

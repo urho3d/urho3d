@@ -573,9 +573,6 @@ static int SystemRun(const std::string& fileName, CScriptArray* srcArguments)
     for (unsigned i = 0; i < numArguments; ++i)
         destArguments[i] = *(static_cast<std::string*>(srcArguments->At(i)));
     
-    LOGINFO("Systemrun: " + fileName);
-    for (unsigned i = 0; i < destArguments.size(); ++i)
-        LOGINFO(destArguments[i]);
     return systemRun(fileName, destArguments);
 }
 

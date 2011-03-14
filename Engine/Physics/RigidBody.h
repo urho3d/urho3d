@@ -25,6 +25,7 @@
 #define PHYSICS_RIGIDBODY_H
 
 #include "CollisionShape.h"
+#include "EventListener.h"
 #include "Node.h"
 #include "PhysicsDefs.h"
 
@@ -42,7 +43,7 @@ enum PhysicsMode
 };
 
 //! Rigid body scene node
-class RigidBody : public Node
+class RigidBody : public Node, public EventListener
 {
     DEFINE_TYPE(RigidBody);
     
@@ -193,6 +194,10 @@ private:
     void updateMass();
     //! Set temporary disable for optimizing client-side prediction
     void setTempDisabled(bool disable);
+    //! Handle collision shape reload start
+    void handleCollisionShapeReload(StringHash eventType, VariantMap& eventData);
+    //! Handle collision shape reload finished
+    void handleCollisionShapeReloadFinished(StringHash eventType, VariantMap& eventData);
     
     //! Physics world
     SharedPtr<PhysicsWorld> mWorld;

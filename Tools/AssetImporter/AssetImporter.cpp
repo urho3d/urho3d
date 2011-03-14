@@ -132,7 +132,7 @@ void getMeshesUnderNode(std::vector<std::pair<aiNode*, aiMesh*> >& meshes, aiNod
 unsigned getMeshIndex(aiMesh* mesh);
 unsigned getBoneIndex(ExportModel& model, const std::string& boneName);
 aiBone* getMeshBone(ExportModel& model, const std::string& boneName);
-Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName, bool useMeshTransform);
+Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName);
 void getBlendData(ExportModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
     blendIndices, std::vector<std::vector<float> >& blendWeights);
 std::string getMeshMaterialName(aiMesh* mesh);
@@ -147,6 +147,7 @@ unsigned getElementMask(aiMesh* mesh);
 aiNode* findNode(const std::string& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 getDerivedTransform(aiNode* node, aiNode* rootNode);
 aiMatrix4x4 getDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode);
+aiMatrix4x4 getMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode);
 void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 
 std::string toStdString(const aiString& str);
@@ -440,7 +441,7 @@ void dumpNodes(aiNode* rootNode, unsigned level)
     
     Vector3 pos, scale;
     Quaternion rot;
-    aiMatrix4x4 transform = getDerivedTransform(rootNode, 0);
+    aiMatrix4x4 transform = getDerivedTransform(rootNode, gRootNode);
     getPosRotScale(transform, pos, rot, scale);
     
     std::cout << indent << "Node " << toStdString(rootNode->mName) << " pos " << toString(pos) << std::endl;
@@ -683,14 +684,12 @@ void buildAndSaveModel(ExportModel& model)
         std::cout << "Writing separate buffers" << std::endl;
         for (unsigned i = 0; i < model.mMeshes.size(); ++i)
         {
-            // Get the world transform of the mesh for baking into the vertices (model mode only)
+            // Get the world transform of the mesh for baking into the vertices
             Matrix4x3 vertexTransform;
             Matrix3 normalTransform;
-            Vector3 pos(Vector3::sZero);
-            Quaternion rot(Quaternion::sIdentity);
-            Vector3 scale(Vector3::sUnity);
-            if (gCommand == CMD_MODEL)
-                getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            Vector3 pos, scale;
+            Quaternion rot;
+            getPosRotScale(getMeshBakingTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
             vertexTransform.define(pos, rot, scale);
             normalTransform = rot.getRotationMatrix();
             
@@ -768,14 +767,12 @@ void buildAndSaveModel(ExportModel& model)
         
         for (unsigned i = 0; i < model.mMeshes.size(); ++i)
         {
-            // Get the world transform of the mesh for baking into the vertices (model mode only)
+            // Get the world transform of the mesh for baking into the vertices
             Matrix4x3 vertexTransform;
             Matrix3 normalTransform;
-            Vector3 pos(Vector3::sZero);
-            Quaternion rot(Quaternion::sIdentity);
-            Vector3 scale(Vector3::sUnity);
-            if (gCommand == CMD_MODEL)
-                getPosRotScale(getDerivedTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
+            Vector3 pos, scale;
+            Quaternion rot;
+            getPosRotScale(getMeshBakingTransform(model.mMeshNodes[i], model.mRootNode), pos, rot, scale);
             vertexTransform.define(pos, rot, scale);
             normalTransform = rot.getRotationMatrix();
             
@@ -854,7 +851,7 @@ void buildAndSaveModel(ExportModel& model)
             getPosRotScale(transform, pos, rot, scale);
             
             // Get offset information if exists
-            srcBones[i]->setOffsetMatrix(getOffsetMatrix(model, boneName, gCommand == CMD_MODEL));
+            srcBones[i]->setOffsetMatrix(getOffsetMatrix(model, boneName));
             
             srcBones[i]->setInitialTransform(pos, rot, scale);
             srcBones[i]->setRadius(model.mBoneRadii[i]);
@@ -1155,7 +1152,7 @@ void buildAndSaveScene(ExportScene& scene)
         // Set a flattened transform
         Vector3 pos, scale;
         Quaternion rot;
-        getPosRotScale(getDerivedTransform(scene.mNodes[i], 0), pos, rot, scale);
+        getPosRotScale(getDerivedTransform(scene.mNodes[i], gRootNode), pos, rot, scale);
         staticModel->setTransform(pos, rot, scale);
         // Set materials if they are known
         for (unsigned j = 0; j < model.mMeshes.size(); ++j)
@@ -1409,7 +1406,7 @@ aiBone* getMeshBone(ExportModel& model, const std::string& boneName)
     return 0;
 }
 
-Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName, bool useMeshTransform)
+Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName)
 {
     for (unsigned i = 0; i < model.mMeshes.size(); ++i)
     {
@@ -1421,12 +1418,9 @@ Matrix4x3 getOffsetMatrix(ExportModel& model, const std::string& boneName, bool 
             if (toStdString(bone->mName) == boneName)
             {
                 aiMatrix4x4 offset = bone->mOffsetMatrix;
-                if (useMeshTransform)
-                {
-                    aiMatrix4x4 nodeDerivedInverse = getDerivedTransform(node, model.mRootNode);
-                    nodeDerivedInverse.Inverse();
-                    offset *= nodeDerivedInverse;
-                }
+                aiMatrix4x4 nodeDerivedInverse = getMeshBakingTransform(node, model.mRootNode);
+                nodeDerivedInverse.Inverse();
+                offset *= nodeDerivedInverse;
                 Matrix4x3 ret;
                 memcpy(&ret.m00, &offset.a1, sizeof(Matrix4x3));
                 return ret;
@@ -1643,6 +1637,14 @@ aiMatrix4x4 getDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* roo
             transform = node->mTransformation * transform;
     }
     return transform;
+}
+
+aiMatrix4x4 getMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode)
+{
+    if (meshNode == modelRootNode)
+        return aiMatrix4x4();
+    else
+        return getDerivedTransform(meshNode, modelRootNode);
 }
 
 void getPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale)

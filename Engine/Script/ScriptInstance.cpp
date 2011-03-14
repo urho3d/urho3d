@@ -28,6 +28,7 @@
 #include "RegisterArray.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "ScriptEngine.h"
@@ -360,6 +361,18 @@ bool ScriptInstance::setScriptClass(ScriptFile* scriptFile, const std::string& c
     
     releaseObject();
     
+    // Unsubscribe from the reload event of previous script file (if any), then subscribe to the new
+    if (mScriptFile)
+    {
+        unsubscribeFromEvent(mScriptFile, EVENT_RELOADSTARTED);
+        unsubscribeFromEvent(mScriptFile, EVENT_RELOADFINISHED);
+    }
+    if (scriptFile)
+    {
+        subscribeToEvent(scriptFile, EVENT_RELOADSTARTED, EVENT_HANDLER(ScriptInstance, handleScriptFileReload));
+        subscribeToEvent(scriptFile, EVENT_RELOADFINISHED, EVENT_HANDLER(ScriptInstance, handleScriptFileReloadFinished));
+    }
+    
     mScriptFile = scriptFile;
     mClassName = className;
     
@@ -484,7 +497,6 @@ bool ScriptInstance::createObject()
     mScriptObject = mScriptFile->createObject(mClassName);
     if (mScriptObject)
     {
-        mScriptFile->addScriptInstance(this);
         objectToInstance[(void*)mScriptObject] = this;
         getSupportedMethods();
         if (mMethods[METHOD_START])
@@ -514,8 +526,6 @@ void ScriptInstance::releaseObject()
         mScriptObject = 0;
         
         objectToInstance.erase((void*)mScriptObject);
-        
-        mScriptFile->removeScriptInstance(this);
     }
 }
 
@@ -700,4 +710,15 @@ ScriptEventListener* getScriptContextEventListener()
         return instance;
     ScriptFile* file = getScriptContextFile();
     return file;
+}
+
+void ScriptInstance::handleScriptFileReload(StringHash eventType, VariantMap& eventData)
+{
+    releaseObject();
+}
+
+void ScriptInstance::handleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    if (!mClassName.empty())
+        createObject();
 }

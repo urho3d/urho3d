@@ -24,12 +24,13 @@
 #ifndef RENDERER_STATICMODEL_H
 #define RENDERER_STATICMODEL_H
 
+#include "EventListener.h"
 #include "GeometryNode.h"
 
 class Model;
 
 //! A static model scene node
-class StaticModel : public GeometryNode
+class StaticModel : public GeometryNode, public EventListener
 {
     DEFINE_TYPE(StaticModel);
     
@@ -107,6 +108,10 @@ protected:
     BoundingBox mBoundingBox;
     //! Model
     SharedPtr<Model> mModel;
+    
+private:
+    //! Handle model reload finished
+    void handleModelReloadFinished(StringHash eventType, VariantMap& eventData);
 };
 
 #endif // RENDERER_STATICMODEL_H

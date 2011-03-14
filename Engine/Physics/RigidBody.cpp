@@ -27,6 +27,7 @@
 #include "PhysicsWorld.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "RigidBody.h"
 #include "StringUtils.h"
 #include "XMLElement.h"
@@ -440,6 +441,18 @@ void RigidBody::setCollisionShape(CollisionShape* shape)
 {
     if (shape == mCollisionShape)
         return;
+    
+    // Unsubscribe from the reload event of previous collision shape (if any), then subscribe to the new
+    if (mCollisionShape)
+    {
+        unsubscribeFromEvent(mCollisionShape, EVENT_RELOADSTARTED);
+        unsubscribeFromEvent(mCollisionShape, EVENT_RELOADFINISHED);
+    }
+    if (shape)
+    {
+        subscribeToEvent(shape, EVENT_RELOADSTARTED, EVENT_HANDLER(RigidBody, handleCollisionShapeReload));
+        subscribeToEvent(shape, EVENT_RELOADFINISHED, EVENT_HANDLER(RigidBody, handleCollisionShapeReloadFinished));
+    }
     
     mCollisionShape = shape;
     updateGeometries();
@@ -1148,4 +1161,14 @@ void RigidBody::setTempDisabled(bool disable)
         mSavedAngularVelocity = getAngularVelocity();
         setActive(false);
     }
+}
+
+void RigidBody::handleCollisionShapeReload(StringHash eventType, VariantMap& eventData)
+{
+    removeGeometries();
+}
+
+void RigidBody::handleCollisionShapeReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    updateGeometries();
 }

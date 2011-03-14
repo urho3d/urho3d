@@ -24,6 +24,7 @@
 #ifndef RESOURCE_RESOURCE_H
 #define RESOURCE_RESOURCE_H
 
+#include "EventListener.h"
 #include "HashedType.h"
 #include "Timer.h"
 

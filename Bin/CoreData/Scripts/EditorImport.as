@@ -8,6 +8,8 @@ void importModel(const string& in fileName)
     string outFileName = sceneResourcePath + modelName;
     string materialListName = sceneResourcePath + "_tempmatlist_.txt";
 
+    createDirectory(sceneResourcePath + "Models");
+    
     array<string> args;
     args.push("model");
     args.push("\"" + fileName + "\"");

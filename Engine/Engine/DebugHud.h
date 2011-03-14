@@ -53,6 +53,8 @@ public:
     void setMode(unsigned mode);
     //! Set profiler accumulation interval
     void setProfilerInterval(float interval);
+    //! Set whether to show 3D geometry primitive/batch count only. Default false
+    void setUsePipelineStats(bool enable);
     //! Toggle elements
     void toggle(unsigned mode);
     //! Toggle all elements
@@ -70,6 +72,8 @@ public:
     unsigned getMode() const;
     //! Return profiler accumulation interval
     float getProfilerInterval() const { return mProfilerInterval; }
+    //! Return whether showing 3D geometry primitive/batch count only
+    bool getUsePipelineStats() const { return mUsePipelineStats; }
     
 private:
     //! Engine
@@ -86,6 +90,8 @@ private:
     float mProfilerInterval;
     //! Profiler accumulation timer
     float mProfilerTimer;
+    //! Show 3D geometry primitive/batch count flag
+    bool mUsePipelineStats;
 };
 
 DebugHud* getDebugHud();

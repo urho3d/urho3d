@@ -35,6 +35,7 @@
 #include "Renderer.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "VertexBuffer.h"
 #include "XMLElement.h"
 
@@ -555,6 +556,12 @@ void InstancedModel::setModel(Model* model)
     if (!model)
         return;
     
+    // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
+    if (mModel)
+        unsubscribeFromEvent(mModel, EVENT_RELOADFINISHED);
+    if (model)
+        subscribeToEvent(model, EVENT_RELOADFINISHED, EVENT_HANDLER(InstancedModel, handleModelReloadFinished));
+    
     mModel = model;
     mOriginalGeometries.clear();
     
@@ -1066,4 +1073,11 @@ void InstancedModel::calculateLodLevels()
     }
     
     mLodLevelsDirty = false;
+}
+
+void InstancedModel::handleModelReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    Model* currentModel = mModel;
+    mModel = 0; // Set null to allow to be re-set
+    setModel(currentModel);
 }

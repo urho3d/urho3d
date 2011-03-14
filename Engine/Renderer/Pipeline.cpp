@@ -615,6 +615,8 @@ bool Pipeline::render()
     // If no views, just clear the screen
     if (!mNumViews)
     {
+        mNumPrimitives = 0;
+        mNumBatches = 0;
         mRenderer->setAlphaTest(false);
         mRenderer->setBlendMode(BLEND_REPLACE);
         mRenderer->setColorWrite(true);
@@ -635,6 +637,9 @@ bool Pipeline::render()
     mRenderer->setStencilTest(false);
     mRenderer->resetStreamFrequencies();
     
+    // Copy the number of batches & primitives from Renderer so that we can account for 3D geometry only
+    mNumPrimitives = mRenderer->getNumPrimitives();
+    mNumBatches = mRenderer->getNumBatches();
     return true;
 }
 

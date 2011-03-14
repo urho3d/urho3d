@@ -35,7 +35,7 @@
     <MouseSensitivity>0.125</MouseSensitivity>
   </Controls>
   <Game>
-    <LevelName>TestLevel.xml</LevelName>
+    <LevelName>NinjaSnowWarScene.xml</LevelName>
     <PlayerHealth>20</PlayerHealth>
     <PlayerStart>0 90 0</PlayerStart>
     <Enemies>5</Enemies>

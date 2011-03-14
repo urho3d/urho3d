@@ -25,6 +25,7 @@
 #define PHYSICS_COLLISIONSHAPE_H
 
 #include "BoundingBox.h"
+#include "EventListener.h"
 #include "Quaternion.h"
 #include "PhysicsDefs.h"
 #include "Resource.h"
@@ -122,7 +123,7 @@ struct CollisionSubShape
 };
 
 //! Physics collision shape resource
-class CollisionShape : public Resource
+class CollisionShape : public Resource, public EventListener
 {
     DEFINE_TYPE(CollisionShape);
     

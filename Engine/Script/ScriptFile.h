@@ -84,11 +84,6 @@ public:
     //! Return whether script compiled successfully
     bool isCompiled() const { return mCompiled; }
     
-    //! Add script instance to keep track of in case of script reload
-    void addScriptInstance(ScriptInstance* instance);
-    //! Remove script instance to keep track of
-    void removeScriptInstance(ScriptInstance* instance);
-    
 private:
     //! Add a script section, checking for includes recursively
     void addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache);
@@ -113,8 +108,6 @@ private:
     std::map<std::string, asIScriptFunction*> mFunctions;
     //! Search cache for methods
     std::map<asIObjectType*, std::map<std::string, asIScriptFunction*> > mMethods;
-    //! ScriptInstances that have created objects from this script file
-    std::vector<ScriptInstance*> mScriptInstances;
 };
 
 //! Get currently executing script file

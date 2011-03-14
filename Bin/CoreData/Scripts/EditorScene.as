@@ -175,11 +175,6 @@ void reloadResources()
     uint numResources = sceneResources.size();
     for (uint i = 0; i < numResources; ++i)
     {
-        // For now, skip physics for safety
-        // (Rigidbodies would need to be informed of the ODE collisionshape being blown away from under their feet)
-        if (sceneResources[i].getTypeName() == "CollisionShape")
-            continue;
-        
         // Material textures are not listed by getResourceRefs(), so have to handle them manually
         Material@ mat = cast<Material>(sceneResources[i]);
         if (mat !is null)

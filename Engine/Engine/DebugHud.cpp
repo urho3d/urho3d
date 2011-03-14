@@ -37,7 +37,8 @@
 DebugHud::DebugHud(Engine* engine) :
     mEngine(engine),
     mProfilerInterval(1.0f),
-    mProfilerTimer(0.0f)
+    mProfilerTimer(0.0f),
+    mUsePipelineStats(false)
 {
     if (!mEngine)
         EXCEPTION("Null Engine for Debug HUD");
@@ -86,6 +87,18 @@ void DebugHud::update(float timeStep)
     Renderer* renderer = mEngine->getRenderer();
     if ((!pipeline) || (!renderer))
         return;
+    
+    unsigned primitives, batches;
+    if (!mUsePipelineStats)
+    {
+        primitives = renderer->getNumPrimitives();
+        batches = renderer->getNumBatches();
+    }
+    else
+    {
+        primitives = pipeline->getNumPrimitives();
+        batches = pipeline->getNumBatches();
+    }
     
     if (mStatsText->isVisible())
     {
@@ -224,6 +237,11 @@ void DebugHud::setMode(unsigned mode)
 void DebugHud::setProfilerInterval(float interval)
 {
     mProfilerInterval = max(interval, 0.0f);
+}
+
+void DebugHud::setUsePipelineStats(bool enable)
+{
+    mUsePipelineStats = enable;
 }
 
 void DebugHud::toggle(unsigned mode)

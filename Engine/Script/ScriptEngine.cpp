@@ -53,6 +53,8 @@ ScriptEngine::ScriptEngine() :
     mAngelScriptEngine->SetUserData(this);
     mAngelScriptEngine->SetEngineProperty(asEP_USE_CHARACTER_LITERALS, true);
     mAngelScriptEngine->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, true);
+    mAngelScriptEngine->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, true);
+    mAngelScriptEngine->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, true);
     mAngelScriptEngine->SetMessageCallback(asFUNCTION(messageCallback), this, asCALL_CDECL);
     
     // Register the array and string types, but leave it for the script engine instantiator to install the rest of the API

@@ -171,6 +171,8 @@ private:
     void applyMorph(VertexBuffer* buffer, void* lockedMorphRange, const VertexBufferMorph& morph, float weight);
     //! Remove unnecessary animations after a load or network update
     void removeExtraAnimations(const std::set<StringHash>& animations);
+    //! Handle model reload finished
+    void handleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     
     //! Skeleton
     Skeleton mSkeleton;

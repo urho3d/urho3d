@@ -915,6 +915,8 @@ static void registerPipeline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pipeline", "int getOcclusionBufferSize() const", asMETHOD(Pipeline, getOcclusionBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "float getOccluderSizeThreshold() const", asMETHOD(Pipeline, getOccluderSizeThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "const EdgeFilterParameters& getEdgeFilter() const", asMETHOD(Pipeline, getEdgeFilter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "uint getNumPrimitives() const", asMETHOD(Pipeline, getNumPrimitives), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pipeline", "uint getNumBatches() const", asMETHOD(Pipeline, getNumBatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumViews() const", asMETHOD(Pipeline, getNumViews), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumGeometries(bool) const", asMETHOD(Pipeline, getNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pipeline", "uint getNumLights(bool) const", asMETHOD(Pipeline, getNumLights), asCALL_THISCALL);

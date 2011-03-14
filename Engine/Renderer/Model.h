@@ -25,6 +25,7 @@
 #define RENDERER_MODEL_H
 
 #include "BoundingBox.h"
+#include "EventListener.h"
 #include "Skeleton.h"
 #include "Resource.h"
 #include "SharedPtr.h"
@@ -64,7 +65,7 @@ struct ModelMorph
 };
 
 //! Model resource
-class Model : public Resource
+class Model : public Resource, public EventListener
 {
     DEFINE_TYPE(Model);
     

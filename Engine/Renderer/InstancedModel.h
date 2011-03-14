@@ -24,6 +24,7 @@
 #ifndef RENDERER_INSTANCEDMODEL_H
 #define RENDERER_INSTANCEDMODEL_H
 
+#include "EventListener.h"
 #include "GeometryNode.h"
 #include "Matrix4x3.h"
 
@@ -45,7 +46,7 @@ struct Instance
 };
 
 //! Scene node that defines instanced geometry
-class InstancedModel : public GeometryNode
+class InstancedModel : public GeometryNode, public EventListener
 {
     DEFINE_TYPE(InstancedModel);
     
@@ -147,6 +148,8 @@ private:
     void resetLodLevels();
     //! Choose LOD levels based on distance
     void calculateLodLevels();
+    //! Handle model reload finished
+    void handleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     
     //! Create a duplicated vertex buffer copy for instancing
     static const SharedPtr<VertexBuffer>& createInstanceVertexBuffer(VertexBuffer* original, unsigned instanceCount);

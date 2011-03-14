@@ -60,10 +60,6 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
 {
     PROFILE(Script_Load);
     
-    // If script instances have created objects from this file, release them now
-    // Make a copy of the vector because the script instances will remove themselves from the member vector
-    std::vector<ScriptInstance*> instances = mScriptInstances;
-    
     releaseModule();
     
     // Create the module. Discard previous module if there was one
@@ -91,10 +87,6 @@ void ScriptFile::load(Deserializer& source, ResourceCache* cache)
     LOGINFO("Compiled script module " + getName());
     mCompiled = true;
     moduleToFile[mScriptModule] = this;
-    
-    // Now let the script instances recreate their objects
-    for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
-        (*i)->createObject();
 }
 
 void ScriptFile::addEventHandler(StringHash eventType, const std::string& handlerName)
@@ -330,23 +322,6 @@ asIScriptFunction* ScriptFile::getMethod(asIScriptObject* object, const std::str
     return function;
 }
 
-void ScriptFile::addScriptInstance(ScriptInstance* instance)
-{
-    mScriptInstances.push_back(instance);
-}
-
-void ScriptFile::removeScriptInstance(ScriptInstance* instance)
-{
-    for (std::vector<ScriptInstance*>::iterator i = mScriptInstances.begin(); i != mScriptInstances.end(); ++i)
-    {
-        if ((*i) == instance)
-        {
-            mScriptInstances.erase(i);
-            break;
-        }
-    }
-}
-
 void ScriptFile::addScriptSection(asIScriptEngine* engine, Deserializer& source, ResourceCache* cache)
 {
     unsigned dataSize = source.getSize();
@@ -523,11 +498,6 @@ void ScriptFile::releaseModule()
 {
     if (mScriptModule)
     {
-        // Release script instances if any exist
-        std::vector<ScriptInstance*> instances = mScriptInstances;
-        for (std::vector<ScriptInstance*>::iterator i = instances.begin(); i != instances.end(); ++i)
-            (*i)->releaseObject();
-        
         // Clear search caches, event handlers and function-to-file mappings
         mAllIncludeFiles.clear();
         mCheckedClasses.clear();

@@ -37,6 +37,7 @@
 #include "Renderer.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "Scene.h"
 #include "VertexBuffer.h"
 
@@ -639,6 +640,12 @@ void AnimatedModel::setModel(Model* model)
     
     if (!model)
         return;
+    
+    // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
+    if (mModel)
+        unsubscribeFromEvent(mModel, EVENT_RELOADFINISHED);
+    if (model)
+        subscribeToEvent(model, EVENT_RELOADFINISHED, EVENT_HANDLER(AnimatedModel, handleModelReloadFinished));
     
     mModel = model;
     
@@ -1301,4 +1308,11 @@ void AnimatedModel::removeExtraAnimations(const std::set<StringHash>& animations
     
     if (removedAny)
         markAnimationDirty();
+}
+
+void AnimatedModel::handleModelReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    Model* currentModel = mModel;
+    mModel = 0; // Set null to allow to be re-set
+    setModel(currentModel);
 }

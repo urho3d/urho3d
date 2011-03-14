@@ -32,6 +32,7 @@
 #include "Profiler.h"
 #include "ReplicationUtils.h"
 #include "ResourceCache.h"
+#include "ResourceEvents.h"
 #include "StaticModel.h"
 #include "XMLElement.h"
 
@@ -320,6 +321,12 @@ void StaticModel::setModel(Model* model)
     if (!model)
         return;
     
+    // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
+    if (mModel)
+        unsubscribeFromEvent(mModel, EVENT_RELOADFINISHED);
+    if (model)
+        subscribeToEvent(model, EVENT_RELOADFINISHED, EVENT_HANDLER(StaticModel, handleModelReloadFinished));
+    
     mModel = model;
     
     // Copy the subgeometry & LOD level structure
@@ -402,4 +409,11 @@ void StaticModel::calculateLodLevels()
     }
     
     mLodLevelsDirty = false;
+}
+
+void StaticModel::handleModelReloadFinished(StringHash eventType, VariantMap& eventData)
+{
+    Model* currentModel = mModel;
+    mModel = 0; // Set null to allow to be re-set
+    setModel(currentModel);
 }

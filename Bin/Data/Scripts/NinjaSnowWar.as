@@ -91,7 +91,7 @@ void initScene()
     engine.setDefaultScene(gameScene);
     engine.setDefaultScriptFile(scriptFile);
 
-    File@ levelFile = cache.getFile("TestLevel.xml");
+    File@ levelFile = cache.getFile("NinjaSnowWarScene.xml");
     gameScene.loadXML(levelFile);
 }
 
