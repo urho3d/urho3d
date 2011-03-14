@@ -756,7 +756,7 @@ public:
     
 private:
     //! Set new type and allocate/deallocate memory as necessary
-    void Variant::setType(VariantType newType);
+    void setType(VariantType newType);
     
     //! Variant type
     VariantType mType;

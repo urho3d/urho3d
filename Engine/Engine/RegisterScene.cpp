@@ -246,7 +246,7 @@ static Entity* GetEntity()
     return getScriptContextEntity();
 }
 
-static void registerEntity(asIScriptEngine* engine)
+void registerEntity(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("PropertyMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPropertyMap), asCALL_CDECL_OBJLAST);
