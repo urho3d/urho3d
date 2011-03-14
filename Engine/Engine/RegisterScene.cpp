@@ -252,7 +252,7 @@ static void registerEntity(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructPropertyMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructPropertyMapCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("PropertyMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructPropertyMap), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("PropertyMap", "PropertyMap& opAssign(const PropertyMap& in)", asMETHOD(PropertyMap, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PropertyMap", "PropertyMap& opAssign(const PropertyMap& in)", asMETHODPR(PropertyMap, operator =, (const PropertyMap&), PropertyMap&), asCALL_THISCALL);
     engine->RegisterObjectMethod("PropertyMap", "Variant& opIndex(const string& in)", asFUNCTION(PropertyMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PropertyMap", "const Variant& opIndex(const string& in) const", asFUNCTION(PropertyMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PropertyMap", "void setSync(const string& in, bool enable)", asFUNCTION(PropertyMapSetSync), asCALL_CDECL_OBJLAST);

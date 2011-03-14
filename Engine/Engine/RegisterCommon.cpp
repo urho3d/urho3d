@@ -455,7 +455,7 @@ static void registerVariant(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVariantMap), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap& in)", asMETHOD(VariantMap, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap& in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const string& in)", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const string& in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "uint size() const", asMETHOD(VariantMap, size), asCALL_THISCALL);
