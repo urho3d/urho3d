@@ -100,27 +100,26 @@ void ps(
             diff *= evaluateShadow(shadowPos);
         #endif
 
-        const float3 rgbDot = 1.0 / 3.0;
-        float shapeFactor;
         #ifdef SPOTLIGHT
             float4 spotPos = mul(float4(worldPos, 1.0), cSpotProjPS);
             float3 shapeColor = spotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, spotPos).rgb : 0.0;
-            shapeFactor = dot(shapeColor, rgbDot);
             lightColor = shapeColor * cLightColor.rgb;
         #else
             #ifdef CUBEMASK
                 float3 shapeColor = texCUBE(sLightCubeMap, mul(lightVec, cLightVecRot)).rgb;
-                shapeFactor = dot(shapeColor, rgbDot);
                 lightColor = shapeColor * cLightColor.rgb;
             #else
-                shapeFactor = 1.0;
                 lightColor = cLightColor.rgb;
             #endif
         #endif
 
         #ifdef SPECULAR
-            float spec = evaluateSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
-            oColor = diff * float4(lightColor, spec * shapeFactor * cLightColor.a);
+            #if defined(SPOTLIGHT) || defined(CUBEMASK)
+                float spec = shapeColor.g * evaluateSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
+            #else
+                float spec = evaluateSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
+            #endif
+            oColor = diff * float4(lightColor, spec * cLightColor.a);
         #else
             oColor = float4(diff * lightColor, 0.0);
         #endif

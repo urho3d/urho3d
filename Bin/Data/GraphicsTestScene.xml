@@ -6484,50 +6484,6 @@
         </component>
     </entity>
     <entity id="397" netflags="0" netdistance="0" groupflags="0">
-        <component type="AnimatedModel" netflags="0">
-            <transform pos="20 20 50" rot="0 0 0" scale="0.01 0.01 0.01" />
-            <parent id="0" type="" name="" />
-            <render castshadows="false" occluder="false" visible="true" />
-            <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" lodbias="1" animlodbias="1" invisiblelodfactor="0" localanimation="false" />
-            <model name="Models/cat.mdl" />
-            <material name="" />
-            <animation name="Models/cat_Anim1.ani" startbone="root" looped="true" weight="1" time="0" priority="0" nlerp="false" />
-        </component>
-    </entity>
-    <entity id="398" netflags="0" netdistance="0" groupflags="0">
-        <component type="AnimatedModel" netflags="0">
-            <transform pos="30 20 50" rot="0 0 0" scale="0.01 0.01 0.01" />
-            <parent id="0" type="" name="" />
-            <render castshadows="false" occluder="false" visible="true" />
-            <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" lodbias="1" animlodbias="1" invisiblelodfactor="0" localanimation="false" />
-            <model name="Models/neko.mdl" />
-            <material name="" />
-            <animation name="Models/neko_Anim1.ani" startbone="root" looped="true" weight="1" time="0" priority="0" nlerp="false" />
-        </component>
-    </entity>
-    <entity id="399" netflags="0" netdistance="0" groupflags="0">
-        <component type="AnimatedModel" netflags="0">
-            <transform pos="20 20 70" rot="0 0 0" scale="0.005 0.005 0.005" />
-            <parent id="0" type="" name="" />
-            <render castshadows="false" occluder="false" visible="true" />
-            <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" lodbias="1" animlodbias="1" invisiblelodfactor="0" localanimation="false" />
-            <model name="Models/scout.mdl" />
-            <material name="" />
-            <animation name="Models/scout_Anim1.ani" startbone="scout_rigged_max" looped="true" weight="1" time="0" priority="0" nlerp="false" />
-        </component>
-    </entity>
-    <entity id="400" netflags="0" netdistance="0" groupflags="0">
-        <component type="AnimatedModel" netflags="0">
-            <transform pos="30 20 70" rot="0 0 0" scale="0.005 0.005 0.005" />
-            <parent id="0" type="" name="" />
-            <render castshadows="false" occluder="false" visible="true" />
-            <lod drawdistance="0" shadowdistance="0" viewmask="-1" lightmask="-1" lodbias="1" animlodbias="1" invisiblelodfactor="0" localanimation="false" />
-            <model name="Models/scoutmodel.mdl" />
-            <material name="" />
-            <animation name="Models/scoutmodelAnim1.ani" startbone="scout_rigged_max" looped="true" weight="1" time="0" priority="0" nlerp="false" />
-        </component>
-    </entity>
-    <entity id="401" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="8.22144 16.6862 67.0898" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6552,7 +6508,7 @@
             <billboard enabled="true" pos="-2.61749 3.82642 -2.41425" size="3.77332 4.60217" uv="0 0 1 1" color="1 1 1 1" rot="144.415" />
         </component>
     </entity>
-    <entity id="402" netflags="0" netdistance="0" groupflags="0">
+    <entity id="398" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-64.1479 19.2584 -76.0437" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6577,7 +6533,7 @@
             <billboard enabled="true" pos="1.02173 0.658203 -4.82574" size="4.75275 3.3028" uv="0 0 1 1" color="1 1 1 1" rot="174.76" />
         </component>
     </entity>
-    <entity id="403" netflags="0" netdistance="0" groupflags="0">
+    <entity id="399" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="35.2905 11.0631 -63.8672" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6602,7 +6558,7 @@
             <billboard enabled="true" pos="1.00708 -0.253174 -4.77951" size="4.93286 4.30548" uv="0 0 1 1" color="1 1 1 1" rot="239.37" />
         </component>
     </entity>
-    <entity id="404" netflags="0" netdistance="0" groupflags="0">
+    <entity id="400" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="67.7185 10.6213 -80.481" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6627,7 +6583,7 @@
             <billboard enabled="true" pos="4.58267 2.65552 -4.57855" size="4.26135 4.65717" uv="0 0 1 1" color="1 1 1 1" rot="0.911865" />
         </component>
     </entity>
-    <entity id="405" netflags="0" netdistance="0" groupflags="0">
+    <entity id="401" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-55.0049 17.2488 75.2319" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6652,7 +6608,7 @@
             <billboard enabled="true" pos="2.67929 3.9751 -0.112152" size="4.5166 4.95605" uv="0 0 1 1" color="1 1 1 1" rot="268.11" />
         </component>
     </entity>
-    <entity id="406" netflags="0" netdistance="0" groupflags="0">
+    <entity id="402" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="72.2473 16.7027 -56.9824" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6677,7 +6633,7 @@
             <billboard enabled="true" pos="-0.524597 -2.44775 5.36453" size="4.06592 3.43811" uv="0 0 1 1" color="1 1 1 1" rot="191.788" />
         </component>
     </entity>
-    <entity id="407" netflags="0" netdistance="0" groupflags="0">
+    <entity id="403" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="3.28369 8.30551 -59.8877" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6702,7 +6658,7 @@
             <billboard enabled="true" pos="2.94388 3.34937 0.166626" size="3.67584 3.85736" uv="0 0 1 1" color="1 1 1 1" rot="318.219" />
         </component>
     </entity>
-    <entity id="408" netflags="0" netdistance="0" groupflags="0">
+    <entity id="404" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="96.344 5.06271 -71.0144" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6727,7 +6683,7 @@
             <billboard enabled="true" pos="-5.99762 -0.247803 2.84637" size="3.88116 4.22003" uv="0 0 1 1" color="1 1 1 1" rot="237.294" />
         </component>
     </entity>
-    <entity id="409" netflags="0" netdistance="0" groupflags="0">
+    <entity id="405" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="19.9585 6.45523 -99.7864" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6752,7 +6708,7 @@
             <billboard enabled="true" pos="-6.26312 -2.34912 -1.41861" size="4.30457 3.07739" uv="0 0 1 1" color="1 1 1 1" rot="56.6016" />
         </component>
     </entity>
-    <entity id="410" netflags="0" netdistance="0" groupflags="0">
+    <entity id="406" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="74.7925 18.3827 45.5566" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6777,7 +6733,7 @@
             <billboard enabled="true" pos="-0.553436 1.45361 0.637665" size="3.37384 4.15625" uv="0 0 1 1" color="1 1 1 1" rot="1.5271" />
         </component>
     </entity>
-    <entity id="411" netflags="0" netdistance="0" groupflags="0">
+    <entity id="407" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-77.7832 7.90222 20.9778" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6802,7 +6758,7 @@
             <billboard enabled="true" pos="-2.10388 -3.15894 2.33002" size="3.966 4.0589" uv="0 0 1 1" color="1 1 1 1" rot="340.071" />
         </component>
     </entity>
-    <entity id="412" netflags="0" netdistance="0" groupflags="0">
+    <entity id="408" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-13.0493 6.50192 92.2852" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6827,7 +6783,7 @@
             <billboard enabled="true" pos="5.45517 -1.25659 1.54953" size="3.83032 3.95679" uv="0 0 1 1" color="1 1 1 1" rot="297.433" />
         </component>
     </entity>
-    <entity id="413" netflags="0" netdistance="0" groupflags="0">
+    <entity id="409" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-47.5403 14.7032 47.467" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6852,7 +6808,7 @@
             <billboard enabled="true" pos="6.40778 -0.440186 2.13455" size="3.73175 4.19666" uv="0 0 1 1" color="1 1 1 1" rot="294.258" />
         </component>
     </entity>
-    <entity id="414" netflags="0" netdistance="0" groupflags="0">
+    <entity id="410" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="30.9937 15.0525 -18.1946" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6877,7 +6833,7 @@
             <billboard enabled="true" pos="0.817566 -0.959961 3.49228" size="3.41296 4.52454" uv="0 0 1 1" color="1 1 1 1" rot="139.57" />
         </component>
     </entity>
-    <entity id="415" netflags="0" netdistance="0" groupflags="0">
+    <entity id="411" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-36.6638 18.1145 30.7129" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6902,7 +6858,7 @@
             <billboard enabled="true" pos="-0.578156 0.484863 -4.29245" size="3.16223 3.47162" uv="0 0 1 1" color="1 1 1 1" rot="267.363" />
         </component>
     </entity>
-    <entity id="416" netflags="0" netdistance="0" groupflags="0">
+    <entity id="412" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-29.3457 5.55893 11.5417" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6927,7 +6883,7 @@
             <billboard enabled="true" pos="-5.93033 -2.68457 -1.42593" size="4.3429 3.96954" uv="0 0 1 1" color="1 1 1 1" rot="303.333" />
         </component>
     </entity>
-    <entity id="417" netflags="0" netdistance="0" groupflags="0">
+    <entity id="413" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-64.8438 11.5341 -0.3479" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6952,7 +6908,7 @@
             <billboard enabled="true" pos="-2.68524 2.09668 7.37274" size="4.97467 3.12653" uv="0 0 1 1" color="1 1 1 1" rot="14.0735" />
         </component>
     </entity>
-    <entity id="418" netflags="0" netdistance="0" groupflags="0">
+    <entity id="414" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="72.1985 17.8156 -83.7524" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -6977,7 +6933,7 @@
             <billboard enabled="true" pos="-5.37689 3.41772 -3.95782" size="3.83221 3.22809" uv="0 0 1 1" color="1 1 1 1" rot="55.2612" />
         </component>
     </entity>
-    <entity id="419" netflags="0" netdistance="0" groupflags="0">
+    <entity id="415" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="95.8008 19.7926 20.7397" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -7002,7 +6958,7 @@
             <billboard enabled="true" pos="-4.22195 1.47925 -1.55914" size="3.16589 3.29425" uv="0 0 1 1" color="1 1 1 1" rot="244.973" />
         </component>
     </entity>
-    <entity id="420" netflags="0" netdistance="0" groupflags="0">
+    <entity id="416" netflags="0" netdistance="0" groupflags="0">
         <component type="BillboardSet" netflags="0">
             <transform pos="-46.9299 12.7513 -7.33032" rot="0 0 0" scale="1 1 1" />
             <parent id="0" type="" name="" />
@@ -7027,7 +6983,7 @@
             <billboard enabled="true" pos="0.329132 -1.66455 6.67191" size="4.86145 4.42084" uv="0 0 1 1" color="1 1 1 1" rot="53.4705" />
         </component>
     </entity>
-    <entity id="421" netflags="0" netdistance="0" groupflags="0">
+    <entity id="417" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.809479 0.436766 0.3924 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="4.78821 53.898 22.7097" rot="45 63.9514 28.9965" scale="1 1 1" />
@@ -7043,7 +6999,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="422" netflags="0" netdistance="0" groupflags="0">
+    <entity id="418" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.383172 0.922701 -0.0424472 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-27.9099 44.8636 70.7199" rot="45 -177.363 -173.64" scale="1 1 1" />
@@ -7059,7 +7015,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="423" netflags="0" netdistance="0" groupflags="0">
+    <entity id="419" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.632069 0.559358 0.536289 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-16.4063 40.9113 74.6521" rot="45 106.512 58.0452" scale="1 1 1" />
@@ -7075,7 +7031,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="424" netflags="0" netdistance="0" groupflags="0">
+    <entity id="420" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.672071 0.526065 0.521129 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-21.9131 49.9155 -22.3206" rot="45 97.8552 50.842" scale="1 1 1" />
@@ -7091,7 +7047,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="425" netflags="0" netdistance="0" groupflags="0">
+    <entity id="421" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.915743 0.386084 0.111153 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="19.1208 34.5978 58.0765" rot="45 16.7322 6.97176" scale="1 1 1" />
@@ -7107,7 +7063,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="426" netflags="0" netdistance="0" groupflags="0">
+    <entity id="422" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.499425 0.707921 0.499422 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="48.5046 52.8479 57.5912" rot="45 135.132 90.1867" scale="1 1 1" />
@@ -7123,7 +7079,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="427" netflags="0" netdistance="0" groupflags="0">
+    <entity id="423" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.796545 0.443858 0.410494 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="52.9587 56.7654 43.2312" rot="45 67.6428 31.0204" scale="1 1 1" />
@@ -7139,7 +7095,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="428" netflags="0" netdistance="0" groupflags="0">
+    <entity id="424" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.440873 0.801939 -0.403143 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-5.4245 33.0139 -50.7889" rot="45 -149.821 -113.877" scale="1 1 1" />
@@ -7155,7 +7111,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="429" netflags="0" netdistance="0" groupflags="0">
+    <entity id="425" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.91203 0.387655 -0.133881 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-21.7255 37.9651 51.6174" rot="45 -20.2038 -8.44122" scale="1 1 1" />
@@ -7171,7 +7127,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="430" netflags="0" netdistance="0" groupflags="0">
+    <entity id="426" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.632532 0.558949 -0.53617 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="10.8856 42.9465 63.0981" rot="45 -106.414 -57.9578" scale="1 1 1" />
@@ -7187,7 +7143,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="431" netflags="0" netdistance="0" groupflags="0">
+    <entity id="427" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.731892 0.483068 0.480603 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-68.7561 43.3301 -29.2236" rot="45 84.2102 41.0455" scale="1 1 1" />
@@ -7203,7 +7159,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="432" netflags="0" netdistance="0" groupflags="0">
+    <entity id="428" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.803278 0.440138 0.401277 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="56.9595 56.5768 -43.721" rot="45 65.7422 29.9702" scale="1 1 1" />
@@ -7219,7 +7175,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="433" netflags="0" netdistance="0" groupflags="0">
+    <entity id="429" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.54353 0.650477 0.530524 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="36.7722 57.6196 49.0997" rot="45 125.354 77.4407" scale="1 1 1" />
@@ -7235,7 +7191,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="434" netflags="0" netdistance="0" groupflags="0">
+    <entity id="430" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.407388 0.867854 0.284367 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-53.5309 59.3408 55.2933" rot="45 160.873 135.731" scale="1 1 1" />
@@ -7251,7 +7207,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="435" netflags="0" netdistance="0" groupflags="0">
+    <entity id="431" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.884829 0.399572 -0.239622 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-8.4549 41.4111 -28.5141" rot="45 -36.8481 -15.7126" scale="1 1 1" />
@@ -7267,7 +7223,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="436" netflags="0" netdistance="0" groupflags="0">
+    <entity id="432" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.679191 0.520551 0.517423 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-33.2108 49.4943 16.3101" rot="45 96.2842 49.6252" scale="1 1 1" />
@@ -7283,7 +7239,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="437" netflags="0" netdistance="0" groupflags="0">
+    <entity id="433" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.508116 0.695813 -0.507605 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-10.8444 45.6335 -41.8854" rot="45 -133.154 -87.4314" scale="1 1 1" />
@@ -7299,7 +7255,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="438" netflags="0" netdistance="0" groupflags="0">
+    <entity id="434" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.76716 0.46086 -0.446177 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="-25.415 35.0858 19.0567" rot="45 -75.4981 -35.5628" scale="1 1 1" />
@@ -7315,7 +7271,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="439" netflags="0" netdistance="0" groupflags="0">
+    <entity id="435" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.85721 0.412447 0.308349 -0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="52.2537 37.6208 -48.1796" rot="45 48.3838 21.0826" scale="1 1 1" />
@@ -7331,7 +7287,7 @@
             <shapetexture name="" />
         </component>
     </entity>
-    <entity id="440" netflags="0" netdistance="0" groupflags="0">
+    <entity id="436" netflags="0" netdistance="0" groupflags="0">
         <property hash="44830" type="Quaternion" value="0.891534 0.396568 -0.218865 0" sync="false" />
         <component type="Light" netflags="0">
             <transform pos="64.9155 47.5919 -2.99835" rot="45 -33.4973 -14.2109" scale="1 1 1" />
