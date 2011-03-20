@@ -107,12 +107,8 @@ public:
     
     //! Construct from translation, rotation and uniform scale
     Matrix4x3(const Vector3& translation, const Quaternion& rotation, float scale);
-    //! Construct from translation, rotation matrix and uniform scale
-    Matrix4x3(const Vector3& translation, const Matrix3& rotation, float scale);
     //! Construct from translation, rotation and nonuniform scale
     Matrix4x3(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
-    //! Construct from translation, rotation matrix and nonuniform scale
-    Matrix4x3(const Vector3& translation, const Matrix3& rotation, const Vector3& scale);
     
     //! Assign from another matrix
     Matrix4x3& operator = (const Matrix4x3& rhs)
@@ -311,12 +307,8 @@ public:
     
     //! Define from translation, rotation and uniform scale
     void define(const Vector3& translation, const Quaternion& rotation, float scale);
-    //! Define from translation, rotation matrix and uniform scale
-    void define(const Vector3& translation, const Matrix3& rotation, float scale);
     //! Define from translation, rotation and nonuniform scale
     void define(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
-    //! Define from translation, rotation matrix and nonuniform scale
-    void define(const Vector3& translation, const Matrix3& rotation, const Vector3& scale);
     
     //! Return the rotation matrix
     Matrix3 getRotationMatrix() const
@@ -344,15 +336,8 @@ public:
         );
     }
     
-    //! Return the scaling elements
-    Vector3 getScale() const
-    {
-        return Vector3(
-            m00,
-            m11,
-            m22
-        );
-    }
+    //! Return decomposition to translation, rotation and scale
+    void getDecomposition(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     
     //! Return inverse
     Matrix4x3 getInverse() const;

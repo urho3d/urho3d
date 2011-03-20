@@ -74,6 +74,8 @@ public:
     Quaternion(float angleX, float angleY, float angleZ);
     //! Construct from the rotation difference between two vectors
     Quaternion(const Vector3& start, const Vector3& end);
+    //! Construct from a rotation matrix
+    Quaternion(const Matrix3& matrix);
     
     //! Assign from another quaternion
     Quaternion& operator = (const Quaternion& rhs)
@@ -185,6 +187,8 @@ public:
     void fromEulerAngles(const Vector3& euler);
     //! Set from the rotation difference between two vectors
     void fromRotationTo(const Vector3& start, const Vector3& end);
+    //! Set from a rotation matrix
+    void fromRotationMatrix(const Matrix3& matrix);
     
     //! Return normalized to unit length
     Quaternion getNormalized() const

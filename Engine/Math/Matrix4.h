@@ -348,16 +348,6 @@ public:
         );
     }
     
-    //! Return the scaling elements
-    Vector3 getScale() const
-    {
-        return Vector3(
-            m00,
-            m11,
-            m22
-        );
-    }
-    
     //! Return transpose
     Matrix4 getTranspose() const
     {
@@ -380,6 +370,9 @@ public:
             m33
         );
     }
+    
+    //! Return decomposition to translation, rotation and scale
+    void getDecomposition(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     
     //! Return inverse
     Matrix4 getInverse() const;

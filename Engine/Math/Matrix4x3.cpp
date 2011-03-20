@@ -39,17 +39,7 @@ Matrix4x3::Matrix4x3(const Vector3& translation, const Quaternion& rotation, flo
     define(translation, rotation, scale);
 }
 
-Matrix4x3::Matrix4x3(const Vector3& translation, const Matrix3& rotation, float scale)
-{
-    define(translation, rotation, scale);
-}
-
 Matrix4x3::Matrix4x3(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
-{
-    define(translation, rotation, scale);
-}
-
-Matrix4x3::Matrix4x3(const Vector3& translation, const Matrix3& rotation, const Vector3& scale)
 {
     define(translation, rotation, scale);
 }
@@ -63,15 +53,6 @@ void Matrix4x3::define(const Vector3& translation, const Quaternion& rotation, f
     setTranslation(translation);
 }
 
-void Matrix4x3::define(const Vector3& translation, const Matrix3& rotation, float scale)
-{
-    Matrix3 scaleMatrix(Matrix3::sIdentity);
-    scaleMatrix.setScale(scale);
-    
-    *this = rotation * scaleMatrix;
-    setTranslation(translation);
-}
-
 void Matrix4x3::define(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 {
     Matrix3 scaleMatrix(Matrix3::sIdentity);
@@ -81,13 +62,25 @@ void Matrix4x3::define(const Vector3& translation, const Quaternion& rotation, c
     setTranslation(translation);
 }
 
-void Matrix4x3::define(const Vector3& translation, const Matrix3& rotation, const Vector3& scale)
+void Matrix4x3::getDecomposition(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
-    Matrix3 scaleMatrix(Matrix3::sIdentity);
-    scaleMatrix.setScale(scale);
+    translation.mX = m03;
+    translation.mY = m13;
+    translation.mZ = m23;
     
-    *this = rotation * scaleMatrix;
-    setTranslation(translation);
+    Vector3 row1(m00, m10, m20);
+    Vector3 row2(m01, m11, m21);
+    Vector3 row3(m02, m12, m22);
+    
+    scale.mX = row1.getLength();
+    scale.mY = row2.getLength();
+    scale.mZ = row3.getLength();
+    
+    // Remove scaling from the 3x3 matrix to get rotation
+    row1 /= scale.mX;
+    row2 /= scale.mY;
+    row3 /= scale.mZ;
+    rotation.fromRotationMatrix(Matrix3(row1.mX, row2.mX, row3.mX, row1.mY, row2.mY, row3.mY, row1.mZ, row2.mZ, row3.mZ));
 }
 
 Matrix4x3 Matrix4x3::getInverse() const

@@ -46,6 +46,11 @@ Quaternion::Quaternion(const Vector3& start, const Vector3& end)
     fromRotationTo(start, end);
 }
 
+Quaternion::Quaternion(const Matrix3& matrix)
+{
+    fromRotationMatrix(matrix);
+}
+
 void Quaternion::fromAngleAxis(float angle, const Vector3& axis)
 {
     Vector3 normAxis = axis.getNormalized();
@@ -90,7 +95,7 @@ void Quaternion::fromRotationTo(const Vector3& start, const Vector3& end)
         mX = c.mX * invS;
         mY = c.mY * invS;
         mZ = c.mZ * invS;
-        mW = s * 0.5f;
+        mW = 0.5f * s;
     }
     else
     {
@@ -102,10 +107,58 @@ void Quaternion::fromRotationTo(const Vector3& start, const Vector3& end)
     }
 }
 
+void Quaternion::fromRotationMatrix(const Matrix3& matrix)
+{
+    float t = matrix.m00 + matrix.m11 + matrix.m22 + 1.0f;
+    if (t > 0.0f)
+    {
+        float s = sqrtf(t) * 2.0f;
+        float invS = 1.0f / s;
+        
+        mX = (matrix.m21 - matrix.m12) * invS;
+        mY = (matrix.m02 - matrix.m20) * invS;
+        mZ = (matrix.m10 - matrix.m01) * invS;
+        mW = 0.25f * s;
+    }
+    else
+    {
+        if ((matrix.m00 > matrix.m11) && (matrix.m00 > matrix.m22))
+        {
+            float s = sqrtf(1.0f + matrix.m00 - matrix.m11 - matrix.m22) * 2.0f;
+            float invS = 1.0f / s;
+            
+            mX = 0.25f * s;
+            mY = (matrix.m01 + matrix.m10) * invS;
+            mZ = (matrix.m20 + matrix.m02) * invS;
+            mW = (matrix.m21 - matrix.m12) * invS;
+        }
+        else if (matrix.m11 > matrix.m22)
+        {
+            float s = sqrtf(1.0f + matrix.m11 - matrix.m00 - matrix.m22) * 2.0f;
+            float invS = 1.0f / s;
+            
+            mX = (matrix.m01 + matrix.m10) * invS;
+            mY = 0.25f * s;
+            mZ = (matrix.m12 + matrix.m21) * invS;
+            mW = (matrix.m02 - matrix.m20) * invS;
+        }
+        else
+        {
+            float s = sqrtf(1.0f + matrix.m22 - matrix.m00 - matrix.m11) * 2.0f;
+            float invS = 1.0f / s;
+            
+            mX = (matrix.m02 + matrix.m20) * invS;
+            mY = (matrix.m12 + matrix.m21) * invS;
+            mZ = 0.25f * s;
+            mW = (matrix.m10 - matrix.m01) * invS;
+        }
+    }
+}
+
 Vector3 Quaternion::getEulerAngles() const
 {
     // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
-    
+    // Order of rotations: Z first, then X, then Y
     float check = 2.0f * (-mY * mZ + mW * mX);
     
     if (check < -0.995f)
