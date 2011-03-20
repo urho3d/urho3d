@@ -593,6 +593,7 @@ bool Pipeline::update(float timeStep)
         Octree* octree = viewport.mScene->getExtension<Octree>();
         if (mUpdatedOctrees.find(octree) == mUpdatedOctrees.end())
         {
+            mFrame.mCamera = viewport.mCamera;
             octree->updateOctree(mFrame);
             mUpdatedOctrees.insert(octree);
         }
