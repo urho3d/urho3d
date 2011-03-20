@@ -181,14 +181,14 @@ public:
         mZ *= invLen;
     }
     
-    //! Set from an angle (in degrees) and axis
-    void fromAngleAxis(float angle, const Vector3& axis);
-    //! Set from Euler angles (in degrees)
-    void fromEulerAngles(const Vector3& euler);
-    //! Set from the rotation difference between two vectors
-    void fromRotationTo(const Vector3& start, const Vector3& end);
-    //! Set from a rotation matrix
-    void fromRotationMatrix(const Matrix3& matrix);
+    //! Define from an angle (in degrees) and axis
+    void define(float angle, const Vector3& axis);
+    //! Define from Euler angles (in degrees)
+    void define(const Vector3& euler);
+    //! Define from the rotation difference between two vectors
+    void define(const Vector3& start, const Vector3& end);
+    //! Define from a rotation matrix
+    void define(const Matrix3& matrix);
     
     //! Return normalized to unit length
     Quaternion getNormalized() const

@@ -28,30 +28,30 @@ const Quaternion Quaternion::sIdentity(1.0f, 0.0f, 0.0f, 0.0f);
 
 Quaternion::Quaternion(float angle, const Vector3& Axis)
 {
-    fromAngleAxis(angle, Axis);
+    define(angle, Axis);
 }
 
 Quaternion::Quaternion(const Vector3& euler)
 {
-    fromEulerAngles(euler);
+    define(euler);
 }
 
 Quaternion::Quaternion(float angleX, float angleY, float angleZ)
 {
-    fromEulerAngles(Vector3(angleX, angleY, angleZ));
+    define(Vector3(angleX, angleY, angleZ));
 }
 
 Quaternion::Quaternion(const Vector3& start, const Vector3& end)
 {
-    fromRotationTo(start, end);
+    define(start, end);
 }
 
 Quaternion::Quaternion(const Matrix3& matrix)
 {
-    fromRotationMatrix(matrix);
+    define(matrix);
 }
 
-void Quaternion::fromAngleAxis(float angle, const Vector3& axis)
+void Quaternion::define(float angle, const Vector3& axis)
 {
     Vector3 normAxis = axis.getNormalized();
     float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
@@ -63,7 +63,7 @@ void Quaternion::fromAngleAxis(float angle, const Vector3& axis)
     mZ = normAxis.mZ * sinAngle;
 }
 
-void Quaternion::fromEulerAngles(const Vector3& euler)
+void Quaternion::define(const Vector3& euler)
 {
     // Order of rotations: Z first, then X, then Y (mimics typical FPS camera with gimbal lock at top/bottom)
     float sinX = sinf((euler.mX * M_DEGTORAD) * 0.5f);
@@ -79,7 +79,7 @@ void Quaternion::fromEulerAngles(const Vector3& euler)
     mZ = cosY * cosX * sinZ - sinY * sinX * cosZ;
 }
 
-void Quaternion::fromRotationTo(const Vector3& start, const Vector3& end)
+void Quaternion::define(const Vector3& start, const Vector3& end)
 {
     Vector3 normStart = start.getNormalized();
     Vector3 normEnd = end.getNormalized();
@@ -103,11 +103,11 @@ void Quaternion::fromRotationTo(const Vector3& start, const Vector3& end)
         if (tempAxis.getLength() < M_EPSILON)
             tempAxis = Vector3::sUp.crossProduct(normStart);
         
-        fromAngleAxis(180.0f, tempAxis);
+        define(180.0f, tempAxis);
     }
 }
 
-void Quaternion::fromRotationMatrix(const Matrix3& matrix)
+void Quaternion::define(const Matrix3& matrix)
 {
     float t = matrix.m00 + matrix.m11 + matrix.m22 + 1.0f;
     if (t > 0.0f)

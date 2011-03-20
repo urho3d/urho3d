@@ -361,9 +361,9 @@ static void registerQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "Quaternion opSub(const Quaternion& in) const", asMETHODPR(Quaternion, operator +, (const Quaternion&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion opMul(const Quaternion& in) const", asMETHODPR(Quaternion, operator *, (const Quaternion&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void normalize()", asMETHOD(Quaternion, normalize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void fromAngleAxis(float, const Vector3& in)", asMETHOD(Quaternion, fromAngleAxis), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void fromEulerAngles(const Vector3& in)", asMETHOD(Quaternion, fromEulerAngles), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "void fromRotation(const Vector3& in, const Vector3& in)", asMETHOD(Quaternion, fromRotationTo), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void define(float, const Vector3& in)", asMETHODPR(Quaternion, define, (float, const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void define(const Vector3& in)", asMETHODPR(Quaternion, define, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void fromRotation(const Vector3& in, const Vector3& in)", asMETHODPR(Quaternion, define, (const Vector3&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion getNormalized() const", asMETHOD(Quaternion, getNormalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion getInverse() const", asMETHOD(Quaternion, getInverse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float dotProduct(const Quaternion& in) const", asMETHOD(Quaternion, dotProduct), asCALL_THISCALL);

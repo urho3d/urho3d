@@ -54,7 +54,7 @@ void Matrix4::getDecomposition(Vector3& translation, Quaternion& rotation, Vecto
     row1 /= scale.mX;
     row2 /= scale.mY;
     row3 /= scale.mZ;
-    rotation.fromRotationMatrix(Matrix3(row1.mX, row2.mX, row3.mX, row1.mY, row2.mY, row3.mY, row1.mZ, row2.mZ, row3.mZ));
+    rotation.define(Matrix3(row1.mX, row2.mX, row3.mX, row1.mY, row2.mY, row3.mY, row1.mZ, row2.mZ, row3.mZ));
 }
 
 Matrix4 Matrix4::getInverse() const
