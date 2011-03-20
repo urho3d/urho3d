@@ -46,19 +46,13 @@ Matrix4x3::Matrix4x3(const Vector3& translation, const Quaternion& rotation, con
 
 void Matrix4x3::define(const Vector3& translation, const Quaternion& rotation, float scale)
 {
-    Matrix3 scaleMatrix(Matrix3::sIdentity);
-    scaleMatrix.setScale(scale);
-    
-    *this = rotation.getRotationMatrix() * scaleMatrix;
+    setRotation(rotation.getRotationMatrix() * scale);
     setTranslation(translation);
 }
 
 void Matrix4x3::define(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 {
-    Matrix3 scaleMatrix(Matrix3::sIdentity);
-    scaleMatrix.setScale(scale);
-    
-    *this = rotation.getRotationMatrix() * scaleMatrix;
+    setRotation(rotation.getRotationMatrix().getScaled(scale));
     setTranslation(translation);
 }
 

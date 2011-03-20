@@ -95,7 +95,7 @@ public:
         return *this;
     }
     
-    //! Multiply a Vector4
+    //! Multiply a Vector3
     Vector3 operator * (const Vector3& rhs) const
     {
         return Vector3(
@@ -185,9 +185,6 @@ public:
         m22 = scale;
     }
     
-    //! Set rotation from an angle (in degrees) and axis
-    void setRotation(float angle, const Vector3& axis);
-    
     //! Return transpose
     Matrix3 getTranspose() const
     {
@@ -201,6 +198,22 @@ public:
             m02,
             m12,
             m22
+        );
+    }
+    
+    //! Return scaled by a vector
+    Matrix3 getScaled(const Vector3& scale) const
+    {
+        return Matrix3(
+            m00 * scale.mX,
+            m01 * scale.mY,
+            m02 * scale.mZ,
+            m10 * scale.mX,
+            m11 * scale.mY,
+            m12 * scale.mZ,
+            m20 * scale.mX,
+            m21 * scale.mY,
+            m22 * scale.mZ
         );
     }
     

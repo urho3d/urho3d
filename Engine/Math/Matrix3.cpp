@@ -34,23 +34,6 @@ const Matrix3 Matrix3::sIdentity(
     0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 1.0f);
 
-void Matrix3::setRotation(float angle, const Vector3& axis)
-{
-    Vector3 normAxis = axis.getNormalized();
-    float sinAngle = sinf(angle * M_DEGTORAD);
-    float cosAngle = cosf(angle * M_DEGTORAD);
-    
-    m00 = normAxis.mX * normAxis.mX + cosAngle * (1.0f - normAxis.mX * normAxis.mX);
-    m01 = normAxis.mX * normAxis.mY * (1.0f - cosAngle) - sinAngle * normAxis.mZ;
-    m02 = normAxis.mX * normAxis.mZ * (1.0f - cosAngle) + sinAngle * normAxis.mY;
-    m10 = normAxis.mX * normAxis.mY * (1.0f - cosAngle) + sinAngle * normAxis.mZ;
-    m11 = normAxis.mY * normAxis.mY + cosAngle * (1.0f - normAxis.mY * normAxis.mY);
-    m12 = normAxis.mY * normAxis.mZ * (1.0f - cosAngle) - sinAngle * normAxis.mX;
-    m20 = normAxis.mX * normAxis.mZ * (1.0f - cosAngle) - sinAngle * normAxis.mY;
-    m21 = normAxis.mY * normAxis.mZ * (1.0f - cosAngle) + sinAngle * normAxis.mX;
-    m22 = normAxis.mZ * normAxis.mZ + cosAngle * (1.0f - normAxis.mZ * normAxis.mZ);
-}
-
 Matrix3 Matrix3::getInverse() const
 {
     float det = m00 * m11 * m22 +
