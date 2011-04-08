@@ -191,7 +191,7 @@ public:
         *this = value;
     }
     
-    //! Construct from a variant vector
+    //! Construct from a variant map
     Variant(const VariantMap& value) :
         mType(VAR_NONE)
     {

@@ -192,8 +192,8 @@ bool Zone::isInside(const Vector3& point)
 {
     // Use an oriented bounding box test
     Matrix4x3 inverse = getWorldTransform().getInverse();
-    Vector3 localpoint = inverse * point;
-    return mBoundingBox.isInside(point) != OUTSIDE;
+    Vector3 localPoint = inverse * point;
+    return mBoundingBox.isInside(localPoint) != OUTSIDE;
 }
 
 void Zone::onWorldBoundingBoxUpdate(BoundingBox& worldBoundingBox)
