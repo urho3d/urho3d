@@ -48,7 +48,7 @@ class Zone;
 
 static const int SHADOW_MIN_PIXELS = 64;
 static const int NUM_SHADOWMAP_RESOLUTIONS = 3;
-static const int MIN_INSTANCES = 2;
+static const int MIN_INSTANCES = 3;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 
 /// Light vertex shader variations

@@ -22,6 +22,10 @@ void VS(float4 iPos : POSITION,
     #else
         out float3 oNormal : TEXCOORD2,
     #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
+        out float4 oColor : COLOR0,
+    #endif
     out float4 oPos : POSITION)
 {
     #if (!defined(SKINNED)) && (!defined(INSTANCED))
@@ -46,12 +50,16 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 
-    oTexCoord = GetTexCoord(iTexCoord);
-    oDepth = GetDepth(oPos);
-    
     #ifdef NORMALMAP
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
+
+    #ifdef VERTEXCOLOR
+        oColor = iColor;
+    #endif
+    
+    oTexCoord = GetTexCoord(iTexCoord);
+    oDepth = GetDepth(oPos);
 }
 
 void PS(
@@ -63,6 +71,9 @@ void PS(
         float3 iBitangent : TEXCOORD4,
     #else
         float3 iNormal : TEXCOORD2,
+    #endif
+    #ifdef VERTEXCOLOR
+        float4 iColor : COLOR0,
     #endif
     out float4 oDiff : COLOR0,
     out float4 oNormal : COLOR1,
@@ -79,6 +90,10 @@ void PS(
         float3 diffColor = cMatDiffColor.rgb;
     #endif
 
+    #ifdef VERTEXCOLOR
+        diffColor *= iColor.rgb;
+    #endif
+    
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
         float3 normal = normalize(mul(UnpackNormal(tex2D(sNormalMap, iTexCoord)), tbn));

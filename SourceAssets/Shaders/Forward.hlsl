@@ -119,7 +119,6 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-
     #if (!defined(VOLUMETRIC)) && ((defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT)))
 
         float3 lightColor;
