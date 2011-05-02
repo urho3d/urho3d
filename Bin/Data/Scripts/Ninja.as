@@ -243,7 +243,7 @@ class Ninja : GameObject
 
             controller.SetAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0, 0.75, 0.0, 0.0, false);
             controller.SetFade("Models/Ninja_Attack1.ani", 0.0, 0.5);
-            controller.priority["Models/Ninja_Attack1.ani"] = 1;
+            controller.SetPriority("Models/Ninja_Attack1.ani", 1);
 
             Node@ snowball = SpawnObject(node.position + vel * timeStep + q * ninjaThrowPosition, GetAim(), "SnowBall");
             RigidBody@ snowballBody = snowball.GetComponent("RigidBody");
