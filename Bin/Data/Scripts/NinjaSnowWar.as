@@ -437,7 +437,7 @@ void UpdateCamera()
 
     Vector3 pos = playerNode.position;
     Quaternion dir;
-    dir = dir * Quaternion(playerControls.yaw, Vector3(0, 1, 0));
+    dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(playerControls.pitch, Vector3(1, 0, 0));
 
     Vector3 aimPoint = pos + Vector3(0, 100, 0);

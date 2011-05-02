@@ -97,9 +97,9 @@ public:
     }
     
     /// Test for equality with another quaternion
-    bool operator == (const Quaternion& rhs) const { return (w_ == rhs.w_) && (x_ == rhs.x_) && (y_ == rhs.y_) && (z_ == rhs.z_); }
+    bool operator == (const Quaternion& rhs) const { return Equals(w_, rhs.w_) && Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
     /// Test for inequality with another quaternion
-    bool operator != (const Quaternion& rhs) const { return (w_ != rhs.w_) || (x_ != rhs.x_) || (y_ != rhs.y_) || (z_ != rhs.z_); }
+    bool operator != (const Quaternion& rhs) const { return (!Equals(w_, rhs.w_)) || (!Equals(x_, rhs.x_)) || (!Equals(y_, rhs.y_)) || (!Equals(z_, rhs.z_)); }
     /// Multiply with a scalar
     Quaternion operator * (float rhs) const { return Quaternion(w_ * rhs, x_ * rhs, y_ * rhs, z_ * rhs); }
     /// Return negation

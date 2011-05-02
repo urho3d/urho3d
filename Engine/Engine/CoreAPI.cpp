@@ -502,7 +502,7 @@ static void RegisterProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void OpenConsoleWindow()", asFUNCTION(OpenConsoleWindow), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetConsoleInput()", asFUNCTION(GetConsoleInput), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ get_arguments()", asFUNCTION(GetArgumentsToArray), asCALL_CDECL);
-    engine->RegisterGlobalFunction("uint get_numCpuCores()", asFUNCTION(GetNumCPUCores), asCALL_CDECL); /// \todo Move somewhere else
+    engine->RegisterGlobalFunction("uint get_numCpuCores()", asFUNCTION(GetNumCPUCores), asCALL_CDECL);
 }
 
 static void ConstructAttributeInfo(AttributeInfo* ptr)
