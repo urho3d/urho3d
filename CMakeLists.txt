@@ -20,12 +20,9 @@ else ()
     set (DBGHELP_LIB "")
 endif ()
   
-# Enable profiling. This only affects whether autoprofile-blocks (PROFILE macro) will be generated;
-# the profiler is compiled and instantiated nevertheless.
+# Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not
+# instantiated.
 add_definitions (-DENABLE_PROFILING)
-
-# Enable runtime integrity checks for RefCounted objects.
-add_definitions (-DENABLE_REFCOUNTED_CHECKS)
 
 # Compiler-specific options
 if (MSVC)
@@ -76,6 +73,7 @@ macro (finalize_lib)
     endif ()
 endmacro ()
 
+
 # Macro for model asset compilation
 macro (add_model NAME PARAMETERS)
     add_custom_command (
@@ -104,22 +102,20 @@ macro (add_shader NAME)
     set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.xml ../../Bin/CoreData/Shaders/SM3/${NAME}.xml)
 endmacro ()
 
-# Recurse subdirectories
+# Add projects
 add_subdirectory (Engine/Audio)
-add_subdirectory (Engine/Common)
+add_subdirectory (Engine/Core)
 add_subdirectory (Engine/Engine)
+add_subdirectory (Engine/Graphics)
 add_subdirectory (Engine/Input)
+add_subdirectory (Engine/IO)
 add_subdirectory (Engine/Math)
 add_subdirectory (Engine/Network)
 add_subdirectory (Engine/Physics)
-add_subdirectory (Engine/Renderer)
 add_subdirectory (Engine/Resource)
 add_subdirectory (Engine/Scene)
 add_subdirectory (Engine/Script)
 add_subdirectory (Engine/UI)
-add_subdirectory (Examples/NetworkTest)
-add_subdirectory (Examples/NinjaSnowWar)
-add_subdirectory (Examples/Urho3D)
 add_subdirectory (SourceAssets/Models)
 add_subdirectory (SourceAssets/Shaders)
 add_subdirectory (ThirdParty/AngelScript)
@@ -136,3 +132,4 @@ add_subdirectory (Tools/OgreImporter)
 add_subdirectory (Tools/PackageTool)
 add_subdirectory (Tools/RampGenerator)
 add_subdirectory (Tools/ShaderCompiler)
+add_subdirectory (Urho3D)

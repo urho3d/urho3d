@@ -1,0 +1,3 @@
+<technique>
+    <pass name="base" vs="Forward_VCol" ps="Forward_DiffVColUnlit" depthwrite="false" blend="alpha" />
+</technique>

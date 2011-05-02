@@ -1,0 +1,114 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#pragma once
+
+#include "BoundingBox.h"
+#include "Node.h"
+
+static const unsigned BONECOLLISION_NONE = 0x0;
+static const unsigned BONECOLLISION_SPHERE = 0x1;
+static const unsigned BONECOLLISION_BOX = 0x2;
+
+class Deserializer;
+class ResourceCache;
+class Serializer;
+
+/// Bone in a skeleton
+struct Bone
+{
+    Bone() :
+        parentIndex_(0),
+        collisionMask_(0),
+        radius_(0.0f),
+        animationEnabled_(true)
+    {
+    }
+    
+    /// Bone name
+    std::string name_;
+    /// Bone name hash
+    StringHash nameHash_;
+    /// Parent bone index
+    unsigned parentIndex_;
+    /// Reset position
+    Vector3 initialPosition_;
+    /// Reset rotation
+    Quaternion initialRotation_;
+    /// Reset scale
+    Vector3 initialScale_;
+    /// Offset matrix
+    Matrix4x3 offsetMatrix_;
+    /// Animation enable flag
+    bool animationEnabled_;
+    /// Supported collision types
+    unsigned char collisionMask_;
+    /// Radius
+    float radius_;
+    /// Bounding box
+    BoundingBox boundingBox_;
+    /// Scene node
+    WeakPtr<Node> node_;
+};
+
+/// Hierarchical collection of bones
+class Skeleton
+{
+public:
+    /// Construct an empty skeleton
+    Skeleton();
+    /// Destruct
+    ~Skeleton();
+    
+    /// Read from a stream. Return true if successful
+    bool Load(Deserializer& source);
+    /// Write to a stream. Return true if successful
+    bool Save(Serializer& dest);
+    /// Define from another skeleton
+    void Define(const Skeleton& src);
+    /// Clear bones
+    void ClearBones();
+    /// Reset all animating bones to initial positions
+    void Reset();
+    
+    /// Return all bones
+    const std::vector<Bone>& GetBones() const { return bones_; }
+    /// Return modifiable bones
+    std::vector<Bone>& GetModifiableBones() { return bones_; }
+    /// Return number of bones
+    unsigned GetNumBones() const { return bones_.size(); }
+    /// Return root bone
+    Bone* GetRootBone();
+    /// Return bone by index
+    Bone* GetBone(unsigned index);
+    /// Return bone by name
+    Bone* GetBone(const std::string& boneName);
+    /// Return bone by name hash
+    Bone* GetBone(StringHash boneNameHash);
+    
+private:
+    /// Bones
+    std::vector<Bone> bones_;
+    /// Root bone index
+    unsigned rootBoneIndex_;
+};

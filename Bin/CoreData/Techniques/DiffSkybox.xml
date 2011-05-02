@@ -1,0 +1,3 @@
+<technique>
+    <pass name="extra" vs="Forward" ps="Forward_DiffUnlit" depthwrite="false" />
+</technique>

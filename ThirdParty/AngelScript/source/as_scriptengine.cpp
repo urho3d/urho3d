@@ -353,10 +353,13 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 asCScriptEngine::asCScriptEngine()
 {
 	// Instanciate the thread manager
+	// Urho3D: create the thread manager under critical section, so that it is not multi-instantiated
+	ENTERCRITICALSECTION(engineCritical);
 	if( threadManager == 0 )
 		threadManager = asNEW(asCThreadManager);
 	else
 		threadManager->AddRef();
+	LEAVECRITICALSECTION(engineCritical);
 
 	// Engine properties
 	{

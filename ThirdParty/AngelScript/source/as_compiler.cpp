@@ -5126,12 +5126,16 @@ int asCCompiler::DoAssignment(asSExprContext *ctx, asSExprContext *lctx, asSExpr
 		lctx->type.isExplicitHandle = true;
 	}
 
+    // Urho3D: if there is a handle type, and it does not have an overloaded assignment operator, convert to an explicit handle
+    // for scripting convenience. (For the Urho3D handle types, value assignment is not supported)
+    if (lctx->type.dataType.IsObjectHandle() && !lctx->type.isExplicitHandle && !lctx->type.dataType.GetObjectType()->beh.copy)
+        lctx->type.isExplicitHandle = true;
+
 	// If the left hand expression is a property accessor, then that should be used
 	// to do the assignment instead of the ordinary operator. The exception is when
 	// the property accessor is for a handle property, and the operation is a value
 	// assignment.
-	if( (lctx->property_get || lctx->property_set) &&
-		!(lctx->type.dataType.IsObjectHandle() && !lctx->type.isExplicitHandle) )
+	if (lctx->property_get || lctx->property_set)
 	{
 		if( op != ttAssignment )
 		{
@@ -8173,9 +8177,10 @@ int asCCompiler::CompileExpressionPostOp(asCScriptNode *node, asSExprContext *ct
 	else if( op == ttOpenBracket )
 	{
 		// If the property access takes an index arg, then we should use that instead of processing it now
+		// Urho3D: fix possible null pointer access
 		asCString propertyName;
 		if( (ctx->property_get && engine->scriptFunctions[ctx->property_get]->GetParamCount() == 1) ||
-			(ctx->property_set && engine->scriptFunctions[ctx->property_get]->GetParamCount() == 2) )
+			(ctx->property_set && engine->scriptFunctions[ctx->property_set]->GetParamCount() == 2) )
 		{
 			// Determine the name of the property accessor
 			asCScriptFunction *func = 0;

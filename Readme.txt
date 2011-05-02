@@ -10,7 +10,6 @@ Credits
 -------
 
 Urho3D engine & example code by Lasse Öörni (loorni@gmail.com)
-Additional MOD/XM playback code by Olli Niemitalo
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -51,10 +50,7 @@ NinjaSnowWar sounds by Veli-Pekka Tätilä.
 Documentation
 -------------
 
-For documentation, see the Urho3D wiki:
-http://code.google.com/p/urho3d/wiki/Urho3D
-
-Urho3D classes have also been sparsely documented using Doxygen notation. To
+Urho3D classes have been sparsely documented using Doxygen notation. To
 generate documentation into the "Docs" subdirectory, open the Doxyfile in the
 root directory with doxywizard and click "Run doxygen" from the "Run" tab. 
 Get Doxygen from http://www.doxygen.org
@@ -80,16 +76,15 @@ fxc.exe (from the DirectX SDK) to be available through the system PATH. Note
 that the debug executables of tools will not have the _d postfix, to allow the
 asset build scripts to work in both debug & release builds.
 
-After the build is complete, the examples can be run from the Bin directory.
+After the build is complete, the programs can be run from the Bin directory.
 
-To run for example NinjaSnowWar from the Visual Studio debugger, set it as a
-startup project and enter its relative path and filename into Debugging ->
-Command: ..\..\Bin\NinjaSnowWar.exe or ..\..\Bin\NinjaSnowWar_d.exe
-Additionally, entering -w into Debugging -> Command Arguments is highly
-recommended. This enables startup in windowed mode: without it running into an
-exception or breakpoint will be obnoxious as the mouse cursor will most probably
-be hidden.
+To run Urho3D.exe from the Visual Studio debugger, set it as a startup project
+and enter its relative path and filename into Debugging -> Command: 
+..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into 
+Debugging -> Command Arguments is highly recommended. This enables startup in 
+windowed mode: without it running into an exception or breakpoint will be 
+obnoxious as the mouse cursor will most probably be hidden.
 
-Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction 
+Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction
 count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At
-least the March 2009 SDK is known to work.
+least the February 2010 SDK is known to work.

@@ -1,0 +1,3 @@
+<technique>
+    <pass name="base" vs="Forward" ps="Forward_Unlit" depthwrite="false" blend="add" />
+</technique>

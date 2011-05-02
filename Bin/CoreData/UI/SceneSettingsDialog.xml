@@ -1,0 +1,65 @@
+<element type="Window" name="SceneSettingsDialog">
+    <movable enable="true" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <text value="Global scene settings" />
+        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Octree min bounds" />
+        </element>
+        <element type="LineEdit" name="OctreeMinEdit">
+            <fixedwidth value="160" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Octree max bounds" />
+        </element>
+       <element type="LineEdit" name="OctreeMaxEdit">
+            <fixedwidth value="160" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Octree levels" />
+        </element>
+       <element type="LineEdit" name="OctreeLevelsEdit">
+            <fixedwidth value="160" />
+       </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Gravity" />
+        </element>
+       <element type="LineEdit" name="GravityEdit">
+            <fixedwidth value="160" />
+       </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Physics FPS" />
+        </element>
+       <element type="LineEdit" name="PhysicsFPSEdit">
+            <fixedwidth value="160" />
+       </element>
+    </element>
+</element>

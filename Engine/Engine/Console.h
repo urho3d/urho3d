@@ -1,0 +1,107 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#pragma once
+
+#include "Object.h"
+
+class BorderImage;
+class Engine;
+class Font;
+class LineEdit;
+class Text;
+class UIElement;
+class XMLFile;
+
+/// Console window with log history and AngelScript prompt
+class Console : public Object
+{
+    OBJECT(Console);
+    
+public:
+    /// Construct
+    Console(Context* context);
+    /// Destruct
+    ~Console();
+    
+    /// Set UI elements' style from an XML file
+    void SetStyle(XMLFile* style);
+    /// Show or hide. Showing automatically focuses the line edit
+    void SetVisible(bool enable);
+    /// Toggle visibility
+    void Toggle();
+    /// Set number of displayed rows
+    void SetNumRows(unsigned rows);
+    /// Set command history maximum size, 0 disables history
+    void SetNumHistoryRows(unsigned rows);
+    /// Update elements to layout properly. Call this after manually adjusting the sub-elements
+    void UpdateElements();
+    
+    /// Return the UI style file
+    XMLFile* GetStyle() const { return style_; }
+    /// Return the background element
+    BorderImage* GetBackground() const { return background_; }
+    /// Return the line edit element
+    LineEdit* GetLineEdit() const { return lineEdit_; }
+    /// Return whether is visible
+    bool IsVisible() const;
+    /// Return number of displayed rows
+    unsigned GetNumRows() const { return rows_.size(); }
+    /// Return history maximum size
+    unsigned GetNumHistoryRows() const { return historyRows_; }
+    /// Return current history position
+    unsigned GetHistoryPosition() const { return historyPosition_; }
+    /// Return history row at index
+    const std::string& GetHistoryRow(unsigned index) const;
+    
+private:
+    /// Handle enter pressed on the line edit
+    void HandleTextFinished(StringHash eventType, VariantMap& eventData);
+    /// Handle unhandled key on the line edit for scrolling the history
+    void HandleLineEditKey(StringHash eventType, VariantMap& eventData);
+    /// Handle rendering window resize
+    void HandleScreenMode(StringHash eventType, VariantMap& eventData);
+    /// Handle a log message
+    void HandleLogMessage(StringHash eventType, VariantMap& eventData);
+    
+    /// UI style file
+    SharedPtr<XMLFile> style_;
+    /// Background
+    SharedPtr<BorderImage> background_;
+    /// Container for text rows
+    SharedPtr<UIElement> rowContainer_;
+    /// Text rows
+    std::vector<SharedPtr<Text> > rows_;
+    /// Line edit
+    SharedPtr<LineEdit> lineEdit_;
+    /// Command history
+    std::vector<std::string> history_;
+    /// Current row being edited
+    std::string current_Row;
+    /// Command history maximum rows
+    unsigned historyRows_;
+    /// Command history current position
+    unsigned historyPosition_;
+    /// Currently printing a log message -flag
+    bool inLogMessage_;
+};

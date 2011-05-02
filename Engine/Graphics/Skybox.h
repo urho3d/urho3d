@@ -1,0 +1,52 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#pragma once
+
+#include "StaticModel.h"
+
+/// Static model component with fixed position in relation to the camera
+class Skybox : public StaticModel
+{
+    OBJECT(Skybox);
+    
+public:
+    /// Construct
+    Skybox(Context* context);
+    /// Destruct
+    virtual ~Skybox();
+    /// Register object factory
+    static void RegisterObject(Context* context);
+    
+    /// Calculate distance for rendering
+    virtual void UpdateDistance(const FrameUpdate& frame);
+    /// Return rendering batch
+    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch);
+    
+protected:
+    /// Update world-space bounding box
+    virtual void OnWorldBoundingBoxUpdate();
+    
+    /// Custom world transform
+    Matrix4x3 customWorldTransform_;
+};

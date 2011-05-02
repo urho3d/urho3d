@@ -831,8 +831,7 @@
 #endif
 
 
-// Urho3D: disable threading, always use float type
-#define AS_NO_THREADS
+// Urho3D: always use float type
 #define AS_USE_DOUBLE_AS_FLOAT
 
 

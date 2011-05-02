@@ -1,0 +1,6 @@
+<technique>
+    <pass name="base" vs="Forward" ps="Forward_DiffAmbient" alphatest="true" />
+    <pass name="litbase" vs="Forward_Normal" ps="Forward_DiffNormalAmbient" alphatest="true" />
+    <pass name="light" vs="Forward_Normal" ps="Forward_DiffNormal" alphatest="true" depthwrite="false" depthtest="equal" blend="add" />
+    <pass name="shadow" vs="Shadow_Mask" ps="Shadow_Mask" alphamask="true" />
+</technique>

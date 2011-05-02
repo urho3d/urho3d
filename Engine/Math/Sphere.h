@@ -1,0 +1,171 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#pragma once
+
+#include "Vector3.h"
+
+class BoundingBox;
+class Frustum;
+class Ray;
+
+/// Sphere in three-dimensional space
+class Sphere
+{
+public:
+    /// Construct an undefined sphere
+    Sphere() :
+        defined_(false)
+    {
+    }
+    
+    /// Copy-construct from another sphere
+    Sphere(const Sphere& sphere) :
+        center_(sphere.center_),
+        radius_(sphere.radius_),
+        defined_(sphere.defined_)
+    {
+    }
+    
+    /// Construct from center and radius
+    Sphere(const Vector3& center, float radius) :
+        center_(center),
+        radius_(radius),
+        defined_(true)
+    {
+    }
+    
+    /// Assign from another sphere
+    Sphere& operator = (const Sphere& rhs)
+    {
+        center_ = rhs.center_;
+        radius_ = rhs.radius_;
+        defined_ = rhs.defined_;
+        
+        return *this;
+    }
+    
+    /// Test for equality with another sphere
+    bool operator == (const Sphere& rhs) const { return (center_ == rhs.center_) && (radius_ == rhs.radius_); }
+    
+    /// Test for inequality with another sphere
+    bool operator != (const Sphere& rhs) const { return (center_ != rhs.center_) || (radius_ != rhs.radius_); }
+    
+    /// Define from center and radius
+    void Define(const Vector3& center, float radius)
+    {
+        center_ = center;
+        radius_ = radius;
+        defined_ = true;
+    }
+    
+    /// Define from a vector of vertices
+    void Define(const std::vector<Vector3>& vertices);
+    /// Define from an array of vertices
+    void Define(const Vector3* vertices, unsigned count);
+    /// Define from a boundingBox
+    void Define(const BoundingBox& box);
+    /// Define from a frustum
+    void Define(const Frustum& frustum);
+    
+    /// Merge a point
+    void Merge(const Vector3& point)
+    {
+        if (!defined_)
+        {
+            center_ = point;
+            radius_ = 0.0f;
+            defined_ = true;
+            return;
+        }
+        
+        Vector3 offset = point - center_;
+        float dist = offset.GetLength();
+        if (dist > radius_)
+        {
+            float half = (dist - radius_) * 0.5f;
+            radius_ += half;
+            center_ += (half / dist) * offset;
+        }
+    }
+    
+    /// Merge a vector of vertices
+    void Merge(const std::vector<Vector3>& vertices);
+    /// Merge an array of vertices
+    void Merge(const Vector3* vertices, unsigned count);
+    /// Merge a bounding box
+    void Merge(const BoundingBox& box);
+    /// Merge a frustum
+    void Merge(const Frustum& frustum);
+    /// Merge a sphere
+    void Merge(const Sphere& sphere);
+    
+    /// Test if a point is inside
+    Intersection IsInside(const Vector3& point) const
+    {
+        float distSquared = (point - center_).GetLengthSquared();
+        
+        if (distSquared < radius_ * radius_)
+            return INSIDE;
+        else
+            return OUTSIDE;
+    }
+    
+    /// Test if another sphere is inside, outside or intersects
+    Intersection IsInside(const Sphere& sphere) const
+    {
+        float dist = (sphere.center_ - center_).GetLength();
+        
+        if (dist >= sphere.radius_ + radius_)
+            return OUTSIDE;
+        if (dist + sphere.radius_ < radius_)
+            return INSIDE;
+        return INTERSECTS;
+    }
+    
+    /// Test if another sphere is (partially) inside or outside
+    Intersection IsInsideFast(const Sphere& sphere) const
+    {
+        float distSquared = (sphere.center_ - center_).GetLengthSquared();
+        float combined = sphere.radius_ + radius_;
+        
+        if (distSquared >= combined * combined)
+            return OUTSIDE;
+        else
+            return INSIDE;
+    }
+    
+    /// Test if a bounding box is inside, outside or intersects
+    Intersection IsInside(const BoundingBox& box) const;
+    /// Test if a bounding box is (partially) inside or outside
+    Intersection IsInsideFast(const BoundingBox& box) const;
+    /// Return distance to a ray, or infinity if no intersection
+    float GetDistance(const Ray& ray) const;
+    
+    /// Sphere center
+    Vector3 center_;
+    /// Sphere radius
+    float radius_;
+    /// Defined flag
+    bool defined_;
+};

@@ -1,0 +1,176 @@
+//
+// Urho3D Engine
+// Copyright (c) 2008-2011 Lasse Öörni
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
+#include "Precompiled.h"
+#include "Button.h"
+#include "Context.h"
+#include "InputEvents.h"
+#include "UIEvents.h"
+
+#include "DebugNew.h"
+
+OBJECTTYPESTATIC(Button);
+
+Button::Button(Context* context) :
+    BorderImage(context),
+    pressedOffset_(IntVector2::ZERO),
+    labelOffset_(IntVector2::ZERO),
+    repeatDelay_(1.0f),
+    repeatRate_(0.0f),
+    repeatTimer_(0.0f),
+    pressed_(false)
+{
+    active_ = true;
+}
+
+Button::~Button()
+{
+}
+
+void Button::RegisterObject(Context* context)
+{
+    context->RegisterFactory<Button>();
+}
+
+void Button::SetStyle(const XMLElement& element)
+{
+    BorderImage::SetStyle(element);
+    
+    if (element.HasChildElement("pressedoffset"))
+        SetPressedOffset(element.GetChildElement("pressedoffset").GetIntVector2("value"));
+    if (element.HasChildElement("labeloffset"))
+        SetLabelOffset(element.GetChildElement("labeloffset").GetIntVector2("value"));
+    if (element.HasChildElement("repeat"))
+    {
+        XMLElement repeatElem = element.GetChildElement("repeat");
+        SetRepeat(repeatElem.GetFloat("delay"), repeatElem.GetFloat("rate"));
+    }
+}
+
+void Button::Update(float timeStep)
+{
+    if ((!hovering_) && (pressed_ == true))
+        SetPressed(false);
+    
+    // Send repeat events if pressed
+    if ((pressed_) && (repeatRate_ > 0.0f))
+    {
+        repeatTimer_ -= timeStep;
+        if (repeatTimer_ <= 0.0f)
+        {
+            repeatTimer_ += 1.0f / repeatRate_;
+            
+            using namespace Pressed;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            SendEvent(E_PRESSED, eventData);
+        }
+    }
+}
+
+void Button::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+{
+    IntVector2 offset(IntVector2::ZERO);
+    if (hovering_)
+        offset += hoverOffset_;
+    if ((pressed_) || (selected_))
+        offset += pressedOffset_;
+    
+    BorderImage::GetBatches(batches, quads, currentScissor, offset);
+}
+
+void Button::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    bool oldPressed = pressed_;
+    SetPressed((buttons & MOUSEB_LEFT) != 0);
+    hovering_ = true;
+    
+    if ((oldPressed) && (!pressed_))
+    {
+        using namespace Released;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        SendEvent(E_RELEASED, eventData);
+    }
+}
+
+void Button::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
+{
+    if (buttons & MOUSEB_LEFT)
+    {
+        SetPressed(true);
+        repeatTimer_ = repeatDelay_;
+        hovering_ = true;
+        
+        using namespace Pressed;
+        
+        VariantMap eventData;
+        eventData[P_ELEMENT] = (void*)this;
+        SendEvent(E_PRESSED, eventData);
+    }
+}
+
+void Button::SetPressedOffset(const IntVector2& offset)
+{
+    pressedOffset_ = offset;
+}
+
+void Button::SetPressedOffset(int x, int y)
+{
+    pressedOffset_ = IntVector2(x, y);
+}
+
+
+void Button::SetLabelOffset(const IntVector2& offset)
+{
+    labelOffset_ = offset;
+}
+
+void Button::SetLabelOffset(int x, int y)
+{
+    labelOffset_ = IntVector2(x, y);
+}
+
+void Button::SetRepeat(float delay, float rate)
+{
+    SetRepeatDelay(delay);
+    SetRepeatRate(rate);
+}
+
+void Button::SetRepeatDelay(float delay)
+{
+    repeatDelay_ = Max(delay, 0.0f);
+}
+
+void Button::SetRepeatRate(float rate)
+{
+    repeatRate_ = Max(rate, 0.0f);
+}
+
+void Button::SetPressed(bool enable)
+{
+    pressed_ = enable;
+    SetChildOffset(pressed_ ? labelOffset_ : IntVector2::ZERO);
+}

@@ -1,0 +1,8 @@
+<shaders>
+    <shader name="TemporalAA" type="vs">
+        <option name="Ortho" define="ORTHO" />
+    </shader>
+    <shader name="TemporalAA" type="ps">
+        <option name="Ortho" define="ORTHO" />
+    </shader>
+</shaders>

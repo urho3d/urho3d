@@ -1,0 +1,77 @@
+<element type="Window" name="SceneWindow">
+    <movable enable="true" />
+    <resizable enable="true" />
+    <resizeborder value="6 6 6 6" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <text value="Scene hierarchy" />
+        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element>
+        <fixedheight value="18" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Button" name="ExpandAllButton">
+            <fixedwidth value="70" />
+            <element type="Text">
+                <font name="cour.ttf" size="9" />
+                <text value="Expand" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element type="Button" name="CollapseAllButton">
+            <fixedwidth value="70" />
+            <element type="Text">
+                <font name="cour.ttf" size="9" />
+                <text value="Collapse" />
+                <alignment horizontal="center" vertical="center" />
+            </element>
+        </element>
+        <element />
+    </element>
+    <element type="ListView" name="EntityList">
+        <hierarchy enable="true" />
+        <highlight value="always" />
+    </element>
+    <element>
+        <fixedheight value="22" />
+        <layout mode="horizontal" spacing="4" />
+        <element type="Element" />
+        <element type="DropDownList" name="NewEntityList">
+            <fixedsize value="90 22" />
+            <layout border="4 4 4 4" />
+            <placeholder>
+                <visible enable="false" />
+            </placeholder>
+            <element type="Text">
+                <text value="New Entity" />
+                <textalignment value="center" />
+            </element>
+            <popup>
+                <layout border="4 4 4 4" />   
+            </popup>         
+        </element>
+        <element />
+        <element type="DropDownList" name="NewComponentList">
+            <fixedsize value="90 22" />
+            <layout border="4 4 4 4" />
+            <placeholder>
+                <visible enable="false" />
+            </placeholder>
+            <element type="Text">
+                <text value="New Comp" />
+                <textalignment value="center" />
+            </element>
+            <popup>
+                <layout border="4 4 4 4" />   
+            </popup>
+        </element>
+        <element />
+    </element>
+</element>

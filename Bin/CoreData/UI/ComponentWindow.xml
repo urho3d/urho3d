@@ -1,0 +1,47 @@
+<element type="Window" name="ComponentWindow">
+    <movable enable="true" />
+    <resizable enable="true" />
+    <resizeborder value="6 6 6 6" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text" name="WindowTitle">
+            <text value="Entity / component edit" />
+        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element type="Text" name="EntityTitle">
+        <fixedheight value="16" />
+    </element>
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <fixedwidth value="50" />
+            <text value="Name" />
+        </element>
+        <element type="LineEdit" name="EntityNameEdit" />
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element type="Text" name="ComponentTitle">
+        <fixedheight value="16" />
+    </element>
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <fixedwidth value="50" />
+            <text value="Name" />
+        </element>
+        <element type="LineEdit" name="ComponentNameEdit" />
+    </element>
+    <element type="ListView" name="AttributeList">
+        <highlight value="always" />
+    </element>
+</element>

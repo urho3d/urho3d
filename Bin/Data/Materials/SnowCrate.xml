@@ -1,0 +1,5 @@
+<material>
+    <technique name="Techniques/Diff.xml" />
+    <texture unit="diffuse" name="Textures/SnowCrate.dds" />
+    <parameter name="MatSpecProperties" value="0.15 16" />
+</material>
