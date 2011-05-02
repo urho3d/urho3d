@@ -1,6 +1,0 @@
-<shaders>
-    <shader name="GBufferFill" type="vs" />
-    <shader name="GBufferFill" type="ps">
-        <option name="HW" define="HWDEPTH" />
-    </shader>
-</shaders>

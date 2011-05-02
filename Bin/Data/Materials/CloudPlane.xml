@@ -1,6 +1,0 @@
-<material>
-    <technique>
-        <texture unit="diffuse" name="Textures/CloudPlane.dds" />
-        <pass name="postopaque" vs="Forward_Unlit" ps="Forward_DiffUnlit" cull="none" depthwrite="false" />
-    </technique>
-</material>

@@ -1,7 +1,0 @@
-<material>
-    <base name="Materials/Default.xml" />
-    <technique>
-        <parameter name="MatDiffColor" value="1 0 0 1" />
-        <parameter name="MatSpecProperties" value="0.25 16" />
-    </technique>
-</material>

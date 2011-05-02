@@ -1,9 +1,0 @@
-<material>
-    <technique>
-        <texture unit="diffuse" name="Textures/Smoke.dds" />
-        <parameter name="MatDiffColor" value="0.5 0.5 0.5 0.5" />
-        <pass name="ambient" vs="Billboard" ps="Billboard_DiffAmbient" depthwrite="false" blend="alpha" />
-        <pass name="light" vs="Billboard" ps="Billboard_Diff" depthwrite="false" blend="addalpha" />
-        <pass name="negative" vs="Billboard" ps="Billboard_Diff" depthwrite="false" blend="multiply" />
-    </technique>
-</material>

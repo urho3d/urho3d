@@ -1,8 +1,0 @@
-<material>
-    <technique>
-        <parameter name="MatSpecProperties" value="0.5 16" />
-        <pass name="ambient" vs="Forward" ps="Forward_DiffAmbient" depthwrite="false" blend="alpha" />
-        <pass name="light" vs="Forward" ps="Forward_Diff" depthwrite="false" blend="addalpha" />
-        <pass name="negative" vs="Forward" ps="Forward_Diff" depthwrite="false" blend="multiply" />
-    </technique>
-</material>
