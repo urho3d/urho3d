@@ -23,9 +23,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
-#include "Context.h"
 #include "ResourceCache.h"
-#include "Script.h"
 #include "ScriptAPI.h"
 #include "ScriptFile.h"
 

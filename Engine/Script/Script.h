@@ -28,6 +28,7 @@
 class Scene;
 class ScriptFile;
 class ScriptInstance;
+class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptModule;
@@ -84,6 +85,8 @@ public:
     ScriptFile* GetDefaultScriptFile() const;
     /// Return immediate mode scene
     Scene* GetDefaultScene() const;
+    /// Query for an inbuilt object type by constant declaration. Can not be used for script types
+    asIObjectType* GetObjectType(const char* declaration);
     /// Return logging mode
     ScriptLogMode GetLogMode() const { return logMode_; }
     /// Return retained mode log messages
@@ -118,6 +121,8 @@ private:
     std::map<asIScriptModule*, ScriptFile*> moduleMap_;
     /// Map of script objects to script instance components
     std::map<void*, ScriptInstance*> objectMap_;
+    /// Search cache for inbuilt object types (constant declaration)
+    std::map<const char*, asIObjectType*> objectTypes_;
     /// Script engine logging mode
     ScriptLogMode logMode_;
     /// Retained mode log messages

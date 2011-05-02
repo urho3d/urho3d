@@ -37,7 +37,7 @@
 
 #include "DebugNew.h"
 
-/// Holder for the FreeType library
+/// FreeType library subsystem
 class FreeTypeLibrary : public Object
 {
     OBJECT(FreeTypeLibrary);

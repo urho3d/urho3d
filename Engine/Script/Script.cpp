@@ -408,6 +408,17 @@ Scene* Script::GetDefaultScene() const
     return defaultScene_;
 }
 
+asIObjectType* Script::GetObjectType(const char* declaration)
+{
+    std::map<const char*, asIObjectType*>::const_iterator i = objectTypes_.find(declaration);
+    if (i != objectTypes_.end())
+        return i->second;
+    
+    asIObjectType* type = scriptEngine_->GetObjectTypeById(scriptEngine_->GetTypeIdByDecl(declaration));
+    objectTypes_[declaration] = type;
+    return type;
+}
+
 void Script::OutputAPIRow(const std::string& row, bool removeReference)
 {
     std::string out = row;

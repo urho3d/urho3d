@@ -25,9 +25,11 @@
 
 #include "Addons.h"
 #include "BorderImage.h"
+#include "Context.h"
 #include "Drawable.h"
 #include "File.h"
 #include "Resource.h"
+#include "Script.h"
 #include "ScriptInstance.h"
 #include "SoundSource.h"
 #include "Texture.h"
@@ -63,8 +65,7 @@ template <class T> CScriptArray* VectorToArray(const std::vector<T>& vector, con
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
-        asIScriptEngine* engine = context->GetEngine();
-        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -82,8 +83,7 @@ template <class T> CScriptArray* VectorToHandleArray(const std::vector<T*>& vect
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
-        asIScriptEngine* engine = context->GetEngine();
-        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -106,8 +106,7 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const std::vector<
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
-        asIScriptEngine* engine = context->GetEngine();
-        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(vector.size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -130,8 +129,7 @@ template <class T> CScriptArray* SetToArray(const std::set<T>& set, const char* 
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
-        asIScriptEngine* engine = context->GetEngine();
-        asIObjectType* type = engine->GetObjectTypeById(engine->GetTypeIdByDecl(arrayName));
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = new CScriptArray(set.size(), type);
         
         unsigned index = 0;

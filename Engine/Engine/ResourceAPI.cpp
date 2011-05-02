@@ -23,7 +23,6 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
-#include "Context.h"
 #include "ResourceCache.h"
 
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest);

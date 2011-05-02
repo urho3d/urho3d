@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "APITemplates.h"
 #include "CollisionShape.h"
-#include "Context.h"
 #include "Joint.h"
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
