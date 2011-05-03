@@ -1,10 +1,10 @@
 /**
 
-\mainpage Urho3D Rendering and Game Engine
+\mainpage Urho3D rendering and game engine
 
 Urho3D is a lightweight, object-oriented Win32 / Direct3D9 rendering and game engine implemented in C++.
 
-For getting started, see the pages \subpage Building "Building", \subpage Structure "Library Structure", \subpage Examples "Examples" and \subpage Conventions "Conventions".
+For getting started, see the pages \subpage Building "Building", \subpage Structure "Library structure", \subpage Examples "Examples" and \subpage Conventions "Conventions".
 
 Also see \subpage Credits & \subpage License for copyright and licensing information.
 
@@ -26,9 +26,9 @@ To run Urho3D.exe from the Visual Studio debugger, set it as a startup project a
 Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
 
 
-\page Structure Library Structure
+\page Structure Library structure
 
-From a code structure viewpoint Urho3D is a collection of static libraries that enable various functionality. They are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
+Urho3D consists of several static libraries that are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
 
 The libraries are the following:
 
@@ -45,9 +45,9 @@ The libraries are the following:
 - Script. Provides scripting support using the AngelScript language.
 - Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
-The main executable Urho3D in turn uses the Engine library to start up the subsystems and to load a script file, from which a function called Start() is executed. This function will determine how the Urho3D application in question will behave; typically the script would create a scene and subscribe to update and input events to be able to hook into the main loop and into the user's actions.
+The main executable Urho3D uses the Engine library to start up the subsystems and to load a script file, from which the function Start() is executed before entering the main loop. This function will determine how the Urho3D application in question will behave; typically the script would create a scene and subscribe to update and input events to be able to hook into the main loop and into the user's actions.
 
-Note that although the Urho3D executable is geared towards running a scripted application, it is also perfectly possible to use Urho3D through C++ only.
+Note that although the Urho3D executable is geared towards running a scripted application, it is also perfectly possible to use the engine through C++ only.
 
 The third-party libraries are used for the following functionality:
 
@@ -110,10 +110,12 @@ Urho3D uses the following conventions:
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
-For more details related to coding style, see also \subpage CodingConventions "Coding conventions".
+- In the script API, properties are used whenever possible instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+
+For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
 
 
-\page CodingConventions Coding Conventions
+\page CodingConventions Coding conventions
 
 - Class and struct names are in camelcase beginning with an upper case letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
 
@@ -123,7 +125,7 @@ For more details related to coding style, see also \subpage CodingConventions "C
 
 - Constants and enumerations are in capitals. For example Vector3::ZERO or PASS_SHADOW.
 
-- Class definitions in header files proceed in the following order: 
+- Class definitions in header files proceed in the following order:
   - public constructors and destructors
   - public virtual functions
   - public non-virtual member functions
