@@ -77,20 +77,21 @@ public:
     
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
-    /// Add an animation by full resource name. Return true on success
-    bool AddAnimation(const std::string& name, unsigned char group);
-    /// Remove an animation. Zero fadetime is instant. Return true on success
-    bool RemoveAnimation(const std::string& name, float fadeTime);
-    /// Remove all animations within a group. Zero fadetime is instant
-    void RemoveAnimations(unsigned char group, float fadeTime);
-    /// Remove all animations. Zero fadetime is instant
-    void RemoveAllAnimations(float fadeTime);
-    /// Add animation if does not exist, and set multiple properties. Return true on success
-    bool SetAnimation(const std::string& name, unsigned char group, bool looped, bool restart, float speed, float targetWeight,
-        float fadeTime, float autoFadeTime, bool fadeOutOthersInGroup);
-    /// Set multiple properties, but do not add the animation if does not exist. Return true on success
-    bool SetProperties(const std::string& name, unsigned char group, float speed, float targetWeight, float fadeTime,
-        float autoFadeTime);
+    /// Play an animation. Name must be the full resource name. Return true on success
+    bool Play(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime);
+    /// Play an animation and fade out all others in the same group. Name must be the full resource name. Return true on success
+    bool PlayExclusive(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime, float fadeOutTime);
+    /// Stop an animation. Zero fadetime is instant. Return true on success
+    bool Stop(const std::string& name, float fadeOutTime);
+    /// Stop all animations in a specific group. Zero fadetime is instant
+    void StopGroup(unsigned char group, float fadeOutTime);
+    /// Stop all animations. Zero fadetime is instant
+    void StopAll(float fadeTime);
+    /// Fade an already playing animation in or out. Time is in seconds. Return true on success
+    bool Fade(const std::string& name, float targetWeight, float fadeTime);
+    /// Fade other animations within same group. Return true on success
+    bool FadeOthers(const std::string& name, float targetWeight, float fadeTime);
+    
     /// Set animation blending priority. Return true on success
     bool SetPriority(const std::string& name, int priority);
     /// Set animation start bone. Return true on success
@@ -107,17 +108,17 @@ public:
     bool SetGroup(const std::string& name, unsigned char group);
     /// Set animation speed. Return true on success
     bool SetSpeed(const std::string& name, float speed);
-    /// Fade animation in or out. Time is in seconds. Return true on success
-    bool SetFade(const std::string& name, float targetWeight, float time);
-    /// Fade other animations within same group. Return true on success
-    bool SetFadeOthers(const std::string& name, float targetWeight, float time);
     /// Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success
-    bool SetAutoFade(const std::string& name, float time);
+    bool SetAutoFade(const std::string& name, float fadeOutTime);
 
-    /// Return the animated model being controlled. Is always the first AnimatedModel in the node
+    /// Return the animated model being controlled. Is always the first (master) AnimatedModel in the node
     AnimatedModel* GetAnimatedModel() const;
     /// Return whether an animation is active
-    bool HasAnimation(const std::string& name) const;
+    bool IsPlaying(const std::string& name) const;
+    /// Return whether an animation is fading in
+    bool IsFadingIn(const std::string& name) const;
+    /// Return whether an animation is fading out
+    bool IsFadingOut(const std::string& name) const;
     /// Return animation priority
     int GetPriority(const std::string& name) const;
     /// Return animation start bone, or null if no such animation

@@ -28,7 +28,6 @@
 
 class Console;
 class DebugHud;
-class ScriptEngine;
 
 /// Urho3D engine. Creates the other subsystems
 class Engine : public Object
@@ -44,6 +43,8 @@ public:
     /// Initialize and show the application window. Return true if successful
     bool Initialize(const std::string& windowTitle = "Urho3D", const std::string& logName = "Urho3D.log", const std::vector<std::string>&
         arguments = std::vector<std::string>());
+    /// Initialize script subsystem and register the script API. Return true if successful (engine must be initialized first)
+    bool InitializeScripting();
     /// Run one frame
     void RunFrame();
     /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode)
@@ -86,8 +87,6 @@ private:
     void RegisterObjects();
     /// Create and register subsystems. In headless mode graphics, input & UI are not created
     void RegisterSubsystems();
-    /// Register the script API
-    void RegisterAPI();
     
     /// Frame update timer
     Timer frameTimer_;

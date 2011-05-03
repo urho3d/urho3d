@@ -496,9 +496,14 @@ static CScriptArray* GetArgumentsToArray()
     return VectorToArray<std::string>(GetArguments(), "Array<String>");
 }
 
+static void ShowErrorDialog(const std::string& title, const std::string& message)
+{
+    ErrorDialog(title.c_str(), message.c_str());
+}
+
 static void RegisterProcessUtils(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("void ErrorDialog(const String& in, const String& in)", asFUNCTION(ErrorDialog), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void ErrorDialog(const String& in, const String& in)", asFUNCTION(ShowErrorDialog), asCALL_CDECL);
     engine->RegisterGlobalFunction("void OpenConsoleWindow()", asFUNCTION(OpenConsoleWindow), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetConsoleInput()", asFUNCTION(GetConsoleInput), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ get_arguments()", asFUNCTION(GetArgumentsToArray), asCALL_CDECL);

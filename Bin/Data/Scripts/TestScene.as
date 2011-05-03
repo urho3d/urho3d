@@ -133,7 +133,7 @@ void InitScene()
         object.castShadows = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0, Vector3(), Quaternion());
+        shape.SetConvexHull(cache.GetResource("Model", "Models/Mushroom.mdl"), 0.01, 0, Vector3(), Quaternion());
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }
@@ -150,7 +150,7 @@ void InitScene()
         object.castShadows = true;
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
-        ctrl.SetAnimation("Models/Jack_Walk.ani", 1, true, true, 1.0, 1.0, 0.0, 0.0, false);
+        ctrl.Play("Models/Jack_Walk.ani", 1, true, true, 0.0f);
     }
 
     {

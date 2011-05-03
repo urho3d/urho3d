@@ -176,14 +176,20 @@ class Ninja : GameObject
 
                 // Walk or sidestep animation
                 if (sidemove)
-                    controller.SetAnimation("Models/Ninja_Stealth.ani", ANIM_MOVE, true, false, animDir * 2.2, 1.0, 0.2, 0.0, true);
+                {
+                    controller.PlayExclusive("Models/Ninja_Stealth.ani", ANIM_MOVE, true, false, 0.2, 0.2);
+                    controller.SetSpeed("Models/Ninja_Stealth.ani", animDir * 2.2);
+                }
                 else
-                    controller.SetAnimation("Models/Ninja_Walk.ani", ANIM_MOVE, true, false, animDir * 1.6, 1.0, 0.2, 0.0, true);
+                {
+                    controller.PlayExclusive("Models/Ninja_Walk.ani", ANIM_MOVE, true, false, 0.2, 0.2);
+                    controller.SetSpeed("Models/Ninja_Walk.ani", animDir * 1.6);
+                }
             }
             else
             {
                 // Idle animation
-                controller.SetAnimation("Models/Ninja_Idle3.ani", ANIM_MOVE, true, false, 1.0, 1.0, 0.2, 0.0, true);
+                controller.PlayExclusive("Models/Ninja_Idle3.ani", ANIM_MOVE, true, false, 0.2, 0.2);
             }
 
             // Overall damping to cap maximum speed
@@ -198,7 +204,7 @@ class Ninja : GameObject
                     node.position = node.position + Vector3(0, 3, 0);
                     body.ApplyForce(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
-                    controller.SetAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 1.0, 1.0, 0.0, 0.0, true);
+                    controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 0.2, 0.2);
                     okToJump = false;
                 }
             }
@@ -230,7 +236,7 @@ class Ninja : GameObject
 
             // Falling/jumping/sliding animation
             if (inAirTime > 0.01f)
-                controller.SetAnimation("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 1.0, 1.0, 0.2, 0.0, true);
+                controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 0.2, 0.2);
         }
 
         // Shooting
@@ -241,8 +247,8 @@ class Ninja : GameObject
         {
             Vector3 projectileVel = GetAim() * ninjaThrowVelocity;
 
-            controller.SetAnimation("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 1.0, 0.75, 0.0, 0.0, false);
-            controller.SetFade("Models/Ninja_Attack1.ani", 0.0, 0.5);
+            controller.Play("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 0.0);
+            controller.Fade("Models/Ninja_Attack1.ani", 0.0, 0.5);
             controller.SetPriority("Models/Ninja_Attack1.ani", 1);
 
             Node@ snowball = SpawnObject(node.position + vel * timeStep + q * ninjaThrowPosition, GetAim(), "SnowBall");
@@ -301,16 +307,18 @@ class Ninja : GameObject
         if (deathDir < 0)
         {
             // Backward death
-            controller.RemoveAnimations(ANIM_ATTACK, 0.1);
-            controller.SetAnimation("Models/Ninja_Death1.ani", ANIM_MOVE, false, false, 0.5, 1.0, 0.2, 0.0, true);
+            controller.StopGroup(ANIM_ATTACK, 0.1);
+            controller.PlayExclusive("Models/Ninja_Death1.ani", ANIM_MOVE, false, false, 0.2, 0.2);
+            controller.SetSpeed("Models/Ninja_Death1.ani", 0.5);
             if ((deathTime >= 0.3) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, 425 * timeStep));
         }
         else if (deathDir > 0)
         {
             // Forward death
-            controller.RemoveAnimations(ANIM_ATTACK, 0.1);
-            controller.SetAnimation("Models/Ninja_Death2.ani", ANIM_MOVE, false, false, 0.5, 1.0, 0.2, 0.0, true);
+            controller.StopGroup(ANIM_ATTACK, 0.1);
+            controller.PlayExclusive("Models/Ninja_Death2.ani", ANIM_MOVE, false, false, 0.2, 0.2);
+            controller.SetSpeed("Models/Ninja_Death2.ani", 0.5);
             if ((deathTime >= 0.4) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, -425 * timeStep));
         }

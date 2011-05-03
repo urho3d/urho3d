@@ -616,24 +616,25 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
 static void RegisterAnimationController(asIScriptEngine* engine)
 {
     RegisterComponent<AnimationController>(engine, "AnimationController");
-    engine->RegisterObjectMethod("AnimationController", "bool AddAnimation(const String& in, uint8)", asMETHOD(AnimationController, AddAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool RemoveAnimation(const String& in, float)", asMETHOD(AnimationController, RemoveAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void RemoveAnimations(uint8, float)", asMETHOD(AnimationController, RemoveAnimations), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void RemoveAllAnimations(float)", asMETHOD(AnimationController, RemoveAllAnimations), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetAnimation(const String& in, uint8, bool, bool, float, float, float, float, bool)", asMETHOD(AnimationController, SetAnimation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetProperties(const String& in, uint8, float, float, float, float)", asMETHOD(AnimationController, SetProperties), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetBlending(const String& in, int, const String& in)", asMETHOD(AnimationController, SetBlending), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetFade(const String& in, float, float)", asMETHOD(AnimationController, SetFade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetFadeOthers(const String& in, float, float)", asMETHOD(AnimationController, SetFadeOthers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool Play(const String& in, uint8, bool, bool, float)", asMETHOD(AnimationController, Play), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool PlayExclusive(const String& in, uint8, bool, bool, float, float)", asMETHOD(AnimationController, PlayExclusive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void Stop(const String& in, float)", asMETHOD(AnimationController, Stop), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void StopGroup(uint8, float)", asMETHOD(AnimationController, StopGroup), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void StopAll(float)", asMETHOD(AnimationController, StopAll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool Fade(const String& in, float, float)", asMETHOD(AnimationController, Fade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool FadeOthers(const String& in, float, float)", asMETHOD(AnimationController, FadeOthers), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetPriority(const String& in, int)", asMETHOD(AnimationController, SetPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetStartBone(const String& in, const String& in)", asMETHOD(AnimationController, SetStartBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetBlending(const String& in, int, const String& in)", asMETHOD(AnimationController, SetBlending), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetTime(const String& in, float)", asMETHOD(AnimationController, SetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetWeight(const String& in, float)", asMETHOD(AnimationController, SetWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetLooped(const String& in, bool)", asMETHOD(AnimationController, SetLooped), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetGroup(const String& in, uint8)", asMETHOD(AnimationController, SetGroup), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetSpeed(const String& in, float)", asMETHOD(AnimationController, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetAutoFade(const String& in, float)", asMETHOD(AnimationController, SetAutoFade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool HasAnimation(const String& in) const", asMETHOD(AnimationController, HasAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String& in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String& in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String& in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "int GetPriority(const String& in) const", asMETHOD(AnimationController, GetPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "const String& GetStartBone(const String& in) const", asMETHOD(AnimationController, GetStartBoneName), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "float GetTime(const String& in) const", asMETHOD(AnimationController, GetTime), asCALL_THISCALL);

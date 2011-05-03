@@ -93,6 +93,7 @@ void Run(const char* cmdLine)
     context->GetSubsystem<Time>()->SetTimerPeriod(5);
     
     // Execute the Start function from the script file, then run the engine loop until exited
+    engine->InitializeScripting();
     ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
     if ((scriptFile) && (scriptFile->Execute("void Start()")))
     {

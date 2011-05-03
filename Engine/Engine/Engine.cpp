@@ -159,10 +159,9 @@ bool Engine::Initialize(const std::string& windowTitle, const std::string& logNa
         }
     }
     
-    // Register object factories and attributes first, then subsystems, and finally the script API
+    // Register object factories and attributes first, then subsystems
     RegisterObjects();
     RegisterSubsystems();
-    RegisterAPI();
     
     // Start logging
     Log* log = GetSubsystem<Log>();
@@ -205,6 +204,40 @@ bool Engine::Initialize(const std::string& windowTitle, const std::string& logNa
     }
     
     initialized_ = true;
+    return true;
+}
+
+bool Engine::InitializeScripting()
+{
+    if (!initialized_)
+        return false;
+    
+    // Check if scripting already initialized
+    if (GetSubsystem<Script>())
+        return true;
+    
+    RegisterScriptLibrary(context_);
+    context_->RegisterSubsystem(new Script(context_));
+   
+    {
+        PROFILE(RegisterScriptAPI);
+        
+        asIScriptEngine* engine = GetSubsystem<Script>()->GetScriptEngine();
+        RegisterMathAPI(engine);
+        RegisterCoreAPI(engine);
+        RegisterIOAPI(engine);
+        RegisterResourceAPI(engine);
+        RegisterSceneAPI(engine);
+        RegisterGraphicsAPI(engine);
+        RegisterInputAPI(engine);
+        RegisterAudioAPI(engine);
+        RegisterUIAPI(engine);
+        RegisterNetworkAPI(engine);
+        RegisterPhysicsAPI(engine);
+        RegisterScriptAPI(engine);
+        RegisterEngineAPI(engine);
+    }
+    
     return true;
 }
 
@@ -368,7 +401,6 @@ void Engine::RegisterObjects()
     RegisterAudioLibrary(context_);
     RegisterUILibrary(context_);
     RegisterPhysicsLibrary(context_);
-    RegisterScriptLibrary(context_);
 }
 
 void Engine::RegisterSubsystems()
@@ -390,30 +422,9 @@ void Engine::RegisterSubsystems()
     {
         context_->RegisterSubsystem(new Graphics(context_));
         context_->RegisterSubsystem(new Renderer(context_));
-        context_->RegisterSubsystem(new Input(context_));
     }
     
-    context_->RegisterSubsystem(new Audio(context_));
+    context_->RegisterSubsystem(new Input(context_));
     context_->RegisterSubsystem(new UI(context_));
-    context_->RegisterSubsystem(new Script(context_));
-}
-
-void Engine::RegisterAPI()
-{
-    PROFILE(RegisterScriptAPI);
-    
-    asIScriptEngine* engine = GetSubsystem<Script>()->GetScriptEngine();
-    RegisterMathAPI(engine);
-    RegisterCoreAPI(engine);
-    RegisterIOAPI(engine);
-    RegisterResourceAPI(engine);
-    RegisterSceneAPI(engine);
-    RegisterGraphicsAPI(engine);
-    RegisterInputAPI(engine);
-    RegisterAudioAPI(engine);
-    RegisterUIAPI(engine);
-    RegisterNetworkAPI(engine);
-    RegisterPhysicsAPI(engine);
-    RegisterScriptAPI(engine);
-    RegisterEngineAPI(engine);
+    context_->RegisterSubsystem(new Audio(context_));
 }

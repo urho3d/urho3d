@@ -167,7 +167,7 @@ void AnimationController::Update(float timeStep)
     }
 }
 
-bool AnimationController::AddAnimation(const std::string& name, unsigned char group)
+bool AnimationController::Play(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime)
 {
     AnimatedModel* model = GetAnimatedModel();
     if (!model)
@@ -196,10 +196,29 @@ bool AnimationController::AddAnimation(const std::string& name, unsigned char gr
     }
     
     animations_[index].group_ = group;
+    if (restart)
+        state->SetTime(0.0f);
+    
+    state->SetLooped(looped);
+    
+    if (fadeInTime > 0.0f)
+    {
+        animations_[index].targetWeight_ = 1.0f;
+        animations_[index].fadeTime_ = fadeInTime;
+    }
+    else
+        state->SetWeight(1.0f);
+    
     return true;
 }
 
-bool AnimationController::RemoveAnimation(const std::string& name, float fadeTime)
+bool AnimationController::PlayExclusive(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime, float fadeOutTime)
+{
+    FadeOthers(name, 0.0f, fadeOutTime);
+    return Play(name, group, looped, restart, fadeInTime);
+}
+
+bool AnimationController::Stop(const std::string& name, float fadeOutTime)
 {
     AnimatedModel* model = GetAnimatedModel();
     if (!model)
@@ -208,7 +227,7 @@ bool AnimationController::RemoveAnimation(const std::string& name, float fadeTim
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (fadeTime <= 0.0f)
+    if (fadeOutTime <= 0.0f)
     {
         if (index != M_MAX_UNSIGNED)
             animations_.erase(animations_.begin() + index);
@@ -220,14 +239,14 @@ bool AnimationController::RemoveAnimation(const std::string& name, float fadeTim
         if (index != M_MAX_UNSIGNED)
         {
             animations_[index].targetWeight_ = 0.0f;
-            animations_[index].fadeTime_ = fadeTime;
+            animations_[index].fadeTime_ = fadeOutTime;
         }
     }
     
     return (index != M_MAX_UNSIGNED) || (state != 0);
 }
 
-void AnimationController::RemoveAnimations(unsigned char group, float fadeTime)
+void AnimationController::StopGroup(unsigned char group, float fadeOutTime)
 {
     AnimatedModel* model = GetAnimatedModel();
     if (!model)
@@ -239,7 +258,7 @@ void AnimationController::RemoveAnimations(unsigned char group, float fadeTime)
         
         if (i->group_ == group)
         {
-            if (fadeTime < 0.0f)
+            if (fadeOutTime <= 0.0f)
             {
                 remove = true;
                 AnimationState* state = model->GetAnimationState(i->hash_);
@@ -249,7 +268,7 @@ void AnimationController::RemoveAnimations(unsigned char group, float fadeTime)
             else
             {
                 i->targetWeight_ = 0.0f;
-                i->fadeTime_ = fadeTime;
+                i->fadeTime_ = fadeOutTime;
             }
         }
         
@@ -260,7 +279,7 @@ void AnimationController::RemoveAnimations(unsigned char group, float fadeTime)
     }
 }
 
-void AnimationController::RemoveAllAnimations(float fadeTime)
+void AnimationController::StopAll(float fadeOutTime)
 {
     AnimatedModel* model = GetAnimatedModel();
     if (!model)
@@ -270,7 +289,7 @@ void AnimationController::RemoveAllAnimations(float fadeTime)
     {
         bool remove = false;
         
-        if (fadeTime < 0.0f)
+        if (fadeOutTime <= 0.0f)
         {
             remove = true;
             AnimationState* state = model->GetAnimationState(i->hash_);
@@ -280,7 +299,7 @@ void AnimationController::RemoveAllAnimations(float fadeTime)
         else
         {
             i->targetWeight_ = 0.0f;
-            i->fadeTime_ = fadeTime;
+            i->fadeTime_ = fadeOutTime;
         }
     
         if (remove)
@@ -290,67 +309,36 @@ void AnimationController::RemoveAllAnimations(float fadeTime)
     }
 }
 
-bool AnimationController::SetAnimation(const std::string& name, unsigned char group, bool looped, bool restart, float speed,
-    float targetWeight, float fadeTime, float autoFadeTime, bool fadeOutOthersInGroup)
-{
-    unsigned index;
-    AnimationState* state;
-    FindAnimation(name, index, state);
-    if ((index == M_MAX_UNSIGNED) || (!state))
-    {
-        // If animation is not active, and target weight is zero, do nothing
-        if (targetWeight <= 0.0f)
-            return true;
-        // Attempt to add, then re-find
-        if (!AddAnimation(name, group))
-            return false;
-        FindAnimation(name, index, state);
-    }
-    
-    state->SetLooped(looped);
-    if (restart)
-        state->SetTime(0.0f);
-    
-    AnimationControl& control = animations_[index];
-    control.group_ = group;
-    control.speed_ = speed;
-    
-    if (fadeTime > 0.0f)
-        control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-    else
-        state->SetWeight(targetWeight);
-    control.fadeTime_ = Max(fadeTime, 0.0f);
-    control.autoFadeTime_ = Max(autoFadeTime, 0.0f);
-    
-    if (fadeOutOthersInGroup)
-    {
-        for (unsigned i = 0; i < animations_.size(); ++i)
-        {
-            AnimationControl& otherControl = animations_[i];
-            if ((otherControl.group_ == group) && (i != index))
-            {
-                otherControl.targetWeight_ = 0.0f;
-                otherControl.fadeTime_ = Max(fadeTime, M_EPSILON);
-            }
-        }
-    }
-    return true;
-}
-
-bool AnimationController::SetProperties(const std::string& name, unsigned char group, float speed, float targetWeight, float fadeTime,
-    float autoFadeTime)
+bool AnimationController::Fade(const std::string& name, float targetWeight, float fadeTime)
 {
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
     if (index == M_MAX_UNSIGNED)
         return false;
-    AnimationControl& control = animations_[index];
-    control.group_ = group;
-    control.speed_ = speed;
-    control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-    control.fadeTime_ = Max(fadeTime, 0.0f);
-    control.autoFadeTime_ = Max(fadeTime, 0.0f);
+    animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
+    animations_[index].fadeTime_ = Max(fadeTime, M_EPSILON);
+    return true;
+}
+
+bool AnimationController::FadeOthers(const std::string& name, float targetWeight, float fadeTime)
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED)
+        return false;
+    unsigned char group = animations_[index].group_;
+    
+    for (unsigned i = 0; i < animations_.size(); ++i)
+    {
+        AnimationControl& control = animations_[i];
+        if ((control.group_ == group) && (i != index))
+        {
+            control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
+            control.fadeTime_ = Max(fadeTime, M_EPSILON);
+        }
+    }
     return true;
 }
 
@@ -436,39 +424,6 @@ bool AnimationController::SetWeight(const std::string& name, float weight)
     return true;
 }
 
-bool AnimationController::SetFade(const std::string& name, float targetWeight, float time)
-{
-    unsigned index;
-    AnimationState* state;
-    FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
-        return false;
-    animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-    animations_[index].fadeTime_ = Max(time, M_EPSILON);
-    return true;
-}
-
-bool AnimationController::SetFadeOthers(const std::string& name, float targetWeight, float time)
-{
-    unsigned index;
-    AnimationState* state;
-    FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
-        return false;
-    unsigned char group = animations_[index].group_;
-    
-    for (unsigned i = 0; i < animations_.size(); ++i)
-    {
-        AnimationControl& control = animations_[i];
-        if ((control.group_ == group) && (i != index))
-        {
-            control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-            control.fadeTime_ = Max(time, M_EPSILON);
-        }
-    }
-    return true;
-}
-
 bool AnimationController::SetLooped(const std::string& name, bool enable)
 {
     AnimationState* state = FindAnimationState(name);
@@ -478,14 +433,14 @@ bool AnimationController::SetLooped(const std::string& name, bool enable)
     return true;
 }
 
-bool AnimationController::SetAutoFade(const std::string& name, float time)
+bool AnimationController::SetAutoFade(const std::string& name, float fadeOutTime)
 {
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
     if (index == M_MAX_UNSIGNED)
         return false;
-    animations_[index].autoFadeTime_ = Max(time, 0.0f);
+    animations_[index].autoFadeTime_ = Max(fadeOutTime, 0.0f);
     return true;
 }
 
@@ -494,12 +449,34 @@ AnimatedModel* AnimationController::GetAnimatedModel() const
     return GetComponent<AnimatedModel>();
 }
 
-bool AnimationController::HasAnimation(const std::string& name) const
+bool AnimationController::IsPlaying(const std::string& name) const
 {
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
     return index != M_MAX_UNSIGNED;
+}
+
+bool AnimationController::IsFadingIn(const std::string& name) const
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if ((index == M_MAX_UNSIGNED) || (!state))
+        return false;
+    return (animations_[index].fadeTime_) && (animations_[index].targetWeight_ > state->GetWeight());
+}
+
+bool AnimationController::IsFadingOut(const std::string& name) const
+{
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if ((index == M_MAX_UNSIGNED) || (!state))
+        return false;
+    
+    return ((animations_[index].fadeTime_) && (animations_[index].targetWeight_ < state->GetWeight()))
+        || ((!state->IsLooped()) && (state->GetTime() >= state->GetLength()) && (animations_[index].autoFadeTime_));
 }
 
 int AnimationController::GetPriority(const std::string& name) const

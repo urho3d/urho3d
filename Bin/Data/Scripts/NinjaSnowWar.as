@@ -43,6 +43,9 @@ float powerupSpawnTimer = 0;
 
 void Start()
 {
+    if (engine.headless)
+        OpenConsoleWindow();
+
     InitAudio();
     InitConsole();
     InitScene();
@@ -211,6 +214,12 @@ void CreateOverlays()
     healthBorder.AddChild(healthBar);
 }
 
+void SetMessage(const String&in message)
+{
+    if (messageText !is null)
+        messageText.text = message;
+}
+
 void StartGame()
 {
     // Clear the scene of all existing scripted objects
@@ -239,7 +248,7 @@ void StartGame()
     playerControls.yaw = 0;
     playerControls.pitch = 0;
 
-    messageText.text = "";
+    SetMessage("");
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -256,13 +265,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.keyPress[KEY_F5])
         gameScene.Save(File(fileSystem.programDir + "Data/Save.dat", FILE_WRITE));
 
-    if ((!console.visible) && (input.keyPress['P']) && (gameOn))
+    if ((input.keyPress['P']) && (!console.visible) && (gameOn))
     {
         gameScene.active = !gameScene.active;
         if (!gameScene.active)
-            messageText.text = "PAUSED";
+            SetMessage("PAUSED");
         else
-            messageText.text = "";
+            SetMessage("");
     }
 
     if (input.keyPress[KEY_ESC])
@@ -383,7 +392,7 @@ void CheckEndAndRestart()
     if ((gameOn) && (gameScene.GetChild("Player", true) is null))
     {
         gameOn = false;
-        messageText.text = "Press Fire or Jump to restart!";
+        SetMessage("Press Fire or Jump to restart!");
         return;
     }
 
@@ -396,7 +405,7 @@ void UpdateControls()
     prevPlayerControls = playerControls;
     playerControls.Set(CTRL_ALL, false);
 
-    if (!console.visible)
+    if ((console is null) || (!console.visible))
     {
         if (input.keyDown['W'])
             playerControls.Set(CTRL_UP, true);

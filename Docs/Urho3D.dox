@@ -4,7 +4,7 @@
 
 Urho3D is a lightweight, object-oriented Win32 / Direct3D9 rendering and game engine implemented in C++.
 
-For getting started, see the pages \subpage Building "Building", \subpage Structure "Library structure", \subpage Examples "Examples" and \subpage Conventions "Conventions".
+For getting started, see the pages \subpage Building "Building", \subpage Structure "Overall structure", \subpage Examples "Examples" and \subpage Conventions "Conventions".
 
 Also see \subpage Credits & \subpage License for copyright and licensing information.
 
@@ -26,7 +26,7 @@ To run Urho3D.exe from the Visual Studio debugger, set it as a startup project a
 Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
 
 
-\page Structure Library structure
+\page Structure Overall structure
 
 Urho3D consists of several static libraries that are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
 
@@ -45,9 +45,9 @@ The libraries are the following:
 - Script. Provides scripting support using the AngelScript language.
 - Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
-The main executable Urho3D uses the Engine library to start up the subsystems and to load a script file, from which the function Start() is executed before entering the main loop. This function will determine how the Urho3D application in question will behave; typically the script would create a scene and subscribe to update and input events to be able to hook into the main loop and into the user's actions.
+The main executable Urho3D.exe uses the Engine library to start up the subsystems and to load a script file, from which the function Start() is executed before entering the main loop. This function will determine how the Urho3D application in question will behave; typically the script would create a scene and subscribe to update and input events to be able to hook into the main loop and into the user's actions.
 
-Note that although the Urho3D executable is geared towards running a scripted application, it is also perfectly possible to use the engine through C++ only.
+Note that although Urho3D.exe is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the script subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
 
 The third-party libraries are used for the following functionality:
 
@@ -110,7 +110,7 @@ Urho3D uses the following conventions:
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
-- In the script API, properties are used whenever possible instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+- In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
 
 For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
 
@@ -123,7 +123,7 @@ For more details related to the C++ coding style, see also \subpage CodingConven
 
 - Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
 
-- Constants and enumerations are in capitals. For example Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example Vector3::ZERO or PASS_SHADOW.
 
 - Class definitions in header files proceed in the following order:
   - public constructors and destructors
@@ -135,6 +135,10 @@ For more details related to the C++ coding style, see also \subpage CodingConven
   - repeat all of the above in order for protected definitions, and finally private
 
 - Header files are commented using one-line comments beginning with /// to mark the comments for Doxygen.
+
+- Inline functions are defined inside the class definitions where possible, without using the inline keyword.
+
+- For threading and multi-instance safety, the only allowed form of static data is const static data outside function definitions.
 
 
 \page Credits Credits
