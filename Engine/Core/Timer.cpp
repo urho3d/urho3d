@@ -25,8 +25,8 @@
 #include "CoreEvents.h"
 #include "Timer.h"
 
-#include <windows.h>
-#include <mmsystem.h>
+#include <Windows.h>
+#include <MMSystem.h>
 
 #include "DebugNew.h"
 

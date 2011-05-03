@@ -24,7 +24,7 @@
 #include "Precompiled.h"
 #include "Mutex.h"
 
-#include <windows.h>
+#include <Windows.h>
 
 #include "DebugNew.h"
 

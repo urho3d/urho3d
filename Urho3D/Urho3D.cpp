@@ -30,8 +30,7 @@
 #include "ScriptFile.h"
 #include "Time.h"
 
-#include <stdexcept>
-#include <windows.h>
+#include <Windows.h>
 
 #include "DebugNew.h"
 
@@ -59,7 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 void Run(const char* cmdLine)
 {
     // Check for script file name
-    std::vector<std::string> arguments = ParseArguments(cmdLine);
+    const std::vector<std::string>& arguments = ParseArguments(cmdLine);
     std::string scriptFileName;
     for (unsigned i = 0; i < arguments.size(); ++i)
     {

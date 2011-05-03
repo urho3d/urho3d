@@ -2,152 +2,45 @@
 
 \mainpage Urho3D rendering and game engine
 
-Urho3D is a lightweight, object-oriented Win32 / Direct3D9 rendering and game engine implemented in C++.
+Urho3D is a lightweight, object-oriented Win32 / Direct3D9 rendering and game engine written in C++.
 
-For getting started, see the pages \subpage Building "Building", \subpage Structure "Overall structure", \subpage Examples "Examples" and \subpage Conventions "Conventions".
+For getting started, see:
 
-Also see \subpage Credits & \subpage License for copyright and licensing information.
+\subpage Building "Building Urho3D" <br>
+\subpage Running "Running Urho3D" <br>
+\subpage Structure "Overall structure" <br>
+\subpage Conventions "Conventions" <br>
+\subpage ScriptQuickstart "Quickstart in script" <br>
+\subpage CppQuickstart "Quickstart in C++" <br>
 
+For further reference, see:
 
-\page Building Building
+\subpage Subsystems "Subsystems" <br>
+\subpage Events "Events" <br>
+\subpage MainLoop "Main loop and frame update" <br>
+\subpage SceneModel "Scene model" <br>
+\subpage Scripting "Scripting" <br>
+\subpage Resources "Resources" <br>
+\subpage Rendering "Rendering" <br>
+\subpage Input "Input" <br>
+\subpage Network "Networking" <br>
+\subpage Audio "Audio" <br>
+\subpage Physics "Physics" <br>
+\subpage UI "User interface" <br>
+\subpage Tools "Tools" <br>
+\subpage FileFormats "Custom file formats" <br>
+\subpage CodingConventions "Coding conventions" <br>
 
-Urho3D uses cmake (http://www.cmake.org) to build. The build process has two steps:
-
-1) Run cmake in the root directory with your preferred toolchain specified to generate the build files. Visual Studio 2008/2010 and MinGW have been tested. You can use the batch files provided (cmake_vs2008.bat, cmake_vs2010.bat and cmake_gcc.bat.)
-
-2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For MinGW, execute make (by default, cmake_gcc.bat specifies to make a Release build.)
-
-The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires fxc.exe (from the DirectX SDK) to be available through the system PATH. Note that the debug executables of tools will not have the _d postfix, to allow the asset build scripts to work in both debug & release builds.
-
-After the build is complete, the programs can be run from the Bin directory.
-
-To run Urho3D.exe from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Debugging -> Command: ..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
-
-Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
-
-
-\page Structure Overall structure
-
-Urho3D consists of several static libraries that are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
-
-The libraries are the following:
-
-- Math. Provides vector & quaternion types and geometric shapes used in intersection tests.
-- Core. Provides the execution Context, the base class Object for typed objects, object factories, event handling, threading and profiling.
-- IO. Provides file system access, stream input/output and logging.
-- Resource. Provides the ResourceCache and the base resource types, including XML documents.
-- Scene. Provides Node and Component classes, from which Urho3D scenes (or worlds, maps, levels) are built.
-- Graphics. Provides application window handling and 3D rendering capabilities.
-- Input. Provides mouse & keyboard input in both polled and event-based mode.
-- Network. Provides low-level client-server networking functionality.
-- Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
-- Physics. Provides physics simulation.
-- Script. Provides scripting support using the AngelScript language.
-- Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
-
-The main executable Urho3D.exe uses the Engine library to start up the subsystems and to load a script file, from which the function Start() is executed before entering the main loop. This function will determine how the Urho3D application in question will behave; typically the script would create a scene and subscribe to update and input events to be able to hook into the main loop and into the user's actions.
-
-Note that although Urho3D.exe is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the script subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
-
-The third-party libraries are used for the following functionality:
-
-- AngelScript: scripting language implementation
-- ENet: UDP networking
-- FreeType: font rendering
-- Open Asset Import Library: reading various 3D file formats
-- Open Dynamics Engine: physics simulation implementation
-- StanHull: convex hull generation from triangle meshes, used for physics collision shapes
-- stb_image: image loading
-- stb_vorbis: Ogg Vorbis decoding
-- TinyXML: parsing of XML files
-
-
-\page Examples Examples
-
-Currently there are two examples, both implemented in script:
-
-\section ExTestScene TestScene
-
-Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory. Controls:
-
-- WSAD - move
-- Left mouse - create a new physics object
-- Right mouse - hold and move mouse to rotate view
-- Space - toggle debug geometry
-- F5 - save scene
-- F7 - load scene
-- 1 to 9 - toggle rendering options
-- T - toggle profiling display
-- ~ - toggle AngelScript console
-
-\section ExNinjaSnowWar NinjaSnowWar
-
-A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory. Controls:
-  
-- WSAD - move
-- Left mouse - attack
-- Space - jump
-- F1 - toggle physics debug geometry
-- F2 - toggle profiling display
-- ~ - toggle AngelScript console
-
-
-\page Conventions Conventions
-
-Urho3D uses the following conventions:
-
-- Left-handed coordinates. Positive X, Y & Z axes point to the right, up, and forward, and positive rotation is clockwise.
-
-- Degrees are used for angles.
-
-- Clockwise vertices define a front face.
-
-- Audio volume is specified from 0.0 (silence) to 1.0 (full volume)
-
-- Axis aligned bounding boxes are used in all bounding tests, except for raycast into bone collision boxes, and testing whether a Camera is inside a Zone; in those cases oriented bounding boxes are used instead.
-
-- Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
-
-- Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
-
-- In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
-
-For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
-
-
-\page CodingConventions Coding conventions
-
-- Class and struct names are in camelcase beginning with an upper case letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
-
-- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
-
-- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
-
-- Constants and enumerations are in uppercase. For example Vector3::ZERO or PASS_SHADOW.
-
-- Class definitions in header files proceed in the following order:
-  - public constructors and destructors
-  - public virtual functions
-  - public non-virtual member functions
-  - public static functions
-  - public member variables
-  - public static variables
-  - repeat all of the above in order for protected definitions, and finally private
-
-- Header files are commented using one-line comments beginning with /// to mark the comments for Doxygen.
-
-- Inline functions are defined inside the class definitions where possible, without using the inline keyword.
-
-- For threading and multi-instance safety, the only allowed form of static data is const static data outside function definitions.
+For credits, copyright and licensing information, see \subpage Credits & \subpage License.
 
 
 \page Credits Credits
 
 Urho3D engine & example code by Lasse &Ouml;&ouml;rni (loorni@gmail.com)
 
-Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D (http://www.horde3d.org). Additional inspiration & research used:
+Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://www.horde3d.org/). Additional inspiration & research used:
 
-- Rectangle packing by Jukka Jyl&auml;nki (clb) (http://clb.demon.fi/projects/rectangle-bin-packing)
+- Rectangle packing by Jukka Jyl&auml;nki (clb) (http://clb.demon.fi/projects/rectangle-bin-packing/)
 - Tangent generation from Terathon (http://www.terathon.com/code/tangent.html)
 - Fast, Minimum Storage Ray/Triangle Intersection by M&ouml;ller & Trumbore (http://www.graphics.cornell.edu/pubs/1997/MT97.pdf)
 - Linear-Speed Vertex Cache Optimisation by Tom Forsyth (http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html)
@@ -169,7 +62,7 @@ Urho3D uses the following third-party libraries:
 
 Ninja model, BlueHighway font and smoke/flare/status bar textures are from OGRE.
 
-Jack and mushroom models are from the realXtend project (http:///www.realxtend.org).
+Jack and mushroom models are from the realXtend project (http:///www.realxtend.org/).
 
 NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 

@@ -202,7 +202,8 @@ const FontFace* Font::GetFace(int pointSize)
         newFace.glyphs_.push_back(newGlyph);
     }
     
-    // Store the height of a row
+    // Store point size and the height of a row
+    newFace.pointSize_ = pointSize;
     newFace.rowHeight_ = (face->size->metrics.height + 63) >> 6;
     
     // Now try to pack into the smallest possible texture

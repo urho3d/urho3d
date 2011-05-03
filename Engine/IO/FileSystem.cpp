@@ -31,7 +31,7 @@
 
 #include <direct.h>
 #include <process.h>
-#include <windows.h>
+#include <Windows.h>
 #include <shellapi.h>
 
 // Enable SHGetSpecialFolderPath on MinGW

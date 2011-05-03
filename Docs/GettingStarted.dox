@@ -1,0 +1,446 @@
+/**
+
+\page Building Building Urho3D
+
+Urho3D uses cmake (http://www.cmake.org) to build. The build process has two steps:
+
+1) Run cmake in the root directory with your preferred toolchain specified to generate the build files. Visual Studio 2008/2010 and MinGW have been tested. You can use the batch files provided (cmake_vs2008.bat, cmake_vs2010.bat and cmake_gcc.bat.)
+
+2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For MinGW, execute make (by default, cmake_gcc.bat specifies to make a Release build.)
+
+The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires fxc.exe (from the DirectX SDK) to be available through the system PATH. Note that the debug executables of tools will not have the _d postfix, to allow the asset build scripts to work in both debug & release builds.
+
+After the build is complete, the programs can be run from the Bin directory.
+
+To run the main executable Urho3D.exe from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Debugging -> Command: ..\\Bin\\Urho3D.exe (release) or ..\\Bin\\Urho3D_d.exe (debug.) Entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
+
+To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. See \subpage Running "Running Urho3D" for more information, but for a quick test you can try the following Command Arguments: Scripts/TestScene.as -w
+
+Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
+
+
+\page Running Running Urho3D
+
+Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended.
+
+The main executable Urho3d.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
+
+Urho3D.exe <scriptfilename> [options]
+
+The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \subpage Events "events", such as the update that happens every frame.
+
+Currently, two example application scripts exist:
+
+\section Running_TestScene TestScene
+
+Rendering, physics and serialization test. To start, run TestScene.bat in the Bin directory, or use the command Urho3D.exe Scripts/TestScene.as
+
+Key and mouse controls:
+
+- WSAD        Move
+- Left mouse  Create a new physics object
+- Right mouse Hold and move mouse to rotate view
+- Space       Toggle debug geometry
+- F5          Save scene
+- F7          Load scene
+- 1 to 9      Toggle rendering options
+- T           Toggle profiling display
+- ~           Toggle AngelScript console
+
+\section Running_NinjaSnowWar NinjaSnowWar
+
+A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as
+
+Key and mouse controls:
+
+- WSAD        Move
+- Left mouse  Attack
+- Space       Jump
+- F1          Toggle physics debug geometry
+- F2          Toggle profiling display
+- ~           Toggle AngelScript console
+
+\section Running_Commandline Command line options
+
+Urho3D.exe understands the following command line options:
+
+-x<res>       Horizontal resolution <br>
+-y<res>       Vertical resolution <br>
+-m<level>     Enable hardware multisampling (*)<br>
+-v            Enable vertical sync <br>
+-w            Start in windowed mode <br>
+-headless     Headless mode. No application window will be created <br>
+-forward      Use forward rendering (default) <br>
+-prepass      Use light pre-pass rendering <br>
+-deferred     Use deferred rendering <br>
+-b<length>    Mixing buffer length in milliseconds <br>
+-r<freq>      Mixing frequency in Hz <br>
+-nolimit      Disable frame limiter <br>
+-noshadows    Disable rendering of shadows <br>
+-nosound      Disable sound output <br>
+-noip         Disable sound mixing interpolation <br>
+-8bit         Force 8-bit audio output <br>
+-mono         Force mono audio output <br>
+-sm2          Force SM2.0 rendering <br>
+
+(*) Only forward rendering supports hardware multisampling. In light pre-pass and deferred rendering modes temporal antialiasing will be used instead.
+
+
+\page Structure Overall structure
+
+Urho3D consists of several static libraries that are independent where possible: for example the Graphics library could be used without the Engine library, if only rendering capabilities were desired.
+
+The libraries are the following:
+
+- Math. Provides vector & quaternion types and geometric shapes used in intersection tests.
+- Core. Provides the execution Context, the base class Object for typed objects, object factories, \subpage Event "event handling", threading and profiling.
+- IO. Provides file system access, stream input/output and logging.
+- Resource. Provides the ResourceCache and the base resource types, including XML documents.
+- Scene. Provides Node and Component classes, from which Urho3D scenes (or worlds, maps, levels) are built.
+- Graphics. Provides application window handling and 3D rendering capabilities.
+- Input. Provides mouse & keyboard input in both polled and event-based mode.
+- Network. Provides low-level client-server networking functionality.
+- Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
+- Physics. Provides physics simulation.
+- Script. Provides scripting support using the AngelScript language.
+- Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
+
+Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however due to the cmake build process all the libraries above get automatically linked (as Engine library depends on all of them.)
+
+Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the script subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
+
+The third-party libraries are used for the following functionality:
+
+- AngelScript: scripting language implementation
+- ENet: UDP networking
+- FreeType: font rendering
+- Open Asset Import Library: reading various 3D file formats
+- Open Dynamics Engine: physics simulation implementation
+- StanHull: convex hull generation from triangle meshes, used for physics collision shapes
+- stb_image: image loading
+- stb_vorbis: Ogg Vorbis decoding
+- TinyXML: parsing of XML files
+
+
+\page Conventions Conventions
+
+Urho3D uses the following conventions:
+
+- Left-handed coordinates. Positive X, Y & Z axes point to the right, up, and forward, and positive rotation is clockwise.
+
+- Degrees are used for angles.
+
+- Clockwise vertices define a front face.
+
+- Audio volume is specified from 0.0 (silence) to 1.0 (full volume)
+
+- Axis aligned bounding boxes are used in all bounding tests, except for raycast into bone collision boxes, and testing whether a Camera is inside a Zone; in those cases oriented bounding boxes are used instead.
+
+- Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
+
+- Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
+
+- In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+
+For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
+
+
+\page ScriptQuickstart Quickstart in script
+
+When Urho3D.exe executes the application script's Start() function, all the engine subsystems are already in place, so any initialization that needs to be done is specific to the application. In the following example, a minimal "Hello World" application with 3D content will be built.
+
+First, we need to declare an object handle for the 3D scene we are going to create. This must be outside the Start() function so that the Scene object will remain even when function's the execution ends. Angelscript uses the @ symbol for object handles, which correspond to SharedPtr's on C++ side (ie. they keep alive the object pointed to.)
+
+\code
+Scene@ helloScene;
+\endcode
+
+Now we can begin with the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
+
+Note: Urho3D has tweaked AngelScript slightly to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
+
+\code
+void Start()
+{
+    helloScene = Scene();
+
+    CreateObjects();
+    CreateText();
+    SubscribeToEvents();
+}
+\endcode
+
+Next, the scene will be filled with some content. The Urho3D scene model is basically a scene graph; the Scene object serves also as the root node. Three child nodes will be created: one for a 3D model object, one for a directional light, and one for the camera. The scene nodes themselves display nothing in the 3D world; components need to be created into them for the actual visible content. First, however, we need to create an Octree component into the root node. This is used for accelerated visibility queries to check what the camera "sees", and without it nothing would be visible.
+
+Child nodes can be created with or without names; uniqueness of names is not enforced. In this case we opt to not use names, as we do not need to find the nodes later after creation.
+
+For the 3D model, a StaticModel component is used, as animation is not needed. Its scene node remains at the origin (default position of each scene node.) To load the needed Model & Material resources, the ResourceCache subsystem is used.
+
+The light scene node also remains at the origin. For directional lights the position does not matter, but the node's forward direction is adjusted so that the light will shine down diagonally.
+
+The camera's scene node will be pulled back along the Z-axis to be able to see the object.
+
+Finally we define a fullscreen Viewport into the Renderer subsystem so that the scene can be shown. The viewport needs Scene and Camera object handles. Note the indexing; multiple viewports could be defined (for example to use split screen rendering) if necessary.
+
+\code
+void CreateObjects()
+{
+    helloScene.CreateComponent("Octree");
+
+    Node@ objectNode = helloScene.CreateChild();
+    Node@ lightNode = helloScene.CreateChild();
+    Node@ cameraNode = helloScene.CreateChild();
+
+    StaticModel@ object = objectNode.CreateComponent("StaticModel");
+    object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+    object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
+
+    Light@ light = lightNode.CreateComponent("Light");
+    light.lightType = LIGHT_DIRECTIONAL;
+    lightNode.direction = Vector3(-1, -1, -1);
+
+    Camera@ camera = cameraNode.CreateComponent("Camera");
+    cameraNode.position = Vector3(0, 0.3, -3);
+
+    renderer.viewports[0] = Viewport(helloScene, camera);
+}
+\endcode
+
+Now that the 3D scene is ready, we move on to displaying "Hello World" on the screen with the help of a Text user interface element. In addition to the Data and CoreData directories, the operating system font directory is available for resource loading; we use the Courier system font with point size 30. To display the text, it is centered, and then added as a child of the user interface root element (the UI can be thought of as a 2D scene graph.)
+
+\code
+void CreateText()
+{
+    Text@ helloText = Text();
+    helloText.SetFont(cache.GetResource("Font", "cour.ttf"), 30);
+    helloText.text = "Hello World from Urho3D";
+    helloText.color = Color(0, 1, 0);
+    helloText.horizontalAlignment = HA_CENTER;
+    helloText.verticalAlignment = VA_CENTER;
+
+    ui.rootElement.AddChild(helloText);
+}
+\endcode
+
+The final step we need is to subscribe to the frame update event; otherwise the application would just be left running with no possibility to interact with it, until it was forcibly exited with Alt-F4. The frame update event will be sent on each iteration of the main loop. When subscribing, we need to give the name of the event, and the name of the event handler function. We could also require the event to be sent by a specific sender, but in this case that is unnecessary.
+
+\code
+void SubscribeToEvents()
+{
+    SubscribeToEvent("Update", "HandleUpdate");
+}
+\endcode
+
+The event handler function needs to have a specific signature. If event type and parameters are not needed, "void HandleEvent()", or "void HandleEvent(StringHash eventType, VariantMap& eventData)" if they are.
+
+We might want to expand the application later, so we use the latter form. The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's Exit() function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
+
+Note that we could also subscribe to the "KeyDown" event sent by the Input subsystem.
+
+\code
+void HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    float timeStep = eventData["TimeStep"].GetFloat();
+
+    if (input.keyPress[KEY_ESC])
+        engine.Exit();
+}
+\endcode
+
+To try out the application, save it as HelloWorld.as in the Bin/Data/Scripts directory, then run Urho3D.exe Scripts/HelloWorld.as
+
+
+\page CppQuickstart Quickstart in C++
+
+This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \subpage ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
+
+To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt file:
+
+\code
+add_subdirectory (HelloWorld)
+\endcode
+
+Then, create the following CMakeLists.txt file into the HelloWorld directory (mostly copied from CMakeLists.txt of Urho3D.exe):
+
+\code
+# Define target name
+set (TARGET_NAME HelloWorld)
+
+# Define source files
+file (GLOB CPP_FILES *.cpp)
+file (GLOB H_FILES *.h)
+set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
+
+# Include directories
+include_directories (
+    ../Engine/Core ../Engine/Engine ../Engine/Graphics ../Engine/Input ../Engine/IO ../Engine/Math
+    ../Engine/Resource ../Engine/Scene ../Engine/UI
+)
+
+# Define target & libraries to link
+add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
+set_target_properties (${TARGET_NAME} PROPERTIES DEBUG_POSTFIX _d)
+target_link_libraries (${TARGET_NAME} Core Engine Graphics Input IO Math Resource Scene UI ${DBGHELP_LIB})
+finalize_exe ()
+\endcode
+
+Before recreating the build files with cmake, create an empty HelloWorld.cpp into the HelloWorld directory. Now you can re-run cmake. If using Visual Studio, the HelloWorld project should now appear in the Urho3D solution, and you can start writing the actual application into HelloWorld.cpp.
+
+To start with, we need the include files for all the engine classes we are going to use, plus Windows.h for the WinMain function:
+
+\code
+#include "Camera.h"
+#include "Context.h"
+#include "CoreEvents.h"
+#include "Engine.h"
+#include "Font.h"
+#include "Input.h"
+#include "Light.h"
+#include "Material.h"
+#include "Model.h"
+#include "Octree.h"
+#include "ProcessUtils.h"
+#include "Renderer.h"
+#include "ResourceCache.h"
+#include "Scene.h"
+#include "StaticModel.h"
+#include "Text.h"
+#include "UI.h"
+
+#include <Windows.h>
+\endcode
+
+To be able to subscribe to events, we need to subclass Object (if we did not use events, we could do everything procedurally, for example directly in WinMain, but that would be somewhat ugly.) We name the class HelloWorld, with functions that match the script version, plus a constructor. Note the shared pointers to the scene that we will create, and to the ResourceCache, which is perhaps the most often used subsystem, and therefore convenient to store here. Also note the OBJECT macro, which inserts code for object type identification:
+
+\code
+class HelloWorld : public Object
+{
+    OBJECT(HelloWorld);
+
+public:
+    HelloWorld(Context* context);
+    void Start();
+    void CreateObjects();
+    void CreateText();
+    void SubscribeToEvents();
+    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+    SharedPtr<Scene> helloScene_;
+    SharedPtr<ResourceCache> cache_;
+};
+\endcode
+
+Next, before actual the HelloWorld implementation, we can define WinMain. First, we need to create the Context object, which holds all subsystems and object factories, and keeps track of event senders and receivers. All Object subclasses need to be supplied a pointer to that context. When using an object factory (such as when creating components) that is automatic, but when creating objects manually, the pointer also needs to be passed manually.
+
+With the context at hand, we create the Engine and initialize it. The arguments for the Initialize() function are the initial window title, the log file name, and command line parameters, which are parsed using the ParseArguments() helper function.
+
+After this, we instantiate the HelloWorld object, call its Start() function, and run the main loop until Engine tells that we should exit. The shared pointers will take care of deleting the objects in the correct order; the Context will be the last to be destroyed.
+
+\code
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
+{
+    SharedPtr<Context> context(new Context());
+    SharedPtr<Engine> engine(new Engine(context));
+    engine->Initialize("HelloWorld", "HelloWorld.log", ParseArguments(cmdLine));
+
+    SharedPtr<HelloWorld> helloWorld(new HelloWorld(context));
+    helloWorld->Start();
+    while (!engine->IsExiting())
+        engine->RunFrame();
+
+    return 0;
+}
+\endcode
+
+Now we can continue with HelloWorld implementation. Note the OBJECTTYPESTATIC macro, which creates the static name and name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file. The reason to do that instead of defining them directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
+
+During construction, we store the ResourceCache subsystem pointer for later access:
+
+\code
+OBJECTTYPESTATIC(HelloWorld);
+
+HelloWorld::HelloWorld(Context* context) :
+    Object(context),
+    cache_(GetSubsystem<ResourceCache>())
+{
+}
+\endcode
+
+Next is the Start() function, in which the Scene will be created:
+
+\code
+void HelloWorld::Start()
+{
+    helloScene_ = new Scene(context_);
+    
+    CreateObjects();
+    CreateText();
+    SubscribeToEvents();
+}
+\endcode
+
+Then we get to scene object creation and defining the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of CreateComponent():
+
+\code
+void HelloWorld::CreateObjects()
+{
+    helloScene_->CreateComponent<Octree>();
+    
+    Node* objectNode = helloScene_->CreateChild();
+    Node* lightNode = helloScene_->CreateChild();
+    Node* cameraNode = helloScene_->CreateChild();
+
+    StaticModel* object = objectNode->CreateComponent<StaticModel>();
+    object->SetModel(cache_->GetResource<Model>("Models/Mushroom.mdl"));
+    object->SetMaterial(cache_->GetResource<Material>("Materials/Mushroom.xml"));
+    
+    Light* light = lightNode->CreateComponent<Light>();
+    light->SetLightType(LIGHT_DIRECTIONAL);
+    lightNode->SetDirection(Vector3(-1.0f, -1.0f, -1.0f));
+    
+    Camera* camera = cameraNode->CreateComponent<Camera>();
+    cameraNode->SetPosition(Vector3(0.0f, 0.3f, -3.0f));
+    
+    GetSubsystem<Renderer>()->SetViewport(0, Viewport(helloScene_, camera));
+}
+\endcode
+
+Next is the text overlay creation:
+
+\code
+void HelloWorld::CreateText()
+{
+    SharedPtr<Text> helloText(new Text(context_));
+    helloText->SetFont(cache_->GetResource<Font>("cour.ttf"), 30);
+    helloText->SetText("Hello World from Urho3D");
+    helloText->SetColor(Color(0.0f, 1.0f, 0.0f));
+    helloText->SetHorizontalAlignment(HA_CENTER);
+    helloText->SetVerticalAlignment(VA_CENTER);
+    
+    GetSubsystem<UI>()->GetRootElement()->AddChild(helloText);
+}
+\endcode
+
+Finally we get to event subscribing and handling. The helper macro HANDLER is used to create pointers to the event handler functions. Note also that unlike script, where events and event parameters are identified with strings, here we use precalculated hashes instead. In this case, the event type and parameter hashes are defined in CoreEvents.h.
+
+\code
+void HelloWorld::SubscribeToEvents()
+{
+    SubscribeToEvent(E_UPDATE, HANDLER(HelloWorld, HandleUpdate));
+}
+\endcode
+
+Unlike in script, in C++ there is no choice - the event handler function must always have the signature "void HandleEvent(StringHash eventType, VariantMap& eventData)". Note that to prevent name clashes, the event's name is used as a namespace for the event parameter hashes:
+
+\code
+void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
+    
+    if (GetSubsystem<Input>()->GetKeyDown(KEY_ESC))
+        GetSubsystem<Engine>()->Exit();
+}
+\endcode
+
+Now you should be ready to compile HelloWorld.cpp. The resulting executable will be placed in the Bin directory. It should be substantially smaller than Urho3D.exe, due to leaving out the scripting functionality.
+*/

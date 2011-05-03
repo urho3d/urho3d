@@ -69,7 +69,7 @@ public:
     /// Begin event send
     void BeginSendEvent(Object* sender)
     {
-        senders_.push_back(SharedPtr<Object>(sender));
+        senders_.push_back(sender);
     }
     
     /// End event send. Clean up event receivers removed in the meanwhile
@@ -174,8 +174,8 @@ private:
     std::map<StringHash, std::vector<Object*> > receivers_;
     /// Event receivers for specific senders' events
     std::map<std::pair<Object*, StringHash>, std::vector<Object*> > specificReceivers_;
-    /// Event sender stack. Stores shared pointers to prevent destruction during event handling
-    std::vector<SharedPtr<Object> > senders_;
+    /// Event sender stack
+    std::vector<Object*> senders_;
     /// Event types that have had receivers removed during event handling
     std::set<StringHash> dirtyReceivers_;
     /// Event types for specific senders that have had receivers removed during event handling

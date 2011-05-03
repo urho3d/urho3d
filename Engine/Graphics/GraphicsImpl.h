@@ -25,7 +25,7 @@
 
 #include "Color.h"
 
-#include <windows.h>
+#include <Windows.h>
 #include <d3d9.h>
 
 /// Graphics implementation. Contains the main Direct3D9 objects

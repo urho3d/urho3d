@@ -46,7 +46,7 @@
 #include "StringUtils.h"
 #include "UI.h"
 
-#include <windows.h>
+#include <Windows.h>
 
 #include "DebugNew.h"
 
@@ -259,6 +259,12 @@ void Engine::RunFrame()
     time->BeginFrame(timeStep_);
     
     Render();
+    
+    // If scripting initialized, garbage collect before getting the next time step
+    Script* script = GetSubsystem<Script>();
+    if (script)
+        script->GarbageCollect(false);
+    
     GetNextTimeStep();
     
     time->EndFrame();
@@ -347,9 +353,6 @@ void Engine::Render()
         GetSubsystem<UI>()->Render();
         graphics->EndFrame();
     }
-    
-    // Garbage collect before getting the next time step
-    GetSubsystem<Script>()->GarbageCollect(false);
 }
 
 void Engine::GetNextTimeStep()

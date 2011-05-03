@@ -1,0 +1,73 @@
+/**
+
+\page Subsystems Subsystems
+
+
+\page Events Events
+
+
+\page MainLoop Main loop and frame update
+
+
+\page SceneModel Scene model
+
+
+\page Resources Resources
+
+
+\page Rendering Rendering
+
+
+\page Input Input
+
+
+\page Network Networking
+
+
+\page Audio Audio
+
+
+\page Physics Physics
+
+
+\page UI User interface
+
+
+\page Scripting Scripting internals
+
+
+\page Tools Tools
+
+
+\page FileFormats Custom file formats
+
+
+\page CodingConventions Coding conventions
+
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
+
+- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
+
+- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
+
+- Constants and enumerations are in uppercase. For example Vector3::ZERO or PASS_SHADOW.
+
+- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, Serializer& dest.
+
+- Class definitions in header files proceed in the following order:
+  - public constructors and destructors
+  - public virtual functions
+  - public non-virtual member functions
+  - public static functions
+  - public member variables
+  - public static variables
+  - repeat all of the above in order for protected definitions, and finally private
+
+- Header files are commented using one-line comments beginning with /// to mark the comments for Doxygen.
+
+- Inline functions are defined inside the class definitions where possible, without using the inline keyword.
+
+- For threading and multi-instance safety, the only allowed form of static data is const static data outside function definitions.
+
+
+*/

@@ -30,7 +30,7 @@
 #include "Profiler.h"
 
 #include <cstring>
-#include <windows.h>
+#include <Windows.h>
 
 #include "DebugNew.h"
 

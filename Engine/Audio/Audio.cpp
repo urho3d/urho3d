@@ -35,10 +35,9 @@
 
 #define DIRECTSOUND_VERSION 0x0800
 
-#include <windows.h>
+#include <Windows.h>
+#include <MMSystem.h>
 #include <dsound.h>
-#include <mmsystem.h>
-#include <process.h>
 
 #include "DebugNew.h"
 

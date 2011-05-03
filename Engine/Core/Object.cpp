@@ -203,6 +203,8 @@ void Object::SendEvent(StringHash eventType)
 
 void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
+    // Make a weak pointer to self to check for destruction during event handling
+    WeakPtr<Object> self(this);
     std::set<Object*> processed;
     
     context_->BeginSendEvent(this);
@@ -220,6 +222,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             {
                 processed.insert(receiver);
                 receiver->OnEvent(this, true, eventType, eventData);
+                if (self.IsExpired())
+                {
+                    context_->EndSendEvent();
+                    return;
+                }
             }
         }
     }
@@ -235,7 +242,14 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             {
                 Object* receiver = group->at(k);
                 if (receiver)
+                {
                     receiver->OnEvent(this, true, eventType, eventData);
+                    if (self.IsExpired())
+                    {
+                        context_->EndSendEvent();
+                        return;
+                    }
+                }
             }
         }
         else
@@ -245,7 +259,14 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             {
                 Object* receiver = group->at(k);
                 if ((receiver) && (processed.find(receiver) == processed.end()))
+                {
                     receiver->OnEvent(this, true, eventType, eventData);
+                    if (self.IsExpired())
+                    {
+                        context_->EndSendEvent();
+                        return;
+                    }
+                }
             }
         }
     }

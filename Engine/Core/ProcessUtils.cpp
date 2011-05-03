@@ -31,7 +31,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>
-#include <windows.h>
+#include <Windows.h>
 
 // Enable SHGetSpecialFolderPath on MinGW
 #ifndef _MSC_VER
