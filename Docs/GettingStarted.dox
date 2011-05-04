@@ -155,7 +155,7 @@ First we need to declare an object handle for the 3D scene we are going to creat
 Scene@ helloScene;
 \endcode
 
-Next is the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
+Now we can begin the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
 
 Note: Urho3D has tweaked AngelScript slightly to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
 
@@ -170,7 +170,7 @@ void Start()
 }
 \endcode
 
-In CreateObjects(), which is defined next, the scene will be filled with some content. The Urho3D scene model is basically a scene graph; the Scene object serves also as the root node. 
+In CreateObjects(), which we define next, the scene will be filled with some content. The Urho3D scene model is basically a scene graph; the Scene object serves also as the root node.
 
 Three child nodes will be created: one for a 3D model object, one for a directional light, and one for the camera. The scene nodes themselves display nothing in the 3D world; components need to be created into them for the actual visible content. First, however, we need to create an Octree component into the root node. This is used for accelerated visibility queries to check what the camera "sees", and without it nothing would be visible.
 
@@ -354,7 +354,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 }
 \endcode
 
-Next is the HelloWorld implementation. Note the OBJECTTYPESTATIC macro, which creates the static name and name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file. The reason to do that instead of defining them directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
+Now we can start implementing HelloWorld. Note the OBJECTTYPESTATIC macro, which creates the static name and name hash for object type identification. For each OBJECT macro, a matching OBJECTTYPESTATIC must appear in a .cpp file. The reason to do that instead of defining them directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
 
 During construction, we store the ResourceCache subsystem pointer for later access:
 
@@ -381,7 +381,7 @@ void HelloWorld::Start()
 }
 \endcode
 
-Next is scene object creation and defining the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of CreateComponent():
+Like in the script example, CreateObjects() does the actual scene object creation and defines the viewport. Unlike in script, where properties were used to set the component values and scene node transforms, here we must use setter functions instead. Also, whereas strings were used in script to identify the components to create, here it is most convenient to use the template form of CreateComponent():
 
 \code
 void HelloWorld::CreateObjects()
