@@ -138,6 +138,8 @@ Urho3D uses the following conventions:
 
 - Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
 
+- No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead.
+
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
 - In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
@@ -155,7 +157,7 @@ First we need to declare an object handle for the 3D scene we are going to creat
 Scene@ helloScene;
 \endcode
 
-Now we can begin the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
+Now we can define the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
 
 Note: Urho3D has tweaked AngelScript slightly to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
 
@@ -176,9 +178,9 @@ Three child nodes will be created: one for a 3D model object, one for a directio
 
 Child nodes can be created with or without names; uniqueness of names is not enforced. In this case we opt to not use names, as we do not need to find the nodes later after creation.
 
-For the 3D model, a StaticModel component is used, as animation is not needed. Its scene node remains at the origin (default position of each scene node.) To load the needed Model & Material resources, the ResourceCache subsystem is used.
+As animation is not needed, we use a StaticModel component for the 3D model. Its scene node remains at the origin (default position of each scene node.) The ResourceCache subsystem is used to load the needed Model & Material resources.
 
-The light scene node also remains at the origin. For directional lights the position does not matter, but the node's forward direction is adjusted so that the light will shine down diagonally.
+The light scene node also remains at the origin. Position does not matter for directional lights, but the node's forward direction is adjusted so that the light will shine down diagonally.
 
 The camera's scene node will be pulled back along the Z-axis to be able to see the object.
 
@@ -423,7 +425,7 @@ void HelloWorld::CreateText()
 }
 \endcode
 
-Finally we get to event subscribing and handling. The helper macro HANDLER is used to create pointers to the event handler functions. Note also that unlike script, where events and event parameters are identified with strings, here we use precalculated hashes instead. In this case, the event type and parameter hashes are defined in CoreEvents.h.
+Finally we get to event subscribing and handling. The helper macro HANDLER is used to create pointers to the event handler member functions: it takes the class name followed by the function name. Note also that unlike script, where events and event parameters are identified with strings, in C++ precalculated hash constants are used instead. The frame update event is defined in CoreEvents.h.
 
 \code
 void HelloWorld::SubscribeToEvents()
