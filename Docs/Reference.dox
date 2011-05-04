@@ -1,5 +1,8 @@
 /**
 
+\page ObjectTypes Object types and factories
+
+
 \page Subsystems Subsystems
 
 
@@ -15,13 +18,13 @@
 \page Resources Resources
 
 
+\page Scripting Scripting
+
+
 \page Rendering Rendering
 
 
 \page Input Input
-
-
-\page Network Networking
 
 
 \page Audio Audio
@@ -33,7 +36,10 @@
 \page UI User interface
 
 
-\page Scripting Scripting internals
+\page Serialization Serialization
+
+
+\page Network Networking
 
 
 \page Tools Tools

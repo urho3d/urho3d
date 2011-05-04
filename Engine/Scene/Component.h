@@ -46,6 +46,9 @@ public:
     /// Handle scene node transform dirtied
     virtual void OnMarkedDirty(Node* node) {};
     
+    /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion
+    void Remove();
+    
     /// Return ID
     unsigned GetID() const { return id_; }
     /// Get scene node

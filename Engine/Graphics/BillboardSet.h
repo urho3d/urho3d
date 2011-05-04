@@ -68,13 +68,13 @@ public:
     /// Handle attribute read access
     virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Calculate distance for rendering
-    virtual void UpdateDistance(const FrameUpdate& frame);
+    virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering
-    virtual void UpdateGeometry(const FrameUpdate& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches
     virtual unsigned GetNumBatches();
     /// Return rendering batch
-    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch);
+    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     
     /// Set material
     void SetMaterial(Material* material);
@@ -133,7 +133,7 @@ private:
     /// Resize billboard vertex and index buffers
     void UpdateBufferSize();
     /// Rewrite billboard vertex buffer
-    void UpdateVertexBuffer(const FrameUpdate& frame);
+    void UpdateVertexBuffer(const FrameInfo& frame);
     
     /// Geometry
     SharedPtr<Geometry> geometry_;

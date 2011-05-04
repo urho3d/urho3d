@@ -35,7 +35,6 @@
 #include "Octree.h"
 #include "OctreeQuery.h"
 #include "ParticleEmitter.h"
-#include "Renderer.h"
 #include "Scene.h"
 #include "Technique.h"
 #include "Texture2D.h"

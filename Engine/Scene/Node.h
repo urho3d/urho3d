@@ -105,7 +105,9 @@ public:
     void RemoveChild(Node* node);
     /// Remove all child scene nodes
     void RemoveAllChildren();
-    /// Set parent. Same as parent->AddChild(this)
+    /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion
+    void Remove();
+    /// Set parent scene node. Same as parent->AddChild(this)
     void SetParent(Node* parent);
     /// Create a component to this node
     Component* CreateComponent(ShortStringHash type);

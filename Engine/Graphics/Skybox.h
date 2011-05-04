@@ -39,9 +39,9 @@ public:
     static void RegisterObject(Context* context);
     
     /// Calculate distance for rendering
-    virtual void UpdateDistance(const FrameUpdate& frame);
+    virtual void UpdateDistance(const FrameInfo& frame);
     /// Return rendering batch
-    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch);
+    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     
 protected:
     /// Update world-space bounding box

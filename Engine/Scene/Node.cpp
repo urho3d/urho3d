@@ -541,6 +541,12 @@ void Node::RemoveListener(Component* component)
     }
 }
 
+void Node::Remove()
+{
+    if (parent_)
+        parent_->RemoveChild(this);
+}
+
 unsigned Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)

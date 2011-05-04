@@ -160,7 +160,7 @@ Variant BillboardSet::OnGetAttribute(const AttributeInfo& attr)
     
 }
 
-void BillboardSet::UpdateDistance(const FrameUpdate& frame)
+void BillboardSet::UpdateDistance(const FrameInfo& frame)
 {
     // Check if position relative to camera has changed, and re-sort in that case
     const Vector3& worldPos = GetWorldPosition();
@@ -191,7 +191,7 @@ void BillboardSet::UpdateDistance(const FrameUpdate& frame)
         lodDistance_ = 0.0f;
 }
 
-void BillboardSet::UpdateGeometry(const FrameUpdate& frame)
+void BillboardSet::UpdateGeometry(const FrameInfo& frame)
 {
     if (bufferSizeDirty_)
     {
@@ -213,7 +213,7 @@ unsigned BillboardSet::GetNumBatches()
     return 1;
 }
 
-void BillboardSet::GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch)
+void BillboardSet::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
     batch.geometry_ = geometry_;
     batch.geometryType_ = GEOM_BILLBOARD;
@@ -358,7 +358,7 @@ void BillboardSet::UpdateBufferSize()
     indexBuffer_->Unlock();
 }
 
-void BillboardSet::UpdateVertexBuffer(const FrameUpdate& frame)
+void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
     if ((animationLodBias_ > 0.0f) && (lodDistance_ > 0.0f))

@@ -150,7 +150,7 @@ public:
     /// Handle attribute read access
     virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Calculate distance for rendering
-    virtual void UpdateDistance(const FrameUpdate& frame);
+    virtual void UpdateDistance(const FrameInfo& frame);
     /// Add debug geometry to the debug graphics
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     

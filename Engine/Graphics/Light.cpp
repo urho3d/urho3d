@@ -182,7 +182,7 @@ Variant Light::OnGetAttribute(const AttributeInfo& attr)
     }
 }
 
-void Light::UpdateDistance(const FrameUpdate& frame)
+void Light::UpdateDistance(const FrameInfo& frame)
 {
     switch (lightType_)
     {

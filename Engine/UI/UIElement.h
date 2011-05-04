@@ -249,6 +249,8 @@ public:
     void RemoveChild(UIElement* element);
     /// Remove all child elements
     void RemoveAllChildren();
+    /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion
+    void Remove();
     /// Set parent element. Same as parent->AddChild(this)
     void SetParent(UIElement* parent);
     

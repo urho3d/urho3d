@@ -325,7 +325,7 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
     numLevels_ = numLevels;
 }
 
-void Octree::Update(const FrameUpdate& frame)
+void Octree::Update(const FrameInfo& frame)
 {
     {
         PROFILE(UpdateDrawables);

@@ -165,7 +165,7 @@ public:
     /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root
     void Resize(const BoundingBox& box, unsigned numLevels);
     /// Update and reinsert drawable objects
-    void Update(const FrameUpdate& frame);
+    void Update(const FrameInfo& frame);
     
     /// Return drawable objects by a query
     void GetDrawables(OctreeQuery& query) const;

@@ -45,7 +45,7 @@ class Octant;
 class RayOctreeQuery;
 
 /// Rendering frame update parameters
-struct FrameUpdate
+struct FrameInfo
 {
     /// Frame number
     unsigned frameNumber_;
@@ -75,15 +75,15 @@ public:
     /// Process octree raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Needs to be requested with MarkForUpdate()
-    virtual void Update(const FrameUpdate& frame) {}
+    virtual void Update(const FrameInfo& frame) {}
     /// Calculate distance for rendering
-    virtual void UpdateDistance(const FrameUpdate& frame);
+    virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering
-    virtual void UpdateGeometry(const FrameUpdate& frame) {}
+    virtual void UpdateGeometry(const FrameInfo& frame) {}
     /// Return number of rendering batches
     virtual unsigned GetNumBatches() { return 0; }
     /// Return rendering batch
-    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch) {}
+    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch) {}
     /// Draw to occlusion buffer
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
     /// Draw debug geometry
@@ -138,9 +138,9 @@ public:
     /// Set sorting value. Called by View
     void SetSortValue(float value);
     /// Mark in view this frame. Called by View
-    void MarkInView(const FrameUpdate& frame);
+    void MarkInView(const FrameInfo& frame);
     /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View
-    void MarkInShadowView(const FrameUpdate& frame);
+    void MarkInShadowView(const FrameInfo& frame);
     /// Clear base pass flags. Also resets light vector
     void ClearBasePass();
     /// Set base pass flag for a batch
@@ -158,7 +158,7 @@ public:
     /// Return whether is in view this frame
     bool IsInView(unsigned frameNumber) const;
     /// Return whether is visible in a specific view this frame
-    bool IsInView(const FrameUpdate& frame) const;
+    bool IsInView(const FrameInfo& frame) const;
     /// Return whether has a base pass
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return lights

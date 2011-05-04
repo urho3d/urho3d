@@ -102,7 +102,7 @@ public:
     /// Define with rendertarget and viewport. Return true if successful
     bool Define(RenderSurface* renderTarget, const Viewport& viewport);
     /// Update culling and construct rendering batches
-    void Update(const FrameUpdate& frame);
+    void Update(const FrameInfo& frame);
     /// Render batches
     void Render();
     
@@ -214,7 +214,7 @@ private:
     /// Previous view matrix for temporal antialiasing
     Matrix4x3 lastCameraView_;
     /// Information of the frame being rendered
-    FrameUpdate frame_;
+    FrameInfo frame_;
     /// Combined bounding box of visible geometries
     BoundingBox sceneBox_;
     /// Combined bounding box of visible geometries in view space

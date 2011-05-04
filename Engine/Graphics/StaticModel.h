@@ -47,11 +47,11 @@ public:
     /// Process renderer raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Prepare geometry for rendering
-    virtual void UpdateGeometry(const FrameUpdate& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return number of batches
     virtual unsigned GetNumBatches();
     /// Return rendering batch
-    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch);
+    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     /// Draw to occlusion buffer
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     

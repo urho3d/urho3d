@@ -178,7 +178,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     }
 }
 
-void StaticModel::UpdateGeometry(const FrameUpdate& frame)
+void StaticModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (lodLevelsDirty_)
         CalculateLodLevels();
@@ -189,7 +189,7 @@ unsigned StaticModel::GetNumBatches()
     return geometries_.size();
 }
 
-void StaticModel::GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch)
+void StaticModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.worldTransform_ = &GetWorldTransform();

@@ -39,6 +39,12 @@ Component::~Component()
 {
 }
 
+void Component::Remove()
+{
+    if (node_)
+        node_->RemoveComponent(this);
+}
+
 void Component::SetID(unsigned id)
 {
     id_ = id;

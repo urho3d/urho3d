@@ -57,13 +57,13 @@ public:
     /// Process renderer raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Animation is updated here
-    virtual void Update(const FrameUpdate& frame);
+    virtual void Update(const FrameInfo& frame);
     /// Calculate distance for rendering
-    virtual void UpdateDistance(const FrameUpdate& frame);
+    virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering
-    virtual void UpdateGeometry(const FrameUpdate& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame);
     /// Return rendering batch
-    virtual void GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch);
+    virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     /// Add debug geometry to the debug graphics
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
@@ -151,7 +151,7 @@ private:
     /// Clone geometries as required
     void cloneGeometries();
     /// Recalculate animations. Called from updateNode()
-    void UpdateAnimation(const FrameUpdate& frame);
+    void UpdateAnimation(const FrameInfo& frame);
     /// Recalculate skinning
     void UpdateSkinning();
     /// Reapply all vertex morphs

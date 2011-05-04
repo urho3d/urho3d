@@ -274,7 +274,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
     }
 }
 
-void AnimatedModel::Update(const FrameUpdate& frame)
+void AnimatedModel::Update(const FrameInfo& frame)
 {
     // Update animation here
     if ((!animationDirty_) && (!animationOrderDirty_))
@@ -298,7 +298,7 @@ void AnimatedModel::Update(const FrameUpdate& frame)
     UpdateAnimation(frame);
 }
 
-void AnimatedModel::UpdateDistance(const FrameUpdate& frame)
+void AnimatedModel::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
@@ -321,7 +321,7 @@ void AnimatedModel::UpdateDistance(const FrameUpdate& frame)
     }
 }
 
-void AnimatedModel::UpdateGeometry(const FrameUpdate& frame)
+void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
 {
     if (lodLevelsDirty_)
         CalculateLodLevels();
@@ -333,7 +333,7 @@ void AnimatedModel::UpdateGeometry(const FrameUpdate& frame)
         UpdateSkinning();
 }
 
-void AnimatedModel::GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch)
+void AnimatedModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
     batch.geometry_ = geometries_[batchIndex][lodLevels_[batchIndex]];
     batch.geometryType_ = GEOM_SKINNED;
@@ -891,7 +891,7 @@ void AnimatedModel::RefreshGeometryBoneMappings()
     }
 }
 
-void AnimatedModel::UpdateAnimation(const FrameUpdate& frame)
+void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
     if ((animationLodBias_ > 0.0f) && (animationLodDistance_ > 0.0f))

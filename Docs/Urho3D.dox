@@ -15,18 +15,20 @@ For getting started, see:
 
 For further reference, see:
 
+\subpage ObjectTypes "Object types and factories" <br>
 \subpage Subsystems "Subsystems" <br>
 \subpage Events "Events" <br>
 \subpage MainLoop "Main loop and frame update" <br>
 \subpage SceneModel "Scene model" <br>
-\subpage Scripting "Scripting" <br>
 \subpage Resources "Resources" <br>
+\subpage Scripting "Scripting" <br>
 \subpage Rendering "Rendering" <br>
 \subpage Input "Input" <br>
-\subpage Network "Networking" <br>
 \subpage Audio "Audio" <br>
 \subpage Physics "Physics" <br>
 \subpage UI "User interface" <br>
+\subpage Serialization "Serialization" <br>
+\subpage Network "Networking" <br>
 \subpage Tools "Tools" <br>
 \subpage FileFormats "Custom file formats" <br>
 \subpage CodingConventions "Coding conventions" <br>

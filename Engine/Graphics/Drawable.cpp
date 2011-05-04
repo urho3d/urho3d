@@ -90,7 +90,7 @@ void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     query.result_.push_back(result);
 }
 
-void Drawable::UpdateDistance(const FrameUpdate& frame)
+void Drawable::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
@@ -171,13 +171,13 @@ const BoundingBox& Drawable::GetWorldBoundingBox()
     return worldBoundingBox_;
 }
 
-void Drawable::MarkInView(const FrameUpdate& frame)
+void Drawable::MarkInView(const FrameInfo& frame)
 {
     viewFrameNumber_ = frame.frameNumber_;
     viewCamera_ = frame.camera_;
 }
 
-void Drawable::MarkInShadowView(const FrameUpdate& frame)
+void Drawable::MarkInShadowView(const FrameInfo& frame)
 {
     if (viewFrameNumber_ != frame.frameNumber_)
     {
@@ -240,7 +240,7 @@ bool Drawable::IsInView(unsigned frameNumber) const
     return viewFrameNumber_ == frameNumber;
 }
 
-bool Drawable::IsInView(const FrameUpdate& frame) const
+bool Drawable::IsInView(const FrameInfo& frame) const
 {
     return (viewFrameNumber_ == frame.frameNumber_) && (viewCamera_ == frame.camera_);
 }

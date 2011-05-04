@@ -44,12 +44,12 @@ void Skybox::RegisterObject(Context* context)
     context->CopyBaseAttributes<StaticModel, Skybox>();
 }
 
-void Skybox::UpdateDistance(const FrameUpdate& frame)
+void Skybox::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = 0.0f;
 }
 
-void Skybox::GetBatch(const FrameUpdate& frame, unsigned batchIndex, Batch& batch)
+void Skybox::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
 {
     // Follow only the camera rotation, not position
     Matrix4x3 customView(Vector3::ZERO, frame.camera_->GetWorldRotation().GetInverse(), Vector3::UNITY);

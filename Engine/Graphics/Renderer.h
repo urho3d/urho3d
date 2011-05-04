@@ -242,6 +242,8 @@ public:
     VertexShader* GetVertexShader(const std::string& name, bool checkExists = false) const;
     /// Return a pixel shader by name
     PixelShader* GetPixelShader(const std::string& name, bool checkExists = false) const;
+    /// Return the frame update parameters
+    const FrameInfo& GetFrameInfo() { return frame_; }
     
     /// Update for rendering. Called by handleRenderUpdate()
     void Update(float timeStep);
@@ -367,7 +369,7 @@ private:
     /// Number of shadow cameras
     unsigned numShadowCameras_;
     /// Number of split lights
-    unsigned nusplitLights__;
+    unsigned numSplitLights_;
     /// Number of temporary scene nodes
     unsigned numTempNodes_;
     /// Number of primitives (3D geometry only)
@@ -403,7 +405,7 @@ private:
     /// Frame number on which shaders last changed
     unsigned shadersChangedFrameNumber_;
     /// Frame info for rendering
-    FrameUpdate frame_;
+    FrameInfo frame_;
     /// Shaders need reloading flag
     bool shadersDirty_;
     /// Initialized flag

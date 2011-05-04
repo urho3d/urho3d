@@ -160,7 +160,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     return true;
 }
 
-void View::Update(const FrameUpdate& frame)
+void View::Update(const FrameInfo& frame)
 {
     if ((!camera_) || (!octree_))
         return;

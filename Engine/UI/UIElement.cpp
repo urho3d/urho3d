@@ -815,12 +815,17 @@ void UIElement::RemoveAllChildren()
     }
 }
 
+void UIElement::Remove()
+{
+    if (parent_)
+        parent_->RemoveChild(this);
+}
+
 void UIElement::SetParent(UIElement* parent)
 {
     if (parent)
         parent->AddChild(this);
 }
-
 
 IntVector2 UIElement::GetScreenPosition()
 {

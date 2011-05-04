@@ -78,12 +78,16 @@ asset build scripts to work in both debug & release builds.
 
 After the build is complete, the programs can be run from the Bin directory.
 
-To run Urho3D.exe from the Visual Studio debugger, set it as a startup project
-and enter its relative path and filename into Debugging -> Command: 
-..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into 
-Debugging -> Command Arguments is highly recommended. This enables startup in 
-windowed mode: without it running into an exception or breakpoint will be 
+To run Urho3D from the Visual Studio debugger, set it as a startup project and
+enter its relative path and filename into Properties -> Debugging -> Command:
+..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into
+Debugging -> Command Arguments is highly recommended. This enables startup in
+windowed mode: without it running into an exception or breakpoint will be
 obnoxious as the mouse cursor will most probably be hidden.
+
+To actually make Urho3D.exe do something useful, it must be supplied with the 
+name of the script file it should load and run. You can try for example the 
+following arguments: Scripts/TestScene.as -w
 
 Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction
 count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At

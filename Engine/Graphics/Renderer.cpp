@@ -264,7 +264,7 @@ Renderer::Renderer(Context* context) :
     defaultZone_(new Zone(context)),
     numViews_(0),
     numShadowCameras_(0),
-    nusplitLights__(0),
+    numSplitLights_(0),
     numTempNodes_(0),
     specularLighting_(true),
     drawShadows_(true),
@@ -563,7 +563,7 @@ void Renderer::Update(float timeStep)
     frame_.timeStep_ = timeStep;
     frame_.camera_ = 0;
     numShadowCameras_ = 0;
-    nusplitLights__ = 0;
+    numSplitLights_ = 0;
     numTempNodes_ = 0;
     updateOctrees_.clear();
     
@@ -1301,13 +1301,13 @@ Camera* Renderer::CreateShadowCamera()
 
 Light* Renderer::CreateSplitLight(Light* original)
 {
-    if (nusplitLights__ >= splitLightStore_.size())
+    if (numSplitLights_ >= splitLightStore_.size())
         splitLightStore_.push_back(SharedPtr<Light>(new Light(context_)));
-    Light* light = splitLightStore_[nusplitLights__];
+    Light* light = splitLightStore_[numSplitLights_];
     light->SetNode(CreateTempNode());
     light->copyFrom(original);
     
-    ++nusplitLights__;
+    ++numSplitLights_;
     return light;
 }
 
