@@ -58,6 +58,7 @@ Key and mouse controls:
 - Space       Jump
 - F1          Toggle physics debug geometry
 - F2          Toggle profiling display
+- F3          Toggle octree debug geometry
 - ~           Toggle AngelScript console
 
 \section Running_Commandline Command line options

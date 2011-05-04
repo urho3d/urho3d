@@ -496,9 +496,12 @@ void Text::UpdateText(bool inResize)
         charPositions_[text_.length()] = IntVector2(x, y);
     }
     
-    // Set minimum size according to the text size, but respect fixed width if set
+    // Set minimum and current size according to the text size, but respect fixed width if set
     if (GetMinWidth() != GetMaxWidth())
+    {
         SetMinWidth(width);
+        SetWidth(width);
+    }
     SetFixedHeight(height);
 }
 
