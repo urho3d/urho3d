@@ -41,7 +41,10 @@ struct Bone
         parentIndex_(0),
         collisionMask_(0),
         radius_(0.0f),
-        animationEnabled_(true)
+        initialPosition_(Vector3::ZERO),
+        initialRotation_(Quaternion::IDENTITY),
+        initialScale_(Vector3::UNITY),
+        animated_(true)
     {
     }
     
@@ -60,7 +63,7 @@ struct Bone
     /// Offset matrix
     Matrix4x3 offsetMatrix_;
     /// Animation enable flag
-    bool animationEnabled_;
+    bool animated_;
     /// Supported collision types
     unsigned char collisionMask_;
     /// Radius

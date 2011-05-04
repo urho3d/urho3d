@@ -86,15 +86,28 @@ static Node* BoneGetNode(Bone* ptr)
     return ptr->node_;
 }
 
+// AngelScript complains "Reference is temporary" for non-primitive properties of reference types. Work around with set/get methods
+ACCESSORS(Bone, Vector3, InitialPosition, initialPosition_);
+ACCESSORS(Bone, Quaternion, InitialRotation, initialRotation_);
+ACCESSORS(Bone, Vector3, InitialScale, initialScale_);
+ACCESSORS(Bone, BoundingBox, BoundingBox, boundingBox_);
+
 static void RegisterSkeleton(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Bone", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Bone", "const String name", offsetof(Bone, name_));
-    engine->RegisterObjectProperty("Bone", "bool animationEnabled", offsetof(Bone, animationEnabled_));
-    engine->RegisterObjectProperty("Bone", "const float radius", offsetof(Bone, radius_));
-    engine->RegisterObjectProperty("Bone", "const BoundingBox boundingBox", offsetof(Bone, boundingBox_));
+    engine->RegisterObjectMethod("Bone", "void set_initialPosition(const Vector3& in)", asFUNCTION(BoneSetInitialPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "const Vector3& get_initialPosition() const", asFUNCTION(BoneGetInitialPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "void set_initialRotation(const Quaternion& in)", asFUNCTION(BoneSetInitialRotation), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "const Quaternion& get_initialRotation() const", asFUNCTION(BoneGetInitialRotation), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "void set_initialScale(const Vector3& in)", asFUNCTION(BoneSetInitialScale), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "const Vector3& get_initialScale() const", asFUNCTION(BoneGetInitialScale), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("Bone", "bool animated", offsetof(Bone, animated_));
+    engine->RegisterObjectProperty("Bone", "float radius", offsetof(Bone, radius_));
+    engine->RegisterObjectMethod("Bone", "void set_boundingBox(const BoundingBox& in)", asFUNCTION(BoneSetBoundingBox), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Bone", "const BoundingBox& get_boundingBox() const", asFUNCTION(BoneGetBoundingBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Bone", "Node@+ get_node()", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
@@ -104,7 +117,7 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "Bone@+ GetBone(const String& in) const", asMETHODPR(Skeleton, GetBone, (const std::string&), Bone*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ get_rootBone() const", asMETHOD(Skeleton, GetRootBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "uint get_numBones() const", asMETHOD(Skeleton, GetNumBones), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bone(uint) const", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bones(uint) const", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
 }
 
 static void ConstructViewport(Viewport* ptr)
@@ -646,15 +659,24 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String& in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
 }
 
+ACCESSORS(Billboard, Vector3, Position, position_);
+ACCESSORS(Billboard, Vector2, Size, size_);
+ACCESSORS(Billboard, Rect, Uv, uv_);
+ACCESSORS(Billboard, Color, Color, color_);
+
 static void RegisterBillboardSet(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectProperty("Billboard", "Vector3 position", offsetof(Billboard, position_));
-    engine->RegisterObjectProperty("Billboard", "Vector2 size", offsetof(Billboard, size_));
-    engine->RegisterObjectProperty("Billboard", "Rect uv", offsetof(Billboard, uv_));
-    engine->RegisterObjectProperty("Billboard", "Color color", offsetof(Billboard, color_));
+    engine->RegisterObjectMethod("Billboard", "void set_position(const Vector3& in)", asFUNCTION(BillboardSetPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "const Vector3& get_position() const", asFUNCTION(BillboardGetPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_size(const Vector2& in)", asFUNCTION(BillboardSetSize), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "const Vector2& get_size() const", asFUNCTION(BillboardGetSize), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_uv(const Rect& in)", asFUNCTION(BillboardSetUv), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "const Rect& get_uv() const", asFUNCTION(BillboardGetUv), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_color(const Color& in)", asFUNCTION(BillboardSetColor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "const Color& get_color() const", asFUNCTION(BillboardGetColor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Billboard", "float rotation", offsetof(Billboard, rotation_));
     engine->RegisterObjectProperty("Billboard", "bool enabled", offsetof(Billboard, enabled_));
     

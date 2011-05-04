@@ -86,7 +86,7 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Materials", materials_, ResourceRefList(Material::GetTypeStatic()));
     ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f);
     ATTRIBUTE(AnimatedModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED);
-    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", skeleton_, std::vector<unsigned char>());
+    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bones Animated", skeleton_, std::vector<unsigned char>());
     ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", animationStates_, std::vector<unsigned char>());
 }
 
@@ -115,7 +115,7 @@ void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& val
             std::vector<Bone>& bones = skeleton_.GetModifiableBones();
             unsigned numBones = buf.ReadVLE();
             for (unsigned i = 0; (i < numBones) && (i < bones.size()); ++i)
-                bones[i].animationEnabled_ = buf.ReadBool();
+                bones[i].animated_ = buf.ReadBool();
         }
         break;
         
@@ -166,7 +166,7 @@ Variant AnimatedModel::OnGetAttribute(const AttributeInfo& attr)
             const std::vector<Bone>& bones = skeleton_.GetBones();
             buf.WriteVLE(bones.size());
             for (std::vector<Bone>::const_iterator i = bones.begin(); i != bones.end(); ++i)
-                buf.WriteBool(i->animationEnabled_);
+                buf.WriteBool(i->animated_);
             return buf.GetBuffer();
         }
         

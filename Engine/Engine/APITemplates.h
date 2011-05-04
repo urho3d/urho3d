@@ -39,6 +39,17 @@
 #include <cstring>
 #include <set>
 
+#define ACCESSORS(className, type, variableName, variable) \
+    void className ## Set ## variableName(const type& value, className* ptr) \
+    { \
+        ptr->variable = value; \
+    } \
+    \
+    const type& className ## Get ## variableName(className* ptr) \
+    { \
+        return ptr->variable; \
+    } \
+
 /// Template function for dynamic cast between two script classes
 template <class T, class U> U* RefCast(T* t)
 {

@@ -121,7 +121,7 @@ void Skeleton::Reset()
 {
     for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
     {
-        if ((i->animationEnabled_) && (i->node_))
+        if ((i->animated_) && (i->node_))
             i->node_->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
     }
 }

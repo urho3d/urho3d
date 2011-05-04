@@ -176,7 +176,7 @@ void AnimationState::Apply()
             const AnimationTrack* track = animation_->GetTrack(i->first);
             Bone* bone = i->second;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animationEnabled_) || (!track->keyFrames_.size()))
+            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.size()))
                 continue;
             
             unsigned& frame = lastKeyFrame_[i->first];
@@ -239,7 +239,7 @@ void AnimationState::Apply()
             const AnimationTrack* track = animation_->GetTrack(i->first);
             Bone* bone = i->second;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animationEnabled_) || (!track->keyFrames_.size()))
+            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.size()))
                 continue;
             
             unsigned& frame = lastKeyFrame_[i->first];
