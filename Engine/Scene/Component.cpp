@@ -56,6 +56,14 @@ void Component::SetNode(Node* node)
     OnNodeSet(node_);
 }
 
+bool Component::HasComponent(ShortStringHash type) const
+{
+    if (node_)
+        return node_->HasComponent(type);
+    else
+        return 0;
+}
+
 Component* Component::GetComponent(ShortStringHash type, unsigned index) const
 {
     if (node_)

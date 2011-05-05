@@ -68,7 +68,6 @@ void AnimationController::OnSetAttribute(const AttributeInfo& attr, const Varian
             for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end(); ++i)
             {
                 i->hash_ = buf.ReadStringHash();
-                i->group_ = buf.ReadUByte();
                 i->speed_ = buf.ReadFloat();
                 i->targetWeight_ = buf.ReadFloat();
                 i->fadeTime_ = buf.ReadFloat();
@@ -94,7 +93,6 @@ Variant AnimationController::OnGetAttribute(const AttributeInfo& attr)
             for (std::vector<AnimationControl>::const_iterator i = animations_.begin(); i != animations_.end(); ++i)
             {
                 buf.WriteStringHash(i->hash_);
-                buf.WriteUByte(i->group_);
                 buf.WriteFloat(i->speed_);
                 buf.WriteFloat(i->targetWeight_);
                 buf.WriteFloat(i->fadeTime_);
@@ -110,7 +108,7 @@ Variant AnimationController::OnGetAttribute(const AttributeInfo& attr)
 
 void AnimationController::Update(float timeStep)
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return;
     
@@ -167,9 +165,9 @@ void AnimationController::Update(float timeStep)
     }
 }
 
-bool AnimationController::Play(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime)
+bool AnimationController::Play(const std::string& name, int layer, bool looped, float fadeInTime)
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return false;
     
@@ -195,10 +193,7 @@ bool AnimationController::Play(const std::string& name, unsigned char group, boo
         index = animations_.size() - 1;
     }
     
-    animations_[index].group_ = group;
-    if (restart)
-        state->SetTime(0.0f);
-    
+    state->SetLayer(layer);
     state->SetLooped(looped);
     
     if (fadeInTime > 0.0f)
@@ -212,15 +207,15 @@ bool AnimationController::Play(const std::string& name, unsigned char group, boo
     return true;
 }
 
-bool AnimationController::PlayExclusive(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime, float fadeOutTime)
+bool AnimationController::PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime)
 {
-    FadeOthers(name, 0.0f, fadeOutTime);
-    return Play(name, group, looped, restart, fadeInTime);
+    FadeOthers(name, 0.0f, fadeTime);
+    return Play(name, layer, looped, fadeTime);
 }
 
 bool AnimationController::Stop(const std::string& name, float fadeOutTime)
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return false;
     
@@ -246,22 +241,23 @@ bool AnimationController::Stop(const std::string& name, float fadeOutTime)
     return (index != M_MAX_UNSIGNED) || (state != 0);
 }
 
-void AnimationController::StopGroup(unsigned char group, float fadeOutTime)
+void AnimationController::StopLayer(int layer, float fadeOutTime)
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return;
     
     for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end();)
     {
+        AnimationState* state = model->GetAnimationState(i->hash_);
         bool remove = false;
         
-        if (i->group_ == group)
+        if ((state) && (state->GetLayer() == layer))
         {
             if (fadeOutTime <= 0.0f)
             {
                 remove = true;
-                AnimationState* state = model->GetAnimationState(i->hash_);
+                
                 if (state)
                     model->RemoveAnimationState(state);
             }
@@ -281,7 +277,7 @@ void AnimationController::StopGroup(unsigned char group, float fadeOutTime)
 
 void AnimationController::StopAll(float fadeOutTime)
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return;
     
@@ -316,6 +312,7 @@ bool AnimationController::Fade(const std::string& name, float targetWeight, floa
     FindAnimation(name, index, state);
     if (index == M_MAX_UNSIGNED)
         return false;
+    
     animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
     animations_[index].fadeTime_ = Max(fadeTime, M_EPSILON);
     return true;
@@ -326,56 +323,46 @@ bool AnimationController::FadeOthers(const std::string& name, float targetWeight
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
+    if ((index == M_MAX_UNSIGNED) || (!state))
         return false;
-    unsigned char group = animations_[index].group_;
+    
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    int layer = state->GetLayer();
     
     for (unsigned i = 0; i < animations_.size(); ++i)
     {
-        AnimationControl& control = animations_[i];
-        if ((control.group_ == group) && (i != index))
+        if (i != index)
         {
-            control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-            control.fadeTime_ = Max(fadeTime, M_EPSILON);
+            AnimationControl& control = animations_[i];
+            AnimationState* otherState = model->GetAnimationState(control.hash_);
+            if ((otherState) && (otherState->GetLayer() == layer))
+            {
+                control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
+                control.fadeTime_ = Max(fadeTime, M_EPSILON);
+            }
         }
     }
     return true;
 }
 
-bool AnimationController::SetPriority(const std::string& name, int priority)
+bool AnimationController::SetLayer(const std::string& name, int layer)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
         return false;
-    state->SetPriority(priority);
+    
+    state->SetLayer(layer);
     return true;
 }
 
 bool AnimationController::SetStartBone(const std::string& name, const std::string& startBoneName)
 {
-    AnimatedModel* model = GetAnimatedModel();
-    if (!model)
-        return false;
-    
     AnimationState* state = FindAnimationState(name);
     if (!state)
         return false;
-    Bone* bone = model->GetSkeleton().GetBone(startBoneName);
-    state->SetStartBone(bone);
-    return true;
-}
-
-bool AnimationController::SetBlending(const std::string& name, int priority, const std::string& startBoneName)
-{
-    AnimatedModel* model = GetAnimatedModel();
-    if (!model)
-        return false;
     
-    AnimationState* state = FindAnimationState(name);
-    if (!state)
-        return false;
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     Bone* bone = model->GetSkeleton().GetBone(startBoneName);
-    state->SetPriority(priority);
     state->SetStartBone(bone);
     return true;
 }
@@ -385,18 +372,8 @@ bool AnimationController::SetTime(const std::string& name, float time)
     AnimationState* state = FindAnimationState(name);
     if (!state)
         return false;
+    
     state->SetTime(time);
-    return true;
-}
-
-bool AnimationController::SetGroup(const std::string& name, unsigned char group)
-{
-    unsigned index;
-    AnimationState* state;
-    FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
-        return false;
-    animations_[index].group_ = group;
     return true;
 }
 
@@ -407,6 +384,7 @@ bool AnimationController::SetSpeed(const std::string& name, float speed)
     FindAnimation(name, index, state);
     if (index == M_MAX_UNSIGNED)
         return false;
+    
     animations_[index].speed_ = speed;
     return true;
 }
@@ -418,6 +396,7 @@ bool AnimationController::SetWeight(const std::string& name, float weight)
     FindAnimation(name, index, state);
     if ((index == M_MAX_UNSIGNED) || (!state))
         return false;
+    
     state->SetWeight(weight);
     // Stop any ongoing fade
     animations_[index].fadeTime_ = 0.0f;
@@ -429,6 +408,7 @@ bool AnimationController::SetLooped(const std::string& name, bool enable)
     AnimationState* state = FindAnimationState(name);
     if (!state)
         return false;
+    
     state->SetLooped(enable);
     return true;
 }
@@ -440,13 +420,9 @@ bool AnimationController::SetAutoFade(const std::string& name, float fadeOutTime
     FindAnimation(name, index, state);
     if (index == M_MAX_UNSIGNED)
         return false;
+    
     animations_[index].autoFadeTime_ = Max(fadeOutTime, 0.0f);
     return true;
-}
-
-AnimatedModel* AnimationController::GetAnimatedModel() const
-{
-    return GetComponent<AnimatedModel>();
 }
 
 bool AnimationController::IsPlaying(const std::string& name) const
@@ -464,6 +440,7 @@ bool AnimationController::IsFadingIn(const std::string& name) const
     FindAnimation(name, index, state);
     if ((index == M_MAX_UNSIGNED) || (!state))
         return false;
+    
     return (animations_[index].fadeTime_) && (animations_[index].targetWeight_ > state->GetWeight());
 }
 
@@ -479,12 +456,12 @@ bool AnimationController::IsFadingOut(const std::string& name) const
         || ((!state->IsLooped()) && (state->GetTime() >= state->GetLength()) && (animations_[index].autoFadeTime_));
 }
 
-int AnimationController::GetPriority(const std::string& name) const
+int AnimationController::GetLayer(const std::string& name) const
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
         return 0;
-    return state->GetPriority();
+    return state->GetLayer();
 }
 
 Bone* AnimationController::GetStartBone(const std::string& name) const
@@ -504,43 +481,25 @@ const std::string& AnimationController::GetStartBoneName(const std::string& name
 float AnimationController::GetTime(const std::string& name) const
 {
     AnimationState* state = FindAnimationState(name);
-    if (!state)
-        return 0.0f;
-    return state->GetTime();
+    return state ? state->GetTime() : 0.0f;
 }
 
 float AnimationController::GetWeight(const std::string& name) const
 {
     AnimationState* state = FindAnimationState(name);
-    if (!state)
-        return 0.0f;
-    return state->GetWeight();
+    return state ? state->GetWeight() : 0.0f;
 }
 
 bool AnimationController::IsLooped(const std::string& name) const
 {
     AnimationState* state = FindAnimationState(name);
-    if (!state)
-        return false;
-    return state->IsLooped();
+    return state ? state->IsLooped() : false;
 }
 
 float AnimationController::GetLength(const std::string& name) const
 {
     AnimationState* state = FindAnimationState(name);
-    if (!state)
-        return 0.0f;
-    return state->GetLength();
-}
-
-unsigned char AnimationController::GetGroup(const std::string& name) const
-{
-    unsigned index;
-    AnimationState* state;
-    FindAnimation(name, index, state);
-    if (index == M_MAX_UNSIGNED)
-        return 0;
-    return animations_[index].group_;
+    return state ? state->GetLength() : 0.0f;
 }
 
 float AnimationController::GetSpeed(const std::string& name) const
@@ -595,7 +554,7 @@ void AnimationController::OnNodeSet(Node* node)
 
 void AnimationController::FindAnimation(const std::string& name, unsigned& index, AnimationState*& state) const
 {
-    AnimatedModel* model = GetAnimatedModel();
+    AnimatedModel* model = GetComponent<AnimatedModel>();
     StringHash nameHash(name);
     
     // Find the AnimationState
@@ -620,10 +579,8 @@ void AnimationController::FindAnimation(const std::string& name, unsigned& index
 
 AnimationState* AnimationController::FindAnimationState(const std::string& name) const
 {
-    AnimatedModel* model = GetAnimatedModel();
-    StringHash nameHash(name);
-    
-    return model ? model->GetAnimationState(nameHash) : 0;
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    return model ? model->GetAnimationState(name) : 0;
 }
 
 void AnimationController::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)

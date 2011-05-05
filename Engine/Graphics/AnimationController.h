@@ -35,7 +35,6 @@ struct AnimationControl
 {
     /// Construct with defaults
     AnimationControl() :
-        group_(0),
         speed_(1.0f),
         targetWeight_(0.0f),
         fadeTime_(0.0f),
@@ -45,8 +44,6 @@ struct AnimationControl
 
     /// Animation resource name hash
     StringHash hash_;
-    /// Animation group
-    unsigned char group_;
     /// Animation speed
     float speed_;
     /// Animation target weight
@@ -77,50 +74,44 @@ public:
     
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
-    /// Play an animation. Name must be the full resource name. Return true on success
-    bool Play(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime);
-    /// Play an animation and fade out all others in the same group. Name must be the full resource name. Return true on success
-    bool PlayExclusive(const std::string& name, unsigned char group, bool looped, bool restart, float fadeInTime, float fadeOutTime);
+    /// Play an animation and set full target weight. Name must be the full resource name. Return true on success
+    bool Play(const std::string& name, int layer, bool looped, float fadeInTime);
+    /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success
+    bool PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime);
     /// Stop an animation. Zero fadetime is instant. Return true on success
     bool Stop(const std::string& name, float fadeOutTime);
-    /// Stop all animations in a specific group. Zero fadetime is instant
-    void StopGroup(unsigned char group, float fadeOutTime);
+    /// Stop all animations on a specific layer. Zero fadetime is instant
+    void StopLayer(int layer, float fadeOutTime);
     /// Stop all animations. Zero fadetime is instant
     void StopAll(float fadeTime);
-    /// Fade an already playing animation in or out. Time is in seconds. Return true on success
+    /// Fade animation to target weight. Return true on success
     bool Fade(const std::string& name, float targetWeight, float fadeTime);
-    /// Fade other animations within same group. Return true on success
+    /// Fade other animations on the same layer to target weight. Return true on success
     bool FadeOthers(const std::string& name, float targetWeight, float fadeTime);
     
-    /// Set animation blending priority. Return true on success
-    bool SetPriority(const std::string& name, int priority);
+    /// Set animation blending layer priority. Return true on success
+    bool SetLayer(const std::string& name, int layer);
     /// Set animation start bone. Return true on success
     bool SetStartBone(const std::string& name, const std::string& startBoneName);
-    /// Set both blending priority and start bone. Return true on success
-    bool SetBlending(const std::string& name, int priority, const std::string& startBoneName);
     /// Set animation time position. Return true on success
     bool SetTime(const std::string& name, float time);
     /// Set animation weight. Return true on success
     bool SetWeight(const std::string& name, float weight);
     /// Set animation looping. Return true on success
     bool SetLooped(const std::string& name, bool enable);
-    /// Set animation group. Return true on success
-    bool SetGroup(const std::string& name, unsigned char group);
     /// Set animation speed. Return true on success
     bool SetSpeed(const std::string& name, float speed);
     /// Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success
     bool SetAutoFade(const std::string& name, float fadeOutTime);
-
-    /// Return the animated model being controlled. Is always the first (master) AnimatedModel in the node
-    AnimatedModel* GetAnimatedModel() const;
+    
     /// Return whether an animation is active
     bool IsPlaying(const std::string& name) const;
     /// Return whether an animation is fading in
     bool IsFadingIn(const std::string& name) const;
     /// Return whether an animation is fading out
     bool IsFadingOut(const std::string& name) const;
-    /// Return animation priority
-    int GetPriority(const std::string& name) const;
+    /// Return animation blending layer
+    int GetLayer(const std::string& name) const;
     /// Return animation start bone, or null if no such animation
     Bone* GetStartBone(const std::string& name) const;
     /// Return animation start bone name, or null if no such animation
@@ -133,8 +124,6 @@ public:
     bool IsLooped(const std::string& name) const;
     /// Return animation length
     float GetLength(const std::string& name) const;
-    /// Return animation group
-    unsigned char GetGroup(const std::string& name) const;
     /// Return animation speed
     float GetSpeed(const std::string& name) const;
     /// Return animation fade target weight

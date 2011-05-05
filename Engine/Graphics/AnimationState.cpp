@@ -37,7 +37,7 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     looped_(false),
     weight_(0.0f),
     time_(0.0f),
-    priority_(0),
+    layer_(0),
     useNlerp_(false)
 {
     animation_ = animation;
@@ -143,12 +143,11 @@ void AnimationState::AddTime(float delta)
     SetTime(time);
 }
 
-void AnimationState::SetPriority(int priority)
+void AnimationState::SetLayer(int layer)
 {
-    priority = Clamp(priority, 0, 255);
-    if (priority != priority_)
+    if (layer != layer_)
     {
-        priority_ = priority;
+        layer_ = layer;
         model_->MarkAnimationOrderDirty();
     }
 }
@@ -312,19 +311,4 @@ void AnimationState::Apply()
             }
         }
     }
-}
-
-void AnimationState::Sync(AnimationState* src)
-{
-    Bone* srcStartBone = src->GetStartBone();
-    if (!srcStartBone)
-        return;
-    
-    if (startBone_->name_ != srcStartBone->name_)
-        SetStartBone(model_->GetSkeleton().GetBone(srcStartBone->name_));
-    
-    SetLooped(src->IsLooped());
-    SetPriority(src->GetPriority());
-    SetTime(src->GetTime());
-    SetWeight(src->GetWeight());
 }

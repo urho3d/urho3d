@@ -214,22 +214,22 @@ public:
     const std::vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type
     void GetComponents(std::vector<Component*>& dest, ShortStringHash type) const;
-    /// Return whether has a specific component
-    bool HasComponent(ShortStringHash type) const;
     /// Return component by index
     Component* GetComponent(unsigned index) const;
     /// Return component by type. The optional index allows to specify which component, if there are several
     Component* GetComponent(ShortStringHash type, unsigned index = 0) const;
+    /// Return whether has a specific component
+    bool HasComponent(ShortStringHash type) const;
     /// Return listener components
     const std::vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
     /// Template version of returning child nodes with a specific component
     template <class T> void GetChildrenWithComponent(std::vector<Node*>& dest, bool recursive = false) const;
-    /// Template version of checking whether has a specific component
-    template <class T> bool HasComponent() const;
     /// Template version of returning a component by type
     template <class T> T* GetComponent(unsigned index = 0) const;
     /// Template version of returning all components of type
     template <class T> void GetComponents(std::vector<T*>& dest) const;
+    /// Template version of checking whether has a specific component
+    template <class T> bool HasComponent() const;
     
 protected:
     /// Create a component with specific ID. Used internally
@@ -296,11 +296,6 @@ template <class T> void Node::GetChildrenWithComponent(std::vector<Node*>& dest,
     GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive);
 }
 
-template <class T> bool Node::HasComponent() const
-{
-    return HasComponent(T::GetTypeStatic());
-}
-
 template <class T> T* Node::GetComponent(unsigned index) const
 {
     return static_cast<T*>(GetComponent(T::GetTypeStatic(), index));
@@ -309,4 +304,9 @@ template <class T> T* Node::GetComponent(unsigned index) const
 template <class T> void Node::GetComponents(std::vector<T*>& dest) const
 {
     GetComponents(reinterpret_cast<std::vector<Component*>&>(dest), T::GetTypeStatic());
+}
+
+template <class T> bool Node::HasComponent() const
+{
+    return HasComponent(T::GetTypeStatic());
 }

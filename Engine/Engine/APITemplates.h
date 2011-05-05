@@ -474,9 +474,9 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetScriptedChildren(const String& in, bool) const", asFUNCTION(NodeGetScriptedChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String& in, bool) const", asMETHODPR(T, GetChild, (const std::string&, bool) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String& in) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool HasComponent(const String& in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String& in) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String& in, uint) const", asFUNCTION(NodeGetComponentWithTypeAndIndex), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasComponent(const String& in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_position(const Vector3& in)", asMETHOD(T, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_position() const", asMETHOD(T, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_rotation(const Quaternion& in)", asMETHOD(T, SetRotation), asCALL_THISCALL);

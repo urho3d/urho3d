@@ -27,6 +27,8 @@
 #include "ScriptAPI.h"
 #include "ScriptFile.h"
 
+static const std::string noClassName;
+
 static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)
@@ -164,6 +166,47 @@ static ScriptInstance* GetSelf()
     return GetScriptContextInstance();
 }
 
+static void SelfSetActive(bool active)
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        ptr->SetActive(active);
+}
+
+static bool SelfIsActive()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        return ptr->IsActive();
+    else
+        return false;
+}
+
+static void SelfSetFixedUpdateFps(int fps)
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        ptr->SetFixedUpdateFps(fps);
+}
+
+static int SelfGetFixedUpdateFps()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        return ptr->GetFixedUpdateFps();
+    else
+        return 0;
+}
+
+static const std::string& SelfGetClassName()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        return ptr->GetClassName();
+    else
+        return noClassName;
+}
+
 static void SelfDelayedExecute(float delay, const std::string& declaration, CScriptArray* srcParams)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
@@ -183,19 +226,22 @@ static void SelfDelayedExecute(float delay, const std::string& declaration, CScr
 static void SelfDelayedExecuteNoParams(float delay, const std::string& declaration)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
-    if (!ptr)
-        return;
-    
-    ptr->DelayedExecute(delay, declaration);
+    if (ptr)
+        ptr->DelayedExecute(delay, declaration);
 }
 
 static void SelfClearDelayedExecute()
 {
     ScriptInstance* ptr = GetScriptContextInstance();
-    if (!ptr)
-        return;
-    
-    ptr->ClearDelayedExecute();
+    if (ptr)
+        ptr->ClearDelayedExecute();
+}
+
+static void SelfRemove()
+{
+    ScriptInstance* ptr = GetScriptContextInstance();
+    if (ptr)
+        ptr->Remove();
 }
 
 static void RegisterScriptInstance(asIScriptEngine* engine)
@@ -224,10 +270,17 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "void set_className(const String& in)", asMETHOD(ScriptInstance, SetClassName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", asMETHOD(ScriptInstance, GetClassName), asCALL_THISCALL);
     
-    engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
+    // Register global properties & functions that work as if the ScriptInstance and the script object were one and the same
+    // (event subscribing & sending works similarly)
+    engine->RegisterGlobalFunction("void set_active(bool)", asFUNCTION(SelfSetActive), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool get_active()", asFUNCTION(SelfIsActive), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void set_fixedUpdateFps(int)", asFUNCTION(SelfSetFixedUpdateFps), asCALL_CDECL);
+    engine->RegisterGlobalFunction("int get_fixedUpdateFps()", asFUNCTION(SelfGetFixedUpdateFps), asCALL_CDECL);
+    engine->RegisterGlobalFunction("const String& get_className()", asFUNCTION(SelfGetClassName), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String& in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String& in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
     engine->RegisterGlobalFunction("void ClearDelayedExecute()", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Remove()", asFUNCTION(SelfRemove), asCALL_CDECL);
 }
 
 static Script* GetScript()

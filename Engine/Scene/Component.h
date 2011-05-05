@@ -85,6 +85,8 @@ public:
     void GetComponents(std::vector<Component*>& dest, ShortStringHash type) const;
     /// Return component in the same scene node by type. The optional index allows to specify which component, if there are several
     Component* GetComponent(ShortStringHash type, unsigned index = 0) const;
+    /// Return whether the same scene node has a specific component
+    bool HasComponent(ShortStringHash type) const;
     /// Template version of returning a component in the same scene node by type
     template <class T> T* GetComponent(unsigned index = 0) const;
     /// Template version of returning components in the same scene node by type

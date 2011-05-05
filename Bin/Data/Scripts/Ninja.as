@@ -1,8 +1,8 @@
 #include "Scripts/GameObject.as"
 #include "Scripts/AIController.as"
 
-const int ANIM_MOVE = 1;
-const int ANIM_ATTACK = 2;
+const int LAYER_MOVE = 0;
+const int LAYER_ATTACK = 1;
 
 const float ninjaMass = 80;
 const float ninjaFriction = 0.5;
@@ -177,19 +177,19 @@ class Ninja : GameObject
                 // Walk or sidestep animation
                 if (sidemove)
                 {
-                    controller.PlayExclusive("Models/Ninja_Stealth.ani", ANIM_MOVE, true, false, 0.2, 0.2);
+                    controller.PlayExclusive("Models/Ninja_Stealth.ani", LAYER_MOVE, true, 0.2);
                     controller.SetSpeed("Models/Ninja_Stealth.ani", animDir * 2.2);
                 }
                 else
                 {
-                    controller.PlayExclusive("Models/Ninja_Walk.ani", ANIM_MOVE, true, false, 0.2, 0.2);
+                    controller.PlayExclusive("Models/Ninja_Walk.ani", LAYER_MOVE, true, 0.2);
                     controller.SetSpeed("Models/Ninja_Walk.ani", animDir * 1.6);
                 }
             }
             else
             {
                 // Idle animation
-                controller.PlayExclusive("Models/Ninja_Idle3.ani", ANIM_MOVE, true, false, 0.2, 0.2);
+                controller.PlayExclusive("Models/Ninja_Idle3.ani", LAYER_MOVE, true, 0.2);
             }
 
             // Overall damping to cap maximum speed
@@ -204,7 +204,8 @@ class Ninja : GameObject
                     node.position = node.position + Vector3(0, 3, 0);
                     body.ApplyForce(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
-                    controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, true, 0.2, 0.2);
+                    controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.2);
+                    controller.SetTime("Models/Ninja_JumpNoHeight.ani", 0.0); // Always play from beginning
                     okToJump = false;
                 }
             }
@@ -236,7 +237,7 @@ class Ninja : GameObject
 
             // Falling/jumping/sliding animation
             if (inAirTime > 0.01f)
-                controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", ANIM_MOVE, false, false, 0.2, 0.2);
+                controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false, 0.2);
         }
 
         // Shooting
@@ -247,9 +248,9 @@ class Ninja : GameObject
         {
             Vector3 projectileVel = GetAim() * ninjaThrowVelocity;
 
-            controller.Play("Models/Ninja_Attack1.ani", ANIM_ATTACK, false, true, 0.0);
+            controller.Play("Models/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0);
+            controller.SetTime("Models/Ninja_Attack1.ani", 0.0); // Always play from beginning
             controller.Fade("Models/Ninja_Attack1.ani", 0.0, 0.5);
-            controller.SetPriority("Models/Ninja_Attack1.ani", 1);
 
             Node@ snowball = SpawnObject(node.position + vel * timeStep + q * ninjaThrowPosition, GetAim(), "SnowBall");
             RigidBody@ snowballBody = snowball.GetComponent("RigidBody");
@@ -307,8 +308,8 @@ class Ninja : GameObject
         if (deathDir < 0)
         {
             // Backward death
-            controller.StopGroup(ANIM_ATTACK, 0.1);
-            controller.PlayExclusive("Models/Ninja_Death1.ani", ANIM_MOVE, false, false, 0.2, 0.2);
+            controller.StopLayer(LAYER_ATTACK, 0.1);
+            controller.PlayExclusive("Models/Ninja_Death1.ani", LAYER_MOVE, false, 0.2);
             controller.SetSpeed("Models/Ninja_Death1.ani", 0.5);
             if ((deathTime >= 0.3) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, 425 * timeStep));
@@ -316,8 +317,8 @@ class Ninja : GameObject
         else if (deathDir > 0)
         {
             // Forward death
-            controller.StopGroup(ANIM_ATTACK, 0.1);
-            controller.PlayExclusive("Models/Ninja_Death2.ani", ANIM_MOVE, false, false, 0.2, 0.2);
+            controller.StopLayer(LAYER_ATTACK, 0.1);
+            controller.PlayExclusive("Models/Ninja_Death2.ani", LAYER_MOVE, false, 0.2);
             controller.SetSpeed("Models/Ninja_Death2.ani", 0.5);
             if ((deathTime >= 0.4) && (deathTime < 0.8))
                 modelNode.Translate(Vector3(0, 0, -425 * timeStep));

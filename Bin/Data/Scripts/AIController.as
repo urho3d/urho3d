@@ -1,4 +1,4 @@
-const float initialAggression = 0.0025;
+const float initialAggression = 0.0020;
 const float initialPrediction = 3000;
 const float initialAimSpeed = 5;
 const float deltaAggression = 0.00005;

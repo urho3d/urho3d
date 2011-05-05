@@ -150,7 +150,7 @@ void InitScene()
         object.castShadows = true;
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
-        ctrl.Play("Models/Jack_Walk.ani", 1, true, true, 0.0f);
+        ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0f);
     }
 
     {

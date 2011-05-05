@@ -56,8 +56,8 @@ public:
     void AddWeight(float delta);
     /// Modify time position
     void AddTime(float delta);
-    /// Set blending priority
-    void SetPriority(int priority);
+    /// Set blending layer
+    void SetLayer(int layer);
     /// Set whether to use nlerp instead of slerp for rotation, default false
     void SetUseNlerp(bool enable);
     
@@ -75,15 +75,13 @@ public:
     float GetTime() const { return time_; }
     /// Return animation length
     float GetLength() const;
-    /// Return blending priority
-    int GetPriority() const { return priority_; }
+    /// Return blending layer
+    int GetLayer() const { return layer_; }
     /// Return whether using nlerp for rotation
     bool GetUseNlerp() const { return useNlerp_; }
     
     /// Apply to the animated model's skeleton. Called by AnimatedModel
     void Apply();
-    /// Sync from another animation state. Called by AnimatedModel
-    void Sync(AnimationState* src);
     
 private:
     /// Animated model
@@ -102,8 +100,8 @@ private:
     float weight_;
     /// Time position
     float time_;
-    /// Blending priority
-    int priority_;
+    /// Blending layer
+    int layer_;
     /// Nlerp flag
     bool useNlerp_;
 };

@@ -52,7 +52,7 @@ static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 static bool CompareAnimationOrder(AnimationState* lhs, AnimationState* rhs)
 {
-    return lhs->GetPriority() < rhs->GetPriority();
+    return lhs->GetLayer() < rhs->GetLayer();
 }
 
 OBJECTTYPESTATIC(AnimatedModel);
@@ -135,7 +135,7 @@ void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& val
                     state->SetLooped(buf.ReadBool());
                     state->SetWeight(buf.ReadFloat());
                     state->SetTime(buf.ReadFloat());
-                    state->SetPriority(buf.ReadInt());
+                    state->SetLayer(buf.ReadInt());
                     state->SetUseNlerp(buf.ReadBool());
                 }
                 else
@@ -183,7 +183,7 @@ Variant AnimatedModel::OnGetAttribute(const AttributeInfo& attr)
                 buf.WriteBool(state->IsLooped());
                 buf.WriteFloat(state->GetWeight());
                 buf.WriteFloat(state->GetTime());
-                buf.WriteInt(state->GetPriority());
+                buf.WriteInt(state->GetLayer());
                 buf.WriteBool(state->GetUseNlerp());
             }
             return buf.GetBuffer();
@@ -708,11 +708,8 @@ void AnimatedModel::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
     
-    if (node)
-    {
-        // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
-        isMaster_ = node->GetComponent<AnimatedModel>(0) == this;
-    }
+    // If this AnimatedModel is the first in the node, it is the master which controls animation & morphs
+    isMaster_ = GetComponent<AnimatedModel>(0) == this;
 }
 
 void AnimatedModel::OnMarkedDirty(Node* node)
