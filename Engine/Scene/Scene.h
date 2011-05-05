@@ -42,6 +42,8 @@ public:
     
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
+    /// Save to binary data. Return true if successful
+    virtual bool Save(Serializer& dest);
     /// Load from XML data. Return true if successful
     virtual bool LoadXML(const XMLElement& source);
     

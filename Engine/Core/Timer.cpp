@@ -83,6 +83,9 @@ void Time::BeginFrame(unsigned mSec)
         eventData[P_TIMESTEP] = timeStep_;
         SendEvent(E_UPDATE, eventData);
         
+        // Logic post-update event
+        SendEvent(E_POSTUPDATE, eventData);
+        
         // Rendering update event
         SendEvent(E_RENDERUPDATE, eventData);
         

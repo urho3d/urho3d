@@ -26,6 +26,7 @@
 #include "Context.h"
 #include "CoreEvents.h"
 #include "File.h"
+#include "Log.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -60,6 +61,13 @@ void Scene::RegisterObject(Context* context)
 
 bool Scene::Load(Deserializer& source)
 {
+    // Check ID
+    if (source.ReadID() != "USCN")
+    {
+        LOGERROR(source.GetName() + " is not a valid scene file");
+        return false;
+    }
+    
     // Load the whole scene, then perform post-load if successfully loaded
     /// \todo Async loading support
     if (Node::Load(source))
@@ -69,6 +77,18 @@ bool Scene::Load(Deserializer& source)
     }
     else
         return false;
+}
+
+bool Scene::Save(Serializer& dest)
+{
+    // Write ID first
+    if (!dest.WriteID("USCN"))
+    {
+        LOGERROR("Could not save scene, writing to stream failed");
+        return false;
+    }
+    
+    return Node::Save(dest);
 }
 
 bool Scene::LoadXML(const XMLElement& source)

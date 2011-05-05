@@ -51,9 +51,9 @@ public:
     void SetFocusElement(UIElement* element);
     /// Clear the UI (excluding the cursor)
     void Clear();
-    /// Update the UI logic. Called by handleUpdate()
+    /// Update the UI logic. Called by HandlePostUpdate()
     void Update(float timeStep);
-    /// Update the UI for rendering. Called by handleRenderUpdate()
+    /// Update the UI for rendering. Called by HandlePostRenderUpdate()
     void RenderUpdate();
     /// Render the UI
     void Render();
@@ -82,7 +82,7 @@ public:
 private:
     /// Initialize when screen mode initially set
     void Initialize();
-    /// Update UI elements and generate batches for UI rendering
+    /// Update UI element logic recursively
     void Update(float timeStep, UIElement* element);
     /// Generate batches from an UI element recursively
     void GetBatches(UIElement* element, IntRect currentScissor);
@@ -104,8 +104,8 @@ private:
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
     /// Handle character event
     void HandleChar(StringHash eventType, VariantMap& eventData);
-    /// Handle logic update event
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle logic post-update event
+    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle render update event
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     

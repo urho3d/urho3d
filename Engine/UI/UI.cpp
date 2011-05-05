@@ -75,7 +75,7 @@ UI::UI(Context* context) :
     SubscribeToEvent(E_MOUSEWHEEL, HANDLER(UI, HandleMouseWheel));
     SubscribeToEvent(E_KEYDOWN, HANDLER(UI, HandleKeyDown));
     SubscribeToEvent(E_CHAR, HANDLER(UI, HandleChar));
-    SubscribeToEvent(E_UPDATE, HANDLER(UI, HandleUpdate));
+    SubscribeToEvent(E_POSTUPDATE, HANDLER(UI, HandlePostUpdate));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(UI, HandleRenderUpdate));
     
     // Try to initialize right now, but skip if screen mode is not yet set
@@ -774,11 +774,11 @@ void UI::HandleChar(StringHash eventType, VariantMap& eventData)
         element->OnChar(eventData[P_CHAR].GetInt(), mouseButtons_, qualifiers_);
 }
 
-void UI::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void UI::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (initialized_)
     {
-        using namespace Update;
+        using namespace PostUpdate;
         
         Update(eventData[P_TIMESTEP].GetFloat());
     }

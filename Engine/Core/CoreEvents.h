@@ -38,6 +38,12 @@ EVENT(E_UPDATE, Update)
     PARAM(P_TIMESTEP, TimeStep);          // float
 }
 
+/// Application-wide logic post-update event
+EVENT(E_POSTUPDATE, PostUpdate)
+{
+    PARAM(P_TIMESTEP, TimeStep);          // float
+}
+
 /// Render update event
 EVENT(E_RENDERUPDATE, RenderUpdate)
 {
