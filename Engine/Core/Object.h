@@ -195,7 +195,7 @@ protected:
     void* userData_;
 };
 
-/// Template implementation of the event handler (stores a function pointer of specific class)
+/// Template implementation of the event handler invoke helper (stores a function pointer of specific class)
 template <class T> class EventHandlerImpl : public EventHandler
 {
 public:
