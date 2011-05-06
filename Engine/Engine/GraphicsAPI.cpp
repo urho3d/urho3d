@@ -86,28 +86,18 @@ static Node* BoneGetNode(Bone* ptr)
     return ptr->node_;
 }
 
-// AngelScript complains "Reference is temporary" for non-primitive properties of reference types. Work around with set/get methods
-ACCESSORS(Bone, Vector3, InitialPosition, initialPosition_);
-ACCESSORS(Bone, Quaternion, InitialRotation, initialRotation_);
-ACCESSORS(Bone, Vector3, InitialScale, initialScale_);
-ACCESSORS(Bone, BoundingBox, BoundingBox, boundingBox_);
-
 static void RegisterSkeleton(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Bone", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Bone", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Bone", "const String name", offsetof(Bone, name_));
-    engine->RegisterObjectMethod("Bone", "void set_initialPosition(const Vector3& in)", asFUNCTION(BoneSetInitialPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "const Vector3& get_initialPosition() const", asFUNCTION(BoneGetInitialPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "void set_initialRotation(const Quaternion& in)", asFUNCTION(BoneSetInitialRotation), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "const Quaternion& get_initialRotation() const", asFUNCTION(BoneGetInitialRotation), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "void set_initialScale(const Vector3& in)", asFUNCTION(BoneSetInitialScale), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "const Vector3& get_initialScale() const", asFUNCTION(BoneGetInitialScale), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("Bone", "const Vector3 initialPosition", offsetof(Bone, initialPosition_));
+    engine->RegisterObjectProperty("Bone", "const Quaternion initialRotation", offsetof(Bone, initialRotation_));
+    engine->RegisterObjectProperty("Bone", "const Vector3 initialScale", offsetof(Bone, initialScale_));
     engine->RegisterObjectProperty("Bone", "bool animated", offsetof(Bone, animated_));
     engine->RegisterObjectProperty("Bone", "float radius", offsetof(Bone, radius_));
-    engine->RegisterObjectMethod("Bone", "void set_boundingBox(const BoundingBox& in)", asFUNCTION(BoneSetBoundingBox), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Bone", "const BoundingBox& get_boundingBox() const", asFUNCTION(BoneGetBoundingBox), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("Bone", "const BoundingBox boundingBox", offsetof(Bone, boundingBox_));
     engine->RegisterObjectMethod("Bone", "Node@+ get_node()", asFUNCTION(BoneGetNode), asCALL_CDECL_OBJLAST);
     
     engine->RegisterObjectType("Skeleton", 0, asOBJ_REF);
@@ -117,7 +107,7 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Skeleton", "Bone@+ GetBone(const String& in) const", asMETHODPR(Skeleton, GetBone, (const std::string&), Bone*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ get_rootBone() const", asMETHOD(Skeleton, GetRootBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "uint get_numBones() const", asMETHOD(Skeleton, GetNumBones), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bones(uint) const", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bones(uint)", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
 }
 
 static void ConstructViewport(Viewport* ptr)
@@ -381,7 +371,7 @@ static void RegisterModel(asIScriptEngine* engine)
 {
     RegisterResource<Model>(engine, "Model");
     engine->RegisterObjectMethod("Model", "const BoundingBox& get_boundingBox() const", asMETHOD(Model, GetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Model", "Skeleton@+ get_skeleton() const", asMETHOD(Model, GetSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Model", "Skeleton@+ get_skeleton()", asMETHOD(Model, GetSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numGeometries() const", asMETHOD(Model, GetNumGeometries), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numGeometryLodLevels(uint) const", asMETHOD(Model, GetNumGeometryLodLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
@@ -617,7 +607,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "float get_animationLodBias() const", asMETHOD(AnimatedModel, GetAnimationLodBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void set_invisibleLodFactor(float)", asMETHOD(AnimatedModel, SetInvisibleLodFactor), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "float get_invisibleLodFactor() const", asMETHOD(AnimatedModel, GetInvisibleLodFactor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ get_skeleton() const", asMETHOD(AnimatedModel, GetSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ get_skeleton()", asMETHOD(AnimatedModel, GetSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String& in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const std::string&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
@@ -656,6 +646,7 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String& in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
 }
 
+// Work around Angelscript error "Reference is temporary" when setting non-primitive properties of a reference type
 ACCESSORS(Billboard, Vector3, Position, position_);
 ACCESSORS(Billboard, Vector2, Size, size_);
 ACCESSORS(Billboard, Rect, Uv, uv_);
