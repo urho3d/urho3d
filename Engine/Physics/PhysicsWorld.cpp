@@ -140,105 +140,16 @@ void PhysicsWorld::RegisterObject(Context* context)
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Bounce Threshold", bounceThreshold_, DEFAULT_BOUNCETHRESHOLD);
     ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f);
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", ATTR_GRAVITY, Vector3::ZERO);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Rest Threshold", ATTR_LIN_RESTTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Threshold", ATTR_LIN_DAMPINGTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Scale", ATTR_LIN_DAMPINGSCALE, 0.0f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Rest Threshold", ATTR_ANG_RESTTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Threshold", ATTR_ANG_DAMPINGTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Scale", ATTR_ANG_DAMPINGSCALE, 0.0f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "ERP", ATTR_ERP, 0.2f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "CFM", ATTR_CFM, 0.00001f);
-    ID_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Contact Surface Layer", ATTR_CONTACTSURFACELAYER, 0.0f);
-}
-
-void PhysicsWorld::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    switch (attr.offset_)
-    {
-    case ATTR_GRAVITY:
-        SetGravity(value.GetVector3());
-        break;
-        
-    case ATTR_LIN_RESTTHRESHOLD:
-        SetLinearRestThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_LIN_DAMPINGTHRESHOLD:
-        SetLinearDampingThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_LIN_DAMPINGSCALE:
-        SetLinearDampingScale(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_RESTTHRESHOLD:
-        SetAngularRestThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_DAMPINGTHRESHOLD:
-        SetAngularDampingThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_DAMPINGSCALE:
-        SetAngularDampingScale(value.GetFloat());
-        break;
-        
-    case ATTR_ERP:
-        SetERP(value.GetFloat());
-        break;
-        
-    case ATTR_CFM:
-        SetCFM(value.GetFloat());
-        break;
-        
-    case ATTR_CONTACTSURFACELAYER:
-        SetContactSurfaceLayer(value.GetFloat());
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant PhysicsWorld::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case ATTR_GRAVITY:
-        return GetGravity();
-        
-    case ATTR_LIN_RESTTHRESHOLD:
-        return GetLinearRestThreshold();
-        
-    case ATTR_LIN_DAMPINGTHRESHOLD:
-        return GetLinearDampingThreshold();
-        
-    case ATTR_LIN_DAMPINGSCALE:
-        return GetLinearDampingScale();
-        
-    case ATTR_ANG_RESTTHRESHOLD:
-        return GetAngularRestThreshold();
-        
-    case ATTR_ANG_DAMPINGTHRESHOLD:
-        return GetAngularDampingThreshold();
-        
-    case ATTR_ANG_DAMPINGSCALE:
-        return GetAngularDampingScale();
-        
-    case ATTR_ERP:
-        return GetERP();
-        
-    case ATTR_CFM:
-        return GetCFM();
-        
-    case ATTR_CONTACTSURFACELAYER:
-        return GetContactSurfaceLayer();
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, Vector3::ZERO);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Angular Damping Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "ERP", GetERP, SetERP, float, 0.2f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "CFM", GetCFM, SetCFM, float, 0.00001f);
+    ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Contact Surface Layer", GetContactSurfaceLayer, SetContactSurfaceLayer, float, 0.0f);
 }
 
 void PhysicsWorld::Update(float timeStep)
@@ -313,7 +224,7 @@ void PhysicsWorld::SetMaxContacts(unsigned num)
     contacts->resize(maxContacts_);
 }
 
-void PhysicsWorld::SetGravity(const Vector3& gravity)
+void PhysicsWorld::SetGravity(Vector3 gravity)
 {
     dWorldSetGravity(physicsWorld_, gravity.x_, gravity.y_, gravity.z_);;
 }

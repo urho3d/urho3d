@@ -49,9 +49,12 @@ Serializable::~Serializable()
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 {
-    // Check for ID-based attribute handling (negative offset); can not be supported in the base implementation
-    if (attr.offset_ >= ID_ATTRIBUTE_BASE)
+    // Check for accessor function mode
+    if (attr.accessor_)
+    {
+        attr.accessor_->Set(this, value);
         return;
+    }
     
     // Calculate the destination address
     void* dest = reinterpret_cast<unsigned char*>(this) + attr.offset_;
@@ -102,10 +105,6 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
         *(reinterpret_cast<std::vector<unsigned char>*>(dest)) = value.GetBuffer();
         break;
         
-    case VAR_PTR:
-        *(reinterpret_cast<void**>(dest)) = value.GetPtr();
-        break;
-        
     case VAR_RESOURCEREF:
         *(reinterpret_cast<ResourceRef*>(dest)) = value.GetResourceRef();
         break;
@@ -126,9 +125,9 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
 
 Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
 {
-    // Check for ID-based attribute handling (negative offset); can not be supported in the base implementation
-    if (attr.offset_ >= ID_ATTRIBUTE_BASE)
-        return Variant();
+    // Check for accessor function mode
+    if (attr.accessor_)
+        return attr.accessor_->Get(this);
     
     // Calculate the source address
     void* src = reinterpret_cast<unsigned char*>(this) + attr.offset_;
@@ -168,9 +167,6 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
         
     case VAR_BUFFER:
         return Variant(*(reinterpret_cast<const std::vector<unsigned char>*>(src)));
-        
-    case VAR_PTR:
-        return Variant(*(reinterpret_cast<void**>(src)));
         
     case VAR_RESOURCEREF:
         return Variant(*(reinterpret_cast<const ResourceRef*>(src)));

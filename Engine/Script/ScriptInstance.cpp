@@ -83,7 +83,7 @@ void ScriptInstance::RegisterObject(Context* context)
     ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", fixedUpdateFps_, 0);
     ATTRIBUTE_MODE(ScriptInstance, VAR_FLOAT, "Time Accumulator", fixedUpdateAcc_, 0.0f, AM_SERIALIZATION);
     ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, std::vector<unsigned char>(), AM_SERIALIZATION);
-    ID_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", ATTR_SCRIPTDATA, std::vector<unsigned char>());
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, std::vector<unsigned char>, std::vector<unsigned char>());
 }
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -122,16 +122,6 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& va
         }
         break;
         
-    case ATTR_SCRIPTDATA:
-        if ((scriptObject_) && (methods_[METHOD_LOAD]))
-        {
-            MemoryBuffer buf(value.GetBuffer());
-            VariantVector parameters;
-            parameters.push_back(Variant((void*)static_cast<Deserializer*>(&buf)));
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
-        }
-        break;
-        
     default:
         Serializable::OnSetAttribute(attr, value);
         break;
@@ -155,18 +145,6 @@ Variant ScriptInstance::OnGetAttribute(const AttributeInfo& attr)
                 buf.WriteString(i->declaration_);
                 buf.WriteVariantVector(i->parameters_);
             }
-            return buf.GetBuffer();
-        }
-        
-    case ATTR_SCRIPTDATA:
-        if ((!scriptObject_) || (!methods_[METHOD_SAVE]))
-            return std::vector<unsigned char>();
-        else
-        {
-            VectorBuffer buf;
-            VariantVector parameters;
-            parameters.push_back(Variant((void*)static_cast<Serializer*>(&buf)));
-            scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
             return buf.GetBuffer();
         }
         
@@ -395,6 +373,31 @@ void ScriptInstance::GetSupportedMethods()
                     SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
             }
         }
+    }
+}
+
+std::vector<unsigned char> ScriptInstance::GetScriptData() const
+{
+    if ((!scriptObject_) || (!methods_[METHOD_SAVE]))
+        return std::vector<unsigned char>();
+    else
+    {
+        VectorBuffer buf;
+        VariantVector parameters;
+        parameters.push_back(Variant((void*)static_cast<Serializer*>(&buf)));
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
+        return buf.GetBuffer();
+    }
+}
+
+void ScriptInstance::SetScriptData(std::vector<unsigned char> data)
+{
+    if ((scriptObject_) && (methods_[METHOD_LOAD]))
+    {
+        MemoryBuffer buf(data);
+        VariantVector parameters;
+        parameters.push_back(Variant((void*)static_cast<Deserializer*>(&buf)));
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
     }
 }
 

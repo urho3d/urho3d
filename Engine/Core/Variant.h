@@ -648,108 +648,46 @@ public:
     }
     
     /// Test for inequality with an integer
-    bool operator != (int rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (int rhs) const { return !(*this == rhs); }
     /// Test for inequality with an unsigned integer
-    bool operator != (unsigned rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (unsigned rhs) const { return !(*this == rhs); }
     /// Test for inequality with a bool
-    bool operator != (bool rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (bool rhs) const { return !(*this == rhs); }
     /// Test for inequality with a float
-    bool operator != (float rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (float rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Vector2
-    bool operator != (const Vector2& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const Vector2& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Vector3
-    bool operator != (const Vector3& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const Vector3& rhs) const { return !(*this == rhs); }
     /// Test for inequality with an Vector4
-    bool operator != (const Vector4& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const Vector4& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a Quaternion
-    bool operator != (const Quaternion& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const Quaternion& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a string
-    bool operator != (const std::string& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const std::string& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a buffer
-    bool operator != (const std::vector<unsigned char>& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const std::vector<unsigned char>& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a pointer
-    bool operator != (void* rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (void* rhs) const { return !(*this == rhs); }
     /// Test for inequality with an object reference
-    bool operator != (const ResourceRef& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const ResourceRef& rhs) const { return !(*this == rhs); }
     /// Test for inequality with an object reference list
-    bool operator != (const ResourceRefList& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const ResourceRefList& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a variant vector
-    bool operator != (const VariantVector& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const VariantVector& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a variant map
-    bool operator != (const VariantMap& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const VariantMap& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a StringHash
-    bool operator != (const StringHash& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    
+    bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a ShortStringHash
-    bool operator != (const ShortStringHash& rhs) const
-    {
-        return !(*this == rhs);
-    }
+    bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     
-    /// Return an integer, 0 if type mismatch
+    /// Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported
+    void FromString(const std::string& type, const std::string& value);
+    /// Set buffer type from a memory area
+    void SetBuffer(const void* data, unsigned size);
+    
+    /// Return int or zero on type mismatch
     int GetInt() const
     {
         if (type_ != VAR_INT)
@@ -757,15 +695,15 @@ public:
         return value_.int_;
     }
     
-    /// Return an unsigned integer, 0 if type mismatch
-    unsigned GetUInt() const
+    /// Return unsigned int or zero on type mismatch
+    int GetUInt() const
     {
         if (type_ != VAR_INT)
             return 0;
         return (unsigned)value_.int_;
     }
     
-    /// Return a StringHash, zero hash if type mismatch
+    /// Return StringHash or zero on type mismatch
     StringHash GetStringHash() const
     {
         if (type_ != VAR_INT)
@@ -773,7 +711,7 @@ public:
         return StringHash(value_.int_);
     }
     
-    /// Return a ShortStringHash, zero hash if type mismatch
+    /// Return ShortStringHash or zero on type mismatch
     ShortStringHash GetShortStringHash() const
     {
         if (type_ != VAR_INT)
@@ -781,7 +719,7 @@ public:
         return ShortStringHash(value_.int_);
     }
     
-    /// Return a bool, false if type mismatch
+    /// Return bool or false on type mismatch
     bool GetBool() const
     {
         if (type_ != VAR_BOOL)
@@ -789,7 +727,7 @@ public:
         return value_.bool_;
     }
     
-    /// Return a float, 0 if type mismatch
+    /// Return float or zero on type mismatch
     float GetFloat() const
     {
         if (type_ != VAR_FLOAT)
@@ -797,7 +735,7 @@ public:
         return value_.float_;
     }
     
-    /// Return a Vector2, zero vector if type mismatch
+    /// Return Vector2 or zero on type mismatch
     const Vector2& GetVector2() const
     {
         if (type_ != VAR_VECTOR2)
@@ -805,7 +743,7 @@ public:
         return *reinterpret_cast<const Vector2*>(&value_);
     }
     
-    /// Return a Vector3, zero vector if type mismatch
+    /// Return Vector3 or zero on type mismatch
     const Vector3& GetVector3() const
     {
         if (type_ != VAR_VECTOR3)
@@ -813,7 +751,7 @@ public:
         return *reinterpret_cast<const Vector3*>(&value_);
     }
     
-    /// Return a Vector4, zero vector if type mismatch
+    /// Return Vector4 or zero on type mismatch
     const Vector4& GetVector4() const
     {
         if (type_ != VAR_VECTOR4)
@@ -821,7 +759,7 @@ public:
         return *reinterpret_cast<const Vector4*>(&value_);
     }
     
-    /// Return a Quaternion, identity if type mismatch
+    /// Return Quaternion or identity on type mismatch
     const Quaternion& GetQuaternion() const
     {
         if (type_ != VAR_QUATERNION)
@@ -829,7 +767,7 @@ public:
         return *reinterpret_cast<const Quaternion*>(&value_);
     }
     
-    /// Return a Color, default if type mismatch
+    /// Return Color or default on type mismatch
     const Color& GetColor() const
     {
         if (type_ != VAR_COLOR)
@@ -837,7 +775,7 @@ public:
         return *reinterpret_cast<const Color*>(&value_);
     }
     
-    /// Return a string, empty if type mismatch
+    /// Return string or empty on type mismatch
     const std::string& GetString() const
     {
         if (type_ != VAR_STRING)
@@ -845,7 +783,7 @@ public:
         return *reinterpret_cast<const std::string*>(value_.ptr_);
     }
     
-    /// Return a buffer, empty if type mismatch
+    /// Return buffer or empty on type mismatch
     const std::vector<unsigned char>& GetBuffer() const
     {
         if (type_ != VAR_BUFFER)
@@ -853,7 +791,7 @@ public:
         return *reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_);
     }
     
-    /// Return a pointer, null if type mismatch
+    /// Return pointer or null on type mismatch
     void* GetPtr() const
     {
         if (type_ != VAR_PTR)
@@ -861,7 +799,7 @@ public:
         return value_.ptr_;
     }
     
-    /// Return an object reference, empty if type mismatch
+    /// Return ResourceRef or empty on type mismatch
     const ResourceRef& GetResourceRef() const
     {
         if (type_ != VAR_RESOURCEREF)
@@ -869,7 +807,7 @@ public:
         return *reinterpret_cast<ResourceRef*>(value_.ptr_);
     }
     
-    /// Return an object reference list, empty if type mismatch
+    /// Return ResourceRefList or empty on type mismatch
     const ResourceRefList& GetResourceRefList() const
     {
         if (type_ != VAR_RESOURCEREFLIST)
@@ -877,7 +815,7 @@ public:
         return *reinterpret_cast<ResourceRefList*>(value_.ptr_);
     }
     
-    /// Return a variant vector, empty if type mismatch
+    /// Return VariantVector or empty on type mismatch
     const VariantVector& GetVariantVector() const
     {
         if (type_ != VAR_VARIANTVECTOR)
@@ -885,19 +823,16 @@ public:
         return *reinterpret_cast<VariantVector*>(value_.ptr_);
     }
     
-    /// Return a variant map, empty if type mismatch
+    /// Return VariantMap or empty on type mismatch
     const VariantMap& GetVariantMap() const
     {
         if (type_ != VAR_VARIANTMAP)
             return emptyVariantMap;
         return *reinterpret_cast<VariantMap*>(value_.ptr_);
     }
-    
-    /// Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported
-    void FromString(const std::string& type, const std::string& value);
-    /// Set buffer type from a memory area
-    void SetBuffer(const void* data, unsigned size);
-    
+
+    /// Return the value, template version
+    template <typename T> T Get() const;
     /// Return type
     VariantType GetType() const { return type_; }
     /// Return type name

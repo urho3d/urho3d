@@ -69,126 +69,18 @@ void RigidBody::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody>();
     
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS);
-    ID_ATTRIBUTE_MODE(RigidBody, VAR_VECTOR3, "Physics Position", ATTR_POSITION, Vector3::ZERO, AM_SERIALIZATION);
-    ID_ATTRIBUTE_MODE(RigidBody, VAR_QUATERNION, "Physics Rotation", ATTR_ROTATION, Quaternion::IDENTITY, AM_SERIALIZATION);
-    ID_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", ATTR_LIN_VELOCITY, Vector3::ZERO);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", ATTR_LIN_RESTTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Threshold", ATTR_LIN_DAMPINGTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Scale", ATTR_LIN_DAMPINGSCALE, 0.0f);
-    ID_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", ATTR_ANG_VELOCITY, Vector3::ZERO);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", ATTR_ANG_RESTTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Threshold", ATTR_ANG_DAMPINGTHRESHOLD, 0.01f);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Scale", ATTR_ANG_DAMPINGSCALE, 0.0f);
-    ID_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Max Velocity", ATTR_ANG_MAXVELOCITY, M_INFINITY);
-    ID_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Active", ATTR_ACTIVE, true);
-}
-
-void RigidBody::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(RigidBody, mass_):
-        SetMass(value.GetFloat());
-        break;
-        
-    case ATTR_POSITION:
-        SetPosition(value.GetVector3());
-        break;
-        
-    case ATTR_ROTATION:
-        SetRotation(value.GetQuaternion());
-        break;
-        
-    case ATTR_LIN_VELOCITY:
-        SetLinearVelocity(value.GetVector3());
-        break;
-        
-    case ATTR_LIN_RESTTHRESHOLD:
-        SetLinearRestThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_LIN_DAMPINGTHRESHOLD:
-        SetLinearDampingThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_LIN_DAMPINGSCALE:
-        SetLinearDampingScale(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_RESTTHRESHOLD:
-        SetAngularRestThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_VELOCITY:
-        SetAngularVelocity(value.GetVector3());
-        break;
-        
-    case ATTR_ANG_DAMPINGTHRESHOLD:
-        SetAngularDampingThreshold(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_DAMPINGSCALE:
-        SetAngularDampingScale(value.GetFloat());
-        break;
-        
-    case ATTR_ANG_MAXVELOCITY:
-        SetAngularMaxVelocity(value.GetFloat());
-        break;
-        
-    case ATTR_ACTIVE:
-        SetActive(value.GetBool());
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-
-Variant RigidBody::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case ATTR_POSITION:
-        return GetPosition();
-        
-    case ATTR_ROTATION:
-        return GetRotation();
-        
-    case ATTR_LIN_VELOCITY:
-        return GetLinearVelocity();
-        
-    case ATTR_LIN_RESTTHRESHOLD:
-        return GetLinearRestThreshold();
-        
-    case ATTR_LIN_DAMPINGTHRESHOLD:
-        return GetLinearDampingThreshold();
-        
-    case ATTR_LIN_DAMPINGSCALE:
-        return GetLinearDampingScale();
-        
-    case ATTR_ANG_VELOCITY:
-        return GetAngularVelocity();
-        
-    case ATTR_ANG_RESTTHRESHOLD:
-        return GetAngularRestThreshold();
-        
-    case ATTR_ANG_DAMPINGTHRESHOLD:
-        return GetAngularDampingThreshold();
-        
-    case ATTR_ANG_DAMPINGSCALE:
-        return GetAngularDampingScale();
-        
-    case ATTR_ANG_MAXVELOCITY:
-        return GetAngularMaxVelocity();
-        
-    case ATTR_ACTIVE:
-        return IsActive();
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
+    ACCESSOR_ATTRIBUTE_MODE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_SERIALIZATION);
+    ACCESSOR_ATTRIBUTE_MODE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_SERIALIZATION);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Max Velocity", GetAngularMaxVelocity, SetAngularMaxVelocity, float, M_INFINITY);
+    ACCESSOR_ATTRIBUTE(RigidBody, VAR_BOOL, "Is Active", IsActive, SetActive, bool, true);
 }
 
 void RigidBody::SetMass(float mass)
@@ -197,7 +89,7 @@ void RigidBody::SetMass(float mass)
     UpdateMass();
 }
 
-void RigidBody::SetPosition(const Vector3& position)
+void RigidBody::SetPosition(Vector3 position)
 {
     if (body_)
     {
@@ -206,7 +98,7 @@ void RigidBody::SetPosition(const Vector3& position)
     }
 }
 
-void RigidBody::SetRotation(const Quaternion& rotation)
+void RigidBody::SetRotation(Quaternion rotation)
 {
     if (body_)
     {
@@ -226,7 +118,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     }
 }
 
-void RigidBody::SetLinearVelocity(const Vector3& velocity)
+void RigidBody::SetLinearVelocity(Vector3 velocity)
 {
     if (body_)
         dBodySetLinearVel(body_, velocity.x_, velocity.y_, velocity.z_);
@@ -250,7 +142,7 @@ void RigidBody::SetLinearDampingScale(float scale)
         dBodySetLinearDamping(body_, scale);
 }
 
-void RigidBody::SetAngularVelocity(const Vector3& velocity)
+void RigidBody::SetAngularVelocity(Vector3 velocity)
 {
     if (body_)
         dBodySetAngularVel(body_, velocity.x_, velocity.y_, velocity.z_);
@@ -366,7 +258,6 @@ Vector3 RigidBody::GetLinearVelocity() const
     else
         return Vector3::ZERO;
 }
-
 
 float RigidBody::GetLinearRestThreshold() const
 {

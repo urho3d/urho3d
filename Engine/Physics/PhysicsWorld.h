@@ -100,11 +100,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    
     /// Step the simulation forward
     void Update(float timeStep);
     /// Set simulation steps per second
@@ -112,7 +107,7 @@ public:
     /// Set maximum contacts in one collision
     void SetMaxContacts(unsigned num);
     /// Set gravity
-    void SetGravity(const Vector3& gravity);
+    void SetGravity(Vector3 gravity);
     /// Set default linear velocity deactivation threshold for new rigid bodies
     void SetLinearRestThreshold(float threshold);
     /// Set default linear velocity damping threshold
@@ -232,21 +227,6 @@ private:
     std::map<std::string, SharedPtr<TriangleMeshData> > triangleMeshCache_;
     /// Cache for heightfield geometries
     std::map<std::string, SharedPtr<HeightfieldData> > heightfieldCache_;
-    
-    /// PhysicsWorld ID based attributes
-    enum PhysicsWorldIDAttributes
-    {
-        ATTR_GRAVITY = ID_ATTRIBUTE_BASE,
-        ATTR_LIN_RESTTHRESHOLD,
-        ATTR_LIN_DAMPINGTHRESHOLD,
-        ATTR_LIN_DAMPINGSCALE,
-        ATTR_ANG_RESTTHRESHOLD,
-        ATTR_ANG_DAMPINGTHRESHOLD,
-        ATTR_ANG_DAMPINGSCALE,
-        ATTR_ERP,
-        ATTR_CFM,
-        ATTR_CONTACTSURFACELAYER
-    };
 };
 
 /// Register Physics library objects

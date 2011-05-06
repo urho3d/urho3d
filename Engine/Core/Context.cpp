@@ -63,7 +63,8 @@ void Context::RegisterSubsystem(Object* object)
 
 void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
 {
-    if (attr.type_ == VAR_NONE)
+    // None or Pointer types can not be supported
+    if ((attr.type_ == VAR_NONE) || (attr.type_ == VAR_PTR))
         return;
     
     attributes_[objectType].push_back(attr);

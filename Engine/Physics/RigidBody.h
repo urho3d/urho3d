@@ -46,21 +46,16 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    
     /// Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic
     void SetMass(float mass);
     /// Set physics position
-    void SetPosition(const Vector3& position);
+    void SetPosition(Vector3 position);
     /// Set physics rotation
-    void SetRotation(const Quaternion& rotation);
+    void SetRotation(Quaternion rotation);
     /// Set physics transform
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set linear velocity
-    void SetLinearVelocity(const Vector3& velocity);
+    void SetLinearVelocity(Vector3 velocity);
     /// Set linear velocity deactivation threshold
     void SetLinearRestThreshold(float threshold);
     /// Set linear velocity damping threshold
@@ -68,7 +63,7 @@ public:
     /// Set linear velocity damping scale
     void SetLinearDampingScale(float scale);
     /// Set angular velocity
-    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularVelocity(Vector3 angularVelocity);
     /// Set angular velocity deactivation threshold
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping threshold
@@ -150,21 +145,4 @@ private:
     Quaternion previousRotation_;
     /// Poststep flag
     bool inPostStep_;
-    
-    /// RigidBody ID-based attributes
-    enum IDAttributes
-    {
-        ATTR_POSITION = ID_ATTRIBUTE_BASE,
-        ATTR_ROTATION,
-        ATTR_LIN_VELOCITY,
-        ATTR_LIN_RESTTHRESHOLD,
-        ATTR_LIN_DAMPINGTHRESHOLD,
-        ATTR_LIN_DAMPINGSCALE,
-        ATTR_ANG_VELOCITY,
-        ATTR_ANG_RESTTHRESHOLD,
-        ATTR_ANG_DAMPINGTHRESHOLD,
-        ATTR_ANG_DAMPINGSCALE,
-        ATTR_ANG_MAXVELOCITY,
-        ATTR_ACTIVE
-    };
 };

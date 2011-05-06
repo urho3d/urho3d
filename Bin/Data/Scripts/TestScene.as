@@ -133,7 +133,7 @@ void InitScene()
         object.castShadows = true;
 
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetConvexHull(cache.GetResource("Model", "Models/Mushroom.mdl"), 0.01, 0, Vector3(), Quaternion());
+        shape.SetTriangleMesh(cache.GetResource("Model", "Models/Mushroom.mdl"), 0, Vector3(), Quaternion());
         shape.collisionGroup = 2;
         shape.collisionMask = 1;
     }

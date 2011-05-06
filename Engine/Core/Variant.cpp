@@ -30,7 +30,6 @@
 #include "DebugNew.h"
 
 const Variant Variant::EMPTY;
-
 const std::string Variant::emptyString;
 const std::vector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
@@ -354,4 +353,129 @@ void Variant::SetType(VariantType newType)
         *reinterpret_cast<VariantMap**>(&value_.ptr_) = new VariantMap();
         break;
     }
+}
+
+template<> int Variant::Get<int>() const
+{
+    return GetInt();
+}
+
+template<> unsigned Variant::Get<unsigned>() const
+{
+    return GetUInt();
+}
+
+template<> StringHash Variant::Get<StringHash>() const
+{
+    return GetStringHash();
+}
+
+template<> ShortStringHash Variant::Get<ShortStringHash>() const
+{
+    return GetShortStringHash();
+}
+
+template<> bool Variant::Get<bool>() const
+{
+    return GetBool();
+}
+
+template<> float Variant::Get<float>() const
+{
+    return GetFloat();
+}
+
+template<> const Vector2& Variant::Get<const Vector2&>() const
+{
+    return GetVector2();
+}
+
+template<> const Vector3& Variant::Get<const Vector3&>() const
+{
+    return GetVector3();
+}
+
+template<> const Vector4& Variant::Get<const Vector4&>() const
+{
+    return GetVector4();
+}
+
+template<> const Quaternion& Variant::Get<const Quaternion&>() const
+{
+    return GetQuaternion();
+}
+
+template<> const Color& Variant::Get<const Color&>() const
+{
+    return GetColor();
+}
+
+template<> const std::string& Variant::Get<const std::string&>() const
+{
+    return GetString();
+}
+
+template<> const std::vector<unsigned char>& Variant::Get<const std::vector<unsigned char>& >() const
+{
+    return GetBuffer();
+}
+
+template<> void* Variant::Get<void*>() const
+{
+    return GetPtr();
+}
+
+template<> const ResourceRef& Variant::Get<const ResourceRef&>() const
+{
+    return GetResourceRef();
+}
+
+template<> const ResourceRefList& Variant::Get<const ResourceRefList&>() const
+{
+    return GetResourceRefList();
+}
+
+template<> const VariantVector& Variant::Get<const VariantVector&>() const
+{
+    return GetVariantVector();
+}
+
+template<> const VariantMap& Variant::Get<const VariantMap&>() const
+{
+    return GetVariantMap();
+}
+
+template<> Vector2 Variant::Get<Vector2>() const
+{
+    return GetVector2();
+}
+
+template<> Vector3 Variant::Get<Vector3>() const
+{
+    return GetVector3();
+}
+
+template<> Vector4 Variant::Get<Vector4>() const
+{
+    return GetVector4();
+}
+
+template<> Quaternion Variant::Get<Quaternion>() const
+{
+    return GetQuaternion();
+}
+
+template<> Color Variant::Get<Color>() const
+{
+    return GetColor();
+}
+
+template<> std::string Variant::Get<std::string>() const
+{
+    return GetString();
+}
+
+template<> std::vector<unsigned char> Variant::Get<std::vector<unsigned char> >() const
+{
+    return GetBuffer();
 }

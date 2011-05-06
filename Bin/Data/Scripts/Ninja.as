@@ -204,7 +204,7 @@ class Ninja : GameObject
                     node.position = node.position + Vector3(0, 3, 0);
                     body.ApplyForce(Vector3(0, ninjaJumpForce, 0));
                     inAirTime = 1.0f;
-                    controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.2);
+                    controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false,  0.1);
                     controller.SetTime("Models/Ninja_JumpNoHeight.ani", 0.0); // Always play from beginning
                     okToJump = false;
                 }
@@ -237,7 +237,7 @@ class Ninja : GameObject
 
             // Falling/jumping/sliding animation
             if (inAirTime > 0.01f)
-                controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false, 0.2);
+                controller.PlayExclusive("Models/Ninja_JumpNoHeight.ani", LAYER_MOVE, false, 0.1);
         }
 
         // Shooting
