@@ -50,7 +50,7 @@
 
 static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
-static bool CompareAnimationOrder(AnimationState* lhs, AnimationState* rhs)
+static bool CompareAnimationOrder(SharedPtr<AnimationState> lhs, SharedPtr<AnimationState> rhs)
 {
     return lhs->GetLayer() < rhs->GetLayer();
 }
@@ -74,7 +74,6 @@ AnimatedModel::AnimatedModel(Context* context) :
 
 AnimatedModel::~AnimatedModel()
 {
-    RemoveAllAnimationStates();
 }
 
 void AnimatedModel::RegisterObject(Context* context)
@@ -174,7 +173,7 @@ Variant AnimatedModel::OnGetAttribute(const AttributeInfo& attr)
         {
             VectorBuffer buf;
             buf.WriteVLE(animationStates_.size());
-            for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+            for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
             {
                 AnimationState* state = *i;
                 Bone* startBone = state->GetStartBone();
@@ -430,7 +429,7 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     if (existing)
         return existing;
     
-    AnimationState* newState = new AnimationState(this, animation);
+    SharedPtr<AnimationState> newState(new AnimationState(this, animation));
     animationStates_.push_back(newState);
     MarkAnimationOrderDirty();
     return newState;
@@ -449,14 +448,13 @@ void AnimatedModel::RemoveAnimationState(const std::string& animationName)
 
 void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 {
-    for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
         // Check both the animation and the resource name
         if ((animation->GetNameHash() == animationNameHash) || (animation->GetAnimationNameHash() == animationNameHash))
         {
-            delete state;
             animationStates_.erase(i);
             MarkAnimationDirty();
         }
@@ -465,11 +463,10 @@ void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 
 void AnimatedModel::RemoveAnimationState(AnimationState* state)
 {
-    for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         if (*i == state)
         {
-            delete state;
             animationStates_.erase(i);
             MarkAnimationDirty();
             return;
@@ -479,9 +476,6 @@ void AnimatedModel::RemoveAnimationState(AnimationState* state)
 
 void AnimatedModel::RemoveAllAnimationStates()
 {
-    for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
-        delete *i;
-    
     animationStates_.clear();
     MarkAnimationDirty();
 }
@@ -597,7 +591,7 @@ float AnimatedModel::GetMorphWeight(StringHash nameHash) const
 
 AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 {
-    for (std::vector<AnimationState*>::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         if ((*i)->GetAnimation() == animation)
             return *i;
@@ -608,7 +602,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 
 AnimationState* AnimatedModel::GetAnimationState(const std::string& animationName) const
 {
-    for (std::vector<AnimationState*>::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
         
@@ -622,7 +616,7 @@ AnimationState* AnimatedModel::GetAnimationState(const std::string& animationNam
 
 AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
 {
-    for (std::vector<AnimationState*>::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
         
@@ -636,7 +630,7 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
 
 AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
 {
-    return index < animationStates_.size() ? animationStates_[index] : 0;
+    return index < animationStates_.size() ? animationStates_[index].GetPtr() : 0;
 }
 
 void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
@@ -765,7 +759,7 @@ void AnimatedModel::AssignBoneNodes()
     }
     
     // Re-assign the same start bone to get the proper bone node this time
-    for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
@@ -917,7 +911,7 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     
     // Reset skeleton, then apply all animations
     skeleton_.Reset();
-    for (std::vector<AnimationState*>::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
         (*i)->Apply();
     
     // Animation has changed the bounding box: mark node for octree reinsertion

@@ -304,7 +304,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     }
     
     std::string type = rootElem.GetString("type");
-    root = StaticCast<UIElement>(CreateObject(ShortStringHash(type)));
+    root = StaticCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
     if (!root)
     {
         LOGERROR("Could not create UI element " + type);
@@ -508,7 +508,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
     {
         // Create element
         std::string type = childElem.GetString("type");
-        SharedPtr<UIElement> child = StaticCast<UIElement>(CreateObject(ShortStringHash(type)));
+        SharedPtr<UIElement> child = StaticCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
         if (!child)
         {
             LOGERROR("Could not create UI element " + type);

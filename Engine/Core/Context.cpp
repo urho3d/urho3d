@@ -45,6 +45,15 @@ Context::~Context()
     factories_.clear();
 }
 
+SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
+{
+    std::map<ShortStringHash, SharedPtr<ObjectFactory> >::const_iterator i = factories_.find(objectType);
+    if (i != factories_.end())
+        return i->second->CreateObject();
+    else
+        return SharedPtr<Object>();
+}
+
 void Context::RegisterFactory(ObjectFactory* factory)
 {
     if (!factory)

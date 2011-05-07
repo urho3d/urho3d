@@ -36,7 +36,7 @@ struct AnimationTrack;
 struct Bone;
 
 /// Animation instance in an animated model
-class AnimationState
+class AnimationState : public RefCounted
 {
 public:
     /// Construct with animated model and animation pointers
@@ -64,7 +64,7 @@ public:
     /// Return animation
     Animation* GetAnimation() const { return animation_; }
     /// Return start bone
-    Bone* GetStartBone() const { return startBone_; }
+    Bone* GetStartBone() const;
     /// Return whether weight is nonzero
     bool IsEnabled() const { return weight_ > 0.0f; }
     /// Return whether looped
@@ -85,11 +85,11 @@ public:
     
 private:
     /// Animated model
-    AnimatedModel* model_;
-    /// Start bone
-    Bone* startBone_;
+    WeakPtr<AnimatedModel> model_;
     /// Animation
     SharedPtr<Animation> animation_;
+    /// Start bone
+    Bone* startBone_;
     /// Mapping of animation track indices to bones
     std::map<unsigned, Bone*> trackToBoneMap_;
     /// Last keyframe on each animation track for optimized keyframe search

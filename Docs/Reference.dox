@@ -1,18 +1,139 @@
 /**
 
-\page ObjectTypes Object types and factories
+\page ObjectTypes %Object types and factories
+
+Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.
+
+%Object factory registration and object creation through factories are directly accessible only in C++, not in script.
+
+The definition of an Object subclass must contain the OBJECT(className) macro. Type identification is available both as text (GetTypeName() or GetTypeNameStatic()) and as a 16-bit hash of the type name (GetType() or GetTypeStatic()).
+
+In addition the OBJECTTYPESTATIC(className) macro must appear in a .cpp file to actually define the type identification data. The reason for doing this instead of defining the data directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
+
+To register an object factory for a specific type, call the \ref Context::RegisterFactory() "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext() "GetContext()". An example:
+
+\code
+context_->RegisterFactory<Camera>();
+\endcode
+
+To create an object using a factory, call Context's \ref Context::CreateObject() "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
+
+\code
+SharedPtr<Object> newComponent = context_->CreateObject(type));
+\endcode
 
 
 \page Subsystems Subsystems
 
+Any Object can be registered to the Context as a subsystem, by using the function \ref Context::RegisterSubsystem() "RegisterSubsystem()". They can then be accessed by any other Object inside the same context by calling \ref Object::GetSubsystem() "GetSubsystem()". Only one instance of each object type can exist as a subsystem.
+
+After Engine initialization, the following subsystems will always exist:
+
+- Time: manages frame updates, frame number and elapsed time counting, and controls the frequency of the operating system low-resolution timer.
+- FileSystem: provides directory operations.
+- Log: provides logging services.
+- ResourceCache: loads resources and keeps them cached for later access.
+- Network: provides UDP networking.
+- Input: handles keyboard and mouse input. Will be inactive in headless mode.
+- UI: the graphical user interface. Will be inactive in headless mode.
+- Audio: provides sound output. Will be inactive if sound disabled.
+- Engine: creates the other subsystems and controls the main loop iteration and framerate limiting.
+
+The following subsystems are optional, so GetSubsystem() may return null if they have not been created:
+
+- Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
+- Graphics: Manages the application window and the Direct3D9 device and resources. Exists if not in headless mode.
+- Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
+- Script: Provides the AngelScript execution environment. Created by calling \ref Engine::InitializeScripting() "InitializeScripting()".
+- Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole() "CreateConsole()".
+- DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud() "CreateDebugHud()".
+
+In script, the subsystems are available through the following global properties:
+time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud. Note that Profiler is not available to script due to its low-level nature.
+
 
 \page Events Events
+
+The Urho3D event system allows for data transport and function invocation without the sender and receiver having to explicitly know of each other. It supports both broadcast and targeted events. Both the event sender and receiver must derive from Object. An event receiver must subscribe to each event type it wishes to receive: one can either subscribe to the event coming from any sender, or from a specific sender. The latter is useful for example when handling events from the user interface elements.
+
+Events themselves do not need to be registered. They are identified by 32-bit hashes of their names. Event parameters (the data payload) are optional and are contained inside a VariantMap, identified by 16-bit parameter name hashes. For the inbuilt Urho3D events, event type (E_UPDATE, E_KEYDOWN, E_MOUSEMOVE etc.) and parameter hashes (P_TIMESTEP, P_DX, P_DY etc.) are defined as constants inside include files such as CoreEvents.h or InputEvents.h.
+
+When subscribing to an event, a handler function must be specified. In C++ these must have the signature void HandleEvent(StringHash eventType, VariantMap& eventData). The HANDLER(className, function) macro helps in defining the required class-specific function pointers. For example:
+
+\code
+SubscribeToEvent(E_UPDATE, HANDLER(MyClass, MyEventHandler));
+\endcode
+
+In script events are identified by their string names instead of name hashes (though these are internally converted to hashes.) Script event handlers can either have the same signature as in C++, or a simplified signature void HandleEvent() when event type and parameters are not required. The same event subscription would look like:
+
+\code
+SubscribeToEvent("Update", "MyEventHandler");
+\endcode
+
+In C++ events must always be handled by a member function. In script procedural event handling is also possible; in this case the ScriptFile where the event handler function is located becomes the event receiver. See \ref Scripting "Scripting" for more details.
+
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Time subsystem sends the Update event. Note how for the inbuilt Urho3D events, the parameter name hashes are always put inside a namespace (the event's name) to prevent name clashes:
+
+\code
+using namespace Update;
+
+VariantMap eventData;
+eventData[P_TIMESTEP] = timeStep_;
+SendEvent(E_UPDATE, eventData);
+\endcode
+
+In script event parameters, like event types, are referred to with strings, so the same code would look like:
+
+\code
+VariantMap eventData;
+eventData["TimeStep"] = timeStep;
+SendEvent("Update", eventData);
+\endcode
+
+Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
 
 \page MainLoop Main loop and frame update
 
+The main loop iteration (also called a frame) is driven by the Engine. In contrast it is the program's (for example Urho3D.exe) responsibility to continuously loop this iteration. The iteration consists of the Engine calling the Time subsystem's \ref Time::BeginFrame "BeginFrame()" and \ref Time::EndFrame "EndFrame()" functions, which causes several events to be sent:
 
-\page SceneModel Scene model
+- E_BEGINFRAME: signals the beginning of the new frame. Input and Network react to this to check for operating system window messages and arrived network packets.
+- E_UPDATE: application-wide logic update event. By default each active Scene reacts to this and triggers the scene update (more on this below.)
+- E_POSTUPDATE: application-wide logic post-update event. The UI subsystem updates its logic here.
+- E_RENDERUPDATE: Renderer updates its viewports here to prepare for rendering, and the UI generates render commands necessary to render the user interface.
+- E_POSTRENDERUPDATE: by default nothing hooks to this. This can be used to implement logic that requires the rendering views to be up-to-date (for example to do accurate raycasts.) Scenes may not be modified at this point (especially scene objects may not be deleted or crashes may occur.)
+- E_ENDFRAME: signals the end of the frame. Before this, rendering the frame and measuring the next frame's timestep will have occurred.
+
+The update of each Scene causes further events to be sent:
+
+- E_SCENEUPDATE: variable timestep scene update. This is a good place to implement any scene logic that does not need to happen at a fixed step.
+- E_SCENESUBSYSTEMUPDATE: update scene-wide subsystems. Currently only the PhysicsWorld component listens to this, which causes it to step the physics simulation and send the following two events for each simulation step:
+- E_PHYSICSPRESTEP: called before the simulation iteration. Happens at a fixed rate (the physics FPS.) If fixed timestep logic updates are needed, this is a good event to listen to.
+- E_PHYSICSPOSTSTEP: called after the simulation iteration. Happens at the same rate as E_PHYSICSPRESTEP.
+- E_SCENEPOSTUPDATE: variable timestep scene post-update. ParticleEmitter and AnimationController update themselves as a response to this event.
+
+Variable timestep logic updates are preferable to fixed timestep, because they are only executed once per frame. In contrast, if the rendering framerate is low, several physics world simulation steps will be performed on each frame to keep up the apparent passage if time, and if this also causes a lot of logic code to be executed for each step, the program may bog down further if the CPU can not handle the load.
+
+
+\page SceneModel %Scene model
+
+Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale) and a name, but no other functionality. Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating \ref Component "Components" into the nodes.
+
+For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
+
+Components created into the Scene itself have a special role: to implement scene-wide functionality. They should be created before all other components, and include the following:
+
+- Octree: implements visibility queries. Without this 3D objects can not be rendered.
+- PhysicsWorld: implements physics simulation. Physics components such as RigidBody or CollisionShape can not function properly without this.
+- DebugRenderer: implements debug geometry rendering.
+
+"Ordinary" components like Light, Camera or StaticModel should not be created directly into the Scene, but rather into child nodes.
+
+A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
+
+%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other reference to it exists. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling it.
+
+When created, nodes and components get unique integer IDs starting from 1. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
 
 
 \page Resources Resources
@@ -24,10 +145,10 @@
 \page Rendering Rendering
 
 
-\page Input Input
+\page Input %Input
 
 
-\page Audio Audio
+\page Audio %Audio
 
 
 \page Physics Physics

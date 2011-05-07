@@ -243,7 +243,7 @@ void ScriptInstance::DelayedExecute(float delay, const std::string& declaration,
     delayedMethodCalls_.push_back(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
-    if ((!methods_[METHOD_UPDATE]) && (!HasSubscribed(E_SCENEUPDATE)))
+    if ((!methods_[METHOD_UPDATE]) && (!HasSubscribedToEvent(E_SCENEUPDATE)))
     {
         Node* node = GetNode();
         if (node)

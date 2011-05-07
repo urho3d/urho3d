@@ -1,8 +1,8 @@
 const float initialAggression = 0.0020;
 const float initialPrediction = 3000;
 const float initialAimSpeed = 5;
-const float deltaAggression = 0.00005;
-const float deltaPrediction = -20;
+const float deltaAggression = 0.000025;
+const float deltaPrediction = -15;
 const float deltaAimSpeed = 0.15;
 const float maxAggression = 0.01;
 const float maxPrediction = 2000;

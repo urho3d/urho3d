@@ -366,7 +366,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     }
     
     // Make sure the pointer is non-null and is a Resource subclass
-    resource = DynamicCast<Resource>(CreateObject(type));
+    resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
         LOGERROR("Could not load unknown resource type " + ToString(type));

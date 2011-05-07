@@ -39,6 +39,8 @@ public:
     /// Destruct
     ~Context();
     
+    /// Create an object by type. Return pointer to it or null if no factory found
+    SharedPtr<Object> CreateObject(ShortStringHash objectType);
     /// Register a factory for an object type. If exists already, will not be replaced
     void RegisterFactory(ObjectFactory* factory);
     /// Register a subsystem. If exists already, will not be replaced
@@ -138,7 +140,7 @@ public:
     EventHandler* GetHandler() const { return handler_; }
     /// Return object type name from hash, or null if unknown
     const char* GetTypeName(ShortStringHash type) const;
-    /// Template version of returning subsystem
+    /// Template version of returning a subsystem
     template <class T> T* GetSubsystem() const;
     
     /// Return attribute descriptions for an object type, or null if none defined
@@ -181,7 +183,7 @@ private:
     /// Event types for specific senders that have had receivers removed during event handling
     std::set<std::pair<Object*, StringHash> > dirtySpecificReceivers_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases
-    EventHandler* handler_;
+    WeakPtr<EventHandler> handler_;
 };
 
 template <class T> void Context::RegisterFactory()

@@ -33,6 +33,7 @@
 
 AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     model_(model),
+    animation_(animation),
     startBone_(0),
     looped_(false),
     weight_(0.0f),
@@ -40,7 +41,6 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     layer_(0),
     useNlerp_(false)
 {
-    animation_ = animation;
     SetStartBone(0);
     
     // Setup a cache for last keyframe of each track
@@ -55,6 +55,12 @@ AnimationState::~AnimationState()
 
 void AnimationState::SetStartBone(Bone* startBone)
 {
+    if (!model_)
+    {
+        startBone_ = 0;
+        return;
+    }
+    
     Skeleton& skeleton = model_->GetSkeleton();
     const std::vector<Bone>& bones = skeleton.GetBones();
     Bone* rootBone = skeleton.GetRootBone();
@@ -155,6 +161,11 @@ void AnimationState::SetLayer(int layer)
 void AnimationState::SetUseNlerp(bool enable)
 {
     useNlerp_ = enable;
+}
+
+Bone* AnimationState::GetStartBone() const
+{
+    return model_ ? startBone_ : 0;
 }
 
 float AnimationState::GetLength() const

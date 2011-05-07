@@ -45,8 +45,6 @@ public:
     /// Handle event
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
     
-    /// Create object by type
-    SharedPtr<Object> CreateObject(ShortStringHash type);
     /// Subscribe to an event that can be sent by any sender
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event
@@ -59,7 +57,7 @@ public:
     void UnsubscribeFromEvents(Object* sender);
     /// Unsubscribe from all events
     void UnsubscribeFromAllEvents();
-    /// Unsubscribe from all events with userdata defined in the handler (possibly scripted)
+    /// Unsubscribe from all events with userdata defined in the handler
     void UnsubscribeFromAllEventsWithUserData();
     /// Send event to all subscribers
     void SendEvent(StringHash eventType);
@@ -79,9 +77,9 @@ public:
     /// Return subsystem by type
     Object* GetSubsystem(ShortStringHash type) const;
     /// Return whether has subscribed to an event without specific sender
-    bool HasSubscribed(StringHash eventType) const;
+    bool HasSubscribedToEvent(StringHash eventType) const;
     /// Return whether has subscribed to a specific sender's event
-    bool HasSubscribed(Object* sender, StringHash eventType) const;
+    bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
     /// Return active event sender
     Object* GetSender() const;
     /// Template version of returning a subsystem
@@ -96,7 +94,7 @@ protected:
     
 private:
     /// Event handlers. Sender is null for non-specific handlers
-    std::map<std::pair<Object*, StringHash>, EventHandler*> eventHandlers_;
+    std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
 };
 
 template <class T> SharedPtr<T> Object::CreateObject()
@@ -160,7 +158,7 @@ public:
 };
 
 /// Internal helper class for invoking event handler functions
-class EventHandler
+class EventHandler : public RefCounted
 {
 public:
     /// Construct with specified receiver

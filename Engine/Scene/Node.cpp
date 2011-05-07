@@ -664,7 +664,7 @@ Component* Node::GetComponent(ShortStringHash type, unsigned index) const
 Component* Node::CreateComponent(ShortStringHash type, unsigned id)
 {
     // Make sure the object in question is a component
-    SharedPtr<Component> newComponent = DynamicCast<Component>(CreateObject(type));
+    SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
     if (!newComponent)
     {
         LOGERROR("Could not create unknown component type " + ToString(type));

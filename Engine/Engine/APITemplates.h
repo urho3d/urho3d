@@ -237,6 +237,14 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool get_eof() const", asMETHODPR(T, IsEof, () const, bool), asCALL_THISCALL);
 }
 
+/// Template function for registering a class derived from RefCounted
+template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* className)
+{
+    engine->RegisterObjectType(className, 0, asOBJ_REF);
+    engine->RegisterObjectBehaviour(className, asBEHAVE_ADDREF, "void f()", asMETHODPR(T, AddRef, (), void), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
+}
+
 /// Template function for registering a class derived from Object
 template <class T> void RegisterObject(asIScriptEngine* engine, const char* className)
 {

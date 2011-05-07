@@ -562,9 +562,7 @@ static void AnimatedModelSetModel(Model* model, AnimatedModel* ptr)
 
 static void RegisterAnimatedModel(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("AnimationState", 0, asOBJ_REF);
-    engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
+    RegisterRefCounted<AnimationState>(engine, "AnimationState");
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_startBone(Bone@+)", asMETHOD(AnimationState, SetStartBone), asCALL_THISCALL);

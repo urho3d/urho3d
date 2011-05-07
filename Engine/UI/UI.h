@@ -53,7 +53,7 @@ public:
     void Clear();
     /// Update the UI logic. Called by HandlePostUpdate()
     void Update(float timeStep);
-    /// Update the UI for rendering. Called by HandlePostRenderUpdate()
+    /// Update the UI for rendering. Called by HandleRenderUpdate()
     void RenderUpdate();
     /// Render the UI
     void Render();

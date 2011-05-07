@@ -48,7 +48,7 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     WeakPtr<Object> self(this);
     
     // Check first the specific event handlers, which have priority
-    std::map<std::pair<Object*, StringHash>, EventHandler*>::const_iterator i = eventHandlers_.find(
+    std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::const_iterator i = eventHandlers_.find(
         std::make_pair(sender, eventType));
     if (i != eventHandlers_.end())
     {
@@ -70,27 +70,12 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     }
 }
 
-SharedPtr<Object> Object::CreateObject(ShortStringHash type)
-{
-    const std::map<ShortStringHash, SharedPtr<ObjectFactory> >& factories = context_->GetObjectFactories();
-    std::map<ShortStringHash, SharedPtr<ObjectFactory> >::const_iterator i = factories.find(type);
-    if (i != factories.end())
-        return i->second->CreateObject();
-    else
-        return SharedPtr<Object>();
-}
-
 void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
 {
     if (!handler)
         return;
     
     std::pair<Object*, StringHash> combination((Object*)0, eventType);
-    
-    // If there already is a handler, delete it
-    std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.find(combination);
-    if (i != eventHandlers_.end())
-        delete i->second;
     
     eventHandlers_[combination] = handler;
     context_->AddEventReceiver(this, eventType);
@@ -103,28 +88,22 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     
     std::pair<Object*, StringHash> combination(sender, eventType);
     
-    // If there already is a handler, delete it
-    std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.find(combination);
-    if (i != eventHandlers_.end())
-        delete i->second;
-    
     eventHandlers_[combination] = handler;
     context_->AddEventReceiver(this, sender, eventType);
 }
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
-    for (std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.begin();
+    for (std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.begin();
         i != eventHandlers_.end();)
     {
-        std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator current = i++;
+        std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator current = i++;
         if (current->first.second == eventType)
         {
             if (current->first.first)
                 context_->RemoveEventReceiver(this, current->first.first, current->first.second);
             else
                 context_->RemoveEventReceiver(this, current->first.second);
-            delete current->second;
             eventHandlers_.erase(current);
         }
     }
@@ -134,11 +113,10 @@ void Object::UnsubscribeFromEvent(Object* sender, StringHash eventType)
 {
     std::pair<Object*, StringHash> combination(sender, eventType);
     
-    std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.find(combination);
+    std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.find(combination);
     if (i != eventHandlers_.end())
     {
         context_->RemoveEventReceiver(this, i->first.first, i->first.second);
-        delete i->second;
         eventHandlers_.erase(i);
     }
 }
@@ -148,14 +126,13 @@ void Object::UnsubscribeFromEvents(Object* sender)
     if (!sender)
         return;
     
-    for (std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.begin();
+    for (std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.begin();
         i != eventHandlers_.end();)
     {
-        std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator current = i++;
+        std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator current = i++;
         if (current->first.first == sender)
         {
             context_->RemoveEventReceiver(this, current->first.first, current->first.second);
-            delete current->second;
             eventHandlers_.erase(current);
         }
     }
@@ -163,14 +140,13 @@ void Object::UnsubscribeFromEvents(Object* sender)
 
 void Object::UnsubscribeFromAllEvents()
 {
-    for (std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.begin();
+    for (std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.begin();
         i != eventHandlers_.end(); ++i)
     {
         if (i->first.first)
             context_->RemoveEventReceiver(this, i->first.first, i->first.second);
         else
             context_->RemoveEventReceiver(this, i->first.second);
-        delete i->second;
     }
     
     eventHandlers_.clear();
@@ -178,17 +154,16 @@ void Object::UnsubscribeFromAllEvents()
 
 void Object::UnsubscribeFromAllEventsWithUserData()
 {
-    for (std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.begin();
+    for (std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.begin();
         i != eventHandlers_.end(); )
     {
         if (i->second->GetUserData())
         {
-            std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator current = i++;
+            std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator current = i++;
             if (current->first.first)
                 context_->RemoveEventReceiver(this, current->first.first, current->first.second);
             else
                 context_->RemoveEventReceiver(this, current->first.second);
-            delete current->second;
             eventHandlers_.erase(current);
         }
         else
@@ -304,12 +279,12 @@ Object* Object::GetSubsystem(ShortStringHash type) const
         return 0;
 }
 
-bool Object::HasSubscribed(StringHash eventType) const
+bool Object::HasSubscribedToEvent(StringHash eventType) const
 {
     return eventHandlers_.find(std::make_pair((Object*)0, eventType)) != eventHandlers_.end();
 }
 
-bool Object::HasSubscribed(Object* sender, StringHash eventType) const
+bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
 {
     return eventHandlers_.find(std::make_pair(sender, eventType)) != eventHandlers_.end();
 }
@@ -321,14 +296,11 @@ Object* Object::GetSender() const
 
 void Object::RemoveEventSender(Object* sender)
 {
-    for (std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator i = eventHandlers_.begin();
+    for (std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator i = eventHandlers_.begin();
         i != eventHandlers_.end();)
     {
-        std::map<std::pair<Object*, StringHash>, EventHandler*>::iterator current = i++;
+        std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> >::iterator current = i++;
         if (current->first.first == sender)
-        {
-            delete current->second;
             eventHandlers_.erase(current);
-        }
     }
 }

@@ -97,7 +97,7 @@ public:
     /// Return skeleton
     Skeleton& GetSkeleton() { return skeleton_; }
     /// Return all animation states
-    const std::vector<AnimationState*>& GetAnimationStates() const { return animationStates_; }
+    const std::vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
     /// Return number of animation states
     unsigned GetNumAnimationStates() const { return animationStates_.size(); }
     /// Return animation state by animation pointer
@@ -168,7 +168,7 @@ private:
     /// Vertex morphs
     std::vector<ModelMorph> morphs_;
     /// Animation states
-    std::vector<AnimationState*> animationStates_;
+    std::vector<SharedPtr<AnimationState> > animationStates_;
     /// Skinning matrices
     std::vector<Matrix4x3> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage
