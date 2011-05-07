@@ -222,6 +222,8 @@ public:
     bool HasComponent(ShortStringHash type) const;
     /// Return listener components
     const std::vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
+    /// Return user variables
+    VariantMap& GetVars() { return vars_; }
     /// Template version of returning child nodes with a specific component
     template <class T> void GetChildrenWithComponent(std::vector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type
@@ -230,6 +232,9 @@ public:
     template <class T> void GetComponents(std::vector<T*>& dest) const;
     /// Template version of checking whether has a specific component
     template <class T> bool HasComponent() const;
+    
+    /// User variables
+    VariantMap vars_;
     
 protected:
     /// Create a component with specific ID. Used internally

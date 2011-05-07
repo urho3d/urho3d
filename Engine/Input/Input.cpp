@@ -435,7 +435,7 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_NCLBUTTONUP:
-        case WM_LBUTTONUP:
+    case WM_LBUTTONUP:
         SetMouseButton(MOUSEB_LEFT, false);
         eventData[P_HANDLED] = true;
         break;

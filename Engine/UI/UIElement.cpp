@@ -228,8 +228,8 @@ void UIElement::SetStyle(const XMLElement& element)
         else
             UpdateLayout();
     }
-    if (element.HasChildElement("userdata"))
-        SetUserData(element.GetChildElement("userdat").GetVariantMap());
+    if (element.HasChildElement("vars"))
+        vars_ = element.GetChildElement("vars").GetVariantMap();
 }
 
 void UIElement::Update(float timeStep)
@@ -615,11 +615,6 @@ void UIElement::SetLayoutBorder(const IntRect& border)
 {
     layoutBorder_ = IntRect(Max(border.left_, 0), Max(border.top_, 0), Max(border.right_, 0), Max(border.bottom_, 0));
     UpdateLayout();
-}
-
-void UIElement::SetUserData(const VariantMap& userData)
-{
-    userData_ = userData;
 }
 
 void UIElement::UpdateLayout()

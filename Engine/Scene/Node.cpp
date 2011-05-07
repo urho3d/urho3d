@@ -69,6 +69,7 @@ void Node::RegisterObject(Context* context)
     ATTRIBUTE(Node, VAR_VECTOR3, "Position", position_, Vector3::ZERO);
     ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY);
     ATTRIBUTE(Node, VAR_VECTOR3, "Scale", scale_, Vector3::UNITY);
+    ATTRIBUTE_MODE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_SERIALIZATION);
 }
 
 void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)

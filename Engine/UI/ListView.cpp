@@ -45,7 +45,7 @@ int GetItemIndent(UIElement* item)
 {
     if (!item)
         return 0;
-    return item->GetUserData()[indentHash].GetInt();
+    return item->vars_[indentHash].GetInt();
 }
 
 OBJECTTYPESTATIC(ListView);
@@ -92,7 +92,7 @@ void ListView::SetStyle(const XMLElement& element)
                 UIElement* item = root->GetChild(itemElem.GetString("name"), true);
                 AddItem(item);
                 if (itemElem.HasAttribute("indent"))
-                    item->GetUserData()[indentHash] = itemElem.GetInt("indent");
+                    item->vars_[indentHash] = itemElem.GetInt("indent");
                 itemElem = itemElem.GetNextElement("listitem");
             }
         }

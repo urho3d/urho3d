@@ -56,7 +56,7 @@ Menu::~Menu()
         UIElement* parent = popup_->GetParent();
         if (parent)
         {
-            popup_->GetUserData()[originHash].Clear();
+            popup_->vars_[originHash].Clear();
             parent->RemoveChild(popup_);
         }
     }
@@ -132,7 +132,7 @@ void Menu::ShowPopup(bool enable)
         
         popup_->SetPosition(GetScreenPosition() + popupOffset_);
         popup_->SetVisible(true);
-        popup_->GetUserData()[originHash] = (void*)this;
+        popup_->vars_[originHash] = (void*)this;
         root->AddChild(popup_);
         
         // Set fixed high priority
@@ -142,7 +142,7 @@ void Menu::ShowPopup(bool enable)
     }
     else
     {
-        popup_->GetUserData()[originHash].Clear();
+        popup_->vars_[originHash].Clear();
         root->RemoveChild(popup_);
     }
     
@@ -217,7 +217,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
         if ((element == this) || (element == popup_))
             return;
         if (element->GetParent() == root)
-            element = static_cast<UIElement*>(element->GetUserData()[originHash].GetPtr());
+            element = static_cast<UIElement*>(element->vars_[originHash].GetPtr());
         else
             element = element->GetParent();
     }

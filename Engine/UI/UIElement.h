@@ -103,8 +103,6 @@ class UIElement : public Object
 {
     OBJECT(Element);
     
-    template <class T> friend void RegisterUIElement(asIScriptEngine* engine, const char* className);
-    
 public:
     /// Construct
     UIElement(Context* context);
@@ -231,8 +229,6 @@ public:
     void SetLayoutSpacing(int spacing);
     /// Set layout border
     void SetLayoutBorder(const IntRect& border);
-    /// Set userdata
-    void SetUserData(const VariantMap& userData);
     /// Manually update layout. Should not be necessary in most cases, but is provided for completeness
     void UpdateLayout();
     /// Disable automatic layout update. Should only be used if there are performance problems
@@ -322,8 +318,6 @@ public:
     int GetLayoutSpacing() const { return layoutSpacing_; }
     /// Return layout border
     const IntRect& GetLayoutBorder() const { return layoutBorder_; }
-    /// Return userdata
-    VariantMap& GetUserData() { return userData_; }
     /// Return number of child elements
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return child element by index
@@ -338,6 +332,8 @@ public:
     UIElement* GetRootElement() const;
     /// Return precalculated 32-bit color. Only valid when no gradient
     unsigned GetUIntColor();
+    /// Return user variables
+    VariantMap& GetVars() { return vars_; }
     
     /// Convert screen coordinates to element coordinates
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
@@ -359,6 +355,9 @@ public:
     /// Get UI rendering batches with a specified offset. Also recurses to child elements
     void GetBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
         currentScissor);
+    
+    /// User variables
+    VariantMap vars_;
     
 protected:
     /// Mark screen position as needing an update
@@ -396,8 +395,6 @@ protected:
     FocusMode focusMode_;
     /// Drag and drop flags
     unsigned dragDropMode_;
-    /// Userdata
-    VariantMap userData_;
     /// Layout mode
     LayoutMode layoutMode_;
     /// Layout spacing
