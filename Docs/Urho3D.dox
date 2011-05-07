@@ -6,34 +6,34 @@ Urho3D is a lightweight, object-oriented Win32 / Direct3D9 rendering and game en
 
 For getting started, see:
 
-\subpage Building "Building Urho3D" <br>
-\subpage Running "Running Urho3D" <br>
-\subpage Structure "Overall structure" <br>
-\subpage Conventions "Conventions" <br>
-\subpage ScriptQuickstart "Quickstart in script" <br>
-\subpage CppQuickstart "Quickstart in C++" <br>
+\ref Building "Building Urho3D" <br>
+\ref Running "Running Urho3D" <br>
+\ref Structure "Overall structure" <br>
+\ref Conventions "Conventions" <br>
+\ref ScriptQuickstart "Quickstart in script" <br>
+\ref CppQuickstart "Quickstart in C++" <br>
 
 For further reference, see:
 
-\subpage ObjectTypes "Object types and factories" <br>
-\subpage Subsystems "Subsystems" <br>
-\subpage Events "Events" <br>
-\subpage MainLoop "Main loop and frame update" <br>
-\subpage SceneModel "Scene model" <br>
-\subpage Resources "Resources" <br>
-\subpage Scripting "Scripting" <br>
-\subpage Rendering "Rendering" <br>
-\subpage Input "Input" <br>
-\subpage Audio "Audio" <br>
-\subpage Physics "Physics" <br>
-\subpage UI "User interface" <br>
-\subpage Serialization "Serialization" <br>
-\subpage Network "Networking" <br>
-\subpage Tools "Tools" <br>
-\subpage FileFormats "Custom file formats" <br>
-\subpage CodingConventions "Coding conventions" <br>
+\ref ObjectTypes "Object types and factories" <br>
+\ref Subsystems "Subsystems" <br>
+\ref Events "Events" <br>
+\ref MainLoop "Main loop and frame update" <br>
+\ref SceneModel "Scene model" <br>
+\ref Resources "Resources" <br>
+\ref Scripting "Scripting" <br>
+\ref Rendering "Rendering" <br>
+\ref Input "Input" <br>
+\ref Audio "Audio" <br>
+\ref Physics "Physics" <br>
+\ref UI "User interface" <br>
+\ref Serialization "Serialization" <br>
+\ref Network "Networking" <br>
+\ref Tools "Tools" <br>
+\ref FileFormats "Custom file formats" <br>
+\ref CodingConventions "Coding conventions" <br>
 
-For credits, copyright and licensing information, see \subpage Credits & \subpage License.
+For credits, copyright and licensing information, see \ref Credits & \ref License.
 
 
 \page Credits Credits
@@ -46,17 +46,17 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 - Tangent generation from Terathon (http://www.terathon.com/code/tangent.html)
 - Fast, Minimum Storage Ray/Triangle Intersection by M&ouml;ller & Trumbore (http://www.graphics.cornell.edu/pubs/1997/MT97.pdf)
 - Linear-Speed Vertex Cache Optimisation by Tom Forsyth (http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html)
-- Software rasterization of triangles based on Chris Hecker's Perspective Texture Mapping series in the Game Developer magazine (http://chrishecker.com/Miscellaneous_Technical_Articles)
+- Software rasterization of triangles based on Chris Hecker's Perspective %Texture Mapping series in the Game Developer magazine (http://chrishecker.com/Miscellaneous_Technical_Articles)
 - Networked Physics by Glenn Fiedler (http://gafferongames.com/game-physics/networked-physics/)
 - Euler Angle Formulas by David Eberly (http://www.geometrictools.com/Documentation/EulerAngles.pdf)
 
 Urho3D uses the following third-party libraries:
 
 - AngelScript 2.20.2 (http://www.angelcode.com/angelscript/)
-- ENet 1.3.0 (http://enet.bespin.org/)
+- ENet 1.3.1 (http://enet.bespin.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - Open Asset Import Library 2.0.863 (http://assimp.sourceforge.net/)
-- Open Dynamics Engine, svn rev 1770 (http://www.ode.org/)
+- Open Dynamics %Engine, svn rev 1770 (http://www.ode.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 1.29 (http://nothings.org/)
 - stb_vorbis 0.99996 (http://nothings.org/)
@@ -64,14 +64,14 @@ Urho3D uses the following third-party libraries:
 
 Ninja model, BlueHighway font and smoke/flare/status bar textures are from OGRE.
 
-Jack and mushroom models are from the realXtend project (http:///www.realxtend.org/).
+Jack and mushroom models are from the realXtend project (http://www.realxtend.org/).
 
 NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
 
 
 \page License
 
-Urho3D Engine
+Urho3D %Engine
 Copyright (c) 2008-2011 Lasse &Ouml;&ouml;rni
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:

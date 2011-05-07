@@ -14,7 +14,7 @@ After the build is complete, the programs can be run from the Bin directory.
 
 To run Urho3D from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\\Bin\\Urho3D.exe (release) or ..\\Bin\\Urho3D_d.exe (debug.) Entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
 
-To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. See \subpage Running "Running Urho3D" for more information, but for a quick test you can try the following arguments: Scripts/TestScene.as -w
+To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. See \ref Running "Running Urho3D" for more information, but for a quick test you can try the following arguments: Scripts/TestScene.as -w
 
 Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
 
@@ -27,7 +27,7 @@ The main executable Urho3D.exe in the Bin directory contains all the engine runt
 
 Urho3D.exe <scriptfilename> [options]
 
-The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \subpage Events "events", such as the update that happens every frame.
+The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
 Currently, two example application scripts exist:
 
@@ -94,17 +94,17 @@ Urho3D consists of several static libraries that are independent where possible:
 The libraries are the following:
 
 - Math. Provides vector & quaternion types and geometric shapes used in intersection tests.
-- Core. Provides the execution Context, the base class Object for typed objects, object factories, \subpage Event "event handling", threading and profiling.
+- Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Event "event handling", threading and profiling.
 - IO. Provides file system access, stream input/output and logging.
-- Resource. Provides the ResourceCache and the base resource types, including XML documents.
-- Scene. Provides Node and Component classes, from which Urho3D scenes (or worlds, maps, levels) are built.
-- Graphics. Provides application window handling and 3D rendering capabilities.
-- Input. Provides mouse & keyboard input in both polled and event-based mode.
-- Network. Provides low-level client-server networking functionality.
-- Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
+- %Resource. Provides the ResourceCache and the base resource types, including XML documents.
+- %Scene. Provides Node and Component classes, from which Urho3D scenes are built.
+- %Graphics. Provides application window handling and 3D rendering capabilities.
+- %Input. Provides mouse & keyboard input in both polled and event-based mode.
+- %Network. Provides low-level client-server networking functionality.
+- %Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
 - Physics. Provides physics simulation.
-- Script. Provides scripting support using the AngelScript language.
-- Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
+- %Script. Provides scripting support using the AngelScript language.
+- %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
 Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however due to the cmake build process all the libraries above get automatically linked (as Engine library depends on all of them.)
 
@@ -116,7 +116,7 @@ The third-party libraries are used for the following functionality:
 - ENet: UDP networking
 - FreeType: font rendering
 - Open Asset Import Library: reading various 3D file formats
-- Open Dynamics Engine: physics simulation implementation
+- Open Dynamics %Engine: physics simulation implementation
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
 - stb_vorbis: Ogg Vorbis decoding
@@ -133,7 +133,7 @@ Urho3D uses the following conventions:
 
 - Clockwise vertices define a front face.
 
-- Audio volume is specified from 0.0 (silence) to 1.0 (full volume)
+- %Audio volume is specified from 0.0 (silence) to 1.0 (full volume)
 
 - Axis aligned bounding boxes are used in all bounding tests, except for raycast into bone collision boxes, and testing whether a Camera is inside a Zone; in those cases oriented bounding boxes are used instead.
 
@@ -145,7 +145,7 @@ Urho3D uses the following conventions:
 
 - In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
 
-For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
+For more details related to the C++ coding style, see also \ref CodingConventions "Coding conventions".
 
 
 \page ScriptQuickstart Quickstart in script
@@ -257,7 +257,7 @@ To try out the application, save it as HelloWorld.as in the Bin/Data/Scripts dir
 
 \page CppQuickstart Quickstart in C++
 
-This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \subpage ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
+This example shows how to create an Urho3D C++ application from the ground up. The actual functionality will be the same as in \ref ScriptQuickstart "Quickstart in script"; it is strongly recommended that you familiarize yourself with it first.
 
 To start with, create a subdirectory "HelloWorld" into the Urho3D root directory, and add the following line to the root directory's CMakeLists.txt file:
 
@@ -435,7 +435,7 @@ void HelloWorld::SubscribeToEvents()
 }
 \endcode
 
-Unlike in script, in C++ there is no choice - the event handler function must always have the signature "void HandleEvent(StringHash eventType, VariantMap& eventData)". Note that to prevent name clashes, the event's name is used as a namespace for the event parameter hashes:
+Unlike in script, in C++ the event handler function must always have the signature "void HandleEvent(StringHash eventType, VariantMap& eventData)". Note that when accessing event parameters, the event's name is used as a namespace to prevent name clashes:
 
 \code
 void HelloWorld::HandleUpdate(StringHash eventType, VariantMap& eventData)

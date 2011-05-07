@@ -25,7 +25,7 @@ extern "C"
 
 #define ENET_VERSION_MAJOR 1
 #define ENET_VERSION_MINOR 3
-#define ENET_VERSION_PATCH 0
+#define ENET_VERSION_PATCH 1
 #define ENET_VERSION_CREATE(major, minor, patch) (((major)<<16) | ((minor)<<8) | (patch))
 #define ENET_VERSION ENET_VERSION_CREATE(ENET_VERSION_MAJOR, ENET_VERSION_MINOR, ENET_VERSION_PATCH)
 
