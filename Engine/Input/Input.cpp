@@ -182,6 +182,8 @@ bool Input::GetQualifierDown(int qualifier) const
         return keyDown_[KEY_SHIFT] != 0;
     if (qualifier == QUAL_CTRL)
         return keyDown_[KEY_CTRL] != 0;
+    if (qualifier == QUAL_ALT)
+        return keyDown_[KEY_ALT] != 0;
     return false;
 }
 
@@ -191,6 +193,8 @@ bool Input::GetQualifierPress(int qualifier) const
         return keyPress_[KEY_SHIFT] != 0;
     if (qualifier == QUAL_CTRL)
         return keyPress_[KEY_CTRL] != 0;
+    if (qualifier == QUAL_ALT)
+        return keyPress_[KEY_ALT] != 0;
     return false;
 }
 
@@ -201,6 +205,8 @@ int Input::GetQualifiers() const
         ret |= QUAL_SHIFT;
     if (keyDown_[KEY_CTRL] != 0)
         ret |= QUAL_CTRL;
+    if (keyDown_[KEY_ALT] != 0)
+        ret |= QUAL_ALT;
     return ret;
 }
 

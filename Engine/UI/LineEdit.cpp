@@ -347,7 +347,8 @@ void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
 {
     bool changed = false;
     
-    if (qualifiers & QUAL_CTRL)
+    // If only CTRL is held down, do not edit
+    if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
         return;
     
     if (c == '\b')
