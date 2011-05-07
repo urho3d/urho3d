@@ -203,20 +203,52 @@ static void setAllColliders (int i, dColliderFn *fn)
   setCollider (dTriMeshClass,dPlaneClass,&dCollideTrimeshPlane);
   setCollider (dCylinderClass,dTriMeshClass,&dCollideCylinderTrimesh);
 #endif
+
+#ifdef dLIBCCD_BOX_CYL
+  setCollider (dBoxClass,dCylinderClass,&dCollideBoxCylinderCCD);
+#else
   setCollider (dCylinderClass,dBoxClass,&dCollideCylinderBox);
+#endif
   setCollider (dCylinderClass,dSphereClass,&dCollideCylinderSphere);
   setCollider (dCylinderClass,dPlaneClass,&dCollideCylinderPlane);
 
 #ifdef dLIBCCD_CYL_CYL
   setCollider (dCylinderClass, dCylinderClass, &dCollideCylinderCylinder);
 #endif
+#ifdef dLIBCCD_CAP_CYL
+  setCollider (dCapsuleClass, dCylinderClass, &dCollideCapsuleCylinder);
+#endif
 
 //--> Convex Collision
-  setCollider (dConvexClass,dPlaneClass,&dCollideConvexPlane);
-  setCollider (dSphereClass,dConvexClass,&dCollideSphereConvex);
+#ifdef dLIBCCD_CONVEX_BOX
+  setCollider (dConvexClass, dBoxClass, &dCollideConvexBoxCCD);
+#else
   setCollider (dConvexClass,dBoxClass,&dCollideConvexBox);
+#endif
+
+#ifdef dLIBCCD_CONVEX_CAP
+  setCollider (dConvexClass,dCapsuleClass,&dCollideConvexCapsuleCCD);
+#else
   setCollider (dConvexClass,dCapsuleClass,&dCollideConvexCapsule);
+#endif
+
+#ifdef dLIBCCD_CONVEX_CYL
+  setCollider (dConvexClass,dCylinderClass,&dCollideConvexCylinderCCD);
+#endif
+
+#ifdef dLIBCCD_CONVEX_SPHERE
+  setCollider (dConvexClass,dSphereClass,&dCollideConvexSphereCCD);
+#else
+  setCollider (dSphereClass,dConvexClass,&dCollideSphereConvex);
+#endif
+
+#ifdef dLIBCCD_CONVEX_CONVEX
+  setCollider (dConvexClass,dConvexClass,&dCollideConvexConvexCCD);
+#else
   setCollider (dConvexClass,dConvexClass,&dCollideConvexConvex);
+#endif
+
+  setCollider (dConvexClass,dPlaneClass,&dCollideConvexPlane);
   setCollider (dRayClass,dConvexClass,&dCollideRayConvex);
 //<-- Convex Collision
 

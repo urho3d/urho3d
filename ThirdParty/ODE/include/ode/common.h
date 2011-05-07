@@ -33,7 +33,6 @@ extern "C" {
 
 #define PURE_INLINE static __inline
 
-
 /* configuration stuff */
 
 /* constants */
@@ -149,6 +148,7 @@ typedef dReal dQuaternion[4];
 #define dAtan2(y,x) (atan2f(y,x))		/* arc tangent with 2 args */
 #define dFMod(a,b) (fmodf(a,b))		/* modulo */
 #define dFloor(x) floorf(x)			/* floor */
+#define dCeil(x) ceilf(x)			/* floor */
 #define dCopySign(a,b) ((dReal)copysignf(a,b)) /* copy value sign */
 #define dNextAfter(x, y) nextafterf(x, y) /* next value after */
 
@@ -187,6 +187,7 @@ float _nextafterf(float x, float y);
 #define dAtan2(y,x) atan2((y),(x))
 #define dFMod(a,b) (fmod((a),(b)))
 #define dFloor(x) floor(x)
+#define dCeil(x) ceil(x)
 #define dCopySign(a,b) (copysign((a),(b)))
 #define dNextAfter(x, y) nextafter(x, y)
 

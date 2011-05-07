@@ -1,6 +1,7 @@
 #ifndef ODECONFIG_H
 #define ODECONFIG_H
 
+// Urho3D: modified config
 #define dSINGLE
 #define dNODEBUG
 

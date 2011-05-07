@@ -8,6 +8,25 @@ the rules for this file:
   * keep the format consistent (79 char width, M/D/Y date format).
 
 ------------------------------------------------------------------------------
+01/29/11 Oleh Derevenko
+		* Heightfield zone boundaries calculation code fixed to also consider
+		  whole next cell after the AABB if the AABB ends exactly at the cell
+		  boundary.
+01/23/11 Daniel K. O.
+        * Applied patch from Daniel Fiser, add libccd collider for
+          box-cylinder.
+
+01/20/11 Daniel K. O.
+        * Applied patch from Daniel Fiser, fix infinite loop in libccd caused
+          by numerical problems.
+
+01/06/11 Daniel K. O.
+        * Applied patch from Daniel Fiser, efficient libccd tests when using
+          CONTACTS_UNIMPORTANT.
+
+12/17/10 Daniel K. O.
+        * Applied patches from Daniel Fiser for new colliders based on libccd.
+
 11/08/10 Daniel K. O.
         * Applied patches from Daniel Fiser to incorporate libccd for
           Cylinder-Cylinder collision tests.

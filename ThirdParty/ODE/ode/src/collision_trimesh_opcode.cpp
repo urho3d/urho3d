@@ -272,13 +272,14 @@ void dxTriMeshData::Preprocess()
 
 	// Make a list of every edge in the mesh
 	const IndexedTriangle* tris = Mesh.GetTris();
-    for (unsigned int i = 0; i < numTris; i++)
+	const unsigned tristride = Mesh.GetTriStride();
+	for (unsigned int i = 0; i < numTris; i++)
 	{
 		SetupEdge(&records[i*3],   0, i, tris->mVRef);
 		SetupEdge(&records[i*3+1], 1, i, tris->mVRef);
 		SetupEdge(&records[i*3+2], 2, i, tris->mVRef);
 
-		tris = (const IndexedTriangle*)(((uint8*)tris) + Mesh.GetTriStride());
+		tris = (const IndexedTriangle*)(((uint8*)tris) + tristride);
 	}
 
 	// Sort the edges, so the ones sharing the same verts are beside each other
