@@ -139,11 +139,13 @@ Urho3D uses the following conventions:
 
 - Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
 
-- No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead.
+- In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
-- In the script API, properties are used whenever appropriate instead of Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+- No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead.
+
+- Third party libraries are hidden from the public API as completely as possible.
 
 For more details related to the C++ coding style, see also \ref CodingConventions "Coding conventions".
 
@@ -160,7 +162,7 @@ Scene@ helloScene;
 
 Now we can define the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
 
-Note: Urho3D has tweaked AngelScript slightly to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
+Note: Urho3D has modified AngelScript to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
 
 \code
 void Start()

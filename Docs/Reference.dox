@@ -117,9 +117,30 @@ Variable timestep logic updates are preferable to fixed timestep, because they a
 
 \page SceneModel %Scene model
 
-Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale) and a name, but no other functionality. Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating \ref Component "Components" into the nodes.
+Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale) and a name, but no other functionality. Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating different \ref Component "Components" into the nodes by calling \ref Node::CreateComponent "CreateComponent()".
 
-For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
+Components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
+
+As with events, in C++ components are identified by type name hashes, and template forms of the component creation and retrieval functions exist for convenience. For example:
+
+\code
+Light* light = lightNode->CreateComponent<Light>();
+\endcode
+
+In script, strings are used to identify component types instead, so the same code would look like:
+\code
+Light@ light = lightNode.CreateComponent("Light");
+\endcode
+
+Because components are created using \ref ObjectTypes "object factories", a factory must be registered for each component type.
+
+When created, nodes and components get scene-global integer IDs starting from 1. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
+
+There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and to decide in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness (or even existence) of node names is not enforced.
+
+Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node, so several of them can be attached to the same node to create a compound collision shape. For example a chair could have collision made of several box shapes. See \ref Physics "Physics" for more details.
+
+%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
 Components created into the Scene itself have a special role: to implement scene-wide functionality. They should be created before all other components, and include the following:
 
@@ -131,19 +152,358 @@ Components created into the Scene itself have a special role: to implement scene
 
 A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
 
-%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other reference to it exists. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling it.
+It is also legal to create a Node that does not belong to a scene. This particularly useful with cameras, because then the Camera will not be serialized along with the actual scene, which is perhaps not always wanted.
 
-When created, nodes and components get unique integer IDs starting from 1. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
-
+For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
 
 \page Resources Resources
+
+Resources include most things in Urho3D that are loaded from mass storage during initialization or runtime:
+
+- Image
+- XMLFile
+- Model
+- Animation
+- Material
+- ScriptFile
+- Technique
+- Texture2D
+- TextureCube
+- Sound
+
+They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes Objects, resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
+
+The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, Urho3D.exe registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist, plus the system font directory.
+
+If loading a resource fails, an error will be logged and a null pointer is returned.
+
+Typical C++ example of requesting a resource from the cache, in this case, a texture for a UI element. Note the use of a convenience template argument to specify the resource type, instead of using the type hash.
+
+\code
+healthBar->SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>("Textures/HealthBarBorder.png"));
+\endcode
+
+The same in script would look like this (note the use of a property instead of a setter function):
+
+\code
+healthBar.texture = cache.GetResource("Texture2D", "Textures/HealthBarBorder.png");
+\endcode
+
+Resources can also be created manually and stored to the resource cache as if they had been loaded from disk.
 
 
 \page Scripting Scripting
 
+There are three ways the AngelScript language can be interacted with in Urho3D:
+
+\section Scripting_Immediate Immediate execution
+
+Immediate execution takes one line of AngelScript, compiles it, and executes. This is not recommended for anything that needs high performance, but can be used for example to implement a developer console. Call the Script subsystem's \ref Script::Execute "Execute()" function to use. For example:
+
+\code
+GetSubsystem<Script>()->Execute("Print(\"Hello World!\");");
+\endcode
+
+It may be useful to be able to access a specific scene or a script file while executing immediate script code. These can be set on the Script subsystem by calling \ref Script::SetDefaultScene "SetDefaultScene()" and \ref Script::SetDefaultScriptFile "SetDefaultScriptFile()".
+
+\section Scripting_Procedural Calling a function from a script file
+
+This requires a successfully loaded ScriptFile resource, whose \ref ScriptFile::Execute "Execute()" function will be used. To identify the function to be called, its full declaration is needed. Parameters are passed in a VariantVector. For example:
+
+\code
+ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.as");
+
+VariantVector parameters;
+parameters.push_back(Variant(100)); // Add an int parameter
+file->Execute("void MyFunction(int)", parameters); // Execute
+\endcode
+
+\ref ScriptFile::Execute "Execute()" also has an overload which takes a function pointer instead of querying by declaration. Using a pointer is naturally faster than a query, but note that the query results are also stored to an internal cache, so repeated queries for the same declaration do not need to go to the AngelScript module level each time. Storing function pointers is risky in case the ScriptFile resource is reloaded, because then the pointers will be invalidated.
+
+\section Scripting_Object Instantiating a script object
+
+The component ScriptInstance can be used to instantiate a specific class from within a script file. After this the script object can respond to scene updates, \ref Events "events" and \ref Serialization "serialization" much like a component written in C++ would do, if it has the appropriate methods implemented. For example:
+
+\code
+ScriptInstance* instance = node->CreateComponent<ScriptInstance>();
+instance->CreateObject(GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyClass.as"), "MyClass");
+\endcode
+
+The class must implement the empty interface ScriptObject, so that the object can also be accessed from script using ScriptInstance's \ref ScriptInstance::GetScriptObject "GetScriptObject()" function.
+
+The following methods that implement the component behaviour will be checked for. None of them are required.
+
+- void Start()
+- void Stop()
+- void Update(float)
+- void PostUpdate(float)
+- void FixedUpdate(float)
+- void FixedPostUpdate(float)
+- void Save(Serializer&)
+- void Load(Deserializer&)
+
+The update methods above correspond to the variable timestep scene update and post-update, and the fixed timestep physics world update and post-update. The application-wide update events are not handled by default.
+
+The Start() and Stop() methods do not have direct counterparts in C++ components. Start() is called just after the script object has been created. Stop() is called just before the script object is destroyed. This happens when the ScriptInstance is destroyed, or if the script class is changed.
+
+Subscribing to \ref Events "events" in script behaves differently depending on whether \ref Object::SubscribeToEvent "SubscribeToEvent()" is called from a script object's method, or from a procedural script function. If called from an object method, the ScriptInstance becomes the event receiver on the C++ side, and forwards the events to the script object. If called from a function, the ScriptFile will be the event receiver.
+
+The script object's active/inactive state can be controlled through the \ref ScriptInstance::SetActive "SetActive()" function. When inactive, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
+
+There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject(). These are not actual Node member functions on the C++ side. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
+
+\code
+ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
+\endcode
+
+\section Script_ScriptAPI The script API
+
+Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access or immediate rendering) are not. Also for scripting convenience some things have been changed from the C++ API:
+
+- The template array and std::string types are exposed as Array<type> and String.
+
+- Public member variables are exposed without the underscore appended. For example x, y, z in Vector3.
+
+- Whenever only a single parameter is needed, setter and getter functions are replaced with properties. Such properties start with a lowercase letter. If an index parameter is needed, the property will be indexed. Indexed properties are in plural.
+
+- Subsystems exist as global properties: time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud.
+
+- Additional global properties exist for accessing the script object's node, the scene and the scene-wide components: node, scene, octree, physicsWorld, debugRenderer. When an object method is not executing, these are null. An exception: when the default scene for immediate execution has been set by calling \ref Script::SetDefaultScene "SetDefaultScene()", it is always available as "scene".
+
+- The first script object created to a node is available as its scriptObject property.
+
+- The script file that is currently executing is available through the scriptFile property.
+
+- Printing raw output to the log is simply called Print(). The rest of the logging functions are accessed by calling log.Debug(), log.Info(), log.Warning() and log.Error().
+
+- Functions that would take a StringHash or ShortStringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
+
+- Most of StringUtils have been exposed as methods of the string class or the corresponding classes. For example String.ToLower(), Vector3.ToString().
+
+- Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
+
+\section Scripting_Limitations Limitations
+
+There are some complexities of the scripting system one has to watch out for:
+
+- During the execution of the script object's constructor, the object is not yet associated with the ScriptInstance, and therefore subscribing to events, or trying to access the node or scene will fail. The use of the constructor is best reserved for initializing member variables only.
+
+- There is a maximum allowed nesting level (currently 32) for execution that moves between C++ & AngelScript. Nested execution typically occurs if you send an event to another ScriptInstance from a scripted event handler. If the nesting level is exceeded, an error will be logged and the script code that would have required the extra nesting level will not be executed.
+
+- When the resource request for a particular ScriptFile is initially made, the script file and the files it includes are compiled into an AngelScript script module. Each script module has its own class hierarchy that is not usable from other script modules. Particularly casts to/from base classes will not work across script modules as you would expect, as the base class will actually be uniquely defined within each script module. Interfaces should work across modules. If access to a class hierarchy is needed, and using interfaces is not sufficient, it is best to ensure that only a single script module, which includes all the necessary classes, will be compiled. This could be for example the game's main program class, which would simply #include all the game object classes it needs. It may sound ugly to include a large number of files, but actually it is more memory-optimal to make one large script module, than several smaller ones which would duplicate the definition for eg. a game object base class.
+
+- If a ScriptFile resource is reloaded, all the script objects created from it will be destroyed, then recreated. They will lose any stored state as their constructors and Start() methods will be run again. This is rarely useful when running an actual game, but may be helpful during development.
+
+\section Scripting_Modifications AngelScript modifications
+
+The following changes have been made to AngelScript in Urho3D:
+
+- For performance reasons and to guarantee immediate removal of expired objects, AngelScript garbage collection has been disabled for script classes and the Array type. This has the downside that circular references will not be detected. Therefore, whenever you have object handles in your script, think of them as if they were C++ shared pointers and avoid creating circular references with them.
+
+- %Object handle assignment can be done without the @ symbol if the object in question does not support value assignment. All exposed Urho3D C++ classes that derive from RefCounted never support value assignment. For example, when assigning the Model and Material of a StaticModel component:
+
+\code
+object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
+\endcode
+
+In unmodified AngelScript, this would have to be written as:
+
+\code
+@object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
+@object.material = cache.GetResource("Material", "Materials/Mushroom.xml");
+\endcode
+
 
 \page Rendering Rendering
+                    
+                    
+Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer, contained within the %Graphics library.
 
+\section Rendering_Graphics Graphics
+
+Graphics implements the low-level functionality:
+
+- Creating the window and the Direct3D device
+- Setting the screen mode
+- Keeping track of GPU resources
+- Keeping track of Direct3D state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
+- Handling lost device
+- Performing primitive rendering operations
+
+It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
+
+Screen resolution, fullscreen/windowed, vertical sync, deferred/forward mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
+
+When setting the initial screen mode, Graphics does a few checks:
+
+- Which shader model is supported? 2.0 is minimum, but 3.0 will be used if available. Shader model 2.0 can be forced by calling setForceSM2() before calling setMode() for the first time.
+- Are multiple render targets supported? If not, only forward rendering will be available.
+- Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, shadow rendering will be disabled.
+
+\section Rendering_Renderer Renderer
+
+Renderer implements the rendering of 3D scene(s) each frame. To do this, it needs a Scene with an Octree component, and a Camera that does not necessarily have to belong to the scene. The octree stores all visible components (derived from Drawable) to allow querying for them in an accelerated manner. Global rendering quality settings such as texture quality, material quality, specular lighting and shadow rendering are controlled from this subsystem.
+
+The scene, camera and screen rectangle to use are set with Renderer's \ref Renderer::SetViewport "SetViewport()" function. By default there is one viewport, but the amount can be increased with the function \ref Renderer::SetNumViewports "SetNumViewports()". The viewport(s) should cover the entire screen or otherwise hall-of-mirrors artifacts may occur. By specifying a zero screen rectangle the whole window will be used automatically. The viewports will be rendered in ascending order, so if you want for example to have a small overlay window on top of the main viewport, use viewport index 0 for the main view, and 1 for the overlay.
+
+The steps for rendering each viewport on each frame are roughly the following:
+
+- Query the octree for visible objects and lights in the camera's view frustum.
+- Optimize the visible objects using software rasterized occlusion (can be switched off if this sounds scary and time-wasting, but practically it allows for a huge performance increase in more complex & occluded scenes.)
+- Check the influence of each visible light on the objects. If the light casts shadows, query the octree for shadowcaster geometries.
+- Construct render operations (batches) for the visible objects.
+- Perform these render operations during the rendering step at the end of the frame.
+
+For opaque, non-skinned geometry, batches using the same material and same vertex/index buffers are automatically grouped together for hardware instancing when SM3.0 hardware is available. This reduces the actual draw call count needed.
+
+The rendering operations are divided into passes in the following order:
+
+- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (light prepass & deferred.)
+- Lighting opaque geometry. For shadow casting lights, the shadow map is rendered first.
+- Post-opaque or "extra" rendering pass for materials that define that.
+- Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
+
+\section Rendering_Drawable Rendering components
+
+The rendering-related components defined by the %Renderer library are:
+
+- Octree: spatial partitioning of Drawables for accelerated visibility queries. Must be created to the Scene (root node) or nothing will be rendered.
+- Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
+- Drawable: Base class for anything visible.
+- StaticModel: non-skinned geometry. Can LOD transition according to distance.
+- Skybox: a subclass of StaticModel that appears to always stay in place.
+- AnimatedModel: skinned geometry that can do skeletal and vertex morph animation.
+- BillboardSet: a group of camera-facing billboards, which can have varying sizes, rotations and texture coordinates.
+- ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
+- Light: illuminates the scene. Can optionally cast shadows.
+- Zone: defines global properties like fogging and background color. The active zone is the one the Camera is currently in.
+
+\section Rendering_Materials Materials
+
+Material and Technique resources define how to render 3D scene geometry. On the disk, they are XML data. By default, materials exist in the CoreData/Materials & Data/Materials subdirectories, and techniques exist in the CoreData/Techniques subdirectory.
+
+A material defines the textures, shader parameters and culling mode to use, and refers to techniques. A technique defines the actual rendering passes, the shaders to use in each, and all other rendering states such as depth test, depth write, and blending.
+
+A material definition looks like this:
+
+\code
+<material>
+    <technique name="TechniqueName" quality="q" loddistance="d" sm3="true|false" />
+    <texture unit="diffuse|normal|specular|detail|environment|emissive" name="TextureName" />
+    <texture ... />
+    <parameter name="name" value="x y z w" />
+    <parameter ... />
+    <cull value="cw|ccw|none" />
+    <shadowcull value="cw|ccw|none" />
+</material>
+\endcode
+
+The shadowcull element is optional and specifies the culling mode to use in the shadow pass. If omitted, the culling mode when drawing shadows is the same as the normal culling mode.
+
+%Material quality levels are specified from 0 (low) to 2 (high). The quality level that will be chosen is the highest available according to the Renderer's material quality setting (see \ref Renderer::SetMaterialQuality() SetMaterialQuality()). If a technique requires SM3.0-only shaders, it can be marked as such by the "sm3" attribute.
+
+When a material defines several techniques for LOD levels and quality settings, they must appear in a specific order:
+
+- Most distant & highest quality
+- ...
+- Most distant & lowest quality
+- Second most distant & highest quality
+- ...
+
+A technique definition looks like this:
+
+\code
+<technique>
+    <pass name="deferred|prepass|material|base|litbase|light|extra|shadow"
+        vs="VertexShaderName" ps="PixelShaderName" alphamask="true|false"
+        alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
+        depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
+    <pass ... />
+    <pass ... />
+</technique>
+\endcode
+
+"Alphamask" is not an actual renderstate. It is a hint that the pixel shader will do discard(), and should therefore be rendered after geometry that does not use discard(), to ensure optimal depth buffer performance.
+
+The passes are:
+
+- deferred: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, and depth.
+- prepass: light pre-pass rendering G-buffer pass for opaque geometry. Writes normals and depth only.
+- material: light pre-pass rendering material pass. Renders the opaque object using the light accumulation result.
+- base: forward rendering base pass. Renders the ambient light.
+- litbase: forward rendering base pass. Renders the ambient light and the first light affecting the object for optimization.
+- light: forward rendering light pass. Renders one light's contribution additively.
+- extra: custom rendering pass. Rendered after the opaque geometry.
+- shadow: shadow map rendering pass. Renders depth only.
+
+Note that the technique does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and light types (directional, point and spot, shadowed and non-shadowed.) Instead specific hardcoded shader variations are assumed to exist.
+
+\section Rendering_Lights Lights
+
+Lights in Urho3D can be directional, point, or spot lights. Shadow mapping is supported for all light types.
+
+A directional light's position has no effect, as it's assumed to be infinitely far away, only its rotation matters. It casts orthographically projected shadows. For increasing the shadow quality, cascaded shadow mapping (splitting the view into several shadow maps along the Z-axis) can be used.
+
+Point lights are spherical in shape. When a point light casts shadows, it will be internally split into 6 spot lights with a 90 degree FOV each. This is very expensive rendering-wise, so shadow casting point lights should be used sparingly.
+
+Spot lights have FOV & aspect ratio values like cameras to define the shape of the light cone.
+
+Both point and spot lights use an attenuation ramp texture to determine how the intensity varies with distance. In addition they have a shape texture, 2D for spot lights, and an optional cube texture for point lights. It is important that the spot light's shape texture has black at the borders, and has mipmapping disabled, otherwise there will be "bleeding" artifacts at the edges of the light cone.
+
+\section Rendering_ShadowedLights Shadowed lights
+
+Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of parameters exists for controlling the shadows:
+
+- BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Also, these can be different for orthographic (directional) and projective (point and spot) shadows. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
+
+- CascadeParameters: these have effect only for directional lights, and they consist of the number of splits, split lambda parameter, split fade range, and shadow maximum range. Lambda is between 0.0 - 1.0. Higher values create more high-resolution splits near the viewer. Split fade range determines to what degree the splits overlap, creating a smooth fade effect. For example fade range of 0.1 would use 10% of the full depth range to fade each split to the next. Geometry beyond shadow maximum range will be unshadowed (practically, an extra unshadowed split will be rendered, if maximum range is less than the far clip distance.)
+
+- FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), out-zooming enable flag (reduces fillrate of distant spot lights by not using the whole shadow map when not necessary), and quantization & minimum size parameters for the shadow camera view.
+
+Additionally, there exist shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
+
+- If both shadow distance and shadow fade distance are greater than zero, shadows start to fade at the shadow fade distance, and vanish completely at the shadow distance.
+
+- Shadow intensity defines how dark the shadows are, between 0.0 (maximum darkness, the default) and 1.0 (fully lit.)
+
+- The shadow resolution parameter allows choosing between a fullsize (1.0), half-size (0.5) and quarter-size (0.25) shadow map. Choose according to the size and importance of the light; smaller shadow maps will be much less performance hungry.
+
+- The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
+
+\section Rendering_ShadowMapReuse Shadow map reuse
+
+The Renderer can be configured to either reuse shadow maps, or not. To reuse is the default, use \ref Renderer::SetReuseShadowMaps "SetReuseShadowMaps()" to change.
+
+When reuse is enabled, only one shadow texture of each shadow map size (full, half and quarter) needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
+
+When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the desired number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows. The exception is shadowed point lights: they need stencil masking to split into the 6 shadow map sides, which conflicts with the need to render transparent objects back-to-front, instead of rendering per light.
+
+\section Rendering_LightCulling Light culling
+
+When occlusion is used, a light will automatically be culled if its bounding box is fully behind an occluder. However, directional lights have an infinite bounding box, and can not be culled this way.
+
+In forward rendering, it is possible to limit which objects are affected by each light, by calling \ref Drawable::SetLightMask "SetLightMask()" on both the light and the objects. The lightmasks of the light and objects are ANDed to check whether the light should have effect: the light will only illuminate an object if the result is nonzero. By default objects and lights have all bits set in their lightmask, thus passing this test always.
+
+\ref Zone "Zones" can also be used for light culling in a similar manner. The lightmask of the zone the camera is in will be ANDed with each light's lightmask to see whether the light should be included in rendering. This method of light culling works equally in deferred and forward rendering. By default a zone has all bits set in its lightmask.
+
+Care must be utilized when doing light culling with lightmasks, because they easily create situations where a light's influence is cut off unnaturally. However, they can be a great performance boost: for example if you imagine a multi-store building with lights, lights would normally need to have shadows enabled to not "bleed" into the lower floors, which would cost performance. The bleeding could also be prevented by using unique lightmask bits on the objects and lights of each floor.
+
+\section Rendering_AuxiliaryViews Auxiliary views
+
+Auxiliary views are viewports defined into a RenderSurface. These will be rendered whenever the texture containing the surface is visible, and can be typically used to implement for example reflections. The texture in question must have been created in rendertarget mode, see Texture's \ref Texture2D::SetSize "SetSize()" function.
+
+The viewport is not assigned directly to the texture because of cube map support: a cubic rendertarget has 6 render surfaces, and done this way, a different camera could be assigned to each.
+
+A "backup texture" can be assigned to the rendertarget texture: because it is illegal to sample a texture that is also being simultaneously rendered to (in cases where the rendertarget texture becomes "recursively" visible in the auxiliary view), the backup texture can be used to specify which texture should be used in place instead.
+
+When using deferred rendering, there is currently a limitation that the auxiliary view rendertarget can not be bigger in either width or height than the rendering window, due to the G-buffer's size. Overcoming this would require reserving an additional G-buffer for large auxiliary views.
+
+Rendering detailed auxiliary views can easily have a large performance impact. Some things you can do for optimization with the auxiliary view camera:
+
+- Set the far clip distance as small as possible.
+- Set the camera's viewmask to for example VIEW_REFLECTION, then clear that viewmask bit from objects you don't need rendered.
+- Use the camera's \ref Camera::SetViewOverrideFlags "SetViewOverrideFlags()" function to disable shadows, to disable occlusion, or force the lowest material quality.
 
 \page Input %Input
 

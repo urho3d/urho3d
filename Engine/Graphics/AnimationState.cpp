@@ -56,10 +56,7 @@ AnimationState::~AnimationState()
 void AnimationState::SetStartBone(Bone* startBone)
 {
     if (!model_)
-    {
-        startBone_ = 0;
         return;
-    }
     
     Skeleton& skeleton = model_->GetSkeleton();
     const std::vector<Bone>& bones = skeleton.GetBones();
@@ -109,7 +106,8 @@ void AnimationState::SetWeight(float weight)
     if (weight != weight_)
     {
         weight_ = weight;
-        model_->MarkAnimationDirty();
+        if (model_)
+            model_->MarkAnimationDirty();
     }
 }
 
@@ -119,7 +117,8 @@ void AnimationState::SetTime(float time)
     if (time != time_)
     {
         time_ = time;
-        model_->MarkAnimationDirty();
+        if (model_)
+            model_->MarkAnimationDirty();
     }
 }
 
@@ -154,7 +153,8 @@ void AnimationState::SetLayer(int layer)
     if (layer != layer_)
     {
         layer_ = layer;
-        model_->MarkAnimationOrderDirty();
+        if (model_)
+            model_->MarkAnimationOrderDirty();
     }
 }
 
