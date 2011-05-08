@@ -375,6 +375,7 @@ The rendering-related components defined by the %Graphics library are:
 - StaticModel: non-skinned geometry. Can LOD transition according to distance.
 - Skybox: a subclass of StaticModel that appears to always stay in place.
 - AnimatedModel: skinned geometry that can do skeletal and vertex morph animation.
+- AnimationController: drives AnimatedModel's animations forward automatically and controls animation fade-in/out.
 - BillboardSet: a group of camera-facing billboards, which can have varying sizes, rotations and texture coordinates.
 - ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
 - Light: illuminates the scene. Can optionally cast shadows.
@@ -890,7 +891,7 @@ Classes that derive from Serializable can perform automatic serialization to bin
 
 The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
 
-To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()". For example, the components implement serialization of their Resource pointers into ResourceRef or ResourceRefList this way.
+To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()". For example, the components serialize their Resource pointers as ResourceRef or ResourceRefList this way.
 
 The attribute system also supports editing by providing human-readable names.
 
