@@ -37,15 +37,17 @@ Rendering, physics and serialization test. To start, run TestScene.bat in the Bi
 
 Key and mouse controls:
 
-- WSAD        Move
-- Left mouse  Create a new physics object
-- Right mouse Hold and move mouse to rotate view
-- Space       Toggle debug geometry
-- F5          Save scene
-- F7          Load scene
-- 1 to 9      Toggle rendering options
-- T           Toggle profiling display
-- ~           Toggle AngelScript console
+\verbatim
+WSAD        Move
+Left mouse  Create a new physics object
+Right mouse Hold and move mouse to rotate view
+Space       Toggle debug geometry
+F5          Save scene
+F7          Load scene
+1 to 9      Toggle rendering options
+T           Toggle profiling display
+~           Toggle AngelScript console
+\endverbatim
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -53,36 +55,40 @@ A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory,
 
 Key and mouse controls:
 
-- WSAD        Move
-- Left mouse  Attack
-- Space       Jump
-- F1          Toggle physics debug geometry
-- F2          Toggle profiling display
-- F3          Toggle octree debug geometry
-- ~           Toggle AngelScript console
+\verbatim
+WSAD        Move
+Left mouse  Attack
+Space       Jump
+F1          Toggle physics debug geometry
+F2          Toggle profiling display
+F3          Toggle octree debug geometry
+~           Toggle AngelScript console
+\endverbatim
 
 \section Running_Commandline Command line options
 
 Urho3D.exe understands the following command line options:
 
--x<res>       Horizontal resolution <br>
--y<res>       Vertical resolution <br>
--m<level>     Enable hardware multisampling (*)<br>
--v            Enable vertical sync <br>
--w            Start in windowed mode <br>
--headless     Headless mode. No application window will be created <br>
--forward      Use forward rendering (default) <br>
--prepass      Use light pre-pass rendering <br>
--deferred     Use deferred rendering <br>
--b<length>    Mixing buffer length in milliseconds <br>
--r<freq>      Mixing frequency in Hz <br>
--nolimit      Disable frame limiter <br>
--noshadows    Disable rendering of shadows <br>
--nosound      Disable sound output <br>
--noip         Disable sound mixing interpolation <br>
--8bit         Force 8-bit audio output <br>
--mono         Force mono audio output <br>
--sm2          Force SM2.0 rendering <br>
+\verbatim
+-x<res>     Horizontal resolution
+-y<res>     Vertical resolution
+-m<level>   Enable hardware multisampling (*)
+-v          Enable vertical sync
+-w          Start in windowed mode
+-headless   Headless mode. No application window will be created
+-forward    Use forward rendering (default)
+-prepass    Use light pre-pass rendering
+-deferred   Use deferred rendering
+-b<length>  Mixing buffer length in milliseconds
+-r<freq>    Mixing frequency in Hz
+-nolimit    Disable frame limiter
+-noshadows  Disable rendering of shadows
+-nosound    Disable sound output
+-noip       Disable sound mixing interpolation
+-8bit       Force 8-bit audio output
+-mono       Force mono audio output
+-sm2        Force SM2.0 rendering
+\endverbatim
 
 (*) Only forward rendering supports hardware multisampling. In light pre-pass and deferred rendering modes temporal antialiasing will be used instead.
 

@@ -41,9 +41,9 @@ public:
     /// Destruct
     virtual ~Serializable();
     
-    /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes set accessor
+    /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access. Default implementation reads the variable at offset, or invokes get accessor
+    /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor
     virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);

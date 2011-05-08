@@ -189,7 +189,7 @@ void Run(const std::vector<std::string>& arguments)
             "\n"
             "Options:\n"
             "-b    Save scene in binary format, default format is XML\n"
-            "-i    Use local ID's for scene entities\n"
+            "-i    Use local ID's for scene nodes\n"
             "-mX   Output a material list file X (model mode only)\n"
             "-na   Do not export animations\n"
             "-nm   Do not export materials\n"

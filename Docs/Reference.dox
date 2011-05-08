@@ -2,7 +2,7 @@
 
 \page ObjectTypes %Object types and factories
 
-Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.
+Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component, Resource and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.
 
 %Object factory registration and object creation through factories are directly accessible only in C++, not in script.
 
@@ -136,15 +136,15 @@ Because components are created using \ref ObjectTypes "object factories", a fact
 
 When created, nodes and components get scene-global integer IDs starting from 1. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
 
-There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and to decide in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness (or even existence) of node names is not enforced.
+There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and to decide in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
 
-Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node, so several of them can be attached to the same node to create a compound collision shape. For example a chair could have collision made of several box shapes. See \ref Physics "Physics" for more details.
+Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details.
 
 %Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
 
 Components created into the Scene itself have a special role: to implement scene-wide functionality. They should be created before all other components, and include the following:
 
-- Octree: implements visibility queries. Without this 3D objects can not be rendered.
+- Octree: implements spatial partitioning and accelerated visibility queries. Without this 3D objects can not be rendered.
 - PhysicsWorld: implements physics simulation. Physics components such as RigidBody or CollisionShape can not function properly without this.
 - DebugRenderer: implements debug geometry rendering.
 
@@ -156,22 +156,22 @@ It is also legal to create a Node that does not belong to a scene. This particul
 
 For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
 
+
 \page Resources Resources
 
 Resources include most things in Urho3D that are loaded from mass storage during initialization or runtime:
 
-- Image
-- XMLFile
-- Model
 - Animation
+- Image
+- Model
 - Material
 - ScriptFile
-- Technique
+- Sound
 - Texture2D
 - TextureCube
-- Sound
+- XMLFile
 
-They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes Objects, resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
+They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
 The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, Urho3D.exe registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist, plus the system font directory.
 
@@ -316,8 +316,7 @@ In unmodified AngelScript, this would have to be written as:
 
 
 \page Rendering Rendering
-                    
-                    
+
 Much of the rendering functionality in Urho3D is built on two subsystems, Graphics and Renderer, contained within the %Graphics library.
 
 \section Rendering_Graphics Graphics
@@ -333,7 +332,7 @@ Graphics implements the low-level functionality:
 
 It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
 
-Screen resolution, fullscreen/windowed, vertical sync, deferred/forward mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
+Screen resolution, fullscreen/windowed, vertical sync, forward/light pre-pass/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
 
 When setting the initial screen mode, Graphics does a few checks:
 
@@ -359,16 +358,18 @@ For opaque, non-skinned geometry, batches using the same material and same verte
 
 The rendering operations are divided into passes in the following order:
 
-- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (light prepass & deferred.)
+- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (light pre-pass & deferred.)
 - Lighting opaque geometry. For shadow casting lights, the shadow map is rendered first.
 - Post-opaque or "extra" rendering pass for materials that define that.
 - Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
 
+For details on how lighting opaque geometry differs between forward and deferred rendering, see \ref ForwardDeferred "Comparision of forward, light pre-pass and deferred rendering".
+
 \section Rendering_Drawable Rendering components
 
-The rendering-related components defined by the %Renderer library are:
+The rendering-related components defined by the %Graphics library are:
 
-- Octree: spatial partitioning of Drawables for accelerated visibility queries. Must be created to the Scene (root node) or nothing will be rendered.
+- Octree: spatial partitioning of Drawables for accelerated visibility queries. Needs to be created to the Scene (root node.)
 - Camera: describes a viewpoint for rendering, including projection parameters (FOV, near/far distance, perspective/orthographic)
 - Drawable: Base class for anything visible.
 - StaticModel: non-skinned geometry. Can LOD transition according to distance.
@@ -428,8 +429,8 @@ A technique definition looks like this:
 
 The passes are:
 
-- deferred: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, and depth.
-- prepass: light pre-pass rendering G-buffer pass for opaque geometry. Writes normals and depth only.
+- deferred: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, specular power and depth.
+- prepass: light pre-pass rendering G-buffer pass for opaque geometry. Writes normals, specular power and depth only.
 - material: light pre-pass rendering material pass. Renders the opaque object using the light accumulation result.
 - base: forward rendering base pass. Renders the ambient light.
 - litbase: forward rendering base pass. Renders the ambient light and the first light affecting the object for optimization.
@@ -505,28 +506,634 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 - Set the camera's viewmask to for example VIEW_REFLECTION, then clear that viewmask bit from objects you don't need rendered.
 - Use the camera's \ref Camera::SetViewOverrideFlags "SetViewOverrideFlags()" function to disable shadows, to disable occlusion, or force the lowest material quality.
 
+
+\page ForwardDeferred Comparision of forward, light pre-pass and deferred rendering
+
+The rendering mode configured to the Graphics subsystem determines whether forward, light pre-pass, or deferred rendering is used for opaque objects. Transparent objects are always rendered using forward rendering.
+
+\section ForwardDeferred_Forward Forward rendering
+
+For each light that influences the object in question, the object is redrawn with additive blending. Multiple lights per pass are not used to not explode the shader permutation count, and to not go over SM2.0 instruction limits. Scissor optimization is used to reduce pixel count in case of small lights / large geometries.
+
+\section ForwardDeferred_Prepass Light pre-pass rendering
+
+%Light pre-pass creates the following lightweight G-buffer, using 2 render targets:
+
+- World-space normal and specular power (D3DFMT_A8R8G8B8)
+- Linear depth (D3DFMT_R32F)
+
+The normals, specular power and depth of opaque objects are rendered first to the G-buffer. After this, a D3DFMT_A8R8G8B8 light accumulation buffer is cleared to black, and light volumes are rendered to it with additive blending, using stencil masking to optimize the light volume depth range if possible. The diffuse light color is rendered to the RGB channels, and monochromatic specular intensity is rendered to the A channel. Only half the intensity of lights is used to allow up to 2x "overburn" for the total accumulated lighting.
+
+When the light accumulation buffer is ready, opaque objects are rendered for the second time (the "material" pass), using the light accumulation buffer to calculate diffuse and specular lighting. Ambient color is also added at this point. The color of specular lighting is resolved by modulating the monochromatic specular intensity with the diffuse light color. This will not result in correct specular lighting when multiple lights combine, but is a reasonable approximation in most cases. Emissive and environment mapping effects can be added during the material pass.
+
+\section ForwardDeferred_Deferred Deferred rendering
+
+Deferred rendering creates the following G-buffer, using 3 render targets:
+
+- Diffuse albedo and specular intensity (D3DFMT_A8R8G8B8)
+- World-space normal and specular power (D3DFMT_A8R8G8B8)
+- Linear depth (D3DFMT_R32F)
+
+Opaque objects are rendered to the G-buffer first, then an initial full-screen quad is drawn to initialize the backbuffer, using the G-buffer information to blend between ambient lighting and fog color. After this, light volumes are rendered with additive blending, using stencil masking to optimize the light volume depth range if possible.
+
+After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional "emissive" pass for objects that need them.
+
+\section ForwardDeferred_TemporalAA Temporal antialiasing
+
+When multisampling is enabled, both light pre-pass and deferred rendering use subpixel projection jittering to render temporal antialiasing that should look similar to 2x MSAA. Reprojection based on the previous frame's camera view transform is used to eliminate "ghosting" effects when the camera rotates, and additional ghosting prevention is done by analyzing the depth of each pixel compared to the previous frame. Depending on the GPU speed, this form of antialiasing has a low-to-moderate performance impact.
+
+\section ForwardDeferred_Conclusion Conclusion
+
+Deferred rendering will win particularly in vertex-heavy scenes, as the actual geometries need to be rendered only once. However, in simple scenes the cost of filling the G-buffer may be substantial and outweight the benefit. Light pre-pass does not consume as much texture sampling bandwidth when accumulating the lighting, so it may have a performance advantage over deferred when the lighting environment is complex. In the simplest scenes, forward rendering can still be assumed to be fastest.
+
+Note that it is not possible to specify the material's specular color in deferred rendering, only the specular intensity. The default forward rendering shaders have also been written in the same way to match the output of deferred rendering, but more material variety could in fact be achieved with forward-shaded materials, or with the material pass of light pre-pass rendering.
+
+
 \page Input %Input
+
+The Input subsystem provides keyboard and mouse input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created.
+
+Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary. The cursor can be in either confined or non-confined mode. In confined mode (default) it is always forcibly centered to the window, so that mouse delta motion can be read "infinitely" in each direction. Non-confined mode is set by calling \ref Input::SetClipCursor "SetClipCursor(false)". In this case the cursor may freely travel out of the application window, which also means that infinite mouse delta motion can no longer be relied upon.
+
+The input events include:
+
+- E_MOUSEBUTTONUP: a mouse button has been released.
+- E_MOUSEBUTTONDOWN: a mouse button has been pressed.
+- E_MOUSEMOVE: the mouse has been moved. Both movement and cursor position will be sent, but the position is only useful in non-confined mode.
+- E_MOUSEWHEEL: the mouse wheel has been moved.
+- E_KEYUP: a key has been released.
+- E_KEYDOWN: a key has been pressed.
+- E_CHAR: translation of a keypress to Latin-1 charset for text entry. This is currently the only way to get translated key input.
+
+The input polling API differentiates between the initiation of a key/mouse button press, and holding the key or button down. \ref Input::GetKeyPress "GetKeyPress()" and \ref Input::GetMouseButtonPress "GetMouseButtonPress()" return true only for one frame (the initiation) while \ref Input::GetKeyDown "GetKeyDown()" and \ref Input::GetMouseButtonDown "GetMouseButtonDown()" return true as long as the key or button is held down.
+
+From the input subsystem you can also query whether the application is active/inactive, or minimized.
+
+In script, the polling API is accessed via properties: input.keyDown[], input.keyPress[], input.mouseButtonDown[], input.mouseButtonPress[], input.mouseMove.
 
 
 \page Audio %Audio
 
+The Audio subsystem implements an audio output stream using DirectSound. DirectSound requires a window handle, so sound can not be played back before the application window has been opened. Once playing, the following operations are supported:
+
+- Playing raw audio, Ogg Vorbis or WAV Sound resources using the SoundSource component. This allows manual stereo panning of mono sounds; stereo sounds will be output with their original stereo mix.
+- Playing the above sound formats in pseudo-3D using the SoundSource3D component. It has stereo positioning and distance attenuation, but does not (at least yet) filter the sound depending on the direction.
+
+For pseudo-3D positional sounds, the listener position and rotation have to be updated by calling \ref Audio::SetListenerPosition() "SetListenerPosition()" and \ref Audio::SetListenerRotation() "SetListenerRotation()".
+
+The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
+
+For purposes of volume control, each SoundSource is classified into one of three categories:
+
+- %Sound effects
+- Music
+- Voice
+
+A master gain category also exists that affects the final output level. To control the category volumes, use \ref Audio::SetMasterGain "SetMasterGain()".
+
+The SoundSource components support automatic removal from the node they belong to, once playback is finished. To use, call \ref SoundSource::SetAutoRemove "SetAutoRemove()" on them. This may be useful when a game object plays several "fire and forget" sound effects.
+
+\section Audio_Parameters Sound parameters
+
+A standard WAV file can not tell whether it should loop, and raw audio does not contain any header information. Parameters for the Sound resource can optionally be specified through an XML file that has the same name as the sound, but .xml extension. Possible elements and attributes are described below:
+
+\code
+<sound>
+    <format frequency="x" sixteenbit="true|false" stereo="true|false" />
+    <loop enable="true|false" start="x" end="x" />
+</sound>
+\endcode
+
+The frequency is in Hz, and loop start and end are bytes from the start of audio data. If a loop is enabled without specifying the start and end, it is assumed to be the whole sound. Ogg Vorbis compressed sounds do not support specifying the loop range, only whether whole sound looping is enabled or disabled.
+
+The Audio subsystem is always instantiated, but in headless mode it is not active. In headless mode the playback of sounds is simulated, taking the sound length and frequency into account. This allows basing logic on whether a specific sound is still playing or not, even in server code.
+
 
 \page Physics Physics
+
+The %Physics library in Urho3D implements rigid body physics simulation using Open Dynamics %Engine.
+
+To use, a PhysicsWorld component must first be created to the Scene.
+
+The physics simulation has its own, fixed update rate. By default it is 60Hz. For higher rendering frame rates, physics motion is interpolated so that it always appears smooth. The update rate can be changed with \ref PhysicsWorld::SetFps "SetFps()" function. The physics update rate also determines the frequency of fixed timestep scene logic updates.
+
+The other physics components are:
+
+- CollisionShape: defines physics collision geometry. The supported shapes are sphere, box, cylinder, capsule, triangle mesh, convex hull and heightfield.
+- RigidBody: this component is necessary to create moving physics objects. Its parameters include mass and linear/angular velocities.
+- Joint: connects two RigidBodies together, or one RigidBody to a static point in the world. Currently ball and hinge joints are supported.
+
+Triangle meshes, convex hulls and heightfields are created by specifying a Model resource.
+
+Several collision shapes may exist in the same scene node to create compound shapes. An offset position and rotation relative to the node's transform can be specified for each. The shape (instead of RigidBody) also contains collision behaviour parameters: which other objects to collide with (see \ref CollisionShape::SetCollisionGroup "SetCollisionGroup()" and \ref CollisionShape::SetCollisionMask "SetCollisionMask()"), the friction coefficient, and the bounce coefficient.
+
+Note that static physics objects such as unmoving level geometry should not have RigidBody components at all.
+
+The physics simulation does all calculations in world space. Therefore nodes containing a RigidBody component should only be parented to the Scene (root node) to operate correctly. Hierarchically parented rigid bodies might be supported in the future.
+
+The physics world sends 3 types of events during its update step:
+
+- E_PHYSICSPRESTEP before the simulation is stepped.
+- E_PHYSICSCOLLISION (and E_NODECOLLISION to the participating scene nodes) for each collision during the simulation step.
+- E_PHYSICSPOSTSTEP after the simulation has been stepped.
+
+Note that if the rendering framerate is high, the physics might not be stepped at all on each frame: in that case those events will not be sent.
 
 
 \page UI User interface
 
+Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided by default are:
+
+- BorderImage: a texture image with an optional border
+- Button: a pushbutton
+- CheckBox: a button that can be toggled on/off
+- Cursor: a mouse cursor
+- DropDownList: shows a vertical list of items (optionally scrollable) as a popup
+- LineEdit: a single-line text editor
+- ListView: shows a scrollable vertical list of items
+- Menu: a button which can show a popup element
+- ScrollBar: a slider with back and forward buttons
+- ScrollView: a scrollable view of child elements
+- Slider: a horizontal or vertical slider bar
+- Text: static text that can be multiline
+- UIElement: container for other elements, renders nothing by itself
+- Window: a movable and resizable window
+
+From the UI subsystem you can query the root element, which is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
+
+Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions.
+
+\section UI_Defining Defining UI elements in XML
+
+Each UI element knows to load its properties from an XML file. There are two distinct use cases for this: either defining just the UI element style and leaving the actual position and dimensions to be filled in later, or fully defining a set of UI elements. For an example of defining element styles, see the file Data/UI/DefaultStyle.xml.
+
+The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
+
+The XML data for each UI element follows. Everything is optional and defaults will be used if missing. Note the redundant ways in which to define element size. Also note the element class hierarchy; for example a Button derives from BorderImage, and all elements derive from UIElement. See the comments in the elements' header files for descriptions of each property.
+
+\subsection UI_UIElement UIElement
+
+\code
+<element name="ElementName" type="Element" >
+    <position value="x y" />
+    <size value="x y" />
+    <width value="x" />
+    <height value="y" />
+    <minsize value="x y" />
+    <minwidth value="x" />
+    <minheight value="y" />
+    <maxsize value="x y" />
+    <maxwidth value="x" />
+    <maxheight value="y" />
+    <fixedsize value="x y" />
+    <fixedwidth value="x" />
+    <fixedheight value="y" />
+    <alignment horizontal="left|center|right" vertical="top|center|bottom" />
+    <clipborder value="l t r b" />
+    <priority value="p" />
+    <opacity value="o" />
+    <color value="r g b a" | topleft="r g b a" topright="r g b a" bottomleft="r g b a" bottomright="r g b a" />
+    <bringtofront enable="true|false" />
+    <bringtoback enable="true|false" />
+    <clipchildren enable="true|false" />
+    <enabled enable="true|false" />
+    <selected enable="true|false" />
+    <visible enable="true|false" />
+    <focusmode value="notfocusable|resetfocus|focusable|focusabledefocusable" />
+    <layout mode="free|horizontal|vertical" spacing="s" border="l t r b" />
+    <vars>
+        <variant name="n" type="t" value="v" />
+        ...
+    </vars>
+</element>
+\endcode
+
+\subsection UI_BorderImage BorderImage
+
+\code
+<element type="BorderImage">
+    <texture name="TextureName" />
+    <imagerect value="l t r b" />
+    <border value="l t r b" />
+    <hoveroffset value="x y" />
+</element>
+\endcode
+
+\subsection UI_Button Button
+
+\code
+<element type="Button">
+    <pressedoffset value="x y" />
+    <labeloffset value="x y" />
+    <repeat delay="d" rate="r" />
+</element>
+\endcode
+
+\subsection UI_Checkbox Checkbox
+
+\code
+<element type="Checkbox">
+    <checkedoffset value="x y" />
+</element>
+\endcode
+
+\subsection UI_Cursor Cursor
+
+\code
+<element type="Cursor">
+    <shape name="normal|resizevertical|resizediagonal_topright|resizehorizontal|resizediagonal_topleft|acceptdrop|rejectdrop"
+        texture="TextureName" imagerect="l t r b" hotspot="x y" />
+    ...
+</element>
+\endcode
+
+\subsection UI_Menu Menu
+
+If a popup element is specified, it will be searched for by name from the UI element hierarchy.
+
+\code
+<element type="Menu">
+    <popup name="ElementName" />
+    <popupoffset value="x y" />
+</element>
+\endcode
+
+\subsection UI_Text Text
+
+\code
+<element type="Text">
+    <font name="FontName" size="s" />
+    <text value="..." />
+    <textalignment value="left|center|right" />
+    <rowspacing value="s" />
+    <selection start="s" length="l" />
+    <selectioncolor value="r g b a" />
+    <hovercolor value="r g b a" />
+</element>
+\endcode
+
+\subsection UI_Window Window
+
+\code
+<element type="Window">
+    <resizeborder value="l t r b" />
+    <movable enable="true|false" />
+    <resizable enable="true|false" />
+</element>
+\endcode
+
+\subsection UI_DropDownList DropDownList
+
+The styles of the listview, popup and placeholder sub-elements can be specified within the respective XML elements. The listview can be pre-filled by specifying popup items; they will be searched for by name from the UI element hierarchy.
+
+\code
+<element type="DropDownList">
+    <selection value="s" />
+    <resizepopup enable="true|false" />
+    <listview />
+    <popup />
+    <placeholder />
+    <popupitem name="ElementName" />
+    ...
+</element>
+\endcode
+
+\subsection UI_LineEdit LineEdit
+
+The style of the cursor sub-element can specified with the "cursor" XML element.
+\code
+<element type="LineEdit">
+    <maxlength value="l" />
+    <cursormovable enable="true|false" />
+    <textselectable enable="true|false" />
+    <textcopyable enable="true|false" />
+    <text value="..." />
+    <cursorposition value="p" />
+    <cursorblinkrate value="r" />
+    <echocharacter value="c" />
+    <cursor />
+</element>
+\endcode
+
+\subsection UI_Slider Slider
+
+The style of the knob sub-element can specified with the "knob" XML element.
+
+\code
+<element type="Slider">
+    <orientation value="horizontal|vertical" />
+    <range max="m" value="v" />
+    <knob />
+</element>
+\endcode
+
+\subsection UI_ScrollBar ScrollBar
+
+The styles of the back button, forward button and the slider can be specified with the respective XML elements. Note the buttons' nonstandard imagerect element, which specifies the image to use for both a horizontal and a vertical button.
+
+\code
+<element type="ScrollBar">
+    <orientation value="horizontal|vertical" />
+    <range max="m" value="v" />
+    <scrollstep value="s" />
+    <stepfactor value="f" />
+    <backbutton>
+        <imagerect horizontal="l t r b" vertical="l t r b" />
+    </backbutton>
+    <forwardbutton>
+        <imagerect horizontal="l t r b" vertical="l t r b" />
+    </forwardbutton>
+    <slider />
+</element>
+\endcode
+
+\subsection UI_ScrollView ScrollView
+
+The styles of the horizontal and vertical scrollbars can be specified with the respective XML elements. If a content element is specified, it will be searched for by name from the UI element hierarchy.
+
+\code
+<element type="ScrollView">
+    <viewposition value="x y" />
+    <scrollstep value="s" />
+    <pagestep value="p" />
+    <horizontalscrollbar />
+    <verticalscrollbar />
+    <contentelement name="ElementName" />
+</element>
+\endcode
+
+\subsection UI_ListView ListView
+
+\code
+<element type="ListView">
+    <selection value="s" />
+    <highlight value="never|focus|always" />
+    <multiselect enable="true|false" />
+    <hierarchy enable="true|false" />
+    <clearselection enable="true|false" />
+    <doubleclickinterval value="i" />
+</element>
+\endcode
+
+\section UI_Layouts UI element layout
+
+By default %UI elements operate in a "free" layout mode, where child elements' positions can be specified relative to any of the parent element corners, but they are not automatically positioned or resized.
+
+To create automatically adjusting layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
+
+Left, top, right & bottom border widths and spacing between elements can also be specified for the layout. A grid layout is not directly supported, but it can be manually created with a horizontal layout inside a vertical layout, or vice versa.
+
 
 \page Serialization Serialization
+
+Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining attributes. Attributes are stored to the Context per class. Scene load/save is implemented by Node and Component both deriving from Serializable.
+
+The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
+
+To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()". For example, the components implement serialization of their Resource pointers into ResourceRef or ResourceRefList this way.
+
+The attribute system also supports editing by providing human-readable names.
 
 
 \page Network Networking
 
+The Network library provides reliable and unreliable UDP messaging using ENet. A server can be created that listens for incoming connections, and client connections can be made to server(s).
+
+Packets are sent using a fixed number of channels (4 by default); packet order is guaranteed within each channel. If received out-of-order, reliable packets will be stalled until all in a sequence have been received, while older unreliable packets will simply be dropped if a newer packet has already been received. There is also an option to send unsequenced unreliable packets.
+
+Note that by default the Network library itself does not care of what is being sent (low-level networking.) The high-level networking protocol for multiplayer currently needs reimplementation.
+
+Outgoing packets are queued by calling \ref Peer::Send "Send()" on the networking peer. Packets can be received from networking peers by calling \ref Peer::Receive "Receive()". Events will be sent to notify of peer connections and disconnections, see NetworkEvents.h for the event definitions:
+
+  * E_PEERCONNECTED
+  * E_PEERDISCONNECTED
+
+All network packets are compressed using ENet's built-in compression.
+
 
 \page Tools Tools
 
+\section Tools_AssetImporter AssetImporter
+
+Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at 
+http://assimp.sourceforge.net/main_features_formats.html.
+
+Usage:
+
+\verbatim
+AssetImporter <command> <input file> <output file> [options]
+
+Commands:
+model     Export a model and animations
+scene     Export a scene and its models
+dumpnodes Dump scene node structure. No output file is generated
+lod       Combine several Urho3D models as LOD levels of the output model
+          Syntax: lod <dist0> <mdl0> <dist1> <mdl1> ... <output file>
+
+Options:
+-b        Save scene in binary format, default format is XML
+-i        Use local IDs for scene nodes
+-na       Do not export animations
+-ne       Do not create Octree & PhysicsWorld extensions to the scene
+-nm       Do not export materials
+-pX       Use base path X for resources in the scene file
+-rX       Use scene node X as root node
+-t        Generate tangents to model(s)
+\endverbatim
+
+\section Tools_NormalMapTool NormalMapTool
+
+NormalMapTool converts normal map images into DXT5 format, with an encoding that preserves quality better than simply compressing the original, unmodified image. The encoding is:
+
+- X axis (red in the original normal map) goes into the alpha channel
+- Y axis (green in the original normal map) goes into the color channels
+- Z axis will be reconstructed in the pixel shader
+
+Usage:
+
+\verbatim
+NormalMapTool <input image file>
+\endverbatim
+
+The texconv tool from the DirectX SDK needs to be available through the system PATH.
+
+\section Tools_OgreImporter OgreImporter
+
+Tool that loads OGRE .mesh.xml and .skeleton.xml files and saves them as Urho3D .mdl (model) and .ani (animation) files. For other 3D formats and whole scene importing, see AssetImporter instead. However that tool does not handle the OGRE formats as completely as this.
+
+Usage:
+
+\verbatim
+OgreImporter <input file> <output file> [options]
+
+Options:
+-a   Export animations
+-m   Export morphs
+-r   Export only rotations from animations
+-s   Split each submesh into own vertex buffer
+-t   Generate tangents
+\endverbatim
+
+Note: exporting only bone rotations may help when using an animation in a different model, but if bone position changes have been used for effect, the animation may become less lively. Unpredictable mutilations might result from using an animation in a model not originally intended for, as Urho3D does not specifically attempt to retarget animations.
+
+\section Tools_PackageTool PackageTool
+
+PackageTool examines a directory recursively for files and subdirectories, and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem.
+
+Usage:
+
+\verbatim
+PackageTool <directory to process> <package name> [basepath]
+\endverbatim
+
+When PackageTool runs, it will go inside the source directory, then look for subdirectories and any files. Paths inside the package will by default be relative to the source directory, but if an extra path prefix is desired, it can be specified by the optional basepath argument.
+
+For example, this would convert all the resource files inside the Urho3D Data directory into a package called Data.pak (execute the command from the Bin directory)
+
+\verbatim
+PackageTool Data Data.pak
+\endverbatim
+
+\section Tools_RampGenerator RampGenerator
+
+RampGenerator creates 1D and 2D ramp textures for use in light attenuation and spotlight spot shapes.
+
+Usage:
+
+\verbatim
+RampGenerator <output file> <width> <power> [dimensions]
+\endverbatim
+
+The output is saved in PNG format. The power parameter is fed into the pow() function to determine ramp shape; higher value gives more brightness and more abrupt fade at the edge.
+
+The texconv tool from the DirectX SDK needs to be available through the system PATH.
+
+\section Tools_ShaderCompiler ShaderCompiler
+
+This tool generates HLSL shader permutations using an XML definition file that describes the permutations, and their associated HLSL preprocessor defines.
+
+The output consists of shader bytecode for each permutation, generated using fxc from the DirectX SDK, as well as an output XML file that describes the constant parameters and texture units (for pixel shaders only) used by each.
+
+Usage:
+
+\verbatim
+ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2] ..
+
+HLSL files will be loaded from definition file directory, and binary code will
+be output to same directory as the output file.
+\endverbatim
+
+It is possible to give additional defines from the command line. These will then be present in each permutation. SM3 is a special define which enables compilation of VS3.0 and PS3.0 code, otherwise VS2.0 and PS2.0 code is generated.
+
+fxc needs to be available through the system PATH.
+
 
 \page FileFormats Custom file formats
+
+Urho3D tries to use existing file formats whenever possible, and define custom file formats only when absolutely necessary. Currently used custom file formats are:
+
+\section FileFormats_Model Binary model format (.mdl)
+
+\verbatim
+Model geometry and vertex morph data
+
+byte[4]    Identifier "UMDL"
+uint       Number of vertex buffers
+
+  For each vertex buffer:
+  uint       Vertex count
+  uint       Vertex element mask (determines vertex size)
+  uint       Morphable vertex range start index
+  uint       Morphable vertex count
+  byte[]     Vertex data (vertex count * vertex size)
+
+uint    Number of index buffers
+
+  For each index buffer:
+  uint       Index count
+  uint       Index size (2 for 16-bit indices, 4 for 32-bit indices)
+  byte[]     Index data (index count * index size)  
+
+uint    Number of geometries
+
+  For each geometry:
+  uint       Number of bone mapping entries 
+  uint[]     Bone mapping data, Maps geometry bone indices to global bone indices for HW skinning.
+             May be empty, in this case identity mapping will be used.
+  uint       Number of LOD levels
+
+    For each LOD level:
+    float      LOD distance
+    uint       Primitive type (0 = triangle list, 1 = line list)
+    uint       Vertex buffer index, starting from 0
+    uint       Index buffer index, starting from 0
+    uint       Draw range: index start
+    uint       Draw range: index count
+
+uint    Number of vertex morphs (may be 0)
+
+  For each vertex morph:
+  cstring    Name of morph
+  uint       Number of affected vertex buffers
+ 
+    For each affected vertex buffer:
+    uint       Vertex buffer index, starting from 0
+    uint       Vertex element mask for morph data. Only positions, normals & tangents are supported.
+    uint       Vertex count
+
+      For each vertex:
+      uint       Vertex index
+      Vector3    Position (if included in the mask)
+      Vector3    Normal (if included in the mask)
+      Vector3    Tangent (if included in the mask) 
+
+Skeleton data
+
+uint       Number of bones (may be 0)
+
+  For each bone:
+  cstring    Bone name
+  uint       Parent bone index starting from 0. Same as own bone index for the root bone
+  Vector3    Initial position
+  Quaternion Initial rotation
+  Vector3    Initial scale
+  float[12]  4x3 offset matrix for skinning
+  byte       Bone collision info bitmask. 1 = bounding sphere 2 = bounding box
+  
+  If bounding sphere data included:
+  float      Bone radius
+
+  If bounding box data included:
+  Vector3    Bone bounding box minimum
+  Vector3    Bone bounding box maximum
+
+Bounding box data
+
+Vector3    Model bounding box minimum
+Vector3    Model bounding box maximum
+\endverbatim
+
+\section FileFormats_Animation Binary animation format (.ani)
+
+\verbatim
+byte[4]    Identifier "UANI"
+cstring    Animation name
+float      Length in seconds
+uint       Number of tracks
+
+  For each track:
+  cstring    Track name (practically same as the bone name that should be driven)
+  byte       Mask of included animation data. 1 = bone positions 2 = bone rotations 4 = bone scaling
+  uint       Number of keyframes
+
+    For each keyframe:
+    float      Time position in seconds
+    Vector3    Position (if included in data)
+    Quaternion Rotation (if included in data)
+    Vector3    Scale (if included in data)
+\endverbatim
+
+Note: animations are stored using absolute bone transformations. Therefore only lerp-blending between animations is supported; additive pose modification is not.
 
 
 \page CodingConventions Coding conventions
