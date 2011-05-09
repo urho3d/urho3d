@@ -45,10 +45,7 @@ PixelShader::PixelShader(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     isSM3_(false)
 {
-    for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)
-        useParameter_[i] = false;
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+    ClearParameters();
 }
 
 PixelShader::~PixelShader()
@@ -71,8 +68,6 @@ bool PixelShader::Load(Deserializer& source)
         return false;
     
     unsigned dataSize = source.GetSize();
-    SetMemoryUse(dataSize);
-    
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
     source.Read((void*)buffer.GetPtr(), dataSize);
     
@@ -85,6 +80,7 @@ bool PixelShader::Load(Deserializer& source)
         return false;
     }
     
+    SetMemoryUse(dataSize);
     LoadParameters();
     return true;
 }
@@ -111,19 +107,18 @@ void PixelShader::Release()
         
         ((IDirect3DPixelShader9*)object_)->Release();
         object_ = 0;
+        
+        SetMemoryUse(0);
     }
 }
 
 void PixelShader::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if ((!cache) || (!graphics_))
-        return;
     
-    std::string shaderPath;
-    std::string shaderName;
-    std::string shaderExt;
+    ClearParameters();
     
+    std::string shaderPath, shaderName, shaderExt;
     SplitPath(GetName(), shaderPath, shaderName, shaderExt);
     
     isSM3_ = (shaderExt.find('3') != std::string::npos);
@@ -165,11 +160,6 @@ void PixelShader::LoadParameters()
         
         if ((name == shaderName) && (type == "ps"))
         {
-            for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)
-                useParameter_[i] = false;
-            for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-                useTextureUnit_[i] = false;
-            
             XMLElement shaderParamElem = shaderElem.GetChildElement("parameter");
             while (shaderParamElem)
             {
@@ -201,4 +191,12 @@ void PixelShader::LoadParameters()
     }
     
     LOGERROR("Shader " + shaderName + " not found in shader description XML file");
+}
+
+void PixelShader::ClearParameters()
+{
+    for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)
+        useParameter_[i] = false;
+    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+        useTextureUnit_[i] = false;
 }

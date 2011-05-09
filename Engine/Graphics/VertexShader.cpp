@@ -45,8 +45,7 @@ VertexShader::VertexShader(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     isSM3_(false)
 {
-    for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
-        useParameter_[i] = false;
+    ClearParameters();
 }
 
 VertexShader::~VertexShader()
@@ -69,7 +68,6 @@ bool VertexShader::Load(Deserializer& source)
         return false;
     
     unsigned dataSize = source.GetSize();
-    SetMemoryUse(dataSize);
     
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
     source.Read((void*)buffer.GetPtr(), dataSize);
@@ -83,6 +81,7 @@ bool VertexShader::Load(Deserializer& source)
         return false;
     }
     
+    SetMemoryUse(dataSize);
     LoadParameters();
     return true;
 }
@@ -109,19 +108,18 @@ void VertexShader::Release()
         
         ((IDirect3DVertexShader9*)object_)->Release();
         object_ = 0;
+        
+        SetMemoryUse(0);
     }
 }
 
 void VertexShader::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if ((!cache) || (!graphics_))
-        return;
     
-    std::string shaderPath;
-    std::string shaderName;
-    std::string shaderExt;
+    ClearParameters();
     
+    std::string shaderPath, shaderName, shaderExt;
     SplitPath(GetName(), shaderPath, shaderName, shaderExt);
     
     isSM3_ = (shaderExt.find('3') != std::string::npos);
@@ -163,9 +161,6 @@ void VertexShader::LoadParameters()
         
         if ((name == shaderName) && (type == "vs"))
         {
-            for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
-                useParameter_[i] = false;
-            
             XMLElement shaderParamElem = shaderElem.GetChildElement("parameter");
             while (shaderParamElem)
             {
@@ -184,4 +179,10 @@ void VertexShader::LoadParameters()
     }
     
     LOGERROR("Shader " + shaderName + " not found in shader description XML file");
+}
+
+void VertexShader::ClearParameters()
+{
+    for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
+        useParameter_[i] = false;
 }

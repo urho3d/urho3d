@@ -59,8 +59,8 @@ public:
 private:
     /// Load parameters from an XML file
     void LoadParameters();
-    /// Initialize parameter map with known values
-    static void InitializeParameters();
+    /// Clear parameter use flags
+    void ClearParameters();
     
     /// Parameter use flags
     bool useParameter_[MAX_VS_PARAMETERS];

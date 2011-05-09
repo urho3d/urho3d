@@ -141,6 +141,7 @@ unsigned Texture::GetCompressedD3DFormat(CompressedFormat format)
 void Texture::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
+    
     std::string texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     std::string xmlName = texPath + texName + ".xml";

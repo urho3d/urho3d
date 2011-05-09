@@ -164,9 +164,7 @@ bool TextureCube::Load(Deserializer& source)
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());
     
-    std::string texPath;
-    std::string texName;
-    std::string texExt;
+    std::string texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -181,9 +179,8 @@ bool TextureCube::Load(Deserializer& source)
     while ((faceElem) && (faces < MAX_CUBEMAP_FACES))
     {
         std::string name = faceElem.GetString("name");
-        std::string faceTexPath;
-        std::string faceTexName;
-        std::string faceTexExt;
+        
+        std::string faceTexPath, faceTexName, faceTexExt;
         SplitPath(name, faceTexPath, faceTexName, faceTexExt);
         // If path is empty, add the XML file path
         if (faceTexPath.empty())

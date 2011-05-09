@@ -60,6 +60,8 @@ public:
 private:
     /// Load parameters from an XML file
     void LoadParameters();
+    /// Clear parameter and texture unit use flags
+    void ClearParameters();
     
     /// Parameter use flags
     bool useParameter_[MAX_PS_PARAMETERS];
