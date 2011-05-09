@@ -3192,7 +3192,7 @@ void asCContext::ExecuteNext()
 
 	case asBC_LoadThisR:
 		{
-			// PshV4
+			// PshVPtr 0
 			asPTRWORD tmp = *(asPTRWORD*)l_fp;
 
 			// ADDSi
@@ -3287,10 +3287,36 @@ void asCContext::ExecuteNext()
 		l_bc += 2;
 		break;
 
+	case asBC_LoadRObjR:
+		{
+			// PshVPtr x
+			asPTRWORD tmp = *(asPTRWORD*)(l_fp - asBC_SWORDARG0(l_bc)); 
+
+			// ADDSi y
+			tmp = tmp + asBC_SWORDARG1(l_bc);
+
+			// PopRPtr
+			*(asPTRWORD*)&regs.valueRegister = tmp;
+			l_bc += 3;
+		}
+		break;
+
+	case asBC_LoadVObjR:
+		{
+			// PSF x
+			asPTRWORD tmp = (asPTRWORD)(size_t)(l_fp - asBC_SWORDARG0(l_bc)); 
+
+			// ADDSi y
+			tmp = tmp + asBC_SWORDARG1(l_bc);
+
+			// PopRPtr
+			*(asPTRWORD*)&regs.valueRegister = tmp;
+			l_bc += 3;
+		}
+		break;
+
 	// Don't let the optimizer optimize for size,
 	// since it requires extra conditions and jumps
-	case 184: l_bc = (asDWORD*)184; break;
-	case 185: l_bc = (asDWORD*)185; break;
 	case 186: l_bc = (asDWORD*)186; break;
 	case 187: l_bc = (asDWORD*)187; break;
 	case 188: l_bc = (asDWORD*)188; break;

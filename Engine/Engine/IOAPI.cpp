@@ -97,18 +97,18 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int LOG_NONE", (void*)&LOG_NONE);
     
     RegisterObject<Log>(engine, "Log");
-    engine->RegisterObjectMethod("Log", "void Write(const String& in)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Log", "void Debug(const String& in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Log", "void Info(const String& in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Log", "void Warning(const String& in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Log", "void Error(const String& in)", asFUNCTION(LogError), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Write(const String&in)", asFUNCTION(LogWrite), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Debug(const String&in)", asFUNCTION(LogDebug), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Info(const String&in)", asFUNCTION(LogInfo), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Warning(const String&in)", asFUNCTION(LogWarning), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Log", "void Error(const String&in)", asFUNCTION(LogError), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Log", "int get_level() const", asMETHOD(Log, GetLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "void set_level(int)", asMETHOD(Log, SetLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("Log", "const String& get_lastMessage()", asMETHOD(Log, GetLastMessage), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
     
     // Register also Print() functions for convenience
-    engine->RegisterGlobalFunction("void Print(const String& in)", asFUNCTIONPR(Print, (const std::string&), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(const String&in)", asFUNCTIONPR(Print, (const std::string&), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int)", asFUNCTIONPR(Print, (int), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float)", asFUNCTIONPR(Print, (float), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool)", asFUNCTIONPR(Print, (bool), void), asCALL_CDECL);
@@ -228,8 +228,8 @@ static void RegisterSerialization(asIScriptEngine* engine)
     
     RegisterObject<File>(engine, "File");
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String& in, FileMode)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
-    engine->RegisterObjectMethod("File", "bool Open(const String& in, FileMode)", asMETHODPR(File, Open, (const std::string&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode)", asMETHODPR(File, Open, (const std::string&, FileMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "uint get_checksum()", asMETHOD(File, GetChecksum), asCALL_THISCALL);
@@ -239,10 +239,10 @@ static void RegisterSerialization(asIScriptEngine* engine)
     
     engine->RegisterObjectType("VectorBuffer", sizeof(VectorBuffer), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer& in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer@+, uint)", asFUNCTION(ConstructVectorBufferFromStream), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VectorBuffer", "VectorBuffer &opAssign(const VectorBuffer& in)", asMETHOD(VectorBuffer, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VectorBuffer", "VectorBuffer &opAssign(const VectorBuffer&in)", asMETHOD(VectorBuffer, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void SetData(Deserializer@+, uint)", asFUNCTION(VectorBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VectorBuffer", "void Clear()", asMETHOD(VectorBuffer, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void Resize(uint)", asMETHOD(VectorBuffer, Resize), asCALL_THISCALL);
@@ -252,38 +252,38 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterDeserializer<VectorBuffer>(engine, "VectorBuffer");
     
     // Register VectorBuffer conversions to Variant
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer& in)", asFUNCTION(ConstructVariantBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asFUNCTION(VariantGetBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer& in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
 }
 
 void RegisterFileSystem(asIScriptEngine* engine)
 {
     RegisterObject<FileSystem>(engine, "FileSystem");
-    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String& in)", asMETHOD(FileSystem, FileExists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String& in)", asMETHOD(FileSystem, DirExists), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const String& in, const String& in, uint, bool)", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String& in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String& in)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String& in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String& in, const String& in)", asMETHOD(FileSystem, SystemOpen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Copy(const String& in, const String& in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Rename(const String& in, const String& in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "bool Delete(const String& in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool FileExists(const String&in)", asMETHOD(FileSystem, FileExists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool DirExists(const String&in)", asMETHOD(FileSystem, DirExists), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "Array<String>@ ScanDir(const String&in, const String&in, uint, bool)", asFUNCTION(FileSystemScanDir), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "bool CreateDir(const String&in)", asMETHOD(FileSystem, CreateDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "int SystemCommand(const String&in)", asMETHOD(FileSystem, SystemCommand), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "int SystemRun(const String&in, Array<String>@+)", asFUNCTION(FileSystemSystemRun), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("FileSystem", "bool SystemOpen(const String&in, const String&in)", asMETHOD(FileSystem, SystemOpen), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Copy(const String&in, const String&in)", asMETHOD(FileSystem, Copy), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Rename(const String&in, const String&in)", asMETHOD(FileSystem, Rename), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "bool Delete(const String&in)", asMETHOD(FileSystem, Delete), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_currentDir()", asMETHOD(FileSystem, GetCurrentDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String& in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_programDir()", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir()", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_systemFontDir()", asMETHOD(FileSystem, GetSystemFontDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
     
-    engine->RegisterGlobalFunction("String GetPath(const String& in)", asFUNCTION(GetPath), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String GetFileName(const String& in)", asFUNCTION(GetFileName), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String GetExtension(const String& in)", asFUNCTION(GetExtension), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String GetFileNameAndExtension(const String& in)", asFUNCTION(GetFileNameAndExtension), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String AddTrailingSlash(const String& in)", asFUNCTION(AddTrailingSlash), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String RemoveTrailingSlash(const String& in)", asFUNCTION(RemoveTrailingSlash), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String GetParentPath(const String& in)", asFUNCTION(GetParentPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetFileName(const String&in)", asFUNCTION(GetFileName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetExtension(const String&in)", asFUNCTION(GetExtension), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetFileNameAndExtension(const String&in)", asFUNCTION(GetFileNameAndExtension), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String AddTrailingSlash(const String&in)", asFUNCTION(AddTrailingSlash), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String RemoveTrailingSlash(const String&in)", asFUNCTION(RemoveTrailingSlash), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetParentPath(const String&in)", asFUNCTION(GetParentPath), asCALL_CDECL);
 }
 
 static PackageFile* ConstructPackageFile()
@@ -300,9 +300,9 @@ static void RegisterPackageFile(asIScriptEngine* engine)
 {
     RegisterObject<PackageFile>(engine, "PackageFile");
     engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f()", asFUNCTION(ConstructPackageFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String& in)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
-    engine->RegisterObjectMethod("PackageFile", "bool Open(const String& in) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
-    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String& in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("PackageFile", asBEHAVE_FACTORY, "PackageFile@+ f(const String&in)", asFUNCTION(ConstructAndOpenPackageFile), asCALL_CDECL);
+    engine->RegisterObjectMethod("PackageFile", "bool Open(const String&in) const", asMETHOD(PackageFile, Open), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "bool Exists(const String&in) const", asMETHOD(PackageFile, Exists), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);

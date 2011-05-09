@@ -48,11 +48,11 @@ void FakeReleaseRef(void* ptr);
 static void RegisterCamera(asIScriptEngine* engine)
 {
     RegisterComponent<Camera>(engine, "Camera");
-    engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2& in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "void SetOrthoSize(const Vector2&in)", asMETHODPR(Camera, SetOrthoSize, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Frustum GetSplitFrustum(float, float)", asMETHOD(Camera, GetSplitFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "Ray GetScreenRay(float, float)", asMETHOD(Camera, GetScreenRay), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3& in)", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3& in)", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "float GetDistance(const Vector3&in)", asMETHOD(Camera, GetDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "float GetDistanceSquared(const Vector3&in)", asMETHOD(Camera, GetDistanceSquared), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_nearClip(float)", asMETHOD(Camera, SetNearClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_nearClip() const", asMETHOD(Camera, GetNearClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_farClip(float)", asMETHOD(Camera, SetFarClip), asCALL_THISCALL);
@@ -104,7 +104,7 @@ static void RegisterSkeleton(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Skeleton", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Skeleton", "void Reset()", asMETHOD(Skeleton, Reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Skeleton", "Bone@+ GetBone(const String& in) const", asMETHODPR(Skeleton, GetBone, (const std::string&), Bone*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Skeleton", "Bone@+ GetBone(const String&in) const", asMETHODPR(Skeleton, GetBone, (const std::string&), Bone*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ get_rootBone() const", asMETHOD(Skeleton, GetRootBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "uint get_numBones() const", asMETHOD(Skeleton, GetNumBones), asCALL_THISCALL);
     engine->RegisterObjectMethod("Skeleton", "Bone@+ get_bones(uint)", asMETHODPR(Skeleton, GetBone, (unsigned), Bone*), asCALL_THISCALL);
@@ -203,11 +203,11 @@ static void RegisterTextures(asIScriptEngine* engine)
     
     engine->RegisterObjectType("Viewport", sizeof(Viewport), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructViewport), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport& in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(const Viewport&in)", asFUNCTION(ConstructViewportCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect& in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructViewport), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "Viewport &opAssign(const Viewport& in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "Viewport &opAssign(const Viewport&in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asFUNCTION(ViewportSetScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asFUNCTION(ViewportSetCamera), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asFUNCTION(ViewportGetScene), asCALL_CDECL_OBJLAST);
@@ -221,7 +221,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "int get_width() const", asMETHOD(RenderSurface, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "int get_height() const", asMETHOD(RenderSurface, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "TextureUsage get_usage() const", asMETHOD(RenderSurface, GetUsage), asCALL_THISCALL);
-    engine->RegisterObjectMethod("RenderSurface", "void set_viewport(const Viewport& in)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RenderSurface", "void set_viewport(const Viewport&in)", asMETHOD(RenderSurface, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "const Viewport& get_viewport() const", asMETHOD(RenderSurface, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "void set_linkedRenderTarget(RenderSurface@+)", asMETHOD(RenderSurface, SetLinkedRenderTarget), asCALL_THISCALL);
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedRenderTarget() const", asMETHOD(RenderSurface, GetLinkedRenderTarget), asCALL_THISCALL);
@@ -334,9 +334,9 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "CompareMode get_depthTestMode() const", asMETHOD(Pass, GetDepthTestMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_depthWrite(bool)", asMETHOD(Pass, SetDepthWrite), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_depthWrite() const", asMETHOD(Pass, GetDepthWrite), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "void set_vertexShader(const String& in)", asMETHOD(Pass, SetVertexShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pass", "void set_vertexShader(const String&in)", asMETHOD(Pass, SetVertexShader), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "const String& get_vertexShader() const", asMETHOD(Pass, GetVertexShaderName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "void set_pixelShader(const String& in)", asMETHOD(Pass, SetPixelShader), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pass", "void set_pixelShader(const String&in)", asMETHOD(Pass, SetPixelShader), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "const String& get_pixelShader() const", asMETHOD(Pass, GetPixelShaderName), asCALL_THISCALL);
     
     RegisterResource<Technique>(engine, "Technique");
@@ -348,15 +348,15 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Technique", "Pass@+ get_pass(PassType)", asMETHOD(Technique, GetPass), asCALL_THISCALL);
     
     RegisterResource<Material>(engine, "Material");
-    engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2& in, float, const Vector2& in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2& in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Material@ Clone(const String& in) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_vertexShaderParameter(VSParameter, const Vector4& in)", asMETHOD(Material, SetVertexShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_vertexShaderParameter(VSParameter, const Vector4&in)", asMETHOD(Material, SetVertexShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Vector4 get_vertexShaderParameter(VSParameter) const", asFUNCTION(MaterialGetVertexShaderParameter), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Material", "void set_pixelShaderParameter(PSParameter, const Vector4& in)", asMETHOD(Material, SetPixelShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_pixelShaderParameter(PSParameter, const Vector4&in)", asMETHOD(Material, SetPixelShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Vector4 get_pixelShaderParameter(VSParameter) const", asFUNCTION(MaterialGetPixelShaderParameter), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_texture(TextureUnit, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_texture(TextureUnit) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
@@ -450,14 +450,14 @@ static void RegisterLight(asIScriptEngine* engine)
     
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBiasParameters), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(const BiasParameters& in)", asFUNCTION(ConstructBiasParametersCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(const BiasParameters&in)", asFUNCTION(ConstructBiasParametersCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
     
     engine->RegisterObjectType("CascadeParameters", sizeof(CascadeParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructCascadeParameters), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f(const CascadeParameters& in)", asFUNCTION(ConstructCascadeParametersCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f(const CascadeParameters&in)", asFUNCTION(ConstructCascadeParametersCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("CascadeParameters", asBEHAVE_CONSTRUCT, "void f(uint, float, float, float)", asFUNCTION(ConstructCascadeParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("CascadeParameters", "uint splits", offsetof(CascadeParameters, splits_));
     engine->RegisterObjectProperty("CascadeParameters", "float lambda", offsetof(CascadeParameters, lambda_));
@@ -466,7 +466,7 @@ static void RegisterLight(asIScriptEngine* engine)
     
     engine->RegisterObjectType("FocusParameters", sizeof(FocusParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructFocusParameters), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f(const FocusParameters& in)", asFUNCTION(ConstructFocusParametersCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f(const FocusParameters&in)", asFUNCTION(ConstructFocusParametersCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("FocusParameters", asBEHAVE_CONSTRUCT, "void f(bool, bool, bool, float, float)", asFUNCTION(ConstructFocusParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("FocusParameters", "bool focus", offsetof(FocusParameters, focus_));
     engine->RegisterObjectProperty("FocusParameters", "bool nonUniform", offsetof(FocusParameters, nonUniform_));
@@ -477,7 +477,7 @@ static void RegisterLight(asIScriptEngine* engine)
     RegisterDrawable<Light>(engine, "Light");
     engine->RegisterObjectMethod("Light", "void set_lightType(LightType)", asMETHOD(Light, SetLightType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "LightType get_lightType() const", asMETHOD(Light, GetLightType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void set_color(const Color& in)", asMETHOD(Light, SetColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void set_color(const Color&in)", asMETHOD(Light, SetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const Color& get_color() const", asMETHOD(Light, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_specularIntensity(float)", asMETHOD(Light, SetSpecularIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float get_specularIntensity() const", asMETHOD(Light, GetSpecularIntensity), asCALL_THISCALL);
@@ -489,11 +489,11 @@ static void RegisterLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "float get_aspectRatio() const", asMETHOD(Light, GetAspectRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_fadeDistance(float)", asMETHOD(Light, SetFadeDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float get_fadeDistance() const", asMETHOD(Light, GetFadeDistance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void set_shadowBias(const BiasParameters& in)", asMETHOD(Light, SetShadowBias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void set_shadowBias(const BiasParameters&in)", asMETHOD(Light, SetShadowBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const BiasParameters& get_shadowBias() const", asMETHOD(Light, GetShadowBias), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void set_shadowCascade(const CascadeParameters& in)", asMETHOD(Light, SetShadowCascade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void set_shadowCascade(const CascadeParameters&in)", asMETHOD(Light, SetShadowCascade), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const CascadeParameters& get_shadowCascade() const", asMETHOD(Light, GetShadowCascade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void set_shadowFocus(const FocusParameters& in)", asMETHOD(Light, SetShadowFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Light", "void set_shadowFocus(const FocusParameters&in)", asMETHOD(Light, SetShadowFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "const FocusParameters& get_shadowFocus() const", asMETHOD(Light, GetShadowFocus), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_shadowFadeDistance(float)", asMETHOD(Light, SetShadowFadeDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float get_shadowFadeDistance() const", asMETHOD(Light, GetShadowFadeDistance), asCALL_THISCALL);
@@ -513,11 +513,11 @@ static void RegisterLight(asIScriptEngine* engine)
 static void RegisterZone(asIScriptEngine* engine)
 {
     RegisterDrawable<Zone>(engine, "Zone");
-    engine->RegisterObjectMethod("Zone", "void set_boundingBox(const BoundingBox& in)", asMETHOD(Zone, SetBoundingBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Zone, SetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const BoundingBox& get_boundingBox() const", asMETHOD(Zone, GetBoundingBox), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Zone", "void set_ambientColor(const Color& in)", asMETHOD(Zone, SetAmbientColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_ambientColor(const Color&in)", asMETHOD(Zone, SetAmbientColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_ambientColor() const", asMETHOD(Zone, GetAmbientColor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Zone", "void set_fogColor(const Color& in)", asMETHOD(Zone, SetFogColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Zone", "void set_fogColor(const Color&in)", asMETHOD(Zone, SetFogColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "const Color& get_fogColor() const", asMETHOD(Zone, GetFogColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "void set_fogStart(float)", asMETHOD(Zone, SetFogStart), asCALL_THISCALL);
     engine->RegisterObjectMethod("Zone", "float get_fogStart() const", asMETHOD(Zone, GetFogStart), asCALL_THISCALL);
@@ -584,7 +584,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     RegisterDrawable<AnimatedModel>(engine, "AnimatedModel");
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHOD(AnimatedModel, AddAnimationState), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String& in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const std::string&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const std::string&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(AnimationState@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (AnimationState*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAllAnimationStates()", asMETHOD(AnimatedModel, RemoveAllAnimationStates), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void SetMorphWeight(uint, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (unsigned, float), void), asCALL_THISCALL);
@@ -607,41 +607,41 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "float get_invisibleLodFactor() const", asMETHOD(AnimatedModel, GetInvisibleLodFactor), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ get_skeleton()", asMETHOD(AnimatedModel, GetSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String& in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const std::string&) const, AnimationState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const std::string&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeight(const String& in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const std::string&, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(const String& in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const std::string&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeight(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const std::string&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "float getMorphWeight(const String&in) const", asMETHODPR(AnimatedModel, GetMorphWeight, (const std::string&) const, float), asCALL_THISCALL);
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)
 {
     RegisterComponent<AnimationController>(engine, "AnimationController");
-    engine->RegisterObjectMethod("AnimationController", "bool Play(const String& in, int, bool, float)", asMETHOD(AnimationController, Play), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool PlayExclusive(const String& in, int, bool, float)", asMETHOD(AnimationController, PlayExclusive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void Stop(const String& in, float)", asMETHOD(AnimationController, Stop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void StopLayer(int, float)", asMETHOD(AnimationController, StopLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void StopAll(float)", asMETHOD(AnimationController, StopAll), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool Fade(const String& in, float, float)", asMETHOD(AnimationController, Fade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool FadeOthers(const String& in, float, float)", asMETHOD(AnimationController, FadeOthers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetLayer(const String& in, int)", asMETHOD(AnimationController, SetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetStartBone(const String& in, const String& in)", asMETHOD(AnimationController, SetStartBone), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetTime(const String& in, float)", asMETHOD(AnimationController, SetTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetWeight(const String& in, float)", asMETHOD(AnimationController, SetWeight), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetLooped(const String& in, bool)", asMETHOD(AnimationController, SetLooped), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetSpeed(const String& in, float)", asMETHOD(AnimationController, SetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetAutoFade(const String& in, float)", asMETHOD(AnimationController, SetAutoFade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String& in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String& in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String& in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "int GetLayer(const String& in) const", asMETHOD(AnimationController, GetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "const String& GetStartBone(const String& in) const", asMETHOD(AnimationController, GetStartBoneName), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetTime(const String& in) const", asMETHOD(AnimationController, GetTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetWeight(const String& in) const", asMETHOD(AnimationController, GetWeight), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool GetLooped(const String& in) const", asMETHOD(AnimationController, IsLooped), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetLength(const String& in) const", asMETHOD(AnimationController, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetSpeed(const String& in) const", asMETHOD(AnimationController, GetSpeed), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetAutoFade(const String& in) const", asMETHOD(AnimationController, GetAutoFade), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String& in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool Play(const String&in, int, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, Play), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool PlayExclusive(const String&in, int, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, PlayExclusive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void Stop(const String&in, float fadeTime = 0.0f)", asMETHOD(AnimationController, Stop), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void StopLayer(int, float fadeTime = 0.0f)", asMETHOD(AnimationController, StopLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void StopAll(float fadeTime = 0.0f)", asMETHOD(AnimationController, StopAll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool Fade(const String&in, float, float)", asMETHOD(AnimationController, Fade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool FadeOthers(const String&in, float, float)", asMETHOD(AnimationController, FadeOthers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetLayer(const String&in, int)", asMETHOD(AnimationController, SetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetStartBone(const String&in, const String&in)", asMETHOD(AnimationController, SetStartBone), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetTime(const String&in, float)", asMETHOD(AnimationController, SetTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetWeight(const String&in, float)", asMETHOD(AnimationController, SetWeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetLooped(const String&in, bool)", asMETHOD(AnimationController, SetLooped), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetSpeed(const String&in, float)", asMETHOD(AnimationController, SetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetAutoFade(const String&in, float)", asMETHOD(AnimationController, SetAutoFade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String&in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String&in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String&in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "int GetLayer(const String&in) const", asMETHOD(AnimationController, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "const String& GetStartBone(const String&in) const", asMETHOD(AnimationController, GetStartBoneName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetTime(const String&in) const", asMETHOD(AnimationController, GetTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetWeight(const String&in) const", asMETHOD(AnimationController, GetWeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool GetLooped(const String&in) const", asMETHOD(AnimationController, IsLooped), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetLength(const String&in) const", asMETHOD(AnimationController, GetLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetSpeed(const String&in) const", asMETHOD(AnimationController, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetAutoFade(const String&in) const", asMETHOD(AnimationController, GetAutoFade), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String&in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
 }
 
 // Work around Angelscript error "Reference is temporary" when setting non-primitive properties of a reference type
@@ -655,13 +655,13 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_position(const Vector3& in)", asFUNCTION(BillboardSetPosition), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_position(const Vector3&in)", asFUNCTION(BillboardSetPosition), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Billboard", "const Vector3& get_position() const", asFUNCTION(BillboardGetPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_size(const Vector2& in)", asFUNCTION(BillboardSetSize), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_size(const Vector2&in)", asFUNCTION(BillboardSetSize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Billboard", "const Vector2& get_size() const", asFUNCTION(BillboardGetSize), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_uv(const Rect& in)", asFUNCTION(BillboardSetUv), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_uv(const Rect&in)", asFUNCTION(BillboardSetUv), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Billboard", "const Rect& get_uv() const", asFUNCTION(BillboardGetUv), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_color(const Color& in)", asFUNCTION(BillboardSetColor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Billboard", "void set_color(const Color&in)", asFUNCTION(BillboardSetColor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Billboard", "const Color& get_color() const", asFUNCTION(BillboardGetColor), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("Billboard", "float rotation", offsetof(Billboard, rotation_));
     engine->RegisterObjectProperty("Billboard", "bool enabled", offsetof(Billboard, enabled_));
@@ -735,7 +735,7 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool TakeScreenShot(Image@+)", asMETHOD(Graphics, TakeScreenShot), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_flushGPU(bool)", asMETHOD(Graphics, SetFlushGPU), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_flushGPU() const", asMETHOD(Graphics, GetFlushGPU), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "void set_windowTitle(const String& in)", asMETHOD(Graphics, SetWindowTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void set_windowTitle(const String&in)", asMETHOD(Graphics, SetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "const String& get_windowTitle() const", asMETHOD(Graphics, GetWindowTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "RenderMode get_renderMode() const", asMETHOD(Graphics, GetRenderMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "int get_width() const", asMETHOD(Graphics, GetWidth), asCALL_THISCALL);
@@ -780,7 +780,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "void DrawDebugGeometry(bool) const", asMETHOD(Renderer, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_numViewports(uint)", asMETHOD(Renderer, SetNumViewports), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numViewports() const", asMETHOD(Renderer, GetNumViewports), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Renderer", "void set_viewports(uint, const Viewport& in)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_viewports(uint, const Viewport&in)", asMETHOD(Renderer, SetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "const Viewport& get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_specularLighting(bool)", asMETHOD(Renderer, SetSpecularLighting), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "bool get_specularLighting() const", asMETHOD(Renderer, GetSpecularLighting), asCALL_THISCALL);
@@ -839,10 +839,10 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer");
-    engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3& in, const Vector3& in, const Color& in, bool)", asMETHOD(DebugRenderer, AddLine), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox& in, const Color& in, bool)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddFrustum(const Frustum& in, const Color& in, bool)", asMETHOD(DebugRenderer, AddFrustum), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color& in, bool)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool)", asMETHOD(DebugRenderer, AddLine), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox&in, const Color&in, bool)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddFrustum(const Frustum&in, const Color&in, bool)", asMETHOD(DebugRenderer, AddFrustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
 }
@@ -934,13 +934,13 @@ static void RegisterOctree(asIScriptEngine* engine)
     engine->RegisterObjectProperty("RayQueryResult", "uint subObject", offsetof(RayQueryResult, subObject_));
     
     RegisterComponent<Octree>(engine, "Octree");
-    engine->RegisterObjectMethod("Octree", "void Resize(const BoundingBox& in, uint)", asMETHOD(Octree, Resize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Octree", "void Resize(const BoundingBox&in, uint)", asMETHOD(Octree, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHOD(Octree, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray& in, uint8, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3& in, uint8)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox& in, uint8)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Frustum& in, uint8)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Sphere& in, uint8)", asFUNCTION(OctreeGetDrawablesSphere), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, uint8, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3&in, uint8)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox&in, uint8)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Frustum&in, uint8)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Sphere&in, uint8)", asFUNCTION(OctreeGetDrawablesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& get_worldBoundingBox() const", asMETHODPR(Octree, GetWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint get_numLevels() const", asMETHOD(Octree, GetNumLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Octree@+ get_octree() const", asFUNCTION(SceneGetOctree), asCALL_CDECL_OBJLAST);

@@ -185,7 +185,7 @@ asCString asCDataType::Format() const
 			str += "const";
 	}
 
-	if( isReference )
+    if( isReference )
 		str += "&";
 
 	return str;

@@ -89,6 +89,13 @@ struct ResourceRef
     {
     }
     
+    // Construct from another ResourceRef
+    ResourceRef(const ResourceRef& rhs) :
+        type_(rhs.type_),
+        id_(rhs.id_)
+    {
+    }
+    
     /// Object type
     ShortStringHash type_;
     /// Object identifier, for example name hash

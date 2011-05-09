@@ -75,15 +75,15 @@ public:
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success
-    bool Play(const std::string& name, int layer, bool looped, float fadeInTime);
+    bool Play(const std::string& name, int layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success
-    bool PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime);
+    bool PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime = 0.0f);
     /// Stop an animation. Zero fadetime is instant. Return true on success
-    bool Stop(const std::string& name, float fadeOutTime);
+    bool Stop(const std::string& name, float fadeOutTime = 0.0f);
     /// Stop all animations on a specific layer. Zero fadetime is instant
-    void StopLayer(int layer, float fadeOutTime);
+    void StopLayer(int layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant
-    void StopAll(float fadeTime);
+    void StopAll(float fadeTime = 0.0f);
     /// Fade animation to target weight. Return true on success
     bool Fade(const std::string& name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success

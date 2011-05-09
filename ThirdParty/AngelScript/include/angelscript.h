@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22002
-#define ANGELSCRIPT_VERSION_STRING "2.20.2"
+#define ANGELSCRIPT_VERSION        22003
+#define ANGELSCRIPT_VERSION_STRING "2.20.3"
 
 // Data types
 
@@ -107,28 +107,37 @@ enum asECallConvTypes
 // Object type flags
 enum asEObjTypeFlags
 {
-	asOBJ_REF                   = 0x01,
-	asOBJ_VALUE                 = 0x02,
-	asOBJ_GC                    = 0x04,
-	asOBJ_POD                   = 0x08,
-	asOBJ_NOHANDLE              = 0x10,
-	asOBJ_SCOPED                = 0x20,
-	asOBJ_TEMPLATE              = 0x40,
-	asOBJ_APP_CLASS             = 0x100,
-	asOBJ_APP_CLASS_CONSTRUCTOR = 0x200,
-	asOBJ_APP_CLASS_DESTRUCTOR  = 0x400,
-	asOBJ_APP_CLASS_ASSIGNMENT  = 0x800,
-	asOBJ_APP_CLASS_C           = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR),
-	asOBJ_APP_CLASS_CD          = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR),
-	asOBJ_APP_CLASS_CA          = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
-	asOBJ_APP_CLASS_CDA         = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
-	asOBJ_APP_CLASS_D           = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR),
-	asOBJ_APP_CLASS_A           = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_ASSIGNMENT),
-	asOBJ_APP_CLASS_DA          = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
-	asOBJ_APP_PRIMITIVE         = 0x1000,
-	asOBJ_APP_FLOAT             = 0x2000,
-	asOBJ_MASK_VALID_FLAGS      = 0x3F7F,
-	asOBJ_SCRIPT_OBJECT         = 0x10000
+	asOBJ_REF                        = 0x01,
+	asOBJ_VALUE                      = 0x02,
+	asOBJ_GC                         = 0x04,
+	asOBJ_POD                        = 0x08,
+	asOBJ_NOHANDLE                   = 0x10,
+	asOBJ_SCOPED                     = 0x20,
+	asOBJ_TEMPLATE                   = 0x40,
+	asOBJ_APP_CLASS                  = 0x100,
+	asOBJ_APP_CLASS_CONSTRUCTOR      = 0x200,
+	asOBJ_APP_CLASS_DESTRUCTOR       = 0x400,
+	asOBJ_APP_CLASS_ASSIGNMENT       = 0x800,
+	asOBJ_APP_CLASS_COPY_CONSTRUCTOR = 0x1000,
+	asOBJ_APP_CLASS_C                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR),
+	asOBJ_APP_CLASS_CD               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR),
+	asOBJ_APP_CLASS_CA               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
+	asOBJ_APP_CLASS_CK               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_CDA              = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
+	asOBJ_APP_CLASS_CDK              = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_CAK              = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_CDAK             = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_CONSTRUCTOR + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_D                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR),
+	asOBJ_APP_CLASS_DA               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT),
+	asOBJ_APP_CLASS_DK               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_DAK              = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_DESTRUCTOR + asOBJ_APP_CLASS_ASSIGNMENT + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_A                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_ASSIGNMENT),
+	asOBJ_APP_CLASS_AK               = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_ASSIGNMENT + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_CLASS_K                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
+	asOBJ_APP_PRIMITIVE              = 0x2000,
+	asOBJ_APP_FLOAT                  = 0x4000,
+	asOBJ_MASK_VALID_FLAGS           = 0x7F7F,
+	asOBJ_SCRIPT_OBJECT              = 0x10000
 };
 
 // Behaviours
@@ -904,7 +913,7 @@ public:
 // Function pointers
 
 // Use our own memset() and memcpy() implementations for better portability
-inline void asMemClear(void *_p, int size)
+inline void asMemClear(void *_p, size_t size)
 {
 	char *p = (char *)_p;
 	const char *e = p + size;
@@ -912,7 +921,7 @@ inline void asMemClear(void *_p, int size)
 		*p = 0;
 }
 
-inline void asMemCopy(void *_d, const void *_s, int size)
+inline void asMemCopy(void *_d, const void *_s, size_t size)
 {
 	char *d = (char *)_d;
 	const char *s = (const char *)_s;
@@ -1283,8 +1292,10 @@ enum asEBCInstr
 	asBC_MODu			= 181,
 	asBC_DIVu64			= 182,
 	asBC_MODu64			= 183,
+	asBC_LoadRObjR      = 184,
+	asBC_LoadVObjR      = 185,
 
-	asBC_MAXBYTECODE	= 184,
+	asBC_MAXBYTECODE	= 186,
 
 	// Temporary tokens. Can't be output to the final program
 	asBC_Block          = 252,
@@ -1314,31 +1325,33 @@ enum asEBCType
 	asBCTYPE_wW_W_ARG     = 15,
 	asBCTYPE_QW_DW_ARG    = 16,
 	asBCTYPE_rW_QW_ARG    = 17,
-	asBCTYPE_W_DW_ARG     = 18
+	asBCTYPE_W_DW_ARG     = 18,
+	asBCTYPE_rW_W_DW_ARG  = 19
 };
 
 // Instruction type sizes
-const int asBCTypeSize[19] =
+const int asBCTypeSize[20] =
 {
-    0, // asBCTYPE_INFO
-    1, // asBCTYPE_NO_ARG
-    1, // asBCTYPE_W_ARG
-    1, // asBCTYPE_wW_ARG
-    2, // asBCTYPE_DW_ARG
-    2, // asBCTYPE_rW_DW_ARG
-    3, // asBCTYPE_QW_ARG
-    3, // asBCTYPE_DW_DW_ARG
-    2, // asBCTYPE_wW_rW_rW_ARG
-    3, // asBCTYPE_wW_QW_ARG
-    2, // asBCTYPE_wW_rW_ARG
-    1, // asBCTYPE_rW_ARG
-    2, // asBCTYPE_wW_DW_ARG
-    3, // asBCTYPE_wW_rW_DW_ARG
-    2, // asBCTYPE_rW_rW_ARG
-    2, // asBCTYPE_wW_W_ARG
-    4, // asBCTYPE_QW_DW_ARG
-    3, // asBCTYPE_rW_QW_ARG
-    2  // asBCTYPE_W_DW_ARG
+	0, // asBCTYPE_INFO
+	1, // asBCTYPE_NO_ARG
+	1, // asBCTYPE_W_ARG
+	1, // asBCTYPE_wW_ARG
+	2, // asBCTYPE_DW_ARG
+	2, // asBCTYPE_rW_DW_ARG
+	3, // asBCTYPE_QW_ARG
+	3, // asBCTYPE_DW_DW_ARG
+	2, // asBCTYPE_wW_rW_rW_ARG
+	3, // asBCTYPE_wW_QW_ARG
+	2, // asBCTYPE_wW_rW_ARG
+	1, // asBCTYPE_rW_ARG
+	2, // asBCTYPE_wW_DW_ARG
+	3, // asBCTYPE_wW_rW_DW_ARG
+	2, // asBCTYPE_rW_rW_ARG
+	2, // asBCTYPE_wW_W_ARG
+	4, // asBCTYPE_QW_DW_ARG
+	3, // asBCTYPE_rW_QW_ARG
+	2, // asBCTYPE_W_DW_ARG
+	3  // asBCTYPE_rW_W_DW_ARG
 };
 
 // Instruction info
@@ -1557,9 +1570,9 @@ const asSBCInfo asBCInfo[256] =
 	asBCINFO(MODu,		wW_rW_rW_ARG,	0),
 	asBCINFO(DIVu64,	wW_rW_rW_ARG,	0),
 	asBCINFO(MODu64,	wW_rW_rW_ARG,	0),
+	asBCINFO(LoadRObjR, rW_W_DW_ARG,    0),
+	asBCINFO(LoadVObjR, rW_W_DW_ARG,    0),
 
-	asBCINFO_DUMMY(184),
-	asBCINFO_DUMMY(185),
 	asBCINFO_DUMMY(186),
 	asBCINFO_DUMMY(187),
 	asBCINFO_DUMMY(188),

@@ -393,7 +393,7 @@
 
 	#define ASM_INTEL  // Intel style for inline assembly on microsoft compilers
 
-	#if defined(WIN32) || defined(_WIN64)
+	#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 		#define AS_WIN
 	#endif
 
@@ -546,11 +546,16 @@
 		#if defined(i386) && !defined(__LP64__)
 			// Support native calling conventions on Mac OS X + Intel 32bit CPU
 			#define AS_X86
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__)
+			// http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/LowLevelABI/140-x86-64_Function_Calling_Conventions/x86_64.html#//apple_ref/doc/uid/TP40005035-SW1
 			#define AS_NO_THREADS
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			// STDCALL is not available on 64bit Mac
 			#undef STDCALL
 			#define STDCALL
@@ -560,6 +565,8 @@
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 		#elif (defined(__ppc__) || defined(__PPC__)) && defined(__LP64__)
 			#define AS_PPC_64
 		#elif (defined(_ARM_) || defined(__arm__))
@@ -571,6 +578,8 @@
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+
+			#undef GNU_STYLE_VIRTUAL_METHOD
 
 			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
@@ -589,11 +598,14 @@
 		#define AS_POSIX_THREADS
  
 	// Windows
-	#elif defined(WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+	#elif defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
 		// On Windows the simple classes are returned in the EAX:EDX registers
 		//#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 		//#define CDECL_RETURN_SIMPLE_IN_MEMORY
 		//#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+
+		#undef COMPLEX_MASK
+		#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 
 		#if defined(i386) && !defined(__LP64__)
 			// Support native calling conventions on Intel 32bit CPU
@@ -617,12 +629,17 @@
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
 
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
+
 			// Support native calling conventions on Intel 32bit CPU
 			#define AS_X86
 		#elif defined(__LP64__)
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			// STDCALL is not available on 64bit Linux
 			#undef STDCALL
 			#define STDCALL
@@ -658,12 +675,15 @@
 	#elif defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 		#define AS_BSD
 		#if defined(i386) && !defined(__LP64__)
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#define AS_X86
 		#elif defined(__LP64__)
 			#define AS_X64_GCC
 			#define HAS_128_BIT_PRIMITIVES
 			#define SPLIT_OBJS_BY_MEMBER_TYPES
-
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR)
 			#undef STDCALL
 			#define STDCALL
 		#else
@@ -831,9 +851,9 @@
 #endif
 
 
-// Urho3D: always use float type
+// Urho3D: always use float type, use EMMS to clear FPU stack
 #define AS_USE_DOUBLE_AS_FLOAT
-
+#define CLEAR_FPU_STACK emms
 
 // The assert macro
 #if defined(ANDROID)

@@ -84,26 +84,26 @@ static int ShortStringHashCmp(const ShortStringHash& lhs, const ShortStringHash&
 
 static void RegisterStringHash(asIScriptEngine* engine)
 {
-    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CA);
+    engine->RegisterObjectType("StringHash", sizeof(StringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructStringHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash& in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String& in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("StringHash", "StringHash &opAssign(const StringHash& in)", asMETHOD(StringHash, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "StringHash &opAddAssign(const StringHash& in)", asMETHOD(StringHash, operator +=), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash& in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash& in) const", asFUNCTION(StringHashCmp), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash& in) const", asMETHOD(StringHash, operator +), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructStringHashCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("StringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructStringHashInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StringHash", "StringHash &opAssign(const StringHash&in)", asMETHOD(StringHash, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StringHash", "StringHash &opAddAssign(const StringHash&in)", asMETHOD(StringHash, operator +=), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHashCmp), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHOD(StringHash, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "String ToString() const", asFUNCTIONPR(ToString, (const StringHash&), std::string), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("StringHash", "uint get_value()", asMETHOD(StringHash, GetValue), asCALL_THISCALL);
     
-    engine->RegisterObjectType("ShortStringHash", sizeof(ShortStringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CA);
+    engine->RegisterObjectType("ShortStringHash", sizeof(ShortStringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructShortStringHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash& in)", asFUNCTION(ConstructShortStringHashCopyShort), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash& in)", asFUNCTION(ConstructShortStringHashCopyLong), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const String& in)", asFUNCTION(ConstructShortStringHashInit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ShortStringHash", "ShortStringHash &opAssign(const ShortStringHash& in)", asMETHODPR(ShortStringHash, operator =, (const ShortStringHash&), ShortStringHash&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ShortStringHash", "bool opEquals(const ShortStringHash& in) const", asMETHOD(ShortStringHash, operator ==), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ShortStringHash", "int opCmp(const ShortStringHash& in) const", asFUNCTION(ShortStringHashCmp), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash&in)", asFUNCTION(ConstructShortStringHashCopyShort), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructShortStringHashCopyLong), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ShortStringHash", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructShortStringHashInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ShortStringHash", "ShortStringHash &opAssign(const ShortStringHash&in)", asMETHODPR(ShortStringHash, operator =, (const ShortStringHash&), ShortStringHash&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ShortStringHash", "bool opEquals(const ShortStringHash&in) const", asMETHOD(ShortStringHash, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ShortStringHash", "int opCmp(const ShortStringHash&in) const", asFUNCTION(ShortStringHashCmp), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("ShortStringHash", "String ToString() const", asFUNCTIONPR(ToString, (const ShortStringHash&), std::string), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ShortStringHash", "uint16 get_value()", asMETHOD(ShortStringHash, GetValue), asCALL_THISCALL);
 }
@@ -335,74 +335,74 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterEnumValue("VariantType", "VAR_VARIANTVECTOR", VAR_VARIANTVECTOR);
     engine->RegisterEnumValue("VariantType", "VAR_VARIANTMAP", VAR_VARIANTMAP);
     
-    engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CA);
+    engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef& in)", asFUNCTION(ConstructResourceRefCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceRef", "ResourceRef &opAssign(const ResourceRef& in)", asMETHOD(ResourceRef, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceRef", "bool opEquals(const ResourceRef& in) const", asMETHOD(ResourceRef, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ConstructResourceRefCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRef", "ResourceRef &opAssign(const ResourceRef&in)", asMETHOD(ResourceRef, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceRef", "bool opEquals(const ResourceRef&in) const", asMETHOD(ResourceRef, operator ==), asCALL_THISCALL);
     engine->RegisterObjectProperty("ResourceRef", "ShortStringHash type", offsetof(ResourceRef, type_));
     engine->RegisterObjectProperty("ResourceRef", "StringHash id", offsetof(ResourceRef, id_));
     
     engine->RegisterObjectType("ResourceRefList", sizeof(ResourceRefList), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRefList), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f(const ResourceRefList& in)", asFUNCTION(ConstructResourceRefListCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_CONSTRUCT, "void f(const ResourceRefList&in)", asFUNCTION(ConstructResourceRefListCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ResourceRefList", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructResourceRefList), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceRefList", "ResourceRefList &opAssign(const ResourceRefList& in)", asMETHOD(ResourceRefList, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceRefList", "bool opEquals(const ResourceRefList& in) const", asMETHOD(ResourceRefList, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceRefList", "ResourceRefList &opAssign(const ResourceRefList&in)", asMETHOD(ResourceRefList, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceRefList", "bool opEquals(const ResourceRefList&in) const", asMETHOD(ResourceRefList, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceRefList", "void Resize(uint)", asFUNCTION(ResourceRefListResize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRefList", "uint get_length() const", asFUNCTION(ResourceRefListGetSize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRefList", "bool get_empty() const", asFUNCTION(ResourceRefListIsEmpty), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceRefList", "void set_ids(uint, const StringHash& in) const", asFUNCTION(ResourceRefListSetId), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceRefList", "void set_ids(uint, const StringHash&in) const", asFUNCTION(ResourceRefListSetId), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRefList", "StringHash get_ids(uint) const", asFUNCTION(ResourceRefListGetId), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("ResourceRefList", "ShortStringHash type", offsetof(ResourceRef, type_));
     
     engine->RegisterObjectType("Variant", sizeof(Variant), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectType("VariantMap", sizeof(VariantMap), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariant), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Variant& in)", asFUNCTION(ConstructVariantCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Variant&in)", asFUNCTION(ConstructVariantCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructVariantInt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(uint)", asFUNCTION(ConstructVariantUInt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const StringHash& in)", asFUNCTION(ConstructVariantStringHash), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash& in)", asFUNCTION(ConstructVariantShortStringHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const StringHash&in)", asFUNCTION(ConstructVariantStringHash), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const ShortStringHash&in)", asFUNCTION(ConstructVariantShortStringHash), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructVariantBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(float)", asFUNCTION(ConstructVariantFloat), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector2& in)", asFUNCTION(ConstructVariantVector2), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector3& in)", asFUNCTION(ConstructVariantVector3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Quaternion& in)", asFUNCTION(ConstructVariantQuaternion), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Color& in)", asFUNCTION(ConstructVariantColor), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String& in)", asFUNCTION(ConstructVariantString), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector2&in)", asFUNCTION(ConstructVariantVector2), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructVariantVector3), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Quaternion&in)", asFUNCTION(ConstructVariantQuaternion), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Color&in)", asFUNCTION(ConstructVariantColor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const String&in)", asFUNCTION(ConstructVariantString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const Array<Variant>@+)", asFUNCTION(ConstructVariantVariantVector), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructVariantVariantMap), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVariant), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "void Clear()", asMETHOD(Variant, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Variant& in)", asMETHODPR(Variant, operator =, (const Variant&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Variant&in)", asMETHODPR(Variant, operator =, (const Variant&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(int)", asMETHODPR(Variant, operator =, (int), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(uint)", asMETHODPR(Variant, operator =, (unsigned), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const StringHash& in)", asMETHODPR(Variant, operator =, (const StringHash&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const ShortStringHash& in)", asMETHODPR(Variant, operator =, (const ShortStringHash&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const StringHash&in)", asMETHODPR(Variant, operator =, (const StringHash&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const ShortStringHash&in)", asMETHODPR(Variant, operator =, (const ShortStringHash&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(bool)", asMETHODPR(Variant, operator =, (bool), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(float)", asMETHODPR(Variant, operator =, (float), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Vector2& in)", asMETHODPR(Variant, operator =, (const Vector2&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Vector3& in)", asMETHODPR(Variant, operator =, (const Vector3&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Quaternion& in)", asMETHODPR(Variant, operator =, (const Quaternion&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Color& in)", asMETHODPR(Variant, operator =, (const Color&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const String& in)", asMETHODPR(Variant, operator =, (const std::string&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Vector2&in)", asMETHODPR(Variant, operator =, (const Vector2&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Vector3&in)", asMETHODPR(Variant, operator =, (const Vector3&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Quaternion&in)", asMETHODPR(Variant, operator =, (const Quaternion&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Color&in)", asMETHODPR(Variant, operator =, (const Color&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const String&in)", asMETHODPR(Variant, operator =, (const std::string&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Array<Variant>@+)", asFUNCTION(VariantAssignVariantVector), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const VariantMap& in)", asMETHODPR(Variant, operator =, (const VariantMap&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const Variant& in) const", asMETHODPR(Variant, operator ==, (const Variant&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const VariantMap&in)", asMETHODPR(Variant, operator =, (const VariantMap&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Variant&in) const", asMETHODPR(Variant, operator ==, (const Variant&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(int) const", asMETHODPR(Variant, operator ==, (int) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(uint) const", asMETHODPR(Variant, operator ==, (unsigned) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const StringHash& in) const", asMETHODPR(Variant, operator ==, (const StringHash&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const ShortStringHash& in) const", asMETHODPR(Variant, operator ==, (const ShortStringHash&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const StringHash&in) const", asMETHODPR(Variant, operator ==, (const StringHash&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const ShortStringHash&in) const", asMETHODPR(Variant, operator ==, (const ShortStringHash&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(bool) const", asMETHODPR(Variant, operator ==, (bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(float) const", asMETHODPR(Variant, operator ==, (float) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector2& in) const", asMETHODPR(Variant, operator ==, (const Vector2&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector3& in) const", asMETHODPR(Variant, operator ==, (const Vector3&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const Quaternion& in) const", asMETHODPR(Variant, operator ==, (const Quaternion&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const Color& in) const", asMETHODPR(Variant, operator ==, (const Color&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const String& in) const", asMETHODPR(Variant, operator ==, (const std::string&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector2&in) const", asMETHODPR(Variant, operator ==, (const Vector2&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector3&in) const", asMETHODPR(Variant, operator ==, (const Vector3&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Quaternion&in) const", asMETHODPR(Variant, operator ==, (const Quaternion&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const Color&in) const", asMETHODPR(Variant, operator ==, (const Color&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const String&in) const", asMETHODPR(Variant, operator ==, (const std::string&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<Variant>@+)", asFUNCTION(VariantEqualsVariantVector), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap& in) const", asMETHODPR(Variant, operator ==, (const VariantMap&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap&in) const", asMETHODPR(Variant, operator ==, (const VariantMap&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "int GetInt() const", asMETHOD(Variant, GetInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "uint GetUInt() const", asMETHOD(Variant, GetUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "StringHash GetStringHash() const", asMETHOD(Variant, GetStringHash), asCALL_THISCALL);
@@ -417,19 +417,19 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "const String& GetString() const", asMETHOD(Variant, GetString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Array<Variant>@ GetVariantVector() const", asFUNCTION(VariantGetVariantVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "const VariantMap& GetVariantMap() const", asMETHOD(Variant, GetVariantMap), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "void FromString(const String& in, const String& in)", asMETHOD(Variant, FromString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHOD(Variant, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHOD(Variant, GetTypeName), asCALL_THISCALL);
     
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap& in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVariantMap), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap& in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const String& in)", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const String& in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "bool Contains(const String& in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "void Erase(const String& in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "VariantMap& opAssign(const VariantMap&in)", asMETHODPR(VariantMap, operator =, (const VariantMap&), VariantMap&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "Variant& opIndex(const String&in)", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const String&in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "bool Contains(const String&in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VariantMap", "void Erase(const String&in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, size), asCALL_THISCALL);
 }
@@ -445,7 +445,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     // Register most of StringUtils as string's const methods, or objects' ToString() const methods for convenience
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String Replace(uint8, uint8) const", asFUNCTIONPR(Replace, (const std::string&, char, char), std::string), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String Replace(const String& in, const String& in) const", asFUNCTIONPR(Replace, (const std::string&, const std::string&, const std::string&), std::string), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String Replace(const String&in, const String&in) const", asFUNCTIONPR(Replace, (const std::string&, const std::string&, const std::string&), std::string), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("String", "String ToUpper() const", asFUNCTION(ToUpper), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "String ToLower() const", asFUNCTION(ToLower), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTION(ToBool), asCALL_CDECL_OBJLAST);
@@ -503,7 +503,7 @@ static void ShowErrorDialog(const std::string& title, const std::string& message
 
 static void RegisterProcessUtils(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalFunction("void ErrorDialog(const String& in, const String& in)", asFUNCTION(ShowErrorDialog), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void ErrorDialog(const String&in, const String&in)", asFUNCTION(ShowErrorDialog), asCALL_CDECL);
     engine->RegisterGlobalFunction("void OpenConsoleWindow()", asFUNCTION(OpenConsoleWindow), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetConsoleInput()", asFUNCTION(GetConsoleInput), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ get_arguments()", asFUNCTION(GetArgumentsToArray), asCALL_CDECL);
@@ -607,9 +607,9 @@ void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructAttributeInfo), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f(const AttributeInfo& in)", asFUNCTION(ConstructAttributeInfoCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f(const AttributeInfo&in)", asFUNCTION(ConstructAttributeInfoCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo& in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeInfo", "String get_name()", asFUNCTION(AttributeInfoGetName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames()", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
@@ -618,12 +618,12 @@ void RegisterObject(asIScriptEngine* engine)
     
     RegisterObject<Object>(engine, "Object");
     
-    engine->RegisterGlobalFunction("void SendEvent(const String& in, VariantMap&)", asFUNCTION(SendEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SendEvent(Object@+, const String& in, VariantMap&)", asFUNCTION(SendTargetedEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(const String& in, const String& in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String& in, const String& in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String& in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String& in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap&)", asFUNCTION(SendEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SendEvent(Object@+, const String&in, VariantMap&)", asFUNCTION(SendTargetedEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(const String&in)", asFUNCTION(UnsubscribeFromEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void UnsubscribeFromEvent(Object@+, const String&in)", asFUNCTION(UnsubscribeFromSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     

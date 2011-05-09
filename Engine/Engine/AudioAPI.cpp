@@ -72,12 +72,12 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool, bool)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void SetListenerTransform(const Vector3& in, const Quaternion& in)", asMETHOD(Audio, SetListenerTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void SetListenerTransform(const Vector3&in, const Quaternion&in)", asMETHOD(Audio, SetListenerTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_masterGain(SoundType, float)", asMETHOD(Audio, SetMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "float get_masterGain(SoundType) const", asMETHOD(Audio, GetMasterGain), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void set_listenerPosition(const Vector3& in)", asMETHOD(Audio, SetListenerPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void set_listenerPosition(const Vector3&in)", asMETHOD(Audio, SetListenerPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "const Vector3& get_listenerPosition() const", asMETHOD(Audio, GetListenerPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "void set_listenerRotation(const Quaternion& in)", asMETHOD(Audio, SetListenerRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void set_listenerRotation(const Quaternion&in)", asMETHOD(Audio, SetListenerRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "const Quaternion& get_listenerRotation() const", asMETHOD(Audio, GetListenerRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_bufferSamples() const", asMETHOD(Audio, GetBufferSamples), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_bufferSize() const", asMETHOD(Audio, GetBufferSize), asCALL_THISCALL);

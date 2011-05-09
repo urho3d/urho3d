@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1136,7 +1136,7 @@ int asCScriptEngine::RegisterInterfaceMethod(const char *intf, const char *decla
 	}
 
 	// Check name conflicts
-	r = bld.CheckNameConflictMember(dt.GetObjectType(), func->name.AddressOf(), 0, 0);
+	r = bld.CheckNameConflictMember(dt.GetObjectType(), func->name.AddressOf(), 0, 0, false);
 	if( r < 0 )
 	{
 		asDELETE(func,asCScriptFunction);
@@ -2054,7 +2054,7 @@ int asCScriptEngine::RegisterMethodToObjectType(asCObjectType *objectType, const
 	}
 
 	// Check name conflicts
-	r = bld.CheckNameConflictMember(objectType, func->name.AddressOf(), 0, 0);
+	r = bld.CheckNameConflictMember(objectType, func->name.AddressOf(), 0, 0, false);
 	if( r < 0 )
 	{
 		asDELETE(func,asCScriptFunction);
@@ -2546,6 +2546,10 @@ asCObjectType *asCScriptEngine::GetTemplateInstanceType(asCObjectType *templateT
 	}
 
 	// No previous template instance exists
+
+	// Make sure the template has factories as it doesn't have a default factory
+	if( templateType->beh.factories.GetLength() == 0 )
+		return 0;
 
 	// Make sure this template supports the subtype
 	if( !templateType->acceptValueSubType && (subType.IsPrimitive() || (subType.GetObjectType()->flags & asOBJ_VALUE)) )
@@ -3403,6 +3407,8 @@ void *asCScriptEngine::CreateScriptObjectCopy(void *origObj, int typeId)
 
 void asCScriptEngine::CopyScriptObject(void *dstObj, void *srcObj, int typeId)
 {
+	// TODO: optimize: Use the copy constructor when available
+
 	// Make sure the type id is for an object type, and not a primitive or a handle
 	if( (typeId & (asTYPEID_MASK_OBJECT | asTYPEID_MASK_SEQNBR)) != typeId ) return;
 	if( (typeId & asTYPEID_MASK_OBJECT) == 0 ) return;
@@ -3415,6 +3421,7 @@ void asCScriptEngine::CopyScriptObject(void *dstObj, void *srcObj, int typeId)
 
 	asCObjectType *objType = dt->GetObjectType();
 	// TODO: beh.copy will be removed, so we need to find the default opAssign method instead
+	// TODO: Must not copy if the opAssign is not available and the object is not a POD object
 	if( objType->beh.copy )
 	{
 		CallObjectMethod(dstObj, srcObj, objType->beh.copy);
@@ -3967,6 +3974,11 @@ int asCScriptEngine::RegisterEnumValue(const char *typeName, const char *valueNa
 		return ConfigError(asINVALID_TYPE);
 
 	if( NULL == valueName )
+		return ConfigError(asINVALID_NAME);
+
+	int tokenLen;
+	asETokenClass tokenClass = ParseToken(valueName, 0, &tokenLen);
+	if( tokenClass != asTC_IDENTIFIER || tokenLen != strlen(valueName) )
 		return ConfigError(asINVALID_NAME);
 
 	for( unsigned int n = 0; n < ot->enumValues.GetLength(); n++ )

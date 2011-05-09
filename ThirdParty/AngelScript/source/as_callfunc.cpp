@@ -523,8 +523,8 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 			// actually receiving the value in the high DWORD of retQW.
 			retQW >>= 32;
 
-			// due to endian issues we need to handle return values, that are
-			// less than a DWORD (32 bits) in size, special
+			// Due to endian issues we need to handle return values that are
+			// less than a DWORD (32 bits) in size specially
 			int numBytes = descr->returnType.GetSizeInMemoryBytes();
 			if( descr->returnType.IsReference() ) numBytes = 4;
 			switch( numBytes )

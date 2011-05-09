@@ -233,6 +233,13 @@ public:
     {
     }
     
+    /// Copy-construct from another vector
+    IntVector2(const IntVector2& rhs) :
+        x_(rhs.x_),
+        y_(rhs.y_)
+    {
+    }
+    
     /// Test for equality with another vector
     bool operator == (const IntVector2& rhs) const { return (x_ == rhs.x_) && (y_ == rhs.y_); }
     /// Test for inequality with another vector

@@ -735,7 +735,7 @@ int asCModule::GetNextImportedFunctionId()
 }
 
 // internal
-int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate)
+int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const asCDataType &returnType, asCDataType *params, asETypeModifiers *inOutFlags, asCString **defaultArgs, int paramCount, bool isInterface, asCObjectType *objType, bool isConstMethod, bool isGlobalFunction, bool isPrivate)
 {
 	asASSERT(id >= 0);
 
@@ -749,6 +749,7 @@ int asCModule::AddScriptFunction(int sectionIdx, int id, const char *name, const
 	{
 		func->parameterTypes.PushLast(params[n]);
 		func->inOutFlags.PushLast(inOutFlags[n]);
+		func->defaultArgs.PushLast(defaultArgs[n]);
 	}
 	func->objectType = objType;
 	func->isReadOnly = isConstMethod;
@@ -1024,7 +1025,7 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 		}
 		
 		if( found )
-			break;
+			continue;
 
 		for( unsigned int n = 0; n < engine->classTypes.GetLength(); n++ )
 		{

@@ -140,13 +140,13 @@ static void RegisterControls(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Controls", sizeof(Controls), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f(const Controls& in)", asFUNCTION(ConstructControlsCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f(const Controls&in)", asFUNCTION(ConstructControlsCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Controls", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Controls", "Controls &opAssign(const Controls& in)", asMETHOD(Controls, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "Controls &opAssign(const Controls&in)", asMETHOD(Controls, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void Reset()", asMETHOD(Controls, Reset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void Set(uint, bool)", asMETHOD(Controls, Set), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "bool IsDown(uint)", asMETHOD(Controls, IsDown), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls& in)", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls&in)", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
     engine->RegisterObjectProperty("Controls", "uint buttons", offsetof(Controls, buttons_));
     engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, yaw_));
     engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, pitch_));
@@ -167,7 +167,7 @@ static void RegisterInput(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Input", "bool get_clipCursor() const", asMETHOD(Input, GetClipCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_mousePosition(const IntVector2& in)", asMETHODPR(Input, SetMousePosition, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Input", "void set_mousePosition(const IntVector2&in)", asMETHODPR(Input, SetMousePosition, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "IntVector2 get_mousePosition() const", asMETHOD(Input, GetMousePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyPress(int) const", asMETHOD(Input, GetKeyPress), asCALL_THISCALL);

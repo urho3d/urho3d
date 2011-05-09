@@ -118,7 +118,7 @@ public:
 	void WriteWarning(const char *scriptname, const char *msg, int r, int c);
 
 	int CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code);
-	int CheckNameConflictMember(asCObjectType *type, const char *name, asCScriptNode *node, asCScriptCode *code);
+	int CheckNameConflictMember(asCObjectType *type, const char *name, asCScriptNode *node, asCScriptCode *code, bool isProperty);
 
 protected:
 	friend class asCCompiler;
@@ -143,7 +143,8 @@ protected:
 	void CompleteFuncDef(sFuncDef *funcDef);
 	void CompileClasses();
 
-	void GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate);
+	void GetParsedFunctionDetails(asCScriptNode *node, asCScriptCode *file, asCObjectType *objType, asCString &name, asCDataType &returnType, asCArray<asCDataType> &parameterTypes, asCArray<asETypeModifiers> &inOutFlags, asCArray<asCString *> &defaultArgs, bool &isConstMethod, bool &isConstructor, bool &isDestructor, bool &isPrivate);
+	int  ValidateDefaultArgs(asCScriptCode *script, asCScriptNode *node, asCScriptFunction *func);
 
 	bool DoesMethodExist(asCObjectType *objType, int methodId);
 
@@ -157,6 +158,8 @@ protected:
 
 	int GetEnumValueFromObjectType(asCObjectType *objType, const char *name, asCDataType &outDt, asDWORD &outValue);
 	int GetEnumValue(const char *name, asCDataType &outDt, asDWORD &outValue);
+
+	asCString GetCleanExpressionString(asCScriptNode *n, asCScriptCode *file);
 
 	void ParseScripts();
 	void CompileFunctions();

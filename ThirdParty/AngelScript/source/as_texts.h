@@ -48,7 +48,6 @@
 #define TXT_BOTH_MUST_BE_SAME                     "Both expressions must have the same type"
 #define TXT_BOTH_CONDITIONS_MUST_CALL_CONSTRUCTOR "Both conditions must call constructor"
 
-#define TXT_CALLING_NONCONST_METHOD_ON_TEMP      "A non-const method is called on temporary object. Changes to the object may be lost."
 #define TXT_CANDIDATES_ARE                       "Candidates are:"
 #define TXT_CANNOT_CALL_CONSTRUCTOR_IN_LOOPS     "Can't call a constructor in loops"
 #define TXT_CANNOT_CALL_CONSTRUCTOR_IN_SWITCH    "Can't call a constructor in switch"
@@ -68,6 +67,7 @@
 #define TXT_DATA_TYPE_CANT_BE_s           "Data type can't be '%s'"
 #define TXT_DECL_IN_SWITCH                "Variables cannot be declared in switch cases, except inside statement blocks"
 #define TXT_DEFAULT_MUST_BE_LAST          "The default case must be the last one"
+#define TXT_DEF_ARG_MISSING_IN_FUNC_s     "All subsequent parameters after the first default value must have default values in function '%s'"
 #define TXT_DESTRUCTOR_MAY_NOT_HAVE_PARM  "The destructor must not have any parameters"
 #define TXT_DUPLICATE_SWITCH_CASE         "Duplicate switch case"
 
@@ -87,6 +87,7 @@
 #define TXT_EXPECTED_STRING               "Expected string"
 #define TXT_EXPR_MUST_BE_BOOL             "Expression must be of boolean type"
 
+#define TXT_FAILED_TO_COMPILE_DEF_ARG_d_IN_FUNC_s "Failed while compiling default arg for parameter %d in function '%s'"
 #define TXT_FOUND_MULTIPLE_ENUM_VALUES    "Found multiple matching enum values"
 #define TXT_FUNCTION_IN_GLOBAL_EXPR       "Function calls are not allowed in global expressions"
 #define TXT_FUNCTION_ALREADY_EXIST        "A function with the same name and parameters already exist"
@@ -136,6 +137,8 @@
 #define TXT_NAME_CONFLICT_s_IS_FUNCDEF             "Name conflict. '%s' is a funcdef."
 #define TXT_NAME_CONFLICT_s_STRUCT                 "Name conflict. '%s' is a class."
 #define TXT_NAME_CONFLICT_s_OBJ_PROPERTY           "Name conflict. '%s' is an object property."
+#define TXT_NAME_CONFLICT_s_METHOD                 "Name conflict. '%s' is a class method."
+#define TXT_NAME_CONFLICT_s_ALREADY_USED           "Name conflict. '%s' is already used."
 #define TXT_NO_APPROPRIATE_INDEX_OPERATOR          "No appropriate indexing operator found"
 #define TXT_NO_CONVERSION_s_TO_s                   "No conversion from '%s' to '%s' available."
 #define TXT_NO_CONVERSION_s_TO_MATH_TYPE           "No conversion from '%s' to math type available."

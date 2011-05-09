@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -177,6 +177,12 @@ asCScriptFunction::~asCScriptFunction()
 	{
 		asDELETE(sysFuncIntf,asSSystemFunctionInterface);
 	}
+
+	for( asUINT p = 0; p < defaultArgs.GetLength(); p++ )
+	{
+		if( defaultArgs[p] )
+			asDELETE(defaultArgs[p], asCString);
+	}
 }
 
 // interface
@@ -304,6 +310,8 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName) const
 {
 	asCString str;
 
+	// TODO: default arg: Make the declaration with the default args an option
+
 	// Don't add the return type for constructors and destructors
 	if( !(returnType.GetTokenType() == ttVoid && 
 		  objectType && 
@@ -336,15 +344,31 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName) const
 				else if( inOutFlags[n] == asTM_OUTREF ) str += "out";
 				else if( inOutFlags[n] == asTM_INOUTREF ) str += "inout";
 			}
+
+			if( defaultArgs.GetLength() > n && defaultArgs[n] )
+			{
+				asCString tmp;
+				tmp.Format(" arg%d = %s", n, defaultArgs[n]->AddressOf());
+				str += tmp;
+			}
+
 			str += ", ";
 		}
 
+		// Add the last parameter
 		str += parameterTypes[n].Format();
 		if( parameterTypes[n].IsReference() && inOutFlags.GetLength() > n )
 		{
 			if( inOutFlags[n] == asTM_INREF ) str += "in";
 			else if( inOutFlags[n] == asTM_OUTREF ) str += "out";
 			else if( inOutFlags[n] == asTM_INOUTREF ) str += "inout";
+		}
+
+		if( defaultArgs.GetLength() > n && defaultArgs[n] )
+		{
+			asCString tmp;
+			tmp.Format(" arg%d = %s", n, defaultArgs[n]->AddressOf());
+			str += tmp;
 		}
 	}
 
@@ -549,7 +573,9 @@ void asCScriptFunction::AddReferences()
 			// Need to increase the reference for each global variable
 			{
 				void *gvarPtr = (void*)(size_t)asBC_PTRARG(&byteCode[n]);
+				if( !gvarPtr ) break;
 				asCGlobalProperty *prop = GetPropertyByGlobalVarPtr(gvarPtr);
+				if( !prop ) break;
 
 				// Only addref the properties once
 				if( !ptrs.Exists(gvarPtr) )
@@ -612,7 +638,8 @@ void asCScriptFunction::ReleaseReferences()
 				parameterTypes[p].GetObjectType()->Release();
 
 		for( asUINT n = 0; n < objVariableTypes.GetLength(); n++ )
-			objVariableTypes[n]->Release();
+			if( objVariableTypes[n] )
+				objVariableTypes[n]->Release();
 	}
 
 	// Go through the byte code and release references to all resources used by the function
@@ -655,7 +682,9 @@ void asCScriptFunction::ReleaseReferences()
 			// Need to increase the reference for each global variable
 			{
 				void *gvarPtr = (void*)(size_t)asBC_PTRARG(&byteCode[n]);
+				if( !gvarPtr ) break;
 				asCGlobalProperty *prop = GetPropertyByGlobalVarPtr(gvarPtr);
+				if( !prop ) break;
 				
 				// Only release the properties once
 				if( !ptrs.Exists(gvarPtr) )

@@ -58,8 +58,6 @@ typedef asQWORD ( *funcptr_t )( void );
 // Note to self: Always remember to inform the used registers on the clobber line, 
 // so that the gcc optimizer doesn't try to use them for other things
 
-// TODO: Should this really be different on Mac and other systems? Probably the Mac way is the correct one
-#if defined(AS_MAC)
 #define PUSH_LONG( val )                         \
 	__asm__ __volatile__ (                       \
 		"movq   %0, %%rax\n"                     \
@@ -69,6 +67,11 @@ typedef asQWORD ( *funcptr_t )( void );
 		: "%rax"                                 \
 	)
 
+// While movq really should be used to move from general 
+// purpose register to xmm register, this is isn't accepted
+// by older GNUC versions, where movd should be used instead.
+// Reference: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=43215
+#if (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ <= 2)
 #define POP_LONG( reg )                          \
 	__asm__ __volatile__ (                       \
 		"popq     %%rax\n"                       \
@@ -78,6 +81,26 @@ typedef asQWORD ( *funcptr_t )( void );
 		: "%rax", reg                            \
 	)
 
+#define POP_LONG_XMM( reg )                      \
+	__asm__ __volatile__ (                       \
+		"popq     %%rax\n"                       \
+		"movd     %%rax, %" reg                  \
+		:                                        \
+		:                                        \
+		: "%rax", reg                            \
+	)
+#else
+#define POP_LONG( reg )                          \
+	__asm__ __volatile__ (                       \
+		"popq     %%rax\n"                       \
+		"movq     %%rax, %" reg                  \
+		:                                        \
+		:                                        \
+		: "%rax", reg                            \
+	)
+
+#define POP_LONG_XMM( reg ) POP_LONG( reg )
+#endif
 
 #define ASM_GET_REG( name, dest )                \
 	__asm__ __volatile__ (                       \
@@ -86,34 +109,7 @@ typedef asQWORD ( *funcptr_t )( void );
 		: "m" ( dest )                           \
 		: name                                   \
 	)
-#else
-#define PUSH_LONG( val )                         \
-	__asm__ __volatile__ (                       \
-		"mov    %0, %%rax\n"                     \
-		"push   %%rax"                           \
-		:                                        \
-		: "m" ( val )                            \
-		: "%rax"                                 \
-	)
 
-#define POP_LONG( reg )                          \
-	__asm__ __volatile__ (                       \
-		"popq     %%rax\n"                       \
-		"movq     %%rax, %" reg                  \
-		:                                        \
-		:                                        \
-		: "%rax", reg                            \
-	)
-
-
-#define ASM_GET_REG( name, dest )                \
-	__asm__ __volatile__ (                       \
-		"mov  %" name ", %0\n"                   \
-		:                                        \
-		: "m" ( dest )                           \
-		: name                                   \
-	)
-#endif
 
 static asDWORD GetReturnedFloat()
 {
@@ -181,14 +177,14 @@ static asQWORD __attribute__ ((noinline)) X64_CallFunction( const asDWORD* pArgs
 	}
 
 	/* now pop the registers in reverse order and make the call */
-	POP_LONG( "%xmm7" );
-	POP_LONG( "%xmm6" );
-	POP_LONG( "%xmm5" );
-	POP_LONG( "%xmm4" );
-	POP_LONG( "%xmm3" );
-	POP_LONG( "%xmm2" );
-	POP_LONG( "%xmm1" );
-	POP_LONG( "%xmm0" );
+	POP_LONG_XMM( "%xmm7" );
+	POP_LONG_XMM( "%xmm6" );
+	POP_LONG_XMM( "%xmm5" );
+	POP_LONG_XMM( "%xmm4" );
+	POP_LONG_XMM( "%xmm3" );
+	POP_LONG_XMM( "%xmm2" );
+	POP_LONG_XMM( "%xmm1" );
+	POP_LONG_XMM( "%xmm0" );
 
 	POP_LONG( "%r9" );
 	POP_LONG( "%r8" );
@@ -240,7 +236,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	}
 
 	argumentCount = ( int )descr->parameterTypes.GetLength();
-	assert( argumentCount <= X64_MAX_ARGS );
+	asASSERT( argumentCount <= X64_MAX_ARGS );
 
 	// TODO: optimize: argsType should be computed in PrepareSystemFunction
 	for( a = 0; a < argumentCount; ++a, ++argIndex ) {
@@ -260,7 +256,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 			argsType[argIndex] = x64VARIABLE;
 		}
 	}
-	assert( argIndex == argumentCount );
+	asASSERT( argIndex == argumentCount );
 
 	for ( a = 0; a < argumentCount && totalArgumentCount <= X64_MAX_ARGS; a++ ) {
 		switch ( argsType[a] ) {
@@ -282,7 +278,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 	}
 
-	assert( totalArgumentCount <= X64_MAX_ARGS );
+	asASSERT( totalArgumentCount <= X64_MAX_ARGS );
 	if ( totalArgumentCount > argumentCount ) {
 		memcpy( argsType, tempType, totalArgumentCount );
 	}
@@ -441,7 +437,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		}
 	}
 
-	// If we are returning a object not by reference, we need to make the
+	// If we are returning an object not by reference, we need to make the
 	// pointer to the space allocated to the object the first parameter.
 	if( descr->returnType.IsObject() && ( descr->returnType.GetObjectType()->flags & asOBJ_APP_CLASS_CA ) == asOBJ_APP_CLASS_CA &&
 		!descr->returnType.IsReference() && !sysFunc->hostReturnInMemory )

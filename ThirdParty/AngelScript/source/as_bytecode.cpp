@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -119,7 +119,8 @@ void asCByteCode::GetVarsUsed(asCArray<int> &vars)
 				 asBCInfo[curr->op].type == asBCTYPE_wW_W_ARG  ||
 			     asBCInfo[curr->op].type == asBCTYPE_rW_DW_ARG ||
 			     asBCInfo[curr->op].type == asBCTYPE_wW_DW_ARG ||
-			     asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG )
+			     asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG ||
+				 asBCInfo[curr->op].type == asBCTYPE_rW_W_DW_ARG )
 		{
 			InsertIfNotExists(vars, curr->wArg[0]);
 		}
@@ -155,7 +156,8 @@ bool asCByteCode::IsVarUsed(int offset)
 				 asBCInfo[curr->op].type == asBCTYPE_wW_W_ARG  ||
 				 asBCInfo[curr->op].type == asBCTYPE_rW_DW_ARG ||
 				 asBCInfo[curr->op].type == asBCTYPE_wW_DW_ARG ||
-				 asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG )
+				 asBCInfo[curr->op].type == asBCTYPE_wW_QW_ARG ||
+				 asBCInfo[curr->op].type == asBCTYPE_rW_W_DW_ARG )
 		{
 			if( curr->wArg[0] == offset )
 				return true;
@@ -652,6 +654,35 @@ int asCByteCode::Optimize()
 			DeleteInstruction(curr);
 			instr = GoBack(ChangeFirstDeleteNext(instr, asBC_LoadThisR));
 		}
+		// PshV4 x, ADDSi, PopRPtr -> LoadRObjR
+		// PshV8 x, ADDSi, PopRPtr -> LoadRObjR
+		else if( (IsCombination(curr, asBC_PshV4, asBC_ADDSi) ||
+			      IsCombination(curr, asBC_PshV8, asBC_ADDSi)) &&
+		         IsCombination(instr, asBC_ADDSi, asBC_PopRPtr) &&
+				 curr->wArg[0] != 0 )
+		{
+			curr->op = asBC_LoadRObjR;
+			curr->size = asBCTypeSize[asBCInfo[asBC_LoadRObjR].type];
+			curr->stackInc = asBCInfo[asBC_LoadRObjR].stackInc;
+			curr->wArg[1] = instr->wArg[0];
+			*(asDWORD*)&curr->arg = *(asDWORD*)&instr->arg;
+			DeleteInstruction(instr->next);
+			DeleteInstruction(instr);
+			instr = GoBack(curr);
+		}
+		// PSF x, ADDSi, PopRPtr -> LoadVObjR
+		else if( IsCombination(curr, asBC_PSF, asBC_ADDSi) &&
+		         IsCombination(instr, asBC_ADDSi, asBC_PopRPtr) )
+		{
+			curr->op = asBC_LoadVObjR;
+			curr->size = asBCTypeSize[asBCInfo[asBC_LoadVObjR].type];
+			curr->stackInc = asBCInfo[asBC_LoadVObjR].stackInc;
+			curr->wArg[1] = instr->wArg[0];
+			*(asDWORD*)&curr->arg = *(asDWORD*)&instr->arg;
+			DeleteInstruction(instr->next);
+			DeleteInstruction(instr);
+			instr = GoBack(curr);
+		}
 		// PSF x, RDS4 -> PshV4 x
 		else if( IsCombination(curr, asBC_PSF, asBC_RDS4) )
 			instr = GoBack(ChangeFirstDeleteNext(curr, asBC_PshV4));
@@ -740,6 +771,13 @@ int asCByteCode::Optimize()
 		// LINE, LINE -> LINE
 		else if( IsCombination(curr, asBC_SUSPEND, asBC_SUSPEND) || 
 			     IsCombination(curr, asBC_LINE, asBC_LINE) ) 
+		{
+			// Delete the first instruction
+			instr = GoBack(DeleteInstruction(curr));
+		}
+		// SUSPEND, Block, SUSPEND -> Block, SUSPEND
+		else if( (IsCombination(curr, asBC_SUSPEND, asBC_Block) && IsCombination(instr, asBC_Block, asBC_SUSPEND)) ||
+			     (IsCombination(curr, asBC_LINE, asBC_Block) && IsCombination(instr, asBC_Block, asBC_LINE)) )
 		{
 			// Delete the first instruction
 			instr = GoBack(DeleteInstruction(curr));
@@ -923,6 +961,7 @@ bool asCByteCode::IsTempVarReadByInstr(cByteInstruction *curr, int offset)
 	else if( (asBCInfo[curr->op].type == asBCTYPE_rW_ARG    ||
 			  asBCInfo[curr->op].type == asBCTYPE_rW_DW_ARG ||
 			  asBCInfo[curr->op].type == asBCTYPE_rW_QW_ARG ||
+			  asBCInfo[curr->op].type == asBCTYPE_rW_W_DW_ARG ||
 			  curr->op == asBC_FREE) &&  // FREE both read and write to the variable
 			  curr->wArg[0] == offset )
 		return true;
@@ -1019,8 +1058,30 @@ bool asCByteCode::IsTempVarRead(cByteInstruction *curr, int offset)
 					!openPaths.Exists(dest) )
 					openPaths.PushLast(dest);
 			}
-			// We cannot optimize over BC_JMPP
-			else if( curr->op == asBC_JMPP ) return true;
+			else if( curr->op == asBC_JMPP ) 
+			{
+				// A JMPP instruction is always followed by a series of JMP instructions 
+				// that give the real destination (like a look-up table). We need add all
+				// of these as open paths.
+				curr = curr->next;
+				while( curr->op == asBC_JMP )
+				{
+					cByteInstruction *dest = 0;
+					int label = *((int*)ARG_DW(curr->arg));
+					int r = FindLabel(label, curr, &dest, 0); asASSERT( r == 0 ); UNUSED_VAR(r);
+
+					if( !closedPaths.Exists(dest) &&
+						!openPaths.Exists(dest) )
+						openPaths.PushLast(dest);
+
+					curr = curr->next;
+				}
+
+				// We should now be on a label which is the destination of the 
+				// first JMP in the sequence and is already added in the open paths
+				asASSERT(curr->op == asBC_LABEL);
+				break;
+			}
 
 			curr = curr->next;
 		}
@@ -1105,11 +1166,37 @@ bool asCByteCode::IsTempRegUsed(cByteInstruction *curr)
 			curr->op == asBC_CMPIu     ||
 			curr->op == asBC_CMPIf     ||
 			curr->op == asBC_LABEL     ||
-			curr->op == asBC_LoadThisR )
+			curr->op == asBC_LoadThisR ||
+			curr->op == asBC_LoadRObjR ||
+			curr->op == asBC_LoadVObjR )
 			return false;
 	}
 
 	return false;
+}
+
+bool asCByteCode::IsSimpleExpression()
+{
+	// A simple expression is one that cannot be suspended at any time, i.e.
+	// it doesn't have any calls to other routines, and doesn't have any suspend instructions
+	cByteInstruction *instr = first;
+	while( instr )
+	{
+		if( instr->op == asBC_ALLOC ||
+			instr->op == asBC_CALL ||
+			instr->op == asBC_CALLSYS ||
+			instr->op == asBC_SUSPEND ||
+			instr->op == asBC_LINE ||
+			instr->op == asBC_FREE ||
+			instr->op == asBC_CallPtr ||
+			instr->op == asBC_CALLINTF ||
+			instr->op == asBC_CALLBND )
+			return false;
+
+		instr = instr->next;
+	}
+
+	return true;
 }
 
 void asCByteCode::ExtractLineNumbers()
@@ -1509,6 +1596,7 @@ void asCByteCode::Output(asDWORD *array)
 				*(ap+1) = *(asDWORD*)&instr->arg;
 				break;
 			case asBCTYPE_wW_rW_DW_ARG:
+			case asBCTYPE_rW_W_DW_ARG:
 				*(((asWORD*)ap)+1) = instr->wArg[0];
 				*(((asWORD*)ap)+2) = instr->wArg[1];
 				*(ap+2) = *(asDWORD*)&instr->arg;
@@ -1775,6 +1863,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			break;
 
 		case asBCTYPE_wW_rW_DW_ARG:
+		case asBCTYPE_rW_W_DW_ARG:
 			switch( instr->op )
 			{
 			case asBC_ADDIf:

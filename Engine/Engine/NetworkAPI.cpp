@@ -41,7 +41,7 @@ void RegisterPeer(asIScriptEngine* engine)
     engine->RegisterEnumValue("ConnectionState", "CS_CONNECTED", CS_CONNECTED);
     
     RegisterObject<Peer>(engine, "Peer");
-    engine->RegisterObjectMethod("Peer", "void Send(const VectorBuffer& in, uint8, bool, bool)", asMETHODPR(Peer, Send, (const VectorBuffer&, unsigned char, bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Peer", "void Send(const VectorBuffer&in, uint8, bool, bool)", asMETHODPR(Peer, Send, (const VectorBuffer&, unsigned char, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "bool Receive(VectorBuffer&, uint8)", asMETHOD(Peer, Receive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "void FlushPackets()", asMETHOD(Peer, FlushPackets), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "bool HasPackets() const", asMETHOD(Peer, HasPackets), asCALL_THISCALL);
@@ -68,10 +68,10 @@ void RegisterNetwork(asIScriptEngine* engine)
     RegisterObject<Network>(engine, "Network");
     engine->RegisterObjectMethod("Network", "void SetDataRate(int, int)", asMETHOD(Network, SetDataRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL),
-    engine->RegisterObjectMethod("Network", "Peer@+ Connect(const String& in, uint16)", asMETHOD(Network, Connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "Peer@+ Connect(const String&in, uint16)", asMETHOD(Network, Connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopClient()", asMETHOD(Network, StopClient), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void Broadcast(const VectorBuffer& in, uint8, bool, bool)", asMETHODPR(Network, Broadcast, (const VectorBuffer&, unsigned char, bool ,bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void Broadcast(const VectorBuffer&in, uint8, bool, bool)", asMETHODPR(Network, Broadcast, (const VectorBuffer&, unsigned char, bool ,bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_serverMaxConnections(uint)", asMETHOD(Network, SetServerMaxConnections), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "uint get_serverMaxConnections() const", asMETHOD(Network, GetServerMaxConnections), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void set_clientMaxConnections(uint)", asMETHOD(Network, SetClientMaxConnections), asCALL_THISCALL);
