@@ -226,7 +226,7 @@ void PhysicsWorld::SetMaxContacts(unsigned num)
 
 void PhysicsWorld::SetGravity(Vector3 gravity)
 {
-    dWorldSetGravity(physicsWorld_, gravity.x_, gravity.y_, gravity.z_);;
+    dWorldSetGravity(physicsWorld_, gravity.x_, gravity.y_, gravity.z_);
 }
 
 void PhysicsWorld::SetLinearRestThreshold(float threshold)

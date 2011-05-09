@@ -296,7 +296,7 @@ unsigned UIBatch::GetInterpolatedColor(UIElement& element, int x, int y)
         Color bottocolor_ = element.GetColor(C_BOTTOMLEFT).Lerp(element.GetColor(C_BOTTOMRIGHT), cLerpX);
         Color color = topColor.Lerp(bottocolor_, cLerpY);
         color.a_ *= element.GetDerivedOpacity();
-        return color.ToUInt();;
+        return color.ToUInt();
     }
     else
     {

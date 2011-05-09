@@ -288,7 +288,7 @@ bool Model::Save(Serializer& dest)
         // Write bone mappings
         dest.WriteUInt(geometryBoneMappings_[i].size());
         for (unsigned j = 0; j < geometryBoneMappings_[i].size(); ++j)
-            dest.WriteUInt(geometryBoneMappings_[i][j]);;
+            dest.WriteUInt(geometryBoneMappings_[i][j]);
         
         // Write the LOD levels
         dest.WriteUInt(geometries_[i].size());
