@@ -644,25 +644,15 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "float GetFadeTarget(const String&in) const", asMETHOD(AnimationController, GetFadeTarget), asCALL_THISCALL);
 }
 
-// Work around Angelscript error "Reference is temporary" when setting non-primitive properties of a reference type
-ACCESSORS(Billboard, Vector3, Position, position_);
-ACCESSORS(Billboard, Vector2, Size, size_);
-ACCESSORS(Billboard, Rect, Uv, uv_);
-ACCESSORS(Billboard, Color, Color, color_);
-
 static void RegisterBillboardSet(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Billboard", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Billboard", asBEHAVE_RELEASE, "void f()", asFUNCTION(FakeReleaseRef), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_position(const Vector3&in)", asFUNCTION(BillboardSetPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "const Vector3& get_position() const", asFUNCTION(BillboardGetPosition), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_size(const Vector2&in)", asFUNCTION(BillboardSetSize), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "const Vector2& get_size() const", asFUNCTION(BillboardGetSize), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_uv(const Rect&in)", asFUNCTION(BillboardSetUv), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "const Rect& get_uv() const", asFUNCTION(BillboardGetUv), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "void set_color(const Color&in)", asFUNCTION(BillboardSetColor), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Billboard", "const Color& get_color() const", asFUNCTION(BillboardGetColor), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectProperty("Billboard", "Vector3 position", offsetof(Billboard, position_));
+    engine->RegisterObjectProperty("Billboard", "Vector2 size", offsetof(Billboard, size_));
+    engine->RegisterObjectProperty("Billboard", "Rect uv", offsetof(Billboard, uv_));
+    engine->RegisterObjectProperty("Billboard", "Color color", offsetof(Billboard, color_));
     engine->RegisterObjectProperty("Billboard", "float rotation", offsetof(Billboard, rotation_));
     engine->RegisterObjectProperty("Billboard", "bool enabled", offsetof(Billboard, enabled_));
     
