@@ -34,12 +34,12 @@
 
 #include "DebugNew.h"
 
-static const char* typeNames[] =
+static const std::string typeNames[] =
 {
     "none",
     "ball",
     "hinge",
-    0
+    ""
 };
 
 OBJECTTYPESTATIC(Joint);

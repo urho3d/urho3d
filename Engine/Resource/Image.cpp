@@ -350,7 +350,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     }
     if (index >= numCompressedLevels_)
     {
-        LOGERROR("Illegal compressed image mip level");
+        LOGERROR("Compressed image mip level out of bounds");
         return level;
     }
     

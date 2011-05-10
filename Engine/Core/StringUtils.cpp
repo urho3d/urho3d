@@ -25,7 +25,6 @@
 #include "StringUtils.h"
 
 #include <cstdio>
-#include <cstring>
 #include <ctype.h>
 
 #include "DebugNew.h"
@@ -404,26 +403,6 @@ unsigned GetStringListIndex(const std::string& value, const std::string* strings
         else
         {
             if (ToLower(value) == ToLower(strings[i]))
-                return i;
-        }
-    }
-    
-    return defaultIndex;
-}
-
-unsigned GetStringListIndex(const char* value, const char** strings, unsigned count, unsigned defaultIndex,
-    bool caseSensitive)
-{
-    for (unsigned i = 0; i < count; ++i)
-    {
-        if (caseSensitive)
-        {
-            if (!strcmp(value, strings[i]))
-                return i;
-        }
-        else
-        {
-            if (!_stricmp(value, strings[i]))
                 return i;
         }
     }

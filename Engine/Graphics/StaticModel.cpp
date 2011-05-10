@@ -284,7 +284,7 @@ bool StaticModel::SetMaterial(unsigned index, Material* material)
 {
     if (index >= materials_.size())
     {
-        LOGERROR("Illegal material index");
+        LOGERROR("Material index out of bounds");
         return false;
     }
     

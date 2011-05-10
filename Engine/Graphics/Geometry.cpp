@@ -74,7 +74,7 @@ bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned el
 {
     if (index >= vertexBuffer_.size())
     {
-        LOGERROR("Illegal stream index");
+        LOGERROR("Stream index out of bounds");
         return false;
     }
     

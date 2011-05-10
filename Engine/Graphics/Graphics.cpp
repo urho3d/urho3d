@@ -50,8 +50,6 @@
 #include "VertexShader.h"
 #include "Zone.h"
 
-#include <cstring>
-
 #include "DebugNew.h"
 
 #ifdef _MSC_VER

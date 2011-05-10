@@ -44,13 +44,13 @@ static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 
-static const char* typeNames[] =
+static const std::string typeNames[] =
 {
     "directional",
     "spot",
     "point",
     "splitpoint",
-    0
+    ""
 };
 
 void BiasParameters::Validate()

@@ -225,7 +225,7 @@ bool Node::SaveXML(XMLElement& dest)
         Component* component = components_[i];
         XMLElement compElem = dest.CreateChildElement("component");
         
-        compElem.SetString("type", component->GetTypeNameStr());
+        compElem.SetString("type", component->GetTypeName());
         compElem.SetInt("id", component->GetID());
         if (!component->SaveXML(compElem))
             return false;

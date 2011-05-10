@@ -30,8 +30,6 @@
 #include "StringUtils.h"
 #include "XMLElement.h"
 
-#include <cstring>
-
 #include "DebugNew.h"
 
 OBJECTTYPESTATIC(Serializable);
@@ -201,7 +199,7 @@ bool Serializable::Load(Deserializer& source)
         
         if (source.IsEof())
         {
-            LOGERROR("Could not load " + ToLower(GetTypeNameStr()) + ", stream not open or at end");
+            LOGERROR("Could not load " + ToLower(GetTypeName()) + ", stream not open or at end");
             inSerialization_  = false;
             return false;
         }
@@ -229,7 +227,7 @@ bool Serializable::Save(Serializer& dest)
         
         if (!dest.WriteVariantData(GetAttribute(i)))
         {
-            LOGERROR("Could not save " + ToLower(GetTypeNameStr()) + ", writing to stream failed");
+            LOGERROR("Could not save " + ToLower(GetTypeName()) + ", writing to stream failed");
             inSerialization_ = false;
             return false;
         }
@@ -243,7 +241,7 @@ bool Serializable::LoadXML(const XMLElement& source)
 {
     if (source.IsNull())
     {
-        LOGERROR("Could not load " + ToLower(GetTypeNameStr()) + ", null source element");
+        LOGERROR("Could not load " + ToLower(GetTypeName()) + ", null source element");
         return false;
     }
     
@@ -264,18 +262,18 @@ bool Serializable::LoadXML(const XMLElement& source)
         bool found = false;
         while (attrElem)
         {
-            if (!strcmp(attrElem.GetString("name").c_str(), attr.name_))
+            if (attrElem.GetString("name") == attr.name_)
             {
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
                     std::string value = attrElem.GetString("value");
-                    const char** enumPtr = attr.enumNames_;
+                    const std::string* enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
-                    while (*enumPtr)
+                    while (enumPtr->length())
                     {
-                        if (!strcmp(value.c_str(), *enumPtr))
+                        if (*enumPtr == value)
                         {
                             enumFound = true;
                             break;
@@ -310,7 +308,7 @@ bool Serializable::SaveXML(XMLElement& dest)
 {
     if (dest.IsNull())
     {
-        LOGERROR("Could not save " + ToLower(GetTypeNameStr()) + ", null destination element");
+        LOGERROR("Could not save " + ToLower(GetTypeName()) + ", null destination element");
         return false;
     }
     
@@ -343,35 +341,66 @@ bool Serializable::SaveXML(XMLElement& dest)
     return true;
 }
 
-void Serializable::SetAttribute(unsigned index, const Variant& value)
+bool Serializable::SetAttribute(unsigned index, const Variant& value)
 {
     const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
-    if ((!attributes) || (index >= attributes->size()))
-        return;
+    if (!attributes)
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
+        return false;
+    }
+    if (index >= attributes->size())
+    {
+        LOGERROR("Attribute index out of bounds");
+        return false;
+    }
     
     const AttributeInfo& attr = attributes->at(index);
     
     // Check that the new value's type matches the attribute type
     if (value.GetType() == attr.type_)
+    {
         OnSetAttribute(attr, value);
+        return true;
+    }
+    else
+    {
+        LOGERROR("Could not set attribute " + std::string(attr.name_) + ": expected type " + Variant::GetTypeName(attr.type_) +
+            " but got " + value.GetTypeName());
+        return false;
+    }
 }
 
-void Serializable::SetAttribute(const char* name, const Variant& value)
+bool Serializable::SetAttribute(const std::string& name, const Variant& value)
 {
     const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
-        return;
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
+        return false;
+    }
     
     for (std::vector<AttributeInfo>::const_iterator i = attributes->begin(); i != attributes->end(); ++i)
     {
-        if (!strcmp(i->name_, name))
+        if (i->name_ == name)
         {
             // Check that the new value's type matches the attribute type
             if (value.GetType() == i->type_)
+            {
                 OnSetAttribute(*i, value);
-            return;
+                return true;
+            }
+            else
+            {
+                LOGERROR("Could not set attribute " + std::string(i->name_) + ": expected type " + Variant::GetTypeName(i->type_)
+                    + " but got " + value.GetTypeName());
+                return false;
+            }
         }
     }
+    
+    LOGERROR("Could not find attribute " + std::string(name) + " in " + GetTypeName());
+    return false;
 }
 
 Variant Serializable::GetAttribute(unsigned index)
@@ -383,18 +412,22 @@ Variant Serializable::GetAttribute(unsigned index)
     return OnGetAttribute(attributes->at(index));
 }
 
-Variant Serializable::GetAttribute(const char* name)
+Variant Serializable::GetAttribute(const std::string& name)
 {
     const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
+    {
+        LOGERROR(GetTypeName() + " has no attributes");
         return Variant();
+    }
     
     for (std::vector<AttributeInfo>::const_iterator i = attributes->begin(); i != attributes->end(); ++i)
     {
-        if (!strcmp(i->name_, name))
+        if (i->name_ == name)
             return OnGetAttribute(*i);
     }
     
+    LOGERROR("Could not find attribute " + std::string(name) + " in " + GetTypeName());
     return Variant();
 }
 

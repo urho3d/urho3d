@@ -479,3 +479,8 @@ template<> std::vector<unsigned char> Variant::Get<std::vector<unsigned char> >(
 {
     return GetBuffer();
 }
+
+const std::string& Variant::GetTypeName(VariantType type)
+{
+    return typeNames[type];
+}

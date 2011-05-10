@@ -420,7 +420,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHOD(Variant, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHOD(Variant, GetTypeName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const std::string&), asCALL_THISCALL);
     
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
@@ -525,18 +525,13 @@ static void DestructAttributeInfo(AttributeInfo* ptr)
     ptr->~AttributeInfo();
 }
 
-static std::string AttributeInfoGetName(AttributeInfo* ptr)
-{
-    return ptr->name_ ? std::string(ptr->name_) : std::string();
-}
-
 static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
 {
     std::vector<std::string> enumNames;
-    const char** enumNamePtrs = ptr->enumNames_;
-    while ((enumNamePtrs) && (*enumNamePtrs))
+    const std::string* enumNamePtrs = ptr->enumNames_;
+    while ((enumNamePtrs) && (enumNamePtrs->length()))
     {
-        enumNames.push_back(std::string(*enumNamePtrs));
+        enumNames.push_back(*enumNamePtrs);
         ++enumNamePtrs;
     }
     return VectorToArray<std::string>(enumNames, "Array<String>");
@@ -610,9 +605,9 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_CONSTRUCT, "void f(const AttributeInfo&in)", asFUNCTION(ConstructAttributeInfoCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AttributeInfo", "String get_name()", asFUNCTION(AttributeInfoGetName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames()", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
+    engine->RegisterObjectProperty("AttributeInfo", "const String name", offsetof(AttributeInfo, name_));
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
     engine->RegisterObjectProperty("AttributeInfo", "uint mode", offsetof(AttributeInfo, mode_));
     

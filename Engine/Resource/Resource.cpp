@@ -40,7 +40,7 @@ bool Resource::Load(Deserializer& src)
 
 bool Resource::Save(Serializer& dest)
 {
-    LOGERROR("Save not supported for " + GetTypeNameStr());
+    LOGERROR("Save not supported for " + GetTypeName());
     return false;
 }
 

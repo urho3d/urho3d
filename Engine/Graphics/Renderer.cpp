@@ -307,7 +307,7 @@ void Renderer::SetViewport(unsigned index, const Viewport& viewport)
 {
     if (index >= viewports_.size())
     {
-        LOGERROR("Illegal viewport index");
+        LOGERROR("Viewport index out of bounds");
         return;
     }
     

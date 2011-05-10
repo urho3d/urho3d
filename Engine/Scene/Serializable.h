@@ -56,15 +56,15 @@ public:
     /// Perform post-load after the whole scene has been loaded
     virtual void PostLoad() {}
     
-    /// Set attribute by index
-    void SetAttribute(unsigned index, const Variant& value);
-    /// Set attribute by name
-    void SetAttribute(const char* name, const Variant& value);
+    /// Set attribute by index. Return true if successfully set
+    bool SetAttribute(unsigned index, const Variant& value);
+    /// Set attribute by name. Return true if successfully set
+    bool SetAttribute(const std::string& name, const Variant& value);
     
     /// Return attribute value by index. Return empty if illegal index
     Variant GetAttribute(unsigned index);
     /// Return attribute value by name. Return empty if not found
-    Variant GetAttribute(const char* name);
+    Variant GetAttribute(const std::string& name);
     /// Return number of attributes
     unsigned GetNumAttributes() const;
     /// Return attribute descriptions, or null if none defined

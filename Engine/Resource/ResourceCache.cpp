@@ -577,7 +577,7 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
         if ((i->second.memoryBudget_) && (i->second.memoryUse_ > i->second.memoryBudget_) &&
             (oldestResource != i->second.resources_.end()))
         {
-            LOGDEBUG("Resource group " + oldestResource->second->GetTypeNameStr() + " over memory budget, releasing resource " +
+            LOGDEBUG("Resource group " + oldestResource->second->GetTypeName() + " over memory budget, releasing resource " +
                 oldestResource->second->GetName());
             i->second.resources_.erase(oldestResource);
         }

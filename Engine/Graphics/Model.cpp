@@ -37,7 +37,7 @@
 
 #include "DebugNew.h"
 
-unsigned storeOrLookupVertexBuffer(VertexBuffer* buffer, std::vector<VertexBuffer*>& dest)
+unsigned StoreOrLookupVertexBuffer(VertexBuffer* buffer, std::vector<VertexBuffer*>& dest)
 {
     for (unsigned i = 0; i < dest.size(); ++i)
     {
@@ -48,7 +48,7 @@ unsigned storeOrLookupVertexBuffer(VertexBuffer* buffer, std::vector<VertexBuffe
     return dest.size() - 1;
 }
 
-unsigned storeOrLookupIndexBuffer(IndexBuffer* buffer, std::vector<IndexBuffer*>& dest)
+unsigned StoreOrLookupIndexBuffer(IndexBuffer* buffer, std::vector<IndexBuffer*>& dest)
 {
     for (unsigned i = 0; i < dest.size(); ++i)
     {
@@ -165,12 +165,12 @@ bool Model::Load(Deserializer& source)
             
             if (vertexBufferRef >= vertexBuffer_.size())
             {
-                LOGERROR("Illegal vertex buffer index");
+                LOGERROR("Vertex buffer index out of bounds");
                 return false;
             }
             if (indexBufferRef >= indexBuffers_.size())
             {
-                LOGERROR("Illegal index buffer index");
+                LOGERROR("Index buffer index out of bounds");
                 return false;
             }
             
@@ -244,8 +244,8 @@ bool Model::Save(Serializer& dest)
     {
         for (unsigned j = 0; j < geometries_[i].size(); ++j)
         {
-            storeOrLookupVertexBuffer(geometries_[i][j]->GetVertexBuffer(0), vertexBuffers);
-            storeOrLookupIndexBuffer(geometries_[i][j]->GetIndexBuffer(), indexBuffers);
+            StoreOrLookupVertexBuffer(geometries_[i][j]->GetVertexBuffer(0), vertexBuffers);
+            StoreOrLookupIndexBuffer(geometries_[i][j]->GetIndexBuffer(), indexBuffers);
         }
     }
     
@@ -297,8 +297,8 @@ bool Model::Save(Serializer& dest)
             Geometry* geometry = geometries_[i][j];
             dest.WriteFloat(geometry->GetLodDistance());
             dest.WriteUInt(geometry->GetPrimitiveType());
-            dest.WriteUInt(storeOrLookupVertexBuffer(geometry->GetVertexBuffer(0), vertexBuffers));
-            dest.WriteUInt(storeOrLookupIndexBuffer(geometry->GetIndexBuffer(), indexBuffers));
+            dest.WriteUInt(StoreOrLookupVertexBuffer(geometry->GetVertexBuffer(0), vertexBuffers));
+            dest.WriteUInt(StoreOrLookupIndexBuffer(geometry->GetIndexBuffer(), indexBuffers));
             dest.WriteUInt(geometry->GetIndexStart());
             dest.WriteUInt(geometry->GetIndexCount());
         }
@@ -357,7 +357,7 @@ bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
 {
     if (index >= geometries_.size())
     {
-        LOGERROR("Illegal geometry index");
+        LOGERROR("Geometry index out of bounds");
         return false;
     }
     if (!num)
@@ -374,12 +374,12 @@ bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
 {
     if (index >= geometries_.size())
     {
-        LOGERROR("Illegal geometry index");
+        LOGERROR("Geometry index out of bounds");
         return false;
     }
     if (lodLevel >= geometries_[index].size())
     {
-        LOGERROR("Illegal LOD level index");
+        LOGERROR("LOD level index out of bounds");
         return false;
     }
     

@@ -241,7 +241,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectBehaviour(className, asBEHAVE_ADDREF, "void f()", asMETHODPR(T, AddRef, (), void), asCALL_THISCALL);
     engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "ShortStringHash get_type() const", asMETHODPR(T, GetType, () const, ShortStringHash), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "String get_typeName() const", asMETHODPR(T, GetTypeNameStr, () const, std::string), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const std::string&), asCALL_THISCALL);
     RegisterSubclass<Object, T>(engine, "Object", className);
 }
 
@@ -277,7 +277,10 @@ static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Seriali
 {
     const std::vector<AttributeInfo>* attributes = ptr->GetAttributes();
     if ((!attributes) || (index >= attributes->size()))
+    {
+        asGetActiveContext()->SetException("Index out of bounds");
         return noAttributeInfo;
+    }
     else
         return attributes->at(index);
 }
@@ -306,8 +309,10 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool Save(File@+)", asFUNCTION(SerializableSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&)", asMETHODPR(T, LoadXML, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&)", asMETHODPR(T, SaveXML, (XMLElement&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const std::string&, const Variant&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Variant GetAttribute(const String&in)", asMETHODPR(T, GetAttribute, (const std::string&), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numAttributes() const", asMETHODPR(T, GetNumAttributes, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_attributes(uint, const Variant&in) const", asMETHODPR(T, SetAttribute, (unsigned, const Variant&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Variant get_attributes(uint) const", asMETHODPR(T, GetAttribute, (unsigned), Variant), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const AttributeInfo& get_attributeInfos(uint) const", asFUNCTION(SerializableGetAttributeInfo), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Serializable", className);
@@ -322,11 +327,6 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHODPR(T, GetID, () const, unsigned), asCALL_THISCALL);
     if (nodeRegistered)
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
-}
-
-static Node* NodeCreateChild(Node* ptr)
-{
-    return ptr->CreateChild();
 }
 
 static Component* NodeCreateComponent(const std::string& typeName, Node* ptr)
@@ -453,7 +453,6 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\")", asMETHODPR(T, CreateChild, (const std::string&), Node*), asCALL_THISCALL);
-    //engine->RegisterObjectMethod(className, "Node@+ CreateChild()", asFUNCTION(NodeCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(Node@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(Node@+)", asMETHODPR(T, RemoveChild, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);

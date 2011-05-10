@@ -51,22 +51,9 @@ struct AttributeInfo
     /// Construct empty
     AttributeInfo() :
         type_(VAR_NONE),
-        name_(0),
         offset_(0),
         enumNames_(0),
         mode_(AM_BOTH)
-    {
-    }
-    
-    /// Copy-construct from another AttributeInfo
-    AttributeInfo(const AttributeInfo& rhs) :
-        type_(rhs.type_),
-        name_(rhs.name_),
-        offset_(rhs.offset_),
-        accessor_(rhs.accessor_),
-        enumNames_(rhs.enumNames_),
-        defaultValue_(rhs.defaultValue_),
-        mode_(rhs.mode_)
     {
     }
     
@@ -82,7 +69,7 @@ struct AttributeInfo
     }
     
    /// Construct offset enum attribute
-    AttributeInfo(VariantType type, const char* name, unsigned offset, const char** enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(VariantType type, const char* name, unsigned offset, const std::string* enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
         offset_(offset),
@@ -107,11 +94,11 @@ struct AttributeInfo
     /// Attribute type
     VariantType type_;
     /// Name
-    const char* name_;
+    std::string name_;
     /// Byte offset from start of object
     unsigned offset_;
     /// Enum string names
-    const char** enumNames_;
+    const std::string* enumNames_;
     /// Helper object for accessor mode
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication

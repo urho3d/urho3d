@@ -88,13 +88,13 @@
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const char* typeNames[] = 
+static const std::string typeNames[] = 
 {
     "master",
     "effect",
     "music",
     "voice",
-    0
+    ""
 };
 
 // Compressed audio decode buffer length in milliseconds

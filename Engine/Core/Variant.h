@@ -847,6 +847,9 @@ public:
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty
     std::string ToString() const;
     
+    /// Return type name for enum value
+    static const std::string& GetTypeName(VariantType type);
+    
     /// Empty variant
     static const Variant EMPTY;
     

@@ -41,7 +41,7 @@ public:
     /// Return type
     virtual ShortStringHash GetType() const = 0;
     /// Return type name
-    virtual const char* GetTypeName() const = 0;
+    virtual const std::string& GetTypeName() const = 0;
     /// Handle event
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
     
@@ -70,8 +70,6 @@ public:
     /// Template version of creating an object
     template <class T> SharedPtr<T> CreateObject();
     
-    /// Return typename as std::string
-    std::string GetTypeNameStr() const { return std::string(GetTypeName()); }
     /// Return execution context
     Context* GetContext() const { return context_; }
     /// Return subsystem by type
@@ -125,9 +123,7 @@ public:
     /// Return type
     ShortStringHash GetType() const { return type_; }
     /// Return typename
-    const char* GetTypeName() const { return typeName_; }
-    /// Return typename as std::string
-    std::string GetTypeNameStr() const { return std::string(typeName_); }
+    const std::string& GetTypeName() const { return typeName_; }
     
 protected:
     /// Execution context
@@ -135,7 +131,7 @@ protected:
     /// Object type
     ShortStringHash type_;
     /// Object typename
-    const char* typeName_;
+    std::string typeName_;
 };
 
 /// Template implementation of the object factory
@@ -228,22 +224,22 @@ private:
 #define OBJECT(typeName) \
     private: \
         static const ShortStringHash typeStatic; \
-        static const char* typeNameStatic; \
+        static const std::string typeNameStatic; \
     public: \
         virtual ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual const char* GetTypeName() const { return GetTypeNameStatic(); } \
+        virtual const std::string& GetTypeName() const { return GetTypeNameStatic(); } \
         static ShortStringHash GetTypeStatic() \
         { \
             return typeStatic; \
         } \
-        static const char* GetTypeNameStatic() \
+        static const std::string& GetTypeNameStatic() \
         { \
             return typeNameStatic; \
         } \
 
 #define OBJECTTYPESTATIC(typeName) \
     const ShortStringHash typeName::typeStatic(#typeName); \
-    const char* typeName::typeNameStatic = #typeName; \
+    const std::string typeName::typeNameStatic(#typeName); \
 
 #define EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
 #define PARAM(paraid_, paraname_) static const ShortStringHash paraid_(#paraname_)

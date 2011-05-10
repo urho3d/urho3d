@@ -25,8 +25,6 @@
 #include "Context.h"
 #include "StringUtils.h"
 
-#include <cstring>
-
 #include "DebugNew.h"
 
 static VariantMap noEventData;

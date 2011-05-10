@@ -109,6 +109,3 @@ std::string ToStringHex(unsigned value);
 /// Return an index to a string list corresponding to the given string, or a default value if not found
 unsigned GetStringListIndex(const std::string& value, const std::string* strings, unsigned count, unsigned defaultIndex,
     bool caseSensitive = false);
-/// Return an index to a string list (C string version)
-unsigned GetStringListIndex(const char* value, const char** strings, unsigned count, unsigned defaultIndex,
-    bool caseSensitive = false);

@@ -43,7 +43,7 @@
 
 #include "DebugNew.h"
 
-static const char* typeNames[] = 
+static const std::string typeNames[] = 
 {
     "none",
     "box",
@@ -53,7 +53,7 @@ static const char* typeNames[] =
     "trianglemesh",
     "heightfield",
     "convexhull",
-    0
+    ""
 };
 
 static const float DEFAULT_FRICTION = 0.5f;
