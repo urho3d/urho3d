@@ -194,6 +194,8 @@ TriangleMeshData::TriangleMeshData(Model* model, bool makeConvexHull, float thic
         // Copy index data
         indexData_ = new unsigned[indexCount];
         memcpy(indexData_.GetPtr(), result.mIndices, indexCount * sizeof(unsigned));
+        
+        lib.ReleaseResult(result);
     }
     
     triMesh_ = dGeomTriMeshDataCreate();
