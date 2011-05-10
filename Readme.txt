@@ -30,15 +30,16 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://www.geometrictools.com/Documentation/EulerAngles.pdf
 
 Urho3D uses the following third-party libraries:
-- AngelScript (2.20.2)
-- ENet (1.3.0)
-- FreeType (2.3.12)
-- Open Asset Import Library (2.0.863)
-- Open Dynamics Engine (svn rev 1770)
-- StanHull
-- stb_image (1.29)
-- stb_vorbis (0.99996)
-- TinyXML (2.6.1)
+- AngelScript 2.20.3 WIP (http://www.angelcode.com/angelscript/)
+- ENet 1.3.1 (http://enet.bespin.org/)
+- FreeType 2.3.12 (http://www.freetype.org/)
+- Open Asset Import Library 2.0.863 (http://assimp.sourceforge.net/)
+- Open Dynamics Engine, svn rev 1806 (http://www.ode.org/)
+- StanHull (http://codesuppository.blogspot.com/2006/03/
+  john-ratcliffs-code-suppository-blog.html)
+- stb_image 1.29 (http://nothings.org/)
+- stb_vorbis 0.99996 (http://nothings.org/)
+- TinyXML 2.6.1 (http://www.grinninglizard.com/tinyxml/)
 
 Ninja model, BlueHighway font and smoke/flare/status bar textures are from OGRE.
 
