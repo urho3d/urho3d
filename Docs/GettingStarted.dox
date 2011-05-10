@@ -149,11 +149,13 @@ Urho3D uses the following conventions and principles:
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
 
-- No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead. %Script exceptions are used when there is no other sensible way, such as with illegal array access.
+- No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead. %Script exceptions are used when there is no other sensible way, such as with out of bounds array access.
 
 - Feeding illegal data to public API functions, such out of range indices or null pointers, should not cause crashes or corruption. Instead errors are logged as appropriate.
 
-- Third party libraries are hidden from the public API as completely as possible.
+- For threading and multi-instance safety, no mutable static data (including singletons) or function-static data is allowed.
+
+- Third party libraries are included as source code into the main engine project. They are however hidden from the public API as completely as possible.
 
 For more details related to the C++ coding style, see also \ref CodingConventions "Coding conventions".
 

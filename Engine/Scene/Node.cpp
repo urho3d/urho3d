@@ -129,7 +129,7 @@ bool Node::Load(Deserializer& source)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash newType = compBuffer.ReadShortStringHash();
-        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt());
+        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), false);
         if (newComponent)
         {
             if (!newComponent->Load(compBuffer))
@@ -140,7 +140,7 @@ bool Node::Load(Deserializer& source)
     unsigned numChildren = source.ReadVLE();
     for (unsigned i = 0; i < numChildren; ++i)
     {
-        Node* newNode = CreateChild(source.ReadUInt());
+        Node* newNode = CreateChild(source.ReadUInt(), false);
         if (!newNode->Load(source))
             return false;
     }
@@ -192,7 +192,7 @@ bool Node::LoadXML(const XMLElement& source)
     while (compElem)
     {
         std::string typeName = compElem.GetString("type");
-        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"));
+        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), false);
         if (newComponent)
         {
             if (!newComponent->LoadXML(compElem))
@@ -205,7 +205,7 @@ bool Node::LoadXML(const XMLElement& source)
     XMLElement childElem = source.GetChildElement("node");
     while (childElem)
     {
-        Node* newNode = CreateChild(compElem.GetInt("id"));
+        Node* newNode = CreateChild(compElem.GetInt("id"), false);
         if (!newNode->LoadXML(childElem))
             return false;
         
@@ -404,11 +404,10 @@ void Node::MarkDirty()
         (*i)->MarkDirty();
 }
 
-Node* Node::CreateChild(const std::string& name)
+Node* Node::CreateChild(const std::string& name, bool local)
 {
-    SharedPtr<Node> newNode(new Node(context_));
+    Node* newNode = CreateChild(0, local);
     newNode->SetName(name);
-    AddChild(newNode);
     return newNode;
 }
 
@@ -459,18 +458,18 @@ void Node::SetParent(Node* parent)
         parent->AddChild(this);
 }
 
-Component* Node::CreateComponent(ShortStringHash type)
+Component* Node::CreateComponent(ShortStringHash type, bool local)
 {
-    return CreateComponent(type, 0);
+    return CreateComponent(type, 0, local);
 }
 
-Component* Node::GetOrCreateComponent(ShortStringHash type)
+Component* Node::GetOrCreateComponent(ShortStringHash type, bool local)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
         return oldComponent;
     else
-        return CreateComponent(type, 0);
+        return CreateComponent(type, 0, local);
 }
 
 void Node::RemoveComponent(Component* component)
@@ -661,7 +660,7 @@ Component* Node::GetComponent(ShortStringHash type, unsigned index) const
 }
 
 
-Component* Node::CreateComponent(ShortStringHash type, unsigned id)
+Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
 {
     // Make sure the object in question is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
@@ -671,23 +670,32 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id)
         return 0;
     }
     
-    // If zero ID specified, the scene will auto-assign
-    newComponent->SetID(id);
-    
     components_.push_back(newComponent);
+    
+    // If zero ID specified, let the scene assign
     if (scene_)
+    {
+        newComponent->SetID(id ? id : scene_->GetFreeComponentID(local));
         scene_->ComponentAdded(newComponent);
+    }
+    else
+        newComponent->SetID(id);
     
     newComponent->SetNode(this);
     newComponent->OnMarkedDirty(this);
-    
     return newComponent;
 }
 
-Node* Node::CreateChild(unsigned id)
+Node* Node::CreateChild(unsigned id, bool local)
 {
     SharedPtr<Node> newNode(new Node(context_));
-    newNode->SetID(id);
+    
+    // If zero ID specified, let the scene assign
+    if (scene_)
+        newNode->SetID(id ? id : scene_->GetFreeNodeID(local));
+    else
+        newNode->SetID(id);
+    
     AddChild(newNode);
     return newNode;
 }

@@ -69,6 +69,16 @@ static bool SceneSaveXML(File* file, Scene* ptr)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("NetworkMode");
+    engine->RegisterEnumValue("NetworkMode", "NM_NONETWORK", NM_NONETWORK);
+    engine->RegisterEnumValue("NetworkMode", "NM_SERVER", NM_SERVER);
+    engine->RegisterEnumValue("NetworkMode", "NM_CLIENT", NM_CLIENT);
+    
+    engine->RegisterGlobalProperty("const uint FIRST_NONLOCAL_ID", (void*)&FIRST_NONLOCAL_ID);
+    engine->RegisterGlobalProperty("const uint LAST_NONLOCAL_ID", (void*)&LAST_NONLOCAL_ID);
+    engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
+    engine->RegisterGlobalProperty("const uint LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
+    
     RegisterNode<Scene>(engine, "Scene");
     RegisterObjectConstructor<Scene>(engine, "Scene");
     RegisterNamedObjectConstructor<Scene>(engine, "Scene");
@@ -79,6 +89,8 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_networkMode(NetworkMode)", asMETHOD(Scene, SetNetworkMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "NetworkMode get_networkMode() const", asMETHOD(Scene, GetNetworkMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "Scene@+ get_scene() const", asMETHOD(Node, GetScene), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Scene@+ get_scene()", asFUNCTION(GetScriptContextScene), asCALL_CDECL);
     

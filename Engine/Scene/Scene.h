@@ -25,13 +25,30 @@
 
 #include "Node.h"
 
+/// First replicated node/component ID
+static const unsigned FIRST_NONLOCAL_ID = 0x1;
+/// Last replicated node/component ID
+static const unsigned LAST_NONLOCAL_ID = 0xffffff;
+/// First local node/component ID
+static const unsigned FIRST_LOCAL_ID = 0x01000000;
+/// Last local node/component ID
+static const unsigned LAST_LOCAL_ID = 0xffffffff;
+
+/// Scene's networking mode
+enum NetworkMode
+{
+    NM_NONETWORK,
+    NM_SERVER,
+    NM_CLIENT
+};
+
 /// Root scene node, represents the whole scene
 class Scene : public Node
 {
     OBJECT(Scene);
-
+    
     using Node::SaveXML;
-        
+    
 public:
     /// Construct
     Scene(Context* context);
@@ -53,50 +70,51 @@ public:
     bool SaveXML(Serializer& dest);
     /// Update scene
     void Update(float timeStep);
+    /// Set networking mode
+    void SetNetworkMode(NetworkMode mode);
     /// Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
-    /// Node added. Assign scene pointer & ID
-    void NodeAdded(Node* node);
-    /// Node removed. Remove ID assignment
-    void NodeRemoved(Node* node);
-    /// Component added. Assign ID
-    void ComponentAdded(Component* component);
-    /// Component removed. Remove ID assignment
-    void ComponentRemoved(Component* component);
     
-    /// Return active flag
-    bool IsActive() const { return active_; }
     /// Return node from the whole scene by ID, or null if not found
     Node* GetNodeByID(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found
     Component* GetComponentByID(unsigned id) const;
+    /// Return networking mode
+    NetworkMode GetNetworkMode() const { return networkMode_; }
+    /// Return active flag
+    bool IsActive() const { return active_; }
+    
+    /// Get free node ID, either non-local or local
+    unsigned GetFreeNodeID(bool local);
+    /// Get free component ID, either non-local or local
+    unsigned GetFreeComponentID(bool local);
+    /// Node added. Assign scene pointer and add to ID map
+    void NodeAdded(Node* node);
+    /// Node removed. Remove from ID map
+    void NodeRemoved(Node* node);
+    /// Component added. Add to ID map
+    void ComponentAdded(Component* component);
+    /// Component removed. Remove from ID map
+    void ComponentRemoved(Component* component);
     
 private:
     /// Handle the logic update event to update the scene, if active
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     
-    inline void GetNextNodeID()
-    {
-        ++nodeID_;
-        if (!nodeID_)
-            nodeID_ = 1;
-    }
-    
-    inline void GetNextComponentID()
-    {
-        ++componentID_;
-        if (!componentID_)
-            componentID_ = 1;
-    }
-    
-    /// Next free node ID
-    unsigned nodeID_;
-    /// Next free component ID
-    unsigned componentID_;
     /// Map of scene nodes by ID
     std::map<unsigned, Node*> allNodes_;
     /// Map of components by ID
     std::map<unsigned, Component*> allComponents_;
+    /// Networking mode
+    NetworkMode networkMode_;
+    /// Next free non-local node ID
+    unsigned nonLocalNodeID_;
+    /// Next free local node ID
+    unsigned localNodeID_;
+    /// Next free non-local component ID
+    unsigned nonLocalComponentID_;
+    /// Next free local component ID
+    unsigned localComponentID_;
     /// Active flag
     bool active_;
 };

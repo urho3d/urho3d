@@ -98,7 +98,7 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components
     void MarkDirty();
     /// Create a child scene node
-    Node* CreateChild(const std::string& name = std::string());
+    Node* CreateChild(const std::string& name = std::string(), bool local = false);
     /// Add a child scene node
     void AddChild(Node* node);
     /// Remove a child scene node
@@ -110,9 +110,9 @@ public:
     /// Set parent scene node. Same as parent->AddChild(this)
     void SetParent(Node* parent);
     /// Create a component to this node
-    Component* CreateComponent(ShortStringHash type);
+    Component* CreateComponent(ShortStringHash type, bool local = false);
     /// Create a component to this node if it does not exist already
-    Component* GetOrCreateComponent(ShortStringHash type);
+    Component* GetOrCreateComponent(ShortStringHash type, bool local = false);
     /// Remove a component from this node
     void RemoveComponent(Component* component);
     /// Remove all components from this node
@@ -122,9 +122,9 @@ public:
     /// Remove listener component
     void RemoveListener(Component* component);
     /// Template version of creating a component
-    template <class T> T* CreateComponent();
+    template <class T> T* CreateComponent(bool local = false);
     /// Template version of getting or creating a component
-    template <class T> T* GetOrCreateComponent();
+    template <class T> T* GetOrCreateComponent(bool local = false);
     
     /// Return ID
     unsigned GetID() const { return id_; }
@@ -238,9 +238,9 @@ public:
     
 protected:
     /// Create a component with specific ID. Used internally
-    Component* CreateComponent(ShortStringHash type, unsigned id);
+    Component* CreateComponent(ShortStringHash type, unsigned id, bool local);
     /// Create a child node with specific ID. Used internally
-    Node* CreateChild(unsigned id);
+    Node* CreateChild(unsigned id, bool local);
     
 private:
     /// Recalculate the world transform
@@ -286,14 +286,14 @@ private:
     bool dirty_;
 };
 
-template <class T> T* Node::CreateComponent()
+template <class T> T* Node::CreateComponent(bool local)
 {
-    return static_cast<T*>(CreateComponent(T::GetTypeStatic()));
+    return static_cast<T*>(CreateComponent(T::GetTypeStatic(), local));
 }
 
-template <class T> T* Node::GetOrCreateComponent()
+template <class T> T* Node::GetOrCreateComponent(bool local)
 {
-    return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic()));
+    return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), local));
 }
 
 template <class T> void Node::GetChildrenWithComponent(std::vector<Node*>& dest, bool recursive) const

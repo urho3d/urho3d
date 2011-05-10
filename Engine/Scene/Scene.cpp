@@ -36,11 +36,15 @@ OBJECTTYPESTATIC(Scene);
 
 Scene::Scene(Context* context) :
     Node(context),
-    nodeID_(1),
-    componentID_(1),
+    networkMode_(NM_NONETWORK),
+    nonLocalNodeID_(FIRST_NONLOCAL_ID),
+    nonLocalComponentID_(FIRST_NONLOCAL_ID),
+    localNodeID_(FIRST_LOCAL_ID),
+    localComponentID_(FIRST_LOCAL_ID),
     active_(true)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
+    SetID(GetFreeNodeID(false));
     NodeAdded(this);
     
     SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
@@ -57,6 +61,11 @@ void Scene::RegisterObject(Context* context)
 {
     context->RegisterFactory<Scene>();
     context->CopyBaseAttributes<Node, Scene>();
+    
+    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Node ID", nonLocalNodeID_, FIRST_NONLOCAL_ID);
+    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Component ID", nonLocalComponentID_, FIRST_NONLOCAL_ID);
+    ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID);
+    ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID);
 }
 
 bool Scene::Load(Deserializer& source)
@@ -148,22 +157,18 @@ void Scene::SetActive(bool enable)
     active_ = enable;
 }
 
+void Scene::SetNetworkMode(NetworkMode mode)
+{
+    networkMode_ = mode;
+}
+
 void Scene::NodeAdded(Node* node)
 {
     if ((!node) || (node->GetScene()))
         return;
     
-    // Assign ID if not already set
-    if (!node->GetID())
-    {
-        while (allNodes_.find(nodeID_) != allNodes_.end())
-            GetNextNodeID();
-        node->SetID(nodeID_);
-    }
-    
     node->setScene(this);
     allNodes_[node->GetID()] = node;
-    GetNextNodeID();
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -181,16 +186,7 @@ void Scene::ComponentAdded(Component* component)
     if (!component)
         return;
     
-    // Assign ID if not already set
-    if (!component->GetID())
-    {
-        while (allComponents_.find(componentID_) != allComponents_.end())
-            GetNextComponentID();
-        component->SetID(componentID_);
-    }
-    
     allComponents_[component->GetID()] = component;
-    GetNextComponentID();
 }
 
 void Scene::ComponentRemoved(Component* component)
@@ -226,6 +222,66 @@ void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     if (active_)
         Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+unsigned Scene::GetFreeNodeID(bool local)
+{
+    if (!local)
+    {
+        for (;;)
+        {
+            if (allNodes_.find(nonLocalNodeID_) == allNodes_.end())
+                return nonLocalNodeID_;
+            
+            if (nonLocalNodeID_ != LAST_NONLOCAL_ID)
+                ++nonLocalNodeID_;
+            else
+                nonLocalNodeID_ = FIRST_NONLOCAL_ID;
+        }
+    }
+    else
+    {
+        for (;;)
+        {
+            if (allNodes_.find(localNodeID_) == allNodes_.end())
+                return localNodeID_;
+            
+            if (localNodeID_ != LAST_LOCAL_ID)
+                ++localNodeID_;
+            else
+                localNodeID_ = FIRST_LOCAL_ID;
+        }
+    }
+}
+
+unsigned Scene::GetFreeComponentID(bool local)
+{
+    if (!local)
+    {
+        for (;;)
+        {
+            if (allComponents_.find(nonLocalComponentID_) == allComponents_.end())
+                return nonLocalComponentID_;
+            
+            if (nonLocalComponentID_ != LAST_NONLOCAL_ID)
+                ++nonLocalComponentID_;
+            else
+                nonLocalComponentID_ = FIRST_NONLOCAL_ID;
+        }
+    }
+    else
+    {
+        for (;;)
+        {
+            if (allComponents_.find(localComponentID_) == allComponents_.end())
+                return localComponentID_;
+            
+            if (localComponentID_ != LAST_LOCAL_ID)
+                ++localComponentID_;
+            else
+                localComponentID_ = FIRST_LOCAL_ID;
+        }
+    }
 }
 
 void RegisterSceneLibrary(Context* context)
