@@ -24,6 +24,9 @@
 #pragma once
 
 #include "Node.h"
+#include "XMLElement.h"
+
+class File;
 
 /// First replicated node/component ID
 static const unsigned FIRST_NONLOCAL_ID = 0x1;
@@ -40,6 +43,21 @@ enum NetworkMode
     NM_NONETWORK,
     NM_SERVER,
     NM_CLIENT
+};
+
+/// Scene's asynchronous loading progress
+struct AsyncProgress
+{
+    /// File for binary mode
+    SharedPtr<File> file_;
+    /// XML file for XML mode
+    SharedPtr<XMLFile> xmlFile_;
+    /// Current XML element for XML mode
+    XMLElement xmlElement_;
+    /// Loaded root-level nodes
+    unsigned loadedNodes_;
+    /// Total root-level nodes
+    unsigned totalNodes_;
 };
 
 /// Root scene node, represents the whole scene
@@ -68,6 +86,10 @@ public:
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful
     bool SaveXML(Serializer& dest);
+    /// Load from a binary file asynchronously. Return true if started successfully
+    bool LoadAsync(File* file);
+    /// Load from an XML file asynchronously. Return true if started successfully
+    bool LoadAsyncXML(File* file);
     /// Update scene
     void Update(float timeStep);
     /// Set networking mode
@@ -100,6 +122,10 @@ public:
 private:
     /// Handle the logic update event to update the scene, if active
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Update asynchronous loading
+    void UpdateAsyncLoad();
+    /// Finish asynchronous loading
+    void FinishAsyncLoad();
     
     /// Map of scene nodes by ID
     std::map<unsigned, Node*> allNodes_;
@@ -107,6 +133,8 @@ private:
     std::map<unsigned, Component*> allComponents_;
     /// Networking mode
     NetworkMode networkMode_;
+    /// Async loading progress
+    AsyncProgress asyncProgress_;
     /// Next free non-local node ID
     unsigned nonLocalNodeID_;
     /// Next free local node ID
@@ -117,6 +145,8 @@ private:
     unsigned localComponentID_;
     /// Active flag
     bool active_;
+    /// Async loading flag
+    bool asyncLoading_;
 };
 
 /// Register Scene library objects

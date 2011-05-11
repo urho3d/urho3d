@@ -237,6 +237,10 @@ public:
     VariantMap vars_;
     
 protected:
+    /// Load components and optionally load child nodes. Used internally
+    bool Load(Deserializer& source, bool loadChildren);
+    /// Load components from XML data and optionally load child nodes. Used internally
+    bool LoadXML(const XMLElement& source, bool loadChildren);
     /// Create a component with specific ID. Used internally
     Component* CreateComponent(ShortStringHash type, unsigned id, bool local);
     /// Create a child node with specific ID. Used internally

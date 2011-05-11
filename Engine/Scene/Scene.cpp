@@ -34,6 +34,9 @@
 
 OBJECTTYPESTATIC(Scene);
 
+static const int ASYNC_LOAD_MIN_FPS = 60;
+static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
+
 Scene::Scene(Context* context) :
     Node(context),
     networkMode_(NM_NONETWORK),
@@ -41,7 +44,8 @@ Scene::Scene(Context* context) :
     nonLocalComponentID_(FIRST_NONLOCAL_ID),
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
-    active_(true)
+    active_(true),
+    asyncLoading_(false)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
     SetID(GetFreeNodeID(false));
@@ -78,7 +82,6 @@ bool Scene::Load(Deserializer& source)
     }
     
     // Load the whole scene, then perform post-load if successfully loaded
-    /// \todo Async loading support
     if (Node::Load(source))
     {
         PostLoad();
@@ -103,7 +106,6 @@ bool Scene::Save(Serializer& dest)
 bool Scene::LoadXML(const XMLElement& source)
 {
     // Load the whole scene, then perform post-load if successfully loaded
-    /// \todo Async loading support
     if (Node::LoadXML(source))
     {
         PostLoad();
@@ -132,8 +134,81 @@ bool Scene::SaveXML(Serializer& dest)
     return xml->Save(dest);
 }
 
+bool Scene::LoadAsync(File* file)
+{
+    if (!file)
+    {
+        LOGERROR("Null file for async loading");
+        return false;
+    }
+    
+    // Check ID
+    if (file->ReadID() != "USCN")
+    {
+        LOGERROR(file->GetName() + " is not a valid scene file");
+        return false;
+    }
+    
+    // Load the root level components first
+    if (!Node::Load(*file, false))
+        return false;
+    
+    // Then prepare for loading all root level child nodes in the async update
+    asyncLoading_ = true;
+    asyncProgress_.file_ = file;
+    asyncProgress_.xmlFile_.Reset();
+    asyncProgress_.xmlElement_ = XMLElement();
+    asyncProgress_.loadedNodes_ = 0;
+    asyncProgress_.totalNodes_ = file->ReadVLE();
+    
+    return true;
+}
+
+bool Scene::LoadAsyncXML(File* file)
+{
+    if (!file)
+    {
+        LOGERROR("Null file for async loading");
+        return false;
+    }
+    
+    SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
+    if (!xmlFile->Load(*file))
+        return false;
+    
+    // Load the root level components first
+    XMLElement rootElement = xmlFile->GetRootElement();
+    if (!Node::LoadXML(rootElement))
+        return false;
+    
+    XMLElement childNodeElement = rootElement.GetChildElement("node");
+    
+    // Then prepare for loading all root level child nodes in the async update
+    asyncLoading_ = true;
+    asyncProgress_.file_.Reset();
+    asyncProgress_.xmlFile_ = xmlFile;
+    asyncProgress_.xmlElement_ = childNodeElement;
+    asyncProgress_.loadedNodes_ = 0;
+    asyncProgress_.totalNodes_ = 0;
+    
+    // Count the amount of child nodes
+    while (childNodeElement)
+    {
+        ++asyncProgress_.totalNodes_;
+        childNodeElement = childNodeElement.GetNextElement("node");
+    }
+    
+    return true;
+}
+
 void Scene::Update(float timeStep)
 {
+    if (asyncLoading_)
+    {
+        UpdateAsyncLoad();
+        return;
+    }
+    
     PROFILE(UpdateScene);
     
     using namespace SceneUpdate;
@@ -283,6 +358,67 @@ void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
     
     if (active_)
         Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void Scene::UpdateAsyncLoad()
+{
+    PROFILE(UpdateAsyncLoad);
+    
+    Timer asyncLoadTimer;
+    
+    for (;;)
+    {
+        // Check if everything loaded
+        if (asyncProgress_.loadedNodes_ >= asyncProgress_.totalNodes_)
+        {
+            FinishAsyncLoad();
+            return;
+        }
+        
+        // Read one child node either from binary or XML
+        if (asyncProgress_.file_)
+        {
+            Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), false);
+            newNode->Load(*asyncProgress_.file_);
+        }
+        else
+        {
+            Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), false);
+            newNode->LoadXML(asyncProgress_.xmlElement_);
+            asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNextElement("node");
+        }
+        
+        ++asyncProgress_.loadedNodes_;
+        
+        // Break if time limit elapsed, so that we keep sufficient FPS
+        if (asyncLoadTimer.GetMSec(true) >= ASYNC_LOAD_MAX_MSEC)
+            break;
+    }
+    
+    using namespace AsyncLoadProgress;
+    
+    VariantMap eventData;
+    eventData[P_SCENE] = (void*)this;
+    eventData[P_PROGRESS] = (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
+    eventData[P_LOADEDNODES]  = asyncProgress_.loadedNodes_;
+    eventData[P_TOTALNODES]  = asyncProgress_.totalNodes_;
+    SendEvent(E_ASYNCLOADPROGRESS, eventData);
+}
+
+void Scene::FinishAsyncLoad()
+{
+    PostLoad();
+    
+    asyncLoading_ = false;
+    asyncProgress_.file_.Reset();
+    asyncProgress_.xmlFile_.Reset();
+    asyncProgress_.xmlElement_ = XMLElement();
+    
+    using namespace AsyncLoadFinished;
+    
+    VariantMap eventData;
+    eventData[P_SCENE] = (void*)this;
+    SendEvent(E_ASYNCLOADFINISHED, eventData);
 }
 
 void RegisterSceneLibrary(Context* context)

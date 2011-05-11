@@ -116,36 +116,7 @@ void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 
 bool Node::Load(Deserializer& source)
 {
-    // Remove all children and components first in case this is not a fresh load
-    RemoveAllChildren();
-    RemoveAllComponents();
-    
-    // ID has been read at the parent level
-    if (!Serializable::Load(source))
-        return false;
-    
-    unsigned numComponents = source.ReadVLE();
-    for (unsigned i = 0; i < numComponents; ++i)
-    {
-        VectorBuffer compBuffer(source, source.ReadVLE());
-        ShortStringHash newType = compBuffer.ReadShortStringHash();
-        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), false);
-        if (newComponent)
-        {
-            if (!newComponent->Load(compBuffer))
-                return false;
-        }
-    }
-    
-    unsigned numChildren = source.ReadVLE();
-    for (unsigned i = 0; i < numChildren; ++i)
-    {
-        Node* newNode = CreateChild(source.ReadUInt(), false);
-        if (!newNode->Load(source))
-            return false;
-    }
-    
-    return true;
+    return Load(source, true);
 }
 
 bool Node::Save(Serializer& dest)
@@ -181,38 +152,7 @@ bool Node::Save(Serializer& dest)
 
 bool Node::LoadXML(const XMLElement& source)
 {
-    // Remove all children and components first in case this is not a fresh load
-    RemoveAllChildren();
-    RemoveAllComponents();
-    
-    if (!Serializable::LoadXML(source))
-        return false;
-    
-    XMLElement compElem = source.GetChildElement("component");
-    while (compElem)
-    {
-        std::string typeName = compElem.GetString("type");
-        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), false);
-        if (newComponent)
-        {
-            if (!newComponent->LoadXML(compElem))
-                return false;
-        }
-        
-        compElem = compElem.GetNextElement("component");
-    }
-    
-    XMLElement childElem = source.GetChildElement("node");
-    while (childElem)
-    {
-        Node* newNode = CreateChild(compElem.GetInt("id"), false);
-        if (!newNode->LoadXML(childElem))
-            return false;
-        
-        childElem = childElem.GetNextElement("node");
-    }
-    
-    return true;
+    return LoadXML(source, true);
 }
 
 bool Node::SaveXML(XMLElement& dest)
@@ -659,6 +599,81 @@ Component* Node::GetComponent(ShortStringHash type, unsigned index) const
     return 0;
 }
 
+bool Node::Load(Deserializer& source, bool readChildren)
+{
+    // Remove all children and components first in case this is not a fresh load
+    RemoveAllChildren();
+    RemoveAllComponents();
+    
+    // ID has been read at the parent level
+    if (!Serializable::Load(source))
+        return false;
+    
+    unsigned numComponents = source.ReadVLE();
+    for (unsigned i = 0; i < numComponents; ++i)
+    {
+        VectorBuffer compBuffer(source, source.ReadVLE());
+        ShortStringHash newType = compBuffer.ReadShortStringHash();
+        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), false);
+        if (newComponent)
+        {
+            if (!newComponent->Load(compBuffer))
+                return false;
+        }
+    }
+    
+    if (!readChildren)
+        return true;
+    
+    unsigned numChildren = source.ReadVLE();
+    for (unsigned i = 0; i < numChildren; ++i)
+    {
+        Node* newNode = CreateChild(source.ReadUInt(), false);
+        if (!newNode->Load(source))
+            return false;
+    }
+    
+    return true;
+}
+
+bool Node::LoadXML(const XMLElement& source, bool readChildren)
+{
+    // Remove all children and components first in case this is not a fresh load
+    RemoveAllChildren();
+    RemoveAllComponents();
+    
+    if (!Serializable::LoadXML(source))
+        return false;
+    
+    XMLElement compElem = source.GetChildElement("component");
+    while (compElem)
+    {
+        std::string typeName = compElem.GetString("type");
+        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), false);
+        if (newComponent)
+        {
+            if (!newComponent->LoadXML(compElem))
+                return false;
+        }
+        
+        compElem = compElem.GetNextElement("component");
+    }
+    
+    if (!readChildren)
+        return true;
+    
+    XMLElement childElem = source.GetChildElement("node");
+    while (childElem)
+    {
+        Node* newNode = CreateChild(compElem.GetInt("id"), false);
+        if (!newNode->LoadXML(childElem))
+            return false;
+        
+        childElem = childElem.GetNextElement("node");
+    }
+    
+    return true;
+}
 
 Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
 {
