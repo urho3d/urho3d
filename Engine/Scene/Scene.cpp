@@ -162,42 +162,6 @@ void Scene::SetNetworkMode(NetworkMode mode)
     networkMode_ = mode;
 }
 
-void Scene::NodeAdded(Node* node)
-{
-    if ((!node) || (node->GetScene()))
-        return;
-    
-    node->setScene(this);
-    allNodes_[node->GetID()] = node;
-}
-
-void Scene::NodeRemoved(Node* node)
-{
-    if ((!node) || (node->GetScene() != this))
-        return;
-    
-    allNodes_.erase(node->GetID());
-    node->SetID(0);
-    node->setScene(0);
-}
-
-void Scene::ComponentAdded(Component* component)
-{
-    if (!component)
-        return;
-    
-    allComponents_[component->GetID()] = component;
-}
-
-void Scene::ComponentRemoved(Component* component)
-{
-    if (!component)
-        return;
-    
-    allComponents_.erase(component->GetID());
-    component->SetID(0);
-}
-
 Node* Scene::GetNodeByID(unsigned id) const
 {
     std::map<unsigned, Node*>::const_iterator i = allNodes_.find(id);
@@ -214,14 +178,6 @@ Component* Scene::GetComponentByID(unsigned id) const
         return i->second;
     else
         return 0;
-}
-
-void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace Update;
-    
-    if (active_)
-        Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 unsigned Scene::GetFreeNodeID(bool local)
@@ -282,6 +238,51 @@ unsigned Scene::GetFreeComponentID(bool local)
                 localComponentID_ = FIRST_LOCAL_ID;
         }
     }
+}
+
+
+void Scene::NodeAdded(Node* node)
+{
+    if ((!node) || (node->GetScene()))
+        return;
+    
+    node->setScene(this);
+    allNodes_[node->GetID()] = node;
+}
+
+void Scene::NodeRemoved(Node* node)
+{
+    if ((!node) || (node->GetScene() != this))
+        return;
+    
+    allNodes_.erase(node->GetID());
+    node->SetID(0);
+    node->setScene(0);
+}
+
+void Scene::ComponentAdded(Component* component)
+{
+    if (!component)
+        return;
+    
+    allComponents_[component->GetID()] = component;
+}
+
+void Scene::ComponentRemoved(Component* component)
+{
+    if (!component)
+        return;
+    
+    allComponents_.erase(component->GetID());
+    component->SetID(0);
+}
+
+void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace Update;
+    
+    if (active_)
+        Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 void RegisterSceneLibrary(Context* context)
