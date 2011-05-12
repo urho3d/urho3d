@@ -86,6 +86,7 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool SaveXML(File@+)", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+)", asMETHOD(Scene, LoadAsync), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+)", asMETHOD(Scene, LoadAsyncXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHOD(Scene, StopAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponentByID(uint)", asMETHOD(Scene, GetComponentByID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNodeByID(uint)", asMETHOD(Scene, GetNodeByID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);

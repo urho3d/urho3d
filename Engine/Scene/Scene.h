@@ -90,6 +90,8 @@ public:
     bool LoadAsync(File* file);
     /// Load from an XML file asynchronously. Return true if started successfully
     bool LoadAsyncXML(File* file);
+    /// Stop asynchronous loading
+    void StopAsyncLoading();
     /// Update scene
     void Update(float timeStep);
     /// Set networking mode
@@ -105,9 +107,9 @@ public:
     NetworkMode GetNetworkMode() const { return networkMode_; }
     /// Return active flag
     bool IsActive() const { return active_; }
-    /// Return async loading flag
+    /// Return asynchronous loading flag
     bool IsAsyncLoading() const { return asyncLoading_; }
-    /// Return async loading progress between 0.0 and 1.0, or 1.0 if not async loading
+    /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress
     float GetAsyncProgress() const;
     
     /// Get free node ID, either non-local or local
@@ -127,9 +129,9 @@ private:
     /// Handle the logic update event to update the scene, if active
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Update asynchronous loading
-    void UpdateAsyncLoad();
+    void UpdateAsyncLoading();
     /// Finish asynchronous loading
-    void FinishAsyncLoad();
+    void FinishAsyncLoading();
     
     /// Map of scene nodes by ID
     std::map<unsigned, Node*> allNodes_;
@@ -137,7 +139,7 @@ private:
     std::map<unsigned, Component*> allComponents_;
     /// Networking mode
     NetworkMode networkMode_;
-    /// Async loading progress
+    /// Asynchronous loading progress
     AsyncProgress asyncProgress_;
     /// Next free non-local node ID
     unsigned nonLocalNodeID_;
@@ -149,7 +151,7 @@ private:
     unsigned localComponentID_;
     /// Active flag
     bool active_;
-    /// Async loading flag
+    /// Asynchronous loading flag
     bool asyncLoading_;
 };
 

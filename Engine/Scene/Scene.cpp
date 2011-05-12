@@ -75,6 +75,8 @@ void Scene::RegisterObject(Context* context)
 
 bool Scene::Load(Deserializer& source)
 {
+    StopAsyncLoading();
+    
     // Check ID
     if (source.ReadID() != "USCN")
     {
@@ -106,6 +108,8 @@ bool Scene::Save(Serializer& dest)
 
 bool Scene::LoadXML(const XMLElement& source)
 {
+    StopAsyncLoading();
+    
     // Load the whole scene, then perform post-load if successfully loaded
     if (Node::LoadXML(source))
     {
@@ -118,6 +122,8 @@ bool Scene::LoadXML(const XMLElement& source)
 
 bool Scene::LoadXML(Deserializer& source)
 {
+    StopAsyncLoading();
+    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
@@ -142,6 +148,8 @@ bool Scene::LoadAsync(File* file)
         LOGERROR("Null file for async loading");
         return false;
     }
+    
+    StopAsyncLoading();
     
     // Check ID
     if (file->ReadID() != "USCN")
@@ -173,6 +181,8 @@ bool Scene::LoadAsyncXML(File* file)
         return false;
     }
     
+    StopAsyncLoading();
+    
     SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
     if (!xmlFile->Load(*file))
         return false;
@@ -201,11 +211,19 @@ bool Scene::LoadAsyncXML(File* file)
     return true;
 }
 
+void Scene::StopAsyncLoading()
+{
+    asyncLoading_ = false;
+    asyncProgress_.file_.Reset();
+    asyncProgress_.xmlFile_.Reset();
+    asyncProgress_.xmlElement_ = XMLElement();
+}
+
 void Scene::Update(float timeStep)
 {
     if (asyncLoading_)
     {
-        UpdateAsyncLoad();
+        UpdateAsyncLoading();
         return;
     }
     
@@ -378,9 +396,9 @@ void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)
         Update(eventData[P_TIMESTEP].GetFloat());
 }
 
-void Scene::UpdateAsyncLoad()
+void Scene::UpdateAsyncLoading()
 {
-    PROFILE(UpdateAsyncLoad);
+    PROFILE(UpdateAsyncLoading);
     
     Timer asyncLoadTimer;
     
@@ -388,7 +406,7 @@ void Scene::UpdateAsyncLoad()
     {
         if (asyncProgress_.loadedNodes_ >= asyncProgress_.totalNodes_)
         {
-            FinishAsyncLoad();
+            FinishAsyncLoading();
             return;
         }
         
@@ -407,7 +425,7 @@ void Scene::UpdateAsyncLoad()
         
         ++asyncProgress_.loadedNodes_;
         
-        // Break if time limit elapsed, so that we keep sufficient FPS
+        // Break if time limit exceeded, so that we keep sufficient FPS
         if (asyncLoadTimer.GetMSec(true) >= ASYNC_LOAD_MAX_MSEC)
             break;
     }
@@ -422,14 +440,10 @@ void Scene::UpdateAsyncLoad()
     SendEvent(E_ASYNCLOADPROGRESS, eventData);
 }
 
-void Scene::FinishAsyncLoad()
+void Scene::FinishAsyncLoading()
 {
     PostLoad();
-    
-    asyncLoading_ = false;
-    asyncProgress_.file_.Reset();
-    asyncProgress_.xmlFile_.Reset();
-    asyncProgress_.xmlElement_ = XMLElement();
+    StopAsyncLoading();
     
     using namespace AsyncLoadFinished;
     

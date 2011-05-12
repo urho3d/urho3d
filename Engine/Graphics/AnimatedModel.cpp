@@ -661,7 +661,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             std::vector<Bone>& bones = skeleton_.GetModifiableBones();
             for (std::vector<Bone>::iterator i = bones.begin(); i != bones.end(); ++i)
             {
-                Node* boneNode = node_->CreateChild(i->name_);
+                // Create bones as local, as they are never to be directly synchronized over the network
+                Node* boneNode = node_->CreateChild(i->name_, true);
                 boneNode->AddListener(this);
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
                 i->node_ = boneNode;
