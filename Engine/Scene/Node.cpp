@@ -392,12 +392,6 @@ void Node::RemoveAllChildren()
         RemoveChild(children_.end() - 1);
 }
 
-void Node::SetParent(Node* parent)
-{
-    if (parent)
-        parent->AddChild(this);
-}
-
 Component* Node::CreateComponent(ShortStringHash type, bool local)
 {
     return CreateComponent(type, 0, local);
@@ -485,6 +479,12 @@ void Node::Remove()
 {
     if (parent_)
         parent_->RemoveChild(this);
+}
+
+void Node::SetParent(Node* parent)
+{
+    if (parent)
+        parent->AddChild(this);
 }
 
 unsigned Node::GetNumChildren(bool recursive) const
@@ -665,7 +665,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     XMLElement childElem = source.GetChildElement("node");
     while (childElem)
     {
-        Node* newNode = CreateChild(compElem.GetInt("id"), false);
+        Node* newNode = CreateChild(childElem.GetInt("id"), false);
         if (!newNode->LoadXML(childElem))
             return false;
         
@@ -766,7 +766,7 @@ void Node::SetID(unsigned id)
     id_ = id;
 }
 
-void Node::setScene(Scene* scene)
+void Node::SetScene(Scene* scene)
 {
     scene_ = scene;
 }

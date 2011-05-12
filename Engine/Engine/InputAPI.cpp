@@ -23,12 +23,9 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
-#include "Controls.h"
 #include "Input.h"
 
-#include <angelscript.h>
-
-static void RegisterKeyCodes(asIScriptEngine* engine)
+static void RegisterInputConstants(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const int MOUSEB_LEFT", (void*)&MOUSEB_LEFT);
     engine->RegisterGlobalProperty("const int MOUSEB_RIGHT", (void*)&MOUSEB_RIGHT);
@@ -121,38 +118,6 @@ static void RegisterKeyCodes(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_OEM_8", (void*)&KEY_OEM_8);
 }
 
-static void ConstructControls(Controls* ptr)
-{
-    new(ptr) Controls();
-}
-
-static void ConstructControlsCopy(const Controls& controls, Controls* ptr)
-{
-    new(ptr) Controls(controls);
-}
-
-static void DestructControls(Controls* ptr)
-{
-    ptr->~Controls();
-}
-
-static void RegisterControls(asIScriptEngine* engine)
-{
-    engine->RegisterObjectType("Controls", sizeof(Controls), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_CONSTRUCT, "void f(const Controls&in)", asFUNCTION(ConstructControlsCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("Controls", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructControls), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Controls", "Controls &opAssign(const Controls&in)", asMETHOD(Controls, operator =), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "void Reset()", asMETHOD(Controls, Reset), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "void Set(uint, bool)", asMETHOD(Controls, Set), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsDown(uint)", asMETHOD(Controls, IsDown), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls&in)", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
-    engine->RegisterObjectProperty("Controls", "uint buttons", offsetof(Controls, buttons_));
-    engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, yaw_));
-    engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, pitch_));
-    engine->RegisterObjectProperty("Controls", "VariantMap extraData", offsetof(Controls, extraData_));
-}
-
 static Input* GetInput()
 {
     return GetScriptContext()->GetSubsystem<Input>();
@@ -187,7 +152,6 @@ static void RegisterInput(asIScriptEngine* engine)
 
 void RegisterInputAPI(asIScriptEngine* engine)
 {
-    RegisterKeyCodes(engine);
-    RegisterControls(engine);
+    RegisterInputConstants(engine);
     RegisterInput(engine);
 }

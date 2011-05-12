@@ -105,6 +105,10 @@ public:
     NetworkMode GetNetworkMode() const { return networkMode_; }
     /// Return active flag
     bool IsActive() const { return active_; }
+    /// Return async loading flag
+    bool IsAsyncLoading() const { return asyncLoading_; }
+    /// Return async loading progress between 0.0 and 1.0, or 1.0 if not async loading
+    float GetAsyncProgress() const;
     
     /// Get free node ID, either non-local or local
     unsigned GetFreeNodeID(bool local);

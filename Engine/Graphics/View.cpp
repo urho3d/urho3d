@@ -93,8 +93,8 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
         return false;
     
     // If scene is loading asynchronously, it is incomplete and should not be rendered
-    //if (viewport.scene_->isAsyncLoading())
-    //    return false;
+    if (viewport.scene_->IsAsyncLoading())
+        return false;
     
     Octree* octree = viewport.scene_->GetComponent<Octree>();
     if (!octree)

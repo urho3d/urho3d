@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 
+#include "Precompiled.h"
 #include "Controls.h"
 
 Controls::Controls()

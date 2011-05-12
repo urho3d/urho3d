@@ -105,10 +105,6 @@ public:
     void RemoveChild(Node* node);
     /// Remove all child scene nodes
     void RemoveAllChildren();
-    /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion
-    void Remove();
-    /// Set parent scene node. Same as parent->AddChild(this)
-    void SetParent(Node* parent);
     /// Create a component to this node
     Component* CreateComponent(ShortStringHash type, bool local = false);
     /// Create a component to this node if it does not exist already
@@ -121,6 +117,10 @@ public:
     void AddListener(Component* component);
     /// Remove listener component
     void RemoveListener(Component* component);
+    /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion
+    void Remove();
+    /// Set parent scene node. Same as parent->AddChild(this)
+    void SetParent(Node* parent);
     /// Template version of creating a component
     template <class T> T* CreateComponent(bool local = false);
     /// Template version of getting or creating a component
@@ -258,7 +258,7 @@ private:
     /// Set ID. Called by Scene
     void SetID(unsigned id);
     /// Set scene. Called by Scene
-    void setScene(Scene* scene);
+    void SetScene(Scene* scene);
     
     /// Unique ID within the scene
     unsigned id_;

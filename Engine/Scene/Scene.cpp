@@ -30,11 +30,12 @@
 #include "Profiler.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "StringUtils.h"
 #include "XMLFile.h"
 
 OBJECTTYPESTATIC(Scene);
 
-static const int ASYNC_LOAD_MIN_FPS = 60;
+static const int ASYNC_LOAD_MIN_FPS = 50;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 
 Scene::Scene(Context* context) :
@@ -58,7 +59,7 @@ Scene::~Scene()
 {
     // Remove scene reference from all nodes that still exist
     for (std::map<unsigned, Node*>::iterator i = allNodes_.begin(); i != allNodes_.end(); ++i)
-        i->second->setScene(0);
+        i->second->SetScene(0);
 }
 
 void Scene::RegisterObject(Context* context)
@@ -149,7 +150,7 @@ bool Scene::LoadAsync(File* file)
         return false;
     }
     
-    // Load the root level components first
+    // Clear the previous scene and load the root level components first
     if (!Node::Load(*file, false))
         return false;
     
@@ -176,14 +177,13 @@ bool Scene::LoadAsyncXML(File* file)
     if (!xmlFile->Load(*file))
         return false;
     
-    // Load the root level components first
+    // Clear the previous scene and load the root level components first
     XMLElement rootElement = xmlFile->GetRootElement();
-    if (!Node::LoadXML(rootElement))
+    if (!Node::LoadXML(rootElement, false))
         return false;
     
-    XMLElement childNodeElement = rootElement.GetChildElement("node");
-    
     // Then prepare for loading all root level child nodes in the async update
+    XMLElement childNodeElement = rootElement.GetChildElement("node");
     asyncLoading_ = true;
     asyncProgress_.file_.Reset();
     asyncProgress_.xmlFile_ = xmlFile;
@@ -255,6 +255,14 @@ Component* Scene::GetComponentByID(unsigned id) const
         return 0;
 }
 
+float Scene::GetAsyncProgress() const
+{
+    if ((!asyncLoading_) || (!asyncProgress_.totalNodes_))
+        return 1.0f;
+    else
+        return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
+}
+
 unsigned Scene::GetFreeNodeID(bool local)
 {
     if (!local)
@@ -321,8 +329,18 @@ void Scene::NodeAdded(Node* node)
     if ((!node) || (node->GetScene()))
         return;
     
-    node->setScene(this);
-    allNodes_[node->GetID()] = node;
+    node->SetScene(this);
+    
+    // If we already have an existing node with the same ID, must remove the scene reference from it
+    unsigned id = node->GetID();
+    std::map<unsigned, Node*>::iterator i = allNodes_.find(id);
+    if ((i != allNodes_.end()) && (i->second != node))
+    {
+        LOGWARNING("Overwriting node with ID " + ToString(id));
+        i->second->SetScene(0);
+    }
+    
+    allNodes_[id] = node;
 }
 
 void Scene::NodeRemoved(Node* node)
@@ -332,7 +350,7 @@ void Scene::NodeRemoved(Node* node)
     
     allNodes_.erase(node->GetID());
     node->SetID(0);
-    node->setScene(0);
+    node->SetScene(0);
 }
 
 void Scene::ComponentAdded(Component* component)
@@ -368,7 +386,6 @@ void Scene::UpdateAsyncLoad()
     
     for (;;)
     {
-        // Check if everything loaded
         if (asyncProgress_.loadedNodes_ >= asyncProgress_.totalNodes_)
         {
             FinishAsyncLoad();
@@ -376,12 +393,12 @@ void Scene::UpdateAsyncLoad()
         }
         
         // Read one child node either from binary or XML
-        if (asyncProgress_.file_)
+        if ((asyncProgress_.file_) && (!asyncProgress_.file_->IsEof()))
         {
             Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), false);
             newNode->Load(*asyncProgress_.file_);
         }
-        else
+        if (asyncProgress_.xmlElement_)
         {
             Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), false);
             newNode->LoadXML(asyncProgress_.xmlElement_);
