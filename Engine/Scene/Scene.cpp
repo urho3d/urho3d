@@ -57,9 +57,12 @@ Scene::Scene(Context* context) :
 
 Scene::~Scene()
 {
-    // Remove scene reference from all nodes that still exist
+    // Remove scene reference and owner from all nodes that still exist
     for (std::map<unsigned, Node*>::iterator i = allNodes_.begin(); i != allNodes_.end(); ++i)
+    {
         i->second->SetScene(0);
+        i->second->SetOwner(0);
+    }
 }
 
 void Scene::RegisterObject(Context* context)
@@ -356,6 +359,7 @@ void Scene::NodeAdded(Node* node)
     {
         LOGWARNING("Overwriting node with ID " + ToString(id));
         i->second->SetScene(0);
+        i->second->SetOwner(0);
     }
     
     allNodes_[id] = node;

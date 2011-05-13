@@ -42,6 +42,7 @@ Node::Node(Context* context) :
     id_(0),
     parent_(0),
     scene_(0),
+    owner_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::UNITY),
@@ -599,6 +600,21 @@ Component* Node::GetComponent(ShortStringHash type, unsigned index) const
     return 0;
 }
 
+void Node::SetID(unsigned id)
+{
+    id_ = id;
+}
+
+void Node::SetScene(Scene* scene)
+{
+    scene_ = scene;
+}
+
+void Node::SetOwner(Connection* owner)
+{
+    owner_ = owner;
+}
+
 bool Node::Load(Deserializer& source, bool readChildren)
 {
     // Remove all children and components first in case this is not a fresh load
@@ -759,14 +775,4 @@ void Node::GetChildrenWithComponentRecursive(std::vector<Node*>& dest, ShortStri
         if (!node->children_.empty())
             node->GetChildrenRecursive(dest);
     }
-}
-
-void Node::SetID(unsigned id)
-{
-    id_ = id;
-}
-
-void Node::SetScene(Scene* scene)
-{
-    scene_ = scene;
 }

@@ -29,14 +29,13 @@
 #include <vector>
 
 class Component;
+class Connection;
 class Scene;
 
 /// Scene node that may contain components and child nodes
 class Node : public Serializable
 {
     OBJECT(Node);
-    
-    friend class Scene;
     
 public:
     /// Construct
@@ -136,6 +135,8 @@ public:
     Node* GetParent() const { return parent_; }
     /// Return scene
     Scene* GetScene() const { return scene_; }
+    /// Return owner connection in multiplayer
+    Connection* GetOwner() const { return owner_; }
     /// Return position
     const Vector3& GetPosition() const { return position_; }
     /// Return rotation
@@ -233,6 +234,13 @@ public:
     /// Template version of checking whether has a specific component
     template <class T> bool HasComponent() const;
     
+    /// Set ID. Called by Scene
+    void SetID(unsigned id);
+    /// Set scene. Called by Scene
+    void SetScene(Scene* scene);
+    /// Set owner connection for multiplayer
+    void SetOwner(Connection* owner);
+    
     /// User variables
     VariantMap vars_;
     
@@ -255,10 +263,6 @@ private:
     void GetChildrenRecursive(std::vector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively
     void GetChildrenWithComponentRecursive(std::vector<Node*>& dest, ShortStringHash type) const;
-    /// Set ID. Called by Scene
-    void SetID(unsigned id);
-    /// Set scene. Called by Scene
-    void SetScene(Scene* scene);
     
     /// Unique ID within the scene
     unsigned id_;
@@ -266,6 +270,8 @@ private:
     Node* parent_;
     /// Scene (root node)
     Scene* scene_;
+    /// Owner connection in multiplayer
+    Connection* owner_;
     /// Position
     Vector3 position_;
     /// Rotation
