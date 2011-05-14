@@ -89,6 +89,9 @@ void RegisterPeer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Peer", "uint get_numPackets() const", asMETHOD(Peer, GetNumPackets), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "const String& get_address() const", asMETHOD(Peer, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "uint16 get_port() const", asMETHOD(Peer, GetPort), asCALL_THISCALL);
+    
+    // Register Variant GetPtr() for Peer
+    engine->RegisterObjectMethod("Variant", "Peer@+ GetPeer() const", asFUNCTION(GetVariantPtr<Peer>), asCALL_CDECL_OBJLAST);
 }
 
 static Network* GetNetwork()

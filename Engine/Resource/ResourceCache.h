@@ -97,7 +97,7 @@ public:
     /// Return added resource load paths
     const std::vector<std::string>& GetResourcePaths() const { return resourcePaths_; }
     /// Return added package files
-    const std::vector<SharedPtr<PackageFile> >& getPackageFiles() const { return packages_; }
+    const std::vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name
     template <class T> T* GetResource(const std::string& name);
     /// Template version of returning a resource by name hash

@@ -655,24 +655,24 @@ std::string StringSubstring2Params(unsigned start, unsigned length, const std::s
 
 std::string StringTrim(const std::string& str)
 {
-    unsigned tristart_ = 0;
-    unsigned triend_ = str.length();
-    while (tristart_ < triend_)
+    unsigned trimStart = 0;
+    unsigned trimEnd = str.length();
+    while (trimStart < trimEnd)
     {
-        char c = str[tristart_];
+        char c = str[trimStart];
         if ((c != ' ') && (c != 9))
             break;
-        ++tristart_;
+        ++trimStart;
     }
-    while (triend_ > tristart_)
+    while (trimEnd > trimStart)
     {
-        char c = str[triend_ - 1];
+        char c = str[trimEnd - 1];
         if ((c != ' ') && (c != 9))
             break;
-        --triend_;
+        --trimEnd;
     }
     
-    return str.substr(tristart_, triend_ - tristart_);
+    return str.substr(trimStart, trimEnd - trimStart);
 }
 
 static void ConstructStringInt(int value, std::string* ptr)

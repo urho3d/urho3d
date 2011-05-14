@@ -44,6 +44,8 @@ public:
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream
     virtual const std::string& GetName() const;
+    /// Return a checksum if applicable
+    virtual unsigned GetChecksum();
     /// Return current position
     unsigned GetPosition() const { return position_; }
     /// Return size

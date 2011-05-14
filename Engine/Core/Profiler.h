@@ -64,7 +64,7 @@ public:
     }
     
     /// End timing
-    void end()
+    void End()
     {
         time_ += timer_.GetUSec(false);
     }
@@ -195,7 +195,7 @@ public:
     {
         if (current_ != root_)
         {
-            current_->end();
+            current_->End();
             current_ = current_->GetParent();
         }
     }

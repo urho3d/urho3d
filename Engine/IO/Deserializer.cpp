@@ -50,6 +50,11 @@ const std::string& Deserializer::GetName() const
     return noName;
 }
 
+unsigned Deserializer::GetChecksum()
+{
+    return 0;
+}
+
 int Deserializer::ReadInt()
 {
     int ret;

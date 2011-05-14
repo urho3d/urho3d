@@ -232,7 +232,6 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode)", asMETHODPR(File, Open, (const std::string&, FileMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("File", "uint get_checksum()", asMETHOD(File, GetChecksum), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");

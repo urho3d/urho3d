@@ -27,6 +27,7 @@
 #include "CoreEvents.h"
 #include "File.h"
 #include "Log.h"
+#include "PackageFile.h"
 #include "Profiler.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -45,11 +46,12 @@ Scene::Scene(Context* context) :
     nonLocalComponentID_(FIRST_NONLOCAL_ID),
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
+    checksum_(0),
     active_(true),
     asyncLoading_(false)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
-    SetID(GetFreeNodeID(false));
+    SetID(GetFreeunsigned(false));
     NodeAdded(this);
     
     SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
@@ -90,7 +92,7 @@ bool Scene::Load(Deserializer& source)
     // Load the whole scene, then perform post-load if successfully loaded
     if (Node::Load(source))
     {
-        PostLoad();
+        FinishLoading(&source);
         return true;
     }
     else
@@ -114,13 +116,40 @@ bool Scene::LoadXML(const XMLElement& source)
     StopAsyncLoading();
     
     // Load the whole scene, then perform post-load if successfully loaded
+    // Note: the scene filename and checksum can not be set, as we only used an XML element
     if (Node::LoadXML(source))
     {
-        PostLoad();
+        FinishLoading(0);
         return true;
     }
     else
         return false;
+}
+
+void Scene::Update(float timeStep)
+{
+    if (asyncLoading_)
+    {
+        UpdateAsyncLoading();
+        return;
+    }
+    
+    PROFILE(UpdateScene);
+    
+    using namespace SceneUpdate;
+    
+    VariantMap eventData;
+    eventData[P_SCENE] = (void*)this;
+    eventData[P_TIMESTEP] = timeStep;
+    
+    // Update variable timestep logic
+    SendEvent(E_SCENEUPDATE, eventData);
+    
+    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
+    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
+    
+    // Post-update variable timestep logic
+    SendEvent(E_SCENEPOSTUPDATE, eventData);
 }
 
 bool Scene::LoadXML(Deserializer& source)
@@ -131,7 +160,14 @@ bool Scene::LoadXML(Deserializer& source)
     if (!xml->Load(source))
         return false;
     
-    return LoadXML(xml->GetRootElement());
+    // Load the whole scene, then perform post-load if successfully loaded
+    if (Node::LoadXML(xml->GetRootElement()))
+    {
+        FinishLoading(&source);
+        return true;
+    }
+    else
+        return false;
 }
 
 bool Scene::SaveXML(Serializer& dest)
@@ -162,6 +198,7 @@ bool Scene::LoadAsync(File* file)
     }
     
     // Clear the previous scene and load the root level components first
+    Clear();
     if (!Node::Load(*file, false))
         return false;
     
@@ -191,6 +228,7 @@ bool Scene::LoadAsyncXML(File* file)
         return false;
     
     // Clear the previous scene and load the root level components first
+    Clear();
     XMLElement rootElement = xmlFile->GetRootElement();
     if (!Node::LoadXML(rootElement, false))
         return false;
@@ -198,7 +236,7 @@ bool Scene::LoadAsyncXML(File* file)
     // Then prepare for loading all root level child nodes in the async update
     XMLElement childNodeElement = rootElement.GetChildElement("node");
     asyncLoading_ = true;
-    asyncProgress_.file_.Reset();
+    asyncProgress_.file_ = file;
     asyncProgress_.xmlFile_ = xmlFile;
     asyncProgress_.xmlElement_ = childNodeElement;
     asyncProgress_.loadedNodes_ = 0;
@@ -222,32 +260,6 @@ void Scene::StopAsyncLoading()
     asyncProgress_.xmlElement_ = XMLElement();
 }
 
-void Scene::Update(float timeStep)
-{
-    if (asyncLoading_)
-    {
-        UpdateAsyncLoading();
-        return;
-    }
-    
-    PROFILE(UpdateScene);
-    
-    using namespace SceneUpdate;
-    
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
-    eventData[P_TIMESTEP] = timeStep;
-    
-    // Update variable timestep logic
-    SendEvent(E_SCENEUPDATE, eventData);
-    
-    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
-    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
-    
-    // Post-update variable timestep logic
-    SendEvent(E_SCENEPOSTUPDATE, eventData);
-}
-
 void Scene::SetActive(bool enable)
 {
     active_ = enable;
@@ -256,6 +268,42 @@ void Scene::SetActive(bool enable)
 void Scene::SetNetworkMode(NetworkMode mode)
 {
     networkMode_ = mode;
+}
+
+void Scene::Clear()
+{
+    RemoveAllChildren();
+    RemoveAllComponents();
+    fileName_ = std::string();
+    checksum_ = 0;
+}
+
+void Scene::ClearNonLocal()
+{
+    // Because node removal can remove arbitrary other nodes, can not iterate. Instead loop until the first node is local,
+    // or the map is empty
+    while ((allNodes_.size()) && (allNodes_.begin()->first < FIRST_LOCAL_ID))
+        allNodes_.begin()->second->Remove();
+}
+
+void Scene::AddRequiredPackageFile(PackageFile* file)
+{
+    if (file)
+        requiredPackageFiles_.push_back(SharedPtr<PackageFile>(file));
+}
+
+void Scene::ClearRequiredPackageFiles()
+{
+    requiredPackageFiles_.clear();
+}
+
+void Scene::ResetOwner(Connection* owner)
+{
+    for (std::map<unsigned, Node*>::iterator i = allNodes_.begin(); i != allNodes_.end(); ++i)
+    {
+        if (i->second->GetOwner() == owner)
+            i->second->SetOwner(0);
+    }
 }
 
 Node* Scene::GetNodeByID(unsigned id) const
@@ -284,7 +332,7 @@ float Scene::GetAsyncProgress() const
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
 }
 
-unsigned Scene::GetFreeNodeID(bool local)
+unsigned Scene::GetFreeunsigned(bool local)
 {
     if (!local)
     {
@@ -415,12 +463,12 @@ void Scene::UpdateAsyncLoading()
         }
         
         // Read one child node either from binary or XML
-        if ((asyncProgress_.file_) && (!asyncProgress_.file_->IsEof()))
+        if (!asyncProgress_.xmlFile_)
         {
             Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), false);
             newNode->Load(*asyncProgress_.file_);
         }
-        if (asyncProgress_.xmlElement_)
+        else
         {
             Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), false);
             newNode->LoadXML(asyncProgress_.xmlElement_);
@@ -430,7 +478,7 @@ void Scene::UpdateAsyncLoading()
         ++asyncProgress_.loadedNodes_;
         
         // Break if time limit exceeded, so that we keep sufficient FPS
-        if (asyncLoadTimer.GetMSec(true) >= ASYNC_LOAD_MAX_MSEC)
+        if (asyncLoadTimer.GetMSec(false) >= ASYNC_LOAD_MAX_MSEC)
             break;
     }
     
@@ -446,7 +494,7 @@ void Scene::UpdateAsyncLoading()
 
 void Scene::FinishAsyncLoading()
 {
-    PostLoad();
+    FinishLoading(asyncProgress_.file_);
     StopAsyncLoading();
     
     using namespace AsyncLoadFinished;
@@ -454,6 +502,17 @@ void Scene::FinishAsyncLoading()
     VariantMap eventData;
     eventData[P_SCENE] = (void*)this;
     SendEvent(E_ASYNCLOADFINISHED, eventData);
+}
+
+void Scene::FinishLoading(Deserializer* source)
+{
+    PostLoad();
+    
+    if (source)
+    {
+        fileName_ = source->GetName();
+        checksum_ = source->GetChecksum();
+    }
 }
 
 void RegisterSceneLibrary(Context* context)

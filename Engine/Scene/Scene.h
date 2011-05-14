@@ -27,6 +27,7 @@
 #include "XMLElement.h"
 
 class File;
+class PackageFile;
 
 /// First replicated node/component ID
 static const unsigned FIRST_NONLOCAL_ID = 0x1;
@@ -82,6 +83,8 @@ public:
     /// Load from XML data. Return true if successful
     virtual bool LoadXML(const XMLElement& source);
     
+    /// Update scene
+    void Update(float timeStep);
     /// Load from an XML file. Return true if successful
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful
@@ -92,12 +95,20 @@ public:
     bool LoadAsyncXML(File* file);
     /// Stop asynchronous loading
     void StopAsyncLoading();
-    /// Update scene
-    void Update(float timeStep);
     /// Set networking mode
     void SetNetworkMode(NetworkMode mode);
     /// Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
+    /// Clear scene completely of nodes and components
+    void Clear();
+    /// Clear scene of all non-local child nodes. Note: if they have local children, they will be removed as well
+    void ClearNonLocal();
+    /// Add a required package file for multiplayer. To be called on the server
+    void AddRequiredPackageFile(PackageFile* file);
+    /// Clear required package files
+    void ClearRequiredPackageFiles();
+    /// Reset specific owner reference from nodes on disconnect
+    void ResetOwner(Connection* owner);
     
     /// Return node from the whole scene by ID, or null if not found
     Node* GetNodeByID(unsigned id) const;
@@ -111,9 +122,19 @@ public:
     bool IsAsyncLoading() const { return asyncLoading_; }
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress
     float GetAsyncProgress() const;
+    /// Return source file name
+    const std::string& GetFileName() const { return fileName_; }
+    /// Return source file checksum
+    unsigned GetChecksum() const { return checksum_; }
+    /// Return required package files
+    const std::vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
+    /// Return all nodes
+    const std::map<unsigned, Node*>& GetAllNodes() const { return allNodes_; }
+    /// Return all components
+    const std::map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
     
     /// Get free node ID, either non-local or local
-    unsigned GetFreeNodeID(bool local);
+    unsigned GetFreeunsigned(bool local);
     /// Get free component ID, either non-local or local
     unsigned GetFreeComponentID(bool local);
     /// Node added. Assign scene pointer and add to ID map
@@ -132,6 +153,8 @@ private:
     void UpdateAsyncLoading();
     /// Finish asynchronous loading
     void FinishAsyncLoading();
+    /// Finish loading
+    void FinishLoading(Deserializer* source);
     
     /// Map of scene nodes by ID
     std::map<unsigned, Node*> allNodes_;
@@ -141,6 +164,10 @@ private:
     NetworkMode networkMode_;
     /// Asynchronous loading progress
     AsyncProgress asyncProgress_;
+    /// Source file name
+    std::string fileName_;
+    /// Required package files for multiplayer
+    std::vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Next free non-local node ID
     unsigned nonLocalNodeID_;
     /// Next free local node ID
@@ -149,6 +176,8 @@ private:
     unsigned nonLocalComponentID_;
     /// Next free local component ID
     unsigned localComponentID_;
+    /// Scene source file checksum
+    unsigned checksum_;
     /// Active flag
     bool active_;
     /// Asynchronous loading flag

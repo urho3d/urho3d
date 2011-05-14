@@ -60,6 +60,8 @@ public:
     virtual unsigned Write(const void* data, unsigned size);
     /// Return the file name
     virtual const std::string& GetName() const { return fileName_; }
+    /// Return a checksum of the file contents, using the SDBM hash algorithm
+    virtual unsigned GetChecksum();
     
     /// Open a filesystem file. Return true if successful
     bool Open(const std::string& fileName, FileMode mode = FILE_READ);
@@ -74,8 +76,6 @@ public:
     FileMode GetMode() const { return mode_; }
     /// Return whether is open
     bool IsOpen() const { return handle_ != 0; }
-    /// Return a checksum of the file contents, using the SDBM hash algorithm
-    unsigned GetChecksum();
     
     /// Return the file handle
     void* GetHandle() const { return handle_; }

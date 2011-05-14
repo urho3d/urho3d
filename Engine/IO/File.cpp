@@ -219,6 +219,22 @@ unsigned File::Write(const void* data, unsigned size)
     return size;
 }
 
+unsigned File::GetChecksum()
+{
+    if ((offset_) || (checksum_))
+        return checksum_;
+    
+    unsigned oldPos = position_;
+    checksum_ = 0;
+    
+    Seek(0);
+    while (!IsEof())
+        checksum_ = SDBMHash(checksum_, ReadUByte());
+    
+    Seek(oldPos);
+    return checksum_;
+}
+
 void File::Close()
 {
     if (handle_)
@@ -235,20 +251,4 @@ void File::Close()
 void File::SetName(const std::string& name)
 {
     fileName_ = name;
-}
-
-unsigned File::GetChecksum()
-{
-    if ((offset_) || (checksum_))
-        return checksum_;
-    
-    unsigned oldPos = position_;
-    checksum_ = 0;
-    
-    Seek(0);
-    while (!IsEof())
-        checksum_ = SDBMHash(checksum_, ReadUByte());
-    
-    Seek(oldPos);
-    return checksum_;
 }

@@ -723,7 +723,7 @@ Node* Node::CreateChild(unsigned id, bool local)
     
     // If zero ID specified, let the scene assign
     if (scene_)
-        newNode->SetID(id ? id : scene_->GetFreeNodeID(local));
+        newNode->SetID(id ? id : scene_->GetFreeunsigned(local));
     else
         newNode->SetID(id);
     

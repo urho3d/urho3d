@@ -100,7 +100,7 @@ public:
     void Reset();
     
     /// Return if high-resolution timer is supported
-    static bool Isupported() { return supported; }
+    static bool IsSupported() { return supported; }
     /// Return high-resolution timer frequency if supported
     static long long GetFrequency() { return frequency; }
     
