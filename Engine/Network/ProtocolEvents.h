@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Event.h"
+#include "Object.h"
 
 /// (Server) Client has sent login
 EVENT(E_CLIENTLOGIN, ClientLogin)

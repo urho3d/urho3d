@@ -26,7 +26,7 @@
 #include "RefCounted.h"
 
 /// Shared array pointer template class. Uses non-intrusive reference counting
-template <typename T> class SharedArrayPtr
+template <class T> class SharedArrayPtr
 {
 public:
     /// Construct a null shared array pointer
@@ -115,7 +115,7 @@ public:
     }
     
     /// Perform a static cast from a shared array pointer of another type
-    template <typename U> void StaticCast(const SharedArrayPtr<U>& rhs)
+    template <class U> void StaticCast(const SharedArrayPtr<U>& rhs)
     {
         Release();
         
@@ -126,7 +126,7 @@ public:
     }
     
     /// Perform a dynatic cast from a shared array pointer of another type
-    template <typename U> void DynamicCast(const SharedArrayPtr<U>& rhs)
+    template <class U> void DynamicCast(const SharedArrayPtr<U>& rhs)
     {
         Release();
         
@@ -156,7 +156,7 @@ public:
     
 private:
     /// Prevent direct assignment from a shared array pointer of different type
-    template <typename U> SharedArrayPtr<T>& operator = (const SharedArrayPtr<U>& rhs);
+    template <class U> SharedArrayPtr<T>& operator = (const SharedArrayPtr<U>& rhs);
     
     /// Release the array reference and delete it and the RefCount structure as applicable
     void Release()
@@ -188,7 +188,7 @@ private:
 };
 
 /// Perform a static cast from one shared array pointer type to another
-template <typename T, typename U> SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>& ptr)
+template <class T, class U> SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>& ptr)
 {
     SharedArrayPtr<T> ret;
     ret.StaticCast(ptr);
@@ -196,7 +196,7 @@ template <typename T, typename U> SharedArrayPtr<T> StaticCast(const SharedArray
 }
 
 /// Perform a dynamic cast from one shared array pointer type to another
-template <typename T, typename U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U>& ptr)
+template <class T, class U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U>& ptr)
 {
     SharedArrayPtr<T> ret;
     ret.DynamicCast(ptr);
@@ -204,7 +204,7 @@ template <typename T, typename U> SharedArrayPtr<T> DynamicCast(const SharedArra
 }
 
 /// Weak array pointer template class. Uses non-intrusive reference counting
-template <typename T> class WeakArrayPtr
+template <class T> class WeakArrayPtr
 {
 public:
     /// Construct a null weak array pointer
@@ -322,7 +322,7 @@ public:
     }
     
     /// Perform a static cast from a weak array pointer of another type
-    template <typename U> void StaticCast(const WeakArrayPtr<U>& rhs)
+    template <class U> void StaticCast(const WeakArrayPtr<U>& rhs)
     {
         Release();
         
@@ -333,7 +333,7 @@ public:
     }
     
     /// Perform a dynamic cast from a weak array pointer of another type
-    template <typename U> void DynamicCast(const WeakArrayPtr<U>& rhs)
+    template <class U> void DynamicCast(const WeakArrayPtr<U>& rhs)
     {
         Release();
         
@@ -363,7 +363,7 @@ public:
     
 private:
     /// Prevent direct assignment from a weak array pointer of different type
-    template <typename U> WeakArrayPtr<T>& operator = (const WeakArrayPtr<U>& rhs);
+    template <class U> WeakArrayPtr<T>& operator = (const WeakArrayPtr<U>& rhs);
     
     /// Release the weak reference. Delete the Refcount structure if the array has expired and this was the last weak reference
     void Release()
@@ -388,7 +388,7 @@ private:
 };
 
 /// Perform a static cast from one weak array pointer type to another
-template <typename T, typename U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& ptr)
+template <class T, class U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& ptr)
 {
     WeakArrayPtr<T> ret;
     ret.StaticCast(ptr);
@@ -396,7 +396,7 @@ template <typename T, typename U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<
 }
 
 /// Perform a dynamic cast from one weak pointer type to another
-template <typename T, typename U> WeakArrayPtr<T> DynamicCast(const WeakArrayPtr<U>& ptr)
+template <class T, class U> WeakArrayPtr<T> DynamicCast(const WeakArrayPtr<U>& ptr)
 {
     WeakArrayPtr<T> ret;
     ret.DynamicCast(ptr);

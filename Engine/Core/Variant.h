@@ -839,7 +839,7 @@ public:
     }
 
     /// Return the value, template version
-    template <typename T> T Get() const;
+    template <class T> T Get() const;
     /// Return type
     VariantType GetType() const { return type_; }
     /// Return type name

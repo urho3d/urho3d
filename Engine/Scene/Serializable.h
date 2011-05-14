@@ -79,7 +79,7 @@ protected:
 
 
 /// Template implementation of the attribute accessor invoke helper class (stores function pointers of specific class)
-template <class T, typename U> class AttributeAccessorImpl : public AttributeAccessor
+template <class T, class U> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
     typedef U (T::*GetFunctionPtr)() const;

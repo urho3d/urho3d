@@ -62,17 +62,17 @@ Server::~Server()
 
 void Server::SetNetFps(int fps)
 {
-    netFps_ = max(fps, 1);
+    netFps_ = Max(fps, 1);
 }
 
 void Server::SetMaxSceneRevisions(int revisions)
 {
-    maxSceneRevisions_ = max(revisions, 3);
+    maxSceneRevisions_ = Max(revisions, 3);
 }
 
 void Server::SetStayRelevantTime(int time)
 {
-    stayRelevantTime_ = max(time, 1);
+    stayRelevantTime_ = Max(time, 1);
 }
 
 void Server::AddScene(Scene* scene)
