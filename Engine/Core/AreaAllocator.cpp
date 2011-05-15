@@ -31,10 +31,10 @@ AreaAllocator::AreaAllocator(int width, int height)
 
 void AreaAllocator::Reset(int width, int height)
 {
-    freeAreas_.clear();
+    freeAreas_.Clear();
     
     IntRect initialArea(0, 0, width, height);
-    freeAreas_.push_back(initialArea);
+    freeAreas_.Push(initialArea);
 }
 
 bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
@@ -44,10 +44,10 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     if (height < 0)
         height = 0;
     
-    std::vector<IntRect>::iterator best = freeAreas_.end();
+    Vector<IntRect>::Iterator best = freeAreas_.End();
     int bestFreeArea = M_MAX_INT;
     
-    for (std::vector<IntRect>::iterator i = freeAreas_.begin(); i != freeAreas_.end(); ++i)
+    for (Vector<IntRect>::Iterator i = freeAreas_.Begin(); i != freeAreas_.End(); ++i)
     {
         int freeWidth = i->right_ - i->left_;
         int freeHeight = i->bottom_ - i->top_;
@@ -57,7 +57,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
             // Calculate rank for free area. Lower is better
             int freeArea = freeWidth * freeHeight;
             
-            if ((best == freeAreas_.end()) || (freeArea < bestFreeArea))
+            if ((best == freeAreas_.End()) || (freeArea < bestFreeArea))
             {
                 best = i;
                 bestFreeArea = freeArea;
@@ -65,7 +65,7 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         }
     }
     
-    if (best == freeAreas_.end())
+    if (best == freeAreas_.End())
         return false;
     
     IntRect reserved;
@@ -78,10 +78,10 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
     y = best->top_;
     
     // Remove the reserved area from all free areas
-    for (unsigned i = 0; i < freeAreas_.size();)
+    for (unsigned i = 0; i < freeAreas_.Size();)
     {
         if (SplitRect(freeAreas_[i], reserved))
-            freeAreas_.erase(freeAreas_.begin() + i);
+            freeAreas_.Erase(i);
         else
             ++i;
     }
@@ -100,28 +100,28 @@ bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
         {
             IntRect newRect = original;
             newRect.left_ = reserve.right_;
-            freeAreas_.push_back(newRect);
+            freeAreas_.Push(newRect);
         }
         // Check for splitting from the left
         if (reserve.left_ > original.left_)
         {
             IntRect newRect = original;
             newRect.right_ = reserve.left_;
-            freeAreas_.push_back(newRect);
+            freeAreas_.Push(newRect);
         }
         // Check for splitting from the bottom
         if (reserve.bottom_ < original.bottom_)
         {
             IntRect newRect = original;
             newRect.top_ = reserve.bottom_;
-            freeAreas_.push_back(newRect);
+            freeAreas_.Push(newRect);
         }
         // Check for splitting from the top
         if (reserve.top_ > original.top_)
         {
             IntRect newRect = original;
             newRect.bottom_ = reserve.top_;
-            freeAreas_.push_back(newRect);
+            freeAreas_.Push(newRect);
         }
         
         return true;
@@ -133,17 +133,17 @@ bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
 void AreaAllocator::Cleanup()
 {
     // Remove rects which are contained within another rect
-    for (unsigned i = 0; i < freeAreas_.size(); )
+    for (unsigned i = 0; i < freeAreas_.Size(); )
     {
         bool erased = false;
-        for (unsigned j = i + 1; j < freeAreas_.size(); )
+        for (unsigned j = i + 1; j < freeAreas_.Size(); )
         {
             if ((freeAreas_[i].left_ >= freeAreas_[j].left_) &&
                 (freeAreas_[i].top_ >= freeAreas_[j].top_) &&
                 (freeAreas_[i].right_ <= freeAreas_[j].right_) &&
                 (freeAreas_[i].bottom_ <= freeAreas_[j].bottom_))
             {
-                freeAreas_.erase(freeAreas_.begin() + i);
+                freeAreas_.Erase(i);
                 erased = true;
                 break;
             }
@@ -151,7 +151,7 @@ void AreaAllocator::Cleanup()
                 (freeAreas_[j].top_ >= freeAreas_[i].top_) &&
                 (freeAreas_[j].right_ <= freeAreas_[i].right_) &&
                 (freeAreas_[j].bottom_ <= freeAreas_[i].bottom_))
-                freeAreas_.erase(freeAreas_.begin() + j);
+                freeAreas_.Erase(j);
             else
                 ++j;
         }

@@ -23,28 +23,32 @@
 
 #pragma once
 
-#include "Rect.h"
-
-#include <vector>
-
-/// Rectangle allocator, used for font glyph packing
-class AreaAllocator
+/// Pair template class
+template <class T, class U> class Pair
 {
 public:
-    /// Construct with given width and height
-    AreaAllocator(int width, int height);
+    /// Construct
+    Pair()
+    {
+    }
     
-    /// Reset to given width and height and remove all previous allocations
-    void Reset(int width, int height);
-    /// Try to allocate an area. Return true if successful, with x & y coordinates filled
-    bool Allocate(int width, int height, int& x, int& y);
-
-private:
-    /// Cut the reserved area from a rectangle. Return true if the rectangle should be removed from the vector
-    bool SplitRect(IntRect original, const IntRect& reserved);
-    /// Remove overlapping free rectangles
-    void Cleanup();
+    /// Construct with values
+    Pair(const T& first, const U& second) :
+        first_(first),
+        second_(second)
+    {
+    }
     
-    /// Free rectangles
-    std::vector<IntRect> freeAreas_;
+    /// Check for equality
+    bool operator == (const Pair<T, U>& rhs) { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+    /// Check for inequality
+    bool operator != (const Pair<T, U>& rhs) { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+    
+    T first_;
+    U second_;
 };
+
+template <class T, class U> Pair<T, U> MakePair(const T& first, const U& second)
+{
+    return Pair<T, U>(first, second);
+}
