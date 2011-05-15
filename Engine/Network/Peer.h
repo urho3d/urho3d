@@ -134,9 +134,9 @@ private:
     /// Connection state
     ConnectionState connectionState_;
     /// Received packets per channel
-    std::map<unsigned char, std::list<QueuedPacket> > packets_;
+    std::map<unsigned char, std::vector<QueuedPacket> > packets_;
     /// Latency-simulated packets waiting to be sent
-    std::list<QueuedPacket> sentPackets_;
+    std::vector<QueuedPacket> sentPackets_;
     /// Remote host address
     std::string address_;
     /// Remote host port

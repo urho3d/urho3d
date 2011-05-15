@@ -111,14 +111,14 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
     
     if (channel == CHANNEL_ANY)
     {
-        for (std::map<unsigned char, std::list<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
+        for (std::map<unsigned char, std::vector<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
         {
-            std::list<QueuedPacket>& packetList = i->second;
+            std::vector<QueuedPacket>& packetList = i->second;
             if ((!packetList.empty()) && (packetList.front().timer_.GetMSec(false) >= halfSimulatedLatency_))
             {
                 ENetPacket* enetPacket = packetList.front().packet_;
                 reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-                packetList.pop_front();
+                packetList.erase(packetList.begin());
                 
                 packet.SetData(enetPacket->data, enetPacket->dataLength);
                 enet_packet_destroy(enetPacket);
@@ -129,12 +129,12 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
     }
     else
     {
-        std::list<QueuedPacket>& packetList = packets_[channel];
+        std::vector<QueuedPacket>& packetList = packets_[channel];
         if ((!packetList.empty()) && (packetList.front().timer_.GetMSec(false) >= halfSimulatedLatency_))
         {
             ENetPacket* enetPacket = packetList.front().packet_;
             reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-            packetList.pop_front();
+            packetList.erase(packetList.begin());
             
             packet.SetData(enetPacket->data, enetPacket->dataLength);
             enet_packet_destroy(enetPacket);
@@ -157,7 +157,7 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
 void Peer::Update()
 {
     // Check send timer of packets with simulated latency and send as necessary
-    for (std::list<QueuedPacket>::iterator i = sentPackets_.begin(); i != sentPackets_.end();)
+    for (std::vector<QueuedPacket>::iterator i = sentPackets_.begin(); i != sentPackets_.end();)
     {
         if (i->timer_.GetMSec(false) >= halfSimulatedLatency_)
         {
@@ -171,20 +171,20 @@ void Peer::Update()
 
 void Peer::FlushPackets()
 {
-    for (std::map<unsigned char, std::list<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
+    for (std::map<unsigned char, std::vector<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
     {
-        std::list<QueuedPacket>& packetList = i->second;
+        std::vector<QueuedPacket>& packetList = i->second;
         while (!packetList.empty())
         {
-            ENetPacket* enetPacket = packetList.front().packet_;
-            packetList.pop_front();
+            ENetPacket* enetPacket = packetList.back().packet_;
+            packetList.pop_back();
             enet_packet_destroy(enetPacket);
         }
     }
     while (!sentPackets_.empty())
     {
-        ENetPacket* enetPacket = sentPackets_.front().packet_;
-        sentPackets_.pop_front();
+        ENetPacket* enetPacket = sentPackets_.back().packet_;
+        sentPackets_.pop_back();
         enet_packet_destroy(enetPacket);
     }
 }
