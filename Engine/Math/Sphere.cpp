@@ -24,13 +24,6 @@
 #include "Precompiled.h"
 #include "Frustum.h"
 
-void Sphere::Define(const std::vector<Vector3>& vertices)
-{
-    defined_ = false;
-    for (std::vector<Vector3>::const_iterator i = vertices.begin(); i != vertices.end(); ++i)
-        Merge(*i);
-}
-
 void Sphere::Define(const Vector3* vertices, unsigned count)
 {
     if (!count)
@@ -59,12 +52,6 @@ void Sphere::Define(const BoundingBox& box)
 void Sphere::Define(const Frustum& frustum)
 {
     Define(frustum.GetVertices(), NUM_FRUSTUM_VERTICES);
-}
-
-void Sphere::Merge(const std::vector<Vector3>& vertices)
-{
-    for (std::vector<Vector3>::const_iterator i = vertices.begin(); i != vertices.end(); ++i)
-        Merge(*i);
 }
 
 void Sphere::Merge(const Vector3* vertices, unsigned count)

@@ -25,6 +25,8 @@
 
 #include "Rect.h"
 
+#include <vector>
+
 /// Rectangle allocator, used for font glyph packing
 class AreaAllocator
 {

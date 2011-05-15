@@ -24,13 +24,6 @@
 #include "Precompiled.h"
 #include "Frustum.h"
 
-void BoundingBox::Define(const std::vector<Vector3>& vertices)
-{
-    defined_ = false;
-    for (std::vector<Vector3>::const_iterator i = vertices.begin(); i != vertices.end(); ++i)
-        Merge(*i);
-}
-
 void BoundingBox::Define(const Vector3* vertices, unsigned count)
 {
     if (!count)
@@ -53,12 +46,6 @@ void BoundingBox::Define(const Sphere& sphere)
     min_ = center + Vector3(-radius, -radius, -radius);
     max_ = center + Vector3(radius, radius, radius);
     defined_ = true;
-}
-
-void BoundingBox::Merge(const std::vector<Vector3>& vertices)
-{
-    for (std::vector<Vector3>::const_iterator i = vertices.begin(); i != vertices.end(); ++i)
-        Merge(*i);
 }
 
 void BoundingBox::Merge(const Vector3* vertices, unsigned count)
@@ -100,11 +87,11 @@ void BoundingBox::Intersect(const BoundingBox& box)
         max_.z_ = box.max_.z_;
     
     if (min_.x_ > max_.x_)
-        std::swap(min_.x_, max_.x_);
+        Swap(min_.x_, max_.x_);
     if (min_.y_ > max_.y_)
-        std::swap(min_.y_, max_.y_);
+        Swap(min_.y_, max_.y_);
     if (min_.z_ > max_.z_)
-        std::swap(min_.z_, max_.z_);
+        Swap(min_.z_, max_.z_);
 }
 
 void BoundingBox::Transform(const Matrix3& transform)

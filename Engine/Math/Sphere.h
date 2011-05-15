@@ -79,8 +79,6 @@ public:
         defined_ = true;
     }
     
-    /// Define from a vector of vertices
-    void Define(const std::vector<Vector3>& vertices);
     /// Define from an array of vertices
     void Define(const Vector3* vertices, unsigned count);
     /// Define from a boundingBox
@@ -109,8 +107,6 @@ public:
         }
     }
     
-    /// Merge a vector of vertices
-    void Merge(const std::vector<Vector3>& vertices);
     /// Merge an array of vertices
     void Merge(const Vector3* vertices, unsigned count);
     /// Merge a bounding box

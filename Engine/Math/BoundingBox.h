@@ -26,8 +26,6 @@
 #include "Rect.h"
 #include "Vector3.h"
 
-#include <vector>
-
 class Frustum;
 class Matrix3;
 class Matrix4;
@@ -171,16 +169,12 @@ public:
         if (box.max_.z_ > max_.z_) max_.z_ = box.max_.z_;
     }
     
-    /// Define from a vector of vertices
-    void Define(const std::vector<Vector3>& vertices);
     /// Define from an array of vertices
     void Define(const Vector3* vertices, unsigned count);
     /// Define from a frustum
     void Define(const Frustum& frustum);
     /// Define from a sphere
     void Define(const Sphere& sphere);
-    /// Merge a vector of vertices
-    void Merge(const std::vector<Vector3>& vertices);
     /// Merge an array of vertices
     void Merge(const Vector3* vertices, unsigned count);
     /// Merge a frustum
