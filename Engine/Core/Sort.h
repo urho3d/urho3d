@@ -23,18 +23,13 @@
 
 #pragma once
 
+#include "MathDefs.h"
+
 static const int QUICKSORT_THRESHOLD = 16;
 
-/// Swap two elements
-template <class T> void Swap(T& first, T& second)
-{
-    T temp = first;
-    first = second;
-    second = temp;
-}
+// Based on http://warp.povusers.org/SortComparison/
 
 /// Perform insertion sort on an array
-/// Based on http://warp.povusers.org/SortComparison/
 template <class T> void InsertionSort(T* begin, T* end)
 {
     for (T* i = begin + 1; i < end; ++i)
@@ -51,7 +46,6 @@ template <class T> void InsertionSort(T* begin, T* end)
 }
 
 /// Perform insertion sort on an array using a compare function
-/// Based on http://warp.povusers.org/SortComparison/
 template <class T> void InsertionSort(T* begin, T* end, bool (*compare)(const T&, const T&))
 {
     for (T* i = begin + 1; i < end; ++i)
@@ -68,7 +62,6 @@ template <class T> void InsertionSort(T* begin, T* end, bool (*compare)(const T&
 }
 
 /// Perform quick sort initial pass on an array. Does not sort fully
-/// Based on http://warp.povusers.org/SortComparison/
 template <class T> void InitialQuickSort(T* begin, T* end)
 {
     while (begin + QUICKSORT_THRESHOLD < end)
@@ -100,7 +93,6 @@ template <class T> void InitialQuickSort(T* begin, T* end)
 }
 
 /// Perform quick sort initial pass on an array using a compare function. Does not sort fully
-/// Based on http://warp.povusers.org/SortComparison/
 template <class T> void InitialQuickSort(T* begin, T* end, bool (*compare)(const T&, const T&))
 {
     while (begin + QUICKSORT_THRESHOLD < end)

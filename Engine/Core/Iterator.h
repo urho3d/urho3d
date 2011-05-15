@@ -53,9 +53,9 @@ public:
     RandomAccessIterator operator - (unsigned value) { return RandomAccessIterator(ptr_ - value); }
     /// Calculate offset to another iterator
     int operator - (const RandomAccessIterator& rhs) const { return ptr_ - rhs.ptr_; }
-    /// Check for equality
+    /// Test for equality with another iterator
     bool operator == (const RandomAccessIterator& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Check for inequality
+    /// Test for inequality with another iterator
     bool operator != (const RandomAccessIterator& rhs) const { return ptr_ != rhs.ptr_; }
     
 private:
@@ -93,9 +93,9 @@ public:
     RandomAccessConstIterator operator - (unsigned value) { return RandomAccessConstIterator(ptr_ - value); }
     /// Calculate offset to another iterator
     int operator - (const RandomAccessConstIterator& rhs) const { return ptr_ - rhs.ptr_; }
-    /// Check for equality
+    /// Test for equality with another iterator
     bool operator == (const RandomAccessConstIterator& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Check for inequality
+    /// Test for inequality with another iterator
     bool operator != (const RandomAccessConstIterator& rhs) const { return ptr_ != rhs.ptr_; }
     
 private:

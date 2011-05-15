@@ -28,8 +28,9 @@
 #include <cstdlib>
 #include <new>
 
-/// Map template class using skip lists
-/// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
+// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
+
+/// Map template class using a skip list
 template <class T, class U> class Map
 {
 public:
@@ -50,9 +51,9 @@ public:
         {
         }
         
-        /// Check for equality
+        /// Test for equality with another pair
         bool operator == (const Pair<T, U>& rhs) { return (first_ == rhs.first_) && (second_ == rhs.second_); }
-        /// Check for inequality
+        /// Test for inequality with another pair
         bool operator != (const Pair<T, U>& rhs) { return (first_ != rhs.first_) || (second_ != rhs.second_); }
         
         const T first_;
@@ -83,9 +84,9 @@ public:
         KeyValue* operator -> () const { return &ptr_->pair_; }
         /// Dereference the pair
         KeyValue& operator * () const { return ptr_->pair_; }
-        /// Check for equality
+        /// Test for equality with another iterator
         bool operator == (const Iterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Check for inequality
+        /// Test for inequality with another iterator
         bool operator != (const Iterator& rhs) const { return ptr_ != rhs.ptr_; }
         /// Return whether non-null
         operator bool () const { return ptr_ != 0; }
@@ -115,9 +116,9 @@ public:
         const KeyValue* operator -> () const { return &ptr_->pair_; }
         /// Dereference the pair
         const KeyValue& operator * () const { return ptr_->pair_; }
-        /// Check for equality
+        /// Test for equality with another iterator
         bool operator == (const ConstIterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Check for inequality
+        /// Test for inequality with another iterator
         bool operator != (const ConstIterator& rhs) const { return ptr_ != rhs.ptr_; }
         /// Return whether non-null
         operator bool () const { return ptr_ != 0; }
@@ -176,54 +177,6 @@ public:
         delete[] fix_;
     }
     
-    /// Insert into the map
-    void Insert(const T& key, const U& value)
-    {
-        InsertNode(MakePair(key, value), 0);
-    }
-    
-    /// Insert into the map
-    void Insert(const Pair<T, U>& pair)
-    {
-        InsertNode(pair, 0);
-    }
-    
-    /// Erase a key from the map. Return true if was found and erased
-    bool Erase(const T& key)
-    {
-        Node* i = head_;
-        
-        for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
-        {
-            while ((i->next_[j]) && (key > i->next_[j]->pair_.first_))
-                i = i->next_[j];
-            fix_[j] = i;
-        }
-        
-        // Check if key does not exist
-        if ((!i->next_[0]) && (i->next_[0]->pair_.first_ != key))
-            return false;
-        
-        Node* toRemove = fix_[0]->next_[0];
-        
-        for (unsigned j = 0; j < height_; ++j)
-        {
-            if (fix_[j]->next_[j])
-                fix_[j]->next_[j] = fix_[j]->next_[j]->next_[j];
-        }
-        
-        while (height_ > 0)
-        {
-            if (head_->next_[height_ - 1])
-                break;
-            head_->next_[--height_] = 0;
-        }
-        
-        DeleteNode(toRemove);
-        --size_;
-        return true;
-    }
-    
     /// Assign from another map
     Map& operator = (const Map<T, U>& rhs)
     {
@@ -266,7 +219,7 @@ public:
         }
     }
     
-    /// Check for equality
+    /// Test for equality with another map
     bool operator == (const Map<T, U>& rhs) const
     {
         if (rhs.size_ != size_)
@@ -285,7 +238,7 @@ public:
         return true;
     }
     
-    /// Check for inequality
+    /// Test for inequality with another map
     bool operator != (const Map<T, U>& rhs) const
     {
         if (rhs.size_ != size_)
@@ -304,45 +257,64 @@ public:
         return false;
     }
     
-    /// Clear the map
-    void Clear()
+    /// Insert into the map
+    void Insert(const T& key, const U& value)
     {
-        // Let the head node remain, but clear its next pointers
-        Node* node = head_->next_[0];
-        for (unsigned i = 0; i < height_; ++i)
-            head_->next_[i] = 0;
-        
-        // Then remove all the nodes
-        while (node)
-        {
-            Node* current = node;
-            node = node->next_[0];
-            DeleteNode(current);
-        }
-        
-        height_ = 0;
-        size_ = 0;
+        InsertNode(MakePair(key, value), 0);
     }
     
-    /// Return whether contains a key
-    bool Contains(const T& key) const { return FindNode(key) != 0; }
-    /// Return number of keys
-    unsigned Size() const { return size_; }
-    /// Return current height
-    unsigned Height() const { return height_; }
+    /// Insert into the map
+    void Insert(const Pair<T, U>& pair)
+    {
+        InsertNode(pair, 0);
+    }
     
-    /// Return iterator to the node with key, or null iterator if not found
-    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
-    /// Return iterator to the first actual node
-    Iterator Begin() { return Iterator(head_->next_[0]); }
-    /// Return iterator to the end (null iterator)
-    Iterator End() { return Iterator(0); }
-    /// Return const iterator to the node with key, or null iterator if not found
-    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
-    /// Return const iterator to the first actual node
-    ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
-    /// Return const iterator to the end (null iterator)
-    ConstIterator End() const { return ConstIterator(0); }
+    /// Insert a range by iterators
+    void Insert(const Iterator& start, const Iterator& end)
+    {
+        Iterator it = start;
+        while ((it) && (it != end))
+        {
+            Insert(*it);
+            ++it;
+        }
+    }
+    
+    /// Erase a key from the map. Return true if was found and erased
+    bool Erase(const T& key)
+    {
+        Node* i = head_;
+        
+        for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
+        {
+            while ((i->next_[j]) && (key > i->next_[j]->pair_.first_))
+                i = i->next_[j];
+            fix_[j] = i;
+        }
+        
+        // Check if key does not exist
+        if ((!i->next_[0]) && (i->next_[0]->pair_.first_ != key))
+            return false;
+        
+        Node* toRemove = fix_[0]->next_[0];
+        
+        for (unsigned j = 0; j < height_; ++j)
+        {
+            if (fix_[j]->next_[j])
+                fix_[j]->next_[j] = fix_[j]->next_[j]->next_[j];
+        }
+        
+        while (height_ > 0)
+        {
+            if (head_->next_[height_ - 1])
+                break;
+            head_->next_[--height_] = 0;
+        }
+        
+        DeleteNode(toRemove);
+        --size_;
+        return true;
+    }
     
     /// Erase by an iterator. Return an iterator to the next element
     Iterator Erase(const Iterator& it)
@@ -369,16 +341,46 @@ public:
         return it;
     }
     
-    /// Insert a range by iterators
-    void Insert(const Iterator& start, const Iterator& end)
+    /// Clear the map
+    void Clear()
     {
-        Iterator it = start;
-        while ((it) && (it != end))
+        // Let the head node remain, but clear its next pointers
+        Node* node = head_->next_[0];
+        for (unsigned i = 0; i < height_; ++i)
+            head_->next_[i] = 0;
+        
+        // Then remove all the nodes
+        while (node)
         {
-            Insert(*it);
-            ++it;
+            Node* current = node;
+            node = node->next_[0];
+            DeleteNode(current);
         }
+        
+        height_ = 0;
+        size_ = 0;
     }
+    
+    /// Return iterator to the node with key, or null iterator if not found
+    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
+    /// Return const iterator to the node with key, or null iterator if not found
+    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
+    /// Return iterator to the first actual node
+    Iterator Begin() { return Iterator(head_->next_[0]); }
+    /// Return iterator to the end (null iterator)
+    Iterator End() { return Iterator(0); }
+    /// Return const iterator to the first actual node
+    ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
+    /// Return const iterator to the end (null iterator)
+    ConstIterator End() const { return ConstIterator(0); }
+    /// Return whether contains a key
+    bool Contains(const T& key) const { return FindNode(key) != 0; }
+    /// Return number of keys
+    unsigned Size() const { return size_; }
+    /// Return current height
+    unsigned Height() const { return height_; }
+    /// Return whether map is empty
+    bool Empty() const { return size_ == 0; }
     
     static const unsigned MAX_HEIGHT = 15;
     

@@ -39,15 +39,16 @@ public:
     {
     }
     
-    /// Check for equality
+    /// Test for equality with another pair
     bool operator == (const Pair<T, U>& rhs) { return (first_ == rhs.first_) && (second_ == rhs.second_); }
-    /// Check for inequality
+    /// Test for inequality with another pair
     bool operator != (const Pair<T, U>& rhs) { return (first_ != rhs.first_) || (second_ != rhs.second_); }
     
     T first_;
     U second_;
 };
 
+/// Construct a pair
 template <class T, class U> Pair<T, U> MakePair(const T& first, const U& second)
 {
     return Pair<T, U>(first, second);

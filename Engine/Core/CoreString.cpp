@@ -58,6 +58,17 @@ void String::Replace(unsigned pos, unsigned length, const String& str)
     Replace(pos, length, str.buffer_, str.length_);
 }
 
+String::Iterator String::Replace(const String::Iterator& start, const String::Iterator& end, const String& replaceWith)
+{
+    unsigned pos = start - Begin();
+    if (pos >= length_)
+        return End();
+    unsigned length = end - start;
+    Replace(pos, length, replaceWith);
+    
+    return Begin() + pos;
+}
+
 void String::Insert(unsigned pos, const String& str)
 {
     if (pos > length_)
@@ -85,9 +96,61 @@ void String::Insert(unsigned pos, char c)
     }
 }
 
+String::Iterator String::Insert(const String::Iterator& dest, const String& str)
+{
+    unsigned pos = dest - Begin();
+    if (pos > length_)
+        pos = length_;
+    Insert(pos, str);
+    
+    return Begin() + pos;
+}
+
+String::Iterator String::Insert(const String::Iterator& dest, const String::Iterator& start, const String::Iterator& end)
+{
+    unsigned pos = dest - Begin();
+    if (pos > length_)
+        pos = length_;
+    unsigned length = end - start;
+    Replace(pos, 0, start, length);
+    
+    return Begin() + pos;
+}
+
+String::Iterator String::Insert(const String::Iterator& dest, char c)
+{
+    unsigned pos = dest - Begin();
+    if (pos > length_)
+        pos = length_;
+    Insert(pos, c);
+    
+    return Begin() + pos;
+}
+
 void String::Erase(unsigned pos, unsigned length)
 {
     Replace(pos, length, String());
+}
+
+String::Iterator String::Erase(const String::Iterator& it)
+{
+    unsigned pos = it - Begin();
+    if (pos >= length_)
+        return End();
+    Erase(pos);
+    
+    return Begin() + pos;
+}
+
+String::Iterator String::Erase(const String::Iterator& start, const String::Iterator& end)
+{
+    unsigned pos = start - Begin();
+    if (pos >= length_)
+        return End();
+    unsigned length = end - start;
+    Erase(pos, length);
+    
+    return Begin() + pos;
 }
 
 void String::Resize(unsigned newLength)
@@ -315,69 +378,6 @@ unsigned String::FindLast(const String& str) const
     }
     
     return NPOS;
-}
-
-String::Iterator String::Replace(const String::Iterator& start, const String::Iterator& end, const String& replaceWith)
-{
-    unsigned pos = start - Begin();
-    if (pos >= length_)
-        return End();
-    unsigned length = end - start;
-    Replace(pos, length, replaceWith);
-    
-    return Begin() + pos;
-}
-
-String::Iterator String::Insert(const String::Iterator& dest, const String& str)
-{
-    unsigned pos = dest - Begin();
-    if (pos > length_)
-        pos = length_;
-    Insert(pos, str);
-    
-    return Begin() + pos;
-}
-
-String::Iterator String::Insert(const String::Iterator& dest, const String::Iterator& start, const String::Iterator& end)
-{
-    unsigned pos = dest - Begin();
-    if (pos > length_)
-        pos = length_;
-    unsigned length = end - start;
-    Replace(pos, 0, start, length);
-    
-    return Begin() + pos;
-}
-
-String::Iterator String::Insert(const String::Iterator& dest, char c)
-{
-    unsigned pos = dest - Begin();
-    if (pos > length_)
-        pos = length_;
-    Insert(pos, c);
-    
-    return Begin() + pos;
-}
-
-String::Iterator String::Erase(const String::Iterator& it)
-{
-    unsigned pos = it - Begin();
-    if (pos >= length_)
-        return End();
-    Erase(pos);
-    
-    return Begin() + pos;
-}
-
-String::Iterator String::Erase(const String::Iterator& start, const String::Iterator& end)
-{
-    unsigned pos = start - Begin();
-    if (pos >= length_)
-        return End();
-    unsigned length = end - start;
-    Erase(pos, length);
-    
-    return Begin() + pos;
 }
 
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)

@@ -32,6 +32,9 @@
 class String
 {
 public:
+    typedef RandomAccessIterator<char> Iterator;
+    typedef RandomAccessConstIterator<char> ConstIterator;
+    
     /// Construct empty
     String() :
         length_(0),
@@ -121,64 +124,6 @@ public:
         return *this;
     }
     
-    /// Check for equality with another string
-    bool operator == (const String& rhs) const
-    {
-        if (rhs.length_ != length_)
-            return false;
-        
-        for (unsigned i = 0; i < length_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return false;
-        }
-        
-        return true;
-    }
-    
-    /// Check for inequality with another string
-    bool operator != (const String& rhs) const
-    {
-        if (rhs.length_ != length_)
-            return true;
-        
-        for (unsigned i = 0; i < length_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return true;
-        }
-        
-        return false;
-    }
-    
-    /// Check if string is less than another string 
-    bool operator < (const String& rhs) const
-    {
-        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
-        {
-            if (buffer_[i] < rhs.buffer_[i])
-                return true;
-            if (buffer_[i] > rhs.buffer_[i])
-                return false;
-        }
-        
-        return length_ < rhs.length_;
-    }
-    
-    /// Check if string is greater than another string 
-    bool operator > (const String& rhs) const
-    {
-        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
-        {
-            if (buffer_[i] > rhs.buffer_[i])
-                return true;
-            if (buffer_[i] < rhs.buffer_[i])
-                return false;
-        }
-        
-        return length_ > rhs.length_;
-    }
-    
     /// Add a string
     String operator + (const String& rhs) const
     {
@@ -217,18 +162,93 @@ public:
         return ret;
     }
     
+    /// Test for equality
+    bool operator == (const String& rhs) const
+    {
+        if (rhs.length_ != length_)
+            return false;
+        
+        for (unsigned i = 0; i < length_; ++i)
+        {
+            if (buffer_[i] != rhs.buffer_[i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another string
+    bool operator != (const String& rhs) const
+    {
+        if (rhs.length_ != length_)
+            return true;
+        
+        for (unsigned i = 0; i < length_; ++i)
+        {
+            if (buffer_[i] != rhs.buffer_[i])
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /// Test if string is less than another string
+    bool operator < (const String& rhs) const
+    {
+        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
+        {
+            if (buffer_[i] < rhs.buffer_[i])
+                return true;
+            if (buffer_[i] > rhs.buffer_[i])
+                return false;
+        }
+        
+        return length_ < rhs.length_;
+    }
+    
+    /// Test if string is greater than another string
+    bool operator > (const String& rhs) const
+    {
+        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
+        {
+            if (buffer_[i] > rhs.buffer_[i])
+                return true;
+            if (buffer_[i] < rhs.buffer_[i])
+                return false;
+        }
+        
+        return length_ > rhs.length_;
+    }
+    
+    /// Return char at index
+    char& operator [] (unsigned pos) { return buffer_[pos]; }
+    /// Return const char at index
+    const char& operator [] (unsigned pos) const { return buffer_[pos]; }
+    
     /// Replace all occurrences of a character
     void Replace(char replaceThis, char replaceWith);
     /// Replace all occurrences of a string
     void Replace(const String& replaceThis, const String& replaceWith);
     /// Replace a substring
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
+    /// Replace a substring using iterators
+    Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Insert a string
     void Insert(unsigned pos, const String& str);
     /// Insert a character
     void Insert(unsigned pos, char c);
+    /// Insert a string using an iterator
+    Iterator Insert(const Iterator& dest, const String& str);
+    /// Insert a string partially using iterators
+    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end);
+    /// Insert a character using an iterator
+    Iterator Insert(const Iterator& dest, char c);
     /// Erase a substring
     void Erase(unsigned pos, unsigned length = 1);
+    /// Erase a character using an iterator
+    Iterator Erase(const Iterator& it);
+    /// Erase a substring using iterators
+    Iterator Erase(const Iterator& start, const Iterator& end);
     /// Resize the string
     void Resize(unsigned newLength);
     /// Set new capacity
@@ -237,9 +257,15 @@ public:
     void Compact();
     /// Clear the string
     void Clear();
-    /// Return char at index
-    char& operator [] (unsigned pos) { return buffer_[pos]; }
     
+    /// Return iterator to the beginning
+    Iterator Begin() { return Iterator(buffer_); }
+    /// Return const iterator to the beginning
+    ConstIterator Begin() const { return ConstIterator(buffer_); }
+    /// Return iterator to the end
+    Iterator End() { return Iterator(buffer_ + length_); }
+    /// Return const iterator to the end
+    ConstIterator End() const { return ConstIterator(buffer_ + length_); }
     /// Return a substring from position to end
     String Substring(unsigned pos) const;
     /// Return a substring with length from position
@@ -266,38 +292,11 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether the string is empty
     bool Empty() const { return length_ == 0; }
-    /// Return const char at index
-    const char& operator [] (unsigned pos) const { return buffer_[pos]; }
     
     /// Position for "not found"
     static const unsigned NPOS = 0xffffffff;
     /// Initial dynamic allocation size
     static const unsigned MIN_CAPACITY = 8;
-    
-    typedef RandomAccessIterator<char> Iterator;
-    typedef RandomAccessConstIterator<char> ConstIterator;
-    
-    /// Return iterator to the beginning
-    Iterator Begin() { return Iterator(buffer_); }
-    /// Return iterator to the end
-    Iterator End() { return Iterator(buffer_ + length_); }
-    /// Return const iterator to the beginning
-    ConstIterator Begin() const { return ConstIterator(buffer_); }
-    /// Return const iterator to the end
-    ConstIterator End() const { return ConstIterator(buffer_ + length_); }
-    
-    /// Replace a substring using iterators
-    Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
-    /// Insert a string using an iterator
-    Iterator Insert(const Iterator& dest, const String& str);
-    /// Insert a string partially using iterators
-    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end);
-    /// Insert a character using an iterator
-    Iterator Insert(const Iterator& dest, char c);
-    /// Erase a character using an iterator
-    Iterator Erase(const Iterator& it);
-    /// Erase a substring using iterators
-    Iterator Erase(const Iterator& start, const Iterator& end);
     
 private:
     /// Move a range of characters within the string

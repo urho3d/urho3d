@@ -26,8 +26,9 @@
 #include <cstdlib>
 #include <new>
 
-/// Set template class using skip lists
-/// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
+// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
+
+/// Set template class using a skip list
 template <class T> class Set
 {
 public:
@@ -55,9 +56,9 @@ public:
         const T* operator -> () const { return &ptr_->key_; }
         /// Dereference the key
         const T& operator * () const { return ptr_->key_; }
-        /// Check for equality
+        /// Test for equality with another iterator
         bool operator == (const Iterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Check for inequality
+        /// Test for inequality with another iterator
         bool operator != (const Iterator& rhs) const { return ptr_ != rhs.ptr_; }
         /// Return whether non-null
         operator bool () const { return ptr_ != 0; }
@@ -87,9 +88,9 @@ public:
         const T* operator -> () const { return &ptr_->key_; }
         /// Dereference the key
         const T& operator * () const { return ptr_->key_; }
-        /// Check for equality
+        /// Test for equality with anoter iterator
         bool operator == (const ConstIterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Check for inequality
+        /// Test for inequality with another iterator
         bool operator != (const ConstIterator& rhs) const { return ptr_ != rhs.ptr_; }
         /// Return whether non-null
         operator bool () const { return ptr_ != 0; }
@@ -148,10 +149,87 @@ public:
         delete[] fix_;
     }
     
+    /// Assign from another set
+    Set& operator = (const Set<T>& rhs)
+    {
+        Clear();
+        
+        // Insert the nodes with same heights
+        for (Node* i = rhs.head_->next_[0]; i; i = i->next_[0])
+            InsertNode(i->key_, i->height_);
+        
+        return *this;
+    }
+    
+    /// Add-assign a key
+    Set& operator += (const T& rhs)
+    {
+        Insert(rhs);
+        return *this;
+    }
+    
+    /// Add-assign a set
+    Set& operator += (const Set<T>& rhs)
+    {
+        for (Iterator i = rhs.Begin(); i != rhs.End(); ++i)
+            Insert(*i);
+        
+        return *this;
+    }
+    
+    /// Test for equality with another set
+    bool operator == (const Set<T>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return false;
+        
+        Iterator i = Begin();
+        Iterator j = rhs.Begin();
+        while (i != End())
+        {
+            if (*i != *j)
+                return false;
+            ++i;
+            ++j;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another set
+    bool operator != (const Set<T>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return true;
+        
+        Iterator i = Begin();
+        Iterator j = rhs.Begin();
+        while (i != End())
+        {
+            if (*i != *j)
+                return true;
+            ++i;
+            ++j;
+        }
+        
+        return false;
+    }
+    
     /// Insert into the set. Return true if did not exist already
     bool Insert(const T& key)
     {
         return InsertNode(key, 0);
+    }
+    
+    /// Insert a range by iterators
+    void Insert(const Iterator& start, const Iterator& end)
+    {
+        Iterator it = start;
+        while ((it) && (it != end))
+        {
+            Insert(*it);
+            ++it;
+        }
     }
     
     /// Erase a key from the set. Return true if was found and erased
@@ -190,112 +268,6 @@ public:
         return true;
     }
     
-    /// Assign from another set
-    Set& operator = (const Set<T>& rhs)
-    {
-        Clear();
-        
-        // Insert the nodes with same heights
-        for (Node* i = rhs.head_->next_[0]; i; i = i->next_[0])
-            InsertNode(i->key_, i->height_);
-        
-        return *this;
-    }
-    
-    /// Add-assign a key
-    Set& operator += (const T& rhs)
-    {
-        Insert(rhs);
-        return *this;
-    }
-    
-    /// Add-assign a set
-    Set& operator += (const Set<T>& rhs)
-    {
-        for (Iterator i = rhs.Begin(); i != rhs.End(); ++i)
-            Insert(*i);
-        
-        return *this;
-    }
-    
-    /// Check for equality
-    bool operator == (const Set<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return false;
-        
-        Iterator i = Begin();
-        Iterator j = rhs.Begin();
-        while (i != End())
-        {
-            if (*i != *j)
-                return false;
-            ++i;
-            ++j;
-        }
-        
-        return true;
-    }
-    
-    /// Check for inequality
-    bool operator != (const Set<T>& rhs) const
-    {
-        if (rhs.size_ != size_)
-            return true;
-        
-        Iterator i = Begin();
-        Iterator j = rhs.Begin();
-        while (i != End())
-        {
-            if (*i != *j)
-                return true;
-            ++i;
-            ++j;
-        }
-        
-        return false;
-    }
-    
-    /// Clear the set
-    void Clear()
-    {
-        // Let the head node remain, but clear its next pointers
-        Node* node = head_->next_[0];
-        for (unsigned i = 0; i < height_; ++i)
-            head_->next_[i] = 0;
-        
-        // Then remove all the key nodes
-        while (node)
-        {
-            Node* current = node;
-            node = node->next_[0];
-            DeleteNode(current);
-        }
-        
-        height_ = 0;
-        size_ = 0;
-    }
-    
-    /// Return whether contains a key
-    bool Contains(const T& key) const { return FindNode(key) != 0; }
-    /// Return number of keys
-    unsigned Size() const { return size_; }
-    /// Return current height
-    unsigned Height() const { return height_; }
-    
-    /// Return iterator to the node with key, or null iterator if not found
-    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
-    /// Return iterator to the first actual node
-    Iterator Begin() { return Iterator(head_->next_[0]); }
-    /// Return iterator to the end (null iterator)
-    Iterator End() { return Iterator(0); }
-    /// Return const iterator to the node with key, or null iterator if not found
-    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
-    /// Return iterator to the first actual node
-    ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
-    /// Return iterator to the end (null iterator)
-    ConstIterator End() const { return ConstIterator(0); }
-    
     /// Erase by an iterator. Return an iterator to the next element
     Iterator Erase(const Iterator& it)
     {
@@ -321,16 +293,46 @@ public:
         return it;
     }
     
-    /// Insert a range by iterators
-    void Insert(const Iterator& start, const Iterator& end)
+    /// Clear the set
+    void Clear()
     {
-        Iterator it = start;
-        while ((it) && (it != end))
+        // Let the head node remain, but clear its next pointers
+        Node* node = head_->next_[0];
+        for (unsigned i = 0; i < height_; ++i)
+            head_->next_[i] = 0;
+        
+        // Then remove all the key nodes
+        while (node)
         {
-            Insert(*it);
-            ++it;
+            Node* current = node;
+            node = node->next_[0];
+            DeleteNode(current);
         }
+        
+        height_ = 0;
+        size_ = 0;
     }
+    
+    /// Return iterator to the node with key, or null iterator if not found
+    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
+    /// Return const iterator to the node with key, or null iterator if not found
+    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
+    /// Return iterator to the first actual node
+    Iterator Begin() { return Iterator(head_->next_[0]); }
+    /// Return iterator to the first actual node
+    ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
+    /// Return iterator to the end (null iterator)
+    Iterator End() { return Iterator(0); }
+    /// Return iterator to the end (null iterator)
+    ConstIterator End() const { return ConstIterator(0); }
+    /// Return whether contains a key
+    bool Contains(const T& key) const { return FindNode(key) != 0; }
+    /// Return number of keys
+    unsigned Size() const { return size_; }
+    /// Return current height
+    unsigned Height() const { return height_; }
+    /// Return whether set is empty
+    bool Empty() const { return size_ == 0; }
     
     static const unsigned MAX_HEIGHT = 15;
     

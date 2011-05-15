@@ -31,6 +31,9 @@
 template <class T> class PODVector
 {
 public:
+    typedef RandomAccessIterator<T> Iterator;
+    typedef RandomAccessConstIterator<T> ConstIterator;
+    
     /// Construct empty
     PODVector() :
         size_(0),
@@ -72,28 +75,6 @@ public:
         return *this;
     }
     
-    /// Return element at index
-    T& operator [] (unsigned index) { return buffer_[index]; }
-    
-    /// Add an element at the end
-    void Push(const T& value)
-    {
-        unsigned oldSize = size_;
-        Resize(size_ + 1);
-        buffer_[oldSize] = value;
-    }
-    
-    /// Add another vector at the end
-    void Push(const PODVector<T>& vector)
-    {
-        if (!vector.size_)
-            return;
-        
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        CopyElements(buffer_ + oldSize, vector.buffer_, vector.size_);
-    }
-    
     /// Add-assign an element
     PODVector<T>& operator += (const T& rhs)
     {
@@ -124,6 +105,60 @@ public:
         ret.Push(rhs);
         
         return ret;
+    }
+    
+    /// Test for equality with another vector
+    bool operator == (const PODVector<T>& rhs)
+    {
+        if (rhs.size_ != size_)
+            return false;
+        
+        for (unsigned i = 0; i < size_; ++i)
+        {
+            if (buffer_[i] != rhs.buffer_[i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another vector
+    bool operator != (const PODVector<T>& rhs)
+    {
+        if (rhs.size_ != size_)
+            return true;
+        
+        for (unsigned i = 0; i < size_; ++i)
+        {
+            if (buffer_[i] != rhs.buffer_[i])
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /// Return element at index
+    T& operator [] (unsigned index) { return buffer_[index]; }
+    /// Return const element at index
+    const T& operator [] (unsigned index) const { return buffer_[index]; }
+    
+    /// Add an element at the end
+    void Push(const T& value)
+    {
+        unsigned oldSize = size_;
+        Resize(size_ + 1);
+        buffer_[oldSize] = value;
+    }
+    
+    /// Add another vector at the end
+    void Push(const PODVector<T>& vector)
+    {
+        if (!vector.size_)
+            return;
+        
+        unsigned oldSize = size_;
+        Resize(size_ + vector.size_);
+        CopyElements(buffer_ + oldSize, vector.buffer_, vector.size_);
     }
     
     /// Remove the last element
@@ -172,6 +207,45 @@ public:
         CopyElements(buffer_ + pos, vector.buffer_, vector.size_);
     }
     
+    /// Insert an element using an iterator
+    Iterator Insert(const Iterator& dest, const T& value)
+    {
+        unsigned pos = dest - Begin();
+        if (pos > size_)
+            pos = size_;
+        Insert(pos, value);
+        
+        return Begin() + pos;
+    }
+    
+    /// Insert a vector using an iterator
+    Iterator Insert(const Iterator& dest, const PODVector<T>& vector)
+    {
+        unsigned pos = dest - Begin();
+        if (pos > size_)
+            pos = size_;
+        Insert(pos, vector);
+        
+        return Begin() + pos;
+    }
+    
+    /// Insert a vector partially using iterators
+    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
+    {
+        unsigned pos = dest - Begin();
+        if (pos > size_)
+            pos = size_;
+        unsigned length = end - start;
+        Resize(size_ + length);
+        MoveRange(pos + length, pos, size_ - pos - length);
+        
+        T* destPtr = buffer_ + pos;
+        for (Iterator i = start; i != end; ++i)
+            *destPtr++ = *i;
+        
+        return Begin() + pos;
+    }
+    
     /// Erase a range of elements
     void Erase(unsigned pos, unsigned length = 1)
     {
@@ -181,6 +255,29 @@ public:
         
         MoveRange(pos, pos + length, size_ - pos - length);
         Resize(size_ - length);
+    }
+    
+    /// Erase an element using an iterator
+    Iterator Erase(const Iterator& it)
+    {
+        unsigned pos = it - Begin();
+        if (pos >= size_)
+            return End();
+        Erase(pos);
+        
+        return Begin() + pos;
+    }
+    
+    /// Erase a range of values using iterators
+    Iterator Erase(const Iterator& start, const Iterator& end)
+    {
+        unsigned pos = start - Begin();
+        if (pos >= size_)
+            return End();
+        unsigned length = end - start;
+        Erase(pos, length);
+        
+        return Begin() + pos;
     }
     
     /// Clear the vector
@@ -252,118 +349,20 @@ public:
         Reserve(size_);
     }
     
-    /// Check for equality
-    bool operator == (const PODVector<T>& rhs)
-    {
-        if (rhs.size_ != size_)
-            return false;
-        
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return false;
-        }
-        
-        return true;
-    }
-    
-    /// Check for inequality
-    bool operator != (const PODVector<T>& rhs)
-    {
-        if (rhs.size_ != size_)
-            return true;
-        
-        for (unsigned i = 0; i < size_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return true;
-        }
-        
-        return false;
-    }
-    
+    /// Return iterator to the beginning
+    Iterator Begin() { return Iterator(buffer_); }
+    /// Return const iterator to the beginning
+    ConstIterator Begin() const { return ConstIterator(buffer_); }
+    /// Return iterator to the end
+    Iterator End() { return Iterator(buffer_ + size_); }
+    /// Return const iterator to the end
+    ConstIterator End() const { return ConstIterator(buffer_ + size_); }
     /// Return size of vector
     unsigned Size() const { return size_; }
     /// Return capacity of vector
     unsigned Capacity() const { return capacity_; }
     /// Return whether vector is empty
     bool Empty() const { return size_ == 0; }
-    /// Return const element at index
-    const T& operator [] (unsigned index) const { return buffer_[index]; }
-    
-    typedef RandomAccessIterator<T> Iterator;
-    typedef RandomAccessConstIterator<T> ConstIterator;
-    
-    /// Return iterator to the beginning
-    Iterator Begin() { return Iterator(buffer_); }
-    /// Return iterator to the end
-    Iterator End() { return Iterator(buffer_ + size_); }
-    /// Return const iterator to the beginning
-    ConstIterator Begin() const { return ConstIterator(buffer_); }
-    /// Return const iterator to the end
-    ConstIterator End() const { return ConstIterator(buffer_ + size_); }
-    
-    /// Insert an element using an iterator
-    Iterator Insert(const Iterator& dest, const T& value)
-    {
-        unsigned pos = dest - Begin();
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, value);
-        
-        return Begin() + pos;
-    }
-    
-    /// Insert a vector using an iterator
-    Iterator Insert(const Iterator& dest, const PODVector<T>& vector)
-    {
-        unsigned pos = dest - Begin();
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, vector);
-        
-        return Begin() + pos;
-    }
-    
-    /// Insert a vector partially using iterators
-    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
-    {
-        unsigned pos = dest - Begin();
-        if (pos > size_)
-            pos = size_;
-        unsigned length = end - start;
-        Resize(size_ + length);
-        MoveRange(pos + length, pos, size_ - pos - length);
-        
-        T* destPtr = buffer_ + pos;
-        for (Iterator i = start; i != end; ++i)
-            *destPtr++ = *i;
-        
-        return Begin() + pos;
-    }
-    
-    /// Erase an element using an iterator
-    Iterator Erase(const Iterator& it)
-    {
-        unsigned pos = it - Begin();
-        if (pos >= size_)
-            return End();
-        Erase(pos);
-        
-        return Begin() + pos;
-    }
-    
-    /// Erase a range of values using iterators
-    Iterator Erase(const Iterator& start, const Iterator& end)
-    {
-        unsigned pos = start - Begin();
-        if (pos >= size_)
-            return End();
-        unsigned length = end - start;
-        Erase(pos, length);
-        
-        return Begin() + pos;
-    }
     
     /// Minimum dynamic allocation size
     static const unsigned MIN_CAPACITY = 1;
