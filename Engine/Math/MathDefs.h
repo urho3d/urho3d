@@ -125,14 +125,6 @@ inline int Clamp(int value, int min, int max)
     return value;
 }
 
-/// Swap two values
-template<class T> inline void Swap(T& first, T& second)
-{
-    T temp = first;
-    first = second;
-    second = temp;
-}
-
 /// Check whether an unsigned integer is a power of two
 inline bool IsPowerOfTwo(unsigned value)
 {

@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Iterator.h"
+#include "Swap.h"
 
 #include <cstring>
 #include <ctype.h>
@@ -257,6 +258,8 @@ public:
     void Compact();
     /// Clear the string
     void Clear();
+    /// Swap with another string
+    void Swap(String& str);
     
     /// Return iterator to the beginning
     Iterator Begin() { return Iterator(buffer_); }

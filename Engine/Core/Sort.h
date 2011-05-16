@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "MathDefs.h"
+#include "Swap.h"
 
 static const int QUICKSORT_THRESHOLD = 16;
 

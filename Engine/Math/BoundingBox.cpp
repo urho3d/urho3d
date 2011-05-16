@@ -86,12 +86,25 @@ void BoundingBox::Intersect(const BoundingBox& box)
     if (box.max_.z_ < max_.z_)
         max_.z_ = box.max_.z_;
     
+    float temp;
     if (min_.x_ > max_.x_)
-        Swap(min_.x_, max_.x_);
+    {
+        temp = min_.x_;
+        min_.x_ = max_.x_;
+        max_.x_ = temp;
+    }
     if (min_.y_ > max_.y_)
-        Swap(min_.y_, max_.y_);
+    {
+        temp = min_.y_;
+        min_.y_ = max_.y_;
+        max_.y_ = temp;
+    }
     if (min_.z_ > max_.z_)
-        Swap(min_.z_, max_.z_);
+    {
+        temp = min_.z_;
+        min_.z_ = max_.z_;
+        max_.z_ = temp;
+    }
 }
 
 void BoundingBox::Transform(const Matrix3& transform)

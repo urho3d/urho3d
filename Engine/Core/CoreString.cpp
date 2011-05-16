@@ -224,6 +224,13 @@ void String::Clear()
     Resize(0);
 }
 
+void String::Swap(String& str)
+{
+    ::Swap(length_, str.length_);
+    ::Swap(capacity_, str.capacity_);
+    ::Swap(buffer_, str.buffer_);
+}
+
 String String::Substring(unsigned pos) const
 {
     if (pos >= length_)
@@ -401,4 +408,9 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         Resize(length_ + delta);
     
     CopyChars(buffer_ + pos, srcStart, srcLength);
+}
+
+template<> void Swap<String>(String& first, String& second)
+{
+    first.Swap(second);
 }
