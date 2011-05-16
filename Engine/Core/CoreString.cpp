@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "CoreString.h"
+#include "Swap.h"
 
 char String::endZero = 0;
 
@@ -408,9 +409,4 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
         Resize(length_ + delta);
     
     CopyChars(buffer_ + pos, srcStart, srcLength);
-}
-
-template<> void Swap<String>(String& first, String& second)
-{
-    first.Swap(second);
 }

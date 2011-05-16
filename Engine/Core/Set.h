@@ -23,15 +23,14 @@
 
 #pragma once
 
-#include "Iterator.h"
+#include "ListBase.h"
 
-#include <cstdlib>
 #include <new>
 
 // Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx
 
 /// Set template class using a skip list
-template <class T> class Set
+template <class T> class Set : public SkipListBase
 {
 public:
     /// Set node
@@ -85,42 +84,40 @@ public:
 
     /// Construct empty
     Set(unsigned maxHeight = MAX_HEIGHT) :
-        maxHeight_(maxHeight < MAX_HEIGHT ? maxHeight : MAX_HEIGHT),
-        height_(0),
-        size_(0),
-        bitsLeft_(0)
+        SkipListBase(maxHeight)
     {
         // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_);
         tail_ = AllocateNode(maxHeight_);
+        Node* head = GetHead();
+        Node* tail = GetTail();
         for (unsigned i = 0; i < maxHeight_; ++i)
         {
-            head_->SetNext(i, tail_);
-            tail_->SetNext(i, 0);
+            head->SetNext(i, tail);
+            tail->SetNext(i, 0);
         }
         
         // Allocate the fixup pointers
-        fix_ = new Node*[maxHeight_];
+        fix_ = reinterpret_cast<void**>(new Node*[maxHeight_]);
     }
     
     /// Construct from another set
     Set(const Set<T>& set) :
-        maxHeight_(set.maxHeight_),
-        height_(0),
-        size_(0),
-        bitsLeft_(0)
+        SkipListBase(maxHeight)
     {
         // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_);
         tail_ = AllocateNode(maxHeight_);
+        Node* head = GetHead();
+        Node* tail = GetTail();
         for (unsigned i = 0; i < maxHeight_; ++i)
         {
-            head_->SetNext(i, tail_);
-            tail_->SetNext(i, 0);
+            head->SetNext(i, tail);
+            tail->SetNext(i, 0);
         }
         
         // Allocate the fixup pointers
-        fix_ = new Node*[maxHeight_];
+        fix_ = reinterpret_cast<void**>(new Node*[maxHeight_]);
         
         // Then assign the another set
         *this = set;
@@ -130,9 +127,9 @@ public:
     ~Set()
     {
         Clear();
-        DeleteNode(head_);
-        DeleteNode(tail_);
-        delete[] fix_;
+        DeleteNode(GetHead());
+        DeleteNode(GetTail());
+        delete[] GetFix();
     }
     
     /// Assign from another set
@@ -141,7 +138,7 @@ public:
         Clear();
         
         // Insert the nodes with same heights
-        for (Node* i = rhs.head_->next_[0]; i; i = i->next_[0])
+        for (Node* i = rhs.GetHead()->GetNext(0); i != rhs.GetTail(); i = i->GetNext(0))
             InsertNode(i->key_, i->height_);
         
         return *this;
@@ -157,9 +154,7 @@ public:
     /// Add-assign a set
     Set& operator += (const Set<T>& rhs)
     {
-        for (Iterator i = rhs.Begin(); i != rhs.End(); ++i)
-            Insert(*i);
-        
+        Insert(rhs.Begin(), rhs.End());
         return *this;
     }
     
@@ -224,46 +219,49 @@ public:
     /// Erase a key from the set. Return true if was found and erased
     bool Erase(const T& key)
     {
-        Node* i = head_;
+        Node* head = GetHead();
+        Node* tail = GetTail();
+        Node** fix = GetFix();
+        Node* i = head;
         
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
             for (;;)
             {
                 Node* next = i->GetNext(j);
-                if ((next) && (next != tail_) && (key > next->key_))
+                if ((next) && (next != tail) && (key > next->key_))
                     i = next;
                 else
                     break;
             }
-            fix_[j] = i;
+            fix[j] = i;
         }
         
         // Check if key does not exist
         Node* toRemove = i->GetNext(0);
-        if ((!toRemove) || (toRemove == tail_) || (toRemove->key_ != key))
+        if ((!toRemove) || (toRemove == tail) || (toRemove->key_ != key))
             return false;
         
         // Fix the previous link. However, do not set the head node as a previous link
         Node* prev = toRemove->GetPrev();
         Node* next = toRemove->GetNext(0);
         if (next)
-            next->SetPrev(prev != head_ ? prev : 0);
+            next->SetPrev(prev != head ? prev : 0);
         
         // Fix the next links
         for (unsigned j = 0; j < height_; ++j)
         {
-            Node* fixNext = fix_[j]->GetNext(j);
+            Node* fixNext = fix[j]->GetNext(j);
             if (fixNext)
-                fix_[j]->SetNext(j, fixNext->GetNext(j));
+                fix[j]->SetNext(j, fixNext->GetNext(j));
         }
         
         // Check if height should be changed
         while (height_ > 0)
         {
-            if (head_->GetNext(height_ - 1))
+            if (head->GetNext(height_ - 1))
                 break;
-            head_->SetNext(--height_, 0);
+            head->SetNext(--height_, 0);
         }
         
         DeleteNode(toRemove);
@@ -303,16 +301,18 @@ public:
     void Clear()
     {
         // Let the head and tails node remain, but reset the next pointers
-        Node* node = head_->GetNext(0);
+        Node* head = GetHead();
+        Node* tail = GetTail();
+        Node* node = head->GetNext(0);
+        
         for (unsigned i = 0; i < maxHeight_; ++i)
         {
-            head_->SetNext(i, tail_);
-            tail_->SetNext(i, 0);
-            tail_->SetPrev(0);
+            head->SetNext(i, tail);
+            tail->SetPrev(0);
         }
         
         // Then remove all the key nodes
-        while (node != tail_)
+        while (node != tail)
         {
             Node* current = node;
             node = node->GetNext(0);
@@ -328,13 +328,13 @@ public:
     /// Return const iterator to the node with key, or null iterator if not found
     ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
     /// Return iterator to the first actual node
-    Iterator Begin() { return Iterator(head_->next_[0]); }
+    Iterator Begin() { return Iterator(GetHead()->GetNext(0)); }
     /// Return iterator to the first actual node
-    ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
+    ConstIterator Begin() const { return ConstIterator(GetHead()->GetNext(0)); }
     /// Return iterator to the end
-    Iterator End() { return Iterator(tail_); }
+    Iterator End() { return Iterator(GetTail()); }
     /// Return iterator to the end
-    ConstIterator End() const { return ConstIterator(tail_); }
+    ConstIterator End() const { return ConstIterator(GetTail()); }
     /// Return whether contains a key
     bool Contains(const T& key) const { return FindNode(key) != 0; }
     /// Return number of keys
@@ -344,19 +344,26 @@ public:
     /// Return whether set is empty
     bool Empty() const { return size_ == 0; }
     
-    static const unsigned MAX_HEIGHT = 15;
-    
 private:
+    /// Return the head pointer with correct type
+    Node* GetHead() const { return reinterpret_cast<Node*>(head_); }
+    /// Return the tail pointer with correct type
+    Node* GetTail() const { return reinterpret_cast<Node*>(tail_); }
+    /// Return the fixup array with correct type
+    Node** GetFix() const { return reinterpret_cast<Node**>(fix_); }
+    
     /// Find a key from the set. Return null if not found
     Node* FindNode(const T& key) const
     {
-        Node* i = head_;
+        Node* i = GetHead();
+        Node* tail = GetTail();
+        
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
             for (;;)
             {
                 Node* next = i->GetNext(j);
-                if ((next) && (next != tail_) && (key > next->key_)) 
+                if ((next) && (next != tail) && (key > next->key_)) 
                     i = next;
                 else
                     break;
@@ -364,7 +371,7 @@ private:
         }
         
         Node* next = i->GetNext(0);
-        if ((next) && (next != tail_) && (next->key_ == key))
+        if ((next) && (next != tail) && (next->key_ == key))
             return next;
         else
             return 0;
@@ -373,24 +380,27 @@ private:
     /// Insert into the set with a specific height. Zero height will randomize
     bool InsertNode(const T& key, unsigned height)
     {
-        Node* i = head_;
+        Node* head = GetHead();
+        Node* tail = GetTail();
+        Node** fix = GetFix();
+        Node* i = head;
         
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
             for (;;)
             {
                 Node* next = i->GetNext(j);
-                if ((next) && (next != tail_) && (key > next->key_))
+                if ((next) && (next != tail) && (key > next->key_))
                     i = next;
                 else
                     break;
             }
-            fix_[j] = i;
+            fix[j] = i;
         }
         
         // Check if key already exists
         Node* next = i->GetNext(0);
-        if ((next) && (next != tail_) && (next->key_ == key))
+        if ((next) && (next != tail) && (next->key_ == key))
             return false;
         
         // Create new node, assign height and key
@@ -400,48 +410,22 @@ private:
         newNode->key_ = key;
         
         // Fix the previous link, however do not set the head node as previous
-        if (i != head_)
+        if (i != head)
             newNode->SetPrev(i);
         if (next)
             next->SetPrev(newNode);
         
         while (newNode->height_ > height_)
-            fix_[height_++] = head_;
+            fix[height_++] = head;
         
         for (unsigned h = 0; h < newNode->height_; ++h)
         {
-            newNode->SetNext(h, fix_[h]->GetNext(h));
-            fix_[h]->SetNext(h, newNode);
+            newNode->SetNext(h, fix[h]->GetNext(h));
+            fix[h]->SetNext(h, newNode);
         }
         
         ++size_;
         return true;
-    }
-    
-    /// Generate a random height for a new node
-    unsigned GetHeight()
-    {
-        unsigned height = 1;
-        while ((height < maxHeight_) && (GetBit()))
-            ++height;
-        
-        return height;
-    }
-    
-    /// Return a random true/false result
-    bool GetBit()
-    {
-        if (!bitsLeft_)
-        {
-            random_ = rand();
-            bitsLeft_ = 15;
-        }
-        
-        bool ret = (random_ & 1) != 0;
-        random_ >>= 1;
-        --bitsLeft_;
-        
-        return ret;
     }
     
     /// Allocate a node and its next pointers
@@ -468,21 +452,4 @@ private:
         (&node->key_)->~T();
         delete[] reinterpret_cast<unsigned char*>(node);
     }
-    
-    /// Head node pointer
-    Node* head_;
-    /// Tail node pointer
-    Node* tail_;
-    /// Fixup pointers for insert & erase
-    Node** fix_;
-    /// Maximum height
-    unsigned maxHeight_;
-    /// Current height
-    unsigned height_;
-    /// Number of keys
-    unsigned size_;
-    /// Random bits
-    unsigned short random_;
-    /// Random bits remaining
-    unsigned short bitsLeft_;
 };

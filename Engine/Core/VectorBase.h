@@ -23,18 +23,33 @@
 
 #pragma once
 
-class SkipListBase;
-class String;
-class VectorBase;
+#include "Swap.h"
 
-/// Swap two values
-template<class T> inline void Swap(T& first, T& second)
+/// Vector base class
+class VectorBase
 {
-    T temp = first;
-    first = second;
-    second = temp;
-}
-
-template<> void Swap<String>(String& first, String& second);
-template<> void Swap<VectorBase>(VectorBase& first, VectorBase& second);
-template<> void Swap<SkipListBase>(SkipListBase& first, SkipListBase& second);
+public:
+    /// Construct
+    VectorBase() :
+        size_(0),
+        capacity_(0),
+        buffer_(0)
+    {
+    }
+    
+    /// Swap with another vector
+    void Swap(VectorBase& rhs)
+    {
+        ::Swap(size_, rhs.size_);
+        ::Swap(capacity_, rhs.capacity_);
+        ::Swap(buffer_, rhs.buffer_);
+    }
+    
+protected:
+    /// Size of vector
+    unsigned size_;
+    /// Buffer capacity
+    unsigned capacity_;
+    /// Buffer
+    void* buffer_;
+};

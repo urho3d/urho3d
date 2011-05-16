@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Iterator.h"
-#include "Swap.h"
 
 #include <cstring>
 #include <ctype.h>
@@ -54,7 +53,7 @@ public:
     }
     
     /// Construct from a C string
-    explicit String(const char* str) :
+    String(const char* str) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)

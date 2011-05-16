@@ -24,38 +24,30 @@
 #pragma once
 
 #include "Iterator.h"
+#include "VectorBase.h"
 
 #include <cstring>
 
 /// Vector template class for POD types. Does not call constructors or destructors and uses block move
-template <class T> class PODVector
+template <class T> class PODVector : public VectorBase
 {
 public:
     typedef RandomAccessIterator<T> Iterator;
     typedef RandomAccessConstIterator<T> ConstIterator;
     
     /// Construct empty
-    PODVector() :
-        size_(0),
-        capacity_(0),
-        buffer_(0)
+    PODVector()
     {
     }
     
     /// Construct with initial size
-    explicit PODVector(unsigned size) :
-        size_(0),
-        capacity_(0),
-        buffer_(0)
+    explicit PODVector(unsigned size)
     {
         Resize(size);
     }
     
     /// Construct from another vector
-    PODVector(const PODVector<T>& vector) :
-        size_(0),
-        capacity_(0),
-        buffer_(0)
+    PODVector(const PODVector<T>& vector)
     {
         *this = vector;
     }
@@ -70,7 +62,7 @@ public:
     PODVector<T>& operator = (const PODVector<T>& rhs)
     {
         Resize(rhs.size_);
-        CopyElements(buffer_, rhs.buffer_, rhs.size_);
+        CopyElements(GetBuffer(), rhs.GetBuffer(), rhs.size_);
         
         return *this;
     }
@@ -113,9 +105,11 @@ public:
         if (rhs.size_ != size_)
             return false;
         
+        T* buffer = GetBuffer();
+        T* rhsBuffer = rhs.GetBuffer();
         for (unsigned i = 0; i < size_; ++i)
         {
-            if (buffer_[i] != rhs.buffer_[i])
+            if (buffer[i] != rhsBuffer[i])
                 return false;
         }
         
@@ -128,9 +122,11 @@ public:
         if (rhs.size_ != size_)
             return true;
         
+        T* buffer = GetBuffer();
+        T* rhsBuffer = rhs.GetBuffer();
         for (unsigned i = 0; i < size_; ++i)
         {
-            if (buffer_[i] != rhs.buffer_[i])
+            if (buffer[i] != rhsBuffer[i])
                 return true;
         }
         
@@ -138,16 +134,16 @@ public:
     }
     
     /// Return element at index
-    T& operator [] (unsigned index) { return buffer_[index]; }
+    T& operator [] (unsigned index) { return GetBuffer()[index]; }
     /// Return const element at index
-    const T& operator [] (unsigned index) const { return buffer_[index]; }
+    const T& operator [] (unsigned index) const { return GetBuffer()[index]; }
     
     /// Add an element at the end
     void Push(const T& value)
     {
         unsigned oldSize = size_;
         Resize(size_ + 1);
-        buffer_[oldSize] = value;
+        GetBuffer()[oldSize] = value;
     }
     
     /// Add another vector at the end
@@ -158,7 +154,7 @@ public:
         
         unsigned oldSize = size_;
         Resize(size_ + vector.size_);
-        CopyElements(buffer_ + oldSize, vector.buffer_, vector.size_);
+        CopyElements(GetBuffer() + oldSize, vector.GetBuffer(), vector.size_);
     }
     
     /// Remove the last element
@@ -183,7 +179,7 @@ public:
         unsigned oldSize = size_;
         Resize(size_ + 1);
         MoveRange(pos + 1, pos, oldSize - pos);
-        buffer_[pos] = value;
+        GetBuffer()[pos] = value;
     }
     
     /// Insert another vector at position
@@ -204,7 +200,7 @@ public:
         unsigned oldSize = size_;
         Resize(size_ + vector.size_);
         MoveRange(pos + vector.size_, pos, oldSize - pos);
-        CopyElements(buffer_ + pos, vector.buffer_, vector.size_);
+        CopyElements(GetBuffer() + pos, vector.GetBuffer(), vector.size_);
     }
     
     /// Insert an element using an iterator
@@ -239,7 +235,7 @@ public:
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
         
-        T* destPtr = buffer_ + pos;
+        T* destPtr = GetBuffer() + pos;
         for (Iterator i = start; i != end; ++i)
             *destPtr++ = *i;
         
@@ -311,7 +307,7 @@ public:
             // Move the data into the new buffer and delete the old
             if (buffer_)
             {
-                CopyElements(newBuffer, buffer_, size_);
+                CopyElements(newBuffer, GetBuffer(), size_);
                 delete[] reinterpret_cast<unsigned char*>(buffer_);
             }
             buffer_ = newBuffer;
@@ -335,7 +331,7 @@ public:
         {
             newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
             // Move the data into the new buffer
-            CopyElements(newBuffer, buffer_, size_);
+            CopyElements(newBuffer, GetBuffer(), size_);
         }
         
         // Delete the old buffer
@@ -350,21 +346,21 @@ public:
     }
     
     /// Return iterator to the beginning
-    Iterator Begin() { return Iterator(buffer_); }
+    Iterator Begin() { return Iterator(GetBuffer()); }
     /// Return const iterator to the beginning
-    ConstIterator Begin() const { return ConstIterator(buffer_); }
+    ConstIterator Begin() const { return ConstIterator(GetBuffer()); }
     /// Return iterator to the end
-    Iterator End() { return Iterator(buffer_ + size_); }
+    Iterator End() { return Iterator(GetBuffer() + size_); }
     /// Return const iterator to the end
-    ConstIterator End() const { return ConstIterator(buffer_ + size_); }
+    ConstIterator End() const { return ConstIterator(GetBuffer() + size_); }
     /// Return first element
-    T& Front() { return buffer_[0]; }
+    T& Front() { return GetBuffer()[0]; }
     /// Return const first element
-    const T& Front() const { return buffer_[0]; }
+    const T& Front() const { return GetBuffer()[0]; }
     /// Return last element
-    T& Back() { return buffer_[size_ - 1]; }
+    T& Back() { return GetBuffer()[size_ - 1]; }
     /// Return const last element
-    const T& Back() const { return buffer_[size_ - 1]; }
+    const T& Back() const { return GetBuffer()[size_ - 1]; }
     /// Return size of vector
     unsigned Size() const { return size_; }
     /// Return capacity of vector
@@ -376,6 +372,9 @@ public:
     static const unsigned MIN_CAPACITY = 1;
     
 private:
+    /// Return the buffer with right type
+    T* GetBuffer() const { return reinterpret_cast<T*>(buffer_); }
+    
     /// Move a range of elements within the vector
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {
@@ -389,11 +388,4 @@ private:
         if (count)
             memcpy(dest, src, count * sizeof(T));
     }
-    
-    /// Size of vector
-    unsigned size_;
-    /// Buffer capacity
-    unsigned capacity_;
-    /// Buffer
-    T* buffer_;
 };
