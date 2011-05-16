@@ -104,6 +104,7 @@ endmacro ()
 
 # Add projects
 add_subdirectory (Engine/Audio)
+add_subdirectory (Engine/Container)
 add_subdirectory (Engine/Core)
 add_subdirectory (Engine/Engine)
 add_subdirectory (Engine/Graphics)

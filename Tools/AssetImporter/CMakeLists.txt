@@ -8,12 +8,13 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math ../../Engine/Resource
-    ../../Engine/Physics ../../Engine/Scene ../../ThirdParty/Assimp/include
+    ../../Engine/Container ../../Engine/Core ../../Engine/Graphics ../../Engine/IO ../../Engine/Math 
+    ../../Engine/Resource ../../Engine/Physics ../../Engine/Scene ../../ThirdParty/Assimp/include
 )
 
 # Define target & libraries to link
 add_executable (${TARGET_NAME} ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Assimp Core Graphics IO Math Physics Scene Resource ${DBGHELP_LIB})
+target_link_libraries (${TARGET_NAME} Assimp Container Core Graphics IO Math Physics Scene Resource 
+    ${DBGHELP_LIB})
 finalize_exe ()
 

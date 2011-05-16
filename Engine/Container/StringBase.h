@@ -23,6 +23,8 @@
 
 #pragma once
 
+// Note: file is named StringBase.h to prevent conflicts with C headers
+
 #include "Iterator.h"
 
 #include <cstring>

@@ -21,8 +21,7 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "CoreString.h"
+#include "StringBase.h"
 #include "Swap.h"
 
 char String::endZero = 0;

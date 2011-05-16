@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Core ../IO ../Math ../Resource ../Scene
+    ../Container ../Core ../IO ../Math ../Resource ../Scene
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Core Math Resource Scene d3d9.lib)
+target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene d3d9.lib)
 enable_pch ()
 finalize_lib ()

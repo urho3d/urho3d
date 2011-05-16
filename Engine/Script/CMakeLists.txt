@@ -8,11 +8,12 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Core ../IO ../Math ../Physics ../Resource ../Scene ../../ThirdParty/AngelScript/include
+    ../Container ../Core ../IO ../Math ../Physics ../Resource ../Scene 
+    ../../ThirdParty/AngelScript/include
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} AngelScript Core IO Math Physics Resource Scene)
+target_link_libraries (${TARGET_NAME} AngelScript Container Core IO Math Physics Resource Scene)
 enable_pch ()
 finalize_lib ()

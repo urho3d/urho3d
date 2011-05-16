@@ -8,12 +8,13 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../../ThirdParty/ODE/include
-    ../../ThirdParty/StanHull
+    ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene 
+    ../../ThirdParty/ODE/include ../../ThirdParty/StanHull
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Core Graphics IO Math ODE Resource Scene StanHull)
+target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math ODE Resource Scene 
+    StanHull)
 enable_pch ()
 finalize_lib ()
