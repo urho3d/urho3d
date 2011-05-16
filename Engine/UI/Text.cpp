@@ -148,7 +148,7 @@ void Text::SetStyle(const XMLElement& element)
     }
 }
 
-void Text::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     // Hovering or whole selection batch
     if ((hovering_ && (hoverColor_.a_ > 0.0f)) || (selected_ && (selectionColor_.a_ > 0.0f)))

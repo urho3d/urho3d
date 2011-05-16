@@ -93,7 +93,7 @@ void DropDownList::SetStyle(const XMLElement& element)
         SetResizePopup(element.GetChildElement("resizepopup").GetBool("enable"));
 }
 
-void DropDownList::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     Button::GetBatches(batches, quads, currentScissor);
     

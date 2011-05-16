@@ -63,7 +63,7 @@ public:
     /// Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches
-    virtual void GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
     /// Define a shape
     void DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot);

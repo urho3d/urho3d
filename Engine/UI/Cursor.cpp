@@ -103,13 +103,13 @@ void Cursor::SetShape(CursorShape shape)
     SetSize(info.imageRect_.right_ - info.imageRect_.left_, info.imageRect_.bottom_ - info.imageRect_.top_);
 }
 
-void Cursor::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void Cursor::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    unsigned initialSize = quads.size();
+    unsigned initialSize = quads.Size();
     const IntVector2& offset = shapeInfos_[shape_].hotSpot_;
     
     BorderImage::GetBatches(batches, quads, currentScissor);
-    for (unsigned i = initialSize; i < quads.size(); ++i)
+    for (unsigned i = initialSize; i < quads.Size(); ++i)
     {
         quads[i].left_ -= offset.x_;
         quads[i].top_ -= offset.y_;

@@ -127,14 +127,14 @@ private:
     SharedPtr<UIElement> rootElement_;
     /// Cursor
     SharedPtr<Cursor> cursor_;
-    /// UI rendering batches
-    std::vector<UIBatch> batches_;
-    /// UI rendering quads
-    std::vector<UIQuad> quads_;
     /// UI element being dragged
     WeakPtr<UIElement> dragElement_;
     /// Element to defocus on the next update
     WeakPtr<UIElement> defocusElement_;
+    /// UI rendering batches
+    PODVector<UIBatch> batches_;
+    /// UI rendering quads
+    PODVector<UIQuad> quads_;
     /// Clipboard text
     std::string clipBoard_;
     /// Mouse buttons held down

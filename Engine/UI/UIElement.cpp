@@ -236,7 +236,7 @@ void UIElement::Update(float timeStep)
 {
 }
 
-void UIElement::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     // Reset hovering for next frame
     hovering_ = false;
@@ -1058,12 +1058,12 @@ void UIElement::AdjustScissor(IntRect& currentScissor)
     }
 }
 
-void UIElement::GetBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
+void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
     currentScissor)
 {
-    unsigned initialSize = quads.size();
+    unsigned initialSize = quads.Size();
     GetBatches(batches, quads, currentScissor);
-    for (unsigned i = initialSize; i < quads.size(); ++i)
+    for (unsigned i = initialSize; i < quads.Size(); ++i)
     {
         quads[i].left_ += offset.x_;
         quads[i].top_ += offset.y_;

@@ -116,7 +116,7 @@ public:
     /// Perform UI element update
     virtual void Update(float timeStep);
     /// Return UI rendering batches
-    virtual void GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
     /// React to mouse hover
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
@@ -353,7 +353,7 @@ public:
     /// Adjust scissor for rendering
     void AdjustScissor(IntRect& currentScissor);
     /// Get UI rendering batches with a specified offset. Also recurses to child elements
-    void GetBatchesWithOffset(IntVector2& offset, std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, IntRect
+    void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
     
     /// User variables

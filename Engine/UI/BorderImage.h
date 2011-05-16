@@ -46,7 +46,7 @@ public:
     /// Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches
-    virtual void GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
     /// Set textures
     void SetTexture(Texture* texture);
@@ -72,7 +72,7 @@ public:
     
 protected:
     /// Return UI rendering batches with offset to image rectangle
-    void GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset);
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset);
     
     /// Texture
     SharedPtr<Texture> texture_;

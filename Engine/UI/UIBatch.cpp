@@ -30,12 +30,12 @@
 
 #include "DebugNew.h"
 
-void UIBatch::Begin(std::vector<UIQuad>* quads)
+void UIBatch::Begin(PODVector<UIQuad>* quads)
 {
     if (quads)
     {
         quads_ = quads;
-        quadStart_ = quads_->size();
+        quadStart_ = quads_->Size();
         quadCount_ = 0;
     }
 }
@@ -76,7 +76,7 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
         quad.bottomRightColor_ = uintColor;
     }
     
-    quads_->push_back(quad);
+    quads_->Push(quad);
     quadCount_++;
 }
 
@@ -117,7 +117,7 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
         quad.bottomRightColor_ = uintColor;
     }
     
-    quads_->push_back(quad);
+    quads_->Push(quad);
     quadCount_++;
 }
 
@@ -149,7 +149,7 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
     quad.bottomLeftColor_ = uintColor;
     quad.bottomRightColor_ = uintColor;
     
-    quads_->push_back(quad);
+    quads_->Push(quad);
     quadCount_++;
 }
 
@@ -185,7 +185,7 @@ void UIBatch::Draw(Graphics* graphics, VertexShader* vs, PixelShader* ps) const
     Vector2 posAdjust(0.5f, 0.5f);
     Vector2 invScreenSize(1.0f / (float)graphics->GetWidth(), 1.0f / (float)graphics->GetHeight());
     
-    const std::vector<UIQuad>& quads = *quads_;
+    const PODVector<UIQuad>& quads = *quads_;
     
     if (texture_)
     {
@@ -267,19 +267,19 @@ void UIBatch::Draw(Graphics* graphics, VertexShader* vs, PixelShader* ps) const
     }
 }
 
-void UIBatch::AddOrMerge(const UIBatch& batch, std::vector<UIBatch>& batches)
+void UIBatch::AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches)
 {
     if (!batch.quadCount_)
         return;
     
-    if (!batches.size())
-        batches.push_back(batch);
+    if (!batches.Size())
+        batches.Push(batch);
     else
     {
-        if (batches.back().Merge(batch))
+        if (batches.Back().Merge(batch))
             return;
         else
-            batches.push_back(batch);
+            batches.Push(batch);
     }
 }
 

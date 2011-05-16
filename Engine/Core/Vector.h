@@ -357,6 +357,14 @@ public:
     Iterator End() { return Iterator(buffer_ + size_); }
     /// Return const iterator to the end
     ConstIterator End() const { return ConstIterator(buffer_ + size_); }
+    /// Return first element
+    T& Front() { return buffer_[0]; }
+    /// Return const first element
+    const T& Front() const { return buffer_[0]; }
+    /// Return last element
+    T& Back() { return buffer_[size_ - 1]; }
+    /// Return const last element
+    const T& Back() const { return buffer_[size_ - 1]; }
     /// Return size of vector
     unsigned Size() const { return size_; }
     /// Return capacity of vector

@@ -56,7 +56,7 @@ void CheckBox::SetStyle(const XMLElement& element)
         SetCheckedOffset(element.GetChildElement("checkedoffset").GetIntVector2("value"));
 }
 
-void CheckBox::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
     if ((hovering_) || (selected_))

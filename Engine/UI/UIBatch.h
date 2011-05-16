@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Color.h"
+#include "PODVector.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"
 
@@ -78,7 +79,7 @@ public:
     }
     
     /// Begin adding quads
-    void Begin(std::vector<UIQuad>* quads);
+    void Begin(PODVector<UIQuad>* quads);
     /// Add a quad
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
     /// Add a quad with scaled texture
@@ -91,7 +92,7 @@ public:
     void Draw(Graphics* graphics, VertexShader* vs, PixelShader* ps) const;
     
     /// Add or merge a batch
-    static void AddOrMerge(const UIBatch& batch, std::vector<UIBatch>& batches);
+    static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
     /// Return an interpolated color for an UI element
     static unsigned GetInterpolatedColor(UIElement& element, int x, int y);
     
@@ -102,7 +103,7 @@ public:
     /// Texture
     Texture* texture_;
     /// Quads
-    std::vector<UIQuad>* quads_;
+    PODVector<UIQuad>* quads_;
     /// Quad start index
     unsigned quadStart_;
     /// Number of quads

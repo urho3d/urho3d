@@ -66,7 +66,7 @@ void BorderImage::SetStyle(const XMLElement& element)
         SetHoverOffset(element.GetChildElement("hoveroffset").GetIntVector2("value"));
 }
 
-void BorderImage::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor)
+void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     if ((hovering_) || (selected_))
         GetBatches(batches, quads, currentScissor, hoverOffset_);
@@ -111,7 +111,7 @@ void BorderImage::SetHoverOffset(int x, int y)
     hoverOffset_ = IntVector2(x, y);
 }
 
-void BorderImage::GetBatches(std::vector<UIBatch>& batches, std::vector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
+void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
 {
     bool allOpaque = true;
     if ((GetDerivedOpacity() < 1.0f) || (color_[C_TOPLEFT].a_ < 1.0f) || (color_[C_TOPRIGHT].a_ < 1.0f) ||

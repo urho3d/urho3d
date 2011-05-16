@@ -217,8 +217,8 @@ void UI::RenderUpdate()
     
     PROFILE(GetUIBatches);
     
-    batches_.clear();
-    quads_.clear();
+    batches_.Clear();
+    quads_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
     GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
     
@@ -259,7 +259,7 @@ void UI::Render()
     PixelShader* ps = 0;
     VertexShader* vs = 0;
     
-    for (unsigned i = 0; i < batches_.size(); ++i)
+    for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         // Choose shaders here so that UIBatch does not need to look up shaders each time
         if (!batches_[i].texture_)
