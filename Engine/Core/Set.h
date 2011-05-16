@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "Iterator.h"
+
 #include <cstdlib>
 #include <new>
 
@@ -33,18 +35,26 @@ template <class T> class Set
 {
 public:
     /// Set node
-    struct Node
+    struct Node : public SkipListNodeBase
     {
         /// Key
         T key_;
-        /// Node height
-        unsigned height_;
-        /// Skip list pointers
-        Node** next_;
+        
+        /// Return next node on a specific height
+        Node* GetNext(unsigned height) const
+        {
+            if (!height)
+                return static_cast<Node*>(next_);
+            else
+                return static_cast<Node*>(levels_[height - 1]);
+        }
+        
+        /// Return previous node
+        Node* GetPrev() { return static_cast<Node*>(prev_); }
     };
     
     /// Set node iterator
-    class Iterator
+    class Iterator : public ListIteratorBase
     {
     public:
         explicit Iterator(Node* ptr) :
@@ -53,30 +63,13 @@ public:
         }
         
         /// Point to the key
-        const T* operator -> () const { return &ptr_->key_; }
+        const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
         /// Dereference the key
-        const T& operator * () const { return ptr_->key_; }
-        /// Test for equality with another iterator
-        bool operator == (const Iterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Test for inequality with another iterator
-        bool operator != (const Iterator& rhs) const { return ptr_ != rhs.ptr_; }
-        /// Return whether non-null
-        operator bool () const { return ptr_ != 0; }
-        
-        /// Go to the next node, or to null if at the end
-        void operator ++ ()
-        {
-            if (ptr_)
-                ptr_ = ptr_->next_[0];
-        }
-        
-    private:
-        /// Node pointer
-        Node* ptr_;
+        const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
     
     /// Set node const iterator
-    class ConstIterator
+    class ConstIterator : public ListIteratorBase
     {
     public:
         explicit ConstIterator(Node* ptr) :
@@ -85,28 +78,11 @@ public:
         }
         
         /// Point to the key
-        const T* operator -> () const { return &ptr_->key_; }
+        const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
         /// Dereference the key
-        const T& operator * () const { return ptr_->key_; }
-        /// Test for equality with anoter iterator
-        bool operator == (const ConstIterator& rhs) const { return ptr_ == rhs.ptr_; }
-        /// Test for inequality with another iterator
-        bool operator != (const ConstIterator& rhs) const { return ptr_ != rhs.ptr_; }
-        /// Return whether non-null
-        operator bool () const { return ptr_ != 0; }
-        
-        /// Go to the next node, or to null if at the end
-        void operator ++ ()
-        {
-            if (ptr_)
-                ptr_ = ptr_->next_[0];
-        }
-        
-    private:
-        /// Node pointer
-        Node* ptr_;
+        const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
-    
+
     /// Construct empty
     Set(unsigned maxHeight = MAX_HEIGHT) :
         maxHeight_(maxHeight < MAX_HEIGHT ? maxHeight : MAX_HEIGHT),
@@ -114,10 +90,14 @@ public:
         size_(0),
         bitsLeft_(0)
     {
-        // Allocate the head node and zero the next pointers
+        // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_);
+        tail_ = AllocateNode(maxHeight_);
         for (unsigned i = 0; i < maxHeight_; ++i)
-            head_->next_[i] = 0;
+        {
+            head_->SetNext(i, tail_);
+            tail_->SetNext(i, 0);
+        }
         
         // Allocate the fixup pointers
         fix_ = new Node*[maxHeight_];
@@ -130,14 +110,19 @@ public:
         size_(0),
         bitsLeft_(0)
     {
-        // Allocate the head node and zero the next pointers
+        // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_);
+        tail_ = AllocateNode(maxHeight_);
         for (unsigned i = 0; i < maxHeight_; ++i)
-            head_->next_[i] = 0;
+        {
+            head_->SetNext(i, tail_);
+            tail_->SetNext(i, 0);
+        }
         
         // Allocate the fixup pointers
         fix_ = new Node*[maxHeight_];
         
+        // Then assign the another set
         *this = set;
     }
     
@@ -146,6 +131,7 @@ public:
     {
         Clear();
         DeleteNode(head_);
+        DeleteNode(tail_);
         delete[] fix_;
     }
     
@@ -227,8 +213,11 @@ public:
         Iterator it = start;
         while ((it) && (it != end))
         {
-            Insert(*it);
-            ++it;
+            Iterator current = it++;
+            Insert(*current);
+            // Break if the iterator got stuck
+            if (it == current)
+                break;
         }
     }
     
@@ -239,28 +228,42 @@ public:
         
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
-            while ((i->next_[j]) && (key > i->next_[j]->key_))
-                i = i->next_[j];
+            for (;;)
+            {
+                Node* next = i->GetNext(j);
+                if ((next) && (next != tail_) && (key > next->key_))
+                    i = next;
+                else
+                    break;
+            }
             fix_[j] = i;
         }
         
         // Check if key does not exist
-        if ((!i->next_[0]) && (i->next_[0]->key_ != key))
+        Node* toRemove = i->GetNext(0);
+        if ((!toRemove) || (toRemove == tail_) || (toRemove->key_ != key))
             return false;
         
-        Node* toRemove = fix_[0]->next_[0];
+        // Fix the previous link. However, do not set the head node as a previous link
+        Node* prev = toRemove->GetPrev();
+        Node* next = toRemove->GetNext(0);
+        if (next)
+            next->SetPrev(prev != head_ ? prev : 0);
         
+        // Fix the next links
         for (unsigned j = 0; j < height_; ++j)
         {
-            if (fix_[j]->next_[j])
-                fix_[j]->next_[j] = fix_[j]->next_[j]->next_[j];
+            Node* fixNext = fix_[j]->GetNext(j);
+            if (fixNext)
+                fix_[j]->SetNext(j, fixNext->GetNext(j));
         }
         
+        // Check if height should be changed
         while (height_ > 0)
         {
-            if (head_->next_[height_ - 1])
+            if (head_->GetNext(height_ - 1))
                 break;
-            head_->next_[--height_] = 0;
+            head_->SetNext(--height_, 0);
         }
         
         DeleteNode(toRemove);
@@ -284,9 +287,12 @@ public:
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
         Iterator it = start;
-        while ((it) && (it != end))
+        while (it != end)
         {
             Iterator current = it++;
+            // Break if the iterator got stuck
+            if (it == current)
+                break;
             Erase(*current);
         }
         
@@ -296,16 +302,20 @@ public:
     /// Clear the set
     void Clear()
     {
-        // Let the head node remain, but clear its next pointers
-        Node* node = head_->next_[0];
-        for (unsigned i = 0; i < height_; ++i)
-            head_->next_[i] = 0;
+        // Let the head and tails node remain, but reset the next pointers
+        Node* node = head_->GetNext(0);
+        for (unsigned i = 0; i < maxHeight_; ++i)
+        {
+            head_->SetNext(i, tail_);
+            tail_->SetNext(i, 0);
+            tail_->SetPrev(0);
+        }
         
         // Then remove all the key nodes
-        while (node)
+        while (node != tail_)
         {
             Node* current = node;
-            node = node->next_[0];
+            node = node->GetNext(0);
             DeleteNode(current);
         }
         
@@ -321,10 +331,10 @@ public:
     Iterator Begin() { return Iterator(head_->next_[0]); }
     /// Return iterator to the first actual node
     ConstIterator Begin() const { return ConstIterator(head_->next_[0]); }
-    /// Return iterator to the end (null iterator)
-    Iterator End() { return Iterator(0); }
-    /// Return iterator to the end (null iterator)
-    ConstIterator End() const { return ConstIterator(0); }
+    /// Return iterator to the end
+    Iterator End() { return Iterator(tail_); }
+    /// Return iterator to the end
+    ConstIterator End() const { return ConstIterator(tail_); }
     /// Return whether contains a key
     bool Contains(const T& key) const { return FindNode(key) != 0; }
     /// Return number of keys
@@ -343,12 +353,19 @@ private:
         Node* i = head_;
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
-            while ((i->next_[j]) && (key > i->next_[j]->key_))
-                i = i->next_[j];
+            for (;;)
+            {
+                Node* next = i->GetNext(j);
+                if ((next) && (next != tail_) && (key > next->key_)) 
+                    i = next;
+                else
+                    break;
+            }
         }
         
-        if ((i->next_[0]) && (i->next_[0]->key_ == key))
-            return i->next_[0];
+        Node* next = i->GetNext(0);
+        if ((next) && (next != tail_) && (next->key_ == key))
+            return next;
         else
             return 0;
     }
@@ -360,13 +377,20 @@ private:
         
         for (unsigned j = height_ - 1; j < MAX_HEIGHT; --j)
         {
-            while ((i->next_[j]) && (key > i->next_[j]->key_))
-                i = i->next_[j];
+            for (;;)
+            {
+                Node* next = i->GetNext(j);
+                if ((next) && (next != tail_) && (key > next->key_))
+                    i = next;
+                else
+                    break;
+            }
             fix_[j] = i;
         }
         
         // Check if key already exists
-        if ((i->next_[0]) && (i->next_[0]->key_ == key))
+        Node* next = i->GetNext(0);
+        if ((next) && (next != tail_) && (next->key_ == key))
             return false;
         
         // Create new node, assign height and key
@@ -375,13 +399,19 @@ private:
         Node* newNode = AllocateNode(height);
         newNode->key_ = key;
         
+        // Fix the previous link, however do not set the head node as previous
+        if (i != head_)
+            newNode->SetPrev(i);
+        if (next)
+            next->SetPrev(newNode);
+        
         while (newNode->height_ > height_)
             fix_[height_++] = head_;
         
         for (unsigned h = 0; h < newNode->height_; ++h)
         {
-            newNode->next_[h] = fix_[h]->next_[h];
-            fix_[h]->next_[h] = newNode;
+            newNode->SetNext(h, fix_[h]->GetNext(h));
+            fix_[h]->SetNext(h, newNode);
         }
         
         ++size_;
@@ -417,13 +447,16 @@ private:
     /// Allocate a node and its next pointers
     Node* AllocateNode(unsigned height)
     {
-        unsigned char* block = new unsigned char[sizeof(Node) + height * sizeof(Node*)];
+        unsigned char* block = new unsigned char[sizeof(Node) + (height - 1) * sizeof(Node*)];
         Node* newNode = reinterpret_cast<Node*>(block);
         
         // Construct the key with placement new and set the next pointers' address
         new(&newNode->key_) T();
         newNode->height_ = height;
-        newNode->next_ = reinterpret_cast<Node**>(block + sizeof(Node));
+        if (height > 1)
+            newNode->levels_ = reinterpret_cast<SkipListNodeBase**>(block + sizeof(Node));
+        else
+            newNode->levels_ = 0;
         
         return newNode;
     }
@@ -438,6 +471,8 @@ private:
     
     /// Head node pointer
     Node* head_;
+    /// Tail node pointer
+    Node* tail_;
     /// Fixup pointers for insert & erase
     Node** fix_;
     /// Maximum height
