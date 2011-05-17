@@ -241,22 +241,22 @@ static void RegisterTextures(asIScriptEngine* engine)
 
 static Vector4 MaterialGetVertexShaderParameter(VSParameter parameter, Material* ptr)
 {
-    const std::map<VSParameter, Vector4>& parameters = ptr->GetVertexShaderParameters();
-    std::map<VSParameter, Vector4>::const_iterator i = parameters.find(parameter);
-    if (i == parameters.end())
+    const Map<VSParameter, Vector4>& parameters = ptr->GetVertexShaderParameters();
+    Map<VSParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    if (i == parameters.End())
         return Vector4::ZERO;
     else
-        return i->second;
+        return i->second_;
 }
 
 static Vector4 MaterialGetPixelShaderParameter(PSParameter parameter, Material* ptr)
 {
-    const std::map<PSParameter, Vector4>& parameters = ptr->GetPixelShaderParameters();
-    std::map<PSParameter, Vector4>::const_iterator i = parameters.find(parameter);
-    if (i == parameters.end())
+    const Map<PSParameter, Vector4>& parameters = ptr->GetPixelShaderParameters();
+    Map<PSParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    if (i == parameters.End())
         return Vector4::ZERO;
     else
-        return i->second;
+        return i->second_;
 }
 
 static Material* MaterialClone(const String& cloneName, Material* ptr)
@@ -859,7 +859,7 @@ static Node* RayQueryResultGetNode(RayQueryResult* ptr)
 
 static CScriptArray* OctreeRaycast(const Ray& ray, unsigned char drawableFlags, float maxDistance, RayQueryLevel level, Octree* ptr)
 {
-    std::vector<RayQueryResult> result;
+    Vector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, drawableFlags, false, false, maxDistance, level);
     ptr->GetDrawables(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");
@@ -867,7 +867,7 @@ static CScriptArray* OctreeRaycast(const Ray& ray, unsigned char drawableFlags, 
 
 static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char drawableFlags, Octree* ptr)
 {
-    std::vector<Drawable*> result;
+    Vector<Drawable*> result;
     PointOctreeQuery query(result, point, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -875,7 +875,7 @@ static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char
 
 static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char drawableFlags, Octree* ptr)
 {
-    std::vector<Drawable*> result;
+    Vector<Drawable*> result;
     BoxOctreeQuery query(result, box, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -883,7 +883,7 @@ static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char
 
 static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned char drawableFlags, Octree* ptr)
 {
-    std::vector<Drawable*> result;
+    Vector<Drawable*> result;
     FrustumOctreeQuery query(result, frustum, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");
@@ -891,7 +891,7 @@ static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned 
 
 static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned char drawableFlags, Octree* ptr)
 {
-    std::vector<Drawable*> result;
+    Vector<Drawable*> result;
     SphereOctreeQuery query(result, sphere, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");

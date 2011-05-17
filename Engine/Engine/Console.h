@@ -66,7 +66,7 @@ public:
     /// Return whether is visible
     bool IsVisible() const;
     /// Return number of displayed rows
-    unsigned GetNumRows() const { return rows_.size(); }
+    unsigned GetNumRows() const { return rows_.Size(); }
     /// Return history maximum size
     unsigned GetNumHistoryRows() const { return historyRows_; }
     /// Return current history position
@@ -91,11 +91,11 @@ private:
     /// Container for text rows
     SharedPtr<UIElement> rowContainer_;
     /// Text rows
-    std::vector<SharedPtr<Text> > rows_;
+    Vector<SharedPtr<Text> > rows_;
     /// Line edit
     SharedPtr<LineEdit> lineEdit_;
     /// Command history
-    std::vector<String> history_;
+    Vector<String> history_;
     /// Current row being edited
     String current_Row;
     /// Command history maximum rows

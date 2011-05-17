@@ -28,8 +28,8 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
-#include <map>
-#include <vector>
+#include "Map.h"
+#include "Vector.h"
 
 /// Supported variable types for Variant
 enum VariantType
@@ -128,7 +128,7 @@ struct ResourceRefList
     {
     }
     /// Construct with type and id list
-    ResourceRefList(ShortStringHash type, const std::vector<StringHash>& ids) :
+    ResourceRefList(ShortStringHash type, const Vector<StringHash>& ids) :
         type_(type),
         ids_(ids)
     {
@@ -137,7 +137,7 @@ struct ResourceRefList
     /// Object type
     ShortStringHash type_;
     /// List of object identifiers, for example name hashes
-    std::vector<StringHash> ids_;
+    Vector<StringHash> ids_;
     
     /// Test for equality with another reference list
     bool operator == (const ResourceRefList& rhs) const
@@ -155,9 +155,9 @@ struct ResourceRefList
 class Variant;
 
 /// Vector of variants
-typedef std::vector<Variant> VariantVector;
+typedef Vector<Variant> VariantVector;
 /// Map of variants
-typedef std::map<ShortStringHash, Variant> VariantMap;
+typedef Map<ShortStringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types
 class Variant
@@ -261,7 +261,7 @@ public:
     }
     
     /// Construct from a buffer
-    Variant(const std::vector<unsigned char>& value) :
+    Variant(const Vector<unsigned char>& value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -436,10 +436,10 @@ public:
     }
 
     /// Assign from a buffer
-    Variant& operator = (const std::vector<unsigned char>& rhs)
+    Variant& operator = (const Vector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
-        *(reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_)) = rhs;
         return *this;
     }
     
@@ -583,10 +583,10 @@ public:
     }
     
     /// Test for equality with a buffer. To return true, both the type and value must match
-    bool operator == (const std::vector<unsigned char>& rhs) const
+    bool operator == (const Vector<unsigned char>& rhs) const
     {
         if (type_ == VAR_BUFFER)
-            return *(reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_)) == rhs;
         else
             return false;
     }
@@ -673,7 +673,7 @@ public:
     /// Test for inequality with a string
     bool operator != (const String& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a buffer
-    bool operator != (const std::vector<unsigned char>& rhs) const { return !(*this == rhs); }
+    bool operator != (const Vector<unsigned char>& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a pointer
     bool operator != (void* rhs) const { return !(*this == rhs); }
     /// Test for inequality with an object reference
@@ -791,11 +791,11 @@ public:
     }
     
     /// Return buffer or empty on type mismatch
-    const std::vector<unsigned char>& GetBuffer() const
+    const Vector<unsigned char>& GetBuffer() const
     {
         if (type_ != VAR_BUFFER)
             return emptyBuffer;
-        return *reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_);
+        return *reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_);
     }
     
     /// Return pointer or null on type mismatch
@@ -865,7 +865,7 @@ private:
     /// Empty string
     static const String emptyString;
     /// Empty buffer
-    static const std::vector<unsigned char> emptyBuffer;
+    static const Vector<unsigned char> emptyBuffer;
     /// Empty object reference
     static const ResourceRef emptyResourceRef;
     /// Empty object reference list

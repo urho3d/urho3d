@@ -100,7 +100,7 @@ public:
     }
     
     /// Test for equality with another vector
-    bool operator == (const Vector<T>& rhs)
+    bool operator == (const Vector<T>& rhs) const
     {
         if (rhs.size_ != size_)
             return false;
@@ -117,7 +117,7 @@ public:
     }
     
     /// Test for inequality with another vector
-    bool operator != (const Vector<T>& rhs)
+    bool operator != (const Vector<T>& rhs) const
     {
         if (rhs.size_ != size_)
             return true;
@@ -137,7 +137,11 @@ public:
     T& operator [] (unsigned index) { return GetBuffer()[index]; }
     /// Return const element at index
     const T& operator [] (unsigned index) const { return GetBuffer()[index]; }
-    
+    /// Return element at index
+    T& At(unsigned index) { return GetBuffer()[index]; }
+    /// Return const element at index
+    const T& At(unsigned index) const { return GetBuffer()[index]; }
+
     /// Add an element at the end
     void Push(const T& value)
     {
@@ -169,7 +173,7 @@ public:
     {
         if (!size_)
         {
-            Add(value);
+            Push(value);
             return;
         }
         

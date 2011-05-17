@@ -28,7 +28,7 @@
 #include "Drawable.h"
 #include "RenderSurface.h"
 
-#include <set>
+#include "Set.h"
 
 class DebugRenderer;
 class Geometry;
@@ -177,7 +177,7 @@ public:
     /// Set required size (1.0 = full screen) for occluders
     void SetOccluderSizeThreshold(float screenSize);
     /// Return number of viewports
-    unsigned GetNumViewports() const { return viewports_.size(); }
+    unsigned GetNumViewports() const { return viewports_.Size(); }
     /// Return viewport
     const Viewport& GetViewport(unsigned index) const;
     /// Return whether specular lighting is enabled
@@ -199,11 +199,11 @@ public:
     /// Return whether shadow maps are reused
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
     /// Return number of full resolution shadow maps
-    unsigned GetNumFullShadowMaps() const { return shadowMaps_[0].size(); }
+    unsigned GetNumFullShadowMaps() const { return shadowMaps_[0].Size(); }
     /// Return number of half resolution shadow maps
-    unsigned GetNumHalfShadowMaps() const { return shadowMaps_[1].size(); }
+    unsigned GetNumHalfShadowMaps() const { return shadowMaps_[1].Size(); }
     /// Return number of quarter resolution shadow maps
-    unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].size(); }
+    unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].Size(); }
     /// Return whether dynamic instancing is in use
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
     /// Return maximum number of occluder triangles
@@ -327,7 +327,7 @@ private:
     /// Default spotlight attenuation texture
     SharedPtr<Texture2D> defaultLightSpot;
     /// Shadow maps by resolution
-    std::vector<SharedPtr<Texture2D> > shadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
+    Vector<SharedPtr<Texture2D> > shadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
     /// Shadow map dummy color textures by resolution
     SharedPtr<Texture2D> colorShadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
     /// Shadow map use count if reusing is disabled. Is reset for each view
@@ -337,25 +337,25 @@ private:
     /// Stencil rendering pixel shader
     SharedPtr<PixelShader> stencilPS_;
     /// Light vertex shaders
-    std::vector<SharedPtr<VertexShader> > lightVS_;
+    Vector<SharedPtr<VertexShader> > lightVS_;
     /// Light pixel shaders
-    std::vector<SharedPtr<PixelShader> > lightPS_;
+    Vector<SharedPtr<PixelShader> > lightPS_;
     /// Reusable shadow cameras
-    std::vector<SharedPtr<Camera> > shadowCameraStore_;
+    Vector<SharedPtr<Camera> > shadowCameraStore_;
     /// Reusable split lights
-    std::vector<SharedPtr<Light> > splitLightStore_;
+    Vector<SharedPtr<Light> > splitLightStore_;
     /// Reusable temporary scene nodes
-    std::vector<SharedPtr<Node> > tempNodeStore_;
+    Vector<SharedPtr<Node> > tempNodeStore_;
     /// Occlusion buffers
-    std::map<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
+    Map<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
     /// Viewports
-    std::vector<Viewport> viewports_;
+    Vector<Viewport> viewports_;
     /// Views
-    std::vector<SharedPtr<View> > views_;
+    Vector<SharedPtr<View> > views_;
     /// Octrees that have been updated during the frame
-    std::set<Octree*> updateOctrees_;
+    Set<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed
-    std::set<Technique*> shaderErrorDisplayed_;
+    Set<Technique*> shaderErrorDisplayed_;
     /// Vertex shader format
     String vsFormat_;
     /// Pixel shader format

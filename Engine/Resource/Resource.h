@@ -90,16 +90,16 @@ inline ResourceRef GetResourceRef(Resource* resource, ShortStringHash defaultTyp
     return ResourceRef(GetResourceType(resource, defaultType), GetResourceHash(resource));
 }
 
-template <class T> std::vector<StringHash> GetResourceHashes(const std::vector<SharedPtr<T> >& resources)
+template <class T> Vector<StringHash> GetResourceHashes(const Vector<SharedPtr<T> >& resources)
 {
-    std::vector<StringHash> ret(resources.size());
-    for (unsigned i = 0; i < resources.size(); ++i)
+    Vector<StringHash> ret(resources.Size());
+    for (unsigned i = 0; i < resources.Size(); ++i)
         ret[i] = GetResourceHash(resources[i].GetPtr());
     
     return ret;
 }
 
-template <class T> ResourceRefList GetResourceRefList(const std::vector<SharedPtr<T> >& resources)
+template <class T> ResourceRefList GetResourceRefList(const Vector<SharedPtr<T> >& resources)
 {
     return ResourceRefList(T::GetTypeStatic(), GetResourceHashes(resources));
 }

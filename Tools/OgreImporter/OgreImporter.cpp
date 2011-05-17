@@ -29,10 +29,10 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
-#include <algorithm>
+#include "Sort.h"
 #include <cstring>
-#include <map>
-#include <set>
+#include "Map.h"
+#include "Set.h"
 
 #include "DebugNew.h"
 
@@ -41,17 +41,17 @@ static const int VERTEX_CACHE_SIZE = 32;
 SharedPtr<Context> context_(new Context());
 SharedPtr<XMLFile> meshFile_(new XMLFile(context_));
 SharedPtr<XMLFile> skelFile_(new XMLFile(context_));
-std::vector<ModelIndexBuffer> indexBuffers_;
-std::vector<ModelVertexBuffer> vertexBuffers_;
-std::vector<std::vector<ModelSubGeometryLodLevel> > subGeometries_;
-std::vector<ModelBone> bones_;
-std::vector<ModelMorph> morphs_;
+Vector<ModelIndexBuffer> indexBuffers_;
+Vector<ModelVertexBuffer> vertexBuffers_;
+Vector<Vector<ModelSubGeometryLodLevel> > subGeometries_;
+Vector<ModelBone> bones_;
+Vector<ModelMorph> morphs_;
 BoundingBox boundingBox_;
 unsigned numSubMeshes_ = 0;
 bool useOneBuffer_ = true;
 
 int main(int argc, char** argv);
-void Run(const std::vector<String>& arguments);
+void Run(const Vector<String>& arguments);
 void LoadSkeleton(const String& skeletonFileName);
 void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs);
 void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly);
@@ -60,18 +60,18 @@ void CalculateScore(ModelVertex& vertex);
 
 int main(int argc, char** argv)
 {
-    std::vector<String> arguments;
+    Vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(String(argv[i]));
+        arguments.Push(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<String>& arguments)
+void Run(const Vector<String>& arguments)
 {
-    if (arguments.size() < 2)
+    if (arguments.Size() < 2)
     {
         ErrorExit(
             "Usage: OgreImporter <input file> <output file> [options]\n\n"
@@ -90,9 +90,9 @@ void Run(const std::vector<String>& arguments)
     bool exportAnimations = false;
     bool rotationsOnly = false;
     
-    if (arguments.size() > 2)
+    if (arguments.Size() > 2)
     {
-        for (unsigned i = 2; i < arguments.size(); ++i)
+        for (unsigned i = 2; i < arguments.Size(); ++i)
         {
             if (arguments[i][0] == '-')
             {
@@ -146,8 +146,8 @@ void LoadSkeleton(const String& skeletonFileName)
         {
             unsigned index = bone.GetInt("id");
             String name = bone.GetString("name");
-            if (index >= bones_.size())
-                bones_.resize(index + 1);
+            if (index >= bones_.Size())
+                bones_.Resize(index + 1);
             
             // Convert from right- to left-handed
             XMLElement position = bone.GetChildElement("position");
@@ -184,10 +184,10 @@ void LoadSkeleton(const String& skeletonFileName)
             String bone = boneParent.GetString("bone");
             String parent = boneParent.GetString("parent");
             unsigned i = 0, j = 0;
-            for (i = 0; (i < bones_.size()) && (bones_[i].name_ != bone); ++i)
-            for (j = 0; (j < bones_.size()) && (bones_[j].name_ != parent); ++j)
+            for (i = 0; (i < bones_.Size()) && (bones_[i].name_ != bone); ++i)
+            for (j = 0; (j < bones_.Size()) && (bones_[j].name_ != parent); ++j)
             
-            if ((i >= bones_.size()) || (j >= bones_.size()))
+            if ((i >= bones_.Size()) || (j >= bones_.Size()))
                 ErrorExit("Found indeterminate parent bone assignment");
             bones_[i].parentIndex_ = j;
             
@@ -195,7 +195,7 @@ void LoadSkeleton(const String& skeletonFileName)
         }
         
         // Calculate bone derived positions
-        for (unsigned i = 0; i < bones_.size(); ++i)
+        for (unsigned i = 0; i < bones_.Size(); ++i)
         {
             Vector3 derivedPosition = bones_[i].bindPosition_;
             Quaternion derivedRotation = bones_[i].bindRotation_;
@@ -273,13 +273,13 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     if ((splitSubMeshes) || ((totalVertices > 65535) && (maxSubMeshVertices <= 65535)))
     {
         useOneBuffer_ = false;
-        vertexBuffers_.resize(numSubMeshes_);
-        indexBuffers_.resize(numSubMeshes_);
+        vertexBuffers_.Resize(numSubMeshes_);
+        indexBuffers_.Resize(numSubMeshes_);
     }
     else
     {
-        vertexBuffers_.resize(1);
-        indexBuffers_.resize(1);
+        vertexBuffers_.Resize(1);
+        indexBuffers_.Resize(1);
     }
     
     subMesh = subMeshes.GetChildElement("submesh");
@@ -287,8 +287,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     unsigned vertexStart = 0;
     unsigned subMeshIndex = 0;
     
-    std::vector<unsigned> vertexStarts;
-    vertexStarts.resize(numSubMeshes_);
+    Vector<unsigned> vertexStarts;
+    vertexStarts.Resize(numSubMeshes_);
     
     while (subMesh)
     {
@@ -315,7 +315,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         {
             vBuf = &vertexBuffers_[0];
             if (vertices)
-                vBuf->vertices_.resize(vertexStart + vertices);
+                vBuf->vertices_.Resize(vertexStart + vertices);
             iBuf = &indexBuffers_[0];
             
             subGeometryLodLevel.vertexBuffer_ = 0;
@@ -327,7 +327,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             indexStart = 0;
             
             vBuf = &vertexBuffers_[subMeshIndex];
-            vBuf->vertices_.resize(vertices);
+            vBuf->vertices_.Resize(vertices);
             iBuf = &indexBuffers_[subMeshIndex];
             
             subGeometryLodLevel.vertexBuffer_ = subMeshIndex;
@@ -407,9 +407,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             unsigned v1 = triangle.GetInt("v1");
             unsigned v2 = triangle.GetInt("v2");
             unsigned v3 = triangle.GetInt("v3");
-            iBuf->indices_.push_back(v3 + vertexStart);
-            iBuf->indices_.push_back(v2 + vertexStart);
-            iBuf->indices_.push_back(v1 + vertexStart);
+            iBuf->indices_.Push(v3 + vertexStart);
+            iBuf->indices_.Push(v2 + vertexStart);
+            iBuf->indices_.Push(v1 + vertexStart);
             triangle = triangle.GetNextElement("face");
         }
         
@@ -418,7 +418,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         if (vertexStart + vertices > 65535)
             iBuf->indexSize_ = sizeof(unsigned);
         
-        if (bones_.size())
+        if (bones_.Size())
         {
             XMLElement boneAssignments = subMesh.GetChildElement("boneassignments");
             if (boneAssignments)
@@ -436,7 +436,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     // Source data might have 0 weights. Disregard these
                     if (assign.weight_ > 0.0f)
                     {
-                        subGeometryLodLevel.boneWeights_[vertex].push_back(assign);
+                        subGeometryLodLevel.boneWeights_[vertex].Push(assign);
                         
                         if (assign.weight_ > 0.33f)
                         {
@@ -458,77 +458,77 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 }
             }
             
-            if ((subGeometryLodLevel.boneWeights_.size()) && bones_.size())
+            if ((subGeometryLodLevel.boneWeights_.Size()) && bones_.Size())
             {
                 vBuf->elementMask_ |= MASK_BLENDWEIGHTS | MASK_BLENDINDICES;
                 bool sorted = false;
                 
                 // If amount of bones_ is larger than supported by HW skinning, must remap per submesh
-                if (bones_.size() > MAX_SKIN_MATRICES)
+                if (bones_.Size() > MAX_SKIN_MATRICES)
                 {
-                    std::map<unsigned, unsigned> usedBoneMap;
+                    Map<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
-                    for (std::map<unsigned, std::vector<BoneWeightAssignment> >::iterator i =
-                        subGeometryLodLevel.boneWeights_.begin(); i != subGeometryLodLevel.boneWeights_.end(); ++i)
+                    for (Map<unsigned, Vector<BoneWeightAssignment> >::Iterator i =
+                        subGeometryLodLevel.boneWeights_.Begin(); i != subGeometryLodLevel.boneWeights_.End(); ++i)
                     {
                         // Sort the bone assigns by weight
-                        std::sort(i->second.begin(), i->second.end(), CompareWeights);
+                        Sort(i->second_.Begin(), i->second_.End(), CompareWeights);
                         
                         // Use only the first 4 weights
-                        for (unsigned j = 0; j < i->second.size() && j < 4; ++j)
+                        for (unsigned j = 0; j < i->second_.Size() && j < 4; ++j)
                         {
-                            unsigned originalIndex = i->second[j].boneIndex_;
-                            if (usedBoneMap.find(originalIndex) == usedBoneMap.end())
+                            unsigned originalIndex = i->second_[j].boneIndex_;
+                            if (usedBoneMap.Find(originalIndex) == usedBoneMap.End())
                             {
                                 usedBoneMap[originalIndex] = remapIndex;
                                 remapIndex++;
                             }
-                            i->second[j].boneIndex_ = usedBoneMap[originalIndex];
+                            i->second_[j].boneIndex_ = usedBoneMap[originalIndex];
                         }
                     }
                     
                     // If still too many bones_ in one subgeometry, error
-                    if (usedBoneMap.size() > MAX_SKIN_MATRICES)
+                    if (usedBoneMap.Size() > MAX_SKIN_MATRICES)
                         ErrorExit("Too many bones_ in submesh " + ToString(subMeshIndex + 1));
                     
                     // Write mapping of vertex buffer bone indices to original bone indices
-                    subGeometryLodLevel.boneMapping_.resize(usedBoneMap.size());
-                    for (std::map<unsigned, unsigned>::iterator j = usedBoneMap.begin(); j != usedBoneMap.end(); ++j)
-                        subGeometryLodLevel.boneMapping_[j->second] = j->first;
+                    subGeometryLodLevel.boneMapping_.Resize(usedBoneMap.Size());
+                    for (Map<unsigned, unsigned>::Iterator j = usedBoneMap.Begin(); j != usedBoneMap.End(); ++j)
+                        subGeometryLodLevel.boneMapping_[j->second_] = j->first_;
                     
                     sorted = true;
                 }
                 
-                for (std::map<unsigned, std::vector<BoneWeightAssignment> >::iterator i = subGeometryLodLevel.boneWeights_.begin();
-                    i != subGeometryLodLevel.boneWeights_.end(); ++i)
+                for (Map<unsigned, Vector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
+                    i != subGeometryLodLevel.boneWeights_.End(); ++i)
                 {
                     // Sort the bone assigns by weight, if not sorted yet in bone remapping pass
                     if (!sorted)
-                        std::sort(i->second.begin(), i->second.end(), CompareWeights);
+                        Sort(i->second_.Begin(), i->second_.End(), CompareWeights);
                     
                     float totalWeight = 0.0f;
                     float normalizationFactor = 0.0f;
                     
                     // Calculate normalization factor in case there are more than 4 blend weights, or they do not add up to 1
-                    for (unsigned j = 0; j < i->second.size() && j < 4; ++j)
-                        totalWeight += i->second[j].weight_;
+                    for (unsigned j = 0; j < i->second_.Size() && j < 4; ++j)
+                        totalWeight += i->second_[j].weight_;
                     if (totalWeight > 0.0f)
                         normalizationFactor = 1.0f / totalWeight;
                     
-                    for (unsigned j = 0; j < i->second.size() && j < 4; ++j)
+                    for (unsigned j = 0; j < i->second_.Size() && j < 4; ++j)
                     {
-                        vBuf->vertices_[i->first].blendIndices_[j] = i->second[j].boneIndex_;
-                        vBuf->vertices_[i->first].blendWeights_[j] = i->second[j].weight_ * normalizationFactor;
+                        vBuf->vertices_[i->first_].blendIndices_[j] = i->second_[j].boneIndex_;
+                        vBuf->vertices_[i->first_].blendWeights_[j] = i->second_[j].weight_ * normalizationFactor;
                     }
                     
                     // If there are less than 4 blend weights, fill rest with zero
-                    for (unsigned j = i->second.size(); j < 4; ++j)
+                    for (unsigned j = i->second_.Size(); j < 4; ++j)
                     {
-                        vBuf->vertices_[i->first].blendIndices_[j] = 0;
-                        vBuf->vertices_[i->first].blendWeights_[j] = 0.0f;
+                        vBuf->vertices_[i->first_].blendIndices_[j] = 0;
+                        vBuf->vertices_[i->first_].blendWeights_[j] = 0.0f;
                     }
                     
-                    vBuf->vertices_[i->first].hasBlendWeights_ = true;
+                    vBuf->vertices_[i->first_].hasBlendWeights_ = true;
                 }
             }
         }
@@ -542,9 +542,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         
         PrintLine("Processed submesh " + ToString(subMeshIndex + 1) + ": " + ToString(vertices) + " vertices " + 
             ToString(triangles) + " triangles");
-        std::vector<ModelSubGeometryLodLevel> thisSubGeometry;
-        thisSubGeometry.push_back(subGeometryLodLevel);
-        subGeometries_.push_back(thisSubGeometry);
+        Vector<ModelSubGeometryLodLevel> thisSubGeometry;
+        thisSubGeometry.Push(subGeometryLodLevel);
+        subGeometries_.Push(thisSubGeometry);
         
         subMesh = subMesh.GetNextElement("submesh");
         subMeshIndex++;
@@ -591,7 +591,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         iBuf = &indexBuffers_[subMeshIndex];
                     }
                     
-                    unsigned indexStart = iBuf->indices_.size();
+                    unsigned indexStart = iBuf->indices_.Size();
                     unsigned indexCount = triangles * 3;
                     unsigned vertexStart = vertexStarts[subMeshIndex];
                     
@@ -606,15 +606,15 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         unsigned v1 = triangle.GetInt("v1");
                         unsigned v2 = triangle.GetInt("v2");
                         unsigned v3 = triangle.GetInt("v3");
-                        iBuf->indices_.push_back(v3 + vertexStart);
-                        iBuf->indices_.push_back(v2 + vertexStart);
-                        iBuf->indices_.push_back(v1 + vertexStart);
+                        iBuf->indices_.Push(v3 + vertexStart);
+                        iBuf->indices_.Push(v2 + vertexStart);
+                        iBuf->indices_.Push(v1 + vertexStart);
                         triangle = triangle.GetNextElement("face");
                     }
                     
                     OptimizeIndices(&newLodLevel, vBuf, iBuf);
                     
-                    subGeometries_[subMeshIndex].push_back(newLodLevel);
+                    subGeometries_[subMeshIndex].Push(newLodLevel);
                     PrintLine("Processed LOD level for submesh " + ToString(subMeshIndex + 1) + ": distance " + ToString(distance));
                     
                     lodSubMesh = lodSubMesh.GetNextElement("lodfacelist");
@@ -631,14 +631,14 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     {
         try
         {
-            std::vector<XMLElement> poses;
+            Vector<XMLElement> poses;
             XMLElement posesRoot = root.GetChildElement("poses");
             if (posesRoot)
             {
                 XMLElement pose = posesRoot.GetChildElement("pose");
                 while (pose)
                 {
-                    poses.push_back(pose);
+                    poses.Push(pose);
                     pose = pose.GetNextElement("pose");
                 }
             }
@@ -652,7 +652,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 {
                     String name = anim.GetString("name");
                     float length = anim.GetFloat("length");
-                    std::set<unsigned> usedPoses;
+                    Set<unsigned> usedPoses;
                     XMLElement tracks = anim.GetChildElement("tracks");
                     if (tracks)
                     {
@@ -669,7 +669,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                     XMLElement poseref = keyframe.GetChildElement("poseref");
                                     // Get only the end pose
                                     if ((poseref) && (time == length))
-                                        usedPoses.insert(poseref.GetInt("poseindex"));
+                                        usedPoses.Insert(poseref.GetInt("poseindex"));
                                     
                                     keyframe = keyframe.GetNextElement("keyframe");
                                 }
@@ -678,19 +678,19 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         }
                     }
                     
-                    if (usedPoses.size())
+                    if (usedPoses.Size())
                     {
                         ModelMorph newMorph;
                         newMorph.name_ = name;
                         
                         if (useOneBuffer_)
-                            newMorph.buffers_.resize(1);
+                            newMorph.buffers_.Resize(1);
                         else
-                            newMorph.buffers_.resize(usedPoses.size());
+                            newMorph.buffers_.Resize(usedPoses.Size());
                         
                         unsigned bufIndex = 0;
                         
-                        for (std::set<unsigned>::iterator i = usedPoses.begin(); i != usedPoses.end(); ++i)
+                        for (Set<unsigned>::Iterator i = usedPoses.Begin(); i != usedPoses.End(); ++i)
                         {
                             XMLElement pose = poses[*i];
                             unsigned targetSubMesh = pose.GetInt("index");
@@ -740,8 +740,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                             if (!useOneBuffer_)
                                 ++bufIndex;
                         }
-                        morphs_.push_back(newMorph);
-                        PrintLine("Processed morph " + name + " with " + ToString(usedPoses.size()) + " sub-poses");
+                        morphs_.Push(newMorph);
+                        PrintLine("Processed morph " + name + " with " + ToString(usedPoses.Size()) + " sub-poses");
                     }
                     
                     anim = anim.GetNextElement("animation");
@@ -752,11 +752,11 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     }
     
     // Check any of the buffers for vertices with missing blend weight assignments
-    for (unsigned i = 0; i < vertexBuffers_.size(); ++i)
+    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
         if (vertexBuffers_[i].elementMask_ & MASK_BLENDWEIGHTS)
         {
-            for (unsigned j = 0; j < vertexBuffers_[i].vertices_.size(); ++j)
+            for (unsigned j = 0; j < vertexBuffers_[i].vertices_.Size(); ++j)
                 if (!vertexBuffers_[i].vertices_[j].hasBlendWeights_)
                     ErrorExit("Found a vertex with missing skinning information");
         }
@@ -765,15 +765,15 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     // Tangent generation
     if (generateTangents)
     {
-        for (unsigned i = 0; i < subGeometries_.size(); ++i)
+        for (unsigned i = 0; i < subGeometries_.Size(); ++i)
         {
-            for (unsigned j = 0; j < subGeometries_[i].size(); ++j)
+            for (unsigned j = 0; j < subGeometries_[i].Size(); ++j)
             {
                 ModelVertexBuffer& vBuf = vertexBuffers_[subGeometries_[i][j].vertexBuffer_];
                 ModelIndexBuffer& iBuf = indexBuffers_[subGeometries_[i][j].indexBuffer_];
                 unsigned indexStart = subGeometries_[i][j].indexStart_;
                 unsigned indexCount = subGeometries_[i][j].indexCount_;
-                unsigned vertexCount = vBuf.vertices_.size();
+                unsigned vertexCount = vBuf.vertices_.Size();
                 
                 // If already has tangents, do not regenerate
                 if (vBuf.elementMask_ & MASK_TANGENT)
@@ -878,27 +878,27 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         dest.WriteID("UMDL");
         
         // Vertexbuffers
-        dest.WriteUInt(vertexBuffers_.size());
-        for (unsigned i = 0; i < vertexBuffers_.size(); ++i)
+        dest.WriteUInt(vertexBuffers_.Size());
+        for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
             vertexBuffers_[i].WriteData(dest);
         
         // Indexbuffers
-        dest.WriteUInt(indexBuffers_.size());
-        for (unsigned i = 0; i < indexBuffers_.size(); ++i)
+        dest.WriteUInt(indexBuffers_.Size());
+        for (unsigned i = 0; i < indexBuffers_.Size(); ++i)
             indexBuffers_[i].WriteData(dest);
         
         // Subgeometries
-        dest.WriteUInt(subGeometries_.size());
-        for (unsigned i = 0; i < subGeometries_.size(); ++i)
+        dest.WriteUInt(subGeometries_.Size());
+        for (unsigned i = 0; i < subGeometries_.Size(); ++i)
         {
             // Write bone mapping info from the first LOD level. It does not change for further LODs
-            dest.WriteUInt(subGeometries_[i][0].boneMapping_.size());
-            for (unsigned k = 0; k < subGeometries_[i][0].boneMapping_.size(); ++k)
+            dest.WriteUInt(subGeometries_[i][0].boneMapping_.Size());
+            for (unsigned k = 0; k < subGeometries_[i][0].boneMapping_.Size(); ++k)
                 dest.WriteUInt(subGeometries_[i][0].boneMapping_[k]);
             
             // Lod levels for this subgeometry
-            dest.WriteUInt(subGeometries_[i].size());
-            for (unsigned j = 0; j < subGeometries_[i].size(); ++j)
+            dest.WriteUInt(subGeometries_[i].Size());
+            for (unsigned j = 0; j < subGeometries_[i].Size(); ++j)
             {
                 dest.WriteFloat(subGeometries_[i][j].distance_);
                 dest.WriteUInt((unsigned)subGeometries_[i][j].primitiveType_);
@@ -910,13 +910,13 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
         }
         
         // Morphs
-        dest.WriteUInt(morphs_.size());
-        for (unsigned i = 0; i < morphs_.size(); ++i)
+        dest.WriteUInt(morphs_.Size());
+        for (unsigned i = 0; i < morphs_.Size(); ++i)
             morphs_[i].WriteData(dest);
         
         // Skeleton
-        dest.WriteUInt(bones_.size());
-        for (unsigned i = 0; i < bones_.size(); ++i)
+        dest.WriteUInt(bones_.Size());
+        for (unsigned i = 0; i < bones_.Size(); ++i)
         {
             dest.WriteString(bones_[i].name_);
             dest.WriteUInt(bones_[i].parentIndex_);
@@ -959,7 +959,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 {
                     String trackName = track.GetString("bone");
                     ModelBone* bone = 0;
-                    for (unsigned i = 0; i < bones_.size(); ++i)
+                    for (unsigned i = 0; i < bones_.Size(); ++i)
                     {
                         if (bones_[i].name_ == trackName)
                         {
@@ -1007,16 +1007,16 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                         newKeyFrame.position_ = pos;
                         newKeyFrame.rotation_ = rot;
                         
-                        newAnimationTrack.keyFrames_.push_back(newKeyFrame);
+                        newAnimationTrack.keyFrames_.Push(newKeyFrame);
                         keyFrame = keyFrame.GetNextElement("keyframe");
                     }
                     
                     // Make sure keyframes are sorted from beginning to end
-                    std::sort(newAnimationTrack.keyFrames_.begin(), newAnimationTrack.keyFrames_.end(), CompareKeyFrames);
+                    Sort(newAnimationTrack.keyFrames_.Begin(), newAnimationTrack.keyFrames_.End(), CompareKeyFrames);
                     
                     // Do not add tracks with no keyframes
-                    if (newAnimationTrack.keyFrames_.size())
-                        newAnimation.tracks_.push_back(newAnimationTrack);
+                    if (newAnimationTrack.keyFrames_.Size())
+                        newAnimation.tracks_.Push(newAnimationTrack);
                     
                     track = track.GetNextElement("track");
                 }
@@ -1029,14 +1029,14 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 dest.WriteID("UANI");
                 dest.WriteString(newAnimation.name_);
                 dest.WriteFloat(newAnimation.length_);
-                dest.WriteUInt(newAnimation.tracks_.size());
-                for (unsigned i = 0; i < newAnimation.tracks_.size(); ++i)
+                dest.WriteUInt(newAnimation.tracks_.Size());
+                for (unsigned i = 0; i < newAnimation.tracks_.Size(); ++i)
                 {
                     AnimationTrack& track = newAnimation.tracks_[i];
                     dest.WriteString(track.name_);
                     dest.WriteUByte(track.channelMask_);
-                    dest.WriteUInt(track.keyFrames_.size());
-                    for (unsigned j = 0; j < track.keyFrames_.size(); ++j)
+                    dest.WriteUInt(track.keyFrames_.Size());
+                    for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
                     {
                         AnimationKeyFrame& keyFrame = track.keyFrames_[j];
                         dest.WriteFloat(keyFrame.time_);
@@ -1058,10 +1058,10 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
 
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib)
 {
-    std::vector<Triangle> oldTriangles;
-    std::vector<Triangle> newTriangles;
+    Vector<Triangle> oldTriangles;
+    Vector<Triangle> newTriangles;
     
-    for (unsigned i = 0; i < vb->vertices_.size(); ++i)
+    for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
     {
         vb->vertices_[i].useCount_ = 0;
         vb->vertices_[i].cachePosition_ = -1;
@@ -1079,21 +1079,21 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
         vb->vertices_[triangle.v0_].useCount_++;
         vb->vertices_[triangle.v1_].useCount_++;
         vb->vertices_[triangle.v2_].useCount_++;
-        oldTriangles.push_back(triangle);
+        oldTriangles.Push(triangle);
     }
     
-    for (unsigned i = 0; i < vb->vertices_.size(); ++i)
+    for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
         CalculateScore(vb->vertices_[i]);
     
-    std::vector<unsigned> vertexCache;
+    Vector<unsigned> vertexCache;
     
-    while (oldTriangles.size())
+    while (oldTriangles.Size())
     {
         unsigned bestTriangle = M_MAX_UNSIGNED;
         float bestTriangleScore = -1.0f;
         
         // Find the best triangle at this point
-        for (unsigned i = 0; i < oldTriangles.size(); ++i)
+        for (unsigned i = 0; i < oldTriangles.Size(); ++i)
         {
             Triangle& triangle = oldTriangles[i];
             float triangleScore = 
@@ -1113,8 +1113,8 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
         
         // Add the best triangle
         Triangle triangleCopy = oldTriangles[bestTriangle];
-        newTriangles.push_back(triangleCopy);
-        oldTriangles.erase(oldTriangles.begin() + bestTriangle);
+        newTriangles.Push(triangleCopy);
+        oldTriangles.Erase(oldTriangles.Begin() + bestTriangle);
         
         // Reduce the use count
         vb->vertices_[triangleCopy.v0_].useCount_--;
@@ -1123,25 +1123,25 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
         
         // Model the LRU cache behaviour
         // Erase the triangle vertices from the middle of the cache, if they were there
-        for (unsigned i = 0; i < vertexCache.size(); ++i)
+        for (unsigned i = 0; i < vertexCache.Size(); ++i)
         {
             if ((vertexCache[i] == triangleCopy.v0_) ||
                 (vertexCache[i] == triangleCopy.v1_) ||
                 (vertexCache[i] == triangleCopy.v2_))
             {
-                vertexCache.erase(vertexCache.begin() + i);
+                vertexCache.Erase(vertexCache.Begin() + i);
                 --i;
             }
         }
         
         // Then push them to the front
-        vertexCache.insert(vertexCache.begin(), triangleCopy.v0_);
-        vertexCache.insert(vertexCache.begin(), triangleCopy.v1_);
-        vertexCache.insert(vertexCache.begin(), triangleCopy.v2_);
+        vertexCache.Insert(vertexCache.Begin(), triangleCopy.v0_);
+        vertexCache.Insert(vertexCache.Begin(), triangleCopy.v1_);
+        vertexCache.Insert(vertexCache.Begin(), triangleCopy.v2_);
         
         // Update positions & scores of all vertices in the cache
         // Give position -1 if vertex is going to be erased
-        for (unsigned i = 0; i < vertexCache.size(); ++i)
+        for (unsigned i = 0; i < vertexCache.Size(); ++i)
         {
             ModelVertex& vertex = vb->vertices_[vertexCache[i]];
             if (i >= VERTEX_CACHE_SIZE)
@@ -1152,13 +1152,13 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
         }
         
         // Finally erase the extra vertices
-        if (vertexCache.size() > VERTEX_CACHE_SIZE)
-            vertexCache.resize(VERTEX_CACHE_SIZE);
+        if (vertexCache.Size() > VERTEX_CACHE_SIZE)
+            vertexCache.Resize(VERTEX_CACHE_SIZE);
     }
     
     // Rewrite the index data now
     unsigned i = subGeom->indexStart_;
-    for (unsigned j = 0; j < newTriangles.size(); ++j)
+    for (unsigned j = 0; j < newTriangles.Size(); ++j)
     {
         ib->indices_[i++] = newTriangles[j].v0_;
         ib->indices_[i++] = newTriangles[j].v1_;

@@ -162,7 +162,7 @@ public:
     /// Return whether has a base pass
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return lights
-    const std::vector<Light*>& GetLights() const { return lights_; }
+    const Vector<Light*>& GetLights() const { return lights_; }
     
 protected:
     /// Handle node being assigned
@@ -215,11 +215,15 @@ protected:
     /// Last camera rendered from. Not safe to dereference
     Camera* viewCamera_;
     /// Lights affecting this drawable, when light count is limited
-    std::vector<Light*> lights_;
+    Vector<Light*> lights_;
     /// Bounding box dirty flag
     bool worldBoundingBoxDirty_;
     /// Lod levels dirty flag
     bool lodLevelsDirty_;
 };
 
-bool CompareDrawables(const Drawable* lhs, const Drawable* rhs);
+inline bool CompareDrawables(Drawable* lhs, Drawable* rhs)
+{
+    return lhs->GetSortValue() < rhs->GetSortValue();
+}
+

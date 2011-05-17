@@ -68,9 +68,9 @@ void DebugRenderer::SetView(Camera* camera)
 void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest)
 {
     if (depthTest)
-        lines_.push_back(DebugLine(start, end, color.ToUInt()));
+        lines_.Push(DebugLine(start, end, color.ToUInt()));
     else
-        noDepthLines_.push_back(DebugLine(start, end, color.ToUInt()));
+        noDepthLines_.Push(DebugLine(start, end, color.ToUInt()));
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
@@ -87,22 +87,22 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     
     unsigned d3dColor = color.ToUInt();
     
-    std::vector<DebugLine>* dest = &lines_;
+    Vector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->push_back(DebugLine(min, v0, d3dColor));
-    dest->push_back(DebugLine(v0, v1, d3dColor));
-    dest->push_back(DebugLine(v1, v2, d3dColor));
-    dest->push_back(DebugLine(v2, min, d3dColor));
-    dest->push_back(DebugLine(v3, v4, d3dColor));
-    dest->push_back(DebugLine(v4, max, d3dColor));
-    dest->push_back(DebugLine(max, v5, d3dColor));
-    dest->push_back(DebugLine(v5, v3, d3dColor));
-    dest->push_back(DebugLine(min, v3, d3dColor));
-    dest->push_back(DebugLine(v0, v4, d3dColor));
-    dest->push_back(DebugLine(v1, max, d3dColor));
-    dest->push_back(DebugLine(v2, v5, d3dColor));
+    dest->Push(DebugLine(min, v0, d3dColor));
+    dest->Push(DebugLine(v0, v1, d3dColor));
+    dest->Push(DebugLine(v1, v2, d3dColor));
+    dest->Push(DebugLine(v2, min, d3dColor));
+    dest->Push(DebugLine(v3, v4, d3dColor));
+    dest->Push(DebugLine(v4, max, d3dColor));
+    dest->Push(DebugLine(max, v5, d3dColor));
+    dest->Push(DebugLine(v5, v3, d3dColor));
+    dest->Push(DebugLine(min, v3, d3dColor));
+    dest->Push(DebugLine(v0, v4, d3dColor));
+    dest->Push(DebugLine(v1, max, d3dColor));
+    dest->Push(DebugLine(v2, v5, d3dColor));
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix4x3& transform, const Color& color, bool depthTest)
@@ -121,22 +121,22 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix4x3& tran
     
     unsigned d3dColor = color.ToUInt();
     
-    std::vector<DebugLine>* dest = &lines_;
+    Vector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->push_back(DebugLine(v0, v1, d3dColor));
-    dest->push_back(DebugLine(v1, v2, d3dColor));
-    dest->push_back(DebugLine(v2, v3, d3dColor));
-    dest->push_back(DebugLine(v3, v0, d3dColor));
-    dest->push_back(DebugLine(v4, v5, d3dColor));
-    dest->push_back(DebugLine(v5, v6, d3dColor));
-    dest->push_back(DebugLine(v6, v7, d3dColor));
-    dest->push_back(DebugLine(v7, v4, d3dColor));
-    dest->push_back(DebugLine(v0, v4, d3dColor));
-    dest->push_back(DebugLine(v1, v5, d3dColor));
-    dest->push_back(DebugLine(v2, v6, d3dColor));
-    dest->push_back(DebugLine(v3, v7, d3dColor));
+    dest->Push(DebugLine(v0, v1, d3dColor));
+    dest->Push(DebugLine(v1, v2, d3dColor));
+    dest->Push(DebugLine(v2, v3, d3dColor));
+    dest->Push(DebugLine(v3, v0, d3dColor));
+    dest->Push(DebugLine(v4, v5, d3dColor));
+    dest->Push(DebugLine(v5, v6, d3dColor));
+    dest->Push(DebugLine(v6, v7, d3dColor));
+    dest->Push(DebugLine(v7, v4, d3dColor));
+    dest->Push(DebugLine(v0, v4, d3dColor));
+    dest->Push(DebugLine(v1, v5, d3dColor));
+    dest->Push(DebugLine(v2, v6, d3dColor));
+    dest->Push(DebugLine(v3, v7, d3dColor));
 }
 
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
@@ -144,38 +144,38 @@ void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool 
     const Vector3* vertices = frustum.GetVertices();
     unsigned d3dColor = color.ToUInt();
     
-    std::vector<DebugLine>* dest = &lines_;
+    Vector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->push_back(DebugLine(vertices[0], vertices[1], d3dColor));
-    dest->push_back(DebugLine(vertices[1], vertices[2], d3dColor));
-    dest->push_back(DebugLine(vertices[2], vertices[3], d3dColor));
-    dest->push_back(DebugLine(vertices[3], vertices[0], d3dColor));
-    dest->push_back(DebugLine(vertices[4], vertices[5], d3dColor));
-    dest->push_back(DebugLine(vertices[5], vertices[6], d3dColor));
-    dest->push_back(DebugLine(vertices[6], vertices[7], d3dColor));
-    dest->push_back(DebugLine(vertices[7], vertices[4], d3dColor));
-    dest->push_back(DebugLine(vertices[0], vertices[4], d3dColor));
-    dest->push_back(DebugLine(vertices[1], vertices[5], d3dColor));
-    dest->push_back(DebugLine(vertices[2], vertices[6], d3dColor));
-    dest->push_back(DebugLine(vertices[3], vertices[7], d3dColor));
+    dest->Push(DebugLine(vertices[0], vertices[1], d3dColor));
+    dest->Push(DebugLine(vertices[1], vertices[2], d3dColor));
+    dest->Push(DebugLine(vertices[2], vertices[3], d3dColor));
+    dest->Push(DebugLine(vertices[3], vertices[0], d3dColor));
+    dest->Push(DebugLine(vertices[4], vertices[5], d3dColor));
+    dest->Push(DebugLine(vertices[5], vertices[6], d3dColor));
+    dest->Push(DebugLine(vertices[6], vertices[7], d3dColor));
+    dest->Push(DebugLine(vertices[7], vertices[4], d3dColor));
+    dest->Push(DebugLine(vertices[0], vertices[4], d3dColor));
+    dest->Push(DebugLine(vertices[1], vertices[5], d3dColor));
+    dest->Push(DebugLine(vertices[2], vertices[6], d3dColor));
+    dest->Push(DebugLine(vertices[3], vertices[7], d3dColor));
 }
 
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)
 {
-    const std::vector<Bone>& bones = skeleton.GetBones();
-    if (!bones.size())
+    const Vector<Bone>& bones = skeleton.GetBones();
+    if (!bones.Size())
         return;
     
     DebugLine newLine;
     newLine.color_ = color.ToUInt();
     
-    std::vector<DebugLine>* dest = &lines_;
+    Vector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    for (unsigned i = 0; i < bones.size(); ++i)
+    for (unsigned i = 0; i < bones.Size(); ++i)
     {
         Node* boneNode = bones[i].node_;
         if (!boneNode)
@@ -189,7 +189,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
         else
             newLine.end_ = newLine.start_;
         
-        dest->push_back(newLine);
+        dest->Push(newLine);
     }
 }
 
@@ -198,7 +198,7 @@ void DebugRenderer::Render()
 {
     PROFILE(RenderDebugGeometry);
     
-    if ((!lines_.size()) && (!noDepthLines_.size()))
+    if ((!lines_.Size()) && (!noDepthLines_.Size()))
         return;
     
     Graphics* graphics = GetSubsystem<Graphics>();
@@ -219,12 +219,12 @@ void DebugRenderer::Render()
     graphics->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     
     // Draw all line geometry with depth testing
-    if (lines_.size())
+    if (lines_.Size())
     {
-        graphics->BeginImmediate(LINE_LIST, lines_.size() * 2, MASK_POSITION | MASK_COLOR);
+        graphics->BeginImmediate(LINE_LIST, lines_.Size() * 2, MASK_POSITION | MASK_COLOR);
         float* dest = (float*)graphics->GetImmediateDataPtr();
         
-        for (unsigned i = 0; i < lines_.size(); ++i)
+        for (unsigned i = 0; i < lines_.Size(); ++i)
         {
             const DebugLine& line = lines_[i];
             
@@ -240,12 +240,12 @@ void DebugRenderer::Render()
     
     // Draw all line geometry without depth testing
     graphics->SetDepthTest(CMP_ALWAYS);
-    if (noDepthLines_.size())
+    if (noDepthLines_.Size())
     {
-        graphics->BeginImmediate(LINE_LIST, noDepthLines_.size() * 2, MASK_POSITION | MASK_COLOR);
+        graphics->BeginImmediate(LINE_LIST, noDepthLines_.Size() * 2, MASK_POSITION | MASK_COLOR);
         float* dest = (float*)graphics->GetImmediateDataPtr();
         
-        for (unsigned i = 0; i < noDepthLines_.size(); ++i)
+        for (unsigned i = 0; i < noDepthLines_.Size(); ++i)
         {
             const DebugLine& line = noDepthLines_[i];
             
@@ -267,6 +267,6 @@ bool DebugRenderer::IsInside(const BoundingBox& box) const
 
 void DebugRenderer::HandleEndFrame(StringHash eventType, VariantMap& eventData)
 {
-    lines_.clear();
-    noDepthLines_.clear();
+    lines_.Clear();
+    noDepthLines_.Clear();
 }

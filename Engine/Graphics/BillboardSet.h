@@ -94,9 +94,9 @@ public:
     /// Return material
     Material* GetMaterial() const { return material_; }
     /// Return number of billboards
-    unsigned GetNumBillboards() const { return billboards_.size(); }
+    unsigned GetNumBillboards() const { return billboards_.Size(); }
     /// Return all billboards
-    std::vector<Billboard>& GetBillboards() { return billboards_; }
+    Vector<Billboard>& GetBillboards() { return billboards_; }
     /// Return billboard by index
     Billboard* GetBillboard(unsigned index);
     /// Return whether billboards are relative to the scene node
@@ -117,7 +117,7 @@ protected:
     void MarkPositionsDirty();
     
     /// Billboards
-    std::vector<Billboard> billboards_;
+    Vector<Billboard> billboards_;
     /// Animation LOD bias
     float animationLodBias_;
     /// Animation LOD timer
@@ -154,5 +154,5 @@ private:
     /// Previous offset to camera for determining whether sorting is necessary
     Vector3 previousOffset_;
     /// Billboard pointers for sorting
-    std::vector<Billboard*> sortedBillboards_;
+    Vector<Billboard*> sortedBillboards_;
 };

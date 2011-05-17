@@ -30,7 +30,7 @@
 #include "OctreeQuery.h"
 #include "Scene.h"
 
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -87,7 +87,7 @@ void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     result.drawable_ = this;
     result.node_ = GetNode();
     result.distance_ = initialDistance;
-    query.result_.push_back(result);
+    query.result_.Push(result);
 }
 
 void Drawable::UpdateDistance(const FrameInfo& frame)
@@ -194,7 +194,7 @@ void Drawable::SetSortValue(float value)
 void Drawable::ClearBasePass()
 {
     basePassFlags_ = 0;
-    lights_.clear();
+    lights_.Clear();
 }
 
 void Drawable::SetBasePass(unsigned batchIndex)
@@ -204,32 +204,32 @@ void Drawable::SetBasePass(unsigned batchIndex)
 
 void Drawable::AddLight(Light* light)
 {
-    lights_.push_back(light);
+    lights_.Push(light);
 }
 
 void Drawable::LimitLights()
 {
-    std::set<Light*> uniqueLights;
+    Set<Light*> uniqueLights;
     
     const Vector3& worldPos = GetWorldPosition();
-    for (unsigned i = 0; i < lights_.size(); ++i)
+    for (unsigned i = 0; i < lights_.Size(); ++i)
         lights_[i]->SetIntensitySortValue(worldPos);
     
-    std::sort(lights_.begin(), lights_.end(), CompareDrawables);
+    Sort(lights_.Begin(), lights_.End(), CompareDrawables);
     
-    for (unsigned i = 0; i < lights_.size(); ++i)
+    for (unsigned i = 0; i < lights_.Size(); ++i)
     {
         // For split lights, take into account the original light instead, so that we do not get "partial" lighting
         Light* originalLight = lights_[i]->GetOriginalLight();
         if (originalLight)
-            uniqueLights.insert(originalLight);
+            uniqueLights.Insert(originalLight);
         else
-            uniqueLights.insert(lights_[i]);
+            uniqueLights.Insert(lights_[i]);
         
         // Stop when allowed light count exceeded
-        if (uniqueLights.size() > maxLights_)
+        if (uniqueLights.Size() > maxLights_)
         {
-            lights_.resize(i);
+            lights_.Resize(i);
             return;
         }
     }
@@ -287,9 +287,4 @@ void Drawable::RemoveFromOctree()
         octree->CancelReinsertion(this);
         octant_->RemoveDrawable(this);
     }
-}
-
-bool CompareDrawables(const Drawable* lhs, const Drawable* rhs)
-{
-    return lhs->GetSortValue() < rhs->GetSortValue();
 }

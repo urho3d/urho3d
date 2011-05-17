@@ -178,10 +178,10 @@ static void RegisterScrollView(asIScriptEngine* engine)
 void ListViewSetSelections(CScriptArray* selections, ListView* ptr)
 {
     unsigned numItems = selections->GetSize();
-    std::set<unsigned> dest;
+    Set<unsigned> dest;
     
     for (unsigned i = 0; i < numItems; ++i)
-        dest.insert(*((unsigned*)selections->At(i)));
+        dest.Insert(*((unsigned*)selections->At(i)));
     
     ptr->SetSelections(dest);
 }
@@ -193,13 +193,13 @@ static CScriptArray* ListViewGetSelections(ListView* ptr)
 
 static CScriptArray* ListViewGetItems(ListView* ptr)
 {
-    std::vector<UIElement*> result = ptr->GetItems();
+    Vector<UIElement*> result = ptr->GetItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 
 static CScriptArray* ListViewGetSelectedItems(ListView* ptr)
 {
-    std::vector<UIElement*> result = ptr->GetSelectedItems();
+    Vector<UIElement*> result = ptr->GetSelectedItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 
@@ -325,7 +325,7 @@ static void RegisterMenu(asIScriptEngine* engine)
 
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)
 {
-    std::vector<UIElement*> result = ptr->GetItems();
+    Vector<UIElement*> result = ptr->GetItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 
@@ -372,7 +372,7 @@ static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex,
         return;
     
     unsigned numFilters = filters->GetSize();
-    std::vector<String> destFilters(numFilters);
+    Vector<String> destFilters(numFilters);
     
     for (unsigned i = 0; i < numFilters; ++i)
         destFilters[i] = *(static_cast<String*>(filters->At(i)));

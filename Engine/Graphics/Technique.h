@@ -74,9 +74,9 @@ public:
     /// Return pixel shader name
     const String& GetPixelShaderName() const { return pixelShaderName_; }
     /// Return vertex shaders
-    std::vector<SharedPtr<VertexShader> >& GetVertexShaders() { return vertexShaders_; }
+    Vector<SharedPtr<VertexShader> >& GetVertexShaders() { return vertexShaders_; }
     /// Return pixel shaders
-    std::vector<SharedPtr<PixelShader> >& GetPixelShaders() { return pixelShaders_; }
+    Vector<SharedPtr<PixelShader> >& GetPixelShaders() { return pixelShaders_; }
     
 private:
     /// Pass type
@@ -96,9 +96,9 @@ private:
     /// Pixel shader name
     String pixelShaderName_;
     /// Vertex shaders
-    std::vector<SharedPtr<VertexShader> > vertexShaders_;
+    Vector<SharedPtr<VertexShader> > vertexShaders_;
     /// Pixel shaders
-    std::vector<SharedPtr<PixelShader> > pixelShaders_;
+    Vector<SharedPtr<PixelShader> > pixelShaders_;
 };
 
 /// Material technique. Consists of several passes
@@ -134,15 +134,15 @@ public:
     /// Return whether has a pass
     bool HasPass(PassType pass) const
     {
-        return passes_.find(pass) != passes_.end();
+        return passes_.Find(pass) != passes_.End();
     }
     
     /// Return a pass
     Pass* GetPass(PassType pass)
     {
-        std::map<PassType, Pass>::iterator i = passes_.find(pass);
-        if (i != passes_.end())
-            return &(i->second);
+        Map<PassType, Pass>::Iterator i = passes_.Find(pass);
+        if (i != passes_.End())
+            return &(i->second_);
         else
             return 0;
     }
@@ -150,7 +150,7 @@ public:
     /// Return whether requires Shader Model 3
     bool IsSM3() const { return isSM3_; }
     /// Return all passes
-    const std::map<PassType, Pass>& GetPasses() const { return passes_; }
+    const Map<PassType, Pass>& GetPasses() const { return passes_; }
     /// Return last shaders loaded frame number
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     
@@ -163,5 +163,5 @@ private:
     /// Last shaders loaded frame number
     unsigned shadersLoadedFrameNumber_;
     /// Passes
-    std::map<PassType, Pass> passes_;
+    Map<PassType, Pass> passes_;
 };

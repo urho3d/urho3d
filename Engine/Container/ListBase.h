@@ -46,26 +46,31 @@ struct ListNodeBase
 class ListIteratorBase
 {
 public:
+    explicit ListIteratorBase(ListNodeBase* ptr) :
+        ptr_(ptr)
+    {
+    }
+    
     /// Test for equality with another iterator
     bool operator == (const ListIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another iterator
     bool operator != (const ListIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
+protected:
     /// Go to the next node
-    void operator ++ ()
+    void GotoNext()
     {
         if (ptr_->next_)
             ptr_ = ptr_->next_;
     }
     
     /// Go to the previous node
-    void operator -- ()
+    void GotoPrev()
     {
         if (ptr_->prev_)
             ptr_ = ptr_->prev_;
     }
     
-protected:
     /// Node pointer
     ListNodeBase* ptr_;
 };

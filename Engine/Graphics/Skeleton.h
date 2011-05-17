@@ -95,11 +95,11 @@ public:
     void Reset();
     
     /// Return all bones
-    const std::vector<Bone>& GetBones() const { return bones_; }
+    const Vector<Bone>& GetBones() const { return bones_; }
     /// Return modifiable bones
-    std::vector<Bone>& GetModifiableBones() { return bones_; }
+    Vector<Bone>& GetModifiableBones() { return bones_; }
     /// Return number of bones
-    unsigned GetNumBones() const { return bones_.size(); }
+    unsigned GetNumBones() const { return bones_.Size(); }
     /// Return root bone
     Bone* GetRootBone();
     /// Return bone by index
@@ -111,7 +111,7 @@ public:
     
 private:
     /// Bones
-    std::vector<Bone> bones_;
+    Vector<Bone> bones_;
     /// Root bone index
     unsigned rootBoneIndex_;
 };

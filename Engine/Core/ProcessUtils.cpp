@@ -43,7 +43,7 @@
 
 static bool consoleOpened = false;
 static String currentLine;
-static std::vector<String> arguments;
+static Vector<String> arguments;
 static Mutex staticMutex;
 
 void ErrorDialog(const char* title, const char* message)
@@ -53,7 +53,7 @@ void ErrorDialog(const char* title, const char* message)
 
 void ErrorExit(const String& message, int exitCode)
 {
-    PrintLine(message);
+    printf("%s", message.CString());
     exit(exitCode);
 }
 
@@ -81,7 +81,7 @@ void OpenConsoleWindow()
 
 void PrintLine(const String& str)
 {
-    PrintLine(str.CString());
+    printf("%s\n", str.CString());
 }
 
 void PrintLine(const char* str)
@@ -94,9 +94,9 @@ Mutex& GetStaticMutex()
     return staticMutex;
 }
 
-const std::vector<String>& ParseArguments(const char* cmdLine)
+const Vector<String>& ParseArguments(const char* cmdLine)
 {
-    arguments.clear();
+    arguments.Clear();
     
     if (!cmdLine)
         return arguments;
@@ -116,7 +116,7 @@ const std::vector<String>& ParseArguments(const char* cmdLine)
             {
                 inCmd = false;
                 cmdEnd = i;
-                arguments.push_back(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
+                arguments.Push(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
             }
         }
         else
@@ -131,13 +131,13 @@ const std::vector<String>& ParseArguments(const char* cmdLine)
     if (inCmd)
     {
         cmdEnd = cmdStr.Length();
-        arguments.push_back(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
+        arguments.Push(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
     }
     
     return arguments;
 }
 
-const std::vector<String>& GetArguments()
+const Vector<String>& GetArguments()
 {
     return arguments;
 }

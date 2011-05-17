@@ -57,7 +57,7 @@ struct ModelAnimation
 {
     String name_;
     float length_;
-    std::vector<AnimationTrack> tracks_;
+    Vector<AnimationTrack> tracks_;
 };
 
 struct BoneWeightAssignment
@@ -105,7 +105,7 @@ struct ModelVertexBuffer
     unsigned elementMask_;
     unsigned morphStart_;
     unsigned morphCount_;
-    std::vector<ModelVertex> vertices_;
+    Vector<ModelVertex> vertices_;
     
     ModelVertexBuffer() :
         elementMask_(0),
@@ -116,12 +116,12 @@ struct ModelVertexBuffer
     
     void WriteData(Serializer& dest)
     {
-        dest.WriteUInt(vertices_.size());
+        dest.WriteUInt(vertices_.Size());
         dest.WriteUInt(elementMask_);
         dest.WriteUInt(morphStart_);
         dest.WriteUInt(morphCount_);
         
-        for (unsigned i = 0; i < vertices_.size(); ++i)
+        for (unsigned i = 0; i < vertices_.Size(); ++i)
         {
             if (elementMask_ & MASK_POSITION)
                 dest.WriteVector3(vertices_[i].position_);
@@ -151,34 +151,34 @@ struct ModelMorphBuffer
 {
     unsigned vertexBuffer_;
     unsigned elementMask_;
-    std::map<unsigned, ModelVertex> vertices_;
+    Map<unsigned, ModelVertex> vertices_;
 };
 
 struct ModelMorph
 {
     String name_;
-    std::vector<ModelMorphBuffer> buffers_;
+    Vector<ModelMorphBuffer> buffers_;
     
     void WriteData(Serializer& dest)
     {
         dest.WriteString(name_);
-        dest.WriteUInt(buffers_.size());
-        for (unsigned i = 0; i < buffers_.size(); ++i)
+        dest.WriteUInt(buffers_.Size());
+        for (unsigned i = 0; i < buffers_.Size(); ++i)
         {
             dest.WriteUInt(buffers_[i].vertexBuffer_);
             dest.WriteUInt(buffers_[i].elementMask_);
-            dest.WriteUInt(buffers_[i].vertices_.size());
+            dest.WriteUInt(buffers_[i].vertices_.Size());
             unsigned elementMask = buffers_[i].elementMask_;
             
-            for (std::map<unsigned, ModelVertex>::iterator j = buffers_[i].vertices_.begin(); j != buffers_[i].vertices_.end(); ++j)
+            for (Map<unsigned, ModelVertex>::Iterator j = buffers_[i].vertices_.Begin(); j != buffers_[i].vertices_.End(); ++j)
             {
-                dest.WriteUInt(j->first);
+                dest.WriteUInt(j->first_);
                 if (elementMask & MASK_POSITION)
-                    dest.WriteVector3(j->second.position_);
+                    dest.WriteVector3(j->second_.position_);
                 if (elementMask & MASK_NORMAL)
-                    dest.WriteVector3(j->second.normal_);
+                    dest.WriteVector3(j->second_.normal_);
                 if (elementMask & MASK_TANGENT)
-                    dest.WriteVector4(j->second.tangent_);
+                    dest.WriteVector4(j->second_.tangent_);
             }
         }
     }
@@ -187,7 +187,7 @@ struct ModelMorph
 struct ModelIndexBuffer
 {
     unsigned indexSize_;
-    std::vector<unsigned> indices_;
+    Vector<unsigned> indices_;
     
     ModelIndexBuffer() :
         indexSize_(sizeof(unsigned short))
@@ -196,10 +196,10 @@ struct ModelIndexBuffer
     
     void WriteData(Serializer& dest)
     {
-        dest.WriteUInt(indices_.size());
+        dest.WriteUInt(indices_.Size());
         dest.WriteUInt(indexSize_);
         
-        for (unsigned i = 0; i < indices_.size(); ++i)
+        for (unsigned i = 0; i < indices_.Size(); ++i)
         {
             if (indexSize_ == sizeof(unsigned short))
                 dest.WriteUShort(indices_[i]);
@@ -217,8 +217,8 @@ struct ModelSubGeometryLodLevel
     unsigned indexBuffer_;
     unsigned indexStart_;
     unsigned indexCount_;
-    std::map<unsigned, std::vector<BoneWeightAssignment> > boneWeights_;
-    std::vector<unsigned> boneMapping_;
+    Map<unsigned, Vector<BoneWeightAssignment> > boneWeights_;
+    Vector<unsigned> boneMapping_;
     
     ModelSubGeometryLodLevel() : 
         distance_(0.0f),

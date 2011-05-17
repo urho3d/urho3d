@@ -34,17 +34,16 @@
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "Sort.h"
 #include "VectorBuffer.h"
 #include "VertexBuffer.h"
 #include "XMLElement.h"
-
-#include <algorithm>
 
 #include "DebugNew.h"
 
 static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
-static bool CompareBillboards(Billboard* lhs, Billboard* rhs)
+inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
@@ -82,7 +81,7 @@ void BillboardSet::RegisterObject(Context* context)
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", scaled_, true);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", sorted_, false);
     ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", material_, ResourceRef(Material::GetTypeStatic()));
-    ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", billboards_, std::vector<unsigned char>());
+    ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", billboards_, Vector<unsigned char>());
 }
 
 void BillboardSet::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -112,7 +111,7 @@ void BillboardSet::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
             MemoryBuffer buf(value.GetBuffer());
             unsigned numBillboards = buf.ReadVLE();
             SetNumBillboards(numBillboards);
-            for (std::vector<Billboard>::iterator i = billboards_.begin(); i != billboards_.end(); ++i)
+            for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
             {
                 i->position_ = buf.ReadVector3();
                 i->size_ = buf.ReadVector2();
@@ -141,8 +140,8 @@ Variant BillboardSet::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(BillboardSet, billboards_):
         {
             VectorBuffer buf;
-            buf.WriteVLE(billboards_.size());
-            for (std::vector<Billboard>::const_iterator i = billboards_.begin(); i != billboards_.end(); ++i)
+            buf.WriteVLE(billboards_.Size());
+            for (Vector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
             {
                 buf.WriteVector3(i->position_);
                 buf.WriteVector2(i->size_);
@@ -228,9 +227,9 @@ void BillboardSet::SetMaterial(Material* material)
 
 void BillboardSet::SetNumBillboards(unsigned num)
 {
-    unsigned oldNum = billboards_.size();
+    unsigned oldNum = billboards_.Size();
     
-    billboards_.resize(num);
+    billboards_.Resize(num);
     
     // Set default values to new billboards
     for (unsigned i = oldNum; i < num; ++i)
@@ -277,7 +276,7 @@ void BillboardSet::Updated()
 
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
-    return index < billboards_.size() ? &billboards_[index] : (Billboard*)0;
+    return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
 }
 
 void BillboardSet::OnMarkedDirty(Node* node)
@@ -298,7 +297,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     const Matrix4x3& worldTransform = GetWorldTransform();
     const Vector3& worldScale = worldTransform.GetScale();
     
-    for (unsigned i = 0; i < billboards_.size(); ++i)
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             continue;
@@ -333,7 +332,7 @@ void BillboardSet::UpdateBufferSize()
         geometry_->SetIndexBuffer(indexBuffer_);
     }
     
-    unsigned numBillboards = billboards_.size();
+    unsigned numBillboards = billboards_.Size();
     
     vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
     indexBuffer_->SetSize(numBillboards * 6, false);
@@ -376,7 +375,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     
     PROFILE(UpdateBillboardSet);
     
-    unsigned numBillboards = billboards_.size();
+    unsigned numBillboards = billboards_.Size();
     unsigned enabledBillboards = 0;
     const Matrix4x3& worldTransform = GetWorldTransform();
     
@@ -387,7 +386,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             ++enabledBillboards;
     }
     
-    sortedBillboards_.resize(enabledBillboards);
+    sortedBillboards_.Resize(enabledBillboards);
     unsigned index = 0;
     
     // Then set initial sort order and distances
@@ -415,7 +414,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         return;
     
     if (sorted_)
-        std::sort(sortedBillboards_.begin(), sortedBillboards_.end(), CompareBillboards);
+        Sort(sortedBillboards_.Begin(), sortedBillboards_.End(), CompareBillboards);
     
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, LOCK_DISCARD);
     if (!dest)

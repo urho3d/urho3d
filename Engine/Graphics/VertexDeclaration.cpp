@@ -83,7 +83,7 @@ const BYTE d3dElementUsageIndex[] =
 VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
     declaration_(0)
 {
-    std::vector<VertexDeclarationElement> elements;
+    Vector<VertexDeclarationElement> elements;
     unsigned offset = 0;
     
     for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
@@ -98,20 +98,20 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
             newElement.offset_ = offset;
             offset += VertexBuffer::elementSize[i];
             
-            elements.push_back(newElement);
+            elements.Push(newElement);
         }
     }
     
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const std::vector<VertexBuffer*>& buffers, const std::vector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks) :
     declaration_(0)
 {
     unsigned usedElementMask = 0;
-    std::vector<VertexDeclarationElement> elements;
+    Vector<VertexDeclarationElement> elements;
     
-    for (unsigned i = 0; i < buffers.size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (buffers[i])
         {
@@ -137,7 +137,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const std::vector<Verte
                     newElement.offset_ = buffers[i]->GetElementOffset(element);
                     usedElementMask |= 1 << j;
                     
-                    elements.push_back(newElement);
+                    elements.Push(newElement);
                 }
             }
         }
@@ -146,13 +146,13 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const std::vector<Verte
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const std::vector<SharedPtr<VertexBuffer> >& buffers, const std::vector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>& elementMasks) :
     declaration_(0)
 {
     unsigned usedElementMask = 0;
-    std::vector<VertexDeclarationElement> elements;
+    Vector<VertexDeclarationElement> elements;
     
-    for (unsigned i = 0; i < buffers.size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (buffers[i])
         {
@@ -178,7 +178,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const std::vector<Share
                     newElement.offset_ = buffers[i]->GetElementOffset(element);
                     usedElementMask |= 1 << j;
                     
-                    elements.push_back(newElement);
+                    elements.Push(newElement);
                 }
             }
         }
@@ -192,12 +192,12 @@ VertexDeclaration::~VertexDeclaration()
     Release();
 }
 
-void VertexDeclaration::Create(Graphics* graphics, const std::vector<VertexDeclarationElement>& elements)
+void VertexDeclaration::Create(Graphics* graphics, const Vector<VertexDeclarationElement>& elements)
 {
-    SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.size() + 1]);
+    SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.Size() + 1]);
     
     D3DVERTEXELEMENT9* dest = elementArray;
-    for (std::vector<VertexDeclarationElement>::const_iterator i = elements.begin(); i != elements.end(); ++i)
+    for (Vector<VertexDeclarationElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
     {
         dest->Stream = i->stream_;
         dest->Offset = i->offset_;

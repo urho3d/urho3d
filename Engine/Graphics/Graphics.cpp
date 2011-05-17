@@ -188,11 +188,11 @@ Graphics::Graphics(Context* context) :
 Graphics::~Graphics()
 {
     // Release all GPU objects that still exist
-    for (std::vector<GPUObject*>::iterator i = gpuObjects_.begin(); i != gpuObjects_.end(); ++i)
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->Release();
-    gpuObjects_.clear();
+    gpuObjects_.Clear();
     
-    vertexDeclarations_.clear();
+    vertexDeclarations_.Clear();
     
     if (impl_->frameQuery_)
     {
@@ -307,9 +307,9 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Check fullscreen mode validity. If not valid, revert to windowed
     if (fullscreen)
     {
-        std::vector<IntVector2> resolutions = GetResolutions();
+        Vector<IntVector2> resolutions = GetResolutions();
         fullscreen = false;
-        for (unsigned i = 0; i < resolutions.size(); ++i)
+        for (unsigned i = 0; i < resolutions.Size(); ++i)
         {
             if ((width == resolutions[i].x_) && (height == resolutions[i].y_))
             {
@@ -455,7 +455,7 @@ void Graphics::Close()
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
-        immediatevertexBuffer_.clear();
+        immediatevertexBuffer_.Clear();
         
         DestroyWindow(impl_->window_);
         impl_->window_ = 0;
@@ -602,8 +602,8 @@ bool Graphics::BeginFrame()
     ResetStreamFrequencies();
     
     // Reset immediate mode vertex buffer positions
-    for (std::map<unsigned, unsigned>::iterator i = immediateVertexBufferPos_.begin(); i != immediateVertexBufferPos_.end(); ++i)
-        i->second = 0;
+    for (Map<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
+        i->second_ = 0;
     
     numPrimitives_ = 0;
     numBatches_ = 0;
@@ -740,22 +740,22 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
-    std::vector<VertexBuffer*> vertexBuffers(1);
-    std::vector<unsigned> elementMasks(1);
+    Vector<VertexBuffer*> vertexBuffers(1);
+    Vector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
     elementMasks[0] = MASK_DEFAULT;
     SetVertexBuffers(vertexBuffers, elementMasks);
 }
 
-bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const std::vector<unsigned>& elementMasks,
+bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks,
     unsigned instanceOffset)
 {
-    if (buffers.size() > MAX_VERTEX_STREAMS)
+    if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.size() != elementMasks.size())
+    if (buffers.Size() != elementMasks.Size())
     {
         LOGERROR("Amount of element masks and vertex buffers does not match");
         return false;
@@ -763,7 +763,7 @@ bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const
     
     // Build vertex declaration hash code out of the buffers & masks
     unsigned long long hash = 0;
-    for (unsigned i = 0; i < buffers.size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
@@ -774,7 +774,7 @@ bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const
     if (hash)
     {
         // If no previous vertex declaration for that hash, create new
-        if (vertexDeclarations_.find(hash) == vertexDeclarations_.end())
+        if (vertexDeclarations_.Find(hash) == vertexDeclarations_.End())
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
@@ -799,7 +799,7 @@ bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const
         VertexBuffer* buffer = 0;
         unsigned offset = 0;
         
-        if (i < buffers.size())
+        if (i < buffers.Size())
         {
             buffer = buffers[i];
             if ((buffer) && (buffer->GetElementMask() & MASK_INSTANCEMATRIX1))
@@ -821,15 +821,15 @@ bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const std::vector<SharedPtr<VertexBuffer> >& buffers, const std::vector<unsigned>&
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
-   if (buffers.size() > MAX_VERTEX_STREAMS)
+   if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.size() != elementMasks.size())
+    if (buffers.Size() != elementMasks.Size())
     {
         LOGERROR("Amount of element masks and vertex buffers does not match");
         return false;
@@ -837,7 +837,7 @@ bool Graphics::SetVertexBuffers(const std::vector<SharedPtr<VertexBuffer> >& buf
     
     // Build vertex declaration hash code out of the buffers & masks
     unsigned long long hash = 0;
-    for (unsigned i = 0; i < buffers.size(); ++i)
+    for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
@@ -848,7 +848,7 @@ bool Graphics::SetVertexBuffers(const std::vector<SharedPtr<VertexBuffer> >& buf
     if (hash)
     {
         // If no previous vertex declaration for that hash, create new
-        if (vertexDeclarations_.find(hash) == vertexDeclarations_.end())
+        if (vertexDeclarations_.Find(hash) == vertexDeclarations_.End())
         {
             SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
             if (!newDeclaration->GetDeclaration())
@@ -873,7 +873,7 @@ bool Graphics::SetVertexBuffers(const std::vector<SharedPtr<VertexBuffer> >& buf
         VertexBuffer* buffer = 0;
         unsigned offset = 0;
         
-        if (i < buffers.size())
+        if (i < buffers.Size())
         {
             buffer = buffers[i];
             if ((buffer) && (buffer->GetElementMask() & MASK_INSTANCEMATRIX1))
@@ -1748,7 +1748,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
         newSize <<= 1;
         
     // See if buffer exists for this vertex format. If not, create new
-    if (immediatevertexBuffer_.find(elementMask) == immediatevertexBuffer_.end())
+    if (immediatevertexBuffer_.Find(elementMask) == immediatevertexBuffer_.End())
     {
         LOGDEBUG("Created immediate vertex buffer");
         VertexBuffer* newBuffer = new VertexBuffer(context_);
@@ -1896,9 +1896,9 @@ unsigned Graphics::GetWindowHandle() const
     return (unsigned)impl_->window_;
 }
 
-std::vector<IntVector2> Graphics::GetResolutions() const
+Vector<IntVector2> Graphics::GetResolutions() const
 {
-    std::vector<IntVector2> ret;
+    Vector<IntVector2> ret;
     if (!impl_->interface_)
         return ret;
     
@@ -1916,7 +1916,7 @@ std::vector<IntVector2> Graphics::GetResolutions() const
         
         // Check for duplicate before storing
         bool unique = true;
-        for (unsigned j = 0; j < ret.size(); ++j)
+        for (unsigned j = 0; j < ret.Size(); ++j)
         {
             if (ret[j] == newMode)
             {
@@ -1925,17 +1925,17 @@ std::vector<IntVector2> Graphics::GetResolutions() const
             }
         }
         if (unique)
-            ret.push_back(newMode);
+            ret.Push(newMode);
     }
     
     return ret;
 }
 
-std::vector<int> Graphics::GetMultiSampleLevels() const
+Vector<int> Graphics::GetMultiSampleLevels() const
 {
-    std::vector<int> ret;
+    Vector<int> ret;
     // No multisampling always supported
-    ret.push_back(0);
+    ret.Push(0);
     
     if (!impl_->interface_)
         return ret;
@@ -1944,7 +1944,7 @@ std::vector<int> Graphics::GetMultiSampleLevels() const
     {
         if (SUCCEEDED(impl_->interface_->CheckDeviceMultiSampleType(impl_->adapter_, impl_->deviceType_, D3DFMT_R8G8B8, FALSE,
             (D3DMULTISAMPLE_TYPE)i, NULL)))
-            ret.push_back(i);
+            ret.Push(i);
     }
     
     return ret;
@@ -1957,57 +1957,57 @@ VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 
 VSParameter Graphics::GetVSParameter(const String& name)
 {
-    std::map<String, VSParameter>::iterator i = vsParameters_.find(name);
-    if (i != vsParameters_.end())
-        return i->second;
+    Map<String, VSParameter>::Iterator i = vsParameters_.Find(name);
+    if (i != vsParameters_.End())
+        return i->second_;
     else
         return MAX_VS_PARAMETERS;
 }
 
 PSParameter Graphics::GetPSParameter(const String& name)
 {
-    std::map<String, PSParameter>::iterator i = psParameters_.find(name);
-    if (i != psParameters_.end())
-        return i->second;
+    Map<String, PSParameter>::Iterator i = psParameters_.Find(name);
+    if (i != psParameters_.End())
+        return i->second_;
     else
         return MAX_PS_PARAMETERS;
 }
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
 {
-    std::map<String, TextureUnit>::iterator i = textureUnits_.find(name);
-    if (i != textureUnits_.end())
-        return i->second;
+    Map<String, TextureUnit>::Iterator i = textureUnits_.Find(name);
+    if (i != textureUnits_.End())
+        return i->second_;
     else
         return MAX_TEXTURE_UNITS;
 }
 
 const String& Graphics::GetVSParameterName(VSParameter parameter)
 {
-    for (std::map<String, VSParameter>::iterator i = vsParameters_.begin(); i != vsParameters_.end(); ++i)
+    for (Map<String, VSParameter>::Iterator i = vsParameters_.Begin(); i != vsParameters_.End(); ++i)
     {
-        if (i->second == parameter)
-            return i->first;
+        if (i->second_ == parameter)
+            return i->first_;
     }
     return noParameter;
 }
 
 const String& Graphics::GetPSParameterName(PSParameter parameter)
 {
-    for (std::map<String, PSParameter>::iterator i = psParameters_.begin(); i != psParameters_.end(); ++i)
+    for (Map<String, PSParameter>::Iterator i = psParameters_.Begin(); i != psParameters_.End(); ++i)
     {
-        if (i->second == parameter)
-            return i->first;
+        if (i->second_ == parameter)
+            return i->first_;
     }
     return noParameter;
 }
 
 const String& Graphics::GetTextureUnitName(TextureUnit unit)
 {
-    for (std::map<String, TextureUnit>::iterator i = textureUnits_.begin(); i != textureUnits_.end(); ++i)
+    for (Map<String, TextureUnit>::Iterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
     {
-        if (i->second == unit)
-            return i->first;
+        if (i->second_ == unit)
+            return i->first_;
     }
     return noParameter;
 }
@@ -2047,16 +2047,16 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
 
 void Graphics::AddGPUObject(GPUObject* object)
 {
-    gpuObjects_.push_back(object);
+    gpuObjects_.Push(object);
 }
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
-    for (std::vector<GPUObject*>::iterator i = gpuObjects_.begin(); i != gpuObjects_.end(); ++i)
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
         if ((*i) == object)
         {
-            gpuObjects_.erase(i);
+            gpuObjects_.Erase(i);
             return;
         }
     }
@@ -2319,7 +2319,7 @@ void Graphics::OnDeviceLost()
         impl_->defaultDepthStencilSurface_ = 0;
     }
     
-    for (unsigned i = 0; i < gpuObjects_.size(); ++i)
+    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceLost();
 }
 
@@ -2333,7 +2333,7 @@ void Graphics::OnDeviceReset()
     // Create deferred rendering buffers now
     CreateRenderTargets();
     
-    for (unsigned i = 0; i < gpuObjects_.size(); ++i)
+    for (unsigned i = 0; i < gpuObjects_.Size(); ++i)
         gpuObjects_[i]->OnDeviceReset();
     
     // Get default surfaces

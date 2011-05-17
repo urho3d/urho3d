@@ -35,7 +35,7 @@
 #include "Server.h"
 #include "StringUtils.h"
 
-#include <set>
+#include "Set.h"
 
 #include "DebugNew.h"
 
@@ -87,7 +87,7 @@ void Server::AddScene(Scene* scene)
     }
     
     scene->SetNetworkMode(NM_SERVER);
-    scenes_.push_back(SharedPtr<Scene>(scene));
+    scenes_.Push(SharedPtr<Scene>(scene));
 }
 
 void Server::RemoveScene(Scene* scene)
@@ -95,7 +95,7 @@ void Server::RemoveScene(Scene* scene)
     if (!scene)
         return;
     
-    for (unsigned i = 0; i < scenes_.size(); ++i)
+    for (unsigned i = 0; i < scenes_.Size(); ++i)
     {
         if (scenes_[i] == scene)
         {
@@ -105,7 +105,7 @@ void Server::RemoveScene(Scene* scene)
             packet.WriteString("The scene is shutting down");
             
             // If any clients are connected to this scene, they must leave forcibly
-            for (unsigned j = 0; j < connections_.size(); ++j)
+            for (unsigned j = 0; j < connections_.Size(); ++j)
             {
                 Connection* connection = connections_[j];
                 if (connection->GetScene() == scene)
@@ -117,7 +117,7 @@ void Server::RemoveScene(Scene* scene)
             
             // Remove the network mode
             scene->SetNetworkMode(NM_NONETWORK);
-            scenes_.erase(scenes_.begin() + i);
+            scenes_.Erase(scenes_.Begin() + i);
             return;
         }
     }
@@ -142,7 +142,7 @@ void Server::Update(float timeStep)
     PROFILE(UpdateServer);
     
     // Process incoming packets from connections (assume that Engine has updated Network, so we do not do that here)
-    for (unsigned i = 0; i < connections_.size(); ++i)
+    for (unsigned i = 0; i < connections_.Size(); ++i)
         HandlePackets(connections_[i]);
     
     // Update scenes / send update if enough time passed
@@ -151,7 +151,7 @@ void Server::Update(float timeStep)
     if (timeAcc_ >= netPeriod)
     {
         // Update simulation of scene(s)
-        for (unsigned i = 0; i < scenes_.size(); ++i)
+        for (unsigned i = 0; i < scenes_.Size(); ++i)
             scenes_[i]->Update(netPeriod);
         
         // If multiple updates have accumulated because of a slow frame, send just one
@@ -164,25 +164,25 @@ void Server::Update(float timeStep)
             ++frameNumber_;
         
         // Send update for each connection
-        for (unsigned i = 0; i < connections_.size(); ++i)
+        for (unsigned i = 0; i < connections_.Size(); ++i)
             SendServerUpdate(connections_[i]);
     }
     
     // Remove disconnected clients
-    for (std::vector<SharedPtr<Connection> >::iterator i = connections_.begin(); i != connections_.end();)
+    for (Vector<SharedPtr<Connection> >::Iterator i = connections_.Begin(); i != connections_.End();)
     {
         if (!(*i)->IsConnected())
-            i = connections_.erase(i);
+            i = connections_.Erase(i);
         else
             ++i;
     }
     
     // Close file transfers that have been unused for some time
-    for (std::map<StringHash, ServerFileTransfer>::iterator i = fileTransfers_.begin(); i != fileTransfers_.end();)
+    for (Map<StringHash, ServerFileTransfer>::Iterator i = fileTransfers_.Begin(); i != fileTransfers_.End();)
     {
-        std::map<StringHash, ServerFileTransfer>::iterator current = i++;
-        if (current->second.closeTimer_.GetMSec(false) > FILE_TIMEOUT)
-            fileTransfers_.erase(current);
+        Map<StringHash, ServerFileTransfer>::Iterator current = i++;
+        if (current->second_.closeTimer_.GetMSec(false) > FILE_TIMEOUT)
+            fileTransfers_.Erase(current);
     }
 }
 
@@ -205,7 +205,7 @@ bool Server::IsRunning() const
 
 bool Server::HasScene(Scene* scene) const
 {
-    for (unsigned i = 0; i < scenes_.size(); ++i)
+    for (unsigned i = 0; i < scenes_.Size(); ++i)
     {
         if (scenes_[i] == scene)
             return true;
@@ -218,7 +218,7 @@ unsigned Server::GetNumUsersInScene(Scene* scene) const
 {
     unsigned users = 0;
     
-    for (unsigned i = 0; i < connections_.size(); ++i)
+    for (unsigned i = 0; i < connections_.Size(); ++i)
     {
         if (connections_[i]->GetScene() == scene)
             ++users;
@@ -254,7 +254,7 @@ void Server::HandlePeerConnected(StringHash eventType, VariantMap& eventData)
     
     // Create a new connection, assign a challenge, then send the challenge message
     SharedPtr<Connection> connection(new Connection(context_, peer));
-    connections_.push_back(connection);
+    connections_.Push(connection);
     
     unsigned challenge = GenerateChallenge();
     connection->SetChallenge(challenge);
@@ -273,7 +273,7 @@ void Server::HandlePeerDisconnected(StringHash eventType, VariantMap& eventData)
     if (peerPtr->GetPeerType() != PEER_CLIENT)
         return;
     
-    for (unsigned i = 0; i < connections_.size(); ++i)
+    for (unsigned i = 0; i < connections_.Size(); ++i)
     {
         Connection* connection = connections_[i];
         if (connection->GetPeer() == peerPtr)
@@ -349,10 +349,10 @@ void Server::HandleRequestFile(Connection* connection, VectorBuffer& packet)
     
     // The only files we are willing to transmit are packages associated with scene(s)
     PackageFile* package = 0;
-    for (unsigned i = 0; i < scenes_.size(); ++i)
+    for (unsigned i = 0; i < scenes_.Size(); ++i)
     {
-        const std::vector<SharedPtr<PackageFile> >& packages =  scenes_[i]->GetRequiredPackageFiles();
-        for (unsigned j = 0; j < packages.size(); ++j)
+        const Vector<SharedPtr<PackageFile> >& packages =  scenes_[i]->GetRequiredPackageFiles();
+        for (unsigned j = 0; j < packages.Size(); ++j)
         {
             if (packages[j]->GetNameHash() == nameHash)
             {
@@ -557,10 +557,10 @@ void Server::SendSceneInfo(Connection* connection)
     packet.WriteInt(netFps_);
     
     // Write source file name & required packages
-    const std::vector<SharedPtr<PackageFile> >& requiredPackages = scene->GetRequiredPackageFiles();
+    const Vector<SharedPtr<PackageFile> >& requiredPackages = scene->GetRequiredPackageFiles();
     packet.WriteString(scene->GetFileName());
-    packet.WriteVLE(requiredPackages.size());
-    for (unsigned i = 0; i < requiredPackages.size(); ++i)
+    packet.WriteVLE(requiredPackages.Size());
+    for (unsigned i = 0; i < requiredPackages.Size(); ++i)
     {
         PackageFile* package = requiredPackages[i];
         packet.WriteString(package->GetName());
@@ -627,7 +627,7 @@ void Server::SendServerUpdate(Connection* connection)
     
     //LOGDEBUG("Delta: " + ToString(packet.GetSize()) + " Revisions: " +
     //    ToString(connection->GetSceneState().GetRevisionCount()) + " Events: " +
-    //    ToString(connection->GetUnackedRemoteEvents().size()));
+    //    ToString(connection->GetUnackedRemoteEvents().Size()));
 }
 
 unsigned Server::GenerateChallenge() const
@@ -673,32 +673,32 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
     /*
     
     // Find relevant nodes for this client
-    std::set<unsigned> relevantNodes;
+    Set<unsigned> relevantNodes;
     GetRelevantNodes(connection, relevantNodes);
     
     {
         // Go through the scene and see which nodes are new and which have been removed
-        const std::map<unsigned, SharedPtr<Node> >& nodes = scene->GetAllNodes();
-        std::set<unsigned> processedNodes;
-        for (std::map<unsigned, SharedPtr<Node> >::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+        const Map<unsigned, SharedPtr<Node> >& nodes = scene->GetAllNodes();
+        Set<unsigned> processedNodes;
+        for (Map<unsigned, SharedPtr<Node> >::ConstIterator i = nodes.Begin(); i != nodes.End(); ++i)
         {
             // If we reach the local node ID's, break
-            if (i->first >= FIRST_LOCAL_ID)
+            if (i->first_ >= FIRST_LOCAL_ID)
                 break;
             
-            processedNodes.insert(i->first);
+            processedNodes.Insert(i->first_);
             
-            bool relevant = relevantNodes.find(i->first) != relevantNodes.end();
+            bool relevant = relevantNodes.Find(i->first_) != relevantNodes.End();
             
-            Node* node = i->second;
-            NodeReplicationState* nodeState = sceneState.findNode(i->first);
+            Node* node = i->second_;
+            NodeReplicationState* nodeState = sceneState.findNode(i->first_);
             if (!nodeState)
             {
                 // If client does not have this node and it is not relevant, skip
                 if (!relevant)
                     continue;
                 
-                nodeState = &sceneState.nodes_[i->first];
+                nodeState = &sceneState.nodes_[i->first_];
                 nodeState->Created(frameNumber_);
                 nodeState->stayRelevantTime_ = stayRelevantTime_;
             }
@@ -721,9 +721,9 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
             }
             
             // Check components of this node
-            const std::vector<SharedPtr<Component> >& components = node->GetComponents();
-            std::set<ShortStringHash> processedComponents;
-            for (std::vector<SharedPtr<Component> >::const_iterator j = components.begin(); j != components.end(); ++j)
+            const Vector<SharedPtr<Component> >& components = node->GetComponents();
+            Set<ShortStringHash> processedComponents;
+            for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
             {
                 Component* component = *j;
                 if (!component->checkSync(connection))
@@ -740,40 +740,40 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                 else if (!componentState->exists_)
                     componentState->Created(frameNumber_);
                 
-                processedComponents.insert(combinedHash);
+                processedComponents.Insert(combinedHash);
             }
             
             // Check components that have been removed
-            for (std::map<ShortStringHash, ComponentReplicationState>::iterator j = nodeState->components_.begin();
-                j != nodeState->components_.end(); ++j)
+            for (Map<ShortStringHash, ComponentReplicationState>::Iterator j = nodeState->components_.Begin();
+                j != nodeState->components_.End(); ++j)
             {
-                if (j->second.exists_)
+                if (j->second_.exists_)
                 {
-                    if (processedComponents.find(j->first) == processedComponents.end())
-                        j->second.Removed(frameNumber_);
+                    if (processedComponents.Find(j->first_) == processedComponents.End())
+                        j->second_.Removed(frameNumber_);
                 }
             }
         }
         
         // Check nodes that have been removed
-        for (std::map<unsigned, NodeReplicationState>::iterator i = sceneState.nodes_.begin();
-            i != sceneState.nodes_.end(); ++i)
+        for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState.nodes_.Begin();
+            i != sceneState.nodes_.End(); ++i)
         {
-            if (i->second.exists_)
+            if (i->second_.exists_)
             {
-                if (processedNodes.find(i->first) == processedNodes.end())
-                    i->second.Removed(frameNumber_);
+                if (processedNodes.Find(i->first_) == processedNodes.End())
+                    i->second_.Removed(frameNumber_);
             }
         }
     }
     
     {
         // Now go through the replication state again and build commands
-        for (std::map<unsigned, NodeReplicationState>::iterator i = sceneState.nodes_.begin();
-            i != sceneState.nodes_.end(); ++i)
+        for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState.nodes_.Begin();
+            i != sceneState.nodes_.End(); ++i)
         {
-            Node* node = scene->GetNode(i->first);
-            NodeReplicationState& nodeState = i->second;
+            Node* node = scene->GetNode(i->first_);
+            NodeReplicationState& nodeState = i->second_;
             // Create
             if ((nodeState.createdFrame_) && (node))
             {
@@ -789,11 +789,11 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                     nodeState.revisions_.Commit(frameNumber_, newRevision);
                 
                 // Write a full update of all components that should be synced
-                const std::vector<SharedPtr<Component> >& components = node->GetComponents();
+                const Vector<SharedPtr<Component> >& components = node->GetComponents();
                 unsigned newComponents = 0;
                 newBuffer.Seek(0);
                 
-                for (std::vector<SharedPtr<Component> >::const_iterator j = components.begin(); j != components.end(); ++j)
+                for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
                 {
                     Component* component = *j;
                     if (!component->checkSync(connection))
@@ -818,7 +818,7 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
             else if (nodeState.removedFrame_)
             {
                 dest.WriteUByte(MSG_REMOVEENTITY);
-                dest.WriteUShort(i->first);
+                dest.WriteUShort(i->first_);
             }
             // Update
             else if (node)
@@ -830,10 +830,10 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                     // If node has unacked property or component revisions, must forget all of them
                     if (nodeState.HasUnAcked(connection->GetFrameAck()))
                     {
-                        nodeState.revisions_.clear();
-                        for (std::map<ShortStringHash, ComponentReplicationState>::iterator j = nodeState.components_.begin();
-                            j != nodeState.components_.end(); ++j)
-                            j->second.revisions_.clear();
+                        nodeState.revisions_.Clear();
+                        for (Map<ShortStringHash, ComponentReplicationState>::Iterator j = nodeState.components_.Begin();
+                            j != nodeState.components_.End(); ++j)
+                            j->second_.revisions_.Clear();
                     }
                     continue;
                 }
@@ -861,11 +861,11 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                 }
                 
                 // Component create/remove/update
-                for (std::map<ShortStringHash, ComponentReplicationState>::iterator j = nodeState.components_.begin();
-                    j != nodeState.components_.end(); ++j)
+                for (Map<ShortStringHash, ComponentReplicationState>::Iterator j = nodeState.components_.Begin();
+                    j != nodeState.components_.End(); ++j)
                 {
-                    Component* component = node->GetComponent(j->first.mData);
-                    ComponentReplicationState& componentState = j->second;
+                    Component* component = node->GetComponent(j->first_.mData);
+                    ComponentReplicationState& componentState = j->second_;
                     // Create
                     if ((componentState.createdFrame_) && (component))
                     {
@@ -883,7 +883,7 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                     {
                         msgID |= UPD_REMOVECOMPONENTS;
                         ++removedComponents;
-                        removeBuffer.WriteShortStringHash(j->first);
+                        removeBuffer.WriteShortStringHash(j->first_);
                     }
                     // Update
                     else if (component)
@@ -935,34 +935,34 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
     */
     
     // Append unacked remote events
-    const std::vector<RemoteEvent>& unackedEvents = connection->GetUnackedRemoteEvents();
-    for (std::vector<RemoteEvent>::const_iterator i = unackedEvents.begin(); i != unackedEvents.end(); ++i)
+    const Vector<RemoteEvent>& unackedEvents = connection->GetUnackedRemoteEvents();
+    for (Vector<RemoteEvent>::ConstIterator i = unackedEvents.Begin(); i != unackedEvents.End(); ++i)
     {
         dest.WriteUByte(i->nodeID_ ? MSG_REMOTENODEEVENT : MSG_REMOTEEVENT);
         i->Write(dest);
     }
 }
 
-void Server::GetRelevantNodes(Connection* connection, std::set<unsigned>& dest) const
+void Server::GetRelevantNodes(Connection* connection, Set<unsigned>& dest) const
 {
     // Generate just the raw set of relevant nodes based on their owner, distance and references. A node might need
     // to stay relevant because it has unacked changes, or has time left in its relevancy timer, but that is checked in
     // WriteNetUpdate()
     PROFILE(GetRelevantNodes);
     
-    dest.clear();
+    dest.Clear();
     
     Scene* scene = connection->GetScene();
-    const std::map<unsigned, Node*>& nodes = scene->GetAllNodes();
+    const Map<unsigned, Node*>& nodes = scene->GetAllNodes();
     const Vector3& clientPos = connection->GetPosition();
     
-    for (std::map<unsigned, Node*>::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+    for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         // Stop when local node ID range reached
-        if (i->first >= FIRST_LOCAL_ID)
+        if (i->first_ >= FIRST_LOCAL_ID)
             break;
         
-        Node* node = i->second;
+        Node* node = i->second_;
         
         // If node is not owned by client and max. update distance has been defined, check it
         if (node->GetOwner() != connection)
@@ -977,7 +977,7 @@ void Server::GetRelevantNodes(Connection* connection, std::set<unsigned>& dest) 
         }
         
         // Node is relevant. Now also find its dependencies
-        dest.insert(i->first);
+        dest.Insert(i->first_);
         /// \todo Implement getting the dependencies from a node
         //GetNodeDependencies(connection, node, dest);
     }

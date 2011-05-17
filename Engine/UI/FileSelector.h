@@ -70,7 +70,7 @@ public:
     /// Set current filename
     void SetFileName(const String& fileName);
     /// Set filters
-    void SetFilters(const std::vector<String>& filters, unsigned defaultIndex);
+    void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
     /// Set directory selection mode. Default false
     void SetDirectoryMode(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements
@@ -164,9 +164,9 @@ private:
     /// Current path
     String path_;
     /// Filters
-    std::vector<String> filters_;
+    Vector<String> filters_;
     /// File entries
-    std::vector<FileSelectorEntry> fileEntries_;
+    Vector<FileSelectorEntry> fileEntries_;
     /// Filter used to get the file list
     String lastUsedFilter_;
     /// Directory mode flag

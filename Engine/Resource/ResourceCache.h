@@ -43,7 +43,7 @@ struct ResourceGroup
     /// Current memory use
     unsigned memoryUse_;
     /// Resources
-    std::map<StringHash, SharedPtr<Resource> > resources_;
+    Map<StringHash, SharedPtr<Resource> > resources_;
 };
 
 /// Resource cache subsystem. Loads resources on demand and stores them for later access
@@ -91,19 +91,19 @@ public:
     /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails
     Resource* GetResource(ShortStringHash type, StringHash nameHash);
     /// Return all loaded resources of a specific type
-    void GetResources(std::vector<Resource*>& result, ShortStringHash type) const;
+    void GetResources(Vector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources
-    const std::map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
+    const Map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load paths
-    const std::vector<String>& GetResourcePaths() const { return resourcePaths_; }
+    const Vector<String>& GetResourcePaths() const { return resourcePaths_; }
     /// Return added package files
-    const std::vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
+    const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name
     template <class T> T* GetResource(const String& name);
     /// Template version of returning a resource by name hash
     template <class T> T* GetResource(StringHash nameHash);
     /// Template version of returning loaded resources of a specific type
-    template <class T> void GetResources(std::vector<T*>& result) const;
+    template <class T> void GetResources(Vector<T*>& result) const;
     /// Return whether a file exists by name
     bool Exists(const String& name) const;
     /// Return whether a file exists by name hash
@@ -130,13 +130,13 @@ private:
     void StoreNameHash(const String& name);
     
     /// Resources by type
-    std::map<ShortStringHash, ResourceGroup> resourceGroups_;
+    Map<ShortStringHash, ResourceGroup> resourceGroups_;
     /// Resource load paths
-    std::vector<String> resourcePaths_;
+    Vector<String> resourcePaths_;
     /// Package files
-    std::vector<SharedPtr<PackageFile> > packages_;
+    Vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames
-    std::map<StringHash, String> hashToName_;
+    Map<StringHash, String> hashToName_;
 };
 
 template <class T> T* ResourceCache::GetResource(const String& name)
@@ -151,14 +151,14 @@ template <class T> T* ResourceCache::GetResource(StringHash nameHash)
     return static_cast<T*>(GetResource(type, nameHash));
 }
 
-template <class T> void ResourceCache::GetResources(std::vector<T*>& result) const
+template <class T> void ResourceCache::GetResources(Vector<T*>& result) const
 {
-    std::vector<Resource*>& resources = reinterpret_cast<std::vector<Resource*>&>(result);
+    Vector<Resource*>& resources = reinterpret_cast<Vector<Resource*>&>(result);
     ShortStringHash type = T::GetTypeStatic();
     GetResources(resources, type);
     
     // Perform conversion of the returned pointers
-    for (unsigned i = 0; i < result.size(); ++i)
+    for (unsigned i = 0; i < result.Size(); ++i)
     {
         Resource* resource = resources[i];
         result[i] = static_cast<T*>(resource);

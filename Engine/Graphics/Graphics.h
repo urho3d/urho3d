@@ -94,9 +94,9 @@ public:
     /// Set vertex buffer
     void SetVertexBuffer(VertexBuffer* buffer);
     /// Set multiple vertex buffers
-    bool SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, const std::vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
     /// Set multiple vertex buffers
-    bool SetVertexBuffers(const std::vector<SharedPtr<VertexBuffer> >& buffers, const std::vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
     /// Set index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
@@ -269,9 +269,9 @@ public:
     /// Return whether stream offset is supported
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return supported fullscreen resolutions
-    std::vector<IntVector2> GetResolutions() const;
+    Vector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels
-    std::vector<int> GetMultiSampleLevels() const;
+    Vector<int> GetMultiSampleLevels() const;
     /// Return vertex buffer by index
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return index buffer
@@ -453,13 +453,13 @@ private:
     /// Immediate rendering data pointer
     unsigned char* immediateDataPtr_;
     /// GPU objects
-    std::vector<GPUObject*> gpuObjects_;
+    Vector<GPUObject*> gpuObjects_;
     /// Vertex declarations
-    std::map<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
+    Map<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Immediate rendering vertex buffers by vertex declaration
-    std::map<unsigned, SharedPtr<VertexBuffer> > immediatevertexBuffer_;
+    Map<unsigned, SharedPtr<VertexBuffer> > immediatevertexBuffer_;
     /// Immediate rendering vertex buffer start positions
-    std::map<unsigned, unsigned> immediateVertexBufferPos_;
+    Map<unsigned, unsigned> immediateVertexBufferPos_;
     /// Deferred rendering diffuse buffer
     SharedPtr<Texture2D> diffBuffer_;
     /// Deferred rendering normal buffer
@@ -489,9 +489,9 @@ private:
     /// Pixel shader in use
     PixelShader* pixelShader_;
     /// Vertex shader parameter mappings
-    std::map<String, VSParameter> vsParameters_;
+    Map<String, VSParameter> vsParameters_;
     /// Pixel shader parameter mappings
-    std::map<String, PSParameter> psParameters_;
+    Map<String, PSParameter> psParameters_;
     /// Vertex shader constant register mappings
     unsigned vsRegisters_[MAX_VS_PARAMETERS];
     /// Pixel shader constant register mappings
@@ -505,7 +505,7 @@ private:
     /// "View texture" to prevent sampling the destination render target
     Texture* viewTexture_;
     /// Texture unit mappings
-    std::map<String, TextureUnit> textureUnits_;
+    Map<String, TextureUnit> textureUnits_;
     /// Render targets in use
     RenderSurface* renderTarget_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use

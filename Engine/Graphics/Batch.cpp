@@ -31,16 +31,15 @@
 #include "Renderer.h"
 #include "PixelShader.h"
 #include "Profiler.h"
+#include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
 #include "VertexShader.h"
 
-#include <algorithm>
-
 #include "DebugNew.h"
 
-bool CompareBatchesFrontToBack(const Batch* lhs, const Batch* rhs)
+inline bool CompareBatchesFrontToBack(Batch* lhs, Batch* rhs)
 {
     if (lhs->sortKey_ == rhs->sortKey_)
         return lhs->distance_ < rhs->distance_;
@@ -48,7 +47,7 @@ bool CompareBatchesFrontToBack(const Batch* lhs, const Batch* rhs)
         return lhs->sortKey_ < rhs->sortKey_;
 }
 
-bool CompareBatchesBackToFront(const Batch* lhs, const Batch* rhs)
+inline bool CompareBatchesBackToFront(Batch* lhs, Batch* rhs)
 {
     if (lhs->distance_ == rhs->distance_)
         return lhs->sortKey_ < rhs->sortKey_;
@@ -56,7 +55,7 @@ bool CompareBatchesBackToFront(const Batch* lhs, const Batch* rhs)
         return lhs->distance_ > rhs->distance_;
 }
 
-bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceData& rhs)
+inline bool CompareInstancesFrontToBack(const InstanceData& lhs, const InstanceData& rhs)
 {
     return lhs.distance_ < rhs.distance_;
 }
@@ -91,7 +90,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite());
         
-        const std::vector<SharedPtr<Texture> >& textures = material_->GetTextures();
+        const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
         
         if (pixelShader_->HasTextureUnit(TU_DIFFUSE))
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
@@ -201,11 +200,11 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     // Set material's vertex shader parameters
     if (material_)
     {
-        const std::map<VSParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
-        for (std::map<VSParameter, Vector4>::const_iterator i = parameters.begin(); i != parameters.end(); ++i)
+        const Map<VSParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
+        for (Map<VSParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
-            if (vertexShader_->NeedParameterUpdate(i->first, material_))
-                graphics->SetVertexShaderParameter(i->first, i->second);
+            if (vertexShader_->NeedParameterUpdate(i->first_, material_))
+                graphics->SetVertexShaderParameter(i->first_, i->second_);
         }
     }
     
@@ -280,11 +279,11 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     // Set material's pixel shader parameters
     if (material_)
     {
-        const std::map<PSParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
-        for (std::map<PSParameter, Vector4>::const_iterator i = parameters.begin(); i != parameters.end(); ++i)
+        const Map<PSParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
+        for (Map<PSParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
-            if (pixelShader_->NeedParameterUpdate(i->first, material_))
-                graphics->SetPixelShaderParameter(i->first, i->second);
+            if (pixelShader_->NeedParameterUpdate(i->first_, material_))
+                graphics->SetPixelShaderParameter(i->first_, i->second_);
         }
     }
     
@@ -359,22 +358,22 @@ void Batch::Draw(Graphics* graphics) const
 void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
 {
     // Do not use up buffer space if not going to draw as instanced
-    if (instances_.size() < MIN_INSTANCES)
+    if (instances_.Size() < MIN_INSTANCES)
         return;
     
     startIndex_ = freeIndex;
     Matrix4x3* dest = (Matrix4x3*)lockedData;
     dest += freeIndex;
     
-    for (unsigned i = 0; i < instances_.size(); ++i)
+    for (unsigned i = 0; i < instances_.Size(); ++i)
         *dest++ = *instances_[i].worldTransform_;
     
-    freeIndex += instances_.size();
+    freeIndex += instances_.Size();
 }
 
 void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
 {
-    if (!instances_.size())
+    if (!instances_.Size())
         return;
     
     // Construct a temporary batch for rendering
@@ -389,14 +388,14 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
     batch.vertexShaderIndex_ = vertexShaderIndex_;
     
     // Draw as individual instances if below minimum size, or if instancing not supported
-    if ((instances_.size() < MIN_INSTANCES) || (!buffer))
+    if ((instances_.Size() < MIN_INSTANCES) || (!buffer))
     {
         batch.Prepare(graphics, false);
         
         graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
         graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
         
-        for (unsigned i = 0; i < instances_.size(); ++i)
+        for (unsigned i = 0; i < instances_.Size(); ++i)
         {
             if (vertexShader_->NeedParameterUpdate(VSP_MODEL, instances_[i].worldTransform_))
                 graphics->SetVertexShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
@@ -409,8 +408,8 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
     {
         // Switch to the instancing vertex shader
         // The indexing is different in the forward lit passes
-        std::vector<SharedPtr<VertexShader> >& vertexShaders = pass_->GetVertexShaders();
-        std::vector<SharedPtr<PixelShader> >& pixelShaders = pass_->GetPixelShaders();
+        Vector<SharedPtr<VertexShader> >& vertexShaders = pass_->GetVertexShaders();
+        Vector<SharedPtr<PixelShader> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
         if ((type != PASS_LITBASE) && (type != PASS_LIGHT))
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
@@ -420,18 +419,18 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
         batch.Prepare(graphics, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
-        std::vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();
-        std::vector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
-        vertexBuffers.push_back(SharedPtr<VertexBuffer>(buffer));
-        elementMasks.push_back(buffer->GetElementMask());
+        Vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();
+        Vector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
+        vertexBuffers.Push(SharedPtr<VertexBuffer>(buffer));
+        elementMasks.Push(buffer->GetElementMask());
         
         // No stream offset support, instancing buffer not pre-filled with transforms: have to lock and fill now
         if (startIndex_ == M_MAX_UNSIGNED)
         {
             unsigned startIndex = 0;
-            while (startIndex < instances_.size())
+            while (startIndex < instances_.Size())
             {
-                unsigned instances = instances_.size() - startIndex;
+                unsigned instances = instances_.Size() - startIndex;
                 if (instances > buffer->GetVertexCount())
                     instances = buffer->GetVertexCount();
                 
@@ -458,25 +457,25 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
             graphics->SetVertexBuffers(vertexBuffers, elementMasks, startIndex_);
             graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
-                geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.size());
+                geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
         }
     }
 }
 
 void BatchQueue::Clear()
 {
-    batches_.clear();
-    sortedPriorityBatches_.clear();
-    sortedBatches_.clear();
-    priorityBatchGroups_.clear();
-    batchGroups_.clear();
+    batches_.Clear();
+    sortedPriorityBatches_.Clear();
+    sortedBatches_.Clear();
+    priorityBatchGroups_.Clear();
+    batchGroups_.Clear();
 }
 
 void BatchQueue::AddBatch(const Batch& batch, bool noInstancing)
 {
     // If batch is something else than static, has custom view, or has per-instance shader data defined, can not instance
     if ((noInstancing) || (batch.geometryType_ != GEOM_STATIC) || (batch.overrideView_) || (batch.shaderData_))
-        batches_.push_back(batch);
+        batches_.Push(batch);
     else
     {
         BatchGroupKey key;
@@ -485,10 +484,10 @@ void BatchQueue::AddBatch(const Batch& batch, bool noInstancing)
         key.material_ = batch.material_;
         key.geometry_ = batch.geometry_;
         
-        std::map<BatchGroupKey, BatchGroup>* groups = batch.hasPriority_ ? &priorityBatchGroups_ : &batchGroups_;
+        Map<BatchGroupKey, BatchGroup>* groups = batch.hasPriority_ ? &priorityBatchGroups_ : &batchGroups_;
         
-        std::map<BatchGroupKey, BatchGroup>::iterator i = groups->find(key);
-        if (i == groups->end())
+        Map<BatchGroupKey, BatchGroup>::Iterator i = groups->Find(key);
+        if (i == groups->End())
         {
             // Create new group
             BatchGroup newGroup;
@@ -500,56 +499,56 @@ void BatchQueue::AddBatch(const Batch& batch, bool noInstancing)
             newGroup.camera_ = batch.camera_;
             newGroup.light_ = batch.light_;
             newGroup.vertexShaderIndex_ = batch.vertexShaderIndex_;
-            newGroup.instances_.push_back(InstanceData(batch.worldTransform_, batch.distance_));
-            groups->insert(std::make_pair(key, newGroup));
+            newGroup.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
+            groups->Insert(MakePair(key, newGroup));
         }
         else
-            i->second.instances_.push_back(InstanceData(batch.worldTransform_, batch.distance_));
+            i->second_.instances_.Push(InstanceData(batch.worldTransform_, batch.distance_));
     }
 }
 
 void BatchQueue::SortBackToFront()
 {
-    sortedPriorityBatches_.clear();
-    sortedBatches_.resize(batches_.size());
+    sortedPriorityBatches_.Clear();
+    sortedBatches_.Resize(batches_.Size());
     
-    for (unsigned i = 0; i < batches_.size(); ++i)
+    for (unsigned i = 0; i < batches_.Size(); ++i)
         sortedBatches_[i] = &batches_[i];
     
-    std::sort(sortedBatches_.begin(), sortedBatches_.end(), CompareBatchesBackToFront);
+    Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
 }
 
 void BatchQueue::SortFrontToBack()
 {
-    sortedPriorityBatches_.clear();
-    sortedBatches_.clear();
+    sortedPriorityBatches_.Clear();
+    sortedBatches_.Clear();
     
     // Must explicitly divide into priority batches and non-priority, so that priorities do not get mixed up between
     // instanced and non-instanced batches
-    for (unsigned i = 0; i < batches_.size(); ++i)
+    for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         if (batches_[i].hasPriority_)
-            sortedPriorityBatches_.push_back(&batches_[i]);
+            sortedPriorityBatches_.Push(&batches_[i]);
         else
-            sortedBatches_.push_back(&batches_[i]);
+            sortedBatches_.Push(&batches_[i]);
     }
     
-    std::sort(sortedPriorityBatches_.begin(), sortedPriorityBatches_.end(), CompareBatchesFrontToBack);
-    std::sort(sortedBatches_.begin(), sortedBatches_.end(), CompareBatchesFrontToBack);
+    Sort(sortedPriorityBatches_.Begin(), sortedPriorityBatches_.End(), CompareBatchesFrontToBack);
+    Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesFrontToBack);
     
     // Sort each group front to back
-    for (std::map<BatchGroupKey, BatchGroup>::iterator i = priorityBatchGroups_.begin(); i != priorityBatchGroups_.end(); ++i)
-        std::sort(i->second.instances_.begin(), i->second.instances_.end(), CompareInstancesFrontToBack);
-    for (std::map<BatchGroupKey, BatchGroup>::iterator i = batchGroups_.begin(); i != batchGroups_.end(); ++i)
-        std::sort(i->second.instances_.begin(), i->second.instances_.end(), CompareInstancesFrontToBack);
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+        Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+        Sort(i->second_.instances_.Begin(), i->second_.instances_.End(), CompareInstancesFrontToBack);
 }
 
 void BatchQueue::SetTransforms(void* lockedData, unsigned& freeIndex)
 {
-    for (std::map<BatchGroupKey, BatchGroup>::iterator i = priorityBatchGroups_.begin(); i != priorityBatchGroups_.end(); ++i)
-        i->second.SetTransforms(lockedData, freeIndex);
-    for (std::map<BatchGroupKey, BatchGroup>::iterator i = batchGroups_.begin(); i != batchGroups_.end(); ++i)
-        i->second.SetTransforms(lockedData, freeIndex);
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
+        i->second_.SetTransforms(lockedData, freeIndex);
+    for (Map<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
+        i->second_.SetTransforms(lockedData, freeIndex);
 }
 
 unsigned BatchQueue::GetNumInstances() const
@@ -558,15 +557,15 @@ unsigned BatchQueue::GetNumInstances() const
     
     // This is for the purpose of calculating how much space is needed in the instancing buffer. Do not add instance counts
     // that are below the minimum threshold for instancing
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = priorityBatchGroups_.begin(); i != priorityBatchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = priorityBatchGroups_.Begin(); i != priorityBatchGroups_.End(); ++i)
     {
-        unsigned instances = i->second.instances_.size();
+        unsigned instances = i->second_.instances_.Size();
         if (instances >= MIN_INSTANCES)
             total += instances;
     }
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = batchGroups_.begin(); i != batchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
     {
-        unsigned instances = i->second.instances_.size();
+        unsigned instances = i->second_.instances_.Size();
         if (instances >= MIN_INSTANCES)
             total += instances;
     }

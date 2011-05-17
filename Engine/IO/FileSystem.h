@@ -25,8 +25,8 @@
 
 #include "Object.h"
 
-#include <set>
-#include <vector>
+#include "Set.h"
+#include "Vector.h"
 
 /// Return files
 static const unsigned SCAN_FILES = 0x1;
@@ -53,7 +53,7 @@ public:
     /// Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined
     int SystemCommand(const String& commandLine);
     /// Run a specific program, block until it exists and return the exit code. Will fail if any allowed paths are defined
-    int SystemRun(const String& fileName, const std::vector<String>& arguments);
+    int SystemRun(const String& fileName, const Vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined
     bool SystemOpen(const String& fileName, const String& mode = String());
     /// Copy a file. Return true if successful
@@ -74,7 +74,7 @@ public:
     /// Check if a directory exists
     bool DirExists(const String& pathName);
     /// Scan a directory for specified files
-    void ScanDir(std::vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive);
+    void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive);
     /// Return the program's directory
     String GetProgramDir();
     /// Return the user documents directory
@@ -84,11 +84,11 @@ public:
     
 private:
     /// Scan directory, called internally
-    void ScanDirInternal(std::vector<String>& result, String path, const String& startPath,
+    void ScanDirInternal(Vector<String>& result, String path, const String& startPath,
         const String& filter, unsigned flags, bool recursive);
     
     /// Allowed directories
-    std::set<String> allowedPaths_;
+    Set<String> allowedPaths_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase

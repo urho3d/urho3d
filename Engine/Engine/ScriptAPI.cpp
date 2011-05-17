@@ -49,8 +49,8 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
         return 0;
     
     // Try first to reuse an existing, empty ScriptInstance
-    const std::vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
+    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
@@ -86,8 +86,8 @@ static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, con
 asIScriptObject* NodeGetScriptObject(Node* ptr)
 {
     // Get the first available ScriptInstance with an object
-    const std::vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
+    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
@@ -103,8 +103,8 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
 
 asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
 {
-    const std::vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
+    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
@@ -128,7 +128,7 @@ static bool ScriptInstanceExecute(const String& declaration, CScriptArray* srcPa
     
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
-    destParams.resize(numParams);
+    destParams.Resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
@@ -148,7 +148,7 @@ static void ScriptInstanceDelayedExecute(float delay, const String& declaration,
     
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
-    destParams.resize(numParams);
+    destParams.Resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));
@@ -215,7 +215,7 @@ static void SelfDelayedExecute(float delay, const String& declaration, CScriptAr
     
     unsigned numParams = srcParams->GetSize();
     VariantVector destParams;
-    destParams.resize(numParams);
+    destParams.Resize(numParams);
     
     for (unsigned i = 0; i < numParams; ++i)
         destParams[i] = *(static_cast<Variant*>(srcParams->At(i)));

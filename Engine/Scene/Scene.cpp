@@ -60,10 +60,10 @@ Scene::Scene(Context* context) :
 Scene::~Scene()
 {
     // Remove scene reference and owner from all nodes that still exist
-    for (std::map<unsigned, Node*>::iterator i = allNodes_.begin(); i != allNodes_.end(); ++i)
+    for (Map<unsigned, Node*>::Iterator i = allNodes_.Begin(); i != allNodes_.End(); ++i)
     {
-        i->second->SetScene(0);
-        i->second->SetOwner(0);
+        i->second_->SetScene(0);
+        i->second_->SetOwner(0);
     }
 }
 
@@ -282,44 +282,44 @@ void Scene::ClearNonLocal()
 {
     // Because node removal can remove arbitrary other nodes, can not iterate. Instead loop until the first node is local,
     // or the map is empty
-    while ((allNodes_.size()) && (allNodes_.begin()->first < FIRST_LOCAL_ID))
-        allNodes_.begin()->second->Remove();
+    while ((allNodes_.Size()) && (allNodes_.Begin()->first_ < FIRST_LOCAL_ID))
+        allNodes_.Begin()->second_->Remove();
 }
 
 void Scene::AddRequiredPackageFile(PackageFile* file)
 {
     if (file)
-        requiredPackageFiles_.push_back(SharedPtr<PackageFile>(file));
+        requiredPackageFiles_.Push(SharedPtr<PackageFile>(file));
 }
 
 void Scene::ClearRequiredPackageFiles()
 {
-    requiredPackageFiles_.clear();
+    requiredPackageFiles_.Clear();
 }
 
 void Scene::ResetOwner(Connection* owner)
 {
-    for (std::map<unsigned, Node*>::iterator i = allNodes_.begin(); i != allNodes_.end(); ++i)
+    for (Map<unsigned, Node*>::Iterator i = allNodes_.Begin(); i != allNodes_.End(); ++i)
     {
-        if (i->second->GetOwner() == owner)
-            i->second->SetOwner(0);
+        if (i->second_->GetOwner() == owner)
+            i->second_->SetOwner(0);
     }
 }
 
 Node* Scene::GetNodeByID(unsigned id) const
 {
-    std::map<unsigned, Node*>::const_iterator i = allNodes_.find(id);
-    if (i != allNodes_.end())
-        return i->second;
+    Map<unsigned, Node*>::ConstIterator i = allNodes_.Find(id);
+    if (i != allNodes_.End())
+        return i->second_;
     else
         return 0;
 }
 
 Component* Scene::GetComponentByID(unsigned id) const
 {
-    std::map<unsigned, Component*>::const_iterator i = allComponents_.find(id);
-    if (i != allComponents_.end())
-        return i->second;
+    Map<unsigned, Component*>::ConstIterator i = allComponents_.Find(id);
+    if (i != allComponents_.End())
+        return i->second_;
     else
         return 0;
 }
@@ -338,7 +338,7 @@ unsigned Scene::GetFreeunsigned(bool local)
     {
         for (;;)
         {
-            if (allNodes_.find(nonLocalNodeID_) == allNodes_.end())
+            if (allNodes_.Find(nonLocalNodeID_) == allNodes_.End())
                 return nonLocalNodeID_;
             
             if (nonLocalNodeID_ != LAST_NONLOCAL_ID)
@@ -351,7 +351,7 @@ unsigned Scene::GetFreeunsigned(bool local)
     {
         for (;;)
         {
-            if (allNodes_.find(localNodeID_) == allNodes_.end())
+            if (allNodes_.Find(localNodeID_) == allNodes_.End())
                 return localNodeID_;
             
             if (localNodeID_ != LAST_LOCAL_ID)
@@ -368,7 +368,7 @@ unsigned Scene::GetFreeComponentID(bool local)
     {
         for (;;)
         {
-            if (allComponents_.find(nonLocalComponentID_) == allComponents_.end())
+            if (allComponents_.Find(nonLocalComponentID_) == allComponents_.End())
                 return nonLocalComponentID_;
             
             if (nonLocalComponentID_ != LAST_NONLOCAL_ID)
@@ -381,7 +381,7 @@ unsigned Scene::GetFreeComponentID(bool local)
     {
         for (;;)
         {
-            if (allComponents_.find(localComponentID_) == allComponents_.end())
+            if (allComponents_.Find(localComponentID_) == allComponents_.End())
                 return localComponentID_;
             
             if (localComponentID_ != LAST_LOCAL_ID)
@@ -402,12 +402,12 @@ void Scene::NodeAdded(Node* node)
     
     // If we already have an existing node with the same ID, must remove the scene reference from it
     unsigned id = node->GetID();
-    std::map<unsigned, Node*>::iterator i = allNodes_.find(id);
-    if ((i != allNodes_.end()) && (i->second != node))
+    Map<unsigned, Node*>::Iterator i = allNodes_.Find(id);
+    if ((i != allNodes_.End()) && (i->second_ != node))
     {
         LOGWARNING("Overwriting node with ID " + ToString(id));
-        i->second->SetScene(0);
-        i->second->SetOwner(0);
+        i->second_->SetScene(0);
+        i->second_->SetOwner(0);
     }
     
     allNodes_[id] = node;
@@ -418,7 +418,7 @@ void Scene::NodeRemoved(Node* node)
     if ((!node) || (node->GetScene() != this))
         return;
     
-    allNodes_.erase(node->GetID());
+    allNodes_.Erase(node->GetID());
     node->SetID(0);
     node->SetScene(0);
 }
@@ -436,7 +436,7 @@ void Scene::ComponentRemoved(Component* component)
     if (!component)
         return;
     
-    allComponents_.erase(component->GetID());
+    allComponents_.Erase(component->GetID());
     component->SetID(0);
 }
 

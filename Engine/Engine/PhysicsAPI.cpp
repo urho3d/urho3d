@@ -55,7 +55,7 @@ static Node* PhysicsRaycastResultGetNode(PhysicsRaycastResult* ptr)
 
 static CScriptArray* PhysicsWorldRaycast(const Ray& ray, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
 {
-    static std::vector<PhysicsRaycastResult> result;
+    static Vector<PhysicsRaycastResult> result;
     ptr->Raycast(result, ray, maxDistance, collisionMask);
     return VectorToArray<PhysicsRaycastResult>(result, "Array<PhysicsRaycastResult>");
 }

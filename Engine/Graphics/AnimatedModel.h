@@ -27,7 +27,7 @@
 #include "Skeleton.h"
 #include "StaticModel.h"
 
-#include <set>
+#include "Set.h"
 
 class Animation;
 class AnimationState;
@@ -97,9 +97,9 @@ public:
     /// Return skeleton
     Skeleton& GetSkeleton() { return skeleton_; }
     /// Return all animation states
-    const std::vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
+    const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
     /// Return number of animation states
-    unsigned GetNumAnimationStates() const { return animationStates_.size(); }
+    unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
     /// Return animation state by animation pointer
     AnimationState* GetAnimationState(Animation* animation) const;
     /// Return animation state by animation name
@@ -113,11 +113,11 @@ public:
     /// Return animation LOD distance factor when not visible
     float GetInvisibleLodFactor() const { return invisibleLodFactor_; }
     /// Return all vertex morphs
-    const std::vector<ModelMorph>& GetMorphs() const { return morphs_; }
+    const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
     /// Return all morph vertex buffers
-    const std::vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphvertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphvertexBuffer_; }
     /// Return number of vertex morphs
-    unsigned GetNumMorphs() const { return morphs_.size(); }
+    unsigned GetNumMorphs() const { return morphs_.Size(); }
     /// Return vertex morph weight by index
     float GetMorphWeight(unsigned index) const;
     /// Return vertex morph weight by name
@@ -164,19 +164,19 @@ private:
     /// Skeleton
     Skeleton skeleton_;
     /// Morph vertex buffers
-    std::vector<SharedPtr<VertexBuffer> > morphvertexBuffer_;
+    Vector<SharedPtr<VertexBuffer> > morphvertexBuffer_;
     /// Vertex morphs
-    std::vector<ModelMorph> morphs_;
+    Vector<ModelMorph> morphs_;
     /// Animation states
-    std::vector<SharedPtr<AnimationState> > animationStates_;
+    Vector<SharedPtr<AnimationState> > animationStates_;
     /// Skinning matrices
-    std::vector<Matrix4x3> skinMatrices_;
+    Vector<Matrix4x3> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage
-    std::vector<std::vector<unsigned> > geometryBoneMappings_;
+    Vector<Vector<unsigned> > geometryBoneMappings_;
     /// Subgeometry skinning matrices, used if more bones than skinning shader can manage
-    std::vector<std::vector<Matrix4x3> > geometrySkinMatrices_;
+    Vector<Vector<Matrix4x3> > geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
-    std::vector<std::vector<Matrix4x3*> > geometrySkinMatrixPtrs_;
+    Vector<Vector<Matrix4x3*> > geometrySkinMatrixPtrs_;
     /// The frame number animation LOD distance was last Calculated on
     unsigned animationLodFrameNumber_;
     /// Animation LOD bias

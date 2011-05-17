@@ -44,7 +44,7 @@ public:
     /// Return oldest revision
     Deserializer& GetBase()
     {
-        if (revisions_.empty())
+        if (revisions_.Empty())
             return emptyBaseRevision;
         else
         {
@@ -68,14 +68,14 @@ public:
         // Note: write only up to source's current position, so that can use Seek() instead of resize() to write multiple commits
         // to the same buffer
         Write(data.GetData(), data.GetPosition());
-        revisions_.push_back(newRevision);
+        revisions_.Push(newRevision);
     }
     
     /// Clear revisions
     void Clear()
     {
         VectorBuffer::Clear();
-        revisions_.clear();
+        revisions_.Clear();
     }
     
     /// Purge revisions that are older than frame
@@ -84,11 +84,11 @@ public:
     /// Return whether has unacked revisions newer than frame
     bool HasUnAcked(unsigned short frameNumber) const;
     /// Return number of revisions
-    unsigned GetCount() const { return revisions_.size(); }
+    unsigned GetCount() const { return revisions_.Size(); }
     
 private:
     /// Revision information
-    std::vector<Revision> revisions_;
+    Vector<Revision> revisions_;
     
     /// Empty revision
     static VectorBuffer emptyBaseRevision;
@@ -134,9 +134,9 @@ public:
     /// Return per-client state for a component, or null if not found
     ComponentReplicationState* FindComponent(ShortStringHash combinedHash)
     {
-        std::map<ShortStringHash, ComponentReplicationState>::iterator i = components_.find(combinedHash);
-        if (i != components_.end())
-            return &i->second;
+        Map<ShortStringHash, ComponentReplicationState>::Iterator i = components_.Find(combinedHash);
+        if (i != components_.End())
+            return &i->second_;
         else
             return 0;
     }
@@ -167,7 +167,7 @@ public:
     /// Stored state revisions
     RevisionBuffer revisions_;
     /// Component states
-    std::map<ShortStringHash, ComponentReplicationState> components_;
+    Map<ShortStringHash, ComponentReplicationState> components_;
 };
 
 /// Per-client scene state for delta updates
@@ -177,9 +177,9 @@ public:
     /// Return per-client state for an node, or null if not found
     NodeReplicationState* FindNode(unsigned id)
     {
-        std::map<unsigned, NodeReplicationState>::iterator i = nodes_.find(id);
-        if (i != nodes_.end())
-            return &(i->second);
+        Map<unsigned, NodeReplicationState>::Iterator i = nodes_.Find(id);
+        if (i != nodes_.End())
+            return &(i->second_);
         else
             return 0;
     }
@@ -192,5 +192,5 @@ public:
     unsigned GetRevisionCount() const;
     
     /// Node states
-    std::map<unsigned, NodeReplicationState> nodes_;
+    Map<unsigned, NodeReplicationState> nodes_;
 };

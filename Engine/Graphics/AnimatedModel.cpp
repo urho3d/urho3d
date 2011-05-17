@@ -41,16 +41,15 @@
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
 #include "Scene.h"
+#include "Sort.h"
 #include "VectorBuffer.h"
 #include "VertexBuffer.h"
-
-#include <algorithm>
 
 #include "DebugNew.h"
 
 static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
-static bool CompareAnimationOrder(SharedPtr<AnimationState> lhs, SharedPtr<AnimationState> rhs)
+static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
     return lhs->GetLayer() < rhs->GetLayer();
 }
@@ -85,8 +84,8 @@ void AnimatedModel::RegisterObject(Context* context)
     ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Materials", materials_, ResourceRefList(Material::GetTypeStatic()));
     ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f);
     ATTRIBUTE(AnimatedModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED);
-    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", skeleton_, std::vector<unsigned char>());
-    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", animationStates_, std::vector<unsigned char>());
+    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", skeleton_, Vector<unsigned char>());
+    ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", animationStates_, Vector<unsigned char>());
 }
 
 void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -103,7 +102,7 @@ void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& val
     case offsetof(AnimatedModel, materials_):
         {
             const ResourceRefList& refs = value.GetResourceRefList();
-            for (unsigned i = 0; i < refs.ids_.size(); ++i)
+            for (unsigned i = 0; i < refs.ids_.Size(); ++i)
                 SetMaterial(i, cache->GetResource<Material>(refs.ids_[i]));
         }
         break;
@@ -111,9 +110,9 @@ void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& val
     case offsetof(AnimatedModel, skeleton_):
         {
             MemoryBuffer buf(value.GetBuffer());
-            std::vector<Bone>& bones = skeleton_.GetModifiableBones();
+            Vector<Bone>& bones = skeleton_.GetModifiableBones();
             unsigned numBones = buf.ReadVLE();
-            for (unsigned i = 0; (i < numBones) && (i < bones.size()); ++i)
+            for (unsigned i = 0; (i < numBones) && (i < bones.Size()); ++i)
                 bones[i].animated_ = buf.ReadBool();
         }
         break;
@@ -162,9 +161,9 @@ Variant AnimatedModel::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(AnimatedModel, skeleton_):
         {
             VectorBuffer buf;
-            const std::vector<Bone>& bones = skeleton_.GetBones();
-            buf.WriteVLE(bones.size());
-            for (std::vector<Bone>::const_iterator i = bones.begin(); i != bones.end(); ++i)
+            const Vector<Bone>& bones = skeleton_.GetBones();
+            buf.WriteVLE(bones.Size());
+            for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
                 buf.WriteBool(i->animated_);
             return buf.GetBuffer();
         }
@@ -172,8 +171,8 @@ Variant AnimatedModel::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(AnimatedModel, animationStates_):
         {
             VectorBuffer buf;
-            buf.WriteVLE(animationStates_.size());
-            for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+            buf.WriteVLE(animationStates_.Size());
+            for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
             {
                 AnimationState* state = *i;
                 Bone* startBone = state->GetStartBone();
@@ -209,11 +208,11 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
     
     PROFILE(RaycastAnimatedModel);
     
-    const std::vector<Bone>& bones = skeleton_.GetBones();
+    const Vector<Bone>& bones = skeleton_.GetBones();
     Sphere boneSphere;
     RayQueryLevel level = query.level_;
     
-    for (unsigned i = 0; i < bones.size(); ++i)
+    for (unsigned i = 0; i < bones.Size(); ++i)
     {
         const Bone& bone = bones[i];
         if (!bone.node_)
@@ -235,7 +234,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                     result.node_ = GetNode();
                     result.distance_ = distance;
                     result.subObject_ = i;
-                    query.result_.push_back(result);
+                    query.result_.Push(result);
                 }
                 else
                 {
@@ -250,7 +249,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                         result.node_ = GetNode();
                         result.distance_ = distance;
                         result.subObject_ = i;
-                        query.result_.push_back(result);
+                        query.result_.Push(result);
                     }
                 }
             }
@@ -267,7 +266,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                 result.node_ = GetNode();
                 result.subObject_ = i;
                 result.distance_ = distance;
-                query.result_.push_back(result);
+                query.result_.Push(result);
             }
         }
     }
@@ -325,7 +324,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
     if (lodLevelsDirty_)
         CalculateLodLevels();
     
-    if ((morphsDirty_) && (morphs_.size()))
+    if ((morphsDirty_) && (morphs_.Size()))
         UpdateMorphs();
     
     if (skinningDirty_)
@@ -339,19 +338,19 @@ void AnimatedModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch&
     batch.worldTransform_ = &GetWorldTransform();
     batch.material_ = materials_[batchIndex];
     
-    if (skinMatrices_.size())
+    if (skinMatrices_.Size())
     {
         // Check if model has per-geometry bone mappings
-        if ((geometrySkinMatrices_.size()) && (geometrySkinMatrices_[batchIndex].size()))
+        if ((geometrySkinMatrices_.Size()) && (geometrySkinMatrices_[batchIndex].Size()))
         {
             batch.shaderData_ = geometrySkinMatrices_[batchIndex][0].GetData();
-            batch.shaderDataSize_ = geometrySkinMatrices_[batchIndex].size() * 12;
+            batch.shaderDataSize_ = geometrySkinMatrices_[batchIndex].Size() * 12;
         }
         // If not, use the global skin matrices
         else
         {
             batch.shaderData_ = skinMatrices_[0].GetData();
-            batch.shaderDataSize_ = skinMatrices_.size() * 12;
+            batch.shaderDataSize_ = skinMatrices_.Size() * 12;
         }
     }
 }
@@ -377,32 +376,32 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     
     // Copy the subgeometry & LOD level structure
     SetNumGeometries(model->GetNumGeometries());
-    const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-    for (unsigned i = 0; i < geometries.size(); ++i)
+    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
     
     // Copy geometry bone mappings
-    const std::vector<std::vector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
-    geometryBoneMappings_.clear();
-    for (unsigned i = 0; i < geometryBoneMappings.size(); ++i)
-        geometryBoneMappings_.push_back(geometryBoneMappings[i]);
+    const Vector<Vector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
+    geometryBoneMappings_.Clear();
+    for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
+        geometryBoneMappings_.Push(geometryBoneMappings[i]);
     
     // Copy morphs
-    morphvertexBuffer_.clear();
-    morphs_.clear();
-    const std::vector<ModelMorph>& morphs = model->GetMorphs();
-    for (unsigned i = 0; i < morphs.size(); ++i)
+    morphvertexBuffer_.Clear();
+    morphs_.Clear();
+    const Vector<ModelMorph>& morphs = model->GetMorphs();
+    for (unsigned i = 0; i < morphs.Size(); ++i)
     {
         ModelMorph newMorph;
         newMorph.name_ = morphs[i].name_;
         newMorph.nameHash_ = morphs[i].nameHash_;
         newMorph.weight_ = 0.0f;
         newMorph.buffers_ = morphs[i].buffers_;
-        morphs_.push_back(newMorph);
+        morphs_.Push(newMorph);
     }
     
     // If model has morphs, must clone all geometries & vertex buffers that refer to morphable vertex data
-    if (morphs.size())
+    if (morphs.Size())
     {
         cloneGeometries();
         MarkMorphsDirty();
@@ -430,7 +429,7 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
         return existing;
     
     SharedPtr<AnimationState> newState(new AnimationState(this, animation));
-    animationStates_.push_back(newState);
+    animationStates_.Push(newState);
     MarkAnimationOrderDirty();
     return newState;
 }
@@ -448,14 +447,14 @@ void AnimatedModel::RemoveAnimationState(const String& animationName)
 
 void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 {
-    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
         // Check both the animation and the resource name
         if ((animation->GetNameHash() == animationNameHash) || (animation->GetAnimationNameHash() == animationNameHash))
         {
-            animationStates_.erase(i);
+            animationStates_.Erase(i);
             MarkAnimationDirty();
         }
     }
@@ -463,11 +462,11 @@ void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
 
 void AnimatedModel::RemoveAnimationState(AnimationState* state)
 {
-    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         if (*i == state)
         {
-            animationStates_.erase(i);
+            animationStates_.Erase(i);
             MarkAnimationDirty();
             return;
         }
@@ -476,7 +475,7 @@ void AnimatedModel::RemoveAnimationState(AnimationState* state)
 
 void AnimatedModel::RemoveAllAnimationStates()
 {
-    animationStates_.clear();
+    animationStates_.Clear();
     MarkAnimationDirty();
 }
 
@@ -496,7 +495,7 @@ void AnimatedModel::SetInvisibleLodFactor(float factor)
 
 void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 {
-    if (index >= morphs_.size())
+    if (index >= morphs_.Size())
         return;
     
     weight = Clamp(weight, 0.0f, 1.0f);
@@ -509,11 +508,11 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
         {
-            std::vector<AnimatedModel*> models;
+            Vector<AnimatedModel*> models;
             GetComponents<AnimatedModel>(models);
             
             // Indexing might not be the same, so use the name hash instead
-            for (unsigned i = 1; i < models.size(); ++i)
+            for (unsigned i = 1; i < models.Size(); ++i)
                 models[i]->SetMorphWeight(morphs_[index].nameHash_, weight);
         }
     }
@@ -521,7 +520,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
 
 void AnimatedModel::SetMorphWeight(const String& name, float weight)
 {
-    for (unsigned i = 0; i < morphs_.size(); ++i)
+    for (unsigned i = 0; i < morphs_.Size(); ++i)
     {
         if (morphs_[i].name_ == name)
         {
@@ -533,7 +532,7 @@ void AnimatedModel::SetMorphWeight(const String& name, float weight)
 
 void AnimatedModel::SetMorphWeight(StringHash nameHash, float weight)
 {
-    for (unsigned i = 0; i < morphs_.size(); ++i)
+    for (unsigned i = 0; i < morphs_.Size(); ++i)
     {
         if (morphs_[i].nameHash_ == nameHash)
         {
@@ -545,7 +544,7 @@ void AnimatedModel::SetMorphWeight(StringHash nameHash, float weight)
 
 void AnimatedModel::ResetMorphWeights()
 {
-    for (std::vector<ModelMorph>::iterator i = morphs_.begin(); i != morphs_.end(); ++i)
+    for (Vector<ModelMorph>::Iterator i = morphs_.Begin(); i != morphs_.End(); ++i)
         i->weight_ = 0.0f;
     
     MarkMorphsDirty();
@@ -553,23 +552,23 @@ void AnimatedModel::ResetMorphWeights()
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
-        std::vector<AnimatedModel*> models;
+        Vector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
         
         // Indexing might not be the same, so use the name hash instead
-        for (unsigned i = 1; i < models.size(); ++i)
+        for (unsigned i = 1; i < models.Size(); ++i)
             models[i]->ResetMorphWeights();
     }
 }
 
 float AnimatedModel::GetMorphWeight(unsigned index) const
 {
-    return index < morphs_.size() ? morphs_[index].weight_ : 0.0f;
+    return index < morphs_.Size() ? morphs_[index].weight_ : 0.0f;
 }
 
 float AnimatedModel::GetMorphWeight(const String& name) const
 {
-    for (std::vector<ModelMorph>::const_iterator i = morphs_.begin(); i != morphs_.end(); ++i)
+    for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
     {
         if (i->name_ == name)
             return i->weight_;
@@ -580,7 +579,7 @@ float AnimatedModel::GetMorphWeight(const String& name) const
 
 float AnimatedModel::GetMorphWeight(StringHash nameHash) const
 {
-    for (std::vector<ModelMorph>::const_iterator i = morphs_.begin(); i != morphs_.end(); ++i)
+    for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
     {
         if (i->nameHash_ == nameHash)
             return i->weight_;
@@ -591,7 +590,7 @@ float AnimatedModel::GetMorphWeight(StringHash nameHash) const
 
 AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 {
-    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         if ((*i)->GetAnimation() == animation)
             return *i;
@@ -602,7 +601,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
 
 AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const
 {
-    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
         
@@ -616,7 +615,7 @@ AnimationState* AnimatedModel::GetAnimationState(const String& animationName) co
 
 AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) const
 {
-    for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         Animation* animation = (*i)->GetAnimation();
         
@@ -630,7 +629,7 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
 
 AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
 {
-    return index < animationStates_.size() ? animationStates_[index].GetPtr() : 0;
+    return index < animationStates_.Size() ? animationStates_[index].GetPtr() : 0;
 }
 
 void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
@@ -658,8 +657,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         // Create scene nodes for the bones, or get from the master model if not master
         if (createBones)
         {
-            std::vector<Bone>& bones = skeleton_.GetModifiableBones();
-            for (std::vector<Bone>::iterator i = bones.begin(); i != bones.end(); ++i)
+            Vector<Bone>& bones = skeleton_.GetModifiableBones();
+            for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
                 // Create bones as local, as they are never to be directly synchronized over the network
                 Node* boneNode = node_->CreateChild(i->name_, true);
@@ -668,10 +667,10 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 i->node_ = boneNode;
             }
             
-            for (unsigned i = 0; i < bones.size(); ++i)
+            for (unsigned i = 0; i < bones.Size(); ++i)
             {
                 unsigned parentIndex = bones[i].parentIndex_;
-                if ((parentIndex != i) && (parentIndex < bones.size()))
+                if ((parentIndex != i) && (parentIndex < bones.Size()))
                     bones[parentIndex].node_->AddChild(bones[i].node_);
             }
         }
@@ -683,8 +682,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
         
         if (createBones)
         {
-            std::vector<Bone>& bones = skeleton_.GetModifiableBones();
-            for (std::vector<Bone>::iterator i = bones.begin(); i != bones.end(); ++i)
+            Vector<Bone>& bones = skeleton_.GetModifiableBones();
+            for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
             {
                 Node* boneNode = node_->GetChild(i->name_, true);
                 if (boneNode)
@@ -695,7 +694,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     }
     
     // Reserve space for skinning matrices
-    skinMatrices_.resize(skeleton_.GetNumBones());
+    skinMatrices_.Resize(skeleton_.GetNumBones());
     RefreshGeometryBoneMappings();
 }
 
@@ -728,8 +727,8 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
         // If has bones, update world bounding box based on them
         worldBoundingBox_.defined_ = false;
         
-        const std::vector<Bone>& bones = skeleton_.GetBones();
-        for (std::vector<Bone>::const_iterator i = bones.begin(); i != bones.end(); ++i)
+        const Vector<Bone>& bones = skeleton_.GetBones();
+        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
         {
             Node* boneNode = i->node_;
             if (!boneNode)
@@ -750,8 +749,8 @@ void AnimatedModel::AssignBoneNodes()
         return;
     
     // Find the bone nodes from the node hierarchy and add listeners
-    std::vector<Bone>& bones = skeleton_.GetModifiableBones();
-    for (std::vector<Bone>::iterator i = bones.begin(); i != bones.end(); ++i)
+    Vector<Bone>& bones = skeleton_.GetModifiableBones();
+    for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
     {
         Node* boneNode = node_->GetChild(i->name_, true);
         if (boneNode)
@@ -760,7 +759,7 @@ void AnimatedModel::AssignBoneNodes()
     }
     
     // Re-assign the same start bone to get the proper bone node this time
-    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
@@ -795,12 +794,12 @@ void AnimatedModel::MarkMorphsDirty()
 void AnimatedModel::cloneGeometries()
 {
     // Clone vertex buffers as necessary
-    const std::vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
-    std::map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
+    const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
+    Map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
     
-    morphvertexBuffer_.resize(originalVertexBuffers.size());
+    morphvertexBuffer_.Resize(originalVertexBuffers.Size());
     
-    for (unsigned i = 0; i < originalVertexBuffers.size(); ++i)
+    for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
     {
         VertexBuffer* original = originalVertexBuffers[i];
         if (original->HasMorphRange())
@@ -823,20 +822,20 @@ void AnimatedModel::cloneGeometries()
     }
     
     // Geometries will always be cloned fully. They contain only references to buffer, so they are relatively light
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
-        for (unsigned j = 0; j < geometries_[i].size(); ++j)
+        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
             SharedPtr<Geometry> original = geometries_[i][j];
             
-            const std::vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
+            const Vector<SharedPtr<VertexBuffer> >& originalBuffers = original->GetVertexBuffers();
             
             SharedPtr<Geometry> clone(new Geometry(context_));
-            clone->SetNumVertexBuffers(originalVertexBuffers.size());
-            for (unsigned k = 0; k < originalVertexBuffers.size(); ++k)
+            clone->SetNumVertexBuffers(originalVertexBuffers.Size());
+            for (unsigned k = 0; k < originalVertexBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
-                if (clonedVertexBuffers.find(originalBuffer) != clonedVertexBuffers.end())
+                if (clonedVertexBuffers.Find(originalBuffer) != clonedVertexBuffers.End())
                     clone->SetVertexBuffer(k, clonedVertexBuffers[originalBuffer], original->GetVertexElementMask(k));
                 else
                     clone->SetVertexBuffer(k, originalBuffers[k], original->GetVertexElementMask(k));
@@ -853,33 +852,33 @@ void AnimatedModel::cloneGeometries()
 
 void AnimatedModel::RefreshGeometryBoneMappings()
 {
-    geometrySkinMatrices_.clear();
-    geometrySkinMatrixPtrs_.clear();
+    geometrySkinMatrices_.Clear();
+    geometrySkinMatrixPtrs_.Clear();
     
-    if (!geometryBoneMappings_.size())
+    if (!geometryBoneMappings_.Size())
         return;
     
     // Check if all mappings are empty, then we do not need to use mapped skinning
     bool allEmpty = true;
-    for (unsigned i = 0; i < geometryBoneMappings_.size(); ++i)
-        if (geometryBoneMappings_[i].size())
+    for (unsigned i = 0; i < geometryBoneMappings_.Size(); ++i)
+        if (geometryBoneMappings_[i].Size())
             allEmpty = false;
     
     if (allEmpty)
         return;
     
     // Reserve space for per-geometry skinning matrices
-    geometrySkinMatrices_.resize(geometryBoneMappings_.size());
-    for (unsigned i = 0; i < geometryBoneMappings_.size(); ++i)
-        geometrySkinMatrices_[i].resize(geometryBoneMappings_[i].size());
+    geometrySkinMatrices_.Resize(geometryBoneMappings_.Size());
+    for (unsigned i = 0; i < geometryBoneMappings_.Size(); ++i)
+        geometrySkinMatrices_[i].Resize(geometryBoneMappings_[i].Size());
     
     // Build original-to-skinindex matrix pointer mapping for fast copying
     // Note: at this point layout of geometrySkinMatrices_ cannot be modified or pointers become invalid
-    geometrySkinMatrixPtrs_.resize(skeleton_.GetNumBones());
-    for (unsigned i = 0; i < geometryBoneMappings_.size(); ++i)
+    geometrySkinMatrixPtrs_.Resize(skeleton_.GetNumBones());
+    for (unsigned i = 0; i < geometryBoneMappings_.Size(); ++i)
     {
-        for (unsigned j = 0; j < geometryBoneMappings_[i].size(); ++j)
-            geometrySkinMatrixPtrs_[geometryBoneMappings_[i][j]].push_back(&geometrySkinMatrices_[i][j]);
+        for (unsigned j = 0; j < geometryBoneMappings_[i].Size(); ++j)
+            geometrySkinMatrixPtrs_[geometryBoneMappings_[i][j]].Push(&geometrySkinMatrices_[i][j]);
     }
 }
 
@@ -906,13 +905,13 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     // Make sure animations are in ascending priority order
     if (animationOrderDirty_)
     {
-        std::sort(animationStates_.begin(), animationStates_.end(), CompareAnimationOrder);
+        Sort(animationStates_.Begin(), animationStates_.End(), CompareAnimationOrder);
         animationOrderDirty_ = false;
     }
     
     // Reset skeleton, then apply all animations
     skeleton_.Reset();
-    for (std::vector<SharedPtr<AnimationState> >::iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
+    for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
         (*i)->Apply();
     
     // Animation has changed the bounding box: mark node for octree reinsertion
@@ -925,14 +924,14 @@ void AnimatedModel::UpdateSkinning()
     PROFILE(UpdateSkinning);
     
     // Note: the model's world transform will be baked in the skin matrices
-    const std::vector<Bone>& bones = skeleton_.GetBones();
+    const Vector<Bone>& bones = skeleton_.GetBones();
     // Use model's world transform in case a bone is missing
     const Matrix4x3& worldTransform = node_->GetWorldTransform();
     
     // Skinning with global matrices only
-    if (!geometrySkinMatrices_.size())
+    if (!geometrySkinMatrices_.Size())
     {
-        for (unsigned i = 0; i < bones.size(); ++i)
+        for (unsigned i = 0; i < bones.Size(); ++i)
         {
             const Bone& bone = bones[i];
             if (bone.node_)
@@ -944,7 +943,7 @@ void AnimatedModel::UpdateSkinning()
     // Skinning with per-geometry matrices
     else
     {
-        for (unsigned i = 0; i < bones.size(); ++i)
+        for (unsigned i = 0; i < bones.Size(); ++i)
         {
             const Bone& bone = bones[i];
             if (bone.node_)
@@ -953,7 +952,7 @@ void AnimatedModel::UpdateSkinning()
                 skinMatrices_[i] = worldTransform;
             
             // Copy the skin matrix to per-geometry matrices as needed
-            for (unsigned j = 0; j < geometrySkinMatrixPtrs_[i].size(); ++j)
+            for (unsigned j = 0; j < geometrySkinMatrixPtrs_[i].Size(); ++j)
                 *geometrySkinMatrixPtrs_[i][j] = skinMatrices_[i];
         }
     }
@@ -963,12 +962,12 @@ void AnimatedModel::UpdateSkinning()
 
 void AnimatedModel::UpdateMorphs()
 {
-    if (morphs_.size())
+    if (morphs_.Size())
     {
         PROFILE(UpdateMorphs);
         
         // Reset the morph data range from all morphable vertex buffers, then apply morphs
-        for (unsigned i = 0; i < morphvertexBuffer_.size(); ++i)
+        for (unsigned i = 0; i < morphvertexBuffer_.Size(); ++i)
         {
             VertexBuffer* buffer = morphvertexBuffer_[i];
             if (buffer)
@@ -978,13 +977,13 @@ void AnimatedModel::UpdateMorphs()
                     continue;
                 buffer->ResetMorphRange(lockedMorphRange);
                 
-                for (unsigned j = 0; j < morphs_.size(); ++j)
+                for (unsigned j = 0; j < morphs_.Size(); ++j)
                 {
                     if (morphs_[j].weight_ > 0.0f)
                     {
-                        std::map<unsigned, VertexBufferMorph>::iterator k = morphs_[j].buffers_.find(i);
-                        if (k != morphs_[j].buffers_.end())
-                            ApplyMorph(buffer, lockedMorphRange, k->second, morphs_[j].weight_);
+                        Map<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
+                        if (k != morphs_[j].buffers_.End())
+                            ApplyMorph(buffer, lockedMorphRange, k->second_, morphs_[j].weight_);
                     }
                 }
                 

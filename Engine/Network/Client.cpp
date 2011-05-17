@@ -105,8 +105,8 @@ void Client::Disconnect()
     if (!scene_)
         scene_->StopAsyncLoading();
     
-    pendingDownloads_.clear();
-    fileTransfers_.clear();
+    pendingDownloads_.Clear();
+    fileTransfers_.Clear();
     sceneInfo_ = SceneInfo();
 }
 
@@ -192,10 +192,10 @@ String Client::GetFileTransferStatus() const
 {
     String ret;
     
-    for (std::map<StringHash, FileTransfer>::const_iterator i = fileTransfers_.begin(); i != fileTransfers_.end(); ++i)
+    for (Map<StringHash, FileTransfer>::ConstIterator i = fileTransfers_.Begin(); i != fileTransfers_.End(); ++i)
     {
-        String line = i->second.fileName_ + " " + ToString(i->second.bytesReceived_) + "/" + ToString(i->second.size_) 
-            + " (" + ToString((int)(((float)i->second.bytesReceived_ / (float)i->second.size_) * 100.0f + 0.5f)) + "%)\n";
+        String line = i->second_.fileName_ + " " + ToString(i->second_.bytesReceived_) + "/" + ToString(i->second_.size_) 
+            + " (" + ToString((int)(((float)i->second_.bytesReceived_ / (float)i->second_.size_) * 100.0f + 0.5f)) + "%)\n";
         ret += line;
     }
     
@@ -216,8 +216,8 @@ void Client::HandlePeerDisconnected(StringHash eventType, VariantMap& eventData)
         {
             serverConnection_->LeftScene();
             serverConnection_.Reset();
-            pendingDownloads_.clear();
-            fileTransfers_.clear();
+            pendingDownloads_.Clear();
+            fileTransfers_.Clear();
             sceneInfo_ = SceneInfo();
         }
     }
@@ -228,9 +228,9 @@ void Client::HandleFileTransferCompleted(StringHash eventType, VariantMap& event
     using namespace FileTransferCompleted;
     
     String fileName = eventData[P_FILENAME].GetString();
-    if (pendingDownloads_.find(fileName) != pendingDownloads_.end())
+    if (pendingDownloads_.Find(fileName) != pendingDownloads_.End())
     {
-        pendingDownloads_.erase(fileName);
+        pendingDownloads_.Erase(fileName);
         
         // Add the package to the resource cache
         SharedPtr<PackageFile> package(new PackageFile(context_));
@@ -243,7 +243,7 @@ void Client::HandleFileTransferCompleted(StringHash eventType, VariantMap& event
         GetSubsystem<ResourceCache>()->AddPackageFile(package, true);
         
         // If this was the last required download, can now join scene
-        if ((pendingDownloads_.empty()) && (IsJoinPending()))
+        if ((pendingDownloads_.Empty()) && (IsJoinPending()))
             SetupScene();
     }
 }
@@ -253,7 +253,7 @@ void Client::HandleFileTransferFailed(StringHash eventType, VariantMap& eventDat
     using namespace FileTransferFailed;
     
     String fileName = eventData[P_FILENAME].GetString();
-    if (pendingDownloads_.find(fileName) != pendingDownloads_.end())
+    if (pendingDownloads_.Find(fileName) != pendingDownloads_.End())
         JoinFailed("Failed to transfer file " + fileName);
 }
 
@@ -336,14 +336,14 @@ void Client::HandleSceneInfo(VectorBuffer& packet)
     // Read source file name & required packages
     sceneInfo_.fileName_ = packet.ReadString();
     unsigned numPackages = packet.ReadVLE();
-    sceneInfo_.requiredPackages_.clear();
+    sceneInfo_.requiredPackages_.Clear();
     for (unsigned i = 0; i < numPackages; ++i)
     {
         PackageInfo package;
         package.name_ = packet.ReadString();
         package.size_ = packet.ReadUInt();
         package.checksum_ = packet.ReadUInt();
-        sceneInfo_.requiredPackages_.push_back(package);
+        sceneInfo_.requiredPackages_.Push(package);
     }
     
     // Check need for downloads: if none, can join immediately
@@ -354,13 +354,13 @@ void Client::HandleSceneInfo(VectorBuffer& packet)
 void Client::HandleTransferData(VectorBuffer& packet)
 {
     StringHash nameHash = packet.ReadStringHash();
-    std::map<StringHash, FileTransfer>::iterator i = fileTransfers_.find(nameHash);
-    if (i == fileTransfers_.end())
+    Map<StringHash, FileTransfer>::Iterator i = fileTransfers_.Find(nameHash);
+    if (i == fileTransfers_.End())
     {
         LOGDEBUG("Received fragment for nonexisting file transfer " + ToString(nameHash));
         return;
     }
-    FileTransfer& transfer = i->second;
+    FileTransfer& transfer = i->second_;
     
     unsigned index = packet.ReadVLE();
     if (transfer.fragmentsReceived_ != index)
@@ -374,7 +374,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         eventData[P_REASON] = "Unexpected fragment";
         SendEvent(E_FILETRANSFERFAILED, eventData);
         
-        fileTransfers_.erase(i);
+        fileTransfers_.Erase(i);
         return;
     }
     
@@ -414,7 +414,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
             SendEvent(E_FILETRANSFERCOMPLETED, eventData);
         }
         
-        fileTransfers_.erase(i);
+        fileTransfers_.Erase(i);
         return;
     }
     
@@ -453,7 +453,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         
         VectorBuffer packet;
         packet.WriteUByte(MSG_REQUESTFILE);
-        packet.WriteStringHash(i->first);
+        packet.WriteStringHash(i->first_);
         packet.WriteVLE(transfer.batchStart_);
         packet.WriteVLE(transfer.batchSize_);
         serverConnection_->SendReliable(packet);
@@ -465,8 +465,8 @@ void Client::HandleTransferFailed(VectorBuffer& packet)
     StringHash nameHash = packet.ReadStringHash();
     String reason = packet.ReadString();
     
-    std::map<StringHash, FileTransfer>::iterator i = fileTransfers_.find(nameHash);
-    if (i == fileTransfers_.end())
+    Map<StringHash, FileTransfer>::Iterator i = fileTransfers_.Find(nameHash);
+    if (i == fileTransfers_.End())
     {
         LOGDEBUG("Received fail for nonexisting file transfer " + ToString(nameHash));
         return;
@@ -478,11 +478,11 @@ void Client::HandleTransferFailed(VectorBuffer& packet)
     using namespace FileTransferFailed;
     
     VariantMap eventData;
-    eventData[P_FILENAME] = i->second.fileName_;
+    eventData[P_FILENAME] = i->second_.fileName_;
     eventData[P_REASON] = reason;
     SendEvent(E_FILETRANSFERFAILED, eventData);
     
-    fileTransfers_.erase(i);
+    fileTransfers_.Erase(i);
 }
 
 void Client::HandleJoinReply(VectorBuffer& packet)
@@ -504,8 +504,8 @@ void Client::HandleJoinReply(VectorBuffer& packet)
         String reason = packet.ReadString();
         
         serverConnection_->LeftScene();
-        pendingDownloads_.clear();
-        fileTransfers_.clear();
+        pendingDownloads_.Clear();
+        fileTransfers_.Clear();
         
         JoinFailed(reason);
     }
@@ -545,8 +545,8 @@ void Client::HandleServerUpdate(VectorBuffer& packet, bool initial)
     
     unsigned short previousEventFrameNumber = serverConnection_->GetEventFrameNumber();
     
-    std::set<unsigned> updatedNodes;
-    std::set<unsigned> updatedComponents;
+    Set<unsigned> updatedNodes;
+    Set<unsigned> updatedComponents;
     
     // Read the actual scene update messages
     while (!packet.IsEof())
@@ -605,33 +605,33 @@ void Client::HandleServerUpdate(VectorBuffer& packet, bool initial)
 
 unsigned Client::CheckPackages()
 {
-    pendingDownloads_.clear();
+    pendingDownloads_.Clear();
     
     // To avoid resource version conflicts and to keep the amount of open packages reasonable, remove all existing
     // downloaded packages from the resource cache first
-    std::vector<String> downloadedPackages;
-    std::vector<SharedPtr<PackageFile> > registeredPackages = GetSubsystem<ResourceCache>()->GetPackageFiles();
+    Vector<String> downloadedPackages;
+    Vector<SharedPtr<PackageFile> > registeredPackages = GetSubsystem<ResourceCache>()->GetPackageFiles();
     GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, downloadDirectory_, "*.pak", SCAN_FILES, false);
     
-    for (std::vector<SharedPtr<PackageFile> >::iterator i = registeredPackages.begin(); i != registeredPackages.end();)
+    for (Vector<SharedPtr<PackageFile> >::Iterator i = registeredPackages.Begin(); i != registeredPackages.End();)
     {
         if ((*i)->GetName().Find(downloadDirectory_) != String::NPOS)
         {
             GetSubsystem<ResourceCache>()->RemovePackageFile(*i);
-            i = registeredPackages.erase(i);
+            i = registeredPackages.Erase(i);
         }
         else
             ++i;
     }
     
-    for (unsigned i = 0; i < sceneInfo_.requiredPackages_.size(); ++i)
+    for (unsigned i = 0; i < sceneInfo_.requiredPackages_.Size(); ++i)
     {
         const PackageInfo& required = sceneInfo_.requiredPackages_[i];
         String requiredName = GetFileName(required.name_);
         bool found = false;
         
         // Check both already registered packages, and existing downloads
-        for (unsigned j = 0; j < registeredPackages.size(); ++j)
+        for (unsigned j = 0; j < registeredPackages.Size(); ++j)
         {
             PackageFile* package = registeredPackages[i];
             String name = GetFileName(package->GetName());
@@ -645,7 +645,7 @@ unsigned Client::CheckPackages()
         
         if (!found)
         {
-            for (unsigned j = 0; j < downloadedPackages.size(); ++j)
+            for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
             {
                 // Downloaded packages are encoded as filename_checksum.pak, so check if the filename contains the required name
                 String name = GetFileName(downloadedPackages[i]);
@@ -672,17 +672,17 @@ unsigned Client::CheckPackages()
                 JoinFailed("Failed to initiate transfer for file " + required.name_);
                 return M_MAX_UNSIGNED; // Return nonzero to prevent immediate join attempt
             }
-            pendingDownloads_.insert(required.name_);
+            pendingDownloads_.Insert(required.name_);
         }
     }
     
-    return pendingDownloads_.size();
+    return pendingDownloads_.Size();
 }
 
 bool Client::RequestFile(const String& fileName, unsigned size, unsigned checksum)
 {
     StringHash nameHash(fileName);
-    if (fileTransfers_.find(nameHash) != fileTransfers_.end())
+    if (fileTransfers_.Find(nameHash) != fileTransfers_.End())
         return true; // Already initiated
     
     FileTransfer newTransfer;
@@ -800,8 +800,8 @@ void Client::SendClientUpdate()
     serverConnection_->AddUnackedControls(frameNumber_, controls);
     
     // Append unacked remote events
-    const std::vector<RemoteEvent>& unackedEvents = serverConnection_->GetUnackedRemoteEvents();
-    for (std::vector<RemoteEvent>::const_iterator i = unackedEvents.begin(); i != unackedEvents.end(); ++i)
+    const Vector<RemoteEvent>& unackedEvents = serverConnection_->GetUnackedRemoteEvents();
+    for (Vector<RemoteEvent>::ConstIterator i = unackedEvents.Begin(); i != unackedEvents.End(); ++i)
     {
         packet.WriteUByte(i->nodeID_ ? MSG_REMOTENODEEVENT : MSG_REMOTEEVENT);
         i->Write(packet);
@@ -810,7 +810,7 @@ void Client::SendClientUpdate()
     serverConnection_->SendUnreliable(packet);
 }
 
-void Client::ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, std::set<unsigned>& updatedNodes, std::set<unsigned>& updatedComponents)
+void Client::ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, Set<unsigned>& updatedNodes, Set<unsigned>& updatedComponents)
 {
     /*
     unsigned id = source.ReadUShort();
@@ -835,11 +835,11 @@ void Client::ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, std::
             
             node->setProperties(source.ReadVariantMap(), true);
             
-            std::set<Component*> extraComponents;
-            extraComponents.clear();
-            const std::vector<SharedPtr<Component> >& components = node->GetComponents();
-            for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
-                extraComponents.insert(*i);
+            Set<Component*> extraComponents;
+            extraComponents.Clear();
+            const Vector<SharedPtr<Component> >& components = node->GetComponents();
+            for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
+                extraComponents.Insert(*i);
             
             unsigned nucomponents_ = source.ReadVLE();
             for (unsigned i = 0; i < nucomponents_; ++i)
@@ -860,14 +860,14 @@ void Client::ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, std::
                 if (newComponent)
                     component->interpolate(true);
                 
-                extraComponents.erase(component);
+                extraComponents.Erase(component);
             }
             
             // Now check if the node has extra components it should not, and remove them
-            for (std::set<Component*>::iterator i = extraComponents.begin(); i != extraComponents.end(); ++i)
+            for (Set<Component*>::Iterator i = extraComponents.Begin(); i != extraComponents.End(); ++i)
                 node->removeComponent(*i);
             
-            updatedNodes.insert(id);
+            updatedNodes.Insert(id);
         }
         break;
         
@@ -947,7 +947,7 @@ void Client::ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, std::
                     }
                 }
             }
-            updatedNodes.insert(id);
+            updatedNodes.Insert(id);
         }
         break;
     }

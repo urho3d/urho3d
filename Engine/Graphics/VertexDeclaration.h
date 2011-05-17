@@ -27,7 +27,7 @@
 #include "GraphicsDefs.h"
 
 #include <d3d9.h>
-#include <vector>
+#include "Vector.h"
 
 class Graphics;
 class VertexBuffer;
@@ -50,9 +50,9 @@ public:
     /// Construct with graphics subsystem pointer and vertex element mask
     VertexDeclaration(Graphics* graphics, unsigned elementMask);
     /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const std::vector<VertexBuffer*>& buffers, const std::vector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks);
     /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const std::vector<SharedPtr<VertexBuffer> >& buffers, const std::vector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>& elementMasks);
     /// Destruct
     ~VertexDeclaration();
     
@@ -61,7 +61,7 @@ public:
     
 private:
     /// Create declaration
-    void Create(Graphics* graphics, const std::vector<VertexDeclarationElement>& elements);
+    void Create(Graphics* graphics, const Vector<VertexDeclarationElement>& elements);
     /// Release declaration
     void Release();
     

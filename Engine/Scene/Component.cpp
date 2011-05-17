@@ -72,10 +72,10 @@ Component* Component::GetComponent(ShortStringHash type, unsigned index) const
         return 0;
 }
 
-void Component::GetComponents(std::vector<Component*>& dest, ShortStringHash type) const
+void Component::GetComponents(Vector<Component*>& dest, ShortStringHash type) const
 {
     if (node_)
         node_->GetComponents(dest, type);
     else
-        dest.clear();
+        dest.Clear();
 }

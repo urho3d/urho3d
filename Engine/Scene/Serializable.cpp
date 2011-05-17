@@ -100,7 +100,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
         break;
         
     case VAR_BUFFER:
-        *(reinterpret_cast<std::vector<unsigned char>*>(dest)) = value.GetBuffer();
+        *(reinterpret_cast<Vector<unsigned char>*>(dest)) = value.GetBuffer();
         break;
         
     case VAR_RESOURCEREF:
@@ -164,7 +164,7 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
         return Variant(*(reinterpret_cast<const String*>(src)));
         
     case VAR_BUFFER:
-        return Variant(*(reinterpret_cast<const std::vector<unsigned char>*>(src)));
+        return Variant(*(reinterpret_cast<const Vector<unsigned char>*>(src)));
         
     case VAR_RESOURCEREF:
         return Variant(*(reinterpret_cast<const ResourceRef*>(src)));
@@ -184,16 +184,16 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
 
 bool Serializable::Load(Deserializer& source)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
         return true;
     
     inSerialization_ = true;
     
     // Read attributes as Variants with predefined types from the attribute info
-    for (unsigned i = 0; i < attributes->size(); ++i)
+    for (unsigned i = 0; i < attributes->Size(); ++i)
     {
-        const AttributeInfo& attr = attributes->at(i);
+        const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_SERIALIZATION))
             continue;
         
@@ -212,16 +212,16 @@ bool Serializable::Load(Deserializer& source)
 
 bool Serializable::Save(Serializer& dest)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
         return true;
     
     inSerialization_ = true;
     
     // Then write attributes as Variants without type
-    for (unsigned i = 0; i < attributes->size(); ++i)
+    for (unsigned i = 0; i < attributes->Size(); ++i)
     {
-        const AttributeInfo& attr = attributes->at(i);
+        const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_SERIALIZATION))
             continue;
         
@@ -245,15 +245,15 @@ bool Serializable::LoadXML(const XMLElement& source)
         return false;
     }
     
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
         return true;
     
     inSerialization_ = true;
     
-    for (unsigned i = 0; i < attributes->size(); ++i)
+    for (unsigned i = 0; i < attributes->Size(); ++i)
     {
-        const AttributeInfo& attr = attributes->at(i);
+        const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_SERIALIZATION))
             continue;
         
@@ -312,15 +312,15 @@ bool Serializable::SaveXML(XMLElement& dest)
         return false;
     }
     
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
         return true;
     
     inSerialization_ = true;
     
-    for (unsigned i = 0; i < attributes->size(); ++i)
+    for (unsigned i = 0; i < attributes->Size(); ++i)
     {
-        const AttributeInfo& attr = attributes->at(i);
+        const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_SERIALIZATION))
             continue;
         
@@ -343,19 +343,19 @@ bool Serializable::SaveXML(XMLElement& dest)
 
 bool Serializable::SetAttribute(unsigned index, const Variant& value)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
         return false;
     }
-    if (index >= attributes->size())
+    if (index >= attributes->Size())
     {
         LOGERROR("Attribute index out of bounds");
         return false;
     }
     
-    const AttributeInfo& attr = attributes->at(index);
+    const AttributeInfo& attr = attributes->At(index);
     
     // Check that the new value's type matches the attribute type
     if (value.GetType() == attr.type_)
@@ -373,14 +373,14 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
 
 bool Serializable::SetAttribute(const String& name, const Variant& value)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
         return false;
     }
     
-    for (std::vector<AttributeInfo>::const_iterator i = attributes->begin(); i != attributes->end(); ++i)
+    for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
         if (i->name_ == name)
         {
@@ -405,23 +405,23 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
 
 Variant Serializable::GetAttribute(unsigned index)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
-    if ((!attributes) || (index >= attributes->size()))
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    if ((!attributes) || (index >= attributes->Size()))
         return Variant();
     
-    return OnGetAttribute(attributes->at(index));
+    return OnGetAttribute(attributes->At(index));
 }
 
 Variant Serializable::GetAttribute(const String& name)
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
         return Variant();
     }
     
-    for (std::vector<AttributeInfo>::const_iterator i = attributes->begin(); i != attributes->end(); ++i)
+    for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
         if (i->name_ == name)
             return OnGetAttribute(*i);
@@ -433,11 +433,11 @@ Variant Serializable::GetAttribute(const String& name)
 
 unsigned Serializable::GetNumAttributes() const
 {
-    const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
-    return attributes ? attributes->size() : 0;
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    return attributes ? attributes->Size() : 0;
 }
 
-const std::vector<AttributeInfo>* Serializable::GetAttributes() const
+const Vector<AttributeInfo>* Serializable::GetAttributes() const
 {
     return context_->GetAttributes(GetType());
 }

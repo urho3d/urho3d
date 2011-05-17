@@ -54,7 +54,7 @@ struct AnimationTrack
     /// Bitmask of included data (position, rotation, scale)
     unsigned char channelMask_;
     /// Keyframes
-    std::vector<AnimationKeyFrame> keyFrames_;
+    Vector<AnimationKeyFrame> keyFrames_;
 };
 
 static const unsigned char CHANNEL_POSITION = 0x1;
@@ -84,7 +84,7 @@ public:
     /// Set animation length
     void SetLength(float length);
     /// Set all animation tracks
-    void SetTracks(const std::vector<AnimationTrack>& tracks);
+    void SetTracks(const Vector<AnimationTrack>& tracks);
     
     /// Return animation name
     const String& GetAnimationName() const { return animationName_; }
@@ -93,7 +93,7 @@ public:
     /// Return animation length
     float GetLength() const { return length_; }
     /// Return all animation tracks
-    const std::vector<AnimationTrack>& GetTracks() const { return tracks_; }
+    const Vector<AnimationTrack>& GetTracks() const { return tracks_; }
     /// Return number of animation tracks
     unsigned GetNumTracks() const;
     /// Return animation track by index
@@ -111,5 +111,5 @@ private:
     /// Animation length
     float length_;
     /// Animation tracks
-    std::vector<AnimationTrack> tracks_;
+    Vector<AnimationTrack> tracks_;
 };

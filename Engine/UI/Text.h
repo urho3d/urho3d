@@ -95,13 +95,13 @@ public:
     /// Return row height
     int GetRowHeight() const { return rowHeight_; }
     /// Return number of rows
-    unsigned GetNumRows() const { return rowWidths_.size(); }
+    unsigned GetNumRows() const { return rowWidths_.Size(); }
     /// Return width of each row
-    const std::vector<int>& GetRowWidths() const { return rowWidths_; }
+    const Vector<int>& GetRowWidths() const { return rowWidths_; }
     /// Return position of each character
-    const std::vector<IntVector2>& GetCharPositions() const { return charPositions_; }
+    const Vector<IntVector2>& GetCharPositions() const { return charPositions_; }
     /// Return size of each character
-    const std::vector<IntVector2>& GetCharSizes() const { return charSizes_; }
+    const Vector<IntVector2>& GetCharSizes() const { return charSizes_; }
     
 protected:
     /// Update text when text, font or spacing changed
@@ -136,9 +136,9 @@ protected:
     /// Row height
     int rowHeight_;
     /// Row widths
-    std::vector<int> rowWidths_;
+    Vector<int> rowWidths_;
     /// Positions of each character
-    std::vector<IntVector2> charPositions_;
+    Vector<IntVector2> charPositions_;
     /// Sizes of each character
-    std::vector<IntVector2> charSizes_;
+    Vector<IntVector2> charSizes_;
 };

@@ -29,10 +29,10 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
-#include <vector>
+#include "Vector.h"
 
 /// Split string with a separator char
-std::vector<String> Split(const String& source, char separator);
+Vector<String> Split(const String& source, char separator);
 /// Parse a bool from a string. Check for the substring "true" case-insensitively
 bool ToBool(const String& source);
 /// Parse a float from a string

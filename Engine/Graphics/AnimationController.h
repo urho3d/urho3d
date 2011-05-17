@@ -146,5 +146,5 @@ private:
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
     /// Controlled animations
-    std::vector<AnimationControl> animations_;
+    Vector<AnimationControl> animations_;
 };

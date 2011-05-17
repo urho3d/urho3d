@@ -92,7 +92,7 @@ public:
     /// Return parameter XML file
     XMLFile* GetParameters() const { return parameterSource_; }
     /// Return number of particles
-    unsigned GetNumParticles() const { return particles_.size(); }
+    unsigned GetNumParticles() const { return particles_.Size(); }
     /// Return whether emitter is active
     bool IsActive() const { return active_; }
     
@@ -102,7 +102,7 @@ protected:
     /// Set color of particles
     void SetParticleColor(const Color& color);
     /// Set color fade of particles
-    void SetParticleColors(const std::vector<ColorFade>& colors);
+    void SetParticleColors(const Vector<ColorFade>& colors);
     /// Create a new particle. Return true if there was room
     bool EmitNewParticle();
     /// Return a free particle index
@@ -125,11 +125,11 @@ private:
     /// Parameter XML file
     SharedPtr<XMLFile> parameterSource_;
     /// Particles
-    std::vector<Particle> particles_;
+    Vector<Particle> particles_;
     /// Color fade range
-    std::vector<ColorFade> colors_;
+    Vector<ColorFade> colors_;
     /// Texture animation
-    std::vector<TextureAnimation> textureAnimation_;
+    Vector<TextureAnimation> textureAnimation_;
     /// Emitter shape
     EmitterType emitterType_;
     /// Emitter size

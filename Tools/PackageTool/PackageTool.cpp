@@ -31,7 +31,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <vector>
+#include "Vector.h"
 #include <Windows.h>
 
 #include "DebugNew.h"
@@ -47,7 +47,7 @@ struct FileEntry
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
 String basePath_;
-std::vector<FileEntry> entries_;
+Vector<FileEntry> entries_;
 unsigned checksum_ = 0;
 
 String ignoreExtensions_[] = {
@@ -57,52 +57,52 @@ String ignoreExtensions_[] = {
 };
 
 int main(int argc, char** argv);
-void Run(const std::vector<String>& arguments);
+void Run(const Vector<String>& arguments);
 void ProcessFile(const String& fileName, const String& rootDir);
 void WritePackageFile(const String& fileName, const String& rootDir);
 
 int main(int argc, char** argv)
 {
-    std::vector<String> arguments;
+    Vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(String(argv[i]));
+        arguments.Push(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<String>& arguments)
+void Run(const Vector<String>& arguments)
 {
-    if (arguments.size() < 2)
+    if (arguments.Size() < 2)
         ErrorExit("Usage: PackageTool <directory to process> <package name> [basepath]\n");
     
     const String& dirName = arguments[0];
     const String& packageName = arguments[1];
-    if (arguments.size() > 2)
+    if (arguments.Size() > 2)
         basePath_ = AddTrailingSlash(arguments[2]);
     
    // Get the file list recursively
-    std::vector<String> fileNames;
+    Vector<String> fileNames;
     fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
-    if (!fileNames.size())
+    if (!fileNames.Size())
         ErrorExit("No files found");
     
     // Check for extensions to ignore
-    for (unsigned i = fileNames.size() - 1; i < fileNames.size(); --i)
+    for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
     {
         String extension = GetExtension(fileNames[i]);
         for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
         {
             if (extension == ignoreExtensions_[j])
             {
-                fileNames.erase(fileNames.begin() + i);
+                fileNames.Erase(fileNames.Begin() + i);
                 break;
             }
         }
     }
     
-    for (unsigned i = 0; i < fileNames.size(); ++i)
+    for (unsigned i = 0; i < fileNames.Size(); ++i)
         ProcessFile(fileNames[i], dirName);
     
     WritePackageFile(packageName, dirName);
@@ -122,7 +122,7 @@ void ProcessFile(const String& fileName, const String& rootDir)
     newEntry.offset_ = 0; // Offset not yet known
     newEntry.size_ = file.GetSize();
     newEntry.checksum_ = 0; // Will be Calculated later
-    entries_.push_back(newEntry);
+    entries_.Push(newEntry);
 }
 
 void WritePackageFile(const String& fileName, const String& rootDir)
@@ -135,10 +135,10 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     
     // Write ID, number of files & placeholder for checksum
     dest.WriteID("UPAK");
-    dest.WriteUInt(entries_.size());
+    dest.WriteUInt(entries_.Size());
     dest.WriteUInt(checksum_);
     
-    for (unsigned i = 0; i < entries_.size(); ++i)
+    for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
         dest.WriteString(entries_[i].name_);
@@ -148,7 +148,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     }
     
     // Write file data, Calculate checksums & correct offsets
-    for (unsigned i = 0; i < entries_.size(); ++i)
+    for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         entries_[i].offset_ = dest.GetSize();
         String fileFullPath = GetNativePath(rootDir + "/" + entries_[i].name_);
@@ -172,10 +172,10 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     // Write header again with correct offsets & checksums
     dest.Seek(0);
     dest.WriteID("UPAK");
-    dest.WriteUInt(entries_.size());
+    dest.WriteUInt(entries_.Size());
     dest.WriteUInt(checksum_);
     
-    for (unsigned i = 0; i < entries_.size(); ++i)
+    for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         dest.WriteString(entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);

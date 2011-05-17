@@ -26,7 +26,7 @@
 #include "Matrix4x3.h"
 #include "Serializable.h"
 
-#include <vector>
+#include "Vector.h"
 
 class Component;
 class Connection;
@@ -198,11 +198,11 @@ public:
     /// Return number of child scene nodes
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return immediate child scene nodes
-    const std::vector<SharedPtr<Node> >& GetChildren() const { return children_; }
+    const Vector<SharedPtr<Node> >& GetChildren() const { return children_; }
     /// Return child scene nodes, optionally recursive
-    void GetChildren(std::vector<Node*>& dest, bool recursive = false) const;
+    void GetChildren(Vector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes with a specific component
-    void GetChildrenWithComponent(std::vector<Node*>& dest, ShortStringHash type, bool recursive = false) const;
+    void GetChildrenWithComponent(Vector<Node*>& dest, ShortStringHash type, bool recursive = false) const;
     /// Return child scene node by index
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name
@@ -210,11 +210,11 @@ public:
     /// Return child scene node by name hash
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
     /// Return number of components
-    unsigned GetNumComponents() const { return components_.size(); }
+    unsigned GetNumComponents() const { return components_.Size(); }
     /// Return all components
-    const std::vector<SharedPtr<Component> >& GetComponents() const { return components_; }
+    const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type
-    void GetComponents(std::vector<Component*>& dest, ShortStringHash type) const;
+    void GetComponents(Vector<Component*>& dest, ShortStringHash type) const;
     /// Return component by index
     Component* GetComponent(unsigned index) const;
     /// Return component by type. The optional index allows to specify which component, if there are several
@@ -222,15 +222,15 @@ public:
     /// Return whether has a specific component
     bool HasComponent(ShortStringHash type) const;
     /// Return listener components
-    const std::vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
+    const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
     /// Return user variables
     VariantMap& GetVars() { return vars_; }
     /// Template version of returning child nodes with a specific component
-    template <class T> void GetChildrenWithComponent(std::vector<Node*>& dest, bool recursive = false) const;
+    template <class T> void GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type
     template <class T> T* GetComponent(unsigned index = 0) const;
     /// Template version of returning all components of type
-    template <class T> void GetComponents(std::vector<T*>& dest) const;
+    template <class T> void GetComponents(Vector<T*>& dest) const;
     /// Template version of checking whether has a specific component
     template <class T> bool HasComponent() const;
     
@@ -258,11 +258,11 @@ private:
     /// Recalculate the world transform
     void UpdateWorldTransform();
     /// Remove child node by iterator
-    void RemoveChild(std::vector<SharedPtr<Node> >::iterator i);
+    void RemoveChild(Vector<SharedPtr<Node> >::Iterator i);
     /// Return child nodes recursively
-    void GetChildrenRecursive(std::vector<Node*>& dest) const;
+    void GetChildrenRecursive(Vector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively
-    void GetChildrenWithComponentRecursive(std::vector<Node*>& dest, ShortStringHash type) const;
+    void GetChildrenWithComponentRecursive(Vector<Node*>& dest, ShortStringHash type) const;
     
     /// Unique ID within the scene
     unsigned id_;
@@ -285,11 +285,11 @@ private:
     /// Name hash
     StringHash nameHash_;
     /// Child scene nodes
-    std::vector<SharedPtr<Node> > children_;
+    Vector<SharedPtr<Node> > children_;
     /// Components
-    std::vector<SharedPtr<Component> > components_;
+    Vector<SharedPtr<Component> > components_;
     /// Node listeners
-    std::vector<WeakPtr<Component> > listeners_;
+    Vector<WeakPtr<Component> > listeners_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
     /// World transform needs update flag
@@ -306,7 +306,7 @@ template <class T> T* Node::GetOrCreateComponent(bool local)
     return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), local));
 }
 
-template <class T> void Node::GetChildrenWithComponent(std::vector<Node*>& dest, bool recursive) const
+template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive) const
 {
     GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive);
 }
@@ -316,9 +316,9 @@ template <class T> T* Node::GetComponent(unsigned index) const
     return static_cast<T*>(GetComponent(T::GetTypeStatic(), index));
 }
 
-template <class T> void Node::GetComponents(std::vector<T*>& dest) const
+template <class T> void Node::GetComponents(Vector<T*>& dest) const
 {
-    GetComponents(reinterpret_cast<std::vector<Component*>&>(dest), T::GetTypeStatic());
+    GetComponents(reinterpret_cast<Vector<Component*>&>(dest), T::GetTypeStatic());
 }
 
 template <class T> bool Node::HasComponent() const

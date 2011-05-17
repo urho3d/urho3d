@@ -28,7 +28,7 @@
 #include "Frustum.h"
 #include "SharedPtr.h"
 
-#include <vector>
+#include "Vector.h"
 
 class BoundingBox;
 class Camera;
@@ -105,9 +105,9 @@ private:
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
     
     /// Lines rendered with depth test
-    std::vector<DebugLine> lines_;
+    Vector<DebugLine> lines_;
     /// Lines rendered without depth test
-    std::vector<DebugLine> noDepthLines_;
+    Vector<DebugLine> noDepthLines_;
     /// View transform
     Matrix4x3 view_;
     /// Projection transform

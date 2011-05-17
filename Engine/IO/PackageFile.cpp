@@ -86,14 +86,14 @@ bool PackageFile::Open(const String& fileName)
 
 bool PackageFile::Exists(const String& fileName) const
 {
-    return entries_.find(fileName.ToLower()) != entries_.end();
+    return entries_.Find(fileName.ToLower()) != entries_.End();
 }
 
 const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 {
-    std::map<String, PackageEntry>::const_iterator i = entries_.find(fileName.ToLower());
-    if (i == entries_.end())
+    Map<String, PackageEntry>::ConstIterator i = entries_.Find(fileName.ToLower());
+    if (i == entries_.End())
         return 0;
     
-    return &i->second;
+    return &i->second_;
 }

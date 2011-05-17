@@ -130,12 +130,12 @@ void Network::Update()
         Update(clientHost_);
     
     // Update peers and purge those that are disconnected
-    for (std::vector<SharedPtr<Peer> >::iterator i = peers_.begin(); i != peers_.end();)
+    for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End();)
     {
         (*i)->Update();
         
         if ((*i)->GetConnectionState() == CS_DISCONNECTED)
-            i = peers_.erase(i);
+            i = peers_.Erase(i);
         else
             ++i;
     }
@@ -192,7 +192,7 @@ Peer* Network::Connect(const String& address, unsigned short port)
     // Create a Peer instance for the server
     SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_SERVER));
     enetPeer->data = newPeer.GetPtr();
-    peers_.push_back(newPeer);
+    peers_.Push(newPeer);
     
     LOGINFO("Connecting to " + address + ":" + ToString(port));
     return newPeer;
@@ -238,7 +238,7 @@ void Network::StopServer()
     if (serverHost_)
     {
         // Disconnect all peers created through the server host
-        for (std::vector<SharedPtr<Peer> >::iterator i = peers_.begin(); i != peers_.end(); ++i)
+        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
         {
             if ((*i)->GetPeerType() == PEER_CLIENT)
                 (*i)->Disconnect();
@@ -248,7 +248,7 @@ void Network::StopServer()
         Update(serverHost_);
         
         // Then perform forcible disconnection
-        for (std::vector<SharedPtr<Peer> >::iterator i = peers_.begin(); i != peers_.end(); ++i)
+        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
         {
             if ((*i)->GetPeerType() == PEER_CLIENT)
                 (*i)->OnDisconnect();
@@ -266,7 +266,7 @@ void Network::StopClient()
     if (clientHost_)
     {
         // Disconnect all peers created through the client host
-        for (std::vector<SharedPtr<Peer> >::iterator i = peers_.begin(); i != peers_.end(); ++i)
+        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
         {
             if ((*i)->GetPeerType() == PEER_SERVER)
                 (*i)->Disconnect();
@@ -276,7 +276,7 @@ void Network::StopClient()
         Update(clientHost_);
         
         // Then perform forcible disconnection
-        for (std::vector<SharedPtr<Peer> >::iterator i = peers_.begin(); i != peers_.end(); ++i)
+        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
         {
             if ((*i)->GetPeerType() == PEER_SERVER)
                 (*i)->OnDisconnect();
@@ -291,13 +291,13 @@ void Network::StopClient()
 
 Peer* Network::GetPeer(unsigned index) const
 {
-    return index < peers_.size() ? peers_[index] : (Peer*)0;
+    return index < peers_.Size() ? peers_[index] : (Peer*)0;
 }
 
 Peer* Network::GetServerPeer() const
 {
     // Just return the first server peer
-    for (std::vector<SharedPtr<Peer> >::const_iterator i = peers_.begin(); i != peers_.end(); ++i)
+    for (Vector<SharedPtr<Peer> >::ConstIterator i = peers_.Begin(); i != peers_.End(); ++i)
     {
         if ((*i)->GetPeerType() == PEER_SERVER)
             return *i;
@@ -325,7 +325,7 @@ void Network::Update(ENetHost* enetHost)
                 // If no existing Peer instance (server operation), create one now
                 SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_CLIENT));
                 enetPeer->data = newPeer.GetPtr();
-                peers_.push_back(newPeer);
+                peers_.Push(newPeer);
                 newPeer->OnConnect();
             }
             else
@@ -339,7 +339,7 @@ void Network::Update(ENetHost* enetHost)
                 QueuedPacket newPacket;
                 newPacket.packet_ = enetEvent.packet;
                 newPacket.channel_ = enetEvent.channelID;
-                peer->packets_[enetEvent.channelID].push_back(newPacket);
+                peer->packets_[enetEvent.channelID].Push(newPacket);
             }
             else
                 enet_packet_destroy(enetEvent.packet);

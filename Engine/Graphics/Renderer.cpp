@@ -288,7 +288,7 @@ Renderer::Renderer(Context* context) :
     
     // Default to one of each shadow map resolution
     for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-        shadowMaps_[i].resize(1);
+        shadowMaps_[i].Resize(1);
     
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
@@ -300,12 +300,12 @@ Renderer::~Renderer()
 
 void Renderer::SetNumViewports(unsigned num)
 {
-    viewports_.resize(num);
+    viewports_.Resize(num);
 }
 
 void Renderer::SetViewport(unsigned index, const Viewport& viewport)
 {
-    if (index >= viewports_.size())
+    if (index >= viewports_.Size())
     {
         LOGERROR("Viewport index out of bounds");
         return;
@@ -395,7 +395,7 @@ void Renderer::SetReuseShadowMaps(bool enable)
     if (reuseShadowMaps_)
     {
         for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
-            shadowMaps_[i].resize(1);
+            shadowMaps_[i].Resize(1);
     }
     if (!CreateShadowMaps())
         drawShadows_ = false;
@@ -404,9 +404,9 @@ void Renderer::SetReuseShadowMaps(bool enable)
 
 void Renderer::SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter)
 {
-    shadowMaps_[0].resize(full ? full : 1);
-    shadowMaps_[1].resize(half ? half : 1);
-    shadowMaps_[2].resize(quarter ? quarter : 1);
+    shadowMaps_[0].Resize(full ? full : 1);
+    shadowMaps_[1].Resize(half ? half : 1);
+    shadowMaps_[2].Resize(quarter ? quarter : 1);
     if (!CreateShadowMaps())
         drawShadows_ = false;
 }
@@ -427,7 +427,7 @@ void Renderer::SetMaxOccluderTriangles(int triangles)
 void Renderer::SetOcclusionBufferSize(int size)
 {
     occlusionBufferSize_ = Max(size, 1);
-    occlusionBuffers_.clear();
+    occlusionBuffers_.Clear();
 }
 
 void Renderer::SetOccluderSizeThreshold(float screenSize)
@@ -437,7 +437,7 @@ void Renderer::SetOccluderSizeThreshold(float screenSize)
 
 const Viewport& Renderer::GetViewport(unsigned index) const
 {
-    return index < viewports_.size() ? viewports_[index] : noViewport;
+    return index < viewports_.Size() ? viewports_[index] : noViewport;
 }
 
 VertexShader* Renderer::GetVertexShader(const String& name, bool checkExists) const
@@ -470,7 +470,7 @@ unsigned Renderer::GetNumGeometries(bool allViews) const
     unsigned lastView = allViews ? numViews_ : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numGeometries += views_[i]->GetGeometries().size();
+        numGeometries += views_[i]->GetGeometries().Size();
     
     return numGeometries;
 }
@@ -481,7 +481,7 @@ unsigned Renderer::GetNumLights(bool allViews) const
     unsigned lastView = allViews ? numViews_ : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        nulights_ += views_[i]->GetLights().size();
+        nulights_ += views_[i]->GetLights().Size();
     
     return nulights_;
 }
@@ -493,9 +493,9 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
     
     for (unsigned i = 0; i < lastView; ++i)
     {
-        const std::vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
+        const Vector<LightBatchQueue>& lightQueues = views_[i]->GetLightQueues();
         
-        for (unsigned j = 0; j < lightQueues.size(); ++j)
+        for (unsigned j = 0; j < lightQueues.Size(); ++j)
         {
             Light* light = lightQueues[j].light_;
             if ((light) && (light->GetShadowMap()))
@@ -512,7 +512,7 @@ unsigned Renderer::GetNumOccluders(bool allViews) const
     unsigned lastView = allViews ? numViews_ : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numOccluders += views_[i]->GetOccluders().size();
+        numOccluders += views_[i]->GetOccluders().Size();
     
     return numOccluders;
 }
@@ -523,7 +523,7 @@ unsigned Renderer::GetNumShadowOccluders(bool allViews) const
     unsigned lastView = allViews ? numViews_ : 1;
     
     for (unsigned i = 0; i < lastView; ++i)
-        numShadowOccluders += views_[i]->GetShadowOccluders().size();
+        numShadowOccluders += views_[i]->GetShadowOccluders().Size();
     
     return numShadowOccluders;
 }
@@ -540,9 +540,9 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
     }
     int searchKey = (width << 12) | height;
     
-    std::map<int, SharedPtr<OcclusionBuffer> >::iterator i = occlusionBuffers_.find(searchKey);
-    if (i != occlusionBuffers_.end())
-        return i->second;
+    Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
+    if (i != occlusionBuffers_.End())
+        return i->second_;
     else
         return 0;
 }
@@ -565,7 +565,7 @@ void Renderer::Update(float timeStep)
     numShadowCameras_ = 0;
     numSplitLights_ = 0;
     numTempNodes_ = 0;
-    updateOctrees_.clear();
+    updateOctrees_.Clear();
     
     // Reload shaders if needed
     if (shadersDirty_)
@@ -573,7 +573,7 @@ void Renderer::Update(float timeStep)
     
     // Process all viewports. Use reverse order, because during rendering the order will be reversed again to handle auxiliary
     // view dependencies correctly
-    for (unsigned i = viewports_.size() - 1; i < viewports_.size(); --i)
+    for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
     {
         unsigned mainView = numViews_;
         Viewport& viewport = viewports_[i];
@@ -584,14 +584,14 @@ void Renderer::Update(float timeStep)
         // However, if the same scene is viewed from multiple cameras, update the octree only once
         Octree* octree = viewport.scene_->GetComponent<Octree>();
         DebugRenderer* debug = viewport.scene_->GetComponent<DebugRenderer>();
-        if (updateOctrees_.find(octree) == updateOctrees_.end())
+        if (updateOctrees_.Find(octree) == updateOctrees_.End())
         {
             frame_.camera_ = viewport.camera_;
             frame_.viewSize_ = IntVector2(viewport.rect_.right_ - viewport.rect_.left_, viewport.rect_.bottom_ - viewport.rect_.top_);
             if (frame_.viewSize_ == IntVector2::ZERO)
                 frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
             octree->Update(frame_);
-            updateOctrees_.insert(octree);
+            updateOctrees_.Insert(octree);
             
             // Set also the view for the debug graphics already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
@@ -652,8 +652,8 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     PROFILE(RendererDrawDebug);
     
     /// \todo Because debug geometry is per-scene, if two cameras show views of the same area, occlusion is not shown correctly
-    std::set<Drawable*> processedGeometries;
-    std::set<Light*> processedLights;
+    Set<Drawable*> processedGeometries;
+    Set<Light*> processedLights;
     
     for (unsigned i = 0; i < numViews_; ++i)
     {
@@ -671,23 +671,23 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         if (!debug)
             continue;
         
-        const std::vector<Drawable*>& geometries = view->GetGeometries();
-        const std::vector<Light*>& lights = view->GetLights();
+        const Vector<Drawable*>& geometries = view->GetGeometries();
+        const Vector<Light*>& lights = view->GetLights();
         
-        for (unsigned i = 0; i < geometries.size(); ++i)
+        for (unsigned i = 0; i < geometries.Size(); ++i)
         {
-            if (processedGeometries.find(geometries[i]) == processedGeometries.end())
+            if (processedGeometries.Find(geometries[i]) == processedGeometries.End())
             {
                 geometries[i]->DrawDebugGeometry(debug, depthTest);
-                processedGeometries.insert(geometries[i]);
+                processedGeometries.Insert(geometries[i]);
             }
         }
-        for (unsigned i = 0; i < lights.size(); ++i)
+        for (unsigned i = 0; i < lights.Size(); ++i)
         {
-            if (processedLights.find(lights[i]) == processedLights.end())
+            if (processedLights.Find(lights[i]) == processedLights.End())
             {
                 lights[i]->DrawDebugGeometry(debug, depthTest);
-                processedLights.insert(lights[i]);
+                processedLights.Insert(lights[i]);
             }
         }
     }
@@ -730,7 +730,7 @@ void Renderer::Initialize()
     if (!CreateShadowMaps())
         drawShadows_ = false;
     
-    viewports_.resize(1);
+    viewports_.Resize(1);
     ResetViews();
     
     LOGINFO("Initialized renderer");
@@ -739,7 +739,7 @@ void Renderer::Initialize()
 
 void Renderer::ResetViews()
 {
-    views_.clear();
+    views_.Clear();
     numViews_ = 0;
 }
 
@@ -755,8 +755,8 @@ bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
         }
     }
     
-    if (views_.size() <= numViews_)
-        views_.resize(numViews_ + 1);
+    if (views_.Size() <= numViews_)
+        views_.Resize(numViews_ + 1);
     if (!views_[numViews_])
         views_[numViews_] = new View(context_);
     
@@ -782,9 +782,9 @@ OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOcc
     int searchKey = (width << 12) | height;
     
     SharedPtr<OcclusionBuffer> buffer;
-    std::map<int, SharedPtr<OcclusionBuffer> >::iterator i = occlusionBuffers_.find(searchKey);
-    if (i != occlusionBuffers_.end())
-        buffer = i->second;
+    Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
+    if (i != occlusionBuffers_.End())
+        buffer = i->second_;
     else
     {
         buffer = new OcclusionBuffer(context_);
@@ -828,7 +828,7 @@ Texture2D* Renderer::GetShadowMap(float resolution)
         // If higher resolution shadow maps already used up, fall back to lower resolutions
         while (index < NUM_SHADOWMAP_RESOLUTIONS)
         {
-            if (shadowMapUseCount_[index] < shadowMaps_[index].size())
+            if (shadowMapUseCount_[index] < shadowMaps_[index].Size())
                 return shadowMaps_[index][shadowMapUseCount_[index]++];
             ++index;
         }
@@ -847,9 +847,9 @@ void Renderer::setBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     batch.pass_ = pass;
     
     // Check if shaders are unloaded or need reloading
-    std::vector<SharedPtr<VertexShader> >& vertexShaders = pass->GetVertexShaders();
-    std::vector<SharedPtr<PixelShader> >& pixelShaders = pass->GetPixelShaders();
-    if ((!vertexShaders.size()) || (!pixelShaders.size()) || (technique->GetShadersLoadedFrameNumber() !=
+    Vector<SharedPtr<VertexShader> >& vertexShaders = pass->GetVertexShaders();
+    Vector<SharedPtr<PixelShader> >& pixelShaders = pass->GetPixelShaders();
+    if ((!vertexShaders.Size()) || (!pixelShaders.Size()) || (technique->GetShadersLoadedFrameNumber() !=
         shadersChangedFrameNumber_))
     {
         // First release all previous shaders, then load
@@ -858,7 +858,7 @@ void Renderer::setBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
     
     // Make sure shaders are loaded now
-    if ((vertexShaders.size()) && (pixelShaders.size()))
+    if ((vertexShaders.Size()) && (pixelShaders.Size()))
     {
         //  Check whether is a forward lit pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
@@ -919,9 +919,9 @@ void Renderer::setBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     // Log error if shaders could not be assigned, but only once per technique
     if ((!batch.vertexShader_) || (!batch.pixelShader_))
     {
-        if (shaderErrorDisplayed_.find(technique) == shaderErrorDisplayed_.end())
+        if (shaderErrorDisplayed_.Find(technique) == shaderErrorDisplayed_.End())
         {
-            shaderErrorDisplayed_.insert(technique);
+            shaderErrorDisplayed_.Insert(technique);
             LOGERROR("Technique " + technique->GetName() + " has missing shaders");
         }
     }
@@ -997,15 +997,15 @@ void Renderer::LoadShaders()
     // Load inbuilt shaders
     stencilVS_ = GetVertexShader("Stencil");
     stencilPS_ = GetPixelShader("Stencil");
-    lightVS_.clear();
-    lightPS_.clear();
+    lightVS_.Clear();
+    lightPS_.Clear();
     
     RenderMode mode = graphics_->GetRenderMode();
     if (mode != RENDER_FORWARD)
     {
         // There are rather many light volume shader variations, so load them later on-demand
-        lightVS_.resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
-        lightPS_.resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+        lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
+        lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
         if (mode == RENDER_DEFERRED)
             lightShaderName_ = "Deferred/Light_";
         else
@@ -1053,12 +1053,12 @@ void Renderer::LoadMaterialShaders(Technique* technique)
 
 void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowShadows)
 {
-    std::map<PassType, Pass>::iterator i = technique->passes_.find(pass);
-    if (i == technique->passes_.end())
+    Map<PassType, Pass>::Iterator i = technique->passes_.Find(pass);
+    if (i == technique->passes_.End())
         return;
     
-    String vertexShaderName = i->second.GetVertexShaderName();
-    String pixelShaderName = i->second.GetPixelShaderName();
+    String vertexShaderName = i->second_.GetVertexShaderName();
+    String pixelShaderName = i->second_.GetPixelShaderName();
     
     // Check if the shader name is already a variation in itself
     if (vertexShaderName.Find('_') == String::NPOS)
@@ -1075,18 +1075,18 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
-    std::vector<SharedPtr<VertexShader> >& vertexShaders = i->second.GetVertexShaders();
-    std::vector<SharedPtr<PixelShader> >& pixelShaders = i->second.GetPixelShaders();
+    Vector<SharedPtr<VertexShader> >& vertexShaders = i->second_.GetVertexShaders();
+    Vector<SharedPtr<PixelShader> >& pixelShaders = i->second_.GetPixelShaders();
     
     // Forget all the old shaders
-    vertexShaders.clear();
-    pixelShaders.clear();
+    vertexShaders.Clear();
+    pixelShaders.Clear();
     
-    switch (i->first)
+    switch (i->first_)
     {
     default:
-        vertexShaders.resize(MAX_GEOMETRYTYPES);
-        pixelShaders.resize(1);
+        vertexShaders.Resize(MAX_GEOMETRYTYPES);
+        pixelShaders.Resize(1);
         for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             vertexShaders[j] = GetVertexShader(vertexShaderName + geometryVSVariations[j], j != 0);
         pixelShaders[0] = GetPixelShader(pixelShaderName);
@@ -1096,10 +1096,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     case PASS_LIGHT:
         {
             // In first light pass, load only directional light shaders
-            unsigned numPS = i->first == PASS_LIGHT ? MAX_LIGHT_PS_VARIATIONS : LPS_SPOT;
+            unsigned numPS = i->first_ == PASS_LIGHT ? MAX_LIGHT_PS_VARIATIONS : LPS_SPOT;
             
-            vertexShaders.resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
-            pixelShaders.resize(numPS);
+            vertexShaders.Resize(MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS);
+            pixelShaders.Resize(numPS);
             
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES * MAX_LIGHT_VS_VARIATIONS; ++j)
             {
@@ -1133,10 +1133,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
 
 void Renderer::ReleaseMaterialShaders()
 {
-    std::vector<Material*> materials;
+    Vector<Material*> materials;
     cache_->GetResources<Material>(materials);
     
-    for (unsigned i = 0; i < materials.size(); ++i)
+    for (unsigned i = 0; i < materials.Size(); ++i)
     {
         for (unsigned j = 0; j < materials[i]->GetNumTechniques(); ++j)
             materials[i]->ReleaseShaders();
@@ -1145,14 +1145,14 @@ void Renderer::ReleaseMaterialShaders()
 
 void Renderer::ReloadTextures()
 {
-    std::vector<Resource*> textures;
+    Vector<Resource*> textures;
     
     cache_->GetResources(textures, Texture2D::GetTypeStatic());
-    for (unsigned i = 0; i < textures.size(); ++i)
+    for (unsigned i = 0; i < textures.Size(); ++i)
         cache_->ReloadResource(textures[i]);
     
     cache_->GetResources(textures, TextureCube::GetTypeStatic());
-    for (unsigned i = 0; i < textures.size(); ++i)
+    for (unsigned i = 0; i < textures.Size(); ++i)
         cache_->ReloadResource(textures[i]);
 }
 
@@ -1256,7 +1256,7 @@ bool Renderer::CreateShadowMaps()
     {
         for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
         {
-            for (unsigned j = 0; j < shadowMaps_[i].size(); ++j)
+            for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
                 shadowMaps_[i][j].Reset();
         }
         return true;
@@ -1271,7 +1271,7 @@ bool Renderer::CreateShadowMaps()
         if (!colorShadowMaps_[i]->SetSize(size, size, dummyColorFormat, TEXTURE_RENDERTARGET))
             return false;
         
-        for (unsigned j = 0; j < shadowMaps_[i].size(); ++j)
+        for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
         {
             if (!shadowMaps_[i][j])
                 shadowMaps_[i][j] = new Texture2D(context_);
@@ -1290,8 +1290,8 @@ bool Renderer::CreateShadowMaps()
 
 Camera* Renderer::CreateShadowCamera()
 {
-    if (numShadowCameras_ >= shadowCameraStore_.size())
-        shadowCameraStore_.push_back(SharedPtr<Camera>(new Camera(context_)));
+    if (numShadowCameras_ >= shadowCameraStore_.Size())
+        shadowCameraStore_.Push(SharedPtr<Camera>(new Camera(context_)));
     Camera* camera = shadowCameraStore_[numShadowCameras_];
     camera->SetNode(CreateTempNode());
     
@@ -1301,8 +1301,8 @@ Camera* Renderer::CreateShadowCamera()
 
 Light* Renderer::CreateSplitLight(Light* original)
 {
-    if (numSplitLights_ >= splitLightStore_.size())
-        splitLightStore_.push_back(SharedPtr<Light>(new Light(context_)));
+    if (numSplitLights_ >= splitLightStore_.Size())
+        splitLightStore_.Push(SharedPtr<Light>(new Light(context_)));
     Light* light = splitLightStore_[numSplitLights_];
     light->SetNode(CreateTempNode());
     light->copyFrom(original);
@@ -1313,8 +1313,8 @@ Light* Renderer::CreateSplitLight(Light* original)
 
 Node* Renderer::CreateTempNode()
 {
-    if (numTempNodes_ >= tempNodeStore_.size())
-        tempNodeStore_.push_back(SharedPtr<Node>(new Node(context_)));
+    if (numTempNodes_ >= tempNodeStore_.Size())
+        tempNodeStore_.Push(SharedPtr<Node>(new Node(context_)));
     Node* node = tempNodeStore_[numTempNodes_];
     
     ++numTempNodes_;
@@ -1462,7 +1462,7 @@ void Renderer::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     {
         // When screen mode changes, reload shaders and purge old views and occlusion buffers
         shadersDirty_ = true;
-        occlusionBuffers_.clear();
+        occlusionBuffers_.Clear();
         ResetViews();
     }
 }

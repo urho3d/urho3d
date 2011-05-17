@@ -282,14 +282,14 @@ void ListView::InsertItem(unsigned index, UIElement* item)
     contentElement_->InsertChild(index, item);
     
     // If necessary, shift the following selections
-    std::set<unsigned> prevSelections;
-    selections_.clear();
-    for (std::set<unsigned>::iterator j = prevSelections.begin(); j != prevSelections.end(); ++j)
+    Set<unsigned> prevSelections;
+    selections_.Clear();
+    for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
     {
         if (*j >= index)
-            selections_.insert(*j + 1);
+            selections_.Insert(*j + 1);
         else
-            selections_.insert(*j);
+            selections_.Insert(*j);
     }
     UpdateSelectionEffect();
 }
@@ -303,7 +303,7 @@ void ListView::RemoveItem(UIElement* item)
         if (GetItem(i) == item)
         {
             item->SetSelected(false);
-            selections_.erase(i);
+            selections_.Erase(i);
             
             // Remove any child items in hierarchy mode
             unsigned removed = 1;
@@ -319,7 +319,7 @@ void ListView::RemoveItem(UIElement* item)
                     if (GetItemIndent(childItem) > baseIndent)
                     {
                         childItem->SetSelected(false);
-                        selections_.erase(j);
+                        selections_.Erase(j);
                         contentElement_->RemoveChild(childItem);
                         ++removed;
                     }
@@ -330,14 +330,14 @@ void ListView::RemoveItem(UIElement* item)
             }
             
             // If necessary, shift the following selections
-            std::set<unsigned> prevSelections;
-            selections_.clear();
-            for (std::set<unsigned>::iterator j = prevSelections.begin(); j != prevSelections.end(); ++j)
+            Set<unsigned> prevSelections;
+            selections_.Clear();
+            for (Set<unsigned>::Iterator j = prevSelections.Begin(); j != prevSelections.End(); ++j)
             {
                 if (*j > i)
-                    selections_.insert(*j - removed);
+                    selections_.Insert(*j - removed);
                 else
-                    selections_.insert(*j);
+                    selections_.Insert(*j);
             }
             UpdateSelectionEffect();
             break;
@@ -362,24 +362,24 @@ void ListView::RemoveAllItems()
 
 void ListView::SetSelection(unsigned index)
 {
-    std::set<unsigned> indices;
-    indices.insert(index);
+    Set<unsigned> indices;
+    indices.Insert(index);
     SetSelections(indices);
     EnsureItemVisibility(index);
 }
 
-void ListView::SetSelections(const std::set<unsigned>& indices)
+void ListView::SetSelections(const Set<unsigned>& indices)
 {
     unsigned numItems = GetNumItems();
     
     // Remove first items that should no longer be selected
-    for (std::set<unsigned>::iterator i = selections_.begin(); i != selections_.end();)
+    for (Set<unsigned>::Iterator i = selections_.Begin(); i != selections_.End();)
     {
         unsigned index = *i;
-        if (indices.find(index) == indices.end())
+        if (indices.Find(index) == indices.End())
         {
-            std::set<unsigned>::iterator current = i++;
-            selections_.erase(current);
+            Set<unsigned>::Iterator current = i++;
+            selections_.Erase(current);
             
             using namespace Iteselected_;
             
@@ -393,15 +393,15 @@ void ListView::SetSelections(const std::set<unsigned>& indices)
     }
     
     // Then add missing items
-    for (std::set<unsigned>::const_iterator i = indices.begin(); i != indices.end(); ++i)
+    for (Set<unsigned>::ConstIterator i = indices.Begin(); i != indices.End(); ++i)
     {
         unsigned index = *i;
         if (index < numItems)
         {
             // In singleselect mode, resend the event even for the same selection
-            if ((selections_.find(index) == selections_.end()) || (!multiselect_))
+            if ((selections_.Find(index) == selections_.End()) || (!multiselect_))
             {
-                selections_.insert(*i);
+                selections_.Insert(*i);
                 
                 using namespace Iteselected_;
                 
@@ -428,8 +428,8 @@ void ListView::AddSelection(unsigned index)
         if (index >= GetNumItems())
             return;
         
-        std::set<unsigned> newSelections = selections_;
-        newSelections.insert(index);
+        Set<unsigned> newSelections = selections_;
+        newSelections.Insert(index);
         SetSelections(newSelections);
         EnsureItemVisibility(index);
     }
@@ -440,8 +440,8 @@ void ListView::RemoveSelection(unsigned index)
     if (index >= GetNumItems())
         return;
     
-    std::set<unsigned> newSelections = selections_;
-    newSelections.erase(index);
+    Set<unsigned> newSelections = selections_;
+    newSelections.Erase(index);
     SetSelections(newSelections);
     EnsureItemVisibility(index);
 }
@@ -452,7 +452,7 @@ void ListView::ToggleSelection(unsigned index)
     if (index >= numItems)
         return;
     
-    if (selections_.find(index) != selections_.end())
+    if (selections_.Find(index) != selections_.End())
         RemoveSelection(index);
     else
         AddSelection(index);
@@ -460,13 +460,13 @@ void ListView::ToggleSelection(unsigned index)
 
 void ListView::ChangeSelection(int delta, bool additive)
 {
-    if (selections_.empty())
+    if (selections_.Empty())
         return;
     if (!multiselect_)
         additive = false;
     
     // If going downwards, use the last selection as a base. Otherwise use first
-    unsigned selection = delta > 0 ? *selections_.rbegin() : *selections_.begin();
+    unsigned selection = delta > 0 ? selections_.Back() : selections_.Front();
     unsigned numItems = GetNumItems();
     unsigned newSelection = selection;
     unsigned okSelection = selection;
@@ -503,7 +503,7 @@ void ListView::ChangeSelection(int delta, bool additive)
 
 void ListView::ClearSelection()
 {
-    SetSelections(std::set<unsigned>());
+    SetSelections(Set<unsigned>());
     UpdateSelectionEffect();
 }
 
@@ -562,7 +562,7 @@ void ListView::SetChildItemsVisible(bool enable)
             SetChildItemsVisible(i, enable);
     }
     
-    if (GetSelections().size() == 1)
+    if (GetSelections().Size() == 1)
         EnsureItemVisibility(GetSelection());
 }
 
@@ -606,17 +606,17 @@ UIElement* ListView::GetItem(unsigned index) const
     return contentElement_->GetChild(index);
 }
 
-std::vector<UIElement*> ListView::GetItems() const
+Vector<UIElement*> ListView::GetItems() const
 {
     return contentElement_->GetChildren();
 }
 
 unsigned ListView::GetSelection() const
 {
-    if (selections_.empty())
+    if (selections_.Empty())
         return M_MAX_UNSIGNED;
     else
-        return *selections_.begin();
+        return *selections_.Begin();
 }
 
 UIElement* ListView::GetSelectedItem() const
@@ -624,14 +624,14 @@ UIElement* ListView::GetSelectedItem() const
     return contentElement_->GetChild(GetSelection());
 }
 
-std::vector<UIElement*> ListView::GetSelectedItems() const
+Vector<UIElement*> ListView::GetSelectedItems() const
 {
-    std::vector<UIElement*> ret;
-    for (std::set<unsigned>::const_iterator i = selections_.begin(); i != selections_.end(); ++i)
+    Vector<UIElement*> ret;
+    for (Set<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);
         if (item)
-            ret.push_back(item);
+            ret.Push(item);
     }
     return ret;
 }
@@ -643,7 +643,7 @@ void ListView::UpdateSelectionEffect()
     for (unsigned i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
-        if ((highlightMode_ != HM_NEVER) && (selections_.find(i) != selections_.end()))
+        if ((highlightMode_ != HM_NEVER) && (selections_.Find(i) != selections_.End()))
             item->SetSelected((focus_) || (highlightMode_ == HM_ALWAYS));
         else
             item->SetSelected(false);
@@ -705,40 +705,40 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
             {
                 if (qualifiers & QUAL_SHIFT)
                 {
-                    if (selections_.empty())
+                    if (selections_.Empty())
                         SetSelection(i);
                     else
                     {
-                        unsigned first = *selections_.begin();
-                        unsigned last = *selections_.rbegin();
-                        std::set<unsigned> newSelections = selections_;
+                        unsigned first = selections_.Front();
+                        unsigned last = selections_.Back();
+                        Set<unsigned> newSelections = selections_;
                         if ((i == first) || (i == last))
                         {
                             for (unsigned j = first; j <= last; ++j)
-                                newSelections.insert(j);
+                                newSelections.Insert(j);
                         }
                         else if (i < first)
                         {
                             for (unsigned j = i; j <= first; ++j)
-                                newSelections.insert(j);
+                                newSelections.Insert(j);
                         }
                         else if (i < last)
                         {
                             if ((abs((int)i - (int)first)) <= (abs((int)i - (int)last)))
                             {
                                 for (unsigned j = first; j <= i; ++j)
-                                    newSelections.insert(j);
+                                    newSelections.Insert(j);
                             }
                             else
                             {
                                 for (unsigned j = i; j <= last; ++j)
-                                    newSelections.insert(j);
+                                    newSelections.Insert(j);
                             }
                         }
                         else if (i > last)
                         {
                             for (unsigned j = last; j <= i; ++j)
-                                newSelections.insert(j);
+                                newSelections.Insert(j);
                         }
                         SetSelections(newSelections);
                     }

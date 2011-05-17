@@ -75,7 +75,7 @@ void Peer::Send(const VectorBuffer& packet, unsigned char channel, bool reliable
         QueuedPacket packet;
         packet.packet_ = enetPacket;
         packet.channel_ = channel;
-        sentPackets_.push_back(packet);
+        sentPackets_.Push(packet);
     }
 }
 
@@ -100,7 +100,7 @@ void Peer::Send(const void* data, unsigned size, unsigned char channel, bool rel
         QueuedPacket packet;
         packet.packet_ = enetPacket;
         packet.channel_ = channel;
-        sentPackets_.push_back(packet);
+        sentPackets_.Push(packet);
     }
 }
 
@@ -111,14 +111,14 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
     
     if (channel == CHANNEL_ANY)
     {
-        for (std::map<unsigned char, std::vector<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
+        for (Map<unsigned char, Vector<QueuedPacket> >::Iterator i = packets_.Begin(); i != packets_.End(); ++i)
         {
-            std::vector<QueuedPacket>& packetList = i->second;
-            if ((!packetList.empty()) && (packetList.front().timer_.GetMSec(false) >= halfSimulatedLatency_))
+            Vector<QueuedPacket>& packetList = i->second_;
+            if ((!packetList.Empty()) && (packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_))
             {
-                ENetPacket* enetPacket = packetList.front().packet_;
+                ENetPacket* enetPacket = packetList.Front().packet_;
                 reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-                packetList.erase(packetList.begin());
+                packetList.Erase(packetList.Begin());
                 
                 packet.SetData(enetPacket->data, enetPacket->dataLength);
                 enet_packet_destroy(enetPacket);
@@ -129,12 +129,12 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
     }
     else
     {
-        std::vector<QueuedPacket>& packetList = packets_[channel];
-        if ((!packetList.empty()) && (packetList.front().timer_.GetMSec(false) >= halfSimulatedLatency_))
+        Vector<QueuedPacket>& packetList = packets_[channel];
+        if ((!packetList.Empty()) && (packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_))
         {
-            ENetPacket* enetPacket = packetList.front().packet_;
+            ENetPacket* enetPacket = packetList.Front().packet_;
             reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
-            packetList.erase(packetList.begin());
+            packetList.Erase(packetList.Begin());
             
             packet.SetData(enetPacket->data, enetPacket->dataLength);
             enet_packet_destroy(enetPacket);
@@ -157,12 +157,12 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
 void Peer::Update()
 {
     // Check send timer of packets with simulated latency and send as necessary
-    for (std::vector<QueuedPacket>::iterator i = sentPackets_.begin(); i != sentPackets_.end();)
+    for (Vector<QueuedPacket>::Iterator i = sentPackets_.Begin(); i != sentPackets_.End();)
     {
         if (i->timer_.GetMSec(false) >= halfSimulatedLatency_)
         {
             enet_peer_send(peer_, i->channel_, i->packet_);
-            i = sentPackets_.erase(i);
+            i = sentPackets_.Erase(i);
         }
         else
             ++i;
@@ -171,20 +171,20 @@ void Peer::Update()
 
 void Peer::FlushPackets()
 {
-    for (std::map<unsigned char, std::vector<QueuedPacket> >::iterator i = packets_.begin(); i != packets_.end(); ++i)
+    for (Map<unsigned char, Vector<QueuedPacket> >::Iterator i = packets_.Begin(); i != packets_.End(); ++i)
     {
-        std::vector<QueuedPacket>& packetList = i->second;
-        while (!packetList.empty())
+        Vector<QueuedPacket>& packetList = i->second_;
+        while (!packetList.Empty())
         {
-            ENetPacket* enetPacket = packetList.back().packet_;
-            packetList.pop_back();
+            ENetPacket* enetPacket = packetList.Back().packet_;
+            packetList.Pop();
             enet_packet_destroy(enetPacket);
         }
     }
-    while (!sentPackets_.empty())
+    while (!sentPackets_.Empty())
     {
-        ENetPacket* enetPacket = sentPackets_.back().packet_;
-        sentPackets_.pop_back();
+        ENetPacket* enetPacket = sentPackets_.Back().packet_;
+        sentPackets_.Pop();
         enet_packet_destroy(enetPacket);
     }
 }

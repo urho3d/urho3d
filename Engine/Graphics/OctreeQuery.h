@@ -28,7 +28,7 @@
 #include "Ray.h"
 #include "Sphere.h"
 
-#include <vector>
+#include "Vector.h"
 
 class OcclusionBuffer;
 class Drawable;
@@ -39,7 +39,7 @@ class OctreeQuery
 {
 public:
     /// Construct with result vector, include/exclude flags and whether to get only occluders or shadowcasters
-    OctreeQuery(std::vector<Drawable*>& result, unsigned char drawableFlags, bool occludersOnly, bool shadowCastersOnly) :
+    OctreeQuery(Vector<Drawable*>& result, unsigned char drawableFlags, bool occludersOnly, bool shadowCastersOnly) :
         result_(result),
         drawableFlags_(drawableFlags),
         occludersOnly_(occludersOnly),
@@ -58,7 +58,7 @@ public:
     virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const = 0;
     
     /// Result vector reference
-    std::vector<Drawable*>& result_;
+    Vector<Drawable*>& result_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
     /// Get occluders only flag
@@ -72,7 +72,7 @@ class PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters
-    PointOctreeQuery(std::vector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags, bool occludersOnly = false,
+    PointOctreeQuery(Vector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         point_(point)
@@ -93,7 +93,7 @@ class SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters
-    SphereOctreeQuery(std::vector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags, bool occludersOnly = false,
+    SphereOctreeQuery(Vector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         sphere_(sphere)
@@ -114,7 +114,7 @@ class BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters
-    BoxOctreeQuery(std::vector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags, bool occludersOnly = false,
+    BoxOctreeQuery(Vector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         box_(box)
@@ -135,7 +135,7 @@ class FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters
-    FrustumOctreeQuery(std::vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags, bool occludersOnly = false,
+    FrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         frustum_(frustum)
@@ -156,7 +156,7 @@ class OccludedFrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum, occlusion buffer pointer and query parameters
-    OccludedFrustumOctreeQuery(std::vector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
+    OccludedFrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
             unsigned char drawableFlags, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         frustum_(frustum),
@@ -208,7 +208,7 @@ class RayOctreeQuery
 {
 public:
     /// Construct with ray and query parameters
-    RayOctreeQuery(std::vector<RayQueryResult>& result, const Ray& ray, unsigned char drawableFlags, bool occludersOnly = false,
+    RayOctreeQuery(Vector<RayQueryResult>& result, const Ray& ray, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false, float maxDistance = M_INFINITY, RayQueryLevel level = RAY_TRIANGLE) :
         ray_(ray),
         result_(result),
@@ -223,7 +223,7 @@ public:
     /// Ray
     Ray ray_;
     /// Result vector reference
-    std::vector<RayQueryResult>& result_;
+    Vector<RayQueryResult>& result_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
     /// Get occluders only flag

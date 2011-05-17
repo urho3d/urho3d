@@ -173,10 +173,10 @@ bool Serializer::WriteShortStringHash(const ShortStringHash& value)
     return WriteUShort(value.GetValue());
 }
 
-bool Serializer::WriteBuffer(const std::vector<unsigned char>& value)
+bool Serializer::WriteBuffer(const Vector<unsigned char>& value)
 {
     bool success = true;
-    unsigned size = value.size();
+    unsigned size = value.Size();
     
     success &= WriteVLE(size);
     if (size)
@@ -196,10 +196,10 @@ bool Serializer::WriteResourceRef(const ResourceRef& value)
 bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 {
     bool success = true;
-    unsigned size = value.ids_.size() * sizeof(StringHash);
+    unsigned size = value.ids_.Size() * sizeof(StringHash);
     
     success &= WriteShortStringHash(value.type_);
-    success &= WriteVLE(value.ids_.size());
+    success &= WriteVLE(value.ids_.Size());
     if (size)
         success &= Write(&value.ids_[0], size) == size;
     return success;
@@ -275,8 +275,8 @@ bool Serializer::WriteVariantVector(const VariantVector& value)
 {
     bool success = true;
     
-    success &= WriteVLE(value.size());
-    for (VariantVector::const_iterator i = value.begin(); i != value.end(); ++i)
+    success &= WriteVLE(value.Size());
+    for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
         success &= WriteVariant(*i);
     return success;
 }
@@ -285,11 +285,11 @@ bool Serializer::WriteVariantMap(const VariantMap& value)
 {
     bool success = true;
     
-    success &= WriteVLE(value.size());
-    for (VariantMap::const_iterator i = value.begin(); i != value.end(); ++i)
+    success &= WriteVLE(value.Size());
+    for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        WriteShortStringHash(i->first);
-        WriteVariant(i->second);
+        WriteShortStringHash(i->first_);
+        WriteVariant(i->second_);
     }
     return success;
 }

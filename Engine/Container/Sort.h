@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "Iterator.h"
 #include "Swap.h"
 
 static const int QUICKSORT_THRESHOLD = 16;
@@ -30,12 +31,12 @@ static const int QUICKSORT_THRESHOLD = 16;
 // Based on http://warp.povusers.org/SortComparison/
 
 /// Perform insertion sort on an array
-template <class T> void InsertionSort(T* begin, T* end)
+template <class T> void InsertionSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
-    for (T* i = begin + 1; i < end; ++i)
+    for (RandomAccessIterator<T> i = begin + 1; i < end; ++i)
     {
         T temp = *i;
-        T* j = i;
+        RandomAccessIterator<T> j = i;
         while ((j > begin) && (temp < *(j - 1)))
         {
             *j = *(j - 1);
@@ -46,12 +47,12 @@ template <class T> void InsertionSort(T* begin, T* end)
 }
 
 /// Perform insertion sort on an array using a compare function
-template <class T> void InsertionSort(T* begin, T* end, bool (*compare)(const T&, const T&))
+template <class T, class U> void InsertionSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
-    for (T* i = begin + 1; i < end; ++i)
+    for (RandomAccessIterator<T> i = begin + 1; i < end; ++i)
     {
         T temp = *i;
-        T* j = i;
+        RandomAccessIterator<T> j = i;
         while ((j > begin) && (compare(temp, *(j - 1))))
         {
             *j = *(j - 1);
@@ -62,20 +63,20 @@ template <class T> void InsertionSort(T* begin, T* end, bool (*compare)(const T&
 }
 
 /// Perform quick sort initial pass on an array. Does not sort fully
-template <class T> void InitialQuickSort(T* begin, T* end)
+template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
-    while (begin + QUICKSORT_THRESHOLD < end)
+    while (end - begin > QUICKSORT_THRESHOLD)
     {
         // Choose the pivot by median
-        T* pivot = begin + ((end - begin) / 2);
+        RandomAccessIterator<T> pivot = begin + ((end - begin) / 2);
         if ((*begin < *pivot) && (*(end - 1) < *begin))
             pivot = begin;
         else if ((*(end - 1) < *pivot) && (*begin < *(end - 1)))
             pivot = end - 1;
         
         // Partition and sort recursively
-        T* i = begin - 1;
-        T* j = end;
+        RandomAccessIterator<T> i = begin - 1;
+        RandomAccessIterator<T> j = end;
         T pivotValue = *pivot;
         for (;;)
         {
@@ -93,20 +94,20 @@ template <class T> void InitialQuickSort(T* begin, T* end)
 }
 
 /// Perform quick sort initial pass on an array using a compare function. Does not sort fully
-template <class T> void InitialQuickSort(T* begin, T* end, bool (*compare)(const T&, const T&))
+template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
-    while (begin + QUICKSORT_THRESHOLD < end)
+    while (end - begin > QUICKSORT_THRESHOLD)
     {
         // Choose the pivot by median
-        T* pivot = begin + ((end - begin) / 2);
+        RandomAccessIterator<T> pivot = begin + ((end - begin) / 2);
         if ((compare(*begin, *pivot)) && (compare(*(end - 1), *begin)))
             pivot = begin;
         else if ((compare(*(end - 1), *pivot)) && (compare(*begin, *(end - 1))))
             pivot = end - 1;
         
         // Partition and sort recursively
-        T* i = begin - 1;
-        T* j = end;
+        RandomAccessIterator<T> i = begin - 1;
+        RandomAccessIterator<T> j = end;
         T pivotValue = *pivot;
         for (;;)
         {
@@ -118,20 +119,20 @@ template <class T> void InitialQuickSort(T* begin, T* end, bool (*compare)(const
                 break;
         }
         
-        InitialQuickSort(begin, j + 1);
+        InitialQuickSort(begin, j + 1, compare);
         begin = j + 1;
     }
 }
 
 /// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize
-template <class T> void Sort(T* begin, T* end)
+template <class T> void Sort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
     InitialQuickSort(begin, end);
     InsertionSort(begin, end);
 }
 
 /// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize, using a compare function
-template <class T> void Sort(T* begin, T* end, bool (*compare)(const T&, const T&))
+template <class T, class U> void Sort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
     InitialQuickSort(begin, end, compare);
     InsertionSort(begin, end, compare);

@@ -59,7 +59,7 @@ public:
     /// Set a buffer attribute
     bool SetBuffer(const String& name, const void* data, unsigned size);
     /// Set a buffer attribute
-    bool SetBuffer(const String& name, const std::vector<unsigned char>& value);
+    bool SetBuffer(const String& name, const Vector<unsigned char>& value);
     /// Set a Color attribute
     bool SetColor(const String& name, const Color& value);
     /// Set a float attribute
@@ -118,11 +118,11 @@ public:
     /// Return attribute, or empty if missing
     String GetAttribute(const String& name) const;
     /// Return names of all attributes
-    std::vector<String> GetAttributeNames() const;
+    Vector<String> GetAttributeNames() const;
     /// Return bool attribute, or false if missing
     bool GetBool(const String& name) const;
     /// Return buffer attribute, or empty if missing
-    std::vector<unsigned char> GetBuffer(const String& name) const;
+    Vector<unsigned char> GetBuffer(const String& name) const;
     /// Copy buffer attribute into a supplied buffer. Return false if not big enough
     bool GetBuffer(const String& name, void* dest, unsigned size) const;
     /// Return bounding box attribute, or empty if missing

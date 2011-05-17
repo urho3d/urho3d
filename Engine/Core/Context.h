@@ -26,9 +26,9 @@
 #include "Attribute.h"
 #include "Object.h"
 
-#include <map>
-#include <set>
-#include <vector>
+#include "Map.h"
+#include "Set.h"
+#include "Vector.h"
 
 /// Execution context within a process. Provides access to the subsystems, object factories and attributes, and event receivers
 class Context : public RefCounted
@@ -71,48 +71,48 @@ public:
     /// Begin event send
     void BeginSendEvent(Object* sender)
     {
-        senders_.push_back(sender);
+        senders_.Push(sender);
     }
     
     /// End event send. Clean up event receivers removed in the meanwhile
     void EndSendEvent()
     {
-        senders_.pop_back();
+        senders_.Pop();
     
         // Clean up dirtied event receiver groups when event handling finishes
-        if (senders_.empty())
+        if (senders_.Empty())
         {
-            if (!dirtySpecificReceivers_.empty())
+            if (!dirtySpecificReceivers_.Empty())
             {
-                for (std::set<std::pair<Object*, StringHash> >::iterator i = dirtySpecificReceivers_.begin();
-                    i != dirtySpecificReceivers_.end(); ++i)
+                for (Set<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
+                    i != dirtySpecificReceivers_.End(); ++i)
                 {
-                    std::vector<Object*>& receivers = specificReceivers_[*i];
-                    for (std::vector<Object*>::iterator j = receivers.begin(); j != receivers.end();)
+                    Vector<Object*>& receivers = specificReceivers_[*i];
+                    for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
-                            j = receivers.erase(j);
+                            j = receivers.Erase(j);
                         else
                             ++j;
                     }
                 }
-                dirtySpecificReceivers_.clear();
+                dirtySpecificReceivers_.Clear();
             }
             
-            if (!dirtyReceivers_.empty())
+            if (!dirtyReceivers_.Empty())
             {
-                for (std::set<StringHash>::iterator i = dirtyReceivers_.begin(); i != dirtyReceivers_.end(); ++i)
+                for (Set<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
                 {
-                    std::vector<Object*>& receivers = receivers_[*i];
-                    for (std::vector<Object*>::iterator j = receivers.begin(); j != receivers.end();)
+                    Vector<Object*>& receivers = receivers_[*i];
+                    for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
-                            j = receivers.erase(j);
+                            j = receivers.Erase(j);
                         else
                             ++j;
                     }
                 }
-                dirtyReceivers_.clear();
+                dirtyReceivers_.Clear();
             }
         }
     }
@@ -129,11 +129,11 @@ public:
     /// Return subsystem by type
     Object* GetSubsystem(ShortStringHash type) const;
     /// Return all subsystems
-    const std::map<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
+    const Map<ShortStringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
     /// Return all object factories
-    const std::map<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
+    const Map<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
     /// Return attributes for all object types
-    const std::map<ShortStringHash, std::vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
+    const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
     /// Return active event sender. Null outside event handling
     Object* GetSender() const;
     /// Return active event handler. Set by Object. Null outside event handling
@@ -144,44 +144,44 @@ public:
     template <class T> T* GetSubsystem() const;
     
     /// Return attribute descriptions for an object type, or null if none defined
-    const std::vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
+    const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
     {
-        std::map<ShortStringHash, std::vector<AttributeInfo> >::const_iterator i = attributes_.find(type);
-        return (i != attributes_.end()) ? &i->second : 0;
+        Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
+        return (i != attributes_.End()) ? &i->second_ : 0;
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist
-    std::vector<Object*>* GetReceivers(Object* sender, StringHash eventType)
+    Vector<Object*>* GetReceivers(Object* sender, StringHash eventType)
     {
-        std::map<std::pair<Object*, StringHash>, std::vector<Object*> >::iterator i = 
-            specificReceivers_.find(std::make_pair(sender, eventType));
-        return (i != specificReceivers_.end()) ? &i->second : 0;
+        Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator i = 
+            specificReceivers_.Find(MakePair(sender, eventType));
+        return (i != specificReceivers_.End()) ? &i->second_ : 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist
-    std::vector<Object*>* GetReceivers(StringHash eventType)
+    Vector<Object*>* GetReceivers(StringHash eventType)
     {
-        std::map<StringHash, std::vector<Object*> >::iterator i = receivers_.find(eventType);
-        return (i != receivers_.end()) ? &i->second : 0;
+        Map<StringHash, Vector<Object*> >::Iterator i = receivers_.Find(eventType);
+        return (i != receivers_.End()) ? &i->second_ : 0;
     }
     
 private:
     /// Object factories
-    std::map<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
+    Map<ShortStringHash, SharedPtr<ObjectFactory> > factories_;
     /// Subsystems
-    std::map<ShortStringHash, SharedPtr<Object> > subsystems_;
+    Map<ShortStringHash, SharedPtr<Object> > subsystems_;
     /// Attribute descriptions per object type
-    std::map<ShortStringHash, std::vector<AttributeInfo> > attributes_;
+    Map<ShortStringHash, Vector<AttributeInfo> > attributes_;
     /// Event receivers for non-specific events
-    std::map<StringHash, std::vector<Object*> > receivers_;
+    Map<StringHash, Vector<Object*> > receivers_;
     /// Event receivers for specific senders' events
-    std::map<std::pair<Object*, StringHash>, std::vector<Object*> > specificReceivers_;
+    Map<Pair<Object*, StringHash>, Vector<Object*> > specificReceivers_;
     /// Event sender stack
-    std::vector<Object*> senders_;
+    Vector<Object*> senders_;
     /// Event types that have had receivers removed during event handling
-    std::set<StringHash> dirtyReceivers_;
+    Set<StringHash> dirtyReceivers_;
     /// Event types for specific senders that have had receivers removed during event handling
-    std::set<std::pair<Object*, StringHash> > dirtySpecificReceivers_;
+    Set<Pair<Object*, StringHash> > dirtySpecificReceivers_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases
     WeakPtr<EventHandler> handler_;
 };

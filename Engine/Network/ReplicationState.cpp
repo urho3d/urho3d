@@ -34,16 +34,16 @@ VectorBuffer RevisionBuffer::emptyBaseRevision;
 void RevisionBuffer::PurgeOld(unsigned short frameNumber)
 {
     // Remove revisions which are older than last ack, but make sure at least 1 revision remains
-    if (!revisions_.size())
+    if (!revisions_.Size())
         return;
     
     unsigned eraseCount = 0;
-    for (std::vector<Revision>::iterator i = revisions_.begin(); (i != revisions_.end() - 1) &&
-        (revisions_.size() - eraseCount > 1); ++i)
+    for (Vector<Revision>::Iterator i = revisions_.Begin(); (i != revisions_.End() - 1) &&
+        (revisions_.Size() - eraseCount > 1); ++i)
     {
         // If oldest and second-oldest are both older than framenumber, or if the second-oldest is on the exact same frame,
         // can delete the oldest
-        std::vector<Revision>::iterator j = i + 1;
+        Vector<Revision>::Iterator j = i + 1;
         if ((j->frameNumber_ == frameNumber) || ((!CheckFrameNumber(i->frameNumber_, frameNumber)) &&
             (!CheckFrameNumber(j->frameNumber_, frameNumber))))
             eraseCount++;
@@ -53,7 +53,7 @@ void RevisionBuffer::PurgeOld(unsigned short frameNumber)
     
     if (eraseCount)
     {
-        revisions_.erase(revisions_.begin(), revisions_.begin() + eraseCount);
+        revisions_.Erase(revisions_.Begin(), revisions_.Begin() + eraseCount);
         
         // Move the data and datapointers
         unsigned delta = revisions_[0].offset_;
@@ -62,14 +62,14 @@ void RevisionBuffer::PurgeOld(unsigned short frameNumber)
         memmove(dest, src, GetSize() - delta);
         Resize(GetSize() - delta);
         
-        for (std::vector<Revision>::iterator i = revisions_.begin(); i != revisions_.end(); ++i)
+        for (Vector<Revision>::Iterator i = revisions_.Begin(); i != revisions_.End(); ++i)
             i->offset_ -= delta;
     }
 }
 
 bool RevisionBuffer::HasUnAcked(unsigned short frameNumber) const
 {
-    for (std::vector<Revision>::const_iterator i = revisions_.begin(); i != revisions_.end(); ++i)
+    for (Vector<Revision>::ConstIterator i = revisions_.Begin(); i != revisions_.End(); ++i)
     {
         if (CheckFrameNumber(i->frameNumber_, frameNumber, false))
             return true;
@@ -143,7 +143,7 @@ void NodeReplicationState::Removed(unsigned short frameNumber)
     
     // Clear property revisions & components in case this node gets recreated
     revisions_.Clear();
-    components_.clear();
+    components_.Clear();
 }
 
 void NodeReplicationState::Acked(unsigned short lastAck)
@@ -158,14 +158,14 @@ void NodeReplicationState::Acked(unsigned short lastAck)
     revisions_.PurgeOld(lastAck);
     
     // Ack each component and remove if necessary
-    for (std::map<ShortStringHash, ComponentReplicationState>::iterator j = components_.begin(); j != components_.end();)
+    for (Map<ShortStringHash, ComponentReplicationState>::Iterator j = components_.Begin(); j != components_.End();)
     {
-        std::map<ShortStringHash, ComponentReplicationState>::iterator component = j;
+        Map<ShortStringHash, ComponentReplicationState>::Iterator component = j;
         ++j;
         
-        component->second.Acked(lastAck);
-        if (component->second.CanRemove())
-            components_.erase(component);
+        component->second_.Acked(lastAck);
+        if (component->second_.CanRemove())
+            components_.Erase(component);
     }
 }
 
@@ -174,9 +174,9 @@ bool NodeReplicationState::HasUnAcked(unsigned short frameNumber) const
     if (revisions_.HasUnAcked(frameNumber))
         return true;
     
-    for (std::map<ShortStringHash, ComponentReplicationState>::const_iterator i = components_.begin(); i != components_.end(); ++i)
+    for (Map<ShortStringHash, ComponentReplicationState>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        if (i->second.revisions_.HasUnAcked(frameNumber))
+        if (i->second_.revisions_.HasUnAcked(frameNumber))
             return true;
     }
     
@@ -194,28 +194,28 @@ unsigned NodeReplicationState::GetRevisionCount() const
     // Return the highest of property revisions and component revisions
     int maxRevisions = revisions_.GetCount();
     
-    for (std::map<ShortStringHash, ComponentReplicationState>::const_iterator i = components_.begin(); i != components_.end(); ++i)
-        maxRevisions = Max((int)maxRevisions, (int)i->second.GetRevisionCount());
+    for (Map<ShortStringHash, ComponentReplicationState>::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+        maxRevisions = Max((int)maxRevisions, (int)i->second_.GetRevisionCount());
     
     return maxRevisions;
 }
 
 void SceneReplicationState::Clear()
 {
-    nodes_.clear();
+    nodes_.Clear();
 }
 
 void SceneReplicationState::Acked(unsigned short lastAck)
 {
     // Ack each node and remove if necessary
-    for (std::map<unsigned, NodeReplicationState>::iterator i = nodes_.begin(); i != nodes_.end();)
+    for (Map<unsigned, NodeReplicationState>::Iterator i = nodes_.Begin(); i != nodes_.End();)
     {
-        std::map<unsigned, NodeReplicationState>::iterator node = i;
+        Map<unsigned, NodeReplicationState>::Iterator node = i;
         ++i;
         
-        node->second.Acked(lastAck);
-        if (node->second.CanRemove())
-            nodes_.erase(node);
+        node->second_.Acked(lastAck);
+        if (node->second_.CanRemove())
+            nodes_.Erase(node);
     }
 }
 
@@ -224,8 +224,8 @@ unsigned SceneReplicationState::GetRevisionCount() const
     // Get the highest revision count of all nodes;
     int maxRevisions = 0;
     
-    for (std::map<unsigned, NodeReplicationState>::const_iterator i = nodes_.begin(); i != nodes_.end(); ++i)
-        maxRevisions = Max((int)maxRevisions, (int)i->second.GetRevisionCount());
+    for (Map<unsigned, NodeReplicationState>::ConstIterator i = nodes_.Begin(); i != nodes_.End(); ++i)
+        maxRevisions = Max((int)maxRevisions, (int)i->second_.GetRevisionCount());
     
     return maxRevisions;
 }

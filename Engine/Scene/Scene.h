@@ -127,11 +127,11 @@ public:
     /// Return source file checksum
     unsigned GetChecksum() const { return checksum_; }
     /// Return required package files
-    const std::vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
+    const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return all nodes
-    const std::map<unsigned, Node*>& GetAllNodes() const { return allNodes_; }
+    const Map<unsigned, Node*>& GetAllNodes() const { return allNodes_; }
     /// Return all components
-    const std::map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
+    const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
     
     /// Get free node ID, either non-local or local
     unsigned GetFreeunsigned(bool local);
@@ -157,9 +157,9 @@ private:
     void FinishLoading(Deserializer* source);
     
     /// Map of scene nodes by ID
-    std::map<unsigned, Node*> allNodes_;
+    Map<unsigned, Node*> allNodes_;
     /// Map of components by ID
-    std::map<unsigned, Component*> allComponents_;
+    Map<unsigned, Component*> allComponents_;
     /// Networking mode
     NetworkMode networkMode_;
     /// Asynchronous loading progress
@@ -167,7 +167,7 @@ private:
     /// Source file name
     String fileName_;
     /// Required package files for multiplayer
-    std::vector<SharedPtr<PackageFile> > requiredPackageFiles_;
+    Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Next free non-local node ID
     unsigned nonLocalNodeID_;
     /// Next free local node ID

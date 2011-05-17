@@ -81,7 +81,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
     // Reserve extra memory in case 3D clipping is not exact
     fullBuffer_ = new int[width * (height + 2)];
     buffer_ = fullBuffer_.GetPtr() + 1 * width;
-    mipBuffers_.clear();
+    mipBuffers_.Clear();
     
     // Build buffers for mip levels
     for (;;)
@@ -89,14 +89,14 @@ bool OcclusionBuffer::SetSize(int width, int height)
         width = (width + 1) / 2;
         height = (height + 1) / 2;
         
-        mipBuffers_.push_back(SharedArrayPtr<DepthValue>(new DepthValue[width * height]));
+        mipBuffers_.Push(SharedArrayPtr<DepthValue>(new DepthValue[width * height]));
         
         if ((width <= OCCLUSION_MIN_SIZE) && (height <= OCCLUSION_MIN_SIZE))
             break;
     }
     
     LOGINFO("Set occlusion buffer size " + ToString(width_) + "x" + ToString(height_) + " with " + 
-        ToString(mipBuffers_.size()) + " mip levels");
+        ToString(mipBuffers_.Size()) + " mip levels");
     
     CalculateViewport();
     return true;
@@ -216,7 +216,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
     // Build the first mip level from the pixel-level data
     int width = (width_ + 1) / 2;
     int height = (height_ + 1) / 2;
-    if (mipBuffers_.size())
+    if (mipBuffers_.Size())
     {
         for (int y = 0; y < height; ++y)
         {
@@ -256,7 +256,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
     }
     
     // Build the rest of the mip levels
-    for (unsigned i = 1; i < mipBuffers_.size(); ++i)
+    for (unsigned i = 1; i < mipBuffers_.Size(); ++i)
     {
         int prevWidth = width;
         int prevHeight = height;
@@ -382,7 +382,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (!depthHierarchyDirty_)
     {
         // Start from lowest mip level and check if a conclusive result can be found
-        for (int i = mipBuffers_.size() - 1; i >= 0; --i)
+        for (int i = mipBuffers_.Size() - 1; i >= 0; --i)
         {
             int shift = i + 1;
             int width = width_ >> shift;

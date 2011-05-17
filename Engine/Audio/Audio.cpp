@@ -190,7 +190,7 @@ void Audio::Update(float timeStep)
     MutexLock Lock(audioMutex_);
     
     // Update in reverse order, because sound sources might remove themselves
-    for (unsigned i = soundSources_.size() - 1; i < soundSources_.size(); --i)
+    for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)
         soundSources_[i]->Update(timeStep);
 }
 
@@ -263,7 +263,7 @@ void Audio::SetListenerTransform(const Vector3& position, const Quaternion& rota
 
 void Audio::StopSound(Sound* soundClip)
 {
-    for (std::vector<SoundSource*>::iterator i = soundSources_.begin(); i != soundSources_.end(); ++i)
+    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
         if ((*i)->GetSound() == soundClip)
             (*i)->Stop();
@@ -287,18 +287,18 @@ void Audio::AddSoundSource(SoundSource* channel)
 {
     MutexLock Lock(audioMutex_);
     
-    soundSources_.push_back(channel);
+    soundSources_.Push(channel);
 }
 
 void Audio::RemoveSoundSource(SoundSource* channel)
 {
     MutexLock Lock(audioMutex_);
     
-    for (std::vector<SoundSource*>::iterator i = soundSources_.begin(); i != soundSources_.end(); ++i)
+    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
         if (*i == channel)
         {
-            soundSources_.erase(i);
+            soundSources_.Erase(i);
             return;
         }
     }
@@ -399,7 +399,7 @@ void Audio::MixOutput(void *dest, unsigned bytes)
     int* clipPtr = clipBuffer_.GetPtr();
     
     // Mix samples to clip buffer
-    for (std::vector<SoundSource*>::iterator i = soundSources_.begin(); i != soundSources_.end(); ++i)
+    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         (*i)->Mix(clipPtr, mixSamples, mixRate_, stereo_, interpolate_);
     
     // Copy output from clip buffer to destination

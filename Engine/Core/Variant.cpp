@@ -31,7 +31,7 @@
 
 const Variant Variant::EMPTY;
 const String Variant::emptyString;
-const std::vector<unsigned char> Variant::emptyBuffer;
+const Vector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
@@ -68,7 +68,7 @@ Variant& Variant::operator = (const Variant& rhs)
         break;
         
     case VAR_BUFFER:
-        *(reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_)) = *(reinterpret_cast<const std::vector<unsigned char>*>(rhs.value_.ptr_));
+        *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_)) = *(reinterpret_cast<const Vector<unsigned char>*>(rhs.value_.ptr_));
         break;
     
     case VAR_RESOURCEREF:
@@ -130,7 +130,7 @@ bool Variant::operator == (const Variant& rhs) const
         return *(reinterpret_cast<const String*>(value_.ptr_)) == *(reinterpret_cast<const String*>(rhs.value_.ptr_));
         
     case VAR_BUFFER:
-        return *(reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_)) == *(reinterpret_cast<const std::vector<unsigned char>*>(rhs.value_.ptr_));
+        return *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_)) == *(reinterpret_cast<const Vector<unsigned char>*>(rhs.value_.ptr_));
         
     case VAR_PTR:
         return value_.ptr_ == rhs.value_.ptr_;
@@ -178,10 +178,10 @@ void Variant::FromString(const String& type, const String& value)
     else if (typeLower == "buffer")
     {
         SetType(VAR_BUFFER);
-        std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_));
-        std::vector<String> values = Split(value, ' ');
-        buffer.resize(values.size());
-        for (unsigned i = 0; i < values.size(); ++i)
+        Vector<unsigned char>& buffer = *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_));
+        Vector<String> values = Split(value, ' ');
+        buffer.Resize(values.Size());
+        for (unsigned i = 0; i < values.Size(); ++i)
             buffer[i] = ToInt(values[i]);
     }
     else if (typeLower == "pointer")
@@ -190,8 +190,8 @@ void Variant::FromString(const String& type, const String& value)
     }
     else if (typeLower == "objectref")
     {
-        std::vector<String> values = Split(value, ';');
-        if (values.size() == 2)
+        Vector<String> values = Split(value, ';');
+        if (values.Size() == 2)
         {
             SetType(VAR_RESOURCEREF);
             ResourceRef& ref = *(reinterpret_cast<ResourceRef*>(value_.ptr_));
@@ -201,14 +201,14 @@ void Variant::FromString(const String& type, const String& value)
     }
     else if (typeLower == "objectreflist")
     {
-        std::vector<String> values = Split(value, ';');
-        if (values.size() >= 1)
+        Vector<String> values = Split(value, ';');
+        if (values.Size() >= 1)
         {
             SetType(VAR_RESOURCEREFLIST);
             ResourceRefList& refList = *(reinterpret_cast<ResourceRefList*>(value_.ptr_));
             refList.type_ = ShortStringHash(values[0]);
-            refList.ids_.resize(values.size() - 1);
-            for (unsigned i = 1; i < values.size(); ++i)
+            refList.ids_.Resize(values.Size() - 1);
+            for (unsigned i = 1; i < values.Size(); ++i)
                 refList.ids_[i - 1] = StringHash(values[i]);
         }
     }
@@ -222,8 +222,8 @@ void Variant::SetBuffer(const void* data, unsigned size)
         size = 0;
     
     SetType(VAR_BUFFER);
-    std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_));
-    buffer.resize(size);
+    Vector<unsigned char>& buffer = *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_));
+    buffer.Resize(size);
     if (size)
         memcpy(&buffer[0], data, size);
 }
@@ -266,11 +266,11 @@ String Variant::ToString() const
         
     case VAR_BUFFER:
         {
-            const std::vector<unsigned char>& buffer = *(reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_));
+            const Vector<unsigned char>& buffer = *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_));
             String ret;
-            for (std::vector<unsigned char>::const_iterator i = buffer.begin(); i != buffer.end(); ++i)
+            for (Vector<unsigned char>::ConstIterator i = buffer.Begin(); i != buffer.End(); ++i)
             {
-                if (i != buffer.begin())
+                if (i != buffer.Begin())
                     ret += " ";
                 ret += ::ToString(*i);
             }
@@ -305,7 +305,7 @@ void Variant::SetType(VariantType newType)
         break;
         
     case VAR_BUFFER:
-        delete reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_);
+        delete reinterpret_cast<Vector<unsigned char>*>(value_.ptr_);
         break;
         
     case VAR_RESOURCEREF:
@@ -334,7 +334,7 @@ void Variant::SetType(VariantType newType)
         break;
         
     case VAR_BUFFER:
-        *reinterpret_cast<std::vector<unsigned char>**>(&value_.ptr_) = new std::vector<unsigned char>();
+        *reinterpret_cast<Vector<unsigned char>**>(&value_.ptr_) = new Vector<unsigned char>();
         break;
         
     case VAR_RESOURCEREF:
@@ -415,7 +415,7 @@ template<> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
-template<> const std::vector<unsigned char>& Variant::Get<const std::vector<unsigned char>& >() const
+template<> const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>& >() const
 {
     return GetBuffer();
 }
@@ -475,7 +475,7 @@ template<> String Variant::Get<String>() const
     return GetString();
 }
 
-template<> std::vector<unsigned char> Variant::Get<std::vector<unsigned char> >() const
+template<> Vector<unsigned char> Variant::Get<Vector<unsigned char> >() const
 {
     return GetBuffer();
 }

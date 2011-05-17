@@ -53,7 +53,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", animations_, std::vector<unsigned char>());
+    ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", animations_, Vector<unsigned char>());
 }
 
 
@@ -64,8 +64,8 @@ void AnimationController::OnSetAttribute(const AttributeInfo& attr, const Varian
     case offsetof(AnimationController, animations_):
         {
             MemoryBuffer buf(value.GetBuffer());
-            animations_.resize(buf.ReadVLE());
-            for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end(); ++i)
+            animations_.Resize(buf.ReadVLE());
+            for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
             {
                 i->hash_ = buf.ReadStringHash();
                 i->speed_ = buf.ReadFloat();
@@ -89,8 +89,8 @@ Variant AnimationController::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(AnimationController, animations_):
         {
             VectorBuffer buf;
-            buf.WriteVLE(animations_.size());
-            for (std::vector<AnimationControl>::const_iterator i = animations_.begin(); i != animations_.end(); ++i)
+            buf.WriteVLE(animations_.Size());
+            for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
             {
                 buf.WriteStringHash(i->hash_);
                 buf.WriteFloat(i->speed_);
@@ -115,7 +115,7 @@ void AnimationController::Update(float timeStep)
     PROFILE(UpdateAnimationController);
     
     // Loop through animations
-    for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end();)
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
     {
         bool remove = false;
         AnimationState* state = model->GetAnimationState(i->hash_);
@@ -158,7 +158,7 @@ void AnimationController::Update(float timeStep)
         {
             if (state)
                 model->RemoveAnimationState(state);
-            i = animations_.erase(i);
+            i = animations_.Erase(i);
         }
         else
             ++i;
@@ -189,8 +189,8 @@ bool AnimationController::Play(const String& name, int layer, bool looped, float
         AnimationControl newControl;
         Animation* animation = state->GetAnimation();
         newControl.hash_ = animation->GetNameHash();
-        animations_.push_back(newControl);
-        index = animations_.size() - 1;
+        animations_.Push(newControl);
+        index = animations_.Size() - 1;
     }
     
     state->SetLayer(layer);
@@ -225,7 +225,7 @@ bool AnimationController::Stop(const String& name, float fadeOutTime)
     if (fadeOutTime <= 0.0f)
     {
         if (index != M_MAX_UNSIGNED)
-            animations_.erase(animations_.begin() + index);
+            animations_.Erase(animations_.Begin() + index);
         if (state)
             model->RemoveAnimationState(state);
     }
@@ -247,7 +247,7 @@ void AnimationController::StopLayer(int layer, float fadeOutTime)
     if (!model)
         return;
     
-    for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end();)
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
     {
         AnimationState* state = model->GetAnimationState(i->hash_);
         bool remove = false;
@@ -269,7 +269,7 @@ void AnimationController::StopLayer(int layer, float fadeOutTime)
         }
         
         if (remove)
-            i = animations_.erase(i);
+            i = animations_.Erase(i);
         else
             ++i;
     }
@@ -281,7 +281,7 @@ void AnimationController::StopAll(float fadeOutTime)
     if (!model)
         return;
     
-    for (std::vector<AnimationControl>::iterator i = animations_.begin(); i != animations_.end();)
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
     {
         bool remove = false;
         
@@ -299,7 +299,7 @@ void AnimationController::StopAll(float fadeOutTime)
         }
     
         if (remove)
-            i = animations_.erase(i);
+            i = animations_.Erase(i);
         else
             ++i;
     }
@@ -329,7 +329,7 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
     AnimatedModel* model = GetComponent<AnimatedModel>();
     int layer = state->GetLayer();
     
-    for (unsigned i = 0; i < animations_.size(); ++i)
+    for (unsigned i = 0; i < animations_.Size(); ++i)
     {
         if (i != index)
         {
@@ -567,7 +567,7 @@ void AnimationController::FindAnimation(const String& name, unsigned& index, Ani
     
     // Find the internal control structure
     index = M_MAX_UNSIGNED;
-    for (unsigned i = 0; i < animations_.size(); ++i)
+    for (unsigned i = 0; i < animations_.Size(); ++i)
     {
         if (animations_[i].hash_ == nameHash)
         {

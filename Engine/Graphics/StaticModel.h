@@ -69,7 +69,7 @@ public:
     /// Return model's bounding box
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return number of geometries
-    unsigned GetNumGeometries() const { return geometries_.size(); }
+    unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return material by geometry index
     Material* GetMaterial(unsigned index) const;
     /// Return software LOD level
@@ -94,11 +94,11 @@ protected:
     /// Bounding box
     BoundingBox boundingBox_;
     /// Geometries
-    std::vector<std::vector<SharedPtr<Geometry> > > geometries_;
+    Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// LOD levels
-    std::vector<unsigned> lodLevels_;
+    Vector<unsigned> lodLevels_;
     /// Materials
-    std::vector<SharedPtr<Material> > materials_;
+    Vector<SharedPtr<Material> > materials_;
     /// Software LOD level, used in raycast and occlusion
     unsigned softwareLodLevel_;
     

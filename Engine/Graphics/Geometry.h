@@ -58,11 +58,11 @@ public:
     void Draw(Graphics* graphics);
     
     /// Return all vertex buffers
-    const std::vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
     /// Return vertex element masks
-    const std::vector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
+    const Vector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
     /// Return number of vertex buffers
-    unsigned GetNumVertexBuffers() const { return vertexBuffer_.size(); }
+    unsigned GetNumVertexBuffers() const { return vertexBuffer_.Size(); }
     /// Return vertex buffer by index
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return vertex element mask by index
@@ -95,9 +95,9 @@ private:
     void GetPositionBufferIndex();
     
     /// Vertex buffers
-    std::vector<SharedPtr<VertexBuffer> > vertexBuffer_;
+    Vector<SharedPtr<VertexBuffer> > vertexBuffer_;
     /// Vertex element masks
-    std::vector<unsigned> elementMasks_;
+    Vector<unsigned> elementMasks_;
     /// Index buffer
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Primitive type

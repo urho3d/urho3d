@@ -27,7 +27,7 @@
 #include "PhysicsDefs.h"
 #include "Vector3.h"
 
-#include <set>
+#include "Set.h"
 
 class CollisionShape;
 class DebugRenderer;
@@ -82,7 +82,7 @@ struct PhysicsCollisionInfo
     /// New collision flag
     bool newCollision_;
     /// Contacts
-    std::vector<PhysicsContactInfo> contacts_;
+    Vector<PhysicsContactInfo> contacts_;
 };
 
 static const float PHYSICS_MIN_TIMESTEP = 0.001f;
@@ -131,7 +131,7 @@ public:
     /// Set simulation step time accumulator
     void SetTimeAccumulator(float time);
     /// Perform a physics world raycast
-    void Raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
+    void Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
     
     /// Return ODE world ID
@@ -179,9 +179,9 @@ public:
     /// Clean up the geometry cache
     void CleanupGeometryCache();
     /// Return the triangle mesh cache
-    std::map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
+    Map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
     /// Return the heightfield cache
-    std::map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
+    Map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
     
 protected:
     /// Handle node being assigned
@@ -214,19 +214,19 @@ private:
     /// Simulation random seed
     unsigned randomSeed_;
     /// Rigid bodies
-    std::vector<RigidBody*> rigidBodies_;
-    /// Collision contacts (std::vector<dContact>)
+    Vector<RigidBody*> rigidBodies_;
+    /// Collision contacts (Vector<dContact>)
     void* contacts_;
     /// Collision pairs on this frame
-    std::set<std::pair<RigidBody*, RigidBody*> > currentCollisions_;
+    Set<Pair<RigidBody*, RigidBody*> > currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new"
-    std::set<std::pair<RigidBody*, RigidBody*> > previousCollisions_;
+    Set<Pair<RigidBody*, RigidBody*> > previousCollisions_;
     /// Collision infos to be sent as events
-    std::vector<PhysicsCollisionInfo> collisionInfos_;
+    Vector<PhysicsCollisionInfo> collisionInfos_;
     /// Cache for triangle mesh geometries
-    std::map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
+    Map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
     /// Cache for heightfield geometries
-    std::map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
+    Map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
 };
 
 /// Register Physics library objects

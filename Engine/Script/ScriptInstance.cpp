@@ -82,8 +82,8 @@ void ScriptInstance::RegisterObject(Context* context)
     ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true);
     ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", fixedUpdateFps_, 0);
     ATTRIBUTE_MODE(ScriptInstance, VAR_FLOAT, "Time Accumulator", fixedUpdateAcc_, 0.0f, AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, std::vector<unsigned char>(), AM_SERIALIZATION);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, std::vector<unsigned char>, std::vector<unsigned char>());
+    ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, Vector<unsigned char>(), AM_SERIALIZATION);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, Vector<unsigned char>, Vector<unsigned char>());
 }
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -112,8 +112,8 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& va
     case offsetof(ScriptInstance, delayedMethodCalls_):
         {
             MemoryBuffer buf(value.GetBuffer());
-            delayedMethodCalls_.resize(buf.ReadVLE());
-            for (std::vector<DelayedMethodCall>::iterator i = delayedMethodCalls_.begin(); i != delayedMethodCalls_.end(); ++i)
+            delayedMethodCalls_.Resize(buf.ReadVLE());
+            for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
             {
                 i->delay_ = buf.ReadFloat();
                 i->declaration_ = buf.ReadString();
@@ -138,8 +138,8 @@ Variant ScriptInstance::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(ScriptInstance, delayedMethodCalls_):
         {
             VectorBuffer buf;
-            buf.WriteVLE(delayedMethodCalls_.size());
-            for (std::vector<DelayedMethodCall>::const_iterator i = delayedMethodCalls_.begin(); i != delayedMethodCalls_.end(); ++i)
+            buf.WriteVLE(delayedMethodCalls_.Size());
+            for (Vector<DelayedMethodCall>::ConstIterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
             {
                 buf.WriteFloat(i->delay_);
                 buf.WriteString(i->declaration_);
@@ -240,7 +240,7 @@ void ScriptInstance::DelayedExecute(float delay, const String& declaration, cons
     call.delay_ = Max(delay, 0.0f);
     call.declaration_ = declaration;
     call.parameters_ = parameters;
-    delayedMethodCalls_.push_back(call);
+    delayedMethodCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
     if ((!methods_[METHOD_UPDATE]) && (!HasSubscribedToEvent(E_SCENEUPDATE)))
@@ -253,7 +253,7 @@ void ScriptInstance::DelayedExecute(float delay, const String& declaration, cons
 
 void ScriptInstance::ClearDelayedExecute()
 {
-    delayedMethodCalls_.clear();
+    delayedMethodCalls_.Clear();
 }
 
 void ScriptInstance::AddEventHandler(StringHash eventType, const String& handlerName)
@@ -335,7 +335,7 @@ void ScriptInstance::ReleaseObject()
         scriptObject_->Release();
         scriptObject_ = 0;
         
-        script_->GetObjectMap().erase((void*)scriptObject_);
+        script_->GetObjectMap().Erase((void*)scriptObject_);
     }
 }
 
@@ -344,7 +344,7 @@ void ScriptInstance::ClearMethods()
     for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
         methods_[i] = 0;
     
-    delayedMethodCalls_.clear();
+    delayedMethodCalls_.Clear();
 }
 
 void ScriptInstance::GetSupportedMethods()
@@ -376,27 +376,27 @@ void ScriptInstance::GetSupportedMethods()
     }
 }
 
-std::vector<unsigned char> ScriptInstance::GetScriptData() const
+Vector<unsigned char> ScriptInstance::GetScriptData() const
 {
     if ((!scriptObject_) || (!methods_[METHOD_SAVE]))
-        return std::vector<unsigned char>();
+        return Vector<unsigned char>();
     else
     {
         VectorBuffer buf;
         VariantVector parameters;
-        parameters.push_back(Variant((void*)static_cast<Serializer*>(&buf)));
+        parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
         scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
         return buf.GetBuffer();
     }
 }
 
-void ScriptInstance::SetScriptData(std::vector<unsigned char> data)
+void ScriptInstance::SetScriptData(Vector<unsigned char> data)
 {
     if ((scriptObject_) && (methods_[METHOD_LOAD]))
     {
         MemoryBuffer buf(data);
         VariantVector parameters;
-        parameters.push_back(Variant((void*)static_cast<Deserializer*>(&buf)));
+        parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
         scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
     }
 }
@@ -411,13 +411,13 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     
     // Execute delayed method calls
-    for (std::vector<DelayedMethodCall>::iterator i = delayedMethodCalls_.begin(); i != delayedMethodCalls_.end();)
+    for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End();)
     {
         i->delay_ -= timeStep;
         if (i->delay_ <= 0.0f)
         {
             Execute(i->declaration_, i->parameters_);
-            i = delayedMethodCalls_.erase(i);
+            i = delayedMethodCalls_.Erase(i);
         }
         else
             ++i;
@@ -426,7 +426,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
     if (methods_[METHOD_UPDATE])
     {
         VariantVector parameters;
-        parameters.push_back(timeStep);
+        parameters.Push(timeStep);
         scriptFile_->Execute(scriptObject_, methods_[METHOD_UPDATE], parameters);
     }
 }
@@ -439,7 +439,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     using namespace ScenePostUpdate;
     
     VariantVector parameters;
-    parameters.push_back(eventData[P_TIMESTEP]);
+    parameters.Push(eventData[P_TIMESTEP]);
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
 }
 
@@ -453,7 +453,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     if (!fixedUpdateFps_)
     {
         VariantVector parameters;
-        parameters.push_back(eventData[P_TIMESTEP]);
+        parameters.Push(eventData[P_TIMESTEP]);
         scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
     }
     else
@@ -464,7 +464,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
         {
             fixedUpdateAcc_ = fmodf(fixedUpdateAcc_, fixedUpdateInterval_);
             VariantVector parameters;
-            parameters.push_back(fixedUpdateInterval_);
+            parameters.Push(fixedUpdateInterval_);
             scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDUPDATE], parameters);
         }
     }
@@ -480,7 +480,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
     if (!fixedUpdateFps_)
     {
         VariantVector parameters;
-        parameters.push_back(eventData[P_TIMESTEP]);
+        parameters.Push(eventData[P_TIMESTEP]);
         scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
     }
     else
@@ -491,7 +491,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
         {
             fixedPostUpdateAcc_ = fmodf(fixedPostUpdateAcc_, fixedUpdateInterval_);
             VariantVector parameters;
-            parameters.push_back(fixedUpdateInterval_);
+            parameters.Push(fixedUpdateInterval_);
             scriptFile_->Execute(scriptObject_, methods_[METHOD_FIXEDPOSTUPDATE], parameters);
         }
     }
@@ -507,8 +507,8 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
     VariantVector parameters;
     if (method->GetParamCount() > 0)
     {
-        parameters.push_back(Variant((void*)&eventType));
-        parameters.push_back(Variant((void*)&eventData));
+        parameters.Push(Variant((void*)&eventType));
+        parameters.Push(Variant((void*)&eventData));
     }
     
     scriptFile_->Execute(scriptObject_, method, parameters);
@@ -523,10 +523,10 @@ ScriptInstance* GetScriptContextInstance()
 {
     asIScriptContext* context = asGetActiveContext();
     void* object = context->GetThisPointer();
-    std::map<void*, ScriptInstance*>& objectMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetObjectMap();
-    std::map<void*, ScriptInstance*>::const_iterator i = objectMap.find(object);
-    if (i != objectMap.end())
-        return i->second;
+    Map<void*, ScriptInstance*>& objectMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetObjectMap();
+    Map<void*, ScriptInstance*>::ConstIterator i = objectMap.Find(object);
+    if (i != objectMap.End())
+        return i->second_;
     else
         return 0;
 }

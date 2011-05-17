@@ -75,7 +75,7 @@ void StaticModel::OnSetAttribute(const AttributeInfo& attr, const Variant& value
     case offsetof(StaticModel, materials_):
         {
             const ResourceRefList& refs = value.GetResourceRefList();
-            for (unsigned i = 0; i < refs.ids_.size(); ++i)
+            for (unsigned i = 0; i < refs.ids_.Size(); ++i)
                 SetMaterial(i, cache->GetResource<Material>(refs.ids_[i]));
         }
         break;
@@ -119,7 +119,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
             result.drawable_ = this;
             result.node_ = GetNode();
             result.distance_ = initialDistance;
-            query.result_.push_back(result);
+            query.result_.Push(result);
         }
         break;
         
@@ -134,7 +134,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                 result.drawable_ = this;
                 result.node_ = GetNode();
                 result.distance_ = distance;
-                query.result_.push_back(result);
+                query.result_.Push(result);
             }
         }
         break;
@@ -148,14 +148,14 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
             if (distance < query.maxDistance_)
             {
                 // Then the actual test using triangle geometry
-                for (unsigned i = 0; i < geometries_.size(); ++i)
+                for (unsigned i = 0; i < geometries_.Size(); ++i)
                 {
                     unsigned lodLevel;
                     // Check whether to use same LOD as visible, or a specific LOD
                     if (softwareLodLevel_ == M_MAX_UNSIGNED)
                         lodLevel = lodLevels_[i];
                     else
-                        lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].size());
+                        lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
                     
                     Geometry* geom = geometries_[i][lodLevel];
                     if (geom)
@@ -167,7 +167,7 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
                             result.drawable_ = this;
                             result.node_ = GetNode();
                             result.distance_ = distance;
-                            query.result_.push_back(result);
+                            query.result_.Push(result);
                             break;
                         }
                     }
@@ -186,7 +186,7 @@ void StaticModel::UpdateGeometry(const FrameInfo& frame)
 
 unsigned StaticModel::GetNumBatches()
 {
-    return geometries_.size();
+    return geometries_.Size();
 }
 
 void StaticModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch)
@@ -200,14 +200,14 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 {
     bool success = true;
     
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned lodLevel;
         // Check whether to use same LOD as visible, or a specific LOD
         if (softwareLodLevel_ == M_MAX_UNSIGNED)
             lodLevel = lodLevels_[i];
         else
-            lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].size());
+            lodLevel = Clamp(softwareLodLevel_, 0, geometries_[i].Size());
         
         Geometry* geom = geometries_[i][lodLevel];
         if (!geom)
@@ -266,8 +266,8 @@ void StaticModel::SetModel(Model* model)
     
     // Copy the subgeometry & LOD level structure
     SetNumGeometries(model->GetNumGeometries());
-    const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
-    for (unsigned i = 0; i < geometries.size(); ++i)
+    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    for (unsigned i = 0; i < geometries.Size(); ++i)
         geometries_[i] = geometries[i];
     
     SetBoundingBox(model->GetBoundingBox());
@@ -276,13 +276,13 @@ void StaticModel::SetModel(Model* model)
 
 void StaticModel::SetMaterial(Material* material)
 {
-    for (unsigned i = 0; i < materials_.size(); ++i)
+    for (unsigned i = 0; i < materials_.Size(); ++i)
         materials_[i] = material;
 }
 
 bool StaticModel::SetMaterial(unsigned index, Material* material)
 {
-    if (index >= materials_.size())
+    if (index >= materials_.Size())
     {
         LOGERROR("Material index out of bounds");
         return false;
@@ -299,7 +299,7 @@ void StaticModel::SetSoftwareLodLevel(unsigned level)
 
 Material* StaticModel::GetMaterial(unsigned index) const
 {
-    return index < materials_.size() ? materials_[index] : (Material*)0;
+    return index < materials_.Size() ? materials_[index] : (Material*)0;
 }
 
 void StaticModel::SetBoundingBox(const BoundingBox& box)
@@ -310,8 +310,8 @@ void StaticModel::SetBoundingBox(const BoundingBox& box)
 
 void StaticModel::SetNumGeometries(unsigned num)
 {
-    geometries_.resize(num);
-    materials_.resize(num);
+    geometries_.Resize(num);
+    materials_.Resize(num);
     ResetLodLevels();
 }
 
@@ -323,11 +323,11 @@ void StaticModel::OnWorldBoundingBoxUpdate()
 void StaticModel::ResetLodLevels()
 {
     // Ensure that each subgeometry has at least one LOD level, and reset the current LOD level
-    lodLevels_.resize(geometries_.size());
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    lodLevels_.Resize(geometries_.Size());
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
-        if (!geometries_[i].size())
-            geometries_[i].resize(1);
+        if (!geometries_[i].Size())
+            geometries_[i].Resize(1);
         lodLevels_[i] = 0;
     }
     
@@ -337,10 +337,10 @@ void StaticModel::ResetLodLevels()
 
 void StaticModel::CalculateLodLevels()
 {
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         unsigned j;
-        for (j = 1; j < geometries_[i].size(); ++j)
+        for (j = 1; j < geometries_[i].Size(); ++j)
         {
             if ((geometries_[i][j]) && (lodDistance_ <= geometries_[i][j]->GetLodDistance()))
                 break;

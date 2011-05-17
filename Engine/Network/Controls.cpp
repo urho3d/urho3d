@@ -38,5 +38,5 @@ void Controls::Reset()
     buttons_ = 0;
     yaw_ = 0.0f;
     pitch_ = 0.0f;
-    extraData_.clear();
+    extraData_.Clear();
 }

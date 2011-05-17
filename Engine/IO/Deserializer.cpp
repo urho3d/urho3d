@@ -261,13 +261,13 @@ ShortStringHash Deserializer::ReadShortStringHash()
     return ret;
 }
 
-std::vector<unsigned char> Deserializer::ReadBuffer()
+Vector<unsigned char> Deserializer::ReadBuffer()
 {
-    std::vector<unsigned char> ret;
+    Vector<unsigned char> ret;
     
-    ret.resize(ReadVLE());
-    if (ret.size())
-        Read(&ret[0], ret.size());
+    ret.Resize(ReadVLE());
+    if (ret.Size())
+        Read(&ret[0], ret.Size());
     return ret;
 }
 
@@ -285,9 +285,9 @@ ResourceRefList Deserializer::ReadResourceRefList()
     ResourceRefList ret;
     
     ret.type_ = ReadShortStringHash();
-    ret.ids_.resize(ReadVLE());
-    if (ret.ids_.size())
-        Read(&ret.ids_[0], ret.ids_.size() * sizeof(StringHash));
+    ret.ids_.Resize(ReadVLE());
+    if (ret.ids_.Size())
+        Read(&ret.ids_[0], ret.ids_.Size() * sizeof(StringHash));
     return ret;
 }
 
@@ -356,7 +356,7 @@ VariantVector Deserializer::ReadVariantVector()
     VariantVector ret;
     
     unsigned num = ReadVLE();
-    ret.resize(num);
+    ret.Resize(num);
     for (unsigned i = 0; i < num; ++i)
         ret[i] = ReadVariant();
     

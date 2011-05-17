@@ -25,7 +25,7 @@
 
 #include "ScrollView.h"
 
-#include <set>
+#include "Set.h"
 
 /// ListView selection highlight mode
 enum HighlightMode
@@ -79,7 +79,7 @@ public:
     /// Set selection
     void SetSelection(unsigned index);
     /// Set multiple selected items. If multiselect disabled, sets only the first
-    void SetSelections(const std::set<unsigned>& indices);
+    void SetSelections(const Set<unsigned>& indices);
     /// Add item to the selection, multiselect mode only
     void AddSelection(unsigned index);
     /// Remove item from the selection
@@ -112,15 +112,15 @@ public:
     /// Return item at index
     UIElement* GetItem(unsigned index) const;
     /// Return all items
-    std::vector<UIElement*> GetItems() const;
+    Vector<UIElement*> GetItems() const;
     /// Return first selected index, or M_MAX_UNSIGNED if none selected
     unsigned GetSelection() const;
     /// Return all selected indices
-    std::set<unsigned> GetSelections() const { return selections_; }
+    Set<unsigned> GetSelections() const { return selections_; }
     /// Return first selected item, or null if none selected
     UIElement* GetSelectedItem() const;
     /// Return all selected items
-    std::vector<UIElement*> GetSelectedItems() const;
+    Vector<UIElement*> GetSelectedItems() const;
     /// Return highlight mode
     HighlightMode GetHighlightMode() const { return highlightMode_; }
     /// Return whether multiselect enabled
@@ -139,7 +139,7 @@ protected:
     void EnsureItemVisibility(unsigned index);
     
     /// Current selection
-    std::set<unsigned> selections_;
+    Set<unsigned> selections_;
     /// Highlight mode
     HighlightMode highlightMode_;
     /// Multiselect flag

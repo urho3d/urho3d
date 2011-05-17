@@ -30,7 +30,7 @@
 #include "Thread.h"
 #include "SharedArrayPtr.h"
 
-#include <vector>
+#include "Vector.h"
 
 class AudioImpl;
 class Sound;
@@ -93,7 +93,7 @@ public:
     /// Return listener rotation
     const Quaternion& GetListenerRotation() const { return listenerRotation_; }
     /// Return all sound sources
-    const std::vector<SoundSource*>& GetSoundSources() const { return soundSources_; }
+    const Vector<SoundSource*>& GetSoundSources() const { return soundSources_; }
     
     /// Add a sound source to keep track of. Called by SoundSource
     void AddSoundSource(SoundSource* soundSource);
@@ -146,7 +146,7 @@ private:
     /// Master gain by sound source type
     float masterGain_[MAX_SOUND_TYPES];
     /// Sound sources
-    std::vector<SoundSource*> soundSources_;
+    Vector<SoundSource*> soundSources_;
     /// Listener position
     Vector3 listenerPosition_;
     /// Listener rotation

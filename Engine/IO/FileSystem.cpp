@@ -29,6 +29,7 @@
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
 
+#include <cstdio>
 #include <direct.h>
 #include <process.h>
 #include <Windows.h>
@@ -88,7 +89,7 @@ bool FileSystem::CreateDir(const String& pathName)
 
 int FileSystem::SystemCommand(const String& commandLine)
 {
-    if (allowedPaths_.empty())
+    if (allowedPaths_.Empty())
         return system(commandLine.CString());
     else
     {
@@ -97,17 +98,17 @@ int FileSystem::SystemCommand(const String& commandLine)
     }
 }
 
-int FileSystem::SystemRun(const String& fileName, const std::vector<String>& arguments)
+int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
 {
-    if (allowedPaths_.empty())
+    if (allowedPaths_.Empty())
     {
         String fixedFileName = GetNativePath(fileName, true);
         
-        std::vector<const char*> argPtrs;
-        argPtrs.push_back(fixedFileName.CString());
-        for (unsigned i = 0; i < arguments.size(); ++i)
-            argPtrs.push_back(arguments[i].CString());
-        argPtrs.push_back(0);
+        Vector<const char*> argPtrs;
+        argPtrs.Push(fixedFileName.CString());
+        for (unsigned i = 0; i < arguments.Size(); ++i)
+            argPtrs.Push(arguments[i].CString());
+        argPtrs.Push(0);
         
         return _spawnv(_P_WAIT, fixedFileName.CString(), &argPtrs[0]);
     }
@@ -120,7 +121,7 @@ int FileSystem::SystemRun(const String& fileName, const std::vector<String>& arg
 
 bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
-    if (allowedPaths_.empty())
+    if (allowedPaths_.Empty())
     {
         if ((!FileExists(fileName)) && (!DirExists(fileName)))
         {
@@ -208,7 +209,7 @@ bool FileSystem::CheckAccess(const String& pathName)
     String fixedPath = AddTrailingSlash(pathName);
     
     // If no allowed directories defined, succeed always
-    if (allowedPaths_.empty())
+    if (allowedPaths_.Empty())
         return true;
     
     // If there is any attempt to go to a parent directory, disallow
@@ -216,7 +217,7 @@ bool FileSystem::CheckAccess(const String& pathName)
         return false;
     
     // Check if the path is a partial match of any of the allowed directories
-    for (std::set<String>::const_iterator i = allowedPaths_.begin(); i != allowedPaths_.end(); ++i)
+    for (Set<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
         if (fixedPath.Find(*i) == 0)
             return true;
@@ -252,9 +253,9 @@ bool FileSystem::DirExists(const String& pathName)
     return true;
 }
 
-void FileSystem::ScanDir(std::vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive)
+void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive)
 {
-    result.clear();
+    result.Clear();
     
     if (CheckAccess(pathName))
     {
@@ -292,10 +293,10 @@ void FileSystem::RegisterPath(const String& pathName)
     if (pathName.Empty())
         return;
     
-    allowedPaths_.insert(AddTrailingSlash(pathName));
+    allowedPaths_.Insert(AddTrailingSlash(pathName));
 }
 
-void FileSystem::ScanDirInternal(std::vector<String>& result, String path, const String& startPath,
+void FileSystem::ScanDirInternal(Vector<String>& result, String path, const String& startPath,
     const String& filter, unsigned flags, bool recursive)
 {
     path = AddTrailingSlash(path);
@@ -318,12 +319,12 @@ void FileSystem::ScanDirInternal(std::vector<String>& result, String path, const
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
                     if (flags & SCAN_DIRS)
-                        result.push_back(deltaPath + fileName);
+                        result.Push(deltaPath + fileName);
                     if ((recursive) && (fileName != ".") && (fileName != ".."))
                         ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)
-                    result.push_back(deltaPath + fileName);
+                    result.Push(deltaPath + fileName);
             }
         } 
         while (FindNextFile(handle, &info));

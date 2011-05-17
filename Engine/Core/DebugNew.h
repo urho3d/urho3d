@@ -27,6 +27,10 @@
 
 #define _CRTDBG_MAP_ALLOC
 
+#ifdef _malloca
+#undef _malloca
+#endif
+
 #include <crtdbg.h>
 
 #define _DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)

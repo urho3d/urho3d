@@ -99,9 +99,9 @@ public:
     /// Return current script nesting level
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
     /// Return script module to script file map
-    std::map<asIScriptModule*, ScriptFile*>& GetModuleMap() { return moduleMap_; }
+    Map<asIScriptModule*, ScriptFile*>& GetModuleMap() { return moduleMap_; }
     /// Return script object to script instance map
-    std::map<void*, ScriptInstance*>& GetObjectMap() { return objectMap_; }
+    Map<void*, ScriptInstance*>& GetObjectMap() { return objectMap_; }
     
 private:
     /// Output a sanitated row of script API
@@ -116,13 +116,13 @@ private:
     /// Immediate execution scene
     WeakPtr<Scene> defaultScene_;
     /// Script function/method execution contexts
-    std::vector<asIScriptContext*> scriptFileContexts_;
+    Vector<asIScriptContext*> scriptFileContexts_;
     /// Map of script modules to script files
-    std::map<asIScriptModule*, ScriptFile*> moduleMap_;
+    Map<asIScriptModule*, ScriptFile*> moduleMap_;
     /// Map of script objects to script instance components
-    std::map<void*, ScriptInstance*> objectMap_;
+    Map<void*, ScriptInstance*> objectMap_;
     /// Search cache for inbuilt object types (constant declaration)
-    std::map<const char*, asIObjectType*> objectTypes_;
+    Map<const char*, asIObjectType*> objectTypes_;
     /// Script engine logging mode
     ScriptLogMode logMode_;
     /// Retained mode log messages

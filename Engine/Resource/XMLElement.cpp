@@ -142,12 +142,12 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     return SetAttribute(name, dataStr);
 }
 
-bool XMLElement::SetBuffer(const String& name, const std::vector<unsigned char>& value)
+bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
 {
-    if (!value.size())
+    if (!value.Size())
         return SetAttribute(name, String());
     else
-        return SetBuffer(name, &value[0], value.size());
+        return SetBuffer(name, &value[0], value.Size());
 }
 
 bool XMLElement::SetColor(const String& name, const Color& value)
@@ -237,7 +237,7 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
     
     String str(context->GetTypeName(value.type_));
-    for (unsigned i = 0; i < value.ids_.size(); ++i)
+    for (unsigned i = 0; i < value.ids_.Size(); ++i)
     {
         str += ";";
         str += cache->GetResourceName(value.ids_[i]);
@@ -253,7 +253,7 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
     if (!RemoveChildElements("variant"))
         return false;
     
-    for (VariantVector::const_iterator i = value.begin(); i != value.end(); ++i)
+    for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
         XMLElement variantElem = CreateChildElement("variant");
         if (!variantElem)
@@ -269,13 +269,13 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
     if (!RemoveChildElements("variant"))
         return false;
     
-    for (VariantMap::const_iterator i = value.begin(); i != value.end(); ++i)
+    for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
         XMLElement variantElem = CreateChildElement("variant");
         if (!variantElem)
             return false;
-        variantElem.SetInt("hash", i->first.GetValue());
-        variantElem.SetVariant(i->second);
+        variantElem.SetInt("hash", i->first_.GetValue());
+        variantElem.SetVariant(i->second_);
     }
     
     return true;
@@ -402,16 +402,16 @@ String XMLElement::GetAttribute(const String& name) const
     }
 }
 
-std::vector<String> XMLElement::GetAttributeNames() const
+Vector<String> XMLElement::GetAttributeNames() const
 {
-    std::vector<String> ret;
+    Vector<String> ret;
     
     if ((file_) && (element_))
     {
         const TiXmlAttribute* attribute = element_->FirstAttribute();
         while (attribute)
         {
-            ret.push_back(String(attribute->Name()));
+            ret.Push(String(attribute->Name()));
             attribute = attribute->Next();
         }
     }
@@ -434,26 +434,26 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-std::vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
-    std::vector<unsigned char> ret;
-    std::vector<String> bytes = Split(GetAttribute(name), ' ');
+    Vector<unsigned char> ret;
+    Vector<String> bytes = Split(GetAttribute(name), ' ');
     
-    ret.resize(bytes.size());
-    for (unsigned i = 0; i < bytes.size(); ++i)
+    ret.Resize(bytes.Size());
+    for (unsigned i = 0; i < bytes.Size(); ++i)
         ret[i] = ToInt(bytes[i]);
     return ret;
 }
 
 bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
 {
-    std::vector<unsigned char> ret;
-    std::vector<String> bytes = Split(GetAttribute(name), ' ');
+    Vector<unsigned char> ret;
+    Vector<String> bytes = Split(GetAttribute(name), ' ');
     unsigned char* destBytes = (unsigned char*)dest;
-    if (size < bytes.size())
+    if (size < bytes.Size())
         return false;
     
-    for (unsigned i = 0; i < bytes.size(); ++i)
+    for (unsigned i = 0; i < bytes.Size(); ++i)
         destBytes[i] = ToInt(bytes[i]);
     return true;
 }
@@ -531,8 +531,8 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
     
-    std::vector<String> values = Split(GetAttribute("value"), ';');
-    if (values.size() == 2)
+    Vector<String> values = Split(GetAttribute("value"), ';');
+    if (values.Size() == 2)
     {
         ret.type_ = ShortStringHash(values[0]);
         ret.id_ = StringHash(values[1]);
@@ -545,12 +545,12 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    std::vector<String> values = Split(GetAttribute("value"), ';');
-    if (values.size() >= 1)
+    Vector<String> values = Split(GetAttribute("value"), ';');
+    if (values.Size() >= 1)
     {
         ret.type_ = ShortStringHash(values[0]);
-        ret.ids_.resize(values.size() - 1);
-        for (unsigned i = 1; i < values.size(); ++i)
+        ret.ids_.Resize(values.Size() - 1);
+        for (unsigned i = 1; i < values.Size(); ++i)
             ret.ids_[i - 1] = StringHash(values[i]);
     }
     
@@ -564,7 +564,7 @@ VariantVector XMLElement::GetVariantVector() const
     XMLElement variantElem = GetChildElement("variant");
     while (variantElem)
     {
-        ret.push_back(variantElem.GetVariant());
+        ret.Push(variantElem.GetVariant());
         variantElem = variantElem.GetNextElement("variant");
     }
     

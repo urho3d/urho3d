@@ -81,7 +81,7 @@ void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, Variant
     // If this is a targeted event, forward it to all components
     if (!broadcast)
     {
-        for (unsigned i = components_.size() - 1; i < components_.size(); --i)
+        for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
         {
             components_[i]->OnEvent(sender, broadcast, eventType, eventData);
             if (self.IsExpired())
@@ -125,8 +125,8 @@ bool Node::Save(Serializer& dest)
     if (!Serializable::Save(dest))
         return false;
     
-    dest.WriteVLE(components_.size());
-    for (unsigned i = 0; i < components_.size(); ++i)
+    dest.WriteVLE(components_.Size());
+    for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
         // Create a separate buffer to be able to skip unknown components during deserialization
@@ -139,8 +139,8 @@ bool Node::Save(Serializer& dest)
         dest.Write(compBuffer.GetData(), compBuffer.GetSize());
     }
     
-    dest.WriteVLE(children_.size());
-    for (unsigned i = 0; i < children_.size(); ++i)
+    dest.WriteVLE(children_.Size());
+    for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
         dest.WriteUInt(node->GetID());
@@ -161,7 +161,7 @@ bool Node::SaveXML(XMLElement& dest)
     if (!Serializable::SaveXML(dest))
         return false;
     
-    for (unsigned i = 0; i < components_.size(); ++i)
+    for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
         XMLElement compElem = dest.CreateChildElement("component");
@@ -172,7 +172,7 @@ bool Node::SaveXML(XMLElement& dest)
             return false;
     }
     
-    for (unsigned i = 0; i < children_.size(); ++i)
+    for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
         XMLElement childElem = dest.CreateChildElement("node");
@@ -187,10 +187,10 @@ bool Node::SaveXML(XMLElement& dest)
 
 void Node::PostLoad()
 {
-    for (unsigned i = 0; i < components_.size(); ++i)
+    for (unsigned i = 0; i < components_.Size(); ++i)
         components_[i]->PostLoad();
     
-    for (unsigned i = 0; i < children_.size(); ++i)
+    for (unsigned i = 0; i < children_.Size(); ++i)
         children_[i]->PostLoad();
 }
 
@@ -329,7 +329,7 @@ void Node::MarkDirty()
     dirty_ = true;
     
     // Notify listener components first, then mark child nodes
-    for (std::vector<WeakPtr<Component> >::iterator i = listeners_.begin(); i != listeners_.end();)
+    for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End();)
     {
         if (*i)
         {
@@ -338,10 +338,10 @@ void Node::MarkDirty()
         }
         // If listener has expired, erase from list
         else
-            i = listeners_.erase(i);
+            i = listeners_.Erase(i);
     }
     
-    for (std::vector<SharedPtr<Node> >::iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->MarkDirty();
 }
 
@@ -359,7 +359,7 @@ void Node::AddChild(Node* node)
         return;
     
     // Add first, then remove from old parent, to ensure the node does not get deleted
-    children_.push_back(SharedPtr<Node>(node));
+    children_.Push(SharedPtr<Node>(node));
     
     if (node->parent_)
         node->parent_->RemoveChild(node);
@@ -377,7 +377,7 @@ void Node::RemoveChild(Node* node)
     if (!node)
         return;
     
-    for (std::vector<SharedPtr<Node> >::iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if (i->GetPtr() == node)
         {
@@ -389,8 +389,8 @@ void Node::RemoveChild(Node* node)
 
 void Node::RemoveAllChildren()
 {
-    while (children_.size())
-        RemoveChild(children_.end() - 1);
+    while (children_.Size())
+        RemoveChild(children_.End() - 1);
 }
 
 Component* Node::CreateComponent(ShortStringHash type, bool local)
@@ -409,7 +409,7 @@ Component* Node::GetOrCreateComponent(ShortStringHash type, bool local)
 
 void Node::RemoveComponent(Component* component)
 {
-    for (std::vector<SharedPtr<Component> >::iterator i = components_.begin(); i != components_.end(); ++i)
+    for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if (*i == component)
         {
@@ -418,7 +418,7 @@ void Node::RemoveComponent(Component* component)
             RemoveListener(*i);
             if (scene_)
                 scene_->ComponentRemoved(*i);
-            components_.erase(i);
+            components_.Erase(i);
             
             // If the component is still referenced elsewhere, reset its node pointer now
             if (componentWeak)
@@ -430,15 +430,15 @@ void Node::RemoveComponent(Component* component)
 
 void Node::RemoveAllComponents()
 {
-    while (components_.size())
+    while (components_.Size())
     {
-        std::vector<SharedPtr<Component> >::iterator i = components_.end() - 1;
+        Vector<SharedPtr<Component> >::Iterator i = components_.End() - 1;
         WeakPtr<Component> componentWeak(*i);
         
         RemoveListener(*i);
         if (scene_)
             scene_->ComponentRemoved(*i);
-        components_.erase(i);
+        components_.Erase(i);
         
         // If the component is still referenced elsewhere, reset its node pointer now
         if (componentWeak)
@@ -452,13 +452,13 @@ void Node::AddListener(Component* component)
         return;
     
     // Check for not adding twice
-    for (std::vector<WeakPtr<Component> >::iterator i = listeners_.begin(); i != listeners_.end(); ++i)
+    for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End(); ++i)
     {
         if ((*i) == component)
             return;
     }
     
-    listeners_.push_back(WeakPtr<Component>(component));
+    listeners_.Push(WeakPtr<Component>(component));
     // If the node is currently dirty, notify immediately
     if (dirty_)
         component->OnMarkedDirty(this);
@@ -466,11 +466,11 @@ void Node::AddListener(Component* component)
 
 void Node::RemoveListener(Component* component)
 {
-    for (std::vector<WeakPtr<Component> >::iterator i = listeners_.begin(); i != listeners_.end(); ++i)
+    for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End(); ++i)
     {
         if ((*i) == component)
         {
-            listeners_.erase(i);
+            listeners_.Erase(i);
             return;
         }
     }
@@ -491,40 +491,40 @@ void Node::SetParent(Node* parent)
 unsigned Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)
-        return children_.size();
+        return children_.Size();
     else
     {
-        unsigned allChildren = children_.size();
-        for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+        unsigned allChildren = children_.Size();
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             allChildren += (*i)->GetNumChildren(true);
         
         return allChildren;
     }
 }
 
-void Node::GetChildren(std::vector<Node*>& dest, bool recursive) const
+void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
 {
-    dest.clear();
+    dest.Clear();
     
     if (!recursive)
     {
-        for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
-            dest.push_back(*i);
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+            dest.Push(*i);
     }
     else
         GetChildrenRecursive(dest);
 }
 
-void Node::GetChildrenWithComponent(std::vector<Node*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetChildrenWithComponent(Vector<Node*>& dest, ShortStringHash type, bool recursive) const
 {
-    dest.clear();
+    dest.Clear();
     
     if (!recursive)
     {
-        for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if ((*i)->HasComponent(type))
-                dest.push_back(*i);
+                dest.Push(*i);
         }
     }
     else
@@ -533,7 +533,7 @@ void Node::GetChildrenWithComponent(std::vector<Node*>& dest, ShortStringHash ty
 
 Node* Node::GetChild(unsigned index) const
 {
-    return index < children_.size() ? children_[index].GetPtr() : 0;
+    return index < children_.Size() ? children_[index].GetPtr() : 0;
 }
 
 Node* Node::GetChild(const String& name, bool recursive) const
@@ -543,7 +543,7 @@ Node* Node::GetChild(const String& name, bool recursive) const
 
 Node* Node::GetChild(StringHash nameHash, bool recursive) const
 {
-    for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if ((*i)->GetNameHash() == nameHash)
             return *i;
@@ -559,19 +559,19 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
     return 0;
 }
 
-void Node::GetComponents(std::vector<Component*>& dest, ShortStringHash type) const
+void Node::GetComponents(Vector<Component*>& dest, ShortStringHash type) const
 {
-    dest.clear();
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components_.begin(); i != components_.end(); ++i)
+    dest.Clear();
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
-            dest.push_back(*i);
+            dest.Push(*i);
     }
 }
 
 bool Node::HasComponent(ShortStringHash type) const
 {
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components_.begin(); i != components_.end(); ++i)
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
             return true;
@@ -581,13 +581,13 @@ bool Node::HasComponent(ShortStringHash type) const
 
 Component* Node::GetComponent(unsigned index) const
 {
-    return index < components_.size() ? components_[index].GetPtr() : 0;
+    return index < components_.Size() ? components_[index].GetPtr() : 0;
 }
 
 Component* Node::GetComponent(ShortStringHash type, unsigned index) const
 {
     unsigned cmpIndex = 0;
-    for (std::vector<SharedPtr<Component> >::const_iterator i = components_.begin(); i != components_.end(); ++i)
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
         if ((*i)->GetType() == type)
         {
@@ -701,7 +701,7 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
         return 0;
     }
     
-    components_.push_back(newComponent);
+    components_.Push(newComponent);
     
     // If zero ID specified, let the scene assign
     if (scene_)
@@ -747,32 +747,32 @@ void Node::UpdateWorldTransform()
     dirty_ = false;
 }
 
-void Node::RemoveChild(std::vector<SharedPtr<Node> >::iterator i)
+void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
     (*i)->parent_ = 0;
     (*i)->MarkDirty();
-    children_.erase(i);
+    children_.Erase(i);
 }
 
-void Node::GetChildrenRecursive(std::vector<Node*>& dest) const
+void Node::GetChildrenRecursive(Vector<Node*>& dest) const
 {
-    for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         Node* node = *i;
-        dest.push_back(node);
-        if (!node->children_.empty())
+        dest.Push(node);
+        if (!node->children_.Empty())
             node->GetChildrenRecursive(dest);
     }
 }
 
-void Node::GetChildrenWithComponentRecursive(std::vector<Node*>& dest, ShortStringHash type) const
+void Node::GetChildrenWithComponentRecursive(Vector<Node*>& dest, ShortStringHash type) const
 {
-    for (std::vector<SharedPtr<Node> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         Node* node = *i;
         if (node->HasComponent(type))
-            dest.push_back(node);
-        if (!node->children_.empty())
+            dest.Push(node);
+        if (!node->children_.Empty())
             node->GetChildrenRecursive(dest);
     }
 }

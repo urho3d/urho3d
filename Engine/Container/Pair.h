@@ -40,11 +40,33 @@ public:
     }
     
     /// Test for equality with another pair
-    bool operator == (const Pair<T, U>& rhs) { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+    bool operator == (const Pair<T, U>& rhs) const { return (first_ == rhs.first_) && (second_ == rhs.second_); }
     /// Test for inequality with another pair
-    bool operator != (const Pair<T, U>& rhs) { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+    bool operator != (const Pair<T, U>& rhs) const { return (first_ != rhs.first_) || (second_ != rhs.second_); }
     
+    /// Test for less than with another pair
+    bool operator < (const Pair<T, U>& rhs) const
+    {
+        if (first_ < rhs.first_)
+            return true;
+        if (first_ != rhs.first_)
+            return false;
+        return second_ < rhs.second_;
+    }
+    
+    /// Test for less than with another pair
+    bool operator > (const Pair<T, U>& rhs) const
+    {
+        if (first_ > rhs.first_)
+            return true;
+        if (first_ != rhs.first_)
+            return false;
+        return second_ > rhs.second_;
+    }
+    
+    /// First value
     T first_;
+    /// Second value
     U second_;
 };
 

@@ -71,9 +71,9 @@ public:
     /// Return whether client has been started (is automatically started when a connection attempt is made)
     bool IsClient() const { return clientHost_ != 0; }
     /// Return number of networking peers
-    unsigned GetNumPeers() const { return peers_.size(); }
+    unsigned GetNumPeers() const { return peers_.Size(); }
     /// Return all networking peers
-    const std::vector<SharedPtr<Peer> >& GetPeers() const { return peers_; }
+    const Vector<SharedPtr<Peer> >& GetPeers() const { return peers_; }
     /// Return networking peer by index
     Peer* GetPeer(unsigned index) const;
     /// Return the first server peer
@@ -100,7 +100,7 @@ private:
     /// Client host
     ENetHost* clientHost_;
     /// Peers
-    std::vector<SharedPtr<Peer> > peers_;
+    Vector<SharedPtr<Peer> > peers_;
     /// Maximum server connections
     unsigned serverMaxConnections_;
     /// Maximum client connections

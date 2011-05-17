@@ -25,6 +25,7 @@
 
 #include "MathDefs.h"
 #include "GraphicsDefs.h"
+#include "PODVector.h"
 #include "SharedPtr.h"
 
 class Camera;
@@ -97,6 +98,11 @@ struct Batch
 /// Data for one geometry instance
 struct InstanceData
 {
+    /// Construct undefined
+    InstanceData()
+    {
+    }
+    
     /// Construct with transform and distance
     InstanceData(const Matrix4x3* worldTransform, float distance) :
         worldTransform_(worldTransform),
@@ -132,7 +138,7 @@ struct BatchGroup
     /// Geometry
     Geometry* geometry_;
     /// Instance data
-    std::vector<InstanceData> instances_;
+    PODVector<InstanceData> instances_;
     /// Material
     Material* material_;
     /// Material pass
@@ -162,6 +168,11 @@ struct BatchGroupKey
     Material* material_;
     /// Geometry
     Geometry* geometry_;
+    
+    /// Test for equality with another batch group key
+    bool operator == (const BatchGroupKey& rhs) const { return (light_ == rhs.light_) && (pass_ == rhs.pass_) && (material_ == rhs.material_) && (geometry_ == rhs.geometry_); }
+    /// Test for inequality with another batch group key
+    bool operator != (const BatchGroupKey& rhs) const { return (light_ != rhs.light_) || (pass_ != rhs.pass_) || (material_ != rhs.material_) || (geometry_ != rhs.geometry_); }
     
     /// Test if less than another batch group key
     bool operator < (const BatchGroupKey& rhs) const
@@ -221,15 +232,15 @@ public:
     unsigned GetNumInstances() const;
     
     /// Unsorted non-instanced draw calls
-    std::vector<Batch> batches_;
+    PODVector<Batch> batches_;
     /// Sorted non-instanced draw calls with priority flag
-    std::vector<Batch*> sortedPriorityBatches_;
+    PODVector<Batch*> sortedPriorityBatches_;
     /// Sorted non-instanced draw calls
-    std::vector<Batch*> sortedBatches_;
+    PODVector<Batch*> sortedBatches_;
     /// Instanced draw calls with priority flag
-    std::map<BatchGroupKey, BatchGroup> priorityBatchGroups_;
+    Map<BatchGroupKey, BatchGroup> priorityBatchGroups_;
     /// Instanced draw calls
-    std::map<BatchGroupKey, BatchGroup> batchGroups_;
+    Map<BatchGroupKey, BatchGroup> batchGroups_;
 };
 
 /// Queue for light related draw calls
@@ -242,7 +253,7 @@ struct LightBatchQueue
     /// Lit geometry draw calls
     BatchQueue litBatches_;
     /// Light volume draw calls, should be only one
-    std::vector<Batch> volumeBatches_;
+    PODVector<Batch> volumeBatches_;
     /// Last split flag for clearing the stencil buffer
     bool lastSplit_;
 };

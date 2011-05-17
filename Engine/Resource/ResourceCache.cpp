@@ -76,18 +76,18 @@ bool ResourceCache::AddResourcePath(const String& path)
     String pathLower = fixedPath.ToLower();
     
     // Check that the same path does not already exist
-    for (unsigned i = 0; i < resourcePaths_.size(); ++i)
+    for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
     {
         if (resourcePaths_[i].ToLower() == pathLower)
             return true;
     }
     
-    resourcePaths_.push_back(fixedPath);
+    resourcePaths_.Push(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
-    std::vector<String> fileNames;
+    Vector<String> fileNames;
     fileSystem->ScanDir(fileNames, fixedPath, "*.*", SCAN_FILES, true);
-    for (unsigned i = 0; i < fileNames.size(); ++i)
+    for (unsigned i = 0; i < fileNames.Size(); ++i)
         StoreNameHash(fileNames[i]);
     
     LOGINFO("Added resource path " + fixedPath);
@@ -101,14 +101,14 @@ void ResourceCache::AddPackageFile(PackageFile* package, bool addAsFirst)
         return;
     
     if (addAsFirst)
-        packages_.insert(packages_.begin(), SharedPtr<PackageFile>(package));
+        packages_.Insert(packages_.Begin(), SharedPtr<PackageFile>(package));
     else
-        packages_.push_back(SharedPtr<PackageFile>(package));
+        packages_.Push(SharedPtr<PackageFile>(package));
     
     // Scan the package for files and add their hash-to-name mappings
-    const std::map<String, PackageEntry>& entries = package->GetEntries();
-    for (std::map<String, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
-        StoreNameHash(i->first);
+    const Map<String, PackageEntry>& entries = package->GetEntries();
+    for (Map<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
+        StoreNameHash(i->first_);
     
     LOGINFO("Added resource package " + package->GetName());
 }
@@ -138,11 +138,11 @@ bool ResourceCache::AddManualResource(Resource* resource)
 void ResourceCache::RemoveResourcePath(const String& path)
 {
     String fixedPath = AddTrailingSlash(path).ToLower();
-    for (std::vector<String>::iterator i = resourcePaths_.begin(); i != resourcePaths_.end(); ++i)
+    for (Vector<String>::Iterator i = resourcePaths_.Begin(); i != resourcePaths_.End(); ++i)
     {
         if (i->ToLower() == fixedPath)
         {
-            resourcePaths_.erase(i);
+            resourcePaths_.Erase(i);
             return;
         }
     }
@@ -150,13 +150,13 @@ void ResourceCache::RemoveResourcePath(const String& path)
 
 void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResources, bool forceRelease)
 {
-    for (std::vector<SharedPtr<PackageFile> >::iterator i = packages_.begin(); i != packages_.end(); ++i)
+    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if ((*i) == package)
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            packages_.erase(i);
+            packages_.Erase(i);
             return;
         }
     }
@@ -166,13 +166,13 @@ void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResour
 {
     String fileNameLower = fileName.ToLower();
     
-    for (std::vector<SharedPtr<PackageFile> >::iterator i = packages_.begin(); i != packages_.end(); ++i)
+    for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
         if ((*i)->GetName().ToLower() == fileNameLower)
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);
-            packages_.erase(i);
+            packages_.Erase(i);
             return;
         }
     }
@@ -192,7 +192,7 @@ void ResourceCache::ReleaseResource(ShortStringHash type, StringHash nameHash, b
     // If other references exist, do not release, unless forced
     if ((existingRes.GetRefCount() == 1) || (force))
     {
-        resourceGroups_[type].resources_.erase(nameHash);
+        resourceGroups_[type].resources_.Erase(nameHash);
         UpdateResourceGroup(type);
     }
 }
@@ -201,19 +201,19 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
 {
     bool released = false;
     
-    for (std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.begin();
-        i != resourceGroups_.end(); ++i)
+    for (Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+        i != resourceGroups_.End(); ++i)
     {
-        if (i->first == type)
+        if (i->first_ == type)
         {
-            for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.resources_.begin();
-                j != i->second.resources_.end();)
+            for (Map<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+                j != i->second_.resources_.End();)
             {
-                std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
+                Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
                 // If other references exist, do not release, unless forced
-                if ((current->second.GetRefCount() == 1) || (force))
+                if ((current->second_.GetRefCount() == 1) || (force))
                 {
-                    i->second.resources_.erase(current);
+                    i->second_.resources_.Erase(current);
                     released = true;
                 }
             }
@@ -229,21 +229,21 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
     String partialNameLower = partialName.ToLower();
     bool released = false;
     
-    for (std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.begin();
-        i != resourceGroups_.end(); ++i)
+    for (Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+        i != resourceGroups_.End(); ++i)
     {
-        if (i->first == type)
+        if (i->first_ == type)
         {
-            for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.resources_.begin();
-                j != i->second.resources_.end();)
+            for (Map<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+                j != i->second_.resources_.End();)
             {
-                std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
-                if (current->second->GetName().Find(partialNameLower) != String::NPOS)
+                Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
+                if (current->second_->GetName().Find(partialNameLower) != String::NPOS)
                 {
                     // If other references exist, do not release, unless forced
-                    if ((current->second.GetRefCount() == 1) || (force))
+                    if ((current->second_.GetRefCount() == 1) || (force))
                     {
-                        i->second.resources_.erase(current);
+                        i->second_.resources_.Erase(current);
                         released = true;
                     }
                 }
@@ -257,24 +257,24 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
 
 void ResourceCache::ReleaseAllResources(bool force)
 {
-    for (std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.begin();
-        i != resourceGroups_.end(); ++i)
+    for (Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
+        i != resourceGroups_.End(); ++i)
     {
         bool released = false;
         
-        for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.resources_.begin();
-            j != i->second.resources_.end();)
+        for (Map<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            j != i->second_.resources_.End();)
         {
-            std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
+            Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
             // If other references exist, do not release, unless forced
-            if ((current->second.GetRefCount() == 1) || (force))
+            if ((current->second_.GetRefCount() == 1) || (force))
             {
-                i->second.resources_.erase(current);
+                i->second_.resources_.Erase(current);
                 released = true;
             }
         }
         if (released)
-            UpdateResourceGroup(i->first);
+            UpdateResourceGroup(i->first_);
     }
 }
 
@@ -312,7 +312,7 @@ void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
 SharedPtr<File> ResourceCache::GetFile(const String& name)
 {
     // Check first the packages
-    for (unsigned i = 0; i < packages_.size(); ++i)
+    for (unsigned i = 0; i < packages_.Size(); ++i)
     {
         if (packages_[i]->Exists(name))
             return SharedPtr<File>(new File(context_, packages_[i], name));
@@ -322,7 +322,7 @@ SharedPtr<File> ResourceCache::GetFile(const String& name)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
     {
-        for (unsigned i = 0; i < resourcePaths_.size(); ++i)
+        for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
         {
             if (fileSystem->FileExists(resourcePaths_[i] + name))
             {
@@ -391,21 +391,21 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     return resource;
 }
 
-void ResourceCache::GetResources(std::vector<Resource*>& result, ShortStringHash type) const
+void ResourceCache::GetResources(Vector<Resource*>& result, ShortStringHash type) const
 {
-    result.clear();
-    std::map<ShortStringHash, ResourceGroup>::const_iterator i = resourceGroups_.find(type);
-    if (i != resourceGroups_.end())
+    result.Clear();
+    Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    if (i != resourceGroups_.End())
     {
-        for (std::map<StringHash, SharedPtr<Resource> >::const_iterator j = i->second.resources_.begin();
-            j != i->second.resources_.end(); ++j)
-            result.push_back(j->second);
+        for (Map<StringHash, SharedPtr<Resource> >::ConstIterator j = i->second_.resources_.Begin();
+            j != i->second_.resources_.End(); ++j)
+            result.Push(j->second_);
     }
 }
 
 bool ResourceCache::Exists(const String& name) const
 {
-    for (unsigned i = 0; i < packages_.size(); ++i)
+    for (unsigned i = 0; i < packages_.Size(); ++i)
     {
         if (packages_[i]->Exists(name))
             return true;
@@ -414,7 +414,7 @@ bool ResourceCache::Exists(const String& name) const
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
     {
-        for (unsigned i = 0; i < resourcePaths_.size(); ++i)
+        for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
         {
             if (fileSystem->FileExists(resourcePaths_[i] + name))
                 return true;
@@ -431,18 +431,18 @@ bool ResourceCache::Exists(StringHash nameHash) const
 
 unsigned ResourceCache::GetMemoryBudget(ShortStringHash type) const
 {
-    std::map<ShortStringHash, ResourceGroup>::const_iterator i = resourceGroups_.find(type);
-    if (i != resourceGroups_.end())
-        return i->second.memoryBudget_;
+    Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    if (i != resourceGroups_.End())
+        return i->second_.memoryBudget_;
     else
         return 0;
 }
 
 unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
 {
-    std::map<ShortStringHash, ResourceGroup>::const_iterator i = resourceGroups_.find(type);
-    if (i != resourceGroups_.end())
-        return i->second.memoryUse_;
+    Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);
+    if (i != resourceGroups_.End())
+        return i->second_.memoryUse_;
     else
         return 0;
 }
@@ -450,18 +450,18 @@ unsigned ResourceCache::GetMemoryUse(ShortStringHash type) const
 unsigned ResourceCache::GetTotalMemoryUse() const
 {
     unsigned total = 0;
-    for (std::map<ShortStringHash, ResourceGroup>::const_iterator i = resourceGroups_.begin(); i != resourceGroups_.end(); ++i)
-        total += i->second.memoryUse_;
+    for (Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Begin(); i != resourceGroups_.End(); ++i)
+        total += i->second_.memoryUse_;
     return total;
 }
 
 const String& ResourceCache::GetResourceName(StringHash nameHash) const
 {
-    std::map<StringHash, String>::const_iterator i = hashToName_.find(nameHash);
-    if (i == hashToName_.end())
+    Map<StringHash, String>::ConstIterator i = hashToName_.Find(nameHash);
+    if (i == hashToName_.End())
         return noName;
     else
-        return i->second;
+        return i->second_;
 }
 
 String ResourceCache::GetPreferredResourcePath(const String& path)
@@ -505,64 +505,64 @@ String ResourceCache::GetPreferredResourcePath(const String& path)
 
 const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)
 {
-    std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.find(type);
-    if (i == resourceGroups_.end())
+    Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    if (i == resourceGroups_.End())
         return noResource;
-    std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.resources_.find(nameHash);
-    if (j == i->second.resources_.end())
+    Map<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Find(nameHash);
+    if (j == i->second_.resources_.End())
         return noResource;
     
-    return j->second;
+    return j->second_;
 }
 
 void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
-    std::set<ShortStringHash> affectedGroups;
+    Set<ShortStringHash> affectedGroups;
     
-    const std::map<String, PackageEntry>& entries = package->GetEntries();
-    for (std::map<String, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    const Map<String, PackageEntry>& entries = package->GetEntries();
+    for (Map<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
     {
-        StringHash nameHash(i->first);
+        StringHash nameHash(i->first_);
         
         // We do not know the actual resource type, so search all type containers
-        for (std::map<ShortStringHash, ResourceGroup>::iterator j = resourceGroups_.begin();
-            j != resourceGroups_.end(); ++j)
+        for (Map<ShortStringHash, ResourceGroup>::Iterator j = resourceGroups_.Begin();
+            j != resourceGroups_.End(); ++j)
         {
-            std::map<StringHash, SharedPtr<Resource> >::iterator k = j->second.resources_.find(nameHash);
-            if (k != j->second.resources_.end())
+            Map<StringHash, SharedPtr<Resource> >::Iterator k = j->second_.resources_.Find(nameHash);
+            if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
-                if ((k->second.GetRefCount() == 1) || (force))
+                if ((k->second_.GetRefCount() == 1) || (force))
                 {
-                    j->second.resources_.erase(k);
-                    affectedGroups.insert(j->first);
+                    j->second_.resources_.Erase(k);
+                    affectedGroups.Insert(j->first_);
                 }
                 break;
             }
         }
     }
     
-    for (std::set<ShortStringHash>::iterator i = affectedGroups.begin(); i != affectedGroups.end(); ++i)
+    for (Set<ShortStringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
         UpdateResourceGroup(*i);
 }
 
 void ResourceCache::UpdateResourceGroup(ShortStringHash type)
 {
-    std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.find(type);
-    if (i == resourceGroups_.end())
+    Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
+    if (i == resourceGroups_.End())
         return;
     
     for (;;)
     {
         unsigned totalSize = 0;
         unsigned oldestTimer = 0;
-        std::map<StringHash, SharedPtr<Resource> >::iterator oldestResource = i->second.resources_.end();
+        Map<StringHash, SharedPtr<Resource> >::Iterator oldestResource = i->second_.resources_.End();
         
-        for (std::map<StringHash, SharedPtr<Resource> >::iterator j = i->second.resources_.begin();
-            j != i->second.resources_.end(); ++j)
+        for (Map<StringHash, SharedPtr<Resource> >::Iterator j = i->second_.resources_.Begin();
+            j != i->second_.resources_.End(); ++j)
         {
-            totalSize += j->second->GetMemoryUse();
-            unsigned useTimer = j->second->GetUseTimer();
+            totalSize += j->second_->GetMemoryUse();
+            unsigned useTimer = j->second_->GetUseTimer();
             if (useTimer > oldestTimer)
             {
                 oldestTimer = useTimer;
@@ -570,16 +570,16 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
             }
         }
         
-        i->second.memoryUse_ = totalSize;
+        i->second_.memoryUse_ = totalSize;
         
         // If memory budget defined and is exceeded, remove the oldest resource and loop again
         // (resources in use always return a zero timer and can not be removed)
-        if ((i->second.memoryBudget_) && (i->second.memoryUse_ > i->second.memoryBudget_) &&
-            (oldestResource != i->second.resources_.end()))
+        if ((i->second_.memoryBudget_) && (i->second_.memoryUse_ > i->second_.memoryBudget_) &&
+            (oldestResource != i->second_.resources_.End()))
         {
-            LOGDEBUG("Resource group " + oldestResource->second->GetTypeName() + " over memory budget, releasing resource " +
-                oldestResource->second->GetName());
-            i->second.resources_.erase(oldestResource);
+            LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
+                oldestResource->second_->GetName());
+            i->second_.resources_.Erase(oldestResource);
         }
         else
             break;

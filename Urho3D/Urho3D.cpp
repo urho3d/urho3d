@@ -59,9 +59,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 void Run(const char* cmdLine)
 {
     // Check for script file name
-    const std::vector<String>& arguments = ParseArguments(cmdLine);
+    const Vector<String>& arguments = ParseArguments(cmdLine);
     String scriptFileName;
-    for (unsigned i = 0; i < arguments.size(); ++i)
+    for (unsigned i = 0; i < arguments.Size(); ++i)
     {
         if (arguments[i][0] != '-')
         {

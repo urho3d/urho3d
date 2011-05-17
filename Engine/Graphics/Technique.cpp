@@ -123,8 +123,8 @@ void Pass::SetPixelShader(const String& name)
 
 void Pass::ReleaseShaders()
 {
-    vertexShaders_.clear();
-    pixelShaders_.clear();
+    vertexShaders_.Clear();
+    pixelShaders_.Clear();
 }
 
 OBJECTTYPESTATIC(Technique);
@@ -213,7 +213,7 @@ bool Technique::Load(Deserializer& source)
     // Calculate memory use
     unsigned memoryUse = 0;
     memoryUse += sizeof(Technique);
-    for (std::map<PassType, Pass>::const_iterator j = passes_.begin(); j != passes_.end(); ++j)
+    for (Map<PassType, Pass>::ConstIterator j = passes_.Begin(); j != passes_.End(); ++j)
         memoryUse += sizeof(Pass);
     
     SetMemoryUse(memoryUse);
@@ -227,8 +227,8 @@ void Technique::SetIsSM3(bool enable)
 
 void Technique::ReleaseShaders()
 {
-    for (std::map<PassType, Pass>::iterator i = passes_.begin(); i != passes_.end(); ++i)
-        i->second.ReleaseShaders();
+    for (Map<PassType, Pass>::Iterator i = passes_.Begin(); i != passes_.End(); ++i)
+        i->second_.ReleaseShaders();
 }
 
 Pass* Technique::CreatePass(PassType pass)
@@ -245,7 +245,7 @@ Pass* Technique::CreatePass(PassType pass)
 
 void Technique::RemovePass(PassType pass)
 {
-    passes_.erase(pass);
+    passes_.Erase(pass);
 }
 
 void Technique::MarkShadersLoaded(unsigned frameNumber)

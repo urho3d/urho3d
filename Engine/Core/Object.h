@@ -92,7 +92,7 @@ protected:
     
 private:
     /// Event handlers. Sender is null for non-specific handlers
-    std::map<std::pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
+    Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> > eventHandlers_;
 };
 
 template <class T> SharedPtr<T> Object::CreateObject()

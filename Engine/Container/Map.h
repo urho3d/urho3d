@@ -52,9 +52,9 @@ public:
         }
         
         /// Test for equality with another pair
-        bool operator == (const Pair<T, U>& rhs) { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+        bool operator == (const KeyValue& rhs) const { return (first_ == rhs.first_) && (second_ == rhs.second_); }
         /// Test for inequality with another pair
-        bool operator != (const Pair<T, U>& rhs) { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+        bool operator != (const KeyValue& rhs) const { return (first_ != rhs.first_) || (second_ != rhs.second_); }
         
         const T first_;
         U second_;
@@ -82,31 +82,61 @@ public:
     /// Map node iterator
     class Iterator : public ListIteratorBase
     {
+        friend class ConstIterator;
+        
     public:
+        /// Construct
         explicit Iterator(Node* ptr) :
-            ptr_(ptr)
+            ListIteratorBase(ptr)
         {
         }
         
+        /// Preincrement the pointer
+        Iterator& operator ++ () { GotoNext(); return *this; }
+        /// Postincrement the pointer
+        Iterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        /// Predecrement the pointer
+        Iterator& operator -- () { GotoPrev(); return *this; }
+        /// Postdecrement the pointer
+        Iterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
+        
         /// Point to the pair
-        T* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }
+        KeyValue* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }
         /// Dereference the pair
-        T& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
+        KeyValue& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
     };
     
-    /// Map node const iterator
+    /// Set node const iterator
     class ConstIterator : public ListIteratorBase
     {
     public:
+        /// Construct
         explicit ConstIterator(Node* ptr) :
-            ptr_(ptr)
+            ListIteratorBase(ptr)
         {
         }
         
+        /// Construct from a non-const iterator
+        ConstIterator(const Iterator& rhs) :
+            ListIteratorBase(rhs.ptr_)
+        {
+        }
+        
+        /// Assign from a non-const iterator
+        ConstIterator& operator = (const Iterator& rhs) { ptr_ = rhs.ptr_; return *this; }
+        /// Preincrement the pointer
+        ConstIterator& operator ++ () { GotoNext(); return *this; }
+        /// Postincrement the pointer
+        ConstIterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        /// Predecrement the pointer
+        ConstIterator& operator -- () { GotoPrev(); return *this; }
+        /// Postdecrement the pointer
+        ConstIterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
+        
         /// Point to the pair
-        const T* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }
+        const KeyValue* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }
         /// Dereference the pair
-        const T& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
+        const KeyValue& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
     };
     
     /// Construct empty
@@ -130,10 +160,7 @@ public:
     
     /// Construct from another map
     Map(const Map<T, U>& map) :
-        maxHeight_(map.maxHeight_),
-        height_(0),
-        size_(0),
-        bitsLeft_(0)
+        SkipListBase(map.maxHeight_)
     {
         // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_, T());
@@ -169,7 +196,7 @@ public:
         
         // Insert the nodes with same heights
         for (Node* i = rhs.GetHead()->GetNext(0); i != rhs.GetTail(); i = i->GetNext(0))
-            InsertNode(i->pair_, i->height_);
+            InsertNode(Pair<T, U>(i->pair_.first_, i->pair_.second_), i->height_);
         
         return *this;
     }
@@ -320,9 +347,9 @@ public:
     }
     
     /// Erase by an iterator. Return an iterator to the next element
-    Iterator Erase(const Iterator& it)
+    Iterator Erase(Iterator it)
     {
-        if (it)
+        if (it != End())
         {
             Iterator current = it++;
             Erase(current->first_);
@@ -373,10 +400,10 @@ public:
         size_ = 0;
     }
     
-    /// Return iterator to the node with key, or null iterator if not found
-    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
+    /// Return iterator to the node with key, or end iterator if not found
+    Iterator Find(const T& key) { Node* node = FindNode(key); return node ? Iterator(node) : End(); }
     /// Return const iterator to the node with key, or null iterator if not found
-    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
+    ConstIterator Find(const T& key) const { Node* node = FindNode(key); return node ? ConstIterator(node) : End(); }
     /// Return iterator to the first actual node
     Iterator Begin() { return Iterator(GetHead()->GetNext(0)); }
     /// Return iterator to the first actual node
@@ -385,6 +412,15 @@ public:
     Iterator End() { return Iterator(GetTail()); }
     /// Return iterator to the end
     ConstIterator End() const { return ConstIterator(GetTail()); }
+    /// Return first pair
+    KeyValue& Front() { return *Begin(); }
+    /// Return const first pair
+    const KeyValue& Front() const { return *Begin(); }
+    /// Return last pair
+    const KeyValue& Back() { return *(--End()); }
+    /// Return const last pair
+    const KeyValue& Back() const { return *(--End()); }
+    
     /// Return whether contains a key
     bool Contains(const T& key) const { return FindNode(key) != 0; }
     /// Return number of keys

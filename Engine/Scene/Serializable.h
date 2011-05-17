@@ -68,7 +68,7 @@ public:
     /// Return number of attributes
     unsigned GetNumAttributes() const;
     /// Return attribute descriptions, or null if none defined
-    const std::vector<AttributeInfo>* GetAttributes() const;
+    const Vector<AttributeInfo>* GetAttributes() const;
     
 protected:
     /// In serialization -flag

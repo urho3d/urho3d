@@ -44,8 +44,8 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     SetStartBone(0);
     
     // Setup a cache for last keyframe of each track
-    lastKeyFrame_.resize(animation_->GetNumTracks());
-    for (unsigned i = 0; i < lastKeyFrame_.size(); ++i)
+    lastKeyFrame_.Resize(animation_->GetNumTracks());
+    for (unsigned i = 0; i < lastKeyFrame_.Size(); ++i)
         lastKeyFrame_[i] = 0;
 }
 
@@ -59,7 +59,7 @@ void AnimationState::SetStartBone(Bone* startBone)
         return;
     
     Skeleton& skeleton = model_->GetSkeleton();
-    const std::vector<Bone>& bones = skeleton.GetBones();
+    const Vector<Bone>& bones = skeleton.GetBones();
     Bone* rootBone = skeleton.GetRootBone();
     if (!rootBone)
         return;
@@ -67,13 +67,13 @@ void AnimationState::SetStartBone(Bone* startBone)
         startBone = rootBone;
     startBone_ = startBone;
     
-    trackToBoneMap_.clear();
+    trackToBoneMap_.Clear();
     if (!startBone->node_)
         return;
     
-    const std::vector<AnimationTrack>& tracks = animation_->GetTracks();
+    const Vector<AnimationTrack>& tracks = animation_->GetTracks();
     
-    for (unsigned i = 0; i < tracks.size(); ++i)
+    for (unsigned i = 0; i < tracks.Size(); ++i)
     {
         // Include those tracks that are either the startbone itself, or its children
         Bone* trackBone = 0;
@@ -181,21 +181,21 @@ void AnimationState::Apply()
     // Check first if full weight or blending
     if (weight_ == 1.0f)
     {
-        for (std::map<unsigned, Bone*>::const_iterator i = trackToBoneMap_.begin(); i != trackToBoneMap_.end(); ++i)
+        for (Map<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
-            const AnimationTrack* track = animation_->GetTrack(i->first);
-            Bone* bone = i->second;
+            const AnimationTrack* track = animation_->GetTrack(i->first_);
+            Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.size()))
+            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.Size()))
                 continue;
             
-            unsigned& frame = lastKeyFrame_[i->first];
+            unsigned& frame = lastKeyFrame_[i->first_];
             track->GetKeyFrameIndex(time_, frame);
             
             // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
             unsigned nextFrame = frame + 1;
             bool interpolate = true;
-            if (nextFrame >= track->keyFrames_.size())
+            if (nextFrame >= track->keyFrames_.Size())
             {
                 if (!looped_)
                 {
@@ -244,21 +244,21 @@ void AnimationState::Apply()
     }
     else
     {
-        for (std::map<unsigned, Bone*>::const_iterator i = trackToBoneMap_.begin(); i != trackToBoneMap_.end(); ++i)
+        for (Map<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
-            const AnimationTrack* track = animation_->GetTrack(i->first);
-            Bone* bone = i->second;
+            const AnimationTrack* track = animation_->GetTrack(i->first_);
+            Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.size()))
+            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.Size()))
                 continue;
             
-            unsigned& frame = lastKeyFrame_[i->first];
+            unsigned& frame = lastKeyFrame_[i->first_];
             track->GetKeyFrameIndex(time_, frame);
             
             // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
             unsigned nextFrame = frame + 1;
             bool interpolate = true;
-            if (nextFrame >= track->keyFrames_.size())
+            if (nextFrame >= track->keyFrames_.Size())
             {
                 if (!looped_)
                 {

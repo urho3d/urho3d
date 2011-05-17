@@ -36,15 +36,15 @@ void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
     if (time < 0.0f)
         time = 0.0f;
     
-    if (index >= keyFrames_.size())
-        index = keyFrames_.size() - 1;
+    if (index >= keyFrames_.Size())
+        index = keyFrames_.Size() - 1;
     
     // Check for being too far ahead
     while ((index) && (time < keyFrames_[index].time_))
         index--;
     
     // Check for being too far behind
-    while ((index < keyFrames_.size() - 1) && (time >= keyFrames_[index + 1].time_))
+    while ((index < keyFrames_.Size() - 1) && (time >= keyFrames_[index + 1].time_))
         index++;
 }
 
@@ -81,10 +81,10 @@ bool Animation::Load(Deserializer& source)
     animationName_ = source.ReadString();
     animationNameHash_ = StringHash(animationName_);
     length_ = source.ReadFloat();
-    tracks_.clear();
+    tracks_.Clear();
     
     unsigned tracks = source.ReadUInt();
-    tracks_.resize(tracks);
+    tracks_.Resize(tracks);
     memoryUse += tracks * sizeof(AnimationTrack);
     
     // Read tracks
@@ -96,7 +96,7 @@ bool Animation::Load(Deserializer& source)
         newTrack.channelMask_ = source.ReadUByte();
         
         unsigned keyFrames = source.ReadUInt();
-        newTrack.keyFrames_.resize(keyFrames);
+        newTrack.keyFrames_.Resize(keyFrames);
         memoryUse += keyFrames * sizeof(AnimationKeyFrame);
         
         // Read keyframes of the track
@@ -125,16 +125,16 @@ bool Animation::Save(Serializer& dest)
     dest.WriteFloat(length_);
     
     // Write tracks
-    dest.WriteUInt(tracks_.size());
-    for (unsigned i = 0; i < tracks_.size(); ++i)
+    dest.WriteUInt(tracks_.Size());
+    for (unsigned i = 0; i < tracks_.Size(); ++i)
     {
         const AnimationTrack& track = tracks_[i];
         dest.WriteString(track.name_);
         dest.WriteUByte(track.channelMask_);
-        dest.WriteUInt(track.keyFrames_.size());
+        dest.WriteUInt(track.keyFrames_.Size());
         
         // Write keyframes of the track
-        for (unsigned j = 0; j < track.keyFrames_.size(); ++j)
+        for (unsigned j = 0; j < track.keyFrames_.Size(); ++j)
         {
             const AnimationKeyFrame& keyFrame = track.keyFrames_[j];
             dest.WriteFloat(keyFrame.time_);
@@ -161,24 +161,24 @@ void Animation::SetLength(float length)
     length_ = Max(length, 0.0f);
 }
 
-void Animation::SetTracks(const std::vector<AnimationTrack>& tracks)
+void Animation::SetTracks(const Vector<AnimationTrack>& tracks)
 {
     tracks_ = tracks;
 }
 
 unsigned Animation::GetNumTracks() const
 {
-    return tracks_.size();
+    return tracks_.Size();
 }
 
 const AnimationTrack* Animation::GetTrack(unsigned index) const
 {
-    return index < tracks_.size() ? &tracks_[index] : 0;
+    return index < tracks_.Size() ? &tracks_[index] : 0;
 }
 
 const AnimationTrack* Animation::GetTrack(const String& name) const
 {
-    for (std::vector<AnimationTrack>::const_iterator i = tracks_.begin(); i != tracks_.end(); ++i)
+    for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
         if ((*i).name_ == name)
             return &(*i);
@@ -189,7 +189,7 @@ const AnimationTrack* Animation::GetTrack(const String& name) const
 
 const AnimationTrack* Animation::GetTrack(StringHash nameHash) const
 {
-    for (std::vector<AnimationTrack>::const_iterator i = tracks_.begin(); i != tracks_.end(); ++i)
+    for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
         if ((*i).nameHash_ == nameHash)
             return &(*i);

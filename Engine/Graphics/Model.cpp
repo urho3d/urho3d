@@ -37,26 +37,26 @@
 
 #include "DebugNew.h"
 
-unsigned StoreOrLookupVertexBuffer(VertexBuffer* buffer, std::vector<VertexBuffer*>& dest)
+unsigned StoreOrLookupVertexBuffer(VertexBuffer* buffer, Vector<VertexBuffer*>& dest)
 {
-    for (unsigned i = 0; i < dest.size(); ++i)
+    for (unsigned i = 0; i < dest.Size(); ++i)
     {
         if (dest[i] == buffer)
             return i;
     }
-    dest.push_back(buffer);
-    return dest.size() - 1;
+    dest.Push(buffer);
+    return dest.Size() - 1;
 }
 
-unsigned StoreOrLookupIndexBuffer(IndexBuffer* buffer, std::vector<IndexBuffer*>& dest)
+unsigned StoreOrLookupIndexBuffer(IndexBuffer* buffer, Vector<IndexBuffer*>& dest)
 {
-    for (unsigned i = 0; i < dest.size(); ++i)
+    for (unsigned i = 0; i < dest.Size(); ++i)
     {
         if (dest[i] == buffer)
             return i;
     }
-    dest.push_back(buffer);
-    return dest.size() - 1;
+    dest.Push(buffer);
+    return dest.Size() - 1;
 }
 
 OBJECTTYPESTATIC(Model);
@@ -86,11 +86,11 @@ bool Model::Load(Deserializer& source)
         return false;
     }
     
-    geometries_.clear();
-    geometryBoneMappings_.clear();
-    morphs_.clear();
-    vertexBuffer_.clear();
-    indexBuffers_.clear();
+    geometries_.Clear();
+    geometryBoneMappings_.Clear();
+    morphs_.Clear();
+    vertexBuffer_.Clear();
+    indexBuffers_.Clear();
     
     SetMemoryUse(source.GetSize());
     
@@ -120,7 +120,7 @@ bool Model::Load(Deserializer& source)
             buffer->SetMorphRangeResetData(morphResetData);
         }
         
-        vertexBuffer_.push_back(buffer);
+        vertexBuffer_.Push(buffer);
     }
     
     // Read index buffers
@@ -136,7 +136,7 @@ bool Model::Load(Deserializer& source)
         source.Read(data.GetPtr(), indexCount * indexSize);
         buffer->SetData(data.GetPtr());
         
-        indexBuffers_.push_back(buffer);
+        indexBuffers_.Push(buffer);
     }
     
     // Read geometries
@@ -145,13 +145,13 @@ bool Model::Load(Deserializer& source)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadUInt();
-        std::vector<unsigned> boneMapping;
+        Vector<unsigned> boneMapping;
         for (unsigned j = 0; j < boneMappingCount; ++j)
-            boneMapping.push_back(source.ReadUInt());
-        geometryBoneMappings_.push_back(boneMapping);
+            boneMapping.Push(source.ReadUInt());
+        geometryBoneMappings_.Push(boneMapping);
         
         unsigned nulodLevels_ = source.ReadUInt();
-        std::vector<SharedPtr<Geometry> > geometryLodLevels;
+        Vector<SharedPtr<Geometry> > geometryLodLevels;
         
         for (unsigned j = 0; j < nulodLevels_; ++j)
         {
@@ -163,12 +163,12 @@ bool Model::Load(Deserializer& source)
             unsigned indexStart = source.ReadUInt();
             unsigned indexCount = source.ReadUInt();
             
-            if (vertexBufferRef >= vertexBuffer_.size())
+            if (vertexBufferRef >= vertexBuffer_.Size())
             {
                 LOGERROR("Vertex buffer index out of bounds");
                 return false;
             }
-            if (indexBufferRef >= indexBuffers_.size())
+            if (indexBufferRef >= indexBuffers_.Size())
             {
                 LOGERROR("Index buffer index out of bounds");
                 return false;
@@ -181,10 +181,10 @@ bool Model::Load(Deserializer& source)
             geometry->SetDrawRange(type, indexStart, indexCount);
             geometry->SetLodDistance(distance);
             
-            geometryLodLevels.push_back(geometry);
+            geometryLodLevels.Push(geometry);
         }
         
-        geometries_.push_back(geometryLodLevels);
+        geometries_.Push(geometryLodLevels);
     }
     
     // Read morphs
@@ -222,7 +222,7 @@ bool Model::Load(Deserializer& source)
             newMorph.buffers_[bufferIndex] = newBuffer;
         }
         
-        morphs_.push_back(newMorph);
+        morphs_.Push(newMorph);
     }
     
     // Read skeleton
@@ -237,12 +237,12 @@ bool Model::Load(Deserializer& source)
 bool Model::Save(Serializer& dest)
 {
     // Build lists of vertex and index buffers used by the geometries
-    std::vector<VertexBuffer*> vertexBuffers;
-    std::vector<IndexBuffer*> indexBuffers;
+    Vector<VertexBuffer*> vertexBuffers;
+    Vector<IndexBuffer*> indexBuffers;
     
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
-        for (unsigned j = 0; j < geometries_[i].size(); ++j)
+        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
             StoreOrLookupVertexBuffer(geometries_[i][j]->GetVertexBuffer(0), vertexBuffers);
             StoreOrLookupIndexBuffer(geometries_[i][j]->GetIndexBuffer(), indexBuffers);
@@ -254,8 +254,8 @@ bool Model::Save(Serializer& dest)
         return false;
     
     // Write vertex buffers
-    dest.WriteUInt(vertexBuffers.size());
-    for (unsigned i = 0; i < vertexBuffers.size(); ++i)
+    dest.WriteUInt(vertexBuffers.Size());
+    for (unsigned i = 0; i < vertexBuffers.Size(); ++i)
     {
         VertexBuffer* buffer = vertexBuffers[i];
         dest.WriteUInt(buffer->GetVertexCount());
@@ -269,8 +269,8 @@ bool Model::Save(Serializer& dest)
         buffer->Unlock();
     }
     // Write index buffers
-    dest.WriteUInt(indexBuffers.size());
-    for (unsigned i = 0; i < indexBuffers.size(); ++i)
+    dest.WriteUInt(indexBuffers.Size());
+    for (unsigned i = 0; i < indexBuffers.Size(); ++i)
     {
         IndexBuffer* buffer = indexBuffers[i];
         dest.WriteUInt(buffer->GetIndexCount());
@@ -282,17 +282,17 @@ bool Model::Save(Serializer& dest)
         buffer->Unlock();
     }
     // Write geometries
-    dest.WriteUInt(geometries_.size());
-    for (unsigned i = 0; i < geometries_.size(); ++i)
+    dest.WriteUInt(geometries_.Size());
+    for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         // Write bone mappings
-        dest.WriteUInt(geometryBoneMappings_[i].size());
-        for (unsigned j = 0; j < geometryBoneMappings_[i].size(); ++j)
+        dest.WriteUInt(geometryBoneMappings_[i].Size());
+        for (unsigned j = 0; j < geometryBoneMappings_[i].Size(); ++j)
             dest.WriteUInt(geometryBoneMappings_[i][j]);
         
         // Write the LOD levels
-        dest.WriteUInt(geometries_[i].size());
-        for (unsigned j = 0; j < geometries_[i].size(); ++j)
+        dest.WriteUInt(geometries_[i].Size());
+        for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
             Geometry* geometry = geometries_[i][j];
             dest.WriteFloat(geometry->GetLodDistance());
@@ -305,31 +305,31 @@ bool Model::Save(Serializer& dest)
     }
     
     // Write morphs
-    dest.WriteUInt(morphs_.size());
-    for (unsigned i = 0; i < morphs_.size(); ++i)
+    dest.WriteUInt(morphs_.Size());
+    for (unsigned i = 0; i < morphs_.Size(); ++i)
     {
         dest.WriteString(morphs_[i].name_);
-        dest.WriteUInt(morphs_[i].buffers_.size());
+        dest.WriteUInt(morphs_[i].buffers_.Size());
         
         // Write morph vertex buffers
-        for (std::map<unsigned int, VertexBufferMorph>::const_iterator j = morphs_[i].buffers_.begin();
-            j != morphs_[i].buffers_.end(); ++j)
+        for (Map<unsigned int, VertexBufferMorph>::ConstIterator j = morphs_[i].buffers_.Begin();
+            j != morphs_[i].buffers_.End(); ++j)
         {
-            dest.WriteUInt(j->first);
-            dest.WriteUInt(j->second.elementMask_);
-            dest.WriteUInt(j->second.vertexCount_);
+            dest.WriteUInt(j->first_);
+            dest.WriteUInt(j->second_.elementMask_);
+            dest.WriteUInt(j->second_.vertexCount_);
             
             // Base size: size of each vertex index
             unsigned vertexSize = sizeof(unsigned);
             // Add size of individual elements
-            if (j->second.elementMask_ & MASK_POSITION)
+            if (j->second_.elementMask_ & MASK_POSITION)
                 vertexSize += sizeof(Vector3);
-            if (j->second.elementMask_ & MASK_NORMAL)
+            if (j->second_.elementMask_ & MASK_NORMAL)
                 vertexSize += sizeof(Vector3);
-            if (j->second.elementMask_ & MASK_TANGENT)
+            if (j->second_.elementMask_ & MASK_TANGENT)
                 vertexSize += sizeof(Vector3);
             
-            dest.Write(j->second.morphData_.GetPtr(), vertexSize * j->second.vertexCount_);
+            dest.Write(j->second_.morphData_.GetPtr(), vertexSize * j->second_.vertexCount_);
         }
     }
     
@@ -349,13 +349,13 @@ void Model::SetBoundingBox(const BoundingBox& box)
 
 void Model::SetNumGeometries(unsigned num)
 {
-    geometries_.resize(num);
-    geometryBoneMappings_.resize(num);
+    geometries_.Resize(num);
+    geometryBoneMappings_.Resize(num);
 }
 
 bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
 {
-    if (index >= geometries_.size())
+    if (index >= geometries_.Size())
     {
         LOGERROR("Geometry index out of bounds");
         return false;
@@ -366,18 +366,18 @@ bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
         return false;
     }
     
-    geometries_[index].resize(num);
+    geometries_[index].Resize(num);
     return true;
 }
 
 bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
 {
-    if (index >= geometries_.size())
+    if (index >= geometries_.Size())
     {
         LOGERROR("Geometry index out of bounds");
         return false;
     }
-    if (lodLevel >= geometries_[index].size())
+    if (lodLevel >= geometries_[index].Size())
     {
         LOGERROR("LOD level index out of bounds");
         return false;
@@ -392,24 +392,24 @@ void Model::SetSkeleton(const Skeleton& skeleton)
     skeleton_ = skeleton;
 }
 
-void Model::SetGeometryBoneMappings(const std::vector<std::vector<unsigned> >& geometryBoneMappings)
+void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned> >& geometryBoneMappings)
 {
     geometryBoneMappings_ = geometryBoneMappings;
 }
 
-void Model::SetMorphs(const std::vector<ModelMorph>& morphs)
+void Model::SetMorphs(const Vector<ModelMorph>& morphs)
 {
     morphs_ = morphs;
 }
 
 unsigned Model::GetNumGeometryLodLevels(unsigned index) const
 {
-    return index < geometries_.size() ? geometries_[index].size() : 0;
+    return index < geometries_.Size() ? geometries_[index].Size() : 0;
 }
 
 Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 {
-    if ((index >= geometries_.size()) || (lodLevel >= geometries_[index].size()))
+    if ((index >= geometries_.Size()) || (lodLevel >= geometries_[index].Size()))
         return 0;
     
     return geometries_[index][lodLevel];
@@ -417,7 +417,7 @@ Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 
 const ModelMorph* Model::GetMorph(unsigned index) const
 {
-    return index < morphs_.size() ? &morphs_[index] : 0;
+    return index < morphs_.Size() ? &morphs_[index] : 0;
 }
 
 const ModelMorph* Model::GetMorph(const String& name) const
@@ -427,7 +427,7 @@ const ModelMorph* Model::GetMorph(const String& name) const
 
 const ModelMorph* Model::GetMorph(StringHash nameHash) const
 {
-    for (std::vector<ModelMorph>::const_iterator i = morphs_.begin(); i != morphs_.end(); ++i)
+    for (Vector<ModelMorph>::ConstIterator i = morphs_.Begin(); i != morphs_.End(); ++i)
     {
         if (i->nameHash_ == nameHash)
             return &(*i);

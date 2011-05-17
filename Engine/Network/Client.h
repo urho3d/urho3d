@@ -29,8 +29,8 @@
 #include "Timer.h"
 #include "VectorBuffer.h"
 
-#include <map>
-#include <set>
+#include "Map.h"
+#include "Set.h"
 
 class Connection;
 class Network;
@@ -67,7 +67,7 @@ struct SceneInfo
     /// Scene file name
     String fileName_;
     /// Required package files
-    std::vector<PackageInfo> requiredPackages_;
+    Vector<PackageInfo> requiredPackages_;
 };
 
 /// An ongoing download from the server
@@ -159,9 +159,9 @@ public:
     /// Return scene info
     const SceneInfo& GetSceneInfo() const { return sceneInfo_; }
     /// Return number of ongoing file transfers
-    unsigned GetNumFileTransfers() { return fileTransfers_.size(); }
+    unsigned GetNumFileTransfers() { return fileTransfers_.Size(); }
     /// Return ongoing file transfers
-    const std::map<StringHash, FileTransfer>& GetFileTransfers() { return fileTransfers_; }
+    const Map<StringHash, FileTransfer>& GetFileTransfers() { return fileTransfers_; }
     /// Return download directory
     const String& GetDownloadDirectory() const { return downloadDirectory_; }
     /// Return file transfer status as text
@@ -205,7 +205,7 @@ private:
     /// Send a client update packet
     void SendClientUpdate();
     /// Read a server update block
-    void ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, std::set<unsigned>& updatedNodes, std::set<unsigned>& updatedComponents);
+    void ReadNetUpdateBlock(Deserializer& source, unsigned char msgID, Set<unsigned>& updatedNodes, Set<unsigned>& updatedComponents);
     
     /// Scene
     SharedPtr<Scene> scene_;
@@ -220,11 +220,11 @@ private:
     /// Scene info
     SceneInfo sceneInfo_;
     /// Ongoing file downloads
-    std::map<StringHash, FileTransfer> fileTransfers_;
+    Map<StringHash, FileTransfer> fileTransfers_;
     /// Directory to use for downloads
     String downloadDirectory_;
     /// Downloads required to join the scene
-    std::set<String> pendingDownloads_;
+    Set<String> pendingDownloads_;
     /// Login data to send to the server
     VariantMap pendingLoginData_;
 };

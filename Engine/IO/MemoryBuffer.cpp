@@ -46,16 +46,16 @@ MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
         size_ = 0;
 }
 
-MemoryBuffer::MemoryBuffer(std::vector<unsigned char>& data) :
-    Deserializer(data.size()),
-    buffer_(data.size() ? &data[0] : 0),
+MemoryBuffer::MemoryBuffer(Vector<unsigned char>& data) :
+    Deserializer(data.Size()),
+    buffer_(data.Size() ? &data[0] : 0),
     readOnly_(false)
 {
 }
 
-MemoryBuffer::MemoryBuffer(const std::vector<unsigned char>& data) :
-    Deserializer(data.size()),
-    buffer_(data.size() ? const_cast<unsigned char*>(&data[0]) : 0),
+MemoryBuffer::MemoryBuffer(const Vector<unsigned char>& data) :
+    Deserializer(data.Size()),
+    buffer_(data.Size() ? const_cast<unsigned char*>(&data[0]) : 0),
     readOnly_(true)
 {
 }

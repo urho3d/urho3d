@@ -107,9 +107,9 @@ public:
     /// Return connection state
     ConnectionState GetConnectionState() const { return connectionState_; }
     /// Return whether has received packets waiting
-    bool HasPackets() const { return packets_.size() > 0; }
+    bool HasPackets() const { return packets_.Size() > 0; }
     /// Return number of received packets waiting
-    unsigned GetNumPackets() const { return packets_.size(); }
+    unsigned GetNumPackets() const { return packets_.Size(); }
     /// Return address of remote host
     const String& GetAddress()const { return address_; }
     /// Return port of remote host
@@ -134,9 +134,9 @@ private:
     /// Connection state
     ConnectionState connectionState_;
     /// Received packets per channel
-    std::map<unsigned char, std::vector<QueuedPacket> > packets_;
+    Map<unsigned char, Vector<QueuedPacket> > packets_;
     /// Latency-simulated packets waiting to be sent
-    std::vector<QueuedPacket> sentPackets_;
+    Vector<QueuedPacket> sentPackets_;
     /// Remote host address
     String address_;
     /// Remote host port

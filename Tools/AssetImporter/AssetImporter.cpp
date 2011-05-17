@@ -44,10 +44,10 @@
 #include "XMLFile.h"
 #include "Zone.h"
 
-#include <algorithm>
+#include "Sort.h"
 #include <cstring>
-#include <map>
-#include <set>
+#include "Map.h"
+#include "Set.h"
 
 #include <assimp.hpp>
 #include <aiScene.h>
@@ -75,13 +75,13 @@ struct OutModel
     
     String outName_;
     aiNode* rootNode_;
-    std::set<unsigned> meshIndices_;
-    std::vector<aiMesh*> meshes_;
-    std::vector<aiNode*> meshNodes_;
-    std::vector<aiNode*> bones_;
-    std::vector<aiAnimation*> animations_;
-    std::vector<float> boneRadii_;
-    std::vector<BoundingBox> boneHitboxes_;
+    Set<unsigned> meshIndices_;
+    Vector<aiMesh*> meshes_;
+    Vector<aiNode*> meshNodes_;
+    Vector<aiNode*> bones_;
+    Vector<aiAnimation*> animations_;
+    Vector<float> boneRadii_;
+    Vector<BoundingBox> boneHitboxes_;
     aiNode* rootBone_;
     unsigned totalVertices_;
     unsigned totalIndices_;
@@ -91,9 +91,9 @@ struct OutScene
 {
     String outName_;
     aiNode* rootNode_;
-    std::vector<OutModel> models_;
-    std::vector<aiNode*> nodes_;
-    std::vector<unsigned> nodeModelIndices_;
+    Vector<OutModel> models_;
+    Vector<aiNode*> nodes_;
+    Vector<unsigned> nodeModelIndices_;
 };
 
 SharedPtr<Context> context_(new Context());
@@ -110,13 +110,13 @@ bool createZone_ = true;
 bool noAnimations_ = false;
 
 int main(int argc, char** argv);
-void Run(const std::vector<String>& arguments);
+void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
 void ExportModel(const String& outName);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model);
-void CollectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node);
+void CollectBonesFinal(Vector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel& model);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
@@ -126,26 +126,26 @@ void ExportScene(const String& outName);
 void CollectSceneModels(OutScene& scene, aiNode* node);
 void BuildAndSaveScene(OutScene& scene);
 
-void ExportMaterials(std::set<String>& usedTextures);
-void BuildAndSaveMaterial(aiMaterial* material, std::set<String>& usedTextures);
-void CopyTextures(const std::set<String>& usedTextures, const String& sourcePath);
+void ExportMaterials(Set<String>& usedTextures);
+void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures);
+void CopyTextures(const Set<String>& usedTextures, const String& sourcePath);
 
-void CombineLods(const std::vector<float>& lodDistances, const std::vector<String>& modelNames, const String& outName);
+void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
-void GetMeshesUnderNode(std::vector<std::pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
-    blendIndices, std::vector<std::vector<float> >& blendWeights);
+void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char> >&
+    blendIndices, Vector<Vector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, std::vector<std::vector<unsigned char> >& blendIndices,
-    std::vector<std::vector<float> >& blendWeights);
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char> >& blendIndices,
+    Vector<Vector<float> >& blendWeights);
 unsigned GetElementMask(aiMesh* mesh);
 
 aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
@@ -162,18 +162,18 @@ String SanitateAssetName(const String& name);
 
 int main(int argc, char** argv)
 {
-    std::vector<String> arguments;
+    Vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(argv[i]);
+        arguments.Push(argv[i]);
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<String>& arguments)
+void Run(const Vector<String>& arguments)
 {
-    if (arguments.size() < 2)
+    if (arguments.Size() < 2)
     {
         ErrorExit(
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
@@ -222,7 +222,7 @@ void Run(const std::vector<String>& arguments)
         aiProcess_FindInstances |
         aiProcess_OptimizeMeshes;
     
-    for (unsigned i = 2; i < arguments.size(); ++i)
+    for (unsigned i = 2; i < arguments.Size(); ++i)
     {
         if ((arguments[i].Length() >= 2) && (arguments[i][0] == '-'))
         {
@@ -298,7 +298,7 @@ void Run(const std::vector<String>& arguments)
     {
         String inFile = arguments[1];
         String outFile;
-        if ((arguments.size() > 2) && (arguments[2][0] != '-'))
+        if ((arguments.Size() > 2) && (arguments[2][0] != '-'))
             outFile = arguments[2].Replace('\\', '/');
         
         if (resourcePath_.Empty())
@@ -348,19 +348,19 @@ void Run(const std::vector<String>& arguments)
         
         if (!noMaterials)
         {
-            std::set<String> usedTextures;
+            Set<String> usedTextures;
             ExportMaterials(usedTextures);
             CopyTextures(usedTextures, GetPath(inFile));
         }
     }
     else
     {
-        std::vector<float> lodDistances;
-        std::vector<String> modelNames;
+        Vector<float> lodDistances;
+        Vector<String> modelNames;
         String outFile;
         
         unsigned numLodArguments = 0;
-        for (unsigned i = 1; i < arguments.size(); ++i)
+        for (unsigned i = 1; i < arguments.Size(); ++i)
         {
             if (arguments[i][0] == '-')
                 break;
@@ -378,9 +378,9 @@ void Run(const std::vector<String>& arguments)
             else
             {
                 if (i & 1)
-                    lodDistances.push_back(Max(ToFloat(arguments[i]), 0.0f));
+                    lodDistances.Push(Max(ToFloat(arguments[i]), 0.0f));
                 else
-                    modelNames.push_back(arguments[i].Replace('\\', '/'));
+                    modelNames.Push(arguments[i].Replace('\\', '/'));
             }
         }
         
@@ -445,7 +445,7 @@ void ExportModel(const String& outName)
         File listFile(context_);
         if (listFile.Open(materialListName_, FILE_WRITE))
         {
-            for (unsigned i = 0; i < model.meshes_.size(); ++i)
+            for (unsigned i = 0; i < model.meshes_.Size(); ++i)
                 listFile.WriteLine(GetMeshMaterialName(model.meshes_[i]));
         }
         else
@@ -458,7 +458,7 @@ void CollectMeshes(OutModel& model, aiNode* node)
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene_->mMeshes[node->mMeshes[i]];
-        for (unsigned j = 0; j < model.meshes_.size(); ++j)
+        for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
             if (mesh == model.meshes_[j])
             {
@@ -467,9 +467,9 @@ void CollectMeshes(OutModel& model, aiNode* node)
             }
         }
         
-        model.meshIndices_.insert(node->mMeshes[i]);
-        model.meshes_.push_back(mesh);
-        model.meshNodes_.push_back(node);
+        model.meshIndices_.Insert(node->mMeshes[i]);
+        model.meshes_.Push(mesh);
+        model.meshNodes_.Push(node);
         model.totalVertices_ += mesh->mNumVertices;
         model.totalIndices_ += mesh->mNumFaces * 3;
     }
@@ -480,10 +480,10 @@ void CollectMeshes(OutModel& model, aiNode* node)
 
 void CollectBones(OutModel& model)
 {
-    std::set<aiNode*> necessary;
-    std::set<aiNode*> rootNodes;
+    Set<aiNode*> necessary;
+    Set<aiNode*> rootNodes;
     
-    for (unsigned i = 0; i < model.meshes_.size(); ++i)
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         aiNode* meshNode = model.meshNodes_[i];
@@ -497,7 +497,7 @@ void CollectBones(OutModel& model)
             aiNode* boneNode = FindNode(boneName, scene_->mRootNode, true);
             if (!boneNode)
                 ErrorExit("Could not find scene node for bone " + boneName);
-            necessary.insert(boneNode);
+            necessary.Insert(boneNode);
             rootNode = boneNode;
             
             for (;;)
@@ -506,19 +506,19 @@ void CollectBones(OutModel& model)
                 if ((!boneNode) || (boneNode == meshNode) || (boneNode == meshParentNode))
                     break;
                 rootNode = boneNode;
-                necessary.insert(boneNode);
+                necessary.Insert(boneNode);
             }
             
-            if (rootNodes.find(rootNode) == rootNodes.end())
-                rootNodes.insert(rootNode);
+            if (rootNodes.Find(rootNode) == rootNodes.End())
+                rootNodes.Insert(rootNode);
         }
     }
     
     // If we find multiple root nodes, try to remedy by using their parent instead
-    if (rootNodes.size() > 1)
+    if (rootNodes.Size() > 1)
     {
-        aiNode* commonParent = (*rootNodes.begin())->mParent;
-        for (std::set<aiNode*>::iterator i = rootNodes.begin(); i != rootNodes.end(); ++i)
+        aiNode* commonParent = (*rootNodes.Begin())->mParent;
+        for (Set<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
         {
             if ((*i) != commonParent)
             {
@@ -526,31 +526,31 @@ void CollectBones(OutModel& model)
                     ErrorExit("Skeleton with multiple root nodes found, not supported");
             }
         }
-        rootNodes.clear();
-        rootNodes.insert(commonParent);
-        necessary.insert(commonParent);
+        rootNodes.Clear();
+        rootNodes.Insert(commonParent);
+        necessary.Insert(commonParent);
     }
     
-    if (rootNodes.empty())
+    if (rootNodes.Empty())
         return;
     
-    model.rootBone_ = *rootNodes.begin();
+    model.rootBone_ = *rootNodes.Begin();
     CollectBonesFinal(model.bones_, necessary, model.rootBone_);
     // Initialize the bone collision info
-    model.boneRadii_.resize(model.bones_.size());
-    model.boneHitboxes_.resize(model.bones_.size());
-    for (unsigned i = 0; i < model.bones_.size(); ++i)
+    model.boneRadii_.Resize(model.bones_.Size());
+    model.boneHitboxes_.Resize(model.bones_.Size());
+    for (unsigned i = 0; i < model.bones_.Size(); ++i)
     {
         model.boneRadii_[i] = 0.0f;
         model.boneHitboxes_[i] = BoundingBox(0.0f, 0.0f);
     }
 }
 
-void CollectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* node)
+void CollectBonesFinal(Vector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node)
 {
-    if (necessary.find(node) != necessary.end())
+    if (necessary.Find(node) != necessary.End())
     {
-        dest.push_back(node);
+        dest.Push(node);
         for (unsigned i = 0; i < node->mNumChildren; ++i)
             CollectBonesFinal(dest, necessary, node->mChildren[i]);
     }
@@ -574,7 +574,7 @@ void CollectAnimations(OutModel& model)
             }
         }
         if (modelBoneFound)
-            model.animations_.push_back(anim);
+            model.animations_.Push(anim);
     }
     
     /// \todo Vertex morphs are ignored for now
@@ -582,7 +582,7 @@ void CollectAnimations(OutModel& model)
 
 void BuildBoneCollisionInfo(OutModel& model)
 {
-    for (unsigned i = 0; i < model.meshes_.size(); ++i)
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
@@ -615,20 +615,20 @@ void BuildAndSaveModel(OutModel& model)
     if (!model.rootNode_)
         ErrorExit("Null root node for model");
     String rootNodeName = ToString(model.rootNode_->mName);
-    if (!model.meshes_.size())
+    if (!model.meshes_.Size())
         ErrorExit("No geometries found starting from node " + rootNodeName);
     
     PrintLine("Writing model " + rootNodeName);
     
     SharedPtr<Model> outModel(new Model(context_));
-    outModel->SetNumGeometries(model.meshes_.size());
-    std::vector<std::vector<unsigned> > allBoneMappings;
+    outModel->SetNumGeometries(model.meshes_.Size());
+    Vector<Vector<unsigned> > allBoneMappings;
     BoundingBox box;
     
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
     unsigned elementMask = GetElementMask(model.meshes_[0]);
-    for (unsigned i = 1; i < model.meshes_.size(); ++i)
+    for (unsigned i = 1; i < model.meshes_.Size(); ++i)
     {
         if (GetElementMask(model.meshes_[i]) != elementMask)
         {
@@ -640,7 +640,7 @@ void BuildAndSaveModel(OutModel& model)
     if ((combineBuffers) && (model.totalVertices_ > 65535))
     {
         bool allUnder65k = true;
-        for (unsigned i = 0; i < model.meshes_.size(); ++i)
+        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             if (model.meshes_[i]->mNumVertices > 65535)
                 allUnder65k = false;
@@ -652,7 +652,7 @@ void BuildAndSaveModel(OutModel& model)
     if (!combineBuffers)
     {
         PrintLine("Writing separate buffers");
-        for (unsigned i = 0; i < model.meshes_.size(); ++i)
+        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             // Get the world transform of the mesh for baking into the vertices
             Matrix4x3 vertexTransform;
@@ -694,10 +694,10 @@ void BuildAndSaveModel(OutModel& model)
             
             // Build the vertex data
             // If there are bones, get blend data
-            std::vector<std::vector<unsigned char> > blendIndices;
-            std::vector<std::vector<float> > blendWeights;
-            std::vector<unsigned> boneMappings;
-            if (model.bones_.size())
+            Vector<Vector<unsigned char> > blendIndices;
+            Vector<Vector<float> > blendWeights;
+            Vector<unsigned> boneMappings;
+            if (model.bones_.Size())
                 GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
             
             void* vertexData = vb->Lock(0, vb->GetVertexCount(), LOCK_NORMAL);
@@ -714,8 +714,8 @@ void BuildAndSaveModel(OutModel& model)
             geom->SetDrawRange(TRIANGLE_LIST, 0, mesh->mNumFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
-            if (model.bones_.size() > MAX_SKIN_MATRICES)
-                allBoneMappings.push_back(boneMappings);
+            if (model.bones_.Size() > MAX_SKIN_MATRICES)
+                allBoneMappings.Push(boneMappings);
         }
     }
     else
@@ -735,7 +735,7 @@ void BuildAndSaveModel(OutModel& model)
         ib->Unlock();
         vb->Unlock();
         
-        for (unsigned i = 0; i < model.meshes_.size(); ++i)
+        for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             // Get the world transform of the mesh for baking into the vertices
             Matrix4x3 vertexTransform;
@@ -768,10 +768,10 @@ void BuildAndSaveModel(OutModel& model)
             
             // Build the vertex data
             // If there are bones, get blend data
-            std::vector<std::vector<unsigned char> > blendIndices;
-            std::vector<std::vector<float> > blendWeights;
-            std::vector<unsigned> boneMappings;
-            if (model.bones_.size())
+            Vector<Vector<unsigned char> > blendIndices;
+            Vector<Vector<float> > blendWeights;
+            Vector<unsigned> boneMappings;
+            if (model.bones_.Size())
                 GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
             
             float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
@@ -784,8 +784,8 @@ void BuildAndSaveModel(OutModel& model)
             geom->SetDrawRange(TRIANGLE_LIST, startIndexOffset, mesh->mNumFaces * 3, true);
             outModel->SetNumGeometryLodLevels(i, 1);
             outModel->SetGeometry(i, 0, geom);
-            if (model.bones_.size() > MAX_SKIN_MATRICES)
-                allBoneMappings.push_back(boneMappings);
+            if (model.bones_.Size() > MAX_SKIN_MATRICES)
+                allBoneMappings.Push(boneMappings);
             
             startVertexOffset += mesh->mNumVertices;
             startIndexOffset += mesh->mNumFaces * 3;
@@ -795,15 +795,15 @@ void BuildAndSaveModel(OutModel& model)
     outModel->SetBoundingBox(box);
     
     // Build skeleton if necessary
-    if ((model.bones_.size()) && (model.rootBone_))
+    if ((model.bones_.Size()) && (model.rootBone_))
     {
-        PrintLine("Writing skeleton with " + ToString(model.bones_.size()) + " bones, rootbone " +
+        PrintLine("Writing skeleton with " + ToString(model.bones_.Size()) + " bones, rootbone " +
             ToString(model.rootBone_->mName));
         
         Skeleton skeleton;
-        std::vector<Bone>& bones = skeleton.GetModifiableBones();
+        Vector<Bone>& bones = skeleton.GetModifiableBones();
         
-        for (unsigned i = 0; i < model.bones_.size(); ++i)
+        for (unsigned i = 0; i < model.bones_.Size(); ++i)
         {
             aiNode* boneNode = model.bones_[i];
             String boneName(ToString(boneNode->mName));
@@ -824,13 +824,13 @@ void BuildAndSaveModel(OutModel& model)
             newBone.boundingBox_ = model.boneHitboxes_[i];
             newBone.collisionMask_ = BONECOLLISION_SPHERE | BONECOLLISION_BOX;
             newBone.parentIndex_ = i;
-            bones.push_back(newBone);
+            bones.Push(newBone);
         }
         // Set the bone hierarchy
-        for (unsigned i = 1; i < model.bones_.size(); ++i)
+        for (unsigned i = 1; i < model.bones_.Size(); ++i)
         {
             String parentName = ToString(model.bones_[i]->mParent->mName);
-            for (unsigned j = 0; j < bones.size(); ++j)
+            for (unsigned j = 0; j < bones.Size(); ++j)
             {
                 if (bones[j].name_ == parentName)
                 {
@@ -841,7 +841,7 @@ void BuildAndSaveModel(OutModel& model)
         }
         
         outModel->SetSkeleton(skeleton);
-        if (model.bones_.size() > MAX_SKIN_MATRICES)
+        if (model.bones_.Size() > MAX_SKIN_MATRICES)
             outModel->SetGeometryBoneMappings(allBoneMappings);
     }
     
@@ -853,7 +853,7 @@ void BuildAndSaveModel(OutModel& model)
 
 void BuildAndSaveAnimations(OutModel& model)
 {
-    for (unsigned i = 0; i < model.animations_.size(); ++i)
+    for (unsigned i = 0; i < model.animations_.Size(); ++i)
     {
         aiAnimation* anim = model.animations_[i];
         String animName = ToString(anim->mName);
@@ -867,7 +867,7 @@ void BuildAndSaveAnimations(OutModel& model)
         outAnim->SetLength((float)anim->mDuration * tickConversion);
         
         PrintLine("Writing animation " + animName + " length " + ToString(outAnim->GetLength()));
-        std::vector<AnimationTrack> tracks;
+        Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
@@ -979,10 +979,10 @@ void BuildAndSaveAnimations(OutModel& model)
                 if (track.channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
                 
-                track.keyFrames_.push_back(kf);
+                track.keyFrames_.Push(kf);
             }
             
-            tracks.push_back(track);
+            tracks.Push(track);
         }
         
         outAnim->SetTracks(tracks);
@@ -1006,7 +1006,7 @@ void ExportScene(const String& outName)
     CollectSceneModels(outScene, rootNode_);
     
     // Save models
-    for (unsigned i = 0; i < outScene.models_.size(); ++i)
+    for (unsigned i = 0; i < outScene.models_.Size(); ++i)
         BuildAndSaveModel(outScene.models_[i]);
     
     // Save scene
@@ -1015,34 +1015,34 @@ void ExportScene(const String& outName)
 
 void CollectSceneModels(OutScene& scene, aiNode* node)
 {
-    std::vector<std::pair<aiNode*, aiMesh*> > meshes;
+    Vector<Pair<aiNode*, aiMesh*> > meshes;
     GetMeshesUnderNode(meshes, node);
     
-    if (meshes.size())
+    if (meshes.Size())
     {
         OutModel model;
         model.rootNode_ = node;
         model.outName_ = resourcePath_ + (useSubdirs_ ? "Models/" : "") + SanitateAssetName(ToString(node->mName)) + ".mdl";
-        for (unsigned i = 0; i < meshes.size(); ++i)
+        for (unsigned i = 0; i < meshes.Size(); ++i)
         {
-            aiMesh* mesh = meshes[i].second;
+            aiMesh* mesh = meshes[i].second_;
             unsigned meshIndex = GetMeshIndex(mesh);
-            model.meshIndices_.insert(meshIndex);
-            model.meshes_.push_back(mesh);
-            model.meshNodes_.push_back(meshes[i].first);
+            model.meshIndices_.Insert(meshIndex);
+            model.meshes_.Push(mesh);
+            model.meshNodes_.Push(meshes[i].first_);
             model.totalVertices_ += mesh->mNumVertices;
             model.totalIndices_ += mesh->mNumFaces * 3;
         }
         
         // Check if a model with identical mesh indices already exists. If yes, do not export twice
         bool unique = true;
-        for (unsigned i = 0; i < scene.models_.size(); ++i)
+        for (unsigned i = 0; i < scene.models_.Size(); ++i)
         {
             if (scene.models_[i].meshIndices_ == model.meshIndices_)
             {
                 PrintLine("Added node " + ToString(node->mName));
-                scene.nodes_.push_back(node);
-                scene.nodeModelIndices_.push_back(i);
+                scene.nodes_.Push(node);
+                scene.nodeModelIndices_.Push(i);
                 unique = false;
                 break;
             }
@@ -1059,9 +1059,9 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
                 BuildAndSaveAnimations(model);
             }
             
-            scene.models_.push_back(model);
-            scene.nodes_.push_back(node);
-            scene.nodeModelIndices_.push_back(scene.models_.size() - 1);
+            scene.models_.Push(model);
+            scene.nodes_.Push(node);
+            scene.nodeModelIndices_.Push(scene.models_.Size() - 1);
         }
     }
     
@@ -1098,7 +1098,7 @@ void BuildAndSaveScene(OutScene& scene)
     
     ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
     
-    for (unsigned i = 0; i < scene.nodes_.size(); ++i)
+    for (unsigned i = 0; i < scene.nodes_.Size(); ++i)
     {
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         
@@ -1112,7 +1112,7 @@ void BuildAndSaveScene(OutScene& scene)
         {
             Model* dummyModel = new Model(context_);
             dummyModel->SetName(modelName);
-            dummyModel->SetNumGeometries(model.meshes_.size());
+            dummyModel->SetNumGeometries(model.meshes_.Size());
             cache->AddManualResource(dummyModel);
         }
         staticModel->SetModel(cache->GetResource<Model>(modelName));
@@ -1123,7 +1123,7 @@ void BuildAndSaveScene(OutScene& scene)
         GetPosRotScale(GetDerivedTransform(scene.nodes_[i], rootNode_), pos, rot, scale);
         modelNode->SetTransform(pos, rot, scale);
         // Set materials if they are known
-        for (unsigned j = 0; j < model.meshes_.size(); ++j)
+        for (unsigned j = 0; j < model.meshes_.Size(); ++j)
         {
             String matName = GetMeshMaterialName(model.meshes_[j]);
             if (!matName.Empty())
@@ -1149,7 +1149,7 @@ void BuildAndSaveScene(OutScene& scene)
         outScene->Save(file);
 }
 
-void ExportMaterials(std::set<String>& usedTextures)
+void ExportMaterials(Set<String>& usedTextures)
 {
     if (useSubdirs_)
         fileSystem_->CreateDir(resourcePath_ + "Materials");
@@ -1158,7 +1158,7 @@ void ExportMaterials(std::set<String>& usedTextures)
         BuildAndSaveMaterial(scene_->mMaterials[i], usedTextures);
 }
 
-void BuildAndSaveMaterial(aiMaterial* material, std::set<String>& usedTextures)
+void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
 {
     // Material must have name so it can be successfully saved
     aiString matNameStr;
@@ -1223,14 +1223,14 @@ void BuildAndSaveMaterial(aiMaterial* material, std::set<String>& usedTextures)
         XMLElement diffuseElem = materialElem.CreateChildElement("texture");
         diffuseElem.SetString("unit", "diffuse");
         diffuseElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + diffuseTexName);
-        usedTextures.insert(diffuseTexName);
+        usedTextures.Insert(diffuseTexName);
     }
     if (!normalTexName.Empty())
     {
         XMLElement normalElem = materialElem.CreateChildElement("texture");
         normalElem.SetString("unit", "diffuse");
         normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + normalTexName);
-        usedTextures.insert(normalTexName);
+        usedTextures.Insert(normalTexName);
     }
     
     XMLElement diffuseColorElem = materialElem.CreateChildElement("parameter");
@@ -1255,23 +1255,23 @@ void BuildAndSaveMaterial(aiMaterial* material, std::set<String>& usedTextures)
     outMaterial.Save(outFile);
 }
 
-void CopyTextures(const std::set<String>& usedTextures, const String& sourcePath)
+void CopyTextures(const Set<String>& usedTextures, const String& sourcePath)
 {
     if (useSubdirs_)
         fileSystem_->CreateDir(resourcePath_ + "Textures");
     
-    for (std::set<String>::const_iterator i = usedTextures.begin(); i != usedTextures.end(); ++i)
+    for (Set<String>::ConstIterator i = usedTextures.Begin(); i != usedTextures.End(); ++i)
     {
         PrintLine("Copying texture " + (*i));
         fileSystem_->Copy(sourcePath + *i, resourcePath_ + (useSubdirs_ ? "Textures/" : "") + *i);
     }
 }
 
-void CombineLods(const std::vector<float>& lodDistances, const std::vector<String>& modelNames, const String& outName)
+void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
 {
     // Load models
-    std::vector<SharedPtr<Model> > srcModels;
-    for (unsigned i = 0; i < modelNames.size(); ++i)
+    Vector<SharedPtr<Model> > srcModels;
+    for (unsigned i = 0; i < modelNames.Size(); ++i)
     {
         PrintLine("Reading LOD level " + ToString(i) + ": model " + modelNames[i] + " distance " + ToString(lodDistances[i]));
         File srcFile(context_);
@@ -1279,11 +1279,11 @@ void CombineLods(const std::vector<float>& lodDistances, const std::vector<Strin
         SharedPtr<Model> srcModel(new Model(context_));
         if (!srcModel->Load(srcFile))
             ErrorExit("Could not load input model " + modelNames[i]);
-        srcModels.push_back(srcModel);
+        srcModels.Push(srcModel);
     }
     
     // Check that none of the models already has LOD levels
-    for (unsigned i = 0; i < srcModels.size(); ++i)
+    for (unsigned i = 0; i < srcModels.Size(); ++i)
     {
         for (unsigned j = 0; j < srcModels[i]->GetNumGeometries(); ++j)
         {
@@ -1293,14 +1293,14 @@ void CombineLods(const std::vector<float>& lodDistances, const std::vector<Strin
     }
     
     // Check for number of geometries (need to have same amount for now)
-    for (unsigned i = 1; i < srcModels.size(); ++i)
+    for (unsigned i = 1; i < srcModels.Size(); ++i)
     {
         if (srcModels[i]->GetNumGeometries() != srcModels[0]->GetNumGeometries())
             ErrorExit(modelNames[i] + " has different amount of geometries than " + modelNames[0]);
     }
     
     // If there are bones, check for compatibility (need to have exact match for now)
-    for (unsigned i = 1; i < srcModels.size(); ++i)
+    for (unsigned i = 1; i < srcModels.Size(); ++i)
     {
         if (srcModels[i]->GetSkeleton().GetNumBones() != srcModels[0]->GetSkeleton().GetNumBones())
             ErrorExit(modelNames[i] + " has different amount of bones than " + modelNames[0]);
@@ -1318,8 +1318,8 @@ void CombineLods(const std::vector<float>& lodDistances, const std::vector<Strin
     outModel->SetNumGeometries(srcModels[0]->GetNumGeometries());
     for (unsigned i = 0; i < srcModels[0]->GetNumGeometries(); ++i)
     {
-        outModel->SetNumGeometryLodLevels(i, srcModels.size());
-        for (unsigned j = 0; j < srcModels.size(); ++j)
+        outModel->SetNumGeometryLodLevels(i, srcModels.Size());
+        for (unsigned j = 0; j < srcModels.Size(); ++j)
         {
             Geometry* geom = srcModels[j]->GetGeometry(i, 0);
             geom->SetLodDistance(lodDistances[j]);
@@ -1339,10 +1339,10 @@ void CombineLods(const std::vector<float>& lodDistances, const std::vector<Strin
     outModel->Save(outFile);
 }
 
-void GetMeshesUnderNode(std::vector<std::pair<aiNode*, aiMesh*> >& dest, aiNode* node)
+void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& dest, aiNode* node)
 {
     for (unsigned i = 0; i < node->mNumMeshes; ++i)
-        dest.push_back(std::make_pair(node, scene_->mMeshes[node->mMeshes[i]]));
+        dest.Push(MakePair(node, scene_->mMeshes[node->mMeshes[i]]));
 }
 
 unsigned GetMeshIndex(aiMesh* mesh)
@@ -1357,7 +1357,7 @@ unsigned GetMeshIndex(aiMesh* mesh)
 
 unsigned GetBoneIndex(OutModel& model, const String& boneName)
 {
-    for (unsigned i = 0; i < model.bones_.size(); ++i)
+    for (unsigned i = 0; i < model.bones_.Size(); ++i)
     {
         if (ToString(model.bones_[i]->mName) == boneName)
             return i;
@@ -1367,7 +1367,7 @@ unsigned GetBoneIndex(OutModel& model, const String& boneName)
 
 aiBone* GetMeshBone(OutModel& model, const String& boneName)
 {
-    for (unsigned i = 0; i < model.meshes_.size(); ++i)
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
@@ -1382,7 +1382,7 @@ aiBone* GetMeshBone(OutModel& model, const String& boneName)
 
 Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
 {
-    for (unsigned i = 0; i < model.meshes_.size(); ++i)
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
         aiNode* node = model.meshNodes_[i];
@@ -1404,19 +1404,19 @@ Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix4x3::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, std::vector<unsigned>& boneMappings, std::vector<std::vector<unsigned char> >&
-    blendIndices, std::vector<std::vector<float> >& blendWeights)
+void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char> >&
+    blendIndices, Vector<Vector<float> >& blendWeights)
 {
-    blendIndices.resize(mesh->mNumVertices);
-    blendWeights.resize(mesh->mNumVertices);
-    boneMappings.clear();
+    blendIndices.Resize(mesh->mNumVertices);
+    blendWeights.Resize(mesh->mNumVertices);
+    boneMappings.Clear();
     
     // If model has more bones than can fit vertex shader parameters, write the per-geometry mappings
-    if (model.bones_.size() > MAX_SKIN_MATRICES)
+    if (model.bones_.Size() > MAX_SKIN_MATRICES)
     {
         if (mesh->mNumBones > MAX_SKIN_MATRICES)
             ErrorExit("Geometry has too many bone influences");
-        boneMappings.resize(mesh->mNumBones);
+        boneMappings.Resize(mesh->mNumBones);
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
             aiBone* bone = mesh->mBones[i];
@@ -1428,9 +1428,9 @@ void GetBlendData(OutModel& model, aiMesh* mesh, std::vector<unsigned>& boneMapp
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].push_back(i);
-                blendWeights[vertex].push_back(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].size() > 4)
+                blendIndices[vertex].Push(i);
+                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                if (blendWeights[vertex].Size() > 4)
                     ErrorExit("More than 4 bone influences on vertex");
             }
         }
@@ -1447,9 +1447,9 @@ void GetBlendData(OutModel& model, aiMesh* mesh, std::vector<unsigned>& boneMapp
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
                 unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].push_back(globalIndex);
-                blendWeights[vertex].push_back(bone->mWeights[j].mWeight);
-                if (blendWeights[vertex].size() > 4)
+                blendIndices[vertex].Push(globalIndex);
+                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                if (blendWeights[vertex].Size() > 4)
                     ErrorExit("More than 4 bone influences on vertex");
             }
         }
@@ -1483,8 +1483,8 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 }
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, std::vector<std::vector<unsigned char> >& blendIndices,
-    std::vector<std::vector<float> >& blendWeights)
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char> >& blendIndices,
+    Vector<Vector<float> >& blendWeights)
 {
     Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);
     box.Merge(vertex);
@@ -1535,7 +1535,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     {
         for (unsigned i = 0; i < 4; ++i)
         {
-            if (i < blendWeights[index].size())
+            if (i < blendWeights[index].Size())
                 *dest++ = blendWeights[index][i];
             else
                 *dest++ = 0.0f;
@@ -1547,7 +1547,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
         ++dest;
         for (unsigned i = 0; i < 4; ++i)
         {
-            if (i < blendIndices[index].size())
+            if (i < blendIndices[index].Size())
                 *destBytes++ = blendIndices[index][i];
             else
                 *destBytes++ = 0;

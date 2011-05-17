@@ -112,7 +112,7 @@ String::Iterator String::Insert(const String::Iterator& dest, const String::Iter
     if (pos > length_)
         pos = length_;
     unsigned length = end - start;
-    ReplaceInPlace(pos, 0, start, length);
+    ReplaceInPlace(pos, 0, &(*start), length);
     
     return Begin() + pos;
 }

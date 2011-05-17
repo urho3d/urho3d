@@ -26,7 +26,7 @@
 #include "Node.h"
 #include "PhysicsDefs.h"
 
-#include <map>
+#include "Map.h"
 
 class DebugRenderer;
 class PhysicsWorld;

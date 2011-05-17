@@ -100,7 +100,7 @@ public:
     /// Read a 16-bit ShortStringHash
     ShortStringHash ReadShortStringHash();
     /// Read a buffer with size encoded as VLE
-    std::vector<unsigned char> ReadBuffer();
+    Vector<unsigned char> ReadBuffer();
     /// Read a resource reference
     ResourceRef ReadResourceRef();
     /// Read a resource reference list

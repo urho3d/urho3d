@@ -28,7 +28,7 @@
 #include "Octree.h"
 #include "OctreeQuery.h"
 
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -39,7 +39,7 @@
 static const float DEFAULT_OCTREE_SIZE = 1000.0f;
 static const int DEFAULT_OCTREE_LEVELS = 8;
 
-inline static bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
+inline bool CompareRayQueryResults(const RayQueryResult& lhs, const RayQueryResult& rhs)
 {
     return lhs.distance_ < rhs.distance_;
 }
@@ -186,7 +186,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
             mask = M_MAX_UNSIGNED;
     }
     
-    for (std::vector<Drawable*>::const_iterator i = drawables_.begin(); i != drawables_.end(); ++i)
+    for (Vector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         unsigned flags = drawable->GetDrawableFlags();
@@ -199,7 +199,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
             continue;
         
         if (query.TestDrawable(drawable->GetWorldBoundingBox(), mask) != OUTSIDE)
-            query.result_.push_back(drawable);
+            query.result_.Push(drawable);
     }
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
@@ -218,7 +218,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     if (octantDist >= query.maxDistance_)
         return;
     
-    for (std::vector<Drawable*>::const_iterator i = drawables_.begin(); i != drawables_.end(); ++i)
+    for (Vector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
@@ -248,19 +248,19 @@ void Octant::Release()
     if ((root_) && (this != root_))
     {
         // Remove the drawables (if any) from this octant to the root octant
-        for (std::vector<Drawable*>::iterator i = drawables_.begin(); i != drawables_.end(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             (*i)->SetOctant(root_);
-            root_->drawables_.push_back(*i);
+            root_->drawables_.Push(*i);
             root_->QueueReinsertion(*i);
         }
-        drawables_.clear();
+        drawables_.Clear();
         numDrawables_ = 0;
     }
     else if (!root_)
     {
         // If the whole octree is being destroyed, just detach the drawables
-        for (std::vector<Drawable*>::iterator i = drawables_.begin(); i != drawables_.end(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
             (*i)->SetOctant(0);
     }
     
@@ -321,7 +321,7 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
     
     worldBoundingBox_ = box;
     cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize, worldBoundingBox_.max_ + halfSize);
-    numDrawables_ = drawables_.size();
+    numDrawables_ = drawables_.Size();
     numLevels_ = numLevels;
 }
 
@@ -331,7 +331,7 @@ void Octree::Update(const FrameInfo& frame)
         PROFILE(UpdateDrawables);
         
         // Let drawables update themselves before reinsertion
-        for (std::set<Drawable*>::iterator i = drawableUpdates_.begin(); i != drawableUpdates_.end(); ++i)
+        for (Set<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
             (*i)->Update(frame);
     }
     
@@ -339,7 +339,7 @@ void Octree::Update(const FrameInfo& frame)
         PROFILE(ReinsertDrawables);
         
         // Reinsert drawables into the octree
-        for (std::set<Drawable*>::iterator i = drawableReinsertions_.begin(); i != drawableReinsertions_.end(); ++i)
+        for (Set<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
         {
             Drawable* drawable = *i;
             Octant* octant = drawable->GetOctant();
@@ -370,15 +370,15 @@ void Octree::Update(const FrameInfo& frame)
         }
     }
     
-    drawableUpdates_.clear();
-    drawableReinsertions_.clear();
+    drawableUpdates_.Clear();
+    drawableReinsertions_.Clear();
 }
 
 void Octree::GetDrawables(OctreeQuery& query) const
 {
     PROFILE(OctreeQuery);
     
-    query.result_.clear();
+    query.result_.Clear();
     GetDrawablesInternal(query, 0);
 }
 
@@ -386,29 +386,29 @@ void Octree::GetDrawables(RayOctreeQuery& query) const
 {
     PROFILE(Raycast);
     
-    query.result_.clear();
+    query.result_.Clear();
     GetDrawablesInternal(query);
-    std::sort(query.result_.begin(), query.result_.end(), CompareRayQueryResults);
+    Sort(query.result_.Begin(), query.result_.End(), CompareRayQueryResults);
 }
 
 void Octree::QueueUpdate(Drawable* drawable)
 {
-    drawableUpdates_.insert(drawable);
+    drawableUpdates_.Insert(drawable);
 }
 
 void Octree::QueueReinsertion(Drawable* drawable)
 {
-    drawableReinsertions_.insert(drawable);
+    drawableReinsertions_.Insert(drawable);
 }
 
 void Octree::CancelUpdate(Drawable* drawable)
 {
-    drawableUpdates_.erase(drawable);
+    drawableUpdates_.Erase(drawable);
 }
 
 void Octree::CancelReinsertion(Drawable* drawable)
 {
-    drawableReinsertions_.erase(drawable);
+    drawableReinsertions_.Erase(drawable);
 }
 
 void Octree::DrawDebugGeometry(bool depthTest)

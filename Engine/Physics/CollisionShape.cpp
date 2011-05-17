@@ -62,14 +62,14 @@ static const float DEFAULT_BOUNCE = 0.0f;
 void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr<Vector3>& destVertexData, unsigned& destVertexCount,
     SharedArrayPtr<unsigned>& destIndexData, unsigned& destIndexCount, const Vector3& scale)
 {
-    const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     
     destVertexCount = 0;
     destIndexCount = 0;
     
-    for (unsigned i = 0; i < geometries.size(); ++i)
+    for (unsigned i = 0; i < geometries.Size(); ++i)
     {
-        unsigned subGeometryLodLevel = Clamp(lodLevel, 0, geometries[i].size());
+        unsigned subGeometryLodLevel = Clamp(lodLevel, 0, geometries[i].Size());
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
             continue;
@@ -87,11 +87,11 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
     unsigned firstVertex = 0;
     unsigned firstIndex = 0;
     
-    for (unsigned i = 0; i < geometries.size(); ++i)
+    for (unsigned i = 0; i < geometries.Size(); ++i)
     {
         unsigned subGeometryLodLevel = lodLevel;
-        if (subGeometryLodLevel >= geometries[i].size())
-            subGeometryLodLevel = geometries[i].size() / 2;
+        if (subGeometryLodLevel >= geometries[i].Size())
+            subGeometryLodLevel = geometries[i].Size() / 2;
         
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
@@ -219,12 +219,12 @@ HeightfieldData::HeightfieldData(Model* model, IntVector2 numPoints, float thick
 {
     modelName_ = model->GetName();
     
-    const std::vector<std::vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
+    const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
     
-    if (!geometries.size())
+    if (!geometries.Size())
         return;
     
-    lodLevel = Clamp(lodLevel, 0, geometries[0].size());
+    lodLevel = Clamp(lodLevel, 0, geometries[0].Size());
     
     Geometry* geom = geometries[0][lodLevel];
     if (!geom)
@@ -849,12 +849,12 @@ void CollisionShape::CreateGeometry()
             if (shapeType_ == SHAPE_CONVEXHULL)
                 id += "_" + ToString(thickness_);
             
-            std::map<String, SharedPtr<TriangleMeshData> >& cache = physicsWorld_->GetTriangleMeshCache();
-            std::map<String, SharedPtr<TriangleMeshData> >::iterator j = cache.find(id);
-            if (j != cache.end())
+            Map<String, SharedPtr<TriangleMeshData> >& cache = physicsWorld_->GetTriangleMeshCache();
+            Map<String, SharedPtr<TriangleMeshData> >::Iterator j = cache.Find(id);
+            if (j != cache.End())
             {
-                geometry_ = dCreateTriMesh(space, j->second->triMesh_, 0, 0, 0);
-                geometryData_ = StaticCast<CollisionGeometryData>(j->second);
+                geometry_ = dCreateTriMesh(space, j->second_->triMesh_, 0, 0, 0);
+                geometryData_ = StaticCast<CollisionGeometryData>(j->second_);
             }
             else
             {
@@ -872,12 +872,12 @@ void CollisionShape::CreateGeometry()
             // Check the geometry cache
             String id = model_->GetName() + "_" + ToString(numPoints_) + "_" + ToString(thickness_) + "_" + ToString(lodLevel_);
             
-            std::map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
-            std::map<String, SharedPtr<HeightfieldData> >::iterator j = cache.find(id);
-            if (j != cache.end())
+            Map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
+            Map<String, SharedPtr<HeightfieldData> >::Iterator j = cache.Find(id);
+            if (j != cache.End())
             {
-                geometry_ = dCreateHeightfield(space, j->second->heightfield_, 1);
-                geometryData_ = StaticCast<CollisionGeometryData>(j->second);
+                geometry_ = dCreateHeightfield(space, j->second_->heightfield_, 1);
+                geometryData_ = StaticCast<CollisionGeometryData>(j->second_);
             }
             else
             {

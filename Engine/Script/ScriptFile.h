@@ -28,8 +28,8 @@
 #include "SharedPtr.h"
 #include "Variant.h"
 
-#include <set>
-#include <vector>
+#include "Set.h"
+#include "Vector.h"
 
 class Script;
 class ScriptInstance;
@@ -100,13 +100,13 @@ private:
     /// Compiled flag
     bool compiled_;
     /// Encountered include files during script file loading
-    std::set<String> includeFiles_;
+    Set<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface
-    std::map<asIObjectType*, bool> checkedClasses_;
+    Map<asIObjectType*, bool> checkedClasses_;
     /// Search cache for functions
-    std::map<String, asIScriptFunction*> functions_;
+    Map<String, asIScriptFunction*> functions_;
     /// Search cache for methods
-    std::map<asIObjectType*, std::map<String, asIScriptFunction*> > methods_;
+    Map<asIObjectType*, Map<String, asIScriptFunction*> > methods_;
 };
 
 /// Get currently executing script file

@@ -25,7 +25,7 @@
 
 #include "Drawable.h"
 
-#include <set>
+#include "Set.h"
 
 class Drawable;
 class Octree;
@@ -58,20 +58,20 @@ public:
     void AddDrawable(Drawable* drawable)
     {
         drawable->SetOctant(this);
-        drawables_.push_back(drawable);
+        drawables_.Push(drawable);
         IncDrawableCount();
     }
     
     /// Remove a drawable object from this octant
     void RemoveDrawable(Drawable* drawable, bool reSetOctant = true)
     {
-        for (std::vector<Drawable*>::iterator i = drawables_.begin(); i != drawables_.end(); ++i)
+        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             if (*i == drawable)
             {
                 if (reSetOctant)
                     drawable->SetOctant(0);
-                drawables_.erase(i);
+                drawables_.Erase(i);
                 DecDrawableCount();
                 return;
             }
@@ -141,7 +141,7 @@ protected:
     /// Octree root
     Octree* root_;
     /// Drawable objects
-    std::vector<Drawable*> drawables_;
+    Vector<Drawable*> drawables_;
     /// Number of drawable objects in this octant and child octants
     unsigned numDrawables_;
 };
@@ -187,9 +187,9 @@ public:
     
 private:
     /// Set of drawable objects that require update
-    std::set<Drawable*> drawableUpdates_;
+    Set<Drawable*> drawableUpdates_;
     /// Set of drawable objects that require reinsertion
-    std::set<Drawable*> drawableReinsertions_;
+    Set<Drawable*> drawableReinsertions_;
     /// Subdivision level
     unsigned numLevels_;
 };

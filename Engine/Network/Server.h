@@ -26,7 +26,7 @@
 #include "Object.h"
 #include "Timer.h"
 
-#include <set>
+#include "Set.h"
 
 class Connection;
 class Network;
@@ -81,9 +81,9 @@ public:
     /// Return whether has a specific scene
     bool HasScene(Scene* scene) const;
     /// Return all scenes
-    const std::vector<SharedPtr<Scene> >& GetScenes() const { return scenes_; }
+    const Vector<SharedPtr<Scene> >& GetScenes() const { return scenes_; }
     /// Return all connections
-    const std::vector<SharedPtr<Connection> >& GetConnections() const { return connections_; }
+    const Vector<SharedPtr<Connection> >& GetConnections() const { return connections_; }
     /// Return number of clients in scene
     unsigned GetNumUsersInScene(Scene* scene) const;
     
@@ -119,14 +119,14 @@ private:
     /// Generate a scene update. If connection has no stored scene revisions, a full update will be written
     void WriteNetUpdate(Connection* connection, Serializer& dest);
     /// Return relevant node IDs for the client
-    void GetRelevantNodes(Connection* connection, std::set<unsigned>& dest) const;
+    void GetRelevantNodes(Connection* connection, Set<unsigned>& dest) const;
     
     /// Scenes
-    std::vector<SharedPtr<Scene> > scenes_;
+    Vector<SharedPtr<Scene> > scenes_;
     /// Client connections
-    std::vector<SharedPtr<Connection> > connections_;
+    Vector<SharedPtr<Connection> > connections_;
     /// Ongoing file downloads
-    std::map<StringHash, ServerFileTransfer> fileTransfers_;
+    Map<StringHash, ServerFileTransfer> fileTransfers_;
     /// Network updates per second
     int netFps_;
     /// Network update time accumulator

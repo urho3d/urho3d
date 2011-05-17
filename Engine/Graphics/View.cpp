@@ -45,7 +45,7 @@
 #include "View.h"
 #include "Zone.h"
 
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -108,9 +108,9 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
         if ((renderTarget->GetWidth() > graphics_->GetWidth()) || (renderTarget->GetHeight() > graphics_->GetHeight()))
         {
             // Display message only once per rendertarget, do not spam each frame
-            if (gBufferErrorDisplayed_.find(renderTarget) == gBufferErrorDisplayed_.end())
+            if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
             {
-                gBufferErrorDisplayed_.insert(renderTarget);
+                gBufferErrorDisplayed_.Insert(renderTarget);
                 LOGERROR("Render texture is larger than the G-buffer, can not render");
             }
             return false;
@@ -171,18 +171,18 @@ void View::Update(const FrameInfo& frame)
     frame_.viewSize_ = IntVector2(width_, height_);
     
     // Clear old light scissor cache, geometry, light, occluder & batch lists
-    lightScissorCache_.clear();
-    geometries_.clear();
-    geometryDepthBounds_.clear();
-    lights_.clear();
-    occluders_.clear();
-    shadowOccluders_.clear();
+    lightScissorCache_.Clear();
+    geometries_.Clear();
+    geometryDepthBounds_.Clear();
+    lights_.Clear();
+    occluders_.Clear();
+    shadowOccluders_.Clear();
     gBufferQueue_.Clear();
     baseQueue_.Clear();
     extraQueue_.Clear();
     transparentQueue_.Clear();
     noShadowLightQueue_.Clear();
-    lightQueues_.clear();
+    lightQueues_.Clear();
     
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
@@ -227,7 +227,7 @@ void View::Render()
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->reuseShadowMaps_)
     {
-        for (unsigned i = 0; i < lightQueues_.size(); ++i)
+        for (unsigned i = 0; i < lightQueues_.Size(); ++i)
         {
             LightBatchQueue& queue = lightQueues_[i];
             if (queue.light_->GetShadowMap())
@@ -271,12 +271,12 @@ void View::GetDrawables()
     Vector3 cameraPos = camera_->GetWorldPosition();
     
     // Get zones & find the zone camera is in
-    std::vector<Zone*> zones;
-    PointOctreeQuery query(reinterpret_cast<std::vector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE);
+    Vector<Zone*> zones;
+    PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE);
     octree_->GetDrawables(query);
     
     int highestZonePriority = M_MIN_INT;
-    for (unsigned i = 0; i < zones.size(); ++i)
+    for (unsigned i = 0; i < zones.Size(); ++i)
     {
         Zone* zone = zones[i];
         if ((zone->IsInside(cameraPos)) && (zone->GetPriority() > highestZonePriority))
@@ -292,13 +292,13 @@ void View::GetDrawables()
     
     if (maxOccluderTriangles_ > 0)
     {
-        FrustumOctreeQuery query(reinterpret_cast<std::vector<Drawable*>& >(occluders_), camera_->GetFrustum(),
+        FrustumOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(occluders_), camera_->GetFrustum(),
             DRAWABLE_GEOMETRY, true, false);
         
         octree_->GetDrawables(query);
         UpdateOccluders(occluders_, camera_);
         
-        if (occluders_.size())
+        if (occluders_.Size())
         {
             buffer = renderer_->GetOrCreateOcclusionBuffer(camera_, maxOccluderTriangles_);
             
@@ -329,7 +329,7 @@ void View::GetDrawables()
     Matrix4x3 view(camera_->GetInverseWorldTransform());
     unsigned cameraViewMask = camera_->GetViewMask();
     
-    for (unsigned i = 0; i < tempDrawables_.size(); ++i)
+    for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
     {
         Drawable* drawable = tempDrawables_[i];
         
@@ -362,8 +362,8 @@ void View::GetDrawables()
             bounds.min_ = geoview_Box.min_.z_;
             bounds.max_ = geoview_Box.max_.z_;
             
-            geometryDepthBounds_.push_back(bounds);
-            geometries_.push_back(drawable);
+            geometryDepthBounds_.Push(bounds);
+            geometries_.Push(drawable);
         }
         else if (flags & DRAWABLE_LIGHT)
         {
@@ -374,23 +374,23 @@ void View::GetDrawables()
                 continue;
             
             light->MarkInView(frame_);
-            lights_.push_back(light);
+            lights_.Push(light);
         }
     }
     
     // Sort the lights to brightest/closest first
-    for (unsigned i = 0; i < lights_.size(); ++i)
+    for (unsigned i = 0; i < lights_.Size(); ++i)
         lights_[i]->SetIntensitySortValue(cameraPos);
     
-    std::sort(lights_.begin(), lights_.end(), CompareDrawables);
+    Sort(lights_.Begin(), lights_.End(), CompareDrawables);
 }
 
 
 void View::GetBatches()
 {
-    std::set<LitTransparencyCheck> litTransparencies;
-    std::set<Drawable*> maxLightsDrawables;
-    std::map<Light*, unsigned> lightQueueIndex;
+    Set<LitTransparencyCheck> litTransparencies;
+    Set<Drawable*> maxLightsDrawables;
+    Map<Light*, unsigned> lightQueueIndex;
     
     PassType gBufferPass = PASS_DEFERRED;
     PassType additionalPass = PASS_EXTRA;
@@ -402,10 +402,10 @@ void View::GetBatches()
     
     // Go through lights
     {
-        PROFILE_MULTIPLE(GetLightBatches, lights_.size());
+        PROFILE_MULTIPLE(GetLightBatches, lights_.Size());
         
         unsigned lightQueueCount = 0;
-        for (unsigned i = 0; i < lights_.size(); ++i)
+        for (unsigned i = 0; i < lights_.Size(); ++i)
         {
             Light* light = lights_[i];
             unsigned splits = ProcessLight(light);
@@ -414,8 +414,8 @@ void View::GetBatches()
                 continue;
             
             // Prepare lit object + shadow caster queues for each split
-            if (lightQueues_.size() < lightQueueCount + splits)
-                lightQueues_.resize(lightQueueCount + splits);
+            if (lightQueues_.Size() < lightQueueCount + splits)
+                lightQueues_.Resize(lightQueueCount + splits);
             unsigned prevLightQueueCount = lightQueueCount;
             
             for (unsigned j = 0; j < splits; ++j)
@@ -425,12 +425,12 @@ void View::GetBatches()
                 lightQueue.light_ = SplitLight;
                 lightQueue.shadowBatches_.Clear();
                 lightQueue.litBatches_.Clear();
-                lightQueue.volumeBatches_.clear();
+                lightQueue.volumeBatches_.Clear();
                 lightQueue.lastSplit_ = false;
                 
                 // Loop through shadow casters
                 Camera* shadowCamera = SplitLight->GetShadowCamera();
-                for (unsigned k = 0; k < shadowCasters_[j].size(); ++k)
+                for (unsigned k = 0; k < shadowCasters_[j].Size(); ++k)
                 {
                     Drawable* drawable = shadowCasters_[j][k];
                     unsigned numBatches = drawable->GetNumBatches();
@@ -461,11 +461,11 @@ void View::GetBatches()
                 }
                 
                 // Loop through lit geometries
-                if (litGeometries_[j].size())
+                if (litGeometries_[j].Size())
                 {
                     bool storeLightQueue = true;
                     
-                    for (unsigned k = 0; k < litGeometries_[j].size(); ++k)
+                    for (unsigned k = 0; k < litGeometries_[j].Size(); ++k)
                     {
                         Drawable* drawable = litGeometries_[j][k];
                         
@@ -475,7 +475,7 @@ void View::GetBatches()
                         else
                         {
                             drawable->AddLight(SplitLight);
-                            maxLightsDrawables.insert(drawable);
+                            maxLightsDrawables.Insert(drawable);
                         }
                     }
                     
@@ -494,7 +494,7 @@ void View::GetBatches()
                         
                         // If light is a split point light, it must be treated as shadowed in any case for correct stencil clearing
                         if ((SplitLight->GetShadowMap()) || (SplitLight->GetLightType() == LIGHT_SPLITPOINT))
-                            lightQueue.volumeBatches_.push_back(volumeBatch);
+                            lightQueue.volumeBatches_.Push(volumeBatch);
                         else
                         {
                             storeLightQueue = false;
@@ -516,21 +516,21 @@ void View::GetBatches()
         }
         
         // Resize the light queue vector now that final size is known
-        lightQueues_.resize(lightQueueCount);
+        lightQueues_.Resize(lightQueueCount);
     }
     
     // Process drawables with limited light count
-    if (maxLightsDrawables.size())
+    if (maxLightsDrawables.Size())
     {
         PROFILE(GetMaxLightsBatches);
         
-        for (std::set<Drawable*>::iterator i = maxLightsDrawables.begin(); i != maxLightsDrawables.end(); ++i)
+        for (Set<Drawable*>::Iterator i = maxLightsDrawables.Begin(); i != maxLightsDrawables.End(); ++i)
         {
             Drawable* drawable = *i;
             drawable->LimitLights();
-            const std::vector<Light*>& lights = drawable->GetLights();
+            const Vector<Light*>& lights = drawable->GetLights();
             
-            for (unsigned i = 0; i < lights.size(); ++i)
+            for (unsigned i = 0; i < lights.Size(); ++i)
             {
                 Light* SplitLight = lights[i];
                 Light* light = SplitLight->GetOriginalLight();
@@ -539,9 +539,9 @@ void View::GetBatches()
                 
                 // Find the correct light queue again
                 LightBatchQueue* queue = 0;
-                std::map<Light*, unsigned>::iterator j = lightQueueIndex.find(SplitLight);
-                if (j != lightQueueIndex.end())
-                    queue = &lightQueues_[j->second];
+                Map<Light*, unsigned>::Iterator j = lightQueueIndex.Find(SplitLight);
+                if (j != lightQueueIndex.End())
+                    queue = &lightQueues_[j->second_];
                 
                 GetLitBatches(drawable, light, SplitLight, queue, litTransparencies, gBufferPass);
             }
@@ -551,7 +551,7 @@ void View::GetBatches()
     // Go through geometries for base pass batches
     {
         PROFILE(GetBaseBatches);
-        for (unsigned i = 0; i < geometries_.size(); ++i)
+        for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             Drawable* drawable = geometries_[i];
             unsigned numBatches = drawable->GetNumBatches();
@@ -638,7 +638,7 @@ void View::GetBatches()
 }
 
 void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue,
-    std::set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass)
+    Set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass)
 {
     bool splitPointLight = SplitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
@@ -712,11 +712,11 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
             {
                 // Check if already lit
                 LitTransparencyCheck check(light, drawable, i);
-                if (litTransparencies.find(check) != litTransparencies.end())
+                if (litTransparencies.Find(check) != litTransparencies.End())
                     continue;
                 // Use the original light instead of the split one, to choose correct scissor
                 litBatch.light_ = light;
-                litTransparencies.insert(check);
+                litTransparencies.Insert(check);
             }
             
             renderer_->setBatchShaders(litBatch, tech, pass, allowShadows);
@@ -746,7 +746,7 @@ void View::RenderBatcheforward()
         // Render shadow maps + opaque objects' shadowed additive lighting
         PROFILE(RenderLights);
         
-        for (unsigned i = 0; i < lightQueues_.size(); ++i)
+        for (unsigned i = 0; i < lightQueues_.Size(); ++i)
         {
             LightBatchQueue& queue = lightQueues_[i];
             
@@ -921,7 +921,7 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderLights);
         
         // Shadowed lights
-        for (unsigned i = 0; i < lightQueues_.size(); ++i)
+        for (unsigned i = 0; i < lightQueues_.Size(); ++i)
         {
             LightBatchQueue& queue = lightQueues_[i];
             
@@ -930,7 +930,7 @@ void View::RenderBatchesDeferred()
                 RenderShadowMap(queue);
             
             // Light volume batches are not sorted as there should be only one of them
-            if (queue.volumeBatches_.size())
+            if (queue.volumeBatches_.Size())
             {
                 graphics_->ClearLastParameterSources();
                 
@@ -947,7 +947,7 @@ void View::RenderBatchesDeferred()
                 graphics_->ResetDepthStencil();
                 graphics_->SetViewport(screenRect_);
                 
-                for (unsigned j = 0; j < queue.volumeBatches_.size(); ++j)
+                for (unsigned j = 0; j < queue.volumeBatches_.Size(); ++j)
                 {
                     renderer_->SetupLightBatch(queue.volumeBatches_[j]);
                     queue.volumeBatches_[j].Draw(graphics_);
@@ -960,7 +960,7 @@ void View::RenderBatchesDeferred()
         }
         
         // Non-shadowed lights
-        if (noShadowLightQueue_.sortedBatches_.size())
+        if (noShadowLightQueue_.sortedBatches_.Size())
         {
             graphics_->ClearLastParameterSources();
             
@@ -977,7 +977,7 @@ void View::RenderBatchesDeferred()
             graphics_->ResetDepthStencil();
             graphics_->SetViewport(screenRect_);
             
-            for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.size(); ++i)
+            for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.Size(); ++i)
             {
                 renderer_->SetupLightBatch(*noShadowLightQueue_.sortedBatches_[i]);
                 noShadowLightQueue_.sortedBatches_[i]->Draw(graphics_);
@@ -1061,7 +1061,7 @@ void View::RenderBatchesDeferred()
     }
 }
 
-void View::UpdateOccluders(std::vector<Drawable*>& occluders, Camera* camera)
+void View::UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera)
 {
     float occluderSizeThreshold_ = renderer_->GetOccluderSizeThreshold();
     float halfViewSize = camera->GetHalfViewSize();
@@ -1069,7 +1069,7 @@ void View::UpdateOccluders(std::vector<Drawable*>& occluders, Camera* camera)
     Vector3 cameraPos = camera->GetWorldPosition();
     unsigned cameraViewMask = camera->GetViewMask();
     
-    for (unsigned i = 0; i < occluders.size(); ++i)
+    for (unsigned i = 0; i < occluders.Size(); ++i)
     {
         Drawable* occluder = occluders[i];
         occluder->UpdateDistance(frame_);
@@ -1115,19 +1115,19 @@ void View::UpdateOccluders(std::vector<Drawable*>& occluders, Camera* camera)
         }
         else
         {
-            occluders.erase(occluders.begin() + i);
+            occluders.Erase(occluders.Begin() + i);
             --i;
         }
     }
     
     // Sort occluders so that if triangle budget is exceeded, best occluders have been drawn
-    if (occluders.size())
-        std::sort(occluders.begin(), occluders.end(), CompareDrawables);
+    if (occluders.Size())
+        Sort(occluders.Begin(), occluders.End(), CompareDrawables);
 }
 
-void View::DrawOccluders(OcclusionBuffer* buffer, const std::vector<Drawable*>& occluders)
+void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders)
 {
-    for (unsigned i = 0; i < occluders.size(); ++i)
+    for (unsigned i = 0; i < occluders.Size(); ++i)
     {
         Drawable* occluder = occluders[i];
         if (i > 0)
@@ -1184,13 +1184,13 @@ unsigned View::ProcessLight(Light* light)
         SetupShadowCamera(light, true);
         
         // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery query(reinterpret_cast<std::vector<Drawable*>& >(shadowOccluders_), shadowCamera->GetFrustum(),
+        FrustumOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(shadowOccluders_), shadowCamera->GetFrustum(),
             DRAWABLE_GEOMETRY, true, true);
         octree_->GetDrawables(query);
         
         UpdateOccluders(shadowOccluders_, shadowCamera);
         
-        if (shadowOccluders_.size())
+        if (shadowOccluders_.Size())
         {
             // Shadow viewport is rectangular and consumes more CPU fillrate, so halve size
             buffer = renderer_->GetOrCreateOcclusionBuffer(shadowCamera, maxOccluderTriangles_, true);
@@ -1204,8 +1204,8 @@ unsigned View::ProcessLight(Light* light)
     // Process each split for shadow camera update, lit geometries, and shadow casters
     for (unsigned i = 0; i < numSplits; ++i)
     {
-        litGeometries_[i].clear();
-        shadowCasters_[i].clear();
+        litGeometries_[i].Clear();
+        shadowCasters_[i].Clear();
     }
     
     for (unsigned i = 0; i < numSplits; ++i)
@@ -1265,7 +1265,7 @@ unsigned View::ProcessLight(Light* light)
                 
                 if (!optimize)
                 {
-                    for (unsigned j = 0; j < geometries_.size(); ++j)
+                    for (unsigned j = 0; j < geometries_.Size(); ++j)
                     {
                         Drawable* drawable = geometries_[j];
                         const GeometryDepthBounds& bounds = geometryDepthBounds_[j];
@@ -1274,7 +1274,7 @@ unsigned View::ProcessLight(Light* light)
                         if ((bounds.min_ <= farSplit) && (bounds.max_ >= nearSplit) && (drawable->GetLightMask() &
                             split->GetLightMask()))
                         {
-                            litGeometries_[i].push_back(drawable);
+                            litGeometries_[i].Push(drawable);
                             if (generateBoxes)
                                 geometryBox.Merge(drawable->GetWorldBoundingBox().GetTransformed(lightView));
                         }
@@ -1282,14 +1282,14 @@ unsigned View::ProcessLight(Light* light)
                 }
                 else
                 {
-                    for (unsigned j = 0; j < geometries_.size(); ++j)
+                    for (unsigned j = 0; j < geometries_.Size(); ++j)
                     {
                         Drawable* drawable = geometries_[j];
                         
                         // Need to check light mask only
                         if (drawable->GetLightMask() & split->GetLightMask())
                         {
-                            litGeometries_[i].push_back(drawable);
+                            litGeometries_[i].Push(drawable);
                             if (generateBoxes)
                                 geometryBox.Merge(drawable->GetWorldBoundingBox().GetTransformed(lightView));
                         }
@@ -1298,7 +1298,7 @@ unsigned View::ProcessLight(Light* light)
             }
             
             // Then get shadow casters by shadow camera frustum query. Use occlusion because of potentially many geometries
-            if ((isSplitShadowed) && (litGeometries_[i].size()))
+            if ((isSplitShadowed) && (litGeometries_[i].Size()))
             {
                 Camera* shadowCamera = split->GetShadowCamera();
                 
@@ -1339,7 +1339,7 @@ unsigned View::ProcessLight(Light* light)
         }
         
         // Optimization: if a particular split has no shadow casters, render as unshadowed
-        if (!shadowCasters_[i].size())
+        if (!shadowCasters_[i].Size())
             split->SetShadowMap(0);
         
         // Focus shadow camera as applicable
@@ -1357,8 +1357,8 @@ unsigned View::ProcessLight(Light* light)
         }
         
         // Update count of total lit geometries & shadow casters
-        numLitGeometries += litGeometries_[i].size();
-        numShadowCasters += shadowCasters_[i].size();
+        numLitGeometries += litGeometries_[i].Size();
+        numShadowCasters += shadowCasters_[i].Size();
     }
     
     // If no lit geometries at all, no need to process further
@@ -1370,16 +1370,16 @@ unsigned View::ProcessLight(Light* light)
         if (numSplits > 1)
         {
             // Make sure there are no duplicates
-            std::set<Drawable*> allLitGeometries;
+            Set<Drawable*> allLitGeometries;
             for (unsigned i = 0; i < numSplits; ++i)
             {
-                for (std::vector<Drawable*>::iterator j = litGeometries_[i].begin(); j != litGeometries_[i].end(); ++j)
-                    allLitGeometries.insert(*j);
+                for (Vector<Drawable*>::Iterator j = litGeometries_[i].Begin(); j != litGeometries_[i].End(); ++j)
+                    allLitGeometries.Insert(*j);
             }
             
-            litGeometries_[0].resize(allLitGeometries.size());
+            litGeometries_[0].Resize(allLitGeometries.Size());
             unsigned index = 0;
-            for (std::set<Drawable*>::iterator i = allLitGeometries.begin(); i != allLitGeometries.end(); ++i)
+            for (Set<Drawable*>::Iterator i = allLitGeometries.Begin(); i != allLitGeometries.End(); ++i)
                 litGeometries_[0][index++] = *i;
         }
         
@@ -1391,7 +1391,7 @@ unsigned View::ProcessLight(Light* light)
     return numSplits;
 }
 
-void View::ProcessLightQuery(unsigned splitIndex, const std::vector<Drawable*>& result, BoundingBox& geometryBox,
+void View::ProcessLightQuery(unsigned splitIndex, const Vector<Drawable*>& result, BoundingBox& geometryBox,
     BoundingBox& shadowCasterBox, bool getLitGeometries, bool GetShadowCasters)
 {
     Light* light = splitLights_[splitIndex];
@@ -1431,7 +1431,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const std::vector<Drawable*>& 
     BoundingBox lightViewBox;
     BoundingBox lightProjBox;
     
-    for (unsigned i = 0; i < result.size(); ++i)
+    for (unsigned i = 0; i < result.Size(); ++i)
     {
         Drawable* drawable = static_cast<Drawable*>(result[i]);
         drawable->UpdateDistance(frame_);
@@ -1465,7 +1465,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const std::vector<Drawable*>& 
                 boxGenerated = true;
             }
             
-            litGeometries_[splitIndex].push_back(drawable);
+            litGeometries_[splitIndex].Push(drawable);
         }
         
         // Shadow caster need not be inside main camera frustum: in that case try to detect whether
@@ -1500,7 +1500,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const std::vector<Drawable*>& 
                     drawable->MarkInShadowView(frame_);
                     drawable->UpdateGeometry(frame_);
                 }
-                shadowCasters_[splitIndex].push_back(drawable);
+                shadowCasters_[splitIndex].Push(drawable);
             }
         }
     }
@@ -1738,9 +1738,9 @@ void View::OptimizeLightByScissor(Light* light)
 
 const Rect& View::GetLightScissor(Light* light)
 {
-    std::map<Light*, Rect>::iterator i = lightScissorCache_.find(light);
-    if (i != lightScissorCache_.end())
-        return i->second;
+    Map<Light*, Rect>::Iterator i = lightScissorCache_.Find(light);
+    if (i != lightScissorCache_.End())
+        return i->second_;
     
     Matrix4x3 view(camera_->GetInverseWorldTransform());
     Matrix4 projection(camera_->GetProjection());
@@ -1873,8 +1873,8 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
         return 0;
     
     float lodDistance = drawable->GetLodDistance();
-    const std::vector<TechniqueEntry>& techniques = material->GetTechniques();
-    if (!techniques.size())
+    const Vector<TechniqueEntry>& techniques = material->GetTechniques();
+    if (!techniques.Size())
         return 0;
     
     // Check for suitable technique. Techniques should be ordered like this:
@@ -1882,7 +1882,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     // Most distant & lowest quality
     // Second most distant & highest quality
     // ...
-    for (unsigned i = 0; i < techniques.size(); ++i)
+    for (unsigned i = 0; i < techniques.Size(); ++i)
     {
         const TechniqueEntry& entry = techniques[i];
         Technique* technique = entry.technique_;
@@ -1893,14 +1893,14 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     }
     
     // If no suitable technique found, fallback to the last
-    return techniques[techniques.size() - 1].technique_;
+    return techniques[techniques.Size() - 1].technique_;
 }
 
 void View::CheckMaterialForAuxView(Material* material)
 {
-    const std::vector<SharedPtr<Texture> >& textures = material->GetTextures();
+    const Vector<SharedPtr<Texture> >& textures = material->GetTextures();
     
-    for (unsigned i = 0; i < textures.size(); ++i)
+    for (unsigned i = 0; i < textures.Size(); ++i)
     {
         // Have to check cube & 2D textures separately
         Texture* texture = textures[i];
@@ -1952,7 +1952,7 @@ void View::SortBatches()
     extraQueue_.SortFrontToBack();
     transparentQueue_.SortBackToFront();
     
-    for (unsigned i = 0; i < lightQueues_.size(); ++i)
+    for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
         lightQueues_[i].shadowBatches_.SortFrontToBack();
         lightQueues_[i].litBatches_.SortFrontToBack();
@@ -1970,7 +1970,7 @@ void View::PrepareInstancingBuffer()
     totalInstances += baseQueue_.GetNumInstances();
     totalInstances += extraQueue_.GetNumInstances();
     
-    for (unsigned i = 0; i < lightQueues_.size(); ++i)
+    for (unsigned i = 0; i < lightQueues_.Size(); ++i)
     {
         totalInstances += lightQueues_[i].shadowBatches_.GetNumInstances();
         totalInstances += lightQueues_[i].litBatches_.GetNumInstances();
@@ -1988,7 +1988,7 @@ void View::PrepareInstancingBuffer()
             baseQueue_.SetTransforms(lockedData, freeIndex);
             extraQueue_.SetTransforms(lockedData, freeIndex);
             
-            for (unsigned i = 0; i < lightQueues_.size(); ++i)
+            for (unsigned i = 0; i < lightQueues_.Size(); ++i)
             {
                 lightQueues_[i].shadowBatches_.SetTransforms(lockedData, freeIndex);
                 lightQueues_[i].litBatches_.SetTransforms(lockedData, freeIndex);
@@ -2132,16 +2132,16 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
     graphics_->SetStencilTest(false);
     
     // Priority instanced
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = queue.priorityBatchGroups_.begin(); i !=
-        queue.priorityBatchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.priorityBatchGroups_.Begin(); i !=
+        queue.priorityBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second;
+        const BatchGroup& group = i->second_;
         if ((useLightBuffer) && (!group.light_))
             graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
         group.Draw(graphics_, instancingBuffer);
     }
     // Priority non-instanced
-    for (std::vector<Batch*>::const_iterator i = queue.sortedPriorityBatches_.begin(); i != queue.sortedPriorityBatches_.end(); ++i)
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
         if ((useLightBuffer) && (!batch->light_))
@@ -2150,10 +2150,10 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
     }
     
     // Non-priority instanced
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = queue.batchGroups_.begin(); i !=
-        queue.batchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.batchGroups_.Begin(); i !=
+        queue.batchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second;
+        const BatchGroup& group = i->second_;
         if ((useScissor) && (group.light_))
             OptimizeLightByScissor(group.light_);
         else
@@ -2163,7 +2163,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
         group.Draw(graphics_, instancingBuffer);
     }
     // Non-priority non-instanced
-    for (std::vector<Batch*>::const_iterator i = queue.sortedBatches_.begin(); i != queue.sortedBatches_.end(); ++i)
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         // For the transparent queue, both priority and non-priority batches are copied here, so check the flag
@@ -2187,14 +2187,14 @@ void View::RenderForwardLightBatchQueue(const BatchQueue& queue, Light* light)
     graphics_->SetStencilTest(false);
     
     // Priority instanced
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = queue.priorityBatchGroups_.begin(); i !=
-        queue.priorityBatchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.priorityBatchGroups_.Begin(); i !=
+        queue.priorityBatchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second;
+        const BatchGroup& group = i->second_;
         group.Draw(graphics_, instancingBuffer);
     }
     // Priority non-instanced
-    for (std::vector<Batch*>::const_iterator i = queue.sortedPriorityBatches_.begin(); i != queue.sortedPriorityBatches_.end(); ++i)
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
         batch->Draw(graphics_);
@@ -2210,14 +2210,14 @@ void View::RenderForwardLightBatchQueue(const BatchQueue& queue, Light* light)
     }
     
     // Non-priority instanced
-    for (std::map<BatchGroupKey, BatchGroup>::const_iterator i = queue.batchGroups_.begin(); i !=
-        queue.batchGroups_.end(); ++i)
+    for (Map<BatchGroupKey, BatchGroup>::ConstIterator i = queue.batchGroups_.Begin(); i !=
+        queue.batchGroups_.End(); ++i)
     {
-        const BatchGroup& group = i->second;
+        const BatchGroup& group = i->second_;
         group.Draw(graphics_, instancingBuffer);
     }
     // Non-priority non-instanced
-    for (std::vector<Batch*>::const_iterator i = queue.sortedBatches_.begin(); i != queue.sortedBatches_.end(); ++i)
+    for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
         batch->Draw(graphics_);

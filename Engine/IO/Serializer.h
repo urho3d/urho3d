@@ -25,8 +25,8 @@
 
 #include "StringHash.h"
 
-#include <map>
-#include <vector>
+#include "Map.h"
+#include "Vector.h"
 
 class Color;
 class IntRect;
@@ -40,8 +40,8 @@ class Vector4;
 struct ResourceRef;
 struct ResourceRefList;
 
-typedef std::vector<Variant> VariantVector;
-typedef std::map<ShortStringHash, Variant> VariantMap;
+typedef Vector<Variant> VariantVector;
+typedef Map<ShortStringHash, Variant> VariantMap;
 
 /// Abstract stream for writing
 class Serializer
@@ -100,7 +100,7 @@ public:
     /// Write a 16-bit ShortStringHash
     bool WriteShortStringHash(const ShortStringHash& value);
     /// Write a buffer, with size encoded as VLE
-    bool WriteBuffer(const std::vector<unsigned char>& buffer);
+    bool WriteBuffer(const Vector<unsigned char>& buffer);
     /// Write a resource reference
     bool WriteResourceRef(const ResourceRef& value);
     /// Write a resource reference list

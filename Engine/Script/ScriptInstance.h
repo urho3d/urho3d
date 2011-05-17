@@ -121,9 +121,9 @@ private:
     /// Check for supported methods
     void GetSupportedMethods();
     /// Get script object's serialization data by calling a script function
-    std::vector<unsigned char> GetScriptData() const;
+    Vector<unsigned char> GetScriptData() const;
     /// Set script object's serialization data by calling a script function
-    void SetScriptData(std::vector<unsigned char> data);
+    void SetScriptData(Vector<unsigned char> data);
     /// Handle scene update event
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event
@@ -160,7 +160,7 @@ private:
     /// Fixed post update time accumulator
     float fixedPostUpdateAcc_;
     /// Delayed method calls
-    std::vector<DelayedMethodCall> delayedMethodCalls_;
+    Vector<DelayedMethodCall> delayedMethodCalls_;
 };
 
 /// Return the Urho3D context of the active script context

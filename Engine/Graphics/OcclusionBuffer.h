@@ -27,7 +27,7 @@
 #include "GraphicsDefs.h"
 #include "SharedArrayPtr.h"
 
-#include <vector>
+#include "Vector.h"
 
 class BoundingBox;
 class Camera;
@@ -155,5 +155,5 @@ private:
     /// Highest level buffer with safety padding
     SharedArrayPtr<int> fullBuffer_;
     /// Reduced size depth buffers
-    std::vector<SharedArrayPtr<DepthValue> > mipBuffers_;
+    Vector<SharedArrayPtr<DepthValue> > mipBuffers_;
 };

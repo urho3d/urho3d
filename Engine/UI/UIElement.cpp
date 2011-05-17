@@ -100,15 +100,15 @@ UIElement::UIElement(Context* context) :
 UIElement::~UIElement()
 {
     // If child elements have outside references, detach them
-    while (children_.size())
+    while (children_.Size())
     {
-        const SharedPtr<UIElement>& element = children_.back();
+        const SharedPtr<UIElement>& element = children_.Back();
         if (element.GetRefCount() > 1)
         {
             element->parent_ = 0;
             element->MarkDirty();
         }
-        children_.pop_back();
+        children_.Pop();
     }
 }
 
@@ -625,23 +625,23 @@ void UIElement::UpdateLayout()
     // Prevent further updates while this update happens
     DisableLayoutUpdate();
     
-    std::vector<int> positions;
-    std::vector<int> sizes;
-    std::vector<int> minSizes;
-    std::vector<int> maxSizes;
+    Vector<int> positions;
+    Vector<int> sizes;
+    Vector<int> minSizes;
+    Vector<int> maxSizes;
     
     if (layoutMode_ == LM_HORIZONTAL)
     {
         int minChildHeight = 0;
         
-        for (unsigned i = 0; i < children_.size(); ++i)
+        for (unsigned i = 0; i < children_.Size(); ++i)
         {
             if (!children_[i]->IsVisible())
                 continue;
-            positions.push_back(0);
-            sizes.push_back(children_[i]->GetWidth());
-            minSizes.push_back(children_[i]->GetMinWidth());
-            maxSizes.push_back(children_[i]->GetMaxWidth());
+            positions.Push(0);
+            sizes.Push(children_[i]->GetWidth());
+            minSizes.Push(children_[i]->GetMinWidth());
+            maxSizes.Push(children_[i]->GetMaxWidth());
             minChildHeight = Max(minChildHeight, children_[i]->GetMinHeight());
         }
         
@@ -663,7 +663,7 @@ void UIElement::UpdateLayout()
         height = size_.y_;
         
         unsigned j = 0;
-        for (unsigned i = 0; i < children_.size(); ++i)
+        for (unsigned i = 0; i < children_.Size(); ++i)
         {
             if (!children_[i]->IsVisible())
                 continue;
@@ -679,14 +679,14 @@ void UIElement::UpdateLayout()
         int minChildWidth = 0;
         int maxChildWidth = M_MAX_INT;
         
-        for (unsigned i = 0; i < children_.size(); ++i)
+        for (unsigned i = 0; i < children_.Size(); ++i)
         {
             if (!children_[i]->IsVisible())
                 continue;
-            positions.push_back(0);
-            sizes.push_back(children_[i]->GetHeight());
-            minSizes.push_back(children_[i]->GetMinHeight());
-            maxSizes.push_back(children_[i]->GetMaxHeight());
+            positions.Push(0);
+            sizes.Push(children_[i]->GetHeight());
+            minSizes.Push(children_[i]->GetMinHeight());
+            maxSizes.Push(children_[i]->GetMaxHeight());
             minChildWidth = Max(minChildWidth, children_[i]->GetMinWidth());
         }
         
@@ -706,7 +706,7 @@ void UIElement::UpdateLayout()
         height = size_.y_;
         
         unsigned j = 0;
-        for (unsigned i = 0; i < children_.size(); ++i)
+        for (unsigned i = 0; i < children_.Size(); ++i)
         {
             if (!children_[i]->IsVisible())
                 continue;
@@ -744,8 +744,8 @@ void UIElement::BringToFront()
     // and decrease others' priority by one. However, take into account only active (enabled) elements
     // and those which have the BringToBack flag set
     int maxPriority = M_MIN_INT;
-    std::vector<UIElement*> topLevelElements = root->GetChildren();
-    for (std::vector<UIElement*>::iterator i = topLevelElements.begin(); i != topLevelElements.end(); ++i)
+    Vector<UIElement*> topLevelElements = root->GetChildren();
+    for (Vector<UIElement*>::Iterator i = topLevelElements.Begin(); i != topLevelElements.End(); ++i)
     {
         UIElement* other = *i;
         if ((other->IsActive()) && (other->bringToBack_) && (other != ptr))
@@ -761,7 +761,7 @@ void UIElement::BringToFront()
 
 void UIElement::AddChild(UIElement* element)
 {
-    InsertChild(children_.size(), element);
+    InsertChild(children_.Size(), element);
 }
 
 void UIElement::InsertChild(unsigned index, UIElement* element)
@@ -771,10 +771,10 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
         return;
     
     // Add first, then remove from old parent, to ensure the element does not get deleted
-    if (index >= children_.size())
-        children_.push_back(SharedPtr<UIElement>(element));
+    if (index >= children_.Size())
+        children_.Push(SharedPtr<UIElement>(element));
     else
-        children_.insert(children_.begin() + index, SharedPtr<UIElement>(element));
+        children_.Insert(children_.Begin() + index, SharedPtr<UIElement>(element));
     
     if (element->parent_)
         element->parent_->RemoveChild(element);
@@ -786,13 +786,13 @@ void UIElement::InsertChild(unsigned index, UIElement* element)
 
 void UIElement::RemoveChild(UIElement* element)
 {
-    for (std::vector<SharedPtr<UIElement> >::iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if ((*i) == element)
         {
             element->parent_ = 0;
             element->MarkDirty();
-            children_.erase(i);
+            children_.Erase(i);
             UpdateLayout();
             return;
         }
@@ -801,12 +801,12 @@ void UIElement::RemoveChild(UIElement* element)
 
 void UIElement::RemoveAllChildren()
 {
-    while (children_.size())
+    while (children_.Size())
     {
-        const SharedPtr<UIElement>& element = children_.back();
+        const SharedPtr<UIElement>& element = children_.Back();
         element->parent_ = 0;
         element->MarkDirty();
-        children_.pop_back();
+        children_.Pop();
     }
 }
 
@@ -894,19 +894,19 @@ float UIElement::GetDerivedOpacity()
     return derivedOpacity_;
 }
 
-std::vector<UIElement*> UIElement::GetChildren(bool recursive) const
+Vector<UIElement*> UIElement::GetChildren(bool recursive) const
 {
     if (!recursive)
     {
-        std::vector<UIElement*> ret;
-        for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
-            ret.push_back(*i);
+        Vector<UIElement*> ret;
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+            ret.Push(*i);
         
         return ret;
     }
     else
     {
-        std::vector<UIElement*> allChildren;
+        Vector<UIElement*> allChildren;
         GetChildrenRecursive(allChildren);
         
         return allChildren;
@@ -916,11 +916,11 @@ std::vector<UIElement*> UIElement::GetChildren(bool recursive) const
 unsigned UIElement::GetNumChildren(bool recursive) const
 {
     if (!recursive)
-        return children_.size();
+        return children_.Size();
     else
     {
-        unsigned allChildren = children_.size();
-        for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+        unsigned allChildren = children_.Size();
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             allChildren += (*i)->GetNumChildren(true);
         
         return allChildren;
@@ -929,12 +929,12 @@ unsigned UIElement::GetNumChildren(bool recursive) const
 
 UIElement* UIElement::GetChild(unsigned index) const
 {
-    return index < children_.size() ? children_[index] : (UIElement*)0;
+    return index < children_.Size() ? children_[index] : (UIElement*)0;
 }
 
 UIElement* UIElement::GetChild(const String& name, bool recursive) const
 {
-    for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if ((*i)->name_ == name)
             return *i;
@@ -1009,7 +1009,7 @@ IntRect UIElement::GetCombinedScreenRect()
     IntVector2 screenPosition(GetScreenPosition());
     IntRect combined(screenPosition.x_, screenPosition.y_, screenPosition.x_ + size_.x_, screenPosition.y_ + size_.y_);
     
-    for (std::vector<SharedPtr<UIElement> >::iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
         IntVector2 childPos = (*i)->GetScreenPosition();
         const IntVector2& childSize = (*i)->GetSize();
@@ -1031,7 +1031,7 @@ void UIElement::SetChildOffset(const IntVector2& offset)
     if (offset != childOffset_)
     {
         childOffset_ = offset;
-        for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->MarkDirty();
     }
 }
@@ -1072,7 +1072,7 @@ void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& bat
     }
     
     AdjustScissor(currentScissor);
-    for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
         if ((*i)->IsVisible())
             (*i)->GetBatchesWithOffset(offset, batches, quads, currentScissor);
@@ -1085,38 +1085,38 @@ void UIElement::MarkDirty()
     opacityDirty_ = true;
     derivedColorDirty_ = true;
     
-    for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
         (*i)->MarkDirty();
 }
 
-void UIElement::GetChildrenRecursive(std::vector<UIElement*>& dest) const
+void UIElement::GetChildrenRecursive(Vector<UIElement*>& dest) const
 {
-    for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        dest.push_back(*i);
+        dest.Push(*i);
         (*i)->GetChildrenRecursive(dest);
     }
 }
 
-int UIElement::CalculateLayoutParentSize(const std::vector<int>& sizes, int begin, int end, int spacing)
+int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, int end, int spacing)
 {
     int width = begin + end;
-    for (unsigned i = 0; i < sizes.size(); ++i)
+    for (unsigned i = 0; i < sizes.Size(); ++i)
     {
         // If calculating maximum size, and the default is specified, do not overflow it
         if (sizes[i] == M_MAX_INT)
             return M_MAX_INT;
         width += sizes[i];
-        if (i < sizes.size() - 1)
+        if (i < sizes.Size() - 1)
             width += spacing;
     }
     return width;
 }
 
-void UIElement::CalculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
-        const std::vector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
+void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
+        const Vector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
 {
-    int numChildren = sizes.size();
+    int numChildren = sizes.Size();
     if (!numChildren)
         return;
     int targetTotalSize = targetSize - begin - end - (numChildren - 1) * spacing;
@@ -1156,18 +1156,18 @@ void UIElement::CalculateLayout(std::vector<int>& positions, std::vector<int>& s
             break;
         
         // Check which of the children can be resized to correct the error. If none, must break
-        std::vector<unsigned> resizable;
+        Vector<unsigned> resizable;
         for (int i = 0; i < numChildren; ++i)
         {
             if ((error < 0) && (sizes[i] > minSizes[i]))
-                resizable.push_back(i);
+                resizable.Push(i);
             else if ((error > 0) && (sizes[i] < maxSizes[i]))
-                resizable.push_back(i);
+                resizable.Push(i);
         }
-        if (resizable.empty())
+        if (resizable.Empty())
             break;
         
-        int numResizable = resizable.size();
+        int numResizable = resizable.Size();
         int errorPerChild = error / numResizable;
         remainder = (abs(error)) % numResizable;
         add = (float)remainder / numResizable;

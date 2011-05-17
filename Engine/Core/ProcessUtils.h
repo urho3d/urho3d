@@ -25,7 +25,7 @@
 
 #include "StringBase.h"
 
-#include <vector>
+#include "Vector.h"
 
 class Mutex;
 
@@ -42,9 +42,9 @@ void PrintLine(const char* str);
 /// Return the static library init/shutdown mutex
 Mutex& GetStaticMutex();
 /// Parse arguments from the command line
-const std::vector<String>& ParseArguments(const char* cmdLine);
+const Vector<String>& ParseArguments(const char* cmdLine);
 /// Return previously parsed arguments
-const std::vector<String>& GetArguments();
+const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input
 String GetConsoleInput();
 /// Return the number of (logical) CPU cores

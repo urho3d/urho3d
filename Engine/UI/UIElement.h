@@ -325,7 +325,7 @@ public:
     /// Return child element by name
     UIElement* GetChild(const String& name, bool recursive = false) const;
     /// Return all child elements
-    std::vector<UIElement*> GetChildren(bool recursive = false) const;
+    Vector<UIElement*> GetChildren(bool recursive = false) const;
     /// Return parent element
     UIElement* GetParent() const { return parent_; }
     /// Return root element
@@ -366,7 +366,7 @@ protected:
     /// Name
     String name_;
     /// Child elements
-    std::vector<SharedPtr<UIElement> > children_;
+    Vector<SharedPtr<UIElement> > children_;
     /// Parent element
     UIElement* parent_;
     /// Child element clipping border
@@ -408,12 +408,12 @@ protected:
     
 private:
     /// Return child elements recursively
-    void GetChildrenRecursive(std::vector<UIElement*>& dest) const;
+    void GetChildrenRecursive(Vector<UIElement*>& dest) const;
     /// Calculate layout width for resizing the parent element
-    int CalculateLayoutParentSize(const std::vector<int>& sizes, int begin, int end, int spacing);
+    int CalculateLayoutParentSize(const Vector<int>& sizes, int begin, int end, int spacing);
     /// Calculate child widths/positions in the layout
-    void CalculateLayout(std::vector<int>& positions, std::vector<int>& sizes, const std::vector<int>& minSizes,
-        const std::vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
+    void CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
+        const Vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
     /// Get child element constant position in a layout
     IntVector2 GetLayoutChildPosition(UIElement* child);
     

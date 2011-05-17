@@ -158,7 +158,7 @@ void Connection::LeftScene()
     }
     
     scene_.Reset();
-    remoteEvents_.clear();
+    remoteEvents_.Clear();
     sceneState_.Clear();
     joinState_ = JS_NOTINSCENE;
 }
@@ -202,7 +202,7 @@ void Connection::SetPosition(const Vector3& position)
 
 void Connection::addRemoteEvent(const RemoteEvent& remoteEvent)
 {
-    remoteEvents_.push_back(remoteEvent);
+    remoteEvents_.Push(remoteEvent);
 }
 
 bool Connection::CheckRemoteEventFrame(const RemoteEvent& remoteEvent, unsigned short previousEventFrameNumber)
@@ -222,7 +222,7 @@ void Connection::PurgeAckedSceneState()
 
 void Connection::PurgeAckedRemoteEvents(unsigned short frameNumber)
 {
-    for (std::vector<RemoteEvent>::iterator i = remoteEvents_.begin(); i != remoteEvents_.end();)
+    for (Vector<RemoteEvent>::Iterator i = remoteEvents_.Begin(); i != remoteEvents_.End();)
     {
         bool erase = false;
         
@@ -238,7 +238,7 @@ void Connection::PurgeAckedRemoteEvents(unsigned short frameNumber)
         }
         
         if (erase)
-            i = remoteEvents_.erase(i);
+            i = remoteEvents_.Erase(i);
         else
             ++i;
     }
@@ -251,7 +251,7 @@ void Connection::ClearSceneState()
 
 void Connection::ClearRemoteEvents()
 {
-    remoteEvents_.clear();
+    remoteEvents_.Clear();
 }
 
 String Connection::GetIdentity() const

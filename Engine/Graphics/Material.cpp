@@ -84,7 +84,7 @@ Material::Material(Context* context) :
     occlusion_(true)
 {
     SetNumTechniques(1);
-    textures_.resize(MAX_MATERIAL_TEXTURE_UNITS);
+    textures_.Resize(MAX_MATERIAL_TEXTURE_UNITS);
     
     // Setup often used default parameters
     vsParameters_[VSP_UOFFSET] = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
@@ -119,7 +119,7 @@ bool Material::Load(Deserializer& source)
     XMLElement rootElem = xml->GetRootElement();
     
     XMLElement techniqueElem = rootElem.GetChildElement("technique");
-    techniques_.clear();
+    techniques_.Clear();
     while (techniqueElem)
     {
         Technique* technique = cache->GetResource<Technique>(techniqueElem.GetString("name"));
@@ -131,7 +131,7 @@ bool Material::Load(Deserializer& source)
                 newTechnique.qualityLevel_ = techniqueElem.GetInt("quality");
             if (techniqueElem.HasAttribute("loddistance"))
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
-            techniques_.push_back(newTechnique);
+            techniques_.Push(newTechnique);
         }
         techniqueElem = techniqueElem.GetNextElement("technique");
     }
@@ -199,10 +199,10 @@ bool Material::Load(Deserializer& source)
     // Calculate memory use
     unsigned memoryUse = 0;
     memoryUse += sizeof(Material);
-    memoryUse += techniques_.size() * sizeof(TechniqueEntry);
-    memoryUse += textures_.size() * sizeof(SharedPtr<Texture>);
-    memoryUse += vsParameters_.size() * (sizeof(VSParameter) + sizeof(Vector4));
-    memoryUse += psParameters_.size() * (sizeof(PSParameter) + sizeof(Vector4));
+    memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
+    memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
+    memoryUse += vsParameters_.Size() * (sizeof(VSParameter) + sizeof(Vector4));
+    memoryUse += psParameters_.Size() * (sizeof(PSParameter) + sizeof(Vector4));
     
     SetMemoryUse(memoryUse);
     Update();
@@ -219,7 +219,7 @@ bool Material::Save(Serializer& dest)
     XMLElement materialElem = xml->CreateRootElement("material");
     
     // Write techniques
-    for (unsigned i = 0; i < techniques_.size(); ++i)
+    for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
         TechniqueEntry& entry = techniques_[i];
         if (!entry.technique_)
@@ -244,17 +244,17 @@ bool Material::Save(Serializer& dest)
     }
     
     // Write shader parameters
-    for (std::map<VSParameter, Vector4>::const_iterator j = vsParameters_.begin(); j != vsParameters_.end(); ++j)
+    for (Map<VSParameter, Vector4>::ConstIterator j = vsParameters_.Begin(); j != vsParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetVSParameterName(j->first));
-        parameterElem.SetVector4("value", j->second);
+        parameterElem.SetString("name", graphics->GetVSParameterName(j->first_));
+        parameterElem.SetVector4("value", j->second_);
     }
-    for (std::map<PSParameter, Vector4>::const_iterator j = psParameters_.begin(); j != psParameters_.end(); ++j)
+    for (Map<PSParameter, Vector4>::ConstIterator j = psParameters_.Begin(); j != psParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetPSParameterName(j->first));
-        parameterElem.SetVector4("value", j->second);
+        parameterElem.SetString("name", graphics->GetPSParameterName(j->first_));
+        parameterElem.SetVector4("value", j->second_);
     }
     
     return xml->Save(dest);
@@ -265,12 +265,12 @@ void Material::SetNumTechniques(unsigned num)
     if (!num)
         return;
     
-    techniques_.resize(num);
+    techniques_.Resize(num);
 }
 
 void Material::SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel, float lodDistance)
 {
-    if (index >= techniques_.size())
+    if (index >= techniques_.Size())
         return;
     
     techniques_[index] = TechniqueEntry(technique, qualityLevel, lodDistance);
@@ -347,7 +347,7 @@ void Material::SetShadowCullMode(CullMode mode)
 
 void Material::ReleaseShaders()
 {
-    for (unsigned i = 0; i < techniques_.size(); ++i)
+    for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
         Technique* technique = techniques_[i].technique_;
         if (technique)
@@ -379,23 +379,23 @@ void Material::MarkForAuxView(unsigned frameNumber)
 const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 {
     TechniqueEntry noEntry;
-    return index < techniques_.size() ? techniques_[index] : noEntry;
+    return index < techniques_.Size() ? techniques_[index] : noEntry;
 }
 
 Technique* Material::GetTechnique(unsigned index) const
 {
-    return index < techniques_.size() ? techniques_[index].technique_ : (Technique*)0;
+    return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
 }
 
 Pass* Material::GetPass(unsigned index, PassType pass) const
 {
-    Technique* technique = index < techniques_.size() ? techniques_[index].technique_ : (Technique*)0;
+    Technique* technique = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
     return technique ? technique->GetPass(pass) : 0;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
-    return (unsigned)unit < textures_.size() ? textures_[unit] : (Texture*)0;
+    return (unsigned)unit < textures_.Size() ? textures_[unit] : (Texture*)0;
 }
 
 const String& Material::GetTextureUnitName(TextureUnit unit)
@@ -407,17 +407,17 @@ void Material::Update()
 {
     // Determine occlusion by checking the first pass of each technique
     occlusion_ = false;
-    for (unsigned i = 0; i < techniques_.size(); ++i)
+    for (unsigned i = 0; i < techniques_.Size(); ++i)
     {
         Technique* technique = techniques_[i].technique_;
         if (!technique)
             continue;
         
-        const std::map<PassType, Pass>& passes = technique->GetPasses();
-        if (!passes.empty())
+        const Map<PassType, Pass>& passes = technique->GetPasses();
+        if (!passes.Empty())
         {
             // If pass writes depth, enable occlusion
-            const Pass& pass = passes.begin()->second;
+            const Pass& pass = passes.Begin()->second_;
             if (pass.GetDepthWrite())
             {
                 occlusion_ = true;

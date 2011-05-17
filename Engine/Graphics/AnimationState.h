@@ -25,7 +25,7 @@
 
 #include "SharedPtr.h"
 
-#include <map>
+#include "Map.h"
 
 class Animation;
 class AnimatedModel;
@@ -91,9 +91,9 @@ private:
     /// Start bone
     Bone* startBone_;
     /// Mapping of animation track indices to bones
-    std::map<unsigned, Bone*> trackToBoneMap_;
+    Map<unsigned, Bone*> trackToBoneMap_;
     /// Last keyframe on each animation track for optimized keyframe search
-    std::vector<unsigned> lastKeyFrame_;
+    Vector<unsigned> lastKeyFrame_;
     /// Looped flag
     bool looped_;
     /// Blending weight

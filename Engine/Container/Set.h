@@ -55,11 +55,23 @@ public:
     /// Set node iterator
     class Iterator : public ListIteratorBase
     {
+        friend class ConstIterator;
+        
     public:
+        /// Construct
         explicit Iterator(Node* ptr) :
-            ptr_(ptr)
+            ListIteratorBase(ptr)
         {
         }
+        
+        /// Preincrement the pointer
+        Iterator& operator ++ () { GotoNext(); return *this; }
+        /// Postincrement the pointer
+        Iterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        /// Predecrement the pointer
+        Iterator& operator -- () { GotoPrev(); return *this; }
+        /// Postdecrement the pointer
+        Iterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
         
         /// Point to the key
         const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
@@ -71,10 +83,28 @@ public:
     class ConstIterator : public ListIteratorBase
     {
     public:
+        /// Construct
         explicit ConstIterator(Node* ptr) :
-            ptr_(ptr)
+            ListIteratorBase(ptr)
         {
         }
+        
+        /// Construct from a non-const iterator
+        ConstIterator(const Iterator& rhs) :
+            ListIteratorBase(rhs.ptr_)
+        {
+        }
+        
+        /// Assign from a non-const iterator
+        ConstIterator& operator = (const Iterator& rhs) { ptr_ = rhs.ptr_; return *this; }
+        /// Preincrement the pointer
+        ConstIterator& operator ++ () { GotoNext(); return *this; }
+        /// Postincrement the pointer
+        ConstIterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        /// Predecrement the pointer
+        ConstIterator& operator -- () { GotoPrev(); return *this; }
+        /// Postdecrement the pointer
+        ConstIterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
         
         /// Point to the key
         const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
@@ -103,7 +133,7 @@ public:
     
     /// Construct from another set
     Set(const Set<T>& set) :
-        SkipListBase(maxHeight)
+        SkipListBase(set.maxHeight_)
     {
         // Allocate the head and tail nodes and zero the next pointers
         head_ = AllocateNode(maxHeight_);
@@ -164,8 +194,8 @@ public:
         if (rhs.size_ != size_)
             return false;
         
-        Iterator i = Begin();
-        Iterator j = rhs.Begin();
+        ConstIterator i = Begin();
+        ConstIterator j = rhs.Begin();
         while (i != End())
         {
             if (*i != *j)
@@ -183,8 +213,8 @@ public:
         if (rhs.size_ != size_)
             return true;
         
-        Iterator i = Begin();
-        Iterator j = rhs.Begin();
+        ConstIterator i = Begin();
+        ConstIterator j = rhs.Begin();
         while (i != End())
         {
             if (*i != *j)
@@ -270,9 +300,9 @@ public:
     }
     
     /// Erase by an iterator. Return an iterator to the next element
-    Iterator Erase(const Iterator& it)
+    Iterator Erase(Iterator it)
     {
-        if (it)
+        if (it != End())
         {
             Iterator current = it++;
             Erase(*current);
@@ -323,10 +353,10 @@ public:
         size_ = 0;
     }
     
-    /// Return iterator to the node with key, or null iterator if not found
-    Iterator Find(const T& key) { return Iterator(FindNode(key)); }
+    /// Return iterator to the node with key, or end iterator if not found
+    Iterator Find(const T& key) { Node* node = FindNode(key); return node ? Iterator(node) : End(); }
     /// Return const iterator to the node with key, or null iterator if not found
-    ConstIterator Find(const T& key) const { return ConstIterator(FindNode(key)); }
+    ConstIterator Find(const T& key) const { Node* node = FindNode(key); return node ? ConstIterator(node) : End(); }
     /// Return iterator to the first actual node
     Iterator Begin() { return Iterator(GetHead()->GetNext(0)); }
     /// Return iterator to the first actual node
@@ -335,6 +365,10 @@ public:
     Iterator End() { return Iterator(GetTail()); }
     /// Return iterator to the end
     ConstIterator End() const { return ConstIterator(GetTail()); }
+    /// Return first key
+    const T& Front() const { return *Begin(); }
+    /// Return last key
+    const T& Back() const { return *(--End()); }
     /// Return whether contains a key
     bool Contains(const T& key) const { return FindNode(key) != 0; }
     /// Return number of keys

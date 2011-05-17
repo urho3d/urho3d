@@ -39,7 +39,7 @@
 #include "VectorBuffer.h"
 
 #include <ode/ode.h>
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -86,14 +86,14 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     // Enable automatic resting of rigid bodies
     dWorldSetAutoDisableFlag(physicsWorld_, 1);
     
-    contacts_ = new std::vector<dContact>(maxContacts_);
+    contacts_ = new Vector<dContact>(maxContacts_);
 }
 
 PhysicsWorld::~PhysicsWorld()
 {
     // Forcibly remove any cached geometries that still remain
-    triangleMeshCache_.clear();
-    heightfieldCache_.clear();
+    triangleMeshCache_.Clear();
+    heightfieldCache_.Clear();
     
     if (contactJoints_)
     {
@@ -112,7 +112,7 @@ PhysicsWorld::~PhysicsWorld()
     }
     if (contacts_)
     {
-        std::vector<dContact>* contacts = static_cast<std::vector<dContact>*>(contacts_);
+        Vector<dContact>* contacts = static_cast<Vector<dContact>*>(contacts_);
         delete contacts;
         contacts = 0;
     }
@@ -177,7 +177,7 @@ void PhysicsWorld::Update(float timeStep)
             SendEvent(E_PHYSICSPRESTEP, eventData);
             
             // Store the previous transforms of the physics objects
-            for (std::vector<RigidBody*>::iterator i = rigidBodies_.begin(); i != rigidBodies_.end(); ++i)
+            for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
                 (*i)->PreStep();
             
             /// \todo ODE random number generation is not threadsafe
@@ -193,7 +193,7 @@ void PhysicsWorld::Update(float timeStep)
                 dWorldQuickStep(physicsWorld_, internalTimeStep);
                 dJointGroupEmpty(contactJoints_);
                 previousCollisions_ = currentCollisions_;
-                currentCollisions_.clear();
+                currentCollisions_.Clear();
             }
             
             randomSeed_ = dRandGetSeed();
@@ -203,7 +203,7 @@ void PhysicsWorld::Update(float timeStep)
             
             // Interpolate transforms of physics objects
             float t = Clamp(timeAcc_ / internalTimeStep, 0.0f, 1.0f);
-            for (std::vector<RigidBody*>::iterator i = rigidBodies_.begin(); i != rigidBodies_.end(); ++i)
+            for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
                 (*i)->PostStep(t);
             
             // Send post-step event
@@ -220,8 +220,8 @@ void PhysicsWorld::SetFps(int fps)
 void PhysicsWorld::SetMaxContacts(unsigned num)
 {
     maxContacts_ = Max(num, 1);
-    std::vector<dContact>* contacts = static_cast<std::vector<dContact>*>(contacts_);
-    contacts->resize(maxContacts_);
+    Vector<dContact>* contacts = static_cast<Vector<dContact>*>(contacts_);
+    contacts->Resize(maxContacts_);
 }
 
 void PhysicsWorld::SetGravity(Vector3 gravity)
@@ -284,17 +284,17 @@ void PhysicsWorld::SetTimeAccumulator(float time)
     timeAcc_ = time;
 }
 
-void PhysicsWorld::Raycast(std::vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
+void PhysicsWorld::Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsRaycast);
     
-    result.clear();
+    result.Clear();
     dGeomRaySetLength(rayGeometry_, maxDistance);
     dGeomRaySet(rayGeometry_, ray.origin_.x_, ray.origin_.y_, ray.origin_.z_, ray.direction_.x_, ray.direction_.y_, ray.direction_.z_);
     dGeomSetCollideBits(rayGeometry_, collisionMask);
     dSpaceCollide2(rayGeometry_, (dGeomID)space_, &result, RaycastCallback);
     
-    std::sort(result.begin(), result.end(), CompareRaycastResults);
+    Sort(result.Begin(), result.End(), CompareRaycastResults);
 }
 
 Vector3 PhysicsWorld::GetGravity() const
@@ -351,16 +351,16 @@ float PhysicsWorld::GetContactSurfaceLayer() const
 
 void PhysicsWorld::AddRigidBody(RigidBody* body)
 {
-    rigidBodies_.push_back(body);
+    rigidBodies_.Push(body);
 }
 
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
-    for (std::vector<RigidBody*>::iterator i = rigidBodies_.begin(); i != rigidBodies_.end(); ++i)
+    for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
     {
         if ((*i) == body)
         {
-            rigidBodies_.erase(i);
+            rigidBodies_.Erase(i);
             return;
         }
     }
@@ -376,7 +376,7 @@ void PhysicsWorld::SendCollisionEvents()
     
     physicsCollisionData[PhysicsCollision::P_WORLD] = (void*)this;
     
-    for (std::vector<PhysicsCollisionInfo>::const_iterator i = collisionInfos_.begin(); i != collisionInfos_.end(); ++i)
+    for (Vector<PhysicsCollisionInfo>::ConstIterator i = collisionInfos_.Begin(); i != collisionInfos_.End(); ++i)
     {
         // Skip if either of the nodes has been removed
         if ((!i->nodeA_) || (!i->nodeB_))
@@ -389,7 +389,7 @@ void PhysicsWorld::SendCollisionEvents()
         physicsCollisionData[PhysicsCollision::P_NEWCOLLISION] = i->newCollision_;
         
         contacts.Clear();
-        for (unsigned j = 0; j < i->contacts_.size(); ++j)
+        for (unsigned j = 0; j < i->contacts_.Size(); ++j)
         {
             contacts.WriteVector3(i->contacts_[j].position_);
             contacts.WriteVector3(i->contacts_[j].normal_);
@@ -417,7 +417,7 @@ void PhysicsWorld::SendCollisionEvents()
             continue;
         
         contacts.Clear();
-        for (unsigned j = 0; j < i->contacts_.size(); ++j)
+        for (unsigned j = 0; j < i->contacts_.Size(); ++j)
         {
             contacts.WriteVector3(i->contacts_[j].position_);
             contacts.WriteVector3(-i->contacts_[j].normal_);
@@ -433,7 +433,7 @@ void PhysicsWorld::SendCollisionEvents()
         SendEvent(i->nodeB_, E_NODECOLLISION, nodeCollisionData);
     }
     
-    collisionInfos_.clear();
+    collisionInfos_.Clear();
 }
 
 void PhysicsWorld::DrawDebugGeometry(bool depthTest)
@@ -445,14 +445,14 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
         return;
     
     // Get all geometries, also those that have no rigid bodies
-    std::vector<Node*> nodes;
-    std::vector<CollisionShape*> shapes;
+    Vector<Node*> nodes;
+    Vector<CollisionShape*> shapes;
     node_->GetChildrenWithComponent<CollisionShape>(nodes, true);
     
-    for (std::vector<Node*>::iterator i = nodes.begin(); i != nodes.end(); ++i)
+    for (Vector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         (*i)->GetComponents<CollisionShape>(shapes);
-        for (std::vector<CollisionShape*>::iterator j = shapes.begin(); j != shapes.end(); ++j)
+        for (Vector<CollisionShape*>::Iterator j = shapes.Begin(); j != shapes.End(); ++j)
             (*j)->DrawDebugGeometry(debug, depthTest);
     }
 }
@@ -460,20 +460,20 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (std::map<String, SharedPtr<TriangleMeshData> >::iterator i = triangleMeshCache_.begin();
-        i != triangleMeshCache_.end();)
+    for (Map<String, SharedPtr<TriangleMeshData> >::Iterator i = triangleMeshCache_.Begin();
+        i != triangleMeshCache_.End();)
     {
-        std::map<String, SharedPtr<TriangleMeshData> >::iterator current = i++;
-        if (current->second.GetRefCount() == 1)
-            triangleMeshCache_.erase(current);
+        Map<String, SharedPtr<TriangleMeshData> >::Iterator current = i++;
+        if (current->second_.GetRefCount() == 1)
+            triangleMeshCache_.Erase(current);
     }
     
-    for (std::map<String, SharedPtr<HeightfieldData> >::iterator i = heightfieldCache_.begin();
-        i != heightfieldCache_.end();)
+    for (Map<String, SharedPtr<HeightfieldData> >::Iterator i = heightfieldCache_.Begin();
+        i != heightfieldCache_.End();)
     {
-        std::map<String, SharedPtr<HeightfieldData> >::iterator current = i++;
-        if (current->second.GetRefCount() == 1)
-            heightfieldCache_.erase(current);
+        Map<String, SharedPtr<HeightfieldData> >::Iterator current = i++;
+        if (current->second_.GetRefCount() == 1)
+            heightfieldCache_.Erase(current);
     }
 }
 
@@ -518,7 +518,7 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     float friction = (shapeA->GetFriction() + shapeB->GetFriction()) * 0.5f;
     float bounce = (shapeA->GetBounce() + shapeB->GetBounce()) * 0.5f;
     
-    std::vector<dContact>& contacts = *(static_cast<std::vector<dContact>*>(world->contacts_));
+    Vector<dContact>& contacts = *(static_cast<Vector<dContact>*>(world->contacts_));
     
     for (unsigned i = 0; i < world->maxContacts_; ++i)
     {
@@ -536,20 +536,20 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     if (!numContacts)
         return;
     
-    std::pair<RigidBody*, RigidBody*> bodyPair;
+    Pair<RigidBody*, RigidBody*> bodyPair;
     if (rigidBodyA < rigidBodyB)
-        bodyPair = std::make_pair(rigidBodyA, rigidBodyB);
+        bodyPair = MakePair(rigidBodyA, rigidBodyB);
     else
-        bodyPair = std::make_pair(rigidBodyB, rigidBodyA);
+        bodyPair = MakePair(rigidBodyB, rigidBodyA);
     
     PhysicsCollisionInfo collisionInfo;
     collisionInfo.nodeA_ = nodeA;
     collisionInfo.nodeB_ = nodeB;
     collisionInfo.shapeA_ = shapeA;
     collisionInfo.shapeB_ = shapeB;
-    collisionInfo.newCollision_ = world->previousCollisions_.find(bodyPair) == world->previousCollisions_.end();
-    collisionInfo.contacts_.clear();
-    world->currentCollisions_.insert(bodyPair);
+    collisionInfo.newCollision_ = world->previousCollisions_.Find(bodyPair) == world->previousCollisions_.End();
+    collisionInfo.contacts_.Clear();
+    world->currentCollisions_.Insert(bodyPair);
     
     for (unsigned i = 0; i < numContacts; ++i)
     {
@@ -594,11 +594,11 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
         contactInfo.normal_ = Vector3(contacts[i].geom.normal[0], contacts[i].geom.normal[1], contacts[i].geom.normal[2]);
         contactInfo.depth_ = contacts[i].geom.depth;
         contactInfo.velocity_ = length;
-        collisionInfo.contacts_.push_back(contactInfo);
+        collisionInfo.contacts_.Push(contactInfo);
     }
     
     // Store collision info to be sent later
-    world->collisionInfos_.push_back(collisionInfo);
+    world->collisionInfos_.Push(collisionInfo);
 }
 
 void PhysicsWorld::RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
@@ -608,7 +608,7 @@ void PhysicsWorld::RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
     
     if (numContacts > 0)
     {
-        std::vector<PhysicsRaycastResult>* result = static_cast<std::vector<PhysicsRaycastResult>*>(userData);
+        Vector<PhysicsRaycastResult>* result = static_cast<Vector<PhysicsRaycastResult>*>(userData);
         PhysicsRaycastResult newResult;
         
         CollisionShape* shapeA = static_cast<CollisionShape*>(dGeomGetData(geomA));
@@ -623,7 +623,7 @@ void PhysicsWorld::RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
         newResult.distance_ = contact.geom.depth;
         newResult.position_ = Vector3(contact.geom.pos[0], contact.geom.pos[1], contact.geom.pos[2]);
         newResult.normal_ = Vector3(contact.geom.normal[0], contact.geom.normal[1], contact.geom.normal[2]);
-        result->push_back(newResult);
+        result->Push(newResult);
     }
 }
 

@@ -135,22 +135,22 @@ static void DestructResourceRefList(ResourceRefList* ptr)
 
 static void ResourceRefListResize(unsigned size, ResourceRefList* ptr)
 {
-    ptr->ids_.resize(size);
+    ptr->ids_.Resize(size);
 }
 
 static unsigned ResourceRefListGetSize(ResourceRefList* ptr)
 {
-    return ptr->ids_.size();
+    return ptr->ids_.Size();
 }
 
 static bool ResourceRefListIsEmpty(ResourceRefList* ptr)
 {
-    return ptr->ids_.size() == 0;
+    return ptr->ids_.Size() == 0;
 }
 
 static void ResourceRefListSetId(unsigned index, const StringHash& id, ResourceRefList* ptr)
 {
-    if (index >= ptr->ids_.size())
+    if (index >= ptr->ids_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return;
@@ -161,7 +161,7 @@ static void ResourceRefListSetId(unsigned index, const StringHash& id, ResourceR
 
 static StringHash ResourceRefListGetId(unsigned index, ResourceRefList* ptr)
 {
-    if (index >= ptr->ids_.size())
+    if (index >= ptr->ids_.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return StringHash();
@@ -243,7 +243,7 @@ static void ConstructVariantString(const String& value, Variant* ptr)
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest)
 {
     unsigned numVariants = arr->GetSize();
-    dest.resize(numVariants);
+    dest.Resize(numVariants);
     for (unsigned i = 0; i < numVariants; ++i)
         dest[i] = *(static_cast<Variant*>(arr->At(i)));
 }
@@ -307,12 +307,12 @@ static Variant& VariantMapAt(const String& key, VariantMap& map)
 
 static bool VariantMapContains(const String& key, VariantMap& map)
 {
-    return map.find(ShortStringHash(key)) != map.end();
+    return map.Find(ShortStringHash(key)) != map.End();
 }
 
 static void VariantMapErase(const String& key, VariantMap& map)
 {
-    map.erase(ShortStringHash(key));
+    map.Erase(ShortStringHash(key));
 }
 
 static void RegisterVariant(asIScriptEngine* engine)
@@ -430,13 +430,13 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "const Variant& opIndex(const String&in) const", asFUNCTION(VariantMapAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "bool Contains(const String&in) const", asFUNCTION(VariantMapContains), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VariantMap", "void Erase(const String&in)", asFUNCTION(VariantMapErase), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "void Clear()", asMETHOD(VariantMap, Clear), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, Size), asCALL_THISCALL);
 }
 
 static CScriptArray* StringSplit(char separator, const String* str)
 {
-    std::vector<String> result = Split(*str, separator);
+    Vector<String> result = Split(*str, separator);
     return VectorToArray<String>(result, "Array<String>");
 }
 
@@ -523,11 +523,11 @@ static void DestructAttributeInfo(AttributeInfo* ptr)
 
 static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
 {
-    std::vector<String> enumNames;
+    Vector<String> enumNames;
     const String* enumNamePtrs = ptr->enumNames_;
     while ((enumNamePtrs) && (enumNamePtrs->Length()))
     {
-        enumNames.push_back(*enumNamePtrs);
+        enumNames.Push(*enumNamePtrs);
         ++enumNamePtrs;
     }
     return VectorToArray<String>(enumNames, "Array<String>");

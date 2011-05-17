@@ -67,7 +67,7 @@ bool Skeleton::Load(Deserializer& source)
         if (newBone.parentIndex_ == i)
             rootBoneIndex_ = i;
         
-        bones_.push_back(newBone);
+        bones_.Push(newBone);
     }
     
     return true;
@@ -75,10 +75,10 @@ bool Skeleton::Load(Deserializer& source)
 
 bool Skeleton::Save(Serializer& dest)
 {
-    if (!dest.WriteUInt(bones_.size()))
+    if (!dest.WriteUInt(bones_.Size()))
         return false;
     
-    for (unsigned i = 0; i < bones_.size(); ++i)
+    for (unsigned i = 0; i < bones_.Size(); ++i)
     {
         const Bone& bone = bones_[i];
         dest.WriteString(bone.name_);
@@ -106,20 +106,20 @@ void Skeleton::Define(const Skeleton& src)
     bones_ = src.GetBones();
     // Make sure we clear node references, if they exist
     // (AnimatedModel will create new nodes on its own)
-    for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
         i->node_.Reset();
     rootBoneIndex_ = src.rootBoneIndex_;
 }
 
 void Skeleton::ClearBones()
 {
-    bones_.clear();
+    bones_.Clear();
     rootBoneIndex_ = M_MAX_UNSIGNED;
 }
 
 void Skeleton::Reset()
 {
-    for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
     {
         if ((i->animated_) && (i->node_))
             i->node_->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
@@ -133,12 +133,12 @@ Bone* Skeleton::GetRootBone()
 
 Bone* Skeleton::GetBone(unsigned index)
 {
-    return index < bones_.size() ? &bones_[index] : (Bone*)0;
+    return index < bones_.Size() ? &bones_[index] : (Bone*)0;
 }
 
 Bone* Skeleton::GetBone(const String& name)
 {
-    for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
     {
         if (i->name_ == name)
             return &(*i);
@@ -149,7 +149,7 @@ Bone* Skeleton::GetBone(const String& name)
 
 Bone* Skeleton::GetBone(StringHash nameHash)
 {
-    for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
+    for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
     {
         if (i->nameHash_ == nameHash)
             return &(*i);

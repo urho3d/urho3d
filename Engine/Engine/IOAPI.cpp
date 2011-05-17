@@ -187,7 +187,7 @@ static FileSystem* GetFileSystem()
 
 static CScriptArray* FileSystemScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive, FileSystem* ptr)
 {
-    std::vector<String> result;
+    Vector<String> result;
     ptr->ScanDir(result, pathName, filter, flags, recursive);
     return VectorToArray<String>(result, "Array<String>");
 }
@@ -198,7 +198,7 @@ static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArgument
         return -1;
     
     unsigned numArguments = srcArguments->GetSize();
-    std::vector<String> destArguments(numArguments);
+    Vector<String> destArguments(numArguments);
     for (unsigned i = 0; i < numArguments; ++i)
         destArguments[i] = *(static_cast<String*>(srcArguments->At(i)));
     

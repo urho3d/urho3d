@@ -28,7 +28,7 @@
 #include "Scene.h"
 #include "StringUtils.h"
 
-#include <set>
+#include "Set.h"
 
 #include "DebugNew.h"
 

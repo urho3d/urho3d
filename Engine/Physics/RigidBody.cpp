@@ -430,9 +430,9 @@ void RigidBody::CreateBody()
         previousRotation_ = rotation;
         
         // Associate geometries with the body
-        std::vector<CollisionShape*> shapes;
+        Vector<CollisionShape*> shapes;
         GetComponents<CollisionShape>(shapes);
-        for (unsigned i = 0; i < shapes.size(); ++i)
+        for (unsigned i = 0; i < shapes.Size(); ++i)
             shapes[i]->UpdateTransform();
     }
     
@@ -444,11 +444,11 @@ void RigidBody::ReleaseBody()
     if (!body_)
         return;
     
-    std::vector<CollisionShape*> shapes;
+    Vector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
     
     // First remove rigid body associations
-    for (unsigned i = 0; i < shapes.size(); ++i)
+    for (unsigned i = 0; i < shapes.Size(); ++i)
     {
         dGeomID geom = shapes[i]->GetGeometry();
         if (geom)
@@ -459,7 +459,7 @@ void RigidBody::ReleaseBody()
     body_ = 0;
     
     // Then update geometry transforms
-    for (unsigned i = 0; i < shapes.size(); ++i)
+    for (unsigned i = 0; i < shapes.Size(); ++i)
         shapes[i]->UpdateTransform();
 }
 
@@ -474,10 +474,10 @@ void RigidBody::UpdateMass()
     float density = 1.0f;
     
     // Get all attached collision shapes to Calculate the mass
-    std::vector<CollisionShape*> shapes;
+    Vector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
     
-    for (unsigned i = 0; i < shapes.size(); ++i)
+    for (unsigned i = 0; i < shapes.Size(); ++i)
     {
         CollisionShape* shape = shapes[i];
         

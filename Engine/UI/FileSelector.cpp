@@ -35,7 +35,7 @@
 #include "UIEvents.h"
 #include "Window.h"
 
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -114,8 +114,8 @@ FileSelector::FileSelector(Context* context) :
     if (ui)
         ui->GetRootElement()->AddChild(window_);
     
-    std::vector<String> defaultFilters;
-    defaultFilters.push_back("*.*");
+    Vector<String> defaultFilters;
+    defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
@@ -181,12 +181,12 @@ void FileSelector::SetStyle(XMLFile* style)
     okButton_->SetStyle(style, "FileSelectorButton");
     cancelButton_->SetStyle(style, "FileSelectorButton");
     
-    std::vector<UIElement*> filterTexts = filterList_->GetListView()->GetContentElement()->GetChildren();
-    for (unsigned i = 0; i < filterTexts.size(); ++i)
+    Vector<UIElement*> filterTexts = filterList_->GetListView()->GetContentElement()->GetChildren();
+    for (unsigned i = 0; i < filterTexts.Size(); ++i)
         filterTexts[i]->SetStyle(style, "FileSelectorFilterText");
     
-    std::vector<UIElement*> listTexts = fileList_->GetContentElement()->GetChildren();
-    for (unsigned i = 0; i < listTexts.size(); ++i)
+    Vector<UIElement*> listTexts = fileList_->GetContentElement()->GetChildren();
+    for (unsigned i = 0; i < listTexts.Size(); ++i)
         listTexts[i]->SetStyle(style, "FileSelectorListText");
     
     UpdateElements();
@@ -228,23 +228,23 @@ void FileSelector::SetFileName(const String& fileName)
     SetLineEditText(fileNameEdit_, fileName);
 }
 
-void FileSelector::SetFilters(const std::vector<String>& filters, unsigned defaultIndex)
+void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultIndex)
 {
-    if (filters.empty())
+    if (filters.Empty())
         return;
     
     ignoreEvents_ = true;
     
     filters_ = filters;
     filterList_->RemoveAllItems();
-    for (unsigned i = 0; i < filters_.size(); ++i)
+    for (unsigned i = 0; i < filters_.Size(); ++i)
     {
         Text* filterText = new Text(context_);
         filterText->SetText(filters_[i]);
         filterText->SetStyle(style_, "FileSelectorFilterText");
         filterList_->AddItem(filterText);
     }
-    if (defaultIndex > filters.size())
+    if (defaultIndex > filters.Size())
         defaultIndex = 0;
     filterList_->SetSelection(defaultIndex);
     
@@ -312,35 +312,35 @@ void FileSelector::RefreshFiles()
     ignoreEvents_ = true;
     
     fileList_->RemoveAllItems();
-    fileEntries_.clear();
+    fileEntries_.Clear();
     
-    std::vector<String> directories;
-    std::vector<String> files;
+    Vector<String> directories;
+    Vector<String> files;
     fileSystem->ScanDir(directories, path_, "*.*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
     
-    for (unsigned i = 0; i < directories.size(); ++i)
+    for (unsigned i = 0; i < directories.Size(); ++i)
     {
         FileSelectorEntry newEntry;
         newEntry.name_ = directories[i];
         newEntry.directory_ = true;
-        fileEntries_.push_back(newEntry);
+        fileEntries_.Push(newEntry);
     }
     
-    for (unsigned i = 0; i < files.size(); ++i)
+    for (unsigned i = 0; i < files.Size(); ++i)
     {
         FileSelectorEntry newEntry;
         newEntry.name_ = files[i];
         newEntry.directory_ = false;
-        fileEntries_.push_back(newEntry);
+        fileEntries_.Push(newEntry);
     }
     
     // Sort and add to the list view
     // While items are being added, disable layout update for performance optimization
-    std::sort(fileEntries_.begin(), fileEntries_.end(), CompareEntries);
+    Sort(fileEntries_.Begin(), fileEntries_.End(), CompareEntries);
     UIElement* listContent = fileList_->GetContentElement();
     listContent->DisableLayoutUpdate();
-    for (unsigned i = 0; i < fileEntries_.size(); ++i)
+    for (unsigned i = 0; i < fileEntries_.Size(); ++i)
     {
         String displayName;
         if (fileEntries_[i].directory_)
@@ -366,7 +366,7 @@ void FileSelector::RefreshFiles()
 bool FileSelector::EnterFile()
 {
     unsigned index = fileList_->GetSelection();
-    if (index >= fileEntries_.size())
+    if (index >= fileEntries_.Size())
         return false;
     
     if (fileEntries_[index].directory_)
@@ -424,7 +424,7 @@ void FileSelector::HandleFileSelected(StringHash eventType, VariantMap& eventDat
         return;
     
     unsigned index = fileList_->GetSelection();
-    if (index >= fileEntries_.size())
+    if (index >= fileEntries_.Size())
         return;
     // If a file selected, update the filename edit field
     if (!fileEntries_[index].directory_)

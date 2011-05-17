@@ -75,7 +75,7 @@ public:
     /// Return loop start
     signed char* GetRepeat() const { return repeat_; }
     /// Return sound data end
-    signed char* Getend() const { return end_; }
+    signed char* GetEnd() const { return end_; }
     /// Return length in seconds
     float GetLength() const;
     /// Return total sound data size

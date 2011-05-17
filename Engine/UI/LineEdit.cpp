@@ -518,9 +518,9 @@ void LineEdit::UpdateText()
 void LineEdit::UpdateCursor()
 {
     int x = 0;
-    const std::vector<IntVector2>& charPositions = text_->GetCharPositions();
-    if (charPositions.size())
-        x = cursorPosition_ < charPositions.size() ? charPositions[cursorPosition_].x_ : charPositions.back().x_;
+    const Vector<IntVector2>& charPositions = text_->GetCharPositions();
+    if (charPositions.Size())
+        x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
     
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
@@ -543,12 +543,12 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
 {
     IntVector2 screenPosition = ElementToScreen(position);
     IntVector2 textPosition = text_->ScreenToElement(screenPosition);
-    const std::vector<IntVector2>& charPositions = text_->GetCharPositions();
+    const Vector<IntVector2>& charPositions = text_->GetCharPositions();
     
     if (textPosition.x_ < 0)
         return 0;
     
-    for (unsigned i = charPositions.size() - 1; i < charPositions.size(); --i)
+    for (unsigned i = charPositions.Size() - 1; i < charPositions.Size(); --i)
     {
         if (textPosition.x_ >= charPositions[i].x_)
             return i;

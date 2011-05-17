@@ -66,7 +66,7 @@ struct FontFace
     /// Glyph index mapping
     unsigned short glyphIndex_[MAX_FONT_CHARS];
     /// Glyphs
-    std::vector<FontGlyph> glyphs_;
+    Vector<FontGlyph> glyphs_;
 };
 
 /// Font resource
@@ -90,7 +90,7 @@ public:
     
 private:
     /// Created faces
-    std::map<int, FontFace> faces_;
+    Map<int, FontFace> faces_;
     /// Font data
     SharedArrayPtr<unsigned char> fontData_;
     /// Size of font data

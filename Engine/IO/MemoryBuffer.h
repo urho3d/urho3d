@@ -35,9 +35,9 @@ public:
     /// Construct as read-only with a pointer and size
     MemoryBuffer(const void* data, unsigned size);
     /// Construct from a vector, whuch must not go out of scope before MemoryBuffer
-    MemoryBuffer(std::vector<unsigned char>& data);
+    MemoryBuffer(Vector<unsigned char>& data);
     /// Construct from a read-only vector, whuch must not go out of scope before MemoryBuffer
-    MemoryBuffer(const std::vector<unsigned char>& data);
+    MemoryBuffer(const Vector<unsigned char>& data);
     
     /// Read bytes from the memory area. Return number of bytes actually read
     virtual unsigned Read(void* dest, unsigned size);

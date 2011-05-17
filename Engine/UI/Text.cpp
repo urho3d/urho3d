@@ -163,7 +163,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
     }
     
     // Partial selection batch
-    if ((!selected_) && (selectionLength_) && (charSizes_.size() >= selectionStart_ + selectionLength_) && (selectionColor_.a_ > 0.0f))
+    if ((!selected_) && (selectionLength_) && (charSizes_.Size() >= selectionStart_ + selectionLength_) && (selectionColor_.a_ > 0.0f))
     {
         UIBatch batch;
         batch.Begin(&quads);
@@ -337,10 +337,10 @@ void Text::UpdateText(bool inResize)
     int width = 0;
     int height = 0;
     
-    rowWidths_.clear();
+    rowWidths_.Clear();
     printText_.Clear();
     
-    std::vector<unsigned> printToText;
+    Vector<unsigned> printToText;
     
     if (font_)
     {
@@ -355,7 +355,7 @@ void Text::UpdateText(bool inResize)
         if (!wordWrap_)
         {
             printText_ = text_;
-            printToText.resize(text_.Length());
+            printToText.Resize(text_.Length());
             for (unsigned i = 0; i < text_.Length(); ++i)
                 printToText[i] = i;
         }
@@ -404,12 +404,12 @@ void Text::UpdateText(bool inResize)
                             printText_ += text_.Substring(i, copyLength);
                             for (int k = 0; k < copyLength; ++k)
                             {
-                                printToText.push_back(i);
+                                printToText.Push(i);
                                 ++i;
                             }
                         }
                         printText_ += '\n';
-                        printToText.push_back(Min((int)i, (int)text_.Length() - 1));
+                        printToText.Push(Min((int)i, (int)text_.Length() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -421,14 +421,14 @@ void Text::UpdateText(bool inResize)
                         if (rowWidth <= maxWidth)
                         {
                             printText_ += text_[i];
-                            printToText.push_back(i);
+                            printToText.Push(i);
                         }
                     }
                 }
                 else
                 {
                     printText_ += '\n';
-                    printToText.push_back(Min((int)i, (int)text_.Length() - 1));
+                    printToText.Push(Min((int)i, (int)text_.Length() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -450,7 +450,7 @@ void Text::UpdateText(bool inResize)
             {
                 width = Max(width, rowWidth);
                 height += rowHeight;
-                rowWidths_.push_back(rowWidth);
+                rowWidths_.Push(rowWidth);
                 rowWidth = 0;
             }
         }
@@ -459,7 +459,7 @@ void Text::UpdateText(bool inResize)
         {
             width = Max(width, rowWidth);
             height += rowHeight;
-            rowWidths_.push_back(rowWidth);
+            rowWidths_.Push(rowWidth);
         }
         
         // Set row height even if text is empty
@@ -467,8 +467,8 @@ void Text::UpdateText(bool inResize)
             height = rowHeight;
         
         // Store position & size of each character
-        charPositions_.resize(text_.Length() + 1);
-        charSizes_.resize(text_.Length());
+        charPositions_.Resize(text_.Length() + 1);
+        charSizes_.Resize(text_.Length());
         
         unsigned rowIndex = 0;
         int x = GetRowStartPosition(rowIndex);
@@ -526,7 +526,7 @@ int Text::GetRowStartPosition(unsigned rowIndex) const
 {
     int rowWidth = 0;
     
-    if (rowIndex < rowWidths_.size())
+    if (rowIndex < rowWidths_.Size())
         rowWidth = rowWidths_[rowIndex];
     
     switch (textAlignment_)

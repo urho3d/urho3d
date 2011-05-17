@@ -97,9 +97,9 @@ public:
     void MarkForAuxView(unsigned frameNumber);
     
     /// Return number of techniques
-    unsigned GetNumTechniques() const { return techniques_.size(); }
+    unsigned GetNumTechniques() const { return techniques_.Size(); }
     /// Return all techniques
-    const std::vector<TechniqueEntry>& GetTechniques() const { return techniques_; }
+    const Vector<TechniqueEntry>& GetTechniques() const { return techniques_; }
     /// Return technique entry by index
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
     /// Return technique by index
@@ -107,13 +107,13 @@ public:
     /// Return pass by technique index and pass type
     Pass* GetPass(unsigned index, PassType pass) const;
     /// Return all textures
-    const std::vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
+    const Vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
     /// Return texture by unit
     Texture* GetTexture(TextureUnit unit) const;
     /// Return all vertex shader parameters
-    const std::map<VSParameter, Vector4>& GetVertexShaderParameters() const { return vsParameters_; }
+    const Map<VSParameter, Vector4>& GetVertexShaderParameters() const { return vsParameters_; }
     /// Return all pixel shader parameters
-    const std::map<PSParameter, Vector4>& GetPixelShaderParameters() const { return psParameters_; }
+    const Map<PSParameter, Vector4>& GetPixelShaderParameters() const { return psParameters_; }
     /// Return normal culling mode
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows
@@ -131,13 +131,13 @@ private:
     void Update();
     
     /// Techniques
-    std::vector<TechniqueEntry> techniques_;
+    Vector<TechniqueEntry> techniques_;
     /// Textures
-    std::vector<SharedPtr<Texture> > textures_;
+    Vector<SharedPtr<Texture> > textures_;
     /// Vertex shader parameters
-    std::map<VSParameter, Vector4> vsParameters_;
+    Map<VSParameter, Vector4> vsParameters_;
     /// Pixel shader parameters
-    std::map<PSParameter, Vector4> psParameters_;
+    Map<PSParameter, Vector4> psParameters_;
     /// Normal culling mode
     CullMode cullMode_;
     /// Culling mode for shadow rendering

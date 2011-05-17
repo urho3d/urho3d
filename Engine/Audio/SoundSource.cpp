@@ -349,7 +349,7 @@ void SoundSource::SetPlayPositionLockless(signed char* pos)
         return;
     
     signed char* start = sound_->GetStart();
-    signed char* end = sound_->Getend();
+    signed char* end = sound_->GetEnd();
     if (pos < start)
         pos = start;
     if ((sound_->IsSixteenBit()) && ((pos - start) & 1))
@@ -542,7 +542,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -569,7 +569,7 @@ void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int m
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -616,7 +616,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -647,7 +647,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -697,7 +697,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -724,7 +724,7 @@ void SoundSource::MixMonoToMonoIP(Sound* sound, int* dest, unsigned samples, int
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -771,7 +771,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -804,7 +804,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -856,7 +856,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -885,7 +885,7 @@ void SoundSource::MixStereoToMono(Sound* sound, int* dest, unsigned samples, int
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -933,7 +933,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -964,7 +964,7 @@ void SoundSource::MixStereoToStereo(Sound* sound, int* dest, unsigned samples, i
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -1014,7 +1014,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -1043,7 +1043,7 @@ void SoundSource::MixStereoToMonoIP(Sound* sound, int* dest, unsigned samples, i
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -1091,7 +1091,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
     if (sound->IsSixteenBit())
     {
         short* pos = (short*)position_;
-        short* end = (short*)sound->Getend();
+        short* end = (short*)sound->GetEnd();
         short* repeat = (short*)sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -1122,7 +1122,7 @@ void SoundSource::MixStereoToStereoIP(Sound* sound, int* dest, unsigned samples,
     else
     {
         signed char* pos = (signed char*)position_;
-        signed char* end = sound->Getend();
+        signed char* end = sound->GetEnd();
         signed char* repeat = sound->GetRepeat();
         
         if (sound->IsLooped())
@@ -1169,13 +1169,13 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
     }
     position_ += intAdd * sampleSize;
     
-    if (position_ > sound->Getend())
+    if (position_ > sound->GetEnd())
     {
         if (sound->IsLooped())
         {
-            while (position_ >= sound->Getend())
+            while (position_ >= sound->GetEnd())
             {
-                position_ -= (sound->Getend() - sound->GetRepeat());
+                position_ -= (sound->GetEnd() - sound->GetRepeat());
             }
         }
         else

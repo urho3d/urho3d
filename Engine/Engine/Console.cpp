@@ -98,7 +98,7 @@ void Console::SetStyle(XMLFile* style)
     style_ = style;
     background_->SetStyle(style, "ConsoleBackground");
     
-    for (unsigned i = 0; i < rows_.size(); ++i)
+    for (unsigned i = 0; i < rows_.Size(); ++i)
         rows_[i]->SetStyle(style, "ConsoleText");
     
     lineEdit_->SetStyle(style, "ConsoleLineEdit");
@@ -127,8 +127,8 @@ void Console::SetNumRows(unsigned rows)
     
     rowContainer_->RemoveAllChildren();
     
-    rows_.resize(rows);
-    for (unsigned i = 0; i < rows_.size(); ++i)
+    rows_.Resize(rows);
+    for (unsigned i = 0; i < rows_.Size(); ++i)
     {
         if (!rows_[i])
         {
@@ -144,8 +144,8 @@ void Console::SetNumRows(unsigned rows)
 void Console::SetNumHistoryRows(unsigned rows)
 {
     historyRows_ = rows;
-    if (history_.size() > rows)
-        history_.resize(rows);
+    if (history_.Size() > rows)
+        history_.Resize(rows);
     if (historyPosition_ > rows)
         historyPosition_ = rows;
 }
@@ -168,7 +168,7 @@ bool Console::IsVisible() const
 
 const String& Console::GetHistoryRow(unsigned index) const
 {
-    return index < history_.size() ? history_[index] : noRow;
+    return index < history_.Size() ? history_[index] : noRow;
 }
 
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
@@ -183,10 +183,10 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             script->Execute(line);
         
         // Store to history, then clear the lineedit
-        history_.push_back(line);
-        if (history_.size() > historyRows_)
-            history_.erase(history_.begin());
-        historyPosition_ = history_.size();
+        history_.Push(line);
+        if (history_.Size() > historyRows_)
+            history_.Erase(history_.Begin());
+        historyPosition_ = history_.Size();
         
         current_Row.Clear();
         lineEdit_->SetText(current_Row);
@@ -207,7 +207,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     case KEY_UP:
         if (historyPosition_ > 0)
         {
-            if (historyPosition_ == history_.size())
+            if (historyPosition_ == history_.Size())
                 current_Row = lineEdit_->GetText();
             --historyPosition_;
             changed = true;
@@ -215,7 +215,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         break;
     
     case KEY_DOWN:
-        if (historyPosition_ < history_.size())
+        if (historyPosition_ < history_.Size())
         {
             ++historyPosition_;
             changed = true;
@@ -225,7 +225,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     
     if (changed)
     {
-        if (historyPosition_ < history_.size())
+        if (historyPosition_ < history_.Size())
             lineEdit_->SetText(history_[historyPosition_]);
         else
             lineEdit_->SetText(current_Row);
@@ -240,7 +240,7 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     // If the rows are not fully initialized yet, or we are recursing here, do not write the message
-    if ((inLogMessage_) || (!rows_.size()) || (!rows_[rows_.size() - 1]))
+    if ((inLogMessage_) || (!rows_.Size()) || (!rows_[rows_.Size() - 1]))
         return;
     
     inLogMessage_ = true;
@@ -248,8 +248,8 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     using namespace LogMessage;
     
     // Be prepared for possible multi-line messages
-    std::vector<String> rows = Split(eventData[P_MESSAGE].GetString(), '\n');
-    for (unsigned i = 0; i < rows.size(); ++i)
+    Vector<String> rows = Split(eventData[P_MESSAGE].GetString(), '\n');
+    for (unsigned i = 0; i < rows.Size(); ++i)
     {
         // Remove the first row, change its text and re-add to the bottom
         Text* text = static_cast<Text*>(rowContainer_->GetChild(0));

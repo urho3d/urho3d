@@ -51,7 +51,7 @@
 #include "VertexShader.h"
 #include "Window.h"
 
-#include <algorithm>
+#include "Sort.h"
 
 #include "DebugNew.h"
 
@@ -131,10 +131,10 @@ void UI::SetFocusElement(UIElement* element)
         }
     }
     
-    std::vector<UIElement*> allChildren = rootElement_->GetChildren(true);
+    Vector<UIElement*> allChildren = rootElement_->GetChildren(true);
     
     // Go through all elements to clear the old focus
-    for (std::vector<UIElement*>::iterator i = allChildren.begin(); i != allChildren.end(); ++i)
+    for (Vector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
         UIElement* other = *i;
         if ((other != element) && (other->HasFocus()))
@@ -343,8 +343,8 @@ UIElement* UI::GetElementAt(int x, int y, bool activeOnly)
 
 UIElement* UI::GetFocusElement() const
 {
-    std::vector<UIElement*> allChildren = rootElement_->GetChildren(true);
-    for (std::vector<UIElement*>::iterator i = allChildren.begin(); i != allChildren.end(); ++i)
+    Vector<UIElement*> allChildren = rootElement_->GetChildren(true);
+    for (Vector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
         if ((*i)->HasFocus())
             return *i;
@@ -355,11 +355,11 @@ UIElement* UI::GetFocusElement() const
 
 UIElement* UI::GetFrontElement() const
 {
-    std::vector<UIElement*> rootChildren = rootElement_->GetChildren(false);
+    Vector<UIElement*> rootChildren = rootElement_->GetChildren(false);
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;
     
-    for (unsigned i = 0; i < rootChildren.size(); ++i)
+    for (unsigned i = 0; i < rootChildren.Size(); ++i)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
         if ((!rootChildren[i]->IsActive()) || (!rootChildren[i]->IsVisible()) || (!rootChildren[i]->GetBringToBack()))
@@ -414,8 +414,8 @@ void UI::Update(float timeStep, UIElement* element)
 {
     element->Update(timeStep);
     
-    const std::vector<UIElement*> children = element->GetChildren();
-    for (std::vector<UIElement*>::const_iterator i = children.begin(); i != children.end(); ++i)
+    const Vector<UIElement*> children = element->GetChildren();
+    for (Vector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         Update(timeStep, *i);
 }
 
@@ -426,22 +426,22 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     if ((currentScissor.left_ == currentScissor.right_) || (currentScissor.top_ == currentScissor.bottom_))
         return;
     
-    std::vector<UIElement*> children = element->GetChildren();
-    if (children.empty())
+    Vector<UIElement*> children = element->GetChildren();
+    if (children.Empty())
         return;
     
-    std::sort(children.begin(), children.end(), CompareUIElements);
+    Sort(children.Begin(), children.End(), CompareUIElements);
     
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
-    std::vector<UIElement*>::const_iterator i = children.begin();
+    Vector<UIElement*>::ConstIterator i = children.Begin();
     if (element != rootElement_)
     {
-        std::vector<UIElement*>::const_iterator j = i;
-        int currentPriority = children.front()->GetPriority();
-        while (i != children.end())
+        Vector<UIElement*>::ConstIterator j = i;
+        int currentPriority = children.Front()->GetPriority();
+        while (i != children.End())
         {
-            while ((j != children.end()) && ((*j)->GetPriority() == currentPriority))
+            while ((j != children.End()) && ((*j)->GetPriority() == currentPriority))
             {
                 if ((*j)->IsVisible())
                     (*j)->GetBatches(batches_, quads_, currentScissor);
@@ -454,14 +454,14 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
                     GetBatches(*i, currentScissor);
                 ++i;
             }
-            if (i != children.end())
+            if (i != children.End())
                 currentPriority = (*i)->GetPriority();
         }
     }
     // On the root level draw each element and its children immediately after to avoid artifacts
     else
     {
-        while (i != children.end())
+        while (i != children.End())
         {
             if ((*i)->IsVisible())
             {
@@ -479,10 +479,10 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         return;
     
     // Get children from lowest priority to highest
-    std::vector<UIElement*> children = current->GetChildren(false);
-    std::sort(children.begin(), children.end(), CompareUIElements);
+    Vector<UIElement*> children = current->GetChildren(false);
+    Sort(children.Begin(), children.End(), CompareUIElements);
     
-    for (std::vector<UIElement*>::const_iterator i = children.begin(); i != children.end(); ++i)
+    for (Vector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
         UIElement* element = *i;
         if ((element != cursor_.GetPtr()) && (element->IsVisible()))
@@ -734,19 +734,19 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 topLevel = topLevel->GetParent();
             if (topLevel)
             {
-                std::vector<UIElement*> children = topLevel->GetChildren(true);
-                for (std::vector<UIElement*>::iterator i = children.begin(); i != children.end();)
+                Vector<UIElement*> children = topLevel->GetChildren(true);
+                for (Vector<UIElement*>::Iterator i = children.Begin(); i != children.End();)
                 {
                     if ((*i)->GetFocusMode() < FM_FOCUSABLE)
-                        i = children.erase(i);
+                        i = children.Erase(i);
                     else
                         ++i;
                 }
-                for (unsigned i = 0; i < children.size(); ++i)
+                for (unsigned i = 0; i < children.Size(); ++i)
                 {
                     if (children[i] == element)
                     {
-                        UIElement* next = children[(i + 1) % children.size()];
+                        UIElement* next = children[(i + 1) % children.Size()];
                         SetFocusElement(next);
                         return;
                     }

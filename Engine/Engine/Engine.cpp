@@ -68,7 +68,7 @@ Engine::~Engine()
 {
 }
 
-bool Engine::Initialize(const String& windowTitle, const String& logName, const std::vector<String>& arguments)
+bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments)
 {
     if (initialized_)
         return true;
@@ -88,7 +88,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool sixteenBit = true;
     bool interpolate = true;
     
-    for (unsigned i = 0; i < arguments.size(); ++i)
+    for (unsigned i = 0; i < arguments.Size(); ++i)
     {
         if ((arguments[i][0] == '-') && (arguments[i].Length() >= 2))
         {
@@ -323,18 +323,18 @@ void Engine::DumpProfilingData()
 void Engine::DumpResources()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    const std::map<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
+    const Map<ShortStringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     LOGRAW("\n");
     
-    for (std::map<ShortStringHash, ResourceGroup>::const_iterator i = resourceGroups.begin();
-        i != resourceGroups.end(); ++i)
+    for (Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups.Begin();
+        i != resourceGroups.End(); ++i)
     {
-        unsigned num = i->second.resources_.size();
-        unsigned memoryUse = i->second.memoryUse_;
+        unsigned num = i->second_.resources_.Size();
+        unsigned memoryUse = i->second_.memoryUse_;
         
         if (num)
         {
-            LOGRAW("Resource type " + i->second.resources_.begin()->second->GetTypeName() +
+            LOGRAW("Resource type " + i->second_.resources_.Begin()->second_->GetTypeName() +
                 ": count " + ToString(num) + " memory use " + ToString(memoryUse) + "\n");
         }
     }

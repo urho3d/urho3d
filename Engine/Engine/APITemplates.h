@@ -37,7 +37,7 @@
 
 #include <angelscript.h>
 #include <cstring>
-#include <set>
+#include "Set.h"
 
 /// Template function for dynamic cast between two script classes
 template <class T, class U> U* RefCast(T* t)
@@ -60,14 +60,14 @@ template <class T> T* GetVariantPtr(Variant* ptr)
         return 0;
 }
 
-/// Template function for std::vector to array conversion
-template <class T> CScriptArray* VectorToArray(const std::vector<T>& vector, const char* arrayName)
+/// Template function for Vector to array conversion
+template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(vector.Size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
             *(static_cast<T*>(arr->At(i))) = vector[i];
@@ -78,14 +78,14 @@ template <class T> CScriptArray* VectorToArray(const std::vector<T>& vector, con
         return 0;
 }
 
-/// Template function for std::vector to handle array conversion
-template <class T> CScriptArray* VectorToHandleArray(const std::vector<T*>& vector, const char* arrayName)
+/// Template function for Vector to handle array conversion
+template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(vector.Size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
@@ -101,14 +101,14 @@ template <class T> CScriptArray* VectorToHandleArray(const std::vector<T*>& vect
         return 0;
 }
 
-/// Template function for shared pointer std::vector to handle array conversion
-template <class T> CScriptArray* SharedPtrVectorToHandleArray(const std::vector<SharedPtr<T> >& vector, const char* arrayName)
+/// Template function for shared pointer Vector to handle array conversion
+template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = new CScriptArray(vector.size(), type);
+        CScriptArray* arr = new CScriptArray(vector.Size(), type);
         
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
@@ -124,17 +124,17 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const std::vector<
         return 0;
 }
 
-/// Template function for std::set to array conversion
-template <class T> CScriptArray* SetToArray(const std::set<T>& set, const char* arrayName)
+/// Template function for Set to array conversion
+template <class T> CScriptArray* SetToArray(const Set<T>& set, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
     if (context)
     {
         asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
-        CScriptArray* arr = new CScriptArray(set.size(), type);
+        CScriptArray* arr = new CScriptArray(set.Size(), type);
         
         unsigned index = 0;
-        for (typename std::set<T>::const_iterator i = set.begin(); i != set.end(); ++i)
+        for (typename Set<T>::ConstIterator i = set.Begin(); i != set.End(); ++i)
         {
             *(static_cast<T*>(arr->At(index))) = *i;
             ++index;
@@ -276,14 +276,14 @@ static const AttributeInfo noAttributeInfo;
 
 static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Serializable* ptr)
 {
-    const std::vector<AttributeInfo>* attributes = ptr->GetAttributes();
-    if ((!attributes) || (index >= attributes->size()))
+    const Vector<AttributeInfo>* attributes = ptr->GetAttributes();
+    if ((!attributes) || (index >= attributes->Size()))
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return noAttributeInfo;
     }
     else
-        return attributes->at(index);
+        return attributes->At(index);
 }
 
 static bool SerializableLoad(File* file, Serializable* ptr)
@@ -342,8 +342,8 @@ static Component* NodeGetOrCreateComponent(const String& typeName, bool local, N
 
 static Component* NodeGetComponent(unsigned index, Node* ptr)
 {
-    const std::vector<SharedPtr<Component> >& components = ptr->GetComponents();
-    if (index >= components.size())
+    const Vector<SharedPtr<Component> >& components = ptr->GetComponents();
+    if (index >= components.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return 0;
@@ -359,7 +359,7 @@ static Component* NodeGetComponentWithTypeAndIndex(const String& typeName, unsig
 
 static CScriptArray* NodeGetComponentsWithType(const String& typeName, Node* ptr)
 {
-    std::vector<Component*> components;
+    Vector<Component*> components;
     ptr->GetComponents(components, ShortStringHash(typeName));
     return VectorToHandleArray<Component>(components, "Array<Component@>");
 }
@@ -371,14 +371,14 @@ static bool NodeHasComponent(const String& typeName, Node* ptr)
 
 static CScriptArray* NodeGetChildren(bool recursive, Node* ptr)
 {
-    std::vector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->GetChildren(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static CScriptArray* NodeGetChildrenWithComponent(String& typeName, bool recursive, Node* ptr)
 {
-    std::vector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->GetChildrenWithComponent(nodes, ShortStringHash(typeName), recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
@@ -395,8 +395,8 @@ static unsigned NodeGetNumChildrenRecursive(Node* ptr)
 
 static Node* NodeGetChild(unsigned index, Node* ptr)
 {
-    const std::vector<SharedPtr<Node> >& children = ptr->GetChildren();
-    if (index >= children.size())
+    const Vector<SharedPtr<Node> >& children = ptr->GetChildren();
+    if (index >= children.Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return 0;
@@ -407,28 +407,28 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
 
 static CScriptArray* NodeGetScriptedChildren(bool recursive, Node* ptr)
 {
-    std::vector<Node*> nodes;
+    Vector<Node*> nodes;
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static CScriptArray* NodeGetScriptedChildrenWithClassName(const String& className, bool recursive, Node* ptr)
 {
-    std::vector<Node*> nodes;
-    std::vector<Node*> ret;
+    Vector<Node*> nodes;
+    Vector<Node*> ret;
     
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
-    for (std::vector<Node*>::iterator i = nodes.begin(); i != nodes.end(); ++i)
+    for (Vector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         Node* node = (*i);
-        const std::vector<SharedPtr<Component> >& components = node->GetComponents();
-        for (std::vector<SharedPtr<Component> >::const_iterator j = components.begin(); j != components.end(); ++j)
+        const Vector<SharedPtr<Component> >& components = node->GetComponents();
+        for (Vector<SharedPtr<Component> >::ConstIterator j = components.Begin(); j != components.End(); ++j)
         {
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
                 ScriptInstance* instance = static_cast<ScriptInstance*>(j->GetPtr());
                 if (instance->GetClassName() == className)
-                    ret.push_back(node);
+                    ret.Push(node);
             }
         }
     }

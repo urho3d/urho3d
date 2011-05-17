@@ -36,22 +36,22 @@
 SharedPtr<Context> context_(new Context());
 
 int main(int argc, char** argv);
-void Run(const std::vector<String>& arguments);
+void Run(const Vector<String>& arguments);
 
 int main(int argc, char** argv)
 {
-    std::vector<String> arguments;
+    Vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(String(argv[i]));
+        arguments.Push(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<String>& arguments)
+void Run(const Vector<String>& arguments)
 {
-    if (arguments.size() < 1)
+    if (arguments.Size() < 1)
     {
         ErrorExit(
             "Usage: NormalMapTool <inputfile>\n\n"

@@ -44,16 +44,26 @@ struct GeometryDepthBounds
     float max_;
 };
 
-
 /// Helper structure for checking whether a transparent object is already lit by a certain light
 struct LitTransparencyCheck
 {
+    /// Construct undefined
+    LitTransparencyCheck()
+    {
+    }
+    
+    /// Construct
     LitTransparencyCheck(Light* light, Drawable* drawable, unsigned batchIndex) :
         light_(light),
         drawable_(drawable),
         batchIndex_(batchIndex)
     {
     }
+    
+    /// Test for equality with another lit transparency check
+    bool operator == (const LitTransparencyCheck& rhs) const { return (light_ == rhs.light_) && (drawable_ == rhs.drawable_) && (batchIndex_ == rhs.batchIndex_); }
+    /// Test for inequality with another lit transparency check
+    bool operator != (const LitTransparencyCheck& rhs) const { return (light_ != rhs.light_) || (drawable_ != rhs.drawable_) || (batchIndex_ != rhs.batchIndex_); }
     
     /// Test if less than another lit transparency check
     bool operator < (const LitTransparencyCheck& rhs) const
@@ -117,15 +127,15 @@ public:
     /// Return the depth stencil. 0 if using the backbuffer's depth stencil
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
     /// Return geometry objects
-    const std::vector<Drawable*>& GetGeometries() const { return geometries_; }
+    const Vector<Drawable*>& GetGeometries() const { return geometries_; }
     /// Return occluder objects
-    const std::vector<Drawable*>& GetOccluders() const { return occluders_; }
+    const Vector<Drawable*>& GetOccluders() const { return occluders_; }
     /// Return directional light shadow rendering occluders
-    const std::vector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
+    const Vector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
     /// Return lights
-    const std::vector<Light*>& GetLights() const { return lights_; }
+    const Vector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues
-    const std::vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
+    const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
     
 private:
     /// Query the octree for scene nodes
@@ -133,19 +143,19 @@ private:
     /// Construct batches from the scene nodes
     void GetBatches();
     /// Get lit batches for a certain light and drawable
-    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, std::set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
+    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, Set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
     /// Render batches, forward mode
     void RenderBatcheforward();
     /// Render batches, deferred mode
     void RenderBatchesDeferred();
     /// Query for occluders as seen from a camera
-    void UpdateOccluders(std::vector<Drawable*>& occluders, Camera* camera);
+    void UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer
-    void DrawOccluders(OcclusionBuffer* buffer, const std::vector<Drawable*>& occluders);
+    void DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light
     unsigned ProcessLight(Light* light);
     /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
-    void ProcessLightQuery(unsigned splitIndex, const std::vector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
+    void ProcessLightQuery(unsigned splitIndex, const Vector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
     /// Check visibility of one shadow caster
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix4x3& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Set up initial shadow camera view
@@ -220,27 +230,27 @@ private:
     /// Combined bounding box of visible geometries in view space
     BoundingBox sceneViewBox_;
     /// Cache for light scissor queries
-    std::map<Light*, Rect> lightScissorCache_;
+    Map<Light*, Rect> lightScissorCache_;
     /// Current split lights being processed
     Light* splitLights_[MAX_LIGHT_SPLITS];
     /// Current lit geometries being processed
-    std::vector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
+    Vector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
     /// Current shadow casters being processed
-    std::vector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
+    Vector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
     /// Temporary drawable query result
-    std::vector<Drawable*> tempDrawables_;
+    Vector<Drawable*> tempDrawables_;
     /// Geometry objects
-    std::vector<Drawable*> geometries_;
+    Vector<Drawable*> geometries_;
     /// Occluder objects
-    std::vector<Drawable*> occluders_;
+    Vector<Drawable*> occluders_;
     /// Directional light shadow rendering occluders
-    std::vector<Drawable*> shadowOccluders_;
+    Vector<Drawable*> shadowOccluders_;
     /// Depth minimum and maximum values for visible geometries
-    std::vector<GeometryDepthBounds> geometryDepthBounds_;
+    Vector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights
-    std::vector<Light*> lights_;
+    Vector<Light*> lights_;
     /// G-buffer size error displayed
-    std::set<RenderSurface*> gBufferErrorDisplayed_;
+    Set<RenderSurface*> gBufferErrorDisplayed_;
     
     /// G-buffer batches
     BatchQueue gBufferQueue_;
@@ -253,5 +263,5 @@ private:
     /// Unshadowed light volume batches
     BatchQueue noShadowLightQueue_;
     /// Shadowed light queues
-    std::vector<LightBatchQueue> lightQueues_;
+    Vector<LightBatchQueue> lightQueues_;
 };

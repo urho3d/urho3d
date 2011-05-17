@@ -32,29 +32,29 @@
 #include "DebugNew.h"
 
 int main(int argc, char** argv);
-void Run(const std::vector<String>& arguments);
+void Run(const Vector<String>& arguments);
 
 int main(int argc, char** argv)
 {
-    std::vector<String> arguments;
+    Vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(String(argv[i]));
+        arguments.Push(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<String>& arguments)
+void Run(const Vector<String>& arguments)
 {
-    if (arguments.size() < 3)
+    if (arguments.Size() < 3)
         ErrorExit("Usage: RampGenerator <output file> <width> <power> [dimensions]\n");
     
     int width = ToInt(arguments[1]);
     float power = ToFloat(arguments[2]);
     
     int dimensions = 1;
-    if (arguments.size() > 3)
+    if (arguments.Size() > 3)
         dimensions = ToInt(arguments[3]);
         
     if (width < 2)

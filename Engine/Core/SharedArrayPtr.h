@@ -99,10 +99,12 @@ public:
     T& operator * () const { return *ptr_; }
     /// Subscript the array
     T& operator [] (const int index) { return ptr_[index]; }
-    /// Test for equality with another shared pointer
+    /// Test for equality with another shared array pointer
     bool operator == (const SharedArrayPtr<T>& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Test for inequality with another shared pointer
+    /// Test for inequality with another shared array pointer
     bool operator != (const SharedArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_; }
+    /// Test for less than with another array pointer
+    bool operator < (const SharedArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an array
     operator bool () const { return ptr_ != 0; }
     /// Convert to a raw pointer
@@ -310,6 +312,8 @@ public:
     bool operator == (const WeakArrayPtr<T>& rhs) const { return (ptr_ == rhs.ptr_) && (refCount_ == rhs.refCount_); }
     /// Test for inequality with another weak array pointer
     bool operator != (const WeakArrayPtr<T>& rhs) const { return (ptr_ != rhs.ptr_) || (refCount_ != rhs.refCount_); }
+    /// Test for less than with another weak array pointer
+    bool operator < (const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an array which is not expired
     operator bool () const { return !IsExpired(); }
     /// Convert to a raw pointer, null if array is expired

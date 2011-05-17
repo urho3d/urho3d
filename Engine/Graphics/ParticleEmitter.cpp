@@ -87,8 +87,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f);
     ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", parameterSource_, ResourceRef(XMLFile::GetTypeStatic()));
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Particles", particles_, std::vector<unsigned char>(), AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Billboards", billboards_, std::vector<unsigned char>(), AM_SERIALIZATION);
+    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Particles", particles_, Vector<unsigned char>(), AM_SERIALIZATION);
+    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Billboards", billboards_, Vector<unsigned char>(), AM_SERIALIZATION);
 }
 
 void ParticleEmitter::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -105,7 +105,7 @@ void ParticleEmitter::OnSetAttribute(const AttributeInfo& attr, const Variant& v
         {
             MemoryBuffer buf(value.GetBuffer());
             SetNumParticles(buf.ReadVLE());
-            for (std::vector<Particle>::iterator i = particles_.begin(); i != particles_.end(); ++i)
+            for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
             {
                 i->velocity_ = buf.ReadVector3();
                 i->size_ = buf.ReadVector2();
@@ -135,8 +135,8 @@ Variant ParticleEmitter::OnGetAttribute(const AttributeInfo& attr)
     case offsetof(ParticleEmitter, particles_):
         {
             VectorBuffer buf;
-            buf.WriteVLE(particles_.size());
-            for (std::vector<Particle>::const_iterator i = particles_.begin(); i != particles_.end(); ++i)
+            buf.WriteVLE(particles_.Size());
+            for (Vector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
             {
                 buf.WriteVector3(i->velocity_);
                 buf.WriteVector2(i->size_);
@@ -168,8 +168,8 @@ void ParticleEmitter::Update(float timeStep)
     PROFILE(UpdateParticleEmitter);
     
     // If there is an amount mismatch between particles and billboards, correct it
-    if (particles_.size() != billboards_.size())
-        SetNumBillboards(particles_.size());
+    if (particles_.Size() != billboards_.Size())
+        SetNumBillboards(particles_.Size());
     
     bool needBillboardUpdate = false;
     
@@ -211,7 +211,7 @@ void ParticleEmitter::Update(float timeStep)
     if ((scaled_) && (!relative_))
         scaleVector = GetWorldScale();
     
-    for (unsigned i = 0; i < particles_.size(); ++i)
+    for (unsigned i = 0; i < particles_.Size(); ++i)
     {
         Particle& particle = particles_[i];
         Billboard& billboard = billboards_[i];
@@ -257,14 +257,14 @@ void ParticleEmitter::Update(float timeStep)
             
             // Color interpolation
             unsigned& index = particle.colorIndex_;
-            if (index < colors_.size())
+            if (index < colors_.Size())
             {
-                if (index < colors_.size() - 1)
+                if (index < colors_.Size() - 1)
                 {
                     if (particle.timer_ >= colors_[index + 1].time_)
                         ++index;
                 }
-                if (index < colors_.size() - 1)
+                if (index < colors_.Size() - 1)
                     billboard.color_ = colors_[index].interpolate(colors_[index + 1], particle.timer_);
                 else
                     billboard.color_ = colors_[index].color_;
@@ -272,7 +272,7 @@ void ParticleEmitter::Update(float timeStep)
             
             // Texture animation
             unsigned& texIndex = particle.texIndex_;
-            if ((textureAnimation_.size()) && (texIndex < textureAnimation_.size() - 1))
+            if ((textureAnimation_.Size()) && (texIndex < textureAnimation_.Size() - 1))
             {
                 if (particle.timer_ >= textureAnimation_[texIndex + 1].time_)
                 {
@@ -383,14 +383,14 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     
     if (rootElem.HasChildElement("colorfade"))
     {
-        std::vector<ColorFade> fades;
+        Vector<ColorFade> fades;
         XMLElement colorFadeElem = rootElem.GetChildElement("colorfade");
         while (colorFadeElem)
         {
             ColorFade fade;
             fade.color_ = colorFadeElem.GetColor("color");
             fade.time_ = colorFadeElem.GetFloat("time");
-            fades.push_back(fade);
+            fades.Push(fade);
             
             colorFadeElem = colorFadeElem.GetNextElement("colorfade");
         }
@@ -399,14 +399,14 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
     
     if (rootElem.HasChildElement("texanim"))
     {
-        std::vector<TextureAnimation> animations;
+        Vector<TextureAnimation> animations;
         XMLElement animElem = rootElem.GetChildElement("texanim");
         while (animElem)
         {
             TextureAnimation animation;
             animation.uv_ = animElem.GetRect("uv");
             animation.time_ = animElem.GetFloat("time");
-            animations.push_back(animation);
+            animations.Push(animation);
             animElem = animElem.GetNextElement("texanim");
         }
         textureAnimation_ = animations;
@@ -427,7 +427,7 @@ void ParticleEmitter::SetActive(bool enable, bool resetPeriod)
 void ParticleEmitter::SetNumParticles(int num)
 {
     num = Max(num, 0);
-    particles_.resize(num);
+    particles_.Resize(num);
     SetNumBillboards(num);
 }
 
@@ -437,13 +437,13 @@ void ParticleEmitter::SetParticleColor(const Color& color)
     newColor.color_ = color;
     newColor.time_ = 0.0f;
     
-    colors_.clear();
-    colors_.push_back(newColor);
+    colors_.Clear();
+    colors_.Push(newColor);
 }
 
-void ParticleEmitter::SetParticleColors(const std::vector<ColorFade>& colors)
+void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
 {
-    if (!colors.size())
+    if (!colors.Size())
         return;
     
     colors_ = colors;
@@ -471,7 +471,7 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
 bool ParticleEmitter::EmitNewParticle()
 {
     unsigned index = GetFreeParticle();
-    if (index >= particles_.size())
+    if (index >= particles_.Size())
         return false;
     Particle& particle = particles_[index];
     Billboard& billboard = billboards_[index];
@@ -530,7 +530,7 @@ bool ParticleEmitter::EmitNewParticle()
     
     billboard.position_ = startPos;
     billboard.size_ = particles_[index].size_;
-    billboard.uv_ = textureAnimation_.size() ? textureAnimation_[0].uv_ : Rect::POSITIVE;
+    billboard.uv_ = textureAnimation_.Size() ? textureAnimation_[0].uv_ : Rect::POSITIVE;
     billboard.rotation_ = Lerp(rotationMin_, rotationMax_, Random(1.0f));
     billboard.color_ = colors_[0].color_;
     billboard.enabled_ = true;
@@ -540,7 +540,7 @@ bool ParticleEmitter::EmitNewParticle()
 
 unsigned ParticleEmitter::GetFreeParticle() const
 {
-    for (unsigned i = 0; i < billboards_.size(); ++i)
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             return i;

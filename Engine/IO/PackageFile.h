@@ -53,13 +53,13 @@ public:
     /// Return the file entry corresponding to the name, or null if not found
     const PackageEntry* GetEntry(const String& fileName) const;
     /// Return all file entries
-    const std::map<String, PackageEntry>& GetEntries() const { return entries_; }
+    const Map<String, PackageEntry>& GetEntries() const { return entries_; }
     /// Return the package file name
     const String& GetName() const { return fileName_; }
     /// Return hash of the package file name
     StringHash GetNameHash() const { return nameHash_; }
     /// Return number of files
-    unsigned GetNumFiles() const { return entries_.size(); }
+    unsigned GetNumFiles() const { return entries_.Size(); }
     /// Return total size of the package file
     unsigned GetTotalSize() const { return totalSize_; }
     /// Return checksum of the package file contents
@@ -67,7 +67,7 @@ public:
     
 private:
     /// File entries
-    std::map<String, PackageEntry> entries_;
+    Map<String, PackageEntry> entries_;
     /// File name
     String fileName_;
     /// Package file name hash

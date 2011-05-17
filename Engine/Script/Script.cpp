@@ -53,31 +53,31 @@ struct PropertyInfo
     bool indexed_;
 };
 
-void ExtractPropertyInfo(const String& functionName, const String& declaration, std::vector<PropertyInfo>& propertyInfos)
+void ExtractPropertyInfo(const String& functionName, const String& declaration, Vector<PropertyInfo>& propertyInfos)
 {
     String propertyName = functionName.Substring(4);
     PropertyInfo* info = 0;
-    for (unsigned k = 0; k < propertyInfos.size(); ++k)
+    for (unsigned k = 0; k < propertyInfos.Size(); ++k)
     {
         if (propertyInfos[k].name_ == propertyName)
             info = &propertyInfos[k];
     }
     if (!info)
     {
-        propertyInfos.resize(propertyInfos.size() + 1);
-        info = &propertyInfos[propertyInfos.size() - 1];
+        propertyInfos.Resize(propertyInfos.Size() + 1);
+        info = &propertyInfos[propertyInfos.Size() - 1];
         info->name_ = propertyName;
     }
     if (functionName.Find("get_") != String::NPOS)
     {
         info->read_ = true;
         // Extract type from the return value
-        std::vector<String> parts = Split(declaration, ' ');
-        if (parts.size())
+        Vector<String> parts = Split(declaration, ' ');
+        if (parts.Size())
         {
             if (parts[0] != "const")
                 info->type_ = parts[0];
-            else if (parts.size() > 1)
+            else if (parts.Size() > 1)
                 info->type_ = parts[1];
         }
         // If get method has parameters, it is indexed
@@ -120,7 +120,7 @@ Script::Script(Context* context) :
     // Create the function/method contexts
     for (unsigned i = 0 ; i < MAX_SCRIPT_NESTING_LEVEL; ++i)
     {
-        scriptFileContexts_.push_back(scriptEngine_->CreateContext());
+        scriptFileContexts_.Push(scriptEngine_->CreateContext());
         scriptFileContexts_[i]->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
     }
     
@@ -141,7 +141,7 @@ Script::~Script()
         if (scriptFileContexts_[i])
             scriptFileContexts_[i]->Release();
     }
-    scriptFileContexts_.clear();
+    scriptFileContexts_.Clear();
     
     if (scriptEngine_)
     {
@@ -219,8 +219,8 @@ void Script::DumpAPI()
 {
     LOGRAW("Urho3D script API:\n");
     
-    std::vector<PropertyInfo> globalPropertyInfos;
-    std::vector<String> globalFunctions;
+    Vector<PropertyInfo> globalPropertyInfos;
+    Vector<String> globalFunctions;
     
     unsigned functions = scriptEngine_->GetGlobalFunctionCount();
     for (unsigned i = 0; i < functions; ++i)
@@ -233,17 +233,17 @@ void Script::DumpAPI()
         if ((functionName.Find("set_") != String::NPOS) || (functionName.Find("get_") != String::NPOS))
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
         else
-            globalFunctions.push_back(declaration);
+            globalFunctions.Push(declaration);
     }
     
     LOGRAW("\nGlobal functions:\n");
     
-    for (unsigned i = 0; i < globalFunctions.size(); ++i)
+    for (unsigned i = 0; i < globalFunctions.Size(); ++i)
         OutputAPIRow(globalFunctions[i]);
     
     LOGRAW("\nGlobal properties:\n");
     
-    for (unsigned i = 0; i < globalPropertyInfos.size(); ++i)
+    for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
     {
         // For now, skip write-only properties
         if (!globalPropertyInfos[i].read_)
@@ -276,8 +276,8 @@ void Script::DumpAPI()
         if (type)
         {
             String typeName(type->GetName());
-            std::vector<String> methodDeclarations;
-            std::vector<PropertyInfo> propertyInfos;
+            Vector<String> methodDeclarations;
+            Vector<PropertyInfo> propertyInfos;
             
             LOGRAW("\n" + typeName + "\n");
             
@@ -293,7 +293,7 @@ void Script::DumpAPI()
                     if (declaration.Find("::op") == String::NPOS)
                     {
                         String prefix(typeName + "::");
-                        methodDeclarations.push_back(declaration.Replace(prefix, ""));
+                        methodDeclarations.Push(declaration.Replace(prefix, ""));
                     }
                 }
                 else
@@ -315,20 +315,20 @@ void Script::DumpAPI()
                 newInfo.name_ = String(propertyName);
                 newInfo.type_ = String(propertyDeclaration);
                 newInfo.read_ = newInfo.write_ = true;
-                propertyInfos.push_back(newInfo);
+                propertyInfos.Push(newInfo);
             }
             
-            if (!methodDeclarations.empty())
+            if (!methodDeclarations.Empty())
             {
                 LOGRAW("\nMethods:\n");
-                for (unsigned j = 0; j < methodDeclarations.size(); ++j)
+                for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
                     OutputAPIRow(methodDeclarations[j]);
             }
             
-            if (!propertyInfos.empty())
+            if (!propertyInfos.Empty())
             {
                 LOGRAW("\nProperties:\n");
-                for (unsigned j = 0; j < propertyInfos.size(); ++j)
+                for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
                     // For now, skip write-only properties
                     if (!propertyInfos[j].read_)
@@ -394,7 +394,7 @@ void Script::ExceptionCallback(asIScriptContext* context)
 
 asIScriptContext* Script::GetScriptFileContext() const
 {
-    return scriptNestingLevel_ < scriptFileContexts_.size() ? scriptFileContexts_[scriptNestingLevel_] : 0;
+    return scriptNestingLevel_ < scriptFileContexts_.Size() ? scriptFileContexts_[scriptNestingLevel_] : 0;
 }
 
 ScriptFile* Script::GetDefaultScriptFile() const
@@ -409,9 +409,9 @@ Scene* Script::GetDefaultScene() const
 
 asIObjectType* Script::GetObjectType(const char* declaration)
 {
-    std::map<const char*, asIObjectType*>::const_iterator i = objectTypes_.find(declaration);
-    if (i != objectTypes_.end())
-        return i->second;
+    Map<const char*, asIObjectType*>::ConstIterator i = objectTypes_.Find(declaration);
+    if (i != objectTypes_.End())
+        return i->second_;
     
     asIObjectType* type = scriptEngine_->GetObjectTypeById(scriptEngine_->GetTypeIdByDecl(declaration));
     objectTypes_[declaration] = type;

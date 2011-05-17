@@ -31,9 +31,9 @@
 
 static const int TEMP_BUFFER_LENGTH = 128;
 
-std::vector<String> Split(const String& source, char separator)
+Vector<String> Split(const String& source, char separator)
 {
-    std::vector<String> ret;
+    Vector<String> ret;
     unsigned pos = 0;
     
     while (pos < source.Length())
@@ -50,7 +50,7 @@ std::vector<String> Split(const String& source, char separator)
         
         if (start == source.Length())
         {
-            ret.push_back(source.Substring(pos));
+            ret.Push(source.Substring(pos));
             break;
         }
         
@@ -64,7 +64,7 @@ std::vector<String> Split(const String& source, char separator)
             end++;
         }
         
-        ret.push_back(source.Substring(pos, start - pos));
+        ret.Push(source.Substring(pos, start - pos));
         pos = end;
     }
     
@@ -103,12 +103,12 @@ float ToFloat(const String& source)
 
 Color ToColor(const String& source)
 {
-    std::vector<String> colors = Split(source, ' ');
-    if (colors.size() < 3)
+    Vector<String> colors = Split(source, ' ');
+    if (colors.Size() < 3)
         return Color();
     
     Color ret(ToFloat(colors[0]), ToFloat(colors[1]), ToFloat(colors[2]));
-    if (colors.size() > 3)
+    if (colors.Size() > 3)
         ret.a_ = ToFloat(colors[3]);
     
     return ret;
@@ -116,8 +116,8 @@ Color ToColor(const String& source)
 
 IntRect ToIntRect(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 4)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 4)
         return IntRect::ZERO;
     else
         return IntRect(ToInt(coords[0]), ToInt(coords[1]), ToInt(coords[2]), ToInt(coords[3]));
@@ -125,8 +125,8 @@ IntRect ToIntRect(const String& source)
 
 IntVector2 ToIntVector2(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 2)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 2)
         return IntVector2::ZERO;
     else
         return IntVector2(ToInt(coords[0]), ToInt(coords[1]));
@@ -134,8 +134,8 @@ IntVector2 ToIntVector2(const String& source)
 
 Rect ToRect(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 4)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 4)
         return Rect::ZERO;
     else
         return Rect(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3]));
@@ -143,10 +143,10 @@ Rect ToRect(const String& source)
 
 Quaternion ToQuaternion(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 3)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 3)
         return Quaternion::IDENTITY;
-    else if (coords.size() < 4)
+    else if (coords.Size() < 4)
         // 3 coords specified: conversion from Euler angles
         return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]));
     else
@@ -156,8 +156,8 @@ Quaternion ToQuaternion(const String& source)
 
 Vector2 ToVector2(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 2)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 2)
         return Vector2::ZERO;
     else
         return Vector2(ToFloat(coords[0]), ToFloat(coords[1]));
@@ -165,8 +165,8 @@ Vector2 ToVector2(const String& source)
 
 Vector3 ToVector3(const String& source)
 {
-    std::vector<String> coords = Split(source, ' ');
-    if (coords.size() < 3)
+    Vector<String> coords = Split(source, ' ');
+    if (coords.Size() < 3)
         return Vector3::ZERO;
     else
         return Vector3(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]));
@@ -174,17 +174,17 @@ Vector3 ToVector3(const String& source)
 
 Vector4 ToVector4(const String& source, bool allowMissingCoords)
 {
-    std::vector<String> coords = Split(source, ' ');
+    Vector<String> coords = Split(source, ' ');
     if (!allowMissingCoords)
     {
-        if (coords.size() < 4)
+        if (coords.Size() < 4)
             return Vector4::ZERO;
         
         return Vector4(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3]));
     }
     else
     {
-        unsigned num = coords.size();
+        unsigned num = coords.Size();
         Vector4 ret(Vector4::ZERO);
         if (num > 0)
             ret.x_ = ToFloat(coords[0]);

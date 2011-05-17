@@ -55,7 +55,7 @@ struct ModelMorph
     /// Current morph weight
     float weight_;
     /// Morph data per vertex buffer
-    std::map<unsigned, VertexBufferMorph> buffers_;
+    Map<unsigned, VertexBufferMorph> buffers_;
 };
 
 /// Model resource
@@ -87,32 +87,32 @@ public:
     /// Set skeleton
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle
-    void SetGeometryBoneMappings(const std::vector<std::vector<unsigned> >& mappings);
+    void SetGeometryBoneMappings(const Vector<Vector<unsigned> >& mappings);
     /// Set vertex morphs
-    void SetMorphs(const std::vector<ModelMorph>& morphs);
+    void SetMorphs(const Vector<ModelMorph>& morphs);
     
     /// Return bounding box
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
     /// Return skeleton
     Skeleton& GetSkeleton() { return skeleton_; }
     /// Return vertex buffers
-    const std::vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
     /// Return index buffers
-    const std::vector<SharedPtr<IndexBuffer> >& GetIndexBuffers() const { return indexBuffers_; }
+    const Vector<SharedPtr<IndexBuffer> >& GetIndexBuffers() const { return indexBuffers_; }
     /// Return number of geometries
-    unsigned GetNumGeometries() const { return geometries_.size(); }
+    unsigned GetNumGeometries() const { return geometries_.Size(); }
     /// Return number of LOD levels in geometry
     unsigned GetNumGeometryLodLevels(unsigned index) const;
     /// Return geometry pointers
-    const std::vector<std::vector<SharedPtr<Geometry> > >& GetGeometries() const { return geometries_; }
+    const Vector<Vector<SharedPtr<Geometry> > >& GetGeometries() const { return geometries_; }
     /// Return geometry by index and LOD level
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
     /// Return geometery bone mappings
-    const std::vector<std::vector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<Vector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
     /// Return vertex morphs
-    const std::vector<ModelMorph>& GetMorphs() const { return morphs_; }
+    const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
     /// Return number of vertex morphs
-    unsigned GetNumMorphs() const { return morphs_.size(); }
+    unsigned GetNumMorphs() const { return morphs_.Size(); }
     /// Return vertex morph by index
     const ModelMorph* GetMorph(unsigned index) const;
     /// Return vertex morph by name
@@ -126,13 +126,13 @@ private:
     /// Skeleton
     Skeleton skeleton_;
     /// Vertex buffer pointers
-    std::vector<SharedPtr<VertexBuffer> > vertexBuffer_;
+    Vector<SharedPtr<VertexBuffer> > vertexBuffer_;
     /// Index buffer pointers
-    std::vector<SharedPtr<IndexBuffer> > indexBuffers_;
+    Vector<SharedPtr<IndexBuffer> > indexBuffers_;
     /// Geometry pointers
-    std::vector<std::vector<SharedPtr<Geometry> > > geometries_;
+    Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Geometry bone mappings
-    std::vector<std::vector<unsigned> > geometryBoneMappings_;
+    Vector<Vector<unsigned> > geometryBoneMappings_;
     /// Vertex morphs
-    std::vector<ModelMorph> morphs_;
+    Vector<ModelMorph> morphs_;
 };

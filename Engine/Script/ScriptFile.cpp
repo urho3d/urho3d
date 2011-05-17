@@ -66,7 +66,7 @@ bool ScriptFile::Load(Deserializer& source)
     
     // Create the module. Discard previous module if there was one
     if (scriptModule_)
-        script_->GetModuleMap().erase(scriptModule_);
+        script_->GetModuleMap().Erase(scriptModule_);
     asIScriptEngine* engine = script_->GetScriptEngine();
     scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
     if (!scriptModule_)
@@ -250,9 +250,9 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
     
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found = false;
-    std::map<asIObjectType*, bool>::const_iterator i = checkedClasses_.find(type);
-    if (i != checkedClasses_.end())
-        found = i->second;
+    Map<asIObjectType*, bool>::ConstIterator i = checkedClasses_.Find(type);
+    if (i != checkedClasses_.End())
+        found = i->second_;
     else
     {
         unsigned numInterfaces = type->GetInterfaceCount();
@@ -291,9 +291,9 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
     if (!compiled_)
         return 0;
     
-    std::map<String, asIScriptFunction*>::const_iterator i = functions_.find(declaration);
-    if (i != functions_.end())
-        return i->second;
+    Map<String, asIScriptFunction*>::ConstIterator i = functions_.Find(declaration);
+    if (i != functions_.End())
+        return i->second_;
     
     int id = scriptModule_->GetFunctionIdByDecl(declaration.CString());
     asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
@@ -309,12 +309,12 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
-    std::map<asIObjectType*, std::map<String, asIScriptFunction*> >::const_iterator i = methods_.find(type);
-    if (i != methods_.end())
+    Map<asIObjectType*, Map<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
+    if (i != methods_.End())
     {
-        std::map<String, asIScriptFunction*>::const_iterator j = i->second.find(declaration);
-        if (j != i->second.end())
-            return j->second;
+        Map<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);
+        if (j != i->second_.End())
+            return j->second_;
     }
     
     int id = type->GetMethodIdByDecl(declaration.CString());
@@ -333,7 +333,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
-    std::vector<String> includeFiles;
+    Vector<String> includeFiles;
     unsigned pos = 0;
     while(pos < dataSize)
     {
@@ -375,10 +375,10 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         String includeFileLower = includeFile.ToLower();
                         
                         // If not included yet, store it for later processing
-                        if (includeFiles_.find(includeFileLower) == includeFiles_.end())
+                        if (includeFiles_.Find(includeFileLower) == includeFiles_.End())
                         {
-                            includeFiles_.insert(includeFileLower);
-                            includeFiles.push_back(includeFile);
+                            includeFiles_.Insert(includeFileLower);
+                            includeFiles.Push(includeFile);
                         }
                         
                         // Overwrite the include directive with space characters to avoid compiler error
@@ -422,7 +422,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     }
     
     // Process includes first
-    for (unsigned i = 0; i < includeFiles.size(); ++i)
+    for (unsigned i = 0; i < includeFiles.Size(); ++i)
     {
         SharedPtr<File> file = cache->GetFile(includeFiles[i]);
         if (!AddScriptSection(engine, *file))
@@ -443,7 +443,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters)
 {
     unsigned paramCount = function->GetParamCount();
-    for (unsigned i = 0; (i < parameters.size()) && (i < paramCount); ++i)
+    for (unsigned i = 0; (i < parameters.Size()) && (i < paramCount); ++i)
     {
         int paramType = function->GetParamTypeId(i);
         
@@ -507,17 +507,17 @@ void ScriptFile::ReleaseModule()
     if (scriptModule_)
     {
         // Clear search caches, event handlers and function-to-file mappings
-        includeFiles_.clear();
-        checkedClasses_.clear();
-        functions_.clear();
-        methods_.clear();
+        includeFiles_.Clear();
+        checkedClasses_.Clear();
+        functions_.Clear();
+        methods_.Clear();
         UnsubscribeFromAllEventsWithUserData();
         
         // Perform a full garbage collection cycle now
         script_->GarbageCollect(true);
         
         // Remove the module
-        script_->GetModuleMap().erase(scriptModule_);
+        script_->GetModuleMap().Erase(scriptModule_);
         asIScriptEngine* engine = script_->GetScriptEngine();
         engine->DiscardModule(GetName().CString());
         scriptModule_ = 0;
@@ -536,8 +536,8 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
     VariantVector parameters;
     if (function->GetParamCount() > 0)
     {
-        parameters.push_back(Variant((void*)&eventType));
-        parameters.push_back(Variant((void*)&eventData));
+        parameters.Push(Variant((void*)&eventType));
+        parameters.Push(Variant((void*)&eventData));
     }
     
     Execute(function, parameters);
@@ -548,10 +548,10 @@ ScriptFile* GetScriptContextFile()
     asIScriptContext* context = asGetActiveContext();
     asIScriptFunction* function = context->GetFunction();
     asIScriptModule* module = function->GetEngine()->GetModule(function->GetModuleName());
-    std::map<asIScriptModule*, ScriptFile*>& moduleMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetModuleMap();
-    std::map<asIScriptModule*, ScriptFile*>::const_iterator i = moduleMap.find(module);
-    if (i != moduleMap.end())
-        return i->second;
+    Map<asIScriptModule*, ScriptFile*>& moduleMap = static_cast<Script*>(context->GetEngine()->GetUserData())->GetModuleMap();
+    Map<asIScriptModule*, ScriptFile*>::ConstIterator i = moduleMap.Find(module);
+    if (i != moduleMap.End())
+        return i->second_;
     else
         return 0;
 }

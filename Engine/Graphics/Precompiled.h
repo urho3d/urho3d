@@ -25,7 +25,7 @@
 
 #include "StringBase.h"
 
-#include <algorithm>
-#include <map>
-#include <set>
-#include <vector>
+#include "Sort.h"
+#include "Map.h"
+#include "Set.h"
+#include "Vector.h"

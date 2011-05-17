@@ -190,7 +190,7 @@ UIElement* DropDownList::GetItem(unsigned index) const
     return listView_->GetItem(index);
 }
 
-std::vector<UIElement*> DropDownList::GetItems() const
+Vector<UIElement*> DropDownList::GetItems() const
 {
     return listView_->GetContentElement()->GetChildren();
 }

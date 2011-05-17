@@ -37,17 +37,17 @@ Context::Context() :
 Context::~Context()
 {
     // Release the subsystems before the event receiver maps are destroyed
-    for (std::map<ShortStringHash, SharedPtr<Object> >::iterator i = subsystems_.begin(); i != subsystems_.end(); ++i)
-        i->second.Reset();
-    subsystems_.clear();
-    factories_.clear();
+    for (Map<ShortStringHash, SharedPtr<Object> >::Iterator i = subsystems_.Begin(); i != subsystems_.End(); ++i)
+        i->second_.Reset();
+    subsystems_.Clear();
+    factories_.Clear();
 }
 
 SharedPtr<Object> Context::CreateObject(ShortStringHash objectType)
 {
-    std::map<ShortStringHash, SharedPtr<ObjectFactory> >::const_iterator i = factories_.find(objectType);
-    if (i != factories_.end())
-        return i->second->CreateObject();
+    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(objectType);
+    if (i != factories_.End())
+        return i->second_->CreateObject();
     else
         return SharedPtr<Object>();
 }
@@ -74,17 +74,17 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
     if ((attr.type_ == VAR_NONE) || (attr.type_ == VAR_PTR))
         return;
     
-    attributes_[objectType].push_back(attr);
+    attributes_[objectType].Push(attr);
 }
 
 void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
 {
-    std::vector<AttributeInfo>& attributes = attributes_[objectType];
-    for (std::vector<AttributeInfo>::iterator i = attributes.begin(); i != attributes.end(); ++i)
+    Vector<AttributeInfo>& attributes = attributes_[objectType];
+    for (Vector<AttributeInfo>::Iterator i = attributes.Begin(); i != attributes.End(); ++i)
     {
         if (i->name_ == name)
         {
-            attributes.erase(i);
+            attributes.Erase(i);
             return;
         }
     }
@@ -97,65 +97,65 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
-    std::vector<Object*>& receivers = receivers_[eventType];
-    for (std::vector<Object*>::const_iterator j = receivers.begin(); j != receivers.end(); ++j)
+    Vector<Object*>& receivers = receivers_[eventType];
+    for (Vector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         // Check if already registered
         if (*j == receiver)
             return;
     }
     
-    receivers.push_back(receiver);
+    receivers.Push(receiver);
 }
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    std::vector<Object*>& receivers = specificReceivers_[std::make_pair(sender, eventType)];
-    for (std::vector<Object*>::const_iterator j = receivers.begin(); j != receivers.end(); ++j)
+    Vector<Object*>& receivers = specificReceivers_[MakePair(sender, eventType)];
+    for (Vector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         if (*j == receiver)
             return;
     }
     
-    receivers.push_back(receiver);
+    receivers.Push(receiver);
 }
 
 void Context::RemoveEventSender(Object* sender)
 {
-    for (std::map<std::pair<Object*, StringHash>, std::vector<Object*> >::iterator i = specificReceivers_.begin();
-        i != specificReceivers_.end();)
+    for (Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator i = specificReceivers_.Begin();
+        i != specificReceivers_.End();)
     {
-        std::map<std::pair<Object*, StringHash>, std::vector<Object*> >::iterator current = i++;
-        if (current->first.first == sender)
+        Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator current = i++;
+        if (current->first_.first_ == sender)
         {
-            std::vector<Object*>& receivers = current->second;
-            for (std::vector<Object*>::iterator j = receivers.begin(); j != receivers.end(); ++j)
+            Vector<Object*>& receivers = current->second_;
+            for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
             {
                 if (*j)
                     (*j)->RemoveEventSender(sender);
             }
-            specificReceivers_.erase(current);
+            specificReceivers_.Erase(current);
         }
     }
 }
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 {
-    std::vector<Object*>* group = GetReceivers(eventType);
+    Vector<Object*>* group = GetReceivers(eventType);
     if (!group)
         return;
     
-    for (std::vector<Object*>::iterator i = group->begin(); i != group->end(); ++i)
+    for (Vector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
     {
         if (*i == receiver)
         {
             // If no event handling going on, can erase the receiver. Otherwise reset the pointer and clean up later
-            if (senders_.empty())
-                group->erase(i);
+            if (senders_.Empty())
+                group->Erase(i);
             else
             {
                 *i = 0;
-                dirtyReceivers_.insert(eventType);
+                dirtyReceivers_.Insert(eventType);
             }
             return;
         }
@@ -164,20 +164,20 @@ void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    std::vector<Object*>* group = GetReceivers(sender, eventType);
+    Vector<Object*>* group = GetReceivers(sender, eventType);
     if (!group)
         return;
     
-    for (std::vector<Object*>::iterator i = group->begin(); i != group->end(); ++i)
+    for (Vector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
     {
         if (*i == receiver)
         {
-            if (senders_.empty())
-                group->erase(i);
+            if (senders_.Empty())
+                group->Erase(i);
             else
             {
                 *i = 0;
-                dirtySpecificReceivers_.insert(std::make_pair(sender, eventType));
+                dirtySpecificReceivers_.Insert(MakePair(sender, eventType));
             }
             return;
         }
@@ -186,17 +186,17 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
 
 Object* Context::GetSubsystem(ShortStringHash type) const
 {
-    std::map<ShortStringHash, SharedPtr<Object> >::const_iterator i = subsystems_.find(type);
-    if (i != subsystems_.end())
-        return i->second;
+    Map<ShortStringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
+    if (i != subsystems_.End())
+        return i->second_;
     else
         return 0;
 }
 
 Object* Context::GetSender() const
 {
-    if (!senders_.empty())
-        return senders_.back();
+    if (!senders_.Empty())
+        return senders_.Back();
     else
         return 0;
 }
@@ -204,6 +204,6 @@ Object* Context::GetSender() const
 const String& Context::GetTypeName(ShortStringHash type) const
 {
     // Search factories to find the hash-to-name mapping
-    std::map<ShortStringHash, SharedPtr<ObjectFactory> >::const_iterator i = factories_.find(type);
-    return (i != factories_.end()) ? i->second->GetTypeName() : noType;
+    Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
+    return (i != factories_.End()) ? i->second_->GetTypeName() : noType;
 }

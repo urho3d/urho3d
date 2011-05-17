@@ -49,7 +49,7 @@ public:
     /// Destruct. Free the child blocks
     ~ProfilerBlock()
     {
-        for (std::vector<ProfilerBlock*>::iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             delete *i;
             *i = 0;
@@ -81,7 +81,7 @@ public:
         time_ = 0;
         count_ = 0;
         
-        for (std::vector<ProfilerBlock*>::iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->EndFrame();
     }
     
@@ -91,7 +91,7 @@ public:
         accumulatedTime_ = 0;
         accumulatedCount_ = 0;
         
-        for (std::vector<ProfilerBlock*>::iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->ClearAccumulated();
     }
     
@@ -103,7 +103,7 @@ public:
         
         lastSearchName_ = name;
         
-        for (std::vector<ProfilerBlock*>::iterator i = children_.begin(); i != children_.end(); ++i)
+        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if ((*i)->name_ == name)
             {
@@ -113,7 +113,7 @@ public:
         }
         
         ProfilerBlock* newBlock = new ProfilerBlock(this, name);
-        children_.push_back(newBlock);
+        children_.Push(newBlock);
         
         lastSearchBlock_ = newBlock;
         return newBlock;
@@ -137,7 +137,7 @@ public:
     /// Return parent block
     ProfilerBlock* GetParent() const { return parent_; }
     /// Return child blocks
-    const std::vector<ProfilerBlock*>& GetChildren() const { return children_; }
+    const Vector<ProfilerBlock*>& GetChildren() const { return children_; }
     
 private:
     /// Block name
@@ -156,7 +156,7 @@ private:
     /// Parent block
     ProfilerBlock* parent_;
     /// Child blocks
-    std::vector<ProfilerBlock*> children_;
+    Vector<ProfilerBlock*> children_;
     
     /// Time on the previous frame
     long long frameTime_;

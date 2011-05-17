@@ -133,9 +133,9 @@ public:
     /// Return client position
     const Vector3& GetPosition() { return position_; }
     /// Return unacked remote events
-    std::vector<RemoteEvent>& GetUnackedRemoteEvents() { return remoteEvents_; }
+    Vector<RemoteEvent>& GetUnackedRemoteEvents() { return remoteEvents_; }
     /// Return unacked controls
-    std::vector<std::pair<unsigned short, Controls> >& GetUnackedControls() { return unackedControls_; }
+    Vector<Pair<unsigned short, Controls> >& GetUnackedControls() { return unackedControls_; }
     /// Return unacked scene revisions
     SceneReplicationState& GetSceneState() { return sceneState_; }
     
@@ -170,9 +170,9 @@ private:
     /// Client position
     Vector3 position_;
     /// Remote events currently being sent
-    std::vector<RemoteEvent> remoteEvents_;
+    Vector<RemoteEvent> remoteEvents_;
     //! Unacked controls
-    std::vector<std::pair<unsigned short, Controls> > unackedControls_;
+    Vector<Pair<unsigned short, Controls> > unackedControls_;
     /// Unacked scene revisions
     SceneReplicationState sceneState_;
 };
