@@ -28,8 +28,8 @@
 #include "StringUtils.h"
 #include "XMLFile.h"
 
+#include <cstdio>
 #include <cstring>
-#include <map>
 
 #include "DebugNew.h"
 
@@ -333,43 +333,52 @@ void Run(const Vector<String>& arguments)
             // Add global parameter & texture sampler definitions
             {
                 XMLElement parameters = outShaders.CreateChildElement("vsparameters");
-                std::multimap<unsigned, String> sorted;
+                Map<unsigned, Vector<String> > sorted;
                 for (Map<String, unsigned>::ConstIterator i = vsParams_.Begin(); i != vsParams_.End(); ++i)
-                    sorted.insert(std::pair<unsigned, String>(i->second_, i->first_));
+                    sorted[i->second_].Push(i->first_);
                 
-                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (Map<unsigned, Vector<String> >::ConstIterator i = sorted.Begin(); i != sorted.End(); ++i)
                 {
-                    XMLElement param = parameters.CreateChildElement("parameter");
-                    param.SetString("name", i->second);
-                    param.SetString("index", ToString(i->first));
+                    for (unsigned j = 0; j < i->second_.Size(); ++j)
+                    {
+                        XMLElement param = parameters.CreateChildElement("parameter");
+                        param.SetString("name", i->second_[j]);
+                        param.SetString("index", ToString(i->first_));
+                    }
                 }
             }
             
             {
                 XMLElement parameters = outShaders.CreateChildElement("psparameters");
-                std::multimap<unsigned, String> sorted;
+                Map<unsigned, Vector<String> > sorted;
                 for (Map<String, unsigned>::ConstIterator i = psParams_.Begin(); i != psParams_.End(); ++i)
-                    sorted.insert(std::pair<unsigned, String>(i->second_, i->first_));
+                    sorted[i->second_].Push(i->first_);
                 
-                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (Map<unsigned, Vector<String> >::ConstIterator i = sorted.Begin(); i != sorted.End(); ++i)
                 {
-                    XMLElement param = parameters.CreateChildElement("parameter");
-                    param.SetString("name", i->second);
-                    param.SetString("index", ToString(i->first));
+                    for (unsigned j = 0; j < i->second_.Size(); ++j)
+                    {
+                        XMLElement param = parameters.CreateChildElement("parameter");
+                        param.SetString("name", i->second_[j]);
+                        param.SetString("index", ToString(i->first_));
+                    }
                 }
             }
             
             {
                 XMLElement parameters = outShaders.CreateChildElement("textureunits");
-                std::multimap<unsigned, String> sorted;
+                Map<unsigned, Vector<String> > sorted;
                 for (Map<String, unsigned>::ConstIterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
-                    sorted.insert(std::pair<unsigned, String>(i->second_, i->first_));
+                    sorted[i->second_].Push(i->first_);
                 
-                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (Map<unsigned, Vector<String> >::ConstIterator i = sorted.Begin(); i != sorted.End(); ++i)
                 {
-                    XMLElement param = parameters.CreateChildElement("textureunit");
-                    param.SetString("name", i->second);
-                    param.SetString("index", ToString(i->first));
+                    for (unsigned j = 0; j < i->second_.Size(); ++j)
+                    {
+                        XMLElement param = parameters.CreateChildElement("parameter");
+                        param.SetString("name", i->second_[j]);
+                        param.SetString("index", ToString(i->first_));
+                    }
                 }
             }
             

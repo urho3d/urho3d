@@ -55,8 +55,6 @@ public:
     /// Set node iterator
     class Iterator : public ListIteratorBase
     {
-        friend class ConstIterator;
-        
     public:
         /// Construct
         explicit Iterator(Node* ptr) :
@@ -149,7 +147,7 @@ public:
         // Allocate the fixup pointers
         fix_ = reinterpret_cast<void**>(new Node*[maxHeight_]);
         
-        // Then assign the another set
+        // Then assign the other set
         *this = set;
     }
     
@@ -236,7 +234,7 @@ public:
     void Insert(const Iterator& start, const Iterator& end)
     {
         Iterator it = start;
-        while ((it) && (it != end))
+        while (it != end)
         {
             Iterator current = it++;
             Insert(*current);

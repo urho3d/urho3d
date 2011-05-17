@@ -56,7 +56,6 @@ public:
     /// Test for inequality with another iterator
     bool operator != (const ListIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
-protected:
     /// Go to the next node
     void GotoNext()
     {
@@ -73,6 +72,32 @@ protected:
     
     /// Node pointer
     ListNodeBase* ptr_;
+};
+
+/// Linked list base class
+class ListBase
+{
+public:
+    ListBase() :
+        size_(0)
+    {
+    }
+    
+    /// Swap with another linked list
+    void Swap(ListBase& rhs)
+    {
+        ::Swap(head_, rhs.head_);
+        ::Swap(tail_, rhs.tail_);
+        ::Swap(size_, rhs.size_);
+    }
+    
+protected:
+    /// Head node pointer
+    ListNodeBase* head_;
+    /// Tail node pointer
+    ListNodeBase* tail_;
+    /// Number of nodes
+    unsigned size_;
 };
 
 /// Skip list node base

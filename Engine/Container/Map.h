@@ -82,8 +82,6 @@ public:
     /// Map node iterator
     class Iterator : public ListIteratorBase
     {
-        friend class ConstIterator;
-        
     public:
         /// Construct
         explicit Iterator(Node* ptr) :
@@ -144,8 +142,8 @@ public:
         SkipListBase(maxHeight)
     {
         // Allocate the head and tail nodes and zero the next pointers
-        head_ = AllocateNode(maxHeight_, T());
-        tail_ = AllocateNode(maxHeight_, T());
+        head_ = AllocateNode(maxHeight_);
+        tail_ = AllocateNode(maxHeight_);
         Node* head = GetHead();
         Node* tail = GetTail();
         for (unsigned i = 0; i < maxHeight_; ++i)
@@ -163,8 +161,8 @@ public:
         SkipListBase(map.maxHeight_)
     {
         // Allocate the head and tail nodes and zero the next pointers
-        head_ = AllocateNode(maxHeight_, T());
-        tail_ = AllocateNode(maxHeight_, T());
+        head_ = AllocateNode(maxHeight_);
+        tail_ = AllocateNode(maxHeight_);
         Node* head = GetHead();
         Node* tail = GetTail();
         for (unsigned i = 0; i < maxHeight_; ++i)
@@ -176,7 +174,7 @@ public:
         // Allocate the fixup pointers
         fix_ = reinterpret_cast<void**>(new Node*[maxHeight_]);
         
-        // Then assign the another map
+        // Then assign the other map
         *this = map;
     }
     
@@ -518,7 +516,7 @@ private:
     }
     
     /// Allocate a node and its next pointers
-    Node* AllocateNode(unsigned height, const T& key)
+    Node* AllocateNode(unsigned height, const T& key = T())
     {
         unsigned char* block = new unsigned char[sizeof(Node) + (height - 1) * sizeof(Node*)];
         Node* newNode = reinterpret_cast<Node*>(block);

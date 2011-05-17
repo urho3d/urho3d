@@ -26,8 +26,6 @@
 /// Random access iterator
 template <class T> class RandomAccessIterator
 {
-    template <class T> friend class RandomAccessConstIterator;
-    
 public:
     /// Construct
     explicit RandomAccessIterator(T* ptr) :
@@ -65,8 +63,7 @@ public:
     bool operator < (const RandomAccessIterator& rhs) const { return ptr_ < rhs.ptr_; }
     /// Test for greater than with another iterator
     bool operator > (const RandomAccessIterator& rhs) const { return ptr_ > rhs.ptr_; }
-
-protected:
+    
     /// Pointer
     T* ptr_;
 };
@@ -120,7 +117,6 @@ public:
     /// Test for greater than with another iterator
     bool operator > (const RandomAccessConstIterator& rhs) const { return ptr_ > rhs.ptr_; }
     
-protected:
     /// Pointer
     T* ptr_;
 };
