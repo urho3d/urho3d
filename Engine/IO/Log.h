@@ -46,24 +46,24 @@ public:
     virtual ~Log();
     
     /// Open the log file
-    void Open(const std::string& fileName);
+    void Open(const String& fileName);
     /// Write to the log. If logging level is higher than the level of the message, the message is ignored
-    void Write(int level, const std::string& message);
+    void Write(int level, const String& message);
     /// Write raw output to the log
-    void WriteRaw(const std::string& message);
+    void WriteRaw(const String& message);
     /// Set logging level
     void SetLevel(int level);
     
     /// Return logging level
     int GetLevel() const { return level_; }
     /// Return last log message
-    const std::string& GetLastMessage() const { return lastMessage_; }
+    const String& GetLastMessage() const { return lastMessage_; }
     
 private:
     /// Log file
     SharedPtr<File> logFile_;
     /// Last log message
-    std::string lastMessage_;
+    String lastMessage_;
     /// Logging level
     int level_;
     /// In write flag to prevent recursion
@@ -71,9 +71,9 @@ private:
 };
 
 /// Write to the log (static)
-void WriteToLog(Context* context, int level, const std::string& message);
+void WriteToLog(Context* context, int level, const String& message);
 /// Write raw output to the log (static)
-void WriteToLogRaw(Context* context, const std::string& message);
+void WriteToLogRaw(Context* context, const String& message);
 
 #define LOGDEBUG(message) WriteToLog(context_, LOG_DEBUG, message)
 #define LOGINFO(message) WriteToLog(context_, LOG_INFO, message)

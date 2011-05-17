@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <string>
+#include "StringBase.h"
 
 /// 32-bit hash value for a string
 class StringHash
@@ -50,7 +50,7 @@ public:
     /// Construct from a C string case-insensitively
     explicit StringHash(const char* str);
     /// Construct from a string case-insensitively
-    explicit StringHash(const std::string& str);
+    explicit StringHash(const String& str);
     
     /// Assign from another hash
     StringHash& operator = (const StringHash& rhs)
@@ -131,7 +131,7 @@ public:
     /// Construct from a C string case-insensitively
     explicit ShortStringHash(const char* str);
     /// Construct from a string case-insensitively
-    explicit ShortStringHash(const std::string& str);
+    explicit ShortStringHash(const String& str);
     
     /// Assign from another hash
     ShortStringHash& operator = (const ShortStringHash& rhs)

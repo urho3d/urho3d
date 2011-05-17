@@ -25,12 +25,12 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "OgreImporterUtils.h"
+#include "ProcessUtils.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <algorithm>
 #include <cstring>
-#include <iostream>
 #include <map>
 #include <set>
 
@@ -51,26 +51,25 @@ unsigned numSubMeshes_ = 0;
 bool useOneBuffer_ = true;
 
 int main(int argc, char** argv);
-void Run(const std::vector<std::string>& arguments);
-void LoadSkeleton(const std::string& skeletonFileName);
-void LoadMesh(const std::string& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs);
-void WriteOutput(const std::string& outputFileName, bool exportAnimations, bool rotationsOnly);
+void Run(const std::vector<String>& arguments);
+void LoadSkeleton(const String& skeletonFileName);
+void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs);
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly);
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib);
 void CalculateScore(ModelVertex& vertex);
-void ErrorExit(const std::string& error);
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> arguments;
+    std::vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(std::string(argv[i]));
+        arguments.push_back(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<std::string>& arguments)
+void Run(const std::vector<String>& arguments)
 {
     if (arguments.size() < 2)
     {
@@ -97,7 +96,7 @@ void Run(const std::vector<std::string>& arguments)
         {
             if (arguments[i][0] == '-')
             {
-                std::string arg = ToLower(arguments[i].substr(1));
+                String arg = arguments[i].Substring(1).ToLower();
                 switch (arg[0])
                 {
                 case 't':
@@ -127,10 +126,10 @@ void Run(const std::vector<std::string>& arguments)
     LoadMesh(arguments[0], generateTangents, splitSubMeshes, GetMorphs);
     WriteOutput(arguments[1], exportAnimations, rotationsOnly);
     
-    std::cout << "Finished" << std::endl;
+    PrintLine("Finished");
 }
 
-void LoadSkeleton(const std::string& skeletonFileName)
+void LoadSkeleton(const String& skeletonFileName)
 {
     // Process skeleton first (if found)
     XMLElement skeletonRoot;
@@ -146,7 +145,7 @@ void LoadSkeleton(const std::string& skeletonFileName)
         while (bone)
         {
             unsigned index = bone.GetInt("id");
-            std::string name = bone.GetString("name");
+            String name = bone.GetString("name");
             if (index >= bones_.size())
                 bones_.resize(index + 1);
             
@@ -182,8 +181,8 @@ void LoadSkeleton(const std::string& skeletonFileName)
         XMLElement boneParent = boneHierarchy.GetChildElement("boneparent");
         while (boneParent)
         {
-            std::string bone = boneParent.GetString("bone");
-            std::string parent = boneParent.GetString("parent");
+            String bone = boneParent.GetString("bone");
+            String parent = boneParent.GetString("parent");
             unsigned i = 0, j = 0;
             for (i = 0; (i < bones_.size()) && (bones_[i].name_ != bone); ++i)
             for (j = 0; (j < bones_.size()) && (bones_[j].name_ != parent); ++j)
@@ -224,11 +223,11 @@ void LoadSkeleton(const std::string& skeletonFileName)
             bones_[i].inverseWorldTransform_ = bones_[i].worldTransform_.GetInverse();
         }
         
-        std::cout << "Processed skeleton" << std::endl;
+        PrintLine("Processed skeleton");
     }
 }
 
-void LoadMesh(const std::string& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs)
+void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubMeshes, bool GetMorphs)
 {
     File meshFileSource(context_);
     meshFileSource.Open(inputFileName);
@@ -239,8 +238,8 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
     XMLElement subMeshes = root.GetChildElement("submeshes");
     XMLElement skeletonLink = root.GetChildElement("skeletonlink");
     
-    std::string skeletonName = skeletonLink.GetString("name");
-    if (!skeletonName.empty())
+    String skeletonName = skeletonLink.GetString("name");
+    if (!skeletonName.Empty())
         LoadSkeleton(GetPath(inputFileName) + GetFileName(skeletonName) + ".skeleton.xml");
     
     // Check whether there's benefit of avoiding 32bit indices by splitting each submesh into own buffer
@@ -534,14 +533,15 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
             }
         }
         else
-            std::cout << "No skeleton loaded, skipping skinning information" << std::endl;
+            PrintLine("No skeleton loaded, skipping skinning information");
         
         indexStart += indices;
         vertexStart += vertices;
         
         OptimizeIndices(&subGeometryLodLevel, vBuf, iBuf);
         
-        std::cout << "Processed submesh " << subMeshIndex + 1 << ": " << vertices << " vertices " << triangles << " triangles" << std::endl;
+        PrintLine("Processed submesh " + ToString(subMeshIndex + 1) + ": " + ToString(vertices) + " vertices " + 
+            ToString(triangles) + " triangles");
         std::vector<ModelSubGeometryLodLevel> thisSubGeometry;
         thisSubGeometry.push_back(subGeometryLodLevel);
         subGeometries_.push_back(thisSubGeometry);
@@ -615,7 +615,7 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                     OptimizeIndices(&newLodLevel, vBuf, iBuf);
                     
                     subGeometries_[subMeshIndex].push_back(newLodLevel);
-                    std::cout << "Processed LOD level for submesh " << subMeshIndex + 1 << ": distance " << distance << std::endl;
+                    PrintLine("Processed LOD level for submesh " + ToString(subMeshIndex + 1) + ": distance " + ToString(distance));
                     
                     lodSubMesh = lodSubMesh.GetNextElement("lodfacelist");
                 }
@@ -650,7 +650,7 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                 XMLElement anim = animsRoot.GetChildElement("animation");
                 while (anim)
                 {
-                    std::string name = anim.GetString("name");
+                    String name = anim.GetString("name");
                     float length = anim.GetFloat("length");
                     std::set<unsigned> usedPoses;
                     XMLElement tracks = anim.GetChildElement("tracks");
@@ -741,7 +741,7 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                                 ++bufIndex;
                         }
                         morphs_.push_back(newMorph);
-                        std::cout << "Processed morph " << name << " with " << usedPoses.size() << " sub-poses" << std::endl;
+                        PrintLine("Processed morph " + name + " with " + ToString(usedPoses.size()) + " sub-poses");
                     }
                     
                     anim = anim.GetNextElement("animation");
@@ -860,13 +860,13 @@ void LoadMesh(const std::string& inputFileName, bool generateTangents, bool spli
                 
                 delete[] tan1;
                 
-                std::cout << "Generated tangents" << std::endl;
+                PrintLine("Generated tangents");
             }
         }
     }
 }
 
-void WriteOutput(const std::string& outputFileName, bool exportAnimations, bool rotationsOnly)
+void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly)
 {
     // Begin serialization
     {
@@ -957,7 +957,7 @@ void WriteOutput(const std::string& outputFileName, bool exportAnimations, bool 
                 XMLElement track = tracksRoot.GetChildElement("track");
                 while (track)
                 {
-                    std::string trackName = track.GetString("bone");
+                    String trackName = track.GetString("bone");
                     ModelBone* bone = 0;
                     for (unsigned i = 0; i < bones_.size(); ++i)
                     {
@@ -1022,7 +1022,7 @@ void WriteOutput(const std::string& outputFileName, bool exportAnimations, bool 
                 }
                 
                 // Write each animation into a separate file
-                std::string animationFileName = Replace(outputFileName, ".mdl", "") + "_" + newAnimation.name_ + ".ani";
+                String animationFileName = outputFileName.Replace(".mdl", "") + "_" + newAnimation.name_ + ".ani";
                 File dest(context_);
                 if (!dest.Open(animationFileName, FILE_WRITE))
                     ErrorExit("Could not open output file " + animationFileName);
@@ -1050,7 +1050,7 @@ void WriteOutput(const std::string& outputFileName, bool exportAnimations, bool 
                 }
                 
                 animation = animation.GetNextElement("animation");
-                std::cout << "Processed animation " << newAnimation.name_ << std::endl;
+                PrintLine("Processed animation " + newAnimation.name_);
             }
         }
     }
@@ -1213,10 +1213,4 @@ void CalculateScore(ModelVertex& vertex)
     float valenceBoost = powf((float)vertex.useCount_, -valenceBoostPower);
     score += valenceBoostScale * valenceBoost;
     vertex.score_ = score;
-}
-
-void ErrorExit(const std::string& error)
-{
-    std::cout << error;
-    exit(1);
 }

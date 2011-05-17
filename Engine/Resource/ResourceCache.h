@@ -58,25 +58,25 @@ public:
     virtual ~ResourceCache();
     
     /// Add a resource load path
-    bool AddResourcePath(const std::string& path);
+    bool AddResourcePath(const String& path);
     /// Add a package file for loading resources from
     void AddPackageFile(PackageFile* package, bool addAsFirst = false);
     /// Add a manually created resource. Must be uniquely named
     bool AddManualResource(Resource* resource);
     /// Remove a resource load path
-    void RemoveResourcePath(const std::string& path);
+    void RemoveResourcePath(const String& path);
     /// Remove a package file. Optionally release the resources loaded from it
     void RemovePackageFile(PackageFile* package, bool ReleaseResources = true, bool forceRelease = false);
     /// Remove a package file by name. Optionally release the resources loaded from it
-    void RemovePackageFile(const std::string& fileName, bool ReleaseResources = true, bool forceRelease = false);
+    void RemovePackageFile(const String& fileName, bool ReleaseResources = true, bool forceRelease = false);
     /// Release a resource by name
-    void ReleaseResource(ShortStringHash type, const std::string& name, bool force = false);
+    void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
     /// Release a resource by name hash
     void ReleaseResource(ShortStringHash type, StringHash nameHash, bool force = false); 
     /// Release all resources of a specific type
     void ReleaseResources(ShortStringHash type, bool force = false);
     /// Release resources of a specific type and partial name
-    void ReleaseResources(ShortStringHash type, const std::string& partialName, bool force = false);
+    void ReleaseResources(ShortStringHash type, const String& partialName, bool force = false);
     /// Release all resources
     void ReleaseAllResources(bool force = false);
     /// Reload a resource. Return false and release it if fails
@@ -85,9 +85,9 @@ public:
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     
     /// Open and return a file from either the resource load paths or from inside a package file. Return null if fails
-    SharedPtr<File> GetFile(const std::string& name);
+    SharedPtr<File> GetFile(const String& name);
     /// Return a resource by type and name. Load if not loaded yet. Return null if fails
-    Resource* GetResource(ShortStringHash type, const std::string& name);
+    Resource* GetResource(ShortStringHash type, const String& name);
     /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails
     Resource* GetResource(ShortStringHash type, StringHash nameHash);
     /// Return all loaded resources of a specific type
@@ -95,17 +95,17 @@ public:
     /// Return all loaded resources
     const std::map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load paths
-    const std::vector<std::string>& GetResourcePaths() const { return resourcePaths_; }
+    const std::vector<String>& GetResourcePaths() const { return resourcePaths_; }
     /// Return added package files
     const std::vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name
-    template <class T> T* GetResource(const std::string& name);
+    template <class T> T* GetResource(const String& name);
     /// Template version of returning a resource by name hash
     template <class T> T* GetResource(StringHash nameHash);
     /// Template version of returning loaded resources of a specific type
     template <class T> void GetResources(std::vector<T*>& result) const;
     /// Return whether a file exists by name
-    bool Exists(const std::string& name) const;
+    bool Exists(const String& name) const;
     /// Return whether a file exists by name hash
     bool Exists(StringHash nameHash) const;
     /// Return memory budget for a resource type
@@ -115,9 +115,9 @@ public:
     /// Return total memory use for all resources
     unsigned GetTotalMemoryUse() const;
     /// Return resource name from hash, or empty if not found
-    const std::string& GetResourceName(StringHash nameHash) const;
+    const String& GetResourceName(StringHash nameHash) const;
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories
-    std::string GetPreferredResourcePath(const std::string& path);
+    String GetPreferredResourcePath(const String& path);
     
 private:
     /// Find a resource
@@ -127,19 +127,19 @@ private:
     /// Update a resource group. Recalculate memory use and release resources if over memory budget
     void UpdateResourceGroup(ShortStringHash type);
     /// Store a hash-to-name mapping
-    void StoreNameHash(const std::string& name);
+    void StoreNameHash(const String& name);
     
     /// Resources by type
     std::map<ShortStringHash, ResourceGroup> resourceGroups_;
     /// Resource load paths
-    std::vector<std::string> resourcePaths_;
+    std::vector<String> resourcePaths_;
     /// Package files
     std::vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames
-    std::map<StringHash, std::string> hashToName_;
+    std::map<StringHash, String> hashToName_;
 };
 
-template <class T> T* ResourceCache::GetResource(const std::string& name)
+template <class T> T* ResourceCache::GetResource(const String& name)
 {
     ShortStringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name));

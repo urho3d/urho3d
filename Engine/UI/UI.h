@@ -60,7 +60,7 @@ public:
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element
     SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
     /// Set clipboard text
-    void SetClipBoardText(const std::string& text);
+    void SetClipBoardText(const String& text);
     
     /// Return root UI elemenet
     UIElement* GetRootElement() const { return rootElement_; }
@@ -77,7 +77,7 @@ public:
     /// Return cursor position
     IntVector2 GetCursorPosition();
     /// Return clipboard text
-    const std::string& GetClipBoardText() const { return clipBoard_; }
+    const String& GetClipBoardText() const { return clipBoard_; }
     
 private:
     /// Initialize when screen mode initially set
@@ -136,7 +136,7 @@ private:
     /// UI rendering quads
     PODVector<UIQuad> quads_;
     /// Clipboard text
-    std::string clipBoard_;
+    String clipBoard_;
     /// Mouse buttons held down
     int mouseButtons_;
     /// Qualifier keys held down

@@ -49,7 +49,7 @@ struct Bone
     }
     
     /// Bone name
-    std::string name_;
+    String name_;
     /// Bone name hash
     StringHash nameHash_;
     /// Parent bone index
@@ -105,7 +105,7 @@ public:
     /// Return bone by index
     Bone* GetBone(unsigned index);
     /// Return bone by name
-    Bone* GetBone(const std::string& boneName);
+    Bone* GetBone(const String& boneName);
     /// Return bone by name hash
     Bone* GetBone(StringHash boneNameHash);
     

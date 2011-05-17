@@ -43,7 +43,7 @@ static Log* GetLog()
     return GetScriptContext()->GetSubsystem<Log>();
 }
 
-static void Print(const std::string& value)
+static void Print(const String& value)
 {
     GetLog()->WriteRaw(value + "\n");
 }
@@ -63,27 +63,27 @@ static void Print(bool value)
     GetLog()->WriteRaw(ToString(value) + "\n");
 }
 
-static void LogWrite(const std::string& str, Log* ptr)
+static void LogWrite(const String& str, Log* ptr)
 {
     ptr->WriteRaw(str + "\n");
 }
 
-static void LogDebug(const std::string& str, Log* ptr)
+static void LogDebug(const String& str, Log* ptr)
 {
     ptr->Write(LOG_DEBUG, str);
 }
 
-static void LogInfo(const std::string& str, Log* ptr)
+static void LogInfo(const String& str, Log* ptr)
 {
     ptr->Write(LOG_INFO, str);
 }
 
-static void LogWarning(const std::string& str, Log* ptr)
+static void LogWarning(const String& str, Log* ptr)
 {
     ptr->Write(LOG_WARNING, str);
 }
 
-static void LogError(const std::string& str, Log* ptr)
+static void LogError(const String& str, Log* ptr)
 {
     ptr->Write(LOG_ERROR, str);
 }
@@ -108,7 +108,7 @@ static void RegisterLog(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("Log@+ get_log()", asFUNCTION(GetLog), asCALL_CDECL);
     
     // Register also Print() functions for convenience
-    engine->RegisterGlobalFunction("void Print(const String&in)", asFUNCTIONPR(Print, (const std::string&), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(const String&in)", asFUNCTIONPR(Print, (const String&), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int)", asFUNCTIONPR(Print, (int), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float)", asFUNCTIONPR(Print, (float), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool)", asFUNCTIONPR(Print, (bool), void), asCALL_CDECL);
@@ -119,7 +119,7 @@ static File* ConstructFile()
     return new File(GetScriptContext());
 }
 
-static File* ConstructFileAndOpen(const std::string& fileName, FileMode mode)
+static File* ConstructFileAndOpen(const String& fileName, FileMode mode)
 {
     return new File(GetScriptContext(), fileName, mode);
 }
@@ -185,22 +185,22 @@ static FileSystem* GetFileSystem()
     return GetScriptContext()->GetSubsystem<FileSystem>();
 }
 
-static CScriptArray* FileSystemScanDir(const std::string& pathName, const std::string& filter, unsigned flags, bool recursive, FileSystem* ptr)
+static CScriptArray* FileSystemScanDir(const String& pathName, const String& filter, unsigned flags, bool recursive, FileSystem* ptr)
 {
-    std::vector<std::string> result;
+    std::vector<String> result;
     ptr->ScanDir(result, pathName, filter, flags, recursive);
-    return VectorToArray<std::string>(result, "Array<String>");
+    return VectorToArray<String>(result, "Array<String>");
 }
 
-static int FileSystemSystemRun(const std::string& fileName, CScriptArray* srcArguments, FileSystem* ptr)
+static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArguments, FileSystem* ptr)
 {
     if (!srcArguments)
         return -1;
     
     unsigned numArguments = srcArguments->GetSize();
-    std::vector<std::string> destArguments(numArguments);
+    std::vector<String> destArguments(numArguments);
     for (unsigned i = 0; i < numArguments; ++i)
-        destArguments[i] = *(static_cast<std::string*>(srcArguments->At(i)));
+        destArguments[i] = *(static_cast<String*>(srcArguments->At(i)));
     
     return ptr->SystemRun(fileName, destArguments);
 }
@@ -229,7 +229,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterObject<File>(engine, "File");
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
-    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode)", asMETHODPR(File, Open, (const std::string&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);
@@ -290,7 +290,7 @@ static PackageFile* ConstructPackageFile()
     return new PackageFile(GetScriptContext());
 }
 
-static PackageFile* ConstructAndOpenPackageFile(const std::string& fileName)
+static PackageFile* ConstructAndOpenPackageFile(const String& fileName)
 {
     return new PackageFile(GetScriptContext(), fileName);
 }

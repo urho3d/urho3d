@@ -41,8 +41,8 @@ public:
     virtual ~Engine();
     
     /// Initialize and show the application window. Return true if successful
-    bool Initialize(const std::string& windowTitle = "Urho3D", const std::string& logName = "Urho3D.log", const std::vector<std::string>&
-        arguments = std::vector<std::string>());
+    bool Initialize(const String& windowTitle = "Urho3D", const String& logName = "Urho3D.log", const std::vector<String>&
+        arguments = std::vector<String>());
     /// Initialize script subsystem and register the script API. Return true if successful (engine must be initialized first)
     bool InitializeScripting();
     /// Run one frame

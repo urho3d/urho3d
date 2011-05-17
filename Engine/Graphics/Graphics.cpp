@@ -146,7 +146,7 @@ static const D3DSTENCILOP d3dStencilOp[] =
     D3DSTENCILOP_DECR
 };
 
-static const std::string noParameter;
+static const String noParameter;
 static const DWORD windowStyle = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
 
 static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -240,11 +240,11 @@ void Graphics::MessagePump()
     }
 }
 
-void Graphics::SetWindowTitle(const std::string& windowTitle)
+void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
     if (impl_->window_)
-        SetWindowText(impl_->window_, windowTitle_.c_str());
+        SetWindowText(impl_->window_, windowTitle_.CString());
 }
 
 bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
@@ -1955,36 +1955,36 @@ VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
     return index < MAX_VERTEX_STREAMS ? vertexBuffer_[index] : 0;
 }
 
-VSParameter Graphics::GetVSParameter(const std::string& name)
+VSParameter Graphics::GetVSParameter(const String& name)
 {
-    std::map<std::string, VSParameter>::iterator i = vsParameters_.find(name);
+    std::map<String, VSParameter>::iterator i = vsParameters_.find(name);
     if (i != vsParameters_.end())
         return i->second;
     else
         return MAX_VS_PARAMETERS;
 }
 
-PSParameter Graphics::GetPSParameter(const std::string& name)
+PSParameter Graphics::GetPSParameter(const String& name)
 {
-    std::map<std::string, PSParameter>::iterator i = psParameters_.find(name);
+    std::map<String, PSParameter>::iterator i = psParameters_.find(name);
     if (i != psParameters_.end())
         return i->second;
     else
         return MAX_PS_PARAMETERS;
 }
 
-TextureUnit Graphics::GetTextureUnit(const std::string& name)
+TextureUnit Graphics::GetTextureUnit(const String& name)
 {
-    std::map<std::string, TextureUnit>::iterator i = textureUnits_.find(name);
+    std::map<String, TextureUnit>::iterator i = textureUnits_.find(name);
     if (i != textureUnits_.end())
         return i->second;
     else
         return MAX_TEXTURE_UNITS;
 }
 
-const std::string& Graphics::GetVSParameterName(VSParameter parameter)
+const String& Graphics::GetVSParameterName(VSParameter parameter)
 {
-    for (std::map<std::string, VSParameter>::iterator i = vsParameters_.begin(); i != vsParameters_.end(); ++i)
+    for (std::map<String, VSParameter>::iterator i = vsParameters_.begin(); i != vsParameters_.end(); ++i)
     {
         if (i->second == parameter)
             return i->first;
@@ -1992,9 +1992,9 @@ const std::string& Graphics::GetVSParameterName(VSParameter parameter)
     return noParameter;
 }
 
-const std::string& Graphics::GetPSParameterName(PSParameter parameter)
+const String& Graphics::GetPSParameterName(PSParameter parameter)
 {
-    for (std::map<std::string, PSParameter>::iterator i = psParameters_.begin(); i != psParameters_.end(); ++i)
+    for (std::map<String, PSParameter>::iterator i = psParameters_.begin(); i != psParameters_.end(); ++i)
     {
         if (i->second == parameter)
             return i->first;
@@ -2002,9 +2002,9 @@ const std::string& Graphics::GetPSParameterName(PSParameter parameter)
     return noParameter;
 }
 
-const std::string& Graphics::GetTextureUnitName(TextureUnit unit)
+const String& Graphics::GetTextureUnitName(TextureUnit unit)
 {
-    for (std::map<std::string, TextureUnit>::iterator i = textureUnits_.begin(); i != textureUnits_.end(); ++i)
+    for (std::map<String, TextureUnit>::iterator i = textureUnits_.begin(); i != textureUnits_.end(); ++i)
     {
         if (i->second == unit)
             return i->first;
@@ -2080,7 +2080,7 @@ bool Graphics::OpenWindow(int width, int height)
     
     RECT rect = {0, 0, width, height};
     AdjustWindowRect(&rect, windowStyle, false);
-    impl_->window_ = CreateWindow("D3DWindow", windowTitle_.c_str(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
+    impl_->window_ = CreateWindow("D3DWindow", windowTitle_.CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right, rect.bottom, 0, 0, impl_->instance_, 0); 
     
     if (!impl_->window_)

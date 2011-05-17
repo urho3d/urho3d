@@ -25,6 +25,7 @@
 #include "Engine.h"
 #include "FileSystem.h"
 #include "Log.h"
+#include "MiniDump.h"
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ScriptFile.h"
@@ -58,8 +59,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 void Run(const char* cmdLine)
 {
     // Check for script file name
-    const std::vector<std::string>& arguments = ParseArguments(cmdLine);
-    std::string scriptFileName;
+    const std::vector<String>& arguments = ParseArguments(cmdLine);
+    String scriptFileName;
     for (unsigned i = 0; i < arguments.size(); ++i)
     {
         if (arguments[i][0] != '-')
@@ -70,7 +71,7 @@ void Run(const char* cmdLine)
     }
     
     // Show usage if not found
-    if (scriptFileName.empty())
+    if (scriptFileName.Empty())
     {
         ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
             "The script file should implement the function void Start(), which should create the scene content and subscribe to "
@@ -84,7 +85,7 @@ void Run(const char* cmdLine)
     SharedPtr<Engine> engine(new Engine(context));
     if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
     {
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().c_str());
+        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
         return;
     }
     
@@ -102,6 +103,6 @@ void Run(const char* cmdLine)
     else
     {
         engine->Exit(); // Close the rendering window
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().c_str());
+        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
     }
 }

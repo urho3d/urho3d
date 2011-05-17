@@ -51,7 +51,7 @@ enum ShapeType
 struct CollisionGeometryData : public RefCounted
 {
     /// Original model name
-    std::string modelName_;
+    String modelName_;
 };
 
 /// Triangle mesh geometry data

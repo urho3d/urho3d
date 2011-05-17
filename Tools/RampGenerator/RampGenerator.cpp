@@ -22,32 +22,30 @@
 //
 
 #include "MathDefs.h"
+#include "ProcessUtils.h"
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
 
 #include <stb_image.h>
 #include <stb_image_write.h>
-#include <iostream>
-#include <string>
 
 #include "DebugNew.h"
 
 int main(int argc, char** argv);
-void Run(const std::vector<std::string>& arguments);
-void ErrorExit(const std::string& error);
+void Run(const std::vector<String>& arguments);
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> arguments;
+    std::vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(std::string(argv[i]));
+        arguments.push_back(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<std::string>& arguments)
+void Run(const std::vector<String>& arguments)
 {
     if (arguments.size() < 3)
         ErrorExit("Usage: RampGenerator <output file> <width> <power> [dimensions]\n");
@@ -65,7 +63,7 @@ void Run(const std::vector<std::string>& arguments)
     if ((dimensions < 1) || (dimensions > 2))
         ErrorExit("Dimensions must be 1 or 2");
     
-    std::string tempDestName = Split(arguments[0], '.')[0] + ".tga";
+    String tempDestName = Split(arguments[0], '.')[0] + ".tga";
     
     if (dimensions == 1)
     {
@@ -82,7 +80,7 @@ void Run(const std::vector<std::string>& arguments)
         data[0] = 255;
         data[width - 1] = 0;
         
-        stbi_write_tga(tempDestName.c_str(), width, 1, 1, data.GetPtr());
+        stbi_write_tga(tempDestName.CString(), width, 1, 1, data.GetPtr());
     }
     
     if (dimensions == 2)
@@ -115,20 +113,14 @@ void Run(const std::vector<std::string>& arguments)
             data[x * width + (width - 1)] = 0;
         }
         
-        stbi_write_tga(tempDestName.c_str(), width, width, 1, data.GetPtr());
+        stbi_write_tga(tempDestName.CString(), width, width, 1, data.GetPtr());
     }
     
-    std::string command = "texconv -f R8G8B8 -ft PNG -if NONE " + tempDestName;
-    int ret = system(command.c_str());
+    String command = "texconv -f R8G8B8 -ft PNG -if NONE " + tempDestName;
+    int ret = system(command.CString());
     
     if (ret)
         ErrorExit("Failed to convert to PNG");
     
-    remove(tempDestName.c_str());
-}
-
-void ErrorExit(const std::string& error)
-{
-    std::cout << error;
-    exit(1);
+    remove(tempDestName.CString());
 }

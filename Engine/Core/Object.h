@@ -41,7 +41,7 @@ public:
     /// Return type
     virtual ShortStringHash GetType() const = 0;
     /// Return type name
-    virtual const std::string& GetTypeName() const = 0;
+    virtual const String& GetTypeName() const = 0;
     /// Handle event
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
     
@@ -123,7 +123,7 @@ public:
     /// Return type
     ShortStringHash GetType() const { return type_; }
     /// Return typename
-    const std::string& GetTypeName() const { return typeName_; }
+    const String& GetTypeName() const { return typeName_; }
     
 protected:
     /// Execution context
@@ -131,7 +131,7 @@ protected:
     /// Object type
     ShortStringHash type_;
     /// Object typename
-    std::string typeName_;
+    String typeName_;
 };
 
 /// Template implementation of the object factory
@@ -224,22 +224,22 @@ private:
 #define OBJECT(typeName) \
     private: \
         static const ShortStringHash typeStatic; \
-        static const std::string typeNameStatic; \
+        static const String typeNameStatic; \
     public: \
         virtual ShortStringHash GetType() const { return GetTypeStatic(); } \
-        virtual const std::string& GetTypeName() const { return GetTypeNameStatic(); } \
+        virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
         static ShortStringHash GetTypeStatic() \
         { \
             return typeStatic; \
         } \
-        static const std::string& GetTypeNameStatic() \
+        static const String& GetTypeNameStatic() \
         { \
             return typeNameStatic; \
         } \
 
 #define OBJECTTYPESTATIC(typeName) \
     const ShortStringHash typeName::typeStatic(#typeName); \
-    const std::string typeName::typeNameStatic(#typeName); \
+    const String typeName::typeNameStatic(#typeName); \
 
 #define EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
 #define PARAM(paraid_, paraname_) static const ShortStringHash paraid_(#paraname_)

@@ -32,12 +32,12 @@ void RegisterResource(asIScriptEngine* engine)
     RegisterResource<Resource>(engine, "Resource");
 }
 
-static Resource* ResourceCacheGetResource(const std::string& type, const std::string& name, ResourceCache* ptr)
+static Resource* ResourceCacheGetResource(const String& type, const String& name, ResourceCache* ptr)
 {
     return ptr->GetResource(ShortStringHash(type), name);
 }
 
-static File* ResourceCacheGetFile(const std::string& name, ResourceCache* ptr)
+static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
 {
     SharedPtr<File> file = ptr->GetFile(name);
     // The shared pointer will go out of scope, so have to increment the reference count
@@ -47,32 +47,32 @@ static File* ResourceCacheGetFile(const std::string& name, ResourceCache* ptr)
     return file.GetPtr();
 }
 
-static void ResourceCacheReleaseResource(const std::string& type, const std::string& name, bool force, ResourceCache* ptr)
+static void ResourceCacheReleaseResource(const String& type, const String& name, bool force, ResourceCache* ptr)
 {
     ptr->ReleaseResource(ShortStringHash(type), name, force);
 }
 
-static void ResourceCacheReleaseResources(const std::string& type, bool force, ResourceCache* ptr)
+static void ResourceCacheReleaseResources(const String& type, bool force, ResourceCache* ptr)
 {
     ptr->ReleaseResources(ShortStringHash(type), force);
 }
 
-static void ResourceCacheReleaseResourcesPartial(const std::string& type, const std::string& partialName, bool force, ResourceCache* ptr)
+static void ResourceCacheReleaseResourcesPartial(const String& type, const String& partialName, bool force, ResourceCache* ptr)
 {
     ptr->ReleaseResources(ShortStringHash(type), partialName, force);
 }
 
-static void ResourceCacheSetMemoryBudget(const std::string& type, unsigned budget, ResourceCache* ptr)
+static void ResourceCacheSetMemoryBudget(const String& type, unsigned budget, ResourceCache* ptr)
 {
     ptr->SetMemoryBudget(ShortStringHash(type), budget);
 }
 
-static unsigned ResourceCacheGetMemoryBudget(const std::string& type, ResourceCache* ptr)
+static unsigned ResourceCacheGetMemoryBudget(const String& type, ResourceCache* ptr)
 {
     return ptr->GetMemoryBudget(ShortStringHash(type));
 }
 
-static unsigned ResourceCacheGetMemoryUse(const std::string& type, ResourceCache* ptr)
+static unsigned ResourceCacheGetMemoryUse(const String& type, ResourceCache* ptr)
 {
     return ptr->GetMemoryUse(ShortStringHash(type));
 }
@@ -90,13 +90,13 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "bool AddManualResource(Resource@+)", asMETHOD(ResourceCache, AddManualResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemoveResourcePath(const String&in)", asMETHOD(ResourceCache, RemoveResourcePath), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (const std::string&, bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (const String&, bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResource(const String&in, const String&in, bool)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, bool)", asFUNCTION(ResourceCacheReleaseResources), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, const String&in, bool)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void ReleaseAllResources(bool)", asMETHOD(ResourceCache, ReleaseAllResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool ReloadResource(Resource@+)", asMETHOD(ResourceCache, ReloadResource), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "bool Exists(const String&in) const", asMETHODPR(ResourceCache, Exists, (const std::string&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool Exists(const String&in) const", asMETHODPR(ResourceCache, Exists, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "File@ GetFile(const String&in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourcePath(const String&in)", asMETHOD(ResourceCache, GetPreferredResourcePath), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
@@ -163,7 +163,7 @@ static XMLElement XMLElementGetNextElementDefault(XMLElement* ptr)
 
 static CScriptArray* XMLElementGetAttributeNames(XMLElement* ptr)
 {
-    return VectorToArray<std::string>(ptr->GetAttributeNames(), "Array<String>");
+    return VectorToArray<String>(ptr->GetAttributeNames(), "Array<String>");
 }
 
 static CScriptArray* XMLElementGetVariantVector(XMLElement* ptr)

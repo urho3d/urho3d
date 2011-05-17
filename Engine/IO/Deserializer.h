@@ -43,7 +43,7 @@ public:
     /// Set position from the beginning of the stream
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream
-    virtual const std::string& GetName() const;
+    virtual const String& GetName() const;
     /// Return a checksum if applicable
     virtual unsigned GetChecksum();
     /// Return current position
@@ -92,9 +92,9 @@ public:
     /// Read a BoundingBox
     BoundingBox ReadBoundingBox();
     /// Read a null-terminated string
-    std::string ReadString();
+    String ReadString();
     /// Read a four-letter ID
-    std::string ReadID();
+    String ReadID();
     /// Read a 32-bit StringHash
     StringHash ReadStringHash();
     /// Read a 16-bit ShortStringHash
@@ -116,7 +116,7 @@ public:
     /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum
     unsigned ReadVLE();
     /// Read a text line
-    std::string ReadLine();
+    String ReadLine();
     
 protected:
     /// Stream position

@@ -46,16 +46,16 @@ struct PropertyInfo
     {
     }
     
-    std::string name_;
-    std::string type_;
+    String name_;
+    String type_;
     bool read_;
     bool write_;
     bool indexed_;
 };
 
-void ExtractPropertyInfo(const std::string& functionName, const std::string& declaration, std::vector<PropertyInfo>& propertyInfos)
+void ExtractPropertyInfo(const String& functionName, const String& declaration, std::vector<PropertyInfo>& propertyInfos)
 {
-    std::string propertyName = functionName.substr(4);
+    String propertyName = functionName.Substring(4);
     PropertyInfo* info = 0;
     for (unsigned k = 0; k < propertyInfos.size(); ++k)
     {
@@ -68,11 +68,11 @@ void ExtractPropertyInfo(const std::string& functionName, const std::string& dec
         info = &propertyInfos[propertyInfos.size() - 1];
         info->name_ = propertyName;
     }
-    if (functionName.find("get_") != std::string::npos)
+    if (functionName.Find("get_") != String::NPOS)
     {
         info->read_ = true;
         // Extract type from the return value
-        std::vector<std::string> parts = Split(declaration, ' ');
+        std::vector<String> parts = Split(declaration, ' ');
         if (parts.size())
         {
             if (parts[0] != "const")
@@ -81,13 +81,13 @@ void ExtractPropertyInfo(const std::string& functionName, const std::string& dec
                 info->type_ = parts[1];
         }
         // If get method has parameters, it is indexed
-        if (declaration.find("()") == std::string::npos)
+        if (declaration.Find("()") == String::NPOS)
         {
             info->indexed_ = true;
             info->type_ += "[]";
         }
     }
-    if (functionName.find("set_") != std::string::npos)
+    if (functionName.Find("set_") != String::NPOS)
         info->write_ = true;
 }
 
@@ -150,12 +150,12 @@ Script::~Script()
     }
 }
 
-bool Script::Execute(const std::string& line)
+bool Script::Execute(const String& line)
 {
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
     PROFILE(ExecuteImmediate);
     
-    std::string wrappedLine = "void f(){\n" + line + ";\n}";
+    String wrappedLine = "void f(){\n" + line + ";\n}";
     
     // If no immediate mode script file set, create a dummy module for compiling the line
     asIScriptModule* module = 0;
@@ -167,7 +167,7 @@ bool Script::Execute(const std::string& line)
         return false;
     
     asIScriptFunction *function = 0;
-    if (module->CompileFunction("", wrappedLine.c_str(), -1, 0, &function) < 0)
+    if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
         return false;
     
     if (immediateContext_->Prepare(function->GetId()) < 0)
@@ -212,7 +212,7 @@ void Script::SetLogMode(ScriptLogMode mode)
 
 void Script::ClearLogMessages()
 {
-    logMessages_.clear();
+    logMessages_.Clear();
 }
 
 void Script::DumpAPI()
@@ -220,17 +220,17 @@ void Script::DumpAPI()
     LOGRAW("Urho3D script API:\n");
     
     std::vector<PropertyInfo> globalPropertyInfos;
-    std::vector<std::string> globalFunctions;
+    std::vector<String> globalFunctions;
     
     unsigned functions = scriptEngine_->GetGlobalFunctionCount();
     for (unsigned i = 0; i < functions; ++i)
     {
         unsigned id = scriptEngine_->GetGlobalFunctionIdByIndex(i);
         asIScriptFunction* function = scriptEngine_->GetFunctionDescriptorById(id);
-        std::string functionName(function->GetName());
-        std::string declaration(function->GetDeclaration());
+        String functionName(function->GetName());
+        String declaration(function->GetDeclaration());
         
-        if ((functionName.find("set_") != std::string::npos) || (functionName.find("get_") != std::string::npos))
+        if ((functionName.Find("set_") != String::NPOS) || (functionName.Find("get_") != String::NPOS))
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
         else
             globalFunctions.push_back(declaration);
@@ -263,8 +263,8 @@ void Script::DumpAPI()
         scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, &typeId);
         propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
         
-        std::string type(propertyDeclaration);
-        OutputAPIRow(type + " " + std::string(propertyName), true);
+        String type(propertyDeclaration);
+        OutputAPIRow(type + " " + String(propertyName), true);
     }
     
     LOGRAW("\nClasses:\n");
@@ -275,8 +275,8 @@ void Script::DumpAPI()
         asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(i);
         if (type)
         {
-            std::string typeName(type->GetName());
-            std::vector<std::string> methodDeclarations;
+            String typeName(type->GetName());
+            std::vector<String> methodDeclarations;
             std::vector<PropertyInfo> propertyInfos;
             
             LOGRAW("\n" + typeName + "\n");
@@ -285,16 +285,15 @@ void Script::DumpAPI()
             for (unsigned j = 0; j < methods; ++j)
             {
                 asIScriptFunction* method = type->GetMethodDescriptorByIndex(j);
-                std::string methodName(method->GetName());
-                std::string declaration(method->GetDeclaration());
-                if ((methodName.find("get_") == std::string::npos) && (methodName.find("set_") == std::string::npos))
+                String methodName(method->GetName());
+                String declaration(method->GetDeclaration());
+                if ((methodName.Find("get_") == String::NPOS) && (methodName.Find("set_") == String::NPOS))
                 {
                     // Sanitate the method name. For now, skip the operators
-                    if (declaration.find("::op") == std::string::npos)
+                    if (declaration.Find("::op") == String::NPOS)
                     {
-                        std::string prefix(typeName + "::");
-                        ReplaceInPlace(declaration, prefix, "");
-                        methodDeclarations.push_back(declaration);
+                        String prefix(typeName + "::");
+                        methodDeclarations.push_back(declaration.Replace(prefix, ""));
                     }
                 }
                 else
@@ -313,8 +312,8 @@ void Script::DumpAPI()
                 propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
                 
                 PropertyInfo newInfo;
-                newInfo.name_ = std::string(propertyName);
-                newInfo.type_ = std::string(propertyDeclaration);
+                newInfo.name_ = String(propertyName);
+                newInfo.type_ = String(propertyDeclaration);
                 newInfo.read_ = newInfo.write_ = true;
                 propertyInfos.push_back(newInfo);
             }
@@ -335,7 +334,7 @@ void Script::DumpAPI()
                     if (!propertyInfos[j].read_)
                         continue;
                     
-                    std::string readOnly;
+                    String readOnly;
                     if (!propertyInfos[j].write_)
                         readOnly = " (readonly)";
                     
@@ -350,8 +349,8 @@ void Script::DumpAPI()
 
 void Script::MessageCallback(const asSMessageInfo* msg)
 {
-    std::string message = std::string(msg->section) + " (" + ToString(msg->row) + "," + ToString(msg->col) + ") " +
-        std::string(msg->message);
+    String message = String(msg->section) + " (" + ToString(msg->row) + "," + ToString(msg->col) + ") " +
+        String(msg->message);
     
     if (logMode_ == LOGMODE_IMMEDIATE)
     {
@@ -382,13 +381,13 @@ void Script::ExceptionCallback(asIScriptContext* context)
 {
     int funcId = context->GetExceptionFunction();
     const asIScriptFunction *function = scriptEngine_->GetFunctionDescriptorById(funcId);
-    std::string message = "Exception '" + std::string(context->GetExceptionString()) + "' in '" +
-        std::string(function->GetDeclaration()) + "'";
+    String message = "Exception '" + String(context->GetExceptionString()) + "' in '" +
+        String(function->GetDeclaration()) + "'";
     
     asSMessageInfo msg;
     msg.row = context->GetExceptionLineNumber(&msg.col, &msg.section);
     msg.type = asMSGTYPE_ERROR;
-    msg.message = message.c_str();
+    msg.message = message.CString();
     
     MessageCallback(&msg);
 }
@@ -419,14 +418,14 @@ asIObjectType* Script::GetObjectType(const char* declaration)
     return type;
 }
 
-void Script::OutputAPIRow(const std::string& row, bool removeReference)
+void Script::OutputAPIRow(const String& row, bool removeReference)
 {
-    std::string out = row;
-    ReplaceInPlace(out, "double", "float");
-    ReplaceInPlace(out, "&in", "&");
-    ReplaceInPlace(out, "&out", "&");
+    String out = row;
+    out.ReplaceInPlace("double", "float");
+    out.ReplaceInPlace("&in", "&");
+    out.ReplaceInPlace("&out", "&");
     if (removeReference)
-        ReplaceInPlace(out, "&", "");
+        out.ReplaceInPlace("&", "");
     
     LOGRAW(out + "\n");
 }

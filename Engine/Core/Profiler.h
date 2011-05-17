@@ -208,13 +208,13 @@ public:
     void ClearAccumulated();
     
     /// Return profiling data as text output
-    std::string GetData(bool showUnused = false, bool showAccumulated = false, bool showTotal = false) const;
+    String GetData(bool showUnused = false, bool showAccumulated = false, bool showTotal = false) const;
     /// Return the current profiling block
     const ProfilerBlock* GetCurrentBlock() { return current_; }
     
 private:
     /// Return profiling data as text output for a specified profiling block
-    void GetData(ProfilerBlock* block, std::string& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const;
+    void GetData(ProfilerBlock* block, String& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const;
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     

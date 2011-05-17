@@ -635,7 +635,7 @@ unsigned Server::GenerateChallenge() const
     return (rand() & 32767) | ((rand() & 32767) << 15) | ((rand() & 32767) << 30);
 }
 
-void Server::Disconnect(Connection* connection, bool forced, const std::string& logMessage)
+void Server::Disconnect(Connection* connection, bool forced, const String& logMessage)
 {
     LOGERROR(logMessage + " " + connection->GetIdentity());
     

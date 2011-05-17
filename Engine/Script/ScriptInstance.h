@@ -52,7 +52,7 @@ struct DelayedMethodCall
     /// Delay time remaining until execution
     float delay_;
     /// Method declaration
-    std::string declaration_;
+    String declaration_;
     /// Parameters
     VariantVector parameters_;
 };
@@ -77,26 +77,26 @@ public:
     /// Perform post-load after the whole scene has been loaded
     virtual void PostLoad();
     /// Add an event handler. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(StringHash eventType, const std::string& handlerName);
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const std::string& handlerName);
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
     
     /// Create object of certain class from the script file. Return true if successful
-    bool CreateObject(ScriptFile* scriptFile, const std::string& className);
+    bool CreateObject(ScriptFile* scriptFile, const String& className);
     /// Set script file only. Recreate object if necessary
     void SetScriptFile(ScriptFile* scriptFile);
     /// Set class name only. Recreate object if necessary
-    void SetClassName(const std::string& className);
+    void SetClassName(const String& className);
     /// Enable or disable scripted updates and event handlers
     void SetActive(bool active);
     /// Set fixed updates per second. 0 (default) uses the physics frame rate
     void SetFixedUpdateFps(int fps);
     /// Query for a method by declaration and execute if found
-    bool Execute(const std::string& declaration, const VariantVector& parameters = VariantVector());
+    bool Execute(const String& declaration, const VariantVector& parameters = VariantVector());
     /// Execute a method
     bool Execute(asIScriptFunction* method, const VariantVector& parameters = VariantVector());
     /// Add a delay-executed method call
-    void DelayedExecute(float delay, const std::string& declaration, const VariantVector& parameters = VariantVector());
+    void DelayedExecute(float delay, const String& declaration, const VariantVector& parameters = VariantVector());
     /// Clear pending delay-executed method calls
     void ClearDelayedExecute();
     
@@ -105,7 +105,7 @@ public:
     /// Return script object
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
     /// Return class name
-    const std::string& GetClassName() const { return className_; }
+    const String& GetClassName() const { return className_; }
     /// Return whether scripted updates and event handlers are enabled
     bool IsActive() const { return active_; }
     /// Return fixed updates per second
@@ -146,7 +146,7 @@ private:
     /// Script object
     asIScriptObject* scriptObject_;
     /// Class name
-    std::string className_;
+    String className_;
     /// Pointers to supported inbuilt methods
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
     /// Active flag

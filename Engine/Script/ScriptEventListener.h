@@ -30,7 +30,7 @@ class ScriptEventListener
 {
 public:
     /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(StringHash eventType, const std::string& handlerName) = 0;
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
     /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const std::string& handlerName) = 0;
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
 };

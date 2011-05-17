@@ -41,7 +41,7 @@ class Scene;
 struct PackageInfo
 {
     /// File name
-    std::string name_;
+    String name_;
     /// File size
     unsigned size_;
     /// Data checksum
@@ -59,13 +59,13 @@ struct SceneInfo
     }
     
     /// Scene name
-    std::string name_;
+    String name_;
     /// Current number of users in scene
     unsigned numUsers_;
     /// Network updates per second
     int netFps_;
     /// Scene file name
-    std::string fileName_;
+    String fileName_;
     /// Required package files
     std::vector<PackageInfo> requiredPackages_;
 };
@@ -87,7 +87,7 @@ struct FileTransfer
     /// File used to store the download
     SharedPtr<File> file_;
     /// File name
-    std::string fileName_;
+    String fileName_;
     /// File size
     unsigned size_;
     /// Data checksum
@@ -126,9 +126,9 @@ public:
     /// Set scene to use. Will be cleared of any existing content
     void SetScene(Scene* scene);
     /// Set package download directory
-    void SetDownloadDirectory(const std::string& path);
+    void SetDownloadDirectory(const String& path);
     /// Connect to a server
-    bool Connect(const std::string& address, unsigned short port, const VariantMap& loginData = VariantMap());
+    bool Connect(const String& address, unsigned short port, const VariantMap& loginData = VariantMap());
     /// Disconnect from a server
     void Disconnect();
     /// Set client controls to be sent over the network
@@ -163,9 +163,9 @@ public:
     /// Return ongoing file transfers
     const std::map<StringHash, FileTransfer>& GetFileTransfers() { return fileTransfers_; }
     /// Return download directory
-    const std::string& GetDownloadDirectory() const { return downloadDirectory_; }
+    const String& GetDownloadDirectory() const { return downloadDirectory_; }
     /// Return file transfer status as text
-    std::string GetFileTransferStatus() const;
+    String GetFileTransferStatus() const;
     
 private:
     /// Handle network peer disconnect event
@@ -195,13 +195,13 @@ private:
     /// Check whether packages need to be downloaded to join the scene
     unsigned CheckPackages();
     /// Begin a file download
-    bool RequestFile(const std::string& fileName, unsigned size, unsigned checksum);
+    bool RequestFile(const String& fileName, unsigned size, unsigned checksum);
     /// Begin setup of the client scene
     void SetupScene();
     /// Send join scene packet after scene setup is complete
     void SendJoinScene();
     /// Send join failed event
-    void JoinFailed(const std::string& reason);
+    void JoinFailed(const String& reason);
     /// Send a client update packet
     void SendClientUpdate();
     /// Read a server update block
@@ -222,9 +222,9 @@ private:
     /// Ongoing file downloads
     std::map<StringHash, FileTransfer> fileTransfers_;
     /// Directory to use for downloads
-    std::string downloadDirectory_;
+    String downloadDirectory_;
     /// Downloads required to join the scene
-    std::set<std::string> pendingDownloads_;
+    std::set<String> pendingDownloads_;
     /// Login data to send to the server
     VariantMap pendingLoginData_;
 };

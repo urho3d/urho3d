@@ -35,7 +35,7 @@
 
 static const float MIN_ROW_SPACING = 0.5f;
 
-static const std::string horizontalAlignments[] =
+static const String horizontalAlignments[] =
 {
     "left",
     "center",
@@ -77,7 +77,7 @@ void Text::SetStyle(const XMLElement& element)
     if (element.HasChildElement("font"))
     {
         XMLElement fontElem = element.GetChildElement("font");
-        std::string fontName = fontElem.GetString("name");
+        String fontName = fontElem.GetString("name");
         
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(fontName))
@@ -93,7 +93,7 @@ void Text::SetStyle(const XMLElement& element)
         else if (element.HasChildElement("fallbackfont"))
         {
             fontElem = element.GetChildElement("fallbackfont");
-            std::string fontName = fontElem.GetString("name");
+            String fontName = fontElem.GetString("name");
             Font* font = cache->GetResource<Font>(fontName);
             if (font)
             {
@@ -105,15 +105,14 @@ void Text::SetStyle(const XMLElement& element)
     }
     if (element.HasChildElement("text"))
     {
-        std::string text = element.GetChildElement("text").GetString("value");
-        ReplaceInPlace(text, "\\n", "\n");
+        String text = element.GetChildElement("text").GetString("value").Replace("\\n", "\n");
         text_ = text;
         changed = true;
     }
     if (element.HasChildElement("textalignment"))
     {
-        std::string horiz = element.GetChildElement("textalignment").GetStringLower("value");
-        if (!horiz.empty())
+        String horiz = element.GetChildElement("textalignment").GetStringLower("value");
+        if (!horiz.Empty())
         {
             textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, 3, 0);
             changed = true;
@@ -219,7 +218,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
         
-        for (unsigned i = 0; i < printText_.length(); ++i)
+        for (unsigned i = 0; i < printText_.Length(); ++i)
         {
             unsigned char c = (unsigned char)printText_[i];
             
@@ -251,7 +250,7 @@ void Text::OnResize()
         UpdateText();
 }
 
-bool Text::SetFont(const std::string& fontName, int size)
+bool Text::SetFont(const String& fontName, int size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Font>(fontName), size);
@@ -275,7 +274,7 @@ bool Text::SetFont(Font* font, int size)
     return true;
 }
 
-void Text::SetText(const std::string& text)
+void Text::SetText(const String& text)
 {
     text_ = text;
     
@@ -339,7 +338,7 @@ void Text::UpdateText(bool inResize)
     int height = 0;
     
     rowWidths_.clear();
-    printText_.clear();
+    printText_.Clear();
     
     std::vector<unsigned> printToText;
     
@@ -356,8 +355,8 @@ void Text::UpdateText(bool inResize)
         if (!wordWrap_)
         {
             printText_ = text_;
-            printToText.resize(text_.length());
-            for (unsigned i = 0; i < text_.length(); ++i)
+            printToText.resize(text_.Length());
+            for (unsigned i = 0; i < text_.Length(); ++i)
                 printToText[i] = i;
         }
         else
@@ -365,7 +364,7 @@ void Text::UpdateText(bool inResize)
             int maxWidth = GetWidth();
             unsigned nextBreak = 0;
             unsigned lineStart = 0;
-            for (unsigned i = 0; i < text_.length(); ++i)
+            for (unsigned i = 0; i < text_.Length(); ++i)
             {
                 unsigned j;
                 if (text_[i] != '\n')
@@ -375,7 +374,7 @@ void Text::UpdateText(bool inResize)
                     if (nextBreak <= i)
                     {
                         int futureRowWidth = rowWidth;
-                        for (j = i; j < text_.length(); ++j)
+                        for (j = i; j < text_.Length(); ++j)
                         {
                             if ((text_[j] == ' ') || (text_[j] == '\n'))
                             {
@@ -402,7 +401,7 @@ void Text::UpdateText(bool inResize)
                         if (nextBreak == lineStart)
                         {
                             int copyLength = Max(j - i, 1);
-                            printText_ += text_.substr(i, copyLength);
+                            printText_ += text_.Substring(i, copyLength);
                             for (int k = 0; k < copyLength; ++k)
                             {
                                 printToText.push_back(i);
@@ -410,12 +409,12 @@ void Text::UpdateText(bool inResize)
                             }
                         }
                         printText_ += '\n';
-                        printToText.push_back(Min((int)i, (int)text_.length() - 1));
+                        printToText.push_back(Min((int)i, (int)text_.Length() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
                     
-                    if (i < text_.length())
+                    if (i < text_.Length())
                     {
                         // When copying a space, position is allowed to be over row width
                         rowWidth += face->glyphs_[face->glyphIndex_[text_[i]]].advanceX_;
@@ -429,7 +428,7 @@ void Text::UpdateText(bool inResize)
                 else
                 {
                     printText_ += '\n';
-                    printToText.push_back(Min((int)i, (int)text_.length() - 1));
+                    printToText.push_back(Min((int)i, (int)text_.Length() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }
@@ -438,7 +437,7 @@ void Text::UpdateText(bool inResize)
         
         rowWidth = 0;
         
-        for (unsigned i = 0; i < printText_.length(); ++i)
+        for (unsigned i = 0; i < printText_.Length(); ++i)
         {
             unsigned char c = (unsigned char)printText_[i];
             
@@ -468,13 +467,13 @@ void Text::UpdateText(bool inResize)
             height = rowHeight;
         
         // Store position & size of each character
-        charPositions_.resize(text_.length() + 1);
-        charSizes_.resize(text_.length());
+        charPositions_.resize(text_.Length() + 1);
+        charSizes_.resize(text_.Length());
         
         unsigned rowIndex = 0;
         int x = GetRowStartPosition(rowIndex);
         int y = 0;
-        for (unsigned i = 0; i < printText_.length(); ++i)
+        for (unsigned i = 0; i < printText_.Length(); ++i)
         {
             charPositions_[printToText[i]] = IntVector2(x, y);
             unsigned char c = (unsigned char)printText_[i];
@@ -493,7 +492,7 @@ void Text::UpdateText(bool inResize)
             }
         }
         // Store the ending position
-        charPositions_[text_.length()] = IntVector2(x, y);
+        charPositions_[text_.Length()] = IntVector2(x, y);
     }
     
     // Set minimum and current size according to the text size, but respect fixed width if set
@@ -507,7 +506,7 @@ void Text::UpdateText(bool inResize)
 
 void Text::ValidateSelection()
 {
-    unsigned textLength = text_.length();
+    unsigned textLength = text_.Length();
     
     if (textLength)
     {

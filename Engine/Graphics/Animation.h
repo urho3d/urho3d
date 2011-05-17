@@ -48,7 +48,7 @@ struct AnimationTrack
     void GetKeyFrameIndex(float time, unsigned& index) const;
     
     /// Bone name
-    std::string name_;
+    String name_;
     /// Bone name hash
     StringHash nameHash_;
     /// Bitmask of included data (position, rotation, scale)
@@ -80,14 +80,14 @@ public:
     virtual bool Save(Serializer& dest);
     
     /// Set animation name
-    void SetAnimationName(const std::string& name);
+    void SetAnimationName(const String& name);
     /// Set animation length
     void SetLength(float length);
     /// Set all animation tracks
     void SetTracks(const std::vector<AnimationTrack>& tracks);
     
     /// Return animation name
-    const std::string& GetAnimationName() const { return animationName_; }
+    const String& GetAnimationName() const { return animationName_; }
     /// Return animation name hash
     StringHash GetAnimationNameHash() const { return animationNameHash_; }
     /// Return animation length
@@ -99,13 +99,13 @@ public:
     /// Return animation track by index
     const AnimationTrack* GetTrack(unsigned index) const;
     /// Return animation track by bone name
-    const AnimationTrack* GetTrack(const std::string& name) const;
+    const AnimationTrack* GetTrack(const String& name) const;
     /// Return animation track by bone name hash
     const AnimationTrack* GetTrack(StringHash nameHash) const;
     
 private:
     /// Animation name
-    std::string animationName_;
+    String animationName_;
     /// Animation name hash
     StringHash animationNameHash_;
     /// Animation length

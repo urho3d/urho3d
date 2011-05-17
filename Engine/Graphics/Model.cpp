@@ -420,7 +420,7 @@ const ModelMorph* Model::GetMorph(unsigned index) const
     return index < morphs_.size() ? &morphs_[index] : 0;
 }
 
-const ModelMorph* Model::GetMorph(const std::string& name) const
+const ModelMorph* Model::GetMorph(const String& name) const
 {
     return GetMorph(StringHash(name));
 }

@@ -23,7 +23,7 @@
 
 #pragma once
 
-// Note: file is named StringBase.h to prevent conflicts with C headers
+// Note: this file is named StringBase.h to prevent conflicts with C headers
 
 #include "Iterator.h"
 
@@ -61,6 +61,16 @@ public:
         buffer_(&endZero)
     {
         *this = str;
+    }
+    
+    /// Construct from a char array and length
+    String(const char* str, unsigned length) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Resize(length);
+        CopyChars(buffer_, str, length);
     }
     
     /// Destruct
@@ -164,62 +174,52 @@ public:
         return ret;
     }
     
-    /// Test for equality
+    /// Test for equality with another string
     bool operator == (const String& rhs) const
     {
-        if (rhs.length_ != length_)
-            return false;
-        
-        for (unsigned i = 0; i < length_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return false;
-        }
-        
-        return true;
+        return strcmp(CString(), rhs.CString()) == 0;
     }
     
     /// Test for inequality with another string
     bool operator != (const String& rhs) const
     {
-        if (rhs.length_ != length_)
-            return true;
-        
-        for (unsigned i = 0; i < length_; ++i)
-        {
-            if (buffer_[i] != rhs.buffer_[i])
-                return true;
-        }
-        
-        return false;
+        return strcmp(CString(), rhs.CString()) != 0;
     }
     
     /// Test if string is less than another string
     bool operator < (const String& rhs) const
     {
-        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
-        {
-            if (buffer_[i] < rhs.buffer_[i])
-                return true;
-            if (buffer_[i] > rhs.buffer_[i])
-                return false;
-        }
-        
-        return length_ < rhs.length_;
+        return strcmp(CString(), rhs.CString()) < 0;
     }
     
     /// Test if string is greater than another string
     bool operator > (const String& rhs) const
     {
-        for (unsigned i = 0; (i < length_) && (i < rhs.length_); ++i)
-        {
-            if (buffer_[i] > rhs.buffer_[i])
-                return true;
-            if (buffer_[i] < rhs.buffer_[i])
-                return false;
-        }
-        
-        return length_ > rhs.length_;
+        return strcmp(CString(), rhs.CString()) > 0;
+    }
+    
+    /// Test for equality with a C string
+    bool operator == (const char* rhs) const
+    {
+        return strcmp(CString(), rhs) == 0;
+    }
+    
+    /// Test for inequality with a C string
+    bool operator != (const char* rhs) const
+    {
+        return strcmp(CString(), rhs) != 0;
+    }
+    
+    /// Test if string is less than a C string
+    bool operator < (const char* rhs) const
+    {
+        return strcmp(CString(), rhs) < 0;
+    }
+    
+    /// Test if string is greater than a C string
+    bool operator > (const char* rhs) const
+    {
+        return strcmp(CString(), rhs) > 0;
     }
     
     /// Return char at index
@@ -228,13 +228,13 @@ public:
     const char& operator [] (unsigned pos) const { return buffer_[pos]; }
     
     /// Replace all occurrences of a character
-    void Replace(char replaceThis, char replaceWith);
+    void ReplaceInPlace(char replaceThis, char replaceWith);
     /// Replace all occurrences of a string
-    void Replace(const String& replaceThis, const String& replaceWith);
+    void ReplaceInPlace(const String& replaceThis, const String& replaceWith);
     /// Replace a substring
-    void Replace(unsigned pos, unsigned length, const String& replaceWith);
+    void ReplaceInPlace(unsigned pos, unsigned length, const String& replaceWith);
     /// Replace a substring using iterators
-    Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
+    Iterator ReplaceInPlace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Insert a string
     void Insert(unsigned pos, const String& str);
     /// Insert a character
@@ -270,6 +270,12 @@ public:
     Iterator End() { return Iterator(buffer_ + length_); }
     /// Return const iterator to the end
     ConstIterator End() const { return ConstIterator(buffer_ + length_); }
+    /// Return string with all occurrences of a character replaced
+    String Replace(char replaceThis, char replaceWith) const;
+    /// Return string with all occurrences of a string replaced
+    String Replace(const String& replaceThis, const String& replaceWith) const;
+    /// Return string with a substring replaced
+    String Replace(unsigned pos, unsigned length, const String& replaceWith) const;
     /// Return a substring from position to end
     String Substring(unsigned pos) const;
     /// Return a substring with length from position
@@ -343,7 +349,7 @@ private:
     }
     
     /// Replace a substring with another substring
-    void Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
+    void ReplaceInPlace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
     
     /// String length
     unsigned length_;

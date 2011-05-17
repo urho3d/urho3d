@@ -83,5 +83,5 @@ protected:
 
 /// Register the array type to script
 void RegisterArray(asIScriptEngine* engine);
-/// Register std::string to script
+/// Register String to script
 void RegisterString(asIScriptEngine* engine);

@@ -26,7 +26,7 @@
 
 #include "DebugNew.h"
 
-static const std::string noName;
+static const String noName;
 static const float invQ = 1.0f / 32767.0f;
 
 Deserializer::Deserializer() :
@@ -45,7 +45,7 @@ Deserializer::~Deserializer()
 {
 }
 
-const std::string& Deserializer::GetName() const
+const String& Deserializer::GetName() const
 {
     return noName;
 }
@@ -220,9 +220,9 @@ BoundingBox Deserializer::ReadBoundingBox()
     return ret;
 }
 
-std::string Deserializer::ReadString()
+String Deserializer::ReadString()
 {
-    std::string ret;
+    String ret;
     
     for (;;)
     {
@@ -236,11 +236,11 @@ std::string Deserializer::ReadString()
     return ret;
 }
 
-std::string Deserializer::ReadID()
+String Deserializer::ReadID()
 {
-    std::string ret;
+    String ret;
     
-    ret.resize(4);
+    ret.Resize(4);
     Read(&ret[0], 4);
     return ret;
 }
@@ -402,9 +402,9 @@ unsigned Deserializer::ReadVLE()
     return ret;
 }
 
-std::string Deserializer::ReadLine()
+String Deserializer::ReadLine()
 {
-    std::string ret;
+    String ret;
     
     while (!IsEof())
     {

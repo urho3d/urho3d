@@ -38,7 +38,7 @@ struct Triangle
 
 struct ModelBone
 {
-    std::string name_;
+    String name_;
     unsigned parentIndex_;
     Vector3 bindPosition_;
     Quaternion bindRotation_;
@@ -55,7 +55,7 @@ struct ModelBone
 
 struct ModelAnimation
 {
-    std::string name_;
+    String name_;
     float length_;
     std::vector<AnimationTrack> tracks_;
 };
@@ -156,7 +156,7 @@ struct ModelMorphBuffer
 
 struct ModelMorph
 {
-    std::string name_;
+    String name_;
     std::vector<ModelMorphBuffer> buffers_;
     
     void WriteData(Serializer& dest)

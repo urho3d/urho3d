@@ -14,7 +14,6 @@ include_directories (
 
 # Define target & libraries to link
 add_executable (${TARGET_NAME} ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Assimp Container Core Graphics IO Math Physics Scene Resource 
-    ${DBGHELP_LIB})
+target_link_libraries (${TARGET_NAME} Assimp Container Core Graphics IO Math Physics Scene Resource)
 finalize_exe ()
 

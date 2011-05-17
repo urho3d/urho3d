@@ -172,13 +172,13 @@ static const unsigned short spotLightIndexData[] =
     7, 6, 5
 };
 
-static const std::string hwVariations[] =
+static const String hwVariations[] =
 {
     "",
     "HW"
 };
 
-static const std::string geometryVSVariations[] =
+static const String geometryVSVariations[] =
 {
     "",
     "Skinned",
@@ -186,7 +186,7 @@ static const std::string geometryVSVariations[] =
     "Billboard"
 };
 
-static const std::string lightVSVariations[] =
+static const String lightVSVariations[] =
 {
     "",
     "Spot",
@@ -194,7 +194,7 @@ static const std::string lightVSVariations[] =
     "SpotShadow"
 };
 
-static const std::string deferredLightVSVariations[] =
+static const String deferredLightVSVariations[] =
 {
     "",
     "Dir",
@@ -202,7 +202,7 @@ static const std::string deferredLightVSVariations[] =
     "OrthoDir"
 };
 
-static const std::string lightPSVariations[] = 
+static const String lightPSVariations[] = 
 {
     "Dir",
     "DirSpec",
@@ -440,10 +440,10 @@ const Viewport& Renderer::GetViewport(unsigned index) const
     return index < viewports_.size() ? viewports_[index] : noViewport;
 }
 
-VertexShader* Renderer::GetVertexShader(const std::string& name, bool checkExists) const
+VertexShader* Renderer::GetVertexShader(const String& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
-    std::string fullName = Replace(shaderPath_ + name + vsFormat_, "_.", ".");
+    String fullName = (shaderPath_ + name + vsFormat_).Replace("_.", ".");
     if (checkExists)
     {
         if (!cache_->Exists(fullName))
@@ -452,10 +452,10 @@ VertexShader* Renderer::GetVertexShader(const std::string& name, bool checkExist
     return cache_->GetResource<VertexShader>(fullName);
 }
 
-PixelShader* Renderer::GetPixelShader(const std::string& name, bool checkExists) const
+PixelShader* Renderer::GetPixelShader(const String& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
-    std::string fullName = Replace(shaderPath_ + name + psFormat_, "_.", ".");
+    String fullName = (shaderPath_ + name + psFormat_).Replace("_.", ".");
     if (checkExists)
     {
         if (!cache_->Exists(fullName))
@@ -1057,13 +1057,13 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     if (i == technique->passes_.end())
         return;
     
-    std::string vertexShaderName = i->second.GetVertexShaderName();
-    std::string pixelShaderName = i->second.GetPixelShaderName();
+    String vertexShaderName = i->second.GetVertexShaderName();
+    String pixelShaderName = i->second.GetPixelShaderName();
     
     // Check if the shader name is already a variation in itself
-    if (vertexShaderName.find('_') == std::string::npos)
+    if (vertexShaderName.Find('_') == String::NPOS)
         vertexShaderName += "_";
-    if (pixelShaderName.find('_') == std::string::npos)
+    if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
     // If ambient pass is not using REPLACE as the blend mode, and shadow maps are reused, do not load shadow variations

@@ -374,9 +374,9 @@ void Sound::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    std::string soundPath, soundName, soundExt;
+    String soundPath, soundName, soundExt;
     SplitPath(GetName(), soundPath, soundName, soundExt);
-    std::string xmlName = soundPath + soundName + ".xml";
+    String xmlName = soundPath + soundName + ".xml";
     
     if (!cache->Exists(xmlName))
         return;
@@ -390,7 +390,7 @@ void Sound::LoadParameters()
     
     while (paramElem)
     {
-        std::string name = paramElem.GetName();
+        String name = paramElem.GetName();
         
         if ((name == "format") && (!compressed_))
         {

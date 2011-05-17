@@ -260,7 +260,7 @@ static void RegisterListView(asIScriptEngine* engine)
 static void RegisterText(asIScriptEngine* engine)
 {
     RegisterUIElement<Text>(engine, "Text");
-    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const std::string&, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const String&, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, int)", asMETHODPR(Text, SetFont, (Font*, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
@@ -372,10 +372,10 @@ static void FileSelectorSetFilters(CScriptArray* filters, unsigned defaultIndex,
         return;
     
     unsigned numFilters = filters->GetSize();
-    std::vector<std::string> destFilters(numFilters);
+    std::vector<String> destFilters(numFilters);
     
     for (unsigned i = 0; i < numFilters; ++i)
-        destFilters[i] = *(static_cast<std::string*>(filters->At(i)));
+        destFilters[i] = *(static_cast<String*>(filters->At(i)));
     
     ptr->SetFilters(destFilters, defaultIndex);
 }

@@ -111,7 +111,7 @@ public:
     /// Return number of received packets waiting
     unsigned GetNumPackets() const { return packets_.size(); }
     /// Return address of remote host
-    const std::string& GetAddress()const { return address_; }
+    const String& GetAddress()const { return address_; }
     /// Return port of remote host
     unsigned short GetPort() const { return port_; }
     /// Return simulated packet loss
@@ -138,7 +138,7 @@ private:
     /// Latency-simulated packets waiting to be sent
     std::vector<QueuedPacket> sentPackets_;
     /// Remote host address
-    std::string address_;
+    String address_;
     /// Remote host port
     unsigned short port_;
     /// Simulated packet loss

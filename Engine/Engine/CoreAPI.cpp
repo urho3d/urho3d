@@ -37,7 +37,7 @@ static void ConstructStringHashCopy(const StringHash& hash, StringHash* ptr)
     new(ptr) StringHash(hash);
 }
 
-static void ConstructStringHashInit(const std::string& str, StringHash* ptr)
+static void ConstructStringHashInit(const String& str, StringHash* ptr)
 {
     new(ptr) StringHash(str);
 }
@@ -67,7 +67,7 @@ static void ConstructShortStringHashCopyLong(const StringHash& hash, ShortString
     new(ptr) ShortStringHash(hash);
 }
 
-static void ConstructShortStringHashInit(const std::string& str, ShortStringHash* ptr)
+static void ConstructShortStringHashInit(const String& str, ShortStringHash* ptr)
 {
     new(ptr) ShortStringHash(str);
 }
@@ -93,7 +93,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHashCmp), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHOD(StringHash, operator +), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "String ToString() const", asFUNCTIONPR(ToString, (const StringHash&), std::string), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StringHash", "String ToString() const", asFUNCTIONPR(ToString, (const StringHash&), String), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("StringHash", "uint get_value()", asMETHOD(StringHash, GetValue), asCALL_THISCALL);
     
     engine->RegisterObjectType("ShortStringHash", sizeof(ShortStringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
@@ -104,7 +104,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ShortStringHash", "ShortStringHash &opAssign(const ShortStringHash&in)", asMETHODPR(ShortStringHash, operator =, (const ShortStringHash&), ShortStringHash&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "bool opEquals(const ShortStringHash&in) const", asMETHOD(ShortStringHash, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "int opCmp(const ShortStringHash&in) const", asFUNCTION(ShortStringHashCmp), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("ShortStringHash", "String ToString() const", asFUNCTIONPR(ToString, (const ShortStringHash&), std::string), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ShortStringHash", "String ToString() const", asFUNCTIONPR(ToString, (const ShortStringHash&), String), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ShortStringHash", "uint16 get_value()", asMETHOD(ShortStringHash, GetValue), asCALL_THISCALL);
 }
 
@@ -235,7 +235,7 @@ static void ConstructVariantColor(const Color& value, Variant* ptr)
     new(ptr) Variant(value);
 }
 
-static void ConstructVariantString(const std::string& value, Variant* ptr)
+static void ConstructVariantString(const String& value, Variant* ptr)
 {
     new(ptr) Variant(value);
 }
@@ -300,17 +300,17 @@ static void DestructVariantMap(VariantMap* ptr)
     ptr->~VariantMap();
 }
 
-static Variant& VariantMapAt(const std::string& key, VariantMap& map)
+static Variant& VariantMapAt(const String& key, VariantMap& map)
 {
     return map[ShortStringHash(key)];
 }
 
-static bool VariantMapContains(const std::string& key, VariantMap& map)
+static bool VariantMapContains(const String& key, VariantMap& map)
 {
     return map.find(ShortStringHash(key)) != map.end();
 }
 
-static void VariantMapErase(const std::string& key, VariantMap& map)
+static void VariantMapErase(const String& key, VariantMap& map)
 {
     map.erase(ShortStringHash(key));
 }
@@ -386,7 +386,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Vector3&in)", asMETHODPR(Variant, operator =, (const Vector3&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Quaternion&in)", asMETHODPR(Variant, operator =, (const Quaternion&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Color&in)", asMETHODPR(Variant, operator =, (const Color&), Variant&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const String&in)", asMETHODPR(Variant, operator =, (const std::string&), Variant&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "Variant &opAssign(const String&in)", asMETHODPR(Variant, operator =, (const String&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const Array<Variant>@+)", asFUNCTION(VariantAssignVariantVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Variant &opAssign(const VariantMap&in)", asMETHODPR(Variant, operator =, (const VariantMap&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Variant&in) const", asMETHODPR(Variant, operator ==, (const Variant&) const, bool), asCALL_THISCALL);
@@ -400,7 +400,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Vector3&in) const", asMETHODPR(Variant, operator ==, (const Vector3&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Quaternion&in) const", asMETHODPR(Variant, operator ==, (const Quaternion&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Color&in) const", asMETHODPR(Variant, operator ==, (const Color&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "bool opEquals(const String&in) const", asMETHODPR(Variant, operator ==, (const std::string&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "bool opEquals(const String&in) const", asMETHODPR(Variant, operator ==, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const Array<Variant>@+)", asFUNCTION(VariantEqualsVariantVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VariantMap&in) const", asMETHODPR(Variant, operator ==, (const VariantMap&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "int GetInt() const", asMETHOD(Variant, GetInt), asCALL_THISCALL);
@@ -420,7 +420,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "void FromString(const String&in, const String&in)", asMETHOD(Variant, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String ToString() const", asMETHOD(Variant, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const std::string&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "const String &get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, const String&), asCALL_THISCALL);
     
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
@@ -434,20 +434,16 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VariantMap", "uint get_length() const", asMETHOD(VariantMap, size), asCALL_THISCALL);
 }
 
-static CScriptArray* StringSplit(char separator, const std::string* str)
+static CScriptArray* StringSplit(char separator, const String* str)
 {
-    std::vector<std::string> result = Split(*str, separator);
-    return VectorToArray<std::string>(result, "Array<String>");
+    std::vector<String> result = Split(*str, separator);
+    return VectorToArray<String>(result, "Array<String>");
 }
 
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
     // Register most of StringUtils as string's const methods, or objects' ToString() const methods for convenience
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String Replace(uint8, uint8) const", asFUNCTIONPR(Replace, (const std::string&, char, char), std::string), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String Replace(const String&in, const String&in) const", asFUNCTIONPR(Replace, (const std::string&, const std::string&, const std::string&), std::string), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String ToUpper() const", asFUNCTION(ToUpper), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String ToLower() const", asFUNCTION(ToLower), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTION(ToBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTION(ToFloat), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "int ToInt() const", asFUNCTION(ToInt), asCALL_CDECL_OBJLAST);
@@ -459,10 +455,10 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTION(ToVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTION(ToVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector4 ToVector4() const", asFUNCTION(ToVector4), asCALL_CDECL_OBJLAST);
-    engine->RegisterGlobalFunction("String ToString(bool)", asFUNCTIONPR(ToString, (bool), std::string), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(float)", asFUNCTIONPR(ToString, (float), std::string), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(int)", asFUNCTIONPR(ToString, (int), std::string), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(uint)", asFUNCTIONPR(ToString, (unsigned), std::string), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String ToString(bool)", asFUNCTIONPR(ToString, (bool), String), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String ToString(float)", asFUNCTIONPR(ToString, (float), String), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String ToString(int)", asFUNCTIONPR(ToString, (int), String), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String ToString(uint)", asFUNCTIONPR(ToString, (unsigned), String), asCALL_CDECL);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
 }
 
@@ -493,12 +489,12 @@ static void RegisterTimer(asIScriptEngine* engine)
 
 static CScriptArray* GetArgumentsToArray()
 {
-    return VectorToArray<std::string>(GetArguments(), "Array<String>");
+    return VectorToArray<String>(GetArguments(), "Array<String>");
 }
 
-static void ShowErrorDialog(const std::string& title, const std::string& message)
+static void ShowErrorDialog(const String& title, const String& message)
 {
-    ErrorDialog(title.c_str(), message.c_str());
+    ErrorDialog(title.CString(), message.CString());
 }
 
 static void RegisterProcessUtils(asIScriptEngine* engine)
@@ -527,52 +523,52 @@ static void DestructAttributeInfo(AttributeInfo* ptr)
 
 static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
 {
-    std::vector<std::string> enumNames;
-    const std::string* enumNamePtrs = ptr->enumNames_;
-    while ((enumNamePtrs) && (enumNamePtrs->length()))
+    std::vector<String> enumNames;
+    const String* enumNamePtrs = ptr->enumNames_;
+    while ((enumNamePtrs) && (enumNamePtrs->Length()))
     {
         enumNames.push_back(*enumNamePtrs);
         ++enumNamePtrs;
     }
-    return VectorToArray<std::string>(enumNames, "Array<String>");
+    return VectorToArray<String>(enumNames, "Array<String>");
 }
 
-static void SendEvent(const std::string& eventType, VariantMap& parameters)
+static void SendEvent(const String& eventType, VariantMap& parameters)
 {
     Object* sender = GetScriptContextEventListenerObject();
     if (sender)
         sender->SendEvent(StringHash(eventType), parameters);
 }
 
-static void SendTargetedEvent(Object* receiver, const std::string& eventType, VariantMap& parameters)
+static void SendTargetedEvent(Object* receiver, const String& eventType, VariantMap& parameters)
 {
     Object* sender = GetScriptContextEventListenerObject();
     if (sender)
         sender->SendEvent(receiver, StringHash(eventType), parameters);
 }
 
-static void SubscribeToEvent(const std::string& eventType, const std::string& handlerName)
+static void SubscribeToEvent(const String& eventType, const String& handlerName)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
         listener->AddEventHandler(StringHash(eventType), handlerName);
 }
 
-static void SubscribeToSenderEvent(Object* sender, const std::string& eventType, const std::string& handlerName)
+static void SubscribeToSenderEvent(Object* sender, const String& eventType, const String& handlerName)
 {
     ScriptEventListener* listener = GetScriptContextEventListener();
     if (listener)
         listener->AddEventHandler(sender, StringHash(eventType), handlerName);
 }
 
-static void UnsubscribeFromEvent(const std::string& eventType)
+static void UnsubscribeFromEvent(const String& eventType)
 {
     Object* listener = GetScriptContextEventListenerObject();
     if (listener)
         listener->UnsubscribeFromEvent(StringHash(eventType));
 }
 
-static void UnsubscribeFromSenderEvent(Object* sender, const std::string& eventType)
+static void UnsubscribeFromSenderEvent(Object* sender, const String& eventType)
 {
     Object* listener = GetScriptContextEventListenerObject();
     if (listener)

@@ -27,7 +27,7 @@
 
 #include "DebugNew.h"
 
-static std::string noType;
+static String noType;
 
 Context::Context() :
     handler_(0)
@@ -77,7 +77,7 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
     attributes_[objectType].push_back(attr);
 }
 
-void Context::RemoveAttribute(ShortStringHash objectType, const std::string& name)
+void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
 {
     std::vector<AttributeInfo>& attributes = attributes_[objectType];
     for (std::vector<AttributeInfo>::iterator i = attributes.begin(); i != attributes.end(); ++i)
@@ -201,7 +201,7 @@ Object* Context::GetSender() const
         return 0;
 }
 
-const std::string& Context::GetTypeName(ShortStringHash type) const
+const String& Context::GetTypeName(ShortStringHash type) const
 {
     // Search factories to find the hash-to-name mapping
     std::map<ShortStringHash, SharedPtr<ObjectFactory> >::const_iterator i = factories_.find(type);

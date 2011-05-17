@@ -50,7 +50,7 @@ File::File(Context* context) :
 {
 }
 
-File::File(Context* context, const std::string& fileName, FileMode mode) :
+File::File(Context* context, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
@@ -60,7 +60,7 @@ File::File(Context* context, const std::string& fileName, FileMode mode) :
     Open(fileName, mode);
 }
 
-File::File(Context* context, PackageFile* package, const std::string& fileName) :
+File::File(Context* context, PackageFile* package, const String& fileName) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
@@ -75,7 +75,7 @@ File::~File()
     Close();
 }
 
-bool File::Open(const std::string& fileName, FileMode mode)
+bool File::Open(const String& fileName, FileMode mode)
 {
     Close();
     
@@ -86,7 +86,7 @@ bool File::Open(const std::string& fileName, FileMode mode)
         return false;
     }
     
-    handle_ = fopen(GetNativePath(fileName).c_str(), openMode[mode]);
+    handle_ = fopen(GetNativePath(fileName).CString(), openMode[mode]);
     if (!handle_)
     {
         LOGERROR("Could not open file " + fileName);
@@ -107,7 +107,7 @@ bool File::Open(const std::string& fileName, FileMode mode)
     return true;
 }
 
-bool File::Open(PackageFile* package, const std::string& fileName)
+bool File::Open(PackageFile* package, const String& fileName)
 {
     Close();
     
@@ -118,7 +118,7 @@ bool File::Open(PackageFile* package, const std::string& fileName)
     if (!entry)
         return false;
     
-    handle_ = fopen(GetNativePath(package->GetName()).c_str(), "rb");
+    handle_ = fopen(GetNativePath(package->GetName()).CString(), "rb");
     if (!handle_)
     {
         LOGERROR("Could not open package file " + fileName);
@@ -248,7 +248,7 @@ void File::Close()
     }
 }
 
-void File::SetName(const std::string& name)
+void File::SetName(const String& name)
 {
     fileName_ = name;
 }

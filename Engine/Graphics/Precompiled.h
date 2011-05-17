@@ -23,8 +23,9 @@
 
 #pragma once
 
+#include "StringBase.h"
+
 #include <algorithm>
 #include <map>
 #include <set>
-#include <string>
 #include <vector>

@@ -572,30 +572,29 @@ void RegisterArray(asIScriptEngine* engine)
 
 // Adapted from AngelScript's scriptstdstring add-on
 
-static std::string StringFactory(asUINT length, const char* s)
+static String StringFactory(asUINT length, const char* s)
 {
-    return std::string(s, length);
+    return String(s, length);
 }
 
-static void ConstructString(std::string* ptr)
+static void ConstructString(String* ptr)
 {
-    new(ptr) std::string();
+    new(ptr) String();
 }
 
-static void ConstructStringCopy(const std::string& str, std::string* ptr)
+static void ConstructStringCopy(const String& str, String* ptr)
 {
-    new(ptr) std::string(str);
+    new(ptr) String(str);
 }
 
-static void DestructString(std::string* ptr)
+static void DestructString(String* ptr)
 {
-    using namespace std;
-    ptr->~string();
+    ptr->~String();
 }
 
-static char* StringCharAt(unsigned int i, std::string& str)
+static char* StringCharAt(unsigned int i, String& str)
 {
-    if (i >= str.size())
+    if (i >= str.Length())
     {
         asIScriptContext* context = asGetActiveContext();
         if (context)
@@ -605,7 +604,7 @@ static char* StringCharAt(unsigned int i, std::string& str)
     return &str[i];
 }
 
-static int StringCmp(const std::string& lhs, const std::string& rhs)
+static int StringCmp(const String& lhs, const String& rhs)
 {
     int cmp = 0;
     if (lhs < rhs)
@@ -615,199 +614,154 @@ static int StringCmp(const std::string& lhs, const std::string& rhs)
     return cmp;
 }
 
-static int StringFind(const std::string& rhs, const std::string& str)
+void StringResize(unsigned newSize, String& str)
 {
-    return str.find(rhs);
-}
-
-void StringResize(unsigned newSize, std::string& str)
-{
-    unsigned oldSize = str.length();
-    str.resize(newSize);
+    unsigned oldSize = str.Length();
+    str.Resize(newSize);
     for (unsigned i = oldSize; i < newSize; ++i)
         str[i] = ' ';
 }
 
-
-std::string StringSubstring1Param(unsigned start, const std::string& str)
+static void ConstructStringInt(int value, String* ptr)
 {
-    try
-    {
-        return str.substr(start);
-    }
-    catch (...)
-    {
-        return std::string();
-    }
-}
-
-std::string StringSubstring2Params(unsigned start, unsigned length, const std::string& str)
-{
-    try
-    {
-        return str.substr(start, length);
-    }
-    catch (...)
-    {
-        return std::string();
-    }
-}
-
-std::string StringTrim(const std::string& str)
-{
-    unsigned trimStart = 0;
-    unsigned trimEnd = str.length();
-    while (trimStart < trimEnd)
-    {
-        char c = str[trimStart];
-        if ((c != ' ') && (c != 9))
-            break;
-        ++trimStart;
-    }
-    while (trimEnd > trimStart)
-    {
-        char c = str[trimEnd - 1];
-        if ((c != ' ') && (c != 9))
-            break;
-        --trimEnd;
-    }
-    
-    return str.substr(trimStart, trimEnd - trimStart);
-}
-
-static void ConstructStringInt(int value, std::string* ptr)
-{
-    new(ptr) std::string();
+    new(ptr) String();
     *ptr = ToString(value);
 }
 
-static void ConstructStringUInt(unsigned value, std::string* ptr)
+static void ConstructStringUInt(unsigned value, String* ptr)
 {
-    new(ptr) std::string();
+    new(ptr) String();
     *ptr = ToString(value);
 }
 
-static void ConstructStringFloat(float value, std::string* ptr)
+static void ConstructStringFloat(float value, String* ptr)
 {
-    new(ptr) std::string();
+    new(ptr) String();
     *ptr = ToString(value);
 }
 
-static void ConstructStringBool(bool value, std::string* ptr)
+static void ConstructStringBool(bool value, String* ptr)
 {
-    new(ptr) std::string();
+    new(ptr) String();
     *ptr = ToString(value);
 }
 
-static std::string& StringAssignInt(int value, std::string& str)
+static String& StringAssignInt(int value, String& str)
 {
     str = ToString(value);
     return str;
 }
 
-static std::string& StringAddAssignInt(int value, std::string& str)
+static String& StringAddAssignInt(int value, String& str)
 {
     str += ToString(value);
     return str;
 }
 
-static std::string StringAddInt(int value, const std::string& str)
+static String StringAddInt(int value, const String& str)
 {
     return str + ToString(value);
 }
 
-static std::string StringAddIntReverse(int value, const std::string& str)
+static String StringAddIntReverse(int value, const String& str)
 {
     return ToString(value) + str;
 }
 
-static std::string& StringAssignUInt(unsigned value, std::string& str)
+static String& StringAssignUInt(unsigned value, String& str)
 {
     str = ToString(value);
     return str;
 }
 
-static std::string& StringAddAssignUInt(unsigned value, std::string& str)
+static String& StringAddAssignUInt(unsigned value, String& str)
 {
     str += ToString(value);
     return str;
 }
 
-static std::string StringAddUInt(unsigned value, const std::string& str)
+static String StringAddUInt(unsigned value, const String& str)
 {
     return str + ToString(value);
 }
 
-static std::string StringAddUIntReverse(unsigned value, const std::string& str)
+static String StringAddUIntReverse(unsigned value, const String& str)
 {
     return ToString(value) + str;
 }
 
-static std::string& StringAssignFloat(float value, std::string& str)
+static String& StringAssignFloat(float value, String& str)
 {
     str = ToString(value);
     return str;
 }
 
-static std::string& StringAddAssignFloat(float value, std::string& str)
+static String& StringAddAssignFloat(float value, String& str)
 {
     str += ToString(value);
     return str;
 }
 
-static std::string StringAddFloat(float value, const std::string& str)
+static String StringAddFloat(float value, const String& str)
 {
     return str + ToString(value);
 }
 
-static std::string StringAddFloatReverse(float value, const std::string& str)
+static String StringAddFloatReverse(float value, const String& str)
 {
     return ToString(value) + str;
 }
 
-static std::string& StringAssignBool(bool value, std::string& str)
+static String& StringAssignBool(bool value, String& str)
 {
     str = ToString(value);
     return str;
 }
 
-static std::string& StringAddAssignBool(bool value, std::string& str)
+static String& StringAddAssignBool(bool value, String& str)
 {
     str += ToString(value);
     return str;
 }
 
-static std::string StringAddBool(bool value, const std::string& str)
+static String StringAddBool(bool value, const String& str)
 {
     return str + ToString(value);
 }
 
-static std::string StringAddBoolReverse(bool value, const std::string& str)
+static String StringAddBoolReverse(bool value, const String& str)
 {
     return ToString(value) + str;
 }
 
 void RegisterString(asIScriptEngine *engine)
 {
-    engine->RegisterObjectType("String", sizeof(std::string), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
+    engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDA);
     engine->RegisterStringFactory("String", asFUNCTION(StringFactory), asCALL_CDECL);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructString), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(const String& in)", asFUNCTION(ConstructStringCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("String", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructString), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String &opAssign(const String& in)", asMETHODPR(std::string, operator =, (const std::string&), std::string&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "String &opAddAssign(const String& in)", asMETHODPR(std::string, operator+=, (const std::string&), std::string&), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "bool opEquals(const String& in) const", asFUNCTIONPR(std::operator ==, (const std::string&, const std::string&), bool), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String &opAssign(const String& in)", asMETHODPR(String, operator =, (const String&), String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String &opAddAssign(const String& in)", asMETHODPR(String, operator +=, (const String&), String&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "bool opEquals(const String& in) const", asMETHODPR(String, operator ==, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "int opCmp(const String& in) const", asFUNCTION(StringCmp), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("String", "String opAdd(const String& in) const", asFUNCTIONPR(std::operator +, (const std::string&, const std::string&), std::string), asCALL_CDECL_OBJFIRST);
+    engine->RegisterObjectMethod("String", "String opAdd(const String& in) const", asMETHODPR(String, operator +, (const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "uint8 &opIndex(uint)", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "int Find(const String& in) const", asFUNCTION(StringFind), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String Substring(uint) const", asFUNCTION(StringSubstring1Param), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String Substring(uint, uint) const", asFUNCTION(StringSubstring2Params), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "String Trim() const", asFUNCTION(StringTrim), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "void Resize(uint)", asFUNCTION(StringResize), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "uint get_length() const", asMETHOD(std::string, length), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "bool get_empty() const", asMETHOD(std::string, empty), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int Find(const String& in, uint start = 0) const", asMETHODPR(String, Find, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int Find(uint8, uint start = 0) const", asMETHODPR(String, Find, (char, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int FindLast(const String& in) const", asMETHODPR(String, FindLast, (const String&) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int FindLast(uint8) const", asMETHODPR(String, FindLast, (char) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Replace(uint8, uint8) const", asMETHODPR(String, Replace, (char, char) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Replace(const String&in, const String&in) const", asMETHODPR(String, Replace, (const String&, const String&) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Substring(uint) const", asMETHODPR(String, Substring, (unsigned) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Substring(uint, uint) const", asMETHODPR(String, Substring, (unsigned, unsigned) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String ToUpper() const", asMETHOD(String, ToUpper), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String ToLower() const", asMETHOD(String, ToLower), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Trim() const", asMETHOD(String, Trim), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "uint get_length() const", asMETHOD(String, Length), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "bool get_empty() const", asMETHOD(String, Empty), asCALL_THISCALL);
     
     // Register automatic conversion functions for convenience
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f(int)", asFUNCTION(ConstructStringInt), asCALL_CDECL_OBJLAST);

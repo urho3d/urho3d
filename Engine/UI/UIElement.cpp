@@ -30,21 +30,21 @@
 
 #include "DebugNew.h"
 
-static const std::string horizontalAlignments[] =
+static const String horizontalAlignments[] =
 {
     "left",
     "center",
     "right"
 };
 
-static const std::string verticalAlignments[] =
+static const String verticalAlignments[] =
 {
     "top",
     "center",
     "bottom"
 };
 
-static const std::string focusModes[] =
+static const String focusModes[] =
 {
     "notfocusable",
     "resetfocus",
@@ -52,7 +52,7 @@ static const std::string focusModes[] =
     "focusabledefocusable"
 };
 
-static const std::string dragDropModes[] =
+static const String dragDropModes[] =
 {
     "disabled",
     "source",
@@ -151,8 +151,8 @@ void UIElement::SetStyle(const XMLElement& element)
     {
         XMLElement alignElem = element.GetChildElement("alignment");
         
-        std::string horiz;
-        std::string vert;
+        String horiz;
+        String vert;
         if (alignElem.HasAttribute("horizontal"))
             horiz = alignElem.GetStringLower("horizontal");
         if (alignElem.HasAttribute("vertical"))
@@ -161,9 +161,9 @@ void UIElement::SetStyle(const XMLElement& element)
             horiz = alignElem.GetStringLower("h");
         if (alignElem.HasAttribute("v"))
             vert = alignElem.GetStringLower("v");
-        if (!horiz.empty())
+        if (!horiz.Empty())
             SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, 3, 0));
-        if (!vert.empty())
+        if (!vert.Empty())
             SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert, verticalAlignments, 3, 0));
     }
     if (element.HasChildElement("clipborder"))
@@ -200,20 +200,20 @@ void UIElement::SetStyle(const XMLElement& element)
         SetVisible(element.GetChildElement("visible").GetBool("enable"));
     if (element.HasChildElement("focusmode"))
     {
-        std::string focusMode = element.GetChildElement("focusmode").GetStringLower("value");
+        String focusMode = element.GetChildElement("focusmode").GetStringLower("value");
         SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, 4, 0));
         if (focusMode == "defocusable")
             SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
     if (element.HasChildElement("dragdropmode"))
     {
-        std::string dragDropMode = element.GetChildElement("dragdropmode").GetStringLower("value");
+        String dragDropMode = element.GetChildElement("dragdropmode").GetStringLower("value");
         SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, 4, 0));
     }
     if (element.HasChildElement("layout"))
     {
         XMLElement layoutElem = element.GetChildElement("layout");
-        std::string mode = layoutElem.GetStringLower("mode");
+        String mode = layoutElem.GetStringLower("mode");
         if (mode == "free")
             layoutMode_ = LM_FREE;
         if ((mode == "horizontal") || (mode == "h"))
@@ -297,7 +297,7 @@ void UIElement::OnDefocus()
 {
 }
 
-void UIElement::SetName(const std::string& name)
+void UIElement::SetName(const String& name)
 {
     name_ = name;
 }
@@ -568,7 +568,7 @@ void UIElement::SetDragDropMode(unsigned mode)
     dragDropMode_ = mode;
 }
 
-void UIElement::SetStyle(XMLFile* file, const std::string& typeName)
+void UIElement::SetStyle(XMLFile* file, const String& typeName)
 {
     if (!file)
         return;
@@ -932,7 +932,7 @@ UIElement* UIElement::GetChild(unsigned index) const
     return index < children_.size() ? children_[index] : (UIElement*)0;
 }
 
-UIElement* UIElement::GetChild(const std::string& name, bool recursive) const
+UIElement* UIElement::GetChild(const String& name, bool recursive) const
 {
     for (std::vector<SharedPtr<UIElement> >::const_iterator i = children_.begin(); i != children_.end(); ++i)
     {

@@ -52,11 +52,11 @@ public:
     virtual void OnResize();
     
     /// Set font and font size
-    bool SetFont(const std::string& fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
     /// Set text
-    void SetText(const std::string& text);
+    void SetText(const String& text);
     /// Set row alignment
     void SetTextAlignment(HorizontalAlignment align);
     /// Set row spacing, 1.0 for original font spacing
@@ -77,7 +77,7 @@ public:
     /// Return font size
     int GetFontSize() const { return fontSize_; }
     /// Return text
-    const std::string& GetText() const { return text_; }
+    const String& GetText() const { return text_; }
     /// Return row alignment
     HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
     /// Return row spacing
@@ -116,9 +116,9 @@ protected:
     /// Font size
     int fontSize_;
     /// Text
-    std::string text_;
+    String text_;
     /// Text modified into printed form
-    std::string printText_;
+    String printText_;
     /// Row alignment
     HorizontalAlignment textAlignment_;
     /// Row spacing

@@ -77,7 +77,7 @@ public:
     
 protected:
     /// Construct with node flags, initial octant pointer and name
-    StaticModel(unsigned flags, Octant* octant, const std::string& name);
+    StaticModel(unsigned flags, Octant* octant, const String& name);
     /// Update the world bounding box
     virtual void OnWorldBoundingBoxUpdate();
     /// Set the bounding box

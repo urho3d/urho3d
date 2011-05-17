@@ -68,7 +68,7 @@ public:
     virtual void OnDefocus();
     
     /// Set text
-    void SetText(const std::string& text);
+    void SetText(const String& text);
     /// Set cursor position
     void SetCursorPosition(unsigned position);
     /// Set cursor blink rate. 0 disables blinking
@@ -85,7 +85,7 @@ public:
     void SetTextCopyable(bool enable);
     
     /// Return text
-    const std::string& GetText() const { return line_; }
+    const String& GetText() const { return line_; }
     /// Return cursor position
     unsigned GetCursorPosition() const { return cursorPosition_; }
     /// Return cursor blink rate
@@ -118,7 +118,7 @@ protected:
     /// Cursor element
     SharedPtr<BorderImage> cursor_;
     /// Text line
-    std::string line_;
+    String line_;
     /// Last known text font
     Font* lastFont_;
     /// Last known text size

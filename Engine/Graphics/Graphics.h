@@ -63,7 +63,7 @@ public:
     /// Pump operating system messages
     void MessagePump();
     /// Set window title
-    void SetWindowTitle(const std::string& windowTitle);
+    void SetWindowTitle(const String& windowTitle);
     /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
     bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
     /// Set screen resolution only
@@ -225,7 +225,7 @@ public:
     /// Return graphics implementation, which holds the actual Direct3D resources
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title
-    const std::string& GetWindowTitle() const { return windowTitle_; }
+    const String& GetWindowTitle() const { return windowTitle_; }
     /// Return rendering mode
     RenderMode GetRenderMode() const { return mode_; }
     /// Return window width
@@ -283,17 +283,17 @@ public:
     /// Return pixel shader
     PixelShader* GetPixelShader() const { return pixelShader_; }
     /// Return vertex shader parameter index by name
-    VSParameter GetVSParameter(const std::string& name);
+    VSParameter GetVSParameter(const String& name);
     /// Return pixel shader parameter index by name
-    PSParameter GetPSParameter(const std::string& name);
+    PSParameter GetPSParameter(const String& name);
     /// Return texture unit index by name
-    TextureUnit GetTextureUnit(const std::string& name);
+    TextureUnit GetTextureUnit(const String& name);
     /// Return vertex shader parameter name by index
-    const std::string& GetVSParameterName(VSParameter parameter);
+    const String& GetVSParameterName(VSParameter parameter);
     /// Return vertex pixel parameter name by index
-    const std::string& GetPSParameterName(PSParameter parameter);
+    const String& GetPSParameterName(PSParameter parameter);
     /// Return texture unit name by index
-    const std::string& GetTextureUnitName(TextureUnit unit);
+    const String& GetTextureUnitName(TextureUnit unit);
     /// Return vertex shader constant register by parameter index
     unsigned GetVSRegister(VSParameter param) { return vsRegisters_[param]; }
     /// Return pixel shader constant register by parameter index
@@ -399,7 +399,7 @@ private:
     /// Implementation
     GraphicsImpl* impl_;
     /// Window title
-    std::string windowTitle_;
+    String windowTitle_;
     /// Rendering mode
     RenderMode mode_;
     /// Window width
@@ -489,9 +489,9 @@ private:
     /// Pixel shader in use
     PixelShader* pixelShader_;
     /// Vertex shader parameter mappings
-    std::map<std::string, VSParameter> vsParameters_;
+    std::map<String, VSParameter> vsParameters_;
     /// Pixel shader parameter mappings
-    std::map<std::string, PSParameter> psParameters_;
+    std::map<String, PSParameter> psParameters_;
     /// Vertex shader constant register mappings
     unsigned vsRegisters_[MAX_VS_PARAMETERS];
     /// Pixel shader constant register mappings
@@ -505,7 +505,7 @@ private:
     /// "View texture" to prevent sampling the destination render target
     Texture* viewTexture_;
     /// Texture unit mappings
-    std::map<std::string, TextureUnit> textureUnits_;
+    std::map<String, TextureUnit> textureUnits_;
     /// Render targets in use
     RenderSurface* renderTarget_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use

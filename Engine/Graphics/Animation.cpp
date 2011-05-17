@@ -150,7 +150,7 @@ bool Animation::Save(Serializer& dest)
     return true;
 }
 
-void Animation::SetAnimationName(const std::string& name)
+void Animation::SetAnimationName(const String& name)
 {
     animationName_ = name;
     animationNameHash_ = StringHash(name);
@@ -176,7 +176,7 @@ const AnimationTrack* Animation::GetTrack(unsigned index) const
     return index < tracks_.size() ? &tracks_[index] : 0;
 }
 
-const AnimationTrack* Animation::GetTrack(const std::string& name) const
+const AnimationTrack* Animation::GetTrack(const String& name) const
 {
     for (std::vector<AnimationTrack>::const_iterator i = tracks_.begin(); i != tracks_.end(); ++i)
     {

@@ -98,19 +98,19 @@ bool XMLFile::Save(Serializer& dest)
     return true;
 }
 
-XMLElement XMLFile::CreateRootElement(const std::string& name)
+XMLElement XMLFile::CreateRootElement(const String& name)
 {
-    TiXmlElement newRoot(name.c_str());
+    TiXmlElement newRoot(name.CString());
     document_->Clear();
     document_->InsertEndChild(newRoot);
     return GetRootElement();
 }
 
-XMLElement XMLFile::GetRootElement(const std::string& name)
+XMLElement XMLFile::GetRootElement(const String& name)
 {
     XMLElement rootElem = XMLElement(this, document_->RootElement());
     
-    if ((rootElem.IsNull()) || ((!name.empty()) && (rootElem.GetName() != name)))
+    if ((rootElem.IsNull()) || ((!name.Empty()) && (rootElem.GetName() != name)))
         return XMLElement();
     return rootElem;
 }

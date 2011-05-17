@@ -24,14 +24,13 @@
 #include "Context.h"
 #include "File.h"
 #include "FileSystem.h"
+#include "ProcessUtils.h"
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
-#include <string>
 #include <vector>
 #include <Windows.h>
 
@@ -39,7 +38,7 @@
 
 struct FileEntry
 {
-    std::string name_;
+    String name_;
     unsigned offset_;
     unsigned size_;
     unsigned checksum_;
@@ -47,45 +46,44 @@ struct FileEntry
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
-std::string basePath_;
+String basePath_;
 std::vector<FileEntry> entries_;
 unsigned checksum_ = 0;
 
-std::string ignoreExtensions_[] = {
+String ignoreExtensions_[] = {
     ".bak",
     ".rule",
     ""
 };
 
 int main(int argc, char** argv);
-void Run(const std::vector<std::string>& arguments);
-void ProcessFile(const std::string& fileName, const std::string& rootDir);
-void WritePackageFile(const std::string& fileName, const std::string& rootDir);
-void ErrorExit(const std::string& error);
+void Run(const std::vector<String>& arguments);
+void ProcessFile(const String& fileName, const String& rootDir);
+void WritePackageFile(const String& fileName, const String& rootDir);
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> arguments;
+    std::vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(std::string(argv[i]));
+        arguments.push_back(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<std::string>& arguments)
+void Run(const std::vector<String>& arguments)
 {
     if (arguments.size() < 2)
         ErrorExit("Usage: PackageTool <directory to process> <package name> [basepath]\n");
     
-    const std::string& dirName = arguments[0];
-    const std::string& packageName = arguments[1];
+    const String& dirName = arguments[0];
+    const String& packageName = arguments[1];
     if (arguments.size() > 2)
         basePath_ = AddTrailingSlash(arguments[2]);
     
    // Get the file list recursively
-    std::vector<std::string> fileNames;
+    std::vector<String> fileNames;
     fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
     if (!fileNames.size())
         ErrorExit("No files found");
@@ -93,8 +91,8 @@ void Run(const std::vector<std::string>& arguments)
     // Check for extensions to ignore
     for (unsigned i = fileNames.size() - 1; i < fileNames.size(); --i)
     {
-        std::string extension = GetExtension(fileNames[i]);
-        for (unsigned j = 0; ignoreExtensions_[j].length(); ++j)
+        String extension = GetExtension(fileNames[i]);
+        for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
         {
             if (extension == ignoreExtensions_[j])
             {
@@ -110,9 +108,9 @@ void Run(const std::vector<std::string>& arguments)
     WritePackageFile(packageName, dirName);
 }
 
-void ProcessFile(const std::string& fileName, const std::string& rootDir)
+void ProcessFile(const String& fileName, const String& rootDir)
 {
-    std::string fullPath = rootDir + "/" + fileName;
+    String fullPath = rootDir + "/" + fileName;
     File file(context_);
     if (!file.Open(fullPath))
         ErrorExit("Could not open file " + fileName);
@@ -127,9 +125,9 @@ void ProcessFile(const std::string& fileName, const std::string& rootDir)
     entries_.push_back(newEntry);
 }
 
-void WritePackageFile(const std::string& fileName, const std::string& rootDir)
+void WritePackageFile(const String& fileName, const String& rootDir)
 {
-    std::cout << "Writing package" << std::endl;
+    PrintLine("Writing package");
     
     File dest(context_);
     if (!dest.Open(fileName, FILE_WRITE))
@@ -153,8 +151,8 @@ void WritePackageFile(const std::string& fileName, const std::string& rootDir)
     for (unsigned i = 0; i < entries_.size(); ++i)
     {
         entries_[i].offset_ = dest.GetSize();
-        std::string fileFullPath = GetNativePath(rootDir + "/" + entries_[i].name_);
-        FILE* handle = fopen(fileFullPath.c_str(), "rb");
+        String fileFullPath = GetNativePath(rootDir + "/" + entries_[i].name_);
+        FILE* handle = fopen(fileFullPath.CString(), "rb");
         if (!handle)
             ErrorExit("Could not open file " + fileFullPath);
         SharedArrayPtr<unsigned char> buffer(new unsigned char[entries_[i].size_]);
@@ -185,11 +183,5 @@ void WritePackageFile(const std::string& fileName, const std::string& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
-    std::cout << "Package total size " << dest.GetSize() << " bytes" << std::endl;
-}
-
-void ErrorExit(const std::string& error)
-{
-    std::cout << error;
-    exit(1);
+    PrintLine("Package total size " + ToString(dest.GetSize()) + " bytes");
 }

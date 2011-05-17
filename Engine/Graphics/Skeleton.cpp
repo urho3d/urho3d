@@ -136,7 +136,7 @@ Bone* Skeleton::GetBone(unsigned index)
     return index < bones_.size() ? &bones_[index] : (Bone*)0;
 }
 
-Bone* Skeleton::GetBone(const std::string& name)
+Bone* Skeleton::GetBone(const String& name)
 {
     for (std::vector<Bone>::iterator i = bones_.begin(); i != bones_.end(); ++i)
     {

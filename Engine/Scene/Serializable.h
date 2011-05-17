@@ -59,12 +59,12 @@ public:
     /// Set attribute by index. Return true if successfully set
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set
-    bool SetAttribute(const std::string& name, const Variant& value);
+    bool SetAttribute(const String& name, const Variant& value);
     
     /// Return attribute value by index. Return empty if illegal index
     Variant GetAttribute(unsigned index);
     /// Return attribute value by name. Return empty if not found
-    Variant GetAttribute(const std::string& name);
+    Variant GetAttribute(const String& name);
     /// Return number of attributes
     unsigned GetNumAttributes() const;
     /// Return attribute descriptions, or null if none defined

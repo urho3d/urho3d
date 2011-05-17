@@ -109,7 +109,7 @@ public:
     /// Return scene the client has joined, if any
     Scene* GetScene() const { return scene_; }
     /// Return identity string (address:port)
-    std::string GetIdentity() const;
+    String GetIdentity() const;
     /// Return login data
     const VariantMap& GetLoginData() const { return loginData_; }
     /// Return challenge value

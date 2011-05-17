@@ -67,7 +67,7 @@ bool Image::Load(Deserializer& source)
         unsigned char* pixelData = GetImageData(source, width, height, components);
         if (!pixelData)
         {
-            LOGERROR("Could not load image: " + std::string(stbi_failure_reason()));
+            LOGERROR("Could not load image: " + String(stbi_failure_reason()));
             return false;
         }
         SetSize(width, height, components);
@@ -139,7 +139,7 @@ void Image::SetData(const unsigned char* pixelData)
     memcpy(data_.GetPtr(), pixelData, width_ * height_ * components_);
 }
 
-bool Image::SaveBMP(const std::string& fileName)
+bool Image::SaveBMP(const String& fileName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if ((fileSystem) && (!fileSystem->CheckAccess(GetPath(fileName))))
@@ -155,12 +155,12 @@ bool Image::SaveBMP(const std::string& fileName)
     }
     
     if (data_)
-        return stbi_write_bmp(fileName.c_str(), width_, height_, components_, data_.GetPtr()) != 0;
+        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.GetPtr()) != 0;
     else
         return false;
 }
 
-bool Image::SaveTGA(const std::string& fileName)
+bool Image::SaveTGA(const String& fileName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if ((fileSystem) && (!fileSystem->CheckAccess(GetPath(fileName))))
@@ -176,7 +176,7 @@ bool Image::SaveTGA(const std::string& fileName)
     }
     
     if (data_)
-        return stbi_write_tga(fileName.c_str(), width_, height_, components_, data_.GetPtr()) != 0;
+        return stbi_write_tga(fileName.CString(), width_, height_, components_, data_.GetPtr()) != 0;
     else
         return false;
 }

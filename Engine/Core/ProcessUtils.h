@@ -23,27 +23,29 @@
 
 #pragma once
 
-#include <string>
+#include "StringBase.h"
+
 #include <vector>
 
 class Mutex;
 
 /// Display an error dialog with the specified title and message
 void ErrorDialog(const char* title, const char* message);
+/// Exit the application with an error message to the console
+void ErrorExit(const String& message, int exitCode = 1);
 /// Open a console window
 void OpenConsoleWindow();
+/// Print to the console. A newline will be added automatically
+void PrintLine(const String& str);
+/// Print to the console. A newline will be added automatically
+void PrintLine(const char* str);
 /// Return the static library init/shutdown mutex
 Mutex& GetStaticMutex();
 /// Parse arguments from the command line
-const std::vector<std::string>& ParseArguments(const char* cmdLine);
+const std::vector<String>& ParseArguments(const char* cmdLine);
 /// Return previously parsed arguments
-const std::vector<std::string>& GetArguments();
+const std::vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input
-std::string GetConsoleInput();
+String GetConsoleInput();
 /// Return the number of (logical) CPU cores
 unsigned GetNumCPUCores();
-
-#ifdef ENABLE_MINIDUMPS
-/// Write a minidump. Needs to be called from within a structured exception handler
-int WriteMiniDump(const char* applicationName, void* exceptionPointers);
-#endif

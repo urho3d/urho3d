@@ -24,8 +24,6 @@
 #include "Precompiled.h"
 #include "Quaternion.h"
 
-#include <iostream>
-
 const Quaternion Quaternion::IDENTITY;
 
 Quaternion::Quaternion(float angle, const Vector3& axis)

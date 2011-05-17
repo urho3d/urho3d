@@ -66,7 +66,7 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
     
-    ATTRIBUTE(Node, VAR_STRING, "Name", name_, std::string());
+    ATTRIBUTE(Node, VAR_STRING, "Name", name_, String());
     ATTRIBUTE(Node, VAR_VECTOR3, "Position", position_, Vector3::ZERO);
     ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY);
     ATTRIBUTE(Node, VAR_VECTOR3, "Scale", scale_, Vector3::UNITY);
@@ -194,7 +194,7 @@ void Node::PostLoad()
         children_[i]->PostLoad();
 }
 
-void Node::SetName(const std::string& name)
+void Node::SetName(const String& name)
 {
     name_ = name;
     nameHash_ = StringHash(name);
@@ -345,7 +345,7 @@ void Node::MarkDirty()
         (*i)->MarkDirty();
 }
 
-Node* Node::CreateChild(const std::string& name, bool local)
+Node* Node::CreateChild(const String& name, bool local)
 {
     Node* newNode = CreateChild(0, local);
     newNode->SetName(name);
@@ -536,7 +536,7 @@ Node* Node::GetChild(unsigned index) const
     return index < children_.size() ? children_[index].GetPtr() : 0;
 }
 
-Node* Node::GetChild(const std::string& name, bool recursive) const
+Node* Node::GetChild(const String& name, bool recursive) const
 {
     return GetChild(StringHash(name), recursive);
 }
@@ -664,7 +664,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     XMLElement compElem = source.GetChildElement("component");
     while (compElem)
     {
-        std::string typeName = compElem.GetString("type");
+        String typeName = compElem.GetString("type");
         Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), false);
         if (newComponent)
         {

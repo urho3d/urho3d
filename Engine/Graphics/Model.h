@@ -49,7 +49,7 @@ struct VertexBufferMorph
 struct ModelMorph
 {
     /// Morph name
-    std::string name_;
+    String name_;
     /// Morph name hash
     StringHash nameHash_;
     /// Current morph weight
@@ -116,7 +116,7 @@ public:
     /// Return vertex morph by index
     const ModelMorph* GetMorph(unsigned index) const;
     /// Return vertex morph by name
-    const ModelMorph* GetMorph(const std::string& name) const;
+    const ModelMorph* GetMorph(const String& name) const;
     /// Return vertex morph by name hash
     const ModelMorph* GetMorph(StringHash nameHash) const;
     

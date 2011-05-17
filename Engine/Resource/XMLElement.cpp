@@ -50,23 +50,23 @@ XMLElement::~XMLElement()
 {
 }
 
-XMLElement XMLElement::CreateChildElement(const std::string& name)
+XMLElement XMLElement::CreateChildElement(const String& name)
 {
     if ((!file_) || (!element_))
         return XMLElement();
     
-    TiXmlElement newElement(name.c_str());
+    TiXmlElement newElement(name.CString());
     element_->InsertEndChild(newElement);
     return XMLElement(file_, static_cast<TiXmlElement*>(element_->LastChild()));
 }
 
-bool XMLElement::RemoveChildElement(const std::string& name, bool last)
+bool XMLElement::RemoveChildElement(const String& name, bool last)
 {
     if ((!file_) || (!element_))
         return false;
     
     TiXmlNode* element;
-    if (name.empty())
+    if (name.Empty())
     {
         if (last)
             element = element_->LastChild();
@@ -76,9 +76,9 @@ bool XMLElement::RemoveChildElement(const std::string& name, bool last)
     else
     {
         if (last)
-            element = element_->LastChild(name.c_str());
+            element = element_->LastChild(name.CString());
         else
-            element = element_->FirstChild(name.c_str());
+            element = element_->FirstChild(name.CString());
     }
     
     if (element)
@@ -90,36 +90,36 @@ bool XMLElement::RemoveChildElement(const std::string& name, bool last)
     return false;
 }
 
-bool XMLElement::RemoveChildElements(const std::string& name)
+bool XMLElement::RemoveChildElements(const String& name)
 {
     if ((!file_) || (!element_))
         return false;
     
     TiXmlNode* element;
-    if (name.empty())
+    if (name.Empty())
     {
         while (element = element_->LastChild())
             element_->RemoveChild(element);
     }
     else
     {
-        while (element = element_->LastChild(name.c_str()))
+        while (element = element_->LastChild(name.CString()))
             element_->RemoveChild(element);
     }
     
     return true;
 }
 
-bool XMLElement::SetAttribute(const std::string& name, const std::string& value)
+bool XMLElement::SetAttribute(const String& name, const String& value)
 {
     if ((!file_) || (!element_))
         return false;
     
-    element_->SetAttribute(name.c_str(), value.c_str());
+    element_->SetAttribute(name.CString(), value.CString());
     return true;
 }
 
-bool XMLElement::SetBool(const std::string& name, bool value)
+bool XMLElement::SetBool(const String& name, bool value)
 {
     return SetAttribute(name, ToString(value));
 }
@@ -131,9 +131,9 @@ bool XMLElement::SetBoundingBox(const BoundingBox& value)
     return SetVector3("max", value.max_);
 }
 
-bool XMLElement::SetBuffer(const std::string& name, const void* data, unsigned size)
+bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
 {
-    std::string dataStr;
+    String dataStr;
     const unsigned char* bytes = (const unsigned char*)data;
     
     for (unsigned i = 0; i < size; ++i)
@@ -142,50 +142,50 @@ bool XMLElement::SetBuffer(const std::string& name, const void* data, unsigned s
     return SetAttribute(name, dataStr);
 }
 
-bool XMLElement::SetBuffer(const std::string& name, const std::vector<unsigned char>& value)
+bool XMLElement::SetBuffer(const String& name, const std::vector<unsigned char>& value)
 {
     if (!value.size())
-        return SetAttribute(name, std::string());
+        return SetAttribute(name, String());
     else
         return SetBuffer(name, &value[0], value.size());
 }
 
-bool XMLElement::SetColor(const std::string& name, const Color& value)
+bool XMLElement::SetColor(const String& name, const Color& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetFloat(const std::string& name, float value)
+bool XMLElement::SetFloat(const String& name, float value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetInt(const std::string& name, int value)
+bool XMLElement::SetInt(const String& name, int value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetIntRect(const std::string& name, const IntRect& value)
+bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetIntVector2(const std::string& name, const IntVector2& value)
+bool XMLElement::SetIntVector2(const String& name, const IntVector2& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetRect(const std::string& name, const Rect& value)
+bool XMLElement::SetRect(const String& name, const Rect& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetQuaternion(const std::string& name, const Quaternion& value)
+bool XMLElement::SetQuaternion(const String& name, const Quaternion& value)
 {
     return XMLElement::SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetString(const std::string& name, const std::string& value)
+bool XMLElement::SetString(const String& name, const String& value)
 {
     return SetAttribute(name, value);
 }
@@ -223,7 +223,7 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
     Context* context = file_->GetContext();
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
     
-    SetAttribute("value", std::string(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
+    SetAttribute("value", String(context->GetTypeName(value.type_)) + ";" + cache->GetResourceName(value.id_));
     return true;
 }
 
@@ -236,7 +236,7 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
     Context* context = file_->GetContext();
     ResourceCache* cache = file_->GetSubsystem<ResourceCache>();
     
-    std::string str(context->GetTypeName(value.type_));
+    String str(context->GetTypeName(value.type_));
     for (unsigned i = 0; i < value.ids_.size(); ++i)
     {
         str += ";";
@@ -281,74 +281,74 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
     return true;
 }
 
-bool XMLElement::SetVector2(const std::string& name, const Vector2& value)
+bool XMLElement::SetVector2(const String& name, const Vector2& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetVector3(const std::string& name, const Vector3& value)
+bool XMLElement::SetVector3(const String& name, const Vector3& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-bool XMLElement::SetVector4(const std::string& name, const Vector4& value)
+bool XMLElement::SetVector4(const String& name, const Vector4& value)
 {
     return SetAttribute(name, ToString(value));
 }
 
-std::string XMLElement::GetName() const
+String XMLElement::GetName() const
 {
     if ((!file_) || (!element_))
-        return std::string();
+        return String();
     
-    return std::string(element_->Value());
+    return String(element_->Value());
 }
 
-std::string XMLElement::GetText() const
+String XMLElement::GetText() const
 {
     if ((!file_) || (!element_))
-        return std::string();
+        return String();
     
     TiXmlNode* node = element_->FirstChild();
     if (node)
-        return std::string(node->Value());
+        return String(node->Value());
     else
-        return std::string();
+        return String();
 }
 
-bool XMLElement::HasChildElement(const std::string& name) const
+bool XMLElement::HasChildElement(const String& name) const
 {
     if ((!file_) || (!element_))
         return false;
     
-    if (element_->FirstChildElement(name.c_str()) != 0)
+    if (element_->FirstChildElement(name.CString()) != 0)
         return true;
     else
         return false;
 }
 
-XMLElement XMLElement::GetChildElement(const std::string& name) const
+XMLElement XMLElement::GetChildElement(const String& name) const
 {
     if ((!file_) || (!element_))
         return XMLElement();
     else
     {
-        if (name.empty())
+        if (name.Empty())
             return XMLElement(file_, element_->FirstChildElement());
         else
-            return XMLElement(file_, element_->FirstChildElement(name.c_str()));
+            return XMLElement(file_, element_->FirstChildElement(name.CString()));
     }
 }
 
-XMLElement XMLElement::GetNextElement(const std::string& name) const
+XMLElement XMLElement::GetNextElement(const String& name) const
 {
     if ((!file_) || (!element_))
         return XMLElement();
     
-    if (name.empty())
+    if (name.Empty())
         return XMLElement(file_, element_->NextSiblingElement());
     else
-        return XMLElement(file_, element_->NextSiblingElement(name.c_str()));
+        return XMLElement(file_, element_->NextSiblingElement(name.CString()));
 }
 
 XMLElement XMLElement::GetParentElement() const
@@ -376,42 +376,42 @@ unsigned XMLElement::GetNumAttributes() const
     return ret;
 }
 
-bool XMLElement::HasAttribute(const std::string& name) const
+bool XMLElement::HasAttribute(const String& name) const
 {
     if ((!file_) || (!element_))
         return false;
     
-    if (element_->Attribute(name.c_str()) != 0)
+    if (element_->Attribute(name.CString()) != 0)
         return true;
     else
         return false;
 }
 
-std::string XMLElement::GetAttribute(const std::string& name) const
+String XMLElement::GetAttribute(const String& name) const
 {
     if ((!file_) || (!element_))
-        return std::string();
+        return String();
     else
     {
-        const char* data = element_->Attribute(name.c_str());
+        const char* data = element_->Attribute(name.CString());
         
         if (!data)
-            return std::string();
+            return String();
         else
-            return std::string(data);
+            return String(data);
     }
 }
 
-std::vector<std::string> XMLElement::GetAttributeNames() const
+std::vector<String> XMLElement::GetAttributeNames() const
 {
-    std::vector<std::string> ret;
+    std::vector<String> ret;
     
     if ((file_) && (element_))
     {
         const TiXmlAttribute* attribute = element_->FirstAttribute();
         while (attribute)
         {
-            ret.push_back(std::string(attribute->Name()));
+            ret.push_back(String(attribute->Name()));
             attribute = attribute->Next();
         }
     }
@@ -419,7 +419,7 @@ std::vector<std::string> XMLElement::GetAttributeNames() const
     return ret;
 }
 
-bool XMLElement::GetBool(const std::string& name) const
+bool XMLElement::GetBool(const String& name) const
 {
     return ToBool(GetAttribute(name));
 }
@@ -434,10 +434,10 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-std::vector<unsigned char> XMLElement::GetBuffer(const std::string& name) const
+std::vector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
     std::vector<unsigned char> ret;
-    std::vector<std::string> bytes = Split(GetAttribute(name), ' ');
+    std::vector<String> bytes = Split(GetAttribute(name), ' ');
     
     ret.resize(bytes.size());
     for (unsigned i = 0; i < bytes.size(); ++i)
@@ -445,10 +445,10 @@ std::vector<unsigned char> XMLElement::GetBuffer(const std::string& name) const
     return ret;
 }
 
-bool XMLElement::GetBuffer(const std::string& name, void* dest, unsigned size) const
+bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
 {
     std::vector<unsigned char> ret;
-    std::vector<std::string> bytes = Split(GetAttribute(name), ' ');
+    std::vector<String> bytes = Split(GetAttribute(name), ' ');
     unsigned char* destBytes = (unsigned char*)dest;
     if (size < bytes.size())
         return false;
@@ -458,61 +458,61 @@ bool XMLElement::GetBuffer(const std::string& name, void* dest, unsigned size) c
     return true;
 }
 
-Color XMLElement::GetColor(const std::string& name) const
+Color XMLElement::GetColor(const String& name) const
 {
     return ToColor(GetAttribute(name));
 }
 
-float XMLElement::GetFloat(const std::string& name) const
+float XMLElement::GetFloat(const String& name) const
 {
     return ToFloat(GetAttribute(name));
 }
 
-int XMLElement::GetInt(const std::string& name) const
+int XMLElement::GetInt(const String& name) const
 {
     return ToInt(GetAttribute(name));
 }
 
-IntRect XMLElement::GetIntRect(const std::string& name) const
+IntRect XMLElement::GetIntRect(const String& name) const
 {
     return ToIntRect(GetAttribute(name));
 }
 
-IntVector2 XMLElement::GetIntVector2(const std::string& name) const
+IntVector2 XMLElement::GetIntVector2(const String& name) const
 {
     return ToIntVector2(GetAttribute(name));
 }
 
-Quaternion XMLElement::GetQuaternion(const std::string& name) const
+Quaternion XMLElement::GetQuaternion(const String& name) const
 {
     return ToQuaternion(GetAttribute(name));
 }
 
-Rect XMLElement::GetRect(const std::string& name) const
+Rect XMLElement::GetRect(const String& name) const
 {
     return ToRect(GetAttribute(name));
 }
 
-std::string XMLElement::GetString(const std::string& name) const
+String XMLElement::GetString(const String& name) const
 {
     return GetAttribute(name);
 }
 
-std::string XMLElement::GetStringLower(const std::string& name) const
+String XMLElement::GetStringLower(const String& name) const
 {
-    return ToLower(GetAttribute(name));
+    return GetAttribute(name).ToLower();
 }
 
-std::string XMLElement::GetStringUpper(const std::string& name) const
+String XMLElement::GetStringUpper(const String& name) const
 {
-    return ToUpper(GetAttribute(name));
+    return GetAttribute(name).ToUpper();
 }
 
 Variant XMLElement::GetVariant() const
 {
     Variant ret;
     
-    std::string type = ToLower(GetAttribute("type"));
+    String type = GetAttribute("type").ToLower();
     if (type == "resourceref")
         ret = GetResourceRef();
     else if (type == "resourcereflist")
@@ -531,7 +531,7 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
     
-    std::vector<std::string> values = Split(GetAttribute("value"), ';');
+    std::vector<String> values = Split(GetAttribute("value"), ';');
     if (values.size() == 2)
     {
         ret.type_ = ShortStringHash(values[0]);
@@ -545,7 +545,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    std::vector<std::string> values = Split(GetAttribute("value"), ';');
+    std::vector<String> values = Split(GetAttribute("value"), ';');
     if (values.size() >= 1)
     {
         ret.type_ = ShortStringHash(values[0]);
@@ -586,22 +586,22 @@ VariantMap XMLElement::GetVariantMap() const
     return ret;
 }
 
-Vector2 XMLElement::GetVector2(const std::string& name) const
+Vector2 XMLElement::GetVector2(const String& name) const
 {
     return ToVector2(GetAttribute(name));
 }
 
-Vector3 XMLElement::GetVector3(const std::string& name) const
+Vector3 XMLElement::GetVector3(const String& name) const
 {
     return ToVector3(GetAttribute(name));
 }
 
-Vector4 XMLElement::GetVector4(const std::string& name) const
+Vector4 XMLElement::GetVector4(const String& name) const
 {
     return ToVector4(GetAttribute(name));
 }
 
-Vector4 XMLElement::GetVector(const std::string& name) const
+Vector4 XMLElement::GetVector(const String& name) const
 {
     return ToVector4(GetAttribute(name), true);
 }

@@ -37,23 +37,24 @@
 #ifndef _MSC_VER
 #define _WIN32_IE 0x0400
 #endif
-#include <shlobj.h>
-
-#ifdef ENABLE_MINIDUMPS
-#include <dbghelp.h>
-#endif
+#include <ShlObj.h>
 
 #include "DebugNew.h"
 
-static bool miniDumpWritten = false;
 static bool consoleOpened = false;
-static std::string currentLine;
-static std::vector<std::string> arguments;
+static String currentLine;
+static std::vector<String> arguments;
 static Mutex staticMutex;
 
 void ErrorDialog(const char* title, const char* message)
 {
     MessageBox(0, message, title, 0);
+}
+
+void ErrorExit(const String& message, int exitCode)
+{
+    PrintLine(message);
+    exit(exitCode);
 }
 
 void OpenConsoleWindow()
@@ -78,24 +79,34 @@ void OpenConsoleWindow()
     consoleOpened = true;
 }
 
+void PrintLine(const String& str)
+{
+    PrintLine(str.CString());
+}
+
+void PrintLine(const char* str)
+{
+    printf("%s\n", str);
+}
+
 Mutex& GetStaticMutex()
 {
     return staticMutex;
 }
 
-const std::vector<std::string>& ParseArguments(const char* cmdLine)
+const std::vector<String>& ParseArguments(const char* cmdLine)
 {
     arguments.clear();
     
     if (!cmdLine)
         return arguments;
     
-    std::string cmdStr(cmdLine);
+    String cmdStr(cmdLine);
     unsigned cmdStart, cmdEnd;
     bool inCmd = false;
     bool inQuote = false;
     
-    for (unsigned i = 0; i < cmdStr.length(); ++i)
+    for (unsigned i = 0; i < cmdStr.Length(); ++i)
     {
         if (cmdStr[i] == '\"')
             inQuote = !inQuote;
@@ -105,7 +116,7 @@ const std::vector<std::string>& ParseArguments(const char* cmdLine)
             {
                 inCmd = false;
                 cmdEnd = i;
-                arguments.push_back(cmdStr.substr(cmdStart, cmdEnd - cmdStart));
+                arguments.push_back(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
             }
         }
         else
@@ -119,21 +130,21 @@ const std::vector<std::string>& ParseArguments(const char* cmdLine)
     }
     if (inCmd)
     {
-        cmdEnd = cmdStr.length();
-        arguments.push_back(cmdStr.substr(cmdStart, cmdEnd - cmdStart));
+        cmdEnd = cmdStr.Length();
+        arguments.push_back(cmdStr.Substring(cmdStart, cmdEnd - cmdStart));
     }
     
     return arguments;
 }
 
-const std::vector<std::string>& GetArguments()
+const std::vector<String>& GetArguments()
 {
     return arguments;
 }
 
-std::string GetConsoleInput()
+String GetConsoleInput()
 {
-    std::string ret;
+    String ret;
     
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE)
@@ -160,15 +171,15 @@ std::string GetConsoleInput()
                 if (c == '\b')
                 {
                     printf("\b \b");
-                    int length = currentLine.length();
+                    int length = currentLine.Length();
                     if (length)
-                        currentLine.resize(length - 1);
+                        currentLine.Resize(length - 1);
                 }
                 else if (c == '\r')
                 {
                     printf("\n");
                     ret = currentLine;
-                    currentLine.clear();
+                    currentLine.Clear();
                     return ret;
                 }
                 else
@@ -190,49 +201,3 @@ unsigned GetNumCPUCores()
     GetSystemInfo(&info);
     return info.dwNumberOfProcessors;
 }
-
-#ifdef ENABLE_MINIDUMPS
-int WriteMiniDump(const char* applicationName, void* exceptionPointers)
-{
-    // In case of recursive or repeating exceptions, only write the dump once
-    if (miniDumpWritten)
-        return EXCEPTION_EXECUTE_HANDLER;
-    
-    miniDumpWritten = true;
-    
-    MINIDUMP_EXCEPTION_INFORMATION info;
-    info.ThreadId = GetCurrentThreadId();
-    info.ExceptionPointers = (EXCEPTION_POINTERS*)exceptionPointers;
-    info.ClientPointers = TRUE;
-    
-    static time_t sysTime;
-    time(&sysTime);
-    const char* dateTime = ctime(&sysTime);
-    std::string dateTimeStr = std::string(dateTime);
-    ReplaceInPlace(dateTimeStr, "\n", "");
-    ReplaceInPlace(dateTimeStr, ":", "");
-    ReplaceInPlace(dateTimeStr, "/", "");
-    ReplaceInPlace(dateTimeStr, ' ', '_');
-    
-    char pathName[MAX_PATH];
-    pathName[0] = 0;
-    SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
-    std::string applicationNameStr(applicationName);
-    std::string miniDumpDir = std::string(pathName) + "\\" + applicationNameStr;
-    std::string miniDumpName = miniDumpDir + "\\" + applicationNameStr + "_" + dateTimeStr + ".dmp";
-    
-    CreateDirectory(miniDumpDir.c_str(), 0);
-    HANDLE file = CreateFile(miniDumpName.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,
-        0, CREATE_ALWAYS, 0, 0);
-    
-    BOOL success = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file, MiniDumpWithDataSegs, &info, 0, 0);
-    CloseHandle(file);
-    
-    if (success)
-        ErrorDialog(applicationName, std::string("An unexpected error occurred. A minidump was generated to " + miniDumpName).c_str());
-    else
-        ErrorDialog(applicationName, "An unexpected error occurred. Could not write minidump.");
-    
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-#endif

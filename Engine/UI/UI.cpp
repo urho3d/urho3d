@@ -303,7 +303,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
         return root;
     }
     
-    std::string type = rootElem.GetString("type");
+    String type = rootElem.GetString("type");
     root = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
     if (!root)
     {
@@ -312,7 +312,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     }
     root->SetName(rootElem.GetString("name"));
     
-    std::string styleName = rootElem.HasAttribute("style") ? rootElem.GetString("style") : rootElem.GetString("type");
+    String styleName = rootElem.HasAttribute("style") ? rootElem.GetString("style") : rootElem.GetString("type");
     // First set the base style from the style file if exists, then apply UI layout overrides
     if (styleFile)
         root->SetStyle(styleFile, styleName);
@@ -324,7 +324,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     return root;
 }
 
-void UI::SetClipBoardText(const std::string& text)
+void UI::SetClipBoardText(const String& text)
 {
     clipBoard_ = text;
 }
@@ -507,7 +507,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
     while (childElem)
     {
         // Create element
-        std::string type = childElem.GetString("type");
+        String type = childElem.GetString("type");
         SharedPtr<UIElement> child = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
         if (!child)
         {
@@ -521,7 +521,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
         current->AddChild(child);
         
         // First set the base style from the style file if exists, then apply UI layout overrides
-        std::string styleName = childElem.HasAttribute("style") ? childElem.GetString("style") : childElem.GetString("type");
+        String styleName = childElem.HasAttribute("style") ? childElem.GetString("style") : childElem.GetString("type");
         if (styleFile)
             child->SetStyle(styleFile, styleName);
         child->SetStyle(childElem);

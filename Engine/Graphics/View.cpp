@@ -51,7 +51,7 @@
 
 #include "StringUtils.h"
 
-static const std::string aaVariation[] = {
+static const String aaVariation[] = {
     "",
     "Ortho"
 };
@@ -1051,7 +1051,7 @@ void View::RenderBatchesDeferred()
         graphics_->SetPixelShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
         
         unsigned index = camera_->IsOrthographic() ? 1 : 0;
-        std::string shaderName = "TemporalAA_" + aaVariation[index];
+        String shaderName = "TemporalAA_" + aaVariation[index];
         
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader(shaderName),
             renderer_->GetPixelShader(shaderName), false);

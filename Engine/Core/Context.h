@@ -48,7 +48,7 @@ public:
     /// Register object attribute
     void RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute
-    void RemoveAttribute(ShortStringHash objectType, const std::string& name);
+    void RemoveAttribute(ShortStringHash objectType, const String& name);
     /// Copy base class attributes to derived class
     void CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType);
     /// Add event receiver
@@ -139,7 +139,7 @@ public:
     /// Return active event handler. Set by Object. Null outside event handling
     EventHandler* GetHandler() const { return handler_; }
     /// Return object type name from hash, or empty if unknown
-    const std::string& GetTypeName(ShortStringHash type) const;
+    const String& GetTypeName(ShortStringHash type) const;
     /// Template version of returning a subsystem
     template <class T> T* GetSubsystem() const;
     

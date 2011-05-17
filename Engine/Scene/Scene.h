@@ -123,7 +123,7 @@ public:
     /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress
     float GetAsyncProgress() const;
     /// Return source file name
-    const std::string& GetFileName() const { return fileName_; }
+    const String& GetFileName() const { return fileName_; }
     /// Return source file checksum
     unsigned GetChecksum() const { return checksum_; }
     /// Return required package files
@@ -165,7 +165,7 @@ private:
     /// Asynchronous loading progress
     AsyncProgress asyncProgress_;
     /// Source file name
-    std::string fileName_;
+    String fileName_;
     /// Required package files for multiplayer
     std::vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Next free non-local node ID

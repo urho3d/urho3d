@@ -21,53 +21,9 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
-#include "Log.h"
-#include "Resource.h"
+#pragma once
 
-OBJECTTYPESTATIC(Resource);
-
-Resource::Resource(Context* context) :
-    Object(context),
-    memoryUse_(0)
-{
-}
-
-bool Resource::Load(Deserializer& src)
-{
-    return false;
-}
-
-bool Resource::Save(Serializer& dest)
-{
-    LOGERROR("Save not supported for " + GetTypeName());
-    return false;
-}
-
-void Resource::SetName(const String& name)
-{
-    name_ = name;
-    nameHash_ = StringHash(name);
-}
-
-void Resource::SetMemoryUse(unsigned size)
-{
-    memoryUse_ = size;
-}
-
-void Resource::ResetUseTimer()
-{
-    useTimer_.Reset();
-}
-
-unsigned Resource::GetUseTimer()
-{
-    // If more references than the resource cache, return always 0 & reset the timer
-    if (GetRefCount() > 1)
-    {
-        useTimer_.Reset();
-        return 0;
-    }
-    else
-        return useTimer_.GetMSec(false);
-}
+#ifdef ENABLE_MINIDUMPS
+/// Write a minidump. Needs to be called from within a structured exception handler
+int WriteMiniDump(const char* applicationName, void* exceptionPointers);
+#endif

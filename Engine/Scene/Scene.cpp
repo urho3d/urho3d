@@ -274,7 +274,7 @@ void Scene::Clear()
 {
     RemoveAllChildren();
     RemoveAllComponents();
-    fileName_ = std::string();
+    fileName_ = String();
     checksum_ = 0;
 }
 

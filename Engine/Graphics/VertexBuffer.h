@@ -95,7 +95,7 @@ public:
     /// Vertex element sizes
     static const unsigned elementSize[];
     /// Vertex element names
-    static const std::string elementName[];
+    static const String elementName[];
     
 private:
     /// Update offsets of vertex elements

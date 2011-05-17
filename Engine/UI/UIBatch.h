@@ -28,8 +28,6 @@
 #include "Rect.h"
 #include "GraphicsDefs.h"
 
-#include <vector>
-
 class PixelShader;
 class Graphics;
 class Texture;

@@ -41,7 +41,7 @@ class XMLFile;
 struct FileSelectorEntry
 {
     /// Name
-    std::string name_;
+    String name_;
     /// Directory flag
     bool directory_;
 };
@@ -62,15 +62,15 @@ public:
     /// Set fileselector UI style
     void SetStyle(XMLFile* style);
     /// Set title text
-    void SetTitle(const std::string& text);
+    void SetTitle(const String& text);
     /// Set button texts
-    void SetButtonTexts(const std::string& okText, const std::string& cancelText);
+    void SetButtonTexts(const String& okText, const String& cancelText);
     /// Set current path
-    void SetPath(const std::string& path);
+    void SetPath(const String& path);
     /// Set current filename
-    void SetFileName(const std::string& fileName);
+    void SetFileName(const String& fileName);
     /// Set filters
-    void SetFilters(const std::vector<std::string>& filters, unsigned defaultIndex);
+    void SetFilters(const std::vector<String>& filters, unsigned defaultIndex);
     /// Set directory selection mode. Default false
     void SetDirectoryMode(bool enable);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements
@@ -97,11 +97,11 @@ public:
     /// Return close button
     Button* GetCloseButton() const { return closeButton_; }
     /// Return current path
-    const std::string& GetPath() const { return path_; }
+    const String& GetPath() const { return path_; }
     /// Return current filename
-    const std::string& GetFileName() const;
+    const String& GetFileName() const;
     /// Return current filter
-    const std::string& GetFilter() const;
+    const String& GetFilter() const;
     /// Return current filter index
     unsigned GetFilterIndex() const;
     /// Return directory mode flag
@@ -109,7 +109,7 @@ public:
     
 private:
     /// Set the text of an edit field and ignore the resulting event
-    void SetLineEditText(LineEdit* edit, const std::string& text);
+    void SetLineEditText(LineEdit* edit, const String& text);
     /// Refresh the directory listing
     void RefreshFiles();
     /// Enter a directory or confirm a file. Return true if a directory entered
@@ -162,13 +162,13 @@ private:
     /// Button layout
     SharedPtr<UIElement> buttonLayout_;
     /// Current path
-    std::string path_;
+    String path_;
     /// Filters
-    std::vector<std::string> filters_;
+    std::vector<String> filters_;
     /// File entries
     std::vector<FileSelectorEntry> fileEntries_;
     /// Filter used to get the file list
-    std::string lastUsedFilter_;
+    String lastUsedFilter_;
     /// Directory mode flag
     bool directoryMode_;
     /// Ignore events flag, used when changing line edits manually

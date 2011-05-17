@@ -57,7 +57,7 @@ public:
     ~Script();
     
     /// Compile and execute a line of script in immediate mode
-    bool Execute(const std::string& line);
+    bool Execute(const String& line);
     /// Perform garbage collection
     void GarbageCollect(bool fullCycle);
     /// Set immediate mode script file
@@ -90,7 +90,7 @@ public:
     /// Return logging mode
     ScriptLogMode GetLogMode() const { return logMode_; }
     /// Return retained mode log messages
-    const std::string& GetLogMessages() const { return logMessages_; }
+    const String& GetLogMessages() const { return logMessages_; }
     
     /// Increase script nesting level
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
@@ -105,7 +105,7 @@ public:
     
 private:
     /// Output a sanitated row of script API
-    void OutputAPIRow(const std::string& row, bool removeReference = false);
+    void OutputAPIRow(const String& row, bool removeReference = false);
     
     /// AngelScript engine
     asIScriptEngine* scriptEngine_;
@@ -126,7 +126,7 @@ private:
     /// Script engine logging mode
     ScriptLogMode logMode_;
     /// Retained mode log messages
-    std::string logMessages_;
+    String logMessages_;
     /// Current script execution nesting level
     unsigned scriptNestingLevel_;
 };

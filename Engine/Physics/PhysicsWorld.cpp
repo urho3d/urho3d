@@ -460,18 +460,18 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (std::map<std::string, SharedPtr<TriangleMeshData> >::iterator i = triangleMeshCache_.begin();
+    for (std::map<String, SharedPtr<TriangleMeshData> >::iterator i = triangleMeshCache_.begin();
         i != triangleMeshCache_.end();)
     {
-        std::map<std::string, SharedPtr<TriangleMeshData> >::iterator current = i++;
+        std::map<String, SharedPtr<TriangleMeshData> >::iterator current = i++;
         if (current->second.GetRefCount() == 1)
             triangleMeshCache_.erase(current);
     }
     
-    for (std::map<std::string, SharedPtr<HeightfieldData> >::iterator i = heightfieldCache_.begin();
+    for (std::map<String, SharedPtr<HeightfieldData> >::iterator i = heightfieldCache_.begin();
         i != heightfieldCache_.end();)
     {
-        std::map<std::string, SharedPtr<HeightfieldData> >::iterator current = i++;
+        std::map<String, SharedPtr<HeightfieldData> >::iterator current = i++;
         if (current->second.GetRefCount() == 1)
             heightfieldCache_.erase(current);
     }

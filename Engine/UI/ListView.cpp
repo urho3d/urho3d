@@ -34,7 +34,7 @@
 
 static const ShortStringHash indentHash("Indent");
 
-static const std::string highlightModes[] =
+static const String highlightModes[] =
 {
     "never",
     "focus",
@@ -100,7 +100,7 @@ void ListView::SetStyle(const XMLElement& element)
     
     if (element.HasChildElement("highlight"))
     {
-        std::string highlight = element.GetChildElement("highlight").GetStringLower("value");
+        String highlight = element.GetChildElement("highlight").GetStringLower("value");
         SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, 3, 1));
     }
     if (element.HasChildElement("multiselect"))

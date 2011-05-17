@@ -119,16 +119,16 @@ void VertexShader::LoadParameters()
     
     ClearParameters();
     
-    std::string shaderPath, shaderName, shaderExt;
+    String shaderPath, shaderName, shaderExt;
     SplitPath(GetName(), shaderPath, shaderName, shaderExt);
     
-    isSM3_ = (shaderExt.find('3') != std::string::npos);
+    isSM3_ = (shaderExt.Find('3') != String::NPOS);
     
     // Take the first part of the shader name (shader group)
-    size_t index = 2;
-    while ((index < shaderName.length()) && (shaderName[index] != '_'))
-        index++;
-    std::string shaderGroup = shaderName.substr(0, index);
+    unsigned index = 2;
+    while ((index < shaderName.Length()) && (shaderName[index] != '_'))
+        ++index;
+    String shaderGroup = shaderName.Substring(0, index);
     
     // Load shader information XML file
     XMLFile* file = cache->GetResource<XMLFile>(shaderPath + shaderGroup + ".xml");
@@ -142,7 +142,7 @@ void VertexShader::LoadParameters()
     
     while (paramElem)
     {
-        std::string name = paramElem.GetString("name");
+        String name = paramElem.GetString("name");
         VSParameter param = graphics_->GetVSParameter(name);
         if (param != MAX_VS_PARAMETERS)
             graphics_->SetVSRegister(param, paramElem.GetInt("index"));
@@ -156,15 +156,15 @@ void VertexShader::LoadParameters()
     XMLElement shaderElem = shadersElem.GetChildElement("shader");
     while (shaderElem)
     {
-        std::string name = shaderElem.GetString("name");
-        std::string type = shaderElem.GetStringLower("type");
+        String name = shaderElem.GetString("name");
+        String type = shaderElem.GetStringLower("type");
         
         if ((name == shaderName) && (type == "vs"))
         {
             XMLElement shaderParamElem = shaderElem.GetChildElement("parameter");
             while (shaderParamElem)
             {
-                std::string name = shaderParamElem.GetString("name");
+                String name = shaderParamElem.GetString("name");
                 VSParameter param = graphics_->GetVSParameter(name);
                 if (param != MAX_VS_PARAMETERS)
                     useParameter_[param] = true;

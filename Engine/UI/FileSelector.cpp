@@ -39,7 +39,7 @@
 
 #include "DebugNew.h"
 
-static const std::string emptyFilter;
+static const String emptyFilter;
 
 static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry& rhs)
 {
@@ -114,7 +114,7 @@ FileSelector::FileSelector(Context* context) :
     if (ui)
         ui->GetRootElement()->AddChild(window_);
     
-    std::vector<std::string> defaultFilters;
+    std::vector<String> defaultFilters;
     defaultFilters.push_back("*.*");
     SetFilters(defaultFilters, 0);
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
@@ -192,18 +192,18 @@ void FileSelector::SetStyle(XMLFile* style)
     UpdateElements();
 }
 
-void FileSelector::SetTitle(const std::string& text)
+void FileSelector::SetTitle(const String& text)
 {
     titleText_->SetText(text);
 }
 
-void FileSelector::SetButtonTexts(const std::string& okText, const std::string& cancelText)
+void FileSelector::SetButtonTexts(const String& okText, const String& cancelText)
 {
     okButtonText_->SetText(okText);
     cancelButtonText_->SetText(cancelText);
 }
 
-void FileSelector::SetPath(const std::string& path)
+void FileSelector::SetPath(const String& path)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (!fileSystem)
@@ -223,12 +223,12 @@ void FileSelector::SetPath(const std::string& path)
     }
 }
 
-void FileSelector::SetFileName(const std::string& fileName)
+void FileSelector::SetFileName(const String& fileName)
 {
     SetLineEditText(fileNameEdit_, fileName);
 }
 
-void FileSelector::SetFilters(const std::vector<std::string>& filters, unsigned defaultIndex)
+void FileSelector::SetFilters(const std::vector<String>& filters, unsigned defaultIndex)
 {
     if (filters.empty())
         return;
@@ -277,12 +277,12 @@ void FileSelector::UpdateElements()
     buttonLayout_->SetFixedHeight(Max(okButton_->GetHeight(), cancelButton_->GetHeight()));
 }
 
-const std::string& FileSelector::GetFileName() const
+const String& FileSelector::GetFileName() const
 {
     return fileNameEdit_->GetText();
 }
 
-const std::string& FileSelector::GetFilter() const
+const String& FileSelector::GetFilter() const
 {
     Text* selectedFilter = static_cast<Text*>(filterList_->GetSelectedItem());
     if (selectedFilter)
@@ -296,7 +296,7 @@ unsigned FileSelector::GetFilterIndex() const
     return filterList_->GetSelection();
 }
 
-void FileSelector::SetLineEditText(LineEdit* edit, const std::string& text)
+void FileSelector::SetLineEditText(LineEdit* edit, const String& text)
 {
     ignoreEvents_ = true;
     edit->SetText(text);
@@ -314,8 +314,8 @@ void FileSelector::RefreshFiles()
     fileList_->RemoveAllItems();
     fileEntries_.clear();
     
-    std::vector<std::string> directories;
-    std::vector<std::string> files;
+    std::vector<String> directories;
+    std::vector<String> files;
     fileSystem->ScanDir(directories, path_, "*.*", SCAN_DIRS, false);
     fileSystem->ScanDir(files, path_, GetFilter(), SCAN_FILES, false);
     
@@ -342,7 +342,7 @@ void FileSelector::RefreshFiles()
     listContent->DisableLayoutUpdate();
     for (unsigned i = 0; i < fileEntries_.size(); ++i)
     {
-        std::string displayName;
+        String displayName;
         if (fileEntries_[i].directory_)
             displayName = "<DIR> " + fileEntries_[i].name_;
         else
@@ -359,7 +359,7 @@ void FileSelector::RefreshFiles()
     ignoreEvents_ = false;
     
     // Clear filename from the previous dir so that there is no confusion
-    SetFileName(std::string());
+    SetFileName(String());
     lastUsedFilter_ = GetFilter();
 }
 
@@ -372,12 +372,12 @@ bool FileSelector::EnterFile()
     if (fileEntries_[index].directory_)
     {
         // If a directory doubleclicked, enter it. Recognize . and .. as a special case
-        const std::string& newPath = fileEntries_[index].name_;
+        const String& newPath = fileEntries_[index].name_;
         if ((newPath != ".") &&  (newPath != ".."))
             SetPath(path_ + newPath);
         else if (newPath == "..")
         {
-            std::string parentPath = GetParentPath(path_);
+            String parentPath = GetParentPath(path_);
             SetPath(parentPath);
         }
         
@@ -460,11 +460,11 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
     if (ignoreEvents_)
         return;
     
-    const std::string& fileName = GetFileName();
+    const String& fileName = GetFileName();
     
     if (!directoryMode_)
     {
-        if (!fileName.empty())
+        if (!fileName.Empty())
         {
             using namespace FileSelected;
             
@@ -474,7 +474,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
             SendEvent(E_FILESELECTED, newEventData);
         }
     }
-    else if ((eventType == E_RELEASED) && (!path_.empty()))
+    else if ((eventType == E_RELEASED) && (!path_.Empty()))
     {
         using namespace FileSelected;
         
@@ -493,7 +493,7 @@ void FileSelector::HandleCancelPressed(StringHash eventType, VariantMap& eventDa
     using namespace FileSelected;
     
     VariantMap newEventData;
-    newEventData[P_FILENAME] = std::string();
+    newEventData[P_FILENAME] = String();
     newEventData[P_OK] = false;
     SendEvent(E_FILESELECTED, newEventData);
 }

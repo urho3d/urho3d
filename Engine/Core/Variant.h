@@ -247,7 +247,7 @@ public:
     }
     
     /// Construct from a string
-    Variant(const std::string& value) :
+    Variant(const String& value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -303,7 +303,7 @@ public:
     }
     
     /// Construct from type and value
-    Variant(const std::string& type, const std::string& value) :
+    Variant(const String& type, const String& value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
@@ -420,10 +420,10 @@ public:
     }
     
     /// Assign from a string
-    Variant& operator = (const std::string& rhs)
+    Variant& operator = (const String& rhs)
     {
         SetType(VAR_STRING);
-        *(reinterpret_cast<std::string*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<String*>(value_.ptr_)) = rhs;
         return *this;
     }
     
@@ -431,7 +431,7 @@ public:
     Variant& operator = (const char* rhs)
     {
         SetType(VAR_STRING);
-        *(reinterpret_cast<std::string*>(value_.ptr_)) = std::string(rhs);
+        *(reinterpret_cast<String*>(value_.ptr_)) = String(rhs);
         return *this;
     }
 
@@ -574,10 +574,10 @@ public:
     }
     
     /// Test for equality with a string. To return true, both the type and value must match
-    bool operator == (const std::string& rhs) const
+    bool operator == (const String& rhs) const
     {
         if (type_ == VAR_STRING)
-            return *(reinterpret_cast<const std::string*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const String*>(value_.ptr_)) == rhs;
         else
             return false;
     }
@@ -671,7 +671,7 @@ public:
     /// Test for inequality with a Quaternion
     bool operator != (const Quaternion& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a string
-    bool operator != (const std::string& rhs) const { return !(*this == rhs); }
+    bool operator != (const String& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a buffer
     bool operator != (const std::vector<unsigned char>& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a pointer
@@ -690,7 +690,7 @@ public:
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     
     /// Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported
-    void FromString(const std::string& type, const std::string& value);
+    void FromString(const String& type, const String& value);
     /// Set buffer type from a memory area
     void SetBuffer(const void* data, unsigned size);
     
@@ -783,11 +783,11 @@ public:
     }
     
     /// Return string or empty on type mismatch
-    const std::string& GetString() const
+    const String& GetString() const
     {
         if (type_ != VAR_STRING)
             return emptyString;
-        return *reinterpret_cast<const std::string*>(value_.ptr_);
+        return *reinterpret_cast<const String*>(value_.ptr_);
     }
     
     /// Return buffer or empty on type mismatch
@@ -843,12 +843,12 @@ public:
     /// Return type
     VariantType GetType() const { return type_; }
     /// Return type name
-    const std::string& GetTypeName() const;
+    const String& GetTypeName() const;
     /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty
-    std::string ToString() const;
+    String ToString() const;
     
     /// Return type name for enum value
-    static const std::string& GetTypeName(VariantType type);
+    static const String& GetTypeName(VariantType type);
     
     /// Empty variant
     static const Variant EMPTY;
@@ -863,7 +863,7 @@ private:
     VariantValue value_;
     
     /// Empty string
-    static const std::string emptyString;
+    static const String emptyString;
     /// Empty buffer
     static const std::vector<unsigned char> emptyBuffer;
     /// Empty object reference

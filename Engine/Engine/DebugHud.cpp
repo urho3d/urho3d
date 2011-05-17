@@ -101,7 +101,7 @@ void DebugHud::Update(float timeStep)
     
     if (statsText_->IsVisible())
     {
-        std::string stats = 
+        String stats = 
             "Triangles " + ToString(graphics->GetNumPrimitives()) +
             "\nBatches " + ToString(graphics->GetNumBatches()) +
             "\nViews " + ToString(renderer->GetNumViews()) + 
@@ -114,7 +114,7 @@ void DebugHud::Update(float timeStep)
     
     if (modeText_->IsVisible())
     {
-        std::string mode;
+        String mode;
         
         RenderMode renderMode = graphics->GetRenderMode();
         if (renderMode == RENDER_FORWARD)
@@ -198,7 +198,7 @@ void DebugHud::Update(float timeStep)
         {
             if (profilerText_->IsVisible())
             {
-                std::string profilerOutput = profiler->GetData(false, true, false);
+                String profilerOutput = profiler->GetData(false, true, false);
                 profilerText_->SetText(profilerOutput);
             }
             

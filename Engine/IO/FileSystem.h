@@ -47,65 +47,65 @@ public:
     ~FileSystem();
     
     /// Set the current working directory
-    bool SetCurrentDir(const std::string& pathName);
+    bool SetCurrentDir(const String& pathName);
     /// Create a directory
-    bool CreateDir(const std::string& pathName);
+    bool CreateDir(const String& pathName);
     /// Run a program using the command interpreter, block until it exits and return the exit code. Will fail if any allowed paths are defined
-    int SystemCommand(const std::string& commandLine);
+    int SystemCommand(const String& commandLine);
     /// Run a specific program, block until it exists and return the exit code. Will fail if any allowed paths are defined
-    int SystemRun(const std::string& fileName, const std::vector<std::string>& arguments);
+    int SystemRun(const String& fileName, const std::vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined
-    bool SystemOpen(const std::string& fileName, const std::string& mode = std::string());
+    bool SystemOpen(const String& fileName, const String& mode = String());
     /// Copy a file. Return true if successful
-    bool Copy(const std::string& srcFileName, const std::string& destFileName);
+    bool Copy(const String& srcFileName, const String& destFileName);
     /// Rename a file. Return true if successful
-    bool Rename(const std::string& srcFileName, const std::string& destFileName);
+    bool Rename(const String& srcFileName, const String& destFileName);
     /// Delete a file. Return true if successful
-    bool Delete(const std::string& fileName);
+    bool Delete(const String& fileName);
     /// Register a path as being allowed to access
-    void RegisterPath(const std::string& pathName);
+    void RegisterPath(const String& pathName);
     
     /// Return the absolute current working directory
-    std::string GetCurrentDir();
+    String GetCurrentDir();
     /// Check if a path is allowed to be accessed. If no paths defined, all are allowed
-    bool CheckAccess(const std::string& pathName);
+    bool CheckAccess(const String& pathName);
     /// Check if a file exists
-    bool FileExists(const std::string& fileName);
+    bool FileExists(const String& fileName);
     /// Check if a directory exists
-    bool DirExists(const std::string& pathName);
+    bool DirExists(const String& pathName);
     /// Scan a directory for specified files
-    void ScanDir(std::vector<std::string>& result, const std::string& pathName, const std::string& filter, unsigned flags, bool recursive);
+    void ScanDir(std::vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive);
     /// Return the program's directory
-    std::string GetProgramDir();
+    String GetProgramDir();
     /// Return the user documents directory
-    std::string GetUserDocumentsDir();
+    String GetUserDocumentsDir();
     /// Return the system fonts directory
-    std::string GetSystemFontDir();
+    String GetSystemFontDir();
     
 private:
     /// Scan directory, called internally
-    void ScanDirInternal(std::vector<std::string>& result, std::string path, const std::string& startPath,
-        const std::string& filter, unsigned flags, bool recursive);
+    void ScanDirInternal(std::vector<String>& result, String path, const String& startPath,
+        const String& filter, unsigned flags, bool recursive);
     
     /// Allowed directories
-    std::set<std::string> allowedPaths_;
+    std::set<String> allowedPaths_;
 };
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase
-void SplitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension);
+void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension);
 /// Return the path from a full path
-std::string GetPath(const std::string& fullPath);
+String GetPath(const String& fullPath);
 /// Return the filename from a full path
-std::string GetFileName(const std::string& fullPath);
+String GetFileName(const String& fullPath);
 /// Return the extension from a full path, converted to lowercase
-std::string GetExtension(const std::string& fullPath);
+String GetExtension(const String& fullPath);
 /// Return the filename and extension from a full path. The extension will be converted to lowercase
-std::string GetFileNameAndExtension(const std::string& fullPath);
+String GetFileNameAndExtension(const String& fullPath);
 /// Fix a path so that it contains a slash in the end, and convert backslashes to slashes
-std::string AddTrailingSlash(const std::string& pathName);
+String AddTrailingSlash(const String& pathName);
 /// Remove the slash or backslash from the end of a path if exists
-std::string RemoveTrailingSlash(const std::string& pathName);
+String RemoveTrailingSlash(const String& pathName);
 /// Return the parent path, or the path itself if not available
-std::string GetParentPath(const std::string& pathName);
+String GetParentPath(const String& pathName);
 /// Convert a path to the format required by the operating system
-std::string GetNativePath(const std::string& pathName, bool forNativeApi = false);
+String GetNativePath(const String& pathName, bool forNativeApi = false);

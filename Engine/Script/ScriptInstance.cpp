@@ -41,7 +41,7 @@
 
 #include "DebugNew.h"
 
-static const std::string methodDeclarations[] = {
+static const String methodDeclarations[] = {
     "void Start()",
     "void Stop()",
     "void Update(float)",
@@ -78,7 +78,7 @@ void ScriptInstance::RegisterObject(Context* context)
     context->RegisterFactory<ScriptInstance>();
     
     ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", scriptFile_, ResourceRef(ScriptFile::GetTypeStatic()));
-    ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", className_, std::string());
+    ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", className_, String());
     ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true);
     ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", fixedUpdateFps_, 0);
     ATTRIBUTE_MODE(ScriptInstance, VAR_FLOAT, "Time Accumulator", fixedUpdateAcc_, 0.0f, AM_SERIALIZATION);
@@ -159,9 +159,9 @@ void ScriptInstance::PostLoad()
         scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTLOAD]);
 }
 
-bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const std::string& className)
+bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& className)
 {
-    className_ = std::string(); // Do not create object during SetScriptFile()
+    className_ = String(); // Do not create object during SetScriptFile()
     SetScriptFile(scriptFile);
     SetClassName(className);
     return scriptObject_ != 0;
@@ -191,7 +191,7 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
     CreateObject();
 }
 
-void ScriptInstance::SetClassName(const std::string& className)
+void ScriptInstance::SetClassName(const String& className)
 {
     if ((className == className_) && (scriptObject_))
         return;
@@ -214,7 +214,7 @@ void ScriptInstance::SetFixedUpdateFps(int fps)
     fixedPostUpdateAcc_ = 0.0f;
 }
 
-bool ScriptInstance::Execute(const std::string& declaration, const VariantVector& parameters)
+bool ScriptInstance::Execute(const String& declaration, const VariantVector& parameters)
 {
     if (!scriptObject_)
         return false;
@@ -231,7 +231,7 @@ bool ScriptInstance::Execute(asIScriptFunction* method, const VariantVector& par
     return scriptFile_->Execute(scriptObject_, method, parameters);
 }
 
-void ScriptInstance::DelayedExecute(float delay, const std::string& declaration, const VariantVector& parameters)
+void ScriptInstance::DelayedExecute(float delay, const String& declaration, const VariantVector& parameters)
 {
     if (!scriptObject_)
         return;
@@ -256,12 +256,12 @@ void ScriptInstance::ClearDelayedExecute()
     delayedMethodCalls_.clear();
 }
 
-void ScriptInstance::AddEventHandler(StringHash eventType, const std::string& handlerName)
+void ScriptInstance::AddEventHandler(StringHash eventType, const String& handlerName)
 {
     if (!scriptObject_)
         return;
     
-    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
@@ -277,7 +277,7 @@ void ScriptInstance::AddEventHandler(StringHash eventType, const std::string& ha
     SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
 }
 
-void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const std::string& handlerName)
+void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
 {
     if (!scriptObject_)
         return;
@@ -288,7 +288,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
         return;
     }
     
-    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* method = scriptFile_->GetMethod(scriptObject_, declaration);
     if (!method)
     {
@@ -306,7 +306,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
 
 void ScriptInstance::CreateObject()
 {
-    if ((!scriptFile_) || (className_.empty()))
+    if ((!scriptFile_) || (className_.Empty()))
         return;
     
     scriptObject_ = scriptFile_->CreateObject(className_);
@@ -576,6 +576,6 @@ void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& ev
 
 void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
 {
-    if (!className_.empty())
+    if (!className_.Empty())
         CreateObject();
 }

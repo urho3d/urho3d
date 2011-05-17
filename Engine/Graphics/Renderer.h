@@ -239,9 +239,9 @@ public:
     /// Return the default spotlight attenuation texture
     Texture2D* GetDefaultLightSpot() const { return defaultLightSpot; }
     /// Return a vertex shader by name
-    VertexShader* GetVertexShader(const std::string& name, bool checkExists = false) const;
+    VertexShader* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name
-    PixelShader* GetPixelShader(const std::string& name, bool checkExists = false) const;
+    PixelShader* GetPixelShader(const String& name, bool checkExists = false) const;
     /// Return the frame update parameters
     const FrameInfo& GetFrameInfo() { return frame_; }
     
@@ -357,13 +357,13 @@ private:
     /// Techniques for which missing shader error has been displayed
     std::set<Technique*> shaderErrorDisplayed_;
     /// Vertex shader format
-    std::string vsFormat_;
+    String vsFormat_;
     /// Pixel shader format
-    std::string psFormat_;
+    String psFormat_;
     /// Base directory for shaders
-    std::string shaderPath_;
+    String shaderPath_;
     /// Light shader base name (deferred and prepass have different light shaders)
-    std::string lightShaderName_;
+    String lightShaderName_;
     /// Number of views
     unsigned numViews_;
     /// Number of shadow cameras

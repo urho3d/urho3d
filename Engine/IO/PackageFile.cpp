@@ -36,7 +36,7 @@ PackageFile::PackageFile(Context* context) :
 {
 }
 
-PackageFile::PackageFile(Context* context, const std::string& fileName) :
+PackageFile::PackageFile(Context* context, const String& fileName) :
     Object(context),
     totalSize_(0),
     checksum_(0)
@@ -48,7 +48,7 @@ PackageFile::~PackageFile()
 {
 }
 
-bool PackageFile::Open(const std::string& fileName)
+bool PackageFile::Open(const String& fileName)
 {
     SharedPtr<File> file(new File(context_, fileName));
     if (!file->IsOpen())
@@ -70,7 +70,7 @@ bool PackageFile::Open(const std::string& fileName)
     
     for (unsigned i = 0; i < numFiles; ++i)
     {
-        std::string entryName = file->ReadString();
+        String entryName = file->ReadString();
         PackageEntry newEntry;
         newEntry.offset_ = file->ReadUInt();
         newEntry.size_ = file->ReadUInt();
@@ -78,20 +78,20 @@ bool PackageFile::Open(const std::string& fileName)
         if (newEntry.offset_ + newEntry.size_ > totalSize_)
             LOGERROR("File entry " + entryName + " outside package file");
         else
-            entries_[ToLower(entryName)] = newEntry;
+            entries_[entryName.ToLower()] = newEntry;
     }
     
     return true;
 }
 
-bool PackageFile::Exists(const std::string& fileName) const
+bool PackageFile::Exists(const String& fileName) const
 {
-    return entries_.find(ToLower(fileName)) != entries_.end();
+    return entries_.find(fileName.ToLower()) != entries_.end();
 }
 
-const PackageEntry* PackageFile::GetEntry(const std::string& fileName) const
+const PackageEntry* PackageFile::GetEntry(const String& fileName) const
 {
-    std::map<std::string, PackageEntry>::const_iterator i = entries_.find(ToLower(fileName));
+    std::map<String, PackageEntry>::const_iterator i = entries_.find(fileName.ToLower());
     if (i == entries_.end())
         return 0;
     

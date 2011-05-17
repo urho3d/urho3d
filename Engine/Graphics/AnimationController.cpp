@@ -36,7 +36,7 @@
 
 #include "DebugNew.h"
 
-static std::string noBoneName;
+static String noBoneName;
 
 OBJECTTYPESTATIC(AnimationController);
 
@@ -165,7 +165,7 @@ void AnimationController::Update(float timeStep)
     }
 }
 
-bool AnimationController::Play(const std::string& name, int layer, bool looped, float fadeInTime)
+bool AnimationController::Play(const String& name, int layer, bool looped, float fadeInTime)
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
@@ -207,13 +207,13 @@ bool AnimationController::Play(const std::string& name, int layer, bool looped, 
     return true;
 }
 
-bool AnimationController::PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime)
+bool AnimationController::PlayExclusive(const String& name, int layer, bool looped, float fadeTime)
 {
     FadeOthers(name, 0.0f, fadeTime);
     return Play(name, layer, looped, fadeTime);
 }
 
-bool AnimationController::Stop(const std::string& name, float fadeOutTime)
+bool AnimationController::Stop(const String& name, float fadeOutTime)
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
@@ -305,7 +305,7 @@ void AnimationController::StopAll(float fadeOutTime)
     }
 }
 
-bool AnimationController::Fade(const std::string& name, float targetWeight, float fadeTime)
+bool AnimationController::Fade(const String& name, float targetWeight, float fadeTime)
 {
     unsigned index;
     AnimationState* state;
@@ -318,7 +318,7 @@ bool AnimationController::Fade(const std::string& name, float targetWeight, floa
     return true;
 }
 
-bool AnimationController::FadeOthers(const std::string& name, float targetWeight, float fadeTime)
+bool AnimationController::FadeOthers(const String& name, float targetWeight, float fadeTime)
 {
     unsigned index;
     AnimationState* state;
@@ -345,7 +345,7 @@ bool AnimationController::FadeOthers(const std::string& name, float targetWeight
     return true;
 }
 
-bool AnimationController::SetLayer(const std::string& name, int layer)
+bool AnimationController::SetLayer(const String& name, int layer)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -355,7 +355,7 @@ bool AnimationController::SetLayer(const std::string& name, int layer)
     return true;
 }
 
-bool AnimationController::SetStartBone(const std::string& name, const std::string& startBoneName)
+bool AnimationController::SetStartBone(const String& name, const String& startBoneName)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -367,7 +367,7 @@ bool AnimationController::SetStartBone(const std::string& name, const std::strin
     return true;
 }
 
-bool AnimationController::SetTime(const std::string& name, float time)
+bool AnimationController::SetTime(const String& name, float time)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -377,7 +377,7 @@ bool AnimationController::SetTime(const std::string& name, float time)
     return true;
 }
 
-bool AnimationController::SetSpeed(const std::string& name, float speed)
+bool AnimationController::SetSpeed(const String& name, float speed)
 {
     unsigned index;
     AnimationState* state;
@@ -389,7 +389,7 @@ bool AnimationController::SetSpeed(const std::string& name, float speed)
     return true;
 }
 
-bool AnimationController::SetWeight(const std::string& name, float weight)
+bool AnimationController::SetWeight(const String& name, float weight)
 {
     unsigned index;
     AnimationState* state;
@@ -403,7 +403,7 @@ bool AnimationController::SetWeight(const std::string& name, float weight)
     return true;
 }
 
-bool AnimationController::SetLooped(const std::string& name, bool enable)
+bool AnimationController::SetLooped(const String& name, bool enable)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -413,7 +413,7 @@ bool AnimationController::SetLooped(const std::string& name, bool enable)
     return true;
 }
 
-bool AnimationController::SetAutoFade(const std::string& name, float fadeOutTime)
+bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
 {
     unsigned index;
     AnimationState* state;
@@ -425,7 +425,7 @@ bool AnimationController::SetAutoFade(const std::string& name, float fadeOutTime
     return true;
 }
 
-bool AnimationController::IsPlaying(const std::string& name) const
+bool AnimationController::IsPlaying(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -433,7 +433,7 @@ bool AnimationController::IsPlaying(const std::string& name) const
     return index != M_MAX_UNSIGNED;
 }
 
-bool AnimationController::IsFadingIn(const std::string& name) const
+bool AnimationController::IsFadingIn(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -444,7 +444,7 @@ bool AnimationController::IsFadingIn(const std::string& name) const
     return (animations_[index].fadeTime_) && (animations_[index].targetWeight_ > state->GetWeight());
 }
 
-bool AnimationController::IsFadingOut(const std::string& name) const
+bool AnimationController::IsFadingOut(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -456,7 +456,7 @@ bool AnimationController::IsFadingOut(const std::string& name) const
         || ((!state->IsLooped()) && (state->GetTime() >= state->GetLength()) && (animations_[index].autoFadeTime_));
 }
 
-int AnimationController::GetLayer(const std::string& name) const
+int AnimationController::GetLayer(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -464,7 +464,7 @@ int AnimationController::GetLayer(const std::string& name) const
     return state->GetLayer();
 }
 
-Bone* AnimationController::GetStartBone(const std::string& name) const
+Bone* AnimationController::GetStartBone(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -472,37 +472,37 @@ Bone* AnimationController::GetStartBone(const std::string& name) const
     return state->GetStartBone();
 }
 
-const std::string& AnimationController::GetStartBoneName(const std::string& name) const
+const String& AnimationController::GetStartBoneName(const String& name) const
 {
     Bone* bone = GetStartBone(name);
     return bone ? bone->name_ : noBoneName;
 }
 
-float AnimationController::GetTime(const std::string& name) const
+float AnimationController::GetTime(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     return state ? state->GetTime() : 0.0f;
 }
 
-float AnimationController::GetWeight(const std::string& name) const
+float AnimationController::GetWeight(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     return state ? state->GetWeight() : 0.0f;
 }
 
-bool AnimationController::IsLooped(const std::string& name) const
+bool AnimationController::IsLooped(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     return state ? state->IsLooped() : false;
 }
 
-float AnimationController::GetLength(const std::string& name) const
+float AnimationController::GetLength(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     return state ? state->GetLength() : 0.0f;
 }
 
-float AnimationController::GetSpeed(const std::string& name) const
+float AnimationController::GetSpeed(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -512,7 +512,7 @@ float AnimationController::GetSpeed(const std::string& name) const
     return animations_[index].speed_;
 }
 
-float AnimationController::GetFadeTarget(const std::string& name) const
+float AnimationController::GetFadeTarget(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -522,7 +522,7 @@ float AnimationController::GetFadeTarget(const std::string& name) const
     return animations_[index].targetWeight_;
 }
 
-float AnimationController::GetFadeTime(const std::string& name) const
+float AnimationController::GetFadeTime(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -532,7 +532,7 @@ float AnimationController::GetFadeTime(const std::string& name) const
     return animations_[index].targetWeight_;
 }
 
-float AnimationController::GetAutoFade(const std::string& name) const
+float AnimationController::GetAutoFade(const String& name) const
 {
     unsigned index;
     AnimationState* state;
@@ -552,7 +552,7 @@ void AnimationController::OnNodeSet(Node* node)
     }
 }
 
-void AnimationController::FindAnimation(const std::string& name, unsigned& index, AnimationState*& state) const
+void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     StringHash nameHash(name);
@@ -577,7 +577,7 @@ void AnimationController::FindAnimation(const std::string& name, unsigned& index
     }
 }
 
-AnimationState* AnimationController::FindAnimationState(const std::string& name) const
+AnimationState* AnimationController::FindAnimationState(const String& name) const
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     return model ? model->GetAnimationState(name) : 0;

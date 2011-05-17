@@ -69,7 +69,7 @@ struct AttributeInfo
     }
     
    /// Construct offset enum attribute
-    AttributeInfo(VariantType type, const char* name, unsigned offset, const std::string* enumNames, const Variant& defaultValue, unsigned mode) :
+    AttributeInfo(VariantType type, const char* name, unsigned offset, const String* enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
         offset_(offset),
@@ -94,11 +94,11 @@ struct AttributeInfo
     /// Attribute type
     VariantType type_;
     /// Name
-    std::string name_;
+    String name_;
     /// Byte offset from start of object
     unsigned offset_;
     /// Enum string names
-    const std::string* enumNames_;
+    const String* enumNames_;
     /// Helper object for accessor mode
     SharedPtr<AttributeAccessor> accessor_;
     /// Default value for network replication

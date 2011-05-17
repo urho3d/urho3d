@@ -51,9 +51,9 @@ public:
     /// Set depth write on/off
     void SetDepthWrite(bool enable);
     /// Set vertex shader name
-    void SetVertexShader(const std::string& name);
+    void SetVertexShader(const String& name);
     /// Set pixel shader name
-    void SetPixelShader(const std::string& name);
+    void SetPixelShader(const String& name);
     /// Reset shader pointers
     void ReleaseShaders();
     
@@ -70,9 +70,9 @@ public:
     /// Return depth write mode
     bool GetDepthWrite() const { return depthWrite_; }
     /// Return vertex shader name
-    const std::string& GetVertexShaderName() const { return vertexShaderName_; }
+    const String& GetVertexShaderName() const { return vertexShaderName_; }
     /// Return pixel shader name
-    const std::string& GetPixelShaderName() const { return pixelShaderName_; }
+    const String& GetPixelShaderName() const { return pixelShaderName_; }
     /// Return vertex shaders
     std::vector<SharedPtr<VertexShader> >& GetVertexShaders() { return vertexShaders_; }
     /// Return pixel shaders
@@ -92,9 +92,9 @@ private:
     /// Depth write mode
     bool depthWrite_;
     /// Vertex shader name
-    std::string vertexShaderName_;
+    String vertexShaderName_;
     /// Pixel shader name
-    std::string pixelShaderName_;
+    String pixelShaderName_;
     /// Vertex shaders
     std::vector<SharedPtr<VertexShader> > vertexShaders_;
     /// Pixel shaders
@@ -155,7 +155,7 @@ public:
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     
     /// Return name for pass
-    static const std::string& GetPassName(PassType pass);
+    static const String& GetPassName(PassType pass);
     
 private:
     /// Require Shader Model 3 flag

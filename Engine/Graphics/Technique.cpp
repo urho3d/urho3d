@@ -32,7 +32,7 @@
 #include "VertexShader.h"
 #include "XMLFile.h"
 
-static const std::string passNames[] =
+static const String passNames[] =
 {
     "deferred",
     "prepass",
@@ -44,7 +44,7 @@ static const std::string passNames[] =
     "shadow"
 };
 
-static const std::string blendModeNames[] =
+static const String blendModeNames[] =
 {
     "replace",
     "add",
@@ -55,7 +55,7 @@ static const std::string blendModeNames[] =
     "invdestalpha"
 };
 
-static const std::string CompareModeNames[] =
+static const String CompareModeNames[] =
 {
     "always",
     "equal",
@@ -109,13 +109,13 @@ void Pass::SetDepthWrite(bool enable)
     depthWrite_ = enable;
 }
 
-void Pass::SetVertexShader(const std::string& name)
+void Pass::SetVertexShader(const String& name)
 {
     vertexShaderName_ = name;
     ReleaseShaders();
 }
 
-void Pass::SetPixelShader(const std::string& name)
+void Pass::SetPixelShader(const String& name)
 {
     pixelShaderName_ = name;
     ReleaseShaders();
@@ -163,7 +163,7 @@ bool Technique::Load(Deserializer& source)
         PassType type = MAX_PASSES;
         if (passElem.HasAttribute("name"))
         {
-            std::string name = passElem.GetStringLower("name");
+            String name = passElem.GetStringLower("name");
             type = (PassType)GetStringListIndex(name, passNames, MAX_PASSES, MAX_PASSES);
             if (type == MAX_PASSES)
                 LOGERROR("Unknown pass " + name);
@@ -189,13 +189,13 @@ bool Technique::Load(Deserializer& source)
             
             if (passElem.HasAttribute("blend"))
             {
-                std::string blend = passElem.GetStringLower("blend");
+                String blend = passElem.GetStringLower("blend");
                 newPass.SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, MAX_BLENDMODES, BLEND_REPLACE));
             }
             
             if (passElem.HasAttribute("depthtest"))
             {
-                std::string depthTest = passElem.GetStringLower("depthtest");
+                String depthTest = passElem.GetStringLower("depthtest");
                 if (depthTest == "false")
                     newPass.SetDepthTestMode(CMP_ALWAYS);
                 else
@@ -253,7 +253,7 @@ void Technique::MarkShadersLoaded(unsigned frameNumber)
     shadersLoadedFrameNumber_ = frameNumber;
 }
 
-const std::string& Technique::GetPassName(PassType pass)
+const String& Technique::GetPassName(PassType pass)
 {
     return passNames[pass];
 }

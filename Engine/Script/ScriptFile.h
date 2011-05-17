@@ -57,29 +57,29 @@ public:
     /// Load resource. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Add an event handler. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(StringHash eventType, const std::string& handlerName);
+    virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const std::string& handlerName);
+    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
     
     /// Query for a function by declaration and execute if found
-    bool Execute(const std::string& declaration, const VariantVector& parameters = VariantVector(), bool unprepare = true);
+    bool Execute(const String& declaration, const VariantVector& parameters = VariantVector(), bool unprepare = true);
     /// Execute a function
     bool Execute(asIScriptFunction* function, const VariantVector& parameters = VariantVector(), bool unprepare = true);
     /// Query for an object method by declaration and execute if found
-    bool Execute(asIScriptObject* object, const std::string& declaration, const VariantVector& parameters =
+    bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters =
         VariantVector(), bool unprepare = true);
     /// Execute an object method
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = VariantVector(),
         bool unprepare = true);
     /// Create a script object
-    asIScriptObject* CreateObject(const std::string& className);
+    asIScriptObject* CreateObject(const String& className);
     
     /// Return script module
     asIScriptModule* GetScriptModule() const { return scriptModule_; }
     /// Return a function by declaration. Will be stored to a search cache so that further searches should be faster
-    asIScriptFunction* GetFunction(const std::string& declaration);
+    asIScriptFunction* GetFunction(const String& declaration);
     /// Return an object method by declaration
-    asIScriptFunction* GetMethod(asIScriptObject* object, const std::string& declaration);
+    asIScriptFunction* GetMethod(asIScriptObject* object, const String& declaration);
     /// Return whether script compiled successfully
     bool IsCompiled() const { return compiled_; }
     
@@ -100,13 +100,13 @@ private:
     /// Compiled flag
     bool compiled_;
     /// Encountered include files during script file loading
-    std::set<std::string> includeFiles_;
+    std::set<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface
     std::map<asIObjectType*, bool> checkedClasses_;
     /// Search cache for functions
-    std::map<std::string, asIScriptFunction*> functions_;
+    std::map<String, asIScriptFunction*> functions_;
     /// Search cache for methods
-    std::map<asIObjectType*, std::map<std::string, asIScriptFunction*> > methods_;
+    std::map<asIObjectType*, std::map<String, asIScriptFunction*> > methods_;
 };
 
 /// Get currently executing script file

@@ -96,7 +96,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
         break;
         
     case VAR_STRING:
-        *(reinterpret_cast<std::string*>(dest)) = value.GetString();
+        *(reinterpret_cast<String*>(dest)) = value.GetString();
         break;
         
     case VAR_BUFFER:
@@ -161,7 +161,7 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
         return Variant(*(reinterpret_cast<const Color*>(src)));
         
     case VAR_STRING:
-        return Variant(*(reinterpret_cast<const std::string*>(src)));
+        return Variant(*(reinterpret_cast<const String*>(src)));
         
     case VAR_BUFFER:
         return Variant(*(reinterpret_cast<const std::vector<unsigned char>*>(src)));
@@ -199,7 +199,7 @@ bool Serializable::Load(Deserializer& source)
         
         if (source.IsEof())
         {
-            LOGERROR("Could not load " + ToLower(GetTypeName()) + ", stream not open or at end");
+            LOGERROR("Could not load " + GetTypeName() + ", stream not open or at end");
             inSerialization_  = false;
             return false;
         }
@@ -227,7 +227,7 @@ bool Serializable::Save(Serializer& dest)
         
         if (!dest.WriteVariantData(GetAttribute(i)))
         {
-            LOGERROR("Could not save " + ToLower(GetTypeName()) + ", writing to stream failed");
+            LOGERROR("Could not save " + GetTypeName() + ", writing to stream failed");
             inSerialization_ = false;
             return false;
         }
@@ -241,7 +241,7 @@ bool Serializable::LoadXML(const XMLElement& source)
 {
     if (source.IsNull())
     {
-        LOGERROR("Could not load " + ToLower(GetTypeName()) + ", null source element");
+        LOGERROR("Could not load " + GetTypeName() + ", null source element");
         return false;
     }
     
@@ -267,11 +267,11 @@ bool Serializable::LoadXML(const XMLElement& source)
                 // If enums specified, do enum lookup and int assignment. Otherwise assign the variant directly
                 if (attr.enumNames_)
                 {
-                    std::string value = attrElem.GetString("value");
-                    const std::string* enumPtr = attr.enumNames_;
+                    String value = attrElem.GetString("value");
+                    const String* enumPtr = attr.enumNames_;
                     int enumValue = 0;
                     bool enumFound = false;
-                    while (enumPtr->length())
+                    while (enumPtr->Length())
                     {
                         if (*enumPtr == value)
                         {
@@ -284,7 +284,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                     if (enumFound)
                         SetAttribute(i, Variant(enumValue));
                     else
-                        LOGWARNING("Unknown enum value " + value + " in attribute " + std::string(attr.name_));
+                        LOGWARNING("Unknown enum value " + value + " in attribute " + String(attr.name_));
                 }
                 else
                     SetAttribute(i, attrElem.GetVariant());
@@ -297,7 +297,7 @@ bool Serializable::LoadXML(const XMLElement& source)
         }
         
         if (!found)
-            LOGWARNING("Attribute " + std::string(attr.name_) + " not found in XML data");
+            LOGWARNING("Attribute " + String(attr.name_) + " not found in XML data");
     }
     
     inSerialization_ = false;
@@ -308,7 +308,7 @@ bool Serializable::SaveXML(XMLElement& dest)
 {
     if (dest.IsNull())
     {
-        LOGERROR("Could not save " + ToLower(GetTypeName()) + ", null destination element");
+        LOGERROR("Could not save " + GetTypeName() + ", null destination element");
         return false;
     }
     
@@ -325,13 +325,13 @@ bool Serializable::SaveXML(XMLElement& dest)
             continue;
         
         XMLElement attrElem = dest.CreateChildElement("attribute");
-        attrElem.SetString("name", std::string(attr.name_));
+        attrElem.SetString("name", String(attr.name_));
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
             int enumValue = GetAttribute(i).GetInt();
             attrElem.SetString("type", "Enum");
-            attrElem.SetString("value", std::string(attr.enumNames_[enumValue]));
+            attrElem.SetString("value", String(attr.enumNames_[enumValue]));
         }
         else
             attrElem.SetVariant(GetAttribute(i));
@@ -365,13 +365,13 @@ bool Serializable::SetAttribute(unsigned index, const Variant& value)
     }
     else
     {
-        LOGERROR("Could not set attribute " + std::string(attr.name_) + ": expected type " + Variant::GetTypeName(attr.type_) +
+        LOGERROR("Could not set attribute " + String(attr.name_) + ": expected type " + Variant::GetTypeName(attr.type_) +
             " but got " + value.GetTypeName());
         return false;
     }
 }
 
-bool Serializable::SetAttribute(const std::string& name, const Variant& value)
+bool Serializable::SetAttribute(const String& name, const Variant& value)
 {
     const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
@@ -392,14 +392,14 @@ bool Serializable::SetAttribute(const std::string& name, const Variant& value)
             }
             else
             {
-                LOGERROR("Could not set attribute " + std::string(i->name_) + ": expected type " + Variant::GetTypeName(i->type_)
+                LOGERROR("Could not set attribute " + String(i->name_) + ": expected type " + Variant::GetTypeName(i->type_)
                     + " but got " + value.GetTypeName());
                 return false;
             }
         }
     }
     
-    LOGERROR("Could not find attribute " + std::string(name) + " in " + GetTypeName());
+    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
     return false;
 }
 
@@ -412,7 +412,7 @@ Variant Serializable::GetAttribute(unsigned index)
     return OnGetAttribute(attributes->at(index));
 }
 
-Variant Serializable::GetAttribute(const std::string& name)
+Variant Serializable::GetAttribute(const String& name)
 {
     const std::vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
@@ -427,7 +427,7 @@ Variant Serializable::GetAttribute(const std::string& name)
             return OnGetAttribute(*i);
     }
     
-    LOGERROR("Could not find attribute " + std::string(name) + " in " + GetTypeName());
+    LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
     return Variant();
 }
 

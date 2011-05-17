@@ -46,7 +46,7 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(float) // Instancematrix3
 };
 
-const std::string VertexBuffer::elementName[] = 
+const String VertexBuffer::elementName[] = 
 {
     "Position",
     "Normal",

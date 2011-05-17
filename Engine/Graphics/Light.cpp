@@ -44,7 +44,7 @@ static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 
-static const std::string typeNames[] =
+static const String typeNames[] =
 {
     "directional",
     "spot",

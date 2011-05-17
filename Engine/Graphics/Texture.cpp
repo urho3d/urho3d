@@ -34,7 +34,7 @@
 
 #include "DebugNew.h"
 
-static const std::string addressModeNames[] =
+static const String addressModeNames[] =
 {
     "wrap",
     "mirror",
@@ -42,7 +42,7 @@ static const std::string addressModeNames[] =
     "border"
 };
 
-static const std::string filterModeNames[] =
+static const String filterModeNames[] =
 {
     "nearest",
     "bilinear",
@@ -142,9 +142,9 @@ void Texture::LoadParameters()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    std::string texPath, texName, texExt;
+    String texPath, texName, texExt;
     SplitPath(GetName(), texPath, texName, texExt);
-    std::string xmlName = texPath + texName + ".xml";
+    String xmlName = texPath + texName + ".xml";
     
     if (cache->Exists(xmlName))
     {
@@ -163,15 +163,15 @@ void Texture::LoadParameters(XMLFile* file)
     
     while (paramElem)
     {
-        std::string name = paramElem.GetName();
+        String name = paramElem.GetName();
         
         if (name == "address")
         {
-            std::string coord = paramElem.GetStringLower("coord");
-            if (coord.length() >= 1)
+            String coord = paramElem.GetStringLower("coord");
+            if (coord.Length() >= 1)
             {
                 TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
-                std::string mode = paramElem.GetStringLower("mode");
+                String mode = paramElem.GetStringLower("mode");
                 SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode, addressModeNames, MAX_ADDRESSMODES,
                     ADDRESS_WRAP));
             }
@@ -182,7 +182,7 @@ void Texture::LoadParameters(XMLFile* file)
         
         if (name == "filter")
         {
-            std::string mode = paramElem.GetStringLower("mode");
+            String mode = paramElem.GetStringLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode, filterModeNames, MAX_FILTERMODES, FILTER_DEFAULT));
         }
         

@@ -33,7 +33,7 @@
 
 #include "DebugNew.h"
 
-static const std::string levelPrefixes[] =
+static const String levelPrefixes[] =
 {
     "DEBUG",
     "INFO",
@@ -58,9 +58,9 @@ Log::~Log()
 {
 }
 
-void Log::Open(const std::string& fileName)
+void Log::Open(const String& fileName)
 {
-    if (fileName.empty())
+    if (fileName.Empty())
         return;
     
     logFile_ = new File(context_);
@@ -73,7 +73,7 @@ void Log::Open(const std::string& fileName)
     }
 }
 
-void Log::Write(int level, const std::string& message)
+void Log::Write(int level, const String& message)
 {
     // Prevent recursion
     if (inWrite_)
@@ -90,10 +90,10 @@ void Log::Write(int level, const std::string& message)
     time_t sysTime;
     time(&sysTime);
     const char* dateTime = ctime(&sysTime);
-    std::string dateTimeString = Replace(std::string(dateTime), "\n", "");
-    std::string formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
+    String dateTimeString = String(dateTime).Replace("\n", "");
+    String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
-    printf("%s\n", formattedMessage.c_str());
+    printf("%s\n", formattedMessage.CString());
     
     if (logFile_)
         logFile_->WriteLine(formattedMessage);
@@ -107,7 +107,7 @@ void Log::Write(int level, const std::string& message)
     inWrite_ = false;
 }
 
-void Log::WriteRaw(const std::string& message)
+void Log::WriteRaw(const String& message)
 {
     // Prevent recursion
     if (inWrite_)
@@ -117,10 +117,10 @@ void Log::WriteRaw(const std::string& message)
     
     lastMessage_ = message;
     
-    printf("%s", message.c_str());
+    printf("%s", message.CString());
     
     if (logFile_)
-        logFile_->Write(message.c_str(), message.length());
+        logFile_->Write(message.CString(), message.Length());
     
     using namespace LogMessage;
     
@@ -136,14 +136,14 @@ void Log::SetLevel(int level)
     level_ = level;
 }
 
-void WriteToLog(Context* context, int level, const std::string& message)
+void WriteToLog(Context* context, int level, const String& message)
 {
     Log* log = context->GetSubsystem<Log>();
     if (log)
         log->Write(level, message);
 }
 
-void WriteToLogRaw(Context* context, const std::string& message)
+void WriteToLogRaw(Context* context, const String& message)
 {
     Log* log = context->GetSubsystem<Log>();
     if (log)

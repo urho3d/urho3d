@@ -61,7 +61,7 @@ public:
     virtual void PostLoad();
     
     /// Set name
-    void SetName(const std::string& name);
+    void SetName(const String& name);
     /// Set position
     void SetPosition(const Vector3& position);
     /// Set rotation
@@ -97,7 +97,7 @@ public:
     /// Mark node and child nodes to need world transform recalculation. Notify listener components
     void MarkDirty();
     /// Create a child scene node
-    Node* CreateChild(const std::string& name = std::string(), bool local = false);
+    Node* CreateChild(const String& name = String(), bool local = false);
     /// Add a child scene node
     void AddChild(Node* node);
     /// Remove a child scene node
@@ -128,7 +128,7 @@ public:
     /// Return ID
     unsigned GetID() const { return id_; }
     /// Return name
-    const std::string& GetName() const { return name_; }
+    const String& GetName() const { return name_; }
     /// Return name hash
     StringHash GetNameHash() const { return nameHash_; }
     /// Return parent scene node
@@ -206,7 +206,7 @@ public:
     /// Return child scene node by index
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name
-    Node* GetChild(const std::string& name, bool recursive = false) const;
+    Node* GetChild(const String& name, bool recursive = false) const;
     /// Return child scene node by name hash
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
     /// Return number of components
@@ -281,7 +281,7 @@ private:
     /// World-space transform matrix
     Matrix4x3 worldTransform_;
     /// Name
-    std::string name_;
+    String name_;
     /// Name hash
     StringHash nameHash_;
     /// Child scene nodes

@@ -42,20 +42,20 @@ public:
     /// Construct
     PackageFile(Context* context);
     /// Construct and open
-    PackageFile(Context* context, const std::string& fileName);
+    PackageFile(Context* context, const String& fileName);
     /// Destruct
     virtual ~PackageFile();
     
     /// Open the package file. Return true if successful
-    bool Open(const std::string& fileName);
+    bool Open(const String& fileName);
     /// Check if a file exists within the package file
-    bool Exists(const std::string& fileName) const;
+    bool Exists(const String& fileName) const;
     /// Return the file entry corresponding to the name, or null if not found
-    const PackageEntry* GetEntry(const std::string& fileName) const;
+    const PackageEntry* GetEntry(const String& fileName) const;
     /// Return all file entries
-    const std::map<std::string, PackageEntry>& GetEntries() const { return entries_; }
+    const std::map<String, PackageEntry>& GetEntries() const { return entries_; }
     /// Return the package file name
-    const std::string& GetName() const { return fileName_; }
+    const String& GetName() const { return fileName_; }
     /// Return hash of the package file name
     StringHash GetNameHash() const { return nameHash_; }
     /// Return number of files
@@ -67,9 +67,9 @@ public:
     
 private:
     /// File entries
-    std::map<std::string, PackageEntry> entries_;
+    std::map<String, PackageEntry> entries_;
     /// File name
-    std::string fileName_;
+    String fileName_;
     /// Package file name hash
     StringHash nameHash_;
     /// Package file total size

@@ -39,7 +39,7 @@
 
 static const float DEFAULT_MASS = 1.0f;
 
-static const std::string modeNames[] =
+static const String modeNames[] =
 {
     "static",
     "dynamic",

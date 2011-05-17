@@ -68,7 +68,7 @@ Engine::~Engine()
 {
 }
 
-bool Engine::Initialize(const std::string& windowTitle, const std::string& logName, const std::vector<std::string>& arguments)
+bool Engine::Initialize(const String& windowTitle, const String& logName, const std::vector<String>& arguments)
 {
     if (initialized_)
         return true;
@@ -90,9 +90,9 @@ bool Engine::Initialize(const std::string& windowTitle, const std::string& logNa
     
     for (unsigned i = 0; i < arguments.size(); ++i)
     {
-        if ((arguments[i][0] == '-') && (arguments[i].length() >= 2))
+        if ((arguments[i][0] == '-') && (arguments[i].Length() >= 2))
         {
-            std::string argument = ToLower(arguments[i].substr(1));
+            String argument = arguments[i].Substring(1).ToLower();
             
             if (argument == "headless")
                 headless_ = true;
@@ -119,28 +119,28 @@ bool Engine::Initialize(const std::string& windowTitle, const std::string& logNa
                 switch (tolower(argument[0]))
                 {
                 case 'x':
-                    if (arguments[i].length() > 1)
-                        width = ToInt(argument.substr(1));
+                    if (arguments[i].Length() > 1)
+                        width = ToInt(argument.Substring(1));
                     break;
                     
                 case 'y':
-                    if (arguments[i].length() > 1)
-                        height = ToInt(argument.substr(1));
+                    if (arguments[i].Length() > 1)
+                        height = ToInt(argument.Substring(1));
                     break;
                 
                 case 'm':
-                    if (arguments[i].length() > 1)
-                        multiSample = ToInt(argument.substr(1));
+                    if (arguments[i].Length() > 1)
+                        multiSample = ToInt(argument.Substring(1));
                     break;
                     
                 case 'b':
-                    if (arguments[i].length() > 1)
-                        buffer = ToInt(argument.substr(1));
+                    if (arguments[i].Length() > 1)
+                        buffer = ToInt(argument.Substring(1));
                     break;
                     
                 case 'r':
-                    if (arguments[i].length() > 1)
-                        mixRate = ToInt(argument.substr(1));
+                    if (arguments[i].Length() > 1)
+                        mixRate = ToInt(argument.Substring(1));
                     break;
                     
                 case 'v':
@@ -170,7 +170,7 @@ bool Engine::Initialize(const std::string& windowTitle, const std::string& logNa
     // Add default resource paths: CoreData package or directory, Data package or directory, system fonts directory
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    std::string exePath = fileSystem->GetProgramDir();
+    String exePath = fileSystem->GetProgramDir();
     if (fileSystem->FileExists(exePath + "CoreData.pak"))
     {
         SharedPtr<PackageFile> package(new PackageFile(context_));

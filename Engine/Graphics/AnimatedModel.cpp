@@ -441,7 +441,7 @@ void AnimatedModel::RemoveAnimationState(Animation* animation)
         RemoveAnimationState(animation->GetNameHash());
 }
 
-void AnimatedModel::RemoveAnimationState(const std::string& animationName)
+void AnimatedModel::RemoveAnimationState(const String& animationName)
 {
     RemoveAnimationState(StringHash(animationName));
 }
@@ -519,7 +519,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
     }
 }
 
-void AnimatedModel::SetMorphWeight(const std::string& name, float weight)
+void AnimatedModel::SetMorphWeight(const String& name, float weight)
 {
     for (unsigned i = 0; i < morphs_.size(); ++i)
     {
@@ -567,7 +567,7 @@ float AnimatedModel::GetMorphWeight(unsigned index) const
     return index < morphs_.size() ? morphs_[index].weight_ : 0.0f;
 }
 
-float AnimatedModel::GetMorphWeight(const std::string& name) const
+float AnimatedModel::GetMorphWeight(const String& name) const
 {
     for (std::vector<ModelMorph>::const_iterator i = morphs_.begin(); i != morphs_.end(); ++i)
     {
@@ -600,7 +600,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
     return 0;
 }
 
-AnimationState* AnimatedModel::GetAnimationState(const std::string& animationName) const
+AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const
 {
     for (std::vector<SharedPtr<AnimationState> >::const_iterator i = animationStates_.begin(); i != animationStates_.end(); ++i)
     {

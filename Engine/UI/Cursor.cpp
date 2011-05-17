@@ -30,7 +30,7 @@
 
 #include "DebugNew.h"
 
-static const std::string shapeNames[] =
+static const String shapeNames[] =
 {
     "normal",
     "resizevertical",

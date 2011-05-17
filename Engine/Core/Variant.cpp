@@ -30,14 +30,14 @@
 #include "DebugNew.h"
 
 const Variant Variant::EMPTY;
-const std::string Variant::emptyString;
+const String Variant::emptyString;
 const std::vector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
 const VariantVector Variant::emptyVariantVector;
 
-static const std::string typeNames[] =
+static const String typeNames[] =
 {
     "None",
     "Int",
@@ -64,7 +64,7 @@ Variant& Variant::operator = (const Variant& rhs)
     switch (type_)
     {
     case VAR_STRING:
-        *(reinterpret_cast<std::string*>(value_.ptr_)) = *(reinterpret_cast<const std::string*>(rhs.value_.ptr_));
+        *(reinterpret_cast<String*>(value_.ptr_)) = *(reinterpret_cast<const String*>(rhs.value_.ptr_));
         break;
         
     case VAR_BUFFER:
@@ -127,7 +127,7 @@ bool Variant::operator == (const Variant& rhs) const
         return *(reinterpret_cast<const Color*>(&value_)) == *(reinterpret_cast<const Color*>(&rhs.value_));
         
     case VAR_STRING:
-        return *(reinterpret_cast<const std::string*>(value_.ptr_)) == *(reinterpret_cast<const std::string*>(rhs.value_.ptr_));
+        return *(reinterpret_cast<const String*>(value_.ptr_)) == *(reinterpret_cast<const String*>(rhs.value_.ptr_));
         
     case VAR_BUFFER:
         return *(reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_)) == *(reinterpret_cast<const std::vector<unsigned char>*>(rhs.value_.ptr_));
@@ -151,9 +151,9 @@ bool Variant::operator == (const Variant& rhs) const
     return true;
 }
 
-void Variant::FromString(const std::string& type, const std::string& value)
+void Variant::FromString(const String& type, const String& value)
 {
-    std::string typeLower = ToLower(type);
+    String typeLower = type.ToLower();
     
     if (typeLower == "none")
         SetType(VAR_NONE);
@@ -179,7 +179,7 @@ void Variant::FromString(const std::string& type, const std::string& value)
     {
         SetType(VAR_BUFFER);
         std::vector<unsigned char>& buffer = *(reinterpret_cast<std::vector<unsigned char>*>(value_.ptr_));
-        std::vector<std::string> values = Split(value, ' ');
+        std::vector<String> values = Split(value, ' ');
         buffer.resize(values.size());
         for (unsigned i = 0; i < values.size(); ++i)
             buffer[i] = ToInt(values[i]);
@@ -190,7 +190,7 @@ void Variant::FromString(const std::string& type, const std::string& value)
     }
     else if (typeLower == "objectref")
     {
-        std::vector<std::string> values = Split(value, ';');
+        std::vector<String> values = Split(value, ';');
         if (values.size() == 2)
         {
             SetType(VAR_RESOURCEREF);
@@ -201,7 +201,7 @@ void Variant::FromString(const std::string& type, const std::string& value)
     }
     else if (typeLower == "objectreflist")
     {
-        std::vector<std::string> values = Split(value, ';');
+        std::vector<String> values = Split(value, ';');
         if (values.size() >= 1)
         {
             SetType(VAR_RESOURCEREFLIST);
@@ -228,12 +228,12 @@ void Variant::SetBuffer(const void* data, unsigned size)
         memcpy(&buffer[0], data, size);
 }
 
-const std::string& Variant::GetTypeName() const
+const String& Variant::GetTypeName() const
 {
     return typeNames[type_];
 }
 
-std::string Variant::ToString() const
+String Variant::ToString() const
 {
     switch (type_)
     {
@@ -262,12 +262,12 @@ std::string Variant::ToString() const
         return ::ToString(*(reinterpret_cast<const Color*>(&value_)));
         
     case VAR_STRING:
-        return *(reinterpret_cast<const std::string*>(value_.ptr_));
+        return *(reinterpret_cast<const String*>(value_.ptr_));
         
     case VAR_BUFFER:
         {
             const std::vector<unsigned char>& buffer = *(reinterpret_cast<const std::vector<unsigned char>*>(value_.ptr_));
-            std::string ret;
+            String ret;
             for (std::vector<unsigned char>::const_iterator i = buffer.begin(); i != buffer.end(); ++i)
             {
                 if (i != buffer.begin())
@@ -287,10 +287,10 @@ std::string Variant::ToString() const
     case VAR_VARIANTMAP:
         // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
-        return std::string();
+        return String();
     }
     
-    return std::string();
+    return String();
 }
 
 void Variant::SetType(VariantType newType)
@@ -301,7 +301,7 @@ void Variant::SetType(VariantType newType)
     switch (type_)
     {
     case VAR_STRING:
-        delete reinterpret_cast<std::string*>(value_.ptr_);
+        delete reinterpret_cast<String*>(value_.ptr_);
         break;
         
     case VAR_BUFFER:
@@ -330,7 +330,7 @@ void Variant::SetType(VariantType newType)
     switch (type_)
     {
     case VAR_STRING:
-        *reinterpret_cast<std::string**>(&value_.ptr_) = new std::string();
+        *reinterpret_cast<String**>(&value_.ptr_) = new String();
         break;
         
     case VAR_BUFFER:
@@ -410,7 +410,7 @@ template<> const Color& Variant::Get<const Color&>() const
     return GetColor();
 }
 
-template<> const std::string& Variant::Get<const std::string&>() const
+template<> const String& Variant::Get<const String&>() const
 {
     return GetString();
 }
@@ -470,7 +470,7 @@ template<> Color Variant::Get<Color>() const
     return GetColor();
 }
 
-template<> std::string Variant::Get<std::string>() const
+template<> String Variant::Get<String>() const
 {
     return GetString();
 }
@@ -480,7 +480,7 @@ template<> std::vector<unsigned char> Variant::Get<std::vector<unsigned char> >(
     return GetBuffer();
 }
 
-const std::string& Variant::GetTypeName(VariantType type)
+const String& Variant::GetTypeName(VariantType type)
 {
     return typeNames[type];
 }

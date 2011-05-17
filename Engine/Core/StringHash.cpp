@@ -24,9 +24,6 @@
 #include "Precompiled.h"
 #include "StringUtils.h"
 
-#include <cstring>
-#include <map>
-
 #include "DebugNew.h"
 
 const StringHash StringHash::ZERO;
@@ -37,8 +34,8 @@ StringHash::StringHash(const char* str) :
 {
 }
 
-StringHash::StringHash(const std::string& str) :
-    value_(Calculate(str.c_str()))
+StringHash::StringHash(const String& str) :
+    value_(Calculate(str.CString()))
 {
 }
 
@@ -65,8 +62,8 @@ ShortStringHash::ShortStringHash(const char* str) :
 {
 }
 
-ShortStringHash::ShortStringHash(const std::string& str) :
-    value_(Calculate(str.c_str()))
+ShortStringHash::ShortStringHash(const String& str) :
+    value_(Calculate(str.CString()))
 {
 }
 

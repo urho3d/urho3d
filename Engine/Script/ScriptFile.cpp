@@ -68,7 +68,7 @@ bool ScriptFile::Load(Deserializer& source)
     if (scriptModule_)
         script_->GetModuleMap().erase(scriptModule_);
     asIScriptEngine* engine = script_->GetScriptEngine();
-    scriptModule_ = engine->GetModule(GetName().c_str(), asGM_ALWAYS_CREATE);
+    scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
     if (!scriptModule_)
     {
         LOGERROR("Failed to create script module " + GetName());
@@ -83,14 +83,14 @@ bool ScriptFile::Load(Deserializer& source)
     script_->SetLogMode(LOGMODE_RETAINED);
     script_->ClearLogMessages();
     int result = scriptModule_->Build();
-    std::string errors = script_->GetLogMessages();
+    String errors = script_->GetLogMessages();
     script_->SetLogMode(LOGMODE_IMMEDIATE);
     if (result < 0)
     {
         LOGERROR("Failed to compile script module " + GetName() + ":\n" + errors);
         return false;
     }
-    if (!errors.empty())
+    if (!errors.Empty())
         LOGWARNING(errors);
     
     LOGINFO("Compiled script module " + GetName());
@@ -100,12 +100,12 @@ bool ScriptFile::Load(Deserializer& source)
     return true;
 }
 
-void ScriptFile::AddEventHandler(StringHash eventType, const std::string& handlerName)
+void ScriptFile::AddEventHandler(StringHash eventType, const String& handlerName)
 {
     if (!compiled_)
         return;
     
-    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
@@ -121,7 +121,7 @@ void ScriptFile::AddEventHandler(StringHash eventType, const std::string& handle
     SubscribeToEvent(eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
 }
 
-void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const std::string& handlerName)
+void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const String& handlerName)
 {
     if (!compiled_)
         return;
@@ -132,7 +132,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const std
         return;
     }
     
-    std::string declaration = "void " + handlerName + "(StringHash, VariantMap&)";
+    String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
@@ -148,7 +148,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const std
     SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptFile, HandleScriptEvent, (void*)function));
 }
 
-bool ScriptFile::Execute(const std::string& declaration, const VariantVector& parameters, bool unprepare)
+bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
 {
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
@@ -188,7 +188,7 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     return success;
 }
 
-bool ScriptFile::Execute(asIScriptObject* object, const std::string& declaration, const VariantVector& parameters, bool unprepare)
+bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters, bool unprepare)
 {
     asIScriptFunction* method = GetMethod(object, declaration);
     if (!method)
@@ -229,7 +229,7 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
     return success;
 }
 
-asIScriptObject* ScriptFile::CreateObject(const std::string& className)
+asIScriptObject* ScriptFile::CreateObject(const String& className)
 {
     PROFILE(CreateObject);
     
@@ -244,7 +244,7 @@ asIScriptObject* ScriptFile::CreateObject(const std::string& className)
     }
     
     asIScriptEngine* engine = script_->GetScriptEngine();
-    asIObjectType *type = engine->GetObjectTypeById(scriptModule_->GetTypeIdByDecl(className.c_str()));
+    asIObjectType *type = engine->GetObjectTypeById(scriptModule_->GetTypeIdByDecl(className.CString()));
     if (!type)
         return 0;
     
@@ -274,8 +274,8 @@ asIScriptObject* ScriptFile::CreateObject(const std::string& className)
     }
     
     // Get the factory function id from the object type
-    std::string factoryName = className + "@ " + className + "()";
-    int factoryId = type->GetFactoryIdByDecl(factoryName.c_str());
+    String factoryName = className + "@ " + className + "()";
+    int factoryId = type->GetFactoryIdByDecl(factoryName.CString());
     if ((factoryId < 0) || (context->Prepare(factoryId) < 0) || (context->Execute() < 0))
         return 0;
     
@@ -286,22 +286,22 @@ asIScriptObject* ScriptFile::CreateObject(const std::string& className)
     return obj;
 }
 
-asIScriptFunction* ScriptFile::GetFunction(const std::string& declaration)
+asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
 {
     if (!compiled_)
         return 0;
     
-    std::map<std::string, asIScriptFunction*>::const_iterator i = functions_.find(declaration);
+    std::map<String, asIScriptFunction*>::const_iterator i = functions_.find(declaration);
     if (i != functions_.end())
         return i->second;
     
-    int id = scriptModule_->GetFunctionIdByDecl(declaration.c_str());
+    int id = scriptModule_->GetFunctionIdByDecl(declaration.CString());
     asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
     functions_[declaration] = function;
     return function;
 }
 
-asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const std::string& declaration)
+asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declaration)
 {
     if ((!compiled_) || (!object))
         return 0;
@@ -309,15 +309,15 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const std::str
     asIObjectType* type = object->GetObjectType();
     if (!type)
         return 0;
-    std::map<asIObjectType*, std::map<std::string, asIScriptFunction*> >::const_iterator i = methods_.find(type);
+    std::map<asIObjectType*, std::map<String, asIScriptFunction*> >::const_iterator i = methods_.find(type);
     if (i != methods_.end())
     {
-        std::map<std::string, asIScriptFunction*>::const_iterator j = i->second.find(declaration);
+        std::map<String, asIScriptFunction*>::const_iterator j = i->second.find(declaration);
         if (j != i->second.end())
             return j->second;
     }
     
-    int id = type->GetMethodIdByDecl(declaration.c_str());
+    int id = type->GetMethodIdByDecl(declaration.CString());
     asIScriptFunction* function = scriptModule_->GetFunctionDescriptorById(id);
     methods_[type][declaration] = function;
     return function;
@@ -333,7 +333,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
-    std::vector<std::string> includeFiles;
+    std::vector<String> includeFiles;
     unsigned pos = 0;
     while(pos < dataSize)
     {
@@ -351,7 +351,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
             if (t == asTC_IDENTIFIER)
             {
-                std::string token(&buffer[pos], len);
+                String token(&buffer[pos], len);
                 if (token == "include")
                 {
                     pos += len;
@@ -365,14 +365,14 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                     if ((t == asTC_VALUE) && (len > 2) && (buffer[pos] == '"'))
                     {
                         // Get the include file
-                        std::string includeFile(&buffer[pos+1], len - 2);
+                        String includeFile(&buffer[pos+1], len - 2);
                         pos += len;
                         
                         // If the file is not found as it is, add the path of current file
                         if (!cache->Exists(includeFile))
                             includeFile = GetPath(GetName()) + includeFile;
                         
-                        std::string includeFileLower = ToLower(includeFile);
+                        String includeFileLower = includeFile.ToLower();
                         
                         // If not included yet, store it for later processing
                         if (includeFiles_.find(includeFileLower) == includeFiles_.end())
@@ -430,7 +430,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     }
     
     // Then add this section
-    if (scriptModule_->AddScriptSection(source.GetName().c_str(), (const char*)buffer.GetPtr(), dataSize) < 0)
+    if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.GetPtr(), dataSize) < 0)
     {
         LOGERROR("Failed to add script section " + source.GetName());
         return false;
@@ -519,7 +519,7 @@ void ScriptFile::ReleaseModule()
         // Remove the module
         script_->GetModuleMap().erase(scriptModule_);
         asIScriptEngine* engine = script_->GetScriptEngine();
-        engine->DiscardModule(GetName().c_str());
+        engine->DiscardModule(GetName().CString());
         scriptModule_ = 0;
         compiled_ = false;
         SetMemoryUse(0);

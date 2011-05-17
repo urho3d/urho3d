@@ -75,63 +75,63 @@ public:
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success
-    bool Play(const std::string& name, int layer, bool looped, float fadeInTime = 0.0f);
+    bool Play(const String& name, int layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success
-    bool PlayExclusive(const std::string& name, int layer, bool looped, float fadeTime = 0.0f);
+    bool PlayExclusive(const String& name, int layer, bool looped, float fadeTime = 0.0f);
     /// Stop an animation. Zero fadetime is instant. Return true on success
-    bool Stop(const std::string& name, float fadeOutTime = 0.0f);
+    bool Stop(const String& name, float fadeOutTime = 0.0f);
     /// Stop all animations on a specific layer. Zero fadetime is instant
     void StopLayer(int layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant
     void StopAll(float fadeTime = 0.0f);
     /// Fade animation to target weight. Return true on success
-    bool Fade(const std::string& name, float targetWeight, float fadeTime);
+    bool Fade(const String& name, float targetWeight, float fadeTime);
     /// Fade other animations on the same layer to target weight. Return true on success
-    bool FadeOthers(const std::string& name, float targetWeight, float fadeTime);
+    bool FadeOthers(const String& name, float targetWeight, float fadeTime);
     
     /// Set animation blending layer priority. Return true on success
-    bool SetLayer(const std::string& name, int layer);
+    bool SetLayer(const String& name, int layer);
     /// Set animation start bone. Return true on success
-    bool SetStartBone(const std::string& name, const std::string& startBoneName);
+    bool SetStartBone(const String& name, const String& startBoneName);
     /// Set animation time position. Return true on success
-    bool SetTime(const std::string& name, float time);
+    bool SetTime(const String& name, float time);
     /// Set animation weight. Return true on success
-    bool SetWeight(const std::string& name, float weight);
+    bool SetWeight(const String& name, float weight);
     /// Set animation looping. Return true on success
-    bool SetLooped(const std::string& name, bool enable);
+    bool SetLooped(const String& name, bool enable);
     /// Set animation speed. Return true on success
-    bool SetSpeed(const std::string& name, float speed);
+    bool SetSpeed(const String& name, float speed);
     /// Set animation autofade on stop (non-looped animations only.) Zero time disables. Return true on success
-    bool SetAutoFade(const std::string& name, float fadeOutTime);
+    bool SetAutoFade(const String& name, float fadeOutTime);
     
     /// Return whether an animation is active
-    bool IsPlaying(const std::string& name) const;
+    bool IsPlaying(const String& name) const;
     /// Return whether an animation is fading in
-    bool IsFadingIn(const std::string& name) const;
+    bool IsFadingIn(const String& name) const;
     /// Return whether an animation is fading out
-    bool IsFadingOut(const std::string& name) const;
+    bool IsFadingOut(const String& name) const;
     /// Return animation blending layer
-    int GetLayer(const std::string& name) const;
+    int GetLayer(const String& name) const;
     /// Return animation start bone, or null if no such animation
-    Bone* GetStartBone(const std::string& name) const;
+    Bone* GetStartBone(const String& name) const;
     /// Return animation start bone name, or null if no such animation
-    const std::string& GetStartBoneName(const std::string& name) const;
+    const String& GetStartBoneName(const String& name) const;
     /// Return animation time position
-    float GetTime(const std::string& name) const;
+    float GetTime(const String& name) const;
     /// Return animation weight
-    float GetWeight(const std::string& name) const;
+    float GetWeight(const String& name) const;
     /// Return animation looping
-    bool IsLooped(const std::string& name) const;
+    bool IsLooped(const String& name) const;
     /// Return animation length
-    float GetLength(const std::string& name) const;
+    float GetLength(const String& name) const;
     /// Return animation speed
-    float GetSpeed(const std::string& name) const;
+    float GetSpeed(const String& name) const;
     /// Return animation fade target weight
-    float GetFadeTarget(const std::string& name) const;
+    float GetFadeTarget(const String& name) const;
     /// Return animation fade time
-    float GetFadeTime(const std::string& name) const;
+    float GetFadeTime(const String& name) const;
     /// Return animation autofade time
-    float GetAutoFade(const std::string& name) const;
+    float GetAutoFade(const String& name) const;
 
 protected:
     /// Handle node being assigned
@@ -139,9 +139,9 @@ protected:
 
 private:
     /// Find the internal index and animation state of an animation
-    void FindAnimation(const std::string& name, unsigned& index, AnimationState*& state) const;
+    void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;
     /// Find the animation state only
-    AnimationState* FindAnimationState(const std::string& name) const;
+    AnimationState* FindAnimationState(const String& name) const;
     /// Handle scene post-update event
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     

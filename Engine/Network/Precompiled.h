@@ -23,8 +23,9 @@
 
 #pragma once
 
+#include "StringBase.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <map>
-#include <string>
 #include <vector>

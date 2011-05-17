@@ -92,7 +92,7 @@ public:
     /// Reset all shader pointers
     void ReleaseShaders();
     /// Clone material
-    SharedPtr<Material> Clone(const std::string& cloneName = std::string()) const;
+    SharedPtr<Material> Clone(const String& cloneName = String()) const;
     /// Mark material for auxiliary view rendering
     void MarkForAuxView(unsigned frameNumber);
     
@@ -124,7 +124,7 @@ public:
     bool GetOcclusion() const { return occlusion_; }
     
     /// Return name for texture unit
-    static const std::string& GetTextureUnitName(TextureUnit unit);
+    static const String& GetTextureUnitName(TextureUnit unit);
     
 private:
     /// Re-evaluate occlusion rendering

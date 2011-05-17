@@ -123,7 +123,7 @@ void ScrollBar::SetStyle(const XMLElement& element)
     
     if (element.HasChildElement("orientation"))
     {
-        std::string orientation = element.GetChildElement("orientation").GetStringLower("value");
+        String orientation = element.GetChildElement("orientation").GetStringLower("value");
         if ((orientation == "horizontal") || (orientation == "h"))
             SetOrientation(O_HORIZONTAL);
         if ((orientation == "vertical") || (orientation == "v"))

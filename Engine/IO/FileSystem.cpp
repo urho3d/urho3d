@@ -54,14 +54,14 @@ FileSystem::~FileSystem()
 }
 
 
-bool FileSystem::SetCurrentDir(const std::string& pathName)
+bool FileSystem::SetCurrentDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
         LOGERROR("Access denied to " + pathName);
         return false;
     }
-    if (SetCurrentDirectory(GetNativePath(pathName, true).c_str()) == FALSE)
+    if (SetCurrentDirectory(GetNativePath(pathName, true).CString()) == FALSE)
     {
         LOGERROR("Failed to change directory to " + pathName);
         return false;
@@ -69,7 +69,7 @@ bool FileSystem::SetCurrentDir(const std::string& pathName)
     return true;
 }
 
-bool FileSystem::CreateDir(const std::string& pathName)
+bool FileSystem::CreateDir(const String& pathName)
 {
     if (!CheckAccess(pathName))
     {
@@ -77,7 +77,7 @@ bool FileSystem::CreateDir(const std::string& pathName)
         return false;
     }
     
-    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName), true).c_str(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
+    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName), true).CString(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
     if (success)
         LOGDEBUG("Created directory " + pathName);
     else
@@ -86,10 +86,10 @@ bool FileSystem::CreateDir(const std::string& pathName)
     return success;
 }
 
-int FileSystem::SystemCommand(const std::string& commandLine)
+int FileSystem::SystemCommand(const String& commandLine)
 {
     if (allowedPaths_.empty())
-        return system(commandLine.c_str());
+        return system(commandLine.CString());
     else
     {
         LOGERROR("Executing an external command is not allowed");
@@ -97,19 +97,19 @@ int FileSystem::SystemCommand(const std::string& commandLine)
     }
 }
 
-int FileSystem::SystemRun(const std::string& fileName, const std::vector<std::string>& arguments)
+int FileSystem::SystemRun(const String& fileName, const std::vector<String>& arguments)
 {
     if (allowedPaths_.empty())
     {
-        std::string fixedFileName = GetNativePath(fileName, true);
+        String fixedFileName = GetNativePath(fileName, true);
         
         std::vector<const char*> argPtrs;
-        argPtrs.push_back(fixedFileName.c_str());
+        argPtrs.push_back(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.size(); ++i)
-            argPtrs.push_back(arguments[i].c_str());
+            argPtrs.push_back(arguments[i].CString());
         argPtrs.push_back(0);
         
-        return _spawnv(_P_WAIT, fixedFileName.c_str(), &argPtrs[0]);
+        return _spawnv(_P_WAIT, fixedFileName.CString(), &argPtrs[0]);
     }
     else
     {
@@ -118,7 +118,7 @@ int FileSystem::SystemRun(const std::string& fileName, const std::vector<std::st
     }
 }
 
-bool FileSystem::SystemOpen(const std::string& fileName, const std::string& mode)
+bool FileSystem::SystemOpen(const String& fileName, const String& mode)
 {
     if (allowedPaths_.empty())
     {
@@ -128,7 +128,8 @@ bool FileSystem::SystemOpen(const std::string& fileName, const std::string& mode
             return false;
         }
         
-        bool success = (int)ShellExecute(0, !mode.empty() ? (char*)mode.c_str() : 0, (char*)GetNativePath(fileName, true).c_str(), 0, 0, SW_SHOW) > 32;
+        bool success = (int)ShellExecute(0, !mode.Empty() ? (char*)mode.CString() : 0,
+            (char*)GetNativePath(fileName, true).CString(), 0, 0, SW_SHOW) > 32;
         if (!success)
             LOGERROR("Failed to open " + fileName + " externally");
         return success;
@@ -140,7 +141,7 @@ bool FileSystem::SystemOpen(const std::string& fileName, const std::string& mode
     }
 }
 
-bool FileSystem::Copy(const std::string& srcFileName, const std::string& destFileName)
+bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
@@ -167,7 +168,7 @@ bool FileSystem::Copy(const std::string& srcFileName, const std::string& destFil
     return (bytesRead == fileSize) && (bytesWritten == fileSize);
 }
 
-bool FileSystem::Rename(const std::string& srcFileName, const std::string& destFileName)
+bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
 {
     if (!CheckAccess(GetPath(srcFileName)))
     {
@@ -180,10 +181,10 @@ bool FileSystem::Rename(const std::string& srcFileName, const std::string& destF
         return false;
     }
     
-    return rename(GetNativePath(srcFileName).c_str(), GetNativePath(destFileName).c_str()) == 0;
+    return rename(GetNativePath(srcFileName).CString(), GetNativePath(destFileName).CString()) == 0;
 }
 
-bool FileSystem::Delete(const std::string& fileName)
+bool FileSystem::Delete(const String& fileName)
 {
     if (!CheckAccess(GetPath(fileName)))
     {
@@ -191,33 +192,33 @@ bool FileSystem::Delete(const std::string& fileName)
         return false;
     }
     
-    return remove(GetNativePath(fileName).c_str()) == 0;
+    return remove(GetNativePath(fileName).CString()) == 0;
 }
 
 
-std::string FileSystem::GetCurrentDir()
+String FileSystem::GetCurrentDir()
 {
     char path[MAX_PATH];
     GetCurrentDirectory(MAX_PATH, path);
-    return AddTrailingSlash(std::string(path));
+    return AddTrailingSlash(String(path));
 }
 
-bool FileSystem::CheckAccess(const std::string& pathName)
+bool FileSystem::CheckAccess(const String& pathName)
 {
-    std::string fixedPath = AddTrailingSlash(pathName);
+    String fixedPath = AddTrailingSlash(pathName);
     
     // If no allowed directories defined, succeed always
     if (allowedPaths_.empty())
         return true;
     
     // If there is any attempt to go to a parent directory, disallow
-    if (fixedPath.find("..") != std::string::npos)
+    if (fixedPath.Find("..") != String::NPOS)
         return false;
     
     // Check if the path is a partial match of any of the allowed directories
-    for (std::set<std::string>::const_iterator i = allowedPaths_.begin(); i != allowedPaths_.end(); ++i)
+    for (std::set<String>::const_iterator i = allowedPaths_.begin(); i != allowedPaths_.end(); ++i)
     {
-        if (fixedPath.find(*i) == 0)
+        if (fixedPath.Find(*i) == 0)
             return true;
     }
     
@@ -225,92 +226,92 @@ bool FileSystem::CheckAccess(const std::string& pathName)
     return false;
 }
 
-bool FileSystem::FileExists(const std::string& fileName)
+bool FileSystem::FileExists(const String& fileName)
 {
     if (!CheckAccess(GetPath(fileName)))
         return false;
     
-    std::string fixedName = GetNativePath(RemoveTrailingSlash(fileName), true);
-    DWORD attributes = GetFileAttributes(fixedName.c_str());
+    String fixedName = GetNativePath(RemoveTrailingSlash(fileName), true);
+    DWORD attributes = GetFileAttributes(fixedName.CString());
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
     
     return true;
 }
 
-bool FileSystem::DirExists(const std::string& pathName)
+bool FileSystem::DirExists(const String& pathName)
 {
     if (!CheckAccess(pathName))
         return false;
     
-    std::string fixedName = GetNativePath(RemoveTrailingSlash(pathName), true);
-    DWORD attributes = GetFileAttributes(fixedName.c_str());
+    String fixedName = GetNativePath(RemoveTrailingSlash(pathName), true);
+    DWORD attributes = GetFileAttributes(fixedName.CString());
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (!(attributes & FILE_ATTRIBUTE_DIRECTORY)))
         return false;
     
     return true;
 }
 
-void FileSystem::ScanDir(std::vector<std::string>& result, const std::string& pathName, const std::string& filter, unsigned flags, bool recursive)
+void FileSystem::ScanDir(std::vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive)
 {
     result.clear();
     
     if (CheckAccess(pathName))
     {
-        std::string initialPath = AddTrailingSlash(pathName);
+        String initialPath = AddTrailingSlash(pathName);
         ScanDirInternal(result, initialPath, initialPath, filter, flags, recursive);
     }
 }
 
-std::string FileSystem::GetProgramDir()
+String FileSystem::GetProgramDir()
 {
     char exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileName(0, exeName, MAX_PATH);
-    return GetPath(std::string(exeName));
+    return GetPath(String(exeName));
 }
 
-std::string FileSystem::GetUserDocumentsDir()
+String FileSystem::GetUserDocumentsDir()
 {
     char pathName[MAX_PATH];
     pathName[0] = 0;
     SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
-    return AddTrailingSlash(std::string(pathName));
+    return AddTrailingSlash(String(pathName));
 }
 
-std::string FileSystem::GetSystemFontDir()
+String FileSystem::GetSystemFontDir()
 {
     char pathName[MAX_PATH];
     if (!ExpandEnvironmentStrings("%WinDir%", pathName, MAX_PATH))
-        return std::string();
-    return AddTrailingSlash(std::string(pathName)) + "Fonts";
+        return String();
+    return AddTrailingSlash(String(pathName)) + "Fonts";
 }
 
-void FileSystem::RegisterPath(const std::string& pathName)
+void FileSystem::RegisterPath(const String& pathName)
 {
-    if (pathName.empty())
+    if (pathName.Empty())
         return;
     
     allowedPaths_.insert(AddTrailingSlash(pathName));
 }
 
-void FileSystem::ScanDirInternal(std::vector<std::string>& result, std::string path, const std::string& startPath,
-    const std::string& filter, unsigned flags, bool recursive)
+void FileSystem::ScanDirInternal(std::vector<String>& result, String path, const String& startPath,
+    const String& filter, unsigned flags, bool recursive)
 {
     path = AddTrailingSlash(path);
-    std::string pathAndFilter = GetNativePath(path + filter, true);
-    std::string deltaPath;
-    if (path.length() > startPath.length())
-        deltaPath = path.substr(startPath.length());
+    String pathAndFilter = GetNativePath(path + filter, true);
+    String deltaPath;
+    if (path.Length() > startPath.Length())
+        deltaPath = path.Substring(startPath.Length());
     
     WIN32_FIND_DATA info;
-    HANDLE handle = FindFirstFile(pathAndFilter.c_str(), &info);
+    HANDLE handle = FindFirstFile(pathAndFilter.CString(), &info);
     if (handle != INVALID_HANDLE_VALUE)
     {
         do
         {
-            std::string fileName((const char*)&info.cFileName[0]);
-            if (!fileName.empty())
+            String fileName((const char*)&info.cFileName[0]);
+            if (!fileName.Empty())
             {
                 if ((info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && (!(flags & SCAN_HIDDEN)))
                     continue;
@@ -331,97 +332,98 @@ void FileSystem::ScanDirInternal(std::vector<std::string>& result, std::string p
     }
 }
 
-void SplitPath(const std::string& fullPath, std::string& pathName, std::string& fileName, std::string& extension)
+void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension)
 {
-    std::string fullPathCopy = Replace(fullPath, '\\', '/');
+    String fullPathCopy = fullPath.Replace('\\', '/');
     
-    size_t extPos = fullPathCopy.rfind('.');
-    if (extPos != std::string::npos)
+    unsigned extPos = fullPathCopy.FindLast('.');
+    if (extPos != String::NPOS)
     {
-        extension = ToLower(fullPathCopy.substr(extPos));
-        fullPathCopy = fullPathCopy.substr(0, extPos);
+        extension = fullPathCopy.Substring(extPos).ToLower();
+        fullPathCopy = fullPathCopy.Substring(0, extPos);
     }
     else
-        extension.clear();
+        extension.Clear();
     
-    size_t pathPos = fullPathCopy.rfind('/');
-    if (pathPos != std::string::npos)
+    unsigned pathPos = fullPathCopy.FindLast('/');
+    if (pathPos != String::NPOS)
     {
-        fileName = fullPathCopy.substr(pathPos + 1);
-        pathName = fullPathCopy.substr(0, pathPos + 1);
+        fileName = fullPathCopy.Substring(pathPos + 1);
+        pathName = fullPathCopy.Substring(0, pathPos + 1);
     }
     else
     {
         fileName = fullPathCopy;
-        pathName.clear();
+        pathName.Clear();
     }
 }
 
-std::string GetPath(const std::string& fullPath)
+String GetPath(const String& fullPath)
 {
-    std::string path, file, extension;
+    String path, file, extension;
     SplitPath(fullPath, path, file, extension);
     return path;
 }
 
-std::string GetFileName(const std::string& fullPath)
+String GetFileName(const String& fullPath)
 {
-    std::string path, file, extension;
+    String path, file, extension;
     SplitPath(fullPath, path, file, extension);
     return file;
 }
 
-std::string GetExtension(const std::string& fullPath)
+String GetExtension(const String& fullPath)
 {
-    std::string path, file, extension;
+    String path, file, extension;
     SplitPath(fullPath, path, file, extension);
     return extension;
 }
 
-std::string GetFileNameAndExtension(const std::string& fileName)
+String GetFileNameAndExtension(const String& fileName)
 {
-    std::string path, file, extension;
+    String path, file, extension;
     SplitPath(fileName, path, file, extension);
     return file + extension;
 }
 
-std::string AddTrailingSlash(const std::string& path)
+String AddTrailingSlash(const String& path)
 {
-    std::string ret;
+    String ret;
     
-    if (!path.empty())
+    if (!path.Empty())
     {
         ret = path;
-        char last = path[path.length() - 1];
+        char last = path[path.Length() - 1];
         if ((last != '/') && (last != '\\'))
             ret += '/';
     }
     
-    return Replace(ret, '\\', '/');
+    ret.ReplaceInPlace('\\', '/');
+    return ret;
 }
 
-std::string RemoveTrailingSlash(const std::string& path)
+String RemoveTrailingSlash(const String& path)
 {
-    if (!path.empty())
+    if (!path.Empty())
     {
-        char last = path[path.length() - 1];
+        char last = path[path.Length() - 1];
         if ((last == '/') || (last == '\\'))
-            return path.substr(0, path.length() - 1);
+            return path.Substring(0, path.Length() - 1);
     }
     
     return path;
 }
 
-std::string GetParentPath(const std::string& path)
+String GetParentPath(const String& path)
 {
-    unsigned pos = RemoveTrailingSlash(path).rfind('/');
-    if (pos != std::string::npos)
-        return path.substr(0, pos + 1);
+    unsigned pos = RemoveTrailingSlash(path).FindLast('/');
+    if (pos != String::NPOS)
+        return path.Substring(0, pos + 1);
     else
         return path;
 }
 
-std::string GetNativePath(const std::string& pathName, bool forNativeApi)
+String GetNativePath(const String& pathName, bool forNativeApi)
 {
     // On MSVC, replace slash always with backslash. On MinGW only if going to do Win32 native calls
 #ifdef _MSC_VER
@@ -429,7 +431,7 @@ std::string GetNativePath(const std::string& pathName, bool forNativeApi)
 #endif
     
     if (forNativeApi)
-        return Replace(pathName, '/', '\\');
+        return pathName.Replace('/', '\\');
     else
         return pathName;
 }

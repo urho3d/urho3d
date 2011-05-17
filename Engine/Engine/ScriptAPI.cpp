@@ -27,9 +27,9 @@
 #include "ScriptAPI.h"
 #include "ScriptFile.h"
 
-static const std::string noClassName;
+static const String noClassName;
 
-static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcParams, ScriptFile* ptr)
+static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams, ScriptFile* ptr)
 {
     if (!srcParams)
         return false;
@@ -43,7 +43,7 @@ static bool ScriptFileExecute(const std::string& declaration, CScriptArray* srcP
     return ptr->Execute(declaration, destParams);
 }
 
-static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const std::string& className, Node* ptr)
+static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, Node* ptr)
 {
     if (!file)
         return 0;
@@ -77,7 +77,7 @@ static void RegisterScriptFile(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(GetScriptContextFile), asCALL_CDECL);
 }
 
-static asIScriptObject* NodeCreateScriptObject(const std::string& scriptFileName, const std::string& className, Node* ptr)
+static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, Node* ptr)
 {
     ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
     return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, ptr);
@@ -101,7 +101,7 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
     return 0;
 }
 
-asIScriptObject* NodeGetNamedScriptObject(const std::string& className, Node* ptr)
+asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
 {
     const std::vector<SharedPtr<Component> >& components = ptr->GetComponents();
     for (std::vector<SharedPtr<Component> >::const_iterator i = components.begin(); i != components.end(); ++i)
@@ -121,7 +121,7 @@ asIScriptObject* NodeGetNamedScriptObject(const std::string& className, Node* pt
     return 0;
 }
 
-static bool ScriptInstanceExecute(const std::string& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
+static bool ScriptInstanceExecute(const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
 {
     if (!srcParams)
         return false;
@@ -136,12 +136,12 @@ static bool ScriptInstanceExecute(const std::string& declaration, CScriptArray* 
     return ptr->Execute(declaration, destParams);
 }
 
-static bool ScriptInstanceExecuteNoParams(const std::string& declaration, ScriptInstance* ptr)
+static bool ScriptInstanceExecuteNoParams(const String& declaration, ScriptInstance* ptr)
 {
     return ptr->Execute(declaration);
 }
 
-static void ScriptInstanceDelayedExecute(float delay, const std::string& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
+static void ScriptInstanceDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams, ScriptInstance* ptr)
 {
     if (!srcParams)
         return;
@@ -156,7 +156,7 @@ static void ScriptInstanceDelayedExecute(float delay, const std::string& declara
     ptr->DelayedExecute(delay, declaration, destParams);
 }
 
-static void ScriptInstanceDelayedExecuteNoParams(float delay, const std::string& declaration, ScriptInstance* ptr)
+static void ScriptInstanceDelayedExecuteNoParams(float delay, const String& declaration, ScriptInstance* ptr)
 {
     ptr->DelayedExecute(delay, declaration);
 }
@@ -198,7 +198,7 @@ static int SelfGetFixedUpdateFps()
         return 0;
 }
 
-static const std::string& SelfGetClassName()
+static const String& SelfGetClassName()
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
@@ -207,7 +207,7 @@ static const std::string& SelfGetClassName()
         return noClassName;
 }
 
-static void SelfDelayedExecute(float delay, const std::string& declaration, CScriptArray* srcParams)
+static void SelfDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if ((!ptr) || (!srcParams))
@@ -223,7 +223,7 @@ static void SelfDelayedExecute(float delay, const std::string& declaration, CScr
     ptr->DelayedExecute(delay, declaration, destParams);
 }
 
-static void SelfDelayedExecuteNoParams(float delay, const std::string& declaration)
+static void SelfDelayedExecuteNoParams(float delay, const String& declaration)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
     if (ptr)
@@ -254,7 +254,7 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Node", "ScriptObject@+ get_scriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
     
     RegisterComponent<ScriptInstance>(engine, "ScriptInstance");
-    engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", asMETHODPR(ScriptInstance, CreateObject, (ScriptFile*, const std::string&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ScriptInstance", "bool CreateObject(ScriptFile@+, const String&in)", asMETHODPR(ScriptInstance, CreateObject, (ScriptFile*, const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceExecute), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "bool Execute(const String&in)", asFUNCTION(ScriptInstanceExecuteNoParams), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ScriptInstance", "void DelayedExecute(float, const String&in, const Array<Variant>@+)", asFUNCTION(ScriptInstanceDelayedExecute), asCALL_CDECL_OBJLAST);

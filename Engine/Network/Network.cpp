@@ -163,7 +163,7 @@ bool Network::StartServer(unsigned short port)
     return true;
 }
 
-Peer* Network::Connect(const std::string& address, unsigned short port)
+Peer* Network::Connect(const String& address, unsigned short port)
 {
     // Create client host if one did not exist already
     if (!clientHost_)
@@ -180,7 +180,7 @@ Peer* Network::Connect(const std::string& address, unsigned short port)
     
     // Attempt to connect
     ENetAddress server;
-    enet_address_set_host(&server, address.c_str());
+    enet_address_set_host(&server, address.CString());
     server.port = port;
     ENetPeer* enetPeer = enet_host_connect(clientHost_, &server, numChannels_, 0);
     if (!enetPeer)

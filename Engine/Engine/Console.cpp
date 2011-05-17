@@ -42,7 +42,7 @@
 
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
-static const std::string noRow;
+static const String noRow;
 
 OBJECTTYPESTATIC(Console);
 
@@ -166,7 +166,7 @@ bool Console::IsVisible() const
     return background_->IsVisible();
 }
 
-const std::string& Console::GetHistoryRow(unsigned index) const
+const String& Console::GetHistoryRow(unsigned index) const
 {
     return index < history_.size() ? history_[index] : noRow;
 }
@@ -175,8 +175,8 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
     
-    std::string line = lineEdit_->GetText();
-    if (!line.empty())
+    String line = lineEdit_->GetText();
+    if (!line.Empty())
     {
         Script* script = GetSubsystem<Script>();
         if (script)
@@ -188,7 +188,7 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             history_.erase(history_.begin());
         historyPosition_ = history_.size();
         
-        current_Row.clear();
+        current_Row.Clear();
         lineEdit_->SetText(current_Row);
     }
 }
@@ -248,7 +248,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     using namespace LogMessage;
     
     // Be prepared for possible multi-line messages
-    std::vector<std::string> rows = Split(eventData[P_MESSAGE].GetString(), '\n');
+    std::vector<String> rows = Split(eventData[P_MESSAGE].GetString(), '\n');
     for (unsigned i = 0; i < rows.size(); ++i)
     {
         // Remove the first row, change its text and re-add to the bottom

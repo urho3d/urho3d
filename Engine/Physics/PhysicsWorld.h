@@ -179,9 +179,9 @@ public:
     /// Clean up the geometry cache
     void CleanupGeometryCache();
     /// Return the triangle mesh cache
-    std::map<std::string, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
+    std::map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
     /// Return the heightfield cache
-    std::map<std::string, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
+    std::map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
     
 protected:
     /// Handle node being assigned
@@ -224,9 +224,9 @@ private:
     /// Collision infos to be sent as events
     std::vector<PhysicsCollisionInfo> collisionInfos_;
     /// Cache for triangle mesh geometries
-    std::map<std::string, SharedPtr<TriangleMeshData> > triangleMeshCache_;
+    std::map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
     /// Cache for heightfield geometries
-    std::map<std::string, SharedPtr<HeightfieldData> > heightfieldCache_;
+    std::map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
 };
 
 /// Register Physics library objects

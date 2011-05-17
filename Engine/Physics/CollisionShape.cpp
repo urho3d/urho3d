@@ -43,7 +43,7 @@
 
 #include "DebugNew.h"
 
-static const std::string typeNames[] = 
+static const String typeNames[] = 
 {
     "none",
     "box",
@@ -845,12 +845,12 @@ void CollisionShape::CreateGeometry()
     case SHAPE_CONVEXHULL:
         {
             // Check the geometry cache
-            std::string id = model_->GetName() + "_" + ToString(geometryScale_) + "_" + ToString(lodLevel_);
+            String id = model_->GetName() + "_" + ToString(geometryScale_) + "_" + ToString(lodLevel_);
             if (shapeType_ == SHAPE_CONVEXHULL)
                 id += "_" + ToString(thickness_);
             
-            std::map<std::string, SharedPtr<TriangleMeshData> >& cache = physicsWorld_->GetTriangleMeshCache();
-            std::map<std::string, SharedPtr<TriangleMeshData> >::iterator j = cache.find(id);
+            std::map<String, SharedPtr<TriangleMeshData> >& cache = physicsWorld_->GetTriangleMeshCache();
+            std::map<String, SharedPtr<TriangleMeshData> >::iterator j = cache.find(id);
             if (j != cache.end())
             {
                 geometry_ = dCreateTriMesh(space, j->second->triMesh_, 0, 0, 0);
@@ -870,10 +870,10 @@ void CollisionShape::CreateGeometry()
     case SHAPE_HEIGHTFIELD:
         {
             // Check the geometry cache
-            std::string id = model_->GetName() + "_" + ToString(numPoints_) + "_" + ToString(thickness_) + "_" + ToString(lodLevel_);
+            String id = model_->GetName() + "_" + ToString(numPoints_) + "_" + ToString(thickness_) + "_" + ToString(lodLevel_);
             
-            std::map<std::string, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
-            std::map<std::string, SharedPtr<HeightfieldData> >::iterator j = cache.find(id);
+            std::map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
+            std::map<String, SharedPtr<HeightfieldData> >::iterator j = cache.find(id);
             if (j != cache.end())
             {
                 geometry_ = dCreateHeightfield(space, j->second->heightfield_, 1);

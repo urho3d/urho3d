@@ -72,7 +72,7 @@ public:
     /// Return current history position
     unsigned GetHistoryPosition() const { return historyPosition_; }
     /// Return history row at index
-    const std::string& GetHistoryRow(unsigned index) const;
+    const String& GetHistoryRow(unsigned index) const;
     
 private:
     /// Handle enter pressed on the line edit
@@ -95,9 +95,9 @@ private:
     /// Line edit
     SharedPtr<LineEdit> lineEdit_;
     /// Command history
-    std::vector<std::string> history_;
+    std::vector<String> history_;
     /// Current row being edited
-    std::string current_Row;
+    String current_Row;
     /// Command history maximum rows
     unsigned historyRows_;
     /// Command history current position

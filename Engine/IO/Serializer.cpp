@@ -147,18 +147,18 @@ bool Serializer::WriteBoundingBox(const BoundingBox& value)
     return success;
 }
 
-bool Serializer::WriteString(const std::string& value)
+bool Serializer::WriteString(const String& value)
 {
-    return Write(value.c_str(), value.length() + 1) == value.length() + 1;
+    return Write(value.CString(), value.Length() + 1) == value.Length() + 1;
 }
 
-bool Serializer::WriteID(const std::string& value)
+bool Serializer::WriteID(const String& value)
 {
     bool success = true;
-    unsigned length = Min((int)value.length(), 4);
+    unsigned length = Min((int)value.Length(), 4);
     
-    success &= Write(value.c_str(), length) == length;
-    for (unsigned i = value.length(); i < 4; ++i)
+    success &= Write(value.CString(), length) == length;
+    for (unsigned i = value.Length(); i < 4; ++i)
         success &= WriteByte(' ');
     return success;
 }
@@ -323,11 +323,11 @@ bool Serializer::WriteVLE(unsigned value)
     }
 }
 
-bool Serializer::WriteLine(const std::string& value)
+bool Serializer::WriteLine(const String& value)
 {
     bool success = true;
     
-    success &= Write(value.c_str(), value.length()) == value.length();
+    success &= Write(value.CString(), value.Length()) == value.Length();
     success &= WriteUByte(13);
     success &= WriteUByte(10);
     return success;

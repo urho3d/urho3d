@@ -115,7 +115,7 @@ private:
     /// Generate a challenge value for the client
     unsigned GenerateChallenge() const;
     /// Disconnect client either forcibly or benevolently
-    void Disconnect(Connection* connection, bool forced, const std::string& logMessage);
+    void Disconnect(Connection* connection, bool forced, const String& logMessage);
     /// Generate a scene update. If connection has no stored scene revisions, a full update will be written
     void WriteNetUpdate(Connection* connection, Serializer& dest);
     /// Return relevant node IDs for the client

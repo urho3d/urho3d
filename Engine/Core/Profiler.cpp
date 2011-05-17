@@ -83,21 +83,21 @@ void Profiler::ClearAccumulated()
     accumulatedFrames_ = 0;
 }
 
-std::string Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal) const
+String Profiler::GetData(bool showUnused, bool showAccumulated, bool showTotal) const
 {
-    std::string output;
+    String output;
     
     if (!showTotal)
-        output += std::string("Block                          Count   Average   Total\n \n");
+        output += String("Block                          Count   Average   Total\n \n");
     else
-        output += std::string("Block                             Frame average (msec)      Accumulated total (sec)\n \n");
+        output += String("Block                             Frame average (msec)      Accumulated total (sec)\n \n");
     
     GetData(root_, output, 0, showUnused, showAccumulated, showTotal);
     
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, std::string& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const
+void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
@@ -159,7 +159,7 @@ void Profiler::GetData(ProfilerBlock* block, std::string& output, unsigned inden
                     indentedName, avgFrameCount, avgFrameTime, avgFrameTotalTime,
                     totalCount, avgTotalTime / 1000.0f, totalTime / 1000.0);
             }
-            output += std::string(line);
+            output += String(line);
             
             indent++;
         }

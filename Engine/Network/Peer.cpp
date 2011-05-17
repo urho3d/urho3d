@@ -220,7 +220,7 @@ void Peer::OnConnect()
     {
         char ipBuffer[MAX_IPADDRESS];
         enet_address_get_host_ip(&peer_->address, ipBuffer, MAX_IPADDRESS);
-        address_ = std::string(ipBuffer);
+        address_ = String(ipBuffer);
         port_ = peer_->address.port;
         connectionState_ = CS_CONNECTED;
         
@@ -250,7 +250,7 @@ void Peer::OnDisconnect()
         eventData[P_PEER] = (void*)this;
         SendEvent(E_PEERDISCONNECTED, eventData);
         
-        if (!address_.empty())
+        if (!address_.Empty())
             LOGINFO(address_ + ":" + ToString(port_) + " disconnected");
         else
             LOGINFO("Disconnected");

@@ -56,7 +56,7 @@ public:
     /// Start server on a port. Return true if successful
     bool StartServer(unsigned short port);
     /// Connect to a server
-    Peer* Connect(const std::string& address, unsigned short port);
+    Peer* Connect(const String& address, unsigned short port);
     /// Broadcast a packet to all connected client peers
     void Broadcast(const VectorBuffer& packet, unsigned char channel, bool reliable, bool inOrder = true);
     /// Broadcast a packet to all connected client peers

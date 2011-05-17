@@ -46,9 +46,9 @@ public:
     /// Construct
     File(Context* context);
     /// Construct and open
-    File(Context* context, const std::string& fileName, FileMode mode = FILE_READ);
+    File(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file
-    File(Context* context, PackageFile* package, const std::string& fileName);
+    File(Context* context, PackageFile* package, const String& fileName);
     /// Destruct. Close the file if open
     virtual ~File();
     
@@ -59,18 +59,18 @@ public:
     /// Write bytes to the file
     virtual unsigned Write(const void* data, unsigned size);
     /// Return the file name
-    virtual const std::string& GetName() const { return fileName_; }
+    virtual const String& GetName() const { return fileName_; }
     /// Return a checksum of the file contents, using the SDBM hash algorithm
     virtual unsigned GetChecksum();
     
     /// Open a filesystem file. Return true if successful
-    bool Open(const std::string& fileName, FileMode mode = FILE_READ);
+    bool Open(const String& fileName, FileMode mode = FILE_READ);
     /// Open from within a package file. Return true if successful
-    bool Open(PackageFile* package, const std::string& fileName);
+    bool Open(PackageFile* package, const String& fileName);
     /// Close the file
     void Close();
     /// Change the file name. Used by the resource system
-    void SetName(const std::string& name);
+    void SetName(const String& name);
     
     /// Return the open mode
     FileMode GetMode() const { return mode_; }
@@ -82,7 +82,7 @@ public:
     
 private:
     /// File name
-    std::string fileName_;
+    String fileName_;
     /// Open mode
     FileMode mode_;
     /// File handle

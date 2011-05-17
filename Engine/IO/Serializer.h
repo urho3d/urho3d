@@ -92,9 +92,9 @@ public:
     /// Write a BoundingBox
     bool WriteBoundingBox(const BoundingBox& value);
     /// Write a null-terminated string
-    bool WriteString(const std::string& value);
+    bool WriteString(const String& value);
     /// Write a four-letter ID. If the string is not long enough, spaces will be appended
-    bool WriteID(const std::string& value);
+    bool WriteID(const String& value);
     /// Write a 32-bit StringHash
     bool WriteStringHash(const StringHash& value);
     /// Write a 16-bit ShortStringHash
@@ -116,5 +116,5 @@ public:
     /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum
     bool WriteVLE(unsigned value);
     /// Write a text line. Char codes 13 & 10 will be automatically appended.
-    bool WriteLine(const std::string& value);
+    bool WriteLine(const String& value);
 };

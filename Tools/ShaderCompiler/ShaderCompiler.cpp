@@ -24,12 +24,11 @@
 #include "Context.h"
 #include "File.h"
 #include "FileSystem.h"
+#include "ProcessUtils.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <cstring>
-#include <fstream>
-#include <iostream>
 
 #include "DebugNew.h"
 
@@ -42,43 +41,43 @@ enum ShaderType
 
 struct Variation
 {
-    Variation(const std::string& name, bool isOption) :
+    Variation(const String& name, bool isOption) :
         name_(name),
         option_(isOption)
     {
     }
     
-    void addDefine(const std::string& def)
+    void addDefine(const String& def)
     {
         defines_.push_back(def);
     }
     
-    void addExclude(const std::string& excl)
+    void addExclude(const String& excl)
     {
         excludes_.push_back(excl);
     }
     
-    void addInclude(const std::string& incl)
+    void addInclude(const String& incl)
     {
         includes_.push_back(incl);
     }
     
-    void addRequire(const std::string& req)
+    void addRequire(const String& req)
     {
         requires_.push_back(req);
     }
     
-    std::string name_;
-    std::vector<std::string> defines_;
-    std::vector<std::string> excludes_;
-    std::vector<std::string> includes_;
-    std::vector<std::string> requires_;
+    String name_;
+    std::vector<String> defines_;
+    std::vector<String> excludes_;
+    std::vector<String> includes_;
+    std::vector<String> requires_;
     bool option_;
 };
 
 struct Shader
 {
-    Shader(const std::string& name, ShaderType type) :
+    Shader(const String& name, ShaderType type) :
         name_(name),
         type_(type)
     {
@@ -89,20 +88,20 @@ struct Shader
         variations_.push_back(var);
     }
     
-    std::string name_;
+    String name_;
     ShaderType type_;
     std::vector<Variation> variations_;
 };
 
 struct Parameter
 {
-    std::string name_;
+    String name_;
     unsigned index_;
 };
 
 struct Parameters
 {
-    void addVSParam(const std::string& name, unsigned index)
+    void addVSParam(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -111,7 +110,7 @@ struct Parameters
         vsParams_.push_back(newParam);
     }
     
-    void addPSParam(const std::string& name, unsigned index)
+    void addPSParam(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -120,7 +119,7 @@ struct Parameters
         psParams_.push_back(newParam);
     }
     
-    void addTextureUnit(const std::string& name, unsigned index)
+    void addTextureUnit(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -136,33 +135,35 @@ struct Parameters
 
 SharedPtr<Context> context_(new Context());
 SharedPtr<FileSystem> fileSystem_(new FileSystem(context_));
-std::string inDir_;
-std::string inFile_;
-std::string outDir_;
-std::map<std::string, unsigned> vsParams_;
-std::map<std::string, unsigned> psParams_;
-std::map<std::string, unsigned> textureUnits_;
-std::vector<std::string> defines_;
+String inDir_;
+String inFile_;
+String outDir_;
+std::map<String, unsigned> vsParams_;
+std::map<String, unsigned> psParams_;
+std::map<String, unsigned> textureUnits_;
+std::vector<String> defines_;
 bool useSM3_ = false;
 
 int main(int argc, char** argv);
-void Run(const std::vector<std::string>& arguments);
+void Run(const std::vector<String>& arguments);
 void CompileVariations(const Shader& baseShader, XMLElement& shaders);
-bool Compile(ShaderType type, const std::string& input, const std::string& output, const std::vector<std::string>& defines, Parameters& params);
-void ErrorExit(const std::string& error);
+bool Compile(ShaderType type, const String& input, const String& output, const std::vector<String>& defines, Parameters& params);
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> arguments;
+    std::vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(Replace(std::string(argv[i]), '/', '\\'));
+    {
+        String argument(argv[i]);
+        arguments.push_back(argument.Replace('/', '\\'));
+    }
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<std::string>& arguments)
+void Run(const std::vector<String>& arguments)
 {
     if (arguments.size() < 2)
     {
@@ -173,11 +174,11 @@ void Run(const std::vector<std::string>& arguments)
         );
     }
     
-    size_t pos = arguments[0].rfind('\\');
-    if (pos != std::string::npos)
+    unsigned pos = arguments[0].FindLast('\\');
+    if (pos != String::NPOS)
     {
-        inDir_ = arguments[0].substr(0, pos);
-        inFile_ = arguments[0].substr(pos + 1);
+        inDir_ = arguments[0].Substring(0, pos);
+        inFile_ = arguments[0].Substring(pos + 1);
     }
     else
     {
@@ -186,21 +187,21 @@ void Run(const std::vector<std::string>& arguments)
     
     outDir_ = arguments[1];
     
-    if (inDir_.empty())
+    if (inDir_.Empty())
         inDir_ = ".\\";
     
-    if (outDir_.empty())
+    if (outDir_.Empty())
         outDir_ = ".\\";
     
-    if (inDir_[inDir_.length()-1] != '\\')
+    if (inDir_[inDir_.Length()-1] != '\\')
         inDir_ = inDir_ + "\\";
     
-    if (outDir_[outDir_.length()-1] != '\\')
+    if (outDir_[outDir_.Length()-1] != '\\')
         outDir_ = outDir_ + "\\";
     
     for (unsigned i = 2; i < arguments.size(); ++i)
     {
-        std::string arg = ToUpper(arguments[i]);
+        String arg = arguments[i].ToUpper();
         
         if (arg == "SM3")
             useSM3_ = true;
@@ -228,10 +229,10 @@ void Run(const std::vector<std::string>& arguments)
     {
         bool WriteOutput = false;
         
-        std::string source = shader.GetString("name");
+        String source = shader.GetString("name");
         
         ShaderType compileType = Both;
-        std::string type = shader.GetString("type");
+        String type = shader.GetString("type");
         if ((type == "VS") || (type == "vs"))
             compileType = VS;
         if ((type == "PS") || (type == "ps"))
@@ -244,33 +245,33 @@ void Run(const std::vector<std::string>& arguments)
         XMLElement variation = shader.GetChildElement("");
         while (variation)
         {
-            std::string value = variation.GetName();
+            String value = variation.GetName();
             if ((value == "variation") || (value == "option"))
             {
-                std::string name = variation.GetString("name");
+                String name = variation.GetString("name");
                 
                 Variation newVar(name, value == "option");
                 
-                std::string simpleDefine = variation.GetString("define");
-                if (!simpleDefine.empty())
+                String simpleDefine = variation.GetString("define");
+                if (!simpleDefine.Empty())
                     newVar.addDefine(simpleDefine);
                     
-                std::string simpleExclude = variation.GetString("exclude");
-                if (!simpleExclude.empty())
+                String simpleExclude = variation.GetString("exclude");
+                if (!simpleExclude.Empty())
                     newVar.addExclude(simpleExclude);
                 
-                std::string simpleInclude = variation.GetString("include");
-                if (!simpleInclude.empty())
+                String simpleInclude = variation.GetString("include");
+                if (!simpleInclude.Empty())
                     newVar.addInclude(simpleInclude);
                 
-                std::string simpleRequire = variation.GetString("require");
-                if (!simpleRequire.empty())
+                String simpleRequire = variation.GetString("require");
+                if (!simpleRequire.Empty())
                     newVar.addRequire(simpleRequire);
                 
                 XMLElement define = variation.GetChildElement("define");
                 while (define)
                 {
-                    std::string name = define.GetString("name");
+                    String name = define.GetString("name");
                     newVar.addDefine(name);
                     
                     define = define.GetNextElement("define");
@@ -279,7 +280,7 @@ void Run(const std::vector<std::string>& arguments)
                 XMLElement exclude = variation.GetChildElement("exclude");
                 while (exclude)
                 {
-                    std::string name = exclude.GetString("name");
+                    String name = exclude.GetString("name");
                     newVar.addExclude(name);
                     
                     exclude = exclude.GetNextElement("exclude");
@@ -288,7 +289,7 @@ void Run(const std::vector<std::string>& arguments)
                 XMLElement include = variation.GetChildElement("include");
                 while (include)
                 {
-                    std::string name = include.GetString("name");
+                    String name = include.GetString("name");
                     newVar.addInclude(name);
                     
                     include = include.GetNextElement("include");
@@ -297,7 +298,7 @@ void Run(const std::vector<std::string>& arguments)
                 XMLElement require = variation.GetChildElement("require");
                 while (require)
                 {
-                    std::string name = require.GetString("name");
+                    String name = require.GetString("name");
                     newVar.addRequire(name);
                     
                     require = require.GetNextElement("require");
@@ -321,17 +322,17 @@ void Run(const std::vector<std::string>& arguments)
         
         if (WriteOutput)
         {
-            std::string outFileName = outDir_ + inDir_ + source + ".xml";
-            remove(outFileName.c_str());
+            String outFileName = outDir_ + inDir_ + source + ".xml";
+            remove(outFileName.CString());
             
             // Add global parameter & texture sampler definitions
             {
                 XMLElement parameters = outShaders.CreateChildElement("vsparameters");
-                std::multimap<unsigned, std::string> sorted;
-                for (std::map<std::string, unsigned>::const_iterator i = vsParams_.begin(); i != vsParams_.end(); ++i)
-                    sorted.insert(std::pair<unsigned, std::string>(i->second, i->first));
+                std::multimap<unsigned, String> sorted;
+                for (std::map<String, unsigned>::const_iterator i = vsParams_.begin(); i != vsParams_.end(); ++i)
+                    sorted.insert(std::pair<unsigned, String>(i->second, i->first));
                 
-                for (std::multimap<unsigned, std::string>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
                 {
                     XMLElement param = parameters.CreateChildElement("parameter");
                     param.SetString("name", i->second);
@@ -341,11 +342,11 @@ void Run(const std::vector<std::string>& arguments)
             
             {
                 XMLElement parameters = outShaders.CreateChildElement("psparameters");
-                std::multimap<unsigned, std::string> sorted;
-                for (std::map<std::string, unsigned>::const_iterator i = psParams_.begin(); i != psParams_.end(); ++i)
-                    sorted.insert(std::pair<unsigned, std::string>(i->second, i->first));
+                std::multimap<unsigned, String> sorted;
+                for (std::map<String, unsigned>::const_iterator i = psParams_.begin(); i != psParams_.end(); ++i)
+                    sorted.insert(std::pair<unsigned, String>(i->second, i->first));
                 
-                for (std::multimap<unsigned, std::string>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
                 {
                     XMLElement param = parameters.CreateChildElement("parameter");
                     param.SetString("name", i->second);
@@ -355,11 +356,11 @@ void Run(const std::vector<std::string>& arguments)
             
             {
                 XMLElement parameters = outShaders.CreateChildElement("textureunits");
-                std::multimap<unsigned, std::string> sorted;
-                for (std::map<std::string, unsigned>::const_iterator i = textureUnits_.begin(); i != textureUnits_.end(); ++i)
-                    sorted.insert(std::pair<unsigned, std::string>(i->second, i->first));
+                std::multimap<unsigned, String> sorted;
+                for (std::map<String, unsigned>::const_iterator i = textureUnits_.begin(); i != textureUnits_.end(); ++i)
+                    sorted.insert(std::pair<unsigned, String>(i->second, i->first));
                 
-                for (std::multimap<unsigned, std::string>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
+                for (std::multimap<unsigned, String>::const_iterator i = sorted.begin(); i != sorted.end(); ++i)
                 {
                     XMLElement param = parameters.CreateChildElement("textureunit");
                     param.SetString("name", i->second);
@@ -385,7 +386,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     
     const std::vector<Variation>& variations = baseShader.variations_;
     
-    std::map<std::string, unsigned> nameToIndex;
+    std::map<String, unsigned> nameToIndex;
     
     if (variations.size() > 32)
         ErrorExit("Maximum amount of variations exceeded");
@@ -497,13 +498,13 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
             bool firstSuffix = true;
             
             // Build output shader filename & defines from active variations
-            std::string outName  = baseShader.name_;
-            std::vector<std::string> defines;
+            String outName  = baseShader.name_;
+            std::vector<String> defines;
             for (unsigned j = 0; j < variations.size(); ++j)
             {
                 if (active & (1 << j))
                 {
-                    if (variations[j].name_.length())
+                    if (variations[j].name_.Length())
                     {
                         if (firstSuffix)
                         {
@@ -560,12 +561,12 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     }
 }
 
-bool Compile(ShaderType type, const std::string& input, const std::string& output, const std::vector<std::string>& defines,
+bool Compile(ShaderType type, const String& input, const String& output, const std::vector<String>& defines,
     Parameters& params)
 {
     bool compiled = false;
     
-    std::string allDefines;
+    String allDefines;
     for (unsigned i = 0; i < defines.size(); ++i)
         allDefines += "/D" + defines[i] + " ";
     for (unsigned i = 0; i < defines_.size(); ++i)
@@ -575,8 +576,8 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
     {
         if (!useSM3_)
         {
-            std::string outFile = output + ".vs2";
-            std::string command = "fxc /Tvs_2_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
+            String outFile = output + ".vs2";
+            String command = "fxc /Tvs_2_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
                 inDir_ + input + ".hlsl";
             
             if (fileSystem_->SystemCommand(command))
@@ -586,8 +587,8 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
         }
         else
         {
-            std::string outFile = output + ".vs3";
-            std::string command = "fxc /Tvs_3_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
+            String outFile = output + ".vs3";
+            String command = "fxc /Tvs_3_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
                 inDir_ + input + ".hlsl";
             
             if (fileSystem_->SystemCommand(command))
@@ -601,11 +602,10 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
     {
         if (!useSM3_)
         {
-            std::string outFile = output + ".ps2";
-            std::string command = "fxc /Tps_2_0 /O3 /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
+            String outFile = output + ".ps2";
+            String command = "fxc /Tps_2_0 /O3 /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
                 inDir_ + input + ".hlsl";
             
-            std::cout << command << std::endl;
             if (fileSystem_->SystemCommand(command))
                 ErrorExit("Failed to compile shader " + outFile);
             
@@ -613,11 +613,10 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
         }
         else
         {
-            std::string outFile = output + ".ps3";
-            std::string command = "fxc /Tps_3_0 /O3 /Gfp /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
+            String outFile = output + ".ps3";
+            String command = "fxc /Tps_3_0 /O3 /Gfp /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
                 inDir_ + input + ".hlsl";
             
-            std::cout << command << std::endl;
             if (fileSystem_->SystemCommand(command))
                 ErrorExit("Failed to compile shader" + outFile);
             
@@ -628,18 +627,16 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
     if (!compiled)
         return false;
     
-    std::ifstream dump("output.txt");
-    if (!dump.good())
+    SharedPtr<File> dump(new File(context_, "output.txt"));
+    if (!dump->IsOpen())
         ErrorExit("Could not open dump file");
     
     bool paramsStarted = false;
     
-    while (!dump.eof())
+    while (!dump->IsEof())
     {
-        char line[256];
-        dump.getline(line, 256);
-        std::string lineStr(line);
-        std::vector<std::string> elements = Split(lineStr, ' ');
+        String lineStr = dump->ReadLine();
+        std::vector<String> elements = Split(lineStr, ' ');
         
         if (paramsStarted)
         {
@@ -648,22 +645,22 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
             
             if ((elements.size() == 4) && (elements[0] == "//") && (elements[1][0] != '-'))
             {
-                std::string name = elements[1];
-                std::string reg = elements[2];
+                String name = elements[1];
+                String reg = elements[2];
                 
                 bool isSampler = false;
                 if (reg[0] == 's')
                     isSampler = true;
                 
                 if ((name[0] == 'c') || (name[0] == 's'))
-                    name = name.substr(1, name.size() - 1);
+                    name = name.Substring(1, name.Length() - 1);
                 
-                unsigned index = ToInt(reg.substr(1, reg.size() - 1));
+                unsigned index = ToInt(reg.Substring(1, reg.Length() - 1));
                 
                 if (isSampler)
                 {
                     // Skip if it's a G-buffer sampler
-                    if (name.find("Buffer") == std::string::npos)
+                    if (name.Find("Buffer") == String::NPOS)
                     {
                         params.addTextureUnit(name, index);
                         
@@ -712,14 +709,8 @@ bool Compile(ShaderType type, const std::string& input, const std::string& outpu
         }
     }
     
-    dump.close();
+    dump->Close();
     remove("output.txt");
     
     return true;
-}
-
-void ErrorExit(const std::string& error)
-{
-    std::cout << error;
-    exit(1);
 }

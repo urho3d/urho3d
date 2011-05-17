@@ -24,11 +24,10 @@
 #include "Context.h"
 #include "File.h"
 #include "Image.h"
+#include "ProcessUtils.h"
 #include "StringUtils.h"
 
 #include <cstdlib>
-#include <iostream>
-#include <string>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
@@ -37,21 +36,20 @@
 SharedPtr<Context> context_(new Context());
 
 int main(int argc, char** argv);
-void Run(const std::vector<std::string>& arguments);
-void ErrorExit(const std::string& error);
+void Run(const std::vector<String>& arguments);
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> arguments;
+    std::vector<String> arguments;
     
     for (int i = 1; i < argc; ++i)
-        arguments.push_back(std::string(argv[i]));
+        arguments.push_back(String(argv[i]));
     
     Run(arguments);
     return 0;
 }
 
-void Run(const std::vector<std::string>& arguments)
+void Run(const std::vector<String>& arguments)
 {
     if (arguments.size() < 1)
     {
@@ -93,20 +91,14 @@ void Run(const std::vector<std::string>& arguments)
         }
     }
     
-    std::string tempDestName = Split(arguments[0], '.')[0] + ".tga";
-    stbi_write_tga(tempDestName.c_str(), image.GetWidth(), image.GetHeight(), 4, buffer.GetPtr());
+    String tempDestName = Split(arguments[0], '.')[0] + ".tga";
+    stbi_write_tga(tempDestName.CString(), image.GetWidth(), image.GetHeight(), 4, buffer.GetPtr());
     
-    std::string command = "texconv -f DXT5 -ft DDS -if NONE " + tempDestName;
-    int ret = system(command.c_str());
+    String command = "texconv -f DXT5 -ft DDS -if NONE " + tempDestName;
+    int ret = system(command.CString());
     
     if (ret)
         ErrorExit("Failed to convert to DXT5");
     
-    remove(tempDestName.c_str());
-}
-
-void ErrorExit(const std::string& error)
-{
-    std::cout << error;
-    exit(1);
+    remove(tempDestName.CString());
 }

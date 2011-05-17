@@ -44,14 +44,14 @@ public:
     virtual bool Save(Serializer& dest);
     
     /// Set name
-    void SetName(const std::string& name);
+    void SetName(const String& name);
     /// Set memory use in bytes, possibly approximate
     void SetMemoryUse(unsigned size);
     /// Reset last used timer
     void ResetUseTimer();
     
     /// Return name
-    const std::string& GetName() const { return name_; }
+    const String& GetName() const { return name_; }
     /// Return name hash
     StringHash GetNameHash() const { return nameHash_; }
     /// Return memory use in bytes, possibly approximate
@@ -61,7 +61,7 @@ public:
     
 private:
     /// Name
-    std::string name_;
+    String name_;
     /// Name hash
     StringHash nameHash_;
     /// Last used timer
@@ -75,9 +75,9 @@ inline StringHash GetResourceHash(Resource* resource)
     return resource ? resource->GetNameHash() : StringHash();
 }
 
-inline std::string GetResourceName(Resource* resource)
+inline String GetResourceName(Resource* resource)
 {
-    return resource ? resource->GetName() : std::string();
+    return resource ? resource->GetName() : String();
 }
 
 inline ShortStringHash GetResourceType(Resource* resource, ShortStringHash defaultType)

@@ -38,7 +38,7 @@
 
 #include "DebugNew.h"
 
-static const std::string textureUnitNames[] =
+static const String textureUnitNames[] =
 {
     "diffuse",
     "normal",
@@ -50,7 +50,7 @@ static const std::string textureUnitNames[] =
     "lightspot" // Not defined by materials
 };
 
-static const std::string cullModeNames[] =
+static const String cullModeNames[] =
 {
     "none",
     "ccw",
@@ -142,7 +142,7 @@ bool Material::Load(Deserializer& source)
         TextureUnit unit = TU_DIFFUSE;
         if (textureElem.HasAttribute("unit"))
         {
-            std::string unitName = textureElem.GetStringLower("unit");
+            String unitName = textureElem.GetStringLower("unit");
             unit = (TextureUnit)GetStringListIndex(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS,
                 MAX_MATERIAL_TEXTURE_UNITS);
             if (unitName == "diff")
@@ -158,7 +158,7 @@ bool Material::Load(Deserializer& source)
         }
         if (unit != MAX_MATERIAL_TEXTURE_UNITS)
         {
-            std::string name = textureElem.GetString("name");
+            String name = textureElem.GetString("name");
             // Detect cube maps by file extension: they are defined by an XML file
             if (GetExtension(name) == ".xml")
                 SetTexture(unit, cache->GetResource<TextureCube>(name));
@@ -171,7 +171,7 @@ bool Material::Load(Deserializer& source)
     XMLElement parameterElem = rootElem.GetChildElement("parameter");
     while (parameterElem)
     {
-        std::string name = parameterElem.GetString("name");
+        String name = parameterElem.GetString("name");
         Vector4 value = parameterElem.GetVector("value");
         VSParameter vsParam = graphics->GetVSParameter(name);
         if (vsParam != MAX_VS_PARAMETERS)
@@ -355,7 +355,7 @@ void Material::ReleaseShaders()
     }
 }
 
-SharedPtr<Material> Material::Clone(const std::string& cloneName) const
+SharedPtr<Material> Material::Clone(const String& cloneName) const
 {
     SharedPtr<Material> ret(new Material(context_));
     
@@ -398,7 +398,7 @@ Texture* Material::GetTexture(TextureUnit unit) const
     return (unsigned)unit < textures_.size() ? textures_[unit] : (Texture*)0;
 }
 
-const std::string& Material::GetTextureUnitName(TextureUnit unit)
+const String& Material::GetTextureUnitName(TextureUnit unit)
 {
     return textureUnitNames[unit];
 }

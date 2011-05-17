@@ -146,7 +146,7 @@ public:
     virtual void OnDefocus();
     
     /// Set name
-    void SetName(const std::string& name);
+    void SetName(const String& name);
     /// Set position
     void SetPosition(const IntVector2& position);
     /// Set position
@@ -218,7 +218,7 @@ public:
     /// Set drag and drop flags
     void SetDragDropMode(unsigned mode);
     /// Set style from an XML file. Find the style element by name
-    void SetStyle(XMLFile* file, const std::string& typeName);
+    void SetStyle(XMLFile* file, const String& typeName);
     /// Set style from an XML file. Find the style element automatically
     void SetStyleAuto(XMLFile* file);
     /// Set layout
@@ -251,7 +251,7 @@ public:
     void SetParent(UIElement* parent);
     
     /// Return name
-    const std::string& GetName() const { return name_; }
+    const String& GetName() const { return name_; }
     /// Return position
     const IntVector2& GetPosition() const { return position_; }
     /// Return screen position
@@ -323,7 +323,7 @@ public:
     /// Return child element by index
     UIElement* GetChild(unsigned index) const;
     /// Return child element by name
-    UIElement* GetChild(const std::string& name, bool recursive = false) const;
+    UIElement* GetChild(const String& name, bool recursive = false) const;
     /// Return all child elements
     std::vector<UIElement*> GetChildren(bool recursive = false) const;
     /// Return parent element
@@ -364,7 +364,7 @@ protected:
     void MarkDirty();
     
     /// Name
-    std::string name_;
+    String name_;
     /// Child elements
     std::vector<SharedPtr<UIElement> > children_;
     /// Parent element

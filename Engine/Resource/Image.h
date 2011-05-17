@@ -87,9 +87,9 @@ public:
     /// Set data
     void SetData(const unsigned char* pixelData);
     /// Save in BMP format. Return true if successful
-    bool SaveBMP(const std::string& fileName);
+    bool SaveBMP(const String& fileName);
     /// Save in TGA format. Return true if successful
-    bool SaveTGA(const std::string& fileName);
+    bool SaveTGA(const String& fileName);
     
     /// Return width
     int GetWidth() const { return width_; }

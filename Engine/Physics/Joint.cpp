@@ -34,7 +34,7 @@
 
 #include "DebugNew.h"
 
-static const std::string typeNames[] =
+static const String typeNames[] =
 {
     "none",
     "ball",

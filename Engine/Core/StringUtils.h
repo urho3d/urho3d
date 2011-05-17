@@ -32,80 +32,64 @@
 #include <vector>
 
 /// Split string with a separator char
-std::vector<std::string> Split(const std::string& source, char separator);
-/// Replace characters in a string
-std::string Replace(const std::string& source, char replaceThis, char replaceWith);
-/// Replace substrings in a string
-std::string Replace(const std::string& source, const std::string& replaceThis, const std::string& replaceWith);
-/// Convert a string to uppercase
-std::string ToUpper(const std::string& source);
-/// Convert a string to lowercase
-std::string ToLower(const std::string& source);
-/// Replace characters in a string by modifying the original string
-void ReplaceInPlace(std::string& str, char replaceThis, char replaceWith);
-/// Replace substrings in a string by modifying the original string
-void ReplaceInPlace(std::string& str, const std::string& replaceThis, const std::string& replaceWith);
-/// Convert a string to uppercase by modifying the original string
-void ToUpperInPlace(std::string& str);
-/// Convert a string to lowercase by modifying the original string
-void ToLowerInPlace(std::string& str);
+std::vector<String> Split(const String& source, char separator);
 /// Parse a bool from a string. Check for the substring "true" case-insensitively
-bool ToBool(const std::string& source);
+bool ToBool(const String& source);
 /// Parse a float from a string
-float ToFloat(const std::string& source);
+float ToFloat(const String& source);
 /// Parse an integer from a string
-int ToInt(const std::string& source);
+int ToInt(const String& source);
 /// Parse an unsigned integer from a string
-unsigned ToUInt(const std::string& source);
+unsigned ToUInt(const String& source);
 /// Parse a Color from a string
-Color ToColor(const std::string& source);
+Color ToColor(const String& source);
 /// Parse an IntRect from a string
-IntRect ToIntRect(const std::string& source);
+IntRect ToIntRect(const String& source);
 /// Parse an IntVector2 from a string
-IntVector2 ToIntVector2(const std::string& source);
+IntVector2 ToIntVector2(const String& source);
 /// Parse a Quaternion from a string. If only 3 components specified, convert Euler angles (degrees) to quaternion
-Quaternion ToQuaternion(const std::string& source);
+Quaternion ToQuaternion(const String& source);
 /// Parse a Rect from a string
-Rect ToRect(const std::string& source);
+Rect ToRect(const String& source);
 /// Parse a Vector2 from a string
-Vector2 ToVector2(const std::string& source);
+Vector2 ToVector2(const String& source);
 /// Parse a Vector3 from a string
-Vector3 ToVector3(const std::string& source);
+Vector3 ToVector3(const String& source);
 /// Parse a Vector4 from a string
-Vector4 ToVector4(const std::string& source, bool allowMissingCoords = false);
+Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Convert a bool to string
-std::string ToString(bool value);
+String ToString(bool value);
 /// Convert a float to string
-std::string ToString(float value);
+String ToString(float value);
 /// Convert an integer to string
-std::string ToString(int value);
+String ToString(int value);
 /// Convert an unsigned integer to string
-std::string ToString(unsigned value);
+String ToString(unsigned value);
 /// Convert a Color to string
-std::string ToString(const Color& value);
+String ToString(const Color& value);
 /// Convert an IntRect to string
-std::string ToString(const IntRect& value);
+String ToString(const IntRect& value);
 /// Convert an IntVector2 to string
-std::string ToString(const IntVector2& value);
+String ToString(const IntVector2& value);
 /// Convert a Quaternion to string
-std::string ToString(const Quaternion& value);
+String ToString(const Quaternion& value);
 /// Convert a Rect to string
-std::string ToString(const Rect& value);
+String ToString(const Rect& value);
 /// Convert a StringHash to string. Return the reverse mapping if found
-std::string ToString(const StringHash& value);
+String ToString(const StringHash& value);
 /// Convert a ShortStringHash to string. Return the reverse mapping if found
-std::string ToString(const ShortStringHash& value);
+String ToString(const ShortStringHash& value);
 /// Convert a Vector2 to string
-std::string ToString(const Vector2& value);
+String ToString(const Vector2& value);
 /// Convert a Vector3 to string
-std::string ToString(const Vector3& value);
+String ToString(const Vector3& value);
 /// Convert a Vector4 to string
-std::string ToString(const Vector4& value);
+String ToString(const Vector4& value);
 /// Convert a pointer to string (returns hexadecimal)
-std::string ToString(void* value);
+String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal
-std::string ToStringHex(unsigned value);
+String ToStringHex(unsigned value);
 
 /// Return an index to a string list corresponding to the given string, or a default value if not found
-unsigned GetStringListIndex(const std::string& value, const std::string* strings, unsigned count, unsigned defaultIndex,
+unsigned GetStringListIndex(const String& value, const String* strings, unsigned count, unsigned defaultIndex,
     bool caseSensitive = false);

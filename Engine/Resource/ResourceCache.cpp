@@ -34,7 +34,7 @@
 
 #include "DebugNew.h"
 
-static const std::string checkDirs[] = {
+static const String checkDirs[] = {
     "Fonts",
     "Materials",
     "Models",
@@ -49,7 +49,7 @@ static const std::string checkDirs[] = {
     ""
 };
 
-static const std::string noName;
+static const String noName;
 static const SharedPtr<Resource> noResource;
 
 OBJECTTYPESTATIC(ResourceCache);
@@ -63,7 +63,7 @@ ResourceCache::~ResourceCache()
 {
 }
 
-bool ResourceCache::AddResourcePath(const std::string& path)
+bool ResourceCache::AddResourcePath(const String& path)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if ((!fileSystem) || (!fileSystem->DirExists(path)))
@@ -72,20 +72,20 @@ bool ResourceCache::AddResourcePath(const std::string& path)
         return false;
     }
     
-    std::string fixedPath = AddTrailingSlash(path);
-    std::string pathLower = ToLower(fixedPath);
+    String fixedPath = AddTrailingSlash(path);
+    String pathLower = fixedPath.ToLower();
     
     // Check that the same path does not already exist
     for (unsigned i = 0; i < resourcePaths_.size(); ++i)
     {
-        if (ToLower(resourcePaths_[i]) == pathLower)
+        if (resourcePaths_[i].ToLower() == pathLower)
             return true;
     }
     
     resourcePaths_.push_back(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
-    std::vector<std::string> fileNames;
+    std::vector<String> fileNames;
     fileSystem->ScanDir(fileNames, fixedPath, "*.*", SCAN_FILES, true);
     for (unsigned i = 0; i < fileNames.size(); ++i)
         StoreNameHash(fileNames[i]);
@@ -106,8 +106,8 @@ void ResourceCache::AddPackageFile(PackageFile* package, bool addAsFirst)
         packages_.push_back(SharedPtr<PackageFile>(package));
     
     // Scan the package for files and add their hash-to-name mappings
-    const std::map<std::string, PackageEntry>& entries = package->GetEntries();
-    for (std::map<std::string, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    const std::map<String, PackageEntry>& entries = package->GetEntries();
+    for (std::map<String, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
         StoreNameHash(i->first);
     
     LOGINFO("Added resource package " + package->GetName());
@@ -121,8 +121,8 @@ bool ResourceCache::AddManualResource(Resource* resource)
         return false;
     }
     
-    const std::string& name = resource->GetName();
-    if (name.empty())
+    const String& name = resource->GetName();
+    if (name.Empty())
     {
         LOGERROR("Manual resource with empty name, can not add");
         return false;
@@ -135,12 +135,12 @@ bool ResourceCache::AddManualResource(Resource* resource)
     return true;
 }
 
-void ResourceCache::RemoveResourcePath(const std::string& path)
+void ResourceCache::RemoveResourcePath(const String& path)
 {
-    std::string fixedPath = ToLower(AddTrailingSlash(path));
-    for (std::vector<std::string>::iterator i = resourcePaths_.begin(); i != resourcePaths_.end(); ++i)
+    String fixedPath = AddTrailingSlash(path).ToLower();
+    for (std::vector<String>::iterator i = resourcePaths_.begin(); i != resourcePaths_.end(); ++i)
     {
-        if (ToLower(*i) == fixedPath)
+        if (i->ToLower() == fixedPath)
         {
             resourcePaths_.erase(i);
             return;
@@ -162,13 +162,13 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResource
     }
 }
 
-void ResourceCache::RemovePackageFile(const std::string& fileName, bool ReleaseResources, bool forceRelease)
+void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResources, bool forceRelease)
 {
-    std::string fileNameLower = ToLower(fileName);
+    String fileNameLower = fileName.ToLower();
     
     for (std::vector<SharedPtr<PackageFile> >::iterator i = packages_.begin(); i != packages_.end(); ++i)
     {
-        if (ToLower((*i)->GetName()) == fileNameLower)
+        if ((*i)->GetName().ToLower() == fileNameLower)
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);
@@ -178,7 +178,7 @@ void ResourceCache::RemovePackageFile(const std::string& fileName, bool ReleaseR
     }
 }
 
-void ResourceCache::ReleaseResource(ShortStringHash type, const std::string& name, bool force)
+void ResourceCache::ReleaseResource(ShortStringHash type, const String& name, bool force)
 {
     ReleaseResource(type, StringHash(name), force);
 }
@@ -224,9 +224,9 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
         UpdateResourceGroup(type);
 }
 
-void ResourceCache::ReleaseResources(ShortStringHash type, const std::string& partialName, bool force)
+void ResourceCache::ReleaseResources(ShortStringHash type, const String& partialName, bool force)
 {
-    std::string partialNameLower = ToLower(partialName);
+    String partialNameLower = partialName.ToLower();
     bool released = false;
     
     for (std::map<ShortStringHash, ResourceGroup>::iterator i = resourceGroups_.begin();
@@ -238,7 +238,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const std::string& pa
                 j != i->second.resources_.end();)
             {
                 std::map<StringHash, SharedPtr<Resource> >::iterator current = j++;
-                if (current->second->GetName().find(partialNameLower) != std::string::npos)
+                if (current->second->GetName().Find(partialNameLower) != String::NPOS)
                 {
                     // If other references exist, do not release, unless forced
                     if ((current->second.GetRefCount() == 1) || (force))
@@ -309,7 +309,7 @@ void ResourceCache::SetMemoryBudget(ShortStringHash type, unsigned budget)
     resourceGroups_[type].memoryBudget_ = budget;
 }
 
-SharedPtr<File> ResourceCache::GetFile(const std::string& name)
+SharedPtr<File> ResourceCache::GetFile(const String& name)
 {
     // Check first the packages
     for (unsigned i = 0; i < packages_.size(); ++i)
@@ -339,7 +339,7 @@ SharedPtr<File> ResourceCache::GetFile(const std::string& name)
     return SharedPtr<File>();
 }
 
-Resource* ResourceCache::GetResource(ShortStringHash type, const std::string& name)
+Resource* ResourceCache::GetResource(ShortStringHash type, const String& name)
 {
     // Add the name to the hash map, so if this is an unknown resource, the error will not be unintelligible
     StoreNameHash(name);
@@ -358,8 +358,8 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
         return existing;
     
     SharedPtr<Resource> resource;
-    const std::string& name = GetResourceName(nameHash);
-    if (name.empty())
+    const String& name = GetResourceName(nameHash);
+    if (name.Empty())
     {
         LOGERROR("Could not load unknown resource " + ToString(nameHash));
         return 0;
@@ -403,7 +403,7 @@ void ResourceCache::GetResources(std::vector<Resource*>& result, ShortStringHash
     }
 }
 
-bool ResourceCache::Exists(const std::string& name) const
+bool ResourceCache::Exists(const String& name) const
 {
     for (unsigned i = 0; i < packages_.size(); ++i)
     {
@@ -455,18 +455,18 @@ unsigned ResourceCache::GetTotalMemoryUse() const
     return total;
 }
 
-const std::string& ResourceCache::GetResourceName(StringHash nameHash) const
+const String& ResourceCache::GetResourceName(StringHash nameHash) const
 {
-    std::map<StringHash, std::string>::const_iterator i = hashToName_.find(nameHash);
+    std::map<StringHash, String>::const_iterator i = hashToName_.find(nameHash);
     if (i == hashToName_.end())
         return noName;
     else
         return i->second;
 }
 
-std::string ResourceCache::GetPreferredResourcePath(const std::string& path)
+String ResourceCache::GetPreferredResourcePath(const String& path)
 {
-    std::string fixedPath = AddTrailingSlash(path);
+    String fixedPath = AddTrailingSlash(path);
     
     bool pathHasKnownDirs = false;
     bool parentHasKnownDirs = false;
@@ -476,7 +476,7 @@ std::string ResourceCache::GetPreferredResourcePath(const std::string& path)
     if (!fileSystem)
         return fixedPath;
     
-    for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+    for (unsigned i = 0; !checkDirs[i].Empty(); ++i)
     {
         if (fileSystem->DirExists(fixedPath + checkDirs[i]))
         {
@@ -486,8 +486,8 @@ std::string ResourceCache::GetPreferredResourcePath(const std::string& path)
     }
     if (!pathHasKnownDirs)
     {
-        std::string parentPath = GetParentPath(fixedPath);
-        for (unsigned i = 0; !checkDirs[i].empty(); ++i)
+        String parentPath = GetParentPath(fixedPath);
+        for (unsigned i = 0; !checkDirs[i].Empty(); ++i)
         {
             if (fileSystem->DirExists(parentPath + checkDirs[i]))
             {
@@ -519,8 +519,8 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
     std::set<ShortStringHash> affectedGroups;
     
-    const std::map<std::string, PackageEntry>& entries = package->GetEntries();
-    for (std::map<std::string, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    const std::map<String, PackageEntry>& entries = package->GetEntries();
+    for (std::map<String, PackageEntry>::const_iterator i = entries.begin(); i != entries.end(); ++i)
     {
         StringHash nameHash(i->first);
         
@@ -586,9 +586,9 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
     }
 }
 
-void ResourceCache::StoreNameHash(const std::string& name)
+void ResourceCache::StoreNameHash(const String& name)
 {
-    if (name.empty())
+    if (name.Empty())
         return;
     
     hashToName_[StringHash(name)] = name;
