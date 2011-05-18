@@ -49,7 +49,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 - Software rasterization of triangles based on Chris Hecker's Perspective %Texture Mapping series in the Game Developer magazine (http://chrishecker.com/Miscellaneous_Technical_Articles)
 - Networked Physics by Glenn Fiedler (http://gafferongames.com/game-physics/networked-physics/)
 - Euler Angle Formulas by David Eberly (http://www.geometrictools.com/Documentation/EulerAngles.pdf)
-- Skip Lists by Julienne Walker (http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_skip.aspx)
+- Red Black Trees by Julienne Walker (http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx)
 - Comparison of several sorting algorithms by Juha Nieminen (http://warp.povusers.org/SortComparison/)
 
 Urho3D uses the following third-party libraries:

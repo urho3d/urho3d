@@ -100,107 +100,141 @@ protected:
     unsigned size_;
 };
 
-/// Skip list node base
-struct SkipListNodeBase : public ListNodeBase
+// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
+
+/// Red-black tree node base
+struct TreeNodeBase
 {
-    /// Node height
-    unsigned height_;
-    /// Skip list pointers for heights > 1
-    SkipListNodeBase** levels_;
-    
-    /// Return next node on a specific height
-    SkipListNodeBase* GetNext(unsigned height) const
+    /// Construct
+    TreeNodeBase() :
+        parent_(0),
+        isRed_(true)
     {
-        if (!height)
-            return static_cast<SkipListNodeBase*>(next_);
-        else
-            return levels_[height - 1];
+        link_[0] = 0;
+        link_[1] = 0;
     }
     
-    /// Return previous node
-    SkipListNodeBase* GetPrev() const { return static_cast<SkipListNodeBase*>(prev_); }
-    
-    // Set next node on a specific height
-    void SetNext(unsigned height, SkipListNodeBase* node)
+    /// Set a child link, adjusting the child's parent as necessary
+    void SetChild(unsigned dir, TreeNodeBase* newChild)
     {
-        if (!height)
-            next_ = node;
-        else
-            levels_[height - 1] = node;
+        link_[dir] = newChild;
+        if (newChild)
+            newChild->parent_ = this;
     }
     
-    /// Set previous node
-    void SetPrev(SkipListNodeBase* node) { prev_ = node; }
+    /// Parent node
+    TreeNodeBase* parent_;
+    /// Child links
+    TreeNodeBase* link_[2];
+    /// Color flag
+    bool isRed_;
 };
 
-/// Skip list base class
-class SkipListBase
+/// Red-black tree iterator base class
+class TreeIteratorBase
 {
 public:
-    SkipListBase(unsigned maxHeight = MAX_HEIGHT) :
-        maxHeight_(maxHeight < MAX_HEIGHT ? maxHeight : MAX_HEIGHT),
-        height_(0),
-        size_(0),
-        bitsLeft_(0)
+    TreeIteratorBase() :
+        ptr_(0)
     {
     }
     
-    /// Swap with another skip list
-    void Swap(SkipListBase& rhs)
+    TreeIteratorBase(TreeNodeBase* ptr) :
+        ptr_(ptr)
     {
-        ::Swap(head_, rhs.head_);
-        ::Swap(tail_, rhs.tail_);
-        ::Swap(fix_, rhs.fix_);
-        ::Swap(maxHeight_, rhs.maxHeight_);
-        ::Swap(height_, rhs.height_);
-        ::Swap(size_, rhs.size_);
-        ::Swap(random_, rhs.random_);
-        ::Swap(bitsLeft_, rhs.bitsLeft_);
     }
     
-    static const unsigned MAX_HEIGHT = 15;
+    /// Test for equality with another iterator
+    bool operator == (const TreeIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
+    /// Test for inequality with another iterator
+    bool operator != (const TreeIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
-protected:
-    /// Generate a random height for a new node
-    unsigned GetHeight()
+    void GotoNext()
     {
-        unsigned height = 1;
-        while ((height < maxHeight_) && (GetBit()))
-            ++height;
+        if (!ptr_)
+            return;
         
-        return height;
-    }
-    
-    /// Return a random true/false result
-    bool GetBit()
-    {
-        if (!bitsLeft_)
+        if (!ptr_->link_[1])
         {
-            random_ = rand();
-            bitsLeft_ = 15;
+            while ((ptr_->parent_) && (ptr_->parent_->link_[1] == ptr_))
+                ptr_ = ptr_->parent_;
+            
+            ptr_ = ptr_->parent_;
+            return;
         }
         
-        bool ret = (random_ & 1) != 0;
-        random_ >>= 1;
-        --bitsLeft_;
-        
-        return ret;
+        ptr_ = ptr_->link_[1];
+        while (ptr_->link_[0])
+            ptr_ = ptr_->link_[0];
     }
     
-    /// Head node pointer
-    void* head_;
-    /// Tail node pointer
-    void* tail_;
-    /// Fixup pointers for insert & erase
-    void** fix_;
-    /// Maximum height
-    unsigned maxHeight_;
-    /// Current height
-    unsigned height_;
-    /// Number of keys
+    void GotoPrev()
+    {
+        if (!ptr_)
+            return;
+        
+        if (!ptr_->link_[0])
+        {
+            while ((ptr_->parent_) && (ptr_->parent_->link_[0] == ptr_))
+                ptr_ = ptr_->parent_;
+            
+            ptr_ = ptr_->parent_;
+            return;
+        }
+        
+        ptr_ = ptr_->link_[0];
+        while (ptr_->link_[1])
+            ptr_ = ptr_->link_[1];
+    }
+    
+    TreeNodeBase* ptr_;
+};
+
+/// Red-black tree base class
+class TreeBase
+{
+public:
+    /// Construct
+    TreeBase() :
+        root_(0),
+        size_(0)
+    {
+    }
+    
+    /// Swap with another tree
+    void Swap(TreeBase& rhs)
+    {
+        ::Swap(root_, rhs.root_);
+        ::Swap(size_, rhs.size_);
+    }
+    
+protected:
+    /// Check whether a node is red
+    bool isRed(TreeNodeBase* node) const { return (node) && (node->isRed_); }
+    
+    /// Single rotation
+    TreeNodeBase* RotateSingle(TreeNodeBase* node, unsigned dir)
+    {
+        TreeNodeBase* save = node->link_[!dir];
+        
+        node->SetChild(!dir, save->link_[dir]);
+        save->SetChild(dir, node);
+        
+        node->isRed_ = true;
+        save->isRed_ = false;
+        
+        return save;
+    }
+    
+    /// Double rotation
+    TreeNodeBase* RotateDouble(TreeNodeBase* node, unsigned dir)
+    {
+        node->SetChild(!dir, RotateSingle(node->link_[!dir], !dir));
+        return RotateSingle(node, dir);
+    }
+    
+    /// Root node
+    TreeNodeBase* root_;
+    /// Number of nodes
     unsigned size_;
-    /// Random bits
-    unsigned short random_;
-    /// Random bits remaining
-    unsigned short bitsLeft_;
 };

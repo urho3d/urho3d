@@ -25,6 +25,15 @@
 #include "StringBase.h"
 #include "VectorBase.h"
 
+#include "Set.h"
+
+void Test()
+{
+    Set<int> testSet;
+    testSet.Insert(10);
+    testSet.Erase(10);
+}
+
 template<> void Swap<String>(String& first, String& second)
 {
     first.Swap(second);
@@ -40,7 +49,7 @@ template<> void Swap<ListBase>(ListBase& first, ListBase& second)
     first.Swap(second);
 }
 
-template<> void Swap<SkipListBase>(SkipListBase& first, SkipListBase& second)
+template<> void Swap<TreeBase>(TreeBase& first, TreeBase& second)
 {
     first.Swap(second);
 }
