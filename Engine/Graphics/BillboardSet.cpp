@@ -81,7 +81,7 @@ void BillboardSet::RegisterObject(Context* context)
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", scaled_, true);
     ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", sorted_, false);
     ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", material_, ResourceRef(Material::GetTypeStatic()));
-    ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", billboards_, Vector<unsigned char>());
+    ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", billboards_, PODVector<unsigned char>());
 }
 
 void BillboardSet::OnSetAttribute(const AttributeInfo& attr, const Variant& value)

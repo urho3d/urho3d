@@ -83,7 +83,7 @@ const BYTE d3dElementUsageIndex[] =
 VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
     declaration_(0)
 {
-    Vector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement> elements;
     unsigned offset = 0;
     
     for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
@@ -109,7 +109,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<VertexBuff
     declaration_(0)
 {
     unsigned usedElementMask = 0;
-    Vector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement> elements;
     
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -150,7 +150,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
     declaration_(0)
 {
     unsigned usedElementMask = 0;
-    Vector<VertexDeclarationElement> elements;
+    PODVector<VertexDeclarationElement> elements;
     
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
@@ -192,7 +192,7 @@ VertexDeclaration::~VertexDeclaration()
     Release();
 }
 
-void VertexDeclaration::Create(Graphics* graphics, const Vector<VertexDeclarationElement>& elements)
+void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements)
 {
     SharedArrayPtr<D3DVERTEXELEMENT9> elementArray(new D3DVERTEXELEMENT9[elements.Size() + 1]);
     

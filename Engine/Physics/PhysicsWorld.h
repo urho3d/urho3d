@@ -25,9 +25,8 @@
 
 #include "Component.h"
 #include "PhysicsDefs.h"
-#include "Vector3.h"
-
 #include "Set.h"
+#include "Vector3.h"
 
 class CollisionShape;
 class DebugRenderer;
@@ -215,7 +214,7 @@ private:
     unsigned randomSeed_;
     /// Rigid bodies
     Vector<RigidBody*> rigidBodies_;
-    /// Collision contacts (Vector<dContact>)
+    /// Collision contacts (PODVector<dContact>)
     void* contacts_;
     /// Collision pairs on this frame
     Set<Pair<RigidBody*, RigidBody*> > currentCollisions_;

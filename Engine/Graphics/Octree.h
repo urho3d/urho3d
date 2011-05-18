@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Drawable.h"
-
 #include "Set.h"
 
 class Drawable;
@@ -33,6 +32,8 @@ class OctreeQuery;
 class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
+
+#include "stdio.h"
 
 /// Octree octant
 class Octant
@@ -63,13 +64,13 @@ public:
     }
     
     /// Remove a drawable object from this octant
-    void RemoveDrawable(Drawable* drawable, bool reSetOctant = true)
+    void RemoveDrawable(Drawable* drawable, bool resetOctant = true)
     {
-        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             if (*i == drawable)
             {
-                if (reSetOctant)
+                if (resetOctant)
                     drawable->SetOctant(0);
                 drawables_.Erase(i);
                 DecDrawableCount();
@@ -141,7 +142,7 @@ protected:
     /// Octree root
     Octree* root_;
     /// Drawable objects
-    Vector<Drawable*> drawables_;
+    PODVector<Drawable*> drawables_;
     /// Number of drawable objects in this octant and child octants
     unsigned numDrawables_;
 };

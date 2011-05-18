@@ -682,7 +682,7 @@ bool Compile(ShaderType type, const String& input, const String& output, const V
                         {
                             unsigned oldIndex = textureUnits_[name];
                             if (oldIndex != index)
-                                ErrorExit("Texture " + name + " bound to several sampler Registers");
+                                ErrorExit("Texture " + name + " bound to several sampler registers");
                         }
                         textureUnits_[name] = index;
                     }
@@ -697,7 +697,7 @@ bool Compile(ShaderType type, const String& input, const String& output, const V
                         {
                             unsigned oldIndex = vsParams_[name];
                             if (oldIndex != index)
-                                ErrorExit("Parameter " + name + " bound to several constant Registers");
+                                ErrorExit("Parameter " + name + " bound to several constant registers");
                         }
                         vsParams_[name] = index;
                     }
@@ -709,7 +709,7 @@ bool Compile(ShaderType type, const String& input, const String& output, const V
                         {
                             unsigned oldIndex = psParams_[name];
                             if (oldIndex != index)
-                                ErrorExit("Parameter " + name + " bound to several constant Registers");
+                                ErrorExit("Parameter " + name + " bound to several constant registers");
                         }
                         psParams_[name] = index;
                     }

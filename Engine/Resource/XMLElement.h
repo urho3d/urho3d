@@ -59,7 +59,7 @@ public:
     /// Set a buffer attribute
     bool SetBuffer(const String& name, const void* data, unsigned size);
     /// Set a buffer attribute
-    bool SetBuffer(const String& name, const Vector<unsigned char>& value);
+    bool SetBuffer(const String& name, const PODVector<unsigned char>& value);
     /// Set a Color attribute
     bool SetColor(const String& name, const Color& value);
     /// Set a float attribute
@@ -122,7 +122,7 @@ public:
     /// Return bool attribute, or false if missing
     bool GetBool(const String& name) const;
     /// Return buffer attribute, or empty if missing
-    Vector<unsigned char> GetBuffer(const String& name) const;
+    PODVector<unsigned char> GetBuffer(const String& name) const;
     /// Copy buffer attribute into a supplied buffer. Return false if not big enough
     bool GetBuffer(const String& name, void* dest, unsigned size) const;
     /// Return bounding box attribute, or empty if missing

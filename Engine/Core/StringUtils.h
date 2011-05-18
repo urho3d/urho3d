@@ -27,9 +27,8 @@
 #include "Quaternion.h"
 #include "Rect.h"
 #include "StringHash.h"
-#include "Vector4.h"
-
 #include "Vector.h"
+#include "Vector4.h"
 
 /// Split string with a separator char
 Vector<String> Split(const String& source, char separator);

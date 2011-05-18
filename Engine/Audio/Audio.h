@@ -30,8 +30,6 @@
 #include "Thread.h"
 #include "SharedArrayPtr.h"
 
-#include "Vector.h"
-
 class AudioImpl;
 class Sound;
 class SoundSource;

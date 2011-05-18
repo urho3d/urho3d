@@ -22,12 +22,11 @@
 //
 
 #pragma once
+
 #include "Frustum.h"
 #include "Object.h"
 #include "GraphicsDefs.h"
 #include "SharedArrayPtr.h"
-
-#include "Vector.h"
 
 class BoundingBox;
 class Camera;

@@ -27,11 +27,11 @@
 #include "ProcessUtils.h"
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
+#include "Vector.h"
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "Vector.h"
 #include <Windows.h>
 
 #include "DebugNew.h"

@@ -23,11 +23,12 @@
 
 #pragma once
 
-#include "RefCounted.h"
 #include "GraphicsDefs.h"
+#include "PODVector.h"
+#include "RefCounted.h"
+#include "Vector.h"
 
 #include <d3d9.h>
-#include "Vector.h"
 
 class Graphics;
 class VertexBuffer;
@@ -61,7 +62,7 @@ public:
     
 private:
     /// Create declaration
-    void Create(Graphics* graphics, const Vector<VertexDeclarationElement>& elements);
+    void Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements);
     /// Release declaration
     void Release();
     

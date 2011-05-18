@@ -31,7 +31,7 @@
 
 const Variant Variant::EMPTY;
 const String Variant::emptyString;
-const Vector<unsigned char> Variant::emptyBuffer;
+const PODVector<unsigned char> Variant::emptyBuffer;
 const ResourceRef Variant::emptyResourceRef;
 const ResourceRefList Variant::emptyResourceRefList;
 const VariantMap Variant::emptyVariantMap;
@@ -68,7 +68,7 @@ Variant& Variant::operator = (const Variant& rhs)
         break;
         
     case VAR_BUFFER:
-        *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_)) = *(reinterpret_cast<const Vector<unsigned char>*>(rhs.value_.ptr_));
+        *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_)) = *(reinterpret_cast<const PODVector<unsigned char>*>(rhs.value_.ptr_));
         break;
     
     case VAR_RESOURCEREF:
@@ -130,7 +130,7 @@ bool Variant::operator == (const Variant& rhs) const
         return *(reinterpret_cast<const String*>(value_.ptr_)) == *(reinterpret_cast<const String*>(rhs.value_.ptr_));
         
     case VAR_BUFFER:
-        return *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_)) == *(reinterpret_cast<const Vector<unsigned char>*>(rhs.value_.ptr_));
+        return *(reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_)) == *(reinterpret_cast<const PODVector<unsigned char>*>(rhs.value_.ptr_));
         
     case VAR_PTR:
         return value_.ptr_ == rhs.value_.ptr_;
@@ -178,7 +178,7 @@ void Variant::FromString(const String& type, const String& value)
     else if (typeLower == "buffer")
     {
         SetType(VAR_BUFFER);
-        Vector<unsigned char>& buffer = *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_));
+        PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_));
         Vector<String> values = Split(value, ' ');
         buffer.Resize(values.Size());
         for (unsigned i = 0; i < values.Size(); ++i)
@@ -222,7 +222,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
         size = 0;
     
     SetType(VAR_BUFFER);
-    Vector<unsigned char>& buffer = *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_));
+    PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_));
     buffer.Resize(size);
     if (size)
         memcpy(&buffer[0], data, size);
@@ -266,9 +266,9 @@ String Variant::ToString() const
         
     case VAR_BUFFER:
         {
-            const Vector<unsigned char>& buffer = *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_));
+            const PODVector<unsigned char>& buffer = *(reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_));
             String ret;
-            for (Vector<unsigned char>::ConstIterator i = buffer.Begin(); i != buffer.End(); ++i)
+            for (PODVector<unsigned char>::ConstIterator i = buffer.Begin(); i != buffer.End(); ++i)
             {
                 if (i != buffer.Begin())
                     ret += " ";
@@ -305,7 +305,7 @@ void Variant::SetType(VariantType newType)
         break;
         
     case VAR_BUFFER:
-        delete reinterpret_cast<Vector<unsigned char>*>(value_.ptr_);
+        delete reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_);
         break;
         
     case VAR_RESOURCEREF:
@@ -334,7 +334,7 @@ void Variant::SetType(VariantType newType)
         break;
         
     case VAR_BUFFER:
-        *reinterpret_cast<Vector<unsigned char>**>(&value_.ptr_) = new Vector<unsigned char>();
+        *reinterpret_cast<PODVector<unsigned char>**>(&value_.ptr_) = new PODVector<unsigned char>();
         break;
         
     case VAR_RESOURCEREF:
@@ -415,7 +415,7 @@ template<> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
-template<> const Vector<unsigned char>& Variant::Get<const Vector<unsigned char>& >() const
+template<> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>& >() const
 {
     return GetBuffer();
 }
@@ -475,7 +475,7 @@ template<> String Variant::Get<String>() const
     return GetString();
 }
 
-template<> Vector<unsigned char> Variant::Get<Vector<unsigned char> >() const
+template<> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const
 {
     return GetBuffer();
 }

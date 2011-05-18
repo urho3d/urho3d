@@ -27,7 +27,6 @@
 #include "Color.h"
 #include "Drawable.h"
 #include "RenderSurface.h"
-
 #include "Set.h"
 
 class DebugRenderer;

@@ -100,7 +100,7 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
         break;
         
     case VAR_BUFFER:
-        *(reinterpret_cast<Vector<unsigned char>*>(dest)) = value.GetBuffer();
+        *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = value.GetBuffer();
         break;
         
     case VAR_RESOURCEREF:
@@ -164,7 +164,7 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
         return Variant(*(reinterpret_cast<const String*>(src)));
         
     case VAR_BUFFER:
-        return Variant(*(reinterpret_cast<const Vector<unsigned char>*>(src)));
+        return Variant(*(reinterpret_cast<const PODVector<unsigned char>*>(src)));
         
     case VAR_RESOURCEREF:
         return Variant(*(reinterpret_cast<const ResourceRef*>(src)));

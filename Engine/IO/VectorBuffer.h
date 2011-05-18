@@ -26,8 +26,6 @@
 #include "Deserializer.h"
 #include "Serializer.h"
 
-#include "Vector.h"
-
 /// Dynamically sized buffer that can be read and written to as a stream
 class VectorBuffer : public Deserializer, public Serializer
 {
@@ -35,7 +33,7 @@ public:
     /// Construct an empty buffer
     VectorBuffer();
     /// Construct from another buffer
-    VectorBuffer(const Vector<unsigned char>& data);
+    VectorBuffer(const PODVector<unsigned char>& data);
     /// Construct from a memory area
     VectorBuffer(const void* data, unsigned size);
     /// Construct from a stream
@@ -49,7 +47,7 @@ public:
     virtual unsigned Write(const void* data, unsigned size);
     
     /// Set data from another buffer
-    void SetData(const Vector<unsigned char>& data);
+    void SetData(const PODVector<unsigned char>& data);
     /// Set data from a memory area
     void SetData(const void* data, unsigned size);
     /// Set data from a stream
@@ -64,9 +62,9 @@ public:
     /// Return non-const data
     unsigned char* GetModifiableData() { return size_ ? &buffer_[0] : 0; }
     /// Return the buffer
-    const Vector<unsigned char>& GetBuffer() const { return buffer_; }
+    const PODVector<unsigned char>& GetBuffer() const { return buffer_; }
     
 private:
-    /// Dynamic sized buffer
-    Vector<unsigned char> buffer_;
+    /// Dynamic data buffer
+    PODVector<unsigned char> buffer_;
 };

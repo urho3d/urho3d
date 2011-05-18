@@ -86,7 +86,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     // Enable automatic resting of rigid bodies
     dWorldSetAutoDisableFlag(physicsWorld_, 1);
     
-    contacts_ = new Vector<dContact>(maxContacts_);
+    contacts_ = new PODVector<dContact>(maxContacts_);
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -112,7 +112,7 @@ PhysicsWorld::~PhysicsWorld()
     }
     if (contacts_)
     {
-        Vector<dContact>* contacts = static_cast<Vector<dContact>*>(contacts_);
+        PODVector<dContact>* contacts = static_cast<PODVector<dContact>*>(contacts_);
         delete contacts;
         contacts = 0;
     }
@@ -220,7 +220,7 @@ void PhysicsWorld::SetFps(int fps)
 void PhysicsWorld::SetMaxContacts(unsigned num)
 {
     maxContacts_ = Max(num, 1);
-    Vector<dContact>* contacts = static_cast<Vector<dContact>*>(contacts_);
+    PODVector<dContact>* contacts = static_cast<PODVector<dContact>*>(contacts_);
     contacts->Resize(maxContacts_);
 }
 
@@ -518,7 +518,7 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     float friction = (shapeA->GetFriction() + shapeB->GetFriction()) * 0.5f;
     float bounce = (shapeA->GetBounce() + shapeB->GetBounce()) * 0.5f;
     
-    Vector<dContact>& contacts = *(static_cast<Vector<dContact>*>(world->contacts_));
+    PODVector<dContact>& contacts = *(static_cast<PODVector<dContact>*>(world->contacts_));
     
     for (unsigned i = 0; i < world->maxContacts_; ++i)
     {

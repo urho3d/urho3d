@@ -66,7 +66,7 @@ struct FontFace
     /// Glyph index mapping
     unsigned short glyphIndex_[MAX_FONT_CHARS];
     /// Glyphs
-    Vector<FontGlyph> glyphs_;
+    PODVector<FontGlyph> glyphs_;
 };
 
 /// Font resource

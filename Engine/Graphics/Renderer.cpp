@@ -671,8 +671,8 @@ void Renderer::DrawDebugGeometry(bool depthTest)
         if (!debug)
             continue;
         
-        const Vector<Drawable*>& geometries = view->GetGeometries();
-        const Vector<Light*>& lights = view->GetLights();
+        const PODVector<Drawable*>& geometries = view->GetGeometries();
+        const PODVector<Light*>& lights = view->GetLights();
         
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {

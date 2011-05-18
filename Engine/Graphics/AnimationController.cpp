@@ -53,7 +53,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", animations_, Vector<unsigned char>());
+    ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", animations_, PODVector<unsigned char>());
 }
 
 

@@ -24,12 +24,12 @@
 #pragma once
 
 #include "Color.h"
+#include "Map.h"
+#include "PODVector.h"
 #include "Quaternion.h"
 #include "StringHash.h"
-#include "Vector4.h"
-
-#include "Map.h"
 #include "Vector.h"
+#include "Vector4.h"
 
 /// Supported variable types for Variant
 enum VariantType
@@ -261,7 +261,7 @@ public:
     }
     
     /// Construct from a buffer
-    Variant(const Vector<unsigned char>& value) :
+    Variant(const PODVector<unsigned char>& value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -436,10 +436,10 @@ public:
     }
 
     /// Assign from a buffer
-    Variant& operator = (const Vector<unsigned char>& rhs)
+    Variant& operator = (const PODVector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
-        *(reinterpret_cast<Vector<unsigned char>*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_)) = rhs;
         return *this;
     }
     
@@ -583,10 +583,10 @@ public:
     }
     
     /// Test for equality with a buffer. To return true, both the type and value must match
-    bool operator == (const Vector<unsigned char>& rhs) const
+    bool operator == (const PODVector<unsigned char>& rhs) const
     {
         if (type_ == VAR_BUFFER)
-            return *(reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_)) == rhs;
         else
             return false;
     }
@@ -673,7 +673,7 @@ public:
     /// Test for inequality with a string
     bool operator != (const String& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a buffer
-    bool operator != (const Vector<unsigned char>& rhs) const { return !(*this == rhs); }
+    bool operator != (const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
     /// Test for inequality with a pointer
     bool operator != (void* rhs) const { return !(*this == rhs); }
     /// Test for inequality with an object reference
@@ -791,11 +791,11 @@ public:
     }
     
     /// Return buffer or empty on type mismatch
-    const Vector<unsigned char>& GetBuffer() const
+    const PODVector<unsigned char>& GetBuffer() const
     {
         if (type_ != VAR_BUFFER)
             return emptyBuffer;
-        return *reinterpret_cast<const Vector<unsigned char>*>(value_.ptr_);
+        return *reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_);
     }
     
     /// Return pointer or null on type mismatch
@@ -865,7 +865,7 @@ private:
     /// Empty string
     static const String emptyString;
     /// Empty buffer
-    static const Vector<unsigned char> emptyBuffer;
+    static const PODVector<unsigned char> emptyBuffer;
     /// Empty object reference
     static const ResourceRef emptyResourceRef;
     /// Empty object reference list

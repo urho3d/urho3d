@@ -261,9 +261,9 @@ ShortStringHash Deserializer::ReadShortStringHash()
     return ret;
 }
 
-Vector<unsigned char> Deserializer::ReadBuffer()
+PODVector<unsigned char> Deserializer::ReadBuffer()
 {
-    Vector<unsigned char> ret;
+    PODVector<unsigned char> ret;
     
     ret.Resize(ReadVLE());
     if (ret.Size())

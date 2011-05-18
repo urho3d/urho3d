@@ -25,10 +25,9 @@
 
 #include "BoundingBox.h"
 #include "Frustum.h"
+#include "PODVector.h"
 #include "Ray.h"
 #include "Sphere.h"
-
-#include "Vector.h"
 
 class OcclusionBuffer;
 class Drawable;
@@ -39,7 +38,7 @@ class OctreeQuery
 {
 public:
     /// Construct with result vector, include/exclude flags and whether to get only occluders or shadowcasters
-    OctreeQuery(Vector<Drawable*>& result, unsigned char drawableFlags, bool occludersOnly, bool shadowCastersOnly) :
+    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, bool occludersOnly, bool shadowCastersOnly) :
         result_(result),
         drawableFlags_(drawableFlags),
         occludersOnly_(occludersOnly),
@@ -58,7 +57,7 @@ public:
     virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const = 0;
     
     /// Result vector reference
-    Vector<Drawable*>& result_;
+    PODVector<Drawable*>& result_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
     /// Get occluders only flag
@@ -72,7 +71,7 @@ class PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters
-    PointOctreeQuery(Vector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags, bool occludersOnly = false,
+    PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         point_(point)
@@ -93,7 +92,7 @@ class SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters
-    SphereOctreeQuery(Vector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags, bool occludersOnly = false,
+    SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         sphere_(sphere)
@@ -114,7 +113,7 @@ class BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters
-    BoxOctreeQuery(Vector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags, bool occludersOnly = false,
+    BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         box_(box)
@@ -135,7 +134,7 @@ class FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters
-    FrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags, bool occludersOnly = false,
+    FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         frustum_(frustum)
@@ -156,7 +155,7 @@ class OccludedFrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum, occlusion buffer pointer and query parameters
-    OccludedFrustumOctreeQuery(Vector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
+    OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
             unsigned char drawableFlags, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
         frustum_(frustum),

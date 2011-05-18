@@ -25,8 +25,8 @@
 
 #include "BoundingBox.h"
 #include "Component.h"
-#include "Node.h"
 #include "GraphicsDefs.h"
+#include "Node.h"
 
 static const unsigned DRAWABLE_GEOMETRY = 0x1;
 static const unsigned DRAWABLE_LIGHT = 0x2;
@@ -162,7 +162,7 @@ public:
     /// Return whether has a base pass
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
     /// Return lights
-    const Vector<Light*>& GetLights() const { return lights_; }
+    const PODVector<Light*>& GetLights() const { return lights_; }
     
 protected:
     /// Handle node being assigned
@@ -215,7 +215,7 @@ protected:
     /// Last camera rendered from. Not safe to dereference
     Camera* viewCamera_;
     /// Lights affecting this drawable, when light count is limited
-    Vector<Light*> lights_;
+    PODVector<Light*> lights_;
     /// Bounding box dirty flag
     bool worldBoundingBoxDirty_;
     /// Lod levels dirty flag

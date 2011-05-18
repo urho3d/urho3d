@@ -87,8 +87,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f);
     ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", parameterSource_, ResourceRef(XMLFile::GetTypeStatic()));
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Particles", particles_, Vector<unsigned char>(), AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Billboards", billboards_, Vector<unsigned char>(), AM_SERIALIZATION);
+    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Particles", particles_, PODVector<unsigned char>(), AM_SERIALIZATION);
+    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Billboards", billboards_, PODVector<unsigned char>(), AM_SERIALIZATION);
 }
 
 void ParticleEmitter::OnSetAttribute(const AttributeInfo& attr, const Variant& value)

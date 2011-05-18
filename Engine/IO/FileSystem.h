@@ -24,9 +24,7 @@
 #pragma once
 
 #include "Object.h"
-
 #include "Set.h"
-#include "Vector.h"
 
 /// Return files
 static const unsigned SCAN_FILES = 0x1;

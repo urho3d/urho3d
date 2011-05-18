@@ -25,11 +25,7 @@
 
 #include "Resource.h"
 #include "ScriptEventListener.h"
-#include "SharedPtr.h"
-#include "Variant.h"
-
 #include "Set.h"
-#include "Vector.h"
 
 class Script;
 class ScriptInstance;

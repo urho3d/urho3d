@@ -27,6 +27,7 @@
 #include "VectorBase.h"
 
 #include <cstring>
+#include <new>
 
 /// Vector template class
 template <class T> class Vector : public VectorBase
@@ -43,7 +44,7 @@ public:
     /// Construct with initial size
     explicit Vector(unsigned size)
     {
-        Resize(size);
+        Resize(size, 0);
     }
     
     /// Construct from another vector
@@ -55,14 +56,15 @@ public:
     /// Destruct
     ~Vector()
     {
-        delete[] GetBuffer();
+        Clear();
+        delete[] buffer_;
     }
     
     /// Assign from another vector
     Vector<T>& operator = (const Vector<T>& rhs)
     {
-        Resize(rhs.size_);
-        CopyElements(GetBuffer(), rhs.GetBuffer(), rhs.size_);
+        Clear();
+        Resize(rhs.size_, rhs.GetBuffer());
         
         return *this;
     }
@@ -146,8 +148,7 @@ public:
     void Push(const T& value)
     {
         unsigned oldSize = size_;
-        Resize(size_ + 1);
-        GetBuffer()[oldSize] = value;
+        Resize(size_ + 1, &value);
     }
     
     /// Add another vector at the end
@@ -157,15 +158,14 @@ public:
             return;
         
         unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
-        CopyElements(GetBuffer() + oldSize, vector.GetBuffer(), vector.size_);
+        Resize(size_ + vector.size_, vector.GetBuffer());
     }
     
     /// Remove the last element
     void Pop()
     {
         if (size_)
-            Resize(size_ - 1);
+            Resize(size_ - 1, 0);
     }
     
     /// Insert an element at position
@@ -181,7 +181,7 @@ public:
             pos = size_;
         
         unsigned oldSize = size_;
-        Resize(size_ + 1);
+        Resize(size_ + 1, 0);
         MoveRange(pos + 1, pos, oldSize - pos);
         GetBuffer()[pos] = value;
     }
@@ -202,7 +202,7 @@ public:
             pos = size_;
         
         unsigned oldSize = size_;
-        Resize(size_ + vector.size_);
+        Resize(size_ + vector.size_, 0);
         MoveRange(pos + vector.size_, pos, oldSize - pos);
         CopyElements(GetBuffer() + pos, vector.GetBuffer(), vector.size_);
     }
@@ -236,7 +236,7 @@ public:
         if (pos > size_)
             pos = size_;
         unsigned length = end - start;
-        Resize(size_ + length);
+        Resize(size_ + length, 0);
         MoveRange(pos + length, pos, size_ - pos - length);
         
         T* destPtr = GetBuffer() + pos;
@@ -254,7 +254,7 @@ public:
             return;
         
         MoveRange(pos, pos + length, size_ - pos - length);
-        Resize(size_ - length);
+        Resize(size_ - length, 0);
     }
     
     /// Erase an element using an iterator
@@ -289,35 +289,7 @@ public:
     /// Resize the vector
     void Resize(unsigned newSize)
     {
-        if (newSize == size_)
-            return;
-        
-        if (newSize > capacity_)
-        {
-            if (!capacity_)
-                capacity_ = newSize;
-            else
-            {
-                while (capacity_ < newSize)
-                {
-                    unsigned increment = capacity_ >> 1;
-                    if (!increment)
-                        increment = 1;
-                    capacity_ += increment;
-                }
-            }
-            
-            T* newBuffer = new T[capacity_];
-            // Move the data into the new buffer and delete the old
-            if (buffer_)
-            {
-                CopyElements(newBuffer, GetBuffer(), size_);
-                delete[] GetBuffer();
-            }
-            buffer_ = newBuffer;
-        }
-        
-        size_ = newSize;
+        Resize(newSize, 0);
     }
     
     /// Set new capacity
@@ -333,14 +305,15 @@ public:
         
         if (capacity_)
         {
-            newBuffer = new T[capacity_];
+            newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
             // Move the data into the new buffer
-            CopyElements(newBuffer, GetBuffer(), size_);
+            ConstructElements(newBuffer, GetBuffer(), size_);
         }
         
         // Delete the old buffer
-        delete[] GetBuffer();
-        buffer_ = newBuffer;
+        DestructElements(GetBuffer(), size_);
+        delete[] buffer_;
+        buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
     }
     
     /// Reallocate so that no extra memory is used
@@ -379,6 +352,50 @@ private:
     /// Return the buffer with right type
     T* GetBuffer() const { return reinterpret_cast<T*>(buffer_); }
     
+   /// Resize the vector and create/remove new elements as necessary
+    void Resize(unsigned newSize, const T* src)
+    {
+        if (newSize == size_)
+            return;
+        
+        // If size shrinks, destruct the removed elements
+        if (newSize < size_)
+            DestructElements(GetBuffer() + newSize, size_ - newSize);
+        else
+        {
+            // Allocate new buffer if necessary and copy the current elements
+            if (newSize > capacity_)
+            {
+                if (!capacity_)
+                    capacity_ = newSize;
+                else
+                {
+                    while (capacity_ < newSize)
+                    {
+                        unsigned increment = capacity_ >> 1;
+                        if (!increment)
+                            increment = 1;
+                        capacity_ += increment;
+                    }
+                }
+                
+                unsigned char* newBuffer = new unsigned char[capacity_ * sizeof(T)];
+                if (buffer_)
+                {
+                    ConstructElements(reinterpret_cast<T*>(newBuffer), GetBuffer(), size_);
+                    DestructElements(GetBuffer(), size_);
+                    delete[] buffer_;
+                }
+                buffer_ = newBuffer;
+            }
+            
+            // Initialize the new elements
+            ConstructElements(GetBuffer() + size_, src, newSize - size_);
+        }
+        
+        size_ = newSize;
+    }
+    
     /// Move a range of elements within the vector
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {
@@ -395,10 +412,32 @@ private:
         }
     }
     
+    /// Construct elements, optionally with source data
+    static void ConstructElements(T* dest, const T* src, unsigned count)
+    {
+        if (!src)
+        {
+            for (unsigned i = 0; i < count; ++i)
+                new(dest + i) T();
+        }
+        else
+        {
+            for (unsigned i = 0; i < count; ++i)
+                new(dest + i) T(*(src + i));
+        }
+    }
+    
     /// Copy elements from one buffer to another
     static void CopyElements(T* dest, const T* src, unsigned count)
     {
         for (unsigned i = 0; i < count; ++i)
             dest[i] = src[i];
+    }
+    
+    // Call the elements' destructors
+    static void DestructElements(T* dest, unsigned count)
+    {
+        for (unsigned i = 0; i < count; ++i)
+            (dest + i)->~T();
     }
 };

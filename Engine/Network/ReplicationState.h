@@ -88,7 +88,7 @@ public:
     
 private:
     /// Revision information
-    Vector<Revision> revisions_;
+    PODVector<Revision> revisions_;
     
     /// Empty revision
     static VectorBuffer emptyBaseRevision;

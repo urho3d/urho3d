@@ -26,5 +26,6 @@
 #include "StringBase.h"
 
 #include "Map.h"
+#include "PODVector.h"
 #include "Set.h"
 #include "Vector.h"

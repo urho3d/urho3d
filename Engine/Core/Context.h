@@ -25,10 +25,7 @@
 
 #include "Attribute.h"
 #include "Object.h"
-
-#include "Map.h"
 #include "Set.h"
-#include "Vector.h"
 
 /// Execution context within a process. Provides access to the subsystems, object factories and attributes, and event receivers
 class Context : public RefCounted

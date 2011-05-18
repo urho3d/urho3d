@@ -35,8 +35,6 @@
 #include "Server.h"
 #include "StringUtils.h"
 
-#include "Set.h"
-
 #include "DebugNew.h"
 
 // Timeout for closing transferred package files, in milliseconds

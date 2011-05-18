@@ -23,10 +23,9 @@
 
 #pragma once
 
-#include "StringHash.h"
-
 #include "Map.h"
-#include "Vector.h"
+#include "PODVector.h"
+#include "StringHash.h"
 
 class Color;
 class IntRect;
@@ -100,7 +99,7 @@ public:
     /// Write a 16-bit ShortStringHash
     bool WriteShortStringHash(const ShortStringHash& value);
     /// Write a buffer, with size encoded as VLE
-    bool WriteBuffer(const Vector<unsigned char>& buffer);
+    bool WriteBuffer(const PODVector<unsigned char>& buffer);
     /// Write a resource reference
     bool WriteResourceRef(const ResourceRef& value);
     /// Write a resource reference list

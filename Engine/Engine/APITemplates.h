@@ -101,6 +101,29 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
         return 0;
 }
 
+/// Template function for PODVector to handle array conversion
+template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector, const char* arrayName)
+{
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        CScriptArray* arr = new CScriptArray(vector.Size(), type);
+        
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+        {
+            // Increment reference count for storing in the array
+            if (vector[i])
+                vector[i]->AddRef();
+            *(static_cast<T**>(arr->At(i))) = vector[i];
+        }
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
 /// Template function for shared pointer Vector to handle array conversion
 template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {

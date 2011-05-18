@@ -26,8 +26,6 @@
 #include "Matrix4x3.h"
 #include "Serializable.h"
 
-#include "Vector.h"
-
 class Component;
 class Connection;
 class Scene;

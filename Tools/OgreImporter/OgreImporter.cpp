@@ -26,13 +26,11 @@
 #include "FileSystem.h"
 #include "OgreImporterUtils.h"
 #include "ProcessUtils.h"
+#include "Sort.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 
-#include "Sort.h"
 #include <cstring>
-#include "Map.h"
-#include "Set.h"
 
 #include "DebugNew.h"
 
@@ -468,7 +466,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 {
                     Map<unsigned, unsigned> usedBoneMap;
                     unsigned remapIndex = 0;
-                    for (Map<unsigned, Vector<BoneWeightAssignment> >::Iterator i =
+                    for (Map<unsigned, PODVector<BoneWeightAssignment> >::Iterator i =
                         subGeometryLodLevel.boneWeights_.Begin(); i != subGeometryLodLevel.boneWeights_.End(); ++i)
                     {
                         // Sort the bone assigns by weight
@@ -499,7 +497,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     sorted = true;
                 }
                 
-                for (Map<unsigned, Vector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
+                for (Map<unsigned, PODVector<BoneWeightAssignment> >::Iterator i = subGeometryLodLevel.boneWeights_.Begin();
                     i != subGeometryLodLevel.boneWeights_.End(); ++i)
                 {
                     // Sort the bone assigns by weight, if not sorted yet in bone remapping pass
@@ -1058,8 +1056,8 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
 
 void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, ModelIndexBuffer* ib)
 {
-    Vector<Triangle> oldTriangles;
-    Vector<Triangle> newTriangles;
+    PODVector<Triangle> oldTriangles;
+    PODVector<Triangle> newTriangles;
     
     for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
     {
@@ -1085,7 +1083,7 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
     for (unsigned i = 0; i < vb->vertices_.Size(); ++i)
         CalculateScore(vb->vertices_[i]);
     
-    Vector<unsigned> vertexCache;
+    PODVector<unsigned> vertexCache;
     
     while (oldTriangles.Size())
     {

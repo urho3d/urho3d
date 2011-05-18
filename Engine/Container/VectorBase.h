@@ -51,5 +51,5 @@ protected:
     /// Buffer capacity
     unsigned capacity_;
     /// Buffer
-    void* buffer_;
+    unsigned char* buffer_;
 };

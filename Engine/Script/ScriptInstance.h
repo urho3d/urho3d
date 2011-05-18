@@ -121,9 +121,9 @@ private:
     /// Check for supported methods
     void GetSupportedMethods();
     /// Get script object's serialization data by calling a script function
-    Vector<unsigned char> GetScriptData() const;
+    PODVector<unsigned char> GetScriptData() const;
     /// Set script object's serialization data by calling a script function
-    void SetScriptData(Vector<unsigned char> data);
+    void SetScriptData(PODVector<unsigned char> data);
     /// Handle scene update event
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event

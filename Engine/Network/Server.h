@@ -24,9 +24,8 @@
 #pragma once
 
 #include "Object.h"
-#include "Timer.h"
-
 #include "Set.h"
+#include "Timer.h"
 
 class Connection;
 class Network;

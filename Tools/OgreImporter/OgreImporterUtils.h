@@ -217,7 +217,7 @@ struct ModelSubGeometryLodLevel
     unsigned indexBuffer_;
     unsigned indexStart_;
     unsigned indexCount_;
-    Map<unsigned, Vector<BoneWeightAssignment> > boneWeights_;
+    Map<unsigned, PODVector<BoneWeightAssignment> > boneWeights_;
     Vector<unsigned> boneMapping_;
     
     ModelSubGeometryLodLevel() : 

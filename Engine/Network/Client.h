@@ -26,11 +26,9 @@
 #include "Controls.h"
 #include "File.h"
 #include "Object.h"
+#include "Set.h"
 #include "Timer.h"
 #include "VectorBuffer.h"
-
-#include "Map.h"
-#include "Set.h"
 
 class Connection;
 class Network;

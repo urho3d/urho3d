@@ -24,10 +24,9 @@
 #pragma once
 
 #include "Model.h"
+#include "Set.h"
 #include "Skeleton.h"
 #include "StaticModel.h"
-
-#include "Set.h"
 
 class Animation;
 class AnimationState;

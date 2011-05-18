@@ -271,8 +271,8 @@ void View::GetDrawables()
     Vector3 cameraPos = camera_->GetWorldPosition();
     
     // Get zones & find the zone camera is in
-    Vector<Zone*> zones;
-    PointOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE);
+    PODVector<Zone*> zones;
+    PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE);
     octree_->GetDrawables(query);
     
     int highestZonePriority = M_MIN_INT;
@@ -292,8 +292,7 @@ void View::GetDrawables()
     
     if (maxOccluderTriangles_ > 0)
     {
-        FrustumOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(occluders_), camera_->GetFrustum(),
-            DRAWABLE_GEOMETRY, true, false);
+        FrustumOctreeQuery query(occluders_, camera_->GetFrustum(), DRAWABLE_GEOMETRY, true, false);
         
         octree_->GetDrawables(query);
         UpdateOccluders(occluders_, camera_);
@@ -528,7 +527,7 @@ void View::GetBatches()
         {
             Drawable* drawable = *i;
             drawable->LimitLights();
-            const Vector<Light*>& lights = drawable->GetLights();
+            const PODVector<Light*>& lights = drawable->GetLights();
             
             for (unsigned i = 0; i < lights.Size(); ++i)
             {
@@ -1061,7 +1060,7 @@ void View::RenderBatchesDeferred()
     }
 }
 
-void View::UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera)
+void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
 {
     float occluderSizeThreshold_ = renderer_->GetOccluderSizeThreshold();
     float halfViewSize = camera->GetHalfViewSize();
@@ -1125,7 +1124,7 @@ void View::UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera)
         Sort(occluders.Begin(), occluders.End(), CompareDrawables);
 }
 
-void View::DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders)
+void View::DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders)
 {
     for (unsigned i = 0; i < occluders.Size(); ++i)
     {
@@ -1184,8 +1183,7 @@ unsigned View::ProcessLight(Light* light)
         SetupShadowCamera(light, true);
         
         // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery query(reinterpret_cast<Vector<Drawable*>& >(shadowOccluders_), shadowCamera->GetFrustum(),
-            DRAWABLE_GEOMETRY, true, true);
+        FrustumOctreeQuery query(shadowOccluders_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, true, true);
         octree_->GetDrawables(query);
         
         UpdateOccluders(shadowOccluders_, shadowCamera);
@@ -1391,7 +1389,7 @@ unsigned View::ProcessLight(Light* light)
     return numSplits;
 }
 
-void View::ProcessLightQuery(unsigned splitIndex, const Vector<Drawable*>& result, BoundingBox& geometryBox,
+void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox,
     BoundingBox& shadowCasterBox, bool getLitGeometries, bool GetShadowCasters)
 {
     Light* light = splitLights_[splitIndex];

@@ -27,8 +27,9 @@
 #include "Profiler.h"
 #include "Octree.h"
 #include "OctreeQuery.h"
-
 #include "Sort.h"
+
+#include "Log.h"
 
 #include "DebugNew.h"
 
@@ -186,7 +187,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
             mask = M_MAX_UNSIGNED;
     }
     
-    for (Vector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         unsigned flags = drawable->GetDrawableFlags();
@@ -218,7 +219,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     if (octantDist >= query.maxDistance_)
         return;
     
-    for (Vector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+    for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
@@ -248,7 +249,7 @@ void Octant::Release()
     if ((root_) && (this != root_))
     {
         // Remove the drawables (if any) from this octant to the root octant
-        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         {
             (*i)->SetOctant(root_);
             root_->drawables_.Push(*i);
@@ -260,7 +261,7 @@ void Octant::Release()
     else if (!root_)
     {
         // If the whole octree is being destroyed, just detach the drawables
-        for (Vector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
             (*i)->SetOctant(0);
     }
     

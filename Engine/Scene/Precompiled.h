@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "StringBase.h"
-
 #include "Map.h"
+#include "StringBase.h"
 #include "Vector.h"

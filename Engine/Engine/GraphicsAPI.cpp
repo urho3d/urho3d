@@ -867,7 +867,7 @@ static CScriptArray* OctreeRaycast(const Ray& ray, unsigned char drawableFlags, 
 
 static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char drawableFlags, Octree* ptr)
 {
-    Vector<Drawable*> result;
+    PODVector<Drawable*> result;
     PointOctreeQuery query(result, point, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -875,7 +875,7 @@ static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char
 
 static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char drawableFlags, Octree* ptr)
 {
-    Vector<Drawable*> result;
+    PODVector<Drawable*> result;
     BoxOctreeQuery query(result, box, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
@@ -883,7 +883,7 @@ static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char
 
 static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned char drawableFlags, Octree* ptr)
 {
-    Vector<Drawable*> result;
+    PODVector<Drawable*> result;
     FrustumOctreeQuery query(result, frustum, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");
@@ -891,7 +891,7 @@ static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned 
 
 static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned char drawableFlags, Octree* ptr)
 {
-    Vector<Drawable*> result;
+    PODVector<Drawable*> result;
     SphereOctreeQuery query(result, sphere, drawableFlags);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");

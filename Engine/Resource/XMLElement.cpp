@@ -142,7 +142,7 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     return SetAttribute(name, dataStr);
 }
 
-bool XMLElement::SetBuffer(const String& name, const Vector<unsigned char>& value)
+bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& value)
 {
     if (!value.Size())
         return SetAttribute(name, String());
@@ -434,9 +434,9 @@ BoundingBox XMLElement::GetBoundingBox() const
     return ret;
 }
 
-Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
+PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
-    Vector<unsigned char> ret;
+    PODVector<unsigned char> ret;
     Vector<String> bytes = Split(GetAttribute(name), ' ');
     
     ret.Resize(bytes.Size());
@@ -447,7 +447,7 @@ Vector<unsigned char> XMLElement::GetBuffer(const String& name) const
 
 bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
 {
-    Vector<unsigned char> ret;
+    PODVector<unsigned char> ret;
     Vector<String> bytes = Split(GetAttribute(name), ' ');
     unsigned char* destBytes = (unsigned char*)dest;
     if (size < bytes.Size())

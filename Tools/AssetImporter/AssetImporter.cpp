@@ -137,14 +137,14 @@ unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<Vector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char> >& blendIndices,
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<Vector<float> >& blendWeights);
 unsigned GetElementMask(aiMesh* mesh);
 
@@ -694,7 +694,7 @@ void BuildAndSaveModel(OutModel& model)
             
             // Build the vertex data
             // If there are bones, get blend data
-            Vector<Vector<unsigned char> > blendIndices;
+            Vector<PODVector<unsigned char> > blendIndices;
             Vector<Vector<float> > blendWeights;
             Vector<unsigned> boneMappings;
             if (model.bones_.Size())
@@ -768,7 +768,7 @@ void BuildAndSaveModel(OutModel& model)
             
             // Build the vertex data
             // If there are bones, get blend data
-            Vector<Vector<unsigned char> > blendIndices;
+            Vector<PODVector<unsigned char> > blendIndices;
             Vector<Vector<float> > blendWeights;
             Vector<unsigned> boneMappings;
             if (model.bones_.Size())
@@ -1404,7 +1404,7 @@ Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix4x3::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<Vector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<Vector<float> >& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
@@ -1483,7 +1483,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 }
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<Vector<unsigned char> >& blendIndices,
+    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<Vector<float> >& blendWeights)
 {
     Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);

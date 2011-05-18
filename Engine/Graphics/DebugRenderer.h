@@ -28,8 +28,6 @@
 #include "Frustum.h"
 #include "SharedPtr.h"
 
-#include "Vector.h"
-
 class BoundingBox;
 class Camera;
 class Frustum;

@@ -127,13 +127,13 @@ public:
     /// Return the depth stencil. 0 if using the backbuffer's depth stencil
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
     /// Return geometry objects
-    const Vector<Drawable*>& GetGeometries() const { return geometries_; }
+    const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
     /// Return occluder objects
-    const Vector<Drawable*>& GetOccluders() const { return occluders_; }
+    const PODVector<Drawable*>& GetOccluders() const { return occluders_; }
     /// Return directional light shadow rendering occluders
-    const Vector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
+    const PODVector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
     /// Return lights
-    const Vector<Light*>& GetLights() const { return lights_; }
+    const PODVector<Light*>& GetLights() const { return lights_; }
     /// Return light batch queues
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
     
@@ -149,13 +149,13 @@ private:
     /// Render batches, deferred mode
     void RenderBatchesDeferred();
     /// Query for occluders as seen from a camera
-    void UpdateOccluders(Vector<Drawable*>& occluders, Camera* camera);
+    void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer
-    void DrawOccluders(OcclusionBuffer* buffer, const Vector<Drawable*>& occluders);
+    void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
     /// Query for lit geometries and shadow casters for a light
     unsigned ProcessLight(Light* light);
     /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
-    void ProcessLightQuery(unsigned splitIndex, const Vector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
+    void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
     /// Check visibility of one shadow caster
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix4x3& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Set up initial shadow camera view
@@ -234,21 +234,21 @@ private:
     /// Current split lights being processed
     Light* splitLights_[MAX_LIGHT_SPLITS];
     /// Current lit geometries being processed
-    Vector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
+    PODVector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
     /// Current shadow casters being processed
-    Vector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
+    PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
     /// Temporary drawable query result
-    Vector<Drawable*> tempDrawables_;
+    PODVector<Drawable*> tempDrawables_;
     /// Geometry objects
-    Vector<Drawable*> geometries_;
+    PODVector<Drawable*> geometries_;
     /// Occluder objects
-    Vector<Drawable*> occluders_;
+    PODVector<Drawable*> occluders_;
     /// Directional light shadow rendering occluders
-    Vector<Drawable*> shadowOccluders_;
+    PODVector<Drawable*> shadowOccluders_;
     /// Depth minimum and maximum values for visible geometries
-    Vector<GeometryDepthBounds> geometryDepthBounds_;
+    PODVector<GeometryDepthBounds> geometryDepthBounds_;
     /// Lights
-    Vector<Light*> lights_;
+    PODVector<Light*> lights_;
     /// G-buffer size error displayed
     Set<RenderSurface*> gBufferErrorDisplayed_;
     

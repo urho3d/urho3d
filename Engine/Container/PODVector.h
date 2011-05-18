@@ -55,7 +55,7 @@ public:
     /// Destruct
     ~PODVector()
     {
-        delete[] reinterpret_cast<unsigned char*>(buffer_);
+        delete[] buffer_;
     }
     
     /// Assign from another vector
@@ -307,12 +307,12 @@ public:
                 }
             }
             
-            T* newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
+            unsigned char* newBuffer = new unsigned char[capacity_ * sizeof(T)];
             // Move the data into the new buffer and delete the old
             if (buffer_)
             {
-                CopyElements(newBuffer, GetBuffer(), size_);
-                delete[] reinterpret_cast<unsigned char*>(buffer_);
+                CopyElements(reinterpret_cast<T*>(newBuffer), GetBuffer(), size_);
+                delete[] buffer_;
             }
             buffer_ = newBuffer;
         }
@@ -328,18 +328,18 @@ public:
         if (newCapacity == capacity_)
             return;
         
-        T* newBuffer = 0;
+        unsigned char* newBuffer = 0;
         capacity_ = newCapacity;
         
         if (capacity_)
         {
-            newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
+            newBuffer = new unsigned char[capacity_ * sizeof(T)];
             // Move the data into the new buffer
-            CopyElements(newBuffer, GetBuffer(), size_);
+            CopyElements(reinterpret_cast<T*>(newBuffer), GetBuffer(), size_);
         }
         
         // Delete the old buffer
-        delete[] reinterpret_cast<unsigned char*>(buffer_);
+        delete[] buffer_;
         buffer_ = newBuffer;
     }
     
@@ -383,7 +383,7 @@ private:
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {
         if (count)
-            memmove(buffer_ + dest, buffer_ + src, count * sizeof(T));
+            memmove(GetBuffer() + dest, GetBuffer() + src, count * sizeof(T));
     }
     
     /// Copy elements from one buffer to another

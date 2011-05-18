@@ -82,8 +82,8 @@ void ScriptInstance::RegisterObject(Context* context)
     ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true);
     ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", fixedUpdateFps_, 0);
     ATTRIBUTE_MODE(ScriptInstance, VAR_FLOAT, "Time Accumulator", fixedUpdateAcc_, 0.0f, AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, Vector<unsigned char>(), AM_SERIALIZATION);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, Vector<unsigned char>, Vector<unsigned char>());
+    ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, PODVector<unsigned char>(), AM_SERIALIZATION);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, PODVector<unsigned char>, PODVector<unsigned char>());
 }
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
@@ -376,10 +376,10 @@ void ScriptInstance::GetSupportedMethods()
     }
 }
 
-Vector<unsigned char> ScriptInstance::GetScriptData() const
+PODVector<unsigned char> ScriptInstance::GetScriptData() const
 {
     if ((!scriptObject_) || (!methods_[METHOD_SAVE]))
-        return Vector<unsigned char>();
+        return PODVector<unsigned char>();
     else
     {
         VectorBuffer buf;
@@ -390,7 +390,7 @@ Vector<unsigned char> ScriptInstance::GetScriptData() const
     }
 }
 
-void ScriptInstance::SetScriptData(Vector<unsigned char> data)
+void ScriptInstance::SetScriptData(PODVector<unsigned char> data)
 {
     if ((scriptObject_) && (methods_[METHOD_LOAD]))
     {

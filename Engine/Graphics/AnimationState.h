@@ -23,9 +23,8 @@
 
 #pragma once
 
-#include "SharedPtr.h"
-
 #include "Map.h"
+#include "SharedPtr.h"
 
 class Animation;
 class AnimatedModel;

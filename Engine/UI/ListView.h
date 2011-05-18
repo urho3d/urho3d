@@ -24,7 +24,6 @@
 #pragma once
 
 #include "ScrollView.h"
-
 #include "Set.h"
 
 /// ListView selection highlight mode
