@@ -29,8 +29,6 @@
 #include "OctreeQuery.h"
 #include "Sort.h"
 
-#include "Log.h"
-
 #include "DebugNew.h"
 
 #ifdef _MSC_VER

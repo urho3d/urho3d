@@ -33,8 +33,6 @@ class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
 
-#include "stdio.h"
-
 /// Octree octant
 class Octant
 {
