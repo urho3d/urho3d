@@ -173,12 +173,7 @@ void String::Resize(unsigned newLength)
         {
             // Increase the capacity with half each time it is exceeded
             while (capacity_ < newLength + 1)
-            {
-                unsigned increment = capacity_ >> 1;
-                if (!increment)
-                    increment = 1;
-                capacity_ += increment;
-            }
+                capacity_ += (capacity_ + 1) >> 1;
             
             char* newBuffer = new char[capacity_];
             // Move the existing data to the new buffer, then delete the old buffer

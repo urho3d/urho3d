@@ -29,26 +29,30 @@ struct AllocatorNode;
 /// Allocator memory block
 struct Allocator
 {
+    /// Node data size
     unsigned nodeSize_;
+    /// Number of nodes in this block
     unsigned capacity_;
-    AllocatorNode* firstFreeNode_;
-    Allocator* nextBlock_;
+    /// First free node
+    AllocatorNode* free_;
+    /// Next allocator block
+    Allocator* next_;
     /// Nodes follow
 };
 
 /// Allocator node
 struct AllocatorNode
 {
-    Allocator* parentBlock_;
-    AllocatorNode* nextFreeNode_;
+    /// Next free node
+    AllocatorNode* next_;
     /// Payload follows
 };
 
 /// Initialize a fixed allocator with the allocation size and initial capacity
 Allocator* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
 /// Uninitialize a fixed allocator. Frees all blocks in the chain
-void AllocatorUninitialize(Allocator* block);
+void AllocatorUninitialize(Allocator* allocator);
 /// Allocate a node. Reserves a new block if necessary
-void* AllocatorGet(Allocator* block);
+void* AllocatorGet(Allocator* allocator);
 /// Free a node. Does not free any blocks
-void AllocatorFree(void* payload);
+void AllocatorFree(Allocator* allocator, void* ptr);

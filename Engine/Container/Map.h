@@ -552,6 +552,6 @@ private:
     void FreeNode(Node* node)
     {
         (node)->~Node();
-        AllocatorFree(node);
+        AllocatorFree(allocator_, node);
     }
 };

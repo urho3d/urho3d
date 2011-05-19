@@ -299,12 +299,7 @@ public:
             else
             {
                 while (capacity_ < newSize)
-                {
-                    unsigned increment = capacity_ >> 1;
-                    if (!increment)
-                        increment = 1;
-                    capacity_ += increment;
-                }
+                    capacity_ += (capacity_ + 1) >> 1;
             }
             
             unsigned char* newBuffer = new unsigned char[capacity_ * sizeof(T)];

@@ -480,6 +480,7 @@ private:
             allocator_ = AllocatorInitialize(sizeof(Node));
         Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
         new(newNode) Node();
+        
         return newNode;
     }
     
@@ -497,6 +498,6 @@ private:
     void FreeNode(Node* node)
     {
         (node)->~Node();
-        AllocatorFree(node);
+        AllocatorFree(allocator_, node);
     }
 };

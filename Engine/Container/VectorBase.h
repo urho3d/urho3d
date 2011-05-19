@@ -45,6 +45,9 @@ public:
         ::Swap(buffer_, rhs.buffer_);
     }
     
+    /// Minimum dynamic allocation size
+    static const unsigned MIN_CAPACITY = 2;
+    
 protected:
     /// Size of vector
     unsigned size_;
