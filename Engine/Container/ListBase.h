@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "Allocator.h"
 #include "Swap.h"
 
 #include <cstdlib>
@@ -79,6 +80,7 @@ class ListBase
 {
 public:
     ListBase() :
+        allocator_(0),
         size_(0)
     {
     }
@@ -88,6 +90,7 @@ public:
     {
         ::Swap(head_, rhs.head_);
         ::Swap(tail_, rhs.tail_);
+        ::Swap(allocator_, rhs.allocator_);
         ::Swap(size_, rhs.size_);
     }
     
@@ -96,6 +99,8 @@ protected:
     ListNodeBase* head_;
     /// Tail node pointer
     ListNodeBase* tail_;
+    /// Node allocator
+    Allocator* allocator_;
     /// Number of nodes
     unsigned size_;
 };
@@ -135,12 +140,16 @@ class TreeIteratorBase
 {
 public:
     TreeIteratorBase() :
-        ptr_(0)
+        ptr_(0),
+        next_(0),
+        prev_(0)
     {
     }
     
     TreeIteratorBase(TreeNodeBase* ptr) :
-        ptr_(ptr)
+        ptr_(ptr),
+        next_(0),
+        prev_(0)
     {
     }
     
@@ -152,7 +161,15 @@ public:
     void GotoNext()
     {
         if (!ptr_)
+        {
+            ptr_ = next_;
+            next_ = 0;
+            prev_ = 0;
             return;
+        }
+        
+        next_ = 0;
+        prev_ = ptr_;
         
         if (!ptr_->link_[1])
         {
@@ -171,7 +188,15 @@ public:
     void GotoPrev()
     {
         if (!ptr_)
+        {
+            ptr_ = prev_;
+            next_ = 0;
+            prev_ = 0;
             return;
+        }
+        
+        next_ = ptr_;
+        prev_ = 0;
         
         if (!ptr_->link_[0])
         {
@@ -187,7 +212,12 @@ public:
             ptr_ = ptr_->link_[1];
     }
     
+    /// Current node pointer
     TreeNodeBase* ptr_;
+    /// Next node pointer
+    TreeNodeBase* next_;
+    /// Previous node pointer
+    TreeNodeBase* prev_;
 };
 
 /// Red-black tree base class
@@ -197,6 +227,7 @@ public:
     /// Construct
     TreeBase() :
         root_(0),
+        allocator_(0),
         size_(0)
     {
     }
@@ -205,6 +236,7 @@ public:
     void Swap(TreeBase& rhs)
     {
         ::Swap(root_, rhs.root_);
+        ::Swap(allocator_, rhs.allocator_);
         ::Swap(size_, rhs.size_);
     }
     
@@ -235,6 +267,8 @@ protected:
     
     /// Root node
     TreeNodeBase* root_;
+    /// Node allocator
+    Allocator* allocator_;
     /// Number of nodes
     unsigned size_;
 };

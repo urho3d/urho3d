@@ -122,6 +122,7 @@ public:
     /// Construct with another set
     Set(const Set<T>& set)
     {
+        AllocatorInitialize(sizeof(Node), set.Size());
         *this = set;
     }
     
@@ -129,6 +130,7 @@ public:
     ~Set()
     {
         Clear();
+        AllocatorUninitialize(allocator_);
     }
     
     /// Assign a set
@@ -312,7 +314,7 @@ private:
         
         if (!root_)
         {
-            root_ = ret = new Node(key);
+            root_ = ret = AllocateNode(key);
             ++size_;
         }
         else
@@ -332,7 +334,7 @@ private:
             {
                 if (!q)
                 {
-                    p->SetChild(dir, q = ret = new Node(key));
+                    p->SetChild(dir, q = ret = AllocateNode(key));
                     ++size_;
                 }
                 else if ((isRed(q->link_[0])) && (isRed(q->link_[1])))
@@ -442,7 +444,7 @@ private:
         {
             f->key_ = q->key_;
             p->SetChild(p->GetChild(1) == q, q->link_[q->GetChild(0) == 0]);
-            delete q;
+            FreeNode(q);
             --size_;
             removed = true;
         }
@@ -462,12 +464,39 @@ private:
     {
         Node* left = node->GetChild(0);
         Node* right = node->GetChild(1);
-        delete node;
+        FreeNode(node);
         --size_;
         
         if (left)
             EraseNodes(left);
         if (right)
             EraseNodes(right);
+    }
+    
+    /// Allocate a node
+    Node* AllocateNode()
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(Node));
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node();
+        return newNode;
+    }
+    
+    /// Allocate a node with specified key
+    Node* AllocateNode(const T& key)
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(Node));
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node(key);
+        return newNode;
+    }
+    
+    /// Free a node
+    void FreeNode(Node* node)
+    {
+        (node)->~Node();
+        AllocatorFree(node);
     }
 };

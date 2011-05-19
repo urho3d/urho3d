@@ -344,9 +344,7 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether vector is empty
     bool Empty() const { return size_ == 0; }
-    
-    /// Minimum dynamic allocation size
-    static const unsigned MIN_CAPACITY = 1;
+
     
 private:
     /// Return the buffer with right type

@@ -120,7 +120,7 @@ public:
         KeyValue& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
     };
     
-    /// Set node const iterator
+    /// Map node const iterator
     class ConstIterator : public TreeIteratorBase
     {
     public:
@@ -161,13 +161,15 @@ public:
     /// Construct with another map
     Map(const Map<T, U>& map)
     {
+        AllocatorInitialize(sizeof(Node), map.Size());
         *this = map;
     }
     
-    /// Destruct the set
+    /// Destruct the map
     ~Map()
     {
         Clear();
+        AllocatorUninitialize(allocator_);
     }
     
     /// Assign a map
@@ -319,7 +321,7 @@ public:
     const T& Back() { return FindLast()->key_; }
     /// Return number of keys
     unsigned Size() const { return size_; }
-    /// Return whether the set is empty
+    /// Return whether the map is empty
     bool Empty() const { return size_ == 0; }
     
 private:
@@ -524,5 +526,32 @@ private:
             EraseNodes(left);
         if (right)
             EraseNodes(right);
+    }
+    
+    /// Allocate a node
+    Node* AllocateNode()
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(Node));
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node();
+        return newNode;
+    }
+    
+    /// Allocate a node with specified key and value
+    Node* AllocateNode(const T& key, const U& value)
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(Node));
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node(key, value);
+        return newNode;
+    }
+    
+    /// Free a node
+    void FreeNode(Node* node)
+    {
+        (node)->~Node();
+        AllocatorFree(node);
     }
 };

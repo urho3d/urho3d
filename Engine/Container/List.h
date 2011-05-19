@@ -25,6 +25,8 @@
 
 #include "ListBase.h"
 
+#include <new>
+
 /// Linked list template class
 template <class T> class List : public ListBase
 {
@@ -116,8 +118,9 @@ public:
         ListBase()
     {
         // Allocate and link the head and tail nodes
-        head_ = new Node();
-        tail_ = new Node();
+        AllocatorInitialize(sizeof(Node), 2);
+        head_ = AllocateNode();
+        tail_ = AllocateNode();
         Node* head = GetHead();
         Node* tail = GetTail();
         head->next_ = tail;
@@ -129,8 +132,9 @@ public:
         ListBase()
     {
         // Allocate and link the head and tail nodes
-        head_ = new Node();
-        tail_ = new Node();
+        AllocatorInitialize(sizeof(Node), list.Size() + 2);
+        head_ = AllocateNode();
+        tail_ = AllocateNode();
         Node* head = GetHead();
         Node* tail = GetTail();
         head->next_ = tail;
@@ -144,8 +148,9 @@ public:
     ~List()
     {
         Clear();
-        delete GetHead();
-        delete GetTail();
+        FreeNode(GetHead());
+        FreeNode(GetTail());
+        AllocatorUninitialize(allocator_);
     }
     
     /// Assign from another list
@@ -306,7 +311,7 @@ private:
         if ((!dest) || (dest == head_))
             return;
         
-        Node* newNode = new Node(value);
+        Node* newNode = AllocateNode(value);
         newNode->next_ = dest;
         newNode->prev_ = dest->prev_;
         dest->prev_ = newNode;
@@ -325,7 +330,30 @@ private:
         Node* next = toRemove->GetNext();
         prev->next_ = next;
         next->prev_ = prev;
-        delete toRemove;
+        FreeNode(toRemove);
         --size_;
+    }
+    
+    /// Allocate a node
+    Node* AllocateNode()
+    {
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node();
+        return newNode;
+    }
+    
+    /// Allocate a node with initial value
+    Node* AllocateNode(const T& value)
+    {
+        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        new(newNode) Node(value);
+        return newNode;
+    }
+    
+    /// Free a node
+    void FreeNode(Node* node)
+    {
+        (node)->~Node();
+        AllocatorFree(node);
     }
 };
