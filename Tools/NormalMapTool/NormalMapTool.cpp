@@ -91,7 +91,7 @@ void Run(const Vector<String>& arguments)
         }
     }
     
-    String tempDestName = Split(arguments[0], '.')[0] + ".tga";
+    String tempDestName = arguments[0].Split('.')[0] + ".tga";
     stbi_write_tga(tempDestName.CString(), image.GetWidth(), image.GetHeight(), 4, buffer.GetPtr());
     
     String command = "texconv -f DXT5 -ft DDS -if NONE " + tempDestName;

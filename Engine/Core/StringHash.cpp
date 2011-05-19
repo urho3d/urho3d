@@ -24,6 +24,8 @@
 #include "Precompiled.h"
 #include "StringUtils.h"
 
+#include <cstdio>
+
 #include "DebugNew.h"
 
 const StringHash StringHash::ZERO;
@@ -57,6 +59,13 @@ unsigned StringHash::Calculate(const char* str)
     return hash;
 }
 
+String StringHash::ToString() const
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%08X", value_);
+    return String(tempBuffer);
+}
+
 ShortStringHash::ShortStringHash(const char* str) :
     value_(Calculate(str))
 {
@@ -70,4 +79,11 @@ ShortStringHash::ShortStringHash(const String& str) :
 unsigned short ShortStringHash::Calculate(const char* str)
 {
     return StringHash::Calculate(str);
+}
+
+String ShortStringHash::ToString() const
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%04X", value_);
+    return String(tempBuffer);
 }

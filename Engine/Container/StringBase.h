@@ -25,10 +25,12 @@
 
 // Note: this file is named StringBase.h to prevent conflicts with C headers
 
-#include "Iterator.h"
+#include "Vector.h"
 
 #include <cstring>
 #include <ctype.h>
+
+static const int CONVERSION_BUFFER_LENGTH = 128;
 
 /// String class
 class String
@@ -63,6 +65,15 @@ public:
         *this = str;
     }
     
+    /// Construct from a C string
+    String(char* str) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        *this = (const char*)str;
+    }
+    
     /// Construct from a char array and length
     String(const char* str, unsigned length) :
         length_(0),
@@ -71,6 +82,28 @@ public:
     {
         Resize(length);
         CopyChars(buffer_, str, length);
+    }
+    
+    /// Construct from an integer
+    explicit String(int value);
+    /// Construct from a short integer
+    explicit String(short value);
+    /// Construct from an unsigned integer
+    explicit String(unsigned value);
+    /// Construct from an unsigned short integer
+    explicit String(unsigned short value);
+    /// Construct from a float
+    explicit String(float value);
+    /// Construct from a bool
+    explicit String(bool value);
+    
+    /// Construct from a convertable value
+    template <class T> explicit String(const T& value) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        *this = value.ToString();
     }
     
     /// Destruct
@@ -173,6 +206,36 @@ public:
         
         return ret;
     }
+    
+    /// Add-assign an integer
+    String& operator += (int rhs);
+    /// Add-assign a short integer
+    String& operator += (short rhs);
+    /// Add-assign an unsigned integer
+    String& operator += (unsigned rhs);
+    /// Add-assign a short unsigned integer
+    String& operator += (unsigned short rhs);
+    /// Add-assign a float
+    String& operator += (float rhs);
+    /// Add-assign a bool
+    String& operator += (bool rhs);
+    /// Add-assign an arbitraty type
+    template <class T> String operator += (const T& rhs) { return *this += rhs.ToString(); }
+    
+    /// Add an integer
+    String operator + (int rhs) const;
+    /// Add a short integer
+    String operator + (short rhs) const;
+    /// Add an unsigned integer
+    String operator + (unsigned rhs) const;
+    /// Add a short unsigned integer
+    String operator + (unsigned short rhs) const;
+    /// Add a float
+    String operator + (float rhs) const;
+    /// Add a bool
+    String operator + (bool rhs) const;
+    /// Add an arbitrary type
+    template <class T> String operator + (const T& rhs) const { return *this + rhs.ToString(); }
     
     /// Test for equality with another string
     bool operator == (const String& rhs) const
@@ -286,6 +349,8 @@ public:
     String ToUpper() const;
     /// Return string in lowercase
     String ToLower() const;
+    /// Split string by a separator char
+    Vector<String> Split(char separator) const;
     /// Find the first occurrence of a string, or NPOS if not found
     unsigned Find(const String& str, unsigned startPos = 0) const;
     /// Find the first occurrence of a character, or NPOS if not found

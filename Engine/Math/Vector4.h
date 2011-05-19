@@ -175,6 +175,8 @@ public:
     
     /// Return float data
     const float* GetData() const { return &x_; }
+    /// Return as string
+    String ToString() const;
     
     /// X coordinate
     float x_;

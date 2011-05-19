@@ -93,7 +93,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectMethod("StringHash", "bool opEquals(const StringHash&in) const", asMETHOD(StringHash, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "int opCmp(const StringHash&in) const", asFUNCTION(StringHashCmp), asCALL_CDECL_OBJFIRST);
     engine->RegisterObjectMethod("StringHash", "StringHash opAdd(const StringHash&in) const", asMETHOD(StringHash, operator +), asCALL_THISCALL);
-    engine->RegisterObjectMethod("StringHash", "String ToString() const", asFUNCTIONPR(ToString, (const StringHash&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("StringHash", "String ToString() const", asMETHOD(StringHash, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("StringHash", "uint get_value()", asMETHOD(StringHash, GetValue), asCALL_THISCALL);
     
     engine->RegisterObjectType("ShortStringHash", sizeof(ShortStringHash), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
@@ -104,7 +104,7 @@ static void RegisterStringHash(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ShortStringHash", "ShortStringHash &opAssign(const ShortStringHash&in)", asMETHODPR(ShortStringHash, operator =, (const ShortStringHash&), ShortStringHash&), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "bool opEquals(const ShortStringHash&in) const", asMETHOD(ShortStringHash, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "int opCmp(const ShortStringHash&in) const", asFUNCTION(ShortStringHashCmp), asCALL_CDECL_OBJFIRST);
-    engine->RegisterObjectMethod("ShortStringHash", "String ToString() const", asFUNCTIONPR(ToString, (const ShortStringHash&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ShortStringHash", "String ToString() const", asMETHOD(ShortStringHash, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("ShortStringHash", "uint16 get_value()", asMETHOD(ShortStringHash, GetValue), asCALL_THISCALL);
 }
 
@@ -436,13 +436,12 @@ static void RegisterVariant(asIScriptEngine* engine)
 
 static CScriptArray* StringSplit(char separator, const String* str)
 {
-    Vector<String> result = Split(*str, separator);
+    Vector<String> result = str->Split(separator);
     return VectorToArray<String>(result, "Array<String>");
 }
 
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
-    // Register most of StringUtils as string's const methods, or objects' ToString() const methods for convenience
     engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTION(ToBool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTION(ToFloat), asCALL_CDECL_OBJLAST);
@@ -455,10 +454,6 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTION(ToVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTION(ToVector3), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector4 ToVector4() const", asFUNCTION(ToVector4), asCALL_CDECL_OBJLAST);
-    engine->RegisterGlobalFunction("String ToString(bool)", asFUNCTIONPR(ToString, (bool), String), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(float)", asFUNCTIONPR(ToString, (float), String), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(int)", asFUNCTIONPR(ToString, (int), String), asCALL_CDECL);
-    engine->RegisterGlobalFunction("String ToString(uint)", asFUNCTIONPR(ToString, (unsigned), String), asCALL_CDECL);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
 }
 

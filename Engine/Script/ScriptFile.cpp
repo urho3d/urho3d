@@ -128,7 +128,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
     
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + ToString(eventType) + ", handler " + handlerName);
+        LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
     

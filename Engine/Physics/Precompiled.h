@@ -26,7 +26,6 @@
 #include "Map.h"
 #include "PODVector.h"
 #include "StringBase.h"
-#include "Vector.h"
 
 #include <cstdio>
 #include <cstdlib>

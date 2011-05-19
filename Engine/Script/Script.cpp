@@ -72,7 +72,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     {
         info->read_ = true;
         // Extract type from the return value
-        Vector<String> parts = Split(declaration, ' ');
+        Vector<String> parts = declaration.Split(' ');
         if (parts.Size())
         {
             if (parts[0] != "const")
@@ -349,7 +349,7 @@ void Script::DumpAPI()
 
 void Script::MessageCallback(const asSMessageInfo* msg)
 {
-    String message = String(msg->section) + " (" + ToString(msg->row) + "," + ToString(msg->col) + ") " +
+    String message = String(msg->section) + " (" + msg->row + "," + msg->col + ") " +
         String(msg->message);
     
     if (logMode_ == LOGMODE_IMMEDIATE)

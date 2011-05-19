@@ -310,7 +310,7 @@ bool Server::HandleReliablePacket(Connection* connection, VectorBuffer& packet)
         break;
         
     default:
-        Disconnect(connection, false, "Unauthorized message ID " + ToString((int)msgID) + ", disconnecting client");
+        Disconnect(connection, false, "Unauthorized message ID " + String((int)msgID) + ", disconnecting client");
         return false;
     }
     
@@ -361,7 +361,7 @@ void Server::HandleRequestFile(Connection* connection, VectorBuffer& packet)
     }
     if (!package)
     {
-        LOGWARNING("Client " + connection->GetIdentity() + " requested unknown file " + ToString(nameHash));
+        LOGWARNING("Client " + connection->GetIdentity() + " requested unknown file " + String(nameHash));
         VectorBuffer replyPacket;
         replyPacket.WriteUByte(MSG_TRANSFERFAILED);
         replyPacket.WriteStringHash(nameHash);
@@ -398,7 +398,7 @@ void Server::HandleRequestFile(Connection* connection, VectorBuffer& packet)
         return;
     
     if (!fragmentStart)
-        LOGINFO("Client " + connection->GetIdentity() + " requested file " + ToString(nameHash));
+        LOGINFO("Client " + connection->GetIdentity() + " requested file " + String(nameHash));
     
     // Send the fragments
     unsigned fragmentOffset = fragmentStart * FILE_FRAGMENT_SIZE;
@@ -532,7 +532,7 @@ bool Server::HandleClientUpdate(Connection* connection, VectorBuffer& packet)
             }
             
         default:
-            Disconnect(connection, false, "Unauthorized message ID " + ToString((int)msgID) + ", disconnecting client");
+            Disconnect(connection, false, "Unauthorized message ID " + String((int)msgID) + ", disconnecting client");
             return false;
         }
     }
@@ -589,7 +589,7 @@ void Server::SendFullUpdate(Connection* connection)
     connection->ClearRemoteEvents();
     connection->SetJoinState(JS_WAITFORACK);
     
-    LOGDEBUG("Initial scene: " + ToString(packet.GetSize()) + " bytes");
+    LOGDEBUG("Initial scene: " + String(packet.GetSize()) + " bytes");
 }
 
 void Server::SendServerUpdate(Connection* connection)

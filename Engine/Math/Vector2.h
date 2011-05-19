@@ -24,6 +24,7 @@
 #pragma once
 
 #include "MathDefs.h"
+#include "StringBase.h"
 
 /// Two-dimensional vector
 class Vector2
@@ -194,6 +195,8 @@ public:
     
     /// Return float data
     const float* GetData() const { return &x_; }
+    /// Return as string
+    String ToString() const;
     
     /// X coordinate
     float x_;
@@ -293,6 +296,8 @@ public:
     
     /// Return integer data
     const int* GetData() const { return &x_; }
+    /// Return as string
+    String ToString() const;
     
     /// X coordinate
     int x_;

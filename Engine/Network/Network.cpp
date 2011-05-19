@@ -154,12 +154,12 @@ bool Network::StartServer(unsigned short port)
         enet_host_compress_with_range_coder(serverHost_);
     else
     {
-        LOGERROR("Failed to start server on port " + ToString(port));
+        LOGERROR("Failed to start server on port " + port);
         return false;
     }
     
 
-    LOGINFO("Started server on port " + ToString(port));
+    LOGINFO("Started server on port " + port);
     return true;
 }
 
@@ -194,7 +194,7 @@ Peer* Network::Connect(const String& address, unsigned short port)
     enetPeer->data = newPeer.GetPtr();
     peers_.Push(newPeer);
     
-    LOGINFO("Connecting to " + address + ":" + ToString(port));
+    LOGINFO("Connecting to " + address + ":" + port);
     return newPeer;
 }
 

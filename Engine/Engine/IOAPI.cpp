@@ -50,17 +50,22 @@ static void Print(const String& value)
 
 static void Print(int value)
 {
-    GetLog()->WriteRaw(ToString(value) + "\n");
+    GetLog()->WriteRaw(String(value) + "\n");
+}
+
+static void Print(unsigned value)
+{
+    GetLog()->WriteRaw(String(value) + "\n");
 }
 
 static void Print(float value)
 {
-    GetLog()->WriteRaw(ToString(value) + "\n");
+    GetLog()->WriteRaw(String(value) + "\n");
 }
 
 static void Print(bool value)
 {
-    GetLog()->WriteRaw(ToString(value) + "\n");
+    GetLog()->WriteRaw(String(value) + "\n");
 }
 
 static void LogWrite(const String& str, Log* ptr)
@@ -110,6 +115,7 @@ static void RegisterLog(asIScriptEngine* engine)
     // Register also Print() functions for convenience
     engine->RegisterGlobalFunction("void Print(const String&in)", asFUNCTIONPR(Print, (const String&), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int)", asFUNCTIONPR(Print, (int), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(uint)", asFUNCTIONPR(Print, (unsigned), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float)", asFUNCTIONPR(Print, (float), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool)", asFUNCTIONPR(Print, (bool), void), asCALL_CDECL);
 }

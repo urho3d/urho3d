@@ -126,6 +126,8 @@ public:
     
     /// Return float data
     const void* GetData() const { return &min_.x_; }
+    /// Return as string
+    String ToString() const;
     
     /// Minimum vector
     Vector2 min_;
@@ -174,6 +176,8 @@ public:
     
     /// Return integer data
     const int* GetData() const { return &left_; }
+    /// Return as string
+    String ToString() const;
     
     /// Left coordinate
     int left_;

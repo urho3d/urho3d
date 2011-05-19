@@ -121,7 +121,7 @@ bool XMLElement::SetAttribute(const String& name, const String& value)
 
 bool XMLElement::SetBool(const String& name, bool value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, String(value));
 }
 
 bool XMLElement::SetBoundingBox(const BoundingBox& value)
@@ -137,7 +137,7 @@ bool XMLElement::SetBuffer(const String& name, const void* data, unsigned size)
     const unsigned char* bytes = (const unsigned char*)data;
     
     for (unsigned i = 0; i < size; ++i)
-        dataStr += ToString(bytes[i]) + " ";
+        dataStr += String((unsigned)bytes[i]) + " ";
     
     return SetAttribute(name, dataStr);
 }
@@ -152,37 +152,37 @@ bool XMLElement::SetBuffer(const String& name, const PODVector<unsigned char>& v
 
 bool XMLElement::SetColor(const String& name, const Color& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetFloat(const String& name, float value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, String(value));
 }
 
 bool XMLElement::SetInt(const String& name, int value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, String(value));
 }
 
 bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetIntVector2(const String& name, const IntVector2& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetRect(const String& name, const Rect& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetQuaternion(const String& name, const Quaternion& value)
 {
-    return XMLElement::SetAttribute(name, ToString(value));
+    return XMLElement::SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetString(const String& name, const String& value)
@@ -283,17 +283,17 @@ bool XMLElement::SetVariantMap(const VariantMap& value)
 
 bool XMLElement::SetVector2(const String& name, const Vector2& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetVector3(const String& name, const Vector3& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetVector4(const String& name, const Vector4& value)
 {
-    return SetAttribute(name, ToString(value));
+    return SetAttribute(name, value.ToString());
 }
 
 String XMLElement::GetName() const
@@ -437,7 +437,7 @@ BoundingBox XMLElement::GetBoundingBox() const
 PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
 {
     PODVector<unsigned char> ret;
-    Vector<String> bytes = Split(GetAttribute(name), ' ');
+    Vector<String> bytes = GetAttribute(name).Split(' ');
     
     ret.Resize(bytes.Size());
     for (unsigned i = 0; i < bytes.Size(); ++i)
@@ -448,7 +448,7 @@ PODVector<unsigned char> XMLElement::GetBuffer(const String& name) const
 bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
 {
     PODVector<unsigned char> ret;
-    Vector<String> bytes = Split(GetAttribute(name), ' ');
+    Vector<String> bytes = GetAttribute(name).Split(' ');
     unsigned char* destBytes = (unsigned char*)dest;
     if (size < bytes.Size())
         return false;
@@ -531,7 +531,7 @@ ResourceRef XMLElement::GetResourceRef() const
 {
     ResourceRef ret;
     
-    Vector<String> values = Split(GetAttribute("value"), ';');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() == 2)
     {
         ret.type_ = ShortStringHash(values[0]);
@@ -545,7 +545,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    Vector<String> values = Split(GetAttribute("value"), ';');
+    Vector<String> values = GetAttribute("value").Split(' ');
     if (values.Size() >= 1)
     {
         ret.type_ = ShortStringHash(values[0]);

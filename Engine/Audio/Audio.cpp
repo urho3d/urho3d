@@ -177,8 +177,8 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool ste
     stereo_ = stereo;
     interpolate_ = interpolate;
     
-    LOGINFO("Set audio mode " + ToString(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " + (sixteenBit_ ? "16-bit" : "8-bit") + " " +
-        (interpolate_ ? "interpolated" : ""));
+    LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
+        (sixteenBit_ ? "16-bit" : "8-bit") + " " + (interpolate_ ? "interpolated" : ""));
     
     return Play();
 }

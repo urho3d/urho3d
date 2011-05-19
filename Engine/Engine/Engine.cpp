@@ -335,11 +335,11 @@ void Engine::DumpResources()
         if (num)
         {
             LOGRAW("Resource type " + i->second_.resources_.Begin()->second_->GetTypeName() +
-                ": count " + ToString(num) + " memory use " + ToString(memoryUse) + "\n");
+                ": count " + num + " memory use " + memoryUse + "\n");
         }
     }
     
-    LOGRAW("Total memory use of all resources " + ToString(cache->GetTotalMemoryUse()) + "\n\n");
+    LOGRAW("Total memory use of all resources " + String(cache->GetTotalMemoryUse()) + "\n\n");
 }
 
 void Engine::Render()

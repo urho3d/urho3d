@@ -27,7 +27,6 @@
 #include "ProcessUtils.h"
 #include "SharedArrayPtr.h"
 #include "StringUtils.h"
-#include "Vector.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -183,5 +182,5 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
-    PrintLine("Package total size " + ToString(dest.GetSize()) + " bytes");
+    PrintLine("Package total size " + String(dest.GetSize()) + " bytes");
 }

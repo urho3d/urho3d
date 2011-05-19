@@ -417,10 +417,10 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     if (!multiSample)
-        LOGINFO("Set screen mode " + ToString(width_) + "x" + ToString(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
+        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
     else
-        LOGINFO("Set screen mode " + ToString(width_) + "x" + ToString(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
-        " multisample " + ToString(multiSample));
+        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
+        " multisample " + String(multiSample));
     
     using namespace ScreenMode;
     
@@ -1761,7 +1761,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
     VertexBuffer* buffer = immediatevertexBuffer_[elementMask];
     if (buffer->GetVertexCount() < newSize)
     {
-        LOGDEBUG("Resized immediate vertex buffer to " + ToString(newSize));
+        LOGDEBUG("Resized immediate vertex buffer to " + newSize);
         buffer->SetSize(newSize, elementMask);
         immediateVertexBufferPos_[elementMask] = 0;
     }

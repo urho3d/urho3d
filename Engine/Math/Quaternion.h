@@ -216,6 +216,8 @@ public:
     Quaternion Slerp(Quaternion rhs, float t) const;
     /// Return float data
     const float* GetData() const { return &w_; }
+    /// Return as string
+    String ToString() const;
     
     /// W coordinate
     float w_;

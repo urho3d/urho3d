@@ -487,7 +487,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     
                     // If still too many bones_ in one subgeometry, error
                     if (usedBoneMap.Size() > MAX_SKIN_MATRICES)
-                        ErrorExit("Too many bones_ in submesh " + ToString(subMeshIndex + 1));
+                        ErrorExit("Too many bones_ in submesh " + (subMeshIndex + 1));
                     
                     // Write mapping of vertex buffer bone indices to original bone indices
                     subGeometryLodLevel.boneMapping_.Resize(usedBoneMap.Size());
@@ -538,8 +538,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         
         OptimizeIndices(&subGeometryLodLevel, vBuf, iBuf);
         
-        PrintLine("Processed submesh " + ToString(subMeshIndex + 1) + ": " + ToString(vertices) + " vertices " + 
-            ToString(triangles) + " triangles");
+        PrintLine("Processed submesh " + String(subMeshIndex + 1) + ": " + String(vertices) + " vertices " + 
+            String(triangles) + " triangles");
         Vector<ModelSubGeometryLodLevel> thisSubGeometry;
         thisSubGeometry.Push(subGeometryLodLevel);
         subGeometries_.Push(thisSubGeometry);
@@ -613,7 +613,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     OptimizeIndices(&newLodLevel, vBuf, iBuf);
                     
                     subGeometries_[subMeshIndex].Push(newLodLevel);
-                    PrintLine("Processed LOD level for submesh " + ToString(subMeshIndex + 1) + ": distance " + ToString(distance));
+                    PrintLine("Processed LOD level for submesh " + String(subMeshIndex + 1) + ": distance " + String(distance));
                     
                     lodSubMesh = lodSubMesh.GetNextElement("lodfacelist");
                 }
@@ -739,7 +739,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                 ++bufIndex;
                         }
                         morphs_.Push(newMorph);
-                        PrintLine("Processed morph " + name + " with " + ToString(usedPoses.Size()) + " sub-poses");
+                        PrintLine("Processed morph " + name + " with " + usedPoses.Size() + " sub-poses");
                     }
                     
                     anim = anim.GetNextElement("animation");

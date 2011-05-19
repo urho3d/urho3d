@@ -102,12 +102,12 @@ void DebugHud::Update(float timeStep)
     if (statsText_->IsVisible())
     {
         String stats = 
-            "Triangles " + ToString(graphics->GetNumPrimitives()) +
-            "\nBatches " + ToString(graphics->GetNumBatches()) +
-            "\nViews " + ToString(renderer->GetNumViews()) + 
-            "\nLights " + ToString(renderer->GetNumLights(true)) +
-            "\nShadowmaps " + ToString(renderer->GetNumShadowMaps(true)) +
-            "\nOccluders " + ToString(renderer->GetNumOccluders(true) + renderer->GetNumShadowOccluders(true));
+            "Triangles " + String(graphics->GetNumPrimitives()) +
+            "\nBatches " + String(graphics->GetNumBatches()) +
+            "\nViews " + String(renderer->GetNumViews()) + 
+            "\nLights " + String(renderer->GetNumLights(true)) +
+            "\nShadowmaps " + String(renderer->GetNumShadowMaps(true)) +
+            "\nOccluders " + String(renderer->GetNumOccluders(true) + renderer->GetNumShadowOccluders(true));
         
         statsText_->SetText(stats);
     }
@@ -157,7 +157,7 @@ void DebugHud::Update(float timeStep)
             mode += "Off";
         
         int shadowMapSize = renderer->GetShadowMapSize();
-        mode += " Size:" + ToString(shadowMapSize);
+        mode += " Size:" + shadowMapSize;
         
         bool shadowMapHiresDepth = renderer->GetShadowMapHiresDepth();
         mode += " Depth:";

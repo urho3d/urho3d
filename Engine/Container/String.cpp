@@ -24,7 +24,136 @@
 #include "StringBase.h"
 #include "Swap.h"
 
+#include <cstdio>
+
 char String::endZero = 0;
+
+String::String(int value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%d", value);
+    *this = tempBuffer;
+}
+
+String::String(short value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%d", value);
+    *this = tempBuffer;
+}
+
+String::String(unsigned value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%u", value);
+    *this = tempBuffer;
+}
+
+String::String(unsigned short value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%u", value);
+    *this = tempBuffer;
+}
+
+String::String(float value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%g", value);
+    *this = tempBuffer;
+}
+
+String::String(bool value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    if (value)
+        *this = "true";
+    else
+        *this = "false";
+}
+
+String& String::operator += (int rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String& String::operator += (short rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String& String::operator += (unsigned rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String& String::operator += (unsigned short rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String& String::operator += (float rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String& String::operator += (bool rhs)
+{
+    *this += String(rhs);
+    return *this;
+}
+
+String String::operator + (int rhs) const
+{
+    return *this + String(rhs);
+}
+
+String String::operator + (short rhs) const
+{
+    return *this + String(rhs);
+}
+
+String String::operator + (unsigned rhs) const
+{
+    return *this + String(rhs);
+}
+
+String String::operator + (unsigned short rhs) const
+{
+    return *this + String(rhs);
+}
+
+String String::operator + (float rhs) const
+{
+    return *this + String(rhs);
+}
+
+String String::operator + (bool rhs) const
+{
+    return *this + String(rhs);
+}
 
 void String::ReplaceInPlace(char replaceThis, char replaceWith)
 {
@@ -317,6 +446,46 @@ String String::ToUpper() const
     String ret(*this);
     for (unsigned i = 0; i < ret.length_; ++i)
         ret[i] = toupper(buffer_[i]);
+    
+    return ret;
+}
+
+Vector<String> String::Split(char separator) const
+{
+    Vector<String> ret;
+    unsigned pos = 0;
+    
+    while (pos < length_)
+    {
+        unsigned start = pos;
+        
+        while (start < length_)
+        {
+            if (buffer_[start] == separator)
+                break;
+            
+            start++;
+        }
+        
+        if (start == length_)
+        {
+            ret.Push(Substring(pos));
+            break;
+        }
+        
+        unsigned end = start;
+        
+        while (end < length_)
+        {
+            if (buffer_[end] != separator)
+                break;
+            
+            end++;
+        }
+        
+        ret.Push(Substring(pos, start - pos));
+        pos = end;
+    }
     
     return ret;
 }

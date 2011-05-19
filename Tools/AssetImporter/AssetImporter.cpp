@@ -154,7 +154,7 @@ aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* roo
 aiMatrix4x4 GetMeshBakingTransform(aiNode* meshNode, aiNode* modelRootNode);
 void GetPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot, Vector3& scale);
 
-String ToString(const aiString& str);
+String FromAIString(const aiString& str);
 Vector3 ToVector3(const aiVector3D& vec);
 Vector2 ToVector2(const aiVector2D& vec);
 Quaternion ToQuaternion(const aiQuaternion& quat);
@@ -409,12 +409,12 @@ void DumpNodes(aiNode* rootNode, unsigned level)
     aiMatrix4x4 transform = GetDerivedTransform(rootNode, rootNode_);
     GetPosRotScale(transform, pos, rot, scale);
     
-    PrintLine(indent + "Node " + ToString(rootNode->mName) + " pos " + ToString(pos));
+    PrintLine(indent + "Node " + FromAIString(rootNode->mName) + " pos " + String(pos));
     
     if (rootNode->mNumMeshes == 1)
-        PrintLine(indent + "  " + ToString(rootNode->mNumMeshes) + " geometry");
+        PrintLine(indent + "  " + String(rootNode->mNumMeshes) + " geometry");
     if (rootNode->mNumMeshes > 1)
-        PrintLine(indent + "  " + ToString(rootNode->mNumMeshes) + " geometries");
+        PrintLine(indent + "  " + String(rootNode->mNumMeshes) + " geometries");
     
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
         DumpNodes(rootNode->mChildren[i], level + 1);
@@ -493,7 +493,7 @@ void CollectBones(OutModel& model)
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
-            String boneName(ToString(bone->mName));
+            String boneName(FromAIString(bone->mName));
             aiNode* boneNode = FindNode(boneName, scene_->mRootNode, true);
             if (!boneNode)
                 ErrorExit("Could not find scene node for bone " + boneName);
@@ -566,7 +566,7 @@ void CollectAnimations(OutModel& model)
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
-            String channelName = ToString(channel->mNodeName);
+            String channelName = FromAIString(channel->mNodeName);
             if (GetBoneIndex(model, channelName) != M_MAX_UNSIGNED)
             {
                 modelBoneFound = true;
@@ -588,7 +588,7 @@ void BuildBoneCollisionInfo(OutModel& model)
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
-            String boneName = ToString(bone->mName);
+            String boneName = FromAIString(bone->mName);
             unsigned boneIndex = GetBoneIndex(model, boneName);
             if (boneIndex == M_MAX_UNSIGNED)
                 continue;
@@ -614,7 +614,7 @@ void BuildAndSaveModel(OutModel& model)
 {
     if (!model.rootNode_)
         ErrorExit("Null root node for model");
-    String rootNodeName = ToString(model.rootNode_->mName);
+    String rootNodeName = FromAIString(model.rootNode_->mName);
     if (!model.meshes_.Size())
         ErrorExit("No geometries found starting from node " + rootNodeName);
     
@@ -668,8 +668,8 @@ void BuildAndSaveModel(OutModel& model)
             SharedPtr<Geometry> geom(new Geometry(context_));
             
             aiMesh* mesh = model.meshes_[i];
-            PrintLine("Writing geometry " + ToString(i) + " with " + ToString(mesh->mNumVertices) + " vertices " +
-                ToString(mesh->mNumFaces * 3) + " indices");
+            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+                String(mesh->mNumFaces * 3) + " indices");
             
             bool largeIndices = mesh->mNumVertices > 65535;
             unsigned elementMask = GetElementMask(mesh);
@@ -749,8 +749,8 @@ void BuildAndSaveModel(OutModel& model)
             SharedPtr<Geometry> geom(new Geometry(context_));
             
             aiMesh* mesh = model.meshes_[i];
-            PrintLine("Writing geometry " + ToString(i) + " with " + ToString(mesh->mNumVertices) + " vertices " +
-                ToString(mesh->mNumFaces * 3) + " indices");
+            PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+                String(mesh->mNumFaces * 3) + " indices");
             
             // Build the index data
             if (!largeIndices)
@@ -797,8 +797,8 @@ void BuildAndSaveModel(OutModel& model)
     // Build skeleton if necessary
     if ((model.bones_.Size()) && (model.rootBone_))
     {
-        PrintLine("Writing skeleton with " + ToString(model.bones_.Size()) + " bones, rootbone " +
-            ToString(model.rootBone_->mName));
+        PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
+            FromAIString(model.rootBone_->mName));
         
         Skeleton skeleton;
         Vector<Bone>& bones = skeleton.GetModifiableBones();
@@ -806,7 +806,7 @@ void BuildAndSaveModel(OutModel& model)
         for (unsigned i = 0; i < model.bones_.Size(); ++i)
         {
             aiNode* boneNode = model.bones_[i];
-            String boneName(ToString(boneNode->mName));
+            String boneName(FromAIString(boneNode->mName));
             
             Bone newBone;
             newBone.name_ = boneName;
@@ -829,7 +829,7 @@ void BuildAndSaveModel(OutModel& model)
         // Set the bone hierarchy
         for (unsigned i = 1; i < model.bones_.Size(); ++i)
         {
-            String parentName = ToString(model.bones_[i]->mParent->mName);
+            String parentName = FromAIString(model.bones_[i]->mParent->mName);
             for (unsigned j = 0; j < bones.Size(); ++j)
             {
                 if (bones[j].name_ == parentName)
@@ -856,9 +856,9 @@ void BuildAndSaveAnimations(OutModel& model)
     for (unsigned i = 0; i < model.animations_.Size(); ++i)
     {
         aiAnimation* anim = model.animations_[i];
-        String animName = ToString(anim->mName);
+        String animName = FromAIString(anim->mName);
         if (animName.Empty())
-            animName = "Anim" + ToString(i + 1);
+            animName = "Anim" + (i + 1);
         String animOutName = GetPath(model.outName_) + GetFileName(model.outName_) + "_" + SanitateAssetName(animName) + ".ani";
         
         SharedPtr<Animation> outAnim(new Animation(context_));
@@ -866,12 +866,12 @@ void BuildAndSaveAnimations(OutModel& model)
         outAnim->SetAnimationName(animName);
         outAnim->SetLength((float)anim->mDuration * tickConversion);
         
-        PrintLine("Writing animation " + animName + " length " + ToString(outAnim->GetLength()));
+        PrintLine("Writing animation " + animName + " length " + outAnim->GetLength());
         Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {
             aiNodeAnim* channel = anim->mChannels[j];
-            String channelName = ToString(channel->mNodeName);
+            String channelName = FromAIString(channel->mNodeName);
             unsigned boneIndex = GetBoneIndex(model, channelName);
             if (boneIndex == M_MAX_UNSIGNED)
             {
@@ -1022,7 +1022,7 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
     {
         OutModel model;
         model.rootNode_ = node;
-        model.outName_ = resourcePath_ + (useSubdirs_ ? "Models/" : "") + SanitateAssetName(ToString(node->mName)) + ".mdl";
+        model.outName_ = resourcePath_ + (useSubdirs_ ? "Models/" : "") + SanitateAssetName(FromAIString(node->mName)) + ".mdl";
         for (unsigned i = 0; i < meshes.Size(); ++i)
         {
             aiMesh* mesh = meshes[i].second_;
@@ -1040,7 +1040,7 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         {
             if (scene.models_[i].meshIndices_ == model.meshIndices_)
             {
-                PrintLine("Added node " + ToString(node->mName));
+                PrintLine("Added node " + FromAIString(node->mName));
                 scene.nodes_.Push(node);
                 scene.nodeModelIndices_.Push(i);
                 unique = false;
@@ -1050,7 +1050,7 @@ void CollectSceneModels(OutScene& scene, aiNode* node)
         if (unique)
         {
             PrintLine("Added model " + model.outName_);
-            PrintLine("Added node " + ToString(node->mName));
+            PrintLine("Added node " + FromAIString(node->mName));
             CollectBones(model);
             BuildBoneCollisionInfo(model);
             if (!noAnimations_)
@@ -1103,7 +1103,7 @@ void BuildAndSaveScene(OutScene& scene)
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         
         // Create a static model component for each node
-        Node* modelNode = outScene->CreateChild(ToString(scene.nodes_[i]->mName));
+        Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName));
         StaticModel* staticModel = modelNode->CreateComponent<StaticModel>();
         
         // Create a dummy model so that the reference can be stored
@@ -1163,7 +1163,7 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
     // Material must have name so it can be successfully saved
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
-    String matName = SanitateAssetName(ToString(matNameStr));
+    String matName = SanitateAssetName(FromAIString(matNameStr));
     if (matName.Empty())
         return;
     
@@ -1187,9 +1187,9 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
     aiColor3D colorVal;
     
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
-        diffuseTexName = GetFileNameAndExtension(ToString(stringVal));
+        diffuseTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
-        normalTexName = GetFileNameAndExtension(ToString(stringVal));
+        normalTexName = GetFileNameAndExtension(FromAIString(stringVal));
     if (material->Get(AI_MATKEY_COLOR_DIFFUSE, colorVal) == AI_SUCCESS)
         diffuseColor = Color(colorVal.r, colorVal.g, colorVal.b);
     if (material->Get(AI_MATKEY_OPACITY, floatVal) == AI_SUCCESS)
@@ -1273,7 +1273,7 @@ void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelN
     Vector<SharedPtr<Model> > srcModels;
     for (unsigned i = 0; i < modelNames.Size(); ++i)
     {
-        PrintLine("Reading LOD level " + ToString(i) + ": model " + modelNames[i] + " distance " + ToString(lodDistances[i]));
+        PrintLine("Reading LOD level " + String(i) + ": model " + modelNames[i] + " distance " + String(lodDistances[i]));
         File srcFile(context_);
         srcFile.Open(modelNames[i]);
         SharedPtr<Model> srcModel(new Model(context_));
@@ -1359,7 +1359,7 @@ unsigned GetBoneIndex(OutModel& model, const String& boneName)
 {
     for (unsigned i = 0; i < model.bones_.Size(); ++i)
     {
-        if (ToString(model.bones_[i]->mName) == boneName)
+        if (boneName == model.bones_[i]->mName.data)
             return i;
     }
     return M_MAX_UNSIGNED;
@@ -1373,7 +1373,7 @@ aiBone* GetMeshBone(OutModel& model, const String& boneName)
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
-            if (ToString(bone->mName) == boneName)
+            if (boneName == bone->mName.data)
                 return bone;
         }
     }
@@ -1389,7 +1389,7 @@ Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
             aiBone* bone = mesh->mBones[j];
-            if (ToString(bone->mName) == boneName)
+            if (boneName == bone->mName.data)
             {
                 aiMatrix4x4 offset = bone->mOffsetMatrix;
                 aiMatrix4x4 nodeDerivedInverse = GetMeshBakingTransform(node, model.rootNode_);
@@ -1420,7 +1420,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings,
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
             aiBone* bone = mesh->mBones[i];
-            String boneName = ToString(bone->mName);
+            String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
                 ErrorExit("Bone " + boneName + " not found");
@@ -1440,7 +1440,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings,
         for (unsigned i = 0; i < mesh->mNumBones; ++i)
         {
             aiBone* bone = mesh->mBones[i];
-            String boneName = ToString(bone->mName);
+            String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
                 ErrorExit("Bone " + boneName + " not found");
@@ -1461,7 +1461,7 @@ String GetMeshMaterialName(aiMesh* mesh)
     aiMaterial* material = scene_->mMaterials[mesh->mMaterialIndex];
     aiString matNameStr;
     material->Get(AI_MATKEY_NAME, matNameStr);
-    String matName = SanitateAssetName(ToString(matNameStr));
+    String matName = SanitateAssetName(FromAIString(matNameStr));
     if (matName.Empty())
         return matName;
     else
@@ -1579,12 +1579,12 @@ aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive)
         return 0;
     if (!caseSensitive)
     {
-        if (ToString(rootNode->mName).ToLower() == name.ToLower())
+        if (FromAIString(rootNode->mName).ToLower() == name.ToLower())
             return rootNode;
     }
     else
     {
-        if (ToString(rootNode->mName) == name)
+        if (name == rootNode->mName.data)
             return rootNode;
     }
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
@@ -1633,7 +1633,7 @@ void GetPosRotScale(const aiMatrix4x4& transform, Vector3& pos, Quaternion& rot,
 }
 
 
-String ToString(const aiString& str)
+String FromAIString(const aiString& str)
 {
     return String(str.data);
 }

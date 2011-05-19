@@ -194,8 +194,8 @@ String Client::GetFileTransferStatus() const
     
     for (Map<StringHash, FileTransfer>::ConstIterator i = fileTransfers_.Begin(); i != fileTransfers_.End(); ++i)
     {
-        String line = i->second_.fileName_ + " " + ToString(i->second_.bytesReceived_) + "/" + ToString(i->second_.size_) 
-            + " (" + ToString((int)(((float)i->second_.bytesReceived_ / (float)i->second_.size_) * 100.0f + 0.5f)) + "%)\n";
+        String line = i->second_.fileName_ + " " + i->second_.bytesReceived_ + "/" + i->second_.size_
+            + " (" + String((int)(((float)i->second_.bytesReceived_ / (float)i->second_.size_) * 100.0f + 0.5f)) + "%)\n";
         ret += line;
     }
     
@@ -302,7 +302,7 @@ void Client::HandleReliablePacket(VectorBuffer& packet)
         break;
         
     default:
-        LOGERROR("Unknown message ID " + ToString((int)msgID) + " received from server");
+        LOGERROR("Unknown message ID " + String((int)msgID) + " received from server");
         break;
     }
 }
@@ -357,7 +357,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
     Map<StringHash, FileTransfer>::Iterator i = fileTransfers_.Find(nameHash);
     if (i == fileTransfers_.End())
     {
-        LOGDEBUG("Received fragment for nonexisting file transfer " + ToString(nameHash));
+        LOGDEBUG("Received fragment for nonexisting file transfer " + nameHash);
         return;
     }
     FileTransfer& transfer = i->second_;
@@ -365,7 +365,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
     unsigned index = packet.ReadVLE();
     if (transfer.fragmentsReceived_ != index)
     {
-        LOGERROR("Received unexpected fragment for file " + ToString(nameHash) + ", stopping transfer");
+        LOGERROR("Received unexpected fragment for file " + String(nameHash) + ", stopping transfer");
         
         using namespace FileTransferFailed;
         
@@ -387,8 +387,8 @@ void Client::HandleTransferData(VectorBuffer& packet)
     {
         if (transfer.bytesReceived_ != transfer.size_)
         {
-            LOGERROR("Transfer of file " + transfer.fileName_ + " finished, expected " + ToString(transfer.size_) +
-                " bytes but got " + ToString(transfer.bytesReceived_));
+            LOGERROR("Transfer of file " + transfer.fileName_ + " finished, expected " + transfer.size_ +
+                " bytes but got " + transfer.bytesReceived_);
             
             using namespace FileTransferFailed;
             
@@ -401,7 +401,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         {
             float totalTime = transfer.receiveTimer_.GetMSec(true) * 0.001f;
             LOGINFO("Transfer of file " + transfer.fileName_ + " completed in " +
-                ToString(totalTime) + " seconds, speed " + ToString(transfer.size_ / totalTime) + " bytes/sec");
+                totalTime + " seconds, speed " + transfer.size_ / totalTime + " bytes/sec");
             using namespace FileTransferCompleted;
             
             VariantMap eventData;
@@ -424,7 +424,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         transfer.batchStart_ = transfer.fragmentsReceived_;
         float batchTime = transfer.batchTimer_.GetMSec(true) * 0.001f;
         float newDataRate = transfer.batchSize_ * FILE_FRAGMENT_SIZE / batchTime;
-        LOGDEBUG("Received " + ToString(transfer.batchSize_) + " fragments in " + ToString(batchTime) + " seconds");
+        LOGDEBUG("Received " + String(transfer.batchSize_) + " fragments in " + String(batchTime) + " seconds");
         
         // If this was the first batch, can not yet estimate speed, so go up in batch size
         if (!transfer.lastBatchSize_)
@@ -468,11 +468,11 @@ void Client::HandleTransferFailed(VectorBuffer& packet)
     Map<StringHash, FileTransfer>::Iterator i = fileTransfers_.Find(nameHash);
     if (i == fileTransfers_.End())
     {
-        LOGDEBUG("Received fail for nonexisting file transfer " + ToString(nameHash));
+        LOGDEBUG("Received fail for nonexisting file transfer " + nameHash);
         return;
     }
     
-    String errorMsg = "Transfer of file " + ToString(nameHash) + " failed: " + reason;
+    String errorMsg = "Transfer of file " + String(nameHash) + " failed: " + reason;
     LOGINFO(errorMsg);
     
     using namespace FileTransferFailed;
@@ -537,7 +537,7 @@ void Client::HandleServerUpdate(VectorBuffer& packet, bool initial)
     {
         // If initial/full update, remove all old non-local nodes
         scene_->ClearNonLocal();
-        LOGDEBUG("Initial scene: " + ToString(packet.GetSize()) + " bytes");
+        LOGDEBUG("Initial scene: " + String(packet.GetSize()) + " bytes");
     }
     
     serverConnection_->SetFrameNumbers(lastFrameNumber, lastFrameAck);
@@ -573,7 +573,7 @@ void Client::HandleServerUpdate(VectorBuffer& packet, bool initial)
             break;
             
         default:
-            LOGWARNING("Unknown message ID " + ToString((int)msgID) + " received from server");
+            LOGWARNING("Unknown message ID " + String((int)msgID) + " received from server");
             packet.Seek(packet.GetSize()); // Break loop
             break;
         }
@@ -708,7 +708,7 @@ bool Client::RequestFile(const String& fileName, unsigned size, unsigned checksu
     serverConnection_->SendReliable(packet);
     
     fileTransfers_[nameHash] = newTransfer;
-    LOGINFO("Started transfer of file " + fileName + ", " + ToString(size) + " bytes");
+    LOGINFO("Started transfer of file " + fileName + ", " + size + " bytes");
     return true;
 }
 

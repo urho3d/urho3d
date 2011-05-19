@@ -343,7 +343,7 @@ void Run(const Vector<String>& arguments)
                     {
                         XMLElement param = parameters.CreateChildElement("parameter");
                         param.SetString("name", i->second_[j]);
-                        param.SetString("index", ToString(i->first_));
+                        param.SetInt("index", i->first_);
                     }
                 }
             }
@@ -360,7 +360,7 @@ void Run(const Vector<String>& arguments)
                     {
                         XMLElement param = parameters.CreateChildElement("parameter");
                         param.SetString("name", i->second_[j]);
-                        param.SetString("index", ToString(i->first_));
+                        param.SetInt("index", i->first_);
                     }
                 }
             }
@@ -377,7 +377,7 @@ void Run(const Vector<String>& arguments)
                     {
                         XMLElement param = parameters.CreateChildElement("parameter");
                         param.SetString("name", i->second_[j]);
-                        param.SetString("index", ToString(i->first_));
+                        param.SetInt("index", i->first_);
                     }
                 }
             }
@@ -650,7 +650,7 @@ bool Compile(ShaderType type, const String& input, const String& output, const V
     while (!dump->IsEof())
     {
         String lineStr = dump->ReadLine();
-        Vector<String> elements = Split(lineStr, ' ');
+        Vector<String> elements = lineStr.Split(' ');
         
         if (paramsStarted)
         {

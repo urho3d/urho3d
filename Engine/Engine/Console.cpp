@@ -248,7 +248,7 @@ void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
     using namespace LogMessage;
     
     // Be prepared for possible multi-line messages
-    Vector<String> rows = Split(eventData[P_MESSAGE].GetString(), '\n');
+    Vector<String> rows = eventData[P_MESSAGE].GetString().Split('\n');
     for (unsigned i = 0; i < rows.Size(); ++i)
     {
         // Remove the first row, change its text and re-add to the bottom

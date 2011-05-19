@@ -27,11 +27,8 @@
 #include "Quaternion.h"
 #include "Rect.h"
 #include "StringHash.h"
-#include "Vector.h"
 #include "Vector4.h"
 
-/// Split string with a separator char
-Vector<String> Split(const String& source, char separator);
 /// Parse a bool from a string. Check for the substring "true" case-insensitively
 bool ToBool(const String& source);
 /// Parse a float from a string
@@ -56,34 +53,6 @@ Vector2 ToVector2(const String& source);
 Vector3 ToVector3(const String& source);
 /// Parse a Vector4 from a string
 Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
-/// Convert a bool to string
-String ToString(bool value);
-/// Convert a float to string
-String ToString(float value);
-/// Convert an integer to string
-String ToString(int value);
-/// Convert an unsigned integer to string
-String ToString(unsigned value);
-/// Convert a Color to string
-String ToString(const Color& value);
-/// Convert an IntRect to string
-String ToString(const IntRect& value);
-/// Convert an IntVector2 to string
-String ToString(const IntVector2& value);
-/// Convert a Quaternion to string
-String ToString(const Quaternion& value);
-/// Convert a Rect to string
-String ToString(const Rect& value);
-/// Convert a StringHash to string. Return the reverse mapping if found
-String ToString(const StringHash& value);
-/// Convert a ShortStringHash to string. Return the reverse mapping if found
-String ToString(const ShortStringHash& value);
-/// Convert a Vector2 to string
-String ToString(const Vector2& value);
-/// Convert a Vector3 to string
-String ToString(const Vector3& value);
-/// Convert a Vector4 to string
-String ToString(const Vector4& value);
 /// Convert a pointer to string (returns hexadecimal)
 String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal

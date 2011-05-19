@@ -63,7 +63,7 @@ void Run(const Vector<String>& arguments)
     if ((dimensions < 1) || (dimensions > 2))
         ErrorExit("Dimensions must be 1 or 2");
     
-    String tempDestName = Split(arguments[0], '.')[0] + ".tga";
+    String tempDestName = arguments[0].Split('.')[0] + ".tga";
     
     if (dimensions == 1)
     {

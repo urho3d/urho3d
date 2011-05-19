@@ -24,6 +24,8 @@
 #include "Precompiled.h"
 #include "Quaternion.h"
 
+#include <cstdio>
+
 const Quaternion Quaternion::IDENTITY;
 
 Quaternion::Quaternion(float angle, const Vector3& axis)
@@ -229,4 +231,11 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
     }
     
     return *this * t1 + rhs * t2;
+}
+
+String Quaternion::ToString() const
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%g %g %g %g", w_, x_, y_, z_);
+    return String(tempBuffer);
 }

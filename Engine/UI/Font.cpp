@@ -143,7 +143,7 @@ const FontFace* Font::GetFace(int pointSize)
     if (error)
     {
         FT_Done_Face(face);
-        LOGERROR("Could not set font point size " + ToString(pointSize));
+        LOGERROR("Could not set font point size " + pointSize);
         return 0;
     }
     

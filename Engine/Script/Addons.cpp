@@ -624,114 +624,110 @@ void StringResize(unsigned newSize, String& str)
 
 static void ConstructStringInt(int value, String* ptr)
 {
-    new(ptr) String();
-    *ptr = ToString(value);
+    new(ptr) String(value);
 }
 
 static void ConstructStringUInt(unsigned value, String* ptr)
 {
-    new(ptr) String();
-    *ptr = ToString(value);
+    new(ptr) String(value);
 }
 
 static void ConstructStringFloat(float value, String* ptr)
 {
-    new(ptr) String();
-    *ptr = ToString(value);
+    new(ptr) String(value);
 }
 
 static void ConstructStringBool(bool value, String* ptr)
 {
-    new(ptr) String();
-    *ptr = ToString(value);
+    new(ptr) String(value);
 }
 
 static String& StringAssignInt(int value, String& str)
 {
-    str = ToString(value);
+    str = String(value);
     return str;
 }
 
 static String& StringAddAssignInt(int value, String& str)
 {
-    str += ToString(value);
+    str += String(value);
     return str;
 }
 
 static String StringAddInt(int value, const String& str)
 {
-    return str + ToString(value);
+    return str + String(value);
 }
 
 static String StringAddIntReverse(int value, const String& str)
 {
-    return ToString(value) + str;
+    return String(value) + str;
 }
 
 static String& StringAssignUInt(unsigned value, String& str)
 {
-    str = ToString(value);
+    str = String(value);
     return str;
 }
 
 static String& StringAddAssignUInt(unsigned value, String& str)
 {
-    str += ToString(value);
+    str += String(value);
     return str;
 }
 
 static String StringAddUInt(unsigned value, const String& str)
 {
-    return str + ToString(value);
+    return str + String(value);
 }
 
 static String StringAddUIntReverse(unsigned value, const String& str)
 {
-    return ToString(value) + str;
+    return String(value) + str;
 }
 
 static String& StringAssignFloat(float value, String& str)
 {
-    str = ToString(value);
+    str = String(value);
     return str;
 }
 
 static String& StringAddAssignFloat(float value, String& str)
 {
-    str += ToString(value);
+    str += String(value);
     return str;
 }
 
 static String StringAddFloat(float value, const String& str)
 {
-    return str + ToString(value);
+    return str + String(value);
 }
 
 static String StringAddFloatReverse(float value, const String& str)
 {
-    return ToString(value) + str;
+    return String(value) + str;
 }
 
 static String& StringAssignBool(bool value, String& str)
 {
-    str = ToString(value);
+    str = String(value);
     return str;
 }
 
 static String& StringAddAssignBool(bool value, String& str)
 {
-    str += ToString(value);
+    str += String(value);
     return str;
 }
 
 static String StringAddBool(bool value, const String& str)
 {
-    return str + ToString(value);
+    return str + String(value);
 }
 
 static String StringAddBoolReverse(bool value, const String& str)
 {
-    return ToString(value) + str;
+    return String(value) + str;
 }
 
 void RegisterString(asIScriptEngine *engine)

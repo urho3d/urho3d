@@ -28,7 +28,6 @@
 #include "PODVector.h"
 #include "Quaternion.h"
 #include "StringHash.h"
-#include "Vector.h"
 #include "Vector4.h"
 
 /// Supported variable types for Variant

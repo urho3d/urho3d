@@ -23,7 +23,16 @@
 
 #include "Precompiled.h"
 #include "Color.h"
+#include "StringBase.h"
+
+#include <cstdio>
 
 const Color Color::WHITE;
 const Color Color::BLACK(0.0f, 0.0f, 0.0f);
 
+String Color::ToString() const
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%g %g %g %g", r_, g_, b_, a_);
+    return String(tempBuffer);
+}

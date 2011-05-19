@@ -257,7 +257,7 @@ void Connection::ClearRemoteEvents()
 String Connection::GetIdentity() const
 {
     if (peer_)
-        return peer_->GetAddress() + ":" + ToString(peer_->GetPort());
+        return peer_->GetAddress() + ":" + peer_->GetPort();
     else
         return "Unknown";
 }

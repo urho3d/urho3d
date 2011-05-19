@@ -179,7 +179,7 @@ void Variant::FromString(const String& type, const String& value)
     {
         SetType(VAR_BUFFER);
         PODVector<unsigned char>& buffer = *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_));
-        Vector<String> values = Split(value, ' ');
+        Vector<String> values = value.Split(' ');
         buffer.Resize(values.Size());
         for (unsigned i = 0; i < values.Size(); ++i)
             buffer[i] = ToInt(values[i]);
@@ -190,7 +190,7 @@ void Variant::FromString(const String& type, const String& value)
     }
     else if (typeLower == "objectref")
     {
-        Vector<String> values = Split(value, ';');
+        Vector<String> values = value.Split(';');
         if (values.Size() == 2)
         {
             SetType(VAR_RESOURCEREF);
@@ -201,7 +201,7 @@ void Variant::FromString(const String& type, const String& value)
     }
     else if (typeLower == "objectreflist")
     {
-        Vector<String> values = Split(value, ';');
+        Vector<String> values = value.Split(';');
         if (values.Size() >= 1)
         {
             SetType(VAR_RESOURCEREFLIST);
@@ -238,28 +238,28 @@ String Variant::ToString() const
     switch (type_)
     {
     case VAR_INT:
-        return ::ToString(value_.int_);
+        return String(value_.int_);
         
     case VAR_BOOL:
-        return ::ToString(value_.bool_);
+        return String(value_.bool_);
         
     case VAR_FLOAT:
-        return ::ToString(value_.float_);
+        return String(value_.float_);
         
     case VAR_VECTOR2:
-        return ::ToString(*(reinterpret_cast<const Vector2*>(&value_)));
+        return (reinterpret_cast<const Vector2*>(&value_))->ToString();
         
     case VAR_VECTOR3:
-        return ::ToString(*(reinterpret_cast<const Vector3*>(&value_)));
+        return (reinterpret_cast<const Vector3*>(&value_))->ToString();
         
     case VAR_VECTOR4:
-        return ::ToString(*(reinterpret_cast<const Vector4*>(&value_)));
+        return (reinterpret_cast<const Vector4*>(&value_))->ToString();
         
     case VAR_QUATERNION:
-        return ::ToString(*(reinterpret_cast<const Quaternion*>(&value_)));
+        return (reinterpret_cast<const Quaternion*>(&value_))->ToString();
         
     case VAR_COLOR:
-        return ::ToString(*(reinterpret_cast<const Color*>(&value_)));
+        return (reinterpret_cast<const Color*>(&value_))->ToString();
         
     case VAR_STRING:
         return *(reinterpret_cast<const String*>(value_.ptr_));
@@ -272,14 +272,14 @@ String Variant::ToString() const
             {
                 if (i != buffer.Begin())
                     ret += " ";
-                ret += ::ToString(*i);
+                ret += String((unsigned)*i);
             }
             return ret;
         }
         
     case VAR_PTR:
         // Pointer serialization not supported (convert to null)
-        return ::ToString((unsigned)0);
+        return String(0);
         
     case VAR_RESOURCEREF:
     case VAR_RESOURCEREFLIST:

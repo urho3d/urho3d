@@ -29,48 +29,6 @@
 
 #include "DebugNew.h"
 
-static const int TEMP_BUFFER_LENGTH = 128;
-
-Vector<String> Split(const String& source, char separator)
-{
-    Vector<String> ret;
-    unsigned pos = 0;
-    
-    while (pos < source.Length())
-    {
-        unsigned start = pos;
-        
-        while (start < source.Length())
-        {
-            if (source[start] == separator)
-                break;
-            
-            start++;
-        }
-        
-        if (start == source.Length())
-        {
-            ret.Push(source.Substring(pos));
-            break;
-        }
-        
-        unsigned end = start;
-        
-        while (end < source.Length())
-        {
-            if (source[end] != separator)
-                break;
-            
-            end++;
-        }
-        
-        ret.Push(source.Substring(pos, start - pos));
-        pos = end;
-    }
-    
-    return ret;
-}
-
 bool ToBool(const String& source)
 {
     String temp = source.ToLower();
@@ -103,7 +61,7 @@ float ToFloat(const String& source)
 
 Color ToColor(const String& source)
 {
-    Vector<String> colors = Split(source, ' ');
+    Vector<String> colors = source.Split(' ');
     if (colors.Size() < 3)
         return Color();
     
@@ -116,7 +74,7 @@ Color ToColor(const String& source)
 
 IntRect ToIntRect(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 4)
         return IntRect::ZERO;
     else
@@ -125,7 +83,7 @@ IntRect ToIntRect(const String& source)
 
 IntVector2 ToIntVector2(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 2)
         return IntVector2::ZERO;
     else
@@ -134,7 +92,7 @@ IntVector2 ToIntVector2(const String& source)
 
 Rect ToRect(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 4)
         return Rect::ZERO;
     else
@@ -143,7 +101,7 @@ Rect ToRect(const String& source)
 
 Quaternion ToQuaternion(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 3)
         return Quaternion::IDENTITY;
     else if (coords.Size() < 4)
@@ -156,7 +114,7 @@ Quaternion ToQuaternion(const String& source)
 
 Vector2 ToVector2(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 2)
         return Vector2::ZERO;
     else
@@ -165,7 +123,7 @@ Vector2 ToVector2(const String& source)
 
 Vector3 ToVector3(const String& source)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (coords.Size() < 3)
         return Vector3::ZERO;
     else
@@ -174,7 +132,7 @@ Vector3 ToVector3(const String& source)
 
 Vector4 ToVector4(const String& source, bool allowMissingCoords)
 {
-    Vector<String> coords = Split(source, ' ');
+    Vector<String> coords = source.Split(' ');
     if (!allowMissingCoords)
     {
         if (coords.Size() < 4)
@@ -198,105 +156,6 @@ Vector4 ToVector4(const String& source, bool allowMissingCoords)
     }
 }
 
-String ToString(bool value)
-{
-    if (value)
-        return "true";
-    else
-        return "false";
-}
-
-String ToString(float value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g", value);
-    return String(tempBuffer);
-}
-
-String ToString(int value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d", value);
-    return String(tempBuffer);
-}
-
-String ToString(unsigned value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%u", value);
-    return String(tempBuffer);
-}
-
-String ToString(const Color& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", value.r_, value.g_, value.b_, value.a_);
-    return String(tempBuffer);
-}
-
-String ToString(const IntRect& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d %d &d", value.left_, value.top_, value.right_, value.bottom_);
-    return String(tempBuffer);
-}
-
-String ToString(const IntVector2& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d", value.x_, value.y_);
-    return String(tempBuffer);
-}
-
-String ToString(const Rect& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", value.min_.x_, value.min_.y_, value.max_.x_, value.max_.y_);
-    return String(tempBuffer);
-}
-
-String ToString(const Quaternion& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", value.w_, value.x_, value.y_, value.z_);
-    return String(tempBuffer);
-}
-
-String ToString(const StringHash& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%08X", value.GetValue());
-    return String(tempBuffer);
-}
-
-String ToString(const ShortStringHash& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%04X", value.GetValue());
-    return String(tempBuffer);
-}
-
-String ToString(const Vector2& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g", value.x_, value.y_);
-    return String(tempBuffer);
-}
-
-String ToString(const Vector3& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g", value.x_, value.y_, value.z_);
-    return String(tempBuffer);
-}
-
-String ToString(const Vector4& value)
-{
-    char tempBuffer[TEMP_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%g %g %g %g", value.x_, value.y_, value.z_, value.w_);
-    return String(tempBuffer);
-}
-
 String ToString(void* value)
 {
     return ToStringHex((int)value);
@@ -304,7 +163,7 @@ String ToString(void* value)
 
 String ToStringHex(unsigned value)
 {
-    char tempBuffer[TEMP_BUFFER_LENGTH];
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%08x", value);
     return String(tempBuffer);
 }

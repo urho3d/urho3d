@@ -155,7 +155,7 @@ static void RegisterIntVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opSub(const IntVector2&in) const", asMETHODPR(IntVector2, operator -, (const IntVector2&) const, IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", asMETHODPR(IntVector2, operator *, (int) const, IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", asMETHODPR(IntVector2, operator /, (int) const, IntVector2), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IntVector2", "String ToString() const", asFUNCTIONPR(ToString, (const IntVector2&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("IntVector2", "String ToString() const", asMETHOD(IntVector2, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("IntVector2", "int x", offsetof(IntVector2, x_));
     engine->RegisterObjectProperty("IntVector2", "int y", offsetof(IntVector2, y_));
 }
@@ -202,7 +202,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 GetNormalized() const", asMETHOD(Vector2, GetNormalized), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "String ToString() const", asFUNCTIONPR(ToString, (const Vector2&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHOD(Vector2, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHOD(Vector2, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float get_lengthSquared() const", asMETHOD(Vector2, GetLengthSquared), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));
@@ -252,7 +252,7 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Lerp(const Vector3&in, float) const", asMETHOD(Vector3, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 GetNormalized() const", asMETHOD(Vector3, GetNormalized), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "String ToString() const", asFUNCTIONPR(ToString, (const Vector3&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Vector3", "String ToString() const", asMETHOD(Vector3, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float get_length() const", asMETHOD(Vector3, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "float get_lengthSquared() const", asMETHOD(Vector3, GetLengthSquared), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector3", "float x", offsetof(Vector3, x_));
@@ -300,7 +300,7 @@ static void RegisterVector4(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector4", "float DotProduct(const Vector4&in) const", asMETHOD(Vector4, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "float AbsDotProduct(const Vector4&in) const", asMETHOD(Vector4, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector4", "Vector4 Lerp(const Vector4&in, float) const", asMETHOD(Vector4, Lerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector4", "String ToString() const", asFUNCTIONPR(ToString, (const Vector4&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Vector4", "String ToString() const", asMETHOD(Vector4, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector4", "float x", offsetof(Vector4, x_));
     engine->RegisterObjectProperty("Vector4", "float y", offsetof(Vector4, y_));
     engine->RegisterObjectProperty("Vector4", "float z", offsetof(Vector4, z_));
@@ -361,7 +361,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "float DotProduct(const Quaternion&in) const", asMETHOD(Quaternion, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "String ToString() const", asFUNCTIONPR(ToString, (const Quaternion&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, GetEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, GetYaw), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, GetPitch), asCALL_THISCALL);
@@ -604,7 +604,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "Color opMul(float) const", asMETHOD(Color, operator *), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color opAdd(const Color&in) const", asMETHOD(Color, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color Lerp(const Color&in, float) const", asMETHOD(Color, Lerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Color", "String ToString() const", asFUNCTIONPR(ToString, (const Color&), String), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Color", "String ToString() const", asMETHOD(Color, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, GetRGB), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "float get_intensity() const", asMETHOD(Color, GetIntensity), asCALL_THISCALL);
     engine->RegisterObjectProperty("Color", "float r", offsetof(Color, r_));

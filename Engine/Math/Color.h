@@ -25,6 +25,8 @@
 
 #include "Vector3.h"
 
+class String;
+
 /// RGBA color
 class Color
 {
@@ -123,6 +125,9 @@ public:
         
         return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
     }
+    
+    /// Return as string
+    String ToString() const;
     
     /// Red value
     float r_;

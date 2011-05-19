@@ -374,7 +374,8 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
         
         if (offset + level.dataSize_ > GetMemoryUse())
         {
-            LOGERROR("Compressed level is outside image data. Offset: " + ToString(offset) + " Size: " + ToString(level.dataSize_) + " Datasize: " + ToString(GetMemoryUse()));
+            LOGERROR("Compressed level is outside image data. Offset: " + String(offset) + " Size: " + String(level.dataSize_) +
+                " Datasize: " + String(GetMemoryUse()));
             level.data_ = 0;
             return level;
         }

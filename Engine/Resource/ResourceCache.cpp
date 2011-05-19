@@ -361,7 +361,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     const String& name = GetResourceName(nameHash);
     if (name.Empty())
     {
-        LOGERROR("Could not load unknown resource " + ToString(nameHash));
+        LOGERROR("Could not load unknown resource " + nameHash);
         return 0;
     }
     
@@ -369,7 +369,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     resource = DynamicCast<Resource>(context_->CreateObject(type));
     if (!resource)
     {
-        LOGERROR("Could not load unknown resource type " + ToString(type));
+        LOGERROR("Could not load unknown resource type " + type);
         return 0;
     }
     

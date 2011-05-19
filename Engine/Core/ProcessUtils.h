@@ -24,7 +24,6 @@
 #pragma once
 
 #include "StringBase.h"
-#include "Vector.h"
 
 class Mutex;
 
