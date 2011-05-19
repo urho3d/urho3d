@@ -118,7 +118,7 @@ public:
         ListBase()
     {
         // Allocate and link the head and tail nodes
-        AllocatorInitialize(sizeof(Node), 2);
+        allocator_ = AllocatorInitialize(sizeof(Node), 2);
         head_ = AllocateNode();
         tail_ = AllocateNode();
         Node* head = GetHead();
@@ -132,7 +132,7 @@ public:
         ListBase()
     {
         // Allocate and link the head and tail nodes
-        AllocatorInitialize(sizeof(Node), list.Size() + 2);
+        allocator_ = AllocatorInitialize(sizeof(Node), list.Size() + 2);
         head_ = AllocateNode();
         tail_ = AllocateNode();
         Node* head = GetHead();

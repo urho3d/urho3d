@@ -122,7 +122,7 @@ public:
     /// Construct with another set
     Set(const Set<T>& set)
     {
-        AllocatorInitialize(sizeof(Node), set.Size());
+        allocator_ = AllocatorInitialize(sizeof(Node), set.Size());
         *this = set;
     }
     

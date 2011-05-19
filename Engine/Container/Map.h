@@ -161,7 +161,7 @@ public:
     /// Construct with another map
     Map(const Map<T, U>& map)
     {
-        AllocatorInitialize(sizeof(Node), map.Size());
+        allocator_ = AllocatorInitialize(sizeof(Node), map.Size());
         *this = map;
     }
     
