@@ -26,8 +26,6 @@
 #include "ListBase.h"
 #include "Pair.h"
 
-#include <new>
-
 // Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
 /// Map template class using a red-black tree
@@ -188,6 +186,13 @@ public:
         return *this;
     }
     
+    /// Add-assign a map
+    Map<T, U>& operator += (const Map<T, U>& rhs)
+    {
+        Insert(rhs.Begin(), rhs.End());
+        return *this;
+    }
+    
     /// Test for equality with another map
     bool operator == (const Map<T, U>& rhs) const
     {
@@ -226,11 +231,17 @@ public:
         return false;
     }
     
-    /// Add-assign a map
-    Map<T, U>& operator += (const Map<T, U>& rhs)
+    /// Index the map. Create new node if key not found
+    U& operator [] (const T& key)
     {
-        Insert(rhs.Begin(), rhs.End());
-        return *this;
+        Node* node = FindNode(key);
+        if (node)
+            return node->pair_.second_;
+        else
+        {
+            node = InsertNode(key, U());
+            return node->pair_.second_;
+        }
     }
     
     /// Clear the map
@@ -288,19 +299,6 @@ public:
     bool Contains(const T& key)
     {
         return FindNode(key) != 0;
-    }
-    
-    /// Index the map. Create new node if key not found
-    U& operator [] (const T& key)
-    {
-        Node* node = FindNode(key);
-        if (node)
-            return node->pair_.second_;
-        else
-        {
-            node = InsertNode(key, U());
-            return node->pair_.second_;
-        }
     }
     
     /// Return iterator to the node with key, or end iterator if not found
@@ -533,7 +531,7 @@ private:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -543,7 +541,7 @@ private:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
     }

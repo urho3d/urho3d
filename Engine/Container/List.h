@@ -25,8 +25,6 @@
 
 #include "ListBase.h"
 
-#include <new>
-
 /// Linked list template class
 template <class T> class List : public ListBase
 {
@@ -117,28 +115,18 @@ public:
     List() :
         ListBase()
     {
-        // Allocate and link the head and tail nodes
-        allocator_ = AllocatorInitialize(sizeof(Node), 2);
-        head_ = AllocateNode();
-        tail_ = AllocateNode();
-        Node* head = GetHead();
-        Node* tail = GetTail();
-        head->next_ = tail;
-        tail->prev_ = head;
+        // Allocate the tail node
+        allocator_ = AllocatorInitialize(sizeof(Node));
+        head_ = tail_ = AllocateNode();
     }
     
     /// Construct from another list
     List(const List<T>& list) :
         ListBase()
     {
-        // Allocate and link the head and tail nodes
-        allocator_ = AllocatorInitialize(sizeof(Node), list.Size() + 2);
-        head_ = AllocateNode();
-        tail_ = AllocateNode();
-        Node* head = GetHead();
-        Node* tail = GetTail();
-        head->next_ = tail;
-        tail->prev_ = head;
+        // Allocate the tail node
+        allocator_ = AllocatorInitialize(sizeof(Node));
+        head_ = tail_ = AllocateNode();
         
         // Then assign the other list
         *this = list;
@@ -148,7 +136,6 @@ public:
     ~List()
     {
         Clear();
-        FreeNode(GetHead());
         FreeNode(GetTail());
         AllocatorUninitialize(allocator_);
     }
@@ -233,13 +220,7 @@ public:
         Node* destNode = static_cast<Node*>(dest.ptr_);
         Iterator it = start;
         while (it != end)
-        {
-            Iterator current = it++;
-            InsertNode(destNode, *it);
-            // Break if the iterator got stuck
-            if (it == current)
-                break;
-        }
+            InsertNode(destNode, *it++);
     }
     
     /// Erase the last node
@@ -252,10 +233,7 @@ public:
     /// Erase a node from the list. Return an iterator to the next element
     Iterator Erase(Iterator it)
     {
-        Iterator current = it++;
-        EraseNode(static_cast<Node*>(current.ptr_));
-        
-        return it;
+        return Iterator(EraseNode(static_cast<Node*>(it.ptr_)));
     }
     
     /// Erase a range of nodes from the list. Return an iterator to the next element
@@ -263,13 +241,7 @@ public:
     {
         Iterator it = start;
         while (it != end)
-        {
-            Iterator current = it++;
-            // Break if the iterator got stuck
-            if (it == current)
-                break;
-            EraseNode(static_cast<Node*>(current.ptr_));
-        }
+            it = EraseNode(static_cast<Node*>(current.ptr_));
         
         return it;
     }
@@ -278,13 +250,13 @@ public:
     void Clear()
     {
         while (size_)
-            EraseNode(GetTail()->GetPrev());
+            EraseNode(GetHead());
     }
     
-    /// Return iterator to the first actual node
-    Iterator Begin() { return Iterator(GetHead()->GetNext()); }
-    /// Return iterator to the first actual node
-    ConstIterator Begin() const { return ConstIterator(GetHead()->GetNext()); }
+    /// Return iterator to the first node
+    Iterator Begin() { return Iterator(GetHead()); }
+    /// Return iterator to the first node
+    ConstIterator Begin() const { return ConstIterator(GetHead()); }
     /// Return iterator to the end
     Iterator End() { return Iterator(GetTail()); }
     /// Return iterator to the end
@@ -307,37 +279,52 @@ private:
     /// Insert a value into the list
     void InsertNode(Node* dest, const T& value)
     {
-        // The head node can not be replaced
-        if ((!dest) || (dest == head_))
+        if (!dest)
             return;
         
         Node* newNode = AllocateNode(value);
+        Node* prev = dest->GetPrev();
         newNode->next_ = dest;
-        newNode->prev_ = dest->prev_;
+        newNode->prev_ = prev;
+        if (prev)
+            prev->next_ = newNode;
         dest->prev_ = newNode;
+        
+        
+        // Reassign the head node if necessary
+        if (dest == GetHead())
+            head_ = newNode;
+        
         ++size_;
     }
     
-    /// Erase a node from the list
-    void EraseNode(Node* toRemove)
+    /// Erase a node from the list. Return pointer to the next element, or to the end if could not erase
+    Node* EraseNode(Node* toRemove)
     {
-        // The head or tail can not be removed
-        if ((!toRemove) || (toRemove == head_) || (toRemove == tail_))
-            return;
+        // The tail node can not be removed
+        if ((!toRemove) || (toRemove == tail_))
+            return GetTail();
         
-        /// \todo Should check that the node belongs to the list
         Node* prev = toRemove->GetPrev();
         Node* next = toRemove->GetNext();
-        prev->next_ = next;
+        if (prev)
+            prev->next_ = next;
         next->prev_ = prev;
+        
+        // Reassign the head node if necessary
+        if (toRemove == GetHead())
+            head_ = next;
+        
         FreeNode(toRemove);
         --size_;
+        
+        return next;
     }
     
     /// Allocate a node
     Node* AllocateNode()
     {
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -345,7 +332,7 @@ private:
     /// Allocate a node with initial value
     Node* AllocateNode(const T& value)
     {
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(value);
         return newNode;
     }

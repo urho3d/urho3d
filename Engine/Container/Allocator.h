@@ -23,11 +23,13 @@
 
 #pragma once
 
-struct Allocator;
+#include <new>
+
+struct AllocatorBlock;
 struct AllocatorNode;
 
 /// Allocator memory block
-struct Allocator
+struct AllocatorBlock
 {
     /// Node data size
     unsigned nodeSize_;
@@ -36,7 +38,7 @@ struct Allocator
     /// First free node
     AllocatorNode* free_;
     /// Next allocator block
-    Allocator* next_;
+    AllocatorBlock* next_;
     /// Nodes follow
 };
 
@@ -45,14 +47,71 @@ struct AllocatorNode
 {
     /// Next free node
     AllocatorNode* next_;
-    /// Payload follows
+    /// Data follows
 };
 
 /// Initialize a fixed allocator with the allocation size and initial capacity
-Allocator* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
+AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
 /// Uninitialize a fixed allocator. Frees all blocks in the chain
-void AllocatorUninitialize(Allocator* allocator);
-/// Allocate a node. Reserves a new block if necessary
-void* AllocatorGet(Allocator* allocator);
+void AllocatorUninitialize(AllocatorBlock* allocator);
+/// Reserve a node. Creates a new block if necessary
+void* AllocatorReserve(AllocatorBlock* allocator);
 /// Free a node. Does not free any blocks
-void AllocatorFree(Allocator* allocator, void* ptr);
+void AllocatorFree(AllocatorBlock* allocator, void* ptr);
+
+/// Template allocator class
+template <class T> class Allocator
+{
+public:
+    /// Construct
+    Allocator(unsigned initialCapacity = 0) :
+        allocator_(0)
+    {
+        if (initialCapacity)
+            allocator_ = AllocatorInitialize(sizeof(T), initialCapacity);
+    }
+    
+    /// Destruct
+    ~Allocator()
+    {
+        AllocatorUninitialize(allocator_);
+    }
+    
+    /// Allocate and default-construct an object
+    T* Allocate()
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(T));
+        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        new(newObject) T();
+        
+        return newObject;
+    }
+    
+    /// Allocate and copy-construct an object
+    T* Allocate(const T& object)
+    {
+        if (!allocator_)
+            allocator_ = AllocatorInitialize(sizeof(T));
+        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        new(newObject) T(object);
+        
+        return newObject;
+    }
+    
+    /// Destruct and free an object
+    void Free(T* object)
+    {
+        (object)->~T();
+        AllocatorFree(allocator_, object);
+    }
+    
+private:
+    /// Prevent copy construction
+    Allocator(const Allocator<T>& rhs);
+    /// Prevent assignment
+    Allocator<T>& operator = (const Allocator<T>& rhs);
+    
+    /// Allocator block
+    AllocatorBlock* allocator_;
+};

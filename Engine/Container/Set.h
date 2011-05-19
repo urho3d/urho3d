@@ -25,8 +25,6 @@
 
 #include "ListBase.h"
 
-#include <new>
-
 // Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
 /// Set template class using a red-black tree
@@ -193,8 +191,6 @@ public:
         
         return false;
     }
-    
-
     
     /// Clear the set
     void Clear()
@@ -478,7 +474,7 @@ private:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         
         return newNode;
@@ -489,7 +485,7 @@ private:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
-        Node* newNode = static_cast<Node*>(AllocatorGet(allocator_));
+        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key);
         return newNode;
     }

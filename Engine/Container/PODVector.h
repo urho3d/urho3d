@@ -145,9 +145,11 @@ public:
     /// Add an element at the end
     void Push(const T& value)
     {
-        unsigned oldSize = size_;
-        Resize(size_ + 1);
-        GetBuffer()[oldSize] = value;
+        if (size_ < capacity_)
+            ++size_;
+        else
+            Resize(size_ + 1);
+        Back() = value;
     }
     
     /// Add another vector at the end

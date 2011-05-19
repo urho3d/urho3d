@@ -147,7 +147,6 @@ public:
     /// Add an element at the end
     void Push(const T& value)
     {
-        unsigned oldSize = size_;
         Resize(size_ + 1, &value);
     }
     
@@ -157,7 +156,6 @@ public:
         if (!vector.size_)
             return;
         
-        unsigned oldSize = size_;
         Resize(size_ + vector.size_, vector.GetBuffer());
     }
     

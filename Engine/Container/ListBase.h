@@ -60,14 +60,14 @@ public:
     /// Go to the next node
     void GotoNext()
     {
-        if (ptr_->next_)
+        if (ptr_)
             ptr_ = ptr_->next_;
     }
     
     /// Go to the previous node
     void GotoPrev()
     {
-        if (ptr_->prev_)
+        if (ptr_)
             ptr_ = ptr_->prev_;
     }
     
@@ -100,7 +100,7 @@ protected:
     /// Tail node pointer
     ListNodeBase* tail_;
     /// Node allocator
-    Allocator* allocator_;
+    AllocatorBlock* allocator_;
     /// Number of nodes
     unsigned size_;
 };
@@ -141,14 +141,12 @@ class TreeIteratorBase
 public:
     TreeIteratorBase() :
         ptr_(0),
-        next_(0),
         prev_(0)
     {
     }
     
     TreeIteratorBase(TreeNodeBase* ptr) :
         ptr_(ptr),
-        next_(0),
         prev_(0)
     {
     }
@@ -162,13 +160,10 @@ public:
     {
         if (!ptr_)
         {
-            ptr_ = next_;
-            next_ = 0;
             prev_ = 0;
             return;
         }
         
-        next_ = 0;
         prev_ = ptr_;
         
         if (!ptr_->link_[1])
@@ -190,12 +185,10 @@ public:
         if (!ptr_)
         {
             ptr_ = prev_;
-            next_ = 0;
             prev_ = 0;
             return;
         }
         
-        next_ = ptr_;
         prev_ = 0;
         
         if (!ptr_->link_[0])
@@ -214,9 +207,7 @@ public:
     
     /// Current node pointer
     TreeNodeBase* ptr_;
-    /// Next node pointer
-    TreeNodeBase* next_;
-    /// Previous node pointer
+    /// Previous node pointer, needed to back from the end
     TreeNodeBase* prev_;
 };
 
@@ -268,7 +259,7 @@ protected:
     /// Root node
     TreeNodeBase* root_;
     /// Node allocator
-    Allocator* allocator_;
+    AllocatorBlock* allocator_;
     /// Number of nodes
     unsigned size_;
 };

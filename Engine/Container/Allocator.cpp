@@ -25,13 +25,13 @@
 
 #include "stdio.h"
 
-Allocator* AllocatorGetBlock(Allocator* allocator, unsigned nodeSize, unsigned capacity)
+AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSize, unsigned capacity)
 {
     if (!capacity)
         capacity = 1;
     
-    unsigned char* blockPtr = new unsigned char[sizeof(Allocator) + capacity * (sizeof(AllocatorNode) + nodeSize)];
-    Allocator* newBlock = reinterpret_cast<Allocator*>(blockPtr);
+    unsigned char* blockPtr = new unsigned char[sizeof(AllocatorBlock) + capacity * (sizeof(AllocatorNode) + nodeSize)];
+    AllocatorBlock* newBlock = reinterpret_cast<AllocatorBlock*>(blockPtr);
     newBlock->nodeSize_ = nodeSize;
     newBlock->capacity_ = capacity;
     newBlock->free_ = 0;
@@ -46,7 +46,7 @@ Allocator* AllocatorGetBlock(Allocator* allocator, unsigned nodeSize, unsigned c
     }
     
     // Initialize the nodes. Free nodes are always chained to the first (parent) allocator
-    unsigned char* nodePtr = blockPtr + sizeof(Allocator);
+    unsigned char* nodePtr = blockPtr + sizeof(AllocatorBlock);
     AllocatorNode* firstNewNode = reinterpret_cast<AllocatorNode*>(nodePtr);
     
     for (unsigned i = 0; i < capacity; ++i)
@@ -66,23 +66,23 @@ Allocator* AllocatorGetBlock(Allocator* allocator, unsigned nodeSize, unsigned c
     return newBlock;
 }
 
-Allocator* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity)
+AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity)
 {
-    Allocator* block = AllocatorGetBlock(0, nodeSize, initialCapacity);
+    AllocatorBlock* block = AllocatorReserveBlock(0, nodeSize, initialCapacity);
     return block;
 }
 
-void AllocatorUninitialize(Allocator* allocator)
+void AllocatorUninitialize(AllocatorBlock* allocator)
 {
     while (allocator)
     {
-        Allocator* next = allocator->next_;
+        AllocatorBlock* next = allocator->next_;
         delete[] reinterpret_cast<unsigned char*>(allocator);
         allocator = next;
     }
 }
 
-void* AllocatorGet(Allocator* allocator)
+void* AllocatorReserve(AllocatorBlock* allocator)
 {
     if (!allocator)
         return 0;
@@ -98,7 +98,7 @@ void* AllocatorGet(Allocator* allocator)
     
     // Free nodes have been exhausted. Allocate a new larger block
     unsigned newCapacity = (allocator->capacity_ + 1) >> 1;
-    Allocator* newBlock = AllocatorGetBlock(allocator, allocator->nodeSize_, newCapacity);
+    AllocatorBlock* newBlock = AllocatorReserveBlock(allocator, allocator->nodeSize_, newCapacity);
     allocator->capacity_ += newCapacity;
     
     // We should have new free node(s) chained
@@ -110,7 +110,7 @@ void* AllocatorGet(Allocator* allocator)
     return ptr;
 }
 
-void AllocatorFree(Allocator* allocator, void* ptr)
+void AllocatorFree(AllocatorBlock* allocator, void* ptr)
 {
     if ((!allocator) || (!ptr))
         return;
