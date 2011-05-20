@@ -89,40 +89,53 @@ String::String(bool value) :
         *this = "false";
 }
 
+String::String(char value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    Resize(1);
+    buffer_[0] = value;
+}
+
+String::String(char value, unsigned length) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    Resize(length);
+    for (unsigned i = 0; i < length; ++i)
+        buffer_[i] = value;
+}
+
 String& String::operator += (int rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String& String::operator += (short rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String& String::operator += (unsigned rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String& String::operator += (unsigned short rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String& String::operator += (float rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String& String::operator += (bool rhs)
 {
-    *this += String(rhs);
-    return *this;
+    return *this += String(rhs);
 }
 
 String String::operator + (int rhs) const

@@ -399,11 +399,7 @@ void DumpNodes(aiNode* rootNode, unsigned level)
     if (!rootNode)
         return;
     
-    String indent;
-    indent.Resize(level * 2);
-    for (unsigned i = 0; i < level * 2; ++i)
-        indent[i] = ' ';
-    
+    String indent(' ', level * 2);
     Vector3 pos, scale;
     Quaternion rot;
     aiMatrix4x4 transform = GetDerivedTransform(rootNode, rootNode_);

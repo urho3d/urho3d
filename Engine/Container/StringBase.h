@@ -96,6 +96,10 @@ public:
     explicit String(float value);
     /// Construct from a bool
     explicit String(bool value);
+    /// Construct from a character
+    explicit String(char value);
+    /// Construct from a character and fill length
+    explicit String(char value, unsigned length);
     
     /// Construct from a convertable value
     template <class T> explicit String(const T& value) :
@@ -169,6 +173,21 @@ public:
         return *this;
     }
     
+    /// Add-assign an integer
+    String& operator += (int rhs);
+    /// Add-assign a short integer
+    String& operator += (short rhs);
+    /// Add-assign an unsigned integer
+    String& operator += (unsigned rhs);
+    /// Add-assign a short unsigned integer
+    String& operator += (unsigned short rhs);
+    /// Add-assign a float
+    String& operator += (float rhs);
+    /// Add-assign a bool
+    String& operator += (bool rhs);
+    /// Add-assign an arbitraty type
+    template <class T> String operator += (const T& rhs) { return *this += rhs.ToString(); }
+    
     /// Add a string
     String operator + (const String& rhs) const
     {
@@ -206,21 +225,6 @@ public:
         
         return ret;
     }
-    
-    /// Add-assign an integer
-    String& operator += (int rhs);
-    /// Add-assign a short integer
-    String& operator += (short rhs);
-    /// Add-assign an unsigned integer
-    String& operator += (unsigned rhs);
-    /// Add-assign a short unsigned integer
-    String& operator += (unsigned short rhs);
-    /// Add-assign a float
-    String& operator += (float rhs);
-    /// Add-assign a bool
-    String& operator += (bool rhs);
-    /// Add-assign an arbitraty type
-    template <class T> String operator += (const T& rhs) { return *this += rhs.ToString(); }
     
     /// Add an integer
     String operator + (int rhs) const;
