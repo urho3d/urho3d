@@ -70,7 +70,7 @@ public:
     void SetOrthographic(bool enable);
     /// Set automatic aspect ratio based on viewport dimensions
     void SetAutoAspectRatio(bool enable);
-    /// Set projection jitter offset. It needs to be Calculated as (offset in pixels) / (viewport dimensions)
+    /// Set projection jitter offset. It needs to be calculated as (offset in pixels) / (viewport dimensions)
     void SetProjectionOffset(const Vector2& offset);
     
     /// Return far clip distance

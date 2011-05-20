@@ -297,22 +297,23 @@ public:
     {
         if (newCapacity < size_)
             newCapacity = size_;
-        if (newCapacity == capacity_)
-            return;
         
-        unsigned char* newBuffer = 0;
-        capacity_ = newCapacity;
-        
-        if (capacity_)
+        if (newCapacity != capacity_)
         {
-            newBuffer = new unsigned char[capacity_ * sizeof(T)];
-            // Move the data into the new buffer
-            CopyElements(reinterpret_cast<T*>(newBuffer), GetBuffer(), size_);
+            unsigned char* newBuffer = 0;
+            capacity_ = newCapacity;
+            
+            if (capacity_)
+            {
+                newBuffer = new unsigned char[capacity_ * sizeof(T)];
+                // Move the data into the new buffer
+                CopyElements(reinterpret_cast<T*>(newBuffer), GetBuffer(), size_);
+            }
+            
+            // Delete the old buffer
+            delete[] buffer_;
+            buffer_ = newBuffer;
         }
-        
-        // Delete the old buffer
-        delete[] buffer_;
-        buffer_ = newBuffer;
     }
     
     /// Reallocate so that no extra memory is used

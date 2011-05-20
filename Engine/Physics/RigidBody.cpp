@@ -473,7 +473,7 @@ void RigidBody::UpdateMass()
     
     float density = 1.0f;
     
-    // Get all attached collision shapes to Calculate the mass
+    // Get all attached collision shapes to calculate the mass
     Vector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
     

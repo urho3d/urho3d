@@ -176,7 +176,7 @@ private:
     Vector<Vector<Matrix4x3> > geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
     Vector<Vector<Matrix4x3*> > geometrySkinMatrixPtrs_;
-    /// The frame number animation LOD distance was last Calculated on
+    /// The frame number animation LOD distance was last calculated on
     unsigned animationLodFrameNumber_;
     /// Animation LOD bias
     float animationLodBias_;

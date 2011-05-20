@@ -52,7 +52,7 @@ float Ray::GetDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
             float v = direction_.DotProduct(q);
             if ((v >= 0.0f) && (u + v <= det))
             {
-                // There is an intersection, so Calculate distance
+                // There is an intersection, so calculate distance
                 return edge2.DotProduct(q) / det;
             }
         }

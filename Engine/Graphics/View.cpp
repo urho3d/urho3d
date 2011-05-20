@@ -129,7 +129,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     
     zone_ = renderer_->GetDefaultZone();
     
-    // Validate the rect and Calculate size. If zero rect, use whole render target size
+    // Validate the rect and calculate size. If zero rect, use whole render target size
     int rtWidth = renderTarget ? renderTarget->GetWidth() : graphics_->GetWidth();
     int rtHeight = renderTarget ? renderTarget->GetHeight() : graphics_->GetHeight();
     if (viewport.rect_ != IntRect::ZERO)
@@ -203,7 +203,7 @@ void View::Render()
     if ((!octree_) || (!camera_))
         return;
     
-    // If stream offset is supported, pre-set all instance transforms to a single large buffer
+    // If stream offset is supported, write all instance transforms to a single large buffer
     // Else we must lock the instance buffer for each batch group
     if ((renderer_->GetDynamicInstancing()) && (graphics_->GetStreamOffsetSupport()))
         PrepareInstancingBuffer();

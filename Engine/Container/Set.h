@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "ListBase.h"
+#include "TreeBase.h"
 
 // Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
@@ -316,38 +316,28 @@ private:
         else
         {
             Node head;
-            Node* g, * t, * p, * q;
-            
+            Node* t = &head;
+            Node* q = GetRoot();
+            Node* p = 0;
+            Node* g = 0;
             unsigned dir = 0;
             unsigned last;
             
-            t = &head;
-            g = p = 0;
-            q = GetRoot();
             t->SetChild(1, GetRoot());
             
             for (;;)
             {
+                unsigned oldSize = size_;
                 if (!q)
                 {
-                    p->SetChild(dir, q = ret = AllocateNode(key));
+                    q = AllocateNode(key);
+                    p->SetChild(dir, q);
+                    ret = q;
                     ++size_;
                 }
-                else if ((isRed(q->link_[0])) && (isRed(q->link_[1])))
-                {
-                    q->isRed_ = true;
-                    q->link_[0]->isRed_ = false;
-                    q->link_[1]->isRed_ = false;
-                }
                 
-                if ((isRed(q)) && (isRed(p)))
-                {
-                    unsigned dir2 = (t->link_[1] == g);
-                    if (q == p->link_[last])
-                        t->SetChild(dir2, RotateSingle(g, !last));
-                    else
-                        t->SetChild(dir2, RotateDouble(g, !last));
-                }
+                BalanceInsert(size_ != oldSize, last, reinterpret_cast<TreeNodeBase*&>(g), reinterpret_cast<TreeNodeBase*&>(p), 
+                    reinterpret_cast<TreeNodeBase*&>(q), reinterpret_cast<TreeNodeBase*&>(t));
                 
                 if (q->key_ == key)
                 {
@@ -381,13 +371,13 @@ private:
             return false;
         
         Node head;
-        Node* q, * p, *g;
+        Node* q = &head;
+        Node* p = 0;
+        Node* g = 0;
         Node* f = 0;
         unsigned dir = 1;
         bool removed = false;
         
-        q = &head;
-        g = p = 0;
         q->SetChild(1, GetRoot());
         
         while (q->link_[dir])
@@ -400,40 +390,9 @@ private:
             
             if (q->key_ == key)
                 f = q;
-             
-            if ((!isRed(q)) && (!isRed(q->GetChild(dir))))
-            {
-                if (isRed(q->GetChild(!dir)))
-                {
-                    p->SetChild(last, RotateSingle(q, dir));
-                    p = p->GetChild(last);
-                }
-                else if (!isRed(q->GetChild(!dir)))
-                {
-                    Node* s = p->GetChild(!last);
-                    
-                    if (s)
-                    {
-                        if ((!isRed(s->GetChild(!last))) && (!isRed(s->GetChild(last))))
-                        {
-                            p->isRed_ = false;
-                            s->isRed_ = true;
-                            q->isRed_ = true;
-                        }
-                        else
-                        {
-                            int dir2 = (g->GetChild(1) == p);
-                            if (isRed(s->GetChild(last)))
-                                g->SetChild(dir2, RotateDouble(p, last));
-                            else if (isRed(s->GetChild(!last)))
-                                g->SetChild(dir2, RotateSingle(p, last));
-                            q->isRed_ = g->GetChild(dir2)->isRed_ = true;
-                            g->GetChild(dir2)->GetChild(0)->isRed_ = false;
-                            g->GetChild(dir2)->GetChild(1)->isRed_ = false;
-                        }
-                    }
-                }
-            }
+            
+            BalanceRemove(dir, last, reinterpret_cast<TreeNodeBase*&>(g), reinterpret_cast<TreeNodeBase*&>(p),
+                reinterpret_cast<TreeNodeBase*&>(q));
         }
         
         if (f)

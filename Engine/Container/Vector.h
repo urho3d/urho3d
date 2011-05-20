@@ -276,23 +276,24 @@ public:
     {
         if (newCapacity < size_)
             newCapacity = size_;
-        if (newCapacity == capacity_)
-            return;
         
-        T* newBuffer = 0;
-        capacity_ = newCapacity;
-        
-        if (capacity_)
+        if (newCapacity != capacity_)
         {
-            newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
-            // Move the data into the new buffer
-            ConstructElements(newBuffer, GetBuffer(), size_);
+            T* newBuffer = 0;
+            capacity_ = newCapacity;
+            
+            if (capacity_)
+            {
+                newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
+                // Move the data into the new buffer
+                ConstructElements(newBuffer, GetBuffer(), size_);
+            }
+            
+            // Delete the old buffer
+            DestructElements(GetBuffer(), size_);
+            delete[] buffer_;
+            buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
         }
-        
-        // Delete the old buffer
-        DestructElements(GetBuffer(), size_);
-        delete[] buffer_;
-        buffer_ = reinterpret_cast<unsigned char*>(newBuffer);
     }
     
     /// Reallocate so that no extra memory is used

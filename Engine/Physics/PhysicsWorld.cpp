@@ -570,7 +570,7 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
             velA[2] -= velB[2];
         }
         
-        // Normalize & only use our Calculated friction if it has enough precision
+        // Normalize & only use our calculated friction if it has enough precision
         float length = sqrtf(velA[0] * velA[0] + velA[1] * velA[1] + velA[2] * velA[2]);
         if (length > M_EPSILON)
         {

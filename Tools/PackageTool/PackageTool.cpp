@@ -120,7 +120,7 @@ void ProcessFile(const String& fileName, const String& rootDir)
     newEntry.name_ = fileName;
     newEntry.offset_ = 0; // Offset not yet known
     newEntry.size_ = file.GetSize();
-    newEntry.checksum_ = 0; // Will be Calculated later
+    newEntry.checksum_ = 0; // Will be calculated later
     entries_.Push(newEntry);
 }
 
@@ -146,7 +146,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         dest.WriteUInt(entries_[i].checksum_);
     }
     
-    // Write file data, Calculate checksums & correct offsets
+    // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         entries_[i].offset_ = dest.GetSize();
