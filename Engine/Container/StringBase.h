@@ -139,12 +139,9 @@ public:
     /// Add-assign a string
     String& operator += (const String& rhs)
     {
-        if (rhs.length_)
-        {
-            unsigned oldLength = length_;
-            Resize(length_ + rhs.length_);
-            CopyChars(buffer_ + oldLength, rhs.buffer_, rhs.length_);
-        }
+        unsigned oldLength = length_;
+        Resize(length_ + rhs.length_);
+        CopyChars(buffer_ + oldLength, rhs.buffer_, rhs.length_);
         
         return *this;
     }
@@ -153,12 +150,9 @@ public:
     String& operator += (const char* rhs)
     {
         unsigned rhsLength = GetCStringLength(rhs);
-        if (rhsLength)
-        {
-            unsigned oldLength = length_;
-            Resize(length_ + rhsLength);
-            CopyChars(buffer_ + oldLength, rhs, rhsLength);
-        }
+        unsigned oldLength = length_;
+        Resize(length_ + rhsLength);
+        CopyChars(buffer_ + oldLength, rhs, rhsLength);
         
         return *this;
     }
@@ -202,13 +196,7 @@ public:
     /// Add a C string
     String operator + (const char* rhs) const
     {
-        if (!rhs)
-            return String(*this);
-        
-        unsigned rhsLength = strlen(rhs);
-        if (!rhsLength)
-            return String(*this);
-        
+        unsigned rhsLength = GetCStringLength(rhs);
         String ret;
         ret.Resize(length_ + rhsLength);
         CopyChars(ret.buffer_, buffer_, length_);
@@ -360,9 +348,9 @@ public:
     /// Find the first occurrence of a character, or NPOS if not found
     unsigned Find(char c, unsigned startPos = 0) const;
     /// Find the last occurrence of a string, or NPOS if not found
-    unsigned FindLast(const String& str) const;
+    unsigned FindLast(const String& str, unsigned startPos = NPOS) const;
     /// Find the last occurrence of a character, or NPOS if not found
-    unsigned FindLast(char c) const;
+    unsigned FindLast(char c, unsigned startPos = NPOS) const;
     /// Return the C string
     const char* CString() const { return buffer_; }
     /// Return length

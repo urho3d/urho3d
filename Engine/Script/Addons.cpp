@@ -747,8 +747,8 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "void Resize(uint)", asFUNCTION(StringResize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "int Find(const String& in, uint start = 0) const", asMETHODPR(String, Find, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "int Find(uint8, uint start = 0) const", asMETHODPR(String, Find, (char, unsigned) const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "int FindLast(const String& in) const", asMETHODPR(String, FindLast, (const String&) const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("String", "int FindLast(uint8) const", asMETHODPR(String, FindLast, (char) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int FindLast(const String& in, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int FindLast(uint8, uint start = 0xffffffff) const", asMETHODPR(String, FindLast, (char, unsigned) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Replace(uint8, uint8) const", asMETHODPR(String, Replace, (char, char) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Replace(const String&in, const String&in) const", asMETHODPR(String, Replace, (const String&, const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Substring(uint) const", asMETHODPR(String, Substring, (unsigned) const, String), asCALL_THISCALL);

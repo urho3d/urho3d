@@ -297,9 +297,6 @@ String::Iterator String::Erase(const String::Iterator& start, const String::Iter
 
 void String::Resize(unsigned newLength)
 {
-    if (newLength == length_)
-        return;
-    
     if (!capacity_)
     {
         // Calculate initial capacity
@@ -311,7 +308,7 @@ void String::Resize(unsigned newLength)
     }
     else
     {
-        if (capacity_ < newLength + 1)
+        if ((newLength) && (capacity_ < newLength + 1))
         {
             // Increase the capacity with half each time it is exceeded
             while (capacity_ < newLength + 1)
@@ -350,10 +347,8 @@ void String::Reserve(unsigned newCapacity)
 
 void String::Compact()
 {
-    if (!capacity_)
-        return;
-    
-    Reserve(length_ + 1);
+    if (capacity_)
+        Reserve(length_ + 1);
 }
 
 void String::Clear()
@@ -394,9 +389,7 @@ String String::Replace(unsigned pos, unsigned length, const String& str) const
 
 String String::Substring(unsigned pos) const
 {
-    if (pos >= length_)
-        return String();
-    else
+    if (pos < length_)
     {
         String ret;
         ret.Resize(length_ - pos);
@@ -404,13 +397,13 @@ String String::Substring(unsigned pos) const
         
         return ret;
     }
+    else
+        return String();
 }
 
 String String::Substring(unsigned pos, unsigned length) const
 {
-    if (pos >= length_)
-        return String();
-    else
+    if (pos < length_)
     {
         String ret;
         if (pos + length > length_)
@@ -420,6 +413,8 @@ String String::Substring(unsigned pos, unsigned length) const
         
         return ret;
     }
+    else
+        return String();
 }
 
 String String::Trim() const
@@ -548,9 +543,12 @@ unsigned String::Find(const String& str, unsigned startPos) const
     return NPOS;
 }
 
-unsigned String::FindLast(char c) const
+unsigned String::FindLast(char c, unsigned startPos) const
 {
-    for (unsigned i = length_ - 1; i < length_; --i)
+    if (startPos >= length_)
+        startPos = length_ - 1;
+    
+    for (unsigned i = startPos; i < length_; --i)
     {
         if (buffer_[i] == c)
             return i;
@@ -559,14 +557,16 @@ unsigned String::FindLast(char c) const
     return NPOS;
 }
 
-unsigned String::FindLast(const String& str) const
+unsigned String::FindLast(const String& str, unsigned startPos) const
 {
     if ((!str.length_) || (str.length_ > length_))
         return NPOS;
+    if (startPos > length_ - str.length_)
+        startPos = length_ - str.length_;
     
     char first = str.buffer_[0];
     
-    for (unsigned i = length_ - str.length_; i < length_; --i)
+    for (unsigned i = startPos; i < length_; --i)
     {
         if (buffer_[i] == first)
         {

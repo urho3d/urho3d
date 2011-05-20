@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Iterator.h"
 #include "Swap.h"
+#include "VectorBase.h"
 
 static const int QUICKSORT_THRESHOLD = 16;
 

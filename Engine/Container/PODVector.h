@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "Iterator.h"
 #include "VectorBase.h"
 
 #include <cstring>
@@ -155,9 +154,6 @@ public:
     /// Add another vector at the end
     void Push(const PODVector<T>& vector)
     {
-        if (!vector.size_)
-            return;
-        
         unsigned oldSize = size_;
         Resize(size_ + vector.size_);
         CopyElements(GetBuffer() + oldSize, vector.GetBuffer(), vector.size_);
@@ -173,12 +169,6 @@ public:
     /// Insert an element at position
     void Insert(unsigned pos, const T& value)
     {
-        if (!size_)
-        {
-            Push(value);
-            return;
-        }
-        
         if (pos > size_)
             pos = size_;
         
@@ -191,15 +181,6 @@ public:
     /// Insert another vector at position
     void Insert(unsigned pos, const PODVector<T>& vector)
     {
-        if (!vector.size_)
-            return;
-            
-        if (!size_)
-        {
-            *this = vector;
-            return;
-        }
-        
         if (pos > size_)
             pos = size_;
         
@@ -240,10 +221,7 @@ public:
         unsigned length = end - start;
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
-        
-        T* destPtr = GetBuffer() + pos;
-        for (Iterator i = start; i != end; ++i)
-            *destPtr++ = *i;
+        CopyElements(GetBuffer() + pos, &(*start), length);
         
         return Begin() + pos;
     }
@@ -291,9 +269,6 @@ public:
     /// Resize the vector
     void Resize(unsigned newSize)
     {
-        if (newSize == size_)
-            return;
-        
         if (newSize > capacity_)
         {
             if (!capacity_)

@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "Iterator.h"
 #include "VectorBase.h"
 
 #include <cstring>
@@ -153,9 +152,6 @@ public:
     /// Add another vector at the end
     void Push(const Vector<T>& vector)
     {
-        if (!vector.size_)
-            return;
-        
         Resize(size_ + vector.size_, vector.GetBuffer());
     }
     
@@ -169,12 +165,6 @@ public:
     /// Insert an element at position
     void Insert(unsigned pos, const T& value)
     {
-        if (!size_)
-        {
-            Push(value);
-            return;
-        }
-        
         if (pos > size_)
             pos = size_;
         
@@ -187,15 +177,6 @@ public:
     /// Insert another vector at position
     void Insert(unsigned pos, const Vector<T>& vector)
     {
-        if (!vector.size_)
-            return;
-            
-        if (!size_)
-        {
-            *this = vector;
-            return;
-        }
-        
         if (pos > size_)
             pos = size_;
         
@@ -351,9 +332,6 @@ private:
    /// Resize the vector and create/remove new elements as necessary
     void Resize(unsigned newSize, const T* src)
     {
-        if (newSize == size_)
-            return;
-        
         // If size shrinks, destruct the removed elements
         if (newSize < size_)
             DestructElements(GetBuffer() + newSize, size_ - newSize);
