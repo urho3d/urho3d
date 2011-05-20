@@ -26,7 +26,8 @@
 #include "Allocator.h"
 #include "Swap.h"
 
-// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
+// Based on Red Black Trees by Julienne Walker
+// http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
 /// Red-black tree node base
 struct TreeNodeBase
@@ -154,7 +155,7 @@ public:
     
 protected:
     /// Check whether a node is red
-    bool isRed(TreeNodeBase* node) const { return (node) && (node->isRed_); }
+    bool IsRed(TreeNodeBase* node) const { return (node) && (node->isRed_); }
     
     /// Single rotation
     TreeNodeBase* RotateSingle(TreeNodeBase* node, unsigned dir)
@@ -175,67 +176,6 @@ protected:
     {
         node->SetChild(!dir, RotateSingle(node->link_[!dir], !dir));
         return RotateSingle(node, dir);
-    }
-    
-    /// Balance during an insert
-    void BalanceInsert(bool newNode, unsigned& last, TreeNodeBase*& g, TreeNodeBase*& p, TreeNodeBase*& q, TreeNodeBase*& t)
-    {
-        if (!newNode)
-        {
-            if ((isRed(q->link_[0])) && (isRed(q->link_[1])))
-            {
-                q->isRed_ = true;
-                q->link_[0]->isRed_ = false;
-                q->link_[1]->isRed_ = false;
-            }
-        }
-        
-        if ((isRed(q)) && (isRed(p)))
-        {
-            unsigned dir2 = (t->link_[1] == g);
-            if (q == p->link_[last])
-                t->SetChild(dir2, RotateSingle(g, !last));
-            else
-                t->SetChild(dir2, RotateDouble(g, !last));
-        }
-    }
-    
-    /// Balance during a remove
-    void BalanceRemove(unsigned& dir, unsigned& last, TreeNodeBase*& g, TreeNodeBase*& p, TreeNodeBase*& q)
-    {
-        if ((!isRed(q)) && (!isRed(q->link_[dir])))
-        {
-            if (isRed(q->link_[!dir]))
-            {
-                p->SetChild(last, RotateSingle(q, dir));
-                p = p->link_[last];
-            }
-            else if (!isRed(q->link_[!dir]))
-            {
-                TreeNodeBase* s = p->link_[!last];
-                
-                if (s)
-                {
-                    if ((!isRed(s->link_[!last])) && (!isRed(s->link_[last])))
-                    {
-                        p->isRed_ = false;
-                        s->isRed_ = true;
-                        q->isRed_ = true;
-                    }
-                    else
-                    {
-                        int dir2 = (g->link_[1] == p);
-                        if (isRed(s->link_[last]))
-                            g->SetChild(dir2, RotateDouble(p, last));
-                        else if (isRed(s->link_[!last]))
-                            g->SetChild(dir2, RotateSingle(p, last));
-                        q->isRed_ = g->link_[dir2]->isRed_ = true;
-                        g->link_[dir2]->link_[0]->isRed_ = false;
-                        g->link_[dir2]->link_[1]->isRed_ = false;
-                    }
-                }
-            }
-        }
     }
     
     /// Root node

@@ -23,6 +23,7 @@
 
 #include "ListBase.h"
 #include "StringBase.h"
+#include "TreeBase.h"
 #include "VectorBase.h"
 
 #include "Set.h"

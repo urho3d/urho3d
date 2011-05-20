@@ -28,7 +28,8 @@
 
 static const int QUICKSORT_THRESHOLD = 16;
 
-// Based on http://warp.povusers.org/SortComparison/
+// Based on Comparison of several sorting algorithms by Juha Nieminen
+// http://warp.povusers.org/SortComparison/
 
 /// Perform insertion sort on an array
 template <class T> void InsertionSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)

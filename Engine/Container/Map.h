@@ -23,10 +23,11 @@
 
 #pragma once
 
-#include "Pair.h"
 #include "TreeBase.h"
+#include "Pair.h"
 
-// Based on http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
+// Based on Red Black Trees by Julienne Walker
+// http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
 /// Map template class using a red-black tree
 template <class T, class U> class Map : public TreeBase
@@ -371,28 +372,38 @@ private:
         else
         {
             Node head;
-            Node* t = &head;
-            Node* q = GetRoot();
-            Node* p = 0;
-            Node* g = 0;
+            Node* g, * t, * p, * q;
+            
             unsigned dir = 0;
             unsigned last;
             
+            t = &head;
+            g = p = 0;
+            q = GetRoot();
             t->SetChild(1, GetRoot());
             
             for (;;)
             {
-                unsigned oldSize = size_;
                 if (!q)
                 {
-                    q = AllocateNode(key, value);
-                    p->SetChild(dir, q);
-                    ret = q;
+                    p->SetChild(dir, q = ret = new Node(key, value));
                     ++size_;
                 }
+                else if ((IsRed(q->link_[0])) && (IsRed(q->link_[1])))
+                {
+                    q->isRed_ = true;
+                    q->link_[0]->isRed_ = false;
+                    q->link_[1]->isRed_ = false;
+                }
                 
-                BalanceInsert(size_ != oldSize, last, reinterpret_cast<TreeNodeBase*&>(g), reinterpret_cast<TreeNodeBase*&>(p), 
-                    reinterpret_cast<TreeNodeBase*&>(q), reinterpret_cast<TreeNodeBase*&>(t));
+                if ((IsRed(q)) && (IsRed(p)))
+                {
+                    unsigned dir2 = (t->link_[1] == g);
+                    if (q == p->link_[last])
+                        t->SetChild(dir2, RotateSingle(g, !last));
+                    else
+                        t->SetChild(dir2, RotateDouble(g, !last));
+                }
                 
                 if (q->pair_.first_ == key)
                 {
@@ -427,12 +438,14 @@ private:
             return false;
         
         Node head;
-        Node* q = &head;
-        Node* p = 0;
-        Node* g = 0;
+        Node* q, * p, *g;
         Node* f = 0;
         unsigned dir = 1;
         bool removed = false;
+        
+        q = &head;
+        g = p = 0;
+        q->SetChild(1, GetRoot());
         
         while (q->link_[dir])
         {
@@ -444,9 +457,42 @@ private:
             
             if (q->pair_.first_ == key)
                 f = q;
-            
-            BalanceRemove(dir, last, reinterpret_cast<TreeNodeBase*&>(g), reinterpret_cast<TreeNodeBase*&>(p),
-                reinterpret_cast<TreeNodeBase*&>(q));
+             
+            if ((!IsRed(q)) && (!IsRed(q->link_[dir])))
+            {
+                if (IsRed(q->link_[!dir]))
+                {
+                    p->SetChild(last, RotateSingle(q, dir));
+                    p = p->GetChild(last);
+                }
+                else if (!IsRed(q->link_[!dir]))
+                {
+                    Node* s = p->GetChild(!last);
+                    
+                    if (s)
+                    {
+                        if ((!IsRed(s->link_[!last])) && (!IsRed(s->link_[last])))
+                        {
+                            p->isRed_ = false;
+                            s->isRed_ = true;
+                            q->isRed_ = true;
+                        }
+                        else
+                        {
+                            int dir2 = (g->link_[1] == p);
+                            if (IsRed(s->link_[last]))
+                                g->SetChild(dir2, RotateDouble(p, last));
+                            else if (IsRed(s->link_[!last]))
+                                g->SetChild(dir2, RotateSingle(p, last));
+                            
+                            Node* t = g->GetChild(dir2);
+                            q->isRed_ = t->isRed_ = true;
+                            t->link_[0]->isRed_ = false;
+                            t->link_[1]->isRed_ = false;
+                        }
+                    }
+                }
+            }
         }
         
         if (f)

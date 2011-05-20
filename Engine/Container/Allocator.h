@@ -50,16 +50,16 @@ struct AllocatorNode
     /// Data follows
 };
 
-/// Initialize a fixed allocator with the allocation size and initial capacity
+/// Initialize a fixed-size allocator with the node size and initial capacity
 AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
-/// Uninitialize a fixed allocator. Frees all blocks in the chain
+/// Uninitialize a fixed-size allocator. Frees all blocks in the chain
 void AllocatorUninitialize(AllocatorBlock* allocator);
 /// Reserve a node. Creates a new block if necessary
 void* AllocatorReserve(AllocatorBlock* allocator);
 /// Free a node. Does not free any blocks
 void AllocatorFree(AllocatorBlock* allocator, void* ptr);
 
-/// Template allocator class
+/// Template allocator class. Allocates fixed-size objects of a specific class
 template <class T> class Allocator
 {
 public:

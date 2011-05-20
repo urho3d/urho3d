@@ -40,7 +40,6 @@ static const String checkDirs[] = {
     "Models",
     "Music",
     "Particle",
-    "Physics",
     "Scripts",
     "Sounds",
     "Shaders",
