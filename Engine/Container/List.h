@@ -241,7 +241,7 @@ public:
     {
         Iterator it = start;
         while (it != end)
-            it = EraseNode(static_cast<Node*>(current.ptr_));
+            it = EraseNode(static_cast<Node*>(it.ptr_));
         
         return it;
     }
