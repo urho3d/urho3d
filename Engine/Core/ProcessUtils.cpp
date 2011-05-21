@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Mutex.h"
 #include "ProcessUtils.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <list>

@@ -25,7 +25,6 @@
 #include "File.h"
 #include "Log.h"
 #include "PackageFile.h"
-#include "StringUtils.h"
 
 OBJECTTYPESTATIC(PackageFile);
 

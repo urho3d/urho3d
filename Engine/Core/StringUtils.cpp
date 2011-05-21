@@ -168,25 +168,28 @@ String ToStringHex(unsigned value)
     return String(tempBuffer);
 }
 
-unsigned GetStringListIndex(const String& value, const String* strings, unsigned count, unsigned defaultIndex,
-    bool caseSensitive)
+unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive)
 {
+    unsigned i = 0;
+    
     if (caseSensitive)
     {
-        for (unsigned i = 0; i < count; ++i)
+        while (!strings[i].Empty())
         {
             if (value == strings[i])
                 return i;
+            ++i;
         }
     }
     else
     {
         String valueLower = value.ToLower();
-        for (unsigned i = 0; i < count; ++i)
+        while (!strings[i].Empty())
         {
             /// \todo Write an insensitive compare function instead of creating new strings
             if (valueLower == strings[i].ToLower())
                 return i;
+            ++i;
         }
     }
     

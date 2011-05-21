@@ -1,5 +1,21 @@
 /**
 
+\page DataTypes Basic data types
+
+Urho3D implements its own string type and template containers instead of using STL. The rationale for this consists of the following:
+
+- Increased performance in some cases, for example when using the PODVector class.
+- Reduced size of each string or vector instance compared to the MSVC STL implementations.
+- Reduced compile time.
+- Straightforward naming and implementation that aids in debugging and profiling.
+- Convenient member functions can be added, for example String::Split() or Vector::Compact().
+- Consistency with the rest of the classes, see \ref CodingConvention "Coding conventions".
+
+The classes in question are String, Vector, PODVector, List, Map and Set. PODVector is only to be used when the elements of the vector need no construction or destruction and can be moved with a block memory copy.
+
+In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a Map<ShortStringHash, Variant>.
+
+
 \page ObjectTypes %Object types and factories
 
 Classes that derive from Object contain type-identification, they can be created through object factories, and they can send and receive \ref Events "events". Examples of these are all Component, Resource and UIElement subclasses. To be able to be constructed by a factory, they need to have a constructor that takes a Context pointer as the only parameter.

@@ -33,7 +33,6 @@
 #include "ResourceCache.h"
 #include "RigidBody.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <ode/ode.h>

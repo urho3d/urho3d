@@ -30,7 +30,6 @@
 #include "Log.h"
 #include "Profiler.h"
 #include "Renderer.h"
-#include "StringUtils.h"
 #include "Text.h"
 #include "UI.h"
 

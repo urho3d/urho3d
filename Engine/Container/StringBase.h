@@ -278,9 +278,13 @@ public:
     }
     
     /// Return char at index
-    char& operator [] (unsigned pos) { return buffer_[pos]; }
+    char& operator [] (unsigned index) { return buffer_[index]; }
     /// Return const char at index
-    const char& operator [] (unsigned pos) const { return buffer_[pos]; }
+    const char& operator [] (unsigned index) const { return buffer_[index]; }
+    /// Return char at index
+    char& At(unsigned index) { return buffer_[index]; }
+    /// Return const char at index
+    const char& At(unsigned index) const { return buffer_[index]; }
     
     /// Replace all occurrences of a character
     void ReplaceInPlace(char replaceThis, char replaceWith);

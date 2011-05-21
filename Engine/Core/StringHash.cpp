@@ -22,7 +22,8 @@
 //
 
 #include "Precompiled.h"
-#include "StringUtils.h"
+#include "MathDefs.h"
+#include "StringHash.h"
 
 #include <cstdio>
 

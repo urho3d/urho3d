@@ -25,7 +25,6 @@
 #include "File.h"
 #include "Image.h"
 #include "ProcessUtils.h"
-#include "StringUtils.h"
 
 #include <cstdlib>
 #include <stb_image.h>

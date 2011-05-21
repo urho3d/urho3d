@@ -27,7 +27,6 @@
 #include "Protocol.h"
 #include "ProtocolEvents.h"
 #include "Scene.h"
-#include "StringUtils.h"
 
 #include "DebugNew.h"
 

@@ -31,6 +31,9 @@
 #include "ScriptFile.h"
 #include "Time.h"
 
+#include <string>
+#include <vector>
+
 #include <Windows.h>
 
 #include "DebugNew.h"
@@ -81,20 +84,25 @@ void Run(const char* cmdLine)
     }
     
     // Create the execution context and the engine
-    SharedPtr<Context> context(new Context());
-    SharedPtr<Engine> engine(new Engine(context));
+    SharedPtr<Context> context_(new Context());
+    SharedPtr<Engine> engine(new Engine(context_));
     if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
     {
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+        ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage().CString());
         return;
     }
     
+    LOGINFO("Size of std::string " + sizeof(std::string));
+    LOGINFO("Size of String " + sizeof(String));
+    LOGINFO("Size of std::vector " + sizeof(std::vector<int>));
+    LOGINFO("Size of Vector " + sizeof (Vector<int>));
+    
     // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
-    context->GetSubsystem<Time>()->SetTimerPeriod(5);
+    context_->GetSubsystem<Time>()->SetTimerPeriod(5);
     
     // Execute the Start function from the script file, then run the engine loop until exited
     engine->InitializeScripting();
-    ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
+    ScriptFile* scriptFile = context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
     if ((scriptFile) && (scriptFile->Execute("void Start()")))
     {
         while (!engine->IsExiting())
@@ -103,6 +111,6 @@ void Run(const char* cmdLine)
     else
     {
         engine->Exit(); // Close the rendering window
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+        ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage().CString());
     }
 }

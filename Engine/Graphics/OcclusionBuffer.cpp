@@ -26,7 +26,6 @@
 #include "Log.h"
 #include "OcclusionBuffer.h"
 #include "Profiler.h"
-#include "StringUtils.h"
 
 #include <cstring>
 

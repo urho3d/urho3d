@@ -58,6 +58,5 @@ String ToString(void* value);
 /// Convert an unsigned integer to string as hexadecimal
 String ToStringHex(unsigned value);
 
-/// Return an index to a string list corresponding to the given string, or a default value if not found
-unsigned GetStringListIndex(const String& value, const String* strings, unsigned count, unsigned defaultIndex,
-    bool caseSensitive = false);
+/// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated
+unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);

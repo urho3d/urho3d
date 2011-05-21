@@ -31,7 +31,6 @@
 #include "Profiler.h"
 #include "Sound.h"
 #include "SoundSource3D.h"
-#include "StringUtils.h"
 
 #define DIRECTSOUND_VERSION 0x0800
 

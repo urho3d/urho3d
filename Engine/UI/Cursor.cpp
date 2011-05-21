@@ -38,7 +38,8 @@ static const String shapeNames[] =
     "resizehorizontal",
     "resizediagonal_topleft",
     "acceptdrop",
-    "rejectdrop"
+    "rejectdrop",
+    ""
 };
 
 OBJECTTYPESTATIC(Cursor);
@@ -74,7 +75,7 @@ void Cursor::SetStyle(const XMLElement& element)
     XMLElement shapeElem = element.GetChildElement("shape");
     while (shapeElem)
     {
-        CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetStringLower("name"), shapeNames, 7, 0);
+        CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetStringLower("name"), shapeNames, CS_NORMAL);
         DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(shapeElem.GetString("texture")),
             shapeElem.GetIntRect("imagerect"), shapeElem.GetIntVector2("hotspot"));
         shapeElem = shapeElem.GetNextElement("shape");

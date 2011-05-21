@@ -29,7 +29,6 @@
 #include "PackageFile.h"
 #include "ResourceCache.h"
 #include "ResourceEvents.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include "DebugNew.h"

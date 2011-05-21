@@ -31,13 +31,12 @@
 #include "Profiler.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
-
-OBJECTTYPESTATIC(Scene);
 
 static const int ASYNC_LOAD_MIN_FPS = 50;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
+
+OBJECTTYPESTATIC(Scene);
 
 Scene::Scene(Context* context) :
     Node(context),

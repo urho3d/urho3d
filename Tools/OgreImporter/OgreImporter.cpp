@@ -27,7 +27,6 @@
 #include "OgreImporterUtils.h"
 #include "ProcessUtils.h"
 #include "Sort.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <cstring>

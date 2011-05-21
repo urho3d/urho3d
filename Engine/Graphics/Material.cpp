@@ -47,14 +47,16 @@ static const String textureUnitNames[] =
     "environment",
     "emissive",
     "lightramp", // Not defined by materials
-    "lightspot" // Not defined by materials
+    "lightspot", // Not defined by materials
+    ""
 };
 
 static const String cullModeNames[] =
 {
     "none",
     "ccw",
-    "cw"
+    "cw",
+    ""
 };
 
 TechniqueEntry::TechniqueEntry() :
@@ -143,8 +145,7 @@ bool Material::Load(Deserializer& source)
         if (textureElem.HasAttribute("unit"))
         {
             String unitName = textureElem.GetStringLower("unit");
-            unit = (TextureUnit)GetStringListIndex(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS,
-                MAX_MATERIAL_TEXTURE_UNITS);
+            unit = (TextureUnit)GetStringListIndex(unitName, textureUnitNames, MAX_MATERIAL_TEXTURE_UNITS);
             if (unitName == "diff")
                 unit = TU_DIFFUSE;
             if (unitName == "norm")
@@ -190,11 +191,11 @@ bool Material::Load(Deserializer& source)
     
     XMLElement cullElem = rootElem.GetChildElement("cull");
     if (cullElem)
-        SetCullMode((CullMode)GetStringListIndex(cullElem.GetString("value"), cullModeNames, MAX_CULLMODES, CULL_CCW));
+        SetCullMode((CullMode)GetStringListIndex(cullElem.GetString("value"), cullModeNames, CULL_CCW));
     
     XMLElement shadowCullElem = rootElem.GetChildElement("shadowcull");
     if (shadowCullElem)
-        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetString("value"), cullModeNames, MAX_CULLMODES, CULL_CCW));
+        SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetString("value"), cullModeNames, CULL_CCW));
     
     // Calculate memory use
     unsigned memoryUse = 0;

@@ -15,6 +15,7 @@ For getting started, see:
 
 For further reference, see:
 
+\ref DataTypes "Basic data types" <br>
 \ref ObjectTypes "Object types and factories" <br>
 \ref Subsystems "Subsystems" <br>
 \ref Events "Events" <br>

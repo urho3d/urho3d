@@ -25,7 +25,6 @@
 #include "Log.h"
 #include "NetworkEvents.h"
 #include "Peer.h"
-#include "StringUtils.h"
 
 #include <enet/enet.h>
 

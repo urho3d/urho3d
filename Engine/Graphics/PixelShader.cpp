@@ -31,7 +31,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "SharedArrayPtr.h"
-#include "StringUtils.h"
 #include "XMLFile.h"
 
 #include <ctype.h>

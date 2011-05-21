@@ -39,7 +39,8 @@ static const String addressModeNames[] =
     "wrap",
     "mirror",
     "clamp",
-    "border"
+    "border",
+    ""
 };
 
 static const String filterModeNames[] =
@@ -48,7 +49,8 @@ static const String filterModeNames[] =
     "bilinear",
     "trilinear",
     "anisotropic",
-    "default"
+    "default",
+    ""
 };
 
 Texture::Texture(Context* context) :
@@ -172,8 +174,7 @@ void Texture::LoadParameters(XMLFile* file)
             {
                 TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
                 String mode = paramElem.GetStringLower("mode");
-                SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode, addressModeNames, MAX_ADDRESSMODES,
-                    ADDRESS_WRAP));
+                SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode, addressModeNames, ADDRESS_WRAP));
             }
         }
         
@@ -183,7 +184,7 @@ void Texture::LoadParameters(XMLFile* file)
         if (name == "filter")
         {
             String mode = paramElem.GetStringLower("mode");
-            SetFilterMode((TextureFilterMode)GetStringListIndex(mode, filterModeNames, MAX_FILTERMODES, FILTER_DEFAULT));
+            SetFilterMode((TextureFilterMode)GetStringListIndex(mode, filterModeNames, FILTER_DEFAULT));
         }
         
         if (name == "mipmap")

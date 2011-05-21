@@ -27,7 +27,6 @@
 #include "Log.h"
 #include "PackageFile.h"
 #include "ProcessUtils.h"
-#include "StringUtils.h"
 #include "VectorBuffer.h"
 
 void FakeAddRef(void* ptr)

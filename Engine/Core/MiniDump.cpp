@@ -26,7 +26,6 @@
 #ifdef ENABLE_MINIDUMPS
 
 #include "ProcessUtils.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <list>

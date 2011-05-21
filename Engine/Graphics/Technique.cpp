@@ -41,7 +41,8 @@ static const String passNames[] =
     "litbase",
     "light",
     "extra",
-    "shadow"
+    "shadow",
+    ""
 };
 
 static const String blendModeNames[] =
@@ -52,7 +53,8 @@ static const String blendModeNames[] =
     "alpha",
     "addalpha",
     "premulalpha",
-    "invdestalpha"
+    "invdestalpha",
+    ""
 };
 
 static const String CompareModeNames[] =
@@ -63,7 +65,8 @@ static const String CompareModeNames[] =
     "less",
     "lessequal",
     "greater",
-    "greaterequal"
+    "greaterequal",
+    ""
 };
 
 Pass::Pass()
@@ -164,7 +167,7 @@ bool Technique::Load(Deserializer& source)
         if (passElem.HasAttribute("name"))
         {
             String name = passElem.GetStringLower("name");
-            type = (PassType)GetStringListIndex(name, passNames, MAX_PASSES, MAX_PASSES);
+            type = (PassType)GetStringListIndex(name, passNames, MAX_PASSES);
             if (type == MAX_PASSES)
                 LOGERROR("Unknown pass " + name);
         }
@@ -190,7 +193,7 @@ bool Technique::Load(Deserializer& source)
             if (passElem.HasAttribute("blend"))
             {
                 String blend = passElem.GetStringLower("blend");
-                newPass.SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, MAX_BLENDMODES, BLEND_REPLACE));
+                newPass.SetBlendMode((BlendMode)GetStringListIndex(blend, blendModeNames, BLEND_REPLACE));
             }
             
             if (passElem.HasAttribute("depthtest"))
@@ -199,8 +202,7 @@ bool Technique::Load(Deserializer& source)
                 if (depthTest == "false")
                     newPass.SetDepthTestMode(CMP_ALWAYS);
                 else
-                    newPass.SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, CompareModeNames, MAX_COMPAREMODES,
-                        CMP_LESSEQUAL));
+                    newPass.SetDepthTestMode((CompareMode)GetStringListIndex(depthTest, CompareModeNames, CMP_LESSEQUAL));
             }
             
             if (passElem.HasAttribute("depthwrite"))

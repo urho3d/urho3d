@@ -23,7 +23,7 @@
 
 #include "Precompiled.h"
 #include "Addons.h"
-#include "StringUtils.h"
+#include "StringBase.h"
 
 #include <cstring>
 
@@ -560,7 +560,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "const T& opIndex(uint) const", asMETHOD(CScriptArray, At), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "Array<T> &opAssign(const Array<T>& in)", asMETHOD(CScriptArray, operator=), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Insert(uint, const T& in)", asMETHOD(CScriptArray, InsertAt), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Array<T>", "void Remove(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Erase(uint)", asMETHOD(CScriptArray, RemoveAt), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Push(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
@@ -568,9 +568,6 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "bool get_empty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("Array<T>");
 }
-
-
-// Adapted from AngelScript's scriptstdstring add-on
 
 static String StringFactory(asUINT length, const char* s)
 {

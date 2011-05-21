@@ -28,7 +28,6 @@
 #include "PhysicsWorld.h"
 #include "RigidBody.h"
 #include "Scene.h"
-#include "StringUtils.h"
 
 #include <ode/ode.h>
 

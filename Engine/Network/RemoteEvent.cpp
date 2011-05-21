@@ -26,7 +26,6 @@
 #include "Log.h"
 #include "Protocol.h"
 #include "Scene.h"
-#include "StringUtils.h"
 
 #include "Set.h"
 

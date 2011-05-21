@@ -34,7 +34,6 @@
 #include "Script.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
-#include "StringUtils.h"
 #include "VectorBuffer.h"
 
 #include <angelscript.h>

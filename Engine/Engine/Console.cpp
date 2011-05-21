@@ -33,7 +33,6 @@
 #include "Log.h"
 #include "ResourceCache.h"
 #include "Script.h"
-#include "StringUtils.h"
 #include "Text.h"
 #include "UI.h"
 #include "UIEvents.h"

@@ -31,7 +31,6 @@
 #include "Peer.h"
 #include "ProcessUtils.h"
 #include "Profiler.h"
-#include "StringUtils.h"
 
 #include <enet/enet.h>
 

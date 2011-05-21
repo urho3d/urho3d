@@ -41,7 +41,6 @@
 #include "PixelShader.h"
 #include "Profiler.h"
 #include "Skybox.h"
-#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"

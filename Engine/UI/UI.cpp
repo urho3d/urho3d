@@ -42,7 +42,6 @@
 #include "ResourceCache.h"
 #include "ScrollBar.h"
 #include "Slider.h"
-#include "StringUtils.h"
 #include "Text.h"
 #include "Texture2D.h"
 #include "Time.h"

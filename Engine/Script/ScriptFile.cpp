@@ -31,7 +31,6 @@
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
 #include "SharedArrayPtr.h"
-#include "StringUtils.h"
 
 #include <angelscript.h>
 #include <cstring>

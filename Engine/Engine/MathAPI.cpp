@@ -22,8 +22,8 @@
 //
 
 #include "Precompiled.h"
+#include "Color.h"
 #include "Frustum.h"
-#include "StringUtils.h"
 
 #include <angelscript.h>
 

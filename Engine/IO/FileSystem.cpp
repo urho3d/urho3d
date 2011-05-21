@@ -27,7 +27,6 @@
 #include "FileSystem.h"
 #include "Log.h"
 #include "SharedArrayPtr.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <direct.h>

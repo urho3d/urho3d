@@ -34,14 +34,16 @@ static const String horizontalAlignments[] =
 {
     "left",
     "center",
-    "right"
+    "right",
+    ""
 };
 
 static const String verticalAlignments[] =
 {
     "top",
     "center",
-    "bottom"
+    "bottom",
+    ""
 };
 
 static const String focusModes[] =
@@ -49,7 +51,8 @@ static const String focusModes[] =
     "notfocusable",
     "resetfocus",
     "focusable",
-    "focusabledefocusable"
+    "focusabledefocusable",
+    ""
 };
 
 static const String dragDropModes[] =
@@ -57,7 +60,8 @@ static const String dragDropModes[] =
     "disabled",
     "source",
     "target",
-    "sourceandtarget"
+    "sourceandtarget",
+    ""
 };
 
 OBJECTTYPESTATIC(UIElement);
@@ -162,9 +166,9 @@ void UIElement::SetStyle(const XMLElement& element)
         if (alignElem.HasAttribute("v"))
             vert = alignElem.GetStringLower("v");
         if (!horiz.Empty())
-            SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, 3, 0));
+            SetHorizontalAlignment((HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT));
         if (!vert.Empty())
-            SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert, verticalAlignments, 3, 0));
+            SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert, verticalAlignments, VA_TOP));
     }
     if (element.HasChildElement("clipborder"))
         SetClipBorder(element.GetChildElement("clipborder").GetIntRect("value"));
@@ -201,14 +205,14 @@ void UIElement::SetStyle(const XMLElement& element)
     if (element.HasChildElement("focusmode"))
     {
         String focusMode = element.GetChildElement("focusmode").GetStringLower("value");
-        SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, 4, 0));
+        SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, FM_NOTFOCUSABLE));
         if (focusMode == "defocusable")
             SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
     if (element.HasChildElement("dragdropmode"))
     {
         String dragDropMode = element.GetChildElement("dragdropmode").GetStringLower("value");
-        SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, 4, 0));
+        SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, DD_DISABLED));
     }
     if (element.HasChildElement("layout"))
     {

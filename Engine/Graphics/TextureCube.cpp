@@ -30,7 +30,6 @@
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "TextureCube.h"
 #include "XMLFile.h"
 

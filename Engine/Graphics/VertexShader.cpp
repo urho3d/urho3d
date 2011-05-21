@@ -30,7 +30,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "SharedArrayPtr.h"
-#include "StringUtils.h"
 #include "VertexShader.h"
 #include "XMLFile.h"
 

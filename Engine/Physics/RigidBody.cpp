@@ -30,7 +30,6 @@
 #include "ResourceEvents.h"
 #include "RigidBody.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "XMLElement.h"
 
 #include <ode/ode.h>

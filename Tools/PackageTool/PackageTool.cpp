@@ -26,7 +26,6 @@
 #include "FileSystem.h"
 #include "ProcessUtils.h"
 #include "SharedArrayPtr.h"
-#include "StringUtils.h"
 
 #include <cstdio>
 #include <cstdlib>

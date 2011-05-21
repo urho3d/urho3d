@@ -26,7 +26,6 @@
 #include "Context.h"
 #include "Log.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "VectorBuffer.h"
 #include "XMLElement.h"
 

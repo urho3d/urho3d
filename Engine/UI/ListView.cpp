@@ -38,7 +38,8 @@ static const String highlightModes[] =
 {
     "never",
     "focus",
-    "always"
+    "always",
+    ""
 };
 
 int GetItemIndent(UIElement* item)
@@ -101,7 +102,7 @@ void ListView::SetStyle(const XMLElement& element)
     if (element.HasChildElement("highlight"))
     {
         String highlight = element.GetChildElement("highlight").GetStringLower("value");
-        SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, 3, 1));
+        SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, HM_FOCUS));
     }
     if (element.HasChildElement("multiselect"))
         SetMultiselect(element.GetChildElement("multiselect").GetBool("enable"));

@@ -23,7 +23,6 @@
 
 #pragma once
 
-#include "AreaAllocator.h"
 #include "Resource.h"
 #include "SharedArrayPtr.h"
 

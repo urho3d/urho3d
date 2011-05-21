@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "AreaAllocator.h"
 #include "Context.h"
 #include "Deserializer.h"
 #include "Font.h"
@@ -29,7 +30,6 @@
 #include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 
 #include "ft2build.h"

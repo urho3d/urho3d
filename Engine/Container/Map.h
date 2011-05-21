@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "TreeBase.h"
 #include "Pair.h"
+#include "TreeBase.h"
 
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx

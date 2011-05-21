@@ -30,7 +30,6 @@
 #include "Script.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
-#include "StringUtils.h"
 
 #include <angelscript.h>
 

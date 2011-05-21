@@ -41,7 +41,6 @@
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
-#include "StringUtils.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"

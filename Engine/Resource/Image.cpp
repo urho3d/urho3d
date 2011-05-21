@@ -27,7 +27,6 @@
 #include "FileSystem.h"
 #include "Image.h"
 #include "Log.h"
-#include "StringUtils.h"
 
 #include <cstring>
 #include <ddraw.h>

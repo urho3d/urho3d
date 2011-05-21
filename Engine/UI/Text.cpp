@@ -39,7 +39,8 @@ static const String horizontalAlignments[] =
 {
     "left",
     "center",
-    "right"
+    "right",
+    ""
 };
 
 OBJECTTYPESTATIC(Text);
@@ -114,7 +115,7 @@ void Text::SetStyle(const XMLElement& element)
         String horiz = element.GetChildElement("textalignment").GetStringLower("value");
         if (!horiz.Empty())
         {
-            textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, 3, 0);
+            textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT);
             changed = true;
         }
     }

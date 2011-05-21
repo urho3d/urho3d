@@ -27,7 +27,6 @@
 #include "DebugRenderer.h"
 #include "Light.h"
 #include "ResourceCache.h"
-#include "StringUtils.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "XMLElement.h"
