@@ -125,12 +125,6 @@ public:
 	void                *SetUserData(void *userData);
 	void                *GetUserData() const;
 
-#ifdef AS_DEPRECATED
-	// Since 2.20.0
-	bool                 IsClassMethod() const;
-	bool                 IsInterfaceMethod() const;
-#endif
-
 public:
 	//-----------------------------------
 	// Internal methods

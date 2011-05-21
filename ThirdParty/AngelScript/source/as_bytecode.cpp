@@ -1363,7 +1363,7 @@ void asCByteCode::CallPtr(asEBCInstr instr, int funcPtrVar, int pop)
 	last->op = instr;
 	last->size = asBCTypeSize[asBCInfo[instr].type];
 	last->stackInc = -pop;
-	last->wArg[0] = funcPtrVar;
+	last->wArg[0] = (short)funcPtrVar;
 
     // Add a JitEntry instruction after function calls so that JIT's can resume execution
     // TODO: Should this be done by the compiler?
@@ -1458,7 +1458,7 @@ void asCByteCode::ObjInfo(int offset, int info)
 	last->op                   = asBC_ObjInfo;
 	last->size                 = 0;
 	last->stackInc             = 0;
-	last->wArg[0]              = offset;
+	last->wArg[0]              = (short)offset;
 	*((int*)ARG_DW(last->arg)) = info;
 }
 
@@ -1791,7 +1791,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 		bool found = false;
 		for( asUINT v = 0; v < func->variables.GetLength(); v++ )
 		{
-			if( func->variables[v]->stackOffset == offset )
+			if( func->variables[v]->stackOffset == (int)offset )
 			{
 				found = true;
 				break;

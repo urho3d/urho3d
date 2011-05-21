@@ -152,12 +152,6 @@ public:
 	virtual int SaveByteCode(asIBinaryStream *out) const;
 	virtual int LoadByteCode(asIBinaryStream *in);
 
-#ifdef AS_DEPRECATED
-	// Since 2.20.0
-	virtual const char *GetGlobalVarName(int index) const;
-	virtual int         GetGlobalVarTypeId(int index, bool *isConst) const;
-#endif
-
 //-----------------------------------------------
 // Internal
 //-----------------------------------------------

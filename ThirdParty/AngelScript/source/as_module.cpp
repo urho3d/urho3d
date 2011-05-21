@@ -610,32 +610,6 @@ int asCModule::GetGlobalVar(asUINT index, const char **name, int *typeId, bool *
 	return asSUCCESS;
 }
 
-
-#ifdef AS_DEPRECATED
-// Since 2.20.0
-// interface
-const char *asCModule::GetGlobalVarName(int index) const
-{
-	if( index < 0 || index >= (int)scriptGlobals.GetLength() )
-		return 0;
-
-	return scriptGlobals[index]->name.AddressOf();
-}
-
-// interface
-// TODO: If the typeId ever encodes the const flag, then the isConst parameter should be removed
-int asCModule::GetGlobalVarTypeId(int index, bool *isConst) const
-{
-	if( index < 0 || index >= (int)scriptGlobals.GetLength() )
-		return asINVALID_ARG;
-
-	if( isConst )
-		*isConst = scriptGlobals[index]->type.IsReadOnly();
-
-	return engine->GetTypeIdFromDataType(scriptGlobals[index]->type);
-}
-#endif
-
 // interface
 int asCModule::GetObjectTypeCount() const
 {

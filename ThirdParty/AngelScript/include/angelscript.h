@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22003
-#define ANGELSCRIPT_VERSION_STRING "2.20.3"
+#define ANGELSCRIPT_VERSION        22100
+#define ANGELSCRIPT_VERSION_STRING "2.21.0"
 
 // Data types
 
@@ -158,9 +158,6 @@ enum asEBehaviours
 	asBEHAVE_IMPLICIT_VALUE_CAST,
 	asBEHAVE_REF_CAST,
 	asBEHAVE_IMPLICIT_REF_CAST,
-#ifdef AS_DEPRECATED
-	asBEHAVE_INDEX,
-#endif
 	asBEHAVE_TEMPLATE_CALLBACK,
 
 	// Garbage collection behaviours
@@ -432,7 +429,7 @@ struct asSMessageInfo
 // ANGELSCRIPT_DLL_MANUAL_IMPORT is defined when manually loading the dll
 // Don't define anything when linking statically to the lib
 
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
   #if defined(ANGELSCRIPT_EXPORT)
     #define AS_API __declspec(dllexport)
   #elif defined(ANGELSCRIPT_DLL_LIBRARY_IMPORT)
@@ -647,11 +644,6 @@ public:
 	virtual int SaveByteCode(asIBinaryStream *out) const = 0;
 	virtual int LoadByteCode(asIBinaryStream *in) = 0;
 
-#ifdef AS_DEPRECATED
-	virtual const char *GetGlobalVarName(int index) const = 0;
-	virtual int         GetGlobalVarTypeId(int index, bool *isConst = 0) const = 0;
-#endif
-
 protected:
 	virtual ~asIScriptModule() {}
 };
@@ -722,12 +714,6 @@ public:
 	// User data
 	virtual void *SetUserData(void *data) = 0;
 	virtual void *GetUserData() const = 0;
-
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.20.0
-	virtual int         GetCurrentLineNumber(int *column = 0, const char **sectionName = 0) = 0;
-	virtual int         GetCurrentFunction() = 0;
-#endif
 
 protected:
 	virtual ~asIScriptContext() {}
@@ -842,13 +828,6 @@ public:
 	virtual int GetBehaviourCount() const = 0;
 	virtual int GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const = 0;
 
-#ifdef AS_DEPRECATED
-	virtual int         GetPropertyTypeId(asUINT prop) const = 0;
-	virtual const char *GetPropertyName(asUINT prop) const = 0;
-	virtual bool        IsPropertyPrivate(asUINT prop) const = 0;
-	virtual int         GetPropertyOffset(asUINT prop) const = 0;
-#endif
-
 protected:
 	virtual ~asIObjectType() {}
 };
@@ -889,11 +868,6 @@ public:
 	// User data
 	virtual void *SetUserData(void *userData) = 0;
 	virtual void *GetUserData() const = 0;
-
-#ifdef AS_DEPRECATED
-	virtual bool             IsClassMethod() const = 0;
-	virtual bool             IsInterfaceMethod() const = 0;
-#endif
 
 protected:
 	virtual ~asIScriptFunction() {};

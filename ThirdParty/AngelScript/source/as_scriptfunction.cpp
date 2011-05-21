@@ -261,21 +261,6 @@ const char *asCScriptFunction::GetName() const
 	return name.AddressOf();
 }
 
-#ifdef AS_DEPRECATED
-// Since 2.20.0
-// interface
-bool asCScriptFunction::IsClassMethod() const
-{
-	return objectType && objectType->IsInterface() == false;
-}
-
-// interface
-bool asCScriptFunction::IsInterfaceMethod() const
-{
-	return objectType && objectType->IsInterface();
-}
-#endif
-
 // interface
 bool asCScriptFunction::IsReadOnly() const
 {

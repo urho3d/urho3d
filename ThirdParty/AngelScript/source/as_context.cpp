@@ -28,7 +28,6 @@
    andreas@angelcode.com
 */
 
-// Modified by Lasse Öörni for Urho3D
 
 //
 // as_context.cpp
@@ -115,9 +114,7 @@ public:
 
 AS_API asIScriptContext *asGetActiveContext()
 {
-	// Urho3D: modified to allow querying for a context without having the engine instantiated
-	if (!threadManager)
-		return 0;
+	asASSERT(threadManager);
 	asCThreadLocalData *tld = threadManager->GetLocalData();
 	if( tld->activeContexts.GetLength() == 0 )
 		return 0;
@@ -3699,34 +3696,6 @@ int asCContext::GetExceptionFunction()
 
 	return exceptionFunction;
 }
-
-#ifdef AS_DEPRECATED
-// deprecated since 2.20.0
-// interface
-int asCContext::GetCurrentFunction()
-{
-	if( status == asEXECUTION_SUSPENDED || status == asEXECUTION_ACTIVE )
-		return currentFunction->id;
-
-	return -1;
-}
-
-// interface
-int asCContext::GetCurrentLineNumber(int *column, const char **sectionName)
-{
-	if( status == asEXECUTION_SUSPENDED || status == asEXECUTION_ACTIVE )
-	{
-		asDWORD line = currentFunction->GetLineNumber(int(regs.programPointer - currentFunction->byteCode.AddressOf()));
-		if( column ) *column = line >> 20;
-
-		if( sectionName ) *sectionName = currentFunction->GetScriptSectionName();
-
-		return line & 0xFFFFF;
-	}
-
-	return -1;
-}
-#endif
 
 // interface
 const char *asCContext::GetExceptionString()

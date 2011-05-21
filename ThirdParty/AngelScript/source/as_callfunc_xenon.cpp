@@ -775,6 +775,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		else
 			retQW = GetReturnedDouble();
 	}
+	else if( sysFunc->hostReturnSize == 1 )
+	{
+		// Move the bits to the higher value to compensate for the adjustment that the caller does
+		retQW <<= 32;
+	}
 
 	return retQW;
 }

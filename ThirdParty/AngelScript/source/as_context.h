@@ -117,12 +117,6 @@ public:
 	void *SetUserData(void *data);
 	void *GetUserData() const;
 
-#ifdef AS_DEPRECATED
-	// Deprecated since 2.20.0
-	int  GetCurrentLineNumber(int *column, const char **sectionName);
-	int  GetCurrentFunction();
-#endif
-
 public:
 	// Internal public functions
 	asCContext(asCScriptEngine *engine, bool holdRef);

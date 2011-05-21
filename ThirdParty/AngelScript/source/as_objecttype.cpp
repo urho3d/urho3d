@@ -455,41 +455,6 @@ const char *asCObjectType::GetPropertyDeclaration(asUINT index) const
 	return tempString->AddressOf();
 }
 
-#ifdef AS_DEPRECATED
-// Since 2.20.0
-int asCObjectType::GetPropertyTypeId(asUINT prop) const
-{
-	if( prop >= properties.GetLength() )
-		return asINVALID_ARG;
-
-	return engine->GetTypeIdFromDataType(properties[prop]->type);
-}
-
-const char *asCObjectType::GetPropertyName(asUINT prop) const
-{
-	if( prop >= properties.GetLength() )
-		return 0;
-
-	return properties[prop]->name.AddressOf();
-}
-
-bool asCObjectType::IsPropertyPrivate(asUINT prop) const
-{
-	if( prop >= properties.GetLength() )
-		return false;
-
-	return properties[prop]->isPrivate;
-}
-
-int asCObjectType::GetPropertyOffset(asUINT prop) const
-{
-	if( prop >= properties.GetLength() )
-		return 0;
-
-	return properties[prop]->byteOffset;
-}
-#endif
-
 asIObjectType *asCObjectType::GetBaseType() const
 {
 	return derivedFrom; 

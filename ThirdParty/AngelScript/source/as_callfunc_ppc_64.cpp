@@ -750,13 +750,11 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		else
 			retQW = GetReturnedDouble();
 	}
-#if AS_PTR_SIZE == 1
-	else if( descr->returnType.IsReference() || descr->returnType.IsObjectHandle() )
+	else if( sysFunc->hostReturnSize == 1 )
 	{
-		// Move the pointer to the higher bits to compensate for the adjustment done outside
+		// Move the bits to the higher value to compensate for the adjustment that the caller does
 		retQW <<= 32;
 	}
-#endif
 
 	return retQW;
 }

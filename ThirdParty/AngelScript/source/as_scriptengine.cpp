@@ -353,7 +353,6 @@ asPWORD asCScriptEngine::GetEngineProperty(asEEngineProp property) const
 asCScriptEngine::asCScriptEngine()
 {
 	// Instanciate the thread manager
-	// Urho3D: create the thread manager under critical section, so that it is not multi-instantiated
 	ENTERCRITICALSECTION(engineCritical);
 	if( threadManager == 0 )
 		threadManager = asNEW(asCThreadManager);
@@ -1704,29 +1703,6 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 
 		func.id = beh->templateCallback = AddBehaviourFunction(func, internal);
 	}
-#ifdef AS_DEPRECATED
-	// Since 2.20.0
-	else if( behaviour == asBEHAVE_INDEX )
-	{
-		// Verify that the var type is not used
-		if( VerifyVarTypeNotInFunction(&func) < 0 )
-			return ConfigError(asINVALID_DECLARATION);
-
-		// Verify that there is only one parameter
-		if( func.parameterTypes.GetLength() != 1 )
-			return ConfigError(asINVALID_DECLARATION);
-
-		// Verify that the return type is not void
-		if( func.returnType.GetTokenType() == ttVoid )
-			return ConfigError(asINVALID_DECLARATION);
-
-		// TODO: Verify that the operator hasn't been registered already
-
-		beh->operators.PushLast(behaviour);
-		func.id = AddBehaviourFunction(func, internal);
-		beh->operators.PushLast(func.id);
-	}
-#endif
 	else if( behaviour >= asBEHAVE_FIRST_GC &&
 		     behaviour <= asBEHAVE_LAST_GC )
 	{
@@ -3978,7 +3954,7 @@ int asCScriptEngine::RegisterEnumValue(const char *typeName, const char *valueNa
 
 	int tokenLen;
 	asETokenClass tokenClass = ParseToken(valueName, 0, &tokenLen);
-	if( tokenClass != asTC_IDENTIFIER || tokenLen != strlen(valueName) )
+	if( tokenClass != asTC_IDENTIFIER || tokenLen != (int)strlen(valueName) )
 		return ConfigError(asINVALID_NAME);
 
 	for( unsigned int n = 0; n < ot->enumValues.GetLength(); n++ )
