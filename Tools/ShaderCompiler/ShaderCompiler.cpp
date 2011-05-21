@@ -643,7 +643,7 @@ bool Compile(ShaderType type, const String& hlslCode, const String& output, cons
     String profile;
     String extension;
     String entryPoint;
-    unsigned flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
+    unsigned flags = 0;
     
     if (type == VS)
     {
