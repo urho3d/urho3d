@@ -285,7 +285,7 @@ public:
             if (capacity_)
             {
                 newBuffer = reinterpret_cast<T*>(new unsigned char[capacity_ * sizeof(T)]);
-                 Move the data into the new buffer
+                // Move the data into the new buffer
                 ConstructElements(newBuffer, GetBuffer(), size_);
             }
             

@@ -314,10 +314,14 @@ public:
     Iterator End() { return ++Iterator(FindLast()); }
     /// Return const iterator to the end
     ConstIterator End() const { return ++ConstIterator(FindLast()); }
-    /// Return first key
-    const T& Front() { return FindFirst()->key_; }
-    /// Return last key
-    const T& Back() { return FindLast()->key_; }
+    /// Return first key-value pair
+    KeyValue& Front() { return FindFirst()->pair_; }
+    /// Return const first key-value pair
+    const KeyValue& Front() const { return FindFirst()->pair_; }
+    /// Return last key-value pair
+    KeyValue& Back() { return FindLast()->pair_; }
+    /// Return const last key-value pair
+    const KeyValue& Back() const { return FindLast()->pair_; }
     /// Return number of keys
     unsigned Size() const { return size_; }
     /// Return whether the map is empty
