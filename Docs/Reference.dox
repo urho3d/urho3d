@@ -977,7 +977,7 @@ All network packets are compressed using ENet's built-in compression.
 
 \section Tools_AssetImporter AssetImporter
 
-Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at 
+Tool that loads various 3D formats supported by Open Asset Import Library (http://assimp.sourceforge.net/) and saves Urho3D model, animation, material and scene files out of them. For the list of supported formats, look at
 http://assimp.sourceforge.net/main_features_formats.html.
 
 Usage:
@@ -1074,7 +1074,7 @@ The texconv tool from the DirectX SDK needs to be available through the system P
 
 This tool generates HLSL shader permutations using an XML definition file that describes the permutations, and their associated HLSL preprocessor defines.
 
-The output consists of shader bytecode for each permutation, generated using fxc from the DirectX SDK, as well as an output XML file that describes the constant parameters and texture units (for pixel shaders only) used by each.
+The output consists of shader bytecode for each permutation, as well as an output XML file that describes the constant parameters and texture units (for pixel shaders only) used by each.
 
 Usage:
 
@@ -1087,7 +1087,7 @@ be output to same directory as the output file.
 
 It is possible to give additional defines from the command line. These will then be present in each permutation. SM3 is a special define which enables compilation of VS3.0 and PS3.0 code, otherwise VS2.0 and PS2.0 code is generated.
 
-fxc needs to be available through the system PATH.
+The D3DX library from the DirectX runtime or SDK needs to be installed.
 
 
 \page FileFormats Custom file formats

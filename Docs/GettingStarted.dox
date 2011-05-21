@@ -8,7 +8,7 @@ Urho3D uses cmake (http://www.cmake.org) to build. The build process has two ste
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For MinGW, execute make (by default, cmake_gcc.bat specifies to make a Release build.)
 
-The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires fxc.exe (from the DirectX SDK) to be available through the system PATH. Note that the debug executables of tools will not have the _d postfix, to allow the asset build scripts to work in both debug & release builds.
+The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires the D3DX library from the DirectX runtime or SDK to be available. The debug executables of the tools will not have the _d postfix, to allow the asset build scripts to work in both debug & release builds.
 
 After the build is complete, the programs can be run from the Bin directory.
 
@@ -16,7 +16,7 @@ To run Urho3D from the Visual Studio debugger, set it as a startup project and e
 
 To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. See \ref Running "Running Urho3D" for more information, but for a quick test you can try the following arguments: Scripts/TestScene.as -w
 
-Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At least the February 2010 SDK is known to work.
+Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. Some versions of the HLSL compiler may fail to compile them. At least the February 2010 SDK is known to work.
 
 
 \page Running Running Urho3D

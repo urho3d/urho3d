@@ -57,7 +57,7 @@ Documentation
 
 Urho3D classes have been sparsely documented using Doxygen notation. To
 generate documentation into the "Docs" subdirectory, open the Doxyfile in the
-root directory with doxywizard and click "Run doxygen" from the "Run" tab. 
+root directory with doxywizard and click "Run doxygen" from the "Run" tab.
 Get Doxygen from http://www.doxygen.org
 
 
@@ -77,9 +77,9 @@ build.)
 
 The build process will also compile models and shaders from the Source_Asset
 directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires
-fxc.exe (from the DirectX SDK) to be available through the system PATH. Note
-that the debug executables of tools will not have the _d postfix, to allow the
-asset build scripts to work in both debug & release builds.
+the D3DX library from the DirectX runtime or SDK to be available. The debug 
+executables of the tools will not have the _d postfix, to allow the asset build 
+scripts to work in both debug & release builds.
 
 After the build is complete, the programs can be run from the Bin directory.
 
@@ -90,10 +90,10 @@ Debugging -> Command Arguments is highly recommended. This enables startup in
 windowed mode: without it running into an exception or breakpoint will be
 obnoxious as the mouse cursor will most probably be hidden.
 
-To actually make Urho3D.exe do something useful, it must be supplied with the 
-name of the script file it should load and run. You can try for example the 
+To actually make Urho3D.exe do something useful, it must be supplied with the
+name of the script file it should load and run. You can try for example the
 following arguments: Scripts/TestScene.as -w
 
 Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction
-count limit. The fxc.exe in newer DirectX SDK's may fail to compile them. At
+count limit. Some versions of the HLSL compiler may fail to compile them. At
 least the February 2010 SDK is known to work.

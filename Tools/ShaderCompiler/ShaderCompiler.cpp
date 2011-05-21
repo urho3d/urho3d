@@ -31,6 +31,10 @@
 #include <cstdio>
 #include <cstring>
 
+#include <Windows.h>
+#include <d3d9.h>
+#include <D3DX9Shader.h>
+
 #include "DebugNew.h"
 
 enum ShaderType
@@ -52,22 +56,22 @@ struct Variation
     {
     }
     
-    void addDefine(const String& def)
+    void AddDefine(const String& def)
     {
         defines_.Push(def);
     }
     
-    void addExclude(const String& excl)
+    void AddExclude(const String& excl)
     {
         excludes_.Push(excl);
     }
     
-    void addInclude(const String& incl)
+    void AddInclude(const String& incl)
     {
         includes_.Push(incl);
     }
     
-    void addRequire(const String& req)
+    void AddRequire(const String& req)
     {
         requires_.Push(req);
     }
@@ -88,7 +92,7 @@ struct Shader
     {
     }
     
-    void addVariation(const Variation& var)
+    void AddVariation(const Variation& var)
     {
         variations_.Push(var);
     }
@@ -106,7 +110,7 @@ struct Parameter
 
 struct Parameters
 {
-    void addVSParam(const String& name, unsigned index)
+    void AddVSParam(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -115,7 +119,7 @@ struct Parameters
         vsParams_.Push(newParam);
     }
     
-    void addPSParam(const String& name, unsigned index)
+    void AddPSParam(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -124,7 +128,7 @@ struct Parameters
         psParams_.Push(newParam);
     }
     
-    void addTextureUnit(const String& name, unsigned index)
+    void AddTextureUnit(const String& name, unsigned index)
     {
         Parameter newParam;
         newParam.name_ = name;
@@ -152,7 +156,33 @@ bool useSM3_ = false;
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void CompileVariations(const Shader& baseShader, XMLElement& shaders);
-bool Compile(ShaderType type, const String& input, const String& output, const Vector<String>& defines, Parameters& params);
+bool Compile(ShaderType type, const String& hlslCode, const String& output, const Vector<String>& defines, Parameters& params);
+
+class IncludeHandler : public ID3DXInclude
+{
+public:
+    STDMETHOD(Open)(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
+    {
+        String fileName = inDir_ + String((const char*)pFileName);
+        SharedPtr<File> file(new File(context_, fileName));
+        if (!file->IsOpen())
+            return E_FAIL;
+        
+        unsigned fileSize = file->GetSize();
+        void* fileData = new unsigned char[fileSize];
+        *pBytes = fileSize;
+        *ppData = fileData;
+        file->Read(fileData, fileSize);
+        
+        return S_OK;
+    }
+    
+    STDMETHOD(Close)(LPCVOID pData)
+    {
+        delete[] (unsigned char*)pData;
+        return S_OK;
+    }
+};
 
 int main(int argc, char** argv)
 {
@@ -192,17 +222,8 @@ void Run(const Vector<String>& arguments)
     
     outDir_ = arguments[1];
     
-    if (inDir_.Empty())
-        inDir_ = ".\\";
-    
-    if (outDir_.Empty())
-        outDir_ = ".\\";
-    
-    if (inDir_[inDir_.Length()-1] != '\\')
-        inDir_ = inDir_ + "\\";
-    
-    if (outDir_[outDir_.Length()-1] != '\\')
-        outDir_ = outDir_ + "\\";
+    inDir_ = AddTrailingSlash(inDir_);
+    outDir_ = AddTrailingSlash(outDir_);
     
     for (unsigned i = 2; i < arguments.Size(); ++i)
     {
@@ -259,25 +280,25 @@ void Run(const Vector<String>& arguments)
                 
                 String simpleDefine = variation.GetString("define");
                 if (!simpleDefine.Empty())
-                    newVar.addDefine(simpleDefine);
+                    newVar.AddDefine(simpleDefine);
                     
                 String simpleExclude = variation.GetString("exclude");
                 if (!simpleExclude.Empty())
-                    newVar.addExclude(simpleExclude);
+                    newVar.AddExclude(simpleExclude);
                 
                 String simpleInclude = variation.GetString("include");
                 if (!simpleInclude.Empty())
-                    newVar.addInclude(simpleInclude);
+                    newVar.AddInclude(simpleInclude);
                 
                 String simpleRequire = variation.GetString("require");
                 if (!simpleRequire.Empty())
-                    newVar.addRequire(simpleRequire);
+                    newVar.AddRequire(simpleRequire);
                 
                 XMLElement define = variation.GetChildElement("define");
                 while (define)
                 {
                     String name = define.GetString("name");
-                    newVar.addDefine(name);
+                    newVar.AddDefine(name);
                     
                     define = define.GetNextElement("define");
                 }
@@ -286,7 +307,7 @@ void Run(const Vector<String>& arguments)
                 while (exclude)
                 {
                     String name = exclude.GetString("name");
-                    newVar.addExclude(name);
+                    newVar.AddExclude(name);
                     
                     exclude = exclude.GetNextElement("exclude");
                 }
@@ -295,7 +316,7 @@ void Run(const Vector<String>& arguments)
                 while (include)
                 {
                     String name = include.GetString("name");
-                    newVar.addInclude(name);
+                    newVar.AddInclude(name);
                     
                     include = include.GetNextElement("include");
                 }
@@ -304,12 +325,12 @@ void Run(const Vector<String>& arguments)
                 while (require)
                 {
                     String name = require.GetString("name");
-                    newVar.addRequire(name);
+                    newVar.AddRequire(name);
                     
                     require = require.GetNextElement("require");
                 }
                 
-                baseShader.addVariation(newVar);
+                baseShader.AddVariation(newVar);
             }
             
             variation = variation.GetNextElement();
@@ -397,13 +418,23 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     unsigned combinations = 1;
     PODVector<unsigned> compiled;
     bool hasVariations = false;
+    Map<String, unsigned> nameToIndex;
+    String hlslCode;
     
     const Vector<Variation>& variations = baseShader.variations_;
     
-    Map<String, unsigned> nameToIndex;
-    
     if (variations.Size() > 32)
         ErrorExit("Maximum amount of variations exceeded");
+    
+    // Load the shader source code
+    String inputFileName = inDir_ + baseShader.name_ + ".hlsl";
+    SharedPtr<File> hlslFile(new File(context_, inputFileName));
+    if (!hlslFile->IsOpen())
+        ErrorExit("Could not open input file " + inputFileName);
+    
+    while (!hlslFile->IsEof())
+        hlslCode += hlslFile->ReadLine() + "\n";
+    hlslFile->Close();
     
     for (unsigned i = 0; i < variations.Size(); ++i)
     {
@@ -535,7 +566,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
             
             Parameters params;
             
-            bool ok = Compile(baseShader.type_, baseShader.name_, outName, defines, params);
+            bool ok = Compile(baseShader.type_, hlslCode, outName, defines, params);
             
             // If shader was unnecessary (for example SM2 does not support HQ variations)
             // no output may have been produced. Skip in that case.
@@ -575,156 +606,161 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     }
 }
 
-bool Compile(ShaderType type, const String& input, const String& output, const Vector<String>& defines,
+bool Compile(ShaderType type, const String& hlslCode, const String& output, const Vector<String>& defines,
     Parameters& params)
 {
-    bool compiled = false;
+    IncludeHandler includeHandler;
+    PODVector<D3DXMACRO> macros;
     
-    String allDefines;
+    String value = "1";
+    
+    // Insert variation-specific and global defines
     for (unsigned i = 0; i < defines.Size(); ++i)
-        allDefines += "/D" + defines[i] + " ";
+    {
+        D3DXMACRO macro;
+        macro.Name = defines[i].CString();
+        macro.Definition = value.CString();
+        macros.Push(macro);
+    }
     for (unsigned i = 0; i < defines_.Size(); ++i)
-        allDefines += "/D" + defines_[i] + " ";
+    {
+        D3DXMACRO macro;
+        macro.Name = defines_[i].CString();
+        macro.Definition = value.CString();
+        macros.Push(macro);
+    }
+    
+    D3DXMACRO endMacro;
+    endMacro.Name = 0;
+    endMacro.Definition = 0;
+    macros.Push(endMacro);
+    
+    LPD3DXBUFFER shaderCode = 0;
+    LPD3DXBUFFER errorMsgs = 0;
+    LPD3DXCONSTANTTABLE constantTable = 0;
+    
+    // Set the profile, entrypoint and flags according to the shader being compiled
+    String profile;
+    String extension;
+    String entryPoint;
+    unsigned flags = D3DXSHADER_OPTIMIZATION_LEVEL3;
     
     if (type == VS)
     {
+        entryPoint = "VS";
         if (!useSM3_)
         {
-            String outFile = output + ".vs2";
-            String command = "fxc /Tvs_2_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
-                inDir_ + input + ".hlsl";
-            
-            if (fileSystem_->SystemCommand(command))
-                ErrorExit("Failed to compile shader " + outFile);
-            
-            compiled = true;
+            profile = "vs_2_0";
+            extension = ".vs2";
         }
         else
         {
-            String outFile = output + ".vs3";
-            String command = "fxc /Tvs_3_0 /O3 /EVS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
-                inDir_ + input + ".hlsl";
-            
-            if (fileSystem_->SystemCommand(command))
-                ErrorExit("Failed to compile shader " + outFile);
-            
-            compiled = true;
+            profile = "vs_3_0";
+            extension = ".vs3";
         }
     }
-    
-    if (type == PS)
+    else
     {
+        entryPoint = "PS";
         if (!useSM3_)
         {
-            String outFile = output + ".ps2";
-            String command = "fxc /Tps_2_0 /O3 /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
-                inDir_ + input + ".hlsl";
-            
-            if (fileSystem_->SystemCommand(command))
-                ErrorExit("Failed to compile shader " + outFile);
-            
-            compiled = true;
+            profile = "ps_2_0";
+            extension = ".ps2";
         }
         else
         {
-            String outFile = output + ".ps3";
-            String command = "fxc /Tps_3_0 /O3 /Gfp /EPS /Fo" + outDir_ + inDir_ + outFile + " /Fcoutput.txt " + allDefines +
-                inDir_ + input + ".hlsl";
-            
-            if (fileSystem_->SystemCommand(command))
-                ErrorExit("Failed to compile shader" + outFile);
-            
-            compiled = true;
+            profile = "ps_3_0";
+            extension = ".ps3";
+            flags |= D3DXSHADER_PREFER_FLOW_CONTROL;
         }
     }
     
-    if (!compiled)
-        return false;
+    String outFileName = outDir_ + inDir_ + output + extension;
     
-    SharedPtr<File> dump(new File(context_, "output.txt"));
-    if (!dump->IsOpen())
-        ErrorExit("Could not open dump file");
-    
-    bool paramsStarted = false;
-    
-    while (!dump->IsEof())
+    // Compile using D3DX
+    PrintLine("Compiling shader " + outFileName);
+    HRESULT hr = D3DXCompileShader(hlslCode.CString(), hlslCode.Length(), &macros.Front(), &includeHandler, 
+        entryPoint.CString(), profile.CString(), flags, &shaderCode, &errorMsgs, &constantTable);
+    if (FAILED(hr))
     {
-        String lineStr = dump->ReadLine();
-        Vector<String> elements = lineStr.Split(' ');
+        String error((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
+        errorMsgs->Release();
+        ErrorExit("Failed to compile shader " + outFileName + ": " + error);
+    }
+    
+    // Write the shader bytecode
+    SharedPtr<File> outFile(new File(context_, outFileName, FILE_WRITE));
+    if (outFile->IsOpen())
+        outFile->Write(shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
+    else
+        ErrorExit("Failed to write output file " + outFileName);
+    
+    // Parse the constant table for constants and texture units
+    D3DXCONSTANTTABLE_DESC desc;
+    constantTable->GetDesc(&desc);
+    for (unsigned i = 0; i < desc.Constants; ++i)
+    {
+        D3DXHANDLE handle = constantTable->GetConstant(NULL, i);
+        D3DXCONSTANT_DESC constantDesc;
+        unsigned numElements = 1;
+        constantTable->GetConstantDesc(handle, &constantDesc, &numElements);
         
-        if (paramsStarted)
+        String name(constantDesc.Name);
+        unsigned index = constantDesc.RegisterIndex;
+        
+        // Check if the parameter is a constant or a texture sampler
+        bool isSampler = (name[0] == 's');
+        name = name.Substring(1);
+    
+        if (isSampler)
         {
-            if ((!elements.Size()) || (elements[0] != "//"))
-                break;
-            
-            if ((elements.Size() == 4) && (elements[0] == "//") && (elements[1][0] != '-'))
+            // Skip if it's a G-buffer sampler
+            if (name.Find("Buffer") == String::NPOS)
             {
-                String name = elements[1];
-                String reg = elements[2];
+                params.AddTextureUnit(name, index);
                 
-                bool isSampler = false;
-                if (reg[0] == 's')
-                    isSampler = true;
-                
-                if ((name[0] == 'c') || (name[0] == 's'))
-                    name = name.Substring(1, name.Length() - 1);
-                
-                unsigned index = ToInt(reg.Substring(1, reg.Length() - 1));
-                
-                if (isSampler)
+                if (textureUnits_.Find(name) != textureUnits_.End())
                 {
-                    // Skip if it's a G-buffer sampler
-                    if (name.Find("Buffer") == String::NPOS)
-                    {
-                        params.addTextureUnit(name, index);
-                        
-                        if (textureUnits_.Find(name) != textureUnits_.End())
-                        {
-                            unsigned oldIndex = textureUnits_[name];
-                            if (oldIndex != index)
-                                ErrorExit("Texture " + name + " bound to several sampler registers");
-                        }
-                        textureUnits_[name] = index;
-                    }
+                    unsigned oldIndex = textureUnits_[name];
+                    if (oldIndex != index)
+                        ErrorExit("Texture " + name + " bound to several sampler registers");
                 }
-                else
-                {
-                    if (type == VS)
-                    {
-                        params.addVSParam(name, index);
-                        
-                        if (vsParams_.Find(name) != vsParams_.End())
-                        {
-                            unsigned oldIndex = vsParams_[name];
-                            if (oldIndex != index)
-                                ErrorExit("Parameter " + name + " bound to several constant registers");
-                        }
-                        vsParams_[name] = index;
-                    }
-                    else
-                    {
-                        params.addPSParam(name, index);
-                        
-                        if (psParams_.Find(name) != psParams_.End())
-                        {
-                            unsigned oldIndex = psParams_[name];
-                            if (oldIndex != index)
-                                ErrorExit("Parameter " + name + " bound to several constant registers");
-                        }
-                        psParams_[name] = index;
-                    }
-                }
+                textureUnits_[name] = index;
             }
         }
         else
         {
-            if ((elements.Size() == 4) && (elements[0] == "//") && (elements[1] == "Name"))
-                paramsStarted = true;
+            if (type == VS)
+            {
+                params.AddVSParam(name, index);
+                
+                if (vsParams_.Find(name) != vsParams_.End())
+                {
+                    unsigned oldIndex = vsParams_[name];
+                    if (oldIndex != index)
+                        ErrorExit("Parameter " + name + " bound to several constant registers");
+                }
+                vsParams_[name] = index;
+            }
+            else
+            {
+                params.AddPSParam(name, index);
+                
+                if (psParams_.Find(name) != psParams_.End())
+                {
+                    unsigned oldIndex = psParams_[name];
+                    if (oldIndex != index)
+                        ErrorExit("Parameter " + name + " bound to several constant registers");
+                }
+                psParams_[name] = index;
+            }
         }
     }
     
-    dump->Close();
-    remove("output.txt");
+    if (shaderCode)
+        shaderCode->Release();
+    if (constantTable)
+        constantTable->Release();
     
     return true;
 }
