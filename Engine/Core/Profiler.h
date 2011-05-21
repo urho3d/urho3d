@@ -49,7 +49,7 @@ public:
     /// Destruct. Free the child blocks
     ~ProfilerBlock()
     {
-        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             delete *i;
             *i = 0;
@@ -81,7 +81,7 @@ public:
         time_ = 0;
         count_ = 0;
         
-        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->EndFrame();
     }
     
@@ -91,7 +91,7 @@ public:
         accumulatedTime_ = 0;
         accumulatedCount_ = 0;
         
-        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
             (*i)->ClearAccumulated();
     }
     
@@ -103,7 +103,7 @@ public:
         
         lastSearchName_ = name;
         
-        for (Vector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
+        for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
             if ((*i)->name_ == name)
             {
@@ -137,7 +137,7 @@ public:
     /// Return parent block
     ProfilerBlock* GetParent() const { return parent_; }
     /// Return child blocks
-    const Vector<ProfilerBlock*>& GetChildren() const { return children_; }
+    const PODVector<ProfilerBlock*>& GetChildren() const { return children_; }
     
 private:
     /// Block name
@@ -156,7 +156,7 @@ private:
     /// Parent block
     ProfilerBlock* parent_;
     /// Child blocks
-    Vector<ProfilerBlock*> children_;
+    PODVector<ProfilerBlock*> children_;
     
     /// Time on the previous frame
     long long frameTime_;

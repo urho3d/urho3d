@@ -341,7 +341,7 @@ void Text::UpdateText(bool inResize)
     rowWidths_.Clear();
     printText_.Clear();
     
-    Vector<unsigned> printToText;
+    PODVector<unsigned> printToText;
     
     if (font_)
     {

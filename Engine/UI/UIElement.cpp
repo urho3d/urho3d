@@ -629,10 +629,10 @@ void UIElement::UpdateLayout()
     // Prevent further updates while this update happens
     DisableLayoutUpdate();
     
-    Vector<int> positions;
-    Vector<int> sizes;
-    Vector<int> minSizes;
-    Vector<int> maxSizes;
+    PODVector<int> positions;
+    PODVector<int> sizes;
+    PODVector<int> minSizes;
+    PODVector<int> maxSizes;
     
     if (layoutMode_ == LM_HORIZONTAL)
     {
@@ -748,8 +748,8 @@ void UIElement::BringToFront()
     // and decrease others' priority by one. However, take into account only active (enabled) elements
     // and those which have the BringToBack flag set
     int maxPriority = M_MIN_INT;
-    Vector<UIElement*> topLevelElements = root->GetChildren();
-    for (Vector<UIElement*>::Iterator i = topLevelElements.Begin(); i != topLevelElements.End(); ++i)
+    PODVector<UIElement*> topLevelElements = root->GetChildren();
+    for (PODVector<UIElement*>::Iterator i = topLevelElements.Begin(); i != topLevelElements.End(); ++i)
     {
         UIElement* other = *i;
         if ((other->IsActive()) && (other->bringToBack_) && (other != ptr))
@@ -898,11 +898,11 @@ float UIElement::GetDerivedOpacity()
     return derivedOpacity_;
 }
 
-Vector<UIElement*> UIElement::GetChildren(bool recursive) const
+PODVector<UIElement*> UIElement::GetChildren(bool recursive) const
 {
     if (!recursive)
     {
-        Vector<UIElement*> ret;
+        PODVector<UIElement*> ret;
         for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
             ret.Push(*i);
         
@@ -910,7 +910,7 @@ Vector<UIElement*> UIElement::GetChildren(bool recursive) const
     }
     else
     {
-        Vector<UIElement*> allChildren;
+        PODVector<UIElement*> allChildren;
         GetChildrenRecursive(allChildren);
         
         return allChildren;
@@ -1093,7 +1093,7 @@ void UIElement::MarkDirty()
         (*i)->MarkDirty();
 }
 
-void UIElement::GetChildrenRecursive(Vector<UIElement*>& dest) const
+void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
 {
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -1102,7 +1102,7 @@ void UIElement::GetChildrenRecursive(Vector<UIElement*>& dest) const
     }
 }
 
-int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, int end, int spacing)
+int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing)
 {
     int width = begin + end;
     for (unsigned i = 0; i < sizes.Size(); ++i)
@@ -1117,8 +1117,8 @@ int UIElement::CalculateLayoutParentSize(const Vector<int>& sizes, int begin, in
     return width;
 }
 
-void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
-        const Vector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
+void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
+        const PODVector<int>& maxSizes, int targetSize, int begin, int end, int spacing)
 {
     int numChildren = sizes.Size();
     if (!numChildren)
@@ -1160,7 +1160,7 @@ void UIElement::CalculateLayout(Vector<int>& positions, Vector<int>& sizes, cons
             break;
         
         // Check which of the children can be resized to correct the error. If none, must break
-        Vector<unsigned> resizable;
+        PODVector<unsigned> resizable;
         for (int i = 0; i < numChildren; ++i)
         {
             if ((error < 0) && (sizes[i] > minSizes[i]))

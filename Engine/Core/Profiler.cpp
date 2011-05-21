@@ -165,8 +165,8 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
         }
     }
     
-    const Vector<ProfilerBlock*>& children = block->GetChildren();
-    for (Vector<ProfilerBlock*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const PODVector<ProfilerBlock*>& children = block->GetChildren();
+    for (PODVector<ProfilerBlock*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         GetData(*i, output, indent, showUnused, showAccumulated, showTotal);
 }
 

@@ -389,7 +389,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     return resource;
 }
 
-void ResourceCache::GetResources(Vector<Resource*>& result, ShortStringHash type) const
+void ResourceCache::GetResources(PODVector<Resource*>& result, ShortStringHash type) const
 {
     result.Clear();
     Map<ShortStringHash, ResourceGroup>::ConstIterator i = resourceGroups_.Find(type);

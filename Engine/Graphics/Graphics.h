@@ -94,9 +94,9 @@ public:
     /// Set vertex buffer
     void SetVertexBuffer(VertexBuffer* buffer);
     /// Set multiple vertex buffers
-    bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
     /// Set multiple vertex buffers
-    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
     /// Set index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
@@ -269,9 +269,9 @@ public:
     /// Return whether stream offset is supported
     bool GetStreamOffsetSupport() const { return streamOffsetSupport_; }
     /// Return supported fullscreen resolutions
-    Vector<IntVector2> GetResolutions() const;
+    PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels
-    Vector<int> GetMultiSampleLevels() const;
+    PODVector<int> GetMultiSampleLevels() const;
     /// Return vertex buffer by index
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return index buffer

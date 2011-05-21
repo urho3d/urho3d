@@ -187,7 +187,7 @@ struct ModelMorph
 struct ModelIndexBuffer
 {
     unsigned indexSize_;
-    Vector<unsigned> indices_;
+    PODVector<unsigned> indices_;
     
     ModelIndexBuffer() :
         indexSize_(sizeof(unsigned short))
@@ -218,7 +218,7 @@ struct ModelSubGeometryLodLevel
     unsigned indexStart_;
     unsigned indexCount_;
     Map<unsigned, PODVector<BoneWeightAssignment> > boneWeights_;
-    Vector<unsigned> boneMapping_;
+    PODVector<unsigned> boneMapping_;
     
     ModelSubGeometryLodLevel() : 
         distance_(0.0f),

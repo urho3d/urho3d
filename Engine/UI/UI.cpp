@@ -130,10 +130,10 @@ void UI::SetFocusElement(UIElement* element)
         }
     }
     
-    Vector<UIElement*> allChildren = rootElement_->GetChildren(true);
+    PODVector<UIElement*> allChildren = rootElement_->GetChildren(true);
     
     // Go through all elements to clear the old focus
-    for (Vector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
+    for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
         UIElement* other = *i;
         if ((other != element) && (other->HasFocus()))
@@ -342,8 +342,8 @@ UIElement* UI::GetElementAt(int x, int y, bool activeOnly)
 
 UIElement* UI::GetFocusElement() const
 {
-    Vector<UIElement*> allChildren = rootElement_->GetChildren(true);
-    for (Vector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
+    PODVector<UIElement*> allChildren = rootElement_->GetChildren(true);
+    for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
         if ((*i)->HasFocus())
             return *i;
@@ -354,7 +354,7 @@ UIElement* UI::GetFocusElement() const
 
 UIElement* UI::GetFrontElement() const
 {
-    Vector<UIElement*> rootChildren = rootElement_->GetChildren(false);
+    PODVector<UIElement*> rootChildren = rootElement_->GetChildren(false);
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;
     
@@ -413,8 +413,8 @@ void UI::Update(float timeStep, UIElement* element)
 {
     element->Update(timeStep);
     
-    const Vector<UIElement*> children = element->GetChildren();
-    for (Vector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    const PODVector<UIElement*> children = element->GetChildren();
+    for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
         Update(timeStep, *i);
 }
 
@@ -425,7 +425,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     if ((currentScissor.left_ == currentScissor.right_) || (currentScissor.top_ == currentScissor.bottom_))
         return;
     
-    Vector<UIElement*> children = element->GetChildren();
+    PODVector<UIElement*> children = element->GetChildren();
     if (children.Empty())
         return;
     
@@ -433,10 +433,10 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
     
     // For non-root elements draw all children of same priority before recursing into their children: assumption is that they have
     // same renderstate
-    Vector<UIElement*>::ConstIterator i = children.Begin();
+    PODVector<UIElement*>::ConstIterator i = children.Begin();
     if (element != rootElement_)
     {
-        Vector<UIElement*>::ConstIterator j = i;
+        PODVector<UIElement*>::ConstIterator j = i;
         int currentPriority = children.Front()->GetPriority();
         while (i != children.End())
         {
@@ -478,10 +478,10 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
         return;
     
     // Get children from lowest priority to highest
-    Vector<UIElement*> children = current->GetChildren(false);
+    PODVector<UIElement*> children = current->GetChildren(false);
     Sort(children.Begin(), children.End(), CompareUIElements);
     
-    for (Vector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
+    for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
         UIElement* element = *i;
         if ((element != cursor_.GetPtr()) && (element->IsVisible()))
@@ -733,8 +733,8 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 topLevel = topLevel->GetParent();
             if (topLevel)
             {
-                Vector<UIElement*> children = topLevel->GetChildren(true);
-                for (Vector<UIElement*>::Iterator i = children.Begin(); i != children.End();)
+                PODVector<UIElement*> children = topLevel->GetChildren(true);
+                for (PODVector<UIElement*>::Iterator i = children.Begin(); i != children.End();)
                 {
                     if ((*i)->GetFocusMode() < FM_FOCUSABLE)
                         i = children.Erase(i);

@@ -152,7 +152,7 @@ const FontFace* Font::GetFace(int pointSize)
     FT_GlyphSlot slot = face->glyph;
     unsigned freeIndex = 0;
     Map<unsigned, unsigned> toRemapped;
-    Vector<unsigned> toOriginal;
+    PODVector<unsigned> toOriginal;
     
     // Build glyph mapping. Only render the glyphs needed by the charset
     for (unsigned i = 0; i < MAX_FONT_CHARS; ++i)

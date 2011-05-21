@@ -60,7 +60,7 @@ public:
     /// Return all vertex buffers
     const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
     /// Return vertex element masks
-    const Vector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
+    const PODVector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
     /// Return number of vertex buffers
     unsigned GetNumVertexBuffers() const { return vertexBuffer_.Size(); }
     /// Return vertex buffer by index
@@ -97,7 +97,7 @@ private:
     /// Vertex buffers
     Vector<SharedPtr<VertexBuffer> > vertexBuffer_;
     /// Vertex element masks
-    Vector<unsigned> elementMasks_;
+    PODVector<unsigned> elementMasks_;
     /// Index buffer
     SharedPtr<IndexBuffer> indexBuffer_;
     /// Primitive type

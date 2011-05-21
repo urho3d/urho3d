@@ -193,13 +193,13 @@ static CScriptArray* ListViewGetSelections(ListView* ptr)
 
 static CScriptArray* ListViewGetItems(ListView* ptr)
 {
-    Vector<UIElement*> result = ptr->GetItems();
+    PODVector<UIElement*> result = ptr->GetItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 
 static CScriptArray* ListViewGetSelectedItems(ListView* ptr)
 {
-    Vector<UIElement*> result = ptr->GetSelectedItems();
+    PODVector<UIElement*> result = ptr->GetSelectedItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 
@@ -325,7 +325,7 @@ static void RegisterMenu(asIScriptEngine* engine)
 
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)
 {
-    Vector<UIElement*> result = ptr->GetItems();
+    PODVector<UIElement*> result = ptr->GetItems();
     return VectorToHandleArray<UIElement>(result, "Array<UIElement@>");
 }
 

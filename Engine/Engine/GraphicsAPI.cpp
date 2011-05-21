@@ -859,7 +859,7 @@ static Node* RayQueryResultGetNode(RayQueryResult* ptr)
 
 static CScriptArray* OctreeRaycast(const Ray& ray, unsigned char drawableFlags, float maxDistance, RayQueryLevel level, Octree* ptr)
 {
-    Vector<RayQueryResult> result;
+    PODVector<RayQueryResult> result;
     RayOctreeQuery query(result, ray, drawableFlags, false, false, maxDistance, level);
     ptr->GetDrawables(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");

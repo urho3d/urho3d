@@ -395,7 +395,7 @@ void Run(const Vector<String>& arguments)
 void CompileVariations(const Shader& baseShader, XMLElement& shaders)
 {
     unsigned combinations = 1;
-    Vector<unsigned> compiled;
+    PODVector<unsigned> compiled;
     bool hasVariations = false;
     
     const Vector<Variation>& variations = baseShader.variations_;

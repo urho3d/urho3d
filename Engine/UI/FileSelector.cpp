@@ -181,11 +181,11 @@ void FileSelector::SetStyle(XMLFile* style)
     okButton_->SetStyle(style, "FileSelectorButton");
     cancelButton_->SetStyle(style, "FileSelectorButton");
     
-    Vector<UIElement*> filterTexts = filterList_->GetListView()->GetContentElement()->GetChildren();
+    PODVector<UIElement*> filterTexts = filterList_->GetListView()->GetContentElement()->GetChildren();
     for (unsigned i = 0; i < filterTexts.Size(); ++i)
         filterTexts[i]->SetStyle(style, "FileSelectorFilterText");
     
-    Vector<UIElement*> listTexts = fileList_->GetContentElement()->GetChildren();
+    PODVector<UIElement*> listTexts = fileList_->GetContentElement()->GetChildren();
     for (unsigned i = 0; i < listTexts.Size(); ++i)
         listTexts[i]->SetStyle(style, "FileSelectorListText");
     

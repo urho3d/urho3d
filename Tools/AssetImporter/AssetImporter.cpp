@@ -76,12 +76,12 @@ struct OutModel
     String outName_;
     aiNode* rootNode_;
     Set<unsigned> meshIndices_;
-    Vector<aiMesh*> meshes_;
-    Vector<aiNode*> meshNodes_;
-    Vector<aiNode*> bones_;
-    Vector<aiAnimation*> animations_;
-    Vector<float> boneRadii_;
-    Vector<BoundingBox> boneHitboxes_;
+    PODVector<aiMesh*> meshes_;
+    PODVector<aiNode*> meshNodes_;
+    PODVector<aiNode*> bones_;
+    PODVector<aiAnimation*> animations_;
+    PODVector<float> boneRadii_;
+    PODVector<BoundingBox> boneHitboxes_;
     aiNode* rootBone_;
     unsigned totalVertices_;
     unsigned totalIndices_;
@@ -92,8 +92,8 @@ struct OutScene
     String outName_;
     aiNode* rootNode_;
     Vector<OutModel> models_;
-    Vector<aiNode*> nodes_;
-    Vector<unsigned> nodeModelIndices_;
+    PODVector<aiNode*> nodes_;
+    PODVector<unsigned> nodeModelIndices_;
 };
 
 SharedPtr<Context> context_(new Context());
@@ -116,7 +116,7 @@ void DumpNodes(aiNode* rootNode, unsigned level);
 void ExportModel(const String& outName);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model);
-void CollectBonesFinal(Vector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node);
+void CollectBonesFinal(PODVector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node);
 void CollectAnimations(OutModel& model);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
@@ -130,22 +130,22 @@ void ExportMaterials(Set<String>& usedTextures);
 void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures);
 void CopyTextures(const Set<String>& usedTextures, const String& sourcePath);
 
-void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
+void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName);
 
 void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
-    blendIndices, Vector<Vector<float> >& blendWeights);
+void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+    blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
     const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
-    Vector<Vector<float> >& blendWeights);
+    Vector<PODVector<float> >& blendWeights);
 unsigned GetElementMask(aiMesh* mesh);
 
 aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
@@ -355,7 +355,7 @@ void Run(const Vector<String>& arguments)
     }
     else
     {
-        Vector<float> lodDistances;
+        PODVector<float> lodDistances;
         Vector<String> modelNames;
         String outFile;
         
@@ -542,7 +542,7 @@ void CollectBones(OutModel& model)
     }
 }
 
-void CollectBonesFinal(Vector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node)
+void CollectBonesFinal(PODVector<aiNode*>& dest, const Set<aiNode*>& necessary, aiNode* node)
 {
     if (necessary.Find(node) != necessary.End())
     {
@@ -618,7 +618,7 @@ void BuildAndSaveModel(OutModel& model)
     
     SharedPtr<Model> outModel(new Model(context_));
     outModel->SetNumGeometries(model.meshes_.Size());
-    Vector<Vector<unsigned> > allBoneMappings;
+    Vector<PODVector<unsigned> > allBoneMappings;
     BoundingBox box;
     
     bool combineBuffers = true;
@@ -691,8 +691,8 @@ void BuildAndSaveModel(OutModel& model)
             // Build the vertex data
             // If there are bones, get blend data
             Vector<PODVector<unsigned char> > blendIndices;
-            Vector<Vector<float> > blendWeights;
-            Vector<unsigned> boneMappings;
+            Vector<PODVector<float> > blendWeights;
+            PODVector<unsigned> boneMappings;
             if (model.bones_.Size())
                 GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
             
@@ -765,8 +765,8 @@ void BuildAndSaveModel(OutModel& model)
             // Build the vertex data
             // If there are bones, get blend data
             Vector<PODVector<unsigned char> > blendIndices;
-            Vector<Vector<float> > blendWeights;
-            Vector<unsigned> boneMappings;
+            Vector<PODVector<float> > blendWeights;
+            PODVector<unsigned> boneMappings;
             if (model.bones_.Size())
                 GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
             
@@ -1263,7 +1263,7 @@ void CopyTextures(const Set<String>& usedTextures, const String& sourcePath)
     }
 }
 
-void CombineLods(const Vector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
+void CombineLods(const PODVector<float>& lodDistances, const Vector<String>& modelNames, const String& outName)
 {
     // Load models
     Vector<SharedPtr<Model> > srcModels;
@@ -1400,8 +1400,8 @@ Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
     return Matrix4x3::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, Vector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
-    blendIndices, Vector<Vector<float> >& blendWeights)
+void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+    blendIndices, Vector<PODVector<float> >& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
     blendWeights.Resize(mesh->mNumVertices);
@@ -1480,7 +1480,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
     const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
-    Vector<Vector<float> >& blendWeights)
+    Vector<PODVector<float> >& blendWeights)
 {
     Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);
     box.Merge(vertex);

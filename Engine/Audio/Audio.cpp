@@ -262,7 +262,7 @@ void Audio::SetListenerTransform(const Vector3& position, const Quaternion& rota
 
 void Audio::StopSound(Sound* soundClip)
 {
-    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
         if ((*i)->GetSound() == soundClip)
             (*i)->Stop();
@@ -293,7 +293,7 @@ void Audio::RemoveSoundSource(SoundSource* channel)
 {
     MutexLock Lock(audioMutex_);
     
-    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
     {
         if (*i == channel)
         {
@@ -398,7 +398,7 @@ void Audio::MixOutput(void *dest, unsigned bytes)
     int* clipPtr = clipBuffer_.GetPtr();
     
     // Mix samples to clip buffer
-    for (Vector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         (*i)->Mix(clipPtr, mixSamples, mixRate_, stereo_, interpolate_);
     
     // Copy output from clip buffer to destination

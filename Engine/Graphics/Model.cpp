@@ -145,7 +145,7 @@ bool Model::Load(Deserializer& source)
     {
         // Read bone mappings
         unsigned boneMappingCount = source.ReadUInt();
-        Vector<unsigned> boneMapping;
+        PODVector<unsigned> boneMapping;
         for (unsigned j = 0; j < boneMappingCount; ++j)
             boneMapping.Push(source.ReadUInt());
         geometryBoneMappings_.Push(boneMapping);
@@ -392,7 +392,7 @@ void Model::SetSkeleton(const Skeleton& skeleton)
     skeleton_ = skeleton;
 }
 
-void Model::SetGeometryBoneMappings(const Vector<Vector<unsigned> >& geometryBoneMappings)
+void Model::SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& geometryBoneMappings)
 {
     geometryBoneMappings_ = geometryBoneMappings;
 }

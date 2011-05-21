@@ -96,7 +96,7 @@ public:
     /// Return number of billboards
     unsigned GetNumBillboards() const { return billboards_.Size(); }
     /// Return all billboards
-    Vector<Billboard>& GetBillboards() { return billboards_; }
+    PODVector<Billboard>& GetBillboards() { return billboards_; }
     /// Return billboard by index
     Billboard* GetBillboard(unsigned index);
     /// Return whether billboards are relative to the scene node
@@ -117,7 +117,7 @@ protected:
     void MarkPositionsDirty();
     
     /// Billboards
-    Vector<Billboard> billboards_;
+    PODVector<Billboard> billboards_;
     /// Animation LOD bias
     float animationLodBias_;
     /// Animation LOD timer

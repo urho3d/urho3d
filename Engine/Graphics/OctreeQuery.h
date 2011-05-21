@@ -25,7 +25,6 @@
 
 #include "BoundingBox.h"
 #include "Frustum.h"
-#include "PODVector.h"
 #include "Ray.h"
 #include "Sphere.h"
 
@@ -207,7 +206,7 @@ class RayOctreeQuery
 {
 public:
     /// Construct with ray and query parameters
-    RayOctreeQuery(Vector<RayQueryResult>& result, const Ray& ray, unsigned char drawableFlags, bool occludersOnly = false,
+    RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, unsigned char drawableFlags, bool occludersOnly = false,
         bool shadowCastersOnly = false, float maxDistance = M_INFINITY, RayQueryLevel level = RAY_TRIANGLE) :
         ray_(ray),
         result_(result),
@@ -222,7 +221,7 @@ public:
     /// Ray
     Ray ray_;
     /// Result vector reference
-    Vector<RayQueryResult>& result_;
+    PODVector<RayQueryResult>& result_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
     /// Get occluders only flag

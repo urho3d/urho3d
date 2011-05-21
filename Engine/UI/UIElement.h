@@ -325,7 +325,7 @@ public:
     /// Return child element by name
     UIElement* GetChild(const String& name, bool recursive = false) const;
     /// Return all child elements
-    Vector<UIElement*> GetChildren(bool recursive = false) const;
+    PODVector<UIElement*> GetChildren(bool recursive = false) const;
     /// Return parent element
     UIElement* GetParent() const { return parent_; }
     /// Return root element
@@ -408,12 +408,12 @@ protected:
     
 private:
     /// Return child elements recursively
-    void GetChildrenRecursive(Vector<UIElement*>& dest) const;
+    void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
     /// Calculate layout width for resizing the parent element
-    int CalculateLayoutParentSize(const Vector<int>& sizes, int begin, int end, int spacing);
+    int CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing);
     /// Calculate child widths/positions in the layout
-    void CalculateLayout(Vector<int>& positions, Vector<int>& sizes, const Vector<int>& minSizes,
-        const Vector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
+    void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
+        const PODVector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
     /// Get child element constant position in a layout
     IntVector2 GetLayoutChildPosition(UIElement* child);
     

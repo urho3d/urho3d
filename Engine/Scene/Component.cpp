@@ -72,7 +72,7 @@ Component* Component::GetComponent(ShortStringHash type, unsigned index) const
         return 0;
 }
 
-void Component::GetComponents(Vector<Component*>& dest, ShortStringHash type) const
+void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const
 {
     if (node_)
         node_->GetComponents(dest, type);

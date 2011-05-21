@@ -25,7 +25,6 @@
 
 #include "MathDefs.h"
 #include "GraphicsDefs.h"
-#include "PODVector.h"
 #include "SharedPtr.h"
 
 class Camera;

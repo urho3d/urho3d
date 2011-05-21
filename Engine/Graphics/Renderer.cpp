@@ -1132,7 +1132,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
 
 void Renderer::ReleaseMaterialShaders()
 {
-    Vector<Material*> materials;
+    PODVector<Material*> materials;
     cache_->GetResources<Material>(materials);
     
     for (unsigned i = 0; i < materials.Size(); ++i)
@@ -1144,7 +1144,7 @@ void Renderer::ReleaseMaterialShaders()
 
 void Renderer::ReloadTextures()
 {
-    Vector<Resource*> textures;
+    PODVector<Resource*> textures;
     
     cache_->GetResources(textures, Texture2D::GetTypeStatic());
     for (unsigned i = 0; i < textures.Size(); ++i)

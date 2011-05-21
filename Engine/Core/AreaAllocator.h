@@ -45,5 +45,5 @@ private:
     void Cleanup();
     
     /// Free rectangles
-    Vector<IntRect> freeAreas_;
+    PODVector<IntRect> freeAreas_;
 };

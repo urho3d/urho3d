@@ -24,7 +24,6 @@
 #pragma once
 
 #include "GraphicsDefs.h"
-#include "PODVector.h"
 #include "RefCounted.h"
 #include "Vector.h"
 
@@ -51,9 +50,9 @@ public:
     /// Construct with graphics subsystem pointer and vertex element mask
     VertexDeclaration(Graphics* graphics, unsigned elementMask);
     /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
     /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>& elementMasks);
+    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
     /// Destruct
     ~VertexDeclaration();
     

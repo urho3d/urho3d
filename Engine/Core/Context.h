@@ -84,8 +84,8 @@ public:
                 for (Set<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
                     i != dirtySpecificReceivers_.End(); ++i)
                 {
-                    Vector<Object*>& receivers = specificReceivers_[*i];
-                    for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
+                    PODVector<Object*>& receivers = specificReceivers_[*i];
+                    for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
                             j = receivers.Erase(j);
@@ -100,8 +100,8 @@ public:
             {
                 for (Set<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
                 {
-                    Vector<Object*>& receivers = receivers_[*i];
-                    for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
+                    PODVector<Object*>& receivers = receivers_[*i];
+                    for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
                             j = receivers.Erase(j);
@@ -148,17 +148,17 @@ public:
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist
-    Vector<Object*>* GetReceivers(Object* sender, StringHash eventType)
+    PODVector<Object*>* GetReceivers(Object* sender, StringHash eventType)
     {
-        Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator i = 
+        Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = 
             specificReceivers_.Find(MakePair(sender, eventType));
         return (i != specificReceivers_.End()) ? &i->second_ : 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist
-    Vector<Object*>* GetReceivers(StringHash eventType)
+    PODVector<Object*>* GetReceivers(StringHash eventType)
     {
-        Map<StringHash, Vector<Object*> >::Iterator i = receivers_.Find(eventType);
+        Map<StringHash, PODVector<Object*> >::Iterator i = receivers_.Find(eventType);
         return (i != receivers_.End()) ? &i->second_ : 0;
     }
     
@@ -170,11 +170,11 @@ private:
     /// Attribute descriptions per object type
     Map<ShortStringHash, Vector<AttributeInfo> > attributes_;
     /// Event receivers for non-specific events
-    Map<StringHash, Vector<Object*> > receivers_;
+    Map<StringHash, PODVector<Object*> > receivers_;
     /// Event receivers for specific senders' events
-    Map<Pair<Object*, StringHash>, Vector<Object*> > specificReceivers_;
+    Map<Pair<Object*, StringHash>, PODVector<Object*> > specificReceivers_;
     /// Event sender stack
-    Vector<Object*> senders_;
+    PODVector<Object*> senders_;
     /// Event types that have had receivers removed during event handling
     Set<StringHash> dirtyReceivers_;
     /// Event types for specific senders that have had receivers removed during event handling

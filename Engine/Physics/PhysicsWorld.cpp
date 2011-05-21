@@ -176,7 +176,7 @@ void PhysicsWorld::Update(float timeStep)
             SendEvent(E_PHYSICSPRESTEP, eventData);
             
             // Store the previous transforms of the physics objects
-            for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+            for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
                 (*i)->PreStep();
             
             /// \todo ODE random number generation is not threadsafe
@@ -202,7 +202,7 @@ void PhysicsWorld::Update(float timeStep)
             
             // Interpolate transforms of physics objects
             float t = Clamp(timeAcc_ / internalTimeStep, 0.0f, 1.0f);
-            for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+            for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
                 (*i)->PostStep(t);
             
             // Send post-step event
@@ -283,7 +283,7 @@ void PhysicsWorld::SetTimeAccumulator(float time)
     timeAcc_ = time;
 }
 
-void PhysicsWorld::Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
+void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask)
 {
     PROFILE(PhysicsRaycast);
     
@@ -355,7 +355,7 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
-    for (Vector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+    for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
     {
         if ((*i) == body)
         {
@@ -444,11 +444,11 @@ void PhysicsWorld::DrawDebugGeometry(bool depthTest)
         return;
     
     // Get all geometries, also those that have no rigid bodies
-    Vector<Node*> nodes;
-    Vector<CollisionShape*> shapes;
+    PODVector<Node*> nodes;
+    PODVector<CollisionShape*> shapes;
     node_->GetChildrenWithComponent<CollisionShape>(nodes, true);
     
-    for (Vector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+    for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         (*i)->GetComponents<CollisionShape>(shapes);
         for (Vector<CollisionShape*>::Iterator j = shapes.Begin(); j != shapes.End(); ++j)
@@ -607,7 +607,7 @@ void PhysicsWorld::RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB)
     
     if (numContacts > 0)
     {
-        Vector<PhysicsRaycastResult>* result = static_cast<Vector<PhysicsRaycastResult>*>(userData);
+        PODVector<PhysicsRaycastResult>* result = static_cast<PODVector<PhysicsRaycastResult>*>(userData);
         PhysicsRaycastResult newResult;
         
         CollisionShape* shapeA = static_cast<CollisionShape*>(dGeomGetData(geomA));

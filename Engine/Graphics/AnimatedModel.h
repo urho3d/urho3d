@@ -169,13 +169,13 @@ private:
     /// Animation states
     Vector<SharedPtr<AnimationState> > animationStates_;
     /// Skinning matrices
-    Vector<Matrix4x3> skinMatrices_;
+    PODVector<Matrix4x3> skinMatrices_;
     /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage
-    Vector<Vector<unsigned> > geometryBoneMappings_;
+    Vector<PODVector<unsigned> > geometryBoneMappings_;
     /// Subgeometry skinning matrices, used if more bones than skinning shader can manage
-    Vector<Vector<Matrix4x3> > geometrySkinMatrices_;
+    Vector<PODVector<Matrix4x3> > geometrySkinMatrices_;
     /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
-    Vector<Vector<Matrix4x3*> > geometrySkinMatrixPtrs_;
+    Vector<PODVector<Matrix4x3*> > geometrySkinMatrixPtrs_;
     /// The frame number animation LOD distance was last calculated on
     unsigned animationLodFrameNumber_;
     /// Animation LOD bias

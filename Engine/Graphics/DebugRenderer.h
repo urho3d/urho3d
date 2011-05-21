@@ -103,9 +103,9 @@ private:
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
     
     /// Lines rendered with depth test
-    Vector<DebugLine> lines_;
+    PODVector<DebugLine> lines_;
     /// Lines rendered without depth test
-    Vector<DebugLine> noDepthLines_;
+    PODVector<DebugLine> noDepthLines_;
     /// View transform
     Matrix4x3 view_;
     /// Projection transform

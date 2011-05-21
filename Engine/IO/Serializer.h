@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Map.h"
-#include "PODVector.h"
 #include "StringHash.h"
 
 class Color;

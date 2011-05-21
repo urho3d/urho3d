@@ -198,9 +198,9 @@ public:
     /// Return immediate child scene nodes
     const Vector<SharedPtr<Node> >& GetChildren() const { return children_; }
     /// Return child scene nodes, optionally recursive
-    void GetChildren(Vector<Node*>& dest, bool recursive = false) const;
+    void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
     /// Return child scene nodes with a specific component
-    void GetChildrenWithComponent(Vector<Node*>& dest, ShortStringHash type, bool recursive = false) const;
+    void GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type, bool recursive = false) const;
     /// Return child scene node by index
     Node* GetChild(unsigned index) const;
     /// Return child scene node by name
@@ -212,7 +212,7 @@ public:
     /// Return all components
     const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type
-    void GetComponents(Vector<Component*>& dest, ShortStringHash type) const;
+    void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
     /// Return component by index
     Component* GetComponent(unsigned index) const;
     /// Return component by type. The optional index allows to specify which component, if there are several
@@ -224,11 +224,11 @@ public:
     /// Return user variables
     VariantMap& GetVars() { return vars_; }
     /// Template version of returning child nodes with a specific component
-    template <class T> void GetChildrenWithComponent(Vector<Node*>& dest, bool recursive = false) const;
+    template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type
     template <class T> T* GetComponent(unsigned index = 0) const;
     /// Template version of returning all components of type
-    template <class T> void GetComponents(Vector<T*>& dest) const;
+    template <class T> void GetComponents(PODVector<T*>& dest) const;
     /// Template version of checking whether has a specific component
     template <class T> bool HasComponent() const;
     
@@ -258,9 +258,9 @@ private:
     /// Remove child node by iterator
     void RemoveChild(Vector<SharedPtr<Node> >::Iterator i);
     /// Return child nodes recursively
-    void GetChildrenRecursive(Vector<Node*>& dest) const;
+    void GetChildrenRecursive(PODVector<Node*>& dest) const;
     /// Return child nodes with a specific component recursively
-    void GetChildrenWithComponentRecursive(Vector<Node*>& dest, ShortStringHash type) const;
+    void GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const;
     
     /// Unique ID within the scene
     unsigned id_;
@@ -304,7 +304,7 @@ template <class T> T* Node::GetOrCreateComponent(bool local)
     return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), local));
 }
 
-template <class T> void Node::GetChildrenWithComponent(Vector<Node*>& dest, bool recursive) const
+template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const
 {
     GetChildrenWithComponent(dest, T::GetTypeStatic(), recursive);
 }
@@ -314,9 +314,9 @@ template <class T> T* Node::GetComponent(unsigned index) const
     return static_cast<T*>(GetComponent(T::GetTypeStatic(), index));
 }
 
-template <class T> void Node::GetComponents(Vector<T*>& dest) const
+template <class T> void Node::GetComponents(PODVector<T*>& dest) const
 {
-    GetComponents(reinterpret_cast<Vector<Component*>&>(dest), T::GetTypeStatic());
+    GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic());
 }
 
 template <class T> bool Node::HasComponent() const

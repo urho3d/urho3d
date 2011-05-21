@@ -607,7 +607,7 @@ UIElement* ListView::GetItem(unsigned index) const
     return contentElement_->GetChild(index);
 }
 
-Vector<UIElement*> ListView::GetItems() const
+PODVector<UIElement*> ListView::GetItems() const
 {
     return contentElement_->GetChildren();
 }
@@ -625,9 +625,9 @@ UIElement* ListView::GetSelectedItem() const
     return contentElement_->GetChild(GetSelection());
 }
 
-Vector<UIElement*> ListView::GetSelectedItems() const
+PODVector<UIElement*> ListView::GetSelectedItems() const
 {
-    Vector<UIElement*> ret;
+    PODVector<UIElement*> ret;
     for (Set<unsigned>::ConstIterator i = selections_.Begin(); i != selections_.End(); ++i)
     {
         UIElement* item = GetItem(*i);

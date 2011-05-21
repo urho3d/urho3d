@@ -111,7 +111,7 @@ public:
     /// Return item at index
     UIElement* GetItem(unsigned index) const;
     /// Return all items
-    Vector<UIElement*> GetItems() const;
+    PODVector<UIElement*> GetItems() const;
     /// Return first selected index, or M_MAX_UNSIGNED if none selected
     unsigned GetSelection() const;
     /// Return all selected indices
@@ -119,7 +119,7 @@ public:
     /// Return first selected item, or null if none selected
     UIElement* GetSelectedItem() const;
     /// Return all selected items
-    Vector<UIElement*> GetSelectedItems() const;
+    PODVector<UIElement*> GetSelectedItems() const;
     /// Return highlight mode
     HighlightMode GetHighlightMode() const { return highlightMode_; }
     /// Return whether multiselect enabled

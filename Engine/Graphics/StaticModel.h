@@ -96,7 +96,7 @@ protected:
     /// Geometries
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// LOD levels
-    Vector<unsigned> lodLevels_;
+    PODVector<unsigned> lodLevels_;
     /// Materials
     Vector<SharedPtr<Material> > materials_;
     /// Software LOD level, used in raycast and occlusion

@@ -81,7 +81,7 @@ struct PhysicsCollisionInfo
     /// New collision flag
     bool newCollision_;
     /// Contacts
-    Vector<PhysicsContactInfo> contacts_;
+    PODVector<PhysicsContactInfo> contacts_;
 };
 
 static const float PHYSICS_MIN_TIMESTEP = 0.001f;
@@ -130,7 +130,7 @@ public:
     /// Set simulation step time accumulator
     void SetTimeAccumulator(float time);
     /// Perform a physics world raycast
-    void Raycast(Vector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
+    void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
     
     /// Return ODE world ID
@@ -213,7 +213,7 @@ private:
     /// Simulation random seed
     unsigned randomSeed_;
     /// Rigid bodies
-    Vector<RigidBody*> rigidBodies_;
+    PODVector<RigidBody*> rigidBodies_;
     /// Collision contacts (PODVector<dContact>)
     void* contacts_;
     /// Collision pairs on this frame

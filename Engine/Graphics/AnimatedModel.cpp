@@ -381,7 +381,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         geometries_[i] = geometries[i];
     
     // Copy geometry bone mappings
-    const Vector<Vector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
+    const Vector<PODVector<unsigned> >& geometryBoneMappings = model->GetGeometryBoneMappings();
     geometryBoneMappings_.Clear();
     for (unsigned i = 0; i < geometryBoneMappings.Size(); ++i)
         geometryBoneMappings_.Push(geometryBoneMappings[i]);
@@ -508,7 +508,7 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         // For a master model, set the same morph weight on non-master models
         if (isMaster_)
         {
-            Vector<AnimatedModel*> models;
+            PODVector<AnimatedModel*> models;
             GetComponents<AnimatedModel>(models);
             
             // Indexing might not be the same, so use the name hash instead
@@ -552,7 +552,7 @@ void AnimatedModel::ResetMorphWeights()
     // For a master model, reset weights on non-master models
     if (isMaster_)
     {
-        Vector<AnimatedModel*> models;
+        PODVector<AnimatedModel*> models;
         GetComponents<AnimatedModel>(models);
         
         // Indexing might not be the same, so use the name hash instead

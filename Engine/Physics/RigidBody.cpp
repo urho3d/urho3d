@@ -429,7 +429,7 @@ void RigidBody::CreateBody()
         previousRotation_ = rotation;
         
         // Associate geometries with the body
-        Vector<CollisionShape*> shapes;
+        PODVector<CollisionShape*> shapes;
         GetComponents<CollisionShape>(shapes);
         for (unsigned i = 0; i < shapes.Size(); ++i)
             shapes[i]->UpdateTransform();
@@ -443,7 +443,7 @@ void RigidBody::ReleaseBody()
     if (!body_)
         return;
     
-    Vector<CollisionShape*> shapes;
+    PODVector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
     
     // First remove rigid body associations
@@ -473,7 +473,7 @@ void RigidBody::UpdateMass()
     float density = 1.0f;
     
     // Get all attached collision shapes to calculate the mass
-    Vector<CollisionShape*> shapes;
+    PODVector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
     
     for (unsigned i = 0; i < shapes.Size(); ++i)

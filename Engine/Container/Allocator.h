@@ -77,8 +77,8 @@ public:
         AllocatorUninitialize(allocator_);
     }
     
-    /// Allocate and default-construct an object
-    T* Allocate()
+    /// Reserve and default-construct an object
+    T* Reserve()
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(T));
@@ -88,8 +88,8 @@ public:
         return newObject;
     }
     
-    /// Allocate and copy-construct an object
-    T* Allocate(const T& object)
+    /// Reserve and copy-construct an object
+    T* Reserve(const T& object)
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(T));

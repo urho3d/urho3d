@@ -306,7 +306,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Check fullscreen mode validity. If not valid, revert to windowed
     if (fullscreen)
     {
-        Vector<IntVector2> resolutions = GetResolutions();
+        PODVector<IntVector2> resolutions = GetResolutions();
         fullscreen = false;
         for (unsigned i = 0; i < resolutions.Size(); ++i)
         {
@@ -740,13 +740,13 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     Vector<VertexBuffer*> vertexBuffers(1);
-    Vector<unsigned> elementMasks(1);
+    PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
     elementMasks[0] = MASK_DEFAULT;
     SetVertexBuffers(vertexBuffers, elementMasks);
 }
 
-bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const Vector<unsigned>& elementMasks,
+bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
     unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
@@ -820,7 +820,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const Vect
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const Vector<unsigned>&
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>&
     elementMasks, unsigned instanceOffset)
 {
    if (buffers.Size() > MAX_VERTEX_STREAMS)
@@ -1895,9 +1895,9 @@ unsigned Graphics::GetWindowHandle() const
     return (unsigned)impl_->window_;
 }
 
-Vector<IntVector2> Graphics::GetResolutions() const
+PODVector<IntVector2> Graphics::GetResolutions() const
 {
-    Vector<IntVector2> ret;
+    PODVector<IntVector2> ret;
     if (!impl_->interface_)
         return ret;
     
@@ -1930,9 +1930,9 @@ Vector<IntVector2> Graphics::GetResolutions() const
     return ret;
 }
 
-Vector<int> Graphics::GetMultiSampleLevels() const
+PODVector<int> Graphics::GetMultiSampleLevels() const
 {
-    Vector<int> ret;
+    PODVector<int> ret;
     // No multisampling always supported
     ret.Push(0);
     

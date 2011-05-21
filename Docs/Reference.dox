@@ -1,6 +1,6 @@
 /**
 
-\page DataTypes Basic data types
+\page Containers Container types
 
 Urho3D implements its own string type and template containers instead of using STL. The rationale for this consists of the following:
 
@@ -9,9 +9,11 @@ Urho3D implements its own string type and template containers instead of using S
 - Reduced compile time.
 - Straightforward naming and implementation that aids in debugging and profiling.
 - Convenient member functions can be added, for example String::Split() or Vector::Compact().
-- Consistency with the rest of the classes, see \ref CodingConvention "Coding conventions".
+- Consistency with the rest of the classes, see \ref CodingConventions "Coding conventions".
 
 The classes in question are String, Vector, PODVector, List, Map and Set. PODVector is only to be used when the elements of the vector need no construction or destruction and can be moved with a block memory copy.
+
+List, Map and Set use a fixed-size allocator internally. This can also be used by the application, either by using the procedural functions AllocatorInitialize(), AllocatorUninitialize(), AllocatorReserve() and AllocatorFree(), or through the template class Allocator.
 
 In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a Map<ShortStringHash, Variant>.
 

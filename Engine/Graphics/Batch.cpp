@@ -420,7 +420,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
         Vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();
-        Vector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
+        PODVector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
         vertexBuffers.Push(SharedPtr<VertexBuffer>(buffer));
         elementMasks.Push(buffer->GetElementMask());
         

@@ -105,7 +105,7 @@ void ParticleEmitter::OnSetAttribute(const AttributeInfo& attr, const Variant& v
         {
             MemoryBuffer buf(value.GetBuffer());
             SetNumParticles(buf.ReadVLE());
-            for (Vector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
+            for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
             {
                 i->velocity_ = buf.ReadVector3();
                 i->size_ = buf.ReadVector2();
@@ -136,7 +136,7 @@ Variant ParticleEmitter::OnGetAttribute(const AttributeInfo& attr)
         {
             VectorBuffer buf;
             buf.WriteVLE(particles_.Size());
-            for (Vector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
+            for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
             {
                 buf.WriteVector3(i->velocity_);
                 buf.WriteVector2(i->size_);

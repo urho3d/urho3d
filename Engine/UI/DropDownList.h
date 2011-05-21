@@ -69,7 +69,7 @@ public:
     /// Return item at index
     UIElement* GetItem(unsigned index) const;
     /// Return all items
-    Vector<UIElement*> GetItems() const;
+    PODVector<UIElement*> GetItems() const;
     /// Return selection index, or M_MAX_UNSIGNED if none selected
     unsigned GetSelection() const;
     /// Return selected item, or null if none selected

@@ -125,7 +125,7 @@ private:
     /// Parameter XML file
     SharedPtr<XMLFile> parameterSource_;
     /// Particles
-    Vector<Particle> particles_;
+    PODVector<Particle> particles_;
     /// Color fade range
     Vector<ColorFade> colors_;
     /// Texture animation

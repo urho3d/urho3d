@@ -87,7 +87,7 @@ public:
     /// Set skeleton
     void SetSkeleton(const Skeleton& skeleton);
     /// Set bone mappings when model has more bones than the skinning shader can handle
-    void SetGeometryBoneMappings(const Vector<Vector<unsigned> >& mappings);
+    void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
     /// Set vertex morphs
     void SetMorphs(const Vector<ModelMorph>& morphs);
     
@@ -108,7 +108,7 @@ public:
     /// Return geometry by index and LOD level
     Geometry* GetGeometry(unsigned index, unsigned lodLevel) const;
     /// Return geometery bone mappings
-    const Vector<Vector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
+    const Vector<PODVector<unsigned> >& GetGeometryBoneMappings() const { return geometryBoneMappings_; }
     /// Return vertex morphs
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
     /// Return number of vertex morphs
@@ -132,7 +132,7 @@ private:
     /// Geometry pointers
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Geometry bone mappings
-    Vector<Vector<unsigned> > geometryBoneMappings_;
+    Vector<PODVector<unsigned> > geometryBoneMappings_;
     /// Vertex morphs
     Vector<ModelMorph> morphs_;
 };

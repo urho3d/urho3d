@@ -501,7 +501,7 @@ unsigned Node::GetNumChildren(bool recursive) const
     }
 }
 
-void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
+void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
 {
     dest.Clear();
     
@@ -514,7 +514,7 @@ void Node::GetChildren(Vector<Node*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
-void Node::GetChildrenWithComponent(Vector<Node*>& dest, ShortStringHash type, bool recursive) const
+void Node::GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type, bool recursive) const
 {
     dest.Clear();
     
@@ -558,7 +558,7 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
     return 0;
 }
 
-void Node::GetComponents(Vector<Component*>& dest, ShortStringHash type) const
+void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const
 {
     dest.Clear();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
@@ -753,7 +753,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
     children_.Erase(i);
 }
 
-void Node::GetChildrenRecursive(Vector<Node*>& dest) const
+void Node::GetChildrenRecursive(PODVector<Node*>& dest) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {
@@ -764,7 +764,7 @@ void Node::GetChildrenRecursive(Vector<Node*>& dest) const
     }
 }
 
-void Node::GetChildrenWithComponentRecursive(Vector<Node*>& dest, ShortStringHash type) const
+void Node::GetChildrenWithComponentRecursive(PODVector<Node*>& dest, ShortStringHash type) const
 {
     for (Vector<SharedPtr<Node> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
     {

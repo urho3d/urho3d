@@ -103,7 +103,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
     {
         String fixedFileName = GetNativePath(fileName, true);
         
-        Vector<const char*> argPtrs;
+        PODVector<const char*> argPtrs;
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
             argPtrs.Push(arguments[i].CString());

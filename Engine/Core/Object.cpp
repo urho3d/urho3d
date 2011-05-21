@@ -182,7 +182,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context_->BeginSendEvent(this);
     
     // Check first the specific event receivers
-    const Vector<Object*>* group = context_->GetReceivers(this, eventType);
+    const PODVector<Object*>* group = context_->GetReceivers(this, eventType);
     if (group)
     {
         unsigned numReceivers = group->Size();

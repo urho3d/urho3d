@@ -284,7 +284,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
     unsigned vertexStart = 0;
     unsigned subMeshIndex = 0;
     
-    Vector<unsigned> vertexStarts;
+    PODVector<unsigned> vertexStarts;
     vertexStarts.Resize(numSubMeshes_);
     
     while (subMesh)

@@ -87,7 +87,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     
     unsigned d3dColor = color.ToUInt();
     
-    Vector<DebugLine>* dest = &lines_;
+    PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
@@ -121,7 +121,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix4x3& tran
     
     unsigned d3dColor = color.ToUInt();
     
-    Vector<DebugLine>* dest = &lines_;
+    PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
@@ -144,7 +144,7 @@ void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool 
     const Vector3* vertices = frustum.GetVertices();
     unsigned d3dColor = color.ToUInt();
     
-    Vector<DebugLine>* dest = &lines_;
+    PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
@@ -171,7 +171,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     DebugLine newLine;
     newLine.color_ = color.ToUInt();
     
-    Vector<DebugLine>* dest = &lines_;
+    PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     

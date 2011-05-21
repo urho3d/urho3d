@@ -91,7 +91,7 @@ public:
     /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails
     Resource* GetResource(ShortStringHash type, StringHash nameHash);
     /// Return all loaded resources of a specific type
-    void GetResources(Vector<Resource*>& result, ShortStringHash type) const;
+    void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources
     const Map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
     /// Return added resource load paths
@@ -103,7 +103,7 @@ public:
     /// Template version of returning a resource by name hash
     template <class T> T* GetResource(StringHash nameHash);
     /// Template version of returning loaded resources of a specific type
-    template <class T> void GetResources(Vector<T*>& result) const;
+    template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists by name
     bool Exists(const String& name) const;
     /// Return whether a file exists by name hash
@@ -151,9 +151,9 @@ template <class T> T* ResourceCache::GetResource(StringHash nameHash)
     return static_cast<T*>(GetResource(type, nameHash));
 }
 
-template <class T> void ResourceCache::GetResources(Vector<T*>& result) const
+template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
-    Vector<Resource*>& resources = reinterpret_cast<Vector<Resource*>&>(result);
+    PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
     ShortStringHash type = T::GetTypeStatic();
     GetResources(resources, type);
     

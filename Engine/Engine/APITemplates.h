@@ -78,6 +78,24 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
         return 0;
 }
 
+/// Template function for PODVector to array conversion
+template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const char* arrayName)
+{
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        CScriptArray* arr = new CScriptArray(vector.Size(), type);
+        
+        for (unsigned i = 0; i < arr->GetSize(); ++i)
+            *(static_cast<T*>(arr->At(i))) = vector[i];
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
 /// Template function for Vector to handle array conversion
 template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
 {
@@ -382,7 +400,7 @@ static Component* NodeGetComponentWithTypeAndIndex(const String& typeName, unsig
 
 static CScriptArray* NodeGetComponentsWithType(const String& typeName, Node* ptr)
 {
-    Vector<Component*> components;
+    PODVector<Component*> components;
     ptr->GetComponents(components, ShortStringHash(typeName));
     return VectorToHandleArray<Component>(components, "Array<Component@>");
 }
@@ -394,14 +412,14 @@ static bool NodeHasComponent(const String& typeName, Node* ptr)
 
 static CScriptArray* NodeGetChildren(bool recursive, Node* ptr)
 {
-    Vector<Node*> nodes;
+    PODVector<Node*> nodes;
     ptr->GetChildren(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static CScriptArray* NodeGetChildrenWithComponent(String& typeName, bool recursive, Node* ptr)
 {
-    Vector<Node*> nodes;
+    PODVector<Node*> nodes;
     ptr->GetChildrenWithComponent(nodes, ShortStringHash(typeName), recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
@@ -430,18 +448,18 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
 
 static CScriptArray* NodeGetScriptedChildren(bool recursive, Node* ptr)
 {
-    Vector<Node*> nodes;
+    PODVector<Node*> nodes;
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static CScriptArray* NodeGetScriptedChildrenWithClassName(const String& className, bool recursive, Node* ptr)
 {
-    Vector<Node*> nodes;
-    Vector<Node*> ret;
+    PODVector<Node*> nodes;
+    PODVector<Node*> ret;
     
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
-    for (Vector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+    for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
         Node* node = (*i);
         const Vector<SharedPtr<Component> >& components = node->GetComponents();

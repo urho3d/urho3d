@@ -96,8 +96,8 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
-    Vector<Object*>& receivers = receivers_[eventType];
-    for (Vector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
+    PODVector<Object*>& receivers = receivers_[eventType];
+    for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         // Check if already registered
         if (*j == receiver)
@@ -109,8 +109,8 @@ void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    Vector<Object*>& receivers = specificReceivers_[MakePair(sender, eventType)];
-    for (Vector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
+    PODVector<Object*>& receivers = specificReceivers_[MakePair(sender, eventType)];
+    for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         if (*j == receiver)
             return;
@@ -121,14 +121,14 @@ void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash even
 
 void Context::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator i = specificReceivers_.Begin();
+    for (Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = specificReceivers_.Begin();
         i != specificReceivers_.End();)
     {
-        Map<Pair<Object*, StringHash>, Vector<Object*> >::Iterator current = i++;
+        Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator current = i++;
         if (current->first_.first_ == sender)
         {
-            Vector<Object*>& receivers = current->second_;
-            for (Vector<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
+            PODVector<Object*>& receivers = current->second_;
+            for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End(); ++j)
             {
                 if (*j)
                     (*j)->RemoveEventSender(sender);
@@ -140,11 +140,11 @@ void Context::RemoveEventSender(Object* sender)
 
 void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 {
-    Vector<Object*>* group = GetReceivers(eventType);
+    PODVector<Object*>* group = GetReceivers(eventType);
     if (!group)
         return;
     
-    for (Vector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
+    for (PODVector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
     {
         if (*i == receiver)
         {
@@ -163,11 +163,11 @@ void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    Vector<Object*>* group = GetReceivers(sender, eventType);
+    PODVector<Object*>* group = GetReceivers(sender, eventType);
     if (!group)
         return;
     
-    for (Vector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
+    for (PODVector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
     {
         if (*i == receiver)
         {

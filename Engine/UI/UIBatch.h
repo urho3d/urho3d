@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Color.h"
-#include "PODVector.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"
 

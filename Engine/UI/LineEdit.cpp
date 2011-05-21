@@ -518,7 +518,7 @@ void LineEdit::UpdateText()
 void LineEdit::UpdateCursor()
 {
     int x = 0;
-    const Vector<IntVector2>& charPositions = text_->GetCharPositions();
+    const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
     if (charPositions.Size())
         x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
     
@@ -543,7 +543,7 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
 {
     IntVector2 screenPosition = ElementToScreen(position);
     IntVector2 textPosition = text_->ScreenToElement(screenPosition);
-    const Vector<IntVector2>& charPositions = text_->GetCharPositions();
+    const PODVector<IntVector2>& charPositions = text_->GetCharPositions();
     
     if (textPosition.x_ < 0)
         return 0;

@@ -97,11 +97,11 @@ public:
     /// Return number of rows
     unsigned GetNumRows() const { return rowWidths_.Size(); }
     /// Return width of each row
-    const Vector<int>& GetRowWidths() const { return rowWidths_; }
+    const PODVector<int>& GetRowWidths() const { return rowWidths_; }
     /// Return position of each character
-    const Vector<IntVector2>& GetCharPositions() const { return charPositions_; }
+    const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
     /// Return size of each character
-    const Vector<IntVector2>& GetCharSizes() const { return charSizes_; }
+    const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
     
 protected:
     /// Update text when text, font or spacing changed
@@ -136,9 +136,9 @@ protected:
     /// Row height
     int rowHeight_;
     /// Row widths
-    Vector<int> rowWidths_;
+    PODVector<int> rowWidths_;
     /// Positions of each character
-    Vector<IntVector2> charPositions_;
+    PODVector<IntVector2> charPositions_;
     /// Sizes of each character
-    Vector<IntVector2> charSizes_;
+    PODVector<IntVector2> charSizes_;
 };

@@ -92,7 +92,7 @@ private:
     /// Mapping of animation track indices to bones
     Map<unsigned, Bone*> trackToBoneMap_;
     /// Last keyframe on each animation track for optimized keyframe search
-    Vector<unsigned> lastKeyFrame_;
+    PODVector<unsigned> lastKeyFrame_;
     /// Looped flag
     bool looped_;
     /// Blending weight

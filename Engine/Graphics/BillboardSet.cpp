@@ -111,7 +111,7 @@ void BillboardSet::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
             MemoryBuffer buf(value.GetBuffer());
             unsigned numBillboards = buf.ReadVLE();
             SetNumBillboards(numBillboards);
-            for (Vector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+            for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
             {
                 i->position_ = buf.ReadVector3();
                 i->size_ = buf.ReadVector2();
@@ -141,7 +141,7 @@ Variant BillboardSet::OnGetAttribute(const AttributeInfo& attr)
         {
             VectorBuffer buf;
             buf.WriteVLE(billboards_.Size());
-            for (Vector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+            for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
             {
                 buf.WriteVector3(i->position_);
                 buf.WriteVector2(i->size_);
