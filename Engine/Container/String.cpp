@@ -138,36 +138,6 @@ String& String::operator += (bool rhs)
     return *this += String(rhs);
 }
 
-String String::operator + (int rhs) const
-{
-    return *this + String(rhs);
-}
-
-String String::operator + (short rhs) const
-{
-    return *this + String(rhs);
-}
-
-String String::operator + (unsigned rhs) const
-{
-    return *this + String(rhs);
-}
-
-String String::operator + (unsigned short rhs) const
-{
-    return *this + String(rhs);
-}
-
-String String::operator + (float rhs) const
-{
-    return *this + String(rhs);
-}
-
-String String::operator + (bool rhs) const
-{
-    return *this + String(rhs);
-}
-
 void String::ReplaceInPlace(char replaceThis, char replaceWith)
 {
     for (unsigned i = 0; i < length_; ++i)

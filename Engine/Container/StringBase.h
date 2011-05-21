@@ -214,21 +214,6 @@ public:
         return ret;
     }
     
-    /// Add an integer
-    String operator + (int rhs) const;
-    /// Add a short integer
-    String operator + (short rhs) const;
-    /// Add an unsigned integer
-    String operator + (unsigned rhs) const;
-    /// Add a short unsigned integer
-    String operator + (unsigned short rhs) const;
-    /// Add a float
-    String operator + (float rhs) const;
-    /// Add a bool
-    String operator + (bool rhs) const;
-    /// Add an arbitrary type
-    template <class T> String operator + (const T& rhs) const { return *this + rhs.ToString(); }
-    
     /// Test for equality with another string
     bool operator == (const String& rhs) const
     {

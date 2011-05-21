@@ -854,7 +854,7 @@ void BuildAndSaveAnimations(OutModel& model)
         aiAnimation* anim = model.animations_[i];
         String animName = FromAIString(anim->mName);
         if (animName.Empty())
-            animName = "Anim" + (i + 1);
+            animName = "Anim" + String(i + 1);
         String animOutName = GetPath(model.outName_) + GetFileName(model.outName_) + "_" + SanitateAssetName(animName) + ".ani";
         
         SharedPtr<Animation> outAnim(new Animation(context_));
@@ -862,7 +862,7 @@ void BuildAndSaveAnimations(OutModel& model)
         outAnim->SetAnimationName(animName);
         outAnim->SetLength((float)anim->mDuration * tickConversion);
         
-        PrintLine("Writing animation " + animName + " length " + outAnim->GetLength());
+        PrintLine("Writing animation " + animName + " length " + String(outAnim->GetLength()));
         Vector<AnimationTrack> tracks;
         for (unsigned j = 0; j < anim->mNumChannels; ++j)
         {

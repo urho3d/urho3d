@@ -486,7 +486,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     
                     // If still too many bones_ in one subgeometry, error
                     if (usedBoneMap.Size() > MAX_SKIN_MATRICES)
-                        ErrorExit("Too many bones_ in submesh " + (subMeshIndex + 1));
+                        ErrorExit("Too many bones in submesh " + String(subMeshIndex + 1));
                     
                     // Write mapping of vertex buffer bone indices to original bone indices
                     subGeometryLodLevel.boneMapping_.Resize(usedBoneMap.Size());
@@ -738,7 +738,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                 ++bufIndex;
                         }
                         morphs_.Push(newMorph);
-                        PrintLine("Processed morph " + name + " with " + usedPoses.Size() + " sub-poses");
+                        PrintLine("Processed morph " + name + " with " + String(usedPoses.Size()) + " sub-poses");
                     }
                     
                     anim = anim.GetNextElement("animation");

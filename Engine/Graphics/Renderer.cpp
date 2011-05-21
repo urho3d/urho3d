@@ -1232,13 +1232,13 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     
     if (!instancingBuffer_->SetSize(newSize, INSTANCING_BUFFER_MASK, true))
     {
-        LOGERROR("Failed to resize instancing buffer to " + newSize);
+        LOGERROR("Failed to resize instancing buffer to " + String(newSize));
         // If failed, try to restore the old size
         instancingBuffer_->SetSize(oldSize, INSTANCING_BUFFER_MASK, true);
         return false;
     }
     
-    LOGDEBUG("Resized instancing buffer to " + newSize);
+    LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
 }
 

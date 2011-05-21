@@ -844,7 +844,7 @@ void CollisionShape::CreateGeometry()
     case SHAPE_CONVEXHULL:
         {
             // Check the geometry cache
-            String id = model_->GetName() + "_" + geometryScale_ + "_" + lodLevel_;
+            String id = model_->GetName() + "_" + String(geometryScale_) + "_" + String(lodLevel_);
             if (shapeType_ == SHAPE_CONVEXHULL)
                 id += "_" + String(thickness_);
             
@@ -869,7 +869,7 @@ void CollisionShape::CreateGeometry()
     case SHAPE_HEIGHTFIELD:
         {
             // Check the geometry cache
-            String id = model_->GetName() + "_" + numPoints_ + "_" + thickness_ + "_" + lodLevel_;
+            String id = model_->GetName() + "_" + String(numPoints_) + "_" + String(thickness_) + "_" + String(lodLevel_);
             
             Map<String, SharedPtr<HeightfieldData> >& cache = physicsWorld_->GetHeightfieldCache();
             Map<String, SharedPtr<HeightfieldData> >::Iterator j = cache.Find(id);

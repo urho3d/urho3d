@@ -404,7 +404,7 @@ void Scene::NodeAdded(Node* node)
     Map<unsigned, Node*>::Iterator i = allNodes_.Find(id);
     if ((i != allNodes_.End()) && (i->second_ != node))
     {
-        LOGWARNING("Overwriting node with ID " + id);
+        LOGWARNING("Overwriting node with ID " + String(id));
         i->second_->SetScene(0);
         i->second_->SetOwner(0);
     }

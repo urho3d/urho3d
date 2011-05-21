@@ -31,9 +31,6 @@
 #include "ScriptFile.h"
 #include "Time.h"
 
-#include <string>
-#include <vector>
-
 #include <Windows.h>
 
 #include "DebugNew.h"
@@ -77,7 +74,8 @@ void Run(const char* cmdLine)
     if (scriptFileName.Empty())
     {
         ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
-            "The script file should implement the function void Start(), which should create the scene content and subscribe to "
+            "The script file should implement the function void Start(), "
+            "which should create the scene content and subscribe to "
             "all necessary events, such as the application update."
         );
         return;
@@ -91,11 +89,6 @@ void Run(const char* cmdLine)
         ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage().CString());
         return;
     }
-    
-    LOGINFO("Size of std::string " + sizeof(std::string));
-    LOGINFO("Size of String " + sizeof(String));
-    LOGINFO("Size of std::vector " + sizeof(std::vector<int>));
-    LOGINFO("Size of Vector " + sizeof (Vector<int>));
     
     // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
     context_->GetSubsystem<Time>()->SetTimerPeriod(5);

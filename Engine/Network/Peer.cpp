@@ -230,7 +230,7 @@ void Peer::OnConnect()
         eventData[P_PEER] = (void*)this;
         SendEvent(E_PEERCONNECTED, eventData);
         
-        LOGINFO(address_ + ":" + port_ + " connected");
+        LOGINFO(address_ + ":" + String(port_) + " connected");
     }
 }
 
@@ -250,7 +250,7 @@ void Peer::OnDisconnect()
         SendEvent(E_PEERDISCONNECTED, eventData);
         
         if (!address_.Empty())
-            LOGINFO(address_ + ":" + port_ + " disconnected");
+            LOGINFO(address_ + ":" + String(port_) + " disconnected");
         else
             LOGINFO("Disconnected");
     }

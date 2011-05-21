@@ -194,8 +194,8 @@ String Client::GetFileTransferStatus() const
     
     for (Map<StringHash, FileTransfer>::ConstIterator i = fileTransfers_.Begin(); i != fileTransfers_.End(); ++i)
     {
-        String line = i->second_.fileName_ + " " + i->second_.bytesReceived_ + "/" + i->second_.size_
-            + " (" + String((int)(((float)i->second_.bytesReceived_ / (float)i->second_.size_) * 100.0f + 0.5f)) + "%)\n";
+        String line = i->second_.fileName_ + " " + String(i->second_.bytesReceived_) + "/" + String(i->second_.size_) +
+            " (" + String((int)(((float)i->second_.bytesReceived_ / (float)i->second_.size_) * 100.0f + 0.5f)) + "%)\n";
         ret += line;
     }
     
@@ -387,8 +387,8 @@ void Client::HandleTransferData(VectorBuffer& packet)
     {
         if (transfer.bytesReceived_ != transfer.size_)
         {
-            LOGERROR("Transfer of file " + transfer.fileName_ + " finished, expected " + transfer.size_ +
-                " bytes but got " + transfer.bytesReceived_);
+            LOGERROR("Transfer of file " + transfer.fileName_ + " finished, expected " + String(transfer.size_) +
+                " bytes but got " + String(transfer.bytesReceived_));
             
             using namespace FileTransferFailed;
             
@@ -401,7 +401,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         {
             float totalTime = transfer.receiveTimer_.GetMSec(true) * 0.001f;
             LOGINFO("Transfer of file " + transfer.fileName_ + " completed in " +
-                totalTime + " seconds, speed " + transfer.size_ / totalTime + " bytes/sec");
+                String(totalTime) + " seconds, speed " + String(transfer.size_ / totalTime) + " bytes/sec");
             using namespace FileTransferCompleted;
             
             VariantMap eventData;
@@ -708,7 +708,7 @@ bool Client::RequestFile(const String& fileName, unsigned size, unsigned checksu
     serverConnection_->SendReliable(packet);
     
     fileTransfers_[nameHash] = newTransfer;
-    LOGINFO("Started transfer of file " + fileName + ", " + size + " bytes");
+    LOGINFO("Started transfer of file " + fileName + ", " + String(size) + " bytes");
     return true;
 }
 

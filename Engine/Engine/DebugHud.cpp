@@ -156,7 +156,7 @@ void DebugHud::Update(float timeStep)
             mode += "Off";
         
         int shadowMapSize = renderer->GetShadowMapSize();
-        mode += " Size:" + shadowMapSize;
+        mode += " Size:" + String(shadowMapSize);
         
         bool shadowMapHiresDepth = renderer->GetShadowMapHiresDepth();
         mode += " Depth:";

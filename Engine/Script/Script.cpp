@@ -348,7 +348,7 @@ void Script::DumpAPI()
 
 void Script::MessageCallback(const asSMessageInfo* msg)
 {
-    String message = String(msg->section) + " (" + msg->row + "," + msg->col + ") " +
+    String message = String(msg->section) + " (" + String(msg->row) + "," + String(msg->col) + ") " +
         String(msg->message);
     
     if (logMode_ == LOGMODE_IMMEDIATE)
