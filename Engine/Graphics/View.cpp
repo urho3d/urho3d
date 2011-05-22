@@ -1868,7 +1868,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     
     float lodDistance = drawable->GetLodDistance();
     const Vector<TechniqueEntry>& techniques = material->GetTechniques();
-    if (!techniques.Size())
+    if (techniques.Empty())
         return 0;
     
     // Check for suitable technique. Techniques should be ordered like this:
@@ -1887,7 +1887,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     }
     
     // If no suitable technique found, fallback to the last
-    return techniques[techniques.Size() - 1].technique_;
+    return techniques.Back().technique_;
 }
 
 void View::CheckMaterialForAuxView(Material* material)

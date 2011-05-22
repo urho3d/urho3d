@@ -89,7 +89,8 @@ void Log::Write(int level, const String& message)
     time_t sysTime;
     time(&sysTime);
     const char* dateTime = ctime(&sysTime);
-    String dateTimeString = String(dateTime).Replace("\n", "");
+    String dateTimeString = String(dateTime);
+    dateTimeString.Replace("\n", "");
     String formattedMessage = "[" + dateTimeString + "] " + levelPrefixes[level] + ": " + message;
     
     printf("%s\n", formattedMessage.CString());

@@ -239,7 +239,7 @@ void Console::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Console::HandleLogMessage(StringHash eventType, VariantMap& eventData)
 {
     // If the rows are not fully initialized yet, or we are recursing here, do not write the message
-    if ((inLogMessage_) || (!rows_.Size()) || (!rows_[rows_.Size() - 1]))
+    if ((inLogMessage_) || (rows_.Empty()) || (!rows_.Back()))
         return;
     
     inLogMessage_ = true;

@@ -1,7 +1,10 @@
 <shaders>
     <shader name="Forward" type="vs">
         <option name="Normal" define="NORMALMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />
+        <option name="VCol" define="VERTEXCOLOR">
+            <exclude name="Normal" />
+            <exclude name="Shadow" />
+        </option>
         <option name="Spot" define="SPOTLIGHT" />
         <option name="Shadow" define="SHADOW" />
         <variation name="" />
@@ -15,12 +18,18 @@
         <option name="Diff" define="DIFFMAP" />
         <option name="Normal" define="NORMALMAP" />
         <option name="SpecMap" define="SPECMAP" include="Spec" />
-        <option name="VCol" define="VERTEXCOLOR" />
+        <option name="VCol" define="VERTEXCOLOR">
+            <exclude name="Normal" />
+            <exclude name="Shadow" />
+            <exclude name="Spec" />
+            <exclude name="SpecMap" />
+        </option>
         <option name="Volume" define="VOLUMETRIC">
             <exclude name="Additive" />
             <exclude name="Ambient" />
             <exclude name="Normal" />
             <exclude name="Shadow" />
+            <exclude name="Spec" />
             <exclude name="SpecMap" />
             <exclude name="Unlit" />
         </option>

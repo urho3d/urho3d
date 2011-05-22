@@ -442,7 +442,8 @@ const Viewport& Renderer::GetViewport(unsigned index) const
 VertexShader* Renderer::GetVertexShader(const String& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
-    String fullName = (shaderPath_ + name + vsFormat_).Replace("_.", ".");
+    String fullName = (shaderPath_ + name + vsFormat_);
+    fullName.Replace("_.", ".");
     if (checkExists)
     {
         if (!cache_->Exists(fullName))
@@ -454,7 +455,8 @@ VertexShader* Renderer::GetVertexShader(const String& name, bool checkExists) co
 PixelShader* Renderer::GetPixelShader(const String& name, bool checkExists) const
 {
     // Check for extra underscore with no variations and remove
-    String fullName = (shaderPath_ + name + psFormat_).Replace("_.", ".");
+    String fullName = (shaderPath_ + name + psFormat_);
+    fullName.Replace("_.", ".");
     if (checkExists)
     {
         if (!cache_->Exists(fullName))

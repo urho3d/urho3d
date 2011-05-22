@@ -1,14 +1,12 @@
 <shaders>
     <shader name="Material" type="vs">
-        <option name="VCol" define="VERTEXCOLOR" />
         <variation name="" />
         <variation name="Skinned" define="SKINNED" />
         <variation name="Instanced" define="INSTANCED" />
     </shader>
     <shader name="Material" type="ps">
         <option name="Diff" define="DIFFMAP" />
-        <option name="Spec" define="SPECMAP" />
-        <option name="VCol" define="VERTEXCOLOR" />        
+        <option name="Spec" define="SPECMAP" />    
         <option name="Mask" define="ALPHAMASK" include="Diff" />
     </shader>
 </shaders>

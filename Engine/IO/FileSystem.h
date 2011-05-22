@@ -99,11 +99,13 @@ String GetFileName(const String& fullPath);
 String GetExtension(const String& fullPath);
 /// Return the filename and extension from a full path. The extension will be converted to lowercase
 String GetFileNameAndExtension(const String& fullPath);
-/// Fix a path so that it contains a slash in the end, and convert backslashes to slashes
+/// Add a slash in the end of the path if missing, and convert backslashes to slashes
 String AddTrailingSlash(const String& pathName);
-/// Remove the slash or backslash from the end of a path if exists
+/// Remove the slash from the end of a path if exists, and convert backslashes to slashes
 String RemoveTrailingSlash(const String& pathName);
 /// Return the parent path, or the path itself if not available
 String GetParentPath(const String& pathName);
+/// Convert a path to internal format (use slashes)
+String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system
 String GetNativePath(const String& pathName, bool forNativeApi = false);

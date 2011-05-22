@@ -106,7 +106,8 @@ void Text::SetStyle(const XMLElement& element)
     }
     if (element.HasChildElement("text"))
     {
-        String text = element.GetChildElement("text").GetString("value").Replace("\\n", "\n");
+        String text = element.GetChildElement("text").GetString("value");
+        text.Replace("\\n", "\n");
         text_ = text;
         changed = true;
     }

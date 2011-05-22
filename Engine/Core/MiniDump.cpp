@@ -60,10 +60,10 @@ int WriteMiniDump(const char* applicationName, void* exceptionPointers)
     time(&sysTime);
     const char* dateTime = ctime(&sysTime);
     String dateTimeStr = String(dateTime);
-    dateTimeStr.ReplaceInPlace("\n", "");
-    dateTimeStr.ReplaceInPlace(":", "");
-    dateTimeStr.ReplaceInPlace("/", "");
-    dateTimeStr.ReplaceInPlace(' ', '_');
+    dateTimeStr.Replace("\n", "");
+    dateTimeStr.Replace(":", "");
+    dateTimeStr.Replace("/", "");
+    dateTimeStr.Replace(' ', '_');
     
     char pathName[MAX_PATH];
     pathName[0] = 0;

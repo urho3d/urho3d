@@ -138,7 +138,7 @@ String& String::operator += (bool rhs)
     return *this += String(rhs);
 }
 
-void String::ReplaceInPlace(char replaceThis, char replaceWith)
+void String::Replace(char replaceThis, char replaceWith)
 {
     for (unsigned i = 0; i < length_; ++i)
     {
@@ -147,7 +147,7 @@ void String::ReplaceInPlace(char replaceThis, char replaceWith)
     }
 }
 
-void String::ReplaceInPlace(const String& replaceThis, const String& replaceWith)
+void String::Replace(const String& replaceThis, const String& replaceWith)
 {
     unsigned nextPos = 0;
     
@@ -156,27 +156,27 @@ void String::ReplaceInPlace(const String& replaceThis, const String& replaceWith
         unsigned pos = Find(replaceThis, nextPos);
         if (pos == NPOS)
             break;
-        ReplaceInPlace(pos, replaceThis.length_, replaceWith);
+        Replace(pos, replaceThis.length_, replaceWith);
         nextPos = pos + replaceWith.length_;
     }
 }
 
-void String::ReplaceInPlace(unsigned pos, unsigned length, const String& str)
+void String::Replace(unsigned pos, unsigned length, const String& str)
 {
     // If substring is illegal, do nothing
     if (pos + length > length_)
         return;
     
-    ReplaceInPlace(pos, length, str.buffer_, str.length_);
+    Replace(pos, length, str.buffer_, str.length_);
 }
 
-String::Iterator String::ReplaceInPlace(const String::Iterator& start, const String::Iterator& end, const String& replaceWith)
+String::Iterator String::Replace(const String::Iterator& start, const String::Iterator& end, const String& replaceWith)
 {
     unsigned pos = start - Begin();
     if (pos >= length_)
         return End();
     unsigned length = end - start;
-    ReplaceInPlace(pos, length, replaceWith);
+    Replace(pos, length, replaceWith);
     
     return Begin() + pos;
 }
@@ -189,7 +189,7 @@ void String::Insert(unsigned pos, const String& str)
     if (pos == length_)
         (*this) += str;
     else
-        ReplaceInPlace(pos, 0, str);
+        Replace(pos, 0, str);
 }
 
 void String::Insert(unsigned pos, char c)
@@ -224,7 +224,7 @@ String::Iterator String::Insert(const String::Iterator& dest, const String::Iter
     if (pos > length_)
         pos = length_;
     unsigned length = end - start;
-    ReplaceInPlace(pos, 0, &(*start), length);
+    Replace(pos, 0, &(*start), length);
     
     return Begin() + pos;
 }
@@ -241,7 +241,7 @@ String::Iterator String::Insert(const String::Iterator& dest, char c)
 
 void String::Erase(unsigned pos, unsigned length)
 {
-    ReplaceInPlace(pos, length, String());
+    Replace(pos, length, String());
 }
 
 String::Iterator String::Erase(const String::Iterator& it)
@@ -333,30 +333,6 @@ void String::Swap(String& str)
     ::Swap(buffer_, str.buffer_);
 }
 
-String String::Replace(char replaceThis, char replaceWith) const
-{
-    String ret(*this);
-    ret.ReplaceInPlace(replaceThis, replaceWith);
-    
-    return ret;
-}
-
-String String::Replace(const String& replaceThis, const String& replaceWith) const
-{
-    String ret(*this);
-    ret.ReplaceInPlace(replaceThis, replaceWith);
-    
-    return ret;
-}
-
-String String::Replace(unsigned pos, unsigned length, const String& str) const
-{
-    String ret(*this);
-    ret.ReplaceInPlace(pos, length, str);
-    
-    return ret;
-}
-
 String String::Substring(unsigned pos) const
 {
     if (pos < length_)
@@ -387,7 +363,7 @@ String String::Substring(unsigned pos, unsigned length) const
         return String();
 }
 
-String String::Trim() const
+String String::Trimmed() const
 {
     unsigned trimStart = 0;
     unsigned trimEnd = length_;
@@ -558,7 +534,7 @@ unsigned String::FindLast(const String& str, unsigned startPos) const
     return NPOS;
 }
 
-void String::ReplaceInPlace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)
+void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)
 {
     int delta = (int)srcLength - (int)length;
     

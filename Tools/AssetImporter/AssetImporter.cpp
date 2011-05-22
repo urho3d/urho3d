@@ -241,7 +241,7 @@ void Run(const Vector<String>& arguments)
                 break;
                 
             case 'm':
-                materialListName_ = parameter.Replace('\\', '/');
+                materialListName_ = GetInternalPath(parameter);
                 break;
                 
             case 'p':
@@ -299,7 +299,7 @@ void Run(const Vector<String>& arguments)
         String inFile = arguments[1];
         String outFile;
         if ((arguments.Size() > 2) && (arguments[2][0] != '-'))
-            outFile = arguments[2].Replace('\\', '/');
+            outFile = GetInternalPath(arguments[2]);
         
         if (resourcePath_.Empty())
         {
@@ -374,13 +374,13 @@ void Run(const Vector<String>& arguments)
         for (unsigned i = 1; i < numLodArguments + 1; ++i)
         {
             if (i == numLodArguments)
-                outFile = arguments[i].Replace('\\', '/');
+                outFile = GetInternalPath(arguments[i]);
             else
             {
                 if (i & 1)
                     lodDistances.Push(Max(ToFloat(arguments[i]), 0.0f));
                 else
-                    modelNames.Push(arguments[i].Replace('\\', '/'));
+                    modelNames.Push(GetInternalPath(arguments[i]));
             }
         }
         
@@ -1652,15 +1652,15 @@ Quaternion ToQuaternion(const aiQuaternion& quat)
 String SanitateAssetName(const String& name)
 {
     String fixedName = name;
-    fixedName.ReplaceInPlace("<", "");
-    fixedName.ReplaceInPlace(">", "");
-    fixedName.ReplaceInPlace("?", "");
-    fixedName.ReplaceInPlace("*", "");
-    fixedName.ReplaceInPlace(":", "");
-    fixedName.ReplaceInPlace("\"", "");
-    fixedName.ReplaceInPlace("/", "");
-    fixedName.ReplaceInPlace("\\", "");
-    fixedName.ReplaceInPlace("|", "");
+    fixedName.Replace("<", "");
+    fixedName.Replace(">", "");
+    fixedName.Replace("?", "");
+    fixedName.Replace("*", "");
+    fixedName.Replace(":", "");
+    fixedName.Replace("\"", "");
+    fixedName.Replace("/", "");
+    fixedName.Replace("\\", "");
+    fixedName.Replace("|", "");
     
     return fixedName;
 }

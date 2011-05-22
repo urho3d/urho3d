@@ -45,18 +45,18 @@ class File : public Object, public Deserializer, public Serializer
 public:
     /// Construct
     File(Context* context);
-    /// Construct and open
+    /// Construct and open a filesystem file
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
     /// Construct and open from a package file
     File(Context* context, PackageFile* package, const String& fileName);
     /// Destruct. Close the file if open
     virtual ~File();
     
-    /// Read bytes from the file
+    /// Read bytes from the file. Return number of bytes actually read
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position from the beginning of the file
     virtual unsigned Seek(unsigned position);
-    /// Write bytes to the file
+    /// Write bytes to the file. Return number of bytes actually written
     virtual unsigned Write(const void* data, unsigned size);
     /// Return the file name
     virtual const String& GetName() const { return fileName_; }

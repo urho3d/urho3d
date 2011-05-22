@@ -227,7 +227,7 @@ public:
     void Pop()
     {
         if (size_)
-            Erase(End() - 1);
+            Erase(--End());
     }
     
     /// Erase a node from the list. Return an iterator to the next element

@@ -149,21 +149,25 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         entries_[i].offset_ = dest.GetSize();
-        String fileFullPath = GetNativePath(rootDir + "/" + entries_[i].name_);
-        FILE* handle = fopen(fileFullPath.CString(), "rb");
-        if (!handle)
-            ErrorExit("Could not open file " + fileFullPath);
-        SharedArrayPtr<unsigned char> buffer(new unsigned char[entries_[i].size_]);
-        if (fread(&buffer[0], entries_[i].size_, 1, handle) != 1)
-            ErrorExit("Could not read file " + fileFullPath);
+        String fileFullPath = rootDir + "/" + entries_[i].name_;
         
-        for (unsigned j = 0; j < entries_[i].size_; ++j)
+        File srcFile(context_, fileFullPath);
+        if (!srcFile.IsOpen())
+            ErrorExit("Could not open file " + fileFullPath);
+        
+        unsigned dataSize = entries_[i].size_;
+        SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
+        
+        if (srcFile.Read(&buffer[0], dataSize) != dataSize)
+            ErrorExit("Could not read file " + fileFullPath);
+        srcFile.Close();
+        
+        for (unsigned j = 0; j < dataSize; ++j)
         {
             checksum_ = SDBMHash(checksum_, buffer[j]);
             entries_[i].checksum_ = SDBMHash(entries_[i].checksum_, buffer[j]);
         }
         
-        fclose(handle);
         dest.Write(&buffer[0], entries_[i].size_);
     }
     

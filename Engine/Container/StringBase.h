@@ -272,13 +272,13 @@ public:
     const char& At(unsigned index) const { return buffer_[index]; }
     
     /// Replace all occurrences of a character
-    void ReplaceInPlace(char replaceThis, char replaceWith);
+    void Replace(char replaceThis, char replaceWith);
     /// Replace all occurrences of a string
-    void ReplaceInPlace(const String& replaceThis, const String& replaceWith);
+    void Replace(const String& replaceThis, const String& replaceWith);
     /// Replace a substring
-    void ReplaceInPlace(unsigned pos, unsigned length, const String& replaceWith);
+    void Replace(unsigned pos, unsigned length, const String& replaceWith);
     /// Replace a substring using iterators
-    Iterator ReplaceInPlace(const Iterator& start, const Iterator& end, const String& replaceWith);
+    Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Insert a string
     void Insert(unsigned pos, const String& str);
     /// Insert a character
@@ -314,18 +314,16 @@ public:
     Iterator End() { return Iterator(buffer_ + length_); }
     /// Return const iterator to the end
     ConstIterator End() const { return ConstIterator(buffer_ + length_); }
-    /// Return string with all occurrences of a character replaced
-    String Replace(char replaceThis, char replaceWith) const;
-    /// Return string with all occurrences of a string replaced
-    String Replace(const String& replaceThis, const String& replaceWith) const;
-    /// Return string with a substring replaced
-    String Replace(unsigned pos, unsigned length, const String& replaceWith) const;
+    /// Return first char, or 0 if empty
+    char Front() const { return buffer_[0]; }
+    /// Return last char, or 0 if empty
+    char Back() const { return length_ ? buffer_[length_ - 1] : buffer_[0]; }
     /// Return a substring from position to end
     String Substring(unsigned pos) const;
     /// Return a substring with length from position
     String Substring(unsigned pos, unsigned length) const;
     /// Return string with whitespace trimmed from the beginning and the end
-    String Trim() const;
+    String Trimmed() const;
     /// Return string in uppercase
     String ToUpper() const;
     /// Return string in lowercase
@@ -395,7 +393,7 @@ private:
     }
     
     /// Replace a substring with another substring
-    void ReplaceInPlace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
+    void Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
     
     /// String length
     unsigned length_;

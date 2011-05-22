@@ -1019,10 +1019,14 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 }
                 
                 // Write each animation into a separate file
-                String animationFileName = outputFileName.Replace(".mdl", "") + "_" + newAnimation.name_ + ".ani";
+                String animationFileName = outputFileName;
+                animationFileName.Replace(".mdl", "");
+                animationFileName += "_" + newAnimation.name_ + ".ani";
+                
                 File dest(context_);
                 if (!dest.Open(animationFileName, FILE_WRITE))
                     ErrorExit("Could not open output file " + animationFileName);
+                
                 dest.WriteID("UANI");
                 dest.WriteString(newAnimation.name_);
                 dest.WriteFloat(newAnimation.length_);

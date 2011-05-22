@@ -1,9 +1,0 @@
-<technique>
-    <pass name="deferred" vs="Deferred/GBuffer_VCol" ps="Deferred/GBuffer_VCol" />
-    <pass name="prepass" vs="Prepass/GBuffer" ps="Prepass/GBuffer" />
-    <pass name="material" vs="Prepass/Material_VCol" ps="Prepass/Material_VCol" depthwrite="false" depthtest="equal" />
-    <pass name="base" vs="Forward_VCol" ps="Forward_VColAmbient" />
-    <pass name="litbase" vs="Forward_VCol" ps="Forward_VColAmbient" />
-    <pass name="light" vs="Forward_VCol" ps="Forward_VCol" depthwrite="false" depthtest="equal" blend="add" />
-    <pass name="shadow" vs="Shadow" ps="Shadow" />
-</technique>

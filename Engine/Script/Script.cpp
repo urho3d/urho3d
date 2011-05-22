@@ -64,7 +64,7 @@ void ExtractPropertyInfo(const String& functionName, const String& declaration, 
     if (!info)
     {
         propertyInfos.Resize(propertyInfos.Size() + 1);
-        info = &propertyInfos[propertyInfos.Size() - 1];
+        info = &propertyInfos.Back();
         info->name_ = propertyName;
     }
     if (functionName.Find("get_") != String::NPOS)
@@ -292,7 +292,8 @@ void Script::DumpAPI()
                     if (declaration.Find("::op") == String::NPOS)
                     {
                         String prefix(typeName + "::");
-                        methodDeclarations.Push(declaration.Replace(prefix, ""));
+                        declaration.Replace(prefix, "");
+                        methodDeclarations.Push(declaration);
                     }
                 }
                 else
@@ -420,11 +421,11 @@ asIObjectType* Script::GetObjectType(const char* declaration)
 void Script::OutputAPIRow(const String& row, bool removeReference)
 {
     String out = row;
-    out.ReplaceInPlace("double", "float");
-    out.ReplaceInPlace("&in", "&");
-    out.ReplaceInPlace("&out", "&");
+    out.Replace("double", "float");
+    out.Replace("&in", "&");
+    out.Replace("&out", "&");
     if (removeReference)
-        out.ReplaceInPlace("&", "");
+        out.Replace("&", "");
     
     LOGRAW(out + "\n");
 }

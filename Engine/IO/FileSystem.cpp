@@ -77,7 +77,8 @@ bool FileSystem::CreateDir(const String& pathName)
         return false;
     }
     
-    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName), true).CString(), 0) == TRUE) || (GetLastError() == ERROR_ALREADY_EXISTS);
+    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName), true).CString(), 0) == TRUE) ||
+        (GetLastError() == ERROR_ALREADY_EXISTS);
     if (success)
         LOGDEBUG("Created directory " + pathName);
     else
@@ -334,7 +335,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
 
 void SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension)
 {
-    String fullPathCopy = fullPath.Replace('\\', '/');
+    String fullPathCopy = GetInternalPath(fullPath);
     
     unsigned extPos = fullPathCopy.FindLast('.');
     if (extPos != String::NPOS)
@@ -386,32 +387,24 @@ String GetFileNameAndExtension(const String& fileName)
     return file + extension;
 }
 
-String AddTrailingSlash(const String& path)
+String AddTrailingSlash(const String& pathName)
 {
-    String ret;
+    String ret = pathName;
+    ret.Replace('\\', '/');
+    if ((!ret.Empty()) && (ret.Back() != '/'))
+        ret += '/';
     
-    if (!path.Empty())
-    {
-        ret = path;
-        char last = path[path.Length() - 1];
-        if ((last != '/') && (last != '\\'))
-            ret += '/';
-    }
-    
-    ret.ReplaceInPlace('\\', '/');
     return ret;
 }
 
-String RemoveTrailingSlash(const String& path)
+String RemoveTrailingSlash(const String& pathName)
 {
-    if (!path.Empty())
-    {
-        char last = path[path.Length() - 1];
-        if ((last == '/') || (last == '\\'))
-            return path.Substring(0, path.Length() - 1);
-    }
+    String ret = pathName;
+    ret.Replace('\\', '/');
+    if ((!ret.Empty()) && (ret.Back() == '/'))
+        ret.Resize(ret.Length() - 1);
     
-    return path;
+    return ret;
 }
 
 String GetParentPath(const String& path)
@@ -423,6 +416,14 @@ String GetParentPath(const String& path)
         return path;
 }
 
+String GetInternalPath(const String& pathName)
+{
+    String ret = pathName;
+    ret.Replace('\\', '/');
+    
+    return ret;
+}
+
 String GetNativePath(const String& pathName, bool forNativeApi)
 {
     // On MSVC, replace slash always with backslash. On MinGW only if going to do Win32 native calls
@@ -431,7 +432,11 @@ String GetNativePath(const String& pathName, bool forNativeApi)
 #endif
     
     if (forNativeApi)
-        return pathName.Replace('/', '\\');
+    {
+        String ret = pathName;
+        ret.Replace('/', '\\');
+        return ret;
+    }
     else
         return pathName;
 }
