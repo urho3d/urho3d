@@ -62,6 +62,7 @@ bool Shader::Load(Deserializer& source)
 {
     PROFILE(LoadShader);
     
+    // Clear existing variations
     variations_.Clear();
     
     Graphics* graphics = GetSubsystem<Graphics>();

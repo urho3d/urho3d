@@ -156,6 +156,7 @@ int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
 void CompileVariations(const Shader& baseShader, XMLElement& shaders);
 void Compile(CompiledVariation* variation);
+void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSize);
 
 class WorkerThread : public RefCounted, public Thread
 {
@@ -667,14 +668,7 @@ void Compile(CompiledVariation* variation)
         compileFailed_ = true;
     }
     else
-    {
-        unsigned dataSize = shaderCode->GetBufferSize();
-        if (dataSize)
-        {
-            variation->byteCode_.Resize(dataSize);
-            memcpy(&variation->byteCode_[0], shaderCode->GetBufferPointer(), dataSize);
-        }
-    }
+        CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
     
     // Parse the constant table for constants and texture units
     D3DXCONSTANTTABLE_DESC desc;
@@ -719,4 +713,28 @@ void Compile(CompiledVariation* variation)
         constantTable->Release();
     if (errorMsgs)
         errorMsgs->Release();
+}
+
+void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSize)
+{
+    unsigned* srcWords = (unsigned*)src;
+    unsigned srcWordSize = srcSize >> 2;
+    
+    dest.Clear();
+    
+    for (unsigned i = 0; i < srcWordSize; ++i)
+    {
+        if ((srcWords[i] & 0xffff) != D3DSIO_COMMENT)
+        {
+            // Not a comment, copy the data
+            unsigned char* srcBytes = (unsigned char*)(srcWords + i);
+            dest.Push(srcBytes[0]);
+            dest.Push(srcBytes[1]);
+            dest.Push(srcBytes[2]);
+            dest.Push(srcBytes[3]);
+        }
+        else
+            // Skip the comment
+            i += (srcWords[i] >> 16);
+    }
 }
