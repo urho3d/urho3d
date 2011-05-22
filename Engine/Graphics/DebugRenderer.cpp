@@ -30,11 +30,10 @@
 #include "DebugRenderer.h"
 #include "Graphics.h"
 #include "Light.h"
-#include "PixelShader.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
-#include "VertexShader.h"
+#include "ShaderProgram.h"
 
 #include "DebugNew.h"
 

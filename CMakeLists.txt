@@ -88,18 +88,18 @@ endmacro ()
 # Macro for shader asset compilation
 macro (add_shader NAME)
     add_custom_command (
-        OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.xml
+        OUTPUT ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2
         COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM2 SM2
         DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
     )
 
     add_custom_command (
-        OUTPUT ../../Bin/CoreData/Shaders/SM3/${NAME}.xml
+        OUTPUT ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3
         COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM3 SM3
         DEPENDS ShaderCompiler Common.hlsl ${NAME}.hlsl ${NAME}.xml
     )
 
-    set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.xml ../../Bin/CoreData/Shaders/SM3/${NAME}.xml)
+    set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2 ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3)
 endmacro ()
 
 # Add projects

@@ -29,9 +29,9 @@
 
 class PixelShader;
 class Graphics;
+class ShaderProgram;
 class Texture;
 class UIElement;
-class VertexShader;
 
 /// UI rendering quad
 struct UIQuad
@@ -86,7 +86,7 @@ public:
     /// Merge with another batch
     bool Merge(const UIBatch& batch);
     /// Draw
-    void Draw(Graphics* graphics, VertexShader* vs, PixelShader* ps) const;
+    void Draw(Graphics* graphics, ShaderProgram* vs, ShaderProgram* ps) const;
     
     /// Add or merge a batch
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);

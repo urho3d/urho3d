@@ -38,15 +38,15 @@
 #include "Material.h"
 #include "Octree.h"
 #include "ParticleEmitter.h"
-#include "PixelShader.h"
 #include "Profiler.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 #include "Skybox.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
 #include "VertexDeclaration.h"
-#include "VertexShader.h"
 #include "Zone.h"
 
 #include "DebugNew.h"
@@ -907,11 +907,11 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
     }
 }
 
-void Graphics::SetShaders(VertexShader* vs, PixelShader* ps)
+void Graphics::SetShaders(ShaderProgram* vs, ShaderProgram* ps)
 {
     if (vs != vertexShader_)
     {
-        if (vs)
+        if ((vs) && (vs->GetShaderType() == VS))
             impl_->device_->SetVertexShader((IDirect3DVertexShader9*)vs->GetGPUObject());
         else
             impl_->device_->SetVertexShader(0);
@@ -921,7 +921,7 @@ void Graphics::SetShaders(VertexShader* vs, PixelShader* ps)
     
     if (ps != pixelShader_)
     {
-        if (ps)
+        if ((ps) && (ps->GetShaderType() == PS))
             impl_->device_->SetPixelShader((IDirect3DPixelShader9*)ps->GetGPUObject());
         else
             impl_->device_->SetPixelShader(0);
@@ -930,36 +930,36 @@ void Graphics::SetShaders(VertexShader* vs, PixelShader* ps)
     }
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const bool* data, unsigned count)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const bool* data, unsigned count)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantB(index, (const BOOL*)data, count);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const float* data, unsigned count)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const float* data, unsigned count)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantF(index, data, count / 4);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const int* data, unsigned count)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const int* data, unsigned count)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantI(index, data, count / 4);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, float value)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, float value)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -976,18 +976,18 @@ void Graphics::SetVertexShaderParameter(VSParameter param, float value)
     impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Color& color)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Color& color)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantF(index, color.GetData(), 1);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Matrix3& matrix)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix3& matrix)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1009,9 +1009,9 @@ void Graphics::SetVertexShaderParameter(VSParameter param, const Matrix3& matrix
     impl_->device_->SetVertexShaderConstantF(index, &data[0], 3);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Vector3& vector)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector3& vector)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1030,63 +1030,63 @@ void Graphics::SetVertexShaderParameter(VSParameter param, const Vector3& vector
     impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Matrix4& matrix)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix4& matrix)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 4);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Vector4& vector)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector4& vector)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantF(index, vector.GetData(), 1);
 }
 
-void Graphics::SetVertexShaderParameter(VSParameter param, const Matrix4x3& matrix)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix4x3& matrix)
 {
-    unsigned index = vsRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 3);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const bool* data, unsigned count)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const bool* data, unsigned count)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantB(index, (const BOOL*)data, count);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const float* data, unsigned count)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const float* data, unsigned count)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantF(index, data, count / 4);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const int* data, unsigned count)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const int* data, unsigned count)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantI(index, data, count / 4);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, float value)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, float value)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1103,18 +1103,18 @@ void Graphics::SetPixelShaderParameter(PSParameter param, float value)
     impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Color& color)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Color& color)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantF(index, color.GetData(), 1);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Matrix3& matrix)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix3& matrix)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1136,9 +1136,9 @@ void Graphics::SetPixelShaderParameter(PSParameter param, const Matrix3& matrix)
     impl_->device_->SetPixelShaderConstantF(index, &data[0], 3);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Vector3& vector)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector3& vector)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1157,27 +1157,27 @@ void Graphics::SetPixelShaderParameter(PSParameter param, const Vector3& vector)
     impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Matrix4& matrix)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix4& matrix)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 4);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Vector4& vector)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector4& vector)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
     impl_->device_->SetPixelShaderConstantF(index, vector.GetData(), 1);
 }
 
-void Graphics::SetPixelShaderParameter(PSParameter param, const Matrix4x3& matrix)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix4x3& matrix)
 {
-    unsigned index = psRegisters_[param];
+    unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
@@ -1186,16 +1186,14 @@ void Graphics::SetPixelShaderParameter(PSParameter param, const Matrix4x3& matri
 
 void Graphics::ClearLastParameterSources()
 {
-    for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
-        lastVSParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
-    for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)
-        lastPSParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
+        lastShaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::ClearTransformSources()
 {
-    lastVSParameterSources_[VSP_MODEL] = (const void*)M_MAX_UNSIGNED;
-    lastVSParameterSources_[VSP_VIEWPROJ] = (const void*)M_MAX_UNSIGNED;
+    lastShaderParameterSources_[VSP_MODEL] = (const void*)M_MAX_UNSIGNED;
+    lastShaderParameterSources_[VSP_VIEWPROJ] = (const void*)M_MAX_UNSIGNED;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
@@ -1954,22 +1952,13 @@ VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
     return index < MAX_VERTEX_STREAMS ? vertexBuffer_[index] : 0;
 }
 
-VSParameter Graphics::GetVSParameter(const String& name)
+ShaderParameter Graphics::GetShaderParameter(const String& name)
 {
-    Map<String, VSParameter>::Iterator i = vsParameters_.Find(name);
-    if (i != vsParameters_.End())
+    Map<String, ShaderParameter>::Iterator i = shaderParameters_.Find(name);
+    if (i != shaderParameters_.End())
         return i->second_;
     else
-        return MAX_VS_PARAMETERS;
-}
-
-PSParameter Graphics::GetPSParameter(const String& name)
-{
-    Map<String, PSParameter>::Iterator i = psParameters_.Find(name);
-    if (i != psParameters_.End())
-        return i->second_;
-    else
-        return MAX_PS_PARAMETERS;
+        return MAX_SHADER_PARAMETERS;
 }
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
@@ -1981,19 +1970,9 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
         return MAX_TEXTURE_UNITS;
 }
 
-const String& Graphics::GetVSParameterName(VSParameter parameter)
+const String& Graphics::GetShaderParameterName(ShaderParameter parameter)
 {
-    for (Map<String, VSParameter>::Iterator i = vsParameters_.Begin(); i != vsParameters_.End(); ++i)
-    {
-        if (i->second_ == parameter)
-            return i->first_;
-    }
-    return noParameter;
-}
-
-const String& Graphics::GetPSParameterName(PSParameter parameter)
-{
-    for (Map<String, PSParameter>::Iterator i = psParameters_.Begin(); i != psParameters_.End(); ++i)
+    for (Map<String, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
     {
         if (i->second_ == parameter)
             return i->first_;
@@ -2409,50 +2388,48 @@ void Graphics::ResetCachedState()
 void Graphics::InitializeShaderParameters()
 {
     // Initialize all parameters as unknown
-    for (unsigned i = 0; i < MAX_VS_PARAMETERS; ++i)
-        vsRegisters_[i] = MAX_CONSTANT_REGISTERS;
-    for (unsigned i = 0; i < MAX_PS_PARAMETERS; ++i)
-        psRegisters_[i] = MAX_CONSTANT_REGISTERS;
+    for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
+        shaderRegisters_[i] = MAX_CONSTANT_REGISTERS;
     
     // Map parameter names
-    vsParameters_["CameraPos"] = VSP_CAMERAPOS;
-    vsParameters_["CameraRot"] = VSP_CAMERAROT;
-    vsParameters_["DepthMode"] = VSP_DEPTHMODE;
-    vsParameters_["ElapsedTime"] = VSP_ELAPSEDTIME;
-    vsParameters_["FrustumSize"] = VSP_FRUSTUMSIZE;
-    vsParameters_["GBufferOffsets"] = VSP_GBUFFEROFFSETS;
-    vsParameters_["Model"] = VSP_MODEL;
-    vsParameters_["ShadowProj"] = VSP_SHADOWPROJ;
-    vsParameters_["SpotProj"] = VSP_SPOTPROJ;
-    vsParameters_["ViewProj"] = VSP_VIEWPROJ;
-    vsParameters_["UOffset"] = VSP_UOFFSET;
-    vsParameters_["VOffset"] = VSP_VOFFSET;
-    vsParameters_["ViewRightVector"] = VSP_VIEWRIGHTVECTOR;
-    vsParameters_["ViewUpVector"] = VSP_VIEWUPVECTOR;
-    vsParameters_["SkinMatrices"] = VSP_SKINMATRICES;
+    shaderParameters_["CameraPos"] = VSP_CAMERAPOS;
+    shaderParameters_["CameraRot"] = VSP_CAMERAROT;
+    shaderParameters_["DepthMode"] = VSP_DEPTHMODE;
+    shaderParameters_["ElapsedTime"] = VSP_ELAPSEDTIME;
+    shaderParameters_["FrustumSize"] = VSP_FRUSTUMSIZE;
+    shaderParameters_["GBufferOffsets"] = VSP_GBUFFEROFFSETS;
+    shaderParameters_["Model"] = VSP_MODEL;
+    shaderParameters_["ShadowProj"] = VSP_SHADOWPROJ;
+    shaderParameters_["SpotProj"] = VSP_SPOTPROJ;
+    shaderParameters_["ViewProj"] = VSP_VIEWPROJ;
+    shaderParameters_["UOffset"] = VSP_UOFFSET;
+    shaderParameters_["VOffset"] = VSP_VOFFSET;
+    shaderParameters_["ViewRightVector"] = VSP_VIEWRIGHTVECTOR;
+    shaderParameters_["ViewUpVector"] = VSP_VIEWUPVECTOR;
+    shaderParameters_["SkinMatrices"] = VSP_SKINMATRICES;
     
-    psParameters_["AmbientColor"] = PSP_AMBIENTCOLOR;
-    psParameters_["AntiAliasWeights"] = PSP_ANTIALIASWEIGHTS;
-    psParameters_["CameraPosPS"] = PSP_CAMERAPOS;
-    psParameters_["ElapsedTimePS"] = PSP_ELAPSEDTIME;
-    psParameters_["FogColor"] = PSP_FOGCOLOR;
-    psParameters_["FogParams"] = PSP_FOGPARAMS;
-    psParameters_["GBufferOffsetsPS"] = PSP_GBUFFEROFFSETS;
-    psParameters_["GBufferViewport"] = PSP_GBUFFERVIEWPORT;
-    psParameters_["LightAtten"] = PSP_LIGHTATTEN;
-    psParameters_["LightColor"] = PSP_LIGHTCOLOR;
-    psParameters_["LightDir"] = PSP_LIGHTDIR;
-    psParameters_["LightPos"] = PSP_LIGHTPOS;
-    psParameters_["LightSplits"] = PSP_LIGHTSPLITS;
-    psParameters_["LightVecRot"] = PSP_LIGHTVECROT;
-    psParameters_["MatDiffColor"] = PSP_MATDIFFCOLOR;
-    psParameters_["MatEmissiveColor"] = PSP_MATEMISSIVECOLOR;
-    psParameters_["MatSpecProperties"] = PSP_MATSPECPROPERTIES;
-    psParameters_["SampleOffsets"] = PSP_SAMPLEOFFSETS;
-    psParameters_["ShadowIntensity"] = PSP_SHADOWINTENSITY;
-    psParameters_["ShadowProjPS"] = PSP_SHADOWPROJ;
-    psParameters_["SpotProjPS"] = PSP_SPOTPROJ;
-    psParameters_["ViewProjPS"] = PSP_VIEWPROJ;
+    shaderParameters_["AmbientColor"] = PSP_AMBIENTCOLOR;
+    shaderParameters_["AntiAliasWeights"] = PSP_ANTIALIASWEIGHTS;
+    shaderParameters_["CameraPosPS"] = PSP_CAMERAPOS;
+    shaderParameters_["ElapsedTimePS"] = PSP_ELAPSEDTIME;
+    shaderParameters_["FogColor"] = PSP_FOGCOLOR;
+    shaderParameters_["FogParams"] = PSP_FOGPARAMS;
+    shaderParameters_["GBufferOffsetsPS"] = PSP_GBUFFEROFFSETS;
+    shaderParameters_["GBufferViewport"] = PSP_GBUFFERVIEWPORT;
+    shaderParameters_["LightAtten"] = PSP_LIGHTATTEN;
+    shaderParameters_["LightColor"] = PSP_LIGHTCOLOR;
+    shaderParameters_["LightDir"] = PSP_LIGHTDIR;
+    shaderParameters_["LightPos"] = PSP_LIGHTPOS;
+    shaderParameters_["LightSplits"] = PSP_LIGHTSPLITS;
+    shaderParameters_["LightVecRot"] = PSP_LIGHTVECROT;
+    shaderParameters_["MatDiffColor"] = PSP_MATDIFFCOLOR;
+    shaderParameters_["MatEmissiveColor"] = PSP_MATEMISSIVECOLOR;
+    shaderParameters_["MatSpecProperties"] = PSP_MATSPECPROPERTIES;
+    shaderParameters_["SampleOffsets"] = PSP_SAMPLEOFFSETS;
+    shaderParameters_["ShadowIntensity"] = PSP_SHADOWINTENSITY;
+    shaderParameters_["ShadowProjPS"] = PSP_SHADOWPROJ;
+    shaderParameters_["SpotProjPS"] = PSP_SPOTPROJ;
+    shaderParameters_["ViewProjPS"] = PSP_VIEWPROJ;
     
     // Map texture units
     textureUnits_["NormalMap"] = TU_NORMAL;
@@ -2521,8 +2498,7 @@ void RegisterGraphicsLibrary(Context* context)
     Animation::RegisterObject(context);
     Material::RegisterObject(context);
     Model::RegisterObject(context);
-    PixelShader::RegisterObject(context);
-    VertexShader::RegisterObject(context);
+    Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
     TextureCube::RegisterObject(context);

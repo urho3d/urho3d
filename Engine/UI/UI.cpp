@@ -37,17 +37,17 @@
 #include "ListView.h"
 #include "Log.h"
 #include "Matrix4x3.h"
-#include "PixelShader.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ScrollBar.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 #include "Slider.h"
 #include "Text.h"
 #include "Texture2D.h"
 #include "Time.h"
 #include "UI.h"
 #include "UIEvents.h"
-#include "VertexShader.h"
 #include "Window.h"
 
 #include "Sort.h"
@@ -255,8 +255,8 @@ void UI::Render()
     graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
     graphics_->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     
-    PixelShader* ps = 0;
-    VertexShader* vs = 0;
+    ShaderProgram* ps = 0;
+    ShaderProgram* vs = 0;
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
@@ -399,11 +399,17 @@ void UI::Initialize()
     rootElement_ = new UIElement(context_);
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     
-    noTextureVS_ = cache->GetResource<VertexShader>("Shaders/SM2/Basic_VCol.vs2");
-    diffTextureVS_ = cache->GetResource<VertexShader>("Shaders/SM2/Basic_DiffVCol.vs2");
-    noTexturePS_ = cache->GetResource<PixelShader>("Shaders/SM2/Basic_VCol.ps2");
-    diffTexturePS_ = cache->GetResource<PixelShader>("Shaders/SM2/Basic_DiffVCol.ps2");
-    alphaTexturePS_ = cache->GetResource<PixelShader>("Shaders/SM2/Basic_AlphaVCol.ps2");
+    Shader* basicVS = cache->GetResource<Shader>("Shaders/SM2/Basic.vs2");
+    Shader* basicPS = cache->GetResource<Shader>("Shaders/SM2/Basic.ps2");
+    
+    if ((basicVS) && (basicPS))
+    {
+        noTextureVS_ = basicVS->GetVariation("VCol");
+        diffTextureVS_ = basicVS->GetVariation("DiffVCol");
+        noTexturePS_ = basicPS->GetVariation("VCol");
+        diffTexturePS_ = basicPS->GetVariation("DiffVCol");
+        alphaTexturePS_ = basicPS->GetVariation("AlphaVCol");
+    }
     
     LOGINFO("Initialized user interface");
     initialized_ = true;

@@ -30,14 +30,13 @@
 class Camera;
 class Drawable;
 class Geometry;
+class Graphics;
 class Light;
 class Material;
 class Pass;
 class Matrix4x3;
-class PixelShader;
-class Graphics;
+class ShaderProgram;
 class VertexBuffer;
-class VertexShader;
 
 /// Description of a 3D geometry draw call
 struct Batch
@@ -69,9 +68,9 @@ struct Batch
     /// Material pass
     Pass* pass_;
     /// Vertex shader
-    VertexShader* vertexShader_;
+    ShaderProgram* vertexShader_;
     /// Pixel shader
-    PixelShader* pixelShader_;
+    ShaderProgram* pixelShader_;
     /// Camera
     Camera* camera_;
     /// Light that affects the geometry, if any
@@ -143,9 +142,9 @@ struct BatchGroup
     /// Material pass
     Pass* pass_;
     /// Vertex shader
-    VertexShader* vertexShader_;
+    ShaderProgram* vertexShader_;
     /// Pixel shader
-    PixelShader* pixelShader_;
+    ShaderProgram* pixelShader_;
     /// Camera
     Camera* camera_;
     /// Light that affects the geometry, if any

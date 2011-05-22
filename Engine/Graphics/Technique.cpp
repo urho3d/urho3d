@@ -25,11 +25,10 @@
 #include "Context.h"
 #include "Log.h"
 #include "Technique.h"
-#include "PixelShader.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
+#include "ShaderProgram.h"
 #include "StringUtils.h"
-#include "VertexShader.h"
 #include "XMLFile.h"
 
 static const String passNames[] =

@@ -239,20 +239,20 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurface(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
 }
 
-static Vector4 MaterialGetVertexShaderParameter(VSParameter parameter, Material* ptr)
+static Vector4 MaterialGetVertexShaderParameter(ShaderParameter parameter, Material* ptr)
 {
-    const Map<VSParameter, Vector4>& parameters = ptr->GetVertexShaderParameters();
-    Map<VSParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    const Map<ShaderParameter, Vector4>& parameters = ptr->GetVertexShaderParameters();
+    Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
     if (i == parameters.End())
         return Vector4::ZERO;
     else
         return i->second_;
 }
 
-static Vector4 MaterialGetPixelShaderParameter(PSParameter parameter, Material* ptr)
+static Vector4 MaterialGetPixelShaderParameter(ShaderParameter parameter, Material* ptr)
 {
-    const Map<PSParameter, Vector4>& parameters = ptr->GetPixelShaderParameters();
-    Map<PSParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    const Map<ShaderParameter, Vector4>& parameters = ptr->GetPixelShaderParameters();
+    Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
     if (i == parameters.End())
         return Vector4::ZERO;
     else
@@ -270,14 +270,12 @@ static Material* MaterialClone(const String& cloneName, Material* ptr)
 
 static void RegisterMaterial(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("VSParameter");
-    engine->RegisterEnumValue("VSParameter", "VSP_UOFFSET", VSP_UOFFSET);
-    engine->RegisterEnumValue("VSParameter", "VSP_VOFFSET", VSP_VOFFSET);
-    
-    engine->RegisterEnum("PSParameter");
-    engine->RegisterEnumValue("PSParameter", "PSP_MATDIFFCOLOR", PSP_MATDIFFCOLOR);
-    engine->RegisterEnumValue("PSParameter", "PSP_MATEMISSIVECOLOR", PSP_MATEMISSIVECOLOR);
-    engine->RegisterEnumValue("PSParameter", "PSP_MATSPECPROPERTIES", PSP_MATSPECPROPERTIES);
+    engine->RegisterEnum("ShaderParameter");
+    engine->RegisterEnumValue("ShaderParameter", "VSP_UOFFSET", VSP_UOFFSET);
+    engine->RegisterEnumValue("ShaderParameter", "VSP_VOFFSET", VSP_VOFFSET);
+    engine->RegisterEnumValue("ShaderParameter", "PSP_MATDIFFCOLOR", PSP_MATDIFFCOLOR);
+    engine->RegisterEnumValue("ShaderParameter", "PSP_MATEMISSIVECOLOR", PSP_MATEMISSIVECOLOR);
+    engine->RegisterEnumValue("ShaderParameter", "PSP_MATSPECPROPERTIES", PSP_MATSPECPROPERTIES);
     
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
@@ -354,10 +352,10 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_vertexShaderParameter(VSParameter, const Vector4&in)", asMETHOD(Material, SetVertexShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_vertexShaderParameter(VSParameter) const", asFUNCTION(MaterialGetVertexShaderParameter), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Material", "void set_pixelShaderParameter(PSParameter, const Vector4&in)", asMETHOD(Material, SetPixelShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_pixelShaderParameter(VSParameter) const", asFUNCTION(MaterialGetPixelShaderParameter), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void set_vertexShaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetVertexShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Vector4 get_vertexShaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetVertexShaderParameter), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void set_pixelShaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetPixelShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Vector4 get_pixelShaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetPixelShaderParameter), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_texture(TextureUnit, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_texture(TextureUnit) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);

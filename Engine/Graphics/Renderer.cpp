@@ -36,16 +36,16 @@
 #include "OcclusionBuffer.h"
 #include "Octree.h"
 #include "OctreeQuery.h"
-#include "PixelShader.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Scene.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "VertexBuffer.h"
-#include "VertexShader.h"
 #include "View.h"
 #include "XMLFile.h"
 #include "Zone.h"
@@ -439,30 +439,14 @@ const Viewport& Renderer::GetViewport(unsigned index) const
     return index < viewports_.Size() ? viewports_[index] : noViewport;
 }
 
-VertexShader* Renderer::GetVertexShader(const String& name, bool checkExists) const
+ShaderProgram* Renderer::GetVertexShader(const String& name, bool checkExists) const
 {
-    // Check for extra underscore with no variations and remove
-    String fullName = (shaderPath_ + name + vsFormat_);
-    fullName.Replace("_.", ".");
-    if (checkExists)
-    {
-        if (!cache_->Exists(fullName))
-            return 0;
-    }
-    return cache_->GetResource<VertexShader>(fullName);
+    return GetShader(name, vsFormat_, checkExists);
 }
 
-PixelShader* Renderer::GetPixelShader(const String& name, bool checkExists) const
+ShaderProgram* Renderer::GetPixelShader(const String& name, bool checkExists) const
 {
-    // Check for extra underscore with no variations and remove
-    String fullName = (shaderPath_ + name + psFormat_);
-    fullName.Replace("_.", ".");
-    if (checkExists)
-    {
-        if (!cache_->Exists(fullName))
-            return 0;
-    }
-    return cache_->GetResource<PixelShader>(fullName);
+    return GetShader(name, psFormat_, checkExists);
 }
 
 unsigned Renderer::GetNumGeometries(bool allViews) const
@@ -843,13 +827,40 @@ void Renderer::ResetShadowMapUseCount()
         shadowMapUseCount_[i] = 0;
 }
 
-void Renderer::setBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows)
+ShaderProgram* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
+{
+    String shaderName = shaderPath_;
+    String variationName;
+    
+    unsigned split = name.Find('_');
+    if (split != String::NPOS)
+    {
+        shaderName += name.Substring(0, split) + extension;
+        variationName = name.Substring(split + 1);
+    }
+    else
+        shaderName += name + extension;
+    
+    if (checkExists)
+    {
+        if (!cache_->Exists(shaderName))
+            return 0;
+    }
+    
+    Shader* shader = cache_->GetResource<Shader>(shaderName);
+    if (shader)
+        return shader->GetVariation(variationName);
+    else
+        return 0;
+}
+
+void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows)
 {
     batch.pass_ = pass;
     
     // Check if shaders are unloaded or need reloading
-    Vector<SharedPtr<VertexShader> >& vertexShaders = pass->GetVertexShaders();
-    Vector<SharedPtr<PixelShader> >& pixelShaders = pass->GetPixelShaders();
+    Vector<SharedPtr<ShaderProgram> >& vertexShaders = pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderProgram> >& pixelShaders = pass->GetPixelShaders();
     if ((!vertexShaders.Size()) || (!pixelShaders.Size()) || (technique->GetShadersLoadedFrameNumber() !=
         shadersChangedFrameNumber_))
     {
@@ -1014,8 +1025,7 @@ void Renderer::LoadShaders()
     }
     
     // Remove shaders that are no longer referenced from the cache
-    cache_->ReleaseResources(VertexShader::GetTypeStatic());
-    cache_->ReleaseResources(PixelShader::GetTypeStatic());
+    cache_->ReleaseResources(Shader::GetTypeStatic());
     
     shadersDirty_ = false;
 }
@@ -1076,8 +1086,8 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
-    Vector<SharedPtr<VertexShader> >& vertexShaders = i->second_.GetVertexShaders();
-    Vector<SharedPtr<PixelShader> >& pixelShaders = i->second_.GetPixelShaders();
+    Vector<SharedPtr<ShaderProgram> >& vertexShaders = i->second_.GetVertexShaders();
+    Vector<SharedPtr<ShaderProgram> >& pixelShaders = i->second_.GetPixelShaders();
     
     // Forget all the old shaders
     vertexShaders.Clear();
@@ -1138,10 +1148,7 @@ void Renderer::ReleaseMaterialShaders()
     cache_->GetResources<Material>(materials);
     
     for (unsigned i = 0; i < materials.Size(); ++i)
-    {
-        for (unsigned j = 0; j < materials[i]->GetNumTechniques(); ++j)
-            materials[i]->ReleaseShaders();
-    }
+        materials[i]->ReleaseShaders();
 }
 
 void Renderer::ReloadTextures()
@@ -1439,7 +1446,7 @@ void Renderer::SetupLightBatch(Batch& batch)
     }
 }
 
-void Renderer::DrawFullScreenQuad(Camera& camera, VertexShader* vs, PixelShader* ps, bool nearQuad)
+void Renderer::DrawFullScreenQuad(Camera& camera, ShaderProgram* vs, ShaderProgram* ps, bool nearQuad)
 {
     graphics_->ClearTransformSources();
     

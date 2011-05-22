@@ -33,15 +33,14 @@
 #include "Octree.h"
 #include "OctreeQuery.h"
 #include "Renderer.h"
-#include "PixelShader.h"
 #include "Profiler.h"
 #include "Scene.h"
+#include "ShaderProgram.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "Time.h"
 #include "VertexBuffer.h"
-#include "VertexShader.h"
 #include "View.h"
 #include "Zone.h"
 
@@ -450,7 +449,7 @@ void View::GetBatches()
                         shadowBatch.light_ = SplitLight;
                         shadowBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
                         
-                        renderer_->setBatchShaders(shadowBatch, tech, pass);
+                        renderer_->SetBatchShaders(shadowBatch, tech, pass);
                         lightQueue.shadowBatches_.AddBatch(shadowBatch);
                     }
                 }
@@ -580,7 +579,7 @@ void View::GetBatches()
                     pass = tech->GetPass(gBufferPass);
                     if (pass)
                     {
-                        renderer_->setBatchShaders(baseBatch, tech, pass);
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
                         baseBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
                         gBufferQueue_.AddBatch(baseBatch);
                         
@@ -588,7 +587,7 @@ void View::GetBatches()
                         pass = tech->GetPass(additionalPass);
                         if (pass)
                         {
-                            renderer_->setBatchShaders(baseBatch, tech, pass);
+                            renderer_->SetBatchShaders(baseBatch, tech, pass);
                             baseQueue_.AddBatch(baseBatch);
                         }
                         
@@ -600,7 +599,7 @@ void View::GetBatches()
                 pass = tech->GetPass(PASS_BASE);
                 if (pass)
                 {
-                    renderer_->setBatchShaders(baseBatch, tech, pass);
+                    renderer_->SetBatchShaders(baseBatch, tech, pass);
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                     {
                         baseBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
@@ -620,7 +619,7 @@ void View::GetBatches()
                     if (pass)
                     {
                         baseBatch.hasPriority_ = false;
-                        renderer_->setBatchShaders(baseBatch, tech, pass);
+                        renderer_->SetBatchShaders(baseBatch, tech, pass);
                         extraQueue_.AddBatch(baseBatch);
                     }
                 }
@@ -691,13 +690,13 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
             {
                 if (lightQueue)
                 {
-                    renderer_->setBatchShaders(litBatch, tech, pass);
+                    renderer_->SetBatchShaders(litBatch, tech, pass);
                     lightQueue->litBatches_.AddBatch(litBatch);
                 }
             }
             else
             {
-                renderer_->setBatchShaders(litBatch, tech, pass, allowShadows);
+                renderer_->SetBatchShaders(litBatch, tech, pass, allowShadows);
                 baseQueue_.AddBatch(litBatch);
             }
         }
@@ -714,7 +713,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
                 litTransparencies.Insert(check);
             }
             
-            renderer_->setBatchShaders(litBatch, tech, pass, allowShadows);
+            renderer_->SetBatchShaders(litBatch, tech, pass, allowShadows);
             transparentQueue_.AddBatch(litBatch, true);
         }
     }

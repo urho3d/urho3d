@@ -193,8 +193,15 @@ enum CubeMapFace
     MAX_CUBEMAP_FACES
 };
 
-/// Vertex shader parameters
-enum VSParameter
+/// Shader types
+enum ShaderType
+{
+    VS = 0,
+    PS,
+};
+
+/// Shader parameters
+enum ShaderParameter
 {
     VSP_CAMERAPOS,
     VSP_CAMERAROT,
@@ -211,13 +218,7 @@ enum VSParameter
     VSP_VIEWRIGHTVECTOR,
     VSP_VIEWUPVECTOR,
     VSP_SKINMATRICES,
-    MAX_VS_PARAMETERS
-};
-
-/// Pixel shader parameters
-enum PSParameter
-{
-    PSP_AMBIENTCOLOR = 0,
+    PSP_AMBIENTCOLOR,
     PSP_ANTIALIASWEIGHTS,
     PSP_CAMERAPOS,
     PSP_ELAPSEDTIME,
@@ -239,7 +240,7 @@ enum PSParameter
     PSP_SHADOWPROJ,
     PSP_SPOTPROJ,
     PSP_VIEWPROJ,
-    MAX_PS_PARAMETERS
+    MAX_SHADER_PARAMETERS
 };
 
 /// Texture units

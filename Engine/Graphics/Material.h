@@ -74,9 +74,9 @@ public:
     /// Set technique
     void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set vertex shader parameter
-    void SetVertexShaderParameter(VSParameter parameter, const Vector4& value);
+    void SetVertexShaderParameter(ShaderParameter parameter, const Vector4& value);
     /// Set pixel shader parameter
-    void SetPixelShaderParameter(PSParameter parameter, const Vector4& value);
+    void SetPixelShaderParameter(ShaderParameter parameter, const Vector4& value);
     /// Set texture
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform
@@ -87,8 +87,6 @@ public:
     void SetCullMode(CullMode mode);
     /// Set culling mode for shadows
     void SetShadowCullMode(CullMode mode);
-    /// Mark needing shadow casting and occlusion re-evaluation
-    void SetDirty();
     /// Reset all shader pointers
     void ReleaseShaders();
     /// Clone material
@@ -111,9 +109,9 @@ public:
     /// Return texture by unit
     Texture* GetTexture(TextureUnit unit) const;
     /// Return all vertex shader parameters
-    const Map<VSParameter, Vector4>& GetVertexShaderParameters() const { return vsParameters_; }
+    const Map<ShaderParameter, Vector4>& GetVertexShaderParameters() const { return vsParameters_; }
     /// Return all pixel shader parameters
-    const Map<PSParameter, Vector4>& GetPixelShaderParameters() const { return psParameters_; }
+    const Map<ShaderParameter, Vector4>& GetPixelShaderParameters() const { return psParameters_; }
     /// Return normal culling mode
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows
@@ -135,9 +133,9 @@ private:
     /// Textures
     Vector<SharedPtr<Texture> > textures_;
     /// Vertex shader parameters
-    Map<VSParameter, Vector4> vsParameters_;
+    Map<ShaderParameter, Vector4> vsParameters_;
     /// Pixel shader parameters
-    Map<PSParameter, Vector4> psParameters_;
+    Map<ShaderParameter, Vector4> psParameters_;
     /// Normal culling mode
     CullMode cullMode_;
     /// Culling mode for shadow rendering

@@ -33,10 +33,10 @@ class IndexBuffer;
 class Matrix3;
 class Matrix4;
 class Matrix4x3;
-class PixelShader;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
+class ShaderProgram;
 class Texture;
 class Texture2D;
 class TextureCube;
@@ -44,7 +44,6 @@ class Vector3;
 class Vector4;
 class VertexBuffer;
 class VertexDeclaration;
-class VertexShader;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 static const int NUM_SCREEN_BUFFERS = 2;
@@ -100,55 +99,51 @@ public:
     /// Set index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
-    void SetShaders(VertexShader* vs, PixelShader* ps);
+    void SetShaders(ShaderProgram* vs, ShaderProgram* ps);
     /// Set vertex shader bool parameter
-    void SetVertexShaderParameter(VSParameter param, const bool* data, unsigned count);
+    void SetVertexShaderParameter(ShaderParameter param, const bool* data, unsigned count);
     /// Set vertex shader float constants
-    void SetVertexShaderParameter(VSParameter param, const float* data, unsigned count);
+    void SetVertexShaderParameter(ShaderParameter param, const float* data, unsigned count);
     /// Set vertex shader int constants
-    void SetVertexShaderParameter(VSParameter param, const int* data, unsigned count);
+    void SetVertexShaderParameter(ShaderParameter param, const int* data, unsigned count);
     /// Set vertex shader float constant
-    void SetVertexShaderParameter(VSParameter param, float value);
+    void SetVertexShaderParameter(ShaderParameter param, float value);
     /// Set vertex shader color constant
-    void SetVertexShaderParameter(VSParameter param, const Color& color);
+    void SetVertexShaderParameter(ShaderParameter param, const Color& color);
     /// Set vertex shader 3x3 matrix constant
-    void SetVertexShaderParameter(VSParameter param, const Matrix3& matrix);
+    void SetVertexShaderParameter(ShaderParameter param, const Matrix3& matrix);
     /// Set vertex shader 3D vector constant
-    void SetVertexShaderParameter(VSParameter param, const Vector3& vector);
+    void SetVertexShaderParameter(ShaderParameter param, const Vector3& vector);
     /// Set vertex shader 4x4 matrix constant
-    void SetVertexShaderParameter(VSParameter param, const Matrix4& matrix);
+    void SetVertexShaderParameter(ShaderParameter param, const Matrix4& matrix);
     /// Set vertex shader 4D vector constant
-    void SetVertexShaderParameter(VSParameter param, const Vector4& vector);
+    void SetVertexShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set vertex shader 4x3 matrix constant
-    void SetVertexShaderParameter(VSParameter param, const Matrix4x3& matrix);
+    void SetVertexShaderParameter(ShaderParameter param, const Matrix4x3& matrix);
     /// Set pixel shader bool constants
-    void SetPixelShaderParameter(PSParameter param, const bool* data, unsigned count);
+    void SetPixelShaderParameter(ShaderParameter param, const bool* data, unsigned count);
     /// Set pixel shader float constants
-    void SetPixelShaderParameter(PSParameter param, const float* data, unsigned count);
+    void SetPixelShaderParameter(ShaderParameter param, const float* data, unsigned count);
     /// Set pixel shader int constants
-    void SetPixelShaderParameter(PSParameter param, const int* data, unsigned count);
+    void SetPixelShaderParameter(ShaderParameter param, const int* data, unsigned count);
     /// Set pixel shader float constant
-    void SetPixelShaderParameter(PSParameter param, float value);
+    void SetPixelShaderParameter(ShaderParameter param, float value);
     /// Set pixel shader color constant
-    void SetPixelShaderParameter(PSParameter param, const Color& color);
+    void SetPixelShaderParameter(ShaderParameter param, const Color& color);
     /// Set pixel shader 3x3 matrix constant
-    void SetPixelShaderParameter(PSParameter param, const Matrix3& matrix);
+    void SetPixelShaderParameter(ShaderParameter param, const Matrix3& matrix);
     /// Set pixel shader 3D vector constant
-    void SetPixelShaderParameter(PSParameter param, const Vector3& vector);
+    void SetPixelShaderParameter(ShaderParameter param, const Vector3& vector);
      /// Set pixel shader 4x4 matrix constant
-    void SetPixelShaderParameter(PSParameter param, const Matrix4& matrix);
+    void SetPixelShaderParameter(ShaderParameter param, const Matrix4& matrix);
     /// Set pixel shader 3D vector constant
-    void SetPixelShaderParameter(PSParameter param, const Vector4& vector);
+    void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set pixel shader 4x3 matrix constant
-    void SetPixelShaderParameter(PSParameter param, const Matrix4x3& matrix);
+    void SetPixelShaderParameter(ShaderParameter param, const Matrix4x3& matrix);
     /// Set vertex shader parameter source. Called by VertexShader
-    void SetVSParameterSource(VSParameter param, const void* source) { lastVSParameterSources_[param] = source; }
-    /// Set pixel shader parameter source. Called by PixelShader
-    void SetPSParameterSource(PSParameter param, const void* source) { lastPSParameterSources_[param] = source; }
-    /// Map vertex shader parameter to a constant Register. Called by VertexShader
-    void SetVSRegister(VSParameter param, unsigned index) { vsRegisters_[param] = index; }
-    /// Map pixel shader parameter to a constant Register. Called by PixelShader
-    void SetPSRegister(PSParameter param, unsigned index) { psRegisters_[param] = index; }
+    void SetShaderParameterSource(ShaderParameter param, const void* source) { lastShaderParameterSources_[param] = source; }
+    /// Map shader parameter to a constant register. Called by Shader
+    void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
     /// Clear remembered shader parameter sources
     void ClearLastParameterSources();
     /// Clear remembered transform shader parameter sources
@@ -279,29 +274,23 @@ public:
     /// Return vertex declaration
     VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
     /// Return vertex shader
-    VertexShader* GetVertexShader() const { return vertexShader_; }
+    ShaderProgram* GetVertexShader() const { return vertexShader_; }
     /// Return pixel shader
-    PixelShader* GetPixelShader() const { return pixelShader_; }
-    /// Return vertex shader parameter index by name
-    VSParameter GetVSParameter(const String& name);
-    /// Return pixel shader parameter index by name
-    PSParameter GetPSParameter(const String& name);
+    ShaderProgram* GetPixelShader() const { return pixelShader_; }
+    /// Return shader parameter index by name
+    ShaderParameter GetShaderParameter(const String& name);
     /// Return texture unit index by name
     TextureUnit GetTextureUnit(const String& name);
-    /// Return vertex shader parameter name by index
-    const String& GetVSParameterName(VSParameter parameter);
-    /// Return vertex pixel parameter name by index
-    const String& GetPSParameterName(PSParameter parameter);
+    /// Return shader parameter name by index
+    const String& GetShaderParameterName(ShaderParameter parameter);
     /// Return texture unit name by index
     const String& GetTextureUnitName(TextureUnit unit);
     /// Return vertex shader constant register by parameter index
-    unsigned GetVSRegister(VSParameter param) { return vsRegisters_[param]; }
+    unsigned GetVSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
     /// Return pixel shader constant register by parameter index
-    unsigned GetPSRegister(PSParameter param) { return psRegisters_[param]; }
-    /// Return last vertex shader parameter source
-    const void* GetVSParameterSource(VSParameter param) { return lastVSParameterSources_[param]; }
-    /// Return last pixel shader parameter source
-    const void* GetPSParameterSource(PSParameter param) { return lastPSParameterSources_[param]; }
+    unsigned GetPSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
+    /// Return last shader parameter source
+    const void* GetShaderParameterSource(ShaderParameter param) { return lastShaderParameterSources_[param]; }
     /// Return texture by texture unit index
     Texture* GetTexture(unsigned index) const;
     /// Return the "view texture"
@@ -485,21 +474,15 @@ private:
     /// Vertex declaration in use
     VertexDeclaration* vertexDeclaration_;
     /// Vertex shader in use
-    VertexShader* vertexShader_;
+    ShaderProgram* vertexShader_;
     /// Pixel shader in use
-    PixelShader* pixelShader_;
-    /// Vertex shader parameter mappings
-    Map<String, VSParameter> vsParameters_;
-    /// Pixel shader parameter mappings
-    Map<String, PSParameter> psParameters_;
-    /// Vertex shader constant register mappings
-    unsigned vsRegisters_[MAX_VS_PARAMETERS];
-    /// Pixel shader constant register mappings
-    unsigned psRegisters_[MAX_PS_PARAMETERS];
-    /// Last vertex shader parameter sources per parameter
-    const void* lastVSParameterSources_[MAX_VS_PARAMETERS];
-    /// Last pixel shader parameter sources per parameter
-    const void* lastPSParameterSources_[MAX_PS_PARAMETERS];
+    ShaderProgram* pixelShader_;
+    /// Shader parameter mappings
+    Map<String, ShaderParameter> shaderParameters_;
+    /// Shader constant register mappings
+    unsigned shaderRegisters_[MAX_SHADER_PARAMETERS];
+    /// Last shader parameter sources per parameter
+    const void* lastShaderParameterSources_[MAX_SHADER_PARAMETERS];
     /// Textures in use
     Texture* texture_[MAX_TEXTURE_UNITS];
     /// "View texture" to prevent sampling the destination render target

@@ -23,10 +23,9 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
-#include "PixelShader.h"
+#include "ShaderProgram.h"
 #include "Texture.h"
 #include "UIElement.h"
-#include "VertexShader.h"
 
 #include "DebugNew.h"
 
@@ -166,7 +165,7 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-void UIBatch::Draw(Graphics* graphics, VertexShader* vs, PixelShader* ps) const
+void UIBatch::Draw(Graphics* graphics, ShaderProgram* vs, ShaderProgram* ps) const
 {
     if ((!quads_) || (!quadCount_))
         return;

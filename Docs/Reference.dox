@@ -1074,15 +1074,15 @@ The texconv tool from the DirectX SDK needs to be available through the system P
 
 This tool generates HLSL shader permutations using an XML definition file that describes the permutations, and their associated HLSL preprocessor defines.
 
-The output consists of shader bytecode for each permutation, as well as an output XML file that describes the constant parameters and texture units (for pixel shaders only) used by each.
+The output consists of shader bytecode for each permutation, as well as information of the constant parameters and texture units used. See \ref FileFormats_Shader "Binary shader format" for details.
 
 Usage:
 
 \verbatim
 ShaderCompiler <definitionfile> <outputpath> [SM3] [define1] [define2] ..
 
-HLSL files will be loaded from definition file directory, and binary code will
-be output to same directory as the output file.
+HLSL files will be loaded from definition file directory, and binary files will
+be output to the output path, preserving the subdirectory structure.
 \endverbatim
 
 It is possible to give additional defines from the command line. These will then be present in each permutation. SM3 is a special define which enables compilation of VS3.0 and PS3.0 code, otherwise VS2.0 and PS2.0 code is generated.
@@ -1197,6 +1197,35 @@ uint       Number of tracks
 
 Note: animations are stored using absolute bone transformations. Therefore only lerp-blending between animations is supported; additive pose modification is not.
 
+\section FileFormats_Shader Binary shader format (.vs2, .ps2, .vs3, .ps3)
+
+\verbatim
+byte[4]    Identifier "USHD"
+
+short      Shader type (0 = vertex, 1 = pixel)
+short      Shader model (2 or 3)
+
+uint       Number of constant parameters
+
+    For each constant parameter:
+    cstring    Parameter name
+    byte       Hardware register index
+
+uint       Number of texture units (0 for vertex shaders)
+
+    For each texture unit:
+    cstring    Texture unit name
+    byte       Hardware sampler index
+
+uint       Number of shader variations
+
+    For each variation:
+    cstring    Variation name
+    bool[]     Use flags for constants
+    bool[]     Use flags for texture units
+    uint       Bytecode size
+    byte[]     Bytecode
+\endverbatim
 
 \page CodingConventions Coding conventions
 

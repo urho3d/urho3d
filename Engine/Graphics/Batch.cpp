@@ -29,13 +29,12 @@
 #include "Light.h"
 #include "Material.h"
 #include "Renderer.h"
-#include "PixelShader.h"
 #include "Profiler.h"
+#include "ShaderProgram.h"
 #include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "VertexBuffer.h"
-#include "VertexShader.h"
 
 #include "DebugNew.h"
 
@@ -200,8 +199,8 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     // Set material's vertex shader parameters
     if (material_)
     {
-        const Map<VSParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
-        for (Map<VSParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        const Map<ShaderParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
+        for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
             if (vertexShader_->NeedParameterUpdate(i->first_, material_))
                 graphics->SetVertexShaderParameter(i->first_, i->second_);
@@ -279,8 +278,8 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     // Set material's pixel shader parameters
     if (material_)
     {
-        const Map<PSParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
-        for (Map<PSParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        const Map<ShaderParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
+        for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
             if (pixelShader_->NeedParameterUpdate(i->first_, material_))
                 graphics->SetPixelShaderParameter(i->first_, i->second_);
@@ -408,8 +407,8 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
     {
         // Switch to the instancing vertex shader
         // The indexing is different in the forward lit passes
-        Vector<SharedPtr<VertexShader> >& vertexShaders = pass_->GetVertexShaders();
-        Vector<SharedPtr<PixelShader> >& pixelShaders = pass_->GetPixelShaders();
+        Vector<SharedPtr<ShaderProgram> >& vertexShaders = pass_->GetVertexShaders();
+        Vector<SharedPtr<ShaderProgram> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
         if ((type != PASS_LITBASE) && (type != PASS_LIGHT))
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];

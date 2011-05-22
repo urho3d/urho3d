@@ -174,17 +174,14 @@ bool Material::Load(Deserializer& source)
     {
         String name = parameterElem.GetString("name");
         Vector4 value = parameterElem.GetVector("value");
-        VSParameter vsParam = graphics->GetVSParameter(name);
-        if (vsParam != MAX_VS_PARAMETERS)
-            SetVertexShaderParameter(vsParam, value);
+        ShaderParameter param = graphics->GetShaderParameter(name);
+        // Check whether a VS or PS parameter
+        if (param < PSP_AMBIENTCOLOR)
+            SetVertexShaderParameter(param, value);
+        else if (param != MAX_SHADER_PARAMETERS)
+            SetPixelShaderParameter(param, value);
         else
-        {
-            PSParameter psParam = graphics->GetPSParameter(name);
-            if (psParam != MAX_PS_PARAMETERS)
-                SetPixelShaderParameter(psParam, value);
-            else
-                LOGERROR("Unknown shader parameter " + name);
-        }
+            LOGERROR("Unknown shader parameter " + name);
         
         parameterElem = parameterElem.GetNextElement("parameter");
     }
@@ -202,8 +199,8 @@ bool Material::Load(Deserializer& source)
     memoryUse += sizeof(Material);
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
     memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
-    memoryUse += vsParameters_.Size() * (sizeof(VSParameter) + sizeof(Vector4));
-    memoryUse += psParameters_.Size() * (sizeof(PSParameter) + sizeof(Vector4));
+    memoryUse += vsParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
+    memoryUse += psParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
     
     SetMemoryUse(memoryUse);
     Update();
@@ -245,16 +242,16 @@ bool Material::Save(Serializer& dest)
     }
     
     // Write shader parameters
-    for (Map<VSParameter, Vector4>::ConstIterator j = vsParameters_.Begin(); j != vsParameters_.End(); ++j)
+    for (Map<ShaderParameter, Vector4>::ConstIterator j = vsParameters_.Begin(); j != vsParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetVSParameterName(j->first_));
+        parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));
         parameterElem.SetVector4("value", j->second_);
     }
-    for (Map<PSParameter, Vector4>::ConstIterator j = psParameters_.Begin(); j != psParameters_.End(); ++j)
+    for (Map<ShaderParameter, Vector4>::ConstIterator j = psParameters_.Begin(); j != psParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetPSParameterName(j->first_));
+        parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));
         parameterElem.SetVector4("value", j->second_);
     }
     
@@ -278,12 +275,12 @@ void Material::SetTechnique(unsigned index, Technique* technique, unsigned quali
     Update();
 }
 
-void Material::SetVertexShaderParameter(VSParameter parameter, const Vector4& value)
+void Material::SetVertexShaderParameter(ShaderParameter parameter, const Vector4& value)
 {
     vsParameters_[parameter] = value;
 }
 
-void Material::SetPixelShaderParameter(PSParameter parameter, const Vector4& value)
+void Material::SetPixelShaderParameter(ShaderParameter parameter, const Vector4& value)
 {
     psParameters_[parameter] = value;
 }
