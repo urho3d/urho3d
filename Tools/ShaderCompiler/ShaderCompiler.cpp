@@ -283,9 +283,6 @@ void Run(const Vector<String>& arguments)
     XMLElement shader = shaders.GetChildElement("shader");
     while (shader)
     {
-        constants_.Clear();
-        textureUnits_.Clear();
-        
         String source = shader.GetString("name");
         ShaderType compileType = Both;
         String type = shader.GetString("type");
@@ -372,6 +369,9 @@ void Run(const Vector<String>& arguments)
 
 void CompileVariations(const Shader& baseShader, XMLElement& shaders)
 {
+    constants_.Clear();
+    textureUnits_.Clear();
+    
     unsigned combinations = 1;
     PODVector<unsigned> usedCombinations;
     Map<String, unsigned> nameToIndex;
