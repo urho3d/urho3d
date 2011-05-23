@@ -722,27 +722,23 @@ void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSiz
     
     dest.Clear();
     
-    unsigned instrLength = 0;
     for (unsigned i = 0; i < srcWordSize; ++i)
     {
-        if ((instrLength) || (srcWords[i] & 0xffff) != D3DSIO_COMMENT)
+        unsigned opcode = srcWords[i] & 0xffff;
+        unsigned paramLength = (srcWords[i] & 0x0f000000) >> 4;
+        unsigned commentLength = srcWords[i] >> 16;
+        
+        if (opcode != D3DSIO_COMMENT)
         {
-            if (!instrLength)
-                instrLength = (srcWords[i] & 0x0f000000) >> 24;
-            else
-                --instrLength;
-            
             // Not a comment, copy the data
             unsigned char* srcBytes = (unsigned char*)(srcWords + i);
-            dest.Push(srcBytes[0]);
-            dest.Push(srcBytes[1]);
-            dest.Push(srcBytes[2]);
-            dest.Push(srcBytes[3]);
+            for (unsigned j = 0; j < 4; ++j)
+                dest.Push(*srcBytes++);
         }
         else
         {
             // Skip the comment
-            i += (srcWords[i] >> 16);
+            i += commentLength;
         }
     }
 }
