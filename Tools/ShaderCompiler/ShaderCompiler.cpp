@@ -36,7 +36,7 @@
 
 #include <Windows.h>
 #include <d3d9.h>
-#include <D3DX9Shader.h>
+#include <d3dx9shader.h>
 
 #include "DebugNew.h"
 
@@ -728,17 +728,20 @@ void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSiz
         unsigned paramLength = (srcWords[i] & 0x0f000000) >> 24;
         unsigned commentLength = srcWords[i] >> 16;
         
-        if (opcode != D3DSIO_COMMENT)
-        {
-            // Not a comment, copy the data
-            unsigned char* srcBytes = (unsigned char*)(srcWords + i);
-            for (unsigned j = 0; j < 4; ++j)
-                dest.Push(*srcBytes++);
-        }
-        else
+        // For now, skip comment only at fixed position to prevent false positives
+        if ((i == 1) && (opcode == D3DSIO_COMMENT))
         {
             // Skip the comment
             i += commentLength;
+        }
+        else
+        {
+            // Not a comment, copy the data
+            unsigned char* srcBytes = (unsigned char*)(srcWords + i);
+            dest.Push(*srcBytes++);
+            dest.Push(*srcBytes++);
+            dest.Push(*srcBytes++);
+            dest.Push(*srcBytes++);
         }
     }
 }
