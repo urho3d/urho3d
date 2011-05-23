@@ -82,20 +82,20 @@ void Run(const char* cmdLine)
     }
     
     // Create the execution context and the engine
-    SharedPtr<Context> context_(new Context());
-    SharedPtr<Engine> engine(new Engine(context_));
+    SharedPtr<Context> context(new Context());
+    SharedPtr<Engine> engine(new Engine(context));
     if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
     {
-        ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage().CString());
+        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
         return;
     }
     
     // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
-    context_->GetSubsystem<Time>()->SetTimerPeriod(5);
+    context->GetSubsystem<Time>()->SetTimerPeriod(5);
     
     // Execute the Start function from the script file, then run the engine loop until exited
     engine->InitializeScripting();
-    ScriptFile* scriptFile = context_->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
+    ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
     if ((scriptFile) && (scriptFile->Execute("void Start()")))
     {
         while (!engine->IsExiting())
@@ -104,6 +104,6 @@ void Run(const char* cmdLine)
     else
     {
         engine->Exit(); // Close the rendering window
-        ErrorDialog("Urho3D", context_->GetSubsystem<Log>()->GetLastMessage().CString());
+        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
     }
 }
