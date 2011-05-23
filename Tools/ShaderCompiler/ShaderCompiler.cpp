@@ -725,7 +725,7 @@ void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSiz
     for (unsigned i = 0; i < srcWordSize; ++i)
     {
         unsigned opcode = srcWords[i] & 0xffff;
-        unsigned paramLength = (srcWords[i] & 0x0f000000) >> 4;
+        unsigned paramLength = (srcWords[i] & 0x0f000000) >> 24;
         unsigned commentLength = srcWords[i] >> 16;
         
         if (opcode != D3DSIO_COMMENT)
