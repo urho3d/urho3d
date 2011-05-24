@@ -174,7 +174,7 @@ static inline void dConstructPlane(const dVector3& normal,const dReal& distance,
 
 static inline void dMatrix3Copy(const dReal* source,dMatrix3& dest)
 {
-  dCopyMatrix3x4(dest, source);
+  dCopyMatrix4x3(dest, source);
 }
 
 static inline dReal dMatrix3Det( const dMatrix3& mat )
