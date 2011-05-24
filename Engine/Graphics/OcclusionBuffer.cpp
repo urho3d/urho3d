@@ -106,7 +106,7 @@ void OcclusionBuffer::SetView(Camera* camera)
     if (!camera)
         return;
     
-    view_ = camera->GetInverseWorldTransform();
+    view_ = camera->InverseWorldTransform();
     projection_ = camera->GetProjection();
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
@@ -151,7 +151,7 @@ void OcclusionBuffer::Clear()
     depthHierarchyDirty_ = true;
 }
 
-bool OcclusionBuffer::Draw(const Matrix4x3& model, const unsigned char* vertexData, unsigned vertexSize,
+bool OcclusionBuffer::Draw(const Matrix3x4& model, const unsigned char* vertexData, unsigned vertexSize,
     const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount)
 {
     PROFILE(DrawOcclusion);

@@ -33,7 +33,7 @@ class Camera;
 class Frustum;
 class Drawable;
 class Light;
-class Matrix4x3;
+class Matrix3x4;
 class Renderer;
 class Skeleton;
 
@@ -81,7 +81,7 @@ public:
     /// Add a bounding box
     void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
     /// Add a bounding box with transform
-    void AddBoundingBox(const BoundingBox& box, const Matrix4x3& transform, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
     /// Add a frustum
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     /// Add a skeleton
@@ -90,7 +90,7 @@ public:
     void Render();
     
     /// Return the view transform
-    const Matrix4x3& GetView() const { return view_; }
+    const Matrix3x4& GetView() const { return view_; }
     /// Return the projection transform
     const Matrix4& GetProjection() const { return projection_; }
     /// Return the view frustum
@@ -107,7 +107,7 @@ private:
     /// Lines rendered without depth test
     PODVector<DebugLine> noDepthLines_;
     /// View transform
-    Matrix4x3 view_;
+    Matrix3x4 view_;
     /// Projection transform
     Matrix4 projection_;
     /// View frustum

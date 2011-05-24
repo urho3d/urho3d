@@ -24,7 +24,7 @@
 #pragma once
 
 #include "BoundingBox.h"
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 #include "Plane.h"
 #include "Rect.h"
 #include "Sphere.h"
@@ -55,22 +55,22 @@ public:
     Frustum& operator = (const Frustum& rhs);
     
     /// Define with projection parameters and a transform matrix
-    void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix4x3& transform = Matrix4x3::IDENTITY);
+    void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     /// Define with near and far dimension vectors and a transform matrix
-    void Define(const Vector3& near, const Vector3& far, const Matrix4x3& transform);
+    void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform);
     /// Define with orthographic projection parameters and a transform matrix
-    void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix4x3& transform = Matrix4x3::IDENTITY);
+    void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
     /// Transform by a 3x3 matrix
     void Transform(const Matrix3& transform);
     /// Transform by a 4x3 matrix
-    void Transform(const Matrix4x3& transform);
+    void Transform(const Matrix3x4& transform);
     
     /// Test if a point is inside or outside
     Intersection IsInside(const Vector3& point) const
     {
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            if (planes_[i].GetDistance(point) < 0.0)
+            if (planes_[i].Distance(point) < 0.0)
                 return OUTSIDE;
         }
         
@@ -85,7 +85,7 @@ public:
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].GetDistance(sphere.center_);
+            float dist = planes_[i].Distance(sphere.center_);
             
             if (dist < -radius)
                 return OUTSIDE;
@@ -103,7 +103,7 @@ public:
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].GetDistance(sphere.center_);
+            float dist = planes_[i].Distance(sphere.center_);
             
             if (dist < -radius)
                 return OUTSIDE;
@@ -115,14 +115,14 @@ public:
     /// Test if a bounding box is inside, outside or intersects
     Intersection IsInside(const BoundingBox& box) const
     {
-        Vector3 center = box.GetCenter();
+        Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
         bool allInside = true;
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].GetDistance(center);
-            float absDist = planes_[i].GetAbsDistanceFast(edge);
+            float dist = planes_[i].Distance(center);
+            float absDist = planes_[i].AbsDistanceFast(edge);
             
             if (dist < -absDist)
                 return OUTSIDE;
@@ -136,13 +136,13 @@ public:
     /// Test if a bounding box is (partially) inside or outside
     Intersection IsInsideFast(const BoundingBox& box) const
     {
-        Vector3 center = box.GetCenter();
+        Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].GetDistance(center);
-            float absDist = planes_[i].GetAbsDistanceFast(edge);
+            float dist = planes_[i].Distance(center);
+            float absDist = planes_[i].AbsDistanceFast(edge);
             
             if (dist < -absDist)
                 return OUTSIDE;
@@ -154,7 +154,7 @@ public:
     /// Test if a bounding box is inside, outside or intersects. Use (and update) a plane bitmask to speed up testing a box hierarchy
     Intersection IsInsideMasked(const BoundingBox& box, unsigned& mask) const
     {
-        Vector3 center = box.GetCenter();
+        Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
         bool allInside = true;
         
@@ -163,8 +163,8 @@ public:
             unsigned bit = 1 << i;
             if (!(mask & bit))
             {
-                float dist = planes_[i].GetDistance(center);
-                float absDist = planes_[i].GetAbsDistanceFast(edge);
+                float dist = planes_[i].Distance(center);
+                float absDist = planes_[i].AbsDistanceFast(edge);
                 
                 if (dist < -absDist)
                     return OUTSIDE;
@@ -181,7 +181,7 @@ public:
     /// Test if a bounding box is (partially) inside or outside. Use a bitmask to skip unnecessary planes
     Intersection IsInsideFastMasked(const BoundingBox& box, unsigned mask) const
     {
-        Vector3 center = box.GetCenter();
+        Vector3 center = box.Center();
         Vector3 edge = center - box.min_;
         
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
@@ -189,8 +189,8 @@ public:
             unsigned bit = 1 << i;
             if (!(mask & bit))
             {
-                float dist = planes_[i].GetDistance(center);
-                float absDist = planes_[i].GetAbsDistanceFast(edge);
+                float dist = planes_[i].Distance(center);
+                float absDist = planes_[i].AbsDistanceFast(edge);
                 
                 if (dist < -absDist)
                     return OUTSIDE;
@@ -200,18 +200,12 @@ public:
         return INSIDE;
     }
     
-    /// Return all planes
-    const Plane* GetPlanes() const { return &planes_[0]; }
-    /// Return all vertices
-    const Vector3* GetVertices() const { return &vertices_[0]; }
-    /// Return a plane
-    const Plane& GetPlane(FrustumPlane plane) const { return planes_[plane]; }
     /// Return transformed by a 3x3 matrix
-    Frustum GetTransformed(const Matrix3& transform) const;
+    Frustum Transformed(const Matrix3& transform) const;
     /// Return transformed by a 4x3 matrix
-    Frustum GetTransformed(const Matrix4x3& transform) const;
+    Frustum Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix
-    Rect GetProjected(const Matrix4& transform) const;
+    Rect Projected(const Matrix4& transform) const;
     
     /// Update the planes. Called internally
     void UpdatePlanes();

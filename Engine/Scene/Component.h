@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 #include "Node.h"
 
 /// Base class for components. Components can be added to scene nodes
@@ -55,12 +55,12 @@ public:
     Node* GetNode() const { return node_; }
     
     /// Return parent node's world transform
-    const Matrix4x3& GetWorldTransform() const
+    const Matrix3x4& GetWorldTransform() const
     {
         if (node_)
             return node_->GetWorldTransform();
         else
-            return Matrix4x3::IDENTITY;
+            return Matrix3x4::IDENTITY;
     }
     
     /// Return parent node's world position

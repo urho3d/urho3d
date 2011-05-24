@@ -55,7 +55,7 @@ bool Skeleton::Load(Deserializer& source)
         newBone.initialPosition_ = source.ReadVector3();
         newBone.initialRotation_ = source.ReadQuaternion();
         newBone.initialScale_ = source.ReadVector3();
-        source.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix4x3));
+        source.Read(&newBone.offsetMatrix_.m00_, sizeof(Matrix3x4));
         
         // Read bone collision data
         newBone.collisionMask_ = source.ReadUByte();
@@ -86,7 +86,7 @@ bool Skeleton::Save(Serializer& dest)
         dest.WriteVector3(bone.initialPosition_);
         dest.WriteQuaternion(bone.initialRotation_);
         dest.WriteVector3(bone.initialScale_);
-        dest.Write(bone.offsetMatrix_.GetData(), sizeof(Matrix4x3));
+        dest.Write(bone.offsetMatrix_.GetData(), sizeof(Matrix3x4));
         
         // Collision info
         dest.WriteUByte(bone.collisionMask_);

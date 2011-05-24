@@ -119,12 +119,12 @@ void Zone::SetPriority(int priority)
 bool Zone::IsInside(const Vector3& point)
 {
     // Use an oriented bounding box test
-    Matrix4x3 inverse(GetWorldTransform().GetInverse());
+    Matrix3x4 inverse(GetWorldTransform().Inverse());
     Vector3 localPoint(inverse * point);
     return boundingBox_.IsInside(localPoint) != OUTSIDE;
 }
 
 void Zone::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_ = boundingBox_.GetTransformed(GetWorldTransform());
+    worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
 }

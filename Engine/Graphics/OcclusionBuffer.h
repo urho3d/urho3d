@@ -72,14 +72,14 @@ public:
     /// Clear buffer
     void Clear();
     /// Draw triangle mesh to buffer
-    bool Draw(const Matrix4x3& model, const unsigned char* vertexData, unsigned vertexSize, const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
+    bool Draw(const Matrix3x4& model, const unsigned char* vertexData, unsigned vertexSize, const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
     /// Build reduced size mip levels
     void BuildDepthHierarchy();
     
     /// Return highest level depth values
     int* GetBuffer() const { return buffer_; }
     /// Return view transform matrix
-    const Matrix4x3& GetView() const { return view_; }
+    const Matrix3x4& GetView() const { return view_; }
     /// Return projection matrix
     const Matrix4& GetProjection() const { return projection_; }
     /// Return buffer width
@@ -128,7 +128,7 @@ private:
     /// Depth hierarchy needs update flag
     bool depthHierarchyDirty_;
     /// View transform matrix
-    Matrix4x3 view_;
+    Matrix3x4 view_;
     /// Projection matrix
     Matrix4 projection_;
     /// Combined view and projection matrix

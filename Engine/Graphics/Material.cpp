@@ -27,7 +27,7 @@
 #include "Graphics.h"
 #include "Log.h"
 #include "Material.h"
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
@@ -295,13 +295,13 @@ void Material::SetTexture(TextureUnit unit, Texture* texture)
 
 void Material::SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat)
 {
-    Matrix4x3 transform(Matrix4x3::IDENTITY);
+    Matrix3x4 transform(Matrix3x4::IDENTITY);
     transform.m00_ = repeat.x_;
     transform.m11_ = repeat.y_;
     transform.m03_ = -0.5f * transform.m00_ + 0.5f;
     transform.m13_ = -0.5f * transform.m11_ + 0.5f;
     
-    Matrix4x3 rotationMatrix(Matrix4x3::IDENTITY);
+    Matrix3x4 rotationMatrix(Matrix3x4::IDENTITY);
     float angleRad = rotation * M_DEGTORAD;
     rotationMatrix.m00_ = cosf(angleRad);
     rotationMatrix.m01_ = sinf(angleRad);
@@ -312,7 +312,7 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     
     transform = rotationMatrix * transform;
     
-    Matrix4x3 offsetMatrix = Matrix4x3::IDENTITY;
+    Matrix3x4 offsetMatrix = Matrix3x4::IDENTITY;
     offsetMatrix.m03_ = offset.x_;
     offsetMatrix.m13_ = offset.y_;
     

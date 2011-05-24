@@ -141,7 +141,7 @@ public:
     /// Normalize to unit length and return the previous length
     float Normalize()
     {
-        float len = GetLength();
+        float len = Length();
         if (len < M_EPSILON)
             return len;
         
@@ -161,11 +161,11 @@ public:
     }
     
     /// Return length
-    float GetLength() const { return sqrtf(x_ * x_ + y_ * y_); }
+    float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
     /// Return length using fast square root
-    float GetLengthFast() const { return FastSqrt(x_ * x_ + y_ * y_); }
+    float LengthFast() const { return FastSqrt(x_ * x_ + y_ * y_); }
     /// Return squared length
-    float GetLengthSquared() const { return x_ * x_ + y_ * y_; }
+    float LengthSquared() const { return x_ * x_ + y_ * y_; }
     /// Calculate dot product
     float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
     /// Calculate absolute dot product
@@ -174,9 +174,9 @@ public:
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     
     /// Return normalized to unit length
-    Vector2 GetNormalized() const
+    Vector2 Normalized() const
     {
-        float len = GetLength();
+        float len = Length();
         if (len < M_EPSILON)
             return *this;
         
@@ -186,7 +186,7 @@ public:
     }
     
     /// Return normalized to unit length using fast inverse square root
-    Vector2 GetNormalizedFast() const
+    Vector2 NormalizedFast() const
     {
         float invLen = FastInvSqrt(x_ * x_ + y_ * y_);
         

@@ -98,7 +98,7 @@ public:
         }
         
         Vector3 offset = point - center_;
-        float dist = offset.GetLength();
+        float dist = offset.Length();
         if (dist > radius_)
         {
             float half = (dist - radius_) * 0.5f;
@@ -119,7 +119,7 @@ public:
     /// Test if a point is inside
     Intersection IsInside(const Vector3& point) const
     {
-        float distSquared = (point - center_).GetLengthSquared();
+        float distSquared = (point - center_).LengthSquared();
         
         if (distSquared < radius_ * radius_)
             return INSIDE;
@@ -130,7 +130,7 @@ public:
     /// Test if another sphere is inside, outside or intersects
     Intersection IsInside(const Sphere& sphere) const
     {
-        float dist = (sphere.center_ - center_).GetLength();
+        float dist = (sphere.center_ - center_).Length();
         
         if (dist >= sphere.radius_ + radius_)
             return OUTSIDE;
@@ -142,7 +142,7 @@ public:
     /// Test if another sphere is (partially) inside or outside
     Intersection IsInsideFast(const Sphere& sphere) const
     {
-        float distSquared = (sphere.center_ - center_).GetLengthSquared();
+        float distSquared = (sphere.center_ - center_).LengthSquared();
         float combined = sphere.radius_ + radius_;
         
         if (distSquared >= combined * combined)
@@ -156,7 +156,7 @@ public:
     /// Test if a bounding box is (partially) inside or outside
     Intersection IsInsideFast(const BoundingBox& box) const;
     /// Return distance to a ray, or infinity if no intersection
-    float GetDistance(const Ray& ray) const;
+    float Distance(const Ray& ray) const;
     
     /// Sphere center
     Vector3 center_;

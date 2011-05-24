@@ -1048,7 +1048,7 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector4& ve
     impl_->device_->SetVertexShaderConstantF(index, vector.GetData(), 1);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix4x3& matrix)
+void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
@@ -1175,7 +1175,7 @@ void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector4& vec
     impl_->device_->SetPixelShaderConstantF(index, vector.GetData(), 1);
 }
 
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix4x3& matrix)
+void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)

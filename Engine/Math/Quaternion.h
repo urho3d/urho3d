@@ -157,7 +157,7 @@ public:
     }
     
     /// Return normalized to unit length
-    Quaternion GetNormalized() const
+    Quaternion Normalized() const
     {
         float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
         if (len < M_EPSILON)
@@ -169,7 +169,7 @@ public:
     }
     
     /// Return normalized to unit length, using fast inverse square root
-    Quaternion GetNormalizedFast() const
+    Quaternion NormalizedFast() const
     {
         float invLen = FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
         
@@ -177,7 +177,7 @@ public:
     }
     
     /// Return inverse
-    Quaternion GetInverse() const
+    Quaternion Inverse() const
     {
         float lenSquared = w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_;
         if (lenSquared < M_EPSILON)
@@ -194,24 +194,24 @@ public:
     }
     
     /// Return squared length
-    float GetLengthSquared() const { return w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_; }
+    float LengthSquared() const { return w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_; }
     /// Calculate dot product
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
     /// Normalized interpolation with another quaternion
-    Quaternion Nlerp(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).GetNormalized(); }
+    Quaternion Nlerp(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).Normalized(); }
     /// Normalized interpolation with another quaternion, using fast inverse square root
-    Quaternion NlerpFast(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).GetNormalizedFast(); }
+    Quaternion NlerpFast(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).NormalizedFast(); }
     
     /// Return Euler angles in degrees
-    Vector3 GetEulerAngles() const;
+    Vector3 ToEuler() const;
     /// Return yaw angle in degrees
-    float GetYaw() const;
+    float YawAngle() const;
     /// Return pitch angle in degrees
-    float GetPitch() const;
+    float PitchAngle() const;
     /// Return roll angle in degrees
-    float GetRoll() const;
+    float RollAngle() const;
     /// Convert to rotation matrix
-    Matrix3 GetRotationMatrix() const;
+    Matrix3 ToRotationMatrix() const;
     /// Spherical interpolation with another quaternion
     Quaternion Slerp(Quaternion rhs, float t) const;
     /// Return float data

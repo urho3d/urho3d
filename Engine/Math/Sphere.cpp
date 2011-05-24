@@ -51,7 +51,7 @@ void Sphere::Define(const BoundingBox& box)
 
 void Sphere::Define(const Frustum& frustum)
 {
-    Define(frustum.GetVertices(), NUM_FRUSTUM_VERTICES);
+    Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
 void Sphere::Merge(const Vector3* vertices, unsigned count)
@@ -80,7 +80,7 @@ void Sphere::Merge(const BoundingBox& box)
 
 void Sphere::Merge(const Frustum& frustum)
 {
-    const Vector3* vertices = frustum.GetVertices();
+    const Vector3* vertices = frustum.vertices_;
     Merge(vertices, NUM_FRUSTUM_VERTICES);
 }
 
@@ -95,7 +95,7 @@ void Sphere::Merge(const Sphere& sphere)
     }
     
     Vector3 offset = sphere.center_ - center_;
-    float dist = offset.GetLength();
+    float dist = offset.Length();
     
     // If sphere fits inside, do nothing
     if (dist + sphere.radius_ < radius_)
@@ -114,7 +114,7 @@ void Sphere::Merge(const Sphere& sphere)
         Vector3 min = center_ - radius_ * NormalizedOffset;
         Vector3 max = sphere.center_ + sphere.radius_ * NormalizedOffset;
         center_ = (min + max) * 0.5f;
-        radius_ = (max - center_).GetLength();
+        radius_ = (max - center_).Length();
     }
 }
 
@@ -165,28 +165,28 @@ Intersection Sphere::IsInside(const BoundingBox& box) const
     max -= center_;
     
     Vector3 tempVec = min; // - - -
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.x_ = max.x_; // + - -
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.y_ = max.y_; // + + -
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.x_ = min.x_; // - + -
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.z_ = max.z_; // - + +
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.y_ = min.y_; // - - +
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.x_ = max.x_; // + - +
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     tempVec.y_ = max.y_; // + + +
-    if (tempVec.GetLengthSquared() >= radiusSquared)
+    if (tempVec.LengthSquared() >= radiusSquared)
         return INTERSECTS;
     
     return INSIDE;
@@ -238,13 +238,13 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
         return INSIDE;
 }
 
-float Sphere::GetDistance(const Ray& ray) const
+float Sphere::Distance(const Ray& ray) const
 {
     Vector3 centeredOrigin = ray.origin_ - center_;
     float squaredRadius = radius_ * radius_;
     
     // Check if ray originates inside the sphere
-    if (centeredOrigin.GetLengthSquared() <= squaredRadius)
+    if (centeredOrigin.LengthSquared() <= squaredRadius)
         return 0.0f;
     
     // Calculate intersection by quadratic equation

@@ -125,9 +125,9 @@ public:
     float GetLodDistance(float distance, float scale, float bias) const;
     
     /// Return inverse world transform
-    Matrix4x3 GetInverseWorldTransform() const
+    Matrix3x4 InverseWorldTransform() const
     {
-        return GetWorldTransform().GetInverse();
+        return GetWorldTransform().Inverse();
     }
 
 private:

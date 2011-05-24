@@ -255,9 +255,9 @@ public:
     /// Return volume safety extent of spot or point light
     float GetVolumeExtent() const;
     /// Return directional light quad transform for either near or far split
-    Matrix4x3 GetDirLightTransform(Camera& camera, bool getNearQuad = false);
+    Matrix3x4 GetDirLightTransform(Camera& camera, bool getNearQuad = false);
     /// Return light volume model transform. For directional lights, the view transform must be overridden
-    const Matrix4x3& GetVolumeTransform(Camera& camera);
+    const Matrix3x4& GetVolumeTransform(Camera& camera);
     
 protected:
     /// Update world-space bounding box
@@ -287,7 +287,7 @@ private:
     /// Shadow map focus parameters
     FocusParameters shadowFocus_;
     /// Custom world transform for the light volume
-    Matrix4x3 volumeTransform_;
+    Matrix3x4 volumeTransform_;
     /// Shadow intensity
     float shadowIntensity_;
     /// Shadow resolution

@@ -968,7 +968,7 @@ void Server::GetRelevantNodes(Connection* connection, Set<unsigned>& dest) const
             float maxDistance = 100.0f; /// \todo Add max. update distance to Node
             if (maxDistance > 0.0f)
             {
-                if ((node->GetWorldPosition() - clientPos).GetLengthSquared() > maxDistance * maxDistance)
+                if ((node->GetWorldPosition() - clientPos).LengthSquared() > maxDistance * maxDistance)
                     continue;
             }
         }

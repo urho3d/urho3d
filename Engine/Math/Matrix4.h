@@ -322,7 +322,7 @@ public:
     }
     
     /// Return the combined rotation and scaling matrix
-    Matrix3 GetRotationScaleMatrix() const
+    Matrix3 ToMatrix3() const
     {
         return Matrix3(
             m00_,
@@ -338,7 +338,7 @@ public:
     }
     
     /// Return the rotation matrix with scaling removed
-    Matrix3 GetRotationMatrix() const
+    Matrix3 ToRotationMatrix() const
     {
         Vector3 invScale(
             1.0f / sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_),
@@ -346,7 +346,7 @@ public:
             1.0f / sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_)
         );
         
-        return GetRotationScaleMatrix().GetScaled(invScale);
+        return ToMatrix3().Scaled(invScale);
     }
     
     /// Return the translation part
@@ -362,7 +362,7 @@ public:
     /// Return the rotation part
     Quaternion GetRotation() const
     {
-        return Quaternion(GetRotationMatrix());
+        return Quaternion(ToRotationMatrix());
     }
     
     /// Return the scaling part
@@ -376,7 +376,7 @@ public:
     }
     
     /// Return transpose
-    Matrix4 GetTranspose() const
+    Matrix4 Transpose() const
     {
         return Matrix4(
             m00_,
@@ -402,7 +402,7 @@ public:
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     
     /// Return inverse
-    Matrix4 GetInverse() const;
+    Matrix4 Inverse() const;
     
     /// Return float data
     const float* GetData() const { return &m00_; }

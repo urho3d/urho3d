@@ -30,7 +30,7 @@ const Quaternion Quaternion::IDENTITY;
 
 Quaternion::Quaternion(float angle, const Vector3& axis)
 {
-    Vector3 normAxis = axis.GetNormalized();
+    Vector3 normAxis = axis.Normalized();
     float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
     float cosAngle = cosf((angle * M_DEGTORAD) * 0.5f);
     
@@ -58,8 +58,8 @@ Quaternion::Quaternion(float x, float y, float z)
 
 Quaternion::Quaternion(const Vector3& start, const Vector3& end)
 {
-    Vector3 normStart = start.GetNormalized();
-    Vector3 normEnd = end.GetNormalized();
+    Vector3 normStart = start.Normalized();
+    Vector3 normEnd = end.Normalized();
     
     float d = normStart.DotProduct(normEnd);
     
@@ -77,11 +77,11 @@ Quaternion::Quaternion(const Vector3& start, const Vector3& end)
     else
     {
         Vector3 axis = Vector3::RIGHT.CrossProduct(normStart);
-        if (axis.GetLength() < M_EPSILON)
+        if (axis.Length() < M_EPSILON)
             axis = Vector3::UP.CrossProduct(normStart);
         float angle = 180.0f;
         
-        Vector3 normAxis = axis.GetNormalized();
+        Vector3 normAxis = axis.Normalized();
         float sinAngle = sinf((angle * M_DEGTORAD) * 0.5f);
         float cosAngle = cosf((angle * M_DEGTORAD) * 0.5f);
         
@@ -141,7 +141,7 @@ Quaternion::Quaternion(const Matrix3& matrix)
     }
 }
 
-Vector3 Quaternion::GetEulerAngles() const
+Vector3 Quaternion::ToEuler() const
 {
     // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
     // Order of rotations: Z first, then X, then Y
@@ -173,22 +173,22 @@ Vector3 Quaternion::GetEulerAngles() const
     }
 }
 
-float Quaternion::GetYaw() const
+float Quaternion::YawAngle() const
 {
-    return GetEulerAngles().y_;
+    return ToEuler().y_;
 }
 
-float Quaternion::GetPitch() const
+float Quaternion::PitchAngle() const
 {
-    return GetEulerAngles().x_;
+    return ToEuler().x_;
 }
 
-float Quaternion::GetRoll() const
+float Quaternion::RollAngle() const
 {
-    return GetEulerAngles().z_;
+    return ToEuler().z_;
 }
 
-Matrix3 Quaternion::GetRotationMatrix() const
+Matrix3 Quaternion::ToRotationMatrix() const
 {
     return Matrix3(
         1.0f - 2.0f * y_ * y_ - 2.0f * z_ * z_,

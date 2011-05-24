@@ -61,7 +61,7 @@ struct Bone
     /// Reset scale
     Vector3 initialScale_;
     /// Offset matrix
-    Matrix4x3 offsetMatrix_;
+    Matrix3x4 offsetMatrix_;
     /// Animation enable flag
     bool animated_;
     /// Supported collision types

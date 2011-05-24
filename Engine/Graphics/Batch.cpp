@@ -130,7 +130,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         graphics->SetVertexShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
     
     if (vertexShader_->NeedParameterUpdate(VSP_CAMERAROT, camera_))
-        graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().GetRotationMatrix());
+        graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().ToRotationMatrix());
     
     if (vertexShader_->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
     {
@@ -150,7 +150,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     if ((shadowMap) && (vertexShader_->NeedParameterUpdate(VSP_SHADOWPROJ, light_)))
     {
         Camera* shadowCamera = light_->GetShadowCamera();
-        Matrix4x3 shadowView(shadowCamera->GetInverseWorldTransform());
+        Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
         Matrix4 shadowProj(shadowCamera->GetProjection());
         
         Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -163,8 +163,8 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     
     if ((light_) && (vertexShader_->NeedParameterUpdate(VSP_SPOTPROJ, light_)))
     {
-        const Matrix4x3& transform = light_->GetWorldTransform();
-        Matrix4x3 spotView(transform.GetTranslation(), transform.GetRotation(), 1.0f);
+        const Matrix3x4& transform = light_->GetWorldTransform();
+        Matrix3x4 spotView(transform.GetTranslation(), transform.GetRotation(), 1.0f);
         
         Matrix4 spotProj(Matrix4::ZERO);
         // Make the projected light slightly smaller than the shadow map to prevent light spill
@@ -179,21 +179,21 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
         texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
         
-        graphics->SetVertexShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.GetInverse());
+        graphics->SetVertexShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
     }
     
     if (overrideView_)
     {
         // If we override the view matrix, also disable any projection jittering
         /// \todo This may not be correct in all cases (skybox rendering?)
-        if (vertexShader_->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix4x3::IDENTITY))
+        if (vertexShader_->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix3x4::IDENTITY))
             graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
     }
     else
     {
         if (vertexShader_->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
             graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
-                camera_->GetInverseWorldTransform());
+                camera_->InverseWorldTransform());
     }
     
     // Set material's vertex shader parameters
@@ -263,13 +263,13 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         
         if (pixelShader_->NeedParameterUpdate(PSP_LIGHTVECROT, light_))
         {
-            Matrix4x3 light_VecRot;
+            Matrix3x4 light_VecRot;
             // Use original light if available (split lights)
             Light* original = light_->GetOriginalLight();
             if (!original)
-                light_VecRot = Matrix4x3(Vector3::ZERO, light_->GetWorldRotation(), Vector3::UNITY);
+                light_VecRot = Matrix3x4(Vector3::ZERO, light_->GetWorldRotation(), Vector3::UNITY);
             else
-                light_VecRot = Matrix4x3(Vector3::ZERO, original->GetWorldRotation(), Vector3::UNITY);
+                light_VecRot = Matrix3x4(Vector3::ZERO, original->GetWorldRotation(), Vector3::UNITY);
             
             graphics->SetPixelShaderParameter(PSP_LIGHTVECROT, light_VecRot);
         }
@@ -309,10 +309,10 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         if (pixelShader_->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
-            Matrix4x3 shadowView(shadowCamera->GetInverseWorldTransform());
+            Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
             Matrix4 shadowProj(shadowCamera->GetProjection());
             
-            Matrix4x3 viewPos(Matrix4x3::IDENTITY);
+            Matrix3x4 viewPos(Matrix3x4::IDENTITY);
             viewPos.SetTranslation(camera_->GetWorldPosition());
             
             Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -326,7 +326,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     
     if ((light_) && (pixelShader_->NeedParameterUpdate(PSP_SPOTPROJ, light_)))
     {
-        Matrix4x3 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
+        Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
         Matrix4 spotProj(Matrix4::IDENTITY);
         
         // Make the projected light slightly smaller than the shadow map to prevent light spill
@@ -337,14 +337,14 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         spotProj.m22_ = 1.0f / Max(light_->GetRange(), M_EPSILON);
         spotProj.m32_ = 1.0f;
         
-        Matrix4x3 viewPos(Matrix4x3::IDENTITY);
+        Matrix3x4 viewPos(Matrix3x4::IDENTITY);
         viewPos.SetTranslation(camera_->GetWorldPosition());
         
         Matrix4 texAdjust(Matrix4::IDENTITY);
         texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
         texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
         
-        graphics->SetPixelShaderParameter(PSP_SPOTPROJ, texAdjust * spotProj * spotView.GetInverse() * viewPos);
+        graphics->SetPixelShaderParameter(PSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse() * viewPos);
     }
 }
 
@@ -361,7 +361,7 @@ void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
         return;
     
     startIndex_ = freeIndex;
-    Matrix4x3* dest = (Matrix4x3*)lockedData;
+    Matrix3x4* dest = (Matrix3x4*)lockedData;
     dest += freeIndex;
     
     for (unsigned i = 0; i < instances_.Size(); ++i)
@@ -437,7 +437,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
                 void* data = buffer->Lock(0, instances, LOCK_DISCARD);
                 if (!data)
                     return;
-                Matrix4x3* dest = (Matrix4x3*)data;
+                Matrix3x4* dest = (Matrix3x4*)data;
                 for (unsigned i = 0; i < instances; ++i)
                     dest[i] = *instances_[i + startIndex].worldTransform_;
                 buffer->Unlock();

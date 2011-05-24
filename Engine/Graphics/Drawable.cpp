@@ -94,7 +94,7 @@ void Drawable::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
-    float scale = GetWorldBoundingBox().GetSize().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     if (newLodDistance != lodDistance_)

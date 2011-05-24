@@ -125,9 +125,9 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
         
     case RAY_OBB:
         {
-            Matrix4x3 inverse(GetWorldTransform().GetInverse());
+            Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = boundingBox_.GetDistance(localRay);
+            float distance = boundingBox_.Distance(localRay);
             if (distance < query.maxDistance_)
             {
                 RayQueryResult result;
@@ -142,9 +142,9 @@ void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
     case RAY_TRIANGLE:
         {
             // Do a pretest using the OBB
-            Matrix4x3 inverse(GetWorldTransform().GetInverse());
+            Matrix3x4 inverse(GetWorldTransform().Inverse());
             Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-            float distance = boundingBox_.GetDistance(localRay);
+            float distance = boundingBox_.Distance(localRay);
             if (distance < query.maxDistance_)
             {
                 // Then the actual test using triangle geometry
@@ -317,7 +317,7 @@ void StaticModel::SetNumGeometries(unsigned num)
 
 void StaticModel::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_ = boundingBox_.GetTransformed(GetWorldTransform());
+    worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
 }
 
 void StaticModel::ResetLodLevels()

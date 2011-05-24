@@ -58,7 +58,7 @@ void RegisterSoundSources(asIScriptEngine* engine)
     engine->RegisterObjectMethod("SoundSource3D", "void set_farDistance(float)", asMETHOD(SoundSource3D, SetFarDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "float get_farDistance() const", asMETHOD(SoundSource3D, GetFarDistance), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void set_rolloffFactor(float)", asMETHOD(SoundSource3D, SetRolloffFactor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("SoundSource3D", "float get_rolloffFactor() const", asMETHOD(SoundSource3D, GetRolloffFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SoundSource3D", "float get_rolloffFactor() const", asMETHOD(SoundSource3D, RollAngleoffFactor), asCALL_THISCALL);
 }
 
 static Audio* GetAudio()

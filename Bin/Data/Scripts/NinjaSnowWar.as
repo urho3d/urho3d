@@ -454,7 +454,7 @@ void UpdateCamera()
     Vector3 maxDist = aimPoint + dir * Vector3(0, 0, -cameraMaxDist);
 
     // Collide camera ray with static objects (collision mask 2)
-    Vector3 rayDir = (maxDist - minDist).GetNormalized();
+    Vector3 rayDir = (maxDist - minDist).Normalized();
     float rayDistance = cameraMaxDist - cameraMinDist + cameraSafetyDist;
     Array<PhysicsRaycastResult>@ result = gameScene.physicsWorld.Raycast(Ray(minDist, rayDir), rayDistance, 2);
     if (result.length > 0)

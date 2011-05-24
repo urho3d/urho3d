@@ -59,7 +59,7 @@ void DebugRenderer::SetView(Camera* camera)
     if (!camera)
         return;
     
-    view_ = camera->GetInverseWorldTransform();
+    view_ = camera->InverseWorldTransform();
     projection_ = camera->GetProjection(false);
     frustum_ = camera->GetFrustum();
 }
@@ -104,7 +104,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     dest->Push(DebugLine(v2, v5, d3dColor));
 }
 
-void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix4x3& transform, const Color& color, bool depthTest)
+void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
@@ -140,7 +140,7 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix4x3& tran
 
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
-    const Vector3* vertices = frustum.GetVertices();
+    const Vector3* vertices = frustum.vertices_;
     unsigned d3dColor = color.ToUInt();
     
     PODVector<DebugLine>* dest = &lines_;
@@ -213,7 +213,7 @@ void DebugRenderer::Render()
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(renderer->GetVertexShader("Basic_VCol"), renderer->GetPixelShader("Basic_VCol"));
-    graphics->SetVertexShaderParameter(VSP_MODEL, Matrix4x3::IDENTITY);
+    graphics->SetVertexShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetVertexShaderParameter(VSP_VIEWPROJ, projection_ * view_);
     graphics->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     

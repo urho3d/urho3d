@@ -136,7 +136,7 @@ void GetMeshesUnderNode(Vector<Pair<aiNode*, aiMesh*> >& meshes, aiNode* node);
 unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
-Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName);
+Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
@@ -144,7 +144,7 @@ String GetMeshMaterialName(aiMesh* mesh);
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
+    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights);
 unsigned GetElementMask(aiMesh* mesh);
 
@@ -596,7 +596,7 @@ void BuildBoneCollisionInfo(OutModel& model)
                 {
                     aiVector3D vertexBoneSpace = bone->mOffsetMatrix * mesh->mVertices[bone->mWeights[k].mVertexId];
                     Vector3 vertex = ToVector3(vertexBoneSpace);
-                    float radius = vertex.GetLength();
+                    float radius = vertex.Length();
                     if (radius > model.boneRadii_[boneIndex])
                         model.boneRadii_[boneIndex] = radius;
                     model.boneHitboxes_[boneIndex].Merge(vertex);
@@ -651,13 +651,13 @@ void BuildAndSaveModel(OutModel& model)
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             // Get the world transform of the mesh for baking into the vertices
-            Matrix4x3 vertexTransform;
+            Matrix3x4 vertexTransform;
             Matrix3 normalTransform;
             Vector3 pos, scale;
             Quaternion rot;
             GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
-            vertexTransform = Matrix4x3(pos, rot, scale);
-            normalTransform = rot.GetRotationMatrix();
+            vertexTransform = Matrix3x4(pos, rot, scale);
+            normalTransform = rot.ToRotationMatrix();
             
             SharedPtr<IndexBuffer> ib(new IndexBuffer(context_));
             SharedPtr<VertexBuffer> vb(new VertexBuffer(context_));
@@ -734,13 +734,13 @@ void BuildAndSaveModel(OutModel& model)
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
         {
             // Get the world transform of the mesh for baking into the vertices
-            Matrix4x3 vertexTransform;
+            Matrix3x4 vertexTransform;
             Matrix3 normalTransform;
             Vector3 pos, scale;
             Quaternion rot;
             GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
-            vertexTransform = Matrix4x3(pos, rot, scale);
-            normalTransform = rot.GetRotationMatrix();
+            vertexTransform = Matrix3x4(pos, rot, scale);
+            normalTransform = rot.ToRotationMatrix();
             
             SharedPtr<Geometry> geom(new Geometry(context_));
             
@@ -1376,7 +1376,7 @@ aiBone* GetMeshBone(OutModel& model, const String& boneName)
     return 0;
 }
 
-Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
+Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
 {
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
@@ -1391,13 +1391,13 @@ Matrix4x3 GetOffsetMatrix(OutModel& model, const String& boneName)
                 aiMatrix4x4 nodeDerivedInverse = GetMeshBakingTransform(node, model.rootNode_);
                 nodeDerivedInverse.Inverse();
                 offset *= nodeDerivedInverse;
-                Matrix4x3 ret;
-                memcpy(&ret.m00_, &offset.a1, sizeof(Matrix4x3));
+                Matrix3x4 ret;
+                memcpy(&ret.m00_, &offset.a1, sizeof(Matrix3x4));
                 return ret;
             }
         }
     }
-    return Matrix4x3::IDENTITY;
+    return Matrix3x4::IDENTITY;
 }
 
 void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
@@ -1479,7 +1479,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 }
 
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
-    const Matrix4x3& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
+    const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights)
 {
     Vector3 vertex = vertexTransform * ToVector3(mesh->mVertices[index]);

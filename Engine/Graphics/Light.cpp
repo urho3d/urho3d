@@ -327,8 +327,8 @@ void Light::copyFrom(Light* original)
 
 Frustum Light::GetFrustum() const
 {
-    const Matrix4x3& transform = GetWorldTransform();
-    Matrix4x3 frustumTransform(transform.GetTranslation(), transform.GetRotation(), 1.0f);
+    const Matrix3x4& transform = GetWorldTransform();
+    Matrix3x4 frustumTransform(transform.GetTranslation(), transform.GetRotation(), 1.0f);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, transform);
     return ret;
@@ -360,7 +360,7 @@ float Light::GetVolumeExtent() const
     }
 }
 
-Matrix4x3 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
+Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
 {
     Vector3 nearVector, farVector;
     camera.GetFrustumSize(nearVector, farVector);
@@ -378,12 +378,12 @@ Matrix4x3 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
     else
         farVector.z_ *= (distance / farClip);
     
-    return  Matrix4x3(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
+    return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
 }
 
-const Matrix4x3& Light::GetVolumeTransform(Camera& camera)
+const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
 {
-    const Matrix4x3& transform = GetWorldTransform();
+    const Matrix3x4& transform = GetWorldTransform();
     
     switch (lightType_)
     {
@@ -392,19 +392,19 @@ const Matrix4x3& Light::GetVolumeTransform(Camera& camera)
         break;
         
     case LIGHT_POINT:
-        volumeTransform_ = Matrix4x3(transform.GetTranslation(), Quaternion::IDENTITY, range_);
+        volumeTransform_ = Matrix3x4(transform.GetTranslation(), Quaternion::IDENTITY, range_);
         break;
         
     case LIGHT_SPOT:
         {
             float yScale = tan(fov_ * M_DEGTORAD * 0.5f) * range_;
             float xScale = aspectRatio_ * yScale;
-            volumeTransform_ = Matrix4x3(transform.GetTranslation(), transform.GetRotation(), Vector3(xScale, yScale, range_));
+            volumeTransform_ = Matrix3x4(transform.GetTranslation(), transform.GetRotation(), Vector3(xScale, yScale, range_));
         }
         break;
         
     case LIGHT_SPLITPOINT:
-        volumeTransform_ = Matrix4x3(transform.GetTranslation(), transform.GetRotation(), range_);
+        volumeTransform_ = Matrix3x4(transform.GetTranslation(), transform.GetRotation(), range_);
         break;
     }
     
@@ -473,5 +473,5 @@ void Light::SetIntensitySortValue(const Vector3& position)
     if (lightType_ == LIGHT_DIRECTIONAL)
         sortValue_ = invIntensity;
     else
-        sortValue_ = invIntensity * (1.0f + (GetWorldPosition() - position).GetLengthFast() / range_);
+        sortValue_ = invIntensity * (1.0f + (GetWorldPosition() - position).LengthFast() / range_);
 }

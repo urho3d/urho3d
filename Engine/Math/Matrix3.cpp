@@ -34,7 +34,7 @@ const Matrix3 Matrix3::IDENTITY(
     0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 1.0f);
 
-Matrix3 Matrix3::GetInverse() const
+Matrix3 Matrix3::Inverse() const
 {
     float det = m00_ * m11_ * m22_ +
         m10_ * m21_ * m02_ +

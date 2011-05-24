@@ -50,7 +50,7 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     root_(root),
     numDrawables_(0)
 {
-    Vector3 halfSize = worldBoundingBox_.GetSize() * 0.5f;
+    Vector3 halfSize = worldBoundingBox_.Size() * 0.5f;
     cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize, worldBoundingBox_.max_ + halfSize);
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
@@ -69,7 +69,7 @@ Octant* Octant::GetOrCreateChild(unsigned index)
     
     Vector3 newMin = worldBoundingBox_.min_;
     Vector3 newMax = worldBoundingBox_.max_;
-    Vector3 oldCenter = worldBoundingBox_.GetCenter();
+    Vector3 oldCenter = worldBoundingBox_.Center();
     
     if (index & 1)
         newMin.x_ = oldCenter.x_;
@@ -125,8 +125,8 @@ void Octant::InsertDrawable(Drawable* drawable)
         return;
     }
     
-    Vector3 octantCenter = worldBoundingBox_.GetCenter();
-    Vector3 drawableCenter = drawable->GetWorldBoundingBox().GetCenter();
+    Vector3 octantCenter = worldBoundingBox_.Center();
+    Vector3 drawableCenter = drawable->GetWorldBoundingBox().Center();
     unsigned x = drawableCenter.x_ < octantCenter.x_ ? 0 : 1;
     unsigned y = drawableCenter.y_ < octantCenter.y_ ? 0 : 2;
     unsigned z = drawableCenter.z_ < octantCenter.z_ ? 0 : 4;
@@ -139,8 +139,8 @@ bool Octant::CheckDrawableSize(Drawable* drawable) const
     if (level_ == root_->GetNumLevels())
         return true;
     
-    Vector3 octantHalfSize = worldBoundingBox_.GetSize() * 0.5;
-    Vector3 drawableSize = drawable->GetWorldBoundingBox().GetSize();
+    Vector3 octantHalfSize = worldBoundingBox_.Size() * 0.5;
+    Vector3 drawableSize = drawable->GetWorldBoundingBox().Size();
     
     return (drawableSize.x_ >= octantHalfSize.x_) || (drawableSize.y_ >= octantHalfSize.y_) || (drawableSize.z_ >=
         octantHalfSize.z_);
@@ -213,7 +213,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
     if (!numDrawables_)
         return;
     
-    float octantDist = cullingBox_.GetDistance(query.ray_);
+    float octantDist = cullingBox_.Distance(query.ray_);
     if (octantDist >= query.maxDistance_)
         return;
     
@@ -229,7 +229,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         if ((query.shadowCastersOnly_) && (!drawable->GetCastShadows()))
             continue;
         
-        float drawableDist = drawable->GetWorldBoundingBox().GetDistance(query.ray_);
+        float drawableDist = drawable->GetWorldBoundingBox().Distance(query.ray_);
         // The drawable will possibly do more accurate collision testing, then store the result(s)
         if (drawableDist < query.maxDistance_)
             drawable->ProcessRayQuery(query, drawableDist);
@@ -316,7 +316,7 @@ void Octree::Resize(const BoundingBox& box, unsigned numLevels)
     // If drawables exist, they are temporarily moved to the root
     Release();
     
-    Vector3 halfSize = box.GetSize() * 0.5f;
+    Vector3 halfSize = box.Size() * 0.5f;
     
     worldBoundingBox_ = box;
     cullingBox_ = BoundingBox(worldBoundingBox_.min_ - halfSize, worldBoundingBox_.max_ + halfSize);

@@ -199,7 +199,7 @@ float Geometry::GetDistance(const Ray& ray)
     if ((!indexData) || (!vertexData))
         return M_INFINITY;
     
-    float nearest = ray.GetDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
+    float nearest = ray.Distance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
     UnlockRawData();
     
     return nearest;

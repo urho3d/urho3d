@@ -36,7 +36,7 @@
 #include "LineEdit.h"
 #include "ListView.h"
 #include "Log.h"
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "ScrollBar.h"
@@ -251,7 +251,7 @@ void UI::Render()
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
-    graphics_->SetVertexShaderParameter(VSP_MODEL, Matrix4x3::IDENTITY);
+    graphics_->SetVertexShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
     graphics_->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     

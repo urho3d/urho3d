@@ -184,7 +184,7 @@ bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bo
         return false;
     }
     
-    Vector3 NormalizedAxis = axis.GetNormalized();
+    Vector3 NormalizedAxis = axis.Normalized();
     
     joint_ = dJointCreateHinge(physicsWorld_->GetWorld(), 0);
     dJointSetData(joint_, this);

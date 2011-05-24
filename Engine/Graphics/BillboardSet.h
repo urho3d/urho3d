@@ -100,11 +100,11 @@ public:
     /// Return billboard by index
     Billboard* GetBillboard(unsigned index);
     /// Return whether billboards are relative to the scene node
-    bool GetRelative() const { return relative_; }
+    bool IsRelative() const { return relative_; }
     /// Return whether scene node scale affects billboards' size
-    bool GetScaled() const { return scaled_; }
+    bool IsScaled() const { return scaled_; }
     /// Return whether billboards are sorted
-    bool GetSorted() const { return sorted_; }
+    bool IsSorted() const { return sorted_; }
     /// Return animation LOD bias
     float GetAnimationLodBias() const { return animationLodBias_; }
     

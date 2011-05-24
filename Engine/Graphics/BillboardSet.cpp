@@ -182,7 +182,7 @@ void BillboardSet::UpdateDistance(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(worldPos);
     
     // Calculate scaled distance for animation LOD
-    float scale = GetWorldBoundingBox().GetSize().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
     // If there are no billboards, the size becomes zero, and LOD'ed updates no longer happen. Disable LOD in that case
     if (scale > M_EPSILON)
         lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -294,7 +294,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     worldBoundingBox_.defined_ = false;
     
     unsigned enabledBillboards = 0;
-    const Matrix4x3& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = GetWorldTransform();
     const Vector3& worldScale = worldTransform.GetScale();
     
     for (unsigned i = 0; i < billboards_.Size(); ++i)
@@ -377,7 +377,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     
     unsigned numBillboards = billboards_.Size();
     unsigned enabledBillboards = 0;
-    const Matrix4x3& worldTransform = GetWorldTransform();
+    const Matrix3x4& worldTransform = GetWorldTransform();
     
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)

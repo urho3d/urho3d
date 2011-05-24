@@ -157,7 +157,7 @@ private:
     /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
     void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
     /// Check visibility of one shadow caster
-    bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix4x3& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
+    bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Set up initial shadow camera view
     void SetupShadowCamera(Light* light, bool shadowOcclusion = false);
     /// Focus shadow camera to use shadow map texture space more optimally
@@ -222,7 +222,7 @@ private:
     /// Jitter counter for temporal antialiasing
     int jitterCounter_;
     /// Previous view matrix for temporal antialiasing
-    Matrix4x3 lastCameraView_;
+    Matrix3x4 lastCameraView_;
     /// Information of the frame being rendered
     FrameInfo frame_;
     /// Combined bounding box of visible geometries

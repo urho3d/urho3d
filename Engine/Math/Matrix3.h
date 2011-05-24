@@ -195,7 +195,7 @@ public:
     }
     
     /// Return transpose
-    Matrix3 GetTranspose() const
+    Matrix3 Transpose() const
     {
         return Matrix3(
             m00_,
@@ -211,7 +211,7 @@ public:
     }
     
     /// Return scaled by a vector
-    Matrix3 GetScaled(const Vector3& scale) const
+    Matrix3 Scaled(const Vector3& scale) const
     {
         return Matrix3(
             m00_ * scale.x_,
@@ -227,7 +227,7 @@ public:
     }
     
     /// Return inverse
-    Matrix3 GetInverse() const;
+    Matrix3 Inverse() const;
     
     /// Return float data
     const float* GetData() const { return &m00_; }

@@ -48,5 +48,5 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
     /// Custom world transform
-    Matrix4x3 customWorldTransform_;
+    Matrix3x4 customWorldTransform_;
 };

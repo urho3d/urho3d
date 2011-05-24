@@ -29,7 +29,7 @@
 class Frustum;
 class Matrix3;
 class Matrix4;
-class Matrix4x3;
+class Matrix3x4;
 class Ray;
 class Sphere;
 
@@ -186,21 +186,21 @@ public:
     /// Transform with a 3x3 matrix
     void Transform(const Matrix3& transform);
     /// Transform with a 4x3 matrix
-    void Transform(const Matrix4x3& transform);
+    void Transform(const Matrix3x4& transform);
     
     /// Return center
-    Vector3 GetCenter() const { return (max_ + min_) * 0.5f; }
+    Vector3 Center() const { return (max_ + min_) * 0.5f; }
     /// Return size
-    Vector3 GetSize() const { return max_ - min_; }
+    Vector3 Size() const { return max_ - min_; }
     /// Return half-size
-    Vector3 GetHalfSize() const { return (max_ - min_) * 0.5f; }
+    Vector3 HalfSize() const { return (max_ - min_) * 0.5f; }
     
     /// Return transformed by a 3x3 matrix
-    BoundingBox GetTransformed(const Matrix3& transform) const;
+    BoundingBox Transformed(const Matrix3& transform) const;
     /// Return transformed by a 4x3 matrix
-    BoundingBox GetTransformed(const Matrix4x3& transform) const;
+    BoundingBox Transformed(const Matrix3x4& transform) const;
     /// Return projected by a 4x4 projection matrix
-    Rect GetProjected(const Matrix4& projection) const;
+    Rect Projected(const Matrix4& projection) const;
     
     /// Test if a point is inside
     Intersection IsInside(const Vector3& point) const
@@ -253,7 +253,7 @@ public:
     /// Test if a sphere is (partially) inside or outside
     Intersection IsInsideFast(const Sphere& sphere) const;
     /// Return ray hit distance, or infinity if no hit
-    float GetDistance(const Ray& ray) const;
+    float Distance(const Ray& ray) const;
     
     /// Minimum vector
     Vector3 min_;

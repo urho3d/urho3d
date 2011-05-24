@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 #include "Serializable.h"
 
 class Component;
@@ -144,7 +144,7 @@ public:
     /// Return scale
     const Vector3& GetScale() const { return scale_; }
     /// Return local transform
-    Matrix4x3 GetTransform() const { return Matrix4x3(position_, rotation_, scale_); }
+    Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
     
     /// Return world-space position
     Vector3 GetWorldPosition()
@@ -170,7 +170,7 @@ public:
         if (dirty_)
             UpdateWorldTransform();
         
-        return worldTransform_.GetRotationMatrix() * Vector3::FORWARD;
+        return worldTransform_.ToRotationMatrix() * Vector3::FORWARD;
     }
     
     /// Return world-space scale
@@ -183,7 +183,7 @@ public:
     }
     
     /// Return world-space transform
-    const Matrix4x3& GetWorldTransform()
+    const Matrix3x4& GetWorldTransform()
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -277,7 +277,7 @@ private:
     /// Scale
     Vector3 scale_;
     /// World-space transform matrix
-    Matrix4x3 worldTransform_;
+    Matrix3x4 worldTransform_;
     /// Name
     String name_;
     /// Name hash

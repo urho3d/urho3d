@@ -25,17 +25,17 @@
 
 #include "Matrix4.h"
 
-/// 4x3 matrix for scene node transform calculations
-class Matrix4x3
+/// 3x4 matrix for scene node transform calculations
+class Matrix3x4
 {
 public:
     /// Construct an undefined matrix
-    Matrix4x3()
+    Matrix3x4()
     {
     }
     
     /// Copy-construct from another matrix
-    Matrix4x3(const Matrix4x3& matrix) :
+    Matrix3x4(const Matrix3x4& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -52,7 +52,7 @@ public:
     }
     
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity
-    Matrix4x3(const Matrix3& matrix) :
+    Matrix3x4(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -69,7 +69,7 @@ public:
     }
     
     // Construct from values
-    Matrix4x3(float v00, float v01, float v02, float v03,
+    Matrix3x4(float v00, float v01, float v02, float v03,
             float v10, float v11, float v12, float v13,
             float v20, float v21, float v22, float v23) :
         m00_(v00),
@@ -88,7 +88,7 @@ public:
     }
     
     /// Construct from a float array
-    Matrix4x3(float* data) :
+    Matrix3x4(float* data) :
         m00_(data[0]),
         m01_(data[1]),
         m02_(data[2]),
@@ -105,12 +105,12 @@ public:
     }
     
     /// Construct from translation, rotation and uniform scale
-    Matrix4x3(const Vector3& translation, const Quaternion& rotation, float scale);
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale);
     /// Construct from translation, rotation and nonuniform scale
-    Matrix4x3(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
+    Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale);
     
     /// Assign from another matrix
-    Matrix4x3& operator = (const Matrix4x3& rhs)
+    Matrix3x4& operator = (const Matrix3x4& rhs)
     {
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
@@ -129,7 +129,7 @@ public:
     }
     
     /// Assign from a 3x3 matrix and set the extra elements to identity
-    Matrix4x3& operator = (const Matrix3& rhs)
+    Matrix3x4& operator = (const Matrix3& rhs)
     {
         m00_ = rhs.m00_;
         m01_ = rhs.m01_;
@@ -168,9 +168,9 @@ public:
     }
     
     /// Add a matrix
-    Matrix4x3 operator + (const Matrix4x3& rhs) const
+    Matrix3x4 operator + (const Matrix3x4& rhs) const
     {
-        return Matrix4x3(
+        return Matrix3x4(
             m00_ + rhs.m00_,
             m01_ + rhs.m01_,
             m02_ + rhs.m02_,
@@ -187,9 +187,9 @@ public:
     }
     
     /// Subtract a matrix
-    Matrix4x3 operator - (const Matrix4x3& rhs) const
+    Matrix3x4 operator - (const Matrix3x4& rhs) const
     {
-        return Matrix4x3(
+        return Matrix3x4(
             m00_ - rhs.m00_,
             m01_ - rhs.m01_,
             m02_ - rhs.m02_,
@@ -206,9 +206,9 @@ public:
     }
     
     /// Multiply with a scalar
-    Matrix4x3 operator * (float rhs) const
+    Matrix3x4 operator * (float rhs) const
     {
-        return Matrix4x3(
+        return Matrix3x4(
             m00_ * rhs,
             m01_ * rhs,
             m02_ * rhs,
@@ -225,9 +225,9 @@ public:
     }
     
     /// Multiply a matrix
-    Matrix4x3 operator * (const Matrix4x3& rhs) const
+    Matrix3x4 operator * (const Matrix3x4& rhs) const
     {
-        return Matrix4x3(
+        return Matrix3x4(
             m00_ * rhs.m00_ + m01_ * rhs.m10_ + m02_ * rhs.m20_,
             m00_ * rhs.m01_ + m01_ * rhs.m11_ + m02_ * rhs.m21_,
             m00_ * rhs.m02_ + m01_ * rhs.m12_ + m02_ * rhs.m22_,
@@ -305,7 +305,7 @@ public:
     }
     
     /// Return the combined rotation and scaling matrix
-    Matrix3 GetRotationScaleMatrix() const
+    Matrix3 ToMatrix3() const
     {
         return Matrix3(
             m00_,
@@ -321,7 +321,7 @@ public:
     }
     
     /// Return the rotation matrix with scaling removed
-    Matrix3 GetRotationMatrix() const
+    Matrix3 ToRotationMatrix() const
     {
         Vector3 invScale(
             1.0f / sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_),
@@ -329,7 +329,7 @@ public:
             1.0f / sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_)
         );
         
-        return GetRotationScaleMatrix().GetScaled(invScale);
+        return ToMatrix3().Scaled(invScale);
     }
     
     /// Return the translation part
@@ -345,7 +345,7 @@ public:
     /// Return the rotation part
     Quaternion GetRotation() const
     {
-        return Quaternion(GetRotationMatrix());
+        return Quaternion(ToRotationMatrix());
     }
     
     /// Return the scaling part
@@ -362,7 +362,7 @@ public:
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
     
     /// Return inverse
-    Matrix4x3 GetInverse() const;
+    Matrix3x4 Inverse() const;
     
     /// Return float data
     const float* GetData() const { return &m00_; }
@@ -381,16 +381,16 @@ public:
     float m23_;
     
     /// Zero matrix
-    static const Matrix4x3 ZERO;
+    static const Matrix3x4 ZERO;
     /// Identity matrix
-    static const Matrix4x3 IDENTITY;
+    static const Matrix3x4 IDENTITY;
 };
 
 /// Multiply a 4x3 matrix with a scalar
-inline Matrix4x3 operator * (float lhs, const Matrix4x3& rhs) { return rhs * lhs; }
+inline Matrix3x4 operator * (float lhs, const Matrix3x4& rhs) { return rhs * lhs; }
 
 /// Multiply a 4x3 matrix with a 4x4 matrix
-inline Matrix4 operator * (const Matrix4& lhs, const Matrix4x3& rhs)
+inline Matrix4 operator * (const Matrix4& lhs, const Matrix3x4& rhs)
 {
     return Matrix4(
         lhs.m00_ * rhs.m00_ + lhs.m01_ * rhs.m10_ + lhs.m02_ * rhs.m20_,

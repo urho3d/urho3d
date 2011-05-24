@@ -35,7 +35,7 @@ void BoundingBox::Define(const Vector3* vertices, unsigned count)
 
 void BoundingBox::Define(const Frustum& frustum)
 {
-    Define(frustum.GetVertices(), NUM_FRUSTUM_VERTICES);
+    Define(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
 void BoundingBox::Define(const Sphere& sphere)
@@ -59,7 +59,7 @@ void BoundingBox::Merge(const Vector3* vertices, unsigned count)
 
 void BoundingBox::Merge(const Frustum& frustum)
 {
-    Merge(frustum.GetVertices(), NUM_FRUSTUM_VERTICES);
+    Merge(frustum.vertices_, NUM_FRUSTUM_VERTICES);
 }
 
 void BoundingBox::Merge(const Sphere& sphere)
@@ -109,8 +109,8 @@ void BoundingBox::Intersect(const BoundingBox& box)
 
 void BoundingBox::Transform(const Matrix3& transform)
 {
-    Vector3 newCenter = transform * GetCenter();
-    Vector3 oldEdge = GetSize() * 0.5;
+    Vector3 newCenter = transform * Center();
+    Vector3 oldEdge = Size() * 0.5;
     
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
@@ -122,10 +122,10 @@ void BoundingBox::Transform(const Matrix3& transform)
     max_ = newCenter + newEdge;
 }
 
-void BoundingBox::Transform(const Matrix4x3& transform)
+void BoundingBox::Transform(const Matrix3x4& transform)
 {
-    Vector3 newCenter = transform * GetCenter();
-    Vector3 oldEdge = GetSize() * 0.5;
+    Vector3 newCenter = transform * Center();
+    Vector3 oldEdge = Size() * 0.5;
     
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
@@ -137,10 +137,10 @@ void BoundingBox::Transform(const Matrix4x3& transform)
     max_ = newCenter + newEdge;
 }
 
-BoundingBox BoundingBox::GetTransformed(const Matrix3& transform) const
+BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
 {
-    Vector3 newCenter = transform * GetCenter();
-    Vector3 oldEdge = GetSize() * 0.5;
+    Vector3 newCenter = transform * Center();
+    Vector3 oldEdge = Size() * 0.5;
     
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
@@ -151,10 +151,10 @@ BoundingBox BoundingBox::GetTransformed(const Matrix3& transform) const
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
 }
 
-BoundingBox BoundingBox::GetTransformed(const Matrix4x3& transform) const
+BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
 {
-    Vector3 newCenter = transform * GetCenter();
-    Vector3 oldEdge = GetSize() * 0.5f;
+    Vector3 newCenter = transform * Center();
+    Vector3 oldEdge = Size() * 0.5f;
     
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
@@ -165,7 +165,7 @@ BoundingBox BoundingBox::GetTransformed(const Matrix4x3& transform) const
     return BoundingBox(newCenter - newEdge, newCenter + newEdge);
 }
 
-Rect BoundingBox::GetProjected(const Matrix4& projection) const
+Rect BoundingBox::Projected(const Matrix4& projection) const
 {
     Vector3 projMin = min_;
     Vector3 projMax = max_;
@@ -292,7 +292,7 @@ Intersection BoundingBox::IsInsideFast(const Sphere& sphere) const
     return INSIDE;
 }
 
-float BoundingBox::GetDistance(const Ray& ray) const
+float BoundingBox::Distance(const Ray& ray) const
 {
     // If undefined, no hit (infinite distance)
     if (!defined_)

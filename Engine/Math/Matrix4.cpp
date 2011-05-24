@@ -47,10 +47,10 @@ void Matrix4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& sca
     scale.z_ = sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_);
     
     Vector3 invScale(1.0f / scale.x_, 1.0f / scale.y_, 1.0f / scale.z_);
-    rotation = Quaternion(GetRotationScaleMatrix().GetScaled(invScale));
+    rotation = Quaternion(ToMatrix3().Scaled(invScale));
 }
 
-Matrix4 Matrix4::GetInverse() const
+Matrix4 Matrix4::Inverse() const
 {
     float v0 = m20_ * m31_ - m21_ * m30_;
     float v1 = m20_ * m32_ - m22_ * m30_;

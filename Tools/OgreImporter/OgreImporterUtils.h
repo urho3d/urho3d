@@ -27,7 +27,7 @@
 #include "BoundingBox.h"
 #include "Graphics.h"
 #include "Serializer.h"
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 
 struct Triangle
 {
@@ -46,8 +46,8 @@ struct ModelBone
     Vector3 derivedPosition_;
     Quaternion derivedRotation_;
     Vector3 derivedScale_;
-    Matrix4x3 worldTransform_;
-    Matrix4x3 inverseWorldTransform_;
+    Matrix3x4 worldTransform_;
+    Matrix3x4 inverseWorldTransform_;
     unsigned char collisionMask_;
     float radius_;
     BoundingBox boundingBox_;

@@ -216,8 +216,8 @@ void LoadSkeleton(const String& skeletonFileName)
             bones_[i].derivedPosition_ = derivedPosition;
             bones_[i].derivedRotation_ = derivedRotation;
             bones_[i].derivedScale_ = derivedScale;
-            bones_[i].worldTransform_ = Matrix4x3(derivedPosition, derivedRotation, derivedScale);
-            bones_[i].inverseWorldTransform_ = bones_[i].worldTransform_.GetInverse();
+            bones_[i].worldTransform_ = Matrix3x4(derivedPosition, derivedRotation, derivedScale);
+            bones_[i].inverseWorldTransform_ = bones_[i].worldTransform_.Inverse();
         }
         
         PrintLine("Processed skeleton");
@@ -440,7 +440,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                             // Check distance of vertex from bone to get bone max. radius information
                             Vector3 bonePos = bones_[bone].derivedPosition_;
                             Vector3 vertexPos = vBuf->vertices_[vertex].position_;
-                            float distance = (bonePos - vertexPos).GetLength();
+                            float distance = (bonePos - vertexPos).Length();
                             if (distance > bones_[bone].radius_)
                             {
                                 bones_[bone].collisionMask_ |= 1;
@@ -847,7 +847,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                     float w;
                     
                     // Gram-Schmidt orthogonalize
-                    xyz = (t - n * n.DotProduct(t)).GetNormalized();
+                    xyz = (t - n * n.DotProduct(t)).Normalized();
                     
                     // Calculate handedness
                     w = n.CrossProduct(t).DotProduct(tan2[a]) < 0.0f ? -1.0f : 1.0f;
@@ -921,9 +921,9 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             dest.WriteQuaternion(bones_[i].bindRotation_);
             dest.WriteVector3(bones_[i].bindScale_);
             
-            Matrix4x3 offsetMatrix(bones_[i].derivedPosition_, bones_[i].derivedRotation_, bones_[i].derivedScale_);
-            offsetMatrix = offsetMatrix.GetInverse();
-            dest.Write(offsetMatrix.GetData(), sizeof(Matrix4x3));
+            Matrix3x4 offsetMatrix(bones_[i].derivedPosition_, bones_[i].derivedRotation_, bones_[i].derivedScale_);
+            offsetMatrix = offsetMatrix.Inverse();
+            dest.Write(offsetMatrix.GetData(), sizeof(Matrix3x4));
             
             dest.WriteUByte(bones_[i].collisionMask_);
             if (bones_[i].collisionMask_ & 1)

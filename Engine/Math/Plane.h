@@ -61,7 +61,7 @@ public:
         Vector3 dist1 = v1 - v0;
         Vector3 dist2 = v2 - v0;
         
-        normal_ = (dist1.CrossProduct(dist2)).GetNormalized();
+        normal_ = (dist1.CrossProduct(dist2)).Normalized();
         absNormal_ = Vector3(fabsf(normal_.x_), fabsf(normal_.y_), fabsf(normal_.z_));
         intercept_ = -normal_.DotProduct(v0);
     }
@@ -74,26 +74,26 @@ public:
     }
     
     /// Return distance to a point
-    float GetDistance(const Vector3& point) const
+    float Distance(const Vector3& point) const
     {
         return normal_.DotProduct(point) + intercept_;
     }
     
     /// Return absolute distance to a point
-    float GetAbsDistance(const Vector3& point) const
+    float AbsDistance(const Vector3& point) const
     {
         return normal_.AbsDotProduct(point);
     }
     
     /// Return absolute distance to a point which has only positive coordinates
-    float GetAbsDistanceFast(const Vector3& absPoint) const
+    float AbsDistanceFast(const Vector3& absPoint) const
     {
         // Point must contain only positive X, Y, Z
         return absNormal_.DotProduct(absPoint);
     }
     
     /// Return ray hit distance, or infinity if no hit
-    float GetDistance(const Ray& ray) const
+    float Distance(const Ray& ray) const
     {
         float d = normal_.DotProduct(ray.direction_);
         if (fabsf(d) < M_EPSILON)

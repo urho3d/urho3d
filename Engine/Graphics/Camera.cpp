@@ -182,7 +182,7 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
 
 Ray Camera::GetScreenRay(float x, float y)
 {
-    Matrix4 viewProjInverse = (GetProjection() * GetInverseWorldTransform()).GetInverse();
+    Matrix4 viewProjInverse = (GetProjection() * InverseWorldTransform()).Inverse();
     
     // The parameters range from 0.0 to 1.0. Expand to Normalized device coordinates (-1.0 to 1.0) & flip Y axis
     x = 2.0f * x - 1.0f;
@@ -193,7 +193,7 @@ Ray Camera::GetScreenRay(float x, float y)
     
     Ray ray;
     ray.origin_ = viewProjInverse * near;
-    ray.direction_ = ((viewProjInverse * far) - ray.origin_).GetNormalized();
+    ray.direction_ = ((viewProjInverse * far) - ray.origin_).Normalized();
     
     return ray;
 }
@@ -286,34 +286,34 @@ float Camera::GetHalfViewSize() const
 
 Vector3 Camera::GetForwardVector()
 {
-    return GetWorldTransform().GetRotationMatrix() * Vector3::FORWARD;
+    return GetWorldTransform().ToRotationMatrix() * Vector3::FORWARD;
 }
 
 Vector3 Camera::GetRightVector()
 {
-    return GetWorldTransform().GetRotationMatrix() * Vector3::RIGHT;
+    return GetWorldTransform().ToRotationMatrix() * Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector()
 {
-    return GetWorldTransform().GetRotationMatrix() * Vector3::UP;
+    return GetWorldTransform().ToRotationMatrix() * Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos)
 {
     if (!orthographic_)
-        return (worldPos - GetWorldPosition()).GetLengthFast();
+        return (worldPos - GetWorldPosition()).LengthFast();
     else
-        return fabsf((GetInverseWorldTransform() * worldPos).z_);
+        return fabsf((InverseWorldTransform() * worldPos).z_);
 }
 
 float Camera::GetDistanceSquared(const Vector3& worldPos)
 {
     if (!orthographic_)
-        return (worldPos - GetWorldPosition()).GetLengthSquared();
+        return (worldPos - GetWorldPosition()).LengthSquared();
     else
     {
-        float distance = (GetInverseWorldTransform() * worldPos).z_;
+        float distance = (InverseWorldTransform() * worldPos).z_;
         return distance * distance;
     }
 }

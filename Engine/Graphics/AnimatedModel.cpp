@@ -223,8 +223,8 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
         {
             // Do an initial crude test using the bone's AABB
             const BoundingBox& box = bone.boundingBox_;
-            const Matrix4x3& transform = bone.node_->GetWorldTransform();
-            float distance = box.GetTransformed(transform).GetDistance(query.ray_);
+            const Matrix3x4& transform = bone.node_->GetWorldTransform();
+            float distance = box.Transformed(transform).Distance(query.ray_);
             if (distance < query.maxDistance_)
             {
                 if (level == RAY_AABB)
@@ -239,9 +239,9 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
                 else
                 {
                     // Follow with an OBB test if required
-                    Matrix4x3 inverse = transform.GetInverse();
+                    Matrix3x4 inverse = transform.Inverse();
                     Ray localRay(inverse * query.ray_.origin_, inverse * Vector4(query.ray_.direction_, 0.0f));
-                    distance = box.GetDistance(localRay);
+                    distance = box.Distance(localRay);
                     if (distance < query.maxDistance_)
                     {
                         RayQueryResult result;
@@ -258,7 +258,7 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
         {
             boneSphere.center_ = bone.node_->GetWorldPosition();
             boneSphere.radius_ = bone.radius_;
-            float distance = boneSphere.GetDistance(query.ray_);
+            float distance = boneSphere.Distance(query.ray_);
             if (distance < query.maxDistance_)
             {
                 RayQueryResult result;
@@ -289,7 +289,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
         if ((drawDistance_ > 0.0f) && (distance > drawDistance_))
             return;
         // Multiply the distance by a constant so that invisible nodes don't update that often
-        float scale = GetWorldBoundingBox().GetSize().DotProduct(dotScale);
+        float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
         animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_) * invisibleLodFactor_;
     }
     
@@ -300,7 +300,7 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
-    float scale = GetWorldBoundingBox().GetSize().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     // If model is rendered from several views, use the minimum LOD distance for animation LOD
@@ -721,7 +721,7 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 void AnimatedModel::OnWorldBoundingBoxUpdate()
 {
     if (!skeleton_.GetNumBones())
-        worldBoundingBox_ = boundingBox_.GetTransformed(GetWorldTransform());
+        worldBoundingBox_ = boundingBox_.Transformed(GetWorldTransform());
     else
     {
         // If has bones, update world bounding box based on them
@@ -736,7 +736,7 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
             
             // Use hitbox if available. If not, use only half of the sphere radius
             if (i->collisionMask_ & BONECOLLISION_BOX)
-                worldBoundingBox_.Merge(i->boundingBox_.GetTransformed(boneNode->GetWorldTransform()));
+                worldBoundingBox_.Merge(i->boundingBox_.Transformed(boneNode->GetWorldTransform()));
             else if (i->collisionMask_ & BONECOLLISION_SPHERE)
                 worldBoundingBox_.Merge(Sphere(boneNode->GetWorldPosition(), i->radius_ * 0.5f));
         }
@@ -926,7 +926,7 @@ void AnimatedModel::UpdateSkinning()
     // Note: the model's world transform will be baked in the skin matrices
     const Vector<Bone>& bones = skeleton_.GetBones();
     // Use model's world transform in case a bone is missing
-    const Matrix4x3& worldTransform = node_->GetWorldTransform();
+    const Matrix3x4& worldTransform = node_->GetWorldTransform();
     
     // Skinning with global matrices only
     if (!geometrySkinMatrices_.Size())

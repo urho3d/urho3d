@@ -30,7 +30,7 @@ Vector3 Ray::Project(const Vector3& point) const
     return origin_ + offset.DotProduct(direction_) * direction_;
 }
 
-float Ray::GetDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
+float Ray::Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const
 {
     // Based on Fast, Minimum Storage Ray/Triangle Intersection by Möller & Trumbore
     // http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
@@ -61,7 +61,7 @@ float Ray::GetDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) 
     return M_INFINITY;
 }
 
-float Ray::GetDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
+float Ray::Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
 {
     float nearest = M_INFINITY;
     
@@ -77,7 +77,7 @@ float Ray::GetDistance(const void* vertexData, unsigned vertexSize, const void* 
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
-            nearest = Min(nearest, GetDistance(v0, v1, v2));
+            nearest = Min(nearest, Distance(v0, v1, v2));
         }
     }
     // 32-bit indices
@@ -90,7 +90,7 @@ float Ray::GetDistance(const void* vertexData, unsigned vertexSize, const void* 
             const Vector3& v0 = *((const Vector3*)(&vertices[indices[i] * vertexSize]));
             const Vector3& v1 = *((const Vector3*)(&vertices[indices[i + 1] * vertexSize]));
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[i + 2] * vertexSize]));
-            nearest = Min(nearest, GetDistance(v0, v1, v2));
+            nearest = Min(nearest, Distance(v0, v1, v2));
         }
     }
     

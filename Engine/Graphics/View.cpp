@@ -320,7 +320,7 @@ void View::GetDrawables()
     sceneBox_.defined_ = false;
     sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
     sceneViewBox_.defined_ = false;
-    Matrix4x3 view(camera_->GetInverseWorldTransform());
+    Matrix3x4 view(camera_->InverseWorldTransform());
     unsigned cameraViewMask = camera_->GetViewMask();
     
     for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
@@ -347,7 +347,7 @@ void View::GetDrawables()
             
             // Expand the scene bounding boxes
             const BoundingBox& geomBox = drawable->GetWorldBoundingBox();
-            BoundingBox geoview_Box = geomBox.GetTransformed(view);
+            BoundingBox geoview_Box = geomBox.Transformed(view);
             sceneBox_.Merge(geomBox);
             sceneViewBox_.Merge(geoview_Box);
             
@@ -1037,7 +1037,7 @@ void View::RenderBatchesDeferred()
         graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
         graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
         graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
-        graphics_->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().GetRotationMatrix());
+        graphics_->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().ToRotationMatrix());
         graphics_->SetVertexShaderParameter(VSP_DEPTHMODE, depthMode);
         graphics_->SetPixelShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
         graphics_->SetPixelShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));
@@ -1051,7 +1051,7 @@ void View::RenderBatchesDeferred()
             renderer_->GetPixelShader(shaderName), false);
         
         // Store view transform for next frame
-        lastCameraView_ = camera_->GetInverseWorldTransform();
+        lastCameraView_ = camera_->InverseWorldTransform();
     }
 }
 
@@ -1080,7 +1080,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         
         // Check that occluder is big enough on the screen
         const BoundingBox& box = occluder->GetWorldBoundingBox();
-        float diagonal = (box.max_ - box.min_).GetLengthFast();
+        float diagonal = (box.max_ - box.min_).LengthFast();
         float compare;
         if (!camera->IsOrthographic())
             compare = diagonal * halfViewSize / occluder->GetDistance();
@@ -1252,9 +1252,9 @@ unsigned View::ProcessLight(Light* light)
                 }
                 
                 bool generateBoxes = (isSplitShadowed) && (split->GetShadowFocus().focus_);
-                Matrix4x3 lightView;
+                Matrix3x4 lightView;
                 if (shadowCamera)
-                    lightView = shadowCamera->GetInverseWorldTransform();
+                    lightView = shadowCamera->InverseWorldTransform();
                 
                 if (!optimize)
                 {
@@ -1269,7 +1269,7 @@ unsigned View::ProcessLight(Light* light)
                         {
                             litGeometries_[i].Push(drawable);
                             if (generateBoxes)
-                                geometryBox.Merge(drawable->GetWorldBoundingBox().GetTransformed(lightView));
+                                geometryBox.Merge(drawable->GetWorldBoundingBox().Transformed(lightView));
                         }
                     }
                 }
@@ -1284,7 +1284,7 @@ unsigned View::ProcessLight(Light* light)
                         {
                             litGeometries_[i].Push(drawable);
                             if (generateBoxes)
-                                geometryBox.Merge(drawable->GetWorldBoundingBox().GetTransformed(lightView));
+                                geometryBox.Merge(drawable->GetWorldBoundingBox().Transformed(lightView));
                         }
                     }
                 }
@@ -1389,7 +1389,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
 {
     Light* light = splitLights_[splitIndex];
     
-    Matrix4x3 lightView;
+    Matrix3x4 lightView;
     Matrix4 lightProj;
     Frustum lightViewFrustum;
     BoundingBox lightViewFrustumBox;
@@ -1400,7 +1400,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
     if (shadowCamera)
     {
         bool projectBoxes = !shadowCamera->IsOrthographic();
-        lightView = shadowCamera->GetInverseWorldTransform();
+        lightView = shadowCamera->InverseWorldTransform();
         lightProj = shadowCamera->GetProjection();
         
         // Transform scene frustum into shadow camera's view space for shadow caster visibility check
@@ -1408,10 +1408,10 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
         // intersection of the scene frustum and the split frustum, so that shadow casters do not get
         // rendered into unnecessary splits
         if (light->GetLightType() != LIGHT_DIRECTIONAL)
-            lightViewFrustum = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_).GetTransformed(lightView);
+            lightViewFrustum = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_).Transformed(lightView);
         else
             lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, light->GetNearSplit() - light->GetNearFadeRange()),
-                Min(sceneViewBox_.max_.z_, light->GetFarSplit())).GetTransformed(lightView);
+                Min(sceneViewBox_.max_.z_, light->GetFarSplit())).Transformed(lightView);
         lightViewFrustumBox.Define(lightViewFrustum);
         
         // Check for degenerate split frustum: in that case there is no need to get shadow casters
@@ -1445,13 +1445,13 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
             if (mergeBoxes)
             {
                 // Transform bounding box into light view space, and to projection space if needed
-                lightViewBox = drawable->GetWorldBoundingBox().GetTransformed(lightView);
+                lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
                 
                 if (!projectBoxes)
                     geometryBox.Merge(lightViewBox);
                 else
                 {
-                    lightProjBox = lightViewBox.GetProjected(lightProj);
+                    lightProjBox = lightViewBox.Projected(lightProj);
                     geometryBox.Merge(lightProjBox);
                 }
                 
@@ -1471,7 +1471,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
                 continue;
             
             if (!boxGenerated)
-                lightViewBox = drawable->GetWorldBoundingBox().GetTransformed(lightView);
+                lightViewBox = drawable->GetWorldBoundingBox().Transformed(lightView);
             
             if (IsShadowCasterVisible(drawable, lightViewBox, shadowCamera, lightView, lightViewFrustum, lightViewFrustumBox))
             {
@@ -1482,7 +1482,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
                     else
                     {
                         if (!boxGenerated)
-                            lightProjBox = lightViewBox.GetProjected(lightProj);
+                            lightProjBox = lightViewBox.Projected(lightProj);
                         shadowCasterBox.Merge(lightProjBox);
                     }
                 }
@@ -1499,7 +1499,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
     }
 }
 
-bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix4x3& lightView,
+bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView,
     const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox)
 {
     // If shadow caster is also an occluder, must let it be visible, because it has potentially already culled
@@ -1520,11 +1520,11 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
             return true;
         
         // For perspective lights, extrusion direction depends on the position of the shadow caster
-        Vector3 center = lightViewBox.GetCenter();
-        Ray extrusionRay(center, center.GetNormalized());
+        Vector3 center = lightViewBox.Center();
+        Ray extrusionRay(center, center.Normalized());
         
         float extrusionDistance = shadowCamera->GetFarClip();
-        float originalDistance = Clamp(center.GetLengthFast(), M_EPSILON, extrusionDistance);
+        float originalDistance = Clamp(center.LengthFast(), M_EPSILON, extrusionDistance);
         
         // Because of the perspective, the bounding box must also grow when it is extruded to the distance
         float sizeFactor = extrusionDistance / originalDistance;
@@ -1532,7 +1532,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         // Calculate the endpoint box and merge it to the original. Because it's axis-aligned, it will be larger
         // than necessary, so the test will be conservative
         Vector3 newCenter = extrusionDistance * extrusionRay.direction_;
-        Vector3 newHalfSize = lightViewBox.GetSize() * sizeFactor * 0.5f;
+        Vector3 newHalfSize = lightViewBox.Size() * sizeFactor * 0.5f;
         BoundingBox extrudedBox(newCenter - newHalfSize, newCenter + newHalfSize);
         lightViewBox.Merge(extrudedBox);
         
@@ -1567,9 +1567,9 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             if ((shadowOcclusion) || (parameters.focus_))
                 sceneMaxZ = Min(sceneViewBox_.max_.z_, sceneMaxZ);
             
-            Matrix4x3 lightView(shadowCamera->GetInverseWorldTransform());
+            Matrix3x4 lightView(shadowCamera->InverseWorldTransform());
             Frustum lightViewSplitFrustum = camera_->GetSplitFrustum(light->GetNearSplit() - light->GetNearFadeRange(),
-                Min(light->GetFarSplit(), sceneMaxZ)).GetTransformed(lightView);
+                Min(light->GetFarSplit(), sceneMaxZ)).Transformed(lightView);
             
             // Fit the frustum inside a bounding box. If uniform size, use a sphere instead
             BoundingBox shadowBox;
@@ -1605,7 +1605,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             if ((light->GetLightType() == LIGHT_SPOT) && (parameters.zoomOut_))
             {
                 // Make sure the out-zooming does not start while we are inside the spot
-                float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
+                float distance = Max((camera_->InverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
                 float lightPixels = (((float)height_ * light->GetRange() * camera_->GetZoom() * 0.5f) / distance);
                 
                 // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
@@ -1712,7 +1712,7 @@ void View::QuantizeDirShadowCamera(Light* light, const BoundingBox& viewBox)
     Texture2D* shadowMap = light->GetShadowMap();
     if (shadowMap)
     {
-        Vector3 viewPos(rot.GetInverse() * shadowCamera->GetWorldPosition());
+        Vector3 viewPos(rot.Inverse() * shadowCamera->GetWorldPosition());
         // Take into account that shadow map border will not be used
         float invActualSize = 1.0f / (float)(shadowMap->GetWidth() - 2);
         Vector2 texelSize(viewSize.x_ * invActualSize, viewSize.y_ * invActualSize);
@@ -1735,22 +1735,22 @@ const Rect& View::GetLightScissor(Light* light)
     if (i != lightScissorCache_.End())
         return i->second_;
     
-    Matrix4x3 view(camera_->GetInverseWorldTransform());
+    Matrix3x4 view(camera_->InverseWorldTransform());
     Matrix4 projection(camera_->GetProjection());
     
     switch (light->GetLightType())
     {
     case LIGHT_POINT:
         {
-            BoundingBox viewBox = light->GetWorldBoundingBox().GetTransformed(view);
-            return lightScissorCache_[light] = viewBox.GetProjected(projection);
+            BoundingBox viewBox = light->GetWorldBoundingBox().Transformed(view);
+            return lightScissorCache_[light] = viewBox.Projected(projection);
         }
         
     case LIGHT_SPOT:
     case LIGHT_SPLITPOINT:
         {
-            Frustum viewFrustum = light->GetFrustum().GetTransformed(view);
-            return lightScissorCache_[light] = viewFrustum.GetProjected(projection);
+            Frustum viewFrustum = light->GetFrustum().Transformed(view);
+            return lightScissorCache_[light] = viewFrustum.Projected(projection);
         }
         
     default:
@@ -2014,7 +2014,7 @@ void View::SetShaderParameters()
 void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
 {
     graphics_->ClearTransformSources();
-    Matrix4x3 view(camera.GetInverseWorldTransform());
+    Matrix3x4 view(camera.InverseWorldTransform());
     
     switch (light->GetLightType())
     {
@@ -2022,9 +2022,9 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
         if (!clear)
         {
             Matrix4 projection(camera.GetProjection());
-            const Matrix4x3& model = light->GetVolumeTransform(camera);
+            const Matrix3x4& model = light->GetVolumeTransform(camera);
             float lightExtent = light->GetVolumeExtent();
-            float lightViewDist = (light->GetWorldPosition() - camera.GetWorldPosition()).GetLengthFast();
+            float lightViewDist = (light->GetWorldPosition() - camera.GetWorldPosition()).LengthFast();
             bool drawBackFaces = lightViewDist < (lightExtent + camera.GetNearClip());
             
             graphics_->SetAlphaTest(false);
@@ -2069,8 +2069,8 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             {
                 // Get projection without jitter offset to ensure the whole screen is filled
                 Matrix4 projection(camera.GetProjection(false));
-                Matrix4x3 nearTransform(light->GetDirLightTransform(camera, true));
-                Matrix4x3 farTransform(light->GetDirLightTransform(camera, false));
+                Matrix3x4 nearTransform(light->GetDirLightTransform(camera, true));
+                Matrix3x4 farTransform(light->GetDirLightTransform(camera, false));
                 
                 graphics_->SetAlphaTest(false);
                 graphics_->SetColorWrite(false);

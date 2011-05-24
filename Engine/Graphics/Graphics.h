@@ -32,7 +32,7 @@ class Image;
 class IndexBuffer;
 class Matrix3;
 class Matrix4;
-class Matrix4x3;
+class Matrix3x4;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
@@ -119,7 +119,7 @@ public:
     /// Set vertex shader 4D vector constant
     void SetVertexShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set vertex shader 4x3 matrix constant
-    void SetVertexShaderParameter(ShaderParameter param, const Matrix4x3& matrix);
+    void SetVertexShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
     /// Set pixel shader bool constants
     void SetPixelShaderParameter(ShaderParameter param, const bool* data, unsigned count);
     /// Set pixel shader float constants
@@ -139,7 +139,7 @@ public:
     /// Set pixel shader 3D vector constant
     void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set pixel shader 4x3 matrix constant
-    void SetPixelShaderParameter(ShaderParameter param, const Matrix4x3& matrix);
+    void SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
     /// Set vertex shader parameter source. Called by VertexShader
     void SetShaderParameterSource(ShaderParameter param, const void* source) { lastShaderParameterSources_[param] = source; }
     /// Map shader parameter to a constant register. Called by Shader

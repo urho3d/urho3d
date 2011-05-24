@@ -134,7 +134,7 @@ PURE_INLINE void dCopyMatrix4x4(dReal *res, const dReal *a)
   dCopyVector4(res + 8, a + 8);
 }
 
-PURE_INLINE void dCopyMatrix4x3(dReal *res, const dReal *a)
+PURE_INLINE void dCopyMatrix3x4(dReal *res, const dReal *a)
 {
   dCopyVector3(res + 0, a + 0);
   dCopyVector3(res + 4, a + 4);

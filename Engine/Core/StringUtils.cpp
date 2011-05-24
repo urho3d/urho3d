@@ -109,7 +109,7 @@ Quaternion ToQuaternion(const String& source)
         return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]));
     else
         // 4 coords specified: full quaternion
-        return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3])).GetNormalized();
+        return Quaternion(ToFloat(coords[0]), ToFloat(coords[1]), ToFloat(coords[2]), ToFloat(coords[3])).Normalized();
 }
 
 Vector2 ToVector2(const String& source)

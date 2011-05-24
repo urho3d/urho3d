@@ -67,15 +67,15 @@ public:
     void Define(const Vector3& origin, const Vector3& direction)
     {
         origin_ = origin;
-        direction_ = direction.GetNormalized();
+        direction_ = direction.Normalized();
     }
     
     /// Project a point on the ray
     Vector3 Project(const Vector3& point) const;
     /// Return minimum distance to a triangle, or infinity if no hit
-    float GetDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
+    float Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
     /// Return minimum distance to a triangle mesh defined by vertex and index data
-    float GetDistance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
+    float Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
     
     /// Ray origin
     Vector3 origin_;

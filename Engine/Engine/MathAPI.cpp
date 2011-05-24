@@ -201,10 +201,10 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "Vector2 GetNormalized() const", asMETHOD(Vector2, GetNormalized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "Vector2 Normalized() const", asMETHOD(Vector2, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "String ToString() const", asMETHOD(Vector2, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHOD(Vector2, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector2", "float get_lengthSquared() const", asMETHOD(Vector2, GetLengthSquared), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "float get_length() const", asMETHOD(Vector2, Length), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "float get_lengthSquared() const", asMETHOD(Vector2, LengthSquared), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector2", "float x", offsetof(Vector2, x_));
     engine->RegisterObjectProperty("Vector2", "float y", offsetof(Vector2, y_));
 }
@@ -251,10 +251,10 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector3", "float AbsDotProduct(const Vector3&in) const", asMETHOD(Vector3, AbsDotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 CrossProduct(const Vector3&in) const", asMETHOD(Vector3, CrossProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "Vector3 Lerp(const Vector3&in, float) const", asMETHOD(Vector3, Lerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "Vector3 GetNormalized() const", asMETHOD(Vector3, GetNormalized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "Vector3 Normalized() const", asMETHOD(Vector3, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector3", "String ToString() const", asMETHOD(Vector3, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "float get_length() const", asMETHOD(Vector3, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Vector3", "float get_lengthSquared() const", asMETHOD(Vector3, GetLengthSquared), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "float get_length() const", asMETHOD(Vector3, Length), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector3", "float get_lengthSquared() const", asMETHOD(Vector3, LengthSquared), asCALL_THISCALL);
     engine->RegisterObjectProperty("Vector3", "float x", offsetof(Vector3, x_));
     engine->RegisterObjectProperty("Vector3", "float y", offsetof(Vector3, y_));
     engine->RegisterObjectProperty("Vector3", "float z", offsetof(Vector3, z_));
@@ -356,16 +356,16 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "Quaternion opSub(const Quaternion&in) const", asMETHODPR(Quaternion, operator +, (const Quaternion&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion opMul(const Quaternion&in) const", asMETHODPR(Quaternion, operator *, (const Quaternion&) const, Quaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "Quaternion GetNormalized() const", asMETHOD(Quaternion, GetNormalized), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "Quaternion GetInverse() const", asMETHOD(Quaternion, GetInverse), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Normalized() const", asMETHOD(Quaternion, Normalized), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float DotProduct(const Quaternion&in) const", asMETHOD(Quaternion, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, GetEulerAngles), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, GetYaw), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, GetPitch), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "float get_roll() const", asMETHOD(Quaternion, GetRoll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, ToEuler), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, YawAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, PitchAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "float get_roll() const", asMETHOD(Quaternion, RollAngle), asCALL_THISCALL);
     engine->RegisterObjectProperty("Quaternion", "float w", offsetof(Quaternion, w_));
     engine->RegisterObjectProperty("Quaternion", "float x", offsetof(Quaternion, x_));
     engine->RegisterObjectProperty("Quaternion", "float y", offsetof(Quaternion, y_));
@@ -386,7 +386,7 @@ static void ConstructRayCopy(const Ray& ray, Ray* ptr)
 static void ConstructRayInit(const Vector3& origin, const Vector3& direction, Ray* ptr)
 {
     // Normalize direction because performance is not critical
-    new(ptr) Ray(origin, direction.GetNormalized());
+    new(ptr) Ray(origin, direction.Normalized());
 }
 
 static void RegisterRay(asIScriptEngine* engine)
@@ -398,7 +398,7 @@ static void RegisterRay(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Ray", "Ray &opAssign(const Ray&in)", asMETHOD(Ray, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "bool opEquals(const Ray&in) const", asMETHOD(Ray, operator ==), asCALL_THISCALL);
     engine->RegisterObjectMethod("Ray", "void Define(const Vector3&in, const Vector3&in)", asMETHOD(Ray, Define), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Ray", "float GetDistance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, GetDistance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Ray", "float Distance(const Vector3&in, const Vector3&in, const Vector3&in) const", asMETHODPR(Ray, Distance, (const Vector3&, const Vector3&, const Vector3&) const, float), asCALL_THISCALL);
     engine->RegisterObjectProperty("Ray", "Vector3 origin", offsetof(Ray, origin_));
     engine->RegisterObjectProperty("Ray", "Vector3 direction", offsetof(Ray, direction_));
 }
@@ -532,10 +532,10 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Vector3&in) const", asMETHODPR(BoundingBox, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const Sphere&in) const", asMETHODPR(BoundingBox, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("BoundingBox", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(BoundingBox, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "float GetDistance(const Ray&in) const", asMETHOD(BoundingBox, GetDistance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_center() const", asMETHOD(BoundingBox, GetCenter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_size() const", asMETHOD(BoundingBox, GetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_halfSize() const", asMETHOD(BoundingBox, GetHalfSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "float Distance(const Ray&in) const", asMETHOD(BoundingBox, Distance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_center() const", asMETHOD(BoundingBox, Center), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_size() const", asMETHOD(BoundingBox, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("BoundingBox", "Vector3 get_halfSize() const", asMETHOD(BoundingBox, HalfSize), asCALL_THISCALL);
     engine->RegisterObjectProperty("BoundingBox", "Vector3 min", offsetof(BoundingBox, min_));
     engine->RegisterObjectProperty("BoundingBox", "Vector3 max", offsetof(BoundingBox, max_));
     engine->RegisterObjectProperty("BoundingBox", "bool defined", offsetof(BoundingBox, defined_));
@@ -555,7 +555,7 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const Vector3&in) const", asMETHODPR(Sphere, IsInside, (const Vector3&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const Sphere&in) const", asMETHODPR(Sphere, IsInside, (const Sphere&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(Sphere, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Sphere", "float GetDistance(const Ray&in) const", asMETHOD(Sphere, GetDistance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sphere", "float Distance(const Ray&in) const", asMETHOD(Sphere, Distance), asCALL_THISCALL);
     engine->RegisterObjectProperty("Sphere", "Vector3 center", offsetof(Sphere, center_));
     engine->RegisterObjectProperty("Sphere", "float radius", offsetof(Sphere, radius_));
     engine->RegisterObjectProperty("Sphere", "bool defined", offsetof(Sphere, defined_));

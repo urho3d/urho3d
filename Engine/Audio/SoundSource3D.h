@@ -57,7 +57,7 @@ public:
     /// Return far distance
     float GetFarDistance() const { return farDistance_; }
     /// Return rolloff power factor
-    float GetRolloffFactor() const { return rolloffFactor_; }
+    float RollAngleoffFactor() const { return rolloffFactor_; }
     
 protected:
     /// Near distance

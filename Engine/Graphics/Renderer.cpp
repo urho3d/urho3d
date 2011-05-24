@@ -1332,11 +1332,11 @@ Node* Renderer::CreateTempNode()
 void Renderer::SetupLightBatch(Batch& batch)
 {
     graphics_->ClearTransformSources();
-    Matrix4x3 view(batch.camera_->GetInverseWorldTransform());
+    Matrix3x4 view(batch.camera_->InverseWorldTransform());
     
     Light* light = batch.light_;
     float lightExtent = light->GetVolumeExtent();
-    float lightViewDist = (light->GetWorldPosition() - batch.camera_->GetWorldPosition()).GetLengthFast();
+    float lightViewDist = (light->GetWorldPosition() - batch.camera_->GetWorldPosition()).LengthFast();
     
     graphics_->SetAlphaTest(false);
     graphics_->SetBlendMode(BLEND_ADD);
@@ -1356,7 +1356,7 @@ void Renderer::SetupLightBatch(Batch& batch)
         }
         else
         {
-            Matrix4x3 nearTransform = light->GetDirLightTransform(*batch.camera_, true);
+            Matrix3x4 nearTransform = light->GetDirLightTransform(*batch.camera_, true);
             
             // Set state for stencil rendering
             graphics_->SetColorWrite(false);
@@ -1379,7 +1379,7 @@ void Renderer::SetupLightBatch(Batch& batch)
     else
     {
         Matrix4 projection(batch.camera_->GetProjection());
-        const Matrix4x3& model = light->GetVolumeTransform(*batch.camera_);
+        const Matrix3x4& model = light->GetVolumeTransform(*batch.camera_);
         
         if (light->GetLightType() == LIGHT_SPLITPOINT)
         {
@@ -1451,7 +1451,7 @@ void Renderer::DrawFullScreenQuad(Camera& camera, ShaderProgram* vs, ShaderProgr
     graphics_->ClearTransformSources();
     
     Light quadDirLight(context_);
-    Matrix4x3 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
+    Matrix3x4 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
     
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetShaders(vs, ps);

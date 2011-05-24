@@ -73,7 +73,7 @@ Frustum& Frustum::operator = (const Frustum& rhs)
     return *this;
 }
 
-void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix4x3& transform)
+void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 {
     float halfViewSize = tanf(fov * M_DEGTORAD * 0.5f) / zoom;
     Vector3 near;
@@ -92,7 +92,7 @@ void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, floa
     Define(near, far, transform);
 }
 
-void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix4x3& transform)
+void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform)
 {
     vertices_[0] = transform * near;
     vertices_[1] = transform * Vector3(near.x_, -near.y_, near.z_);
@@ -106,7 +106,7 @@ void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix4x3& t
     UpdatePlanes();
 }
 
-void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix4x3& transform)
+void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 {
     float halfViewSize = orthoSize * 0.5f / zoom;
     Vector3 near;
@@ -130,14 +130,14 @@ void Frustum::Transform(const Matrix3& transform)
     UpdatePlanes();
 }
 
-void Frustum::Transform(const Matrix4x3& transform)
+void Frustum::Transform(const Matrix3x4& transform)
 {
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         vertices_[i] = transform * vertices_[i];
     UpdatePlanes();
 }
 
-Frustum Frustum::GetTransformed(const Matrix3& transform) const
+Frustum Frustum::Transformed(const Matrix3& transform) const
 {
     Frustum transformed;
     
@@ -148,7 +148,7 @@ Frustum Frustum::GetTransformed(const Matrix3& transform) const
     return transformed;
 }
 
-Frustum Frustum::GetTransformed(const Matrix4x3& transform) const
+Frustum Frustum::Transformed(const Matrix3x4& transform) const
 {
     Frustum transformed;
     
@@ -159,7 +159,7 @@ Frustum Frustum::GetTransformed(const Matrix4x3& transform) const
     return transformed;
 }
 
-Rect Frustum::GetProjected(const Matrix4& projection) const
+Rect Frustum::Projected(const Matrix4& projection) const
 {
     Rect rect;
     

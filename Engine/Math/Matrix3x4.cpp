@@ -22,31 +22,31 @@
 //
 
 #include "Precompiled.h"
-#include "Matrix4x3.h"
+#include "Matrix3x4.h"
 
-const Matrix4x3 Matrix4x3::ZERO(
+const Matrix3x4 Matrix3x4::ZERO(
     0.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f);
 
-const Matrix4x3 Matrix4x3::IDENTITY(
+const Matrix3x4 Matrix3x4::IDENTITY(
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f);
 
-Matrix4x3::Matrix4x3(const Vector3& translation, const Quaternion& rotation, float scale)
+Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
 {
-    SetRotation(rotation.GetRotationMatrix() * scale);
+    SetRotation(rotation.ToRotationMatrix() * scale);
     SetTranslation(translation);
 }
 
-Matrix4x3::Matrix4x3(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
+Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 {
-    SetRotation(rotation.GetRotationMatrix().GetScaled(scale));
+    SetRotation(rotation.ToRotationMatrix().Scaled(scale));
     SetTranslation(translation);
 }
 
-void Matrix4x3::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
+void Matrix3x4::Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const
 {
     translation.x_ = m03_;
     translation.y_ = m13_;
@@ -57,10 +57,10 @@ void Matrix4x3::Decompose(Vector3& translation, Quaternion& rotation, Vector3& s
     scale.z_ = sqrtf(m02_ * m02_ + m12_ * m12_ + m22_ * m22_);
     
     Vector3 invScale(1.0f / scale.x_, 1.0f / scale.y_, 1.0f / scale.z_);
-    rotation = Quaternion(GetRotationScaleMatrix().GetScaled(invScale));
+    rotation = Quaternion(ToMatrix3().Scaled(invScale));
 }
 
-Matrix4x3 Matrix4x3::GetInverse() const
+Matrix3x4 Matrix3x4::Inverse() const
 {
     float det = m00_ * m11_ * m22_ +
         m10_ * m21_ * m02_ +
@@ -71,7 +71,7 @@ Matrix4x3 Matrix4x3::GetInverse() const
     
     float invDet = 1.0f / det;
     
-    Matrix4x3 out;
+    Matrix3x4 out;
     
     out.m00_ = (m11_ * m22_ - m21_ * m12_) * invDet;
     out.m01_ = -(m01_ * m22_ - m21_ * m02_) * invDet;

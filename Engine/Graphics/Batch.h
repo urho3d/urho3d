@@ -34,7 +34,7 @@ class Graphics;
 class Light;
 class Material;
 class Pass;
-class Matrix4x3;
+class Matrix3x4;
 class ShaderProgram;
 class VertexBuffer;
 
@@ -62,7 +62,7 @@ struct Batch
     /// Geometry
     Geometry* geometry_;
     /// Model world transform
-    const Matrix4x3* worldTransform_;
+    const Matrix3x4* worldTransform_;
     /// Material
     Material* material_;
     /// Material pass
@@ -102,14 +102,14 @@ struct InstanceData
     }
     
     /// Construct with transform and distance
-    InstanceData(const Matrix4x3* worldTransform, float distance) :
+    InstanceData(const Matrix3x4* worldTransform, float distance) :
         worldTransform_(worldTransform),
         distance_(distance)
     {
     }
     
     /// World transform
-    const Matrix4x3* worldTransform_;
+    const Matrix3x4* worldTransform_;
     /// Distance from camera
     float distance_;
 };

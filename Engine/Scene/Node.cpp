@@ -45,7 +45,7 @@ Node::Node(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::UNITY),
-    worldTransform_(Matrix4x3::IDENTITY),
+    worldTransform_(Matrix3x4::IDENTITY),
     rotateCount_(0),
     dirty_(false)
 {
@@ -738,10 +738,10 @@ void Node::UpdateWorldTransform()
     {
         if (parent_->dirty_)
             parent_->UpdateWorldTransform();
-        worldTransform_ = parent_->worldTransform_ * Matrix4x3(position_, rotation_, scale_);
+        worldTransform_ = parent_->worldTransform_ * Matrix3x4(position_, rotation_, scale_);
     }
     else
-        worldTransform_ = Matrix4x3(position_, rotation_, scale_);
+        worldTransform_ = Matrix3x4(position_, rotation_, scale_);
     
     dirty_ = false;
 }

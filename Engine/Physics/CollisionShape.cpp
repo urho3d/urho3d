@@ -437,7 +437,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     model_ = model;
     shapeType_ = SHAPE_TRIANGLEMESH;
     lodLevel_ = lodLevel;
-    size_ = model->GetBoundingBox().GetSize();
+    size_ = model->GetBoundingBox().Size();
     position_ = position;
     rotation_ = rotation;
     
@@ -463,7 +463,7 @@ void CollisionShape::SetHeightfield(Model* model, const IntVector2& numPoints, f
     lodLevel_ = lodLevel;
     position_ = position;
     rotation_ = rotation;
-    size_ = model->GetBoundingBox().GetSize();
+    size_ = model->GetBoundingBox().Size();
     
     CreateGeometry();
 }
@@ -484,7 +484,7 @@ void CollisionShape::SetConvexHull(Model* model, float thickness, unsigned lodLe
     shapeType_ = SHAPE_CONVEXHULL;
     thickness_ = thickness;
     lodLevel_ = lodLevel;
-    size_ = model->GetBoundingBox().GetSize();
+    size_ = model->GetBoundingBox().Size();
     position_ = position;
     rotation_ = rotation;
     
@@ -604,7 +604,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     dQuaternion quat;
     dGeomGetQuaternion(geometry_, quat);
     
-    Matrix4x3 transform(Vector3(pos[0], pos[1], pos[2]), Quaternion(quat[0], quat[1], quat[2], quat[3]), 1.0f);
+    Matrix3x4 transform(Vector3(pos[0], pos[1], pos[2]), Quaternion(quat[0], quat[1], quat[2], quat[3]), 1.0f);
     
     switch (dGeomGetClass(geometry_))
     {

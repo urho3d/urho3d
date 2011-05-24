@@ -205,7 +205,7 @@ void ParticleEmitter::Update(float timeStep)
     }
     
     // Update existing particles
-    Vector3 relativeConstantForce = GetWorldRotation().GetInverse() * constanceForce_;
+    Vector3 relativeConstantForce = GetWorldRotation().Inverse() * constanceForce_;
     // If billboards are not relative, apply scaling to the position update
     Vector3 scaleVector = Vector3::UNITY;
     if ((scaled_) && (!relative_))
