@@ -239,7 +239,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             if ((light_->GetLightType() != LIGHT_DIRECTIONAL) && (fadeEnd > 0.0f) && (fadeStart > 0.0f) && (fadeStart < fadeEnd))
                 fade = Min(1.0f - (light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
             
-            graphics->SetPixelShaderParameter(PSP_LIGHTCOLOR, Vector4(light_->GetColor().GetRGB(),
+            graphics->SetPixelShaderParameter(PSP_LIGHTCOLOR, Vector4(light_->GetColor().RGBValues(),
                 light_->GetSpecularIntensity()) * fade);
         }
         

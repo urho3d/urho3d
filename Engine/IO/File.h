@@ -76,7 +76,6 @@ public:
     FileMode GetMode() const { return mode_; }
     /// Return whether is open
     bool IsOpen() const { return handle_ != 0; }
-    
     /// Return the file handle
     void* GetHandle() const { return handle_; }
     
