@@ -321,7 +321,7 @@ public:
     }
     
     /// Return the rotation matrix with scaling removed
-    Matrix3 ToRotationMatrix() const
+    Matrix3 RotationMatrix() const
     {
         Vector3 invScale(
             1.0f / sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_),
@@ -333,7 +333,7 @@ public:
     }
     
     /// Return the translation part
-    Vector3 GetTranslation() const
+    Vector3 Translation() const
     {
         return Vector3(
             m03_,
@@ -343,13 +343,13 @@ public:
     }
     
     /// Return the rotation part
-    Quaternion GetRotation() const
+    Quaternion Rotation() const
     {
-        return Quaternion(ToRotationMatrix());
+        return Quaternion(RotationMatrix());
     }
     
     /// Return the scaling part
-    Vector3 GetScale() const
+    Vector3 Scale() const
     {
         return Vector3(
             sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_),

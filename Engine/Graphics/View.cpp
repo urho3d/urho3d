@@ -1037,7 +1037,7 @@ void View::RenderBatchesDeferred()
         graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
         graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
         graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
-        graphics_->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().ToRotationMatrix());
+        graphics_->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
         graphics_->SetVertexShaderParameter(VSP_DEPTHMODE, depthMode);
         graphics_->SetPixelShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
         graphics_->SetPixelShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));

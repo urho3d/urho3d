@@ -50,9 +50,9 @@ public:
         T key_;
         
         /// Return parent node
-        Node* GetParent() const { return static_cast<Node*>(parent_); }
+        Node* Parent() const { return static_cast<Node*>(parent_); }
         /// Return the left or right child
-        Node* GetChild(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
+        Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
     /// Set node iterator
@@ -118,7 +118,7 @@ public:
     {
     }
     
-    /// Construct with another set
+    /// Construct from another set
     Set(const Set<T>& set)
     {
         allocator_ = AllocatorInitialize(sizeof(Node), set.Size());
@@ -196,7 +196,7 @@ public:
     /// Clear the set
     void Clear()
     {
-        Node* root = GetRoot();
+        Node* root = Root();
         if (!root)
             return;
         EraseNodes(root);
@@ -270,36 +270,36 @@ public:
     
 private:
     /// Return the root pointer with correct type
-    Node* GetRoot() const { return reinterpret_cast<Node*>(root_); }
+    Node* Root() const { return reinterpret_cast<Node*>(root_); }
     
     /// Find the node with smallest key
     Node* FindFirst() const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while ((node) && (node->link_[0]))
-            node = node->GetChild(0);
+            node = node->Child(0);
         return node;
     }
     
     /// Find the node with largest key
     Node* FindLast() const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while ((node) && (node->link_[1]))
-            node = node->GetChild(1);
+            node = node->Child(1);
         return node;
     }
     
     /// Find a node with key. Return null if not found
     Node* FindNode(const T& key) const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while (node)
         {
             if (node->key_ == key)
                 return node;
             else
-                node = node->GetChild(node->key_ < key);
+                node = node->Child(node->key_ < key);
         }
         return 0;
     }
@@ -311,7 +311,7 @@ private:
         
         if (!root_)
         {
-            root_ = ret = AllocateNode(key);
+            root_ = ret = ReserveNode(key);
             ++size_;
         }
         else
@@ -324,14 +324,14 @@ private:
             
             t = &head;
             g = p = 0;
-            q = GetRoot();
-            t->SetChild(1, GetRoot());
+            q = Root();
+            t->SetChild(1, Root());
             
             for (;;)
             {
                 if (!q)
                 {
-                    p->SetChild(dir, q = ret = AllocateNode(key));
+                    p->SetChild(dir, q = ret = ReserveNode(key));
                     ++size_;
                 }
                 else if ((IsRed(q->link_[0])) && (IsRed(q->link_[1])))
@@ -363,10 +363,10 @@ private:
                     t = g;
                 g = p;
                 p = q;
-                q = q->GetChild(dir);
+                q = q->Child(dir);
             }
             
-            root_ = head.GetChild(1);
+            root_ = head.Child(1);
         }
         
         root_->isRed_ = false;
@@ -389,14 +389,14 @@ private:
         
         q = &head;
         g = p = 0;
-        q->SetChild(1, GetRoot());
+        q->SetChild(1, Root());
         
         while (q->link_[dir])
         {
             unsigned last = dir;
             g = p;
             p = q;
-            q = q->GetChild(dir);
+            q = q->Child(dir);
             dir = q->key_ < key;
             
             if (q->key_ == key)
@@ -407,11 +407,11 @@ private:
                 if (IsRed(q->link_[!dir]))
                 {
                     p->SetChild(last, RotateSingle(q, dir));
-                    p = p->GetChild(last);
+                    p = p->Child(last);
                 }
                 else if (!IsRed(q->link_[!dir]))
                 {
-                    Node* s = p->GetChild(!last);
+                    Node* s = p->Child(!last);
                     
                     if (s)
                     {
@@ -429,7 +429,7 @@ private:
                             else if (IsRed(s->link_[!last]))
                                 g->SetChild(dir2, RotateSingle(p, last));
                             
-                            Node* t = g->GetChild(dir2);
+                            Node* t = g->Child(dir2);
                             q->isRed_ = t->isRed_ = true;
                             t->link_[0]->isRed_ = false;
                             t->link_[1]->isRed_ = false;
@@ -448,7 +448,7 @@ private:
             removed = true;
         }
         
-        root_ = head.GetChild(1);
+        root_ = head.Child(1);
         if (root_)
         {
             root_->isRed_ = false;
@@ -461,8 +461,8 @@ private:
     /// Erase the nodes recursively
     void EraseNodes(Node* node)
     {
-        Node* left = node->GetChild(0);
-        Node* right = node->GetChild(1);
+        Node* left = node->Child(0);
+        Node* right = node->Child(1);
         FreeNode(node);
         --size_;
         
@@ -472,8 +472,8 @@ private:
             EraseNodes(right);
     }
     
-    /// Allocate a node
-    Node* AllocateNode()
+    /// Reserve a node
+    Node* ReserveNode()
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
@@ -483,8 +483,8 @@ private:
         return newNode;
     }
     
-    /// Allocate a node with specified key
-    Node* AllocateNode(const T& key)
+    /// Reserve a node with specified key
+    Node* ReserveNode(const T& key)
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));

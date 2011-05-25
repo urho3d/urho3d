@@ -68,18 +68,18 @@ public:
     /// Map node
     struct Node : public TreeNodeBase
     {
-        // Construct undefined
+        /// Construct undefined
         Node()
         {
         }
         
-        // Construct with key
+        /// Construct with key
         Node(const T& key) :
             pair_(key)
         {
         }
         
-        // Construct with key and value
+        /// Construct with key and value
         Node(const T& key, const U& value) :
             pair_(key, value)
         {
@@ -89,9 +89,9 @@ public:
         KeyValue pair_;
         
         /// Return parent node
-        Node* GetParent() const { return static_cast<Node*>(parent_); }
+        Node* Parent() const { return static_cast<Node*>(parent_); }
         /// Return the left or right child
-        Node* GetChild(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
+        Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
     /// Map node iterator
@@ -123,13 +123,13 @@ public:
     class ConstIterator : public TreeIteratorBase
     {
     public:
-        // Construct
+        /// Construct
         ConstIterator(Node* ptr) :
             TreeIteratorBase(ptr)
         {
         }
         
-        // Construct from a non-const iterator
+        /// Construct from a non-const iterator
         ConstIterator(const Iterator& it) :
             TreeIteratorBase(it.ptr_)
         {
@@ -157,7 +157,7 @@ public:
     {
     }
     
-    /// Construct with another map
+    /// Construct from another map
     Map(const Map<T, U>& map)
     {
         allocator_ = AllocatorInitialize(sizeof(Node), map.Size());
@@ -248,7 +248,7 @@ public:
     /// Clear the map
     void Clear()
     {
-        Node* root = GetRoot();
+        Node* root = Root();
         if (!root)
             return;
         EraseNodes(root);
@@ -329,36 +329,36 @@ public:
     
 private:
     /// Return the root pointer with correct type
-    Node* GetRoot() const { return reinterpret_cast<Node*>(root_); }
+    Node* Root() const { return reinterpret_cast<Node*>(root_); }
     
     /// Find the node with smallest key
     Node* FindFirst() const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while ((node) && (node->link_[0]))
-            node = node->GetChild(0);
+            node = node->Child(0);
         return node;
     }
     
     /// Find the node with largest key
     Node* FindLast() const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while ((node) && (node->link_[1]))
-            node = node->GetChild(1);
+            node = node->Child(1);
         return node;
     }
     
     /// Find a node with key. Return null if not found
     Node* FindNode(const T& key) const
     {
-        Node* node = GetRoot();
+        Node* node = Root();
         while (node)
         {
             if (node->pair_.first_ == key)
                 return node;
             else
-                node = node->GetChild(node->pair_.first_ < key);
+                node = node->Child(node->pair_.first_ < key);
         }
         return 0;
     }
@@ -383,8 +383,8 @@ private:
             
             t = &head;
             g = p = 0;
-            q = GetRoot();
-            t->SetChild(1, GetRoot());
+            q = Root();
+            t->SetChild(1, Root());
             
             for (;;)
             {
@@ -423,10 +423,10 @@ private:
                     t = g;
                 g = p;
                 p = q;
-                q = q->GetChild(dir);
+                q = q->Child(dir);
             }
             
-            root_ = head.GetChild(1);
+            root_ = head.Child(1);
         }
         
         root_->isRed_ = false;
@@ -449,14 +449,14 @@ private:
         
         q = &head;
         g = p = 0;
-        q->SetChild(1, GetRoot());
+        q->SetChild(1, Root());
         
         while (q->link_[dir])
         {
             unsigned last = dir;
             g = p;
             p = q;
-            q = q->GetChild(dir);
+            q = q->Child(dir);
             dir = q->pair_.first_ < key;
             
             if (q->pair_.first_ == key)
@@ -467,11 +467,11 @@ private:
                 if (IsRed(q->link_[!dir]))
                 {
                     p->SetChild(last, RotateSingle(q, dir));
-                    p = p->GetChild(last);
+                    p = p->Child(last);
                 }
                 else if (!IsRed(q->link_[!dir]))
                 {
-                    Node* s = p->GetChild(!last);
+                    Node* s = p->Child(!last);
                     
                     if (s)
                     {
@@ -489,7 +489,7 @@ private:
                             else if (IsRed(s->link_[!last]))
                                 g->SetChild(dir2, RotateSingle(p, last));
                             
-                            Node* t = g->GetChild(dir2);
+                            Node* t = g->Child(dir2);
                             q->isRed_ = t->isRed_ = true;
                             t->link_[0]->isRed_ = false;
                             t->link_[1]->isRed_ = false;
@@ -503,13 +503,13 @@ private:
         {
             const_cast<T&>(f->pair_.first_) = q->pair_.first_;
             f->pair_.second_ = q->pair_.second_;
-            p->SetChild(p->GetChild(1) == q, q->link_[q->GetChild(0) == 0]);
+            p->SetChild(p->Child(1) == q, q->link_[q->Child(0) == 0]);
             delete q;
             --size_;
             removed = true;
         }
         
-        root_ = head.GetChild(1);
+        root_ = head.Child(1);
         if (root_)
         {
             root_->isRed_ = false;
@@ -522,8 +522,8 @@ private:
     /// Erase the nodes recursively
     void EraseNodes(Node* node)
     {
-        Node* left = node->GetChild(0);
-        Node* right = node->GetChild(1);
+        Node* left = node->Child(0);
+        Node* right = node->Child(1);
         delete node;
         --size_;
         
@@ -533,8 +533,8 @@ private:
             EraseNodes(right);
     }
     
-    /// Allocate a node
-    Node* AllocateNode()
+    /// Reserve a node
+    Node* ReserveNode()
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));
@@ -543,8 +543,8 @@ private:
         return newNode;
     }
     
-    /// Allocate a node with specified key and value
-    Node* AllocateNode(const T& key, const U& value)
+    /// Reserve a node with specified key and value
+    Node* ReserveNode(const T& key, const U& value)
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize(sizeof(Node));

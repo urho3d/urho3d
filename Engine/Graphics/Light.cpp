@@ -328,7 +328,7 @@ void Light::copyFrom(Light* original)
 Frustum Light::GetFrustum() const
 {
     const Matrix3x4& transform = GetWorldTransform();
-    Matrix3x4 frustumTransform(transform.GetTranslation(), transform.GetRotation(), 1.0f);
+    Matrix3x4 frustumTransform(transform.Translation(), transform.Rotation(), 1.0f);
     Frustum ret;
     ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, transform);
     return ret;
@@ -392,19 +392,19 @@ const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
         break;
         
     case LIGHT_POINT:
-        volumeTransform_ = Matrix3x4(transform.GetTranslation(), Quaternion::IDENTITY, range_);
+        volumeTransform_ = Matrix3x4(transform.Translation(), Quaternion::IDENTITY, range_);
         break;
         
     case LIGHT_SPOT:
         {
             float yScale = tan(fov_ * M_DEGTORAD * 0.5f) * range_;
             float xScale = aspectRatio_ * yScale;
-            volumeTransform_ = Matrix3x4(transform.GetTranslation(), transform.GetRotation(), Vector3(xScale, yScale, range_));
+            volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), Vector3(xScale, yScale, range_));
         }
         break;
         
     case LIGHT_SPLITPOINT:
-        volumeTransform_ = Matrix3x4(transform.GetTranslation(), transform.GetRotation(), range_);
+        volumeTransform_ = Matrix3x4(transform.Translation(), transform.Rotation(), range_);
         break;
     }
     

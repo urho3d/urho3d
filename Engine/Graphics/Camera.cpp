@@ -286,17 +286,17 @@ float Camera::GetHalfViewSize() const
 
 Vector3 Camera::GetForwardVector()
 {
-    return GetWorldTransform().ToRotationMatrix() * Vector3::FORWARD;
+    return GetWorldTransform().RotationMatrix() * Vector3::FORWARD;
 }
 
 Vector3 Camera::GetRightVector()
 {
-    return GetWorldTransform().ToRotationMatrix() * Vector3::RIGHT;
+    return GetWorldTransform().RotationMatrix() * Vector3::RIGHT;
 }
 
 Vector3 Camera::GetUpVector()
 {
-    return GetWorldTransform().ToRotationMatrix() * Vector3::UP;
+    return GetWorldTransform().RotationMatrix() * Vector3::UP;
 }
 
 float Camera::GetDistance(const Vector3& worldPos)

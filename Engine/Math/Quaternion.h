@@ -203,15 +203,15 @@ public:
     Quaternion NlerpFast(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).NormalizedFast(); }
     
     /// Return Euler angles in degrees
-    Vector3 ToEuler() const;
+    Vector3 EulerAngles() const;
     /// Return yaw angle in degrees
     float YawAngle() const;
     /// Return pitch angle in degrees
     float PitchAngle() const;
     /// Return roll angle in degrees
     float RollAngle() const;
-    /// Convert to rotation matrix
-    Matrix3 ToRotationMatrix() const;
+    /// Return the rotation matrix that corresponds to this quaternion
+    Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion
     Quaternion Slerp(Quaternion rhs, float t) const;
     /// Return float data

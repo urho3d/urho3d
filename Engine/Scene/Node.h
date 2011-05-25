@@ -152,7 +152,7 @@ public:
         if (dirty_)
             UpdateWorldTransform();
         
-        return worldTransform_.GetTranslation();
+        return worldTransform_.Translation();
     }
     
     /// Return world-space rotation
@@ -161,7 +161,7 @@ public:
         if (dirty_)
             UpdateWorldTransform();
         
-        return worldTransform_.GetRotation();
+        return worldTransform_.Rotation();
     }
     
     /// Return world-space direction
@@ -170,7 +170,7 @@ public:
         if (dirty_)
             UpdateWorldTransform();
         
-        return worldTransform_.ToRotationMatrix() * Vector3::FORWARD;
+        return worldTransform_.RotationMatrix() * Vector3::FORWARD;
     }
     
     /// Return world-space scale
@@ -179,7 +179,7 @@ public:
         if (dirty_)
             UpdateWorldTransform();
         
-        return worldTransform_.GetScale();
+        return worldTransform_.Scale();
     }
     
     /// Return world-space transform

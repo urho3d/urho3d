@@ -36,13 +36,13 @@ const Matrix3x4 Matrix3x4::IDENTITY(
 
 Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, float scale)
 {
-    SetRotation(rotation.ToRotationMatrix() * scale);
+    SetRotation(rotation.RotationMatrix() * scale);
     SetTranslation(translation);
 }
 
 Matrix3x4::Matrix3x4(const Vector3& translation, const Quaternion& rotation, const Vector3& scale)
 {
-    SetRotation(rotation.ToRotationMatrix().Scaled(scale));
+    SetRotation(rotation.RotationMatrix().Scaled(scale));
     SetTranslation(translation);
 }
 

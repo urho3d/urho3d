@@ -115,18 +115,18 @@ public:
     List() :
         ListBase()
     {
-        // Allocate the tail node
+        // Reserve the tail node
         allocator_ = AllocatorInitialize(sizeof(Node));
-        head_ = tail_ = AllocateNode();
+        head_ = tail_ = ReserveNode();
     }
     
     /// Construct from another list
     List(const List<T>& list) :
         ListBase()
     {
-        // Allocate the tail node
+        // Reserve the tail node
         allocator_ = AllocatorInitialize(sizeof(Node));
-        head_ = tail_ = AllocateNode();
+        head_ = tail_ = ReserveNode();
         
         // Then assign the other list
         *this = list;
@@ -282,7 +282,7 @@ private:
         if (!dest)
             return;
         
-        Node* newNode = AllocateNode(value);
+        Node* newNode = ReserveNode(value);
         Node* prev = dest->GetPrev();
         newNode->next_ = dest;
         newNode->prev_ = prev;
@@ -321,16 +321,16 @@ private:
         return next;
     }
     
-    /// Allocate a node
-    Node* AllocateNode()
+    /// Reserve a node
+    Node* ReserveNode()
     {
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
     
-    /// Allocate a node with initial value
-    Node* AllocateNode(const T& value)
+    /// Reserve a node with initial value
+    Node* ReserveNode(const T& value)
     {
         Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(value);

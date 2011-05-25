@@ -66,19 +66,19 @@ public:
     /// Return parent node's world position
     Vector3 GetWorldPosition() const
     {
-        return GetWorldTransform().GetTranslation();
+        return GetWorldTransform().Translation();
     }
     
     /// Return parent node's world rotation
     Quaternion GetWorldRotation() const
     {
-        return GetWorldTransform().GetRotation();
+        return GetWorldTransform().Rotation();
     }
     
     /// Return parent node's world scale
     Vector3 GetWorldScale() const
     {
-        return GetWorldTransform().GetScale();
+        return GetWorldTransform().Scale();
     }
     
     /// Return components in the same scene node by type

@@ -657,7 +657,7 @@ void BuildAndSaveModel(OutModel& model)
             Quaternion rot;
             GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
             vertexTransform = Matrix3x4(pos, rot, scale);
-            normalTransform = rot.ToRotationMatrix();
+            normalTransform = rot.RotationMatrix();
             
             SharedPtr<IndexBuffer> ib(new IndexBuffer(context_));
             SharedPtr<VertexBuffer> vb(new VertexBuffer(context_));
@@ -740,7 +740,7 @@ void BuildAndSaveModel(OutModel& model)
             Quaternion rot;
             GetPosRotScale(GetMeshBakingTransform(model.meshNodes_[i], model.rootNode_), pos, rot, scale);
             vertexTransform = Matrix3x4(pos, rot, scale);
-            normalTransform = rot.ToRotationMatrix();
+            normalTransform = rot.RotationMatrix();
             
             SharedPtr<Geometry> geom(new Geometry(context_));
             

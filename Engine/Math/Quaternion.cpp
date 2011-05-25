@@ -141,7 +141,7 @@ Quaternion::Quaternion(const Matrix3& matrix)
     }
 }
 
-Vector3 Quaternion::ToEuler() const
+Vector3 Quaternion::EulerAngles() const
 {
     // Derivation from http://www.geometrictools.com/Documentation/EulerAngles.pdf
     // Order of rotations: Z first, then X, then Y
@@ -175,20 +175,20 @@ Vector3 Quaternion::ToEuler() const
 
 float Quaternion::YawAngle() const
 {
-    return ToEuler().y_;
+    return EulerAngles().y_;
 }
 
 float Quaternion::PitchAngle() const
 {
-    return ToEuler().x_;
+    return EulerAngles().x_;
 }
 
 float Quaternion::RollAngle() const
 {
-    return ToEuler().z_;
+    return EulerAngles().z_;
 }
 
-Matrix3 Quaternion::ToRotationMatrix() const
+Matrix3 Quaternion::RotationMatrix() const
 {
     return Matrix3(
         1.0f - 2.0f * y_ * y_ - 2.0f * z_ * z_,

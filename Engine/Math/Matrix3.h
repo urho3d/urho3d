@@ -185,7 +185,7 @@ public:
     }
     
     /// Return the scaling part
-    Vector3 GetScale() const
+    Vector3 Scale() const
     {
         return Vector3(
             sqrtf(m00_ * m00_ + m10_ * m10_ + m20_ * m20_),

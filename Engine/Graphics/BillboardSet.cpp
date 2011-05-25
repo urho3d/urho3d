@@ -295,7 +295,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();
-    const Vector3& worldScale = worldTransform.GetScale();
+    const Vector3& worldScale = worldTransform.Scale();
     
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
@@ -419,7 +419,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, LOCK_DISCARD);
     if (!dest)
         return;
-    const Vector3& worldScale = GetWorldTransform().GetScale();
+    const Vector3& worldScale = GetWorldTransform().Scale();
     
     for (unsigned i = 0; i < enabledBillboards; ++i)
     {

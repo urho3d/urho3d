@@ -130,7 +130,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         graphics->SetVertexShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
     
     if (vertexShader_->NeedParameterUpdate(VSP_CAMERAROT, camera_))
-        graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().ToRotationMatrix());
+        graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
     if (vertexShader_->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
     {
@@ -164,7 +164,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     if ((light_) && (vertexShader_->NeedParameterUpdate(VSP_SPOTPROJ, light_)))
     {
         const Matrix3x4& transform = light_->GetWorldTransform();
-        Matrix3x4 spotView(transform.GetTranslation(), transform.GetRotation(), 1.0f);
+        Matrix3x4 spotView(transform.Translation(), transform.Rotation(), 1.0f);
         
         Matrix4 spotProj(Matrix4::ZERO);
         // Make the projected light slightly smaller than the shadow map to prevent light spill
