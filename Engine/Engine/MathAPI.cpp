@@ -605,8 +605,8 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "Color opAdd(const Color&in) const", asMETHOD(Color, operator +), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "Color Lerp(const Color&in, float) const", asMETHOD(Color, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "String ToString() const", asMETHOD(Color, ToString), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, GetRGB), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Color", "float get_intensity() const", asMETHOD(Color, GetIntensity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "Vector3 get_rgb() const", asMETHOD(Color, RGBValues), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float get_intensity() const", asMETHOD(Color, Intensity), asCALL_THISCALL);
     engine->RegisterObjectProperty("Color", "float r", offsetof(Color, r_));
     engine->RegisterObjectProperty("Color", "float g", offsetof(Color, g_));
     engine->RegisterObjectProperty("Color", "float b", offsetof(Color, b_));

@@ -99,9 +99,9 @@ public:
     /// Return float data
     const float* GetData() const { return &r_; }
     /// Return RGB values as a Vector3
-    Vector3 GetRGB() const { return Vector3(r_, g_, b_); }
-    /// Return intensity
-    float GetIntensity() const { return GetRGB().DotProduct(Vector3(0.333f, 0.333f, 0.333f)); }
+    Vector3 RGBValues() const { return Vector3(r_, g_, b_); }
+    /// Return approximate intensity
+    float Intensity() const { return RGBValues().DotProduct(Vector3(0.333f, 0.333f, 0.333f)); }
     
     /// Linear interpolation with another color
     Color Lerp(const Color& rhs, float t) const

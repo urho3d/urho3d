@@ -469,7 +469,7 @@ void Light::SetShadowMap(Texture2D* shadowMap)
 void Light::SetIntensitySortValue(const Vector3& position)
 {
     // Directional lights are always assumed to be "infinitely" close, while point and spot lights take distance into account
-    float invIntensity = 1.0f / color_.GetIntensity();
+    float invIntensity = 1.0f / color_.Intensity();
     if (lightType_ == LIGHT_DIRECTIONAL)
         sortValue_ = invIntensity;
     else
