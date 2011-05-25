@@ -31,6 +31,7 @@
 #include "ScriptFile.h"
 #include "Time.h"
 
+#include <stdexcept>
 #include <Windows.h>
 
 #include "DebugNew.h"
@@ -58,52 +59,59 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 
 void Run(const char* cmdLine)
 {
-    // Check for script file name
-    const Vector<String>& arguments = ParseArguments(cmdLine);
-    String scriptFileName;
-    for (unsigned i = 0; i < arguments.Size(); ++i)
+    try
     {
-        if (arguments[i][0] != '-')
+        // Check for script file name
+        const Vector<String>& arguments = ParseArguments(cmdLine);
+        String scriptFileName;
+        for (unsigned i = 0; i < arguments.Size(); ++i)
         {
-            scriptFileName = arguments[i];
-            break;
+            if (arguments[i][0] != '-')
+            {
+                scriptFileName = arguments[i];
+                break;
+            }
+        }
+    
+        // Show usage if not found
+        if (scriptFileName.Empty())
+        {
+            ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
+                "The script file should implement the function void Start(), "
+                "which should create the scene content and subscribe to "
+                "all necessary events, such as the application update."
+            );
+            return;
+        }
+    
+        // Create the execution context and the engine
+        SharedPtr<Context> context(new Context());
+        SharedPtr<Engine> engine(new Engine(context));
+        if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
+        {
+            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+            return;
+        }
+    
+        // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
+        context->GetSubsystem<Time>()->SetTimerPeriod(5);
+    
+        // Execute the Start function from the script file, then run the engine loop until exited
+        engine->InitializeScripting();
+        ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
+        if ((scriptFile) && (scriptFile->Execute("void Start()")))
+        {
+            while (!engine->IsExiting())
+                engine->RunFrame();
+        }
+        else
+        {
+            engine->Exit(); // Close the rendering window
+            ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
         }
     }
-    
-    // Show usage if not found
-    if (scriptFileName.Empty())
+    catch (std::bad_alloc&)
     {
-        ErrorDialog("Urho3D", "Usage: Urho3D <scriptfile> [options]\n\n"
-            "The script file should implement the function void Start(), "
-            "which should create the scene content and subscribe to "
-            "all necessary events, such as the application update."
-        );
-        return;
-    }
-    
-    // Create the execution context and the engine
-    SharedPtr<Context> context(new Context());
-    SharedPtr<Engine> engine(new Engine(context));
-    if (!engine->Initialize("Urho3D", "Urho3D.log", arguments))
-    {
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
-        return;
-    }
-    
-    // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
-    context->GetSubsystem<Time>()->SetTimerPeriod(5);
-    
-    // Execute the Start function from the script file, then run the engine loop until exited
-    engine->InitializeScripting();
-    ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
-    if ((scriptFile) && (scriptFile->Execute("void Start()")))
-    {
-        while (!engine->IsExiting())
-            engine->RunFrame();
-    }
-    else
-    {
-        engine->Exit(); // Close the rendering window
-        ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
+        ErrorDialog("Urho3D", "An out-of-memory error occurred. The application will now exit.");
     }
 }
