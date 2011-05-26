@@ -181,14 +181,14 @@ public:
         *this = (int)value;
     }
     
-    /// Construct from a StringHash (convert to integer)
+    /// Construct from a string hash (convert to integer)
     Variant(const StringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.GetValue();
     }
     
-    /// Construct from a ShortStringHash (convert to integer)
+    /// Construct from a short string hash (convert to integer)
     Variant(const ShortStringHash& value) :
         type_(VAR_NONE)
     {

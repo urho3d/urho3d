@@ -25,16 +25,6 @@
 
 #include "Object.h"
 
-/// Application activated
-EVENT(E_ACTIVATED, Activated)
-{
-}
-
-/// Application inactivated
-EVENT(E_INACTIVATED, Inactivated)
-{
-}
-
 /// Mouse button pressed
 EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {

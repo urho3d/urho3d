@@ -43,7 +43,7 @@ public:
     {
     }
     
-    /// Construct from a Vector3 and the W coordinate
+    /// Construct from a 3-dimensional vector and the W coordinate
     Vector4(const Vector3& vector, float w) :
         x_(vector.x_),
         y_(vector.y_),

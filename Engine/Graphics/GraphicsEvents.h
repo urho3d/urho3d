@@ -35,6 +35,13 @@ EVENT(E_WINDOWMESSAGE, WindowMessage)
     PARAM(P_HANDLED, Handled);            // bool
 }
 
+/// Application activation state changed. Sent by the Input subsystem
+EVENT(E_ACTIVATION, Activation)
+{
+    PARAM(P_ACTIVE, Active);              // bool
+    PARAM(P_MINIMIZED, Minimized);        // bool
+}
+
 /// New screen mode set
 EVENT(E_SCREENMODE, ScreenMode)
 {

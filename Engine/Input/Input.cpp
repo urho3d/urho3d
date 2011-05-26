@@ -241,7 +241,12 @@ void Input::MakeActive()
     SetClipCursor(clipCursor_);
     SetCursorVisible(false);
     
-    SendEvent(E_ACTIVATED);
+    using namespace Activation;
+    
+    VariantMap eventData;
+    eventData[P_ACTIVE] = active_;
+    eventData[P_MINIMIZED] = minimized_;
+    SendEvent(E_ACTIVATION, eventData);
 }
 
 void Input::MakeInactive()
@@ -259,7 +264,12 @@ void Input::MakeInactive()
     ClipCursor(0);
     SetCursorVisible(true);
     
-    SendEvent(E_INACTIVATED);
+    using namespace Activation;
+    
+    VariantMap eventData;
+    eventData[P_ACTIVE] = active_;
+    eventData[P_MINIMIZED] = minimized_;
+    SendEvent(E_ACTIVATION, eventData);
 }
 
 void Input::clearState()
@@ -468,30 +478,13 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_ACTIVATE:
+        minimized_ = HIWORD(wParam) != 0;
         if (LOWORD(wParam) == WA_INACTIVE)
-        {
             MakeInactive();
-            if (graphics_->GetFullscreen())
-                minimized_ = true;
-        }
         else
         {
             if (!minimized_)
                activated_ = true;
-        }
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_SIZE:
-        if (wParam == SIZE_MINIMIZED)
-        {
-            minimized_ = true;
-            MakeInactive();
-        }
-        if ((wParam == SIZE_RESTORED) || (wParam == SIZE_MAXIMIZED))
-        {
-            minimized_ = false;
-            activated_ = true;
         }
         eventData[P_HANDLED] = true;
         break;

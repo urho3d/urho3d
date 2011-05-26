@@ -53,7 +53,7 @@ public:
     {
     }
     
-    /// Construct from a Rect, with the Z dimension left zero
+    /// Construct from a rect, with the Z dimension left zero
     BoundingBox(const Rect& rect) :
         min_(Vector3(rect.min_, 0.0f)),
         max_(Vector3(rect.max_, 0.0f)),
