@@ -227,7 +227,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
         unsigned components = image->GetComponents();
-        D3DFORMAT format = D3DFMT_UNKNOWN;
+        unsigned format = 0;
         
         if (levelWidth != levelHeight)
         {
@@ -246,19 +246,19 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         switch (components)
         {
             case 1:
-            format = D3DFMT_L8;
+            format = Graphics::GetLuminanceFormat();
             break;
             
             case 2:
-            format = D3DFMT_A8L8;
+            format = Graphics::GetLuminanceAlphaFormat();
             break;
             
             case 3:
-            format = D3DFMT_X8R8G8B8;
+            format = Graphics::GetRGBFormat();
             break;
             
             case 4:
-            format = D3DFMT_A8R8G8B8;
+            format = Graphics::GetRGBAFormat();
             break;
         }
         
@@ -336,7 +336,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         int width = image->GetWidth();
         int height = image->GetHeight();
         unsigned levels = image->GetNumCompressedLevels();
-        D3DFORMAT format = (D3DFORMAT)GetCompressedD3DFormat(image->GetCompressedFormat());
+        unsigned format = GetDXTFormat(image->GetCompressedFormat());
         
         if (width != height)
         {
@@ -400,7 +400,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
     return true;
 }
 
-bool TextureCube::Lock(CubeMapFace face, unsigned level, IntRect* rect, LockedRect& lockedRect)
+bool TextureCube::Lock(CubeMapFace face, unsigned level, const IntRect* rect, LockedRect& lockedRect)
 {
     if (!object_)
     {

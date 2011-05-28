@@ -38,7 +38,7 @@ struct LockedRect
 {
     /// Texture data, format-specific
     unsigned char* bits_;
-    /// Byte offset between this row and the next
+    /// Byte offset between rows
     unsigned pitch_;
 };
 
@@ -84,8 +84,8 @@ public:
     const Color& GetBorderColor() const { return borderColor_; }
     /// Return backup texture
     Texture* GetBackupTexture() const { return backupTexture_; }
-    /// Return compressed format
-    static unsigned GetCompressedD3DFormat(CompressedFormat format);
+    /// Return API-specific DXT compressed texture format
+    static unsigned GetDXTFormat(CompressedFormat format);
     
 protected:
     /// Load parameters

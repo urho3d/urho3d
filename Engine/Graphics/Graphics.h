@@ -247,9 +247,9 @@ public:
     unsigned GetNumBatches() const { return numBatches_; }
     /// Return dummy color texture format for shadow maps. Is "NULL" (consume no video memory) if supported
     unsigned GetDummyColorFormat() const { return dummyColorFormat_; }
-    /// Return shadow map depth texture format, or D3DFMT_UNKNOWN if not supported
+    /// Return shadow map depth texture format, or 0 if not supported
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
-    /// Return 24-bit shadow map depth texture format, or D3DFMT_UNKNOWN if not supported
+    /// Return 24-bit shadow map depth texture format, or 0 if not supported
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether deferred rendering is supported
     bool GetDeferredSupport() const { return deferredSupport_; }
@@ -362,6 +362,19 @@ public:
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject
     void RemoveGPUObject(GPUObject* object);
+    
+    /// Return the API-specific alpha texture format
+    static unsigned GetAlphaFormat();
+    /// Return the API-specific luminance texture format
+    static unsigned GetLuminanceFormat();
+    /// Return the API-specific luminance alpha texture format
+    static unsigned GetLuminanceAlphaFormat();
+    /// Return the API-specific RGB texture format
+    static unsigned GetRGBFormat();
+    /// Return the API-specific RGBA texture format
+    static unsigned GetRGBAFormat();
+    /// Return the API-specific deferred rendering depth texture format
+    static unsigned GetDepthFormat();
     
 private:
     /// Create the application window

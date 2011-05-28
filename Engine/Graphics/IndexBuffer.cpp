@@ -156,7 +156,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         return 0;
     }
     
-    void* hwData;
+    void* hwData = 0;
     
     if (object_)
     {

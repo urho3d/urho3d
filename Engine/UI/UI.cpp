@@ -31,7 +31,6 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
-#include "GraphicsImpl.h"
 #include "InputEvents.h"
 #include "LineEdit.h"
 #include "ListView.h"
@@ -258,6 +257,8 @@ void UI::Render()
     ShaderProgram* ps = 0;
     ShaderProgram* vs = 0;
     
+    unsigned alphaFormat = Graphics::GetAlphaFormat();
+    
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         // Choose shaders here so that UIBatch does not need to look up shaders each time
@@ -271,7 +272,7 @@ void UI::Render()
             // If texture contains only an alpha channel, use the alpha pixel shader
             vs = diffTextureVS_;
             
-            if (batches_[i].texture_->GetFormat() == D3DFMT_A8)
+            if (batches_[i].texture_->GetFormat() == alphaFormat)
                 ps = alphaTexturePS_;
             else
                 ps = diffTexturePS_;

@@ -1257,7 +1257,7 @@ bool Renderer::CreateShadowMaps()
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
     bool hardwarePCF = graphics_->GetHardwareShadowSupport();
     
-    if (shadowMapFormat == D3DFMT_UNKNOWN)
+    if (!shadowMapFormat)
         return false;
     
     if (!drawShadows_)

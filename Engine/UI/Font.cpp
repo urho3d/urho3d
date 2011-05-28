@@ -27,7 +27,6 @@
 #include "Deserializer.h"
 #include "Font.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Texture2D.h"
@@ -276,7 +275,7 @@ const FontFace* Font::GetFace(int pointSize)
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
     texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
     texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-    if (!texture->SetSize(texWidth, texHeight, D3DFMT_A8))
+    if (!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat()))
     {
         FT_Done_Face(face);
         return 0;

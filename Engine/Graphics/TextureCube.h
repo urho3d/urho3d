@@ -58,8 +58,8 @@ public:
     bool Load(CubeMapFace face, Deserializer& source);
     /// Load one face from an image. Return true if successful
     bool Load(CubeMapFace face, SharedPtr<Image> image);
-    /// Lock a rectangular area from one face and mipmap level. A null rectangle locks the entire face. Return true if successful
-    bool Lock(CubeMapFace face, unsigned level, IntRect* rect, LockedRect& lockedRect);
+    /// Lock a rectangular area from one face and mipmap level. A null rect locks the entire face. Return true if successful
+    bool Lock(CubeMapFace face, unsigned level, const IntRect* rect, LockedRect& lockedRect);
     /// Unlock texture
     void Unlock();
     

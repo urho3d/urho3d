@@ -123,7 +123,7 @@ TextureUsage Texture::GetUsage() const
     return TEXTURE_STATIC;
 }
 
-unsigned Texture::GetCompressedD3DFormat(CompressedFormat format)
+unsigned Texture::GetDXTFormat(CompressedFormat format)
 {
     switch (format)
     {
@@ -137,7 +137,7 @@ unsigned Texture::GetCompressedD3DFormat(CompressedFormat format)
         return D3DFMT_DXT5;
     }
     
-    return D3DFMT_UNKNOWN;
+    return 0;
 }
 
 void Texture::LoadParameters()

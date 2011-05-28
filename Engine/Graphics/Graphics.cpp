@@ -2024,6 +2024,36 @@ void Graphics::RemoveGPUObject(GPUObject* object)
     }
 }
 
+unsigned Graphics::GetAlphaFormat()
+{
+    return D3DFMT_A8;
+}
+
+unsigned Graphics::GetLuminanceFormat()
+{
+    return D3DFMT_L8;
+}
+
+unsigned Graphics::GetLuminanceAlphaFormat()
+{
+    return D3DFMT_A8L8;
+}
+
+unsigned Graphics::GetRGBFormat()
+{
+    return D3DFMT_X8R8G8B8;
+}
+
+unsigned Graphics::GetRGBAFormat()
+{
+    return D3DFMT_A8R8G8B8;
+}
+
+unsigned Graphics::GetDepthFormat()
+{
+    return D3DFMT_R32F;
+}
+
 bool Graphics::OpenWindow(int width, int height)
 {
     WNDCLASS wc;
@@ -2139,8 +2169,8 @@ bool Graphics::CreateInterface()
         else
         {
             // No depth texture shadow map support -> no shadows at all
-            shadowMapFormat_ = D3DFMT_UNKNOWN;
-            hiresShadowMapFormat_ = D3DFMT_UNKNOWN;
+            shadowMapFormat_ = 0;
+            hiresShadowMapFormat_ = 0;
         }
     }
     
@@ -2210,19 +2240,19 @@ void Graphics::CreateRenderTargets()
         if (!diffBuffer_)
         {
             diffBuffer_ = new Texture2D(context_);
-            diffBuffer_->SetSize(0, 0, D3DFMT_A8R8G8B8, TEXTURE_RENDERTARGET);
+            diffBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
         }
         
         if (!normalBuffer_)
         {
             normalBuffer_ = new Texture2D(context_);
-            normalBuffer_->SetSize(0, 0, D3DFMT_A8R8G8B8, TEXTURE_RENDERTARGET);
+            normalBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
         }
         
         if (!depthBuffer_)
         {
             depthBuffer_ = new Texture2D(context_);
-            depthBuffer_->SetSize(0, 0, D3DFMT_R32F, TEXTURE_RENDERTARGET);
+            depthBuffer_->SetSize(0, 0, GetDepthFormat(), TEXTURE_RENDERTARGET);
         }
         
         // If deferred mode temporal AA is used, reserve screen buffers
@@ -2233,7 +2263,7 @@ void Graphics::CreateRenderTargets()
             for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
             {
                 screenBuffer_[i] = new Texture2D(context_);
-                screenBuffer_[i]->SetSize(0, 0, D3DFMT_A8R8G8B8, TEXTURE_RENDERTARGET);
+                screenBuffer_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
             }
         }
         else
