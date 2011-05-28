@@ -671,7 +671,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
     }
     
     numPrimitives_ += primitiveCount;
-    numBatches_++;
+    ++numBatches_;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
@@ -697,7 +697,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     }
     
     numPrimitives_ += primitiveCount;
-    numBatches_++;
+    ++numBatches_;
 }
 
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
@@ -734,7 +734,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     }
     
     numPrimitives_ += instanceCount * primitiveCount;
-    numBatches_++;
+    ++numBatches_;
 }
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
@@ -963,15 +963,12 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, float value)
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    float data[4] =
-    {
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f
-    };
+    float data[4];
     
     data[0] = value;
+    data[1] = 0.0f;
+    data[2] = 0.0f;
+    data[3] = 0.0f;
     
     impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
 }
@@ -1015,17 +1012,12 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector3& ve
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    float data[4] =
-    {
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f
-    };
+    float data[4];
     
     data[0] = vector.x_;
     data[1] = vector.y_;
     data[2] = vector.z_;
+    data[3] = 0.0f;
     
     impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
 }
@@ -1090,15 +1082,12 @@ void Graphics::SetPixelShaderParameter(ShaderParameter param, float value)
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    float data[4] =
-    {
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f
-    };
+    float data[4];
     
     data[0] = value;
+    data[1] = 0.0f;
+    data[2] = 0.0f;
+    data[3] = 0.0f;
     
     impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }
@@ -1142,17 +1131,12 @@ void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector3& vec
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    float data[4] =
-    {
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f
-    };
+    float data[4];
     
     data[0] = vector.x_;
     data[1] = vector.y_;
     data[2] = vector.z_;
+    data[3] = 0.0f;
     
     impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }

@@ -284,15 +284,15 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         
         for (unsigned i = 0; i < manualLevels; ++i)
         {
-            D3DLOCKED_RECT hwRect;
-            if (!Lock(face, i, 0, &hwRect))
+            LockedRect hwRect;
+            if (!Lock(face, i, 0, hwRect))
                 return false;
             
             memoryUse += levelWidth * levelHeight * components;
             
             for (int y = 0; y < levelHeight; ++y)
             {
-                unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * y;
+                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * y;
                 unsigned char* src = levelData + components * levelWidth * y;
                 
                 switch (components)
@@ -377,13 +377,13 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             memoryUse += level.rows_ * level.rowSize_;
             
-            D3DLOCKED_RECT hwRect;
-            if (!Lock(face, i, 0, &hwRect))
+            LockedRect hwRect;
+            if (!Lock(face, i, 0, hwRect))
                 return false;
             
             for (unsigned j = 0; j < level.rows_; ++j)
             {
-                unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * j;
+                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * j;
                 unsigned char* src = level.data_ + level.rowSize_ * j;
                 memcpy(dest, src, level.rowSize_);
             }
@@ -400,14 +400,8 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
     return true;
 }
 
-bool TextureCube::Lock(CubeMapFace face, unsigned level, void* rect, void* hwRect)
+bool TextureCube::Lock(CubeMapFace face, unsigned level, IntRect* rect, LockedRect& lockedRect)
 {
-    D3DLOCKED_RECT* lockedRect = (D3DLOCKED_RECT*)hwRect;
-    if (!lockedRect)
-    {
-        LOGERROR("Null locked rect structure");
-        return false;
-    }
     if (!object_)
     {
         LOGERROR("No texture created, can not lock");
@@ -419,16 +413,28 @@ bool TextureCube::Lock(CubeMapFace face, unsigned level, void* rect, void* hwRec
         return false;
     }
     
+    D3DLOCKED_RECT d3dLockedRect;
+    RECT d3dRect;
+    if (rect)
+    {
+        d3dRect.left = rect->left_;
+        d3dRect.top = rect->top_;
+        d3dRect.right = rect->right_;
+        d3dRect.bottom = rect->bottom_;
+    }
+    
     DWORD flags = 0;
     if ((!rect) && (pool_ == D3DPOOL_DEFAULT))
         flags |= D3DLOCK_DISCARD;
     
-    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, lockedRect, (RECT*)rect, flags)))
+    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, rect ? &d3dRect : 0, flags)))
     {
         LOGERROR("Could not lock texture");
         return false;
     }
     
+    lockedRect.bits_ = (unsigned char*)d3dLockedRect.pBits;
+    lockedRect.pitch_ = d3dLockedRect.Pitch;
     lockedLevel_ = level;
     lockedFace_ = face;
     return true;

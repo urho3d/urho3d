@@ -34,7 +34,7 @@ class IndexBuffer : public Object, public GPUObject
     OBJECT(IndexBuffer);
     
 public:
-    /// Construct with graphics subsystem pointer and whether is dynamic or not
+    /// Construct
     IndexBuffer(Context* context);
     /// Destruct
     virtual ~IndexBuffer();
@@ -76,7 +76,7 @@ private:
     /// Create buffer
     bool Create();
     
-    /// Fallback data when operating with a null graphics
+    /// Fallback data when operating with a null graphics subsystem
     SharedArrayPtr<unsigned char> fallbackData_;
     /// Memory pool
     unsigned pool_;

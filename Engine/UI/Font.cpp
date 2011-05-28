@@ -282,8 +282,8 @@ const FontFace* Font::GetFace(int pointSize)
         return 0;
     }
     
-    D3DLOCKED_RECT hwRect;
-    if (!texture->Lock(0, 0, &hwRect))
+    LockedRect hwRect;
+    if (!texture->Lock(0, 0, hwRect))
     {
         FT_Done_Face(face);
         return 0;
@@ -292,7 +292,7 @@ const FontFace* Font::GetFace(int pointSize)
     // First clear the whole texture
     for (int y = 0; y < texHeight; ++y)
     {
-        unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * y;
+        unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * y;
         memset(dest, 0, texWidth);
     }
     
@@ -309,7 +309,7 @@ const FontFace* Font::GetFace(int pointSize)
         for (int y = 0; y < newFace.glyphs_[i].height_; ++y)
         {
             unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-            unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
+            unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
             
             for (int x = 0; x < newFace.glyphs_[i].width_; ++x)
             {
@@ -336,7 +336,7 @@ const FontFace* Font::GetFace(int pointSize)
         {
             for (int y = 0; y < newFace.glyphs_[i].height_; ++y)
             {
-                unsigned char* dest = (unsigned char*)hwRect.pBits + hwRect.Pitch * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
+                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
                 for (int x = 0; x < newFace.glyphs_[i].width_; ++x)
                 {
                     int pixel = dest[x];

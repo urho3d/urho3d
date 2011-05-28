@@ -33,6 +33,15 @@ static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLFile;
 
+/// Locked texture rectangle structure
+struct LockedRect
+{
+    /// Texture data, format-specific
+    unsigned char* bits_;
+    /// Byte offset between this row and the next
+    unsigned pitch_;
+};
+
 /// Base class for texture resources
 class Texture : public Resource, public GPUObject
 {
