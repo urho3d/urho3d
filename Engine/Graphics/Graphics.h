@@ -140,7 +140,7 @@ public:
     void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set pixel shader 4x3 matrix constant
     void SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
-    /// Set vertex shader parameter source. Called by VertexShader
+    /// Set shader parameter source. Called by ShaderProgram
     void SetShaderParameterSource(ShaderParameter param, const void* source) { lastShaderParameterSources_[param] = source; }
     /// Map shader parameter to a constant register. Called by Shader
     void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
