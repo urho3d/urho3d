@@ -33,7 +33,7 @@
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 
 #include "DebugNew.h"
 

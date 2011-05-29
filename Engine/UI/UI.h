@@ -114,15 +114,15 @@ private:
     /// Resource cache
     WeakPtr<ResourceCache> cache_;
     /// Vertex shader for no texture
-    SharedPtr<ShaderProgram> noTextureVS_;
+    SharedPtr<ShaderVariation> noTextureVS_;
     /// Vertex shader for diffuse texture
-    SharedPtr<ShaderProgram> diffTextureVS_;
+    SharedPtr<ShaderVariation> diffTextureVS_;
     /// Pixel shader for no texture
-    SharedPtr<ShaderProgram> noTexturePS_;
+    SharedPtr<ShaderVariation> noTexturePS_;
     /// Pixel shader for diffuse texture
-    SharedPtr<ShaderProgram> diffTexturePS_;
+    SharedPtr<ShaderVariation> diffTexturePS_;
     /// Pixel shader for alpha texture
-    SharedPtr<ShaderProgram> alphaTexturePS_;
+    SharedPtr<ShaderVariation> alphaTexturePS_;
     /// UI root element
     SharedPtr<UIElement> rootElement_;
     /// Cursor

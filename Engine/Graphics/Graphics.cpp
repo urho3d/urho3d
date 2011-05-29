@@ -40,7 +40,7 @@
 #include "ParticleEmitter.h"
 #include "Profiler.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Skybox.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -907,7 +907,7 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
     }
 }
 
-void Graphics::SetShaders(ShaderProgram* vs, ShaderProgram* ps)
+void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
     if (vs != vertexShader_)
     {

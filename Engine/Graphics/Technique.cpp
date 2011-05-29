@@ -27,7 +27,7 @@
 #include "Technique.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "StringUtils.h"
 #include "XMLFile.h"
 

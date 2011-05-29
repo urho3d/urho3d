@@ -35,7 +35,7 @@ class Light;
 class Material;
 class Pass;
 class Matrix3x4;
-class ShaderProgram;
+class ShaderVariation;
 class VertexBuffer;
 
 /// Description of a 3D geometry draw call
@@ -68,9 +68,9 @@ struct Batch
     /// Material pass
     Pass* pass_;
     /// Vertex shader
-    ShaderProgram* vertexShader_;
+    ShaderVariation* vertexShader_;
     /// Pixel shader
-    ShaderProgram* pixelShader_;
+    ShaderVariation* pixelShader_;
     /// Camera
     Camera* camera_;
     /// Light that affects the geometry, if any
@@ -142,9 +142,9 @@ struct BatchGroup
     /// Material pass
     Pass* pass_;
     /// Vertex shader
-    ShaderProgram* vertexShader_;
+    ShaderVariation* vertexShader_;
     /// Pixel shader
-    ShaderProgram* pixelShader_;
+    ShaderVariation* pixelShader_;
     /// Camera
     Camera* camera_;
     /// Light that affects the geometry, if any

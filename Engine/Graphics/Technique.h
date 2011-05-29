@@ -26,7 +26,7 @@
 #include "GraphicsDefs.h"
 #include "Resource.h"
 
-class ShaderProgram;
+class ShaderVariation;
 
 /// Material rendering pass, which defines shaders and render state
 class Pass
@@ -73,9 +73,9 @@ public:
     /// Return pixel shader name
     const String& GetPixelShaderName() const { return pixelShaderName_; }
     /// Return vertex shaders
-    Vector<SharedPtr<ShaderProgram> >& GetVertexShaders() { return vertexShaders_; }
+    Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
     /// Return pixel shaders
-    Vector<SharedPtr<ShaderProgram> >& GetPixelShaders() { return pixelShaders_; }
+    Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
     
 private:
     /// Pass type
@@ -95,9 +95,9 @@ private:
     /// Pixel shader name
     String pixelShaderName_;
     /// Vertex shaders
-    Vector<SharedPtr<ShaderProgram> > vertexShaders_;
+    Vector<SharedPtr<ShaderVariation> > vertexShaders_;
     /// Pixel shaders
-    Vector<SharedPtr<ShaderProgram> > pixelShaders_;
+    Vector<SharedPtr<ShaderVariation> > pixelShaders_;
 };
 
 /// Material technique. Consists of several passes

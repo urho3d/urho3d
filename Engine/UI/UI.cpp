@@ -40,7 +40,7 @@
 #include "ResourceCache.h"
 #include "ScrollBar.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Slider.h"
 #include "Text.h"
 #include "Texture2D.h"
@@ -254,8 +254,8 @@ void UI::Render()
     graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
     graphics_->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     
-    ShaderProgram* ps = 0;
-    ShaderProgram* vs = 0;
+    ShaderVariation* ps = 0;
+    ShaderVariation* vs = 0;
     
     unsigned alphaFormat = Graphics::GetAlphaFormat();
     

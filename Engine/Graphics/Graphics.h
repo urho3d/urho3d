@@ -36,7 +36,7 @@ class Matrix3x4;
 class GPUObject;
 class GraphicsImpl;
 class RenderSurface;
-class ShaderProgram;
+class ShaderVariation;
 class Texture;
 class Texture2D;
 class TextureCube;
@@ -99,7 +99,7 @@ public:
     /// Set index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
-    void SetShaders(ShaderProgram* vs, ShaderProgram* ps);
+    void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
     /// Set vertex shader bool parameter
     void SetVertexShaderParameter(ShaderParameter param, const bool* data, unsigned count);
     /// Set vertex shader float constants
@@ -140,7 +140,7 @@ public:
     void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set pixel shader 4x3 matrix constant
     void SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
-    /// Set shader parameter source. Called by ShaderProgram
+    /// Set shader parameter source. Called by ShaderVariation
     void SetShaderParameterSource(ShaderParameter param, const void* source) { lastShaderParameterSources_[param] = source; }
     /// Map shader parameter to a constant register. Called by Shader
     void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
@@ -274,9 +274,9 @@ public:
     /// Return vertex declaration
     VertexDeclaration* GetVertexDeclaration() const { return vertexDeclaration_; }
     /// Return vertex shader
-    ShaderProgram* GetVertexShader() const { return vertexShader_; }
+    ShaderVariation* GetVertexShader() const { return vertexShader_; }
     /// Return pixel shader
-    ShaderProgram* GetPixelShader() const { return pixelShader_; }
+    ShaderVariation* GetPixelShader() const { return pixelShader_; }
     /// Return shader parameter index by name
     ShaderParameter GetShaderParameter(const String& name);
     /// Return texture unit index by name
@@ -487,9 +487,9 @@ private:
     /// Vertex declaration in use
     VertexDeclaration* vertexDeclaration_;
     /// Vertex shader in use
-    ShaderProgram* vertexShader_;
+    ShaderVariation* vertexShader_;
     /// Pixel shader in use
-    ShaderProgram* pixelShader_;
+    ShaderVariation* pixelShader_;
     /// Shader parameter mappings
     Map<String, ShaderParameter> shaderParameters_;
     /// Shader constant register mappings

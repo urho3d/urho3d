@@ -30,7 +30,7 @@
 #include "Material.h"
 #include "Renderer.h"
 #include "Profiler.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
@@ -407,8 +407,8 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
     {
         // Switch to the instancing vertex shader
         // The indexing is different in the forward lit passes
-        Vector<SharedPtr<ShaderProgram> >& vertexShaders = pass_->GetVertexShaders();
-        Vector<SharedPtr<ShaderProgram> >& pixelShaders = pass_->GetPixelShaders();
+        Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass_->GetVertexShaders();
+        Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
         if ((type != PASS_LITBASE) && (type != PASS_LIGHT))
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];

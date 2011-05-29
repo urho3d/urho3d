@@ -23,7 +23,7 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Texture.h"
 #include "UIElement.h"
 
@@ -165,7 +165,7 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-void UIBatch::Draw(Graphics* graphics, ShaderProgram* vs, ShaderProgram* ps) const
+void UIBatch::Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps) const
 {
     if ((!quads_) || (!quadCount_))
         return;

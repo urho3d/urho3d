@@ -29,7 +29,7 @@
 
 class PixelShader;
 class Graphics;
-class ShaderProgram;
+class ShaderVariation;
 class Texture;
 class UIElement;
 
@@ -86,7 +86,7 @@ public:
     /// Merge with another batch
     bool Merge(const UIBatch& batch);
     /// Draw
-    void Draw(Graphics* graphics, ShaderProgram* vs, ShaderProgram* ps) const;
+    void Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps) const;
     
     /// Add or merge a batch
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);

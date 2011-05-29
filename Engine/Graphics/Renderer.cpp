@@ -41,7 +41,7 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
@@ -439,12 +439,12 @@ const Viewport& Renderer::GetViewport(unsigned index) const
     return index < viewports_.Size() ? viewports_[index] : noViewport;
 }
 
-ShaderProgram* Renderer::GetVertexShader(const String& name, bool checkExists) const
+ShaderVariation* Renderer::GetVertexShader(const String& name, bool checkExists) const
 {
     return GetShader(name, vsFormat_, checkExists);
 }
 
-ShaderProgram* Renderer::GetPixelShader(const String& name, bool checkExists) const
+ShaderVariation* Renderer::GetPixelShader(const String& name, bool checkExists) const
 {
     return GetShader(name, psFormat_, checkExists);
 }
@@ -827,7 +827,7 @@ void Renderer::ResetShadowMapUseCount()
         shadowMapUseCount_[i] = 0;
 }
 
-ShaderProgram* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
+ShaderVariation* Renderer::GetShader(const String& name, const String& extension, bool checkExists) const
 {
     String shaderName = shaderPath_;
     String variationName;
@@ -859,8 +859,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     batch.pass_ = pass;
     
     // Check if shaders are unloaded or need reloading
-    Vector<SharedPtr<ShaderProgram> >& vertexShaders = pass->GetVertexShaders();
-    Vector<SharedPtr<ShaderProgram> >& pixelShaders = pass->GetPixelShaders();
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
     if ((!vertexShaders.Size()) || (!pixelShaders.Size()) || (technique->GetShadersLoadedFrameNumber() !=
         shadersChangedFrameNumber_))
     {
@@ -1086,8 +1086,8 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
-    Vector<SharedPtr<ShaderProgram> >& vertexShaders = i->second_.GetVertexShaders();
-    Vector<SharedPtr<ShaderProgram> >& pixelShaders = i->second_.GetPixelShaders();
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = i->second_.GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = i->second_.GetPixelShaders();
     
     // Forget all the old shaders
     vertexShaders.Clear();
@@ -1446,7 +1446,7 @@ void Renderer::SetupLightBatch(Batch& batch)
     }
 }
 
-void Renderer::DrawFullScreenQuad(Camera& camera, ShaderProgram* vs, ShaderProgram* ps, bool nearQuad)
+void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad)
 {
     graphics_->ClearTransformSources();
     

@@ -35,7 +35,7 @@
 #include "Renderer.h"
 #include "Profiler.h"
 #include "Scene.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"

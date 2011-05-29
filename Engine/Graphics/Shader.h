@@ -25,7 +25,7 @@
 
 #include "Resource.h"
 
-class ShaderProgram;
+class ShaderVariation;
 
 /// Shader resource consisting of several shader variations
 class Shader : public Resource
@@ -44,9 +44,9 @@ public:
     virtual bool Load(Deserializer& source);
     
     /// Get a named variation. Return null if not found or could not be created
-    ShaderProgram* GetVariation(const String& name);
+    ShaderVariation* GetVariation(const String& name);
     /// Get a named variation. Return null if not found or could not be created
-    ShaderProgram* GetVariation(StringHash nameHash);
+    ShaderVariation* GetVariation(StringHash nameHash);
     /// Release (unload) all variations
     void ReleaseAll();
     
@@ -63,5 +63,5 @@ private:
     /// Shader Model 3 flag
     bool isSM3_;
     /// Shader variations. Will be in an unloaded state until requested
-    Map<StringHash, SharedPtr<ShaderProgram> > variations_;
+    Map<StringHash, SharedPtr<ShaderVariation> > variations_;
 };

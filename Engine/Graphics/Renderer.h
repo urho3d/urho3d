@@ -239,9 +239,9 @@ public:
     /// Return the default spotlight attenuation texture
     Texture2D* GetDefaultLightSpot() const { return defaultLightSpot; }
     /// Return a vertex shader by name
-    ShaderProgram* GetVertexShader(const String& name, bool checkExists = false) const;
+    ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
     /// Return a pixel shader by name
-    ShaderProgram* GetPixelShader(const String& name, bool checkExists = false) const;
+    ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
     /// Return the frame update parameters
     const FrameInfo& GetFrameInfo() { return frame_; }
     
@@ -268,7 +268,7 @@ private:
     /// Reset shadow map use count
     void ResetShadowMapUseCount();
     /// Get a shader program
-    ShaderProgram* GetShader(const String& name, const String& extension, bool checkExists) const;
+    ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
     /// Choose shaders for a batch
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
     /// Choose light volume shaders for a batch
@@ -302,7 +302,7 @@ private:
     /// Set up a light volume rendering batch
     void SetupLightBatch(Batch& batch);
     /// Draw a full screen quad (either near or far)
-    void DrawFullScreenQuad(Camera& camera, ShaderProgram* vs, ShaderProgram* ps, bool nearQuad);
+    void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad);
     /// Handle screen mode event
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event
@@ -335,13 +335,13 @@ private:
     /// Shadow map use count if reusing is disabled. Is reset for each view
     unsigned shadowMapUseCount_[NUM_SHADOWMAP_RESOLUTIONS];
     /// Stencil rendering vertex shader
-    SharedPtr<ShaderProgram> stencilVS_;
+    SharedPtr<ShaderVariation> stencilVS_;
     /// Stencil rendering pixel shader
-    SharedPtr<ShaderProgram> stencilPS_;
+    SharedPtr<ShaderVariation> stencilPS_;
     /// Light vertex shaders
-    Vector<SharedPtr<ShaderProgram> > lightVS_;
+    Vector<SharedPtr<ShaderVariation> > lightVS_;
     /// Light pixel shaders
-    Vector<SharedPtr<ShaderProgram> > lightPS_;
+    Vector<SharedPtr<ShaderVariation> > lightPS_;
     /// Reusable shadow cameras
     Vector<SharedPtr<Camera> > shadowCameraStore_;
     /// Reusable split lights

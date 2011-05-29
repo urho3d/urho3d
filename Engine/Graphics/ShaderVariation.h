@@ -59,15 +59,15 @@
 class Shader;
 
 /// Shader program on the GPU
-class ShaderProgram : public RefCounted, public GPUObject
+class ShaderVariation : public RefCounted, public GPUObject
 {
-    OBJECT(ShaderProgram);
+    OBJECT(ShaderVariation);
     
 public:
     /// Construct
-    ShaderProgram(Shader* shader, ShaderType type, bool isSM3);
+    ShaderVariation(Shader* shader, ShaderType type, bool isSM3);
     /// Destruct
-    virtual ~ShaderProgram();
+    virtual ~ShaderVariation();
     
     /// Create the shader program. Return true if successful
     bool Create();

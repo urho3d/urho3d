@@ -29,7 +29,7 @@
 #include "Log.h"
 #include "Profiler.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 
 /// Shader parameter structure for loading
 struct Parameter
@@ -115,7 +115,7 @@ bool Shader::Load(Deserializer& source)
     unsigned numVariations = source.ReadUInt();
     for (unsigned i = 0; i < numVariations; ++i)
     {
-        SharedPtr<ShaderProgram> variation(new ShaderProgram(this, shaderType_, isSM3_));
+        SharedPtr<ShaderVariation> variation(new ShaderVariation(this, shaderType_, isSM3_));
         variation->SetName(source.ReadString());
         
         // Fill the parameter & texture unit use information
@@ -157,22 +157,22 @@ bool Shader::Load(Deserializer& source)
     return true;
 }
 
-ShaderProgram* Shader::GetVariation(const String& name)
+ShaderVariation* Shader::GetVariation(const String& name)
 {
     return GetVariation(StringHash(name));
 }
 
-ShaderProgram* Shader::GetVariation(StringHash nameHash)
+ShaderVariation* Shader::GetVariation(StringHash nameHash)
 {
-    Map<StringHash, SharedPtr<ShaderProgram> >::Iterator i = variations_.Find(nameHash);
+    Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
     if (i == variations_.End())
         return 0;
-    ShaderProgram* variation = i->second_;
+    ShaderVariation* variation = i->second_;
     
     // Create shader object now if not yet created. If fails, remove the variation
     if (!variation->GetGPUObject())
     {
-        PROFILE(CreateShaderProgram);
+        PROFILE(CreateShaderVariation);
         bool success = variation->Create();
         if (!success)
         {

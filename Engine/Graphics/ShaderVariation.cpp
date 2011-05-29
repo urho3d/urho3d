@@ -25,15 +25,15 @@
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Shader.h"
-#include "ShaderProgram.h"
+#include "ShaderVariation.h"
 
 #include <ctype.h>
 
 #include "DebugNew.h"
 
-OBJECTTYPESTATIC(ShaderProgram);
+OBJECTTYPESTATIC(ShaderVariation);
 
-ShaderProgram::ShaderProgram(Shader* shader, ShaderType type, bool isSM3) :
+ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
     GPUObject(shader->GetSubsystem<Graphics>()),
     shader_(shader),
     shaderType_(type),
@@ -42,12 +42,12 @@ ShaderProgram::ShaderProgram(Shader* shader, ShaderType type, bool isSM3) :
     ClearParameters();
 }
 
-ShaderProgram::~ShaderProgram()
+ShaderVariation::~ShaderVariation()
 {
     Release();
 }
 
-bool ShaderProgram::Create()
+bool ShaderVariation::Create()
 {
     Release();
     
@@ -73,7 +73,7 @@ bool ShaderProgram::Create()
     return true;
 }
 
-void ShaderProgram::Release()
+void ShaderVariation::Release()
 {
     if (object_)
     {
@@ -99,12 +99,12 @@ void ShaderProgram::Release()
     }
 }
 
-void ShaderProgram::SetName(const String& name)
+void ShaderVariation::SetName(const String& name)
 {
     name_ = name;
 }
 
-void ShaderProgram::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
+void ShaderVariation::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
 {
     byteCode_ = byteCode;
     
@@ -113,17 +113,17 @@ void ShaderProgram::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
         Create();
 }
 
-void ShaderProgram::SetUseParameter(ShaderParameter param, bool enable)
+void ShaderVariation::SetUseParameter(ShaderParameter param, bool enable)
 {
     useParameter_[param] = enable;
 }
 
-void ShaderProgram::SetUseTextureUnit(TextureUnit unit, bool enable)
+void ShaderVariation::SetUseTextureUnit(TextureUnit unit, bool enable)
 {
     useTextureUnit_[unit] = enable;
 }
 
-void ShaderProgram::ClearParameters()
+void ShaderVariation::ClearParameters()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
         useParameter_[i] = false;
@@ -131,7 +131,7 @@ void ShaderProgram::ClearParameters()
         useTextureUnit_[i] = false;
 }
 
-bool ShaderProgram::NeedParameterUpdate(ShaderParameter parameter, const void* source)
+bool ShaderVariation::NeedParameterUpdate(ShaderParameter parameter, const void* source)
 {
     if ((useParameter_[parameter]) && (graphics_) && (graphics_->GetShaderParameterSource(parameter) != source))
     {
@@ -141,7 +141,7 @@ bool ShaderProgram::NeedParameterUpdate(ShaderParameter parameter, const void* s
     return false;
 }
 
-Shader* ShaderProgram::GetShader() const
+Shader* ShaderVariation::GetShader() const
 {
     return shader_;
 }
