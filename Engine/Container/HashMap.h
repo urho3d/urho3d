@@ -219,7 +219,7 @@ public:
             InsertNode(it->first_, it->second_);
     }
     
-    /// Insert a key by iterator. Return iterator to the value
+    /// Insert a pair by iterator. Return iterator to the value
     Iterator Insert(const ConstIterator& it)
     {
         return Iterator(InsertNode(it->first_, it->second_));
