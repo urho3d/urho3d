@@ -45,13 +45,13 @@
 #include "Zone.h"
 
 #include "Sort.h"
-#include <cstring>
 #include "Map.h"
 #include "Set.h"
 
 #include <assimp.hpp>
 #include <aiScene.h>
 #include <aiPostProcess.h>
+#include <cstring>
 
 #include "DebugNew.h"
 

@@ -330,7 +330,7 @@ void Octree::Update(const FrameInfo& frame)
         PROFILE(UpdateDrawables);
         
         // Let drawables update themselves before reinsertion
-        for (Set<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
+        for (HashSet<Drawable*>::Iterator i = drawableUpdates_.Begin(); i != drawableUpdates_.End(); ++i)
             (*i)->Update(frame);
     }
     
@@ -338,7 +338,7 @@ void Octree::Update(const FrameInfo& frame)
         PROFILE(ReinsertDrawables);
         
         // Reinsert drawables into the octree
-        for (Set<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
+        for (HashSet<Drawable*>::Iterator i = drawableReinsertions_.Begin(); i != drawableReinsertions_.End(); ++i)
         {
             Drawable* drawable = *i;
             Octant* octant = drawable->GetOctant();

@@ -61,12 +61,14 @@ struct TreeNodeBase
 class TreeIteratorBase
 {
 public:
+    /// Construct
     TreeIteratorBase() :
         ptr_(0),
         prev_(0)
     {
     }
     
+    /// Construct with a node pointer
     TreeIteratorBase(TreeNodeBase* ptr) :
         ptr_(ptr),
         prev_(0)
@@ -78,6 +80,7 @@ public:
     /// Test for inequality with another iterator
     bool operator != (const TreeIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
+    /// Go to the next node
     void GotoNext()
     {
         if (!ptr_)
@@ -102,6 +105,7 @@ public:
             ptr_ = ptr_->link_[0];
     }
     
+    /// Go to the previous node
     void GotoPrev()
     {
         if (!ptr_)

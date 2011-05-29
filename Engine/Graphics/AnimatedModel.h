@@ -24,7 +24,6 @@
 #pragma once
 
 #include "Model.h"
-#include "Set.h"
 #include "Skeleton.h"
 #include "StaticModel.h"
 

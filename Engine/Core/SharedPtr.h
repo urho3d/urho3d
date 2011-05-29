@@ -142,6 +142,8 @@ public:
     unsigned GetWeakRefCount() const { return ptr_ ? ptr_->GetWeakRefCount() : 0; }
     /// Return pointer to the RefCount structure
     RefCount* GetRefCountPtr() const { return ptr_ ? ptr_->GetRefCountPtr() : 0; }
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (unsigned)ptr_; }
     
 private:
     /// Prevent direct assignment from a shared pointer of another type
@@ -371,6 +373,8 @@ public:
     bool IsExpired() const { return refCount_ ? refCount_->expired_ : true; }
     /// Return pointer to the RefCount structure
     RefCount* GetRefCountPtr() const { return refCount_; }
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (unsigned)ptr_; }
     
 private:
     /// Prevent direct assignment from a weak pointer of different type

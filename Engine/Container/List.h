@@ -47,13 +47,12 @@ public:
         T value_;
         
         /// Return next node
-        Node* GetNext() const { return static_cast<Node*>(next_); }
-        
+        Node* Next() const { return static_cast<Node*>(next_); }
         /// Return previous node
-        Node* GetPrev() { return static_cast<Node*>(prev_); }
+        Node* Prev() { return static_cast<Node*>(prev_); }
     };
     
-    /// List node iterator
+    /// List iterator
     class Iterator : public ListIteratorBase
     {
     public:
@@ -78,7 +77,7 @@ public:
         T& operator * () const { return (static_cast<Node*>(ptr_))->value_; }
     };
     
-    /// List node const iterator
+    /// List const iterator
     class ConstIterator : public ListIteratorBase
     {
     public:
@@ -112,8 +111,7 @@ public:
     };
 
     /// Construct empty
-    List() :
-        ListBase()
+    List()
     {
         // Reserve the tail node
         allocator_ = AllocatorInitialize(sizeof(Node));
@@ -121,8 +119,7 @@ public:
     }
     
     /// Construct from another list
-    List(const List<T>& list) :
-        ListBase()
+    List(const List<T>& list)
     {
         // Reserve the tail node
         allocator_ = AllocatorInitialize(sizeof(Node));
@@ -136,7 +133,7 @@ public:
     ~List()
     {
         Clear();
-        FreeNode(GetTail());
+        FreeNode(Tail());
         AllocatorUninitialize(allocator_);
     }
     
@@ -145,12 +142,12 @@ public:
     {
         // Clear, then insert the nodes of the other list
         Clear();
-        Insert(End(), rhs.Begin(), rhs.End());
+        Insert(End(), rhs);
         
         return *this;
     }
     
-    /// Add-assign a value
+    /// Add-assign an element
     List& operator += (const T& rhs)
     {
         Push(rhs);
@@ -160,7 +157,7 @@ public:
     /// Add-assign a list
     List& operator += (const List<T>& rhs)
     {
-        Insert(End(), rhs.Begin(), rhs.End());
+        Insert(End(), rhs);
         return *this;
     }
     
@@ -202,19 +199,29 @@ public:
         return false;
     }
     
-    /// Insert a value at the end
+    /// Insert an element the end
     void Push(const T& value)
     {
-        InsertNode(GetTail(), value);
+        InsertNode(Tail(), value);
     }
     
-    /// Insert a value into the list
+    /// Insert an element at position
     void Insert(const Iterator& dest, const T& value)
     {
         InsertNode(static_cast<Node*>(dest.ptr_), value);
     }
     
-    /// Insert a range by iterators
+    /// Insert a list at position
+    void Insert(const Iterator& dest, const List<T>& list)
+    {
+        Node* destNode = static_cast<Node*>(dest.ptr_);
+        Iterator it = list.Begin();
+        Iterator end = list.End();
+        while (it != end)
+            InsertNode(destNode, *it++);
+    }
+    
+    /// Insert elements by iterators
     void Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
     {
         Node* destNode = static_cast<Node*>(dest.ptr_);
@@ -223,20 +230,20 @@ public:
             InsertNode(destNode, *it++);
     }
     
-    /// Erase the last node
+    /// Erase the last element
     void Pop()
     {
         if (size_)
             Erase(--End());
     }
     
-    /// Erase a node from the list. Return an iterator to the next element
+    /// Erase an element. Return an iterator to the next element
     Iterator Erase(Iterator it)
     {
         return Iterator(EraseNode(static_cast<Node*>(it.ptr_)));
     }
     
-    /// Erase a range of nodes from the list. Return an iterator to the next element
+    /// Erase a range by iterators. Return an iterator to the next element
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
         Iterator it = start;
@@ -250,69 +257,68 @@ public:
     void Clear()
     {
         while (size_)
-            EraseNode(GetHead());
+            EraseNode(Head());
     }
     
-    /// Return iterator to the first node
-    Iterator Begin() { return Iterator(GetHead()); }
-    /// Return iterator to the first node
-    ConstIterator Begin() const { return ConstIterator(GetHead()); }
+    /// Return iterator to the first element
+    Iterator Begin() { return Iterator(Head()); }
+    /// Return iterator to the first element
+    ConstIterator Begin() const { return ConstIterator(Head()); }
     /// Return iterator to the end
-    Iterator End() { return Iterator(GetTail()); }
+    Iterator End() { return Iterator(Tail()); }
     /// Return iterator to the end
-    ConstIterator End() const { return ConstIterator(GetTail()); }
+    ConstIterator End() const { return ConstIterator(Tail()); }
     /// Return first value
     const T& Front() const { return *Begin(); }
     /// Return last value
     const T& Back() const { return *(--End()); }
-    /// Return number of value
+    /// Return number of values
     unsigned Size() const { return size_; }
     /// Return whether list is empty
     bool Empty() const { return size_ == 0; }
     
 private:
     /// Return the head pointer with correct type
-    Node* GetHead() const { return reinterpret_cast<Node*>(head_); }
+    Node* Head() const { return reinterpret_cast<Node*>(head_); }
     /// Return the tail pointer with correct type
-    Node* GetTail() const { return reinterpret_cast<Node*>(tail_); }
+    Node* Tail() const { return reinterpret_cast<Node*>(tail_); }
     
-    /// Insert a value into the list
+    /// Allocate and insert a node into the list
     void InsertNode(Node* dest, const T& value)
     {
         if (!dest)
             return;
         
         Node* newNode = ReserveNode(value);
-        Node* prev = dest->GetPrev();
+        Node* prev = dest->Prev();
         newNode->next_ = dest;
         newNode->prev_ = prev;
         if (prev)
             prev->next_ = newNode;
         dest->prev_ = newNode;
         
-        
         // Reassign the head node if necessary
-        if (dest == GetHead())
+        if (dest == Head())
             head_ = newNode;
         
         ++size_;
     }
     
-    /// Erase a node from the list. Return pointer to the next element, or to the end if could not erase
+    /// Erase and free a node. Return pointer to the next node, or to the end if could not erase
     Node* EraseNode(Node* toRemove)
     {
         // The tail node can not be removed
         if ((!toRemove) || (toRemove == tail_))
-            return GetTail();
+            return Tail();
         
-        Node* prev = toRemove->GetPrev();
-        Node* next = toRemove->GetNext();
+        Node* prev = toRemove->Prev();
+        Node* next = toRemove->Next();
         if (prev)
             prev->next_ = next;
         next->prev_ = prev;
         
         // Reassign the head node if necessary
-        if (toRemove == GetHead())
+        if (toRemove == Head())
             head_ = next;
         
         FreeNode(toRemove);

@@ -29,6 +29,7 @@
 /// List node base
 struct ListNodeBase
 {
+    /// Construct
     ListNodeBase() :
         prev_(0),
         next_(0)
@@ -45,6 +46,7 @@ struct ListNodeBase
 class ListIteratorBase
 {
 public:
+    /// Construct
     explicit ListIteratorBase(ListNodeBase* ptr) :
         ptr_(ptr)
     {
@@ -77,6 +79,7 @@ public:
 class ListBase
 {
 public:
+    /// Construct
     ListBase() :
         allocator_(0),
         size_(0)

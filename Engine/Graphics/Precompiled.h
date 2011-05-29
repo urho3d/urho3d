@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "HashSet.h"
 #include "Map.h"
 #include "Set.h"
 #include "Sort.h"

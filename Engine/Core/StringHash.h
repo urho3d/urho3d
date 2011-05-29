@@ -49,6 +49,7 @@ public:
     
     /// Construct from a C string case-insensitively
     explicit StringHash(const char* str);
+    
     /// Construct from a string case-insensitively
     explicit StringHash(const String& str);
     

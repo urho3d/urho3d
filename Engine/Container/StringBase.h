@@ -277,7 +277,7 @@ public:
     void Replace(const String& replaceThis, const String& replaceWith);
     /// Replace a substring
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
-    /// Replace a substring using iterators
+    /// Replace a substring by iterators
     Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
     /// Insert a string
     void Insert(unsigned pos, const String& str);
@@ -285,15 +285,15 @@ public:
     void Insert(unsigned pos, char c);
     /// Insert a string using an iterator
     Iterator Insert(const Iterator& dest, const String& str);
-    /// Insert a string partially using iterators
+    /// Insert a string partially by iterators
     Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end);
     /// Insert a character using an iterator
     Iterator Insert(const Iterator& dest, char c);
     /// Erase a substring
     void Erase(unsigned pos, unsigned length = 1);
-    /// Erase a character using an iterator
+    /// Erase a character by iterator
     Iterator Erase(const Iterator& it);
-    /// Erase a substring using iterators
+    /// Erase a substring by iterators
     Iterator Erase(const Iterator& start, const Iterator& end);
     /// Resize the string
     void Resize(unsigned newLength);
@@ -346,6 +346,20 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether the string is empty
     bool Empty() const { return length_ == 0; }
+    
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const
+    {
+        unsigned hash = 0;
+        const char* ptr = buffer_;
+        while (*ptr)
+        {
+            hash = *ptr + (hash << 6) + (hash << 16) - hash;
+            ++ptr;
+        }
+        
+        return hash;
+    }
     
     /// Position for "not found"
     static const unsigned NPOS = 0xffffffff;

@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 //
 
+#include "HashBase.h"
 #include "ListBase.h"
 #include "StringBase.h"
 #include "TreeBase.h"
@@ -51,6 +52,11 @@ template<> void Swap<ListBase>(ListBase& first, ListBase& second)
 }
 
 template<> void Swap<TreeBase>(TreeBase& first, TreeBase& second)
+{
+    first.Swap(second);
+}
+
+template<> void Swap<HashBase>(HashBase& first, HashBase& second)
 {
     first.Swap(second);
 }

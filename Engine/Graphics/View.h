@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Batch.h"
+#include "HashSet.h"
 #include "Object.h"
 
 class Camera;
@@ -64,34 +65,8 @@ struct LitTransparencyCheck
     bool operator == (const LitTransparencyCheck& rhs) const { return (light_ == rhs.light_) && (drawable_ == rhs.drawable_) && (batchIndex_ == rhs.batchIndex_); }
     /// Test for inequality with another lit transparency check
     bool operator != (const LitTransparencyCheck& rhs) const { return (light_ != rhs.light_) || (drawable_ != rhs.drawable_) || (batchIndex_ != rhs.batchIndex_); }
-    
-    /// Test if less than another lit transparency check
-    bool operator < (const LitTransparencyCheck& rhs) const
-    {
-        if (light_ == rhs.light_)
-        {
-            if (drawable_ == rhs.drawable_)
-                return batchIndex_ < rhs.batchIndex_;
-            else
-                return drawable_ < rhs.drawable_;
-        }
-        else
-            return light_ < rhs.light_;
-    }
-    
-    /// Test if greater than another lit transparency check
-    bool operator > (const LitTransparencyCheck& rhs) const
-    {
-        if (light_ == rhs.light_)
-        {
-            if (drawable_ == rhs.drawable_)
-                return batchIndex_ > rhs.batchIndex_;
-            else
-                return drawable_ > rhs.drawable_;
-        }
-        else
-            return light_ > rhs.light_;
-    }
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (unsigned)light_ + (unsigned)drawable_ + batchIndex_; }
     
     Light* light_;
     Drawable* drawable_;
@@ -143,7 +118,7 @@ private:
     /// Construct batches from the scene nodes
     void GetBatches();
     /// Get lit batches for a certain light and drawable
-    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, Set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
+    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
     /// Render batches, forward mode
     void RenderBatcheforward();
     /// Render batches, deferred mode

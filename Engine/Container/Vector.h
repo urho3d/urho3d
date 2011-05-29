@@ -208,7 +208,7 @@ public:
         return Begin() + pos;
     }
     
-    /// Insert a vector partially using iterators
+    /// Insert a vector partially by iterators
     Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
     {
         unsigned pos = dest - Begin();
@@ -236,7 +236,7 @@ public:
         Resize(size_ - length, 0);
     }
     
-    /// Erase an element using an iterator
+    /// Erase an element by iterator
     Iterator Erase(const Iterator& it)
     {
         unsigned pos = it - Begin();
@@ -247,7 +247,7 @@ public:
         return Begin() + pos;
     }
     
-    /// Erase a range of values using iterators
+    /// Erase a range by iterators
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
         unsigned pos = start - Begin();
@@ -597,7 +597,7 @@ public:
         return Begin() + pos;
     }
     
-    /// Insert a vector partially using iterators
+    /// Insert a vector partially by iterators
     Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
     {
         unsigned pos = dest - Begin();
@@ -633,7 +633,7 @@ public:
         return Begin() + pos;
     }
     
-    /// Erase a range of values using iterators
+    /// Erase a range by iterators
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
         unsigned pos = start - Begin();

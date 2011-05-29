@@ -43,12 +43,6 @@ public:
         {
         }
         
-        /// Construct with key
-        KeyValue(const T& first) :
-            first_(first)
-        {
-        }
-        
         /// Construct with key and value
         KeyValue(const T& first, const U& second) :
             first_(first),
@@ -73,12 +67,6 @@ public:
         {
         }
         
-        /// Construct with key
-        Node(const T& key) :
-            pair_(key)
-        {
-        }
-        
         /// Construct with key and value
         Node(const T& key, const U& value) :
             pair_(key, value)
@@ -94,7 +82,7 @@ public:
         Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
-    /// Map node iterator
+    /// Map iterator
     class Iterator : public TreeIteratorBase
     {
     public:
@@ -119,7 +107,7 @@ public:
         KeyValue& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
     };
     
-    /// Map node const iterator
+    /// Map const iterator
     class ConstIterator : public TreeIteratorBase
     {
     public:
@@ -172,10 +160,10 @@ public:
     }
     
     /// Assign a map
-    Map<T, U>& operator = (const Map<T, U>& map)
+    Map<T, U>& operator = (const Map<T, U>& rhs)
     {
         Clear();
-        Insert(map.Begin(), map.End());
+        Insert(rhs);
         
         return *this;
     }
@@ -190,7 +178,7 @@ public:
     /// Add-assign a map
     Map<T, U>& operator += (const Map<T, U>& rhs)
     {
-        Insert(rhs.Begin(), rhs.End());
+        Insert(rhs);
         return *this;
     }
     
@@ -232,7 +220,7 @@ public:
         return false;
     }
     
-    /// Index the map. Create new node if key not found
+    /// Index the map. Create a new pair if key not found
     U& operator [] (const T& key)
     {
         Node* node = FindNode(key);
@@ -267,16 +255,16 @@ public:
         Insert(map.Begin(), map.End());
     }
     
-    /// Insert a key by iterator. Return iterator to the value
+    /// Insert a pair by iterator. Return iterator to the value
     Iterator Insert(const ConstIterator& it)
     {
         return Iterator(InsertNode(it->first_, it->second_));
     }
     
-    /// Insert by a range of iterators
-    void Insert(const ConstIterator& begin, const ConstIterator& end)
+    /// Insert a range by iterators
+    void Insert(const ConstIterator& start, const ConstIterator& end)
     {
-        ConstIterator it = begin;
+        ConstIterator it = start;
         while (it != end)
         {
             InsertNode(it->first_, it->second_);
@@ -284,27 +272,38 @@ public:
         }
     }
     
-    /// Erase a key. Return true if was found
+    /// Erase a pair by key. Return true if was found
     bool Erase(const T& key)
     {
         return EraseNode(key);
     }
     
-    /// Erase a key by iterator. Return true if was found
-    bool Erase(const Iterator& it)
+    /// Erase a pair by iterator
+    void Erase(const Iterator& it)
     {
-        return EraseNode(it->first_);
+        EraseNode(it->first_);
     }
     
-    /// Return whether contains a key
+    /// Erase a range by iterators
+    void Erase(const Iterator& start, const Iterator& end)
+    {
+        Iterator it = start;
+        while (it != end)
+        {
+            Iterator current = it++;
+            Erase(current);
+        }
+    }
+    
+    /// Return whether contains a pair with key
     bool Contains(const T& key)
     {
         return FindNode(key) != 0;
     }
     
-    /// Return iterator to the node with key, or end iterator if not found
+    /// Return iterator to the pair, or end iterator if not found
     Iterator Find(const T& key) { Node* node = FindNode(key); return node ? Iterator(node) : End(); }
-    /// Return const iterator to the node with key, or null iterator if not found
+    /// Return const iterator to the pair, or null iterator if not found
     ConstIterator Find(const T& key) const { Node* node = FindNode(key); return node ? ConstIterator(node) : End(); }
     /// Return iterator to the beginning
     Iterator Begin() { return Iterator(FindFirst()); }
@@ -370,7 +369,7 @@ private:
         
         if (!root_)
         {
-            root_ = ret = new Node(key, value);
+            root_ = ret = ReserveNode(key, value);
             ++size_;
         }
         else
@@ -390,7 +389,7 @@ private:
             {
                 if (!q)
                 {
-                    p->SetChild(dir, q = ret = new Node(key, value));
+                    p->SetChild(dir, q = ret = ReserveNode(key, value));
                     ++size_;
                 }
                 else if ((IsRed(q->link_[0])) && (IsRed(q->link_[1])))
@@ -504,7 +503,7 @@ private:
             const_cast<T&>(f->pair_.first_) = q->pair_.first_;
             f->pair_.second_ = q->pair_.second_;
             p->SetChild(p->Child(1) == q, q->link_[q->Child(0) == 0]);
-            delete q;
+            FreeNode(q);
             --size_;
             removed = true;
         }
@@ -524,7 +523,7 @@ private:
     {
         Node* left = node->Child(0);
         Node* right = node->Child(1);
-        delete node;
+        FreeNode(node);
         --size_;
         
         if (left)

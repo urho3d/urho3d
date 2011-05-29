@@ -382,8 +382,8 @@ void View::GetDrawables()
 
 void View::GetBatches()
 {
-    Set<LitTransparencyCheck> litTransparencies;
-    Set<Drawable*> maxLightsDrawables;
+    HashSet<LitTransparencyCheck> litTransparencies;
+    HashSet<Drawable*> maxLightsDrawables;
     Map<Light*, unsigned> lightQueueIndex;
     
     PassType gBufferPass = PASS_DEFERRED;
@@ -518,7 +518,7 @@ void View::GetBatches()
     {
         PROFILE(GetMaxLightsBatches);
         
-        for (Set<Drawable*>::Iterator i = maxLightsDrawables.Begin(); i != maxLightsDrawables.End(); ++i)
+        for (HashSet<Drawable*>::Iterator i = maxLightsDrawables.Begin(); i != maxLightsDrawables.End(); ++i)
         {
             Drawable* drawable = *i;
             drawable->LimitLights();
@@ -632,7 +632,7 @@ void View::GetBatches()
 }
 
 void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue,
-    Set<LitTransparencyCheck>& litTransparencies, PassType gBufferPass)
+    HashSet<LitTransparencyCheck>& litTransparencies, PassType gBufferPass)
 {
     bool splitPointLight = SplitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
@@ -1363,7 +1363,7 @@ unsigned View::ProcessLight(Light* light)
         if (numSplits > 1)
         {
             // Make sure there are no duplicates
-            Set<Drawable*> allLitGeometries;
+            HashSet<Drawable*> allLitGeometries;
             for (unsigned i = 0; i < numSplits; ++i)
             {
                 for (Vector<Drawable*>::Iterator j = litGeometries_[i].Begin(); j != litGeometries_[i].End(); ++j)
@@ -1372,7 +1372,7 @@ unsigned View::ProcessLight(Light* light)
             
             litGeometries_[0].Resize(allLitGeometries.Size());
             unsigned index = 0;
-            for (Set<Drawable*>::Iterator i = allLitGeometries.Begin(); i != allLitGeometries.End(); ++i)
+            for (HashSet<Drawable*>::Iterator i = allLitGeometries.Begin(); i != allLitGeometries.End(); ++i)
                 litGeometries_[0][index++] = *i;
         }
         

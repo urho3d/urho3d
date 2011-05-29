@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "HashBase.h"
 #include "RefCounted.h"
 
 /// Shared array pointer template class. Uses non-intrusive reference counting
@@ -155,6 +156,8 @@ public:
     unsigned GetWeakRefCount() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return pointer to the RefCount structure
     RefCount* GetRefCountPtr() const { return refCount_; }
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (unsigned)ptr_; }
     
 private:
     /// Prevent direct assignment from a shared array pointer of different type
@@ -364,6 +367,8 @@ public:
     bool IsExpired() const { return refCount_ ? refCount_->expired_ : true; }
     /// Return pointer to RefCount structure
     RefCount* GetRefCountPtr() const { return refCount_; }
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (unsigned)ptr_; }
     
 private:
     /// Prevent direct assignment from a weak array pointer of different type

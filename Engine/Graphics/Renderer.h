@@ -26,8 +26,8 @@
 #include "Batch.h"
 #include "Color.h"
 #include "Drawable.h"
+#include "HashSet.h"
 #include "RenderSurface.h"
-#include "Set.h"
 
 class DebugRenderer;
 class Geometry;
@@ -354,9 +354,9 @@ private:
     /// Views
     Vector<SharedPtr<View> > views_;
     /// Octrees that have been updated during the frame
-    Set<Octree*> updateOctrees_;
+    HashSet<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed
-    Set<Technique*> shaderErrorDisplayed_;
+    HashSet<Technique*> shaderErrorDisplayed_;
     /// Vertex shader format
     String vsFormat_;
     /// Pixel shader format

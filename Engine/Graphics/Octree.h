@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Drawable.h"
-#include "Set.h"
+#include "HashSet.h"
 
 class Drawable;
 class Octree;
@@ -186,9 +186,9 @@ public:
     
 private:
     /// Set of drawable objects that require update
-    Set<Drawable*> drawableUpdates_;
+    HashSet<Drawable*> drawableUpdates_;
     /// Set of drawable objects that require reinsertion
-    Set<Drawable*> drawableReinsertions_;
+    HashSet<Drawable*> drawableReinsertions_;
     /// Subdivision level
     unsigned numLevels_;
 };

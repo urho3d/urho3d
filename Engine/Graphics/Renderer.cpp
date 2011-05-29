@@ -637,8 +637,8 @@ void Renderer::DrawDebugGeometry(bool depthTest)
     PROFILE(RendererDrawDebug);
     
     /// \todo Because debug geometry is per-scene, if two cameras show views of the same area, occlusion is not shown correctly
-    Set<Drawable*> processedGeometries;
-    Set<Light*> processedLights;
+    HashSet<Drawable*> processedGeometries;
+    HashSet<Light*> processedLights;
     
     for (unsigned i = 0; i < numViews_; ++i)
     {

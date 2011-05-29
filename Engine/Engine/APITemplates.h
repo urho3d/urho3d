@@ -37,7 +37,6 @@
 
 #include <angelscript.h>
 #include <cstring>
-#include "Set.h"
 
 /// Template function for dynamic cast between two script classes
 template <class T, class U> U* RefCast(T* t)

@@ -55,7 +55,7 @@ public:
         Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
-    /// Set node iterator
+    /// Set iterator
     class Iterator : public TreeIteratorBase
     {
     public:
@@ -80,7 +80,7 @@ public:
         const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
     
-    /// Set node const iterator
+    /// Set const iterator
     class ConstIterator : public TreeIteratorBase
     {
     public:
@@ -136,7 +136,7 @@ public:
     Set& operator = (const Set<T>& set)
     {
         Clear();
-        Insert(set.Begin(), set.End());
+        Insert(set);
         
         return *this;
     }
@@ -151,7 +151,7 @@ public:
     /// Add-assign a set
     Set& operator += (const Set<T>& rhs)
     {
-        Insert(rhs.Begin(), rhs.End());
+        Insert(rhs);
         return *this;
     }
     
@@ -221,10 +221,10 @@ public:
         return Iterator(InsertNode(*it));
     }
     
-    /// Insert by a range of iterators
-    void Insert(const ConstIterator& begin, const ConstIterator& end)
+    /// Insert a range by iterators
+    void Insert(const ConstIterator& start, const ConstIterator& end)
     {
-        ConstIterator it = begin;
+        ConstIterator it = start;
         while (it != end)
             InsertNode(*it++);
     }
@@ -235,10 +235,21 @@ public:
         return EraseNode(key);
     }
     
-    /// Erase a key by iterator. Return true if was found
-    bool Erase(const Iterator& it)
+    /// Erase a key by iterator
+    void Erase(const Iterator& it)
     {
-        return EraseNode(*it);
+        EraseNode(*it);
+    }
+    
+    /// Erase a range by iterators
+    void Erase(const Iterator& start, const Iterator& end)
+    {
+        Iterator it = start;
+        while (it != end)
+        {
+            Iterator current = it++;
+            Erase(current);
+        }
     }
     
     /// Return whether contains a key

@@ -209,7 +209,7 @@ void Drawable::AddLight(Light* light)
 
 void Drawable::LimitLights()
 {
-    Set<Light*> uniqueLights;
+    HashSet<Light*> uniqueLights;
     
     const Vector3& worldPos = GetWorldPosition();
     for (unsigned i = 0; i < lights_.Size(); ++i)
