@@ -143,7 +143,7 @@ public:
     HashSet& operator = (const HashSet<T>& rhs)
     {
         Clear();
-        Insert(rhs.Begin(), rhs.End());
+        Insert(rhs);
         
         return *this;
     }
@@ -158,7 +158,7 @@ public:
     /// Add-assign a hash set
     HashSet& operator += (const HashSet<T>& rhs)
     {
-        Insert(rhs.Begin(), rhs.End());
+        Insert(rhs);
         return *this;
     }
     
@@ -196,21 +196,16 @@ public:
     /// Insert a set
     void Insert(const HashSet<T>& set)
     {
-        Insert(set.Begin(), set.End());
+        ConstIterator it = set.Begin();
+        ConstIterator end = set.End();
+        while (it != end)
+            Insert(*it++);
     }
     
     /// Insert a key by iterator. Return iterator to the value
     Iterator Insert(const ConstIterator& it)
     {
         return Iterator(InsertNode(*it));
-    }
-    
-    /// Insert a range by iterators
-    void Insert(const ConstIterator& start, const ConstIterator& end)
-    {
-        ConstIterator it = start;
-        while (it != end)
-            InsertNode(*it++);
     }
     
     /// Erase a key. Return true if was found
@@ -239,17 +234,6 @@ public:
     void Erase(const Iterator& it)
     {
         return Erase(*it);
-    }
-    
-    /// Erase a range by iterators
-    void Erase(const Iterator& start, const Iterator& end)
-    {
-        Iterator it = start;
-        while (it != end)
-        {
-            Iterator current = it++;
-            Erase(current);
-        }
     }
     
     /// Clear the set

@@ -26,6 +26,7 @@
 #include "Batch.h"
 #include "HashSet.h"
 #include "Object.h"
+#include "Set.h"
 
 class Camera;
 class DebugRenderer;
@@ -66,7 +67,7 @@ struct LitTransparencyCheck
     /// Test for inequality with another lit transparency check
     bool operator != (const LitTransparencyCheck& rhs) const { return (light_ != rhs.light_) || (drawable_ != rhs.drawable_) || (batchIndex_ != rhs.batchIndex_); }
     /// Return hash value for HashSet & HashMap
-    unsigned ToHash() const { return (unsigned)light_ + (unsigned)drawable_ + batchIndex_; }
+    unsigned ToHash() const { return ((unsigned)light_) / sizeof(Light) + ((unsigned)drawable_) / sizeof(Drawable) + batchIndex_; }
     
     Light* light_;
     Drawable* drawable_;

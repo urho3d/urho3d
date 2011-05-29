@@ -193,10 +193,7 @@ public:
     U& operator [] (const T& key)
     {
         if (!numBuckets_)
-        {
-            Node* newNode = InsertNode(Tail(), key, U());
-            return newNode->pair_.second_;
-        }
+            return InsertNode(key, U())->pair_.second_;
         
         unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
         
@@ -204,57 +201,28 @@ public:
         if (node)
             return node->pair_.second_;
         else
-        {
-            node = InsertNode(Tail(), key, U());
-            return node->pair_.second_;
-        }
+            return InsertNode(key, U())->pair_.second_;
     }
     
     /// Insert a pair. Return an iterator to it
     Iterator Insert(const Pair<T, U>& pair)
     {
-        // If no pointers yet, allocate with minimum bucket count
-        if (!ptrs_)
-        {
-            numBuckets_ = MIN_BUCKETS;
-            Rehash();
-        }
-        
-        unsigned hashKey = MakeHash(pair.first_) & (numBuckets_ - 1);
-        
-        // If exists, just change the value
-        Node* existing = FindNode(pair.first_, hashKey);
-        if (existing)
-        {
-            existing->pair_.second_ = pair.second_;
-            return Iterator(existing);
-        }
-        
-        Node** ptrs = Ptrs();
-        Node* newNode = InsertNode(Tail(), pair.first_, pair.second_);
-        newNode->down_ = ptrs[hashKey];
-        ptrs[hashKey] = newNode;
-        
-        // Rehash if the maximum load factor has been exceeded
-        if (size_ > numBuckets_ * MAX_LOAD_FACTOR)
-        {
-            numBuckets_ <<= 1;
-            Rehash();
-        }
-        
-        return Iterator(newNode);
+        return Iterator(InsertNode(pair.first_, pair.second_));
     }
     
     /// Insert a map
     void Insert(const HashMap<T, U>& map)
     {
-        Insert(map.Begin(), map.End());
+        ConstIterator it = map.Begin();
+        ConstIterator end = map.End();
+        while (it != end)
+            InsertNode(it->first_, it->second_);
     }
     
     /// Insert a key by iterator. Return iterator to the value
     Iterator Insert(const ConstIterator& it)
     {
-        return Iterator(InsertNode(*it));
+        return Iterator(InsertNode(it->first_, it->second_));
     }
     
     /// Insert a range by iterators
@@ -291,17 +259,6 @@ public:
     void Erase(const Iterator& it)
     {
         return Erase(it->first_);
-    }
-    
-    /// Erase a range by iterators
-    void Erase(const Iterator& start, const Iterator& end)
-    {
-        Iterator it = start;
-        while (it != end)
-        {
-            Iterator current = it++;
-            Erase(current->first_);
-        }
     }
     
     /// Clear the map
@@ -415,6 +372,41 @@ private:
         }
         
         return 0;
+    }
+    
+    /// Insert a key and value and return either the new or existing node
+    Node* InsertNode(const T& key, const U& value)
+    {
+        // If no pointers yet, allocate with minimum bucket count
+        if (!ptrs_)
+        {
+            numBuckets_ = MIN_BUCKETS;
+            Rehash();
+        }
+        
+        unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
+        
+        // If exists, just change the value
+        Node* existing = FindNode(key, hashKey);
+        if (existing)
+        {
+            existing->pair_.second_ = value;
+            return existing;
+        }
+        
+        Node** ptrs = Ptrs();
+        Node* newNode = InsertNode(Tail(), key, value);
+        newNode->down_ = ptrs[hashKey];
+        ptrs[hashKey] = newNode;
+        
+        // Rehash if the maximum load factor has been exceeded
+        if (size_ > numBuckets_ * MAX_LOAD_FACTOR)
+        {
+            numBuckets_ <<= 1;
+            Rehash();
+        }
+        
+        return newNode;
     }
     
     /// Insert a node into the list. Return the new node
