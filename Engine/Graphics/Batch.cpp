@@ -76,6 +76,9 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     if ((!vertexShader_) || (!pixelShader_))
         return;
     
+    // Set shaders
+    graphics->SetShaders(vertexShader_, pixelShader_);
+    
     // Set pass / material-specific renderstates
     if ((pass_) && (material_))
     {
@@ -91,19 +94,19 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         
         const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
         
-        if (pixelShader_->HasTextureUnit(TU_DIFFUSE))
+        if (graphics->NeedTextureUnit(TU_DIFFUSE))
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
-        if (pixelShader_->HasTextureUnit(TU_NORMAL))
+        if (graphics->NeedTextureUnit(TU_NORMAL))
             graphics->SetTexture(TU_NORMAL, textures[TU_NORMAL]);
-        if (pixelShader_->HasTextureUnit(TU_SPECULAR))
+        if (graphics->NeedTextureUnit(TU_SPECULAR))
             graphics->SetTexture(TU_SPECULAR, textures[TU_SPECULAR]);
-        if (pixelShader_->HasTextureUnit(TU_DETAIL))
+        if (graphics->NeedTextureUnit(TU_DETAIL))
             graphics->SetTexture(TU_DETAIL, textures[TU_DETAIL]);
-        if (pixelShader_->HasTextureUnit(TU_ENVIRONMENT))
+        if (graphics->NeedTextureUnit(TU_ENVIRONMENT))
             graphics->SetTexture(TU_ENVIRONMENT, textures[TU_ENVIRONMENT]);
         if (!light_)
         {
-            if (pixelShader_->HasTextureUnit(TU_EMISSIVE))
+            if (graphics->NeedTextureUnit(TU_EMISSIVE))
                 graphics->SetTexture(TU_EMISSIVE, textures[TU_EMISSIVE]);
         }
     }
@@ -114,25 +117,22 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     {
         shadowMap = light_->GetShadowMap();
         
-        if ((shadowMap) && (pixelShader_->HasTextureUnit(TU_SHADOWMAP)))
+        if ((shadowMap) && (graphics->NeedTextureUnit(TU_SHADOWMAP)))
             graphics->SetTexture(TU_SHADOWMAP, shadowMap);
-        if (pixelShader_->HasTextureUnit(TU_LIGHTRAMP))
+        if (graphics->NeedTextureUnit(TU_LIGHTRAMP))
             graphics->SetTexture(TU_LIGHTRAMP, light_->GetRampTexture());
-        if (pixelShader_->HasTextureUnit(TU_LIGHTSPOT))
+        if (graphics->NeedTextureUnit(TU_LIGHTSPOT))
             graphics->SetTexture(TU_LIGHTSPOT, light_->GetShapeTexture());
     }
     
-    // Set shaders
-    graphics->SetShaders(vertexShader_, pixelShader_);
-    
     // Set viewport parameters
-    if (vertexShader_->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
+    if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
         graphics->SetVertexShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
     
-    if (vertexShader_->NeedParameterUpdate(VSP_CAMERAROT, camera_))
+    if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
         graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
-    if (vertexShader_->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
+    if (graphics->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
     {
         Vector4 depthMode = Vector4::ZERO;
         if (camera_->IsOrthographic())
@@ -144,10 +144,10 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     }
     
     // Set transforms
-    if ((SetModelTransform) && (vertexShader_->NeedParameterUpdate(VSP_MODEL, worldTransform_)))
+    if ((SetModelTransform) && (graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_)))
         graphics->SetVertexShaderParameter(VSP_MODEL, *worldTransform_);
     
-    if ((shadowMap) && (vertexShader_->NeedParameterUpdate(VSP_SHADOWPROJ, light_)))
+    if ((shadowMap) && (graphics->NeedParameterUpdate(VSP_SHADOWPROJ, light_)))
     {
         Camera* shadowCamera = light_->GetShadowCamera();
         Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
@@ -161,7 +161,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         graphics->SetVertexShaderParameter(VSP_SHADOWPROJ, texAdjust * shadowProj * shadowView);
     }
     
-    if ((light_) && (vertexShader_->NeedParameterUpdate(VSP_SPOTPROJ, light_)))
+    if ((light_) && (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light_)))
     {
         const Matrix3x4& transform = light_->GetWorldTransform();
         Matrix3x4 spotView(transform.Translation(), transform.Rotation(), 1.0f);
@@ -186,12 +186,12 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     {
         // If we override the view matrix, also disable any projection jittering
         /// \todo This may not be correct in all cases (skybox rendering?)
-        if (vertexShader_->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix3x4::IDENTITY))
+        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix3x4::IDENTITY))
             graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
     }
     else
     {
-        if (vertexShader_->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
+        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
             graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
                 camera_->InverseWorldTransform());
     }
@@ -202,34 +202,34 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         const Map<ShaderParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
         for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
-            if (vertexShader_->NeedParameterUpdate(i->first_, material_))
+            if (graphics->NeedParameterUpdate(i->first_, material_))
                 graphics->SetVertexShaderParameter(i->first_, i->second_);
         }
     }
     
-    if (vertexShader_->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
+    if (graphics->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
         graphics->SetVertexShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
     
-    if (vertexShader_->NeedParameterUpdate(VSP_VIEWUPVECTOR, camera_))
+    if (graphics->NeedParameterUpdate(VSP_VIEWUPVECTOR, camera_))
         graphics->SetVertexShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
     
     // Set skinning transforms
     if ((shaderData_) && (shaderDataSize_))
     {
-        if (vertexShader_->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
+        if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
             graphics->SetVertexShaderParameter(VSP_SKINMATRICES, (const float*)shaderData_, shaderDataSize_);
     }
     
     // Set light-related parameters
     if (light_)
     {
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTATTEN, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTATTEN, light_))
         {
             Vector4 light_Atten(1.0f / Max(light_->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
             graphics->SetPixelShaderParameter(PSP_LIGHTATTEN, light_Atten);
         }
         
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTCOLOR, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light_))
         {
             float fade = 1.0f;
             float fadeEnd = light_->GetDrawDistance();
@@ -243,13 +243,13 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
                 light_->GetSpecularIntensity()) * fade);
         }
         
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTDIR, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTDIR, light_))
             graphics->SetPixelShaderParameter(PSP_LIGHTDIR, light_->GetWorldRotation() * Vector3::BACK);
         
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTPOS, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTPOS, light_))
             graphics->SetPixelShaderParameter(PSP_LIGHTPOS, light_->GetWorldPosition() - camera_->GetWorldPosition());
         
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTSPLITS, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTSPLITS, light_))
         {
             float nearFadeRange = light_->GetNearFadeRange();
             float farFadeRange = light_->GetFarFadeRange();
@@ -261,7 +261,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
                 farFadeStart / depthRange, 1.0f / (farFadeRange / depthRange)));
         }
         
-        if (pixelShader_->NeedParameterUpdate(PSP_LIGHTVECROT, light_))
+        if (graphics->NeedParameterUpdate(PSP_LIGHTVECROT, light_))
         {
             Matrix3x4 light_VecRot;
             // Use original light if available (split lights)
@@ -281,7 +281,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         const Map<ShaderParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
         for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
-            if (pixelShader_->NeedParameterUpdate(i->first_, material_))
+            if (graphics->NeedParameterUpdate(i->first_, material_))
                 graphics->SetPixelShaderParameter(i->first_, i->second_);
         }
     }
@@ -289,13 +289,13 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     // Set shadow & spotlight projection parameters
     if (shadowMap)
     {
-        if (pixelShader_->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
+        if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
         {
             float invWidth = 1.0f / (float)shadowMap->GetWidth();
             graphics->SetPixelShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, -0.5f * invWidth, 0.0f, 0.0f));
         }
         
-        if (pixelShader_->NeedParameterUpdate(PSP_SHADOWINTENSITY, light_))
+        if (graphics->NeedParameterUpdate(PSP_SHADOWINTENSITY, light_))
         {
             float intensity = light_->GetShadowIntensity();
             float fadeStart = light_->GetShadowFadeDistance();
@@ -306,7 +306,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             graphics->SetPixelShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
         }
         
-        if (pixelShader_->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
+        if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
             Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
@@ -324,7 +324,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         }
     }
     
-    if ((light_) && (pixelShader_->NeedParameterUpdate(PSP_SPOTPROJ, light_)))
+    if ((light_) && (graphics->NeedParameterUpdate(PSP_SPOTPROJ, light_)))
     {
         Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
         Matrix4 spotProj(Matrix4::IDENTITY);
@@ -396,7 +396,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
         
         for (unsigned i = 0; i < instances_.Size(); ++i)
         {
-            if (vertexShader_->NeedParameterUpdate(VSP_MODEL, instances_[i].worldTransform_))
+            if (graphics->NeedParameterUpdate(VSP_MODEL, instances_[i].worldTransform_))
                 graphics->SetVertexShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
             
             graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),

@@ -131,16 +131,6 @@ void ShaderVariation::ClearParameters()
         useTextureUnit_[i] = false;
 }
 
-bool ShaderVariation::NeedParameterUpdate(ShaderParameter parameter, const void* source)
-{
-    if ((useParameter_[parameter]) && (graphics_) && (graphics_->GetShaderParameterSource(parameter) != source))
-    {
-        graphics_->SetShaderParameterSource(parameter, source);
-        return true;
-    }
-    return false;
-}
-
 Shader* ShaderVariation::GetShader() const
 {
     return shader_;

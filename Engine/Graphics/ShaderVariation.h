@@ -97,8 +97,6 @@ public:
     bool HasParameter(ShaderParameter parameter) const { return useParameter_[parameter]; }
     /// Return whether uses a texture unit (only for pixel shaders)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
-    /// Check whether a shader parameter needs update
-    bool NeedParameterUpdate(ShaderParameter parameter, const void* source);
     
 private:
     /// Parent shader

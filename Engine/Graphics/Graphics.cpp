@@ -1168,6 +1168,33 @@ void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& m
     impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 3);
 }
 
+bool Graphics::NeedParameterUpdate(ShaderParameter parameter, const void* source)
+{
+    if (parameter < PSP_AMBIENTCOLOR)
+    {
+        if ((vertexShader_) && (vertexShader_->HasParameter(parameter)) && (lastShaderParameterSources_[parameter] != source))
+        {
+            lastShaderParameterSources_[parameter] = source;
+            return true;
+        }
+    }
+    else
+    {
+        if ((pixelShader_) && (pixelShader_->HasParameter(parameter)) && (lastShaderParameterSources_[parameter] != source))
+        {
+            lastShaderParameterSources_[parameter] = source;
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool Graphics::NeedTextureUnit(TextureUnit unit)
+{
+    return (pixelShader_) && (pixelShader_->HasTextureUnit(unit));
+}
+
 void Graphics::ClearLastParameterSources()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)

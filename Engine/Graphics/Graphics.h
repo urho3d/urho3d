@@ -140,10 +140,12 @@ public:
     void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
     /// Set pixel shader 4x3 matrix constant
     void SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
-    /// Set shader parameter source. Called by ShaderVariation
-    void SetShaderParameterSource(ShaderParameter param, const void* source) { lastShaderParameterSources_[param] = source; }
     /// Map shader parameter to a constant register. Called by Shader
     void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
+    /// Check whether a shader parameter in the currently set shaders needs update
+    bool NeedParameterUpdate(ShaderParameter parameter, const void* source);
+    /// Check whether the current pixel shader uses a texture unit
+    bool NeedTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter sources
     void ClearLastParameterSources();
     /// Clear remembered transform shader parameter sources
@@ -289,8 +291,6 @@ public:
     unsigned GetVSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
     /// Return pixel shader constant register by parameter index
     unsigned GetPSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
-    /// Return last shader parameter source
-    const void* GetShaderParameterSource(ShaderParameter param) { return lastShaderParameterSources_[param]; }
     /// Return texture by texture unit index
     Texture* GetTexture(unsigned index) const;
     /// Return the "view texture"
