@@ -58,11 +58,9 @@
 
 class Shader;
 
-/// Shader program on the GPU
+/// Vertex or pixel shader on the GPU
 class ShaderVariation : public RefCounted, public GPUObject
 {
-    OBJECT(ShaderVariation);
-    
 public:
     /// Construct
     ShaderVariation(Shader* shader, ShaderType type, bool isSM3);

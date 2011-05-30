@@ -31,8 +31,6 @@
 
 #include "DebugNew.h"
 
-OBJECTTYPESTATIC(ShaderVariation);
-
 ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
     GPUObject(shader->GetSubsystem<Graphics>()),
     shader_(shader),
