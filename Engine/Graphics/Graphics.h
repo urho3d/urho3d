@@ -100,46 +100,26 @@ public:
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// Set vertex shader bool parameter
-    void SetVertexShaderParameter(ShaderParameter param, const bool* data, unsigned count);
-    /// Set vertex shader float constants
-    void SetVertexShaderParameter(ShaderParameter param, const float* data, unsigned count);
-    /// Set vertex shader int constants
-    void SetVertexShaderParameter(ShaderParameter param, const int* data, unsigned count);
-    /// Set vertex shader float constant
-    void SetVertexShaderParameter(ShaderParameter param, float value);
-    /// Set vertex shader color constant
-    void SetVertexShaderParameter(ShaderParameter param, const Color& color);
-    /// Set vertex shader 3x3 matrix constant
-    void SetVertexShaderParameter(ShaderParameter param, const Matrix3& matrix);
-    /// Set vertex shader 3D vector constant
-    void SetVertexShaderParameter(ShaderParameter param, const Vector3& vector);
-    /// Set vertex shader 4x4 matrix constant
-    void SetVertexShaderParameter(ShaderParameter param, const Matrix4& matrix);
-    /// Set vertex shader 4D vector constant
-    void SetVertexShaderParameter(ShaderParameter param, const Vector4& vector);
-    /// Set vertex shader 4x3 matrix constant
-    void SetVertexShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
-    /// Set pixel shader bool constants
-    void SetPixelShaderParameter(ShaderParameter param, const bool* data, unsigned count);
-    /// Set pixel shader float constants
-    void SetPixelShaderParameter(ShaderParameter param, const float* data, unsigned count);
-    /// Set pixel shader int constants
-    void SetPixelShaderParameter(ShaderParameter param, const int* data, unsigned count);
-    /// Set pixel shader float constant
-    void SetPixelShaderParameter(ShaderParameter param, float value);
-    /// Set pixel shader color constant
-    void SetPixelShaderParameter(ShaderParameter param, const Color& color);
-    /// Set pixel shader 3x3 matrix constant
-    void SetPixelShaderParameter(ShaderParameter param, const Matrix3& matrix);
-    /// Set pixel shader 3D vector constant
-    void SetPixelShaderParameter(ShaderParameter param, const Vector3& vector);
-     /// Set pixel shader 4x4 matrix constant
-    void SetPixelShaderParameter(ShaderParameter param, const Matrix4& matrix);
-    /// Set pixel shader 3D vector constant
-    void SetPixelShaderParameter(ShaderParameter param, const Vector4& vector);
-    /// Set pixel shader 4x3 matrix constant
-    void SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
+    /// Set shader bool parameter
+    void SetShaderParameter(ShaderParameter param, const bool* data, unsigned count);
+    /// Set shader float constants
+    void SetShaderParameter(ShaderParameter param, const float* data, unsigned count);
+    /// Set shader int constants
+    void SetShaderParameter(ShaderParameter param, const int* data, unsigned count);
+    /// Set shader float constant
+    void SetShaderParameter(ShaderParameter param, float value);
+    /// Set shader color constant
+    void SetShaderParameter(ShaderParameter param, const Color& color);
+    /// Set shader 3x3 matrix constant
+    void SetShaderParameter(ShaderParameter param, const Matrix3& matrix);
+    /// Set shader 3D vector constant
+    void SetShaderParameter(ShaderParameter param, const Vector3& vector);
+    /// Set shader 4x4 matrix constant
+    void SetShaderParameter(ShaderParameter param, const Matrix4& matrix);
+    /// Set shader 4D vector constant
+    void SetShaderParameter(ShaderParameter param, const Vector4& vector);
+    /// Set shader 4x3 matrix constant
+    void SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
     /// Map shader parameter to a constant register. Called by Shader
     void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
     /// Check whether a shader parameter in the currently set shaders needs update

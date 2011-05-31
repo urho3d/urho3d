@@ -239,19 +239,9 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurface(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
 }
 
-static Vector4 MaterialGetVertexShaderParameter(ShaderParameter parameter, Material* ptr)
+static Vector4 MaterialGetShaderParameter(ShaderParameter parameter, Material* ptr)
 {
-    const Map<ShaderParameter, Vector4>& parameters = ptr->GetVertexShaderParameters();
-    Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
-    if (i == parameters.End())
-        return Vector4::ZERO;
-    else
-        return i->second_;
-}
-
-static Vector4 MaterialGetPixelShaderParameter(ShaderParameter parameter, Material* ptr)
-{
-    const Map<ShaderParameter, Vector4>& parameters = ptr->GetPixelShaderParameters();
+    const Map<ShaderParameter, Vector4>& parameters = ptr->GetShaderParameters();
     Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
     if (i == parameters.End())
         return Vector4::ZERO;
@@ -352,10 +342,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_vertexShaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetVertexShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_vertexShaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetVertexShaderParameter), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Material", "void set_pixelShaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetPixelShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_pixelShaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetPixelShaderParameter), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void set_shaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Vector4 get_shaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetShaderParameter), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_texture(TextureUnit, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_texture(TextureUnit) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);

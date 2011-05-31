@@ -1364,8 +1364,8 @@ void Renderer::SetupLightBatch(Batch& batch)
             graphics_->SetDepthTest(CMP_LESSEQUAL);
             graphics_->SetStencilTest(true, CMP_ALWAYS, OP_INCR, OP_KEEP, OP_KEEP, 1);
             graphics_->SetShaders(stencilVS_, stencilPS_);
-            graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
-            graphics_->SetVertexShaderParameter(VSP_MODEL, nearTransform);
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+            graphics_->SetShaderParameter(VSP_MODEL, nearTransform);
             
             // Draw to stencil
             batch.geometry_->Draw(graphics_);
@@ -1391,8 +1391,8 @@ void Renderer::SetupLightBatch(Batch& batch)
             graphics_->SetDepthTest(drawBackFaces ? CMP_GREATER : CMP_LESS);
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_INCR, OP_KEEP, OP_KEEP, 0);
             graphics_->SetShaders(stencilVS_, stencilPS_);
-            graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection * view);
-            graphics_->SetVertexShaderParameter(VSP_MODEL, model);
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+            graphics_->SetShaderParameter(VSP_MODEL, model);
             
             // Draw the other faces to stencil to mark where we should not draw
             batch.geometry_->Draw(graphics_);
@@ -1423,8 +1423,8 @@ void Renderer::SetupLightBatch(Batch& batch)
                     graphics_->SetDepthTest(CMP_GREATEREQUAL);
                     graphics_->SetStencilTest(true, CMP_ALWAYS, OP_INCR, OP_KEEP, OP_KEEP, 1);
                     graphics_->SetShaders(stencilVS_, stencilPS_);
-                    graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection * view);
-                    graphics_->SetVertexShaderParameter(VSP_MODEL, model);
+                    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+                    graphics_->SetShaderParameter(VSP_MODEL, model);
                     
                     // Draw to stencil
                     batch.geometry_->Draw(graphics_);
@@ -1455,9 +1455,9 @@ void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVar
     
     graphics_->SetCullMode(CULL_NONE);
     graphics_->SetShaders(vs, ps);
-    graphics_->SetVertexShaderParameter(VSP_MODEL, model);
+    graphics_->SetShaderParameter(VSP_MODEL, model);
     // Get projection without jitter offset to ensure the whole screen is filled
-    graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, camera.GetProjection(false));
+    graphics_->SetShaderParameter(VSP_VIEWPROJ, camera.GetProjection(false));
     
     dirLightGeometry_->Draw(graphics_);
 }

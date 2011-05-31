@@ -127,10 +127,10 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     
     // Set viewport parameters
     if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
-        graphics->SetVertexShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
+        graphics->SetShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
     
     if (graphics->NeedParameterUpdate(VSP_CAMERAROT, camera_))
-        graphics->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
+        graphics->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
     
     if (graphics->NeedParameterUpdate(VSP_DEPTHMODE, camera_))
     {
@@ -140,12 +140,12 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         else
             depthMode.w_ = 1.0f / camera_->GetFarClip();
         
-        graphics->SetVertexShaderParameter(VSP_DEPTHMODE, depthMode);
+        graphics->SetShaderParameter(VSP_DEPTHMODE, depthMode);
     }
     
     // Set transforms
     if ((SetModelTransform) && (graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_)))
-        graphics->SetVertexShaderParameter(VSP_MODEL, *worldTransform_);
+        graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
     
     if ((shadowMap) && (graphics->NeedParameterUpdate(VSP_SHADOWPROJ, light_)))
     {
@@ -158,7 +158,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         texAdjust.SetTranslation(Vector3(offset, offset, 0.0f));
         texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
         
-        graphics->SetVertexShaderParameter(VSP_SHADOWPROJ, texAdjust * shadowProj * shadowView);
+        graphics->SetShaderParameter(VSP_SHADOWPROJ, texAdjust * shadowProj * shadowView);
     }
     
     if ((light_) && (graphics->NeedParameterUpdate(VSP_SPOTPROJ, light_)))
@@ -179,7 +179,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
         texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
         
-        graphics->SetVertexShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
+        graphics->SetShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
     }
     
     if (overrideView_)
@@ -187,37 +187,26 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         // If we override the view matrix, also disable any projection jittering
         /// \todo This may not be correct in all cases (skybox rendering?)
         if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix3x4::IDENTITY))
-            graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
+            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
     }
     else
     {
         if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
-            graphics->SetVertexShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
+            graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
                 camera_->InverseWorldTransform());
     }
     
-    // Set material's vertex shader parameters
-    if (material_)
-    {
-        const Map<ShaderParameter, Vector4>& parameters = material_->GetVertexShaderParameters();
-        for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
-        {
-            if (graphics->NeedParameterUpdate(i->first_, material_))
-                graphics->SetVertexShaderParameter(i->first_, i->second_);
-        }
-    }
-    
     if (graphics->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
-        graphics->SetVertexShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
+        graphics->SetShaderParameter(VSP_VIEWRIGHTVECTOR, camera_->GetRightVector());
     
     if (graphics->NeedParameterUpdate(VSP_VIEWUPVECTOR, camera_))
-        graphics->SetVertexShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
+        graphics->SetShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
     
     // Set skinning transforms
     if ((shaderData_) && (shaderDataSize_))
     {
         if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
-            graphics->SetVertexShaderParameter(VSP_SKINMATRICES, (const float*)shaderData_, shaderDataSize_);
+            graphics->SetShaderParameter(VSP_SKINMATRICES, (const float*)shaderData_, shaderDataSize_);
     }
     
     // Set light-related parameters
@@ -226,7 +215,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         if (graphics->NeedParameterUpdate(PSP_LIGHTATTEN, light_))
         {
             Vector4 light_Atten(1.0f / Max(light_->GetRange(), M_EPSILON), 0.0f, 0.0f, 0.0f);
-            graphics->SetPixelShaderParameter(PSP_LIGHTATTEN, light_Atten);
+            graphics->SetShaderParameter(PSP_LIGHTATTEN, light_Atten);
         }
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTCOLOR, light_))
@@ -239,15 +228,15 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             if ((light_->GetLightType() != LIGHT_DIRECTIONAL) && (fadeEnd > 0.0f) && (fadeStart > 0.0f) && (fadeStart < fadeEnd))
                 fade = Min(1.0f - (light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
             
-            graphics->SetPixelShaderParameter(PSP_LIGHTCOLOR, Vector4(light_->GetColor().RGBValues(),
+            graphics->SetShaderParameter(PSP_LIGHTCOLOR, Vector4(light_->GetColor().RGBValues(),
                 light_->GetSpecularIntensity()) * fade);
         }
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTDIR, light_))
-            graphics->SetPixelShaderParameter(PSP_LIGHTDIR, light_->GetWorldRotation() * Vector3::BACK);
+            graphics->SetShaderParameter(PSP_LIGHTDIR, light_->GetWorldRotation() * Vector3::BACK);
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTPOS, light_))
-            graphics->SetPixelShaderParameter(PSP_LIGHTPOS, light_->GetWorldPosition() - camera_->GetWorldPosition());
+            graphics->SetShaderParameter(PSP_LIGHTPOS, light_->GetWorldPosition() - camera_->GetWorldPosition());
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTSPLITS, light_))
         {
@@ -257,7 +246,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             float farFadeStart = light_->GetFarSplit() - farFadeRange;
             float depthRange = camera_->GetFarClip();
             
-            graphics->SetPixelShaderParameter(PSP_LIGHTSPLITS, Vector4(nearFadeStart / depthRange, 1.0f / (nearFadeRange / depthRange),
+            graphics->SetShaderParameter(PSP_LIGHTSPLITS, Vector4(nearFadeStart / depthRange, 1.0f / (nearFadeRange / depthRange),
                 farFadeStart / depthRange, 1.0f / (farFadeRange / depthRange)));
         }
         
@@ -271,18 +260,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             else
                 light_VecRot = Matrix3x4(Vector3::ZERO, original->GetWorldRotation(), Vector3::UNITY);
             
-            graphics->SetPixelShaderParameter(PSP_LIGHTVECROT, light_VecRot);
-        }
-    }
-    
-    // Set material's pixel shader parameters
-    if (material_)
-    {
-        const Map<ShaderParameter, Vector4>& parameters = material_->GetPixelShaderParameters();
-        for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
-        {
-            if (graphics->NeedParameterUpdate(i->first_, material_))
-                graphics->SetPixelShaderParameter(i->first_, i->second_);
+            graphics->SetShaderParameter(PSP_LIGHTVECROT, light_VecRot);
         }
     }
     
@@ -292,7 +270,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         if (graphics->NeedParameterUpdate(PSP_SAMPLEOFFSETS, shadowMap))
         {
             float invWidth = 1.0f / (float)shadowMap->GetWidth();
-            graphics->SetPixelShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, -0.5f * invWidth, 0.0f, 0.0f));
+            graphics->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(0.5f * invWidth, -0.5f * invWidth, 0.0f, 0.0f));
         }
         
         if (graphics->NeedParameterUpdate(PSP_SHADOWINTENSITY, light_))
@@ -303,7 +281,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             if ((fadeStart > 0.0f) && (fadeEnd > 0.0f) && (fadeEnd > fadeStart))
                 intensity = Lerp(intensity, 1.0f, Clamp((light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
             float pcfValues = (1.0f - intensity) * 0.25f;
-            graphics->SetPixelShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
+            graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
         }
         
         if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
@@ -320,7 +298,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
             texAdjust.SetTranslation(Vector3(offset, offset, 0.0f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
             
-            graphics->SetPixelShaderParameter(PSP_SHADOWPROJ, texAdjust * shadowProj * shadowView * viewPos);
+            graphics->SetShaderParameter(PSP_SHADOWPROJ, texAdjust * shadowProj * shadowView * viewPos);
         }
     }
     
@@ -344,7 +322,18 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
         texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
         
-        graphics->SetPixelShaderParameter(PSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse() * viewPos);
+        graphics->SetShaderParameter(PSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse() * viewPos);
+    }
+    
+    // Set material's shader parameters
+    if (material_)
+    {
+        const Map<ShaderParameter, Vector4>& parameters = material_->GetShaderParameters();
+        for (Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        {
+            if (graphics->NeedParameterUpdate(i->first_, material_))
+                graphics->SetShaderParameter(i->first_, i->second_);
+        }
     }
 }
 
@@ -397,7 +386,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
         for (unsigned i = 0; i < instances_.Size(); ++i)
         {
             if (graphics->NeedParameterUpdate(VSP_MODEL, instances_[i].worldTransform_))
-                graphics->SetVertexShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
+                graphics->SetShaderParameter(VSP_MODEL, *instances_[i].worldTransform_);
             
             graphics->Draw(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                 geometry_->GetVertexStart(), geometry_->GetVertexCount());

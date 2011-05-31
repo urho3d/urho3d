@@ -213,9 +213,9 @@ void DebugRenderer::Render()
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(renderer->GetVertexShader("Basic_VCol"), renderer->GetPixelShader("Basic_VCol"));
-    graphics->SetVertexShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-    graphics->SetVertexShaderParameter(VSP_VIEWPROJ, projection_ * view_);
-    graphics->SetPixelShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
+    graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+    graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
+    graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     
     // Draw all line geometry with depth testing
     if (lines_.Size())

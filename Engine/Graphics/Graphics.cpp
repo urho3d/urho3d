@@ -930,34 +930,43 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const bool* data, unsigned count)
+void Graphics::SetShaderParameter(ShaderParameter param, const bool* data, unsigned count)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantB(index, (const BOOL*)data, count);
+    if (param < PSP_AMBIENTCOLOR)
+       impl_->device_->SetVertexShaderConstantB(index, (const BOOL*)data, count);
+    else
+       impl_->device_->SetPixelShaderConstantB(index, (const BOOL*)data, count);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const float* data, unsigned count)
+void Graphics::SetShaderParameter(ShaderParameter param, const float* data, unsigned count)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantF(index, data, count / 4);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, data, count / 4);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, data, count / 4);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const int* data, unsigned count)
+void Graphics::SetShaderParameter(ShaderParameter param, const int* data, unsigned count)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantI(index, data, count / 4);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantI(index, data, count / 4);
+    else
+        impl_->device_->SetPixelShaderConstantI(index, data, count / 4);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, float value)
+void Graphics::SetShaderParameter(ShaderParameter param, float value)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
@@ -970,19 +979,25 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, float value)
     data[2] = 0.0f;
     data[3] = 0.0f;
     
-    impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Color& color)
+void Graphics::SetShaderParameter(ShaderParameter param, const Color& color)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantF(index, color.GetData(), 1);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, color.GetData(), 1);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, color.GetData(), 1);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix3& matrix)
+void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3& matrix)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
@@ -1003,10 +1018,13 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix3& ma
     data[10] = matrix.m22_;
     data[11] = 0.0f;
     
-    impl_->device_->SetVertexShaderConstantF(index, &data[0], 3);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, &data[0], 3);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, &data[0], 3);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector3& vector)
+void Graphics::SetShaderParameter(ShaderParameter param, const Vector3& vector)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
@@ -1019,153 +1037,46 @@ void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector3& ve
     data[2] = vector.z_;
     data[3] = 0.0f;
     
-    impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, &data[0], 1);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix4& matrix)
+void Graphics::SetShaderParameter(ShaderParameter param, const Matrix4& matrix)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 4);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 4);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 4);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Vector4& vector)
+void Graphics::SetShaderParameter(ShaderParameter param, const Vector4& vector)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantF(index, vector.GetData(), 1);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, vector.GetData(), 1);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, vector.GetData(), 1);
 }
 
-void Graphics::SetVertexShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
+void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
 {
     unsigned index = shaderRegisters_[param];
     if (index >= MAX_CONSTANT_REGISTERS)
         return;
     
-    impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 3);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const bool* data, unsigned count)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantB(index, (const BOOL*)data, count);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const float* data, unsigned count)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantF(index, data, count / 4);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const int* data, unsigned count)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantI(index, data, count / 4);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, float value)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    float data[4];
-    
-    data[0] = value;
-    data[1] = 0.0f;
-    data[2] = 0.0f;
-    data[3] = 0.0f;
-    
-    impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Color& color)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantF(index, color.GetData(), 1);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix3& matrix)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    float data[12];
-    
-    data[0] = matrix.m00_;
-    data[1] = matrix.m01_;
-    data[2] = matrix.m02_;
-    data[3] = 0.0f;
-    data[4] = matrix.m10_;
-    data[5] = matrix.m11_;
-    data[6] = matrix.m12_;
-    data[7] = 0.0f;
-    data[8] = matrix.m20_;
-    data[9] = matrix.m21_;
-    data[10] = matrix.m22_;
-    data[11] = 0.0f;
-    
-    impl_->device_->SetPixelShaderConstantF(index, &data[0], 3);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector3& vector)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    float data[4];
-    
-    data[0] = vector.x_;
-    data[1] = vector.y_;
-    data[2] = vector.z_;
-    data[3] = 0.0f;
-    
-    impl_->device_->SetPixelShaderConstantF(index, &data[0], 1);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix4& matrix)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 4);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Vector4& vector)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantF(index, vector.GetData(), 1);
-}
-
-void Graphics::SetPixelShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
-{
-    unsigned index = shaderRegisters_[param];
-    if (index >= MAX_CONSTANT_REGISTERS)
-        return;
-    
-    impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 3);
+    if (param < PSP_AMBIENTCOLOR)
+        impl_->device_->SetVertexShaderConstantF(index, matrix.GetData(), 3);
+    else
+        impl_->device_->SetPixelShaderConstantF(index, matrix.GetData(), 3);
 }
 
 bool Graphics::NeedParameterUpdate(ShaderParameter parameter, const void* source)

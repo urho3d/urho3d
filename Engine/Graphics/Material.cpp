@@ -89,11 +89,11 @@ Material::Material(Context* context) :
     textures_.Resize(MAX_MATERIAL_TEXTURE_UNITS);
     
     // Setup often used default parameters
-    vsParameters_[VSP_UOFFSET] = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-    vsParameters_[VSP_VOFFSET] = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
-    psParameters_[PSP_MATDIFFCOLOR] = Vector4::UNITY;
-    psParameters_[PSP_MATEMISSIVECOLOR] = Vector4::ZERO;
-    psParameters_[PSP_MATSPECPROPERTIES] = Vector4::ZERO;
+    shaderParameters_[VSP_UOFFSET] = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+    shaderParameters_[VSP_VOFFSET] = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
+    shaderParameters_[PSP_MATDIFFCOLOR] = Vector4::UNITY;
+    shaderParameters_[PSP_MATEMISSIVECOLOR] = Vector4::ZERO;
+    shaderParameters_[PSP_MATSPECPROPERTIES] = Vector4::ZERO;
 }
 
 Material::~Material()
@@ -176,10 +176,8 @@ bool Material::Load(Deserializer& source)
         Vector4 value = parameterElem.GetVector("value");
         ShaderParameter param = graphics->GetShaderParameter(name);
         // Check whether a VS or PS parameter
-        if (param < PSP_AMBIENTCOLOR)
-            SetVertexShaderParameter(param, value);
-        else if (param != MAX_SHADER_PARAMETERS)
-            SetPixelShaderParameter(param, value);
+        if (param < MAX_SHADER_PARAMETERS)
+            SetShaderParameter(param, value);
         else
             LOGERROR("Unknown shader parameter " + name);
         
@@ -199,8 +197,7 @@ bool Material::Load(Deserializer& source)
     memoryUse += sizeof(Material);
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
     memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
-    memoryUse += vsParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
-    memoryUse += psParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
+    memoryUse += shaderParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
     
     SetMemoryUse(memoryUse);
     Update();
@@ -242,13 +239,7 @@ bool Material::Save(Serializer& dest)
     }
     
     // Write shader parameters
-    for (Map<ShaderParameter, Vector4>::ConstIterator j = vsParameters_.Begin(); j != vsParameters_.End(); ++j)
-    {
-        XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));
-        parameterElem.SetVector4("value", j->second_);
-    }
-    for (Map<ShaderParameter, Vector4>::ConstIterator j = psParameters_.Begin(); j != psParameters_.End(); ++j)
+    for (Map<ShaderParameter, Vector4>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
         parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));
@@ -275,14 +266,9 @@ void Material::SetTechnique(unsigned index, Technique* technique, unsigned quali
     Update();
 }
 
-void Material::SetVertexShaderParameter(ShaderParameter parameter, const Vector4& value)
+void Material::SetShaderParameter(ShaderParameter parameter, const Vector4& value)
 {
-    vsParameters_[parameter] = value;
-}
-
-void Material::SetPixelShaderParameter(ShaderParameter parameter, const Vector4& value)
-{
-    psParameters_[parameter] = value;
+    shaderParameters_[parameter] = value;
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -318,8 +304,8 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     
     transform = offsetMatrix * transform;
     
-    Vector4& uOffset = vsParameters_[VSP_UOFFSET];
-    Vector4& vOffset = vsParameters_[VSP_VOFFSET];
+    Vector4& uOffset = shaderParameters_[VSP_UOFFSET];
+    Vector4& vOffset = shaderParameters_[VSP_VOFFSET];
     uOffset.x_ = transform.m00_;
     uOffset.y_ = transform.m01_;
     uOffset.w_ = transform.m03_;
@@ -359,8 +345,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
-    ret->vsParameters_ = vsParameters_;
-    ret->psParameters_ = psParameters_;
+    ret->shaderParameters_ = shaderParameters_;
     ret->textures_ = textures_;
     ret->occlusion_ = occlusion_;
     ret->cullMode_ = cullMode_;

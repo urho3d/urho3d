@@ -73,10 +73,8 @@ public:
     void SetNumTechniques(unsigned num);
     /// Set technique
     void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
-    /// Set vertex shader parameter
-    void SetVertexShaderParameter(ShaderParameter parameter, const Vector4& value);
-    /// Set pixel shader parameter
-    void SetPixelShaderParameter(ShaderParameter parameter, const Vector4& value);
+    /// Set shader parameter
+    void SetShaderParameter(ShaderParameter parameter, const Vector4& value);
     /// Set texture
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform
@@ -108,10 +106,8 @@ public:
     const Vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
     /// Return texture by unit
     Texture* GetTexture(TextureUnit unit) const;
-    /// Return all vertex shader parameters
-    const Map<ShaderParameter, Vector4>& GetVertexShaderParameters() const { return vsParameters_; }
-    /// Return all pixel shader parameters
-    const Map<ShaderParameter, Vector4>& GetPixelShaderParameters() const { return psParameters_; }
+    /// Return all shader parameters
+    const Map<ShaderParameter, Vector4>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows
@@ -132,10 +128,8 @@ private:
     Vector<TechniqueEntry> techniques_;
     /// Textures
     Vector<SharedPtr<Texture> > textures_;
-    /// Vertex shader parameters
-    Map<ShaderParameter, Vector4> vsParameters_;
-    /// Pixel shader parameters
-    Map<ShaderParameter, Vector4> psParameters_;
+    /// Shader parameters
+    Map<ShaderParameter, Vector4> shaderParameters_;
     /// Normal culling mode
     CullMode cullMode_;
     /// Culling mode for shadow rendering

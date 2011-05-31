@@ -827,10 +827,10 @@ void View::RenderBatchesDeferred()
     Vector4 viewportSize((float)screenRect_.left_ / gBufferWidth, (float)screenRect_.top_ / gBufferHeight,
         (float)screenRect_.right_ / gBufferWidth, (float)screenRect_.bottom_ / gBufferHeight);
     
-    graphics_->SetVertexShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
-    graphics_->SetVertexShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetPixelShaderParameter(PSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetPixelShaderParameter(PSP_GBUFFERVIEWPORT, viewportSize);
+    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
+    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
+    graphics_->SetShaderParameter(PSP_GBUFFEROFFSETS, bufferUVOffset);
+    graphics_->SetShaderParameter(PSP_GBUFFERVIEWPORT, viewportSize);
     
     {
         // Render G-buffer
@@ -1037,12 +1037,12 @@ void View::RenderBatchesDeferred()
         graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
         graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
         graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
-        graphics_->SetVertexShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
-        graphics_->SetVertexShaderParameter(VSP_DEPTHMODE, depthMode);
-        graphics_->SetPixelShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
-        graphics_->SetPixelShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));
-        graphics_->SetPixelShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f));
-        graphics_->SetPixelShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
+        graphics_->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
+        graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
+        graphics_->SetShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
+        graphics_->SetShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f));
+        graphics_->SetShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
         
         unsigned index = camera_->IsOrthographic() ? 1 : 0;
         String shaderName = "TemporalAA_" + aaVariation[index];
@@ -2004,11 +2004,11 @@ void View::SetShaderParameters()
     Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
     Vector4 elapsedTime((time->GetTotalMSec() & 0x3fffff) / 1000.0f, 0.0f, 0.0f, 0.0f);
     
-    graphics_->SetVertexShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
-    graphics_->SetPixelShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
-    graphics_->SetPixelShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
-    graphics_->SetPixelShaderParameter(PSP_FOGCOLOR, zone_->GetFogColor());
-    graphics_->SetPixelShaderParameter(PSP_FOGPARAMS, fogParams);
+    graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+    graphics_->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
+    graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+    graphics_->SetShaderParameter(PSP_FOGCOLOR, zone_->GetFogColor());
+    graphics_->SetShaderParameter(PSP_FOGPARAMS, fogParams);
 }
 
 void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
@@ -2033,8 +2033,8 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             graphics_->SetCullMode(drawBackFaces ? CULL_CW : CULL_CCW);
             graphics_->SetDepthTest(drawBackFaces ? CMP_GREATER : CMP_LESS);
             graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-            graphics_->SetVertexShaderParameter(VSP_MODEL, model);
-            graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection * view);
+            graphics_->SetShaderParameter(VSP_MODEL, model);
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
             
             // Draw the faces to stencil which we should draw (where no light has not been rendered yet)
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_INCR, OP_KEEP, OP_KEEP, 0);
@@ -2082,8 +2082,8 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                 {
                     graphics_->SetDepthTest(CMP_GREATEREQUAL);
                     graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-                    graphics_->SetVertexShaderParameter(VSP_MODEL, farTransform);
-                    graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
+                    graphics_->SetShaderParameter(VSP_MODEL, farTransform);
+                    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
                     graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
                 }
                 // Otherwise draw at split near plane
@@ -2091,8 +2091,8 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                 {
                     graphics_->SetDepthTest(CMP_LESSEQUAL);
                     graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-                    graphics_->SetVertexShaderParameter(VSP_MODEL, nearTransform);
-                    graphics_->SetVertexShaderParameter(VSP_VIEWPROJ, projection);
+                    graphics_->SetShaderParameter(VSP_MODEL, nearTransform);
+                    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
                     graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
                 }
                 
