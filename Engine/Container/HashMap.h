@@ -197,7 +197,7 @@ public:
         
         unsigned hashKey = MakeHash(key) & (numBuckets_ - 1);
         
-        Node* node = FindNode(key);
+        Node* node = FindNode(key, hashKey);
         if (node)
             return node->pair_.second_;
         else
