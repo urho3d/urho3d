@@ -58,11 +58,11 @@ public:
     void Draw(Graphics* graphics);
     
     /// Return all vertex buffers
-    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffers_; }
     /// Return vertex element masks
     const PODVector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
     /// Return number of vertex buffers
-    unsigned GetNumVertexBuffers() const { return vertexBuffer_.Size(); }
+    unsigned GetNumVertexBuffers() const { return vertexBuffers_.Size(); }
     /// Return vertex buffer by index
     VertexBuffer* GetVertexBuffer(unsigned index) const;
     /// Return vertex element mask by index
@@ -95,7 +95,7 @@ private:
     void GetPositionBufferIndex();
     
     /// Vertex buffers
-    Vector<SharedPtr<VertexBuffer> > vertexBuffer_;
+    Vector<SharedPtr<VertexBuffer> > vertexBuffers_;
     /// Vertex element masks
     PODVector<unsigned> elementMasks_;
     /// Index buffer

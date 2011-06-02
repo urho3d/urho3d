@@ -131,7 +131,7 @@ struct BatchGroup
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Prepare and draw
-    void Draw(Graphics* graphics, VertexBuffer* buffer) const;
+    void Draw(Graphics* graphics, VertexBuffer* instanceBuffer) const;
     
     /// Geometry
     Geometry* geometry_;

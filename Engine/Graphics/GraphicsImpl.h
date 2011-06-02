@@ -78,17 +78,17 @@ private:
     /// Direct3D presentation parameters
     D3DPRESENT_PARAMETERS presentParams_;
     /// Texture min/mag filter modes in use
-    D3DTEXTUREFILTERTYPE minMagFilter_[MAX_TEXTURE_UNITS];
+    D3DTEXTUREFILTERTYPE minMagFilters_[MAX_TEXTURE_UNITS];
     /// Texture mip filter modes in use
-    D3DTEXTUREFILTERTYPE mipFilter_[MAX_TEXTURE_UNITS];
+    D3DTEXTUREFILTERTYPE mipFilters_[MAX_TEXTURE_UNITS];
     /// Texture U coordinate addressing modes in use
-    D3DTEXTUREADDRESS uAddressMode_[MAX_TEXTURE_UNITS];
+    D3DTEXTUREADDRESS uAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture V coordinate addressing modes in use
-    D3DTEXTUREADDRESS vAddressMode_[MAX_TEXTURE_UNITS];
+    D3DTEXTUREADDRESS vAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use
-    Color borderColor_[MAX_TEXTURE_UNITS];
+    Color borderColors_[MAX_TEXTURE_UNITS];
     /// Color surfaces in use
-    IDirect3DSurface9* colorSurface_[MAX_RENDERTARGETS];
+    IDirect3DSurface9* colorSurfaces_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use
     IDirect3DSurface9* depthStencilSurface_;
     /// Blending enabled flag

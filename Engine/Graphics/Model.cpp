@@ -89,7 +89,7 @@ bool Model::Load(Deserializer& source)
     geometries_.Clear();
     geometryBoneMappings_.Clear();
     morphs_.Clear();
-    vertexBuffer_.Clear();
+    vertexBuffers_.Clear();
     indexBuffers_.Clear();
     
     SetMemoryUse(source.GetSize());
@@ -124,7 +124,7 @@ bool Model::Load(Deserializer& source)
         else
             return false;
         
-        vertexBuffer_.Push(buffer);
+        vertexBuffers_.Push(buffer);
     }
     
     // Read index buffers
@@ -173,7 +173,7 @@ bool Model::Load(Deserializer& source)
             unsigned indexStart = source.ReadUInt();
             unsigned indexCount = source.ReadUInt();
             
-            if (vertexBufferRef >= vertexBuffer_.Size())
+            if (vertexBufferRef >= vertexBuffers_.Size())
             {
                 LOGERROR("Vertex buffer index out of bounds");
                 return false;
@@ -186,7 +186,7 @@ bool Model::Load(Deserializer& source)
             
             SharedPtr<Geometry> geometry(new Geometry(context_));
             geometry->SetNumVertexBuffers(1);
-            geometry->SetVertexBuffer(0, vertexBuffer_[vertexBufferRef]);
+            geometry->SetVertexBuffer(0, vertexBuffers_[vertexBufferRef]);
             geometry->SetIndexBuffer(indexBuffers_[indexBufferRef]);
             geometry->SetDrawRange(type, indexStart, indexCount);
             geometry->SetLodDistance(distance);

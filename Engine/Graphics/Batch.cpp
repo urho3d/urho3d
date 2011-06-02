@@ -359,7 +359,7 @@ void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
+void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer) const
 {
     if (!instances_.Size())
         return;
@@ -376,7 +376,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
     batch.vertexShaderIndex_ = vertexShaderIndex_;
     
     // Draw as individual instances if below minimum size, or if instancing not supported
-    if ((instances_.Size() < MIN_INSTANCES) || (!buffer))
+    if ((instances_.Size() < MIN_INSTANCES) || (!instanceBuffer))
     {
         batch.Prepare(graphics, false);
         
@@ -409,8 +409,8 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
         // Get the geometry vertex buffers, then add the instancing stream buffer
         Vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();
         PODVector<unsigned> elementMasks = geometry_->GetVertexElementMasks();
-        vertexBuffers.Push(SharedPtr<VertexBuffer>(buffer));
-        elementMasks.Push(buffer->GetElementMask());
+        vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
+        elementMasks.Push(instanceBuffer->GetElementMask());
         
         // No stream offset support, instancing buffer not pre-filled with transforms: have to lock and fill now
         if (startIndex_ == M_MAX_UNSIGNED)
@@ -419,17 +419,17 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* buffer) const
             while (startIndex < instances_.Size())
             {
                 unsigned instances = instances_.Size() - startIndex;
-                if (instances > buffer->GetVertexCount())
-                    instances = buffer->GetVertexCount();
+                if (instances > instanceBuffer->GetVertexCount())
+                    instances = instanceBuffer->GetVertexCount();
                 
                 // Lock the instance stream buffer and copy the transforms
-                void* data = buffer->Lock(0, instances, LOCK_DISCARD);
+                void* data = instanceBuffer->Lock(0, instances, LOCK_DISCARD);
                 if (!data)
                     return;
                 Matrix3x4* dest = (Matrix3x4*)data;
                 for (unsigned i = 0; i < instances; ++i)
                     dest[i] = *instances_[i + startIndex].worldTransform_;
-                buffer->Unlock();
+                instanceBuffer->Unlock();
                 
                 graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
                 graphics->SetVertexBuffers(vertexBuffers, elementMasks);

@@ -454,7 +454,7 @@ void Graphics::Close()
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
-        immediatevertexBuffer_.Clear();
+        immediateVertexBuffers_.Clear();
         
         DestroyWindow(impl_->window_);
         impl_->window_ = 0;
@@ -708,7 +708,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        VertexBuffer* buffer = vertexBuffer_[i];
+        VertexBuffer* buffer = vertexBuffers_[i];
         if (buffer)
         {
             if (buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
@@ -746,10 +746,10 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
     SetVertexBuffers(vertexBuffers, elementMasks);
 }
 
-bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>&
+    elementMasks, unsigned instanceOffset)
 {
-    if (buffers.Size() > MAX_VERTEX_STREAMS)
+   if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         LOGERROR("Too many vertex buffers");
         return false;
@@ -805,15 +805,15 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
                 offset = instanceOffset * buffer->GetVertexSize();
         }
         
-        if ((buffer != vertexBuffer_[i]) || (offset != streamOffset_[i]))
+        if ((buffer != vertexBuffers_[i]) || (offset != streamOffsets_[i]))
         {
             if (buffer)
                 impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
             else
                 impl_->device_->SetStreamSource(i, 0, 0, 0);
             
-            vertexBuffer_[i] = buffer;
-            streamOffset_[i] = offset;
+            vertexBuffers_[i] = buffer;
+            streamOffsets_[i] = offset;
         }
     }
     
@@ -879,15 +879,15 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
                 offset = instanceOffset * buffer->GetVertexSize();
         }
         
-        if ((buffer != vertexBuffer_[i]) || (offset != streamOffset_[i]))
+        if ((buffer != vertexBuffers_[i]) || (offset != streamOffsets_[i]))
         {
             if (buffer)
                 impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
             else
                 impl_->device_->SetStreamSource(i, 0, 0, 0);
             
-            vertexBuffer_[i] = buffer;
-            streamOffset_[i] = offset;
+            vertexBuffers_[i] = buffer;
+            streamOffsets_[i] = offset;
         }
     }
     
@@ -1126,7 +1126,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if ((renderTarget_[0]) && (renderTarget_[0]->GetParentTexture() == texture))
+        if ((renderTargets_[0]) && (renderTargets_[0]->GetParentTexture() == texture))
             texture = texture->GetBackupTexture();
         // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
         // but should still not sample it either
@@ -1134,14 +1134,14 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             texture = texture->GetBackupTexture();
     }
     
-    if (texture != texture_[index])
+    if (texture != textures_[index])
     {
         if (texture)
             impl_->device_->SetTexture(index, (IDirect3DBaseTexture9*)texture->GetGPUObject());
         else
             impl_->device_->SetTexture(index, 0);
         
-        texture_[index] = texture;
+        textures_[index] = texture;
     }
     
     if (texture)
@@ -1152,38 +1152,38 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         
         D3DTEXTUREFILTERTYPE minMag, mip;
         minMag = d3dMinMagFilter[filterMode];
-        if (minMag != impl_->minMagFilter_[index])
+        if (minMag != impl_->minMagFilters_[index])
         {
             impl_->device_->SetSamplerState(index, D3DSAMP_MAGFILTER, minMag);
             impl_->device_->SetSamplerState(index, D3DSAMP_MINFILTER, minMag);
-            impl_->minMagFilter_[index] = minMag;
+            impl_->minMagFilters_[index] = minMag;
         }
         mip = d3dMipFilter[filterMode];
-        if (mip != impl_->mipFilter_[index])
+        if (mip != impl_->mipFilters_[index])
         {
             impl_->device_->SetSamplerState(index, D3DSAMP_MIPFILTER, mip);
-            impl_->mipFilter_[index] = mip;
+            impl_->mipFilters_[index] = mip;
         }
         D3DTEXTUREADDRESS u, v;
         u = d3dAddressMode[texture->GetAddressMode(COORD_U)];
-        if (u != impl_->uAddressMode_[index])
+        if (u != impl_->uAddressModes_[index])
         {
             impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSU, u);
-            impl_->uAddressMode_[index] = u;
+            impl_->uAddressModes_[index] = u;
         }
         v = d3dAddressMode[texture->GetAddressMode(COORD_V)];
-        if (v != impl_->vAddressMode_[index])
+        if (v != impl_->vAddressModes_[index])
         {
             impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSV, v);
-            impl_->vAddressMode_[index] = v;
+            impl_->vAddressModes_[index] = v;
         }
         if ((u == D3DTADDRESS_BORDER) || (v == D3DTADDRESS_BORDER))
         {
             const Color& borderColor = texture->GetBorderColor();
-            if (borderColor != impl_->borderColor_[index])
+            if (borderColor != impl_->borderColors_[index])
             {
                 impl_->device_->SetSamplerState(index, D3DSAMP_BORDERCOLOR, borderColor.ToUInt());
-                impl_->borderColor_[index] = borderColor;
+                impl_->borderColors_[index] = borderColor;
             }
         }
     }
@@ -1231,12 +1231,12 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             newColorSurface = impl_->defaultColorSurface_;
     }
     
-    renderTarget_[index] = renderTarget;
+    renderTargets_[index] = renderTarget;
     
-    if (newColorSurface != impl_->colorSurface_[index])
+    if (newColorSurface != impl_->colorSurfaces_[index])
     {
         impl_->device_->SetRenderTarget(index, newColorSurface);
-        impl_->colorSurface_[index] = newColorSurface;
+        impl_->colorSurfaces_[index] = newColorSurface;
     }
     
     // If the rendertarget is also bound as a texture, replace with backup texture or null
@@ -1246,8 +1246,8 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
-            if (texture_[i] == parentTexture)
-                SetTexture(i, texture_[i]->GetBackupTexture());
+            if (textures_[i] == parentTexture)
+                SetTexture(i, textures_[i]->GetBackupTexture());
         }
     }
     
@@ -1339,8 +1339,8 @@ void Graphics::SetViewTexture(Texture* texture)
     {
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
-            if (texture_[i] == texture)
-                SetTexture(i, texture_[i]->GetBackupTexture());
+            if (textures_[i] == texture)
+                SetTexture(i, textures_[i]->GetBackupTexture());
         }
     }
 }
@@ -1627,10 +1627,10 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 
 void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
 {
-    if ((index < MAX_VERTEX_STREAMS) && (streamFrequency_[index] != frequency))
+    if ((index < MAX_VERTEX_STREAMS) && (streamFrequencies_[index] != frequency))
     {
         impl_->device_->SetStreamSourceFreq(index, frequency);
-        streamFrequency_[index] = frequency;
+        streamFrequencies_[index] = frequency;
     }
 }
 
@@ -1638,10 +1638,10 @@ void Graphics::ResetStreamFrequencies()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        if (streamFrequency_[i] != 1)
+        if (streamFrequencies_[i] != 1)
         {
             impl_->device_->SetStreamSourceFreq(i, 1);
-            streamFrequency_[i] = 1;
+            streamFrequencies_[i] = 1;
         }
     }
 }
@@ -1667,17 +1667,17 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
         newSize <<= 1;
         
     // See if buffer exists for this vertex format. If not, create new
-    if (immediatevertexBuffer_.Find(elementMask) == immediatevertexBuffer_.End())
+    if (immediateVertexBuffers_.Find(elementMask) == immediateVertexBuffers_.End())
     {
         LOGDEBUG("Created immediate vertex buffer");
         VertexBuffer* newBuffer = new VertexBuffer(context_);
         newBuffer->SetSize(newSize, elementMask, true);
-        immediatevertexBuffer_[elementMask] = newBuffer;
+        immediateVertexBuffers_[elementMask] = newBuffer;
         immediateVertexBufferPos_[elementMask] = 0;
     }
     
     // Resize buffer if it is too small
-    VertexBuffer* buffer = immediatevertexBuffer_[elementMask];
+    VertexBuffer* buffer = immediateVertexBuffers_[elementMask];
     if (buffer->GetVertexCount() < newSize)
     {
         LOGDEBUG("Resized immediate vertex buffer to " + String(newSize));
@@ -1871,7 +1871,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
-    return index < MAX_VERTEX_STREAMS ? vertexBuffer_[index] : 0;
+    return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
 }
 
 ShaderParameter Graphics::GetShaderParameter(const String& name)
@@ -1914,27 +1914,27 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
 
 Texture* Graphics::GetTexture(unsigned index) const
 {
-    return index < MAX_TEXTURE_UNITS ? texture_[index] : 0;
+    return index < MAX_TEXTURE_UNITS ? textures_[index] : 0;
 }
 
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
-    return index < MAX_RENDERTARGETS ? renderTarget_[index] : 0;
+    return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
 }
 
 unsigned Graphics::GetStreamFrequency(unsigned index) const
 {
-    return index < MAX_VERTEX_STREAMS ? streamFrequency_[index] : 0;
+    return index < MAX_VERTEX_STREAMS ? streamFrequencies_[index] : 0;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const
 {
     int width, height;
     
-    if (renderTarget_[0])
+    if (renderTargets_[0])
     {
-        width = renderTarget_[0]->GetWidth();
-        height = renderTarget_[0]->GetHeight();
+        width = renderTargets_[0]->GetWidth();
+        height = renderTargets_[0]->GetHeight();
     }
     else
     {
@@ -2200,14 +2200,14 @@ void Graphics::CreateRenderTargets()
         {
             for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
             {
-                screenBuffer_[i] = new Texture2D(context_);
-                screenBuffer_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
+                screenBuffers_[i] = new Texture2D(context_);
+                screenBuffers_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
             }
         }
         else
         {
             for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-                screenBuffer_[i].Reset();
+                screenBuffers_[i].Reset();
         }
     }
     else
@@ -2216,7 +2216,7 @@ void Graphics::CreateRenderTargets()
         normalBuffer_.Reset();
         depthBuffer_.Reset();
         for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            screenBuffer_[i].Reset();
+            screenBuffers_[i].Reset();
     }
 }
 
@@ -2277,24 +2277,24 @@ void Graphics::ResetCachedState()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        vertexBuffer_[i] = 0;
-        streamOffset_[i] = 0;
+        vertexBuffers_[i] = 0;
+        streamOffsets_[i] = 0;
     }
     
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        texture_[i] = 0;
-        impl_->minMagFilter_[i] = D3DTEXF_POINT;
-        impl_->mipFilter_[i] = D3DTEXF_NONE;
-        impl_->uAddressMode_[i] = D3DTADDRESS_WRAP;
-        impl_->vAddressMode_[i] = D3DTADDRESS_WRAP;
-        impl_->borderColor_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
+        textures_[i] = 0;
+        impl_->minMagFilters_[i] = D3DTEXF_POINT;
+        impl_->mipFilters_[i] = D3DTEXF_NONE;
+        impl_->uAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl_->vAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl_->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
     }
     
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
-        renderTarget_[i] = 0;
-        impl_->colorSurface_[i] = 0;
+        renderTargets_[i] = 0;
+        impl_->colorSurfaces_[i] = 0;
     }
     depthStencil_ = 0;
     impl_->depthStencilSurface_ = 0;
@@ -2302,7 +2302,7 @@ void Graphics::ResetCachedState()
     viewTexture_ = 0;
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-        streamFrequency_[i] = 1;
+        streamFrequencies_[i] = 1;
     
     indexBuffer_ = 0;
     vertexDeclaration_ = 0;

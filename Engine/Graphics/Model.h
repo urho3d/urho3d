@@ -96,7 +96,7 @@ public:
     /// Return skeleton
     Skeleton& GetSkeleton() { return skeleton_; }
     /// Return vertex buffers
-    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffers_; }
     /// Return index buffers
     const Vector<SharedPtr<IndexBuffer> >& GetIndexBuffers() const { return indexBuffers_; }
     /// Return number of geometries
@@ -125,11 +125,11 @@ private:
     BoundingBox boundingBox_;
     /// Skeleton
     Skeleton skeleton_;
-    /// Vertex buffer pointers
-    Vector<SharedPtr<VertexBuffer> > vertexBuffer_;
-    /// Index buffer pointers
+    /// Vertex buffers
+    Vector<SharedPtr<VertexBuffer> > vertexBuffers_;
+    /// Index buffers
     Vector<SharedPtr<IndexBuffer> > indexBuffers_;
-    /// Geometry pointers
+    /// Geometries
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
     /// Geometry bone mappings
     Vector<PODVector<unsigned> > geometryBoneMappings_;

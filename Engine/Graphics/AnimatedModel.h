@@ -113,7 +113,7 @@ public:
     /// Return all vertex morphs
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
     /// Return all morph vertex buffers
-    const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphvertexBuffer_; }
+    const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphVertexBuffers_; }
     /// Return number of vertex morphs
     unsigned GetNumMorphs() const { return morphs_.Size(); }
     /// Return vertex morph weight by index
@@ -162,7 +162,7 @@ private:
     /// Skeleton
     Skeleton skeleton_;
     /// Morph vertex buffers
-    Vector<SharedPtr<VertexBuffer> > morphvertexBuffer_;
+    Vector<SharedPtr<VertexBuffer> > morphVertexBuffers_;
     /// Vertex morphs
     Vector<ModelMorph> morphs_;
     /// Animation states

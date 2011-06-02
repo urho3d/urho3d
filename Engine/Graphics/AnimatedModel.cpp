@@ -387,7 +387,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         geometryBoneMappings_.Push(geometryBoneMappings[i]);
     
     // Copy morphs
-    morphvertexBuffer_.Clear();
+    morphVertexBuffers_.Clear();
     morphs_.Clear();
     const Vector<ModelMorph>& morphs = model->GetMorphs();
     for (unsigned i = 0; i < morphs.Size(); ++i)
@@ -797,7 +797,7 @@ void AnimatedModel::cloneGeometries()
     const Vector<SharedPtr<VertexBuffer> >& originalVertexBuffers = model_->GetVertexBuffers();
     Map<VertexBuffer*, SharedPtr<VertexBuffer> > clonedVertexBuffers;
     
-    morphvertexBuffer_.Resize(originalVertexBuffers.Size());
+    morphVertexBuffers_.Resize(originalVertexBuffers.Size());
     
     for (unsigned i = 0; i < originalVertexBuffers.Size(); ++i)
     {
@@ -817,7 +817,7 @@ void AnimatedModel::cloneGeometries()
             clone->SetMorphRangeResetData(original->GetMorphRangeResetData());
             
             clonedVertexBuffers[original] = clone;
-            morphvertexBuffer_[i] = clone;
+            morphVertexBuffers_[i] = clone;
         }
     }
     
@@ -967,9 +967,9 @@ void AnimatedModel::UpdateMorphs()
         PROFILE(UpdateMorphs);
         
         // Reset the morph data range from all morphable vertex buffers, then apply morphs
-        for (unsigned i = 0; i < morphvertexBuffer_.Size(); ++i)
+        for (unsigned i = 0; i < morphVertexBuffers_.Size(); ++i)
         {
-            VertexBuffer* buffer = morphvertexBuffer_[i];
+            VertexBuffer* buffer = morphVertexBuffers_[i];
             if (buffer)
             {
                 void* lockedMorphRange = buffer->LockMorphRange();

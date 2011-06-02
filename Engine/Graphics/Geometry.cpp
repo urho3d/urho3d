@@ -59,8 +59,8 @@ bool Geometry::SetNumVertexBuffers(unsigned num)
         return false;
     }
     
-    unsigned oldSize = vertexBuffer_.Size();
-    vertexBuffer_.Resize(num);
+    unsigned oldSize = vertexBuffers_.Size();
+    vertexBuffers_.Resize(num);
     elementMasks_.Resize(num);
     
     for (unsigned i = oldSize; i < num; ++i)
@@ -72,13 +72,13 @@ bool Geometry::SetNumVertexBuffers(unsigned num)
 
 bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask)
 {
-    if (index >= vertexBuffer_.Size())
+    if (index >= vertexBuffers_.Size())
     {
         LOGERROR("Stream index out of bounds");
         return false;
     }
     
-    vertexBuffer_[index] = buffer;
+    vertexBuffers_[index] = buffer;
     
     if (buffer)
     {
@@ -116,7 +116,7 @@ bool Geometry::SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned in
     
     // Get min.vertex index and num of vertices from index buffer. If it fails, use full range as fallback
     vertexStart_ = 0;
-    vertexCount_ = vertexBuffer_[0]->GetVertexCount();
+    vertexCount_ = vertexBuffers_[0]->GetVertexCount();
     
     if (GetUsedVertexRange)
         indexBuffer_->GetUsedVertexRange(indexStart_, indexCount_, vertexStart_, vertexCount_);
@@ -157,13 +157,13 @@ void Geometry::SetLodDistance(float distance)
 void Geometry::Draw(Graphics* graphics)
 {
     graphics->SetIndexBuffer(indexBuffer_);
-    graphics->SetVertexBuffers(vertexBuffer_, elementMasks_);
+    graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
     graphics->Draw(primitiveType_, indexStart_, indexCount_, vertexStart_, vertexCount_);
 }
 
 VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
 {
-    return index < vertexBuffer_.Size() ? vertexBuffer_[index] : (VertexBuffer*)0;
+    return index < vertexBuffers_.Size() ? vertexBuffers_[index] : (VertexBuffer*)0;
 }
 
 unsigned Geometry::GetVertexElementMask(unsigned index) const
@@ -175,9 +175,9 @@ unsigned short Geometry::GetBufferHash() const
 {
     unsigned short hash = 0;
     
-    for (unsigned i = 0; i < vertexBuffer_.Size(); ++i)
+    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        VertexBuffer* vBuf = vertexBuffer_[i];
+        VertexBuffer* vBuf = vertexBuffers_[i];
         hash += *((unsigned short*)&vBuf);
     }
     
@@ -207,11 +207,12 @@ float Geometry::GetDistance(const Ray& ray)
 
 void Geometry::LockRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize)
 {
-    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffer_.Size()))
+    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffers_.Size()))
     {
-        VertexBuffer* positionBuffer = vertexBuffer_[positionBufferIndex_];
+        VertexBuffer* positionBuffer = vertexBuffers_[positionBufferIndex_];
         
-        vertexData = reinterpret_cast<const unsigned char*>(positionBuffer->Lock(0, positionBuffer->GetVertexCount(), LOCK_READONLY));
+        vertexData = reinterpret_cast<const unsigned char*>(positionBuffer->Lock(0, positionBuffer->GetVertexCount(),
+            LOCK_READONLY));
         vertexSize = positionBuffer->GetVertexSize();
         indexData = reinterpret_cast<const unsigned char*>(indexBuffer_->Lock(0, indexBuffer_->GetIndexCount(), LOCK_READONLY));
         indexSize = indexBuffer_->GetIndexSize();
@@ -234,18 +235,18 @@ void Geometry::LockRawData(const unsigned char*& vertexData, unsigned& vertexSiz
 
 void Geometry::UnlockRawData()
 {
-    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffer_.Size()))
+    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffers_.Size()))
     {
-        vertexBuffer_[positionBufferIndex_]->Unlock();
+        vertexBuffers_[positionBufferIndex_]->Unlock();
         indexBuffer_->Unlock();
     }
 }
 
 void Geometry::GetPositionBufferIndex()
 {
-    for (unsigned i = 0; i < vertexBuffer_.Size(); ++i)
+    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        if ((vertexBuffer_[i]) && (vertexBuffer_[i]->GetElementMask() & MASK_POSITION))
+        if ((vertexBuffers_[i]) && (vertexBuffers_[i]->GetElementMask() & MASK_POSITION))
         {
             positionBufferIndex_ = i;
             return;

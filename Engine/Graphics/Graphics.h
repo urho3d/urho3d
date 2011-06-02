@@ -336,7 +336,7 @@ public:
     /// Return depth buffer for deferred rendering. If reading hardware depth is supported, return a depth texture
     Texture2D* GetDepthBuffer() const { return depthBuffer_; }
     /// Return screen buffer for post-processing
-    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffer_[index & (NUM_SCREEN_BUFFERS - 1)]; }
+    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffers_[index & (NUM_SCREEN_BUFFERS - 1)]; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -439,7 +439,7 @@ private:
     /// Vertex declarations
     Map<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Immediate rendering vertex buffers by vertex declaration
-    Map<unsigned, SharedPtr<VertexBuffer> > immediatevertexBuffer_;
+    Map<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
     /// Immediate rendering vertex buffer start positions
     Map<unsigned, unsigned> immediateVertexBufferPos_;
     /// Deferred rendering diffuse buffer
@@ -449,7 +449,7 @@ private:
     /// Deferred rendering depth buffer
     SharedPtr<Texture2D> depthBuffer_;
     /// Screen buffers for post processing
-    SharedPtr<Texture2D> screenBuffer_[NUM_SCREEN_BUFFERS];
+    SharedPtr<Texture2D> screenBuffers_[NUM_SCREEN_BUFFERS];
     /// Shadow map dummy color texture format
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format
@@ -457,11 +457,11 @@ private:
     /// Shadow map 24-bit depth texture format
     unsigned hiresShadowMapFormat_;
     /// Vertex buffers in use
-    VertexBuffer* vertexBuffer_[MAX_VERTEX_STREAMS];
+    VertexBuffer* vertexBuffers_[MAX_VERTEX_STREAMS];
     /// Stream frequencies by vertex buffer
-    unsigned streamFrequency_[MAX_VERTEX_STREAMS];
+    unsigned streamFrequencies_[MAX_VERTEX_STREAMS];
     /// Stream offsets by vertex buffer
-    unsigned streamOffset_[MAX_VERTEX_STREAMS];
+    unsigned streamOffsets_[MAX_VERTEX_STREAMS];
     /// Index buffer in use
     IndexBuffer* indexBuffer_;
     /// Vertex declaration in use
@@ -477,13 +477,13 @@ private:
     /// Last shader parameter sources per parameter
     const void* lastShaderParameterSources_[MAX_SHADER_PARAMETERS];
     /// Textures in use
-    Texture* texture_[MAX_TEXTURE_UNITS];
+    Texture* textures_[MAX_TEXTURE_UNITS];
     /// "View texture" to prevent sampling the destination render target
     Texture* viewTexture_;
     /// Texture unit mappings
     Map<String, TextureUnit> textureUnits_;
     /// Render targets in use
-    RenderSurface* renderTarget_[MAX_RENDERTARGETS];
+    RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use
     RenderSurface* depthStencil_;
     /// Viewport coordinates
