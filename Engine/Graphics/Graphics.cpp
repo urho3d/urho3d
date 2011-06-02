@@ -1199,7 +1199,6 @@ void Graphics::ResetRenderTargets()
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         SetRenderTarget(i, (RenderSurface*)0);
     SetDepthStencil((RenderSurface*)0);
-    SetViewport(IntRect(0, 0, width_, height_));
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
@@ -1361,11 +1360,7 @@ void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
             alphaTestMode_ = mode;
         }
         
-        if (alphaRef < 0.0f)
-            alphaRef = 0.0f;
-        if (alphaRef > 1.0f) 
-            alphaRef = 1.0f;
-        
+        alphaRef = Clamp(alphaRef, 0.0f, 1.0f);
         if (alphaRef != alphaRef_)
         {
             impl_->device_->SetRenderState(D3DRS_ALPHAREF, (DWORD)(alphaRef * 255.0f));
@@ -1478,7 +1473,7 @@ void Graphics::SetFillMode(FillMode mode)
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
-    // During some light rendering loops, a full rect is Toggled on/off repeatedly.
+    // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
     if (rect == Rect::FULL)
         enable = false;
