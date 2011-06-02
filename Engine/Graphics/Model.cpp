@@ -95,8 +95,8 @@ bool Model::Load(Deserializer& source)
     SetMemoryUse(source.GetSize());
     
     // Read vertex buffers
-    unsigned nuvertexBuffer_ = source.ReadUInt();
-    for (unsigned i = 0; i < nuvertexBuffer_; ++i)
+    unsigned numVertexBuffers = source.ReadUInt();
+    for (unsigned i = 0; i < numVertexBuffers; ++i)
     {
         unsigned vertexCount = source.ReadUInt();
         unsigned elementMask = source.ReadUInt();
@@ -108,33 +108,43 @@ bool Model::Load(Deserializer& source)
         buffer->SetMorphRange(morphStart, morphCount);
         
         unsigned vertexSize = buffer->GetVertexSize();
-        
-        SharedArrayPtr<unsigned char> data(new unsigned char[vertexCount * vertexSize]);
-        source.Read(data.GetPtr(), vertexCount * buffer->GetVertexSize());
-        buffer->SetData(data.GetPtr());
-        // If there is a morph range, make a copy of the data so that the morph range can be reset
-        if (morphCount)
+        unsigned char* data = (unsigned char*)buffer->Lock(0, vertexCount, LOCK_NORMAL);
+        if (data)
         {
-            SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
-            memcpy(morphResetData.GetPtr(), &data[morphStart * vertexSize], morphCount * vertexSize);
-            buffer->SetMorphRangeResetData(morphResetData);
+            source.Read(data, vertexCount * vertexSize);
+            // If there is a morph range, make a copy of the data so that the morph range can be reset
+            if (morphCount)
+            {
+                SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
+                memcpy(morphResetData.GetPtr(), &data[morphStart * vertexSize], morphCount * vertexSize);
+                buffer->SetMorphRangeResetData(morphResetData);
+            }
+            buffer->Unlock();
         }
+        else
+            return false;
         
         vertexBuffer_.Push(buffer);
     }
     
     // Read index buffers
-    unsigned nuindexBuffers_ = source.ReadUInt();
-    for (unsigned i = 0; i < nuindexBuffers_; ++i)
+    unsigned numIndexBuffers = source.ReadUInt();
+    for (unsigned i = 0; i < numIndexBuffers; ++i)
     {
         unsigned indexCount = source.ReadUInt();
         unsigned indexSize = source.ReadUInt();
         
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
         buffer->SetSize(indexCount, indexSize);
-        SharedArrayPtr<unsigned char> data(new unsigned char[indexCount * indexSize]);
-        source.Read(data.GetPtr(), indexCount * indexSize);
-        buffer->SetData(data.GetPtr());
+        
+        unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
+        if (data)
+        {
+            source.Read(data, indexCount * indexSize);
+            buffer->Unlock();
+        }
+        else
+            return false;
         
         indexBuffers_.Push(buffer);
     }
@@ -150,14 +160,14 @@ bool Model::Load(Deserializer& source)
             boneMapping.Push(source.ReadUInt());
         geometryBoneMappings_.Push(boneMapping);
         
-        unsigned nulodLevels_ = source.ReadUInt();
+        unsigned numLodLevels = source.ReadUInt();
         Vector<SharedPtr<Geometry> > geometryLodLevels;
         
-        for (unsigned j = 0; j < nulodLevels_; ++j)
+        for (unsigned j = 0; j < numLodLevels; ++j)
         {
             float distance = source.ReadFloat();
             PrimitiveType type = (PrimitiveType)source.ReadUInt();
-        
+            
             unsigned vertexBufferRef = source.ReadUInt();
             unsigned indexBufferRef = source.ReadUInt();
             unsigned indexStart = source.ReadUInt();
@@ -188,8 +198,8 @@ bool Model::Load(Deserializer& source)
     }
     
     // Read morphs
-    unsigned numorphs_ = source.ReadUInt();
-    for (unsigned i = 0; i < numorphs_; ++i)
+    unsigned numMorphs = source.ReadUInt();
+    for (unsigned i = 0; i < numMorphs; ++i)
     {
         ModelMorph newMorph;
         
