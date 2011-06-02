@@ -1332,7 +1332,7 @@ Node* Renderer::CreateTempNode()
 void Renderer::SetupLightBatch(Batch& batch)
 {
     graphics_->ClearTransformSources();
-    Matrix3x4 view(batch.camera_->InverseWorldTransform());
+    Matrix3x4 view(batch.camera_->GetInverseWorldTransform());
     
     Light* light = batch.light_;
     float lightExtent = light->GetVolumeExtent();

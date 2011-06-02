@@ -182,9 +182,9 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
 
 Ray Camera::GetScreenRay(float x, float y)
 {
-    Matrix4 viewProjInverse = (GetProjection() * InverseWorldTransform()).Inverse();
+    Matrix4 viewProjInverse = (GetProjection() * GetInverseWorldTransform()).Inverse();
     
-    // The parameters range from 0.0 to 1.0. Expand to Normalized device coordinates (-1.0 to 1.0) & flip Y axis
+    // The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0) & flip Y axis
     x = 2.0f * x - 1.0f;
     y = 1.0f - 2.0f * y;
     
@@ -304,7 +304,7 @@ float Camera::GetDistance(const Vector3& worldPos)
     if (!orthographic_)
         return (worldPos - GetWorldPosition()).LengthFast();
     else
-        return fabsf((InverseWorldTransform() * worldPos).z_);
+        return fabsf((GetInverseWorldTransform() * worldPos).z_);
 }
 
 float Camera::GetDistanceSquared(const Vector3& worldPos)
@@ -313,7 +313,7 @@ float Camera::GetDistanceSquared(const Vector3& worldPos)
         return (worldPos - GetWorldPosition()).LengthSquared();
     else
     {
-        float distance = (InverseWorldTransform() * worldPos).z_;
+        float distance = (GetInverseWorldTransform() * worldPos).z_;
         return distance * distance;
     }
 }

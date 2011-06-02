@@ -320,7 +320,7 @@ void View::GetDrawables()
     sceneBox_.defined_ = false;
     sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
     sceneViewBox_.defined_ = false;
-    Matrix3x4 view(camera_->InverseWorldTransform());
+    Matrix3x4 view(camera_->GetInverseWorldTransform());
     unsigned cameraViewMask = camera_->GetViewMask();
     
     for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
@@ -1051,7 +1051,7 @@ void View::RenderBatchesDeferred()
             renderer_->GetPixelShader(shaderName), false);
         
         // Store view transform for next frame
-        lastCameraView_ = camera_->InverseWorldTransform();
+        lastCameraView_ = camera_->GetInverseWorldTransform();
     }
 }
 
@@ -1254,7 +1254,7 @@ unsigned View::ProcessLight(Light* light)
                 bool generateBoxes = (isSplitShadowed) && (split->GetShadowFocus().focus_);
                 Matrix3x4 lightView;
                 if (shadowCamera)
-                    lightView = shadowCamera->InverseWorldTransform();
+                    lightView = shadowCamera->GetInverseWorldTransform();
                 
                 if (!optimize)
                 {
@@ -1400,7 +1400,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
     if (shadowCamera)
     {
         bool projectBoxes = !shadowCamera->IsOrthographic();
-        lightView = shadowCamera->InverseWorldTransform();
+        lightView = shadowCamera->GetInverseWorldTransform();
         lightProj = shadowCamera->GetProjection();
         
         // Transform scene frustum into shadow camera's view space for shadow caster visibility check
@@ -1567,7 +1567,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             if ((shadowOcclusion) || (parameters.focus_))
                 sceneMaxZ = Min(sceneViewBox_.max_.z_, sceneMaxZ);
             
-            Matrix3x4 lightView(shadowCamera->InverseWorldTransform());
+            Matrix3x4 lightView(shadowCamera->GetInverseWorldTransform());
             Frustum lightViewSplitFrustum = camera_->GetSplitFrustum(light->GetNearSplit() - light->GetNearFadeRange(),
                 Min(light->GetFarSplit(), sceneMaxZ)).Transformed(lightView);
             
@@ -1605,7 +1605,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             if ((light->GetLightType() == LIGHT_SPOT) && (parameters.zoomOut_))
             {
                 // Make sure the out-zooming does not start while we are inside the spot
-                float distance = Max((camera_->InverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
+                float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
                 float lightPixels = (((float)height_ * light->GetRange() * camera_->GetZoom() * 0.5f) / distance);
                 
                 // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision
@@ -1735,7 +1735,7 @@ const Rect& View::GetLightScissor(Light* light)
     if (i != lightScissorCache_.End())
         return i->second_;
     
-    Matrix3x4 view(camera_->InverseWorldTransform());
+    Matrix3x4 view(camera_->GetInverseWorldTransform());
     Matrix4 projection(camera_->GetProjection());
     
     switch (light->GetLightType())
@@ -2014,7 +2014,7 @@ void View::SetShaderParameters()
 void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
 {
     graphics_->ClearTransformSources();
-    Matrix3x4 view(camera.InverseWorldTransform());
+    Matrix3x4 view(camera.GetInverseWorldTransform());
     
     switch (light->GetLightType())
     {

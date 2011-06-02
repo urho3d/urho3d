@@ -150,7 +150,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     if ((shadowMap) && (graphics->NeedParameterUpdate(VSP_SHADOWPROJ, light_)))
     {
         Camera* shadowCamera = light_->GetShadowCamera();
-        Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
+        Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
         Matrix4 shadowProj(shadowCamera->GetProjection());
         
         Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -193,7 +193,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     {
         if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, camera_))
             graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection() *
-                camera_->InverseWorldTransform());
+                camera_->GetInverseWorldTransform());
     }
     
     if (graphics->NeedParameterUpdate(VSP_VIEWRIGHTVECTOR, camera_))
@@ -287,7 +287,7 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
         if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
-            Matrix3x4 shadowView(shadowCamera->InverseWorldTransform());
+            Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
             Matrix4 shadowProj(shadowCamera->GetProjection());
             
             Matrix3x4 viewPos(Matrix3x4::IDENTITY);

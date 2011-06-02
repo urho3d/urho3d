@@ -124,12 +124,9 @@ public:
     /// Return a scene node's LOD scaled distance
     float GetLodDistance(float distance, float scale, float bias) const;
     
-    /// Return inverse world transform
-    Matrix3x4 InverseWorldTransform() const
-    {
-        return GetWorldTransform().Inverse();
-    }
-
+    /// Return inverse world transform (view matrix)
+    Matrix3x4 GetInverseWorldTransform() const { return GetWorldTransform().Inverse(); }
+    
 private:
     /// Near clip distance
     float nearClip_;
