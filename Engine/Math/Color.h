@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Vector3.h"
+#include "Vector4.h"
 
 class String;
 
@@ -125,6 +125,9 @@ public:
         
         return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
     }
+    
+    /// Return as a four-dimensional vector
+    Vector4 ToVector4() const { return Vector4(r_, g_, b_, a_); }
     
     /// Return as string
     String ToString() const;

@@ -71,13 +71,20 @@ void Batch::CalculateSortKey()
         (((unsigned long long)material) << 16) || geometry;
 }
 
-void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
+void Batch::Prepare(Graphics* graphics, const Map<ShaderParameter, Vector4>& shaderParameters, bool SetModelTransform) const
 {
     if ((!vertexShader_) || (!pixelShader_))
         return;
     
     // Set shaders
     graphics->SetShaders(vertexShader_, pixelShader_);
+    
+    // Set global shader parameters as needed
+    for (Map<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
+    {
+        if (graphics->NeedParameterUpdate(i->first_, &shaderParameters))
+            graphics->SetShaderParameter(i->first_, i->second_);
+    }
     
     // Set pass / material-specific renderstates
     if ((pass_) && (material_))
@@ -337,9 +344,9 @@ void Batch::Prepare(Graphics* graphics, bool SetModelTransform) const
     }
 }
 
-void Batch::Draw(Graphics* graphics) const
+void Batch::Draw(Graphics* graphics, const Map<ShaderParameter, Vector4>& shaderParameters) const
 {
-    Prepare(graphics);
+    Prepare(graphics, shaderParameters);
     geometry_->Draw(graphics);
 }
 
@@ -359,7 +366,7 @@ void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer) const
+void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Map<ShaderParameter, Vector4>& shaderParameters) const
 {
     if (!instances_.Size())
         return;
@@ -378,7 +385,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer) const
     // Draw as individual instances if below minimum size, or if instancing not supported
     if ((instances_.Size() < MIN_INSTANCES) || (!instanceBuffer))
     {
-        batch.Prepare(graphics, false);
+        batch.Prepare(graphics, shaderParameters, false);
         
         graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
         graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
@@ -404,7 +411,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer) const
         else
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED * MAX_LIGHT_VS_VARIATIONS];
         
-        batch.Prepare(graphics, false);
+        batch.Prepare(graphics, shaderParameters, false);
         
         // Get the geometry vertex buffers, then add the instancing stream buffer
         Vector<SharedPtr<VertexBuffer> > vertexBuffers = geometry_->GetVertexBuffers();

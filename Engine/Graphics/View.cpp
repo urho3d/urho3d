@@ -72,8 +72,7 @@ View::View(Context* context) :
     zone_(0),
     renderTarget_(0),
     depthStencil_(0),
-    jitterCounter_(0),
-    hasSM3_(graphics_->GetSM3Support())
+    jitterCounter_(0)
 {
     frame_.camera_ = 0;
 }
@@ -217,7 +216,7 @@ void View::Render()
     graphics_->SetFillMode(FILL_SOLID);
     
     // Set per-view shader parameters
-    SetShaderParameters();
+    CalculateShaderParameters();
     
     // If not reusing shadowmaps, render all of them first
     if (!renderer_->reuseShadowMaps_)
@@ -231,7 +230,7 @@ void View::Render()
     }
     
     if (mode_ == RENDER_FORWARD)
-        RenderBatcheforward();
+        RenderBatchesForward();
     else
         RenderBatchesDeferred();
     
@@ -719,7 +718,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
     }
 }
 
-void View::RenderBatcheforward()
+void View::RenderBatchesForward()
 {
     {
         // Render opaque objects' base passes
@@ -827,10 +826,10 @@ void View::RenderBatchesDeferred()
     Vector4 viewportSize((float)screenRect_.left_ / gBufferWidth, (float)screenRect_.top_ / gBufferHeight,
         (float)screenRect_.right_ / gBufferWidth, (float)screenRect_.bottom_ / gBufferHeight);
     
-    graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, viewportParams);
-    graphics_->SetShaderParameter(VSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetShaderParameter(PSP_GBUFFEROFFSETS, bufferUVOffset);
-    graphics_->SetShaderParameter(PSP_GBUFFERVIEWPORT, viewportSize);
+    shaderParameters_[VSP_FRUSTUMSIZE] = viewportParams;
+    shaderParameters_[VSP_GBUFFEROFFSETS] = bufferUVOffset;
+    shaderParameters_[PSP_GBUFFEROFFSETS] = bufferUVOffset;
+    shaderParameters_[PSP_GBUFFERVIEWPORT] = viewportSize;
     
     {
         // Render G-buffer
@@ -872,7 +871,7 @@ void View::RenderBatchesDeferred()
             graphics_->SetRenderTarget(1, depthBuffer);
             
             renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Deferred/GBufferFill"),
-                renderer_->GetPixelShader("Deferred/GBufferFill"), false);
+                renderer_->GetPixelShader("Deferred/GBufferFill"), false, shaderParameters_);
         }
         else
         {
@@ -882,7 +881,7 @@ void View::RenderBatchesDeferred()
             
             // The stencil shader writes color 1.0, which equals far depth
             renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Stencil"),
-                renderer_->GetPixelShader("Stencil"), false);
+                renderer_->GetPixelShader("Stencil"), false, shaderParameters_);
         }
     }
     
@@ -899,7 +898,7 @@ void View::RenderBatchesDeferred()
         graphics_->SetViewport(screenRect_);
         
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Deferred/Ambient"),
-            renderer_->GetPixelShader("Deferred/Ambient"), false);
+            renderer_->GetPixelShader("Deferred/Ambient"), false, shaderParameters_);
     }
     else
     {
@@ -944,7 +943,7 @@ void View::RenderBatchesDeferred()
                 for (unsigned j = 0; j < queue.volumeBatches_.Size(); ++j)
                 {
                     renderer_->SetupLightBatch(queue.volumeBatches_[j]);
-                    queue.volumeBatches_[j].Draw(graphics_);
+                    queue.volumeBatches_[j].Draw(graphics_, shaderParameters_);
                 }
                 
                 // If was the last split of a split point light, clear the stencil by rendering the point light again
@@ -974,7 +973,7 @@ void View::RenderBatchesDeferred()
             for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.Size(); ++i)
             {
                 renderer_->SetupLightBatch(*noShadowLightQueue_.sortedBatches_[i]);
-                noShadowLightQueue_.sortedBatches_[i]->Draw(graphics_);
+                noShadowLightQueue_.sortedBatches_[i]->Draw(graphics_, shaderParameters_);
             }
         }
     }
@@ -1048,7 +1047,7 @@ void View::RenderBatchesDeferred()
         String shaderName = "TemporalAA_" + aaVariation[index];
         
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader(shaderName),
-            renderer_->GetPixelShader(shaderName), false);
+            renderer_->GetPixelShader(shaderName), false, shaderParameters_);
         
         // Store view transform for next frame
         lastCameraView_ = camera_->GetInverseWorldTransform();
@@ -1879,7 +1878,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     {
         const TechniqueEntry& entry = techniques[i];
         Technique* technique = entry.technique_;
-        if ((!technique) || ((!hasSM3_) && (technique->IsSM3())) || (materialQuality_ < entry.qualityLevel_))
+        if ((!technique) || ((technique->IsSM3()) && (!graphics_->GetSM3Support())) || (materialQuality_ < entry.qualityLevel_))
             continue;
         if (lodDistance >= entry.lodDistance_)
             return technique;
@@ -1992,7 +1991,7 @@ void View::PrepareInstancingBuffer()
     }
 }
 
-void View::SetShaderParameters()
+void View::CalculateShaderParameters()
 {
     Time* time = GetSubsystem<Time>();
     
@@ -2004,11 +2003,12 @@ void View::SetShaderParameters()
     Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
     Vector4 elapsedTime((time->GetTotalMSec() & 0x3fffff) / 1000.0f, 0.0f, 0.0f, 0.0f);
     
-    graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
-    graphics_->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
-    graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
-    graphics_->SetShaderParameter(PSP_FOGCOLOR, zone_->GetFogColor());
-    graphics_->SetShaderParameter(PSP_FOGPARAMS, fogParams);
+    shaderParameters_.Clear();
+    shaderParameters_[VSP_ELAPSEDTIME] = elapsedTime;
+    shaderParameters_[PSP_AMBIENTCOLOR] = zone_->GetAmbientColor().ToVector4();
+    shaderParameters_[PSP_ELAPSEDTIME] = elapsedTime;
+    shaderParameters_[PSP_FOGCOLOR] = zone_->GetFogColor().ToVector4(),
+    shaderParameters_[PSP_FOGPARAMS] = fogParams;
 }
 
 void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
@@ -2131,7 +2131,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
         const BatchGroup& group = i->second_;
         if ((useLightBuffer) && (!group.light_))
             graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
-        group.Draw(graphics_, instancingBuffer);
+        group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
@@ -2139,7 +2139,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
         Batch* batch = *i;
         if ((useLightBuffer) && (!batch->light_))
             graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
-        batch->Draw(graphics_);
+        batch->Draw(graphics_, shaderParameters_);
     }
     
     // Non-priority instanced
@@ -2153,7 +2153,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
             graphics_->SetScissorTest(false);
         if ((useLightBuffer) && (!group.light_))
             graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
-        group.Draw(graphics_, instancingBuffer);
+        group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
@@ -2166,7 +2166,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
             graphics_->SetScissorTest(false);
         if ((useLightBuffer) && (!batch->light_))
             graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
-        batch->Draw(graphics_);
+        batch->Draw(graphics_, shaderParameters_);
     }
 }
 
@@ -2184,13 +2184,13 @@ void View::RenderForwardLightBatchQueue(const BatchQueue& queue, Light* light)
         queue.priorityBatchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        group.Draw(graphics_, instancingBuffer);
+        group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_);
+        batch->Draw(graphics_, shaderParameters_);
     }
     
     // All base passes have been drawn. Optimize at this point by both scissor and stencil
@@ -2207,13 +2207,13 @@ void View::RenderForwardLightBatchQueue(const BatchQueue& queue, Light* light)
         queue.batchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        group.Draw(graphics_, instancingBuffer);
+        group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Non-priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedBatches_.Begin(); i != queue.sortedBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        batch->Draw(graphics_);
+        batch->Draw(graphics_, shaderParameters_);
     }
 }
 

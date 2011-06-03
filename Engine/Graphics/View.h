@@ -121,7 +121,7 @@ private:
     /// Get lit batches for a certain light and drawable
     void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
     /// Render batches, forward mode
-    void RenderBatcheforward();
+    void RenderBatchesForward();
     /// Render batches, deferred mode
     void RenderBatchesDeferred();
     /// Query for occluders as seen from a camera
@@ -154,8 +154,8 @@ private:
     void SortBatches();
     /// Prepare instancing buffer by filling it with all instance transforms
     void PrepareInstancingBuffer();
-    /// Set per-view shader parameters
-    void SetShaderParameters();
+    /// Calculate per-view shader parameters
+    void CalculateShaderParameters();
     /// Draw a split light to stencil buffer
     void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     /// Draw everything in a batch queue, priority batches first
@@ -189,8 +189,6 @@ private:
     RenderMode mode_;
     /// Draw shadows flag
     bool drawShadows_;
-    /// Shader Model 3 support flag
-    bool hasSM3_;
     /// Material quality level
     int materialQuality_;
     /// Maximum number of occluder triangles
@@ -227,6 +225,8 @@ private:
     PODVector<Light*> lights_;
     /// G-buffer size error displayed
     Set<RenderSurface*> gBufferErrorDisplayed_;
+    /// Per-view shader parameters
+    Map<ShaderParameter, Vector4> shaderParameters_;
     
     /// G-buffer batches
     BatchQueue gBufferQueue_;
