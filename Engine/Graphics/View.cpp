@@ -215,7 +215,7 @@ void View::Render()
     
     graphics_->SetFillMode(FILL_SOLID);
     
-    // Set per-view shader parameters
+    // Calculate view-global shader parameters
     CalculateShaderParameters();
     
     // If not reusing shadowmaps, render all of them first

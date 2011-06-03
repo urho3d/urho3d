@@ -154,7 +154,7 @@ private:
     void SortBatches();
     /// Prepare instancing buffer by filling it with all instance transforms
     void PrepareInstancingBuffer();
-    /// Calculate per-view shader parameters
+    /// Calculate view-global shader parameters
     void CalculateShaderParameters();
     /// Draw a split light to stencil buffer
     void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
@@ -225,7 +225,7 @@ private:
     PODVector<Light*> lights_;
     /// G-buffer size error displayed
     Set<RenderSurface*> gBufferErrorDisplayed_;
-    /// Per-view shader parameters
+    /// View-global shader parameters
     Map<ShaderParameter, Vector4> shaderParameters_;
     
     /// G-buffer batches
