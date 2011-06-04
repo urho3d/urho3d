@@ -75,7 +75,7 @@ public:
     /// Set technique
     void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set shader parameter
-    void SetShaderParameter(ShaderParameter parameter, const Vector4& value);
+    void SetShaderParameter(ShaderParameter param, const Vector4& value);
     /// Set texture
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform
@@ -86,6 +86,8 @@ public:
     void SetCullMode(CullMode mode);
     /// Set culling mode for shadows
     void SetShadowCullMode(CullMode mode);
+    /// Remove a shader parameter
+    void RemoveShaderParameter(ShaderParameter param);
     /// Reset all shader pointers
     void ReleaseShaders();
     /// Clone material

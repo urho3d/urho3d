@@ -266,9 +266,9 @@ void Material::SetTechnique(unsigned index, Technique* technique, unsigned quali
     Update();
 }
 
-void Material::SetShaderParameter(ShaderParameter parameter, const Vector4& value)
+void Material::SetShaderParameter(ShaderParameter param, const Vector4& value)
 {
-    shaderParameters_[parameter] = value;
+    shaderParameters_[param] = value;
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -327,6 +327,11 @@ void Material::SetCullMode(CullMode mode)
 void Material::SetShadowCullMode(CullMode mode)
 {
     shadowCullMode_ = mode;
+}
+
+void Material::RemoveShaderParameter(ShaderParameter param)
+{
+    shaderParameters_.Erase(param);
 }
 
 void Material::ReleaseShaders()

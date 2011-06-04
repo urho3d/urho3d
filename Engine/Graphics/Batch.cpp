@@ -100,17 +100,6 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             graphics->SetShaderParameter(i->first_, i->second_);
     }
     
-    // Set material's shader parameters
-    if (material_)
-    {
-        const HashMap<ShaderParameter, Vector4>& parameters = material_->GetShaderParameters();
-        for (HashMap<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
-        {
-            if (graphics->NeedParameterUpdate(i->first_, material_))
-                graphics->SetShaderParameter(i->first_, i->second_);
-        }
-    }
-    
     // Set viewport and camera shader parameters
     if (graphics->NeedParameterUpdate(VSP_CAMERAPOS, camera_))
         graphics->SetShaderParameter(VSP_CAMERAPOS, camera_->GetWorldPosition());
@@ -157,7 +146,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     if ((shaderData_) && (shaderDataSize_))
     {
         if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
-            graphics->SetShaderParameter(VSP_SKINMATRICES, (const float*)shaderData_, shaderDataSize_);
+            graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
     }
     
     // Set light-related shader parameters
@@ -315,11 +304,17 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
         }
     }
     
-    // Set material-specific textures
+    // Set material-specific shader parameters and textures
     if (material_)
     {
-        const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
+        const HashMap<ShaderParameter, Vector4>& parameters = material_->GetShaderParameters();
+        for (HashMap<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        {
+            if (graphics->NeedParameterUpdate(i->first_, material_))
+                graphics->SetShaderParameter(i->first_, i->second_);
+        }
         
+        const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
         if (graphics->NeedTextureUnit(TU_DIFFUSE))
             graphics->SetTexture(TU_DIFFUSE, textures[TU_DIFFUSE]);
         if (graphics->NeedTextureUnit(TU_NORMAL))

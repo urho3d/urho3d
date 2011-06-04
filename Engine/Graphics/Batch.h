@@ -65,6 +65,10 @@ struct Batch
     Geometry* geometry_;
     /// Model world transform
     const Matrix3x4* worldTransform_;
+    /// Camera
+    Camera* camera_;
+    /// Light that affects the geometry, if any
+    Light* light_;
     /// Material
     Material* material_;
     /// Material pass
@@ -73,12 +77,8 @@ struct Batch
     ShaderVariation* vertexShader_;
     /// Pixel shader
     ShaderVariation* pixelShader_;
-    /// Camera
-    Camera* camera_;
-    /// Light that affects the geometry, if any
-    Light* light_;
     /// Vertex shader data
-    const void* shaderData_;
+    const float* shaderData_;
     /// Vertex shader data size in floats
     unsigned shaderDataSize_;
     /// Distance from camera
@@ -139,6 +139,10 @@ struct BatchGroup
     Geometry* geometry_;
     /// Instance data
     PODVector<InstanceData> instances_;
+    /// Camera
+    Camera* camera_;
+    /// Light that affects the geometry, if any
+    Light* light_;
     /// Material
     Material* material_;
     /// Material pass
@@ -147,10 +151,6 @@ struct BatchGroup
     ShaderVariation* vertexShader_;
     /// Pixel shader
     ShaderVariation* pixelShader_;
-    /// Camera
-    Camera* camera_;
-    /// Light that affects the geometry, if any
-    Light* light_;
     /// Vertex shader index
     unsigned char vertexShaderIndex_;
     /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set
