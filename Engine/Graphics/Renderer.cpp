@@ -1446,7 +1446,7 @@ void Renderer::SetupLightBatch(Batch& batch)
     }
 }
 
-void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const Map<ShaderParameter, Vector4>& shaderParameters)
+void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<ShaderParameter, Vector4>& shaderParameters)
 {
     graphics_->ClearTransformSources();
     
@@ -1460,7 +1460,7 @@ void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVar
     graphics_->SetShaderParameter(VSP_VIEWPROJ, camera.GetProjection(false));
     
     // Set global shader parameters as needed
-    for (Map<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
+    for (HashMap<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
     {
         if (graphics_->NeedParameterUpdate(i->first_, &shaderParameters))
             graphics_->SetShaderParameter(i->first_, i->second_);

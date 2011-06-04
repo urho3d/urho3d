@@ -241,8 +241,8 @@ static void RegisterTextures(asIScriptEngine* engine)
 
 static Vector4 MaterialGetShaderParameter(ShaderParameter parameter, Material* ptr)
 {
-    const Map<ShaderParameter, Vector4>& parameters = ptr->GetShaderParameters();
-    Map<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    const HashMap<ShaderParameter, Vector4>& parameters = ptr->GetShaderParameters();
+    HashMap<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
     if (i == parameters.End())
         return Vector4::ZERO;
     else

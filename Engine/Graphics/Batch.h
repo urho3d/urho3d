@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "HashMap.h"
 #include "MathDefs.h"
 #include "GraphicsDefs.h"
 #include "SharedPtr.h"
@@ -56,9 +57,9 @@ struct Batch
     /// Calculate sort key, which consists of priority flag, light, pass and geometry
     void CalculateSortKey();
     /// Prepare for rendering
-    void Prepare(Graphics* graphics, const Map<ShaderParameter, Vector4>& shaderParameters, bool SetModelTransform = true) const;
+    void Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool SetModelTransform = true) const;
     /// Prepare and draw
-    void Draw(Graphics* graphics, const Map<ShaderParameter, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters) const;
     
     /// Geometry
     Geometry* geometry_;
@@ -132,7 +133,7 @@ struct BatchGroup
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Prepare and draw
-    void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Map<ShaderParameter, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<ShaderParameter, Vector4>& shaderParameters) const;
     
     /// Geometry
     Geometry* geometry_;

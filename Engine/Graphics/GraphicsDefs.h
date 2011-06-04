@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "HashBase.h"
+
 /// Rendering mode
 enum RenderMode
 {
@@ -242,6 +244,11 @@ enum ShaderParameter
     PSP_VIEWPROJ,
     MAX_SHADER_PARAMETERS
 };
+
+template<> inline unsigned MakeHash(const ShaderParameter& param)
+{
+    return (unsigned)param;
+}
 
 /// Texture units
 enum TextureUnit

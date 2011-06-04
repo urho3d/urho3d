@@ -239,7 +239,7 @@ bool Material::Save(Serializer& dest)
     }
     
     // Write shader parameters
-    for (Map<ShaderParameter, Vector4>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
+    for (HashMap<ShaderParameter, Vector4>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
         parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));

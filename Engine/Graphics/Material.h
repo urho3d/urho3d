@@ -24,6 +24,7 @@
 #pragma once
 
 #include "GraphicsDefs.h"
+#include "HashMap.h"
 #include "Resource.h"
 #include "Vector4.h"
 
@@ -107,7 +108,7 @@ public:
     /// Return texture by unit
     Texture* GetTexture(TextureUnit unit) const;
     /// Return all shader parameters
-    const Map<ShaderParameter, Vector4>& GetShaderParameters() const { return shaderParameters_; }
+    const HashMap<ShaderParameter, Vector4>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows
@@ -129,7 +130,7 @@ private:
     /// Textures
     Vector<SharedPtr<Texture> > textures_;
     /// Shader parameters
-    Map<ShaderParameter, Vector4> shaderParameters_;
+    HashMap<ShaderParameter, Vector4> shaderParameters_;
     /// Normal culling mode
     CullMode cullMode_;
     /// Culling mode for shadow rendering

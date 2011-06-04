@@ -100,7 +100,7 @@ public:
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// Set shader bool parameter
+    /// Set shader bool constants
     void SetShaderParameter(ShaderParameter param, const bool* data, unsigned count);
     /// Set shader float constants
     void SetShaderParameter(ShaderParameter param, const float* data, unsigned count);
@@ -123,7 +123,7 @@ public:
     /// Map shader parameter to a constant register. Called by Shader
     void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
     /// Check whether a shader parameter in the currently set shaders needs update
-    bool NeedParameterUpdate(ShaderParameter parameter, const void* source);
+    bool NeedParameterUpdate(ShaderParameter param, const void* source);
     /// Check whether the current pixel shader uses a texture unit
     bool NeedTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter sources
@@ -134,6 +134,8 @@ public:
     void SetTexture(unsigned index, Texture* texture);
     /// Set default texture filtering mode
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
+    /// Set texture anisotropy
+    void SetTextureAnisotropy(unsigned level);
     /// Reset all render targets and depth buffer (render to back buffer and back buffer depth stencil)
     void ResetRenderTargets();
     /// Reset specific render target
@@ -154,8 +156,6 @@ public:
     void SetViewTexture(Texture* texture);
     /// Set alpha test
     void SetAlphaTest(bool enable, CompareMode mode = CMP_ALWAYS, float alphaRef = 0.5f);
-    /// Set texture anisotropy
-    void SetTextureAnisotropy(unsigned level);
     /// Set blending mode
     void SetBlendMode(BlendMode mode);
     /// Set color write on/off
@@ -199,7 +199,7 @@ public:
     
     /// Return whether rendering initialized
     bool IsInitialized() const;
-    /// Return graphics implementation, which holds the actual Direct3D resources
+    /// Return graphics implementation, which holds the actual API-specific resources
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title
     const String& GetWindowTitle() const { return windowTitle_; }
@@ -267,10 +267,6 @@ public:
     const String& GetShaderParameterName(ShaderParameter parameter);
     /// Return texture unit name by index
     const String& GetTextureUnitName(TextureUnit unit);
-    /// Return vertex shader constant register by parameter index
-    unsigned GetVSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
-    /// Return pixel shader constant register by parameter index
-    unsigned GetPSRegister(ShaderParameter param) { return shaderRegisters_[param]; }
     /// Return texture by texture unit index
     Texture* GetTexture(unsigned index) const;
     /// Return the "view texture"

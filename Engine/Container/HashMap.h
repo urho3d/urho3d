@@ -125,13 +125,13 @@ public:
         /// Assign from a non-const iterator
         ConstIterator& operator = (const Iterator& rhs) { ptr_ = rhs.ptr_; return *this; }
         /// Preincrement the pointer
-        Iterator& operator ++ () { GotoNext(); return *this; }
+        ConstIterator& operator ++ () { GotoNext(); return *this; }
         /// Postincrement the pointer
-        Iterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        ConstIterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
         /// Predecrement the pointer
-        Iterator& operator -- () { GotoPrev(); return *this; }
+        ConstIterator& operator -- () { GotoPrev(); return *this; }
         /// Postdecrement the pointer
-        Iterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
+        ConstIterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
         
         /// Point to the pair
         const KeyValue* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }

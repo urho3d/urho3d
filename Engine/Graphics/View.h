@@ -226,7 +226,7 @@ private:
     /// G-buffer size error displayed
     Set<RenderSurface*> gBufferErrorDisplayed_;
     /// View-global shader parameters
-    Map<ShaderParameter, Vector4> shaderParameters_;
+    HashMap<ShaderParameter, Vector4> shaderParameters_;
     
     /// G-buffer batches
     BatchQueue gBufferQueue_;

@@ -378,7 +378,6 @@ void View::GetDrawables()
     Sort(lights_.Begin(), lights_.End(), CompareDrawables);
 }
 
-
 void View::GetBatches()
 {
     HashSet<LitTransparencyCheck> litTransparencies;
