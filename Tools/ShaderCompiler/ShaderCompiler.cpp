@@ -668,42 +668,44 @@ void Compile(CompiledVariation* variation)
         compileFailed_ = true;
     }
     else
-        CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
-    
-    // Parse the constant table for constants and texture units
-    D3DXCONSTANTTABLE_DESC desc;
-    constantTable->GetDesc(&desc);
-    for (unsigned i = 0; i < desc.Constants; ++i)
     {
-        D3DXHANDLE handle = constantTable->GetConstant(NULL, i);
-        D3DXCONSTANT_DESC constantDesc;
-        unsigned numElements = 1;
-        constantTable->GetConstantDesc(handle, &constantDesc, &numElements);
+        CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
         
-        String name(constantDesc.Name);
-        unsigned index = constantDesc.RegisterIndex;
-        
-        // Check if the parameter is a constant or a texture sampler
-        bool isSampler = (name[0] == 's');
-        name = name.Substring(1);
-        
-        MutexLock lock(globalParamMutex_);
-        
-        if (isSampler)
+        // Parse the constant table for constants and texture units
+        D3DXCONSTANTTABLE_DESC desc;
+        constantTable->GetDesc(&desc);
+        for (unsigned i = 0; i < desc.Constants; ++i)
         {
-            // Skip if it's a G-buffer sampler
-            if (name.Find("Buffer") == String::NPOS)
+            D3DXHANDLE handle = constantTable->GetConstant(NULL, i);
+            D3DXCONSTANT_DESC constantDesc;
+            unsigned numElements = 1;
+            constantTable->GetConstantDesc(handle, &constantDesc, &numElements);
+            
+            String name(constantDesc.Name);
+            unsigned index = constantDesc.RegisterIndex;
+            
+            // Check if the parameter is a constant or a texture sampler
+            bool isSampler = (name[0] == 's');
+            name = name.Substring(1);
+            
+            MutexLock lock(globalParamMutex_);
+            
+            if (isSampler)
             {
-                Parameter newTextureUnit(name, index);
-                variation->textureUnits_.Insert(newTextureUnit);
-                textureUnits_.Insert(newTextureUnit);
+                // Skip if it's a G-buffer sampler
+                if (name.Find("Buffer") == String::NPOS)
+                {
+                    Parameter newTextureUnit(name, index);
+                    variation->textureUnits_.Insert(newTextureUnit);
+                    textureUnits_.Insert(newTextureUnit);
+                }
             }
-        }
-        else
-        {
-            Parameter newParam(name, index);
-            variation->constants_.Insert(newParam);
-            constants_.Insert(newParam);
+            else
+            {
+                Parameter newParam(name, index);
+                variation->constants_.Insert(newParam);
+                constants_.Insert(newParam);
+            }
         }
     }
     

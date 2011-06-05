@@ -1,4 +1,8 @@
-#include "Common.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "Lighting.hlsl"
+#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,

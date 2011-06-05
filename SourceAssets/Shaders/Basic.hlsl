@@ -1,4 +1,6 @@
-#include "Common.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
     #ifdef DIFFMAP
@@ -32,11 +34,11 @@ void PS(
     out float4 oColor : COLOR0)
 {
     float4 diffColor = cMatDiffColor;
-    
+
     #ifdef VERTEXCOLOR
         diffColor *= iColor;
     #endif
-    
+
     #if (!defined(DIFFMAP)) && (!defined(ALPHAMAP))
         oColor = diffColor;
     #endif

@@ -1,4 +1,6 @@
-#include "Common.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
     #ifdef SKINNED

@@ -1,4 +1,5 @@
-#include "Common.hlsl"
+#include "Uniforms.hlsl"
+#include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION)

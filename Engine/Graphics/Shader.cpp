@@ -172,6 +172,8 @@ ShaderVariation* Shader::GetVariation(StringHash nameHash)
     // Create shader object now if not yet created. If fails, remove the variation
     if (!variation->GetGPUObject())
     {
+        LOGDEBUG("Creating variation " + variation->GetName() + " of shader " + GetName());
+        
         PROFILE(CreateShaderVariation);
         bool success = variation->Create();
         if (!success)

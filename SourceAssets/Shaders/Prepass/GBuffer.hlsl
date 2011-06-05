@@ -1,4 +1,6 @@
-#include "../Common.hlsl"
+#include "../Uniforms.hlsl"
+#include "../Samplers.hlsl"
+#include "../Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
@@ -48,7 +50,7 @@ void VS(float4 iPos : POSITION,
 
     oTexCoord = GetTexCoord(iTexCoord);
     oDepth = GetDepth(oPos);
-    
+
     #ifdef NORMALMAP
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif

@@ -1,4 +1,7 @@
-#include "../Common.hlsl"
+#include "../Uniforms.hlsl"
+#include "../Samplers.hlsl"
+#include "../Transform.hlsl"
+#include "../Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
@@ -57,7 +60,7 @@ void VS(float4 iPos : POSITION,
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
-    
+
     oTexCoord = GetTexCoord(iTexCoord);
     oDepth = GetDepth(oPos);
 }
@@ -93,14 +96,14 @@ void PS(
     #ifdef VERTEXCOLOR
         diffColor *= iColor.rgb;
     #endif
-    
+
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent, iBitangent, iNormal);
         float3 normal = normalize(mul(UnpackNormal(tex2D(sNormalMap, iTexCoord)), tbn));
     #else
         float3 normal = normalize(iNormal);
     #endif
-    
+
     #ifdef SPECMAP
         float specStrength = tex2D(sSpecMap, iTexCoord).r * cMatSpecProperties.x;
     #else

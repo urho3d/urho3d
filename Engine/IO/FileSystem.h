@@ -108,4 +108,4 @@ String GetParentPath(const String& pathName);
 /// Convert a path to internal format (use slashes)
 String GetInternalPath(const String& pathName);
 /// Convert a path to the format required by the operating system
-String GetNativePath(const String& pathName, bool forNativeApi = false);
+String GetNativePath(const String& pathName);

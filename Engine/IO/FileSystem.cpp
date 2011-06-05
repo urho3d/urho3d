@@ -61,7 +61,7 @@ bool FileSystem::SetCurrentDir(const String& pathName)
         LOGERROR("Access denied to " + pathName);
         return false;
     }
-    if (SetCurrentDirectory(GetNativePath(pathName, true).CString()) == FALSE)
+    if (SetCurrentDirectory(GetNativePath(pathName).CString()) == FALSE)
     {
         LOGERROR("Failed to change directory to " + pathName);
         return false;
@@ -77,7 +77,7 @@ bool FileSystem::CreateDir(const String& pathName)
         return false;
     }
     
-    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName), true).CString(), 0) == TRUE) ||
+    bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
     if (success)
         LOGDEBUG("Created directory " + pathName);
@@ -102,7 +102,7 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
 {
     if (allowedPaths_.Empty())
     {
-        String fixedFileName = GetNativePath(fileName, true);
+        String fixedFileName = GetNativePath(fileName);
         
         PODVector<const char*> argPtrs;
         argPtrs.Push(fixedFileName.CString());
@@ -130,7 +130,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         }
         
         bool success = (int)ShellExecute(0, !mode.Empty() ? (char*)mode.CString() : 0,
-            (char*)GetNativePath(fileName, true).CString(), 0, 0, SW_SHOW) > 32;
+            (char*)GetNativePath(fileName).CString(), 0, 0, SW_SHOW) > 32;
         if (!success)
             LOGERROR("Failed to open " + fileName + " externally");
         return success;
@@ -232,7 +232,7 @@ bool FileSystem::FileExists(const String& fileName)
     if (!CheckAccess(GetPath(fileName)))
         return false;
     
-    String fixedName = GetNativePath(RemoveTrailingSlash(fileName), true);
+    String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
     DWORD attributes = GetFileAttributes(fixedName.CString());
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
@@ -245,7 +245,7 @@ bool FileSystem::DirExists(const String& pathName)
     if (!CheckAccess(pathName))
         return false;
     
-    String fixedName = GetNativePath(RemoveTrailingSlash(pathName), true);
+    String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
     DWORD attributes = GetFileAttributes(fixedName.CString());
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (!(attributes & FILE_ATTRIBUTE_DIRECTORY)))
         return false;
@@ -300,7 +300,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
     const String& filter, unsigned flags, bool recursive)
 {
     path = AddTrailingSlash(path);
-    String pathAndFilter = GetNativePath(path + filter, true);
+    String pathAndFilter = GetNativePath(path + filter);
     String deltaPath;
     if (path.Length() > startPath.Length())
         deltaPath = path.Substring(startPath.Length());
@@ -424,19 +424,13 @@ String GetInternalPath(const String& pathName)
     return ret;
 }
 
-String GetNativePath(const String& pathName, bool forNativeApi)
+String GetNativePath(const String& pathName)
 {
-    // On MSVC, replace slash always with backslash. On MinGW only if going to do Win32 native calls
-#ifdef _MSC_VER
-    forNativeApi = true;
+#ifdef WIN32
+    String ret = pathName;
+    ret.Replace('/', '\\');
+    return ret;
+#else
+    return pathName;
 #endif
-    
-    if (forNativeApi)
-    {
-        String ret = pathName;
-        ret.Replace('/', '\\');
-        return ret;
-    }
-    else
-        return pathName;
 }
