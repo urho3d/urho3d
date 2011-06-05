@@ -23,14 +23,12 @@ void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION)
 {
     float4 pos;
-    #if (!defined(SKINNED)) && (!defined(INSTANCED))
-        pos = GetPosition(iPos, oPos);
-    #endif
-    #ifdef SKINNED
+    #if defined(SKINNED)
         pos = GetPositionSkinned(iPos, iBlendWeights, iBlendIndices, oPos);
-    #endif
-    #ifdef INSTANCED
+    #elif defined(INSTANCED)
         pos = GetPositionInstanced(iPos, iModelInstance, oPos);
+    #else
+        pos = GetPosition(iPos, oPos);
     #endif
 
     #ifdef VERTEXCOLOR

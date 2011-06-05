@@ -16,14 +16,12 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : POSITION)
 {
-    #if (!defined(SKINNED)) && (!defined(INSTANCED))
-        GetPosition(iPos, oPos);
-    #endif
-    #ifdef SKINNED
+    #if defined(SKINNED)
         GetPositionSkinned(iPos, iBlendWeights, iBlendIndices, oPos);
-    #endif
-    #ifdef INSTANCED
+    #elif defined(INSTANCED)
         GetPositionInstanced(iPos, iModelInstance, oPos);
+    #else
+        GetPosition(iPos, oPos);
     #endif
 
     #ifdef ALPHAMASK

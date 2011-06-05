@@ -41,33 +41,27 @@ void VS(float4 iPos : POSITION,
 {
     float4 pos;
 
-    #if (!defined(SKINNED)) && (!defined(INSTANCED)) && (!defined(BILLBOARD))
-        #ifndef NORMALMAP
-            pos = GetPositionNormal(iPos, iNormal, oPos, oNormal);
-        #else
-            pos = GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
-        #endif
-    #endif
-
-    #ifdef SKINNED
+    #if defined(SKINNED)
         #ifndef NORMALMAP
             pos = GetPositionNormalSkinned(iPos, iNormal, iBlendWeights, iBlendIndices, oPos, oNormal);
         #else
             pos = GetPositionNormalTangentSkinned(iPos, iNormal, iTangent, iBlendWeights, iBlendIndices, oPos, oNormal, oTangent);
         #endif
-    #endif
-
-    #ifdef INSTANCED
+    #elif defined(INSTANCED)
         #ifndef NORMALMAP
             pos = GetPositionNormalInstanced(iPos, iNormal, iModelInstance, oPos, oNormal);
         #else
             pos = GetPositionNormalTangentInstanced(iPos, iNormal, iTangent, iModelInstance, oPos, oNormal, oTangent);
         #endif
-    #endif
-
-    #ifdef BILLBOARD
+    #elif defined(BILLBOARD)
         pos = GetPositionBillboard(iPos, iSize, oPos);
         oNormal = float3(-cCameraRot[2][0], -cCameraRot[2][1], -cCameraRot[2][2]);
+    #else
+        #ifndef NORMALMAP
+            pos = GetPositionNormal(iPos, iNormal, oPos, oNormal);
+        #else
+            pos = GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
+        #endif
     #endif
 
     // Store adjusted world position and linear depth for light calculations

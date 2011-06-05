@@ -31,25 +31,23 @@ void VS(float4 iPos : POSITION,
     #endif
     out float4 oPos : POSITION)
 {
-    #if (!defined(SKINNED)) && (!defined(INSTANCED))
-        #ifndef NORMALMAP
-            GetPositionNormal(iPos, iNormal, oPos, oNormal);
-        #else
-            GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
-        #endif
-    #endif
-    #ifdef SKINNED
+    #if defined(SKINNED)
         #ifndef NORMALMAP
             GetPositionNormalSkinned(iPos, iNormal, iBlendWeights, iBlendIndices, oPos, oNormal);
         #else
             GetPositionNormalTangentSkinned(iPos, iNormal, iTangent, iBlendWeights, iBlendIndices, oPos, oNormal, oTangent);
         #endif
-    #endif
-    #ifdef INSTANCED
+    #elif defined(INSTANCED)
         #ifndef NORMALMAP
             GetPositionNormalInstanced(iPos, iNormal, iModelInstance, oPos, oNormal);
         #else
             GetPositionNormalTangentInstanced(iPos, iNormal, iTangent, iModelInstance, oPos, oNormal, oTangent);
+        #endif
+    #else
+        #ifndef NORMALMAP
+            GetPositionNormal(iPos, iNormal, oPos, oNormal);
+        #else
+            GetPositionNormalTangent(iPos, iNormal, iTangent, oPos, oNormal, oTangent);
         #endif
     #endif
 
