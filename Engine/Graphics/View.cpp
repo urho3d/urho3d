@@ -837,7 +837,6 @@ void View::RenderBatchesDeferred()
         graphics_->ClearLastParameterSources();
         
         // Use always the default depth stencil, so that it matches the G-buffer size, and is in the expected format
-        // Enable depth rendertarget only if hardware depth not supported
         graphics_->SetColorWrite(true);
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
