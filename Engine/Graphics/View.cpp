@@ -2110,7 +2110,7 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
     }
 }
 
-void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLightBuffer)
+void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLightBuffer, bool disableScissor)
 {
     Texture2D* diffBuffer = 0;
     VertexBuffer* instancingBuffer = 0;
@@ -2119,7 +2119,8 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
     if (renderer_->GetDynamicInstancing())
         instancingBuffer = renderer_->instancingBuffer_;
     
-    graphics_->SetScissorTest(false);
+    if (disableScissor)
+        graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
     
     // Priority instanced
@@ -2239,14 +2240,14 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     {
         float zoom = Min(queue.light_->GetShadowCamera()->GetZoom(),
             (float)(shadowMap->GetWidth() - 2) / (float)shadowMap->GetWidth());
-        Rect zoorect_(Vector2(-1.0f, -1.0f) * zoom, Vector2(1.0f, 1.0f) * zoom);
-        graphics_->SetScissorTest(true, zoorect_, false);
+        Rect zoomRect(Vector2(-1.0f, -1.0f) * zoom, Vector2(1.0f, 1.0f) * zoom);
+        graphics_->SetScissorTest(true, zoomRect, false);
     }
     else
         graphics_->SetScissorTest(false);
     
     // Draw instanced and non-instanced shadow casters
-    RenderBatchQueue(queue.shadowBatches_);
+    RenderBatchQueue(queue.shadowBatches_, false, false, false);
     
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);

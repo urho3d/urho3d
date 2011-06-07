@@ -159,7 +159,7 @@ private:
     /// Draw a split light to stencil buffer
     void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     /// Draw everything in a batch queue, priority batches first
-    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool useLightBuffer = false);
+    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool useLightBuffer = false, bool disableScissor = true);
     /// Draw a forward (shadowed) light batch queue
     void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
     /// Render a shadow map
