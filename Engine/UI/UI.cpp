@@ -280,7 +280,7 @@ void UI::Render()
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
         graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
         
-        batches_[i].Draw(graphics_, vs, ps);
+        batches_[i].Draw(graphics_);
     }
 }
 

@@ -1,5 +1,5 @@
-Urho3D - a rendering and game engine
-------------------------------------
+Urho3D - Direct3D9 / OpenGL rendering and game engine
+-----------------------------------------------------
 
 http://urho3d.googlecode.com
 

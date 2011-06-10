@@ -86,7 +86,7 @@ public:
     /// Merge with another batch
     bool Merge(const UIBatch& batch);
     /// Draw
-    void Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps) const;
+    void Draw(Graphics* graphics) const;
     
     /// Add or merge a batch
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);

@@ -165,7 +165,7 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-void UIBatch::Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps) const
+void UIBatch::Draw(Graphics* graphics) const
 {
     if ((!quads_) || (!quadCount_))
         return;
@@ -179,9 +179,12 @@ void UIBatch::Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps)
     graphics->SetBlendMode(blendMode_);
     graphics->SetScissorTest(true, scissor_);
     graphics->SetTexture(0, texture_);
-    graphics->SetShaders(vs, ps);
     
+    #ifdef USE_OPENGL
+    Vector2 posAdjust(Vector2::ZERO);
+    #else
     Vector2 posAdjust(0.5f, 0.5f);
+    #endif
     Vector2 invScreenSize(1.0f / (float)graphics->GetWidth(), 1.0f / (float)graphics->GetHeight());
     
     const PODVector<UIQuad>& quads = *quads_;
@@ -196,36 +199,36 @@ void UIBatch::Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps)
         for (unsigned i = quadStart_; i < quadStart_ + quadCount_; ++i)
         {
             const UIQuad& quad = quads[i];
-            Vector2 topLeft, bottoright_, topLeftUV, bottorightUV_;
+            Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
             topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
-            bottoright_ = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
+            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
             topLeftUV = Vector2((float)quad.leftUV_, (float)quad.topUV_) * invTextureSize;
-            bottorightUV_ = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
+            bottomRightUV = Vector2((float)quad.rightUV_, (float)quad.bottomUV_) * invTextureSize;
             
             *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topLeftColor_; dest++;
             *dest++ = topLeftUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = bottoright_.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topRightColor_; dest++;
-            *dest++ = bottorightUV_.x_; *dest++ = topLeftUV.y_;
+            *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = topLeft.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
-            *dest++ = topLeftUV.x_; *dest++ = bottorightUV_.y_;
+            *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
             
-            *dest++ = bottoright_.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topRightColor_; dest++;
-            *dest++ = bottorightUV_.x_; *dest++ = topLeftUV.y_;
+            *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
-            *dest++ = bottoright_.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomRightColor_; dest++;
-            *dest++ = bottorightUV_.x_; *dest++ = bottorightUV_.y_;
+            *dest++ = bottomRightUV.x_; *dest++ = bottomRightUV.y_;
             
-            *dest++ = topLeft.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
-            *dest++ = topLeftUV.x_; *dest++ = bottorightUV_.y_;
+            *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
         }
         
         graphics->EndImmediate();
@@ -238,27 +241,27 @@ void UIBatch::Draw(Graphics* graphics, ShaderVariation* vs, ShaderVariation* ps)
         for (unsigned i = quadStart_; i < quadStart_ + quadCount_; ++i)
         {
             const UIQuad& quad = quads[i];
-            Vector2 topLeft, bottoright_, topLeftUV, bottorightUV_;
+            Vector2 topLeft, bottomRight, topLeftUV, bottomRightUV;
             
             topLeft = (Vector2((float)quad.left_, (float)quad.top_) - posAdjust) * invScreenSize;
-            bottoright_ = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
+            bottomRight = (Vector2((float)quad.right_, (float)quad.bottom_) - posAdjust) * invScreenSize;
             
             *dest++ = topLeft.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topLeftColor_; dest++;
             
-            *dest++ = bottoright_.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topRightColor_; dest++;
             
-            *dest++ = topLeft.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
             
-            *dest++ = bottoright_.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].topRightColor_; dest++;
             
-            *dest++ = bottoright_.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = bottomRight.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomRightColor_; dest++;
             
-            *dest++ = topLeft.x_; *dest++ = bottoright_.y_; *dest++ = 0.0f;
+            *dest++ = topLeft.x_; *dest++ = bottomRight.y_; *dest++ = 0.0f;
             *((unsigned*)dest) = quads[i].bottomLeftColor_; dest++;
         }
         

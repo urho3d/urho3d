@@ -2,7 +2,7 @@
 
 \mainpage Urho3D rendering and game engine
 
-Urho3D is a lightweight, object-oriented rendering and game engine written in C++.
+Urho3D is a lightweight, object-oriented rendering and game engine written in C++, that utilizes either Direct3D9 or OpenGL for rendering.
 
 For getting started, see:
 

@@ -125,6 +125,10 @@ void Texture::SetParametersDirty()
     parametersDirty_ = true;
 }
 
+void Texture::ClearDataLost()
+{
+}    
+
 void Texture::UpdateParameters()
 {
     if ((!object_) || (!graphics_))

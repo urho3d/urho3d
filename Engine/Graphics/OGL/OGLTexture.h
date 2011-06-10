@@ -57,7 +57,7 @@ public:
     /// Dirty the parameters
     void SetParametersDirty();
     /// Clear data lost flag. No-op on OpenGL
-    void ClearDataLost() {}
+    void ClearDataLost();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture
     void UpdateParameters();
     

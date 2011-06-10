@@ -91,7 +91,7 @@ public:
     /// Draw indexed geometry
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed, instanced geometry. No-op on OpenGL
-    void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount) {}
+    void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
     /// Set vertex buffer
     void SetVertexBuffer(VertexBuffer* buffer);
     /// Set multiple vertex buffers
@@ -183,9 +183,9 @@ public:
     /// Set stencil test
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned stencilMask = M_MAX_UNSIGNED);
     /// Set vertex buffer stream frequency. No-op on OpenGL
-    void SetStreamFrequency(unsigned index, unsigned frequency) {}
+    void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies. No-op on OpenGL
-    void ResetStreamFrequencies() {}
+    void ResetStreamFrequencies();
     /// Begin immediate rendering command
     bool BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned elementMask);
     /// Define immediate vertex
@@ -201,7 +201,7 @@ public:
     /// End immediate rendering command and render
     void EndImmediate();
     /// Set force Shader Model 2 flag. No effect on OpenGL
-    void SetForceSM2(bool enable) {}
+    void SetForceSM2(bool enable);
     
     /// Return whether rendering initialized
     bool IsInitialized() const;

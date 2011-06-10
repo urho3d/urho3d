@@ -397,6 +397,13 @@ bool Graphics::BeginFrame()
     SetColorWrite(true);
     SetDepthWrite(true);
     
+    // Reset immediate mode vertex buffer positions
+    for (Map<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
+        i->second_ = 0;
+    
+    numPrimitives_ = 0;
+    numBatches_ = 0;
+    
     SendEvent(E_BEGINRENDER);
     
     return true;
@@ -500,6 +507,10 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     
     numPrimitives_ += primitiveCount;
     ++numBatches_;
+}
+
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount)
+{
 }
 
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
@@ -1590,6 +1601,14 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     }
 }
 
+void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
+{
+}
+
+void Graphics::ResetStreamFrequencies()
+{
+}
+
 void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, StencilOp fail, StencilOp zFail, unsigned stencilRef, unsigned stencilMask)
 {
     if (enable != stencilTest_)
@@ -1760,6 +1779,10 @@ void Graphics::EndImmediate()
         Draw(immediateType_, immediateStartPos_, immediateVertexCount_);
         immediateBuffer_ = 0;
     }
+}
+
+void Graphics::SetForceSM2(bool enable)
+{
 }
 
 unsigned char* Graphics::GetImmediateDataPtr() const
