@@ -12,10 +12,6 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD2,
     #endif
-    #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
-        out float4 oColor : COLOR0,
-    #endif
     float2 iTexCoord : TEXCOORD0,
     out float2 oTexCoord : TEXCOORD0,
     out float4 oWorldPos : TEXCOORD1,
@@ -31,10 +27,6 @@ void VS(float4 iPos : POSITION,
         pos = GetPosition(iPos, oPos);
     #endif
 
-    #ifdef VERTEXCOLOR
-        oColor = iColor;
-    #endif
-
     // Store world-oriented view position in case it is needed
     oWorldPos = float4(pos.xyz - cCameraPos, GetDepth(oPos));
     oScreenPos = GetScreenPos(oPos);
@@ -44,9 +36,6 @@ void VS(float4 iPos : POSITION,
 void PS(float2 iTexCoord : TEXCOORD0,
     float4 iWorldPos : TEXCOORD1,
     float4 iScreenPos : TEXCOORD2,
-    #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
-    #endif
     out float4 oColor : COLOR0)
 {
     #ifdef DIFFMAP
@@ -58,10 +47,6 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float3 diffColor = cMatDiffColor.rgb * diffInput.rgb;
     #else
         float3 diffColor = cMatDiffColor.rgb;
-    #endif
-
-    #ifdef VERTEXCOLOR
-        diffColor *= iColor.rgb;
     #endif
 
     #ifdef SPECMAP

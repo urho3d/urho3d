@@ -25,10 +25,6 @@ void VS(float4 iPos : POSITION,
     #else
         out float3 oNormal : TEXCOORD2,
     #endif
-    #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
-        out float4 oColor : COLOR0,
-    #endif
     out float4 oPos : POSITION)
 {
     #if defined(SKINNED)
@@ -55,10 +51,6 @@ void VS(float4 iPos : POSITION,
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
 
-    #ifdef VERTEXCOLOR
-        oColor = iColor;
-    #endif
-
     oTexCoord = GetTexCoord(iTexCoord);
     oDepth = GetDepth(oPos);
 }
@@ -73,9 +65,6 @@ void PS(
     #else
         float3 iNormal : TEXCOORD2,
     #endif
-    #ifdef VERTEXCOLOR
-        float4 iColor : COLOR0,
-    #endif
     out float4 oDiff : COLOR0,
     out float4 oNormal : COLOR1,
     out float4 oDepth : COLOR2)
@@ -89,10 +78,6 @@ void PS(
         #endif
     #else
         float3 diffColor = cMatDiffColor.rgb;
-    #endif
-
-    #ifdef VERTEXCOLOR
-        diffColor *= iColor.rgb;
     #endif
 
     #ifdef NORMALMAP

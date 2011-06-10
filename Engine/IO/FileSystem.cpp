@@ -413,7 +413,7 @@ String GetParentPath(const String& path)
     if (pos != String::NPOS)
         return path.Substring(0, pos + 1);
     else
-        return path;
+        return String();
 }
 
 String GetInternalPath(const String& pathName)
