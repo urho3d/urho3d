@@ -250,14 +250,11 @@ void UI::Render()
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
-    graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-    graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
     
-    unsigned alphaFormat = Graphics::GetAlphaFormat();
+    unsigned luminanceFormat = Graphics::GetLuminanceFormat();
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
@@ -269,14 +266,19 @@ void UI::Render()
         }
         else
         {
-            // If texture contains only an alpha channel, use the alpha pixel shader
+            // If texture contains only a luminance channel, interpret it as alpha (for fonts)
             vs = diffTextureVS_;
             
-            if (batches_[i].texture_->GetFormat() == alphaFormat)
+            if (batches_[i].texture_->GetFormat() == luminanceFormat)
                 ps = alphaTexturePS_;
             else
                 ps = diffTexturePS_;
         }
+        
+        graphics_->SetShaders(vs, ps);
+        graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
         
         batches_[i].Draw(graphics_, vs, ps);
     }
@@ -400,8 +402,13 @@ void UI::Initialize()
     rootElement_ = new UIElement(context_);
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     
+    #ifdef USE_OPENGL
+    Shader* basicVS = cache->GetResource<Shader>("Shaders/OGL/Basic.vert");
+    Shader* basicPS = cache->GetResource<Shader>("Shaders/OGL/Basic.frag");
+    #else
     Shader* basicVS = cache->GetResource<Shader>("Shaders/SM2/Basic.vs2");
     Shader* basicPS = cache->GetResource<Shader>("Shaders/SM2/Basic.ps2");
+    #endif
     
     if ((basicVS) && (basicPS))
     {

@@ -27,9 +27,11 @@
 #include "Log.h"
 #include "VertexBuffer.h"
 
+#include <GLee.h>
+
 #include "DebugNew.h"
 
-const unsigned VertexBuffer::elementSize[] = 
+const unsigned VertexBuffer::elementSize[] =
 {
     3 * sizeof(float), // Position
     3 * sizeof(float), // Normal
@@ -46,7 +48,58 @@ const unsigned VertexBuffer::elementSize[] =
     4 * sizeof(float) // Instancematrix3
 };
 
-const String VertexBuffer::elementName[] = 
+const unsigned VertexBuffer::elementType[] =
+{
+    GL_FLOAT, // Position
+    GL_FLOAT, // Normal
+    GL_UNSIGNED_BYTE, // Color
+    GL_FLOAT, // Texcoord1
+    GL_FLOAT, // Texcoord2
+    GL_FLOAT, // Cubetexcoord1
+    GL_FLOAT, // Cubetexcoord2
+    GL_FLOAT, // Tangent
+    GL_FLOAT, // Blendweights
+    GL_UNSIGNED_BYTE, // Blendindices
+    GL_FLOAT, // Instancematrix1
+    GL_FLOAT, // Instancematrix2
+    GL_FLOAT // Instancematrix3
+};
+
+const unsigned VertexBuffer::elementComponents[] =
+{
+    3, // Position
+    3, // Normal
+    4, // Color
+    2, // Texcoord1
+    2, // Texcoord2
+    3, // Cubetexcoord1
+    3, // Cubetexcoord2
+    4, // Tangent
+    4, // Blendweights
+    4, // Blendindices
+    4, // Instancematrix1
+    4, // Instancematrix2
+    4 // Instancematrix3
+};
+
+const unsigned VertexBuffer::elementNormalize[] =
+{
+    GL_FALSE, // Position
+    GL_FALSE, // Normal
+    GL_TRUE, // Color
+    GL_FALSE, // Texcoord1
+    GL_FALSE, // Texcoord2
+    GL_FALSE, // Cubetexcoord1
+    GL_FALSE, // Cubetexcoord2
+    GL_FALSE, // Tangent
+    GL_FALSE, // Blendweights
+    GL_FALSE, // Blendindices
+    GL_FALSE, // Instancematrix1
+    GL_FALSE, // Instancematrix2
+    GL_FALSE // Instancematrix3
+};
+
+const String VertexBuffer::elementName[] =
 {
     "Position",
     "Normal",
@@ -68,14 +121,12 @@ OBJECTTYPESTATIC(VertexBuffer);
 VertexBuffer::VertexBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>()),
-    pool_(D3DPOOL_MANAGED),
-    usage_(0),
     vertexCount_(0),
     elementMask_(0),
     morphRangeStart_(0),
     morphRangeCount_(0),
-    locked_(false),
-    dataLost_(false)
+    dynamic_(false),
+    locked_(false)
 {
     UpdateOffsets();
 }
@@ -83,21 +134,6 @@ VertexBuffer::VertexBuffer(Context* context) :
 VertexBuffer::~VertexBuffer()
 {
     Release();
-}
-
-void VertexBuffer::OnDeviceLost()
-{
-    if (pool_ == D3DPOOL_DEFAULT)
-        Release();
-}
-
-void VertexBuffer::OnDeviceReset()
-{
-    if (pool_ == D3DPOOL_DEFAULT)
-    {
-        Create();
-        dataLost_ = true;
-    }
 }
 
 void VertexBuffer::Release()
@@ -113,7 +149,7 @@ void VertexBuffer::Release()
                 graphics_->SetVertexBuffer(0);
         }
         
-        ((IDirect3DVertexBuffer9*)object_)->Release();
+        glDeleteBuffers(1, &object_);
         object_ = 0;
     }
     
@@ -122,17 +158,7 @@ void VertexBuffer::Release()
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
-    if (dynamic)
-    {
-        pool_ = D3DPOOL_DEFAULT;
-        usage_ = D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY;
-    }
-    else
-    {
-        pool_ = D3DPOOL_MANAGED;
-        usage_ = 0;
-    }
-    
+    dynamic_ = dynamic;
     vertexCount_ = vertexCount;
     elementMask_ = elementMask;
     
@@ -148,27 +174,60 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
 
 bool VertexBuffer::SetData(const void* data)
 {
-    void* hwData = Lock(0, vertexCount_, LOCK_DISCARD);
-    if (!hwData)
+    if (!data)
+    {
+        LOGERROR("Null pointer for vertex buffer data");
         return false;
+    }
     
-    memcpy(hwData, data, vertexCount_ * vertexSize_);
-    Unlock();
-    return true;
+    if (locked_)
+        Unlock();
+    
+    if (object_)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexCount_ * vertexSize_, data);
+        return true;
+    }
+    else if (fallbackData_)
+    {
+        memcpy(fallbackData_.GetPtr(), data, vertexCount_ * vertexSize_);
+        return true;
+    }
+    
+    return false;
 }
 
 bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
 {
-    if (!count)
-        return true;
-    
-    void* hwData = Lock(start, count, LOCK_NORMAL);
-    if (!hwData)
+    if (!data)
+    {
+        LOGERROR("Null pointer for vertex buffer data");
         return false;
+    }
     
-    memcpy(hwData, data, count * vertexSize_);
-    Unlock();
-    return true;
+    if (start + count > vertexCount_)
+    {
+        LOGERROR("Illegal range for setting new index buffer data");
+        return false;
+    }
+    
+    if (locked_)
+        Unlock();
+    
+    if (object_)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, vertexCount_ * vertexSize_, data);
+        return true;
+    }
+    else if (fallbackData_)
+    {
+        memcpy(fallbackData_.GetPtr() + start * vertexSize_, data, vertexCount_ * vertexSize_);
+        return true;
+    }
+    
+    return false;
 }
 
 bool VertexBuffer::SetMorphRange(unsigned start, unsigned count)
@@ -192,10 +251,7 @@ void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& d
 void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
     if ((!object_) && (!fallbackData_))
-    {
-        LOGERROR("No vertex buffer created, can not lock");
         return 0;
-    }
     
     if (locked_)
     {
@@ -210,23 +266,19 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     }
     
     void* hwData = 0;
+    GLenum glLockMode = GL_WRITE_ONLY;
+    if (mode == LOCK_READONLY)
+        glLockMode = GL_READ_ONLY;
+    else if (mode == LOCK_NORMAL)
+        glLockMode = GL_READ_WRITE;
     
     if (object_)
     {
-        DWORD flags = 0;
-        
-        if ((mode == LOCK_DISCARD) && (usage_ & D3DUSAGE_DYNAMIC))
-            flags = D3DLOCK_DISCARD;
-        if (mode == LOCK_NOOVERWRITE)
-            flags = D3DLOCK_NOOVERWRITE;
-        if (mode == LOCK_READONLY)
-            flags = D3DLOCK_READONLY;
-        
-        if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
-        {
-            LOGERROR("Could not lock vertex buffer");
+        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
+        if (!hwData)
             return 0;
-        }
+        hwData = (unsigned char*)hwData + start * vertexSize_;
     }
     else
         hwData = fallbackData_.GetPtr() + start * vertexSize_;
@@ -240,7 +292,10 @@ void VertexBuffer::Unlock()
     if (locked_)
     {
         if (object_)
-            ((IDirect3DVertexBuffer9*)object_)->Unlock();
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, object_);
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
         locked_ = false;
     }
 }
@@ -262,16 +317,6 @@ void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
         return;
     
     memcpy(lockedMorphRange, morphRangeResetData_.GetPtr(), morphRangeCount_ * vertexSize_);
-}
-
-void VertexBuffer::ClearDataLost()
-{
-    dataLost_ = false;
-}
-
-bool VertexBuffer::IsDynamic() const
-{
-    return pool_ == D3DPOOL_DEFAULT;
 }
 
 void VertexBuffer::UpdateOffsets()
@@ -327,18 +372,9 @@ bool VertexBuffer::Create()
     
     if (graphics_)
     {
-        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        if ((!device) || (FAILED(device->CreateVertexBuffer(
-            vertexCount_ * vertexSize_,
-            usage_,
-            0,
-            (D3DPOOL)pool_,
-            (IDirect3DVertexBuffer9**)&object_,
-            0))))
-        {
-            LOGERROR("Could not create vertex buffer");
-            return false;
-        }
+        glGenBuffers(1, &object_);
+        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
     else
         fallbackData_ = new unsigned char[vertexCount_ * vertexSize_];

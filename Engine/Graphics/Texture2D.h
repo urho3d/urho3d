@@ -23,54 +23,8 @@
 
 #pragma once
 
-#include "RenderSurface.h"
-#include "SharedPtr.h"
-#include "Texture.h"
-
-class Image;
-
-/// 2D texture resource
-class Texture2D : public Texture
-{
-    OBJECT(Texture2D);
-    
-public:
-    /// Construct
-    Texture2D(Context* context);
-    /// Destruct
-    virtual ~Texture2D();
-    /// Register object factory
-    static void RegisterObject(Context* context);
-    
-    /// Load resource. Return true if successful
-    virtual bool Load(Deserializer& source);
-    /// Release default pool resources
-    virtual void OnDeviceLost();
-    /// Recreate default pool resources
-    virtual void OnDeviceReset();
-    /// Release texture
-    virtual void Release();
-    
-    /// Set size, format and usage. Zero size will follow application window size. Return true if successful
-    bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-    /// Load from an image. Return true if successful
-    bool Load(SharedPtr<Image> image);
-    /// Lock a rectangular area from a mipmap level. A null rect locks the entire level. Return true if successful
-    bool Lock(unsigned level, const IntRect* rect, LockedRect& lockedRect);
-    /// Unlock texture
-    void Unlock();
-    
-    /// Return render surface
-    RenderSurface* GetRenderSurface() const { return renderSurface_; }
-    
-private:
-    /// Create texture
-    bool Create();
-    
-    /// Render surface
-    SharedPtr<RenderSurface> renderSurface_;
-    /// Currently locked mipmap level
-    int lockedLevel_;
-    /// Follow window size flag
-    bool followWindowSize_;
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLTexture2D.h"
+#else
+#include "D3D9/D3D9Texture2D.h"
+#endif

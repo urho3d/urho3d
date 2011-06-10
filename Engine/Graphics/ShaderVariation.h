@@ -23,64 +23,8 @@
 
 #pragma once
 
-#include "GPUObject.h"
-#include "GraphicsDefs.h"
-#include "RefCounted.h"
-#include "SharedArrayPtr.h"
-
-class Shader;
-
-/// Vertex or pixel shader on the GPU
-class ShaderVariation : public RefCounted, public GPUObject
-{
-public:
-    /// Construct
-    ShaderVariation(Shader* shader, ShaderType type, bool isSM3);
-    /// Destruct
-    virtual ~ShaderVariation();
-    
-    /// Create the shader program. Return true if successful
-    bool Create();
-    /// Release shader
-    virtual void Release();
-    
-    /// Set name
-    void SetName(const String& name);
-    /// Set bytecode
-    void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
-    /// Set to use a parameter
-    void SetUseParameter(ShaderParameter param, bool enable);
-    /// Set to use a texture unit
-    void SetUseTextureUnit(TextureUnit unit, bool enable);
-    /// Clear parameter and texture unit use flags
-    void ClearParameters();
-    
-    /// Return parent shader
-    Shader* GetShader() const;
-    /// Return shader type
-    ShaderType GetShaderType() const { return shaderType_; }
-    /// Return variation name
-    const String& GetName() const { return name_; }
-    /// Return whether requires Shader Model 3
-    bool IsSM3() const { return isSM3_; }
-    /// Return whether uses a specific shader parameter
-    bool HasParameter(ShaderParameter parameter) const { return useParameter_[parameter]; }
-    /// Return whether uses a texture unit (only for pixel shaders)
-    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
-    
-private:
-    /// Parent shader
-    WeakPtr<Shader> shader_;
-    /// Shader bytecode
-    SharedArrayPtr<unsigned char> byteCode_;
-    /// Shader type
-    ShaderType shaderType_;
-    /// Variation name
-    String name_;
-    /// Shader Model 3 flag
-    bool isSM3_;
-    /// Parameter use flags
-    bool useParameter_[MAX_SHADER_PARAMETERS];
-    /// Texture unit use flags
-    bool useTextureUnit_[MAX_TEXTURE_UNITS];
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLShaderVariation.h"
+#else
+#include "D3D9/D3D9ShaderVariation.h"
+#endif

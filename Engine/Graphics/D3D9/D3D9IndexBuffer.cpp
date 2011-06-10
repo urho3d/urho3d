@@ -139,11 +139,8 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
 void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
     if ((!object_) && (!fallbackData_))
-    {
-        LOGERROR("No index buffer created, can not lock");
         return 0;
-    }
-    
+
     if (locked_)
     {
         LOGERROR("Index buffer already locked");

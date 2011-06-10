@@ -1,0 +1,15 @@
+uniform vec3 cCameraPos;
+uniform mat3 cCameraRot;
+uniform vec4 cDepthMode;
+uniform vec2 cElapsedTime;
+uniform vec4 cFrustumSize;
+uniform vec4 cGBufferOffsets;
+uniform mat4 cModel;
+uniform mat4 cShadowProj;
+uniform mat4 cSpotProj;
+uniform mat4 cViewProj;
+uniform vec4 cUOffset;
+uniform vec4 cVOffset;
+uniform vec3 cViewRightVector;
+uniform vec3 cViewUpVector;
+uniform vec4 cSkinMatrices[64*3];

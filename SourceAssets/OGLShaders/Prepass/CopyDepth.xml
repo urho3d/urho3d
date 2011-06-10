@@ -1,0 +1,4 @@
+<shaders>
+    <shader name="CopyDepth" type="vs" />
+    <shader name="CopyDepth" type="ps" />
+</shaders>

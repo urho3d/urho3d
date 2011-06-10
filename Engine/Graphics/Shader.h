@@ -23,45 +23,8 @@
 
 #pragma once
 
-#include "Resource.h"
-
-class ShaderVariation;
-
-/// Shader resource consisting of several shader variations
-class Shader : public Resource
-{
-    OBJECT(Shader);
-    
-public:
-    /// Construct
-    Shader(Context* context);
-    /// Destruct
-    virtual ~Shader();
-    /// Register object factory
-    static void RegisterObject(Context* context);
-    
-    /// Load resource. Return true if successful
-    virtual bool Load(Deserializer& source);
-    
-    /// Get a named variation. Return null if not found or could not be created
-    ShaderVariation* GetVariation(const String& name);
-    /// Get a named variation. Return null if not found or could not be created
-    ShaderVariation* GetVariation(StringHash nameHash);
-    /// Release (unload) all variations
-    void ReleaseAll();
-    
-    /// Return shader type
-    ShaderType GetShaderType() const { return shaderType_; }
-    /// Return whether requires Shader Model 3
-    bool IsSM3() const { return isSM3_; }
-    /// Return number of variations
-    unsigned GetNumVariations() const { return variations_.Size(); }
-    
-private:
-    /// Shader type
-    ShaderType shaderType_;
-    /// Shader Model 3 flag
-    bool isSM3_;
-    /// Shader variations. Will be in an unloaded state until requested
-    Map<StringHash, SharedPtr<ShaderVariation> > variations_;
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLShader.h"
+#else
+#include "D3D9/D3D9Shader.h"
+#endif

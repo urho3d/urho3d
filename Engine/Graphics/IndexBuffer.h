@@ -23,71 +23,8 @@
 
 #pragma once
 
-#include "GPUObject.h"
-#include "Object.h"
-#include "GraphicsDefs.h"
-#include "SharedArrayPtr.h"
-
-/// Hardware index buffer
-class IndexBuffer : public Object, public GPUObject
-{
-    OBJECT(IndexBuffer);
-    
-public:
-    /// Construct
-    IndexBuffer(Context* context);
-    /// Destruct
-    virtual ~IndexBuffer();
-    
-    /// Release default pool resources
-    virtual void OnDeviceLost();
-    /// Recreate default pool resources
-    virtual void OnDeviceReset();
-    /// Release buffer
-    virtual void Release();
-    
-    /// Set buffer size and dynamic mode. Previous data will be lost
-    bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
-    /// Set buffer size and dynamic mode. Previous data will be lost
-    bool SetSize(unsigned indexCount, unsigned indexSize, bool dynamic = false);
-    /// Set all data in the buffer,
-    bool SetData(const void* data);
-    /// Set a data range in the buffer
-    bool SetDataRange(const void* data, unsigned start, unsigned count);
-    /// Lock a data range in the buffer. Return pointer to locked data if successful
-    void* Lock(unsigned start, unsigned count, LockMode mode);
-    /// Unlock buffer
-    void Unlock();
-    /// Clear data lost flag
-    void ClearDataLost();
-    
-    /// Return whether is dynamic
-    bool IsDynamic() const;
-    /// Return whether default pool data lost
-    bool IsDataLost() const { return dataLost_; }
-    /// Return number of indices
-    unsigned GetIndexCount() const {return indexCount_; }
-    /// Return index size
-    unsigned GetIndexSize() const { return indexSize_; }
-    /// Return used vertex range from index range
-    bool GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount);
-    
-private:
-    /// Create buffer
-    bool Create();
-    
-    /// Fallback data when operating with a null graphics subsystem
-    SharedArrayPtr<unsigned char> fallbackData_;
-    /// Memory pool
-    unsigned pool_;
-    /// Usage type
-    unsigned usage_;
-    /// Number of indices
-    unsigned indexCount_;
-    /// Index size
-    unsigned indexSize_;
-    /// Buffer locked flag
-    bool locked_;
-    /// Default pool data lost flag
-    bool dataLost_;
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLIndexBuffer.h"
+#else
+#include "D3D9/D3D9IndexBuffer.h"
+#endif

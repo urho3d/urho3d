@@ -115,11 +115,10 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     camera_ = viewport.camera_;
     renderTarget_ = renderTarget;
     
-    // If not rendering to the back buffer, get the depth buffer linked to the color render target
-    if (renderTarget)
-        depthStencil_ = renderTarget->GetLinkedDepthBuffer();
-    else
+    if (!renderTarget)
         depthStencil_ = 0;
+    else
+        depthStencil_ = renderTarget->GetLinkedDepthBuffer();
     
     zone_ = renderer_->GetDefaultZone();
     
@@ -808,9 +807,23 @@ void View::RenderBatchesDeferred()
         camera_->SetProjectionOffset(jitter);
     }
     
-    RenderSurface* renderBuffer = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
+    RenderSurface* finalRenderTarget = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
     
-    // Set shader parameters needed only in deferred rendering
+    // In OpenGL, we will use two depth stencils: one for the G-buffer, and one for light accumulation
+    #ifdef USE_OPENGL
+    RenderSurface* lightDepthStencil = deferred ? depthStencil_ : depthBuffer->GetRenderSurface();
+    RenderSurface* finalDepthStencil = depthStencil_;
+    // Exception: if temporal AA is used, the G-buffer depth stencil can be used for the whole time,
+    // as the backbuffer is only copied to in the very end
+    if (temporalAA)
+        lightDepthStencil = finalDepthStencil = depthBuffer->GetRenderSurface();
+    #else
+    // In Direct3D9 the system depth stencil will be used for the whole time
+    RenderSurface* lightDepthStencil = 0;
+    RenderSurface* finalDepthStencil = 0;
+    #endif
+    
+    // Calculate shader parameters needed only in deferred rendering
     Vector3 nearVector, farVector;
     camera_->GetFrustumSize(nearVector, farVector);
     Vector4 viewportParams(farVector.x_, farVector.y_, farVector.z_, 0.0f);
@@ -819,8 +832,21 @@ void View::RenderBatchesDeferred()
     float gBufferHeight = (float)diffBuffer->GetHeight();
     float widthRange = 0.5f * width_ / gBufferWidth;
     float heightRange = 0.5f * height_ / gBufferHeight;
+    
+    #ifdef USE_OPENGL
+    Vector4 bufferUVOffset(((float)screenRect_.left_) / gBufferWidth + widthRange,
+        ((float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+    // Hardware depth is non-linear in perspective views, so calculate the depth reconstruction parameters
+    float farClip = camera_->GetFarClip();
+    float nearClip = camera_->GetNearClip();
+    Vector4 depthReconstruct = Vector4::ZERO;
+    depthReconstruct.x_ = farClip / (farClip - nearClip);
+    depthReconstruct.y_ = -nearClip / (farClip - nearClip);
+    shaderParameters_[PSP_DEPTHRECONSTRUCT] = depthReconstruct;
+    #else
     Vector4 bufferUVOffset((0.5f + (float)screenRect_.left_) / gBufferWidth + widthRange,
         (0.5f + (float)screenRect_.top_) / gBufferHeight + heightRange, widthRange, heightRange);
+    #endif
     
     Vector4 viewportSize((float)screenRect_.left_ / gBufferWidth, (float)screenRect_.top_ / gBufferHeight,
         (float)screenRect_.right_ / gBufferWidth, (float)screenRect_.bottom_ / gBufferHeight);
@@ -836,11 +862,26 @@ void View::RenderBatchesDeferred()
         
         graphics_->ClearLastParameterSources();
         
-        // Use always the default depth stencil, so that it matches the G-buffer size, and is in the expected format
         graphics_->SetColorWrite(true);
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
-        graphics_->ResetDepthStencil();
+        #ifdef USE_OPENGL
+        // On OpenGL, clear the depth and diffuse albedo buffers normally
+        if (deferred)
+        {
+            graphics_->SetRenderTarget(0, diffBuffer);
+            graphics_->SetDepthStencil(depthBuffer);
+            graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
+            graphics_->SetRenderTarget(1, normalBuffer);
+        }
+        else
+        {
+            graphics_->SetRenderTarget(0, (RenderSurface*)0);
+            graphics_->SetDepthStencil(depthBuffer);
+            graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+            graphics_->SetRenderTarget(0, normalBuffer);
+        }
+        #else
         if (deferred)
         {
             graphics_->SetRenderTarget(0, diffBuffer);
@@ -852,15 +893,19 @@ void View::RenderBatchesDeferred()
             graphics_->SetRenderTarget(0, normalBuffer);
             graphics_->SetRenderTarget(1, depthBuffer);
         }
+        // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
+        graphics_->SetDepthStencil(lightDepthStencil);
         graphics_->SetViewport(screenRect_);
-        
-        // Clear only depth and stencil at first, render the G-buffer batches
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
+        #endif
+        
         RenderBatchQueue(gBufferQueue_);
         
-        // Then fill the untouched parts of the G-buffer with defaults: black diffuse + specular (deferred only), far depth
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
+        
+        #ifndef USE_OPENGL
+        // On Direct3D9, clear now the parts of G-Buffer that were not rendered into
         graphics_->SetDepthTest(CMP_LESSEQUAL);
         graphics_->SetDepthWrite(false);
         if (deferred)
@@ -881,16 +926,23 @@ void View::RenderBatchesDeferred()
             renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Stencil"),
                 renderer_->GetPixelShader("Stencil"), false, shaderParameters_);
         }
+        #endif
     }
     
     if (deferred)
     {
-        // Render ambient color & fog
+        // Render ambient color & fog. On OpenGL the depth buffer will be copied now if necessary
         graphics_->ClearLastParameterSources();
         graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetRenderTarget(0, renderBuffer);
+        graphics_->SetRenderTarget(0, finalRenderTarget);
         graphics_->ResetRenderTarget(1);
+        #ifdef USE_OPENGL
+        bool copyDepth = lightDepthStencil != depthBuffer->GetRenderSurface();
+        graphics_->SetDepthWrite(copyDepth);
+        #else
         graphics_->ResetRenderTarget(2);
+        #endif
+        graphics_->SetDepthStencil(lightDepthStencil);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
         graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
         graphics_->SetViewport(screenRect_);
@@ -901,8 +953,12 @@ void View::RenderBatchesDeferred()
     else
     {
         // Light prepass: reset the light accumulation buffer with black color
+        // On OpenGL we still use the GBuffer's depth buffer at this point, so depth is not copied yet
         graphics_->SetRenderTarget(0, diffBuffer);
+        #ifndef USE_OPENGL
         graphics_->ResetRenderTarget(1);
+        #endif
+        graphics_->SetDepthStencil(lightDepthStencil);
         graphics_->SetViewport(screenRect_);
         graphics_->Clear(CLEAR_COLOR);
     }
@@ -927,7 +983,7 @@ void View::RenderBatchesDeferred()
                 
                 if (deferred)
                 {
-                    graphics_->SetRenderTarget(0, renderBuffer);
+                    graphics_->SetRenderTarget(0, finalRenderTarget);
                     graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
                 }
                 else
@@ -935,7 +991,7 @@ void View::RenderBatchesDeferred()
                 
                 graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
                 graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-                graphics_->ResetDepthStencil();
+                graphics_->SetDepthStencil(lightDepthStencil);
                 graphics_->SetViewport(screenRect_);
                 
                 for (unsigned j = 0; j < queue.volumeBatches_.Size(); ++j)
@@ -957,7 +1013,7 @@ void View::RenderBatchesDeferred()
             
             if (deferred)
             {
-                graphics_->SetRenderTarget(0, renderBuffer);
+                graphics_->SetRenderTarget(0, finalRenderTarget);
                 graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
             }
             else
@@ -965,7 +1021,7 @@ void View::RenderBatchesDeferred()
             
             graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
             graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-            graphics_->ResetDepthStencil();
+            graphics_->SetDepthStencil(lightDepthStencil);
             graphics_->SetViewport(screenRect_);
             
             for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.Size(); ++i)
@@ -982,14 +1038,33 @@ void View::RenderBatchesDeferred()
         
         graphics_->ClearLastParameterSources();
         graphics_->SetStencilTest(false);
-        graphics_->SetRenderTarget(0, renderBuffer);
+        graphics_->SetRenderTarget(0, finalRenderTarget);
+        graphics_->SetDepthStencil(finalDepthStencil);
+        graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, 0);
         graphics_->SetTexture(TU_NORMALBUFFER, 0);
         graphics_->SetTexture(TU_DEPTHBUFFER, 0);
-        graphics_->SetViewport(screenRect_);
         
         if (!deferred)
+        {
+            #ifdef USE_OPENGL
+            // In OpenGL light prepass mode, copy depth now
+            if (finalDepthStencil != depthBuffer->GetRenderSurface())
+            {
+                graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
+                graphics_->SetAlphaTest(false);
+                graphics_->SetBlendMode(BLEND_REPLACE);
+                graphics_->SetDepthTest(CMP_ALWAYS);
+                graphics_->SetDepthWrite(true);
+                renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Prepass/CopyDepth"),
+                    renderer_->GetPixelShader("Prepass/CopyDepth"), false, shaderParameters_);
+            }
+            else
+                graphics_->Clear(CLEAR_COLOR, zone_->GetFogColor());
+            #else
             graphics_->Clear(CLEAR_COLOR, zone_->GetFogColor());
+            #endif
+        }
         
         // Remember to bind the light buffer in prepass mode
         RenderBatchQueue(baseQueue_, true, !deferred);
@@ -1023,6 +1098,9 @@ void View::RenderBatchesDeferred()
         else
             depthMode.w_ = 1.0f / camera_->GetFarClip();
         
+        unsigned index = camera_->IsOrthographic() ? 1 : 0;
+        String shaderName = "TemporalAA_" + aaVariation[index];
+        
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetDepthTest(CMP_ALWAYS);
@@ -1030,19 +1108,21 @@ void View::RenderBatchesDeferred()
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
+        graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
-        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
-        graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
-        graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
+        
+        // Pre-select the right shaders so that we can set shader parameters that can not go into the parameter map
+        // (matrices)
+        graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
         graphics_->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
         graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
         graphics_->SetShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
         graphics_->SetShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));
         graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f));
         graphics_->SetShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
-        
-        unsigned index = camera_->IsOrthographic() ? 1 : 0;
-        String shaderName = "TemporalAA_" + aaVariation[index];
+        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
+        graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
+        graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
         
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader(shaderName),
             renderer_->GetPixelShader(shaderName), false, shaderParameters_);

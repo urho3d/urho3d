@@ -23,59 +23,8 @@
 
 #pragma once
 
-#include "RenderSurface.h"
-#include "SharedPtr.h"
-#include "Texture.h"
-
-class Deserializer;
-class Image;
-
-/// Cube texture resource
-class TextureCube : public Texture
-{
-    OBJECT(TextureCube);
-    
-public:
-    /// Construct
-    TextureCube(Context* context);
-    /// Destruct
-    virtual ~TextureCube();
-    /// Register object factory
-    static void RegisterObject(Context* context);
-    
-    /// Load resource. Return true if successful
-    virtual bool Load(Deserializer& source);
-    /// Release default pool resources
-    virtual void OnDeviceLost();
-    /// ReCreate default pool resources
-    virtual void OnDeviceReset();
-    /// Release texture
-    virtual void Release();
-    
-    /// Set size, format and usage. Return true if successful
-    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-    /// Load one face from a stream. Return true if successful
-    bool Load(CubeMapFace face, Deserializer& source);
-    /// Load one face from an image. Return true if successful
-    bool Load(CubeMapFace face, SharedPtr<Image> image);
-    /// Lock a rectangular area from one face and mipmap level. A null rect locks the entire face. Return true if successful
-    bool Lock(CubeMapFace face, unsigned level, const IntRect* rect, LockedRect& lockedRect);
-    /// Unlock texture
-    void Unlock();
-    
-    /// Return render surface for one face
-    RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
-    
-private:
-    /// Create texture
-    bool Create();
-    
-    /// Render surfaces
-    SharedPtr<RenderSurface> renderSurfaces_[MAX_CUBEMAP_FACES];
-    /// Memory use per face
-    unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
-    /// Currently locked mipmap level
-    int lockedLevel_;
-    /// Currently locked face
-    CubeMapFace lockedFace_;
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLTextureCube.h"
+#else
+#include "D3D9/D3D9TextureCube.h"
+#endif

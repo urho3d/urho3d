@@ -269,35 +269,21 @@ const FontFace* Font::GetFace(int pointSize)
             break;
     }
     
-    // Create the texture
-    SharedPtr<Texture2D> texture(new Texture2D(context_));
-    texture->SetNumLevels(1); // No mipmaps
-    texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
-    texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
-    texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-    if (!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat()))
-    {
-        FT_Done_Face(face);
-        return 0;
-    }
+    // Create the image for rendering the fonts
+    SharedPtr<Image> image(new Image(context_));
+    image->SetSize(texWidth, texHeight, 1);
     
-    LockedRect hwRect;
-    if (!texture->Lock(0, 0, hwRect))
-    {
-        FT_Done_Face(face);
-        return 0;
-    }
-    
-    // First clear the whole texture
+    // First clear the whole image
+    unsigned char* imageData = image->GetData();
     for (int y = 0; y < texHeight; ++y)
     {
-        unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * y;
+        unsigned char* dest = imageData + texWidth * y;
         memset(dest, 0, texWidth);
     }
     
     // Render glyphs into texture, and find out a scaling value in case font uses less than full opacity (thin outlines)
     unsigned char avgMaxOpacity = 255;
-    unsigned sumax_Opacity = 0;
+    unsigned sumMaxOpacity = 0;
     unsigned samples = 0;
     for (unsigned i = 0; i < newFace.glyphs_.Size(); ++i)
     {
@@ -308,7 +294,7 @@ const FontFace* Font::GetFace(int pointSize)
         for (int y = 0; y < newFace.glyphs_[i].height_; ++y)
         {
             unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-            unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
+            unsigned char* dest = imageData + texWidth * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
             
             for (int x = 0; x < newFace.glyphs_[i].width_; ++x)
             {
@@ -318,14 +304,14 @@ const FontFace* Font::GetFace(int pointSize)
         }
         if (glyphOpacity)
         {
-            sumax_Opacity += glyphOpacity;
+            sumMaxOpacity += glyphOpacity;
             ++samples;
         }
     }
     
     // Clamp the minimum possible value to avoid overbrightening
     if (samples)
-        avgMaxOpacity = Max(sumax_Opacity / samples, 128);
+        avgMaxOpacity = Max(sumMaxOpacity / samples, 128);
     
     if (avgMaxOpacity < 255)
     {
@@ -335,7 +321,7 @@ const FontFace* Font::GetFace(int pointSize)
         {
             for (int y = 0; y < newFace.glyphs_[i].height_; ++y)
             {
-                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
+                unsigned char* dest = imageData + texWidth * (y + newFace.glyphs_[i].y_) + newFace.glyphs_[i].x_;
                 for (int x = 0; x < newFace.glyphs_[i].width_; ++x)
                 {
                     int pixel = dest[x];
@@ -345,8 +331,16 @@ const FontFace* Font::GetFace(int pointSize)
         }
     }
     
-    texture->Unlock();
     FT_Done_Face(face);
+    
+    // Create the texture and load the image into it
+    SharedPtr<Texture2D> texture(new Texture2D(context_));
+    texture->SetNumLevels(1); // No mipmaps
+    texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
+    texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
+    texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+    if ((!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat())) || (!texture->Load(image)))
+        return 0;
     
     SetMemoryUse(GetMemoryUse() + texWidth * texHeight);
     newFace.texture_ = StaticCast<Texture>(texture);

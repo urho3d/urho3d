@@ -523,7 +523,7 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
         width >>= 1;
         height >>= 1;
     }
-    int searchKey = (width << 12) | height;
+    int searchKey = (width << 16) | height;
     
     Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
     if (i != occlusionBuffers_.End())
@@ -540,7 +540,7 @@ void Renderer::Update(float timeStep)
     
     // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
     // and if the device is lost, the updates queue up, causing memory use to rise constantly
-    if ((!graphics_) || (graphics_->IsDeviceLost()))
+    if ((!graphics_) || (!graphics_->IsInitialized()) || (graphics_->IsDeviceLost()))
         return;
     
     // Advance frame number & time, set up the frameinfo structure, and reset views & stats
@@ -692,6 +692,7 @@ void Renderer::Initialize()
     cache_ = cache;
     
     // Check shader model support
+    #ifndef USE_OPENGL
     if (graphics_->GetSM3Support())
     {
         shaderPath_ = "Shaders/SM3/";
@@ -704,6 +705,13 @@ void Renderer::Initialize()
         vsFormat_ = ".vs2";
         psFormat_ = ".ps2";
     }
+    #else
+    {
+        shaderPath_ = "Shaders/OGL/";
+        vsFormat_ = ".vert";
+        psFormat_ = ".frag";
+    }
+    #endif
     
     defaultLightRamp_ = cache->GetResource<Texture2D>("Textures/Ramp.png");
     defaultLightSpot = cache->GetResource<Texture2D>("Textures/Spot.png");
@@ -764,7 +772,7 @@ OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOcc
         width >>= 1;
         height >>= 1;
     }
-    int searchKey = (width << 12) | height;
+    int searchKey = (width << 16) | height;
     
     SharedPtr<OcclusionBuffer> buffer;
     Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
@@ -1270,6 +1278,26 @@ bool Renderer::CreateShadowMaps()
         return true;
     }
     
+    #ifdef USE_OPENGL
+    
+    // Create shadow maps only. Color rendertargets are not needed
+    unsigned size = shadowMapSize_;
+    for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
+    {
+        for (unsigned j = 0; j < shadowMaps_[i].Size(); ++j)
+        {
+            if (!shadowMaps_[i][j])
+                shadowMaps_[i][j] = new Texture2D(context_);
+            if (!shadowMaps_[i][j]->SetSize(size, size, shadowMapFormat, TEXTURE_DEPTHSTENCIL))
+                return false;
+            shadowMaps_[i][j]->SetFilterMode(FILTER_BILINEAR);
+            shadowMaps_[i][j]->SetShadowCompare(true);
+        }
+        size >>= 1;
+    }
+    
+    #else
+    
     // Create shadow maps and dummy color rendertargets
     unsigned size = shadowMapSize_;
     for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
@@ -1292,6 +1320,8 @@ bool Renderer::CreateShadowMaps()
         }
         size >>= 1;
     }
+    
+    #endif
     
     return true;
 }

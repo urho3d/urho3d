@@ -23,48 +23,6 @@
 
 #pragma once
 
-#include "GraphicsDefs.h"
-#include "RefCounted.h"
-#include "Vector.h"
-
-#include <d3d9.h>
-
-class Graphics;
-class VertexBuffer;
-
-/// Element in the vertex declaration
-struct VertexDeclarationElement
-{
-    /// Stream index
-    unsigned stream_;
-    /// Element type
-    VertexElement element_;
-    /// Element offset
-    unsigned offset_;
-};
-
-/// Vertex declaration
-class VertexDeclaration : public RefCounted
-{
-public:
-    /// Construct with graphics subsystem pointer and vertex element mask
-    VertexDeclaration(Graphics* graphics, unsigned elementMask);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
-    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
-    /// Destruct
-    ~VertexDeclaration();
-    
-    /// Return Direct3D vertex declaration
-    IDirect3DVertexDeclaration9* GetDeclaration() const { return declaration_; }
-    
-private:
-    /// Create declaration
-    void Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements);
-    /// Release declaration
-    void Release();
-    
-    /// Direct3D vertex declaration
-    IDirect3DVertexDeclaration9* declaration_;
-};
+#ifndef USE_OPENGL
+#include "D3D9/D3D9VertexDeclaration.h"
+#endif

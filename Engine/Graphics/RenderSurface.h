@@ -23,79 +23,8 @@
 
 #pragma once
 
-#include "Rect.h"
-#include "GraphicsDefs.h"
-#include "SharedPtr.h"
-
-class Camera;
-class Scene;
-class Texture;
-
-/// Viewport definition either for a RenderSurface or the backbuffer
-struct Viewport
-{
-    /// Construct with defaults
-    Viewport();
-    /// Construct with a full rectangle
-    Viewport(Scene* scene, Camera* camera);
-    /// Construct with a specified rectangle
-    Viewport(Scene* scene, Camera* camera, const IntRect& rect);
-    
-    /// Scene pointer
-    WeakPtr<Scene> scene_;
-    /// Camera pointer
-    WeakPtr<Camera> camera_;
-    /// Viewport rectangle
-    IntRect rect_;
-};
-
-/// Color or depth stencil surface that can be rendered into
-class RenderSurface : public RefCounted
-{
-    friend class Texture2D;
-    friend class TextureCube;
-    
-public:
-    /// Construct with parent texture
-    RenderSurface(Texture* parentTexture);
-    /// Destruct
-    ~RenderSurface();
-    
-    /// Set viewport for auxiliary view rendering
-    void SetViewport(const Viewport& viewport);
-    /// Set linked color buffer
-    void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// Set linked depth buffer
-    void SetLinkedDepthBuffer(RenderSurface* depthBuffer);
-    /// Release surface
-    void Release();
-    
-    /// Return parent texture
-    Texture* GetParentTexture() const { return parentTexture_; }
-    /// Return Direct3D surface
-    void* GetSurface() const { return surface_; }
-    /// Return width
-    int GetWidth() const;
-    /// Return height
-    int GetHeight() const;
-    /// Return usage
-    TextureUsage GetUsage() const;
-    /// Return auxiliary view rendering viewport
-    const Viewport& GetViewport() const { return viewport_; }
-    /// Return linked color buffer
-    RenderSurface* GetLinkedRenderTarget() const { return linkedRenderTarget_; }
-    /// Return linked depth buffer
-    RenderSurface* GetLinkedDepthBuffer() const { return linkedDepthBuffer_; }
-    
-private:
-    /// Parent texture
-    Texture* parentTexture_;
-    /// Direct3D surface
-    void* surface_;
-    /// Viewport
-    Viewport viewport_;
-    /// Linked color buffer
-    WeakPtr<RenderSurface> linkedRenderTarget_;
-    /// Linked depth buffer
-    WeakPtr<RenderSurface> linkedDepthBuffer_;
-};
+#ifdef USE_OPENGL
+#include "OGL/OGLRenderSurface.h"
+#else
+#include "D3D9/D3D9RenderSurface.h"
+#endif

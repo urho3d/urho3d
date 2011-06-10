@@ -247,9 +247,9 @@ public:
             return false;
         
         if (previous)
-            previous->next_ = node->next_;
+            previous->down_ = node->down_;
         else
-            ptrs_[hashKey] = node->next_;
+            ptrs_[hashKey] = node->down_;
         EraseNode(node);
         
         return true;

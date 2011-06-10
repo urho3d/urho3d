@@ -188,8 +188,13 @@ Ray Camera::GetScreenRay(float x, float y)
     x = 2.0f * x - 1.0f;
     y = 1.0f - 2.0f * y;
     
+    #ifdef USE_OPENGL
+    Vector3 near(x, y, -1.0f);
+    Vector3 far(x, y, 1.0f);
+    #else
     Vector3 near(x, y, 0.0f);
     Vector3 far(x, y, 1.0f);
+    #endif
     
     Ray ray;
     ray.origin_ = viewProjInverse * near;
@@ -219,12 +224,18 @@ Matrix4 Camera::GetProjection(bool enableOffset) const
         float nearClip = GetNearClip();
         float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
         float w = h / aspectRatio_;
+        #ifdef USE_OPENGL
+        float q = (farClip_ + nearClip) / (farClip_ - nearClip);
+        float r = -2.0f * farClip_ * nearClip / (farClip_ - nearClip);
+        #else
         float q = farClip_ / (farClip_ - nearClip);
+        float r = -q * nearClip;
+        #endif
         
         ret.m00_ = w;
         ret.m11_ = h;
         ret.m22_ = q;
-        ret.m23_ = -q * nearClip;
+        ret.m23_ = r;
         ret.m32_ = 1.0f;
         
         if (enableOffset)
@@ -238,11 +249,18 @@ Matrix4 Camera::GetProjection(bool enableOffset) const
         // Disregard near clip, because it does not affect depth precision as with perspective projection
         float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
         float w = h / aspectRatio_;
+        #ifdef USE_OPENGL
+        float q = 2.0f / farClip_;
+        float r = -1.0f;
+        #else
         float q = 1.0f / farClip_;
+        float r = 0.0f;
+        #endif
         
         ret.m00_ = w;
         ret.m11_ = h;
         ret.m22_ = q;
+        ret.m23_ = r;
         ret.m33_ = 1.0f;
         
         if (enableOffset)

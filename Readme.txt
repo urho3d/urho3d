@@ -1,5 +1,5 @@
-Urho3D - a Win32/Direct3D9 rendering and game engine
-----------------------------------------------------
+Urho3D - a rendering and game engine
+------------------------------------
 
 http://urho3d.googlecode.com
 
@@ -37,6 +37,7 @@ Urho3D uses the following third-party libraries:
 - AngelScript 2.21.0 WIP (http://www.angelcode.com/angelscript/)
 - ENet 1.3.1 (http://enet.bespin.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
+- GLee 5.4 (http://elf-stone.com/)
 - Open Asset Import Library 2.0.863 (http://assimp.sourceforge.net/)
 - Open Dynamics Engine, svn rev 1806 (http://www.ode.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/

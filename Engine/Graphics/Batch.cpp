@@ -167,8 +167,13 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             spotProj.m32_ = 1.0f;
             
             Matrix4 texAdjust(Matrix4::IDENTITY);
+            #ifdef USE_OPENGL
+            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+            texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
+            #else
             texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+            #endif
             
             graphics->SetShaderParameter(VSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse());
         }
@@ -241,8 +246,13 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             viewPos.SetTranslation(camera_->GetWorldPosition());
             
             Matrix4 texAdjust(Matrix4::IDENTITY);
+            #ifdef USE_OPENGL
+            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+            texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
+            #else
             texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.0f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+            #endif
             
             graphics->SetShaderParameter(PSP_SPOTPROJ, texAdjust * spotProj * spotView.Inverse() * viewPos);
         }
@@ -262,9 +272,15 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             Matrix4 shadowProj(shadowCamera->GetProjection());
             
             Matrix4 texAdjust(Matrix4::IDENTITY);
+            
+            #ifdef USE_OPENGL
+            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+            texAdjust.SetScale(Vector3(0.5f, 0.5f, 0.5f));
+            #else
             float offset = 0.5f + 0.5f / (float)shadowMap->GetWidth();
             texAdjust.SetTranslation(Vector3(offset, offset, 0.0f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+            #endif
             
             graphics->SetShaderParameter(VSP_SHADOWPROJ, texAdjust * shadowProj * shadowView);
         }
@@ -296,9 +312,14 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             viewPos.SetTranslation(camera_->GetWorldPosition());
             
             Matrix4 texAdjust(Matrix4::IDENTITY);
+            #ifdef USE_OPENGL
+            texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
+            texAdjust.SetScale(Vector3(0.5f, 0.5f, 0.5f));
+            #else
             float offset = 0.5f + 0.5f / (float)shadowMap->GetWidth();
             texAdjust.SetTranslation(Vector3(offset, offset, 0.0f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
+            #endif
             
             graphics->SetShaderParameter(PSP_SHADOWPROJ, texAdjust * shadowProj * shadowView * viewPos);
         }
