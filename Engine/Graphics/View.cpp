@@ -857,7 +857,7 @@ void View::RenderBatchesDeferred()
     shaderParameters_[PSP_GBUFFERVIEWPORT] = viewportSize;
     
     {
-        // Render G-buffer
+        // Clear and render the G-buffer
         PROFILE(RenderGBuffer);
         
         graphics_->ClearLastParameterSources();
@@ -866,7 +866,7 @@ void View::RenderBatchesDeferred()
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
         #ifdef USE_OPENGL
-        // On OpenGL, clear the depth and diffuse albedo buffers normally
+        // On OpenGL, clear the diffuse and depth buffers normally
         if (deferred)
         {
             graphics_->SetRenderTarget(0, diffBuffer);
@@ -882,6 +882,7 @@ void View::RenderBatchesDeferred()
             graphics_->SetRenderTarget(0, normalBuffer);
         }
         #else
+        // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
         if (deferred)
         {
             graphics_->SetRenderTarget(0, diffBuffer);
@@ -893,7 +894,6 @@ void View::RenderBatchesDeferred()
             graphics_->SetRenderTarget(0, normalBuffer);
             graphics_->SetRenderTarget(1, depthBuffer);
         }
-        // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
         graphics_->SetDepthStencil(lightDepthStencil);
         graphics_->SetViewport(screenRect_);
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
@@ -947,8 +947,14 @@ void View::RenderBatchesDeferred()
         graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
         graphics_->SetViewport(screenRect_);
         
+        String pixelShaderName = "Deferred/Ambient";
+        #ifdef USE_OPENGL
+        if (camera_->IsOrthographic())
+            pixelShaderName += "Ortho";
+        #endif
+        
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Deferred/Ambient"),
-            renderer_->GetPixelShader("Deferred/Ambient"), false, shaderParameters_);
+            renderer_->GetPixelShader(pixelShaderName), false, shaderParameters_);
     }
     else
     {

@@ -245,11 +245,13 @@ void UI::Render()
     projection.m33_ = 1.0f;
     
     graphics_->ResetRenderTargets();
+    graphics_->SetAlphaTest(false);
     graphics_->SetCullMode(CULL_CCW);
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
     graphics_->SetStencilTest(false);
+    graphics_->ClearLastParameterSources();
     
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
@@ -276,9 +278,12 @@ void UI::Render()
         }
         
         graphics_->SetShaders(vs, ps);
-        graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
-        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-        graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
+        if (graphics_->NeedParameterUpdate(VSP_MODEL, this))
+            graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+        if (graphics_->NeedParameterUpdate(VSP_VIEWPROJ, this))
+            graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+        if (graphics_->NeedParameterUpdate(PSP_MATDIFFCOLOR, this))
+            graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
         
         batches_[i].Draw(graphics_);
     }

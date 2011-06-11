@@ -877,12 +877,7 @@ void Graphics::SetShaderParameter(ShaderParameter param, float value)
 
 void Graphics::SetShaderParameter(ShaderParameter param, const Color& color)
 {
-    if (shaderProgram_)
-    {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
-        if (info)
-            glUniform4fv(info->location_, 1, color.GetData());
-    }
+    SetShaderParameter(param, color.GetData(), 4);
 }
 
 void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3& matrix)

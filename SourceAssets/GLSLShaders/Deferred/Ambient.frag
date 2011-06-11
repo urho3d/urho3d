@@ -11,8 +11,15 @@ void main()
 
     vec3 ambientColor = cAmbientColor * diffInput.rgb;
 
+    #ifdef ORTHO
+        float linearDepth = depth;
+    #else
+        float linearDepth = ReconstructDepth(depth);
+    #endif
+
     // Store coarse depth to alpha channel for deferred antialiasing
-    gl_FragColor = vec4(ambientColor + GetFogFactor(depth) * cFogColor, depth);
+    gl_FragColor = vec4(ambientColor + GetFogFactor(linearDepth) * cFogColor, linearDepth);
+    
     // Copy a slightly biased depth value because of possible inaccuracy
     gl_FragDepth = min(texture2D(sDepthBuffer, vScreenPos).r + 0.000001, 1.0);
 }

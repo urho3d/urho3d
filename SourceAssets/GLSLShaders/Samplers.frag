@@ -27,3 +27,8 @@ float GetIntensity(vec3 color)
 {
     return dot(color, vec3(0.333, 0.333, 0.333));
 }
+
+float ReconstructDepth(float hwDepth)
+{
+    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
+}

@@ -1,8 +1,3 @@
-float ReconstructDepth(float hwDepth)
-{
-    return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
-}
-
 float GetDiffuseDir(vec3 normal, out vec3 lightDir)
 {
     lightDir = cLightDir;
