@@ -1441,20 +1441,21 @@ void Graphics::SetCullMode(CullMode mode)
 
 void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
 {
-    // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
-    // Zero depth bits may be returned if using the packed depth stencil format. Assume 24bit in that case
-    int depthBits = min(impl_->depthBits_, 23);
-    if (!depthBits)
-        depthBits = 23;
-    float adjustedConstantBias = constantBias * (float)(1 << (depthBits - 1));
-    
-    if ((adjustedConstantBias != constantDepthBias_) || (slopeScaledBias != slopeScaledDepthBias_))
+    if ((constantBias != constantDepthBias_) || (slopeScaledBias != slopeScaledDepthBias_))
     {
-        if ((adjustedConstantBias != 0.0f) || (slopeScaledBias != 0.0f))
+        if ((constantBias != 0.0f) || (slopeScaledBias != 0.0f))
         {
+            // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
+            // Zero depth bits may be returned if using the packed depth stencil format. Assume 24bit in that case
+            int depthBits = min(impl_->depthBits_, 23);
+            if (!depthBits)
+                depthBits = 23;
+            float adjustedConstantBias = constantBias * (float)(1 << (depthBits - 1));
+            float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
+            
             glEnable(GL_POLYGON_OFFSET_FILL);
             glEnable(GL_POLYGON_OFFSET_LINE);
-            glPolygonOffset(slopeScaledBias, adjustedConstantBias);
+            glPolygonOffset(adjustedSlopeScaledBias, adjustedConstantBias);
         }
         else
         {
@@ -1462,7 +1463,7 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
             glDisable(GL_POLYGON_OFFSET_LINE);
         }
         
-        constantDepthBias_ = adjustedConstantBias;
+        constantDepthBias_ = constantBias;
         slopeScaledDepthBias_ = slopeScaledBias;
     }
 }
