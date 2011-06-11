@@ -96,12 +96,12 @@ endmacro ()
 if (USE_OPENGL)
     macro (add_shader NAME)
         add_custom_command (
-            OUTPUT ../../Bin/CoreData/Shaders/OGL/${NAME}.vert
-            COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/OGL
+            OUTPUT ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert
+            COMMAND ../../Bin/GLShaderProcessor ${NAME}.xml ../../Bin/CoreData/Shaders/GLSL
             DEPENDS GLShaderProcessor ${NAME}.vert ${NAME}.frag Uniforms.vert Transform.vert ScreenPos.vert Uniforms.frag Samplers.frag Lighting.frag Fog.frag ${NAME}.xml
         )
-    
-        set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/OGL/${NAME}.vert)
+        
+        set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/GLSL/${NAME}.vert)
     endmacro ()
 else()
     macro (add_shader NAME)
@@ -110,13 +110,13 @@ else()
             COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM2 SM2
             DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl ScreenPos.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
         )
-    
+        
         add_custom_command (
             OUTPUT ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3
             COMMAND ../../Bin/ShaderCompiler ${NAME}.xml ../../Bin/CoreData/Shaders/SM3 SM3
             DEPENDS ShaderCompiler Uniforms.hlsl Samplers.hlsl Transform.hlsl ScreenPos.hlsl Lighting.hlsl Fog.hlsl ${NAME}.hlsl ${NAME}.xml
         )
-    
+        
         set (ALL_SHADERS ${ALL_SHADERS} ../../Bin/CoreData/Shaders/SM2/${NAME}.vs2 ../../Bin/CoreData/Shaders/SM3/${NAME}.vs3)
     endmacro ()
 endif ()
@@ -153,10 +153,10 @@ add_subdirectory (Tools/RampGenerator)
 add_subdirectory (Urho3D)
 
 if (USE_OPENGL)
-    add_subdirectory (SourceAssets/OGLShaders)
+    add_subdirectory (SourceAssets/GLSLShaders)
     add_subdirectory (ThirdParty/GLee)
     add_subdirectory (Tools/GLShaderProcessor)
 else ()
-    add_subdirectory (SourceAssets/D3D9Shaders)
+    add_subdirectory (SourceAssets/HLSLShaders)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()

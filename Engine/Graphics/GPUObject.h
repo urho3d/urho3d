@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLGPUObject.h"
+#include "OpenGL/OGLGPUObject.h"
 #else
-#include "D3D9/D3D9GPUObject.h"
+#include "Direct3D9/D3D9GPUObject.h"
 #endif

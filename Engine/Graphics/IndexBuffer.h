@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLIndexBuffer.h"
+#include "OpenGL/OGLIndexBuffer.h"
 #else
-#include "D3D9/D3D9IndexBuffer.h"
+#include "Direct3D9/D3D9IndexBuffer.h"
 #endif

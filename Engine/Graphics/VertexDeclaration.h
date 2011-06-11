@@ -24,5 +24,5 @@
 #pragma once
 
 #ifndef USE_OPENGL
-#include "D3D9/D3D9VertexDeclaration.h"
+#include "Direct3D9/D3D9VertexDeclaration.h"
 #endif

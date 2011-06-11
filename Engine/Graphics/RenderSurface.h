@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLRenderSurface.h"
+#include "OpenGL/OGLRenderSurface.h"
 #else
-#include "D3D9/D3D9RenderSurface.h"
+#include "Direct3D9/D3D9RenderSurface.h"
 #endif

@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLShader.h"
+#include "OpenGL/OGLShader.h"
 #else
-#include "D3D9/D3D9Shader.h"
+#include "Direct3D9/D3D9Shader.h"
 #endif

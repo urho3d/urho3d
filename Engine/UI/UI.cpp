@@ -403,8 +403,8 @@ void UI::Initialize()
     rootElement_->SetSize(graphics->GetWidth(), graphics->GetHeight());
     
     #ifdef USE_OPENGL
-    Shader* basicVS = cache->GetResource<Shader>("Shaders/OGL/Basic.vert");
-    Shader* basicPS = cache->GetResource<Shader>("Shaders/OGL/Basic.frag");
+    Shader* basicVS = cache->GetResource<Shader>("Shaders/GLSL/Basic.vert");
+    Shader* basicPS = cache->GetResource<Shader>("Shaders/GLSL/Basic.frag");
     #else
     Shader* basicVS = cache->GetResource<Shader>("Shaders/SM2/Basic.vs2");
     Shader* basicPS = cache->GetResource<Shader>("Shaders/SM2/Basic.ps2");

@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLVertexBuffer.h"
+#include "OpenGL/OGLVertexBuffer.h"
 #else
-#include "D3D9/D3D9VertexBuffer.h"
+#include "Direct3D9/D3D9VertexBuffer.h"
 #endif

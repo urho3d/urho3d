@@ -24,7 +24,7 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLTexture.h"
+#include "OpenGL/OGLTexture.h"
 #else
-#include "D3D9/D3D9Texture.h"
+#include "Direct3D9/D3D9Texture.h"
 #endif

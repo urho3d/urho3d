@@ -707,7 +707,7 @@ void Renderer::Initialize()
     }
     #else
     {
-        shaderPath_ = "Shaders/OGL/";
+        shaderPath_ = "Shaders/GLSL/";
         vsFormat_ = ".vert";
         psFormat_ = ".frag";
     }

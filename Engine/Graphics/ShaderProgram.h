@@ -24,5 +24,5 @@
 #pragma once
 
 #ifdef USE_OPENGL
-#include "OGL/OGLShaderProgram.h"
+#include "OpenGL/OGLShaderProgram.h"
 #endif
