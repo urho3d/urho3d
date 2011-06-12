@@ -943,6 +943,7 @@ void View::RenderBatchesDeferred()
         graphics_->ResetRenderTarget(2);
         #endif
         graphics_->SetDepthStencil(lightDepthStencil);
+        graphics_->Clear(CLEAR_STENCIL);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
         graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
         graphics_->SetViewport(screenRect_);

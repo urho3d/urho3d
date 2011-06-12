@@ -234,23 +234,7 @@ static const String lightPSVariations[] =
     "OrthoPointMask",
     "OrthoPointMaskSpec",
     "OrthoPointMaskShadow",
-    "OrthoPointMaskShadowSpec",
-    "LinearDir",
-    "LinearDirSpec",
-    "LinearDirShadow",
-    "LinearDirShadowSpec",
-    "LinearSpot",
-    "LinearSpotSpec",
-    "LinearSpotShadow",
-    "LinearSpotShadowSpec",
-    "LinearPoint",
-    "LinearPointSpec",
-    "LinearPointShadow",
-    "LinearPointShadowSpec",
-    "LinearPointMask",
-    "LinearPointMaskSpec",
-    "LinearPointMaskShadow",
-    "LinearPointMaskShadowSpec"
+    "OrthoPointMaskShadowSpec"
 };
 
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;

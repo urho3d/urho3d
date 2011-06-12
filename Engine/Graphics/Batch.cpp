@@ -218,15 +218,15 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
         
         if (graphics->NeedParameterUpdate(PSP_LIGHTVECROT, light_))
         {
-            Matrix3x4 light_VecRot;
+            Matrix3x4 lightVecRot;
             // Use original light if available (split lights)
             Light* original = light_->GetOriginalLight();
             if (!original)
-                light_VecRot = Matrix3x4(Vector3::ZERO, light_->GetWorldRotation(), Vector3::UNITY);
+                lightVecRot = Matrix3x4(Vector3::ZERO, light_->GetWorldRotation(), Vector3::UNITY);
             else
-                light_VecRot = Matrix3x4(Vector3::ZERO, original->GetWorldRotation(), Vector3::UNITY);
+                lightVecRot = Matrix3x4(Vector3::ZERO, original->GetWorldRotation(), Vector3::UNITY);
             
-            graphics->SetShaderParameter(PSP_LIGHTVECROT, light_VecRot);
+            graphics->SetShaderParameter(PSP_LIGHTVECROT, lightVecRot);
         }
         
         if (graphics->NeedParameterUpdate(PSP_SPOTPROJ, light_))
