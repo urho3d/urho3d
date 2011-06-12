@@ -397,10 +397,6 @@ bool Graphics::BeginFrame()
     SetColorWrite(true);
     SetDepthWrite(true);
     
-    // Reset immediate mode vertex buffer positions
-    for (Map<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
-        i->second_ = 0;
-    
     numPrimitives_ = 0;
     numBatches_ = 0;
     
@@ -1654,7 +1650,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
     unsigned newSize = IMMEDIATE_BUFFER_DEFAULT_SIZE;
     while (newSize < vertexCount)
         newSize <<= 1;
-        
+    
     // See if buffer exists for this vertex format. If not, create new
     if (immediateVertexBuffers_.Find(elementMask) == immediateVertexBuffers_.End())
     {
@@ -1662,7 +1658,6 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
         VertexBuffer* newBuffer = new VertexBuffer(context_);
         newBuffer->SetSize(newSize, elementMask, true);
         immediateVertexBuffers_[elementMask] = newBuffer;
-        immediateVertexBufferPos_[elementMask] = 0;
     }
     
     // Resize buffer if it is too small
@@ -1671,31 +1666,18 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
     {
         LOGDEBUG("Resized immediate vertex buffer to " + String(newSize));
         buffer->SetSize(newSize, elementMask);
-        immediateVertexBufferPos_[elementMask] = 0;
     }
     
-    // Get the current lock position for the buffer
-    unsigned bufferPos = immediateVertexBufferPos_[elementMask];
-    if (bufferPos + vertexCount >= buffer->GetVertexCount())
-        bufferPos = 0;
-    
-    LockMode lockMode = LOCK_DISCARD;
-    if (bufferPos != 0)
-        lockMode = LOCK_NOOVERWRITE;
+    // Resize the corresponding CPU buffer if it is too small
+    if (immediateVertexData_.Size() < vertexCount * buffer->GetVertexSize())
+        immediateVertexData_.Resize(vertexCount * buffer->GetVertexSize());
     
     // Note: the data pointer gets pre-decremented here, because the first call to DefineVertex() will increment it
-    immediateDataPtr_ = ((unsigned char*)buffer->Lock(bufferPos, vertexCount, lockMode)) - buffer->GetVertexSize();
+    immediateDataPtr_ = &immediateVertexData_[0] - buffer->GetVertexSize();
     immediateBuffer_ = buffer;
     immediateType_= type;
-    immediateStartPos_ = bufferPos;
     immediateVertexCount_ = vertexCount;
     immediateCurrentVertex_ = 0;
-    
-    // Store new buffer position for next lock into the same buffer
-    bufferPos += vertexCount;
-    if (bufferPos >= buffer->GetVertexCount())
-        bufferPos = 0;
-    immediateVertexBufferPos_[elementMask] = bufferPos;
     
     return true;
 }
@@ -1770,9 +1752,9 @@ void Graphics::EndImmediate()
 {
     if (immediateBuffer_)
     {
-        immediateBuffer_->Unlock();
+        immediateBuffer_->SetData(&immediateVertexData_[0], immediateVertexCount_);
         SetVertexBuffer(immediateBuffer_);
-        Draw(immediateType_, immediateStartPos_, immediateVertexCount_);
+        Draw(immediateType_, 0, immediateVertexCount_);
         immediateBuffer_ = 0;
     }
 }
@@ -2021,29 +2003,19 @@ bool Graphics::OpenWindow(int width, int height)
 bool Graphics::SetScreenMode(int newWidth, int newHeight)
 {
     inModeChange_ = true;
-    bool success = true;
     
-    IntVector2 desktopResolution = impl_->GetDesktopResolution();
-    unsigned bitsPerPixel = impl_->GetDesktopBitsPerPixel();
+    DEVMODE dmScreenSettings;
+    ZeroMemory(&dmScreenSettings, sizeof(dmScreenSettings));
+    dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+    dmScreenSettings.dmPelsWidth = newWidth;
+    dmScreenSettings.dmPelsHeight = newHeight;
+    dmScreenSettings.dmBitsPerPel = 32;
+    dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
     
-    // Switch resolution only if necessary
-    if ((desktopResolution.x_ != newWidth) || (desktopResolution.y_ != newHeight) || (bitsPerPixel != 32))
-    {
-        DEVMODE dmScreenSettings;
-        ZeroMemory(&dmScreenSettings, sizeof(dmScreenSettings));
-        dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-        dmScreenSettings.dmPelsWidth = newWidth;
-        dmScreenSettings.dmPelsHeight = newHeight;
-        dmScreenSettings.dmBitsPerPel = 32;
-        dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-        
-        success = ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
-        if (success)
-            fullscreenModeSet_ = true;
-    }
-    else
+    bool success = ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
+    if (success)
         fullscreenModeSet_ = true;
-    
+
     inModeChange_ = false;
     return success;
 }

@@ -87,6 +87,16 @@ bool IndexBuffer::SetSize(unsigned indexCount, unsigned indexSize, bool dynamic)
 
 bool IndexBuffer::SetData(const void* data)
 {
+    return SetData(data, indexCount_);
+}
+
+bool IndexBuffer::SetData(const void* data, unsigned indexCount)
+{
+    if (!indexCount)
+    {
+        LOGERROR("Null size for index buffer data");
+        return false;
+    }
     if (!data)
     {
         LOGERROR("Null pointer for index buffer data");
@@ -96,10 +106,12 @@ bool IndexBuffer::SetData(const void* data)
     if (locked_)
         Unlock();
     
+    indexCount_ = indexCount;
+    
     if (object_)
     {
         graphics_->SetIndexBuffer(this);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexCount_ * indexSize_, data);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         return true;
     }
     else if (fallbackData_)

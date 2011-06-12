@@ -418,8 +418,6 @@ private:
     unsigned numBatches_;
     /// Immediate rendering primitive type
     PrimitiveType immediateType_;
-    /// Immediate vertex buffer start position
-    unsigned immediateStartPos_;
     /// Immediate rendering vertex buffer size
     unsigned immediateVertexCount_;
     /// Immediate rendering vertex number
@@ -432,8 +430,8 @@ private:
     Vector<GPUObject*> gpuObjects_;
     /// Immediate rendering vertex buffers by vertex element mask
     Map<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
-    /// Immediate rendering vertex buffer start positions
-    Map<unsigned, unsigned> immediateVertexBufferPos_;
+    /// Immediate rendering CPU-side data buffer
+    PODVector<unsigned char> immediateVertexData_;
     /// Deferred rendering diffuse buffer
     SharedPtr<Texture2D> diffBuffer_;
     /// Deferred rendering normal buffer

@@ -174,6 +174,16 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
 
 bool VertexBuffer::SetData(const void* data)
 {
+    return SetData(data, vertexCount_);
+}
+
+bool VertexBuffer::SetData(const void* data, unsigned vertexCount)
+{
+    if (!vertexCount)
+    {
+        LOGERROR("Null size for vertex buffer data");
+        return false;
+    }
     if (!data)
     {
         LOGERROR("Null pointer for vertex buffer data");
@@ -183,10 +193,12 @@ bool VertexBuffer::SetData(const void* data)
     if (locked_)
         Unlock();
     
+    vertexCount_ = vertexCount;
+    
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexCount_ * vertexSize_, data);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         return true;
     }
     else if (fallbackData_)
