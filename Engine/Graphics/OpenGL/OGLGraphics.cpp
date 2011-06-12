@@ -1036,8 +1036,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if (((renderTargets_[0]) && (renderTargets_[0]->GetParentTexture() == texture)) ||
-            ((depthStencil_) && (depthStencil_->GetParentTexture() == texture)))
+        if ((renderTargets_[0]) && (renderTargets_[0]->GetParentTexture() == texture))
             texture = texture->GetBackupTexture();
         // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
         // but should still not sample it either
