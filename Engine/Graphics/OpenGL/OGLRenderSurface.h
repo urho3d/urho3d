@@ -56,8 +56,8 @@ class RenderSurface : public RefCounted
     friend class TextureCube;
     
 public:
-    /// Construct with parent texture
-    RenderSurface(Texture* parentTexture);
+    /// Construct with parent texture and target
+    RenderSurface(Texture* parentTexture, unsigned target);
     /// Destruct
     ~RenderSurface();
     
@@ -72,8 +72,8 @@ public:
     
     /// Return parent texture
     Texture* GetParentTexture() const { return parentTexture_; }
-    /// Return Direct3D surface
-    void* GetSurface() const { return surface_; }
+    /// Return surface's OpenGL target
+    unsigned GetTarget() const { return target_; }
     /// Return width
     int GetWidth() const;
     /// Return height
@@ -90,8 +90,8 @@ public:
 private:
     /// Parent texture
     Texture* parentTexture_;
-    /// Direct3D surface
-    void* surface_;
+    /// OpenGL target
+    unsigned target_;
     /// Viewport
     Viewport viewport_;
     /// Linked color buffer

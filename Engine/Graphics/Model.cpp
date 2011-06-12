@@ -94,6 +94,9 @@ bool Model::Load(Deserializer& source)
     
     SetMemoryUse(source.GetSize());
     
+    Vector<SharedArrayPtr<unsigned char> > rawVertexDatas;
+    Vector<SharedArrayPtr<unsigned char> > rawIndexDatas;
+    
     // Read vertex buffers
     unsigned numVertexBuffers = source.ReadUInt();
     for (unsigned i = 0; i < numVertexBuffers; ++i)
@@ -125,6 +128,18 @@ bool Model::Load(Deserializer& source)
             return false;
         
         vertexBuffers_.Push(buffer);
+        
+        // Copy the raw position data for CPU-side operations
+        SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
+        float* rawDest = (float*)rawVertexData.GetPtr();
+        for (unsigned i = 0; i < vertexCount; ++i)
+        {
+            float* rawSrc = (float*)&data[i * vertexSize];
+            *rawDest++ = *rawSrc++;
+            *rawDest++ = *rawSrc++;
+            *rawDest++ = *rawSrc++;
+        }
+        rawVertexDatas.Push(rawVertexData);
     }
     
     // Read index buffers
@@ -147,6 +162,11 @@ bool Model::Load(Deserializer& source)
             return false;
         
         indexBuffers_.Push(buffer);
+        
+        // Copy the raw index data for CPU-side operations
+        SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
+        memcpy(rawIndexData.GetPtr(), data, indexSize * indexCount);
+        rawIndexDatas.Push(rawIndexData);
     }
     
     // Read geometries
@@ -190,6 +210,7 @@ bool Model::Load(Deserializer& source)
             geometry->SetIndexBuffer(indexBuffers_[indexBufferRef]);
             geometry->SetDrawRange(type, indexStart, indexCount);
             geometry->SetLodDistance(distance);
+            geometry->SetRawData(rawVertexDatas[vertexBufferRef], rawIndexDatas[indexBufferRef]);
             
             geometryLodLevels.Push(geometry);
         }

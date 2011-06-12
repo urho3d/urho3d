@@ -20,7 +20,7 @@ void main()
             float depth = texture2D(sDepthBuffer, vScreenPos).r;
             vec3 worldPos = mix(vNearRay, vFarRay, depth);
         #else
-            float depth = ReconstructDepth(texture2D(sDepthBuffer, vScreenPos)).r;
+            float depth = ReconstructDepth(texture2D(sDepthBuffer, vScreenPos).r);
             vec3 worldPos = vFarRay * depth;
         #endif
         vec4 normalInput = texture2D(sNormalBuffer, vScreenPos);
@@ -30,7 +30,7 @@ void main()
             float depth = texture2DProj(sDepthBuffer, vScreenPos).r;
             vec3 worldPos = mix(vNearRay, vFarRay, depth) / vScreenPos.w;
         #else
-            float depth = ReconstructDepth(texture2DProj(sDepthBuffer, vScreenPos)).r;
+            float depth = ReconstructDepth(texture2DProj(sDepthBuffer, vScreenPos).r);
             vec3 worldPos = vFarRay * depth / vScreenPos.w;
         #endif
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);

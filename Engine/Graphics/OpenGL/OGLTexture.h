@@ -63,8 +63,8 @@ public:
     
     /// Return texture usage type
     TextureUsage GetUsage() const;
-    /// Return texture's OpenGL type
-    unsigned GetTextureType() const { return textureType_; }
+    /// Return texture's OpenGL target
+    unsigned GetTarget() const { return target_; }
     /// Return texture format
     unsigned GetFormat() const { return format_; }
     /// Return number of mipmap levels
@@ -104,8 +104,8 @@ protected:
     /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references
     void CheckTextureBudget(ShortStringHash type);
     
-    /// Texture's OpenGL type
-    unsigned textureType_;
+    /// OpenGL target
+    unsigned target_;
     /// Texture format
     unsigned format_;
     /// Current mipmap levels

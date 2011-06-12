@@ -135,8 +135,8 @@ void Texture::UpdateParameters()
         return;
     
    // Wrapping
-    glTexParameteri(textureType_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
-    glTexParameteri(textureType_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
+    glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
     
     TextureFilterMode filterMode = filterMode_;
     if (filterMode == FILTER_DEFAULT)
@@ -146,42 +146,42 @@ void Texture::UpdateParameters()
     switch (filterMode)
     {
     case FILTER_NEAREST:
-        glTexParameteri(textureType_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(textureType_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         break;
         
     case FILTER_BILINEAR:
         if (levels_ < 2)
-            glTexParameteri(textureType_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         else
-            glTexParameteri(textureType_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        glTexParameteri(textureType_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         break;
         
     case FILTER_ANISOTROPIC:
     case FILTER_TRILINEAR:
         if (levels_ < 2)
-            glTexParameteri(textureType_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         else
-            glTexParameteri(textureType_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(textureType_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         break;
     }
     
     // Anisotropy
-    glTexParameterf(textureType_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode_ == FILTER_ANISOTROPIC ?
+    glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT, filterMode_ == FILTER_ANISOTROPIC ?
         (float)graphics_->GetTextureAnisotropy() : 1.0f);
     
     // Shadow compare
     if (shadowCompare_)
     {
-        glTexParameteri(textureType_, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-        glTexParameteri(textureType_, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        glTexParameteri(target_, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+        glTexParameteri(target_, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     }
     else
-        glTexParameteri(textureType_, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+        glTexParameteri(target_, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     
-    glTexParameterfv(textureType_, GL_TEXTURE_BORDER_COLOR, borderColor_.GetData());
+    glTexParameterfv(target_, GL_TEXTURE_BORDER_COLOR, borderColor_.GetData());
     
     parametersDirty_ = false;
 }

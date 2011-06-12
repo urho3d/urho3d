@@ -87,16 +87,6 @@ bool IndexBuffer::SetSize(unsigned indexCount, unsigned indexSize, bool dynamic)
 
 bool IndexBuffer::SetData(const void* data)
 {
-    return SetData(data, indexCount_);
-}
-
-bool IndexBuffer::SetData(const void* data, unsigned indexCount)
-{
-    if (!indexCount)
-    {
-        LOGERROR("Null size for index buffer data");
-        return false;
-    }
     if (!data)
     {
         LOGERROR("Null pointer for index buffer data");
@@ -105,8 +95,6 @@ bool IndexBuffer::SetData(const void* data, unsigned indexCount)
     
     if (locked_)
         Unlock();
-    
-    indexCount_ = indexCount;
     
     if (object_)
     {
@@ -205,6 +193,10 @@ void IndexBuffer::Unlock()
         }
         locked_ = false;
     }
+}
+
+void IndexBuffer::ClearDataLost()
+{
 }
 
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)

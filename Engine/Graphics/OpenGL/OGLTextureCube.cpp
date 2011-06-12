@@ -46,7 +46,7 @@ OBJECTTYPESTATIC(TextureCube);
 TextureCube::TextureCube(Context* context) :
     Texture(context)
 {
-    textureType_ = GL_TEXTURE_CUBE_MAP;
+    target_ = GL_TEXTURE_CUBE_MAP;
     
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         faceMemoryUse_[i] = 0;
@@ -109,7 +109,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     if (usage == TEXTURE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-            renderSurfaces_[i] = new RenderSurface(this);
+            renderSurfaces_[i] = new RenderSurface(this, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
         
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
@@ -325,7 +325,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
-            glCompressedTexImage2D(textureType_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
+            glCompressedTexImage2D(target_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
             
             memoryUse += level.rows_ * level.rowSize_;
         }
@@ -379,8 +379,8 @@ bool TextureCube::Create()
         }
     }
     
-    glTexParameteri(textureType_, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(textureType_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
+    glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
     
     // Set initial parameters, then unbind the texture
     UpdateParameters();

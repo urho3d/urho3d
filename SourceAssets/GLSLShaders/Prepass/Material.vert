@@ -8,7 +8,7 @@ varying vec4 vScreenPos;
 
 void main()
 {
-    float4 pos;
+    vec4 pos;
     #if defined(SKINNED)
         pos = GetPositionSkinned(iPosition, iBlendWeights, iBlendIndices, gl_Position);
     #else
@@ -16,7 +16,7 @@ void main()
     #endif
 
     // Store world-oriented view position in case it is needed
-    vWorldPos = float4(pos.xyz - cCameraPos, GetDepth(gl_Position));
+    vWorldPos = vec4(pos.xyz - cCameraPos, GetDepth(gl_Position));
     vScreenPos = GetScreenPos(gl_Position);
     vTexCoord = GetTexCoord(iTexCoord);
 }

@@ -230,7 +230,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         const unsigned char* indexData;
         unsigned indexSize;
         
-        geom->LockRawData(vertexData, vertexSize, indexData, indexSize);
+        geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
         // Check for valid geometry data
         if ((!vertexData) || (!indexData))
             continue;
@@ -241,8 +241,6 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         // Draw and check for running out of triangles
         if (!buffer->Draw(GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
             success = false;
-        
-        geom->UnlockRawData();
         
         if (!success)
             break;

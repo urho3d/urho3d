@@ -154,6 +154,12 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
+void Geometry::SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData)
+{
+    rawVertexData_ = vertexData;
+    rawIndexData_ = indexData;
+}
+
 void Geometry::Draw(Graphics* graphics)
 {
     graphics->SetIndexBuffer(indexBuffer_);
@@ -187,59 +193,38 @@ unsigned short Geometry::GetBufferHash() const
     return hash;
 }
 
+
+void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize)
+{
+    if (rawVertexData_)
+    {
+        vertexData = rawVertexData_.GetPtr();
+        vertexSize = 3 * sizeof(float);
+    }
+    else
+    {
+        vertexData = 0;
+        vertexSize = 0;
+    }
+    
+    if ((rawIndexData_) && (indexBuffer_))
+    {
+        indexData = rawIndexData_.GetPtr();
+        indexSize = indexBuffer_->GetIndexSize();
+    }
+    else
+    {
+        indexData = 0;
+        indexSize = 0;
+    }
+}
+
 float Geometry::GetDistance(const Ray& ray)
 {
-    const unsigned char* vertexData;
-    const unsigned char* indexData;
-    unsigned vertexSize;
-    unsigned indexSize;
-    
-    LockRawData(vertexData, vertexSize, indexData, indexSize);
-    
-    if ((!indexData) || (!vertexData))
+    if ((!rawIndexData_) || (!rawVertexData_) || (!indexBuffer_))
         return M_INFINITY;
     
-    float nearest = ray.Distance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_);
-    UnlockRawData();
-    
-    return nearest;
-}
-
-void Geometry::LockRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize)
-{
-    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffers_.Size()))
-    {
-        VertexBuffer* positionBuffer = vertexBuffers_[positionBufferIndex_];
-        
-        vertexData = reinterpret_cast<const unsigned char*>(positionBuffer->Lock(0, positionBuffer->GetVertexCount(),
-            LOCK_READONLY));
-        vertexSize = positionBuffer->GetVertexSize();
-        indexData = reinterpret_cast<const unsigned char*>(indexBuffer_->Lock(0, indexBuffer_->GetIndexCount(), LOCK_READONLY));
-        indexSize = indexBuffer_->GetIndexSize();
-        if ((vertexData) && (indexData))
-            return;
-        
-        // One of the locks failed; unlock the other
-        if (vertexData)
-            positionBuffer->Unlock();
-        if (indexData)
-            indexBuffer_->Unlock();
-    }
-    
-    // Lock failed, or no buffers: return null pointers and sizes
-    vertexData = 0;
-    vertexSize = 0;
-    indexData = 0;
-    indexSize = 0;
-}
-
-void Geometry::UnlockRawData()
-{
-    if ((indexBuffer_) && (positionBufferIndex_ < vertexBuffers_.Size()))
-    {
-        vertexBuffers_[positionBufferIndex_]->Unlock();
-        indexBuffer_->Unlock();
-    }
+    return ray.Distance(rawVertexData_.GetPtr(), 3 * sizeof(float), rawIndexData_.GetPtr(), indexBuffer_->GetIndexSize(), indexStart_, indexCount_);
 }
 
 void Geometry::GetPositionBufferIndex()

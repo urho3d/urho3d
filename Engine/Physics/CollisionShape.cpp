@@ -101,7 +101,7 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         unsigned vertexSize;
         unsigned indexSize;
         
-        geom->LockRawData(vertexData, vertexSize, indexData, indexSize);
+        geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
         if ((!vertexData) || (!indexData))
             continue;
         
@@ -147,8 +147,6 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         
         firstVertex += vertexCount;
         firstIndex += indexCount;
-        
-        geom->UnlockRawData();
     }
 }
 
@@ -234,7 +232,7 @@ HeightfieldData::HeightfieldData(Model* model, IntVector2 numPoints, float thick
     unsigned vertexSize;
     unsigned indexSize;
     
-    geom->LockRawData(vertexData, vertexSize, indexData, indexSize);
+    geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
     if ((!vertexData) || (!indexData))
         return;
     
@@ -274,8 +272,6 @@ HeightfieldData::HeightfieldData(Model* model, IntVector2 numPoints, float thick
         if (vertex.y_ > heightData_[z * numPoints.x_ + x])
             heightData_[z * numPoints.x_ + x] = vertex.y_ * scale.y_;
     }
-    
-    geom->UnlockRawData();
     
     heightfield_ = dGeomHeightfieldDataCreate();
     

@@ -174,16 +174,6 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
 
 bool VertexBuffer::SetData(const void* data)
 {
-    return SetData(data, vertexCount_);
-}
-
-bool VertexBuffer::SetData(const void* data, unsigned vertexCount)
-{
-    if (!vertexCount)
-    {
-        LOGERROR("Null size for vertex buffer data");
-        return false;
-    }
     if (!data)
     {
         LOGERROR("Null pointer for vertex buffer data");
@@ -192,8 +182,6 @@ bool VertexBuffer::SetData(const void* data, unsigned vertexCount)
     
     if (locked_)
         Unlock();
-    
-    vertexCount_ = vertexCount;
     
     if (object_)
     {
@@ -329,6 +317,10 @@ void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
         return;
     
     memcpy(lockedMorphRange, morphRangeResetData_.GetPtr(), morphRangeCount_ * vertexSize_);
+}
+
+void VertexBuffer::ClearDataLost()
+{
 }
 
 void VertexBuffer::UpdateOffsets()

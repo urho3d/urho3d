@@ -41,7 +41,7 @@ Texture2D::Texture2D(Context* context) :
     Texture(context),
     followWindowSize_(false)
 {
-    textureType_ = GL_TEXTURE_2D;
+    target_ = GL_TEXTURE_2D;
 }
 
 Texture2D::~Texture2D()
@@ -116,7 +116,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         if (!graphics_->GetRenderTextureSupport())
             return false;
         
-        renderSurface_ = new RenderSurface(this);
+        renderSurface_ = new RenderSurface(this, GL_TEXTURE_2D);
         dynamic_ = true;
         
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
@@ -203,7 +203,7 @@ bool Texture2D::Load(SharedPtr<Image> image)
         
         for (unsigned i = 0; i < levels_; ++i)
         {
-            glTexImage2D(textureType_, i, format_, levelWidth, levelHeight, 0, GetExternalFormat(format_), GL_UNSIGNED_BYTE,
+            glTexImage2D(target_, i, format_, levelWidth, levelHeight, 0, GetExternalFormat(format_), GL_UNSIGNED_BYTE,
                 levelData);
             
             if (i < levels_ - 1)
@@ -242,7 +242,7 @@ bool Texture2D::Load(SharedPtr<Image> image)
         for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
-            glCompressedTexImage2D(textureType_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
+            glCompressedTexImage2D(target_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
             
             memoryUse += level.rows_ * level.rowSize_;
         }
@@ -281,11 +281,11 @@ bool Texture2D::Create()
     
     if ((format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) && (format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT) && 
         (format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT))
-        glTexImage2D(textureType_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
+        glTexImage2D(target_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
     
     // If depth format, get the depth size
     if (externalFormat == GL_DEPTH_COMPONENT)
-        glGetTexLevelParameteriv(textureType_, 0, GL_TEXTURE_DEPTH_SIZE, &depthBits_);
+        glGetTexLevelParameteriv(target_, 0, GL_TEXTURE_DEPTH_SIZE, &depthBits_);
     
     // Set mipmapping
     levels_ = requestedLevels_;
@@ -299,8 +299,8 @@ bool Texture2D::Create()
         }
     }
     
-    glTexParameteri(textureType_, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(textureType_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
+    glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
     
     // Set initial parameters, then unbind the texture
     UpdateParameters();

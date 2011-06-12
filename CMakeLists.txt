@@ -26,7 +26,7 @@ add_definitions (-DENABLE_PROFILING)
 
 # Enable use of OpenGL instead of Direct3D9. Later this will automatically depend on platform,
 # with Win32 defaulting to Direct3D9.
-# set (USE_OPENGL 1)
+set (USE_OPENGL 1)
 if (USE_OPENGL)
     add_definitions (-DUSE_OPENGL)
 endif ()

@@ -418,20 +418,22 @@ private:
     unsigned numBatches_;
     /// Immediate rendering primitive type
     PrimitiveType immediateType_;
-    /// Immediate rendering vertex buffer size
+    /// Immediate rendering total number of vertices
     unsigned immediateVertexCount_;
-    /// Immediate rendering vertex number
+    /// Immediate rendering vertex size
+    unsigned immediateVertexSize_;
+    /// Immediate rendering vertex element mask
+    unsigned immediateElementMask_;
+    /// Immediate rendering current vertex number
     unsigned immediateCurrentVertex_;
-    /// Immediate rendering vertex buffer in use
-    VertexBuffer* immediateBuffer_;
     /// Immediate rendering data pointer
     unsigned char* immediateDataPtr_;
+    /// Immediate rendering data buffer
+    PODVector<unsigned char> immediateVertexData_;
+    /// Immediate rendering element offsets
+    unsigned immediateElementOffsets_[MAX_IMMEDIATE_ELEMENTS];
     /// GPU objects
     Vector<GPUObject*> gpuObjects_;
-    /// Immediate rendering vertex buffers by vertex element mask
-    Map<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
-    /// Immediate rendering CPU-side data buffer
-    PODVector<unsigned char> immediateVertexData_;
     /// Deferred rendering diffuse buffer
     SharedPtr<Texture2D> diffBuffer_;
     /// Deferred rendering normal buffer

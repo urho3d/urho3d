@@ -422,9 +422,9 @@ private:
     PrimitiveType immediateType_;
     /// Immediate vertex buffer start position
     unsigned immediateStartPos_;
-    /// Immediate rendering vertex buffer size
+    /// Immediate rendering total number of vertices
     unsigned immediateVertexCount_;
-    /// Immediate rendering vertex number
+    /// Immediate rendering current vertex number
     unsigned immediateCurrentVertex_;
     /// Immediate rendering vertex buffer in use
     VertexBuffer* immediateBuffer_;

@@ -51,9 +51,9 @@ Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect) :
 {
 }
 
-RenderSurface::RenderSurface(Texture* parentTexture) :
+RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
     parentTexture_(parentTexture),
-    surface_(0)
+    target_(target)
 {
 }
 
@@ -87,19 +87,14 @@ void RenderSurface::Release()
     if (!graphics)
         return;
     
-    if (surface_)
+    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
     {
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        {
-            if (graphics->GetRenderTarget(i) == this)
-                graphics->ResetRenderTarget(i);
-        }
-        
-        if (graphics->GetDepthStencil() == this)
-            graphics->ResetDepthStencil();
-        
-        surface_ = 0;
+        if (graphics->GetRenderTarget(i) == this)
+            graphics->ResetRenderTarget(i);
     }
+    
+    if (graphics->GetDepthStencil() == this)
+        graphics->ResetDepthStencil();
 }
 
 int RenderSurface::GetWidth() const

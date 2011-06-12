@@ -23,8 +23,9 @@
 
 #pragma once
 
-#include "Object.h"
 #include "GraphicsDefs.h"
+#include "Object.h"
+#include "SharedArrayPtr.h"
 
 class IndexBuffer;
 class Ray;
@@ -54,6 +55,8 @@ public:
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// Set the LOD distance to report
     void SetLodDistance(float distance);
+    /// Set vertex and index raw data. Vertex raw data should contain positions only
+    void SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData);
     /// Draw
     void Draw(Graphics* graphics);
     
@@ -83,12 +86,10 @@ public:
     float GetLodDistance() const { return lodDistance_; }
     /// Return buffers' combined hash value for state sorting
     unsigned short GetBufferHash() const;
-    /// Return ray hit distance or infinity if no hit
+    /// Return raw vertex and index data for CPU operations, or null pointers if not available
+    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
+    /// Return ray hit distance or infinity if no hit. Requires raw data to be set
     float GetDistance(const Ray& ray);
-    /// Lock vertex and index data. Return null pointers if can not lock
-    void LockRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
-    /// Unlock vertex and index data
-    void UnlockRawData();
     
 private:
     /// Locate vertex buffer with position data
@@ -114,4 +115,8 @@ private:
     unsigned positionBufferIndex_;
     /// LOD distance
     float lodDistance_;
+    /// Raw vertex data (positions only) for CPU operations
+    SharedArrayPtr<unsigned char> rawVertexData_;
+    /// Raw index data for CPU operations
+    SharedArrayPtr<unsigned char> rawIndexData_;
 };
