@@ -205,12 +205,12 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             {
                 --nextRenderMode;
                 if (nextRenderMode < 0)
-                    nextRenderMode = 2;
+                    nextRenderMode = 1;
             }
             else
             {
                 ++nextRenderMode;
-                if (nextRenderMode > 2)
+                if (nextRenderMode > 1)
                     nextRenderMode = 0;
             }
 

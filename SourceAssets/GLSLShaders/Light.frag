@@ -1,6 +1,6 @@
-#include "../Uniforms.frag"
-#include "../Samplers.frag"
-#include "../Lighting.frag"
+#include "Uniforms.frag"
+#include "Samplers.frag"
+#include "Lighting.frag"
 
 #ifdef DIRLIGHT
 varying vec2 vScreenPos;
@@ -24,6 +24,7 @@ void main()
             vec3 worldPos = vFarRay * depth;
         #endif
         vec4 normalInput = texture2D(sNormalBuffer, vScreenPos);
+        vec4 diffInput = texture2D(sDiffBuffer, vScreenPos);
     #else
         #ifdef ORTHO
             float depth = texture2DProj(sDepthBuffer, vScreenPos).r;
@@ -33,6 +34,7 @@ void main()
             vec3 worldPos = vFarRay * depth / vScreenPos.w;
         #endif
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);
+        vec4 diffInput = texture2DProj(sDiffBuffer, vScreenPos);
     #endif
 
     // With specular, normalization greatly improves stability of reflections,
@@ -47,12 +49,11 @@ void main()
     vec3 lightDir;
     float diff;
 
-    // Accumulate lights at half intensity to allow 2x "overburn"
     #ifdef DIRLIGHT
-        diff = 0.5 * GetDiffuseDir(normal, lightDir) * GetSplitFade(depth);
+        diff = GetDiffuseDir(normal, lightDir) * GetSplitFade(depth);
     #else
         vec3 lightVec;
-        diff = 0.5 * GetDiffusePointOrSpot(normal, worldPos, lightDir, lightVec);
+        diff = GetDiffusePointOrSpot(normal, worldPos, lightDir, lightVec);
     #endif
 
     #ifdef SHADOW
@@ -62,25 +63,21 @@ void main()
 
     #ifdef SPOTLIGHT
         vec4 spotPos = cSpotProjPS * vec4(worldPos, 1.0);
-        vec3 shapeColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb : vec3(0.0, 0.0, 0.0);
-        lightColor = shapeColor * cLightColor.rgb;
+        lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0, 0.0, 0.0);
     #else
         #ifdef CUBEMASK
-            vec3 shapeColor = textureCube(sLightCubeMap, cLightVecRot * lightVec, cLightVecRot).rgb;
-            lightColor = shapeColor * cLightColor.rgb;
+            lightColor = textureCube(sLightCubeMap, cLightVecRot * lightVec).rgb * cLightColor.rgb;
         #else
             lightColor = cLightColor.rgb;
         #endif
     #endif
 
     #ifdef SPECULAR
-        #if defined(SPOTLIGHT) || defined(CUBEMASK)
-            float spec = shapeColor.g * GetSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
-        #else
-            float spec = GetSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
-        #endif
-        gl_FragColor = diff * vec4(lightColor, spec * cLightColor.a);
+        float spec = GetSpecular(normal, worldPos, lightDir, normalInput.a * 255.0);
+        vec3 finalColor = diff * lightColor * (diffInput.rgb + spec * diffInput.a * cLightColor.a);
+        gl_FragColor = vec4(finalColor, 0.0);
     #else
-        gl_FragColor = diff * vec4(lightColor, 0.0);
+        vec3 finalColor = diff * diffInput.rgb * lightColor;
+        gl_FragColor = vec4(finalColor, 0.0);
     #endif
 }

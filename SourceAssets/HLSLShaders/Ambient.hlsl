@@ -1,8 +1,8 @@
-#include "../Uniforms.hlsl"
-#include "../Samplers.hlsl"
-#include "../Transform.hlsl"
-#include "../ScreenPos.hlsl"
-#include "../Fog.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "ScreenPos.hlsl"
+#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     out float4 oPos : POSITION,

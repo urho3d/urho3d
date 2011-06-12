@@ -364,8 +364,6 @@ private:
     String psFormat_;
     /// Base directory for shaders
     String shaderPath_;
-    /// Light shader base name (deferred and prepass have different light shaders)
-    String lightShaderName_;
     /// Number of views
     unsigned numViews_;
     /// Number of shadow cameras

@@ -33,9 +33,7 @@
 
 static const String passNames[] =
 {
-    "deferred",
-    "prepass",
-    "material",
+    "gbuffer",
     "base",
     "litbase",
     "light",

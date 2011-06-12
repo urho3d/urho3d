@@ -167,7 +167,6 @@ Graphics::Graphics(Context* context) :
     deviceLost_(false),
     queryIssued_(false),
     deferredSupport_(false),
-    prepassSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),
     streamOffsetSupport_(false),
@@ -285,12 +284,8 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             return false;
     }
     
-    // Disable deferred / light prepass rendering if not supported
-    // Note: we do not fall back from deferred to light prepass, because there might not be shaders / materials
-    // defined for it. Instead fall back directly to forward rendering
+    // Disable deferred  rendering if not supported
     if ((mode == RENDER_DEFERRED) && (!deferredSupport_))
-        mode = RENDER_FORWARD;
-    if ((mode == RENDER_PREPASS) && (!prepassSupport_))
         mode = RENDER_FORWARD;
     
     if (multiSample >= (int)D3DMULTISAMPLE_2_SAMPLES)
@@ -298,7 +293,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     else
         multiSample = 0;
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
-    // In deferred or light prepass mode, it is used to control the edge filter
+    // In deferred rendering mode, it is used to control temporal antialiasing
     multiSample_ = multiSample;
     if (mode != RENDER_FORWARD)
         multiSample = 0;
@@ -1987,6 +1982,11 @@ unsigned Graphics::GetDepthFormat()
     return D3DFMT_R32F;
 }
 
+unsigned Graphics::GetDepthStencilFormat()
+{
+    return D3DFMT_D24S8;
+}
+
 bool Graphics::OpenWindow(int width, int height)
 {
     WNDCLASS wc;
@@ -2056,8 +2056,8 @@ bool Graphics::CreateInterface()
         return false;
     }
     
-    // Check supported features: Shader Model 3, deferred / light prepass rendering, hardware depth texture, shadow map,
-    // dummy color surface, stream offset
+    // Check supported features: Shader Model 3, deferred rendering, hardware depth texture, shadow map, dummy color surface,
+    // stream offset
     if (!forceSM2_)
     {
         if ((impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0)) && (impl_->deviceCaps_.PixelShaderVersion >=
@@ -2069,8 +2069,6 @@ bool Graphics::CreateInterface()
     {
         if (impl_->deviceCaps_.NumSimultaneousRTs >= 3)
             deferredSupport_ = true;
-        if (impl_->deviceCaps_.NumSimultaneousRTs >= 2)
-            prepassSupport_ = true;
     }
     
     // Prefer NVIDIA style hardware depth Compared shadow maps if available
@@ -2169,7 +2167,6 @@ void Graphics::CreateRenderTargets()
 {
     if (mode_ != RENDER_FORWARD)
     {
-        // In deferred rendering, the diffuse buffer stores diffuse albedo. In light prepass, it is used for light accumulation
         if (!diffBuffer_)
         {
             diffBuffer_ = new Texture2D(context_);
@@ -2394,7 +2391,6 @@ void Graphics::InitializeShaderParameters()
     textureUnits_["DiffBuffer"] = TU_DIFFBUFFER;
     textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
-    textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
 }
 
 void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)

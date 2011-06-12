@@ -1,7 +1,5 @@
 <technique>
-    <pass name="deferred" vs="Deferred/GBuffer" ps="Deferred/GBuffer" />
-    <pass name="prepass" vs="Prepass/GBuffer" ps="Prepass/GBuffer" />
-    <pass name="material" vs="Prepass/Material" ps="Prepass/Material" depthwrite="false" />
+    <pass name="gbuffer" vs="GBuffer" ps="GBuffer" />
     <pass name="base" vs="Forward" ps="Forward_Ambient" />
     <pass name="litbase" vs="Forward" ps="Forward_Ambient" />
     <pass name="light" vs="Forward" ps="Forward" depthwrite="false" blend="add" />

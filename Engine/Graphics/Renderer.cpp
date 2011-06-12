@@ -971,15 +971,15 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
     
     if (!lightVS_[vsi])
-        lightVS_[vsi] = GetVertexShader(lightShaderName_ + deferredLightVSVariations[vsi]);
+        lightVS_[vsi] = GetVertexShader("Light_" + deferredLightVSVariations[vsi]);
     
     if (!lightPS_[psi])
     {
         unsigned variation = psi % DLPS_SPOT;
         if ((variation == DLPS_SHADOW) || (variation == DLPS_SHADOWSPEC))
-            lightPS_[psi] = GetPixelShader(lightShaderName_ + lightPSVariations[psi] + hwVariations[hwShadows]);
+            lightPS_[psi] = GetPixelShader("Light_" + lightPSVariations[psi] + hwVariations[hwShadows]);
         else
-            lightPS_[psi] = GetPixelShader(lightShaderName_ + lightPSVariations[psi]);
+            lightPS_[psi] = GetPixelShader("Light_" + lightPSVariations[psi]);
     }
     
     batch.material_ = 0;
@@ -1010,10 +1010,6 @@ void Renderer::LoadShaders()
         // There are rather many light volume shader variations, so load them later on-demand
         lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
-        if (mode == RENDER_DEFERRED)
-            lightShaderName_ = "Deferred/Light_";
-        else
-            lightShaderName_ = "Prepass/Light_";
     }
     
     // Remove shaders that are no longer referenced from the cache
@@ -1036,14 +1032,8 @@ void Renderer::LoadMaterialShaders(Technique* technique)
     }
     else
     {
-        // G-Buffer pass types depend on whether deferred shading or light prepass is in use
-        if (mode == RENDER_DEFERRED)
-            LoadPassShaders(technique, PASS_DEFERRED);
-        else if (mode == RENDER_PREPASS)
-        {
-            LoadPassShaders(technique, PASS_PREPASS);
-            LoadPassShaders(technique, PASS_MATERIAL);
-        }
+        if (technique->HasPass(PASS_GBUFFER))
+            LoadPassShaders(technique, PASS_GBUFFER);
         else
         {
             LoadPassShaders(technique, PASS_BASE);

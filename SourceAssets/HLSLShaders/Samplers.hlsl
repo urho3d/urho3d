@@ -37,8 +37,3 @@ float3 UnpackNormal(float4 normalInput)
     normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
     return normal;
 }
-
-float GetIntensity(float3 color)
-{
-    return dot(color, float3(0.333, 0.333, 0.333));
-}

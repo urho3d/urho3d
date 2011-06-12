@@ -243,8 +243,6 @@ public:
     bool GetRenderTextureSupport() const;
     /// Return whether deferred rendering is supported
     bool GetDeferredSupport() const { return deferredSupport_; }
-    /// Return whether light prepass rendering is supported
-    bool GetPrepassSupport() const { return prepassSupport_; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL
     bool GetSM3Support() const { return false; }
     /// Return whether shadow map depth compare is done in hardware. Always false on OpenGL to avoid the HW suffix in shaders
@@ -357,8 +355,10 @@ public:
     static unsigned GetRGBFormat();
     /// Return the API-specific RGBA texture format
     static unsigned GetRGBAFormat();
-    /// Return the API-specific depth texture format. Includes a stencil if possible
+    /// Return the API-specific deferred rendering depth texture format
     static unsigned GetDepthFormat();
+    /// Return the API-specific depth stencil texture format
+    static unsigned GetDepthStencilFormat();
     
 private:
     /// Create the application window. Return true if successful
@@ -410,8 +410,6 @@ private:
     bool inModeChange_;
     /// Deferred rendering support flag
     bool deferredSupport_;
-    /// Light prepass support flag
-    bool prepassSupport_;
     /// Number of primitives this frame
     unsigned numPrimitives_;
     /// Number of batches this frame

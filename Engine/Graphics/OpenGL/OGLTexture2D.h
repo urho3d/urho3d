@@ -52,7 +52,7 @@ public:
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
     /// Load from an image. Return true if successful
-    bool Load(SharedPtr<Image> image);
+    bool Load(SharedPtr<Image> image, bool useAlpha = false);
     
     /// Return render surface
     RenderSurface* GetRenderSurface() const { return renderSurface_; }

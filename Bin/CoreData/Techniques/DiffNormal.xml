@@ -1,7 +1,5 @@
 <technique>
-    <pass name="deferred" vs="Deferred/GBuffer_Normal" ps="Deferred/GBuffer_DiffNormal" />
-    <pass name="prepass" vs="Prepass/GBuffer_Normal" ps="Prepass/GBuffer_Normal" />
-    <pass name="material" vs="Prepass/Material" ps="Prepass/Material_Diff" depthwrite="false" />
+    <pass name="gbuffer" vs="GBuffer_Normal" ps="GBuffer_DiffNormal" />
     <pass name="base" vs="Forward" ps="Forward_DiffAmbient" />
     <pass name="litbase" vs="Forward_Normal" ps="Forward_DiffNormalAmbient" />
     <pass name="light" vs="Forward_Normal" ps="Forward_DiffNormal" depthwrite="false" blend="add" />

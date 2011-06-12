@@ -235,8 +235,6 @@ public:
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether deferred rendering is supported
     bool GetDeferredSupport() const { return deferredSupport_; }
-    /// Return whether light prepass rendering is supported
-    bool GetPrepassSupport() const { return prepassSupport_; }
     /// Return whether Shader Model 3 is supported
     bool GetSM3Support() const { return hasSM3_; }
     /// Return whether shadow map depth compare is done in hardware
@@ -351,6 +349,8 @@ public:
     static unsigned GetRGBAFormat();
     /// Return the API-specific deferred rendering depth texture format
     static unsigned GetDepthFormat();
+    /// Return the API-specific depth stencil texture format
+    static unsigned GetDepthStencilFormat();
     
 private:
     /// Create the application window
@@ -402,8 +402,6 @@ private:
     bool queryIssued_;
     /// Deferred rendering support flag
     bool deferredSupport_;
-    /// Light prepass support flag
-    bool prepassSupport_;
     /// Hardware shadow map depth compare support flag
     bool hardwareShadowSupport_;
     /// 24-bit shadow map support flag

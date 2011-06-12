@@ -256,7 +256,7 @@ void UI::Render()
     ShaderVariation* ps = 0;
     ShaderVariation* vs = 0;
     
-    unsigned luminanceFormat = Graphics::GetLuminanceFormat();
+    unsigned alphaFormat = Graphics::GetAlphaFormat();
     
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
@@ -268,10 +268,10 @@ void UI::Render()
         }
         else
         {
-            // If texture contains only a luminance channel, interpret it as alpha (for fonts)
+            // If texture contains only an alpha channel, interpret it as alpha (for fonts)
             vs = diffTextureVS_;
             
-            if (batches_[i].texture_->GetFormat() == luminanceFormat)
+            if (batches_[i].texture_->GetFormat() == alphaFormat)
                 ps = alphaTexturePS_;
             else
                 ps = diffTexturePS_;

@@ -350,7 +350,7 @@ Graphics implements the low-level functionality:
 
 It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
 
-Screen resolution, fullscreen/windowed, vertical sync, forward/light pre-pass/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
+Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
 
 When setting the initial screen mode, Graphics does a few checks:
 
@@ -377,7 +377,7 @@ For opaque, non-skinned geometry, batches using the same material and same verte
 
 The rendering operations are divided into passes in the following order:
 
-- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (light pre-pass & deferred.)
+- Opaque geometry ambient pass (forward) or filling the G-buffer with opaque geometry (deferred.)
 - Lighting opaque geometry. For shadow casting lights, the shadow map is rendered first.
 - Post-opaque or "extra" rendering pass for materials that define that.
 - Transparent geometry rendering pass. Transparent, alpha-blended objects are sorted according to distance and rendered back-to-front to ensure correct blending.
@@ -402,7 +402,7 @@ The rendering-related components defined by the %Graphics library are:
 
 See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems" and \ref AuxiliaryViews "Auxiliary views".
 
-For details on how lighting opaque geometry differs between forward and deferred rendering, see \ref ForwardDeferred "Comparision of forward, light pre-pass and deferred rendering".
+For details on how lighting opaque geometry differs between forward and deferred rendering, see \ref ForwardDeferred "Comparision of forward and deferred rendering".
 
 For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferences "Differences between Direct3D9 and OpenGL".
 
@@ -425,7 +425,7 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 - Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 on Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
 
-- In deferred and light prepass rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the depth stencil buffer will be read directly, and linear depth will be reconstructed in the pixel shader. This results in less GPU memory bandwidth needed, but can introduce inaccuracy to depth calculations.
+- In deferred rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the hardware depth buffer will be read directly, and linear depth will be reconstructed in the pixel shader. This results in less GPU memory bandwidth needed, but can introduce inaccuracy to depth calculations.
 
 - On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents.
 
@@ -470,7 +470,7 @@ A technique definition looks like this:
 
 \code
 <technique>
-    <pass name="deferred|prepass|material|base|litbase|light|extra|shadow"
+    <pass name="gbuffer|base|litbase|light|extra|shadow"
         vs="VertexShaderName" ps="PixelShaderName" alphamask="true|false"
         alphatest="true|false" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha"
         depthtest="always|equal|less|lessequal|greater|greaterequal" depthwrite="true|false" />
@@ -483,9 +483,7 @@ A technique definition looks like this:
 
 The passes are:
 
-- deferred: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, specular power and depth.
-- prepass: light pre-pass rendering G-buffer pass for opaque geometry. Writes normals, specular power and depth only.
-- material: light pre-pass rendering material pass. Renders the opaque object using the light accumulation result.
+- gbuffer: deferred rendering G-buffer pass for opaque geometery. Writes material albedo, normals, specular power and depth.
 - base: forward rendering base pass. Renders the ambient light.
 - litbase: forward rendering base pass. Renders the ambient light and the first light affecting the object for optimization.
 - light: forward rendering light pass. Renders one light's contribution additively.
@@ -599,24 +597,13 @@ Rendering detailed auxiliary views can easily have a large performance impact. S
 - Use the camera's \ref Camera::SetViewOverrideFlags "SetViewOverrideFlags()" function to disable shadows, to disable occlusion, or force the lowest material quality.
 
 
-\page ForwardDeferred Comparision of forward, light pre-pass and deferred rendering
+\page ForwardDeferred Comparision of forward and deferred rendering
 
-The rendering mode configured to the Graphics subsystem determines whether forward, light pre-pass, or deferred rendering is used for opaque objects. Transparent objects are always rendered using forward rendering.
+The rendering mode configured to the Graphics subsystem determines whether forward or deferred rendering is used for opaque objects. Transparent objects are always rendered using forward rendering.
 
 \section ForwardDeferred_Forward Forward rendering
 
 For each light that influences the object in question, the object is redrawn with additive blending. Multiple lights per pass are not used to not explode the shader permutation count, and to not go over SM2.0 instruction limits. Scissor optimization is used to reduce pixel count in case of small lights / large geometries.
-
-\section ForwardDeferred_Prepass Light pre-pass rendering
-
-%Light pre-pass creates the following lightweight G-buffer, using 2 render targets:
-
-- World-space normal and specular power (D3DFMT_A8R8G8B8)
-- Linear depth (D3DFMT_R32F)
-
-The normals, specular power and depth of opaque objects are rendered first to the G-buffer. After this, a D3DFMT_A8R8G8B8 light accumulation buffer is cleared to black, and light volumes are rendered to it with additive blending, using stencil masking to optimize the light volume depth range if possible. The diffuse light color is rendered to the RGB channels, and monochromatic specular intensity is rendered to the A channel. Only half the intensity of lights is used to allow up to 2x "overburn" for the total accumulated lighting.
-
-When the light accumulation buffer is ready, opaque objects are rendered for the second time (the "material" pass), using the light accumulation buffer to calculate diffuse and specular lighting. Ambient color is also added at this point. The color of specular lighting is resolved by modulating the monochromatic specular intensity with the diffuse light color. This will not result in correct specular lighting when multiple lights combine, but is a reasonable approximation in most cases. Emissive and environment mapping effects can be added during the material pass.
 
 \section ForwardDeferred_Deferred Deferred rendering
 
@@ -626,19 +613,23 @@ Deferred rendering creates the following G-buffer, using 3 render targets:
 - World-space normal and specular power (D3DFMT_A8R8G8B8)
 - Linear depth (D3DFMT_R32F)
 
+(on OpenGL a DEPTH_COMPONENT24 texture is used instead for non-linear hardware depth)
+
 Opaque objects are rendered to the G-buffer first, then an initial full-screen quad is drawn to initialize the backbuffer, using the G-buffer information to blend between ambient lighting and fog color. After this, light volumes are rendered with additive blending, using stencil masking to optimize the light volume depth range if possible.
 
-After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional "emissive" pass for objects that need them.
+After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional pass for objects that need them.
 
 \section ForwardDeferred_TemporalAA Temporal antialiasing
 
-When multisampling is enabled, both light pre-pass and deferred rendering use subpixel projection jittering to render temporal antialiasing that should look similar to 2x MSAA. Reprojection based on the previous frame's camera view transform is used to eliminate "ghosting" effects when the camera rotates, and additional ghosting prevention is done by analyzing the depth of each pixel compared to the previous frame. Depending on the GPU speed, this form of antialiasing has a low-to-moderate performance impact.
+When multisampling is enabled, deferred rendering uses subpixel projection jittering to render temporal antialiasing that should look similar to 2x MSAA. Reprojection based on the previous frame's camera view transform is used to eliminate "ghosting" effects when the camera rotates, and additional ghosting prevention is done by analyzing the depth of each pixel compared to the previous frame. Depending on the GPU speed, this form of antialiasing has a low-to-moderate performance impact.
 
 \section ForwardDeferred_Conclusion Conclusion
 
-Deferred rendering will win particularly in vertex-heavy scenes, as the actual geometries need to be rendered only once. However, in simple scenes the cost of filling the G-buffer may be substantial and outweight the benefit. Light pre-pass does not consume as much texture sampling bandwidth when accumulating the lighting, so it may have a performance advantage over deferred when the lighting environment is complex. In the simplest scenes, forward rendering can still be assumed to be fastest.
+Deferred rendering will win particularly in vertex-heavy scenes, as the actual geometries need to be rendered only once. However, in simple scenes the cost of filling the G-buffer may be substantial and outweight the benefit.
 
-Note that it is not possible to specify the material's specular color in deferred rendering, only the specular intensity. The default forward rendering shaders have also been written in the same way to match the output of deferred rendering, but more material variety could in fact be achieved with forward-shaded materials, or with the material pass of light pre-pass rendering.
+Note that it is not possible to specify the material's specular color in deferred rendering, only the specular intensity. The default forward rendering shaders have also been written in the same way to match the output of deferred rendering, but more material variety could in fact be achieved with forward-shaded materials.
+
+Forward rendering also allows per-object control of which lights will influence the object.
 
 
 \page Input %Input

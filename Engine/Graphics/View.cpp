@@ -118,7 +118,18 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     if (!renderTarget)
         depthStencil_ = 0;
     else
+    {
+        // In Direct3D9 deferred rendering, always use the system depth stencil for the whole time
+        // to ensure it is as large as the G-buffer
+        #ifdef USE_OPENGL
         depthStencil_ = renderTarget->GetLinkedDepthBuffer();
+        #else
+        if (mode_ == RENDER_FORWARD)
+            depthStencil_ = renderTarget->GetLinkedDepthBuffer();
+        else
+            depthStencil_ = 0;
+        #endif
+    }
     
     zone_ = renderer_->GetDefaultZone();
     
@@ -383,14 +394,6 @@ void View::GetBatches()
     HashSet<Drawable*> maxLightsDrawables;
     Map<Light*, unsigned> lightQueueIndex;
     
-    PassType gBufferPass = PASS_DEFERRED;
-    PassType additionalPass = PASS_EXTRA;
-    if (mode_ == RENDER_PREPASS)
-    {
-        gBufferPass = PASS_PREPASS;
-        additionalPass = PASS_MATERIAL;
-    }
-    
     // Go through lights
     {
         PROFILE_MULTIPLE(GetLightBatches, lights_.Size());
@@ -462,7 +465,7 @@ void View::GetBatches()
                         
                         // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                         if (!drawable->GetMaxLights())
-                            GetLitBatches(drawable, light, SplitLight, &lightQueue, litTransparencies, gBufferPass);
+                            GetLitBatches(drawable, light, SplitLight, &lightQueue, litTransparencies);
                         else
                         {
                             drawable->AddLight(SplitLight);
@@ -534,7 +537,7 @@ void View::GetBatches()
                 if (j != lightQueueIndex.End())
                     queue = &lightQueues_[j->second_];
                 
-                GetLitBatches(drawable, light, SplitLight, queue, litTransparencies, gBufferPass);
+                GetLitBatches(drawable, light, SplitLight, queue, litTransparencies);
             }
         }
     }
@@ -573,15 +576,15 @@ void View::GetBatches()
                 // In deferred mode, check for a G-buffer batch first
                 if (mode_ != RENDER_FORWARD)
                 {
-                    pass = tech->GetPass(gBufferPass);
+                    pass = tech->GetPass(PASS_GBUFFER);
                     if (pass)
                     {
                         renderer_->SetBatchShaders(baseBatch, tech, pass);
                         baseBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
                         gBufferQueue_.AddBatch(baseBatch);
                         
-                        // Check also for an additional pass. In light prepass mode this actually renders the visible geometry
-                        pass = tech->GetPass(additionalPass);
+                        // Check also for an additional pass (possibly for emissive)
+                        pass = tech->GetPass(PASS_EXTRA);
                         if (pass)
                         {
                             renderer_->SetBatchShaders(baseBatch, tech, pass);
@@ -629,7 +632,7 @@ void View::GetBatches()
 }
 
 void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue,
-    HashSet<LitTransparencyCheck>& litTransparencies, PassType gBufferPass)
+    HashSet<LitTransparencyCheck>& litTransparencies)
 {
     bool splitPointLight = SplitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
@@ -646,7 +649,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
             continue;
         
         // If material uses opaque G-buffer rendering, skip
-        if ((mode_ != RENDER_FORWARD) && (tech->HasPass(gBufferPass)))
+        if ((mode_ != RENDER_FORWARD) && (tech->HasPass(PASS_GBUFFER)))
             continue;
         
         Pass* pass = 0;
@@ -784,8 +787,6 @@ void View::RenderBatchesForward()
 
 void View::RenderBatchesDeferred()
 {
-    bool deferred = mode_ != RENDER_PREPASS;
-    
     Texture2D* diffBuffer = graphics_->GetDiffBuffer();
     Texture2D* normalBuffer = graphics_->GetNormalBuffer();
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
@@ -807,21 +808,7 @@ void View::RenderBatchesDeferred()
         camera_->SetProjectionOffset(jitter);
     }
     
-    RenderSurface* finalRenderTarget = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
-    
-    // In OpenGL, we will use two depth stencils: one for the G-buffer, and one for light accumulation
-    #ifdef USE_OPENGL
-    RenderSurface* lightDepthStencil = deferred ? depthStencil_ : depthBuffer->GetRenderSurface();
-    RenderSurface* finalDepthStencil = depthStencil_;
-    // Exception: if temporal AA is used, the G-buffer depth stencil can be used for the whole time,
-    // as the backbuffer is only copied to in the very end
-    if (temporalAA)
-        lightDepthStencil = finalDepthStencil = depthBuffer->GetRenderSurface();
-    #else
-    // In Direct3D9 the system depth stencil will be used for the whole time
-    RenderSurface* lightDepthStencil = 0;
-    RenderSurface* finalDepthStencil = 0;
-    #endif
+    RenderSurface* renderBuffer = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
     
     // Calculate shader parameters needed only in deferred rendering
     Vector3 nearVector, farVector;
@@ -867,34 +854,16 @@ void View::RenderBatchesDeferred()
         graphics_->SetStencilTest(false);
         #ifdef USE_OPENGL
         // On OpenGL, clear the diffuse and depth buffers normally
-        if (deferred)
-        {
-            graphics_->SetRenderTarget(0, diffBuffer);
-            graphics_->SetDepthStencil(depthBuffer);
-            graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
-            graphics_->SetRenderTarget(1, normalBuffer);
-        }
-        else
-        {
-            graphics_->SetRenderTarget(0, (RenderSurface*)0);
-            graphics_->SetDepthStencil(depthBuffer);
-            graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
-            graphics_->SetRenderTarget(0, normalBuffer);
-        }
+        graphics_->SetRenderTarget(0, diffBuffer);
+        graphics_->SetDepthStencil(depthBuffer);
+        graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL);
+        graphics_->SetRenderTarget(1, normalBuffer);
         #else
         // On Direct3D9, clear only depth and stencil at first (fillrate optimization)
-        if (deferred)
-        {
-            graphics_->SetRenderTarget(0, diffBuffer);
-            graphics_->SetRenderTarget(1, normalBuffer);
-            graphics_->SetRenderTarget(2, depthBuffer);
-        }
-        else
-        {
-            graphics_->SetRenderTarget(0, normalBuffer);
-            graphics_->SetRenderTarget(1, depthBuffer);
-        }
-        graphics_->SetDepthStencil(lightDepthStencil);
+        graphics_->SetRenderTarget(0, diffBuffer);
+        graphics_->SetRenderTarget(1, normalBuffer);
+        graphics_->SetRenderTarget(2, depthBuffer);
+        graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
         graphics_->Clear(CLEAR_DEPTH | CLEAR_STENCIL);
         #endif
@@ -908,66 +877,46 @@ void View::RenderBatchesDeferred()
         // On Direct3D9, clear now the parts of G-Buffer that were not rendered into
         graphics_->SetDepthTest(CMP_LESSEQUAL);
         graphics_->SetDepthWrite(false);
-        if (deferred)
-        {
-            graphics_->ResetRenderTarget(2);
-            graphics_->SetRenderTarget(1, depthBuffer);
-            
-            renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Deferred/GBufferFill"),
-                renderer_->GetPixelShader("Deferred/GBufferFill"), false, shaderParameters_);
-        }
-        else
-        {
-            graphics_->ResetRenderTarget(1);
-            graphics_->SetRenderTarget(0, depthBuffer);
-            graphics_->SetViewport(screenRect_);
-            
-            // The stencil shader writes color 1.0, which equals far depth
-            renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Stencil"),
-                renderer_->GetPixelShader("Stencil"), false, shaderParameters_);
-        }
+        graphics_->ResetRenderTarget(2);
+        graphics_->SetRenderTarget(1, depthBuffer);
+        
+        renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("GBufferFill"),
+            renderer_->GetPixelShader("GBufferFill"), false, shaderParameters_);
         #endif
     }
     
-    if (deferred)
     {
-        // Render ambient color & fog. On OpenGL the depth buffer will be copied now if necessary
+        PROFILE(RenderAmbientQuad);
+        
+        // Render ambient color & fog. On OpenGL the depth buffer will be copied now
         graphics_->ClearLastParameterSources();
         graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetRenderTarget(0, finalRenderTarget);
+        graphics_->SetRenderTarget(0, renderBuffer);
         graphics_->ResetRenderTarget(1);
         #ifdef USE_OPENGL
-        bool copyDepth = lightDepthStencil != depthBuffer->GetRenderSurface();
-        graphics_->SetDepthWrite(copyDepth);
+        graphics_->SetDepthWrite(true);
         #else
         graphics_->ResetRenderTarget(2);
         #endif
-        graphics_->SetDepthStencil(lightDepthStencil);
-        graphics_->Clear(CLEAR_STENCIL);
+        graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
         graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
         graphics_->SetViewport(screenRect_);
         
-        String pixelShaderName = "Deferred/Ambient";
+        String pixelShaderName = "Ambient";
         #ifdef USE_OPENGL
         if (camera_->IsOrthographic())
             pixelShaderName += "Ortho";
+        // On OpenGL, set up a stencil operation to reset the stencil during the quad rendering
+        graphics_->SetStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP);
         #endif
         
-        renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Deferred/Ambient"),
+        renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Ambient"),
             renderer_->GetPixelShader(pixelShaderName), false, shaderParameters_);
-    }
-    else
-    {
-        // Light prepass: reset the light accumulation buffer with black color
-        // On OpenGL we still use the GBuffer's depth buffer at this point, so depth is not copied yet
-        graphics_->SetRenderTarget(0, diffBuffer);
-        #ifndef USE_OPENGL
-        graphics_->ResetRenderTarget(1);
+        
+        #ifdef USE_OPENGL
+        graphics_->SetStencilTest(false);
         #endif
-        graphics_->SetDepthStencil(lightDepthStencil);
-        graphics_->SetViewport(screenRect_);
-        graphics_->Clear(CLEAR_COLOR);
     }
     
     {
@@ -988,18 +937,12 @@ void View::RenderBatchesDeferred()
             {
                 graphics_->ClearLastParameterSources();
                 
-                if (deferred)
-                {
-                    graphics_->SetRenderTarget(0, finalRenderTarget);
-                    graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
-                }
-                else
-                    graphics_->SetRenderTarget(0, diffBuffer);
-                
+                graphics_->SetRenderTarget(0, renderBuffer);
+                graphics_->SetDepthStencil(depthStencil_);
+                graphics_->SetViewport(screenRect_);
+                graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
                 graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
                 graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-                graphics_->SetDepthStencil(lightDepthStencil);
-                graphics_->SetViewport(screenRect_);
                 
                 for (unsigned j = 0; j < queue.volumeBatches_.Size(); ++j)
                 {
@@ -1018,17 +961,11 @@ void View::RenderBatchesDeferred()
         {
             graphics_->ClearLastParameterSources();
             
-            if (deferred)
-            {
-                graphics_->SetRenderTarget(0, finalRenderTarget);
-                graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
-            }
-            else
-                graphics_->SetRenderTarget(0, diffBuffer);
-            
+            graphics_->SetRenderTarget(0, renderBuffer);
+            graphics_->SetDepthStencil(depthStencil_);
+            graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
             graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
             graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-            graphics_->SetDepthStencil(lightDepthStencil);
             graphics_->SetViewport(screenRect_);
             
             for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.Size(); ++i)
@@ -1045,36 +982,14 @@ void View::RenderBatchesDeferred()
         
         graphics_->ClearLastParameterSources();
         graphics_->SetStencilTest(false);
-        graphics_->SetRenderTarget(0, finalRenderTarget);
-        graphics_->SetDepthStencil(finalDepthStencil);
+        graphics_->SetRenderTarget(0, renderBuffer);
+        graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, 0);
         graphics_->SetTexture(TU_NORMALBUFFER, 0);
         graphics_->SetTexture(TU_DEPTHBUFFER, 0);
         
-        if (!deferred)
-        {
-            #ifdef USE_OPENGL
-            // In OpenGL light prepass mode, copy depth now
-            if (finalDepthStencil != depthBuffer->GetRenderSurface())
-            {
-                graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-                graphics_->SetAlphaTest(false);
-                graphics_->SetBlendMode(BLEND_REPLACE);
-                graphics_->SetDepthTest(CMP_ALWAYS);
-                graphics_->SetDepthWrite(true);
-                renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Prepass/CopyDepth"),
-                    renderer_->GetPixelShader("Prepass/CopyDepth"), false, shaderParameters_);
-            }
-            else
-                graphics_->Clear(CLEAR_COLOR, zone_->GetFogColor());
-            #else
-            graphics_->Clear(CLEAR_COLOR, zone_->GetFogColor());
-            #endif
-        }
-        
-        // Remember to bind the light buffer in prepass mode
-        RenderBatchQueue(baseQueue_, true, !deferred);
+        RenderBatchQueue(baseQueue_, true);
     }
     
     {
@@ -2197,12 +2112,9 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
     }
 }
 
-void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLightBuffer, bool disableScissor)
+void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disableScissor)
 {
-    Texture2D* diffBuffer = 0;
     VertexBuffer* instancingBuffer = 0;
-    if (useLightBuffer)
-        diffBuffer = graphics_->GetDiffBuffer();
     if (renderer_->GetDynamicInstancing())
         instancingBuffer = renderer_->instancingBuffer_;
     
@@ -2215,16 +2127,12 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
         queue.priorityBatchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        if ((useLightBuffer) && (!group.light_))
-            graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
         group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Priority non-instanced
     for (PODVector<Batch*>::ConstIterator i = queue.sortedPriorityBatches_.Begin(); i != queue.sortedPriorityBatches_.End(); ++i)
     {
         Batch* batch = *i;
-        if ((useLightBuffer) && (!batch->light_))
-            graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
         batch->Draw(graphics_, shaderParameters_);
     }
     
@@ -2237,8 +2145,6 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
             OptimizeLightByScissor(group.light_);
         else
             graphics_->SetScissorTest(false);
-        if ((useLightBuffer) && (!group.light_))
-            graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
         group.Draw(graphics_, instancingBuffer, shaderParameters_);
     }
     // Non-priority non-instanced
@@ -2250,8 +2156,6 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool useLi
             OptimizeLightByScissor(batch->light_);
         else
             graphics_->SetScissorTest(false);
-        if ((useLightBuffer) && (!batch->light_))
-            graphics_->SetTexture(TU_LIGHTBUFFER, diffBuffer);
         batch->Draw(graphics_, shaderParameters_);
     }
 }
@@ -2334,7 +2238,7 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         graphics_->SetScissorTest(false);
     
     // Draw instanced and non-instanced shadow casters
-    RenderBatchQueue(queue.shadowBatches_, false, false, false);
+    RenderBatchQueue(queue.shadowBatches_, false, false);
     
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);

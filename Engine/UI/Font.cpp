@@ -339,7 +339,7 @@ const FontFace* Font::GetFace(int pointSize)
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
     texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
     texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-    if ((!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat())) || (!texture->Load(image)))
+    if ((!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat())) || (!texture->Load(image, true)))
         return 0;
     
     SetMemoryUse(GetMemoryUse() + texWidth * texHeight);

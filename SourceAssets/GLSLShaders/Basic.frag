@@ -23,7 +23,7 @@ void main()
         gl_FragColor = diffColor * texture2D(sDiffMap, vTexCoord);
     #endif
     #ifdef ALPHAMAP
-        float alphaInput = texture2D(sDiffMap, vTexCoord).r;
+        float alphaInput = texture2D(sDiffMap, vTexCoord).a;
         gl_FragColor = vec4(diffColor.rgb, diffColor.a * alphaInput);
     #endif
 }

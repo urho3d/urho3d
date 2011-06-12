@@ -118,8 +118,6 @@ void DebugHud::Update(float timeStep)
         RenderMode renderMode = graphics->GetRenderMode();
         if (renderMode == RENDER_FORWARD)
             mode = "Forward";
-        else if (renderMode == RENDER_PREPASS)
-            mode = "Prepass";
         else
             mode = "Deferred";
         
@@ -179,12 +177,16 @@ void DebugHud::Update(float timeStep)
         else
             mode += "Off";
         
-        bool sm3 = graphics->GetSM3Support();
         mode += " Mode:";
+        #ifdef USE_OPENGL
+        mode += "OGL";
+        #else
+        bool sm3 = graphics->GetSM3Support();
         if (sm3)
             mode += "SM3";
         else
             mode += "SM2";
+        #endif
         
         modeText_->SetText(mode);
     }

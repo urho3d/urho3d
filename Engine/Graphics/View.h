@@ -119,7 +119,7 @@ private:
     /// Construct batches from the scene nodes
     void GetBatches();
     /// Get lit batches for a certain light and drawable
-    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies, PassType gBufferPass);
+    void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies);
     /// Render batches, forward mode
     void RenderBatchesForward();
     /// Render batches, deferred mode
@@ -159,7 +159,7 @@ private:
     /// Draw a split light to stencil buffer
     void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
     /// Draw everything in a batch queue, priority batches first
-    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool useLightBuffer = false, bool disableScissor = true);
+    void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool disableScissor = true);
     /// Draw a forward (shadowed) light batch queue
     void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
     /// Render a shadow map

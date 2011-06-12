@@ -186,7 +186,7 @@ bool TextureCube::Load(CubeMapFace face, Deserializer& source)
     return Load(face, image);
 }
 
-bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
+bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
@@ -226,7 +226,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image)
         switch (components)
         {
             case 1:
-            format = Graphics::GetLuminanceFormat();
+            format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
             break;
             
             case 2:

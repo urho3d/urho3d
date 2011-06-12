@@ -96,8 +96,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
             
             if (argument == "headless")
                 headless_ = true;
-            else if (argument == "prepass")
-                mode = RENDER_PREPASS;
             else if (argument == "deferred")
                 mode = RENDER_DEFERRED;
             else if (argument == "nolimit")

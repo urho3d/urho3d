@@ -157,7 +157,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     return Create();
 }
 
-bool Texture2D::Load(SharedPtr<Image> image)
+bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
 {
     if (!image)
     {
@@ -192,7 +192,7 @@ bool Texture2D::Load(SharedPtr<Image> image)
         switch (components)
         {
             case 1:
-            format = Graphics::GetLuminanceFormat();
+            format = useAlpha ? Graphics::GetAlphaFormat() : Graphics::GetLuminanceFormat();
             break;
             
             case 2:

@@ -1,6 +1,6 @@
-#include "../Uniforms.frag"
-#include "../Samplers.frag"
-#include "../Fog.frag"
+#include "Uniforms.frag"
+#include "Samplers.frag"
+#include "Fog.frag"
 
 varying vec2 vTexCoord;
 varying float vDepth;

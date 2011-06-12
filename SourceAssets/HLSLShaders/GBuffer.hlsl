@@ -1,6 +1,7 @@
-#include "../Uniforms.hlsl"
-#include "../Samplers.hlsl"
-#include "../Transform.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
@@ -46,12 +47,12 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 
-    oTexCoord = GetTexCoord(iTexCoord);
-    oDepth = GetDepth(oPos);
-
     #ifdef NORMALMAP
         oBitangent = cross(oTangent, oNormal) * iTangent.w;
     #endif
+
+    oTexCoord = GetTexCoord(iTexCoord);
+    oDepth = GetDepth(oPos);
 }
 
 void PS(
@@ -64,12 +65,19 @@ void PS(
     #else
         float3 iNormal : TEXCOORD2,
     #endif
-    out float4 oNormal : COLOR0,
-    out float4 oDepth : COLOR1)
+    out float4 oDiff : COLOR0,
+    out float4 oNormal : COLOR1,
+    out float4 oDepth : COLOR2)
 {
-    #ifdef ALPHAMASK
-        if (tex2D(sDiffMap, iTexCoord).a < 0.5)
-            discard;
+    #ifdef DIFFMAP
+        float4 diffInput = tex2D(sDiffMap, iTexCoord);
+        float3 diffColor = cMatDiffColor.rgb * diffInput.rgb;
+        #ifdef ALPHAMASK
+            if (diffInput.a < 0.5)
+                discard;
+        #endif
+    #else
+        float3 diffColor = cMatDiffColor.rgb;
     #endif
 
     #ifdef NORMALMAP
@@ -79,8 +87,15 @@ void PS(
         float3 normal = normalize(iNormal);
     #endif
 
-    float specPower = cMatSpecProperties.y * (1.0 / 255.0);
+    #ifdef SPECMAP
+        float specStrength = tex2D(sSpecMap, iTexCoord).r * cMatSpecProperties.x;
+    #else
+        float specStrength = cMatSpecProperties.x;
+    #endif
+    float specPower = cMatSpecProperties.y / 255.0;
 
+    // Take fogging into account here so that deferred lights do not need to calculate it
+    oDiff = GetReverseFogFactor(iDepth) * float4(diffColor, specStrength);
     oNormal = float4(normal * 0.5 + 0.5, specPower);
     oDepth = iDepth;
 }

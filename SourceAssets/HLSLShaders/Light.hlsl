@@ -1,8 +1,8 @@
-#include "../Uniforms.hlsl"
-#include "../Samplers.hlsl"
-#include "../Transform.hlsl"
-#include "../ScreenPos.hlsl"
-#include "../Lighting.hlsl"
+#include "Uniforms.hlsl"
+#include "Samplers.hlsl"
+#include "Transform.hlsl"
+#include "ScreenPos.hlsl"
+#include "Lighting.hlsl"
 
 void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT

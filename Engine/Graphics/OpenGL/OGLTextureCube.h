@@ -53,7 +53,7 @@ public:
     /// Load one face from a stream. Return true if successful
     bool Load(CubeMapFace face, Deserializer& source);
     /// Load one face from an image. Return true if successful
-    bool Load(CubeMapFace face, SharedPtr<Image> image);
+    bool Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
     
     /// Return render surface for one face
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }

@@ -1,6 +1,6 @@
-#include "../Uniforms.frag"
-#include "../Samplers.frag"
-#include "../Fog.frag"
+#include "Uniforms.frag"
+#include "Samplers.frag"
+#include "Fog.frag"
 
 varying vec2 vScreenPos;
 
@@ -17,9 +17,8 @@ void main()
         float linearDepth = ReconstructDepth(depth);
     #endif
 
-    // Store coarse depth to alpha channel for deferred antialiasing
+    // Store coarse linear depth to alpha channel for deferred antialiasing
     gl_FragColor = vec4(ambientColor + GetFogFactor(linearDepth) * cFogColor, linearDepth);
-    
-    // Copy a slightly biased depth value because of possible inaccuracy
-    gl_FragDepth = min(texture2D(sDepthBuffer, vScreenPos).r + 0.000001, 1.0);
+    // Copy the actual hardware depth value to the destination depth buffer
+    gl_FragDepth = depth;
 }

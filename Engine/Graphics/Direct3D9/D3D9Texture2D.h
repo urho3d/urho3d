@@ -54,7 +54,7 @@ public:
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
     /// Load from an image. Return true if successful
-    bool Load(SharedPtr<Image> image);
+    bool Load(SharedPtr<Image> image, bool useAlpha = false);
     /// Lock a rectangular area from a mipmap level. A null rect locks the entire level. Return true if successful
     bool Lock(unsigned level, const IntRect* rect, LockedRect& lockedRect);
     /// Unlock texture

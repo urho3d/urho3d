@@ -54,6 +54,10 @@
 
 #include <GLee.h>
 
+#ifdef _MSC_VER
+#include <float.h>
+#endif
+
 #include "DebugNew.h"
 
 #ifdef _MSC_VER
@@ -124,7 +128,6 @@ Graphics::Graphics(Context* context_) :
     fullscreenModeSet_(false),
     inModeChange_(false),
     deferredSupport_(false),
-    prepassSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
     immediateVertexCount_(0),
@@ -213,6 +216,11 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Create OpenGL context
     if (!impl_->renderContext_)
     {
+        // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
+        #ifdef _MSC_VER
+        _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+        #endif
+        
         impl_->renderContext_ = wglCreateContext(impl_->deviceContext_);
         wglMakeCurrent(impl_->deviceContext_, impl_->renderContext_);
         
@@ -229,21 +237,14 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         }
         
         // Create the FBO if supported
-        if (_GLEE_EXT_framebuffer_object)
+        if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
         {
             glGenFramebuffersEXT(1, &impl_->fbo_);
             
-            // If FBO is supported, shadows can be rendered
+            // If both FBO and packed depth stencil is supported, shadows and deferred rendering can be supported
             shadowMapFormat_ = GL_DEPTH_COMPONENT16;
             hiresShadowMapFormat_ = GL_DEPTH_COMPONENT24;
-            
-            // Deferred and light prepass rendering require the ability to use a depth/stencil buffer with FBO,
-            // for proper optimization and split point light masking
-            if (_GLEE_EXT_packed_depth_stencil)
-            {
-                deferredSupport_ = true;
-                prepassSupport_ = true;
-            }
+            deferredSupport_ = true;
         }
         
         // Set initial state to match Direct3D
@@ -1249,7 +1250,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
                 else
                 {
                     SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
-                    newDepthTexture->SetSize(width, height, GetDepthFormat(), TEXTURE_DEPTHSTENCIL);
+                    newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
                     depthTextures_[searchKey] = newDepthTexture;
                     depthStencil = newDepthTexture->GetRenderSurface();
                 }
@@ -1745,7 +1746,6 @@ void Graphics::EndImmediate()
         if (shaderProgram_)
         {
             const int* attributeLocations = shaderProgram_->GetAttributeLocations();
-            unsigned char* elementData = &immediateVertexData_[0];
             unsigned vertexSize = VertexBuffer::GetVertexSize(immediateElementMask_);
             
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1765,9 +1765,7 @@ void Graphics::EndImmediate()
                     }
                     
                     glVertexAttribPointer(attributeIndex, VertexBuffer::elementComponents[i], VertexBuffer::elementType[i],
-                        VertexBuffer::elementNormalize[i], vertexSize, (const GLvoid*)elementData);
-                    
-                    elementData += VertexBuffer::elementSize[i];
+                        VertexBuffer::elementNormalize[i], vertexSize, (const GLvoid*)&immediateVertexData_[immediateElementOffsets_[i]]);
                 }
                 else if (impl_->enabledAttributes_ & attributeBit)
                 {
@@ -1934,11 +1932,12 @@ unsigned Graphics::GetRGBAFormat()
 
 unsigned Graphics::GetDepthFormat()
 {
-    // Note: this requires GLee static initialization to have completed to return the proper result
-    if (_GLEE_EXT_packed_depth_stencil)
-        return GL_DEPTH24_STENCIL8_EXT;
-    else
-        return GL_DEPTH_COMPONENT24;
+    return GL_DEPTH_COMPONENT24;
+}
+
+unsigned Graphics::GetDepthStencilFormat()
+{
+    return GL_DEPTH24_STENCIL8_EXT;
 }
 
 bool Graphics::IsInitialized() const
@@ -2083,7 +2082,6 @@ void Graphics::CreateRenderTargets()
 {
     if (mode_ != RENDER_FORWARD)
     {
-        // In deferred rendering, the diffuse buffer stores diffuse albedo. In light prepass, it is used for light accumulation
         if (!diffBuffer_)
         {
             diffBuffer_ = new Texture2D(context_);
@@ -2267,7 +2265,6 @@ void Graphics::InitializeShaderParameters()
     textureUnits_["DiffBuffer"] = TU_DIFFBUFFER;
     textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
-    textureUnits_["LightBuffer"] = TU_LIGHTBUFFER;
 }
 
 void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)

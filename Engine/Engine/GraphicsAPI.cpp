@@ -277,9 +277,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextureUnit", "MAX_MATERIAL_TEXTURE_UNITS", MAX_MATERIAL_TEXTURE_UNITS);
     
     engine->RegisterEnum("PassType");
-    engine->RegisterEnumValue("PassType", "PASS_DEFERRED", PASS_DEFERRED);
-    engine->RegisterEnumValue("PassType", "PASS_PREPASS", PASS_PREPASS);
-    engine->RegisterEnumValue("PassType", "PASS_MATERIAL", PASS_MATERIAL);
+    engine->RegisterEnumValue("PassType", "PASS_GBUFFER", PASS_GBUFFER);
     engine->RegisterEnumValue("PassType", "PASS_BASE", PASS_BASE);
     engine->RegisterEnumValue("PassType", "PASS_LITBASE", PASS_LITBASE);
     engine->RegisterEnumValue("PassType", "PASS_LIGHT", PASS_LIGHT);
@@ -700,7 +698,6 @@ static void RegisterGraphics(asIScriptEngine* engine)
 {
     engine->RegisterEnum("RenderMode");
     engine->RegisterEnumValue("RenderMode", "RENDER_DEFERRED", RENDER_DEFERRED);
-    engine->RegisterEnumValue("RenderMode", "RENDER_PREPASS", RENDER_PREPASS);
     engine->RegisterEnumValue("RenderMode", "RENDER_FORWARD", RENDER_FORWARD);
     
     RegisterObject<Graphics>(engine, "Graphics");
@@ -725,7 +722,6 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "uint get_numPrimitives() const", asMETHOD(Graphics, GetNumPrimitives), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "uint get_numBatches() const", asMETHOD(Graphics, GetNumBatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_deferredSupport() const", asMETHOD(Graphics, GetDeferredSupport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "bool get_prepassSupport() const", asMETHOD(Graphics, GetPrepassSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sm3Support() const", asMETHOD(Graphics, GetSM3Support), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hardwareShadowSupport() const", asMETHOD(Graphics, GetHardwareShadowSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_hiresShadowSupport() const", asMETHOD(Graphics, GetHiresShadowSupport), asCALL_THISCALL);

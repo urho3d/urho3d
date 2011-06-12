@@ -29,8 +29,7 @@
 enum RenderMode
 {
     RENDER_FORWARD = 0,
-    RENDER_PREPASS,
-    RENDER_DEFERRED,
+    RENDER_DEFERRED
 };
 
 /// Primitive type
@@ -172,9 +171,7 @@ enum TextureUsage
 /// Rendering passes
 enum PassType
 {
-    PASS_DEFERRED,
-    PASS_PREPASS,
-    PASS_MATERIAL,
+    PASS_GBUFFER,
     PASS_BASE,
     PASS_LITBASE,
     PASS_LIGHT,
@@ -265,7 +262,6 @@ enum TextureUnit
     TU_NORMALBUFFER = 1,
     TU_DEPTHBUFFER = 2,
     TU_SHADOWMAP = 5,
-    TU_LIGHTBUFFER = 6,
     TU_LIGHTRAMP = 6,
     TU_LIGHTSPOT = 7,
     MAX_TEXTURE_UNITS = 8

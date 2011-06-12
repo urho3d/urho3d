@@ -77,7 +77,6 @@ Urho3D.exe understands the following command line options:
 -w          Start in windowed mode
 -headless   Headless mode. No application window will be created
 -forward    Use forward rendering (default)
--prepass    Use light pre-pass rendering
 -deferred   Use deferred rendering
 -b<length>  Mixing buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
