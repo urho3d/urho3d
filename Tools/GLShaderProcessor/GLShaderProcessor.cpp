@@ -161,8 +161,8 @@ void Run(const Vector<String>& arguments)
     {
         ErrorExit(
             "Usage: GLShaderProcessor <definitionfile> <outputpath> [define1] [define2]\n\n"
-            "GLSL files will be loaded from definition file directory, and binary files will\n"
-            "be output to the output path, preserving the subdirectory structure.\n"
+            "GLSL files will be loaded from definition file directory, and finalized GLSL +\n"
+            "XML files are saved to the output path, preserving the subdirectory structure.\n"
         );
     }
     

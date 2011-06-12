@@ -60,7 +60,7 @@ After Engine initialization, the following subsystems will always exist:
 The following subsystems are optional, so GetSubsystem() may return null if they have not been created:
 
 - Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
-- Graphics: Manages the application window and the Direct3D9 device and resources. Exists if not in headless mode.
+- Graphics: Manages the application window, the rendering context and resources. Exists if not in headless mode.
 - Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
 - Script: Provides the AngelScript execution environment. Created by calling \ref Engine::InitializeScripting() "InitializeScripting()".
 - Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole() "CreateConsole()".
@@ -341,10 +341,10 @@ Much of the rendering functionality in Urho3D is built on two subsystems, Graphi
 
 Graphics implements the low-level functionality:
 
-- Creating the window and the Direct3D device
+- Creating the window and the rendering context
 - Setting the screen mode
 - Keeping track of GPU resources
-- Keeping track of Direct3D state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
+- Keeping track of rendering context state (current rendertarget, vertex and index buffers, textures, shaders and renderstates)
 - Handling lost device
 - Performing primitive rendering operations
 
@@ -354,7 +354,8 @@ Screen resolution, fullscreen/windowed, vertical sync, forward/light pre-pass/de
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- Which shader model is supported? 2.0 is minimum, but 3.0 will be used if available. Shader model 2.0 can be forced by calling setForceSM2() before calling setMode() for the first time.
+- For Direct3D9, it checks which shader model is supported? 2.0 is minimum, but 3.0 will be used if available. Shader model 2.0 can be forced by calling setForceSM2() before calling setMode() for the first time. 
+- For OpenGL, version 2.0 is required as a minimum. Shadows and deferred rendering additionally require the frame buffer object extension.
 - Are multiple render targets supported? If not, only forward rendering will be available.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, shadow rendering will be disabled.
 
@@ -402,6 +403,35 @@ The rendering-related components defined by the %Graphics library are:
 See also \ref Materials "Materials", \ref Lights "Lights and shadows", \ref Particles "Particle systems" and \ref AuxiliaryViews "Auxiliary views".
 
 For details on how lighting opaque geometry differs between forward and deferred rendering, see \ref ForwardDeferred "Comparision of forward, light pre-pass and deferred rendering".
+
+For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferences "Differences between Direct3D9 and OpenGL".
+
+
+\page APIDifferences Differences between Direct3D9 and OpenGL
+
+- On Direct3D9 shader uniform parameters are global. On OpenGL they are shader-specific. To ensure correct operation also on OpenGL, first set the shaders, then query Graphics whether each shader parameter is needed, and set the corresponding parameter if needed. This includes also frame-global parameters, which on Direct3D9 need to be set only once per frame.
+
+- On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
+
+- OpenGL does not provide texture locking operations for direct pixel data access.
+
+- On Direct3D9 the depth stencil surface can be equal size or larger than the color render target. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the system depth stencil buffer when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth stencil buffers on demand whenever a texture is set as a color render target, and a null depth stencil is specified.
+
+- On Direct3D9 setting the first color render target resets the viewport dimensions. On OpenGL there is no such mechanism, but as sometimes (for example in shadow rendering) only a depth stencil buffer is set for rendering, Graphics will instead reset the viewport when the depth stencil buffer is set. To ensure correct operation on both APIs, first set the render targets, then the depth stencil buffer, and finally the viewport, if you need it to be less than the whole render target.
+
+- On OpenGL modifying a texture will cause it to be momentarily set on the first texture unit. If another texture was set there, the assignment will be lost. Graphics performs a check to not assign textures redundantly, so it is safe and recommended to always set all needed textures before rendering.
+
+- Modifying an index buffer on OpenGL will similarly cause the existing index buffer assignment to be lost. Therefore, always set the vertex and index buffers before rendering.
+
+- Shader resources are stored in different locations depending on the API: CoreData/Shaders/SM2 or CoreData/Shaders/SM3 on Direct3D9, and CoreData/Shaders/GLSL for OpenGL.
+
+- In deferred and light prepass rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the depth stencil buffer will be read directly, and linear depth will be reconstructed in the pixel shader. This results in less GPU memory bandwidth needed, but can introduce inaccuracy to depth calculations.
+
+- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents.
+
+- At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
+
+Note that these differences only need to be observed when writing custom rendering functionality and accessing Graphics directly. When using Renderer and the Drawable components, they are taken care of automatically.
 
 
 \page Materials Materials
@@ -1003,6 +1033,18 @@ Options:
 -t        Generate tangents to model(s)
 \endverbatim
 
+\section Tools_GLShaderProcessor GLShaderProcessor
+
+GLShaderProcessor creates final GLSL source code for vertex and pixel shaders, and enumerates the possible shader combinations. Unlike \ref Tools_ShaderCompiler "ShaderCompiler", compiling the shaders is left to runtime.
+
+Usage:
+\verbatim
+GLShaderProcessor <definitionfile> <outputpath> [define1] [define2]
+
+GLSL files will be loaded from definition file directory, and finalized GLSL +
+XML files are saved to the output path, preserving the subdirectory structure.
+\endverbatim
+
 \section Tools_NormalMapTool NormalMapTool
 
 NormalMapTool converts normal map images into DXT5 format, with an encoding that preserves quality better than simply compressing the original, unmodified image. The encoding is:
@@ -1197,7 +1239,7 @@ uint       Number of tracks
 
 Note: animations are stored using absolute bone transformations. Therefore only lerp-blending between animations is supported; additive pose modification is not.
 
-\section FileFormats_Shader Binary shader format (.vs2, .ps2, .vs3, .ps3)
+\section FileFormats_Shader Direct3D9 binary shader format (.vs2, .ps2, .vs3, .ps3)
 
 \verbatim
 byte[4]    Identifier "USHD"
