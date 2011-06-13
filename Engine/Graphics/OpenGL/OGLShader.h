@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Resource.h"
+#include "SharedArrayPtr.h"
 
 class ShaderVariation;
 
@@ -54,14 +55,14 @@ public:
     ShaderType GetShaderType() const { return shaderType_; }
     /// Return number of variations
     unsigned GetNumVariations() const { return variations_.Size(); }
-    /// Return shader source code
-    const String& GetShaderCode() const { return shaderCode_; }
     
 private:
     /// Shader type
     ShaderType shaderType_;
-    /// Shader source code
-    String shaderCode_;
+    /// GLSL source code
+    SharedArrayPtr<char> sourceCode_;
+    /// Source code length
+    unsigned sourceCodeLength_;
     /// Shader variations. Will be in an unloaded state until requested
     Map<StringHash, SharedPtr<ShaderVariation> > variations_;
 };

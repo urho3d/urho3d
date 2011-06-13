@@ -46,11 +46,6 @@
 
 #include "DebugNew.h"
 
-static const String aaVariation[] = {
-    "",
-    "Ortho"
-};
-
 static const Vector3 directions[] =
 {
     Vector3::RIGHT,
@@ -206,6 +201,9 @@ void View::Render()
 {
     if ((!octree_) || (!camera_))
         return;
+    
+    // Forget parameter sources from the previous view
+    graphics_->ClearParameterSources();
     
     // If stream offset is supported, write all instance transforms to a single large buffer
     // Else we must lock the instance buffer for each batch group
@@ -725,7 +723,6 @@ void View::RenderBatchesForward()
         // Render opaque objects' base passes
         PROFILE(RenderBasePass);
         
-        graphics_->ClearLastParameterSources();
         graphics_->SetColorWrite(true);
         graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
@@ -748,7 +745,6 @@ void View::RenderBatchesForward()
             if ((renderer_->reuseShadowMaps_) && (queue.light_->GetShadowMap()))
                 RenderShadowMap(queue);
             
-            graphics_->ClearLastParameterSources();
             graphics_->SetRenderTarget(0, renderTarget_);
             graphics_->SetDepthStencil(depthStencil_);
             graphics_->SetViewport(screenRect_);
@@ -769,7 +765,6 @@ void View::RenderBatchesForward()
         // Render extra / custom passes
         PROFILE(RenderExtraPass);
         
-        graphics_->ClearLastParameterSources();
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
@@ -847,8 +842,6 @@ void View::RenderBatchesDeferred()
         // Clear and render the G-buffer
         PROFILE(RenderGBuffer);
         
-        graphics_->ClearLastParameterSources();
-        
         graphics_->SetColorWrite(true);
         graphics_->SetScissorTest(false);
         graphics_->SetStencilTest(false);
@@ -889,7 +882,6 @@ void View::RenderBatchesDeferred()
         PROFILE(RenderAmbientQuad);
         
         // Render ambient color & fog. On OpenGL the depth buffer will be copied now
-        graphics_->ClearLastParameterSources();
         graphics_->SetDepthTest(CMP_ALWAYS);
         graphics_->SetRenderTarget(0, renderBuffer);
         graphics_->ResetRenderTarget(1);
@@ -899,15 +891,15 @@ void View::RenderBatchesDeferred()
         graphics_->ResetRenderTarget(2);
         #endif
         graphics_->SetDepthStencil(depthStencil_);
+        graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
         graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-        graphics_->SetViewport(screenRect_);
         
         String pixelShaderName = "Ambient";
         #ifdef USE_OPENGL
         if (camera_->IsOrthographic())
             pixelShaderName += "Ortho";
-        // On OpenGL, set up a stencil operation to reset the stencil during the quad rendering
+        // On OpenGL, set up a stencil operation to reset the stencil during ambient quad rendering
         graphics_->SetStencilTest(true, CMP_ALWAYS, OP_ZERO, OP_KEEP, OP_KEEP);
         #endif
         
@@ -935,8 +927,6 @@ void View::RenderBatchesDeferred()
             // Light volume batches are not sorted as there should be only one of them
             if (queue.volumeBatches_.Size())
             {
-                graphics_->ClearLastParameterSources();
-                
                 graphics_->SetRenderTarget(0, renderBuffer);
                 graphics_->SetDepthStencil(depthStencil_);
                 graphics_->SetViewport(screenRect_);
@@ -959,14 +949,12 @@ void View::RenderBatchesDeferred()
         // Non-shadowed lights
         if (noShadowLightQueue_.sortedBatches_.Size())
         {
-            graphics_->ClearLastParameterSources();
-            
             graphics_->SetRenderTarget(0, renderBuffer);
             graphics_->SetDepthStencil(depthStencil_);
+            graphics_->SetViewport(screenRect_);
             graphics_->SetTexture(TU_DIFFBUFFER, diffBuffer);
             graphics_->SetTexture(TU_NORMALBUFFER, normalBuffer);
             graphics_->SetTexture(TU_DEPTHBUFFER, depthBuffer);
-            graphics_->SetViewport(screenRect_);
             
             for (unsigned i = 0; i < noShadowLightQueue_.sortedBatches_.Size(); ++i)
             {
@@ -980,14 +968,13 @@ void View::RenderBatchesDeferred()
         // Render base passes
         PROFILE(RenderBasePass);
         
-        graphics_->ClearLastParameterSources();
         graphics_->SetStencilTest(false);
-        graphics_->SetRenderTarget(0, renderBuffer);
-        graphics_->SetDepthStencil(depthStencil_);
-        graphics_->SetViewport(screenRect_);
         graphics_->SetTexture(TU_DIFFBUFFER, 0);
         graphics_->SetTexture(TU_NORMALBUFFER, 0);
         graphics_->SetTexture(TU_DEPTHBUFFER, 0);
+        graphics_->SetRenderTarget(0, renderBuffer);
+        graphics_->SetDepthStencil(depthStencil_);
+        graphics_->SetViewport(screenRect_);
         
         RenderBatchQueue(baseQueue_, true);
     }
@@ -1020,8 +1007,9 @@ void View::RenderBatchesDeferred()
         else
             depthMode.w_ = 1.0f / camera_->GetFarClip();
         
-        unsigned index = camera_->IsOrthographic() ? 1 : 0;
-        String shaderName = "TemporalAA_" + aaVariation[index];
+        String shaderName = "TemporalAA";
+        if (camera_->IsOrthographic())
+            shaderName += "_Ortho";
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
@@ -2013,7 +2001,6 @@ void View::CalculateShaderParameters()
 
 void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
 {
-    graphics_->ClearTransformSources();
     Matrix3x4 view(camera.GetInverseWorldTransform());
     
     switch (light->GetLightType())
@@ -2035,6 +2022,7 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
             graphics_->SetShaderParameter(VSP_MODEL, model);
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
+            graphics_->ClearTransformSources();
             
             // Draw the faces to stencil which we should draw (where no light has not been rendered yet)
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_INCR, OP_KEEP, OP_KEEP, 0);
@@ -2095,6 +2083,8 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                     graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
                     graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
                 }
+                
+                graphics_->ClearTransformSources();
                 
                 renderer_->dirLightGeometry_->Draw(graphics_);
                 graphics_->SetColorWrite(true);
@@ -2213,7 +2203,6 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     
     Texture2D* shadowMap = queue.light_->GetShadowMap();
     
-    graphics_->ClearLastParameterSources();
     graphics_->SetColorWrite(false);
     graphics_->SetStencilTest(false);
     graphics_->SetTexture(TU_SHADOWMAP, 0);

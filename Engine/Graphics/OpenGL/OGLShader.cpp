@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
@@ -37,7 +38,8 @@ OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :
     Resource(context),
-    shaderType_(VS)
+    shaderType_(VS),
+    sourceCodeLength_(0)
 {
 }
 
@@ -61,10 +63,11 @@ bool Shader::Load(Deserializer& source)
     if (!graphics)
         return false;
     
-    unsigned codeLength = source.GetSize();
-    shaderCode_.Resize(codeLength);
-    source.Read(&shaderCode_[0], codeLength);
+    sourceCodeLength_ = source.GetSize();
+    sourceCode_ = new char[sourceCodeLength_];
+    source.Read(&sourceCode_[0], sourceCodeLength_);
     
+    String fileName = GetFileName(source.GetName());
     String xmlName = source.GetName() + ".xml";
     XMLFile* file = GetSubsystem<ResourceCache>()->GetResource<XMLFile>(xmlName);
     if (!file)
@@ -79,7 +82,11 @@ bool Shader::Load(Deserializer& source)
         String variationName = variationElem.GetString("name");
         StringHash nameHash(variationName);
         SharedPtr<ShaderVariation> newVariation(new ShaderVariation(this, shaderType_));
-        newVariation->SetName(variationName);
+        if (!variationName.Empty())
+            newVariation->SetName(fileName + "_" + variationName);
+        else
+            newVariation->SetName(fileName);
+        newVariation->SetSourceCode(sourceCode_, sourceCodeLength_);
         newVariation->SetDefines(variationElem.GetString("defines").Split(' '));
         variations_[nameHash] = newVariation;
         
@@ -97,25 +104,8 @@ ShaderVariation* Shader::GetVariation(const String& name)
 ShaderVariation* Shader::GetVariation(StringHash nameHash)
 {
     Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
-    if (i == variations_.End())
+    if (i != variations_.End())
+        return i->second_;
+    else
         return 0;
-    ShaderVariation* variation = i->second_;
-    
-    // Create shader object now if not yet created. If fails, remove the variation
-    if (!variation->GetGPUObject())
-    {
-        LOGDEBUG("Creating variation " + variation->GetName() + " of shader " + GetName());
-        
-        PROFILE(CreateShaderVariation);
-        bool success = variation->Create();
-        if (!success)
-        {
-            LOGERROR("Failed to create variation " + variation->GetName() + " of shader " + GetName() + ":\n" +
-                variation->GetCompilerOutput());
-            variations_.Erase(i);
-            return 0;
-        }
-    }
-    
-    return variation;
 }

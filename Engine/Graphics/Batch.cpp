@@ -122,7 +122,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     {
         // If we override the view matrix, also disable any projection jittering
         /// \todo This may not be correct in all cases (skybox rendering?)
-        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, &Matrix3x4::IDENTITY))
+        if (graphics->NeedParameterUpdate(VSP_VIEWPROJ, ((unsigned char*)camera_) + 4))
             graphics->SetShaderParameter(VSP_VIEWPROJ, camera_->GetProjection(false));
     }
     else

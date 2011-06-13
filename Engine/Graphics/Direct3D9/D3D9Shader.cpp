@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Deserializer.h"
+#include "FileSystem.h"
 #include "Graphics.h"
 #include "GraphicsImpl.h"
 #include "Log.h"
@@ -76,6 +77,7 @@ bool Shader::Load(Deserializer& source)
         return false;
     }
     
+    String fileName = GetFileName(source.GetName());
     shaderType_ = (ShaderType)source.ReadShort();
     isSM3_ = (source.ReadShort() == 3);
     
@@ -116,7 +118,12 @@ bool Shader::Load(Deserializer& source)
     for (unsigned i = 0; i < numVariations; ++i)
     {
         SharedPtr<ShaderVariation> variation(new ShaderVariation(this, shaderType_, isSM3_));
-        variation->SetName(source.ReadString());
+        String variationName = source.ReadString();
+        StringHash nameHash(variationName);
+        if (!variationName.Empty())
+            variation->SetName(fileName + "_" + variationName);
+        else
+            variation->SetName(fileName);
         
         // Fill the parameter & texture unit use information
         for (unsigned j = 0; j < numParameters; ++j)
@@ -149,7 +156,7 @@ bool Shader::Load(Deserializer& source)
         }
         
         // Store the variation
-        variations_[StringHash(variation->GetName())] = variation;
+        variations_[nameHash] = variation;
     }
     
     // This is not exactly accurate, but a reasonable estimate
@@ -165,24 +172,8 @@ ShaderVariation* Shader::GetVariation(const String& name)
 ShaderVariation* Shader::GetVariation(StringHash nameHash)
 {
     Map<StringHash, SharedPtr<ShaderVariation> >::Iterator i = variations_.Find(nameHash);
-    if (i == variations_.End())
+    if (i != variations_.End())
+        return i->second_;
+    else
         return 0;
-    ShaderVariation* variation = i->second_;
-    
-    // Create shader object now if not yet created. If fails, remove the variation
-    if (!variation->GetGPUObject())
-    {
-        LOGDEBUG("Creating variation " + variation->GetName() + " of shader " + GetName());
-        
-        PROFILE(CreateShaderVariation);
-        bool success = variation->Create();
-        if (!success)
-        {
-            LOGERROR("Failed to create variation " + variation->GetName() + " of shader " + GetName());
-            variations_.Erase(i);
-            return 0;
-        }
-    }
-    
-    return variation;
 }

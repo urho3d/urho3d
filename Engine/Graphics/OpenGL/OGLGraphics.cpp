@@ -134,7 +134,8 @@ Graphics::Graphics(Context* context_) :
     immediateVertexCount_(0),
     defaultTextureFilterMode_(FILTER_BILINEAR),
     shadowMapFormat_(0),
-    hiresShadowMapFormat_(0)
+    hiresShadowMapFormat_(0),
+    shaderParameterFrame_(0)
 {
     ResetCachedState();
     InitializeShaderParameters();
@@ -365,7 +366,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
 {
     PROFILE(TakeScreenShot);
     
-    SetRenderTarget(0, (RenderSurface*)0);
+    ResetRenderTargets();
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
     
@@ -733,8 +734,45 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if ((vs == vertexShader_) && (ps == pixelShader_))
         return;
     
-    // All vertex attributes must be re-bound after shader change, and uniforms need to be reassigned
-    ClearLastParameterSources();
+    // Compile the shaders now if not yet compiled. If already attempted, do not retry
+    if ((vs) && (!vs->IsCompiled()))
+    {
+        if (vs->GetCompilerOutput().Empty())
+        {
+            PROFILE(CompileVertexShader);
+
+            bool success = vs->Create();
+            if (success)
+                LOGDEBUG("Compiled vertex shader " + vs->GetName());
+            else
+            {
+                LOGERROR("Failed to compile vertex shader " + vs->GetName() + ":\n" + vs->GetCompilerOutput());
+                vs = 0;
+            }
+        }
+        else
+            vs = 0;
+    }
+    
+    if ((ps) && (!ps->IsCompiled()))
+    {
+        if (ps->GetCompilerOutput().Empty())
+        {
+            PROFILE(CompilePixelShader);
+
+            bool success = ps->Create();
+            if (success)
+                LOGDEBUG("Compiled pixel shader " + ps->GetName());
+            else
+            {
+                LOGERROR("Failed to compile pixel shader " + ps->GetName() + ":\n" + ps->GetCompilerOutput());
+                ps = 0;
+            }
+        }
+        else
+            ps = 0;
+    }
+    
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         vertexBuffers_[i] = 0;
@@ -774,18 +812,19 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         {
             // Link a new combination
             SharedPtr<ShaderProgram> newProgram(new ShaderProgram(this, vs, ps));
-            if (!newProgram->Link())
+            if (newProgram->Link())
             {
-                LOGERROR("Failed to link shader " + vs->GetShader()->GetName() + ":\n" +
-                    newProgram->GetLinkerOutput());
-                glUseProgram(0);
-                shaderProgram_ = 0;
-            }
-            else
-            {
+                LOGDEBUG("Linked vertex shader " + vs->GetName() + " and pixel shader " + ps->GetName());
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
                 shaderProgram_ = newProgram;
+            }
+            else
+            {
+                LOGERROR("Failed to link vertex shader " + vs->GetName() + " and pixel shader " + ps->GetName() + ":\n" +
+                    newProgram->GetLinkerOutput());
+                glUseProgram(0);
+                shaderProgram_ = 0;
             }
             
             shaderPrograms_[combination] = newProgram;
@@ -988,11 +1027,8 @@ void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix
 
 bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
 {
-    if ((shaderProgram_) && (shaderProgram_->HasParameter(param)) && (lastShaderParameterSources_[param] != source))
-    {
-        lastShaderParameterSources_[param] = source;
-        return true;
-    }
+    if (shaderProgram_)
+        return shaderProgram_->NeedParameterUpdate(param, source, shaderParameterFrame_);
     
     return false;
 }
@@ -1005,16 +1041,18 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
     return false;
 }
 
-void Graphics::ClearLastParameterSources()
+void Graphics::ClearParameterSources()
 {
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
-        lastShaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+    ++shaderParameterFrame_;
 }
 
 void Graphics::ClearTransformSources()
 {
-    lastShaderParameterSources_[VSP_MODEL] = (const void*)M_MAX_UNSIGNED;
-    lastShaderParameterSources_[VSP_VIEWPROJ] = (const void*)M_MAX_UNSIGNED;
+    if (shaderProgram_)
+    {
+        shaderProgram_->ClearParameterSource(VSP_MODEL);
+        shaderProgram_->ClearParameterSource(VSP_VIEWPROJ);
+    }
 }
 
 void Graphics::CleanupShaderPrograms()
@@ -1022,7 +1060,7 @@ void Graphics::CleanupShaderPrograms()
     for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
     {
         ShaderProgramMap::Iterator current = i++;
-        if (!current->second_->GetGPUObject())
+        if ((!current->second_->GetVertexShader()->GetGPUObject()) || (!current->second_->GetPixelShader()->GetGPUObject()))
         {
             if (shaderProgram_ == current->second_)
                 shaderProgram_ = 0;

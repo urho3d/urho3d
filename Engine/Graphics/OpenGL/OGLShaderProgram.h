@@ -53,6 +53,10 @@ public:
     virtual void Release();
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful
     bool Link();
+    /// Check whether needs a parameter update
+    bool NeedParameterUpdate(ShaderParameter param, const void* source, unsigned frame);
+    /// Clear a specific remembered parameter source
+    void ClearParameterSource(ShaderParameter param);
     
     /// Return the vertex shader
     ShaderVariation* GetVertexShader() const;
@@ -78,6 +82,10 @@ private:
     WeakPtr<ShaderVariation> pixelShader_;
     /// Uniform info map
     HashMap<ShaderParameter, UniformInfo> uniformInfos_;
+    /// Shader parameter last source map
+    HashMap<ShaderParameter, const void*> lastParameterSources_;
+    /// Shader parameters global frame number
+    unsigned lastParameterFrame_;
     /// Texture unit use
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
     /// Vertex attribute bindings
@@ -86,4 +94,5 @@ private:
     String linkerOutput_;
     /// Linked flag
     bool linked_;
+    
 };

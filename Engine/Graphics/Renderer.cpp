@@ -971,20 +971,6 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
         psi += DLPS_ORTHO;
     }
     
-    unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
-    
-    if (!lightVS_[vsi])
-        lightVS_[vsi] = GetVertexShader("Light_" + deferredLightVSVariations[vsi]);
-    
-    if (!lightPS_[psi])
-    {
-        unsigned variation = psi % DLPS_SPOT;
-        if ((variation == DLPS_SHADOW) || (variation == DLPS_SHADOWSPEC))
-            lightPS_[psi] = GetPixelShader("Light_" + lightPSVariations[psi] + hwVariations[hwShadows]);
-        else
-            lightPS_[psi] = GetPixelShader("Light_" + lightPSVariations[psi]);
-    }
-    
     batch.material_ = 0;
     batch.pass_ = 0;
     batch.vertexShader_ = lightVS_[vsi];
@@ -1010,9 +996,22 @@ void Renderer::LoadShaders()
     RenderMode mode = graphics_->GetRenderMode();
     if (mode != RENDER_FORWARD)
     {
-        // There are rather many light volume shader variations, so load them later on-demand
         lightVS_.Resize(MAX_DEFERRED_LIGHT_VS_VARIATIONS);
         lightPS_.Resize(MAX_DEFERRED_LIGHT_PS_VARIATIONS);
+        
+        unsigned hwShadows = graphics_->GetHardwareShadowSupport() ? 1 : 0;
+        
+        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_VS_VARIATIONS; ++i)
+            lightVS_[i] = GetVertexShader("Light_" + deferredLightVSVariations[i]);
+        
+        for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
+        {
+            unsigned variation = i % DLPS_SPOT;
+            if ((variation == DLPS_SHADOW) || (variation == DLPS_SHADOWSPEC))
+                lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i] + hwVariations[hwShadows]);
+            else
+                lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i]);
+        }
     }
     
     // Remove shaders that are no longer referenced from the cache
@@ -1338,7 +1337,6 @@ Node* Renderer::CreateTempNode()
 
 void Renderer::SetupLightBatch(Batch& batch)
 {
-    graphics_->ClearTransformSources();
     Matrix3x4 view(batch.camera_->GetInverseWorldTransform());
     
     Light* light = batch.light_;
@@ -1373,6 +1371,7 @@ void Renderer::SetupLightBatch(Batch& batch)
             graphics_->SetShaders(stencilVS_, stencilPS_);
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
             graphics_->SetShaderParameter(VSP_MODEL, nearTransform);
+            graphics_->ClearTransformSources();
             
             // Draw to stencil
             batch.geometry_->Draw(graphics_);
@@ -1455,8 +1454,6 @@ void Renderer::SetupLightBatch(Batch& batch)
 
 void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<ShaderParameter, Vector4>& shaderParameters)
 {
-    graphics_->ClearTransformSources();
-    
     Light quadDirLight(context_);
     Matrix3x4 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
     
@@ -1465,6 +1462,7 @@ void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVar
     graphics_->SetShaderParameter(VSP_MODEL, model);
     // Get projection without jitter offset to ensure the whole screen is filled
     graphics_->SetShaderParameter(VSP_VIEWPROJ, camera.GetProjection(false));
+    graphics_->ClearTransformSources();
     
     // Set global shader parameters as needed
     for (HashMap<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)

@@ -55,12 +55,14 @@ public:
     /// Clear parameter and texture unit use flags
     void ClearParameters();
     
-    /// Return parent shader
-    Shader* GetShader() const;
     /// Return shader type
     ShaderType GetShaderType() const { return shaderType_; }
-    /// Return variation name
+    /// Return full shader name
     const String& GetName() const { return name_; }
+    /// Return whether created successfully
+    bool IsCreated() const;
+    /// Return whether compile failed
+    bool IsFailed() const { return failed_; }
     /// Return whether requires Shader Model 3
     bool IsSM3() const { return isSM3_; }
     /// Return whether uses a specific shader parameter
@@ -69,16 +71,16 @@ public:
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     
 private:
-    /// Parent shader
-    WeakPtr<Shader> shader_;
-    /// Shader bytecode
-    SharedArrayPtr<unsigned char> byteCode_;
     /// Shader type
     ShaderType shaderType_;
-    /// Variation name
+    /// Full shader name
     String name_;
+    /// Shader bytecode
+    SharedArrayPtr<unsigned char> byteCode_;
     /// Shader Model 3 flag
     bool isSM3_;
+    /// Compile failed flag
+    bool failed_;
     /// Parameter use flags
     bool useParameter_[MAX_SHADER_PARAMETERS];
     /// Texture unit use flags

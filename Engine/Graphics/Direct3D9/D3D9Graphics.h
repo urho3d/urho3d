@@ -127,7 +127,7 @@ public:
     /// Check whether the current pixel shader uses a texture unit
     bool NeedTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter sources
-    void ClearLastParameterSources();
+    void ClearParameterSources();
     /// Clear remembered transform shader parameter sources
     void ClearTransformSources();
     /// Set texture

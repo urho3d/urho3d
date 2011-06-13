@@ -33,9 +33,9 @@
 
 ShaderVariation::ShaderVariation(Shader* shader, ShaderType type, bool isSM3) :
     GPUObject(shader->GetSubsystem<Graphics>()),
-    shader_(shader),
     shaderType_(type),
-    isSM3_(isSM3)
+    isSM3_(isSM3),
+    failed_(false)
 {
     ClearParameters();
 }
@@ -58,17 +58,17 @@ bool ShaderVariation::Create()
         if ((!device) || (FAILED(device->CreateVertexShader(
             (const DWORD*)byteCode_.GetPtr(),
             (IDirect3DVertexShader9**)&object_))))
-            return false;
+            failed_ = true;
     }
     else
     {
         if ((!device) || (FAILED(device->CreatePixelShader(
             (const DWORD*)byteCode_.GetPtr(),
             (IDirect3DPixelShader9**)&object_))))
-            return false;
+            failed_ = true;
     }
     
-    return true;
+    return !failed_;
 }
 
 void ShaderVariation::Release()
@@ -95,6 +95,8 @@ void ShaderVariation::Release()
         
         object_ = 0;
     }
+    
+    failed_ = false;
 }
 
 void ShaderVariation::SetName(const String& name)
@@ -129,7 +131,7 @@ void ShaderVariation::ClearParameters()
         useTextureUnit_[i] = false;
 }
 
-Shader* ShaderVariation::GetShader() const
+bool ShaderVariation::IsCreated() const
 {
-    return shader_;
+    return object_ != 0;
 }

@@ -170,6 +170,10 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     if (object_)
     {
         graphics_->SetIndexBuffer(this);
+        // If locking the whole buffer in discard mode, create a new data store
+        if ((mode == LOCK_DISCARD) && (count == indexCount_))
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        
         hwData = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, glLockMode);
         if (!hwData)
             return 0;
@@ -241,14 +245,17 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
 
 bool IndexBuffer::Create()
 {
-    Release();
-    
     if (!indexCount_)
+    {
+        Release();
         return true;
+    }
     
     if (graphics_)
     {
-        glGenBuffers(1, &object_);
+        if (!object_)
+            glGenBuffers(1, &object_);
+        
         graphics_->SetIndexBuffer(this);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }

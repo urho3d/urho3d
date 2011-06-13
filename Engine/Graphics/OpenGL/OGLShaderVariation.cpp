@@ -34,8 +34,8 @@
 
 ShaderVariation::ShaderVariation(Shader* shader, ShaderType type) :
     GPUObject(shader->GetSubsystem<Graphics>()),
-    shader_(shader),
     shaderType_(type),
+    sourceCodeLength_(0),
     compiled_(false)
 {
 }
@@ -63,17 +63,12 @@ void ShaderVariation::Release()
                 graphics_->SetShaders(0, 0);
         }
         
-        // Release the linked shader program if exists
-        if (shaderProgram_)
-        {
-            shaderProgram_->Release();
-            shaderProgram_.Reset();
-            graphics_->CleanupShaderPrograms();
-        }
+        graphics_->CleanupShaderPrograms();
         
         glDeleteShader(object_);
         object_ = 0;
         compiled_ = false;
+        compilerOutput_.Clear();
     }
 }
 
@@ -81,7 +76,7 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if (!shader_)
+    if ((!sourceCode_) || (!sourceCodeLength_))
         return false;
     
     object_ = glCreateShader((shaderType_ == VS) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
@@ -95,7 +90,9 @@ bool ShaderVariation::Create()
     String shaderCode;
     for (unsigned i = 0; i < defines_.Size(); ++i)
         shaderCode += "#define " + defines_[i] + "\n";
-    shaderCode += shader_->GetShaderCode();
+    if (!defines_.Empty())
+        shaderCode += "\n";
+    shaderCode += String(sourceCode_.GetPtr(), sourceCodeLength_);
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);
@@ -121,12 +118,13 @@ void ShaderVariation::SetName(const String& name)
     name_ = name;
 }
 
+void ShaderVariation::SetSourceCode(const SharedArrayPtr<char>& code, unsigned length)
+{
+    sourceCode_ = code;
+    sourceCodeLength_ = length;
+}
+
 void ShaderVariation::SetDefines(const Vector<String>& defines)
 {
     defines_ = defines;
-}
-
-Shader* ShaderVariation::GetShader() const
-{
-    return shader_;
 }

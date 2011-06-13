@@ -68,6 +68,8 @@ struct TriangleMeshData : public CollisionGeometryData
     SharedArrayPtr<Vector3> vertexData_;
     /// Index data
     SharedArrayPtr<unsigned> indexData_;
+    /// Number of indices
+    unsigned indexCount_;
 };
 
 /// Heightfield geometry data

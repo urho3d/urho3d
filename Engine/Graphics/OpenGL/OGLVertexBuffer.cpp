@@ -275,6 +275,10 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     if (object_)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
+        // If locking the whole buffer in discard mode, create a new data store
+        if ((mode == LOCK_DISCARD) && (count == vertexCount_))
+            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        
         hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
         if (!hwData)
             return 0;
@@ -369,14 +373,17 @@ unsigned VertexBuffer::GetVertexSize(unsigned mask)
 
 bool VertexBuffer::Create()
 {
-    Release();
-    
     if ((!vertexCount_) || (!elementMask_))
+    {
+        Release();
         return true;
+    }
     
     if (graphics_)
     {
-        glGenBuffers(1, &object_);
+        if (!object_)
+            glGenBuffers(1, &object_);
+        
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }

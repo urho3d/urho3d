@@ -907,20 +907,65 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
     if (vs != vertexShader_)
     {
+        // Create the shader now if not yet created. If already attempted, do not retry
+        if ((vs) && (!vs->IsCreated()))
+        {
+            if (!vs->IsFailed())
+            {
+                PROFILE(CreateVertexShader);
+                
+                bool success = vs->Create();
+                if (success)
+                    LOGDEBUG("Created vertex shader " + vs->GetName());
+                else
+                {
+                    LOGERROR("Failed to create vertex shader " + vs->GetName());
+                    vs = 0;
+                }
+            }
+            else
+                vs = 0;
+        }
+        
         if ((vs) && (vs->GetShaderType() == VS))
             impl_->device_->SetVertexShader((IDirect3DVertexShader9*)vs->GetGPUObject());
         else
+        {
             impl_->device_->SetVertexShader(0);
-            
+            vs = 0;
+        }
+        
         vertexShader_ = vs;
     }
     
     if (ps != pixelShader_)
     {
+        if ((ps) && (!ps->IsCreated()))
+        {
+            if (!ps->IsFailed())
+            {
+                PROFILE(CreatePixelShader);
+                
+                bool success = ps->Create();
+                if (success)
+                    LOGDEBUG("Created pixel shader " + ps->GetName());
+                else
+                {
+                    LOGERROR("Failed to create pixel shader " + ps->GetName());
+                    ps = 0;
+                }
+            }
+            else
+                ps = 0;
+        }
+        
         if ((ps) && (ps->GetShaderType() == PS))
             impl_->device_->SetPixelShader((IDirect3DPixelShader9*)ps->GetGPUObject());
         else
+        {
             impl_->device_->SetPixelShader(0);
+            ps = 0;
+        }
         
         pixelShader_ = ps;
     }
@@ -1102,7 +1147,7 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
     return (pixelShader_) && (pixelShader_->HasTextureUnit(unit));
 }
 
-void Graphics::ClearLastParameterSources()
+void Graphics::ClearParameterSources()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
         lastShaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;

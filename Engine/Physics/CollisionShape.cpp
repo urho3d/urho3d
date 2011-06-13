@@ -68,7 +68,10 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
     
     for (unsigned i = 0; i < geometries.Size(); ++i)
     {
-        unsigned subGeometryLodLevel = Clamp(lodLevel, 0, geometries[i].Size());
+        unsigned subGeometryLodLevel = lodLevel;
+        if (subGeometryLodLevel >= geometries[i].Size())
+            subGeometryLodLevel = geometries[i].Size() / 2;
+        
         Geometry* geom = geometries[i][subGeometryLodLevel];
         if (!geom)
             continue;
@@ -151,7 +154,8 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
 }
 
 TriangleMeshData::TriangleMeshData(Model* model, bool makeConvexHull, float thickness, unsigned lodLevel, const Vector3& scale) :
-    triMesh_(0)
+    triMesh_(0),
+    indexCount_(0)
 {
     modelName_ = model->GetName();
     
@@ -199,6 +203,8 @@ TriangleMeshData::TriangleMeshData(Model* model, bool makeConvexHull, float thic
     
     dGeomTriMeshDataBuildSingle(triMesh_, vertexData_.GetPtr(), sizeof(Vector3), vertexCount,
         indexData_.GetPtr(), indexCount, 3 * sizeof(unsigned));
+    
+    indexCount_ = indexCount;
 }
 
 TriangleMeshData::~TriangleMeshData()
@@ -714,21 +720,22 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         
     case dTriMeshClass:
         {
-            unsigned numTriangles = dGeomTriMeshGetTriangleCount(geometry_);
-            for (unsigned i = 0; i < numTriangles; ++i)
+            TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.GetPtr());
+            if (!data)
+                return;
+            
+            const Vector3* vertices = data->vertexData_;
+            const unsigned* indices = data->indexData_;
+            
+            for (unsigned i = 0; i < data->indexCount_; i += 3)
             {
-                dVector3 v0;
-                dVector3 v1;
-                dVector3 v2;
+                Vector3 v0 = transform * vertices[indices[i]];
+                Vector3 v1 = transform * vertices[indices[i + 1]];
+                Vector3 v2 = transform * vertices[indices[i + 2]];
                 
-                dGeomTriMeshGetTriangle(geometry_, i, &v0, &v1, &v2);
-                
-                Vector3 a(v0[0], v0[1], v0[2]);
-                Vector3 b(v1[0], v1[1], v1[2]);
-                Vector3 c(v2[0], v2[1], v2[2]);
-                debug->AddLine(a, b, color, depthTest);
-                debug->AddLine(b, c, color, depthTest);
-                debug->AddLine(c, a, color, depthTest);
+                debug->AddLine(v0, v1, color, depthTest);
+                debug->AddLine(v1, v2, color, depthTest);
+                debug->AddLine(v2, v0, color, depthTest);
             }
         }
         break;

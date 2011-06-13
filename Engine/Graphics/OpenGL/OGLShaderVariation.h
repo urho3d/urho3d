@@ -26,6 +26,7 @@
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
 #include "RefCounted.h"
+#include "SharedArrayPtr.h"
 
 class Shader;
 class ShaderProgram;
@@ -46,14 +47,14 @@ public:
     
     /// Set name
     void SetName(const String& name);
+    /// Set source code
+    void SetSourceCode(const SharedArrayPtr<char>& code, unsigned length);
     /// Set defines
     void SetDefines(const Vector<String>& defines);
     
-    /// Return parent shader
-    Shader* GetShader() const;
     /// Return shader type
     ShaderType GetShaderType() const { return shaderType_; }
-    /// Return variation name
+    /// Return full shader name
     const String& GetName() const { return name_; }
     /// Return defines
     const Vector<String>& GetDefines() const { return defines_; }
@@ -63,14 +64,14 @@ public:
     const String& GetCompilerOutput() const { return compilerOutput_; }
     
 private:
-    /// Parent shader
-    WeakPtr<Shader> shader_;
-    /// Parent linked shader program
-    WeakPtr<ShaderProgram> shaderProgram_;
     /// Shader type
     ShaderType shaderType_;
-    /// Variation name
+    /// Full shader name
     String name_;
+    /// GLSL source code
+    SharedArrayPtr<char> sourceCode_;
+    /// Source code length
+    unsigned sourceCodeLength_;
     /// Defines to use in compiling
     Vector<String> defines_;
     /// Shader compile error string

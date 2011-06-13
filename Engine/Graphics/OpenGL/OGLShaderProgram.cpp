@@ -35,6 +35,7 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
     GPUObject(graphics),
     vertexShader_(vertexShader),
     pixelShader_(pixelShader),
+    lastParameterFrame_(0),
     linked_(false)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -65,6 +66,7 @@ void ShaderProgram::Release()
         glDeleteProgram(object_);
         object_ = 0;
         linked_ = false;
+        linkerOutput_.Clear();
     }
 }
 
@@ -171,6 +173,37 @@ bool ShaderProgram::Link()
     attributeLocations_[9] = glGetAttribLocation(object_, "iBlendIndices");
     
     return true;
+}
+
+bool ShaderProgram::NeedParameterUpdate(ShaderParameter param, const void* source, unsigned int frame)
+{
+    // If global parameter frame has changed, clear all remembered sources
+    if (frame != lastParameterFrame_)
+    {
+        lastParameterFrame_ = frame;
+        lastParameterSources_.Clear();
+    }
+    
+    if (uniformInfos_.Find(param) == uniformInfos_.End())
+        return false;
+    
+    HashMap<ShaderParameter, const void*>::Iterator i = lastParameterSources_.Find(param);
+    if (i != lastParameterSources_.End())
+    {
+        if (i->second_ == source)
+            return false;
+        
+        i->second_ = source;
+        return true;
+    }
+    
+    lastParameterSources_[param] = source;
+    return true;
+}
+
+void ShaderProgram::ClearParameterSource(ShaderParameter param)
+{
+    lastParameterSources_.Erase(param);
 }
 
 ShaderVariation* ShaderProgram::GetVertexShader() const
