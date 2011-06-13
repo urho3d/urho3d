@@ -166,6 +166,7 @@ Graphics::Graphics(Context* context) :
     flushGPU_(true),
     deviceLost_(false),
     queryIssued_(false),
+    renderTargetSupport_(true),
     deferredSupport_(false),
     hardwareShadowSupport_(false),
     hiresShadowSupport_(false),

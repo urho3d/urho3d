@@ -233,6 +233,8 @@ public:
     unsigned GetShadowMapFormat() const { return shadowMapFormat_; }
     /// Return 24-bit shadow map depth texture format, or 0 if not supported
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
+    /// Return whether texture render targets are supported
+    bool GetRenderTargetSupport() const { return renderTargetSupport_; }
     /// Return whether deferred rendering is supported
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether Shader Model 3 is supported
@@ -400,6 +402,8 @@ private:
     bool deviceLost_;
     /// Query issued (used to flush the GPU command queue) flag
     bool queryIssued_;
+    /// Texture render target support flag
+    bool renderTargetSupport_;
     /// Deferred rendering support flag
     bool deferredSupport_;
     /// Hardware shadow map depth compare support flag

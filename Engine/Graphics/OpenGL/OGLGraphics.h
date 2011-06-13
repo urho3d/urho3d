@@ -240,7 +240,7 @@ public:
     /// Return 24-bit shadow map depth texture format, or 0 if not supported
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
     /// Return whether texture render targets are supported
-    bool GetRenderTextureSupport() const;
+    bool GetRenderTargetSupport() const { return renderTargetSupport_; }
     /// Return whether deferred rendering is supported
     bool GetDeferredSupport() const { return deferredSupport_; }
     /// Return whether Shader Model 3 is supported. Always false on OpenGL
@@ -408,6 +408,8 @@ private:
     bool fullscreenModeSet_;
     /// In screen mode change -flag
     bool inModeChange_;
+    /// Texture render target support flag
+    bool renderTargetSupport_;
     /// Deferred rendering support flag
     bool deferredSupport_;
     /// Number of primitives this frame

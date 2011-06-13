@@ -722,9 +722,12 @@ void Renderer::ResetViews()
 
 bool Renderer::AddView(RenderSurface* renderTarget, const Viewport& viewport)
 {
-    // If using a render target texture, make sure it will not be rendered to multiple times
+    // If using a render target texture, make sure it is supported, and will not be rendered to multiple times
     if (renderTarget)
     {
+        if (!graphics_->GetRenderTargetSupport())
+            return false;
+        
         for (unsigned i = 0; i < numViews_; ++i)
         {
             if (views_[i]->GetRenderTarget() == renderTarget)

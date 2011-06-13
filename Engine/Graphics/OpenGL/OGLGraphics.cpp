@@ -127,6 +127,7 @@ Graphics::Graphics(Context* context_) :
     flushGPU_(true),
     fullscreenModeSet_(false),
     inModeChange_(false),
+    renderTargetSupport_(false),
     deferredSupport_(false),
     numPrimitives_(0),
     numBatches_(0),
@@ -236,14 +237,15 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             return false;
         }
         
-        // Create the FBO if supported
+        // Create the FBO if fully supported
         if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
         {
             glGenFramebuffersEXT(1, &impl_->fbo_);
             
-            // If both FBO and packed depth stencil is supported, shadows and deferred rendering can be supported
+            // Shadows, render targets and deferred rendering all depend on FBO & packed depth stencil
             shadowMapFormat_ = GL_DEPTH_COMPONENT16;
             hiresShadowMapFormat_ = GL_DEPTH_COMPONENT24;
+            renderTargetSupport_ = true;
             deferredSupport_ = true;
         }
         
@@ -1948,11 +1950,6 @@ bool Graphics::IsInitialized() const
 unsigned Graphics::GetWindowHandle() const
 {
     return (unsigned)impl_->window_;
-}
-
-bool Graphics::GetRenderTextureSupport() const
-{
-    return impl_->fbo_ != 0;
 }
 
 bool Graphics::OpenWindow(int width, int height)

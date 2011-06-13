@@ -113,7 +113,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     
     if (usage >= TEXTURE_RENDERTARGET)
     {
-        if (!graphics_->GetRenderTextureSupport())
+        if (!graphics_->GetRenderTargetSupport())
             return false;
         
         renderSurface_ = new RenderSurface(this, GL_TEXTURE_2D);
