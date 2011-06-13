@@ -20,5 +20,5 @@ void main()
     // Store coarse linear depth to alpha channel for deferred antialiasing
     gl_FragColor = vec4(ambientColor + GetFogFactor(linearDepth) * cFogColor, linearDepth);
     // Copy the actual hardware depth value with slight bias to the destination depth buffer
-    gl_FragDepth = min(depth + 0.0000001;
+    gl_FragDepth = min(depth + 0.0000001, 1.0);
 }
