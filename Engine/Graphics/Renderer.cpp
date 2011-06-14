@@ -240,6 +240,13 @@ static const String lightPSVariations[] =
 static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
 static const Viewport noViewport;
 
+void EdgeFilterParameters::Validate()
+{
+    radius_ = max(radius_, 0.0f);
+    threshold_ = max(threshold_, 0.0f);
+    strength_ = max(strength_, 0.0f);
+}
+
 OBJECTTYPESTATIC(Renderer);
 
 Renderer::Renderer(Context* context) :
@@ -259,6 +266,7 @@ Renderer::Renderer(Context* context) :
     shadowMapHiresDepth_(false),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
+    edgeFilter_(EdgeFilterParameters(2.0f, 1.0f, 0.66f)),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
@@ -400,6 +408,12 @@ void Renderer::SetDynamicInstancing(bool enable)
         enable = false;
     
     dynamicInstancing_ = enable;
+}
+
+void Renderer::SetEdgeFilter(const EdgeFilterParameters& parameters)
+{
+    edgeFilter_ = parameters;
+    edgeFilter_.Validate();
 }
 
 void Renderer::SetMaxOccluderTriangles(int triangles)

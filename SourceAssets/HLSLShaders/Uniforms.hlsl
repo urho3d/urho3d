@@ -17,8 +17,8 @@ uniform float4x3 cSkinMatrices[64] : register(C27);
 
 // Pixel shader parameters
 uniform float3 cAmbientColor : register(C0);
-uniform float4 cAntiAliasWeights : register(C1);
-uniform float3 cCameraPosPS : register(C2);
+uniform float3 cCameraPosPS : register(C1);
+uniform float4 cEdgeFilterParams : register(C2);
 uniform float2 cElapsedTimePS : register(C3);
 uniform float4 cFogParams : register(C4);
 uniform float3 cFogColor : register(C5);
@@ -37,4 +37,3 @@ uniform float4 cSampleOffsets : register(C19);
 uniform float2 cShadowIntensity : register(C20);
 uniform float4x4 cShadowProjPS : register(C21);
 uniform float4x4 cSpotProjPS : register(C25);
-uniform float4x4 cViewProjPS : register(C25);

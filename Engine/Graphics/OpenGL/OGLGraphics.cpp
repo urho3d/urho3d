@@ -174,9 +174,6 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 {
     PROFILE(SetScreenMode);
     
-    /// \todo For now multisampling is not supported
-    multiSample = 0;
-
     // If zero dimensions, use the desktop default
     if ((width <= 0) || (height <= 0))
     {
@@ -286,6 +283,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     mode_ = mode;
+    multiSample_ = multiSample;
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -2134,30 +2132,24 @@ void Graphics::CreateRenderTargets()
             depthBuffer_->SetSize(0, 0, GetDepthFormat(), TEXTURE_DEPTHSTENCIL);
         }
         
-        // If deferred mode temporal AA is used, reserve screen buffers
+        // If deferred antialiasing is used, reserve screen buffer
         // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
         // which will also be useful in forward rendering)
         if (multiSample_)
         {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            {
-                screenBuffers_[i] = new Texture2D(context_);
-                screenBuffers_[i]->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
-            }
+            screenBuffer_ = new Texture2D(context_);
+            screenBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
+            screenBuffer_->SetFilterMode(FILTER_BILINEAR);
         }
         else
-        {
-            for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-                screenBuffers_[i].Reset();
-        }
+            screenBuffer_.Reset();
     }
     else
     {
         diffBuffer_.Reset();
         normalBuffer_.Reset();
         depthBuffer_.Reset();
-        for (unsigned i = 0; i < NUM_SCREEN_BUFFERS; ++i)
-            screenBuffers_[i].Reset();
+        screenBuffer_.Reset();
     }
 }
 
@@ -2260,9 +2252,9 @@ void Graphics::InitializeShaderParameters()
     shaderParameters_["SkinMatrices"] = VSP_SKINMATRICES;
     
     shaderParameters_["AmbientColor"] = PSP_AMBIENTCOLOR;
-    shaderParameters_["AntiAliasWeights"] = PSP_ANTIALIASWEIGHTS;
     shaderParameters_["CameraPosPS"] = PSP_CAMERAPOS;
     shaderParameters_["DepthReconstruct"] = PSP_DEPTHRECONSTRUCT;
+    shaderParameters_["EdgeFilterParams"] = PSP_EDGEFILTERPARAMS;
     shaderParameters_["ElapsedTimePS"] = PSP_ELAPSEDTIME;
     shaderParameters_["FogColor"] = PSP_FOGCOLOR;
     shaderParameters_["FogParams"] = PSP_FOGPARAMS;
@@ -2281,8 +2273,7 @@ void Graphics::InitializeShaderParameters()
     shaderParameters_["ShadowIntensity"] = PSP_SHADOWINTENSITY;
     shaderParameters_["ShadowProjPS"] = PSP_SHADOWPROJ;
     shaderParameters_["SpotProjPS"] = PSP_SPOTPROJ;
-    shaderParameters_["ViewProjPS"] = PSP_VIEWPROJ;
-    
+
     // Map texture units
     textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["DiffMap"] = TU_DIFFUSE;

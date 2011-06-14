@@ -37,3 +37,10 @@ float3 UnpackNormal(float4 normalInput)
     normal.z = sqrt(1.0 - dot(normal.xy, normal.xy));
     return normal;
 }
+
+float GetIntensity(float3 color)
+{
+    const float dotValue = 1.0 / 3.0;
+
+    return dot(color, dotValue);
+}

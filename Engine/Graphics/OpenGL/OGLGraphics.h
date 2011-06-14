@@ -46,9 +46,6 @@ class Vector3;
 class Vector4;
 class VertexBuffer;
 
-static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
-static const int NUM_SCREEN_BUFFERS = 2;
-
 typedef Map<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// Graphics subsystem. Manages the application window, rendering state and GPU resources
@@ -338,7 +335,7 @@ public:
     /// Return depth buffer for deferred rendering. If reading hardware depth is supported, return a depth texture
     Texture2D* GetDepthBuffer() const { return depthBuffer_; }
     /// Return screen buffer for post-processing
-    Texture2D* GetScreenBuffer(unsigned index) const { return screenBuffers_[index & (NUM_SCREEN_BUFFERS - 1)]; }
+    Texture2D* GetScreenBuffer() const { return screenBuffer_; }
     
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
@@ -440,8 +437,8 @@ private:
     SharedPtr<Texture2D> normalBuffer_;
     /// Deferred rendering depth buffer
     SharedPtr<Texture2D> depthBuffer_;
-    /// Screen buffers for post processing
-    SharedPtr<Texture2D> screenBuffers_[NUM_SCREEN_BUFFERS];
+    /// Screen buffer for post processing
+    SharedPtr<Texture2D> screenBuffer_;
     /// Shadow map depth texture format
     unsigned shadowMapFormat_;
     /// Shadow map 24-bit depth texture format

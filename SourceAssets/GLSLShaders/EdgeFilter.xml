@@ -1,0 +1,4 @@
+<shaders>
+    <shader name="EdgeFilter" type="vs" />
+    <shader name="EdgeFilter" type="ps" />
+</shaders>

@@ -350,7 +350,7 @@ Graphics implements the low-level functionality:
 
 It also provides a low-performance, immediate-like interface for manually defining small amounts of geometry to be rendered. This interface is used for rendering the debug geometry and the user interface.
 
-Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled in deferred rendering modes as incompatible, instead it is replaced by manual temporal antialiasing.
+Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, and hardware multisampling level are all set at once by calling Graphics's \ref Graphics::SetMode "SetMode()" function. Hardware multisampling will be disabled as incompatible in deferred rendering mode; instead it is replaced by a post-process edge filter.
 
 When setting the initial screen mode, Graphics does a few checks:
 
@@ -619,9 +619,9 @@ Opaque objects are rendered to the G-buffer first, then an initial full-screen q
 
 After light accumulation, emissive properties of materials as well as effects like environment mapping need to be rendered in an additional pass for objects that need them.
 
-\section ForwardDeferred_TemporalAA Temporal antialiasing
+\section ForwardDeferred_DeferredAntiAlias Deferred antialiasing
 
-When multisampling is enabled, deferred rendering uses subpixel projection jittering to render temporal antialiasing that should look similar to 2x MSAA. Reprojection based on the previous frame's camera view transform is used to eliminate "ghosting" effects when the camera rotates, and additional ghosting prevention is done by analyzing the depth of each pixel compared to the previous frame. Depending on the GPU speed, this form of antialiasing has a low-to-moderate performance impact.
+As actual hardware multisampling is incompatible with deferred rendering, a post-process edge filter will be used instead, if multisampling is requested, to detect intensity change gradients and smooth them. Depending on the GPU speed, this has a low-to-moderate performance impact.
 
 \section ForwardDeferred_Conclusion Conclusion
 

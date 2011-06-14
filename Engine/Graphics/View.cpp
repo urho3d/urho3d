@@ -786,24 +786,9 @@ void View::RenderBatchesDeferred()
     Texture2D* normalBuffer = graphics_->GetNormalBuffer();
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
     
-    // Check for temporal antialiasing in deferred mode. Only use it on the main view (null rendertarget)
-    bool temporalAA = (!renderTarget_) && (graphics_->GetMultiSample() > 0);
-    if (temporalAA)
-    {
-        ++jitterCounter_;
-        if (jitterCounter_ > 3)
-            jitterCounter_ = 2;
-        
-        Vector2 jitter(-0.25f, -0.25f);
-        if (jitterCounter_ & 1)
-            jitter = -jitter;
-        jitter.x_ /= width_;
-        jitter.y_ /= height_;
-        
-        camera_->SetProjectionOffset(jitter);
-    }
-    
-    RenderSurface* renderBuffer = temporalAA ? graphics_->GetScreenBuffer(jitterCounter_ & 1)->GetRenderSurface() : renderTarget_;
+    // Check for deferred antialiasing (edge filter) in deferred mode. Only use it on the main view (null rendertarget)
+    bool edgeFilter = (!renderTarget_) && (graphics_->GetMultiSample() > 0);
+    RenderSurface* renderBuffer = edgeFilter ? graphics_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     
     // Calculate shader parameters needed only in deferred rendering
     Vector3 nearVector, farVector;
@@ -993,52 +978,28 @@ void View::RenderBatchesDeferred()
         RenderBatchQueue(transparentQueue_, true);
     }
     
-    // Render temporal antialiasing now if enabled
-    if (temporalAA)
+    // Render deferred antialiasing now if enabled
+    if (edgeFilter)
     {
-        PROFILE(RenderTemporalAA);
+        PROFILE(RenderEdgeFilter);
         
-        // Disable averaging if it is the first frame rendered in this view
-        float thisFrameWeight = jitterCounter_ < 2 ? 1.0f : 0.5f;
+        const EdgeFilterParameters& parameters = renderer_->GetEdgeFilter();
+        ShaderVariation* vs = renderer_->GetVertexShader("EdgeFilter");
+        ShaderVariation* ps = renderer_->GetPixelShader("EdgeFilter");  
         
-        Vector4 depthMode = Vector4::ZERO;
-        if (camera_->IsOrthographic())
-            depthMode.z_ = 1.0f;
-        else
-            depthMode.w_ = 1.0f / camera_->GetFarClip();
-        
-        String shaderName = "TemporalAA";
-        if (camera_->IsOrthographic())
-            shaderName += "_Ortho";
+        HashMap<ShaderParameter, Vector4> shaderParameters(shaderParameters_);
+        shaderParameters[PSP_EDGEFILTERPARAMS] = Vector4(parameters.radius_, parameters.threshold_, parameters.strength_, 0.0f);
+        shaderParameters[PSP_SAMPLEOFFSETS] = Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f);
         
         graphics_->SetAlphaTest(false);
         graphics_->SetBlendMode(BLEND_REPLACE);
-        graphics_->SetDepthTest(CMP_ALWAYS);
-        graphics_->SetDepthWrite(false);
-        graphics_->SetScissorTest(false);
+        graphics_->SetDepthTest(CMP_ALWAYS),
         graphics_->SetStencilTest(false);
         graphics_->SetRenderTarget(0, renderTarget_);
         graphics_->SetDepthStencil(depthStencil_);
         graphics_->SetViewport(screenRect_);
-        
-        // Pre-select the right shaders so that we can set shader parameters that can not go into the parameter map
-        // (matrices)
-        graphics_->SetShaders(renderer_->GetVertexShader(shaderName), renderer_->GetPixelShader(shaderName));
-        graphics_->SetShaderParameter(VSP_CAMERAROT, camera_->GetWorldTransform().RotationMatrix());
-        graphics_->SetShaderParameter(VSP_DEPTHMODE, depthMode);
-        graphics_->SetShaderParameter(PSP_CAMERAPOS, camera_->GetWorldPosition());
-        graphics_->SetShaderParameter(PSP_ANTIALIASWEIGHTS, Vector4(thisFrameWeight, 1.0f - thisFrameWeight, 0.0f, 0.0f));
-        graphics_->SetShaderParameter(PSP_SAMPLEOFFSETS, Vector4(1.0f / gBufferWidth, 1.0f / gBufferHeight, 0.0f, 0.0f));
-        graphics_->SetShaderParameter(PSP_VIEWPROJ, camera_->GetProjection(false) * lastCameraView_);
-        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer(jitterCounter_ & 1));
-        graphics_->SetTexture(TU_NORMALBUFFER, graphics_->GetScreenBuffer((jitterCounter_ + 1) & 1));
-        graphics_->SetTexture(TU_DEPTHBUFFER, graphics_->GetDepthBuffer());
-        
-        renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader(shaderName),
-            renderer_->GetPixelShader(shaderName), false, shaderParameters_);
-        
-        // Store view transform for next frame
-        lastCameraView_ = camera_->GetInverseWorldTransform();
+        graphics_->SetTexture(TU_DIFFBUFFER, graphics_->GetScreenBuffer());
+        renderer_->DrawFullScreenQuad(*camera_, vs, ps, false, shaderParameters);
     }
 }
 

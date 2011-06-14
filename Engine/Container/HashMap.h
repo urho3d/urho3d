@@ -216,7 +216,10 @@ public:
         ConstIterator it = map.Begin();
         ConstIterator end = map.End();
         while (it != end)
+        {
             InsertNode(it->first_, it->second_);
+            ++it;
+        }
     }
     
     /// Insert a pair by iterator. Return iterator to the value

@@ -1,7 +1,7 @@
 uniform vec3 cAmbientColor;
-uniform vec4 cAntiAliasWeights;
 uniform vec3 cCameraPosPS;
 uniform vec2 cDepthReconstruct;
+uniform vec3 cEdgeFilterParams;
 uniform vec2 cElapsedTimePS;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;
@@ -20,4 +20,3 @@ uniform vec4 cSampleOffsets;
 uniform vec2 cShadowIntensity;
 uniform mat4 cShadowProjPS;
 uniform mat4 cSpotProjPS;
-uniform mat4 cViewProjPS;
