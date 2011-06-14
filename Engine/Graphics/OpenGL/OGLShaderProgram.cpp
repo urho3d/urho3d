@@ -54,14 +54,12 @@ void ShaderProgram::Release()
         if (!graphics_)
             return;
         
-        if ((vertexShader_) && (vertexShader_->GetGPUObject()))
-            glDetachShader(object_, vertexShader_->GetGPUObject());
-        if ((pixelShader_) && (pixelShader_->GetGPUObject()))
-            glDetachShader(object_, pixelShader_->GetGPUObject());
-        
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             useTextureUnit_[i] = false;
         uniformInfos_.Clear();
+        
+        if (graphics_->GetShaderProgram() == this)
+            graphics_->SetShaders(0, 0);
         
         glDeleteProgram(object_);
         object_ = 0;

@@ -54,21 +54,21 @@ void ShaderVariation::Release()
         
         if (shaderType_ == VS)
         {
-            if (graphics_->GetPixelShader() == this)
+            if (graphics_->GetVertexShader() == this)
                 graphics_->SetShaders(0, 0);
         }
         else
         {
-            if (graphics_->GetVertexShader() == this)
+            if (graphics_->GetPixelShader() == this)
                 graphics_->SetShaders(0, 0);
         }
-        
-        graphics_->CleanupShaderPrograms();
         
         glDeleteShader(object_);
         object_ = 0;
         compiled_ = false;
         compilerOutput_.Clear();
+        
+        graphics_->CleanupShaderPrograms();
     }
 }
 

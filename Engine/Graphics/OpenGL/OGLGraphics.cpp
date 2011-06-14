@@ -1060,12 +1060,11 @@ void Graphics::CleanupShaderPrograms()
     for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
     {
         ShaderProgramMap::Iterator current = i++;
-        if ((!current->second_->GetVertexShader()->GetGPUObject()) || (!current->second_->GetPixelShader()->GetGPUObject()))
-        {
-            if (shaderProgram_ == current->second_)
-                shaderProgram_ = 0;
+        ShaderVariation* vs = current->second_->GetVertexShader();
+        ShaderVariation* ps = current->second_->GetPixelShader();
+        
+        if ((!vs) || (!ps) || (!vs->GetGPUObject()) || (!ps->GetGPUObject()))
             shaderPrograms_.Erase(current);
-        }
     }
 }
 
