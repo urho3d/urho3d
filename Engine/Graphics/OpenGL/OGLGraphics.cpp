@@ -1288,7 +1288,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             }
         }
         
-        /// \todo Should check if the texture actually is in depth format
+        /// \todo Should check that the texture actually is in depth format
         depthStencil_ = depthStencil;
         
         // Bind the FBO to be able to make changes to it
@@ -1300,22 +1300,35 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         
         if (depthStencil)
         {
-            Texture* texture = depthStencil->GetParentTexture();
-            
-            // If texture's parameters are dirty, update before attaching
-            if (texture->GetParametersDirty())
+            // Bind either a renderbuffer or a depth texture, depending on what is available
+            unsigned renderBufferID = depthStencil->GetRenderBuffer();
+            if (!renderBufferID)
             {
-                SetTextureForUpdate(texture);
-                texture->UpdateParameters();
-                SetTexture(0, 0);
+                Texture* texture = depthStencil->GetParentTexture();
+                
+                // If texture's parameters are dirty, update before attaching
+                if (texture->GetParametersDirty())
+                {
+                    SetTextureForUpdate(texture);
+                    texture->UpdateParameters();
+                    SetTexture(0, 0);
+                }
+                
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
+                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+                impl_->depthBits_ = texture->GetDepthBits();
             }
-            
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, texture->GetGPUObject(), 0);
-            impl_->depthBits_ = texture->GetDepthBits();
+            else
+            {
+                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
+                glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, renderBufferID);
+                impl_->depthBits_ = 24;
+            }
         }
         else
         {
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
             impl_->depthBits_ = impl_->windowDepthBits_;
         }
         

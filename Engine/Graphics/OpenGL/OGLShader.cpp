@@ -26,7 +26,6 @@
 #include "Deserializer.h"
 #include "FileSystem.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "ResourceCache.h"

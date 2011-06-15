@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Renderer.h"
@@ -269,6 +268,19 @@ bool Texture2D::Create()
     
     if ((!width_) || (!height_))
         return false;
+    
+    // If we create a depth stencil texture with packed format, create a renderbuffer instead of an actual texture
+    // This is because packed depth textures have performance problems with ATI display adapters
+    if (format_ == Graphics::GetDepthStencilFormat())
+    {
+        if (renderSurface_)
+        {
+            renderSurface_->CreateRenderBuffer(width_, height_, format_);
+            return true;
+        }
+        else
+            return false;
+    }
     
     glGenTextures(1, &object_);
     

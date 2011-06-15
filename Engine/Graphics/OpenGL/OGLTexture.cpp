@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "FileSystem.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "Material.h"
 #include "Profiler.h"
 #include "ResourceCache.h"

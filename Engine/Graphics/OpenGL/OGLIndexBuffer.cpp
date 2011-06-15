@@ -24,7 +24,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "IndexBuffer.h"
 #include "Log.h"
 

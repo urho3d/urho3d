@@ -24,11 +24,12 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "Graphics.h"
-#include "GraphicsImpl.h"
 #include "Log.h"
 #include "RenderSurface.h"
 #include "Scene.h"
 #include "Texture.h"
+
+#include <GLee.h>
 
 #include "DebugNew.h"
 
@@ -53,7 +54,8 @@ Viewport::Viewport(Scene* scene, Camera* camera, const IntRect& rect) :
 
 RenderSurface::RenderSurface(Texture* parentTexture, unsigned target) :
     parentTexture_(parentTexture),
-    target_(target)
+    target_(target),
+    renderBuffer_(0)
 {
 }
 
@@ -81,6 +83,23 @@ void RenderSurface::SetLinkedDepthBuffer(RenderSurface* depthBuffer)
     linkedDepthBuffer_ = depthBuffer;
 }
 
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
+{
+    Graphics* graphics = parentTexture_->GetGraphics();
+    if (!graphics)
+        return false;
+    if (!graphics->GetRenderTargetSupport())
+        return false;
+    
+    Release();
+    
+    glGenRenderbuffersEXT(1, &renderBuffer_);
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
+    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
+    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    return true;
+}
+
 void RenderSurface::Release()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
@@ -95,6 +114,12 @@ void RenderSurface::Release()
     
     if (graphics->GetDepthStencil() == this)
         graphics->ResetDepthStencil();
+    
+    if (renderBuffer_)
+    {
+        glDeleteRenderbuffersEXT(1, &renderBuffer_);
+        renderBuffer_ = 0;
+    }
 }
 
 int RenderSurface::GetWidth() const

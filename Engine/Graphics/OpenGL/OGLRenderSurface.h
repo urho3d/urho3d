@@ -67,13 +67,17 @@ public:
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
     /// Set linked depth buffer
     void SetLinkedDepthBuffer(RenderSurface* depthBuffer);
-    /// Release surface
+    /// Create a renderbuffer. Return true if successful
+    bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);
+    /// Release renderbuffer if any
     void Release();
     
     /// Return parent texture
     Texture* GetParentTexture() const { return parentTexture_; }
     /// Return surface's OpenGL target
     unsigned GetTarget() const { return target_; }
+    /// Return renderbuffer if created
+    unsigned GetRenderBuffer() const { return renderBuffer_; }
     /// Return width
     int GetWidth() const;
     /// Return height
@@ -92,6 +96,8 @@ private:
     Texture* parentTexture_;
     /// OpenGL target
     unsigned target_;
+    /// OpenGL renderbuffer
+    unsigned renderBuffer_;
     /// Viewport
     Viewport viewport_;
     /// Linked color buffer
