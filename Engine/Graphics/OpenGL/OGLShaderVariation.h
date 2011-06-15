@@ -40,11 +40,11 @@ public:
     /// Destruct
     virtual ~ShaderVariation();
     
-    /// Create the shader program. Return true if successful
-    bool Create();
-    /// Release shader
+    /// Release the shader
     virtual void Release();
     
+    /// Compile the shader. Return true if successful
+    bool Create();
     /// Set name
     void SetName(const String& name);
     /// Set source code

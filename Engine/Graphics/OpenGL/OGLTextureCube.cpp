@@ -61,6 +61,18 @@ void TextureCube::RegisterObject(Context* context)
     context->RegisterFactory<TextureCube>();
 }
 
+void TextureCube::OnDeviceReset()
+{
+    if (!object_)
+    {
+        // Reload from the original file if possible
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        const String& name = GetName();
+        if ((cache) && (!name.Empty()) && (cache->Exists(name)))
+            cache->ReloadResource(this);
+    }
+}
+
 void TextureCube::Release()
 {
     if (object_)
@@ -82,6 +94,7 @@ void TextureCube::Release()
         
         glDeleteTextures(1, &object_);
         object_ = 0;
+        dataLost_ = true;
     }
 }
 
@@ -171,6 +184,7 @@ bool TextureCube::Load(Deserializer& source)
         faceElem = faceElem.GetNextElement("face");
     }
     
+    ClearDataLost();
     return true;
 }
 

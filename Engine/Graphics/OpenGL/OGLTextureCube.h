@@ -45,7 +45,9 @@ public:
     
     /// Load resource. Return true if successful
     virtual bool Load(Deserializer& source);
-    /// Release texture
+    /// Recreate the texture from the original file if necessary and possible
+    virtual void OnDeviceReset();
+    /// Release the texture
     virtual void Release();
     
     /// Set size, format and usage. Return true if successful

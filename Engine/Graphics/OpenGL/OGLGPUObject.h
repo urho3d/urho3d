@@ -36,7 +36,9 @@ public:
     /// Destruct. Remove from the Graphics
     virtual ~GPUObject();
     
-    /// Screen mode has been changed. React to it if necessary
+    /// OpenGL context will be destroyed. Save data if necessary and release the GPU resource
+    virtual void OnDeviceLost();
+    /// Screen mode change or OpenGL context recreation is complete. Recreate the GPU resource and restore data
     virtual void OnDeviceReset() {}
     /// Unconditionally release the GPU resource
     virtual void Release() {}

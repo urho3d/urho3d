@@ -174,6 +174,15 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 {
     PROFILE(SetScreenMode);
     
+    // If OpenGL extensions not yet initialized, initialize now
+    InitializeExtensions();
+    
+    if (!_GLEE_VERSION_2_0)
+    {
+        LOGERROR("OpenGL 2.0 is required");
+        return false;
+    }
+    
     // If zero dimensions, use the desktop default
     if ((width <= 0) || (height <= 0))
     {
@@ -212,28 +221,43 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         }
     }
     
-    // Create OpenGL context
-    if (!impl_->renderContext_)
+    // Choose pixel format
+    int pixelFormat = GetPixelFormat(mode, multiSample);
+    if (!pixelFormat)
+    {
+        LOGERROR("Failed to choose pixel format");
+        return false;
+    }
+    
+    // Create context if not created yet, or if the pixel format changed
+    if ((!impl_->renderContext_) || (pixelFormat != impl_->pixelFormat_))
     {
         // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
-        #ifdef _MSC_VER
-        _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
-        #endif
+        if (!impl_->renderContext_)
+        {
+            #ifdef _MSC_VER
+            _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+            #endif
+        }
+        else
+        {
+            // Existing context needs to be destroyed, and the window closed and reopened
+            Release();
+            if (!OpenWindow(width, height))
+                return false;
+        }
         
+        if (SetPixelFormat(impl_->deviceContext_, pixelFormat, 0) == FALSE)
+        {
+            LOGERROR("Failed to set pixel format");
+            return false;
+        }
+        
+        impl_->pixelFormat_ = pixelFormat;
         impl_->renderContext_ = wglCreateContext(impl_->deviceContext_);
         wglMakeCurrent(impl_->deviceContext_, impl_->renderContext_);
         
-        // Query for extensions now. Needs to happen under lock as the function pointers are static
-        {
-            MutexLock lock(GetStaticMutex());
-            GLeeInit();
-        }
-        
-        if (!_GLEE_VERSION_2_0)
-        {
-            LOGERROR("OpenGL 2.0 is required");
-            return false;
-        }
+        LOGINFO("Created OpenGL context");
         
         // Create the FBO if fully supported
         if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
@@ -292,12 +316,12 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Get the system depth buffer's bit depth
     glGetIntegerv(GL_DEPTH_BITS, &impl_->depthBits_);
     
-    // Create rendering buffers
-    CreateRenderTargets();
-    
-    // Let screen mode dependent GPU objects update themselves
+    // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
+    
+    // Create rendering buffers
+    CreateRenderTargets();
     
     if (!multiSample)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
@@ -338,26 +362,7 @@ void Graphics::Close()
         (*i)->Release();
     gpuObjects_.Clear();
     
-    if (impl_->renderContext_)
-    {
-        if (impl_->fbo_)
-            glDeleteFramebuffersEXT(1, &impl_->fbo_);
-        
-        wglMakeCurrent(NULL, NULL);
-        wglDeleteContext(impl_->renderContext_);
-        impl_->renderContext_ = 0;
-    }
-    if (impl_->deviceContext_)
-    {
-        ReleaseDC(impl_->window_, impl_->deviceContext_);
-        impl_->deviceContext_ = 0;
-    }
-    if (impl_->window_)
-    {
-        RestoreScreenMode();
-        DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
-    }
+    Release();
 }
 
 bool Graphics::TakeScreenShot(Image& destImage)
@@ -2032,9 +2037,15 @@ bool Graphics::OpenWindow(int width, int height)
         windowPosY_ = wndpl.rcNormalPosition.top;
     }
     
-    // Save the device context, then set the pixel format
+    // Save the device context
     impl_->deviceContext_ = GetDC(impl_->window_);
     
+    LOGINFO("Created application window");
+    return true;
+}
+
+int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
+{
     PIXELFORMATDESCRIPTOR pfd;
     ZeroMemory(&pfd, sizeof(pfd));
     
@@ -2046,20 +2057,33 @@ bool Graphics::OpenWindow(int width, int height)
     pfd.cDepthBits = 24;
     pfd.cStencilBits = 8;
     
-    int iFormat = ChoosePixelFormat(impl_->deviceContext_, &pfd);
-    if (!iFormat)
-    {
-        LOGERROR("Failed to choose pixel format");
-        return false;
-    }
-    if (SetPixelFormat(impl_->deviceContext_, iFormat, &pfd) == FALSE)
-    {
-        LOGERROR("Failed to set pixel format");
-        return false;
-    }
+    int pixelFormat = 0;
+    unsigned numFormats;
     
-    LOGINFO("Created application window");
-    return true;
+    // Use the extended pixel format if multisampling requested in forward rendering mode
+    if ((_GLEE_WGL_ARB_pixel_format) && (multiSample > 1) && (mode == RENDER_FORWARD))
+    {
+        int attributes[] = {
+            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+            WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+            WGL_COLOR_BITS_ARB, 24,
+            WGL_DEPTH_BITS_ARB, 24,
+            WGL_STENCIL_BITS_ARB, 8,
+            WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+            WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+            WGL_SAMPLES_ARB, multiSample,
+            0, 0
+        };
+        
+        // If multisample fails, switch to non-multisampled pixel format
+        if ((!wglChoosePixelFormatARB(impl_->deviceContext_, attributes, 0, 1, &pixelFormat, &numFormats)) || (!pixelFormat))
+            pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &pfd);
+    }
+    else
+        pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &pfd);
+    
+    return pixelFormat;
 }
 
 bool Graphics::SetScreenMode(int newWidth, int newHeight)
@@ -2205,6 +2229,12 @@ void Graphics::ResetCachedState()
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
     stencilMask_ = M_MAX_UNSIGNED;
+    
+    impl_->activeTexture_ = 0;
+    impl_->drawBuffers_ = M_MAX_UNSIGNED;
+    impl_->enabledAttributes_ = 0;
+    impl_->fbo_ = 0;
+    impl_->fboBound_ = false;
 }
 
 void Graphics::SetDrawBuffers()
@@ -2237,6 +2267,96 @@ void Graphics::SetDrawBuffers()
     }
     
     glReadBuffer(GL_NONE);
+}
+
+void Graphics::Release()
+{
+    diffBuffer_.Reset();
+    normalBuffer_.Reset();
+    depthBuffer_.Reset();
+    screenBuffer_.Reset();
+    
+    // If GPU objects exist ie. it's a context delete/recreate, not Close(), tell the GPU objects to save and release themselves
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        (*i)->OnDeviceLost();
+    
+    if (impl_->renderContext_)
+    {
+        if (impl_->fbo_)
+            glDeleteFramebuffersEXT(1, &impl_->fbo_);
+        
+        wglMakeCurrent(NULL, NULL);
+        wglDeleteContext(impl_->renderContext_);
+        impl_->renderContext_ = 0;
+    }
+    if (impl_->deviceContext_)
+    {
+        ReleaseDC(impl_->window_, impl_->deviceContext_);
+        impl_->deviceContext_ = 0;
+    }
+    if (impl_->window_)
+    {
+        RestoreScreenMode();
+        DestroyWindow(impl_->window_);
+        impl_->window_ = 0;
+    }
+    
+    // When the new context is initialized, it will have default state again
+    ResetCachedState();
+    ClearParameterSources();
+}
+
+void Graphics::InitializeExtensions()
+{
+    // Query for extensions needs to happen under lock as the function pointers are static
+    MutexLock lock(GetStaticMutex());
+    
+    if (GLeeInitialized())
+        return;
+    
+    WNDCLASS wc;
+    wc.style         = CS_OWNDC;
+    wc.lpfnWndProc   = wndProc;
+    wc.cbClsExtra    = 0;
+    wc.cbWndExtra    = 0;
+    wc.hInstance     = impl_->instance_;
+    wc.hIcon         = NULL;
+    wc.hCursor       = NULL;
+    wc.hbrBackground = 0;
+    wc.lpszMenuName  = 0;
+    wc.lpszClassName = "DummyOpenGL";
+    
+    RegisterClass(&wc);
+    
+    HWND dummyWindow = CreateWindow("DummyOpenGL", "Urho3D", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+        32, 32, 0, 0, impl_->instance_, 0);
+    
+    SetWindowLongPtr(dummyWindow, GWLP_USERDATA, 0);
+    
+    // Save the device context, then set the pixel format
+    HDC deviceContext = GetDC(dummyWindow);
+    
+    PIXELFORMATDESCRIPTOR pfd;
+    ZeroMemory(&pfd, sizeof(pfd));
+    
+    pfd.nSize = sizeof(pfd);
+    pfd.nVersion = 1;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 16;
+    pfd.cDepthBits = 15;
+    
+    int iFormat = ChoosePixelFormat(deviceContext, &pfd);
+    SetPixelFormat(deviceContext, iFormat, &pfd);
+    HGLRC renderContext = wglCreateContext(deviceContext);
+    wglMakeCurrent(deviceContext, renderContext);
+    
+    GLeeInit();
+    
+    wglMakeCurrent(NULL, NULL);
+    wglDeleteContext(renderContext);
+    ReleaseDC(dummyWindow, deviceContext);
+    DestroyWindow(dummyWindow);
 }
 
 void Graphics::InitializeShaderParameters()

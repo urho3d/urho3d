@@ -28,6 +28,7 @@
 #include "Log.h"
 
 #include <GLee.h>
+#include <cstring>
 
 #include "DebugNew.h"
 
@@ -48,6 +49,34 @@ IndexBuffer::~IndexBuffer()
     Release();
 }
 
+void IndexBuffer::OnDeviceLost()
+{
+    if (object_)
+    {
+        void* hwData = Lock(0, indexCount_, LOCK_READONLY);
+        if (hwData)
+        {
+            saveData_ = new unsigned char[indexCount_ * indexSize_];
+            memcpy(saveData_.GetPtr(), hwData, indexCount_ * indexSize_);
+        }
+        Unlock();
+        Release();
+    }
+}
+
+void IndexBuffer::OnDeviceReset()
+{
+    if (!object_)
+    {
+        Create();
+        if (saveData_)
+        {
+            SetData(saveData_.GetPtr());
+            saveData_.Reset();
+        }
+    }
+}
+
 void IndexBuffer::Release()
 {
     if (object_)
@@ -59,6 +88,7 @@ void IndexBuffer::Release()
             graphics_->SetIndexBuffer(0);
         
         glDeleteBuffers(1, &object_);
+        object_ = 0;
     }
     
     fallbackData_.Reset();

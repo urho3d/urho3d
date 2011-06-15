@@ -361,6 +361,8 @@ public:
 private:
     /// Create the application window. Return true if successful
     bool OpenWindow(int width, int height);
+    /// Get the pixel format for a given multisample level. Return nonzero if successful
+    int GetPixelFormat(RenderMode mode, int multiSample);
     /// Change to a fullscreen mode. Return true if successful
     bool SetScreenMode(int newWidth, int newHeight);
     /// Restore desktop mode
@@ -373,6 +375,10 @@ private:
     void ResetCachedState();
     /// Set draw buffer(s) on the FBO
     void SetDrawBuffers();
+    /// Destroy the OpenGL rendering context and the window
+    void Release();
+    /// Initialize OpenGL extensions. Creates a dummy window and OpenGL context
+    void InitializeExtensions();
     /// Initialize shader parameter and texture unit mappings
     void InitializeShaderParameters();
     /// Handle operating system window message

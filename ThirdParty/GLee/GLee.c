@@ -1193,12 +1193,14 @@ int __GLeeGLNumExtensions=7;
 /* Extension querying variables */
 
 GLboolean _GLEE_WGL_ARB_extensions_string = GL_FALSE;
+GLboolean _GLEE_WGL_ARB_pixel_format = GL_FALSE;
 GLboolean _GLEE_WGL_EXT_swap_control = GL_FALSE;
 
 /*  WGL Extension names */
 
-char __GLeeWGLExtensionNames[2][26]={
+char __GLeeWGLExtensionNames[3][26]={
     "WGL_ARB_extensions_string",
+    "WGL_ARB_pixel_format",
     "WGL_EXT_swap_control"
 };
 int __GLeeWGLNumExtensions=2;
@@ -1211,6 +1213,23 @@ int __GLeeWGLNumExtensions=2;
   GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC GLeeFuncPtr_wglGetExtensionsStringARB = 0;
 #endif
 #endif
+
+/* WGL_ARB_pixel_format */
+
+#ifdef __GLEE_WGL_ARB_pixel_format
+#ifndef GLEE_C_DEFINED_wglGetPixelFormatAttribivARB
+#define GLEE_C_DEFINED_wglGetPixelFormatAttribivARB
+  GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribivARB = 0;
+#endif
+#ifndef GLEE_C_DEFINED_wglGetPixelFormatAttribfvARB
+#define GLEE_C_DEFINED_wglGetPixelFormatAttribfvARB
+  GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribfvARB = 0;
+#endif
+#ifndef GLEE_C_DEFINED_wglChoosePixelFormatARB
+#define GLEE_C_DEFINED_wglChoosePixelFormatARB
+  GLEEPFNWGLCHOOSEPIXELFORMATARBPROC GLeeFuncPtr_wglChoosePixelFormatARB = 0;
+#endif
+#endif 
 
 /* WGL_EXT_swap_control */
 
@@ -1603,6 +1622,19 @@ GLuint __GLeeLink_WGL_ARB_extensions_string(void)
     return GLEE_LINK_PARTIAL;
 }
 
+GLuint __GLeeLink_WGL_ARB_pixel_format(void)
+{
+    GLint nLinked=0;
+#ifdef __GLEE_WGL_ARB_pixel_format
+    if ((GLeeFuncPtr_wglGetPixelFormatAttribivARB = (GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC) __GLeeGetProcAddress("wglGetPixelFormatAttribivARB"))!=0) nLinked++;
+    if ((GLeeFuncPtr_wglGetPixelFormatAttribfvARB = (GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC) __GLeeGetProcAddress("wglGetPixelFormatAttribfvARB"))!=0) nLinked++;
+    if ((GLeeFuncPtr_wglChoosePixelFormatARB = (GLEEPFNWGLCHOOSEPIXELFORMATARBPROC) __GLeeGetProcAddress("wglChoosePixelFormatARB"))!=0) nLinked++;
+#endif
+    if (nLinked==3) return GLEE_LINK_COMPLETE;
+    if (nLinked==0) return GLEE_LINK_FAIL;
+    return GLEE_LINK_PARTIAL;
+}
+
 GLuint __GLeeLink_WGL_EXT_swap_control(void)
 {
     GLint nLinked=0;
@@ -1615,12 +1647,13 @@ GLuint __GLeeLink_WGL_EXT_swap_control(void)
     return GLEE_LINK_PARTIAL;
 }
 
-GLEE_LINK_FUNCTION __GLeeWGLLoadFunction[2];
+GLEE_LINK_FUNCTION __GLeeWGLLoadFunction[3];
 
 void initWGLLoadFunctions(void)
 {
     __GLeeWGLLoadFunction[0]=__GLeeLink_WGL_ARB_extensions_string;
-    __GLeeWGLLoadFunction[1]=__GLeeLink_WGL_EXT_swap_control;
+    __GLeeWGLLoadFunction[1]=__GLeeLink_WGL_ARB_pixel_format;
+    __GLeeWGLLoadFunction[2]=__GLeeLink_WGL_EXT_swap_control;
 }
 
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
@@ -1923,6 +1956,11 @@ GLEE_EXTERN GLboolean GLeeEnabled(GLboolean * extensionQueryingVariable)
 	return *extensionQueryingVariable;	
 }
 
+GLEE_EXTERN GLboolean GLeeInitialized( void )
+{
+    return __GLeeInited;
+}
+
 GLEE_EXTERN GLboolean GLeeInit( void )
 {
 	int version;
@@ -1995,6 +2033,11 @@ GLEE_EXTERN GLboolean GLeeInit( void )
     {
         _GLEE_WGL_ARB_extensions_string = GL_TRUE;
         __GLeeLink_WGL_ARB_extensions_string();
+    }
+    if (__GLeeCheckExtension("WGL_ARB_pixel_format", &extensionNames) )
+    {
+        _GLEE_WGL_ARB_pixel_format = GL_TRUE;
+        __GLeeLink_WGL_ARB_pixel_format();
     }
     if (__GLeeCheckExtension("WGL_EXT_swap_control", &extensionNames) )
     {

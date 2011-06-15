@@ -37,6 +37,7 @@ GraphicsImpl::GraphicsImpl() :
     drawBuffers_(M_MAX_UNSIGNED),
     fbo_(0),
     enabledAttributes_(0),
+    pixelFormat_(0),
     depthBits_(0),
     windowDepthBits_(0),
     fboBound_(false)

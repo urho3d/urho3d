@@ -27,6 +27,7 @@
 #include "VertexBuffer.h"
 
 #include <GLee.h>
+#include <cstring>
 
 #include "DebugNew.h"
 
@@ -133,6 +134,34 @@ VertexBuffer::VertexBuffer(Context* context) :
 VertexBuffer::~VertexBuffer()
 {
     Release();
+}
+
+void VertexBuffer::OnDeviceLost()
+{
+    if (object_)
+    {
+        void* hwData = Lock(0, vertexCount_, LOCK_NORMAL);
+        if (hwData)
+        {
+            saveData_ = new unsigned char[vertexCount_ * vertexSize_];
+            memcpy(saveData_.GetPtr(), hwData, vertexCount_ * vertexSize_);
+        }
+        Unlock();
+        Release();
+    }
+}
+
+void VertexBuffer::OnDeviceReset()
+{
+    if (!object_)
+    {
+        Create();
+        if (saveData_)
+        {
+            SetData(saveData_.GetPtr());
+            saveData_.Reset();
+        }
+    }
 }
 
 void VertexBuffer::Release()

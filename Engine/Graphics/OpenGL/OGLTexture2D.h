@@ -23,11 +23,10 @@
 
 #pragma once
 
+#include "Image.h"
 #include "RenderSurface.h"
 #include "SharedPtr.h"
 #include "Texture.h"
-
-class Image;
 
 /// 2D texture resource
 class Texture2D : public Texture
@@ -44,9 +43,9 @@ public:
     
     /// Load resource. Return true if successful
     virtual bool Load(Deserializer& source);
-    /// React to screen mode change
+    /// Recreate the texture from the original file if necessary and possible
     virtual void OnDeviceReset();
-    /// Release texture
+    /// Release the texture
     virtual void Release();
     
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful

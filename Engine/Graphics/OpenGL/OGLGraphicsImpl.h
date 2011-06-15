@@ -61,6 +61,8 @@ private:
     unsigned fbo_;
     /// Vertex attributes in use
     unsigned enabledAttributes_;
+    /// Current pixel format
+    int pixelFormat_;
     /// Current depth bits
     int depthBits_;
     /// Backbuffer depth bits

@@ -38,7 +38,11 @@ public:
     /// Destruct
     virtual ~VertexBuffer();
     
-    /// Release buffer
+    /// Save data and release the buffer
+    virtual void OnDeviceLost();
+    /// Recreate the buffer from saved data
+    virtual void OnDeviceReset();
+    /// Release the buffer
     virtual void Release();
     
     /// Set size and vertex elements and dynamic mode. Previous data will be lost
@@ -109,6 +113,8 @@ private:
     SharedArrayPtr<unsigned char> fallbackData_;
     /// Morph vertex range reset data
     SharedArrayPtr<unsigned char> morphRangeResetData_;
+    /// Save data when OpenGL context needs to be destroyed and recreated
+    SharedArrayPtr<unsigned char> saveData_;
     /// Number of vertices
     unsigned vertexCount_;
     /// Vertex size

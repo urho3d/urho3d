@@ -40,3 +40,8 @@ GPUObject::~GPUObject()
     if (graphics_)
         graphics_->RemoveGPUObject(this);
 }
+
+void GPUObject::OnDeviceLost()
+{
+    Release();
+}

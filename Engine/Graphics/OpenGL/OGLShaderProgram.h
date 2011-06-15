@@ -49,8 +49,9 @@ public:
     /// Destruct
     ~ShaderProgram();
     
-    /// Release the shader program object
+    /// Release shader program
     virtual void Release();
+    
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful
     bool Link();
     /// Check whether needs a parameter update

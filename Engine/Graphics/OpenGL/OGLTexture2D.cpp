@@ -77,6 +77,16 @@ void Texture2D::OnDeviceReset()
 {
     if (followWindowSize_)
         Create();
+    else if (!object_)
+    {
+        // Reload from the original file if possible
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        const String& name = GetName();
+        if ((cache) && (!name.Empty()) && (cache->Exists(name)))
+            cache->ReloadResource(this);
+        else
+            Create();
+    }
 }
 
 void Texture2D::Release()
@@ -97,6 +107,7 @@ void Texture2D::Release()
         
         glDeleteTextures(1, &object_);
         object_ = 0;
+        dataLost_ = true;
     }
     else
     {
@@ -250,6 +261,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
     }
     
     SetMemoryUse(memoryUse);
+    ClearDataLost();
     return true;
 }
 

@@ -70,6 +70,7 @@ Texture::Texture(Context* context) :
     depthBits_(0),
     width_(0),
     height_(0),
+    dataLost_(false),
     dynamic_(false),
     shadowCompare_(false),
     parametersDirty_(true),
@@ -126,14 +127,15 @@ void Texture::SetParametersDirty()
 
 void Texture::ClearDataLost()
 {
-}    
+    dataLost_ = false;
+}
 
 void Texture::UpdateParameters()
 {
     if ((!object_) || (!graphics_))
         return;
     
-   // Wrapping
+    // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, glWrapModes[addressMode_[0]]);
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, glWrapModes[addressMode_[1]]);
     
