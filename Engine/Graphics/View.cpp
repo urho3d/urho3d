@@ -889,7 +889,7 @@ void View::RenderBatchesDeferred()
         #endif
         
         renderer_->DrawFullScreenQuad(*camera_, renderer_->GetVertexShader("Ambient"),
-            renderer_->GetPixelShader(pixelShaderName), false, shaderParameters_);
+            renderer_->GetPixelShader("Ambient"), false, shaderParameters_);
         
         #ifdef USE_OPENGL
         graphics_->SetStencilTest(false);

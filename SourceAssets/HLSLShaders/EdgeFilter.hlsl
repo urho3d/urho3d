@@ -29,11 +29,11 @@ void PS(float2 iScreenPos : TEXCOORD0,
 
     float2 posOffset = cSampleOffsets.xy * cEdgeFilterParams.x;
 
-    float3 rgbNW = tex2D(sDiffBuffer, iScreenPos + float2(-posOffset.x, -posOffset.y)).rgb;
-    float3 rgbNE = tex2D(sDiffBuffer, iScreenPos + float2(posOffset.x, -posOffset.y)).rgb;
-    float3 rgbSW = tex2D(sDiffBuffer, iScreenPos + float2(-posOffset.x, posOffset.y)).rgb;
-    float3 rgbSE = tex2D(sDiffBuffer, iScreenPos + float2(posOffset.x, posOffset.y)).rgb;
-    float3 rgbM  = tex2D(sDiffBuffer, iScreenPos).rgb;
+    float3 rgbNW = Sample(sDiffBuffer, iScreenPos + float2(-posOffset.x, -posOffset.y)).rgb;
+    float3 rgbNE = Sample(sDiffBuffer, iScreenPos + float2(posOffset.x, -posOffset.y)).rgb;
+    float3 rgbSW = Sample(sDiffBuffer, iScreenPos + float2(-posOffset.x, posOffset.y)).rgb;
+    float3 rgbSE = Sample(sDiffBuffer, iScreenPos + float2(posOffset.x, posOffset.y)).rgb;
+    float3 rgbM  = Sample(sDiffBuffer, iScreenPos).rgb;
 
     float3 luma = float3(0.299, 0.587, 0.114);
     float lumaNW = dot(rgbNW, luma);
@@ -45,33 +45,38 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
     float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
 
-    float2 dir;
-    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
-    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
-
-    float dirReduce = max(
-        (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
-        FXAA_REDUCE_MIN);
-    float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
-    dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
-          max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
-          dir * rcpDirMin)) * cSampleOffsets.xy;
-
-    dir *= cEdgeFilterParams.z;
-
-    float3 rgbA = (1.0/2.0) * (
-        tex2D(sDiffBuffer, iScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
-        tex2D(sDiffBuffer, iScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
-    float3 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (
-        tex2D(sDiffBuffer, iScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
-        tex2D(sDiffBuffer, iScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
-    float lumaB = dot(rgbB, luma);
+    if (((lumaMax - lumaMin) / lumaMin) >= cEdgeFilterParams.y)
+    {
+        float2 dir;
+        dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+        dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
     
-    float3 rgbOut;
-    if((lumaB < lumaMin) || (lumaB > lumaMax))
-        rgbOut = rgbA;
+        float dirReduce = max(
+            (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
+            FXAA_REDUCE_MIN);
+        float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
+        dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
+              max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
+              dir * rcpDirMin)) * cSampleOffsets.xy;
+    
+        dir *= cEdgeFilterParams.z;
+    
+        float3 rgbA = (1.0/2.0) * (
+            Sample(sDiffBuffer, iScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
+            Sample(sDiffBuffer, iScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
+        float3 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (
+            Sample(sDiffBuffer, iScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
+            Sample(sDiffBuffer, iScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
+        float lumaB = dot(rgbB, luma);
+        
+        float3 rgbOut;
+        if((lumaB < lumaMin) || (lumaB > lumaMax))
+            rgbOut = rgbA;
+        else
+            rgbOut = rgbB;
+
+        oColor = float4(rgbOut, 1.0);
+    }
     else
-        rgbOut = rgbB;
-    
-    oColor = float4(rgbOut, 1.0);
+        oColor = float4(rgbM, 1.0);
 }

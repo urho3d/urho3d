@@ -36,33 +36,38 @@ void main()
     float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
     float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
 
-    vec2 dir;
-    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
-    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+    if (((lumaMax - lumaMin) / lumaMin) >= cEdgeFilterParams.y)
+    {
+        vec2 dir;
+        dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+        dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
 
-    float dirReduce = max(
-        (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
-        FXAA_REDUCE_MIN);
-    float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
-    dir = min(vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
-          max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
-          dir * rcpDirMin)) * cSampleOffsets.xy;
+        float dirReduce = max(
+            (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
+            FXAA_REDUCE_MIN);
+        float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
+        dir = min(vec2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
+              max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
+              dir * rcpDirMin)) * cSampleOffsets.xy;
 
-    dir *= cEdgeFilterParams.z;
+        dir *= cEdgeFilterParams.z;
 
-    vec3 rgbA = (1.0/2.0) * (
-        texture2D(sDiffBuffer, vScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
-        texture2D(sDiffBuffer, vScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
-    vec3 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (
-        texture2D(sDiffBuffer, vScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
-        texture2D(sDiffBuffer, vScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
-    float lumaB = dot(rgbB, luma);
+        vec3 rgbA = (1.0/2.0) * (
+            texture2D(sDiffBuffer, vScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
+            texture2D(sDiffBuffer, vScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
+        vec3 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (
+            texture2D(sDiffBuffer, vScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
+            texture2D(sDiffBuffer, vScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
+        float lumaB = dot(rgbB, luma);
+
+        vec3 rgbOut;
+        if((lumaB < lumaMin) || (lumaB > lumaMax))
+            rgbOut = rgbA;
+        else
+            rgbOut = rgbB;
     
-    vec3 rgbOut;
-    if((lumaB < lumaMin) || (lumaB > lumaMax))
-        rgbOut = rgbA;
+        gl_FragColor = vec4(rgbOut, 1.0);
+    }
     else
-        rgbOut = rgbB;
-    
-    gl_FragColor = vec4(rgbOut, 1.0);
+        gl_FragColor = vec4(rgbM, 1.0);
 }

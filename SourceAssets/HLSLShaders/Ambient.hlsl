@@ -17,9 +17,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
 {
     float4 diffInput = tex2D(sDiffBuffer, iScreenPos);
     float depth = tex2D(sDepthBuffer, iScreenPos).r;
-
     float3 ambientColor = cAmbientColor * diffInput.rgb;
 
-    // Store coarse depth to alpha channel for deferred antialiasing
-    oColor = float4(ambientColor + GetFogFactor(depth) * cFogColor, depth);
+    oColor = float4(ambientColor + GetFogFactor(depth) * cFogColor, 1.0);
 }
