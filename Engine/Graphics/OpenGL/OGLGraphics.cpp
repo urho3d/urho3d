@@ -2233,7 +2233,6 @@ void Graphics::ResetCachedState()
     impl_->activeTexture_ = 0;
     impl_->drawBuffers_ = M_MAX_UNSIGNED;
     impl_->enabledAttributes_ = 0;
-    impl_->fbo_ = 0;
     impl_->fboBound_ = false;
 }
 
@@ -2283,7 +2282,10 @@ void Graphics::Release()
     if (impl_->renderContext_)
     {
         if (impl_->fbo_)
+        {
             glDeleteFramebuffersEXT(1, &impl_->fbo_);
+            impl_->fbo_ = 0;
+        }
         
         wglMakeCurrent(NULL, NULL);
         wglDeleteContext(impl_->renderContext_);

@@ -66,8 +66,7 @@ View::View(Context* context) :
     camera_(0),
     zone_(0),
     renderTarget_(0),
-    depthStencil_(0),
-    jitterCounter_(0)
+    depthStencil_(0)
 {
     frame_.camera_ = 0;
 }
