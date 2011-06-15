@@ -20,7 +20,7 @@ void main()
     float right = GetIntensity(texture2D(sDiffBuffer, vScreenPos + vec2(offsets.x, 0)).rgb);
     
     // Calculate normal, scale with base intensity
-    vec2 normal = vec2((up - base) + (base - down), (right - base) + (base - left)) / base;
+    vec2 normal = vec2(up - down, right - left) / base;
     float len = length(normal);
     
     // Clamp normal to maximum

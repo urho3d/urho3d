@@ -26,9 +26,9 @@
 #include "Batch.h"
 #include "Color.h"
 #include "Drawable.h"
+#include "HashMap.h"
 #include "HashSet.h"
 #include "RenderSurface.h"
-#include "Set.h"
 
 class DebugRenderer;
 class Geometry;
@@ -380,7 +380,7 @@ private:
     /// Reusable temporary scene nodes
     Vector<SharedPtr<Node> > tempNodeStore_;
     /// Occlusion buffers
-    Map<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
+    HashMap<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
     /// Viewports
     Vector<Viewport> viewports_;
     /// Views
@@ -388,7 +388,7 @@ private:
     /// Octrees that have been updated during the frame
     HashSet<Octree*> updateOctrees_;
     /// Techniques for which missing shader error has been displayed
-    Set<Technique*> shaderErrorDisplayed_;
+    HashSet<Technique*> shaderErrorDisplayed_;
     /// Vertex shader format
     String vsFormat_;
     /// Pixel shader format

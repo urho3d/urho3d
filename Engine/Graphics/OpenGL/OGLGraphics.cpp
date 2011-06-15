@@ -1275,22 +1275,16 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         {
             int width = renderTargets_[0]->GetWidth();
             int height = renderTargets_[0]->GetHeight();
-            // Reuse the deferred depth buffer if possible
-            if ((depthBuffer_) && (width == width_) && (height == height_))
-                depthStencil = depthBuffer_->GetRenderSurface();
+            int searchKey = (width << 16) | height;
+            HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
+            if (i != depthTextures_.End())
+                depthStencil = i->second_->GetRenderSurface();
             else
             {
-                int searchKey = (width << 16) | height;
-                Map<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
-                if (i != depthTextures_.End())
-                    depthStencil = i->second_->GetRenderSurface();
-                else
-                {
-                    SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
-                    newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-                    depthTextures_[searchKey] = newDepthTexture;
-                    depthStencil = newDepthTexture->GetRenderSurface();
-                }
+                SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
+                newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
+                depthTextures_[searchKey] = newDepthTexture;
+                depthStencil = newDepthTexture->GetRenderSurface();
             }
         }
         

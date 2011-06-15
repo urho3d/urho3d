@@ -29,7 +29,7 @@ void PS(float2 iScreenPos : TEXCOORD0,
     float right = GetIntensity(tex2D(sDiffBuffer, iScreenPos + float2(offsets.x, 0)).rgb);
     
     // Calculate normal, scale with base intensity
-    float2 normal = float2((up - base) + (base - down), (right - base) + (base - left)) / base;
+    float2 normal = float2(up - down, right - left) / base;
     float len = length(normal);
     
     // Clamp normal to maximum

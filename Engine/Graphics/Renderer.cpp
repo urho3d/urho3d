@@ -266,7 +266,7 @@ Renderer::Renderer(Context* context) :
     shadowMapHiresDepth_(false),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
-    edgeFilter_(EdgeFilterParameters(2.0f, 1.0f, 0.66f)),
+    edgeFilter_(EdgeFilterParameters(1.5f, 1.0f, 0.66f)),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),
@@ -523,7 +523,7 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
     }
     int searchKey = (width << 16) | height;
     
-    Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
+    HashMap<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
     if (i != occlusionBuffers_.End())
         return i->second_;
     else
@@ -776,7 +776,7 @@ OcclusionBuffer* Renderer::GetOrCreateOcclusionBuffer(Camera* camera, int maxOcc
     int searchKey = (width << 16) | height;
     
     SharedPtr<OcclusionBuffer> buffer;
-    Map<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
+    HashMap<int, SharedPtr<OcclusionBuffer> >::Iterator i = occlusionBuffers_.Find(searchKey);
     if (i != occlusionBuffers_.End())
         buffer = i->second_;
     else

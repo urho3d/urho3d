@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Color.h"
+#include "HashMap.h"
 #include "Matrix3x4.h"
 #include "Object.h"
 #include "Rect.h"
@@ -520,7 +521,7 @@ private:
     /// Default texture filtering mode
     TextureFilterMode defaultTextureFilterMode_;
     /// Map for additional depth textures, to emulate Direct3D9 ability to mix rendertarget and backbuffer rendering
-    Map<int, SharedPtr<Texture2D> > depthTextures_;
+    HashMap<int, SharedPtr<Texture2D> > depthTextures_;
 };
 
 /// Register Graphics library objects
