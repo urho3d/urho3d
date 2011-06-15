@@ -27,10 +27,3 @@ float ReconstructDepth(float hwDepth)
 {
     return cDepthReconstruct.y / (hwDepth - cDepthReconstruct.x);
 }
-
-float GetIntensity(vec3 color)
-{
-    const float dotValue = 1.0 / 3.0;
-
-    return dot(color, vec3(dotValue, dotValue, dotValue));
-}

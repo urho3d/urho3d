@@ -1,3 +1,11 @@
+/*============================================================================
+ 
+                  FXAA v2 CONSOLE by TIMOTHY LOTTES @ NVIDIA                                
+
+============================================================================*/
+
+// Adapted for Urho3D from http://timothylottes.blogspot.com/2011/04/nvidia-fxaa-ii-for-console.html
+
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
@@ -14,36 +22,56 @@ void VS(float4 iPos : POSITION,
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : COLOR0)
 {
-    // Shader based on the blog post http://www.gamestart3d.com/blog/ssaa-antialiasing
-    float2 offsets = cEdgeFilterParams.x * cSampleOffsets.xy;
+    float FXAA_SUBPIX_SHIFT = 1.0/4.0; // Not used
+    float FXAA_SPAN_MAX = 8.0;
+    float FXAA_REDUCE_MUL = 1.0/8.0;
+    float FXAA_REDUCE_MIN = 1.0/128.0;
 
-    float4 color = tex2D(sDiffBuffer, iScreenPos);
+    float2 posOffset = cSampleOffsets.xy * cEdgeFilterParams.x;
+
+    float3 rgbNW = tex2D(sDiffBuffer, iScreenPos + float2(-posOffset.x, -posOffset.y)).rgb;
+    float3 rgbNE = tex2D(sDiffBuffer, iScreenPos + float2(posOffset.x, -posOffset.y)).rgb;
+    float3 rgbSW = tex2D(sDiffBuffer, iScreenPos + float2(-posOffset.x, posOffset.y)).rgb;
+    float3 rgbSE = tex2D(sDiffBuffer, iScreenPos + float2(posOffset.x, posOffset.y)).rgb;
+    float3 rgbM  = tex2D(sDiffBuffer, iScreenPos).rgb;
+
+    float3 luma = float3(0.299, 0.587, 0.114);
+    float lumaNW = dot(rgbNW, luma);
+    float lumaNE = dot(rgbNE, luma);
+    float lumaSW = dot(rgbSW, luma);
+    float lumaSE = dot(rgbSE, luma);
+    float lumaM  = dot(rgbM,  luma);
+
+    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+    float2 dir;
+    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+
+    float dirReduce = max(
+        (lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL),
+        FXAA_REDUCE_MIN);
+    float rcpDirMin = 1.0/(min(abs(dir.x), abs(dir.y)) + dirReduce);
+    dir = min(float2( FXAA_SPAN_MAX,  FXAA_SPAN_MAX),
+          max(float2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
+          dir * rcpDirMin)) * cSampleOffsets.xy;
+
+    dir *= cEdgeFilterParams.z;
+
+    float3 rgbA = (1.0/2.0) * (
+        tex2D(sDiffBuffer, iScreenPos + dir * (1.0/3.0 - 0.5)).xyz +
+        tex2D(sDiffBuffer, iScreenPos + dir * (2.0/3.0 - 0.5)).xyz);
+    float3 rgbB = rgbA * (1.0/2.0) + (1.0/4.0) * (
+        tex2D(sDiffBuffer, iScreenPos + dir * (0.0/3.0 - 0.5)).xyz +
+        tex2D(sDiffBuffer, iScreenPos + dir * (3.0/3.0 - 0.5)).xyz);
+    float lumaB = dot(rgbB, luma);
     
-    // Get intensity at center, clamp to 10% minimum to not cause oversensitivity in dark areas
-    float base = max(GetIntensity(color.rgb), 0.1);
-    
-    // Get intensities at neighbour pixels
-    float up = GetIntensity(tex2D(sDiffBuffer, iScreenPos + float2(0, -offsets.y)).rgb);
-    float down = GetIntensity(tex2D(sDiffBuffer, iScreenPos + float2(0, offsets.y)).rgb);
-    float left = GetIntensity(tex2D(sDiffBuffer, iScreenPos + float2(-offsets.x, 0)).rgb);
-    float right = GetIntensity(tex2D(sDiffBuffer, iScreenPos + float2(offsets.x, 0)).rgb);
-    
-    // Calculate normal, scale with base intensity
-    float2 normal = float2(up - down, right - left) / base;
-    float len = length(normal);
-    
-    // Clamp normal to maximum
-    if (len > 1)
-        normal /= len;
-    
-    // Blur if over threshold (compare to center pixel intensity)
-    if (len > cEdgeFilterParams.y)
-    {
-        normal *= cSampleOffsets.xy * cEdgeFilterParams.z;
-        oColor = (color +
-            Sample(sDiffBuffer, iScreenPos + normal) +
-            Sample(sDiffBuffer, iScreenPos - normal)) * (1.0 / 3.0);
-    }
+    float3 rgbOut;
+    if((lumaB < lumaMin) || (lumaB > lumaMax))
+        rgbOut = rgbA;
     else
-        oColor = color;
+        rgbOut = rgbB;
+    
+    oColor = float4(rgbOut, 1.0);
 }

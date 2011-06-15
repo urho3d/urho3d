@@ -985,7 +985,7 @@ void View::RenderBatchesDeferred()
         
         const EdgeFilterParameters& parameters = renderer_->GetEdgeFilter();
         ShaderVariation* vs = renderer_->GetVertexShader("EdgeFilter");
-        ShaderVariation* ps = renderer_->GetPixelShader("EdgeFilter");  
+        ShaderVariation* ps = renderer_->GetPixelShader("EdgeFilter");
         
         HashMap<ShaderParameter, Vector4> shaderParameters(shaderParameters_);
         shaderParameters[PSP_EDGEFILTERPARAMS] = Vector4(parameters.radius_, parameters.threshold_, parameters.strength_, 0.0f);
