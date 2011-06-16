@@ -120,13 +120,13 @@ Graphics::Graphics(Context* context_) :
     width_(0),
     height_(0),
     multiSample_(0),
+    inModeChange_(0),
     windowPosX_(0),
     windowPosY_(0),
     fullscreen_(false),
     vsync_(false),
     flushGPU_(true),
     fullscreenModeSet_(false),
-    inModeChange_(false),
     renderTargetSupport_(false),
     deferredSupport_(false),
     numPrimitives_(0),
@@ -209,9 +209,9 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             return false;
     }
     
-    // Save window placement if currently windowed
     if (!fullscreen_)
     {
+        // Save the window placement if not fullscreen
         WINDOWPLACEMENT wndpl;
         wndpl.length = sizeof wndpl;
         if (SUCCEEDED(GetWindowPlacement(impl_->window_, &wndpl)))
@@ -284,10 +284,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
             fullscreen = false;
     }
     else
-    {
-        if (fullscreen_)
-            RestoreScreenMode();
-    }
+        RestoreScreenMode();
     
     AdjustWindow(width, height, fullscreen);
     
@@ -2028,15 +2025,6 @@ bool Graphics::OpenWindow(int width, int height)
     
     SetWindowLongPtr(impl_->window_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     
-    // Save window placement
-    WINDOWPLACEMENT wndpl;
-    wndpl.length = sizeof wndpl;
-    if (SUCCEEDED(GetWindowPlacement(impl_->window_, &wndpl)))
-    {
-        windowPosX_ = wndpl.rcNormalPosition.left;
-        windowPosY_ = wndpl.rcNormalPosition.top;
-    }
-    
     // Save the device context
     impl_->deviceContext_ = GetDC(impl_->window_);
     
@@ -2088,7 +2076,7 @@ int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
 
 bool Graphics::SetScreenMode(int newWidth, int newHeight)
 {
-    inModeChange_ = true;
+    ++inModeChange_;
     
     DEVMODE dmScreenSettings;
     ZeroMemory(&dmScreenSettings, sizeof(dmScreenSettings));
@@ -2101,8 +2089,8 @@ bool Graphics::SetScreenMode(int newWidth, int newHeight)
     bool success = ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
     if (success)
         fullscreenModeSet_ = true;
-
-    inModeChange_ = false;
+    
+    --inModeChange_;
     return success;
 }
 
@@ -2110,35 +2098,35 @@ void Graphics::RestoreScreenMode()
 {
     if (fullscreenModeSet_)
     {
-        inModeChange_ = true;
+        ++inModeChange_;
         ChangeDisplaySettings(NULL, 0);
         fullscreenModeSet_ = false;
-        inModeChange_ = false;
+        --inModeChange_;
     }
 }
 
 void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
 {
-    inModeChange_ = true;
+    ++inModeChange_;
     
     if (newFullscreen)
     {
         SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
-        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_NOZORDER | SWP_SHOWWINDOW);
+        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW);
     }
     else
     {
         RECT rect = {0, 0, newWidth, newHeight};
-        AdjustWindowRect(&rect, windowStyle, false);
+        AdjustWindowRect(&rect, windowStyle, FALSE);
         SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
         SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
-            SWP_NOZORDER | SWP_SHOWWINDOW);
+            SWP_SHOWWINDOW);
         
-        // Clean up the desktop of the old window contents
-        InvalidateRect(0, 0, true);
+        // Clean up the desktop of old window contents
+        InvalidateRect(0, 0, TRUE);
     }
     
-    inModeChange_ = false;
+    --inModeChange_;
 }
 
 void Graphics::CreateRenderTargets()
@@ -2461,9 +2449,9 @@ void Graphics::HandleActivation(StringHash eventType, VariantMap& eventData)
     else
     {
         // Reset to desktop resolution on inactivation
-        inModeChange_ = true;
+        ++inModeChange_;
         ShowWindow(impl_->window_, SW_MINIMIZE);
-        inModeChange_ = false;
+        --inModeChange_;
         RestoreScreenMode();
     }
 }

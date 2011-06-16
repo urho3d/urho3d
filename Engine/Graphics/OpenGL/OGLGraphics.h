@@ -402,6 +402,8 @@ private:
     int windowPosX_;
     /// Stored window Y-position
     int windowPosY_;
+    /// In screen mode change -counter
+    int inModeChange_;
     /// Fullscreen flag
     bool fullscreen_;
     /// Vertical sync flag
@@ -410,8 +412,6 @@ private:
     bool flushGPU_;
     /// Fullscreen mode set -flag
     bool fullscreenModeSet_;
-    /// In screen mode change -flag
-    bool inModeChange_;
     /// Texture render target support flag
     bool renderTargetSupport_;
     /// Deferred rendering support flag
