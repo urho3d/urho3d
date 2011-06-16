@@ -393,23 +393,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     else
         ResetDevice();
     
-    // Adjust window style/size now
-    if (fullscreen)
-    {
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
-        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW);
-    }
-    else
-    {
-        RECT rect = {0, 0, width, height};
-        AdjustWindowRect(&rect, windowStyle, FALSE);
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
-        SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
-            SWP_SHOWWINDOW);
-
-        // Clean up the desktop of old window contents
-        InvalidateRect(0, 0, TRUE);
-    }
+    AdjustWindow(width, height, fullscreen);
     
     if (!multiSample)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
@@ -2064,6 +2048,27 @@ bool Graphics::OpenWindow(int width, int height)
 
     LOGINFO("Created application window");
     return true;
+}
+
+void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
+{
+    // Adjust window style/size now
+    if (newFullscreen)
+    {
+        SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
+        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW | SWP_NOCOPYBITS);
+    }
+    else
+    {
+        RECT rect = {0, 0, newWidth, newHeight};
+        AdjustWindowRect(&rect, windowStyle, FALSE);
+        SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
+        SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
+            SWP_SHOWWINDOW | SWP_NOCOPYBITS);
+        
+        // Clean up the desktop of old window contents
+        InvalidateRect(0, 0, TRUE);
+    }
 }
 
 bool Graphics::CreateInterface()

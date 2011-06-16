@@ -356,6 +356,8 @@ public:
 private:
     /// Create the application window
     bool OpenWindow(int width, int height);
+    /// Adjust the window for new resolution and fullscreen mode
+    void AdjustWindow(int newWidth, int newHeight, bool newFullscreen);
     /// Create the Direct3D interface
     bool CreateInterface();
     /// Create the Direct3D device

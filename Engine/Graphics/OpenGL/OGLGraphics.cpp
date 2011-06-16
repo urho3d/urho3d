@@ -229,8 +229,28 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         return false;
     }
     
-    // Create context if not created yet, or if the pixel format changed
-    if ((!impl_->renderContext_) || (pixelFormat != impl_->pixelFormat_))
+    // Check fullscreen mode validity. If not valid, revert to windowed
+    if (fullscreen)
+    {
+        PODVector<IntVector2> resolutions = GetResolutions();
+        fullscreen = false;
+        for (unsigned i = 0; i < resolutions.Size(); ++i)
+        {
+            if ((width == resolutions[i].x_) && (height == resolutions[i].y_))
+            {
+                fullscreen = true;
+                break;
+            }
+        }
+    }
+    
+    // Clear any additional depth buffers now, as they are possibly not needed any more
+    depthTextures_.Clear();
+    
+    // Create context if not created yet, or if the pixel format or fullscreen mode changes
+    // (it is not strictly necessary to recreate context just because the fullscreen mode changes, but on some ATI cards
+    // there seem to be corruption or wrong client area bugs)
+    if ((!impl_->renderContext_) || (pixelFormat != impl_->pixelFormat_) || (fullscreen != fullscreen_))
     {
         // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
         if (!impl_->renderContext_)
@@ -296,9 +316,6 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
     impl_->depthBits_ = impl_->windowDepthBits_;
     
-    // Clear all additional depth buffers now, as they are possibly not needed any more
-    depthTextures_.Clear();
-    
     width_ = width;
     height_ = height;
     fullscreen_ = fullscreen;
@@ -313,11 +330,15 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Get the system depth buffer's bit depth
     glGetIntegerv(GL_DEPTH_BITS, &impl_->depthBits_);
     
+    // Clear the window to black now, because GPU object restore may take time
+    Clear(CLEAR_COLOR);
+    SwapBuffers(impl_->deviceContext_);
+    
     // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
     
-    // Create rendering buffers
+    // Create deferred rendering buffers as necessary
     CreateRenderTargets();
     
     if (!multiSample)
@@ -1846,6 +1867,32 @@ PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
     
+    DEVMODE displayMode;
+    unsigned index = 0;
+    for (unsigned index = 0;; ++index)
+    {
+        if (!EnumDisplaySettings(NULL, index, &displayMode))
+            break;
+        
+        if (displayMode.dmBitsPerPel < 16)
+            continue;
+        
+        IntVector2 newMode(displayMode.dmPelsWidth, displayMode.dmPelsHeight);
+        
+        // Check for duplicate before storing
+        bool unique = true;
+        for (unsigned j = 0; j < ret.Size(); ++j)
+        {
+            if (ret[j] == newMode)
+            {
+                unique = false;
+                break;
+            }
+        }
+        if (unique)
+            ret.Push(newMode);
+    }
+    
     return ret;
 }
 
@@ -2013,7 +2060,7 @@ bool Graphics::OpenWindow(int width, int height)
     RegisterClass(&wc);
     
     RECT rect = {0, 0, width, height};
-    AdjustWindowRect(&rect, windowStyle, false);
+    AdjustWindowRect(&rect, windowStyle, FALSE);
     impl_->window_ = CreateWindow("OpenGL", windowTitle_.CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
         rect.right, rect.bottom, 0, 0, impl_->instance_, 0); 
     
@@ -2034,16 +2081,16 @@ bool Graphics::OpenWindow(int width, int height)
 
 int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
 {
-    PIXELFORMATDESCRIPTOR pfd;
-    ZeroMemory(&pfd, sizeof(pfd));
+    PIXELFORMATDESCRIPTOR format;
+    ZeroMemory(&format, sizeof(format));
     
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_GENERIC_ACCELERATED | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 24;
-    pfd.cDepthBits = 24;
-    pfd.cStencilBits = 8;
+    format.nSize = sizeof(format);
+    format.nVersion = 1;
+    format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_GENERIC_ACCELERATED | PFD_DOUBLEBUFFER;
+    format.iPixelType = PFD_TYPE_RGBA;
+    format.cColorBits = impl_->GetDesktopBitsPerPixel();
+    format.cDepthBits = 24;
+    format.cStencilBits = 8;
     
     int pixelFormat = 0;
     unsigned numFormats;
@@ -2055,7 +2102,7 @@ int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
             WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
             WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
             WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-            WGL_COLOR_BITS_ARB, 24,
+            WGL_COLOR_BITS_ARB, impl_->GetDesktopBitsPerPixel(),
             WGL_DEPTH_BITS_ARB, 24,
             WGL_STENCIL_BITS_ARB, 8,
             WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
@@ -2066,10 +2113,10 @@ int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
         
         // If multisample fails, switch to non-multisampled pixel format
         if ((!wglChoosePixelFormatARB(impl_->deviceContext_, attributes, 0, 1, &pixelFormat, &numFormats)) || (!pixelFormat))
-            pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &pfd);
+            pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &format);
     }
     else
-        pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &pfd);
+        pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &format);
     
     return pixelFormat;
 }
@@ -2078,15 +2125,14 @@ bool Graphics::SetScreenMode(int newWidth, int newHeight)
 {
     ++inModeChange_;
     
-    DEVMODE dmScreenSettings;
-    ZeroMemory(&dmScreenSettings, sizeof(dmScreenSettings));
-    dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-    dmScreenSettings.dmPelsWidth = newWidth;
-    dmScreenSettings.dmPelsHeight = newHeight;
-    dmScreenSettings.dmBitsPerPel = 32;
-    dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+    DEVMODE displayMode;
+    ZeroMemory(&displayMode, sizeof(displayMode));
+    displayMode.dmSize = sizeof(displayMode);
+    displayMode.dmPelsWidth = newWidth;
+    displayMode.dmPelsHeight = newHeight;
+    displayMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
     
-    bool success = ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
+    bool success = ChangeDisplaySettings(&displayMode, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
     if (success)
         fullscreenModeSet_ = true;
     
@@ -2112,7 +2158,7 @@ void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
     if (newFullscreen)
     {
         SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
-        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW);
+        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW | SWP_NOCOPYBITS);
     }
     else
     {
@@ -2120,7 +2166,7 @@ void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
         AdjustWindowRect(&rect, windowStyle, FALSE);
         SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
         SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
-            SWP_SHOWWINDOW);
+            SWP_SHOWWINDOW | SWP_NOCOPYBITS);
         
         // Clean up the desktop of old window contents
         InvalidateRect(0, 0, TRUE);
@@ -2233,7 +2279,7 @@ void Graphics::SetDrawBuffers()
         if (renderTargets_[i])
             newDrawBuffers |= 1 << i;
     }
-    
+
     if (newDrawBuffers == impl_->drawBuffers_)
         return;
     
@@ -2326,18 +2372,18 @@ void Graphics::InitializeExtensions()
     // Save the device context, then set the pixel format
     HDC deviceContext = GetDC(dummyWindow);
     
-    PIXELFORMATDESCRIPTOR pfd;
-    ZeroMemory(&pfd, sizeof(pfd));
+    PIXELFORMATDESCRIPTOR format;
+    ZeroMemory(&format, sizeof(format));
     
-    pfd.nSize = sizeof(pfd);
-    pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    pfd.iPixelType = PFD_TYPE_RGBA;
-    pfd.cColorBits = 16;
-    pfd.cDepthBits = 15;
+    format.nSize = sizeof(format);
+    format.nVersion = 1;
+    format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    format.iPixelType = PFD_TYPE_RGBA;
+    format.cColorBits = 16;
+    format.cDepthBits = 15;
     
-    int iFormat = ChoosePixelFormat(deviceContext, &pfd);
-    SetPixelFormat(deviceContext, iFormat, &pfd);
+    int iFormat = ChoosePixelFormat(deviceContext, &format);
+    SetPixelFormat(deviceContext, iFormat, &format);
     HGLRC renderContext = wglCreateContext(deviceContext);
     wglMakeCurrent(deviceContext, renderContext);
     
