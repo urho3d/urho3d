@@ -786,7 +786,7 @@ void View::RenderBatchesDeferred()
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
     
     // Check for deferred antialiasing (edge filter) in deferred mode. Only use it on the main view (null rendertarget)
-    bool edgeFilter = (!renderTarget_) && (graphics_->GetMultiSample() > 0);
+    bool edgeFilter = (!renderTarget_) && (graphics_->GetMultiSample() > 1);
     RenderSurface* renderBuffer = edgeFilter ? graphics_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     
     // Calculate shader parameters needed only in deferred rendering

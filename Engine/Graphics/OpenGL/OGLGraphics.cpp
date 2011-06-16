@@ -119,7 +119,7 @@ Graphics::Graphics(Context* context_) :
     mode_(RENDER_FORWARD),
     width_(0),
     height_(0),
-    multiSample_(0),
+    multiSample_(1),
     inModeChange_(0),
     windowPosX_(0),
     windowPosY_(0),
@@ -182,6 +182,9 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         LOGERROR("OpenGL 2.0 is required");
         return false;
     }
+    
+    if (multiSample < 1)
+        multiSample = 1;
     
     // If zero dimensions, use the desktop default
     if ((width <= 0) || (height <= 0))
@@ -341,11 +344,11 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Create deferred rendering buffers as necessary
     CreateRenderTargets();
     
-    if (!multiSample)
-        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
-    else
+    if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
         " multisample " + String(multiSample));
+    else
+        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
     
     using namespace ScreenMode;
     
@@ -1900,7 +1903,47 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 {
     PODVector<int> ret;
     // No multisampling always supported
-    ret.Push(0);
+    ret.Push(1);
+    
+    if ((_GLEE_WGL_ARB_pixel_format) && (impl_->deviceContext_))
+    {
+        int attributes[] = {
+            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+            WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+            WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+            WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+            WGL_SAMPLES_ARB, 2,
+            0, 0
+        };
+        
+        int pixelFormats[256];
+        unsigned numPixelFormats;
+        
+        wglChoosePixelFormatARB(impl_->deviceContext_, attributes, 0, 256, pixelFormats, &numPixelFormats);
+        for (unsigned i = 0; i < numPixelFormats; ++i)
+        {
+            int multiSampleQuery = WGL_SAMPLES_ARB;
+            int multiSampleLevel;
+            
+            wglGetPixelFormatAttribivARB(impl_->deviceContext_, pixelFormats[i], 0, 1, &multiSampleQuery, &multiSampleLevel);
+            if (multiSampleLevel > 1)
+            {
+                bool unique = true;
+                for (unsigned j = 0; j < ret.Size(); ++j)
+                {
+                    if (ret[j] == multiSampleLevel)
+                    {
+                        unique = false;
+                        break;
+                    }
+                }
+                
+                if (unique)
+                    ret.Push(multiSampleLevel);
+            }
+        }
+    }
     
     return ret;
 }
@@ -2200,7 +2243,7 @@ void Graphics::CreateRenderTargets()
         // If deferred antialiasing is used, reserve screen buffer
         // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
         // which will also be useful in forward rendering)
-        if (multiSample_)
+        if (multiSample_ > 1)
         {
             screenBuffer_ = new Texture2D(context_);
             screenBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);

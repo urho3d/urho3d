@@ -213,7 +213,7 @@ public:
     int GetWidth() const { return width_; }
     /// Return window height
     int GetHeight() const { return height_; }
-    /// Return multisample mode (0 = no multisampling)
+    /// Return multisample mode (1 = no multisampling)
     int GetMultiSample() const { return multiSample_; }
     /// Return whether window is fullscreen
     bool GetFullscreen() const { return fullscreen_; }

@@ -158,7 +158,7 @@ Graphics::Graphics(Context* context) :
     mode_(RENDER_FORWARD),
     width_(0),
     height_(0),
-    multiSample_(0),
+    multiSample_(1),
     windowPosX_(0),
     windowPosY_(0),
     fullscreen_(false),
@@ -269,6 +269,8 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         }
     }
     
+    multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
+
     if ((mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) && (vsync == vsync_)
         && (multiSample == multiSample_))
         return true;
@@ -288,16 +290,12 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     // Disable deferred  rendering if not supported
     if ((mode == RENDER_DEFERRED) && (!deferredSupport_))
         mode = RENDER_FORWARD;
-    
-    if (multiSample >= (int)D3DMULTISAMPLE_2_SAMPLES)
-        multiSample = Clamp(multiSample, (int)D3DMULTISAMPLE_NONE, (int)D3DMULTISAMPLE_16_SAMPLES);
-    else
-        multiSample = 0;
+
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
     // In deferred rendering mode, it is used to control temporal antialiasing
     multiSample_ = multiSample;
     if (mode != RENDER_FORWARD)
-        multiSample = 0;
+        multiSample = 1;
     
     // Check fullscreen mode validity. If not valid, revert to windowed
     if (fullscreen)
@@ -315,11 +313,11 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     // Fall back to non-multisampled if unsupported multisampling mode
-    if (multiSample)
+    if (multiSample > 1)
     {
         if (FAILED(impl_->interface_->CheckDeviceMultiSampleType(impl_->adapter_, impl_->deviceType_, fullscreenFormat, FALSE,
             (D3DMULTISAMPLE_TYPE)multiSample, NULL)))
-            multiSample = 0;
+            multiSample = 1;
     }
     
     // Save window placement if currently windowed
@@ -348,7 +346,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     impl_->presentParams_.BackBufferWidth            = width;
     impl_->presentParams_.BackBufferHeight           = height;
     impl_->presentParams_.BackBufferCount            = 1;
-    impl_->presentParams_.MultiSampleType            = (D3DMULTISAMPLE_TYPE)multiSample;
+    impl_->presentParams_.MultiSampleType            = multiSample > 1 ? (D3DMULTISAMPLE_TYPE)multiSample : D3DMULTISAMPLE_NONE;
     impl_->presentParams_.MultiSampleQuality         = 0;
     impl_->presentParams_.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
     impl_->presentParams_.hDeviceWindow              = impl_->window_;
@@ -395,11 +393,11 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     AdjustWindow(width, height, fullscreen);
     
-    if (!multiSample)
-        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
-    else
+    if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
         " multisample " + String(multiSample));
+    else
+        LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed"));
     
     using namespace ScreenMode;
     
@@ -1874,14 +1872,16 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 {
     PODVector<int> ret;
     // No multisampling always supported
-    ret.Push(0);
+    ret.Push(1);
     
     if (!impl_->interface_)
         return ret;
     
+    D3DFORMAT fullscreenFormat = impl_->GetDesktopFormat();
+    
     for (unsigned i = (int)D3DMULTISAMPLE_2_SAMPLES; i < (int)D3DMULTISAMPLE_16_SAMPLES; ++i)
     {
-        if (SUCCEEDED(impl_->interface_->CheckDeviceMultiSampleType(impl_->adapter_, impl_->deviceType_, D3DFMT_R8G8B8, FALSE,
+        if (SUCCEEDED(impl_->interface_->CheckDeviceMultiSampleType(impl_->adapter_, impl_->deviceType_, fullscreenFormat, FALSE,
             (D3DMULTISAMPLE_TYPE)i, NULL)))
             ret.Push(i);
     }
@@ -2230,7 +2230,7 @@ void Graphics::CreateRenderTargets()
         // If deferred antialiasing is used, reserve screen buffer
         // (later we will probably want the screen buffer reserved in any case, to do for example distortion effects,
         // which will also be useful in forward rendering)
-        if (multiSample_)
+        if (multiSample_ > 1)
         {
             screenBuffer_ = new Texture2D(context_);
             screenBuffer_->SetSize(0, 0, GetRGBAFormat(), TEXTURE_RENDERTARGET);
