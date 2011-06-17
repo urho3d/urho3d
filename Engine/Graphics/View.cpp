@@ -819,8 +819,6 @@ void View::RenderBatchesDeferred()
     
     shaderParameters_[VSP_FRUSTUMSIZE] = viewportParams;
     shaderParameters_[VSP_GBUFFEROFFSETS] = bufferUVOffset;
-    shaderParameters_[PSP_GBUFFEROFFSETS] = bufferUVOffset;
-    shaderParameters_[PSP_GBUFFERVIEWPORT] = viewportSize;
     
     {
         // Clear and render the G-buffer

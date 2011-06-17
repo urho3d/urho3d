@@ -266,7 +266,7 @@ Renderer::Renderer(Context* context) :
     shadowMapHiresDepth_(false),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
-    edgeFilter_(EdgeFilterParameters(0.4f, 0.5f, 0.8f)),
+    edgeFilter_(EdgeFilterParameters(0.4f, 0.5f, 0.9f)),
     maxOccluderTriangles_(5000),
     occlusionBufferSize_(256),
     occluderSizeThreshold_(0.1f),

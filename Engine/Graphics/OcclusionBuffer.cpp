@@ -94,7 +94,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
             break;
     }
     
-    LOGINFO("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " + 
+    LOGDEBUG("Set occlusion buffer size " + String(width_) + "x" + String(height_) + " with " + 
         String(mipBuffers_.Size()) + " mip levels");
     
     CalculateViewport();

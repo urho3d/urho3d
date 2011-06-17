@@ -1,12 +1,9 @@
 uniform vec3 cAmbientColor;
-uniform vec3 cCameraPosPS;
 uniform vec2 cDepthReconstruct;
 uniform vec3 cEdgeFilterParams;
 uniform vec2 cElapsedTimePS;
 uniform vec4 cFogParams;
 uniform vec3 cFogColor;
-uniform vec4 cGBufferOffsetsPS;
-uniform vec4 cGBufferViewport;
 uniform float cLightAtten;
 uniform vec4 cLightColor;
 uniform vec3 cLightDir;

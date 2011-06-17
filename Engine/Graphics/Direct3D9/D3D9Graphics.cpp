@@ -2389,13 +2389,10 @@ void Graphics::InitializeShaderParameters()
     shaderParameters_["SkinMatrices"] = VSP_SKINMATRICES;
     
     shaderParameters_["AmbientColor"] = PSP_AMBIENTCOLOR;
-    shaderParameters_["CameraPosPS"] = PSP_CAMERAPOS;
     shaderParameters_["EdgeFilterParams"] = PSP_EDGEFILTERPARAMS;
     shaderParameters_["ElapsedTimePS"] = PSP_ELAPSEDTIME;
     shaderParameters_["FogColor"] = PSP_FOGCOLOR;
     shaderParameters_["FogParams"] = PSP_FOGPARAMS;
-    shaderParameters_["GBufferOffsetsPS"] = PSP_GBUFFEROFFSETS;
-    shaderParameters_["GBufferViewport"] = PSP_GBUFFERVIEWPORT;
     shaderParameters_["LightAtten"] = PSP_LIGHTATTEN;
     shaderParameters_["LightColor"] = PSP_LIGHTCOLOR;
     shaderParameters_["LightDir"] = PSP_LIGHTDIR;
