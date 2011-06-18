@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifndef _SDL_config_h
 #define _SDL_config_h
 
@@ -35,14 +37,8 @@
 #include "SDL_config_windows.h"
 #elif defined(__MACOSX__)
 #include "SDL_config_macosx.h"
-#elif defined(__IPHONEOS__) 
-#include "SDL_config_iphoneos.h"
-#elif defined(__ANDROID__)
-#include "SDL_config_android.h"
-#elif defined(__NINTENDODS__)
-#include "SDL_config_nintendods.h"
 #else
-#include "SDL_config_minimal.h"
+#include "SDL_config_linux.h"
 #endif /* platform config */
 
 #endif /* _SDL_config_h */

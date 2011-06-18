@@ -132,7 +132,8 @@ void LoadSkeleton(const String& skeletonFileName)
     XMLElement skeletonRoot;
     File skeletonFileSource(context_);
     skeletonFileSource.Open(skeletonFileName);
-    skelFile_->Load(skeletonFileSource);
+    if (!skelFile_->Load(skeletonFileSource))
+        PrintLine("Failed to load skeleton " + skeletonFileName);
     skeletonRoot = skelFile_->GetRootElement();
     
     if (skeletonRoot)
@@ -415,9 +416,9 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
         if (vertexStart + vertices > 65535)
             iBuf->indexSize_ = sizeof(unsigned);
         
+        XMLElement boneAssignments = subMesh.GetChildElement("boneassignments");
         if (bones_.Size())
         {
-            XMLElement boneAssignments = subMesh.GetChildElement("boneassignments");
             if (boneAssignments)
             {
                 XMLElement boneAssignment = boneAssignments.GetChildElement("vertexboneassignment");
@@ -529,7 +530,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 }
             }
         }
-        else
+        else if (boneAssignments)
             PrintLine("No skeleton loaded, skipping skinning information");
         
         indexStart += indices;

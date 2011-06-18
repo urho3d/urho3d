@@ -29,7 +29,6 @@
 #include "ProcessUtils.h"
 #include "ResourceCache.h"
 #include "ScriptFile.h"
-#include "Time.h"
 
 #include <stdexcept>
 
@@ -64,11 +63,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 int main(int argc, char** argv)
 {
     String cmdLine;
-    for (int i = 0; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
-        if (i)
+        if (i > 1)
             cmdLine += ' ';
-        cmdLine += argv[i];
+        cmdLine += String(argv[i]);
     }
     
     Run(cmdLine.CString());

@@ -54,13 +54,33 @@
 
 #ifdef _MSC_VER
 #include <float.h>
+#else
+// From http://stereopsis.com/FPU.html
+
+#define FPU_CW_PREC_MASK        0x0300
+#define FPU_CW_PREC_SINGLE      0x0000
+#define FPU_CW_PREC_DOUBLE      0x0200
+#define FPU_CW_PREC_EXTENDED    0x0300
+#define FPU_CW_ROUND_MASK       0x0c00
+#define FPU_CW_ROUND_NEAR       0x0000
+#define FPU_CW_ROUND_DOWN       0x0400
+#define FPU_CW_ROUND_UP         0x0800
+#define FPU_CW_ROUND_CHOP       0x0c00
+
+inline unsigned GetFPUState()
+{
+    unsigned control = 0;
+    __asm__ __volatile__ ("fnstcw %0" : "=m" (control));
+    return control;
+}
+
+inline void SetFPUState(unsigned control)
+{
+    __asm__ __volatile__ ("fldcw %0" : : "m" (control));
+}
 #endif
 
 #include "DebugNew.h"
-
-//#ifdef _MSC_VER
-//#pragma warning(disable:4355)
-//#endif
 
 static const unsigned glCmpFunc[] =
 {
@@ -224,8 +244,14 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
+    // This is actually needed for ODE to behave predictably in float mode
     #ifdef _MSC_VER
     _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+    #else
+    unsigned control = GetFPUState();
+    control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
+    control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
+    SetFPUState(control);
     #endif
     
     // If OpenGL extensions not yet initialized, initialize now

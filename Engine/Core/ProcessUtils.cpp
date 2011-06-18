@@ -26,13 +26,13 @@
 #include "ProcessUtils.h"
 
 #include <cstdio>
-#include <list>
-#include <io.h>
 #include <fcntl.h>
 #include <time.h>
 
 #ifdef WIN32
 #include <Windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #ifdef USE_SDL
@@ -51,7 +51,7 @@ void ErrorDialog(const char* title, const char* message)
     #ifdef WIN32
     MessageBox(0, message, title, 0);
     #else
-    printf("%s", message);
+    printf("%s\n", message);
     #endif
 }
 

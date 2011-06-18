@@ -208,13 +208,13 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool ste
     
     // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
     if (desired.freq <= 11025)
-        desired.samples = 256;
-    else if (desired.freq <= 22050)
         desired.samples = 512;
-    else if (desired.freq <= 44100)
+    else if (desired.freq <= 22050)
         desired.samples = 1024;
-    else
+    else if (desired.freq <= 44100)
         desired.samples = 2048;
+    else
+        desired.samples = 4096;
     
     desired.callback = SDLAudioCallback;
     desired.userdata = this;

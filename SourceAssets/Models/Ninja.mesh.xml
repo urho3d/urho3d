@@ -7769,5 +7769,5 @@
             </boneassignments>
         </submesh>
     </submeshes>
-    <skeletonlink name="ninja.skeleton" />
+    <skeletonlink name="Ninja.skeleton" />
 </mesh>

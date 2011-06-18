@@ -39,7 +39,6 @@
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"
-#include "Time.h"
 #include "VertexBuffer.h"
 #include "View.h"
 #include "Zone.h"

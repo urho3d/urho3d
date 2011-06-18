@@ -13,5 +13,9 @@ include_directories (
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} ws2_32.lib)
+
+if (WIN32)
+    target_link_libraries (${TARGET_NAME} ws2_32.lib)
+endif()
+
 finalize_lib ()

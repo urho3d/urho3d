@@ -29,20 +29,23 @@
 #include "SharedArrayPtr.h"
 
 #include <cstdio>
-#include <direct.h>
-#include <process.h>
 
 #ifdef WIN32
 #include <Windows.h>
 #include <Shellapi.h>
+#include <direct.h>
+#include <process.h>
 // Enable SHGetSpecialFolderPath on MinGW
 #ifndef _MSC_VER
-#define _WIN32_IE 0x0400
+#define _WIN32_IE 0x0400st
 #endif
 #include <Shlobj.h>
 #else
+#include <dirent.h>
+#include <errno.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#define MAX_PATH 256
 #endif
 
 #include "DebugNew.h"
@@ -118,6 +121,7 @@ int FileSystem::SystemCommand(const String& commandLine)
 
 int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
 {
+    #ifdef WIN32
     if (allowedPaths_.Empty())
     {
         String fixedFileName = GetNativePath(fileName);
@@ -135,6 +139,11 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         LOGERROR("Executing an external command is not allowed");
         return -1;
     }
+    #else
+    /// \todo Implement on Unix-like systems
+    LOGERROR("SystemRun not implemented");
+    return false;
+    #endif
 }
 
 bool FileSystem::SystemOpen(const String& fileName, const String& mode)
@@ -160,7 +169,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
         return false;
     }
     #else
-    /// \todo Implement on Unix-like systems, if possible
+    /// \todo Implement on Unix-like systems
     LOGERROR("SystemOpen not implemented");
     return false;
     #endif
@@ -269,8 +278,8 @@ bool FileSystem::FileExists(const String& fileName)
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
     #else
-    struct stat fileInfo;
-    if ((stat(fixedName.CString(), &fileInfo)) || (stat.st_mode & S_IFDIR))
+    struct stat st;
+    if ((stat(fixedName.CString(), &st)) || (st.st_mode & S_IFDIR))
         return false;
     #endif
     
@@ -288,8 +297,8 @@ bool FileSystem::DirExists(const String& pathName)
     if ((attributes == INVALID_FILE_ATTRIBUTES) || (!(attributes & FILE_ATTRIBUTE_DIRECTORY)))
         return false;
     #else
-    struct stat fileInfo;
-    if ((stat(fixedName.CString(), &fileInfo)) || (!(stat.st_mode & S_IFDIR)))
+    struct stat st;
+    if ((stat(fixedName.CString(), &st)) || (!(st.st_mode & S_IFDIR)))
         return false;
     #endif
     

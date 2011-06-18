@@ -38,10 +38,17 @@
 #ifndef __glee_h_
 #define __glee_h_
 
-#define NO_SDL_GLEXT
+// Do not include OpenGL extensions from the system headers
+#define __glext_h_
 
-#include <SDL.h>
-#include <SDL_opengl.h>
+#ifdef __WIN32__
+#include <Windows.h>
+#endif
+#if defined(__MACOSX__)
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #ifndef APIENTRY
 	#define APIENTRY

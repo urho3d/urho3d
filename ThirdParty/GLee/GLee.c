@@ -44,6 +44,8 @@
 #include <string.h>
 #include "GLee.h"
 
+#include <SDL.h>
+
 typedef GLuint(*GLEE_LINK_FUNCTION)(void);
 
 GLboolean __GLeeInited=GL_FALSE;

@@ -31,7 +31,7 @@
 #include "ResourceCache.h"
 #include "Shader.h"
 #include "ShaderVariation.h"
-#include "XMLFIle.h"
+#include "XMLFile.h"
 
 OBJECTTYPESTATIC(Shader);
 
