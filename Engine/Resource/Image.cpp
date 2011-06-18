@@ -29,11 +29,141 @@
 #include "Log.h"
 
 #include <cstring>
-#include <ddraw.h>
 #include <stb_image.h>
 #include <stb_image_write.h>
 
 #include "DebugNew.h"
+
+#ifndef DUMMYUNIONNAMEN
+#if defined(__cplusplus) || !defined(NONAMELESSUNION)
+#define DUMMYUNIONNAMEN(n)
+#else
+#define DUMMYUNIONNAMEN(n) u##n
+#endif
+#endif
+
+#ifndef MAKEFOURCC
+#define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
+#endif
+
+#define FOURCC_DXT1 (MAKEFOURCC('D','X','T','1'))
+#define FOURCC_DXT2 (MAKEFOURCC('D','X','T','2'))
+#define FOURCC_DXT3 (MAKEFOURCC('D','X','T','3'))
+#define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
+#define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
+
+typedef struct _DDCOLORKEY
+{
+    unsigned dwColorSpaceLowValue;
+    unsigned dwColorSpaceHighValue;
+} DDCOLORKEY;
+
+typedef struct _DDPIXELFORMAT
+{
+    unsigned dwSize;
+    unsigned dwFlags;
+    unsigned dwFourCC;
+    union
+    {
+        unsigned dwRGBBitCount;
+        unsigned dwYUVBitCount;
+        unsigned dwZBufferBitDepth;
+        unsigned dwAlphaBitDepth;
+        unsigned dwLuminanceBitCount;
+        unsigned dwBumpBitCount;
+        unsigned dwPrivateFormatBitCount;
+    } DUMMYUNIONNAMEN(1);
+    union
+    {
+        unsigned dwRBitMask;
+        unsigned dwYBitMask;
+        unsigned dwStencilBitDepth;
+        unsigned dwLuminanceBitMask;
+        unsigned dwBumpDuBitMask;
+        unsigned dwOperations;
+    } DUMMYUNIONNAMEN(2);
+    union
+    {
+        unsigned dwGBitMask;
+        unsigned dwUBitMask;
+        unsigned dwZBitMask;
+        unsigned dwBumpDvBitMask;
+        struct
+        {
+            unsigned short wFlipMSTypes;
+            unsigned short wBltMSTypes;
+        } MultiSampleCaps;
+    } DUMMYUNIONNAMEN(3);
+    union
+    {
+        unsigned dwBBitMask;
+        unsigned dwVBitMask;
+        unsigned dwStencilBitMask;
+        unsigned dwBumpLuminanceBitMask;
+    } DUMMYUNIONNAMEN(4);
+    union
+    {
+        unsigned dwRGBAlphaBitMask;
+        unsigned dwYUVAlphaBitMask;
+        unsigned dwLuminanceAlphaBitMask;
+        unsigned dwRGBZBitMask;
+        unsigned dwYUVZBitMask;
+    } DUMMYUNIONNAMEN(5);
+} DDPIXELFORMAT;
+
+typedef struct _DDSCAPS2
+{
+    unsigned dwCaps;
+    unsigned dwCaps2;
+    unsigned dwCaps3;
+    union
+    {
+        unsigned dwCaps4;
+        unsigned dwVolumeDepth;
+    } DUMMYUNIONNAMEN(1);
+} DDSCAPS2;
+
+typedef struct _DDSURFACEDESC2
+{
+    unsigned dwSize;
+    unsigned dwFlags;
+    unsigned dwHeight;
+    unsigned dwWidth;
+    union
+    {
+        long lPitch;
+        unsigned dwLinearSize;
+    } DUMMYUNIONNAMEN(1);
+    union
+    {
+        unsigned dwBackBufferCount;
+        unsigned dwDepth;
+    } DUMMYUNIONNAMEN(5);
+    union
+    {
+        unsigned dwMipMapCount;
+        unsigned dwRefreshRate;
+        unsigned dwSrcVBHandle;
+    } DUMMYUNIONNAMEN(2);
+    unsigned dwAlphaBitDepth;
+    unsigned dwReserved;
+    void* lpSurface;
+    union
+    {
+        DDCOLORKEY ddckCKDestOverlay;
+        unsigned dwEmptyFaceColor;
+    } DUMMYUNIONNAMEN(3);
+    DDCOLORKEY ddckCKDestBlt;
+    DDCOLORKEY ddckCKSrcOverlay;
+    DDCOLORKEY ddckCKSrcBlt;
+    union
+    {
+        DDPIXELFORMAT ddpfPixelFormat;
+        unsigned dwFVF;
+    } DUMMYUNIONNAMEN(4);
+    DDSCAPS2 ddsCaps;
+    unsigned dwTextureStage;
+} DDSURFACEDESC2;
 
 OBJECTTYPESTATIC(Image);
 
