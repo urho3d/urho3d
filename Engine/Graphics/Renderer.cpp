@@ -242,9 +242,9 @@ static const Viewport noViewport;
 
 void EdgeFilterParameters::Validate()
 {
-    radius_ = max(radius_, 0.0f);
-    threshold_ = max(threshold_, 0.0f);
-    strength_ = max(strength_, 0.0f);
+    radius_ = Max(radius_, 0.0f);
+    threshold_ = Max(threshold_, 0.0f);
+    strength_ = Max(strength_, 0.0f);
 }
 
 OBJECTTYPESTATIC(Renderer);

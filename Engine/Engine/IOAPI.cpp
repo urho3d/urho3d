@@ -278,7 +278,6 @@ void RegisterFileSystem(asIScriptEngine* engine)
     engine->RegisterObjectMethod("FileSystem", "void set_currentDir(const String&in)", asMETHOD(FileSystem, SetCurrentDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_programDir()", asMETHOD(FileSystem, GetProgramDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSystem", "String get_userDocumentsDir()", asMETHOD(FileSystem, GetUserDocumentsDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("FileSystem", "String get_systemFontDir()", asMETHOD(FileSystem, GetSystemFontDir), asCALL_THISCALL);
     engine->RegisterGlobalFunction("FileSystem@+ get_fileSystem()", asFUNCTION(GetFileSystem), asCALL_CDECL);
     
     engine->RegisterGlobalFunction("String GetPath(const String&in)", asFUNCTION(GetPath), asCALL_CDECL);

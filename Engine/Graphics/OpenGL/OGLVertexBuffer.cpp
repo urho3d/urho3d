@@ -23,10 +23,10 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Log.h"
 #include "VertexBuffer.h"
 
-#include <GLee.h>
 #include <cstring>
 
 #include "DebugNew.h"

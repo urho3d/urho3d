@@ -25,8 +25,12 @@
 #include "CoreEvents.h"
 #include "Timer.h"
 
+#ifndef USE_SDL
 #include <Windows.h>
 #include <MMSystem.h>
+#else
+#include <SDL.h>
+#endif
 
 #include "DebugNew.h"
 
@@ -43,17 +47,26 @@ Time::Time(Context* context) :
     totalMSec_(0),
     timerPeriod_(0)
 {
+    #ifndef USE_SDL
     LARGE_INTEGER frequency;
     if (QueryPerformanceFrequency(&frequency))
     {
         HiresTimer::frequency = frequency.QuadPart;
         HiresTimer::supported = true;
     }
+    #else
+    SDL_InitSubSystem(SDL_INIT_TIMER);
+    HiresTimer::frequency = SDL_GetPerformanceFrequency();
+    HiresTimer::supported = true;
+    #endif
 }
 
 Time::~Time()
 {
     SetTimerPeriod(0);
+    #ifdef USE_SDL
+    SDL_QuitSubSystem(SDL_INIT_TIMER);
+    #endif
 }
 
 void Time::BeginFrame(unsigned mSec)
@@ -104,6 +117,7 @@ void Time::EndFrame()
 
 void Time::SetTimerPeriod(unsigned mSec)
 {
+    #ifndef USE_SDL
     if (timerPeriod_ > 0)
         timeEndPeriod(timerPeriod_);
     
@@ -111,6 +125,7 @@ void Time::SetTimerPeriod(unsigned mSec)
     
     if (timerPeriod_ > 0)
         timeBeginPeriod(timerPeriod_);
+    #endif
 }
 
 Timer::Timer()
@@ -120,7 +135,12 @@ Timer::Timer()
 
 unsigned Timer::GetMSec(bool reset)
 {
+    #ifndef USE_SDL
     unsigned currentTime = timeGetTime();
+    #else
+    unsigned currentTime = SDL_GetTicks();
+    #endif
+    
     unsigned elapsedTime = currentTime - startTime_;
     if (reset)
         startTime_ = currentTime;
@@ -130,7 +150,11 @@ unsigned Timer::GetMSec(bool reset)
 
 void Timer::Reset()
 {
+    #ifndef USE_SDL
     startTime_ = timeGetTime();
+    #else
+    startTime_ = SDL_GetTicks();
+    #endif
 }
 
 HiresTimer::HiresTimer()
@@ -142,6 +166,7 @@ long long HiresTimer::GetUSec(bool reset)
 {
     long long currentTime;
     
+    #ifndef USE_SDL
     if (supported)
     {
         LARGE_INTEGER counter;
@@ -150,6 +175,9 @@ long long HiresTimer::GetUSec(bool reset)
     }
     else
         currentTime = timeGetTime();
+    #else
+    currentTime = SDL_GetPerformanceCounter();
+    #endif
     
     long long elapsedTime = currentTime - startTime_;
     
@@ -165,6 +193,7 @@ long long HiresTimer::GetUSec(bool reset)
 
 void HiresTimer::Reset()
 {
+    #ifndef USE_SDL
     if (supported)
     {
         LARGE_INTEGER counter;
@@ -173,5 +202,8 @@ void HiresTimer::Reset()
     }
     else
         startTime_ = timeGetTime();
+    #else
+    startTime_ = SDL_GetPerformanceCounter();
+    #endif
 }
 

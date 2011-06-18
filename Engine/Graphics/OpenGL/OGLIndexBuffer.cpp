@@ -24,10 +24,10 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "IndexBuffer.h"
 #include "Log.h"
 
-#include <GLee.h>
 #include <cstring>
 
 #include "DebugNew.h"

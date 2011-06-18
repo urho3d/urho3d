@@ -58,8 +58,6 @@ public:
     /// Destruct. Close the window and release the Direct3D9 device 
     virtual ~Graphics();
     
-    /// Pump operating system messages
-    void MessagePump();
     /// Set window title
     void SetWindowTitle(const String& windowTitle);
     /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA

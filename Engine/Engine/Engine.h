@@ -89,7 +89,7 @@ private:
     void RegisterSubsystems();
     
     /// Frame update timer
-    Timer frameTimer_;
+    Timer* frameTimer_;
     /// Next frame timestep in milliseconds
     unsigned timeStep_;
     /// Minimum frames per second

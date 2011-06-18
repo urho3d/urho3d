@@ -332,27 +332,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             SendEvent(E_UNHANDLEDKEY, eventData);
         }
         return;
-    }
-    
-    if (changed)
-    {
-        UpdateText();
-        UpdateCursor();
-    }
-    else if (cursorMoved)
-        UpdateCursor();
-}
-
-void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
-{
-    bool changed = false;
-    
-    // If only CTRL is held down, do not edit
-    if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
-        return;
-    
-    if (c == '\b')
-    {
+        
+    case KEY_BACKSPACE:
         if (!text_->GetSelectionLength())
         {
             if ((line_.Length()) && (cursorPosition_))
@@ -378,18 +359,39 @@ void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
             cursorPosition_ = start;
             changed = true;
         }
-    }
-    else if (c == '\r')
-    {
-        using namespace TextFinished;
+        break;
         
-        VariantMap eventData;
-        eventData[P_ELEMENT] = (void*)this;
-        eventData[P_TEXT] = line_;
-        SendEvent(E_TEXTFINISHED, eventData);
-        return;
+    case KEY_RETURN:
+        {
+            using namespace TextFinished;
+            
+            VariantMap eventData;
+            eventData[P_ELEMENT] = (void*)this;
+            eventData[P_TEXT] = line_;
+            SendEvent(E_TEXTFINISHED, eventData);
+            return;
+        }
+        break;
     }
-    else if ((c >= 0x20) && ((!maxLength_) || (line_.Length() < maxLength_)))
+    
+    if (changed)
+    {
+        UpdateText();
+        UpdateCursor();
+    }
+    else if (cursorMoved)
+        UpdateCursor();
+}
+
+void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
+{
+    bool changed = false;
+    
+    // If only CTRL is held down, do not edit
+    if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
+        return;
+    
+    if ((c >= 0x20) && ((!maxLength_) || (line_.Length() < maxLength_)))
     {
         String charStr;
         charStr.Resize(1);

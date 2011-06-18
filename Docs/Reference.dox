@@ -191,7 +191,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 
 They are managed and loaded by the ResourceCache subsystem. Like with all other \ref ObjectTypes "typed objects", resource types are identified by 16-bit type name hashes (C++) or type names (script). An object factory must be registered for each resource type.
 
-The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, Urho3D.exe registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist, plus the system font directory.
+The resources themselves are identified by their file paths, relative to the registered resource directories or \ref PackageFile "package files". By default, Urho3D.exe registers the resource directories Data and CoreData, or the packages Data.pak and CoreData.pak if they exist.
 
 If loading a resource fails, an error will be logged and a null pointer is returned.
 

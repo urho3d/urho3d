@@ -228,17 +228,6 @@ Graphics::~Graphics()
     impl_ = 0;
 }
 
-void Graphics::MessagePump()
-{
-    MSG msg;
-    
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-}
-
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;

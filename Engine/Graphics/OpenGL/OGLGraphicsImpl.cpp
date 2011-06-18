@@ -26,13 +26,7 @@
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
 
-#include <GLee.h>
-
 GraphicsImpl::GraphicsImpl() :
-    instance_(GetModuleHandle(0)),
-    window_(0),
-    deviceContext_(0),
-    renderContext_(0),
     activeTexture_(0),
     drawBuffers_(M_MAX_UNSIGNED),
     fbo_(0),
@@ -42,18 +36,4 @@ GraphicsImpl::GraphicsImpl() :
     windowDepthBits_(0),
     fboBound_(false)
 {
-}
-
-unsigned GraphicsImpl::GetDesktopBitsPerPixel()
-{
-    DEVMODE settings;
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &settings);
-    return settings.dmBitsPerPel;
-}
-
-IntVector2 GraphicsImpl::GetDesktopResolution()
-{
-    DEVMODE settings;
-    EnumDisplaySettings(0, ENUM_CURRENT_SETTINGS, &settings);
-    return IntVector2(settings.dmPelsWidth, settings.dmPelsHeight);
 }

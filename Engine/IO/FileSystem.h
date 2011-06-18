@@ -77,8 +77,6 @@ public:
     String GetProgramDir();
     /// Return the user documents directory
     String GetUserDocumentsDir();
-    /// Return the system fonts directory
-    String GetSystemFontDir();
     
 private:
     /// Scan directory, called internally

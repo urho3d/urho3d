@@ -26,7 +26,7 @@
 #include "Color.h"
 #include "Map.h"
 
-#include <Windows.h>
+#include <GLee.h>
 
 /// Graphics implementation
 class GraphicsImpl
@@ -36,23 +36,8 @@ class GraphicsImpl
 public:
     /// Construct
     GraphicsImpl();
-
-    /// Return window handle
-    HWND GetWindowHandle() const { return window_; }
-    /// Return desktop bits per pixel
-    unsigned GetDesktopBitsPerPixel();
-    /// Return desktop width/height
-    IntVector2 GetDesktopResolution();
     
 private:
-    /// Application instance
-    HINSTANCE instance_;
-    /// Application window
-    HWND window_;
-    /// Device context_
-    HDC deviceContext_;
-    /// OpenGL render context
-    HGLRC renderContext_;
     /// Active texture unit
     unsigned activeTexture_;
     /// Active draw buffers

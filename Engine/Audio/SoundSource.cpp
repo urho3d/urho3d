@@ -97,8 +97,6 @@ static const String typeNames[] =
     ""
 };
 
-// Compressed audio decode buffer length in milliseconds
-static const int DECODE_BUFFER_LENGTH = 100;
 static const float AUTOREMOVE_DELAY = 0.25f;
 
 OBJECTTYPESTATIC(SoundSource);
@@ -449,7 +447,7 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
                     timePosition_ = 0.0f;
                 }
                 else
-                    decodeBuffer_->SetLooped(false); // Stop after the current Decode buffer has been played
+                    decodeBuffer_->SetLooped(false); // Stop after the current decode buffer has been played
             }
             
             decodePosition_ = currentPos;

@@ -46,7 +46,9 @@
 #include "StringUtils.h"
 #include "UI.h"
 
+#ifndef USE_SDL
 #include <Windows.h>
+#endif
 
 #include "DebugNew.h"
 
@@ -54,6 +56,7 @@ OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
     Object(context),
+    frameTimer_(0),
     minFps_(10),
     maxFps_(200),
     maxInactiveFps_(50),
@@ -66,6 +69,8 @@ Engine::Engine(Context* context) :
 
 Engine::~Engine()
 {
+    delete frameTimer_;
+    frameTimer_ = 0;
 }
 
 bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments)
@@ -161,6 +166,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     RegisterObjects();
     RegisterSubsystems();
     
+    // Create the frame timer
+    frameTimer_ = new Timer();
+    
     // Start logging
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
@@ -185,7 +193,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     }
     else if (fileSystem->DirExists(exePath + "Data"))
         cache->AddResourcePath(exePath + "Data");
-    cache->AddResourcePath(fileSystem->GetSystemFontDir());
     
     // Initialize graphics & audio output
     if (!headless_)
@@ -246,7 +253,7 @@ void Engine::RunFrame()
     
     if (!headless_)
     {
-        if (!GetSubsystem<Graphics>()->GetWindowHandle())
+        if (!GetSubsystem<Graphics>()->IsInitialized())
         {
             Exit();
             return;
@@ -372,16 +379,20 @@ void Engine::GetNextTimeStep()
         int targetMax = 1000 / maxFps;
         for (;;)
         {
-            timeAcc += frameTimer_.GetMSec(true);
+            timeAcc += frameTimer_->GetMSec(true);
             if (timeAcc >= targetMax)
                 break;
             
             unsigned wait = (targetMax - timeAcc);
+            #ifndef USE_SDL
             Sleep(wait / 2);
+            #else
+            SDL_Delay(wait / 2);
+            #endif
         }
     }
     else
-        timeAcc = frameTimer_.GetMSec(true);
+        timeAcc = frameTimer_->GetMSec(true);
     
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)

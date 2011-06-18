@@ -30,7 +30,12 @@
 #include "Profiler.h"
 
 #include <cstring>
+
+#ifndef USE_SDL
 #include <Windows.h>
+#else
+#include <SDL.h>
+#endif
 
 #include "DebugNew.h"
 
@@ -48,13 +53,14 @@ Input::Input(Context* context) :
     initialized_(false)
 {
     // Zero the initial state
-    memset(&keyDown_, 0, sizeof(keyDown_));
-    memset(&keyPress_, 0, sizeof(keyPress_));
     mouseButtonDown_ = 0;
     mouseButtonPress_ = 0;
     lastMousePosition_ = IntVector2::ZERO;
     
+    #ifndef USE_SDL
     SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
+    #endif
+    
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Input, HandleBeginFrame));
     
@@ -73,17 +79,75 @@ void Input::Update()
     if (!graphics_)
         return;
     
-    memset(keyPress_, 0, sizeof(keyPress_));
+    // Reset current state
+    keyPress_.Clear();
     mouseButtonPress_ = 0;
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     
-    graphics_->MessagePump();
+    #ifndef USE_SDL
+    // Pump Win32 events
+    MSG msg;
+    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    #else
+    // Pump SDL events
+    SDL_Event evt;
+    SDL_PumpEvents();
+    while (SDL_PollEvent(&evt))
+        HandleSDLEvent(&evt);
     
+    // Poll SDL activation state
+    unsigned state = SDL_GetAppState();
+    if ((state & (SDL_APPINPUTFOCUS | SDL_APPACTIVE)) == (SDL_APPINPUTFOCUS | SDL_APPACTIVE))
+    {
+        if (!active_)
+            activated_ = true;
+    }
+    else
+    {
+        if (active_)
+            MakeInactive();
+    }
+    #endif
+    
+    // Activate application now if necessary
     if (activated_)
         MakeActive();
     
-    CheckMouseMove();
+    // Finally send mouse move event
+    if (active_)
+    {
+        IntVector2 mousePos = GetMousePosition();
+        mouseMove_ = mousePos - lastMousePosition_;
+        
+        if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
+        {
+            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+            SetMousePosition(center);
+            lastMousePosition_ = GetMousePosition();
+        }
+        else
+            lastMousePosition_ = mousePos;
+        
+        if (mouseMove_ != IntVector2::ZERO)
+        {
+            using namespace MouseMove;
+            
+            VariantMap eventData;
+            eventData[P_X] = lastMousePosition_.x_;
+            eventData[P_Y] = lastMousePosition_.y_;
+            eventData[P_DX] = mouseMove_.x_;
+            eventData[P_DY] = mouseMove_.y_;
+            eventData[P_BUTTONS] = mouseButtonDown_;
+            eventData[P_QUALIFIERS] = GetQualifiers();
+            eventData[P_CLIPCURSOR] = clipCursor_;
+            SendEvent(E_MOUSEMOVE, eventData);
+        }
+    }
 }
 
 void Input::SetClipCursor(bool enable)
@@ -95,11 +159,13 @@ void Input::SetClipCursor(bool enable)
     
     if ((!graphics_->GetFullscreen()) && (active_) && (clipCursor_))
     {
-        RECT clipRect;
         SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         lastMousePosition_ = GetMousePosition();
+        #ifndef USE_SDL
+        RECT clipRect;
         GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
         ClipCursor(&clipRect);
+        #endif
     }
     else
     {
@@ -108,7 +174,9 @@ void Input::SetClipCursor(bool enable)
             SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             lastMousePosition_ = GetMousePosition();
         }
+        #ifndef USE_SDL
         ClipCursor(0);
+        #endif
     }
 }
 
@@ -122,11 +190,15 @@ void Input::SetMousePosition(const IntVector2& position)
     if (!graphics_)
         return;
     
+    #ifndef USE_SDL
     POINT point;
     point.x = position.x_;
     point.y = position.y_;
     ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
     SetCursorPos(point.x, point.y);
+    #else
+    SDL_WarpMouse(position.x_, position.y_);
+    #endif
 }
 
 void Input::SetMousePosition(int x, int y)
@@ -141,29 +213,32 @@ void Input::SuppressNextChar()
 
 bool Input::GetKeyDown(int key) const
 {
-    if ((key < 0) || (key >= MAX_KEYS))
-        return false;
-    
-    return keyDown_[key];
+    return keyDown_.Contains(key);
 }
 
 bool Input::GetKeyPress(int key) const
 {
-    if ((key < 0) || (key >= MAX_KEYS))
-        return false;
-    
-    return keyPress_[key];
+    return keyPress_.Contains(key);
 }
 
 IntVector2 Input::GetMousePosition() const
 {
-    if (!graphics_)
-        return IntVector2(0, 0);
+    IntVector2 ret(0, 0);
     
+    if (!graphics_)
+        return ret;
+    
+    #ifndef USE_SDL
     POINT mouse;
     GetCursorPos(&mouse);
     ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
-    return IntVector2(mouse.x, mouse.y);
+    ret.x_ = mouse.x;
+    ret.y_ = mouse.y;
+    #else
+    SDL_GetMouseState(&ret.x_, &ret.y_);
+    #endif
+    
+    return ret;
 }
 
 bool Input::GetMouseButtonDown(int button) const
@@ -178,34 +253,52 @@ bool Input::GetMouseButtonPress(int button) const
 
 bool Input::GetQualifierDown(int qualifier) const
 {
+    #ifndef USE_SDL
     if (qualifier == QUAL_SHIFT)
-        return keyDown_[KEY_SHIFT] != 0;
+        return GetKeyDown(KEY_SHIFT);
     if (qualifier == QUAL_CTRL)
-        return keyDown_[KEY_CTRL] != 0;
+        return GetKeyDown(KEY_CTRL);
     if (qualifier == QUAL_ALT)
-        return keyDown_[KEY_ALT] != 0;
+        return GetKeyDown(KEY_ALT);
+    #else
+    if (qualifier == QUAL_SHIFT)
+        return GetKeyDown(KEY_LSHIFT) || GetKeyDown(KEY_RSHIFT);
+    if (qualifier == QUAL_CTRL)
+        return GetKeyDown(KEY_LCTRL) || GetKeyDown(KEY_RCTRL);
+    if (qualifier == QUAL_ALT)
+        return GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT);
+    #endif
     return false;
 }
 
 bool Input::GetQualifierPress(int qualifier) const
 {
+    #ifndef USE_SDL
     if (qualifier == QUAL_SHIFT)
-        return keyPress_[KEY_SHIFT] != 0;
+        return GetKeyPress(KEY_SHIFT);
     if (qualifier == QUAL_CTRL)
-        return keyPress_[KEY_CTRL] != 0;
+        return GetKeyPress(KEY_CTRL);
     if (qualifier == QUAL_ALT)
-        return keyPress_[KEY_ALT] != 0;
+        return GetKeyPress(KEY_ALT);
+    #else
+    if (qualifier == QUAL_SHIFT)
+        return GetKeyPress(KEY_LSHIFT) || GetKeyPress(KEY_RSHIFT);
+    if (qualifier == QUAL_CTRL)
+        return GetKeyPress(KEY_LCTRL) || GetKeyPress(KEY_RCTRL);
+    if (qualifier == QUAL_ALT)
+        return GetKeyPress(KEY_LALT) || GetKeyPress(KEY_RALT);
+    #endif
     return false;
 }
 
 int Input::GetQualifiers() const
 {
     int ret = 0;
-    if (keyDown_[KEY_SHIFT] != 0)
+    if (GetQualifierDown(QUAL_SHIFT))
         ret |= QUAL_SHIFT;
-    if (keyDown_[KEY_CTRL] != 0)
+    if (GetQualifierDown(QUAL_CTRL))
         ret |= QUAL_CTRL;
-    if (keyDown_[KEY_ALT] != 0)
+    if (GetQualifierDown(QUAL_ALT))
         ret |= QUAL_ALT;
     return ret;
 }
@@ -219,8 +312,15 @@ void Input::Initialize()
     graphics_ = graphics;
     
     // In fullscreen mode there is no initial window activation message. Therefore assume activation
+    #ifndef USE_SDL
     if (graphics_->GetFullscreen())
         activated_ = true;
+    #else
+    SDL_EnableUNICODE(SDL_TRUE);
+    // For SDL, we never want to show the operating system cursor inside our window
+    SDL_ShowCursor(SDL_DISABLE);
+    showCursor_ = false;
+    #endif
     
     initialized_ = true;
     
@@ -231,8 +331,8 @@ void Input::MakeActive()
 {
     if (!graphics_)
         return;
-        
-    clearState();
+    
+    ResetState();
     
     active_ = true;
     activated_ = false;
@@ -254,15 +354,17 @@ void Input::MakeInactive()
     if (!graphics_)
         return;
     
-    clearState();
+    ResetState();
     
     active_ = false;
     activated_ = false;
     
     // Free and show the mouse cursor
+    #ifndef USE_SDL
     ReleaseCapture();
     ClipCursor(0);
     SetCursorVisible(true);
+    #endif
     
     using namespace Activation;
     
@@ -272,11 +374,12 @@ void Input::MakeInactive()
     SendEvent(E_ACTIVATION, eventData);
 }
 
-void Input::clearState()
+void Input::ResetState()
 {
-    // Use SetKey() & SetMouseButton() to reset the state so that events will be sent properly
-    for (unsigned i = 0; i < MAX_KEYS; ++i)
-        SetKey(i, false);
+    keyDown_.Clear();
+    keyPress_.Clear();
+    
+    // Use SetMouseButton() to reset the state so that mouse events will be sent properly
     SetMouseButton(MOUSEB_LEFT, false);
     SetMouseButton(MOUSEB_RIGHT, false);
     SetMouseButton(MOUSEB_MIDDLE, false);
@@ -284,7 +387,6 @@ void Input::clearState()
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     mouseButtonPress_ = 0;
-    memset(&keyPress_, 0, sizeof(keyPress_));
 }
 
 void Input::SetMouseButton(int button, bool newState)
@@ -316,6 +418,7 @@ void Input::SetMouseButton(int button, bool newState)
     eventData[P_QUALIFIERS] = GetQualifiers();
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
     
+    #ifndef USE_SDL
     // In non-confined mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
     if ((graphics_) && (!clipCursor_))
     {
@@ -324,34 +427,34 @@ void Input::SetMouseButton(int button, bool newState)
         else
             ReleaseCapture();
     }
+    #endif
 }
 
-void Input::SetKey(int key, bool newState)
+void Input::SetKey(int key, int scanCode, bool newState)
 {
-    if ((key < 0) || (key >= MAX_KEYS))
-        return;
-    
     bool repeat = false;
     
     if (newState)
     {
-        if (!keyDown_[key])
-            keyPress_[key] = true;
+        if (!keyDown_.Contains(key))
+        {
+            keyDown_.Insert(key);
+            keyPress_.Insert(key);
+        }
         else
             repeat = true;
     }
     else
     {
-        if (!keyDown_[key])
+        if (!keyDown_.Erase(key))
             return;
     }
-    
-    keyDown_[key] = newState;
     
     using namespace KeyDown;
     
     VariantMap eventData;
     eventData[P_KEY] = key;
+    eventData[P_SCANCODE] = scanCode;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
     if (newState)
@@ -377,46 +480,13 @@ void Input::SetMouseWheel(int delta)
         SendEvent(E_MOUSEWHEEL, eventData);
     }
 }
-void Input::CheckMouseMove()
-{
-    if (!active_)
-        return;
-    
-    IntVector2 mousePos = GetMousePosition();
-    IntVector2 mouseMove = mousePos - lastMousePosition_;
-    
-    if ((clipCursor_) && (mouseMove != IntVector2::ZERO))
-    {
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        SetMousePosition(center);
-        lastMousePosition_ = GetMousePosition();
-    }
-    else
-        lastMousePosition_ = mousePos;
-    
-    if (mouseMove != IntVector2::ZERO)
-    {
-        mouseMove_ += mouseMove;
-        
-        using namespace MouseMove;
-        
-        VariantMap eventData;
-        eventData[P_X] = lastMousePosition_.x_;
-        eventData[P_Y] = lastMousePosition_.y_;
-        eventData[P_DX] = mouseMove.x_;
-        eventData[P_DY] = mouseMove.y_;
-        eventData[P_BUTTONS] = mouseButtonDown_;
-        eventData[P_QUALIFIERS] = GetQualifiers();
-        eventData[P_CLIPCURSOR] = clipCursor_;
-        SendEvent(E_MOUSEMOVE, eventData);
-    }
-}
 
 void Input::SetCursorVisible(bool enable)
 {
     if (!graphics_)
         return;
     
+    #ifndef USE_SDL
     // When inactive, always show the cursor
     if (!active_)
         enable = true;
@@ -426,9 +496,10 @@ void Input::SetCursorVisible(bool enable)
     
     ShowCursor(enable ? TRUE : FALSE);
     showCursor_ = enable;
+    #endif
 }
 
-
+#ifndef USE_SDL
 void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowMessage;
@@ -490,12 +561,12 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_KEYDOWN:
-        SetKey(wParam, true);
+        SetKey(wParam, (lParam >> 16) & 255, true);
         eventData[P_HANDLED] = true;
         break;
         
     case WM_SYSKEYDOWN:
-        SetKey(wParam, true);
+        SetKey(wParam, (lParam >> 16) & 255, true);
         if ((wParam == KEY_RETURN) && (toggleFullscreen_))
             graphics_->ToggleFullscreen();
         if (wParam != KEY_F4)
@@ -503,12 +574,12 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_KEYUP:
-        SetKey(wParam, false);
+        SetKey(wParam, (lParam >> 16) & 255, false);
         eventData[P_HANDLED] = true;
         break;
         
     case WM_SYSKEYUP:
-        SetKey(wParam, false);
+        SetKey(wParam, (lParam >> 16) & 255, false);
         eventData[P_HANDLED] = true;
         break;
         
@@ -538,6 +609,73 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
     }
 }
+#else
+void Input::HandleSDLEvent(void* sdlEvent)
+{
+    SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
+    switch (evt.type)
+    {
+    case SDL_KEYDOWN:
+        // Convert to uppercase to match Win32 virtual key codes
+        SetKey(SDL_toupper(evt.key.keysym.sym), evt.key.keysym.scancode, true);
+        
+        // Check ALT-ENTER fullscreen toggle
+        if ((evt.key.keysym.sym == KEY_RETURN) && ((GetKeyDown(KEY_LALT)) || (GetKeyDown(KEY_RALT))) && (toggleFullscreen_))
+            graphics_->ToggleFullscreen();
+        break;
+        
+    case SDL_KEYUP:
+        SetKey(SDL_toupper(evt.key.keysym.sym), evt.key.keysym.scancode, false);
+        break;
+        
+    case SDL_TEXTINPUT:
+        // Convert back to Latin-1
+        if (!suppressNextChar_)
+        {
+            unsigned char x = evt.text.text[0];
+            unsigned char y = evt.text.text[1];
+            int latin1 = 0;
+            
+            if (x < 0x80)
+                latin1 = x;
+            else if (x < 0xe0)
+                latin1 = (y & 0x3f) | ((x & 0x1f) << 6);
+            
+            if ((latin1) && (latin1 < 256))
+            {
+                using namespace Char;
+                
+                VariantMap keyEventData;
+                
+                keyEventData[P_CHAR] = latin1;
+                keyEventData[P_BUTTONS] = mouseButtonDown_;
+                keyEventData[P_QUALIFIERS] = GetQualifiers();
+                SendEvent(E_CHAR, keyEventData);
+            }
+        }
+        else
+            suppressNextChar_ = false;
+        break;
+        
+    case SDL_MOUSEBUTTONDOWN:
+        SetMouseButton(1 << (evt.button.button - 1), true);
+        break;
+        
+    case SDL_MOUSEBUTTONUP:
+        SetMouseButton(1 << (evt.button.button - 1), false);
+        break;
+        
+    case SDL_MOUSEWHEEL:
+        SetMouseWheel(evt.wheel.y);
+        break;
+        
+    case SDL_QUIT:
+        if (graphics_)
+            graphics_->Close();
+        break;
+    }
+}
+#endif
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {

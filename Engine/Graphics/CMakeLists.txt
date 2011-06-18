@@ -17,7 +17,7 @@ if (USE_OPENGL)
 
     # Define target & libraries to link
     add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-    target_link_libraries (${TARGET_NAME} Container Core GLee Math Resource Scene opengl32.lib)
+    target_link_libraries (${TARGET_NAME} Container Core GLee Math Resource Scene SDL)
 else ()
     file (GLOB IMPL_CPP_FILES Direct3D9/*.cpp)
     file (GLOB IMPL_H_FILES Direct3D9/*.h)

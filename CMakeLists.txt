@@ -14,20 +14,21 @@ project (Urho3D)
 # Enable structured exception handling and minidumps on MSVC only. Note: minidump generation requires
 # a Windows XP or newer version of dbghelp.dll, so disable it if you want Windows 2000 compatibility.
 if (MSVC)
+    set (ENABLE_MINIDUMPS 1)
     add_definitions (-DENABLE_MINIDUMPS)
-    set (DBGHELP_LIB dbghelp.lib)
-else ()
-    set (DBGHELP_LIB "")
 endif ()
 
 # Enable profiling. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not
 # instantiated.
 add_definitions (-DENABLE_PROFILING)
 
-# Enable use of OpenGL instead of Direct3D9. Later this will automatically depend on platform,
-# with Win32 defaulting to Direct3D9.
-# set (USE_OPENGL 1)
-if (USE_OPENGL)
+# If not on Windows, enable use of SDL and OpenGL instead of Direct3D9 (so called "Turso3D" mode.)
+# Setting this on Windows is not recommended, as graphics card drivers are usually better optimized 
+# for Direct3D.
+if (UNIX)
+    set (USE_SDL 1)
+    set (USE_OPENGL 1)
+    add_definitions (-DUSE_SDL)
     add_definitions (-DUSE_OPENGL)
 endif ()
 
@@ -121,6 +122,11 @@ else()
     endmacro ()
 endif ()
 
+# If SDL used, add it as a global include directory
+if (USE_SDL)
+    include_directories (ThirdParty/SDL/include)
+endif ()
+
 # Add projects
 add_subdirectory (Engine/Audio)
 add_subdirectory (Engine/Container)
@@ -159,4 +165,8 @@ if (USE_OPENGL)
 else ()
     add_subdirectory (SourceAssets/HLSLShaders)
     add_subdirectory (Tools/ShaderCompiler)
+endif ()
+
+if (USE_SDL)
+    add_subdirectory (ThirdParty/SDL)
 endif ()

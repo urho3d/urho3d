@@ -32,16 +32,20 @@
 #include "Sound.h"
 #include "SoundSource3D.h"
 
+#ifndef USE_SDL
 #define DIRECTSOUND_VERSION 0x0800
-
 #include <Windows.h>
 #include <MMSystem.h>
 #include <dsound.h>
+#else
+#include <SDL.h>
+#endif
 
 #include "DebugNew.h"
 
 static const int AUDIO_FPS = 100;
 
+#ifndef USE_SDL
 /// Audio implementation. Contains the DirectSound buffer
 class AudioImpl
 {
@@ -61,34 +65,44 @@ private:
     /// DirectSound buffer
     IDirectSoundBuffer* dsBuffer_;
 };
+#else
+static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
+#endif
 
 OBJECTTYPESTATIC(Audio);
 
 Audio::Audio(Context* context) :
     Object(context),
+    #ifndef USE_SDL
     impl_(new AudioImpl()),
-    playing_(false),
     windowHandle_(0),
+    #endif
+    playing_(false),
     bufferSamples_(0),
     bufferSize_(0),
     sampleSize_(0),
     listenerPosition_(Vector3::ZERO),
     listenerRotation_(Quaternion::IDENTITY)
 {
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Audio, HandleScreenMode));
     SubscribeToEvent(E_RENDERUPDATE, HANDLER(Audio, HandleRenderUpdate));
     
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
         masterGain_[i] = 1.0f;
     
+    #ifndef USE_SDL
+    SubscribeToEvent(E_SCREENMODE, HANDLER(Audio, HandleScreenMode));
     // Try to initialize right now, but skip if screen mode is not yet set
     Initialize();
+    #else
+    SDL_InitSubSystem(SDL_INIT_AUDIO);
+    #endif
 }
 
 Audio::~Audio()
 {
-    ReleaseBuffer();
+    Release();
     
+    #ifndef USE_SDL
     if (impl_->dsObject_)
     {
         impl_->dsObject_->Release();
@@ -97,12 +111,16 @@ Audio::~Audio()
     
     delete impl_;
     impl_ = 0;
+    #else
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
+    #endif
 }
 
 bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool stereo, bool interpolate)
 {
-    ReleaseBuffer();
+    Release();
     
+    #ifndef USE_SDL
     if (!impl_->dsObject_)
     {
         if (DirectSoundCreate(0, &impl_->dsObject_, 0) != DS_OK)
@@ -168,6 +186,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool ste
     }
     
     clipBuffer_ = new int[numSamples * waveFormat.nChannels];
+    
     bufferSamples_ = numSamples;
     bufferSize_ = numSamples * sampleSize;
     sampleSize_ = sampleSize;
@@ -175,6 +194,58 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool ste
     sixteenBit_ = sixteenBit;
     stereo_ = stereo;
     interpolate_ = interpolate;
+    #else
+    SDL_AudioSpec desired;
+    SDL_AudioSpec obtained;
+    
+    desired.freq = mixRate;
+    desired.format = AUDIO_U8;
+    if (sixteenBit)
+        desired.format = AUDIO_S16SYS;
+    desired.channels = 1;
+    if (stereo)
+        desired.channels = 2;
+    
+    // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
+    if (desired.freq <= 11025)
+        desired.samples = 256;
+    else if (desired.freq <= 22050)
+        desired.samples = 512;
+    else if (desired.freq <= 44100)
+        desired.samples = 1024;
+    else
+        desired.samples = 2048;
+    
+    desired.callback = SDLAudioCallback;
+    desired.userdata = this;
+    
+    SDL_PauseAudio(1);
+    playing_ = false;
+    if (SDL_OpenAudio(&desired, &obtained))
+    {
+        LOGERROR("Could not initialize audio output");
+        return false;
+    }
+    
+    sampleSize_ = 1;
+    if (obtained.channels == 2)
+    {
+        stereo_ = true;
+        sampleSize_ <<= 1;
+    }
+    if ((obtained.format == AUDIO_S16SYS) || (obtained.format == AUDIO_S16LSB) || (obtained.format == AUDIO_S16MSB))
+    {
+        sixteenBit_ = true;
+        sampleSize_ <<= 1;
+    }
+    
+    clipBuffer_ = new int[obtained.samples * obtained.channels];
+    
+    bufferSamples_ = obtained.samples;
+    bufferSize_ = bufferSamples_ * sampleSize_;
+    mixRate_ = obtained.freq;
+    interpolate_ = interpolate;
+    #endif
     
     LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
         (sixteenBit_ ? "16-bit" : "8-bit") + " " + (interpolate_ ? "interpolated" : ""));
@@ -198,6 +269,7 @@ bool Audio::Play()
     if (playing_)
         return true;
     
+    #ifndef USE_SDL
     if (!impl_->dsBuffer_)
     {
         LOGERROR("No audio buffer, can not start playback");
@@ -227,12 +299,27 @@ bool Audio::Play()
     // Adjust playback thread priority
     SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
     playing_ = true;
+    #else
+    if (!clipBuffer_)
+    {
+        LOGERROR("No audio buffer, can not start playback");
+        return false;
+    }
+    SDL_PauseAudio(0);
+    playing_ = true;
+    #endif
+    
     return true;
 }
 
 void Audio::Stop()
 {
+    #ifndef USE_SDL
     Thread::Stop();
+    #else
+    if (playing_)
+        SDL_PauseAudio(1);
+    #endif
     playing_ = false;
 }
 
@@ -271,7 +358,11 @@ void Audio::StopSound(Sound* soundClip)
 
 bool Audio::IsInitialized() const
 {
+    #ifndef USE_SDL
     return impl_->dsBuffer_ != 0;
+    #else
+    return clipBuffer_.GetPtr() != 0;
+    #endif
 }
 
 float Audio::GetMasterGain(SoundType type) const
@@ -303,6 +394,7 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     }
 }
 
+#ifndef USE_SDL
 void Audio::ThreadFunction()
 {
     AudioImpl* impl = impl_;
@@ -369,15 +461,17 @@ void Audio::ThreadFunction()
     
     impl->dsBuffer_->Stop();
 }
-
-void Audio::Initialize()
+#else
+void SDLAudioCallback(void *userdata, Uint8* stream, int len)
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if ((!graphics) || (!graphics->IsInitialized()))
-        return;
+    Audio* audio = static_cast<Audio*>(userdata);
     
-    windowHandle_ = graphics->GetWindowHandle();
+    {
+        MutexLock Lock(audio->GetMutex());
+        audio->MixOutput(stream, len);
+    }
 }
+#endif
 
 void Audio::MixOutput(void *dest, unsigned bytes)
 {
@@ -398,8 +492,21 @@ void Audio::MixOutput(void *dest, unsigned bytes)
     int* clipPtr = clipBuffer_.GetPtr();
     
     // Mix samples to clip buffer
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-        (*i)->Mix(clipPtr, mixSamples, mixRate_, stereo_, interpolate_);
+    // If the total work request is too large, Ogg Vorbis decode buffers may end up wrapping. Divide to smaller chunks if necessary
+    unsigned maxSamples = mixRate_ * DECODE_BUFFER_LENGTH / 1000 / 4;
+    while (mixSamples)
+    {
+        unsigned currentSamples = Min((int)maxSamples, (int)mixSamples);
+        for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+            (*i)->Mix(clipPtr, currentSamples, mixRate_, stereo_, interpolate_);
+        
+        mixSamples -= currentSamples;
+        if (stereo_)
+            clipPtr += currentSamples * 2;
+        else
+            clipPtr += currentSamples;
+        
+    }
     
     // Copy output from clip buffer to destination
     clipPtr = clipBuffer_.GetPtr();
@@ -417,28 +524,47 @@ void Audio::MixOutput(void *dest, unsigned bytes)
     }
 }
 
-void Audio::ReleaseBuffer()
+void Audio::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 {
-    Stop();
+    using namespace RenderUpdate;
     
-    if (impl_->dsBuffer_)
-    {
-        impl_->dsBuffer_->Release();
-        impl_->dsBuffer_ = 0;
-    }
+    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
+#ifndef USE_SDL
 void Audio::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
     if (!windowHandle_)
         Initialize();
 }
 
-void Audio::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+void Audio::Initialize()
 {
-    using namespace RenderUpdate;
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if ((!graphics) || (!graphics->IsInitialized()))
+        return;
     
-    Update(eventData[P_TIMESTEP].GetFloat());
+    windowHandle_ = graphics->GetWindowHandle();
+}
+#endif
+
+void Audio::Release()
+{
+    Stop();
+    
+    #ifndef USE_SDL
+    if (impl_->dsBuffer_)
+    {
+        impl_->dsBuffer_->Release();
+        impl_->dsBuffer_ = 0;
+    }
+    #else
+    if (clipBuffer_)
+    {
+        SDL_CloseAudio();
+        clipBuffer_.Reset();
+    }
+    #endif
 }
 
 void RegisterAudioLibrary(Context* context)

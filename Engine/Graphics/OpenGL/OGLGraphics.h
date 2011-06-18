@@ -60,8 +60,6 @@ public:
     /// Destruct. Close the window and release the Direct3D9 device 
     virtual ~Graphics();
     
-    /// Pump operating system messages
-    void MessagePump();
     /// Set window title
     void SetWindowTitle(const String& windowTitle);
     /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
@@ -202,7 +200,7 @@ public:
     void SetForceSM2(bool enable);
     
     /// Return whether rendering initialized
-    bool IsInitialized() const;
+    bool IsInitialized() const { return initialized_; }
     /// Return graphics implementation, which holds the actual API-specific resources
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title
@@ -225,8 +223,6 @@ public:
     bool IsDeviceLost() const { return false; }
     /// Return immediate rendering data pointer
     unsigned char* GetImmediateDataPtr() const;
-    /// Return window handle
-    unsigned GetWindowHandle() const;
     /// Return number of primitives drawn this frame
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame
@@ -381,10 +377,6 @@ private:
     void InitializeExtensions();
     /// Initialize shader parameter and texture unit mappings
     void InitializeShaderParameters();
-    /// Handle operating system window message
-    void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
-    /// Handle application activation state change
-    void HandleActivation(StringHash eventType, VariantMap& eventData);
     
     /// Implementation
     GraphicsImpl* impl_;
@@ -398,20 +390,14 @@ private:
     int height_;
     /// Multisampling mode
     int multiSample_;
-    /// Stored window X-position
-    int windowPosX_;
-    /// Stored window Y-position
-    int windowPosY_;
-    /// In screen mode change -counter
-    int inModeChange_;
+    /// Initialized flag
+    bool initialized_;
     /// Fullscreen flag
     bool fullscreen_;
     /// Vertical sync flag
     bool vsync_;
     /// Flush GPU command queue flag
     bool flushGPU_;
-    /// Fullscreen mode set -flag
-    bool fullscreenModeSet_;
     /// Texture render target support flag
     bool renderTargetSupport_;
     /// Deferred rendering support flag

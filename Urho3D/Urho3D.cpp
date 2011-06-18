@@ -32,16 +32,20 @@
 #include "Time.h"
 
 #include <stdexcept>
+
+#ifdef WIN32
 #include <Windows.h>
+#endif
 
 #include "DebugNew.h"
 
 void Run(const char* cmdLine);
 
+#ifdef WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
     #if defined(_MSC_VER) && defined(_DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     #endif
     
     #if defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
@@ -56,6 +60,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     
     return 0;
 }
+#else
+int main(int argc, char** argv)
+{
+    String cmdLine;
+    for (int i = 0; i < argc; ++i)
+    {
+        if (i)
+            cmdLine += ' ';
+        cmdLine += argv[i];
+    }
+    
+    Run(cmdLine.CString());
+}
+#endif
 
 void Run(const char* cmdLine)
 {

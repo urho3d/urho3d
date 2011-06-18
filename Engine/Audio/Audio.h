@@ -34,8 +34,12 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// Audio subsystem. Produces sound output using DirectSound
+/// Audio subsystem
+#ifndef USE_SDL
 class Audio : public Object, public Thread
+#else
+class Audio : public Object
+#endif
 {
     OBJECT(Audio);
     
@@ -64,8 +68,6 @@ public:
     /// Stop any sound source playing a certain sound clip
     void StopSound(Sound* sound);
     
-    /// Return audio implementation, which contains the actual DirectSound objects
-    AudioImpl* GetImpl() { return impl_; }
     /// Return sound buffer size in samples
     unsigned GetBufferSamples() const { return bufferSamples_; }
     /// Return sound buffer size in bytes
@@ -102,29 +104,35 @@ public:
     /// Return sound type specific gain multiplied by master gain
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
     
+    #ifndef USE_SDL
     /// Mixing thread function
     virtual void ThreadFunction();
-    
-private:
-    /// Initialize when screen mode initially set
-    void Initialize();
+    #endif
     /// Mix sound sources into the buffer
     void MixOutput(void* dest, unsigned bytes);
-    /// Release the sound buffer
-    void ReleaseBuffer();
+    
+private:
+    #ifndef USE_SDL
     /// Handle screen mode event
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
+    /// Initialize when screen mode initially set
+    void Initialize();
+    #endif
     /// Handle render update event
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Stop sound output and release the sound buffer
+    void Release();
     
+    #ifndef USE_SDL
     /// Implementation
     AudioImpl* impl_;
+    /// Window handle
+    unsigned windowHandle_;
+    #endif
     /// Clipping buffer for mixing
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex
     Mutex audioMutex_;
-    /// Window handle
-    unsigned windowHandle_;
     /// Sound buffer size in samples
     unsigned bufferSamples_;
     /// Sound buffer size in bytes

@@ -33,42 +33,15 @@
 *
 ***************************************************************************/
 
-// Modified for Urho3D to query only up to OpenGL 2.0 + FBO + WGL & GLX swapinterval extensions,
-// and to remove the lazy initialization
+// Modified by Lasse Öörni for Urho3D
 
 #ifndef __glee_h_
 #define __glee_h_
 
-#ifdef __gl_h_
-	#error gl.h included before glee.h
-#endif
+#define NO_SDL_GLEXT
 
-#ifdef __glext_h_
-	#error glext.h included before glee.h
-#endif
-
-#ifdef __wglext_h_
-	#error wglext.h included before glee.h
-#endif
-
-#ifdef __glxext_h_
-	#error glxext.h included before glee.h
-#endif
-
-#ifdef WIN32
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-	#include <GL/gl.h>
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-    #define GL_GLEXT_LEGACY
-	#include <OpenGL/gl.h>
-#else // GLX
-	#define __glext_h_  /* prevent glext.h from being included  */
-	#define __glxext_h_ /* prevent glxext.h from being included */
-	#define GLX_GLXEXT_PROTOTYPES
-	#include <GL/gl.h>
-	#include <GL/glx.h>
-#endif
+#include <SDL.h>
+#include <SDL_opengl.h>
 
 #ifndef APIENTRY
 	#define APIENTRY
@@ -116,7 +89,7 @@ GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
 
 /* Used for GLSL shader text */
 #ifndef GL_VERSION_2_0
-	typedef char GLchar; 
+	typedef char GLchar;
 #endif
 
 #include <stddef.h>
@@ -125,32 +98,6 @@ GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
 	typedef ptrdiff_t GLintptr;
 	typedef ptrdiff_t GLsizeiptr;
 #endif
-
-/* Platform-specific */
-
-#ifdef WIN32    
-
-	/* WGL */
-
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-
-	/* Mac OS X */
-
-#else          
-
-	/* GLX */
-
-	typedef void (*__GLXextFuncPtr)(void);
-
-	#ifndef GLX_ARB_get_proc_address 
-	#define GLX_ARB_get_proc_address 1
-	    extern __GLXextFuncPtr glXGetProcAddressARB (const GLubyte *);
-	    extern void ( * glXGetProcAddressARB (const GLubyte *procName))(void);
-	    typedef __GLXextFuncPtr ( * PFNGLXGETPROCADDRESSARBPROC) (const GLubyte *procName);
-	#endif
-
-#endif /* end platform specific */
-
 
 
 /* GL_VERSION_1_2 */
@@ -2213,160 +2160,6 @@ GLEE_EXTERN GLboolean _GLEE_EXT_packed_depth_stencil;
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT                      0x84FE
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT                  0x84FF
 
-/* WGL  */
-
-#ifdef WIN32
-
-/* Extension querying variables */
-
-GLEE_EXTERN GLboolean _GLEE_WGL_ARB_extensions_string;
-GLEE_EXTERN GLboolean _GLEE_WGL_ARB_pixel_format;
-GLEE_EXTERN GLboolean _GLEE_WGL_EXT_swap_control;
-
-/* Aliases for extension querying variables */
-
-#define GLEE_WGL_ARB_extensions_string     GLeeEnabled(&_GLEE_WGL_ARB_extensions_string)
-#define GLEE_WGL_ARB_pixel_format     GLeeEnabled(&_GLEE_WGL_ARB_pixel_format)
-#define GLEE_WGL_EXT_swap_control     GLeeEnabled(&_GLEE_WGL_EXT_swap_control)
-
-/* WGL_ARB_extensions_string */
-
-#ifndef WGL_ARB_extensions_string
-#define WGL_ARB_extensions_string 1
-#define __GLEE_WGL_ARB_extensions_string 1
-/* Constants */
-#ifndef GLEE_H_DEFINED_wglGetExtensionsStringARB
-#define GLEE_H_DEFINED_wglGetExtensionsStringARB
-  typedef const char * (APIENTRYP GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
-  GLEE_EXTERN GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC GLeeFuncPtr_wglGetExtensionsStringARB;
-  #define wglGetExtensionsStringARB GLeeFuncPtr_wglGetExtensionsStringARB
-#endif
-#endif
-
-/* WGL_ARB_pixel_format */
-
-#ifndef WGL_ARB_pixel_format
-#define WGL_ARB_pixel_format 1
-#define __GLEE_WGL_ARB_pixel_format 1
-/* Constants */
-#define WGL_NUMBER_PIXEL_FORMATS_ARB                       0x2000
-#define WGL_DRAW_TO_WINDOW_ARB                             0x2001
-#define WGL_DRAW_TO_BITMAP_ARB                             0x2002
-#define WGL_ACCELERATION_ARB                               0x2003
-#define WGL_NEED_PALETTE_ARB                               0x2004
-#define WGL_NEED_SYSTEM_PALETTE_ARB                        0x2005
-#define WGL_SWAP_LAYER_BUFFERS_ARB                         0x2006
-#define WGL_SWAP_METHOD_ARB                                0x2007
-#define WGL_NUMBER_OVERLAYS_ARB                            0x2008
-#define WGL_NUMBER_UNDERLAYS_ARB                           0x2009
-#define WGL_TRANSPARENT_ARB                                0x200A
-#define WGL_TRANSPARENT_RED_VALUE_ARB                      0x2037
-#define WGL_TRANSPARENT_GREEN_VALUE_ARB                    0x2038
-#define WGL_TRANSPARENT_BLUE_VALUE_ARB                     0x2039
-#define WGL_TRANSPARENT_ALPHA_VALUE_ARB                    0x203A
-#define WGL_TRANSPARENT_INDEX_VALUE_ARB                    0x203B
-#define WGL_SHARE_DEPTH_ARB                                0x200C
-#define WGL_SHARE_STENCIL_ARB                              0x200D
-#define WGL_SHARE_ACCUM_ARB                                0x200E
-#define WGL_SUPPORT_GDI_ARB                                0x200F
-#define WGL_SUPPORT_OPENGL_ARB                             0x2010
-#define WGL_DOUBLE_BUFFER_ARB                              0x2011
-#define WGL_STEREO_ARB                                     0x2012
-#define WGL_PIXEL_TYPE_ARB                                 0x2013
-#define WGL_COLOR_BITS_ARB                                 0x2014
-#define WGL_RED_BITS_ARB                                   0x2015
-#define WGL_RED_SHIFT_ARB                                  0x2016
-#define WGL_GREEN_BITS_ARB                                 0x2017
-#define WGL_GREEN_SHIFT_ARB                                0x2018
-#define WGL_BLUE_BITS_ARB                                  0x2019
-#define WGL_BLUE_SHIFT_ARB                                 0x201A
-#define WGL_ALPHA_BITS_ARB                                 0x201B
-#define WGL_ALPHA_SHIFT_ARB                                0x201C
-#define WGL_ACCUM_BITS_ARB                                 0x201D
-#define WGL_ACCUM_RED_BITS_ARB                             0x201E
-#define WGL_ACCUM_GREEN_BITS_ARB                           0x201F
-#define WGL_ACCUM_BLUE_BITS_ARB                            0x2020
-#define WGL_ACCUM_ALPHA_BITS_ARB                           0x2021
-#define WGL_DEPTH_BITS_ARB                                 0x2022
-#define WGL_STENCIL_BITS_ARB                               0x2023
-#define WGL_AUX_BUFFERS_ARB                                0x2024
-#define WGL_NO_ACCELERATION_ARB                            0x2025
-#define WGL_GENERIC_ACCELERATION_ARB                       0x2026
-#define WGL_FULL_ACCELERATION_ARB                          0x2027
-#define WGL_SWAP_EXCHANGE_ARB                              0x2028
-#define WGL_SWAP_COPY_ARB                                  0x2029
-#define WGL_SWAP_UNDEFINED_ARB                             0x202A
-#define WGL_TYPE_RGBA_ARB                                  0x202B
-#define WGL_TYPE_COLORINDEX_ARB                            0x202C
-#ifndef GLEE_H_DEFINED_wglGetPixelFormatAttribivARB
-#define GLEE_H_DEFINED_wglGetPixelFormatAttribivARB
-  typedef BOOL (APIENTRYP GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC) (HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, const int * piAttributes, int * piValues);
-  GLEE_EXTERN GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribivARB;
-  #define wglGetPixelFormatAttribivARB GLeeFuncPtr_wglGetPixelFormatAttribivARB
-#endif
-#ifndef GLEE_H_DEFINED_wglGetPixelFormatAttribfvARB
-#define GLEE_H_DEFINED_wglGetPixelFormatAttribfvARB
-  typedef BOOL (APIENTRYP GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC) (HDC hdc, int iPixelFormat, int iLayerPlane, UINT nAttributes, const int * piAttributes, FLOAT * pfValues);
-  GLEE_EXTERN GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribfvARB;
-  #define wglGetPixelFormatAttribfvARB GLeeFuncPtr_wglGetPixelFormatAttribfvARB
-#endif
-#ifndef GLEE_H_DEFINED_wglChoosePixelFormatARB
-#define GLEE_H_DEFINED_wglChoosePixelFormatARB
-  typedef BOOL (APIENTRYP GLEEPFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int * piAttribIList, const FLOAT * pfAttribFList, UINT nMaxFormats, int * piFormats, UINT * nNumFormats);
-  GLEE_EXTERN GLEEPFNWGLCHOOSEPIXELFORMATARBPROC GLeeFuncPtr_wglChoosePixelFormatARB;
-  #define wglChoosePixelFormatARB GLeeFuncPtr_wglChoosePixelFormatARB
-#endif
-#endif 
-
-/* WGL_EXT_swap_control */
-
-#ifndef WGL_EXT_swap_control
-#define WGL_EXT_swap_control 1
-#define __GLEE_WGL_EXT_swap_control 1
-/* Constants */
-#ifndef GLEE_H_DEFINED_wglSwapIntervalEXT
-#define GLEE_H_DEFINED_wglSwapIntervalEXT
-  typedef BOOL (APIENTRYP GLEEPFNWGLSWAPINTERVALEXTPROC) (int interval);
-  GLEE_EXTERN GLEEPFNWGLSWAPINTERVALEXTPROC GLeeFuncPtr_wglSwapIntervalEXT;
-  #define wglSwapIntervalEXT GLeeFuncPtr_wglSwapIntervalEXT
-#endif
-#ifndef GLEE_H_DEFINED_wglGetSwapIntervalEXT
-#define GLEE_H_DEFINED_wglGetSwapIntervalEXT
-  typedef int (APIENTRYP GLEEPFNWGLGETSWAPINTERVALEXTPROC) ();
-  GLEE_EXTERN GLEEPFNWGLGETSWAPINTERVALEXTPROC GLeeFuncPtr_wglGetSwapIntervalEXT;
-  #define wglGetSwapIntervalEXT GLeeFuncPtr_wglGetSwapIntervalEXT
-#endif
-#endif
-
-#define WGL_SAMPLE_BUFFERS_ARB                             0x2041
-#define WGL_SAMPLES_ARB                                    0x2042
-
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else /* GLX */
-
-/* Extension querying variables */
-
-GLEE_EXTERN GLboolean _GLEE_GLX_SGI_swap_control;
-
-/* Aliases for extension querying variables */
-
-#define GLEE_GLX_SGI_swap_control     GLeeEnabled(&_GLEE_GLX_SGI_swap_control)
-
-/* GLX_SGI_swap_control */
-
-#ifndef GLX_SGI_swap_control
-#define GLX_SGI_swap_control 1
-#define __GLEE_GLX_SGI_swap_control 1
-/* Constants */
-#ifndef GLEE_H_DEFINED_glXSwapIntervalSGI
-#define GLEE_H_DEFINED_glXSwapIntervalSGI
-  typedef int (APIENTRYP GLEEPFNGLXSWAPINTERVALSGIPROC) (int interval);
-  GLEE_EXTERN GLEEPFNGLXSWAPINTERVALSGIPROC GLeeFuncPtr_glXSwapIntervalSGI;
-  #define glXSwapIntervalSGI GLeeFuncPtr_glXSwapIntervalSGI
-#endif
-#endif
-
-#endif /*end GLX */
 
 /*****************************************************************
  * GLee functions
@@ -2374,17 +2167,9 @@ GLEE_EXTERN GLboolean _GLEE_GLX_SGI_swap_control;
  
 GLEE_EXTERN GLboolean GLeeInitialized( void ); // Added for Urho3D
 GLEE_EXTERN GLboolean GLeeInit( void );
-GLEE_EXTERN GLint GLeeForceLink(const char * extensionName);
 GLEE_EXTERN const char * GLeeGetErrorString( void );
 GLEE_EXTERN const char * GLeeGetExtStrGL( void );
 GLEE_EXTERN GLboolean GLeeEnabled(GLboolean * extensionQueryingVariable);
-
-#ifdef WIN32
-GLEE_EXTERN const char * GLeeGetExtStrWGL( void );
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else 
-GLEE_EXTERN const char * GLeeGetExtStrGLX( void );
-#endif
 
 #ifdef __cplusplus
 }	/* end C linkage */

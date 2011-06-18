@@ -42,11 +42,11 @@ WSAD        Move
 Left mouse  Create a new physics object
 Right mouse Hold and move mouse to rotate view
 Space       Toggle debug geometry
+F1          Toggle AngelScript console
 F5          Save scene
 F7          Load scene
 1 to 9      Toggle rendering options
 T           Toggle profiling display
-~           Toggle AngelScript console
 \endverbatim
 
 \section Running_NinjaSnowWar NinjaSnowWar
@@ -59,10 +59,10 @@ Key and mouse controls:
 WSAD        Move
 Left mouse  Attack
 Space       Jump
-F1          Toggle physics debug geometry
-F2          Toggle profiling display
-F3          Toggle octree debug geometry
-~           Toggle AngelScript console
+F1          Toggle AngelScript console
+F2          Toggle physics debug geometry
+F3          Toggle profiling display
+F4          Toggle octree debug geometry
 \endverbatim
 
 \section Running_Commandline Command line options
@@ -222,13 +222,13 @@ void CreateObjects()
 }
 \endcode
 
-Now that the 3D scene is ready, we move on to displaying "Hello World" on the screen with the help of a Text user interface element. In addition to the Data and CoreData directories, the operating system font directory is available for resource loading; we use the Courier system font with point size 30. To display the text, it is centered, and then added as a child of the user interface root element (the UI can be thought of as a 2D scene graph.)
+Now that the 3D scene is ready, we move on to displaying "Hello World" on the screen with the help of a Text user interface element. We use the included Anonymous Pro font with point size 30. To display the text, it is centered, and then added as a child of the user interface root element (the UI can be thought of as a 2D scene graph.)
 
 \code
 void CreateText()
 {
     Text@ helloText = Text();
-    helloText.SetFont(cache.GetResource("Font", "cour.ttf"), 30);
+    helloText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 30);
     helloText.text = "Hello World from Urho3D";
     helloText.color = Color(0, 1, 0);
     helloText.horizontalAlignment = HA_CENTER;
@@ -296,8 +296,7 @@ include_directories (
 # Define target & libraries to link
 add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
 set_target_properties (${TARGET_NAME} PROPERTIES DEBUG_POSTFIX _d)
-target_link_libraries (${TARGET_NAME} Container Core Engine Graphics Input IO Math Resource Scene UI 
-    ${DBGHELP_LIB})
+target_link_libraries (${TARGET_NAME} Container Core Engine Graphics Input IO Math Resource Scene UI)
 finalize_exe ()
 \endcode
 
@@ -428,7 +427,7 @@ The text overlay creation is next. Again, setters are used throughout:
 void HelloWorld::CreateText()
 {
     SharedPtr<Text> helloText(new Text(context_));
-    helloText->SetFont(cache_->GetResource<Font>("cour.ttf"), 30);
+    helloText->SetFont(cache_->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
     helloText->SetText("Hello World from Urho3D");
     helloText->SetColor(Color(0.0f, 1.0f, 0.0f));
     helloText->SetHorizontalAlignment(HA_CENTER);

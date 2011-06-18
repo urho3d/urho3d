@@ -135,6 +135,15 @@ inline bool IsPowerOfTwo(unsigned value)
     return value == 1;
 }
 
+/// Round up to next power of two
+inline unsigned NextPowerOfTwo(unsigned value)
+{
+    unsigned ret = 1;
+    while (ret < value)
+        ret <<= 1;
+    return ret;
+}
+
 /// Fast square root
 inline float FastSqrt(float x)
 {

@@ -118,7 +118,7 @@
         <hoveroffset value="0 16" />
         <text>
             <position value="1 1" />
-            <font name="Cour.ttf" size="10" />
+            <font name="Fonts/Anonymous Pro.ttf" size="11" />
             <hovercolor value="0.45 0.70 0.45" />
             <selectioncolor value="0.70 0.70 0.70" />
         </text>
@@ -312,22 +312,22 @@
         <resizeborder value="8 8 8 8" />
     </element>
     <element type="Text">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="DebugHudText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="ConsoleBackground">
         <color topleft="0 0.25 0 0.75" topright="0 0.25 0 0.75" bottomleft="0.25 0.75 0.25 0.75" bottomright="0.25 0.75 0.25 0.75" />
         <layout spacing="0" border="4 4 4 4" />
     </element>
     <element type="ConsoleText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="ConsoleLineEdit">
         <color value="0 0 0 0.5" />
         <text>
-            <font name="Cour.ttf" size="10" />
+            <font name="Fonts/Anonymous Pro.ttf" size="11" />
             <selectioncolor value="0 0.5 0 0.75" />
         </text>
         <cursor>
@@ -347,14 +347,14 @@
         <fixedsize value="80 22" />
     </element>
     <element type="FileSelectorButtonText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="FileSelectorFilterList">
         <fixedwidth value="64" />
         <resizepopup enable="true" />
     </element>
     <element type="FileSelectorFilterText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="FileSelectorTitleLayout">
@@ -365,12 +365,12 @@
         <layout spacing="4" />
     </element>
     <element type="FileSelectorListText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
         <hovercolor value="0.45 0.70 0.45" />
         <selectioncolor value="0.70 0.70 0.70" />
     </element>
     <element type="FileSelectorTitleText">
-        <font name="Cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="EditorDivider">
         <texture name="Textures/UI.png" />
@@ -383,13 +383,13 @@
         <border value="2 2 2 2" />
     </element>
     <element type="EditorMenuText">
-        <font name="cour.ttf" size="10" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
     </element>
     <element type="EditorAttributeText">
-        <font name="cour.ttf" size="9" />
+        <font name="Fonts/Anonymous Pro.ttf" size="9" />
     </element>
     <element type="EditorEnumAttributeText">
-        <font name="Cour.ttf" size="9" />
+        <font name="Fonts/Anonymous Pro.ttf" size="11" />
         <hovercolor value="0.45 0.70 0.45" />
     </element>
     <element type="EditorAttributeEdit">
@@ -400,7 +400,7 @@
         <hoveroffset value="0 16" />
         <text>
             <position value="1 1" />
-            <font name="Cour.ttf" size="9" />
+            <font name="Fonts/Anonymous Pro.ttf" size="9" />
             <hovercolor value="0.45 0.70 0.45" />
             <selectioncolor value="0.70 0.70 0.70" />
         </text>

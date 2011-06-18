@@ -67,11 +67,15 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 0.99996 (http://nothings.org/)
 - TinyXML 2.6.1 (http://www.grinninglizard.com/tinyxml/)
 
-Ninja model, BlueHighway font and smoke/flare/status bar textures are from OGRE.
+Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
 
-Jack and mushroom models are from the realXtend project (http://www.realxtend.org/).
+Ninja model and smoke/flare/status bar textures from OGRE.
 
-NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
+BlueHighway font from Larabie Fonts.
+
+Anonymous Pro font by Mark Simonson.
+
+NinjaSnowWar sounds by Veli-Pekka Tätilä.
 
 
 \page License

@@ -24,14 +24,13 @@
 #include "Precompiled.h"
 #include "FileSystem.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Material.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "StringUtils.h"
 #include "Texture.h"
 #include "XMLFile.h"
-
-#include <GLee.h>
 
 #include "DebugNew.h"
 

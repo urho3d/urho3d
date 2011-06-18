@@ -23,12 +23,11 @@
 
 #pragma once
 
+#include "HashSet.h"
 #include "InputEvents.h"
 #include "Object.h"
 
 class Graphics;
-
-static const int MAX_KEYS = 256;
 
 /// Input subsystem. Converts operating system window messages to input state and events
 class Input : public Object
@@ -95,19 +94,22 @@ private:
     /// Deactivate the application
     void MakeInactive();
     /// Clear input state
-    void clearState();
+    void ResetState();
     /// Handle a mouse button change
     void SetMouseButton(int button, bool newState);
     /// Handle a key change
-    void SetKey(int key, bool newState);
+    void SetKey(int key, int scanCode, bool newState);
     /// Handle mousewheel change
     void SetMouseWheel(int delta);
-    /// Check for mouse move and send event if moved
-    void CheckMouseMove();
     /// Internal function to show/hide the operating system mouse cursor
     void SetCursorVisible(bool enable);
+    #ifndef USE_SDL
     /// Handle window message event
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
+    #else
+    /// Handle SDL event
+    void HandleSDLEvent(void* sdlEvent);
+    #endif
     /// Handle screen mode event
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event
@@ -116,9 +118,9 @@ private:
     /// Graphics
     WeakPtr<Graphics> graphics_;
     /// Key down state
-    bool keyDown_[MAX_KEYS];
+    HashSet<int> keyDown_;
     /// Key pressed state
-    bool keyPress_[MAX_KEYS];
+    HashSet<int> keyPress_;
     /// Mouse buttons' down state
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state

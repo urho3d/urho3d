@@ -13,7 +13,13 @@ include_directories (
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene STB 
-    dsound.lib)
+target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene STB)
+
+if (USE_SDL)
+    target_link_libraries (${TARGET_NAME} SDL)
+else ()
+    target_link_libraries (${TARGET_NAME} dsound.lib)
+endif()
+
 enable_pch ()
 finalize_lib ()

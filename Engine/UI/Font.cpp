@@ -205,9 +205,9 @@ const FontFace* Font::GetFace(int pointSize)
         newFace.glyphs_.Push(newGlyph);
     }
     
-    // Store point size and the height of a row
+    // Store point size and the height of a row. Use the height of the tallest font if taller than the specified row height
     newFace.pointSize_ = pointSize;
-    newFace.rowHeight_ = (face->size->metrics.height + 63) >> 6;
+    newFace.rowHeight_ = Max((face->size->metrics.height + 63) >> 6, maxHeight);
     
     // Now try to pack into the smallest possible texture
     int texWidth = FONT_TEXTURE_MIN_SIZE;

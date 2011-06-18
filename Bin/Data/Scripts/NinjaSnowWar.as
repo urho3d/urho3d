@@ -255,11 +255,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
-    if (input.keyPress[KEY_F1])
-        debugHud.ToggleAll();
     if (input.keyPress[KEY_F2])
-        drawDebug = !drawDebug;
+        debugHud.ToggleAll();
     if (input.keyPress[KEY_F3])
+        drawDebug = !drawDebug;
+    if (input.keyPress[KEY_F4])
         drawOctreeDebug = !drawOctreeDebug;
 
     if (input.keyPress[KEY_F5])
@@ -486,7 +486,7 @@ void UpdateStatus()
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Check for toggling the console
-    if (eventData["Key"].GetInt() == 220)
+    if (eventData["Key"].GetInt() == KEY_F1)
     {
         console.Toggle();
         input.SuppressNextChar();

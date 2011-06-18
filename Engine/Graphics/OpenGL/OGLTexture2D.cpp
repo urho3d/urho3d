@@ -24,13 +24,12 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Log.h"
 #include "Profiler.h"
 #include "Renderer.h"
 #include "ResourceCache.h"
 #include "Texture2D.h"
-
-#include <GLee.h>
 
 #include "DebugNew.h"
 
@@ -315,7 +314,7 @@ bool Texture2D::Create()
     levels_ = requestedLevels_;
     if (!levels_)
     {
-        unsigned maxSize = max((int)width_, (int)height_);
+        unsigned maxSize = Max((int)width_, (int)height_);
         while (maxSize)
         {
             maxSize >>= 1;

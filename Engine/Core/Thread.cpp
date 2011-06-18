@@ -24,16 +24,29 @@
 #include "Precompiled.h"
 #include "Thread.h"
 
+#ifndef USE_SDL
 #include <Windows.h>
+#else
+#include <SDL.h>
+#endif
 
 #include "DebugNew.h"
 
+#ifndef USE_SDL
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
     return 0;
 }
+#else
+int ThreadFunctionStatic(void* data)
+{
+    Thread* thread = static_cast<Thread*>(data);
+    thread->ThreadFunction();
+    return 0;
+}
+#endif
 
 Thread::Thread() :
     handle_(0),
@@ -53,20 +66,32 @@ bool Thread::Start()
         return false;
     
     shouldRun_ = true;
+    #ifndef USE_SDL
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
+    #else
+    handle_ = SDL_CreateThread(ThreadFunctionStatic, this);
+    #endif
     return handle_ != 0;
 }
 
 void Thread::Stop()
 {
     shouldRun_ = false;
+    #ifndef USE_SDL
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
+    #else
+    if (handle_)
+        SDL_WaitThread((SDL_Thread*)handle_, 0);
+    #endif
     handle_ = 0;
 }
 
 void Thread::SetPriority(int priority)
 {
+    #ifndef USE_SDL
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
+    #endif
+    /// \todo Implement on SDL
 }

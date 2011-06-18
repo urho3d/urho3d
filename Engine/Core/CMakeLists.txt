@@ -13,6 +13,17 @@ include_directories (
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Math winmm.lib)
+target_link_libraries (${TARGET_NAME} Container Math)
+
+if (USE_SDL)
+    target_link_libraries (${TARGET_NAME} SDL)
+else ()
+    target_link_libraries (${TARGET_NAME} winmm.lib)
+endif ()
+
+if (ENABLE_MINIDUMPS)
+    target_link_libraries (${TARGET_NAME} dbghelp.lib)
+endif ()
+
 enable_pch ()
 finalize_lib ()

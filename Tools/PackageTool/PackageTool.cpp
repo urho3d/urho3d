@@ -30,7 +30,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <Windows.h>
 
 #include "DebugNew.h"
 

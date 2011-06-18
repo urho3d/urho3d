@@ -12,8 +12,17 @@ include_directories (
     ../Engine/Script
 )
 
+if (USE_SDL)
+    include_directories (../ThirdParty/SDL/include)
+endif ()
+
 # Define target & libraries to link
-add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
+if (WIN32)
+    add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})
+else ()
+    add_executable (${TARGET_NAME} ${SOURCE_FILES})
+endif ()
+
 set_target_properties (${TARGET_NAME} PROPERTIES DEBUG_POSTFIX _d)
 target_link_libraries (${TARGET_NAME} Container Core Engine IO Math Resource Script ${DBGHELP_LIB})
 finalize_exe ()

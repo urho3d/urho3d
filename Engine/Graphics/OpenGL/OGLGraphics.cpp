@@ -52,17 +52,15 @@
 #include "VertexBuffer.h"
 #include "Zone.h"
 
-#include <GLee.h>
-
 #ifdef _MSC_VER
 #include <float.h>
 #endif
 
 #include "DebugNew.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355)
-#endif
+//#ifdef _MSC_VER
+//#pragma warning(disable:4355)
+//#endif
 
 static const unsigned glCmpFunc[] =
 {
@@ -107,9 +105,6 @@ static const unsigned glStencilOps[] =
 };
 
 static const String noParameter;
-static const DWORD windowStyle = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
-
-static LRESULT CALLBACK wndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 OBJECTTYPESTATIC(Graphics);
 
@@ -120,13 +115,10 @@ Graphics::Graphics(Context* context_) :
     width_(0),
     height_(0),
     multiSample_(1),
-    inModeChange_(0),
-    windowPosX_(0),
-    windowPosY_(0),
+    initialized_(false),
     fullscreen_(false),
     vsync_(false),
     flushGPU_(true),
-    fullscreenModeSet_(false),
     renderTargetSupport_(false),
     deferredSupport_(false),
     numPrimitives_(0),
@@ -139,9 +131,6 @@ Graphics::Graphics(Context* context_) :
 {
     ResetCachedState();
     InitializeShaderParameters();
-    
-    SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Graphics, HandleWindowMessage));
-    SubscribeToEvent(E_ACTIVATION, HANDLER(Graphics, HandleActivation));
 }
 
 Graphics::~Graphics()
@@ -152,197 +141,155 @@ Graphics::~Graphics()
     impl_ = 0;
 }
 
-void Graphics::MessagePump()
-{
-    MSG msg;
-    
-    while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-}
-
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
-    windowTitle_ = windowTitle;
-    if (impl_->window_)
-        SetWindowText(impl_->window_, windowTitle_.CString());
+    SDL_WM_SetCaption(windowTitle.CString(), 0);
 }
 
 bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
 {
     PROFILE(SetScreenMode);
     
-    // If OpenGL extensions not yet initialized, initialize now
-    InitializeExtensions();
+    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) && (vsync == vsync_)
+        && (multiSample == multiSample_))
+        return true;
     
-    if (!_GLEE_VERSION_2_0)
+    multiSample = Clamp(multiSample, 1, 16);
+    
+    // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
+    if ((!width) || (!height))
     {
-        LOGERROR("OpenGL 2.0 is required");
-        return false;
-    }
-    
-    if (multiSample < 1)
-        multiSample = 1;
-    
-    // If zero dimensions, use the desktop default
-    if ((width <= 0) || (height <= 0))
-    {
-        if (fullscreen)
-        {
-            IntVector2 desktopResolution = impl_->GetDesktopResolution();
-            width = desktopResolution.x_;
-            height = desktopResolution.y_;
-        }
-        else
+        if (!fullscreen)
         {
             width = 800;
             height = 600;
         }
-    }
-    
-    if ((mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) && (vsync == vsync_)
-        && (multiSample == multiSample_))
-        return true;
-    
-    if (!impl_->window_)
-    {
-        if (!OpenWindow(width, height))
-            return false;
-    }
-    
-    if (!fullscreen_)
-    {
-        // Save the window placement if not fullscreen
-        WINDOWPLACEMENT wndpl;
-        wndpl.length = sizeof wndpl;
-        if (SUCCEEDED(GetWindowPlacement(impl_->window_, &wndpl)))
+        else
         {
-            windowPosX_ = wndpl.rcNormalPosition.left;
-            windowPosY_ = wndpl.rcNormalPosition.top;
+            width = 0;
+            height = 0;
         }
     }
     
-    // Choose pixel format
-    int pixelFormat = GetPixelFormat(mode, multiSample);
-    if (!pixelFormat)
+    /// \todo Reimplement using SDL 1.3 functionality, which allows multiple windows
+    if (!initialized_)
     {
-        LOGERROR("Failed to choose pixel format");
+        if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+        {
+            LOGERROR("SDL video subsystem initialization failed");
+            return false;
+        }
+    }
+    
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+    
+    if ((multiSample > 1) && (mode == RENDER_FORWARD))
+    {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
+    }
+    else
+    {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    }
+    
+    // Lose the existing OpenGL context now
+    Release();
+    
+    unsigned sdlFlags = SDL_OPENGL;
+    if (fullscreen)
+        sdlFlags |= SDL_FULLSCREEN;
+    SDL_Surface* surface = SDL_SetVideoMode(width, height, 0, sdlFlags);
+    if (!surface)
+    {
+        // If fullscreen mode fails, retry windowed
+        if (fullscreen)
+        {
+            fullscreen = false;
+            unsigned sdlFlags = SDL_OPENGL;
+            surface = SDL_SetVideoMode(width, height, 0, sdlFlags);
+        }
+        if (!surface)
+        {
+            LOGERROR("Could not set screen mode");
+            return false;
+        }
+    }
+    
+    // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
+    #ifdef _MSC_VER
+    _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+    #endif
+    
+    // If OpenGL extensions not yet initialized, initialize now
+    // Query needs to happen under lock as the function pointers are static
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        if (!GLeeInitialized())
+            GLeeInit();
+    }
+    
+    if (!_GLEE_VERSION_2_0)
+    {
+        LOGERROR("OpenGL 2.0 is required");
+        SDL_Quit();
         return false;
     }
     
-    // Check fullscreen mode validity. If not valid, revert to windowed
-    if (fullscreen)
-    {
-        PODVector<IntVector2> resolutions = GetResolutions();
-        fullscreen = false;
-        for (unsigned i = 0; i < resolutions.Size(); ++i)
-        {
-            if ((width == resolutions[i].x_) && (height == resolutions[i].y_))
-            {
-                fullscreen = true;
-                break;
-            }
-        }
-    }
+    // Set vsync
+    SDL_GL_SetSwapInterval(vsync ? 1 : 0);
     
-    // Clear any additional depth buffers now, as they are possibly not needed any more
-    depthTextures_.Clear();
-    
-    // Create context if not created yet, or if the pixel format or fullscreen mode changes
-    // (it is not strictly necessary to recreate context just because the fullscreen mode changes, but on some ATI cards
-    // there seem to be corruption or wrong client area bugs)
-    if ((!impl_->renderContext_) || (pixelFormat != impl_->pixelFormat_) || (fullscreen != fullscreen_))
-    {
-        // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
-        if (!impl_->renderContext_)
-        {
-            #ifdef _MSC_VER
-            _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
-            #endif
-        }
-        else
-        {
-            // Existing context needs to be destroyed, and the window closed and reopened
-            Release();
-            if (!OpenWindow(width, height))
-                return false;
-        }
-        
-        if (SetPixelFormat(impl_->deviceContext_, pixelFormat, 0) == FALSE)
-        {
-            LOGERROR("Failed to set pixel format");
-            return false;
-        }
-        
-        impl_->pixelFormat_ = pixelFormat;
-        impl_->renderContext_ = wglCreateContext(impl_->deviceContext_);
-        wglMakeCurrent(impl_->deviceContext_, impl_->renderContext_);
-        
-        LOGINFO("Created OpenGL context");
-        
-        // Create the FBO if fully supported
-        if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
-        {
-            glGenFramebuffersEXT(1, &impl_->fbo_);
-            
-            // Shadows, render targets and deferred rendering all depend on FBO & packed depth stencil
-            shadowMapFormat_ = GL_DEPTH_COMPONENT16;
-            hiresShadowMapFormat_ = GL_DEPTH_COMPONENT24;
-            renderTargetSupport_ = true;
-            deferredSupport_ = true;
-        }
-        
-        // Set initial state to match Direct3D
-        glEnable(GL_DEPTH_TEST);
-        SetCullMode(CULL_CCW);
-        SetDepthTest(CMP_LESSEQUAL);
-    }
-    
-    // Change/restore desktop resolution as necessary
-    if (fullscreen)
-    {
-        if (!SetScreenMode(width, height))
-            fullscreen = false;
-    }
-    else
-        RestoreScreenMode();
-    
-    AdjustWindow(width, height, fullscreen);
-    
-    #ifdef WIN32
-    if (wglSwapIntervalEXT)
-        wglSwapIntervalEXT(vsync ? 1 : 0);
-    #endif
-    
+    // Query for system backbuffer depth
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
     impl_->depthBits_ = impl_->windowDepthBits_;
     
-    width_ = width;
-    height_ = height;
+    // Create the FBO if fully supported
+    if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
+    {
+        glGenFramebuffersEXT(1, &impl_->fbo_);
+        
+        // Shadows, render targets and deferred rendering all depend on FBO & packed depth stencil
+        shadowMapFormat_ = GL_DEPTH_COMPONENT16;
+        hiresShadowMapFormat_ = GL_DEPTH_COMPONENT24;
+        renderTargetSupport_ = true;
+        deferredSupport_ = true;
+    }
+    
+    // Set initial state to match Direct3D
+    glEnable(GL_DEPTH_TEST);
+    SetCullMode(CULL_CCW);
+    SetDepthTest(CMP_LESSEQUAL);
+    
+    width_ = surface->w;
+    height_ = surface->h;
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     mode_ = mode;
     multiSample_ = multiSample;
+    initialized_ = true;
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
     viewTexture_ = 0;
     
-    // Get the system depth buffer's bit depth
-    glGetIntegerv(GL_DEPTH_BITS, &impl_->depthBits_);
-    
     // Clear the window to black now, because GPU object restore may take time
     Clear(CLEAR_COLOR);
-    SwapBuffers(impl_->deviceContext_);
+    SDL_GL_SwapBuffers();
+    
+    // Create deferred rendering buffers as necessary
+    CreateRenderTargets();
     
     // Let GPU objects restore themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceReset();
-    
-    // Create deferred rendering buffers as necessary
-    CreateRenderTargets();
     
     if (multiSample > 1)
         LOGINFO("Set screen mode " + String(width_) + "x" + String(height_) + " " + (fullscreen_ ? "fullscreen" : "windowed") +
@@ -378,12 +325,18 @@ bool Graphics::ToggleFullscreen()
 
 void Graphics::Close()
 {
-    // Release all GPU objects that still exist
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-        (*i)->Release();
-    gpuObjects_.Clear();
-    
-    Release();
+    if (initialized_)
+    {
+        // Release all GPU objects that still exist
+        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+            (*i)->Release();
+        gpuObjects_.Clear();
+        
+        Release();
+        
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        initialized_ = false;
+    }
 }
 
 bool Graphics::TakeScreenShot(Image& destImage)
@@ -409,9 +362,13 @@ bool Graphics::BeginFrame()
     if (!IsInitialized())
         return false;
     
-    // If we should be fullscreen, but the screen mode is not currently set, do not render
-    if ((fullscreen_) && (!fullscreenModeSet_))
-        return false;
+    // If we should be fullscreen, but are not currently active, do not render
+    if (fullscreen_)
+    {
+        unsigned state = SDL_GetAppState();
+        if (!(state & SDL_APPACTIVE))
+            return false;
+    }
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
@@ -442,7 +399,7 @@ void Graphics::EndFrame()
     
     SendEvent(E_ENDRENDER);
     
-    SwapBuffers(impl_->deviceContext_);
+    SDL_GL_SwapBuffers();
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
@@ -951,7 +908,6 @@ void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3& matrix)
             glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.GetData());
     }
 }
-
 
 void Graphics::SetShaderParameter(ShaderParameter param, const Vector3& vector)
 {
@@ -1513,7 +1469,7 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         {
             // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
             // Zero depth bits may be returned if using the packed depth stencil format. Assume 24bit in that case
-            int depthBits = min(impl_->depthBits_, 23);
+            int depthBits = Min(impl_->depthBits_, 23);
             if (!depthBits)
                 depthBits = 23;
             float adjustedConstantBias = constantBias * (float)(1 << (depthBits - 1));
@@ -1870,30 +1826,12 @@ PODVector<IntVector2> Graphics::GetResolutions() const
 {
     PODVector<IntVector2> ret;
     
-    DEVMODE displayMode;
-    unsigned index = 0;
-    for (unsigned index = 0;; ++index)
-    {
-        if (!EnumDisplaySettings(NULL, index, &displayMode))
-            break;
-        
-        if (displayMode.dmBitsPerPel < 16)
-            continue;
-        
-        IntVector2 newMode(displayMode.dmPelsWidth, displayMode.dmPelsHeight);
-        
-        // Check for duplicate before storing
-        bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++j)
-        {
-            if (ret[j] == newMode)
-            {
-                unique = false;
-                break;
-            }
-        }
-        if (unique)
-            ret.Push(newMode);
+    SDL_Rect** rects = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
+    
+    if ((rects) && (rects != (SDL_Rect**)-1))
+    { 
+        for (unsigned i = 0; rects[i]; ++i)
+            ret.Push(IntVector2(rects[i]->w, rects[i]->h));
     }
     
     return ret;
@@ -1904,46 +1842,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     PODVector<int> ret;
     // No multisampling always supported
     ret.Push(1);
-    
-    if ((_GLEE_WGL_ARB_pixel_format) && (impl_->deviceContext_))
-    {
-        int attributes[] = {
-            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-            WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-            WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-            WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
-            WGL_SAMPLES_ARB, 2,
-            0, 0
-        };
-        
-        int pixelFormats[256];
-        unsigned numPixelFormats;
-        
-        wglChoosePixelFormatARB(impl_->deviceContext_, attributes, 0, 256, pixelFormats, &numPixelFormats);
-        for (unsigned i = 0; i < numPixelFormats; ++i)
-        {
-            int multiSampleQuery = WGL_SAMPLES_ARB;
-            int multiSampleLevel;
-            
-            wglGetPixelFormatAttribivARB(impl_->deviceContext_, pixelFormats[i], 0, 1, &multiSampleQuery, &multiSampleLevel);
-            if (multiSampleLevel > 1)
-            {
-                bool unique = true;
-                for (unsigned j = 0; j < ret.Size(); ++j)
-                {
-                    if (ret[j] == multiSampleLevel)
-                    {
-                        unique = false;
-                        break;
-                    }
-                }
-                
-                if (unique)
-                    ret.Push(multiSampleLevel);
-            }
-        }
-    }
+    /// \todo Implement properly using SDL, if possible
     
     return ret;
 }
@@ -2074,148 +1973,6 @@ unsigned Graphics::GetDepthFormat()
 unsigned Graphics::GetDepthStencilFormat()
 {
     return GL_DEPTH24_STENCIL8_EXT;
-}
-
-bool Graphics::IsInitialized() const
-{
-    return ((impl_->window_ != 0) && (impl_->renderContext_ != 0));
-}
-
-unsigned Graphics::GetWindowHandle() const
-{
-    return (unsigned)impl_->window_;
-}
-
-bool Graphics::OpenWindow(int width, int height)
-{
-    WNDCLASS wc;
-    wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-    wc.lpfnWndProc   = wndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = impl_->instance_;
-    wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor(0, IDC_ARROW);
-    wc.hbrBackground = 0;
-    wc.lpszMenuName  = 0;
-    wc.lpszClassName = "OpenGL";
-    
-    RegisterClass(&wc);
-    
-    RECT rect = {0, 0, width, height};
-    AdjustWindowRect(&rect, windowStyle, FALSE);
-    impl_->window_ = CreateWindow("OpenGL", windowTitle_.CString(), windowStyle, CW_USEDEFAULT, CW_USEDEFAULT,
-        rect.right, rect.bottom, 0, 0, impl_->instance_, 0); 
-    
-    if (!impl_->window_)
-    {
-        LOGERROR("Could not create window");
-        return false;
-    }
-    
-    SetWindowLongPtr(impl_->window_, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-    
-    // Save the device context
-    impl_->deviceContext_ = GetDC(impl_->window_);
-    
-    LOGINFO("Created application window");
-    return true;
-}
-
-int Graphics::GetPixelFormat(RenderMode mode, int multiSample)
-{
-    PIXELFORMATDESCRIPTOR format;
-    ZeroMemory(&format, sizeof(format));
-    
-    format.nSize = sizeof(format);
-    format.nVersion = 1;
-    format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_GENERIC_ACCELERATED | PFD_DOUBLEBUFFER;
-    format.iPixelType = PFD_TYPE_RGBA;
-    format.cColorBits = impl_->GetDesktopBitsPerPixel();
-    format.cDepthBits = 24;
-    format.cStencilBits = 8;
-    
-    int pixelFormat = 0;
-    unsigned numFormats;
-    
-    // Use the extended pixel format if multisampling requested in forward rendering mode
-    if ((_GLEE_WGL_ARB_pixel_format) && (multiSample > 1) && (mode == RENDER_FORWARD))
-    {
-        int attributes[] = {
-            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-            WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-            WGL_COLOR_BITS_ARB, impl_->GetDesktopBitsPerPixel(),
-            WGL_DEPTH_BITS_ARB, 24,
-            WGL_STENCIL_BITS_ARB, 8,
-            WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-            WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
-            WGL_SAMPLES_ARB, multiSample,
-            0, 0
-        };
-        
-        // If multisample fails, switch to non-multisampled pixel format
-        if ((!wglChoosePixelFormatARB(impl_->deviceContext_, attributes, 0, 1, &pixelFormat, &numFormats)) || (!pixelFormat))
-            pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &format);
-    }
-    else
-        pixelFormat = ChoosePixelFormat(impl_->deviceContext_, &format);
-    
-    return pixelFormat;
-}
-
-bool Graphics::SetScreenMode(int newWidth, int newHeight)
-{
-    ++inModeChange_;
-    
-    DEVMODE displayMode;
-    ZeroMemory(&displayMode, sizeof(displayMode));
-    displayMode.dmSize = sizeof(displayMode);
-    displayMode.dmPelsWidth = newWidth;
-    displayMode.dmPelsHeight = newHeight;
-    displayMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
-    
-    bool success = ChangeDisplaySettings(&displayMode, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
-    if (success)
-        fullscreenModeSet_ = true;
-    
-    --inModeChange_;
-    return success;
-}
-
-void Graphics::RestoreScreenMode()
-{
-    if (fullscreenModeSet_)
-    {
-        ++inModeChange_;
-        ChangeDisplaySettings(NULL, 0);
-        fullscreenModeSet_ = false;
-        --inModeChange_;
-    }
-}
-
-void Graphics::AdjustWindow(int newWidth, int newHeight, bool newFullscreen)
-{
-    ++inModeChange_;
-    
-    if (newFullscreen)
-    {
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, WS_POPUP);
-        SetWindowPos(impl_->window_, HWND_TOP, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW | SWP_NOCOPYBITS);
-    }
-    else
-    {
-        RECT rect = {0, 0, newWidth, newHeight};
-        AdjustWindowRect(&rect, windowStyle, FALSE);
-        SetWindowLongPtr(impl_->window_, GWL_STYLE, windowStyle);
-        SetWindowPos(impl_->window_, HWND_TOP, windowPosX_, windowPosY_, rect.right - rect.left, rect.bottom - rect.top,
-            SWP_SHOWWINDOW | SWP_NOCOPYBITS);
-        
-        // Clean up the desktop of old window contents
-        InvalidateRect(0, 0, TRUE);
-    }
-    
-    --inModeChange_;
 }
 
 void Graphics::CreateRenderTargets()
@@ -2351,91 +2108,21 @@ void Graphics::Release()
     normalBuffer_.Reset();
     depthBuffer_.Reset();
     screenBuffer_.Reset();
+    depthTextures_.Clear();
     
-    // If GPU objects exist ie. it's a context delete/recreate, not Close(), tell the GPU objects to save and release themselves
+    // If GPU objects exist ie. it's a context delete/recreate, not Close(), tell them to save and release themselves
     for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
         (*i)->OnDeviceLost();
     
-    if (impl_->renderContext_)
+    if (impl_->fbo_)
     {
-        if (impl_->fbo_)
-        {
-            glDeleteFramebuffersEXT(1, &impl_->fbo_);
-            impl_->fbo_ = 0;
-        }
-        
-        wglMakeCurrent(NULL, NULL);
-        wglDeleteContext(impl_->renderContext_);
-        impl_->renderContext_ = 0;
-    }
-    if (impl_->deviceContext_)
-    {
-        ReleaseDC(impl_->window_, impl_->deviceContext_);
-        impl_->deviceContext_ = 0;
-    }
-    if (impl_->window_)
-    {
-        RestoreScreenMode();
-        DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        glDeleteFramebuffersEXT(1, &impl_->fbo_);
+        impl_->fbo_ = 0;
     }
     
     // When the new context is initialized, it will have default state again
     ResetCachedState();
     ClearParameterSources();
-}
-
-void Graphics::InitializeExtensions()
-{
-    // Query for extensions needs to happen under lock as the function pointers are static
-    MutexLock lock(GetStaticMutex());
-    
-    if (GLeeInitialized())
-        return;
-    
-    WNDCLASS wc;
-    wc.style         = CS_OWNDC;
-    wc.lpfnWndProc   = wndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = impl_->instance_;
-    wc.hIcon         = NULL;
-    wc.hCursor       = NULL;
-    wc.hbrBackground = 0;
-    wc.lpszMenuName  = 0;
-    wc.lpszClassName = "DummyOpenGL";
-    
-    RegisterClass(&wc);
-    
-    HWND dummyWindow = CreateWindow("DummyOpenGL", "Urho3D", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-        32, 32, 0, 0, impl_->instance_, 0);
-    
-    SetWindowLongPtr(dummyWindow, GWLP_USERDATA, 0);
-    
-    // Save the device context, then set the pixel format
-    HDC deviceContext = GetDC(dummyWindow);
-    
-    PIXELFORMATDESCRIPTOR format;
-    ZeroMemory(&format, sizeof(format));
-    
-    format.nSize = sizeof(format);
-    format.nVersion = 1;
-    format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    format.iPixelType = PFD_TYPE_RGBA;
-    format.cColorBits = 16;
-    format.cDepthBits = 15;
-    
-    int iFormat = ChoosePixelFormat(deviceContext, &format);
-    SetPixelFormat(deviceContext, iFormat, &format);
-    HGLRC renderContext = wglCreateContext(deviceContext);
-    wglMakeCurrent(deviceContext, renderContext);
-    
-    GLeeInit();
-    
-    wglMakeCurrent(NULL, NULL);
-    wglDeleteContext(renderContext);
-    ReleaseDC(dummyWindow, deviceContext);
-    DestroyWindow(dummyWindow);
 }
 
 void Graphics::InitializeShaderParameters()
@@ -2476,7 +2163,7 @@ void Graphics::InitializeShaderParameters()
     shaderParameters_["ShadowIntensity"] = PSP_SHADOWINTENSITY;
     shaderParameters_["ShadowProjPS"] = PSP_SHADOWPROJ;
     shaderParameters_["SpotProjPS"] = PSP_SPOTPROJ;
-
+    
     // Map texture units
     textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["DiffMap"] = TU_DIFFUSE;
@@ -2493,76 +2180,6 @@ void Graphics::InitializeShaderParameters()
     textureUnits_["DiffBuffer"] = TU_DIFFBUFFER;
     textureUnits_["NormalBuffer"] = TU_NORMALBUFFER;
     textureUnits_["DepthBuffer"] = TU_DEPTHBUFFER;
-}
-
-void Graphics::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
-{
-    using namespace WindowMessage;
-    
-    if (eventData[P_WINDOW].GetInt() != (int)impl_->window_)
-        return;
-    
-    switch (eventData[P_MSG].GetInt())
-    {
-    case WM_CLOSE:
-        Close();
-        eventData[P_HANDLED] = true;
-        break;
-        
-    case WM_DESTROY:
-        eventData[P_HANDLED] = true;
-        break;
-    }
-}
-
-void Graphics::HandleActivation(StringHash eventType, VariantMap& eventData)
-{
-    if ((inModeChange_) || (!impl_->window_) || (!fullscreen_))
-        return;
-    
-    using namespace Activation;
-    
-    if (eventData[P_ACTIVE].GetBool())
-    {
-        // If we were activated and are not minimized, change back to the custom mode
-        if ((!eventData[P_MINIMIZED].GetBool()) && (!fullscreenModeSet_))
-        {
-            if (!SetScreenMode(width_, height_))
-                fullscreen_ = false;
-            AdjustWindow(width_, height_, fullscreen_);
-        }
-    }
-    else
-    {
-        // Reset to desktop resolution on inactivation
-        ++inModeChange_;
-        ShowWindow(impl_->window_, SW_MINIMIZE);
-        --inModeChange_;
-        RestoreScreenMode();
-    }
-}
-
-LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    using namespace WindowMessage;
-    
-    Graphics* graphics = reinterpret_cast<Graphics*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-    
-    if ((graphics) && (graphics->IsInitialized()))
-    {
-        VariantMap eventData;
-        eventData[P_WINDOW] = (int)hwnd;
-        eventData[P_MSG] = (int)msg;
-        eventData[P_WPARAM] = (int)wParam;
-        eventData[P_LPARAM] = (int)lParam;
-        eventData[P_HANDLED] = false;
-        
-        graphics->SendEvent(E_WINDOWMESSAGE, eventData);
-        if (eventData[P_HANDLED].GetBool())
-            return 0;
-    }
-    
-    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 void RegisterGraphicsLibrary(Context* context)

@@ -23,10 +23,9 @@
 
 #include "Precompiled.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "ShaderProgram.h"
 #include "ShaderVariation.h"
-
-#include <GLee.h>
 
 #include "DebugNew.h"
 

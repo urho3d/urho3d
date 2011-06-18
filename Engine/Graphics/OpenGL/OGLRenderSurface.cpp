@@ -24,12 +24,11 @@
 #include "Precompiled.h"
 #include "Camera.h"
 #include "Graphics.h"
+#include "GraphicsImpl.h"
 #include "Log.h"
 #include "RenderSurface.h"
 #include "Scene.h"
 #include "Texture.h"
-
-#include <GLee.h>
 
 #include "DebugNew.h"
 

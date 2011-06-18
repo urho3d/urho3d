@@ -33,8 +33,7 @@
 *
 ***************************************************************************/
 
-// Modified for Urho3D to query only up to OpenGL 2.0 + FBO + WGL & GLX swapinterval extensions,
-// and to remove the lazy initialization
+// Modified by Lasse Öörni for Urho3D
 
 #ifdef _MSC_VER
 	#pragma optimize( "g", off )
@@ -44,10 +43,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "GLee.h"
-
-#if defined(__APPLE__) || defined(__APPLE_CC__)
-	#include <Carbon/Carbon.h>
-#endif
 
 typedef GLuint(*GLEE_LINK_FUNCTION)(void);
 
@@ -59,32 +54,8 @@ GLboolean __GLeeInited=GL_FALSE;
 
 void * __GLeeGetProcAddress(const char *extname)
 {
-#ifdef WIN32
-	return (void*)wglGetProcAddress(extname);
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-    CFBundleRef bundle;
-    CFURLRef bundleURL = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, CFSTR("/System/Library/Frameworks/OpenGL.framework"), kCFURLPOSIXPathStyle, true);
-
-    CFStringRef functionName = CFStringCreateWithCString(kCFAllocatorDefault, extname, kCFStringEncodingASCII);
-
-    void *function;
-
-    bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
-    assert(bundle != NULL);
-
-    function = CFBundleGetFunctionPointerForName(bundle, functionName);
-
-    CFRelease(bundleURL);
-    CFRelease(functionName);
-    CFRelease(bundle);
-
-    return function;
-#else
-	return (void*)glXGetProcAddressARB((const GLubyte *)extname);
-#endif
+    return SDL_GL_GetProcAddress(extname);
 }
-
-
 
 
 /* Extension querying variables */
@@ -1185,90 +1156,6 @@ int __GLeeGLNumExtensions=7;
 #ifdef __GLEE_GL_EXT_packed_depth_stencil
 #endif
 
-
-/* WGL */
-
-#ifdef WIN32
-
-/* Extension querying variables */
-
-GLboolean _GLEE_WGL_ARB_extensions_string = GL_FALSE;
-GLboolean _GLEE_WGL_ARB_pixel_format = GL_FALSE;
-GLboolean _GLEE_WGL_EXT_swap_control = GL_FALSE;
-
-/*  WGL Extension names */
-
-char __GLeeWGLExtensionNames[3][26]={
-    "WGL_ARB_extensions_string",
-    "WGL_ARB_pixel_format",
-    "WGL_EXT_swap_control"
-};
-int __GLeeWGLNumExtensions=2;
-
-/* WGL_ARB_extensions_string */
-
-#ifdef __GLEE_WGL_ARB_extensions_string
-#ifndef GLEE_C_DEFINED_wglGetExtensionsStringARB
-#define GLEE_C_DEFINED_wglGetExtensionsStringARB
-  GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC GLeeFuncPtr_wglGetExtensionsStringARB = 0;
-#endif
-#endif
-
-/* WGL_ARB_pixel_format */
-
-#ifdef __GLEE_WGL_ARB_pixel_format
-#ifndef GLEE_C_DEFINED_wglGetPixelFormatAttribivARB
-#define GLEE_C_DEFINED_wglGetPixelFormatAttribivARB
-  GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribivARB = 0;
-#endif
-#ifndef GLEE_C_DEFINED_wglGetPixelFormatAttribfvARB
-#define GLEE_C_DEFINED_wglGetPixelFormatAttribfvARB
-  GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC GLeeFuncPtr_wglGetPixelFormatAttribfvARB = 0;
-#endif
-#ifndef GLEE_C_DEFINED_wglChoosePixelFormatARB
-#define GLEE_C_DEFINED_wglChoosePixelFormatARB
-  GLEEPFNWGLCHOOSEPIXELFORMATARBPROC GLeeFuncPtr_wglChoosePixelFormatARB = 0;
-#endif
-#endif 
-
-/* WGL_EXT_swap_control */
-
-#ifdef __GLEE_WGL_EXT_swap_control
-#ifndef GLEE_C_DEFINED_wglSwapIntervalEXT
-#define GLEE_C_DEFINED_wglSwapIntervalEXT
-  GLEEPFNWGLSWAPINTERVALEXTPROC GLeeFuncPtr_wglSwapIntervalEXT = 0;
-#endif
-#ifndef GLEE_C_DEFINED_wglGetSwapIntervalEXT
-#define GLEE_C_DEFINED_wglGetSwapIntervalEXT
-  GLEEPFNWGLGETSWAPINTERVALEXTPROC GLeeFuncPtr_wglGetSwapIntervalEXT = 0;
-#endif
-#endif 
-
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else /* GLX */
-
-/* Extension querying variables */
-
-GLboolean _GLEE_GLX_SGI_swap_control = GL_FALSE;
-
-/*  GLX Extension names */
-
-char __GLeeGLXExtensionNames[1][21]={
-    "GLX_SGI_swap_control"
-};
-int __GLeeGLXNumExtensions=1;
-
-/* GLX_SGI_swap_control */
-
-#ifdef __GLEE_GLX_SGI_swap_control
-#ifndef GLEE_C_DEFINED_glXSwapIntervalSGI
-#define GLEE_C_DEFINED_glXSwapIntervalSGI
-  GLEEPFNGLXSWAPINTERVALSGIPROC GLeeFuncPtr_glXSwapIntervalSGI = 0;
-#endif
-#endif 
-
-#endif /* end GLX */
-
 /*****************************************************************
 * Extension link functions
 *****************************************************************/
@@ -1609,76 +1496,6 @@ void initGLLoadFunctions(void)
     __GLeeGLLoadFunction[7]=__GLeeLink_GL_EXT_packed_depth_stencil;
 }
 
-#ifdef WIN32
-
-GLuint __GLeeLink_WGL_ARB_extensions_string(void)
-{
-    GLint nLinked=0;
-#ifdef __GLEE_WGL_ARB_extensions_string
-    if ((GLeeFuncPtr_wglGetExtensionsStringARB = (GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC) __GLeeGetProcAddress("wglGetExtensionsStringARB"))!=0) nLinked++;
-#endif
-    if (nLinked==1) return GLEE_LINK_COMPLETE;
-    if (nLinked==0) return GLEE_LINK_FAIL;
-    return GLEE_LINK_PARTIAL;
-}
-
-GLuint __GLeeLink_WGL_ARB_pixel_format(void)
-{
-    GLint nLinked=0;
-#ifdef __GLEE_WGL_ARB_pixel_format
-    if ((GLeeFuncPtr_wglGetPixelFormatAttribivARB = (GLEEPFNWGLGETPIXELFORMATATTRIBIVARBPROC) __GLeeGetProcAddress("wglGetPixelFormatAttribivARB"))!=0) nLinked++;
-    if ((GLeeFuncPtr_wglGetPixelFormatAttribfvARB = (GLEEPFNWGLGETPIXELFORMATATTRIBFVARBPROC) __GLeeGetProcAddress("wglGetPixelFormatAttribfvARB"))!=0) nLinked++;
-    if ((GLeeFuncPtr_wglChoosePixelFormatARB = (GLEEPFNWGLCHOOSEPIXELFORMATARBPROC) __GLeeGetProcAddress("wglChoosePixelFormatARB"))!=0) nLinked++;
-#endif
-    if (nLinked==3) return GLEE_LINK_COMPLETE;
-    if (nLinked==0) return GLEE_LINK_FAIL;
-    return GLEE_LINK_PARTIAL;
-}
-
-GLuint __GLeeLink_WGL_EXT_swap_control(void)
-{
-    GLint nLinked=0;
-#ifdef __GLEE_WGL_EXT_swap_control
-    if ((GLeeFuncPtr_wglSwapIntervalEXT = (GLEEPFNWGLSWAPINTERVALEXTPROC) __GLeeGetProcAddress("wglSwapIntervalEXT"))!=0) nLinked++;
-    if ((GLeeFuncPtr_wglGetSwapIntervalEXT = (GLEEPFNWGLGETSWAPINTERVALEXTPROC) __GLeeGetProcAddress("wglGetSwapIntervalEXT"))!=0) nLinked++;
-#endif
-    if (nLinked==2) return GLEE_LINK_COMPLETE;
-    if (nLinked==0) return GLEE_LINK_FAIL;
-    return GLEE_LINK_PARTIAL;
-}
-
-GLEE_LINK_FUNCTION __GLeeWGLLoadFunction[3];
-
-void initWGLLoadFunctions(void)
-{
-    __GLeeWGLLoadFunction[0]=__GLeeLink_WGL_ARB_extensions_string;
-    __GLeeWGLLoadFunction[1]=__GLeeLink_WGL_ARB_pixel_format;
-    __GLeeWGLLoadFunction[2]=__GLeeLink_WGL_EXT_swap_control;
-}
-
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else /* Linux */
-
-GLuint __GLeeLink_GLX_SGI_swap_control(void)
-{
-    GLint nLinked=0;
-#ifdef __GLEE_GLX_SGI_swap_control
-    if ((GLeeFuncPtr_glXSwapIntervalSGI = (GLEEPFNGLXSWAPINTERVALSGIPROC) __GLeeGetProcAddress("glXSwapIntervalSGI"))!=0) nLinked++;
-#endif
-    if (nLinked==1) return GLEE_LINK_COMPLETE;
-    if (nLinked==0) return GLEE_LINK_FAIL;
-    return GLEE_LINK_PARTIAL;
-}
-
-GLEE_LINK_FUNCTION __GLeeGLXLoadFunction[1];
-
-void initGLXLoadFunctions(void)
-{
-    __GLeeGLXLoadFunction[0]=__GLeeLink_GLX_SGI_swap_control;
-}
-
-#endif /* end Linux */
-
 
 /*****************************************************************
  * GLee internal types
@@ -1742,26 +1559,6 @@ void __GLeeExtList_add(ExtensionList *extList, const char * extName)
 	extList->numNames++;
 }
 
-const char *__GLeeGetExtStrPlat( void )
-{
-#ifdef WIN32
-	if (!_GLEE_WGL_ARB_extensions_string)
-		wglGetExtensionsStringARB = (GLEEPFNWGLGETEXTENSIONSSTRINGARBPROC) wglGetProcAddress("wglGetExtensionsStringARB");
-
-	if (wglGetExtensionsStringARB)
-		return (const char *)wglGetExtensionsStringARB(wglGetCurrentDC());
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else
-	Display *dpy=glXGetCurrentDisplay();
-	if(dpy)
-	{
-		int dpynr=DefaultScreen(dpy);
-		return (const char*)glXQueryExtensionsString(dpy,dpynr);
-	}
-#endif
-	return 0;
-}
-
 void __GLeeWriteError(const char * errorStr)
 {
 	int a=0;
@@ -1781,51 +1578,19 @@ int __GLeeGetVersionNumber(char *versionStr)
 
 GLboolean __GLeeGetExtensions(ExtensionList* extList)
 {
-	const char * platExtStr;
-	const char * glExtStr;
-	char * extStr;
-	char emptyString[1] = ""; 
+	const char * extStr;
 	char extensionName[1024];
 	int a,b;
 	int totalExtStrLen;
-	int platExtStrLen;
-	int addASpace;
 	
-	/* read the platform specific extension string */
-	platExtStr=__GLeeGetExtStrPlat(); 
-	if (!platExtStr) platExtStr=emptyString;
-
-	glExtStr=(const char *)glGetString(GL_EXTENSIONS);
-	if (glExtStr==0) 
+	extStr=(const char *)glGetString(GL_EXTENSIONS);
+	if (extStr==0) 
 	{
 		__GLeeWriteError("glGetString(GL_EXTENSIONS) failed.");
 		return GL_FALSE;
 	}
 
-	/* allocate the extension string */
-	platExtStrLen = strlen(platExtStr);
-	totalExtStrLen = platExtStrLen + strlen(glExtStr);
-	extStr=(char *)malloc( (totalExtStrLen+2) * sizeof(char) ); /* we add 2 to allow for an extra space and a null terminator */
-
-	/* If the last character of platExtStr is not a space, we need to add one when we concatenate the extension strings*/
-	addASpace = 0;
-	if ( platExtStrLen > 2 )
-	{
-	    if ( platExtStr[ platExtStrLen-1 ] != ' ')
-		{
-			addASpace = 1;
-		}
-	}
-	
-	/* concatenate the two extension strings */
-	if ( addASpace )
-	{
-	    sprintf(extStr,"%s %s",platExtStr,glExtStr);
-	}
-	else
-	{
-	    sprintf(extStr,"%s%s",platExtStr,glExtStr);
-	}
+	totalExtStrLen = strlen(extStr);
 
 	/* extract the extensions */
 	for ( a=0;a<totalExtStrLen;a++ )
@@ -1839,7 +1604,6 @@ GLboolean __GLeeGetExtensions(ExtensionList* extList)
 		if (b==1023)
 		{
 			__GLeeWriteError("Extension name exceeds 1023 characters.");
-			free((void *)extStr);
 			return GL_FALSE;
 		}
 
@@ -1848,7 +1612,6 @@ GLboolean __GLeeGetExtensions(ExtensionList* extList)
 		/* add the extension */
 		__GLeeExtList_add(extList,extensionName);
 	}
-	free((void *)extStr);
 	return GL_TRUE;
 }
 
@@ -1873,18 +1636,6 @@ GLEE_EXTERN GLint __GLeeGetExtensionNumber(const char *extensionName, int type)
 		for (a=0;a<__GLeeGLNumExtensions;a++)
 			if (strcmp(extensionName,__GLeeGLExtensionNames[a])==0)	return a;
 		return -1;
-#ifdef WIN32
-	case 1:
-		for (a=0;a<__GLeeWGLNumExtensions;a++)
-			if (strcmp(extensionName,__GLeeWGLExtensionNames[a])==0) return a;
-		return -1;
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else
-	case 2:
-		for (a=0;a<__GLeeGLXNumExtensions;a++)
-			if (strcmp(extensionName,__GLeeGLXExtensionNames[a])==0) return a;
-		return -1;
-#endif
 	}
 	return -1;
 }
@@ -1892,19 +1643,6 @@ GLEE_EXTERN GLint __GLeeGetExtensionNumber(const char *extensionName, int type)
 /*****************************************************************
  * GLee external functions 
  *****************************************************************/
-
-#ifdef WIN32
-GLEE_EXTERN const char * GLeeGetExtStrWGL( void )
-{
-	return __GLeeGetExtStrPlat();
-}
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else
-GLEE_EXTERN const char * GLeeGetExtStrGLX( void )	
-{
-	return __GLeeGetExtStrPlat();
-}
-#endif
 
 GLEE_EXTERN const char * GLeeGetExtStrGL( void )
 {
@@ -1917,38 +1655,6 @@ GLEE_EXTERN const char * GLeeGetErrorString( void )
 }
 
 GLboolean __GLeeInitedLoadFunctions=GL_FALSE;
-
-GLEE_EXTERN GLint GLeeForceLink(const char * extensionName)
-{
-	int type=0; 
-	int extNum;
-	int len=strlen(extensionName);
-	if (len<5) return GLEE_LINK_FAIL;
-	if (!__GLeeInitedLoadFunctions)
-	{
-		if (!__GLeeInited) GLeeInit();
-		initGLLoadFunctions();
-#ifdef WIN32
-		initWGLLoadFunctions();
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else
-		initGLXLoadFunctions();
-#endif
-		__GLeeInitedLoadFunctions=GL_TRUE;
-	}
-	if (extensionName[0]=='W') type=1;
-	else if (extensionName[2]=='X') type=2;	
-	extNum=__GLeeGetExtensionNumber(extensionName,type);
-	if (extNum==-1) return GLEE_LINK_FAIL;
-	if (type==0) return __GLeeGLLoadFunction[extNum]();
-#ifdef WIN32
-	if (type==1) return __GLeeWGLLoadFunction[extNum]();
-#elif defined(__APPLE__) || defined(__APPLE_CC__)	
-#else
-	if (type==2) return __GLeeGLXLoadFunction[extNum]();
-#endif
-	return GLEE_LINK_FAIL;
-}
 
 GLEE_EXTERN GLboolean GLeeEnabled(GLboolean * extensionQueryingVariable)
 {
@@ -2028,31 +1734,6 @@ GLEE_EXTERN GLboolean GLeeInit( void )
         __GLeeLink_GL_EXT_packed_depth_stencil();
     }
     
-#ifdef WIN32
-    if (__GLeeCheckExtension("WGL_ARB_extensions_string", &extensionNames) )
-    {
-        _GLEE_WGL_ARB_extensions_string = GL_TRUE;
-        __GLeeLink_WGL_ARB_extensions_string();
-    }
-    if (__GLeeCheckExtension("WGL_ARB_pixel_format", &extensionNames) )
-    {
-        _GLEE_WGL_ARB_pixel_format = GL_TRUE;
-        __GLeeLink_WGL_ARB_pixel_format();
-    }
-    if (__GLeeCheckExtension("WGL_EXT_swap_control", &extensionNames) )
-    {
-        _GLEE_WGL_EXT_swap_control = GL_TRUE;
-        __GLeeLink_WGL_EXT_swap_control();
-    }
-#elif defined(__APPLE__) || defined(__APPLE_CC__)
-#else /* GLX */
-    if (__GLeeCheckExtension("GLX_SGI_swap_control", &extensionNames) )
-    {
-        _GLEE_GLX_SGI_swap_control = GL_TRUE;
-        __GLeeLink_GLX_SGI_swap_control();
-    }
-#endif /* end GLX */
-
     __GLeeExtList_clean(&extensionNames);
     return GL_TRUE;
 }

@@ -30,13 +30,14 @@
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>
-#include <Windows.h>
 
-// Enable SHGetSpecialFolderPath on MinGW
-#ifndef _MSC_VER
-#define _WIN32_IE 0x0400
+#ifdef WIN32
+#include <Windows.h>
 #endif
-#include <ShlObj.h>
+
+#ifdef USE_SDL
+#include <SDL.h>
+#endif
 
 #include "DebugNew.h"
 
@@ -47,7 +48,11 @@ static Mutex staticMutex;
 
 void ErrorDialog(const char* title, const char* message)
 {
+    #ifdef WIN32
     MessageBox(0, message, title, 0);
+    #else
+    printf("%s", message);
+    #endif
 }
 
 void ErrorExit(const String& message, int exitCode)
@@ -58,6 +63,7 @@ void ErrorExit(const String& message, int exitCode)
 
 void OpenConsoleWindow()
 {
+    #ifdef WIN32
     if (consoleOpened)
         return;
     
@@ -76,6 +82,7 @@ void OpenConsoleWindow()
     *stdin = *inFile;
     
     consoleOpened = true;
+    #endif
 }
 
 void PrintLine(const String& str)
@@ -145,6 +152,7 @@ String GetConsoleInput()
 {
     String ret;
     
+    #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE)
         return ret;
@@ -190,13 +198,29 @@ String GetConsoleInput()
             }
         }
     }
+    #else
+    int flags = fcntl(STDIN_FILENO, F_GETFL);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    for (;;)
+    {
+        int ch = fgetc(stdin);
+        if (ch >= 0)
+            ret += (char)ch;
+        else
+            break;
+    }
+    #endif
     
     return ret;
 }
 
 unsigned GetNumCPUCores()
 {
+    #ifndef USE_SDL
     SYSTEM_INFO info;
     GetSystemInfo(&info);
     return info.dwNumberOfProcessors;
+    #else
+    return SDL_GetCPUCount();
+    #endif
 }
