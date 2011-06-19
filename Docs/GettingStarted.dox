@@ -8,15 +8,21 @@ Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For gcc, execute make (by default, cmake_mingw.bat or cmake_gcc.sh specify to make a Release build.)
 
-The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9, shader compilation requires the D3DX library from the DirectX runtime or SDK to be available.
-
-After the build is complete, the programs can be run from the Bin directory.
+The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. After the build is complete, the programs can be run from the Bin directory.
 
 To run Urho3D from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
 
 To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
 
-Note: some Direct3D9 SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. Some versions of the HLSL compiler may fail to compile them. At least the February 2010 SDK is known to work.
+\section Building_SystemDependencies System-level dependencies
+
+Although all required third-party libraries are included as source code, there are also system-level dependencies that must be satisfied before Urho3D can be built successfully:
+
+- For Windows, the DirectX SDK needs to be installed. The HLSL compiler included in some SDK's may fail to compile those SM2.0 shaders that reach exactly the arithmetic instruction count limit; at least the February 2010 SDK is known to work.
+
+- For Linux, the following development packages need to be installed: libx11-dev, libxxf86vm-dev, libgl1-mesa-dev, libasound2-dev.
+
+- For Mac OS X, the Xcode developer tools package should include everything necessary.
 
 
 \page Running Running Urho3D
@@ -120,8 +126,10 @@ The third-party libraries are used for the following functionality:
 - AngelScript: scripting language implementation
 - ENet: UDP networking
 - FreeType: font rendering
+- GLee: OpenGL extensions handling
 - Open Asset Import Library: reading various 3D file formats
 - Open Dynamics %Engine: physics simulation implementation
+- SDL: low-level windowing, input, timing and audio functionality on Linux and Mac OS X, and on Windows when running in OpenGL mode
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
 - stb_vorbis: Ogg Vorbis decoding

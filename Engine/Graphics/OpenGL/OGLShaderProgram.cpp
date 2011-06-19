@@ -171,7 +171,7 @@ bool ShaderProgram::Link()
     return true;
 }
 
-bool ShaderProgram::NeedParameterUpdate(ShaderParameter param, const void* source, unsigned int frame)
+bool ShaderProgram::NeedParameterUpdate(ShaderParameter param, const void* source, unsigned frame)
 {
     // If global parameter frame has changed, clear all remembered sources
     if (frame != lastParameterFrame_)
