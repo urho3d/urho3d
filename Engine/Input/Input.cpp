@@ -135,12 +135,15 @@ void Input::Update()
         else
             lastMousePosition_ = mousePos;
         #else
+        // Manual recentering on OS X causes jerky motion; however it is fine on Windows & Linux
+        #ifndef __APPLE__
         if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
         {
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             SetMousePosition(center);
             lastMousePosition_ = GetMousePosition();
         }
+        #endif
         #endif
         
         if (mouseMove_ != IntVector2::ZERO)
@@ -167,6 +170,12 @@ void Input::SetClipCursor(bool enable)
     if (!graphics_)
         return;
     
+    // On OS X, use SDL's relative mode instead of manual recentering
+    #if defined(USE_SDL) && defined(__APPLE__)
+    SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
+    return;
+    #endif
+    
     if ((!graphics_->GetFullscreen()) && (active_) && (clipCursor_))
     {
         SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
@@ -175,7 +184,7 @@ void Input::SetClipCursor(bool enable)
         RECT clipRect;
         GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
         ClipCursor(&clipRect);
-        #endif
+        #endif        
     }
     else
     {
@@ -326,9 +335,10 @@ void Input::Initialize()
     if (graphics_->GetFullscreen())
         activated_ = true;
     #else
+    // Enable translated keyboard input
     SDL_EnableUNICODE(SDL_TRUE);
-    // For SDL, we never want to show the operating system cursor inside our window
-    SDL_ShowCursor(SDL_DISABLE);
+    // Set initial center position
+    SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
     showCursor_ = false;
     #endif
     
@@ -505,8 +515,10 @@ void Input::SetCursorVisible(bool enable)
         return;
     
     ShowCursor(enable ? TRUE : FALSE);
-    showCursor_ = enable;
+    #else
+    SDL_ShowCursor(enable ? SDL_TRUE : SDL_FALSE);
     #endif
+    showCursor_ = enable;
 }
 
 #ifndef USE_SDL
