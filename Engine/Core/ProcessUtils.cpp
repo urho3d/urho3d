@@ -27,10 +27,10 @@
 
 #include <cstdio>
 #include <fcntl.h>
-#include <time.h>
 
 #ifdef WIN32
 #include <Windows.h>
+#include <io.h>
 #else
 #include <unistd.h>
 #endif

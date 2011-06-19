@@ -77,11 +77,11 @@ Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
 1) Run cmake in the root directory with your preferred toolchain specified to
 generate the build files. Visual Studio 2008/2010 and MinGW have been tested.
 You can use the batch files provided (cmake_vs2008.bat, cmake_vs2010.bat and
-cmake_gcc.bat.)
+cmake_mingw.bat.)
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For MinGW, execute make (by default, cmake_gcc.bat specifies to make a Release
-build.)
+For MinGW, execute make (by default, cmake_mingw.bat specifies to make a 
+Release build.)
 
 The build process will also compile models and shaders from the Source_Asset
 directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires

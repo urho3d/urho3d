@@ -37,7 +37,7 @@
 #include <process.h>
 // Enable SHGetSpecialFolderPath on MinGW
 #ifndef _MSC_VER
-#define _WIN32_IE 0x0400st
+#define _WIN32_IE 0x0400
 #endif
 #include <Shlobj.h>
 #else
