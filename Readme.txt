@@ -75,19 +75,18 @@ Building
 Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
 
 1) Run cmake in the root directory with your preferred toolchain specified to
-generate the build files. Visual Studio 2008/2010 and MinGW have been tested.
-You can use the batch files provided (cmake_vs2008.bat, cmake_vs2010.bat and
-cmake_mingw.bat.)
+generate the build files. You can use the batch files or shell scripts provided.
+Use cmake_vs2008.bat, cmake_vs2010.bat or cmake_mingw.bat on Windows, and
+cmake_gcc.sh on Linux and Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For MinGW, execute make (by default, cmake_mingw.bat specifies to make a 
-Release build.)
+For gcc, execute make (by default, cmake_mingw.bat or cmake_gcc.sh specify to 
+make a Release build.)
 
 The build process will also compile models and shaders from the Source_Asset
-directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires
-the D3DX library from the DirectX runtime or SDK to be available. The debug 
-executables of the tools will not have the _d postfix, to allow the asset build 
-scripts to work in both debug & release builds.
+directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9,
+shader compilation requires the D3DX library from the DirectX runtime or SDK to
+be available.
 
 After the build is complete, the programs can be run from the Bin directory.
 
@@ -102,6 +101,6 @@ To actually make Urho3D.exe do something useful, it must be supplied with the
 name of the script file it should load and run. You can try for example the
 following arguments: Scripts/TestScene.as -w
 
-Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction
-count limit. Some versions of the HLSL compiler may fail to compile them. At
-least the February 2010 SDK is known to work.
+Note: some Direct3D9 SM2.0 shaders in Urho3D reach exactly the arithmetic 
+instruction count limit. Some versions of the HLSL compiler may fail to compile
+them. At least the February 2010 SDK is known to work.

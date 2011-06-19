@@ -2,26 +2,26 @@
 
 \page Building Building Urho3D
 
-Urho3D uses cmake (http://www.cmake.org) to build. The build process has two steps:
+Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
 
-1) Run cmake in the root directory with your preferred toolchain specified to generate the build files. Visual Studio 2008/2010 and MinGW have been tested. You can use the batch files provided (cmake_vs2008.bat, cmake_vs2010.bat and cmake_gcc.bat.)
+1) Run cmake in the root directory with your preferred toolchain specified to generate the build files. You can use the batch files or shell scripts provided. Use cmake_vs2008.bat, cmake_vs2010.bat or cmake_mingw.bat on Windows, and cmake_gcc.sh on Linux and Mac OS X.
 
-2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For MinGW, execute make (by default, cmake_gcc.bat specifies to make a Release build.)
+2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For gcc, execute make (by default, cmake_mingw.bat or cmake_gcc.sh specify to make a Release build.)
 
-The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. Shader compilation requires the D3DX library from the DirectX runtime or SDK to be available. The debug executables of the tools will not have the _d postfix, to allow the asset build scripts to work in both debug & release builds.
+The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9, shader compilation requires the D3DX library from the DirectX runtime or SDK to be available.
 
 After the build is complete, the programs can be run from the Bin directory.
 
-To run Urho3D from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\\Bin\\Urho3D.exe (release) or ..\\Bin\\Urho3D_d.exe (debug.) Entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
+To run Urho3D from the Visual Studio debugger, set it as a startup project and enter its relative path and filename into Properties -> Debugging -> Command: ..\Bin\Urho3D.exe or ..\Bin\Urho3D_d.exe. Additionally, entering -w into Debugging -> Command Arguments is highly recommended. This enables startup in windowed mode: without it running into an exception or breakpoint will be obnoxious as the mouse cursor will most probably be hidden.
 
-To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. See \ref Running "Running Urho3D" for more information, but for a quick test you can try the following arguments: Scripts/TestScene.as -w
+To actually make Urho3D.exe do something useful, it must be supplied with the name of the script file it should load and run. You can try for example the following arguments: Scripts/TestScene.as -w
 
-Note: some SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. Some versions of the HLSL compiler may fail to compile them. At least the February 2010 SDK is known to work.
+Note: some Direct3D9 SM2.0 shaders in Urho3D reach exactly the arithmetic instruction count limit. Some versions of the HLSL compiler may fail to compile them. At least the February 2010 SDK is known to work.
 
 
 \page Running Running Urho3D
 
-Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended.
+For Windows & Direct3D9 mode, Urho3D requires Windows XP or newer, DirectX 9.0c, and a display adapter with SM2.0 support. SM3.0 is highly recommended. For OpenGL mode, an OpenGL 2.0 capable display adapter is required as a minimum; shadows and deferred rendering additionally require the frame buffer object extension.
 
 The main executable Urho3D.exe in the Bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic or application, and therefore must be supplied with the name of the application script file it should run:
 
