@@ -121,10 +121,10 @@ void Input::Update()
     // Finally send the mouse move event if motion has been accumulated
     if (active_)
     {
-        // Require the operating system cursor to be hidden first
+        // In clipped mode, require the operating system cursor to be hidden first
         IntVector2 mousePos = GetMousePosition();
-        mouseMove_ = (!showCursor_) ? mousePos - lastMousePosition_ : IntVector2::ZERO;
-                
+        mouseMove_ = ((!clipCursor_) || (!showCursor_)) ? mousePos - lastMousePosition_ : IntVector2::ZERO;
+        
         // Recenter the mouse cursor manually if cursor clipping is in effect
         if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
         {
@@ -167,7 +167,7 @@ void Input::SetClipCursor(bool enable)
         RECT clipRect;
         GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
         ClipCursor(&clipRect);
-        #endif        
+        #endif
     }
     else
     {
@@ -320,7 +320,7 @@ void Input::Initialize()
     // Set the initial activation
     MakeActive();
     SetClipCursor(clipCursor_);
-    SetCursorVisible(false);    
+    SetCursorVisible(false);
     
     initialized_ = true;
     
@@ -337,9 +337,9 @@ void Input::MakeActive()
     active_ = true;
     activated_ = false;
     
-    // Re-establish mouse cursor clipping immediately in fullscreen. In windowed mode, require a mouse click inside the window 
-    // to not confuse with title bar drag
-    if (graphics_->GetFullscreen())
+    // Re-establish mouse cursor clipping immediately in fullscreen. In windowed mode, require a mouse click inside the window
+    // first to not confuse with title bar drag
+    if ((!clipCursor_) || (graphics_->GetFullscreen()))
     {
         SetClipCursor(clipCursor_);
         SetCursorVisible(false);
@@ -400,13 +400,13 @@ void Input::SetMouseButton(int button, bool newState)
         return;
     
     // If we are still showing the cursor (waiting for a click inside window), hide it now and disregard this click
-    if ((newState) && (showCursor_))
+    if ((newState) && (clipCursor_) && (showCursor_))
     {
         SetClipCursor(clipCursor_);
         SetCursorVisible(false);
         return;
     }
-        
+    
     if (newState)
     {
         if (!(mouseButtonDown_ & button))
@@ -618,13 +618,17 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_SETCURSOR:
-        if ((lParam & 0xffff) == HTCLIENT)
+        // When cursor is not clipped, switch to the operating system cursor outside the client area
+        if (!clipCursor_)
         {
-            SetCursorVisible(false);
-            eventData[P_HANDLED] = true;
+            if ((lParam & 0xffff) == HTCLIENT)
+            {
+                SetCursorVisible(false);
+                eventData[P_HANDLED] = true;
+            }
+            else
+                SetCursorVisible(true);
         }
-        else
-            SetCursorVisible(true);
         break;
     }
 }
@@ -683,7 +687,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONUP:
         SetMouseButton(1 << (evt.button.button - 1), false);
         break;
-                
+        
     case SDL_MOUSEWHEEL:
         SetMouseWheel(evt.wheel.y);
         break;
