@@ -50,7 +50,6 @@ elseif (MINGW)
 else ()
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
-    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
     set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Bin)
 endif ()
 
