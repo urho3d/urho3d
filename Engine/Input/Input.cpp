@@ -118,13 +118,14 @@ void Input::Update()
     if (activated_)
         MakeActive();
     
-    // Finally send mouse move event
+    // Finally send the mouse move event if motion has been accumulated
     if (active_)
     {
-        // Recenter the mouse cursor manually if cursor clipping is in effect
+        // Require the operating system cursor to be hidden first
         IntVector2 mousePos = GetMousePosition();
-        mouseMove_ = mousePos - lastMousePosition_;
-        
+        mouseMove_ = (!showCursor_) ? mousePos - lastMousePosition_ : IntVector2::ZERO;
+                
+        // Recenter the mouse cursor manually if cursor clipping is in effect
         if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
         {
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
@@ -312,17 +313,14 @@ void Input::Initialize()
     
     graphics_ = graphics;
     
-    // In fullscreen mode there is no initial window activation message. Therefore assume activation
-    #ifndef USE_SDL
-    if (graphics_->GetFullscreen())
-        activated_ = true;
-    #else
+    #ifdef USE_SDL
     // Enable translated keyboard input
     SDL_EnableUNICODE(SDL_TRUE);
-    // Set initial center position
-    SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-    showCursor_ = false;
     #endif
+    // Set the initial activation
+    MakeActive();
+    SetClipCursor(clipCursor_);
+    SetCursorVisible(false);    
     
     initialized_ = true;
     
@@ -339,9 +337,13 @@ void Input::MakeActive()
     active_ = true;
     activated_ = false;
     
-    // Re-establish mouse cursor clipping if necessary
-    SetClipCursor(clipCursor_);
-    SetCursorVisible(false);
+    // Re-establish mouse cursor clipping immediately in fullscreen. In windowed mode, require a mouse click inside the window 
+    // to not confuse with title bar drag
+    if (graphics_->GetFullscreen())
+    {
+        SetClipCursor(clipCursor_);
+        SetCursorVisible(false);
+    }
     
     using namespace Activation;
     
@@ -397,6 +399,14 @@ void Input::SetMouseButton(int button, bool newState)
     if ((newState) && (!active_))
         return;
     
+    // If we are still showing the cursor (waiting for a click inside window), hide it now and disregard this click
+    if ((newState) && (showCursor_))
+    {
+        SetClipCursor(clipCursor_);
+        SetCursorVisible(false);
+        return;
+    }
+        
     if (newState)
     {
         if (!(mouseButtonDown_ & button))
@@ -421,7 +431,7 @@ void Input::SetMouseButton(int button, bool newState)
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
     
     #ifndef USE_SDL
-    // In non-confined mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
+    // In non-clipped mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
     if ((graphics_) && (!clipCursor_))
     {
         if (mouseButtonDown_)
@@ -434,6 +444,10 @@ void Input::SetMouseButton(int button, bool newState)
 
 void Input::SetKey(int key, int scanCode, bool newState)
 {
+    // If we are not active yet, do not react to the key down
+    if ((newState) && (!active_))
+        return;
+    
     bool repeat = false;
     
     if (newState)
@@ -466,6 +480,7 @@ void Input::SetKey(int key, int scanCode, bool newState)
 
 void Input::SetMouseWheel(int delta)
 {
+    // If we are not active yet, do not react to the wheel
     if (!active_)
         return;
     
