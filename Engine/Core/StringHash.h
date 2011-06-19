@@ -91,6 +91,8 @@ public:
     const unsigned* GetData() const { return &value_; }
     /// Return as string
     String ToString() const;
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return value_; }
     
     /// Calculate hash value case-insensitively from a C string
     static unsigned Calculate(const char* str);
@@ -174,6 +176,8 @@ public:
     const unsigned short* GetData() const { return &value_; }
     /// Return as string
     String ToString() const;
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return value_; }
     
     /// Calculate hash value case-insensitively from a C string
     static unsigned short Calculate(const char* str);

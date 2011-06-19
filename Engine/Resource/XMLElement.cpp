@@ -545,7 +545,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
     
-    Vector<String> values = GetAttribute("value").Split(' ');
+    Vector<String> values = GetAttribute("value").Split(';');
     if (values.Size() >= 1)
     {
         ret.type_ = ShortStringHash(values[0]);
