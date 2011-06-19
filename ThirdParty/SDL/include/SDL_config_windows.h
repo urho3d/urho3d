@@ -144,13 +144,19 @@ typedef unsigned int uintptr_t;
 #define HAVE_STDDEF_H	1
 #endif
 
+#define SDL_HAPTIC_DISABLED 1
+#define SDL_JOYSTICK_DISABLED 1
+
+/* Allow disabling of core subsystems */
+#define SDL_JOYSTICK_DISABLED 1
+#define SDL_HAPTIC_DISABLED 1
+#define SDL_POWER_DISABLED 1
+
 /* Enable various audio drivers */
 #define SDL_AUDIO_DRIVER_DSOUND	1
 #define SDL_AUDIO_DRIVER_DUMMY	1
 
 /* Enable various input drivers */
-#define SDL_HAPTIC_DISABLED 1
-#define SDL_JOYSTICK_DISABLED 1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_WINDOWS 1

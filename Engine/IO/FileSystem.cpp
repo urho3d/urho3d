@@ -48,6 +48,10 @@
 #define MAX_PATH 256
 #endif
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+
 #include "DebugNew.h"
 
 OBJECTTYPESTATIC(FileSystem);
@@ -320,9 +324,16 @@ String FileSystem::GetProgramDir()
 {
     char exeName[MAX_PATH];
     exeName[0] = 0;
+    
     #ifdef _WIN32
     GetModuleFileName(0, exeName, MAX_PATH);
-    #else
+    #endif
+    #ifdef __APPLE__
+    unsigned size = MAX_PATH;
+    _NSGetExecutablePath(exeName, &size);
+    printf("NSGetExecutablePath: %s\n", exeName);
+    #endif
+    #ifdef __linux__
     unsigned pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);

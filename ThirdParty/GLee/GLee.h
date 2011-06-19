@@ -41,10 +41,10 @@
 // Do not include OpenGL extensions from the system headers
 #define __glext_h_
 
-#ifdef __WIN32__
+#ifdef _WIN32
 #include <Windows.h>
 #endif
-#if defined(__MACOSX__)
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>

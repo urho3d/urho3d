@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifndef _SDL_config_macosx_h
 #define _SDL_config_macosx_h
 
@@ -108,14 +110,16 @@
 #define HAVE_ATAN 1
 #define HAVE_ATAN2 1
 
+/* Allow disabling of core subsystems */
+#define SDL_JOYSTICK_DISABLED 1
+#define SDL_HAPTIC_DISABLED 1
+#define SDL_POWER_DISABLED 1
+
 /* Enable various audio drivers */
 #define SDL_AUDIO_DRIVER_COREAUDIO	1
-#define SDL_AUDIO_DRIVER_DISK	1
 #define SDL_AUDIO_DRIVER_DUMMY	1
 
 /* Enable various input drivers */
-#define SDL_JOYSTICK_IOKIT	1
-#define SDL_HAPTIC_IOKIT	1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_DLOPEN	1
@@ -129,21 +133,6 @@
 
 /* Enable various video drivers */
 #define SDL_VIDEO_DRIVER_COCOA	1
-#define SDL_VIDEO_DRIVER_DUMMY	1
-#define SDL_VIDEO_DRIVER_X11 1
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC "/usr/X11R6/lib/libX11.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XEXT "/usr/X11R6/lib/libXext.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINERAMA "/usr/X11R6/lib/libXinerama.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT "/usr/X11R6/lib/libXi.6.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR "/usr/X11R6/lib/libXrandr.2.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS "/usr/X11R6/lib/libXss.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_DYNAMIC_XVIDMODE "/usr/X11R6/lib/libXxf86vm.1.dylib"
-#define SDL_VIDEO_DRIVER_X11_XINERAMA 1
-#define SDL_VIDEO_DRIVER_X11_XINPUT 1
-#define SDL_VIDEO_DRIVER_X11_XRANDR 1
-#define SDL_VIDEO_DRIVER_X11_XSCRNSAVER 1
-#define SDL_VIDEO_DRIVER_X11_XSHAPE 1
-#define SDL_VIDEO_DRIVER_X11_XVIDMODE 1
 
 #ifndef SDL_VIDEO_RENDER_OGL
 #define SDL_VIDEO_RENDER_OGL	1

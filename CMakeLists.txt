@@ -48,8 +48,9 @@ elseif (MINGW)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
     set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Bin)
 else ()
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof -m32")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    # set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
     set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/Bin)
 endif ()
 
@@ -82,7 +83,6 @@ macro (finalize_lib)
         set_target_properties (${TARGET_NAME} PROPERTIES STATIC_LIBRARY_FLAGS_RELEASE "/LTCG")
     endif ()
 endmacro ()
-
 
 # Macro for model asset compilation
 macro (add_model NAME PARAMETERS)
