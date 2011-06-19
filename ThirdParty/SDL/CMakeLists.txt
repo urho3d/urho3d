@@ -22,9 +22,9 @@ endif ()
 
 file (GLOB H_FILES include/*.h)
 
+set_source_files_properties (${C_FILES} PROPERTIES LANGUAGE C)
+set_source_files_properties (${SYS_FILES} PROPERTIES LANGUAGE C)
 set (SOURCE_FILES ${C_FILES} ${SYS_C_FILES} ${H_FILES})
-
-set_source_files_properties (${SOURCE_FILES} PROPERTIES LANGUAGE C)
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})

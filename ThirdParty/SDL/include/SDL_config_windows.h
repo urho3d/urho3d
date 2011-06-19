@@ -144,9 +144,6 @@ typedef unsigned int uintptr_t;
 #define HAVE_STDDEF_H	1
 #endif
 
-#define SDL_HAPTIC_DISABLED 1
-#define SDL_JOYSTICK_DISABLED 1
-
 /* Allow disabling of core subsystems */
 #define SDL_JOYSTICK_DISABLED 1
 #define SDL_HAPTIC_DISABLED 1

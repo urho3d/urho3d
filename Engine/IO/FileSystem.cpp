@@ -331,7 +331,6 @@ String FileSystem::GetProgramDir()
     #ifdef __APPLE__
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
-    printf("NSGetExecutablePath: %s\n", exeName);
     #endif
     #ifdef __linux__
     unsigned pid = getpid();

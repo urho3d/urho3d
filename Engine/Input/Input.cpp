@@ -121,6 +121,8 @@ void Input::Update()
     // Finally send mouse move event
     if (active_)
     {
+        // Recenter the mouse cursor manually if cursor clipping is in effect
+        #ifndef USE_SDL
         IntVector2 mousePos = GetMousePosition();
         mouseMove_ = mousePos - lastMousePosition_;
         
@@ -132,6 +134,14 @@ void Input::Update()
         }
         else
             lastMousePosition_ = mousePos;
+        #else
+        if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
+        {
+            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+            SetMousePosition(center);
+            lastMousePosition_ = GetMousePosition();
+        }
+        #endif
         
         if (mouseMove_ != IntVector2::ZERO)
         {
@@ -663,6 +673,13 @@ void Input::HandleSDLEvent(void* sdlEvent)
         
     case SDL_MOUSEBUTTONUP:
         SetMouseButton(1 << (evt.button.button - 1), false);
+        break;
+        
+    case SDL_MOUSEMOTION:
+        mouseMove_.x_ += evt.motion.xrel;
+        mouseMove_.y_ += evt.motion.yrel;
+        lastMousePosition_.x_ = evt.motion.x;
+        lastMousePosition_.y_ = evt.motion.y;
         break;
         
     case SDL_MOUSEWHEEL:

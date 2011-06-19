@@ -299,9 +299,11 @@ SDL_WarpMouseInWindow(SDL_Window * window, int x, int y)
     SDL_Mouse *mouse = SDL_GetMouse();
 
     if (mouse->WarpMouse) {
-        // Urho3D: make sure to update the internal position when the mouse is warped
+        // Urho3D: update the internal position and the relative movement origin when the mouse is warped
         mouse->x = x;
         mouse->y = y;
+        mouse->last_x = x;
+        mouse->last_y = y;
         mouse->WarpMouse(window, x, y);
     } else {
         SDL_SendMouseMotion(window, 0, x, y);
