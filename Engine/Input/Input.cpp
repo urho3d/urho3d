@@ -122,7 +122,6 @@ void Input::Update()
     if (active_)
     {
         // Recenter the mouse cursor manually if cursor clipping is in effect
-        #ifndef USE_SDL
         IntVector2 mousePos = GetMousePosition();
         mouseMove_ = mousePos - lastMousePosition_;
         
@@ -134,17 +133,6 @@ void Input::Update()
         }
         else
             lastMousePosition_ = mousePos;
-        #else
-        // Manual recentering on OS X causes jerky motion; however it is fine on Windows & Linux
-        #ifndef __APPLE__
-        if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
-        {
-            IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            SetMousePosition(center);
-            lastMousePosition_ = GetMousePosition();
-        }
-        #endif
-        #endif
         
         if (mouseMove_ != IntVector2::ZERO)
         {
@@ -169,12 +157,6 @@ void Input::SetClipCursor(bool enable)
     
     if (!graphics_)
         return;
-    
-    // On OS X, use SDL's relative mode instead of manual recentering
-    #if defined(USE_SDL) && defined(__APPLE__)
-    SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
-    return;
-    #endif
     
     if ((!graphics_->GetFullscreen()) && (active_) && (clipCursor_))
     {
@@ -383,8 +365,8 @@ void Input::MakeInactive()
     #ifndef USE_SDL
     ReleaseCapture();
     ClipCursor(0);
-    SetCursorVisible(true);
     #endif
+    SetCursorVisible(true);
     
     using namespace Activation;
     
@@ -686,14 +668,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     case SDL_MOUSEBUTTONUP:
         SetMouseButton(1 << (evt.button.button - 1), false);
         break;
-        
-    case SDL_MOUSEMOTION:
-        mouseMove_.x_ += evt.motion.xrel;
-        mouseMove_.y_ += evt.motion.yrel;
-        lastMousePosition_.x_ = evt.motion.x;
-        lastMousePosition_.y_ = evt.motion.y;
-        break;
-        
+                
     case SDL_MOUSEWHEEL:
         SetMouseWheel(evt.wheel.y);
         break;

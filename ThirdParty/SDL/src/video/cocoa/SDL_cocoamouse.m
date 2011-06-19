@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Öörni for Urho3D
+
 #include "SDL_config.h"
 
 #include "SDL_events.h"
@@ -145,6 +148,9 @@ Cocoa_InitMouse(_THIS)
     mouse->SetRelativeMouseMode = Cocoa_SetRelativeMouseMode;
 
     SDL_SetDefaultCursor(Cocoa_CreateDefaultCursor());
+    
+    // Urho3D: set the local events suppression interval to zero so that there is no delay when warping the mouse
+    CGSetLocalEventsSuppressionInterval(0);
 }
 
 static int
