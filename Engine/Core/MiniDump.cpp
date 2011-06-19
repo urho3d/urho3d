@@ -34,11 +34,6 @@
 #include <time.h>
 #include <Windows.h>
 #include <DbgHelp.h>
-
-// Enable SHGetSpecialFolderPath on MinGW
-#ifndef _MSC_VER
-#define _WIN32_IE 0x0400
-#endif
 #include <ShlObj.h>
 
 static bool miniDumpWritten = false;

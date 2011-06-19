@@ -150,7 +150,7 @@ bool Model::Load(Deserializer& source)
         unsigned indexSize = source.ReadUInt();
         
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
-        buffer->SetSize(indexCount, indexSize);
+        buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
         
         unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
         if (data)

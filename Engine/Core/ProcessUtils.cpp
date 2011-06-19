@@ -28,7 +28,7 @@
 #include <cstdio>
 #include <fcntl.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <io.h>
 #else
@@ -48,7 +48,7 @@ static Mutex staticMutex;
 
 void ErrorDialog(const char* title, const char* message)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     MessageBox(0, message, title, 0);
     #else
     printf("%s\n", message);
@@ -63,7 +63,7 @@ void ErrorExit(const String& message, int exitCode)
 
 void OpenConsoleWindow()
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     if (consoleOpened)
         return;
     
@@ -152,7 +152,7 @@ String GetConsoleInput()
 {
     String ret;
     
-    #ifdef WIN32
+    #ifdef _WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE)
         return ret;

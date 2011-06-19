@@ -48,8 +48,6 @@ public:
     
     /// Set buffer size and dynamic mode. Previous data will be lost
     bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
-    /// Set buffer size and dynamic mode. Previous data will be lost
-    bool SetSize(unsigned indexCount, unsigned indexSize, bool dynamic = false);
     /// Set all data in the buffer
     bool SetData(const void* data);
     /// Set a data range in the buffer

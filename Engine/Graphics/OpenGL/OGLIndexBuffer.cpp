@@ -96,20 +96,9 @@ void IndexBuffer::Release()
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
 {
-    return SetSize(indexCount, largeIndices ? sizeof(unsigned) : sizeof(unsigned short), dynamic);
-}
-
-bool IndexBuffer::SetSize(unsigned indexCount, unsigned indexSize, bool dynamic)
-{
-    if ((indexSize != sizeof(unsigned)) && (indexSize != sizeof(unsigned short)))
-    {
-        LOGERROR("Index size not 2 or 4 bytes");
-        return false;
-    }
-    
     dynamic_ = dynamic;
     indexCount_ = indexCount;
-    indexSize_ = indexSize;
+    indexSize_ = largeIndices ? sizeof(unsigned) : sizeof(unsigned short);
     
     return Create();
 }
