@@ -122,24 +122,25 @@ bool Model::Load(Deserializer& source)
                 memcpy(morphResetData.GetPtr(), &data[morphStart * vertexSize], morphCount * vertexSize);
                 buffer->SetMorphRangeResetData(morphResetData);
             }
+
+            // Copy the raw position data for CPU-side operations
+            SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
+            float* rawDest = (float*)rawVertexData.GetPtr();
+            for (unsigned i = 0; i < vertexCount; ++i)
+            {
+                float* rawSrc = (float*)&data[i * vertexSize];
+                *rawDest++ = *rawSrc++;
+                *rawDest++ = *rawSrc++;
+                *rawDest++ = *rawSrc++;
+            }
+            rawVertexDatas.Push(rawVertexData);
+            
             buffer->Unlock();
         }
         else
             return false;
         
         vertexBuffers_.Push(buffer);
-        
-        // Copy the raw position data for CPU-side operations
-        SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
-        float* rawDest = (float*)rawVertexData.GetPtr();
-        for (unsigned i = 0; i < vertexCount; ++i)
-        {
-            float* rawSrc = (float*)&data[i * vertexSize];
-            *rawDest++ = *rawSrc++;
-            *rawDest++ = *rawSrc++;
-            *rawDest++ = *rawSrc++;
-        }
-        rawVertexDatas.Push(rawVertexData);
     }
     
     // Read index buffers
@@ -156,17 +157,18 @@ bool Model::Load(Deserializer& source)
         if (data)
         {
             source.Read(data, indexCount * indexSize);
+
+            // Copy the raw index data for CPU-side operations
+            SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
+            memcpy(rawIndexData.GetPtr(), data, indexSize * indexCount);
+            rawIndexDatas.Push(rawIndexData);
+
             buffer->Unlock();
         }
         else
             return false;
         
         indexBuffers_.Push(buffer);
-        
-        // Copy the raw index data for CPU-side operations
-        SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
-        memcpy(rawIndexData.GetPtr(), data, indexSize * indexCount);
-        rawIndexDatas.Push(rawIndexData);
     }
     
     // Read geometries
