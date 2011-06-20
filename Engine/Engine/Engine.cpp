@@ -81,7 +81,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     RenderMode mode = RENDER_FORWARD;
     int width = 0;
     int height = 0;
-    int multiSample = 0;
+    int multiSample = 1;
     bool fullscreen = true;
     bool vsync = false;
     bool forceSM2 = false;

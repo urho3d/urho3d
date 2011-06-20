@@ -170,11 +170,20 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
 {
     PROFILE(SetScreenMode);
     
-    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) && (vsync == vsync_)
-        && (multiSample == multiSample_))
+    multiSample = Clamp(multiSample, 1, 16);
+    
+    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) &&
+        (vsync == vsync_) && (multiSample == multiSample_))
         return true;
     
-    multiSample = Clamp(multiSample, 1, 16);
+    // If only vsync changes, do not destroy/recreate the context
+    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) &&
+        (multiSample == multiSample_) && (vsync != vsync_))
+    {
+        SDL_GL_SetSwapInterval(vsync ? 1 : 0);
+        vsync_ = vsync;
+        return true;
+    }
     
     // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
     if ((!width) || (!height))

@@ -303,10 +303,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Check for toggling the console
     if (eventData["Key"].GetInt() == KEY_F1)
-    {
         console.Toggle();
-        input.SuppressNextChar();
-    }
 }
 
 void HandleMouseMove(StringHash eventType, VariantMap& eventData)

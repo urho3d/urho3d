@@ -354,8 +354,8 @@ Screen resolution, fullscreen/windowed, vertical sync, forward/deferred mode, an
 
 When setting the initial screen mode, Graphics does a few checks:
 
-- For Direct3D9, it checks which shader model is supported? 2.0 is minimum, but 3.0 will be used if available. Shader model 2.0 can be forced by calling setForceSM2() before calling setMode() for the first time. 
-- For OpenGL, version 2.0 is required as a minimum. Shadows and deferred rendering additionally require the frame buffer object extension.
+- For Direct3D9, it checks which shader model is supported. 2.0 is minimum, but 3.0 will be used if available. %Shader model 2.0 can be forced by calling \ref Graphics::SetForceSM2() "SetForceSM2()" before calling SetMode() for the first time.
+- For OpenGL, version 2.0 is required as a minimum. Shadows and deferred rendering additionally require the frame buffer object and packed depth stencil extensions.
 - Are multiple render targets supported? If not, only forward rendering will be available.
 - Are hardware shadow maps supported? Both ATI & NVIDIA style shadow maps can be used. If neither are available, shadow rendering will be disabled.
 
@@ -373,7 +373,7 @@ The steps for rendering each viewport on each frame are roughly the following:
 - Construct render operations (batches) for the visible objects.
 - Perform these render operations during the rendering step at the end of the frame.
 
-For opaque, non-skinned geometry, batches using the same material and same vertex/index buffers are automatically grouped together for hardware instancing when SM3.0 hardware is available. This reduces the actual draw call count needed.
+For opaque, non-skinned geometry, batches using the same material and same vertex/index buffers are automatically grouped together for hardware instancing when SM3.0 hardware is available. This reduces the actual draw call count needed. Even when instancing is not available, the CPU load is slightly reduced as the rendering state only needs to be checked for each group, not each draw call.
 
 The rendering operations are divided into passes in the following order:
 
@@ -427,7 +427,7 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 - In deferred rendering, OpenGL does not need to allocate a separate render target for linear depth. Instead the hardware depth buffer will be read directly, and linear depth will be reconstructed in the pixel shader. This results in less GPU memory bandwidth needed, but can introduce inaccuracy to depth calculations.
 
-- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents.
+- On OpenGL there is never a "device lost" condition, which would cause dynamic textures or vertex/index buffers to lose their contents. However, when the screen mode is changed, the context (along with all GPU resources) will be manually destroyed and recreated. This would be strictly necessary only when changing the multisampling mode, but as bugs may otherwise occur with some GPU drivers, it is best to do for any mode change. 
 
 - At least for now, instancing is not supported for OpenGL. It still benefits from the instance group rendering loop, which only changes the model transform for each object with the same material and light, instead of setting the whole renderstate.
 
