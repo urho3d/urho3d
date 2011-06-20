@@ -34,7 +34,7 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// Audio subsystem
+/// Audio subsystem. Uses either DirectSound or SDL for sound output
 #ifndef USE_SDL
 class Audio : public Object, public Thread
 #else

@@ -44,7 +44,7 @@ struct WavHeader
     unsigned char formatText_[4];
     unsigned formatLength_;
     unsigned short format_;
-    unsigned short soundSources_;
+    unsigned short channels_;
     unsigned frequency_;
     unsigned avgBytes_;
     unsigned short blockAlign_;
@@ -163,7 +163,7 @@ bool Sound::LoadWav(Deserializer& source)
     
     // Read the FORMAT chunk
     header.format_ = source.ReadUShort();
-    header.soundSources_ = source.ReadUShort();
+    header.channels_ = source.ReadUShort();
     header.frequency_ = source.ReadUInt();
     header.avgBytes_ = source.ReadUInt();
     header.blockAlign_ = source.ReadUShort();
@@ -198,7 +198,7 @@ bool Sound::LoadWav(Deserializer& source)
     // Allocate sound and load audio data
     unsigned length = header.dataLength_;
     SetSize(length);
-    SetFormat(header.frequency_, header.bits_ == 16, header.soundSources_ == 2);
+    SetFormat(header.frequency_, header.bits_ == 16, header.channels_ == 2);
     source.Read(data_.GetPtr(), length);
     
     // Convert 8-bit audio to signed

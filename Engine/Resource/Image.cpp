@@ -34,14 +34,6 @@
 
 #include "DebugNew.h"
 
-#ifndef DUMMYUNIONNAMEN
-#if defined(__cplusplus) || !defined(NONAMELESSUNION)
-#define DUMMYUNIONNAMEN(n)
-#else
-#define DUMMYUNIONNAMEN(n) u##n
-#endif
-#endif
-
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
 #endif
@@ -52,118 +44,122 @@
 #define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
 
-typedef struct _DDCOLORKEY
+/// DirectDraw surface color key
+struct DDColorKey
 {
-    unsigned dwColorSpaceLowValue;
-    unsigned dwColorSpaceHighValue;
-} DDCOLORKEY;
+    unsigned dwColorSpaceLowValue_;
+    unsigned dwColorSpaceHighValue_;
+};
 
-typedef struct _DDPIXELFORMAT
+/// DirectDraw surface pixel format
+struct DDPixelFormat
 {
-    unsigned dwSize;
-    unsigned dwFlags;
-    unsigned dwFourCC;
+    unsigned dwSize_;
+    unsigned dwFlags_;
+    unsigned dwFourCC_;
     union
     {
-        unsigned dwRGBBitCount;
-        unsigned dwYUVBitCount;
-        unsigned dwZBufferBitDepth;
-        unsigned dwAlphaBitDepth;
-        unsigned dwLuminanceBitCount;
-        unsigned dwBumpBitCount;
-        unsigned dwPrivateFormatBitCount;
-    } DUMMYUNIONNAMEN(1);
+        unsigned dwRGBBitCount_;
+        unsigned dwYUVBitCount_;
+        unsigned dwZBufferBitDepth_;
+        unsigned dwAlphaBitDepth_;
+        unsigned dwLuminanceBitCount_;
+        unsigned dwBumpBitCount_;
+        unsigned dwPrivateFormatBitCount_;
+    };
     union
     {
-        unsigned dwRBitMask;
-        unsigned dwYBitMask;
-        unsigned dwStencilBitDepth;
-        unsigned dwLuminanceBitMask;
-        unsigned dwBumpDuBitMask;
-        unsigned dwOperations;
-    } DUMMYUNIONNAMEN(2);
+        unsigned dwRBitMask_;
+        unsigned dwYBitMask_;
+        unsigned dwStencilBitDepth_;
+        unsigned dwLuminanceBitMask_;
+        unsigned dwBumpDuBitMask_;
+        unsigned dwOperations_;
+    };
     union
     {
-        unsigned dwGBitMask;
-        unsigned dwUBitMask;
-        unsigned dwZBitMask;
-        unsigned dwBumpDvBitMask;
+        unsigned dwGBitMask_;
+        unsigned dwUBitMask_;
+        unsigned dwZBitMask_;
+        unsigned dwBumpDvBitMask_;
         struct
         {
-            unsigned short wFlipMSTypes;
-            unsigned short wBltMSTypes;
-        } MultiSampleCaps;
-    } DUMMYUNIONNAMEN(3);
+            unsigned short wFlipMSTypes_;
+            unsigned short wBltMSTypes_;
+        } multiSampleCaps_;
+    };
     union
     {
-        unsigned dwBBitMask;
-        unsigned dwVBitMask;
-        unsigned dwStencilBitMask;
-        unsigned dwBumpLuminanceBitMask;
-    } DUMMYUNIONNAMEN(4);
+        unsigned dwBBitMask_;
+        unsigned dwVBitMask_;
+        unsigned dwStencilBitMask_;
+        unsigned dwBumpLuminanceBitMask_;
+    };
     union
     {
-        unsigned dwRGBAlphaBitMask;
-        unsigned dwYUVAlphaBitMask;
-        unsigned dwLuminanceAlphaBitMask;
-        unsigned dwRGBZBitMask;
-        unsigned dwYUVZBitMask;
-    } DUMMYUNIONNAMEN(5);
-} DDPIXELFORMAT;
+        unsigned dwRGBAlphaBitMask_;
+        unsigned dwYUVAlphaBitMask_;
+        unsigned dwLuminanceAlphaBitMask_;
+        unsigned dwRGBZBitMask_;
+        unsigned dwYUVZBitMask_;
+    };
+};
 
-typedef struct _DDSCAPS2
+/// DirectDraw surface capabilities
+struct DDSCaps2
 {
-    unsigned dwCaps;
-    unsigned dwCaps2;
-    unsigned dwCaps3;
+    unsigned dwCaps_;
+    unsigned dwCaps2_;
+    unsigned dwCaps3_;
     union
     {
-        unsigned dwCaps4;
-        unsigned dwVolumeDepth;
-    } DUMMYUNIONNAMEN(1);
-} DDSCAPS2;
+        unsigned dwCaps4_;
+        unsigned dwVolumeDepth_;
+    };
+};
 
-typedef struct _DDSURFACEDESC2
+/// DirectDraw surface description
+struct DDSurfaceDesc2
 {
-    unsigned dwSize;
-    unsigned dwFlags;
-    unsigned dwHeight;
-    unsigned dwWidth;
+    unsigned dwSize_;
+    unsigned dwFlags_;
+    unsigned dwHeight_;
+    unsigned dwWidth_;
     union
     {
-        long lPitch;
-        unsigned dwLinearSize;
-    } DUMMYUNIONNAMEN(1);
+        long lPitch_;
+        unsigned dwLinearSize_;
+    };
     union
     {
-        unsigned dwBackBufferCount;
-        unsigned dwDepth;
-    } DUMMYUNIONNAMEN(5);
+        unsigned dwBackBufferCount_;
+        unsigned dwDepth_;
+    };
     union
     {
-        unsigned dwMipMapCount;
-        unsigned dwRefreshRate;
-        unsigned dwSrcVBHandle;
-    } DUMMYUNIONNAMEN(2);
-    unsigned dwAlphaBitDepth;
-    unsigned dwReserved;
-    void* lpSurface;
+        unsigned dwMipMapCount_;
+        unsigned dwRefreshRate_;
+        unsigned dwSrcVBHandle_;
+    };
+    unsigned dwAlphaBitDepth_;
+    unsigned dwReserved_;
+    void* lpSurface_;
     union
     {
-        DDCOLORKEY ddckCKDestOverlay;
-        unsigned dwEmptyFaceColor;
-    } DUMMYUNIONNAMEN(3);
-    DDCOLORKEY ddckCKDestBlt;
-    DDCOLORKEY ddckCKSrcOverlay;
-    DDCOLORKEY ddckCKSrcBlt;
+        DDColorKey ddckCKDestOverlay_;
+        unsigned dwEmptyFaceColor_;
+    };
+    DDColorKey ddckCKDestBlt_;
+    DDColorKey ddckCKSrcOverlay_;
+    DDColorKey ddckCKSrcBlt_;
     union
     {
-        DDPIXELFORMAT ddpfPixelFormat;
-        unsigned dwFVF;
-    } DUMMYUNIONNAMEN(4);
-    DDSCAPS2 ddsCaps;
-    unsigned dwTextureStage;
-} DDSURFACEDESC2;
+        DDPixelFormat ddpfPixelFormat_;
+        unsigned dwFVF_;
+    };
+    DDSCaps2 ddsCaps_;
+    unsigned dwTextureStage_;
+};
 
 OBJECTTYPESTATIC(Image);
 
@@ -206,10 +202,10 @@ bool Image::Load(Deserializer& source)
     else
     {
         // DDS compressed format
-        DDSURFACEDESC2 ddsd;
+        DDSurfaceDesc2 ddsd;
         source.Read(&ddsd, sizeof(ddsd));
         
-        switch (ddsd.ddpfPixelFormat.dwFourCC)
+        switch (ddsd.ddpfPixelFormat_.dwFourCC_)
         {
         case FOURCC_DXT1:
             compressedFormat_ = CF_DXT1;
@@ -233,9 +229,9 @@ bool Image::Load(Deserializer& source)
 
         unsigned dataSize = source.GetSize() - source.GetPosition();
         data_ = new unsigned char[dataSize];
-        width_ = ddsd.dwWidth;
-        height_ = ddsd.dwHeight;
-        numCompressedLevels_ = ddsd.dwMipMapCount;
+        width_ = ddsd.dwWidth_;
+        height_ = ddsd.dwHeight_;
+        numCompressedLevels_ = ddsd.dwMipMapCount_;
         if (!numCompressedLevels_)
             numCompressedLevels_ = 1;
         SetMemoryUse(dataSize);
