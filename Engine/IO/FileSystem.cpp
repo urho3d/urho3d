@@ -29,6 +29,7 @@
 #include "SharedArrayPtr.h"
 
 #include <cstdio>
+#include <cstring>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -45,6 +46,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #define MAX_PATH 256
 #endif
 
@@ -125,11 +127,11 @@ int FileSystem::SystemCommand(const String& commandLine)
 
 int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
 {
-    #ifdef _WIN32
     if (allowedPaths_.Empty())
     {
         String fixedFileName = GetNativePath(fileName);
         
+        #ifdef _WIN32
         PODVector<const char*> argPtrs;
         argPtrs.Push(fixedFileName.CString());
         for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -137,17 +139,37 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
         argPtrs.Push(0);
         
         return _spawnv(_P_WAIT, fixedFileName.CString(), &argPtrs[0]);
+        #else
+        pid_t pid = fork();
+        if (!pid)
+        {
+            PODVector<const char*> argPtrs;
+            argPtrs.Push(fixedFileName.CString());
+            for (unsigned i = 0; i < arguments.Size(); ++i)
+                argPtrs.Push(arguments[i].CString());
+            argPtrs.Push(0);    
+
+            execvp(argPtrs[0], (char**)&argPtrs[0]);     
+            return -1; // Return -1 if we could not spawn the process 
+        }
+        else if (pid > 0)
+        {
+            int exitCode;
+            wait(&exitCode);
+            return exitCode ? 1 : 0;
+        }
+        else
+        {
+            LOGERROR("Failed to fork");
+            return -1;
+        }
+        #endif
     }
     else
     {
         LOGERROR("Executing an external command is not allowed");
         return -1;
     }
-    #else
-    /// \todo Implement on Unix-like systems
-    LOGERROR("SystemRun not implemented");
-    return false;
-    #endif
 }
 
 bool FileSystem::SystemOpen(const String& fileName, const String& mode)
@@ -264,6 +286,7 @@ bool FileSystem::CheckAccess(const String& pathName)
     for (Set<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
         if (fixedPath.Find(*i) == 0)
+
             return true;
     }
     
@@ -323,7 +346,7 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 String FileSystem::GetProgramDir()
 {
     char exeName[MAX_PATH];
-    exeName[0] = 0;
+    memset(exeName, 0, MAX_PATH);
     
     #ifdef _WIN32
     GetModuleFileName(0, exeName, MAX_PATH);
@@ -333,7 +356,7 @@ String FileSystem::GetProgramDir()
     _NSGetExecutablePath(exeName, &size);
     #endif
     #ifdef __linux__
-    unsigned pid = getpid();
+    pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
     #endif
