@@ -255,11 +255,11 @@ void SubscribeToEvents()
 }
 \endcode
 
-The event handler function needs to have a specific signature. If event type and parameters are not needed, "void HandleEvent()", or "void HandleEvent(StringHash eventType, VariantMap& eventData)" if they are.
+The event handler function needs to have a specific signature. If event type and parameters are not needed, "void HandleEvent()", or if they are, "void HandleEvent(StringHash eventType, VariantMap& eventData)". We might want to expand the application later, so we use the latter form.
 
-We might want to expand the application later, so we use the latter form. The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's \ref Engine::Exit() "Exit()" function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
+The current frame's delta time is sent in the update event's parameters, and that will be useful when animating the scene. For now the event handler simply checks from the Input subsystem if the ESC key has been pressed; if it is, the Engine subsystem's \ref Engine::Exit() "Exit()" function will be called. This closes the application window and causes Urho3D.exe to exit after the current main loop iteration finishes.
 
-Note that we could also subscribe to the "KeyDown" event sent by the Input subsystem.
+To get the ESC keypress without having to poll it for each frame, we could also subscribe to the "KeyDown" event sent by the Input subsystem.
 
 \code
 void HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -25,12 +25,12 @@ add_definitions (-DENABLE_PROFILING)
 # If not on Windows, enable use of SDL and OpenGL instead of Direct3D9 (so called "Turso3D" mode.)
 # Setting this on Windows is not recommended, as graphics card drivers are usually better optimized 
 # for Direct3D.
-#if (UNIX)
+if (UNIX)
     set (USE_SDL 1)
     set (USE_OPENGL 1)
     add_definitions (-DUSE_SDL)
     add_definitions (-DUSE_OPENGL)
-#endif ()
+endif ()
 
 # Compiler-specific options
 if (MSVC)
