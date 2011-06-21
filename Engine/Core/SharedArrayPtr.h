@@ -178,7 +178,7 @@ private:
                 }
             }
             
-            if ((!refCount_->refs_) && (!refCount_->weakRefs_))
+            if (!refCount_->refs_ && !refCount_->weakRefs_)
                 delete refCount_;
         }
         
@@ -246,7 +246,7 @@ public:
     /// Assign from a shared array pointer
     WeakArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
     {
-        if ((ptr_ == rhs.GetPtr()) && (refCount_ == rhs.GetRefCountPtr()))
+        if (ptr_ == rhs.GetPtr() && refCount_ == rhs.GetRefCountPtr())
             return *this;
         
         Release();
@@ -262,7 +262,7 @@ public:
     /// Assign from another weak array pointer
     WeakArrayPtr<T>& operator = (const WeakArrayPtr<T>& rhs)
     {
-        if ((ptr_ == rhs.ptr_) && (refCount_ == rhs.refCount_))
+        if (ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_)
             return *this;
         
         Release();
@@ -312,9 +312,9 @@ public:
     }
     
     /// Test for equality with another weak array pointer
-    bool operator == (const WeakArrayPtr<T>& rhs) const { return (ptr_ == rhs.ptr_) && (refCount_ == rhs.refCount_); }
+    bool operator == (const WeakArrayPtr<T>& rhs) const { return ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_; }
     /// Test for inequality with another weak array pointer
-    bool operator != (const WeakArrayPtr<T>& rhs) const { return (ptr_ != rhs.ptr_) || (refCount_ != rhs.refCount_); }
+    bool operator != (const WeakArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak array pointer
     bool operator < (const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an array which is not expired
@@ -382,7 +382,7 @@ private:
             if (refCount_->weakRefs_)
                 --(refCount_->weakRefs_);
             
-            if ((!refCount_->refs_) && (!refCount_->weakRefs_))
+            if (!refCount_->refs_ && !refCount_->weakRefs_)
                 delete refCount_;
         }
         

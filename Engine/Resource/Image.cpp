@@ -243,10 +243,10 @@ bool Image::Load(Deserializer& source)
 
 void Image::SetSize(unsigned width, unsigned height, unsigned components)
 {
-    if ((width == width_) && (height == height_) && (components == components_))
+    if (width == width_ && height == height_ && components == components_)
         return;
     
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0)
         return;
     
     data_ = new unsigned char[width * height * components];
@@ -267,7 +267,7 @@ void Image::SetData(const unsigned char* pixelData)
 bool Image::SaveBMP(const String& fileName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if ((fileSystem) && (!fileSystem->CheckAccess(GetPath(fileName))))
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         LOGERROR("Access denied to " + fileName);
         return false;
@@ -288,7 +288,7 @@ bool Image::SaveBMP(const String& fileName)
 bool Image::SaveTGA(const String& fileName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if ((fileSystem) && (!fileSystem->CheckAccess(GetPath(fileName))))
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         LOGERROR("Access denied to " + fileName);
         return false;
@@ -330,7 +330,7 @@ SharedPtr<Image> Image::GetNextLevel() const
         LOGERROR("Can not generate mip level from compressed data");
         return SharedPtr<Image>();
     }
-    if ((components_ < 1) || (components_ > 4))
+    if (components_ < 1 || components_ > 4)
     {
         LOGERROR("Illegal number of image components for mip level generation");
         return SharedPtr<Image>();
@@ -351,7 +351,7 @@ SharedPtr<Image> Image::GetNextLevel() const
     unsigned char* pixelDataOut = mipImage->data_.GetPtr();
     
     // 1D case
-    if ((height_ == 1) || (width_ == 1))
+    if (height_ == 1 || width_ == 1)
     {
         // Loop using the larger dimension
         if (widthOut < heightOut) 
@@ -481,7 +481,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
     
     level.width_ = width_;
     level.height_ = height_;
-    level.blockSize_ = (compressedFormat_ == CF_DXT1) ? 8 : 16;
+    level.blockSize_ = compressedFormat_ == CF_DXT1 ? 8 : 16;
     unsigned i = 0;
     unsigned offset = 0;
     

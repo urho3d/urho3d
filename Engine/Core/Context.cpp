@@ -70,7 +70,7 @@ void Context::RegisterSubsystem(Object* object)
 void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo& attr)
 {
     // None or Pointer types can not be supported
-    if ((attr.type_ == VAR_NONE) || (attr.type_ == VAR_PTR))
+    if (attr.type_ == VAR_NONE || attr.type_ == VAR_PTR)
         return;
     
     attributes_[objectType].Push(attr);
@@ -204,5 +204,5 @@ const String& Context::GetTypeName(ShortStringHash type) const
 {
     // Search factories to find the hash-to-name mapping
     Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories_.Find(type);
-    return (i != factories_.End()) ? i->second_->GetTypeName() : noType;
+    return i != factories_.End() ? i->second_->GetTypeName() : noType;
 }

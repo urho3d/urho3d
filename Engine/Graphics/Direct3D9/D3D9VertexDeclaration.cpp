@@ -129,7 +129,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<VertexBuff
             {
                 VertexElement element = (VertexElement)j;
                 
-                if ((elementMask & (1 << j)) && (!(usedElementMask & (1 << j))))
+                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
                 {
                     VertexDeclarationElement newElement;
                     newElement.stream_ = i;
@@ -170,7 +170,7 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
             {
                 VertexElement element = (VertexElement)j;
                 
-                if ((elementMask & (1 << j)) && (!(usedElementMask & (1 << j))))
+                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
                 {
                     VertexDeclarationElement newElement;
                     newElement.stream_ = i;

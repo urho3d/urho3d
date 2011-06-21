@@ -121,7 +121,7 @@ void Skeleton::Reset()
 {
     for (Vector<Bone>::Iterator i = bones_.Begin(); i != bones_.End(); ++i)
     {
-        if ((i->animated_) && (i->node_))
+        if (i->animated_ && i->node_)
             i->node_->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
     }
 }

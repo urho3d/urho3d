@@ -65,7 +65,7 @@ void Run(const Vector<String>& arguments)
         ErrorExit("Could not load input file " + arguments[0]);
     
     unsigned comp = image.GetComponents();
-    if ((comp < 3) && (comp > 4))
+    if (comp < 3 && comp > 4)
         ErrorExit("Image must contain 3 or 4 components");
     
     SharedArrayPtr<unsigned char> buffer(new unsigned char[image.GetWidth() * image.GetHeight() * 4]);

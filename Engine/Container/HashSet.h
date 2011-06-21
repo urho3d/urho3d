@@ -376,7 +376,7 @@ private:
     Node* EraseNode(Node* toRemove)
     {
         // The tail node can not be removed
-        if ((!toRemove) || (toRemove == tail_))
+        if (!toRemove || toRemove == tail_)
             return Tail();
         
         Node* prev = toRemove->Prev();

@@ -109,7 +109,7 @@ XMLElement XMLFile::GetRootElement(const String& name)
 {
     XMLElement rootElem = XMLElement(this, document_->RootElement());
     
-    if ((rootElem.IsNull()) || ((!name.Empty()) && (rootElem.GetName() != name)))
+    if (rootElem.IsNull() || (!name.Empty() && rootElem.GetName() != name))
         return XMLElement();
     return rootElem;
 }

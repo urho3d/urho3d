@@ -46,11 +46,11 @@ float Ray::Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) con
         // Calculate u & v parameters and test
         Vector3 t = origin_ - v0;
         float u = t.DotProduct(p);
-        if ((u >= 0.0f) && (u <= det))
+        if (u >= 0.0f && u <= det)
         {
             Vector3 q = t.CrossProduct(edge1);
             float v = direction_.DotProduct(q);
-            if ((v >= 0.0f) && (u + v <= det))
+            if (v >= 0.0f && u + v <= det)
             {
                 // There is an intersection, so calculate distance
                 return edge2.DotProduct(q) / det;

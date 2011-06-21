@@ -161,17 +161,17 @@ void Client::Update(float timeStep)
 
 bool Client::IsConnected() const
 {
-    return (serverConnection_) && (serverConnection_->IsConnected()) && (serverConnection_->HasChallenge());
+    return serverConnection_ && serverConnection_->IsConnected() && serverConnection_->HasChallenge();
 }
 
 bool Client::IsJoinPending() const
 {
-    return ((IsConnected()) && (serverConnection_->GetJoinState() == JS_PREPARESCENE));
+    return IsConnected() && serverConnection_->GetJoinState() == JS_PREPARESCENE;
 }
 
 bool Client::IsJoined() const
 {
-    return ((IsConnected()) && (serverConnection_->GetJoinState() > JS_PREPARESCENE));
+    return IsConnected() && serverConnection_->GetJoinState() > JS_PREPARESCENE;
 }
 
 const Controls& Client::GetControls() const
@@ -243,7 +243,7 @@ void Client::HandleFileTransferCompleted(StringHash eventType, VariantMap& event
         GetSubsystem<ResourceCache>()->AddPackageFile(package, true);
         
         // If this was the last required download, can now join scene
-        if ((pendingDownloads_.Empty()) && (IsJoinPending()))
+        if (pendingDownloads_.Empty() && IsJoinPending())
             SetupScene();
     }
 }
@@ -259,13 +259,13 @@ void Client::HandleFileTransferFailed(StringHash eventType, VariantMap& eventDat
 
 void Client::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
-    if ((!scene_) || (!serverConnection_))
+    if (!scene_ || !serverConnection_)
         return;
     
     using namespace AsyncLoadFinished;
     
     // If it is the scene used for networking, send join packet now
-    if ((eventData[P_SCENE].GetPtr() == (void*)scene_) && (serverConnection_->GetJoinState() == JS_LOADSCENE))
+    if (eventData[P_SCENE].GetPtr() == (void*)scene_ && serverConnection_->GetJoinState() == JS_LOADSCENE)
         SendJoinScene();
 }
 
@@ -437,7 +437,7 @@ void Client::HandleTransferData(VectorBuffer& packet)
         {
             bool goUp = true;
             // Go down in batch size if last batch was smaller and had better data rate
-            if ((transfer.lastBatchSize_ < transfer.batchSize_) && (transfer.lastDataRate_ > newDataRate))
+            if (transfer.lastBatchSize_ < transfer.batchSize_ && transfer.lastDataRate_ > newDataRate)
                 goUp = false;
             
             transfer.lastBatchSize_ = transfer.batchSize_;
@@ -635,8 +635,8 @@ unsigned Client::CheckPackages()
         {
             PackageFile* package = registeredPackages[i];
             String name = GetFileName(package->GetName());
-            if ((name.Find(requiredName) != String::NPOS) && (package->GetTotalSize() == required.size_) &&
-                (package->GetChecksum() == required.checksum_))
+            if (name.Find(requiredName) != String::NPOS && package->GetTotalSize() == required.size_ &&
+                package->GetChecksum() == required.checksum_)
             {
                 found = true;
                 break;
@@ -653,7 +653,7 @@ unsigned Client::CheckPackages()
                 {
                     SharedPtr<PackageFile> file(new PackageFile(context_));
                     file->Open(downloadDirectory_ + downloadedPackages[i]);
-                    if ((file->GetTotalSize() == required.size_) && (file->GetChecksum() == required.checksum_))
+                    if (file->GetTotalSize() == required.size_ && file->GetChecksum() == required.checksum_)
                     {
                         // Add the package as first in case it overrides something in the default files
                         GetSubsystem<ResourceCache>()->AddPackageFile(file, true);
@@ -744,7 +744,7 @@ void Client::SetupScene()
 
 void Client::SendJoinScene()
 {
-    if ((!scene_) || (!serverConnection_))
+    if (!scene_ || !serverConnection_)
         return;
     
     VectorBuffer packet;

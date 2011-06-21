@@ -182,10 +182,10 @@ void LoadSkeleton(const String& skeletonFileName)
             String bone = boneParent.GetString("bone");
             String parent = boneParent.GetString("parent");
             unsigned i = 0, j = 0;
-            for (i = 0; (i < bones_.Size()) && (bones_[i].name_ != bone); ++i)
-            for (j = 0; (j < bones_.Size()) && (bones_[j].name_ != parent); ++j)
+            for (i = 0; i < bones_.Size() && bones_[i].name_ != bone; ++i)
+            for (j = 0; j < bones_.Size() && bones_[j].name_ != parent; ++j)
             
-            if ((i >= bones_.Size()) || (j >= bones_.Size()))
+            if (i >= bones_.Size() || j >= bones_.Size())
                 ErrorExit("Found indeterminate parent bone assignment");
             bones_[i].parentIndex_ = j;
             
@@ -268,7 +268,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             maxSubMeshVertices = vertices;
     }
     
-    if ((splitSubMeshes) || ((totalVertices > 65535) && (maxSubMeshVertices <= 65535)))
+    if (splitSubMeshes || (totalVertices > 65535 && maxSubMeshVertices <= 65535))
     {
         useOneBuffer_ = false;
         vertexBuffers_.Resize(numSubMeshes_);
@@ -666,7 +666,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                                     float time = keyframe.GetFloat("time");
                                     XMLElement poseref = keyframe.GetChildElement("poseref");
                                     // Get only the end pose
-                                    if ((poseref) && (time == length))
+                                    if (poseref && time == length)
                                         usedPoses.Insert(poseref.GetInt("poseindex"));
                                     
                                     keyframe = keyframe.GetNextElement("keyframe");
@@ -938,7 +938,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
     }
     
     XMLElement skeletonRoot = skelFile_->GetRootElement("");
-    if ((skeletonRoot) && (exportAnimations))
+    if (skeletonRoot && exportAnimations)
     {
         // Go through animations
         XMLElement animationsRoot = skeletonRoot.GetChildElement("animations");

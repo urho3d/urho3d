@@ -317,7 +317,7 @@ static const AttributeInfo noAttributeInfo;
 static const AttributeInfo& SerializableGetAttributeInfo(unsigned index, Serializable* ptr)
 {
     const Vector<AttributeInfo>* attributes = ptr->GetAttributes();
-    if ((!attributes) || (index >= attributes->Size()))
+    if (!attributes || index >= attributes->Size())
     {
         asGetActiveContext()->SetException("Index out of bounds");
         return noAttributeInfo;

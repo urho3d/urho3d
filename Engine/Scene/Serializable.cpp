@@ -405,7 +405,7 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
 Variant Serializable::GetAttribute(unsigned index)
 {
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
-    if ((!attributes) || (index >= attributes->Size()))
+    if (!attributes || index >= attributes->Size())
         return Variant();
     
     return OnGetAttribute(attributes->At(index));

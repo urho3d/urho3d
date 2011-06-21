@@ -127,7 +127,7 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
         if (totalCount)
             avgTotalTime = totalTime / totalCount;
         
-        if ((showUnused) || (frameCount) || ((showAccumulated) && (accumulatedCount)))
+        if (showUnused || frameCount || (showAccumulated && accumulatedCount))
         {
             memset(indentedName, ' ', NAME_MAX_LENGTH);
             indentedName[indent] = 0;

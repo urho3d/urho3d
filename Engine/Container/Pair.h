@@ -40,9 +40,9 @@ public:
     }
     
     /// Test for equality with another pair
-    bool operator == (const Pair<T, U>& rhs) const { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+    bool operator == (const Pair<T, U>& rhs) const { return first_ == rhs.first_ && second_ == rhs.second_; }
     /// Test for inequality with another pair
-    bool operator != (const Pair<T, U>& rhs) const { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+    bool operator != (const Pair<T, U>& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
     
     /// Test for less than with another pair
     bool operator < (const Pair<T, U>& rhs) const

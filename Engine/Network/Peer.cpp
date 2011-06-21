@@ -55,10 +55,10 @@ Peer::~Peer()
 
 void Peer::Send(const VectorBuffer& packet, unsigned char channel, bool reliable, bool inOrder)
 {
-    if ((!peer_) || (!packet.GetSize()))
+    if (!peer_ || !packet.GetSize())
         return;
     
-    if ((simulatedPacketLoss_ > 0.0f) && (!reliable))
+    if (simulatedPacketLoss_ > 0.0f && !reliable)
     {
         if (Random() < simulatedPacketLoss_)
             return;
@@ -80,10 +80,10 @@ void Peer::Send(const VectorBuffer& packet, unsigned char channel, bool reliable
 
 void Peer::Send(const void* data, unsigned size, unsigned char channel, bool reliable, bool inOrder)
 {
-    if ((!peer_) || (!data) || (!size))
+    if (!peer_ || !data || !size)
         return;
     
-    if ((simulatedPacketLoss_ != 0.0f) && (!reliable))
+    if (simulatedPacketLoss_ != 0.0f && !reliable)
     {
         if (Random() < simulatedPacketLoss_)
             return;
@@ -113,7 +113,7 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
         for (Map<unsigned char, Vector<QueuedPacket> >::Iterator i = packets_.Begin(); i != packets_.End(); ++i)
         {
             Vector<QueuedPacket>& packetList = i->second_;
-            if ((!packetList.Empty()) && (packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_))
+            if (!packetList.Empty() && packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_)
             {
                 ENetPacket* enetPacket = packetList.Front().packet_;
                 reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
@@ -129,7 +129,7 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
     else
     {
         Vector<QueuedPacket>& packetList = packets_[channel];
-        if ((!packetList.Empty()) && (packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_))
+        if (!packetList.Empty() && packetList.Front().timer_.GetMSec(false) >= halfSimulatedLatency_)
         {
             ENetPacket* enetPacket = packetList.Front().packet_;
             reliable = (enetPacket->flags & ENET_PACKET_FLAG_RELIABLE) != 0;
@@ -141,7 +141,7 @@ bool Peer::Receive(VectorBuffer& packet, unsigned char channel)
         }
     }
     
-    if ((received) && (!reliable) && (simulatedPacketLoss_ > 0.0f))
+    if (received && !reliable && simulatedPacketLoss_ > 0.0f)
     {
         if (Random() < simulatedPacketLoss_)
         {
@@ -190,7 +190,7 @@ void Peer::FlushPackets()
 
 void Peer::Disconnect()
 {
-    if ((peer_) && (connectionState_ > CS_DISCONNECTING))
+    if (peer_ && connectionState_ > CS_DISCONNECTING)
     {
         connectionState_ = CS_DISCONNECTING;
         enet_peer_disconnect(peer_, 0);

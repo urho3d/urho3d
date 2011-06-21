@@ -67,7 +67,7 @@ void TextureCube::OnDeviceReset()
         // Reload from the original file if possible
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         const String& name = GetName();
-        if ((cache) && (!name.Empty()) && (cache->Exists(name)))
+        if (cache && !name.Empty() && cache->Exists(name))
             cache->ReloadResource(this);
     }
 }
@@ -166,7 +166,7 @@ bool TextureCube::Load(Deserializer& source)
     XMLElement textureElem = xml->GetRootElement();
     XMLElement faceElem = textureElem.GetChildElement("face");
     unsigned faces = 0;
-    while ((faceElem) && (faces < MAX_CUBEMAP_FACES))
+    while (faceElem && faces < MAX_CUBEMAP_FACES)
     {
         String name = faceElem.GetString("name");
         
@@ -264,7 +264,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
-            if ((levelWidth != width_) || (format != format_))
+            if (levelWidth != width_ || format != format_)
             {
                 LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
@@ -307,7 +307,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while ((mipsToSkip) && ((width / (1 << mipsToSkip) < 4) || (height / (1 << mipsToSkip) < 4)))
+        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4))
             --mipsToSkip;
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
@@ -325,7 +325,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
-            if ((width != width_) || (format != format_))
+            if (width != width_ || format != format_)
             {
                 LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
@@ -334,7 +334,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         
         graphics_->SetTextureForUpdate(this);
         
-        for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
+        for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             glCompressedTexImage2D(target_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
@@ -360,7 +360,7 @@ bool TextureCube::Create()
     if (!graphics_)
         return false;
     
-    if ((!width_) || (!height_))
+    if (!width_ || !height_)
         return false;
     
     glGenTextures(1, &object_);
@@ -372,8 +372,8 @@ bool TextureCube::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
-    if ((format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) && (format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT) &&
-        (format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT))
+    if (format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT && format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT &&
+        format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format_, width_, height_, 0, externalFormat, dataType, 0);

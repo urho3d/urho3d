@@ -48,9 +48,9 @@ public:
         }
         
         /// Test for equality with another pair
-        bool operator == (const KeyValue& rhs) const { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+        bool operator == (const KeyValue& rhs) const { return first_ == rhs.first_ && second_ == rhs.second_; }
         /// Test for inequality with another pair
-        bool operator != (const KeyValue& rhs) const { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+        bool operator != (const KeyValue& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
         
         const T first_;
         U second_;
@@ -439,7 +439,7 @@ private:
     Node* EraseNode(Node* toRemove)
     {
         // The tail node can not be removed
-        if ((!toRemove) || (toRemove == tail_))
+        if (!toRemove || toRemove == tail_)
             return Tail();
         
         Node* prev = toRemove->Prev();

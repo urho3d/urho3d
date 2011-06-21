@@ -100,7 +100,7 @@ inline float Clamp(float value, float min, float max)
 /// Check whether two floating point values are equal within accuracy
 inline bool Equals(float lhs, float rhs)
 {
-    return (lhs + M_EPSILON >= rhs) && (lhs - M_EPSILON <= rhs);
+    return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs;
 }
 
 /// Return the smaller of two integers

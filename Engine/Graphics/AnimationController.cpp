@@ -131,7 +131,7 @@ void AnimationController::Update(float timeStep)
             float fadeTime = i->fadeTime_;
             
             // If non-looped animation at the end, activate autofade as applicable
-            if ((!state->IsLooped()) && (state->GetTime() >= state->GetLength()) && (i->autoFadeTime_ > 0.0f))
+            if (!state->IsLooped() && state->GetTime() >= state->GetLength() && i->autoFadeTime_ > 0.0f)
             {
                 targetWeight = 0.0f;
                 fadeTime = i->autoFadeTime_;
@@ -139,7 +139,7 @@ void AnimationController::Update(float timeStep)
             
             // Process weight fade
             float currentWeight = state->GetWeight();
-            if ((currentWeight != targetWeight) && (fadeTime > 0.0f))
+            if (currentWeight != targetWeight && fadeTime > 0.0f)
             {
                 float weightDelta = 1.0f / fadeTime * timeStep;
                 if (currentWeight < targetWeight)
@@ -150,7 +150,7 @@ void AnimationController::Update(float timeStep)
             }
             
             // Remove if weight zero and target weight zero
-            if ((state->GetWeight() == 0.0f) && ((targetWeight == 0.0f) || (fadeTime == 0.0f)))
+            if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f))
                 remove = true;
         }
         
@@ -238,7 +238,7 @@ bool AnimationController::Stop(const String& name, float fadeOutTime)
         }
     }
     
-    return (index != M_MAX_UNSIGNED) || (state != 0);
+    return index != M_MAX_UNSIGNED || state != 0;
 }
 
 void AnimationController::StopLayer(int layer, float fadeOutTime)
@@ -252,7 +252,7 @@ void AnimationController::StopLayer(int layer, float fadeOutTime)
         AnimationState* state = model->GetAnimationState(i->hash_);
         bool remove = false;
         
-        if ((state) && (state->GetLayer() == layer))
+        if (state && state->GetLayer() == layer)
         {
             if (fadeOutTime <= 0.0f)
             {
@@ -323,7 +323,7 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if ((index == M_MAX_UNSIGNED) || (!state))
+    if (index == M_MAX_UNSIGNED || !state)
         return false;
     
     AnimatedModel* model = GetComponent<AnimatedModel>();
@@ -335,7 +335,7 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
         {
             AnimationControl& control = animations_[i];
             AnimationState* otherState = model->GetAnimationState(control.hash_);
-            if ((otherState) && (otherState->GetLayer() == layer))
+            if (otherState && otherState->GetLayer() == layer)
             {
                 control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
                 control.fadeTime_ = Max(fadeTime, M_EPSILON);
@@ -394,7 +394,7 @@ bool AnimationController::SetWeight(const String& name, float weight)
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if ((index == M_MAX_UNSIGNED) || (!state))
+    if (index == M_MAX_UNSIGNED || !state)
         return false;
     
     state->SetWeight(weight);
@@ -438,10 +438,10 @@ bool AnimationController::IsFadingIn(const String& name) const
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if ((index == M_MAX_UNSIGNED) || (!state))
+    if (index == M_MAX_UNSIGNED || !state)
         return false;
     
-    return (animations_[index].fadeTime_) && (animations_[index].targetWeight_ > state->GetWeight());
+    return animations_[index].fadeTime_ && animations_[index].targetWeight_ > state->GetWeight();
 }
 
 bool AnimationController::IsFadingOut(const String& name) const
@@ -449,11 +449,11 @@ bool AnimationController::IsFadingOut(const String& name) const
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if ((index == M_MAX_UNSIGNED) || (!state))
+    if (index == M_MAX_UNSIGNED || !state)
         return false;
     
-    return ((animations_[index].fadeTime_) && (animations_[index].targetWeight_ < state->GetWeight()))
-        || ((!state->IsLooped()) && (state->GetTime() >= state->GetLength()) && (animations_[index].autoFadeTime_));
+    return (animations_[index].fadeTime_ && animations_[index].targetWeight_ < state->GetWeight())
+        || (!state->IsLooped() && state->GetTime() >= state->GetLength() && animations_[index].autoFadeTime_);
 }
 
 int AnimationController::GetLayer(const String& name) const

@@ -51,9 +51,9 @@ public:
         }
         
         /// Test for equality with another pair
-        bool operator == (const KeyValue& rhs) const { return (first_ == rhs.first_) && (second_ == rhs.second_); }
+        bool operator == (const KeyValue& rhs) const { return first_ == rhs.first_ && second_ == rhs.second_; }
         /// Test for inequality with another pair
-        bool operator != (const KeyValue& rhs) const { return (first_ != rhs.first_) || (second_ != rhs.second_); }
+        bool operator != (const KeyValue& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
         
         const T first_;
         U second_;
@@ -334,7 +334,7 @@ private:
     Node* FindFirst() const
     {
         Node* node = Root();
-        while ((node) && (node->link_[0]))
+        while (node && node->link_[0])
             node = node->Child(0);
         return node;
     }
@@ -343,7 +343,7 @@ private:
     Node* FindLast() const
     {
         Node* node = Root();
-        while ((node) && (node->link_[1]))
+        while (node && node->link_[1])
             node = node->Child(1);
         return node;
     }
@@ -392,14 +392,14 @@ private:
                     p->SetChild(dir, q = ret = ReserveNode(key, value));
                     ++size_;
                 }
-                else if ((IsRed(q->link_[0])) && (IsRed(q->link_[1])))
+                else if (IsRed(q->link_[0]) && IsRed(q->link_[1]))
                 {
                     q->isRed_ = true;
                     q->link_[0]->isRed_ = false;
                     q->link_[1]->isRed_ = false;
                 }
                 
-                if ((IsRed(q)) && (IsRed(p)))
+                if (IsRed(q) && IsRed(p))
                 {
                     unsigned dir2 = (t->link_[1] == g);
                     if (q == p->link_[last])
@@ -461,7 +461,7 @@ private:
             if (q->pair_.first_ == key)
                 f = q;
              
-            if ((!IsRed(q)) && (!IsRed(q->link_[dir])))
+            if (!IsRed(q) && !IsRed(q->link_[dir]))
             {
                 if (IsRed(q->link_[!dir]))
                 {
@@ -474,7 +474,7 @@ private:
                     
                     if (s)
                     {
-                        if ((!IsRed(s->link_[!last])) && (!IsRed(s->link_[last])))
+                        if (!IsRed(s->link_[!last]) && !IsRed(s->link_[last]))
                         {
                             p->isRed_ = false;
                             s->isRed_ = true;

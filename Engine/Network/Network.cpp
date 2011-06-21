@@ -205,7 +205,7 @@ void Network::Broadcast(const void* data, unsigned size, unsigned char channel, 
         return;
     }
     
-    if ((!data) || (!size))
+    if (!data || !size)
         return;
     
     ENetPacket* enetPacket = enet_packet_create(data, size, reliable ? ENET_PACKET_FLAG_RELIABLE : (inOrder ? 0 :

@@ -229,7 +229,7 @@ void Script::DumpAPI()
         String functionName(function->GetName());
         String declaration(function->GetDeclaration());
         
-        if ((functionName.Find("set_") != String::NPOS) || (functionName.Find("get_") != String::NPOS))
+        if (functionName.Find("set_") != String::NPOS || functionName.Find("get_") != String::NPOS)
             ExtractPropertyInfo(functionName, declaration, globalPropertyInfos);
         else
             globalFunctions.Push(declaration);
@@ -286,7 +286,7 @@ void Script::DumpAPI()
                 asIScriptFunction* method = type->GetMethodDescriptorByIndex(j);
                 String methodName(method->GetName());
                 String declaration(method->GetDeclaration());
-                if ((methodName.Find("get_") == String::NPOS) && (methodName.Find("set_") == String::NPOS))
+                if (methodName.Find("get_") == String::NPOS && methodName.Find("set_") == String::NPOS)
                 {
                     // Sanitate the method name. For now, skip the operators
                     if (declaration.Find("::op") == String::NPOS)
@@ -372,7 +372,7 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     else
     {
         // Ignore info messages in retained mode
-        if ((msg->type == asMSGTYPE_ERROR) || (msg->type == asMSGTYPE_WARNING))
+        if (msg->type == asMSGTYPE_ERROR || msg->type == asMSGTYPE_WARNING)
             logMessages_ += message + "\n";
     }
 }

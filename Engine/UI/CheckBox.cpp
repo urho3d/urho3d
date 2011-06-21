@@ -59,7 +59,7 @@ void CheckBox::SetStyle(const XMLElement& element)
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-    if ((hovering_) || (selected_))
+    if (hovering_ || selected_)
         offset += hoverOffset_;
     if (checked_)
         offset += checkedOffset_;

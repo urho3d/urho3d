@@ -131,7 +131,7 @@ void Texture::ClearDataLost()
 
 void Texture::UpdateParameters()
 {
-    if ((!object_) || (!graphics_))
+    if (!object_ || !graphics_)
         return;
     
     // Wrapping
@@ -216,7 +216,7 @@ unsigned Texture::GetDXTFormat(CompressedFormat format)
 unsigned Texture::GetExternalFormat(unsigned format)
 {
     // For DEPTH_COMPONENTxx textures DEPTH_COMPONENT needs to be returned
-    if ((format == GL_DEPTH_COMPONENT16) || (format == GL_DEPTH_COMPONENT24) || (format == GL_DEPTH_COMPONENT32))
+    if (format == GL_DEPTH_COMPONENT16 || format == GL_DEPTH_COMPONENT24 || format == GL_DEPTH_COMPONENT32)
         return GL_DEPTH_COMPONENT;
     else if (format == GL_DEPTH24_STENCIL8_EXT)
         return GL_DEPTH_STENCIL_EXT;

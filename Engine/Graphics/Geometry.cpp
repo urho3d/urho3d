@@ -207,7 +207,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
         vertexSize = 0;
     }
     
-    if ((rawIndexData_) && (indexBuffer_))
+    if (rawIndexData_ && indexBuffer_)
     {
         indexData = rawIndexData_.GetPtr();
         indexSize = indexBuffer_->GetIndexSize();
@@ -221,7 +221,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 
 float Geometry::GetDistance(const Ray& ray)
 {
-    if ((!rawIndexData_) || (!rawVertexData_) || (!indexBuffer_))
+    if (!rawIndexData_ || !rawVertexData_ || !indexBuffer_)
         return M_INFINITY;
     
     return ray.Distance(rawVertexData_.GetPtr(), 3 * sizeof(float), rawIndexData_.GetPtr(), indexBuffer_->GetIndexSize(), indexStart_, indexCount_);
@@ -231,7 +231,7 @@ void Geometry::GetPositionBufferIndex()
 {
     for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
     {
-        if ((vertexBuffers_[i]) && (vertexBuffers_[i]->GetElementMask() & MASK_POSITION))
+        if (vertexBuffers_[i] && vertexBuffers_[i]->GetElementMask() & MASK_POSITION)
         {
             positionBufferIndex_ = i;
             return;

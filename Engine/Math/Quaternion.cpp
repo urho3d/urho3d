@@ -108,7 +108,7 @@ Quaternion::Quaternion(const Matrix3& matrix)
     }
     else
     {
-        if ((matrix.m00_ > matrix.m11_) && (matrix.m00_ > matrix.m22_))
+        if (matrix.m00_ > matrix.m11_ && matrix.m00_ > matrix.m22_)
         {
             float s = sqrtf(1.0f + matrix.m00_ - matrix.m11_ - matrix.m22_) * 2.0f;
             float invS = 1.0f / s;
@@ -221,8 +221,9 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
     
     if (sinAngle > 0.001f)
     {
-        t1 = sinf((1.0f - t) * angle) / sinAngle;
-        t2 = sinf(t * angle) / sinAngle;
+        float invSinAngle = 1.0f / sinAngle;
+        t1 = sinf((1.0f - t) * angle) * invSinAngle;
+        t2 = sinf(t * angle) * invSinAngle;
     }
     else
     {

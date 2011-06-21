@@ -70,7 +70,7 @@ bool ShaderProgram::Link()
 {
     Release();
     
-    if ((!vertexShader_) || (!pixelShader_) || (!vertexShader_->GetGPUObject()) || (!pixelShader_->GetGPUObject()))
+    if (!vertexShader_ || !pixelShader_ || !vertexShader_->GetGPUObject() || !pixelShader_->GetGPUObject())
         return false;
     
     object_ = glCreateProgram();

@@ -73,7 +73,7 @@ bool Shader::Load(Deserializer& source)
         return false;
     
     XMLElement shaderElem = file->GetRootElement();
-    shaderType_ = (shaderElem.GetString("type") == "vs") ? VS : PS;
+    shaderType_ = shaderElem.GetString("type") == "vs" ? VS : PS;
     
     XMLElement variationElem = shaderElem.GetChildElement("variation");
     while (variationElem)

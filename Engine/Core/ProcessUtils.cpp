@@ -116,7 +116,7 @@ const Vector<String>& ParseArguments(const char* cmdLine)
     {
         if (cmdStr[i] == '\"')
             inQuote = !inQuote;
-        if ((cmdStr[i] == ' ') && (!inQuote))
+        if (cmdStr[i] == ' ' && !inQuote)
         {
             if (inCmd)
             {
@@ -170,7 +170,7 @@ String GetConsoleInput()
     while (events--)
     {
         ReadConsoleInput(input, &record, 1, &readEvents);
-        if ((record.EventType == KEY_EVENT) && (record.Event.KeyEvent.bKeyDown))
+        if (record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown)
         {
             char c = record.Event.KeyEvent.uChar.AsciiChar;
             if (c)

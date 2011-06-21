@@ -112,7 +112,7 @@ void* AllocatorReserve(AllocatorBlock* allocator)
 
 void AllocatorFree(AllocatorBlock* allocator, void* ptr)
 {
-    if ((!allocator) || (!ptr))
+    if (!allocator || !ptr)
         return;
     
     unsigned char* dataPtr = static_cast<unsigned char*>(ptr);

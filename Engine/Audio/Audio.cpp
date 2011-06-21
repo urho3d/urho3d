@@ -233,7 +233,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool ste
         stereo_ = true;
         sampleSize_ <<= 1;
     }
-    if ((obtained.format == AUDIO_S16SYS) || (obtained.format == AUDIO_S16LSB) || (obtained.format == AUDIO_S16MSB))
+    if (obtained.format == AUDIO_S16SYS || obtained.format == AUDIO_S16LSB || obtained.format == AUDIO_S16MSB)
     {
         sixteenBit_ = true;
         sampleSize_ <<= 1;
@@ -541,7 +541,7 @@ void Audio::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Audio::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
-    if ((!graphics) || (!graphics->IsInitialized()))
+    if (!graphics || !graphics->IsInitialized())
         return;
     
     windowHandle_ = graphics->GetWindowHandle();

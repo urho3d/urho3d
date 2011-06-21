@@ -57,7 +57,7 @@ struct Batch
     /// Calculate sort key, which consists of priority flag, light, pass and geometry
     void CalculateSortKey();
     /// Prepare for rendering
-    void Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool SetModelTransform = true) const;
+    void Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool setModelTransform = true) const;
     /// Prepare and draw
     void Draw(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters) const;
     
@@ -170,9 +170,9 @@ struct BatchGroupKey
     Geometry* geometry_;
     
     /// Test for equality with another batch group key
-    bool operator == (const BatchGroupKey& rhs) const { return (light_ == rhs.light_) && (pass_ == rhs.pass_) && (material_ == rhs.material_) && (geometry_ == rhs.geometry_); }
+    bool operator == (const BatchGroupKey& rhs) const { return light_ == rhs.light_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
     /// Test for inequality with another batch group key
-    bool operator != (const BatchGroupKey& rhs) const { return (light_ != rhs.light_) || (pass_ != rhs.pass_) || (material_ != rhs.material_) || (geometry_ != rhs.geometry_); }
+    bool operator != (const BatchGroupKey& rhs) const { return light_ != rhs.light_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
     /// Test if less than another batch group key
     bool operator < (const BatchGroupKey& rhs) const

@@ -123,10 +123,10 @@ void Input::Update()
     {
         // In clipped mode, require the operating system cursor to be hidden first
         IntVector2 mousePos = GetMousePosition();
-        mouseMove_ = ((!clipCursor_) || (!showCursor_)) ? mousePos - lastMousePosition_ : IntVector2::ZERO;
+        mouseMove_ = !clipCursor_ || !showCursor_ ? mousePos - lastMousePosition_ : IntVector2::ZERO;
         
         // Recenter the mouse cursor manually if cursor clipping is in effect
-        if ((clipCursor_) && (mouseMove_ != IntVector2::ZERO))
+        if (clipCursor_ && mouseMove_ != IntVector2::ZERO)
         {
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             SetMousePosition(center);
@@ -159,7 +159,7 @@ void Input::SetClipCursor(bool enable)
     if (!graphics_)
         return;
     
-    if ((!graphics_->GetFullscreen()) && (active_) && (clipCursor_))
+    if (!graphics_->GetFullscreen() && active_ && clipCursor_)
     {
         SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
         lastMousePosition_ = GetMousePosition();
@@ -171,7 +171,7 @@ void Input::SetClipCursor(bool enable)
     }
     else
     {
-        if ((graphics_->GetFullscreen()) && (active_) && (clipCursor_))
+        if (graphics_->GetFullscreen() && active_ && clipCursor_)
         {
             SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
             lastMousePosition_ = GetMousePosition();
@@ -308,7 +308,7 @@ int Input::GetQualifiers() const
 void Input::Initialize()
 {
     Graphics* graphics = GetSubsystem<Graphics>();
-    if ((!graphics) || (!graphics->IsInitialized()))
+    if (!graphics || !graphics->IsInitialized())
         return;
     
     graphics_ = graphics;
@@ -339,7 +339,7 @@ void Input::MakeActive()
     
     // Re-establish mouse cursor clipping immediately in fullscreen. In windowed mode, require a mouse click inside the window
     // first to not confuse with title bar drag
-    if ((!clipCursor_) || (graphics_->GetFullscreen()))
+    if (!clipCursor_ || graphics_->GetFullscreen())
     {
         SetClipCursor(clipCursor_);
         SetCursorVisible(false);
@@ -396,11 +396,11 @@ void Input::ResetState()
 void Input::SetMouseButton(int button, bool newState)
 {
     // If we are not active yet, do not react to the mouse button down
-    if ((newState) && (!active_))
+    if (newState && !active_)
         return;
     
     // If we are still showing the cursor (waiting for a click inside window), hide it now and disregard this click
-    if ((newState) && (clipCursor_) && (showCursor_))
+    if (newState && clipCursor_ && showCursor_)
     {
         SetClipCursor(clipCursor_);
         SetCursorVisible(false);
@@ -432,7 +432,7 @@ void Input::SetMouseButton(int button, bool newState)
     
     #ifndef USE_SDL
     // In non-clipped mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
-    if ((graphics_) && (!clipCursor_))
+    if (graphics_ && !clipCursor_)
     {
         if (mouseButtonDown_)
             SetCapture((HWND)graphics_->GetWindowHandle());
@@ -445,7 +445,7 @@ void Input::SetMouseButton(int button, bool newState)
 void Input::SetKey(int key, int scanCode, bool newState)
 {
     // If we are not active yet, do not react to the key down
-    if ((newState) && (!active_))
+    if (newState && !active_)
         return;
     
     bool repeat = false;
@@ -586,7 +586,7 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         
     case WM_SYSKEYDOWN:
         SetKey(wParam, (lParam >> 16) & 255, true);
-        if ((wParam == KEY_RETURN) && (toggleFullscreen_))
+        if (wParam == KEY_RETURN && toggleFullscreen_)
             graphics_->ToggleFullscreen();
         if (wParam != KEY_F4)
             eventData[P_HANDLED] = true;
@@ -643,7 +643,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
         SetKey(SDL_toupper(evt.key.keysym.sym), evt.key.keysym.scancode, true);
         
         // Check ALT-ENTER fullscreen toggle
-        if ((evt.key.keysym.sym == KEY_RETURN) && ((GetKeyDown(KEY_LALT)) || (GetKeyDown(KEY_RALT))) && (toggleFullscreen_))
+        if (evt.key.keysym.sym == KEY_RETURN && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
             graphics_->ToggleFullscreen();
         break;
         
@@ -664,7 +664,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             else if (x < 0xe0)
                 latin1 = (y & 0x3f) | ((x & 0x1f) << 6);
             
-            if ((latin1) && (latin1 < 256))
+            if (latin1 && latin1 < 256)
             {
                 using namespace Char;
                 

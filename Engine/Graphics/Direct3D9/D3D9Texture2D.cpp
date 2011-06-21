@@ -74,13 +74,13 @@ bool Texture2D::Load(Deserializer& source)
 
 void Texture2D::OnDeviceLost()
 {
-    if ((pool_ == D3DPOOL_DEFAULT) || (followWindowSize_))
+    if (pool_ == D3DPOOL_DEFAULT || followWindowSize_)
         Release();
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if ((pool_ == D3DPOOL_DEFAULT) || (followWindowSize_))
+    if (pool_ == D3DPOOL_DEFAULT || followWindowSize_)
     {
         Create();
         dataLost_ = true;
@@ -122,7 +122,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     pool_ = D3DPOOL_MANAGED;
     usage_ = 0;
     
-    if ((usage == TEXTURE_RENDERTARGET) || (usage == TEXTURE_DEPTHSTENCIL))
+    if (usage == TEXTURE_RENDERTARGET || usage == TEXTURE_DEPTHSTENCIL)
     {
         renderSurface_ = new RenderSurface(this);
         if (usage == TEXTURE_RENDERTARGET)
@@ -143,7 +143,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         pool_ = D3DPOOL_DEFAULT;
     }
     
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0)
         followWindowSize_ = true;
     else
     {
@@ -271,7 +271,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while ((mipsToSkip) && ((width / (1 << mipsToSkip) < 4) || (height / (1 << mipsToSkip) < 4)))
+        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4))
             --mipsToSkip;
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
@@ -279,7 +279,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         SetNumLevels(Max((int)(levels - mipsToSkip), 1));
         SetSize(width, height, format);
         
-        for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
+        for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             memoryUse += level.rows_ * level.rowSize_;
@@ -328,7 +328,7 @@ bool Texture2D::Lock(unsigned level, const IntRect* rect, LockedRect& lockedRect
     }
     
     DWORD flags = 0;
-    if ((!rect) && (pool_ == D3DPOOL_DEFAULT))
+    if (!rect && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
     
     if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, rect ? &d3dRect : 0, flags)))
@@ -365,20 +365,20 @@ bool Texture2D::Create()
         height_ = graphics_->GetHeight();
     }
     
-    if ((!width_) || (!height_))
+    if (!width_ || !height_)
         return false;
     
     // If using a default pool texture, must generate mipmaps automatically
-    if ((pool_ == D3DPOOL_DEFAULT) && (requestedLevels_ != 1))
+    if (pool_ == D3DPOOL_DEFAULT && requestedLevels_ != 1)
         usage_ |= D3DUSAGE_AUTOGENMIPMAP;
     else
         usage_ &= ~D3DUSAGE_AUTOGENMIPMAP;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth stencil texture, and it is not supported, create a depth stencil surface instead
-    if ((usage_ & D3DUSAGE_DEPTHSTENCIL) && (!graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE)))
+    if (usage_ & D3DUSAGE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE))
     {
-        if ((!device) || (FAILED(device->CreateDepthStencilSurface(
+        if (!device || FAILED(device->CreateDepthStencilSurface(
             width_,
             height_,
             (D3DFORMAT)format_,
@@ -386,7 +386,7 @@ bool Texture2D::Create()
             0,
             FALSE,
             (IDirect3DSurface9**)&renderSurface_->surface_,
-            0))))
+            0)))
         {
             LOGERROR("Could not create depth stencil surface");
             return false;
@@ -396,7 +396,7 @@ bool Texture2D::Create()
     }
     else
     {
-        if ((!device) || (FAILED(graphics_->GetImpl()->GetDevice()->CreateTexture(
+        if (!device || FAILED(graphics_->GetImpl()->GetDevice()->CreateTexture(
             width_,
             height_,
             requestedLevels_,
@@ -404,7 +404,7 @@ bool Texture2D::Create()
             (D3DFORMAT)format_,
             (D3DPOOL)pool_,
             (IDirect3DTexture9**)&object_,
-            0))))
+            0)))
         {
             LOGERROR("Could not create texture");
             return false;

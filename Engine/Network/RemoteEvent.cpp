@@ -53,7 +53,7 @@ void RemoteEvent::Read(Deserializer& source, bool hasEntity)
 
 bool RemoteEvent::Dispatch(Connection* sender, Scene* scene)
 {
-    if ((!sender) || (!scene))
+    if (!sender || !scene)
         return false;
     
     /// \todo Add fixed blacklist check for event type, so that it is not an internal engine event

@@ -163,7 +163,7 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
 {
     PROFILE(ExecuteFunction);
     
-    if ((!compiled_) || (!function))
+    if (!compiled_ || !function)
         return false;
     
     asIScriptContext* context = script_->GetScriptFileContext();
@@ -203,7 +203,7 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
 {
     PROFILE(ExecuteMethod);
     
-    if ((!compiled_) || (!object) || (!method))
+    if (!compiled_ || !object || !method)
         return false;
     
     asIScriptContext* context = script_->GetScriptFileContext();
@@ -275,7 +275,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className)
     // Get the factory function id from the object type
     String factoryName = className + "@ " + className + "()";
     int factoryId = type->GetFactoryIdByDecl(factoryName.CString());
-    if ((factoryId < 0) || (context->Prepare(factoryId) < 0) || (context->Execute() < 0))
+    if (factoryId < 0 || context->Prepare(factoryId) < 0 || context->Execute() < 0)
         return 0;
     
     asIScriptObject* obj = *(static_cast<asIScriptObject**>(context->GetAddressOfReturnValue()));
@@ -302,7 +302,7 @@ asIScriptFunction* ScriptFile::GetFunction(const String& declaration)
 
 asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& declaration)
 {
-    if ((!compiled_) || (!object))
+    if (!compiled_ || !object)
         return 0;
     
     asIObjectType* type = object->GetObjectType();
@@ -338,7 +338,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     {
         int len;
         asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
-        if ((t == asTC_COMMENT) || (t == asTC_WHITESPACE))
+        if (t == asTC_COMMENT || t == asTC_WHITESPACE)
         {
             pos += len;
             continue;
@@ -361,7 +361,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
                     }
                     
-                    if ((t == asTC_VALUE) && (len > 2) && (buffer[pos] == '"'))
+                    if (t == asTC_VALUE && len > 2 && buffer[pos] == '"')
                     {
                         // Get the include file
                         String includeFile(&buffer[pos+1], len - 2);
@@ -391,18 +391,18 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         {
             int len;
             // Skip until ; or { whichever comes first
-            while ((pos < dataSize) && (buffer[pos] != ';') && (buffer[pos] != '{' ))
+            while (pos < dataSize && buffer[pos] != ';' && buffer[pos] != '{')
             {
                 engine->ParseToken(&buffer[pos], 0, &len);
                 pos += len;
             }
             // Skip entire statement block
-            if ((pos < dataSize) && (buffer[pos] == '{' ))
+            if (pos < dataSize && buffer[pos] == '{')
             {
                 ++pos;
                 // Find the end of the statement block
                 int level = 1;
-                while ((level > 0) && (pos < dataSize))
+                while (level > 0 && pos < dataSize)
                 {
                     asETokenClass t = engine->ParseToken(&buffer[pos], 0, &len);
                     if (t == asTC_KEYWORD)
@@ -442,7 +442,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters)
 {
     unsigned paramCount = function->GetParamCount();
-    for (unsigned i = 0; (i < parameters.Size()) && (i < paramCount); ++i)
+    for (unsigned i = 0; i < parameters.Size() && i < paramCount; ++i)
     {
         int paramType = function->GetParamTypeId(i);
         

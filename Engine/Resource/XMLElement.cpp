@@ -52,7 +52,7 @@ XMLElement::~XMLElement()
 
 XMLElement XMLElement::CreateChildElement(const String& name)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return XMLElement();
     
     TiXmlElement newElement(name.CString());
@@ -62,7 +62,7 @@ XMLElement XMLElement::CreateChildElement(const String& name)
 
 bool XMLElement::RemoveChildElement(const String& name, bool last)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     TiXmlNode* element;
@@ -92,7 +92,7 @@ bool XMLElement::RemoveChildElement(const String& name, bool last)
 
 bool XMLElement::RemoveChildElements(const String& name)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     TiXmlNode* element;
@@ -112,7 +112,7 @@ bool XMLElement::RemoveChildElements(const String& name)
 
 bool XMLElement::SetAttribute(const String& name, const String& value)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     element_->SetAttribute(name.CString(), value.CString());
@@ -216,7 +216,7 @@ bool XMLElement::SetVariant(const Variant& value)
 
 bool XMLElement::SetResourceRef(const ResourceRef& value)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     // Need the context & resource cache to query for reverse hash mappings
@@ -229,7 +229,7 @@ bool XMLElement::SetResourceRef(const ResourceRef& value)
 
 bool XMLElement::SetResourceRefList(const ResourceRefList& value)
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     // Need the context & resource cache to query for reverse hash mappings
@@ -298,7 +298,7 @@ bool XMLElement::SetVector4(const String& name, const Vector4& value)
 
 String XMLElement::GetName() const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return String();
     
     return String(element_->Value());
@@ -306,7 +306,7 @@ String XMLElement::GetName() const
 
 String XMLElement::GetText() const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return String();
     
     TiXmlNode* node = element_->FirstChild();
@@ -318,7 +318,7 @@ String XMLElement::GetText() const
 
 bool XMLElement::HasChildElement(const String& name) const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     if (element_->FirstChildElement(name.CString()) != 0)
@@ -329,7 +329,7 @@ bool XMLElement::HasChildElement(const String& name) const
 
 XMLElement XMLElement::GetChildElement(const String& name) const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return XMLElement();
     else
     {
@@ -342,7 +342,7 @@ XMLElement XMLElement::GetChildElement(const String& name) const
 
 XMLElement XMLElement::GetNextElement(const String& name) const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return XMLElement();
     
     if (name.Empty())
@@ -353,7 +353,7 @@ XMLElement XMLElement::GetNextElement(const String& name) const
 
 XMLElement XMLElement::GetParentElement() const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return XMLElement();
     
     return XMLElement(file_, dynamic_cast<TiXmlElement*>(element_->Parent()));
@@ -363,7 +363,7 @@ unsigned XMLElement::GetNumAttributes() const
 {
     unsigned ret = 0;
     
-    if ((file_) && (element_))
+    if (file_ && element_)
     {
         const TiXmlAttribute* attribute = element_->FirstAttribute();
         while (attribute)
@@ -378,7 +378,7 @@ unsigned XMLElement::GetNumAttributes() const
 
 bool XMLElement::HasAttribute(const String& name) const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return false;
     
     if (element_->Attribute(name.CString()) != 0)
@@ -389,7 +389,7 @@ bool XMLElement::HasAttribute(const String& name) const
 
 String XMLElement::GetAttribute(const String& name) const
 {
-    if ((!file_) || (!element_))
+    if (!file_ || !element_)
         return String();
     else
     {
@@ -406,7 +406,7 @@ Vector<String> XMLElement::GetAttributeNames() const
 {
     Vector<String> ret;
     
-    if ((file_) && (element_))
+    if (file_ && element_)
     {
         const TiXmlAttribute* attribute = element_->FirstAttribute();
         while (attribute)

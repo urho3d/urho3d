@@ -68,7 +68,7 @@ public:
     /// Test for equality with another vector
     bool operator == (const Vector2& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_); }
     /// Test for inequality with another vector
-    bool operator != (const Vector2& rhs) const { return (!Equals(x_, rhs.x_)) || (!Equals(y_, rhs.y_)); }
+    bool operator != (const Vector2& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_); }
     /// Add a vector
     Vector2 operator + (const Vector2& rhs) const { return Vector2(x_ + rhs.x_, y_ + rhs.y_); }
     /// Return negation
@@ -244,9 +244,9 @@ public:
     }
     
     /// Test for equality with another vector
-    bool operator == (const IntVector2& rhs) const { return (x_ == rhs.x_) && (y_ == rhs.y_); }
+    bool operator == (const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
     /// Test for inequality with another vector
-    bool operator != (const IntVector2& rhs) const { return (x_ != rhs.x_) ||(y_ != rhs.y_); }
+    bool operator != (const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
     /// Add a vector
     IntVector2 operator + (const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
     /// Return negation

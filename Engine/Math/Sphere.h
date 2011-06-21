@@ -66,10 +66,10 @@ public:
     }
     
     /// Test for equality with another sphere
-    bool operator == (const Sphere& rhs) const { return (center_ == rhs.center_) && (radius_ == rhs.radius_); }
+    bool operator == (const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }
     
     /// Test for inequality with another sphere
-    bool operator != (const Sphere& rhs) const { return (center_ != rhs.center_) || (radius_ != rhs.radius_); }
+    bool operator != (const Sphere& rhs) const { return center_ != rhs.center_ || radius_ != rhs.radius_; }
     
     /// Define from center and radius
     void Define(const Vector3& center, float radius)

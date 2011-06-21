@@ -38,7 +38,7 @@ template <class T> void InsertionSort(RandomAccessIterator<T> begin, RandomAcces
     {
         T temp = *i;
         RandomAccessIterator<T> j = i;
-        while ((j > begin) && (temp < *(j - 1)))
+        while (j > begin && temp < *(j - 1))
         {
             *j = *(j - 1);
             --j;
@@ -54,7 +54,7 @@ template <class T, class U> void InsertionSort(RandomAccessIterator<T> begin, Ra
     {
         T temp = *i;
         RandomAccessIterator<T> j = i;
-        while ((j > begin) && (compare(temp, *(j - 1))))
+        while (j > begin && compare(temp, *(j - 1)))
         {
             *j = *(j - 1);
             --j;
@@ -70,9 +70,9 @@ template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAc
     {
         // Choose the pivot by median
         RandomAccessIterator<T> pivot = begin + ((end - begin) / 2);
-        if ((*begin < *pivot) && (*(end - 1) < *begin))
+        if (*begin < *pivot && *(end - 1) < *begin)
             pivot = begin;
-        else if ((*(end - 1) < *pivot) && (*begin < *(end - 1)))
+        else if (*(end - 1) < *pivot && *begin < *(end - 1))
             pivot = end - 1;
         
         // Partition and sort recursively
@@ -101,9 +101,9 @@ template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin,
     {
         // Choose the pivot by median
         RandomAccessIterator<T> pivot = begin + ((end - begin) / 2);
-        if ((compare(*begin, *pivot)) && (compare(*(end - 1), *begin)))
+        if (compare(*begin, *pivot) && compare(*(end - 1), *begin))
             pivot = begin;
-        else if ((compare(*(end - 1), *pivot)) && (compare(*begin, *(end - 1))))
+        else if (compare(*(end - 1), *pivot) && compare(*begin, *(end - 1)))
             pivot = end - 1;
         
         // Partition and sort recursively

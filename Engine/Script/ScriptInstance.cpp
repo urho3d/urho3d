@@ -154,7 +154,7 @@ Variant ScriptInstance::OnGetAttribute(const AttributeInfo& attr)
 
 void ScriptInstance::PostLoad()
 {
-    if ((scriptObject_) && (methods_[METHOD_POSTLOAD]))
+    if (scriptObject_ && methods_[METHOD_POSTLOAD])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTLOAD]);
 }
 
@@ -168,7 +168,7 @@ bool ScriptInstance::CreateObject(ScriptFile* scriptFile, const String& classNam
 
 void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
 {
-    if ((scriptFile == scriptFile_) && (scriptObject_))
+    if (scriptFile == scriptFile_ && scriptObject_)
         return;
     
     ReleaseObject();
@@ -192,7 +192,7 @@ void ScriptInstance::SetScriptFile(ScriptFile* scriptFile)
 
 void ScriptInstance::SetClassName(const String& className)
 {
-    if ((className == className_) && (scriptObject_))
+    if (className == className_ && scriptObject_)
         return;
     
     ReleaseObject();
@@ -224,7 +224,7 @@ bool ScriptInstance::Execute(const String& declaration, const VariantVector& par
 
 bool ScriptInstance::Execute(asIScriptFunction* method, const VariantVector& parameters)
 {
-    if ((!method) || (!scriptObject_))
+    if (!method || !scriptObject_)
         return false;
     
     return scriptFile_->Execute(scriptObject_, method, parameters);
@@ -242,7 +242,7 @@ void ScriptInstance::DelayedExecute(float delay, const String& declaration, cons
     delayedMethodCalls_.Push(call);
     
     // Make sure we are registered to the scene update event, because delayed calls are executed there
-    if ((!methods_[METHOD_UPDATE]) && (!HasSubscribedToEvent(E_SCENEUPDATE)))
+    if (!methods_[METHOD_UPDATE] && !HasSubscribedToEvent(E_SCENEUPDATE))
     {
         Node* node = GetNode();
         if (node)
@@ -305,7 +305,7 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
 
 void ScriptInstance::CreateObject()
 {
-    if ((!scriptFile_) || (className_.Empty()))
+    if (!scriptFile_ || className_.Empty())
         return;
     
     scriptObject_ = scriptFile_->CreateObject(className_);
@@ -377,7 +377,7 @@ void ScriptInstance::GetSupportedMethods()
 
 PODVector<unsigned char> ScriptInstance::GetScriptData() const
 {
-    if ((!scriptObject_) || (!methods_[METHOD_SAVE]))
+    if (!scriptObject_ || !methods_[METHOD_SAVE])
         return PODVector<unsigned char>();
     else
     {
@@ -391,7 +391,7 @@ PODVector<unsigned char> ScriptInstance::GetScriptData() const
 
 void ScriptInstance::SetScriptData(PODVector<unsigned char> data)
 {
-    if ((scriptObject_) && (methods_[METHOD_LOAD]))
+    if (scriptObject_ && methods_[METHOD_LOAD])
     {
         MemoryBuffer buf(data);
         VariantVector parameters;
@@ -402,7 +402,7 @@ void ScriptInstance::SetScriptData(PODVector<unsigned char> data)
 
 void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if ((!active_) || (!scriptObject_))
+    if (!active_ || !scriptObject_)
         return;
     
     using namespace SceneUpdate;
@@ -432,7 +432,7 @@ void ScriptInstance::HandleSceneUpdate(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if ((!active_) || (!scriptObject_))
+    if (!active_ || !scriptObject_)
         return;
     
     using namespace ScenePostUpdate;
@@ -444,7 +444,7 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
-    if ((!active_) || (!scriptObject_))
+    if (!active_ || !scriptObject_)
         return;
     
     using namespace PhysicsPreStep;
@@ -471,7 +471,7 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 
 void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData)
 {
-    if ((!active_) || (!scriptObject_))
+    if (!active_ || !scriptObject_)
         return;
     
     using namespace PhysicsPostStep;
@@ -498,7 +498,7 @@ void ScriptInstance::HandlePhysicsPostStep(StringHash eventType, VariantMap& eve
 
 void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    if ((!active_) || (!scriptFile_) || (!scriptObject_))
+    if (!active_ || !scriptFile_ || !scriptObject_)
         return;
     
     asIScriptFunction* method = static_cast<asIScriptFunction*>(context_->GetHandler()->GetUserData());

@@ -43,9 +43,9 @@ static const String emptyFilter;
 
 static bool CompareEntries(const FileSelectorEntry& lhs, const FileSelectorEntry& rhs)
 {
-    if ((lhs.directory_) && (!rhs.directory_))
+    if (lhs.directory_ && !rhs.directory_)
         return true;
-    if ((!lhs.directory_) && (rhs.directory_))
+    if (!lhs.directory_ && rhs.directory_)
         return false;
     return lhs.name_ < rhs.name_;
 }
@@ -450,7 +450,7 @@ void FileSelector::HandleFileListKey(StringHash eventType, VariantMap& eventData
     {
         bool entered = EnterFile();
         // When a key is used to enter a directory, select the first file if no selection
-        if ((entered) && (!fileList_->GetSelectedItem()))
+        if (entered && !fileList_->GetSelectedItem())
             fileList_->SetSelection(0);
     }
 }
@@ -474,7 +474,7 @@ void FileSelector::HandleOKPressed(StringHash eventType, VariantMap& eventData)
             SendEvent(E_FILESELECTED, newEventData);
         }
     }
-    else if ((eventType == E_RELEASED) && (!path_.Empty()))
+    else if (eventType == E_RELEASED && !path_.Empty())
     {
         using namespace FileSelected;
         

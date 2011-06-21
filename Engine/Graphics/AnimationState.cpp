@@ -133,7 +133,7 @@ void AnimationState::AddWeight(float delta)
 void AnimationState::AddTime(float delta)
 {
     float length = animation_->GetLength();
-    if ((delta == 0.0f) || (length == 0.0f))
+    if (delta == 0.0f || length == 0.0f)
         return;
     
     float time = GetTime() + delta;
@@ -186,7 +186,7 @@ void AnimationState::Apply()
             const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.Size()))
+            if (!boneNode || !bone->animated_ || !track->keyFrames_.Size())
                 continue;
             
             unsigned& frame = lastKeyFrame_[i->first_];
@@ -249,7 +249,7 @@ void AnimationState::Apply()
             const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;
             Node* boneNode = bone->node_;
-            if ((!boneNode) || (!bone->animated_) || (!track->keyFrames_.Size()))
+            if (!boneNode || !bone->animated_ || !track->keyFrames_.Size())
                 continue;
             
             unsigned& frame = lastKeyFrame_[i->first_];

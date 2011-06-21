@@ -114,7 +114,7 @@ void LineEdit::Update(float timeStep)
         cursorBlinkTimer_ = 0.0f;
     
     // Update cursor position if font has changed
-    if ((text_->GetFont() != lastFont_) || (text_->GetFontSize() != lastFontSize_))
+    if (text_->GetFont() != lastFont_ || text_->GetFontSize() != lastFontSize_)
     {
         lastFont_ = text_->GetFont();
         lastFontSize_ = text_->GetFontSize();
@@ -129,7 +129,7 @@ void LineEdit::Update(float timeStep)
 
 void LineEdit::OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if ((buttons & MOUSEB_LEFT) && (cursorMovable_))
+    if (buttons & MOUSEB_LEFT && cursorMovable_)
     {
         unsigned pos = GetCharIndex(position);
         if (pos != M_MAX_UNSIGNED)
@@ -147,11 +147,11 @@ void LineEdit::OnDragStart(const IntVector2& position, const IntVector2& screenP
 
 void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if ((cursorMovable_) && (textSelectable_))
+    if (cursorMovable_ && textSelectable_)
     {
         unsigned start = dragStartCursor_;
         unsigned current = GetCharIndex(position);
-        if ((start != M_MAX_UNSIGNED) && (current != M_MAX_UNSIGNED))
+        if (start != M_MAX_UNSIGNED && current != M_MAX_UNSIGNED)
         {
             if (start < current)
                 text_->SetSelection(start, current - start);
@@ -188,7 +188,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     {
     case 'X':
     case 'C':
-        if ((textCopyable_) && (qualifiers & QUAL_CTRL))
+        if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
             unsigned start = text_->GetSelectionStart();
             unsigned length = text_->GetSelectionLength();
@@ -210,7 +210,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
         
     case 'V':
-        if ((textCopyable_) && (qualifiers & QUAL_CTRL))
+        if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
             const String& clipBoard = GetSubsystem<UI>()->GetClipBoardText();
             if (!clipBoard.Empty())
@@ -228,9 +228,9 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_LEFT:
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
-        if ((cursorMovable_) && (cursorPosition_ > 0))
+        if (cursorMovable_ && cursorPosition_ > 0)
         {
-            if ((textSelectable_) && (qualifiers & QUAL_SHIFT) && (!text_->GetSelectionLength()))
+            if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
                 dragStartCursor_ = cursorPosition_;
             
             if (qualifiers & QUAL_CTRL)
@@ -239,7 +239,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
                 --cursorPosition_;
             cursorMoved = true;
             
-            if ((textSelectable_) && (qualifiers & QUAL_SHIFT))
+            if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
                 unsigned start = dragStartCursor_;
                 unsigned current = cursorPosition_;
@@ -254,9 +254,9 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_RIGHT:
         if (!(qualifiers & QUAL_SHIFT))
             text_->ClearSelection();
-        if ((cursorMovable_) && (cursorPosition_ < line_.Length()))
+        if (cursorMovable_ && cursorPosition_ < line_.Length())
         {
-            if ((textSelectable_) && (qualifiers & QUAL_SHIFT) && (!text_->GetSelectionLength()))
+            if (textSelectable_ && qualifiers & QUAL_SHIFT && !text_->GetSelectionLength())
                 dragStartCursor_ = cursorPosition_;
             
             if (qualifiers & QUAL_CTRL)
@@ -265,7 +265,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
                 ++cursorPosition_;
             cursorMoved = true;
             
-            if ((textSelectable_) && (qualifiers & QUAL_SHIFT))
+            if (textSelectable_ && qualifiers & QUAL_SHIFT)
             {
                 unsigned start = dragStartCursor_;
                 unsigned current = cursorPosition_;
@@ -278,7 +278,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_HOME:
-        if ((cursorMovable_) && (cursorPosition_ > 0))
+        if (cursorMovable_ && cursorPosition_ > 0)
         {
             cursorPosition_ = 0;
             cursorMoved = true;
@@ -286,7 +286,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
         
     case KEY_END:
-        if ((cursorMovable_) && (cursorPosition_ < line_.Length()))
+        if (cursorMovable_ && cursorPosition_ < line_.Length())
         {
             cursorPosition_ = line_.Length();
             cursorMoved = true;
@@ -336,7 +336,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
     case KEY_BACKSPACE:
         if (!text_->GetSelectionLength())
         {
-            if ((line_.Length()) && (cursorPosition_))
+            if (line_.Length() && cursorPosition_)
             {
                 if (cursorPosition_ < line_.Length())
                     line_ = line_.Substring(0, cursorPosition_ - 1) + line_.Substring(cursorPosition_);
@@ -391,7 +391,7 @@ void LineEdit::OnChar(unsigned char c, int buttons, int qualifiers)
     if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
         return;
     
-    if ((c >= 0x20) && ((!maxLength_) || (line_.Length() < maxLength_)))
+    if (c >= 0x20 && (!maxLength_ || line_.Length() < maxLength_))
     {
         String charStr;
         charStr.Resize(1);
@@ -450,7 +450,7 @@ void LineEdit::SetText(const String& text)
 
 void LineEdit::SetCursorPosition(unsigned position)
 {
-    if ((position > line_.Length()) || (!cursorMovable_))
+    if (position > line_.Length() || !cursorMovable_)
         position = line_.Length();
     
     if (position != cursorPosition_)

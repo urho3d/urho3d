@@ -243,7 +243,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     D3DFORMAT fullscreenFormat = impl_->GetDesktopFormat();
     
     // If zero dimensions, use the desktop default
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0)
     {
         if (fullscreen)
         {
@@ -260,8 +260,8 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     multiSample = Clamp(multiSample, 1, (int)D3DMULTISAMPLE_16_SAMPLES);
 
-    if ((mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) && (vsync == vsync_)
-        && (multiSample == multiSample_))
+    if (mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ && vsync == vsync_
+        && multiSample == multiSample_)
         return true;
     
     if (!impl_->window_)
@@ -277,7 +277,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     // Disable deferred  rendering if not supported
-    if ((mode == RENDER_DEFERRED) && (!deferredSupport_))
+    if (mode == RENDER_DEFERRED && !deferredSupport_)
         mode = RENDER_FORWARD;
 
     // Note: GetMultiSample() will not reflect the actual hardware multisample mode, but rather what the caller wanted.
@@ -293,7 +293,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         fullscreen = false;
         for (unsigned i = 0; i < resolutions.Size(); ++i)
         {
-            if ((width == resolutions[i].x_) && (height == resolutions[i].y_))
+            if (width == resolutions[i].x_ && height == resolutions[i].y_)
             {
                 fullscreen = true;
                 break;
@@ -547,7 +547,7 @@ bool Graphics::BeginFrame()
     impl_->device_->BeginScene();
     
     // If a query was issued on the previous frame, wait for it to finish before beginning the next
-    if ((impl_->frameQuery_) && (queryIssued_))
+    if (impl_->frameQuery_ && queryIssued_)
     {
         while (impl_->frameQuery_->GetData(0, 0, D3DGETDATA_FLUSH) == S_FALSE)
         {
@@ -589,7 +589,7 @@ void Graphics::EndFrame()
     SendEvent(E_ENDRENDER);
     
     // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to pre-render
-    if ((impl_->frameQuery_) && (flushGPU_))
+    if (impl_->frameQuery_ && flushGPU_)
     {
         impl_->frameQuery_->Issue(D3DISSUE_END);
         queryIssued_ = true;
@@ -670,7 +670,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-    if ((!indexCount) || (!instanceCount))
+    if (!indexCount || !instanceCount)
         return;
     
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
@@ -768,11 +768,11 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         if (i < buffers.Size())
         {
             buffer = buffers[i];
-            if ((buffer) && (buffer->GetElementMask() & MASK_INSTANCEMATRIX1))
+            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
                 offset = instanceOffset * buffer->GetVertexSize();
         }
         
-        if ((buffer != vertexBuffers_[i]) || (offset != streamOffsets_[i]))
+        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i])
         {
             if (buffer)
                 impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
@@ -842,11 +842,11 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         if (i < buffers.Size())
         {
             buffer = buffers[i];
-            if ((buffer) && (buffer->GetElementMask() & MASK_INSTANCEMATRIX1))
+            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
                 offset = instanceOffset * buffer->GetVertexSize();
         }
         
-        if ((buffer != vertexBuffers_[i]) || (offset != streamOffsets_[i]))
+        if (buffer != vertexBuffers_[i] || offset != streamOffsets_[i])
         {
             if (buffer)
                 impl_->device_->SetStreamSource(i, (IDirect3DVertexBuffer9*)buffer->GetGPUObject(), offset, buffer->GetVertexSize());
@@ -879,7 +879,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vs != vertexShader_)
     {
         // Create the shader now if not yet created. If already attempted, do not retry
-        if ((vs) && (!vs->IsCreated()))
+        if (vs && !vs->IsCreated())
         {
             if (!vs->IsFailed())
             {
@@ -898,7 +898,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 vs = 0;
         }
         
-        if ((vs) && (vs->GetShaderType() == VS))
+        if (vs && vs->GetShaderType() == VS)
             impl_->device_->SetVertexShader((IDirect3DVertexShader9*)vs->GetGPUObject());
         else
         {
@@ -911,7 +911,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     
     if (ps != pixelShader_)
     {
-        if ((ps) && (!ps->IsCreated()))
+        if (ps && !ps->IsCreated())
         {
             if (!ps->IsFailed())
             {
@@ -930,7 +930,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 ps = 0;
         }
         
-        if ((ps) && (ps->GetShaderType() == PS))
+        if (ps && ps->GetShaderType() == PS)
             impl_->device_->SetPixelShader((IDirect3DPixelShader9*)ps->GetGPUObject());
         else
         {
@@ -1095,7 +1095,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
 {
     if (param < PSP_AMBIENTCOLOR)
     {
-        if ((vertexShader_) && (vertexShader_->HasParameter(param)) && (lastShaderParameterSources_[param] != source))
+        if (vertexShader_ && vertexShader_->HasParameter(param) && lastShaderParameterSources_[param] != source)
         {
             lastShaderParameterSources_[param] = source;
             return true;
@@ -1103,7 +1103,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
     }
     else
     {
-        if ((pixelShader_) && (pixelShader_->HasParameter(param)) && (lastShaderParameterSources_[param] != source))
+        if (pixelShader_ && pixelShader_->HasParameter(param) && lastShaderParameterSources_[param] != source)
         {
             lastShaderParameterSources_[param] = source;
             return true;
@@ -1115,7 +1115,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
 
 bool Graphics::NeedTextureUnit(TextureUnit unit)
 {
-    return (pixelShader_) && (pixelShader_->HasTextureUnit(unit));
+    return pixelShader_ && pixelShader_->HasTextureUnit(unit);
 }
 
 void Graphics::ClearParameterSources()
@@ -1138,7 +1138,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if ((renderTargets_[0]) && (renderTargets_[0]->GetParentTexture() == texture))
+        if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
         // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
         // but should still not sample it either
@@ -1189,7 +1189,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             impl_->device_->SetSamplerState(index, D3DSAMP_ADDRESSV, v);
             impl_->vAddressModes_[index] = v;
         }
-        if ((u == D3DTADDRESS_BORDER) || (v == D3DTADDRESS_BORDER))
+        if (u == D3DTADDRESS_BORDER || v == D3DTADDRESS_BORDER)
         {
             const Color& borderColor = texture->GetBorderColor();
             if (borderColor != impl_->borderColors_[index])
@@ -1285,7 +1285,7 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* renderTexture)
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
     IDirect3DSurface9* newDepthStencilSurface = 0;
-    if ((depthStencil) && (depthStencil->GetUsage() == TEXTURE_DEPTHSTENCIL))
+    if (depthStencil && depthStencil->GetUsage() == TEXTURE_DEPTHSTENCIL)
     {
         newDepthStencilSurface = (IDirect3DSurface9*)depthStencil->GetSurface();
         depthStencil_ = depthStencil;
@@ -1487,11 +1487,11 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 {
     // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
-    if ((rect.min_.x_ <= 0.0f) && (rect.min_.y_ <= 0.0f) && (rect.max_.y_ >= 1.0f) && (rect.max_.y_ >= 1.0f))
+    if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.y_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
     
     // Check for illegal rect, disable in that case
-    if ((rect.max_.x_ < rect.min_.x_) || (rect.max_.y_ < rect.min_.y_))
+    if (rect.max_.x_ < rect.min_.x_ || rect.max_.y_ < rect.min_.y_)
         enable = false;
     
     if (enable)
@@ -1512,10 +1512,10 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
         
-        if ((intRect.right_ < intRect.left_) || (intRect.bottom_ < intRect.top_))
+        if (intRect.right_ < intRect.left_ || intRect.bottom_ < intRect.top_)
             enable = false;
         
-        if ((enable) && (scissorRect_ != intRect))
+        if (enable && scissorRect_ != intRect)
         {
             RECT d3dRect;
             d3dRect.left = intRect.left_;
@@ -1544,11 +1544,11 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
     // Full scissor is same as disabling the test
-    if ((rect.left_ <= 0) && (rect.right_ >= viewSize.x_) && (rect.top_ <= 0) && (rect.bottom_ >= viewSize.y_))
+    if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
         enable = false;
     
     // Check for illegal rect, disable in that case
-    if ((rect.right_ < rect.left_) || (rect.bottom_ < rect.top_))
+    if (rect.right_ < rect.left_ || rect.bottom_ < rect.top_)
         enable = false;
     
     if (enable)
@@ -1564,10 +1564,10 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
         
-        if ((intRect.right_ < intRect.left_) || (intRect.bottom_ < intRect.top_))
+        if (intRect.right_ < intRect.left_ || intRect.bottom_ < intRect.top_)
             enable = false;
         
-        if ((enable) && (scissorRect_ != intRect))
+        if (enable && scissorRect_ != intRect)
         {
             RECT d3dRect;
             d3dRect.left = intRect.left_;
@@ -1634,7 +1634,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 
 void Graphics::SetStreamFrequency(unsigned index, unsigned frequency)
 {
-    if ((index < MAX_VERTEX_STREAMS) && (streamFrequencies_[index] != frequency))
+    if (index < MAX_VERTEX_STREAMS && streamFrequencies_[index] != frequency)
     {
         impl_->device_->SetStreamSourceFreq(index, frequency);
         streamFrequencies_[index] = frequency;
@@ -1720,7 +1720,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
 
 bool Graphics::DefineVertex(const Vector3& vertex)
 {
-    if ((!immediateBuffer_) || (immediateCurrentVertex_ >= immediateVertexCount_))
+    if (!immediateBuffer_ || immediateCurrentVertex_ >= immediateVertexCount_)
         return false;
     
     immediateDataPtr_ += immediateBuffer_->GetVertexSize();
@@ -1737,7 +1737,7 @@ bool Graphics::DefineVertex(const Vector3& vertex)
 
 bool Graphics::DefineNormal(const Vector3& normal)
 {
-    if ((!immediateBuffer_) ||(!(immediateBuffer_->GetElementMask() & MASK_NORMAL)) || (!immediateCurrentVertex_))
+    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_NORMAL) || !immediateCurrentVertex_)
         return false;
     
     float* dest = (float*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_NORMAL));
@@ -1751,7 +1751,7 @@ bool Graphics::DefineNormal(const Vector3& normal)
 
 bool Graphics::DefineTexCoord(const Vector2& texCoord)
 {
-    if ((!immediateBuffer_) || (!(immediateBuffer_->GetElementMask() & MASK_TEXCOORD1)) || (!immediateCurrentVertex_))
+    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_TEXCOORD1) || !immediateCurrentVertex_)
         return false;
     
     float* dest = (float*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_TEXCOORD1));
@@ -1764,7 +1764,7 @@ bool Graphics::DefineTexCoord(const Vector2& texCoord)
 
 bool Graphics::DefineColor(const Color& color)
 {
-    if ((!immediateBuffer_) || (!(immediateBuffer_->GetElementMask() & MASK_COLOR)) || (!immediateCurrentVertex_))
+    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_COLOR) || !immediateCurrentVertex_)
         return false;
     
     unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_COLOR));
@@ -1775,7 +1775,7 @@ bool Graphics::DefineColor(const Color& color)
 
 bool Graphics::DefineColor(unsigned color)
 {
-    if ((!immediateBuffer_) || (!(immediateBuffer_->GetElementMask() & MASK_COLOR)) || (!immediateCurrentVertex_))
+    if (!immediateBuffer_ || !(immediateBuffer_->GetElementMask() & MASK_COLOR) || !immediateCurrentVertex_)
         return false;
     
     unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateBuffer_->GetElementOffset(ELEMENT_COLOR));
@@ -1803,7 +1803,7 @@ void Graphics::SetForceSM2(bool enable)
 
 bool Graphics::IsInitialized() const
 {
-    return (impl_->window_ != 0) && (impl_->GetDevice() != 0);
+    return impl_->window_ != 0 && impl_->GetDevice() != 0;
 }
 
 unsigned char* Graphics::GetImmediateDataPtr() const
@@ -2091,8 +2091,8 @@ bool Graphics::CreateInterface()
     // stream offset
     if (!forceSM2_)
     {
-        if ((impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0)) && (impl_->deviceCaps_.PixelShaderVersion >=
-            D3DPS_VERSION(3, 0)))
+        if (impl_->deviceCaps_.VertexShaderVersion >= D3DVS_VERSION(3, 0) && impl_->deviceCaps_.PixelShaderVersion >=
+            D3DPS_VERSION(3, 0))
             hasSM3_ = true;
     }
     
@@ -2139,8 +2139,8 @@ bool Graphics::CreateInterface()
     // Check for Intel 4 Series with an old driver, enable manual shadow map compare in that case
     if (shadowMapFormat_ == D3DFMT_D16)
     {
-        if ((impl_->adapterIdentifier_.VendorId == 0x8086) && (impl_->adapterIdentifier_.DeviceId == 0x2a42) &&
-            (impl_->adapterIdentifier_.DriverVersion.QuadPart <= 0x0007000f000a05d0ULL))
+        if (impl_->adapterIdentifier_.VendorId == 0x8086 && impl_->adapterIdentifier_.DeviceId == 0x2a42 &&
+            impl_->adapterIdentifier_.DriverVersion.QuadPart <= 0x0007000f000a05d0ULL)
             hardwareShadowSupport_ = false;
     }
     
@@ -2440,7 +2440,7 @@ LRESULT CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     
     Graphics* graphics = reinterpret_cast<Graphics*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     
-    if ((graphics) && (graphics->IsInitialized()))
+    if (graphics && graphics->IsInitialized())
     {
         VariantMap eventData;
         eventData[P_WINDOW] = (int)hwnd;

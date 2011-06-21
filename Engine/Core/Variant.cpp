@@ -218,7 +218,7 @@ void Variant::FromString(const String& type, const String& value)
 
 void Variant::SetBuffer(const void* data, unsigned size)
 {
-    if ((size) && (!data))
+    if (size && !data)
         size = 0;
     
     SetType(VAR_BUFFER);

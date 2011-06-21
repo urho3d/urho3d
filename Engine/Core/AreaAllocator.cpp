@@ -52,12 +52,12 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
         int freeWidth = i->right_ - i->left_;
         int freeHeight = i->bottom_ - i->top_;
         
-        if ((freeWidth >= width) && (freeHeight >= height))
+        if (freeWidth >= width && freeHeight >= height)
         {
             // Calculate rank for free area. Lower is better
             int freeArea = freeWidth * freeHeight;
             
-            if ((best == freeAreas_.End()) || (freeArea < bestFreeArea))
+            if (best == freeAreas_.End() || freeArea < bestFreeArea)
             {
                 best = i;
                 bestFreeArea = freeArea;
@@ -92,8 +92,8 @@ bool AreaAllocator::Allocate(int width, int height, int& x, int& y)
 
 bool AreaAllocator::SplitRect(IntRect original, const IntRect& reserve)
 {
-    if ((reserve.right_ > original.left_) && (reserve.left_ < original.right_) &&
-        (reserve.bottom_ > original.top_) && (reserve.top_ < original.bottom_))
+    if (reserve.right_ > original.left_ && reserve.left_ < original.right_ && reserve.bottom_ > original.top_ &&
+        reserve.top_ < original.bottom_)
     {
         // Check for splitting from the right
         if (reserve.right_ < original.right_) 

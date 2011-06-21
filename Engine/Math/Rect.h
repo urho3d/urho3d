@@ -70,9 +70,9 @@ public:
     }
     
     /// Test for equality with another rect
-    bool operator == (const Rect& rhs) const { return (min_ == rhs.min_) && (max_ == rhs.max_); }
+    bool operator == (const Rect& rhs) const { return min_ == rhs.min_ && max_ == rhs.max_; }
     /// Test for inequality with another rect
-    bool operator != (const Rect& rhs) const { return (min_ != rhs.min_) || (max_ != rhs.max_); }
+    bool operator != (const Rect& rhs) const { return min_ != rhs.min_ || max_ != rhs.max_; }
     
     /// Define from minimum and maximum vectors
     void Define(const Vector2& min, const Vector2& max)
@@ -165,13 +165,13 @@ public:
     /// Test for equality with another rect
     bool operator == (const IntRect& rhs) const
     {
-        return (left_ == rhs.left_) && (top_ == rhs.top_) && (right_ == rhs.right_) && (bottom_ == rhs.bottom_);
+        return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_;
     }
     
     /// Test for inequality with another rect
     bool operator != (const IntRect& rhs) const
     {
-        return (left_ != rhs.left_) || (top_ != rhs.top_) || (right_ != rhs.right_) || (bottom_ != rhs.bottom_);
+        return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_;
     }
     
     /// Return integer data

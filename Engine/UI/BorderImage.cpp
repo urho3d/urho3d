@@ -68,7 +68,7 @@ void BorderImage::SetStyle(const XMLElement& element)
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
-    if ((hovering_) || (selected_))
+    if (hovering_ || selected_)
         GetBatches(batches, quads, currentScissor, hoverOffset_);
     else
         GetBatches(batches, quads, currentScissor, IntVector2::ZERO);
@@ -114,8 +114,8 @@ void BorderImage::SetHoverOffset(int x, int y)
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset)
 {
     bool allOpaque = true;
-    if ((GetDerivedOpacity() < 1.0f) || (color_[C_TOPLEFT].a_ < 1.0f) || (color_[C_TOPRIGHT].a_ < 1.0f) ||
-        (color_[C_BOTTOMLEFT].a_ < 1.0f) || (color_[C_BOTTOMRIGHT].a_ < 1.0f))
+    if (GetDerivedOpacity() < 1.0f || color_[C_TOPLEFT].a_ < 1.0f || color_[C_TOPRIGHT].a_ < 1.0f ||
+        color_[C_BOTTOMLEFT].a_ < 1.0f || color_[C_BOTTOMRIGHT].a_ < 1.0f)
         allOpaque = false;
         
     UIBatch batch;

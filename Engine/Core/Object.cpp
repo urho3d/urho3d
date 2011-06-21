@@ -80,8 +80,8 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
 
 void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
 {
-    if ((!sender) || (!handler))
-        return; 
+    if (!sender || !handler)
+        return;
     
     Pair<Object*, StringHash> combination(sender, eventType);
     
@@ -230,7 +230,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             for (unsigned k = 0; k < numReceivers; ++k)
             {
                 Object* receiver = group->At(k);
-                if ((receiver) && (processed.Find(receiver) == processed.End()))
+                if (receiver && processed.Find(receiver) == processed.End())
                 {
                     receiver->OnEvent(this, true, eventType, eventData);
                     if (self.IsExpired())

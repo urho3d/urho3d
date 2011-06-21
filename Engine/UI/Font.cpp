@@ -230,7 +230,7 @@ const FontFace* Font::GetFace(int pointSize)
             AreaAllocator allocator(texWidth, texHeight);
             for (unsigned i = 0; i < newFace.glyphs_.Size(); ++i)
             {
-                if ((newFace.glyphs_[i].width_) && (newFace.glyphs_[i].height_))
+                if (newFace.glyphs_[i].width_ && newFace.glyphs_[i].height_)
                 {
                     int x, y;
                     // Reserve an empty border between glyphs for filtering
@@ -261,7 +261,7 @@ const FontFace* Font::GetFace(int pointSize)
             else
                 texHeight <<= 1;
             
-            if ((texWidth > FONT_TEXTURE_MAX_SIZE) || (texHeight > FONT_TEXTURE_MAX_SIZE))
+            if (texWidth > FONT_TEXTURE_MAX_SIZE || texHeight > FONT_TEXTURE_MAX_SIZE)
             {
                 FT_Done_Face(face);
                 LOGERROR("Font face could not be fit into the largest possible texture");
@@ -343,7 +343,7 @@ const FontFace* Font::GetFace(int pointSize)
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
     texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
     texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
-    if ((!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat())) || (!texture->Load(image, true)))
+    if (!texture->SetSize(texWidth, texHeight, Graphics::GetAlphaFormat()) || !texture->Load(image, true))
         return 0;
     
     SetMemoryUse(GetMemoryUse() + texWidth * texHeight);

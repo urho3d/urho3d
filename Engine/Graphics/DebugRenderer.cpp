@@ -197,7 +197,7 @@ void DebugRenderer::Render()
 {
     PROFILE(RenderDebugGeometry);
     
-    if ((!lines_.Size()) && (!noDepthLines_.Size()))
+    if (lines_.Empty() && noDepthLines_.Empty())
         return;
     
     Graphics* graphics = GetSubsystem<Graphics>();

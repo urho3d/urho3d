@@ -281,7 +281,7 @@ void Scene::ClearNonLocal()
 {
     // Because node removal can remove arbitrary other nodes, can not iterate. Instead loop until the first node is local,
     // or the map is empty
-    while ((allNodes_.Size()) && (allNodes_.Begin()->first_ < FIRST_LOCAL_ID))
+    while (allNodes_.Size() && allNodes_.Begin()->first_ < FIRST_LOCAL_ID)
         allNodes_.Begin()->second_->Remove();
 }
 
@@ -325,7 +325,7 @@ Component* Scene::GetComponentByID(unsigned id) const
 
 float Scene::GetAsyncProgress() const
 {
-    if ((!asyncLoading_) || (!asyncProgress_.totalNodes_))
+    if (!asyncLoading_ || !asyncProgress_.totalNodes_)
         return 1.0f;
     else
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
@@ -394,7 +394,7 @@ unsigned Scene::GetFreeComponentID(bool local)
 
 void Scene::NodeAdded(Node* node)
 {
-    if ((!node) || (node->GetScene()))
+    if (!node || node->GetScene())
         return;
     
     node->SetScene(this);
@@ -402,7 +402,7 @@ void Scene::NodeAdded(Node* node)
     // If we already have an existing node with the same ID, must remove the scene reference from it
     unsigned id = node->GetID();
     Map<unsigned, Node*>::Iterator i = allNodes_.Find(id);
-    if ((i != allNodes_.End()) && (i->second_ != node))
+    if (i != allNodes_.End() && i->second_ != node)
     {
         LOGWARNING("Overwriting node with ID " + String(id));
         i->second_->SetScene(0);
@@ -414,7 +414,7 @@ void Scene::NodeAdded(Node* node)
 
 void Scene::NodeRemoved(Node* node)
 {
-    if ((!node) || (node->GetScene() != this))
+    if (!node || node->GetScene() != this)
         return;
     
     allNodes_.Erase(node->GetID());

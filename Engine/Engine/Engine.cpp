@@ -95,7 +95,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
-        if ((arguments[i][0] == '-') && (arguments[i].Length() >= 2))
+        if (arguments[i][0] == '-' && arguments[i].Length() >= 2)
         {
             String argument = arguments[i].Substring(1).ToLower();
             
@@ -248,7 +248,7 @@ bool Engine::InitializeScripting()
 
 void Engine::RunFrame()
 {
-    if ((!initialized_) || (exiting_))
+    if (!initialized_ || exiting_)
         return;
     
     if (!headless_)
@@ -277,7 +277,7 @@ void Engine::RunFrame()
 
 Console* Engine::CreateConsole()
 {
-    if ((headless_) || (!initialized_))
+    if (headless_ || !initialized_)
         return 0;
     context_->RegisterSubsystem(new Console(context_));
     return GetSubsystem<Console>();
@@ -285,7 +285,7 @@ Console* Engine::CreateConsole()
 
 DebugHud* Engine::CreateDebugHud()
 {
-    if ((headless_) || (!initialized_))
+    if (headless_ || !initialized_)
         return 0;
     context_->RegisterSubsystem(new DebugHud(context_));
     return GetSubsystem<DebugHud>();
@@ -352,7 +352,7 @@ void Engine::Render()
     Graphics* graphics = GetSubsystem<Graphics>();
     
     // Do not render if device lost
-    if ((graphics) && (graphics->BeginFrame()))
+    if (graphics && graphics->BeginFrame())
     {
         GetSubsystem<Renderer>()->Render();
         GetSubsystem<UI>()->Render();
@@ -369,7 +369,7 @@ void Engine::GetNextTimeStep()
     
     int maxFps = maxFps_;
     Input* input = GetSubsystem<Input>();
-    if ((input) && (!input->IsActive()))
+    if (input && !input->IsActive())
         maxFps = maxInactiveFps_;
     
     int timeAcc = 0;

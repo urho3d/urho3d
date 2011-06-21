@@ -93,7 +93,7 @@ public:
         
         if (!ptr_->link_[1])
         {
-            while ((ptr_->parent_) && (ptr_->parent_->link_[1] == ptr_))
+            while (ptr_->parent_ && ptr_->parent_->link_[1] == ptr_)
                 ptr_ = ptr_->parent_;
             
             ptr_ = ptr_->parent_;
@@ -119,7 +119,7 @@ public:
         
         if (!ptr_->link_[0])
         {
-            while ((ptr_->parent_) && (ptr_->parent_->link_[0] == ptr_))
+            while (ptr_->parent_ && ptr_->parent_->link_[0] == ptr_)
                 ptr_ = ptr_->parent_;
             
             ptr_ = ptr_->parent_;
@@ -159,7 +159,7 @@ public:
     
 protected:
     /// Check whether a node is red
-    bool IsRed(TreeNodeBase* node) const { return (node) && (node->isRed_); }
+    bool IsRed(TreeNodeBase* node) const { return node && node->isRed_; }
     
     /// Single rotation
     TreeNodeBase* RotateSingle(TreeNodeBase* node, unsigned dir)

@@ -139,7 +139,7 @@ bool Sound::LoadWav(Deserializer& source)
     header.totalLength_ = source.ReadUInt();
     source.Read(&header.waveText_, 4);
     
-    if ((memcmp("RIFF", header.riffText_, 4)) || (memcmp("WAVE", header.waveText_, 4)))
+    if (memcmp("RIFF", header.riffText_, 4) || memcmp("WAVE", header.waveText_, 4))
     {
         LOGERROR("Could not read WAV data from " + source.GetName());
         return false;
@@ -154,7 +154,7 @@ bool Sound::LoadWav(Deserializer& source)
             break;
         
         source.Seek(source.GetPosition() + header.formatLength_);
-        if ((!header.formatLength_) || (source.GetPosition() >= source.GetSize()))
+        if (!header.formatLength_ || source.GetPosition() >= source.GetSize())
         {
             LOGERROR("Could not read WAV data from " + source.GetName());
             return false;
@@ -188,7 +188,7 @@ bool Sound::LoadWav(Deserializer& source)
             break;
         
         source.Seek(source.GetPosition() + header.dataLength_);
-        if ((!header.dataLength_) || (source.GetPosition() >= source.GetSize()))
+        if (!header.dataLength_ || source.GetPosition() >= source.GetSize())
         {
             LOGERROR("Could not read WAV data from " + source.GetName());
             return false;
@@ -392,7 +392,7 @@ void Sound::LoadParameters()
     {
         String name = paramElem.GetName();
         
-        if ((name == "format") && (!compressed_))
+        if (name == "format" && !compressed_)
         {
             if (paramElem.HasAttribute("frequency"))
                 frequency_ = paramElem.GetInt("frequency");
@@ -408,7 +408,7 @@ void Sound::LoadParameters()
         {
             if (paramElem.HasAttribute("enable"))
                 SetLooped(paramElem.GetBool("enable"));
-            if ((paramElem.HasAttribute("start")) && (paramElem.HasAttribute("end")))
+            if (paramElem.HasAttribute("start") && paramElem.HasAttribute("end"))
                 SetLoop(paramElem.GetInt("start"), paramElem.GetInt("end"));
         }
         

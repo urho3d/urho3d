@@ -72,15 +72,9 @@ struct Parameter
             return name_ > rhs.name_;
     }
     
-    bool operator == (const Parameter& rhs) const
-    {
-        return (index_ == rhs.index_) && (name_ == rhs.name_);
-    }
+    bool operator == (const Parameter& rhs) const { return index_ == rhs.index_ && name_ == rhs.name_; }
     
-    bool operator != (const Parameter& rhs) const
-    {
-        return (index_ != rhs.index_) || (name_ != rhs.name_);
-    }
+    bool operator != (const Parameter& rhs) const { return index_ != rhs.index_ || name_ != rhs.name_; }
     
     String name_;
     unsigned index_;
@@ -208,9 +202,9 @@ void Run(const Vector<String>& arguments)
         String source = shader.GetString("name");
         ShaderType compileType = Both;
         String type = shader.GetString("type");
-        if ((type == "VS") || (type == "vs"))
+        if (type == "VS" || type == "vs")
             compileType = VS;
-        if ((type == "PS") || (type == "ps"))
+        if (type == "PS" || type == "ps")
             compileType = PS;
         
         Shader baseShader(source, compileType);
@@ -219,7 +213,7 @@ void Run(const Vector<String>& arguments)
         while (variation)
         {
             String value = variation.GetName();
-            if ((value == "variation") || (value == "option"))
+            if (value == "variation" || value == "option")
             {
                 String name = variation.GetString("name");
                 
@@ -338,7 +332,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
                 ++quoteStart;
                 String includeFileName = glslCode_[i].Substring(quoteStart, quoteEnd - quoteStart);
                 String inputFilePath = GetPath(inputFileName);
-                while ((includeFileName.Find("../") == 0) || (includeFileName.Find("..\\") == 0))
+                while (includeFileName.Find("../") == 0 || includeFileName.Find("..\\") == 0)
                 {
                     includeFileName = includeFileName.Substring(3);
                     inputFilePath = GetParentPath(inputFilePath);
@@ -399,7 +393,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
                 {
                     for (unsigned k = 0; k < variations.Size(); ++k)
                     {
-                        if ((k != j) && (!variations[k].option_))
+                        if (k != j && !variations[k].option_)
                             active &= ~(1 << k);
                     }
                     
@@ -421,7 +415,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
                     
                     for (unsigned l = 0; l < variations.Size(); ++l)
                     {
-                        if (((active >> l) & 1) && (l != j))
+                        if ((active >> l) & 1 && l != j)
                         {
                             if (variations[l].name_ == variations[j].requires_[k])
                             {
@@ -448,7 +442,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
         }
         
         // If variations are included, check that one of them is active
-        if ((hasVariations) && (!variationActive))
+        if (hasVariations && !variationActive)
             continue;
         
         if (skipThis)
@@ -493,7 +487,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     
     // Build the output file
     String glslOutFileName = outDir_ + inDir_ + baseShader.name_;
-    glslOutFileName += (baseShader.type_ == VS) ? ".vert" : ".frag";
+    glslOutFileName += baseShader.type_ == VS ? ".vert" : ".frag";
     String xmlOutFileName = glslOutFileName + ".xml";
     
     File outFile(context_, glslOutFileName, FILE_WRITE);
@@ -508,7 +502,7 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     
     XMLFile xmlOutFile(context_);
     XMLElement shaderElem = xmlOutFile.CreateRootElement("shader");
-    shaderElem.SetString("type", (baseShader.type_ == VS) ? "vs" : "ps");
+    shaderElem.SetString("type", baseShader.type_ == VS ? "vs" : "ps");
     for (unsigned i = 0; i < processedVariations.Size(); ++i)
     {
         XMLElement variationElem = shaderElem.CreateChildElement("variation");

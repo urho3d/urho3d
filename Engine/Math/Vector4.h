@@ -84,7 +84,7 @@ public:
     /// Test for equality with another vector
     bool operator == (const Vector4& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_) && Equals(w_, rhs.w_); }
     /// Test for inequality with another vector
-    bool operator != (const Vector4& rhs) const { return (!Equals(x_, rhs.x_)) || (!Equals(y_, rhs.y_)) || (!Equals(z_, rhs.z_)) || (!Equals(w_, rhs.w_)); }
+    bool operator != (const Vector4& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_) || !Equals(w_, rhs.w_); }
     /// Add a vector
     Vector4 operator + (const Vector4& rhs) const { return Vector4(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_, w_ + rhs.w_); }
     /// Return negation

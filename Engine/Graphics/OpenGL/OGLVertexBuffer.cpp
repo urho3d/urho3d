@@ -278,7 +278,7 @@ void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& d
 
 void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if ((!object_) && (!fallbackData_))
+    if (!object_ && !fallbackData_)
         return 0;
     
     if (locked_)
@@ -287,7 +287,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         return 0;
     }
     
-    if ((!count) || (start + count > vertexCount_))
+    if (!count || start + count > vertexCount_)
     {
         LOGERROR("Illegal range for locking vertex buffer");
         return 0;
@@ -304,7 +304,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     {
         glBindBuffer(GL_ARRAY_BUFFER, object_);
         // If locking the whole buffer in discard mode, create a new data store
-        if ((mode == LOCK_DISCARD) && (count == vertexCount_))
+        if (mode == LOCK_DISCARD && count == vertexCount_)
             glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         
         hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
@@ -345,7 +345,7 @@ void* VertexBuffer::LockMorphRange()
 
 void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
 {
-    if ((!lockedMorphRange) || (!morphRangeResetData_))
+    if (!lockedMorphRange || !morphRangeResetData_)
         return;
     
     memcpy(lockedMorphRange, morphRangeResetData_.GetPtr(), morphRangeCount_ * vertexSize_);
@@ -401,7 +401,7 @@ unsigned VertexBuffer::GetVertexSize(unsigned mask)
 
 bool VertexBuffer::Create()
 {
-    if ((!vertexCount_) || (!elementMask_))
+    if (!vertexCount_ || !elementMask_)
     {
         Release();
         return true;

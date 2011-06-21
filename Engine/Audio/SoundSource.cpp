@@ -189,7 +189,7 @@ void SoundSource::Play(Sound* sound)
         return;
     
     // If no frequency set yet, set from the sound's default
-    if ((frequency_ == 0.0f) && (sound))
+    if (frequency_ == 0.0f && sound)
         SetFrequency(sound->GetFrequency());
     
     // If sound source is currently playing, have to lock the audio mutex
@@ -242,7 +242,7 @@ void SoundSource::Stop()
 
 void SoundSource::SetSoundType(SoundType type)
 {
-    if ((type == SOUND_MASTER) || (type >= MAX_SOUND_TYPES))
+    if (type == SOUND_MASTER || type >= MAX_SOUND_TYPES)
         return;
     
     soundType_ = type;
@@ -280,7 +280,7 @@ bool SoundSource::IsPlaying() const
 
 void SoundSource::SetPlayPosition(signed char* pos)
 {
-    if ((!audio_) || (!sound_))
+    if (!audio_ || !sound_)
         return;
     
     MutexLock Lock(audio_->GetMutex());
@@ -343,14 +343,14 @@ void SoundSource::StopLockless()
 void SoundSource::SetPlayPositionLockless(signed char* pos)
 {
     // Setting position on a compressed sound is not supported
-    if ((!sound_) || (sound_->IsCompressed()))
+    if (!sound_ || sound_->IsCompressed())
         return;
     
     signed char* start = sound_->GetStart();
     signed char* end = sound_->GetEnd();
     if (pos < start)
         pos = start;
-    if ((sound_->IsSixteenBit()) && ((pos - start) & 1))
+    if (sound_->IsSixteenBit() && (pos - start) & 1)
         ++pos;
     if (pos > end)
         pos = end;
@@ -369,7 +369,7 @@ void SoundSource::Update(float timeStep)
         MixNull(timeStep);
     
     // Free the sound if playback has stopped
-    if ((sound_) && (!position_))
+    if (sound_ && !position_)
     {
         FreeDecoder();
         sound_.Reset();
@@ -395,7 +395,7 @@ void SoundSource::Update(float timeStep)
 
 void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolate)
 {
-    if ((!position_) || (!sound_))
+    if (!position_ || !sound_)
         return;
     
     if (sound_->IsCompressed())
@@ -600,7 +600,7 @@ void SoundSource::MixMonoToStereo(Sound* sound, int* dest, unsigned samples, int
     float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
     int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    if ((!leftVol) && (!rightVol))
+    if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
@@ -755,7 +755,7 @@ void SoundSource::MixMonoToStereoIP(Sound* sound, int* dest, unsigned samples, i
     float totalGain = audio_->GetSoundSourceMasterGain(soundType_) * attenuation_ * gain_;
     int leftVol = (int)((-panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
     int rightVol = (int)((panning_ + 1.0f) * (256.0f * totalGain + 0.5f));
-    if ((!leftVol) && (!rightVol))
+    if (!leftVol && !rightVol)
     {
         MixZeroVolume(sound, samples, mixRate);
         return;
@@ -1183,7 +1183,7 @@ void SoundSource::MixZeroVolume(Sound* sound, unsigned samples, int mixRate)
 
 void SoundSource::MixNull(float timeStep)
 {
-    if ((!position_) || (!sound_))
+    if (!position_ || !sound_)
         return;
     
     // Advance only the time position
@@ -1207,7 +1207,7 @@ void SoundSource::MixNull(float timeStep)
 
 void SoundSource::FreeDecoder()
 {
-    if ((sound_) && (decoder_))
+    if (sound_ && decoder_)
     {
         sound_->FreeDecoder(decoder_);
         decoder_ = 0;

@@ -61,10 +61,10 @@ OcclusionBuffer::~OcclusionBuffer()
 
 bool OcclusionBuffer::SetSize(int width, int height)
 {
-    if ((width == width_) && (height == height_))
+    if (width == width_ && height == height_)
         return true;
     
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0)
         return false;
     
     if (!IsPowerOfTwo(width))
@@ -90,7 +90,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
         
         mipBuffers_.Push(SharedArrayPtr<DepthValue>(new DepthValue[width * height]));
         
-        if ((width <= OCCLUSION_MIN_SIZE) && (height <= OCCLUSION_MIN_SIZE))
+        if (width <= OCCLUSION_MIN_SIZE && height <= OCCLUSION_MIN_SIZE)
             break;
     }
     
@@ -361,9 +361,9 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     );
     
     // If outside, can not test, so assume visible (should be frustum culled in that case)
-    if ((rect.right_ < 0) || (rect.bottom_ < 0))
+    if (rect.right_ < 0 || rect.bottom_ < 0)
         return true;
-    if ((rect.left_ >= width_) || (rect.top_ >= height_))
+    if (rect.left_ >= width_ || rect.top_ >= height_)
         return true;
     
     // Clipping of rect
@@ -584,23 +584,23 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
             float d2 = plane.DotProduct(vertices[index + 2]);
             
             // If all vertices behind the plane, reject triangle
-            if ((d0 < 0.0f) && (d1 < 0.0f) && (d2 < 0.0f))
+            if (d0 < 0.0f && d1 < 0.0f && d2 < 0.0f)
             {
                 triangles[i] = false;
                 continue;
             }
             // If 2 vertices behind the plane, create a new triangle in-place
-            else if ((d0 < 0.0f) && (d1 < 0.0f))
+            else if (d0 < 0.0f && d1 < 0.0f)
             {
                 vertices[index] = ClipEdge(vertices[index], vertices[index + 2], d0, d2);
                 vertices[index + 1] = ClipEdge(vertices[index + 1], vertices[index + 2], d1, d2);
             }
-            else if ((d0 < 0.0f) && (d2 < 0.0f))
+            else if (d0 < 0.0f && d2 < 0.0f)
             {
                 vertices[index] = ClipEdge(vertices[index], vertices[index + 1], d0, d1);
                 vertices[index + 2] = ClipEdge(vertices[index + 2], vertices[index + 1], d2, d1);
             }
-            else if ((d1 < 0.0f) && (d2 < 0.0f))
+            else if (d1 < 0.0f && d2 < 0.0f)
             {
                 vertices[index + 1] = ClipEdge(vertices[index + 1], vertices[index], d1, d0);
                 vertices[index + 2] = ClipEdge(vertices[index + 2], vertices[index], d2, d0);

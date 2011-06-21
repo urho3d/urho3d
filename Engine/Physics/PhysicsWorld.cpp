@@ -378,7 +378,7 @@ void PhysicsWorld::SendCollisionEvents()
     for (Vector<PhysicsCollisionInfo>::ConstIterator i = collisionInfos_.Begin(); i != collisionInfos_.End(); ++i)
     {
         // Skip if either of the nodes has been removed
-        if ((!i->nodeA_) || (!i->nodeB_))
+        if (!i->nodeA_ || !i->nodeB_)
             continue;
         
         physicsCollisionData[PhysicsCollision::P_NODEA] = (void*)i->nodeA_;
@@ -400,7 +400,7 @@ void PhysicsWorld::SendCollisionEvents()
         SendEvent(E_PHYSICSCOLLISION, physicsCollisionData);
         
         // Skip if either of the nodes is null, or has been removed as a response to the event
-        if ((!i->nodeA_) || (!i->nodeB_))
+        if (!i->nodeA_ || !i->nodeB_)
             continue;
         
         nodeCollisionData[NodeCollision::P_SHAPE] = (void*)i->shapeA_;
@@ -412,7 +412,7 @@ void PhysicsWorld::SendCollisionEvents()
         SendEvent(i->nodeA_, E_NODECOLLISION, nodeCollisionData);
         
         // Skip if either of the nodes has been removed as a response to the event
-        if ((!i->nodeA_) || (!i->nodeB_))
+        if (!i->nodeA_ || !i->nodeB_)
             continue;
         
         contacts.Clear();
@@ -489,7 +489,7 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     dBodyID bodyB = dGeomGetBody(geomB);
     
     // If both geometries are static, no collision
-    if ((!bodyA) && (!bodyB))
+    if (!bodyA && !bodyB)
         return;
     
     // If the geometries belong to the same body, no collision
@@ -497,13 +497,13 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
         return;
     
     // If the bodies are already connected via other joints, no collision
-    if ((bodyA) && (bodyB) && (dAreConnectedExcluding(bodyA, bodyB, dJointTypeContact)))
+    if (bodyA && bodyB && dAreConnectedExcluding(bodyA, bodyB, dJointTypeContact))
         return;
     
     // If both bodies are inactive, no collision
     RigidBody* rigidBodyA = bodyA ? static_cast<RigidBody*>(dBodyGetData(bodyA)) : 0;
     RigidBody* rigidBodyB = bodyB ? static_cast<RigidBody*>(dBodyGetData(bodyB)) : 0;
-    if ((rigidBodyA) && (!rigidBodyA->IsActive()) && (rigidBodyB) && (!rigidBodyB->IsActive()))
+    if (rigidBodyA && !rigidBodyA->IsActive() && rigidBodyB && !rigidBodyB->IsActive())
         return;
     
     PhysicsWorld* world = static_cast<PhysicsWorld*>(userData);

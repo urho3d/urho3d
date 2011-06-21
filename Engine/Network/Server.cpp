@@ -597,7 +597,7 @@ void Server::SendServerUpdate(Connection* connection)
     
     Scene* scene = connection->GetScene();
     JoinState state = connection->GetJoinState();
-    if ((!scene) || (state < JS_SENDFULLUPDATE) || (state == JS_WAITFORACK))
+    if (!scene || state < JS_SENDFULLUPDATE || state == JS_WAITFORACK)
         return;
     
     // Purge states and events which are older than last acked, and expired remote events
@@ -772,7 +772,7 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
             Node* node = scene->GetNode(i->first_);
             NodeReplicationState& nodeState = i->second_;
             // Create
-            if ((nodeState.createdFrame_) && (node))
+            if (nodeState.createdFrame_ && node)
             {
                 dest.WriteUByte(MSG_CREATEENTITY);
                 dest.WriteUShort(node->GetID());
@@ -864,7 +864,7 @@ void Server::WriteNetUpdate(Connection* connection, Serializer& dest)
                     Component* component = node->GetComponent(j->first_.mData);
                     ComponentReplicationState& componentState = j->second_;
                     // Create
-                    if ((componentState.createdFrame_) && (component))
+                    if (componentState.createdFrame_ && component)
                     {
                         newBuffer.WriteShortStringHash(component->GetType());
                         newBuffer.WriteString(component->GetName());

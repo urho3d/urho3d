@@ -172,13 +172,13 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     multiSample = Clamp(multiSample, 1, 16);
     
-    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) &&
-        (vsync == vsync_) && (multiSample == multiSample_))
+    if (initialized_ && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+        vsync == vsync_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if ((initialized_) && (mode == mode_) && (width == width_) && (height == height_) && (fullscreen == fullscreen_) &&
-        (multiSample == multiSample_) && (vsync != vsync_))
+    if (initialized_ && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+        multiSample == multiSample_ && vsync != vsync_)
     {
         SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
@@ -186,7 +186,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     }
     
     // If zero dimensions in windowed mode, set default. If zero in fullscreen, use desktop mode
-    if ((!width) || (!height))
+    if (!width || !height)
     {
         if (!fullscreen)
         {
@@ -218,7 +218,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     
-    if ((multiSample > 1) && (mode == RENDER_FORWARD))
+    if (multiSample > 1 && mode == RENDER_FORWARD)
     {
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
@@ -287,7 +287,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     impl_->depthBits_ = impl_->windowDepthBits_;
     
     // Create the FBO if fully supported
-    if ((_GLEE_EXT_framebuffer_object) && (_GLEE_EXT_packed_depth_stencil))
+    if (_GLEE_EXT_framebuffer_object && _GLEE_EXT_packed_depth_stencil)
     {
         glGenFramebuffersEXT(1, &impl_->fbo_);
         
@@ -442,9 +442,9 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     bool oldColorWrite = colorWrite_;
     bool oldDepthWrite = depthWrite_;
     
-    if ((flags & CLEAR_COLOR) && (!oldColorWrite))
+    if (flags & CLEAR_COLOR && !oldColorWrite)
         SetColorWrite(true);
-    if ((flags & CLEAR_DEPTH) && (!oldDepthWrite))
+    if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite(true);
     
     unsigned glFlags = 0;
@@ -496,7 +496,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if ((!indexCount) || (!indexBuffer_))
+    if (!indexCount || !indexBuffer_)
         return;
     
     unsigned primitiveCount = 0;
@@ -569,12 +569,12 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         {
             buffer = buffers[i];
             elementMask = elementMasks[i];
-            if ((elementMask == MASK_DEFAULT) && (buffer))
+            if (elementMask == MASK_DEFAULT && buffer)
                 elementMask = buffers[i]->GetElementMask();
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if ((buffer == vertexBuffers_[i]) && (elementMask == elementMasks_[i]))
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
             continue;
         
         vertexBuffers_[i] = buffer;
@@ -666,12 +666,12 @@ bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers,
         {
             buffer = buffers[i];
             elementMask = elementMasks[i];
-            if ((elementMask == MASK_DEFAULT) && (buffer))
+            if (elementMask == MASK_DEFAULT && buffer)
                 elementMask = buffers[i]->GetElementMask();
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
-        if ((buffer == vertexBuffers_[i]) && (elementMask == elementMasks_[i]))
+        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
             continue;
         
         vertexBuffers_[i] = buffer;
@@ -747,11 +747,11 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
 
 void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 {
-    if ((vs == vertexShader_) && (ps == pixelShader_))
+    if (vs == vertexShader_ && ps == pixelShader_)
         return;
     
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
-    if ((vs) && (!vs->IsCompiled()))
+    if (vs && !vs->IsCompiled())
     {
         if (vs->GetCompilerOutput().Empty())
         {
@@ -770,7 +770,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             vs = 0;
     }
     
-    if ((ps) && (!ps->IsCompiled()))
+    if (ps && !ps->IsCompiled())
     {
         if (ps->GetCompilerOutput().Empty())
         {
@@ -795,7 +795,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         elementMasks_[i] = 0;
     }
     
-    if ((!vs) || (!ps))
+    if (!vs || !ps)
     {
         glUseProgram(0);
         vertexShader_ = 0;
@@ -1050,7 +1050,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
 
 bool Graphics::NeedTextureUnit(TextureUnit unit)
 {
-    if ((shaderProgram_) && (shaderProgram_->HasTextureUnit(unit)))
+    if (shaderProgram_ && shaderProgram_->HasTextureUnit(unit))
         return true;
     
     return false;
@@ -1078,7 +1078,7 @@ void Graphics::CleanupShaderPrograms()
         ShaderVariation* vs = current->second_->GetVertexShader();
         ShaderVariation* ps = current->second_->GetPixelShader();
         
-        if ((!vs) || (!ps) || (!vs->GetGPUObject()) || (!ps->GetGPUObject()))
+        if (!vs || !ps || !vs->GetGPUObject() || !ps->GetGPUObject())
             shaderPrograms_.Erase(current);
     }
 }
@@ -1091,7 +1091,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     // Check if texture is currently bound as a render target. In that case, use its backup texture, or blank if not defined
     if (texture)
     {
-        if ((renderTargets_[0]) && (renderTargets_[0]->GetParentTexture() == texture))
+        if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
         // Check also for the view texture, in case a specific rendering pass does not bind the destination render target,
         // but should still not sample it either
@@ -1134,7 +1134,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     }
     else
     {
-        if ((texture) && (texture->GetParametersDirty()))
+        if (texture && texture->GetParametersDirty())
         {
             if (impl_->activeTexture_ != index)
             {
@@ -1207,7 +1207,7 @@ void Graphics::ResetDepthStencil()
 
 void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
 {
-    if ((index >= MAX_RENDERTARGETS) || (!impl_->fbo_))
+    if (index >= MAX_RENDERTARGETS || !impl_->fbo_)
         return;
     
     if (renderTarget != renderTargets_[index])
@@ -1265,7 +1265,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             }
         }
         
-        if ((noFBO) && (impl_->fboBound_))
+        if (noFBO && impl_->fboBound_)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             impl_->fboBound_ = false;
@@ -1284,11 +1284,11 @@ void Graphics::SetRenderTarget(unsigned index, Texture2D* renderTexture)
 
 void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
-    if ((impl_->fbo_) && (depthStencil != depthStencil_))
+    if (impl_->fbo_ && depthStencil != depthStencil_)
     {
         // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth stencil
         // Create a new depth stencil texture as necessary to be able to provide similar behaviour.
-        if ((renderTargets_[0]) && (!depthStencil))
+        if (renderTargets_[0] && !depthStencil)
         {
             int width = renderTargets_[0]->GetWidth();
             int height = renderTargets_[0]->GetHeight();
@@ -1364,7 +1364,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
             }
         }
         
-        if ((noFBO) && (impl_->fboBound_))
+        if (noFBO && impl_->fboBound_)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             impl_->fboBound_ = false;
@@ -1441,7 +1441,7 @@ void Graphics::SetAlphaTest(bool enable, CompareMode mode, float alphaRef)
     if (enable)
     {
         alphaRef = Clamp(alphaRef, 0.0f, 1.0f);
-        if ((mode != alphaTestMode_) || (alphaRef != alphaRef_))
+        if (mode != alphaTestMode_ || alphaRef != alphaRef_)
         {
             glAlphaFunc(glCmpFunc[mode], alphaRef);
             alphaTestMode_ = mode;
@@ -1498,9 +1498,9 @@ void Graphics::SetCullMode(CullMode mode)
 
 void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
 {
-    if ((constantBias != constantDepthBias_) || (slopeScaledBias != slopeScaledDepthBias_))
+    if (constantBias != constantDepthBias_ || slopeScaledBias != slopeScaledDepthBias_)
     {
-        if ((constantBias != 0.0f) || (slopeScaledBias != 0.0f))
+        if (constantBias != 0.0f || slopeScaledBias != 0.0f)
         {
             // Bring the constant bias from Direct3D9 scale to OpenGL (depends on depth buffer bitdepth)
             // Zero depth bits may be returned if using the packed depth stencil format. Assume 24bit in that case
@@ -1556,11 +1556,11 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
 {
      // During some light rendering loops, a full rect is toggled on/off repeatedly.
     // Disable scissor in that case to reduce state changes
-    if ((rect.min_.x_ <= 0.0f) && (rect.min_.y_ <= 0.0f) && (rect.max_.y_ >= 1.0f) && (rect.max_.y_ >= 1.0f))
+    if (rect.min_.x_ <= 0.0f && rect.min_.y_ <= 0.0f && rect.max_.y_ >= 1.0f && rect.max_.y_ >= 1.0f)
         enable = false;
     
     // Check for illegal rect, disable in that case
-    if ((rect.max_.x_ < rect.min_.x_) || (rect.max_.y_ < rect.min_.y_))
+    if (rect.max_.x_ < rect.min_.x_ || rect.max_.y_ < rect.min_.y_)
         enable = false;
     
     if (enable)
@@ -1581,10 +1581,10 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
         
-        if ((intRect.right_ < intRect.left_) || (intRect.bottom_ < intRect.top_))
+        if (intRect.right_ < intRect.left_ || intRect.bottom_ < intRect.top_)
             enable = false;
         
-        if ((enable) && (scissorRect_ != intRect))
+        if (enable && scissorRect_ != intRect)
         {
             // Use Direct3D convention with the vertical coordinates ie. 0 is top
             glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.right_ - intRect.left_, intRect.bottom_ - intRect.top_);
@@ -1611,11 +1611,11 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
     IntVector2 viewPos(viewport_.left_, viewport_.top_);
     
     // Full scissor is same as disabling the test
-    if ((rect.left_ <= 0) && (rect.right_ >= viewSize.x_) && (rect.top_ <= 0) && (rect.bottom_ >= viewSize.y_))
+    if (rect.left_ <= 0 && rect.right_ >= viewSize.x_ && rect.top_ <= 0 && rect.bottom_ >= viewSize.y_)
         enable = false;
     
     // Check for illegal rect, disable in that case
-    if ((rect.right_ < rect.left_) || (rect.bottom_ < rect.top_))
+    if (rect.right_ < rect.left_ || rect.bottom_ < rect.top_)
         enable = false;
     
     if (enable)
@@ -1631,10 +1631,10 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
         
-        if ((intRect.right_ < intRect.left_) || (intRect.bottom_ < intRect.top_))
+        if (intRect.right_ < intRect.left_ || intRect.bottom_ < intRect.top_)
             enable = false;
         
-        if ((enable) && (scissorRect_ != intRect))
+        if (enable && scissorRect_ != intRect)
         {
             // Use Direct3D convention with the vertical coordinates ie. 0 is top
             glScissor(intRect.left_, rtSize.y_ - intRect.bottom_, intRect.right_ - intRect.left_, intRect.bottom_ - intRect.top_);
@@ -1675,14 +1675,14 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     
     if (enable)
     {
-        if ((mode != stencilTestMode_) || (stencilRef != stencilRef_) || (stencilMask != stencilMask_))
+        if (mode != stencilTestMode_ || stencilRef != stencilRef_ || stencilMask != stencilMask_)
         {
             glStencilFunc(glCmpFunc[mode], stencilRef, stencilMask);
             stencilTestMode_ = mode;
             stencilRef_ = stencilRef;
             stencilMask_ = stencilMask;
         }
-        if ((pass != stencilPass_) || (fail != stencilFail_) || (!zFail != stencilZFail_))
+        if (pass != stencilPass_ || fail != stencilFail_ || !zFail != stencilZFail_)
         {
             glStencilOp(glStencilOps[fail], glStencilOps[zFail], glStencilOps[pass]);
             stencilPass_ = pass;
@@ -1733,7 +1733,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
 
 bool Graphics::DefineVertex(const Vector3& vertex)
 {
-    if ((!immediateVertexCount_) || (immediateCurrentVertex_ >= immediateVertexCount_))
+    if (!immediateVertexCount_ || immediateCurrentVertex_ >= immediateVertexCount_)
         return false;
     
     immediateDataPtr_ += immediateVertexSize_;
@@ -1750,7 +1750,7 @@ bool Graphics::DefineVertex(const Vector3& vertex)
 
 bool Graphics::DefineNormal(const Vector3& normal)
 {
-    if ((!immediateVertexCount_) || (!(immediateElementMask_ & MASK_NORMAL)) || (!immediateCurrentVertex_))
+    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_NORMAL) || !immediateCurrentVertex_)
         return false;
     
     float* dest = (float*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_NORMAL]);
@@ -1764,7 +1764,7 @@ bool Graphics::DefineNormal(const Vector3& normal)
 
 bool Graphics::DefineTexCoord(const Vector2& texCoord)
 {
-    if ((!immediateVertexCount_) || (!(immediateElementMask_ & MASK_TEXCOORD1)) || (!immediateCurrentVertex_))
+    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_TEXCOORD1) || !immediateCurrentVertex_)
         return false;
     
     float* dest = (float*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_TEXCOORD1]);
@@ -1777,7 +1777,7 @@ bool Graphics::DefineTexCoord(const Vector2& texCoord)
 
 bool Graphics::DefineColor(const Color& color)
 {
-    if ((!immediateVertexCount_) || (!(immediateElementMask_ & MASK_COLOR)) || (!immediateCurrentVertex_))
+    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_COLOR) || !immediateCurrentVertex_)
         return false;
     
     unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_COLOR]);
@@ -1788,7 +1788,7 @@ bool Graphics::DefineColor(const Color& color)
 
 bool Graphics::DefineColor(unsigned color)
 {
-    if ((!immediateVertexCount_) || (!(immediateElementMask_ & MASK_COLOR)) || (!immediateCurrentVertex_))
+    if (!immediateVertexCount_ || !(immediateElementMask_ & MASK_COLOR) || !immediateCurrentVertex_)
         return false;
     
     unsigned* dest = (unsigned*)(immediateDataPtr_ + immediateElementOffsets_[ELEMENT_COLOR]);
@@ -1863,7 +1863,7 @@ PODVector<IntVector2> Graphics::GetResolutions() const
     
     SDL_Rect** rects = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
     
-    if ((rects) && (rects != (SDL_Rect**)-1))
+    if (rects && rects != (SDL_Rect**)-1)
     { 
         for (unsigned i = 0; rects[i]; ++i)
             ret.Push(IntVector2(rects[i]->w, rects[i]->h));

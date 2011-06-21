@@ -63,9 +63,9 @@ struct LitTransparencyCheck
     }
     
     /// Test for equality with another lit transparency check
-    bool operator == (const LitTransparencyCheck& rhs) const { return (light_ == rhs.light_) && (drawable_ == rhs.drawable_) && (batchIndex_ == rhs.batchIndex_); }
+    bool operator == (const LitTransparencyCheck& rhs) const { return light_ == rhs.light_ && drawable_ == rhs.drawable_ && batchIndex_ == rhs.batchIndex_; }
     /// Test for inequality with another lit transparency check
-    bool operator != (const LitTransparencyCheck& rhs) const { return (light_ != rhs.light_) || (drawable_ != rhs.drawable_) || (batchIndex_ != rhs.batchIndex_); }
+    bool operator != (const LitTransparencyCheck& rhs) const { return light_ != rhs.light_ || drawable_ != rhs.drawable_ || batchIndex_ != rhs.batchIndex_; }
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)light_) / sizeof(Light) + ((unsigned)drawable_) / sizeof(Drawable) + batchIndex_; }
     
@@ -131,7 +131,7 @@ private:
     /// Query for lit geometries and shadow casters for a light
     unsigned ProcessLight(Light* light);
     /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
-    void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool GetShadowCasters);
+    void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool getShadowCasters);
     /// Check visibility of one shadow caster
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
     /// Set up initial shadow camera view

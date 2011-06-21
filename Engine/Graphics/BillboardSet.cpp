@@ -203,7 +203,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
         forceUpdate_ = true;
     }
     
-    if ((bufferDirty_) || (forceUpdate_))
+    if (bufferDirty_ || forceUpdate_)
         UpdateVertexBuffer(frame);
 }
 
@@ -323,7 +323,7 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
 
 void BillboardSet::UpdateBufferSize()
 {
-    if ((!vertexBuffer_) || (!indexBuffer_))
+    if (!vertexBuffer_ || !indexBuffer_)
     {
         vertexBuffer_ = new VertexBuffer(context_);
         indexBuffer_ = new IndexBuffer(context_);
@@ -360,7 +360,7 @@ void BillboardSet::UpdateBufferSize()
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
-    if ((animationLodBias_ > 0.0f) && (lodDistance_ > 0.0f))
+    if (animationLodBias_ > 0.0f && lodDistance_ > 0.0f)
     {
         animationLodTimer_ += animationLodBias_ * frame.timeStep_ * frame.viewSize_.y_ * ANIMATION_LOD_BASESCALE;
         if (animationLodTimer_ >= lodDistance_)

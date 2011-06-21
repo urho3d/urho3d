@@ -79,7 +79,7 @@ public:
     /// Test for equality with another color
     bool operator == (const Color& rhs) const { return Equals(r_, rhs.r_) && Equals(g_, rhs.g_) && Equals(b_, rhs.b_) && Equals(a_, rhs.a_); }
     /// Test for inequality with another color
-    bool operator != (const Color& rhs) const { return (!Equals(r_, rhs.r_)) || (!Equals(g_, rhs.g_)) || (!Equals(b_, rhs.b_)) || (!Equals(a_, rhs.a_)); }
+    bool operator != (const Color& rhs) const { return !Equals(r_, rhs.r_) || !Equals(g_, rhs.g_) || !Equals(b_, rhs.b_) || !Equals(a_, rhs.a_); }
     /// Multiply with a scalar
     Color operator * (float rhs) const { return Color(r_ * rhs, g_ * rhs, b_ * rhs, a_ * rhs); }
     /// Add a color

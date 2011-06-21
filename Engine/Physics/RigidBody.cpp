@@ -175,9 +175,9 @@ void RigidBody::SetActive(bool active)
 {
     if (body_)
     {
-        if ((active) && (!dBodyIsEnabled(body_)))
+        if (active && !dBodyIsEnabled(body_))
             dBodyEnable(body_);
-        else if ((!active) && (dBodyIsEnabled(body_)))
+        else if (!active && dBodyIsEnabled(body_))
             dBodyDisable(body_);
     }
 }
@@ -346,7 +346,7 @@ void RigidBody::OnMarkedDirty(Node* node)
     
     if (body_)
     {
-        if ((GetPosition() != position) || (GetRotation() != rotation))
+        if (GetPosition() != position || GetRotation() != rotation)
         {
             SetActive(true);
             dBodySetPosition(body_, position.x_, position.y_, position.z_);
@@ -388,7 +388,7 @@ void RigidBody::PreStep()
 
 void RigidBody::PostStep(float t)
 {
-    if ((body_) && (IsActive()))
+    if (body_ && IsActive())
     {
         inPostStep_ = true;
         

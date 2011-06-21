@@ -76,7 +76,7 @@ View::~View()
 
 bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
 {
-    if ((!viewport.scene_) || (!viewport.camera_))
+    if (!viewport.scene_ || !viewport.camera_)
         return false;
     
     // If scene is loading asynchronously, it is incomplete and should not be rendered
@@ -90,9 +90,9 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
     mode_ = graphics_->GetRenderMode();
     
     // In deferred mode, check for the render texture being too large
-    if ((mode_ != RENDER_FORWARD) && (renderTarget))
+    if (mode_ != RENDER_FORWARD && renderTarget)
     {
-        if ((renderTarget->GetWidth() > graphics_->GetWidth()) || (renderTarget->GetHeight() > graphics_->GetHeight()))
+        if (renderTarget->GetWidth() > graphics_->GetWidth() || renderTarget->GetHeight() > graphics_->GetHeight())
         {
             // Display message only once per rendertarget, do not spam each frame
             if (gBufferErrorDisplayed_.Find(renderTarget) == gBufferErrorDisplayed_.End())
@@ -159,7 +159,7 @@ bool View::Define(RenderSurface* renderTarget, const Viewport& viewport)
 
 void View::Update(const FrameInfo& frame)
 {
-    if ((!camera_) || (!octree_))
+    if (!camera_ || !octree_)
         return;
     
     frame_.camera_ = camera_;
@@ -197,7 +197,7 @@ void View::Update(const FrameInfo& frame)
 
 void View::Render()
 {
-    if ((!octree_) || (!camera_))
+    if (!octree_ || !camera_)
         return;
     
     // Forget parameter sources from the previous view
@@ -205,7 +205,7 @@ void View::Render()
     
     // If stream offset is supported, write all instance transforms to a single large buffer
     // Else we must lock the instance buffer for each batch group
-    if ((renderer_->GetDynamicInstancing()) && (graphics_->GetStreamOffsetSupport()))
+    if (renderer_->GetDynamicInstancing() && graphics_->GetStreamOffsetSupport())
         PrepareInstancingBuffer();
     
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
@@ -279,7 +279,7 @@ void View::GetDrawables()
     for (unsigned i = 0; i < zones.Size(); ++i)
     {
         Zone* zone = zones[i];
-        if ((zone->IsInside(cameraPos)) && (zone->GetPriority() > highestZonePriority))
+        if (zone->IsInside(cameraPos) && zone->GetPriority() > highestZonePriority)
         {
             zone_ = zone;
             highestZonePriority = zone->GetPriority();
@@ -340,7 +340,7 @@ void View::GetDrawables()
         
         // If draw distance non-zero, check it
         float maxDistance = drawable->GetDrawDistance();
-        if ((maxDistance > 0.0f) && (drawable->GetDistance() > maxDistance))
+        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
             continue;
         
         unsigned flags = drawable->GetDrawableFlags();
@@ -410,16 +410,16 @@ void View::GetBatches()
             
             for (unsigned j = 0; j < splits; ++j)
             {
-                Light* SplitLight = splitLights_[j];
+                Light* splitLight = splitLights_[j];
                 LightBatchQueue& lightQueue = lightQueues_[lightQueueCount];
-                lightQueue.light_ = SplitLight;
+                lightQueue.light_ = splitLight;
                 lightQueue.shadowBatches_.Clear();
                 lightQueue.litBatches_.Clear();
                 lightQueue.volumeBatches_.Clear();
                 lightQueue.lastSplit_ = false;
                 
                 // Loop through shadow casters
-                Camera* shadowCamera = SplitLight->GetShadowCamera();
+                Camera* shadowCamera = splitLight->GetShadowCamera();
                 for (unsigned k = 0; k < shadowCasters_[j].Size(); ++k)
                 {
                     Drawable* drawable = shadowCasters_[j][k];
@@ -431,7 +431,7 @@ void View::GetBatches()
                         drawable->GetBatch(frame_, l, shadowBatch);
                         
                         Technique* tech = GetTechnique(drawable, shadowBatch.material_);
-                        if ((!shadowBatch.geometry_) || (!tech))
+                        if (!shadowBatch.geometry_ || !tech)
                             continue;
                         
                         Pass* pass = tech->GetPass(PASS_SHADOW);
@@ -442,8 +442,8 @@ void View::GetBatches()
                         // Fill the rest of the batch
                         shadowBatch.camera_ = shadowCamera;
                         shadowBatch.distance_ = shadowCamera->GetDistance(drawable->GetWorldPosition());
-                        shadowBatch.light_ = SplitLight;
-                        shadowBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
+                        shadowBatch.light_ = splitLight;
+                        shadowBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         
                         renderer_->SetBatchShaders(shadowBatch, tech, pass);
                         lightQueue.shadowBatches_.AddBatch(shadowBatch);
@@ -461,10 +461,10 @@ void View::GetBatches()
                         
                         // If drawable limits maximum lights, only record the light, and check maximum count / build batches later
                         if (!drawable->GetMaxLights())
-                            GetLitBatches(drawable, light, SplitLight, &lightQueue, litTransparencies);
+                            GetLitBatches(drawable, light, splitLight, &lightQueue, litTransparencies);
                         else
                         {
-                            drawable->AddLight(SplitLight);
+                            drawable->AddLight(splitLight);
                             maxLightsDrawables.Insert(drawable);
                         }
                     }
@@ -473,17 +473,17 @@ void View::GetBatches()
                     if (mode_ != RENDER_FORWARD)
                     {
                         Batch volumeBatch;
-                        volumeBatch.geometry_ = renderer_->GetLightGeometry(SplitLight);
-                        volumeBatch.worldTransform_ = &SplitLight->GetVolumeTransform(*camera_);
-                        volumeBatch.overrideView_ = SplitLight->GetLightType() == LIGHT_DIRECTIONAL;
+                        volumeBatch.geometry_ = renderer_->GetLightGeometry(splitLight);
+                        volumeBatch.worldTransform_ = &splitLight->GetVolumeTransform(*camera_);
+                        volumeBatch.overrideView_ = splitLight->GetLightType() == LIGHT_DIRECTIONAL;
                         volumeBatch.camera_ = camera_;
-                        volumeBatch.light_ = SplitLight;
-                        volumeBatch.distance_ = SplitLight->GetDistance();
+                        volumeBatch.light_ = splitLight;
+                        volumeBatch.distance_ = splitLight->GetDistance();
                         
                         renderer_->SetLightVolumeShaders(volumeBatch);
                         
                         // If light is a split point light, it must be treated as shadowed in any case for correct stencil clearing
-                        if ((SplitLight->GetShadowMap()) || (SplitLight->GetLightType() == LIGHT_SPLITPOINT))
+                        if (splitLight->GetShadowMap() || splitLight->GetLightType() == LIGHT_SPLITPOINT)
                             lightQueue.volumeBatches_.Push(volumeBatch);
                         else
                         {
@@ -494,7 +494,7 @@ void View::GetBatches()
                     
                     if (storeLightQueue)
                     {
-                        lightQueueIndex[SplitLight] = lightQueueCount;
+                        lightQueueIndex[splitLight] = lightQueueCount;
                         ++lightQueueCount;
                     }
                 }
@@ -552,12 +552,12 @@ void View::GetBatches()
                 drawable->GetBatch(frame_, j, baseBatch);
                 
                 Technique* tech = GetTechnique(drawable, baseBatch.material_);
-                if ((!baseBatch.geometry_) || (!tech))
+                if (!baseBatch.geometry_ || !tech)
                     continue;
                 
                 // Check here if the material technique refers to a render target texture with camera(s) attached
                 // Only check this for the main view (null rendertarget)
-                if ((!renderTarget_) && (baseBatch.material_) && (baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_))
+                if (!renderTarget_ && baseBatch.material_ && baseBatch.material_->GetAuxViewFrameNumber() != frame_.frameNumber_)
                     CheckMaterialForAuxView(baseBatch.material_);
                 
                 // If object already has a lit base pass, can skip the unlit base pass
@@ -576,7 +576,7 @@ void View::GetBatches()
                     if (pass)
                     {
                         renderer_->SetBatchShaders(baseBatch, tech, pass);
-                        baseBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         gBufferQueue_.AddBatch(baseBatch);
                         
                         // Check also for an additional pass (possibly for emissive)
@@ -598,7 +598,7 @@ void View::GetBatches()
                     renderer_->SetBatchShaders(baseBatch, tech, pass);
                     if (pass->GetBlendMode() == BLEND_REPLACE)
                     {
-                        baseBatch.hasPriority_ = (!pass->GetAlphaTest()) && (!pass->GetAlphaMask());
+                        baseBatch.hasPriority_ = !pass->GetAlphaTest() && !pass->GetAlphaMask();
                         baseQueue_.AddBatch(baseBatch);
                     }
                     else
@@ -632,7 +632,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
 {
     bool splitPointLight = SplitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
-    bool allowShadows = (!renderer_->reuseShadowMaps_) && (!splitPointLight);
+    bool allowShadows = !renderer_->reuseShadowMaps_ && !splitPointLight;
     unsigned numBatches = drawable->GetNumBatches();
     
     for (unsigned i = 0; i < numBatches; ++i)
@@ -641,11 +641,11 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
         drawable->GetBatch(frame_, i, litBatch);
         
         Technique* tech = GetTechnique(drawable, litBatch.material_);
-        if ((!litBatch.geometry_) || (!tech))
+        if (!litBatch.geometry_ || !tech)
             continue;
         
         // If material uses opaque G-buffer rendering, skip
-        if ((mode_ != RENDER_FORWARD) && (tech->HasPass(PASS_GBUFFER)))
+        if (mode_ != RENDER_FORWARD && tech->HasPass(PASS_GBUFFER))
             continue;
         
         Pass* pass = 0;
@@ -680,7 +680,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
         
         // Check from the ambient pass whether the object is opaque
         Pass* ambientPass = tech->GetPass(PASS_BASE);
-        if ((!ambientPass) || (ambientPass->GetBlendMode() == BLEND_REPLACE))
+        if (!ambientPass || ambientPass->GetBlendMode() == BLEND_REPLACE)
         {
             if (mode_ == RENDER_FORWARD)
             {
@@ -740,7 +740,7 @@ void View::RenderBatchesForward()
             LightBatchQueue& queue = lightQueues_[i];
             
             // If reusing shadowmaps, render each of them before the lit batches
-            if ((renderer_->reuseShadowMaps_) && (queue.light_->GetShadowMap()))
+            if (renderer_->reuseShadowMaps_ && queue.light_->GetShadowMap())
                 RenderShadowMap(queue);
             
             graphics_->SetRenderTarget(0, renderTarget_);
@@ -753,7 +753,7 @@ void View::RenderBatchesForward()
             if (queue.lastSplit_)
             {
                 LightType type = queue.light_->GetLightType();
-                if ((type == LIGHT_SPLITPOINT) || (type == LIGHT_DIRECTIONAL))
+                if (type == LIGHT_SPLITPOINT || type == LIGHT_DIRECTIONAL)
                     DrawSplitLightToStencil(*camera_, queue.light_, true);
             }
         }
@@ -785,7 +785,7 @@ void View::RenderBatchesDeferred()
     Texture2D* depthBuffer = graphics_->GetDepthBuffer();
     
     // Check for deferred antialiasing (edge filter) in deferred mode. Only use it on the main view (null rendertarget)
-    bool edgeFilter = (!renderTarget_) && (graphics_->GetMultiSample() > 1);
+    bool edgeFilter = !renderTarget_ && graphics_->GetMultiSample() > 1;
     RenderSurface* renderBuffer = edgeFilter ? graphics_->GetScreenBuffer()->GetRenderSurface() : renderTarget_;
     
     // Calculate shader parameters needed only in deferred rendering
@@ -902,7 +902,7 @@ void View::RenderBatchesDeferred()
             LightBatchQueue& queue = lightQueues_[i];
             
             // If reusing shadowmaps, render each of them before the lit batches
-            if ((renderer_->reuseShadowMaps_) && (queue.light_->GetShadowMap()))
+            if (renderer_->reuseShadowMaps_ && queue.light_->GetShadowMap())
                 RenderShadowMap(queue);
             
             // Light volume batches are not sorted as there should be only one of them
@@ -922,7 +922,7 @@ void View::RenderBatchesDeferred()
                 }
                 
                 // If was the last split of a split point light, clear the stencil by rendering the point light again
-                if ((queue.lastSplit_) && (queue.light_->GetLightType() == LIGHT_SPLITPOINT))
+                if (queue.lastSplit_ && queue.light_->GetLightType() == LIGHT_SPLITPOINT)
                     DrawSplitLightToStencil(*camera_, queue.light_, true);
             }
         }
@@ -1019,7 +1019,7 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
         
         // Check occluder's draw distance (in main camera view)
         float maxDistance = occluder->GetDrawDistance();
-        if ((maxDistance > 0.0f) && (occluder->GetDistance() > maxDistance))
+        if (maxDistance > 0.0f && occluder->GetDistance() > maxDistance)
             erase = true;
         
         // Check that occluder is big enough on the screen
@@ -1089,15 +1089,15 @@ unsigned View::ProcessLight(Light* light)
     
     unsigned numSplits;
     // Check if light should be shadowed
-    bool isShadowed = (drawShadows_) && (light->GetCastShadows());
+    bool isShadowed = drawShadows_ && light->GetCastShadows();
     // If shadow distance non-zero, check it
-    if ((isShadowed) && (light->GetShadowDistance() > 0.0f) && (light->GetDistance() > light->GetShadowDistance()))
+    if (isShadowed && light->GetShadowDistance() > 0.0f && light->GetDistance() > light->GetShadowDistance())
         isShadowed = false;
     
     // If light has no ramp textures defined, set defaults
-    if ((light->GetLightType() != LIGHT_DIRECTIONAL) && (!light->GetRampTexture()))
+    if (light->GetLightType() != LIGHT_DIRECTIONAL && !light->GetRampTexture())
         light->SetRampTexture(renderer_->GetDefaultLightRamp());
-    if ((light->GetLightType() == LIGHT_SPOT) && (!light->GetShapeTexture()))
+    if (light->GetLightType() == LIGHT_SPOT && !light->GetShapeTexture())
         light->SetShapeTexture(renderer_->GetDefaultLightSpot());
     
     // Split the light if necessary
@@ -1114,7 +1114,7 @@ unsigned View::ProcessLight(Light* light)
     bool useOcclusion = false;
     OcclusionBuffer* buffer = 0;
     
-    if ((maxOccluderTriangles_ > 0) && (isShadowed) && (light->GetLightType() == LIGHT_DIRECTIONAL))
+    if (maxOccluderTriangles_ > 0 && isShadowed && light->GetLightType() == LIGHT_DIRECTIONAL)
     {
         // This shadow camera is never used for actually querying shadow casters, just occluders
         Camera* shadowCamera = renderer_->CreateShadowCamera();
@@ -1149,7 +1149,7 @@ unsigned View::ProcessLight(Light* light)
     {
         Light* split = splitLights_[i];
         LightType type = split->GetLightType();
-        bool isSplitShadowed = (isShadowed) && (split->GetCastShadows());
+        bool isSplitShadowed = isShadowed && split->GetCastShadows();
         Camera* shadowCamera = 0;
         
         // If shadow casting, choose the shadow map & update shadow camera
@@ -1186,16 +1186,16 @@ unsigned View::ProcessLight(Light* light)
                 float nearSplit = split->GetNearSplit() - split->GetNearFadeRange();
                 float farSplit = split->GetFarSplit();
                 // If split extends to the whole visible frustum, no depth check necessary
-                bool optimize = (nearSplit <= camera_->GetNearClip()) && (farSplit >= camera_->GetFarClip());
+                bool optimize = nearSplit <= camera_->GetNearClip() && farSplit >= camera_->GetFarClip();
                 
                 // If whole visible scene is outside the split, can reject trivially
-                if ((sceneViewBox_.min_.z_ > farSplit) || (sceneViewBox_.max_.z_ < nearSplit))
+                if (sceneViewBox_.min_.z_ > farSplit || sceneViewBox_.max_.z_ < nearSplit)
                 {
                     split->SetShadowMap(0);
                     continue;
                 }
                 
-                bool generateBoxes = (isSplitShadowed) && (split->GetShadowFocus().focus_);
+                bool generateBoxes = isSplitShadowed && split->GetShadowFocus().focus_;
                 Matrix3x4 lightView;
                 if (shadowCamera)
                     lightView = shadowCamera->GetInverseWorldTransform();
@@ -1208,8 +1208,8 @@ unsigned View::ProcessLight(Light* light)
                         const GeometryDepthBounds& bounds = geometryDepthBounds_[j];
                         
                         // Check bounds and light mask
-                        if ((bounds.min_ <= farSplit) && (bounds.max_ >= nearSplit) && (drawable->GetLightMask() &
-                            split->GetLightMask()))
+                        if (bounds.min_ <= farSplit && bounds.max_ >= nearSplit && drawable->GetLightMask() &
+                            split->GetLightMask())
                         {
                             litGeometries_[i].Push(drawable);
                             if (generateBoxes)
@@ -1235,7 +1235,7 @@ unsigned View::ProcessLight(Light* light)
             }
             
             // Then get shadow casters by shadow camera frustum query. Use occlusion because of potentially many geometries
-            if ((isSplitShadowed) && (litGeometries_[i].Size()))
+            if (isSplitShadowed && litGeometries_[i].Size())
             {
                 Camera* shadowCamera = split->GetShadowCamera();
                 
@@ -1329,7 +1329,7 @@ unsigned View::ProcessLight(Light* light)
 }
 
 void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox,
-    BoundingBox& shadowCasterBox, bool getLitGeometries, bool GetShadowCasters)
+    BoundingBox& shadowCasterBox, bool getLitGeometries, bool getShadowCasters)
 {
     Light* light = splitLights_[splitIndex];
     
@@ -1337,7 +1337,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
     Matrix4 lightProj;
     Frustum lightViewFrustum;
     BoundingBox lightViewFrustumBox;
-    bool mergeBoxes = (light->GetLightType() != LIGHT_SPLITPOINT) && (light->GetShadowMap()) && (light->GetShadowFocus().focus_);
+    bool mergeBoxes = light->GetLightType() != LIGHT_SPLITPOINT && light->GetShadowMap() && light->GetShadowFocus().focus_;
     bool projectBoxes = false;
     
     Camera* shadowCamera = light->GetShadowCamera();
@@ -1360,10 +1360,10 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
         
         // Check for degenerate split frustum: in that case there is no need to get shadow casters
         if (lightViewFrustum.vertices_[0] == lightViewFrustum.vertices_[4])
-            GetShadowCasters = false;
+            getShadowCasters = false;
     }
     else
-        GetShadowCasters = false;
+        getShadowCasters = false;
     
     BoundingBox lightViewBox;
     BoundingBox lightProjBox;
@@ -1376,7 +1376,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
         
         // If draw distance non-zero, check it
         float maxDistance = drawable->GetDrawDistance();
-        if ((maxDistance > 0.0f) && (drawable->GetDistance() > maxDistance))
+        if (maxDistance > 0.0f && drawable->GetDistance() > maxDistance)
             continue;
         
         // Check light mask
@@ -1384,7 +1384,7 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
             continue;
         
         // Get lit geometry only if inside main camera frustum this frame
-        if ((getLitGeometries) && (drawable->IsInView(frame_)))
+        if (getLitGeometries && drawable->IsInView(frame_))
         {
             if (mergeBoxes)
             {
@@ -1407,11 +1407,11 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
         
         // Shadow caster need not be inside main camera frustum: in that case try to detect whether
         // the shadow projection intersects the view
-        if ((GetShadowCasters) && (drawable->GetCastShadows()))
+        if (getShadowCasters && drawable->GetCastShadows())
         {
             // If shadow distance non-zero, check it
             float maxShadowDistance = drawable->GetShadowDistance();
-            if ((maxShadowDistance > 0.0f) && (drawable->GetDistance() > maxShadowDistance))
+            if (maxShadowDistance > 0.0f && drawable->GetDistance() > maxShadowDistance)
                 continue;
             
             if (!boxGenerated)
@@ -1508,7 +1508,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             // Calculate main camera shadowed frustum in light's view space
             float sceneMaxZ = camera_->GetFarClip();
             // When shadow focusing is enabled, use the scene far Z to limit maximum frustum size
-            if ((shadowOcclusion) || (parameters.focus_))
+            if (shadowOcclusion || parameters.focus_)
                 sceneMaxZ = Min(sceneViewBox_.max_.z_, sceneMaxZ);
             
             Matrix3x4 lightView(shadowCamera->GetInverseWorldTransform());
@@ -1517,7 +1517,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             
             // Fit the frustum inside a bounding box. If uniform size, use a sphere instead
             BoundingBox shadowBox;
-            if ((!shadowOcclusion) && (parameters.nonUniform_))
+            if (!shadowOcclusion && parameters.nonUniform_)
                 shadowBox.Define(lightViewSplitFrustum);
             else
             {
@@ -1546,7 +1546,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             shadowCamera->SetAspectRatio(light->GetAspectRatio());
             
             // For spot lights, zoom out shadowmap if far away (reduces fillrate)
-            if ((light->GetLightType() == LIGHT_SPOT) && (parameters.zoomOut_))
+            if (light->GetLightType() == LIGHT_SPOT && parameters.zoomOut_)
             {
                 // Make sure the out-zooming does not start while we are inside the spot
                 float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
@@ -1568,7 +1568,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
 void View::FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox)
 {
     // If either no geometries or no shadow casters, do nothing
-    if ((!geometryBox.defined_) || (!shadowCasterBox.defined_))
+    if (!geometryBox.defined_ || !shadowCasterBox.defined_)
         return;
     
     Camera* shadowCamera = light->GetShadowCamera();
@@ -1717,7 +1717,7 @@ unsigned View::SplitLight(Light* light)
         // Orthographic view actually has near clip 0, but clamp it to a theoretical minimum
         float farClip = Min(cascade.shadowRange_, camera_->GetFarClip()); // Shadow range end
         float nearClip = Max(camera_->GetNearClip(), M_MIN_NEARCLIP); // Shadow range start
-        bool CreateExtraSplit = farClip < camera_->GetFarClip();
+        bool createExtraSplit = farClip < camera_->GetFarClip();
         
         // Practical split scheme (Zhang et al.)
         unsigned i;
@@ -1756,11 +1756,11 @@ unsigned View::SplitLight(Light* light)
             SplitLight->SetFarSplit(farSplit);
             
             // The final split will not fade
-            if ((CreateExtraSplit) || (i < splits - 1))
+            if (createExtraSplit || i < splits - 1)
                 SplitLight->SetFarFadeRange(farFadeRange);
             
             // Create an extra unshadowed split if necessary
-            if ((CreateExtraSplit) && (i == splits - 1))
+            if (createExtraSplit && i == splits - 1)
             {
                 Light* SplitLight = renderer_->CreateSplitLight(light);
                 splitLights_[i + 1] = SplitLight;
@@ -1771,7 +1771,7 @@ unsigned View::SplitLight(Light* light)
             }
         }
         
-        if (CreateExtraSplit)
+        if (createExtraSplit)
             return i + 1;
         else
             return i;
@@ -1823,7 +1823,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material*& material)
     {
         const TechniqueEntry& entry = techniques[i];
         Technique* technique = entry.technique_;
-        if ((!technique) || ((technique->IsSM3()) && (!graphics_->GetSM3Support())) || (materialQuality_ < entry.qualityLevel_))
+        if (!technique || (technique->IsSM3() && !graphics_->GetSM3Support()) || materialQuality_ < entry.qualityLevel_)
             continue;
         if (lodDistance >= entry.lodDistance_)
             return technique;
@@ -1850,7 +1850,7 @@ void View::CheckMaterialForAuxView(Material* material)
                 if (target)
                 {
                     const Viewport& viewport = target->GetViewport();
-                    if ((viewport.scene_) && (viewport.camera_))
+                    if (viewport.scene_ && viewport.camera_)
                         renderer_->AddView(target, viewport);
                 }
             }
@@ -1863,7 +1863,7 @@ void View::CheckMaterialForAuxView(Material* material)
                     if (target)
                     {
                         const Viewport& viewport = target->GetViewport();
-                        if ((viewport.scene_) && (viewport.camera_))
+                        if (viewport.scene_ && viewport.camera_)
                             renderer_->AddView(target, viewport);
                     }
                 }
@@ -1914,7 +1914,7 @@ void View::PrepareInstancingBuffer()
     }
     
     // If fail to set buffer size, fall back to per-group locking
-    if ((totalInstances) && (renderer_->ResizeInstancingBuffer(totalInstances)))
+    if (totalInstances && renderer_->ResizeInstancingBuffer(totalInstances))
     {
         unsigned freeIndex = 0;
         void* lockedData = renderer_->instancingBuffer_->Lock(0, totalInstances, LOCK_DISCARD);
@@ -2006,7 +2006,7 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
         
     case LIGHT_DIRECTIONAL:
         // If light encompasses whole frustum, no drawing to frustum necessary
-        if ((light->GetNearSplit() <= camera.GetNearClip()) && (light->GetFarSplit() >= camera.GetFarClip()))
+        if (light->GetNearSplit() <= camera.GetNearClip() && light->GetFarSplit() >= camera.GetFarClip())
             return;
         else
         {
@@ -2088,7 +2088,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disab
         queue.batchGroups_.End(); ++i)
     {
         const BatchGroup& group = i->second_;
-        if ((useScissor) && (group.light_))
+        if (useScissor && group.light_)
             OptimizeLightByScissor(group.light_);
         else
             graphics_->SetScissorTest(false);
@@ -2099,7 +2099,7 @@ void View::RenderBatchQueue(const BatchQueue& queue, bool useScissor, bool disab
     {
         Batch* batch = *i;
         // For the transparent queue, both priority and non-priority batches are copied here, so check the flag
-        if ((useScissor) && (batch->light_) && (!batch->hasPriority_))
+        if (useScissor && batch->light_ && !batch->hasPriority_)
             OptimizeLightByScissor(batch->light_);
         else
             graphics_->SetScissorTest(false);
@@ -2135,7 +2135,7 @@ void View::RenderForwardLightBatchQueue(const BatchQueue& queue, Light* light)
     {
         OptimizeLightByScissor(light);
         LightType type = light->GetLightType();
-        if ((type == LIGHT_SPLITPOINT) || (type == LIGHT_DIRECTIONAL))
+        if (type == LIGHT_SPLITPOINT || type == LIGHT_DIRECTIONAL)
             DrawSplitLightToStencil(*camera_, light);
     }
     

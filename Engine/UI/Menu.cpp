@@ -72,7 +72,7 @@ void Menu::SetStyle(const XMLElement& element)
     Button::SetStyle(element);
     
     XMLElement popupElem = element.GetChildElement("popup");
-    if ((popupElem) && (popupElem.HasAttribute("name")))
+    if (popupElem && popupElem.HasAttribute("name"))
     {
         UIElement* root = GetRootElement();
         if (root)
@@ -92,7 +92,7 @@ void Menu::SetPopup(UIElement* popup)
     if (popup == this)
         return;
     
-    if ((popup_) && (!popup))
+    if (popup_ && !popup)
         ShowPopup(false);
     
     popup_ = popup;
@@ -179,7 +179,7 @@ void Menu::HandlePressedReleased(StringHash eventType, VariantMap& eventData)
     ShowPopup(!showPopup_);
     
     // Send event on each click if no popup, or whenever the popup is opened
-    if ((!popup_) || (showPopup_))
+    if (!popup_ || showPopup_)
     {
         using namespace MenuSelected;
         
@@ -200,7 +200,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     UIElement* root = GetRootElement();
     
     // If another element was focused due to the menu button being clicked, do not hide the popup
-    if ((eventType == E_FOCUSCHANGED) && (static_cast<UIElement*>(eventData[P_ORIGINALELEMENT].GetPtr())))
+    if (eventType == E_FOCUSCHANGED && static_cast<UIElement*>(eventData[P_ORIGINALELEMENT].GetPtr()))
         return;
     
     // If clicked emptiness or defocused, hide the popup
@@ -214,7 +214,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     // In that case, do not hide
     while (element)
     {
-        if ((element == this) || (element == popup_))
+        if (element == this || element == popup_)
             return;
         if (element->GetParent() == root)
             element = static_cast<UIElement*>(element->vars_[originHash].GetPtr());
@@ -233,7 +233,7 @@ void Menu::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     using namespace KeyDown;
     
     // Activate if accelerator key pressed
-    if ((eventData[P_KEY].GetInt() == acceleratorKey_) && (eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_) &&
-        (eventData[P_REPEAT].GetBool() == false))
+    if (eventData[P_KEY].GetInt() == acceleratorKey_ && eventData[P_QUALIFIERS].GetInt() == acceleratorQualifiers_ &&
+        eventData[P_REPEAT].GetBool() == false)
         HandlePressedReleased(eventType, eventData);
 }

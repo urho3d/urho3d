@@ -64,7 +64,7 @@ ResourceCache::~ResourceCache()
 bool ResourceCache::AddResourcePath(const String& path)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if ((!fileSystem) || (!fileSystem->DirExists(path)))
+    if (!fileSystem || !fileSystem->DirExists(path))
     {
         LOGERROR("Could not open directory " + path);
         return false;
@@ -95,7 +95,7 @@ bool ResourceCache::AddResourcePath(const String& path)
 void ResourceCache::AddPackageFile(PackageFile* package, bool addAsFirst)
 {
     // Do not add packages that failed to load
-    if ((!package) || (!package->GetNumFiles()))
+    if (!package || !package->GetNumFiles())
         return;
     
     if (addAsFirst)
@@ -188,7 +188,7 @@ void ResourceCache::ReleaseResource(ShortStringHash type, StringHash nameHash, b
         return;
     
     // If other references exist, do not release, unless forced
-    if ((existingRes.GetRefCount() == 1) || (force))
+    if (existingRes.GetRefCount() == 1 || force)
     {
         resourceGroups_[type].resources_.Erase(nameHash);
         UpdateResourceGroup(type);
@@ -209,7 +209,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
             {
                 Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
                 // If other references exist, do not release, unless forced
-                if ((current->second_.GetRefCount() == 1) || (force))
+                if (current->second_.GetRefCount() == 1 || force)
                 {
                     i->second_.resources_.Erase(current);
                     released = true;
@@ -239,7 +239,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
                 if (current->second_->GetName().Find(partialNameLower) != String::NPOS)
                 {
                     // If other references exist, do not release, unless forced
-                    if ((current->second_.GetRefCount() == 1) || (force))
+                    if (current->second_.GetRefCount() == 1 || force)
                     {
                         i->second_.resources_.Erase(current);
                         released = true;
@@ -265,7 +265,7 @@ void ResourceCache::ReleaseAllResources(bool force)
         {
             Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
             // If other references exist, do not release, unless forced
-            if ((current->second_.GetRefCount() == 1) || (force))
+            if (current->second_.GetRefCount() == 1 || force)
             {
                 i->second_.resources_.Erase(current);
                 released = true;
@@ -530,7 +530,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
             if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
-                if ((k->second_.GetRefCount() == 1) || (force))
+                if (k->second_.GetRefCount() == 1 || force)
                 {
                     j->second_.resources_.Erase(k);
                     affectedGroups.Insert(j->first_);
@@ -572,8 +572,8 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
         
         // If memory budget defined and is exceeded, remove the oldest resource and loop again
         // (resources in use always return a zero timer and can not be removed)
-        if ((i->second_.memoryBudget_) && (i->second_.memoryUse_ > i->second_.memoryBudget_) &&
-            (oldestResource != i->second_.resources_.End()))
+        if (i->second_.memoryBudget_ && i->second_.memoryUse_ > i->second_.memoryBudget_ &&
+            oldestResource != i->second_.resources_.End())
         {
             LOGDEBUG("Resource group " + oldestResource->second_->GetTypeName() + " over memory budget, releasing resource " +
                 oldestResource->second_->GetName());

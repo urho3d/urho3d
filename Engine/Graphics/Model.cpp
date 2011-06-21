@@ -442,7 +442,7 @@ unsigned Model::GetNumGeometryLodLevels(unsigned index) const
 
 Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 {
-    if ((index >= geometries_.Size()) || (lodLevel >= geometries_[index].Size()))
+    if (index >= geometries_.Size() || lodLevel >= geometries_[index].Size())
         return 0;
     
     return geometries_[index][lodLevel];

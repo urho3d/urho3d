@@ -134,7 +134,7 @@ void UI::SetFocusElement(UIElement* element)
     for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
         UIElement* other = *i;
-        if ((other != element) && (other->HasFocus()))
+        if (other != element && other->HasFocus())
             other->SetFocus(false);
     }
     
@@ -156,20 +156,20 @@ void UI::Update(float timeStep)
 {
     PROFILE(UpdateUI);
     
-    if ((cursor_) && (cursor_->IsVisible()))
+    if (cursor_ && cursor_->IsVisible())
     {
         IntVector2 pos = cursor_->GetPosition();
         WeakPtr<UIElement> element(GetElementAt(pos));
         
-        bool dragSource = (dragElement_) && ((dragElement_->GetDragDropMode() & DD_SOURCE) != 0);
-        bool dragTarget = (element) && ((element->GetDragDropMode() & DD_TARGET) != 0);
-        bool dragDropTest = (dragSource) && (dragTarget) && (element != dragElement_);
+        bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
+        bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
+        bool dragDropTest = dragSource && dragTarget && element != dragElement_;
         
         // Hover effect
         // If a drag is going on, transmit hover only to the element being dragged, unless it's a drop target
         if (element)
         {
-            if ((!dragElement_) || (dragElement_ == element) || (dragDropTest))
+            if (!dragElement_ || dragElement_ == element || dragDropTest)
                 element->OnHover(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
         }
         
@@ -209,7 +209,7 @@ void UI::Update(float timeStep)
 
 void UI::RenderUpdate()
 {
-    if ((!graphics_) || (graphics_->IsDeviceLost()))
+    if (!graphics_ || graphics_->IsDeviceLost())
         return;
     
     PROFILE(GetUIBatches);
@@ -220,7 +220,7 @@ void UI::RenderUpdate()
     GetBatches(rootElement_, IntRect(0, 0, rootSize.x_, rootSize.y_));
     
     // If no drag, reset cursor shape for next frame
-    if ((cursor_) && (!dragElement_))
+    if (cursor_ && !dragElement_)
         cursor_->SetShape(CS_NORMAL);
 }
 
@@ -368,7 +368,7 @@ UIElement* UI::GetFrontElement() const
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
     {
         // Do not take into account input-disabled elements, hidden elements or those that are always in the front
-        if ((!rootChildren[i]->IsActive()) || (!rootChildren[i]->IsVisible()) || (!rootChildren[i]->GetBringToBack()))
+        if (!rootChildren[i]->IsActive() || !rootChildren[i]->IsVisible() || !rootChildren[i]->GetBringToBack())
             continue;
         
         int priority = rootChildren[i]->GetPriority();
@@ -395,7 +395,7 @@ void UI::Initialize()
     Graphics* graphics = GetSubsystem<Graphics>();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    if ((!graphics) || (!graphics->IsInitialized()) || (!cache))
+    if (!graphics || !graphics->IsInitialized() || !cache)
         return;
     
     PROFILE(InitUI);
@@ -414,7 +414,7 @@ void UI::Initialize()
     Shader* basicPS = cache->GetResource<Shader>("Shaders/SM2/Basic.ps2");
     #endif
     
-    if ((basicVS) && (basicPS))
+    if (basicVS && basicPS)
     {
         noTextureVS_ = basicVS->GetVariation("VCol");
         diffTextureVS_ = basicVS->GetVariation("DiffVCol");
@@ -440,7 +440,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
 {
     // Set clipping scissor for child elements. No need to draw if zero size
     element->AdjustScissor(currentScissor);
-    if ((currentScissor.left_ == currentScissor.right_) || (currentScissor.top_ == currentScissor.bottom_))
+    if (currentScissor.left_ == currentScissor.right_ || currentScissor.top_ == currentScissor.bottom_)
         return;
     
     PODVector<UIElement*> children = element->GetChildren();
@@ -458,7 +458,7 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
         int currentPriority = children.Front()->GetPriority();
         while (i != children.End())
         {
-            while ((j != children.End()) && ((*j)->GetPriority() == currentPriority))
+            while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
                 if ((*j)->IsVisible())
                     (*j)->GetBatches(batches_, quads_, currentScissor);
@@ -502,13 +502,13 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
         UIElement* element = *i;
-        if ((element != cursor_.GetPtr()) && (element->IsVisible()))
+        if (element != cursor_.GetPtr() && element->IsVisible())
         {
             if (element->IsInside(position, true))
             {
                 // Store the current result, then recurse into its children. Because children
                 // are sorted from lowest to highest priority, the topmost match should remain
-                if ((element->IsActive()) || (!activeOnly))
+                if (element->IsActive() || !activeOnly)
                     result = element;
             }
             
@@ -588,7 +588,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
         {
             // When in non-confined mode, move cursor always to ensure accurate position
             IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-            bool inside = (pos.x_ >= 0) && (pos.x_ < rootSize.x_) && (pos.y_ >= 0) && (pos.y_ < rootSize.y_);
+            bool inside = pos.x_ >= 0 && pos.x_ < rootSize.x_ && pos.y_ >= 0 && pos.y_ < rootSize.y_;
             
             // Hide by moving completely outside if outside
             // (do not use SetVisible(), so that actual visibility remains under application control)
@@ -607,10 +607,10 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
                 return;
         }
         
-        if ((dragElement_) && (mouseButtons_))
+        if (dragElement_ && mouseButtons_)
         {
             IntVector2 pos = cursor_->GetPosition();
-            if ((dragElement_->IsActive()) && (dragElement_->IsVisible()))
+            if (dragElement_->IsActive() && dragElement_->IsVisible())
                 dragElement_->OnDragMove(dragElement_->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
             else
             {
@@ -627,7 +627,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
     qualifiers_ = eventData[MouseButtonDown::P_QUALIFIERS].GetInt();
     int button = eventData[MouseButtonDown::P_BUTTON].GetInt();
     
-    if ((cursor_) && (cursor_->IsVisible()))
+    if (cursor_ && cursor_->IsVisible())
     {
         IntVector2 pos = cursor_->GetPosition();
         WeakPtr<UIElement> element(GetElementAt(pos));
@@ -645,7 +645,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
             element->OnClick(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
             
             // Handle start of drag. OnClick() may have caused destruction of the element, so check the pointer again
-            if ((element) && (!dragElement_) && (mouseButtons_ == MOUSEB_LEFT))
+            if (element && !dragElement_ && mouseButtons_ == MOUSEB_LEFT)
             {
                 dragElement_ = element;
                 element->OnDragStart(element->ScreenToElement(pos), pos, mouseButtons_, qualifiers_, cursor_);
@@ -677,30 +677,30 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
     mouseButtons_ = eventData[P_BUTTONS].GetInt();
     qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     
-    if ((cursor_) && ((cursor_->IsVisible()) || (dragElement_)))
+    if (cursor_ && (cursor_->IsVisible())|| (dragElement_))
     {
         IntVector2 pos = cursor_->GetPosition();
         
-        if ((dragElement_) && (!mouseButtons_))
+        if (dragElement_ && !mouseButtons_)
         {
-            if ((dragElement_->IsActive()) && (dragElement_->IsVisible()))
+            if (dragElement_->IsActive() && dragElement_->IsVisible())
             {
                 dragElement_->OnDragEnd(dragElement_->ScreenToElement(pos), pos, cursor_);
                 
                 // Drag and drop finish
-                bool dragSource = (dragElement_) && ((dragElement_->GetDragDropMode() & DD_SOURCE) != 0);
+                bool dragSource = dragElement_ && (dragElement_->GetDragDropMode() & DD_SOURCE) != 0;
                 if (dragSource)
                 {
                     WeakPtr<UIElement> target(GetElementAt(pos));
-                    bool dragTarget = (target) && ((target->GetDragDropMode() & DD_TARGET) != 0);
-                    bool dragDropFinish = (dragSource) && (dragTarget) && (target != dragElement_);
+                    bool dragTarget = target && (target->GetDragDropMode() & DD_TARGET) != 0;
+                    bool dragDropFinish = dragSource && dragTarget && target != dragElement_;
                     
                     if (dragDropFinish)
                     {
                         bool accept = target->OnDragDropFinish(dragElement_);
                         
                         // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
-                        if ((accept) && (dragElement_) && (target))
+                        if (accept && dragElement_ && target)
                         {
                             using namespace DragDropFinish;
                             
@@ -747,7 +747,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (key == KEY_TAB)
         {
             UIElement* topLevel = element->GetParent();
-            while ((topLevel) && (topLevel->GetParent() != rootElement_))
+            while (topLevel && topLevel->GetParent() != rootElement_)
                 topLevel = topLevel->GetParent();
             if (topLevel)
             {
@@ -771,7 +771,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             }
         }
         // Defocus the element
-        else if ((key == KEY_ESC) && (element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE))
+        else if (key == KEY_ESC && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
             defocusElement_ = element;
         // If none of the special keys, pass the key to the focused element
         else

@@ -83,7 +83,7 @@ void DebugHud::Update(float timeStep)
 {
     Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();
-    if ((!renderer) || (!graphics))
+    if (!renderer || !graphics)
         return;
     
     unsigned primitives, batches;

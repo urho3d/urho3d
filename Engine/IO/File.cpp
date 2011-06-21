@@ -79,7 +79,7 @@ bool File::Open(const String& fileName, FileMode mode)
     Close();
     
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if ((fileSystem) && (!fileSystem->CheckAccess(GetPath(fileName))))
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         LOGERROR("Access denied to " + fileName);
         return false;
@@ -220,7 +220,7 @@ unsigned File::Write(const void* data, unsigned size)
 
 unsigned File::GetChecksum()
 {
-    if ((offset_) || (checksum_))
+    if (offset_ || checksum_)
         return checksum_;
     
     unsigned oldPos = position_;

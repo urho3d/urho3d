@@ -81,7 +81,7 @@ void Texture2D::OnDeviceReset()
         // Reload from the original file if possible
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         const String& name = GetName();
-        if ((cache) && (!name.Empty()) && (cache->Exists(name)))
+        if (cache && !name.Empty() && cache->Exists(name))
             cache->ReloadResource(this);
         else
             Create();
@@ -139,7 +139,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     else
         dynamic_ = false;
     
-    if ((width <= 0) || (height <= 0))
+    if (width <= 0 || height <= 0)
         followWindowSize_ = true;
     else
     {
@@ -238,7 +238,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while ((mipsToSkip) && ((width / (1 << mipsToSkip) < 4) || (height / (1 << mipsToSkip) < 4)))
+        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4))
             --mipsToSkip;
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
@@ -248,7 +248,7 @@ bool Texture2D::Load(SharedPtr<Image> image, bool useAlpha)
         
         graphics_->SetTextureForUpdate(this);
         
-        for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
+        for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             glCompressedTexImage2D(target_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
@@ -277,7 +277,7 @@ bool Texture2D::Create()
         height_ = graphics_->GetHeight();
     }
     
-    if ((!width_) || (!height_))
+    if (!width_ || !height_)
         return false;
     
     // If we create a depth stencil texture with packed format, create a renderbuffer instead of an actual texture
@@ -302,8 +302,8 @@ bool Texture2D::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
     
-    if ((format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) && (format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT) && 
-        (format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT))
+    if (format_ != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT && format_ != GL_COMPRESSED_RGBA_S3TC_DXT3_EXT &&
+        format_ != GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
         glTexImage2D(target_, 0, format_, width_, height_, 0, externalFormat, dataType, 0);
     
     // If depth format, get the depth size

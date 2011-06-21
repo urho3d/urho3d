@@ -67,17 +67,17 @@ void Batch::CalculateSortKey()
     unsigned geometry = (*((unsigned*)&geometry_) / sizeof(Geometry)) & 0xffff;
     if (hasPriority_)
         light |= 0x8000;
-    sortKey_ = (((unsigned long long)light) << 48) || (((unsigned long long)pass) << 32) ||
-        (((unsigned long long)material) << 16) || geometry;
+    sortKey_ = (((unsigned long long)light) << 48) | (((unsigned long long)pass) << 32) |
+        (((unsigned long long)material) << 16) | geometry;
 }
 
-void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool SetModelTransform) const
+void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool setModelTransform) const
 {
-    if ((!vertexShader_) || (!pixelShader_))
+    if (!vertexShader_ || !pixelShader_)
         return;
     
     // Set pass / material-specific renderstates
-    if ((pass_) && (material_))
+    if (pass_ && material_)
     {
         if (pass_->GetAlphaTest())
             graphics->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
@@ -139,11 +139,11 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
         graphics->SetShaderParameter(VSP_VIEWUPVECTOR, camera_->GetUpVector());
     
     // Set model transform
-    if ((SetModelTransform) && (graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_)))
+    if (setModelTransform && graphics->NeedParameterUpdate(VSP_MODEL, worldTransform_))
         graphics->SetShaderParameter(VSP_MODEL, *worldTransform_);
     
     // Set skinning transforms
-    if ((shaderData_) && (shaderDataSize_))
+    if (shaderData_ && shaderDataSize_)
     {
         if (graphics->NeedParameterUpdate(VSP_SKINMATRICES, shaderData_))
             graphics->SetShaderParameter(VSP_SKINMATRICES, shaderData_, shaderDataSize_);
@@ -191,7 +191,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             float fadeStart = light_->GetFadeDistance();
             
             // Do fade calculation for light if both fade & draw distance defined
-            if ((light_->GetLightType() != LIGHT_DIRECTIONAL) && (fadeEnd > 0.0f) && (fadeStart > 0.0f) && (fadeStart < fadeEnd))
+            if (light_->GetLightType() != LIGHT_DIRECTIONAL && fadeEnd > 0.0f && fadeStart > 0.0f && fadeStart < fadeEnd)
                 fade = Min(1.0f - (light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 1.0f);
             
             graphics->SetShaderParameter(PSP_LIGHTCOLOR, Vector4(light_->GetColor().RGBValues(),
@@ -296,7 +296,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
             float intensity = light_->GetShadowIntensity();
             float fadeStart = light_->GetShadowFadeDistance();
             float fadeEnd = light_->GetShadowDistance();
-            if ((fadeStart > 0.0f) && (fadeEnd > 0.0f) && (fadeEnd > fadeStart))
+            if (fadeStart > 0.0f && fadeEnd > 0.0f && fadeEnd > fadeStart)
                 intensity = Lerp(intensity, 1.0f, Clamp((light_->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
             float pcfValues = (1.0f - intensity) * 0.25f;
             graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues, intensity, 0.0f, 0.0f));
@@ -356,7 +356,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     // Set light-related textures
     if (light_)
     {
-        if ((shadowMap) && (graphics->NeedTextureUnit(TU_SHADOWMAP)))
+        if (shadowMap && graphics->NeedTextureUnit(TU_SHADOWMAP))
             graphics->SetTexture(TU_SHADOWMAP, shadowMap);
         if (graphics->NeedTextureUnit(TU_LIGHTRAMP))
             graphics->SetTexture(TU_LIGHTRAMP, light_->GetRampTexture());
@@ -404,7 +404,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
     batch.vertexShaderIndex_ = vertexShaderIndex_;
     
     // Draw as individual instances if below minimum size, or if instancing not supported
-    if ((instances_.Size() < MIN_INSTANCES) || (!instanceBuffer))
+    if (instances_.Size() < MIN_INSTANCES || !instanceBuffer)
     {
         batch.Prepare(graphics, shaderParameters, false);
         
@@ -427,7 +427,7 @@ void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const Ha
         Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass_->GetVertexShaders();
         Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass_->GetPixelShaders();
         PassType type = pass_->GetType();
-        if ((type != PASS_LITBASE) && (type != PASS_LIGHT))
+        if (type != PASS_LITBASE && type != PASS_LIGHT)
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED];
         else
             batch.vertexShader_ = vertexShaders[vertexShaderIndex_ + GEOM_INSTANCED * MAX_LIGHT_VS_VARIATIONS];
@@ -490,7 +490,7 @@ void BatchQueue::Clear()
 void BatchQueue::AddBatch(const Batch& batch, bool noInstancing)
 {
     // If batch is something else than static, has custom view, or has per-instance shader data defined, can not instance
-    if ((noInstancing) || (batch.geometryType_ != GEOM_STATIC) || (batch.overrideView_) || (batch.shaderData_))
+    if (noInstancing || batch.geometryType_ != GEOM_STATIC || batch.overrideView_ || batch.shaderData_)
         batches_.Push(batch);
     else
     {

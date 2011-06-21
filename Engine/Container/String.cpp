@@ -278,7 +278,7 @@ void String::Resize(unsigned newLength)
     }
     else
     {
-        if ((newLength) && (capacity_ < newLength + 1))
+        if (newLength && capacity_ < newLength + 1)
         {
             // Increase the capacity with half each time it is exceeded
             while (capacity_ < newLength + 1)
@@ -371,14 +371,14 @@ String String::Trimmed() const
     while (trimStart < trimEnd)
     {
         char c = buffer_[trimStart];
-        if ((c != ' ') && (c != 9))
+        if (c != ' ' && c != 9)
             break;
         ++trimStart;
     }
     while (trimEnd > trimStart)
     {
         char c = buffer_[trimEnd - 1];
-        if ((c != ' ') && (c != 9))
+        if (c != ' ' && c != 9)
             break;
         --trimEnd;
     }
@@ -457,7 +457,7 @@ unsigned String::Find(char c, unsigned startPos) const
 
 unsigned String::Find(const String& str, unsigned startPos) const
 {
-    if ((!str.length_) || (str.length_ > length_))
+    if (!str.length_ || str.length_ > length_)
         return NPOS;
     
     char first = str.buffer_[0];
@@ -471,7 +471,7 @@ unsigned String::Find(const String& str, unsigned startPos) const
             for (unsigned j = 1; j < str.length_; ++j)
             {
                 char c = buffer_[i + j];
-                if ((skip == NPOS) && (c == first))
+                if (skip == NPOS && c == first)
                     skip = i + j - 1;
                 if (c != str.buffer_[j])
                 {
@@ -505,7 +505,7 @@ unsigned String::FindLast(char c, unsigned startPos) const
 
 unsigned String::FindLast(const String& str, unsigned startPos) const
 {
-    if ((!str.length_) || (str.length_ > length_))
+    if (!str.length_ || str.length_ > length_)
         return NPOS;
     if (startPos > length_ - str.length_)
         startPos = length_ - str.length_;

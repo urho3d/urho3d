@@ -116,7 +116,7 @@ void Run(const char* cmdLine)
         // Execute the Start function from the script file, then run the engine loop until exited
         engine->InitializeScripting();
         ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
-        if ((scriptFile) && (scriptFile->Execute("void Start()")))
+        if (scriptFile && scriptFile->Execute("void Start()"))
         {
             while (!engine->IsExiting())
                 engine->RunFrame();

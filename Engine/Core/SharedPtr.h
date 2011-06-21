@@ -226,7 +226,7 @@ public:
     /// Assign from a shared pointer
     WeakPtr<T>& operator = (const SharedPtr<T>& rhs)
     {
-        if ((ptr_ == rhs.GetPtr()) && (refCount_ == rhs.GetRefCountPtr()))
+        if (ptr_ == rhs.GetPtr() && refCount_ == rhs.GetRefCountPtr())
             return *this;
         
         Release();
@@ -242,7 +242,7 @@ public:
     /// Assign from a weak pointer
     WeakPtr<T>& operator = (const WeakPtr<T>& rhs)
     {
-        if ((ptr_ == rhs.ptr_) && (refCount_ == rhs.refCount_))
+        if (ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_)
             return *this;
         
         Release();
@@ -260,7 +260,7 @@ public:
     {
         RefCount* refCount = ptr ? ptr->GetRefCountPtr() : 0;
         
-        if ((ptr_ == ptr) && (refCount_ == refCount))
+        if (ptr_ == ptr && refCount_ == refCount)
             return *this;
         
         Release();
@@ -310,9 +310,9 @@ public:
     }
     
     /// Test for equality with another weak pointer
-    bool operator == (const WeakPtr<T>& rhs) const { return (ptr_ == rhs.ptr_) && (refCount_ == rhs.refCount_); }
+    bool operator == (const WeakPtr<T>& rhs) const { return ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_; }
     /// Test for inequality with another weak pointer
-    bool operator != (const WeakPtr<T>& rhs) const { return (ptr_ != rhs.ptr_) || (refCount_ != rhs.refCount_); }
+    bool operator != (const WeakPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
     /// Test for less than with another weak pointer
     bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an object which is not expired
@@ -388,7 +388,7 @@ private:
             if (refCount_->weakRefs_)
                 --(refCount_->weakRefs_);
             
-            if ((!refCount_->refs_) && (!refCount_->weakRefs_))
+            if (!refCount_->refs_ && !refCount_->weakRefs_)
                 delete refCount_;
         }
         

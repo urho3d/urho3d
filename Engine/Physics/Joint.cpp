@@ -150,7 +150,7 @@ bool Joint::SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB)
         return false;
     }
     
-    if ((!bodyA) && (!bodyB))
+    if (!bodyA && !bodyB)
     {
         LOGERROR("Both bodies null, can not create joint");
         return false;
@@ -178,7 +178,7 @@ bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bo
         return false;
     }
     
-    if ((!bodyA) && (!bodyB))
+    if (!bodyA && !bodyB)
     {
         LOGERROR("Both bodies null, can not create joint");
         return false;

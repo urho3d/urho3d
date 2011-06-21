@@ -220,9 +220,9 @@ void UIElement::SetStyle(const XMLElement& element)
         String mode = layoutElem.GetStringLower("mode");
         if (mode == "free")
             layoutMode_ = LM_FREE;
-        if ((mode == "horizontal") || (mode == "h"))
+        if (mode == "horizontal" || mode == "h")
             layoutMode_ = LM_HORIZONTAL;
-        if ((mode == "vertical") || (mode == "v"))
+        if (mode == "vertical" || mode == "v")
             layoutMode_ = LM_VERTICAL;
         
         if (layoutElem.HasAttribute("spacing"))
@@ -480,7 +480,7 @@ void UIElement::SetColor(Corner corner, const Color& color)
     
     for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
     {
-        if ((i != corner) && (color_[i] != color_[corner]))
+        if (i != corner && color_[i] != color_[corner])
             colorGradient_ = true;
     }
 }
@@ -623,7 +623,7 @@ void UIElement::SetLayoutBorder(const IntRect& border)
 
 void UIElement::UpdateLayout()
 {
-    if ((layoutMode_ == LM_FREE) || (layoutNestingLevel_))
+    if (layoutMode_ == LM_FREE || layoutNestingLevel_)
         return;
     
     // Prevent further updates while this update happens
@@ -739,9 +739,9 @@ void UIElement::BringToFront()
     // Follow the parent chain to the top level window. If it has BringToFront mode, bring it to front now
     UIElement* root = GetRootElement();
     UIElement* ptr = this;
-    while ((ptr) && (ptr->GetParent() != root))
+    while (ptr && ptr->GetParent() != root)
         ptr = ptr->GetParent();
-    if ((!ptr) || (!ptr->GetBringToFront()))
+    if (!ptr || !ptr->GetBringToFront())
         return;
     
     // Get the highest priority used by all other top level elements, assign that to the new front element
@@ -752,7 +752,7 @@ void UIElement::BringToFront()
     for (PODVector<UIElement*>::Iterator i = topLevelElements.Begin(); i != topLevelElements.End(); ++i)
     {
         UIElement* other = *i;
-        if ((other->IsActive()) && (other->bringToBack_) && (other != ptr))
+        if (other->IsActive() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
             maxPriority = Max(priority, maxPriority);
@@ -771,7 +771,7 @@ void UIElement::AddChild(UIElement* element)
 void UIElement::InsertChild(unsigned index, UIElement* element)
 {
     // Check for illegal parent assignments
-    if ((!element) || (element == this) || (element->parent_ == this) || (parent_ == element))
+    if (!element || element == this || element->parent_ == this || parent_ == element)
         return;
     
     // Add first, then remove from old parent, to ensure the element does not get deleted
@@ -991,7 +991,7 @@ bool UIElement::IsInside(IntVector2 position, bool isScreen)
 {
     if (isScreen)
         position = ScreenToElement(position);
-    return (position.x_ >= 0) && (position.y_ >= 0) && (position.x_ < size_.x_) && (position.y_ < size_.y_);
+    return position.x_ >= 0 && position.y_ >= 0 && position.x_ < size_.x_ && position.y_ < size_.y_;
 }
 
 bool UIElement::IsInsideCombined(IntVector2 position, bool isScreen)
@@ -1004,8 +1004,8 @@ bool UIElement::IsInsideCombined(IntVector2 position, bool isScreen)
         position = ElementToScreen(position);
     
     IntRect combined = GetCombinedScreenRect();
-    return (position.x_ >= combined.left_) && (position.y_ >= combined.top_) && (position.x_ < combined.right_) &&
-        (position.y_ < combined.bottom_);
+    return position.x_ >= combined.left_ && position.y_ >= combined.top_ && position.x_ < combined.right_ &&
+        position.y_ < combined.bottom_;
 }
 
 IntRect UIElement::GetCombinedScreenRect()
@@ -1163,9 +1163,9 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
         PODVector<unsigned> resizable;
         for (int i = 0; i < numChildren; ++i)
         {
-            if ((error < 0) && (sizes[i] > minSizes[i]))
+            if (error < 0 && sizes[i] > minSizes[i])
                 resizable.Push(i);
-            else if ((error > 0) && (sizes[i] < maxSizes[i]))
+            else if (error > 0 && sizes[i] < maxSizes[i])
                 resizable.Push(i);
         }
         if (resizable.Empty())

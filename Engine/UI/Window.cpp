@@ -79,7 +79,7 @@ void Window::OnHover(const IntVector2& position, const IntVector2& screenPositio
 
 void Window::OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)
 {
-    if ((buttons != MOUSEB_LEFT) || (!CheckAlignment()))
+    if (buttons != MOUSEB_LEFT || !CheckAlignment())
     {
         dragMode_ = DRAG_NONE;
         return;
@@ -264,7 +264,7 @@ void Window::ValidatePosition()
 bool Window::CheckAlignment() const
 {
     // Only top left-alignment is supported for move and resize
-    if ((GetHorizontalAlignment() == HA_LEFT) && (GetVerticalAlignment() == VA_TOP))
+    if (GetHorizontalAlignment() == HA_LEFT && GetVerticalAlignment() == VA_TOP)
         return true;
     else
         return false;

@@ -60,7 +60,7 @@ void Run(const Vector<String>& arguments)
     if (width < 2)
         ErrorExit("Width must be at least 2");
     
-    if ((dimensions < 1) || (dimensions > 2))
+    if (dimensions < 1 || dimensions > 2)
         ErrorExit("Dimensions must be 1 or 2");
     
     String tempDestName = arguments[0].Split('.')[0] + ".tga";

@@ -177,7 +177,7 @@ void ParticleEmitter::Update(float timeStep)
     periodTimer_ += timeStep;
     if (active_)
     {
-        if ((activeTime_) && (periodTimer_ >= activeTime_))
+        if (activeTime_ && periodTimer_ >= activeTime_)
         {
             active_ = false;
             periodTimer_ -= activeTime_;
@@ -185,7 +185,7 @@ void ParticleEmitter::Update(float timeStep)
     }
     else
     {
-        if ((inactiveTime_) && (periodTimer_ >= inactiveTime_))
+        if (inactiveTime_ && periodTimer_ >= inactiveTime_)
         {
             active_ = true;
             periodTimer_ -= inactiveTime_;
@@ -208,7 +208,7 @@ void ParticleEmitter::Update(float timeStep)
     Vector3 relativeConstantForce = GetWorldRotation().Inverse() * constanceForce_;
     // If billboards are not relative, apply scaling to the position update
     Vector3 scaleVector = Vector3::UNITY;
-    if ((scaled_) && (!relative_))
+    if (scaled_ && !relative_)
         scaleVector = GetWorldScale();
     
     for (unsigned i = 0; i < particles_.Size(); ++i)
@@ -247,7 +247,7 @@ void ParticleEmitter::Update(float timeStep)
             billboard.rotation_ += timeStep * particle.rotationSpeed_;
             
             // Scaling
-            if ((sizeAdd_ != 0.0f) || (sizeMul_ != 1.0f))
+            if (sizeAdd_ != 0.0f || sizeMul_ != 1.0f)
             {
                 particle.scale_ += timeStep * sizeAdd_;
                 if (sizeMul_ != 1.0f)
@@ -272,7 +272,7 @@ void ParticleEmitter::Update(float timeStep)
             
             // Texture animation
             unsigned& texIndex = particle.texIndex_;
-            if ((textureAnimation_.Size()) && (texIndex < textureAnimation_.Size() - 1))
+            if (textureAnimation_.Size() && texIndex < textureAnimation_.Size() - 1)
             {
                 if (particle.timer_ >= textureAnimation_[texIndex + 1].time_)
                 {
@@ -290,7 +290,7 @@ void ParticleEmitter::Update(float timeStep)
 bool ParticleEmitter::LoadParameters(XMLFile* file)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if ((!file) || (!cache))
+    if (!file || !cache)
         return false;
     
     parameterSource_ = file;
@@ -417,7 +417,7 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
 
 void ParticleEmitter::SetActive(bool enable, bool resetPeriod)
 {
-    if ((enable != active_) || (resetPeriod))
+    if (enable != active_ || resetPeriod)
     {
         active_ = enable;
         periodTimer_ = 0.0f;
@@ -557,7 +557,7 @@ void ParticleEmitter::GetFloatMinMax(const XMLElement& element, float& minValue,
     if (element.HasAttribute("value"))
         minValue = maxValue = element.GetFloat("value");
     
-    if ((element.HasAttribute("min")) && (element.HasAttribute("max")))
+    if (element.HasAttribute("min") && element.HasAttribute("max"))
     {
         minValue = element.GetFloat("min");
         maxValue = element.GetFloat("max");
@@ -572,7 +572,7 @@ void ParticleEmitter::GetVector2MinMax(const XMLElement& element, Vector2& minVa
     if (element.HasAttribute("value"))
         minValue = maxValue = element.GetVector2("value");
     
-    if ((element.HasAttribute("min")) && (element.HasAttribute("max")))
+    if (element.HasAttribute("min") && element.HasAttribute("max"))
     {
         minValue = element.GetVector2("min");
         maxValue = element.GetVector2("max");
@@ -587,7 +587,7 @@ void ParticleEmitter::GetVector3MinMax(const XMLElement& element, Vector3& minVa
     if (element.HasAttribute("value"))
         minValue = maxValue = element.GetVector3("value");
     
-    if ((element.HasAttribute("min")) && (element.HasAttribute("max")))
+    if (element.HasAttribute("min") && element.HasAttribute("max"))
     {
         minValue = element.GetVector3("min");
         maxValue = element.GetVector3("max");

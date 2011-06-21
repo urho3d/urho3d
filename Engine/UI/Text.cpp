@@ -152,20 +152,20 @@ void Text::SetStyle(const XMLElement& element)
 void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
 {
     // Hovering or whole selection batch
-    if ((hovering_ && (hoverColor_.a_ > 0.0f)) || (selected_ && (selectionColor_.a_ > 0.0f)))
+    if ((hovering_ && hoverColor_.a_ > 0.0) || (selected_ && selectionColor_.a_ > 0.0f))
     {
         UIBatch batch;
         batch.Begin(&quads);
         batch.blendMode_ = BLEND_ALPHA;
         batch.scissor_ = currentScissor;
         batch.texture_ = 0;
-        batch.AddQuad(*this, 0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, (selected_ && (selectionColor_.a_ > 0.0f)) ? selectionColor_ :
+        batch.AddQuad(*this, 0, 0, GetWidth(), GetHeight(), 0, 0, 0, 0, selected_ && selectionColor_.a_ > 0.0f ? selectionColor_ :
             hoverColor_);
         UIBatch::AddOrMerge(batch, batches);
     }
     
     // Partial selection batch
-    if ((!selected_) && (selectionLength_) && (charSizes_.Size() >= selectionStart_ + selectionLength_) && (selectionColor_.a_ > 0.0f))
+    if (!selected_ && selectionLength_ && charSizes_.Size() >= selectionStart_ + selectionLength_ && selectionColor_.a_ > 0.0f)
     {
         UIBatch batch;
         batch.Begin(&quads);
@@ -178,7 +178,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, con
         for (unsigned i = selectionStart_; i < selectionStart_ + selectionLength_; ++i)
         {
             // Check if row changes, and start a new quad in that case
-            if ((charSizes_[i].x_) && (charSizes_[i].y_))
+            if (charSizes_[i].x_ && charSizes_[i].y_)
             {
                 if (charPositions_[i].y_ != currentStart.y_)
                 {
@@ -266,7 +266,7 @@ bool Text::SetFont(Font* font, int size)
         return false;
     }
     
-    if ((font != font_) || (size != fontSize_))
+    if (font != font_ || size != fontSize_)
     {
         font_ = font;
         fontSize_ = Max(size, 1);
@@ -378,13 +378,13 @@ void Text::UpdateText(bool inResize)
                         int futureRowWidth = rowWidth;
                         for (j = i; j < text_.Length(); ++j)
                         {
-                            if ((text_[j] == ' ') || (text_[j] == '\n'))
+                            if (text_[j] == ' ' || text_[j] == '\n')
                             {
                                 nextBreak = j;
                                 break;
                             }
                             futureRowWidth += face->glyphs_[face->glyphIndex_[text_[j]]].advanceX_;
-                            if ((text_[j] == '-') && (futureRowWidth <= maxWidth))
+                            if (text_[j] == '-' && futureRowWidth <= maxWidth)
                             {
                                 nextBreak = j + 1;
                                 break;

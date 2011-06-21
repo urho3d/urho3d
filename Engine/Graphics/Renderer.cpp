@@ -481,7 +481,7 @@ unsigned Renderer::GetNumShadowMaps(bool allViews) const
         for (unsigned j = 0; j < lightQueues.Size(); ++j)
         {
             Light* light = lightQueues[j].light_;
-            if ((light) && (light->GetShadowMap()))
+            if (light && light->GetShadowMap())
                 ++numShadowMaps;
         }
     }
@@ -538,7 +538,7 @@ void Renderer::Update(float timeStep)
     
     // If device lost, do not perform update. This is because any dynamic vertex/index buffer updates happen already here,
     // and if the device is lost, the updates queue up, causing memory use to rise constantly
-    if ((!graphics_) || (!graphics_->IsInitialized()) || (graphics_->IsDeviceLost()))
+    if (!graphics_ || !graphics_->IsInitialized() || graphics_->IsDeviceLost())
         return;
     
     // Advance frame number & time, set up the frameinfo structure, and reset views & stats
@@ -681,7 +681,7 @@ void Renderer::Initialize()
     Graphics* graphics = GetSubsystem<Graphics>();
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    if ((!graphics) || (!graphics->IsInitialized()) || (!cache))
+    if (!graphics || !graphics->IsInitialized() || !cache)
         return;
     
     PROFILE(InitRenderer);
@@ -870,8 +870,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     // Check if shaders are unloaded or need reloading
     Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
     Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
-    if ((!vertexShaders.Size()) || (!pixelShaders.Size()) || (technique->GetShadersLoadedFrameNumber() !=
-        shadersChangedFrameNumber_))
+    if (!vertexShaders.Size() || !pixelShaders.Size() || technique->GetShadersLoadedFrameNumber() !=
+        shadersChangedFrameNumber_)
     {
         // First release all previous shaders, then load
         technique->ReleaseShaders();
@@ -879,11 +879,11 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     }
     
     // Make sure shaders are loaded now
-    if ((vertexShaders.Size()) && (pixelShaders.Size()))
+    if (vertexShaders.Size() && pixelShaders.Size())
     {
         //  Check whether is a forward lit pass. If not, there is only one pixel shader
         PassType type = pass->GetType();
-        if ((type != PASS_LITBASE) && (type != PASS_LIGHT))
+        if (type != PASS_LITBASE && type != PASS_LIGHT)
         {
             unsigned vsi = batch.geometryType_;
             batch.vertexShader_ = vertexShaders[vsi];
@@ -905,9 +905,9 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
             unsigned psi = 0;
             vsi = batch.geometryType_ * MAX_LIGHT_VS_VARIATIONS;
             
-            if ((specularLighting_) && (light->GetSpecularIntensity() > 0.0f))
+            if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
                 psi += LPS_SPEC;
-            if ((allowShadows) && (light->GetShadowMap()))
+            if (allowShadows && light->GetShadowMap())
             {
                 vsi += LVS_SHADOW;
                 psi += LPS_SHADOW;
@@ -938,7 +938,7 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, b
     batch.CalculateSortKey();
     
     // Log error if shaders could not be assigned, but only once per technique
-    if ((!batch.vertexShader_) || (!batch.pixelShader_))
+    if (!batch.vertexShader_ || !batch.pixelShader_)
     {
         if (shaderErrorDisplayed_.Find(technique) == shaderErrorDisplayed_.End())
         {
@@ -976,7 +976,7 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     if (light->GetShadowMap())
         psi += DLPS_SHADOW;
     
-    if ((specularLighting_) && (light->GetSpecularIntensity() > 0.0))
+    if (specularLighting_ && light->GetSpecularIntensity() > 0.0)
         psi += DLPS_SPEC;
     
     if (batch.camera_->IsOrthographic())
@@ -1021,7 +1021,7 @@ void Renderer::LoadShaders()
         for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
         {
             unsigned variation = i % DLPS_SPOT;
-            if ((variation == DLPS_SHADOW) || (variation == DLPS_SHADOWSPEC))
+            if (variation == DLPS_SHADOW || variation == DLPS_SHADOWSPEC)
                 lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i] + hwVariations[hwShadows]);
             else
                 lightPS_[i] = GetPixelShader("Light_" + lightPSVariations[i]);
@@ -1075,10 +1075,10 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
     if (pixelShaderName.Find('_') == String::NPOS)
         pixelShaderName += "_";
     
-    // If ambient pass is not using REPLACE as the blend mode, and shadow maps are reused, do not load shadow variations
-    if ((reuseShadowMaps_) && ((pass == PASS_LIGHT) || (pass == PASS_LITBASE)))
+    // If ambient pass is transparent, and shadow maps are reused, do not load shadow variations
+    if (reuseShadowMaps_ && (pass == PASS_LIGHT || pass == PASS_LITBASE))
     {
-        if ((!technique->HasPass(PASS_BASE)) || (technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE))
+        if (!technique->HasPass(PASS_BASE) || technique->GetPass(PASS_BASE)->GetBlendMode() != BLEND_REPLACE)
             allowShadows = false;
     }
     
@@ -1114,7 +1114,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
             {
                 unsigned g = j / MAX_LIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
-                if ((!(l & LVS_SHADOW)) || (allowShadows))
+                if (!(l & LVS_SHADOW) || allowShadows)
                     vertexShaders[j] = GetVertexShader(vertexShaderName + lightVSVariations[l] + geometryVSVariations[g], g != 0);
                 else
                     vertexShaders[j].Reset();
@@ -1122,7 +1122,7 @@ void Renderer::LoadPassShaders(Technique* technique, PassType pass, bool allowSh
             for (unsigned j = 0; j < numPS; ++j)
             {
                 unsigned variation = j % LPS_SPOT;
-                if ((variation == LPS_SHADOW) || (variation == LPS_SHADOWSPEC))
+                if (variation == LPS_SHADOW || variation == LPS_SHADOWSPEC)
                 {
                     if (allowShadows)
                         pixelShaders[j] = GetPixelShader(pixelShaderName + lightPSVariations[j] +

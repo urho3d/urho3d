@@ -100,10 +100,10 @@ struct ResourceRef
     StringHash id_;
     
     /// Test for equality with another reference
-    bool operator == (const ResourceRef& rhs) const { return (type_ == rhs.type_) && (id_ == rhs.id_); }
+    bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && id_ == rhs.id_; }
     
     /// Test for inequality with another reference
-    bool operator != (const ResourceRef& rhs) const { return (type_ != rhs.type_) || (id_ != rhs.id_); }
+    bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || id_ != rhs.id_; }
 };
 
 /// List of resource references of a specific type
@@ -132,10 +132,10 @@ struct ResourceRefList
     Vector<StringHash> ids_;
     
     /// Test for equality with another reference list
-    bool operator == (const ResourceRefList& rhs) const { return (type_ == rhs.type_) && (ids_ == rhs.ids_); }
+    bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && ids_ == rhs.ids_; }
     
     /// Test for inequality with another reference list
-    bool operator != (const ResourceRefList& rhs) const { return (type_ != rhs.type_) || (ids_ != rhs.ids_); }
+    bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || ids_ != rhs.ids_; }
 };
 
 class Variant;

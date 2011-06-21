@@ -94,7 +94,7 @@ void Connection::SetLoginData(const VariantMap& loginData)
 void Connection::SetScene(Scene* scene)
 {
     // Leave previous scene first
-    if ((scene_) && (scene_ != scene))
+    if (scene_ && scene_ != scene)
         LeftScene();
     
     scene_ = scene;
@@ -268,7 +268,7 @@ bool Connection::IsConnected() const
 
 void Connection::Send(const VectorBuffer& packet, bool reliable)
 {
-    if ((packet.GetSize()) && (peer_->GetConnectionState() == CS_CONNECTED))
+    if (packet.GetSize() && peer_->GetConnectionState() == CS_CONNECTED)
         peer_->Send(packet, reliable ? CHN_RELIABLE : CHN_UNRELIABLE, reliable);
 }
 

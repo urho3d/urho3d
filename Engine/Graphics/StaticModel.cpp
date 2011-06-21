@@ -232,7 +232,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
         
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
         // Check for valid geometry data
-        if ((!vertexData) || (!indexData))
+        if (!vertexData || !indexData)
             continue;
         
         unsigned indexStart = geom->GetIndexStart();
@@ -251,7 +251,7 @@ bool StaticModel::DrawOcclusion(OcclusionBuffer* buffer)
 
 void StaticModel::SetModel(Model* model)
 {
-    if ((!model) || (model == model_))
+    if (!model || model == model_)
         return;
     
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
@@ -340,7 +340,7 @@ void StaticModel::CalculateLodLevels()
         unsigned j;
         for (j = 1; j < geometries_[i].Size(); ++j)
         {
-            if ((geometries_[i][j]) && (lodDistance_ <= geometries_[i][j]->GetLodDistance()))
+            if (geometries_[i][j] && lodDistance_ <= geometries_[i][j]->GetLodDistance())
                 break;
         }
         lodLevels_[i] = j - 1;

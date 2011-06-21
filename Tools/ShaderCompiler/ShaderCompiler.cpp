@@ -76,15 +76,9 @@ struct Parameter
             return name_ > rhs.name_;
     }
     
-    bool operator == (const Parameter& rhs) const
-    {
-        return (index_ == rhs.index_) && (name_ == rhs.name_);
-    }
+    bool operator == (const Parameter& rhs) const { return index_ == rhs.index_ && name_ == rhs.name_; }
     
-    bool operator != (const Parameter& rhs) const
-    {
-        return (index_ != rhs.index_) || (name_ != rhs.name_);
-    }
+    bool operator != (const Parameter& rhs) const { return index_ != rhs.index_ || name_ != rhs.name_; }
     
     String name_;
     unsigned index_;
@@ -286,9 +280,9 @@ void Run(const Vector<String>& arguments)
         String source = shader.GetString("name");
         ShaderType compileType = Both;
         String type = shader.GetString("type");
-        if ((type == "VS") || (type == "vs"))
+        if (type == "VS" || type == "vs")
             compileType = VS;
-        if ((type == "PS") || (type == "ps"))
+        if (type == "PS" || type == "ps")
             compileType = PS;
         
         Shader baseShader(source, compileType);
@@ -297,7 +291,7 @@ void Run(const Vector<String>& arguments)
         while (variation)
         {
             String value = variation.GetName();
-            if ((value == "variation") || (value == "option"))
+            if (value == "variation" || value == "option")
             {
                 String name = variation.GetString("name");
                 
@@ -431,7 +425,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
                 {
                     for (unsigned k = 0; k < variations.Size(); ++k)
                     {
-                        if ((k != j) && (!variations[k].option_))
+                        if (k != j && !variations[k].option_)
                             active &= ~(1 << k);
                     }
                     
@@ -453,7 +447,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
                     
                     for (unsigned l = 0; l < variations.Size(); ++l)
                     {
-                        if (((active >> l) & 1) && (l != j))
+                        if ((active >> l) & 1 && l != j)
                         {
                             if (variations[l].name_ == variations[j].requires_[k])
                             {
@@ -480,7 +474,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
         }
         
         // If variations are included, check that one of them is active
-        if ((hasVariations) && (!variationActive))
+        if (hasVariations && !variationActive)
             continue;
         
         if (skipThis)
@@ -731,7 +725,7 @@ void CopyStrippedCode(PODVector<unsigned char>& dest, void* src, unsigned srcSiz
         unsigned commentLength = srcWords[i] >> 16;
         
         // For now, skip comment only at fixed position to prevent false positives
-        if ((i == 1) && (opcode == D3DSIO_COMMENT))
+        if (i == 1 && opcode == D3DSIO_COMMENT)
         {
             // Skip the comment
             i += commentLength;

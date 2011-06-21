@@ -175,7 +175,7 @@ bool TextureCube::Load(Deserializer& source)
     XMLElement textureElem = xml->GetRootElement();
     XMLElement faceElem = textureElem.GetChildElement("face");
     unsigned faces = 0;
-    while ((faceElem) && (faces < MAX_CUBEMAP_FACES))
+    while (faceElem && faces < MAX_CUBEMAP_FACES)
     {
         String name = faceElem.GetString("name");
         
@@ -272,7 +272,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
-            if ((levelWidth != width_) || (format != format_))
+            if (levelWidth != width_ || format != format_)
             {
                 LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
@@ -347,7 +347,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         unsigned mipsToSkip = mipsToSkip_[quality];
         if (mipsToSkip >= levels)
             mipsToSkip = levels - 1;
-        while ((mipsToSkip) && ((width / (1 << mipsToSkip) < 4) || (height / (1 << mipsToSkip) < 4)))
+        while (mipsToSkip && (width / (1 << mipsToSkip) < 4 || height / (1 << mipsToSkip) < 4))
             --mipsToSkip;
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
@@ -365,14 +365,14 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
             }
-            if ((width != width_) || (format != format_))
+            if (width != width_ || format != format_)
             {
                 LOGERROR("Cube texture face does not match size or format of face 0");
                 return false;
             }
         }
         
-        for (unsigned i = 0; (i < levels_) && (i < levels - mipsToSkip); ++i)
+        for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
             memoryUse += level.rows_ * level.rowSize_;
@@ -424,7 +424,7 @@ bool TextureCube::Lock(CubeMapFace face, unsigned level, const IntRect* rect, Lo
     }
     
     DWORD flags = 0;
-    if ((!rect) && (pool_ == D3DPOOL_DEFAULT))
+    if (!rect && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
     
     if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, rect ? &d3dRect : 0, flags)))
@@ -456,24 +456,24 @@ bool TextureCube::Create()
     if (!graphics_)
         return false;
     
-    if ((!width_) || (!height_))
+    if (!width_ || !height_)
         return false;
     
     // If using a default pool texture, must generate mipmaps automatically
-    if ((pool_ == D3DPOOL_DEFAULT) && (requestedLevels_ != 1))
+    if (pool_ == D3DPOOL_DEFAULT && requestedLevels_ != 1)
         usage_ |= D3DUSAGE_AUTOGENMIPMAP;
     else
         usage_ &= ~D3DUSAGE_AUTOGENMIPMAP;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-    if ((!device) || (FAILED(device->CreateCubeTexture(
+    if (!device || FAILED(device->CreateCubeTexture(
         width_,
         requestedLevels_,
         usage_,
         (D3DFORMAT)format_,
         (D3DPOOL)pool_,
         (IDirect3DCubeTexture9**)&object_,
-        0))))
+        0)))
     {
         LOGERROR("Could not create cube texture");
         return false;

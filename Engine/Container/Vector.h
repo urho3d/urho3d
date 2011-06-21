@@ -229,7 +229,7 @@ public:
     void Erase(unsigned pos, unsigned length = 1)
     {
         // Return if the range is illegal
-        if ((!length) || (pos + length > size_))
+        if (!length || pos + length > size_)
             return;
         
         MoveRange(pos, pos + length, size_ - pos - length);
@@ -615,7 +615,7 @@ public:
     void Erase(unsigned pos, unsigned length = 1)
     {
         // Return if the range is illegal
-        if ((!length) || (pos + length > size_))
+        if (!length || pos + length > size_)
             return;
         
         MoveRange(pos, pos + length, size_ - pos - length);

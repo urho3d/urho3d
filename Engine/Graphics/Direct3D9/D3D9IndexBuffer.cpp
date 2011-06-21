@@ -127,7 +127,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
 
 void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if ((!object_) && (!fallbackData_))
+    if (!object_ && !fallbackData_)
         return 0;
 
     if (locked_)
@@ -136,7 +136,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         return 0;
     }
 
-    if ((!count) || (start + count > indexCount_))
+    if (!count || start + count > indexCount_)
     {
         LOGERROR("Illegal range for locking index buffer");
         return 0;
@@ -148,7 +148,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     {
         DWORD flags = 0;
         
-        if ((mode == LOCK_DISCARD) && (usage_ & D3DUSAGE_DYNAMIC))
+        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
             flags |= D3DLOCK_DISCARD;
         if (mode == LOCK_NOOVERWRITE)
             flags |= D3DLOCK_NOOVERWRITE;
@@ -238,13 +238,13 @@ bool IndexBuffer::Create()
     if (graphics_)
     {
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        if ((!device) || (FAILED(device->CreateIndexBuffer(
+        if (!device || FAILED(device->CreateIndexBuffer(
             indexCount_ * indexSize_,
             usage_,
             indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
             (D3DPOOL)pool_,
             (IDirect3DIndexBuffer9**)&object_,
-            0))))
+            0)))
         {
             LOGERROR("Could not create index buffer");
             return false;

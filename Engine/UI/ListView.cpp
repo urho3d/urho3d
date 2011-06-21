@@ -133,10 +133,10 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     unsigned numItems = GetNumItems();
     unsigned selection = GetSelection();
     
-    if ((selection != M_MAX_UNSIGNED) && (numItems))
+    if (selection != M_MAX_UNSIGNED && numItems)
     {
         // If either shift or ctrl held down, add to selection if multiselect enabled
-        bool additive = (multiselect_) && (qualifiers != 0);
+        bool additive = multiselect_ && qualifiers != 0;
         
         switch (key)
         {
@@ -274,7 +274,7 @@ void ListView::AddItem(UIElement* item)
 
 void ListView::InsertItem(unsigned index, UIElement* item)
 {
-    if ((!item) || (item->GetParent() == contentElement_))
+    if (!item || item->GetParent() == contentElement_)
         return;
     
     // Enable input so that clicking the item can be detected
@@ -400,7 +400,7 @@ void ListView::SetSelections(const Set<unsigned>& indices)
         if (index < numItems)
         {
             // In singleselect mode, resend the event even for the same selection
-            if ((selections_.Find(index) == selections_.End()) || (!multiselect_))
+            if (selections_.Find(index) == selections_.End() || !multiselect_)
             {
                 selections_.Insert(*i);
                 
@@ -538,7 +538,7 @@ void ListView::SetChildItemsVisible(unsigned index, bool enable)
 {
     unsigned numItems = GetNumItems();
     
-    if ((!hierarchyMode_) || (index >= numItems))
+    if (!hierarchyMode_ || index >= numItems)
         return;
     
     int baseIndent = GetItemIndent(GetItem(index));
@@ -571,7 +571,7 @@ void ListView::ToggleChildItemsVisible(unsigned index)
 {
     unsigned numItems = GetNumItems();
     
-    if ((!hierarchyMode_) || (index >= numItems))
+    if (!hierarchyMode_ || index >= numItems)
         return;
     
     int baseIndent = GetItemIndent(GetItem(index));
@@ -644,8 +644,8 @@ void ListView::UpdateSelectionEffect()
     for (unsigned i = 0; i < numItems; ++i)
     {
         UIElement* item = GetItem(i);
-        if ((highlightMode_ != HM_NEVER) && (selections_.Find(i) != selections_.End()))
-            item->SetSelected((focus_) || (highlightMode_ == HM_ALWAYS));
+        if (highlightMode_ != HM_NEVER && selections_.Find(i) != selections_.End())
+            item->SetSelected(focus_ || highlightMode_ == HM_ALWAYS);
         else
             item->SetSelected(false);
     }
@@ -654,7 +654,7 @@ void ListView::UpdateSelectionEffect()
 void ListView::EnsureItemVisibility(unsigned index)
 {
     UIElement* item = GetItem(index);
-    if ((!item) || (!item->IsVisible()))
+    if (!item || !item->IsVisible())
         return;
     
     IntVector2 currentOffset = item->GetScreenPosition() - scrollPanel_->GetScreenPosition() - contentElement_->GetPosition();
@@ -686,9 +686,9 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
         {
             // Check doubleclick
             bool isDoubleClick = false;
-            if ((!multiselect_) || (!qualifiers))
+            if (!multiselect_ || !qualifiers)
             {
-                if ((doubleClickTimer_ > 0.0f) && (lastClickedItem_ == i))
+                if (doubleClickTimer_ > 0.0f && lastClickedItem_ == i)
                 {
                     isDoubleClick = true;
                     doubleClickTimer_ = 0.0f;
@@ -713,7 +713,7 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
                         unsigned first = selections_.Front();
                         unsigned last = selections_.Back();
                         Set<unsigned> newSelections = selections_;
-                        if ((i == first) || (i == last))
+                        if (i == first || i == last)
                         {
                             for (unsigned j = first; j <= last; ++j)
                                 newSelections.Insert(j);

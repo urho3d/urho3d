@@ -44,8 +44,8 @@ void RevisionBuffer::PurgeOld(unsigned short frameNumber)
         // If oldest and second-oldest are both older than framenumber, or if the second-oldest is on the exact same frame,
         // can delete the oldest
         Vector<Revision>::Iterator j = i + 1;
-        if ((j->frameNumber_ == frameNumber) || ((!CheckFrameNumber(i->frameNumber_, frameNumber)) &&
-            (!CheckFrameNumber(j->frameNumber_, frameNumber))))
+        if (j->frameNumber_ == frameNumber || (!CheckFrameNumber(i->frameNumber_, frameNumber) &&
+            !CheckFrameNumber(j->frameNumber_, frameNumber)))
             eraseCount++;
         else
             break;
@@ -105,9 +105,9 @@ void ComponentReplicationState::Removed(unsigned short frameNumber)
 void ComponentReplicationState::Acked(unsigned short lastAck)
 {
     // If ack is newer or same age than the creation or removal event, reset it
-    if ((createdFrame_) && (CheckFrameNumber(lastAck, createdFrame_)))
+    if (createdFrame_ && CheckFrameNumber(lastAck, createdFrame_))
         createdFrame_ = 0;
-    if ((removedFrame_) && (CheckFrameNumber(lastAck, removedFrame_)))
+    if (removedFrame_ && CheckFrameNumber(lastAck, removedFrame_))
         removedFrame_ = 0;
     
     // Remove old data revisions
@@ -117,7 +117,7 @@ void ComponentReplicationState::Acked(unsigned short lastAck)
 bool ComponentReplicationState::CanRemove() const
 {
     // Can be removed from the replication state if no longer exists, and the remove has been acked
-    return (!exists_) && (!removedFrame_);
+    return !exists_ && !removedFrame_;
 }
 
 NodeReplicationState::NodeReplicationState() :
@@ -149,9 +149,9 @@ void NodeReplicationState::Removed(unsigned short frameNumber)
 void NodeReplicationState::Acked(unsigned short lastAck)
 {
     // If ack is newer or same age than the creation or removal event, reset it
-    if ((createdFrame_) && (CheckFrameNumber(lastAck, createdFrame_)))
+    if (createdFrame_ && CheckFrameNumber(lastAck, createdFrame_))
         createdFrame_ = 0;
-    if ((removedFrame_) && (CheckFrameNumber(lastAck, removedFrame_)))
+    if (removedFrame_ && CheckFrameNumber(lastAck, removedFrame_))
         removedFrame_ = 0;
     
     // Remove old property revisions
@@ -186,7 +186,7 @@ bool NodeReplicationState::HasUnAcked(unsigned short frameNumber) const
 bool NodeReplicationState::CanRemove() const
 {
     // Can be removed from the replication state if no longer exists, and the remove has been acked
-    return (!exists_) && (!removedFrame_);
+    return !exists_ && !removedFrame_;
 }
 
 unsigned NodeReplicationState::GetRevisionCount() const

@@ -354,7 +354,7 @@ Node* Node::CreateChild(const String& name, bool local)
 void Node::AddChild(Node* node)
 {
     // Check for illegal parent assignments, including attempt to reparent the scene
-    if ((!node) || (node == this) || (node->parent_ == this) || (parent_ == node) || (scene_ == node))
+    if (!node || node == this || node->parent_ == this || parent_ == node || scene_ == node)
         return;
     
     // Add first, then remove from old parent, to ensure the node does not get deleted
@@ -364,7 +364,7 @@ void Node::AddChild(Node* node)
         node->parent_->RemoveChild(node);
     
     // Add to the scene if not added yet
-    if ((scene_) && (!node->GetScene()))
+    if (scene_ && !node->GetScene())
         scene_->NodeAdded(node);
     
     node->parent_ = this;
@@ -734,7 +734,7 @@ void Node::UpdateWorldTransform()
 {
     // For now, assume that the Scene has identity transform so that we skip one matrix multiply. However in the future
     // we may want dynamic root nodes for large worlds
-    if ((parent_) && (parent_ != scene_))
+    if (parent_ && parent_ != scene_)
     {
         if (parent_->dirty_)
             parent_->UpdateWorldTransform();

@@ -167,11 +167,11 @@ bool UIBatch::Merge(const UIBatch& batch)
 
 void UIBatch::Draw(Graphics* graphics) const
 {
-    if ((!quads_) || (!quadCount_))
+    if (!quads_ || !quadCount_)
         return;
     
     // Use alpha test if not alpha blending
-    if ((blendMode_ != BLEND_ALPHA) && (blendMode_ != BLEND_ADDALPHA) && (blendMode_ != BLEND_PREMULALPHA))
+    if (blendMode_ != BLEND_ALPHA && blendMode_ != BLEND_ADDALPHA && blendMode_ != BLEND_PREMULALPHA)
         graphics->SetAlphaTest(true, CMP_GREATEREQUAL, 0.5f);
     else
         graphics->SetAlphaTest(false);
@@ -289,7 +289,7 @@ unsigned UIBatch::GetInterpolatedColor(UIElement& element, int x, int y)
 {
     const IntVector2& size = element.GetSize();
     
-    if ((size.x_) && (size.y_))
+    if (size.x_ && size.y_)
     {
         float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
         float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);

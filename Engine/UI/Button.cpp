@@ -69,11 +69,11 @@ void Button::SetStyle(const XMLElement& element)
 
 void Button::Update(float timeStep)
 {
-    if ((!hovering_) && (pressed_ == true))
+    if (!hovering_ && pressed_ == true)
         SetPressed(false);
     
     // Send repeat events if pressed
-    if ((pressed_) && (repeatRate_ > 0.0f))
+    if (pressed_ && repeatRate_ > 0.0f)
     {
         repeatTimer_ -= timeStep;
         if (repeatTimer_ <= 0.0f)
@@ -94,7 +94,7 @@ void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, c
     IntVector2 offset(IntVector2::ZERO);
     if (hovering_)
         offset += hoverOffset_;
-    if ((pressed_) || (selected_))
+    if (pressed_ || selected_)
         offset += pressedOffset_;
     
     BorderImage::GetBatches(batches, quads, currentScissor, offset);
@@ -106,7 +106,7 @@ void Button::OnHover(const IntVector2& position, const IntVector2& screenPositio
     SetPressed((buttons & MOUSEB_LEFT) != 0);
     hovering_ = true;
     
-    if ((oldPressed) && (!pressed_))
+    if (oldPressed && !pressed_)
     {
         using namespace Released;
         

@@ -144,7 +144,7 @@ public:
     const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
     {
         Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
-        return (i != attributes_.End()) ? &i->second_ : 0;
+        return i != attributes_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist
@@ -152,14 +152,14 @@ public:
     {
         Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = 
             specificReceivers_.Find(MakePair(sender, eventType));
-        return (i != specificReceivers_.End()) ? &i->second_ : 0;
+        return i != specificReceivers_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist
     PODVector<Object*>* GetReceivers(StringHash eventType)
     {
         Map<StringHash, PODVector<Object*> >::Iterator i = receivers_.Find(eventType);
-        return (i != receivers_.End()) ? &i->second_ : 0;
+        return i != receivers_.End() ? &i->second_ : 0;
     }
     
 private:

@@ -79,7 +79,7 @@ void Log::Write(int level, const String& message)
         return;
     
     // Check message level
-    if ((level_ > level) || (level < LOG_DEBUG) || (level >= LOG_NONE))
+    if (level_ > level || level < LOG_DEBUG || level >= LOG_NONE)
         return;
     
     inWrite_ = true;

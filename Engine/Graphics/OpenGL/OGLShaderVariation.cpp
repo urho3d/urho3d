@@ -74,10 +74,10 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if ((!sourceCode_) || (!sourceCodeLength_))
+    if (!sourceCode_ || !sourceCodeLength_)
         return false;
     
-    object_ = glCreateShader((shaderType_ == VS) ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+    object_ = glCreateShader(shaderType_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
     if (!object_)
     {
         compilerOutput_ = "Could not create shader object";

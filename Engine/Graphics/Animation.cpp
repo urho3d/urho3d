@@ -40,11 +40,11 @@ void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
         index = keyFrames_.Size() - 1;
     
     // Check for being too far ahead
-    while ((index) && (time < keyFrames_[index].time_))
+    while (index && time < keyFrames_[index].time_)
         index--;
     
     // Check for being too far behind
-    while ((index < keyFrames_.Size() - 1) && (time >= keyFrames_[index + 1].time_))
+    while (index < keyFrames_.Size() - 1 && time >= keyFrames_[index + 1].time_)
         index++;
 }
 

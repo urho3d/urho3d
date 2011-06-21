@@ -132,7 +132,7 @@ void DropDownList::OnShowPopup()
     if (root)
     {
         const IntVector2& screenPos = GetScreenPosition();
-        if ((screenPos.y_ + GetHeight() + popup_->GetHeight() > root->GetHeight()) && (screenPos.y_ - popup_->GetHeight() >= 0))
+        if (screenPos.y_ + GetHeight() + popup_->GetHeight() > root->GetHeight() && screenPos.y_ - popup_->GetHeight() >= 0)
             showAbove = true;
     }
     if (!showAbove)

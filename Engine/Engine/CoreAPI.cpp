@@ -520,7 +520,7 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
 {
     Vector<String> enumNames;
     const String* enumNamePtrs = ptr->enumNames_;
-    while ((enumNamePtrs) && (enumNamePtrs->Length()))
+    while (enumNamePtrs && enumNamePtrs->Length())
     {
         enumNames.Push(*enumNamePtrs);
         ++enumNamePtrs;

@@ -242,7 +242,7 @@ bool Drawable::IsInView(unsigned frameNumber) const
 
 bool Drawable::IsInView(const FrameInfo& frame) const
 {
-    return (viewFrameNumber_ == frame.frameNumber_) && (viewCamera_ == frame.camera_);
+    return viewFrameNumber_ == frame.frameNumber_ && viewCamera_ == frame.camera_;
 }
 
 void Drawable::OnNodeSet(Node* node)

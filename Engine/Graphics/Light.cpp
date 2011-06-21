@@ -215,9 +215,9 @@ void Light::SetLightType(LightType type)
     lightType_ = type;
     
     // Validate shape texture type: 2D for spot lights, cube for point lights. Change to null if wrong
-    if ((lightType_ == LIGHT_SPOT) && (shapeTexture_) && (shapeTexture_->GetType() != Texture2D::GetTypeStatic()))
+    if (lightType_ == LIGHT_SPOT && shapeTexture_ && shapeTexture_->GetType() != Texture2D::GetTypeStatic())
         shapeTexture_ = 0;
-    if ((lightType_ == LIGHT_POINT) && (shapeTexture_) && (shapeTexture_->GetType() != TextureCube::GetTypeStatic()))
+    if (lightType_ == LIGHT_POINT && shapeTexture_ && shapeTexture_->GetType() != TextureCube::GetTypeStatic())
         shapeTexture_ = 0;
 }
 

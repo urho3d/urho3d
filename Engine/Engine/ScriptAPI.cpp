@@ -210,7 +210,7 @@ static const String& SelfGetClassName()
 static void SelfDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
-    if ((!ptr) || (!srcParams))
+    if (!ptr || !srcParams)
         return;
     
     unsigned numParams = srcParams->GetSize();

@@ -111,7 +111,7 @@ bool Material::Load(Deserializer& source)
     
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Graphics* graphics = GetSubsystem<Graphics>();
-    if ((!cache) || (!graphics))
+    if (!cache || !graphics)
         return false;
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));

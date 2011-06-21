@@ -80,7 +80,7 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         destIndexCount += geom->GetIndexCount();
     }
     
-    if ((!destVertexCount) || (!destIndexCount))
+    if (!destVertexCount || !destIndexCount)
         return;
     
     destVertexData = new Vector3[destVertexCount];
@@ -105,7 +105,7 @@ void GetVertexAndIndexData(const Model* model, unsigned lodLevel, SharedArrayPtr
         unsigned indexSize;
         
         geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
-        if ((!vertexData) || (!indexData))
+        if (!vertexData || !indexData)
             continue;
         
         unsigned vertexStart = geom->GetVertexStart();
@@ -239,7 +239,7 @@ HeightfieldData::HeightfieldData(Model* model, IntVector2 numPoints, float thick
     unsigned indexSize;
     
     geom->GetRawData(vertexData, vertexSize, indexData, indexSize);
-    if ((!vertexData) || (!indexData))
+    if (!vertexData || !indexData)
         return;
     
     unsigned indexStart = geom->GetIndexStart();
@@ -556,7 +556,7 @@ void CollisionShape::UpdateTransform()
         // Assign the body, then set offset transform if necessary
         dGeomSetBody(geometry_, body);
         
-        if ((position_ != Vector3::ZERO) || (rotation_ != Quaternion::IDENTITY))
+        if (position_ != Vector3::ZERO || rotation_ != Quaternion::IDENTITY)
         {
             Vector3 offset = geometryScale_ * position_;
             
@@ -585,7 +585,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     Color color(0.0f, 1.0f, 0.0f);
     
     RigidBody* rigidBody = GetComponent<RigidBody>();
-    if ((rigidBody) && (rigidBody->IsActive()))
+    if (rigidBody && rigidBody->IsActive())
         color = Color(1.0f, 1.0f, 1.0f);
     
     // Drawing all the debug geometries of a large world may be expensive (especially triangle meshes)

@@ -237,11 +237,11 @@ Intersection BoundingBox::IsInside(const Sphere& sphere) const
     if (distSquared >= radius * radius)
         return OUTSIDE;
     
-    if ((center.x_ - radius < min_.x_) || (center.x_ + radius > max_.x_))
+    if (center.x_ - radius < min_.x_ || center.x_ + radius > max_.x_)
         return INTERSECTS;
-    if ((center.y_ - radius < min_.y_) || (center.y_ + radius > max_.y_))
+    if (center.y_ - radius < min_.y_ || center.y_ + radius > max_.y_)
         return INTERSECTS;
-    if ((center.z_ - radius < min_.z_) || (center.z_ + radius > max_.z_))
+    if (center.z_ - radius < min_.z_ || center.z_ + radius > max_.z_)
         return INTERSECTS;
     
     return INSIDE;
@@ -305,71 +305,65 @@ float BoundingBox::Distance(const Ray& ray) const
     float dist = M_INFINITY;
     
     // Check for intersecting in the X-direction
-    if ((ray.origin_.x_ < min_.x_) && (ray.direction_.x_ > 0.0f))
+    if (ray.origin_.x_ < min_.x_ && ray.direction_.x_ > 0.0f)
     {
         float x = (min_.x_ - ray.origin_.x_) / ray.direction_.x_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.y_ >= min_.y_) && (point.y_ <= max_.y_) &&
-                (point.z_ >= min_.z_) && (point.z_ <= max_.z_))
+            if (point.y_ >= min_.y_ && point.y_ <= max_.y_ && point.z_ >= min_.z_ && point.z_ <= max_.z_)
                 dist = x;
         }
     }
-    if ((ray.origin_.x_ > max_.x_) && (ray.direction_.x_ < 0.0f))
+    if (ray.origin_.x_ > max_.x_ && ray.direction_.x_ < 0.0f)
     {
         float x = (max_.x_ - ray.origin_.x_) / ray.direction_.x_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.y_ >= min_.y_) && (point.y_ <= max_.y_) &&
-                (point.z_ >= min_.z_) && (point.z_ <= max_.z_))
+            if (point.y_ >= min_.y_ && point.y_ <= max_.y_ && point.z_ >= min_.z_ && point.z_ <= max_.z_)
                 dist = x;
         }
     }
     // Check for intersecting in the Y-direction
-    if ((ray.origin_.y_ < min_.y_) && (ray.direction_.y_ > 0.0f))
+    if (ray.origin_.y_ < min_.y_ && ray.direction_.y_ > 0.0f)
     {
         float x = (min_.y_ - ray.origin_.y_) / ray.direction_.y_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.x_ >= min_.x_) && (point.x_ <= max_.x_) &&
-                (point.z_ >= min_.z_) && (point.z_ <= max_.z_))
+            if (point.x_ >= min_.x_ && point.x_ <= max_.x_ && point.z_ >= min_.z_ && point.z_ <= max_.z_)
                 dist = x;
         }
     }
-    if ((ray.origin_.y_ > max_.y_) && (ray.direction_.y_ < 0.0f))
+    if (ray.origin_.y_ > max_.y_ && ray.direction_.y_ < 0.0f)
     {
         float x = (max_.y_ - ray.origin_.y_) / ray.direction_.y_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.x_ >= min_.x_) && (point.x_ <= max_.x_) &&
-                (point.z_ >= min_.z_) && (point.z_ <= max_.z_))
+            if (point.x_ >= min_.x_ && point.x_ <= max_.x_ && point.z_ >= min_.z_ && point.z_ <= max_.z_)
                 dist = x;
         }
     }
     // Check for intersecting in the Z-direction
-    if ((ray.origin_.z_ < min_.z_) && (ray.direction_.z_ > 0.0f))
+    if (ray.origin_.z_ < min_.z_ && ray.direction_.z_ > 0.0f)
     {
         float x = (min_.z_ - ray.origin_.z_) / ray.direction_.z_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.x_ >= min_.x_) && (point.x_ <= max_.x_) &&
-                (point.y_ >= min_.y_) && (point.y_ <= max_.y_))
+            if (point.x_ >= min_.x_ && point.x_ <= max_.x_ && point.y_ >= min_.y_ && point.y_ <= max_.y_)
                 dist = x;
         }
     }
-    if ((ray.origin_.z_ > max_.z_) && (ray.direction_.z_ < 0.0f))
+    if (ray.origin_.z_ > max_.z_ && ray.direction_.z_ < 0.0f)
     {
         float x = (max_.z_ - ray.origin_.z_) / ray.direction_.z_;
         if (x < dist)
         {
             Vector3 point = ray.origin_ + x * ray.direction_;
-            if ((point.x_ >= min_.x_) && (point.x_ <= max_.x_) &&
-                (point.y_ >= min_.y_) && (point.y_ <= max_.y_))
+            if (point.x_ >= min_.x_ && point.x_ <= max_.x_ && point.y_ >= min_.y_ && point.y_ <= max_.y_)
                 dist = x;
         }
     }

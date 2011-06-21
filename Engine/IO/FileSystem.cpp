@@ -103,7 +103,7 @@ bool FileSystem::CreateDir(const String& pathName)
     bool success = (CreateDirectory(GetNativePath(RemoveTrailingSlash(pathName)).CString(), 0) == TRUE) ||
         (GetLastError() == ERROR_ALREADY_EXISTS);
     #else
-    bool success = (mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0) || (errno == EEXIST);
+    bool success = mkdir(GetNativePath(RemoveTrailingSlash(pathName)).CString(), S_IRWXU) == 0 || errno == EEXIST;
     #endif
     
     if (success)
@@ -177,7 +177,7 @@ bool FileSystem::SystemOpen(const String& fileName, const String& mode)
     #ifdef _WIN32
     if (allowedPaths_.Empty())
     {
-        if ((!FileExists(fileName)) && (!DirExists(fileName)))
+        if (!FileExists(fileName) && !DirExists(fileName))
         {
             LOGERROR("File or directory " + fileName + " not found");
             return false;
@@ -216,7 +216,7 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     
     SharedPtr<File> srcFile(new File(context_, srcFileName, FILE_READ));
     SharedPtr<File> destFile(new File(context_, destFileName, FILE_WRITE));
-    if ((!srcFile->IsOpen()) || (!destFile->IsOpen()))
+    if (!srcFile->IsOpen() || !destFile->IsOpen())
         return false;
     
     unsigned fileSize = srcFile->GetSize();
@@ -225,7 +225,7 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     unsigned bytesRead = srcFile->Read(buffer.GetPtr(), fileSize);
     unsigned bytesWritten = destFile->Write(buffer.GetPtr(), fileSize);
     
-    return (bytesRead == fileSize) && (bytesWritten == fileSize);
+    return bytesRead == fileSize && bytesWritten == fileSize;
 }
 
 bool FileSystem::Rename(const String& srcFileName, const String& destFileName)
@@ -302,11 +302,11 @@ bool FileSystem::FileExists(const String& fileName)
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
     #ifdef _WIN32
     DWORD attributes = GetFileAttributes(fixedName.CString());
-    if ((attributes == INVALID_FILE_ATTRIBUTES) || (attributes & FILE_ATTRIBUTE_DIRECTORY))
+    if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
         return false;
     #else
     struct stat st;
-    if ((stat(fixedName.CString(), &st)) || (st.st_mode & S_IFDIR))
+    if (stat(fixedName.CString(), &st) || st.st_mode & S_IFDIR)
         return false;
     #endif
     
@@ -321,11 +321,11 @@ bool FileSystem::DirExists(const String& pathName)
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
     #ifdef _WIN32
     DWORD attributes = GetFileAttributes(fixedName.CString());
-    if ((attributes == INVALID_FILE_ATTRIBUTES) || (!(attributes & FILE_ATTRIBUTE_DIRECTORY)))
+    if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
         return false;
     #else
     struct stat st;
-    if ((stat(fixedName.CString(), &st)) || (!(st.st_mode & S_IFDIR)))
+    if (stat(fixedName.CString(), &st) || !(st.st_mode & S_IFDIR))
         return false;
     #endif
     
@@ -403,13 +403,13 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
             String fileName((const char*)&info.cFileName[0]);
             if (!fileName.Empty())
             {
-                if ((info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && (!(flags & SCAN_HIDDEN)))
+                if (info.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN && !(flags & SCAN_HIDDEN))
                     continue;
                 if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 {
                     if (flags & SCAN_DIRS)
                         result.Push(deltaPath + fileName);
-                    if ((recursive) && (fileName != ".") && (fileName != ".."))
+                    if (recursive && fileName != "." && fileName != "..")
                         ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)
@@ -437,7 +437,7 @@ void FileSystem::ScanDirInternal(Vector<String>& result, String path, const Stri
                 {
                     if (flags & SCAN_DIRS)
                         result.Push(deltaPath + fileName);
-                    if ((recursive) && (fileName != ".") && (fileName != ".."))
+                    if (recursive && fileName != "." && fileName != "..")
                         ScanDirInternal(result, path + fileName, startPath, filter, flags, recursive);
                 }
                 else if (flags & SCAN_FILES)
@@ -507,7 +507,7 @@ String AddTrailingSlash(const String& pathName)
 {
     String ret = pathName;
     ret.Replace('\\', '/');
-    if ((!ret.Empty()) && (ret.Back() != '/'))
+    if (!ret.Empty() && ret.Back() != '/')
         ret += '/';
     
     return ret;
@@ -517,7 +517,7 @@ String RemoveTrailingSlash(const String& pathName)
 {
     String ret = pathName;
     ret.Replace('\\', '/');
-    if ((!ret.Empty()) && (ret.Back() == '/'))
+    if (!ret.Empty() && ret.Back() == '/')
         ret.Resize(ret.Length() - 1);
     
     return ret;

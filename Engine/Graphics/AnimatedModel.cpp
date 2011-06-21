@@ -112,7 +112,7 @@ void AnimatedModel::OnSetAttribute(const AttributeInfo& attr, const Variant& val
             MemoryBuffer buf(value.GetBuffer());
             Vector<Bone>& bones = skeleton_.GetModifiableBones();
             unsigned numBones = buf.ReadVLE();
-            for (unsigned i = 0; (i < numBones) && (i < bones.Size()); ++i)
+            for (unsigned i = 0; i < numBones && i < bones.Size(); ++i)
                 bones[i].animated_ = buf.ReadBool();
         }
         break;
@@ -200,7 +200,7 @@ void AnimatedModel::PostLoad()
 void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     // If no bones or no bone-level testing, use the Drawable test
-    if ((!skeleton_.GetNumBones()) || (query.level_ < RAY_AABB))
+    if (!skeleton_.GetNumBones() || query.level_ < RAY_AABB)
     {
         Drawable::ProcessRayQuery(query, initialDistance);
         return;
@@ -275,18 +275,18 @@ void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance
 void AnimatedModel::Update(const FrameInfo& frame)
 {
     // Update animation here
-    if ((!animationDirty_) && (!animationOrderDirty_))
+    if (!animationDirty_ && !animationOrderDirty_)
         return;
     
     // If node was invisible last frame, need to decide animation LOD distance here
     // If headless, retain the current animation distance (should be 0)
-    if ((frame.camera_) && (abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1))
+    if (frame.camera_ && abs((int)frame.frameNumber_ - (int)viewFrameNumber_) > 1)
     {
         if (invisibleLodFactor_ == 0.0f)
             return;
         float distance = frame.camera_->GetDistance(GetWorldPosition());
         // If distance is greater than draw distance, no need to update at all
-        if ((drawDistance_ > 0.0f) && (distance > drawDistance_))
+        if (drawDistance_ > 0.0f && distance > drawDistance_)
             return;
         // Multiply the distance by a constant so that invisible nodes don't update that often
         float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
@@ -324,7 +324,7 @@ void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
     if (lodLevelsDirty_)
         CalculateLodLevels();
     
-    if ((morphsDirty_) && (morphs_.Size()))
+    if (morphsDirty_ && morphs_.Size())
         UpdateMorphs();
     
     if (skinningDirty_)
@@ -341,7 +341,7 @@ void AnimatedModel::GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch&
     if (skinMatrices_.Size())
     {
         // Check if model has per-geometry bone mappings
-        if ((geometrySkinMatrices_.Size()) && (geometrySkinMatrices_[batchIndex].Size()))
+        if (geometrySkinMatrices_.Size() && geometrySkinMatrices_[batchIndex].Size())
         {
             batch.shaderData_ = geometrySkinMatrices_[batchIndex][0].GetData();
             batch.shaderDataSize_ = geometrySkinMatrices_[batchIndex].Size() * 12;
@@ -363,7 +363,7 @@ void AnimatedModel::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
 void AnimatedModel::SetModel(Model* model, bool createBones)
 {
-    if ((!model) || (model == model_))
+    if (!model || model == model_)
         return;
     
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
@@ -420,7 +420,7 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
         return 0;
     }
     
-    if ((!animation) || (!skeleton_.GetNumBones()))
+    if (!animation || !skeleton_.GetNumBones())
         return 0;
     
     // Check for not adding twice
@@ -452,7 +452,7 @@ void AnimatedModel::RemoveAnimationState(StringHash animationNameHash)
         AnimationState* state = *i;
         Animation* animation = state->GetAnimation();
         // Check both the animation and the resource name
-        if ((animation->GetNameHash() == animationNameHash) || (animation->GetAnimationNameHash() == animationNameHash))
+        if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
         {
             animationStates_.Erase(i);
             MarkAnimationDirty();
@@ -488,7 +488,7 @@ void AnimatedModel::SetInvisibleLodFactor(float factor)
 {
     if (factor < 0.0f)
         factor = 0.0f;
-    else if ((factor != 0.0f) && (factor < 1.0f))
+    else if (factor != 0.0f && factor < 1.0f)
         factor = 1.0f;
     invisibleLodFactor_ = factor;
 }
@@ -606,7 +606,7 @@ AnimationState* AnimatedModel::GetAnimationState(const String& animationName) co
         Animation* animation = (*i)->GetAnimation();
         
         // Check both the animation and the resource name
-        if ((animation->GetName() == animationName) || (animation->GetAnimationName() == animationName))
+        if (animation->GetName() == animationName || animation->GetAnimationName() == animationName)
             return *i;
     }
     
@@ -620,7 +620,7 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
         Animation* animation = (*i)->GetAnimation();
         
         // Check both the animation and the resource name
-        if ((animation->GetNameHash() == animationNameHash) || (animation->GetAnimationNameHash() == animationNameHash))
+        if (animation->GetNameHash() == animationNameHash || animation->GetAnimationNameHash() == animationNameHash)
             return *i;
     }
     
@@ -634,7 +634,7 @@ AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
 
 void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 {
-    if ((!node_) && (createBones))
+    if (!node_ && createBones)
     {
         LOGWARNING("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
@@ -670,7 +670,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             for (unsigned i = 0; i < bones.Size(); ++i)
             {
                 unsigned parentIndex = bones[i].parentIndex_;
-                if ((parentIndex != i) && (parentIndex < bones.Size()))
+                if (parentIndex != i && parentIndex < bones.Size())
                     bones[parentIndex].node_->AddChild(bones[i].node_);
             }
         }
@@ -885,7 +885,7 @@ void AnimatedModel::RefreshGeometryBoneMappings()
 void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
-    if ((animationLodBias_ > 0.0f) && (animationLodDistance_ > 0.0f))
+    if (animationLodBias_ > 0.0f && animationLodDistance_ > 0.0f)
     {
         // Check for first time update
         if (animationLodTimer_ >= 0.0f)

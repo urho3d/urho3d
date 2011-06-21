@@ -224,7 +224,7 @@ void Run(const Vector<String>& arguments)
     
     for (unsigned i = 2; i < arguments.Size(); ++i)
     {
-        if ((arguments[i].Length() >= 2) && (arguments[i][0] == '-'))
+        if (arguments[i].Length() >= 2 && arguments[i][0] == '-')
         {
             String parameter;
             if (arguments[i].Length() >= 3)
@@ -298,7 +298,7 @@ void Run(const Vector<String>& arguments)
     {
         String inFile = arguments[1];
         String outFile;
-        if ((arguments.Size() > 2) && (arguments[2][0] != '-'))
+        if (arguments.Size() > 2 && arguments[2][0] != '-')
             outFile = GetInternalPath(arguments[2]);
         
         if (resourcePath_.Empty())
@@ -499,7 +499,7 @@ void CollectBones(OutModel& model)
             for (;;)
             {
                 boneNode = boneNode->mParent;
-                if ((!boneNode) || (boneNode == meshNode) || (boneNode == meshParentNode))
+                if (!boneNode || boneNode == meshNode || boneNode == meshParentNode)
                     break;
                 rootNode = boneNode;
                 necessary.Insert(boneNode);
@@ -518,7 +518,7 @@ void CollectBones(OutModel& model)
         {
             if ((*i) != commonParent)
             {
-                if ((!commonParent) || ((*i)->mParent != commonParent))
+                if (!commonParent || (*i)->mParent != commonParent)
                     ErrorExit("Skeleton with multiple root nodes found, not supported");
             }
         }
@@ -633,7 +633,7 @@ void BuildAndSaveModel(OutModel& model)
         }
     }
     // Check if keeping separate buffers allows to avoid 32-bit indices
-    if ((combineBuffers) && (model.totalVertices_ > 65535))
+    if (combineBuffers && model.totalVertices_ > 65535)
     {
         bool allUnder65k = true;
         for (unsigned i = 0; i < model.meshes_.Size(); ++i)
@@ -791,7 +791,7 @@ void BuildAndSaveModel(OutModel& model)
     outModel->SetBoundingBox(box);
     
     // Build skeleton if necessary
-    if ((model.bones_.Size()) && (model.rootBone_))
+    if (model.bones_.Size() && model.rootBone_)
     {
         PrintLine("Writing skeleton with " + String(model.bones_.Size()) + " bones, rootbone " +
             FromAIString(model.rootBone_->mName));
@@ -897,8 +897,8 @@ void BuildAndSaveAnimations(OutModel& model)
                 {
                     float SCALE_EPSILON = 0.000001f;
                     Vector3 scaleVec = ToVector3(channel->mScalingKeys[k].mValue);
-                    if ((fabsf(scaleVec.x_ - 1.0f) >= SCALE_EPSILON) || (fabsf(scaleVec.y_ - 1.0f) >= SCALE_EPSILON) ||
-                        (fabsf(scaleVec.z_ - 1.0f) >= SCALE_EPSILON))
+                    if (fabsf(scaleVec.x_ - 1.0f) >= SCALE_EPSILON || fabsf(scaleVec.y_ - 1.0f) >= SCALE_EPSILON ||
+                        fabsf(scaleVec.z_ - 1.0f) >= SCALE_EPSILON)
                     {
                         redundantScale = false;
                         break;
@@ -913,9 +913,9 @@ void BuildAndSaveAnimations(OutModel& model)
             
             // Currently only same amount of keyframes is supported
             // Note: should also check the times of individual keyframes for match
-            if (((channel->mNumPositionKeys > 1) && (channel->mNumRotationKeys > 1) && (channel->mNumPositionKeys != channel->mNumRotationKeys)) ||
-                ((channel->mNumPositionKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumPositionKeys != channel->mNumScalingKeys)) ||
-                ((channel->mNumRotationKeys > 1) && (channel->mNumScalingKeys > 1) && (channel->mNumRotationKeys != channel->mNumScalingKeys)))
+            if ((channel->mNumPositionKeys > 1 && channel->mNumRotationKeys > 1 && channel->mNumPositionKeys != channel->mNumRotationKeys) ||
+                (channel->mNumPositionKeys > 1 && channel->mNumScalingKeys > 1 && channel->mNumPositionKeys != channel->mNumScalingKeys) ||
+                (channel->mNumRotationKeys > 1 && channel->mNumScalingKeys > 1 && channel->mNumRotationKeys != channel->mNumScalingKeys))
             {
                 PrintLine("Warning: differing amounts of channel keyframes, skipping animation track " + channelName);
                 continue;
@@ -936,11 +936,11 @@ void BuildAndSaveAnimations(OutModel& model)
                 kf.scale_ = Vector3::UNITY;
                 
                 // Get time for the keyframe
-                if ((track.channelMask_ & CHANNEL_POSITION) && (k < channel->mNumPositionKeys))
+                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     kf.time_ = (float)channel->mPositionKeys[k].mTime * tickConversion;
-                else if ((track.channelMask_ & CHANNEL_ROTATION) && (k < channel->mNumRotationKeys))
+                else if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     kf.time_ = (float)channel->mRotationKeys[k].mTime * tickConversion;
-                else if ((track.channelMask_ & CHANNEL_SCALE) && (k < channel->mNumScalingKeys))
+                else if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     kf.time_ = (float)channel->mScalingKeys[k].mTime * tickConversion;
                 
                 // Start with the bone's base transform
@@ -949,11 +949,11 @@ void BuildAndSaveAnimations(OutModel& model)
                 aiQuaternion rot;
                 boneTransform.Decompose(scale, rot, pos);
                 // Then apply the active channels
-                if ((track.channelMask_ & CHANNEL_POSITION) && (k < channel->mNumPositionKeys))
+                if (track.channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
                     pos = channel->mPositionKeys[k].mValue;
-                if ((track.channelMask_ & CHANNEL_ROTATION) && (k < channel->mNumRotationKeys))
+                if (track.channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
                     rot = channel->mRotationKeys[k].mValue;
-                if ((track.channelMask_ & CHANNEL_SCALE) && (k < channel->mNumScalingKeys))
+                if (track.channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
                 
                 // If root bone, transform with the model root node transform
@@ -1600,7 +1600,7 @@ aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode)
 aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* node, aiNode* rootNode)
 {
     // If basenode is defined, go only up to it in the parent chain
-    while ((node) && (node != rootNode))
+    while (node && node != rootNode)
     {
         node = node->mParent;
         if (node)

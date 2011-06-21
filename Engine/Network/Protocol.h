@@ -78,10 +78,10 @@ inline unsigned ReadNetID(Deserializer& source)
 inline bool CheckFrameNumber(unsigned short lhs, unsigned short rhs, bool sameFrameOk = true)
 {
     // Frame number 0 means "frame never received", so in that case lhs is always considered "newer"
-    if ((lhs) && (!rhs))
+    if (lhs && !rhs)
         return true;
     
-    if ((!sameFrameOk) && (lhs == rhs))
+    if (!sameFrameOk && lhs == rhs)
         return false;
     
     return ((lhs - rhs) & 0xffff) < 0x8000;

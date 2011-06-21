@@ -112,7 +112,7 @@ void Octant::DeleteChild(Octant* octant)
 void Octant::InsertDrawable(Drawable* drawable)
 {
     // If size OK or outside, stop recursion & insert here
-    if ((CheckDrawableSize(drawable)) || (cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE))
+    if (CheckDrawableSize(drawable) || cullingBox_.IsInside(drawable->GetWorldBoundingBox()) != INSIDE)
     {
         if (drawable->octant_ != this)
         {
@@ -142,8 +142,8 @@ bool Octant::CheckDrawableSize(Drawable* drawable) const
     Vector3 octantHalfSize = worldBoundingBox_.Size() * 0.5;
     Vector3 drawableSize = drawable->GetWorldBoundingBox().Size();
     
-    return (drawableSize.x_ >= octantHalfSize.x_) || (drawableSize.y_ >= octantHalfSize.y_) || (drawableSize.z_ >=
-        octantHalfSize.z_);
+    return drawableSize.x_ >= octantHalfSize.x_ || drawableSize.y_ >= octantHalfSize.y_ || drawableSize.z_ >=
+        octantHalfSize.z_;
 }
 
 void Octant::ResetRoot()
@@ -177,7 +177,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
     {
         Intersection res = query.TestOctant(cullingBox_, mask);
         
-        if ((res == OUTSIDE) && (this != root_))
+        if (res == OUTSIDE && this != root_)
             // Fully outside, so cull this octant, its children & drawables
             return;
         if (res == INSIDE) 
@@ -190,11 +190,11 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
         Drawable* drawable = *i;
         unsigned flags = drawable->GetDrawableFlags();
         
-        if ((!(flags & query.drawableFlags_)) || (!drawable->IsVisible()))
+        if (!(flags & query.drawableFlags_) || !drawable->IsVisible())
             continue;
-        if ((query.occludersOnly_) && (!drawable->IsOccluder()))
+        if (query.occludersOnly_ && !drawable->IsOccluder())
             continue;
-        if ((query.shadowCastersOnly_) && (!drawable->GetCastShadows()))
+        if (query.shadowCastersOnly_ && !drawable->GetCastShadows())
             continue;
         
         if (query.TestDrawable(drawable->GetWorldBoundingBox(), mask) != OUTSIDE)
@@ -222,11 +222,11 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
         
-        if ((!(drawableFlags & query.drawableFlags_)) || (!drawable->IsVisible()))
+        if (!(drawableFlags & query.drawableFlags_) || !drawable->IsVisible())
             continue;
-        if ((query.occludersOnly_) && (!drawable->IsOccluder()))
+        if (query.occludersOnly_ && !drawable->IsOccluder())
             continue;
-        if ((query.shadowCastersOnly_) && (!drawable->GetCastShadows()))
+        if (query.shadowCastersOnly_ && !drawable->GetCastShadows())
             continue;
         
         float drawableDist = drawable->GetWorldBoundingBox().Distance(query.ray_);
@@ -244,7 +244,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 
 void Octant::Release()
 {
-    if ((root_) && (this != root_))
+    if (root_ && this != root_)
     {
         // Remove the drawables (if any) from this octant to the root octant
         for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
@@ -350,7 +350,7 @@ void Octree::Update(const FrameInfo& frame)
                 if (octant == this)
                 {
                     // Handle root octant as special case: if outside the root, do not reinsert
-                    if ((GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) == INSIDE) && (!CheckDrawableSize(drawable)))
+                    if (GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) == INSIDE && !CheckDrawableSize(drawable))
                         reinsert = true;
                 }
                 else

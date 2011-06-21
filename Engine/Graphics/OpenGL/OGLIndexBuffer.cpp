@@ -163,7 +163,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
 
 void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if ((!object_) && (!fallbackData_))
+    if (!object_ && !fallbackData_)
         return 0;
     
     if (locked_)
@@ -172,7 +172,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         return 0;
     }
 
-    if ((!count) || (start + count > indexCount_))
+    if (!count || start + count > indexCount_)
     {
         LOGERROR("Illegal range for locking index buffer");
         return 0;
@@ -189,7 +189,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     {
         graphics_->SetIndexBuffer(this);
         // If locking the whole buffer in discard mode, create a new data store
-        if ((mode == LOCK_DISCARD) && (count == indexCount_))
+        if (mode == LOCK_DISCARD && count == indexCount_)
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount_ * indexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         
         hwData = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, glLockMode);

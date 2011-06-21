@@ -79,7 +79,7 @@ public:
     /// Test for equality with another vector
     bool operator == (const Vector3& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
     /// Test for inequality with another vector
-    bool operator != (const Vector3& rhs) const { return (!Equals(x_, rhs.x_)) || (!Equals(y_, rhs.y_)) || (!Equals(z_, rhs.z_)); }
+    bool operator != (const Vector3& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_); }
     /// Add a vector
     Vector3 operator + (const Vector3& rhs) const { return Vector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
     /// Return negation

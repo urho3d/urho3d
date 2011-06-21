@@ -57,7 +57,7 @@ public:
     /// Check if a button was pressed on this frame. Requires previous frame's controls
     bool IsPressed(unsigned button, const Controls& prevControls) const
     {
-        return ((buttons_ & button) != 0) && ((prevControls.buttons_ & button) == 0);
+        return (buttons_ & button) != 0 && (prevControls.buttons_ & button) == 0;
     }
     
     /// Button state

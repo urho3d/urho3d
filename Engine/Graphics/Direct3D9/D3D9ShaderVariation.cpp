@@ -49,22 +49,22 @@ bool ShaderVariation::Create()
 {
     Release();
     
-    if ((!graphics_) || (!byteCode_))
+    if (!graphics_ || !byteCode_)
         return false;
     
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     if (shaderType_ == VS)
     {
-        if ((!device) || (FAILED(device->CreateVertexShader(
+        if (!device || FAILED(device->CreateVertexShader(
             (const DWORD*)byteCode_.GetPtr(),
-            (IDirect3DVertexShader9**)&object_))))
+            (IDirect3DVertexShader9**)&object_)))
             failed_ = true;
     }
     else
     {
-        if ((!device) || (FAILED(device->CreatePixelShader(
+        if (!device || FAILED(device->CreatePixelShader(
             (const DWORD*)byteCode_.GetPtr(),
-            (IDirect3DPixelShader9**)&object_))))
+            (IDirect3DPixelShader9**)&object_)))
             failed_ = true;
     }
     

@@ -191,7 +191,7 @@ void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& d
 
 void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if ((!object_) && (!fallbackData_))
+    if (!object_ && !fallbackData_)
         return 0;
 
     if (locked_)
@@ -200,7 +200,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         return 0;
     }
     
-    if ((!count) || (start + count > vertexCount_))
+    if (!count || start + count > vertexCount_)
     {
         LOGERROR("Illegal range for locking vertex buffer");
         return 0;
@@ -212,7 +212,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     {
         DWORD flags = 0;
         
-        if ((mode == LOCK_DISCARD) && (usage_ & D3DUSAGE_DYNAMIC))
+        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
             flags = D3DLOCK_DISCARD;
         if (mode == LOCK_NOOVERWRITE)
             flags = D3DLOCK_NOOVERWRITE;
@@ -255,7 +255,7 @@ void* VertexBuffer::LockMorphRange()
 
 void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
 {
-    if ((!lockedMorphRange) || (!morphRangeResetData_))
+    if (!lockedMorphRange || !morphRangeResetData_)
         return;
     
     memcpy(lockedMorphRange, morphRangeResetData_.GetPtr(), morphRangeCount_ * vertexSize_);
@@ -319,19 +319,19 @@ bool VertexBuffer::Create()
 {
     Release();
     
-    if ((!vertexCount_) || (!elementMask_))
+    if (!vertexCount_ || !elementMask_)
         return true;
     
     if (graphics_)
     {
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        if ((!device) || (FAILED(device->CreateVertexBuffer(
+        if (!device || FAILED(device->CreateVertexBuffer(
             vertexCount_ * vertexSize_,
             usage_,
             0,
             (D3DPOOL)pool_,
             (IDirect3DVertexBuffer9**)&object_,
-            0))))
+            0)))
         {
             LOGERROR("Could not create vertex buffer");
             return false;

@@ -96,7 +96,7 @@ void ScrollView::SetStyle(const XMLElement& element)
         scrollPanel_->SetStyle(panelElem);
     
     UIElement* root = GetRootElement();
-    if ((root) && (element.HasChildElement("contentelement")))
+    if (root && element.HasChildElement("contentelement"))
         SetContentElement(root->GetChild(element.GetChildElement("contentelement").GetString("name"), true));
     
     // Set the scrollbar orientations again and perform size update now that the style is known
@@ -265,13 +265,13 @@ void ScrollView::UpdateScrollBars()
     
     const IntVector2& size = scrollPanel_->GetSize();
     
-    if ((horizontalScrollBar_) && (size.x_ > 0) && (viewSize_.x_ > 0))
+    if (horizontalScrollBar_ && size.x_ > 0 && viewSize_.x_ > 0)
     {
         horizontalScrollBar_->SetRange((float)viewSize_.x_ / (float)size.x_ - 1.0f);
         horizontalScrollBar_->SetValue((float)viewPosition_.x_ / (float)size.x_);
         horizontalScrollBar_->SetStepFactor(STEP_FACTOR / (float)size.x_);
     }
-    if ((verticalScrollBar_) && (size.y_ > 0) && (viewSize_.y_ > 0))
+    if (verticalScrollBar_ && size.y_ > 0 && viewSize_.y_ > 0)
     {
         verticalScrollBar_->SetRange((float)viewSize_.y_ / (float)size.y_ - 1.0f);
         verticalScrollBar_->SetValue((float)viewPosition_.y_ / (float)size.y_);
