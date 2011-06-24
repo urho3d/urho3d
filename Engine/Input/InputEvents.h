@@ -25,8 +25,8 @@
 
 #include "Object.h"
 
-#ifdef USE_SDL
-#include <SDL.h>
+#ifdef USE_OPENGL
+#include <GL/glfw.h>
 #endif
 
 /// Mouse button pressed
@@ -48,13 +48,10 @@ EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 /// Mouse moved
 EVENT(E_MOUSEMOVE, MouseMove)
 {
-    PARAM(P_X, X);                        // int
-    PARAM(P_Y, Y);                        // int
     PARAM(P_DX, DX);                      // int
     PARAM(P_DY, DY);                      // int
     PARAM(P_BUTTONS, Buttons);            // int
     PARAM(P_QUALIFIERS, Qualifiers);      // int
-    PARAM(P_CLIPCURSOR, ClipCursor);      // bool
 }
 
 /// Mouse wheel moved
@@ -69,7 +66,6 @@ EVENT(E_MOUSEWHEEL, MouseWheel)
 EVENT(E_KEYDOWN, KeyDown)
 {
     PARAM(P_KEY, Key);                    // int
-    PARAM(P_SCANCODE, ScanCode);          // int
     PARAM(P_BUTTONS, Buttons);            // int
     PARAM(P_QUALIFIERS, Qualifiers);      // int
     PARAM(P_REPEAT, Repeat);              // bool
@@ -79,7 +75,6 @@ EVENT(E_KEYDOWN, KeyDown)
 EVENT(E_KEYUP, KeyUp)
 {
     PARAM(P_KEY, Key);                    // int
-    PARAM(P_SCANCODE, ScanCode);          // int
     PARAM(P_BUTTONS, Buttons);            // int
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
@@ -93,14 +88,14 @@ EVENT(E_CHAR, Char)
 }
 
 static const int MOUSEB_LEFT = 1;
-static const int MOUSEB_MIDDLE = 2;
-static const int MOUSEB_RIGHT = 4;
+static const int MOUSEB_RIGHT = 2;
+static const int MOUSEB_MIDDLE = 4;
 
 static const int QUAL_SHIFT = 1;
 static const int QUAL_CTRL = 2;
 static const int QUAL_ALT = 4;
 
-#ifndef USE_SDL
+#ifndef USE_OPENGL
 static const int KEY_BACKSPACE = 0x08;
 static const int KEY_TAB = 0x09;
 static const int KEY_RETURN = 0x0d;
@@ -119,8 +114,6 @@ static const int KEY_LEFT = 0x25;
 static const int KEY_UP = 0x26;
 static const int KEY_RIGHT = 0x27;
 static const int KEY_DOWN = 0x28;
-static const int KEY_SELECT = 0x29;
-static const int KEY_PRINTSCREEN = 0x2c;
 static const int KEY_INSERT = 0x2d;
 static const int KEY_DELETE = 0x2e;
 static const int KEY_LWIN = 0x5b;
@@ -173,101 +166,75 @@ static const int KEY_LCTRL = 0xa2;
 static const int KEY_RCTRL = 0xa3;
 static const int KEY_LALT = 0xa4;
 static const int KEY_RALT = 0xa5;
-static const int KEY_OEM_1 = 0xba;
-static const int KEY_OEM_PLUS = 0xbb;
-static const int KEY_OEM_COMMA = 0xbc;
-static const int KEY_OEM_MINUS = 0xbd;
-static const int KEY_OEM_PERIOD = 0xbe;
-static const int KEY_OEM_2 = 0xbf;
-static const int KEY_OEM_3 = 0xc0;
-static const int KEY_OEM_4 = 0xdb;
-static const int KEY_OEM_5 = 0xdc;
-static const int KEY_OEM_6 = 0xdd;
-static const int KEY_OEM_7 = 0xde;
-static const int KEY_OEM_8 = 0xdf;
 #else
-static const int KEY_BACKSPACE = SDLK_BACKSPACE;
-static const int KEY_TAB = SDLK_TAB;
-static const int KEY_RETURN = SDLK_RETURN;
-static const int KEY_SHIFT = SDLK_LSHIFT;
-static const int KEY_CTRL = SDLK_LCTRL;
-static const int KEY_ALT = SDLK_LALT;
-static const int KEY_PAUSE = SDLK_PAUSE;
-static const int KEY_CAPSLOCK = SDLK_CAPSLOCK;
-static const int KEY_ESC = SDLK_ESCAPE;
-static const int KEY_SPACE = SDLK_SPACE;
-static const int KEY_PAGEUP = SDLK_PAGEUP;
-static const int KEY_PAGEDOWN = SDLK_PAGEDOWN;
-static const int KEY_END = SDLK_END;
-static const int KEY_HOME = SDLK_HOME;
-static const int KEY_LEFT = SDLK_LEFT;
-static const int KEY_UP = SDLK_UP;
-static const int KEY_RIGHT = SDLK_RIGHT;
-static const int KEY_DOWN = SDLK_DOWN;
-static const int KEY_SELECT = SDLK_SELECT;
-static const int KEY_PRINTSCREEN = SDLK_PRINTSCREEN;
-static const int KEY_INSERT = SDLK_INSERT;
-static const int KEY_DELETE = SDLK_DELETE;
-static const int KEY_LWIN = SDLK_LGUI;
-static const int KEY_RWIN = SDLK_RGUI;
-static const int KEY_APPS = SDLK_APPLICATION;
-static const int KEY_NUMPAD0 = SDLK_KP_0;
-static const int KEY_NUMPAD1 = SDLK_KP_1;
-static const int KEY_NUMPAD2 = SDLK_KP_2;
-static const int KEY_NUMPAD3 = SDLK_KP_3;
-static const int KEY_NUMPAD4 = SDLK_KP_4;
-static const int KEY_NUMPAD5 = SDLK_KP_5;
-static const int KEY_NUMPAD6 = SDLK_KP_6;
-static const int KEY_NUMPAD7 = SDLK_KP_7;
-static const int KEY_NUMPAD8 = SDLK_KP_8;
-static const int KEY_NUMPAD9 = SDLK_KP_9;
-static const int KEY_MULTIPLY = SDLK_KP_MULTIPLY;
-static const int KEY_ADD = SDLK_KP_PLUS;
-static const int KEY_SUBTRACT = SDLK_KP_MINUS;
-static const int KEY_DECIMAL = SDLK_KP_PERIOD;
-static const int KEY_DIVIDE = SDLK_KP_DIVIDE;
-static const int KEY_F1 = SDLK_F1;
-static const int KEY_F2 = SDLK_F2;
-static const int KEY_F3 = SDLK_F3;
-static const int KEY_F4 = SDLK_F4;
-static const int KEY_F5 = SDLK_F5;
-static const int KEY_F6 = SDLK_F6;
-static const int KEY_F7 = SDLK_F7;
-static const int KEY_F8 = SDLK_F8;
-static const int KEY_F9 = SDLK_F9;
-static const int KEY_F10 = SDLK_F10;
-static const int KEY_F11 = SDLK_F11;
-static const int KEY_F12 = SDLK_F12;
-static const int KEY_F13 = SDLK_F13;
-static const int KEY_F14 = SDLK_F14;
-static const int KEY_F15 = SDLK_F15;
-static const int KEY_F16 = SDLK_F16;
-static const int KEY_F17 = SDLK_F17;
-static const int KEY_F18 = SDLK_F18;
-static const int KEY_F19 = SDLK_F19;
-static const int KEY_F20 = SDLK_F20;
-static const int KEY_F21 = SDLK_F21;
-static const int KEY_F22 = SDLK_F22;
-static const int KEY_F23 = SDLK_F23;
-static const int KEY_F24 = SDLK_F24;
-static const int KEY_NUMLOCK = SDLK_NUMLOCKCLEAR;
-static const int KEY_SCROLLLOCK = SDLK_SCROLLLOCK;
-static const int KEY_LSHIFT = SDLK_LSHIFT;
-static const int KEY_RSHIFT = SDLK_RSHIFT;
-static const int KEY_LCTRL = SDLK_LCTRL;
-static const int KEY_RCTRL = SDLK_RCTRL;
-static const int KEY_LALT = SDLK_LALT;
-static const int KEY_RALT = SDLK_RALT;
-static const int KEY_OEM_1 = 0;
-static const int KEY_OEM_PLUS = 0;
-static const int KEY_OEM_COMMA = 0;
-static const int KEY_OEM_MINUS = 0;
-static const int KEY_OEM_PERIOD = 0;
-static const int KEY_OEM_2 = 0;
-static const int KEY_OEM_3 = 0;
-static const int KEY_OEM_4 = 0;
-static const int KEY_OEM_5 = 0;
-static const int KEY_OEM_6 = 0;
-static const int KEY_OEM_7 = 0;
-static const int KEY_OEM_8 = 0;
+static const int KEY_BACKSPACE = GLFW_KEY_BACKSPACE;
+static const int KEY_TAB = GLFW_KEY_TAB;
+static const int KEY_RETURN = GLFW_KEY_ENTER;
+static const int KEY_SHIFT = GLFW_KEY_LSHIFT;
+static const int KEY_CTRL = GLFW_KEY_LCTRL;
+static const int KEY_ALT = GLFW_KEY_LALT;
+static const int KEY_PAUSE = GLFW_KEY_PAUSE;
+static const int KEY_CAPSLOCK = GLFW_KEY_CAPS_LOCK;
+static const int KEY_ESC = GLFW_KEY_ESC;
+static const int KEY_SPACE = GLFW_KEY_SPACE;
+static const int KEY_PAGEUP = GLFW_KEY_PAGEUP;
+static const int KEY_PAGEDOWN = GLFW_KEY_PAGEDOWN;
+static const int KEY_END = GLFW_KEY_END;
+static const int KEY_HOME = GLFW_KEY_HOME;
+static const int KEY_LEFT = GLFW_KEY_LEFT;
+static const int KEY_UP = GLFW_KEY_UP;
+static const int KEY_RIGHT = GLFW_KEY_RIGHT;
+static const int KEY_DOWN = GLFW_KEY_DOWN;
+static const int KEY_INSERT = GLFW_KEY_INSERT;
+static const int KEY_DELETE = GLFW_KEY_DEL;
+static const int KEY_LWIN = GLFW_KEY_LSUPER;
+static const int KEY_RWIN = GLFW_KEY_RSUPER;
+static const int KEY_APPS = GLFW_KEY_MENU;
+static const int KEY_NUMPAD0 = GLFW_KEY_KP_0;
+static const int KEY_NUMPAD1 = GLFW_KEY_KP_1;
+static const int KEY_NUMPAD2 = GLFW_KEY_KP_2;
+static const int KEY_NUMPAD3 = GLFW_KEY_KP_3;
+static const int KEY_NUMPAD4 = GLFW_KEY_KP_4;
+static const int KEY_NUMPAD5 = GLFW_KEY_KP_5;
+static const int KEY_NUMPAD6 = GLFW_KEY_KP_6;
+static const int KEY_NUMPAD7 = GLFW_KEY_KP_7;
+static const int KEY_NUMPAD8 = GLFW_KEY_KP_8;
+static const int KEY_NUMPAD9 = GLFW_KEY_KP_9;
+static const int KEY_MULTIPLY = GLFW_KEY_KP_MULTIPLY;
+static const int KEY_ADD = GLFW_KEY_KP_ADD;
+static const int KEY_SUBTRACT = GLFW_KEY_KP_SUBTRACT;
+static const int KEY_DECIMAL = GLFW_KEY_KP_DECIMAL;
+static const int KEY_DIVIDE = GLFW_KEY_KP_DIVIDE;
+static const int KEY_F1 = GLFW_KEY_F1;
+static const int KEY_F2 = GLFW_KEY_F2;
+static const int KEY_F3 = GLFW_KEY_F3;
+static const int KEY_F4 = GLFW_KEY_F4;
+static const int KEY_F5 = GLFW_KEY_F5;
+static const int KEY_F6 = GLFW_KEY_F6;
+static const int KEY_F7 = GLFW_KEY_F7;
+static const int KEY_F8 = GLFW_KEY_F8;
+static const int KEY_F9 = GLFW_KEY_F9;
+static const int KEY_F10 = GLFW_KEY_F10;
+static const int KEY_F11 = GLFW_KEY_F11;
+static const int KEY_F12 = GLFW_KEY_F12;
+static const int KEY_F13 = GLFW_KEY_F13;
+static const int KEY_F14 = GLFW_KEY_F14;
+static const int KEY_F15 = GLFW_KEY_F15;
+static const int KEY_F16 = GLFW_KEY_F16;
+static const int KEY_F17 = GLFW_KEY_F17;
+static const int KEY_F18 = GLFW_KEY_F18;
+static const int KEY_F19 = GLFW_KEY_F19;
+static const int KEY_F20 = GLFW_KEY_F20;
+static const int KEY_F21 = GLFW_KEY_F21;
+static const int KEY_F22 = GLFW_KEY_F22;
+static const int KEY_F23 = GLFW_KEY_F23;
+static const int KEY_F24 = GLFW_KEY_F24;
+static const int KEY_NUMLOCK = GLFW_KEY_KP_NUM_LOCK;
+static const int KEY_SCROLLLOCK = GLFW_KEY_SCROLL_LOCK;
+static const int KEY_LSHIFT = GLFW_KEY_LSHIFT;
+static const int KEY_RSHIFT = GLFW_KEY_RSHIFT;
+static const int KEY_LCTRL = GLFW_KEY_LCTRL;
+static const int KEY_RCTRL = GLFW_KEY_RCTRL;
+static const int KEY_LALT = GLFW_KEY_LALT;
+static const int KEY_RALT = GLFW_KEY_RALT;
 #endif

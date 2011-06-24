@@ -373,8 +373,6 @@ private:
     void SetDrawBuffers();
     /// Destroy the OpenGL rendering context and the window
     void Release();
-    /// Initialize OpenGL extensions. Creates a dummy window and OpenGL context
-    void InitializeExtensions();
     /// Initialize shader parameter and texture unit mappings
     void InitializeShaderParameters();
     
@@ -390,7 +388,7 @@ private:
     int height_;
     /// Multisampling mode
     int multiSample_;
-    /// Initialized flag
+    /// Initialized flag (window open)
     bool initialized_;
     /// Fullscreen flag
     bool fullscreen_;

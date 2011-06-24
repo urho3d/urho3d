@@ -34,12 +34,8 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// Audio subsystem. Uses either DirectSound or SDL for sound output
-#ifndef USE_SDL
-class Audio : public Object, public Thread
-#else
+/// Audio subsystem. Uses PortAudio for the actual sound output
 class Audio : public Object
-#endif
 {
     OBJECT(Audio);
     
@@ -50,7 +46,7 @@ public:
     virtual ~Audio();
     
     /// Initialize sound output with specified buffer length and output mode
-    bool SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool stereo, bool interpolate = true);
+    bool SetMode(int mixRate, bool sixteenBit, bool stereo, bool interpolate = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
     void Update(float timeStep);
     /// Restart sound output
@@ -68,10 +64,6 @@ public:
     /// Stop any sound source playing a certain sound clip
     void StopSound(Sound* sound);
     
-    /// Return sound buffer size in samples
-    unsigned GetBufferSamples() const { return bufferSamples_; }
-    /// Return sound buffer size in bytes
-    unsigned GetBufferSize() const { return bufferSize_; }
     /// Return byte size of one sample
     unsigned GetSampleSize() const { return sampleSize_; }
     /// Return mixing rate
@@ -84,8 +76,8 @@ public:
     bool IsInterpolated() const { return interpolate_; }
     /// Return whether audio is being output
     bool IsPlaying() const { return playing_; }
-    /// Return whether an audio buffer has been reserved
-    bool IsInitialized() const;
+    /// Return whether an audio stream has been reserved
+    bool IsInitialized() const { return stream_ != 0; }
     /// Return master gain for a specific sound source type
     float GetMasterGain(SoundType type) const;
     /// Return listener position
@@ -104,39 +96,23 @@ public:
     /// Return sound type specific gain multiplied by master gain
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
     
-    #ifndef USE_SDL
-    /// Mixing thread function
-    virtual void ThreadFunction();
-    #endif
     /// Mix sound sources into the buffer
-    void MixOutput(void* dest, unsigned bytes);
+    void MixOutput(void *dest, unsigned mixSamples);
     
 private:
-    #ifndef USE_SDL
-    /// Handle screen mode event
-    void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Initialize when screen mode initially set
-    void Initialize();
-    #endif
     /// Handle render update event
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Stop sound output and release the sound buffer
     void Release();
     
-    #ifndef USE_SDL
-    /// Implementation
-    AudioImpl* impl_;
-    /// Window handle
-    unsigned windowHandle_;
-    #endif
+    /// PortAudio stream
+    void* stream_;
     /// Clipping buffer for mixing
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex
     Mutex audioMutex_;
-    /// Sound buffer size in samples
-    unsigned bufferSamples_;
-    /// Sound buffer size in bytes
-    unsigned bufferSize_;
+    /// Clipping buffer size in samples
+    unsigned clipBufferSize_;
     /// Sample size
     unsigned sampleSize_;
     /// Mixing rate

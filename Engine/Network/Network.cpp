@@ -51,7 +51,7 @@ Network::Network(Context* context) :
     dataOutBps_(0)
 {
     {
-        MutexLock Lock(GetStaticMutex());
+        MutexLock lock(GetStaticMutex());
         
         if (!numInstances)
         {
@@ -70,7 +70,7 @@ Network::~Network()
     StopClient();
     
     {
-        MutexLock Lock(GetStaticMutex());
+        MutexLock lock(GetStaticMutex());
         
         --numInstances;
         if (!numInstances)

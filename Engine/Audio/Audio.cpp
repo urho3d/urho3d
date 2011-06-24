@@ -28,59 +28,28 @@
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "Log.h"
+#include "ProcessUtils.h"
 #include "Profiler.h"
 #include "Sound.h"
 #include "SoundSource3D.h"
 
-#ifndef USE_SDL
-#define DIRECTSOUND_VERSION 0x0800
-#include <Windows.h>
-#include <MMSystem.h>
-#include <dsound.h>
-#else
-#include <SDL.h>
-#endif
+#include "portaudio.h"
 
 #include "DebugNew.h"
 
-static const int AUDIO_FPS = 100;
+static unsigned numInstances = 0;
 
-#ifndef USE_SDL
-/// Audio implementation. Contains the DirectSound buffer
-class AudioImpl
-{
-    friend class Audio;
-    
-public:
-    /// Construct
-    AudioImpl() :
-        dsObject_(0),
-        dsBuffer_(0)
-    {
-    }
-    
-private:
-    /// DirectSound interface
-    IDirectSound* dsObject_;
-    /// DirectSound buffer
-    IDirectSoundBuffer* dsBuffer_;
-};
-#else
-static void SDLAudioCallback(void *userdata, Uint8 *stream, int len);
-#endif
+static int PortAudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
+    timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
 
 OBJECTTYPESTATIC(Audio);
 
 Audio::Audio(Context* context) :
     Object(context),
-    #ifndef USE_SDL
-    impl_(new AudioImpl()),
-    windowHandle_(0),
-    #endif
-    playing_(false),
-    bufferSamples_(0),
-    bufferSize_(0),
+    stream_(0),
+    clipBufferSize_(0),
     sampleSize_(0),
+    playing_(false),
     listenerPosition_(Vector3::ZERO),
     listenerRotation_(Quaternion::IDENTITY)
 {
@@ -89,163 +58,53 @@ Audio::Audio(Context* context) :
     for (unsigned i = 0; i < MAX_SOUND_TYPES; ++i)
         masterGain_[i] = 1.0f;
     
-    #ifndef USE_SDL
-    SubscribeToEvent(E_SCREENMODE, HANDLER(Audio, HandleScreenMode));
-    // Try to initialize right now, but skip if screen mode is not yet set
-    Initialize();
-    #else
-    SDL_InitSubSystem(SDL_INIT_AUDIO);
-    #endif
+    // Initialize PortAudio under static mutex in case this is the first instance
+    {
+        MutexLock lock(GetStaticMutex());
+        if (!numInstances)
+        {
+            if (Pa_Initialize() != paNoError)
+                LOGERROR("Could not initialize PortAudio");
+        }
+        ++numInstances;
+    }
 }
 
 Audio::~Audio()
 {
     Release();
     
-    #ifndef USE_SDL
-    if (impl_->dsObject_)
+    // Uninitialize PortAudio under static mutex in case this is the last instance
     {
-        impl_->dsObject_->Release();
-        impl_->dsObject_ = 0;
+        MutexLock lock(GetStaticMutex());
+        
+        --numInstances;
+        if (!numInstances)
+            Pa_Terminate();
     }
-    
-    delete impl_;
-    impl_ = 0;
-    #else
-    SDL_QuitSubSystem(SDL_INIT_AUDIO);
-    #endif
 }
 
-bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool sixteenBit, bool stereo, bool interpolate)
+bool Audio::SetMode(int mixRate, bool sixteenBit, bool stereo, bool interpolate)
 {
     Release();
     
-    #ifndef USE_SDL
-    if (!impl_->dsObject_)
+    if (Pa_OpenDefaultStream(&stream_, 0, stereo ? 2 : 1, sixteenBit ? paInt16 : paUInt8, mixRate, paFramesPerBufferUnspecified,
+        PortAudioCallback, this) != paNoError)
     {
-        if (DirectSoundCreate(0, &impl_->dsObject_, 0) != DS_OK)
-        {
-            LOGERROR("Could not create DirectSound object");
-            return false;
-        }
-    }
-    
-    if (impl_->dsObject_->SetCooperativeLevel((HWND)windowHandle_, DSSCL_PRIORITY) != DS_OK)
-    {
-        LOGERROR("Could not set DirectSound cooperative level");
-        return false;
-    }
-    DSCAPS dsCaps;
-    dsCaps.dwSize = sizeof(dsCaps);
-    if (impl_->dsObject_->GetCaps(&dsCaps) != DS_OK)
-    {
-        LOGERROR("Could not get DirectSound capabilities");
-        return false;
-    }
-    
-    if (!(dsCaps.dwFlags & (DSCAPS_SECONDARY16BIT|DSCAPS_PRIMARY16BIT)))
-        sixteenBit = false;
-    if (!(dsCaps.dwFlags & (DSCAPS_SECONDARYSTEREO|DSCAPS_PRIMARYSTEREO)))
-        stereo = false;
-    
-    bufferLengthMSec = Max(bufferLengthMSec, 50);
-    mixRate = Clamp(mixRate, 11025, 48000);
-    
-    WAVEFORMATEX waveFormat;
-    waveFormat.wFormatTag = WAVE_FORMAT_PCM;
-    waveFormat.nSamplesPerSec = mixRate;
-    
-    if (sixteenBit)
-        waveFormat.wBitsPerSample = 16;
-    else
-        waveFormat.wBitsPerSample = 8;
-    
-    if (stereo)
-        waveFormat.nChannels = 2;
-    else
-        waveFormat.nChannels = 1;
-    
-    unsigned sampleSize = waveFormat.nChannels * waveFormat.wBitsPerSample / 8;
-    unsigned numSamples = (bufferLengthMSec * mixRate) / 1000;
-    
-    waveFormat.nAvgBytesPerSec = mixRate * sampleSize;
-    waveFormat.nBlockAlign = sampleSize;
-    waveFormat.cbSize = 0;
-    
-    DSBUFFERDESC bufferDesc;
-    memset(&bufferDesc, 0, sizeof(bufferDesc));
-    bufferDesc.dwSize = sizeof(bufferDesc);
-    bufferDesc.dwFlags = DSBCAPS_STICKYFOCUS;
-    bufferDesc.dwBufferBytes = numSamples * sampleSize;
-    bufferDesc.lpwfxFormat = &waveFormat;
-    
-    if (impl_->dsObject_->CreateSoundBuffer(&bufferDesc, &impl_->dsBuffer_, 0) != DS_OK)
-    {
-        LOGERROR("Could not create DirectSound buffer");
-        return false;
-    }
-    
-    clipBuffer_ = new int[numSamples * waveFormat.nChannels];
-    
-    bufferSamples_ = numSamples;
-    bufferSize_ = numSamples * sampleSize;
-    sampleSize_ = sampleSize;
-    mixRate_ = mixRate;
-    sixteenBit_ = sixteenBit;
-    stereo_ = stereo;
-    interpolate_ = interpolate;
-    #else
-    SDL_AudioSpec desired;
-    SDL_AudioSpec obtained;
-    
-    desired.freq = mixRate;
-    desired.format = AUDIO_U8;
-    if (sixteenBit)
-        desired.format = AUDIO_S16SYS;
-    desired.channels = 1;
-    if (stereo)
-        desired.channels = 2;
-    
-    // For SDL, do not actually use the buffer length, but calculate a suitable power-of-two size from the mixrate
-    if (desired.freq <= 11025)
-        desired.samples = 512;
-    else if (desired.freq <= 22050)
-        desired.samples = 1024;
-    else if (desired.freq <= 44100)
-        desired.samples = 2048;
-    else
-        desired.samples = 4096;
-    
-    desired.callback = SDLAudioCallback;
-    desired.userdata = this;
-    
-    SDL_PauseAudio(1);
-    playing_ = false;
-    if (SDL_OpenAudio(&desired, &obtained))
-    {
-        LOGERROR("Could not initialize audio output");
+        LOGERROR("Failed to open audio stream");
         return false;
     }
     
     sampleSize_ = 1;
-    if (obtained.channels == 2)
-    {
-        stereo_ = true;
+    if (stereo)
         sampleSize_ <<= 1;
-    }
-    if (obtained.format == AUDIO_S16SYS || obtained.format == AUDIO_S16LSB || obtained.format == AUDIO_S16MSB)
-    {
-        sixteenBit_ = true;
+    if (sixteenBit)
         sampleSize_ <<= 1;
-    }
     
-    clipBuffer_ = new int[obtained.samples * obtained.channels];
-    
-    bufferSamples_ = obtained.samples;
-    bufferSize_ = bufferSamples_ * sampleSize_;
-    mixRate_ = obtained.freq;
+    mixRate_ = mixRate;
+    stereo_ = stereo;
+    sixteenBit_ = sixteenBit;
     interpolate_ = interpolate;
-    #endif
     
     LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
         (sixteenBit_ ? "16-bit" : "8-bit") + " " + (interpolate_ ? "interpolated" : ""));
@@ -269,57 +128,28 @@ bool Audio::Play()
     if (playing_)
         return true;
     
-    #ifndef USE_SDL
-    if (!impl_->dsBuffer_)
+    if (!stream_)
     {
-        LOGERROR("No audio buffer, can not start playback");
+        LOGERROR("No audio mode set, can not start playback");
         return false;
     }
     
-    // Clear buffer before starting playback
-    DWORD bytes1, bytes2;
-    void *ptr1, *ptr2;
-    unsigned char value = sixteenBit_ ? 0 : 128;
-    if (impl_->dsBuffer_->Lock(0, bufferSize_, &ptr1, &bytes1, &ptr2, &bytes2, 0) == DS_OK)
+    if (Pa_StartStream(stream_) != paNoError)
     {
-        if (bytes1)
-            memset(ptr1, value, bytes1);
-        if (bytes2)
-            memset(ptr2, value, bytes2);
-        impl_->dsBuffer_->Unlock(ptr1, bytes1, ptr2, bytes2);
-    }
-    
-    // Create playback thread
-    if (!Start())
-    {
-        LOGERROR("Could not create audio thread");
+        LOGERROR("Failed to start playback");
         return false;
     }
     
-    // Adjust playback thread priority
-    SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
     playing_ = true;
-    #else
-    if (!clipBuffer_)
-    {
-        LOGERROR("No audio buffer, can not start playback");
-        return false;
-    }
-    SDL_PauseAudio(0);
-    playing_ = true;
-    #endif
-    
     return true;
 }
 
 void Audio::Stop()
 {
-    #ifndef USE_SDL
-    Thread::Stop();
-    #else
-    if (playing_)
-        SDL_PauseAudio(1);
-    #endif
+    if (!stream_ || !playing_)
+        return;
+    
+    Pa_StopStream(stream_);
     playing_ = false;
 }
 
@@ -356,15 +186,6 @@ void Audio::StopSound(Sound* soundClip)
     }
 }
 
-bool Audio::IsInitialized() const
-{
-    #ifndef USE_SDL
-    return impl_->dsBuffer_ != 0;
-    #else
-    return clipBuffer_.GetPtr() != 0;
-    #endif
-}
-
 float Audio::GetMasterGain(SoundType type) const
 {
     if (type >= MAX_SOUND_TYPES)
@@ -394,97 +215,30 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     }
 }
 
-#ifndef USE_SDL
-void Audio::ThreadFunction()
+int PortAudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
+    timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
-    AudioImpl* impl = impl_;
-    
-    DWORD playCursor = 0;
-    DWORD writeCursor = 0;
-    
-    while (shouldRun_)
-    {
-        Timer audioUpdateTimer;
-        
-        // Restore buffer / restart playback if necessary
-        DWORD status;
-        impl->dsBuffer_->GetStatus(&status);
-        if (status == DSBSTATUS_BUFFERLOST)
-        {
-            impl->dsBuffer_->Restore();
-            impl->dsBuffer_->GetStatus(&status);
-        }
-        if (!(status & DSBSTATUS_PLAYING))
-        {
-            impl->dsBuffer_->Play(0, 0, DSBPLAY_LOOPING);
-            writeCursor = 0;
-        }
-        
-        // Get current buffer position
-        impl->dsBuffer_->GetCurrentPosition(&playCursor, 0);
-        playCursor %= bufferSize_;
-        playCursor &= -((int)sampleSize_);
-        
-        if (playCursor != writeCursor)
-        {
-            int writeBytes = playCursor - writeCursor;
-            if (writeBytes < 0)
-                writeBytes += bufferSize_;
-            
-            // Try to lock buffer
-            DWORD bytes1, bytes2;
-            void *ptr1, *ptr2;
-            if (impl->dsBuffer_->Lock(writeCursor, writeBytes, &ptr1, &bytes1, &ptr2, &bytes2, 0) == DS_OK)
-            {
-                // Mix sound to locked positions
-                {
-                    MutexLock Lock(audioMutex_);
-                    
-                    if (bytes1)
-                        MixOutput(ptr1, bytes1);
-                    if (bytes2)
-                        MixOutput(ptr2, bytes2);
-                }
-                
-                // Unlock buffer and update write cursor
-                impl->dsBuffer_->Unlock(ptr1, bytes1, ptr2, bytes2);
-                writeCursor += writeBytes;
-                if (writeCursor >= bufferSize_)
-                    writeCursor -= bufferSize_;
-            }
-        }
-        
-        // Sleep the remaining time of the audio update period
-        int audioSleepTime = Max(1000 / AUDIO_FPS - (int)audioUpdateTimer.GetMSec(false), 0);
-        Sleep(audioSleepTime);
-    }
-    
-    impl->dsBuffer_->Stop();
-}
-#else
-void SDLAudioCallback(void *userdata, Uint8* stream, int len)
-{
-    Audio* audio = static_cast<Audio*>(userdata);
+    Audio* audio = static_cast<Audio*>(userData);
     
     {
         MutexLock Lock(audio->GetMutex());
-        audio->MixOutput(stream, len);
+        audio->MixOutput(outputBuffer, framesPerBuffer);
     }
+    
+    return 0;
 }
-#endif
 
-void Audio::MixOutput(void *dest, unsigned bytes)
+void Audio::MixOutput(void *dest, unsigned mixSamples)
 {
-    unsigned mixSamples = bytes;
-    unsigned clipSamples = bytes;
-    
+    unsigned clipSamples = mixSamples;
     if (stereo_)
-        mixSamples >>= 1;
+        clipSamples <<= 1;
     
-    if (sixteenBit_)
+    // Make sure the clipbuffer is large enough, then clear it
+    if (clipBufferSize_ < clipSamples)
     {
-        clipSamples >>= 1;
-        mixSamples >>= 1;
+        clipBuffer_ = new int[clipSamples];
+        clipBufferSize_ = clipSamples;
     }
     
     // Clear clip buffer
@@ -531,40 +285,18 @@ void Audio::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     Update(eventData[P_TIMESTEP].GetFloat());
 }
 
-#ifndef USE_SDL
-void Audio::HandleScreenMode(StringHash eventType, VariantMap& eventData)
-{
-    if (!windowHandle_)
-        Initialize();
-}
-
-void Audio::Initialize()
-{
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (!graphics || !graphics->IsInitialized())
-        return;
-    
-    windowHandle_ = graphics->GetWindowHandle();
-}
-#endif
-
 void Audio::Release()
 {
     Stop();
     
-    #ifndef USE_SDL
-    if (impl_->dsBuffer_)
+    if (stream_)
     {
-        impl_->dsBuffer_->Release();
-        impl_->dsBuffer_ = 0;
-    }
-    #else
-    if (clipBuffer_)
-    {
-        SDL_CloseAudio();
+        Pa_CloseStream(stream_);
+        
+        stream_ = 0;
         clipBuffer_.Reset();
+        clipBufferSize_ = 0;
     }
-    #endif
 }
 
 void RegisterAudioLibrary(Context* context)

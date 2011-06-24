@@ -8,7 +8,6 @@ file (GLOB H_FILES *.h)
 if (USE_OPENGL)
     file (GLOB SYS_CPP_FILES OpenGL/*.cpp)
     file (GLOB SYS_H_FILES OpenGL/*.h)
-    include_directories (../../ThirdParty/GLee)
 else ()
     file (GLOB SYS_CPP_FILES Direct3D9/*.cpp)
     file (GLOB SYS_H_FILES Direct3D9/*.h)
@@ -21,12 +20,16 @@ include_directories (
     . ../Container ../Core ../IO ../Math ../Resource ../Scene
 )
 
+if (USE_OPENGL)
+    include_directories (../../ThirdParty/GLee)
+endif ()
+
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Core Math Resource Scene)
 	
 if (USE_OPENGL)
-    target_link_libraries (${TARGET_NAME} GLee)
+    target_link_libraries (${TARGET_NAME} GLee GLFW)
 else ()
     target_link_libraries (${TARGET_NAME} d3d9.lib)
 endif ()

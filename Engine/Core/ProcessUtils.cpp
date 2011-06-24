@@ -35,10 +35,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef USE_SDL
-#include <SDL.h>
-#endif
-
 #include "DebugNew.h"
 
 static bool consoleOpened = false;
@@ -216,11 +212,11 @@ String GetConsoleInput()
 
 unsigned GetNumCPUCores()
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     SYSTEM_INFO info;
     GetSystemInfo(&info);
     return info.dwNumberOfProcessors;
     #else
-    return SDL_GetCPUCount();
+    return sysconf(_SC_NPROCESSORS_ONLN);
     #endif
 }

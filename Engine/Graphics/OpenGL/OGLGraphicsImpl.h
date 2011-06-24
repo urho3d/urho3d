@@ -27,7 +27,7 @@
 #include "Map.h"
 
 #include <GLee.h>
-#include <SDL.h>
+#include <GL/glfw.h>
 
 /// Graphics implementation
 class GraphicsImpl

@@ -151,6 +151,8 @@ Graphics::Graphics(Context* context_) :
 {
     ResetCachedState();
     InitializeShaderParameters();
+    
+    glfwInit();
 }
 
 Graphics::~Graphics()
@@ -159,11 +161,13 @@ Graphics::~Graphics()
     
     delete impl_;
     impl_ = 0;
+    
+    glfwTerminate();
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
-    SDL_WM_SetCaption(windowTitle.CString(), 0);
+    glfwSetWindowTitle(windowTitle.CString());
 }
 
 bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
@@ -180,7 +184,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     if (initialized_ && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         multiSample == multiSample_ && vsync != vsync_)
     {
-        SDL_GL_SetSwapInterval(vsync ? 1 : 0);
+        glfwSwapInterval(vsync ? 1 : 0);
         vsync_ = vsync;
         return true;
     }
@@ -195,61 +199,28 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         }
         else
         {
-            width = 0;
-            height = 0;
+            GLFWvidmode mode;
+            glfwGetDesktopMode(&mode);
+            width = mode.Width;
+            height = mode.Height;
         }
     }
-    
-    /// \todo Reimplement using SDL 1.3 functionality, which allows multiple windows
-    if (!initialized_)
-    {
-        if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
-        {
-            LOGERROR("SDL video subsystem initialization failed");
-            return false;
-        }
-    }
-    
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     
     if (multiSample > 1 && mode == RENDER_FORWARD)
-    {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multiSample);
-    }
+        glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
     else
-    {
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-    }
+       glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
     
-    // Lose the existing OpenGL context now
+    // Disable resize
+    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
+    
+    // Close the existing window
     Release();
     
-    unsigned sdlFlags = SDL_OPENGL;
-    if (fullscreen)
-        sdlFlags |= SDL_FULLSCREEN;
-    SDL_Surface* surface = SDL_SetVideoMode(width, height, 0, sdlFlags);
-    if (!surface)
+    if (!glfwOpenWindow(width, height, 8, 8, 8, 0, 24, 8, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW))
     {
-        // If fullscreen mode fails, retry windowed
-        if (fullscreen)
-        {
-            fullscreen = false;
-            unsigned sdlFlags = SDL_OPENGL;
-            surface = SDL_SetVideoMode(width, height, 0, sdlFlags);
-        }
-        if (!surface)
-        {
-            LOGERROR("Could not set screen mode");
-            return false;
-        }
+        LOGERROR("Could not open window");
+        return false;
     }
     
     // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
@@ -264,23 +235,21 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     #endif
     
     // If OpenGL extensions not yet initialized, initialize now
-    // Query needs to happen under lock as the function pointers are static
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        if (!GLeeInitialized())
-            GLeeInit();
-    }
+    if (!GLeeInitialized())
+        GLeeInit();
     
     if (!_GLEE_VERSION_2_0)
     {
         LOGERROR("OpenGL 2.0 is required");
-        SDL_Quit();
+        glfwCloseWindow();
         return false;
     }
     
+    // Disable auto polling of window events
+    glfwDisable(GLFW_AUTO_POLL_EVENTS);
+    
     // Set vsync
-    SDL_GL_SetSwapInterval(vsync ? 1 : 0);
+    glfwSwapInterval(vsync ? 1 : 0);
     
     // Query for system backbuffer depth
     glGetIntegerv(GL_DEPTH_BITS, &impl_->windowDepthBits_);
@@ -303,8 +272,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     SetCullMode(CULL_CCW);
     SetDepthTest(CMP_LESSEQUAL);
     
-    width_ = surface->w;
-    height_ = surface->h;
+    glfwGetWindowSize(&width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     mode_ = mode;
@@ -317,7 +285,7 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     // Clear the window to black now, because GPU object restore may take time
     Clear(CLEAR_COLOR);
-    SDL_GL_SwapBuffers();
+    glfwSwapBuffers();
     
     // Create deferred rendering buffers as necessary
     CreateRenderTargets();
@@ -368,9 +336,6 @@ void Graphics::Close()
         gpuObjects_.Clear();
         
         Release();
-        
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        initialized_ = false;
     }
 }
 
@@ -398,12 +363,8 @@ bool Graphics::BeginFrame()
         return false;
     
     // If we should be fullscreen, but are not currently active, do not render
-    if (fullscreen_)
-    {
-        unsigned state = SDL_GetAppState();
-        if (!(state & SDL_APPACTIVE))
-            return false;
-    }
+    if (fullscreen_ && (!glfwGetWindowParam(GLFW_ACTIVE) || glfwGetWindowParam(GLFW_ICONIFIED)))
+        return false;
     
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
@@ -434,7 +395,7 @@ void Graphics::EndFrame()
     
     SendEvent(E_ENDRENDER);
     
-    SDL_GL_SwapBuffers();
+    glfwSwapBuffers();
 }
 
 void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned stencil)
@@ -1859,14 +1820,30 @@ unsigned char* Graphics::GetImmediateDataPtr() const
 
 PODVector<IntVector2> Graphics::GetResolutions() const
 {
+    static const unsigned MAX_MODES = 256;
+    GLFWvidmode modes[MAX_MODES];
+    
+    unsigned count = glfwGetVideoModes(modes, MAX_MODES);
     PODVector<IntVector2> ret;
     
-    SDL_Rect** rects = SDL_ListModes(0, SDL_OPENGL | SDL_FULLSCREEN);
-    
-    if (rects && rects != (SDL_Rect**)-1)
-    { 
-        for (unsigned i = 0; rects[i]; ++i)
-            ret.Push(IntVector2(rects[i]->w, rects[i]->h));
+    for (unsigned i = 0; i < count; ++i)
+    {
+        int width = modes[i].Width;
+        int height  = modes[i].Height;
+        
+        // Store mode if unique
+        bool unique = true;
+        for (unsigned j = 0; j < ret.Size(); ++i)
+        {
+            if (ret[j].x_ == width && ret[j].y_ == height)
+            {
+                unique = false;
+                break;
+            }
+        }
+        
+        if (unique)
+            ret.Push(IntVector2(width, height));
     }
     
     return ret;
@@ -1877,7 +1854,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     PODVector<int> ret;
     // No multisampling always supported
     ret.Push(1);
-    /// \todo Implement properly using SDL, if possible
+    /// \todo Implement properly, if possible
     
     return ret;
 }
@@ -2158,6 +2135,9 @@ void Graphics::Release()
     // When the new context is initialized, it will have default state again
     ResetCachedState();
     ClearParameterSources();
+    
+    glfwCloseWindow();
+    initialized_ = false;
 }
 
 void Graphics::InitializeShaderParameters()

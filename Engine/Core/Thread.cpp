@@ -24,15 +24,15 @@
 #include "Precompiled.h"
 #include "Thread.h"
 
-#ifndef USE_SDL
+#ifdef _WIN32
 #include <Windows.h>
 #else
-#include <SDL.h>
+#include <pthread.h>
 #endif
 
 #include "DebugNew.h"
 
-#ifndef USE_SDL
+#ifdef _WIN32
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
@@ -40,10 +40,11 @@ DWORD WINAPI ThreadFunctionStatic(void* data)
     return 0;
 }
 #else
-int ThreadFunctionStatic(void* data)
+void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
+    pthread_exit((void*)0);
     return 0;
 }
 #endif
@@ -66,10 +67,14 @@ bool Thread::Start()
         return false;
     
     shouldRun_ = true;
-    #ifndef USE_SDL
+    #ifdef _WIN32
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
     #else
-    handle_ = SDL_CreateThread(ThreadFunctionStatic, this);
+    handle_ = new pthread_t;
+    pthread_attr_t type;
+    pthread_attr_init(&type);
+    pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
+    pthread_create((pthread_t*)handle_, &type, ThreadFunctionStatic, this);
     #endif
     return handle_ != 0;
 }
@@ -77,21 +82,26 @@ bool Thread::Start()
 void Thread::Stop()
 {
     shouldRun_ = false;
-    #ifndef USE_SDL
+    #ifdef _WIN32
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
     #else
-    if (handle_)
-        SDL_WaitThread((SDL_Thread*)handle_, 0);
+    pthread_t* thread = (pthread_t*)handle_;
+    if (thread)
+    {
+        pthread_join(thread, 0);
+        pthread_destroy(thread);
+    }
+    delete thread;
     #endif
     handle_ = 0;
 }
 
 void Thread::SetPriority(int priority)
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
     #endif
-    /// \todo Implement on SDL
+    /// \todo Implement on pthreads
 }

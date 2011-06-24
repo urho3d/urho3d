@@ -571,40 +571,15 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     {
         const IntVector2& rootSize = rootElement_->GetSize();
         
-        if (eventData[P_CLIPCURSOR].GetBool())
+        // Move cursor only when visible
+        if (cursor_->IsVisible())
         {
-            // When in confined cursor mode, move cursor only when visible
-            if (cursor_->IsVisible())
-            {
-                IntVector2 pos = cursor_->GetPosition();
-                pos.x_ += eventData[P_DX].GetInt();
-                pos.y_ += eventData[P_DY].GetInt();
-                pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
-                pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
-                cursor_->SetPosition(pos);
-            }
-        }
-        else
-        {
-            // When in non-confined mode, move cursor always to ensure accurate position
-            IntVector2 pos(eventData[P_X].GetInt(), eventData[P_Y].GetInt());
-            bool inside = pos.x_ >= 0 && pos.x_ < rootSize.x_ && pos.y_ >= 0 && pos.y_ < rootSize.y_;
-            
-            // Hide by moving completely outside if outside
-            // (do not use SetVisible(), so that actual visibility remains under application control)
-            if (pos.x_ < 0)
-                pos.x_ = -cursor_->GetWidth() * 2;
-            if (pos.x_ >= rootSize.x_)
-                pos.x_ = rootSize.x_ + cursor_->GetWidth() * 2;
-            if (pos.y_ < 0)
-                pos.y_ = -cursor_->GetHeight() * 2;
-            if (pos.y_ >= rootSize.y_)
-                pos.y_ = rootSize.y_ + cursor_->GetHeight() * 2;
+            IntVector2 pos = cursor_->GetPosition();
+            pos.x_ += eventData[P_DX].GetInt();
+            pos.y_ += eventData[P_DY].GetInt();
+            pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
+            pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
             cursor_->SetPosition(pos);
-            
-            // Do not drag when outside
-            if (!inside)
-                return;
         }
         
         if (dragElement_ && mouseButtons_)

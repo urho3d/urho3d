@@ -32,6 +32,13 @@ class Graphics;
 /// Input subsystem. Converts operating system window messages to input state and events
 class Input : public Object
 {
+    #ifdef USE_OPENGL
+    friend void KeyCallback(int, int);
+    friend void CharCallback(int, int);
+    friend void MouseButtonCallback(int, int);
+    friend void MouseWheelCallback(int);
+    #endif
+    
     OBJECT(Input);
     
 public:
@@ -42,14 +49,8 @@ public:
     
     /// Poll for window messages. Called by HandleBeginFrame()
     void Update();
-    /// Set whether mouse cursor is confined inside the window. Mouse delta movement is sent only when enabled, which is default.
-    void SetClipCursor(bool enable);
-    /// Set whether ALT-ENTER fullscreen Toggle is enabled
+    /// Set whether ALT-ENTER fullscreen toggle is enabled
     void SetToggleFullscreen(bool enable);
-    /// Set absolute mouse cursor position within the window. Only useful when the cursor is not confined
-    void SetMousePosition(const IntVector2& position);
-    /// Set absolute mouse cursor position within the window. Only useful when the cursor is not confined
-    void SetMousePosition(int x, int y);
     /// Suppress the next char message
     void SuppressNextChar();
     
@@ -67,8 +68,6 @@ public:
     bool GetQualifierPress(int qualifier) const;
     /// Return the currently held down qualifiers
     int GetQualifiers() const;
-    /// Return absolute mouse cursor position within the window. Only useful when the cursor is not confined
-    IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame
     const IntVector2& GetMouseMove() const { return mouseMove_; }
     /// Return horizontal mouse movement since last frame
@@ -77,8 +76,6 @@ public:
     int GetMouseMoveY() const { return mouseMove_.y_; }
     /// Return mouse wheel movement since last frame
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
-    /// Return whether mouse cursor is confined inside the window
-    bool GetClipCursor() const { return clipCursor_; }
     /// Return whether fullscreen Toggle is enabled
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
     /// Return whether application window is active
@@ -98,18 +95,21 @@ private:
     /// Handle a mouse button change
     void SetMouseButton(int button, bool newState);
     /// Handle a key change
-    void SetKey(int key, int scanCode, bool newState);
+    void SetKey(int key, bool newState);
     /// Handle mousewheel change
     void SetMouseWheel(int delta);
-    /// Internal function to show/hide the operating system mouse cursor
+    #ifndef USE_OPENGL
+    /// Internal function to clip the mouse cursor to the window
+    void SetClipCursor(bool enable);
+    /// Internal function to set the mouse cursor position
+    void SetCursorPosition(const IntVector2& position);
+    /// Internal function to show/hide the mouse cursor
     void SetCursorVisible(bool enable);
-    #ifndef USE_SDL
     /// Handle window message event
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
-    #else
-    /// Handle SDL event
-    void HandleSDLEvent(void* sdlEvent);
     #endif
+    /// Internal function to get the mouse cursor position
+    IntVector2 GetCursorPosition() const;
     /// Handle screen mode event
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event
@@ -125,14 +125,12 @@ private:
     unsigned mouseButtonDown_;
     /// Mouse buttons' pressed state
     unsigned mouseButtonPress_;
-    /// Last mouse position for calculating deltas
-    IntVector2 lastMousePosition_;
+    /// Last mouse position for calculating movement
+    IntVector2 lastCursorPosition_;
     /// Mouse movement since last frame
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame
     int mouseMoveWheel_;
-    /// Mouse cursor confine flag
-    bool clipCursor_;
     /// Mouse cursor show/hide flag
     bool showCursor_;
     /// Fullscreen Toggle flag

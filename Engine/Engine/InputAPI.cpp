@@ -51,7 +51,6 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_UP", (void*)&KEY_UP);
     engine->RegisterGlobalProperty("const int KEY_RIGHT", (void*)&KEY_RIGHT);
     engine->RegisterGlobalProperty("const int KEY_DOWN", (void*)&KEY_DOWN);
-    engine->RegisterGlobalProperty("const int KEY_PRINTSCREEN", (void*)&KEY_PRINTSCREEN);
     engine->RegisterGlobalProperty("const int KEY_INSERT", (void*)&KEY_INSERT);
     engine->RegisterGlobalProperty("const int KEY_DELETE", (void*)&KEY_DELETE);
     engine->RegisterGlobalProperty("const int KEY_LWIN", (void*)&KEY_LWIN);
@@ -104,18 +103,6 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_RCTRL", (void*)&KEY_RCTRL);
     engine->RegisterGlobalProperty("const int KEY_LALT", (void*)&KEY_LALT);
     engine->RegisterGlobalProperty("const int KEY_RALT", (void*)&KEY_RALT);
-    engine->RegisterGlobalProperty("const int KEY_OEM_1", (void*)&KEY_OEM_1);
-    engine->RegisterGlobalProperty("const int KEY_OEM_PLUS", (void*)&KEY_OEM_PLUS);
-    engine->RegisterGlobalProperty("const int KEY_OEM_COMMA", (void*)&KEY_OEM_COMMA);
-    engine->RegisterGlobalProperty("const int KEY_OEM_MINUS", (void*)&KEY_OEM_MINUS);
-    engine->RegisterGlobalProperty("const int KEY_OEM_PERIOD", (void*)&KEY_OEM_PERIOD);
-    engine->RegisterGlobalProperty("const int KEY_OEM_2", (void*)&KEY_OEM_2);
-    engine->RegisterGlobalProperty("const int KEY_OEM_3", (void*)&KEY_OEM_3);
-    engine->RegisterGlobalProperty("const int KEY_OEM_4", (void*)&KEY_OEM_4);
-    engine->RegisterGlobalProperty("const int KEY_OEM_5", (void*)&KEY_OEM_5);
-    engine->RegisterGlobalProperty("const int KEY_OEM_6", (void*)&KEY_OEM_6);
-    engine->RegisterGlobalProperty("const int KEY_OEM_7", (void*)&KEY_OEM_7);
-    engine->RegisterGlobalProperty("const int KEY_OEM_8", (void*)&KEY_OEM_8);
 }
 
 static Input* GetInput()
@@ -126,14 +113,9 @@ static Input* GetInput()
 static void RegisterInput(asIScriptEngine* engine)
 {
     RegisterObject<Input>(engine, "Input");
-    engine->RegisterObjectMethod("Input", "void SetMousePosition(int, int)", asMETHODPR(Input, SetMousePosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void SuppressNextChar()", asMETHOD(Input, SuppressNextChar), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_clipCursor(bool)", asMETHOD(Input, SetClipCursor), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "bool get_clipCursor() const", asMETHOD(Input, GetClipCursor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "void set_toggleFullscreen(bool)", asMETHOD(Input, SetToggleFullscreen), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_toggleFullscreen() const", asMETHOD(Input, GetToggleFullscreen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "void set_mousePosition(const IntVector2&in)", asMETHODPR(Input, SetMousePosition, (const IntVector2&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Input", "IntVector2 get_mousePosition() const", asMETHOD(Input, GetMousePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyDown(int) const", asMETHOD(Input, GetKeyDown), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_keyPress(int) const", asMETHOD(Input, GetKeyPress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Input", "bool get_mouseButtonDown(int) const", asMETHOD(Input, GetMouseButtonDown), asCALL_THISCALL);

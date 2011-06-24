@@ -25,11 +25,12 @@
 #include "CoreEvents.h"
 #include "Timer.h"
 
-#ifndef USE_SDL
+#ifdef _WIN32
 #include <Windows.h>
 #include <MMSystem.h>
 #else
-#include <SDL.h>
+#include <sys/time.h>
+#include <unistd.h>
 #endif
 
 #include "DebugNew.h"
@@ -47,7 +48,7 @@ Time::Time(Context* context) :
     totalMSec_(0),
     timerPeriod_(0)
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     LARGE_INTEGER frequency;
     if (QueryPerformanceFrequency(&frequency))
     {
@@ -55,8 +56,7 @@ Time::Time(Context* context) :
         HiresTimer::supported = true;
     }
     #else
-    SDL_InitSubSystem(SDL_INIT_TIMER);
-    HiresTimer::frequency = SDL_GetPerformanceFrequency();
+    HiresTimer::frequency = 1000000;
     HiresTimer::supported = true;
     #endif
 }
@@ -64,9 +64,6 @@ Time::Time(Context* context) :
 Time::~Time()
 {
     SetTimerPeriod(0);
-    #ifdef USE_SDL
-    SDL_QuitSubSystem(SDL_INIT_TIMER);
-    #endif
 }
 
 void Time::BeginFrame(unsigned mSec)
@@ -117,7 +114,7 @@ void Time::EndFrame()
 
 void Time::SetTimerPeriod(unsigned mSec)
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     if (timerPeriod_ > 0)
         timeEndPeriod(timerPeriod_);
     
@@ -128,6 +125,15 @@ void Time::SetTimerPeriod(unsigned mSec)
     #endif
 }
 
+void Time::Sleep(unsigned mSec)
+{
+    #ifdef _WIN32
+    ::Sleep(mSec);
+    #else
+    usleep(mSec * 1000);
+    #endif
+}
+
 Timer::Timer()
 {
     Reset();
@@ -135,10 +141,12 @@ Timer::Timer()
 
 unsigned Timer::GetMSec(bool reset)
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     unsigned currentTime = timeGetTime();
     #else
-    unsigned currentTime = SDL_GetTicks();
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    unsigned currentTime = time.tv_sec * 1000 + time.tv_usec / 1000;
     #endif
     
     unsigned elapsedTime = currentTime - startTime_;
@@ -150,10 +158,12 @@ unsigned Timer::GetMSec(bool reset)
 
 void Timer::Reset()
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     startTime_ = timeGetTime();
     #else
-    startTime_ = SDL_GetTicks();
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    startTime_ = time.tv_sec * 1000 + time.tv_usec / 1000;
     #endif
 }
 
@@ -166,7 +176,7 @@ long long HiresTimer::GetUSec(bool reset)
 {
     long long currentTime;
     
-    #ifndef USE_SDL
+    #ifdef _WIN32
     if (supported)
     {
         LARGE_INTEGER counter;
@@ -176,7 +186,9 @@ long long HiresTimer::GetUSec(bool reset)
     else
         currentTime = timeGetTime();
     #else
-    currentTime = SDL_GetPerformanceCounter();
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    currentTime = time.tv_sec * 1000000LL + time.tv_usec;
     #endif
     
     long long elapsedTime = currentTime - startTime_;
@@ -193,7 +205,7 @@ long long HiresTimer::GetUSec(bool reset)
 
 void HiresTimer::Reset()
 {
-    #ifndef USE_SDL
+    #ifdef _WIN32
     if (supported)
     {
         LARGE_INTEGER counter;
@@ -203,7 +215,8 @@ void HiresTimer::Reset()
     else
         startTime_ = timeGetTime();
     #else
-    startTime_ = SDL_GetPerformanceCounter();
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    startTime_ = time.tv_sec * 1000000LL + time.tv_usec;
     #endif
 }
-

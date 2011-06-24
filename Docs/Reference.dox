@@ -634,15 +634,13 @@ Forward rendering also allows per-object control of which lights will influence 
 
 \page Input %Input
 
-The Input subsystem provides keyboard and mouse input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created.
-
-Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary. The cursor can be in either confined or non-confined mode. In confined mode (default) it is always forcibly centered to the window, so that mouse delta motion can be read "infinitely" in each direction. Non-confined mode is set by calling \ref Input::SetClipCursor "SetClipCursor(false)". In this case the cursor may freely travel out of the application window, which also means that infinite mouse delta motion can no longer be relied upon.
+The Input subsystem provides keyboard and mouse input via both a polled interface and events. It is always instantiated, even in headless mode, but is active only once the application window has been created. Once active, the subsystem takes over the application mouse cursor. It will be hidden, so the UI should be used to render a software cursor if necessary.
 
 The input events include:
 
 - E_MOUSEBUTTONUP: a mouse button has been released.
 - E_MOUSEBUTTONDOWN: a mouse button has been pressed.
-- E_MOUSEMOVE: the mouse has been moved. Both movement and cursor position will be sent, but the position is only useful in non-confined mode.
+- E_MOUSEMOVE: the mouse has been moved.
 - E_MOUSEWHEEL: the mouse wheel has been moved.
 - E_KEYUP: a key has been released.
 - E_KEYDOWN: a key has been pressed.

@@ -69,7 +69,7 @@ static Audio* GetAudio()
 void RegisterAudio(asIScriptEngine* engine)
 {
     RegisterObject<Audio>(engine, "Audio");
-    engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool, bool)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void SetMode(int, bool, bool, bool)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void SetListenerTransform(const Vector3&in, const Quaternion&in)", asMETHOD(Audio, SetListenerTransform), asCALL_THISCALL);
@@ -79,8 +79,6 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "const Vector3& get_listenerPosition() const", asMETHOD(Audio, GetListenerPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_listenerRotation(const Quaternion&in)", asMETHOD(Audio, SetListenerRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "const Quaternion& get_listenerRotation() const", asMETHOD(Audio, GetListenerRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "uint get_bufferSamples() const", asMETHOD(Audio, GetBufferSamples), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Audio", "uint get_bufferSize() const", asMETHOD(Audio, GetBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "uint get_sampleSize() const", asMETHOD(Audio, GetSampleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "int get_mixRate() const", asMETHOD(Audio, GetMixRate), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool get_sixteenBit() const", asMETHOD(Audio, IsSixteenBit), asCALL_THISCALL);

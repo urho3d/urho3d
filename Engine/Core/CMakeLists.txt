@@ -15,14 +15,13 @@ include_directories (
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Math)
 
-if (USE_SDL)
-    target_link_libraries (${TARGET_NAME} SDL)
-else ()
+if (WIN32)
     target_link_libraries (${TARGET_NAME} winmm.lib)
-endif ()
-
-if (ENABLE_MINIDUMPS)
-    target_link_libraries (${TARGET_NAME} dbghelp.lib)
+    if (ENABLE_MINIDUMPS)
+        target_link_libraries (${TARGET_NAME} dbghelp.lib)
+    endif ()
+else ()
+    target_link_libraries (${TARGET_NAME} pthread)
 endif ()
 
 enable_pch ()

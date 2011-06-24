@@ -24,15 +24,15 @@
 #include "Precompiled.h"
 #include "Mutex.h"
 
-#ifndef USE_SDL
+#ifdef _WIN32
 #include <Windows.h>
 #else
-#include <SDL.h>
+#include <pthread.h>
 #endif
 
 #include "DebugNew.h"
 
-#ifndef USE_SDL
+#ifdef _WIN32
 Mutex::Mutex() :
     criticalSection_(new CRITICAL_SECTION)
 {
@@ -58,24 +58,27 @@ void Mutex::Release()
 }
 #else
 Mutex::Mutex() :
-    criticalSection_(SDL_CreateMutex())
+    criticalSection_(new pthread_mutex_t)
 {
+    pthread_mutex_init((pthread_mutex_t*)criticalSection_);
 }
 
 Mutex::~Mutex()
 {
-    SDL_DestroyMutex((SDL_mutex*)criticalSection_);
+    pthread_mutex_t* mutex = (pthread_mutex_t*)criticalSection_;
+    pthread_mutex_destroy(mutex);
+    delete mutex;
     criticalSection_ = 0;
 }
 
 void Mutex::Acquire()
 {
-    SDL_mutexP((SDL_mutex*)criticalSection_);
+    pthread_mutex_lock((pthread_mutex_t*)criticalSection_);
 }
 
 void Mutex::Release()
 {
-    SDL_mutexV((SDL_mutex*)criticalSection_);
+    pthread_mutex_acquire((pthread_mutex_t*)criticalSection_);
 }
 #endif
 

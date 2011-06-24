@@ -46,17 +46,12 @@
 #include "StringUtils.h"
 #include "UI.h"
 
-#ifndef USE_SDL
-#include <Windows.h>
-#endif
-
 #include "DebugNew.h"
 
 OBJECTTYPESTATIC(Engine);
 
 Engine::Engine(Context* context) :
     Object(context),
-    frameTimer_(0),
     minFps_(10),
     maxFps_(200),
     maxInactiveFps_(50),
@@ -69,8 +64,6 @@ Engine::Engine(Context* context) :
 
 Engine::~Engine()
 {
-    delete frameTimer_;
-    frameTimer_ = 0;
 }
 
 bool Engine::Initialize(const String& windowTitle, const String& logName, const Vector<String>& arguments)
@@ -87,7 +80,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool forceSM2 = false;
     bool shadows = true;
     int mixRate = 44100;
-    int buffer = 100;
     bool sound = true;
     bool stereo = true;
     bool sixteenBit = true;
@@ -136,11 +128,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                         multiSample = ToInt(argument.Substring(1));
                     break;
                     
-                case 'b':
-                    if (arguments[i].Length() > 1)
-                        buffer = ToInt(argument.Substring(1));
-                    break;
-                    
                 case 'r':
                     if (arguments[i].Length() > 1)
                         mixRate = ToInt(argument.Substring(1));
@@ -165,9 +152,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     // Register object factories and attributes first, then subsystems
     RegisterObjects();
     RegisterSubsystems();
-    
-    // Create the frame timer
-    frameTimer_ = new Timer();
     
     // Start logging
     Log* log = GetSubsystem<Log>();
@@ -205,8 +189,10 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         if (!shadows)
             GetSubsystem<Renderer>()->SetDrawShadows(false);
         if (sound)
-            GetSubsystem<Audio>()->SetMode(buffer, mixRate, sixteenBit, stereo, interpolate);
+            GetSubsystem<Audio>()->SetMode(mixRate, sixteenBit, stereo, interpolate);
     }
+    
+    frameTimer_.Reset();
     
     initialized_ = true;
     return true;
@@ -379,20 +365,16 @@ void Engine::GetNextTimeStep()
         int targetMax = 1000 / maxFps;
         for (;;)
         {
-            timeAcc += frameTimer_->GetMSec(true);
+            timeAcc += frameTimer_.GetMSec(true);
             if (timeAcc >= targetMax)
                 break;
             
             unsigned wait = (targetMax - timeAcc);
-            #ifndef USE_SDL
-            Sleep(wait / 2);
-            #else
-            SDL_Delay(wait / 2);
-            #endif
+            Time::Sleep(wait / 2);
         }
     }
     else
-        timeAcc = frameTimer_->GetMSec(true);
+        timeAcc = frameTimer_.GetMSec(true);
     
     // If FPS lower than minimum, clamp elapsed time
     if (minFps_)

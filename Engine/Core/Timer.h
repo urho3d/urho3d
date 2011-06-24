@@ -54,6 +54,9 @@ public:
     /// Return current low-resolution timer period in milliseconds
     unsigned GetTimerPeriod() const { return timerPeriod_; }
     
+    /// Sleep for a number of milliseconds
+    static void Sleep(unsigned mSec);
+    
 private:
     /// Frame number
     unsigned frameNumber_;

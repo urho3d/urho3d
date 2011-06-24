@@ -20,7 +20,7 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the DirectX SDK needs to be installed. The HLSL compiler included in some SDK's may fail to compile those SM2.0 shaders that reach exactly the arithmetic instruction count limit; at least the February 2010 SDK is known to work.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxxf86vm-dev, libgl1-mesa-dev, libasound2-dev.
+- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libgl1-mesa-dev, libasound2-dev.
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary.
 
@@ -84,7 +84,6 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -forward    Use forward rendering (default)
 -deferred   Use deferred rendering
--b<length>  Mixing buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
 -nolimit    Disable frame limiter
 -noshadows  Disable rendering of shadows
@@ -127,9 +126,10 @@ The third-party libraries are used for the following functionality:
 - ENet: UDP networking
 - FreeType: font rendering
 - GLee: OpenGL extensions handling
+- GLFW: low-level windowing and input on Linux and Mac OS X, and on Windows when running in OpenGL mode
 - Open Asset Import Library: reading various 3D file formats
 - Open Dynamics %Engine: physics simulation implementation
-- SDL: low-level windowing, input, timing and audio functionality on Linux and Mac OS X, and on Windows when running in OpenGL mode
+- PortAudio: audio playback
 - StanHull: convex hull generation from triangle meshes, used for physics collision shapes
 - stb_image: image loading
 - stb_vorbis: Ogg Vorbis decoding

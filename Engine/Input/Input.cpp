@@ -31,10 +31,12 @@
 
 #include <cstring>
 
-#ifndef USE_SDL
+#ifndef USE_OPENGL
 #include <Windows.h>
 #else
-#include <SDL.h>
+#include <GL/glfw.h>
+
+static Input* inputInstance = 0;
 #endif
 
 #include "DebugNew.h"
@@ -43,7 +45,6 @@ OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
     Object(context),
-    clipCursor_(true),
     showCursor_(true),
     toggleFullscreen_(true),
     active_(false),
@@ -55,10 +56,13 @@ Input::Input(Context* context) :
     // Zero the initial state
     mouseButtonDown_ = 0;
     mouseButtonPress_ = 0;
-    lastMousePosition_ = IntVector2::ZERO;
+    lastCursorPosition_ = IntVector2::ZERO;
     
-    #ifndef USE_SDL
+    #ifndef USE_OPENGL
     SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
+    #else
+    // GLFW callbacks do not include userdata, so a static instance pointer is necessary
+    inputInstance = this;
     #endif
     
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
@@ -85,7 +89,7 @@ void Input::Update()
     mouseMove_ = IntVector2::ZERO;
     mouseMoveWheel_ = 0;
     
-    #ifndef USE_SDL
+    #ifndef USE_OPENGL
     // Pump Win32 events
     MSG msg;
     while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -94,15 +98,11 @@ void Input::Update()
         DispatchMessage(&msg);
     }
     #else
-    // Pump SDL events
-    SDL_Event evt;
-    SDL_PumpEvents();
-    while (SDL_PollEvent(&evt))
-        HandleSDLEvent(&evt);
+    // Pump GLFW events
+    glfwPollEvents();
     
-    // Poll SDL activation state
-    unsigned state = SDL_GetAppState();
-    if ((state & (SDL_APPINPUTFOCUS | SDL_APPACTIVE)) == (SDL_APPINPUTFOCUS | SDL_APPACTIVE))
+    // Check state
+    if (glfwGetWindowParam(GLFW_ACTIVE))
     {
         if (!active_)
             activated_ = true;
@@ -121,91 +121,42 @@ void Input::Update()
     // Finally send the mouse move event if motion has been accumulated
     if (active_)
     {
-        // In clipped mode, require the operating system cursor to be hidden first
-        IntVector2 mousePos = GetMousePosition();
-        mouseMove_ = !clipCursor_ || !showCursor_ ? mousePos - lastMousePosition_ : IntVector2::ZERO;
+        #ifndef USE_OPENGL
+        IntVector2 mousePos = GetCursorPosition();
+        mouseMove_ = mousePos - lastCursorPosition_;
         
-        // Recenter the mouse cursor manually if cursor clipping is in effect
-        if (clipCursor_ && mouseMove_ != IntVector2::ZERO)
+        // Recenter the mouse cursor manually if it moved
+        if (mouseMove_ != IntVector2::ZERO)
         {
             IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            SetMousePosition(center);
-            lastMousePosition_ = GetMousePosition();
+            SetCursorPosition(center);
+            lastCursorPosition_ = GetCursorPosition();
         }
         else
-            lastMousePosition_ = mousePos;
+            lastCursorPosition_ = mousePos;
+        #else
+        IntVector2 mousePos = GetCursorPosition();
+        mouseMove_ = mousePos - lastCursorPosition_;
+        lastCursorPosition_ = mousePos;
+        #endif
         
         if (mouseMove_ != IntVector2::ZERO)
         {
             using namespace MouseMove;
             
             VariantMap eventData;
-            eventData[P_X] = lastMousePosition_.x_;
-            eventData[P_Y] = lastMousePosition_.y_;
             eventData[P_DX] = mouseMove_.x_;
             eventData[P_DY] = mouseMove_.y_;
             eventData[P_BUTTONS] = mouseButtonDown_;
             eventData[P_QUALIFIERS] = GetQualifiers();
-            eventData[P_CLIPCURSOR] = clipCursor_;
             SendEvent(E_MOUSEMOVE, eventData);
         }
-    }
-}
-
-void Input::SetClipCursor(bool enable)
-{
-    clipCursor_ = enable;
-    
-    if (!graphics_)
-        return;
-    
-    if (!graphics_->GetFullscreen() && active_ && clipCursor_)
-    {
-        SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        lastMousePosition_ = GetMousePosition();
-        #ifndef USE_SDL
-        RECT clipRect;
-        GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
-        ClipCursor(&clipRect);
-        #endif
-    }
-    else
-    {
-        if (graphics_->GetFullscreen() && active_ && clipCursor_)
-        {
-            SetMousePosition(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            lastMousePosition_ = GetMousePosition();
-        }
-        #ifndef USE_SDL
-        ClipCursor(0);
-        #endif
     }
 }
 
 void Input::SetToggleFullscreen(bool enable)
 {
     toggleFullscreen_ = enable;
-}
-
-void Input::SetMousePosition(const IntVector2& position)
-{
-    if (!graphics_)
-        return;
-    
-    #ifndef USE_SDL
-    POINT point;
-    point.x = position.x_;
-    point.y = position.y_;
-    ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
-    SetCursorPos(point.x, point.y);
-    #else
-    SDL_WarpMouse(position.x_, position.y_);
-    #endif
-}
-
-void Input::SetMousePosition(int x, int y)
-{
-    SetMousePosition(IntVector2(x, y));
 }
 
 void Input::SuppressNextChar()
@@ -223,26 +174,6 @@ bool Input::GetKeyPress(int key) const
     return keyPress_.Contains(key);
 }
 
-IntVector2 Input::GetMousePosition() const
-{
-    IntVector2 ret(0, 0);
-    
-    if (!graphics_)
-        return ret;
-    
-    #ifndef USE_SDL
-    POINT mouse;
-    GetCursorPos(&mouse);
-    ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
-    ret.x_ = mouse.x;
-    ret.y_ = mouse.y;
-    #else
-    SDL_GetMouseState(&ret.x_, &ret.y_);
-    #endif
-    
-    return ret;
-}
-
 bool Input::GetMouseButtonDown(int button) const
 {
     return (mouseButtonDown_ & button) != 0;
@@ -255,7 +186,7 @@ bool Input::GetMouseButtonPress(int button) const
 
 bool Input::GetQualifierDown(int qualifier) const
 {
-    #ifndef USE_SDL
+    #ifndef USE_OPENGL
     if (qualifier == QUAL_SHIFT)
         return GetKeyDown(KEY_SHIFT);
     if (qualifier == QUAL_CTRL)
@@ -275,7 +206,7 @@ bool Input::GetQualifierDown(int qualifier) const
 
 bool Input::GetQualifierPress(int qualifier) const
 {
-    #ifndef USE_SDL
+    #ifndef USE_OPENGL
     if (qualifier == QUAL_SHIFT)
         return GetKeyPress(KEY_SHIFT);
     if (qualifier == QUAL_CTRL)
@@ -313,14 +244,12 @@ void Input::Initialize()
     
     graphics_ = graphics;
     
-    #ifdef USE_SDL
-    // Enable translated keyboard input
-    SDL_EnableUNICODE(SDL_TRUE);
-    #endif
     // Set the initial activation
     MakeActive();
-    SetClipCursor(clipCursor_);
+    #ifndef USE_OPENGL
+    SetClipCursor(true);
     SetCursorVisible(false);
+    #endif
     
     initialized_ = true;
     
@@ -337,13 +266,14 @@ void Input::MakeActive()
     active_ = true;
     activated_ = false;
     
-    // Re-establish mouse cursor clipping immediately in fullscreen. In windowed mode, require a mouse click inside the window
-    // first to not confuse with title bar drag
-    if (!clipCursor_ || graphics_->GetFullscreen())
-    {
-        SetClipCursor(clipCursor_);
-        SetCursorVisible(false);
-    }
+    // Re-establish mouse cursor clipping as necessary
+    #ifndef USE_OPENGL
+    SetClipCursor(true);
+    SetCursorVisible(false);
+    #else
+    // Get the current mouse position as a base for movement calculations
+    lastCursorPosition_ = GetCursorPosition();
+    #endif
     
     using namespace Activation;
     
@@ -364,11 +294,11 @@ void Input::MakeInactive()
     activated_ = false;
     
     // Free and show the mouse cursor
-    #ifndef USE_SDL
+    #ifndef USE_OPENGL
     ReleaseCapture();
     ClipCursor(0);
-    #endif
     SetCursorVisible(true);
+    #endif
     
     using namespace Activation;
     
@@ -399,14 +329,6 @@ void Input::SetMouseButton(int button, bool newState)
     if (newState && !active_)
         return;
     
-    // If we are still showing the cursor (waiting for a click inside window), hide it now and disregard this click
-    if (newState && clipCursor_ && showCursor_)
-    {
-        SetClipCursor(clipCursor_);
-        SetCursorVisible(false);
-        return;
-    }
-    
     if (newState)
     {
         if (!(mouseButtonDown_ & button))
@@ -429,20 +351,9 @@ void Input::SetMouseButton(int button, bool newState)
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
     SendEvent(newState ? E_MOUSEBUTTONDOWN : E_MOUSEBUTTONUP, eventData);
-    
-    #ifndef USE_SDL
-    // In non-clipped mode, while any of the mouse buttons are down, capture the mouse so that we get the button release reliably
-    if (graphics_ && !clipCursor_)
-    {
-        if (mouseButtonDown_)
-            SetCapture((HWND)graphics_->GetWindowHandle());
-        else
-            ReleaseCapture();
-    }
-    #endif
 }
 
-void Input::SetKey(int key, int scanCode, bool newState)
+void Input::SetKey(int key, bool newState)
 {
     // If we are not active yet, do not react to the key down
     if (newState && !active_)
@@ -470,7 +381,6 @@ void Input::SetKey(int key, int scanCode, bool newState)
     
     VariantMap eventData;
     eventData[P_KEY] = key;
-    eventData[P_SCANCODE] = scanCode;
     eventData[P_BUTTONS] = mouseButtonDown_;
     eventData[P_QUALIFIERS] = GetQualifiers();
     if (newState)
@@ -498,12 +408,48 @@ void Input::SetMouseWheel(int delta)
     }
 }
 
+#ifndef USE_OPENGL
+void Input::SetClipCursor(bool enable)
+{
+    if (!graphics_)
+        return;
+    
+    if (!graphics_->GetFullscreen() && active_ && enable)
+    {
+        SetCursorPosition(IntVector2(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2));
+        lastCursorPosition_ = GetCursorPosition();
+        RECT clipRect;
+        GetWindowRect((HWND)graphics_->GetWindowHandle(), &clipRect);
+        ClipCursor(&clipRect);
+    }
+    else
+    {
+        if (graphics_->GetFullscreen() && active_ && enable)
+        {
+            SetCursorPosition(IntVector2(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2));
+            lastCursorPosition_ = GetCursorPosition();
+        }
+        ClipCursor(0);
+    }
+}
+
+void Input::SetCursorPosition(const IntVector2& position)
+{
+    if (!graphics_)
+        return;
+    
+    POINT point;
+    point.x = position.x_;
+    point.y = position.y_;
+    ClientToScreen((HWND)graphics_->GetWindowHandle(), &point);
+    SetCursorPos(point.x, point.y);
+}
+
 void Input::SetCursorVisible(bool enable)
 {
     if (!graphics_)
         return;
     
-    #ifndef USE_SDL
     // When inactive, always show the cursor
     if (!active_)
         enable = true;
@@ -512,13 +458,9 @@ void Input::SetCursorVisible(bool enable)
         return;
     
     ShowCursor(enable ? TRUE : FALSE);
-    #else
-    SDL_ShowCursor(enable ? SDL_TRUE : SDL_FALSE);
-    #endif
     showCursor_ = enable;
 }
 
-#ifndef USE_SDL
 void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
 {
     using namespace WindowMessage;
@@ -580,12 +522,12 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_KEYDOWN:
-        SetKey(wParam, (lParam >> 16) & 255, true);
+        SetKey(wParam, true);
         eventData[P_HANDLED] = true;
         break;
         
     case WM_SYSKEYDOWN:
-        SetKey(wParam, (lParam >> 16) & 255, true);
+        SetKey(wParam, true);
         if (wParam == KEY_RETURN && toggleFullscreen_)
             graphics_->ToggleFullscreen();
         if (wParam != KEY_F4)
@@ -593,12 +535,12 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_KEYUP:
-        SetKey(wParam, (lParam >> 16) & 255, false);
+        SetKey(wParam, false);
         eventData[P_HANDLED] = true;
         break;
         
     case WM_SYSKEYUP:
-        SetKey(wParam, (lParam >> 16) & 255, false);
+        SetKey(wParam, false);
         eventData[P_HANDLED] = true;
         break;
         
@@ -616,89 +558,58 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         suppressNextChar_ = false;
         eventData[P_HANDLED] = true;
         break;
-        
-    case WM_SETCURSOR:
-        // When cursor is not clipped, switch to the operating system cursor outside the client area
-        if (!clipCursor_)
-        {
-            if ((lParam & 0xffff) == HTCLIENT)
-            {
-                SetCursorVisible(false);
-                eventData[P_HANDLED] = true;
-            }
-            else
-                SetCursorVisible(true);
-        }
-        break;
     }
 }
 #else
-void Input::HandleSDLEvent(void* sdlEvent)
+void KeyCallback(int key, int action)
 {
-    SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
-    switch (evt.type)
+    inputInstance->SetKey(key, action & GLFW_PRESS);
+}
+
+void CharCallback(int key, int action)
+{
+    if (key < 256 && action == GLFW_PRESS)
     {
-    case SDL_KEYDOWN:
-        // Convert to uppercase to match Win32 virtual key codes
-        SetKey(SDL_toupper(evt.key.keysym.sym), evt.key.keysym.scancode, true);
+        using namespace Char;
         
-        // Check ALT-ENTER fullscreen toggle
-        if (evt.key.keysym.sym == KEY_RETURN && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
-            graphics_->ToggleFullscreen();
-        break;
-        
-    case SDL_KEYUP:
-        SetKey(SDL_toupper(evt.key.keysym.sym), evt.key.keysym.scancode, false);
-        break;
-        
-    case SDL_TEXTINPUT:
-        // Convert back to Latin-1
-        if (!suppressNextChar_)
-        {
-            unsigned char x = evt.text.text[0];
-            unsigned char y = evt.text.text[1];
-            int latin1 = 0;
-            
-            if (x < 0x80)
-                latin1 = x;
-            else if (x < 0xe0)
-                latin1 = (y & 0x3f) | ((x & 0x1f) << 6);
-            
-            if (latin1 && latin1 < 256)
-            {
-                using namespace Char;
-                
-                VariantMap keyEventData;
-                
-                keyEventData[P_CHAR] = latin1;
-                keyEventData[P_BUTTONS] = mouseButtonDown_;
-                keyEventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_CHAR, keyEventData);
-            }
-        }
-        else
-            suppressNextChar_ = false;
-        break;
-        
-    case SDL_MOUSEBUTTONDOWN:
-        SetMouseButton(1 << (evt.button.button - 1), true);
-        break;
-        
-    case SDL_MOUSEBUTTONUP:
-        SetMouseButton(1 << (evt.button.button - 1), false);
-        break;
-        
-    case SDL_MOUSEWHEEL:
-        SetMouseWheel(evt.wheel.y);
-        break;
-        
-    case SDL_QUIT:
-        if (graphics_)
-            graphics_->Close();
-        break;
+        VariantMap keyEventData;
+        keyEventData[P_CHAR] = key;
+        keyEventData[P_BUTTONS] = inputInstance->mouseButtonDown_;
+        keyEventData[P_QUALIFIERS] = inputInstance->GetQualifiers();
+        inputInstance->SendEvent(E_CHAR, keyEventData);
     }
 }
+
+void MouseButtonCallback(int button, int action)
+{
+    inputInstance->SetMouseButton(1 << button, action == GLFW_PRESS);
+}
+
+void MouseWheelCallback(int wheel)
+{
+    /// \todo Implement
+}
 #endif
+
+IntVector2 Input::GetCursorPosition() const
+{
+    IntVector2 ret(0, 0);
+    
+    if (!graphics_)
+        return ret;
+    
+    #ifndef USE_OPENGL
+    POINT mouse;
+    GetCursorPos(&mouse);
+    ScreenToClient((HWND)graphics_->GetWindowHandle(), &mouse);
+    ret.x_ = mouse.x;
+    ret.y_ = mouse.y;
+    #else
+    glfwGetMousePos(&ret.x_, &ret.y_);
+    #endif
+    
+    return ret;
+}
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
@@ -706,8 +617,16 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
         Initialize();
     // Screen mode change may affect the cursor clipping behaviour. Also re-center the cursor (if needed) to the new screen size,
     // so that there is no erroneous mouse move event
-    else
-        SetClipCursor(clipCursor_);
+    #ifndef USE_OPENGL
+    SetClipCursor(true);
+    #else
+    // Re-enable GLFW callbacks each time the window has been recreated
+    glfwDisable(GLFW_MOUSE_CURSOR);
+    glfwSetKeyCallback(&KeyCallback);
+    glfwSetCharCallback(&CharCallback);
+    glfwSetMouseButtonCallback(&MouseButtonCallback);
+    glfwSetMouseWheelCallback(&MouseWheelCallback);
+    #endif
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

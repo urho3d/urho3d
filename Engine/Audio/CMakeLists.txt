@@ -9,17 +9,12 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 # Include directories
 include_directories (
     ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene ../../ThirdParty/STB
+    ../../ThirdParty/PortAudio/include
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene STB)
-
-if (USE_SDL)
-    target_link_libraries (${TARGET_NAME} SDL)
-else ()
-    target_link_libraries (${TARGET_NAME} dsound.lib)
-endif()
+target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math PortAudio Resource Scene STB)
 
 enable_pch ()
 finalize_lib ()

@@ -22,13 +22,11 @@ endif ()
 # instantiated.
 add_definitions (-DENABLE_PROFILING)
 
-# If not on Windows, enable use of SDL and OpenGL instead of Direct3D9 (so called "Turso3D" mode.)
-# Setting this on Windows is not recommended, as graphics card drivers are usually better optimized 
-# for Direct3D.
-if (UNIX)
-    set (USE_SDL 1)
+# If not on Windows, enable use of OpenGL instead of Direct3D9 (so called "Turso3D" mode.) Setting 
+# this on Windows is not recommended, as graphics card drivers are usually better optimized for 
+# Direct3D.
+if (NOT WIN32)
     set (USE_OPENGL 1)
-    add_definitions (-DUSE_SDL)
     add_definitions (-DUSE_OPENGL)
 endif ()
 
@@ -123,9 +121,9 @@ else()
     endmacro ()
 endif ()
 
-# If SDL used, add it as a global include directory
-if (USE_SDL)
-    include_directories (ThirdParty/SDL/include)
+# If GLFW used, add it as a global include directory
+if (USE_OPENGL)
+    include_directories (ThirdParty/GLFW/include)
 endif ()
 
 # Add projects
@@ -149,6 +147,7 @@ add_subdirectory (ThirdParty/Assimp)
 add_subdirectory (ThirdParty/ENet)
 add_subdirectory (ThirdParty/FreeType)
 add_subdirectory (ThirdParty/ODE)
+add_subdirectory (ThirdParty/PortAudio)
 add_subdirectory (ThirdParty/StanHull)
 add_subdirectory (ThirdParty/STB)
 add_subdirectory (ThirdParty/TinyXML)
@@ -162,12 +161,10 @@ add_subdirectory (Urho3D)
 if (USE_OPENGL)
     add_subdirectory (SourceAssets/GLSLShaders)
     add_subdirectory (ThirdParty/GLee)
+    add_subdirectory (ThirdParty/GLFW)
     add_subdirectory (Tools/GLShaderProcessor)
 else ()
     add_subdirectory (SourceAssets/HLSLShaders)
     add_subdirectory (Tools/ShaderCompiler)
 endif ()
 
-if (USE_SDL)
-    add_subdirectory (ThirdParty/SDL)
-endif ()

@@ -12,10 +12,6 @@ include_directories (
     ../Engine/Script
 )
 
-if (USE_SDL)
-    include_directories (../ThirdParty/SDL/include)
-endif ()
-
 # Define target & libraries to link
 if (WIN32)
     add_executable (${TARGET_NAME} WIN32 ${SOURCE_FILES})

@@ -68,7 +68,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     randomSeed_(0)
 {
     {
-        MutexLock Lock(GetStaticMutex());
+        MutexLock lock(GetStaticMutex());
         
         if (!numInstances)
             dInitODE();
@@ -122,7 +122,7 @@ PhysicsWorld::~PhysicsWorld()
     }
     
     {
-        MutexLock Lock(GetStaticMutex());
+        MutexLock lock(GetStaticMutex());
         
         --numInstances;
         if (!numInstances)
