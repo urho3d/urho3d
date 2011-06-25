@@ -36,6 +36,8 @@
  * requested that these non-binding requests be included along with the 
  * license above.
  */
+ 
+// Modified by Lasse Öörni for Urho3D
 
 /** @file
  @ingroup unix_src
@@ -366,13 +368,14 @@ PaError PaUnixThread_New( PaUnixThread* self, void* (*threadFunc)( void* ), void
 
         while( self->parentWaiting && !res )
         {
-            if( waitForChild > 0 )
-            {
-                ts.tv_sec = (time_t) floor( till );
-                ts.tv_nsec = (long) ((till - floor( till )) * 1e9);
-                res = pthread_cond_timedwait( &self->cond, &self->mtx.mtx, &ts );
-            }
-            else
+            // Urho3D: do not timeout
+            // if( waitForChild > 0 )
+            // {
+            //     ts.tv_sec = (time_t) floor( till );
+            //     ts.tv_nsec = (long) ((till - floor( till )) * 1e9);
+            //     res = pthread_cond_timedwait( &self->cond, &self->mtx.mtx, &ts );
+            // }
+            // else
             {
                 res = pthread_cond_wait( &self->cond, &self->mtx.mtx );
             }
