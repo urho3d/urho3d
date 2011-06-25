@@ -186,9 +186,9 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     {
         Graphics* graphics = GetSubsystem<Graphics>();
         graphics->SetForceSM2(forceSM2);
+        graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(mode, width, height, fullscreen, vsync, multiSample))
             return false;
-        graphics->SetWindowTitle(windowTitle);
         if (!shadows)
             GetSubsystem<Renderer>()->SetDrawShadows(false);
         if (sound)

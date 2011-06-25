@@ -167,7 +167,9 @@ Graphics::~Graphics()
 
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
-    glfwSetWindowTitle(windowTitle.CString());
+    windowTitle_ = windowTitle;
+    if (initialized_)
+        glfwSetWindowTitle(windowTitle_.CString());
 }
 
 bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
@@ -222,6 +224,8 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         LOGERROR("Could not open window");
         return false;
     }
+    
+    glfwSetWindowTitle(windowTitle_.CString());
     
     // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
     // This is actually needed for ODE to behave predictably in float mode
