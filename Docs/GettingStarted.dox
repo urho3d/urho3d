@@ -84,13 +84,13 @@ Urho3D.exe understands the following command line options:
 -headless   Headless mode. No application window will be created
 -forward    Use forward rendering (default)
 -deferred   Use deferred rendering
+-b<length>  Sound buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
 -nolimit    Disable frame limiter
 -noshadows  Disable rendering of shadows
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
 -8bit       Force 8-bit audio output
--mono       Force mono audio output
 -sm2        Force SM2.0 rendering
 \endverbatim
 

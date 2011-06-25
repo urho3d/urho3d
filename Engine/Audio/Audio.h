@@ -46,7 +46,7 @@ public:
     virtual ~Audio();
     
     /// Initialize sound output with specified buffer length and output mode
-    bool SetMode(int mixRate, bool sixteenBit, bool stereo, bool interpolate = true);
+    bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolate = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
     void Update(float timeStep);
     /// Restart sound output
@@ -68,8 +68,6 @@ public:
     unsigned GetSampleSize() const { return sampleSize_; }
     /// Return mixing rate
     int GetMixRate() const { return mixRate_; }
-    /// Return whether output is sixteen bit
-    bool IsSixteenBit() const { return sixteenBit_; }
     /// Return whether output is stereo
     bool IsStereo() const { return stereo_; }
     /// Return whether output is interpolated
@@ -111,14 +109,10 @@ private:
     SharedArrayPtr<int> clipBuffer_;
     /// Audio thread mutex
     Mutex audioMutex_;
-    /// Clipping buffer size in samples
-    unsigned clipBufferSize_;
     /// Sample size
     unsigned sampleSize_;
     /// Mixing rate
     int mixRate_;
-    /// Sixteen bit flag
-    bool sixteenBit_;
     /// Stereo flag
     bool stereo_;
     /// Interpolation flag

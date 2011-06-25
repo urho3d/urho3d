@@ -75,14 +75,14 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     int width = 0;
     int height = 0;
     int multiSample = 1;
+    int buffer = 100;
+    int mixRate = 44100;
     bool fullscreen = true;
     bool vsync = false;
     bool forceSM2 = false;
     bool shadows = true;
-    int mixRate = 44100;
     bool sound = true;
     bool stereo = true;
-    bool sixteenBit = true;
     bool interpolate = true;
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
@@ -103,8 +103,6 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 interpolate = false;
             else if (argument == "mono")
                 stereo = false;
-            else if (argument == "8bit")
-                sixteenBit = false;
             else if (argument == "noshadows")
                 shadows = false;
             else if (argument == "sm2")
@@ -126,6 +124,11 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 case 'm':
                     if (arguments[i].Length() > 1)
                         multiSample = ToInt(argument.Substring(1));
+                    break;
+                    
+                case 'b':
+                    if (arguments[i].Length() > 1)
+                        buffer = ToInt(argument.Substring(1));
                     break;
                     
                 case 'r':
@@ -189,7 +192,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         if (!shadows)
             GetSubsystem<Renderer>()->SetDrawShadows(false);
         if (sound)
-            GetSubsystem<Audio>()->SetMode(mixRate, sixteenBit, stereo, interpolate);
+            GetSubsystem<Audio>()->SetMode(buffer, mixRate, stereo, interpolate);
     }
     
     frameTimer_.Reset();

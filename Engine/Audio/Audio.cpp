@@ -33,21 +33,24 @@
 #include "Sound.h"
 #include "SoundSource3D.h"
 
-#include "portaudio.h"
+#include <portaudio.h>
 
 #include "DebugNew.h"
 
+static const int MIN_BUFFERLENGTH = 20;
+static const int MIN_MIXRATE = 11025;
+static const int MAX_MIXRATE = 48000;
+
 static unsigned numInstances = 0;
 
-static int PortAudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
-    timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
+static int AudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+    const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
 
 OBJECTTYPESTATIC(Audio);
 
 Audio::Audio(Context* context) :
     Object(context),
     stream_(0),
-    clipBufferSize_(0),
     sampleSize_(0),
     playing_(false),
     listenerPosition_(Vector3::ZERO),
@@ -84,30 +87,42 @@ Audio::~Audio()
     }
 }
 
-bool Audio::SetMode(int mixRate, bool sixteenBit, bool stereo, bool interpolate)
+bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolate)
 {
     Release();
     
-    if (Pa_OpenDefaultStream(&stream_, 0, stereo ? 2 : 1, sixteenBit ? paInt16 : paUInt8, mixRate, paFramesPerBufferUnspecified,
-        PortAudioCallback, this) != paNoError)
+    bufferLengthMSec = Max(bufferLengthMSec, MIN_BUFFERLENGTH);
+    mixRate = Clamp(mixRate, MIN_MIXRATE, MAX_MIXRATE);
+    
+    // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
+    unsigned fragmentSize = NextPowerOfTwo(mixRate >> 6);
+    
+    PaStreamParameters outputParams;
+    outputParams.device = Pa_GetDefaultOutputDevice();
+    outputParams.channelCount = stereo ? 2 : 1;
+    outputParams.sampleFormat = paInt16;
+    outputParams.suggestedLatency = bufferLengthMSec / 1000.0;
+    outputParams.hostApiSpecificStreamInfo = 0;
+    
+    if (Pa_OpenStream(&stream_, 0, &outputParams, mixRate, fragmentSize, 0, AudioCallback, this) != paNoError)
     {
         LOGERROR("Failed to open audio stream");
         return false;
     }
     
-    sampleSize_ = 1;
+    sampleSize_ = sizeof(short);
     if (stereo)
         sampleSize_ <<= 1;
-    if (sixteenBit)
-        sampleSize_ <<= 1;
+    
+    // Allocate the clipping buffer
+    clipBuffer_ = new int[stereo ? fragmentSize << 1 : fragmentSize];
     
     mixRate_ = mixRate;
     stereo_ = stereo;
-    sixteenBit_ = sixteenBit;
     interpolate_ = interpolate;
     
     LOGINFO("Set audio mode " + String(mixRate_) + " Hz " + (stereo_ ? "stereo" : "mono") + " " +
-        (sixteenBit_ ? "16-bit" : "8-bit") + " " + (interpolate_ ? "interpolated" : ""));
+        (interpolate_ ? "interpolated" : ""));
     
     return Play();
 }
@@ -215,7 +230,7 @@ void Audio::RemoveSoundSource(SoundSource* channel)
     }
 }
 
-int PortAudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
+int AudioCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo*
     timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
     Audio* audio = static_cast<Audio*>(userData);
@@ -234,48 +249,19 @@ void Audio::MixOutput(void *dest, unsigned mixSamples)
     if (stereo_)
         clipSamples <<= 1;
     
-    // Make sure the clipbuffer is large enough, then clear it
-    if (clipBufferSize_ < clipSamples)
-    {
-        clipBuffer_ = new int[clipSamples];
-        clipBufferSize_ = clipSamples;
-    }
-    
     // Clear clip buffer
     memset(clipBuffer_.GetPtr(), 0, clipSamples * sizeof(int));
     int* clipPtr = clipBuffer_.GetPtr();
     
     // Mix samples to clip buffer
-    // If the total work request is too large, Ogg Vorbis decode buffers may end up wrapping. Divide to smaller chunks if necessary
-    unsigned maxSamples = mixRate_ * DECODE_BUFFER_LENGTH / 1000 / 4;
-    while (mixSamples)
-    {
-        unsigned currentSamples = Min((int)maxSamples, (int)mixSamples);
-        for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-            (*i)->Mix(clipPtr, currentSamples, mixRate_, stereo_, interpolate_);
-        
-        mixSamples -= currentSamples;
-        if (stereo_)
-            clipPtr += currentSamples * 2;
-        else
-            clipPtr += currentSamples;
-        
-    }
+    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
+        (*i)->Mix(clipPtr, mixSamples, mixRate_, stereo_, interpolate_);
     
     // Copy output from clip buffer to destination
     clipPtr = clipBuffer_.GetPtr();
-    if (sixteenBit_)
-    {
-        short* destPtr = (short*)dest;
-        while (clipSamples--)
-            *destPtr++ = Clamp(*clipPtr++, -32768, 32767);
-    }
-    else
-    {
-        unsigned char* destPtr = (unsigned char*)dest;
-        while (clipSamples--)
-            *destPtr++ = Clamp(((*clipPtr++) >> 8) + 128, 0, 255);
-    }
+    short* destPtr = (short*)dest;
+    while (clipSamples--)
+        *destPtr++ = Clamp(*clipPtr++, -32768, 32767);
 }
 
 void Audio::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
@@ -295,7 +281,6 @@ void Audio::Release()
         
         stream_ = 0;
         clipBuffer_.Reset();
-        clipBufferSize_ = 0;
     }
 }
 
