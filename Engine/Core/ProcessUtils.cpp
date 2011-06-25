@@ -26,6 +26,7 @@
 #include "ProcessUtils.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <fcntl.h>
 
 #ifdef _WIN32

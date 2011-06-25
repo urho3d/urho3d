@@ -88,10 +88,7 @@ void Thread::Stop()
     #else
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
-    {
-        pthread_join(thread, 0);
-        pthread_destroy(thread);
-    }
+        pthread_join(*thread, 0);
     delete thread;
     #endif
     handle_ = 0;

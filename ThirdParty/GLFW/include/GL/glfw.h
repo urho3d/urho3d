@@ -27,6 +27,8 @@
  *
  *************************************************************************/
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifndef __glfw_h_
 #define __glfw_h_
 
@@ -159,6 +161,8 @@ extern "C" {
  * special defines which normally requires the user to include <windows.h>
  * (which is not a nice solution for portable programs).
  */
+#define GLFW_NO_GLU
+
 #if defined(__APPLE_CC__)
  #include <OpenGL/gl.h>
  #ifndef GLFW_NO_GLU

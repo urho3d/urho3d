@@ -60,7 +60,11 @@ void Mutex::Release()
 Mutex::Mutex() :
     criticalSection_(new pthread_mutex_t)
 {
-    pthread_mutex_init((pthread_mutex_t*)criticalSection_);
+    pthread_mutex_t* mutex = (pthread_mutex_t*)criticalSection_;
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(mutex, &attr);
 }
 
 Mutex::~Mutex()
@@ -78,7 +82,7 @@ void Mutex::Acquire()
 
 void Mutex::Release()
 {
-    pthread_mutex_acquire((pthread_mutex_t*)criticalSection_);
+    pthread_mutex_unlock((pthread_mutex_t*)criticalSection_);
 }
 #endif
 
