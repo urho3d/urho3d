@@ -1662,7 +1662,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
             stencilRef_ = stencilRef;
             stencilMask_ = stencilMask;
         }
-        if (pass != stencilPass_ || fail != stencilFail_ || !zFail != stencilZFail_)
+        if (pass != stencilPass_ || fail != stencilFail_ || zFail != stencilZFail_)
         {
             glStencilOp(glStencilOps[fail], glStencilOps[zFail], glStencilOps[pass]);
             stencilPass_ = pass;
