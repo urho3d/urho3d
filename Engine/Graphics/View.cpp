@@ -47,12 +47,12 @@
 
 static const Vector3 directions[] =
 {
-    Vector3::RIGHT,
-    Vector3::LEFT,
-    Vector3::UP,
-    Vector3::DOWN,
-    Vector3::FORWARD,
-    Vector3::BACK,
+    Vector3(1.0f, 0.0f, 0.0f),
+    Vector3(-1.0f, 0.0f, 0.0f),
+    Vector3(0.0f, 1.0f, 0.0f),
+    Vector3(0.0f, -1.0f, 0.0f),
+    Vector3(0.0f, 0.0f, 1.0f),
+    Vector3(0.0f, 0.0f, -1.0f)
 };
 
 OBJECTTYPESTATIC(View);
@@ -522,18 +522,18 @@ void View::GetBatches()
             
             for (unsigned i = 0; i < lights.Size(); ++i)
             {
-                Light* SplitLight = lights[i];
-                Light* light = SplitLight->GetOriginalLight();
+                Light* splitLight = lights[i];
+                Light* light = splitLight->GetOriginalLight();
                 if (!light)
-                    light = SplitLight;
+                    light = splitLight;
                 
                 // Find the correct light queue again
                 LightBatchQueue* queue = 0;
-                Map<Light*, unsigned>::Iterator j = lightQueueIndex.Find(SplitLight);
+                Map<Light*, unsigned>::Iterator j = lightQueueIndex.Find(splitLight);
                 if (j != lightQueueIndex.End())
                     queue = &lightQueues_[j->second_];
                 
-                GetLitBatches(drawable, light, SplitLight, queue, litTransparencies);
+                GetLitBatches(drawable, light, splitLight, queue, litTransparencies);
             }
         }
     }
@@ -627,10 +627,10 @@ void View::GetBatches()
     SortBatches();
 }
 
-void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue,
+void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, LightBatchQueue* lightQueue,
     HashSet<LitTransparencyCheck>& litTransparencies)
 {
-    bool splitPointLight = SplitLight->GetLightType() == LIGHT_SPLITPOINT;
+    bool splitPointLight = splitLight->GetLightType() == LIGHT_SPLITPOINT;
     // Whether to allow shadows for transparencies, or for forward lit objects in deferred mode
     bool allowShadows = !renderer_->reuseShadowMaps_ && !splitPointLight;
     unsigned numBatches = drawable->GetNumBatches();
@@ -652,7 +652,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
         bool priority = false;
         
         // For directional light, check for lit base pass
-        if (SplitLight->GetLightType() == LIGHT_DIRECTIONAL)
+        if (splitLight->GetLightType() == LIGHT_DIRECTIONAL)
         {
             if (!drawable->HasBasePass(i))
             {
@@ -675,7 +675,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, Li
         // Fill the rest of the batch
         litBatch.camera_ = camera_;
         litBatch.distance_ = drawable->GetDistance();
-        litBatch.light_ = SplitLight;
+        litBatch.light_ = splitLight;
         litBatch.hasPriority_ = priority;
         
         // Check from the ambient pass whether the object is opaque
@@ -1742,32 +1742,32 @@ unsigned View::SplitLight(Light* light)
             if ((nearSplit - nearFadeRange) > camera_->GetFarClip())
                 break;
             
-            Light* SplitLight = renderer_->CreateSplitLight(light);
-            splitLights_[i] = SplitLight;
+            Light* splitLight = renderer_->CreateSplitLight(light);
+            splitLights_[i] = splitLight;
             
             // Though the near clip was previously clamped, use the real near clip value for the first split,
             // so that there are no unlit portions
             if (i)
-                SplitLight->SetNearSplit(nearSplit);
+                splitLight->SetNearSplit(nearSplit);
             else
-                SplitLight->SetNearSplit(camera_->GetNearClip());
+                splitLight->SetNearSplit(camera_->GetNearClip());
             
-            SplitLight->SetNearFadeRange(nearFadeRange);
-            SplitLight->SetFarSplit(farSplit);
+            splitLight->SetNearFadeRange(nearFadeRange);
+            splitLight->SetFarSplit(farSplit);
             
             // The final split will not fade
             if (createExtraSplit || i < splits - 1)
-                SplitLight->SetFarFadeRange(farFadeRange);
+                splitLight->SetFarFadeRange(farFadeRange);
             
             // Create an extra unshadowed split if necessary
             if (createExtraSplit && i == splits - 1)
             {
-                Light* SplitLight = renderer_->CreateSplitLight(light);
-                splitLights_[i + 1] = SplitLight;
+                Light* splitLight = renderer_->CreateSplitLight(light);
+                splitLights_[i + 1] = splitLight;
                 
-                SplitLight->SetNearSplit(farSplit);
-                SplitLight->SetNearFadeRange(farFadeRange);
-                SplitLight->SetCastShadows(false);
+                splitLight->SetNearSplit(farSplit);
+                splitLight->SetNearFadeRange(farFadeRange);
+                splitLight->SetCastShadows(false);
             }
         }
         
@@ -1781,15 +1781,15 @@ unsigned View::SplitLight(Light* light)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            Light* SplitLight = renderer_->CreateSplitLight(light);
-            Node* lightNode = SplitLight->GetNode();
-            splitLights_[i] = SplitLight;
+            Light* splitLight = renderer_->CreateSplitLight(light);
+            Node* lightNode = splitLight->GetNode();
+            splitLights_[i] = splitLight;
             
-            SplitLight->SetLightType(LIGHT_SPLITPOINT);
+            splitLight->SetLightType(LIGHT_SPLITPOINT);
             // When making a shadowed point light, align the splits along X, Y and Z axes regardless of light rotation
             lightNode->SetDirection(directions[i]);
-            SplitLight->SetFov(90.0f);
-            SplitLight->SetAspectRatio(1.0f);
+            splitLight->SetFov(90.0f);
+            splitLight->SetAspectRatio(1.0f);
         }
         
         return MAX_CUBEMAP_FACES;
@@ -1797,8 +1797,8 @@ unsigned View::SplitLight(Light* light)
     
     // A spot light does not actually need splitting. However, we may be rendering several views,
     // and in some the light might be unshadowed, so better create an unique copy
-    Light* SplitLight = renderer_->CreateSplitLight(light);
-    splitLights_[0] = SplitLight;
+    Light* splitLight = renderer_->CreateSplitLight(light);
+    splitLights_[0] = splitLight;
     return 1;
 }
 

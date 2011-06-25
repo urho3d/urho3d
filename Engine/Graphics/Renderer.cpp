@@ -1333,7 +1333,7 @@ Light* Renderer::CreateSplitLight(Light* original)
         splitLightStore_.Push(SharedPtr<Light>(new Light(context_)));
     Light* light = splitLightStore_[numSplitLights_];
     light->SetNode(CreateTempNode());
-    light->copyFrom(original);
+    light->CopyFrom(original);
     
     ++numSplitLights_;
     return light;

@@ -237,7 +237,7 @@ public:
     /// Set sort value based on intensity at given world position
     void SetIntensitySortValue(const Vector3& position);
     /// Copy values from another light
-    void copyFrom(Light* original);
+    void CopyFrom(Light* original);
     /// Return near split distance
     float GetNearSplit() const { return nearSplit_; }
     /// Return far split distance

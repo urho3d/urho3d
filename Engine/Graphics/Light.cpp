@@ -299,7 +299,7 @@ void Light::SetShapeTexture(Texture* texture)
     shapeTexture_ = texture;
 }
 
-void Light::copyFrom(Light* original)
+void Light::CopyFrom(Light* original)
 {
     node_->SetTransform(original->GetWorldPosition(), original->GetWorldRotation(), Vector3::UNITY);
     castShadows_ = original->castShadows_;
@@ -320,6 +320,7 @@ void Light::copyFrom(Light* original)
     shadowFadeDistance_ = original->shadowFadeDistance_;
     shadowIntensity_ = original->shadowIntensity_;
     shadowResolution_ = original->shadowResolution_;
+    shadowNearFarRatio_ = original->shadowNearFarRatio_;
     rampTexture_ = original->rampTexture_;
     shapeTexture_ = original->shapeTexture_;
     originalLight_ = original;
@@ -330,7 +331,7 @@ Frustum Light::GetFrustum() const
     const Matrix3x4& transform = GetWorldTransform();
     Matrix3x4 frustumTransform(transform.Translation(), transform.Rotation(), 1.0f);
     Frustum ret;
-    ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, transform);
+    ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, frustumTransform);
     return ret;
 }
 
