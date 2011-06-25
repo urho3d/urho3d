@@ -57,6 +57,7 @@ Input::Input(Context* context) :
     mouseButtonDown_ = 0;
     mouseButtonPress_ = 0;
     lastCursorPosition_ = IntVector2::ZERO;
+    lastWheelPosition_ = 0;
     
     #ifndef USE_OPENGL
     SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
@@ -273,6 +274,7 @@ void Input::MakeActive()
     #else
     // Get the current mouse position as a base for movement calculations
     lastCursorPosition_ = GetCursorPosition();
+    lastWheelPosition_ = glfwGetMouseWheel();
     #endif
     
     using namespace Activation;
@@ -588,7 +590,8 @@ void MouseButtonCallback(int button, int action)
 
 void MouseWheelCallback(int wheel)
 {
-    /// \todo Implement
+    inputInstance->SetMouseWheel(wheel - inputInstance->lastWheelPosition_);
+    inputInstance->lastWheelPosition_ = wheel;
 }
 #endif
 
@@ -628,6 +631,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     glfwSetMouseButtonCallback(&MouseButtonCallback);
     glfwSetMouseWheelCallback(&MouseWheelCallback);
     lastCursorPosition_ = GetCursorPosition();
+    lastWheelPosition_ = glfwGetMouseWheel();
     #endif
 }
 

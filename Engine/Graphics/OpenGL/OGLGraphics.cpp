@@ -120,8 +120,8 @@ static const unsigned glStencilOps[] =
     GL_KEEP,
     GL_ZERO,
     GL_REPLACE,
-    GL_INCR,
-    GL_DECR
+    GL_INCR_WRAP,
+    GL_DECR_WRAP
 };
 
 static const String noParameter;
@@ -407,7 +407,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         SetColorWrite(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite(true);
-    
+
     unsigned glFlags = 0;
     if (flags & CLEAR_COLOR)
     {
@@ -1335,7 +1335,6 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
     // Reset viewport and scissor test
     IntVector2 viewSize = GetRenderTargetDimensions();
     SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
-    SetScissorTest(false);
 }
 
 void Graphics::SetDepthStencil(Texture2D* depthTexture)
@@ -1588,6 +1587,7 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         intRect.bottom_ = Clamp(rect.bottom_ + viewPos.y_, 0, rtSize.y_);
         
         if (intRect.right_ == intRect.left_)
+
             intRect.right_++;
         if (intRect.bottom_ == intRect.top_)
             intRect.bottom_++;
