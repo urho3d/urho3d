@@ -125,6 +125,14 @@ static const unsigned glStencilOps[] =
 };
 
 static const String noParameter;
+static Graphics* graphicsInstance = 0;
+
+int CloseCallback()
+{
+    // Do not let GLFW close the window on its own, rather do a controlled close here
+    graphicsInstance->Close();
+    return GL_FALSE;
+}
 
 OBJECTTYPESTATIC(Graphics);
 
@@ -152,6 +160,9 @@ Graphics::Graphics(Context* context_) :
     ResetCachedState();
     InitializeShaderParameters();
     
+    // GLFW callbacks do not include userdata, so a static instance pointer is necessary
+    graphicsInstance = this;
+    
     glfwInit();
 }
 
@@ -163,6 +174,8 @@ Graphics::~Graphics()
     impl_ = 0;
     
     glfwTerminate();
+    
+    graphicsInstance = 0;
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
@@ -225,7 +238,9 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         return false;
     }
     
+    // Set title and the close callback
     glfwSetWindowTitle(windowTitle_.CString());
+    glfwSetWindowCloseCallback(CloseCallback);
     
     // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
     // This is actually needed for ODE to behave predictably in float mode

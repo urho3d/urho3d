@@ -27,6 +27,8 @@
 //
 //========================================================================
 
+// Modified by Lasse Öörni for Urho3D
+
 // Needed for _NSGetProgname
 #include <crt_externs.h>
 
@@ -224,6 +226,15 @@ static void initThreads( void )
 
 int _glfwPlatformInit( void )
 {
+    // Urho3D: added missing OpenGL framework initialization
+    _glfwLibrary.OpenGLFramework =
+        CFBundleGetBundleWithIdentifier( CFSTR( "com.apple.opengl" ) );
+    if( _glfwLibrary.OpenGLFramework == NULL )
+    {
+        fprintf( stderr, "glfwInit failing because you aren't linked to OpenGL\n" );
+        return GL_FALSE;
+    }
+    
     _glfwLibrary.AutoreleasePool = [[NSAutoreleasePool alloc] init];
 
     // Implicitly create shared NSApplication instance

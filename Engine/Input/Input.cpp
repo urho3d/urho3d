@@ -247,10 +247,6 @@ void Input::Initialize()
     
     // Set the initial activation
     MakeActive();
-    #ifndef USE_OPENGL
-    SetClipCursor(true);
-    SetCursorVisible(false);
-    #endif
     
     initialized_ = true;
     
@@ -626,6 +622,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     #else
     // Re-enable GLFW callbacks each time the window has been recreated
     glfwDisable(GLFW_MOUSE_CURSOR);
+    glfwEnable(GLFW_KEY_REPEAT);
     glfwSetKeyCallback(&KeyCallback);
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);

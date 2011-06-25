@@ -281,6 +281,13 @@ static int convertMacKeyCode( unsigned int macKeyCode )
 
 - (void)mouseMoved:(NSEvent *)event
 {
+    // Urho3D: check for skip
+    if (_glfwWin.skipNextMouseMove)
+    {
+        _glfwWin.skipNextMouseMove = GL_FALSE;
+        return;
+    }
+    
     if( _glfwWin.mouseLock )
     {
         _glfwInput.MousePosX += [event deltaX];
@@ -436,6 +443,7 @@ int  _glfwPlatformOpenWindow( int width, int height,
     _glfwWin.active = GL_FALSE;
     _glfwWin.lastActive = GL_FALSE;
     _glfwWin.leftMouseDown = GL_FALSE;
+    _glfwWin.skipNextMouseMove = GL_FALSE;
 
     // Fail if OpenGL 3.0 or above was requested
     if( wndconfig->glMajor > 2 )
@@ -815,7 +823,7 @@ void _glfwPlatformPollEvents( void )
 
         if (event)
         {
-            // Urho3D: detect events also outside the client area to detect window drag
+            // Urho3D: check for events also outside the client area to detect window drag
             NSEventType eventType = [event type];
             if (eventType == NSLeftMouseDown)
                 _glfwWin.leftMouseDown = GL_TRUE;
@@ -832,7 +840,10 @@ void _glfwPlatformPollEvents( void )
 
     // Urho3D: track activation
     _glfwWin.iconified = [_glfwWin.window isMiniaturized] == YES;
-    _glfwWin.active = [_glfwWin.window isMainWindow] == YES && [_glfwWin.window isKeyWindow] == YES;
+    if (_glfwWin.fullscreen)
+        _glfwWin.active = !_glfwWin.iconified;
+    else
+        _glfwWin.active = [_glfwWin.window isMainWindow] == YES;
     // When activation changes, disable/reenable mouse lock if necessary
     if (_glfwWin.mouseLock)
     {
@@ -847,6 +858,8 @@ void _glfwPlatformPollEvents( void )
             _glfwWin.lastActive = _glfwWin.active;
         }
     }
+    else
+        _glfwWin.lastActive = _glfwWin.active;
 }
 
 //========================================================================
@@ -874,7 +887,10 @@ void _glfwPlatformWaitEvents( void )
 void _glfwPlatformHideMouseCursor( void )
 {
     [NSCursor hide];
+    // Urho3D: when dissociating the mouse cursor position, make sure it is moved inside the window
+    // so we are sure to get mouse button presses correctly
     CGAssociateMouseAndMouseCursorPosition( false );
+    _glfwPlatformSetMouseCursorPos(_glfwWin.width / 2, _glfwWin.height / 2);
 }
 
 //========================================================================
@@ -916,5 +932,8 @@ void _glfwPlatformSetMouseCursorPos( int x, int y )
     CGPoint targetPoint = CGPointMake( globalPoint.x - mainScreenOrigin.x,
                                        mainScreenHeight - globalPoint.y - mainScreenOrigin.y );
     CGDisplayMoveCursorToPoint( CGMainDisplayID(), targetPoint );
-}
 
+    // Urho3D: in mouselock (delta) mode, disregard the event that comes from this movement
+    if (_glfwWin.mouseLock)
+        _glfwWin.skipNextMouseMove = GL_TRUE;
+}

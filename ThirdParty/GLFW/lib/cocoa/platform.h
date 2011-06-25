@@ -128,9 +128,10 @@ struct _GLFWwin_struct {
     id	      delegate;
     unsigned int modifierFlags;
     
-    // Urho3D: added to track activation/deactivation, and left mouse status
+    // Urho3D: added variables
     int       lastActive;
     int       leftMouseDown;
+    int       skipNextMouseMove;
 };
 
 GLFWGLOBAL _GLFWwin _glfwWin;
