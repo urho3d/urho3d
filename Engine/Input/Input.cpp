@@ -386,6 +386,9 @@ void Input::SetKey(int key, bool newState)
     if (newState)
         eventData[P_REPEAT] = repeat;
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
+
+    if (key == KEY_RETURN && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
+        graphics_->ToggleFullscreen();
 }
 
 void Input::SetMouseWheel(int delta)
@@ -528,8 +531,6 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         
     case WM_SYSKEYDOWN:
         SetKey(wParam, true);
-        if (wParam == KEY_RETURN && toggleFullscreen_)
-            graphics_->ToggleFullscreen();
         if (wParam != KEY_F4)
             eventData[P_HANDLED] = true;
         break;
@@ -626,6 +627,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);
     glfwSetMouseWheelCallback(&MouseWheelCallback);
+    lastCursorPosition_ = GetCursorPosition();
     #endif
 }
 
