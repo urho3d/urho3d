@@ -38,8 +38,8 @@ OBJECTTYPESTATIC(Profiler);
 
 Profiler::Profiler(Context* context) :
     Object(context),
-    root_(0),
     current_(0),
+    root_(0),
     accumulatedFrames_(0),
     totalFrames_(0)
 {

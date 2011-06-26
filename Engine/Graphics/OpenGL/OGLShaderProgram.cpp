@@ -54,7 +54,7 @@ void ShaderProgram::Release()
         
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             useTextureUnit_[i] = false;
-        uniformInfos_.Clear();
+        shaderParameters_.Clear();
         
         if (graphics_->GetShaderProgram() == this)
             graphics_->SetShaders(0, 0);
@@ -106,6 +106,7 @@ bool ShaderProgram::Link()
     glUseProgram(object_);
     glGetProgramiv(object_, GL_ACTIVE_UNIFORMS, &uniformCount);
     
+    // Check for shader parameters and texture units
     for (int i = 0; i < uniformCount; ++i)
     {
         int location;
@@ -134,15 +135,11 @@ bool ShaderProgram::Link()
         if (name[0] == 'c')
         {
             // Store the constant uniform mapping
-            ShaderParameter param = graphics_->GetShaderParameter(name.Substring(1));
-            if (param < MAX_SHADER_PARAMETERS)
-            {
-                UniformInfo newInfo;
-                newInfo.location_ = location;
-                newInfo.type_ = type;
-                
-                uniformInfos_[param] = newInfo;
-            }
+            String paramName = name.Substring(1);
+            ShaderParameter newParam;
+            newParam.location_ = location;
+            newParam.type_ = type;
+            shaderParameters_[StringHash(paramName)] = newParam;    
         }
         else if (name[0] == 's')
         {
@@ -171,35 +168,30 @@ bool ShaderProgram::Link()
     return true;
 }
 
-bool ShaderProgram::NeedParameterUpdate(ShaderParameter param, const void* source, unsigned frame)
+bool ShaderProgram::NeedParameterUpdate(StringHash param, const void* source, unsigned frame)
 {
     // If global parameter frame has changed, clear all remembered sources
     if (frame != lastParameterFrame_)
     {
         lastParameterFrame_ = frame;
-        lastParameterSources_.Clear();
+        for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
+            i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
     }
     
-    if (uniformInfos_.Find(param) == uniformInfos_.End())
+    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+    if (i == shaderParameters_.End() || i->second_.lastSource_ == source)
         return false;
     
-    HashMap<ShaderParameter, const void*>::Iterator i = lastParameterSources_.Find(param);
-    if (i != lastParameterSources_.End())
-    {
-        if (i->second_ == source)
-            return false;
-        
-        i->second_ = source;
-        return true;
-    }
-    
-    lastParameterSources_[param] = source;
+    i->second_.lastSource_ = source;
     return true;
 }
 
-void ShaderProgram::ClearParameterSource(ShaderParameter param)
+void ShaderProgram::ClearParameterSource(StringHash param)
 {
-    lastParameterSources_.Erase(param);
+    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
+    if (i == shaderParameters_.End())
+        return;
+    i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
 }
 
 ShaderVariation* ShaderProgram::GetVertexShader() const
@@ -212,15 +204,15 @@ ShaderVariation* ShaderProgram::GetPixelShader() const
     return pixelShader_;
 }
 
-bool ShaderProgram::HasParameter(ShaderParameter param) const
+bool ShaderProgram::HasParameter(StringHash param) const
 {
-    return uniformInfos_.Find(param) != uniformInfos_.End();
+    return shaderParameters_.Find(param) != shaderParameters_.End();
 }
 
-const UniformInfo* ShaderProgram::GetUniformInfo(ShaderParameter param) const
+const ShaderParameter* ShaderProgram::GetParameter(StringHash param) const
 {
-    HashMap<ShaderParameter, UniformInfo>::ConstIterator i = uniformInfos_.Find(param);
-    if (i != uniformInfos_.End())
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
+    if (i != shaderParameters_.End())
         return &i->second_;
     else
         return 0;

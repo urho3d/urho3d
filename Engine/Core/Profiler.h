@@ -32,17 +32,17 @@ public:
     /// Construct with the specified parent block and name
     ProfilerBlock(ProfilerBlock* parent, const char* name) :
         name_(name),
-        parent_(parent),
         time_(0),
         count_(0),
+        parent_(parent),
+        lastSearchName_(0),
+        lastSearchBlock_(0),
         frameTime_(0),
         frameCount_(0),
         accumulatedTime_(0),
         accumulatedCount_(0),
         totalTime_(0),
-        totalCount_(0),
-        lastSearchName_(0),
-        lastSearchBlock_(0)
+        totalCount_(0)
     {
     }
     
@@ -148,13 +148,13 @@ private:
     long long time_;
     /// Calls on current frame
     unsigned count_;
-    
+
+    /// Parent block
+    ProfilerBlock* parent_;    
     /// Last queried child block name (optimization)
     const char* lastSearchName_;
     /// Last queried child block (optimization)
     ProfilerBlock* lastSearchBlock_;
-    /// Parent block
-    ProfilerBlock* parent_;
     /// Child blocks
     PODVector<ProfilerBlock*> children_;
     

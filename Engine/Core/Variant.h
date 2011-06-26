@@ -623,7 +623,7 @@ public:
     bool operator == (const StringHash& rhs) const
     {
         if (type_ == VAR_INT)
-            return value_.int_ == rhs.GetValue();
+            return (unsigned)value_.int_ == rhs.GetValue();
         else
             return false;
     }
@@ -632,7 +632,7 @@ public:
     bool operator == (const ShortStringHash& rhs) const
     {
         if (type_ == VAR_INT)
-            return value_.int_ == rhs.GetValue();
+            return (unsigned short)value_.int_ == rhs.GetValue();
         else
             return false;
     }

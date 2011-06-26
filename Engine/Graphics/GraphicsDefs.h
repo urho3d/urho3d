@@ -200,6 +200,7 @@ enum ShaderType
     PS,
 };
 
+// Inbuilt shader parameters
 static const StringHash VSP_CAMERAPOS("CameraPos");
 static const StringHash VSP_CAMERAROT("CameraRot");
 static const StringHash VSP_DEPTHMODE("DepthMode");
@@ -216,6 +217,7 @@ static const StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
 static const StringHash VSP_VIEWUPVECTOR("ViewUpVector");
 static const StringHash VSP_SKINMATRICES("SkinMatrices");
 static const StringHash PSP_AMBIENTCOLOR("AmbientColor");
+static const StringHash PSP_DEPTHRECONSTRUCT("DepthReconstruct");
 static const StringHash PSP_EDGEFILTERPARAMS("EdgeFilterParams");
 static const StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
 static const StringHash PSP_FOGCOLOR("FogColor");

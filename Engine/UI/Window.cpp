@@ -141,6 +141,9 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
         SetPosition(dragStartPosition_.x_ + delta.x_, dragStartPosition_.y_);
         SetSize(dragStartSize_.x_ - delta.x_, dragStartSize_.y_);
         break;
+
+    default:
+        break;
     }
     
     ValidatePosition();

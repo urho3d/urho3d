@@ -83,7 +83,7 @@ public:
     virtual bool Load(Deserializer& source);
     
     /// Set size and number of color components
-    void SetSize(unsigned width, unsigned height, unsigned components);
+    void SetSize(int width, int height, unsigned components);
     /// Set data
     void SetData(const unsigned char* pixelData);
     /// Save in BMP format. Return true if successful

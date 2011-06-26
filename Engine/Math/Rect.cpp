@@ -42,6 +42,6 @@ String Rect::ToString() const
 String IntRect::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d %d &d", left_, top_, right_,bottom_);
+    sprintf(tempBuffer, "%d %d %d %d", left_, top_, right_, bottom_);
     return String(tempBuffer);
 }

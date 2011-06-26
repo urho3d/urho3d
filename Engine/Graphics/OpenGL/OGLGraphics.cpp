@@ -158,7 +158,7 @@ Graphics::Graphics(Context* context_) :
     shaderParameterFrame_(0)
 {
     ResetCachedState();
-    InitializeShaderParameters();
+    SetTextureUnitMappings();
     
     // GLFW callbacks do not include userdata, so a static instance pointer is necessary
     graphicsInstance = this;
@@ -828,16 +828,16 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const bool* data, unsigned count)
+void Graphics::SetShaderParameter(StringHash param, const bool* data, unsigned count)
 {
     // Not supported
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const float* data, unsigned count)
+void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
             switch (info->type_)
@@ -870,11 +870,11 @@ void Graphics::SetShaderParameter(ShaderParameter param, const float* data, unsi
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const int* data, unsigned count)
+void Graphics::SetShaderParameter(StringHash param, const int* data, unsigned count)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
             switch (info->type_)
@@ -899,36 +899,36 @@ void Graphics::SetShaderParameter(ShaderParameter param, const int* data, unsign
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, float value)
+void Graphics::SetShaderParameter(StringHash param, float value)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
             glUniform1fv(info->location_, 1, &value);
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Color& color)
+void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
     SetShaderParameter(param, color.GetData(), 4);
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3& matrix)
+void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
             glUniformMatrix3fv(info->location_, 1, GL_TRUE, matrix.GetData());
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Vector3& vector)
+void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
             // Check the uniform type to avoid mismatch
@@ -950,21 +950,21 @@ void Graphics::SetShaderParameter(ShaderParameter param, const Vector3& vector)
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Matrix4& matrix)
+void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
             glUniformMatrix4fv(info->location_, 1, GL_TRUE, matrix.GetData());
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Vector4& vector)
+void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
             // Check the uniform type to avoid mismatch
@@ -990,11 +990,11 @@ void Graphics::SetShaderParameter(ShaderParameter param, const Vector4& vector)
     }
 }
 
-void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix)
+void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 {
     if (shaderProgram_)
     {
-        const UniformInfo* info = shaderProgram_->GetUniformInfo(param);
+        const ShaderParameter* info = shaderProgram_->GetParameter(param);
         if (info)
         {
             float data[16];
@@ -1020,7 +1020,7 @@ void Graphics::SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix
     }
 }
 
-bool Graphics::NeedParameterUpdate(ShaderParameter param, const void* source)
+bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
 {
     if (shaderProgram_)
         return shaderProgram_->NeedParameterUpdate(param, source, shaderParameterFrame_);
@@ -1883,15 +1883,6 @@ VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
 }
 
-ShaderParameter Graphics::GetShaderParameter(const String& name)
-{
-    Map<String, ShaderParameter>::Iterator i = shaderParameters_.Find(name);
-    if (i != shaderParameters_.End())
-        return i->second_;
-    else
-        return MAX_SHADER_PARAMETERS;
-}
-
 TextureUnit Graphics::GetTextureUnit(const String& name)
 {
     Map<String, TextureUnit>::Iterator i = textureUnits_.Find(name);
@@ -1899,16 +1890,6 @@ TextureUnit Graphics::GetTextureUnit(const String& name)
         return i->second_;
     else
         return MAX_TEXTURE_UNITS;
-}
-
-const String& Graphics::GetShaderParameterName(ShaderParameter parameter)
-{
-    for (Map<String, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
-    {
-        if (i->second_ == parameter)
-            return i->first_;
-    }
-    return noParameter;
 }
 
 const String& Graphics::GetTextureUnitName(TextureUnit unit)
@@ -2159,45 +2140,8 @@ void Graphics::Release()
     initialized_ = false;
 }
 
-void Graphics::InitializeShaderParameters()
+void Graphics::SetTextureUnitMappings()
 {
-    // Map parameter names
-    shaderParameters_["CameraPos"] = VSP_CAMERAPOS;
-    shaderParameters_["CameraRot"] = VSP_CAMERAROT;
-    shaderParameters_["DepthMode"] = VSP_DEPTHMODE;
-    shaderParameters_["ElapsedTime"] = VSP_ELAPSEDTIME;
-    shaderParameters_["FrustumSize"] = VSP_FRUSTUMSIZE;
-    shaderParameters_["GBufferOffsets"] = VSP_GBUFFEROFFSETS;
-    shaderParameters_["Model"] = VSP_MODEL;
-    shaderParameters_["ShadowProj"] = VSP_SHADOWPROJ;
-    shaderParameters_["SpotProj"] = VSP_SPOTPROJ;
-    shaderParameters_["ViewProj"] = VSP_VIEWPROJ;
-    shaderParameters_["UOffset"] = VSP_UOFFSET;
-    shaderParameters_["VOffset"] = VSP_VOFFSET;
-    shaderParameters_["ViewRightVector"] = VSP_VIEWRIGHTVECTOR;
-    shaderParameters_["ViewUpVector"] = VSP_VIEWUPVECTOR;
-    shaderParameters_["SkinMatrices"] = VSP_SKINMATRICES;
-    
-    shaderParameters_["AmbientColor"] = PSP_AMBIENTCOLOR;
-    shaderParameters_["DepthReconstruct"] = PSP_DEPTHRECONSTRUCT;
-    shaderParameters_["EdgeFilterParams"] = PSP_EDGEFILTERPARAMS;
-    shaderParameters_["ElapsedTimePS"] = PSP_ELAPSEDTIME;
-    shaderParameters_["FogColor"] = PSP_FOGCOLOR;
-    shaderParameters_["FogParams"] = PSP_FOGPARAMS;
-    shaderParameters_["LightAtten"] = PSP_LIGHTATTEN;
-    shaderParameters_["LightColor"] = PSP_LIGHTCOLOR;
-    shaderParameters_["LightDir"] = PSP_LIGHTDIR;
-    shaderParameters_["LightPos"] = PSP_LIGHTPOS;
-    shaderParameters_["LightSplits"] = PSP_LIGHTSPLITS;
-    shaderParameters_["LightVecRot"] = PSP_LIGHTVECROT;
-    shaderParameters_["MatDiffColor"] = PSP_MATDIFFCOLOR;
-    shaderParameters_["MatEmissiveColor"] = PSP_MATEMISSIVECOLOR;
-    shaderParameters_["MatSpecProperties"] = PSP_MATSPECPROPERTIES;
-    shaderParameters_["SampleOffsets"] = PSP_SAMPLEOFFSETS;
-    shaderParameters_["ShadowIntensity"] = PSP_SHADOWINTENSITY;
-    shaderParameters_["ShadowProjPS"] = PSP_SHADOWPROJ;
-    shaderParameters_["SpotProjPS"] = PSP_SPOTPROJ;
-    
     // Map texture units
     textureUnits_["NormalMap"] = TU_NORMAL;
     textureUnits_["DiffMap"] = TU_DIFFUSE;

@@ -241,7 +241,7 @@ bool Image::Load(Deserializer& source)
     return true;
 }
 
-void Image::SetSize(unsigned width, unsigned height, unsigned components)
+void Image::SetSize(int width, int height, unsigned components)
 {
     if (width == width_ && height == height_ && components == components_)
         return;

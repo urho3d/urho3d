@@ -479,20 +479,28 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
                 case VAR_VECTOR2:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector2());
                     break;
+
                 case VAR_VECTOR3:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector3());
                     break;
+
                 case VAR_VECTOR4:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector4());
                     break;
+
                 case VAR_QUATERNION:
                     context->SetArgObject(i, (void *)&parameters[i].GetQuaternion());
                     break;
+
                 case VAR_STRING:
                     context->SetArgObject(i, (void *)&parameters[i].GetString());
                     break;
+
                 case VAR_PTR:
                     context->SetArgObject(i, (void *)parameters[i].GetPtr());
+                    break;
+
+                default:
                     break;
                 }
             }

@@ -378,7 +378,7 @@ private:
             Node* g, * t, * p, * q;
             
             unsigned dir = 0;
-            unsigned last;
+            unsigned last = 0;
             
             t = &head;
             g = p = 0;

@@ -39,8 +39,8 @@ enum FrustumPlane
     PLANE_FAR,
 };
 
-static const int NUM_FRUSTUM_PLANES = 6;
-static const int NUM_FRUSTUM_VERTICES = 8;
+static const unsigned NUM_FRUSTUM_PLANES = 6;
+static const unsigned NUM_FRUSTUM_VERTICES = 8;
 
 /// Convex constructed of 6 planes
 class Frustum

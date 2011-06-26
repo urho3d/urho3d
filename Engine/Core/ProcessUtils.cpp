@@ -38,7 +38,9 @@
 
 #include "DebugNew.h"
 
+#ifdef _WIN32
 static bool consoleOpened = false;
+#endif
 static String currentLine;
 static Vector<String> arguments;
 static Mutex staticMutex;
@@ -105,7 +107,7 @@ const Vector<String>& ParseArguments(const char* cmdLine)
         return arguments;
     
     String cmdStr(cmdLine);
-    unsigned cmdStart, cmdEnd;
+    unsigned cmdStart = 0, cmdEnd = 0;
     bool inCmd = false;
     bool inQuote = false;
     

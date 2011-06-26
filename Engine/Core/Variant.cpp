@@ -102,6 +102,9 @@ bool Variant::operator == (const Variant& rhs) const
     
     switch (type_)
     {
+    case VAR_NONE:
+        return true;
+        
     case VAR_INT:
         return value_.int_ == rhs.value_.int_;
         
@@ -146,9 +149,10 @@ bool Variant::operator == (const Variant& rhs) const
         
     case VAR_VARIANTMAP:
         return *(reinterpret_cast<const VariantMap*>(value_.ptr_)) == *(reinterpret_cast<const VariantMap*>(rhs.value_.ptr_));
+
+    default:
+        return true;
     }
-    
-    return true;
 }
 
 void Variant::FromString(const String& type, const String& value)
@@ -288,9 +292,10 @@ String Variant::ToString() const
         // Reference string serialization requires hash-to-name mapping from the context & subsystems. Can not support here
         // Also variant map or vector string serialization is not supported. XML or binary save should be used instead
         return String();
+
+    default:
+        return String();
     }
-    
-    return String();
 }
 
 void Variant::SetType(VariantType newType)
@@ -323,6 +328,9 @@ void Variant::SetType(VariantType newType)
     case VAR_VARIANTMAP:
         delete reinterpret_cast<VariantMap*>(value_.ptr_);
         break;
+        
+    default:
+        break;
     }
     
     type_ = newType;
@@ -351,6 +359,9 @@ void Variant::SetType(VariantType newType)
         
     case VAR_VARIANTMAP:
         *reinterpret_cast<VariantMap**>(&value_.ptr_) = new VariantMap();
+        break;
+
+    default:
         break;
     }
 }

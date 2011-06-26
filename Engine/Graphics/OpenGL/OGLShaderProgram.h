@@ -31,13 +31,15 @@
 class Graphics;
 class ShaderVariation;
 
-/// GLSL uniform definition
-struct UniformInfo
+/// Shader parameter definition
+struct ShaderParameter
 {
-    /// Location
+    /// Uniform location
     int location_;
-    /// Element type of uniform
+    /// Element type
     unsigned type_;
+    /// Last parameter source
+    const void* lastSource_;
 };
 
 /// Linked shader program on the GPU
@@ -55,20 +57,20 @@ public:
     /// Link the shaders and examine the uniforms and samplers used. Return true if successful
     bool Link();
     /// Check whether needs a parameter update
-    bool NeedParameterUpdate(ShaderParameter param, const void* source, unsigned frame);
+    bool NeedParameterUpdate(StringHash param, const void* source, unsigned frame);
     /// Clear a specific remembered parameter source
-    void ClearParameterSource(ShaderParameter param);
+    void ClearParameterSource(StringHash param);
     
     /// Return the vertex shader
     ShaderVariation* GetVertexShader() const;
     /// Return the pixel shader
     ShaderVariation* GetPixelShader() const;
     /// Return whether uses a shader parameter
-    bool HasParameter(ShaderParameter param) const;
+    bool HasParameter(StringHash param) const;
     /// Return whether uses a texture unit
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
-    /// Return the uniform info for a parameter, or null if does not exist
-    const UniformInfo* GetUniformInfo(ShaderParameter param) const;
+    /// Return the info for a shader parameter, or null if does not exist
+    const ShaderParameter* GetParameter(StringHash param) const;
     /// Return the vertex attribute bindings
     const int* GetAttributeLocations() const { return attributeLocations_; }
     /// Return whether successfully linked
@@ -81,10 +83,8 @@ private:
     WeakPtr<ShaderVariation> vertexShader_;
     /// Pixel shader
     WeakPtr<ShaderVariation> pixelShader_;
-    /// Uniform info map
-    HashMap<ShaderParameter, UniformInfo> uniformInfos_;
-    /// Shader parameter last source map
-    HashMap<ShaderParameter, const void*> lastParameterSources_;
+    /// Shader parameters
+    HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Shader parameters global frame number
     unsigned lastParameterFrame_;
     /// Texture unit use
