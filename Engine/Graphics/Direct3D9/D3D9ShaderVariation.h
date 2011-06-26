@@ -25,6 +25,7 @@
 
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
+#include "HashSet.h"
 #include "RefCounted.h"
 #include "SharedArrayPtr.h"
 
@@ -49,7 +50,7 @@ public:
     /// Set bytecode
     void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
     /// Set to use a parameter
-    void SetUseParameter(ShaderParameter param, bool enable);
+    void SetUseParameter(StringHash param, bool enable);
     /// Set to use a texture unit
     void SetUseTextureUnit(TextureUnit unit, bool enable);
     /// Clear parameter and texture unit use flags
@@ -66,7 +67,7 @@ public:
     /// Return whether requires Shader Model 3
     bool IsSM3() const { return isSM3_; }
     /// Return whether uses a specific shader parameter
-    bool HasParameter(ShaderParameter parameter) const { return useParameter_[parameter]; }
+    bool HasParameter(StringHash param) const { return useParameter_.Contains(param); }
     /// Return whether uses a texture unit (only for pixel shaders)
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
     
@@ -82,7 +83,7 @@ private:
     /// Compile failed flag
     bool failed_;
     /// Parameter use flags
-    bool useParameter_[MAX_SHADER_PARAMETERS];
+    HashSet<StringHash> useParameter_;
     /// Texture unit use flags
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
 };

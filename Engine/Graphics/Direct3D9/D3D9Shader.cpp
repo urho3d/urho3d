@@ -32,8 +32,8 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 
-/// Shader parameter structure for loading
-struct Parameter
+/// Shader constant (uniform or sampler) structure for loading
+struct Constant
 {
     /// Parameter name
     String name_;
@@ -81,29 +81,25 @@ bool Shader::Load(Deserializer& source)
     shaderType_ = (ShaderType)source.ReadShort();
     isSM3_ = (source.ReadShort() == 3);
     
-    Vector<Parameter> parameters;
-    Vector<Parameter> textureUnits;
+    Vector<Constant> parameters;
+    Vector<Constant> textureUnits;
     
     // Read the parameters and texture units used by this shader; use information is specified in terms of them
     unsigned numParameters = source.ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
     {
-        Parameter newParameter;
+        Constant newParameter;
         newParameter.name_ = source.ReadString();
         newParameter.register_ = source.ReadUByte();
         parameters.Push(newParameter);
         
-        ShaderParameter paramIndex = graphics->GetShaderParameter(newParameter.name_);
-        if (paramIndex != MAX_SHADER_PARAMETERS)
-            graphics->SetShaderRegister(paramIndex, newParameter.register_);
-        else
-            LOGWARNING("Unknown shader parameter " + newParameter.name_);
+        graphics->DefineShaderParameter(StringHash(newParameter.name_), shaderType_, newParameter.register_);
     }
     
     unsigned numTextureUnits = source.ReadUInt();
     for (unsigned i = 0; i < numTextureUnits; ++i)
     {
-        Parameter newTextureUnit;
+        Constant newTextureUnit;
         newTextureUnit.name_ = source.ReadString();
         newTextureUnit.register_ = source.ReadUByte();
         textureUnits.Push(newTextureUnit);
@@ -129,11 +125,7 @@ bool Shader::Load(Deserializer& source)
         for (unsigned j = 0; j < numParameters; ++j)
         {
             if (source.ReadBool())
-            {
-                ShaderParameter paramIndex = graphics->GetShaderParameter(parameters[j].name_);
-                if (paramIndex != MAX_SHADER_PARAMETERS)
-                    variation->SetUseParameter(paramIndex, true);
-            }
+                variation->SetUseParameter(StringHash(parameters[j].name_), true);
         }
         
         for (unsigned j = 0; j < numTextureUnits; ++j)

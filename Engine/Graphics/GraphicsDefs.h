@@ -24,6 +24,7 @@
 #pragma once
 
 #include "HashBase.h"
+#include "StringHash.h"
 
 /// Rendering mode
 enum RenderMode
@@ -199,50 +200,39 @@ enum ShaderType
     PS,
 };
 
-/// Shader parameters
-enum ShaderParameter
-{
-    VSP_CAMERAPOS,
-    VSP_CAMERAROT,
-    VSP_DEPTHMODE,
-    VSP_ELAPSEDTIME,
-    VSP_FRUSTUMSIZE,
-    VSP_GBUFFEROFFSETS,
-    VSP_MODEL,
-    VSP_SHADOWPROJ,
-    VSP_SPOTPROJ,
-    VSP_VIEWPROJ,
-    VSP_UOFFSET,
-    VSP_VOFFSET,
-    VSP_VIEWRIGHTVECTOR,
-    VSP_VIEWUPVECTOR,
-    VSP_SKINMATRICES,
-    PSP_AMBIENTCOLOR,
-    PSP_DEPTHRECONSTRUCT,
-    PSP_EDGEFILTERPARAMS,
-    PSP_ELAPSEDTIME,
-    PSP_FOGCOLOR,
-    PSP_FOGPARAMS,
-    PSP_LIGHTATTEN,
-    PSP_LIGHTCOLOR,
-    PSP_LIGHTDIR,
-    PSP_LIGHTPOS,
-    PSP_LIGHTSPLITS,
-    PSP_LIGHTVECROT,
-    PSP_MATDIFFCOLOR,
-    PSP_MATEMISSIVECOLOR,
-    PSP_MATSPECPROPERTIES,
-    PSP_SAMPLEOFFSETS,
-    PSP_SHADOWINTENSITY,
-    PSP_SHADOWPROJ,
-    PSP_SPOTPROJ,
-    MAX_SHADER_PARAMETERS
-};
-
-template<> inline unsigned MakeHash(const ShaderParameter& param)
-{
-    return (unsigned)param;
-}
+static const StringHash VSP_CAMERAPOS("CameraPos");
+static const StringHash VSP_CAMERAROT("CameraRot");
+static const StringHash VSP_DEPTHMODE("DepthMode");
+static const StringHash VSP_ELAPSEDTIME("ElapsedTime");
+static const StringHash VSP_FRUSTUMSIZE("FrustumSize");
+static const StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
+static const StringHash VSP_MODEL("Model");
+static const StringHash VSP_SHADOWPROJ("ShadowProj");
+static const StringHash VSP_SPOTPROJ("SpotProj");
+static const StringHash VSP_VIEWPROJ("ViewProj");
+static const StringHash VSP_UOFFSET("UOffset");
+static const StringHash VSP_VOFFSET("VOffset");
+static const StringHash VSP_VIEWRIGHTVECTOR("ViewRightVector");
+static const StringHash VSP_VIEWUPVECTOR("ViewUpVector");
+static const StringHash VSP_SKINMATRICES("SkinMatrices");
+static const StringHash PSP_AMBIENTCOLOR("AmbientColor");
+static const StringHash PSP_EDGEFILTERPARAMS("EdgeFilterParams");
+static const StringHash PSP_ELAPSEDTIME("ElapsedTimePS");
+static const StringHash PSP_FOGCOLOR("FogColor");
+static const StringHash PSP_FOGPARAMS("FogParams");
+static const StringHash PSP_LIGHTATTEN("LightAtten");
+static const StringHash PSP_LIGHTCOLOR("LightColor");
+static const StringHash PSP_LIGHTDIR("LightDir");
+static const StringHash PSP_LIGHTPOS("LightPos");
+static const StringHash PSP_LIGHTSPLITS("LightSplits");
+static const StringHash PSP_LIGHTVECROT("LightVecRot");
+static const StringHash PSP_MATDIFFCOLOR("MatDiffColor");
+static const StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
+static const StringHash PSP_MATSPECPROPERTIES("MatSpecProperties");
+static const StringHash PSP_SAMPLEOFFSETS("SampleOffsets");
+static const StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
+static const StringHash PSP_SHADOWPROJ("ShadowProjPS");
+static const StringHash PSP_SPOTPROJ("SpotProjPS");
 
 /// Texture units
 enum TextureUnit

@@ -57,9 +57,9 @@ struct Batch
     /// Calculate sort key, which consists of priority flag, light, pass and geometry
     void CalculateSortKey();
     /// Prepare for rendering
-    void Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool setModelTransform = true) const;
+    void Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform = true) const;
     /// Prepare and draw
-    void Draw(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters) const;
     
     /// Geometry
     Geometry* geometry_;
@@ -133,7 +133,7 @@ struct BatchGroup
     /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     /// Prepare and draw
-    void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<ShaderParameter, Vector4>& shaderParameters) const;
+    void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<StringHash, Vector4>& shaderParameters) const;
     
     /// Geometry
     Geometry* geometry_;

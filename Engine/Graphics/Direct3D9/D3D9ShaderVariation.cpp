@@ -113,9 +113,12 @@ void ShaderVariation::SetByteCode(const SharedArrayPtr<unsigned char>& byteCode)
         Create();
 }
 
-void ShaderVariation::SetUseParameter(ShaderParameter param, bool enable)
+void ShaderVariation::SetUseParameter(StringHash param, bool enable)
 {
-    useParameter_[param] = enable;
+    if (enable)
+        useParameter_.Insert(param);
+    else
+        useParameter_.Erase(param);
 }
 
 void ShaderVariation::SetUseTextureUnit(TextureUnit unit, bool enable)
@@ -125,8 +128,7 @@ void ShaderVariation::SetUseTextureUnit(TextureUnit unit, bool enable)
 
 void ShaderVariation::ClearParameters()
 {
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETERS; ++i)
-        useParameter_[i] = false;
+    useParameter_.Clear();
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
 }

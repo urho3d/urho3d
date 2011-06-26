@@ -89,11 +89,11 @@ Material::Material(Context* context) :
     textures_.Resize(MAX_MATERIAL_TEXTURE_UNITS);
     
     // Setup often used default parameters
-    shaderParameters_[VSP_UOFFSET] = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-    shaderParameters_[VSP_VOFFSET] = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
-    shaderParameters_[PSP_MATDIFFCOLOR] = Vector4::UNITY;
-    shaderParameters_[PSP_MATEMISSIVECOLOR] = Vector4::ZERO;
-    shaderParameters_[PSP_MATSPECPROPERTIES] = Vector4::ZERO;
+    SetShaderParameter("UOffset", Vector4(1.0f, 0.0f, 0.0f, 0.0f));
+    SetShaderParameter("VOffset", Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+    SetShaderParameter("MatDiffColor", Vector4::UNITY);
+    SetShaderParameter("MatEmissiveColor", Vector4::ZERO);
+    SetShaderParameter("MatSpecProperties", Vector4::ZERO);
 }
 
 Material::~Material()
@@ -174,12 +174,7 @@ bool Material::Load(Deserializer& source)
     {
         String name = parameterElem.GetString("name");
         Vector4 value = parameterElem.GetVector("value");
-        ShaderParameter param = graphics->GetShaderParameter(name);
-        // Check whether a VS or PS parameter
-        if (param < MAX_SHADER_PARAMETERS)
-            SetShaderParameter(param, value);
-        else
-            LOGERROR("Unknown shader parameter " + name);
+        SetShaderParameter(name, value);
         
         parameterElem = parameterElem.GetNextElement("parameter");
     }
@@ -197,7 +192,7 @@ bool Material::Load(Deserializer& source)
     memoryUse += sizeof(Material);
     memoryUse += techniques_.Size() * sizeof(TechniqueEntry);
     memoryUse += textures_.Size() * sizeof(SharedPtr<Texture>);
-    memoryUse += shaderParameters_.Size() * (sizeof(ShaderParameter) + sizeof(Vector4));
+    memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
     
     SetMemoryUse(memoryUse);
     Update();
@@ -239,11 +234,11 @@ bool Material::Save(Serializer& dest)
     }
     
     // Write shader parameters
-    for (HashMap<ShaderParameter, Vector4>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
+    for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
         XMLElement parameterElem = materialElem.CreateChildElement("parameter");
-        parameterElem.SetString("name", graphics->GetShaderParameterName(j->first_));
-        parameterElem.SetVector4("value", j->second_);
+        parameterElem.SetString("name", j->second_.name_);
+        parameterElem.SetVector4("value", j->second_.value_);
     }
     
     return xml->Save(dest);
@@ -266,9 +261,12 @@ void Material::SetTechnique(unsigned index, Technique* technique, unsigned quali
     Update();
 }
 
-void Material::SetShaderParameter(ShaderParameter param, const Vector4& value)
+void Material::SetShaderParameter(const String& name, const Vector4& value)
 {
-    shaderParameters_[param] = value;
+    MaterialShaderParameter newParam;
+    newParam.name_ = name;
+    newParam.value_ = value;
+    shaderParameters_[StringHash(name)] = newParam;
 }
 
 void Material::SetTexture(TextureUnit unit, Texture* texture)
@@ -304,14 +302,8 @@ void Material::SetUVTransform(const Vector2& offset, float rotation, const Vecto
     
     transform = offsetMatrix * transform;
     
-    Vector4& uOffset = shaderParameters_[VSP_UOFFSET];
-    Vector4& vOffset = shaderParameters_[VSP_VOFFSET];
-    uOffset.x_ = transform.m00_;
-    uOffset.y_ = transform.m01_;
-    uOffset.w_ = transform.m03_;
-    vOffset.x_ = transform.m10_;
-    vOffset.y_ = transform.m11_;
-    vOffset.w_ = transform.m13_;
+    SetShaderParameter("UOffset", Vector4(transform.m00_, transform.m01_, transform.m02_, transform.m03_));
+    SetShaderParameter("VOffset", Vector4(transform.m10_, transform.m11_, transform.m12_, transform.m13_));
 }
 
 void Material::SetUVTransform(const Vector2& offset, float rotation, float repeat)
@@ -329,9 +321,9 @@ void Material::SetShadowCullMode(CullMode mode)
     shadowCullMode_ = mode;
 }
 
-void Material::RemoveShaderParameter(ShaderParameter param)
+void Material::RemoveShaderParameter(const String& name)
 {
-    shaderParameters_.Erase(param);
+    shaderParameters_.Erase(StringHash(name));
 }
 
 void Material::ReleaseShaders()

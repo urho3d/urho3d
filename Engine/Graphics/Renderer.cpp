@@ -1466,7 +1466,7 @@ void Renderer::SetupLightBatch(Batch& batch)
     }
 }
 
-void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<ShaderParameter, Vector4>& shaderParameters)
+void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters)
 {
     Light quadDirLight(context_);
     Matrix3x4 model(quadDirLight.GetDirLightTransform(camera, nearQuad));
@@ -1479,7 +1479,7 @@ void Renderer::DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVar
     graphics_->ClearTransformSources();
     
     // Set global shader parameters as needed
-    for (HashMap<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
+    for (HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
     {
         if (graphics_->NeedParameterUpdate(i->first_, &shaderParameters))
             graphics_->SetShaderParameter(i->first_, i->second_);

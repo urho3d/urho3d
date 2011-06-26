@@ -239,14 +239,14 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurface(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
 }
 
-static Vector4 MaterialGetShaderParameter(ShaderParameter parameter, Material* ptr)
+static Vector4 MaterialGetShaderParameter(const String& name, Material* ptr)
 {
-    const HashMap<ShaderParameter, Vector4>& parameters = ptr->GetShaderParameters();
-    HashMap<ShaderParameter, Vector4>::ConstIterator i = parameters.Find(parameter);
+    const HashMap<StringHash, MaterialShaderParameter>& parameters = ptr->GetShaderParameters();
+    HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Find(StringHash(name));
     if (i == parameters.End())
         return Vector4::ZERO;
     else
-        return i->second_;
+        return i->second_.value_;
 }
 
 static Material* MaterialClone(const String& cloneName, Material* ptr)
@@ -260,13 +260,6 @@ static Material* MaterialClone(const String& cloneName, Material* ptr)
 
 static void RegisterMaterial(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("ShaderParameter");
-    engine->RegisterEnumValue("ShaderParameter", "VSP_UOFFSET", VSP_UOFFSET);
-    engine->RegisterEnumValue("ShaderParameter", "VSP_VOFFSET", VSP_VOFFSET);
-    engine->RegisterEnumValue("ShaderParameter", "PSP_MATDIFFCOLOR", PSP_MATDIFFCOLOR);
-    engine->RegisterEnumValue("ShaderParameter", "PSP_MATEMISSIVECOLOR", PSP_MATEMISSIVECOLOR);
-    engine->RegisterEnumValue("ShaderParameter", "PSP_MATSPECPROPERTIES", PSP_MATSPECPROPERTIES);
-    
     engine->RegisterEnum("TextureUnit");
     engine->RegisterEnumValue("TextureUnit", "TU_DIFFUSE", TU_DIFFUSE);
     engine->RegisterEnumValue("TextureUnit", "TU_NORMAL", TU_NORMAL);
@@ -336,13 +329,13 @@ static void RegisterMaterial(asIScriptEngine* engine)
     RegisterResource<Material>(engine, "Material");
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, const Vector2&in)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void SetUVTransform(const Vector2&in, float, float)", asMETHODPR(Material, SetUVTransform, (const Vector2&, float, float), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(ShaderParameter)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void RemoveShaderParameter(const String&in)", asMETHOD(Material, RemoveShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Material@ Clone(const String&in) const", asFUNCTION(MaterialClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_numTechniques(uint)", asMETHOD(Material, SetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint get_numTechniques() const", asMETHOD(Material, GetNumTechniques), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "void set_shaderParameter(ShaderParameter, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Vector4 get_shaderParameter(ShaderParameter) const", asFUNCTION(MaterialGetShaderParameter), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Material", "void set_shaderParameter(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Vector4 get_shaderParameter(const String&in) const", asFUNCTION(MaterialGetShaderParameter), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_texture(TextureUnit, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_texture(TextureUnit) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);

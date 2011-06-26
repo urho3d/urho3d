@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Color.h"
+#include "HashMap.h"
 #include "Object.h"
 #include "Rect.h"
 #include "GraphicsDefs.h"
@@ -46,6 +47,17 @@ class VertexBuffer;
 class VertexDeclaration;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
+
+/// Shader parameter information
+struct ShaderParameterInfo
+{
+    /// Shader type
+    ShaderType type_;
+    /// Hardware register
+    unsigned register_;
+    /// Last source
+    const void* lastSource_;
+};
 
 /// Graphics subsystem. Manages the Direct3D9 device, application window, rendering state and GPU resources
 class Graphics : public Object
@@ -98,29 +110,29 @@ public:
     /// Set shaders
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
     /// Set shader bool constants
-    void SetShaderParameter(ShaderParameter param, const bool* data, unsigned count);
+    void SetShaderParameter(StringHash param, const bool* data, unsigned count);
     /// Set shader float constants
-    void SetShaderParameter(ShaderParameter param, const float* data, unsigned count);
+    void SetShaderParameter(StringHash param, const float* data, unsigned count);
     /// Set shader int constants
-    void SetShaderParameter(ShaderParameter param, const int* data, unsigned count);
+    void SetShaderParameter(StringHash param, const int* data, unsigned count);
     /// Set shader float constant
-    void SetShaderParameter(ShaderParameter param, float value);
+    void SetShaderParameter(StringHash param, float value);
     /// Set shader color constant
-    void SetShaderParameter(ShaderParameter param, const Color& color);
+    void SetShaderParameter(StringHash param, const Color& color);
     /// Set shader 3x3 matrix constant
-    void SetShaderParameter(ShaderParameter param, const Matrix3& matrix);
+    void SetShaderParameter(StringHash param, const Matrix3& matrix);
     /// Set shader 3D vector constant
-    void SetShaderParameter(ShaderParameter param, const Vector3& vector);
+    void SetShaderParameter(StringHash param, const Vector3& vector);
     /// Set shader 4x4 matrix constant
-    void SetShaderParameter(ShaderParameter param, const Matrix4& matrix);
+    void SetShaderParameter(StringHash param, const Matrix4& matrix);
     /// Set shader 4D vector constant
-    void SetShaderParameter(ShaderParameter param, const Vector4& vector);
+    void SetShaderParameter(StringHash param, const Vector4& vector);
     /// Set shader 4x3 matrix constant
-    void SetShaderParameter(ShaderParameter param, const Matrix3x4& matrix);
-    /// Map shader parameter to a constant register. Called by Shader
-    void SetShaderRegister(ShaderParameter param, unsigned index) { shaderRegisters_[param] = index; }
+    void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
+    /// Define a shader parameter. Called by Shader
+    void DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg);
     /// Check whether a shader parameter in the currently set shaders needs update
-    bool NeedParameterUpdate(ShaderParameter param, const void* source);
+    bool NeedParameterUpdate(StringHash param, const void* source);
     /// Check whether the current pixel shader uses a texture unit
     bool NeedTextureUnit(TextureUnit unit);
     /// Clear remembered shader parameter sources
@@ -256,14 +268,8 @@ public:
     ShaderVariation* GetVertexShader() const { return vertexShader_; }
     /// Return pixel shader
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
-    /// Return shader parameter index by name
-    ShaderParameter GetShaderParameter(const String& name);
     /// Return texture unit index by name
     TextureUnit GetTextureUnit(const String& name);
-    /// Return shader parameter name by index
-    const String& GetShaderParameterName(ShaderParameter parameter);
-    /// Return texture unit name by index
-    const String& GetTextureUnitName(TextureUnit unit);
     /// Return texture by texture unit index
     Texture* GetTexture(unsigned index) const;
     /// Return the "view texture"
@@ -370,8 +376,8 @@ private:
     void OnDeviceReset();
     /// Reset cached rendering state
     void ResetCachedState();
-    /// Initialize shader parameter and texture unit mappings
-    void InitializeShaderParameters();
+    /// Initialize texture unit mappings
+    void SetTextureUnitMappings();
     /// Handle operating system window message
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
     
@@ -467,18 +473,14 @@ private:
     ShaderVariation* vertexShader_;
     /// Pixel shader in use
     ShaderVariation* pixelShader_;
-    /// Shader parameter mappings
-    Map<String, ShaderParameter> shaderParameters_;
-    /// Shader constant register mappings
-    unsigned shaderRegisters_[MAX_SHADER_PARAMETERS];
-    /// Last shader parameter sources per parameter
-    const void* lastShaderParameterSources_[MAX_SHADER_PARAMETERS];
+    /// Shader parameters
+    HashMap<StringHash, ShaderParameterInfo> shaderParameters_;
     /// Textures in use
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// "View texture" to prevent sampling the destination render target
     Texture* viewTexture_;
     /// Texture unit mappings
-    Map<String, TextureUnit> textureUnits_;
+    HashMap<String, TextureUnit> textureUnits_;
     /// Render targets in use
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth stencil buffer in use

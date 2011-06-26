@@ -34,6 +34,15 @@ class Texture;
 class Texture2D;
 class TextureCube;
 
+/// Material's shader parameter definition
+struct MaterialShaderParameter
+{
+    /// Name
+    String name_;
+    /// Value
+    Vector4 value_;
+};
+
 /// Material's technique list entry
 struct TechniqueEntry
 {
@@ -75,7 +84,7 @@ public:
     /// Set technique
     void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
     /// Set shader parameter
-    void SetShaderParameter(ShaderParameter param, const Vector4& value);
+    void SetShaderParameter(const String& name, const Vector4& value);
     /// Set texture
     void SetTexture(TextureUnit unit, Texture* texture);
     /// Set texture coordinate transform
@@ -87,7 +96,7 @@ public:
     /// Set culling mode for shadows
     void SetShadowCullMode(CullMode mode);
     /// Remove a shader parameter
-    void RemoveShaderParameter(ShaderParameter param);
+    void RemoveShaderParameter(const String& name);
     /// Reset all shader pointers
     void ReleaseShaders();
     /// Clone material
@@ -110,7 +119,7 @@ public:
     /// Return texture by unit
     Texture* GetTexture(TextureUnit unit) const;
     /// Return all shader parameters
-    const HashMap<ShaderParameter, Vector4>& GetShaderParameters() const { return shaderParameters_; }
+    const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
     /// Return normal culling mode
     CullMode GetCullMode() const { return cullMode_; }
     /// Return culling mode for shadows
@@ -132,7 +141,7 @@ private:
     /// Textures
     Vector<SharedPtr<Texture> > textures_;
     /// Shader parameters
-    HashMap<ShaderParameter, Vector4> shaderParameters_;
+    HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// Normal culling mode
     CullMode cullMode_;
     /// Culling mode for shadow rendering

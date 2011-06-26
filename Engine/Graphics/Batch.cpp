@@ -71,7 +71,7 @@ void Batch::CalculateSortKey()
         (((unsigned long long)material) << 16) | geometry;
 }
 
-void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters, bool setModelTransform) const
+void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform) const
 {
     if (!vertexShader_ || !pixelShader_)
         return;
@@ -94,7 +94,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     graphics->SetShaders(vertexShader_, pixelShader_);
     
     // Set global shader parameters
-    for (HashMap<ShaderParameter, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
+    for (HashMap<StringHash, Vector4>::ConstIterator i = shaderParameters.Begin(); i != shaderParameters.End(); ++i)
     {
         if (graphics->NeedParameterUpdate(i->first_, &shaderParameters))
             graphics->SetShaderParameter(i->first_, i->second_);
@@ -328,11 +328,11 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     // Set material-specific shader parameters and textures
     if (material_)
     {
-        const HashMap<ShaderParameter, Vector4>& parameters = material_->GetShaderParameters();
-        for (HashMap<ShaderParameter, Vector4>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        const HashMap<StringHash, MaterialShaderParameter>& parameters = material_->GetShaderParameters();
+        for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
         {
             if (graphics->NeedParameterUpdate(i->first_, material_))
-                graphics->SetShaderParameter(i->first_, i->second_);
+                graphics->SetShaderParameter(i->first_, i->second_.value_);
         }
         
         const Vector<SharedPtr<Texture> >& textures = material_->GetTextures();
@@ -365,7 +365,7 @@ void Batch::Prepare(Graphics* graphics, const HashMap<ShaderParameter, Vector4>&
     }
 }
 
-void Batch::Draw(Graphics* graphics, const HashMap<ShaderParameter, Vector4>& shaderParameters) const
+void Batch::Draw(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters) const
 {
     Prepare(graphics, shaderParameters);
     geometry_->Draw(graphics);
@@ -387,7 +387,7 @@ void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
     freeIndex += instances_.Size();
 }
 
-void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<ShaderParameter, Vector4>& shaderParameters) const
+void BatchGroup::Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<StringHash, Vector4>& shaderParameters) const
 {
     if (!instances_.Size())
         return;
