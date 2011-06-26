@@ -35,12 +35,11 @@
 #include <Windows.h>
 #else
 #include <GL/glfw.h>
-
-static Input* inputInstance = 0;
 #endif
 
 #include "DebugNew.h"
 
+#ifndef USE_OPENGL
 /// Convert the virtual key code & scan code if necessary. Return non-zero if key should be posted
 int ConvertKeyCode(unsigned wParam, unsigned lParam)
 {
@@ -86,6 +85,9 @@ int ConvertKeyCode(unsigned wParam, unsigned lParam)
         return wParam;
     }
 }
+#else
+static Input* inputInstance = 0;
+#endif
 
 OBJECTTYPESTATIC(Input);
 
