@@ -103,9 +103,7 @@ Input::Input(Context* context) :
 {
     // Zero the initial state
     mouseButtonDown_ = 0;
-    mouseButtonPress_ = 0;
-    lastCursorPosition_ = IntVector2::ZERO;
-    lastWheelPosition_ = 0;
+    ResetState();
     
     #ifndef USE_OPENGL
     SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
@@ -132,7 +130,7 @@ void Input::Update()
     if (!graphics_)
         return;
     
-    // Reset current state
+    // Reset input accumulation for this frame
     keyPress_.Clear();
     mouseButtonPress_ = 0;
     mouseMove_ = IntVector2::ZERO;
@@ -418,7 +416,10 @@ void Input::SetKey(int key, bool newState)
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
 
     if (key == KEY_RETURN && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
+    {
         graphics_->ToggleFullscreen();
+        ResetState();
+    }
 }
 
 void Input::SetMouseWheel(int delta)
