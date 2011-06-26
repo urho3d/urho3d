@@ -151,55 +151,6 @@ public:
         return INSIDE;
     }
     
-    /// Test if a bounding box is inside, outside or intersects. Use (and update) a plane bitmask to speed up testing a box hierarchy
-    Intersection IsInsideMasked(const BoundingBox& box, unsigned& mask) const
-    {
-        Vector3 center = box.Center();
-        Vector3 edge = center - box.min_;
-        bool allInside = true;
-        
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
-        {
-            unsigned bit = 1 << i;
-            if (!(mask & bit))
-            {
-                float dist = planes_[i].Distance(center);
-                float absDist = planes_[i].AbsDistanceFast(edge);
-                
-                if (dist < -absDist)
-                    return OUTSIDE;
-                if (dist < absDist)
-                    allInside = false;
-                else
-                    mask |= bit;
-            }
-        }
-        
-        return allInside ? INSIDE : INTERSECTS;
-    }
-    
-    /// Test if a bounding box is (partially) inside or outside. Use a bitmask to skip unnecessary planes
-    Intersection IsInsideFastMasked(const BoundingBox& box, unsigned mask) const
-    {
-        Vector3 center = box.Center();
-        Vector3 edge = center - box.min_;
-        
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
-        {
-            unsigned bit = 1 << i;
-            if (!(mask & bit))
-            {
-                float dist = planes_[i].Distance(center);
-                float absDist = planes_[i].AbsDistanceFast(edge);
-                
-                if (dist < -absDist)
-                    return OUTSIDE;
-            }
-        }
-        
-        return INSIDE;
-    }
-    
     /// Return transformed by a 3x3 matrix
     Frustum Transformed(const Matrix3& transform) const;
     /// Return transformed by a 4x3 matrix

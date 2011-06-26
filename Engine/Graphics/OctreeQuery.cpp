@@ -26,74 +26,82 @@
 #include "OctreeQuery.h"
 #include "DebugNew.h"
 
-Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, unsigned& mask) const
+Intersection PointOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    return box.IsInside(point_);
-}
-
-Intersection PointOctreeQuery::TestDrawable(const BoundingBox& box, unsigned& mask) const
-{
-    return box.IsInside(point_);
-}
-
-Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, unsigned& mask) const
-{
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return box.IsInside(point_);
+    else
         return INSIDE;
-    
-    return sphere_.IsInside(box);
 }
 
-Intersection SphereOctreeQuery::TestDrawable(const BoundingBox& box, unsigned& mask) const
+Intersection PointOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
 {
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return box.IsInside(point_);
+    else
         return INSIDE;
-    
-    return sphere_.IsInsideFast(box);
 }
 
-Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, unsigned& mask) const
+Intersection SphereOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return sphere_.IsInside(box);
+    else
         return INSIDE;
-    
-    return box_.IsInside(box);
 }
 
-Intersection BoxOctreeQuery::TestDrawable(const BoundingBox& box, unsigned& mask) const
+Intersection SphereOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
 {
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return sphere_.IsInsideFast(box);
+    else
         return INSIDE;
-    
-    return box_.IsInsideFast(box);
 }
 
-Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, unsigned& mask) const
+Intersection BoxOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return box_.IsInside(box);
+    else
         return INSIDE;
-    
-    return frustum_.IsInsideMasked(box, mask);
 }
 
-Intersection FrustumOctreeQuery::TestDrawable(const BoundingBox& box, unsigned& mask) const
+Intersection BoxOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
 {
-    if (mask == M_MAX_UNSIGNED)
+    if (!inside)
+        return box_.IsInsideFast(box);
+    else
         return INSIDE;
-    
-    return frustum_.IsInsideFastMasked(box, mask);
 }
 
-Intersection OccludedFrustumOctreeQuery::TestOctant(const BoundingBox& box, unsigned& mask) const
+Intersection FrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
+{
+    if (!inside)
+        return frustum_.IsInside(box);
+    else
+        return INSIDE;
+}
+
+Intersection FrustumOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
+{
+    if (!inside)
+        return frustum_.IsInsideFast(box);
+    else
+        return INSIDE;
+}
+
+Intersection OccludedFrustumOctreeQuery::TestOctant(const BoundingBox& box, bool inside) const
 {
     // First check the frustum
-    Intersection frustumRes = INSIDE;
-    if (mask != M_MAX_UNSIGNED)
+    Intersection frustumRes;
+    if (!inside)
     {
-        frustumRes = frustum_.IsInsideMasked(box, mask);
+        frustumRes = frustum_.IsInside(box);
         if (frustumRes == OUTSIDE)
             return OUTSIDE;
     }
+    else
+        frustumRes = INSIDE;
     
     // Then check occlusion
     if (buffer_->IsVisible(box))
@@ -102,14 +110,11 @@ Intersection OccludedFrustumOctreeQuery::TestOctant(const BoundingBox& box, unsi
         return OUTSIDE;
 }
 
-Intersection OccludedFrustumOctreeQuery::TestDrawable(const BoundingBox& box, unsigned& mask) const
+Intersection OccludedFrustumOctreeQuery::TestDrawable(const BoundingBox& box, bool inside) const
 {
     // First check the frustum
-    if (mask != M_MAX_UNSIGNED)
-    {
-        if (frustum_.IsInsideFastMasked(box, mask) == OUTSIDE)
-            return OUTSIDE;
-    }
+    if (!inside && frustum_.IsInsideFast(box) == OUTSIDE)
+        return OUTSIDE;
     
     // Then check occlusion
     if (buffer_->IsVisible(box))

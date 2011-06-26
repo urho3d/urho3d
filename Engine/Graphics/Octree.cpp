@@ -168,22 +168,17 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
+void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 {
     if (!numDrawables_)
         return;
     
-    if (mask != M_MAX_UNSIGNED)
-    {
-        Intersection res = query.TestOctant(cullingBox_, mask);
-        
-        if (res == OUTSIDE && this != root_)
-            // Fully outside, so cull this octant, its children & drawables
-            return;
-        if (res == INSIDE) 
-            // Fully inside, no culling checks necessary for children & drawables
-            mask = M_MAX_UNSIGNED;
-    }
+    Intersection res = query.TestOctant(cullingBox_, inside);
+    if (res == OUTSIDE && this != root_)
+        // Fully outside, so cull this octant, its children & drawables
+        return;
+    if (res == INSIDE)
+        inside = true;
     
     for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
@@ -197,14 +192,14 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, unsigned mask) const
         if (query.shadowCastersOnly_ && !drawable->GetCastShadows())
             continue;
         
-        if (query.TestDrawable(drawable->GetWorldBoundingBox(), mask) != OUTSIDE)
+        if (query.TestDrawable(drawable->GetWorldBoundingBox(), inside) != OUTSIDE)
             query.result_.Push(drawable);
     }
     
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
         if (children_[i])
-            children_[i]->GetDrawablesInternal(query, mask);
+            children_[i]->GetDrawablesInternal(query, inside);
     }
 }
 
@@ -378,7 +373,7 @@ void Octree::GetDrawables(OctreeQuery& query) const
     PROFILE(OctreeQuery);
     
     query.result_.Clear();
-    GetDrawablesInternal(query, 0);
+    GetDrawablesInternal(query, false);
 }
 
 void Octree::GetDrawables(RayOctreeQuery& query) const

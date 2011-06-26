@@ -51,9 +51,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const = 0;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const = 0;
     /// Intersection test for a drawable
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const = 0;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const = 0;
     
     /// Result vector reference
     PODVector<Drawable*>& result_;
@@ -78,9 +78,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
     /// Point
     Vector3 point_;
@@ -99,9 +99,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
     /// Sphere
     Sphere sphere_;
@@ -120,9 +120,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
     /// Bounding box
     BoundingBox box_;
@@ -141,9 +141,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     
     /// Frustum
     Frustum frustum_;
@@ -163,9 +163,9 @@ public:
     }
     
     /// Intersection test for an octant
-    virtual Intersection TestOctant(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     /// Intersection test for a drawable
-    virtual Intersection TestDrawable(const BoundingBox& box, unsigned& mask) const;
+    virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
     /// Frustum
     Frustum frustum_;

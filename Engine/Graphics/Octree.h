@@ -97,7 +97,7 @@ public:
     
 protected:
     /// Return drawable objects by a query, called internally
-    void GetDrawablesInternal(OctreeQuery& query, unsigned mask) const;
+    void GetDrawablesInternal(OctreeQuery& query, bool inside) const;
     /// Return drawable objects by a ray query, called internally
     void GetDrawablesInternal(RayOctreeQuery& query) const;
     /// Free child octants. If drawable objects still exist, move them to root
