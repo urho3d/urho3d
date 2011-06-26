@@ -391,7 +391,6 @@ void Input::SetKey(int key, bool newState)
     
     if (newState)
     {
-        LOGINFO("Keydown: " + String(key));
         if (!keyDown_.Contains(key))
         {
             keyDown_.Insert(key);
