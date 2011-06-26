@@ -529,8 +529,19 @@ int  _glfwPlatformOpenWindow( int width, int height,
 
     if( wndconfig->mode == GLFW_FULLSCREEN )
     {
+        // Urho3D: fade to black during switch
+        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
+        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);
+
         CGCaptureAllDisplays();
         CGDisplaySwitchToMode( CGMainDisplayID(), fullscreenMode );
+
+        if (fade != kCGDisplayFadeReservationInvalidToken)
+        {
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
+            CGReleaseDisplayFadeReservation(fade);
+        }
     }
 
     unsigned int attribute_count = 0;
@@ -636,10 +647,21 @@ void _glfwPlatformCloseWindow( void )
 
     if( _glfwWin.fullscreen )
     {
+        // Urho3D: fade to black during switch
+        CGDisplayFadeReservationToken fade = kCGDisplayFadeReservationInvalidToken;
+        if (CGAcquireDisplayFadeReservation(3.0, &fade) == kCGErrorSuccess)
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0.0, 0.0, 0.0, TRUE);  
+    
         [[_glfwWin.window contentView] exitFullScreenModeWithOptions:nil];
         CGDisplaySwitchToMode( CGMainDisplayID(),
                                (CFDictionaryRef)_glfwLibrary.DesktopMode );
         CGReleaseAllDisplays();
+
+        if (fade != kCGDisplayFadeReservationInvalidToken)
+        {
+            CGDisplayFade(fade, 0.3, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0.0, 0.0, 0.0, FALSE);
+            CGReleaseDisplayFadeReservation(fade);
+        }
     }
 
     [_glfwWin.pixelFormat release];
