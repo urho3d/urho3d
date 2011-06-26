@@ -44,6 +44,18 @@ template <class T> unsigned MakeHash(const T& value)
     return value.ToHash();
 }
 
+/// Long long hash function
+template<> inline unsigned MakeHash(const long long& value)
+{
+    return (value >> 32) | (value & 0xffffffff);
+}
+
+/// Unsigned long long hash function
+template<> inline unsigned MakeHash(const unsigned long long& value)
+{
+    return (value >> 32) | (value & 0xffffffff);
+}
+
 /// Int hash function
 template<> inline unsigned MakeHash(const int& value)
 {

@@ -567,7 +567,7 @@ bool Graphics::BeginFrame()
     ResetStreamFrequencies();
     
     // Reset immediate mode vertex buffer positions
-    for (Map<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
+    for (HashMap<unsigned, unsigned>::Iterator i = immediateVertexBufferPos_.Begin(); i != immediateVertexBufferPos_.End(); ++i)
         i->second_ = 0;
     
     numPrimitives_ = 0;

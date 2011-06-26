@@ -41,6 +41,52 @@ static Input* inputInstance = 0;
 
 #include "DebugNew.h"
 
+/// Convert the virtual key code & scan code if necessary. Return non-zero if key should be posted
+int ConvertKeyCode(unsigned wParam, unsigned lParam)
+{
+    unsigned scanCode = (lParam >> 16) & 0x1ff;
+    
+    // Recognize left/right qualifier key from the scan code
+    switch (wParam)
+    {
+    case VK_SHIFT:
+        if (scanCode == 54)
+            return KEY_RSHIFT;
+        else
+            return KEY_LSHIFT;
+        break;
+        
+    case VK_CONTROL:
+        // Control might not be a real key, as Windows posts it whenever Alt-Gr is pressed (inspired by GLFW)
+        {
+            MSG nextMsg;
+            DWORD msgTime = GetMessageTime();
+            
+            if (PeekMessage(&nextMsg, NULL, 0, 0, PM_NOREMOVE))
+            {
+                if ((nextMsg.message == WM_KEYDOWN || nextMsg.message == WM_SYSKEYDOWN) && nextMsg.wParam == VK_MENU &&
+                    (nextMsg.lParam & 0x01000000) != 0 && nextMsg.time == msgTime)
+                    return 0;
+            }
+            
+            if (scanCode & 0x100)
+                return KEY_RCTRL;
+            else
+                return KEY_LCTRL;
+        }
+        break;
+        
+    case VK_MENU:
+        if (scanCode & 0x100)
+            return KEY_RALT;
+        else
+            return KEY_LALT;
+        
+    default:
+        return wParam;
+    }
+}
+
 OBJECTTYPESTATIC(Input);
 
 Input::Input(Context* context) :
@@ -187,41 +233,25 @@ bool Input::GetMouseButtonPress(int button) const
 
 bool Input::GetQualifierDown(int qualifier) const
 {
-    #ifndef USE_OPENGL
-    if (qualifier == QUAL_SHIFT)
-        return GetKeyDown(KEY_SHIFT);
-    if (qualifier == QUAL_CTRL)
-        return GetKeyDown(KEY_CTRL);
-    if (qualifier == QUAL_ALT)
-        return GetKeyDown(KEY_ALT);
-    #else
     if (qualifier == QUAL_SHIFT)
         return GetKeyDown(KEY_LSHIFT) || GetKeyDown(KEY_RSHIFT);
     if (qualifier == QUAL_CTRL)
         return GetKeyDown(KEY_LCTRL) || GetKeyDown(KEY_RCTRL);
     if (qualifier == QUAL_ALT)
         return GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT);
-    #endif
+    
     return false;
 }
 
 bool Input::GetQualifierPress(int qualifier) const
 {
-    #ifndef USE_OPENGL
-    if (qualifier == QUAL_SHIFT)
-        return GetKeyPress(KEY_SHIFT);
-    if (qualifier == QUAL_CTRL)
-        return GetKeyPress(KEY_CTRL);
-    if (qualifier == QUAL_ALT)
-        return GetKeyPress(KEY_ALT);
-    #else
     if (qualifier == QUAL_SHIFT)
         return GetKeyPress(KEY_LSHIFT) || GetKeyPress(KEY_RSHIFT);
     if (qualifier == QUAL_CTRL)
         return GetKeyPress(KEY_LCTRL) || GetKeyPress(KEY_RCTRL);
     if (qualifier == QUAL_ALT)
         return GetKeyPress(KEY_LALT) || GetKeyPress(KEY_RALT);
-    #endif
+    
     return false;
 }
 
@@ -361,6 +391,7 @@ void Input::SetKey(int key, bool newState)
     
     if (newState)
     {
+        LOGINFO("Keydown: " + String(key));
         if (!keyDown_.Contains(key))
         {
             keyDown_.Insert(key);
@@ -469,6 +500,7 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
     int msg = eventData[P_MSG].GetInt();
     int wParam = eventData[P_WPARAM].GetInt();
     int lParam = eventData[P_LPARAM].GetInt();
+    int keyCode;
     
     switch (msg)
     {
@@ -523,23 +555,25 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
         break;
         
     case WM_KEYDOWN:
-        SetKey(wParam, true);
+        keyCode = ConvertKeyCode(wParam, lParam);
+        if (keyCode)
+            SetKey(keyCode, true);
         eventData[P_HANDLED] = true;
         break;
         
     case WM_SYSKEYDOWN:
-        SetKey(wParam, true);
-        if (wParam != KEY_F4)
+        keyCode = ConvertKeyCode(wParam, lParam);
+        if (keyCode)
+            SetKey(keyCode, true);
+        if (keyCode != KEY_F4)
             eventData[P_HANDLED] = true;
         break;
         
     case WM_KEYUP:
-        SetKey(wParam, false);
-        eventData[P_HANDLED] = true;
-        break;
-        
     case WM_SYSKEYUP:
-        SetKey(wParam, false);
+        keyCode = ConvertKeyCode(wParam, lParam);
+        if (keyCode)
+            SetKey(keyCode, false);
         eventData[P_HANDLED] = true;
         break;
         

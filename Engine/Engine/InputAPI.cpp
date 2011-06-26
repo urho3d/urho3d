@@ -36,9 +36,6 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_BACKSPACE", (void*)&KEY_BACKSPACE);
     engine->RegisterGlobalProperty("const int KEY_TAB", (void*)&KEY_TAB);
     engine->RegisterGlobalProperty("const int KEY_RETURN", (void*)&KEY_RETURN);
-    engine->RegisterGlobalProperty("const int KEY_SHIFT", (void*)&KEY_SHIFT);
-    engine->RegisterGlobalProperty("const int KEY_CTRL", (void*)&KEY_CTRL);
-    engine->RegisterGlobalProperty("const int KEY_ALT", (void*)&KEY_ALT);
     engine->RegisterGlobalProperty("const int KEY_PAUSE", (void*)&KEY_PAUSE);
     engine->RegisterGlobalProperty("const int KEY_CAPSLOCK", (void*)&KEY_CAPSLOCK);
     engine->RegisterGlobalProperty("const int KEY_ESC", (void*)&KEY_ESC);

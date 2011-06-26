@@ -184,9 +184,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (ui.focusElement is null)
     {
         float speedMultiplier = 1.0;
-        if (input.keyDown[KEY_SHIFT])
+        if (input.keyDown[KEY_LSHIFT])
             speedMultiplier = 5.0;
-        if (input.keyDown[KEY_CTRL])
+        if (input.keyDown[KEY_LCTRL])
             speedMultiplier = 0.1;
 
         if (input.keyDown['W'])
@@ -201,7 +201,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (input.keyPress['1'])
         {
             int nextRenderMode = graphics.renderMode;
-            if (input.keyDown[KEY_SHIFT])
+            if (input.keyDown[KEY_LSHIFT])
             {
                 --nextRenderMode;
                 if (nextRenderMode < 0)

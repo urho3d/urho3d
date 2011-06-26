@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Map.h"
+#include "HashMap.h"
 #include "SharedPtr.h"
 
 class Animation;
@@ -90,7 +90,7 @@ private:
     /// Start bone
     Bone* startBone_;
     /// Mapping of animation track indices to bones
-    Map<unsigned, Bone*> trackToBoneMap_;
+    HashMap<unsigned, Bone*> trackToBoneMap_;
     /// Last keyframe on each animation track for optimized keyframe search
     PODVector<unsigned> lastKeyFrame_;
     /// Looped flag

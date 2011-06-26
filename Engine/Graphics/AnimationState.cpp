@@ -181,7 +181,7 @@ void AnimationState::Apply()
     // Check first if full weight or blending
     if (weight_ == 1.0f)
     {
-        for (Map<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
+        for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
             const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;
@@ -244,7 +244,7 @@ void AnimationState::Apply()
     }
     else
     {
-        for (Map<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
+        for (HashMap<unsigned, Bone*>::ConstIterator i = trackToBoneMap_.Begin(); i != trackToBoneMap_.End(); ++i)
         {
             const AnimationTrack* track = animation_->GetTrack(i->first_);
             Bone* bone = i->second_;

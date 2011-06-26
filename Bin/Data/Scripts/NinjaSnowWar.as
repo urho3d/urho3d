@@ -415,7 +415,7 @@ void UpdateControls()
             playerControls.Set(CTRL_LEFT, true);
         if (input.keyDown['D'])
             playerControls.Set(CTRL_RIGHT, true);
-        if (input.keyDown[KEY_CTRL])
+        if (input.keyDown[KEY_LCTRL])
             playerControls.Set(CTRL_FIRE, true);
         if (input.keyDown[' '])
             playerControls.Set(CTRL_JUMP, true);

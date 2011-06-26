@@ -440,11 +440,11 @@ private:
     /// GPU objects
     Vector<GPUObject*> gpuObjects_;
     /// Vertex declarations
-    Map<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
+    HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Immediate rendering vertex buffers by vertex declaration
-    Map<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
+    HashMap<unsigned, SharedPtr<VertexBuffer> > immediateVertexBuffers_;
     /// Immediate rendering vertex buffer start positions
-    Map<unsigned, unsigned> immediateVertexBufferPos_;
+    HashMap<unsigned, unsigned> immediateVertexBufferPos_;
     /// Deferred rendering diffuse buffer
     SharedPtr<Texture2D> diffBuffer_;
     /// Deferred rendering normal buffer
