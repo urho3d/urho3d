@@ -44,6 +44,18 @@ template <class T> unsigned MakeHash(const T& value)
     return value.ToHash();
 }
 
+/// Void pointer hash function
+template<> inline unsigned MakeHash(void* value)
+{
+    return (unsigned)value;
+}
+
+/// Const void pointer hash function
+template<> inline unsigned MakeHash(const void* value)
+{
+    return (unsigned)value;
+}
+
 /// Long long hash function
 template<> inline unsigned MakeHash(const long long& value)
 {
