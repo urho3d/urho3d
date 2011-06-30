@@ -351,8 +351,8 @@ void Octree::Update(const FrameInfo& frame)
                 else
                 {
                     // Otherwise reinsert if outside current octant or if size does not fit octant size
-                    if ((octant->GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) != INSIDE) || 
-                        (!octant->CheckDrawableSize(drawable)))
+                    if (octant->GetCullingBox().IsInside(drawable->GetWorldBoundingBox()) != INSIDE ||
+                        !octant->CheckDrawableSize(drawable))
                         reinsert = true;
                 }
                 

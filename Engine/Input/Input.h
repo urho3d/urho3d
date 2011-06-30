@@ -33,10 +33,10 @@ class Graphics;
 class Input : public Object
 {
     #ifdef USE_OPENGL
-    friend void KeyCallback(int, int);
-    friend void CharCallback(int, int);
-    friend void MouseButtonCallback(int, int);
-    friend void MouseWheelCallback(int);
+    friend void KeyCallback(GLFWwindow, int, int);
+    friend void CharCallback(GLFWwindow, int);
+    friend void MouseButtonCallback(GLFWwindow, int, int);
+    friend void MouseScrollCallback(GLFWwindow, int, int);
     #endif
     
     OBJECT(Input);

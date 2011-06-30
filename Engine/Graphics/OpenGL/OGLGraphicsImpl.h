@@ -27,7 +27,9 @@
 #include "Map.h"
 
 #include <GLee.h>
-#include <GL/glfw.h>
+#include <GL/glfw3.h>
+
+class Context;
 
 /// Graphics implementation
 class GraphicsImpl
@@ -39,6 +41,8 @@ public:
     GraphicsImpl();
     
 private:
+    /// GLFW window
+    GLFWwindow window_;
     /// Active texture unit
     unsigned activeTexture_;
     /// Active draw buffers
@@ -56,3 +60,8 @@ private:
     /// FBO bound flag
     bool fboBound_;
 };
+
+/// Store execution context specific to the GLFW window
+void SetWindowContext(GLFWwindow window, Context* context);
+/// Return execution context specific to the GLFW window
+Context* GetWindowContext(GLFWwindow window);

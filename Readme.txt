@@ -40,7 +40,7 @@ Urho3D uses the following third-party libraries:
 - ENet 1.3.1 (http://enet.bespin.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
-- GLFW 2.7 (http://www.glfw.org/)
+- GLFW 3.0 WIP (http://www.glfw.org/)
 - Open Asset Import Library 2.0.863 (http://assimp.sourceforge.net/)
 - Open Dynamics Engine, svn rev 1806 (http://www.ode.org/)
 - PortAudio V19 (http://www.portaudio.com/)

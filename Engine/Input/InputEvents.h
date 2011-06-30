@@ -26,7 +26,7 @@
 #include "Object.h"
 
 #ifdef USE_OPENGL
-#include <GL/glfw.h>
+#include <GL/glfw3.h>
 #endif
 
 /// Mouse button pressed

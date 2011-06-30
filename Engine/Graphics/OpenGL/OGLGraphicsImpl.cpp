@@ -22,11 +22,17 @@
 //
 
 #include "Precompiled.h"
+#include "Context.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
 #include "GraphicsImpl.h"
+#include "Mutex.h"
+#include "ProcessUtils.h"
+
+static HashMap<GLFWwindow, Context*> windowContexts;
 
 GraphicsImpl::GraphicsImpl() :
+    window_(0),
     activeTexture_(0),
     drawBuffers_(M_MAX_UNSIGNED),
     fbo_(0),
@@ -36,4 +42,25 @@ GraphicsImpl::GraphicsImpl() :
     windowDepthBits_(0),
     fboBound_(false)
 {
+}
+
+void SetWindowContext(GLFWwindow window, Context* context)
+{
+    MutexLock lock(GetStaticMutex());
+    
+    if (context)
+        windowContexts[window] = context;
+    else
+        windowContexts.Erase(context);
+}
+
+Context* GetWindowContext(GLFWwindow window)
+{
+    MutexLock lock(GetStaticMutex());
+    
+    HashMap<GLFWwindow, Context*>::ConstIterator i = windowContexts.Find(window);
+    if (i != windowContexts.End())
+        return i->second_;
+    else
+        return 0;
 }

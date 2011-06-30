@@ -52,6 +52,8 @@
 #include "VertexBuffer.h"
 #include "Zone.h"
 
+#include <stdio.h>
+
 #ifdef _MSC_VER
 #include <float.h>
 #else
@@ -124,13 +126,21 @@ static const unsigned glStencilOps[] =
     GL_DECR_WRAP
 };
 
-static const String noParameter;
-static Graphics* graphicsInstance = 0;
+static unsigned numInstances = 0;
 
-int CloseCallback()
+static const String noParameter;
+
+int CloseCallback(GLFWwindow window)
 {
-    // Do not let GLFW close the window on its own, rather do a controlled close here
-    graphicsInstance->Close();
+    // Do not let GLFW close the window, rather do it ourselves in a controlled fashion
+    Context* context = GetWindowContext(window);
+    if (context)
+    {
+        Graphics* graphics = context->GetSubsystem<Graphics>();
+        if (graphics)
+            graphics->Close();
+    }
+
     return GL_FALSE;
 }
 
@@ -143,7 +153,6 @@ Graphics::Graphics(Context* context_) :
     width_(0),
     height_(0),
     multiSample_(1),
-    initialized_(false),
     fullscreen_(false),
     vsync_(false),
     flushGPU_(true),
@@ -160,10 +169,13 @@ Graphics::Graphics(Context* context_) :
     ResetCachedState();
     SetTextureUnitMappings();
     
-    // GLFW callbacks do not include userdata, so a static instance pointer is necessary
-    graphicsInstance = this;
-    
-    glfwInit();
+    {
+        MutexLock lock(GetStaticMutex());
+        if (!numInstances)
+            glfwInit();
+        
+        ++numInstances;
+    }
 }
 
 Graphics::~Graphics()
@@ -173,16 +185,20 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
     
-    glfwTerminate();
-    
-    graphicsInstance = 0;
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        --numInstances;
+        if (!numInstances)
+            glfwTerminate();
+    }
 }
 
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
-    if (initialized_)
-        glfwSetWindowTitle(windowTitle_.CString());
+    if (impl_->window_)
+        glfwSetWindowTitle(impl_->window_, windowTitle_.CString());
 }
 
 bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample)
@@ -191,12 +207,12 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     
     multiSample = Clamp(multiSample, 1, 16);
     
-    if (initialized_ && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         vsync == vsync_ && multiSample == multiSample_)
         return true;
     
     // If only vsync changes, do not destroy/recreate the context
-    if (initialized_ && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
+    if (IsInitialized() && mode == mode_ && width == width_ && height == height_ && fullscreen == fullscreen_ &&
         multiSample == multiSample_ && vsync != vsync_)
     {
         glfwSwapInterval(vsync ? 1 : 0);
@@ -216,56 +232,66 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
         {
             GLFWvidmode mode;
             glfwGetDesktopMode(&mode);
-            width = mode.Width;
-            height = mode.Height;
+            width = mode.width;
+            height = mode.height;
         }
     }
-    
-    if (multiSample > 1 && mode == RENDER_FORWARD)
-        glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
-    else
-       glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
-    
-    // Disable resize
-    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
     
     // Close the existing window
     Release();
     
-    if (!glfwOpenWindow(width, height, 8, 8, 8, 0, 24, 8, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW))
     {
-        LOGERROR("Could not open window");
-        return false;
+        // GLFW window parameters and the window list are static, so need to operate under static lock
+        MutexLock lock(GetStaticMutex());
+        
+        glfwOpenWindowHint(GLFW_RED_BITS, 8);
+        glfwOpenWindowHint(GLFW_GREEN_BITS, 8);
+        glfwOpenWindowHint(GLFW_BLUE_BITS, 8);
+        glfwOpenWindowHint(GLFW_ALPHA_BITS, 0);
+        glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
+        glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
+        glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
+        if (multiSample > 1 && mode == RENDER_FORWARD)
+            glfwOpenWindowHint(GLFW_FSAA_SAMPLES, multiSample);
+        else
+            glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
+        
+        impl_->window_ = glfwOpenWindow(width, height, fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOWED, windowTitle_.CString(), 0);
+        if (!impl_->window_)
+        {
+            LOGERROR("Could not open window");
+            return false;
+        }
+        
+        // If OpenGL extensions not yet initialized, initialize now
+        if (!GLeeInitialized())
+            GLeeInit();
+        
+        if (!_GLEE_VERSION_2_0)
+        {
+            LOGERROR("OpenGL 2.0 is required");
+            glfwCloseWindow(impl_->window_);
+            return false;
+        }
+        
+        // Set window close callback
+        glfwSetWindowCloseCallback(CloseCallback);
+        
+        // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
+        // This is actually needed for ODE to behave predictably in float mode
+        #ifdef _MSC_VER
+        _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
+        #else
+        unsigned control = GetFPUState();
+        control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
+        control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
+        SetFPUState(control);
+        #endif
+        
+        // Associate GLFW window with the execution context
+        SetWindowContext(impl_->window_, context_);
     }
-    
-    // Set title and the close callback
-    glfwSetWindowTitle(windowTitle_.CString());
-    glfwSetWindowCloseCallback(CloseCallback);
-    
-    // Mimic Direct3D way of setting FPU into round-to-nearest, single precision mode
-    // This is actually needed for ODE to behave predictably in float mode
-    #ifdef _MSC_VER
-    _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
-    #else
-    unsigned control = GetFPUState();
-    control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
-    control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
-    SetFPUState(control);
-    #endif
-    
-    // If OpenGL extensions not yet initialized, initialize now
-    if (!GLeeInitialized())
-        GLeeInit();
-    
-    if (!_GLEE_VERSION_2_0)
-    {
-        LOGERROR("OpenGL 2.0 is required");
-        glfwCloseWindow();
-        return false;
-    }
-    
-    // Disable auto polling of window events
-    glfwDisable(GLFW_AUTO_POLL_EVENTS);
+
     
     // Set vsync
     glfwSwapInterval(vsync ? 1 : 0);
@@ -291,12 +317,11 @@ bool Graphics::SetMode(RenderMode mode, int width, int height, bool fullscreen, 
     SetCullMode(CULL_CCW);
     SetDepthTest(CMP_LESSEQUAL);
     
-    glfwGetWindowSize(&width_, &height_);
+    glfwGetWindowSize(impl_->window_, &width_, &height_);
     fullscreen_ = fullscreen;
     vsync_ = vsync;
     mode_ = mode;
     multiSample_ = multiSample;
-    initialized_ = true;
     
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
@@ -347,15 +372,16 @@ bool Graphics::ToggleFullscreen()
 
 void Graphics::Close()
 {
-    if (initialized_)
-    {
-        // Release all GPU objects that still exist
-        for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-            (*i)->Release();
-        gpuObjects_.Clear();
-        
-        Release();
-    }
+    if (!IsInitialized())
+        return;
+    
+    // Release all GPU objects that still exist
+    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
+        (*i)->Release();
+    gpuObjects_.Clear();
+
+    // Actually close the window
+    Release();
 }
 
 bool Graphics::TakeScreenShot(Image& destImage)
@@ -380,9 +406,9 @@ bool Graphics::BeginFrame()
 
     if (!IsInitialized())
         return false;
-    
+
     // If we should be fullscreen, but are not currently active, do not render
-    if (fullscreen_ && (!glfwGetWindowParam(GLFW_ACTIVE) || glfwGetWindowParam(GLFW_ICONIFIED)))
+    if (fullscreen_ && (!glfwGetWindowParam(impl_->window_, GLFW_ACTIVE) || glfwGetWindowParam(impl_->window_, GLFW_ICONIFIED)))
         return false;
     
     // Set default rendertarget and depth buffer
@@ -547,6 +573,7 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         
         if (i < buffers.Size())
         {
+
             buffer = buffers[i];
             elementMask = elementMasks[i];
             if (elementMask == MASK_DEFAULT && buffer)
@@ -554,6 +581,9 @@ bool Graphics::SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODV
         }
         
         // If buffer and element mask have stayed the same, skip to the next buffer
+
+
+
         if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i])
             continue;
         
@@ -1826,6 +1856,11 @@ void Graphics::SetForceSM2(bool enable)
 {
 }
 
+bool Graphics::IsInitialized() const
+{
+    return impl_->window_ != 0;
+}
+
 unsigned char* Graphics::GetImmediateDataPtr() const
 {
     if (!immediateVertexCount_)
@@ -1835,6 +1870,11 @@ unsigned char* Graphics::GetImmediateDataPtr() const
     }
     
     return const_cast<unsigned char*>(&immediateVertexData_[0]);
+}
+
+void* Graphics::GetWindowHandle() const
+{
+    return impl_->window_;
 }
 
 PODVector<IntVector2> Graphics::GetResolutions() const
@@ -1847,8 +1887,8 @@ PODVector<IntVector2> Graphics::GetResolutions() const
     
     for (unsigned i = 0; i < count; ++i)
     {
-        int width = modes[i].Width;
-        int height  = modes[i].Height;
+        int width = modes[i].width;
+        int height  = modes[i].height;
         
         // Store mode if unique
         bool unique = true;
@@ -2116,6 +2156,9 @@ void Graphics::SetDrawBuffers()
 
 void Graphics::Release()
 {
+    if (!impl_->window_)
+        return;
+    
     diffBuffer_.Reset();
     normalBuffer_.Reset();
     depthBuffer_.Reset();
@@ -2136,8 +2179,13 @@ void Graphics::Release()
     ResetCachedState();
     ClearParameterSources();
     
-    glfwCloseWindow();
-    initialized_ = false;
+    {
+        MutexLock lock(GetStaticMutex());
+        
+        SetWindowContext(impl_->window_, 0);
+        glfwCloseWindow(impl_->window_);
+        impl_->window_ = 0;
+    }
 }
 
 void Graphics::SetTextureUnitMappings()

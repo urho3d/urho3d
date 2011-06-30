@@ -11,6 +11,10 @@ include_directories (
     ../Container ../Core ../Graphics ../IO ../Math ../Resource ../Scene
 )
 
+if (USE_OPENGL)
+    include_directories (../../ThirdParty/GLee)
+endif ()
+
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries (${TARGET_NAME} Container Core Graphics IO Math Resource Scene)

@@ -1,0 +1,136 @@
+# Modified by Lasse Öörni for Urho3D
+
+set(GLFW_VERSION_MAJOR "3")
+set(GLFW_VERSION_MINOR "0")
+set(GLFW_VERSION_PATCH "0")
+set(GLFW_VERSION_EXTRA "")
+set(GLFW_VERSION "${GLFW_VERSION_MAJOR}.${GLFW_VERSION_MINOR}")
+set(GLFW_VERSION_FULL "${GLFW_VERSION}.${GLFW_VERSION_PATCH}${GLFW_VERSION_EXTRA}")
+
+include(CheckFunctionExists)
+include(CheckSymbolExists)
+
+find_package(OpenGL REQUIRED)
+
+set(common_SOURCES
+    ../enable.c
+    ../error.c
+    ../fullscreen.c
+    ../gamma.c
+    ../init.c
+    ../input.c
+    ../joystick.c
+    ../opengl.c
+    ../time.c
+    ../window.c
+)
+
+#--------------------------------------------------------------------
+# Set up GLFW for Win32 and WGL on Windows
+#--------------------------------------------------------------------
+if (WIN32)
+    # Define the platform identifier
+    set(_GLFW_WIN32_WGL 1)
+
+    # Set up library and include paths
+    set(CMAKE_REQUIRED_LIBRARIES ${OPENGL_gl_LIBRARY})
+    list(APPEND GLFW_INCLUDE_DIR ${OPENGL_INCLUDE_DIR})
+    list(APPEND GLFW_LIBRARIES ${OPENGL_gl_LIBRARY})
+
+    # Select platform specific code
+    add_subdirectory(src/win32)
+endif (WIN32)
+
+#--------------------------------------------------------------------
+# Set up GLFW for Xlib and GLX on Unix-like systems with X Windows
+#--------------------------------------------------------------------
+if (UNIX AND NOT APPLE AND NOT CYGWIN)
+    # Define the platform identifier
+    set(_GLFW_X11_GLX 1)
+
+    # Set up library and include paths
+    set(CMAKE_REQUIRED_LIBRARIES ${X11_X11_LIB} ${OPENGL_gl_LIBRARY})
+    list(APPEND GLFW_INCLUDE_DIR ${X11_X11_INCLUDE_PATH})
+    list(APPEND GLFW_LIBRARIES ${X11_X11_LIB})
+    list(APPEND GLFW_INCLUDE_DIR ${OPENGL_INCLUDE_DIR})
+    list(APPEND GLFW_LIBRARIES ${OPENGL_gl_LIBRARY})
+
+    include(CMake/CheckX11Extensions.cmake)
+    
+    # Check for XRandR (modern resolution switching extension)
+    CHECK_X11_XRANDR()
+    if (X11_XRANDR_FOUND)
+        set(_GLFW_HAS_XRANDR 1) 
+        list(APPEND GLFW_INCLUDE_DIR ${X11_XRANDR_INCLUDE_DIR})
+        list(APPEND GLFW_LIBRARIES ${X11_XRANDR_LIBRARIES})
+    endif(X11_XRANDR_FOUND)
+
+    # Check for Xf86VidMode (fallback legacy resolution switching extension)
+    CHECK_X11_XF86VIDMODE()
+    if (X11_XF86VIDMODE_FOUND)
+        set(_GLFW_HAS_XF86VIDMODE 1)
+        list(APPEND GLFW_INCLUDE_DIR ${X11_XF86VIDMODE_INCLUDE_DIR})
+        list(APPEND GLFW_LIBRARIES ${X11_XF86VIDMODE_LIBRARIES})
+    endif(X11_XF86VIDMODE_FOUND) 
+
+    # Check for Xkb (X keyboard extension)
+    CHECK_FUNCTION_EXISTS(XkbQueryExtension _GLFW_HAS_XKB)
+
+    # Check for glXGetProcAddress
+    CHECK_FUNCTION_EXISTS(glXGetProcAddress _GLFW_HAS_GLXGETPROCADDRESS)
+
+    if (NOT _GLFW_HAS_GLXGETPROCADDRESS)
+        CHECK_FUNCTION_EXISTS(glXGetProcAddressARB _GLFW_HAS_GLXGETPROCADDRESSARB)
+    endif (NOT _GLFW_HAS_GLXGETPROCADDRESS)
+
+    if (NOT _GLFW_HAS_GLXGETPROCADDRESS AND NOT _GLFW_HAS_GLXGETPROCADDRESSARB)
+        CHECK_FUNCTION_EXISTS(glXGetProcAddressEXT _GLFW_HAS_GLXGETPROCADDRESSEXT)
+    endif (NOT _GLFW_HAS_GLXGETPROCADDRESS AND NOT _GLFW_HAS_GLXGETPROCADDRESSARB)
+
+    if (NOT _GLFW_HAS_GLXGETPROCADDRESS AND
+        NOT _GLFW_HAS_GLXGETPROCADDRESSARB AND
+        NOT _GLFW_HAS_GLXGETPROCADDRESSEXT)
+        message(WARNING "No glXGetProcAddressXXX variant found")
+    endif (NOT _GLFW_HAS_GLXGETPROCADDRESS AND
+           NOT _GLFW_HAS_GLXGETPROCADDRESSARB AND
+           NOT _GLFW_HAS_GLXGETPROCADDRESSEXT)
+
+    if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+        set(_GLFW_USE_LINUX_JOYSTICKS 1)
+    endif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
+    # Select platform specific code
+    add_subdirectory(src/x11)
+endif(UNIX AND NOT APPLE AND NOT CYGWIN)
+
+#--------------------------------------------------------------------
+# Set up GLFW for Cocoa and NSOpenGL on Mac OS X
+#--------------------------------------------------------------------
+if (UNIX AND APPLE)
+    # Define the platform identifier
+    set(_GLFW_COCOA_NSGL 1)
+
+    option(GLFW_BUILD_UNIVERSAL "Build the GLFW library and examples as Universal Binaries" FALSE)
+
+    # Universal build, decent set of warning flags...
+    if (GLFW_BUILD_UNIVERSAL)
+        set(CMAKE_OSX_ARCHITECTURES ppc;i386;ppc64;x86_64)
+        set(CMAKE_OSX_SYSROOT /Developer/SDKs/MacOSX10.5.sdk)
+        set(CMAKE_C_FLAGS "-mmacosx-version-min=10.5 -Wall -Wextra -Wno-unused-parameter -Werror")
+    endif(GLFW_BUILD_UNIVERSAL)
+    
+    # Set up library and include paths
+    find_library(COCOA_FRAMEWORK Cocoa)
+    list(APPEND GLFW_LIBRARIES ${COCOA_FRAMEWORK})
+    list(APPEND GLFW_LIBRARIES ${OPENGL_gl_LIBRARY})
+
+    # Select platform specific code
+    add_subdirectory(src/cocoa)
+endif(UNIX AND APPLE)
+
+#--------------------------------------------------------------------
+# Create shared configuration header
+#--------------------------------------------------------------------
+configure_file(src/config.h.in
+               src/config.h @ONLY)
+

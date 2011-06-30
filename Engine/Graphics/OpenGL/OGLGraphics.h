@@ -200,7 +200,7 @@ public:
     void SetForceSM2(bool enable);
     
     /// Return whether rendering initialized
-    bool IsInitialized() const { return initialized_; }
+    bool IsInitialized() const;
     /// Return graphics implementation, which holds the actual API-specific resources
     GraphicsImpl* GetImpl() const { return impl_; }
     /// Return window title
@@ -223,6 +223,8 @@ public:
     bool IsDeviceLost() const { return false; }
     /// Return immediate rendering data pointer
     unsigned char* GetImmediateDataPtr() const;
+    /// Return window handle
+    void* GetWindowHandle() const;
     /// Return number of primitives drawn this frame
     unsigned GetNumPrimitives() const { return numPrimitives_; }
     /// Return number of batches drawn this frame
@@ -334,7 +336,7 @@ public:
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject
     void RemoveGPUObject(GPUObject* object);
-    
+
     /// Return the API-specific alpha texture format
     static unsigned GetAlphaFormat();
     /// Return the API-specific luminance texture format
@@ -367,7 +369,7 @@ private:
     void ResetCachedState();
     /// Set draw buffer(s) on the FBO
     void SetDrawBuffers();
-    /// Destroy the OpenGL rendering context and the window
+    /// Release GPU objects and close the window
     void Release();
     /// Initialize texture unit mappings
     void SetTextureUnitMappings();
@@ -384,8 +386,6 @@ private:
     int height_;
     /// Multisampling mode
     int multiSample_;
-    /// Initialized flag (window open)
-    bool initialized_;
     /// Fullscreen flag
     bool fullscreen_;
     /// Vertical sync flag

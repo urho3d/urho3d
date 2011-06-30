@@ -34,7 +34,7 @@
 #ifndef USE_OPENGL
 #include <Windows.h>
 #else
-#include <GL/glfw.h>
+#include <GraphicsImpl.h>
 #endif
 
 #include "DebugNew.h"
@@ -85,8 +85,6 @@ int ConvertKeyCode(unsigned wParam, unsigned lParam)
         return wParam;
     }
 }
-#else
-static Input* inputInstance = 0;
 #endif
 
 OBJECTTYPESTATIC(Input);
@@ -107,9 +105,6 @@ Input::Input(Context* context) :
     
     #ifndef USE_OPENGL
     SubscribeToEvent(E_WINDOWMESSAGE, HANDLER(Input, HandleWindowMessage));
-    #else
-    // GLFW callbacks do not include userdata, so a static instance pointer is necessary
-    inputInstance = this;
     #endif
     
     SubscribeToEvent(E_SCREENMODE, HANDLER(Input, HandleScreenMode));
@@ -127,7 +122,7 @@ void Input::Update()
 {
     PROFILE(UpdateInput);
     
-    if (!graphics_)
+    if (!graphics_ || !graphics_->IsInitialized())
         return;
     
     // Reset input accumulation for this frame
@@ -147,9 +142,9 @@ void Input::Update()
     #else
     // Pump GLFW events
     glfwPollEvents();
-    
-    // Check state
-    if (glfwGetWindowParam(GLFW_ACTIVE))
+
+    // Check activation state
+    if (glfwGetWindowParam(graphics_->GetWindowHandle(), GLFW_ACTIVE))
     {
         if (!active_)
             activated_ = true;
@@ -158,7 +153,7 @@ void Input::Update()
     {
         if (active_)
             MakeInactive();
-    }
+    }    
     #endif
     
     // Activate application now if necessary
@@ -285,7 +280,7 @@ void Input::Initialize()
 
 void Input::MakeActive()
 {
-    if (!graphics_)
+    if (!graphics_ || !graphics_->IsInitialized())
         return;
     
     ResetState();
@@ -300,12 +295,13 @@ void Input::MakeActive()
     #else
     // Get the current mouse position as a base for movement calculations
     lastCursorPosition_ = GetCursorPosition();
-    lastWheelPosition_ = glfwGetMouseWheel();
+    glfwGetScrollOffset(graphics_->GetWindowHandle(), 0, &lastWheelPosition_);
     #endif
     
     using namespace Activation;
     
     VariantMap eventData;
+
     eventData[P_ACTIVE] = active_;
     eventData[P_MINIMIZED] = minimized_;
     SendEvent(E_ACTIVATION, eventData);
@@ -313,7 +309,7 @@ void Input::MakeActive()
 
 void Input::MakeInactive()
 {
-    if (!graphics_)
+    if (!graphics_ || !graphics_->IsInitialized())
         return;
     
     ResetState();
@@ -416,10 +412,7 @@ void Input::SetKey(int key, bool newState)
     SendEvent(newState ? E_KEYDOWN : E_KEYUP, eventData);
 
     if (key == KEY_RETURN && newState && !repeat && toggleFullscreen_ && (GetKeyDown(KEY_LALT) || GetKeyDown(KEY_RALT)))
-    {
         graphics_->ToggleFullscreen();
-        ResetState();
-    }
 }
 
 void Input::SetMouseWheel(int delta)
@@ -596,42 +589,68 @@ void Input::HandleWindowMessage(StringHash eventType, VariantMap& eventData)
     }
 }
 #else
-void KeyCallback(int key, int action)
+Input* GetInputInstance(GLFWwindow window)
 {
-    inputInstance->SetKey(key, action & GLFW_PRESS);
+    Context* context = GetWindowContext(window);
+    if (context)
+        return context->GetSubsystem<Input>();
+    else
+        return 0;
 }
 
-void CharCallback(int key, int action)
+void KeyCallback(GLFWwindow window, int key, int action)
 {
-    if (key < 256 && action == GLFW_PRESS)
+    Input* instance = GetInputInstance(window);
+    if (!instance)
+        return;
+    
+    instance->SetKey(key, action & GLFW_PRESS);
+}
+
+void CharCallback(GLFWwindow window, int key)
+{
+    Input* instance = GetInputInstance(window);
+    if (!instance)
+        return;
+    
+    if (key < 256)
     {
         using namespace Char;
         
         VariantMap keyEventData;
         keyEventData[P_CHAR] = key;
-        keyEventData[P_BUTTONS] = inputInstance->mouseButtonDown_;
-        keyEventData[P_QUALIFIERS] = inputInstance->GetQualifiers();
-        inputInstance->SendEvent(E_CHAR, keyEventData);
+        keyEventData[P_BUTTONS] = instance->mouseButtonDown_;
+        keyEventData[P_QUALIFIERS] = instance->GetQualifiers();
+        instance->SendEvent(E_CHAR, keyEventData);
+
     }
 }
 
-void MouseButtonCallback(int button, int action)
+void MouseButtonCallback(GLFWwindow window, int button, int action)
 {
-    inputInstance->SetMouseButton(1 << button, action == GLFW_PRESS);
+    Input* instance = GetInputInstance(window);
+    if (!instance)
+        return;
+    
+    instance->SetMouseButton(1 << button, action == GLFW_PRESS);
 }
 
-void MouseWheelCallback(int wheel)
+void MouseScrollCallback(GLFWwindow window, int x, int y)
 {
-    inputInstance->SetMouseWheel(wheel - inputInstance->lastWheelPosition_);
-    inputInstance->lastWheelPosition_ = wheel;
+    Input* instance = GetInputInstance(window);
+    if (!instance)
+        return;
+    
+    instance->SetMouseWheel(y - instance->lastWheelPosition_);
+    instance->lastWheelPosition_ = y;
 }
 #endif
 
 IntVector2 Input::GetCursorPosition() const
 {
-    IntVector2 ret(0, 0);
+    IntVector2 ret = lastCursorPosition_;
     
-    if (!graphics_)
+    if (!graphics_ || !graphics_->IsInitialized())
         return ret;
     
     #ifndef USE_OPENGL
@@ -641,7 +660,7 @@ IntVector2 Input::GetCursorPosition() const
     ret.x_ = mouse.x;
     ret.y_ = mouse.y;
     #else
-    glfwGetMousePos(&ret.x_, &ret.y_);
+    glfwGetMousePos(graphics_->GetWindowHandle(), &ret.x_, &ret.y_);
     #endif
     
     return ret;
@@ -649,22 +668,27 @@ IntVector2 Input::GetCursorPosition() const
 
 void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 {
+    // Reset input state on subsequent initializations
     if (!initialized_)
         Initialize();
+    else
+        ResetState();
+    
     // Screen mode change may affect the cursor clipping behaviour. Also re-center the cursor (if needed) to the new screen size,
     // so that there is no erroneous mouse move event
     #ifndef USE_OPENGL
     SetClipCursor(true);
     #else
     // Re-enable GLFW callbacks each time the window has been recreated
-    glfwDisable(GLFW_MOUSE_CURSOR);
-    glfwEnable(GLFW_KEY_REPEAT);
+    GLFWwindow window = graphics_->GetWindowHandle();
+    glfwDisable(window, GLFW_MOUSE_CURSOR);
+    glfwEnable(window, GLFW_KEY_REPEAT);
     glfwSetKeyCallback(&KeyCallback);
     glfwSetCharCallback(&CharCallback);
     glfwSetMouseButtonCallback(&MouseButtonCallback);
-    glfwSetMouseWheelCallback(&MouseWheelCallback);
+    glfwSetScrollCallback(&MouseScrollCallback);
     lastCursorPosition_ = GetCursorPosition();
-    lastWheelPosition_ = glfwGetMouseWheel();
+    glfwGetScrollOffset(window, 0, &lastWheelPosition_);
     #endif
 }
 
