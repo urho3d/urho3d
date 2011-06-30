@@ -719,7 +719,7 @@ int _glfwPlatformOpenWindow(_GLFWwindow* window,
             
         // Urho3D: assume initial input activation for fullscreen
         if (window->mode == GLFW_FULLSCREEN)
-            _glfwInputWindowFocus(window, GL_TRUE);                                                
+            _glfwInputWindowFocus(window, GL_TRUE);
     }
 
     glfwMakeWindowCurrent(window);
@@ -960,7 +960,8 @@ void _glfwPlatformPollEvents(void)
     
     // Urho3D: when the window has just been activated, and left mouse is not down, re-enable
     // mouse lock as necessary (this allows dragging the title bar)
-    if (_glfwLibrary.activeWindow && _glfwLibrary.activeWindow->NS.activated && !_glfwLibrary.activeWindow->NS.leftMouseDown)
+    if (_glfwLibrary.activeWindow && _glfwLibrary.activeWindow->NS.activated &&
+        !_glfwLibrary.activeWindow->NS.leftMouseDown)
     {
         if (_glfwLibrary.activeWindow == _glfwLibrary.cursorLockWindow)
             _glfwPlatformHideMouseCursor(_glfwLibrary.activeWindow);

@@ -1145,7 +1145,7 @@ static void processSingleEvent(void)
                         window->mousePosX += event.xmotion.x -
                                              window->X11.cursorPosX;
                         window->mousePosY += event.xmotion.y -
-                                             window->X11.cursorPosY;                 
+                                             window->X11.cursorPosY;
                     }                
                 }
                 else
