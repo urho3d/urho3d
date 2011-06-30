@@ -28,7 +28,7 @@
 //
 //========================================================================
 
-// Modified by Lasse Ã–Ã¶rni for Urho3D
+// Modified by Lasse Öörni for Urho3D
 
 #include "internal.h"
 
