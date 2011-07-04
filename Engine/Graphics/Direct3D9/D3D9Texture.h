@@ -33,15 +33,6 @@ static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLFile;
 
-/// Locked texture rectangle structure
-struct LockedRect
-{
-    /// Texture data, format-specific
-    unsigned char* bits_;
-    /// Byte offset between rows
-    unsigned pitch_;
-};
-
 /// Base class for texture resources
 class Texture : public Resource, public GPUObject
 {
@@ -51,7 +42,7 @@ public:
     /// Destruct
     virtual ~Texture();
     
-    /// Set number of requested mipmap levels. Needs to be called before setting size
+    /// Set number of requested mip levels. Needs to be called before setting size
     void SetNumLevels(unsigned levels);
     /// Set filtering mode
     void SetFilterMode(TextureFilterMode filter);
@@ -64,11 +55,9 @@ public:
     /// Clear default pool data lost flag
     void ClearDataLost();
     
-    /// Return texture usage type
-    TextureUsage GetUsage() const;
     /// Return texture format
     unsigned GetFormat() const { return format_; }
-    /// Return number of mipmap levels
+    /// Return number of mip levels
     unsigned GetLevels() const { return levels_; }
     /// Return width
     int GetWidth() const { return width_; }
@@ -84,6 +73,16 @@ public:
     const Color& GetBorderColor() const { return borderColor_; }
     /// Return backup texture
     Texture* GetBackupTexture() const { return backupTexture_; }
+    /// Return mip level width, or 0 if level does not exist
+    int GetLevelWidth(unsigned level) const;
+    /// Return mip level width, or 0 if level does not exist
+    int GetLevelHeight(unsigned level) const;
+    /// Return texture usage type
+    TextureUsage GetUsage() const;
+    /// Return data size in bytes for a rectangular region
+    unsigned GetDataSize(int width, int height) const;
+    /// Return data size in bytes for a pixel or block row
+    unsigned GetRowDataSize(int width) const;
     /// Return API-specific DXT compressed texture format
     static unsigned GetDXTFormat(CompressedFormat format);
     
@@ -101,9 +100,9 @@ protected:
     unsigned pool_;
     /// Texture usage type
     unsigned usage_;
-    /// Current mipmap levels
+    /// Current mip levels
     unsigned levels_;
-    /// Requested mipmap levels
+    /// Requested mip levels
     unsigned requestedLevels_;
     /// Texture width
     int width_;

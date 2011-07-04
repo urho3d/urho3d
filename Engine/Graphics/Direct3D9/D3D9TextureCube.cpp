@@ -81,8 +81,6 @@ void TextureCube::Release()
         if (!graphics_)
             return;
         
-        Unlock();
-        
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
@@ -149,6 +147,115 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     format_ = format;
     
     return Create();
+}
+
+bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
+{
+    if (!object_)
+    {
+        LOGERROR("No texture created, can not set data");
+        return false;
+    }
+    
+    if (!data)
+    {
+        LOGERROR("Null source for setting data");
+        return false;
+    }
+    
+    if (level >= levels_)
+    {
+        LOGERROR("Illegal mip level for setting data");
+        return false;
+    }
+    
+    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
+    if (compressed)
+    {
+        x &= ~3;
+        y &= ~3;
+    }
+    
+    int levelWidth = GetLevelWidth(level);
+    int levelHeight = GetLevelHeight(level);
+    if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
+    {
+        LOGERROR("Illegal dimensions for setting data");
+        return false;
+    }
+    
+    D3DLOCKED_RECT d3dLockedRect;
+    RECT d3dRect;
+    d3dRect.left = x;
+    d3dRect.top = y;
+    d3dRect.right = x + width;
+    d3dRect.bottom = y + height;
+    
+    DWORD flags = 0;
+    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+        flags |= D3DLOCK_DISCARD;
+
+    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, flags)))
+    {
+        LOGERROR("Could not lock texture");
+        return false;
+    }
+    
+    if (compressed)
+    {
+        height = (height + 3) >> 2;
+        y >>= 2;
+    }
+    
+    unsigned char* src = (unsigned char*)data;
+    unsigned rowSize = GetRowDataSize(width);
+    unsigned rowOffset = GetRowDataSize(x);
+    // GetRowDataSize() returns CPU-side (source) data size, so need to convert for X8R8G8B8
+    if (format_ == D3DFMT_X8R8G8B8)
+    {
+        rowSize = rowSize / 3 * 4;
+        rowOffset = rowOffset / 3 * 4;
+    }
+
+    // Perform conversion from RGB / RGBA as necessary
+    switch (format_)
+    {
+    default:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            memcpy(dest, src, rowSize);
+            src += rowSize;
+        }
+        break;
+    
+    case D3DFMT_X8R8G8B8:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            for (int j = 0; j < width; ++j)
+            {
+                *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = 255;
+                src += 3;
+           }
+        }
+        break;
+        
+    case D3DFMT_A8R8G8B8:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* dest = (unsigned char*)d3dLockedRect.pBits + (y + i) * d3dLockedRect.Pitch + rowOffset;
+            for (int j = 0; j < width; ++j)
+            {
+                *dest++  = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = src[3];
+                src += 4;
+           }
+        }
+        break;
+    }
+    
+    ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    return true;
 }
 
 bool TextureCube::Load(Deserializer& source)
@@ -284,42 +391,9 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         
         for (unsigned i = 0; i < manualLevels; ++i)
         {
-            LockedRect hwRect;
-            if (!Lock(face, i, 0, hwRect))
-                return false;
-            
+            SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
             memoryUse += levelWidth * levelHeight * components;
-            
-            for (int y = 0; y < levelHeight; ++y)
-            {
-                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * y;
-                unsigned char* src = levelData + components * levelWidth * y;
-                
-                switch (components)
-                {
-                case 1:
-                case 2:
-                    memcpy(dest, src, components * levelWidth);
-                    break;
-                    
-                case 3:
-                    for (int x = 0; x < levelWidth; ++x)
-                    {
-                        *dest++ = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = 255;
-                        src += 3;
-                    }
-                    break;
-                
-                case 4:
-                    for (int x = 0; x < levelWidth; ++x)
-                    {
-                        *dest++ = src[2]; *dest++ = src[1]; *dest++ = src[0]; *dest++ = src[3];
-                        src += 4;
-                    }
-                    break;
-                }
-            }
-            
+
             if (i < manualLevels - 1)
             {
                 image = image->GetNextLevel();
@@ -327,8 +401,6 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
             }
-            
-            Unlock();
         }
     }
     else
@@ -375,20 +447,8 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
+            SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
             memoryUse += level.rows_ * level.rowSize_;
-            
-            LockedRect hwRect;
-            if (!Lock(face, i, 0, hwRect))
-                return false;
-            
-            for (unsigned j = 0; j < level.rows_; ++j)
-            {
-                unsigned char* dest = hwRect.bits_ + hwRect.pitch_ * j;
-                unsigned char* src = level.data_ + level.rowSize_ * j;
-                memcpy(dest, src, level.rowSize_);
-            }
-            
-            Unlock();
         }
     }
     
@@ -397,56 +457,96 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         totalMemoryUse += faceMemoryUse_[i];
     SetMemoryUse(totalMemoryUse);
+    
     return true;
 }
 
-bool TextureCube::Lock(CubeMapFace face, unsigned level, const IntRect* rect, LockedRect& lockedRect)
+bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 {
     if (!object_)
     {
-        LOGERROR("No texture created, can not lock");
-        return false;
-    }
-    if (lockedLevel_ != -1)
-    {
-        LOGERROR("Texture already locked");
+        LOGERROR("No texture created, can not get data");
         return false;
     }
     
+    if (!dest)
+    {
+        LOGERROR("Null destination for getting data");
+        return false;
+    }
+    
+    if (level >= levels_)
+    {
+        LOGERROR("Illegal mip level for getting data");
+        return false;
+    }
+    
+    bool compressed = format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5;
+    int levelWidth = GetLevelWidth(level);
+    int levelHeight = GetLevelHeight(level);
+
     D3DLOCKED_RECT d3dLockedRect;
     RECT d3dRect;
-    if (rect)
-    {
-        d3dRect.left = rect->left_;
-        d3dRect.top = rect->top_;
-        d3dRect.right = rect->right_;
-        d3dRect.bottom = rect->bottom_;
-    }
+    d3dRect.left = 0;
+    d3dRect.top = 0;
+    d3dRect.right = levelWidth;
+    d3dRect.bottom = levelHeight;
     
-    DWORD flags = 0;
-    if (!rect && pool_ == D3DPOOL_DEFAULT)
-        flags |= D3DLOCK_DISCARD;
-    
-    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, rect ? &d3dRect : 0, flags)))
+    if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
     {
         LOGERROR("Could not lock texture");
         return false;
     }
-    
-    lockedRect.bits_ = (unsigned char*)d3dLockedRect.pBits;
-    lockedRect.pitch_ = d3dLockedRect.Pitch;
-    lockedLevel_ = level;
-    lockedFace_ = face;
-    return true;
-}
 
-void TextureCube::Unlock()
-{
-    if (lockedLevel_ != -1)
+    int height = levelHeight;
+    if (compressed)
+        height = (height + 3) >> 2;
+
+    unsigned char* destPtr = (unsigned char*)dest;
+    unsigned rowSize = GetRowDataSize(levelWidth);
+    // GetRowDataSize() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
+    if (format_ == D3DFMT_X8R8G8B8)
+        rowSize = rowSize / 3 * 4;
+
+    // Perform conversion to RGB / RGBA as necessary
+    switch (format_)
     {
-        ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)lockedFace_, lockedLevel_);
-        lockedLevel_ = -1;
+    default:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* src = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
+            memcpy(destPtr, src, rowSize);
+            destPtr += rowSize;
+        }
+        break;
+
+    case D3DFMT_X8R8G8B8:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* src = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
+            for (int j = 0; j < levelWidth; ++j)
+            {
+                destPtr[2] = *src++; destPtr[1] = *src++; destPtr[0] = *src++; ++src;
+                destPtr += 3;
+           }
+        }
+        break;
+        
+    case D3DFMT_A8R8G8B8:
+        for (int i = 0; i < height; ++i)
+        {
+            unsigned char* src = (unsigned char*)d3dLockedRect.pBits + i * d3dLockedRect.Pitch;
+            for (int j = 0; j < levelWidth; ++j)
+            {
+                destPtr[2] = *src++; destPtr[1] = *src++; destPtr[0] = *src++; destPtr[3] = *src++;
+                destPtr += 4;
+           }
+        }
+        break;
     }
+    
+    ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    return true;
 }
 
 bool TextureCube::Create()

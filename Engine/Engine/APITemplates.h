@@ -641,6 +641,8 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "uint get_levels() const", asMETHOD(T, GetLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_width() const", asMETHOD(T, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_height() const", asMETHOD(T, GetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_levelWidth(uint) const", asMETHOD(T, GetLevelWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_levelHeight(uint) const", asMETHOD(T, GetLevelHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_filterMode(TextureFilterMode)", asMETHOD(T, SetFilterMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "TextureFilterMode get_filterMode() const", asMETHOD(T, GetFilterMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHOD(T, SetAddressMode), asCALL_THISCALL);

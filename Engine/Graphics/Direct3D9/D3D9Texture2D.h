@@ -53,13 +53,13 @@ public:
     
     /// Set size, format and usage. Zero size will follow application window size. Return true if successful
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    /// Set data either partially or fully on a mip level. Return true if successful
+    bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
     /// Load from an image. Return true if successful
     bool Load(SharedPtr<Image> image, bool useAlpha = false);
-    /// Lock a rectangular area from a mipmap level. A null rect locks the entire level. Return true if successful
-    bool Lock(unsigned level, const IntRect* rect, LockedRect& lockedRect);
-    /// Unlock texture
-    void Unlock();
     
+    /// Get data from a mip level. The destination buffer must be big enough. Return true if successful
+    bool GetData(unsigned level, void* dest) const;
     /// Return render surface
     RenderSurface* GetRenderSurface() const { return renderSurface_; }
     
@@ -69,8 +69,6 @@ private:
     
     /// Render surface
     SharedPtr<RenderSurface> renderSurface_;
-    /// Currently locked mipmap level
-    int lockedLevel_;
     /// Follow window size flag
     bool followWindowSize_;
 };

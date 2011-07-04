@@ -54,15 +54,15 @@ public:
     
     /// Set size, format and usage. Return true if successful
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    /// Set data either partially or fully on a face's mip level. Return true if successful
+    bool SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
     /// Load one face from a stream. Return true if successful
     bool Load(CubeMapFace face, Deserializer& source);
     /// Load one face from an image. Return true if successful
     bool Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
-    /// Lock a rectangular area from one face and mipmap level. A null rect locks the entire face. Return true if successful
-    bool Lock(CubeMapFace face, unsigned level, const IntRect* rect, LockedRect& lockedRect);
-    /// Unlock texture
-    void Unlock();
     
+    /// Get data from a face's mip level. The destination buffer must be big enough. Return true if successful
+    bool GetData(CubeMapFace face, unsigned level, void* dest) const;
     /// Return render surface for one face
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
     
@@ -74,7 +74,7 @@ private:
     SharedPtr<RenderSurface> renderSurfaces_[MAX_CUBEMAP_FACES];
     /// Memory use per face
     unsigned faceMemoryUse_[MAX_CUBEMAP_FACES];
-    /// Currently locked mipmap level
+    /// Currently locked mip level
     int lockedLevel_;
     /// Currently locked face
     CubeMapFace lockedFace_;

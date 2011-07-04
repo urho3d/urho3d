@@ -35,7 +35,7 @@ enum CompressedFormat
     CF_DXT5
 };
 
-/// Compressed image mipmap level
+/// Compressed image mip level
 struct CompressedLevel
 {
     /// Construct as empty
@@ -103,11 +103,11 @@ public:
     bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
     /// Return compressed format
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
-    /// Return number of compressed mipmap levels
+    /// Return number of compressed mip levels
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
-    /// Return next mipmap level by bilinear filtering
+    /// Return next mip level by bilinear filtering
     SharedPtr<Image> GetNextLevel() const;
-    /// Return a compressed mipmap level
+    /// Return a compressed mip level
     CompressedLevel GetCompressedLevel(unsigned index) const;
     
 private:
@@ -122,7 +122,7 @@ private:
     int height_;
     /// Number of color components
     unsigned components_;
-    /// Number of compressed mipmap levels
+    /// Number of compressed mip levels
     unsigned numCompressedLevels_;
     /// Compressed format
     CompressedFormat compressedFormat_;

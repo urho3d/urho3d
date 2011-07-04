@@ -112,11 +112,7 @@ const FontFace* Font::GetFace(int pointSize)
 {
     Map<int, FontFace>::ConstIterator i = faces_.Find(pointSize);
     if (i != faces_.End())
-    {
-        // Check if the font texture has lost its data, and recreate in that case
-        if (!i->second_.texture_->IsDataLost())
-            return &i->second_;
-    }
+        return &i->second_;
     
     PROFILE(GetFontFace);
     

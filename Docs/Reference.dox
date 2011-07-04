@@ -413,8 +413,6 @@ For details on how Direct3D9 and OpenGL rendering differs, see \ref APIDifferenc
 
 - On OpenGL vertex attribute bindings also depend on the currently set shaders. To ensure correct operation, first set the shaders, then the vertex buffers.
 
-- OpenGL does not provide texture locking operations for direct pixel data access.
-
 - On Direct3D9 the depth stencil surface can be equal size or larger than the color render target. On OpenGL the sizes must always match. Furthermore, OpenGL can not use the system depth stencil buffer when rendering to a texture. To overcome these limitations, Graphics will create correctly sized depth stencil buffers on demand whenever a texture is set as a color render target, and a null depth stencil is specified.
 
 - On Direct3D9 setting the first color render target resets the viewport dimensions. On OpenGL there is no such mechanism, but as sometimes (for example in shadow rendering) only a depth stencil buffer is set for rendering, Graphics will instead reset the viewport when the depth stencil buffer is set. To ensure correct operation on both APIs, first set the render targets, then the depth stencil buffer, and finally the viewport, if you need it to be less than the whole render target.

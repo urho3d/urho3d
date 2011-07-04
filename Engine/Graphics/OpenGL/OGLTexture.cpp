@@ -69,7 +69,6 @@ Texture::Texture(Context* context) :
     depthBits_(0),
     width_(0),
     height_(0),
-    dataLost_(false),
     dynamic_(false),
     shadowCompare_(false),
     parametersDirty_(true),
@@ -126,7 +125,6 @@ void Texture::SetParametersDirty()
 
 void Texture::ClearDataLost()
 {
-    dataLost_ = false;
 }
 
 void Texture::UpdateParameters()
@@ -186,6 +184,20 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
+int Texture::GetLevelWidth(unsigned level) const
+{
+    if (level > levels_)
+        return 0;
+    return Max(width_ >> level, 1);
+}
+
+int Texture::GetLevelHeight(unsigned level) const
+{
+    if (level > levels_)
+        return 0;
+    return Max(height_ >> level, 1);
+}
+
 TextureUsage Texture::GetUsage() const
 {
     /// \todo Check for rendertarget / depthstencil mode
@@ -194,6 +206,45 @@ TextureUsage Texture::GetUsage() const
         return TEXTURE_DYNAMIC;
     
     return TEXTURE_STATIC;
+}
+
+unsigned Texture::GetDataSize(int width, int height) const
+{
+    if (format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
+        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT)
+        return GetRowDataSize(width) * ((height + 3) >> 2);
+    else
+        return GetRowDataSize(width) * height;
+}
+
+unsigned Texture::GetRowDataSize(int width) const
+{
+    switch (format_)
+    {
+    case GL_ALPHA:
+    case GL_LUMINANCE:
+        return width;
+
+    case GL_LUMINANCE_ALPHA:
+        return width * 2;
+
+    case GL_RGB:
+        return width * 3;
+
+    case GL_RGBA:
+    case GL_DEPTH24_STENCIL8_EXT:
+        return width * 4;
+
+    case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+        return ((width + 3) >> 2) * 8;
+
+    case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+    case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+        return ((width + 3) >> 2) * 16;
+        
+    default:
+        return 0;
+    }
 }
 
 unsigned Texture::GetDXTFormat(CompressedFormat format)

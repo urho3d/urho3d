@@ -109,6 +109,20 @@ void Texture::ClearDataLost()
     dataLost_ = false;
 }
 
+int Texture::GetLevelWidth(unsigned level) const
+{
+    if (level > levels_)
+        return 0;
+    return Max(width_ >> level, 1);
+}
+
+int Texture::GetLevelHeight(unsigned level) const
+{
+    if (level > levels_)
+        return 0;
+    return Max(height_ >> level, 1);
+}
+
 TextureUsage Texture::GetUsage() const
 {
     if (usage_ & D3DUSAGE_DEPTHSTENCIL)
@@ -121,6 +135,49 @@ TextureUsage Texture::GetUsage() const
         return TEXTURE_DYNAMIC;
     
     return TEXTURE_STATIC;
+}
+
+unsigned Texture::GetDataSize(int width, int height) const
+{
+    if (format_ == D3DFMT_DXT1 || format_ == D3DFMT_DXT3 || format_ == D3DFMT_DXT5)
+        return GetRowDataSize(width) * ((height + 3) >> 2);
+    else
+        return GetRowDataSize(width) * height;
+}
+
+unsigned Texture::GetRowDataSize(int width) const
+{
+    switch (format_)
+    {
+    case D3DFMT_A8:
+    case D3DFMT_L8:
+        return width;
+    
+    case D3DFMT_D16:
+    case D3DFMT_R5G6B5:
+    case D3DFMT_A4R4G4B4:
+    case D3DFMT_A8L8:
+        return width * 2;
+
+    case D3DFMT_X8R8G8B8:
+        // Note: here source and destination data size differ
+        return width * 3;
+
+    case D3DFMT_A8R8G8B8:
+    case D3DFMT_R32F:
+    case D3DFMT_D24S8:
+        return width * 4;
+
+    case D3DFMT_DXT1:
+        return ((width + 3) >> 2) * 8;
+        
+    case D3DFMT_DXT3:
+    case D3DFMT_DXT5:
+        return ((width + 3) >> 2) * 16;
+        
+    default:
+        return 0;
+    }
 }
 
 unsigned Texture::GetDXTFormat(CompressedFormat format)

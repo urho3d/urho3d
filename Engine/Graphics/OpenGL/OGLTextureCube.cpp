@@ -60,15 +60,48 @@ void TextureCube::RegisterObject(Context* context)
     context->RegisterFactory<TextureCube>();
 }
 
+void TextureCube::OnDeviceLost()
+{
+    savedLevels_.Clear();
+    
+    // Check if save data is supported, in that case save data of each face and mip level
+    if (GetDataSize(width_, height_))
+    {
+        for (unsigned i = 0; i < levels_; ++i)
+        {
+            for (unsigned face = FACE_POSITIVE_X; face < MAX_CUBEMAP_FACES; ++face)
+            {
+                int levelWidth = GetLevelWidth(i);
+                int levelHeight = GetLevelHeight(i);
+                SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
+                GetData((CubeMapFace)face, i, savedLevel.GetPtr());
+                savedLevels_.Push(savedLevel);
+            }
+        }
+    }
+    
+    Release();
+}
+
 void TextureCube::OnDeviceReset()
 {
     if (!object_)
     {
-        // Reload from the original file if possible
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        const String& name = GetName();
-        if (cache && !name.Empty() && cache->Exists(name))
-            cache->ReloadResource(this);
+        Create();
+        
+        // Restore texture from save data if it exists
+        if (savedLevels_.Size())
+        {
+            for (unsigned i = 0; i < savedLevels_.Size(); ++i)
+            {
+                CubeMapFace face = (CubeMapFace)(i % 6);
+                unsigned level = i / 6;
+                int levelWidth = GetLevelWidth(level);
+                int levelHeight = GetLevelHeight(level);
+                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].GetPtr());
+            }
+            savedLevels_.Clear();
+        }
     }
 }
 
@@ -93,7 +126,6 @@ void TextureCube::Release()
         
         glDeleteTextures(1, &object_);
         object_ = 0;
-        dataLost_ = true;
     }
 }
 
@@ -142,6 +174,69 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     return Create();
 }
 
+bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
+{
+    if (!object_ || !graphics_)
+    {
+        LOGERROR("No texture created, can not set data");
+        return false;
+    }
+    
+    if (!data)
+    {
+        LOGERROR("Null source for setting data");
+        return false;
+    }
+    
+    if (level >= levels_)
+    {
+        LOGERROR("Illegal mip level for setting data");
+        return false;
+    }
+    
+    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
+        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    if (compressed)
+    {
+        x &= ~3;
+        y &= ~3;
+    }
+    
+    int levelWidth = GetLevelWidth(level);
+    int levelHeight = GetLevelHeight(level);
+    if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
+    {
+        LOGERROR("Illegal dimensions for setting data");
+        return false;
+    }
+    
+    bool wholeLevel = x == 0 && y == 0 && width == levelWidth && height == levelHeight;
+    
+    graphics_->SetTextureForUpdate(this);
+    
+    if (!compressed)
+    {
+        if (wholeLevel)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format_, width, height, 0, GetExternalFormat(format_),
+                GetDataType(format_), data);
+        else
+            glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, x, y, width, height, GetExternalFormat(format_),
+                GetDataType(format_), data);
+    }
+    else
+    {
+        if (wholeLevel)
+            glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, format_, width, height, 0,
+                GetDataSize(width, height), data);
+        else
+            glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, x, y, width, height, format_,
+                GetDataSize(width, height), data);
+    }
+    
+    graphics_->SetTexture(0, 0);
+    return true;
+}
+
 bool TextureCube::Load(Deserializer& source)
 {
     PROFILE(LoadTextureCube);
@@ -183,7 +278,6 @@ bool TextureCube::Load(Deserializer& source)
         faceElem = faceElem.GetNextElement("face");
     }
     
-    ClearDataLost();
     return true;
 }
 
@@ -271,12 +365,10 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
             }
         }
         
-        graphics_->SetTextureForUpdate(this);
-        
         for (unsigned i = 0; i < levels_; ++i)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, i, format_, levelWidth, levelHeight, 0,
-                GetExternalFormat(format_), GL_UNSIGNED_BYTE, levelData);
+            SetData(face, i, 0, 0, levelWidth, levelHeight, levelData);
+            memoryUse += levelWidth * levelHeight * components;
             
             if (i < levels_ - 1)
             {
@@ -285,11 +377,7 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
             }
-            
-            memoryUse += levelWidth * levelHeight * components;
         }
-        
-        graphics_->SetTexture(0, 0);
     }
     else
     {
@@ -332,17 +420,12 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
             }
         }
         
-        graphics_->SetTextureForUpdate(this);
-        
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
         {
             CompressedLevel level = image->GetCompressedLevel(i + mipsToSkip);
-            glCompressedTexImage2D(target_, i, format_, level.width_, level.height_, 0, level.dataSize_, level.data_);
-            
+            SetData(face, i, 0, 0, level.width_, level.height_, level.data_);
             memoryUse += level.rows_ * level.rowSize_;
         }
-        
-        graphics_->SetTexture(0, 0);
     }
     
     faceMemoryUse_[face] = memoryUse;
@@ -350,6 +433,40 @@ bool TextureCube::Load(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         totalMemoryUse += faceMemoryUse_[i];
     SetMemoryUse(totalMemoryUse);
+    return true;
+}
+
+bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
+{
+    if (!object_ || !graphics_)
+    {
+        LOGERROR("No texture created, can not get data");
+        return false;
+    }
+    
+    if (!dest)
+    {
+        LOGERROR("Null destination for getting data");
+        return false;
+    }
+    
+    if (level >= levels_)
+    {
+        LOGERROR("Illegal mip level for getting data");
+        return false;
+    }
+    
+    bool compressed = format_ == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT || format_ == GL_COMPRESSED_RGBA_S3TC_DXT3_EXT ||
+        format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    
+    graphics_->SetTextureForUpdate(const_cast<TextureCube*>(this));
+    
+    if (!compressed)
+        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, GetExternalFormat(format_), GetDataType(format_), dest);
+    else
+        glGetCompressedTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, dest);
+    
+    graphics_->SetTexture(0, 0);
     return true;
 }
 

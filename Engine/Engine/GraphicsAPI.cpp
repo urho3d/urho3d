@@ -167,6 +167,8 @@ static bool TextureCubeLoad(CubeMapFace face, Image* image, TextureCube* ptr)
 
 static void RegisterTextures(asIScriptEngine* engine)
 {
+    /// \todo Expose getting/setting raw texture data
+    
     engine->RegisterEnum("TextureUsage");
     engine->RegisterEnumValue("TextureUsage", "TEXTURE_STATIC", TEXTURE_STATIC);
     engine->RegisterEnumValue("TextureUsage", "TEXTURE_DYNAMIC", TEXTURE_DYNAMIC);

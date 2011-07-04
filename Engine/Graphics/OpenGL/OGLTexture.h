@@ -28,6 +28,7 @@
 #include "Image.h"
 #include "GraphicsDefs.h"
 #include "Resource.h"
+#include "SharedArrayPtr.h"
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
@@ -56,13 +57,11 @@ public:
     void SetBackupTexture(Texture* texture);
     /// Dirty the parameters
     void SetParametersDirty();
-    /// Clear data lost flag
+    /// Clear data lost flag. No-op on OpenGL.
     void ClearDataLost();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture
     void UpdateParameters();
-    
-    /// Return texture usage type
-    TextureUsage GetUsage() const;
+
     /// Return texture's OpenGL target
     unsigned GetTarget() const { return target_; }
     /// Return texture format
@@ -75,8 +74,8 @@ public:
     int GetWidth() const { return width_; }
     /// Return height
     int GetHeight() const { return height_; }
-    /// Return whether data is lost
-    bool IsDataLost() const { return dataLost_; }
+    /// Return whether data is lost. Always false on OpenGL
+    bool IsDataLost() const { return false; }
     /// Return whether parameters are dirty
     bool GetParametersDirty() const { return parametersDirty_; }
     /// Return filtering mode
@@ -89,6 +88,16 @@ public:
     const Color& GetBorderColor() const { return borderColor_; }
     /// Return backup texture
     Texture* GetBackupTexture() const { return backupTexture_; }
+    /// Return mip level width, or 0 if level does not exist
+    int GetLevelWidth(unsigned level) const;
+    /// Return mip level width, or 0 if level does not exist
+    int GetLevelHeight(unsigned level) const;
+    /// Return texture usage type
+    TextureUsage GetUsage() const;
+    /// Return data size in bytes for a rectangular region
+    unsigned GetDataSize(int width, int height) const;
+    /// Return data size in bytes for a pixel or block row
+    unsigned GetRowDataSize(int width) const;
     /// Return API-specific compressed texture format
     static unsigned GetDXTFormat(CompressedFormat format);
     /// Return the non-internal texture format corresponding to an OpenGL internal format
@@ -118,8 +127,6 @@ protected:
     int width_;
     /// Texture height
     int height_;
-    /// Data lost flag
-    bool dataLost_;
     /// Dynamic flag
     bool dynamic_;
     /// Shadow compare mode, OpenGL only
@@ -136,4 +143,6 @@ protected:
     Color borderColor_;
     /// Backup texture
     SharedPtr<Texture> backupTexture_;
+    /// Save data per mip level
+    Vector<SharedArrayPtr<unsigned char> > savedLevels_;
 };
