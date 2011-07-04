@@ -184,16 +184,6 @@ bool Script::Execute(const String& line)
     return success;
 }
 
-void Script::GarbageCollect(bool fullCycle)
-{
-    PROFILE(GarbageCollect);
-    
-    if (fullCycle)
-        scriptEngine_->GarbageCollect(asGC_FULL_CYCLE);
-    else
-        scriptEngine_->GarbageCollect(asGC_ONE_STEP);
-}
-
 void Script::SetDefaultScriptFile(ScriptFile* file)
 {
     defaultScriptFile_ = file;

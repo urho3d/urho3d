@@ -105,17 +105,17 @@ public:
 	virtual int  CompileGlobalVar(const char *sectionName, const char *code, int lineOffset);
 
 	// Script functions
-	virtual int                GetFunctionCount() const;
-	virtual int                GetFunctionIdByIndex(int index) const;
+	virtual asUINT             GetFunctionCount() const;
+	virtual int                GetFunctionIdByIndex(asUINT index) const;
 	virtual int                GetFunctionIdByName(const char *name) const;
 	virtual int                GetFunctionIdByDecl(const char *decl) const;
-	virtual asIScriptFunction *GetFunctionDescriptorByIndex(int index) const;
+	virtual asIScriptFunction *GetFunctionDescriptorByIndex(asUINT index) const;
 	virtual asIScriptFunction *GetFunctionDescriptorById(int funcId) const;
 	virtual int                RemoveFunction(int funcId);
 
 	// Script global variables
-	virtual int         ResetGlobalVars();
-	virtual int         GetGlobalVarCount() const;
+	virtual int         ResetGlobalVars(asIScriptContext *ctx);
+	virtual asUINT      GetGlobalVarCount() const;
 	virtual int         GetGlobalVarIndexByName(const char *name) const;
 	virtual int         GetGlobalVarIndexByDecl(const char *decl) const;
 	virtual const char *GetGlobalVarDeclaration(asUINT index) const;
@@ -124,27 +124,27 @@ public:
 	virtual int         RemoveGlobalVar(asUINT index);
 
 	// Type identification
-	virtual int            GetObjectTypeCount() const;
+	virtual asUINT         GetObjectTypeCount() const;
 	virtual asIObjectType *GetObjectTypeByIndex(asUINT index) const;
 	virtual int            GetTypeIdByDecl(const char *decl) const;
 
 	// Enums
-	virtual int         GetEnumCount() const;
+	virtual asUINT      GetEnumCount() const;
 	virtual const char *GetEnumByIndex(asUINT index, int *enumTypeId) const;
 	virtual int         GetEnumValueCount(int enumTypeId) const;
 	virtual const char *GetEnumValueByIndex(int enumTypeId, asUINT index, int *outValue) const;
 
 	// Typedefs
-	virtual int         GetTypedefCount() const;
+	virtual asUINT      GetTypedefCount() const;
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId) const;
 
 	// Dynamic binding between modules
-	virtual int         GetImportedFunctionCount() const;
+	virtual asUINT      GetImportedFunctionCount() const;
 	virtual int         GetImportedFunctionIndexByDecl(const char *decl) const;
-	virtual const char *GetImportedFunctionDeclaration(int importIndex) const;
-	virtual const char *GetImportedFunctionSourceModule(int importIndex) const;
-	virtual int         BindImportedFunction(int index, int sourceID);
-	virtual int         UnbindImportedFunction(int importIndex);
+	virtual const char *GetImportedFunctionDeclaration(asUINT importIndex) const;
+	virtual const char *GetImportedFunctionSourceModule(asUINT importIndex) const;
+	virtual int         BindImportedFunction(asUINT index, int sourceID);
+	virtual int         UnbindImportedFunction(asUINT importIndex);
 	virtual int         BindAllImportedFunctions();
 	virtual int         UnbindAllImportedFunctions();
 
@@ -167,7 +167,7 @@ public:
 
 	void InternalReset();
 
-	int  CallInit();
+	int  CallInit(asIScriptContext *ctx);
 	void CallExit();
 
 	void JITCompile();

@@ -1627,20 +1627,6 @@ void asCBuilder::CompileClasses()
 				else
 				{
 					decl->objType->interfaces.PushLast(objType);
-
-					// Make sure all the methods of the interface are implemented
-					for( asUINT i = 0; i < objType->methods.GetLength(); i++ )
-					{
-						if( !DoesMethodExist(decl->objType, objType->methods[i]) )
-						{
-							int r, c;
-							file->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
-							asCString str;
-							str.Format(TXT_MISSING_IMPLEMENTATION_OF_s,
-								engine->GetFunctionDeclaration(objType->methods[i]).AddressOf());
-							WriteError(file->name.AddressOf(), str.AddressOf(), r, c);
-						}
-					}
 				}
 			}
 
@@ -1802,6 +1788,29 @@ void asCBuilder::CompileClasses()
 		toValidate.PushLast(decl);
 	}
 
+	// Verify that all interface methods are implemented in the classes
+	// We do this here so the base class' methods have already been inherited 
+	for( n = 0; n < classDeclarations.GetLength(); n++ )
+	{
+		sClassDeclaration *decl = classDeclarations[n];
+		for( asUINT m = 0; m < decl->objType->interfaces.GetLength(); m++ )
+		{
+			asCObjectType *objType = decl->objType->interfaces[m];
+			for( asUINT i = 0; i < objType->methods.GetLength(); i++ )
+			{
+				if( !DoesMethodExist(decl->objType, objType->methods[i]) )
+				{
+					int r, c;
+					decl->script->ConvertPosToRowCol(decl->node->tokenPos, &r, &c);
+					asCString str;
+					str.Format(TXT_MISSING_IMPLEMENTATION_OF_s,
+						engine->GetFunctionDeclaration(objType->methods[i]).AddressOf());
+					WriteError(decl->script->name.AddressOf(), str.AddressOf(), r, c);
+				}
+			}
+		}
+	}
+
 	// Verify that the declared structures are valid, e.g. that the structure
 	// doesn't contain a member of its own type directly or indirectly
 	while( toValidate.GetLength() > 0 )
@@ -1890,8 +1899,6 @@ void asCBuilder::CompileClasses()
 
 	if( numErrors > 0 ) return;
 
-	// TODO: The declarations form a graph, all circles in
-	//       the graph must be flagged as potential circles
 
 	// Urho3D: disable garbage collection from script classes
 	/*
@@ -1909,17 +1916,22 @@ void asCBuilder::CompileClasses()
 			{
 				if( dt.IsObjectHandle() )
 				{
-					// TODO: Can this handle really generate a circular reference?
-					//       Only if the handle is of a type that can reference this type, either directly or indirectly
+					// TODO: optimize: If it is known that the handle can't be involved in a circular reference
+					//                 then this object doesn't need to be marked as garbage collected. 
+					//                 - The application could set a flag when registering the object.
+					//                 - The script classes can be marked as final, then the compiler will 
+					//                   be able to determine whether the class is garbage collected or not.
 
 					ot->flags |= asOBJ_GC;
+					break;
 				}
 				else if( dt.GetObjectType()->flags & asOBJ_GC )
 				{
-					// TODO: Just because the member type is a potential circle doesn't mean that this one is
-					//       Only if the object is of a type that can reference this type, either directly or indirectly
+					// TODO: optimize: Just because the member type is a potential circle doesn't mean that this one is
+					//                 Only if the object is of a type that can reference this type, either directly or indirectly
 
 					ot->flags |= asOBJ_GC;
+					break;
 				}
 			}
 		}

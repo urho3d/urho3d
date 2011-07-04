@@ -95,8 +95,6 @@ void asCCompiler::Reset(asCBuilder *builder, asCScriptCode *script, asCScriptFun
 	continueLabels.SetLength(0);
 
 	byteCode.ClearAll();
-
-	globalExpression = false;
 }
 
 int asCCompiler::CompileDefaultConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptFunction *outFunc)
@@ -282,6 +280,8 @@ int asCCompiler::CompileFunction(asCBuilder *builder, asCScriptCode *script, asC
 			if( vs.DeclareVariable(name.AddressOf(), type, stackPos, true) < 0 )
 				Error(TXT_PARAMETER_ALREADY_DECLARED, node);
 
+			// Add marker for variable declaration
+			byteCode.VarDecl((int)outFunc->variables.GetLength());
 			outFunc->AddVariable(name, type, stackPos);
 
 			node = node->next;
@@ -744,7 +744,6 @@ void asCCompiler::CompileStatementBlock(asCScriptNode *block, bool ownVariableSc
 int asCCompiler::CompileGlobalVariable(asCBuilder *builder, asCScriptCode *script, asCScriptNode *node, sGlobalVariableDescription *gvar, asCScriptFunction *outFunc)
 {
 	Reset(builder, script, outFunc);
-	globalExpression = true;
 
 	// Add a variable scope (even though variables can't be declared)
 	AddVariableScope();
@@ -1406,7 +1405,12 @@ void asCCompiler::MoveArgsToStack(int funcID, asCByteCode *bc, asCArray<asSExprC
 				{
 					// Send the object as a reference to the object, 
 					// and not to the variable holding the object
-					bc->InstrWORD(asBC_GETOBJREF, (asWORD)offset);
+					if( !IsVariableOnHeap(args[n]->type.stackOffset) )
+						// TODO: optimize: Actually the reference can be pushed on the stack directly
+						//                 as the value allocated on the stack is guaranteed to be safe
+						bc->InstrWORD(asBC_GETREF, (asWORD)offset);
+					else
+						bc->InstrWORD(asBC_GETOBJREF, (asWORD)offset);
 				}
 				else
 					bc->InstrWORD(asBC_GETREF, (asWORD)offset);
@@ -1710,6 +1714,8 @@ void asCCompiler::CompileDeclaration(asCScriptNode *decl, asCByteCode *bc)
 			return;
 		}
 
+		// Add marker that the variable has been declared
+		bc->VarDecl((int)outFunc->variables.GetLength());
 		outFunc->AddVariable(name, type, offset);
 
 		// Keep the node for the variable decl
@@ -3785,7 +3791,7 @@ bool asCCompiler::CompileRefCast(asSExprContext *ctx, const asCDataType &to, boo
 
 #ifdef AS_64BIT_PTR
 				int offset = AllocateVariable(asCDataType::CreatePrimitive(ttUInt64, false), true);
-				ctx->bc.InstrW_QW(asBC_SetV8, offset, 0);
+				ctx->bc.InstrW_QW(asBC_SetV8, (asWORD)offset, 0);
 				ctx->bc.InstrW_W(asBC_CMPi64, ctx->type.stackOffset, offset);
 				DeallocateVariable(offset);
 #else
@@ -4846,7 +4852,9 @@ void asCCompiler::ImplicitConversionConstant(asSExprContext *from, const asCData
 		if( from->type.dataType.IsFloatType() )
 		{
 			float fc = from->type.floatValue;
-			asUINT uic = asUINT(fc);
+			// Some compilers set the value to 0 when converting a negative float to unsigned int.
+			// To maintain a consistent behaviour across compilers we convert to int first.
+			asUINT uic = asUINT(int(fc));
 
 			if( float(uic) != fc )
 			{
@@ -4862,7 +4870,9 @@ void asCCompiler::ImplicitConversionConstant(asSExprContext *from, const asCData
 		else if( from->type.dataType.IsDoubleType() )
 		{
 			double fc = from->type.doubleValue;
-			asUINT uic = asUINT(fc);
+			// Some compilers set the value to 0 when converting a negative double to unsigned int.
+			// To maintain a consistent behaviour across compilers we convert to int first.
+			asUINT uic = asUINT(int(fc));
 
 			if( double(uic) != fc )
 			{
@@ -5101,7 +5111,7 @@ void asCCompiler::ImplicitConversionConstant(asSExprContext *from, const asCData
 		}
 		else if( from->type.dataType.IsUnsignedType() && from->type.dataType.GetSizeInMemoryDWords() == 2 )
 		{
-			float fc = float((signed)from->type.qwordValue);
+			float fc = float((asINT64)from->type.qwordValue);
 
 			if( asQWORD(fc) != from->type.qwordValue )
 			{
@@ -5196,7 +5206,7 @@ void asCCompiler::ImplicitConversionConstant(asSExprContext *from, const asCData
 		}
 		else if( from->type.dataType.IsUnsignedType() && from->type.dataType.GetSizeInMemoryDWords() == 2 )
 		{
-			double fc = double((signed)from->type.qwordValue);
+			double fc = double((asINT64)from->type.qwordValue);
 
 			if( asQWORD(fc) != from->type.qwordValue )
 			{
@@ -5443,13 +5453,6 @@ int asCCompiler::CompileAssignment(asCScriptNode *expr, asSExprContext *ctx)
 	asCScriptNode *lexpr = expr->firstChild;
 	if( lexpr->next )
 	{
-		if( globalExpression )
-		{
-			Error(TXT_ASSIGN_IN_GLOBAL_EXPR, expr);
-			ctx->type.SetDummy();
-			return -1;
-		}
-
 		// Compile the two expression terms
 		asSExprContext lctx(engine), rctx(engine);
 		int rr = CompileAssignment(lexpr->next->next, &rctx);
@@ -5856,12 +5859,12 @@ int asCCompiler::CompileVariableAccess(const asCString &name, const asCString &s
 			{
 				// This is an index access, check if there is a property accessor that takes an index arg
 				asSExprContext dummyArg(engine);
-				r = FindPropertyAccessor(name, &access, &dummyArg, errNode);
+				r = FindPropertyAccessor(name, &access, &dummyArg, errNode, true);
 			}
 			if( r == 0 )
 			{
 				// Normal property access
-				r = FindPropertyAccessor(name, &access, errNode);
+				r = FindPropertyAccessor(name, &access, errNode, true);
 			}
 			if( r < 0 ) return -1;
 			if( access.property_get || access.property_set )
@@ -6944,15 +6947,6 @@ void asCCompiler::CompileConstructCall(asCScriptNode *node, asSExprContext *ctx)
 		return;
 	}
 
-	if( globalExpression )
-	{
-		Error(TXT_FUNCTION_IN_GLOBAL_EXPR, node);
-
-		// Output dummy code
-		ctx->type.SetDummy();
-		return;
-	}
-
 	// Compile the arguments
 	asCArray<asSExprContext *> args;
 	asCArray<asCTypeInfo> temporaryVariables;
@@ -7124,8 +7118,8 @@ void asCCompiler::CompileFunctionCall(asCScriptNode *node, asSExprContext *ctx, 
 	asCScriptNode *nm = node->lastChild->prev;
 	name.Assign(&script->code[nm->tokenPos], nm->tokenLength);
 
-	// TODO: funcdef: First check for a local variable of a function type
-	//                Must not allow function names, nor global variables to be returned in this instance
+	// First check for a local variable of a function type
+	// Must not allow function names, nor global variables to be returned in this instance
 	asSExprContext funcPtr(engine);
 	if( objectType == 0 )
 		r = CompileVariableAccess(name, scope, &funcPtr, node, true, true);
@@ -7156,19 +7150,18 @@ void asCCompiler::CompileFunctionCall(asCScriptNode *node, asSExprContext *ctx, 
 			// TODO: funcdef: It is still possible that there is a global variable of a function type
 		}
 	}
+	else if( !funcPtr.type.dataType.GetFuncDef() )
+	{
+		// The variable is not a function
+		asCString msg;
+		msg.Format(TXT_NOT_A_FUNC_s_IS_VAR, name.AddressOf());
+		Error(msg.AddressOf(), node);
+		return;
+	}
 
 	if( funcs.GetLength() == 0 && funcPtr.type.dataType.GetFuncDef() )
 	{
 		funcs.PushLast(funcPtr.type.dataType.GetFuncDef()->id);
-	}
-
-	if( globalExpression )
-	{
-		Error(TXT_FUNCTION_IN_GLOBAL_EXPR, node);
-
-		// Output dummy code
-		ctx->type.SetDummy();
-		return;
 	}
 
 	// Compile the arguments
@@ -7510,11 +7503,6 @@ int asCCompiler::CompileExpressionPreOp(asCScriptNode *node, asSExprContext *ctx
 	{
 		// Need a reference to the primitive that will be updated
 		// The result of this expression is the same reference as before
-		if( globalExpression )
-		{
-			Error(TXT_INC_OP_IN_GLOBAL_EXPR, node);
-			return -1;
-		}
 
 		// Make sure the reference isn't a temporary variable
 		if( ctx->type.isTemporary )
@@ -7613,12 +7601,12 @@ void asCCompiler::ConvertToReference(asSExprContext *ctx)
 	}
 }
 
-int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asCScriptNode *node)
+int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asCScriptNode *node, bool isThisAccess)
 {
-	return FindPropertyAccessor(name, ctx, 0, node);
+	return FindPropertyAccessor(name, ctx, 0, node, isThisAccess);
 }
 
-int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node)
+int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node, bool isThisAccess)
 {
 	if( engine->ep.propertyAccessorMode == 0 )
 	{
@@ -7763,7 +7751,7 @@ int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx
 	// Check if we are within one of the accessors
 	int realGetId = getId;
 	int realSetId = setId;
-	if( outFunc->objectType )
+	if( outFunc->objectType && isThisAccess )
 	{
 		// The property accessors would be virtual functions, so we need to find the real implementation
 		asCScriptFunction *getFunc = getId ? engine->scriptFunctions[getId] : 0;
@@ -7778,11 +7766,12 @@ int asCCompiler::FindPropertyAccessor(const asCString &name, asSExprContext *ctx
 			realSetId = outFunc->objectType->virtualFunctionTable[setFunc->vfTableIdx]->id;
 	}
 
-	if( (realGetId && realGetId == outFunc->id) ||
-		(realSetId && realSetId == outFunc->id) )
+	// Avoid recursive call, by not treating this as a property accessor call.
+	// This will also allow having the real property with the same name as the accessors.
+	if( (isThisAccess || outFunc->objectType == 0) &&
+		((realGetId && realGetId == outFunc->id) ||
+		 (realSetId && realSetId == outFunc->id)) )
 	{
-		// Avoid recursive call, by not treating this as a property accessor call.
-		// This will also allow having the real property with the same name as the accessors.
 		getId = 0;
 		setId = 0;
 	}
@@ -8093,12 +8082,6 @@ int asCCompiler::CompileExpressionPostOp(asCScriptNode *node, asSExprContext *ct
 	}
 	else if( op == ttInc || op == ttDec )
 	{
-		if( globalExpression )
-		{
-			Error(TXT_INC_OP_IN_GLOBAL_EXPR, node);
-			return -1;
-		}
-
 		// Make sure the reference isn't a temporary variable
 		if( ctx->type.isTemporary )
 		{
@@ -8263,12 +8246,6 @@ int asCCompiler::CompileExpressionPostOp(asCScriptNode *node, asSExprContext *ct
 		}
 		else
 		{
-			if( globalExpression )
-			{
-				Error(TXT_METHOD_IN_GLOBAL_EXPR, node);
-				return -1;
-			}
-
 			// Make sure it is an object we are accessing
 			if( !ctx->type.dataType.IsObject() )
 			{

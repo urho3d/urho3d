@@ -167,8 +167,8 @@ protected:
 	// Helper functions
 	void ProcessPropertyGetAccessor(asSExprContext *ctx, asCScriptNode *node);
 	int  ProcessPropertySetAccessor(asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node);
-	int  FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asCScriptNode *node);
-	int  FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node);
+	int  FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asCScriptNode *node, bool isThisAccess = false);
+	int  FindPropertyAccessor(const asCString &name, asSExprContext *ctx, asSExprContext *arg, asCScriptNode *node, bool isThisAccess = false);
 	void SwapPostFixOperands(asCArray<asCScriptNode *> &postfix, asCArray<asCScriptNode *> &target);
 	void PrepareTemporaryObject(asCScriptNode *node, asSExprContext *ctx, asCArray<int> *reservedVars, bool forceOnHeap = false);
 	void PrepareOperand(asSExprContext *ctx, asCScriptNode *node);
@@ -259,7 +259,6 @@ protected:
 	asCArray<int>         freeVariables;
 	asCArray<int>         tempVariables;
 
-	bool globalExpression;
 	bool isCompilingDefaultArg;
 	bool isProcessingDeferredParams;
 	int noCodeOutput;

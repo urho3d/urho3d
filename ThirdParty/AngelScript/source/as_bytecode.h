@@ -96,6 +96,7 @@ public:
 	void Line(int line, int column);
 	void ObjInfo(int offset, int info);
 	void Block(bool start);
+	void VarDecl(int varDeclIdx);
 	void Call(asEBCInstr bc, int funcID, int pop);
 	void CallPtr(asEBCInstr bc, int funcPtrVar, int pop);
 	void Alloc(asEBCInstr bc, void *objID, int funcID, int pop);

@@ -520,9 +520,6 @@ void ScriptFile::ReleaseModule()
         methods_.Clear();
         UnsubscribeFromAllEventsWithUserData();
         
-        // Perform a full garbage collection cycle now
-        script_->GarbageCollect(true);
-        
         // Remove the module
         script_->GetModuleMap().Erase(scriptModule_);
         asIScriptEngine* engine = script_->GetScriptEngine();

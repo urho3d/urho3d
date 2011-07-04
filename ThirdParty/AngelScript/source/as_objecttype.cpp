@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -274,9 +274,9 @@ int asCObjectType::GetSubTypeId() const
 	return asERROR;
 }
 
-int asCObjectType::GetInterfaceCount() const
+asUINT asCObjectType::GetInterfaceCount() const
 {
-	return (int)interfaces.GetLength();
+	return (asUINT)interfaces.GetLength();
 }
 
 asIObjectType *asCObjectType::GetInterface(asUINT index) const
@@ -298,14 +298,14 @@ asIScriptEngine *asCObjectType::GetEngine() const
 	return engine;
 }
 
-int asCObjectType::GetFactoryCount() const
+asUINT asCObjectType::GetFactoryCount() const
 {
-	return (int)beh.factories.GetLength();
+	return (asUINT)beh.factories.GetLength();
 }
 
-int asCObjectType::GetFactoryIdByIndex(int index) const
+int asCObjectType::GetFactoryIdByIndex(asUINT index) const
 {
-	if( index < 0 || (unsigned)index >= beh.factories.GetLength() )
+	if( index >= beh.factories.GetLength() )
 		return asINVALID_ARG;
 
 	return beh.factories[index];
@@ -321,15 +321,15 @@ int asCObjectType::GetFactoryIdByDecl(const char *decl) const
 }
 
 // interface
-int asCObjectType::GetMethodCount() const
+asUINT asCObjectType::GetMethodCount() const
 {
-	return (int)methods.GetLength();
+	return (asUINT)methods.GetLength();
 }
 
 // interface
-int asCObjectType::GetMethodIdByIndex(int index, bool getVirtual) const
+int asCObjectType::GetMethodIdByIndex(asUINT index, bool getVirtual) const
 {
-	if( index < 0 || (unsigned)index >= methods.GetLength() )
+	if( index >= methods.GetLength() )
 		return asINVALID_ARG;
 
 	if( !getVirtual )
@@ -397,9 +397,9 @@ int asCObjectType::GetMethodIdByDecl(const char *decl, bool getVirtual) const
 }
 
 // interface
-asIScriptFunction *asCObjectType::GetMethodDescriptorByIndex(int index, bool getVirtual) const
+asIScriptFunction *asCObjectType::GetMethodDescriptorByIndex(asUINT index, bool getVirtual) const
 {
-	if( index < 0 || (unsigned)index >= methods.GetLength() ) 
+	if( index >= methods.GetLength() ) 
 		return 0;
 
 	if( !getVirtual )
@@ -413,13 +413,13 @@ asIScriptFunction *asCObjectType::GetMethodDescriptorByIndex(int index, bool get
 }
 
 // interface
-int asCObjectType::GetPropertyCount() const
+asUINT asCObjectType::GetPropertyCount() const
 {
-	return (int)properties.GetLength();
+	return (asUINT)properties.GetLength();
 }
 
 // interface
-int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset) const
+int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, bool *isPrivate, int *offset, bool *isReference) const
 {
 	if( index >= properties.GetLength() )
 		return asINVALID_ARG;
@@ -432,6 +432,8 @@ int asCObjectType::GetProperty(asUINT index, const char **name, int *typeId, boo
 		*isPrivate = properties[index]->isPrivate;
 	if( offset )
 		*offset = properties[index]->byteOffset;
+	if( isReference )
+		*isReference = properties[index]->type.IsReference();
 
 	return 0;
 }
@@ -460,10 +462,10 @@ asIObjectType *asCObjectType::GetBaseType() const
 	return derivedFrom; 
 }
 
-int asCObjectType::GetBehaviourCount() const
+asUINT asCObjectType::GetBehaviourCount() const
 {
 	// Count the number of behaviours (except factory functions)
-	int count = 0;
+	asUINT count = 0;
 	
 	if( beh.destruct )               count++;
 	if( beh.addref )                 count++;
@@ -478,8 +480,8 @@ int asCObjectType::GetBehaviourCount() const
 
 	// For reference types, the factories are also stored in the constructor
 	// list, so it is sufficient to enumerate only those
-	count += (int)beh.constructors.GetLength();
-	count += (int)beh.operators.GetLength() / 2;
+	count += (asUINT)beh.constructors.GetLength();
+	count += (asUINT)beh.operators.GetLength() / 2;
 
 	return count;
 }
@@ -487,63 +489,63 @@ int asCObjectType::GetBehaviourCount() const
 int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour) const
 {
 	// Find the correct behaviour
-	int count = 0;
+	asUINT count = 0;
 
-	if( beh.destruct && count++ == (int)index ) // only increase count if the behaviour is registered
+	if( beh.destruct && count++ == index ) // only increase count if the behaviour is registered
 	{ 
 		if( outBehaviour ) *outBehaviour = asBEHAVE_DESTRUCT;
 		return beh.destruct;
 	}
 
-	if( beh.addref && count++ == (int)index )
+	if( beh.addref && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_ADDREF;
 		return beh.addref;
 	}
 
-	if( beh.release && count++ == (int)index )
+	if( beh.release && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_RELEASE;
 		return beh.release;
 	}
 
-	if( beh.gcGetRefCount && count++ == (int)index )
+	if( beh.gcGetRefCount && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_GETREFCOUNT;
 		return beh.gcGetRefCount;
 	}
 
-	if( beh.gcSetFlag && count++ == (int)index )
+	if( beh.gcSetFlag && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_SETGCFLAG;
 		return beh.gcSetFlag;
 	}
 
-	if( beh.gcGetFlag && count++ == (int)index )
+	if( beh.gcGetFlag && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_GETGCFLAG;
 		return beh.gcGetFlag;
 	}
 
-	if( beh.gcEnumReferences && count++ == (int)index )
+	if( beh.gcEnumReferences && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_ENUMREFS;
 		return beh.gcEnumReferences;
 	}
 
-	if( beh.gcReleaseAllReferences && count++ == (int)index )
+	if( beh.gcReleaseAllReferences && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_RELEASEREFS;
 		return beh.gcReleaseAllReferences;
 	}
 
-	if( beh.templateCallback && count++ == (int)index )
+	if( beh.templateCallback && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_TEMPLATE_CALLBACK;
 		return beh.templateCallback;
 	}
 
-	if( beh.listFactory && count++ == (int)index )
+	if( beh.listFactory && count++ == index )
 	{
 		if( outBehaviour ) *outBehaviour = asBEHAVE_LIST_FACTORY;
 		return beh.listFactory;
@@ -557,7 +559,7 @@ int asCObjectType::GetBehaviourByIndex(asUINT index, asEBehaviours *outBehaviour
 		return beh.constructors[index - count];
 	}
 	else 
-		count += (int)beh.constructors.GetLength();
+		count += (asUINT)beh.constructors.GetLength();
 
 	if( index - count < beh.operators.GetLength() / 2 )
 	{

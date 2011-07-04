@@ -101,7 +101,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 	{
 		if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
 		{
-			if( descr->parameterTypes[n].GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE )
+			if( descr->parameterTypes[n].GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ||
+				(descr->parameterTypes[n].GetObjectType()->flags & COMPLEX_MASK) )
 			{
 				allArgBuffer[dpos++] = *(asQWORD*)&args[spos];
 				spos += AS_PTR_SIZE;

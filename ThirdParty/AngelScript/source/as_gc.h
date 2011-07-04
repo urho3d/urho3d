@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -56,14 +56,14 @@ public:
 	asCGarbageCollector();
 
 	int  GarbageCollect(asDWORD flags);
-	void GetStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected) const;
+	void GetStatistics(asUINT *currentSize, asUINT *totalDestroyed, asUINT *totalDetected, asUINT *newObjects, asUINT *totalNewDestroyed) const;
 	void GCEnumCallback(void *reference);
 	void AddScriptObjectToGC(void *obj, asCObjectType *objType);
 
 	asCScriptEngine *engine;
 
 protected:
-	struct asSObjTypePair {void *obj; asCObjectType *type;};
+	struct asSObjTypePair {void *obj; asCObjectType *type; int count;};
 	struct asSIntTypePair {int i; asCObjectType *type;};
 
 	enum egcDestroyState
@@ -77,25 +77,33 @@ protected:
 	{
 		clearCounters_init = 0,
 		clearCounters_loop,
+		buildMap_init,
+		buildMap_loop,
 		countReferences_init,
 		countReferences_loop,
 		detectGarbage_init,
 		detectGarbage_loop1,
 		detectGarbage_loop2,
-		verifyUnmarked,
+		verifyUnmarked_init,
+		verifyUnmarked_loop,
 		breakCircles_init,
 		breakCircles_loop,
 		breakCircles_haveGarbage
 	};
 
-	int            DestroyGarbage();
+	int            DestroyNewGarbage();
+	int            DestroyOldGarbage();
 	int            IdentifyGarbageWithCyclicRefs();
-	void           ClearMap();
-	asSObjTypePair GetObjectAtIdx(int idx);
-	void           RemoveObjectAtIdx(int idx);
+	asSObjTypePair GetNewObjectAtIdx(int idx);
+	asSObjTypePair GetOldObjectAtIdx(int idx);
+	void           RemoveNewObjectAtIdx(int idx);
+	void           RemoveOldObjectAtIdx(int idx);
+	void           MoveObjectToOldList(int idx);
+	void           IncreaseCounterForNewObject(int idx);
 
 	// Holds all the objects known by the garbage collector
-	asCArray<asSObjTypePair>           gcObjects;
+	asCArray<asSObjTypePair>           gcNewObjects;
+	asCArray<asSObjTypePair>           gcOldObjects;
 
 	// This array temporarily holds references to objects known to be live objects
 	asCArray<void*>                    liveObjects;
@@ -105,16 +113,20 @@ protected:
 	asCMap<void*, asSIntTypePair>      gcMap;
 
 	// State variables
-	egcDestroyState                    destroyState;
-	asUINT                             destroyIdx;
+	egcDestroyState                    destroyNewState;
+	egcDestroyState                    destroyOldState;
+	asUINT                             destroyNewIdx;
+	asUINT                             destroyOldIdx;
 	asUINT                             numDestroyed;
+	asUINT                             numNewDestroyed;
 	egcDetectState                     detectState;
 	asUINT                             detectIdx;
 	asUINT                             numDetected;
 	asSMapNode<void*, asSIntTypePair> *gcMapCursor;
 
 	// Critical section for multithreaded access
-	DECLARECRITICALSECTION(gcCritical);
+	DECLARECRITICALSECTION(gcCritical);   // Used for adding/removing objects
+	DECLARECRITICALSECTION(gcCollecting); // Used for processing
 };
 
 END_AS_NAMESPACE

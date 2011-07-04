@@ -253,12 +253,6 @@ void Engine::RunFrame()
     time->BeginFrame(timeStep_);
     
     Render();
-    
-    // If scripting initialized, garbage collect before getting the next time step
-    Script* script = GetSubsystem<Script>();
-    if (script)
-        script->GarbageCollect(false);
-    
     GetNextTimeStep();
     
     time->EndFrame();

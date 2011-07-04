@@ -58,8 +58,6 @@ public:
     
     /// Compile and execute a line of script in immediate mode
     bool Execute(const String& line);
-    /// Perform garbage collection
-    void GarbageCollect(bool fullCycle);
     /// Set immediate mode script file
     void SetDefaultScriptFile(ScriptFile* file);
     /// Set immediate mode scene

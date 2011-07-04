@@ -58,6 +58,7 @@ struct asSScriptVariable
 	asCString   name;
 	asCDataType type;
 	int         stackOffset;
+	asUINT      declaredAtProgramPos;
 };
 
 enum asEObjVarInfoOption
@@ -109,14 +110,15 @@ public:
 	bool                 IsReadOnly() const;
 	bool                 IsPrivate() const;
 
-	int                  GetParamCount() const;
-	int                  GetParamTypeId(int index, asDWORD *flags = 0) const;
+	asUINT               GetParamCount() const;
+	int                  GetParamTypeId(asUINT index, asDWORD *flags = 0) const;
 	int                  GetReturnTypeId() const;
 
 	// Debug information
-	int                  GetVarCount() const;
+	asUINT               GetVarCount() const;
 	int                  GetVar(asUINT index, const char **name, int *typeId = 0) const;
 	const char *         GetVarDecl(asUINT index) const;
+	int                  FindNextLineWithCode(int line) const;
 
 	// For JIT compilation
 	asDWORD             *GetByteCode(asUINT *length = 0);

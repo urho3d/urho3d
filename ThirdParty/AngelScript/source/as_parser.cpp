@@ -598,7 +598,11 @@ bool asCParser::IsVarDecl()
 	if( t1.type == ttConst )
 		GetToken(&t1);
 
-	if( !IsDataType(t1) )
+	// We don't validate if the identifier is an actual declared type at this moment
+	// as it may wrongly identify the statement as a non-declaration if the user typed
+	// the name incorrectly. The real type is validated in ParseDeclaration where a
+	// proper error message can be given.
+	if( !IsRealType(t1.type) && t1.type != ttIdentifier )
 	{
 		RewindTo(&t);
 		return false;
@@ -1395,7 +1399,15 @@ asCScriptNode *asCParser::ParseDataType(bool allowVariableType)
 	GetToken(&t1);
 	if( !IsDataType(t1) && !(allowVariableType && t1.type == ttQuestion) )
 	{
-		Error(TXT_EXPECTED_DATA_TYPE, &t1);
+		if( t1.type == ttIdentifier )
+		{
+			asCString errMsg, Identifier;
+			Identifier.Assign(&script->code[t1.pos], t1.length);
+			errMsg.Format(TXT_IDENTIFIER_s_NOT_DATA_TYPE, Identifier.AddressOf());
+			Error(errMsg.AddressOf(), &t1);
+		}
+		else
+			Error(TXT_EXPECTED_DATA_TYPE, &t1);
 		return node;
 	}
 

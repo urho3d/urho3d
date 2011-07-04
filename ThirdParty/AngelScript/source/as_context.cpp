@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1096,6 +1096,8 @@ void asCContext::PopCallState()
 // interface
 asUINT asCContext::GetCallstackSize()
 {
+	if( currentFunction == 0 ) return 0;
+
 	// The current function is accessed at stackLevel 0
 	return asUINT(1 + callStack.GetLength() / CALLSTACK_FRAME_SIZE);
 }
@@ -3487,6 +3489,61 @@ void asCContext::CleanStack()
 	inExceptionHandler = false;
 }
 
+// Interface
+bool asCContext::IsVarInScope(asUINT varIndex, asUINT stackLevel)
+{
+	asASSERT( stackLevel < GetCallstackSize() );
+
+	asCScriptFunction *func;
+	asUINT pos;
+
+	if( stackLevel == 0 )
+	{
+		func = currentFunction;
+		pos = asUINT(regs.programPointer - func->byteCode.AddressOf());
+	}
+	else
+	{
+		size_t *s = callStack.AddressOf() + (GetCallstackSize()-stackLevel-1)*CALLSTACK_FRAME_SIZE;
+		func = (asCScriptFunction*)s[1];
+		pos = asUINT((asDWORD*)s[2] - func->byteCode.AddressOf());
+	}
+
+	// First determine if the program position is after the variable declaration
+	if( func->variables.GetLength() <= varIndex ) return false;
+	if( func->variables[varIndex]->declaredAtProgramPos > pos ) return false;
+
+	asUINT declaredAt = func->variables[varIndex]->declaredAtProgramPos;
+
+	// If the program position is after the variable declaration it is necessary 
+	// determine if the program position is still inside the statement block where 
+	// the variable was delcared.
+	for( int n = 0; n < (int)func->objVariableInfo.GetLength(); n++ )
+	{
+		if( func->objVariableInfo[n].programPos >= declaredAt )
+		{
+			// If the current block ends between the declaredAt and current 
+			// program position, then we know the variable is no longer visible
+			int level = 0;
+			for( ; n < (int)func->objVariableInfo.GetLength(); n++ )
+			{
+				if( func->objVariableInfo[n].programPos > pos )
+					break;
+
+				if( func->objVariableInfo[n].option == asBLOCK_BEGIN ) level++;
+				if( func->objVariableInfo[n].option == asBLOCK_END && --level < 0 )
+					return false;
+			}
+
+			break;
+		}
+	}
+
+	// Variable is visible
+	return true;
+}
+
+// Internal
 void asCContext::DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLevel)
 {
 	asASSERT( stackLevel < GetCallstackSize() );
@@ -3623,10 +3680,11 @@ void asCContext::CleanStackFrame()
 			}
 		}
 
-		if( currentFunction->objectType )
+		// If the object is a script declared object, then we must release it
+		// as the compiler adds a reference at the entry of the function. Make sure
+		// the function has actually been entered
+		if( currentFunction->objectType && regs.programPointer != currentFunction->byteCode.AddressOf() )
 		{
-			// If the object is a script declared object, then we must release it
-			// as the compiler adds a reference at the entry of the function
 			asSTypeBehaviour *beh = &currentFunction->objectType->beh;
 			if( beh->release && *(size_t*)&regs.stackFramePointer[0] != 0 )
 			{
@@ -3884,7 +3942,7 @@ int asCContext::GetVarCount(asUINT stackLevel)
 }
 
 // interface
-const char *asCContext::GetVarName(int varIndex, asUINT stackLevel)
+const char *asCContext::GetVarName(asUINT varIndex, asUINT stackLevel)
 {
 	asIScriptFunction *func = GetFunction(stackLevel);
 	if( func == 0 ) return 0;
@@ -3895,7 +3953,7 @@ const char *asCContext::GetVarName(int varIndex, asUINT stackLevel)
 }
 
 // interface
-const char *asCContext::GetVarDeclaration(int varIndex, asUINT stackLevel)
+const char *asCContext::GetVarDeclaration(asUINT varIndex, asUINT stackLevel)
 {
 	asIScriptFunction *func = GetFunction(stackLevel);
 	if( func == 0 ) return 0;
@@ -3904,7 +3962,7 @@ const char *asCContext::GetVarDeclaration(int varIndex, asUINT stackLevel)
 }
 
 // interface
-int asCContext::GetVarTypeId(int varIndex, asUINT stackLevel)
+int asCContext::GetVarTypeId(asUINT varIndex, asUINT stackLevel)
 {
 	asIScriptFunction *func = GetFunction(stackLevel);
 	if( func == 0 ) return asINVALID_ARG;
@@ -3915,7 +3973,7 @@ int asCContext::GetVarTypeId(int varIndex, asUINT stackLevel)
 }
 
 // interface
-void *asCContext::GetAddressOfVar(int varIndex, asUINT stackLevel)
+void *asCContext::GetAddressOfVar(asUINT varIndex, asUINT stackLevel)
 {
 	if( stackLevel >= GetCallstackSize() ) return 0;
 
@@ -3936,7 +3994,7 @@ void *asCContext::GetAddressOfVar(int varIndex, asUINT stackLevel)
 	if( func == 0 )
 		return 0;
 
-	if( varIndex < 0 || varIndex >= (signed)func->variables.GetLength() )
+	if( varIndex >= func->variables.GetLength() )
 		return 0;
 
 	// For object variables it's necessary to dereference the pointer to get the address of the value

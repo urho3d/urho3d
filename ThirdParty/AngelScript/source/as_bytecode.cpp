@@ -1261,6 +1261,10 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 			info.option         = *(int*)ARG_DW(instr->arg);
 			outFunc->objVariableInfo.PushLast(info);
 		}
+		else if( instr->op == asBC_VarDecl )
+		{
+			outFunc->variables[instr->wArg[0]]->declaredAtProgramPos = pos;
+		}
 		else
 			pos += instr->size;
 
@@ -1472,6 +1476,18 @@ void asCByteCode::Block(bool start)
 	last->stackInc = 0;
 	last->wArg[0]  = start ? 1 : 0;
 }
+
+void asCByteCode::VarDecl(int varDeclIdx)
+{
+	if( AddInstruction() < 0 )
+		return;
+
+	last->op       = asBC_VarDecl;
+	last->size     = 0;
+	last->stackInc = 0;
+	last->wArg[0]  = (asWORD)varDeclIdx;
+}
+
 
 int asCByteCode::FindLabel(int label, cByteInstruction *from, cByteInstruction **dest, int *positionDelta)
 {

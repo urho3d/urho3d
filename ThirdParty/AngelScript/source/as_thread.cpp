@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2008 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -260,6 +260,17 @@ void asCThreadCriticalSection::Leave()
 	pthread_mutex_unlock(&criticalSection);
 #elif defined AS_WINDOWS_THREADS
 	LeaveCriticalSection(&criticalSection);
+#endif
+}
+
+bool asCThreadCriticalSection::TryEnter()
+{
+#if defined AS_POSIX_THREADS
+	return !pthread_mutex_trylock(&criticalSection);
+#elif defined AS_WINDOWS_THREADS
+	return TryEnterCriticalSection(&criticalSection) ? true : false;
+#else
+	return true;
 #endif
 }
 #endif

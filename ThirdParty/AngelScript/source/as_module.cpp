@@ -157,34 +157,31 @@ int asCModule::Build()
 
 	// Initialize global variables
 	if( r >= 0 && engine->ep.initGlobalVarsAfterBuild )
-		r = ResetGlobalVars();
+		r = ResetGlobalVars(0);
 
 	return r;
 }
 
 // interface
-int asCModule::ResetGlobalVars()
+int asCModule::ResetGlobalVars(asIScriptContext *ctx)
 {
 	if( isGlobalVarInitialized ) 
 		CallExit();
 
-	// TODO: The application really should do this manually through a context
-	//       otherwise it cannot properly handle script exceptions that may be
-	//       thrown by object initializations.
-	return CallInit();
+	return CallInit(ctx);
 }
 
 // interface
-int asCModule::GetFunctionIdByIndex(int index) const
+int asCModule::GetFunctionIdByIndex(asUINT index) const
 {
-	if( index < 0 || index >= (int)globalFunctions.GetLength() )
+	if( index >= globalFunctions.GetLength() )
 		return asNO_FUNCTION;
 
 	return globalFunctions[index]->id;
 }
 
 // internal
-int asCModule::CallInit()
+int asCModule::CallInit(asIScriptContext *myCtx)
 {
 	if( isGlobalVarInitialized ) 
 		return asERROR;
@@ -200,7 +197,7 @@ int asCModule::CallInit()
 	}
 
 	// Call the init function for each of the global variables
-	asIScriptContext *ctx = 0;
+	asIScriptContext *ctx = myCtx;
 	int r = asEXECUTION_FINISHED;
 	for( n = 0; n < scriptGlobals.GetLength() && r == asEXECUTION_FINISHED; n++ )
 	{
@@ -247,7 +244,7 @@ int asCModule::CallInit()
 		}
 	}
 
-	if( ctx )
+	if( ctx && !myCtx )
 	{
 		ctx->Release();
 		ctx = 0;
@@ -335,7 +332,9 @@ void asCModule::InternalReset()
 	// Free bind information
 	for( n = 0; n < bindInformations.GetLength(); n++ )
 	{
-		engine->importedFunctions[bindInformations[n]->importedFunctionSignature->id & 0xFFFF] = 0 ;
+		asUINT id = bindInformations[n]->importedFunctionSignature->id & 0xFFFF;
+		engine->importedFunctions[id] = 0;
+		engine->freeImportedFunctionIdxs.PushLast(id);
 
 		asDELETE(bindInformations[n]->importedFunctionSignature, asCScriptFunction);
 		asDELETE(bindInformations[n], sBindInfo);
@@ -386,9 +385,9 @@ int asCModule::GetFunctionIdByName(const char *name) const
 }
 
 // interface
-int asCModule::GetImportedFunctionCount() const
+asUINT asCModule::GetImportedFunctionCount() const
 {
-	return (int)bindInformations.GetLength();
+	return (asUINT)bindInformations.GetLength();
 }
 
 // interface
@@ -434,9 +433,9 @@ int asCModule::GetImportedFunctionIndexByDecl(const char *decl) const
 }
 
 // interface
-int asCModule::GetFunctionCount() const
+asUINT asCModule::GetFunctionCount() const
 {
-	return (int)globalFunctions.GetLength();
+	return (asUINT)globalFunctions.GetLength();
 }
 
 // interface
@@ -485,9 +484,9 @@ int asCModule::GetFunctionIdByDecl(const char *decl) const
 }
 
 // interface
-int asCModule::GetGlobalVarCount() const
+asUINT asCModule::GetGlobalVarCount() const
 {
-	return (int)scriptGlobals.GetLength();
+	return (asUINT)scriptGlobals.GetLength();
 }
 
 // interface
@@ -522,9 +521,9 @@ int asCModule::RemoveGlobalVar(asUINT index)
 }
 
 // interface
-asIScriptFunction *asCModule::GetFunctionDescriptorByIndex(int index) const
+asIScriptFunction *asCModule::GetFunctionDescriptorByIndex(asUINT index) const
 {
-	if( index < 0 || index >= (int)globalFunctions.GetLength() )
+	if( index >= globalFunctions.GetLength() )
 		return 0;
 
 	return globalFunctions[index];
@@ -611,9 +610,9 @@ int asCModule::GetGlobalVar(asUINT index, const char **name, int *typeId, bool *
 }
 
 // interface
-int asCModule::GetObjectTypeCount() const
+asUINT asCModule::GetObjectTypeCount() const
 {
-	return (int)classTypes.GetLength();
+	return (asUINT)classTypes.GetLength();
 }
 
 // interface 
@@ -638,9 +637,9 @@ int asCModule::GetTypeIdByDecl(const char *decl) const
 }
 
 // interface
-int asCModule::GetEnumCount() const
+asUINT asCModule::GetEnumCount() const
 {
-	return (int)enumTypes.GetLength();
+	return (asUINT)enumTypes.GetLength();
 }
 
 // interface
@@ -684,9 +683,9 @@ const char *asCModule::GetEnumValueByIndex(int enumTypeId, asUINT index, int *ou
 }
 
 // interface
-int asCModule::GetTypedefCount() const
+asUINT asCModule::GetTypedefCount() const
 {
-	return (int)typeDefs.GetLength();
+	return (asUINT)typeDefs.GetLength();
 }
 
 // interface
@@ -705,6 +704,10 @@ const char *asCModule::GetTypedefByIndex(asUINT index, int *typeId) const
 // internal
 int asCModule::GetNextImportedFunctionId()
 {
+	// TODO: multithread: This will break if one thread if freeing a module, while another is being compiled
+	if( engine->freeImportedFunctionIdxs.GetLength() )
+		return FUNC_IMPORTED | (asUINT)engine->freeImportedFunctionIdxs[engine->freeImportedFunctionIdxs.GetLength()-1];
+
 	return FUNC_IMPORTED | (asUINT)engine->importedFunctions.GetLength();
 }
 
@@ -784,7 +787,10 @@ int asCModule::AddImportedFunction(int id, const char *name, const asCDataType &
 	bindInformations.PushLast(info);
 
 	// Add the info to the array in the engine
-	engine->importedFunctions.PushLast(info);
+	if( engine->freeImportedFunctionIdxs.GetLength() )
+		engine->importedFunctions[engine->freeImportedFunctionIdxs.PopLast()] = info;
+	else
+		engine->importedFunctions.PushLast(info);
 
 	return 0;
 }
@@ -796,7 +802,7 @@ asCScriptFunction *asCModule::GetImportedFunction(int index) const
 }
 
 // interface
-int asCModule::BindImportedFunction(int index, int sourceId)
+int asCModule::BindImportedFunction(asUINT index, int sourceId)
 {
 	// First unbind the old function
 	int r = UnbindImportedFunction(index);
@@ -830,9 +836,9 @@ int asCModule::BindImportedFunction(int index, int sourceId)
 }
 
 // interface
-int asCModule::UnbindImportedFunction(int index)
+int asCModule::UnbindImportedFunction(asUINT index)
 {
-	if( index < 0 || index > (int)bindInformations.GetLength() )
+	if( index >= bindInformations.GetLength() )
 		return asINVALID_ARG;
 
 	// Remove reference to old module
@@ -847,7 +853,7 @@ int asCModule::UnbindImportedFunction(int index)
 }
 
 // interface
-const char *asCModule::GetImportedFunctionDeclaration(int index) const
+const char *asCModule::GetImportedFunctionDeclaration(asUINT index) const
 {
 	asCScriptFunction *func = GetImportedFunction(index);
 	if( func == 0 ) return 0;
@@ -860,9 +866,9 @@ const char *asCModule::GetImportedFunctionDeclaration(int index) const
 }
 
 // interface
-const char *asCModule::GetImportedFunctionSourceModule(int index) const
+const char *asCModule::GetImportedFunctionSourceModule(asUINT index) const
 {
-	if( index >= (int)bindInformations.GetLength() )
+	if( index >= bindInformations.GetLength() )
 		return 0;
 
 	return bindInformations[index]->importFromModule.AddressOf();
@@ -909,8 +915,8 @@ int asCModule::BindAllImportedFunctions()
 // interface
 int asCModule::UnbindAllImportedFunctions()
 {
-	int c = GetImportedFunctionCount();
-	for( int n = 0; n < c; ++n )
+	asUINT c = GetImportedFunctionCount();
+	for( asUINT n = 0; n < c; ++n )
 		UnbindImportedFunction(n);
 
 	return asSUCCESS;
@@ -1053,7 +1059,7 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 			if( classTypes[c]->IsInterface() )
 			{
 				asCObjectType *intf = classTypes[c];
-				for( int m = 0; m < intf->GetMethodCount(); m++ )
+				for( asUINT m = 0; m < intf->GetMethodCount(); m++ )
 				{
 					asCScriptFunction *func = engine->GetScriptFunction(intf->methods[m]);
 					if( func )
@@ -1061,7 +1067,7 @@ void asCModule::ResolveInterfaceIds(asCArray<void*> *substitutions)
 						if( func->returnType.GetObjectType() == equals[i].a )
 							func->returnType.SetObjectType(equals[i].b);
 
-						for( int p = 0; p < func->GetParamCount(); p++ )
+						for( asUINT p = 0; p < func->GetParamCount(); p++ )
 						{
 							if( func->parameterTypes[p].GetObjectType() == equals[i].a )
 								func->parameterTypes[p].SetObjectType(equals[i].b);

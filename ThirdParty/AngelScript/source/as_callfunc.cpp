@@ -161,7 +161,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 		else if( objType & asOBJ_APP_CLASS )
 		{
 			internal->hostReturnFloat = false;
-			if( objType & COMPLEX_MASK )
+			if( objType & COMPLEX_RETURN_MASK )
 			{
 				internal->hostReturnInMemory = true;
 				internal->hostReturnSize     = sizeof(void*)/4;

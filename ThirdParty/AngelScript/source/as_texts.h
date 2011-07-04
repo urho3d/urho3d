@@ -43,7 +43,6 @@
 
 #define TXT_s_ALREADY_DECLARED            "'%s' is already declared"
 #define TXT_ARG_NOT_LVALUE                "Argument cannot be assigned. Output will be discarded."
-#define TXT_ASSIGN_IN_GLOBAL_EXPR         "Assignments are not allowed in global expressions"
 
 #define TXT_BOTH_MUST_BE_SAME                     "Both expressions must have the same type"
 #define TXT_BOTH_CONDITIONS_MUST_CALL_CONSTRUCTOR "Both conditions must call constructor"
@@ -89,7 +88,6 @@
 
 #define TXT_FAILED_TO_COMPILE_DEF_ARG_d_IN_FUNC_s "Failed while compiling default arg for parameter %d in function '%s'"
 #define TXT_FOUND_MULTIPLE_ENUM_VALUES    "Found multiple matching enum values"
-#define TXT_FUNCTION_IN_GLOBAL_EXPR       "Function calls are not allowed in global expressions"
 #define TXT_FUNCTION_ALREADY_EXIST        "A function with the same name and parameters already exist"
 #define TXT_FUNCTION_s_NOT_FOUND          "Function '%s' not found"
 
@@ -106,7 +104,6 @@
 #define TXT_ILLEGAL_OPERATION_ON_s              "Illegal operation on '%s'"
 #define TXT_ILLEGAL_TARGET_TYPE_FOR_REF_CAST    "Illegal target type for reference cast"
 #define TXT_ILLEGAL_VARIABLE_NAME_s             "Illegal variable name '%s'."
-#define TXT_INC_OP_IN_GLOBAL_EXPR               "Incremental operators are not allowed in global expressions"
 #define TXT_INIT_LIST_CANNOT_BE_USED_WITH_s     "Initialization lists cannot be used with '%s'"
 #define TXT_INTERFACE_s_ALREADY_IMPLEMENTED     "The interface '%s' is already implemented"
 #define TXT_INVALID_BREAK                       "Invalid 'break'"
@@ -120,7 +117,6 @@
 #define TXT_INVALID_UNICODE_VALUE               "Invalid unicode code point"
 #define TXT_INVALID_UNICODE_SEQUENCE_IN_SRC     "Invalid unicode sequence in source"
 
-#define TXT_METHOD_IN_GLOBAL_EXPR                   "Object method calls are not allowed in global expressions"
 #define TXT_METHOD_CANT_HAVE_NAME_OF_CLASS          "The method cannot be named with the class name"
 #define TXT_MISSING_IMPLEMENTATION_OF_s             "Missing implementation of '%s'"
 #define TXT_MORE_THAN_ONE_MATCHING_OP               "Found more than one matching operator"
@@ -150,6 +146,7 @@
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPE_s        "No matching operator that takes the type '%s' found"
 #define TXT_NO_MATCHING_OP_FOUND_FOR_TYPES_s_AND_s "No matching operator that takes the types '%s' and '%s' found"
 #define TXT_NON_CONST_METHOD_ON_CONST_OBJ          "Non-const method call on read-only object reference"
+#define TXT_NOT_A_FUNC_s_IS_VAR                    "Expression doesn't form a function call. '%s' is a variable of a non-function type"
 #define TXT_NOT_ALL_PATHS_RETURN                   "Not all paths return a value"
 #define TXT_s_NOT_DECLARED                         "'%s' is not declared"
 #define TXT_NOT_EXACT                              "Implicit conversion of value is not exact"

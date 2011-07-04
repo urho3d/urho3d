@@ -40,6 +40,12 @@ BEGIN_AS_NAMESPACE
 asIScriptObject *ScriptObjectFactory(asCObjectType *objType, asCScriptEngine *engine)
 {
 	asIScriptContext *ctx;
+
+	// TODO: optimize: There should be a pool for the context so it doesn't 
+	//                 have to be allocated just for creating the script object
+
+	// TODO: It must be possible for the application to debug the creation of the object too
+
 	int r = engine->CreateContext(&ctx, true);
 	if( r < 0 )
 		return 0;
@@ -54,7 +60,6 @@ asIScriptObject *ScriptObjectFactory(asCObjectType *objType, asCScriptEngine *en
 	r = ctx->Execute();
 	if( r != asEXECUTION_FINISHED )
 	{
-		// TODO: Verify that the memory for the structure have been released already
 		ctx->Release();
 		return 0;
 	}
