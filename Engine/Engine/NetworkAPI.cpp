@@ -90,7 +90,7 @@ void RegisterPeer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Peer", "const String& get_address() const", asMETHOD(Peer, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Peer", "uint16 get_port() const", asMETHOD(Peer, GetPort), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for Peer
+    // Register Variant Ptr() for Peer
     engine->RegisterObjectMethod("Variant", "Peer@+ GetPeer() const", asFUNCTION(GetVariantPtr<Peer>), asCALL_CDECL_OBJLAST);
 }
 

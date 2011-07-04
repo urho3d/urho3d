@@ -107,7 +107,7 @@ UIElement::~UIElement()
     while (children_.Size())
     {
         const SharedPtr<UIElement>& element = children_.Back();
-        if (element.GetRefCount() > 1)
+        if (element.Refs() > 1)
         {
             element->parent_ = 0;
             element->MarkDirty();

@@ -153,9 +153,9 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<Share
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i].GetPtr())
+            if (vector[i].Ptr())
                 vector[i]->AddRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i].GetPtr();
+            *(static_cast<T**>(arr->At(i))) = vector[i].Ptr();
         }
         
         return arr;
@@ -442,7 +442,7 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
         return 0;
     }
     else
-        return children[index].GetPtr();
+        return children[index].Ptr();
 }
 
 static CScriptArray* NodeGetScriptedChildren(bool recursive, Node* ptr)
@@ -466,7 +466,7 @@ static CScriptArray* NodeGetScriptedChildrenWithClassName(const String& classNam
         {
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
-                ScriptInstance* instance = static_cast<ScriptInstance*>(j->GetPtr());
+                ScriptInstance* instance = static_cast<ScriptInstance*>(j->Ptr());
                 if (instance->GetClassName() == className)
                     ret.Push(node);
             }

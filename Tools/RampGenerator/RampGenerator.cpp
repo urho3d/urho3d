@@ -80,7 +80,7 @@ void Run(const Vector<String>& arguments)
         data[0] = 255;
         data[width - 1] = 0;
         
-        stbi_write_tga(tempDestName.CString(), width, 1, 1, data.GetPtr());
+        stbi_write_tga(tempDestName.CString(), width, 1, 1, data.Ptr());
     }
     
     if (dimensions == 2)
@@ -113,7 +113,7 @@ void Run(const Vector<String>& arguments)
             data[x * width + (width - 1)] = 0;
         }
         
-        stbi_write_tga(tempDestName.CString(), width, width, 1, data.GetPtr());
+        stbi_write_tga(tempDestName.CString(), width, width, 1, data.Ptr());
     }
     
     String command = "texconv -f R8G8B8 -ft PNG -if NONE " + tempDestName;

@@ -51,7 +51,7 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     {
         context_->SetEventHandler(i->second_);
         i->second_->Invoke(eventType, eventData);
-        if (!self.IsExpired())
+        if (!self.Expired())
             context_->SetEventHandler(0);
         return;
     }
@@ -62,7 +62,7 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     {
         context_->SetEventHandler(i->second_);
         i->second_->Invoke(eventType, eventData);
-        if (!self.IsExpired())
+        if (!self.Expired())
             context_->SetEventHandler(0);
     }
 }
@@ -194,7 +194,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             {
                 processed.Insert(receiver);
                 receiver->OnEvent(this, true, eventType, eventData);
-                if (self.IsExpired())
+                if (self.Expired())
                 {
                     context_->EndSendEvent();
                     return;
@@ -216,7 +216,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (receiver)
                 {
                     receiver->OnEvent(this, true, eventType, eventData);
-                    if (self.IsExpired())
+                    if (self.Expired())
                     {
                         context_->EndSendEvent();
                         return;
@@ -233,7 +233,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (receiver && processed.Find(receiver) == processed.End())
                 {
                     receiver->OnEvent(this, true, eventType, eventData);
-                    if (self.IsExpired())
+                    if (self.Expired())
                     {
                         context_->EndSendEvent();
                         return;

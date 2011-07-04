@@ -226,7 +226,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         }
     }
     else
-        hwData = fallbackData_.GetPtr() + start * vertexSize_;
+        hwData = fallbackData_.Ptr() + start * vertexSize_;
     
     locked_ = true;
     return hwData;
@@ -258,7 +258,7 @@ void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
     if (!lockedMorphRange || !morphRangeResetData_)
         return;
     
-    memcpy(lockedMorphRange, morphRangeResetData_.GetPtr(), morphRangeCount_ * vertexSize_);
+    memcpy(lockedMorphRange, morphRangeResetData_.Ptr(), morphRangeCount_ * vertexSize_);
 }
 
 void VertexBuffer::ClearDataLost()

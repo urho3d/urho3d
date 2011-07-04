@@ -250,15 +250,15 @@ void Audio::MixOutput(void *dest, unsigned mixSamples)
         clipSamples <<= 1;
     
     // Clear clip buffer
-    memset(clipBuffer_.GetPtr(), 0, clipSamples * sizeof(int));
-    int* clipPtr = clipBuffer_.GetPtr();
+    memset(clipBuffer_.Ptr(), 0, clipSamples * sizeof(int));
+    int* clipPtr = clipBuffer_.Ptr();
     
     // Mix samples to clip buffer
     for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         (*i)->Mix(clipPtr, mixSamples, mixRate_, stereo_, interpolate_);
     
     // Copy output from clip buffer to destination
-    clipPtr = clipBuffer_.GetPtr();
+    clipPtr = clipBuffer_.Ptr();
     short* destPtr = (short*)dest;
     while (clipSamples--)
         *destPtr++ = Clamp(*clipPtr++, -32768, 32767);

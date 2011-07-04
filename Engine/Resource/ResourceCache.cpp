@@ -188,7 +188,7 @@ void ResourceCache::ReleaseResource(ShortStringHash type, StringHash nameHash, b
         return;
     
     // If other references exist, do not release, unless forced
-    if (existingRes.GetRefCount() == 1 || force)
+    if (existingRes.Refs() == 1 || force)
     {
         resourceGroups_[type].resources_.Erase(nameHash);
         UpdateResourceGroup(type);
@@ -209,7 +209,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
             {
                 Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
                 // If other references exist, do not release, unless forced
-                if (current->second_.GetRefCount() == 1 || force)
+                if (current->second_.Refs() == 1 || force)
                 {
                     i->second_.resources_.Erase(current);
                     released = true;
@@ -239,7 +239,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
                 if (current->second_->GetName().Find(partialNameLower) != String::NPOS)
                 {
                     // If other references exist, do not release, unless forced
-                    if (current->second_.GetRefCount() == 1 || force)
+                    if (current->second_.Refs() == 1 || force)
                     {
                         i->second_.resources_.Erase(current);
                         released = true;
@@ -265,7 +265,7 @@ void ResourceCache::ReleaseAllResources(bool force)
         {
             Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
             // If other references exist, do not release, unless forced
-            if (current->second_.GetRefCount() == 1 || force)
+            if (current->second_.Refs() == 1 || force)
             {
                 i->second_.resources_.Erase(current);
                 released = true;
@@ -286,7 +286,7 @@ bool ResourceCache::ReloadResource(Resource* resource)
     bool success = false;
     SharedPtr<File> file = GetFile(resource->GetName());
     if (file)
-        success = resource->Load(*(file.GetPtr()));
+        success = resource->Load(*(file.Ptr()));
     
     if (success)
     {
@@ -378,7 +378,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     
     LOGDEBUG("Loading resource " + name);
     resource->SetName(file->GetName());
-    if (!resource->Load(*(file.GetPtr())))
+    if (!resource->Load(*(file.Ptr())))
         return 0;
     
     // Store to cache
@@ -530,7 +530,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
             if (k != j->second_.resources_.End())
             {
                 // If other references exist, do not release, unless forced
-                if (k->second_.GetRefCount() == 1 || force)
+                if (k->second_.Refs() == 1 || force)
                 {
                     j->second_.resources_.Erase(k);
                     affectedGroups.Insert(j->first_);

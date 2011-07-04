@@ -190,7 +190,7 @@ Peer* Network::Connect(const String& address, unsigned short port)
     
     // Create a Peer instance for the server
     SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_SERVER));
-    enetPeer->data = newPeer.GetPtr();
+    enetPeer->data = newPeer.Ptr();
     peers_.Push(newPeer);
     
     LOGINFO("Connecting to " + address + ":" + String(port));
@@ -323,7 +323,7 @@ void Network::Update(ENetHost* enetHost)
             {
                 // If no existing Peer instance (server operation), create one now
                 SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_CLIENT));
-                enetPeer->data = newPeer.GetPtr();
+                enetPeer->data = newPeer.Ptr();
                 peers_.Push(newPeer);
                 newPeer->OnConnect();
             }

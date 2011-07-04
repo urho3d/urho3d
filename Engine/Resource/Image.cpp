@@ -235,7 +235,7 @@ bool Image::Load(Deserializer& source)
         if (!numCompressedLevels_)
             numCompressedLevels_ = 1;
         SetMemoryUse(dataSize);
-        source.Read(data_.GetPtr(), dataSize);
+        source.Read(data_.Ptr(), dataSize);
     }
     
     return true;
@@ -261,7 +261,7 @@ void Image::SetSize(int width, int height, unsigned components)
 
 void Image::SetData(const unsigned char* pixelData)
 {
-    memcpy(data_.GetPtr(), pixelData, width_ * height_ * components_);
+    memcpy(data_.Ptr(), pixelData, width_ * height_ * components_);
 }
 
 bool Image::SaveBMP(const String& fileName)
@@ -280,7 +280,7 @@ bool Image::SaveBMP(const String& fileName)
     }
     
     if (data_)
-        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.GetPtr()) != 0;
+        return stbi_write_bmp(fileName.CString(), width_, height_, components_, data_.Ptr()) != 0;
     else
         return false;
 }
@@ -301,7 +301,7 @@ bool Image::SaveTGA(const String& fileName)
     }
     
     if (data_)
-        return stbi_write_tga(fileName.CString(), width_, height_, components_, data_.GetPtr()) != 0;
+        return stbi_write_tga(fileName.CString(), width_, height_, components_, data_.Ptr()) != 0;
     else
         return false;
 }
@@ -311,8 +311,8 @@ unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height
     unsigned dataSize = source.GetSize();
     
     SharedArrayPtr<unsigned char> buffer(new unsigned char[dataSize]);
-    source.Read(buffer.GetPtr(), dataSize);
-    return stbi_load_from_memory(buffer.GetPtr(), dataSize, &width, &height, (int *)&components, 0);
+    source.Read(buffer.Ptr(), dataSize);
+    return stbi_load_from_memory(buffer.Ptr(), dataSize, &width, &height, (int *)&components, 0);
 }
 
 void Image::FreeImageData(unsigned char* pixelData)
@@ -347,8 +347,8 @@ SharedPtr<Image> Image::GetNextLevel() const
     SharedPtr<Image> mipImage(new Image(context_));
     mipImage->SetSize(widthOut, heightOut, components_);
     
-    const unsigned char* pixelDataIn = data_.GetPtr();
-    unsigned char* pixelDataOut = mipImage->data_.GetPtr();
+    const unsigned char* pixelDataIn = data_.Ptr();
+    unsigned char* pixelDataOut = mipImage->data_.Ptr();
     
     // 1D case
     if (height_ == 1 || width_ == 1)
@@ -494,7 +494,7 @@ CompressedLevel Image::GetCompressedLevel(unsigned index) const
         
         level.rowSize_ = ((level.width_ + 3) / 4) * level.blockSize_;
         level.rows_ = ((level.height_ + 3) / 4);
-        level.data_ = data_.GetPtr() + offset;
+        level.data_ = data_.Ptr() + offset;
         level.dataSize_ = level.rows_ * level.rowSize_;
         
         if (offset + level.dataSize_ > GetMemoryUse())

@@ -119,13 +119,13 @@ bool Model::Load(Deserializer& source)
             if (morphCount)
             {
                 SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
-                memcpy(morphResetData.GetPtr(), &data[morphStart * vertexSize], morphCount * vertexSize);
+                memcpy(morphResetData.Ptr(), &data[morphStart * vertexSize], morphCount * vertexSize);
                 buffer->SetMorphRangeResetData(morphResetData);
             }
 
             // Copy the raw position data for CPU-side operations
             SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
-            float* rawDest = (float*)rawVertexData.GetPtr();
+            float* rawDest = (float*)rawVertexData.Ptr();
             for (unsigned i = 0; i < vertexCount; ++i)
             {
                 float* rawSrc = (float*)&data[i * vertexSize];
@@ -160,7 +160,7 @@ bool Model::Load(Deserializer& source)
 
             // Copy the raw index data for CPU-side operations
             SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
-            memcpy(rawIndexData.GetPtr(), data, indexSize * indexCount);
+            memcpy(rawIndexData.Ptr(), data, indexSize * indexCount);
             rawIndexDatas.Push(rawIndexData);
 
             buffer->Unlock();
@@ -362,7 +362,7 @@ bool Model::Save(Serializer& dest)
             if (j->second_.elementMask_ & MASK_TANGENT)
                 vertexSize += sizeof(Vector3);
             
-            dest.Write(j->second_.morphData_.GetPtr(), vertexSize * j->second_.vertexCount_);
+            dest.Write(j->second_.morphData_.Ptr(), vertexSize * j->second_.vertexCount_);
         }
     }
     

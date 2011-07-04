@@ -613,7 +613,7 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     
-    engine->RegisterGlobalFunction("Object@+ get_Sender()", asFUNCTION(GetSender), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Object@+ get_sender()", asFUNCTION(GetSender), asCALL_CDECL);
 }
 
 void RegisterCoreAPI(asIScriptEngine* engine)

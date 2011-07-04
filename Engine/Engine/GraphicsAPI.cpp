@@ -257,7 +257,7 @@ static Material* MaterialClone(const String& cloneName, Material* ptr)
     // The shared pointer will go out of scope, so have to increment the reference count
     // (here an auto handle can not be used)
     clonedMaterial->AddRef();
-    return clonedMaterial.GetPtr();
+    return clonedMaterial.Ptr();
 }
 
 static void RegisterMaterial(asIScriptEngine* engine)

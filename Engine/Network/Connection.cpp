@@ -117,7 +117,7 @@ void Connection::JoinedScene()
         
         VariantMap eventData;
         eventData[P_CONNECTION] = (void*)this;
-        eventData[P_SCENE] = (void*)scene_.GetPtr();
+        eventData[P_SCENE] = (void*)scene_.Ptr();
         SendEvent(E_CLIENTJOINEDSCENE, eventData);
         
         LOGINFO("Client " + GetIdentity() + " joined scene " + scene_->GetName());
@@ -139,7 +139,7 @@ void Connection::LeftScene()
             
             VariantMap eventData;
             eventData[P_CONNECTION] = (void*)this;
-            eventData[P_SCENE] = (void*)scene_.GetPtr();
+            eventData[P_SCENE] = (void*)scene_.Ptr();
             SendEvent(E_CLIENTLEFTSCENE, eventData);
             
             LOGINFO("Client " + GetIdentity() + " left scene " + scene_->GetName());

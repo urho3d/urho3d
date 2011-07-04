@@ -222,8 +222,8 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
     unsigned fileSize = srcFile->GetSize();
     
     SharedArrayPtr<unsigned char> buffer(new unsigned char[fileSize]);
-    unsigned bytesRead = srcFile->Read(buffer.GetPtr(), fileSize);
-    unsigned bytesWritten = destFile->Write(buffer.GetPtr(), fileSize);
+    unsigned bytesRead = srcFile->Read(buffer.Ptr(), fileSize);
+    unsigned bytesWritten = destFile->Write(buffer.Ptr(), fileSize);
     
     return bytesRead == fileSize && bytesWritten == fileSize;
 }

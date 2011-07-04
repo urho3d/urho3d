@@ -328,7 +328,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<char> buffer(new char[dataSize]);
-    source.Read((void*)buffer.GetPtr(), dataSize);
+    source.Read((void*)buffer.Ptr(), dataSize);
     
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
@@ -429,7 +429,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     }
     
     // Then add this section
-    if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.GetPtr(), dataSize) < 0)
+    if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Ptr(), dataSize) < 0)
     {
         LOGERROR("Failed to add script section " + source.GetName());
         return false;
@@ -479,27 +479,27 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
                 case VAR_VECTOR2:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector2());
                     break;
-
+                    
                 case VAR_VECTOR3:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector3());
                     break;
-
+                    
                 case VAR_VECTOR4:
                     context->SetArgObject(i, (void *)&parameters[i].GetVector4());
                     break;
-
+                    
                 case VAR_QUATERNION:
                     context->SetArgObject(i, (void *)&parameters[i].GetQuaternion());
                     break;
-
+                    
                 case VAR_STRING:
                     context->SetArgObject(i, (void *)&parameters[i].GetString());
                     break;
-
+                    
                 case VAR_PTR:
                     context->SetArgObject(i, (void *)parameters[i].GetPtr());
                     break;
-
+                    
                 default:
                     break;
                 }

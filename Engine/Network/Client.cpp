@@ -599,7 +599,7 @@ void Client::HandleServerUpdate(VectorBuffer& packet, bool initial)
     using namespace ServerUpdate;
     
     VariantMap eventData;
-    eventData[P_SCENE] = (void*)scene_.GetPtr();
+    eventData[P_SCENE] = (void*)scene_.Ptr();
     SendEvent(E_SERVERUPDATE, eventData);
 }
 
@@ -777,7 +777,7 @@ void Client::SendClientUpdate()
     using namespace ControlsUpdate;
     
     VariantMap eventData;
-    eventData[P_SCENE] = (void*)scene_.GetPtr();
+    eventData[P_SCENE] = (void*)scene_.Ptr();
     SendEvent(E_CONTROLSUPDATE, eventData);
     
     // Purge acked and expired remote events

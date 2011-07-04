@@ -63,7 +63,7 @@ void Resource::ResetUseTimer()
 unsigned Resource::GetUseTimer()
 {
     // If more references than the resource cache, return always 0 & reset the timer
-    if (GetRefCount() > 1)
+    if (Refs() > 1)
     {
         useTimer_.Reset();
         return 0;

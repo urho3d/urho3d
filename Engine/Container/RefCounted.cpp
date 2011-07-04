@@ -21,10 +21,7 @@
 // THE SOFTWARE.
 //
 
-#include "Precompiled.h"
 #include "RefCounted.h"
-
-#include "DebugNew.h"
 
 RefCounted::RefCounted() :
     refCount_(new RefCount())
@@ -59,12 +56,12 @@ void RefCounted::ReleaseRef()
         delete this;
 }
 
-unsigned RefCounted::GetRefCount() const
+unsigned RefCounted::Refs() const
 {
     return refCount_->refs_;
 }
 
-unsigned RefCounted::GetWeakRefCount() const
+unsigned RefCounted::WeakRefs() const
 {
     // Subtract one to not return the internally held reference
     return refCount_->weakRefs_ - 1;

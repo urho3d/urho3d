@@ -102,11 +102,11 @@ bool Sound::LoadOggVorbis(Deserializer& source)
 {
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<signed char> data(new signed char[dataSize]);
-    source.Read(data.GetPtr(), dataSize);
+    source.Read(data.Ptr(), dataSize);
     
     // Check for validity of data
     int error;
-    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data.GetPtr(), dataSize, &error, 0);
+    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data.Ptr(), dataSize, &error, 0);
     if (!vorbis)
     {
         LOGERROR("Could not read Ogg Vorbis data from " + source.GetName());
@@ -199,7 +199,7 @@ bool Sound::LoadWav(Deserializer& source)
     unsigned length = header.dataLength_;
     SetSize(length);
     SetFormat(header.frequency_, header.bits_ == 16, header.channels_ == 2);
-    source.Read(data_.GetPtr(), length);
+    source.Read(data_.Ptr(), length);
     
     // Convert 8-bit audio to signed
     if (!sixteenBit_)
@@ -215,7 +215,7 @@ bool Sound::LoadRaw(Deserializer& source)
 {
     unsigned dataSize = source.GetSize();
     SetSize(dataSize);
-    return source.Read(data_.GetPtr(), dataSize) == dataSize;
+    return source.Read(data_.Ptr(), dataSize) == dataSize;
 }
 
 void Sound::SetSize(unsigned dataSize)
@@ -237,7 +237,7 @@ void Sound::SetData(const void* data, unsigned dataSize)
         return;
     
     SetSize(dataSize);
-    memcpy(data_.GetPtr(), data, dataSize);
+    memcpy(data_.Ptr(), data, dataSize);
 }
 
 void Sound::SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
@@ -256,7 +256,7 @@ void Sound::SetLooped(bool enable)
     {
         if (!compressed_)
         {
-            end_ = data_.GetPtr() + dataSize_;
+            end_ = data_.Ptr() + dataSize_;
             looped_ = false;
             
             FixInterpolation();
@@ -280,8 +280,8 @@ void Sound::SetLoop(unsigned repeatOffset, unsigned endOffset)
         repeatOffset &= -sampleSize;
         endOffset &= -sampleSize;
         
-        repeat_ = data_.GetPtr() + repeatOffset;
-        end_ = data_.GetPtr() + endOffset;
+        repeat_ = data_.Ptr() + repeatOffset;
+        end_ = data_.Ptr() + endOffset;
         looped_ = true;
         
         FixInterpolation();
@@ -314,7 +314,7 @@ void* Sound::AllocateDecoder()
         return 0;
     
     int error;
-    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data_.GetPtr(), dataSize_, &error, 0);
+    stb_vorbis* vorbis = stb_vorbis_open_memory((unsigned char*)data_.Ptr(), dataSize_, &error, 0);
     return vorbis;
 }
 

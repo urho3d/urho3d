@@ -115,7 +115,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.GetPtr());
+        ptr_ = static_cast<T*>(rhs.Ptr());
         if (ptr_)
             ptr_->AddRef();
     }
@@ -125,23 +125,23 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.GetPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Ptr());
         if (ptr_)
             ptr_->AddRef();
     }
     
     /// Check if the pointer is null
-    bool IsNull() const { return ptr_ == 0; }
+    bool Null() const { return ptr_ == 0; }
     /// Check if the pointer is not null
     bool NotNull() const { return ptr_ != 0; }
     /// Return the raw pointer
-    T* GetPtr() const { return ptr_; }
+    T* Ptr() const { return ptr_; }
     /// Return the object's reference count, or 0 if the pointer is null
-    unsigned GetRefCount() const { return ptr_ ? ptr_->GetRefCount() : 0; }
+    unsigned Refs() const { return ptr_ ? ptr_->Refs() : 0; }
     /// Return the object's weak reference count, or 0 if the pointer is null
-    unsigned GetWeakRefCount() const { return ptr_ ? ptr_->GetWeakRefCount() : 0; }
+    unsigned WeakRefs() const { return ptr_ ? ptr_->WeakRefs() : 0; }
     /// Return pointer to the RefCount structure
-    RefCount* GetRefCountPtr() const { return ptr_ ? ptr_->GetRefCountPtr() : 0; }
+    RefCount* RefCountPtr() const { return ptr_ ? ptr_->RefCountPtr() : 0; }
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     
@@ -192,8 +192,8 @@ public:
     
     /// Construct from a shared pointer
     WeakPtr(const SharedPtr<T>& rhs) :
-        ptr_(rhs.GetPtr()),
-        refCount_(rhs.GetRefCountPtr())
+        ptr_(rhs.Ptr()),
+        refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -211,7 +211,7 @@ public:
     /// Construct from a raw pointer
     explicit WeakPtr(T* ptr) :
         ptr_(ptr),
-        refCount_(ptr ? ptr->GetRefCountPtr() : 0)
+        refCount_(ptr ? ptr->RefCountPtr() : 0)
     {
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -226,13 +226,13 @@ public:
     /// Assign from a shared pointer
     WeakPtr<T>& operator = (const SharedPtr<T>& rhs)
     {
-        if (ptr_ == rhs.GetPtr() && refCount_ == rhs.GetRefCountPtr())
+        if (ptr_ == rhs.Ptr() && refCount_ == rhs.RefCountPtr())
             return *this;
         
         Release();
         
-        ptr_ = rhs.GetPtr();
-        refCount_ = rhs.GetRefCountPtr();
+        ptr_ = rhs.Ptr();
+        refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->weakRefs_);
         
@@ -258,7 +258,7 @@ public:
     /// Assign from a raw pointer
     WeakPtr<T>& operator = (T* ptr)
     {
-        RefCount* refCount = ptr ? ptr->GetRefCountPtr() : 0;
+        RefCount* refCount = ptr ? ptr->RefCountPtr() : 0;
         
         if (ptr_ == ptr && refCount_ == refCount)
             return *this;
@@ -276,16 +276,16 @@ public:
     /// Convert to a shared pointer. If expired, return a null shared pointer
     SharedPtr<T> ToShared() const
     {
-        if (IsExpired())
+        if (Expired())
             return SharedPtr<T>();
         else
             return SharedPtr<T>(ptr_);
     }
     
     /// Return raw pointer. If expired, return null
-    T* GetPtr() const
+    T* Ptr() const
     {
-        if (IsExpired())
+        if (Expired())
             return 0;
         else
             return ptr_;
@@ -294,19 +294,19 @@ public:
     /// Point to the object
     T* operator -> () const
     {
-        return GetPtr();
+        return Ptr();
     }
     
     /// Dereference the object
     T& operator * () const
     {
-        return *GetPtr();
+        return *Ptr();
     }
     
     /// Subscript the object if applicable
     T& operator [] (const int index)
     {
-        return (*GetPtr())[index];
+        return (*Ptr())[index];
     }
     
     /// Test for equality with another weak pointer
@@ -316,9 +316,9 @@ public:
     /// Test for less than with another weak pointer
     bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an object which is not expired
-    operator bool () const { return !IsExpired(); }
+    operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if the object is expired
-    operator T* () const { return GetPtr(); }
+    operator T* () const { return Ptr(); }
     
     /// Reset to null and release the weak reference
     void Reset()
@@ -331,7 +331,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.GetPtr());
+        ptr_ = static_cast<T*>(rhs.Ptr());
         refCount_ = rhs.refCount_;
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -342,7 +342,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.GetPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Ptr());
         if (ptr_)
         {
             refCount_ = rhs.refCount_;
@@ -354,25 +354,25 @@ public:
     }
     
     /// Check if the pointer is null
-    bool IsNull() const { return refCount_ == 0; }
+    bool Null() const { return refCount_ == 0; }
     /// Check if the pointer is not null. It does not matter whether the object has expired or not
     bool NotNull() const { return refCount_ != 0; }
     /// Return the object's reference count, or 0 if null pointer or if object is expired
-    unsigned GetRefCount() const { return refCount_ ? refCount_->refs_ : 0; }
+    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     
     /// Return the object's weak reference count
-    unsigned GetWeakRefCount() const
+    unsigned WeakRefs() const
     {
-        if (!IsExpired())
-            return ptr_->GetWeakRefCount();
+        if (!Expired())
+            return ptr_->WeakRefs();
         
         return refCount_ ? refCount_->weakRefs_ : 0;
     }
     
     /// Return whether the object has expired. If null pointer, always return true
-    bool IsExpired() const { return refCount_ ? refCount_->expired_ : true; }
+    bool Expired() const { return refCount_ ? refCount_->expired_ : true; }
     /// Return pointer to the RefCount structure
-    RefCount* GetRefCountPtr() const { return refCount_; }
+    RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     

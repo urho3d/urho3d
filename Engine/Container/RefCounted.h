@@ -56,11 +56,11 @@ public:
     /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting
     void ReleaseRef();
     /// Return reference count
-    unsigned GetRefCount() const;
+    unsigned Refs() const;
     /// Return weak reference count
-    unsigned GetWeakRefCount() const;
+    unsigned WeakRefs() const;
     /// Return pointer to the reference count structure
-    RefCount* GetRefCountPtr() { return refCount_; }
+    RefCount* RefCountPtr() { return refCount_; }
 
 private:
     /// Prevent copy construction

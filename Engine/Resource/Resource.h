@@ -94,7 +94,7 @@ template <class T> Vector<StringHash> GetResourceHashes(const Vector<SharedPtr<T
 {
     Vector<StringHash> ret(resources.Size());
     for (unsigned i = 0; i < resources.Size(); ++i)
-        ret[i] = GetResourceHash(resources[i].GetPtr());
+        ret[i] = GetResourceHash(resources[i].Ptr());
     
     return ret;
 }

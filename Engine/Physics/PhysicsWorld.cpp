@@ -463,7 +463,7 @@ void PhysicsWorld::CleanupGeometryCache()
         i != triangleMeshCache_.End();)
     {
         Map<String, SharedPtr<TriangleMeshData> >::Iterator current = i++;
-        if (current->second_.GetRefCount() == 1)
+        if (current->second_.Refs() == 1)
             triangleMeshCache_.Erase(current);
     }
     
@@ -471,7 +471,7 @@ void PhysicsWorld::CleanupGeometryCache()
         i != heightfieldCache_.End();)
     {
         Map<String, SharedPtr<HeightfieldData> >::Iterator current = i++;
-        if (current->second_.GetRefCount() == 1)
+        if (current->second_.Refs() == 1)
             heightfieldCache_.Erase(current);
     }
 }

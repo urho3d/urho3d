@@ -122,8 +122,8 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.GetPtr());
-        refCount_ = rhs.GetRefCountPtr();
+        ptr_ = static_cast<T*>(rhs.Ptr());
+        refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->refs_);
     }
@@ -133,10 +133,10 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.GetPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Ptr());
         if (ptr_)
         {
-            refCount_ = rhs.GetRefCountPtr();
+            refCount_ = rhs.RefCountPtr();
             if (refCount_)
                 ++(refCount_->refs_);
         }
@@ -145,17 +145,17 @@ public:
     }
     
     /// Check if the pointer is null
-    bool IsNull() const { return ptr_ == 0; }
+    bool Null() const { return ptr_ == 0; }
     /// Check if the pointer is not null
     bool NotNull() const { return ptr_ != 0; }
     /// Return the raw pointer
-    T* GetPtr() const { return ptr_; }
+    T* Ptr() const { return ptr_; }
     /// Return the array's reference count, or 0 if the pointer is null
-    unsigned GetRefCount() const { return refCount_ ? refCount_->refs_ : 0; }
+    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count, or 0 if the pointer is null
-    unsigned GetWeakRefCount() const { return refCount_ ? refCount_->weakRefs_ : 0; }
+    unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return pointer to the RefCount structure
-    RefCount* GetRefCountPtr() const { return refCount_; }
+    RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     
@@ -221,8 +221,8 @@ public:
     
     /// Construct from a shared array pointer
     WeakArrayPtr(const SharedArrayPtr<T>& rhs) :
-        ptr_(rhs.GetPtr()),
-        refCount_(rhs.GetRefCountPtr())
+        ptr_(rhs.Ptr()),
+        refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -246,13 +246,13 @@ public:
     /// Assign from a shared array pointer
     WeakArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
     {
-        if (ptr_ == rhs.GetPtr() && refCount_ == rhs.GetRefCountPtr())
+        if (ptr_ == rhs.Ptr() && refCount_ == rhs.RefCountPtr())
             return *this;
         
         Release();
         
-        ptr_ = rhs.GetPtr();
-        refCount_ = rhs.GetRefCountPtr();
+        ptr_ = rhs.Ptr();
+        refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->weakRefs_);
         
@@ -278,16 +278,16 @@ public:
     /// Convert to shared array pointer. If expired, return a null shared array pointer
     SharedArrayPtr<T> ToShared() const
     {
-        if (IsExpired())
+        if (Expired())
             return SharedArrayPtr<T>();
         else
             return SharedArrayPtr<T>(ptr_, refCount_);
     }
     
     /// Return raw pointer. If expired, return null
-    T* GetPtr() const
+    T* Ptr() const
     {
-        if (IsExpired())
+        if (Expired())
             return 0;
         else
             return ptr_;
@@ -296,19 +296,19 @@ public:
     /// Point to the array
     T* operator -> () const
     {
-        return GetPtr();
+        return Ptr();
     }
     
     /// Dereference the array
     T& operator * () const
     {
-        return *GetPtr();
+        return *Ptr();
     }
     
     /// Subscript the array
     T& operator [] (const int index)
     {
-        return (*GetPtr())[index];
+        return (*Ptr())[index];
     }
     
     /// Test for equality with another weak array pointer
@@ -318,9 +318,9 @@ public:
     /// Test for less than with another weak array pointer
     bool operator < (const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Return true if points to an array which is not expired
-    operator bool () const { return !IsExpired(); }
+    operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if array is expired
-    operator T* () const { return GetPtr(); }
+    operator T* () const { return Ptr(); }
     
     /// Reset to null and release the weak reference
     void Reset()
@@ -333,7 +333,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.GetPtr());
+        ptr_ = static_cast<T*>(rhs.Ptr());
         refCount_ = rhs.refCount_;
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -344,7 +344,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.GetPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Ptr());
         if (ptr_)
         {
             refCount_ = rhs.refCount_;
@@ -356,17 +356,17 @@ public:
     }
     
     /// Check if the pointer is null
-    bool IsNull() const { return refCount_ == 0; }
+    bool Null() const { return refCount_ == 0; }
     /// Check if the pointer is not null
     bool NotNull() const { return refCount_ != 0; }
     /// Return the array's reference count, or 0 if null pointer or if array is expired
-    unsigned GetRefCount() const { return refCount_ ? refCount_->refs_ : 0; }
+    unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count
-    unsigned GetWeakRefCount() const { return refCount_ ? refCount_->weakRefs_ : 0; }
+    unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
     /// Return whether the array has expired. If null pointer, always return true
-    bool IsExpired() const { return refCount_ ? refCount_->expired_ : true; }
+    bool Expired() const { return refCount_ ? refCount_->expired_ : true; }
     /// Return pointer to RefCount structure
-    RefCount* GetRefCountPtr() const { return refCount_; }
+    RefCount* RefCountPtr() const { return refCount_; }
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     
