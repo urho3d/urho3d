@@ -278,7 +278,7 @@ ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");
 
 Much of the Urho3D classes are exposed to scripts, however things that require low-level access or high performance (like direct vertex buffer access or immediate rendering) are not. Also for scripting convenience some things have been changed from the C++ API:
 
-- The template array and std::string types are exposed as Array<type> and String.
+- The template array and string classes are exposed as Array<type> and String.
 
 - Public member variables are exposed without the underscore appended. For example x, y, z in Vector3.
 
@@ -288,15 +288,17 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 
 - Additional global properties exist for accessing the script object's node, the scene and the scene-wide components: node, scene, octree, physicsWorld, debugRenderer. When an object method is not executing, these are null. An exception: when the default scene for immediate execution has been set by calling \ref Script::SetDefaultScene "SetDefaultScene()", it is always available as "scene".
 
-- The first script object created to a node is available as its scriptObject property.
+- The currently executing script object's ScriptInstance component is available through the global property self.
 
-- The script file that is currently executing is available through the scriptFile property.
+- The currently executing script file is available through the global property scriptFile.
+
+- The first script object created to a node is available as its scriptObject property.
 
 - Printing raw output to the log is simply called Print(). The rest of the logging functions are accessed by calling log.Debug(), log.Info(), log.Warning() and log.Error().
 
 - Functions that would take a StringHash or ShortStringHash parameter usually take a string instead. For example sending events, requesting resources and accessing components.
 
-- Most of StringUtils have been exposed as methods of the string class or the corresponding classes. For example String.ToLower(), Vector3.ToString().
+- Most of StringUtils have been exposed as methods of the string class. For example String.ToBool().
 
 - Template functions for getting components or resources by type are not supported. Instead automatic type casts are performed as necessary.
 

@@ -75,9 +75,7 @@
 - Network@ network
 - PhysicsWorld@ physicsWorld
 - ScriptFile@ scriptFile
-- bool active
-- int fixedUpdateFps
-- String className
+- ScriptInstance@ self
 - Script@ script
 - Console@ console
 - DebugHud@ debugHud

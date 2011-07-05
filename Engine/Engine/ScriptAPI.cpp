@@ -166,47 +166,6 @@ static ScriptInstance* GetSelf()
     return GetScriptContextInstance();
 }
 
-static void SelfSetActive(bool active)
-{
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (ptr)
-        ptr->SetActive(active);
-}
-
-static bool SelfIsActive()
-{
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (ptr)
-        return ptr->IsActive();
-    else
-        return false;
-}
-
-static void SelfSetFixedUpdateFps(int fps)
-{
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (ptr)
-        ptr->SetFixedUpdateFps(fps);
-}
-
-static int SelfGetFixedUpdateFps()
-{
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (ptr)
-        return ptr->GetFixedUpdateFps();
-    else
-        return 0;
-}
-
-static const String& SelfGetClassName()
-{
-    ScriptInstance* ptr = GetScriptContextInstance();
-    if (ptr)
-        return ptr->GetClassName();
-    else
-        return noClassName;
-}
-
 static void SelfDelayedExecute(float delay, const String& declaration, CScriptArray* srcParams)
 {
     ScriptInstance* ptr = GetScriptContextInstance();
@@ -272,11 +231,7 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     
     // Register global properties & functions that work as if the ScriptInstance and the script object were one and the same
     // (event subscribing & sending works similarly)
-    engine->RegisterGlobalFunction("void set_active(bool)", asFUNCTION(SelfSetActive), asCALL_CDECL);
-    engine->RegisterGlobalFunction("bool get_active()", asFUNCTION(SelfIsActive), asCALL_CDECL);
-    engine->RegisterGlobalFunction("void set_fixedUpdateFps(int)", asFUNCTION(SelfSetFixedUpdateFps), asCALL_CDECL);
-    engine->RegisterGlobalFunction("int get_fixedUpdateFps()", asFUNCTION(SelfGetFixedUpdateFps), asCALL_CDECL);
-    engine->RegisterGlobalFunction("const String& get_className()", asFUNCTION(SelfGetClassName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
     engine->RegisterGlobalFunction("void ClearDelayedExecute()", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);
