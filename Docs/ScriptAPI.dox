@@ -1,0 +1,3766 @@
+/**
+\page ScriptAPI Scripting API
+
+\section ScriptAPI_GlobalFunctions Global functions
+- bool Equals(float, float)
+- float Sin(float)
+- float Cos(float)
+- float Tan(float)
+- float Asin(float)
+- float Acos(float)
+- float Atan(float)
+- float Atan2(float, float)
+- float Abs(float)
+- float Sqrt(float)
+- float Pow(float)
+- float Random()
+- float Random(float)
+- int RandomInt()
+- int RandomInt(int)
+- void SetRandomSeed(int)
+- float Min(float, float)
+- float Max(float, float)
+- float Clamp(float, float, float)
+- float Lerp(float, float, float)
+- float Mod(float, float)
+- float Floor(float)
+- float Ceil(float)
+- String ToStringHex(int)
+- void ErrorDialog(const String&, const String&)
+- void OpenConsoleWindow()
+- String GetConsoleInput()
+- void SendEvent(const String&, VariantMap&)
+- void SendEvent(Object@, const String&, VariantMap&)
+- void SubscribeToEvent(const String&, const String&)
+- void SubscribeToEvent(Object@, const String&, const String&)
+- void UnsubscribeFromEvent(const String&)
+- void UnsubscribeFromEvent(Object@, const String&)
+- void UnsubscribeFromEvents(Object@)
+- void UnsubscribeFromAllEvents()
+- void Print(const String&)
+- void Print(int)
+- void Print(uint)
+- void Print(float)
+- void Print(bool)
+- String GetPath(const String&)
+- String GetFileName(const String&)
+- String GetExtension(const String&)
+- String GetFileNameAndExtension(const String&)
+- String AddTrailingSlash(const String&)
+- String RemoveTrailingSlash(const String&)
+- String GetParentPath(const String&)
+- String GetInternalPath(const String&)
+- void DelayedExecute(float, const String&, const Variant[]@)
+- void DelayedExecute(float, const String&)
+- void ClearDelayedExecute()
+- void Remove()
+\section ScriptAPI_GlobalProperties Global properties
+- String[]@ arguments
+- uint numCpuCores
+- Object@ sender
+- Time@ time
+- Log@ log
+- FileSystem@ fileSystem
+- ResourceCache@ resourceCache
+- ResourceCache@ cache
+- Node@ node
+- Scene@ scene
+- DebugRenderer@ debugRenderer
+- Octree@ octree
+- Graphics@ graphics
+- Renderer@ renderer
+- Input@ input
+- Audio@ audio
+- UI@ ui
+- Network@ network
+- PhysicsWorld@ physicsWorld
+- ScriptFile@ scriptFile
+- bool active
+- int fixedUpdateFps
+- String className
+- Script@ script
+- Console@ console
+- DebugHud@ debugHud
+- Engine@ engine
+\section ScriptAPI_GlobalConstants Global constants
+- float M_INFINITY
+- float M_EPSILON
+- int LOG_DEBUG
+- int LOG_INFO
+- int LOG_WARNING
+- int LOG_ERROR
+- int LOG_NONE
+- uint SCAN_FILES
+- uint SCAN_DIRS
+- uint SCAN_HIDDEN
+- uint AM_SERIALIZATION
+- uint AM_NETWORK
+- uint AM_BOTH
+- uint FIRST_NONLOCAL_ID
+- uint LAST_NONLOCAL_ID
+- uint FIRST_LOCAL_ID
+- uint LAST_LOCAL_ID
+- uint DRAWABLE_GEOMETRY
+- uint DRAWABLE_LIGHT
+- uint DRAWABLE_ZONE
+- uint DEFAULT_VIEWMASK
+- uint DEFAULT_LIGHTMASK
+- int QUALITY_LOW
+- int QUALITY_MEDIUM
+- int QUALITY_HIGH
+- int MOUSEB_LEFT
+- int MOUSEB_RIGHT
+- int MOUSEB_MIDDLE
+- int QUAL_SHIFT
+- int QUAL_CTRL
+- int QUAL_ALT
+- int KEY_BACKSPACE
+- int KEY_TAB
+- int KEY_RETURN
+- int KEY_PAUSE
+- int KEY_CAPSLOCK
+- int KEY_ESC
+- int KEY_SPACE
+- int KEY_PAGEUP
+- int KEY_PAGEDOWN
+- int KEY_END
+- int KEY_HOME
+- int KEY_LEFT
+- int KEY_UP
+- int KEY_RIGHT
+- int KEY_DOWN
+- int KEY_INSERT
+- int KEY_DELETE
+- int KEY_LWIN
+- int KEY_RWIN
+- int KEY_APPS
+- int KEY_NUMPAD0
+- int KEY_NUMPAD1
+- int KEY_NUMPAD2
+- int KEY_NUMPAD3
+- int KEY_NUMPAD4
+- int KEY_NUMPAD5
+- int KEY_NUMPAD6
+- int KEY_NUMPAD7
+- int KEY_NUMPAD8
+- int KEY_NUMPAD9
+- int KEY_MULTIPLY
+- int KEY_ADD
+- int KEY_SUBTRACT
+- int KEY_DECIMAL
+- int KEY_DIVIDE
+- int KEY_F1
+- int KEY_F2
+- int KEY_F3
+- int KEY_F4
+- int KEY_F5
+- int KEY_F6
+- int KEY_F7
+- int KEY_F8
+- int KEY_F9
+- int KEY_F10
+- int KEY_F11
+- int KEY_F12
+- int KEY_F13
+- int KEY_F14
+- int KEY_F15
+- int KEY_F16
+- int KEY_F17
+- int KEY_F18
+- int KEY_F19
+- int KEY_F20
+- int KEY_F21
+- int KEY_F22
+- int KEY_F23
+- int KEY_F24
+- int KEY_NUMLOCK
+- int KEY_SCROLLLOCK
+- int KEY_LSHIFT
+- int KEY_RSHIFT
+- int KEY_LCTRL
+- int KEY_RCTRL
+- int KEY_LALT
+- int KEY_RALT
+- uint DD_DISABLED
+- uint DD_SOURCE
+- uint DD_TARGET
+- uint DD_SOURCE_AND_TARGET
+- uint8 CHANNEL_ANY
+- uint DEBUGHUD_SHOW_NONE
+- uint DEBUGHUD_SHOW_STATS
+- uint DEBUGHUD_SHOW_MODE
+- uint DEBUGHUD_SHOW_PROFILER
+- uint DEBUGHUD_SHOW_ALL
+\section ScriptAPI_Classes Classes
+
+Array
+
+Methods:<br>
+- void Insert(uint, const T&)
+- void Erase(uint)
+- void Push(const T&)
+- void Pop()
+- void Resize(uint)
+
+Properties:<br>
+- uint length (readonly)
+- bool empty (readonly)
+
+
+String
+
+Methods:<br>
+- void Replace(uint8, uint8)
+- void Replace(const String&, const String&)
+- void Resize(uint)
+- int Find(const String&, uint arg1 = 0) const
+- int Find(uint8, uint arg1 = 0) const
+- int FindLast(const String&, uint arg1 = 0xffffffff) const
+- int FindLast(uint8, uint arg1 = 0xffffffff) const
+- String Substring(uint) const
+- String Substring(uint, uint) const
+- String ToUpper() const
+- String ToLower() const
+- String Trimmed() const
+- String[]@ Split(uint8) const
+- bool ToBool() const
+- float ToFloat() const
+- int ToInt() const
+- uint ToUInt() const
+- Color ToColor() const
+- IntRect ToIntRect() const
+- IntVector2 ToIntVector2() const
+- Quaternion ToQuaternion() const
+- Vector2 ToVector2() const
+- Vector3 ToVector3() const
+- Vector4 ToVector4() const
+
+Properties:<br>
+- uint length (readonly)
+- bool empty (readonly)
+
+
+IntRect
+
+Properties:<br>
+- int left
+- int top
+- int right
+- int bottom
+
+
+IntVector2
+
+Methods:<br>
+- String ToString() const
+
+Properties:<br>
+- int x
+- int y
+
+
+Vector2
+
+Methods:<br>
+- float Normalize()
+- float DotProduct(const Vector2&) const
+- float AbsDotProduct(const Vector2&) const
+- Vector2 Lerp(const Vector2&, float) const
+- Vector2 Normalized() const
+- String ToString() const
+
+Properties:<br>
+- float length (readonly)
+- float lengthSquared (readonly)
+- float x
+- float y
+
+
+Vector3
+
+Methods:<br>
+- float Normalize()
+- float DotProduct(const Vector3&) const
+- float AbsDotProduct(const Vector3&) const
+- Vector3 CrossProduct(const Vector3&) const
+- Vector3 Lerp(const Vector3&, float) const
+- Vector3 Normalized() const
+- String ToString() const
+
+Properties:<br>
+- float length (readonly)
+- float lengthSquared (readonly)
+- float x
+- float y
+- float z
+
+
+Vector4
+
+Methods:<br>
+- float DotProduct(const Vector4&) const
+- float AbsDotProduct(const Vector4&) const
+- Vector4 Lerp(const Vector4&, float) const
+- String ToString() const
+
+Properties:<br>
+- float x
+- float y
+- float z
+- float w
+
+
+Quaternion
+
+Methods:<br>
+- void Normalize()
+- Quaternion Normalized() const
+- Quaternion Inverse() const
+- float DotProduct(const Quaternion&) const
+- Quaternion Nlerp(const Quaternion&, float) const
+- Quaternion Slerp(const Quaternion&, float) const
+- String ToString() const
+
+Properties:<br>
+- Vector3 eulerAngles (readonly)
+- float yaw (readonly)
+- float pitch (readonly)
+- float roll (readonly)
+- float w
+- float x
+- float y
+- float z
+
+
+Ray
+
+Methods:<br>
+- void Define(const Vector3&, const Vector3&)
+- float Distance(const Vector3&, const Vector3&, const Vector3&) const
+
+Properties:<br>
+- Vector3 origin
+- Vector3 direction
+
+
+Rect
+
+Methods:<br>
+- void Define(const Vector2&, const Vector2&)
+- void Define(const Vector2&)
+- void Merge(const Vector2&)
+- void Merge(const Rect&)
+
+Properties:<br>
+- Vector2 min
+- Vector2 max
+- float left
+- float top
+- float right
+- float bottom
+- bool defined
+
+
+BoundingBox
+
+Methods:<br>
+- void Define(const Vector3&, const Vector3&)
+- void Define(float, float)
+- void Define(const Frustum&)
+- void Define(const Sphere&)
+- void Merge(const Vector3&)
+- void Merge(const BoundingBox&)
+- void Merge(const Frustum&)
+- void Merge(const Sphere&)
+- void Intersect(const BoundingBox&)
+- Intersection IsInside(const Vector3&) const
+- Intersection IsInside(const Sphere&) const
+- Intersection IsInside(const BoundingBox&) const
+- float Distance(const Ray&) const
+
+Properties:<br>
+- Vector3 center (readonly)
+- Vector3 size (readonly)
+- Vector3 halfSize (readonly)
+- Vector3 min
+- Vector3 max
+- bool defined
+
+
+Sphere
+
+Methods:<br>
+- void Define(const Vector3&, float)
+- void Define(const BoundingBox&)
+- void Define(const Frustum&)
+- void Merge(const Vector3&)
+- void Merge(const BoundingBox&)
+- void Merge(const Frustum&)
+- void Merge(const Sphere&)
+- Intersection IsInside(const Vector3&) const
+- Intersection IsInside(const Sphere&) const
+- Intersection IsInside(const BoundingBox&) const
+- float Distance(const Ray&) const
+
+Properties:<br>
+- Vector3 center
+- float radius
+- bool defined
+
+
+Frustum
+
+Methods:<br>
+- Intersection IsInside(const Vector3&)
+- Intersection IsInside(const BoundingBox&)
+- Intersection IsInside(const Sphere&)
+
+Properties:<br>
+- Vector3[] vertices (readonly)
+- bool defined
+
+
+Color
+
+Methods:<br>
+- Color Lerp(const Color&, float) const
+- String ToString() const
+
+Properties:<br>
+- Vector3 rgb (readonly)
+- float intensity (readonly)
+- float r
+- float g
+- float b
+- float a
+
+
+StringHash
+
+Methods:<br>
+- String ToString() const
+
+Properties:<br>
+- uint value (readonly)
+
+
+ShortStringHash
+
+Methods:<br>
+- String ToString() const
+
+Properties:<br>
+- uint16 value (readonly)
+
+
+ResourceRef
+
+Properties:<br>
+- ShortStringHash type
+- StringHash id
+
+
+ResourceRefList
+
+Methods:<br>
+- void Resize(uint)
+
+Properties:<br>
+- uint length (readonly)
+- bool empty (readonly)
+- StringHash[] ids
+- ShortStringHash type
+
+
+Variant
+
+Methods:<br>
+- void Clear()
+- int GetInt() const
+- uint GetUInt() const
+- StringHash GetStringHash() const
+- ShortStringHash GetShortStringHash() const
+- bool GetBool() const
+- float GetFloat() const
+- const Vector2& GetVector2() const
+- const Vector3& GetVector3() const
+- const Vector4& GetVector4() const
+- const Quaternion& GetQuaternion() const
+- const Color& GetColor() const
+- const String& GetString() const
+- Variant[]@ GetVariantVector() const
+- const VariantMap& GetVariantMap() const
+- void FromString(const String&, const String&)
+- String ToString() const
+- VectorBuffer GetBuffer() const
+- Node@ GetNode() const
+- Component@ GetComponent() const
+- Scene@ GetScene() const
+- UIElement@ GetUIElement() const
+- Peer@ GetPeer() const
+- PhysicsWorld@ GetPhysicsWorld() const
+- CollisionShape@ GetCollisionShape() const
+- RigidBody@ GetRigidBody() const
+
+Properties:<br>
+- VariantType type (readonly)
+- String& typeName (readonly)
+
+
+VariantMap
+
+Methods:<br>
+- bool Contains(const String&) const
+- void Erase(const String&)
+- void Clear()
+
+Properties:<br>
+- uint length (readonly)
+
+
+AttributeInfo
+
+Properties:<br>
+- String[]@ enumNames (readonly)
+- VariantType type
+- String name
+- Variant defaultValue
+- uint mode
+
+
+Object
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+
+
+Timer
+
+Methods:<br>
+- uint GetMSec(bool)
+- void Reset()
+
+
+Time
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint frameNumber (readonly)
+- float timeStep (readonly)
+- uint timeStepMSec (readonly)
+- uint totalMSec (readonly)
+
+
+Log
+
+Methods:<br>
+- void Write(const String&)
+- void Debug(const String&)
+- void Info(const String&)
+- void Warning(const String&)
+- void Error(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- int level
+- String& lastMessage (readonly)
+
+
+Serializer
+
+Methods:<br>
+- bool WriteInt(int)
+- bool WriteShort(int16)
+- bool WriteByte(int8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteUByte(uint8)
+- bool WriteBool(bool)
+- bool WriteFloat(float)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteVector4(const Vector4&)
+- bool WriteQuaternion(const Quaternion&)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WriteColor(const Color&)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteString(const String&)
+- bool WriteID(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteShortStringHash(const ShortStringHash&)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVLE(uint)
+- bool WriteLine(const String&)
+
+
+Deserializer
+
+Methods:<br>
+- int ReadInt()
+- int16 ReadShort()
+- int8 ReadByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint8 ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- uint ReadVLE()
+- String ReadLine()
+- uint Seek(uint)
+
+Properties:<br>
+- String& name (readonly)
+- uint checksum (readonly)
+- uint position (readonly)
+- uint size (readonly)
+- bool eof (readonly)
+
+
+File
+
+Methods:<br>
+- bool Open(const String&, FileMode)
+- void Close()
+- bool WriteInt(int)
+- bool WriteShort(int16)
+- bool WriteByte(int8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteUByte(uint8)
+- bool WriteBool(bool)
+- bool WriteFloat(float)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteVector4(const Vector4&)
+- bool WriteQuaternion(const Quaternion&)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WriteColor(const Color&)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteString(const String&)
+- bool WriteID(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteShortStringHash(const ShortStringHash&)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVLE(uint)
+- bool WriteLine(const String&)
+- int ReadInt()
+- int16 ReadShort()
+- int8 ReadByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint8 ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- uint ReadVLE()
+- String ReadLine()
+- uint Seek(uint)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- FileMode mode (readonly)
+- bool open (readonly)
+- String& name (readonly)
+- uint checksum (readonly)
+- uint position (readonly)
+- uint size (readonly)
+- bool eof (readonly)
+
+
+VectorBuffer
+
+Methods:<br>
+- void SetData(Deserializer@, uint)
+- void Clear()
+- void Resize(uint)
+- bool WriteInt(int)
+- bool WriteShort(int16)
+- bool WriteByte(int8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteUByte(uint8)
+- bool WriteBool(bool)
+- bool WriteFloat(float)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteVector4(const Vector4&)
+- bool WriteQuaternion(const Quaternion&)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WriteColor(const Color&)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteString(const String&)
+- bool WriteID(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteShortStringHash(const ShortStringHash&)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVLE(uint)
+- bool WriteLine(const String&)
+- int ReadInt()
+- int16 ReadShort()
+- int8 ReadByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint8 ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadID()
+- StringHash ReadStringHash()
+- ShortStringHash ReadShortStringHash()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- uint ReadVLE()
+- String ReadLine()
+- uint Seek(uint)
+
+Properties:<br>
+- String& name (readonly)
+- uint checksum (readonly)
+- uint position (readonly)
+- uint size (readonly)
+- bool eof (readonly)
+
+
+FileSystem
+
+Methods:<br>
+- bool FileExists(const String&)
+- bool DirExists(const String&)
+- String[]@ ScanDir(const String&, const String&, uint, bool)
+- bool CreateDir(const String&)
+- int SystemCommand(const String&)
+- int SystemRun(const String&, String[]@)
+- bool SystemOpen(const String&, const String&)
+- bool Copy(const String&, const String&)
+- bool Rename(const String&, const String&)
+- bool Delete(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String currentDir
+- String programDir (readonly)
+- String userDocumentsDir (readonly)
+
+
+PackageFile
+
+Methods:<br>
+- bool Open(const String&) const
+- bool Exists(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name (readonly)
+- uint numFiles (readonly)
+- uint totalSize (readonly)
+- uint checksum (readonly)
+
+
+Resource
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+
+
+ResourceCache
+
+Methods:<br>
+- bool AddResourcePath(const String&)
+- void AddPackageFile(PackageFile@)
+- bool AddManualResource(Resource@)
+- void RemoveResourcePath(const String&)
+- void RemovePackageFile(PackageFile@, bool, bool)
+- void RemovePackageFile(const String&, bool, bool)
+- void ReleaseResource(const String&, const String&, bool)
+- void ReleaseResources(const String&, bool)
+- void ReleaseResources(const String&, const String&, bool)
+- void ReleaseAllResources(bool)
+- bool ReloadResource(Resource@)
+- bool Exists(const String&) const
+- File@ GetFile(const String&)
+- String GetPreferredResourcePath(const String&)
+- Resource@ GetResource(const String&, const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint[] memoryBudget
+- uint[] memoryUse (readonly)
+- uint totalMemoryUse (readonly)
+
+
+Image
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- void SaveBMP(const String&)
+- void SaveTGA(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- int width (readonly)
+- int height (readonly)
+- uint components (readonly)
+- bool compressed (readonly)
+
+
+XMLFile
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- XMLElement CreateRootElement(const String&)
+- XMLElement GetRootElement(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- XMLElement rootElement (readonly)
+
+
+XMLElement
+
+Methods:<br>
+- XMLElement CreateChildElement(const String&)
+- bool RemoveChildElement()
+- bool RemoveChildElement(const String&, bool)
+- bool RemoveChildElements()
+- bool RemoveChildElements(const String&)
+- bool SetAttribute(const String&, const String&)
+- bool SetBool(const String&, bool)
+- bool SetBoundingBox(const BoundingBox&)
+- bool SetColor(const String&, const Color&)
+- bool SetFloat(const String&, float)
+- bool SetInt(const String&, int)
+- bool SetQuaternion(const String&, const Quaternion&)
+- bool SetString(const String&, const String&)
+- bool SetVariant(const Variant&)
+- bool SetResourceRef(const String&, const ResourceRef&)
+- bool SetResourceRefList(const String&, const ResourceRefList&)
+- bool SetVariantVector(Variant[]@)
+- bool SetVariantMap(const VariantMap&)
+- bool SetVector2(const String&, const Vector2&)
+- bool SetVector3(const String&, const Vector3&)
+- bool SetVector4(const String&, const Vector3&)
+- uint GetNumAttributes() const
+- bool HasAttribute(const String&) const
+- String GetAttributes(const String&) const
+- String[]@ GetAttributeNames() const
+- bool HasChildElement(const String&) const
+- XMLElement GetChildElement() const
+- XMLElement GetChildElement(const String&) const
+- XMLElement GetNextElement() const
+- XMLElement GetNextElement(const String&) const
+- bool GetBool(const String&) const
+- BoundingBox GetBoundingBox() const
+- Color GetColor(const String&) const
+- float GetFloat(const String&) const
+- int GetInt(const String&) const
+- Quaternion GetQuaternion(const String&) const
+- String GetString(const String&) const
+- String GetStringLower(const String&) const
+- String GetStringUpper(const String&) const
+- Variant GetVariant() const
+- ResourceRef GetResourceRef() const
+- ResourceRefList GetResourceRefList() const
+- Variant[]@ GetVariantVector() const
+- VariantMap GetVariantMap() const
+- Vector2 GetVector2(const String&) const
+- Vector3 GetVector3(const String&) const
+- Vector4 GetVector4(const String&) const
+
+Properties:<br>
+- String name (readonly)
+- String text (readonly)
+- bool null (readonly)
+- bool notNull (readonly)
+- XMLElement parent (readonly)
+- XMLFile@ file (readonly)
+
+
+Serializable
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+
+
+Component
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
+Node
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void SetTransform(const Vector3&, const Quaternion&)
+- void SetTransform(const Vector3&, const Quaternion&, float)
+- void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
+- void SetScale(float)
+- void Translate(const Vector3&)
+- void TranslateRelative(const Vector3&)
+- void Rotate(const Quaternion&, bool)
+- void Pitch(float, bool)
+- void Yaw(float, bool)
+- void Roll(float, bool)
+- void Scale(float)
+- void Scale(const Vector3&)
+- Node@ CreateChild(const String& arg0 = "", bool arg1 = false)
+- void AddChild(Node@)
+- void RemoveChild(Node@)
+- void RemoveAllChildren()
+- void Remove()
+- Component@ CreateComponent(const String&, bool arg1 = false)
+- Component@ GetOrCreateComponent(const String&, bool arg1 = false)
+- Node@[]@ GetChildren(bool arg0 = false) const
+- Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
+- Node@[]@ GetScriptedChildren(bool arg0 = false) const
+- Node@[]@ GetScriptedChildren(const String&, bool arg1 = false) const
+- Node@ GetChild(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents(const String&) const
+- Component@ GetComponent(const String&, uint arg1 = 0) const
+- bool HasComponent(const String&) const
+- ScriptObject@ CreateScriptObject(ScriptFile@, const String&)
+- ScriptObject@ CreateScriptObject(const String&, const String&)
+- ScriptObject@ GetScriptObject() const
+- ScriptObject@ GetScriptObject(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- Vector3& position
+- Quaternion& rotation
+- Vector3 direction
+- Vector3& scale
+- Vector3 worldPosition (readonly)
+- Quaternion worldRotation (readonly)
+- Vector3 worldDirection (readonly)
+- Vector3 worldScale (readonly)
+- uint id (readonly)
+- uint numChildren (readonly)
+- uint numAllChildren (readonly)
+- Node@[] children (readonly)
+- uint numComponents (readonly)
+- Component@[] components (readonly)
+- String& name
+- Node@ parent
+- Scene@ scene (readonly)
+- ScriptObject@ scriptObject (readonly)
+- VariantMap vars
+
+
+Scene
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void SetTransform(const Vector3&, const Quaternion&)
+- void SetTransform(const Vector3&, const Quaternion&, float)
+- void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
+- void SetScale(float)
+- void Translate(const Vector3&)
+- void TranslateRelative(const Vector3&)
+- void Rotate(const Quaternion&, bool)
+- void Pitch(float, bool)
+- void Yaw(float, bool)
+- void Roll(float, bool)
+- void Scale(float)
+- void Scale(const Vector3&)
+- Node@ CreateChild(const String& arg0 = "", bool arg1 = false)
+- void AddChild(Node@)
+- void RemoveChild(Node@)
+- void RemoveAllChildren()
+- void Remove()
+- Component@ CreateComponent(const String&, bool arg1 = false)
+- Component@ GetOrCreateComponent(const String&, bool arg1 = false)
+- Node@[]@ GetChildren(bool arg0 = false) const
+- Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
+- Node@[]@ GetScriptedChildren(bool arg0 = false) const
+- Node@[]@ GetScriptedChildren(const String&, bool arg1 = false) const
+- Node@ GetChild(const String&, bool arg1 = false) const
+- Component@[]@ GetComponents(const String&) const
+- Component@ GetComponent(const String&, uint arg1 = 0) const
+- bool HasComponent(const String&) const
+- void Update(float)
+- bool LoadXML(File@)
+- bool SaveXML(File@)
+- bool LoadAsync(File@)
+- bool LoadAsyncXML(File@)
+- void StopAsyncLoading()
+- void Clear()
+- void ClearNonLocal()
+- void AddRequiredPackageFile(PackageFile@)
+- void ClearRequiredPackageFiles()
+- Component@ GetComponentByID(uint)
+- Node@ GetNodeByID(uint)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- Vector3& position
+- Quaternion& rotation
+- Vector3 direction
+- Vector3& scale
+- Vector3 worldPosition (readonly)
+- Quaternion worldRotation (readonly)
+- Vector3 worldDirection (readonly)
+- Vector3 worldScale (readonly)
+- uint id (readonly)
+- uint numChildren (readonly)
+- uint numAllChildren (readonly)
+- Node@[] children (readonly)
+- uint numComponents (readonly)
+- Component@[] components (readonly)
+- String& name
+- Node@ parent
+- NetworkMode networkMode
+- bool active
+- bool asyncLoading (readonly)
+- float asyncProgress (readonly)
+- uint checksum (readonly)
+- String& fileName (readonly)
+- PackageFile@[]@ requiredPackageFiles (readonly)
+- DebugRenderer@ debugRenderer (readonly)
+- Octree@ octree (readonly)
+- PhysicsWorld@ physicsWorld (readonly)
+- VariantMap vars
+
+
+Camera
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void SetOrthoSize(const Vector2&)
+- Frustum GetSplitFrustum(float, float)
+- Ray GetScreenRay(float, float)
+- float GetDistance(const Vector3&)
+- float GetDistanceSquared(const Vector3&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- float nearClip
+- float farClip
+- float fov
+- float orthoSize
+- float aspectRatio
+- float zoom
+- float lodBias
+- bool orthographic
+- bool autoAspectRatio
+- uint viewMask
+- Frustum frustum (readonly)
+- Frustum viewSpaceFrustum (readonly)
+- float halfViewSize (readonly)
+- Vector3 forwardVector (readonly)
+- Vector3 rightVector (readonly)
+- Vector3 upVector (readonly)
+
+
+Bone
+
+Properties:<br>
+- Node@ node (readonly)
+- String name
+- Vector3 initialPosition
+- Quaternion initialRotation
+- Vector3 initialScale
+- bool animated
+- float radius
+- BoundingBox boundingBox
+
+
+Skeleton
+
+Methods:<br>
+- void Reset()
+- Bone@ GetBone(const String&) const
+
+Properties:<br>
+- Bone@ rootBone (readonly)
+- uint numBones (readonly)
+- Bone@[] bones (readonly)
+
+
+Texture
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- void SetNumLevels(uint)
+- void ClearDataLost()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- TextureUsage usage (readonly)
+- uint format (readonly)
+- uint levels (readonly)
+- int width (readonly)
+- int height (readonly)
+- int[] levelWidth (readonly)
+- int[] levelHeight (readonly)
+- TextureFilterMode filterMode
+- TextureAddressMode[] addressMode
+- Color& borderColor
+- Texture@ backupTexture
+- bool dataLost (readonly)
+
+
+Viewport
+
+Properties:<br>
+- Scene@ scene
+- Camera@ camera
+- IntRect rect
+
+
+RenderSurface
+
+Properties:<br>
+- Texture@ parentTexture (readonly)
+- int width (readonly)
+- int height (readonly)
+- TextureUsage usage (readonly)
+- Viewport& viewport
+- RenderSurface@ linkedRenderTarget
+- RenderSurface@ linkedDepthBuffer
+
+
+Texture2D
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- void SetNumLevels(uint)
+- void ClearDataLost()
+- void SetSize(int, int, uint, TextureUsage)
+- bool Load(Image@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- TextureUsage usage (readonly)
+- uint format (readonly)
+- uint levels (readonly)
+- int width (readonly)
+- int height (readonly)
+- int[] levelWidth (readonly)
+- int[] levelHeight (readonly)
+- TextureFilterMode filterMode
+- TextureAddressMode[] addressMode
+- Color& borderColor
+- Texture@ backupTexture
+- bool dataLost (readonly)
+- RenderSurface@ renderSurface (readonly)
+
+
+TextureCube
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- void SetNumLevels(uint)
+- void ClearDataLost()
+- void SetSize(int, uint, TextureUsage)
+- bool Load(CubeMapFace, Image@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- TextureUsage usage (readonly)
+- uint format (readonly)
+- uint levels (readonly)
+- int width (readonly)
+- int height (readonly)
+- int[] levelWidth (readonly)
+- int[] levelHeight (readonly)
+- TextureFilterMode filterMode
+- TextureAddressMode[] addressMode
+- Color& borderColor
+- Texture@ backupTexture
+- bool dataLost (readonly)
+- RenderSurface@[] renderSurface (readonly)
+
+
+Pass
+
+Properties:<br>
+- bool alphaMask
+- bool alphaTest
+- BlendMode blendMode
+- CompareMode depthTestMode
+- bool depthWrite
+- String& vertexShader
+- String& pixelShader
+
+
+Technique
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- Pass@ CreatePass(PassType)
+- void RemovePass(PassType)
+- bool HasPass(PassType) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- bool sm3
+- Pass@[] pass (readonly)
+
+
+Material
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- void SetUVTransform(const Vector2&, float, const Vector2&)
+- void SetUVTransform(const Vector2&, float, float)
+- void RemoveShaderParameter(const String&)
+- Material@ Clone(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- uint numTechniques
+- Technique@[] technique (readonly)
+- Vector4[] shaderParameter
+- Texture@[] texture
+- bool occlusion (readonly)
+- CullMode cullMode
+- CullMode shadowCullMode
+
+
+Model
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- BoundingBox& boundingBox (readonly)
+- Skeleton@ skeleton (readonly)
+- uint numGeometries (readonly)
+- uint[] numGeometryLodLevels (readonly)
+- uint numMorphs (readonly)
+
+
+Animation
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- String& animationName (readonly)
+- float length (readonly)
+- uint numTracks (readonly)
+
+
+Drawable
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+
+
+BiasParameters
+
+Properties:<br>
+- float constantBias
+- float slopeScaledBias
+
+
+CascadeParameters
+
+Properties:<br>
+- uint splits
+- float lambda
+- float splitFadeRange
+- float shadowRange
+
+
+FocusParameters
+
+Properties:<br>
+- bool focus
+- bool nonUniform
+- bool zoomOut
+- float quantize
+- float minView
+
+
+Light
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- LightType lightType
+- Color& color
+- float specularIntensity
+- float range
+- float fov
+- float aspectRatio
+- float fadeDistance
+- BiasParameters& shadowBias
+- CascadeParameters& shadowCascade
+- FocusParameters& shadowFocus
+- float shadowFadeDistance
+- float shadowIntensity
+- float shadowResolution
+- float shadowNearFarRatio
+- Texture@ rampTexture
+- Texture@ shapeTexture
+- Frustum frustum (readonly)
+
+
+Zone
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- BoundingBox& boundingBox
+- Color& ambientColor
+- Color& fogColor
+- float fogStart
+- float fogEnd
+- int priority
+
+
+StaticModel
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- Model@ model
+- Material@[] materials
+- BoundingBox& boundingBox (readonly)
+- uint numGeometries (readonly)
+- uint softwareLodLevel
+
+
+Skybox
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- Model@ model
+- Material@[] materials
+- BoundingBox& boundingBox (readonly)
+- uint numGeometries (readonly)
+- uint softwareLodLevel
+
+
+AnimationState
+
+Methods:<br>
+- void AddWeight(float)
+- void AddTime(float)
+
+Properties:<br>
+- Bone@ startBone
+- bool looped
+- float weight
+- float time
+- int layer
+- bool useNlerp
+- Animation@ animation (readonly)
+- bool enabled (readonly)
+- float length (readonly)
+
+
+AnimatedModel
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+- AnimationState@ AddAnimationState(Animation@)
+- void RemoveAnimationState(Animation@)
+- void RemoveAnimationState(const String&)
+- void RemoveAnimationState(AnimationState@)
+- void RemoveAllAnimationStates()
+- void SetMorphWeight(uint, float)
+- void ResetMorphWeights()
+- float GetMorphWeight(uint) const
+- AnimationState@ GetAnimationState(Animation@) const
+- AnimationState@ GetAnimationState(uint) const
+- float getMorphWeight(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- Model@ model
+- Material@[] materials
+- BoundingBox& boundingBox (readonly)
+- uint numGeometries (readonly)
+- uint softwareLodLevel
+- float animationLodBias
+- float invisibleLodFactor
+- Skeleton@ skeleton (readonly)
+- uint numAnimationStates (readonly)
+- AnimationState@[] animationStates (readonly)
+- uint numMorphs (readonly)
+
+
+AnimationController
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool Play(const String&, int, bool, float arg3 = 0.0f)
+- bool PlayExclusive(const String&, int, bool, float arg3 = 0.0f)
+- void Stop(const String&, float arg1 = 0.0f)
+- void StopLayer(int, float arg1 = 0.0f)
+- void StopAll(float arg0 = 0.0f)
+- bool Fade(const String&, float, float)
+- bool FadeOthers(const String&, float, float)
+- bool SetLayer(const String&, int)
+- bool SetStartBone(const String&, const String&)
+- bool SetTime(const String&, float)
+- bool SetWeight(const String&, float)
+- bool SetLooped(const String&, bool)
+- bool SetSpeed(const String&, float)
+- bool SetAutoFade(const String&, float)
+- bool IsPlaying(const String&) const
+- bool IsFadingIn(const String&) const
+- bool IsFadingOut(const String&) const
+- int GetLayer(const String&) const
+- const String& GetStartBone(const String&) const
+- float GetTime(const String&) const
+- float GetWeight(const String&) const
+- bool GetLooped(const String&) const
+- float GetLength(const String&) const
+- float GetSpeed(const String&) const
+- float GetAutoFade(const String&) const
+- float GetFadeTarget(const String&) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
+Billboard
+
+Properties:<br>
+- Vector3 position
+- Vector2 size
+- Rect uv
+- Color color
+- float rotation
+- bool enabled
+
+
+BillboardSet
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool IsInView() const
+- void Updated()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool castShadows
+- bool occluder
+- bool visible
+- float drawDistance
+- float shadowDistance
+- float lodBias
+- uint viewMask
+- uint lightMask
+- BoundingBox& worldBoundingBox (readonly)
+- Material@ material
+- uint numBillboards
+- bool relative
+- bool sorted
+- bool scaled
+- float animationLodBias
+- Billboard@[] billboards (readonly)
+
+
+ParticleEmitter
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void SetActive(bool, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Material@ material
+- bool relative
+- bool sorted
+- bool scaled
+- float animationLodBias
+- XMLFile@ parameters
+- bool active (readonly)
+- uint numParticles (readonly)
+
+
+DebugRenderer
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void AddLine(const Vector3&, const Vector3&, const Color&, bool)
+- void AddBoundingBox(const BoundingBox&, const Color&, bool)
+- void AddFrustum(const Frustum&, const Color&, bool)
+- void AddSkeleton(Skeleton@, const Color&, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
+RayQueryResult
+
+Properties:<br>
+- Drawable@ drawable (readonly)
+- Node@ node (readonly)
+- float distance
+- uint subObject
+
+
+Octree
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Resize(const BoundingBox&, uint)
+- void DrawDebugGeometry(bool) const
+- RayQueryResult[]@ Raycast(const Ray&, uint8, float, RayQueryLevel)
+- Node@[]@ GetDrawables(const Vector3&, uint8)
+- Node@[]@ GetDrawables(const BoundingBox&, uint8)
+- Node@[]@ GetDrawables(const Frustum&, uint8)
+- Node@[]@ GetDrawables(const Sphere&, uint8)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- BoundingBox& worldBoundingBox (readonly)
+- uint numLevels (readonly)
+
+
+Graphics
+
+Methods:<br>
+- bool SetMode(RenderMode, int, int, bool, bool, int)
+- bool SetMode(int, int)
+- bool SetMode(RenderMode)
+- bool ToggleFullscreen()
+- void Close()
+- bool TakeScreenShot(Image@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- bool flushGPU
+- String& windowTitle
+- RenderMode renderMode (readonly)
+- int width (readonly)
+- int height (readonly)
+- int multiSample (readonly)
+- bool fullscreen (readonly)
+- bool vsync (readonly)
+- bool initialized (readonly)
+- bool deviceLost (readonly)
+- uint numPrimitives (readonly)
+- uint numBatches (readonly)
+- bool renderTargetSupport (readonly)
+- bool deferredSupport (readonly)
+- bool sm3Support (readonly)
+- bool hardwareShadowSupport (readonly)
+- bool hiresShadowSupport (readonly)
+- IntVector2[]@ resolutions (readonly)
+- int[]@ multiSampleLevels (readonly)
+
+
+EdgeFilterParameters
+
+Properties:<br>
+- float radius
+- float threshold
+- float strength
+
+
+Renderer
+
+Methods:<br>
+- void SetNumShadowMaps(uint, uint, uint)
+- void DrawDebugGeometry(bool) const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numViewports
+- Viewport&[] viewports
+- bool specularLighting
+- bool drawShadows
+- int textureAnisotropy
+- TextureFilterMode textureFilterMode
+- int textureQuality
+- int materialQuality
+- int shadowMapSize
+- bool shadowMapHiresDepth
+- bool reuseShadowMaps
+- bool dynamicInstancing
+- EdgeFilterParameters& edgeFilter
+- int maxOccluderTriangles
+- int occlusionBufferSize
+- float occluderSizeThreshold
+- uint numPrimitives (readonly)
+- uint numBatches (readonly)
+- uint numViews (readonly)
+- uint[] numGeometries (readonly)
+- uint[] numLights (readonly)
+- uint[] numShadowMaps (readonly)
+- uint[] numOccluders (readonly)
+- uint[] numShadowOccluders (readonly)
+- uint numFullShadowMaps (readonly)
+- uint numHalfShadowMaps (readonly)
+- uint numQuarterShadowMaps (readonly)
+
+
+Input
+
+Methods:<br>
+- void SuppressNextChar()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- bool toggleFullscreen
+- bool[] keyDown (readonly)
+- bool[] keyPress (readonly)
+- bool[] mouseButtonDown (readonly)
+- bool[] mouseButtonPress (readonly)
+- bool[] qualifierDown (readonly)
+- bool[] qualifierPress (readonly)
+- int qualifiers (readonly)
+- IntVector2& mouseMove (readonly)
+- int mouseMoveX (readonly)
+- int mouseMoveY (readonly)
+- int mouseMoveWheel (readonly)
+- bool active (readonly)
+- bool minimized (readonly)
+
+
+Sound
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- float length (readonly)
+- uint sampleSize (readonly)
+- float frequency (readonly)
+- bool looped
+- bool sixteenBit (readonly)
+- bool stereo (readonly)
+- bool compressed (readonly)
+
+
+SoundSource
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Play(Sound@)
+- void Play(Sound@, float)
+- void Play(Sound@, float, float)
+- void Play(Sound@, float, float, float)
+- void Stop()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- SoundType soundType
+- float frequency
+- float gain
+- float panning
+- Sound@ sound (readonly)
+- float timePosition (readonly)
+- float attenuation (readonly)
+- bool autoRemove
+- bool playing (readonly)
+
+
+SoundSource3D
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Play(Sound@)
+- void Play(Sound@, float)
+- void Play(Sound@, float, float)
+- void Play(Sound@, float, float, float)
+- void Stop()
+- void SetDistanceAttenuation(float, float, float)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- SoundType soundType
+- float frequency
+- float gain
+- float panning
+- Sound@ sound (readonly)
+- float timePosition (readonly)
+- float attenuation (readonly)
+- bool autoRemove
+- bool playing (readonly)
+- float nearDistance
+- float farDistance
+- float rolloffFactor
+
+
+Audio
+
+Methods:<br>
+- void SetMode(int, int, bool, bool)
+- bool Play()
+- void Stop()
+- void SetListenerTransform(const Vector3&, const Quaternion&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- float[] masterGain
+- Vector3& listenerPosition
+- Quaternion& listenerRotation
+- uint sampleSize (readonly)
+- int mixRate (readonly)
+- bool stereo (readonly)
+- bool interpolated (readonly)
+- bool playing (readonly)
+- bool initialized (readonly)
+
+
+Font
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+
+
+UIElement
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- VariantMap vars
+
+
+BorderImage
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- VariantMap vars
+
+
+Button
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void SetPressedOffset(int, int)
+- void SetLabelOffset(int, int)
+- void SetRepeat(float, float)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- IntVector2& pressedOffset
+- IntVector2& labelOffset
+- float repeatDelay
+- float repeatRate
+- VariantMap vars
+
+
+CheckBox
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void SetCheckedOffset(int, int)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- bool checked
+- IntVector2& checkedOffset
+- VariantMap vars
+
+
+Cursor
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void DefineShape(CursorShape, Texture@, const IntRect&, const IntVector2&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- CursorShape shape
+- VariantMap vars
+
+
+Slider
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void ChangeValue(float)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- Orientation orientation
+- float range
+- float value
+- BorderImage@ knob (readonly)
+- VariantMap vars
+
+
+ScrollBar
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void ChangeValue(float)
+- void StepBack()
+- void StepForward()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Orientation orientation
+- float range
+- float value
+- float scrollStep
+- float stepFactor
+- float effectiveScrollStep (readonly)
+- Button@ backButton (readonly)
+- Button@ forwardButton (readonly)
+- Slider@ slider (readonly)
+- VariantMap vars
+
+
+ScrollView
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetViewPosition(int, int)
+- void SetScrollBarsVisible(bool, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- UIElement@ contentElement
+- IntVector2& viewPosition
+- float scrollStep
+- float pageStep
+- ScrollBar@ horizontalScrollBar (readonly)
+- ScrollBar@ verticalScrollBar (readonly)
+- BorderImage@ scrollPanel (readonly)
+- VariantMap vars
+
+
+ListView
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetViewPosition(int, int)
+- void SetScrollBarsVisible(bool, bool)
+- void AddItem(UIElement@)
+- void InsertItem(uint, UIElement@)
+- void RemoveItem(UIElement@)
+- void RemoveItem(uint)
+- void RemoveAllItems()
+- void AddSelection(uint)
+- void RemoveSelection(uint)
+- void ToggleSelection(uint)
+- void ChangeSelection(int, bool)
+- void ClearSelection()
+- void SetChildItemsVisible(uint, bool)
+- void SetChildItemsVisible(bool)
+- void ToggleChildItemsVisible(uint)
+- UIElement@[]@ GetItems() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- IntVector2& viewPosition
+- UIElement@ contentElement (readonly)
+- ScrollBar@ horizontalScrollBar (readonly)
+- ScrollBar@ verticalScrollBar (readonly)
+- BorderImage@ scrollPanel (readonly)
+- float scrollStep
+- float pageStep
+- uint numItems (readonly)
+- UIElement@[] items (readonly)
+- uint selection
+- uint[]@ selections
+- UIElement@ selectedItem (readonly)
+- UIElement@[]@ selectedItems (readonly)
+- HighlightMode highlightMode
+- bool multiselect
+- bool hierarchyMode
+- bool clearSelectionOnDefocus
+- float floatClickInterval
+- VariantMap vars
+
+
+Text
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- bool SetFont(const String&, int)
+- bool SetFont(Font@, int)
+- void SetSelection(uint, uint)
+- void ClearSelection()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Font@ font (readonly)
+- int fontSize (readonly)
+- String& text
+- HorizontalAlignment textAlignment
+- float rowSpacing
+- bool wordwrap
+- uint selectionStart (readonly)
+- uint selectionLength (readonly)
+- Color& selectionColor
+- Color& hoverColor
+- uint numRows (readonly)
+- int rowHeight (readonly)
+- VariantMap vars
+
+
+LineEdit
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- String& text
+- uint cursorPosition
+- float cursorBlinkRate
+- uint maxLength
+- uint8 echoCharacter
+- bool cursorMovable
+- bool textSelectable
+- bool textCopyable
+- Text@ textElement (readonly)
+- BorderImage@ cursor (readonly)
+- VariantMap vars
+
+
+Menu
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void SetPressedOffset(int, int)
+- void SetLabelOffset(int, int)
+- void SetRepeat(float, float)
+- void SetPopupOffset(int, int)
+- void SetAccelerator(int, int)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- IntVector2& pressedOffset
+- IntVector2& labelOffset
+- float repeatDelay
+- float repeatRate
+- UIElement@ popup
+- IntVector2& popupOffset
+- bool showPopup
+- int acceleratorKey (readonly)
+- int acceleratorQualifiers (readonly)
+- VariantMap vars
+
+
+DropDownList
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+- void SetPressedOffset(int, int)
+- void SetLabelOffset(int, int)
+- void SetRepeat(float, float)
+- void SetAccelerator(int, int)
+- void AddItem(UIElement@)
+- void InsertItem(uint, UIElement@)
+- void RemoveItem(UIElement@)
+- void RemoveItem(uint)
+- void RemoveAllItems()
+- UIElement@[]@ GetItems() const
+- UIElement@ getPopup() const
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- IntVector2& pressedOffset
+- IntVector2& labelOffset
+- float repeatDelay
+- float repeatRate
+- bool showPopup
+- uint selection
+- bool resizePopup
+- int acceleratorKey (readonly)
+- int acceleratorQualifiers (readonly)
+- uint numItems (readonly)
+- UIElement@[] items (readonly)
+- UIElement@ selectedItem (readonly)
+- ListView@ listView (readonly)
+- UIElement@ placeholder (readonly)
+- VariantMap vars
+
+
+Window
+
+Methods:<br>
+- void SetStyle(const XMLElement&)
+- void SetStyle(XMLFile@, const String&)
+- void SetStyleAuto(XMLFile@)
+- void SetPosition(int, int)
+- void SetSize(int, int)
+- void SetMinSize(int, int)
+- void SetMaxSize(int, int)
+- void SetFixedSize(const IntVector2&)
+- void SetFixedSize(int, int)
+- void SetFixedWidth(int)
+- void SetFixedHeight(int)
+- void SetAlignment(HorizontalAlignment, VerticalAlignment)
+- void SetLayout(LayoutMode, int, const IntRect&)
+- void UpdateLayout()
+- void DisableLayoutUpdate()
+- void EnableLayoutUpdate()
+- void BringToFront()
+- void AddChild(UIElement@)
+- void InsertChild(uint, UIElement@)
+- void RemoveChild(UIElement@)
+- void RemoveAllChildren()
+- void Remove()
+- UIElement@ GetChild(const String&, bool arg1 = false) const
+- IntVector2 ScreenToElement(const IntVector2&)
+- IntVector2 ElementToScreen(const IntVector2&)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
+- void SetFullImageRect()
+- void SetHoverOffset(int, int)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- IntVector2& position
+- IntVector2& size
+- int width
+- int height
+- IntVector2& minSize
+- int minWidth
+- int minHeight
+- IntVector2& maxSize
+- int maxWidth
+- int maxHeight
+- HorizontalAlignment horizontalAlignment
+- VerticalAlignment verticalAlignment
+- IntRect& clipBorder
+- Color&[] colors
+- int priority
+- float opacity
+- bool bringToFront
+- bool bringToBack
+- bool clipChildren
+- bool active
+- bool focus
+- bool selected
+- bool visible
+- bool hovering (readonly)
+- bool colorGradient (readonly)
+- FocusMode focusMode
+- uint dragDropMode
+- LayoutMode layoutMode
+- int layoutSpacing
+- IntRect& layoutBorder
+- IntVector2& childOffset (readonly)
+- uint[] numChildren (readonly)
+- UIElement@[] children (readonly)
+- UIElement@ parent (readonly)
+- UIElement@ rootElement (readonly)
+- IntVector2 screenPosition (readonly)
+- float derivedOpacity (readonly)
+- IntRect combinedScreenRect (readonly)
+- Texture@ texture
+- IntRect& imageRect
+- IntRect& border
+- IntVector2& hoverOffset
+- bool movable
+- bool resizable
+- IntRect& resizeBorder
+- VariantMap vars
+
+
+FileSelector
+
+Methods:<br>
+- void SetTitle(const String&)
+- void SetButtonTexts(const String&, const String&)
+- void SetFilters(String[]@, uint)
+- void UpdateElements()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& path
+- String& fileName
+- bool directoryMode
+- String& filter (readonly)
+- uint filterIndex (readonly)
+- XMLFile@ style
+- Window@ window (readonly)
+- Text@ titleText (readonly)
+- ListView@ fileList (readonly)
+- LineEdit@ pathEdit (readonly)
+- LineEdit@ fileNameEdit (readonly)
+- DropDownList@ filterList (readonly)
+- Button@ okButton (readonly)
+- Button@ cancelButton (readonly)
+
+
+UI
+
+Methods:<br>
+- void Clear()
+- UIElement@ LoadLayout(XMLFile@)
+- UIElement@ LoadLayout(XMLFile@, XMLFile@)
+- UIElement@ GetElementAt(const IntVector2&, bool)
+- UIElement@ GetElementAt(int, int, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- Cursor@ cursor
+- UIElement@ focusElement
+- UIElement@ rootElement (readonly)
+- UIElement@ frontElement (readonly)
+- IntVector2 cursorPosition (readonly)
+
+
+Controls
+
+Methods:<br>
+- void Reset()
+- void Set(uint, bool)
+- bool IsDown(uint)
+- bool IsPressed(uint, const Controls&)
+
+Properties:<br>
+- uint buttons
+- float yaw
+- float pitch
+- VariantMap extraData
+
+
+Peer
+
+Methods:<br>
+- void Send(const VectorBuffer&, uint8, bool, bool)
+- bool Receive(VectorBuffer&, uint8)
+- void FlushPackets()
+- bool HasPackets() const
+- void Disconnect()
+- void ForceDisconnect()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- float simulatedPacketLoss
+- uint simulatedLatency
+- PeerType peerType (readonly)
+- ConnectionState connectionState (readonly)
+- uint numPackets (readonly)
+- String& address (readonly)
+- uint16 port (readonly)
+
+
+Network
+
+Methods:<br>
+- void SetDataRate(int, int)
+- bool StartServer(uint16)
+- Peer@ Connect(const String&, uint16)
+- void StopServer()
+- void StopClient()
+- void Broadcast(const VectorBuffer&, uint8, bool, bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint serverMaxConnections
+- uint clientMaxConnections
+- uint numChannels
+- bool serverStarted (readonly)
+- bool clientStarted (readonly)
+- uint numPeers (readonly)
+- int dataRateIn (readonly)
+- int dataRateOut (readonly)
+- Peer@[] peers (readonly)
+- Peer@ serverPeer (readonly)
+
+
+PhysicsRaycastResult
+
+Properties:<br>
+- Node@ node (readonly)
+- Vector3 position
+- Vector3 normal
+- float distance
+
+
+PhysicsWorld
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Update(float)
+- PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint)
+- void DrawDebugGeometry(bool)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Vector3 gravity
+- int fps
+- uint maxContacts
+- float linearRestThreshold
+- float angularRestThreshold
+- float bounceThreshold
+- float erp
+- float cfm
+- float contactSurfaceLayer
+- float linearDampingThreshold
+- float linearDampingScale
+- float angularDampingThreshold
+- float angularDampingScale
+
+
+CollisionShape
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Clear()
+- void SetSphere(float, const Vector3&, const Quaternion&)
+- void SetBox(const Vector3&, const Vector3&, const Quaternion&)
+- void SetCylinder(float, float, const Vector3&, const Quaternion&)
+- void SetCapsule(float, float, const Vector3&, const Quaternion&)
+- void SetTriangleMesh(Model@, uint, const Vector3&, const Quaternion&)
+- void SetHeightfield(Model@, const IntVector2&, float, uint, const Vector3&, const Quaternion&)
+- void SetConvexHull(Model@, float, uint, const Vector3&, const Quaternion&)
+- void SetTransform(const Vector3&, const Quaternion&)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Model@ model (readonly)
+- ShapeType shapeType (readonly)
+- Vector3& position
+- Quaternion& rotation
+- uint collisionGroup
+- uint collisionMask
+- float friction
+- float bounce
+
+
+RigidBody
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void SetTransform(const Vector3&, const Quaternion&)
+- void ApplyForce(const Vector3&)
+- void ApplyForceAtPosition(const Vector3&, const Vector3&)
+- void ApplyTorque(const Vector3&)
+- void ResetForces()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- float mass
+- Vector3 linearVelocity
+- float linearRestThreshold
+- Vector3 angularVelocity
+- float angularRestThreshold
+- float angularMaxVelocity
+- bool active
+- Vector3 position
+- Quaternion rotation
+- float linearDampingThreshold
+- float linearDampingScale
+- float angularDampingThreshold
+- float angularDampingScale
+
+
+Joint
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void Clear()
+- bool SetBall(const Vector3&, RigidBody@, RigidBody@)
+- bool SetHinge(const Vector3&, const Vector3&, RigidBody@, RigidBody@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- Vector3 position
+- Vector3 axis
+- RigidBody@ bodyA (readonly)
+- RigidBody@ bodyB (readonly)
+- JointType jointType (readonly)
+
+
+ScriptFile
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool Execute(const String&, const Variant[]@)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- String& name
+- uint memoryUse (readonly)
+- uint useTimer (readonly)
+- bool compiled (readonly)
+
+
+ScriptObject
+
+
+ScriptInstance
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- bool CreateObject(ScriptFile@, const String&)
+- bool Execute(const String&, const Variant[]@)
+- bool Execute(const String&)
+- void DelayedExecute(float, const String&, const Variant[]@)
+- void DelayedExecute(float, const String&)
+- void ClearDelayedExecute()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- bool active
+- int fixedUpdateFps
+- ScriptFile@ scriptFile
+- ScriptObject@ object (readonly)
+- String& className
+
+
+Script
+
+Methods:<br>
+- bool Execute(const String&)
+- void DumpAPI()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- ScriptFile@ defaultScriptFile
+- Scene@ defaultScene
+
+
+Console
+
+Methods:<br>
+- void Toggle()
+- void UpdateElements()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- XMLFile@ style
+- bool visible
+- uint numRows
+- uint numHistoryRows
+- uint historyPosition (readonly)
+- String&[] historyRow (readonly)
+- BorderImage@ background (readonly)
+- LineEdit@ lineEdit (readonly)
+
+
+DebugHud
+
+Methods:<br>
+- void Toggle(uint)
+- void ToggleAll()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- XMLFile@ style
+- uint mode
+- float profilerInterval
+- bool useRendererStats
+- Text@ statsText (readonly)
+- Text@ modeText (readonly)
+- Text@ profilerText (readonly)
+
+
+Engine
+
+Methods:<br>
+- void RunFrame()
+- void Exit()
+- void DumpProfilingData()
+- void DumpResources()
+- Console@ CreateConsole()
+- DebugHud@ CreateDebugHud()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- int minFps
+- int maxFps
+- int maxInactiveFps
+- bool initialized (readonly)
+- bool exiting (readonly)
+- bool headless (readonly)
+
+*/

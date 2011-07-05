@@ -33,6 +33,7 @@ For further reference, see:
 \ref Tools "Tools" <br>
 \ref FileFormats "Custom file formats" <br>
 \ref CodingConventions "Coding conventions" <br>
+\ref ScriptAPI "Scripting API (generated)" <br>
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 

@@ -206,7 +206,7 @@ void Script::ClearLogMessages()
 
 void Script::DumpAPI()
 {
-    LOGRAW("Urho3D script API:\n");
+    LOGRAW("/**\n\\page ScriptAPI Scripting API \n\n");
     
     Vector<PropertyInfo> globalPropertyInfos;
     Vector<String> globalFunctions;
@@ -225,12 +225,12 @@ void Script::DumpAPI()
             globalFunctions.Push(declaration);
     }
     
-    LOGRAW("\nGlobal functions:\n");
+    LOGRAW("\\section ScriptAPI_GlobalFunctions Global functions\n");
     
     for (unsigned i = 0; i < globalFunctions.Size(); ++i)
         OutputAPIRow(globalFunctions[i]);
     
-    LOGRAW("\nGlobal properties:\n");
+    LOGRAW("\\section ScriptAPI_GlobalProperties Global properties\n");
     
     for (unsigned i = 0; i < globalPropertyInfos.Size(); ++i)
     {
@@ -241,7 +241,7 @@ void Script::DumpAPI()
         OutputAPIRow(globalPropertyInfos[i].type_ + " " + globalPropertyInfos[i].name_, true);
     }
     
-    LOGRAW("\nGlobal constants:\n");
+    LOGRAW("\\section ScriptAPI_GlobalConstants Global constants\n");
     
     unsigned properties = scriptEngine_->GetGlobalPropertyCount();
     for (unsigned i = 0; i < properties; ++i)
@@ -256,7 +256,7 @@ void Script::DumpAPI()
         OutputAPIRow(type + " " + String(propertyName), true);
     }
     
-    LOGRAW("\nClasses:\n");
+    LOGRAW("\\section ScriptAPI_Classes Classes\n");
     
     unsigned types = scriptEngine_->GetObjectTypeCount();
     for (unsigned i = 0; i < types; ++i)
@@ -310,14 +310,14 @@ void Script::DumpAPI()
             
             if (!methodDeclarations.Empty())
             {
-                LOGRAW("\nMethods:\n");
+                LOGRAW("\nMethods:<br>\n");
                 for (unsigned j = 0; j < methodDeclarations.Size(); ++j)
                     OutputAPIRow(methodDeclarations[j]);
             }
             
             if (!propertyInfos.Empty())
             {
-                LOGRAW("\nProperties:\n");
+                LOGRAW("\nProperties:<br>\n");
                 for (unsigned j = 0; j < propertyInfos.Size(); ++j)
                 {
                     // For now, skip write-only properties
@@ -335,6 +335,8 @@ void Script::DumpAPI()
             LOGRAW("\n");
         }
     }
+    
+    LOGRAW("*/\n");
 }
 
 void Script::MessageCallback(const asSMessageInfo* msg)
@@ -417,7 +419,7 @@ void Script::OutputAPIRow(const String& row, bool removeReference)
     if (removeReference)
         out.Replace("&", "");
     
-    LOGRAW(out + "\n");
+    LOGRAW("- " + out + "\n");
 }
 
 void RegisterScriptLibrary(Context* context)
