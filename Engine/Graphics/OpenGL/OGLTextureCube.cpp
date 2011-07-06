@@ -74,7 +74,7 @@ void TextureCube::OnDeviceLost()
                 int levelWidth = GetLevelWidth(i);
                 int levelHeight = GetLevelHeight(i);
                 SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
-                GetData((CubeMapFace)face, i, savedLevel.GetPtr());
+                GetData((CubeMapFace)face, i, savedLevel.Ptr());
                 savedLevels_.Push(savedLevel);
             }
         }
@@ -98,7 +98,7 @@ void TextureCube::OnDeviceReset()
                 unsigned level = i / 6;
                 int levelWidth = GetLevelWidth(level);
                 int levelHeight = GetLevelHeight(level);
-                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].GetPtr());
+                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].Ptr());
             }
             savedLevels_.Clear();
         }

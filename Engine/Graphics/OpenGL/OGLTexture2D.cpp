@@ -84,7 +84,7 @@ void Texture2D::OnDeviceLost()
             int levelWidth = GetLevelWidth(i);
             int levelHeight = GetLevelHeight(i);
             SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
-            GetData(i, savedLevel.GetPtr());
+            GetData(i, savedLevel.Ptr());
             savedLevels_.Push(savedLevel);
         }
     }
@@ -107,7 +107,7 @@ void Texture2D::OnDeviceReset()
             {
                 int levelWidth = GetLevelWidth(i);
                 int levelHeight = GetLevelHeight(i);
-                SetData(i, 0, 0, levelWidth, levelHeight, savedLevels_[i].GetPtr());
+                SetData(i, 0, 0, levelWidth, levelHeight, savedLevels_[i].Ptr());
             }
             savedLevels_.Clear();
         }
