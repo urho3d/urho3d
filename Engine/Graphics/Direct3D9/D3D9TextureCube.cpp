@@ -194,7 +194,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     DWORD flags = 0;
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
-
+    
     if (FAILED(((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, flags)))
     {
         LOGERROR("Could not lock texture");
@@ -216,7 +216,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         rowSize = rowSize / 3 * 4;
         rowOffset = rowOffset / 3 * 4;
     }
-
+    
     // Perform conversion from RGB / RGBA as necessary
     switch (format_)
     {
@@ -497,17 +497,17 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         LOGERROR("Could not lock texture");
         return false;
     }
-
+    
     int height = levelHeight;
     if (compressed)
         height = (height + 3) >> 2;
-
+    
     unsigned char* destPtr = (unsigned char*)dest;
     unsigned rowSize = GetRowDataSize(levelWidth);
     // GetRowDataSize() returns CPU-side (destination) data size, so need to convert for X8R8G8B8
     if (format_ == D3DFMT_X8R8G8B8)
         rowSize = rowSize / 3 * 4;
-
+    
     // Perform conversion to RGB / RGBA as necessary
     switch (format_)
     {
@@ -519,7 +519,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
             destPtr += rowSize;
         }
         break;
-
+        
     case D3DFMT_X8R8G8B8:
         for (int i = 0; i < height; ++i)
         {

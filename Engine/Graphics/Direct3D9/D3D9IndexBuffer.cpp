@@ -149,9 +149,9 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         DWORD flags = 0;
         
         if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
-            flags |= D3DLOCK_DISCARD;
-        if (mode == LOCK_NOOVERWRITE)
-            flags |= D3DLOCK_NOOVERWRITE;
+            flags = D3DLOCK_DISCARD;
+        if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_NOOVERWRITE;
         if (mode == LOCK_READONLY)
             flags = D3DLOCK_READONLY;
         

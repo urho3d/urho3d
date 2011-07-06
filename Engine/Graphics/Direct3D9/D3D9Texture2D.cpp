@@ -180,7 +180,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         x &= ~3;
         y &= ~3;
     }
-
+    
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
@@ -188,30 +188,30 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         LOGERROR("Illegal dimensions for setting data");
         return false;
     }
-
+    
     D3DLOCKED_RECT d3dLockedRect;
     RECT d3dRect;
     d3dRect.left = x;
     d3dRect.top = y;
     d3dRect.right = x + width;
     d3dRect.bottom = y + height;
-
+    
     DWORD flags = 0;
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
-
+    
     if (FAILED(((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, flags)))
     {
         LOGERROR("Could not lock texture");
         return false;
     }
-
+    
     if (compressed)
     {
         height = (height + 3) >> 2;
         y >>= 2;
     }
-
+    
     unsigned char* src = (unsigned char*)data;
     unsigned rowSize = GetRowDataSize(width);
     unsigned rowOffset = GetRowDataSize(x);
@@ -221,7 +221,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         rowSize = rowSize / 3 * 4;
         rowOffset = rowOffset / 3 * 4;
     }
-
+    
     // Perform conversion from RGB / RGBA as necessary
     switch (format_)
     {
@@ -233,7 +233,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
             src += rowSize;
         }
         break;
-    
+        
     case D3DFMT_X8R8G8B8:
         for (int i = 0; i < height; ++i)
         {
