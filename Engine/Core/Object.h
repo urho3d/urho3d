@@ -242,6 +242,6 @@ private:
     const String typeName::typeNameStatic(#typeName); \
 
 #define EVENT(eventID, eventName) static const StringHash eventID(#eventName); namespace eventName
-#define PARAM(paraid_, paraname_) static const ShortStringHash paraid_(#paraname_)
+#define PARAM(paramID, paramName) static const ShortStringHash paramID(#paramName)
 #define HANDLER(className, function) (new EventHandlerImpl<className>(this, &className::function))
 #define HANDLER_USERDATA(className, function, userData) (new EventHandlerImpl<className>(this, &className::function, userData))
