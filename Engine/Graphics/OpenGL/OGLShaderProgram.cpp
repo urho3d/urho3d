@@ -91,7 +91,7 @@ bool ShaderProgram::Link()
     {
         glGetProgramiv(object_, GL_INFO_LOG_LENGTH, &length);
         linkerOutput_.Resize(length);
-        glGetShaderInfoLog(object_, length, &length, &linkerOutput_[0]);
+        glGetProgramInfoLog(object_, length, &length, &linkerOutput_[0]);
     }
     else
         linkerOutput_.Clear();
