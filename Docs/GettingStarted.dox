@@ -103,6 +103,7 @@ Urho3D consists of several static libraries that are independent where possible:
 
 The libraries are the following:
 
+- Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector & quaternion types and geometric shapes used in intersection tests.
 - Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Event "event handling", threading and profiling.
 - IO. Provides file system access, stream input/output and logging.

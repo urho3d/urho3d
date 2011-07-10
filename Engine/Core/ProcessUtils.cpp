@@ -203,7 +203,7 @@ String GetConsoleInput()
     for (;;)
     {
         int ch = fgetc(stdin);
-        if (ch >= 0)
+        if (ch >= 0 && ch != '\n')
             ret += (char)ch;
         else
             break;

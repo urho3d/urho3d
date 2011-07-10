@@ -228,10 +228,9 @@ static void RegisterScriptInstance(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptInstance", "ScriptObject@+ get_object() const", asMETHOD(ScriptInstance, GetScriptObject), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "void set_className(const String&in)", asMETHOD(ScriptInstance, SetClassName), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptInstance", "const String& get_className() const", asMETHOD(ScriptInstance, GetClassName), asCALL_THISCALL);
-    
-    // Register global properties & functions that work as if the ScriptInstance and the script object were one and the same
-    // (event subscribing & sending works similarly)
     engine->RegisterGlobalFunction("ScriptInstance@+ get_self()", asFUNCTION(GetSelf), asCALL_CDECL);
+    
+    // Register convenience functions for controlling delayed execution on self, similar to event sending
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in, const Array<Variant>@+)", asFUNCTION(SelfDelayedExecute), asCALL_CDECL);
     engine->RegisterGlobalFunction("void DelayedExecute(float, const String&in)", asFUNCTION(SelfDelayedExecuteNoParams), asCALL_CDECL);
     engine->RegisterGlobalFunction("void ClearDelayedExecute()", asFUNCTION(SelfClearDelayedExecute), asCALL_CDECL);

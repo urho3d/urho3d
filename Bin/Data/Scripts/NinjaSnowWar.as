@@ -66,10 +66,10 @@ void Start()
 void InitAudio()
 {
     // Lower mastervolumes slightly
-    audio.masterGain[SOUND_MASTER] =  0.75f;
+    audio.masterGain[SOUND_MASTER] = 0.75;
     audio.masterGain[SOUND_MUSIC] = 0.75;
 
-    // Start music playback
+    // Start music playback. Note: the non-positional sound source component does not need to be in the scene
     Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
     musicFile.looped = true;
     musicSource = SoundSource();
