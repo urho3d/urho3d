@@ -1697,7 +1697,7 @@ bool Graphics::BeginImmediate(PrimitiveType type, unsigned vertexCount, unsigned
     if (buffer->GetVertexCount() < newSize)
     {
         LOGDEBUG("Resized immediate vertex buffer to " + String(newSize));
-        buffer->SetSize(newSize, elementMask);
+        buffer->SetSize(newSize, elementMask, true);
         immediateVertexBufferPos_[elementMask] = 0;
     }
     
