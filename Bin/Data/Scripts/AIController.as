@@ -43,7 +43,7 @@ class AIController
         // Get closest ninja on the player's side
         Node@ targetNode;
         Ninja@ targetNinja;
-        Array<Node@> nodes = scene.GetScriptedChildren("Ninja", true);
+        Array<Node@> nodes = scene.GetChildrenWithScript("Ninja", true);
         float closestDistance = M_INFINITY;
         for (uint i = 0; i < nodes.length; ++i)
         {

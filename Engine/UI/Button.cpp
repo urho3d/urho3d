@@ -56,13 +56,13 @@ void Button::SetStyle(const XMLElement& element)
 {
     BorderImage::SetStyle(element);
     
-    if (element.HasChildElement("pressedoffset"))
-        SetPressedOffset(element.GetChildElement("pressedoffset").GetIntVector2("value"));
-    if (element.HasChildElement("labeloffset"))
-        SetLabelOffset(element.GetChildElement("labeloffset").GetIntVector2("value"));
-    if (element.HasChildElement("repeat"))
+    if (element.HasChild("pressedoffset"))
+        SetPressedOffset(element.GetChild("pressedoffset").GetIntVector2("value"));
+    if (element.HasChild("labeloffset"))
+        SetLabelOffset(element.GetChild("labeloffset").GetIntVector2("value"));
+    if (element.HasChild("repeat"))
     {
-        XMLElement repeatElem = element.GetChildElement("repeat");
+        XMLElement repeatElem = element.GetChild("repeat");
         SetRepeat(repeatElem.GetFloat("delay"), repeatElem.GetFloat("rate"));
     }
 }

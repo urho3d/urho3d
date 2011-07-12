@@ -78,26 +78,26 @@ void ScrollView::SetStyle(const XMLElement& element)
 {
     UIElement::SetStyle(element);
     
-    if (element.HasChildElement("viewposition"))
-        SetViewPosition(element.GetChildElement("viewposition").GetIntVector2("value"));
-    if (element.HasChildElement("scrollstep"))
-        SetScrollStep(element.GetChildElement("scrollstep").GetFloat("value"));
-    if (element.HasChildElement("pagestep"))
-        SetScrollStep(element.GetChildElement("pagestep").GetFloat("value"));
+    if (element.HasChild("viewposition"))
+        SetViewPosition(element.GetChild("viewposition").GetIntVector2("value"));
+    if (element.HasChild("scrollstep"))
+        SetScrollStep(element.GetChild("scrollstep").GetFloat("value"));
+    if (element.HasChild("pagestep"))
+        SetScrollStep(element.GetChild("pagestep").GetFloat("value"));
     
-    XMLElement horizElem = element.GetChildElement("horizontalscrollbar");
+    XMLElement horizElem = element.GetChild("horizontalscrollbar");
     if (horizElem)
         horizontalScrollBar_->SetStyle(horizElem);
-    XMLElement vertElem = element.GetChildElement("verticalscrollbar");
+    XMLElement vertElem = element.GetChild("verticalscrollbar");
     if (vertElem)
         verticalScrollBar_->SetStyle(vertElem);
-    XMLElement panelElem = element.GetChildElement("scrollpanel");
+    XMLElement panelElem = element.GetChild("scrollpanel");
     if (panelElem)
         scrollPanel_->SetStyle(panelElem);
     
-    UIElement* root = GetRootElement();
-    if (root && element.HasChildElement("contentelement"))
-        SetContentElement(root->GetChild(element.GetChildElement("contentelement").GetString("name"), true));
+    UIElement* root = GetRoot();
+    if (root && element.HasChild("contentelement"))
+        SetContentElement(root->GetChild(element.GetChild("contentelement").GetString("name"), true));
     
     // Set the scrollbar orientations again and perform size update now that the style is known
     horizontalScrollBar_->SetOrientation(O_HORIZONTAL);

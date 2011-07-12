@@ -445,14 +445,14 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
         return children[index].Ptr();
 }
 
-static CScriptArray* NodeGetScriptedChildren(bool recursive, Node* ptr)
+static CScriptArray* NodeGetChildrenWithScript(bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
     ptr->GetChildrenWithComponent<ScriptInstance>(nodes, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
-static CScriptArray* NodeGetScriptedChildrenWithClassName(const String& className, bool recursive, Node* ptr)
+static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
     PODVector<Node*> ret;
@@ -502,8 +502,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, bool local = false)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetScriptedChildren(bool recursive = false) const", asFUNCTION(NodeGetScriptedChildren), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Array<Node@>@ GetScriptedChildren(const String&in, bool recursive = false) const", asFUNCTION(NodeGetScriptedChildrenWithClassName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in, uint index = 0) const", asFUNCTION(NodeGetComponentWithTypeAndIndex), asCALL_CDECL_OBJLAST);
@@ -754,7 +754,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "uint get_numChildren(bool) const", asMETHOD(T, GetNumChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_children(uint) const", asMETHODPR(T, GetChild, (unsigned) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ get_parent() const", asMETHOD(T, GetParent), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "UIElement@+ get_rootElement() const", asMETHOD(T, GetRootElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ get_root() const", asMETHOD(T, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntVector2 get_screenPosition()", asMETHOD(T, GetScreenPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_derivedOpacity()", asMETHOD(T, GetDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "IntRect get_combinedScreenRect()", asMETHOD(T, GetCombinedScreenRect), asCALL_THISCALL);

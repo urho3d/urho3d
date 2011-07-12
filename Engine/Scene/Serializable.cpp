@@ -257,7 +257,7 @@ bool Serializable::LoadXML(const XMLElement& source)
             continue;
         
         // We could assume fixed order. However, do name-based lookup instead for more robustness
-        XMLElement attrElem = source.GetChildElement("attribute");
+        XMLElement attrElem = source.GetChild("attribute");
         bool found = false;
         while (attrElem)
         {
@@ -292,7 +292,7 @@ bool Serializable::LoadXML(const XMLElement& source)
                 break;
             }
             
-            attrElem = attrElem.GetNextElement("attribute");
+            attrElem = attrElem.GetNext("attribute");
         }
         
         if (!found)
@@ -323,7 +323,7 @@ bool Serializable::SaveXML(XMLElement& dest)
         if (!(attr.mode_ & AM_SERIALIZATION))
             continue;
         
-        XMLElement attrElem = dest.CreateChildElement("attribute");
+        XMLElement attrElem = dest.CreateChild("attribute");
         attrElem.SetString("name", String(attr.name_));
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)

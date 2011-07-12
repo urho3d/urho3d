@@ -72,13 +72,13 @@ void Cursor::SetStyle(const XMLElement& element)
 {
     UIElement::SetStyle(element);
     
-    XMLElement shapeElem = element.GetChildElement("shape");
+    XMLElement shapeElem = element.GetChild("shape");
     while (shapeElem)
     {
         CursorShape shape = (CursorShape)GetStringListIndex(shapeElem.GetStringLower("name"), shapeNames, CS_NORMAL);
         DefineShape(shape, GetSubsystem<ResourceCache>()->GetResource<Texture2D>(shapeElem.GetString("texture")),
             shapeElem.GetIntRect("imagerect"), shapeElem.GetIntVector2("hotspot"));
-        shapeElem = shapeElem.GetNextElement("shape");
+        shapeElem = shapeElem.GetNext("shape");
     }
 }
 

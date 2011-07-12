@@ -302,7 +302,7 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     
     LOGDEBUG("Loading UI layout " + file->GetName());
     
-    XMLElement rootElem = file->GetRootElement("element");
+    XMLElement rootElem = file->GetRoot("element");
     if (!rootElem)
     {
         LOGERROR("No root UI element in " + file->GetName());
@@ -520,7 +520,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
 
 void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile)
 {
-    XMLElement childElem = elem.GetChildElement("element");
+    XMLElement childElem = elem.GetChild("element");
     while (childElem)
     {
         // Create element
@@ -529,7 +529,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
         if (!child)
         {
             LOGERROR("Could not create UI element " + type);
-            childElem = childElem.GetNextElement("element");
+            childElem = childElem.GetNext("element");
             continue;
         }
         child->SetName(childElem.GetString("name"));
@@ -546,7 +546,7 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
         // Load the children recursively
         LoadLayout(child, childElem, styleFile);
         
-        childElem = childElem.GetNextElement("element");
+        childElem = childElem.GetNext("element");
     }
 }
 

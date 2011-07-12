@@ -125,35 +125,35 @@ void UIElement::SetStyle(const XMLElement& element)
 {
     if (element.HasAttribute("name"))
         name_ = element.GetString("name");
-    if (element.HasChildElement("position"))
-        SetPosition(element.GetChildElement("position").GetIntVector2("value"));
-    if (element.HasChildElement("size"))
-        SetSize(element.GetChildElement("size").GetIntVector2("value"));
-    if (element.HasChildElement("width"))
-        SetWidth(element.GetChildElement("width").GetInt("value"));
-    if (element.HasChildElement("height"))
-        SetHeight(element.GetChildElement("height").GetInt("value"));
-    if (element.HasChildElement("minsize"))
-        SetMinSize(element.GetChildElement("minsize").GetIntVector2("value"));
-    if (element.HasChildElement("minwidth"))
-        SetMinWidth(element.GetChildElement("minwidth").GetInt("value"));
-    if (element.HasChildElement("minheight"))
-        SetMinHeight(element.GetChildElement("minheight").GetInt("value"));
-    if (element.HasChildElement("maxsize"))
-        SetMaxSize(element.GetChildElement("maxsize").GetIntVector2("value"));
-    if (element.HasChildElement("maxwidth"))
-        SetMinWidth(element.GetChildElement("maxwidth").GetInt("value"));
-    if (element.HasChildElement("maxheight"))
-        SetMinHeight(element.GetChildElement("maxheight").GetInt("value"));
-    if (element.HasChildElement("fixedsize"))
-        SetFixedSize(element.GetChildElement("fixedsize").GetIntVector2("value"));
-    if (element.HasChildElement("fixedwidth"))
-        SetFixedWidth(element.GetChildElement("fixedwidth").GetInt("value"));
-    if (element.HasChildElement("fixedheight"))
-        SetFixedHeight(element.GetChildElement("fixedheight").GetInt("value"));
-    if (element.HasChildElement("alignment"))
+    if (element.HasChild("position"))
+        SetPosition(element.GetChild("position").GetIntVector2("value"));
+    if (element.HasChild("size"))
+        SetSize(element.GetChild("size").GetIntVector2("value"));
+    if (element.HasChild("width"))
+        SetWidth(element.GetChild("width").GetInt("value"));
+    if (element.HasChild("height"))
+        SetHeight(element.GetChild("height").GetInt("value"));
+    if (element.HasChild("minsize"))
+        SetMinSize(element.GetChild("minsize").GetIntVector2("value"));
+    if (element.HasChild("minwidth"))
+        SetMinWidth(element.GetChild("minwidth").GetInt("value"));
+    if (element.HasChild("minheight"))
+        SetMinHeight(element.GetChild("minheight").GetInt("value"));
+    if (element.HasChild("maxsize"))
+        SetMaxSize(element.GetChild("maxsize").GetIntVector2("value"));
+    if (element.HasChild("maxwidth"))
+        SetMinWidth(element.GetChild("maxwidth").GetInt("value"));
+    if (element.HasChild("maxheight"))
+        SetMinHeight(element.GetChild("maxheight").GetInt("value"));
+    if (element.HasChild("fixedsize"))
+        SetFixedSize(element.GetChild("fixedsize").GetIntVector2("value"));
+    if (element.HasChild("fixedwidth"))
+        SetFixedWidth(element.GetChild("fixedwidth").GetInt("value"));
+    if (element.HasChild("fixedheight"))
+        SetFixedHeight(element.GetChild("fixedheight").GetInt("value"));
+    if (element.HasChild("alignment"))
     {
-        XMLElement alignElem = element.GetChildElement("alignment");
+        XMLElement alignElem = element.GetChild("alignment");
         
         String horiz;
         String vert;
@@ -170,15 +170,15 @@ void UIElement::SetStyle(const XMLElement& element)
         if (!vert.Empty())
             SetVerticalAlignment((VerticalAlignment)GetStringListIndex(vert, verticalAlignments, VA_TOP));
     }
-    if (element.HasChildElement("clipborder"))
-        SetClipBorder(element.GetChildElement("clipborder").GetIntRect("value"));
-    if (element.HasChildElement("priority"))
-        SetPriority(element.GetChildElement("priority").GetInt("value"));
-    if (element.HasChildElement("opacity"))
-        SetOpacity(element.GetChildElement("opacity").GetFloat("value"));
-    if (element.HasChildElement("color"))
+    if (element.HasChild("clipborder"))
+        SetClipBorder(element.GetChild("clipborder").GetIntRect("value"));
+    if (element.HasChild("priority"))
+        SetPriority(element.GetChild("priority").GetInt("value"));
+    if (element.HasChild("opacity"))
+        SetOpacity(element.GetChild("opacity").GetFloat("value"));
+    if (element.HasChild("color"))
     {
-        XMLElement colorElem = element.GetChildElement("color");
+        XMLElement colorElem = element.GetChild("color");
         if (colorElem.HasAttribute("value"))
             SetColor(colorElem.GetColor("value"));
         if (colorElem.HasAttribute("topleft"))
@@ -190,33 +190,33 @@ void UIElement::SetStyle(const XMLElement& element)
         if (colorElem.HasAttribute("bottomright"))
             SetColor(C_BOTTOMRIGHT, colorElem.GetColor("bottomright"));
     }
-    if (element.HasChildElement("bringtofront"))
-        SetBringToFront(element.GetChildElement("bringtofront").GetBool("enable"));
-    if (element.HasChildElement("bringtoback"))
-        SetBringToBack(element.GetChildElement("bringtoback").GetBool("enable"));
-    if (element.HasChildElement("clipchildren"))
-        SetClipChildren(element.GetChildElement("clipchildren").GetBool("enable"));
-    if (element.HasChildElement("enabled"))
-        SetActive(element.GetChildElement("enabled").GetBool("enable"));
-    if (element.HasChildElement("selected"))
-        SetSelected(element.GetChildElement("selected").GetBool("enable"));
-    if (element.HasChildElement("visible"))
-        SetVisible(element.GetChildElement("visible").GetBool("enable"));
-    if (element.HasChildElement("focusmode"))
+    if (element.HasChild("bringtofront"))
+        SetBringToFront(element.GetChild("bringtofront").GetBool("enable"));
+    if (element.HasChild("bringtoback"))
+        SetBringToBack(element.GetChild("bringtoback").GetBool("enable"));
+    if (element.HasChild("clipchildren"))
+        SetClipChildren(element.GetChild("clipchildren").GetBool("enable"));
+    if (element.HasChild("enabled"))
+        SetActive(element.GetChild("enabled").GetBool("enable"));
+    if (element.HasChild("selected"))
+        SetSelected(element.GetChild("selected").GetBool("enable"));
+    if (element.HasChild("visible"))
+        SetVisible(element.GetChild("visible").GetBool("enable"));
+    if (element.HasChild("focusmode"))
     {
-        String focusMode = element.GetChildElement("focusmode").GetStringLower("value");
+        String focusMode = element.GetChild("focusmode").GetStringLower("value");
         SetFocusMode((FocusMode)GetStringListIndex(focusMode, focusModes, FM_NOTFOCUSABLE));
         if (focusMode == "defocusable")
             SetFocusMode(FM_FOCUSABLE_DEFOCUSABLE);
     }
-    if (element.HasChildElement("dragdropmode"))
+    if (element.HasChild("dragdropmode"))
     {
-        String dragDropMode = element.GetChildElement("dragdropmode").GetStringLower("value");
+        String dragDropMode = element.GetChild("dragdropmode").GetStringLower("value");
         SetDragDropMode(GetStringListIndex(dragDropMode, dragDropModes, DD_DISABLED));
     }
-    if (element.HasChildElement("layout"))
+    if (element.HasChild("layout"))
     {
-        XMLElement layoutElem = element.GetChildElement("layout");
+        XMLElement layoutElem = element.GetChild("layout");
         String mode = layoutElem.GetStringLower("mode");
         if (mode == "free")
             layoutMode_ = LM_FREE;
@@ -232,8 +232,8 @@ void UIElement::SetStyle(const XMLElement& element)
         else
             UpdateLayout();
     }
-    if (element.HasChildElement("vars"))
-        vars_ = element.GetChildElement("vars").GetVariantMap();
+    if (element.HasChild("vars"))
+        vars_ = element.GetChild("vars").GetVariantMap();
 }
 
 void UIElement::Update(float timeStep)
@@ -577,8 +577,8 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
     if (!file)
         return;
     
-    XMLElement rootElem = file->GetRootElement();
-    XMLElement childElem = rootElem.GetChildElement("element");
+    XMLElement rootElem = file->GetRoot();
+    XMLElement childElem = rootElem.GetChild("element");
     while (childElem)
     {
         if (childElem.GetString("type") == typeName)
@@ -586,7 +586,7 @@ void UIElement::SetStyle(XMLFile* file, const String& typeName)
             SetStyle(childElem);
             return;
         }
-        childElem = childElem.GetNextElement("element");
+        childElem = childElem.GetNext("element");
     }
 }
 
@@ -737,7 +737,7 @@ void UIElement::EnableLayoutUpdate()
 void UIElement::BringToFront()
 {
     // Follow the parent chain to the top level window. If it has BringToFront mode, bring it to front now
-    UIElement* root = GetRootElement();
+    UIElement* root = GetRoot();
     UIElement* ptr = this;
     while (ptr && ptr->GetParent() != root)
         ptr = ptr->GetParent();
@@ -954,7 +954,7 @@ UIElement* UIElement::GetChild(const String& name, bool recursive) const
     return 0;
 }
 
-UIElement* UIElement::GetRootElement() const
+UIElement* UIElement::GetRoot() const
 {
     UIElement* root = parent_;
     if (!root)

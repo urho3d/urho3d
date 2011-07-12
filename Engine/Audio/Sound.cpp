@@ -385,8 +385,8 @@ void Sound::LoadParameters()
     if (!file)
         return;
     
-    XMLElement rootElem = file->GetRootElement();
-    XMLElement paramElem = rootElem.GetChildElement("");
+    XMLElement rootElem = file->GetRoot();
+    XMLElement paramElem = rootElem.GetChild("");
     
     while (paramElem)
     {
@@ -412,6 +412,6 @@ void Sound::LoadParameters()
                 SetLoop(paramElem.GetInt("start"), paramElem.GetInt("end"));
         }
         
-        paramElem = paramElem.GetNextElement();
+        paramElem = paramElem.GetNext();
     }
 }

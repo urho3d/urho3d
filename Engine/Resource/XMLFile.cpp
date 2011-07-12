@@ -97,15 +97,15 @@ bool XMLFile::Save(Serializer& dest)
     return true;
 }
 
-XMLElement XMLFile::CreateRootElement(const String& name)
+XMLElement XMLFile::CreateRoot(const String& name)
 {
     TiXmlElement newRoot(name.CString());
     document_->Clear();
     document_->InsertEndChild(newRoot);
-    return GetRootElement();
+    return GetRoot();
 }
 
-XMLElement XMLFile::GetRootElement(const String& name)
+XMLElement XMLFile::GetRoot(const String& name)
 {
     XMLElement rootElem = XMLElement(this, document_->RootElement());
     

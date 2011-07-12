@@ -82,8 +82,8 @@ void ListView::SetStyle(const XMLElement& element)
 {
     ScrollView::SetStyle(element);
     
-    UIElement* root = GetRootElement();
-    XMLElement itemElem = element.GetChildElement("listitem");
+    UIElement* root = GetRoot();
+    XMLElement itemElem = element.GetChild("listitem");
     if (root)
     {
         while (itemElem)
@@ -94,30 +94,30 @@ void ListView::SetStyle(const XMLElement& element)
                 AddItem(item);
                 if (itemElem.HasAttribute("indent"))
                     item->vars_[indentHash] = itemElem.GetInt("indent");
-                itemElem = itemElem.GetNextElement("listitem");
+                itemElem = itemElem.GetNext("listitem");
             }
         }
     }
     
-    if (element.HasChildElement("highlight"))
+    if (element.HasChild("highlight"))
     {
-        String highlight = element.GetChildElement("highlight").GetStringLower("value");
+        String highlight = element.GetChild("highlight").GetStringLower("value");
         SetHighlightMode((HighlightMode)GetStringListIndex(highlight, highlightModes, HM_FOCUS));
     }
-    if (element.HasChildElement("multiselect"))
-        SetMultiselect(element.GetChildElement("multiselect").GetBool("enable"));
-    if (element.HasChildElement("hierarchy"))
-        SetHierarchyMode(element.GetChildElement("hierarchy").GetBool("enable"));
-    if (element.HasChildElement("clearselection"))
-        SetClearSelectionOnDefocus(element.GetChildElement("clearselection").GetBool("enable"));
-    if (element.HasChildElement("doubleclickinterval"))
-        SetDoubleClickInterval(element.GetChildElement("doubleclickinterval").GetFloat("value"));
+    if (element.HasChild("multiselect"))
+        SetMultiselect(element.GetChild("multiselect").GetBool("enable"));
+    if (element.HasChild("hierarchy"))
+        SetHierarchyMode(element.GetChild("hierarchy").GetBool("enable"));
+    if (element.HasChild("clearselection"))
+        SetClearSelectionOnDefocus(element.GetChild("clearselection").GetBool("enable"));
+    if (element.HasChild("doubleclickinterval"))
+        SetDoubleClickInterval(element.GetChild("doubleclickinterval").GetFloat("value"));
     
-    XMLElement selectionElem = element.GetChildElement("selection");
+    XMLElement selectionElem = element.GetChild("selection");
     while (selectionElem)
     {
         AddSelection(selectionElem.GetInt("value"));
-        selectionElem = selectionElem.GetNextElement("selection");
+        selectionElem = selectionElem.GetNext("selection");
     }
 }
 

@@ -52,7 +52,7 @@ Console::Console(Context* context) :
     inLogMessage_(false)
 {
     UI* ui = GetSubsystem<UI>();
-    UIElement* uiRoot = ui->GetRootElement();
+    UIElement* uiRoot = ui->GetRoot();
     
     background_ = new BorderImage(context_);
     background_->SetBringToBack(false);
@@ -86,7 +86,7 @@ Console::~Console()
 {
     UI* ui = GetSubsystem<UI>();
     if (ui)
-        ui->GetRootElement()->RemoveChild(background_);
+        ui->GetRoot()->RemoveChild(background_);
 }
 
 void Console::SetStyle(XMLFile* style)

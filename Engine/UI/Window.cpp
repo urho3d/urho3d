@@ -58,12 +58,12 @@ void Window::SetStyle(const XMLElement& element)
 {
     BorderImage::SetStyle(element);
     
-    if (element.HasChildElement("resizeborder"))
-        SetResizeBorder(element.GetChildElement("resizeborder").GetIntRect("value"));
-    if (element.HasChildElement("movable"))
-        SetMovable(element.GetChildElement("movable").GetBool("enable"));
-    if (element.HasChildElement("resizable"))
-        SetResizable(element.GetChildElement("resizable").GetBool("enable"));
+    if (element.HasChild("resizeborder"))
+        SetResizeBorder(element.GetChild("resizeborder").GetIntRect("value"));
+    if (element.HasChild("movable"))
+        SetMovable(element.GetChild("movable").GetBool("enable"));
+    if (element.HasChild("resizable"))
+        SetResizable(element.GetChild("resizable").GetBool("enable"));
 }
 
 void Window::OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor)

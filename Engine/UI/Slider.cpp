@@ -59,22 +59,22 @@ void Slider::SetStyle(const XMLElement& element)
 {
     BorderImage::SetStyle(element);
     
-    if (element.HasChildElement("orientation"))
+    if (element.HasChild("orientation"))
     {
-        String orientation = element.GetChildElement("orientation").GetStringLower("value");
+        String orientation = element.GetChild("orientation").GetStringLower("value");
         if (orientation == "horizontal" || orientation == "h")
             SetOrientation(O_HORIZONTAL);
         if (orientation == "vertical" || orientation == "v")
             SetOrientation(O_VERTICAL);
     }
-    if (element.HasChildElement("range"))
+    if (element.HasChild("range"))
     {
-        XMLElement rangeElem = element.GetChildElement("range");
+        XMLElement rangeElem = element.GetChild("range");
         SetRange(rangeElem.GetFloat("max"));
         SetValue(rangeElem.GetFloat("value"));
     }
     
-    XMLElement knobElem = element.GetChildElement("knob");
+    XMLElement knobElem = element.GetChild("knob");
     if (knobElem)
         knob_->SetStyle(knobElem);
 }

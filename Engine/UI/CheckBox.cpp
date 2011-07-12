@@ -52,8 +52,8 @@ void CheckBox::SetStyle(const XMLElement& element)
 {
     BorderImage::SetStyle(element);
     
-    if (element.HasChildElement("checkedoffset"))
-        SetCheckedOffset(element.GetChildElement("checkedoffset").GetIntVector2("value"));
+    if (element.HasChild("checkedoffset"))
+        SetCheckedOffset(element.GetChild("checkedoffset").GetIntVector2("value"));
 }
 
 void CheckBox::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

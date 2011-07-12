@@ -279,8 +279,8 @@ bool TextureCube::Load(Deserializer& source)
     
     LoadParameters(xml);
     
-    XMLElement textureElem = xml->GetRootElement();
-    XMLElement faceElem = textureElem.GetChildElement("face");
+    XMLElement textureElem = xml->GetRoot();
+    XMLElement faceElem = textureElem.GetChild("face");
     unsigned faces = 0;
     while (faceElem && faces < MAX_CUBEMAP_FACES)
     {
@@ -296,7 +296,7 @@ bool TextureCube::Load(Deserializer& source)
         Load((CubeMapFace)faces, image);
         faces++;
         
-        faceElem = faceElem.GetNextElement("face");
+        faceElem = faceElem.GetNext("face");
     }
     
     return true;

@@ -63,7 +63,7 @@ public:
     void SetClipBoardText(const String& text);
     
     /// Return root UI elemenet
-    UIElement* GetRootElement() const { return rootElement_; }
+    UIElement* GetRoot() const { return rootElement_; }
     /// Return cursor
     Cursor* GetCursor() const { return cursor_; }
     /// Return UI element at screen coordinates

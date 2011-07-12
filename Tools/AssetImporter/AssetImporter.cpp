@@ -1167,7 +1167,7 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
     
     // Do not actually create a material instance, but instead craft an xml file manually
     XMLFile outMaterial(context_);
-    XMLElement materialElem = outMaterial.CreateRootElement("material");
+    XMLElement materialElem = outMaterial.CreateRoot("material");
     
     String diffuseTexName;
     String normalTexName;
@@ -1211,35 +1211,35 @@ void BuildAndSaveMaterial(aiMaterial* material, Set<String>& usedTextures)
     if (hasAlpha)
         techniqueName += "Alpha";
     
-    XMLElement techniqueElem = materialElem.CreateChildElement("technique");
+    XMLElement techniqueElem = materialElem.CreateChild("technique");
     techniqueElem.SetString("name", techniqueName + ".xml");
     
     if (!diffuseTexName.Empty())
     {
-        XMLElement diffuseElem = materialElem.CreateChildElement("texture");
+        XMLElement diffuseElem = materialElem.CreateChild("texture");
         diffuseElem.SetString("unit", "diffuse");
         diffuseElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + diffuseTexName);
         usedTextures.Insert(diffuseTexName);
     }
     if (!normalTexName.Empty())
     {
-        XMLElement normalElem = materialElem.CreateChildElement("texture");
+        XMLElement normalElem = materialElem.CreateChild("texture");
         normalElem.SetString("unit", "diffuse");
         normalElem.SetString("name", (useSubdirs_ ? "Textures/" : "") + normalTexName);
         usedTextures.Insert(normalTexName);
     }
     
-    XMLElement diffuseColorElem = materialElem.CreateChildElement("parameter");
+    XMLElement diffuseColorElem = materialElem.CreateChild("parameter");
     diffuseColorElem.SetString("name", "MatDiffColor");
     diffuseColorElem.SetColor("value", diffuseColor);
-    XMLElement specularElem = materialElem.CreateChildElement("parameter");
+    XMLElement specularElem = materialElem.CreateChild("parameter");
     specularElem.SetString("name", "MatSpecProperties");
     specularElem.SetVector2("value", Vector2(specIntensity, specPower));
     
     if (twoSided)
     {
-        XMLElement cullElem = materialElem.CreateChildElement("cull");
-        XMLElement shadowCullElem = materialElem.CreateChildElement("shadowcull");
+        XMLElement cullElem = materialElem.CreateChild("cull");
+        XMLElement shadowCullElem = materialElem.CreateChild("shadowcull");
         cullElem.SetString("value", "none");
         shadowCullElem.SetString("value", "none");
     }

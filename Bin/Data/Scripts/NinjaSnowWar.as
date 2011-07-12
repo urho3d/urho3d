@@ -173,7 +173,7 @@ void CreateOverlays()
     sight.texture = cache.GetResource("Texture2D", "Textures/Sight.png");
     sight.SetAlignment(HA_CENTER, VA_CENTER);
     sight.SetSize(height, height);
-    ui.rootElement.AddChild(sight);
+    ui.root.AddChild(sight);
 
     Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
 
@@ -183,7 +183,7 @@ void CreateOverlays()
     scoreText.SetPosition(5, 5);
     scoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
     scoreText.colors[C_BOTTOMRIGHT] = Color(1, 1, 0.25);
-    ui.rootElement.AddChild(scoreText);
+    ui.root.AddChild(scoreText);
 
     @hiscoreText = Text();
     hiscoreText.SetFont(font, 17);
@@ -191,21 +191,21 @@ void CreateOverlays()
     hiscoreText.SetPosition(-5, 5);
     hiscoreText.colors[C_BOTTOMLEFT] = Color(1, 1, 0.25);
     hiscoreText.colors[C_BOTTOMRIGHT] = Color(1, 1, 0.25);
-    ui.rootElement.AddChild(hiscoreText);
+    ui.root.AddChild(hiscoreText);
 
     @messageText = Text();
     messageText.SetFont(font, 17);
     messageText.SetAlignment(HA_CENTER, VA_CENTER);
     messageText.SetPosition(0, -height * 2);
     messageText.color = Color(1, 0, 0);
-    ui.rootElement.AddChild(messageText);
+    ui.root.AddChild(messageText);
 
     BorderImage@ healthBorder = BorderImage();
     healthBorder.texture = cache.GetResource("Texture2D", "Textures/HealthBarBorder.png");
     healthBorder.SetAlignment(HA_CENTER, VA_TOP);
     healthBorder.SetPosition(0, 8);
     healthBorder.SetSize(120, 20);
-    ui.rootElement.AddChild(healthBorder);
+    ui.root.AddChild(healthBorder);
 
     healthBar = BorderImage();
     healthBar.texture = cache.GetResource("Texture2D", "Textures/HealthBarInside.png");
@@ -224,7 +224,7 @@ void StartGame()
 {
     // Clear the scene of all existing scripted objects
     {
-        Array<Node@> scriptedNodes = gameScene.GetScriptedChildren(true);
+        Array<Node@> scriptedNodes = gameScene.GetChildrenWithScript(true);
         for (uint i = 0; i < scriptedNodes.length; ++i)
             scriptedNodes[i].Remove();
     }
@@ -343,7 +343,7 @@ void SpawnObjects(float timeStep)
     if (powerupSpawnTimer >= powerupSpawnRate)
     {
         powerupSpawnTimer = 0;
-        int numPowerups = gameScene.GetScriptedChildren("SnowCrate", true).length + gameScene.GetScriptedChildren("Potion", true).length;
+        int numPowerups = gameScene.GetChildrenWithScript("SnowCrate", true).length + gameScene.GetChildrenWithScript("Potion", true).length;
 
         if (numPowerups < maxPowerups)
         {
@@ -364,7 +364,7 @@ void SpawnObjects(float timeStep)
     {
         enemySpawnTimer = 0;
         // Take the player ninja into account
-        int numEnemies = gameScene.GetScriptedChildren("Ninja", true).length - 1;
+        int numEnemies = gameScene.GetChildrenWithScript("Ninja", true).length - 1;
 
         if (numEnemies < maxEnemies)
         {

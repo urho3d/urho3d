@@ -50,7 +50,7 @@ XMLElement::~XMLElement()
 {
 }
 
-XMLElement XMLElement::CreateChildElement(const String& name)
+XMLElement XMLElement::CreateChild(const String& name)
 {
     if (!file_ || !element_)
         return XMLElement();
@@ -60,7 +60,7 @@ XMLElement XMLElement::CreateChildElement(const String& name)
     return XMLElement(file_, static_cast<TiXmlElement*>(element_->LastChild()));
 }
 
-bool XMLElement::RemoveChildElement(const String& name, bool last)
+bool XMLElement::RemoveChild(const String& name, bool last)
 {
     if (!file_ || !element_)
         return false;
@@ -90,7 +90,7 @@ bool XMLElement::RemoveChildElement(const String& name, bool last)
     return false;
 }
 
-bool XMLElement::RemoveChildElements(const String& name)
+bool XMLElement::RemoveChildren(const String& name)
 {
     if (!file_ || !element_)
         return false;
@@ -250,12 +250,12 @@ bool XMLElement::SetResourceRefList(const ResourceRefList& value)
 bool XMLElement::SetVariantVector(const VariantVector& value)
 {
     // Must remove all existing variant child elements (if they exist) to not cause confusion
-    if (!RemoveChildElements("variant"))
+    if (!RemoveChildren("variant"))
         return false;
     
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        XMLElement variantElem = CreateChildElement("variant");
+        XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
         variantElem.SetVariant(*i);
@@ -266,12 +266,12 @@ bool XMLElement::SetVariantVector(const VariantVector& value)
 
 bool XMLElement::SetVariantMap(const VariantMap& value)
 {
-    if (!RemoveChildElements("variant"))
+    if (!RemoveChildren("variant"))
         return false;
     
     for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
-        XMLElement variantElem = CreateChildElement("variant");
+        XMLElement variantElem = CreateChild("variant");
         if (!variantElem)
             return false;
         variantElem.SetInt("hash", i->first_.GetValue());
@@ -316,7 +316,7 @@ String XMLElement::GetText() const
         return String();
 }
 
-bool XMLElement::HasChildElement(const String& name) const
+bool XMLElement::HasChild(const String& name) const
 {
     if (!file_ || !element_)
         return false;
@@ -327,7 +327,7 @@ bool XMLElement::HasChildElement(const String& name) const
         return false;
 }
 
-XMLElement XMLElement::GetChildElement(const String& name) const
+XMLElement XMLElement::GetChild(const String& name) const
 {
     if (!file_ || !element_)
         return XMLElement();
@@ -340,7 +340,7 @@ XMLElement XMLElement::GetChildElement(const String& name) const
     }
 }
 
-XMLElement XMLElement::GetNextElement(const String& name) const
+XMLElement XMLElement::GetNext(const String& name) const
 {
     if (!file_ || !element_)
         return XMLElement();
@@ -351,7 +351,7 @@ XMLElement XMLElement::GetNextElement(const String& name) const
         return XMLElement(file_, element_->NextSiblingElement(name.CString()));
 }
 
-XMLElement XMLElement::GetParentElement() const
+XMLElement XMLElement::GetParent() const
 {
     if (!file_ || !element_)
         return XMLElement();
@@ -561,11 +561,11 @@ VariantVector XMLElement::GetVariantVector() const
 {
     VariantVector ret;
     
-    XMLElement variantElem = GetChildElement("variant");
+    XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
         ret.Push(variantElem.GetVariant());
-        variantElem = variantElem.GetNextElement("variant");
+        variantElem = variantElem.GetNext("variant");
     }
     
     return ret;
@@ -575,12 +575,12 @@ VariantMap XMLElement::GetVariantMap() const
 {
     VariantMap ret;
     
-    XMLElement variantElem = GetChildElement("variant");
+    XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
         ShortStringHash key(variantElem.GetInt("hash"));
         ret[key] = variantElem.GetVariant();
-        variantElem = variantElem.GetNextElement("variant");
+        variantElem = variantElem.GetNext("variant");
     }
     
     return ret;

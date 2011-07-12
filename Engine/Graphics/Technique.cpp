@@ -153,11 +153,11 @@ bool Technique::Load(Deserializer& source)
     if (!xml->Load(source))
         return false;
     
-    XMLElement rootElem = xml->GetRootElement();
+    XMLElement rootElem = xml->GetRoot();
     if (rootElem.HasAttribute("sm3"))
         isSM3_ = rootElem.GetBool("sm3");
     
-    XMLElement passElem = rootElem.GetChildElement("pass");
+    XMLElement passElem = rootElem.GetChild("pass");
     while (passElem)
     {
         PassType type = MAX_PASSES;
@@ -206,7 +206,7 @@ bool Technique::Load(Deserializer& source)
                 newPass.SetDepthWrite(passElem.GetBool("depthwrite"));
         }
         
-        passElem = passElem.GetNextElement("pass");
+        passElem = passElem.GetNext("pass");
     }
     
     // Calculate memory use

@@ -329,7 +329,7 @@ public:
     /// Return parent element
     UIElement* GetParent() const { return parent_; }
     /// Return root element
-    UIElement* GetRootElement() const;
+    UIElement* GetRoot() const;
     /// Return precalculated 32-bit color. Only valid when no gradient
     unsigned GetUIntColor();
     /// Return user variables

@@ -118,9 +118,9 @@ bool Material::Load(Deserializer& source)
     if (!xml->Load(source))
         return false;
     
-    XMLElement rootElem = xml->GetRootElement();
+    XMLElement rootElem = xml->GetRoot();
     
-    XMLElement techniqueElem = rootElem.GetChildElement("technique");
+    XMLElement techniqueElem = rootElem.GetChild("technique");
     techniques_.Clear();
     while (techniqueElem)
     {
@@ -135,10 +135,10 @@ bool Material::Load(Deserializer& source)
                 newTechnique.lodDistance_ = techniqueElem.GetFloat("loddistance");
             techniques_.Push(newTechnique);
         }
-        techniqueElem = techniqueElem.GetNextElement("technique");
+        techniqueElem = techniqueElem.GetNext("technique");
     }
     
-    XMLElement textureElem = rootElem.GetChildElement("texture");
+    XMLElement textureElem = rootElem.GetChild("texture");
     while (textureElem)
     {
         TextureUnit unit = TU_DIFFUSE;
@@ -166,24 +166,24 @@ bool Material::Load(Deserializer& source)
             else
                 SetTexture(unit, cache->GetResource<Texture2D>(name));
         }
-        textureElem = textureElem.GetNextElement("texture");
+        textureElem = textureElem.GetNext("texture");
     }
     
-    XMLElement parameterElem = rootElem.GetChildElement("parameter");
+    XMLElement parameterElem = rootElem.GetChild("parameter");
     while (parameterElem)
     {
         String name = parameterElem.GetString("name");
         Vector4 value = parameterElem.GetVector("value");
         SetShaderParameter(name, value);
         
-        parameterElem = parameterElem.GetNextElement("parameter");
+        parameterElem = parameterElem.GetNext("parameter");
     }
     
-    XMLElement cullElem = rootElem.GetChildElement("cull");
+    XMLElement cullElem = rootElem.GetChild("cull");
     if (cullElem)
         SetCullMode((CullMode)GetStringListIndex(cullElem.GetString("value"), cullModeNames, CULL_CCW));
     
-    XMLElement shadowCullElem = rootElem.GetChildElement("shadowcull");
+    XMLElement shadowCullElem = rootElem.GetChild("shadowcull");
     if (shadowCullElem)
         SetShadowCullMode((CullMode)GetStringListIndex(shadowCullElem.GetString("value"), cullModeNames, CULL_CCW));
     
@@ -206,7 +206,7 @@ bool Material::Save(Serializer& dest)
         return false;
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
-    XMLElement materialElem = xml->CreateRootElement("material");
+    XMLElement materialElem = xml->CreateRoot("material");
     
     // Write techniques
     for (unsigned i = 0; i < techniques_.Size(); ++i)
@@ -215,7 +215,7 @@ bool Material::Save(Serializer& dest)
         if (!entry.technique_)
             continue;
         
-        XMLElement techniqueElem = materialElem.CreateChildElement("technique");
+        XMLElement techniqueElem = materialElem.CreateChild("technique");
         techniqueElem.SetString("name", entry.technique_->GetName());
         techniqueElem.SetInt("quality", entry.qualityLevel_);
         techniqueElem.SetFloat("loddistance", entry.lodDistance_);
@@ -227,7 +227,7 @@ bool Material::Save(Serializer& dest)
         Texture* texture = GetTexture((TextureUnit)j);
         if (texture)
         {
-            XMLElement textureElem = materialElem.CreateChildElement("texture");
+            XMLElement textureElem = materialElem.CreateChild("texture");
             textureElem.SetString("unit", textureUnitNames[j]);
             textureElem.SetString("name", texture->GetName());
         }
@@ -236,7 +236,7 @@ bool Material::Save(Serializer& dest)
     // Write shader parameters
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin(); j != shaderParameters_.End(); ++j)
     {
-        XMLElement parameterElem = materialElem.CreateChildElement("parameter");
+        XMLElement parameterElem = materialElem.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
         parameterElem.SetVector4("value", j->second_.value_);
     }

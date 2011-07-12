@@ -73,16 +73,16 @@ void LineEdit::SetStyle(const XMLElement& element)
 {
     BorderImage::SetStyle(element);
     
-    if (element.HasChildElement("maxlength"))
-        SetMaxLength(element.GetChildElement("maxlength").GetInt("value"));
-    if (element.HasChildElement("cursormovable"))
-        SetCursorMovable(element.GetChildElement("cursormovable").GetBool("enable"));
-    if (element.HasChildElement("textselectable"))
-        SetTextSelectable(element.GetChildElement("textselectable").GetBool("enable"));
-    if (element.HasChildElement("textcopyable"))
-        SetTextCopyable(element.GetChildElement("textcopyable").GetBool("enable"));
+    if (element.HasChild("maxlength"))
+        SetMaxLength(element.GetChild("maxlength").GetInt("value"));
+    if (element.HasChild("cursormovable"))
+        SetCursorMovable(element.GetChild("cursormovable").GetBool("enable"));
+    if (element.HasChild("textselectable"))
+        SetTextSelectable(element.GetChild("textselectable").GetBool("enable"));
+    if (element.HasChild("textcopyable"))
+        SetTextCopyable(element.GetChild("textcopyable").GetBool("enable"));
     
-    XMLElement textElem = element.GetChildElement("text");
+    XMLElement textElem = element.GetChild("text");
     if (textElem)
     {
         if (textElem.HasAttribute("value"))
@@ -90,17 +90,17 @@ void LineEdit::SetStyle(const XMLElement& element)
         text_->SetStyle(textElem);
     }
     
-    XMLElement cursorElem = element.GetChildElement("cursor");
+    XMLElement cursorElem = element.GetChild("cursor");
     if (cursorElem)
         cursor_->SetStyle(cursorElem);
     
-    if (element.HasChildElement("cursorposition"))
-        SetCursorPosition(element.GetChildElement("cursorposition").GetInt("value"));
-    if (element.HasChildElement("cursorblinkrate"))
-        SetCursorBlinkRate(element.GetChildElement("cursorblinkrate").GetFloat("value"));
-    if (element.HasChildElement("echocharacter"))
+    if (element.HasChild("cursorposition"))
+        SetCursorPosition(element.GetChild("cursorposition").GetInt("value"));
+    if (element.HasChild("cursorblinkrate"))
+        SetCursorBlinkRate(element.GetChild("cursorblinkrate").GetFloat("value"));
+    if (element.HasChild("echocharacter"))
     {
-        String text = element.GetChildElement("echocharacter").GetString("value");
+        String text = element.GetChild("echocharacter").GetString("value");
         if (text.Length())
             SetEchoCharacter(text[0]);
     }

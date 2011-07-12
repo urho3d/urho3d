@@ -112,7 +112,7 @@ FileSelector::FileSelector(Context* context) :
     
     UI* ui = GetSubsystem<UI>();
     if (ui)
-        ui->GetRootElement()->AddChild(window_);
+        ui->GetRoot()->AddChild(window_);
     
     Vector<String> defaultFilters;
     defaultFilters.Push("*.*");
@@ -141,7 +141,7 @@ FileSelector::~FileSelector()
 {
     UI* ui = GetSubsystem<UI>();
     if (ui)
-        ui->GetRootElement()->RemoveChild(window_);
+        ui->GetRoot()->RemoveChild(window_);
 }
 
 void FileSelector::RegisterObject(Context* context)

@@ -45,11 +45,11 @@ public:
     ~XMLElement();
     
     /// Create a child element
-    XMLElement CreateChildElement(const String& name);
+    XMLElement CreateChild(const String& name);
     /// Remove a child element, either first or last of them if several exist
-    bool RemoveChildElement(const String& name = String(), bool last = true);
+    bool RemoveChild(const String& name = String(), bool last = true);
     /// Remove child elements of certain name, or all child elements if name is empty
-    bool RemoveChildElements(const String& name = String());
+    bool RemoveChildren(const String& name = String());
     /// Set an attribute
     bool SetAttribute(const String& name, const String& value);
     /// Set a bool attribute
@@ -104,13 +104,13 @@ public:
     /// Return element contents
     String GetText() const;
     /// Return whether has a child element
-    bool HasChildElement(const String& name) const;
+    bool HasChild(const String& name) const;
     /// Return child element, or null if missing
-    XMLElement GetChildElement(const String& name = String()) const;
+    XMLElement GetChild(const String& name = String()) const;
     /// Return next sibling element
-    XMLElement GetNextElement(const String& name = String()) const;
+    XMLElement GetNext(const String& name = String()) const;
     /// Return parent element
-    XMLElement GetParentElement() const;
+    XMLElement GetParent() const;
     /// Return number of attributes
     unsigned GetNumAttributes() const;
     /// Return whether has an attribute

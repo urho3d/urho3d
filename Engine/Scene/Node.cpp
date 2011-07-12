@@ -163,7 +163,7 @@ bool Node::SaveXML(XMLElement& dest)
     for (unsigned i = 0; i < components_.Size(); ++i)
     {
         Component* component = components_[i];
-        XMLElement compElem = dest.CreateChildElement("component");
+        XMLElement compElem = dest.CreateChild("component");
         
         compElem.SetString("type", component->GetTypeName());
         compElem.SetInt("id", component->GetID());
@@ -174,7 +174,7 @@ bool Node::SaveXML(XMLElement& dest)
     for (unsigned i = 0; i < children_.Size(); ++i)
     {
         Node* node = children_[i];
-        XMLElement childElem = dest.CreateChildElement("node");
+        XMLElement childElem = dest.CreateChild("node");
         
         childElem.SetInt("id", node->GetID());
         if (!node->SaveXML(childElem))
@@ -660,7 +660,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     if (!Serializable::LoadXML(source))
         return false;
     
-    XMLElement compElem = source.GetChildElement("component");
+    XMLElement compElem = source.GetChild("component");
     while (compElem)
     {
         String typeName = compElem.GetString("type");
@@ -671,20 +671,20 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
                 return false;
         }
         
-        compElem = compElem.GetNextElement("component");
+        compElem = compElem.GetNext("component");
     }
     
     if (!readChildren)
         return true;
     
-    XMLElement childElem = source.GetChildElement("node");
+    XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
         Node* newNode = CreateChild(childElem.GetInt("id"), false);
         if (!newNode->LoadXML(childElem))
             return false;
         
-        childElem = childElem.GetNextElement("node");
+        childElem = childElem.GetNext("node");
     }
     
     return true;

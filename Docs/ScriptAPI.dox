@@ -879,8 +879,8 @@ XMLFile
 Methods:<br>
 - bool Load(File@)
 - bool Save(File@)
-- XMLElement CreateRootElement(const String&)
-- XMLElement GetRootElement(const String&)
+- XMLElement CreateRoot(const String&)
+- XMLElement GetRoot(const String&)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -888,17 +888,17 @@ Properties:<br>
 - String& name
 - uint memoryUse (readonly)
 - uint useTimer (readonly)
-- XMLElement rootElement (readonly)
+- XMLElement root (readonly)
 
 
 XMLElement
 
 Methods:<br>
 - XMLElement CreateChildElement(const String&)
-- bool RemoveChildElement()
-- bool RemoveChildElement(const String&, bool)
-- bool RemoveChildElements()
-- bool RemoveChildElements(const String&)
+- bool RemoveChild()
+- bool RemoveChild(const String&, bool)
+- bool RemoveChildren()
+- bool RemoveChildren(const String&)
 - bool SetAttribute(const String&, const String&)
 - bool SetBool(const String&, bool)
 - bool SetBoundingBox(const BoundingBox&)
@@ -919,11 +919,11 @@ Methods:<br>
 - bool HasAttribute(const String&) const
 - String GetAttributes(const String&) const
 - String[]@ GetAttributeNames() const
-- bool HasChildElement(const String&) const
-- XMLElement GetChildElement() const
-- XMLElement GetChildElement(const String&) const
-- XMLElement GetNextElement() const
-- XMLElement GetNextElement(const String&) const
+- bool HasChild(const String&) const
+- XMLElement GetChild() const
+- XMLElement GetChild(const String&) const
+- XMLElement GetNext() const
+- XMLElement GetNext(const String&) const
 - bool GetBool(const String&) const
 - BoundingBox GetBoundingBox() const
 - Color GetColor(const String&) const
@@ -1020,8 +1020,8 @@ Methods:<br>
 - Component@ GetOrCreateComponent(const String&, bool arg1 = false)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
-- Node@[]@ GetScriptedChildren(bool arg0 = false) const
-- Node@[]@ GetScriptedChildren(const String&, bool arg1 = false) const
+- Node@[]@ GetChildrenWithScript(bool arg0 = false) const
+- Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&, uint arg1 = 0) const
@@ -1088,8 +1088,8 @@ Methods:<br>
 - Component@ GetOrCreateComponent(const String&, bool arg1 = false)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
-- Node@[]@ GetScriptedChildren(bool arg0 = false) const
-- Node@[]@ GetScriptedChildren(const String&, bool arg1 = false) const
+- Node@[]@ GetChildrenWithScript(bool arg0 = false) const
+- Node@[]@ GetChildrenWithScript(const String&, bool arg1 = false) const
 - Node@ GetChild(const String&, bool arg1 = false) const
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&, uint arg1 = 0) const
@@ -2191,7 +2191,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2269,7 +2269,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2354,7 +2354,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2441,7 +2441,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2526,7 +2526,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2610,7 +2610,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2697,7 +2697,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2784,7 +2784,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2883,7 +2883,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -2981,7 +2981,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3071,7 +3071,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3168,7 +3168,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3270,7 +3270,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3366,7 +3366,7 @@ Properties:<br>
 - uint[] numChildren (readonly)
 - UIElement@[] children (readonly)
 - UIElement@ parent (readonly)
-- UIElement@ rootElement (readonly)
+- UIElement@ root (readonly)
 - IntVector2 screenPosition (readonly)
 - float derivedOpacity (readonly)
 - IntRect combinedScreenRect (readonly)
@@ -3420,10 +3420,10 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - Cursor@ cursor
-- UIElement@ focusElement
-- UIElement@ rootElement (readonly)
-- UIElement@ frontElement (readonly)
 - IntVector2 cursorPosition (readonly)
+- UIElement@ focusElement
+- UIElement@ frontElement (readonly)
+- UIElement@ root (readonly)
 
 
 Controls

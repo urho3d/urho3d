@@ -44,7 +44,7 @@ DebugHud::DebugHud(Context* context) :
     useRendererStats_(false)
 {
     UI* ui = GetSubsystem<UI>();
-    UIElement* uiRoot = ui->GetRootElement();
+    UIElement* uiRoot = ui->GetRoot();
     
     statsText_ = new Text(context_);
     statsText_->SetAlignment(HA_LEFT, VA_TOP);
@@ -72,7 +72,7 @@ DebugHud::~DebugHud()
     UI* ui = GetSubsystem<UI>();
     if (ui)
     {
-        UIElement* uiRoot = ui->GetRootElement();
+        UIElement* uiRoot = ui->GetRoot();
         uiRoot->RemoveChild(statsText_);
         uiRoot->RemoveChild(modeText_);
         uiRoot->RemoveChild(profilerText_);

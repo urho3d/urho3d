@@ -52,18 +52,18 @@ void BorderImage::SetStyle(const XMLElement& element)
 {
     UIElement::SetStyle(element);
     
-    if (element.HasChildElement("texture"))
-        SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>(element.GetChildElement("texture").GetString("name")));
-    if (element.HasChildElement("imagerect"))
+    if (element.HasChild("texture"))
+        SetTexture(GetSubsystem<ResourceCache>()->GetResource<Texture2D>(element.GetChild("texture").GetString("name")));
+    if (element.HasChild("imagerect"))
     {
-        XMLElement imageElem = element.GetChildElement("imagerect");
+        XMLElement imageElem = element.GetChild("imagerect");
         if (imageElem.HasAttribute("value"))
             SetImageRect(imageElem.GetIntRect("value"));
     }
-    if (element.HasChildElement("border"))
-        SetBorder(element.GetChildElement("border").GetIntRect("value"));
-    if (element.HasChildElement("hoveroffset"))
-        SetHoverOffset(element.GetChildElement("hoveroffset").GetIntVector2("value"));
+    if (element.HasChild("border"))
+        SetBorder(element.GetChild("border").GetIntRect("value"));
+    if (element.HasChild("hoveroffset"))
+        SetHoverOffset(element.GetChild("hoveroffset").GetIntVector2("value"));
 }
 
 void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)

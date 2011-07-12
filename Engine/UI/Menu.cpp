@@ -71,16 +71,16 @@ void Menu::SetStyle(const XMLElement& element)
 {
     Button::SetStyle(element);
     
-    XMLElement popupElem = element.GetChildElement("popup");
+    XMLElement popupElem = element.GetChild("popup");
     if (popupElem && popupElem.HasAttribute("name"))
     {
-        UIElement* root = GetRootElement();
+        UIElement* root = GetRoot();
         if (root)
             SetPopup(root->GetChild(popupElem.GetString("name"), true));
     }
     
-    if (element.HasChildElement("popupoffset"))
-        SetPopupOffset(element.GetChildElement("popupoffset").GetIntVector2("value"));
+    if (element.HasChild("popupoffset"))
+        SetPopupOffset(element.GetChild("popupoffset").GetIntVector2("value"));
 }
 
 void Menu::OnShowPopup()
@@ -122,7 +122,7 @@ void Menu::ShowPopup(bool enable)
         return;
     
     // Find the UI root element for showing the popup
-    UIElement* root = GetRootElement();
+    UIElement* root = GetRoot();
     if (!root)
         return;
     
@@ -197,7 +197,7 @@ void Menu::HandleFocusChanged(StringHash eventType, VariantMap& eventData)
     using namespace FocusChanged;
     
     UIElement* element = static_cast<UIElement*>(eventData[P_ELEMENT].GetPtr());
-    UIElement* root = GetRootElement();
+    UIElement* root = GetRoot();
     
     // If another element was focused due to the menu button being clicked, do not hide the popup
     if (eventType == E_FOCUSCHANGED && static_cast<UIElement*>(eventData[P_ORIGINALELEMENT].GetPtr()))

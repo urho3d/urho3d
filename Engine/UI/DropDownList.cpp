@@ -63,34 +63,34 @@ void DropDownList::SetStyle(const XMLElement& element)
 {
     Menu::SetStyle(element);
     
-    XMLElement listElem = element.GetChildElement("listview");
+    XMLElement listElem = element.GetChild("listview");
     if (listElem)
         listView_->SetStyle(listElem);
     
-    XMLElement popupElem = element.GetChildElement("popup");
+    XMLElement popupElem = element.GetChild("popup");
     if (popupElem)
         popup_->SetStyle(popupElem);
     
-    XMLElement placeholderElem = element.GetChildElement("placeholder");
+    XMLElement placeholderElem = element.GetChild("placeholder");
     if (placeholderElem)
         placeholder_->SetStyle(placeholderElem);
     
-    UIElement* root = GetRootElement();
-    XMLElement itemElem = element.GetChildElement("popupitem");
+    UIElement* root = GetRoot();
+    XMLElement itemElem = element.GetChild("popupitem");
     if (root)
     {
         while (itemElem)
         {
             if (itemElem.HasAttribute("name"))
                 AddItem(root->GetChild(itemElem.GetString("name"), true));
-            itemElem = itemElem.GetNextElement("popupitem");
+            itemElem = itemElem.GetNext("popupitem");
         }
     }
     
-    if (element.HasChildElement("selection"))
-        SetSelection(element.GetChildElement("selection").GetInt("value"));
-    if (element.HasChildElement("resizepopup"))
-        SetResizePopup(element.GetChildElement("resizepopup").GetBool("enable"));
+    if (element.HasChild("selection"))
+        SetSelection(element.GetChild("selection").GetInt("value"));
+    if (element.HasChild("resizepopup"))
+        SetResizePopup(element.GetChild("resizepopup").GetBool("enable"));
 }
 
 void DropDownList::GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor)
@@ -128,7 +128,7 @@ void DropDownList::OnShowPopup()
     
     // Check if popup fits below the button. If not, show above instead
     bool showAbove = false;
-    UIElement* root = GetRootElement();
+    UIElement* root = GetRoot();
     if (root)
     {
         const IntVector2& screenPos = GetScreenPosition();

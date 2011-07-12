@@ -76,21 +76,21 @@ void ScrollBar::SetStyle(const XMLElement& element)
 {
     UIElement::SetStyle(element);
     
-    if (element.HasChildElement("range"))
+    if (element.HasChild("range"))
     {
-        XMLElement rangeElem = element.GetChildElement("range");
+        XMLElement rangeElem = element.GetChild("range");
         SetRange(rangeElem.GetFloat("max"));
         SetValue(rangeElem.GetFloat("value"));
     }
-    if (element.HasChildElement("scrollstep"))
-        SetScrollStep(element.GetChildElement("scrollstep").GetFloat("value"));
-    if (element.HasChildElement("stepfactor"))
-        SetStepFactor(element.GetChildElement("stepfactor").GetFloat("value"));
+    if (element.HasChild("scrollstep"))
+        SetScrollStep(element.GetChild("scrollstep").GetFloat("value"));
+    if (element.HasChild("stepfactor"))
+        SetStepFactor(element.GetChild("stepfactor").GetFloat("value"));
     
-    XMLElement backButtonElem = element.GetChildElement("backbutton");
+    XMLElement backButtonElem = element.GetChild("backbutton");
     if (backButtonElem)
     {
-        XMLElement imageElem = backButtonElem.GetChildElement("imagerect");
+        XMLElement imageElem = backButtonElem.GetChild("imagerect");
         if (imageElem.HasAttribute("horizontal"))
             leftRect_ = imageElem.GetIntRect("horizontal");
         if (imageElem.HasAttribute("vertical"))
@@ -102,10 +102,10 @@ void ScrollBar::SetStyle(const XMLElement& element)
         backButton_->SetStyle(backButtonElem);
     }
     
-    XMLElement forwardButtonElem = element.GetChildElement("forwardbutton");
+    XMLElement forwardButtonElem = element.GetChild("forwardbutton");
     if (forwardButtonElem)
     {
-        XMLElement imageElem = forwardButtonElem.GetChildElement("imagerect");
+        XMLElement imageElem = forwardButtonElem.GetChild("imagerect");
         if (imageElem.HasAttribute("horizontal"))
             rightRect_ = imageElem.GetIntRect("horizontal");
         if (imageElem.HasAttribute("vertical"))
@@ -117,13 +117,13 @@ void ScrollBar::SetStyle(const XMLElement& element)
         forwardButton_->SetStyle(forwardButtonElem);
     }
     
-    XMLElement sliderElem = element.GetChildElement("slider");
+    XMLElement sliderElem = element.GetChild("slider");
     if (sliderElem)
         slider_->SetStyle(sliderElem);
     
-    if (element.HasChildElement("orientation"))
+    if (element.HasChild("orientation"))
     {
-        String orientation = element.GetChildElement("orientation").GetStringLower("value");
+        String orientation = element.GetChild("orientation").GetStringLower("value");
         if (orientation == "horizontal" || orientation == "h")
             SetOrientation(O_HORIZONTAL);
         if (orientation == "vertical" || orientation == "v")

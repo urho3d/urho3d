@@ -75,9 +75,9 @@ void Text::SetStyle(const XMLElement& element)
     // Recalculating the text is expensive, so do it only once at the end if something changed
     bool changed = false;
     
-    if (element.HasChildElement("font"))
+    if (element.HasChild("font"))
     {
-        XMLElement fontElem = element.GetChildElement("font");
+        XMLElement fontElem = element.GetChild("font");
         String fontName = fontElem.GetString("name");
         
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -91,9 +91,9 @@ void Text::SetStyle(const XMLElement& element)
                 changed = true;
             }
         }
-        else if (element.HasChildElement("fallbackfont"))
+        else if (element.HasChild("fallbackfont"))
         {
-            fontElem = element.GetChildElement("fallbackfont");
+            fontElem = element.GetChild("fallbackfont");
             String fontName = fontElem.GetString("name");
             Font* font = cache->GetResource<Font>(fontName);
             if (font)
@@ -104,43 +104,43 @@ void Text::SetStyle(const XMLElement& element)
             }
         }
     }
-    if (element.HasChildElement("text"))
+    if (element.HasChild("text"))
     {
-        String text = element.GetChildElement("text").GetString("value");
+        String text = element.GetChild("text").GetString("value");
         text.Replace("\\n", "\n");
         text_ = text;
         changed = true;
     }
-    if (element.HasChildElement("textalignment"))
+    if (element.HasChild("textalignment"))
     {
-        String horiz = element.GetChildElement("textalignment").GetStringLower("value");
+        String horiz = element.GetChild("textalignment").GetStringLower("value");
         if (!horiz.Empty())
         {
             textAlignment_ = (HorizontalAlignment)GetStringListIndex(horiz, horizontalAlignments, HA_LEFT);
             changed = true;
         }
     }
-    if (element.HasChildElement("rowspacing"))
+    if (element.HasChild("rowspacing"))
     {
-        rowSpacing_ = Max(element.GetChildElement("rowspacing").GetFloat("value"), MIN_ROW_SPACING);
+        rowSpacing_ = Max(element.GetChild("rowspacing").GetFloat("value"), MIN_ROW_SPACING);
         changed = true;
     }
-    if (element.HasChildElement("wordwrap"))
+    if (element.HasChild("wordwrap"))
     {
-        wordWrap_ = element.GetChildElement("wordwrap").GetBool("enable");
+        wordWrap_ = element.GetChild("wordwrap").GetBool("enable");
         changed = true;
     }
-    if (element.HasChildElement("selection"))
+    if (element.HasChild("selection"))
     {
-        XMLElement selectionElem = element.GetChildElement("selection");
+        XMLElement selectionElem = element.GetChild("selection");
         selectionStart_ = selectionElem.GetInt("start");
         selectionLength_ = selectionElem.GetInt("length");
         changed = true;
     }
-    if (element.HasChildElement("selectioncolor"))
-        SetSelectionColor(element.GetChildElement("selectioncolor").GetColor("value"));
-    if (element.HasChildElement("hovercolor"))
-        SetHoverColor(element.GetChildElement("hovercolor").GetColor("value"));
+    if (element.HasChild("selectioncolor"))
+        SetSelectionColor(element.GetChild("selectioncolor").GetColor("value"));
+    if (element.HasChild("hovercolor"))
+        SetHoverColor(element.GetChild("hovercolor").GetColor("value"));
     
     if (changed)
     {

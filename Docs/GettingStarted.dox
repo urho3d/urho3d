@@ -243,7 +243,7 @@ void CreateText()
     helloText.horizontalAlignment = HA_CENTER;
     helloText.verticalAlignment = VA_CENTER;
 
-    ui.rootElement.AddChild(helloText);
+    ui.root.AddChild(helloText);
 }
 \endcode
 
@@ -442,7 +442,7 @@ void HelloWorld::CreateText()
     helloText->SetHorizontalAlignment(HA_CENTER);
     helloText->SetVerticalAlignment(VA_CENTER);
 
-    GetSubsystem<UI>()->GetRootElement()->AddChild(helloText);
+    GetSubsystem<UI>()->GetRoot()->AddChild(helloText);
 }
 \endcode
 

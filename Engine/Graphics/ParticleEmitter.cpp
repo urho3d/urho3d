@@ -294,31 +294,31 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
         return false;
     
     parameterSource_ = file;
-    XMLElement rootElem = parameterSource_->GetRootElement();
+    XMLElement rootElem = parameterSource_->GetRoot();
     if (!rootElem)
         return false;
     
-    if (rootElem.HasChildElement("material"))
-        SetMaterial(cache->GetResource<Material>(rootElem.GetChildElement("material").GetString("name")));
+    if (rootElem.HasChild("material"))
+        SetMaterial(cache->GetResource<Material>(rootElem.GetChild("material").GetString("name")));
     
-    if (rootElem.HasChildElement("numparticles"))
-        SetNumParticles(rootElem.GetChildElement("numparticles").GetInt("value"));
+    if (rootElem.HasChild("numparticles"))
+        SetNumParticles(rootElem.GetChild("numparticles").GetInt("value"));
     
-    if (rootElem.HasChildElement("sorted"))
-        sorted_ = rootElem.GetChildElement("sorted").GetBool("enable");
+    if (rootElem.HasChild("sorted"))
+        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
     
-    if (rootElem.HasChildElement("updateinvisible"))
-        updateInvisible_ = rootElem.GetChildElement("updateinvisible").GetBool("enable");
+    if (rootElem.HasChild("updateinvisible"))
+        updateInvisible_ = rootElem.GetChild("updateinvisible").GetBool("enable");
     
-    if (rootElem.HasChildElement("relative"))
-        relative_ = rootElem.GetChildElement("relative").GetBool("enable");
+    if (rootElem.HasChild("relative"))
+        relative_ = rootElem.GetChild("relative").GetBool("enable");
     
-    if (rootElem.HasChildElement("animlodbias"))
-        SetAnimationLodBias(rootElem.GetChildElement("relative").GetFloat("value"));
+    if (rootElem.HasChild("animlodbias"))
+        SetAnimationLodBias(rootElem.GetChild("relative").GetFloat("value"));
     
-    if (rootElem.HasChildElement("emittertype"))
+    if (rootElem.HasChild("emittertype"))
     {
-        String type = rootElem.GetChildElement("emittertype").GetStringLower("value");
+        String type = rootElem.GetChild("emittertype").GetStringLower("value");
         if (type == "point")
             emitterType_ = EMITTER_POINT;
         else if (type == "box")
@@ -329,62 +329,62 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
             LOGERROR("Unknown particle emitter type " + type);
     }
     
-    if (rootElem.HasChildElement("emittersize"))
-        emitterSize_ = rootElem.GetChildElement("emittersize").GetVector3("value");
+    if (rootElem.HasChild("emittersize"))
+        emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
     
-    if (rootElem.HasChildElement("direction"))
-        GetVector3MinMax(rootElem.GetChildElement("direction"), directionMin_, directionMax_);
+    if (rootElem.HasChild("direction"))
+        GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
     
-    if (rootElem.HasChildElement("constantforce"))
-        constanceForce_ = rootElem.GetChildElement("constantforce").GetVector3("value");
+    if (rootElem.HasChild("constantforce"))
+        constanceForce_ = rootElem.GetChild("constantforce").GetVector3("value");
     
-    if (rootElem.HasChildElement("dampingforce"))
-        dampingForce_ = rootElem.GetChildElement("dampingforce").GetFloat("value");
+    if (rootElem.HasChild("dampingforce"))
+        dampingForce_ = rootElem.GetChild("dampingforce").GetFloat("value");
     
-    if (rootElem.HasChildElement("activetime"))
-        activeTime_ = rootElem.GetChildElement("activetime").GetFloat("value");
+    if (rootElem.HasChild("activetime"))
+        activeTime_ = rootElem.GetChild("activetime").GetFloat("value");
     if (activeTime_ < 0.0f)
         activeTime_ = M_INFINITY;
     
-    if (rootElem.HasChildElement("inactivetime"))
-        inactiveTime_ = rootElem.GetChildElement("inactivetime").GetFloat("value");
+    if (rootElem.HasChild("inactivetime"))
+        inactiveTime_ = rootElem.GetChild("inactivetime").GetFloat("value");
     if (inactiveTime_ < 0.0f)
         inactiveTime_ = M_INFINITY;
     
-    if (rootElem.HasChildElement("interval"))
-        GetFloatMinMax(rootElem.GetChildElement("interval"), intervalMin_, intervalMax_);
+    if (rootElem.HasChild("interval"))
+        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin_, intervalMax_);
     
-    if (rootElem.HasChildElement("particlesize"))
-        GetVector2MinMax(rootElem.GetChildElement("particlesize"), sizeMin_, sizeMax_);
+    if (rootElem.HasChild("particlesize"))
+        GetVector2MinMax(rootElem.GetChild("particlesize"), sizeMin_, sizeMax_);
     
-    if (rootElem.HasChildElement("timetolive"))
-        GetFloatMinMax(rootElem.GetChildElement("timetolive"), timeToLiveMin_, timeToLiveMax_);
+    if (rootElem.HasChild("timetolive"))
+        GetFloatMinMax(rootElem.GetChild("timetolive"), timeToLiveMin_, timeToLiveMax_);
     
-    if (rootElem.HasChildElement("velocity"))
-        GetFloatMinMax(rootElem.GetChildElement("velocity"), velocityMin_, velocityMax_);
+    if (rootElem.HasChild("velocity"))
+        GetFloatMinMax(rootElem.GetChild("velocity"), velocityMin_, velocityMax_);
     
-    if (rootElem.HasChildElement("rotation"))
-        GetFloatMinMax(rootElem.GetChildElement("rotation"), rotationMin_, rotationMax_);
+    if (rootElem.HasChild("rotation"))
+        GetFloatMinMax(rootElem.GetChild("rotation"), rotationMin_, rotationMax_);
     
-    if (rootElem.HasChildElement("rotationspeed"))
-        GetFloatMinMax(rootElem.GetChildElement("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
+    if (rootElem.HasChild("rotationspeed"))
+        GetFloatMinMax(rootElem.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
     
-    if (rootElem.HasChildElement("sizedelta"))
+    if (rootElem.HasChild("sizedelta"))
     {
-        XMLElement deltaElem = rootElem.GetChildElement("sizedelta");
+        XMLElement deltaElem = rootElem.GetChild("sizedelta");
         if (deltaElem.HasAttribute("add"))
             sizeAdd_ = deltaElem.GetFloat("add");
         if (deltaElem.HasAttribute("mul"))
             sizeMul_ = deltaElem.GetFloat("mul");
     }
     
-    if (rootElem.HasChildElement("color"))
-        SetParticleColor(rootElem.GetChildElement("color").GetColor("value"));
+    if (rootElem.HasChild("color"))
+        SetParticleColor(rootElem.GetChild("color").GetColor("value"));
     
-    if (rootElem.HasChildElement("colorfade"))
+    if (rootElem.HasChild("colorfade"))
     {
         Vector<ColorFade> fades;
-        XMLElement colorFadeElem = rootElem.GetChildElement("colorfade");
+        XMLElement colorFadeElem = rootElem.GetChild("colorfade");
         while (colorFadeElem)
         {
             ColorFade fade;
@@ -392,22 +392,22 @@ bool ParticleEmitter::LoadParameters(XMLFile* file)
             fade.time_ = colorFadeElem.GetFloat("time");
             fades.Push(fade);
             
-            colorFadeElem = colorFadeElem.GetNextElement("colorfade");
+            colorFadeElem = colorFadeElem.GetNext("colorfade");
         }
         SetParticleColors(fades);
     }
     
-    if (rootElem.HasChildElement("texanim"))
+    if (rootElem.HasChild("texanim"))
     {
         Vector<TextureAnimation> animations;
-        XMLElement animElem = rootElem.GetChildElement("texanim");
+        XMLElement animElem = rootElem.GetChild("texanim");
         while (animElem)
         {
             TextureAnimation animation;
             animation.uv_ = animElem.GetRect("uv");
             animation.time_ = animElem.GetFloat("time");
             animations.Push(animation);
-            animElem = animElem.GetNextElement("texanim");
+            animElem = animElem.GetNext("texanim");
         }
         textureAnimation_ = animations;
     }

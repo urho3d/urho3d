@@ -47,10 +47,10 @@ public:
     virtual bool Save(Serializer& dest);
     
     /// Clear the document and create a root element
-    XMLElement CreateRootElement(const String& name);
+    XMLElement CreateRoot(const String& name);
     
     /// Return the root element, with optionally specified name. Return null element if not found
-    XMLElement GetRootElement(const String& name = String());
+    XMLElement GetRoot(const String& name = String());
     /// Return the TinyXML document
     TiXmlDocument* GetDocument() const { return document_; }
     
