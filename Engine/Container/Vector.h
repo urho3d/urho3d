@@ -46,6 +46,12 @@ public:
         Resize(size, 0);
     }
     
+    /// Construct with initial data
+    Vector(const T* data, unsigned size)
+    {
+        Resize(size, data);
+    }
+    
     /// Construct from another vector
     Vector(const Vector<T>& vector)
     {
@@ -428,6 +434,13 @@ public:
     explicit PODVector(unsigned size)
     {
         Resize(size);
+    }
+    
+    /// Construct with initial data
+    PODVector(const T* data, unsigned size)
+    {
+        Resize(size);
+        CopyElements(Buffer(), data, size);
     }
     
     /// Construct from another vector

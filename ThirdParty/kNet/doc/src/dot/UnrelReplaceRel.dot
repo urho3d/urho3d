@@ -1,0 +1,7 @@
+digraph UnrelReplaceRel
+{
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      a [ label="Message A"];
+      b [ label="Message B", style="dashed"];
+      a -> b [ arrowhead="diamond"];
+}

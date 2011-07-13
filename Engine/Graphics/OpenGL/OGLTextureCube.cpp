@@ -74,7 +74,7 @@ void TextureCube::OnDeviceLost()
                 int levelWidth = GetLevelWidth(i);
                 int levelHeight = GetLevelHeight(i);
                 SharedArrayPtr<unsigned char> savedLevel(new unsigned char[GetDataSize(levelWidth, levelHeight)]);
-                GetData((CubeMapFace)face, i, savedLevel.Ptr());
+                GetData((CubeMapFace)face, i, savedLevel.RawPtr());
                 savedLevels_.Push(savedLevel);
             }
         }
@@ -98,7 +98,7 @@ void TextureCube::OnDeviceReset()
                 unsigned level = i / 6;
                 int levelWidth = GetLevelWidth(level);
                 int levelHeight = GetLevelHeight(level);
-                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].Ptr());
+                SetData(face, level, 0, 0, levelWidth, levelHeight, savedLevels_[i].RawPtr());
             }
             savedLevels_.Clear();
         }
@@ -258,8 +258,8 @@ bool TextureCube::Load(Deserializer& source)
     
     LoadParameters(xml);
     
-    XMLElement textureElem = xml->GetRootElement();
-    XMLElement faceElem = textureElem.GetChildElement("face");
+    XMLElement textureElem = xml->GetRoot();
+    XMLElement faceElem = textureElem.GetChild("face");
     unsigned faces = 0;
     while (faceElem && faces < MAX_CUBEMAP_FACES)
     {
@@ -275,7 +275,7 @@ bool TextureCube::Load(Deserializer& source)
         Load((CubeMapFace)faces, image);
         faces++;
         
-        faceElem = faceElem.GetNextElement("face");
+        faceElem = faceElem.GetNext("face");
     }
     
     return true;

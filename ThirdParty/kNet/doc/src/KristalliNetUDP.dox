@@ -1,0 +1,374 @@
+/**
+\page KristalliUDP kNet Transport over UDP
+
+\section KristalliUDPMain kNet Transport over UDP
+
+This specification defines the details of kNet Transport layer over UDP. 
+
+kNet over UDP offers the following enhancements over raw UDP datagrams:
+<ul>
+<li><b>Connection-oriented.</b> kNet implements virtual sessioning on top of the connectionless UDP layer.</li>
+<li><b>Reliable messaging.</b> Datagrams that are flagged reliable are retransmitted until they reach their destination.</li>
+<li><b>In-order messaging.</b> Messages that have ordering requirements are applied at the receiving end in their proper order. The application can model the dependencies as appropriate, using no/single/multiple in-order transmission channels or an arbitrary dependency graph. </li>
+<li><b>Message coalescing.</b> A single UDP datagram can carry as many application-level messages as can fit, instead of a naive 1:1 mapping between datagrams and messages that is sometimes used. </li>
+<li><b>Byte-efficient transport.</b> On average, the per-datagram overhead is 3-10 bytes, and the per-message overhead is 3-5 bytes. kNet
+is suitable for applications profiled to transfer large amounts of small messages.</li> 
+<li><b>Large message transfers.</b> UDP datagram has a size limit of circa 1400 bytes, but the protocol supports transparent fragmentation and reassembling of large messages to hide this limit. The maximum message size is 2^30 * 1400 bytes, i.e. virtually unlimited.</li>
+</ul>
+
+The major advantages of using kNet over UDP instead of TCP are the following:
+<ul>
+<li><b>Unreliable messaging.</b> Datagrams that are not flagged reliable are treated unreliable and resources will not be wasted in guaranteeing their delivery.</li>
+<li><b>Out-of-order messaging.</b> If a TCP frame is lost, the stream transfer halts until the loss is detected and retransmitted. With UDP, messages without in-order requirements can be delivered to the application regardless of whether other frames have been lost.
+<li><b>NAT Punchthrough.</b> With UDP, Peer-to-peer communication between two clients that are both behind a NAT is possible. For more information, see <a href="http://www.jenkinssoftware.com/raknet/manual/natpunchthrough.html">RakNet</a> or <a href="http://www.mindcontrol.org/~hplus/nat-punch.html">Jon Watte</a>. </li>
+</li>
+</ul>
+
+The protocol specification was designed keeping in mind the possibility of implementing a certain set of performance-related features. For more details on this, see the \ref ImplementationOverview "C++ reference implementation".
+
+The image below shows an overview of the structural format of a kNet UDP datagram.
+\image html KristalliFormat.png "kNet UDP Datagram Structure."
+
+\subsection KristalliUDPByteFormat Datagram Byte Format
+  
+The byte format of a kNet <b>UDP datagram</b> is as follows.
+Multibyte variables are serialized in little-endian order. To understand the VLE-encoded fields in the headers, see \ref KristalliUDPVLE "". 
+
+<div style="background-color: #E0E0E0; padding: 5px; border: solid 1px black;">
+<b>UDP Datagram Format.</b>
+<pre>
+u24    bit     23  InOrder flag. If set, this datagram contains InOrder messages.
+       bit     22  Reliable flag. If set, this datagram is expected to be Acked by the receiver.
+       bits  0-21  PacketID.
+u8                 InOrderDeltaCount. (IOD)         [Only present if InOrder is set.] 
+IOD x VLE-1.7/8    InOrderDeltaArray.               [Only present if InOrder is set.]
+IOD x VLE-1.7/8    InOrderDatagramIndexArray.       [Only present if InOrder is set.]
+? x .Message.      As many times as there are still unparsed bytes left in the datagram.
+</pre>
+</div>
+
+The byte format of a kNet <b>Message block</b> is as follows.
+<div style="background-color: #E0E0E0; padding: 5px; border: solid 1px black;">
+<b>Message Block Format.</b>
+<pre style="padding: 0px; margin: 0px;">
+u16    bit     15  FragmentStart flag. If set, this is the first fragment of a fragmented transfer.
+       bit     14  Fragment flag. If set, this message is a fragment of a fragmented transfer.
+       bits 11-13  InOrder code. Specifices the InOrder requirements of this message.
+       bits  0-10  ContentLength. Specifies the length of the Content block.
+u8                 SingleInOrderIndex.              [Only present if InOrder=6 (110 in base 2).]
+u8                 MultiInOrderIndexCount. (MIO)    [Only present if InOrder=7 (111 in base 2).]
+MIO x u8           MultiInOrderIndexArray.          [Only present if InOrder=7 (111 in base 2).]
+VLE-1.7/1.7/16     FragmentCount.                   [Only present if FragmentStart is set.]
+u8                 TransferID.                      [Only present if Fragment is set or FragmentStart is set.]
+VLE-1.7/1.7/16     FragmentNumber.                  [Only present if Fragment is set and FragmentStart is not set.]
+.Content.          The length of this field is specified by the ContentLength field.
+</pre>
+</div>
+
+The byte format of a kNet <b>Content block</b> is as follows.
+<div style="background-color: #E0E0E0; padding: 5px; border: solid 1px black;">
+<b>Content Block Format.</b>
+<pre>
+VLE-1.7/1.7/16     MessageID                        [Only present if FragmentStart is set or Fragment is not set.]
+.Payload.          The actual data of the message.
+</pre>
+</div>
+   
+All the datagrams transferred through a kNet channel need to follow this datagram format. 
+
+\subsection SessionInit Reserved Messages
+
+To perform proper connection control, the protocol reserves some <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">MessageID</span> values
+for its own use. All other <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">MessageID</span> values are available for client application to define.
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingRequest</span> message is sent to detect that the other end is still responding and to estimate the current round-trip-time.
+ 
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 1: PingRequest</b> \anchor PingRequestMsg
+<pre>
+u8                 pingID.
+</pre>
+Unreliable. Out-of-order. May not be fragmented.
+</div>
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingReply</span> message is a response to the PingRequest message.
+
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 2: PingReply</b> \anchor PingReplyMsg
+<pre>
+u8                 pingID.
+</pre>
+Unreliable. Out-of-order. May not be fragmented.
+</div>
+
+To request a new inbound datagram send rate limit, the client can issue a
+<span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">FlowControlRequest</span> message.
+
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 3: FlowControlRequest</b> \anchor FlowControlRequestMsg
+<pre>
+u16                 newDatagramReceiveRate.
+</pre>
+Reliable. Out-of-order. May not be fragmented.
+</div>
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PacketAck</span> message is sent to acknowedge the receival of reliable datagrams.
+
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 4: PacketAck</b> \anchor PacketAckMsg
+<pre>
+u24     bits  0-21  PacketID.
+        bits 22-23  PacketID sequence bits.
+u32                 PacketID sequence bits.
+</pre>
+Unreliable. Out-of-order. May not be fragmented.
+</div>
+
+To inform the other end that the client is about to finish the session
+and will not send any more messages, it issues the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message. 
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 0x3FFFFFFF: Disconnect</b> \anchor DisconnectMsg
+<pre>
+                    (no data)
+</pre>
+Unreliable. In-order. May not be fragmented.
+</div>
+
+Note the ordering requirements of the messages. The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message needs to be sent in an In-order datagram since the transport layer must guarantee that all other application datagrams have been processed before the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message.
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message is used as a response to the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message to signal that the connection has now been bilaterally closed.
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 0x3FFFFFFE: DisconnectAck</b> \anchor DisconnectAckMsg
+<pre>
+                    (no data)
+</pre>
+Unreliable. In-order. May not be fragmented.
+</div>
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message is marked In-order for the same reason than the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message. 
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> is the first message that a client sends when connecting to a server. 
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 0x3FFFFFFD: ConnectSyn</b> \anchor ConnectSynMsg
+<pre>
+N bytes             Application-specific content.
+</pre>
+Unreliable. Out-of-order. May not be fragmented.
+</div>
+
+The server replies to a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> with a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSynAck</span>. Depending on the contents of this message, the client interprets this as a succeeded or a failed connection
+attempt.
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 0x3FFFFFFC: ConnectSynAck</b> \anchor ConnectSynAckMsg
+<pre>
+N bytes             Application-specific content.
+</pre>
+Unreliable. Out-of-order. May not be fragmented.
+</div>
+
+Finally, to signal the server that messaging is working both ways, the client
+sends the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message.
+<div style="background-color: #B0B0E0; padding: 5px; border: solid 1px black;">
+<b>MessageID 0x3FFFFFFB: ConnectAck</b> \anchor ConnectAckMsg
+<pre>
+                    (no data)
+</pre>
+Reliable. Out-of-order. May not be fragmented.
+</div>
+
+If the application sends any other application-specific message than the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message, that message serves as <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message instead. The purpose of an explicit <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message is only to avoid connection timeout if the client does not immediately have any other messages to send.   
+ 
+\subsection SessionChar Characteristic Values
+
+kNet uses the following constant values to specify time intervals and data rates and other behavior-affecting values. These parameters may be changed at will and need not be static, but servers running on a changed set of characteristics should explicitly specify so. 
+
+<div style="background-color: #E0B0B0; padding: 5px; border: solid 1px black;">
+<i>When a new connection is successfully established, this is the default datagram send and receive rate that both ends should adhere to.</i> <br />
+<b>InitialDatagramRate</b>: 15 datagrams/second
+<br /><br />
+<i>A connection is always allowed to send datagrams at this rate, independent of the flow control applied.</i> <br />
+<b>MinDatagramRate</b>: 5 datagrams/second
+<br /> <br />
+<i>The interval at which we send ping messages.</i> <br />
+<b>PingInterval</b>: 5 seconds
+<br /> <br />
+<i>The maximum time to wait before acking a packet. If there are enough packets to ack for a full ack message, acking will be performed earlier.</i> <br />
+<b>MaxAckDelay</b>: 33 milliseconds
+<br /> <br />
+<i>The time counter after which an unacked reliable datagram will be resent. (UDP only)</i> <br />
+<b>DatagramTimeOut</b>: 2 seconds
+<br /> <br />
+<i>The time interval after which, if we don't get a response to a <span style="border-bottom: dashed 1px blue;">PingRequest</span> message, the connection is declared lost.</i> <br />
+<b>ConnectionLostTimeout</b>: PingInterval * 3
+<br /> <br />
+<i>The time interval after which, if we don't get a response to a <span style="border-bottom: dashed 1px blue;">ConnectSyn</span> or a <span style="border-bottom: dashed 1px blue;">ConnectSynAck</span> message, the connection is declared lost.</i> <br />
+<b>ConnectTimeOut</b>: 10 seconds
+<br /> <br />
+<i>The time interval after which, if we don't get a response to a <span style="border-bottom: dashed 1px blue;">Disconnect</span> message, the connection is declared lost.</i> <br />
+<b>DisconnectTimeOut</b>: 5 seconds
+<br /> <br />
+<i>The maximum number of times sending a reliable message will be tried until the connection is declared lost.</i> <br />
+<b>MaxMessageSendCount</b>: 50
+<br /> <br />
+<i>The maximum size for a fragmented transfer message.</i> <br />
+<b>MaxUDPMessageFragmentSize</b>: 470 bytes
+</div>
+
+\subsection SessionEst Session Management
+
+Building a session on top of the connectionless UDP layer is performed using traditional TCP-like three-way handshaking and acknowledged disconnection.
+ 
+A kNet implementation has to maintain a state variable specifying the current <b>connection state</b>. The connection is expected to operate in the following modes:
+<ul>
+<li><b>ConnectionClosed</b>: No active connection attempt has yet been initiated or the connection has already been closed.</li>
+<li><b>ConnectionSyn</b>: The connection has sent a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> message and is waiting for acknowledgement. No datagrams may be sent through when the connection is in this state. When the connection receives a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSynAck</span> message, it sends a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message and transitions to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionOK</span> state, or it sends a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message and transitions to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span> state. If the connection receives any other messages while in this state or if the <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">ConnectTimeOut</span> limit is exceeded, the connection transitions to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span> state.</li>
+<li><b>ConnectionSynAck</b>: The connection has sent a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSynAck</span> message and is waiting for acknowledgement. No datagrams may be sent through when the connection is in this state. When the connection receives a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectAck</span> message or any other message than <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span>, it transitions to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionOK </span>state. If the connection receives a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message or if the <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">ConnectTimeOut</span> limit is exceeded, it transitions to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span> state.</li>
+<li><b>ConnectionOK</b>: The handshake has been finished successfully and both parties now have an active established session. Sending message datagrams may be freely performed and connection control and ping messages are transmitted.</li>
+<li><b>ConnectionClosing</b>: The connection has sent a Disconnect message and is waiting for a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message. No more datagrams may be sent through this connection. The connection will transition to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span> state when the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message is received or if the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectTimeOut</span> delay is exceeded. </li>
+</ul>
+
+The states <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionSyn</span> and <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionSynAck</span> are collectively referred to as the <b>ConnectionPending</b> state.
+
+<div style="text-align: center;">
+\msc
+  Client,Server;
+
+#  Client abox Client [label="ConnectionClosed" ],
+#  Server abox Server [label="ConnectionClosed" ];
+  
+  Client->Server [label="ConnectSyn", URL="\ref ConnectSynMsg", ID="1"];
+  
+#  Client abox Client [label="ConnectionSyn" ];
+  
+  Server->Client [label="ConnectSynAck", URL="\ref ConnectSynAckMsg", ID="1"];
+
+#  Server abox Server [label="ConnectionSynAck" ];
+
+  Client->Server [label="ConnectAck", URL="\ref ConnectAckMsg", ID="2"];
+  
+#  Client abox Client [label="ConnectionOK" ],
+#  Server abox Server [label="ConnectionOK" ];
+  
+  --- [label="The connection is now properly established."];
+  Client rbox Server [label="Communication using kNet datagrams."];
+  ...;
+
+#  Client abox Client [label="ConnectionDisconnecting" ],
+#  Server abox Server [label="ConnectionOK" ];
+
+  Client->Server[label="Disconnect", URL="\ref DisconnectMsg"];
+
+#  Client abox Client [label="ConnectionDisconnecting" ],
+#  Server abox Server [label="ConnectionOK" ];
+
+  Server->Client[label="DisconnectAck", URL="\ref DisconnectAckMsg"];
+  --- [label="The connection is now closed."];
+\endmsc
+  
+<b>Session initialization and teardown sequence.</b> <!-- <br />
+<span style="vertical-align: super;">1</span>May contain user payload. 
+<span style="vertical-align: super;">2</span>May be replaced with any application-specific message.  -->
+</div>
+
+To initiate a connection attempt, the client sends a kNet datagram containing a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> message. The data contained in this message is arbitrary and up to the application to specify. It can be left empty, or can contain a username or a password. It is up to the server application to parse this data and to either accept or reject the connection attempt. The rest of the communication then proceeds as specified above.    
+ 
+\subsection ServerListen kNet Server Side Listener Socket
+
+On the server side the host maintains a single listen socket that receives inbound kNet datagrams. It is up to the server application to specify a port number on which the server listens. The server maintains two operational modes:
+<ul>
+<li><b>Listen Open</b>: If set, the server is actively listening and handling new connection attempts. If not set, the server ignores all new connection attempts, but continues to manage all the existing connections.</li>
+<li><b>Stealth Mode</b>: If set, the server operates in stealth mode, saving bandwidth and resources when handling new connection attempts. Otherwise the server operates in Responsive Mode by informing clients of all results of connection attempts.</li>
+</ul>
+
+When the server receives a datagram that corresponds to a new connection endpoint, it operates in the following way:
+<ul>
+<li>If the datagram parses to a valid kNet datagram and contains a valid <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> message, the contents of this message is parsed by the application. If the connection attempt is accepted, the server sends an appropriate <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSynAck</span> message back to the client and creates a new connection for that endpoint that is initially set to the <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionSynAck</span> state.</li>
+<li>If the datagram does not parse properly or contains invalid messages that are not valid to be sent at this time, the server should silently discard the datagram. If the application-specific payload of the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">ConnectSyn</span> message is not accepted, the server ignores the datagram if it is in Stealth Mode, or sends back a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message if it is operating in Responsive Mode. This message effectively signals a "Connection Refused" message. If a sequence of datagrams is received, only one <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> reply needs to be sent (It is open to the application to interpret what constitutes a sequence).</li>
+</ul>
+
+\subsection SessionDisc Closing a Session
+
+Disconnecting an established connection (in state <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionOK</span>) may be initiated by either party by sending the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">Disconnect</span> message. After sending this message, no other messages or datagrams may be sent. Upon sending this message, the connection should transition to the <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosing</span> state.
+
+Finalizing the disconnection attempt (i.e. transitioning to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span>) may be performed in three different ways:
+<ol>
+<li>The connection may wait for the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message, which signals that the other end is not going to send any more messages or datagrams either.</li>
+<li>If the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectTimeOut</span> time limit is exceeded, and the connection is not interested in receiving the rest of the data from the other end, or</li>
+<li>If a client is in a hurry, for example if it wants to stay responsive for the user, it may choose to skip waiting for the <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">DisconnectAck</span> message altogether and directly transition to <span style="background-color: #D5FFD5; border-bottom: dashed 1px green;">ConnectionClosed</span> state. This is applicable only in the case that the application knows it is not interested in the remainder of the data sent by the other end.</li>
+</ol>
+
+\subsection SessionReliable Reliable Datagrams
+
+The <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">Reliable</span> flag of the datagram header is used to specify whether a datagram is sent as <b>reliable</b> or <b>unreliable</b>. If the flag is set, the other end is expected to acknowledge the receival of the datagram by sending a <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PacketAck</span> message that contains the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span> from the datagram header. The connection may send back an acknowledgement right away after receiving a reliable datagram, or it may wait for a while, but no longer than the <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">MaxAckDelay</span> time period, to accumulate several reliable packets and acknowledge them all using a single <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PacketAck</span> message. By using sequence delta compression, one <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PacketAck</span> message can acknowledge up to 35 reliable datagrams. A message that is transmitted in a reliable datagram is called a <b>reliable message</b>, and correspondingly, messages transmitted in an unreliable datagram are called <b>unreliable message</b>.   
+
+\subsection KristalliUDPRTT Round-Trip-Time Estimation
+
+The <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingRequest</span> and <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingReply</span> messages are used to estimate the Round-Trip-Time (RTT) of the channel, as well as to detect that the connection is still alive. To know which request corresponds to which reply, both messages contain a matching <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">pingID</span> field. The application should maintain an internal counter and increment this field by one for each subsequent ping request that it sends.
+
+The interval at which an implementation sends ping requests is not enforced, but it should reply to any <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingRequest</span> messages as fast as possible. A recommended interval period is the <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">PingInterval</span> rate.
+
+Since a connection is deemed lost if no messages have been received through the connection in the time period specified by <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">ConnectionLostTimeout</span>, an implementation should send <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">PingRequest</span> messages as keepalive signals to prevent being disconnected.
+
+\subsection SessionInOrder InOrder Datagrams and Messages
+
+Raw UDP datagrams may be received out-of-order and it is up to the client to reorganize them. The stream-oriented TCP protocol handles this transparently to the user. However, in certain conditions this feature can be devastating with respect to network latency, and is seen as a major issue for realtime applications. Minimizing network latency and maintaining a total order at all times are two mutually exclusive goals. Therefore modelling message ordering requirements in a realtime network application can be tricky.
+
+Each kNet datagram is associated with a unique <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span>, which is incremented by one after sending a packet. The client can use this information to reconstruct the original send order of the datagrams. However, the protocol does not enforce a single method for message ordering.
+
+When a connection receives a datagram with several messages, it is required to process the messages in the order they appear in the datagram. For dependencies between messages that were transmitted in different datagrams, kNet proposes the following model. On protocol level, a message can depend on several different messages. This means that each message is associated with a list of <b>(PacketID, MessageIndex)</b> values that specify which messages in previous datagrams should have been applied before the given message can be applied. If a message does not specify any InOrder dependencies, it can be applied out-of-order without regard to other messages. A datagram can contain a mix of both ordered and out-of-order messages.
+
+As an example, the client may implement one of the following patterns for message ordering.
+<ul>
+<li>Send all messages unordered. Examining the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span> numbers at the receiving end allows one to detect when a datagram is received late. This method minimizes end-application latency and is suitable for e.g. realtime streaming.</li>
+<li>Implement a single transmission channel. Each message may be marked to depend on the previous UDP datagram. This model is exactly the one that TCP uses.</li>
+<li>Implement several separate virtual transmission channels. Each channel transmits data ordered independently of all other channels.</li>
+<li>Implement a combination of the above on a per-message basis, or implement one-to-many or many-to-one dependencies. Since the protocol only states "this message depends on these datagrams having been received.", the application can implement complicated dependency relations if needed. </li>
+</ul> 
+
+If the datagram contains any messages that have ordering requirements, the datagram header has the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">InOrder</span> flag set. In this case, the datagram header also stores an array of <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span> values (delta-encoded) that specifies the full list of datagrams that the messages in the current datagram depend on. The array is stored length-prefixed, so the field <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">InOrderDeltaCount</span> specifies the size of this array.
+
+Sending ordered messages has the following limitations:
+<ol>
+<li>Messages in a single datagram may only depend on 256 different preceding datagrams. If this limit is reached, the transmission must throttle for a while to wait for an acknowledgement on a previous message to fulfill a dependency.</li>
+<li>A reliable message can not depend on an unreliable datagram. This is because if the unreliable message never reaches the destination, the reliable message can never be applied. An unreliable message can depend on a reliable message without problems.</li>
+</ol>
+
+In the Message block header, the three bits of the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">InOrderCode</span> field are read most significant bit first and treated in the following manner:
+<div style="background-color: #E0B0E0; padding: 5px; border: solid 1px black;">
+<b>InOrderCode</b> field interpretation:
+<pre>
+  0               This message does not depend on previous messages.
+1-5               This message depends on a single message specified by InOrderDeltaArray[InOrderCode-1]. 
+  6               This message depends on a single message specified by InOrderDeltaArray[InOrderIndex].
+  7               This message depends on multiple messages specified by InOrderDeltaArray[MultiInOrderArray[x]].
+</pre>
+</div>
+ 
+The values of <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">InOrderDeltaArray</span> store <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span> <b>delta</b> values. That is, the actual array of <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">PacketID</span> values that this datagram depends on can be computed with the formula
+<pre style="margin-left: 20px;">DependedPacketID[x] = PacketID(current datagram) - InOrderDeltaArray[x] - 1;</pre> 
+
+\subsection SessionFlow Flow Control
+
+To avoid network congestion -related problems, the protocol implements a connection control message called <span style="background-color: #D5D5FF; border-bottom: dashed 1px blue;">\ref FlowControlRequestMsg "FlowControlRequest"</span> that can be used to set the maximum datagram rate that the client is ready to receive. An implementation must track its send rate and honor this limit. If a client continuously receives datagrams at a rate higher than the requested limit, it may close the connection. 
+
+Our reference implementation uses the same idea as with TCP. That is, when the line is lossless, the data receive rate grows in linear increments. In the presence of packet loss, a geometric reduction is applied. However, we note that the TCP method is unsuitable for certain uses and different applications may benefit from different flow control methods. Therefore it is open to the application to define the exact flow control algorithm that should be used. The reference implementation provides facilities for replacing the TCP method with custom flow control.  
+
+At a minimum, a client is always allowed to send datagrams at <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">MinDatagramRate</span> datagrams/second. When a new connection is established, an initial datagram send rate of <span style="background-color: #FFD5D5; border-bottom: dashed 1px red;">InitialDatagramRate</span> datagrams/second is in effect.   
+
+\subsection SessionFrag Fragmented Transfers
+
+Since the UDP datagrams have an MTU limit, the protocol implements a message fragmentation feature that allows large messages to be sent over several datagrams. A long message may be divided into several smaller <b>message fragments</b> which are then sent as if they were ordinary individual messages. The receiving end tracks these fragments and reassembles them to form the original complete message. This process is called a <b>fragmented transfer</b>, and to distinguish between several simultaneous fragmented transfers, each of them is assigned a unique <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">TransferID</span>. A message that is a fragment of a larger message has the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">Fragment</span> flag set. If the message is the first fragment of the fragmented transfer, it should have the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">FragmentStart</span> flag set as well.  
+
+The <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">TransferID</span> is an arbitrary identifier the size of a byte that is allocated by the sender to identify the messages that comprise the fragmented transfer. All messages that are part of the same fragmented transfer are sent with the same <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">TransferID</span>. When a fragmented transfer is allocated an ID number, that number may be reused for another fragmented transfer only after all the datagrams containing fragments of that transfer have been acknowledged.
+
+The first fragment is identified with the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">FragmentStart</span> flag. If this flag is set, the message header also contains a <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">FragmentCount</span> field, which reveals the total number of fragments the transfer with the given id will contain. This information is used by the receiver to identify when the transfer is finished.   
+
+There are a few restrictions and notes to make:
+<ol>
+<li>As specified above, connection control messages may not be sent as fragmented transfers.</li>
+<li>There may only be 256 simultaneously ongoing fragmented transfers. If this limit is reached, all the previous fragmented transfers must first be finished.</li>
+<li>Any datagram that carries a fragmented transfer message needs to be marked reliable. This is to guarantee that reallocation of <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">TransferID</span> values may be safely done. </li>
+<li>If the message transmitted as a fragmented transfer has any ordering requirements, only the first message with the <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">FragmentStart</span> flag set needs to specify these requirements. All the subsequent message fragments may be sent out-of-order to improve performance. </li>
+<li>An implementation must be prepared to handle the case that messages with a given <span style="background-color: #E8E8E8; border-bottom: dashed 1px black;">TransferID</span> can be received before the first message of that fragmented transfer.</li>
+</ol>
+
+*/

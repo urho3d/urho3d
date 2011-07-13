@@ -25,334 +25,208 @@
 #include "Context.h"
 #include "CoreEvents.h"
 #include "Log.h"
-#include "Mutex.h"
 #include "Network.h"
 #include "NetworkEvents.h"
-#include "Peer.h"
 #include "ProcessUtils.h"
-#include "Profiler.h"
-
-#include <enet/enet.h>
 
 #include "DebugNew.h"
-
-static unsigned numInstances = 0;
 
 OBJECTTYPESTATIC(Network);
 
 Network::Network(Context* context) :
-    Object(context),
-    serverHost_(0),
-    clientHost_(0),
-    serverMaxConnections_(32),
-    clientMaxConnections_(2),
-    numChannels_(4),
-    dataInBps_(0),
-    dataOutBps_(0)
+    Object(context)
 {
-    {
-        MutexLock lock(GetStaticMutex());
-        
-        if (!numInstances)
-        {
-            if (enet_initialize() != 0)
-                LOGERROR("Could not initialize networking");
-        }
-        ++numInstances;
-    }
+    network_ = new kNet::Network();
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
 }
 
 Network::~Network()
 {
-    StopServer();
-    StopClient();
+    clientConnections_.Clear();
     
+    delete network_;
+    network_ = 0;
+}
+
+void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char *data, size_t numBytes)
+{
+    // Only forward the message as an event if the source is known
+    Connection* connection = GetConnection(source);
+    if (connection)
     {
-        MutexLock lock(GetStaticMutex());
+        using namespace NetworkMessage;
         
-        --numInstances;
-        if (!numInstances)
-            enet_deinitialize();
+        VariantMap eventData;
+        eventData[P_CONNECTION] = (void*)connection;
+        eventData[P_MESSAGEID] = (int)id;
+        eventData[P_DATA] = PODVector<unsigned char>((const unsigned char*)data, numBytes);
+        
+        connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
 }
 
-void Network::SetServerMaxConnections(unsigned connections)
+void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
 {
-    if (!connections)
-        connections = 1;
-    serverMaxConnections_ = connections;
+    connection->RegisterInboundMessageHandler(this);
+    
+    // Create a new client connection corresponding to this MessageConnection
+    Connection* newConnection = new Connection(context_, kNet::SharedPtr<kNet::MessageConnection>(connection));
+    clientConnections_[connection] = newConnection;
+    LOGINFO("Client " + newConnection->ToString() + " connected");
+    
+    using namespace ClientConnected;
+    
+    VariantMap eventData;
+    eventData[P_CONNECTION] = (void*)newConnection;
+    SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
-void Network::SetClientMaxConnections(unsigned connections)
+void Network::ClientDisconnected(kNet::MessageConnection* connection)
 {
-    if (!connections)
-        connections = 1;
-    clientMaxConnections_ = connections;
-}
-
-void Network::SetNumChannels(unsigned channels)
-{
-    if (!channels)
-        channels = 1;
-    if (channels > 255)
-        channels = 255;
+    connection->Disconnect(0);
     
-    numChannels_ = channels;
-    
-    if (serverHost_)
-        enet_host_channel_limit(serverHost_, numChannels_);
-    if (clientHost_)
-        enet_host_channel_limit(clientHost_, numChannels_);
-}
-
-void Network::SetDataRate(int dataInBps, int dataOutBps)
-{
-    dataInBps_ = Max(dataInBps, 0);
-    dataOutBps_ = Max(dataOutBps, 0);
-    
-    if (serverHost_)
-        enet_host_bandwidth_limit(serverHost_, dataInBps_, dataOutBps_);
-    if (clientHost_)
-        enet_host_bandwidth_limit(clientHost_, dataInBps_, dataOutBps_);
-}
-
-void Network::Update()
-{
-    PROFILE(UpdateNetwork);
-    
-    // Service hosts if they exist
-    if (serverHost_)
-        Update(serverHost_);
-    if (clientHost_)
-        Update(clientHost_);
-    
-    // Update peers and purge those that are disconnected
-    for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End();)
+    // Remove the client connection that corresponds to this MessageConnection
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    if (i != clientConnections_.End())
     {
-        (*i)->Update();
+        LOGINFO("Client " + i->second_->ToString() + " disconnected");
         
-        if ((*i)->GetConnectionState() == CS_DISCONNECTED)
-            i = peers_.Erase(i);
-        else
-            ++i;
+        using namespace ClientDisconnected;
+        
+        VariantMap eventData;
+        eventData[P_CONNECTION] = (void*)i->second_;
+        SendEvent(E_CLIENTDISCONNECTED, eventData);
+        
+        clientConnections_.Erase(i);
     }
+}
+
+bool Network::Connect(const String& address, unsigned short port)
+{
+    // If connection already exists, disconnect it and wait for some time for the connection to terminate
+    if (serverConnection_)
+    {
+        serverConnection_->Disconnect(100);
+        ServerDisconnected();
+    }
+    
+    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
+    if (connection)
+    {
+        serverConnection_ = new Connection(context_, connection);
+        serverConnection_->connectPending_ = true;
+        return true;
+    }
+    else
+    {
+        LOGERROR("Failed to connect to " + address + ":" + String(port));
+        SendEvent(E_SERVERCONNECTFAILED);
+        return false;
+    }
+}
+
+void Network::Disconnect(int waitMSec)
+{
+    if (serverConnection_)
+        serverConnection_->Disconnect(waitMSec);
 }
 
 bool Network::StartServer(unsigned short port)
 {
-    StopServer();
+    if (IsServerRunning())
+        return true;
     
-    ENetAddress server;
-    server.host = ENET_HOST_ANY;
-    server.port = port;
-    
-    serverHost_ = enet_host_create(&server, serverMaxConnections_, numChannels_, dataInBps_, dataOutBps_);
-    if (serverHost_)
-        enet_host_compress_with_range_coder(serverHost_);
+    /// \todo Investigate why server fails to restart after stopping when false is specified for reuse
+    if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
+    {
+        LOGINFO("Started server on port " + String(port));
+        return true;
+    }
     else
     {
         LOGERROR("Failed to start server on port " + String(port));
         return false;
     }
-    
-
-    LOGINFO("Started server on port " + String(port));
-    return true;
-}
-
-Peer* Network::Connect(const String& address, unsigned short port)
-{
-    // Create client host if one did not exist already
-    if (!clientHost_)
-    {
-        clientHost_ = enet_host_create(0, clientMaxConnections_, numChannels_, dataInBps_, dataOutBps_);
-        if (clientHost_)
-            enet_host_compress_with_range_coder(clientHost_);
-        else
-        {
-            LOGERROR("Failed to create client host");
-            return 0;
-        }
-    }
-    
-    // Attempt to connect
-    ENetAddress server;
-    enet_address_set_host(&server, address.CString());
-    server.port = port;
-    ENetPeer* enetPeer = enet_host_connect(clientHost_, &server, numChannels_, 0);
-    if (!enetPeer)
-    {
-        LOGERROR("No available network connections");
-        return 0;
-    }
-    
-    // Create a Peer instance for the server
-    SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_SERVER));
-    enetPeer->data = newPeer.Ptr();
-    peers_.Push(newPeer);
-    
-    LOGINFO("Connecting to " + address + ":" + String(port));
-    return newPeer;
-}
-
-void Network::Broadcast(const void* data, unsigned size, unsigned char channel, bool reliable, bool inOrder)
-{
-    if (!serverHost_)
-    {
-        LOGERROR("No server running, can not broadcast");
-        return;
-    }
-    
-    if (!data || !size)
-        return;
-    
-    ENetPacket* enetPacket = enet_packet_create(data, size, reliable ? ENET_PACKET_FLAG_RELIABLE : (inOrder ? 0 :
-        ENET_PACKET_FLAG_UNSEQUENCED));
-    
-    enet_host_broadcast(serverHost_, channel, enetPacket);
-}
-
-
-void Network::Broadcast(const VectorBuffer& packet, unsigned char channel, bool reliable, bool inOrder)
-{
-    if (!serverHost_)
-    {
-        LOGERROR("No server running, can not broadcast");
-        return;
-    }
-    
-    if (!packet.GetSize())
-        return;
-    
-    ENetPacket* enetPacket = enet_packet_create(packet.GetData(), packet.GetSize(), reliable ? ENET_PACKET_FLAG_RELIABLE :
-        (inOrder ? 0 : ENET_PACKET_FLAG_UNSEQUENCED));
-    
-    enet_host_broadcast(serverHost_, channel, enetPacket);
 }
 
 void Network::StopServer()
 {
-    if (serverHost_)
+    if (IsServerRunning())
     {
-        // Disconnect all peers created through the server host
-        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
-        {
-            if ((*i)->GetPeerType() == PEER_CLIENT)
-                (*i)->Disconnect();
-        }
-        
-        // Update once more, so that disconnect packet (maybe) goes to clients
-        Update(serverHost_);
-        
-        // Then perform forcible disconnection
-        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
-        {
-            if ((*i)->GetPeerType() == PEER_CLIENT)
-                (*i)->OnDisconnect();
-        }
-        
-        enet_host_destroy(serverHost_);
-        serverHost_ = 0;
-        
+        clientConnections_.Clear();
+        network_->StopServer();
         LOGINFO("Stopped server");
     }
 }
 
-void Network::StopClient()
+Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    if (clientHost_)
-    {
-        // Disconnect all peers created through the client host
-        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
-        {
-            if ((*i)->GetPeerType() == PEER_SERVER)
-                (*i)->Disconnect();
-        }
-        
-        // Update once more, so that disconnect packet (maybe) goes to server
-        Update(clientHost_);
-        
-        // Then perform forcible disconnection
-        for (Vector<SharedPtr<Peer> >::Iterator i = peers_.Begin(); i != peers_.End(); ++i)
-        {
-            if ((*i)->GetPeerType() == PEER_SERVER)
-                (*i)->OnDisconnect();
-        }
-        
-        enet_host_destroy(clientHost_);
-        clientHost_ = 0;
-        
-        LOGINFO("Stopped client");
-    }
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    if (i != clientConnections_.End())
+        return i->second_;
+    else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
+        return serverConnection_;
+    else
+        return 0;
 }
 
-Peer* Network::GetPeer(unsigned index) const
+Connection* Network::GetServerConnection() const
 {
-    return index < peers_.Size() ? peers_[index] : (Peer*)0;
+    return serverConnection_;
 }
 
-Peer* Network::GetServerPeer() const
+bool Network::IsServerRunning() const
 {
-    // Just return the first server peer
-    for (Vector<SharedPtr<Peer> >::ConstIterator i = peers_.Begin(); i != peers_.End(); ++i)
+    return network_->GetServer();
+}
+
+void Network::Update()
+{
+    // Process server connection if it exists
+    if (serverConnection_)
     {
-        if ((*i)->GetPeerType() == PEER_SERVER)
-            return *i;
+        serverConnection_->GetMessageConnection()->Process();
+        
+        // Check for connection/disconnection
+        kNet::ConnectionState state = serverConnection_->GetConnectionState();
+        if (serverConnection_->IsConnectPending() && state == kNet::ConnectionOK)
+            ServerConnected();
+        else if (state == kNet::ConnectionPeerClosed)
+            serverConnection_->Disconnect(0);
+        else if (state == kNet::ConnectionClosed)
+            ServerDisconnected();
     }
     
-    return 0;
+    // Process client connections if the server has been started
+    kNet::NetworkServer* server = network_->GetServer();
+    if (server)
+        server->Process();
 }
 
-void Network::Update(ENetHost* enetHost)
+void Network::ServerConnected()
 {
-    ENetEvent enetEvent;
-    ENetPeer* enetPeer;
-    Peer* peer;
-    
-    while (enet_host_service(enetHost, &enetEvent, 0) > 0)
+    serverConnection_->connectPending_ = false;
+    LOGINFO("Connected to server " + serverConnection_->ToString());
+    SendEvent(E_SERVERCONNECTED);
+}
+
+void Network::ServerDisconnected()
+{
+    // Differentiate between failed connection, and disconnection
+    bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
+    if (!failedConnect)
     {
-        enetPeer = enetEvent.peer;
-        peer = static_cast<Peer*>(enetPeer->data);
-        
-        switch (enetEvent.type)
-        {
-        case ENET_EVENT_TYPE_CONNECT:
-            if (!peer)
-            {
-                // If no existing Peer instance (server operation), create one now
-                SharedPtr<Peer> newPeer(new Peer(context_, enetPeer, PEER_CLIENT));
-                enetPeer->data = newPeer.Ptr();
-                peers_.Push(newPeer);
-                newPeer->OnConnect();
-            }
-            else
-                peer->OnConnect();
-            break;
-            
-        case ENET_EVENT_TYPE_RECEIVE:
-            if (peer)
-            {
-                // queue the packet
-                QueuedPacket newPacket;
-                newPacket.packet_ = enetEvent.packet;
-                newPacket.channel_ = enetEvent.channelID;
-                peer->packets_[enetEvent.channelID].Push(newPacket);
-            }
-            else
-                enet_packet_destroy(enetEvent.packet);
-            break;
-            
-        case ENET_EVENT_TYPE_DISCONNECT:
-            if (peer)
-            {
-                peer->OnDisconnect();
-                enetPeer->data = 0;
-            }
-            break;
-        }
+        SendEvent(E_SERVERDISCONNECTED);
+        LOGINFO("Disconnected from server");
     }
+    else
+    {
+        SendEvent(E_SERVERCONNECTFAILED);
+        LOGERROR("Failed to connect to " + serverConnection_->ToString());
+    }
+    
+    serverConnection_.Reset();
 }
 
 void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

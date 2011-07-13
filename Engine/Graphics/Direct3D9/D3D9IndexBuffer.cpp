@@ -162,7 +162,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         }
     }
     else
-        hwData = fallbackData_.Ptr() + start * indexSize_;
+        hwData = fallbackData_.RawPtr() + start * indexSize_;
     
     locked_ = true;
     return hwData;

@@ -57,7 +57,7 @@ void IndexBuffer::OnDeviceLost()
         if (hwData)
         {
             saveData_ = new unsigned char[indexCount_ * indexSize_];
-            memcpy(saveData_.Ptr(), hwData, indexCount_ * indexSize_);
+            memcpy(saveData_.RawPtr(), hwData, indexCount_ * indexSize_);
         }
         Unlock();
         Release();
@@ -71,7 +71,7 @@ void IndexBuffer::OnDeviceReset()
         Create();
         if (saveData_)
         {
-            SetData(saveData_.Ptr());
+            SetData(saveData_.RawPtr());
             saveData_.Reset();
         }
     }
@@ -122,7 +122,7 @@ bool IndexBuffer::SetData(const void* data)
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.Ptr(), data, indexCount_ * indexSize_);
+        memcpy(fallbackData_.RawPtr(), data, indexCount_ * indexSize_);
         return true;
     }
     
@@ -154,7 +154,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.Ptr() + start * indexSize_, data, indexCount_ * indexSize_);
+        memcpy(fallbackData_.RawPtr() + start * indexSize_, data, indexCount_ * indexSize_);
         return true;
     }
     
@@ -198,7 +198,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         hwData = (unsigned char*)hwData + start * indexSize_;
     }
     else
-        hwData = fallbackData_.Ptr() + start * indexSize_;
+        hwData = fallbackData_.RawPtr() + start * indexSize_;
     
     locked_ = true;
     return hwData;

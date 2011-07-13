@@ -71,7 +71,7 @@ public:
     void FreeDecoder(void* Decoder);
     
     /// Return sound data start
-    signed char* GetStart() const { return data_.Ptr(); }
+    signed char* GetStart() const { return data_.RawPtr(); }
     /// Return loop start
     signed char* GetRepeat() const { return repeat_; }
     /// Return sound data end

@@ -25,7 +25,6 @@
 #include "APITemplates.h"
 #include "Controls.h"
 #include "Network.h"
-#include "Peer.h"
 
 static void ConstructControls(Controls* ptr)
 {
@@ -59,39 +58,19 @@ static void RegisterControls(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Controls", "VariantMap extraData", offsetof(Controls, extraData_));
 }
 
-void RegisterPeer(asIScriptEngine* engine)
+static void RegisterConnection(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint8 CHANNEL_ANY", (void*)&CHANNEL_ANY);
+    RegisterObject<Connection>(engine, "Connection");
+    engine->RegisterObjectMethod("Connection", "void SendMessage(int, bool, bool, const VectorBuffer& in)", asMETHODPR(Connection, SendMessage, (int, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void Disconnect(int waitMSec = 0)", asMETHOD(Connection, Disconnect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "String ToString() const", asMETHOD(Connection, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_connected() const", asMETHOD(Connection, IsConnected), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_connectPending() const", asMETHOD(Connection, IsConnectPending), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     
-    engine->RegisterEnum("PeerType");
-    engine->RegisterEnumValue("PeerType", "PEER_SERVER", PEER_SERVER);
-    engine->RegisterEnumValue("PeerType", "PEER_CLIENT", PEER_CLIENT);
-    
-    engine->RegisterEnum("ConnectionState");
-    engine->RegisterEnumValue("ConnectionState", "CS_DISCONNECTED", CS_DISCONNECTED);
-    engine->RegisterEnumValue("ConnectionState", "CS_DISCONNECTING", CS_DISCONNECTING);
-    engine->RegisterEnumValue("ConnectionState", "CS_CONNECTING", CS_CONNECTING);
-    engine->RegisterEnumValue("ConnectionState", "CS_CONNECTED", CS_CONNECTED);
-    
-    RegisterObject<Peer>(engine, "Peer");
-    engine->RegisterObjectMethod("Peer", "void Send(const VectorBuffer&in, uint8, bool, bool)", asMETHODPR(Peer, Send, (const VectorBuffer&, unsigned char, bool, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "bool Receive(VectorBuffer&, uint8)", asMETHOD(Peer, Receive), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "void FlushPackets()", asMETHOD(Peer, FlushPackets), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "bool HasPackets() const", asMETHOD(Peer, HasPackets), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "void Disconnect()", asMETHOD(Peer, Disconnect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "void ForceDisconnect()", asMETHOD(Peer, ForceDisconnect), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "void set_simulatedPacketLoss(float)", asMETHOD(Peer, SetSimulatedPacketLoss), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "float get_simulatedPacketLoss() const", asMETHOD(Peer, GetSimulatedPacketLoss), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "void set_simulatedLatency(uint)", asMETHOD(Peer, SetSimulatedLatency), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "uint get_simulatedLatency() const" ,asMETHOD(Peer, GetSimulatedLatency), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "PeerType get_peerType() const", asMETHOD(Peer, GetPeerType), asCALL_THISCALL),
-    engine->RegisterObjectMethod("Peer", "ConnectionState get_connectionState() const", asMETHOD(Peer, GetConnectionState), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "uint get_numPackets() const", asMETHOD(Peer, GetNumPackets), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "const String& get_address() const", asMETHOD(Peer, GetAddress), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Peer", "uint16 get_port() const", asMETHOD(Peer, GetPort), asCALL_THISCALL);
-    
-    // Register Variant Ptr() for Peer
-    engine->RegisterObjectMethod("Variant", "Peer@+ GetPeer() const", asFUNCTION(GetVariantPtr<Peer>), asCALL_CDECL_OBJLAST);
+    // Register Variant GetPtr() for UIElement
+    engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
 }
 
 static Network* GetNetwork()
@@ -99,34 +78,50 @@ static Network* GetNetwork()
     return GetScriptContext()->GetSubsystem<Network>();
 }
 
+static CScriptArray* NetworkGetClientConnections(Network* ptr)
+{
+    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> >& connections = ptr->GetClientConnections();
+    
+    asIScriptContext *context = asGetActiveContext();
+    if (context)
+    {
+        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType("Array<Connection@>");
+        CScriptArray* arr = new CScriptArray(connections.Size(), type);
+        
+        unsigned index = 0;
+        for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = connections.Begin();
+            i != connections.End(); ++i)
+        {
+            // Increment reference count for storing in the array
+            const SharedPtr<Connection>& connection = i->second_;
+            if (connection)
+                connection->AddRef();
+            *(static_cast<Connection**>(arr->At(index))) = connection;
+            ++index;
+        }
+        
+        return arr;
+    }
+    else
+        return 0;
+}
+
 void RegisterNetwork(asIScriptEngine* engine)
 {
     RegisterObject<Network>(engine, "Network");
-    engine->RegisterObjectMethod("Network", "void SetDataRate(int, int)", asMETHOD(Network, SetDataRate), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL),
-    engine->RegisterObjectMethod("Network", "Peer@+ Connect(const String&in, uint16)", asMETHOD(Network, Connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool Connect(const String& in, uint16)", asMETHOD(Network, Connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void StopClient()", asMETHOD(Network, StopClient), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void Broadcast(const VectorBuffer&in, uint8, bool, bool)", asMETHODPR(Network, Broadcast, (const VectorBuffer&, unsigned char, bool ,bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void set_serverMaxConnections(uint)", asMETHOD(Network, SetServerMaxConnections), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "uint get_serverMaxConnections() const", asMETHOD(Network, GetServerMaxConnections), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void set_clientMaxConnections(uint)", asMETHOD(Network, SetClientMaxConnections), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "uint get_clientMaxConnections() const", asMETHOD(Network, GetClientMaxConnections), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void set_numChannels(uint)", asMETHOD(Network, SetNumChannels), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "uint get_numChannels() const", asMETHOD(Network, GetNumChannels), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "bool get_serverStarted() const", asMETHOD(Network, IsServer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "bool get_clientStarted() const", asMETHOD(Network, IsClient), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "uint get_numPeers() const", asMETHOD(Network, GetNumPeers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "int get_dataRateIn() const", asMETHOD(Network, GetDataRateIn), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "int get_dataRateOut() const", asMETHOD(Network, GetDataRateOut), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "Peer@+ get_peers(uint) const", asMETHOD(Network, GetPeer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "Peer@+ get_serverPeer() const", asMETHOD(Network, GetServerPeer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "Connection@+ get_serverConnection() const", asMETHOD(Network, GetServerConnection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "Array<Connection@>@ get_clientConnections() const", asFUNCTION(NetworkGetClientConnections), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("Network@+ get_network()", asFUNCTION(GetNetwork), asCALL_CDECL);
 }
 
 void RegisterNetworkAPI(asIScriptEngine* engine)
 {
     RegisterControls(engine);
-    RegisterPeer(engine);
+    RegisterConnection(engine);
     RegisterNetwork(engine);
 }

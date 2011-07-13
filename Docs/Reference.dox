@@ -978,18 +978,9 @@ The attribute system also supports editing by providing human-readable names.
 
 \page Network Networking
 
-The Network library provides reliable and unreliable UDP messaging using ENet. A server can be created that listens for incoming connections, and client connections can be made to server(s).
+The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to server(s).
 
-Packets are sent using a fixed number of channels (4 by default); packet order is guaranteed within each channel. If received out-of-order, reliable packets will be stalled until all in a sequence have been received, while older unreliable packets will simply be dropped if a newer packet has already been received. There is also an option to send unsequenced unreliable packets.
-
-Note that by default the Network library itself does not care of what is being sent (low-level networking.) The high-level networking protocol for multiplayer currently needs reimplementation.
-
-Outgoing packets are queued by calling \ref Peer::Send "Send()" on the networking peer. Packets can be received from networking peers by calling \ref Peer::Receive "Receive()". Events will be sent to notify of peer connections and disconnections, see NetworkEvents.h for the event definitions:
-
-  * E_PEERCONNECTED
-  * E_PEERDISCONNECTED
-
-All network packets are compressed using ENet's built-in compression.
+Currently under construction!
 
 
 \page Tools Tools

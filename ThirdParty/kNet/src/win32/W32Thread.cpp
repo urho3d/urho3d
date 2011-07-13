@@ -1,0 +1,220 @@
+/* Copyright 2010 Jukka Jylänki
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License. */
+
+/** @file W32Thread.cpp
+	@brief */
+
+// Modified by Lasse Öörni for Urho3D
+
+#include <cassert>
+#include <exception>
+
+#include "kNet/Thread.h"
+#include "kNet/NetworkLogging.h"
+#include "kNet/Clock.h"
+#include "kNet/NetException.h"
+#include "kNet/Network.h"
+
+#include "kNet/DebugMemoryLeakCheck.h"
+
+namespace kNet
+{
+
+Thread::Thread()
+:threadHandle(NULL),
+threadEnabled(false),
+invoker(0)
+{
+}
+
+Thread::~Thread()
+{
+	Stop();
+	delete invoker;
+}
+
+bool Thread::ShouldQuit() const { return threadHandle == NULL || threadEnabled == false; }
+
+bool Thread::IsRunning() const
+{ 
+	if (threadHandle == NULL)
+		return false;
+
+	DWORD exitCode = 0;
+	BOOL result = GetExitCodeThread(threadHandle, &exitCode);
+
+	if (result == 0)
+	{
+		LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::IsRunning!", GetLastError());
+		return false;
+	}
+
+	return exitCode == STILL_ACTIVE;
+}
+
+void Thread::Stop()
+{
+	// Signal that the thread should quit now.
+	threadEnabled = false;
+
+	if (threadHandle == NULL)
+	{
+		threadHoldEvent.Close();
+		threadHoldEventAcked.Close();
+		threadResumeEvent.Close();
+
+		delete invoker;
+		invoker = 0;
+		return;
+	}
+
+	kNet::Clock::Sleep(10);
+	assert(threadHandle != 0);
+
+	int numTries = 100;
+	while(numTries-- > 0)
+	{
+		DWORD exitCode = 0;
+		BOOL result = GetExitCodeThread(threadHandle, &exitCode);
+
+		if (result == 0)
+		{
+			LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::Stop()!", GetLastError());
+			break;
+		}
+		else if (exitCode != STILL_ACTIVE)
+		{
+			CloseHandle(threadHandle);
+			break;
+		}
+		kNet::Clock::Sleep(50);
+	}
+
+	if (threadHandle != NULL)
+	{
+		TerminateThread(threadHandle, -1);
+//		CloseHandle(threadHandle);
+		LOG(LogError, "Warning: Had to forcibly terminate thread!");
+	}
+
+	LOG(LogInfo, "Thread::Stop() called.");
+
+	threadHandle = NULL;
+
+	delete invoker;
+	invoker = 0;
+
+	threadHoldEvent.Close();
+	threadHoldEventAcked.Close();
+	threadResumeEvent.Close();
+}
+
+DWORD WINAPI ThreadEntryPoint(LPVOID lpParameter)
+{
+	LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%08X.", lpParameter);
+
+	Thread *thread = reinterpret_cast<Thread*>(lpParameter);
+	if (!thread)
+	{
+		LOG(LogError, "Invalid thread start parameter 0!");
+		return -1;
+	}
+	thread->_ThreadRun();
+
+	return 0;
+}
+
+void Thread::_ThreadRun()
+{
+	try
+	{
+		if (!threadEnabled)
+		{
+			LOG(LogError, "ThreadEntryPoint: Thread immediately requested to quit.");
+			return;
+		}
+
+		invoker->Invoke();
+	} catch(NetException &e)
+	{
+		LOG(LogError, "NetException thrown in thread: %s.", e.what());
+	} catch(std::exception &e)
+	{
+		LOG(LogError, "std::exception thrown in thread: %s.", e.what());
+	} catch(...)
+	{
+		LOG(LogError, "Unknown exception thrown in thread.");
+	}
+}
+
+void Thread::StartThread()
+{
+	if (threadHandle != NULL)
+		return;
+
+	threadHoldEvent = CreateNewEvent(EventWaitSignal);
+	threadHoldEventAcked = CreateNewEvent(EventWaitSignal);
+	threadResumeEvent = CreateNewEvent(EventWaitSignal);
+
+	threadEnabled = true;
+	threadHandle = CreateThread(NULL, 0, ThreadEntryPoint, this, 0, NULL);
+	if (threadHandle == NULL)
+		throw NetException("Failed to create thread!");
+	else
+		LOG(LogInfo, "Thread::Run(): Thread created.");
+
+    SetName("kNet Thread");
+}
+
+void Thread::Sleep(int msecs)
+{
+	///\todo Allow interruption between sleep.
+	Clock::Sleep(msecs);
+}
+
+ThreadId Thread::Id()
+{
+	if (threadHandle == NULL)
+		return NullThreadId();
+
+    // Urho3D: if thread ID's can not be supported, return always null
+    #ifdef KNET_ENABLE_WINXP_SUPPORT
+	return NullThreadId();
+    #else
+    ThreadId id = GetThreadId(threadHandle);
+	if (id == 0)
+	{
+		LOG(LogError, "Thread::Id failed: %s!", Network::GetLastErrorString().c_str());
+		return NullThreadId();
+	}
+	return id;
+    #endif
+}
+
+ThreadId Thread::CurrentThreadId()
+{
+    // Urho3D: if thread ID's can not be supported, return always null
+    #ifdef KNET_ENABLE_WINXP_SUPPORT
+    return NullThreadId();
+    #else
+	return GetCurrentThreadId();
+    #endif
+}
+
+ThreadId Thread::NullThreadId()
+{
+	return 0;
+}
+
+} // ~kNet

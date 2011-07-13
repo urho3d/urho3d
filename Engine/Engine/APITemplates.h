@@ -153,9 +153,9 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<Share
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i].Ptr())
+            if (vector[i])
                 vector[i]->AddRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i].Ptr();
+            *(static_cast<T**>(arr->At(i))) = vector[i].RawPtr();
         }
         
         return arr;
@@ -442,7 +442,7 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
         return 0;
     }
     else
-        return children[index].Ptr();
+        return children[index].RawPtr();
 }
 
 static CScriptArray* NodeGetChildrenWithScript(bool recursive, Node* ptr)
@@ -466,7 +466,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
         {
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
-                ScriptInstance* instance = static_cast<ScriptInstance*>(j->Ptr());
+                ScriptInstance* instance = static_cast<ScriptInstance*>(j->RawPtr());
                 if (instance->GetClassName() == className)
                     ret.Push(node);
             }
@@ -668,7 +668,6 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void SetSize(int, int)", asMETHODPR(T, SetSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetMinSize(int, int)", asMETHODPR(T, SetMinSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetMaxSize(int, int)", asMETHODPR(T, SetMaxSize, (int, int), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetFixedSize(const IntVector2&in)", asMETHODPR(T, SetFixedSize, (const IntVector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedSize(int, int)", asMETHODPR(T, SetFixedSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedWidth(int)", asMETHOD(T, SetFixedWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedHeight(int)", asMETHOD(T, SetFixedHeight), asCALL_THISCALL);
@@ -744,7 +743,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "FocusMode get_focusMode() const", asMETHOD(T, GetFocusMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_dragDropMode(uint)", asMETHOD(T, SetDragDropMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_dragDropMode() const", asMETHOD(T, GetDragDropMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_layoutMode()", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_layoutMode(LayoutMode)", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "LayoutMode get_layoutMode() const", asMETHOD(T, GetLayoutMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_layoutSpacing(int)", asMETHOD(T, SetLayoutSpacing), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);

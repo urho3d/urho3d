@@ -102,7 +102,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "PhysicsWorld@+ get_physicsWorld() const", asFUNCTION(SceneGetPhysicsWorld), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("PhysicsWorld@+ get_physicsWorld()", asFUNCTION(GetPhysicsWorld), asCALL_CDECL);
     
-    // Register Variant Ptr() for PhysicsWorld
+    // Register Variant GetPtr() for PhysicsWorld
     engine->RegisterObjectMethod("Variant", "PhysicsWorld@+ GetPhysicsWorld() const", asFUNCTION(GetVariantPtr<PhysicsWorld>), asCALL_CDECL_OBJLAST);
 }
 
@@ -143,7 +143,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void set_bounce(float)", asMETHOD(CollisionShape, SetBounce), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "float get_bounce()", asMETHOD(CollisionShape, GetBounce), asCALL_THISCALL);
     
-    // Register Variant Ptr() for CollisionShape
+    // Register Variant GetPtr() for CollisionShape
     engine->RegisterObjectMethod("Variant", "CollisionShape@+ GetCollisionShape() const", asFUNCTION(GetVariantPtr<CollisionShape>), asCALL_CDECL_OBJLAST);
 }
 
@@ -182,7 +182,7 @@ static void RegisterRigidBody(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody", "void set_angularDampingScale(float)", asMETHOD(RigidBody, SetAngularDampingScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody", "float get_angularDampingScale() const", asMETHOD(RigidBody, GetAngularDampingScale), asCALL_THISCALL);
     
-    // Register Variant Ptr() for RigidBody
+    // Register Variant GetPtr() for RigidBody
     engine->RegisterObjectMethod("Variant", "RigidBody@+ GetRigidBody() const", asFUNCTION(GetVariantPtr<RigidBody>), asCALL_CDECL_OBJLAST);
 }
 

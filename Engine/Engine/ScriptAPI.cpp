@@ -54,7 +54,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Ptr());
+            ScriptInstance* instance = static_cast<ScriptInstance*>(i->RawPtr());
             asIScriptObject* object = instance->GetScriptObject();
             if (!object)
             {
@@ -91,7 +91,7 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Ptr());
+            ScriptInstance* instance = static_cast<ScriptInstance*>(i->RawPtr());
             asIScriptObject* object = instance->GetScriptObject();
             if (object)
                 return object;
@@ -108,7 +108,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Ptr());
+            ScriptInstance* instance = static_cast<ScriptInstance*>(i->RawPtr());
             if (instance->GetClassName() == className)
             {
                 asIScriptObject* object = instance->GetScriptObject();

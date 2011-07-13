@@ -303,8 +303,8 @@ void Texture::LoadParameters(XMLFile* file)
     if (!file)
         return;
     
-    XMLElement rootElem = file->GetRootElement();
-    XMLElement paramElem = rootElem.GetChildElement("");
+    XMLElement rootElem = file->GetRoot();
+    XMLElement paramElem = rootElem.GetChild("");
     
     while (paramElem)
     {
@@ -352,7 +352,7 @@ void Texture::LoadParameters(XMLFile* file)
             }
         }
         
-        paramElem = paramElem.GetNextElement();
+        paramElem = paramElem.GetNext();
     }
 }
 

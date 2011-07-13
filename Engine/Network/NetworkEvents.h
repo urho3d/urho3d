@@ -25,14 +25,37 @@
 
 #include "Object.h"
 
-/// Network peer connected
-EVENT(E_PEERCONNECTED, PeerConnected)
+/// Server connection established
+EVENT(E_SERVERCONNECTED, ServerConnected)
 {
-    PARAM(P_PEER, Peer);                  // Peer pointer
 }
 
-/// Network peer disconnected
-EVENT(E_PEERDISCONNECTED, PeerDisconnected)
+/// Server connection disconnected
+EVENT(E_SERVERDISCONNECTED, ServerDisconnected)
 {
-    PARAM(P_PEER, Peer);                  // Peer pointer
+}
+
+/// Server connection failed
+EVENT(E_SERVERCONNECTFAILED, ServerConnectFailed)
+{
+}
+
+/// New client connection established
+EVENT(E_CLIENTCONNECTED, ClientConnected)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+}
+
+/// Client connection disconnected
+EVENT(E_CLIENTDISCONNECTED, ClientDisconnected)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+}
+
+/// Network message received
+EVENT(E_NETWORKMESSAGE, NetworkMessage)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    PARAM(P_MESSAGEID, MessageID);        // int
+    PARAM(P_DATA, Data);                  // Buffer
 }

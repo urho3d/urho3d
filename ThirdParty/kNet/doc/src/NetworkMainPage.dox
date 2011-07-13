@@ -1,0 +1,101 @@
+/**
+ \mainpage
+
+<div style="color: darkgray; font-size:50%; ">Document version 2.5 <br />2011/02/02</div> 
+  kNet is a connection-oriented network protocol for transmitting arbitrary application-specific messages between network hosts. It is designed primarily for applications that require a method for rapid space-efficient real-time communication. 
+
+kNet consists of two major specifications. At a lower level, the <b>Transport-level specification</b> defines methods like:
+<ul>
+<li>How a session is initialized, maintained and shut down.</li>
+<li>How data bytes are transferred between hosts.</li>
+<li>How reliable messages, data ordering requirements and large transfers are handled.</li>
+<li>How flow management and congestion control may be performed.</li>
+</ul>
+
+Building on top of that, the <b>Application-level specification</b>, along with a reference C++ implementation, offers most notably the following features:
+<ul>
+<li>How to describe your own application-level protocol sets and their transmission parameters.</li>
+<li>How to model message dependencies and prioritization.</li>
+<li>How to perform content-based late data replacement.</li>
+<li>How to perform data serialization.</li>
+</ul>
+  
+These two specifications and the reference implementation form a complete base on which to build a networking server+client application. Alternatively, only the Transport-level specification can be used, while replacing the application-level features with a different model. The implementation exposes the library that it uses internally for data serialization, but it is possible to use any other solution as well. There are plenty of choices available: <a href="http://www.boost.org/doc/libs/1_41_0/libs/serialization/doc/index.html">boost serialization</a>,
+<a href="http://codesynthesis.com/products/xsd/">CodeSynthesis XSD</a>,
+<a href="http://www.enlightenment.org/p.php?p=about/efl/eet&l=en">Eet</a>,
+<a href="http://gsoap2.sourceforge.net/">gSOAP, 
+<a href="http://msdn.microsoft.com/en-us/library/6bz744w8.aspx">MFC</a>,
+<a href="http://code.google.com/p/protobuf/">Google protobuf</a>,
+<a href="http://doc.trolltech.com/4.6/qdatastream.html">Qt QDataStream</a>,
+<a href="http://s11n.net/">s11n</a>,
+<a href="http://www.appinf.com/docs/poco/Poco.Remoting.Binary.Serializer.html">Poco Serializer</a>,
+<a href="http://www.sweetsoftware.co.nz/persist_overview.php">Sweet Persist</a>,
+<a href="http://tpl.sourceforge.net/">tpl</a>,
+<a href="http://www.ncbi.nlm.nih.gov/bookshelf/br.fcgi?book=toolkit&part=ch_ser">xserial</a>,
+<a href="http://code.google.com/p/yaml-cpp/">yaml-cpp</a>,
+or integrate <a href="http://www.parashift.com/c++-faq-lite/serialization.html">your own</a>.
+ 
+This documentation was generated as a part of the C++ reference implementation of the protocol. More information can be found in the following topic pages.  
+ 
+<table>
+<tr>
+<td><b>Transport-level specification</b></td>
+<td><b>Application-level specification</b></td>
+<td><b>C++ reference implementation and examples</b></td></tr>
+<tr>
+<td valign="top">
+<ul style="padding-left: 10px; padding-top: 0px; margin-top: 0px;">
+<li>\ref KristalliUDP ""</li>
+<li>\ref KristalliTCP ""</li>
+</ul>
+</td>
+<td valign="top">
+<ul style="padding-left: 10px; padding-top: 0px; margin-top: 0px;">
+<li> \ref KristalliMessage ""</li>
+<li> \ref KristalliXML ""</li>
+</ul>
+</td>
+<td valign="top">
+<ul style="padding-left: 10px; padding-top: 0px; margin-top: 0px;">
+<li>\ref ImplementationOverview ""</li>
+<li>\ref kNetServer ""</li>
+<li>\ref kNetClient ""</li>
+<li>\ref ImmediateModeSerialization ""</li>
+<li>\ref DeclarativeModeSerialization ""</li>
+</td>
+</tr>
+</table>
+
+<!--
+
+The following samples demonstrate the applicability of the protocol for different purposes.
+
+TODO:
+
+-->
+The following samples demonstrate how to use the protocol library.
+
+<div style="background-color: #B0F0B0; padding: 5px; border: solid 1px black;">
+<b>Code Samples</b>
+<br />
+<table style="border: 0px;">
+<tr><td style="border: 0px;"><b>SimpleChat</b></td><td style="border: 0px;">A simple example of client<->server message passing.</td></tr>
+<tr><td style="border: 0px;"><b>GroupChatServer</b></td><td style="border: 0px;">Implements a multi-user chat server that broadcasts messages between each participant.</td></tr>
+<tr><td style="border: 0px;"><b>GroupChatClient</b></td><td style="border: 0px;">Implements a multi-user chat client.</td></tr>
+<tr><td style="border: 0px;"><b>ConnectFlood</b></td><td style="border: 0px;">Stress tests a server by hammering it with several simultaneous connections.</td></tr>
+<tr><td style="border: 0px;">\ref LatencyTestSample "LatencyTest"</td><td style="border: 0px;">Measures the network latency between two hosts.</td></tr>
+<tr><td style="border: 0px;">\ref SpeedTestSample "SpeedTest"</td><td style="border: 0px;">Measures the network bandwidth from one host to another.</td></tr>
+<tr><td style="border: 0px;">\ref FileTransferSample "FileTransfer"</td><td style="border: 0px;">A command-line utility to copy files from one host to another.</td></tr>
+<tr><td style="border: 0px;">\ref SerializationStructCompilerSampleSec "MessageCompiler"</td><td style="border: 0px;">A command-line tool to generate C++ headers out of protocol message XML description files.</td></tr>
+<tr><td style="border: 0px;"><b>TwoStreams</b></td><td style="border: 0px;">Mix lossy high priority message streaming with low priority background data transfer.</td></tr>
+<tr><td style="border: 0px;"><b>PoorNetwork</b></td><td style="border: 0px;">Asserts that message ordering and reliability work in lossy and jittery network conditions.</td></tr>
+<tr><td style="border: 0px;"><b>SpeexVoip</b></td><td style="border: 0px;">Shows how to use speex to implement voice communication for multiple users.</td></tr>
+<tr><td style="border: 0px;"><b>TrashTalk</b></td><td style="border: 0px;">A client/server that floods the peer with random data.</td></tr>
+</table>
+</div>
+
+\section DownloadLinks Download
+
+Downloadable prebuilt packages of the library or the samples are not yet available. The official source repository of kNet is hosted at https://bitbucket.org/clb/knet/ . 
+
+*/

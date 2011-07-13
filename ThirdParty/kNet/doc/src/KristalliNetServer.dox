@@ -1,0 +1,104 @@
+/**
+
+\page kNetServer Implementing a kNet Server
+
+\section kNetServerSec Implementing a kNet Server
+
+To write a server for kNet, proceed through the following steps:
+<ol>
+<li>#include "kNet.h". Make sure this #include is positioned before #include <windows.h>, or alternatively add a project-wide #define _WINSOCKAPI_. See \ref WS2Include.h "" for more details.</li>
+<li>Instantiate a \ref kNet::Network "Network" object. Make sure this object stays alive for the duration that the server is running.</li>
+<li>Define a class that implements the \ref kNet::INetworkServerListener "INetworkServerListener" interface. See the chapter \ref kNetServerListener "" for more details.</li>
+<li>Start listening for inbound connections by calling \ref kNet::Network::StartServer "Network::StartServer". This method returns a newly created \ref kNet::NetworkServer "NetworkServer" object, which will be used to manage all server-related operations.</li>
+<li>a) <b>Polled mode:</b> Perform processing in your main server loop, and periodically call \ref kNet::NetworkServer::ProcessMessages "NetworkServer::ProcessMessages" to manage new connection attempts and to receive new data from the client.
+<br />
+b) <b>Event mode:</b> Call \ref kNet::NetworkServer::RunModalServer "NetworkServer::RunModalServer" to have the server start its own event-based processing loop. It will notify about new connections through the listener object you registered when starting the server, until you shut down by calling \ref NetworkServer::StopModalServer "".</li>
+</ol>
+
+\section kNetServerListener The INetworkServerListener Methods
+
+The \ref kNet::INetworkServerListener "INetworkServerListener" interface is a callback that needs to be implemented in order to receive notifications from a running \ref NetworkServer "". There are three events that are sent by the server. 
+
+\note Do not call back to \ref kNet::NetworkServer::ProcessMessages "NetworkServer::ProcessMessages" from any of the member functions. This might cause an infinite recursion.  
+
+\subsection KristalliServerNewAttempt A New Connection Attempt
+
+The \ref kNet::INetworkServerListener::NewConnectionAttempt "INetworkServerListener::NewConnectionAttempt" method is invoked by the server when it operates in UDP mode and a ConnectSyn message is received from a new endpoint.
+
+The implementation of this method should parse the byte data contained in this message, and decide whether the new connection attempt should be accepted. If so, the method should return <i>true</i>. If <i>false</i> is returned the connection datagram is discarded.
+
+<span style="color: red;">The default implementation of this method is to accept all connection attempts</span>, so be sure to override this if you need to handle security.
+
+If the server operates in TCP mode, this method will never be called.
+ 
+\todo Describe non-stealth mode.
+
+\subsection KristalliServerNewConnection A Successful Connection
+
+The \ref kNet::INetworkServerListener::NewConnectionEstablished "INetworkServerListener::NewConnectionEstablished" method is invoked by the server when a new connection has successfully been established. This event is received in both TCP and UDP modes. 
+
+<b>The implementation of this method should at least register a connection listener object to the new connection by calling</b> \ref kNet::MessageConnection::RegisterInboundMessageHandler "MessageConnection::RegisterInboundMessageHandler". The implementation may also perform any application-specific logic necessary in response to this event (i.e. send a custom message through the connection or notify other clients about the new connection).
+
+The default implementation of this method does not do any processing. 
+
+\subsection KristalliServerDisconnection A Client Quits
+
+When a connection is shut down, either due to client or server disconnecting or because of the connection timing out, the \ref kNet::INetworkServerListener::ClientDisconnected "INetworkServerListener::ClientDisconnected" method is called. This event is received in both TCP and UDP modes. 
+
+This method is only provided for the convenience of the developer. There are no required steps to perform in response for this event.
+
+The default implementation is not to do anything. 
+
+\section KristalliServerHelloExample A Server Application Example
+
+<div>
+<b> HelloServer.cpp:</b> An example server that says "hello" to clients. See \ref KristalliClientHelloExample "" for the matching client code.
+
+\code
+
+#include "kNet.h"
+
+// Define a MessageID for our a custom message.
+const message_id_t cHelloMessageID = 10;
+
+// This object gets called for notifications on new network connection events.
+class ServerListener : public INetworkServerListener
+{
+public:
+   void NewConnectionEstablished(MessageConnection *connection)
+   {
+      // Start building a new message.
+      NetworkMessage &msg = connection->StartNewMessage(cHelloMessageID);
+      msg.reliable = true;
+      
+      // Create a DataSerializer object with a buffer of 256 bytes.
+      DataSerializer ds(msg.data, 256);
+      // Add a message string.
+      ds.AddString(std::string("Hello! You are connecting from ") + connection->GetEndPoint().ToString());
+      // Resize the buffer to the size we actually used.
+      msg.data.resize(ds.BytesFilled());
+      
+      // Push the message out to the client.
+      connection->EndAndQueueMessage(msg);
+   }
+};
+
+int main()
+{
+   Network network;
+   ServerListener listener;
+   
+   // Start listening on a port.
+   const unsigned short cServerPort = 1234;
+   NetworkServer *server = network.StartServer(cServerPort, SocketOverUDP, &listener);
+   
+   // Run the main server loop.
+   // This never returns since we don't call NetworkServer::Stop(), but for this example, it doesn't matter.  
+   server->RunModalServer();
+}
+
+\endcode
+
+</div>
+ 
+*/

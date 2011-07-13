@@ -1,0 +1,41 @@
+/**
+
+\page ImplementationOverview Overview of the C++ Implementation
+  
+\section ImplOverview Overview of the C++ Implementation
+  
+We have built a reference implementation of the protocol in C++ using the WinSock2 library. The code implements all the features of the specification described on the \ref mainpage "main page", as well as the following enhancements that are not part of the core specification itself:
+
+<ul>
+<li><b>Steady packet rate.</b> In many cases, application-generated bursted data transfer is problematic for routing resource use viewpoint. The reference implementation maintains a steady periodical (but dynamically adjusted) packet send rate to avoid issues with bursted transfers. </li>
+<li><b>Datagram usage minimization (UDP Only).</b> The implementation aims to minimize the number of datagrams that are sent. Unreliable messages are promoted to reliable messages if it results in sending fewer datagrams. The Steady packet rate feature provides a property similar to Nagle's algorithm, which accumulates data to larger datagrams to avoid lots of small datagrams to be sent out.</li>
+<li><b>Message prioritization (UDP Only).</b> Our implementation maintains a priority queue of outbound messages and chooses to transmit high priority messages first. This guarantees that if the bandwidth is too narrow to manage the immediate transfer of all messages, high priority messages are transmitted first (with low latency) and the remaining bandwidth is utilized for transmitting lower priority data. </li>
+<li><b>Multiple in-order data transfer channels (UDP Only).</b> The application can specify virtual channels for message transfer, and the messages are sent in-order inside each channel.</li>
+<li><b>Late data choice (UDP Only).</b> In real-time systems application state is updated periodically and new published messages often render previous messages of the same type obsolete. Upon having produced a new updated message, if we detect that the "older version" of that message did never reach the destination (and we are still waiting for it to be retransmitted), we may as well discard the old message and send the new updated message instead. This greatly improves resiliency against packet loss and jitter.   
+</li>
+</ul>
+
+\section CoreComponents Core Components
+
+The structure of kNet is presented in the diagram below.
+
+\image html kNetStructure.png
+
+The main interface to perform networking is the \ref kNet::Network "Network" class. It allows the user to initiate new client 
+connections or start up a server. The \ref kNet::MessageConnection "MessageConnection" class represents an active connection, 
+while the \ref kNet::NetworkServer "NetworkServer" class provides all the necessary functionality for maintaining a listen server 
+and multiple client connections.
+
+To receive data from a connection, implement the \ref kNet::IMessageHandler "IMessageHandler" interface. To receive notifications 
+about connection-related events on the server, implement the \ref kNet::INetworkServerListener "INetworkServerListener" interface.
+
+\subsection MessageWriting Reading and Writing Network Messages
+
+The \ref kNet::NetworkMessage "NetworkMessage" class is used to build outbound messages. It has accessible member fields that 
+correspond to the \ref KristalliMessage "" specification. To serialize data, use the \ref kNet::DataSerializer "DataSerializer" 
+utility class and to parse received message streams, use the \ref kNet::DataDeserializer "DataDeserializer" class. Read the page 
+\ref ImmediateModeSerialization "" for an example on how to work with these classes.
+
+Alternatively, avoid using immediate-mode serialization and manage the whole process automatically through serializable objects that are generated using the \ref kNet::SerializationStructCompiler "SerializationStructCompiler" class. For more details on this, see \ref DeclarativeModeSerialization "".
+
+*/

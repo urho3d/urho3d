@@ -1,0 +1,11 @@
+digraph ManyDependOnOne
+{
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      a [ label="Message A"];
+      b [ label="Message B"];
+      c [ label="Message C"];
+      d [ label="Message D"];
+      a -> b [ arrowhead="empty"];
+      a -> c [ arrowhead="empty"];
+      a -> d [ arrowhead="empty"];
+}

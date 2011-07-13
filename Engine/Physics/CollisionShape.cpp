@@ -177,7 +177,7 @@ TriangleMeshData::TriangleMeshData(Model* model, bool makeConvexHull, float thic
         StanHull::HullDesc desc;
         desc.SetHullFlag(StanHull::QF_TRIANGLES);
         desc.mVcount = originalVertexCount;
-        desc.mVertices = (float*)originalVertices.Ptr();
+        desc.mVertices = (float*)originalVertices.RawPtr();
         desc.mVertexStride = 3 * sizeof(float);
         desc.mSkinWidth = thickness;
         
@@ -190,19 +190,19 @@ TriangleMeshData::TriangleMeshData(Model* model, bool makeConvexHull, float thic
         
         // Copy vertex data
         vertexData_ = new Vector3[vertexCount];
-        memcpy(vertexData_.Ptr(), result.mOutputVertices, vertexCount * sizeof(Vector3));
+        memcpy(vertexData_.RawPtr(), result.mOutputVertices, vertexCount * sizeof(Vector3));
         
         // Copy index data
         indexData_ = new unsigned[indexCount];
-        memcpy(indexData_.Ptr(), result.mIndices, indexCount * sizeof(unsigned));
+        memcpy(indexData_.RawPtr(), result.mIndices, indexCount * sizeof(unsigned));
         
         lib.ReleaseResult(result);
     }
     
     triMesh_ = dGeomTriMeshDataCreate();
     
-    dGeomTriMeshDataBuildSingle(triMesh_, vertexData_.Ptr(), sizeof(Vector3), vertexCount,
-        indexData_.Ptr(), indexCount, 3 * sizeof(unsigned));
+    dGeomTriMeshDataBuildSingle(triMesh_, vertexData_.RawPtr(), sizeof(Vector3), vertexCount,
+        indexData_.RawPtr(), indexCount, 3 * sizeof(unsigned));
     
     indexCount_ = indexCount;
 }
@@ -281,7 +281,7 @@ HeightfieldData::HeightfieldData(Model* model, IntVector2 numPoints, float thick
     
     heightfield_ = dGeomHeightfieldDataCreate();
     
-    dGeomHeightfieldDataBuildSingle(heightfield_, heightData_.Ptr(), 0, (box.max_.x_ - box.min_.x_) * scale.x_,
+    dGeomHeightfieldDataBuildSingle(heightfield_, heightData_.RawPtr(), 0, (box.max_.x_ - box.min_.x_) * scale.x_,
         (box.max_.z_ - box.min_.z_) * scale.z_, numPoints.x_, numPoints.y_, 1.0f, 0.0f, thickness, 0);
     dGeomHeightfieldDataSetBounds(heightfield_, box.min_.y_ * scale.y_, box.max_.y_ * scale.y_);
 }
@@ -720,7 +720,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         
     case dTriMeshClass:
         {
-            TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.Ptr());
+            TriangleMeshData* data = static_cast<TriangleMeshData*>(geometryData_.RawPtr());
             if (!data)
                 return;
             

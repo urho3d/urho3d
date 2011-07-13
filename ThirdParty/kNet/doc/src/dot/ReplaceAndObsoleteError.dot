@@ -1,0 +1,10 @@
+digraph ReplaceAndObsoleteError
+{
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      a [ label="Message A", color="red"];
+      b [ label="Message B", color="red"];
+      c [ label="Message C", color="red"];
+      a -> b [ arrowhead="empty", color="red"];
+      a -> c [ arrowhead="diamond", color="red"];
+      b -> c [ arrowhead="empty", color="red"];
+}

@@ -56,14 +56,14 @@ bool ShaderVariation::Create()
     if (shaderType_ == VS)
     {
         if (!device || FAILED(device->CreateVertexShader(
-            (const DWORD*)byteCode_.Ptr(),
+            (const DWORD*)byteCode_.RawPtr(),
             (IDirect3DVertexShader9**)&object_)))
             failed_ = true;
     }
     else
     {
         if (!device || FAILED(device->CreatePixelShader(
-            (const DWORD*)byteCode_.Ptr(),
+            (const DWORD*)byteCode_.RawPtr(),
             (IDirect3DPixelShader9**)&object_)))
             failed_ = true;
     }

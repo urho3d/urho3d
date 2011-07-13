@@ -1,0 +1,10 @@
+dot -Tpng NoRelation.dot > NoRelation.png
+dot -Tpng SimpleDependency.dot > SimpleDependency.png
+dot -Tpng SimpleReplace.dot > SimpleReplace.png
+dot -Tpng Legend.dot > Legend.png
+dot -Tpng ManyDependOnOne.dot > ManyDependOnOne.png
+dot -Tpng OneDependsOnMany.dot > OneDependsOnMany.png
+dot -Tpng OneReplacesMany.dot > OneReplacesMany.png
+dot -Tpng ManyReplaceOne.dot > ManyReplaceOne.png
+dot -Tpng ReplaceAndObsoleteError.dot > ReplaceAndObsoleteError.png
+dot -Tpng MessagePriority.dot > MessagePriority.png

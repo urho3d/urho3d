@@ -189,14 +189,14 @@ void Run(const Vector<String>& arguments)
     if (!doc.Load(source))
         ErrorExit("Could not open input file " + arguments[0]);
     
-    XMLElement shaders = doc.GetRootElement("shaders");
+    XMLElement shaders = doc.GetRoot("shaders");
     if (!shaders)
         ErrorExit("No shaders element in " + source.GetName());
     
     XMLFile outDoc(context_);
-    XMLElement outShaders = outDoc.CreateRootElement("shaders");
+    XMLElement outShaders = outDoc.CreateRoot("shaders");
     
-    XMLElement shader = shaders.GetChildElement("shader");
+    XMLElement shader = shaders.GetChild("shader");
     while (shader)
     {
         String source = shader.GetString("name");
@@ -209,7 +209,7 @@ void Run(const Vector<String>& arguments)
         
         Shader baseShader(source, compileType);
         
-        XMLElement variation = shader.GetChildElement("");
+        XMLElement variation = shader.GetChild("");
         while (variation)
         {
             String value = variation.GetName();
@@ -235,38 +235,38 @@ void Run(const Vector<String>& arguments)
                 if (!simpleRequire.Empty())
                     newVar.requires_.Push(simpleRequire);
                 
-                XMLElement define = variation.GetChildElement("define");
+                XMLElement define = variation.GetChild("define");
                 while (define)
                 {
                     newVar.defines_.Push(define.GetString("name"));
-                    define = define.GetNextElement("define");
+                    define = define.GetNext("define");
                 }
                 
-                XMLElement exclude = variation.GetChildElement("exclude");
+                XMLElement exclude = variation.GetChild("exclude");
                 while (exclude)
                 {
                     newVar.excludes_.Push(exclude.GetString("name"));
-                    exclude = exclude.GetNextElement("exclude");
+                    exclude = exclude.GetNext("exclude");
                 }
                 
-                XMLElement include = variation.GetChildElement("include");
+                XMLElement include = variation.GetChild("include");
                 while (include)
                 {
                     newVar.includes_.Push(include.GetString("name"));
-                    include = include.GetNextElement("include");
+                    include = include.GetNext("include");
                 }
                 
-                XMLElement require = variation.GetChildElement("require");
+                XMLElement require = variation.GetChild("require");
                 while (require)
                 {
                     newVar.requires_.Push(require.GetString("name"));
-                    require = require.GetNextElement("require");
+                    require = require.GetNext("require");
                 }
                 
                 baseShader.variations_.Push(newVar);
             }
             
-            variation = variation.GetNextElement();
+            variation = variation.GetNext();
         }
         
         if (baseShader.type_ != Both)
@@ -279,7 +279,7 @@ void Run(const Vector<String>& arguments)
             ProcessVariations(baseShader, outShaders);
         }
         
-        shader = shader.GetNextElement("shader");
+        shader = shader.GetNext("shader");
     }
 }
 
@@ -501,11 +501,11 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
     outFile.Close();
     
     XMLFile xmlOutFile(context_);
-    XMLElement shaderElem = xmlOutFile.CreateRootElement("shader");
+    XMLElement shaderElem = xmlOutFile.CreateRoot("shader");
     shaderElem.SetString("type", baseShader.type_ == VS ? "vs" : "ps");
     for (unsigned i = 0; i < processedVariations.Size(); ++i)
     {
-        XMLElement variationElem = shaderElem.CreateChildElement("variation");
+        XMLElement variationElem = shaderElem.CreateChild("variation");
         variationElem.SetString("name", processedVariations[i].name_);
         
         String allDefines;

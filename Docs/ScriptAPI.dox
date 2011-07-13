@@ -183,7 +183,6 @@
 - uint DD_SOURCE
 - uint DD_TARGET
 - uint DD_SOURCE_AND_TARGET
-- uint8 CHANNEL_ANY
 - uint DEBUGHUD_SHOW_NONE
 - uint DEBUGHUD_SHOW_STATS
 - uint DEBUGHUD_SHOW_MODE
@@ -495,7 +494,7 @@ Methods:<br>
 - Component@ GetComponent() const
 - Scene@ GetScene() const
 - UIElement@ GetUIElement() const
-- Peer@ GetPeer() const
+- Connection@ GetConnection() const
 - PhysicsWorld@ GetPhysicsWorld() const
 - CollisionShape@ GetCollisionShape() const
 - RigidBody@ GetRigidBody() const
@@ -894,7 +893,7 @@ Properties:<br>
 XMLElement
 
 Methods:<br>
-- XMLElement CreateChildElement(const String&)
+- XMLElement CreateChild(const String&)
 - bool RemoveChild()
 - bool RemoveChild(const String&, bool)
 - bool RemoveChildren()
@@ -2132,7 +2131,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2208,7 +2206,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2290,7 +2287,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2379,7 +2375,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2464,7 +2459,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2548,7 +2542,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2635,7 +2628,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2723,7 +2715,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2808,7 +2799,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -2918,7 +2908,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -3010,7 +2999,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -3102,7 +3090,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -3198,7 +3185,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -3305,7 +3291,6 @@ Methods:<br>
 - void SetSize(int, int)
 - void SetMinSize(int, int)
 - void SetMaxSize(int, int)
-- void SetFixedSize(const IntVector2&)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFixedHeight(int)
@@ -3441,51 +3426,36 @@ Properties:<br>
 - VariantMap extraData
 
 
-Peer
+Connection
 
 Methods:<br>
-- void Send(const VectorBuffer&, uint8, bool, bool)
-- bool Receive(VectorBuffer&, uint8)
-- void FlushPackets()
-- bool HasPackets() const
-- void Disconnect()
-- void ForceDisconnect()
+- void SendMessage(int, bool, bool, const VectorBuffer&)
+- void Disconnect(int arg0 = 0)
+- String ToString() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
-- float simulatedPacketLoss
-- uint simulatedLatency
-- PeerType peerType (readonly)
-- ConnectionState connectionState (readonly)
-- uint numPackets (readonly)
-- String& address (readonly)
+- bool connected (readonly)
+- bool connectPending (readonly)
+- String address (readonly)
 - uint16 port (readonly)
 
 
 Network
 
 Methods:<br>
-- void SetDataRate(int, int)
+- bool Connect(const String&, uint16)
+- void Disconnect(int arg0 = 0)
 - bool StartServer(uint16)
-- Peer@ Connect(const String&, uint16)
 - void StopServer()
-- void StopClient()
-- void Broadcast(const VectorBuffer&, uint8, bool, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
-- uint serverMaxConnections
-- uint clientMaxConnections
-- uint numChannels
-- bool serverStarted (readonly)
-- bool clientStarted (readonly)
-- uint numPeers (readonly)
-- int dataRateIn (readonly)
-- int dataRateOut (readonly)
-- Peer@[] peers (readonly)
-- Peer@ serverPeer (readonly)
+- bool serverRunning (readonly)
+- Connection@ serverConnection (readonly)
+- Connection@[]@ clientConnections (readonly)
 
 
 PhysicsRaycastResult

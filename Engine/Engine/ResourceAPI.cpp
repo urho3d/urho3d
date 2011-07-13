@@ -44,7 +44,7 @@ static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
     // (here an auto handle can not be used)
     if (file)
         file->AddRef();
-    return file.Ptr();
+    return file.RawPtr();
 }
 
 static void ResourceCacheReleaseResource(const String& type, const String& name, bool force, ResourceCache* ptr)

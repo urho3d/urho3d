@@ -1,0 +1,11 @@
+digraph OneDependsOnMany
+{
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      a [ label="Message A"];
+      b [ label="Message B"];
+      c [ label="Message C"];
+      d [ label="Message D"];
+      b -> a [ arrowhead="empty"];
+      c -> a [ arrowhead="empty"];
+      d -> a [ arrowhead="empty"];
+}

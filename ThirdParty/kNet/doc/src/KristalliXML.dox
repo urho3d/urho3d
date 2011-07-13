@@ -1,0 +1,64 @@
+/**
+\page KristalliXML Describing kNet Messages in XML
+  
+\section KristalliXMLSec Describing kNet Messages in XML
+  
+Letting the (de)serialization code serve as the sole reference and documentation of your application-level protocol can be very fragile for maintenance and future development. The kNet Application-level specification provides an XML schema for defining messages in the kNet Message Model. These XML files have the following uses: 
+
+<ul>
+<li>They serve as a good single source reference for the whole protocol.</li>
+<li>It is possible to implement type-safe immediate-mode (de)serialization by using the Message Template feature. See \ref MessageTemplatesUsage "".</li>
+<li>The \ref SerializationStructCompilerSampleSec "MessageCompiler" tool uses these XML files to generate serialization structures for \ref DeclarativeModeSerializationSec "declarative-mode serialization".</li>
+</ul>
+
+The XML format is best introduced using an example. The following XML snippet introduces a message that is used in a networked grid computing architecture when a new node introduces itself to the master server. 
+
+\code 
+
+<message id="9" name="NetCrunchMsgClientIntroduction" reliable="true" inOrder="false" priority="100">
+  <u32 name="Version" />
+  <string name="ID" maxLength="256" />
+  <string name="Name" maxLength="256" />
+  <string name="Team" maxLength="256" />
+  <string name="OS" maxLength="256" />
+  <string name="Processor" maxLength="256" />
+  <string name="CPUID" maxLength="256" />
+  <u32 name="NumCores" />
+  <u32 name="NumThreads" />
+  <u32 name="ClockSpeed" />
+  <u32 name="Memory" />
+  <bit name="DedicatedClient" />
+</message>
+
+\endcode 
+
+A message can contain the following types:
+<ul>
+<li> <b>bit, u8, s8, u16, s16, u32, s32, u64, s64</b>: POD types of the given bit size. After a single bit, padding up to a full byte is not performed. </li>
+<li> <b>float, double</b>: Traditional IEEE-754 32-bit and 64-bit floating point values.</li>
+<li><b>string</b>: A human-readable string. The encoding is not specified. The <b>maxLength</b> attribute specifies the maximum number of <b>bytes</b> the string contents can take up. If this field is not specified, the string length is not limited. If a string longer than this is received, it is truncated to the given size.</li>
+<li><b>struct</b>: The given struct contains a nested structure inside it.</li>
+</ul>
+
+\subsection MultipleFields Field Count
+
+A type can contain one of the attributes <b>count</b>=<i>"numElements"</i> or <b>dynamicCount</b>=<i>"numBits"</i> to specify that the given type occurs several time in the message. The <b>count</b> attribute defines a fixed multiplicity, i.e. the number of instances of the variable is always the same. The <b>dynamicCount</b> attribute specifies a variable-length multiplicity. Between different instances of this message, the number of instances of the field can change. The number of occurrences of this type is serialized to the stream, so the count can be recovered when deserializing. The <i>numBits</i> value specifies how many bits are used in the stream to store the count.
+
+The following example shows the usage of the <b>count</b> and <b>dynamicCount</b> fields. This message is taken from a networked game application where the message sends a list of objects that have their physics updates inactivated due to them reaching a rest state. This message can send updates for at most 256 objects.
+
+\code
+
+<message id="212" name="ECAObjectsStopped" reliable="true" inOrder="true" priority="100">
+  <struct name="ObjectInfo" dynamicCount="8">
+    <float name="position" count="3" />
+    <u16 name="rotation" count="3" />    
+  </struct> 
+</message>
+
+\endcode
+
+<!--
+todo Describe message attributes, dynamicCount="x", restrictions (arrays of variants).
+-->
+
+*/

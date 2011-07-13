@@ -81,7 +81,7 @@ static void RegisterUIElement(asIScriptEngine* engine)
     
     RegisterUIElement<UIElement>(engine, "UIElement");
     
-    // Register Variant Ptr() for UIElement
+    // Register Variant GetPtr() for UIElement
     engine->RegisterObjectMethod("Variant", "UIElement@+ GetUIElement() const", asFUNCTION(GetVariantPtr<UIElement>), asCALL_CDECL_OBJLAST);
 }
 
@@ -418,7 +418,7 @@ static UIElement* UILoadLayout(XMLFile* file, UI* ptr)
     SharedPtr<UIElement> root = ptr->LoadLayout(file);
     if (root)
         root->AddRef();
-    return root.Ptr();
+    return root.RawPtr();
 }
 
 static UIElement* UILoadLayoutWithStyle(XMLFile* file, XMLFile* styleFile, UI* ptr)
@@ -426,7 +426,7 @@ static UIElement* UILoadLayoutWithStyle(XMLFile* file, XMLFile* styleFile, UI* p
     SharedPtr<UIElement> root = ptr->LoadLayout(file, styleFile);
     if (root)
         root->AddRef();
-    return root.Ptr();
+    return root.RawPtr();
 }
 
 static void RegisterUI(asIScriptEngine* engine)

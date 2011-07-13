@@ -8,11 +8,11 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 
 # Include directories
 include_directories (
-    ../Container ../Core ../IO ../Math ../Resource ../Scene ../../ThirdParty/ENet/include
+    ../Container ../Core ../IO ../Math ../Resource ../Scene ../../ThirdParty/kNet/include
 )
 
 # Define target & libraries to link
 add_library (${TARGET_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} Container Core ENet IO Math Resource Scene)
+target_link_libraries (${TARGET_NAME} Container Core IO kNet Math Resource Scene)
 enable_pch ()
 finalize_lib ()

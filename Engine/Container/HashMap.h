@@ -261,7 +261,7 @@ public:
     /// Erase a pair by iterator
     void Erase(const Iterator& it)
     {
-        return Erase(it->first_);
+        Erase(it->first_);
     }
     
     /// Clear the map

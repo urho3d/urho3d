@@ -1,0 +1,1 @@
+The contents of this directory are automatically generated from Qt .ui files. Modifying these files is useless, since they will get regenerated on a new compilation. This file is present here as a dummy to enforce this directory is added to source control.

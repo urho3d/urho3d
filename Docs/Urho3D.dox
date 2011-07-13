@@ -58,10 +58,10 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org/) and Horde3D (http://
 Urho3D uses the following third-party libraries:
 
 - AngelScript 2.21.0 (http://www.angelcode.com/angelscript/)
-- ENet 1.3.1 (http://enet.bespin.org/)
 - FreeType 2.3.12 (http://www.freetype.org/)
 - GLee 5.4 (http://elf-stone.com/)
 - GLFW 3.0 WIP (http://www.glfw.org/)
+- kNet (https://bitbucket.org/clb/knet)
 - Open Asset Import Library 2.0.863 (http://assimp.sourceforge.net/)
 - Open Dynamics %Engine, svn rev 1806 (http://www.ode.org/)
 - PortAudio V19 (http://www.portaudio.com/)

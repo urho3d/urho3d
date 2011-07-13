@@ -233,7 +233,7 @@ public:
     /// Erase a key by iterator
     void Erase(const Iterator& it)
     {
-        return Erase(*it);
+        Erase(*it);
     }
     
     /// Clear the set

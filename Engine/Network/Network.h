@@ -23,92 +23,61 @@
 
 #pragma once
 
+#include "Connection.h"
+#include "HashMap.h"
 #include "Object.h"
 #include "VectorBuffer.h"
 
-class Peer;
-
-struct _ENetHost;
-
-typedef _ENetHost ENetHost;
-
-/// Network subsystem. Sends and receives packets using ENet
-class Network : public Object
+/// Network subsystem. Manages joining to or hosting networked scenes.
+class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
     OBJECT(Network);
     
 public:
-    /// Construct. Initialize ENet
+    /// Construct
     Network(Context* context);
-    /// Destruct. Deinitialize ENet
+    /// Destruct
     ~Network();
     
-    /// Set maximum connections on the server
-    void SetServerMaxConnections(unsigned server);
-    /// Set maximum connections on the client
-    void SetClientMaxConnections(unsigned client);
-    /// Set number of packet channels to use. Each has its own packet ordering
-    void SetNumChannels(unsigned channels);
-    /// Set incoming and outgoing data rate
-    void SetDataRate(int dataInBps, int dataOutBps);
-    /// Service incoming and outgoing packets. Called by HandleBeginFrame()
-    void Update();
-    /// Start server on a port. Return true if successful
-    bool StartServer(unsigned short port);
-    /// Connect to a server
-    Peer* Connect(const String& address, unsigned short port);
-    /// Broadcast a packet to all connected client peers
-    void Broadcast(const VectorBuffer& packet, unsigned char channel, bool reliable, bool inOrder = true);
-    /// Broadcast a packet to all connected client peers
-    void Broadcast(const void* data, unsigned size, unsigned char channel, bool reliable, bool inOrder = true);
-    /// Stop server and close all connections
-    void StopServer();
-    /// Stop server and close all connections
-    void StopClient();
+    /// Handle a kNet message from either a client or the server
+    virtual void HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char *data, size_t numBytes);
+    /// Handle a new client connection
+    virtual void NewConnectionEstablished(kNet::MessageConnection* connection);
+    /// Handle a client disconnection
+    virtual void ClientDisconnected(kNet::MessageConnection* connection);
     
-    /// Return whether server has been started
-    bool IsServer() const { return serverHost_ != 0; }
-    /// Return whether client has been started (is automatically started when a connection attempt is made)
-    bool IsClient() const { return clientHost_ != 0; }
-    /// Return number of networking peers
-    unsigned GetNumPeers() const { return peers_.Size(); }
-    /// Return all networking peers
-    const Vector<SharedPtr<Peer> >& GetPeers() const { return peers_; }
-    /// Return networking peer by index
-    Peer* GetPeer(unsigned index) const;
-    /// Return the first server peer
-    Peer* GetServerPeer() const;
-    /// Return maximum server connections
-    unsigned GetServerMaxConnections() const { return serverMaxConnections_; }
-    /// Return maximum client connections
-    unsigned GetClientMaxConnections() const { return clientMaxConnections_; }
-    /// Return number of packet channels
-    unsigned GetNumChannels() const { return numChannels_; }
-    /// Return incoming data rate
-    int GetDataRateIn() const { return dataInBps_; }
-    /// Return outgoing data rate
-    int GetDataRateOut() const { return dataOutBps_; }
+    /// Connect to a server using UDP protocol. Return true if connection process successfully started
+    bool Connect(const String& address, unsigned short port);
+    /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish
+    void Disconnect(int waitMSec = 0);
+    /// Start a server on a port using UDP protocol. Return true if successful
+    bool StartServer(unsigned short port);
+    /// Stop the server
+    void StopServer();
+    /// Update connections. Called by HandleBeginFrame
+    void Update();
+    
+    /// Return a networked scene connection by kNet MessageConnection, or null if none exist
+    Connection* GetConnection(kNet::MessageConnection* connection) const;
+    /// Return the connection to the server. Null if not connected
+    Connection* GetServerConnection() const;
+    /// Return all client connections
+    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
+    /// Return whether the server is running
+    bool IsServerRunning() const;
     
 private:
-    /// Update a specific network host
-    void Update(ENetHost* enetHost);
-    /// Handle frame begin event
+    /// Handle server connection
+    void ServerConnected();
+    /// Handle server disconnection
+    void ServerDisconnected();
+    /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
-    /// Server host
-    ENetHost* serverHost_;
-    /// Client host
-    ENetHost* clientHost_;
-    /// Peers
-    Vector<SharedPtr<Peer> > peers_;
-    /// Maximum server connections
-    unsigned serverMaxConnections_;
-    /// Maximum client connections
-    unsigned clientMaxConnections_;
-    /// Number of packet channels to use
-    unsigned numChannels_;
-    /// Incoming data rate
-    int dataInBps_;
-    /// Outgoing data rate
-    int dataOutBps_;
+    /// kNet Network instance
+    kNet::Network* network_;
+    /// Client's server connection
+    SharedPtr<Connection> serverConnection_;
+    /// Server's client connections
+    HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
 };

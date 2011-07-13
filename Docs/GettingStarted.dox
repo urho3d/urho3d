@@ -71,6 +71,13 @@ F3          Toggle profiling display
 F4          Toggle octree debug geometry
 \endverbatim
 
+\section Running_Chat Chat
+
+Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
+
+Starting in headless mode (ChatServer.bat) automatically starts the server. On the client, first type the server address to the text edit box and click
+"Connect." After connecting successfully you can start typing messages; either press return or click "Send" to send them. Press ESC to exit.
+
 \section Running_Commandline Command line options
 
 Urho3D.exe understands the following command line options:
@@ -124,10 +131,10 @@ Although Urho3D.exe itself is geared towards running a scripted application, it 
 The third-party libraries are used for the following functionality:
 
 - AngelScript: scripting language implementation
-- ENet: UDP networking
 - FreeType: font rendering
 - GLee: OpenGL extensions handling
 - GLFW: low-level windowing and input on Linux and Mac OS X, and on Windows when running in OpenGL mode
+- kNet: UDP networking
 - Open Asset Import Library: reading various 3D file formats
 - Open Dynamics %Engine: physics simulation implementation
 - PortAudio: audio playback

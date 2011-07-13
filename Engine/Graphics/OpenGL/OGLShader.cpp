@@ -72,10 +72,10 @@ bool Shader::Load(Deserializer& source)
     if (!file)
         return false;
     
-    XMLElement shaderElem = file->GetRootElement();
+    XMLElement shaderElem = file->GetRoot();
     shaderType_ = shaderElem.GetString("type") == "vs" ? VS : PS;
     
-    XMLElement variationElem = shaderElem.GetChildElement("variation");
+    XMLElement variationElem = shaderElem.GetChild("variation");
     while (variationElem)
     {
         String variationName = variationElem.GetString("name");
@@ -89,7 +89,7 @@ bool Shader::Load(Deserializer& source)
         newVariation->SetDefines(variationElem.GetString("defines").Split(' '));
         variations_[nameHash] = newVariation;
         
-        variationElem = variationElem.GetNextElement();
+        variationElem = variationElem.GetNext();
     }
     
     return true;
