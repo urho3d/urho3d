@@ -217,13 +217,13 @@ void Network::ServerDisconnected()
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
     if (!failedConnect)
     {
-        SendEvent(E_SERVERDISCONNECTED);
         LOGINFO("Disconnected from server");
+        SendEvent(E_SERVERDISCONNECTED);
     }
     else
     {
-        SendEvent(E_SERVERCONNECTFAILED);
         LOGERROR("Failed to connect to " + serverConnection_->ToString());
+        SendEvent(E_SERVERCONNECTFAILED);
     }
     
     serverConnection_.Reset();
