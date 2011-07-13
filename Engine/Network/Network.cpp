@@ -114,13 +114,14 @@ bool Network::Connect(const String& address, unsigned short port)
     kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
     if (connection)
     {
+        LOGINFO("Connecting to server " + address + ":" + String(port));
         serverConnection_ = new Connection(context_, connection);
         serverConnection_->connectPending_ = true;
         return true;
     }
     else
     {
-        LOGERROR("Failed to connect to " + address + ":" + String(port));
+        LOGERROR("Failed to connect to server " + address + ":" + String(port));
         SendEvent(E_SERVERCONNECTFAILED);
         return false;
     }
@@ -222,7 +223,7 @@ void Network::ServerDisconnected()
     }
     else
     {
-        LOGERROR("Failed to connect to " + serverConnection_->ToString());
+        LOGERROR("Failed to connect to server");
         SendEvent(E_SERVERCONNECTFAILED);
     }
     
