@@ -30,7 +30,7 @@
 #include "Script.h"
 #include "ScriptFile.h"
 #include "ScriptInstance.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 #include <angelscript.h>
 #include <cstring>

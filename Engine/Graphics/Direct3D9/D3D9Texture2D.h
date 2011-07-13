@@ -24,7 +24,7 @@
 #pragma once
 
 #include "RenderSurface.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 #include "Texture.h"
 
 class Image;

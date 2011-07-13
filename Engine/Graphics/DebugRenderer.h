@@ -26,7 +26,7 @@
 #include "Color.h"
 #include "Component.h"
 #include "Frustum.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 
 class BoundingBox;
 class Camera;

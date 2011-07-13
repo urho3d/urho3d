@@ -25,7 +25,7 @@
 #include "Context.h"
 #include "File.h"
 #include "Log.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 #include "XMLFile.h"
 
 #include <tinyxml.h>

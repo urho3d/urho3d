@@ -26,8 +26,8 @@
 #include "BoundingBox.h"
 #include "Skeleton.h"
 #include "Resource.h"
-#include "SharedPtr.h"
-#include "SharedArrayPtr.h"
+#include "Ptr.h"
+#include "ArrayPtr.h"
 
 class Geometry;
 class IndexBuffer;

@@ -23,7 +23,7 @@
 
 #include "MathDefs.h"
 #include "ProcessUtils.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 #include "StringUtils.h"
 
 #include <stb_image.h>

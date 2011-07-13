@@ -27,7 +27,7 @@
 #include "Component.h"
 #include "Quaternion.h"
 #include "PhysicsDefs.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 class DebugRenderer;
 class Geometry;

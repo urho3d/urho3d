@@ -25,7 +25,7 @@
 
 #include "GraphicsDefs.h"
 #include "Object.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 class IndexBuffer;
 class Ray;

@@ -28,7 +28,7 @@
 #include "Object.h"
 #include "Quaternion.h"
 #include "Thread.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 class AudioImpl;
 class Sound;

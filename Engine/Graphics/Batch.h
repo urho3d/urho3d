@@ -26,7 +26,7 @@
 #include "HashMap.h"
 #include "MathDefs.h"
 #include "GraphicsDefs.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 #include "Vector4.h"
 
 class Camera;

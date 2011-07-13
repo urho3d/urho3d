@@ -25,7 +25,7 @@
 
 #include "Rect.h"
 #include "GraphicsDefs.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 
 class Camera;
 class Scene;

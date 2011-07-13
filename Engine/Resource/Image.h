@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Resource.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 /// Supported compressed image formats
 enum CompressedFormat

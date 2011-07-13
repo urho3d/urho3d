@@ -27,7 +27,7 @@
 #include "GraphicsDefs.h"
 #include "HashSet.h"
 #include "RefCounted.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 class Shader;
 

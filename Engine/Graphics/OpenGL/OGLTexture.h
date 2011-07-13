@@ -28,7 +28,7 @@
 #include "Image.h"
 #include "GraphicsDefs.h"
 #include "Resource.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 

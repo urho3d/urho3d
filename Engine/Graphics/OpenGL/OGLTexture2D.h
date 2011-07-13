@@ -25,7 +25,7 @@
 
 #include "Image.h"
 #include "RenderSurface.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 #include "Texture.h"
 
 /// 2D texture resource

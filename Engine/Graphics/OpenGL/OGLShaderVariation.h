@@ -26,7 +26,7 @@
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
 #include "RefCounted.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 class Shader;
 class ShaderProgram;

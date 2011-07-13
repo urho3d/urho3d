@@ -24,7 +24,7 @@
 #pragma once
 
 #include "HashMap.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 
 class Animation;
 class AnimatedModel;

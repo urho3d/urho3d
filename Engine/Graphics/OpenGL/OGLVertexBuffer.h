@@ -25,7 +25,7 @@
 
 #include "GPUObject.h"
 #include "GraphicsDefs.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 /// Hardware vertex buffer
 class VertexBuffer : public Object, public GPUObject

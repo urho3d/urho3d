@@ -26,7 +26,7 @@
 #include "File.h"
 #include "FileSystem.h"
 #include "Log.h"
-#include "SharedArrayPtr.h"
+#include "ArrayPtr.h"
 
 #include <cstdio>
 #include <cstring>

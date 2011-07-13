@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "SharedPtr.h"
+#include "Ptr.h"
 #include "Variant.h"
 
 class Context;

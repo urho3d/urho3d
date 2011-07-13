@@ -25,7 +25,7 @@
 
 #include "BoundingBox.h"
 #include "Rect.h"
-#include "SharedPtr.h"
+#include "Ptr.h"
 #include "Variant.h"
 
 class TiXmlElement;
