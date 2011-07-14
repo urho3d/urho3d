@@ -52,6 +52,13 @@ EVENT(E_CLIENTDISCONNECTED, ClientDisconnected)
     PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
+/// Client has sent identity
+EVENT(E_CLIENTIDENTITY, ClientIdentity)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+    PARAM(P_ALLOW, Allow);                // bool
+}
+
 /// Network message received
 EVENT(E_NETWORKMESSAGE, NetworkMessage)
 {

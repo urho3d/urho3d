@@ -24,6 +24,8 @@
 #include "Precompiled.h"
 #include "Connection.h"
 
+#include <kNet.h>
+
 #include "DebugNew.h"
 
 OBJECTTYPESTATIC(Connection);
@@ -65,11 +67,6 @@ void Connection::Disconnect(int waitMSec)
 kNet::MessageConnection* Connection::GetMessageConnection() const
 {
     return const_cast<kNet::MessageConnection*>(connection_.ptr());
-}
-
-kNet::ConnectionState Connection::GetConnectionState() const
-{
-    return connection_->GetConnectionState();
 }
 
 bool Connection::IsConnected() const

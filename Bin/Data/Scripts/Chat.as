@@ -11,7 +11,7 @@ Font@ font;
 Array<String> chatHistory;
 bool inLogMessage = false;
 
-const int MSG_CHAT = 10;
+const int MSG_CHAT = 20;
 
 void Start()
 {

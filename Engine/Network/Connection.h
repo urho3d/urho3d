@@ -26,7 +26,8 @@
 #include "Object.h"
 #include "VectorBuffer.h"
 
-#include <kNet.h>
+#include <kNetFwd.h>
+#include <kNet/SharedPtr.h>
 
 #ifdef SendMessage
 #undef SendMessage
@@ -40,7 +41,7 @@ class Connection : public Object
     friend class Network;
     
 public:
-    /// Construct with the context and message connection pointers
+    /// Construct with context and kNet message connection pointers
     Connection(Context* context, kNet::SharedPtr<kNet::MessageConnection> connection);
     /// Destruct
     ~Connection();
@@ -52,10 +53,8 @@ public:
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
     
-    /// Return the message connection
+    /// Return the kNet message connection
     kNet::MessageConnection* GetMessageConnection() const;
-    /// Return connection state
-    kNet::ConnectionState GetConnectionState() const;
     /// Return whether is fully connected
     bool IsConnected() const;
     /// Return whether connection is pending
@@ -68,7 +67,7 @@ public:
     String ToString() const;
     
 private:
-    /// kNet MessageConnection
+    /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Connection pending flag
     bool connectPending_;

@@ -107,9 +107,10 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i])
-                vector[i]->AddRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i];
+            T* ptr = vector[i];
+            if (ptr)
+                ptr->AddRef();
+            *(static_cast<T**>(arr->At(i))) = ptr;
         }
         
         return arr;
@@ -130,9 +131,10 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i])
-                vector[i]->AddRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i];
+            T* ptr = vector[i];
+            if (ptr)
+                ptr->AddRef();
+            *(static_cast<T**>(arr->At(i))) = ptr;
         }
         
         return arr;
@@ -153,9 +155,10 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<Share
         for (unsigned i = 0; i < arr->GetSize(); ++i)
         {
             // Increment reference count for storing in the array
-            if (vector[i])
-                vector[i]->AddRef();
-            *(static_cast<T**>(arr->At(i))) = vector[i].RawPtr();
+            T* ptr = vector[i];
+            if (ptr)
+                ptr->AddRef();
+            *(static_cast<T**>(arr->At(i))) = ptr;
         }
         
         return arr;

@@ -25,9 +25,13 @@
 #include "Context.h"
 #include "CoreEvents.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "Network.h"
 #include "NetworkEvents.h"
-#include "ProcessUtils.h"
+#include "Protocol.h"
+#include "StringUtils.h"
+
+#include <kNet.h>
 
 #include "DebugNew.h"
 
@@ -51,19 +55,30 @@ Network::~Network()
 
 void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char *data, size_t numBytes)
 {
-    // Only forward the message as an event if the source is known
+    // Only process messages from known sources
     Connection* connection = GetConnection(source);
     if (connection)
     {
-        using namespace NetworkMessage;
+        bool handled = false;
+        if (connection == serverConnection_)
+            handled = OnServerMessage(connection, id, data, numBytes);
+        else
+            handled = OnClientMessage(connection, id, data, numBytes);
         
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)connection;
-        eventData[P_MESSAGEID] = (int)id;
-        eventData[P_DATA] = PODVector<unsigned char>((const unsigned char*)data, numBytes);
-        
-        connection->SendEvent(E_NETWORKMESSAGE, eventData);
+        // If message was not handled internally, forward as an event
+        if (!handled)
+        {
+            using namespace NetworkMessage;
+            
+            VariantMap eventData;
+            eventData[P_CONNECTION] = (void*)connection;
+            eventData[P_MESSAGEID] = (int)id;
+            eventData[P_DATA] = PODVector<unsigned char>((const unsigned char*)data, numBytes);
+            connection->SendEvent(E_NETWORKMESSAGE, eventData);
+        }
     }
+    else
+        LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
 }
 
 void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
@@ -87,7 +102,7 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     connection->Disconnect(0);
     
     // Remove the client connection that corresponds to this MessageConnection
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    Map<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
         LOGINFO("Client " + i->second_->ToString() + " disconnected");
@@ -108,7 +123,7 @@ bool Network::Connect(const String& address, unsigned short port)
     if (serverConnection_)
     {
         serverConnection_->Disconnect(100);
-        ServerDisconnected();
+        OnServerDisconnected();
     }
     
     kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
@@ -163,7 +178,7 @@ void Network::StopServer()
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const
 {
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
         return i->second_;
     else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
@@ -187,16 +202,17 @@ void Network::Update()
     // Process server connection if it exists
     if (serverConnection_)
     {
-        serverConnection_->GetMessageConnection()->Process();
+        kNet::MessageConnection* connection = serverConnection_->GetMessageConnection();
+        connection->Process();
         
-        // Check for connection/disconnection
-        kNet::ConnectionState state = serverConnection_->GetConnectionState();
+        // Check for state transitions
+        kNet::ConnectionState state = connection->GetConnectionState();
         if (serverConnection_->IsConnectPending() && state == kNet::ConnectionOK)
-            ServerConnected();
+            OnServerConnected();
         else if (state == kNet::ConnectionPeerClosed)
-            serverConnection_->Disconnect(0);
+            serverConnection_->Disconnect();
         else if (state == kNet::ConnectionClosed)
-            ServerDisconnected();
+            OnServerDisconnected();
     }
     
     // Process client connections if the server has been started
@@ -205,14 +221,14 @@ void Network::Update()
         server->Process();
 }
 
-void Network::ServerConnected()
+void Network::OnServerConnected()
 {
     serverConnection_->connectPending_ = false;
-    LOGINFO("Connected to server " + serverConnection_->ToString());
+    LOGINFO("Connected to server");
     SendEvent(E_SERVERCONNECTED);
 }
 
-void Network::ServerDisconnected()
+void Network::OnServerDisconnected()
 {
     // Differentiate between failed connection, and disconnection
     bool failedConnect = serverConnection_ && serverConnection_->IsConnectPending();
@@ -228,6 +244,35 @@ void Network::ServerDisconnected()
     }
     
     serverConnection_.Reset();
+}
+
+bool Network::OnServerMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes)
+{
+    return false;
+}
+
+bool Network::OnClientMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes)
+{
+    switch (id)
+    {
+    case MSG_IDENTITY:
+        {
+            using namespace ClientIdentity;
+            
+            MemoryBuffer msg(data, numBytes);
+            VariantMap eventData = msg.ReadVariantMap();
+            eventData[P_CONNECTION] = (void*)connection;
+            eventData[P_ALLOW] = true;
+            connection->SendEvent(E_CLIENTIDENTITY, eventData);
+            
+            // Check if connection was denied
+            if (!eventData[P_ALLOW].GetBool())
+                connection->Disconnect();
+        }
+        return true;
+    }
+    
+    return false;
 }
 
 void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)

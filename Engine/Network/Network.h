@@ -24,9 +24,11 @@
 #pragma once
 
 #include "Connection.h"
-#include "HashMap.h"
 #include "Object.h"
 #include "VectorBuffer.h"
+
+#include <kNet/IMessageHandler.h>
+#include <kNet/INetworkServerListener.h>
 
 /// Network subsystem. Manages joining to or hosting networked scenes.
 class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
@@ -57,20 +59,24 @@ public:
     /// Update connections. Called by HandleBeginFrame
     void Update();
     
-    /// Return a networked scene connection by kNet MessageConnection, or null if none exist
+    /// Return a client or server connection by kNet MessageConnection, or null if none exist
     Connection* GetConnection(kNet::MessageConnection* connection) const;
     /// Return the connection to the server. Null if not connected
     Connection* GetServerConnection() const;
     /// Return all client connections
-    const HashMap<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
+    const Map<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
     /// Return whether the server is running
     bool IsServerRunning() const;
     
 private:
     /// Handle server connection
-    void ServerConnected();
+    void OnServerConnected();
     /// Handle server disconnection
-    void ServerDisconnected();
+    void OnServerDisconnected();
+    /// Handle a message from the server. Return true if handled internally and should not be sent as an event
+    bool OnServerMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes);
+    /// Handle a message from the client. Return true if handled internally and should not be sent as an event
+    bool OnClientMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes);
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
@@ -79,5 +85,5 @@ private:
     /// Client's server connection
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
 };
