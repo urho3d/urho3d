@@ -49,7 +49,7 @@ public:
     virtual void ClientDisconnected(kNet::MessageConnection* connection);
     
     /// Connect to a server using UDP protocol. Return true if connection process successfully started
-    bool Connect(const String& address, unsigned short port);
+    bool Connect(const String& address, unsigned short port, const VariantMap& identity = VariantMap());
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful

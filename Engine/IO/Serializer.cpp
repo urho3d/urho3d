@@ -149,7 +149,10 @@ bool Serializer::WriteBoundingBox(const BoundingBox& value)
 
 bool Serializer::WriteString(const String& value)
 {
-    return Write(value.CString(), value.Length() + 1) == value.Length() + 1;
+    const char* chars = value.CString();
+    // Count length to the first zero, because ReadString() does the same
+    unsigned length = strlen(chars);
+    return Write(chars, length + 1) == length + 1;
 }
 
 bool Serializer::WriteID(const String& value)

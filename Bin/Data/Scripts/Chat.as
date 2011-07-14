@@ -34,6 +34,11 @@ void InitUI()
     uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
     font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
 
+    engine.CreateDebugHud();
+    debugHud.style = uiStyle;
+    debugHud.mode = DEBUGHUD_SHOW_PROFILER;
+    debugHud.profilerText.opacity = 0.5;
+
     Cursor@ newCursor = Cursor("Cursor");
     newCursor.style = uiStyle;
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);

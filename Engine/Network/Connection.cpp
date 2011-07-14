@@ -76,14 +76,15 @@ bool Connection::IsConnected() const
 
 String Connection::GetAddress() const
 {
-    kNet::Socket* socket = const_cast<kNet::MessageConnection*>(connection_.ptr())->GetSocket();
-    return socket ? String(socket->DestinationAddress()) : String();
+    const unsigned char* ip = connection_->RemoteEndPoint().ip;
+    char str[256];
+    sprintf(str, "%d.%d.%d.%d", (unsigned)ip[0], (unsigned)ip[1], (unsigned)ip[2], (unsigned)ip[3]);
+    return String(str);
 }
 
 unsigned short Connection::GetPort() const
 {
-    kNet::Socket* socket = const_cast<kNet::MessageConnection*>(connection_.ptr())->GetSocket();;
-    return socket ? socket->DestinationPort() : 0;
+    return connection_->RemoteEndPoint().port;
 }
 
 String Connection::ToString() const

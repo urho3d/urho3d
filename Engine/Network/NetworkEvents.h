@@ -52,7 +52,7 @@ EVENT(E_CLIENTDISCONNECTED, ClientDisconnected)
     PARAM(P_CONNECTION, Connection);      // Connection pointer
 }
 
-/// Client has sent identity
+/// Client has sent identity: identity map is in the event data
 EVENT(E_CLIENTIDENTITY, ClientIdentity)
 {
     PARAM(P_CONNECTION, Connection);      // Connection pointer

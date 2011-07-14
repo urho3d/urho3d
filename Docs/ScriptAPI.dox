@@ -3445,7 +3445,7 @@ Properties:<br>
 Network
 
 Methods:<br>
-- bool Connect(const String&, uint16)
+- bool Connect(const String&, uint16, const VariantMap& arg2 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
 - bool StartServer(uint16)
 - void StopServer()

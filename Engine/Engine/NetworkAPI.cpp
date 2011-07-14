@@ -109,7 +109,7 @@ static CScriptArray* NetworkGetClientConnections(Network* ptr)
 void RegisterNetwork(asIScriptEngine* engine)
 {
     RegisterObject<Network>(engine, "Network");
-    engine->RegisterObjectMethod("Network", "bool Connect(const String& in, uint16)", asMETHOD(Network, Connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool Connect(const String&in, uint16, const VariantMap&in identity = VariantMap())", asMETHOD(Network, Connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);

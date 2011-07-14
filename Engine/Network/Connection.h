@@ -55,6 +55,8 @@ public:
     
     /// Return the kNet message connection
     kNet::MessageConnection* GetMessageConnection() const;
+    /// Return client identity
+    const VariantMap& GetIdentity() const { return identity_; }
     /// Return whether is fully connected
     bool IsConnected() const;
     /// Return whether connection is pending
@@ -69,6 +71,8 @@ public:
 private:
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
+    /// Identity map
+    VariantMap identity_;
     /// Connection pending flag
     bool connectPending_;
 };
