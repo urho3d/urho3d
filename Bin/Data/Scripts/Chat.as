@@ -136,7 +136,7 @@ void HandleConnect()
     String address = textEdit.text.Trimmed();
     if (!address.empty)
     {
-        network.Connect(address, 1234);
+        network.Connect(address, 1234, null);
         textEdit.text = "";
     }
 }

@@ -30,6 +30,9 @@
 #include <kNet/IMessageHandler.h>
 #include <kNet/INetworkServerListener.h>
 
+class MemoryBuffer;
+class Scene;
+
 /// Network subsystem. Manages joining to or hosting networked scenes.
 class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
@@ -42,23 +45,43 @@ public:
     ~Network();
     
     /// Handle a kNet message from either a client or the server
-    virtual void HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char *data, size_t numBytes);
+    virtual void HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char* data, size_t numBytes);
+    /// Compute the content ID for a message
+    virtual u32 ComputeContentID(kNet::message_id_t id, const char* data, size_t numBytes);
     /// Handle a new client connection
     virtual void NewConnectionEstablished(kNet::MessageConnection* connection);
     /// Handle a client disconnection
     virtual void ClientDisconnected(kNet::MessageConnection* connection);
     
     /// Connect to a server using UDP protocol. Return true if connection process successfully started
-    bool Connect(const String& address, unsigned short port, const VariantMap& identity = VariantMap());
+    bool Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity = VariantMap());
     /// Disconnect the connection to the server. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
     /// Start a server on a port using UDP protocol. Return true if successful
     bool StartServer(unsigned short port);
     /// Stop the server
     void StopServer();
+    /// Broadcast a message to all client connections
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
+    /// Broadcast a message to all client connections
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+    /// Broadcast a message with content ID to all client connections
+    void BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg);
+    /// Broadcast a message with content ID to all client connections
+    void BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+    /// Broadcast a remote event to all client connections
+    void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    /// Broadcast a remote event to all client connections in the specific scene
+    void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    /// Broadcast a remote node event to all client connections in the scene with this node
+    void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
+    /// Set network update FPS
+    void SetUpdateFps(int fps);
     /// Update connections. Called by HandleBeginFrame
-    void Update();
+    void Update(float timeStep);
     
+    /// Return network update FPS
+    int GetUpdateFps() const { return updateFps_; }
     /// Return a client or server connection by kNet MessageConnection, or null if none exist
     Connection* GetConnection(kNet::MessageConnection* connection) const;
     /// Return the connection to the server. Null if not connected
@@ -74,9 +97,11 @@ private:
     /// Handle server disconnection
     void OnServerDisconnected();
     /// Handle a message from the server. Return true if handled internally and should not be sent as an event
-    bool OnServerMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes);
+    bool OnServerMessage(Connection* connection, int msgID, MemoryBuffer& msg);
     /// Handle a message from the client. Return true if handled internally and should not be sent as an event
-    bool OnClientMessage(Connection* connection, kNet::message_id_t id, const char *data, size_t numBytes);
+    bool OnClientMessage(Connection* connection, int msgID, MemoryBuffer& msg);
+    /// Handle a remote event either on the server or client. Return true if handled internally and should not be sent as an event
+    void OnRemoteEvent(Connection* connection, int msgID, MemoryBuffer& msg);
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
@@ -86,4 +111,10 @@ private:
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections
     Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    /// Network update FPS
+    int updateFps_;
+    /// Network time interval
+    float updateInterval_;
+    /// Network update time accumulator
+    float updateAcc_;
 };

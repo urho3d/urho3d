@@ -36,7 +36,7 @@ EVENT(E_SERVERDISCONNECTED, ServerDisconnected)
 }
 
 /// Server connection failed
-EVENT(E_SERVERCONNECTFAILED, ServerConnectFailed)
+EVENT(E_CONNECTFAILED, ConnectFailed)
 {
 }
 
@@ -59,10 +59,21 @@ EVENT(E_CLIENTIDENTITY, ClientIdentity)
     PARAM(P_ALLOW, Allow);                // bool
 }
 
-/// Network message received
+/// Client has informed to have loaded the scene
+EVENT(E_CLIENTSCENELOADED, ClientSceneLoaded)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+}
+
+/// Unhandled network message received
 EVENT(E_NETWORKMESSAGE, NetworkMessage)
 {
     PARAM(P_CONNECTION, Connection);      // Connection pointer
     PARAM(P_MESSAGEID, MessageID);        // int
     PARAM(P_DATA, Data);                  // Buffer
+}
+
+/// About to send network update on the client or server
+EVENT(E_NETWORKUPDATE, NetworkUpdate)
+{
 }

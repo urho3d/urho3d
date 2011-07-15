@@ -181,6 +181,32 @@ String::Iterator String::Replace(const String::Iterator& start, const String::It
     return Begin() + pos;
 }
 
+void String::Append(const String& str)
+{
+    *this += str;
+}
+
+void String::Append(const char* str)
+{
+    *this += str;
+}
+
+void String::Append(char c)
+{
+    *this += c;
+}
+
+void String::Append(const char* str, unsigned length)
+{
+    if (!str)
+        return;
+    
+    unsigned oldLength = length_;
+    Resize(oldLength + length);
+    CopyChars(&buffer_[oldLength], str, length);
+}
+
+
 void String::Insert(unsigned pos, const String& str)
 {
     if (pos > length_)

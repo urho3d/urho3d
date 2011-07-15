@@ -38,14 +38,6 @@ static const unsigned FIRST_LOCAL_ID = 0x01000000;
 /// Last local node/component ID
 static const unsigned LAST_LOCAL_ID = 0xffffffff;
 
-/// Scene's networking mode
-enum NetworkMode
-{
-    NM_NONETWORK,
-    NM_SERVER,
-    NM_CLIENT
-};
-
 /// Scene's asynchronous loading progress
 struct AsyncProgress
 {
@@ -95,8 +87,6 @@ public:
     bool LoadAsyncXML(File* file);
     /// Stop asynchronous loading
     void StopAsyncLoading();
-    /// Set networking mode
-    void SetNetworkMode(NetworkMode mode);
     /// Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
     /// Clear scene completely of nodes and components
@@ -114,8 +104,6 @@ public:
     Node* GetNodeByID(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found
     Component* GetComponentByID(unsigned id) const;
-    /// Return networking mode
-    NetworkMode GetNetworkMode() const { return networkMode_; }
     /// Return active flag
     bool IsActive() const { return active_; }
     /// Return asynchronous loading flag
@@ -160,8 +148,6 @@ private:
     Map<unsigned, Node*> allNodes_;
     /// Map of components by ID
     Map<unsigned, Component*> allComponents_;
-    /// Networking mode
-    NetworkMode networkMode_;
     /// Asynchronous loading progress
     AsyncProgress asyncProgress_;
     /// Source file name

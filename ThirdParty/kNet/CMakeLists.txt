@@ -146,7 +146,7 @@ elseif (UNIX)
    file(GLOB kNetUnixHeaderFiles ./include/*.h ./include/kNet/*.h ./include/kNet/unix/*.h)
 
    if (USE_BOOST)
-      list(REMOVE_ITEM kNetWin32SourceFiles ${PROJECT_SOURCE_DIR}/./src/win32/UnixThread.cpp)
+      list(REMOVE_ITEM kNetUnixSourceFiles ${PROJECT_SOURCE_DIR}/./src/unix/UnixThread.cpp)
    endif()
 
    set(kNetSourceFiles ${kNetSourceFiles} ${kNetUnixSourceFiles})

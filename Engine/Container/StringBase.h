@@ -279,6 +279,14 @@ public:
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
     /// Replace a substring by iterators
     Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
+    /// Append a string
+    void Append(const String& str);
+    /// Append a C string
+    void Append(const char* str);
+    /// Append a character
+    void Append(char c);
+    /// Append characters
+    void Append(const char* str, unsigned length);
     /// Insert a string
     void Insert(unsigned pos, const String& str);
     /// Insert a character

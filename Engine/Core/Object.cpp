@@ -26,8 +26,6 @@
 
 #include "DebugNew.h"
 
-static VariantMap noEventData;
-
 Object::Object(Context* context) :
     context_(context)
 {
@@ -170,6 +168,8 @@ void Object::UnsubscribeFromAllEventsWithUserData()
 
 void Object::SendEvent(StringHash eventType)
 {
+    VariantMap noEventData;
+    
     SendEvent(eventType, noEventData);
 }
 
@@ -250,6 +250,8 @@ void Object::SendEvent(Object* receiver, StringHash eventType)
 {
     if (receiver)
     {
+        VariantMap noEventData;
+        
         context_->BeginSendEvent(this);
         receiver->OnEvent(this, false, eventType, noEventData);
         context_->EndSendEvent();

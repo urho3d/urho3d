@@ -1128,7 +1128,6 @@ Properties:<br>
 - Component@[] components (readonly)
 - String& name
 - Node@ parent
-- NetworkMode networkMode
 - bool active
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
@@ -3430,14 +3429,20 @@ Connection
 
 Methods:<br>
 - void SendMessage(int, bool, bool, const VectorBuffer&)
+- void SendMessage(int, uint, bool, bool, const VectorBuffer&)
+- void SendRemoteEvent(StringHash, bool, const VariantMap& arg2 = VariantMap ( ))
+- void SendRemoteEvent(Node@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
 - String ToString() const
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
+- Scene@ scene
+- bool client (readonly)
 - bool connected (readonly)
 - bool connectPending (readonly)
+- bool sceneLoaded (readonly)
 - String address (readonly)
 - uint16 port (readonly)
 
@@ -3445,14 +3450,20 @@ Properties:<br>
 Network
 
 Methods:<br>
-- bool Connect(const String&, uint16, const VariantMap& arg2 = VariantMap ( ))
+- bool Connect(const String&, uint16, Scene@, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
 - bool StartServer(uint16)
 - void StopServer()
+- void BroadcastMessage(int, bool, bool, const VectorBuffer&)
+- void BroadcastMessage(int, uint, bool, bool, const VectorBuffer&)
+- void BroadcastRemoteEvent(StringHash, bool, const VariantMap& arg2 = VariantMap ( ))
+- void BroadcastRemoteEvent(Scene@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
+- void BroadcastRemoteEvent(Node@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
 
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
+- int updateFps
 - bool serverRunning (readonly)
 - Connection@ serverConnection (readonly)
 - Connection@[]@ clientConnections (readonly)

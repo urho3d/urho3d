@@ -75,11 +75,6 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
-    engine->RegisterEnum("NetworkMode");
-    engine->RegisterEnumValue("NetworkMode", "NM_NONETWORK", NM_NONETWORK);
-    engine->RegisterEnumValue("NetworkMode", "NM_SERVER", NM_SERVER);
-    engine->RegisterEnumValue("NetworkMode", "NM_CLIENT", NM_CLIENT);
-    
     engine->RegisterGlobalProperty("const uint FIRST_NONLOCAL_ID", (void*)&FIRST_NONLOCAL_ID);
     engine->RegisterGlobalProperty("const uint LAST_NONLOCAL_ID", (void*)&LAST_NONLOCAL_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
@@ -100,8 +95,6 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponentByID(uint)", asMETHOD(Scene, GetComponentByID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNodeByID(uint)", asMETHOD(Scene, GetNodeByID), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void set_networkMode(NetworkMode)", asMETHOD(Scene, SetNetworkMode), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "NetworkMode get_networkMode() const", asMETHOD(Scene, GetNetworkMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHOD(Scene, IsAsyncLoading), asCALL_THISCALL);

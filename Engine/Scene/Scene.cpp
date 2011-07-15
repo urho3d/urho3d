@@ -40,7 +40,6 @@ OBJECTTYPESTATIC(Scene);
 
 Scene::Scene(Context* context) :
     Node(context),
-    networkMode_(NM_NONETWORK),
     nonLocalNodeID_(FIRST_NONLOCAL_ID),
     nonLocalComponentID_(FIRST_NONLOCAL_ID),
     localNodeID_(FIRST_LOCAL_ID),
@@ -262,11 +261,6 @@ void Scene::StopAsyncLoading()
 void Scene::SetActive(bool enable)
 {
     active_ = enable;
-}
-
-void Scene::SetNetworkMode(NetworkMode mode)
-{
-    networkMode_ = mode;
 }
 
 void Scene::Clear()

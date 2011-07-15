@@ -61,15 +61,22 @@ static void RegisterControls(asIScriptEngine* engine)
 static void RegisterConnection(asIScriptEngine* engine)
 {
     RegisterObject<Connection>(engine, "Connection");
-    engine->RegisterObjectMethod("Connection", "void SendMessage(int, bool, bool, const VectorBuffer& in)", asMETHODPR(Connection, SendMessage, (int, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void SendMessage(int, bool, bool, const VectorBuffer&in)", asMETHODPR(Connection, SendMessage, (int, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void SendMessage(int, uint, bool, bool, const VectorBuffer&in)", asMETHODPR(Connection, SendMessage, (int, unsigned, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void SendRemoteEvent(StringHash, bool, const VariantMap&in eventData = VariantMap())", asMETHODPR(Connection, SendRemoteEvent, (StringHash, bool, const VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void SendRemoteEvent(Node@+, StringHash, bool, const VariantMap&in eventData = VariantMap())", asMETHODPR(Connection, SendRemoteEvent, (Node*, StringHash, bool, const VariantMap&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void Disconnect(int waitMSec = 0)", asMETHOD(Connection, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String ToString() const", asMETHOD(Connection, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void set_scene(Scene@+)", asMETHOD(Connection, SetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "Scene@+ get_scene() const", asMETHOD(Connection, GetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_client() const", asMETHOD(Connection, IsClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connected() const", asMETHOD(Connection, IsConnected), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connectPending() const", asMETHOD(Connection, IsConnectPending), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     
-    // Register Variant GetPtr() for UIElement
+    // Register Variant GetPtr() for Connection
     engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
 }
 
@@ -109,10 +116,17 @@ static CScriptArray* NetworkGetClientConnections(Network* ptr)
 void RegisterNetwork(asIScriptEngine* engine)
 {
     RegisterObject<Network>(engine, "Network");
-    engine->RegisterObjectMethod("Network", "bool Connect(const String&in, uint16, const VariantMap&in identity = VariantMap())", asMETHOD(Network, Connect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool Connect(const String&in, uint16, Scene@+, const VariantMap&in identity = VariantMap())", asMETHOD(Network, Connect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void Disconnect(int waitMSec = 0)", asMETHOD(Network, Disconnect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool StartServer(uint16)", asMETHOD(Network, StartServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, bool, bool, const VectorBuffer&in)", asMETHODPR(Network, BroadcastMessage, (int, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, uint, bool, bool, const VectorBuffer&in)", asMETHODPR(Network, BroadcastMessage, (int, unsigned, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(StringHash, bool, const VariantMap&in eventData = VariantMap())", asMETHODPR(Network, BroadcastRemoteEvent, (StringHash, bool, const VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Scene@+, StringHash, bool, const VariantMap&in eventData = VariantMap())", asMETHODPR(Network, BroadcastRemoteEvent, (Scene*, StringHash, bool, const VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Node@+, StringHash, bool, const VariantMap&in eventData = VariantMap())", asMETHODPR(Network, BroadcastRemoteEvent, (Node*, StringHash, bool, const VariantMap&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void set_updateFps(int)", asMETHOD(Network, SetUpdateFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "int get_updateFps() const", asMETHOD(Network, GetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Connection@+ get_serverConnection() const", asMETHOD(Network, GetServerConnection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Array<Connection@>@ get_clientConnections() const", asFUNCTION(NetworkGetClientConnections), asCALL_CDECL_OBJLAST);
