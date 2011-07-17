@@ -102,9 +102,19 @@ u32 Network::ComputeContentID(kNet::message_id_t id, const char* data, size_t nu
     switch (id)
     {
     case MSG_CONTROLSUPDATE:
+        // Return fixed content ID for controls
         return CONTROLS_CONTENT_ID;
         
+    case MSG_NODELATESTDATA:
+    case MSG_COMPONENTLATESTDATA:
+        {
+            // Return the node or component ID, which is first in the message
+            MemoryBuffer msg(data, numBytes);
+            return msg.ReadVLE();
+        }
+        
     default:
+        // By default return no content ID
         return 0;
     }
 }
