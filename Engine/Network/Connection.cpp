@@ -170,7 +170,7 @@ void Connection::ProcessReplication()
     
     const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
     
-    // Check for new or modified nodes
+    // Check for new or changed nodes
     /// \todo Send in correct order that takes node parenting into account
     for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End(); ++i)
     {
@@ -408,11 +408,14 @@ void Connection::ProcessExistingNode(Node* node)
         for (unsigned i = 0; i < attributes->Size(); ++i)
         {
             const AttributeInfo& attr = attributes->At(i);
-            if ((attr.mode_ & (AM_NETWORK | AM_LATESTDATA)) != (AM_NETWORK | AM_LATESTDATA))
+            if (!(attr.mode_ & AM_NETWORK))
                 continue;
             
-            msg_.WriteVariantData(currentAttributes_[index]);
-            nodeState.attributes_[index] = currentAttributes_[index];
+            if (attr.mode_ & AM_LATESTDATA)
+            {
+                msg_.WriteVariantData(currentAttributes_[index]);
+                nodeState.attributes_[index] = currentAttributes_[index];
+            }
             
             ++index;
         }
@@ -420,7 +423,7 @@ void Connection::ProcessExistingNode(Node* node)
         SendMessage(MSG_NODELATESTDATA, node->GetID(), true, false, msg_);
     }
     
-    // Check for new/updated components
+    // Check for new or changed components
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (unsigned i = 0; i < components.Size(); ++i)
     {
@@ -540,11 +543,14 @@ void Connection::ProcessExistingNode(Node* node)
                 for (unsigned k = 0; k < attributes->Size(); ++k)
                 {
                     const AttributeInfo& attr = attributes->At(k);
-                    if ((attr.mode_ & (AM_NETWORK | AM_LATESTDATA)) != (AM_NETWORK | AM_LATESTDATA))
+                    if (!(attr.mode_ & AM_NETWORK))
                         continue;
                     
-                    msg_.WriteVariantData(currentAttributes_[index]);
-                    componentState.attributes_[index] = currentAttributes_[index];
+                    if (attr.mode_ & AM_LATESTDATA)
+                    {
+                        msg_.WriteVariantData(currentAttributes_[index]);
+                        componentState.attributes_[index] = currentAttributes_[index];
+                    }
                     
                     ++index;
                 }
