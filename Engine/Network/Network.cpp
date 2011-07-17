@@ -333,8 +333,8 @@ void Network::Update(float timeStep)
         else if (state == kNet::ConnectionClosed)
             OnServerDisconnected();
         
-        // Send the controls packet on update
-        if (updateNow)
+        // If scene has been assigned and loaded, send the controls packet on update
+        if (updateNow && serverConnection_->GetScene() && serverConnection_->IsSceneLoaded())
         {
             const Controls& controls = serverConnection_->GetControls();
             
@@ -355,11 +355,10 @@ void Network::Update(float timeStep)
         
         if (updateNow)
         {
+            // Process scene replication for each client connection
             for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
-            {
-                // Process the scene synchronization of each client connection
-            }
+                i->second_->ProcessReplication();
         }
     }
 }

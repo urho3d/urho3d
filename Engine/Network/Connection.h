@@ -24,7 +24,9 @@
 #pragma once
 
 #include "Controls.h"
+#include "HashSet.h"
 #include "Object.h"
+#include "ReplicationState.h"
 #include "VectorBuffer.h"
 
 #include <kNetFwd.h>
@@ -70,6 +72,8 @@ public:
     void SetConnectPending(bool connectPending);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
+    /// Process scene replication state and send scene update messages. Called by Network on the server
+    void ProcessReplication();
     
     /// Return the kNet message connection
     kNet::MessageConnection* GetMessageConnection() const;
@@ -97,16 +101,37 @@ public:
     String ToString() const;
     
 private:
+    /// Process a node that the client had not yet received
+    void ProcessNewNode(Node* node);
+    /// Process a node that the client has already received
+    void ProcessExistingNode(Node* node);
+    
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Identity map
     VariantMap identity_;
     /// Scene
     WeakPtr<Scene> scene_;
+    /// Scene replication state (as last sent to the client)
+    Map<unsigned, NodeReplicationState> sceneState_;
+    /// Pending latest data for not yet received nodes
+    Map<unsigned, Vector<Variant> > nodeLatestData_;
+    /// Pending latest data for not yet received components
+    Map<unsigned, Vector<Variant> > componentLatestData_;
+    /// Internal vector for delta update
+    PODVector<unsigned char> deltaUpdateBits_;
+    /// Internal vector for comparing attributes
+    Vector<Variant> currentAttributes_;
+    /// Internal set for node's variable map changes
+    HashSet<ShortStringHash> changedVars_;
+    /// Reused message buffer
+    VectorBuffer msg_;
     /// Current controls
     Controls controls_;
     /// Previous controls
     Controls previousControls_;
+    /// Update frame number
+    unsigned frameNumber_;
     /// Client flag
     bool isClient_;
     /// Connection pending flag

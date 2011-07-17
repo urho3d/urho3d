@@ -209,6 +209,8 @@ public:
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
     /// Return number of components
     unsigned GetNumComponents() const { return components_.Size(); }
+    /// Return number of non-local components
+    unsigned GetNumNetworkComponents() const;
     /// Return all components
     const Vector<SharedPtr<Component> >& GetComponents() const { return components_; }
     /// Return all components of type

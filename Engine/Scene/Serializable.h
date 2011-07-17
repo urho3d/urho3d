@@ -67,6 +67,8 @@ public:
     Variant GetAttribute(const String& name);
     /// Return number of attributes
     unsigned GetNumAttributes() const;
+    /// Return number of networked attributes
+    unsigned GetNumNetworkAttributes() const;
     /// Return attribute descriptions, or null if none defined
     const Vector<AttributeInfo>* GetAttributes() const;
     

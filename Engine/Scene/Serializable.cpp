@@ -436,6 +436,23 @@ unsigned Serializable::GetNumAttributes() const
     return attributes ? attributes->Size() : 0;
 }
 
+unsigned Serializable::GetNumNetworkAttributes() const
+{
+    const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
+    if (!attributes)
+        return 0;
+    
+    unsigned num = 0;
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (attr.mode_ & AM_NETWORK)
+            ++num;
+    }
+    
+    return num;
+}
+
 const Vector<AttributeInfo>* Serializable::GetAttributes() const
 {
     return context_->GetAttributes(GetType());

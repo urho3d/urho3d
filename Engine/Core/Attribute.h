@@ -28,10 +28,12 @@
 
 /// Attribute used only for disk serialization
 static const unsigned AM_SERIALIZATION = 0x1;
-/// Attribute used only for network replication
+/// Attribute used for network replication
 static const unsigned AM_NETWORK = 0x2;
 /// Attribute used for both (default)
 static const unsigned AM_BOTH = 0x3;
+/// Attribute should use latest data grouping instead of delta update in network replication
+static const unsigned AM_LATESTDATA = 0x4;
 
 class Serializable;
 

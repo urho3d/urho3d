@@ -22,6 +22,7 @@
 //
 
 #include "Precompiled.h"
+#include "Component.h"
 #include "Connection.h"
 #include "Log.h"
 #include "Protocol.h"
@@ -36,6 +37,7 @@ OBJECTTYPESTATIC(Connection);
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     connection_(connection),
+    frameNumber_(0),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false)
@@ -85,10 +87,10 @@ void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool 
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    VectorBuffer msg;
-    msg.WriteStringHash(eventType);
-    msg.WriteVariantMap(eventData);
-    SendMessage(MSG_REMOTEEVENT, true, inOrder, msg);
+    msg_.Clear();
+    msg_.WriteStringHash(eventType);
+    msg_.WriteVariantMap(eventData);
+    SendMessage(MSG_REMOTEEVENT, true, inOrder, msg_);
 }
 
 void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -109,11 +111,11 @@ void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOr
         return;
     }
     
-    VectorBuffer msg;
-    msg.WriteVLE(receiver->GetID());
-    msg.WriteStringHash(eventType);
-    msg.WriteVariantMap(eventData);
-    SendMessage(MSG_REMOTENODEEVENT, true, inOrder, msg);
+    msg_.Clear();
+    msg_.WriteVLE(receiver->GetID());
+    msg_.WriteStringHash(eventType);
+    msg_.WriteVariantMap(eventData);
+    SendMessage(MSG_REMOTENODEEVENT, true, inOrder, msg_);
 }
 
 void Connection::SetScene(Scene* newScene)
@@ -130,11 +132,13 @@ void Connection::SetScene(Scene* newScene)
     
     if (isClient_ && scene_)
     {
+        sceneState_.Clear();
+        
         // When scene is assigned on the server, instruct the client to load it
         /// \todo Download package(s) needed for the scene, if they do not exist already on the client
-        VectorBuffer msg;
-        msg.WriteString(scene_->GetFileName());
-        SendMessage(MSG_LOADSCENE, true, true, msg);
+        msg_.Clear();
+        msg_.WriteString(scene_->GetFileName());
+        SendMessage(MSG_LOADSCENE, true, true, msg_);
     }
 }
 
@@ -157,6 +161,44 @@ void Connection::SetConnectPending(bool connectPending)
 void Connection::Disconnect(int waitMSec)
 {
     connection_->Disconnect(waitMSec);
+}
+
+void Connection::ProcessReplication()
+{
+    if (!isClient_ || !scene_ || !sceneLoaded_)
+        return;
+    
+    const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
+    
+    // Check for new or modified nodes
+    /// \todo Send in correct order that takes node parenting into account
+    for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End(); ++i)
+    {
+        // Break when we reach local node IDs
+        if (i->first_ >= FIRST_LOCAL_ID)
+            break;
+        
+        if (sceneState_.Find(i->first_) == sceneState_.End())
+            ProcessNewNode(i->second_);
+        else
+            ProcessExistingNode(i->second_);
+    }
+    
+    // Check for removed nodes
+    for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
+    {
+        Map<unsigned, NodeReplicationState>::Iterator current = i++;
+        if (current->second_.frameNumber_ != frameNumber_)
+        {
+            msg_.Clear();
+            msg_.WriteVLE(current->first_);
+            
+            SendMessage(MSG_REMOVENODE, true, true, msg_);
+            sceneState_.Erase(current);
+        }
+    }
+    
+    ++frameNumber_;
 }
 
 kNet::MessageConnection* Connection::GetMessageConnection() const
@@ -190,4 +232,340 @@ unsigned short Connection::GetPort() const
 String Connection::ToString() const
 {
     return GetAddress() + ":" + String(GetPort());
+}
+
+void Connection::ProcessNewNode(Node* node)
+{
+    msg_.Clear();
+    msg_.WriteVLE(node->GetID());
+    
+    NodeReplicationState newNodeState;
+    newNodeState.frameNumber_ = frameNumber_;
+    
+    // Write node's attributes
+    msg_.WriteVLE(node->GetNumNetworkAttributes());
+    const Vector<AttributeInfo>* attributes = node->GetAttributes();
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NETWORK))
+            continue;
+        
+        Variant value = node->GetAttribute(i);
+        msg_.WriteVariantData(value);
+        newNodeState.attributes_.Push(value);
+    }
+    
+    // Write node's variable map
+    const VariantMap& vars = node->GetVars();
+    msg_.WriteVLE(vars.Size());
+    for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
+    {
+        msg_.WriteShortStringHash(i->first_);
+        msg_.WriteVariant(i->second_);
+        newNodeState.vars_[i->first_] = i->second_;
+    }
+    
+    // Write node's components
+    msg_.WriteVLE(node->GetNumNetworkComponents());
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    for (unsigned i = 0; i < components.Size(); ++i)
+    {
+        Component* component = components[i];
+        if (component->GetID() >= FIRST_LOCAL_ID)
+            continue;
+        
+        msg_.WriteShortStringHash(component->GetType());
+        msg_.WriteVLE(component->GetID());
+        
+        ComponentReplicationState newComponentState;
+        newComponentState.frameNumber_ = frameNumber_;
+        newComponentState.type_ = component->GetType();
+        
+        // Write component's attributes
+        msg_.WriteVLE(component->GetNumNetworkAttributes());
+        const Vector<AttributeInfo>* attributes = component->GetAttributes();
+        if (attributes)
+        {
+            for (unsigned j = 0; j < attributes->Size(); ++j)
+            {
+                const AttributeInfo& attr = attributes->At(j);
+                if (!(attr.mode_ & AM_NETWORK))
+                    continue;
+                
+                Variant value = component->GetAttribute(j);
+                msg_.WriteVariantData(value);
+                newComponentState.attributes_.Push(value);
+            }
+        }
+        
+        newNodeState.components_[component->GetID()] = newComponentState;
+    }
+    
+    SendMessage(MSG_CREATENODE, true, true, msg_);
+    sceneState_[node->GetID()] = newNodeState;
+}
+
+void Connection::ProcessExistingNode(Node* node)
+{
+    NodeReplicationState& nodeState = sceneState_[node->GetID()];
+    nodeState.frameNumber_ = frameNumber_;
+    
+    // Check if attributes have changed
+    bool deltaUpdate = false;
+    bool latestData = false;
+    const Vector<AttributeInfo>* attributes = node->GetAttributes();
+    deltaUpdateBits_.Resize((node->GetNumNetworkAttributes() + 7) >> 3);
+    for (unsigned i = 0; i < deltaUpdateBits_.Size(); ++i)
+        deltaUpdateBits_[i] = 0;
+    unsigned index = 0;
+    
+    // Make sure the current attributes vector is large enough
+    if (currentAttributes_.Size() < nodeState.attributes_.Size())
+        currentAttributes_.Resize(nodeState.attributes_.Size());
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NETWORK))
+            continue;
+        
+        // Check for attribute change
+        currentAttributes_[index] = node->GetAttribute(i);
+        if (currentAttributes_[index] != nodeState.attributes_[index])
+        {
+            if (attr.mode_ & AM_LATESTDATA)
+                latestData = true;
+            else
+            {
+                deltaUpdate = true;
+                deltaUpdateBits_[index >> 3] |= 1 << (index & 7);
+            }
+        }
+        
+        ++index;
+    }
+    
+    // Check if variable map has changed. Note: variable removal is not supported
+    changedVars_.Clear();
+    const VariantMap& vars = node->GetVars();
+    for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
+    {
+        VariantMap::ConstIterator j = nodeState.vars_.Find(i->first_);
+        if (j == nodeState.vars_.End() || i->second_ != j->second_)
+        {
+            changedVars_.Insert(i->first_);
+            deltaUpdate = true;
+        }
+    }
+    
+    // Send deltaupdate message if necessary
+    if (deltaUpdate)
+    {
+        msg_.Clear();
+        msg_.WriteVLE(node->GetID());
+        
+        // Write changed attributes
+        msg_.Write(&deltaUpdateBits_[0], deltaUpdateBits_.Size());
+        
+        index = 0;
+        for (unsigned i = 0; i < attributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = attributes->At(i);
+            if (!(attr.mode_ & AM_NETWORK))
+                continue;
+            
+            if (deltaUpdateBits_[index << 3] & (1 << (index & 7)))
+            {
+                msg_.WriteVariantData(currentAttributes_[index]);
+                nodeState.attributes_[index] = currentAttributes_[index];
+            }
+            
+            ++index;
+        }
+        
+        // Write changed variables
+        msg_.WriteVLE(changedVars_.Size());
+        for (HashSet<ShortStringHash>::ConstIterator i = changedVars_.Begin(); i != changedVars_.End(); ++i)
+        {
+            VariantMap::ConstIterator j = vars.Find(*i);
+            msg_.WriteShortStringHash(j->first_);
+            msg_.WriteVariant(j->second_);
+            nodeState.vars_[j->first_] = j->second_;
+        }
+        
+        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_);
+    }
+    
+    // Send latestdata message if necessary
+    if (latestData)
+    {
+        // If at least one latest data attribute changes, send all of them
+        msg_.Clear();
+        msg_.WriteVLE(node->GetID());
+        
+        index = 0;
+        for (unsigned i = 0; i < attributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = attributes->At(i);
+            if ((attr.mode_ & (AM_NETWORK | AM_LATESTDATA)) != (AM_NETWORK | AM_LATESTDATA))
+                continue;
+            
+            msg_.WriteVariantData(currentAttributes_[index]);
+            nodeState.attributes_[index] = currentAttributes_[index];
+            
+            ++index;
+        }
+        
+        SendMessage(MSG_NODELATESTDATA, node->GetID(), true, false, msg_);
+    }
+    
+    // Check for new/updated components
+    const Vector<SharedPtr<Component> >& components = node->GetComponents();
+    for (unsigned i = 0; i < components.Size(); ++i)
+    {
+        Component* component = components[i];
+        if (component->GetID() >= FIRST_LOCAL_ID)
+            continue;
+        
+        Map<unsigned, ComponentReplicationState>::Iterator j = nodeState.components_.Find(component->GetID());
+        if (j == nodeState.components_.End())
+        {
+            // New component
+            msg_.Clear();
+            msg_.WriteVLE(node->GetID());
+            msg_.WriteShortStringHash(component->GetType());
+            msg_.WriteVLE(component->GetID());
+            
+            ComponentReplicationState newComponentState;
+            newComponentState.frameNumber_ = frameNumber_;
+            newComponentState.type_ = component->GetType();
+            
+            // Write component's attributes
+            msg_.WriteVLE(component->GetNumNetworkAttributes());
+            const Vector<AttributeInfo>* attributes = component->GetAttributes();
+            if (attributes)
+            {
+                for (unsigned k = 0; k < attributes->Size(); ++k)
+                {
+                    const AttributeInfo& attr = attributes->At(k);
+                    if (!(attr.mode_ & AM_NETWORK))
+                        continue;
+                    
+                    Variant value = component->GetAttribute(k);
+                    msg_.WriteVariantData(value);
+                    newComponentState.attributes_.Push(value);
+                }
+            }
+            
+            SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
+            nodeState.components_[component->GetID()] = newComponentState;
+        }
+        else
+        {
+            // Existing component
+            ComponentReplicationState& componentState = j->second_;
+            componentState.frameNumber_ = frameNumber_;
+            
+            deltaUpdate = false;
+            latestData = false;
+            const Vector<AttributeInfo>* attributes = component->GetAttributes();
+            deltaUpdateBits_.Resize((component->GetNumNetworkAttributes() + 7) >> 3);
+            for (unsigned k = 0; k < deltaUpdateBits_.Size(); ++k)
+                deltaUpdateBits_[k] = 0;
+            index = 0;
+            
+            // Make sure the current attributes vector is large enough
+            if (currentAttributes_.Size() < componentState.attributes_.Size())
+                currentAttributes_.Resize(componentState.attributes_.Size());
+            
+            for (unsigned k = 0; k < attributes->Size(); ++k)
+            {
+                const AttributeInfo& attr = attributes->At(k);
+                if (!(attr.mode_ & AM_NETWORK))
+                    continue;
+                
+                // Check for attribute change
+                currentAttributes_[index] = component->GetAttribute(k);
+                if (currentAttributes_[index] != nodeState.attributes_[index])
+                {
+                    if (attr.mode_ & AM_LATESTDATA)
+                        latestData = true;
+                    else
+                    {
+                        deltaUpdate = true;
+                        deltaUpdateBits_[index >> 3] |= 1 << (index & 7);
+                    }
+                }
+                
+                ++index;
+            }
+            
+            // Send deltaupdate message if necessary
+            if (deltaUpdate)
+            {
+                msg_.Clear();
+                msg_.WriteVLE(component->GetID());
+                
+                // Write changed attributes
+                msg_.Write(&deltaUpdateBits_[0], deltaUpdateBits_.Size());
+                
+                index = 0;
+                for (unsigned k = 0; k < attributes->Size(); ++k)
+                {
+                    const AttributeInfo& attr = attributes->At(k);
+                    if (!(attr.mode_ & AM_NETWORK))
+                        continue;
+                    
+                    if (deltaUpdateBits_[index << 3] & (1 << (index & 7)))
+                    {
+                        msg_.WriteVariantData(currentAttributes_[index]);
+                        componentState.attributes_[index] = currentAttributes_[index];
+                    }
+                    
+                    ++index;
+                }
+                
+                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
+            }
+            
+            // Send latestdata message if necessary
+            if (latestData)
+            {
+                // If at least one latest data attribute changes, send all of them
+                msg_.Clear();
+                msg_.WriteVLE(component->GetID());
+                
+                index = 0;
+                for (unsigned k = 0; k < attributes->Size(); ++k)
+                {
+                    const AttributeInfo& attr = attributes->At(k);
+                    if ((attr.mode_ & (AM_NETWORK | AM_LATESTDATA)) != (AM_NETWORK | AM_LATESTDATA))
+                        continue;
+                    
+                    msg_.WriteVariantData(currentAttributes_[index]);
+                    componentState.attributes_[index] = currentAttributes_[index];
+                    
+                    ++index;
+                }
+                
+                SendMessage(MSG_COMPONENTLATESTDATA, component->GetID(), true, false, msg_);
+            }
+        }
+    }
+    
+    // Check for removed components
+    for (Map<unsigned, ComponentReplicationState>::Iterator i = nodeState.components_.Begin(); i != nodeState.components_.End();)
+    {
+        Map<unsigned, ComponentReplicationState>::Iterator current = i++;
+        if (current->second_.frameNumber_ != frameNumber_)
+        {
+            msg_.Clear();
+            msg_.WriteVLE(node->GetID());
+            msg_.WriteVLE(current->first_);
+            
+            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
+            nodeState.components_.Erase(current);
+        }
+    }
 }

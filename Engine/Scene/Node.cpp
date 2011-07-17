@@ -66,8 +66,8 @@ void Node::RegisterObject(Context* context)
     context->RegisterFactory<Node>();
     
     ATTRIBUTE(Node, VAR_STRING, "Name", name_, String());
-    ATTRIBUTE(Node, VAR_VECTOR3, "Position", position_, Vector3::ZERO);
-    ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY);
+    ATTRIBUTE_MODE(Node, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_BOTH | AM_LATESTDATA);
+    ATTRIBUTE_MODE(Node, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_BOTH | AM_LATESTDATA);
     ATTRIBUTE(Node, VAR_VECTOR3, "Scale", scale_, Vector3::UNITY);
     ATTRIBUTE_MODE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_SERIALIZATION);
 }
@@ -556,6 +556,18 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
     }
     
     return 0;
+}
+
+unsigned Node::GetNumNetworkComponents() const
+{
+    unsigned num = 0;
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetID() < FIRST_LOCAL_ID)
+            ++num;
+    }
+    
+    return num;
 }
 
 void Node::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const
