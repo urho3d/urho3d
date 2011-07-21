@@ -99,12 +99,8 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    /// Perform post-load after the whole scene has been loaded
-    virtual void PostLoad();
+    /// Perform finalization after a scene load or network update
+    virtual void OnFinishUpdate();
     
     /// Clear the collision geometry
     void Clear();
@@ -170,6 +166,11 @@ public:
     void UpdateTransform();
     /// Add debug geometry to the debug graphics
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    
+    /// Set model attribute
+    void SetModelAttr(ResourceRef value);
+    /// Return model attribute
+    ResourceRef GetModelAttr() const;
     
 protected:
     /// Handle node being assigned

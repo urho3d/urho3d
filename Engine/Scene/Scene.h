@@ -91,8 +91,6 @@ public:
     void SetActive(bool enable);
     /// Clear scene completely of nodes and components
     void Clear();
-    /// Clear scene of all non-local child nodes. Note: if they have local children, they will be removed as well
-    void ClearNonLocal();
     /// Add a required package file for multiplayer. To be called on the server
     void AddRequiredPackageFile(PackageFile* file);
     /// Clear required package files
@@ -122,7 +120,7 @@ public:
     const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
     
     /// Get free node ID, either non-local or local
-    unsigned GetFreeunsigned(bool local);
+    unsigned GetFreeNodeID(bool local);
     /// Get free component ID, either non-local or local
     unsigned GetFreeComponentID(bool local);
     /// Node added. Assign scene pointer and add to ID map

@@ -80,79 +80,15 @@ ParticleEmitter::~ParticleEmitter()
 void ParticleEmitter::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter>();
-
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", scaled_, true);
-    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f);
-    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f);
-    ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", parameterSource_, ResourceRef(XMLFile::GetTypeStatic()));
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Particles", particles_, PODVector<unsigned char>(), AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ParticleEmitter, VAR_BUFFER, "Billboards", billboards_, PODVector<unsigned char>(), AM_SERIALIZATION);
-}
-
-void ParticleEmitter::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    switch (attr.offset_)
-    {
-    case offsetof(ParticleEmitter, parameterSource_):
-        LoadParameters(cache->GetResource<XMLFile>(value.GetResourceRef().id_));
-        break;
-    
-    case offsetof(ParticleEmitter, particles_):
-        {
-            MemoryBuffer buf(value.GetBuffer());
-            SetNumParticles(buf.ReadVLE());
-            for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
-            {
-                i->velocity_ = buf.ReadVector3();
-                i->size_ = buf.ReadVector2();
-                i->timer_ = buf.ReadFloat();
-                i->timeToLive_ = buf.ReadFloat();
-                i->scale_ = buf.ReadFloat();
-                i->rotationSpeed_ = buf.ReadFloat();
-                i->colorIndex_ = buf.ReadVLE();
-                i->texIndex_ = buf.ReadVLE();
-            }
-        }
-        break;
-        
-    default:
-        BillboardSet::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant ParticleEmitter::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(ParticleEmitter, parameterSource_):
-        return GetResourceRef(parameterSource_, XMLFile::GetTypeStatic());
-        
-    case offsetof(ParticleEmitter, particles_):
-        {
-            VectorBuffer buf;
-            buf.WriteVLE(particles_.Size());
-            for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
-            {
-                buf.WriteVector3(i->velocity_);
-                buf.WriteVector2(i->size_);
-                buf.WriteFloat(i->timer_);
-                buf.WriteFloat(i->timeToLive_);
-                buf.WriteFloat(i->scale_);
-                buf.WriteFloat(i->rotationSpeed_);
-                buf.WriteVLE(i->colorIndex_);
-                buf.WriteVLE(i->texIndex_);
-            }
-            return buf.GetBuffer();
-        }
-        
-    default:
-        return BillboardSet::OnGetAttribute(attr);
-    }
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Relative Scale", scaled_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_BOOL, "Is Active", active_, true, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BUFFER, "Particles", GetParticlesAttr, SetParticlesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BUFFER, "Billboards", GetBillboardsAttr, SetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
 }
 
 void ParticleEmitter::Update(float timeStep)
@@ -424,6 +360,64 @@ void ParticleEmitter::SetActive(bool enable, bool resetPeriod)
     }
 }
 
+void ParticleEmitter::SetParameterSourceAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    LoadParameters(cache->GetResource<XMLFile>(value.id_));
+}
+
+void ParticleEmitter::SetParticlesAttr(PODVector<unsigned char> value)
+{
+    MemoryBuffer buf(value);
+    SetNumParticles(buf.ReadVLE());
+    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
+    {
+        i->velocity_ = buf.ReadVector3();
+        i->size_ = buf.ReadVector2();
+        i->timer_ = buf.ReadFloat();
+        i->timeToLive_ = buf.ReadFloat();
+        i->scale_ = buf.ReadFloat();
+        i->rotationSpeed_ = buf.ReadFloat();
+        i->colorIndex_ = buf.ReadVLE();
+        i->texIndex_ = buf.ReadVLE();
+    }
+}
+
+ResourceRef ParticleEmitter::GetParameterSourceAttr() const
+{
+    return GetResourceRef(parameterSource_, XMLFile::GetTypeStatic());
+}
+
+PODVector<unsigned char> ParticleEmitter::GetParticlesAttr() const
+{
+    VectorBuffer buf;
+    buf.WriteVLE(particles_.Size());
+    for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
+    {
+        buf.WriteVector3(i->velocity_);
+        buf.WriteVector2(i->size_);
+        buf.WriteFloat(i->timer_);
+        buf.WriteFloat(i->timeToLive_);
+        buf.WriteFloat(i->scale_);
+        buf.WriteFloat(i->rotationSpeed_);
+        buf.WriteVLE(i->colorIndex_);
+        buf.WriteVLE(i->texIndex_);
+    }
+    return buf.GetBuffer();
+}
+
+void ParticleEmitter::OnNodeSet(Node* node)
+{
+    if (node)
+    {
+        Scene* scene = node->GetScene();
+        if (scene)
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+    }
+    
+    BillboardSet::OnNodeSet(node);
+}
+
 void ParticleEmitter::SetNumParticles(int num)
 {
     num = Max(num, 0);
@@ -447,25 +441,6 @@ void ParticleEmitter::SetParticleColors(const Vector<ColorFade>& colors)
         return;
     
     colors_ = colors;
-}
-
-void ParticleEmitter::OnNodeSet(Node* node)
-{
-    if (node)
-    {
-        Scene* scene = node->GetScene();
-        if (scene)
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
-    }
-    
-    BillboardSet::OnNodeSet(node);
-}
-
-void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
-{
-    using namespace ScenePostUpdate;
-    
-    Update(eventData[P_TIMESTEP].GetFloat());
 }
 
 bool ParticleEmitter::EmitNewParticle()
@@ -592,4 +567,11 @@ void ParticleEmitter::GetVector3MinMax(const XMLElement& element, Vector3& minVa
         minValue = element.GetVector3("min");
         maxValue = element.GetVector3("max");
     }
+}
+
+void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace ScenePostUpdate;
+    
+    Update(eventData[P_TIMESTEP].GetFloat());
 }

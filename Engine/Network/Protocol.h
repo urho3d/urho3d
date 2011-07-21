@@ -32,22 +32,24 @@ static const int MSG_SCENELOADED = 0x7;
 
 // Server->client: load new scene. In case of empty filename the client should just empty the scene
 static const int MSG_LOADSCENE = 0x8;
+// Server->client: wrong scene checksum, can not participate
+static const int MSG_SCENECHECKSUMERROR = 0x9;
 // Server->client: create new node
-static const int MSG_CREATENODE = 0x9;
+static const int MSG_CREATENODE = 0xa;
 // Server->client: node delta update
-static const int MSG_NODEDELTAUPDATE = 0xa;
+static const int MSG_NODEDELTAUPDATE = 0xb;
 // Server->client: node latest data update
-static const int MSG_NODELATESTDATA = 0xb;
+static const int MSG_NODELATESTDATA = 0xc;
 // Server->client: remove node
-static const int MSG_REMOVENODE = 0xc;
+static const int MSG_REMOVENODE = 0xd;
 // Server->client: create new component
-static const int MSG_CREATECOMPONENT = 0xd;
+static const int MSG_CREATECOMPONENT = 0xe;
 // Server->client: component delta update
-static const int MSG_COMPONENTDELTAUPDATE = 0xe;
+static const int MSG_COMPONENTDELTAUPDATE = 0xf;
 // Server->client: component latest data update
-static const int MSG_COMPONENTLATESTDATA = 0xf;
+static const int MSG_COMPONENTLATESTDATA = 0x10;
 // Server->client: remove component
-static const int MSG_REMOVECOMPONENT = 0x10;
+static const int MSG_REMOVECOMPONENT = 0x11;
 
 // Client->server and server->client: remote event
 static const int MSG_REMOTEEVENT = 0x11;

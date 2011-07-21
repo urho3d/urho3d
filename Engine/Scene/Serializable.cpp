@@ -35,8 +35,7 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    inSerialization_(false),
-    inNetwork_(false)
+    inSerialization_(false)
 {
 }
 
@@ -193,7 +192,7 @@ bool Serializable::Load(Deserializer& source)
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_SERIALIZATION))
+        if (!(attr.mode_ & AM_FILE))
             continue;
         
         if (source.IsEof())
@@ -221,7 +220,7 @@ bool Serializable::Save(Serializer& dest)
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_SERIALIZATION))
+        if (!(attr.mode_ & AM_FILE))
             continue;
         
         if (!dest.WriteVariantData(GetAttribute(i)))
@@ -253,7 +252,7 @@ bool Serializable::LoadXML(const XMLElement& source)
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_SERIALIZATION))
+        if (!(attr.mode_ & AM_FILE))
             continue;
         
         // We could assume fixed order. However, do name-based lookup instead for more robustness
@@ -320,7 +319,7 @@ bool Serializable::SaveXML(XMLElement& dest)
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_SERIALIZATION))
+        if (!(attr.mode_ & AM_FILE))
             continue;
         
         XMLElement attrElem = dest.CreateChild("attribute");
@@ -446,7 +445,7 @@ unsigned Serializable::GetNumNetworkAttributes() const
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        if (attr.mode_ & AM_NETWORK)
+        if (attr.mode_ & AM_NET)
             ++num;
     }
     

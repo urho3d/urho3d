@@ -49,7 +49,7 @@ Scene::Scene(Context* context) :
     asyncLoading_(false)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
-    SetID(GetFreeunsigned(false));
+    SetID(GetFreeNodeID(false));
     NodeAdded(this);
     
     SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
@@ -70,10 +70,10 @@ void Scene::RegisterObject(Context* context)
     context->RegisterFactory<Scene>();
     context->CopyBaseAttributes<Node, Scene>();
     
-    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Node ID", nonLocalNodeID_, FIRST_NONLOCAL_ID);
-    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Component ID", nonLocalComponentID_, FIRST_NONLOCAL_ID);
-    ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID);
-    ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID);
+    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Node ID", nonLocalNodeID_, FIRST_NONLOCAL_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Component ID", nonLocalComponentID_, FIRST_NONLOCAL_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_DEFAULT);
 }
 
 bool Scene::Load(Deserializer& source)
@@ -271,14 +271,6 @@ void Scene::Clear()
     checksum_ = 0;
 }
 
-void Scene::ClearNonLocal()
-{
-    // Because node removal can remove arbitrary other nodes, can not iterate. Instead loop until the first node is local,
-    // or the map is empty
-    while (allNodes_.Size() && allNodes_.Begin()->first_ < FIRST_LOCAL_ID)
-        allNodes_.Begin()->second_->Remove();
-}
-
 void Scene::AddRequiredPackageFile(PackageFile* file)
 {
     if (file)
@@ -325,7 +317,7 @@ float Scene::GetAsyncProgress() const
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
 }
 
-unsigned Scene::GetFreeunsigned(bool local)
+unsigned Scene::GetFreeNodeID(bool local)
 {
     if (!local)
     {
@@ -499,7 +491,7 @@ void Scene::FinishAsyncLoading()
 
 void Scene::FinishLoading(Deserializer* source)
 {
-    PostLoad();
+    OnFinishUpdate();
     
     if (source)
     {

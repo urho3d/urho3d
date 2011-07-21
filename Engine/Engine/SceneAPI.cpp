@@ -28,9 +28,11 @@
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint AM_SERIALIZATION", (void*)AM_SERIALIZATION);
-    engine->RegisterGlobalProperty("const uint AM_NETWORK", (void*)AM_NETWORK);
-    engine->RegisterGlobalProperty("const uint AM_BOTH", (void*)AM_BOTH);
+    engine->RegisterGlobalProperty("const uint AM_FILE", (void*)AM_FILE);
+    engine->RegisterGlobalProperty("const uint AM_NET", (void*)AM_NET);
+    engine->RegisterGlobalProperty("const uint AM_DEFAULT", (void*)AM_DEFAULT);
+    engine->RegisterGlobalProperty("const uint AM_LATESTDATA", (void*)AM_LATESTDATA);
+    engine->RegisterGlobalProperty("const uint AM_NOEDIT", (void*)AM_NOEDIT);
     
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
@@ -90,7 +92,6 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "bool LoadAsyncXML(File@+)", asMETHOD(Scene, LoadAsyncXML), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void StopAsyncLoading()", asMETHOD(Scene, StopAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void Clear()", asMETHOD(Scene, Clear), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Scene", "void ClearNonLocal()", asMETHOD(Scene, ClearNonLocal), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponentByID(uint)", asMETHOD(Scene, GetComponentByID), asCALL_THISCALL);

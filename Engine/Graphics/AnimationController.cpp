@@ -53,57 +53,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", animations_, PODVector<unsigned char>());
-}
-
-
-void AnimationController::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(AnimationController, animations_):
-        {
-            MemoryBuffer buf(value.GetBuffer());
-            animations_.Resize(buf.ReadVLE());
-            for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
-            {
-                i->hash_ = buf.ReadStringHash();
-                i->speed_ = buf.ReadFloat();
-                i->targetWeight_ = buf.ReadFloat();
-                i->fadeTime_ = buf.ReadFloat();
-                i->autoFadeTime_ = buf.ReadFloat();
-            }
-        }
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant AnimationController::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(AnimationController, animations_):
-        {
-            VectorBuffer buf;
-            buf.WriteVLE(animations_.Size());
-            for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
-            {
-                buf.WriteStringHash(i->hash_);
-                buf.WriteFloat(i->speed_);
-                buf.WriteFloat(i->targetWeight_);
-                buf.WriteFloat(i->fadeTime_);
-                buf.WriteFloat(i->autoFadeTime_);
-            }
-            return buf.GetBuffer();
-        }
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
 }
 
 void AnimationController::Update(float timeStep)
@@ -540,6 +490,35 @@ float AnimationController::GetAutoFade(const String& name) const
     if (index == M_MAX_UNSIGNED)
         return 0.0f;
     return animations_[index].autoFadeTime_;
+}
+
+void AnimationController::SetAnimationsAttr(PODVector<unsigned char> value)
+{
+    MemoryBuffer buf(value);
+    animations_.Resize(buf.ReadVLE());
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        i->hash_ = buf.ReadStringHash();
+        i->speed_ = buf.ReadFloat();
+        i->targetWeight_ = buf.ReadFloat();
+        i->fadeTime_ = buf.ReadFloat();
+        i->autoFadeTime_ = buf.ReadFloat();
+    }
+}
+
+PODVector<unsigned char> AnimationController::GetAnimationsAttr() const
+{
+    VectorBuffer buf;
+    buf.WriteVLE(animations_.Size());
+    for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        buf.WriteStringHash(i->hash_);
+        buf.WriteFloat(i->speed_);
+        buf.WriteFloat(i->targetWeight_);
+        buf.WriteFloat(i->fadeTime_);
+        buf.WriteFloat(i->autoFadeTime_);
+    }
+    return buf.GetBuffer();
 }
 
 void AnimationController::OnNodeSet(Node* node)

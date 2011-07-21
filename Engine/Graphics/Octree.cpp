@@ -281,25 +281,16 @@ void Octree::RegisterObject(Context* context)
 {
     context->RegisterFactory<Octree>();
     
-    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, Vector3(-DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE));
-    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, Vector3(DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE));
-    ATTRIBUTE(Octree, VAR_INT, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS);
+    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, Vector3(-DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE), AM_DEFAULT);
+    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, Vector3(DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), AM_DEFAULT);
+    ATTRIBUTE(Octree, VAR_INT, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
 void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 {
+    // If any of the (size) attributes changes, resize the octree
     Serializable::OnSetAttribute(attr, value);
-    
-    // If any of the size attributes changes, resize the octree
-    /// \todo This may lead to unnecessary resizing, however it is fast once child nodes have been removed
-    switch (attr.offset_)
-    {
-    case offsetof(Octree, worldBoundingBox_.min_):
-    case offsetof(Octree, worldBoundingBox_.max_):
-    case offsetof(Octree, numLevels_):
-        Resize(worldBoundingBox_, numLevels_);
-        break;
-    }
+    Resize(worldBoundingBox_, numLevels_);
 }
 
 void Octree::Resize(const BoundingBox& box, unsigned numLevels)

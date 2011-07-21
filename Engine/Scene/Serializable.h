@@ -45,6 +45,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor
     virtual Variant OnGetAttribute(const AttributeInfo& attr);
+    /// Perform finalization after a scene load or network update
+    virtual void OnFinishUpdate() {}
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful
@@ -53,8 +55,6 @@ public:
     virtual bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful
     virtual bool SaveXML(XMLElement& dest);
-    /// Perform post-load after the whole scene has been loaded
-    virtual void PostLoad() {}
     
     /// Set attribute by index. Return true if successfully set
     bool SetAttribute(unsigned index, const Variant& value);
@@ -75,12 +75,9 @@ public:
 protected:
     /// In serialization -flag
     bool inSerialization_;
-    /// In network replication -flag
-    bool inNetwork_;
 };
 
-
-/// Template implementation of the attribute accessor invoke helper class (stores function pointers of specific class)
+/// Template implementation of the attribute accessor invoke helper class
 template <class T, class U> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
@@ -114,9 +111,41 @@ public:
     SetFunctionPtr setFunction_;
 };
 
-#define ATTRIBUTE(className, type, name, variable, defaultValue) context->RegisterAttribute<className>(AttributeInfo(type, name, offsetof(className, variable), defaultValue, AM_BOTH))
-#define ATTRIBUTE_MODE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
-#define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue) context->RegisterAttribute<className>(AttributeInfo(VAR_INT, name, offsetof(className, variable), enumNames, defaultValue, AM_BOTH))
-#define ENUM_ATTRIBUTE_MODE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(VAR_INT, name, offsetof(className, variable), enumNames, defaultValue, mode))
-#define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, AM_BOTH))
-#define ACCESSOR_ATTRIBUTE_MODE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+/// Template implementation of the attribute accessor invoke helper class using const references
+template <class T, class U> class RefAttributeAccessorImpl : public AttributeAccessor
+{
+public:
+    typedef const U& (T::*GetFunctionPtr)() const;
+    typedef void (T::*SetFunctionPtr)(const U&);
+    
+    /// Construct with function pointers
+    RefAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
+        getFunction_(getFunction),
+        setFunction_(setFunction)
+    {
+    }
+    
+    /// Invoke getter function
+    virtual Variant Get(Serializable* ptr)
+    {
+        T* classPtr = static_cast<T*>(ptr);
+        return Variant((classPtr->*getFunction_)());
+    }
+    
+    /// Invoke setter function
+    virtual void Set(Serializable* ptr, const Variant& value)
+    {
+        T* classPtr = static_cast<T*>(ptr);
+        (classPtr->*setFunction_)(value.Get<U>());
+    }
+    
+    /// Class-specific pointer to getter function
+    GetFunctionPtr getFunction_;
+    /// Class-specific pointer to setter function
+    SetFunctionPtr setFunction_;
+};
+
+#define ATTRIBUTE(className, type, name, variable, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, offsetof(className, variable), defaultValue, mode))
+#define ENUM_ATTRIBUTE(className, name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(VAR_INT, name, offsetof(className, variable), enumNames, defaultValue, mode))
+#define ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new AttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))
+#define REF_ACCESSOR_ATTRIBUTE(className, type, name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<className>(AttributeInfo(type, name, new RefAttributeAccessorImpl<className, typeName>(&className::getFunction, &className::setFunction), defaultValue, mode))

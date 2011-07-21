@@ -76,87 +76,12 @@ void BillboardSet::RegisterObject(Context* context)
     context->RegisterFactory<BillboardSet>();
     context->CopyBaseAttributes<Drawable, BillboardSet>();
     
-    ATTRIBUTE(BillboardSet, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f);
-    ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", relative_, true);
-    ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", scaled_, true);
-    ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", sorted_, false);
-    ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", material_, ResourceRef(Material::GetTypeStatic()));
-    ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", billboards_, PODVector<unsigned char>());
-}
-
-void BillboardSet::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    switch (attr.offset_)
-    {
-    case offsetof(BillboardSet, relative_):
-        SetRelative(value.GetBool());
-        break;
-    
-    case offsetof(BillboardSet, scaled_):
-        SetScaled(value.GetBool());
-        break;
-    
-    case offsetof(BillboardSet, sorted_):
-        SetSorted(value.GetBool());
-        break;
-    
-    case offsetof(BillboardSet, material_):
-        SetMaterial(cache->GetResource<Material>(value.GetResourceRef().id_));
-        break;
-        
-    case offsetof(BillboardSet, billboards_):
-        {
-            MemoryBuffer buf(value.GetBuffer());
-            unsigned numBillboards = buf.ReadVLE();
-            SetNumBillboards(numBillboards);
-            for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
-            {
-                i->position_ = buf.ReadVector3();
-                i->size_ = buf.ReadVector2();
-                i->uv_ = buf.ReadRect();
-                i->color_ = buf.ReadColor();
-                i->rotation_ = buf.ReadFloat();
-                i->enabled_ = buf.ReadBool();
-            }
-            Updated();
-        }
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant BillboardSet::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(BillboardSet, material_):
-        return GetResourceRef(material_, Material::GetTypeStatic());
-        
-    case offsetof(BillboardSet, billboards_):
-        {
-            VectorBuffer buf;
-            buf.WriteVLE(billboards_.Size());
-            for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
-            {
-                buf.WriteVector3(i->position_);
-                buf.WriteVector2(i->size_);
-                buf.WriteRect(i->uv_);
-                buf.WriteColor(i->color_);
-                buf.WriteFloat(i->rotation_);
-                buf.WriteBool(i->enabled_);
-            }
-            return buf.GetBuffer();
-        }
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
-    
+    ATTRIBUTE(BillboardSet, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", GetBillboardsAttr, SetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
 }
 
 void BillboardSet::UpdateDistance(const FrameInfo& frame)
@@ -277,6 +202,50 @@ void BillboardSet::Updated()
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
     return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
+}
+
+void BillboardSet::SetMaterialAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetMaterial(cache->GetResource<Material>(value.id_));
+}
+
+void BillboardSet::SetBillboardsAttr(PODVector<unsigned char> value)
+{
+    MemoryBuffer buf(value);
+    unsigned numBillboards = buf.ReadVLE();
+    SetNumBillboards(numBillboards);
+    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    {
+        i->position_ = buf.ReadVector3();
+        i->size_ = buf.ReadVector2();
+        i->uv_ = buf.ReadRect();
+        i->color_ = buf.ReadColor();
+        i->rotation_ = buf.ReadFloat();
+        i->enabled_ = buf.ReadBool();
+    }
+    Updated();
+}
+
+ResourceRef BillboardSet::GetMaterialAttr() const
+{
+    return GetResourceRef(material_, Material::GetTypeStatic());
+}
+
+PODVector<unsigned char> BillboardSet::GetBillboardsAttr() const
+{
+    VectorBuffer buf;
+    buf.WriteVLE(billboards_.Size());
+    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    {
+        buf.WriteVector3(i->position_);
+        buf.WriteVector2(i->size_);
+        buf.WriteRect(i->uv_);
+        buf.WriteColor(i->color_);
+        buf.WriteFloat(i->rotation_);
+        buf.WriteBool(i->enabled_);
+    }
+    return buf.GetBuffer();
 }
 
 void BillboardSet::OnMarkedDirty(Node* node)

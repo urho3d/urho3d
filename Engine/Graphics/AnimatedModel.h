@@ -46,12 +46,8 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    /// Perform post-load after the whole scene has been loaded
-    virtual void PostLoad();
+    /// Perform finalization after a scene load or network update
+    virtual void OnFinishUpdate();
     /// Process renderer raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Animation is updated here
@@ -125,6 +121,19 @@ public:
     /// Return whether is the master (first) animated model
     bool IsMaster() const { return isMaster_; }
     
+    /// Set model attribute
+    void SetModelAttr(ResourceRef value);
+    /// Set bones' animation enabled attribute
+    void SetBonesEnabledAttr(PODVector<unsigned char> value);
+    /// Set animation states attribute
+    void SetAnimationStatesAttr(PODVector<unsigned char> value);
+    /// Return model attribute
+    ResourceRef GetModelAttr() const;
+    /// Return bones' animation enabled attribute
+    PODVector<unsigned char> GetBonesEnabledAttr() const;
+    /// Return animation states attribute
+    PODVector<unsigned char> GetAnimationStatesAttr() const;
+    
 protected:
     /// Handle node being assigned
     virtual void OnNodeSet(Node* node);
@@ -134,7 +143,7 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Assign skeleton and animation bone node references as a postprocess. Called by PostLoad
+    /// Assign skeleton and animation bone node references as a postprocess. Called by OnFinishUpdate
     void AssignBoneNodes();
     /// Mark animation and skinning to require an update
     void MarkAnimationDirty();
@@ -195,4 +204,6 @@ private:
     bool skinningDirty_;
     /// Master model flag
     bool isMaster_;
+    /// Bone nodes assignment pending flag
+    bool assignBonesPending_;
 };

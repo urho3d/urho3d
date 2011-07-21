@@ -70,12 +70,8 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Perform post-load after the whole scene has been loaded
-    virtual void PostLoad();
+    virtual void OnFinishUpdate();
     /// Add an event handler. Called by script exposed version of SubscribeToEvent()
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
@@ -110,6 +106,19 @@ public:
     bool IsActive() const { return active_; }
     /// Return fixed updates per second
     int GetFixedUpdateFps() const { return fixedUpdateFps_; }
+    
+    /// Set script file attribute
+    void SetScriptFileAttr(ResourceRef value);
+    /// Set delayed method calls attribute
+    void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
+    /// Set fixed update time accumulator attribute
+    void SetFixedUpdateAccAttr(float value);
+    /// Return script file attribute
+    ResourceRef GetScriptFileAttr() const;
+    /// Return delayed method calls attribute
+    PODVector<unsigned char> GetDelayedMethodCallsAttr() const;
+    /// Return fixed update time accumulator attribute
+    float GetFixedUpdateAccAttr() const;
     
 private:
     /// (Re)create the script object and check for supported methods if successfully created

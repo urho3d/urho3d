@@ -436,22 +436,22 @@ template<> void* Variant::Get<void*>() const
     return GetPtr();
 }
 
-template<> const ResourceRef& Variant::Get<const ResourceRef&>() const
+template<> ResourceRef Variant::Get<ResourceRef>() const
 {
     return GetResourceRef();
 }
 
-template<> const ResourceRefList& Variant::Get<const ResourceRefList&>() const
+template<> ResourceRefList Variant::Get<ResourceRefList>() const
 {
     return GetResourceRefList();
 }
 
-template<> const VariantVector& Variant::Get<const VariantVector&>() const
+template<> VariantVector Variant::Get<VariantVector>() const
 {
     return GetVariantVector();
 }
 
-template<> const VariantMap& Variant::Get<const VariantMap&>() const
+template<> VariantMap Variant::Get<VariantMap>() const
 {
     return GetVariantMap();
 }

@@ -60,18 +60,18 @@ void Camera::RegisterObject(Context* context)
 {
     context->RegisterFactory<Camera>();
     
-    ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", nearClip_, DEFAULT_NEARCLIP);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", farClip_, DEFAULT_FARCLIP);
-    ATTRIBUTE(Camera, VAR_FLOAT, "FOV", fov_, DEFAULT_FOV);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", aspectRatio_, 1.0f);
-    ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true);
-    ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", orthographic_, false);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", orthoSize_, DEFAULT_ORTHOSIZE);
-    ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", zoom_, 1.0f);
-    ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", lodBias_, 1.0f);
-    ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK);
-    ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VOF_NONE);
-    ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", projectionOffset_, Vector2::ZERO);
+    ATTRIBUTE(Camera, VAR_FLOAT, "Near Clip", nearClip_, DEFAULT_NEARCLIP, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "Far Clip", farClip_, DEFAULT_FARCLIP, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "FOV", fov_, DEFAULT_FOV, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "Aspect Ratio", aspectRatio_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_BOOL, "Auto Aspect Ratio", autoAspectRatio_, true, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_BOOL, "Orthographic", orthographic_, false, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "Orthographic Size", orthoSize_, DEFAULT_ORTHOSIZE, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "Zoom", zoom_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_FLOAT, "LOD Bias", lodBias_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_INT, "View Override Flags", viewOverrideFlags_, VOF_NONE, AM_DEFAULT);
+    ATTRIBUTE(Camera, VAR_VECTOR2, "Projection Offset", projectionOffset_, Vector2::ZERO, AM_DEFAULT);
 }
 
 void Camera::SetNearClip(float nearClip)

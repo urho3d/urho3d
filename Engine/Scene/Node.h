@@ -45,8 +45,8 @@ public:
     
     /// Handle event
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
+    /// Perform finalization for components and child nodes. Only called after scene load
+    virtual void OnFinishUpdate();
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Load from XML data. Return true if successful
@@ -55,8 +55,6 @@ public:
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful
     virtual bool SaveXML(XMLElement& dest);
-    /// Perform post-load for components and child nodes
-    virtual void PostLoad();
     
     /// Set name
     void SetName(const String& name);
@@ -240,6 +238,11 @@ public:
     void SetScene(Scene* scene);
     /// Set owner connection for multiplayer
     void SetOwner(Connection* owner);
+    
+    /// Set parent attribute (network only)
+    void SetParentAttr(PODVector<unsigned char> value);
+    /// Return parent attribute (network only)
+    PODVector<unsigned char> GetParentAttr() const;
     
     /// User variables
     VariantMap vars_;

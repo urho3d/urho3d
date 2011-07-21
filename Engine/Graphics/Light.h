@@ -145,10 +145,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Calculate distance for rendering
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Add debug geometry to the debug graphics
@@ -258,6 +254,15 @@ public:
     Matrix3x4 GetDirLightTransform(Camera& camera, bool getNearQuad = false);
     /// Return light volume model transform. For directional lights, the view transform must be overridden
     const Matrix3x4& GetVolumeTransform(Camera& camera);
+    
+    /// Set ramp texture attribute
+    void SetRampTextureAttr(ResourceRef value);
+    /// Set shape texture attribute
+    void SetShapeTextureAttr(ResourceRef value);
+    /// Return ramp texture attribute
+    ResourceRef GetRampTextureAttr() const;
+    /// Return shape texture attribute
+    ResourceRef GetShapeTextureAttr() const;
     
 protected:
     /// Update world-space bounding box

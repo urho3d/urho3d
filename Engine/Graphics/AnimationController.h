@@ -67,11 +67,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success
@@ -132,11 +127,16 @@ public:
     float GetFadeTime(const String& name) const;
     /// Return animation autofade time
     float GetAutoFade(const String& name) const;
-
+    
+    /// Set animations attribute
+    void SetAnimationsAttr(PODVector<unsigned char> value);
+    /// Return animations attribute
+    PODVector<unsigned char> GetAnimationsAttr() const;
+    
 protected:
     /// Handle node being assigned
     virtual void OnNodeSet(Node* node);
-
+    
 private:
     /// Find the internal index and animation state of an animation
     void FindAnimation(const String& name, unsigned& index, AnimationState*& state) const;

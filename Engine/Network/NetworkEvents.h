@@ -77,3 +77,9 @@ EVENT(E_NETWORKMESSAGE, NetworkMessage)
 EVENT(E_NETWORKUPDATE, NetworkUpdate)
 {
 }
+
+/// Scene load failed, either due to file not found or checksum error
+EVENT(E_NETWORKSCENELOADFAILED, NetworkSceneLoadFailed)
+{
+    PARAM(P_CONNECTION, Connection);      // Connection pointer
+}

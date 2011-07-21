@@ -38,6 +38,7 @@
 
 class Node;
 class Scene;
+class Serializable;
 
 /// Connection in a networked scene
 class Connection : public Object
@@ -64,6 +65,8 @@ public:
     void SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Assign scene. On the server, this will cause the client to load it
     void SetScene(Scene* newScene);
+    /// Set scene loaded flag
+    void SetSceneLoaded(bool loaded);
     /// Assign identity. Called by Network
     void SetIdentity(const VariantMap& identity);
     /// Set new controls. Moves the current controls as previous
@@ -101,10 +104,14 @@ public:
     String ToString() const;
     
 private:
+    /// Process a node during network update. Will recurse to process parent node(s) first
+    void ProcessNode(Node* node);
     /// Process a node that the client had not yet received
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received
     void ProcessExistingNode(Node* node);
+    /// Write initial attributes (that differ from the default value) for a node or a component
+    void WriteInitialAttributes(VectorBuffer& msg, Serializable* serializable, Vector<Variant>& attributeState);
     
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
@@ -120,10 +127,10 @@ private:
     Map<unsigned, Vector<Variant> > componentLatestData_;
     /// Internal vector for delta update
     PODVector<unsigned char> deltaUpdateBits_;
-    /// Internal vector for comparing attributes
-    Vector<Variant> currentAttributes_;
     /// Internal set for node's variable map changes
     HashSet<ShortStringHash> changedVars_;
+    /// Internal set for processed node ID's during an update
+    HashSet<unsigned> processedNodes_;
     /// Reused message buffer
     VectorBuffer msg_;
     /// Current controls

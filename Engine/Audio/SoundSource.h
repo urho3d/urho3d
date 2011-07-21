@@ -45,11 +45,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    
     /// Play a sound
     void Play(Sound* sound);
     /// Play a sound with specified frequency
@@ -106,6 +101,15 @@ public:
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Sound
     void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolate);
+    
+    /// Set sound attribute
+    void SetSoundAttr(ResourceRef value);
+    /// Set sound position attribute
+    void SetPositionAttr(int value);
+    /// Return sound attribute
+    ResourceRef GetSoundAttr() const;
+    /// Return sound position attribute
+    int GetPositionAttr() const;
     
 protected:
     /// Audio subsystem

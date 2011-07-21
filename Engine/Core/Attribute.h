@@ -26,14 +26,16 @@
 #include "Ptr.h"
 #include "Variant.h"
 
-/// Attribute used only for disk serialization
-static const unsigned AM_SERIALIZATION = 0x1;
+/// Attribute used for file serialization
+static const unsigned AM_FILE = 0x1;
 /// Attribute used for network replication
-static const unsigned AM_NETWORK = 0x2;
-/// Attribute used for both (default)
-static const unsigned AM_BOTH = 0x3;
+static const unsigned AM_NET = 0x2;
+/// Attribute used for both file serialization and network replication (default)
+static const unsigned AM_DEFAULT = 0x3;
 /// Attribute should use latest data grouping instead of delta update in network replication
 static const unsigned AM_LATESTDATA = 0x4;
+/// Attribute should not be shown in the editor
+static const unsigned AM_NOEDIT = 0x8;
 
 class Serializable;
 
@@ -55,7 +57,7 @@ struct AttributeInfo
         type_(VAR_NONE),
         offset_(0),
         enumNames_(0),
-        mode_(AM_BOTH)
+        mode_(AM_DEFAULT)
     {
     }
     

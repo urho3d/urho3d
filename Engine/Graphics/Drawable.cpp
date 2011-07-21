@@ -69,15 +69,15 @@ Drawable::~Drawable()
 
 void Drawable::RegisterObject(Context* context)
 {
-    ATTRIBUTE(Drawable, VAR_BOOL, "Is Visible", visible_, true);
-    ATTRIBUTE(Drawable, VAR_BOOL, "Is Occluder", occluder_, false);
-    ATTRIBUTE(Drawable, VAR_BOOL, "Cast Shadows", castShadows_, false);
-    ATTRIBUTE(Drawable, VAR_FLOAT, "Draw Distance", drawDistance_, 0.0f);
-    ATTRIBUTE(Drawable, VAR_FLOAT, "Shadow Distance", shadowDistance_, 0.0f);
-    ATTRIBUTE(Drawable, VAR_FLOAT, "LOD Bias", lodBias_, 1.0f);
-    ATTRIBUTE(Drawable, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK);
-    ATTRIBUTE(Drawable, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK);
-    ATTRIBUTE(Drawable, VAR_INT, "Max Lights", maxLights_, 0);
+    ATTRIBUTE(Drawable, VAR_BOOL, "Is Visible", visible_, true, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_BOOL, "Is Occluder", occluder_, false, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_BOOL, "Cast Shadows", castShadows_, false, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_FLOAT, "Draw Distance", drawDistance_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_FLOAT, "Shadow Distance", shadowDistance_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_FLOAT, "LOD Bias", lodBias_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "View Mask", viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "Light Mask", lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    ATTRIBUTE(Drawable, VAR_INT, "Max Lights", maxLights_, 0, AM_DEFAULT);
 }
 
 void Drawable::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)

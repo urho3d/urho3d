@@ -49,7 +49,7 @@ static const String methodDeclarations[] = {
     "void FixedPostUpdate(float)",
     "void Load(Deserializer&)",
     "void Save(Serializer&)",
-    "void PostLoad()"
+    "void OnFinishUpdate()"
 };
 
 OBJECTTYPESTATIC(ScriptInstance);
@@ -76,83 +76,16 @@ void ScriptInstance::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScriptInstance>();
     
-    ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", scriptFile_, ResourceRef(ScriptFile::GetTypeStatic()));
-    ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", className_, String());
-    ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true);
-    ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", fixedUpdateFps_, 0);
-    ATTRIBUTE_MODE(ScriptInstance, VAR_FLOAT, "Time Accumulator", fixedUpdateAcc_, 0.0f, AM_SERIALIZATION);
-    ATTRIBUTE_MODE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", delayedMethodCalls_, PODVector<unsigned char>(), AM_SERIALIZATION);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, PODVector<unsigned char>, PODVector<unsigned char>());
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_RESOURCEREF, "Script File", GetScriptFileAttr, SetScriptFileAttr, ResourceRef, ResourceRef(ScriptFile::GetTypeStatic()), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_STRING, "Class Name", GetClassName, SetClassName, String, String(), AM_DEFAULT);
+    ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
 }
 
-void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    switch (attr.offset_)
-    {
-    case offsetof(ScriptInstance, scriptFile_):
-        SetScriptFile(cache->GetResource<ScriptFile>(value.GetResourceRef().id_));
-        break;
-        
-    case offsetof(ScriptInstance, className_):
-        SetClassName(value.GetString());
-        break;
-        
-    case offsetof(ScriptInstance, fixedUpdateFps_):
-        SetFixedUpdateFps(value.GetInt());
-        break;
-        
-    case offsetof(ScriptInstance, fixedUpdateAcc_):
-        Serializable::OnSetAttribute(attr, value);
-        fixedPostUpdateAcc_ = fixedUpdateAcc_;
-        break;
-        
-    case offsetof(ScriptInstance, delayedMethodCalls_):
-        {
-            MemoryBuffer buf(value.GetBuffer());
-            delayedMethodCalls_.Resize(buf.ReadVLE());
-            for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
-            {
-                i->delay_ = buf.ReadFloat();
-                i->declaration_ = buf.ReadString();
-                i->parameters_ = buf.ReadVariantVector();
-            }
-        }
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant ScriptInstance::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(ScriptInstance, scriptFile_):
-        return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
-        
-    case offsetof(ScriptInstance, delayedMethodCalls_):
-        {
-            VectorBuffer buf;
-            buf.WriteVLE(delayedMethodCalls_.Size());
-            for (Vector<DelayedMethodCall>::ConstIterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
-            {
-                buf.WriteFloat(i->delay_);
-                buf.WriteString(i->declaration_);
-                buf.WriteVariantVector(i->parameters_);
-            }
-            return buf.GetBuffer();
-        }
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
-}
-
-void ScriptInstance::PostLoad()
+void ScriptInstance::OnFinishUpdate()
 {
     if (scriptObject_ && methods_[METHOD_POSTLOAD])
         scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTLOAD]);
@@ -301,6 +234,53 @@ void ScriptInstance::AddEventHandler(Object* sender, StringHash eventType, const
     }
     
     SubscribeToEvent(sender, eventType, HANDLER_USERDATA(ScriptInstance, HandleScriptEvent, (void*)method));
+}
+
+void ScriptInstance::SetScriptFileAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetScriptFile(cache->GetResource<ScriptFile>(value.id_));
+}
+
+void ScriptInstance::SetDelayedMethodCallsAttr(PODVector<unsigned char> value)
+{
+    MemoryBuffer buf(value);
+    delayedMethodCalls_.Resize(buf.ReadVLE());
+    for (Vector<DelayedMethodCall>::Iterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    {
+        i->delay_ = buf.ReadFloat();
+        i->declaration_ = buf.ReadString();
+        i->parameters_ = buf.ReadVariantVector();
+    }
+}
+
+void ScriptInstance::SetFixedUpdateAccAttr(float value)
+{
+    fixedUpdateAcc_ = value;
+    fixedPostUpdateAcc_ = value;
+}
+
+ResourceRef ScriptInstance::GetScriptFileAttr() const
+{
+    return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
+}
+
+PODVector<unsigned char> ScriptInstance::GetDelayedMethodCallsAttr() const
+{
+    VectorBuffer buf;
+    buf.WriteVLE(delayedMethodCalls_.Size());
+    for (Vector<DelayedMethodCall>::ConstIterator i = delayedMethodCalls_.Begin(); i != delayedMethodCalls_.End(); ++i)
+    {
+        buf.WriteFloat(i->delay_);
+        buf.WriteString(i->declaration_);
+        buf.WriteVariantVector(i->parameters_);
+    }
+    return buf.GetBuffer();
+}
+
+float ScriptInstance::GetFixedUpdateAccAttr() const
+{
+    return fixedUpdateAcc_;
 }
 
 void ScriptInstance::CreateObject()

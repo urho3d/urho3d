@@ -51,12 +51,8 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    /// Perform post-load after the whole scene has been loaded
-    virtual void PostLoad();
+    /// Perform finalization after a scene load or network update
+    virtual void OnFinishUpdate();
     
     /// Remove the joint
     void Clear();
@@ -65,9 +61,9 @@ public:
     /// Set a hinge joint
     bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bodyA, RigidBody* bodyB = 0);
     /// Set joint world position
-    void SetPosition(const Vector3& position);
+    void SetPosition(Vector3 position);
     /// Set joint world axis if applicable
-    void SetAxis(const Vector3& axis);
+    void SetAxis(Vector3 axis);
     
     /// Return physics world
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
@@ -84,6 +80,15 @@ public:
     /// Return joint world axis
     Vector3 GetAxis() const;
     
+    /// Set body A attribute
+    void SetBodyAAttr(int value);
+    /// Set body B attribute
+    void SetBodyBAttr(int value);
+    /// Return body A attribute
+    int GetBodyAAttr() const;
+    /// Return body B attribute
+    int GetBodyBAttr() const;
+    
 protected:
     /// Handle node being assigned
     virtual void OnNodeSet(Node* node);
@@ -97,6 +102,8 @@ private:
     SharedPtr<RigidBody> bodyB_;
     /// Joint type
     JointType type_;
+    /// Last created joint type
+    JointType createdType_;
     /// ODE joint ID
     dJointID joint_;
     /// Joint position for creation during post-load

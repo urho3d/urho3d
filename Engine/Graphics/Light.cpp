@@ -112,73 +112,30 @@ void Light::RegisterObject(Context* context)
     context->RemoveAttribute<Light>("LOD Bias");
     context->RemoveAttribute<Light>("Max Lights");
     
-    ENUM_ATTRIBUTE(Light, "Light Type", lightType_, typeNames, DEFAULT_LIGHTTYPE);
-    ATTRIBUTE(Light, VAR_COLOR, "Color", color_, Color());
-    ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", specularIntensity_, 0.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Range", range_, 0.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Spotlight FOV", fov_, DEFAULT_FOV);
-    ATTRIBUTE(Light, VAR_FLOAT, "Spotlight Aspect Ratio", aspectRatio_, 1.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Fade Distance", fadeDistance_, 0.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Fade Distance", shadowFadeDistance_, 0.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Intensity", shadowIntensity_, 0.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Map Resolution", shadowResolution_, 1.0f);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Camera Near/Far Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Slope-scaled Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS);
-    ATTRIBUTE(Light, VAR_INT, "Shadow Splits", shadowCascade_.splits_, 1);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Lambda", shadowCascade_.lambda_, DEFAULT_LAMBDA);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Fade Range", shadowCascade_.splitFadeRange_, DEFAULT_SHADOWFADERANGE);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Max Range", shadowCascade_.shadowRange_, M_LARGE_VALUE);
-    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus", shadowFocus_.focus_, true);
-    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus Allow Non-uniform", shadowFocus_.nonUniform_, true);
-    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus Allow Zoom-out", shadowFocus_.zoomOut_, true);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Focus Quantization", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE);
-    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Focus Min. View", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW);
-    ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Ramp Texture", rampTexture_, ResourceRef(Texture2D::GetTypeStatic()));
-    ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", shapeTexture_, ResourceRef(Texture2D::GetTypeStatic()));
-}
-
-void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    switch (attr.offset_)
-    {
-    case offsetof(Light, rampTexture_):
-        {
-            ResourceRef ref = value.GetResourceRef();
-            rampTexture_ = static_cast<Texture*>(cache->GetResource(ref.type_, ref.id_));
-        }
-        break;
-        
-    case offsetof(Light, shapeTexture_):
-        {
-            ResourceRef ref = value.GetResourceRef();
-            shapeTexture_ = static_cast<Texture*>(cache->GetResource(ref.type_, ref.id_));
-        }
-        break;
-    
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant Light::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(Light, rampTexture_):
-        return GetResourceRef(rampTexture_, Texture2D::GetTypeStatic());
-        break;
-        
-    case offsetof(Light, shapeTexture_):
-        return GetResourceRef(shapeTexture_, Texture2D::GetTypeStatic());
-        break;
-    
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
+    ENUM_ATTRIBUTE(Light, "Light Type", lightType_, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_COLOR, "Color", color_, Color(), AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Specular Intensity", specularIntensity_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Range", range_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Spotlight FOV", fov_, DEFAULT_FOV, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Spotlight Aspect Ratio", aspectRatio_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Fade Distance", fadeDistance_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Fade Distance", shadowFadeDistance_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Intensity", shadowIntensity_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Map Resolution", shadowResolution_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Camera Near/Far Ratio", shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Constant Bias", shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Slope-scaled Bias", shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_INT, "Shadow Splits", shadowCascade_.splits_, 1, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Lambda", shadowCascade_.lambda_, DEFAULT_LAMBDA, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Fade Range", shadowCascade_.splitFadeRange_, DEFAULT_SHADOWFADERANGE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Split Max Range", shadowCascade_.shadowRange_, M_LARGE_VALUE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus", shadowFocus_.focus_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus Allow Non-uniform", shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_BOOL, "Shadow Focus Allow Zoom-out", shadowFocus_.zoomOut_, true, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Focus Quantization", shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
+    ATTRIBUTE(Light, VAR_FLOAT, "Shadow Focus Min. View", shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Attenuation Ramp Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Light, VAR_RESOURCEREF, "Light Shape Texture", GetShapeTextureAttr, SetShapeTextureAttr, ResourceRef, ResourceRef(Texture2D::GetTypeStatic()), AM_DEFAULT);
 }
 
 void Light::UpdateDistance(const FrameInfo& frame)
@@ -410,6 +367,28 @@ const Matrix3x4& Light::GetVolumeTransform(Camera& camera)
     }
     
     return volumeTransform_;
+}
+
+void Light::SetRampTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    rampTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+}
+
+void Light::SetShapeTextureAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    shapeTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.id_));
+}
+
+ResourceRef Light::GetRampTextureAttr() const
+{
+    return GetResourceRef(rampTexture_, Texture2D::GetTypeStatic());
+}
+
+ResourceRef Light::GetShapeTextureAttr() const
+{
+    return GetResourceRef(shapeTexture_, Texture2D::GetTypeStatic());
 }
 
 void Light::OnWorldBoundingBoxUpdate()

@@ -57,52 +57,10 @@ void StaticModel::RegisterObject(Context* context)
     context->RegisterFactory<StaticModel>();
     context->CopyBaseAttributes<Drawable, StaticModel>();
     
-    ATTRIBUTE(StaticModel, VAR_RESOURCEREF, "Model", model_, ResourceRef(Model::GetTypeStatic()));
-    ATTRIBUTE(StaticModel, VAR_RESOURCEREFLIST, "Materials", materials_, ResourceRefList(Material::GetTypeStatic()));
-    ATTRIBUTE(StaticModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(StaticModel, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
+    ATTRIBUTE(StaticModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
 }
-
-void StaticModel::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    switch (attr.offset_)
-    {
-    case offsetof(StaticModel, model_):
-        SetModel(cache->GetResource<Model>(value.GetResourceRef().id_));
-        break;
-        
-    case offsetof(StaticModel, materials_):
-        {
-            const ResourceRefList& refs = value.GetResourceRefList();
-            for (unsigned i = 0; i < refs.ids_.Size(); ++i)
-                SetMaterial(i, cache->GetResource<Material>(refs.ids_[i]));
-        }
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant StaticModel::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(StaticModel, model_):
-        return GetResourceRef(model_, Model::GetTypeStatic());
-        break;
-        
-    case offsetof(StaticModel, materials_):
-        return GetResourceRefList(materials_);
-        break;
-    
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
-}
-
 
 void StaticModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
 {
@@ -311,6 +269,29 @@ void StaticModel::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     materials_.Resize(num);
     ResetLodLevels();
+}
+
+void StaticModel::SetModelAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    SetModel(cache->GetResource<Model>(value.id_));
+}
+
+void StaticModel::SetMaterialsAttr(ResourceRefList value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    for (unsigned i = 0; i < value.ids_.Size(); ++i)
+        SetMaterial(i, cache->GetResource<Material>(value.ids_[i]));
+}
+
+ResourceRef StaticModel::GetModelAttr() const
+{
+    return GetResourceRef(model_, Model::GetTypeStatic());
+}
+
+ResourceRefList StaticModel::GetMaterialsAttr() const
+{
+    return GetResourceRefList(materials_);
 }
 
 void StaticModel::OnWorldBoundingBoxUpdate()

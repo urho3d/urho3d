@@ -134,53 +134,14 @@ void SoundSource::RegisterObject(Context* context)
 {
     context->RegisterFactory<SoundSource>();
     
-    ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT);
-    ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f);
-    ATTRIBUTE(SoundSource, VAR_FLOAT, "Gain", gain_, 1.0f);
-    ATTRIBUTE(SoundSource, VAR_FLOAT, "Attenuation", attenuation_, 1.0f);
-    ATTRIBUTE(SoundSource, VAR_FLOAT, "Panning", panning_, 0.0f);
-    ATTRIBUTE(SoundSource, VAR_BOOL, "Autoremove on Stop", autoRemove_, false);
-    ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", sound_, ResourceRef(Sound::GetTypeStatic()));
-    ATTRIBUTE(SoundSource, VAR_INT, "Play Position", position_, 0);
-}
-
-void SoundSource::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    
-    switch (attr.offset_)
-    {
-    case offsetof(SoundSource, sound_):
-        Play(cache->GetResource<Sound>(value.GetResourceRef().id_));
-        break;
-        
-    case offsetof(SoundSource, position_):
-        if (sound_)
-            SetPlayPosition(sound_->GetStart() + value.GetInt());
-        break;
-        
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
-}
-
-Variant SoundSource::OnGetAttribute(const AttributeInfo& attr)
-{
-    switch (attr.offset_)
-    {
-    case offsetof(SoundSource, sound_):
-        return GetResourceRef(sound_, Sound::GetTypeStatic());
-        
-    case offsetof(SoundSource, position_):
-        if (sound_)
-            return (int)(GetPlayPosition() - sound_->GetStart());
-        else
-            return 0;
-        
-    default:
-        return Serializable::OnGetAttribute(attr);
-    }
+    ENUM_ATTRIBUTE(SoundSource, "Sound Type", soundType_, typeNames, SOUND_EFFECT, AM_DEFAULT);
+    ATTRIBUTE(SoundSource, VAR_FLOAT, "Frequency", frequency_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(SoundSource, VAR_FLOAT, "Gain", gain_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(SoundSource, VAR_FLOAT, "Attenuation", attenuation_, 1.0f, AM_DEFAULT);
+    ATTRIBUTE(SoundSource, VAR_FLOAT, "Panning", panning_, 0.0f, AM_DEFAULT);
+    ATTRIBUTE(SoundSource, VAR_BOOL, "Autoremove on Stop", autoRemove_, false, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(SoundSource, VAR_RESOURCEREF, "Sound", GetSoundAttr, SetSoundAttr, ResourceRef, ResourceRef(Sound::GetTypeStatic()), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(SoundSource, VAR_INT, "Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_DEFAULT);
 }
 
 void SoundSource::Play(Sound* sound)
@@ -520,6 +481,31 @@ void SoundSource::Mix(int* dest, unsigned samples, int mixRate, bool stereo, boo
         timePosition_ = (float)((int)position_ - (int)sound_->GetStart()) / (sound_->GetSampleSize() * sound_->GetFrequency());
     else
         timePosition_ += ((float)samples / (float)mixRate) * frequency_ / sound_->GetFrequency();
+}
+
+void SoundSource::SetSoundAttr(ResourceRef value)
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Play(cache->GetResource<Sound>(value.id_));
+}
+
+void SoundSource::SetPositionAttr(int value)
+{
+    if (sound_)
+        SetPlayPosition(sound_->GetStart() + value);
+}
+
+ResourceRef SoundSource::GetSoundAttr() const
+{
+    return GetResourceRef(sound_, Sound::GetTypeStatic());
+}
+
+int SoundSource::GetPositionAttr() const
+{
+    if (sound_)
+        return (int)(GetPlayPosition() - sound_->GetStart());
+    else
+        return 0;
 }
 
 void SoundSource::MixMonoToMono(Sound* sound, int* dest, unsigned samples, int mixRate)

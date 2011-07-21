@@ -53,28 +53,25 @@ void Zone::RegisterObject(Context* context)
     context->RegisterFactory<Zone>();
     context->CopyBaseAttributes<Drawable, Zone>();
     
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, Vector3::ZERO);
-    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO);
-    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR);
-    ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOGSTART);
-    ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOGEND);
-    ATTRIBUTE(Zone, VAR_INT, "Zone Priority", priority_, 0);
+    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Min", boundingBox_.min_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_VECTOR3, "Bounding Box Max", boundingBox_.max_, Vector3::ZERO, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_COLOR, "Ambient Color", ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_COLOR, "Fog Color", fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog Start", fogStart_, DEFAULT_FOGSTART, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_FLOAT, "Fog End", fogEnd_, DEFAULT_FOGEND, AM_DEFAULT);
+    ATTRIBUTE(Zone, VAR_INT, "Zone Priority", priority_, 0, AM_DEFAULT);
 }
 
 void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 {
+    Serializable::OnSetAttribute(attr, value);
+    
+    // If bounding box changes, dirty the drawable as applicable
     switch (attr.offset_)
     {
     case offsetof(Zone, boundingBox_.min_):
     case offsetof(Zone, boundingBox_.max_):
-        Serializable::OnSetAttribute(attr, value);
-        // If bounding box changes, dirty the drawable as applicable
         OnMarkedDirty(node_);
-        break;
-    
-    default:
-        Serializable::OnSetAttribute(attr, value);
         break;
     }
 }

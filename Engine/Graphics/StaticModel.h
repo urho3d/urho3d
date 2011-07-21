@@ -40,10 +40,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Process renderer raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Prepare geometry for rendering
@@ -75,9 +71,16 @@ public:
     /// Return software LOD level
     unsigned GetSoftwareLodLevel() const { return softwareLodLevel_; }
     
+    /// Set model attribute
+    void SetModelAttr(ResourceRef value);
+    /// Set materials attribute
+    void SetMaterialsAttr(ResourceRefList value);
+    /// Return model attribute
+    ResourceRef GetModelAttr() const;
+    /// Return materials attribute
+    ResourceRefList GetMaterialsAttr() const;
+    
 protected:
-    /// Construct with node flags, initial octant pointer and name
-    StaticModel(unsigned flags, Octant* octant, const String& name);
     /// Update the world bounding box
     virtual void OnWorldBoundingBoxUpdate();
     /// Set the bounding box

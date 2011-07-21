@@ -24,6 +24,8 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "File.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Network.h"
@@ -31,6 +33,7 @@
 #include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 #include "StringUtils.h"
 
 #include <kNet.h>
@@ -51,6 +54,7 @@ Network::Network(Context* context) :
     network_ = new kNet::Network();
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
+    SubscribeToEvent(E_ASYNCLOADFINISHED, HANDLER(Network, HandleAsyncLoadFinished));
 }
 
 Network::~Network()
@@ -358,7 +362,7 @@ void Network::Update(float timeStep)
     }
     
     // Process client connections if the server has been started
-    kNet::NetworkServer* server = network_->GetServer();
+    kNet::SharedPtr<kNet::NetworkServer> server = network_->GetServer();
     if (server)
     {
         server->Process();
@@ -429,6 +433,50 @@ bool Network::OnServerMessage(Connection* connection, int msgID, MemoryBuffer& m
 {
     switch (msgID)
     {
+    case MSG_LOADSCENE:
+        {
+            String fileName = msg.ReadString();
+            Scene* scene = connection->GetScene();
+            if (scene)
+            {
+                if (fileName.Empty())
+                    scene->Clear();
+                else
+                {
+                    String extension = GetExtension(fileName);
+                    SharedPtr<File> file(new File(context_, fileName));
+                    bool success;
+                    
+                    if (extension == ".xml")
+                        success = scene->LoadAsyncXML(file);
+                    else
+                        success = scene->LoadAsync(file);
+                    
+                    if (!success)
+                    {
+                        using namespace NetworkSceneLoadFailed;
+                        
+                        VariantMap eventData;
+                        eventData[P_CONNECTION] = (void*)connection;
+                        connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+                    }
+                }
+            }
+            else
+                LOGERROR("Received a LoadScene message without an assigned scene");
+        }
+        return true;
+        
+    case MSG_SCENECHECKSUMERROR:
+        {
+            using namespace NetworkSceneLoadFailed;
+            
+            VariantMap eventData;
+            eventData[P_CONNECTION] = (void*)connection;
+            connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+        }
+        return true;
+        
     case MSG_REMOTEEVENT:
     case MSG_REMOTENODEEVENT:
         OnRemoteEvent(connection, msgID, msg);
@@ -467,6 +515,40 @@ bool Network::OnClientMessage(Connection* connection, int msgID, MemoryBuffer& m
             newControls.pitch_ = msg.ReadFloat();
             newControls.extraData_ = msg.ReadVariantMap();
             connection->SetControls(newControls);
+        }
+        return true;
+        
+    case MSG_SCENELOADED:
+        {
+            unsigned checksum = msg.ReadUInt();
+            
+            Scene* scene = connection->GetScene();
+            if (scene)
+            {
+                if (checksum != scene->GetChecksum())
+                {
+                    VectorBuffer replyMsg;
+                    connection->SendMessage(MSG_SCENECHECKSUMERROR, true, true, replyMsg);
+                    
+                    using namespace NetworkSceneLoadFailed;
+                    
+                    VariantMap eventData;
+                    eventData[P_CONNECTION] = (void*)connection;
+                    connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+                }
+                else
+                {
+                    connection->SetSceneLoaded(true);
+                    
+                    using namespace ClientSceneLoaded;
+                    
+                    VariantMap eventData;
+                    eventData[P_CONNECTION] = (void*)connection;
+                    connection->SendEvent(E_CLIENTSCENELOADED, eventData);
+                }
+            }
+            else
+                LOGWARNING("Client sent a SceneLoaded message without an assigned scene");
         }
         return true;
         
@@ -514,4 +596,21 @@ void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     using namespace BeginFrame;
     
     Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void Network::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
+{
+    if (!serverConnection_)
+        return;
+    
+    Scene* scene = serverConnection_->GetScene();
+    
+    using namespace AsyncLoadFinished;
+    
+    if ((void*)scene == eventData[P_SCENE].GetPtr())
+    {
+        VectorBuffer msg;
+        msg.WriteUInt(scene->GetChecksum());
+        serverConnection_->SendMessage(MSG_SCENELOADED, true, true, msg);
+    }
 }

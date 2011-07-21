@@ -78,10 +78,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Update the particle system. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
     /// Load emitter parameters from an XML file. Return true if successful
@@ -96,7 +92,19 @@ public:
     /// Return whether emitter is active
     bool IsActive() const { return active_; }
     
+    /// Set parameter source attribute
+    void SetParameterSourceAttr(ResourceRef value);
+    /// Set particles attribute
+    void SetParticlesAttr(PODVector<unsigned char> value);
+    /// Return parameter source attribute
+    ResourceRef GetParameterSourceAttr() const;
+    /// Return particles attribute
+    PODVector<unsigned char> GetParticlesAttr() const;
+    
 protected:
+    /// Handle node being assigned
+    virtual void OnNodeSet(Node* node);
+    
     /// Set number of particles
     void SetNumParticles(int num);
     /// Set color of particles
@@ -113,10 +121,6 @@ protected:
     void GetVector2MinMax(const XMLElement& element, Vector2& minValue, Vector2& maxValue);
     /// Read a Vector3 from an XML element
     void GetVector3MinMax(const XMLElement& element, Vector3& minValue, Vector3& maxValue);
-    
-protected:
-    /// Handle node being assigned
-    virtual void OnNodeSet(Node* node);
     
 private:
     /// Handle scene post-update event

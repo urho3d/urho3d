@@ -104,6 +104,8 @@ private:
     void OnRemoteEvent(Connection* connection, int msgID, MemoryBuffer& msg);
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle scene loaded event
+    void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     
     /// kNet Network instance
     kNet::Network* network_;

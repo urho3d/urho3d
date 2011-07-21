@@ -25,6 +25,7 @@
 #include "Component.h"
 #include "Context.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
 #include "Scene.h"
 #include "VectorBuffer.h"
 #include "XMLElement.h"
@@ -65,11 +66,12 @@ void Node::RegisterObject(Context* context)
 {
     context->RegisterFactory<Node>();
     
-    ATTRIBUTE(Node, VAR_STRING, "Name", name_, String());
-    ATTRIBUTE_MODE(Node, VAR_VECTOR3, "Position", position_, Vector3::ZERO, AM_BOTH | AM_LATESTDATA);
-    ATTRIBUTE_MODE(Node, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_BOTH | AM_LATESTDATA);
-    ATTRIBUTE(Node, VAR_VECTOR3, "Scale", scale_, Vector3::UNITY);
-    ATTRIBUTE_MODE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_SERIALIZATION);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_STRING, "Name", GetName, SetName, String, String(), AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::UNITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Parent Node", GetParentAttr, SetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
+    ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE);
 }
 
 void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)
@@ -91,27 +93,13 @@ void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, Variant
         Object::OnEvent(sender, broadcast, eventType, eventData);
 }
 
-void Node::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void Node::OnFinishUpdate()
 {
-    switch (attr.offset_)
-    {
-    case offsetof(Node, name_):
-        SetName(value.GetString());
-        break;
-        
-    case offsetof(Node, position_):
-    case offsetof(Node, rotation_):
-    case offsetof(Node, scale_):
-        Serializable::OnSetAttribute(attr, value);
-        // If transform changes, dirty the node as applicable
-        if (!dirty_)
-            MarkDirty();
-        break;
+    for (unsigned i = 0; i < components_.Size(); ++i)
+        components_[i]->OnFinishUpdate();
     
-    default:
-        Serializable::OnSetAttribute(attr, value);
-        break;
-    }
+    for (unsigned i = 0; i < children_.Size(); ++i)
+        children_[i]->OnFinishUpdate();
 }
 
 bool Node::Load(Deserializer& source)
@@ -182,15 +170,6 @@ bool Node::SaveXML(XMLElement& dest)
     }
     
     return true;
-}
-
-void Node::PostLoad()
-{
-    for (unsigned i = 0; i < components_.Size(); ++i)
-        components_[i]->PostLoad();
-    
-    for (unsigned i = 0; i < children_.Size(); ++i)
-        children_[i]->PostLoad();
 }
 
 void Node::SetName(const String& name)
@@ -626,6 +605,54 @@ void Node::SetOwner(Connection* owner)
     owner_ = owner;
 }
 
+void Node::SetParentAttr(PODVector<unsigned char> value)
+{
+    Scene* scene = GetScene();
+    if (!scene)
+        return;
+    
+    MemoryBuffer buf(value);
+    unsigned baseNodeID = buf.ReadVLE();
+    if (!baseNodeID)
+        return;
+    
+    if (baseNodeID < FIRST_LOCAL_ID)
+        SetParent(scene->GetNodeByID(baseNodeID));
+    else
+    {
+        Node* baseNode = scene->GetNodeByID(baseNodeID);
+        if (baseNode)
+            SetParent(baseNode->GetChild(buf.ReadStringHash(), true));
+    }
+}
+
+PODVector<unsigned char> Node::GetParentAttr() const
+{
+    VectorBuffer buf;
+    Scene* scene = GetScene();
+    if (scene && parent_)
+    {
+        unsigned parentID = parent_->GetID();
+        if (parentID < FIRST_LOCAL_ID)
+            buf.WriteVLE(parentID);
+        else
+        {
+            // Parent is local: traverse hierarchy to find a non-local base node
+            // This iteration always stops due to the scene (root) being non-local
+            Node* current = parent_;
+            while (current->GetID() >= FIRST_LOCAL_ID)
+                current = current->GetParent();
+            
+            buf.WriteVLE(current->GetID());
+            buf.WriteStringHash(parent_->GetNameHash());
+        }
+    }
+    else
+        buf.WriteVLE(0);
+    
+    return buf.GetBuffer();
+}
+
 bool Node::Load(Deserializer& source, bool readChildren)
 {
     // Remove all children and components first in case this is not a fresh load
@@ -734,7 +761,7 @@ Node* Node::CreateChild(unsigned id, bool local)
     
     // If zero ID specified, let the scene assign
     if (scene_)
-        newNode->SetID(id ? id : scene_->GetFreeunsigned(local));
+        newNode->SetID(id ? id : scene_->GetFreeNodeID(local));
     else
         newNode->SetID(id);
     

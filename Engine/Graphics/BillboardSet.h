@@ -63,10 +63,6 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
-    /// Handle attribute read access
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
     /// Calculate distance for rendering
     virtual void UpdateDistance(const FrameInfo& frame);
     /// Prepare geometry for rendering
@@ -107,6 +103,15 @@ public:
     bool IsSorted() const { return sorted_; }
     /// Return animation LOD bias
     float GetAnimationLodBias() const { return animationLodBias_; }
+    
+    /// Set material attribute
+    void SetMaterialAttr(ResourceRef value);
+    /// Set billboards attribute
+    void SetBillboardsAttr(PODVector<unsigned char> value);
+    /// Return material attribute
+    ResourceRef GetMaterialAttr() const;
+    /// Return billboards attribute
+    PODVector<unsigned char> GetBillboardsAttr() const;
     
 protected:
     /// Transform has changed. Mark billboards dirty if necessary

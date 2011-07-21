@@ -44,7 +44,7 @@ void Run(const char* cmdLine);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
     #if defined(_MSC_VER) && defined(_DEBUG)
-    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
     #endif
     
     #if defined(ENABLE_MINIDUMPS) && !defined(_DEBUG)
