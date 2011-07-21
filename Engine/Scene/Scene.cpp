@@ -491,7 +491,7 @@ void Scene::FinishAsyncLoading()
 
 void Scene::FinishLoading(Deserializer* source)
 {
-    OnFinishUpdate();
+    FinishUpdate();
     
     if (source)
     {

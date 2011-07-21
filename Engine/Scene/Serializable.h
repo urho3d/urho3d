@@ -45,8 +45,6 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor
     virtual Variant OnGetAttribute(const AttributeInfo& attr);
-    /// Perform finalization after a scene load or network update
-    virtual void OnFinishUpdate() {}
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful
@@ -55,6 +53,8 @@ public:
     virtual bool LoadXML(const XMLElement& source);
     /// Save as XML data. Return true if successful
     virtual bool SaveXML(XMLElement& dest);
+    /// Perform finalization after a scene load or network update
+    virtual void FinishUpdate() {}
     
     /// Set attribute by index. Return true if successfully set
     bool SetAttribute(unsigned index, const Variant& value);

@@ -89,10 +89,13 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
 }
 
-void AnimatedModel::OnFinishUpdate()
+void AnimatedModel::FinishUpdate()
 {
     if (assignBonesPending_)
+    {
         AssignBoneNodes();
+        assignBonesPending_ = false;
+    }
 }
 
 void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
@@ -719,8 +722,6 @@ void AnimatedModel::OnWorldBoundingBoxUpdate()
 
 void AnimatedModel::AssignBoneNodes()
 {
-    assignBonesPending_ = false;
-    
     if (!node_)
         return;
     

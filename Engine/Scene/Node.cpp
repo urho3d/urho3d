@@ -93,15 +93,6 @@ void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, Variant
         Object::OnEvent(sender, broadcast, eventType, eventData);
 }
 
-void Node::OnFinishUpdate()
-{
-    for (unsigned i = 0; i < components_.Size(); ++i)
-        components_[i]->OnFinishUpdate();
-    
-    for (unsigned i = 0; i < children_.Size(); ++i)
-        children_[i]->OnFinishUpdate();
-}
-
 bool Node::Load(Deserializer& source)
 {
     return Load(source, true);
@@ -170,6 +161,15 @@ bool Node::SaveXML(XMLElement& dest)
     }
     
     return true;
+}
+
+void Node::FinishUpdate()
+{
+    for (unsigned i = 0; i < components_.Size(); ++i)
+        components_[i]->FinishUpdate();
+    
+    for (unsigned i = 0; i < children_.Size(); ++i)
+        children_[i]->FinishUpdate();
 }
 
 void Node::SetName(const String& name)

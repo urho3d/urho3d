@@ -201,7 +201,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     
     bool changed = false;
     
-    switch(eventData[P_KEY].GetInt())
+    switch (eventData[P_KEY].GetInt())
     {
     case KEY_UP:
         if (historyPosition_ > 0)

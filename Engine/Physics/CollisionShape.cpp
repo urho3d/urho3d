@@ -310,7 +310,8 @@ CollisionShape::CollisionShape(Context* context) :
     collisionGroup_(M_MAX_UNSIGNED),
     collisionMask_(M_MAX_UNSIGNED),
     friction_(DEFAULT_FRICTION),
-    bounce_(DEFAULT_BOUNCE)
+    bounce_(DEFAULT_BOUNCE),
+    recreateGeometry_(false)
 {
 }
 
@@ -327,18 +328,38 @@ void CollisionShape::RegisterObject(Context* context)
     ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Size", size_, Vector3::ZERO, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_FLOAT, "Hull Thickness", thickness_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(CollisionShape, VAR_INT, "Model LOD Level", lodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", position_, Vector3::ZERO, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Rotation", rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", collisionGroup_, M_MAX_UNSIGNED, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", collisionMask_, M_MAX_UNSIGNED, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", friction_, DEFAULT_FRICTION, AM_DEFAULT);
-    ATTRIBUTE(CollisionShape, VAR_FLOAT, "Bounce", bounce_, DEFAULT_BOUNCE, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_VECTOR3, "Offset Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
+    REF_ACCESSOR_ATTRIBUTE(CollisionShape, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Group", GetCollisionGroup, SetCollisionGroup, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_INT, "Collision Mask", GetCollisionMask, SetCollisionMask, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Friction", GetFriction, SetFriction, float, DEFAULT_FRICTION, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(CollisionShape, VAR_FLOAT, "Bounce", GetBounce, SetBounce, float, DEFAULT_BOUNCE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
 }
 
-void CollisionShape::OnFinishUpdate()
+void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 {
-    CreateGeometry();
+    Serializable::OnSetAttribute(attr, value);
+    
+    // Change of some attributes requires the geometry to be recreated
+    switch (attr.offset_)
+    {
+    case offsetof(CollisionShape, shapeType_):
+    case offsetof(CollisionShape, size_):
+    case offsetof(CollisionShape, thickness_):
+    case offsetof(CollisionShape, lodLevel_):
+        recreateGeometry_ = true;
+        break;
+    }
+}
+
+void CollisionShape::FinishUpdate()
+{
+    if (recreateGeometry_)
+    {
+        CreateGeometry();
+        recreateGeometry_ = false;
+    }
 }
 
 void CollisionShape::Clear()
@@ -769,6 +790,7 @@ void CollisionShape::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     model_ = cache->GetResource<Model>(value.id_);
+    recreateGeometry_ = true;
 }
 
 ResourceRef CollisionShape::GetModelAttr() const

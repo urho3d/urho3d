@@ -47,7 +47,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Perform finalization after a scene load or network update
-    virtual void OnFinishUpdate();
+    virtual void FinishUpdate();
     /// Process renderer raycast
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
     /// Update before octree reinsertion. Animation is updated here
@@ -143,7 +143,7 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Assign skeleton and animation bone node references as a postprocess. Called by OnFinishUpdate
+    /// Assign skeleton and animation bone node references as a postprocess. Called by FinishUpdate
     void AssignBoneNodes();
     /// Mark animation and skinning to require an update
     void MarkAnimationDirty();

@@ -954,7 +954,7 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     unsigned psi = DLPS_NONE;
     Light* light = batch.light_;
     
-    switch(light->GetLightType())
+    switch (light->GetLightType())
     {
     case LIGHT_DIRECTIONAL:
         vsi += DLVS_DIR;

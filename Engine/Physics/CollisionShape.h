@@ -99,8 +99,10 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
+    /// Handle attribute write access
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
     /// Perform finalization after a scene load or network update
-    virtual void OnFinishUpdate();
+    virtual void FinishUpdate();
     
     /// Clear the collision geometry
     void Clear();
@@ -216,4 +218,6 @@ private:
     float friction_;
     /// Bounce coefficient
     float bounce_;
+    /// Recreate geometry flag
+    bool recreateGeometry_;
 };

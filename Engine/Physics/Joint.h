@@ -51,8 +51,10 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
+    /// Handle attribute write access
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
     /// Perform finalization after a scene load or network update
-    virtual void OnFinishUpdate();
+    virtual void FinishUpdate();
     
     /// Remove the joint
     void Clear();
@@ -102,12 +104,12 @@ private:
     SharedPtr<RigidBody> bodyB_;
     /// Joint type
     JointType type_;
-    /// Last created joint type
-    JointType createdType_;
     /// ODE joint ID
     dJointID joint_;
     /// Joint position for creation during post-load
     Vector3 position_;
     /// Joint axis for creation during post-load
     Vector3 axis_;
+    /// Recreate joint flag
+    bool recreateJoint_;
 };

@@ -1493,7 +1493,7 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
     // Reset zoom
     shadowCamera->SetZoom(1.0f);
     
-    switch(light->GetLightType())
+    switch (light->GetLightType())
     {
     case LIGHT_DIRECTIONAL:
         {

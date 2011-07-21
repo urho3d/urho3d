@@ -45,8 +45,6 @@ public:
     
     /// Handle event
     virtual void OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData);
-    /// Perform finalization for components and child nodes. Only called after scene load
-    virtual void OnFinishUpdate();
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Load from XML data. Return true if successful
@@ -55,6 +53,8 @@ public:
     virtual bool Save(Serializer& dest);
     /// Save as XML data. Return true if successful
     virtual bool SaveXML(XMLElement& dest);
+    /// Perform finalization for components and child nodes. Called after scene load, but not for network updates
+    virtual void FinishUpdate();
     
     /// Set name
     void SetName(const String& name);

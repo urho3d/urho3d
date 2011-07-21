@@ -42,7 +42,7 @@ enum ScriptInstanceMethod
     METHOD_FIXEDPOSTUPDATE,
     METHOD_LOAD,
     METHOD_SAVE,
-    METHOD_POSTLOAD,
+    METHOD_FINISHUPDATE,
     MAX_SCRIPT_METHODS
 };
 
@@ -71,7 +71,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Perform post-load after the whole scene has been loaded
-    virtual void OnFinishUpdate();
+    virtual void FinishUpdate();
     /// Add an event handler. Called by script exposed version of SubscribeToEvent()
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
     /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()

@@ -46,10 +46,10 @@ OBJECTTYPESTATIC(Joint);
 Joint::Joint(Context* context) :
     Component(context),
     type_(JOINT_NONE),
-    createdType_(JOINT_NONE),
     joint_(0),
     position_(Vector3::ZERO),
-    axis_(Vector3::ZERO)
+    axis_(Vector3::ZERO),
+    recreateJoint_(false)
 {
 }
 
@@ -69,24 +69,35 @@ void Joint::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT);
 }
 
-void Joint::OnFinishUpdate()
+void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
 {
-    if (type_ == createdType_)
-        return;
+    Serializable::OnSetAttribute(attr, value);
     
-    switch (type_)
+    // Change of the joint type requires the joint to be recreated
+    if (attr.offset_ == offsetof(Joint, type_))
+        recreateJoint_ = true;
+}
+
+void Joint::FinishUpdate()
+{
+    if (recreateJoint_)
     {
-    case JOINT_NONE:
-        Clear();
-        break;
+        switch (type_)
+        {
+        case JOINT_NONE:
+            Clear();
+            break;
+            
+        case JOINT_BALL:
+            SetBall(position_, bodyA_, bodyB_);
+            break;
+            
+        case JOINT_HINGE:
+            SetHinge(position_, axis_, bodyA_, bodyB_);
+            break;
+        }
         
-    case JOINT_BALL:
-        SetBall(position_, bodyA_, bodyB_);
-        break;
-        
-    case JOINT_HINGE:
-        SetHinge(position_, axis_, bodyA_, bodyB_);
-        break;
+        recreateJoint_ = false;
     }
 }
 
@@ -100,7 +111,7 @@ void Joint::Clear()
     
     bodyA_.Reset();
     bodyB_.Reset();
-    createdType_ = type_ = JOINT_NONE;
+    type_ = JOINT_NONE;
 }
 
 bool Joint::SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB)
@@ -124,7 +135,7 @@ bool Joint::SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB)
     dJointSetBallAnchor(joint_, position.x_, position.y_, position.z_);
     dJointAttach(joint_, bodyA ? bodyA->GetBody() : 0, bodyB ? bodyB->GetBody() : 0);
     
-    createdType_ = type_ = JOINT_BALL;
+    type_ = JOINT_BALL;
     bodyA_ = bodyA;
     bodyB_ = bodyB;
     
@@ -155,7 +166,7 @@ bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bo
     dJointSetHingeAxis(joint_, NormalizedAxis.x_, NormalizedAxis.y_, NormalizedAxis.z_);
     dJointAttach(joint_, bodyA ? bodyA->GetBody() : 0, bodyB ? bodyB->GetBody() : 0);
     
-    createdType_ = type_ = JOINT_HINGE;
+    type_ = JOINT_HINGE;
     bodyA_ = bodyA;
     bodyB_ = bodyB;
     
@@ -164,25 +175,34 @@ bool Joint::SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bo
 
 void Joint::SetPosition(Vector3 position)
 {
-    switch (type_)
+    if (joint_)
     {
-    case JOINT_BALL:
-        dJointSetBallAnchor(joint_, position.x_, position.y_, position.z_);
-        break;
+        dJointType type = dJointGetType(joint_);
         
-    case JOINT_HINGE:
-        dJointSetHingeAnchor(joint_, position.x_, position.y_, position.z_);
-        break;
+        switch (type)
+        {
+        case dJointTypeBall:
+            dJointSetBallAnchor(joint_, position.x_, position.y_, position.z_);
+            break;
+            
+        case dJointTypeHinge:
+            dJointSetHingeAnchor(joint_, position.x_, position.y_, position.z_);
+            break;
+        }
     }
 }
 
 void Joint::SetAxis(Vector3 axis)
 {
-    switch (type_)
+    if (joint_)
     {
-    case JOINT_HINGE:
-        dJointSetHingeAxis(joint_, axis.x_, axis.y_, axis.z_);
-        break;
+        dJointType type = dJointGetType(joint_);
+        
+        switch (type)
+        {
+            dJointSetHingeAxis(joint_, axis.x_, axis.y_, axis.z_);
+            break;
+        }
     }
 }
 
@@ -190,15 +210,20 @@ Vector3 Joint::GetPosition() const
 {
     dVector3 pos;
     
-    switch (type_)
+    if (joint_)
     {
-    case JOINT_BALL:
-        dJointGetBallAnchor(joint_, pos);
-        return Vector3(pos[0], pos[1], pos[2]);
+        dJointType type = dJointGetType(joint_);
         
-    case JOINT_HINGE:
-        dJointGetHingeAnchor(joint_, pos);
-        return Vector3(pos[0], pos[1], pos[2]);
+        switch (type)
+        {
+        case dJointTypeBall:
+            dJointGetBallAnchor(joint_, pos);
+            return Vector3(pos[0], pos[1], pos[2]);
+            
+        case dJointTypeHinge:
+            dJointGetHingeAnchor(joint_, pos);
+            return Vector3(pos[0], pos[1], pos[2]);
+        }
     }
     
     return Vector3::ZERO;
@@ -208,11 +233,16 @@ Vector3 Joint::GetAxis() const
 {
     dVector3 axis;
     
-    switch (type_)
+    if (joint_)
     {
-    case JOINT_HINGE:
-        dJointGetHingeAxis(joint_, axis);
-        return Vector3(axis[0], axis[1], axis[2]);
+        dJointType type = dJointGetType(joint_);
+        
+        switch (type)
+        {
+        case dJointTypeHinge:
+            dJointGetHingeAxis(joint_, axis);
+            return Vector3(axis[0], axis[1], axis[2]);
+        }
     }
     
     return Vector3::ZERO;
@@ -222,12 +252,14 @@ void Joint::SetBodyAAttr(int value)
 {
     Scene* scene = node_ ? node_->GetScene() : 0;
     bodyA_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponentByID(value)) : (RigidBody*)0;
+    recreateJoint_ = true;
 }
 
 void Joint::SetBodyBAttr(int value)
 {
     Scene* scene = node_ ? node_->GetScene() : 0;
     bodyB_ = scene ? dynamic_cast<RigidBody*>(scene->GetComponentByID(value)) : (RigidBody*)0;
+    recreateJoint_ = true;
 }
 
 int Joint::GetBodyAAttr() const
