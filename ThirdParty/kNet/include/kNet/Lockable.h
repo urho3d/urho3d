@@ -16,8 +16,6 @@
 /** @file Lockable.h
 	@brief The Lock<T> and Lockable<T> template classes. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef KNET_USE_BOOST
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
@@ -154,10 +152,10 @@ public:
 #ifdef WIN32
 		InitializeCriticalSection(&lockObject);
 #else
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-        pthread_mutex_init(&mutex, &attr);        
+		pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&mutex, &attr);
 #endif
 #endif
 	}
@@ -176,12 +174,12 @@ public:
 #ifdef WIN32
 		InitializeCriticalSection(&lockObject);
 #else
-        pthread_mutexattr_t attr;
-        pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-        pthread_mutex_init(&mutex, &attr);
-#endif    
-#endif   
+		pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		pthread_mutex_init(&mutex, &attr);
+#endif
+#endif
 	}
 
 	~Lockable()
@@ -190,7 +188,7 @@ public:
 #ifdef WIN32
 		DeleteCriticalSection(&lockObject);
 #else
-        pthread_mutex_destroy(&mutex);
+		pthread_mutex_destroy(&mutex);
 #endif
 #endif
 	}
@@ -213,7 +211,7 @@ public:
 #elif defined(WIN32)
 		EnterCriticalSection(&lockObject);
 #else
-        pthread_mutex_lock(&mutex);
+		pthread_mutex_lock(&mutex);
 #endif
 		return value;
 	}
@@ -225,7 +223,7 @@ public:
 #elif defined(WIN32)
 		EnterCriticalSection(&lockObject);
 #else
-        pthread_mutex_lock(&mutex);
+		pthread_mutex_lock(&mutex);
 #endif
 		return value;
 	}
@@ -237,7 +235,7 @@ public:
 #elif defined(WIN32)
 		LeaveCriticalSection(&lockObject);
 #else
-        pthread_mutex_unlock(&mutex);
+		pthread_mutex_unlock(&mutex);
 #endif
 	}
 
@@ -274,7 +272,7 @@ public:
 #elif defined(WIN32)
 	mutable CRITICAL_SECTION lockObject;
 #else
-    mutable pthread_mutex_t mutex;
+	mutable pthread_mutex_t mutex;
 #endif
 
 private:

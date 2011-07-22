@@ -144,7 +144,7 @@ private:
     Map<unsigned, PODVector<unsigned char> > componentLatestData_;
     /// Internal vector for delta update
     PODVector<unsigned char> deltaUpdateBits_;
-    /// Internal set for node's variable map changes
+    /// Internal set for node's user variable changes
     HashSet<ShortStringHash> changedVars_;
     /// Internal set for already processed nodes during an update
     HashSet<Node*> processedNodes_;

@@ -157,7 +157,7 @@ void DataSerializer::Add(const T &value)
 #endif
 	const u8 *data = reinterpret_cast<const u8*>(&value);
 
-	for(int i = 0; i < sizeof(value); ++i)
+	for(size_t i = 0; i < sizeof(value); ++i)
 		AppendByte(data[i]);
 
 	if (iter)

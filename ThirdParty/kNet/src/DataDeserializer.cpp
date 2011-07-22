@@ -15,8 +15,6 @@
 /** @file DataDeserializer.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cassert>
 #include <cstring>
 

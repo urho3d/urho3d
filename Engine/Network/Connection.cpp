@@ -548,7 +548,7 @@ void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
     eventData[P_ALLOW] = true;
     SendEvent(E_CLIENTIDENTITY, eventData);
     
-    // If connection was denied as a response to the event, disconnect the client now
+    // If connection was denied as a response to the identity event, disconnect now
     if (!eventData[P_ALLOW].GetBool())
         Disconnect();
 }
@@ -630,7 +630,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
         Node* receiver = scene_->GetNodeByID(nodeID);
         if (!receiver)
         {
-            LOGWARNING("Remote node event's receiver not found, discarding event");
+            LOGWARNING("Missing receiver for remote node event, discarding");
             return;
         }
         SendEvent(receiver, eventType, eventData);
@@ -701,7 +701,7 @@ void Connection::ProcessNewNode(Node* node)
     // Write node's attributes
     node->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newNodeState.attributes_);
     
-    // Write node's variable map
+    // Write node's user variables
     const VariantMap& vars = node->GetVars();
     msg_.WriteVLE(vars.Size());
     for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)
@@ -747,7 +747,7 @@ void Connection::ProcessExistingNode(Node* node)
     
     node->PrepareUpdates(deltaUpdateBits_, nodeState.attributes_, deltaUpdate, latestData);
     
-    // Check if variable map has changed. Note: variable removal is not supported
+    // Check if user variables have changed. Note: variable removal is not supported
     changedVars_.Clear();
     const VariantMap& vars = node->GetVars();
     for (VariantMap::ConstIterator i = vars.Begin(); i != vars.End(); ++i)

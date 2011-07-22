@@ -16,13 +16,11 @@
 /** @file Alignment.h
 	@brief Provides functions for working with pointer data alignment computations.*/
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cassert>
 
 #include "Types.h"
 
-#ifndef WIN32
+#ifdef UNIX
 #include <stdint.h>
 #endif
 

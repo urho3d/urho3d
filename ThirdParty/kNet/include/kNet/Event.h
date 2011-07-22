@@ -16,8 +16,6 @@
 /** @file Event.h
 	@brief The class \ref kNet::Event Event. Provides a mechanism for inter-thread signalling. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef WIN32
 #include "win32/WS2Include.h"
 #endif
@@ -100,7 +98,7 @@ public:
 
 	/// Wraps the given WSAEVENT into this event.
 	explicit Event(WSAEVENT wsaEvent, EventWaitType eventType);
-#else
+#elif defined(UNIX)
 public:
 	int fd[2]; // fd[0] is used for reading, fd[1] for writing.
 

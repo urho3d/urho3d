@@ -15,8 +15,6 @@
 /** @file UnixClock.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cassert>
 
 #include <time.h>
@@ -108,7 +106,7 @@ tick_t Clock::Tick()
 	timespec t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
     return (tick_t)t.tv_sec * 1000 * 1000 * 1000 + (tick_t)t.tv_nsec;
-// Urho3D: OS X does not define _POSIX_C_SOURCE
+//_POSIX_C_SOURCE is not defined on OSX
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
 	timeval t;
 	gettimeofday(&t, NULL);
@@ -127,7 +125,7 @@ tick_t Clock::TicksPerSec()
 {
 #ifdef _POSIX_MONOTONIC_CLOCK
     return 1000 * 1000 * 1000;
-// Urho3D: OS X does not define _POSIX_C_SOURCE
+//_POSIX_C_SOURCE is not defined on OSX
 #elif defined(_POSIX_C_SOURCE) || defined(__APPLE__)
     return 1000 * 1000;
 #else

@@ -131,7 +131,7 @@ T DataDeserializer::Read()
 	T value;
 	u8 *data = reinterpret_cast<u8*>(&value);
 
-	for(int i = 0; i < sizeof(value); ++i)
+	for(size_t i = 0; i < sizeof(value); ++i)
 		data[i] = (u8)ReadBitsToU32(8);
 
 	if (iter)

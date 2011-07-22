@@ -28,6 +28,7 @@ add_definitions (-DENABLE_PROFILING)
 if (NOT WIN32)
     set (USE_OPENGL 1)
     add_definitions (-DUSE_OPENGL)
+    add_definitions (-DUNIX)
 endif ()
 
 # Compiler-specific options

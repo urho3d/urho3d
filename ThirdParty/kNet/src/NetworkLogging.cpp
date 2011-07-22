@@ -33,7 +33,7 @@
 #include "kNet/Lockable.h"
 #include "kNet/Clock.h"
 
-#ifndef WIN32
+#ifdef UNIX
 #define _snprintf snprintf
 #endif
 

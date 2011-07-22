@@ -15,14 +15,12 @@
 /** @file Network.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <string>
 #include <sstream>
 
 #include <cassert>
 
-#ifndef WIN32
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

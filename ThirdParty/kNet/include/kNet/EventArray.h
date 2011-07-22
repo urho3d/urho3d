@@ -16,8 +16,6 @@
 /** @file EventArray.h
 	@brief The class \ref kNet::EventArray EventArray. Allows listening to multiple events at once.*/
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <vector>
 
 #include "Event.h"
@@ -61,7 +59,7 @@ private:
 #ifdef WIN32
 	WSAEVENT events[maxEvents]; 
 
-#else
+#elif defined(UNIX)
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

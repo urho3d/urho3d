@@ -15,8 +15,6 @@
 /** @file UnixThread.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cassert>
 #include <exception>
 
@@ -48,7 +46,7 @@ bool Thread::ShouldQuit() const { return !thread || threadEnabled == false; }
 
 bool Thread::IsRunning() const
 { 
-    return thread != 0;
+	return thread != 0;
 }
 
 void Thread::Stop()
@@ -70,9 +68,9 @@ void Thread::Stop()
 	kNet::Clock::Sleep(10);
 	assert(thread);
 
-    /// \todo Do not block indefinitely while waiting for the thread to terminate
-    pthread_join(thread, 0);
-    thread = 0;
+	/// \todo Do not block indefinitely while waiting for the thread to terminate
+	pthread_join(thread, 0);
+	thread = 0;
 
 	LOG(LogInfo, "Thread::Stop() called.");
 
@@ -95,7 +93,7 @@ void* ThreadEntryPoint(void* data)
 		return 0;
 	}
 	thread->_ThreadRun();
-    pthread_exit((void*)0);
+	pthread_exit((void*)0);
 	return 0;
 }
 
@@ -132,10 +130,10 @@ void Thread::StartThread()
 	threadResumeEvent = CreateNewEvent(EventWaitSignal);
 
 	threadEnabled = true;
-    pthread_attr_t type;
-    pthread_attr_init(&type);
-    pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
-    if (pthread_create(&thread, &type, ThreadEntryPoint, this))
+	pthread_attr_t type;
+	pthread_attr_init(&type);
+	pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
+	if (pthread_create(&thread, &type, ThreadEntryPoint, this))
 		throw NetException("Failed to create thread!");
 	else
 		LOG(LogInfo, "Thread::Run(): Thread created.");
@@ -151,12 +149,12 @@ void Thread::Sleep(int msecs)
 
 ThreadId Thread::Id()
 {
-    return thread;
+	return thread;
 }
 
 ThreadId Thread::CurrentThreadId()
 {
-    return pthread_self();
+	return pthread_self();
 }
 
 ThreadId Thread::NullThreadId()

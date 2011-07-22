@@ -16,8 +16,6 @@
 /** @file MessageConnection.h
 	@brief The MessageConnection and ConnectionStatistics classes. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <vector>
 #include <map>
 #include <utility>
@@ -126,7 +124,7 @@ enum ConnectionState
 /// Returns a textual representation of a ConnectionState.
 std::string ConnectionStateToString(ConnectionState state);
 
-// Urho3D: prevent confusion with Win32 functions
+// Prevent confusion with Win32 functions
 #ifdef SendMessage
 #undef SendMessage
 #endif

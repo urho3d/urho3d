@@ -15,8 +15,6 @@
 /** @file DataSerializer.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <cstring>
 
 #include "kNet/DebugMemoryLeakCheck.h"

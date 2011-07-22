@@ -16,9 +16,7 @@
 /** @file Network.h
 	@brief The class Network. The root point for creating client and server objects. */
 
-// Modified by Lasse Öörni for Urho3D
-
-#ifndef WIN32
+#ifdef UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

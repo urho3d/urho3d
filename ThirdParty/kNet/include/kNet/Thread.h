@@ -16,8 +16,6 @@
 /** @file Thread.h
 	@brief The Thread class. Implements threading either using Boost, native Win32 or pthreads constructs. */
 
-// Modified by Lasse Öörni for Urho3D
- 
 #include <string>
 
 #ifdef KNET_USE_BOOST
@@ -202,6 +200,7 @@ private:
 	boost::thread thread;
 #elif defined(WIN32)
 	HANDLE threadHandle;
+	ThreadId threadId;
 
 	/// The entry point that is called from the trampoline. Do not call this function.
 	void _ThreadRun();
@@ -210,11 +209,11 @@ private:
 private:
 	bool threadEnabled;
 #else
-    pthread_t thread;
-    
+	pthread_t thread;
+
 	void _ThreadRun();
 
-    friend void* ThreadEntryPoint(void* data);
+	friend void* ThreadEntryPoint(void* data);
 private:
 	bool threadEnabled;
 #endif

@@ -16,8 +16,6 @@
 /** @file Socket.h
 	@brief The Socket class. */
 
-// Modified by Lasse Öörni for Urho3D
-
 #ifdef WIN32
 
 #include "kNetBuildConfig.h"
@@ -31,7 +29,7 @@ namespace kNet
 typedef int socklen_t;
 }
 
-#else
+#elif defined(UNIX)
 
 #include <sys/types.h>
 #include <sys/socket.h>

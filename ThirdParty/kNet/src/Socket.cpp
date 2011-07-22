@@ -15,8 +15,6 @@
 /** @file Socket.cpp
 	@brief */
 
-// Modified by Lasse Öörni for Urho3D
-
 #include <string>
 #include <cassert>
 #include <utility>
@@ -36,7 +34,7 @@
 
 using namespace std;
 
-#ifndef WIN32
+#ifdef UNIX
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -711,7 +709,7 @@ bool Socket::Send(const char *data, size_t numBytes)
 	}
 
 	int bytesSent = 0;
-    // Urho3D: sendto() to a connected socket causes EISCONN on OS X, so avoid it for client UDP sockets
+	// sendto() to a connected socket causes EISCONN on OSX, so avoid it for client UDP sockets
 	if (transport == SocketOverUDP && type != ClientSocket)
 		bytesSent = sendto(connectSocket, data, numBytes, 0, (sockaddr*)&udpPeerAddress, sizeof(udpPeerAddress));
 	else
@@ -881,7 +879,7 @@ bool Socket::EndSend(OverlappedTransferBuffer *sendBuffer)
 	}
 	return true;
 
-#else
+#elif defined(UNIX)
 	bool success = Send(sendBuffer->buffer.buf, sendBuffer->buffer.len);
 	DeleteOverlappedTransferBuffer(sendBuffer);
 	return success;
