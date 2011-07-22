@@ -240,13 +240,11 @@ void Engine::RunFrame()
     if (!initialized_ || exiting_)
         return;
     
-    if (!headless_)
+    // Set exit flag if the window was closed
+    if (!headless_ && !GetSubsystem<Graphics>()->IsInitialized())
     {
-        if (!GetSubsystem<Graphics>()->IsInitialized())
-        {
-            Exit();
-            return;
-        }
+        exiting_ = true;
+        return;
     }
     
     Time* time = GetSubsystem<Time>();
