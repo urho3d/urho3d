@@ -60,6 +60,18 @@ public:
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set
     bool SetAttribute(const String& name, const Variant& value);
+    /// Write initial delta network update (compared to default attribute values) and prepare the last sent state
+    void WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState);
+    /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate()
+    void PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState, bool& deltaUpdate, bool& latestData);
+    /// Write a delta network update prepared with PrepareUpdates()
+    void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState);
+    /// Write a latestdata network update prepared with PrepareUpdates()
+    void WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& lastSentState);
+    /// Read and apply a network delta update
+    void ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits);
+    /// Read and apply a network latest data update
+    void ReadLatestDataUpdate(Deserializer& source);
     
     /// Return attribute value by index. Return empty if illegal index
     Variant GetAttribute(unsigned index);
@@ -67,7 +79,7 @@ public:
     Variant GetAttribute(const String& name);
     /// Return number of attributes
     unsigned GetNumAttributes() const;
-    /// Return number of networked attributes
+    /// Return number of network serialization attributes
     unsigned GetNumNetworkAttributes() const;
     /// Return attribute descriptions, or null if none defined
     const Vector<AttributeInfo>* GetAttributes() const;

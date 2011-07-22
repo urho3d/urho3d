@@ -401,6 +401,183 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState)
+{
+    unsigned numAttributes = GetNumNetworkAttributes();
+    if (!numAttributes)
+        return;
+    
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    unsigned index = 0;
+    
+    lastSentState.Resize(numAttributes);
+    
+    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
+    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
+        deltaUpdateBits[i] = 0;
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        Variant value = GetAttribute(i);
+        if (value != attr.defaultValue_)
+        {
+            lastSentState[index] = value;
+            deltaUpdateBits[index >> 3] |= (1 << (index & 7));
+        }
+        else
+            lastSentState[index] = attr.defaultValue_;
+        
+        ++index;
+    }
+    
+    dest.Write(&deltaUpdateBits[0], deltaUpdateBits.Size());
+    
+    index = 0;
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        if (deltaUpdateBits[index << 3] & (1 << (index & 7)))
+            dest.WriteVariantData(lastSentState[index]);
+        
+        ++index;
+    }
+}
+
+void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState, bool& deltaUpdate,
+    bool& latestData)
+{
+    deltaUpdate = false;
+    latestData = false;
+    
+    unsigned numAttributes = GetNumNetworkAttributes();
+    if (!numAttributes)
+        return;
+    
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    unsigned index = 0;
+    
+    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
+    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
+        deltaUpdateBits[i] = 0;
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        // Check for attribute change
+        Variant value = GetAttribute(i);
+        if (value != lastSentState[index])
+        {
+            lastSentState[index] = value;
+            if (attr.mode_ & AM_LATESTDATA)
+                latestData = true;
+            else
+            {
+                deltaUpdate = true;
+                deltaUpdateBits[index >> 3] |= 1 << (index & 7);
+            }
+        }
+        
+        ++index;
+    }
+}
+
+void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState)
+{
+    unsigned numAttributes = GetNumNetworkAttributes();
+    if (!numAttributes)
+        return;
+    
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    unsigned index = 0;
+    
+    dest.Write(&deltaUpdateBits[0], deltaUpdateBits.Size());
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        if (deltaUpdateBits[index >> 3] & (1 << (index & 7)))
+            dest.WriteVariantData(lastSentState[index]);
+        
+        ++index;
+    }
+}
+
+void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& lastSentState)
+{
+    unsigned numAttributes = GetNumNetworkAttributes();
+    if (!numAttributes)
+        return;
+    
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    unsigned index = 0;
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        if (attr.mode_ & AM_LATESTDATA)
+            dest.WriteVariantData(lastSentState[index]);
+        
+        ++index;
+    }
+}
+
+void Serializable::ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits)
+{
+    unsigned numAttributes = GetNumNetworkAttributes();
+    if (!numAttributes)
+        return;
+    
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    unsigned index = 0;
+    
+    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
+    source.Read(&deltaUpdateBits[0], deltaUpdateBits.Size());
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if (!(attr.mode_ & AM_NET))
+            continue;
+        
+        if (deltaUpdateBits[index >> 3] & (1 << (index & 7)))
+            SetAttribute(i, source.ReadVariant(attr.type_));
+        
+        ++index;
+    }
+}
+
+void Serializable::ReadLatestDataUpdate(Deserializer& source)
+{
+    const Vector<AttributeInfo>* attributes = GetAttributes();
+    if (!attributes)
+        return;
+    
+    for (unsigned i = 0; i < attributes->Size(); ++i)
+    {
+        const AttributeInfo& attr = attributes->At(i);
+        if ((attr.mode_ & (AM_NET | AM_LATESTDATA)) != (AM_NET | AM_LATESTDATA))
+            continue;
+        
+        SetAttribute(i, source.ReadVariant(attr.type_));
+    }
+}
+
 Variant Serializable::GetAttribute(unsigned index)
 {
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());

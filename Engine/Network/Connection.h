@@ -127,8 +127,6 @@ private:
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received
     void ProcessExistingNode(Node* node);
-    /// Write initial attributes (that differ from the default value) for a node or a component
-    void WriteInitialAttributes(VectorBuffer& msg, Serializable* serializable, Vector<Variant>& attributeState);
     /// Handle scene loaded event
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     
@@ -141,9 +139,9 @@ private:
     /// Scene replication state (as last sent to the client)
     Map<unsigned, NodeReplicationState> sceneState_;
     /// Pending latest data for not yet received nodes
-    Map<unsigned, Vector<Variant> > nodeLatestData_;
+    Map<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components
-    Map<unsigned, Vector<Variant> > componentLatestData_;
+    Map<unsigned, PODVector<unsigned char> > componentLatestData_;
     /// Internal vector for delta update
     PODVector<unsigned char> deltaUpdateBits_;
     /// Internal set for node's variable map changes

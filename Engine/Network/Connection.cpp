@@ -226,6 +226,37 @@ void Connection::SendClientUpdate()
 
 void Connection::ProcessPendingLatestData()
 {
+    if (!scene_)
+        return;
+    
+    // Iterate through pending node data and see if we can find the nodes now
+    for (Map<unsigned, PODVector<unsigned char> >::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
+    {
+        Map<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        Node* node = scene_->GetNodeByID(current->first_);
+        if (node)
+        {
+            MemoryBuffer msg(current->second_);
+            msg.ReadVLE(); // Skip the node ID
+            node->ReadLatestDataUpdate(msg);
+            nodeLatestData_.Erase(current);
+        }
+    }
+    
+    // Iterate through pending component data and see if we can find the components now
+    for (Map<unsigned, PODVector<unsigned char> >::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
+    {
+        Map<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        Component* component = scene_->GetComponentByID(current->first_);
+        if (component)
+        {
+            MemoryBuffer msg(current->second_);
+            msg.ReadVLE(); // Skip the component ID
+            component->ReadLatestDataUpdate(msg);
+            component->FinishUpdate();
+            componentLatestData_.Erase(current);
+        }
+    }
 }
 
 void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
@@ -302,6 +333,201 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     {
         LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
         return;
+    }
+    
+    if (!scene_)
+        return;
+    
+    switch (msgID)
+    {
+    case MSG_CREATENODE:
+        {
+            unsigned nodeID = msg.ReadVLE();
+            // In case of the root node (scene), it may already exist. Do not create in that case
+            Node* node = scene_->GetNodeByID(nodeID);
+            if (!node)
+            {
+                // Add initially to the root level. May be moved later
+                node = scene_->CreateChild(nodeID, false);
+            }
+            
+            // Read initial attributes
+            node->ReadDeltaUpdate(msg, deltaUpdateBits_);
+            
+            // Read initial user variables
+            unsigned numVars = msg.ReadVLE();
+            VariantMap& vars = node->GetVars();
+            while (numVars)
+            {
+                --numVars;
+                
+                ShortStringHash key = msg.ReadShortStringHash();
+                Variant value = msg.ReadVariant();
+                vars[key] = value;
+            }
+            
+            // Read components
+            unsigned numComponents = msg.ReadVLE();
+            while (numComponents)
+            {
+                --numComponents;
+                
+                ShortStringHash type = msg.ReadShortStringHash();
+                unsigned componentID = msg.ReadVLE();
+                
+                // Check if the component by this ID and type already exists in this node
+                Component* component = scene_->GetComponentByID(componentID);
+                if (!component || component->GetType() != type || component->GetNode() != node)
+                {
+                    if (component)
+                        component->Remove();
+                    component = node->CreateComponent(type, componentID, false);
+                }
+                
+                // If was unable to create the component, would desync the message and therefore have to abort
+                if (!component)
+                {
+                    LOGERROR("CreateNode message parsing aborted due to unknown component " + type.ToString());
+                    return;
+                }
+                
+                // Read initial attributes, then perform finalization
+                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->FinishUpdate();
+            }
+        }
+        break;
+        
+    case MSG_NODEDELTAUPDATE:
+        {
+            unsigned nodeID = msg.ReadVLE();
+            Node* node = scene_->GetNodeByID(nodeID);
+            if (node)
+            {
+                node->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                
+                unsigned changedVars = msg.ReadVLE();
+                VariantMap& vars = node->GetVars();
+                while (changedVars)
+                {
+                    --changedVars;
+                    
+                    ShortStringHash key = msg.ReadShortStringHash();
+                    Variant value = msg.ReadVariant();
+                    vars[key] = value;
+                }
+            }
+            else
+                LOGWARNING("NodeDeltaUpdate message received for missing node " + String(nodeID));
+        }
+        break;
+        
+    case MSG_NODELATESTDATA:
+        {
+            unsigned nodeID = msg.ReadVLE();
+            Node* node = scene_->GetNodeByID(nodeID);
+            if (node)
+                node->ReadLatestDataUpdate(msg);
+            else
+            {
+                // Latest data messages may be received out-of-order relative to node creation, so cache if necessary
+                PODVector<unsigned char>& data = nodeLatestData_[nodeID];
+                data.Resize(msg.GetSize());
+                memcpy(&data[0], msg.GetData(), msg.GetSize());
+            }
+        }
+        break;
+        
+    case MSG_REMOVENODE:
+        {
+            unsigned nodeID = msg.ReadVLE();
+            Node* node = scene_->GetNodeByID(nodeID);
+            if (node)
+                node->Remove();
+            else
+                LOGWARNING("RemoveNode message received for missing node " + String(nodeID));
+            nodeLatestData_.Erase(nodeID);
+        }
+        break;
+        
+    case MSG_CREATECOMPONENT:
+        {
+            unsigned nodeID = msg.ReadVLE();
+            Node* node = scene_->GetNodeByID(nodeID);
+            if (node)
+            {
+                ShortStringHash type = msg.ReadShortStringHash();
+                unsigned componentID = msg.ReadVLE();
+                
+                // Check if the component by this ID and type already exists in this node
+                Component* component = scene_->GetComponentByID(componentID);
+                if (!component || component->GetType() != type || component->GetNode() != node)
+                {
+                    if (component)
+                        component->Remove();
+                    component = node->CreateComponent(type, componentID, false);
+                }
+                
+                // If was unable to create the component, would desync the message and therefore have to abort
+                if (!component)
+                {
+                    LOGERROR("CreateComponent message parsing aborted due to unknown component " + type.ToString());
+                    return;
+                }
+                
+                // Read initial attributes, then perform finalization
+                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->FinishUpdate();
+            }
+            else
+                LOGWARNING("CreateComponent message received for missing node " + String(nodeID));
+        }
+        break;
+        
+    case MSG_COMPONENTDELTAUPDATE:
+        {
+            unsigned componentID = msg.ReadVLE();
+            Component* component = scene_->GetComponentByID(componentID);
+            if (component)
+            {
+                component->ReadDeltaUpdate(msg, deltaUpdateBits_);
+                component->FinishUpdate();
+            }
+            else
+                LOGWARNING("ComponentDeltaUpdate message received for missing component " + String(componentID));
+        }
+        break;
+        
+    case MSG_COMPONENTLATESTDATA:
+        {
+            unsigned componentID = msg.ReadVLE();
+            Component* component = scene_->GetComponentByID(componentID);
+            if (component)
+            {
+                component->ReadLatestDataUpdate(msg);
+                component->FinishUpdate();
+            }
+            else
+            {
+                // Latest data messages may be received out-of-order relative to component creation, so cache if necessary
+                PODVector<unsigned char>& data = componentLatestData_[componentID];
+                data.Resize(msg.GetSize());
+                memcpy(&data[0], msg.GetData(), msg.GetSize());
+            }
+        }
+        break;
+        
+    case MSG_REMOVECOMPONENT:
+        {
+            unsigned componentID = msg.ReadVLE();
+            Component* component = scene_->GetComponentByID(componentID);
+            if (component)
+                component->Remove();
+            else
+                LOGWARNING("RemoveComponent message received for missing component " + String(componentID));
+            componentLatestData_.Erase(componentID);
+        }
+        break;
     }
 }
 
@@ -473,7 +699,7 @@ void Connection::ProcessNewNode(Node* node)
     newNodeState.frameNumber_ = frameNumber_;
     
     // Write node's attributes
-    WriteInitialAttributes(msg_, node, newNodeState.attributes_);
+    node->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newNodeState.attributes_);
     
     // Write node's variable map
     const VariantMap& vars = node->GetVars();
@@ -502,7 +728,7 @@ void Connection::ProcessNewNode(Node* node)
         newComponentState.type_ = component->GetType();
         
         // Write component's attributes
-        WriteInitialAttributes(msg_, component, newComponentState.attributes_);
+        component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newComponentState.attributes_);
         
         newNodeState.components_[component->GetID()] = newComponentState;
     }
@@ -517,36 +743,9 @@ void Connection::ProcessExistingNode(Node* node)
     nodeState.frameNumber_ = frameNumber_;
     
     // Check if attributes have changed
-    bool deltaUpdate = false;
-    bool latestData = false;
-    const Vector<AttributeInfo>* attributes = node->GetAttributes();
-    deltaUpdateBits_.Resize((node->GetNumNetworkAttributes() + 7) >> 3);
-    for (unsigned i = 0; i < deltaUpdateBits_.Size(); ++i)
-        deltaUpdateBits_[i] = 0;
-    unsigned index = 0;
+    bool deltaUpdate, latestData;
     
-    for (unsigned i = 0; i < attributes->Size(); ++i)
-    {
-        const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_NET))
-            continue;
-        
-        // Check for attribute change
-        Variant value = node->GetAttribute(i);
-        if (value != nodeState.attributes_[index])
-        {
-            nodeState.attributes_[index] = value;
-            if (attr.mode_ & AM_LATESTDATA)
-                latestData = true;
-            else
-            {
-                deltaUpdate = true;
-                deltaUpdateBits_[index >> 3] |= 1 << (index & 7);
-            }
-        }
-        
-        ++index;
-    }
+    node->PrepareUpdates(deltaUpdateBits_, nodeState.attributes_, deltaUpdate, latestData);
     
     // Check if variable map has changed. Note: variable removal is not supported
     changedVars_.Clear();
@@ -567,22 +766,7 @@ void Connection::ProcessExistingNode(Node* node)
     {
         msg_.Clear();
         msg_.WriteVLE(node->GetID());
-        
-        // Write changed attributes
-        msg_.Write(&deltaUpdateBits_[0], deltaUpdateBits_.Size());
-        
-        index = 0;
-        for (unsigned i = 0; i < attributes->Size(); ++i)
-        {
-            const AttributeInfo& attr = attributes->At(i);
-            if (!(attr.mode_ & AM_NET))
-                continue;
-            
-            if (deltaUpdateBits_[index << 3] & (1 << (index & 7)))
-                msg_.WriteVariantData(nodeState.attributes_[index]);
-            
-            ++index;
-        }
+        node->WriteDeltaUpdate(msg_, deltaUpdateBits_, nodeState.attributes_);
         
         // Write changed variables
         msg_.WriteVLE(changedVars_.Size());
@@ -602,19 +786,7 @@ void Connection::ProcessExistingNode(Node* node)
         // If at least one latest data attribute changes, send all of them
         msg_.Clear();
         msg_.WriteVLE(node->GetID());
-        
-        index = 0;
-        for (unsigned i = 0; i < attributes->Size(); ++i)
-        {
-            const AttributeInfo& attr = attributes->At(i);
-            if (!(attr.mode_ & AM_NET))
-                continue;
-            
-            if (attr.mode_ & AM_LATESTDATA)
-                msg_.WriteVariantData(nodeState.attributes_[index]);
-            
-            ++index;
-        }
+        node->WriteLatestDataUpdate(msg_, nodeState.attributes_);
         
         SendMessage(MSG_NODELATESTDATA, node->GetID(), true, false, msg_);
     }
@@ -641,7 +813,7 @@ void Connection::ProcessExistingNode(Node* node)
             newComponentState.type_ = component->GetType();
             
             // Write component's attributes
-            WriteInitialAttributes(msg_, component, newComponentState.attributes_);
+            component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newComponentState.attributes_);
             
             SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
             nodeState.components_[component->GetID()] = newComponentState;
@@ -652,58 +824,14 @@ void Connection::ProcessExistingNode(Node* node)
             ComponentReplicationState& componentState = j->second_;
             componentState.frameNumber_ = frameNumber_;
             
-            deltaUpdate = false;
-            latestData = false;
-            const Vector<AttributeInfo>* attributes = component->GetAttributes();
-            deltaUpdateBits_.Resize((component->GetNumNetworkAttributes() + 7) >> 3);
-            for (unsigned k = 0; k < deltaUpdateBits_.Size(); ++k)
-                deltaUpdateBits_[k] = 0;
-            index = 0;
-            
-            for (unsigned k = 0; k < attributes->Size(); ++k)
-            {
-                const AttributeInfo& attr = attributes->At(k);
-                if (!(attr.mode_ & AM_NET))
-                    continue;
-                
-                // Check for attribute change
-                Variant value = component->GetAttribute(k);
-                if (value != componentState.attributes_[index])
-                {
-                    componentState.attributes_[index] = value;
-                    if (attr.mode_ & AM_LATESTDATA)
-                        latestData = true;
-                    else
-                    {
-                        deltaUpdate = true;
-                        deltaUpdateBits_[index >> 3] |= 1 << (index & 7);
-                    }
-                }
-                
-                ++index;
-            }
+            component->PrepareUpdates(deltaUpdateBits_, componentState.attributes_, deltaUpdate, latestData);
             
             // Send deltaupdate message if necessary
             if (deltaUpdate)
             {
                 msg_.Clear();
                 msg_.WriteVLE(component->GetID());
-                
-                // Write changed attributes
-                msg_.Write(&deltaUpdateBits_[0], deltaUpdateBits_.Size());
-                
-                index = 0;
-                for (unsigned k = 0; k < attributes->Size(); ++k)
-                {
-                    const AttributeInfo& attr = attributes->At(k);
-                    if (!(attr.mode_ & AM_NET))
-                        continue;
-                    
-                    if (deltaUpdateBits_[index << 3] & (1 << (index & 7)))
-                        msg_.WriteVariantData(componentState.attributes_[index]);
-                    
-                    ++index;
-                }
+                component->WriteDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
                 
                 SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
             }
@@ -714,19 +842,7 @@ void Connection::ProcessExistingNode(Node* node)
                 // If at least one latest data attribute changes, send all of them
                 msg_.Clear();
                 msg_.WriteVLE(component->GetID());
-                
-                index = 0;
-                for (unsigned k = 0; k < attributes->Size(); ++k)
-                {
-                    const AttributeInfo& attr = attributes->At(k);
-                    if (!(attr.mode_ & AM_NET))
-                        continue;
-                    
-                    if (attr.mode_ & AM_LATESTDATA)
-                        msg_.WriteVariantData(componentState.attributes_[index]);
-                    
-                    ++index;
-                }
+                component->WriteLatestDataUpdate(msg_, componentState.attributes_);
                 
                 SendMessage(MSG_COMPONENTLATESTDATA, component->GetID(), true, false, msg_);
             }
@@ -740,60 +856,11 @@ void Connection::ProcessExistingNode(Node* node)
         if (current->second_.frameNumber_ != frameNumber_)
         {
             msg_.Clear();
-            msg_.WriteVLE(node->GetID());
             msg_.WriteVLE(current->first_);
             
             SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
             nodeState.components_.Erase(current);
         }
-    }
-}
-
-void Connection::WriteInitialAttributes(VectorBuffer& msg, Serializable* serializable, Vector<Variant>& attributeState)
-{
-    const Vector<AttributeInfo>* attributes = serializable->GetAttributes();
-    unsigned numAttributes = serializable->GetNumNetworkAttributes();
-    if (!numAttributes)
-        return;
-    
-    attributeState.Resize(numAttributes);
-    
-    deltaUpdateBits_.Resize((numAttributes + 7) >> 3);
-    for (unsigned i = 0; i < deltaUpdateBits_.Size(); ++i)
-        deltaUpdateBits_[i] = 0;
-    
-    unsigned index = 0;
-    for (unsigned i = 0; i < attributes->Size(); ++i)
-    {
-        const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_NET))
-            continue;
-        
-        Variant value = serializable->GetAttribute(i);
-        if (value != attr.defaultValue_)
-        {
-            attributeState[index] = value;
-            deltaUpdateBits_[index >> 3] |= (1 << (index & 7));
-        }
-        else
-            attributeState[index] = attr.defaultValue_;
-        
-        ++index;
-    }
-    
-    msg.Write(&deltaUpdateBits_[0], deltaUpdateBits_.Size());
-    
-    index = 0;
-    for (unsigned i = 0; i < attributes->Size(); ++i)
-    {
-        const AttributeInfo& attr = attributes->At(i);
-        if (!(attr.mode_ & AM_NET))
-            continue;
-        
-        if (deltaUpdateBits_[index << 3] & (1 << (index & 7)))
-            msg.WriteVariantData(attributeState[index]);
-        
-        ++index;
     }
 }
 

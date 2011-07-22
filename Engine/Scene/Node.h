@@ -35,6 +35,8 @@ class Node : public Serializable
 {
     OBJECT(Node);
     
+    friend class Connection;
+    
 public:
     /// Construct
     Node(Context* context);
