@@ -244,24 +244,19 @@ String Connection::ToString() const
 
 void Connection::ProcessNode(Node* node)
 {
-    unsigned nodeID = node->GetID();
-    if (processedNodes_.Contains(nodeID))
+    if (!node || processedNodes_.Contains(node))
         return;
     
-    processedNodes_.Insert(nodeID);
+    processedNodes_.Insert(node);
     
-    // Process parent node first
-    Node* parent = node->GetParent();
-    if (parent)
-    {
-        // If parent is local, proceed to first non-local node in hierarchy
-        while (parent->GetID() >= FIRST_LOCAL_ID)
-            parent = parent->GetParent();
-        ProcessNode(parent);
-    }
+    // Process depended upon nodes first
+    PODVector<Node*> depends;
+    node->GetDependencyNodes(depends);
+    for (PODVector<Node*>::ConstIterator i = depends.Begin(); i != depends.End(); ++i)
+        ProcessNode(*i);
     
     // Check if the client's scene state already has this node
-    if (sceneState_.Find(nodeID) != sceneState_.End())
+    if (sceneState_.Find(node->GetID()) != sceneState_.End())
         ProcessExistingNode(node);
     else
         ProcessNewNode(node);

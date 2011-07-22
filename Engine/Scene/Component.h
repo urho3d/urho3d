@@ -45,6 +45,8 @@ public:
     virtual void OnNodeSet(Node* node) {};
     /// Handle scene node transform dirtied
     virtual void OnMarkedDirty(Node* node) {};
+    /// Return the depended on nodes to order network updates
+    virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
     
     /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion
     void Remove();

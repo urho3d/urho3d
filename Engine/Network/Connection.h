@@ -129,8 +129,8 @@ private:
     PODVector<unsigned char> deltaUpdateBits_;
     /// Internal set for node's variable map changes
     HashSet<ShortStringHash> changedVars_;
-    /// Internal set for processed node ID's during an update
-    HashSet<unsigned> processedNodes_;
+    /// Internal set for already processed nodes during an update
+    HashSet<Node*> processedNodes_;
     /// Reused message buffer
     VectorBuffer msg_;
     /// Current controls

@@ -55,6 +55,8 @@ public:
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
     /// Perform finalization after a scene load or network update
     virtual void FinishUpdate();
+    /// Return the depended on nodes to order network updates
+    virtual void GetDependencyNodes(PODVector<Node*>& dest);
     
     /// Remove the joint
     void Clear();

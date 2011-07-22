@@ -223,6 +223,8 @@ public:
     const Vector<WeakPtr<Component> > GetListeners() const { return listeners_; }
     /// Return user variables
     VariantMap& GetVars() { return vars_; }
+    /// Return the depended on nodes to order network updates
+    void GetDependencyNodes(PODVector<Node*>& dest) const;
     /// Template version of returning child nodes with a specific component
     template <class T> void GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive = false) const;
     /// Template version of returning a component by type

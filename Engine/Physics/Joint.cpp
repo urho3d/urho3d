@@ -101,6 +101,14 @@ void Joint::FinishUpdate()
     }
 }
 
+void Joint::GetDependencyNodes(PODVector<Node*>& dest)
+{
+    if (bodyA_ && bodyA_->GetNode())
+        dest.Push(bodyA_->GetNode());
+    if (bodyB_ && bodyB_->GetNode())
+        dest.Push(bodyB_->GetNode());
+}
+
 void Joint::Clear()
 {
     if (joint_)
@@ -200,6 +208,7 @@ void Joint::SetAxis(Vector3 axis)
         
         switch (type)
         {
+        case dJointTypeHinge:
             dJointSetHingeAxis(joint_, axis.x_, axis.y_, axis.z_);
             break;
         }

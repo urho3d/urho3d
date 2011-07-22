@@ -590,6 +590,22 @@ Component* Node::GetComponent(ShortStringHash type, unsigned index) const
     return 0;
 }
 
+void Node::GetDependencyNodes(PODVector<Node*>& dest) const
+{
+    // Add the parent node, but if it is local, traverse to the first non-local node
+    if (parent_ && parent_ != scene_)
+    {
+        Node* current = parent_;
+        while (current->id_ >= FIRST_LOCAL_ID)
+            current = current->parent_;
+        dest.Push(current);
+    }
+    
+    // Then let the components add their dependencies
+    for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+        (*i)->GetDependencyNodes(dest);
+}
+
 void Node::SetID(unsigned id)
 {
     id_ = id;
