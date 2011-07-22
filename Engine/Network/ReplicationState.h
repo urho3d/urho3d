@@ -39,7 +39,7 @@ struct NodeReplicationState
 {
     /// Attribute values
     Vector<Variant> attributes_;
-    /// Node variables
+    /// User variables
     VariantMap vars_;
     /// Components by ID
     Map<unsigned, ComponentReplicationState> components_;

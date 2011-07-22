@@ -96,16 +96,8 @@ private:
     void OnServerConnected();
     /// Handle server disconnection
     void OnServerDisconnected();
-    /// Handle a message from the server. Return true if handled internally and should not be sent as an event
-    bool OnServerMessage(Connection* connection, int msgID, MemoryBuffer& msg);
-    /// Handle a message from the client. Return true if handled internally and should not be sent as an event
-    bool OnClientMessage(Connection* connection, int msgID, MemoryBuffer& msg);
-    /// Handle a remote event either on the server or client. Return true if handled internally and should not be sent as an event
-    void OnRemoteEvent(Connection* connection, int msgID, MemoryBuffer& msg);
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
-    /// Handle scene loaded event
-    void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     
     /// kNet Network instance
     kNet::Network* network_;

@@ -36,6 +36,7 @@
 #undef SendMessage
 #endif
 
+class MemoryBuffer;
 class Node;
 class Scene;
 class Serializable;
@@ -65,8 +66,6 @@ public:
     void SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Assign scene. On the server, this will cause the client to load it
     void SetScene(Scene* newScene);
-    /// Set scene loaded flag
-    void SetSceneLoaded(bool loaded);
     /// Assign identity. Called by Network
     void SetIdentity(const VariantMap& identity);
     /// Set new controls. Moves the current controls as previous
@@ -75,8 +74,26 @@ public:
     void SetConnectPending(bool connectPending);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
-    /// Process scene replication state and send scene update messages. Called by Network on the server
-    void ProcessReplication();
+    /// Send scene update messages. Called by Network
+    void SendServerUpdate();
+    /// Send latest controls from the client. Called by Network
+    void SendClientUpdate();
+    /// Process pending latest data for nodes and components
+    void ProcessPendingLatestData();
+    /// Process a LoadScene message from the server. Called by Network
+    void ProcessLoadScene(int msgID, MemoryBuffer& msg);
+    /// Process a SceneChecksumError message from the server. Called by Network
+    void ProcessSceneChecksumError(int msgID, MemoryBuffer& msg);
+    /// Process a scene update message from the server. Called by Network
+    void ProcessSceneUpdate(int msgID, MemoryBuffer& msg);
+    /// Process an Identity message from the client. Called by Network
+    void ProcessIdentity(int msgID, MemoryBuffer& msg);
+    /// Process a Controls message from the client. Called by Network
+    void ProcessControls(int msgID, MemoryBuffer& msg);
+    /// Process a SceneLoaded message from the client. Called by Network
+    void ProcessSceneLoaded(int msgID, MemoryBuffer& msg);
+    /// Process a remote event message from the client or server. Called by Network
+    void ProcessRemoteEvent(int msgID, MemoryBuffer& msg);
     
     /// Return the kNet message connection
     kNet::MessageConnection* GetMessageConnection() const;
@@ -104,7 +121,7 @@ public:
     String ToString() const;
     
 private:
-    /// Process a node during network update. Will recurse to process parent node(s) first
+    /// Process a node for sending a network update. Recurses to process depended on node(s) first
     void ProcessNode(Node* node);
     /// Process a node that the client had not yet received
     void ProcessNewNode(Node* node);
@@ -112,6 +129,8 @@ private:
     void ProcessExistingNode(Node* node);
     /// Write initial attributes (that differ from the default value) for a node or a component
     void WriteInitialAttributes(VectorBuffer& msg, Serializable* serializable, Vector<Variant>& attributeState);
+    /// Handle scene loaded event
+    void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;

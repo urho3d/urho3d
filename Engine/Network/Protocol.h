@@ -26,7 +26,7 @@
 // Client->server: send VariantMap of identity and authentication data
 static const int MSG_IDENTITY = 0x5;
 // Client->server: send controls (buttons and mouse movement)
-static const int MSG_CONTROLSUPDATE = 0x6;
+static const int MSG_CONTROLS = 0x6;
 // Client->server: scene has been loaded and client is ready to proceed
 static const int MSG_SCENELOADED = 0x7;
 
@@ -52,6 +52,9 @@ static const int MSG_COMPONENTLATESTDATA = 0x10;
 static const int MSG_REMOVECOMPONENT = 0x11;
 
 // Client->server and server->client: remote event
-static const int MSG_REMOTEEVENT = 0x11;
+static const int MSG_REMOTEEVENT = 0x12;
 // Client->server and server->client: remote node event
-static const int MSG_REMOTENODEEVENT = 0x12;
+static const int MSG_REMOTENODEEVENT = 0x13;
+
+// Fixed content ID for client controls update
+static const unsigned CONTROLS_CONTENT_ID = 1;

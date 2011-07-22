@@ -24,9 +24,14 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Connection.h"
+#include "File.h"
+#include "FileSystem.h"
 #include "Log.h"
+#include "MemoryBuffer.h"
+#include "NetworkEvents.h"
 #include "Protocol.h"
 #include "Scene.h"
+#include "SceneEvents.h"
 
 #include <kNet.h>
 
@@ -129,6 +134,7 @@ void Connection::SetScene(Scene* newScene)
     
     scene_ = newScene;
     sceneLoaded_ = false;
+    UnsubscribeFromEvent(E_ASYNCLOADFINISHED);
     
     if (!scene_)
         return;
@@ -147,12 +153,8 @@ void Connection::SetScene(Scene* newScene)
     {
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
+        SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
     }
-}
-
-void Connection::SetSceneLoaded(bool loaded)
-{
-    sceneLoaded_ = loaded;
 }
 
 void Connection::SetIdentity(const VariantMap& identity)
@@ -176,7 +178,7 @@ void Connection::Disconnect(int waitMSec)
     connection_->Disconnect(waitMSec);
 }
 
-void Connection::ProcessReplication()
+void Connection::SendServerUpdate()
 {
     if (!isClient_ || !scene_ || !sceneLoaded_)
         return;
@@ -207,6 +209,206 @@ void Connection::ProcessReplication()
     }
     
     ++frameNumber_;
+}
+
+void Connection::SendClientUpdate()
+{
+    if (isClient_ || !scene_ || !sceneLoaded_)
+        return;
+    
+    msg_.Clear();
+    msg_.WriteUInt(controls_.buttons_);
+    msg_.WriteFloat(controls_.yaw_);
+    msg_.WriteFloat(controls_.pitch_);
+    msg_.WriteVariantMap(controls_.extraData_);
+    SendMessage(MSG_CONTROLS, CONTROLS_CONTENT_ID, false, false, msg_);
+}
+
+void Connection::ProcessPendingLatestData()
+{
+}
+
+void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
+{
+    if (IsClient())
+    {
+        LOGWARNING("Received unexpected LoadScene message from client " + ToString());
+        return;
+    }
+    
+    if (!scene_)
+    {
+        LOGERROR("Can not handle LoadScene message without an assigned scene");
+        return;
+    }
+    
+    String fileName = msg.ReadString();
+    
+    // Make sure there is no existing async loading, and clear previous pending latest data if any
+    scene_->StopAsyncLoading();
+    nodeLatestData_.Clear();
+    componentLatestData_.Clear();
+    
+    if (fileName.Empty())
+    {
+        scene_->Clear();
+        
+        // If filename is empty, can send the scene loaded reply immediately
+        VectorBuffer replyMsg;
+        replyMsg.WriteUInt(scene_->GetChecksum());
+        SendMessage(MSG_SCENELOADED, true, true, replyMsg);
+    }
+    else
+    {
+        // Otherwise start the async loading process
+        String extension = GetExtension(fileName);
+        SharedPtr<File> file(new File(context_, fileName));
+        bool success;
+        
+        if (extension == ".xml")
+            success = scene_->LoadAsyncXML(file);
+        else
+            success = scene_->LoadAsync(file);
+        
+        if (!success)
+        {
+            using namespace NetworkSceneLoadFailed;
+            
+            VariantMap eventData;
+            eventData[P_CONNECTION] = (void*)this;
+            SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+        }
+    }
+}
+
+void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
+{
+    if (IsClient())
+    {
+        LOGWARNING("Received unexpected SceneChecksumError message from client " + ToString());
+        return;
+    }
+    
+    using namespace NetworkSceneLoadFailed;
+    
+    VariantMap eventData;
+    eventData[P_CONNECTION] = (void*)this;
+    SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+}
+
+void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
+{
+    if (IsClient())
+    {
+        LOGWARNING("Received unexpected SceneUpdate message from client " + ToString());
+        return;
+    }
+}
+
+void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
+{
+    if (!IsClient())
+    {
+        LOGWARNING("Received unexpected Identity message from server");
+        return;
+    }
+    
+    identity_ = msg.ReadVariantMap();
+    
+    using namespace ClientIdentity;
+    
+    VariantMap eventData = identity_;
+    eventData[P_CONNECTION] = (void*)this;
+    eventData[P_ALLOW] = true;
+    SendEvent(E_CLIENTIDENTITY, eventData);
+    
+    // If connection was denied as a response to the event, disconnect the client now
+    if (!eventData[P_ALLOW].GetBool())
+        Disconnect();
+}
+
+void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
+{
+    if (!IsClient())
+    {
+        LOGWARNING("Received unexpected Controls message from server");
+        return;
+    }
+    
+    Controls newControls;
+    newControls.buttons_ = msg.ReadUInt();
+    newControls.yaw_ = msg.ReadFloat();
+    newControls.pitch_ = msg.ReadFloat();
+    newControls.extraData_ = msg.ReadVariantMap();
+    SetControls(newControls);
+}
+
+void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
+{
+    if (!IsClient())
+    {
+        LOGWARNING("Received unexpected SceneLoaded message from server");
+        return;
+    }
+    
+    if (!scene_)
+    {
+        LOGWARNING("Received a SceneLoaded message without an assigned scene from client " + ToString());
+        return;
+    }
+    
+    unsigned checksum = msg.ReadUInt();
+    
+    if (checksum != scene_->GetChecksum())
+    {
+        VectorBuffer replyMsg;
+        SendMessage(MSG_SCENECHECKSUMERROR, true, true, replyMsg);
+        
+        using namespace NetworkSceneLoadFailed;
+        
+        VariantMap eventData;
+        eventData[P_CONNECTION] = (void*)this;
+        SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+    }
+    else
+    {
+        sceneLoaded_ = true;
+        
+        using namespace ClientSceneLoaded;
+        
+        VariantMap eventData;
+        eventData[P_CONNECTION] = (void*)this;
+        SendEvent(E_CLIENTSCENELOADED, eventData);
+    }
+}
+
+void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
+{
+    /// \todo Check whether the remote event is allowed based on a black- or whitelist
+    if (msgID == MSG_REMOTEEVENT)
+    {
+        StringHash eventType = msg.ReadStringHash();
+        VariantMap eventData = msg.ReadVariantMap();
+        SendEvent(eventType, eventData);
+    }
+    else
+    {
+        if (!scene_)
+        {
+            LOGERROR("Can not receive remote node event without an assigned scene");
+            return;
+        }
+        unsigned nodeID = msg.ReadVLE();
+        StringHash eventType = msg.ReadStringHash();
+        VariantMap eventData = msg.ReadVariantMap();
+        Node* receiver = scene_->GetNodeByID(nodeID);
+        if (!receiver)
+        {
+            LOGWARNING("Remote node event's receiver not found, discarding event");
+            return;
+        }
+        SendEvent(receiver, eventType, eventData);
+    }
 }
 
 kNet::MessageConnection* Connection::GetMessageConnection() const
@@ -593,4 +795,11 @@ void Connection::WriteInitialAttributes(VectorBuffer& msg, Serializable* seriali
         
         ++index;
     }
+}
+
+void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
+{
+    VectorBuffer msg;
+    msg.WriteUInt(scene_->GetChecksum());
+    SendMessage(MSG_SCENELOADED, true, true, msg);
 }

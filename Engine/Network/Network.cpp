@@ -24,8 +24,6 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CoreEvents.h"
-#include "File.h"
-#include "FileSystem.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Network.h"
@@ -33,7 +31,6 @@
 #include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
-#include "SceneEvents.h"
 #include "StringUtils.h"
 
 #include <kNet.h>
@@ -41,7 +38,6 @@
 #include "DebugNew.h"
 
 static const int DEFAULT_UPDATE_FPS = 25;
-static const unsigned CONTROLS_CONTENT_ID = 1;
 
 OBJECTTYPESTATIC(Network);
 
@@ -54,7 +50,6 @@ Network::Network(Context* context) :
     network_ = new kNet::Network();
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
-    SubscribeToEvent(E_ASYNCLOADFINISHED, HANDLER(Network, HandleAsyncLoadFinished));
 }
 
 Network::~Network()
@@ -79,23 +74,53 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
     {
         MemoryBuffer msg(data, numBytes);
         
-        bool handled = false;
-        if (connection->IsClient())
-            handled = OnClientMessage(connection, id, msg);
-        else
-            handled = OnServerMessage(connection, id, msg);
+        switch (id)
+        {
+        case MSG_LOADSCENE:
+            connection->ProcessLoadScene(id, msg);
+            return;
+        
+        case MSG_SCENECHECKSUMERROR:
+            connection->ProcessSceneChecksumError(id, msg);
+            return;
+            
+        case MSG_CREATENODE:
+        case MSG_NODEDELTAUPDATE:
+        case MSG_NODELATESTDATA:
+        case MSG_REMOVENODE:
+        case MSG_CREATECOMPONENT:
+        case MSG_COMPONENTDELTAUPDATE:
+        case MSG_COMPONENTLATESTDATA:
+        case MSG_REMOVECOMPONENT:
+            connection->ProcessSceneUpdate(id, msg);
+            return;
+            
+        case MSG_IDENTITY:
+            connection->ProcessIdentity(id, msg);
+            return;
+        
+        case MSG_CONTROLS:
+            connection->ProcessControls(id, msg);
+            return;
+            
+        case MSG_SCENELOADED:
+            connection->ProcessSceneLoaded(id, msg);
+            return;
+            
+        case MSG_REMOTEEVENT:
+        case MSG_REMOTENODEEVENT:
+            connection->ProcessRemoteEvent(id, msg);
+            return;
+        }
         
         // If message was not handled internally, forward as an event
-        if (!handled)
-        {
-            using namespace NetworkMessage;
-            
-            VariantMap eventData;
-            eventData[P_CONNECTION] = (void*)connection;
-            eventData[P_MESSAGEID] = (int)id;
-            eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
-            connection->SendEvent(E_NETWORKMESSAGE, eventData);
-        }
+        using namespace NetworkMessage;
+        
+        VariantMap eventData;
+        eventData[P_CONNECTION] = (void*)connection;
+        eventData[P_MESSAGEID] = (int)id;
+        eventData[P_DATA].SetBuffer(msg.GetData(), msg.GetSize());
+        connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else
         LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
@@ -105,7 +130,7 @@ u32 Network::ComputeContentID(kNet::message_id_t id, const char* data, size_t nu
 {
     switch (id)
     {
-    case MSG_CONTROLSUPDATE:
+    case MSG_CONTROLS:
         // Return fixed content ID for controls
         return CONTROLS_CONTENT_ID;
         
@@ -338,6 +363,9 @@ void Network::Update(float timeStep)
         kNet::MessageConnection* connection = serverConnection_->GetMessageConnection();
         connection->Process();
         
+        // Process latest data messages waiting for the correct nodes or components to be created
+        serverConnection_->ProcessPendingLatestData();
+        
         // Check for state transitions
         kNet::ConnectionState state = connection->GetConnectionState();
         if (serverConnection_->IsConnectPending() && state == kNet::ConnectionOK)
@@ -347,18 +375,9 @@ void Network::Update(float timeStep)
         else if (state == kNet::ConnectionClosed)
             OnServerDisconnected();
         
-        // If scene has been assigned and loaded, send the controls packet on update
-        if (updateNow && serverConnection_->GetScene() && serverConnection_->IsSceneLoaded())
-        {
-            const Controls& controls = serverConnection_->GetControls();
-            
-            VectorBuffer msg;
-            msg.WriteUInt(controls.buttons_);
-            msg.WriteFloat(controls.yaw_);
-            msg.WriteFloat(controls.pitch_);
-            msg.WriteVariantMap(controls.extraData_);
-            serverConnection_->SendMessage(MSG_CONTROLSUPDATE, CONTROLS_CONTENT_ID, false, false, msg);
-        }
+        // Send the client update (controls)
+        if (updateNow && serverConnection_)
+            serverConnection_->SendClientUpdate();
     }
     
     // Process client connections if the server has been started
@@ -369,10 +388,10 @@ void Network::Update(float timeStep)
         
         if (updateNow)
         {
-            // Process scene replication for each client connection
+            // Send server updates for each client connection
             for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
-                i->second_->ProcessReplication();
+                i->second_->SendServerUpdate();
         }
     }
 }
@@ -429,188 +448,9 @@ void Network::OnServerDisconnected()
     serverConnection_.Reset();
 }
 
-bool Network::OnServerMessage(Connection* connection, int msgID, MemoryBuffer& msg)
-{
-    switch (msgID)
-    {
-    case MSG_LOADSCENE:
-        {
-            String fileName = msg.ReadString();
-            Scene* scene = connection->GetScene();
-            if (scene)
-            {
-                if (fileName.Empty())
-                    scene->Clear();
-                else
-                {
-                    String extension = GetExtension(fileName);
-                    SharedPtr<File> file(new File(context_, fileName));
-                    bool success;
-                    
-                    if (extension == ".xml")
-                        success = scene->LoadAsyncXML(file);
-                    else
-                        success = scene->LoadAsync(file);
-                    
-                    if (!success)
-                    {
-                        using namespace NetworkSceneLoadFailed;
-                        
-                        VariantMap eventData;
-                        eventData[P_CONNECTION] = (void*)connection;
-                        connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
-                    }
-                }
-            }
-            else
-                LOGERROR("Received a LoadScene message without an assigned scene");
-        }
-        return true;
-        
-    case MSG_SCENECHECKSUMERROR:
-        {
-            using namespace NetworkSceneLoadFailed;
-            
-            VariantMap eventData;
-            eventData[P_CONNECTION] = (void*)connection;
-            connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
-        }
-        return true;
-        
-    case MSG_REMOTEEVENT:
-    case MSG_REMOTENODEEVENT:
-        OnRemoteEvent(connection, msgID, msg);
-        return true;
-    }
-    
-    return false;
-}
-
-bool Network::OnClientMessage(Connection* connection, int msgID, MemoryBuffer& msg)
-{
-    switch (msgID)
-    {
-    case MSG_IDENTITY:
-        {
-            connection->SetIdentity(msg.ReadVariantMap());
-            
-            using namespace ClientIdentity;
-            
-            VariantMap eventData = connection->GetIdentity();
-            eventData[P_CONNECTION] = (void*)connection;
-            eventData[P_ALLOW] = true;
-            connection->SendEvent(E_CLIENTIDENTITY, eventData);
-            
-            // If connection was denied as a response to the event, disconnect the client now
-            if (!eventData[P_ALLOW].GetBool())
-                connection->Disconnect();
-        }
-        return true;
-        
-    case MSG_CONTROLSUPDATE:
-        {
-            Controls newControls;
-            newControls.buttons_ = msg.ReadUInt();
-            newControls.yaw_ = msg.ReadFloat();
-            newControls.pitch_ = msg.ReadFloat();
-            newControls.extraData_ = msg.ReadVariantMap();
-            connection->SetControls(newControls);
-        }
-        return true;
-        
-    case MSG_SCENELOADED:
-        {
-            unsigned checksum = msg.ReadUInt();
-            
-            Scene* scene = connection->GetScene();
-            if (scene)
-            {
-                if (checksum != scene->GetChecksum())
-                {
-                    VectorBuffer replyMsg;
-                    connection->SendMessage(MSG_SCENECHECKSUMERROR, true, true, replyMsg);
-                    
-                    using namespace NetworkSceneLoadFailed;
-                    
-                    VariantMap eventData;
-                    eventData[P_CONNECTION] = (void*)connection;
-                    connection->SendEvent(E_NETWORKSCENELOADFAILED, eventData);
-                }
-                else
-                {
-                    connection->SetSceneLoaded(true);
-                    
-                    using namespace ClientSceneLoaded;
-                    
-                    VariantMap eventData;
-                    eventData[P_CONNECTION] = (void*)connection;
-                    connection->SendEvent(E_CLIENTSCENELOADED, eventData);
-                }
-            }
-            else
-                LOGWARNING("Client sent a SceneLoaded message without an assigned scene");
-        }
-        return true;
-        
-    case MSG_REMOTEEVENT:
-    case MSG_REMOTENODEEVENT:
-        OnRemoteEvent(connection, msgID, msg);
-        return true;
-    }
-    
-    return false;
-}
-
-void Network::OnRemoteEvent(Connection* connection, int msgID, MemoryBuffer& msg)
-{
-    /// \todo Check whether the remote event is allowed based on a black- or whitelist
-    if (msgID == MSG_REMOTEEVENT)
-    {
-        StringHash eventType = msg.ReadStringHash();
-        VariantMap eventData = msg.ReadVariantMap();
-        connection->SendEvent(eventType, eventData);
-    }
-    else
-    {
-        Scene* scene = connection->GetScene();
-        if (!scene)
-        {
-            LOGERROR("Connection has null scene, can not receive remote node event");
-            return;
-        }
-        unsigned nodeID = msg.ReadVLE();
-        StringHash eventType = msg.ReadStringHash();
-        VariantMap eventData = msg.ReadVariantMap();
-        Node* receiver = scene->GetNodeByID(nodeID);
-        if (!receiver)
-        {
-            LOGWARNING("Remote node event's receiver not found, discarding event");
-            return;
-        }
-        connection->SendEvent(receiver, eventType, eventData);
-    }
-}
-
 void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     using namespace BeginFrame;
     
     Update(eventData[P_TIMESTEP].GetFloat());
-}
-
-void Network::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
-{
-    if (!serverConnection_)
-        return;
-    
-    Scene* scene = serverConnection_->GetScene();
-    
-    using namespace AsyncLoadFinished;
-    
-    if ((void*)scene == eventData[P_SCENE].GetPtr())
-    {
-        VectorBuffer msg;
-        msg.WriteUInt(scene->GetChecksum());
-        serverConnection_->SendMessage(MSG_SCENELOADED, true, true, msg);
-    }
 }
