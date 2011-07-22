@@ -24,7 +24,7 @@
 #include "Precompiled.h"
 #include "Thread.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <Windows.h>
 #else
 #include <pthread.h>
@@ -32,7 +32,7 @@
 
 #include "DebugNew.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
@@ -67,7 +67,7 @@ bool Thread::Start()
         return false;
     
     shouldRun_ = true;
-    #ifdef _WIN32
+    #ifdef WIN32
     handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
     #else
     handle_ = new pthread_t;
@@ -81,8 +81,12 @@ bool Thread::Start()
 
 void Thread::Stop()
 {
+    // Check if already stopped
+    if (!handle_)
+        return;
+    
     shouldRun_ = false;
-    #ifdef _WIN32
+    #ifdef WIN32
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
     #else
@@ -96,7 +100,7 @@ void Thread::Stop()
 
 void Thread::SetPriority(int priority)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
     #endif

@@ -24,7 +24,7 @@
 #include "Precompiled.h"
 #include "Mutex.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <Windows.h>
 #else
 #include <pthread.h>
@@ -32,7 +32,7 @@
 
 #include "DebugNew.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 Mutex::Mutex() :
     criticalSection_(new CRITICAL_SECTION)
 {

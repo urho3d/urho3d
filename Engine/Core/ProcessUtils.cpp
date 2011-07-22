@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <Windows.h>
 #include <io.h>
 #else
@@ -38,7 +38,7 @@
 
 #include "DebugNew.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 static bool consoleOpened = false;
 #endif
 static String currentLine;
@@ -47,7 +47,7 @@ static Mutex staticMutex;
 
 void ErrorDialog(const char* title, const char* message)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     MessageBox(0, message, title, 0);
     #else
     printf("%s\n", message);
@@ -62,7 +62,7 @@ void ErrorExit(const String& message, int exitCode)
 
 void OpenConsoleWindow()
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     if (consoleOpened)
         return;
     
@@ -151,7 +151,7 @@ String GetConsoleInput()
 {
     String ret;
     
-    #ifdef _WIN32
+    #ifdef WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     if (input == INVALID_HANDLE_VALUE)
         return ret;
@@ -215,7 +215,7 @@ String GetConsoleInput()
 
 unsigned GetNumCPUCores()
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     SYSTEM_INFO info;
     GetSystemInfo(&info);
     return info.dwNumberOfProcessors;

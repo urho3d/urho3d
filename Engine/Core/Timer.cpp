@@ -25,7 +25,7 @@
 #include "CoreEvents.h"
 #include "Timer.h"
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <Windows.h>
 #include <MMSystem.h>
 #else
@@ -48,7 +48,7 @@ Time::Time(Context* context) :
     totalMSec_(0),
     timerPeriod_(0)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     LARGE_INTEGER frequency;
     if (QueryPerformanceFrequency(&frequency))
     {
@@ -114,7 +114,7 @@ void Time::EndFrame()
 
 void Time::SetTimerPeriod(unsigned mSec)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     if (timerPeriod_ > 0)
         timeEndPeriod(timerPeriod_);
     
@@ -127,7 +127,7 @@ void Time::SetTimerPeriod(unsigned mSec)
 
 void Time::Sleep(unsigned mSec)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     ::Sleep(mSec);
     #else
     usleep(mSec * 1000);
@@ -141,7 +141,7 @@ Timer::Timer()
 
 unsigned Timer::GetMSec(bool reset)
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     unsigned currentTime = timeGetTime();
     #else
     struct timeval time;
@@ -158,7 +158,7 @@ unsigned Timer::GetMSec(bool reset)
 
 void Timer::Reset()
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     startTime_ = timeGetTime();
     #else
     struct timeval time;
@@ -176,7 +176,7 @@ long long HiresTimer::GetUSec(bool reset)
 {
     long long currentTime;
     
-    #ifdef _WIN32
+    #ifdef WIN32
     if (supported)
     {
         LARGE_INTEGER counter;
@@ -205,7 +205,7 @@ long long HiresTimer::GetUSec(bool reset)
 
 void HiresTimer::Reset()
 {
-    #ifdef _WIN32
+    #ifdef WIN32
     if (supported)
     {
         LARGE_INTEGER counter;

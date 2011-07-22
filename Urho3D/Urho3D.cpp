@@ -32,7 +32,7 @@
 
 #include <stdexcept>
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <Windows.h>
 #endif
 
@@ -40,7 +40,7 @@
 
 void Run(const char* cmdLine);
 
-#ifdef _WIN32
+#ifdef WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
     #if defined(_MSC_VER) && defined(_DEBUG)
