@@ -46,8 +46,12 @@ Node::Node(Context* context) :
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::UNITY),
     worldTransform_(Matrix3x4::IDENTITY),
+    targetPosition_(Vector3::ZERO),
+    targetRotation_(Quaternion::IDENTITY),
     rotateCount_(0),
-    dirty_(false)
+    smoothingFlags_(SMOOTH_NONE),
+    dirty_(false),
+    smoothed_(false)
 {
 }
 
@@ -180,17 +184,33 @@ void Node::SetName(const String& name)
 
 void Node::SetPosition(const Vector3& position)
 {
-    position_ = position;
-    if (!dirty_)
-        MarkDirty();
+    if (!smoothed_)
+    {
+        position_ = position;
+        if (!dirty_)
+            MarkDirty();
+    }
+    else
+    {
+        targetPosition_ = position;
+        smoothingFlags_ |= SMOOTH_POSITION;
+    }
 }
 
 void Node::SetRotation(const Quaternion& rotation)
 {
-    rotation_ = rotation;
+    if (!smoothed_)
+    {
+        rotation_ = rotation;
+        if (!dirty_)
+            MarkDirty();
+    }
+    else
+    {
+        targetRotation_ = rotation;
+        smoothingFlags_ |= SMOOTH_ROTATION;
+    }
     rotateCount_ = 0;
-    if (!dirty_)
-        MarkDirty();
 }
 
 void Node::SetDirection(const Vector3& direction)
@@ -214,58 +234,115 @@ void Node::SetScale(const Vector3& scale)
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
 {
-    position_ = position;
-    rotation_ = rotation;
+    if (!smoothed_)
+    {
+        position_ = position;
+        rotation_ = rotation;
+        if (!dirty_)
+            MarkDirty();
+    }
+    else
+    {
+        targetPosition_ = position;
+        targetRotation_ = rotation;
+        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+    }
     rotateCount_ = 0;
-    if (!dirty_)
-        MarkDirty();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, float scale)
 {
-    position_ = position;
-    rotation_ = rotation;
-    scale_ = Vector3(scale, scale, scale);
+    if (!smoothed_)
+    {
+        position_ = position;
+        rotation_ = rotation;
+    }
+    else
+    {
+        targetPosition_ = position;
+        targetRotation_ = rotation;
+        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+    }
     rotateCount_ = 0;
+    scale_ = Vector3(scale, scale, scale);
     if (!dirty_)
         MarkDirty();
 }
 
 void Node::SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale)
 {
-    position_ = position;
-    rotation_ = rotation;
-    scale_ = scale;
+    if (!smoothed_)
+    {
+        position_ = position;
+        rotation_ = rotation;
+    }
+    else
+    {
+        targetPosition_ = position;
+        targetRotation_ = rotation;
+        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+    }
     rotateCount_ = 0;
+    scale_ = scale;
     if (!dirty_)
         MarkDirty();
 }
 
 void Node::Translate(const Vector3& delta)
 {
-    position_ += delta;
-    if (!dirty_)
-        MarkDirty();
+    if (!smoothed_)
+    {
+        position_ += delta;
+        if (!dirty_)
+            MarkDirty();
+    }
+    else
+    {
+        targetPosition_ += delta;
+        smoothingFlags_ |= SMOOTH_POSITION;
+    }
 }
 
 void Node::TranslateRelative(const Vector3& delta)
 {
-    position_ += rotation_ * delta;
-    if (!dirty_)
-        MarkDirty();
+    if (!smoothed_)
+    {
+        position_ += rotation_ * delta;
+        if (!dirty_)
+            MarkDirty();
+    }
+    else
+    {
+        targetPosition_ += targetRotation_ * delta;
+        smoothingFlags_ |= SMOOTH_POSITION;
+    }
 }
 
 void Node::Rotate(const Quaternion& delta, bool fixedAxis)
 {
-    if (!fixedAxis)
-        rotation_ = rotation_ * delta;
+    if (!smoothed_)
+    {
+        if (!fixedAxis)
+            rotation_ = rotation_ * delta;
+        else
+            rotation_ = delta * rotation_;
+    }
     else
-        rotation_ = delta * rotation_;
+    {
+        if (!fixedAxis)
+            targetRotation_ = targetRotation_ * delta;
+        else
+            targetRotation_ = delta * targetRotation_;
+        smoothingFlags_ |= SMOOTH_ROTATION;
+    }
     
     ++rotateCount_;
     if (rotateCount_ >= NORMALIZE_ROTATION_EVERY)
     {
-        rotation_.Normalize();
+        if (!smoothed_)
+            rotation_.Normalize();
+        else
+            targetRotation_.Normalize();
         rotateCount_ = 0;
     }
     
@@ -302,6 +379,11 @@ void Node::Scale(const Vector3& scale)
         MarkDirty();
 }
 
+void Node::SetSmoothed(bool enable)
+{
+    smoothed_ = enable;
+}
+
 void Node::MarkDirty()
 {
     dirty_ = true;
@@ -323,9 +405,9 @@ void Node::MarkDirty()
         (*i)->MarkDirty();
 }
 
-Node* Node::CreateChild(const String& name, bool local)
+Node* Node::CreateChild(const String& name, CreateMode mode)
 {
-    Node* newNode = CreateChild(0, local);
+    Node* newNode = CreateChild(0, mode);
     newNode->SetName(name);
     return newNode;
 }
@@ -371,18 +453,18 @@ void Node::RemoveAllChildren()
         RemoveChild(children_.End() - 1);
 }
 
-Component* Node::CreateComponent(ShortStringHash type, bool local)
+Component* Node::CreateComponent(ShortStringHash type, CreateMode mode)
 {
-    return CreateComponent(type, 0, local);
+    return CreateComponent(type, 0, mode);
 }
 
-Component* Node::GetOrCreateComponent(ShortStringHash type, bool local)
+Component* Node::GetOrCreateComponent(ShortStringHash type, CreateMode mode)
 {
     Component* oldComponent = GetComponent(type);
     if (oldComponent)
         return oldComponent;
     else
-        return CreateComponent(type, 0, local);
+        return CreateComponent(type, 0, mode);
 }
 
 void Node::RemoveComponent(Component* component)
@@ -682,6 +764,42 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
     return attrBuffer_.GetBuffer();
 }
 
+void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
+{
+    if (!smoothed_ || !smoothingFlags_)
+        return;
+    
+    if (smoothingFlags_ & SMOOTH_POSITION)
+    {
+        // If position snaps, snap everything to the end
+        float delta = (position_ - targetPosition_).LengthSquared();
+        if (delta > squaredSnapThreshold)
+            constant = 1.0f;
+        
+        if (delta < M_EPSILON || constant >= 1.0f)
+        {
+            position_ = targetPosition_;
+            smoothingFlags_ &= ~SMOOTH_POSITION;
+        }
+        else
+            position_ = position_.Lerp(targetPosition_, constant);
+    }
+    if (smoothingFlags_ & SMOOTH_ROTATION)
+    {
+        float delta = (rotation_ - targetRotation_).LengthSquared();
+        if (delta < M_EPSILON || constant >= 1.0f)
+        {
+            rotation_ = targetRotation_;
+            smoothingFlags_ &= ~SMOOTH_ROTATION;
+        }
+        else
+            rotation_ = rotation_.Slerp(targetRotation_, constant);
+    }
+    
+    if (!dirty_)
+        MarkDirty();
+}
+
 bool Node::Load(Deserializer& source, bool readChildren)
 {
     // Remove all children and components first in case this is not a fresh load
@@ -697,7 +815,7 @@ bool Node::Load(Deserializer& source, bool readChildren)
     {
         VectorBuffer compBuffer(source, source.ReadVLE());
         ShortStringHash newType = compBuffer.ReadShortStringHash();
-        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), false);
+        Component* newComponent = CreateComponent(newType, compBuffer.ReadUInt(), REPLICATED);
         if (newComponent)
         {
             if (!newComponent->Load(compBuffer))
@@ -711,7 +829,7 @@ bool Node::Load(Deserializer& source, bool readChildren)
     unsigned numChildren = source.ReadVLE();
     for (unsigned i = 0; i < numChildren; ++i)
     {
-        Node* newNode = CreateChild(source.ReadUInt(), false);
+        Node* newNode = CreateChild(source.ReadUInt(), REPLICATED);
         if (!newNode->Load(source))
             return false;
     }
@@ -732,7 +850,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     while (compElem)
     {
         String typeName = compElem.GetString("type");
-        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), false);
+        Component* newComponent = CreateComponent(ShortStringHash(compElem.GetString("type")), compElem.GetInt("id"), REPLICATED);
         if (newComponent)
         {
             if (!newComponent->LoadXML(compElem))
@@ -748,7 +866,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     XMLElement childElem = source.GetChild("node");
     while (childElem)
     {
-        Node* newNode = CreateChild(childElem.GetInt("id"), false);
+        Node* newNode = CreateChild(childElem.GetInt("id"), REPLICATED);
         if (!newNode->LoadXML(childElem))
             return false;
         
@@ -758,7 +876,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
     return true;
 }
 
-Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
+Component* Node::CreateComponent(ShortStringHash type, unsigned id, CreateMode mode)
 {
     // Make sure the object in question is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
@@ -773,7 +891,7 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
     // If zero ID specified, let the scene assign
     if (scene_)
     {
-        newComponent->SetID(id ? id : scene_->GetFreeComponentID(local));
+        newComponent->SetID(id ? id : scene_->GetFreeComponentID(mode));
         scene_->ComponentAdded(newComponent);
     }
     else
@@ -784,13 +902,13 @@ Component* Node::CreateComponent(ShortStringHash type, unsigned id, bool local)
     return newComponent;
 }
 
-Node* Node::CreateChild(unsigned id, bool local)
+Node* Node::CreateChild(unsigned id, CreateMode mode)
 {
     SharedPtr<Node> newNode(new Node(context_));
     
     // If zero ID specified, let the scene assign
     if (scene_)
-        newNode->SetID(id ? id : scene_->GetFreeNodeID(local));
+        newNode->SetID(id ? id : scene_->GetFreeNodeID(mode));
     else
         newNode->SetID(id);
     

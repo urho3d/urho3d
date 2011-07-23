@@ -373,14 +373,14 @@ template <class T> void RegisterComponent(asIScriptEngine* engine, const char* c
         engine->RegisterObjectMethod(className, "Node@+ get_node() const", asMETHODPR(T, GetNode, () const, Node*), asCALL_THISCALL);
 }
 
-static Component* NodeCreateComponent(const String& typeName, bool local, Node* ptr)
+static Component* NodeCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
 {
-    return ptr->CreateComponent(ShortStringHash(typeName), local);
+    return ptr->CreateComponent(ShortStringHash(typeName), mode);
 }
 
-static Component* NodeGetOrCreateComponent(const String& typeName, bool local, Node* ptr)
+static Component* NodeGetOrCreateComponent(const String& typeName, CreateMode mode, Node* ptr)
 {
-    return ptr->GetOrCreateComponent(ShortStringHash(typeName), local);
+    return ptr->GetOrCreateComponent(ShortStringHash(typeName), mode);
 }
 
 static Component* NodeGetComponent(unsigned index, Node* ptr)
@@ -496,13 +496,13 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Roll(float, bool)", asMETHOD(T, Roll), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", bool local = false)", asMETHODPR(T, CreateChild, (const String&, bool), Node*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED)", asMETHODPR(T, CreateChild, (const String&, CreateMode), Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddChild(Node@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveChild(Node@+)", asMETHODPR(T, RemoveChild, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveAllChildren()", asMETHOD(T, RemoveAllChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, bool local = false)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, bool local = false)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
@@ -519,10 +519,14 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector3 get_direction() const", asMETHOD(T, GetDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_scale(const Vector3&in)", asMETHODPR(T, SetScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Vector3& get_scale() const", asMETHOD(T, GetScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_smoothed(bool)", asMETHOD(T, SetSmoothed), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_smoothed() const", asMETHOD(T, IsSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldPosition()", asMETHOD(T, GetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldDirection()", asMETHOD(T, GetWorldDirection), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector3& get_targetPosition() const", asMETHOD(T, GetTargetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector3& get_targetRotation() const", asMETHOD(T, GetTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(NodeGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(NodeGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);

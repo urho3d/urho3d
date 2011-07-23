@@ -30,9 +30,9 @@ class File;
 class PackageFile;
 
 /// First replicated node/component ID
-static const unsigned FIRST_NONLOCAL_ID = 0x1;
+static const unsigned FIRST_REPLICATED_ID = 0x1;
 /// Last replicated node/component ID
-static const unsigned LAST_NONLOCAL_ID = 0xffffff;
+static const unsigned LAST_REPLICATED_ID = 0xffffff;
 /// First local node/component ID
 static const unsigned FIRST_LOCAL_ID = 0x01000000;
 /// Last local node/component ID
@@ -87,11 +87,15 @@ public:
     bool LoadAsyncXML(File* file);
     /// Stop asynchronous loading
     void StopAsyncLoading();
-    /// Set active flag. Only active scenes will be updated automatically
-    void SetActive(bool enable);
     /// Clear scene completely of nodes and components
     void Clear();
-    /// Add a required package file for multiplayer. To be called on the server
+    /// Set active flag. Only active scenes will be updated automatically
+    void SetActive(bool enable);
+    /// Set motion smoothing constant
+    void SetSmoothingConstant(float constant);
+    /// Set motion smoothing snap threshold
+    void SetSnapThreshold(float threshold);
+    /// Add a required package file for networking. To be called on the server
     void AddRequiredPackageFile(PackageFile* file);
     /// Clear required package files
     void ClearRequiredPackageFiles();
@@ -112,6 +116,10 @@ public:
     const String& GetFileName() const { return fileName_; }
     /// Return source file checksum
     unsigned GetChecksum() const { return checksum_; }
+    /// Return motion smoothing constant
+    float GetSmoothingConstant() const { return smoothingConstant_; }
+    /// Return motion smoothing snap threshold
+    float GetSnapThreshold() const { return snapThreshold_; }
     /// Return required package files
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
     /// Return all nodes
@@ -120,9 +128,9 @@ public:
     const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
     
     /// Get free node ID, either non-local or local
-    unsigned GetFreeNodeID(bool local);
+    unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local
-    unsigned GetFreeComponentID(bool local);
+    unsigned GetFreeComponentID(CreateMode mode);
     /// Node added. Assign scene pointer and add to ID map
     void NodeAdded(Node* node);
     /// Node removed. Remove from ID map
@@ -150,18 +158,22 @@ private:
     AsyncProgress asyncProgress_;
     /// Source file name
     String fileName_;
-    /// Required package files for multiplayer
+    /// Required package files for networking
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
     /// Next free non-local node ID
-    unsigned nonLocalNodeID_;
+    unsigned replicatedNodeID_;
     /// Next free local node ID
     unsigned localNodeID_;
     /// Next free non-local component ID
-    unsigned nonLocalComponentID_;
+    unsigned replicatedComponentID_;
     /// Next free local component ID
     unsigned localComponentID_;
     /// Scene source file checksum
     unsigned checksum_;
+    /// Motion smoothing constant
+    float smoothingConstant_;
+    /// Motion smoothing snap threshold
+    float snapThreshold_;
     /// Active flag
     bool active_;
     /// Asynchronous loading flag

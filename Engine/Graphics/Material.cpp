@@ -109,9 +109,13 @@ bool Material::Load(Deserializer& source)
 {
     PROFILE(LoadMaterial);
     
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    // In headless mode, do not actually load the material, just return success
     Graphics* graphics = GetSubsystem<Graphics>();
-    if (!cache || !graphics)
+    if (!graphics)
+        return true;
+    
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    if (!cache)
         return false;
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
@@ -201,10 +205,6 @@ bool Material::Load(Deserializer& source)
 
 bool Material::Save(Serializer& dest)
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    if (!graphics)
-        return false;
-    
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     XMLElement materialElem = xml->CreateRoot("material");
     

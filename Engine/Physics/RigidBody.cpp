@@ -231,22 +231,26 @@ void RigidBody::ResetForces()
 
 Vector3 RigidBody::GetPosition() const
 {
+    /// \todo Support parented nodes
     if (body_)
     {
         const dReal* pos = dBodyGetPosition(body_);
         return Vector3(pos[0], pos[1], pos[2]);
     }
-    else return node_->GetWorldPosition();
+    // Use smoothing target position in case node is smoothed; if it is not, it is same as GetPosition()
+    else return node_->GetTargetPosition();
 }
 
 Quaternion RigidBody::GetRotation() const
 {
+    /// \todo Support parented nodes
     if (body_)
     {
         const dReal* quat = dBodyGetQuaternion(body_);
         return Quaternion(quat[0], quat[1], quat[2], quat[3]);
     }
-    else return node_->GetWorldRotation();
+    // Use smoothing target rotation in case node is smoothed; if it is not, it is same as GetRotation()
+    else return node_->GetTargetRotation();
 }
 
 Vector3 RigidBody::GetLinearVelocity() const
@@ -354,25 +358,31 @@ const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 
 void RigidBody::OnMarkedDirty(Node* node)
 {
-    // Clear the dirty flag by querying world position; this way we are sure to get the dirty notification immediately
-    // also the next time the node transform changes
-    const Vector3& position = node_->GetWorldPosition();
-    Quaternion rotation = node_->GetWorldRotation();
-    
-    // Disregard node dirtying during the physics poststep, when rendering transform is synced from physics transform
-    if (inPostStep_)
+    // If the node is smoothed, do not use the dirty callback, but rather update manually during prestep
+    if (node_->IsSmoothed())
         return;
     
-    if (body_)
+    // Clear the dirty flag by querying world position; this way we are sure to get the dirty notification immediately
+    // also the next time the node transform changes
+    node_->GetWorldPosition();
+    
+    // Disregard node dirtying during the physics poststep, when we set node transform ourselves
+    if (inPostStep_ || !body_)
+        return;
+    
+    /// \todo Support parented nodes
+    const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
+    const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
+    const Vector3& newPosition = node_->GetPosition();
+    const Quaternion& newRotation = node_->GetRotation();
+    
+    if (newPosition != currentPosition || newRotation != currentRotation)
     {
-        if (GetPosition() != position || GetRotation() != rotation)
-        {
-            SetActive(true);
-            dBodySetPosition(body_, position.x_, position.y_, position.z_);
-            dBodySetQuaternion(body_, rotation.GetData());
-        }
-        previousPosition_ = position;
-        previousRotation_ = rotation;
+        SetActive(true);
+        dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
+        dBodySetQuaternion(body_, newRotation.GetData());
+        previousPosition_ = newPosition;
+        previousRotation_ = newRotation;
     }
 }
 
@@ -395,13 +405,31 @@ void RigidBody::OnNodeSet(Node* node)
 
 void RigidBody::PreStep()
 {
-    // Store the previous position for interpolation
-    if (body_)
+    if (!body_)
+        return;
+    
+    const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
+    const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
+    
+    /// \todo Support parented nodes
+    if (!node_->IsSmoothed())
     {
-        const dReal* pos = dBodyGetPosition(body_);
-        const dReal* quat = dBodyGetQuaternion(body_);
-        previousPosition_ = Vector3(pos[0], pos[1], pos[2]);
-        previousRotation_ = Quaternion(quat[0], quat[1], quat[2], quat[3]);
+        // If no smoothing, store the current body position for interpolation
+        previousPosition_ = currentPosition;
+        previousRotation_ = currentRotation;
+    }
+    else
+    {
+        // If smoothing is active, get the node's target transform and check manually if it has changed
+        if (node_->GetTargetPosition() != currentPosition || node_->GetTargetRotation() != currentRotation)
+        {
+            const Vector3& newPosition = node_->GetTargetPosition();
+            const Quaternion& newRotation = node_->GetTargetRotation();
+            
+            SetActive(true);
+            dBodySetPosition(body_, newPosition.x_, newPosition.y_, newPosition.z_);
+            dBodySetQuaternion(body_, newRotation.GetData());
+        }
     }
 }
 
@@ -411,14 +439,15 @@ void RigidBody::PostStep(float t)
     {
         inPostStep_ = true;
         
-        const dReal* pos = dBodyGetPosition(body_);
-        const dReal* quat = dBodyGetQuaternion(body_);
-        Vector3 currentPosition(pos[0], pos[1], pos[2]);
-        Quaternion currentRotation(quat[0], quat[1], quat[2], quat[3]);
+        const Vector3& currentPosition = *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
+        const Quaternion& currentRotation = *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
         
-        /// \todo If the node is parented, transform will not be set correctly
-        node_->SetPosition(previousPosition_.Lerp(currentPosition, t));
-        node_->SetRotation(previousRotation_.Slerp(currentRotation, t));
+        // If node already has motion smoothing enabled, do not do substep interpolation
+        /// \todo Support parented nodes
+        if (!node_->IsSmoothed())
+            node_->SetTransform(previousPosition_.Lerp(currentPosition, t), previousRotation_.Slerp(currentRotation, t));
+        else
+            node_->SetTransform(currentPosition, currentRotation);
         
         inPostStep_ = false;
     }
@@ -439,9 +468,9 @@ void RigidBody::CreateBody()
         // Set the user data pointer
         dBodySetData(body_, this);
         
-        // Set rendering transform as the initial transform
-        const Vector3& position = node_->GetWorldPosition();
-        Quaternion rotation = node_->GetWorldRotation();
+        // Set initial transform. Use target position in case the node is smoothed
+        const Vector3& position = node_->GetTargetPosition();
+        Quaternion rotation = node_->GetTargetRotation();
         dBodySetPosition(body_, position.x_, position.y_, position.z_);
         dBodySetQuaternion(body_, rotation.GetData());
         previousPosition_ = position;
@@ -500,8 +529,8 @@ void RigidBody::UpdateMass()
         CollisionShape* shape = shapes[i];
         
         dMass subMass;
-        Vector3 size = shape->GetSize() * GetWorldScale();
-        Vector3 offset = shape->GetPosition() * GetWorldScale();
+        Vector3 size = shape->GetSize() * node_->GetScale();
+        Vector3 offset = shape->GetPosition() * node_->GetScale();
         
         switch (shape->GetShapeType())
         {

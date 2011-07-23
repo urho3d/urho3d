@@ -560,12 +560,13 @@ void CollisionShape::UpdateTransform()
     else
     {
         // No rigid body. Must update the geometry transform manually
-        Vector3 nodePos = GetWorldPosition();
-        Quaternion nodeRot = GetWorldRotation();
-        Vector3 geoposition_ = nodePos + (nodeRot * (geometryScale_ * position_));
+        /// \todo Support parented nodes
+        Vector3 nodePos = node_->GetPosition();
+        Quaternion nodeRot = node_->GetRotation();
+        Vector3 geomPos = nodePos + (nodeRot * (geometryScale_ * position_));
         Quaternion geomRot = nodeRot * rotation_;
         
-        dGeomSetPosition(geometry_, geoposition_.x_, geoposition_.y_, geoposition_.z_);
+        dGeomSetPosition(geometry_, geomPos.x_, geomPos.y_, geomPos.z_);
         dGeomSetQuaternion(geometry_, geomRot.GetData());
     }
 }
@@ -780,7 +781,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void CollisionShape::OnMarkedDirty(Node* node)
 {
     // If scale has changed, must recreate the geometry
-    if (GetWorldScale() != geometryScale_)
+    if (node->GetScale() != geometryScale_)
         CreateGeometry();
     else
         UpdateTransform();
@@ -826,7 +827,8 @@ void CollisionShape::CreateGeometry()
         geometry_ = 0;
     }
     
-    geometryScale_ = GetWorldScale();
+    /// \todo Support parented nodes
+    geometryScale_ = node_->GetScale();
     Vector3 size = size_ * geometryScale_;
     dSpaceID space = physicsWorld_->GetSpace();
     

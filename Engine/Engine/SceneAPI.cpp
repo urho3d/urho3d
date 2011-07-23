@@ -39,6 +39,10 @@ static void RegisterSerializable(asIScriptEngine* engine)
 
 static void RegisterNode(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("CreateMode");
+    engine->RegisterEnumValue("CreateMode", "REPLICATED", REPLICATED);
+    engine->RegisterEnumValue("CreateMode", "LOCAL", LOCAL);
+    
     // Register Component first. At this point Node is not yet registered, so can not register GetNode for Component
     RegisterComponent<Component>(engine, "Component", false);
     RegisterNode<Node>(engine, "Node");
@@ -77,8 +81,8 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
 
 static void RegisterScene(asIScriptEngine* engine)
 {
-    engine->RegisterGlobalProperty("const uint FIRST_NONLOCAL_ID", (void*)&FIRST_NONLOCAL_ID);
-    engine->RegisterGlobalProperty("const uint LAST_NONLOCAL_ID", (void*)&LAST_NONLOCAL_ID);
+    engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
+    engine->RegisterGlobalProperty("const uint LAST_REPLICATED_ID", (void*)&LAST_REPLICATED_ID);
     engine->RegisterGlobalProperty("const uint FIRST_LOCAL_ID", (void*)&FIRST_LOCAL_ID);
     engine->RegisterGlobalProperty("const uint LAST_LOCAL_ID", (void*)&LAST_LOCAL_ID);
     
@@ -98,6 +102,10 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "Node@+ GetNodeByID(uint)", asMETHOD(Scene, GetNodeByID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHOD(Scene, SetSmoothingConstant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_smoothingConstant() const", asMETHOD(Scene, GetSmoothingConstant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void set_snapThreshold(float)", asMETHOD(Scene, SetSnapThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "float get_snapThreshold() const", asMETHOD(Scene, GetSnapThreshold), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_asyncLoading() const", asMETHOD(Scene, IsAsyncLoading), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "float get_asyncProgress() const", asMETHOD(Scene, GetAsyncProgress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "uint get_checksum() const", asMETHOD(Scene, GetChecksum), asCALL_THISCALL);

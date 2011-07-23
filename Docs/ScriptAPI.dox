@@ -91,11 +91,13 @@
 - uint SCAN_FILES
 - uint SCAN_DIRS
 - uint SCAN_HIDDEN
-- uint AM_SERIALIZATION
-- uint AM_NETWORK
-- uint AM_BOTH
-- uint FIRST_NONLOCAL_ID
-- uint LAST_NONLOCAL_ID
+- uint AM_FILE
+- uint AM_NET
+- uint AM_DEFAULT
+- uint AM_LATESTDATA
+- uint AM_NOEDIT
+- uint FIRST_REPLICATED_ID
+- uint LAST_REPLICATED_ID
 - uint FIRST_LOCAL_ID
 - uint LAST_LOCAL_ID
 - uint DRAWABLE_GEOMETRY
@@ -1010,13 +1012,13 @@ Methods:<br>
 - void Roll(float, bool)
 - void Scale(float)
 - void Scale(const Vector3&)
-- Node@ CreateChild(const String& arg0 = "", bool arg1 = false)
+- Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
 - void Remove()
-- Component@ CreateComponent(const String&, bool arg1 = false)
-- Component@ GetOrCreateComponent(const String&, bool arg1 = false)
+- Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
+- Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1040,10 +1042,13 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
+- bool smoothed
 - Vector3 worldPosition (readonly)
 - Quaternion worldRotation (readonly)
 - Vector3 worldDirection (readonly)
 - Vector3 worldScale (readonly)
+- Vector3& targetPosition (readonly)
+- Vector3& targetRotation (readonly)
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -1078,13 +1083,13 @@ Methods:<br>
 - void Roll(float, bool)
 - void Scale(float)
 - void Scale(const Vector3&)
-- Node@ CreateChild(const String& arg0 = "", bool arg1 = false)
+- Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
 - void AddChild(Node@)
 - void RemoveChild(Node@)
 - void RemoveAllChildren()
 - void Remove()
-- Component@ CreateComponent(const String&, bool arg1 = false)
-- Component@ GetOrCreateComponent(const String&, bool arg1 = false)
+- Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
+- Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1100,7 +1105,6 @@ Methods:<br>
 - bool LoadAsyncXML(File@)
 - void StopAsyncLoading()
 - void Clear()
-- void ClearNonLocal()
 - void AddRequiredPackageFile(PackageFile@)
 - void ClearRequiredPackageFiles()
 - Component@ GetComponentByID(uint)
@@ -1116,10 +1120,13 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
+- bool smoothed
 - Vector3 worldPosition (readonly)
 - Quaternion worldRotation (readonly)
 - Vector3 worldDirection (readonly)
 - Vector3 worldScale (readonly)
+- Vector3& targetPosition (readonly)
+- Vector3& targetRotation (readonly)
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -1129,6 +1136,8 @@ Properties:<br>
 - String& name
 - Node@ parent
 - bool active
+- float smoothingConstant
+- float snapThreshold
 - bool asyncLoading (readonly)
 - float asyncProgress (readonly)
 - uint checksum (readonly)
@@ -3430,8 +3439,8 @@ Connection
 Methods:<br>
 - void SendMessage(int, bool, bool, const VectorBuffer&)
 - void SendMessage(int, uint, bool, bool, const VectorBuffer&)
-- void SendRemoteEvent(StringHash, bool, const VariantMap& arg2 = VariantMap ( ))
-- void SendRemoteEvent(Node@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
+- void SendRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
+- void SendRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
 - String ToString() const
 
@@ -3456,9 +3465,9 @@ Methods:<br>
 - void StopServer()
 - void BroadcastMessage(int, bool, bool, const VectorBuffer&)
 - void BroadcastMessage(int, uint, bool, bool, const VectorBuffer&)
-- void BroadcastRemoteEvent(StringHash, bool, const VariantMap& arg2 = VariantMap ( ))
-- void BroadcastRemoteEvent(Scene@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
-- void BroadcastRemoteEvent(Node@, StringHash, bool, const VariantMap& arg3 = VariantMap ( ))
+- void BroadcastRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
+- void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
+- void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
 
 Properties:<br>
 - ShortStringHash type (readonly)

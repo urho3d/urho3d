@@ -161,7 +161,7 @@ unsigned File::Read(void* dest, unsigned size)
     {
         // Return to the position where the read began
         fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
-        LOGERROR("Error while reading from file");
+        LOGERROR("Error while reading from file " + GetName());
         return 0;
     }
     
@@ -207,7 +207,7 @@ unsigned File::Write(const void* data, unsigned size)
     {
         // Return to the position where the write began
         fseek((FILE*)handle_, position_ + offset_, SEEK_SET);
-        LOGERROR("Error while writing to file");
+        LOGERROR("Error while writing to file " + GetName());
         return 0;
     }
     

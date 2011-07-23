@@ -129,9 +129,14 @@ void Connection::SetScene(Scene* newScene)
     if (scene_ == newScene)
         return;
     
-    // Reset the owner reference from the previous scene's nodes
     if (scene_)
+    {
+        // Disable smoothing in case scene is no longer used for networking
+        if (!isClient_)
+            scene_->SetSmoothed(false);
+        // Reset the owner reference from the previous scene's nodes
         scene_->ResetOwner(this);
+    }
     
     scene_ = newScene;
     sceneLoaded_ = false;
@@ -152,6 +157,8 @@ void Connection::SetScene(Scene* newScene)
     }
     else
     {
+        // Enable motion smoothing on the client network scene
+        scene_->SetSmoothed(true);
         // Make sure there is no existing async loading
         scene_->StopAsyncLoading();
         SubscribeToEvent(scene_, E_ASYNCLOADFINISHED, HANDLER(Connection, HandleAsyncLoadFinished));
@@ -353,11 +360,15 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             if (!node)
             {
                 // Add initially to the root level. May be moved later
-                node = scene_->CreateChild(nodeID, false);
+                node = scene_->CreateChild(nodeID, REPLICATED);
             }
             
-            // Read initial attributes
+            // Enable motion smoothing on the node
+            node->SetSmoothed(true);
+            
+            // Read initial attributes, then snap the motion smoothing immediately to the end
             node->ReadDeltaUpdate(msg, deltaUpdateBits_);
+            node->UpdateSmoothing(1.0f, 0.0f);
             
             // Read initial user variables
             unsigned numVars = msg.ReadVLE();
@@ -385,7 +396,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 {
                     if (component)
                         component->Remove();
-                    component = node->CreateComponent(type, componentID, false);
+                    component = node->CreateComponent(type, componentID, REPLICATED);
                 }
                 
                 // If was unable to create the component, would desync the message and therefore have to abort
@@ -468,7 +479,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 {
                     if (component)
                         component->Remove();
-                    component = node->CreateComponent(type, componentID, false);
+                    component = node->CreateComponent(type, componentID, REPLICATED);
                 }
                 
                 // If was unable to create the component, would desync the message and therefore have to abort

@@ -85,6 +85,9 @@ UI::~UI()
 
 void UI::SetCursor(Cursor* cursor)
 {
+    if (!rootElement_)
+        return;
+    
     // Remove old cursor (if any) and set new
     if (cursor_)
     {
@@ -106,6 +109,9 @@ void UI::SetCursor(Cursor* cursor)
 
 void UI::SetFocusElement(UIElement* element)
 {
+    if (!rootElement_)
+        return;
+    
     using namespace FocusChanged;
     
     VariantMap eventData;
@@ -147,6 +153,9 @@ void UI::SetFocusElement(UIElement* element)
 
 void UI::Clear()
 {
+    if (!rootElement_)
+        return;
+    
     rootElement_->RemoveAllChildren();
     if (cursor_)
         rootElement_->AddChild(cursor_);
@@ -154,6 +163,9 @@ void UI::Clear()
 
 void UI::Update(float timeStep)
 {
+    if (!rootElement_)
+        return;
+    
     PROFILE(UpdateUI);
     
     if (cursor_ && cursor_->IsVisible())
@@ -209,7 +221,7 @@ void UI::Update(float timeStep)
 
 void UI::RenderUpdate()
 {
-    if (!graphics_ || graphics_->IsDeviceLost())
+    if (!rootElement_ || !graphics_ || graphics_->IsDeviceLost())
         return;
     
     PROFILE(GetUIBatches);
@@ -337,6 +349,9 @@ void UI::SetClipBoardText(const String& text)
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool activeOnly)
 {
+    if (!rootElement_)
+        return 0;
+    
     UIElement* result = 0;
     GetElementAt(result, rootElement_, position, activeOnly);
     return result;
@@ -349,6 +364,9 @@ UIElement* UI::GetElementAt(int x, int y, bool activeOnly)
 
 UIElement* UI::GetFocusElement() const
 {
+    if (!rootElement_)
+        return 0;
+    
     PODVector<UIElement*> allChildren = rootElement_->GetChildren(true);
     for (PODVector<UIElement*>::Iterator i = allChildren.Begin(); i != allChildren.End(); ++i)
     {
@@ -361,6 +379,9 @@ UIElement* UI::GetFocusElement() const
 
 UIElement* UI::GetFrontElement() const
 {
+    if (!rootElement_)
+        return 0;
+    
     PODVector<UIElement*> rootChildren = rootElement_->GetChildren(false);
     int maxPriority = M_MIN_INT;
     UIElement* front = 0;

@@ -35,21 +35,25 @@
 
 static const int ASYNC_LOAD_MIN_FPS = 50;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
+static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
+static const float DEFAULT_SNAP_THRESHOLD = 1.0f;
 
 OBJECTTYPESTATIC(Scene);
 
 Scene::Scene(Context* context) :
     Node(context),
-    nonLocalNodeID_(FIRST_NONLOCAL_ID),
-    nonLocalComponentID_(FIRST_NONLOCAL_ID),
+    replicatedNodeID_(FIRST_REPLICATED_ID),
+    replicatedComponentID_(FIRST_REPLICATED_ID),
     localNodeID_(FIRST_LOCAL_ID),
     localComponentID_(FIRST_LOCAL_ID),
+    smoothingConstant_(DEFAULT_SMOOTHING_CONSTANT),
+    snapThreshold_(DEFAULT_SNAP_THRESHOLD),
     checksum_(0),
     active_(true),
     asyncLoading_(false)
 {
     // Assign an ID to self so that nodes can refer to this node as a parent
-    SetID(GetFreeNodeID(false));
+    SetID(GetFreeNodeID(REPLICATED));
     NodeAdded(this);
     
     SubscribeToEvent(E_UPDATE, HANDLER(Scene, HandleUpdate));
@@ -70,10 +74,12 @@ void Scene::RegisterObject(Context* context)
     context->RegisterFactory<Scene>();
     context->CopyBaseAttributes<Node, Scene>();
     
-    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Node ID", nonLocalNodeID_, FIRST_NONLOCAL_ID, AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_INT, "Next Non-Local Component ID", nonLocalComponentID_, FIRST_NONLOCAL_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Motion Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Motion Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
 }
 
 bool Scene::Load(Deserializer& source)
@@ -148,6 +154,18 @@ void Scene::Update(float timeStep)
     
     // Post-update variable timestep logic
     SendEvent(E_SCENEPOSTUPDATE, eventData);
+    
+    // Update smoothing if enabled (network client scenes)
+    if (IsSmoothed())
+    {
+        PROFILE(UpdateSmoothing);
+        
+        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
+        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
+        
+        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
+    }
 }
 
 bool Scene::LoadXML(Deserializer& source)
@@ -258,17 +276,27 @@ void Scene::StopAsyncLoading()
     asyncProgress_.xmlElement_ = XMLElement();
 }
 
-void Scene::SetActive(bool enable)
-{
-    active_ = enable;
-}
-
 void Scene::Clear()
 {
     RemoveAllChildren();
     RemoveAllComponents();
     fileName_ = String();
     checksum_ = 0;
+}
+
+void Scene::SetActive(bool enable)
+{
+    active_ = enable;
+}
+
+void Scene::SetSmoothingConstant(float constant)
+{
+    smoothingConstant_ = Max(constant, M_EPSILON);
+}
+
+void Scene::SetSnapThreshold(float threshold)
+{
+    snapThreshold_ = Max(threshold, 0.0f);
 }
 
 void Scene::AddRequiredPackageFile(PackageFile* file)
@@ -317,19 +345,19 @@ float Scene::GetAsyncProgress() const
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
 }
 
-unsigned Scene::GetFreeNodeID(bool local)
+unsigned Scene::GetFreeNodeID(CreateMode mode)
 {
-    if (!local)
+    if (mode == REPLICATED)
     {
         for (;;)
         {
-            if (allNodes_.Find(nonLocalNodeID_) == allNodes_.End())
-                return nonLocalNodeID_;
+            if (allNodes_.Find(replicatedNodeID_) == allNodes_.End())
+                return replicatedNodeID_;
             
-            if (nonLocalNodeID_ != LAST_NONLOCAL_ID)
-                ++nonLocalNodeID_;
+            if (replicatedNodeID_ != LAST_REPLICATED_ID)
+                ++replicatedNodeID_;
             else
-                nonLocalNodeID_ = FIRST_NONLOCAL_ID;
+                replicatedNodeID_ = FIRST_REPLICATED_ID;
         }
     }
     else
@@ -347,19 +375,19 @@ unsigned Scene::GetFreeNodeID(bool local)
     }
 }
 
-unsigned Scene::GetFreeComponentID(bool local)
+unsigned Scene::GetFreeComponentID(CreateMode mode)
 {
-    if (!local)
+    if (mode == REPLICATED)
     {
         for (;;)
         {
-            if (allComponents_.Find(nonLocalComponentID_) == allComponents_.End())
-                return nonLocalComponentID_;
+            if (allComponents_.Find(replicatedComponentID_) == allComponents_.End())
+                return replicatedComponentID_;
             
-            if (nonLocalComponentID_ != LAST_NONLOCAL_ID)
-                ++nonLocalComponentID_;
+            if (replicatedComponentID_ != LAST_REPLICATED_ID)
+                ++replicatedComponentID_;
             else
-                nonLocalComponentID_ = FIRST_NONLOCAL_ID;
+                replicatedComponentID_ = FIRST_REPLICATED_ID;
         }
     }
     else
@@ -450,12 +478,12 @@ void Scene::UpdateAsyncLoading()
         // Read one child node either from binary or XML
         if (!asyncProgress_.xmlFile_)
         {
-            Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), false);
+            Node* newNode = CreateChild(asyncProgress_.file_->ReadUInt(), REPLICATED);
             newNode->Load(*asyncProgress_.file_);
         }
         else
         {
-            Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), false);
+            Node* newNode = CreateChild(asyncProgress_.xmlElement_.GetInt("id"), REPLICATED);
             newNode->LoadXML(asyncProgress_.xmlElement_);
             asyncProgress_.xmlElement_ = asyncProgress_.xmlElement_.GetNext("node");
         }

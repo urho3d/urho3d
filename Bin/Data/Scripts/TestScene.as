@@ -9,15 +9,14 @@ bool clientMode = false;
 
 void Start()
 {
-    if (engine.headless)
+    if (!engine.headless)
     {
-        ErrorDialog("TestScene", "Headless mode is not supported. The program will now exit.");
-        engine.Exit();
-        return;
+        InitConsole();
+        InitUI();
     }
+    else
+        OpenConsoleWindow();
 
-    InitConsole();
-    InitUI();
     InitScene();
 
     SubscribeToEvent("Update", "HandleUpdate");
@@ -26,7 +25,8 @@ void Start()
     SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown");
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
-    
+    SubscribeToEvent("SpawnBox", "HandleSpawnBox");
+
     for (uint i = 0; i < arguments.length; ++i)
     {
         if (arguments[i] == "server")
@@ -190,7 +190,8 @@ void InitScene()
     camera = cameraNode.CreateComponent("Camera");
     cameraNode.position = Vector3(0, 2, 0);
 
-    renderer.viewports[0] = Viewport(testScene, camera);
+    if (!engine.headless)
+        renderer.viewports[0] = Viewport(testScene, camera);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -346,31 +347,50 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ui.cursor.visible = false;
 
     // Test creating a new physics object
-    if (!clientMode && button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
+    if (button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
-        Node@ newNode = testScene.CreateChild();
-        newNode.position = cameraNode.position;
-        newNode.rotation = cameraNode.rotation;
-        newNode.SetScale(0.1);
+        VariantMap eventData;
+        eventData["Pos"] = cameraNode.position;
+        eventData["Rot"] = cameraNode.rotation;
 
-        CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(2, 2, 2), Vector3(), Quaternion());
-        shape.friction = 1.0;
-        shape.collisionGroup = 1;
-        shape.collisionMask = 3;
-
-        RigidBody@ body = newNode.CreateComponent("RigidBody");
-        body.angularMaxVelocity = 500.0;
-        body.linearVelocity = camera.upVector + camera.forwardVector * 10.0;
-        body.mass = 1;
-        
-        StaticModel@ object = newNode.CreateComponent("StaticModel");
-        object.model = cache.GetResource("Model", "Models/Box.mdl");
-        object.material = cache.GetResource("Material", "Materials/Test.xml");
-        object.castShadows = true;
-        object.shadowDistance = 150.0;
-        object.drawDistance = 200.0;
+        // If we are the client, send the spawn command as a remote event, else send locally
+        if (clientMode)
+        {
+            if (network.serverConnection !is null)
+                network.serverConnection.SendRemoteEvent("SpawnBox", true, eventData);
+        }
+        else
+            SendEvent("SpawnBox", eventData);
     }
+}
+
+void HandleSpawnBox(StringHash eventType, VariantMap& eventData)
+{
+    Vector3 position = eventData["Pos"].GetVector3();
+    Quaternion rotation = eventData["Rot"].GetQuaternion();
+
+    Node@ newNode = testScene.CreateChild();
+    newNode.position = position;
+    newNode.rotation = rotation;
+    newNode.SetScale(0.1);
+
+    CollisionShape@ shape = newNode.CreateComponent("CollisionShape");
+    shape.SetBox(Vector3(2, 2, 2), Vector3(), Quaternion());
+    shape.friction = 1.0;
+    shape.collisionGroup = 1;
+    shape.collisionMask = 3;
+
+    RigidBody@ body = newNode.CreateComponent("RigidBody");
+    body.angularMaxVelocity = 500.0;
+    body.linearVelocity = rotation * Vector3(0.0, 1.0, 10.0);
+    body.mass = 1;
+
+    StaticModel@ object = newNode.CreateComponent("StaticModel");
+    object.model = cache.GetResource("Model", "Models/Box.mdl");
+    object.material = cache.GetResource("Material", "Materials/Test.xml");
+    object.castShadows = true;
+    object.shadowDistance = 150.0;
+    object.drawDistance = 200.0;
 }
 
 void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -381,6 +401,9 @@ void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
 
 void HandlePostRenderUpdate()
 {
+    if (engine.headless)
+        return;
+
     // Draw rendering debug geometry without depth test to see the effect of occlusion
     if (drawDebug == 1)
         renderer.DrawDebugGeometry(false);

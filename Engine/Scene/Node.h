@@ -31,6 +31,20 @@ class Component;
 class Connection;
 class Scene;
 
+/// Component and child node creation mode for networking
+enum CreateMode
+{
+    REPLICATED = 0,
+    LOCAL = 1
+};
+
+// No ongoing smoothing
+static const unsigned SMOOTH_NONE = 0;
+// Ongoing position smoothing
+static const unsigned SMOOTH_POSITION = 1;
+// Ongoing rotation smoothing
+static const unsigned SMOOTH_ROTATION = 2;
+
 /// Scene node that may contain components and child nodes
 class Node : public Serializable
 {
@@ -93,10 +107,12 @@ public:
     void Scale(float scale);
     /// Modify scale
     void Scale(const Vector3& scale);
+    /// Enable or disable motion smoothing
+    void SetSmoothed(bool enable);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components
     void MarkDirty();
     /// Create a child scene node
-    Node* CreateChild(const String& name = String(), bool local = false);
+    Node* CreateChild(const String& name = String(), CreateMode mode = REPLICATED);
     /// Add a child scene node
     void AddChild(Node* node);
     /// Remove a child scene node
@@ -104,9 +120,9 @@ public:
     /// Remove all child scene nodes
     void RemoveAllChildren();
     /// Create a component to this node
-    Component* CreateComponent(ShortStringHash type, bool local = false);
+    Component* CreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
     /// Create a component to this node if it does not exist already
-    Component* GetOrCreateComponent(ShortStringHash type, bool local = false);
+    Component* GetOrCreateComponent(ShortStringHash type, CreateMode mode = REPLICATED);
     /// Remove a component from this node
     void RemoveComponent(Component* component);
     /// Remove all components from this node
@@ -120,9 +136,9 @@ public:
     /// Set parent scene node. Same as parent->AddChild(this)
     void SetParent(Node* parent);
     /// Template version of creating a component
-    template <class T> T* CreateComponent(bool local = false);
+    template <class T> T* CreateComponent(CreateMode mode = REPLICATED);
     /// Template version of getting or creating a component
-    template <class T> T* GetOrCreateComponent(bool local = false);
+    template <class T> T* GetOrCreateComponent(CreateMode mode = REPLICATED);
     
     /// Return ID
     unsigned GetID() const { return id_; }
@@ -134,12 +150,16 @@ public:
     Node* GetParent() const { return parent_; }
     /// Return scene
     Scene* GetScene() const { return scene_; }
-    /// Return owner connection in multiplayer
+    /// Return owner connection in networking
     Connection* GetOwner() const { return owner_; }
     /// Return position
     const Vector3& GetPosition() const { return position_; }
     /// Return rotation
     const Quaternion& GetRotation() const { return rotation_; }
+    /// Return unsmoothed (target) position
+    const Vector3& GetTargetPosition() const { return smoothed_ ? targetPosition_ : position_; }
+    /// Return unsmoothed (target) rotation
+    const Quaternion& GetTargetRotation() const { return smoothed_ ? targetRotation_ : rotation_; }
     /// Return direction. Identity rotation equals positive Z
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
     /// Return scale
@@ -194,6 +214,8 @@ public:
     
     /// Return whether transform has changed and world transform needs recalculation
     bool IsDirty() const { return dirty_; }
+    /// Return whether motion smoothing is enabled
+    bool IsSmoothed() const { return smoothed_; }
     /// Return number of child scene nodes
     unsigned GetNumChildren(bool recursive = false) const;
     /// Return immediate child scene nodes
@@ -241,7 +263,7 @@ public:
     void SetID(unsigned id);
     /// Set scene. Called by Scene
     void SetScene(Scene* scene);
-    /// Set owner connection for multiplayer
+    /// Set owner connection for networking
     void SetOwner(Connection* owner);
     /// Set network rotation attribute
     void SetNetRotationAttr(const PODVector<unsigned char>& value);
@@ -251,6 +273,8 @@ public:
     const PODVector<unsigned char>& GetNetRotationAttr() const;
     /// Return network parent attribute
     const PODVector<unsigned char>& GetNetParentAttr() const;
+    /// Update motion smoothing. Called by Scene
+    void UpdateSmoothing(float constant, float squaredSnapThreshold);
     
     /// User variables
     VariantMap vars_;
@@ -261,9 +285,9 @@ protected:
     /// Load components from XML data and optionally load child nodes. Used internally
     bool LoadXML(const XMLElement& source, bool loadChildren);
     /// Create a component with specific ID. Used internally
-    Component* CreateComponent(ShortStringHash type, unsigned id, bool local);
+    Component* CreateComponent(ShortStringHash type, unsigned id, CreateMode mode);
     /// Create a child node with specific ID. Used internally
-    Node* CreateChild(unsigned id, bool local);
+    Node* CreateChild(unsigned id, CreateMode mode);
     
 private:
     /// Recalculate the world transform
@@ -281,7 +305,7 @@ private:
     Node* parent_;
     /// Scene (root node)
     Scene* scene_;
-    /// Owner connection in multiplayer
+    /// Owner connection in networking
     Connection* owner_;
     /// Position
     Vector3 position_;
@@ -291,6 +315,10 @@ private:
     Vector3 scale_;
     /// World-space transform matrix
     Matrix3x4 worldTransform_;
+    /// Target position for network motion smoothing
+    Vector3 targetPosition_;
+    /// Target rotation for network motion smoothing
+    Quaternion targetRotation_;
     /// Name
     String name_;
     /// Name hash
@@ -305,18 +333,22 @@ private:
     mutable VectorBuffer attrBuffer_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
+    /// Active smoothing flags
+    unsigned char smoothingFlags_;
     /// World transform needs update flag
     bool dirty_;
+    /// Smoothed motion flag
+    bool smoothed_;
 };
 
-template <class T> T* Node::CreateComponent(bool local)
+template <class T> T* Node::CreateComponent(CreateMode mode)
 {
-    return static_cast<T*>(CreateComponent(T::GetTypeStatic(), local));
+    return static_cast<T*>(CreateComponent(T::GetTypeStatic(), mode));
 }
 
-template <class T> T* Node::GetOrCreateComponent(bool local)
+template <class T> T* Node::GetOrCreateComponent(CreateMode mode)
 {
-    return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), local));
+    return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic(), mode));
 }
 
 template <class T> void Node::GetChildrenWithComponent(PODVector<Node*>& dest, bool recursive) const

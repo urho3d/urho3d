@@ -122,7 +122,7 @@ bool Model::Load(Deserializer& source)
                 memcpy(morphResetData.RawPtr(), &data[morphStart * vertexSize], morphCount * vertexSize);
                 buffer->SetMorphRangeResetData(morphResetData);
             }
-
+            
             // Copy the raw position data for CPU-side operations
             SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
             float* rawDest = (float*)rawVertexData.RawPtr();
@@ -157,12 +157,12 @@ bool Model::Load(Deserializer& source)
         if (data)
         {
             source.Read(data, indexCount * indexSize);
-
+            
             // Copy the raw index data for CPU-side operations
             SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
             memcpy(rawIndexData.RawPtr(), data, indexSize * indexCount);
             rawIndexDatas.Push(rawIndexData);
-
+            
             buffer->Unlock();
         }
         else
