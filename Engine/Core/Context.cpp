@@ -74,17 +74,31 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
         return;
     
     attributes_[objectType].Push(attr);
+    
+    if (attr.mode_ & AM_NET)
+        networkAttributes_[objectType].Push(attr);
 }
 
 void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
 {
     Vector<AttributeInfo>& attributes = attributes_[objectType];
+    Vector<AttributeInfo>& netAttributes = networkAttributes_[objectType];
+    
     for (Vector<AttributeInfo>::Iterator i = attributes.Begin(); i != attributes.End(); ++i)
     {
         if (i->name_ == name)
         {
             attributes.Erase(i);
-            return;
+            break;
+        }
+    }
+    
+    for (Vector<AttributeInfo>::Iterator i = netAttributes.Begin(); i != netAttributes.End(); ++i)
+    {
+        if (i->name_ == name)
+        {
+            netAttributes.Erase(i);
+            break;
         }
     }
 }

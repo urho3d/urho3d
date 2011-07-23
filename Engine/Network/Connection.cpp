@@ -29,6 +29,7 @@
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "NetworkEvents.h"
+#include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -183,6 +184,8 @@ void Connection::SendServerUpdate()
     if (!isClient_ || !scene_ || !sceneLoaded_)
         return;
     
+    PROFILE(SendServerUpdate);
+    
     const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
     
     // Check for new or changed nodes
@@ -215,6 +218,8 @@ void Connection::SendClientUpdate()
 {
     if (isClient_ || !scene_ || !sceneLoaded_)
         return;
+    
+    PROFILE(SendClientUpdate);
     
     msg_.Clear();
     msg_.WriteUInt(controls_.buttons_);
@@ -362,8 +367,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 --numVars;
                 
                 ShortStringHash key = msg.ReadShortStringHash();
-                Variant value = msg.ReadVariant();
-                vars[key] = value;
+                vars[key] = msg.ReadVariant();
             }
             
             // Read components
@@ -413,8 +417,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                     --changedVars;
                     
                     ShortStringHash key = msg.ReadShortStringHash();
-                    Variant value = msg.ReadVariant();
-                    vars[key] = value;
+                    vars[key] = msg.ReadVariant();
                 }
             }
             else

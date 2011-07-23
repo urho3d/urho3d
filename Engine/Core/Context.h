@@ -131,6 +131,8 @@ public:
     const Map<ShortStringHash, SharedPtr<ObjectFactory> >& GetObjectFactories() const { return factories_; }
     /// Return attributes for all object types
     const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllAttributes() const { return attributes_; }
+    /// Return network replication attributes for all object types
+    const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllNetworkAttributes() const { return networkAttributes_; }
     /// Return active event sender. Null outside event handling
     Object* GetSender() const;
     /// Return active event handler. Set by Object. Null outside event handling
@@ -144,6 +146,13 @@ public:
     const Vector<AttributeInfo>* GetAttributes(ShortStringHash type) const
     {
         Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
+        return i != attributes_.End() ? &i->second_ : 0;
+    }
+    
+    /// Return network replication attribute descriptions for an object type, or null if none defined
+    const Vector<AttributeInfo>* GetNetworkAttributes(ShortStringHash type) const
+    {
+        Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
         return i != attributes_.End() ? &i->second_ : 0;
     }
     
@@ -169,6 +178,8 @@ private:
     Map<ShortStringHash, SharedPtr<Object> > subsystems_;
     /// Attribute descriptions per object type
     Map<ShortStringHash, Vector<AttributeInfo> > attributes_;
+    /// Network replication attribute descriptions per object type
+    Map<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events
     Map<StringHash, PODVector<Object*> > receivers_;
     /// Event receivers for specific senders' events

@@ -66,8 +66,6 @@ Network::~Network()
 
 void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t id, const char* data, size_t numBytes)
 {
-    PROFILE(HandleMessage);
-    
     // Only process messages from known sources
     Connection* connection = GetConnection(source);
     if (connection)

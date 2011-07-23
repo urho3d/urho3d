@@ -79,10 +79,12 @@ public:
     Variant GetAttribute(const String& name);
     /// Return number of attributes
     unsigned GetNumAttributes() const;
-    /// Return number of network serialization attributes
+    /// Return number of network replication attributes
     unsigned GetNumNetworkAttributes() const;
     /// Return attribute descriptions, or null if none defined
     const Vector<AttributeInfo>* GetAttributes() const;
+    /// Return network replication attribute descriptions, or null if none defined
+    const Vector<AttributeInfo>* GetNetworkAttributes() const;
     
 protected:
     /// In serialization -flag
