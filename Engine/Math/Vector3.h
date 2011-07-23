@@ -201,6 +201,8 @@ public:
         );
     }
     
+    /// Return absolute vector
+    Vector3 Abs() const { return Vector3(fabsf(x_), fabsf(y_), fabsf(z_)); }
     /// Linear interpolation with another vector
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     

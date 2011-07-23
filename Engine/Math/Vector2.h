@@ -170,6 +170,8 @@ public:
     float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
     /// Calculate absolute dot product
     float AbsDotProduct(const Vector2& rhs) const { return fabsf(x_ * rhs.x_) + fabsf(y_ * rhs.y_); }
+    /// Return absolute vector
+    Vector2 Abs() const { return Vector2(fabsf(x_), fabsf(y_)); }
     /// Linear interpolation with another vector
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     

@@ -65,8 +65,8 @@ void Joint::RegisterObject(Context* context)
     ENUM_ATTRIBUTE(Joint, "Joint Type", type_, typeNames, JOINT_NONE, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Joint, VAR_INT, "Body A", GetBodyAAttr, SetBodyAAttr, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Joint, VAR_INT, "Body B", GetBodyBAttr, SetBodyBAttr, int, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
 }
 
 void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

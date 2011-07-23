@@ -67,10 +67,11 @@ void Node::RegisterObject(Context* context)
     
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_STRING, "Name", GetName, SetName, String, String(), AM_DEFAULT);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::UNITY, AM_DEFAULT);
-    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Parent Node", GetParentAttr, SetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
-    ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE);
+    ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE); // Network replication of vars uses custom data
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Rotation", GetNetRotationAttr, SetNetRotationAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 
 void Node::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)
@@ -620,7 +621,13 @@ void Node::SetOwner(Connection* owner)
     owner_ = owner;
 }
 
-void Node::SetParentAttr(const PODVector<unsigned char>& value)
+void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)
+{
+    MemoryBuffer buf(value);
+    SetRotation(buf.ReadPackedQuaternion());
+}
+
+void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
 {
     Scene* scene = GetScene();
     if (!scene)
@@ -641,15 +648,22 @@ void Node::SetParentAttr(const PODVector<unsigned char>& value)
     }
 }
 
-const PODVector<unsigned char>& Node::GetParentAttr() const
+const PODVector<unsigned char>& Node::GetNetRotationAttr() const
 {
-    parentAttr_.Clear();
+    attrBuffer_.Clear();
+    attrBuffer_.WritePackedQuaternion(rotation_);
+    return attrBuffer_.GetBuffer();
+}
+
+const PODVector<unsigned char>& Node::GetNetParentAttr() const
+{
+    attrBuffer_.Clear();
     Scene* scene = GetScene();
     if (scene && parent_)
     {
         unsigned parentID = parent_->GetID();
         if (parentID < FIRST_LOCAL_ID)
-            parentAttr_.WriteVLE(parentID);
+            attrBuffer_.WriteVLE(parentID);
         else
         {
             // Parent is local: traverse hierarchy to find a non-local base node
@@ -658,14 +672,14 @@ const PODVector<unsigned char>& Node::GetParentAttr() const
             while (current->GetID() >= FIRST_LOCAL_ID)
                 current = current->GetParent();
             
-            parentAttr_.WriteVLE(current->GetID());
-            parentAttr_.WriteStringHash(parent_->GetNameHash());
+            attrBuffer_.WriteVLE(current->GetID());
+            attrBuffer_.WriteStringHash(parent_->GetNameHash());
         }
     }
     else
-        parentAttr_.WriteVLE(0);
+        attrBuffer_.WriteVLE(0);
     
-    return parentAttr_.GetBuffer();
+    return attrBuffer_.GetBuffer();
 }
 
 bool Node::Load(Deserializer& source, bool readChildren)

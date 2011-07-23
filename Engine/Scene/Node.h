@@ -243,11 +243,14 @@ public:
     void SetScene(Scene* scene);
     /// Set owner connection for multiplayer
     void SetOwner(Connection* owner);
-    
-    /// Set parent attribute (network only)
-    void SetParentAttr(const PODVector<unsigned char>& value);
-    /// Return parent attribute (network only)
-    const PODVector<unsigned char>& GetParentAttr() const;
+    /// Set network rotation attribute
+    void SetNetRotationAttr(const PODVector<unsigned char>& value);
+    /// Set network parent attribute
+    void SetNetParentAttr(const PODVector<unsigned char>& value);
+    /// Return network rotation attribute
+    const PODVector<unsigned char>& GetNetRotationAttr() const;
+    /// Return network parent attribute
+    const PODVector<unsigned char>& GetNetParentAttr() const;
     
     /// User variables
     VariantMap vars_;
@@ -298,8 +301,8 @@ private:
     Vector<SharedPtr<Component> > components_;
     /// Node listeners
     Vector<WeakPtr<Component> > listeners_;
-    /// Parent attribute buffer for network replication
-    mutable VectorBuffer parentAttr_;
+    /// Attribute buffer for network replication
+    mutable VectorBuffer attrBuffer_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
     /// World transform needs update flag

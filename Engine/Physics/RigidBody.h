@@ -114,6 +114,10 @@ public:
     
     /// Recalculate mass
     void UpdateMass();
+    /// Set network angular velocity attribute
+    void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
+    /// Return network angular velocity attribute
+    const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
     
 protected:
     /// Handle node being assigned
@@ -141,6 +145,8 @@ private:
     Vector3 previousPosition_;
     /// Previous rotation for rendering interpolation
     Quaternion previousRotation_;
+    /// Attribute buffer for network replication
+    mutable VectorBuffer attrBuffer_;
     /// Poststep flag
     bool inPostStep_;
 };

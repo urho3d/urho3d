@@ -84,7 +84,7 @@ struct PhysicsCollisionInfo
     PODVector<PhysicsContactInfo> contacts_;
 };
 
-static const float PHYSICS_MIN_TIMESTEP = 0.001f;
+static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// A physics simulation world
 class PhysicsWorld : public Component
@@ -121,6 +121,8 @@ public:
     void SetAngularDampingScale(float scale);
     /// Set collision bounce velocity threshold (apply bounce if above)
     void SetBounceThreshold(float threshold);
+    /// Set maximum angular velocity for network replication
+    void SetMaxNetworkAngularVelocity(float velocity);
     /// Set simulation ERP parameter
     void SetERP(float erp);
     /// Set simulation CFM parameter
@@ -157,6 +159,8 @@ public:
     float GetAngularDampingScale() const;
     /// Return collision bounce velocity threshold
     float GetBounceThreshold() const { return bounceThreshold_; }
+    /// Return maximum angular velocity for network replication
+    float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
     /// Return simulation ERP parameter
     float GetERP() const;
     /// Return simulation CFM parameter
@@ -208,6 +212,8 @@ private:
     unsigned maxContacts_;
     /// Collision bounce velocity threshold
     float bounceThreshold_;
+    /// Maximum angular velocity for network replication
+    float maxNetworkAngularVelocity_;
     /// Simulation step time accumulator
     float timeAcc_;
     /// Simulation random seed

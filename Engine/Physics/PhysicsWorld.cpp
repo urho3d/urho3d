@@ -42,8 +42,8 @@
 #include "DebugNew.h"
 
 static const int DEFAULT_FPS = 60;
-static const int DEFAULT_MAXCONTACTS = 20;
-static const float DEFAULT_BOUNCETHRESHOLD = 0.1f;
+static const int DEFAULT_MAX_CONTACTS = 20;
+static const float DEFAULT_BOUNCE_THRESHOLD = 0.1f;
 
 static unsigned numInstances = 0;
 
@@ -61,8 +61,8 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     rayGeometry_(0),
     contactJoints_(0),
     fps_(DEFAULT_FPS),
-    maxContacts_(DEFAULT_MAXCONTACTS),
-    bounceThreshold_(DEFAULT_BOUNCETHRESHOLD),
+    maxContacts_(DEFAULT_MAX_CONTACTS),
+    bounceThreshold_(DEFAULT_BOUNCE_THRESHOLD),
     timeAcc_(0.0f),
     randomSeed_(0)
 {
@@ -134,10 +134,11 @@ void PhysicsWorld::RegisterObject(Context* context)
     context->RegisterFactory<PhysicsWorld>();
     
     ATTRIBUTE(PhysicsWorld, VAR_INT, "Physics FPS", fps_, DEFAULT_FPS, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Contacts", maxContacts_, DEFAULT_MAXCONTACTS, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Bounce Threshold", bounceThreshold_, DEFAULT_BOUNCETHRESHOLD, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f, AM_DEFAULT);
-    ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_INT, "Max Contacts", maxContacts_, DEFAULT_MAX_CONTACTS, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Bounce Threshold", bounceThreshold_, DEFAULT_BOUNCE_THRESHOLD, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Max Network Angular Velocity", maxNetworkAngularVelocity_, DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY, AM_DEFAULT);
+    ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Time Accumulator", timeAcc_, 0.0f, AM_FILE | AM_NOEDIT);
+    ATTRIBUTE(PhysicsWorld, VAR_INT, "Random Seed", randomSeed_, 0, AM_FILE | AM_NOEDIT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_VECTOR3, "Gravity", GetGravity, SetGravity, Vector3, Vector3::ZERO, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(PhysicsWorld, VAR_FLOAT, "Linear Damping Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
@@ -260,6 +261,11 @@ void PhysicsWorld::SetAngularDampingScale(float scale)
 void PhysicsWorld::SetBounceThreshold(float threshold)
 {
     bounceThreshold_ = Max(threshold, 0.0f);
+}
+
+void PhysicsWorld::SetMaxNetworkAngularVelocity(float velocity)
+{
+    maxNetworkAngularVelocity_ = Clamp(velocity, 1.0f, 32767.0f);
 }
 
 void PhysicsWorld::SetERP(float erp)
