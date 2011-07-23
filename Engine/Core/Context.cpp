@@ -28,6 +28,18 @@
 
 static String noType;
 
+void RemoveNamedAttribute(Vector<AttributeInfo>& attributes, const String& name)
+{
+    for (unsigned i = 0; i < attributes.Size(); ++i)
+    {
+        if (attributes[i].name_ == name)
+        {
+            attributes.Erase(i);
+            return;
+        }
+    }
+}
+
 Context::Context() :
     handler_(0)
 {
@@ -81,31 +93,24 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
 
 void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
 {
-    Vector<AttributeInfo>& attributes = attributes_[objectType];
-    Vector<AttributeInfo>& netAttributes = networkAttributes_[objectType];
+    Map<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
+    if (i != attributes_.End())
+        RemoveNamedAttribute(i->second_, name);
     
-    for (Vector<AttributeInfo>::Iterator i = attributes.Begin(); i != attributes.End(); ++i)
-    {
-        if (i->name_ == name)
-        {
-            attributes.Erase(i);
-            break;
-        }
-    }
-    
-    for (Vector<AttributeInfo>::Iterator i = netAttributes.Begin(); i != netAttributes.End(); ++i)
-    {
-        if (i->name_ == name)
-        {
-            netAttributes.Erase(i);
-            break;
-        }
-    }
+    i = networkAttributes_.Find(objectType);
+    if (i != networkAttributes_.End())
+        RemoveNamedAttribute(i->second_, name);
 }
 
 void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)
 {
-    attributes_[derivedType] = attributes_[baseType];
+    const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
+    if (baseAttributes)
+        attributes_[derivedType] = *baseAttributes;
+    
+    const Vector<AttributeInfo>* baseNetworkAttributes = GetNetworkAttributes(baseType);
+    if (baseNetworkAttributes)
+        networkAttributes_[derivedType] = *baseNetworkAttributes;
 }
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
