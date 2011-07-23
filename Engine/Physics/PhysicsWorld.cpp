@@ -35,7 +35,6 @@
 #include "RigidBody.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "VectorBuffer.h"
 
 #include <ode/ode.h>
 #include "Sort.h"

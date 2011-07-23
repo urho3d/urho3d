@@ -27,7 +27,6 @@
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Scene.h"
-#include "VectorBuffer.h"
 #include "XMLElement.h"
 
 #include "DebugNew.h"
@@ -70,7 +69,7 @@ void Node::RegisterObject(Context* context)
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_QUATERNION, "Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_DEFAULT | AM_LATESTDATA);
     REF_ACCESSOR_ATTRIBUTE(Node, VAR_VECTOR3, "Scale", GetScale, SetScale, Vector3, Vector3::UNITY, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Parent Node", GetParentAttr, SetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(Node, VAR_BUFFER, "Parent Node", GetParentAttr, SetParentAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
     ATTRIBUTE(Node, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE);
 }
 
@@ -621,7 +620,7 @@ void Node::SetOwner(Connection* owner)
     owner_ = owner;
 }
 
-void Node::SetParentAttr(PODVector<unsigned char> value)
+void Node::SetParentAttr(const PODVector<unsigned char>& value)
 {
     Scene* scene = GetScene();
     if (!scene)
@@ -642,15 +641,15 @@ void Node::SetParentAttr(PODVector<unsigned char> value)
     }
 }
 
-PODVector<unsigned char> Node::GetParentAttr() const
+const PODVector<unsigned char>& Node::GetParentAttr() const
 {
-    VectorBuffer buf;
+    parentAttr_.Clear();
     Scene* scene = GetScene();
     if (scene && parent_)
     {
         unsigned parentID = parent_->GetID();
         if (parentID < FIRST_LOCAL_ID)
-            buf.WriteVLE(parentID);
+            parentAttr_.WriteVLE(parentID);
         else
         {
             // Parent is local: traverse hierarchy to find a non-local base node
@@ -659,14 +658,14 @@ PODVector<unsigned char> Node::GetParentAttr() const
             while (current->GetID() >= FIRST_LOCAL_ID)
                 current = current->GetParent();
             
-            buf.WriteVLE(current->GetID());
-            buf.WriteStringHash(parent_->GetNameHash());
+            parentAttr_.WriteVLE(current->GetID());
+            parentAttr_.WriteStringHash(parent_->GetNameHash());
         }
     }
     else
-        buf.WriteVLE(0);
+        parentAttr_.WriteVLE(0);
     
-    return buf.GetBuffer();
+    return parentAttr_.GetBuffer();
 }
 
 bool Node::Load(Deserializer& source, bool readChildren)

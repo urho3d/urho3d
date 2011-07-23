@@ -32,7 +32,6 @@
 #include "Scene.h"
 #include "SceneEvents.h"
 #include "XMLFile.h"
-#include "VectorBuffer.h"
 
 #include "DebugNew.h"
 

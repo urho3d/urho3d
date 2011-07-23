@@ -32,7 +32,6 @@
 #include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
-#include "VectorBuffer.h"
 
 #include "DebugNew.h"
 
@@ -53,7 +52,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
 }
 
 void AnimationController::Update(float timeStep)

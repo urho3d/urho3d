@@ -35,7 +35,6 @@
 #include "Profiler.h"
 #include "ResourceCache.h"
 #include "Sort.h"
-#include "VectorBuffer.h"
 #include "VertexBuffer.h"
 #include "XMLElement.h"
 

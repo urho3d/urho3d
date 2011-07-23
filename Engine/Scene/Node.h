@@ -25,6 +25,7 @@
 
 #include "Matrix3x4.h"
 #include "Serializable.h"
+#include "VectorBuffer.h"
 
 class Component;
 class Connection;
@@ -244,9 +245,9 @@ public:
     void SetOwner(Connection* owner);
     
     /// Set parent attribute (network only)
-    void SetParentAttr(PODVector<unsigned char> value);
+    void SetParentAttr(const PODVector<unsigned char>& value);
     /// Return parent attribute (network only)
-    PODVector<unsigned char> GetParentAttr() const;
+    const PODVector<unsigned char>& GetParentAttr() const;
     
     /// User variables
     VariantMap vars_;
@@ -297,6 +298,8 @@ private:
     Vector<SharedPtr<Component> > components_;
     /// Node listeners
     Vector<WeakPtr<Component> > listeners_;
+    /// Parent attribute buffer for network replication
+    mutable VectorBuffer parentAttr_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
     /// World transform needs update flag

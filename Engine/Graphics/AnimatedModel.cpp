@@ -42,7 +42,6 @@
 #include "ResourceEvents.h"
 #include "Scene.h"
 #include "Sort.h"
-#include "VectorBuffer.h"
 #include "VertexBuffer.h"
 
 #include "DebugNew.h"
@@ -85,8 +84,8 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
 }
 
 void AnimatedModel::FinishUpdate()
