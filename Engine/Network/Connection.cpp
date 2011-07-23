@@ -52,9 +52,8 @@ Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::Me
 
 Connection::~Connection()
 {
-    // Reset owner from the scene, as this connection is about to be destroyed
-    if (scene_)
-        scene_->ResetOwner(this);
+    // Reset scene (remove possible owner references), as this connection is about to be destroyed
+    SetScene(0);
 }
 
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
@@ -126,9 +125,6 @@ void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOr
 
 void Connection::SetScene(Scene* newScene)
 {
-    if (scene_ == newScene)
-        return;
-    
     if (scene_)
     {
         // Disable smoothing in case scene is no longer used for networking
