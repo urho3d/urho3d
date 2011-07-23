@@ -387,7 +387,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateNode message parsing aborted due to unknown component " + type.ToString());
+                    LOGERROR("CreateNode message parsing aborted due to unknown component");
                     return;
                 }
                 
@@ -471,7 +471,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 // If was unable to create the component, would desync the message and therefore have to abort
                 if (!component)
                 {
-                    LOGERROR("CreateComponent message parsing aborted due to unknown component " + type.ToString());
+                    LOGERROR("CreateComponent message parsing aborted due to unknown component");
                     return;
                 }
                 

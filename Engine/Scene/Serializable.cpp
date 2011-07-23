@@ -443,7 +443,7 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned 
         if (!(attr.mode_ & AM_NET))
             continue;
         
-        if (deltaUpdateBits[index << 3] & (1 << (index & 7)))
+        if (deltaUpdateBits[index >> 3] & (1 << (index & 7)))
             dest.WriteVariantData(lastSentState[index]);
         
         ++index;
@@ -549,7 +549,7 @@ void Serializable::ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);
     source.Read(&deltaUpdateBits[0], deltaUpdateBits.Size());
     
-    for (unsigned i = 0; i < attributes->Size(); ++i)
+    for (unsigned i = 0; i < attributes->Size() && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if (!(attr.mode_ & AM_NET))
@@ -568,7 +568,7 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
     if (!attributes)
         return;
     
-    for (unsigned i = 0; i < attributes->Size(); ++i)
+    for (unsigned i = 0; i < attributes->Size() && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
         if ((attr.mode_ & (AM_NET | AM_LATESTDATA)) != (AM_NET | AM_LATESTDATA))

@@ -5,6 +5,7 @@ Node@ cameraNode;
 float yaw = 0.0;
 float pitch = 0.0;
 int drawDebug = 0;
+bool clientMode = false;
 
 void Start()
 {
@@ -25,6 +26,21 @@ void Start()
     SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown");
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
+    
+    for (uint i = 0; i < arguments.length; ++i)
+    {
+        if (arguments[i] == "server")
+        {
+            network.StartServer(1234);
+            SubscribeToEvent("ClientConnected", "HandleClientConnected");
+        }
+        else if (arguments[i] == "client" && i < arguments.length - 1)
+        {
+            testScene.Clear();
+            network.Connect(arguments[i + 1], 1234, testScene);
+            clientMode = true;
+        }
+    }
 }
 
 void InitConsole()
@@ -330,7 +346,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         ui.cursor.visible = false;
 
     // Test creating a new physics object
-    if ((button == MOUSEB_LEFT) && (ui.GetElementAt(ui.cursorPosition, true) is null) && (ui.focusElement is null))
+    if (!clientMode && button == MOUSEB_LEFT && ui.GetElementAt(ui.cursorPosition, true) is null && ui.focusElement is null)
     {
         Node@ newNode = testScene.CreateChild();
         newNode.position = cameraNode.position;
@@ -372,7 +388,7 @@ void HandlePostRenderUpdate()
         testScene.physicsWorld.DrawDebugGeometry(true);
 
     IntVector2 pos = ui.cursorPosition;
-    if (ui.GetElementAt(pos, true) is null)
+    if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
         Array<RayQueryResult> result = testScene.octree.Raycast(cameraRay, DRAWABLE_GEOMETRY, 250.0, RAY_TRIANGLE);
@@ -384,4 +400,10 @@ void HandlePostRenderUpdate()
                 Vector3(0.01, 0.01, 0.01)), Color(1.0, 1.0, 1.0), true);
         }
     }
+}
+
+void HandleClientConnected(StringHash eventType, VariantMap& eventData)
+{
+    Connection@ connection = eventData["Connection"].GetConnection();
+    connection.scene = testScene; // Begin scene replication to the client
 }
