@@ -100,7 +100,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Perform finalization after a scene load or network update
     virtual void FinishUpdate();
     

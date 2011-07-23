@@ -31,17 +31,6 @@
 
 #include "DebugNew.h"
 
-bool CompareAndCopyVariant(const Variant& src, Variant& dest)
-{
-    if (dest != src)
-    {
-        dest = src;
-        return true;
-    }
-    else
-        return false;
-}
-
 OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
@@ -54,12 +43,12 @@ Serializable::~Serializable()
 {
 }
 
-void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     // Check for accessor function mode
     if (attr.accessor_)
     {
-        attr.accessor_->Set(this, value);
+        attr.accessor_->Set(this, src);
         return;
     }
     
@@ -71,70 +60,73 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& valu
     case VAR_INT:
         // If enum type, use the low 8 bits only (assume full value to be initialized)
         if (attr.enumNames_)
-            *(reinterpret_cast<unsigned char*>(dest)) = value.GetInt();
+            *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
         else
-            *(reinterpret_cast<int*>(dest)) = value.GetInt();
+            *(reinterpret_cast<int*>(dest)) = src.GetInt();
         break;
         
     case VAR_BOOL:
-        *(reinterpret_cast<bool*>(dest)) = value.GetBool();
+        *(reinterpret_cast<bool*>(dest)) = src.GetBool();
         break;
         
     case VAR_FLOAT:
-        *(reinterpret_cast<float*>(dest)) = value.GetFloat();
+        *(reinterpret_cast<float*>(dest)) = src.GetFloat();
         break;
         
     case VAR_VECTOR2:
-        *(reinterpret_cast<Vector2*>(dest)) = value.GetVector2();
+        *(reinterpret_cast<Vector2*>(dest)) = src.GetVector2();
         break;
         
     case VAR_VECTOR3:
-        *(reinterpret_cast<Vector3*>(dest)) = value.GetVector3();
+        *(reinterpret_cast<Vector3*>(dest)) = src.GetVector3();
         break;
         
     case VAR_VECTOR4:
-        *(reinterpret_cast<Vector4*>(dest)) = value.GetVector4();
+        *(reinterpret_cast<Vector4*>(dest)) = src.GetVector4();
         break;
         
     case VAR_QUATERNION:
-        *(reinterpret_cast<Quaternion*>(dest)) = value.GetQuaternion();
+        *(reinterpret_cast<Quaternion*>(dest)) = src.GetQuaternion();
         break;
         
     case VAR_COLOR:
-        *(reinterpret_cast<Color*>(dest)) = value.GetColor();
+        *(reinterpret_cast<Color*>(dest)) = src.GetColor();
         break;
         
     case VAR_STRING:
-        *(reinterpret_cast<String*>(dest)) = value.GetString();
+        *(reinterpret_cast<String*>(dest)) = src.GetString();
         break;
         
     case VAR_BUFFER:
-        *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = value.GetBuffer();
+        *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = src.GetBuffer();
         break;
         
     case VAR_RESOURCEREF:
-        *(reinterpret_cast<ResourceRef*>(dest)) = value.GetResourceRef();
+        *(reinterpret_cast<ResourceRef*>(dest)) = src.GetResourceRef();
         break;
         
     case VAR_RESOURCEREFLIST:
-        *(reinterpret_cast<ResourceRefList*>(dest)) = value.GetResourceRefList();
+        *(reinterpret_cast<ResourceRefList*>(dest)) = src.GetResourceRefList();
         break;
         
     case VAR_VARIANTVECTOR:
-        *(reinterpret_cast<VariantVector*>(dest)) = value.GetVariantVector();
+        *(reinterpret_cast<VariantVector*>(dest)) = src.GetVariantVector();
         break;
         
     case VAR_VARIANTMAP:
-        *(reinterpret_cast<VariantMap*>(dest)) = value.GetVariantMap();
+        *(reinterpret_cast<VariantMap*>(dest)) = src.GetVariantMap();
         break;
     }
 }
 
-Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
+void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest)
 {
     // Check for accessor function mode
     if (attr.accessor_)
-        return attr.accessor_->Get(this);
+    {
+        attr.accessor_->Get(this, dest);
+        return;
+    }
     
     // Calculate the source address
     void* src = reinterpret_cast<unsigned char*>(this) + attr.offset_;
@@ -144,51 +136,63 @@ Variant Serializable::OnGetAttribute(const AttributeInfo& attr)
     case VAR_INT:
         // If enum type, use the low 8 bits only
         if (attr.enumNames_)
-            return Variant(*(reinterpret_cast<const unsigned char*>(src)));
+            dest = *(reinterpret_cast<const unsigned char*>(src));
         else
-            return Variant(*(reinterpret_cast<const int*>(src)));
+            dest = *(reinterpret_cast<const int*>(src));
+        break;
         
     case VAR_BOOL:
-        return Variant(*(reinterpret_cast<const bool*>(src)));
+        dest = *(reinterpret_cast<const bool*>(src));
+        break;
         
     case VAR_FLOAT:
-        return Variant(*(reinterpret_cast<const float*>(src)));
+        dest = *(reinterpret_cast<const float*>(src));
+        break;
         
     case VAR_VECTOR2:
-        return Variant(*(reinterpret_cast<const Vector2*>(src)));
+        dest = *(reinterpret_cast<const Vector2*>(src));
+        break;
         
     case VAR_VECTOR3:
-        return Variant(*(reinterpret_cast<const Vector3*>(src)));
+        dest = *(reinterpret_cast<const Vector3*>(src));
+        break;
         
     case VAR_VECTOR4:
-        return Variant(*(reinterpret_cast<const Vector4*>(src)));
+        dest = *(reinterpret_cast<const Vector4*>(src));
+        break;
         
     case VAR_QUATERNION:
-        return Variant(*(reinterpret_cast<const Quaternion*>(src)));
+        dest = *(reinterpret_cast<const Quaternion*>(src));
+        break;
         
     case VAR_COLOR:
-        return Variant(*(reinterpret_cast<const Color*>(src)));
+        dest = *(reinterpret_cast<const Color*>(src));
+        break;
         
     case VAR_STRING:
-        return Variant(*(reinterpret_cast<const String*>(src)));
+        dest = *(reinterpret_cast<const String*>(src));
+        break;
         
     case VAR_BUFFER:
-        return Variant(*(reinterpret_cast<const PODVector<unsigned char>*>(src)));
+        dest = *(reinterpret_cast<const PODVector<unsigned char>*>(src));
+        break;
         
     case VAR_RESOURCEREF:
-        return Variant(*(reinterpret_cast<const ResourceRef*>(src)));
+        dest = *(reinterpret_cast<const ResourceRef*>(src));
+        break;
         
     case VAR_RESOURCEREFLIST:
-        return Variant(*(reinterpret_cast<const ResourceRefList*>(src)));
+        dest = *(reinterpret_cast<const ResourceRefList*>(src));
+        break;
         
     case VAR_VARIANTVECTOR:
-        return Variant(*(reinterpret_cast<const VariantVector*>(src)));
+        dest = *(reinterpret_cast<const VariantVector*>(src));
+        break;
         
     case VAR_VARIANTMAP:
-        return Variant(*(reinterpret_cast<const VariantMap*>(src)));
+        dest = *(reinterpret_cast<const VariantMap*>(src));
+        break;
     }
-    
-    return Variant();
 }
 
 bool Serializable::Load(Deserializer& source)
@@ -225,6 +229,7 @@ bool Serializable::Save(Serializer& dest)
     if (!attributes)
         return true;
     
+    Variant value;
     inSerialization_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
@@ -233,7 +238,8 @@ bool Serializable::Save(Serializer& dest)
         if (!(attr.mode_ & AM_FILE))
             continue;
         
-        if (!dest.WriteVariantData(OnGetAttribute(attr)))
+        OnGetAttribute(attr, value);
+        if (!dest.WriteVariantData(value))
         {
             LOGERROR("Could not save " + GetTypeName() + ", writing to stream failed");
             inSerialization_ = false;
@@ -323,6 +329,7 @@ bool Serializable::SaveXML(XMLElement& dest)
     if (!attributes)
         return true;
     
+    Variant value;
     inSerialization_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
@@ -333,15 +340,16 @@ bool Serializable::SaveXML(XMLElement& dest)
         
         XMLElement attrElem = dest.CreateChild("attribute");
         attrElem.SetString("name", String(attr.name_));
+        OnGetAttribute(attr, value);
         // If enums specified, set as an enum string. Otherwise set directly as a Variant
         if (attr.enumNames_)
         {
-            int enumValue = OnGetAttribute(attr).GetInt();
+            int enumValue = value.GetInt();
             attrElem.SetString("type", "Enum");
             attrElem.SetString("value", String(attr.enumNames_[enumValue]));
         }
         else
-            attrElem.SetVariant(OnGetAttribute(attr));
+            attrElem.SetVariant(value);
     }
     
     inSerialization_ = false;
@@ -410,24 +418,26 @@ bool Serializable::SetAttribute(const String& name, const Variant& value)
     return false;
 }
 
-void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState)
+void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits,
+    Vector<Variant>& replicationState)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
         return;
     unsigned numAttributes = attributes->Size();
     
-    lastSentState.Resize(numAttributes);
+    replicationState.Resize(numAttributes);
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);
     for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
         deltaUpdateBits[i] = 0;
     
-    // Set initial values to the last sent state and compare against defaults
+    // Set initial attribute values and compare against defaults
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        lastSentState[i] = OnGetAttribute(attr);
-        if (lastSentState[i] != attr.defaultValue_)
+        
+        OnGetAttribute(attr, replicationState[i]);
+        if (replicationState[i] != attr.defaultValue_)
             deltaUpdateBits[i >> 3] |= (1 << (i & 7));
     }
     
@@ -437,13 +447,14 @@ void Serializable::WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
         if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
-            dest.WriteVariantData(lastSentState[i]);
+            dest.WriteVariantData(replicationState[i]);
     }
 }
 
-void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState, bool& deltaUpdate,
-    bool& latestData)
+void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& classCurrentState,
+    Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData)
 {
     deltaUpdate = false;
     latestData = false;
@@ -452,6 +463,10 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
     if (!attributes)
         return;
     unsigned numAttributes = attributes->Size();
+    
+    // If class-specific current state has not been previously used, resize it now
+    if (classCurrentState.Empty())
+        classCurrentState.Resize(numAttributes);
     
     deltaUpdateBits.Resize((numAttributes + 7) >> 3);
     for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
@@ -462,8 +477,10 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
         const AttributeInfo& attr = attributes->At(i);
         
         // Check for attribute change
-        if (CompareAndCopyVariant(OnGetAttribute(attr), lastSentState[i]))
+        OnGetAttribute(attr, classCurrentState[i]);
+        if (classCurrentState[i] != replicationState[i])
         {
+            replicationState[i] = classCurrentState[i];
             if (attr.mode_ & AM_LATESTDATA)
                 latestData = true;
             else
@@ -475,7 +492,7 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
     }
 }
 
-void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState)
+void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
@@ -488,12 +505,13 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& 
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
         if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
-            dest.WriteVariantData(lastSentState[i]);
+            dest.WriteVariantData(replicationState[i]);
     }
 }
 
-void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& lastSentState)
+void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& replicationState)
 {
     const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
     if (!attributes)
@@ -503,8 +521,9 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& last
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
         if (attr.mode_ & AM_LATESTDATA)
-            dest.WriteVariantData(lastSentState[i]);
+            dest.WriteVariantData(replicationState[i]);
     }
 }
 
@@ -521,6 +540,7 @@ void Serializable::ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
         if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
             OnSetAttribute(attr, source.ReadVariant(attr.type_));
     }
@@ -536,6 +556,7 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
     for (unsigned i = 0; i < numAttributes && !source.IsEof(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
+        
         if (attr.mode_ & AM_LATESTDATA)
             OnSetAttribute(attr, source.ReadVariant(attr.type_));
     }
@@ -543,30 +564,38 @@ void Serializable::ReadLatestDataUpdate(Deserializer& source)
 
 Variant Serializable::GetAttribute(unsigned index)
 {
+    Variant ret;
+    
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes || index >= attributes->Size())
-        return Variant();
+        return ret;
     
-    return OnGetAttribute(attributes->At(index));
+    OnGetAttribute(attributes->At(index), ret);
+    return ret;
 }
 
 Variant Serializable::GetAttribute(const String& name)
 {
+    Variant ret;
+    
     const Vector<AttributeInfo>* attributes = context_->GetAttributes(GetType());
     if (!attributes)
     {
         LOGERROR(GetTypeName() + " has no attributes");
-        return Variant();
+        return ret;
     }
     
     for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
         if (i->name_ == name)
-            return OnGetAttribute(*i);
+        {
+            OnGetAttribute(*i, ret);
+            return ret;
+        }
     }
     
     LOGERROR("Could not find attribute " + String(name) + " in " + GetTypeName());
-    return Variant();
+    return ret;
 }
 
 unsigned Serializable::GetNumAttributes() const

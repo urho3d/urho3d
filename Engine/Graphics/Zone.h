@@ -40,7 +40,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Handle attribute write access
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     
     /// Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside
     void SetBoundingBox(const BoundingBox& box);

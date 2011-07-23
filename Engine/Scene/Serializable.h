@@ -42,9 +42,9 @@ public:
     virtual ~Serializable();
     
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor
-    virtual Variant OnGetAttribute(const AttributeInfo& attr);
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest);
     /// Load from binary data. Return true if successful
     virtual bool Load(Deserializer& source);
     /// Save as binary data. Return true if successful
@@ -61,13 +61,13 @@ public:
     /// Set attribute by name. Return true if successfully set
     bool SetAttribute(const String& name, const Variant& value);
     /// Write initial delta network update (compared to default attribute values) and prepare the last sent state
-    void WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState);
+    void WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
     /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate()
-    void PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState, bool& deltaUpdate, bool& latestData);
+    void PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& classCurrentState, Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData);
     /// Write a delta network update prepared with PrepareUpdates()
-    void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& lastSentState);
+    void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
     /// Write a latestdata network update prepared with PrepareUpdates()
-    void WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& lastSentState);
+    void WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& replicationState);
     /// Read and apply a network delta update
     void ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits);
     /// Read and apply a network latest data update
@@ -106,10 +106,10 @@ public:
     }
     
     /// Invoke getter function
-    virtual Variant Get(Serializable* ptr)
+    virtual void Get(Serializable* ptr, Variant& dest)
     {
         T* classPtr = static_cast<T*>(ptr);
-        return Variant((classPtr->*getFunction_)());
+        dest = (classPtr->*getFunction_)();
     }
     
     /// Invoke setter function
@@ -140,10 +140,10 @@ public:
     }
     
     /// Invoke getter function
-    virtual Variant Get(Serializable* ptr)
+    virtual void Get(Serializable* ptr, Variant& dest)
     {
         T* classPtr = static_cast<T*>(ptr);
-        return Variant((classPtr->*getFunction_)());
+        dest = (classPtr->*getFunction_)();
     }
     
     /// Invoke setter function

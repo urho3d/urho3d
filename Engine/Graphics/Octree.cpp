@@ -286,10 +286,10 @@ void Octree::RegisterObject(Context* context)
     ATTRIBUTE(Octree, VAR_INT, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 
-void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void Octree::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     // If any of the (size) attributes change, resize the octree
-    Serializable::OnSetAttribute(attr, value);
+    Serializable::OnSetAttribute(attr, src);
     Resize(worldBoundingBox_, numLevels_);
 }
 

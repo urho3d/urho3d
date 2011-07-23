@@ -159,7 +159,7 @@ public:
     static void RegisterObject(Context* context);
     
     /// Handle attribute change
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& value);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     
     /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root
     void Resize(const BoundingBox& box, unsigned numLevels);

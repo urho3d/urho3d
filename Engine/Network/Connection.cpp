@@ -748,7 +748,7 @@ void Connection::ProcessExistingNode(Node* node)
     // Check if attributes have changed
     bool deltaUpdate, latestData;
     
-    node->PrepareUpdates(deltaUpdateBits_, nodeState.attributes_, deltaUpdate, latestData);
+    node->PrepareUpdates(deltaUpdateBits_, classCurrentState_[node->GetType()], nodeState.attributes_, deltaUpdate, latestData);
     
     // Check if user variables have changed. Note: variable removal is not supported
     changedVars_.Clear();
@@ -827,7 +827,8 @@ void Connection::ProcessExistingNode(Node* node)
             ComponentReplicationState& componentState = j->second_;
             componentState.frameNumber_ = frameNumber_;
             
-            component->PrepareUpdates(deltaUpdateBits_, componentState.attributes_, deltaUpdate, latestData);
+            component->PrepareUpdates(deltaUpdateBits_, classCurrentState_[component->GetType()], componentState.attributes_,
+                deltaUpdate, latestData);
             
             // Send deltaupdate message if necessary
             if (deltaUpdate)

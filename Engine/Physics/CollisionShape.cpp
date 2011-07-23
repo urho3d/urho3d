@@ -337,9 +337,9 @@ void CollisionShape::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(CollisionShape, VAR_RESOURCEREF, "Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
 }
 
-void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void CollisionShape::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, value);
+    Serializable::OnSetAttribute(attr, src);
     
     // Change of some attributes requires the geometry to be recreated
     switch (attr.offset_)

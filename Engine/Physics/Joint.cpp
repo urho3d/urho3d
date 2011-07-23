@@ -69,9 +69,9 @@ void Joint::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(Joint, VAR_VECTOR3, "Axis", GetAxis, SetAxis, Vector3, Vector3::ZERO, AM_DEFAULT);
 }
 
-void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void Joint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, value);
+    Serializable::OnSetAttribute(attr, src);
     
     // Change of the joint type requires the joint to be recreated
     if (attr.offset_ == offsetof(Joint, type_))

@@ -62,9 +62,9 @@ void Zone::RegisterObject(Context* context)
     ATTRIBUTE(Zone, VAR_INT, "Zone Priority", priority_, 0, AM_DEFAULT);
 }
 
-void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& value)
+void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
-    Serializable::OnSetAttribute(attr, value);
+    Serializable::OnSetAttribute(attr, src);
     
     // If bounding box changes, dirty the drawable as applicable
     switch (attr.offset_)

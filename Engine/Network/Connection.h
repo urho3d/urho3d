@@ -148,6 +148,8 @@ private:
     HashSet<ShortStringHash> changedVars_;
     /// Internal set for already processed nodes during an update
     HashSet<Node*> processedNodes_;
+    /// Internal map of preallocated variants of correct type per networked object class
+    Map<ShortStringHash, Vector<Variant> > classCurrentState_;
     /// Reused message buffer
     VectorBuffer msg_;
     /// Current controls
