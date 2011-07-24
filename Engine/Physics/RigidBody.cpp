@@ -69,13 +69,13 @@ void RigidBody::RegisterObject(Context* context)
     context->RegisterFactory<RigidBody>();
     
     ATTRIBUTE(RigidBody, VAR_FLOAT, "Mass", mass_, DEFAULT_MASS, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Physics Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_QUATERNION, "Physics Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector3, Vector3::ZERO, AM_DEFAULT | AM_LATESTDATA);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Rest Threshold", GetLinearRestThreshold, SetLinearRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Threshold", GetLinearDampingThreshold, SetLinearDampingThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Linear Damping Scale", GetLinearDampingScale, SetLinearDampingScale, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(RigidBody, VAR_VECTOR3, "Angular Velocity", GetAngularVelocity, SetAngularVelocity, Vector3, Vector3::ZERO, AM_FILE);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Rest Threshold", GetAngularRestThreshold, SetAngularRestThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Threshold", GetAngularDampingThreshold, SetAngularDampingThreshold, float, 0.01f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(RigidBody, VAR_FLOAT, "Angular Damping Scale", GetAngularDampingScale, SetAngularDampingScale, float, 0.0f, AM_DEFAULT);
@@ -90,7 +90,7 @@ void RigidBody::SetMass(float mass)
     UpdateMass();
 }
 
-void RigidBody::SetPosition(Vector3 position)
+void RigidBody::SetPosition(const Vector3& position)
 {
     if (body_)
     {
@@ -99,7 +99,7 @@ void RigidBody::SetPosition(Vector3 position)
     }
 }
 
-void RigidBody::SetRotation(Quaternion rotation)
+void RigidBody::SetRotation(const Quaternion& rotation)
 {
     if (body_)
     {
@@ -119,7 +119,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
     }
 }
 
-void RigidBody::SetLinearVelocity(Vector3 velocity)
+void RigidBody::SetLinearVelocity(const Vector3& velocity)
 {
     if (body_)
         dBodySetLinearVel(body_, velocity.x_, velocity.y_, velocity.z_);
@@ -143,7 +143,7 @@ void RigidBody::SetLinearDampingScale(float scale)
         dBodySetLinearDamping(body_, scale);
 }
 
-void RigidBody::SetAngularVelocity(Vector3 velocity)
+void RigidBody::SetAngularVelocity(const Vector3& velocity)
 {
     if (body_)
         dBodySetAngularVel(body_, velocity.x_, velocity.y_, velocity.z_);
@@ -229,37 +229,30 @@ void RigidBody::ResetForces()
     }
 }
 
-Vector3 RigidBody::GetPosition() const
+const Vector3& RigidBody::GetPosition() const
 {
     /// \todo Support parented nodes
+    // If no body, use smoothing target position in case node is smoothed; if it is not, it is same as GetPosition()
     if (body_)
-    {
-        const dReal* pos = dBodyGetPosition(body_);
-        return Vector3(pos[0], pos[1], pos[2]);
-    }
-    // Use smoothing target position in case node is smoothed; if it is not, it is same as GetPosition()
-    else return node_->GetTargetPosition();
+        return *reinterpret_cast<const Vector3*>(dBodyGetPosition(body_));
+    else
+        return node_->GetTargetPosition();
 }
 
-Quaternion RigidBody::GetRotation() const
+const Quaternion& RigidBody::GetRotation() const
 {
     /// \todo Support parented nodes
+    // If no body, use smoothing target rotation in case node is smoothed; if it is not, it is same as GetRotation()
     if (body_)
-    {
-        const dReal* quat = dBodyGetQuaternion(body_);
-        return Quaternion(quat[0], quat[1], quat[2], quat[3]);
-    }
-    // Use smoothing target rotation in case node is smoothed; if it is not, it is same as GetRotation()
-    else return node_->GetTargetRotation();
+        return *reinterpret_cast<const Quaternion*>(dBodyGetQuaternion(body_));
+    else
+        return node_->GetTargetRotation();
 }
 
-Vector3 RigidBody::GetLinearVelocity() const
+const Vector3& RigidBody::GetLinearVelocity() const
 {
     if (body_)
-    {
-        const dReal* vel = dBodyGetLinearVel(body_);
-        return Vector3(vel[0], vel[1], vel[2]);
-    }
+        return *reinterpret_cast<const Vector3*>(dBodyGetLinearVel(body_));
     else
         return Vector3::ZERO;
 }
@@ -288,13 +281,10 @@ float RigidBody::GetLinearDampingScale() const
         return 0.0f;
 }
 
-Vector3 RigidBody::GetAngularVelocity() const
+const Vector3& RigidBody::GetAngularVelocity() const
 {
     if (body_)
-    {
-        const dReal* vel = dBodyGetAngularVel(body_);
-        return Vector3(vel[0], vel[1], vel[2]);
-    }
+        return *reinterpret_cast<const Vector3*>(dBodyGetAngularVel(body_));
     else
         return Vector3::ZERO;
 }

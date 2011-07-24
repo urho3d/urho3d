@@ -47,13 +47,13 @@ public:
     /// Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic
     void SetMass(float mass);
     /// Set physics position
-    void SetPosition(Vector3 position);
+    void SetPosition(const Vector3& position);
     /// Set physics rotation
-    void SetRotation(Quaternion rotation);
+    void SetRotation(const Quaternion& rotation);
     /// Set physics transform
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     /// Set linear velocity
-    void SetLinearVelocity(Vector3 velocity);
+    void SetLinearVelocity(const Vector3& velocity);
     /// Set linear velocity deactivation threshold
     void SetLinearRestThreshold(float threshold);
     /// Set linear velocity damping threshold
@@ -61,7 +61,7 @@ public:
     /// Set linear velocity damping scale
     void SetLinearDampingScale(float scale);
     /// Set angular velocity
-    void SetAngularVelocity(Vector3 angularVelocity);
+    void SetAngularVelocity(const Vector3& angularVelocity);
     /// Set angular velocity deactivation threshold
     void SetAngularRestThreshold(float threshold);
     /// Set angular velocity damping threshold
@@ -88,11 +88,11 @@ public:
     /// Return ODE body ID
     dBodyID GetBody() const { return body_; }
     /// Return physics position
-    Vector3 GetPosition() const;
+    const Vector3& GetPosition() const;
     /// Return physics rotation
-    Quaternion GetRotation() const;
+    const Quaternion& GetRotation() const;
     /// Return linear velocity
-    Vector3 GetLinearVelocity() const;
+    const Vector3& GetLinearVelocity() const;
     /// Return linear velocity deactivation threshold
     float GetLinearRestThreshold() const;
     /// Return linear velocity damping threshold
@@ -100,7 +100,7 @@ public:
     /// Return linear velocity damping scale
     float GetLinearDampingScale() const;
     /// Return angular velocity
-    Vector3 GetAngularVelocity() const;
+    const Vector3& GetAngularVelocity() const;
     /// Return angular velocity deactivation threshold
     float GetAngularRestThreshold() const;
     /// Return angular velocity damping threshold

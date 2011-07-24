@@ -596,11 +596,10 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     if (!debug->IsInside(box))
         return;
     
-    const dReal* pos = dGeomGetPosition(geometry_);
-    dQuaternion quat;
-    dGeomGetQuaternion(geometry_, quat);
-    
-    Matrix3x4 transform(Vector3(pos[0], pos[1], pos[2]), Quaternion(quat[0], quat[1], quat[2], quat[3]), 1.0f);
+    const Vector3& position = *reinterpret_cast<const Vector3*>(dGeomGetPosition(geometry_));
+    Quaternion rotation;
+    dGeomGetQuaternion(geometry_, const_cast<float*>(rotation.GetData()));
+    Matrix3x4 transform(position, rotation, 1.0f);
     
     switch (dGeomGetClass(geometry_))
     {
