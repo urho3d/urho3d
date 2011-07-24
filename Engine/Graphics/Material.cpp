@@ -115,15 +115,12 @@ bool Material::Load(Deserializer& source)
         return true;
     
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    if (!cache)
-        return false;
     
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
     
     XMLElement rootElem = xml->GetRoot();
-    
     XMLElement techniqueElem = rootElem.GetChild("technique");
     techniques_.Clear();
     while (techniqueElem)

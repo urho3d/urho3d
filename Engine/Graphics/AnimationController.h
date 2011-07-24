@@ -70,13 +70,13 @@ public:
     /// Update the animations. Is called from HandleScenePostUpdate()
     void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success
-    bool Play(const String& name, int layer, bool looped, float fadeInTime = 0.0f);
+    bool Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success
-    bool PlayExclusive(const String& name, int layer, bool looped, float fadeTime = 0.0f);
+    bool PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime = 0.0f);
     /// Stop an animation. Zero fadetime is instant. Return true on success
     bool Stop(const String& name, float fadeOutTime = 0.0f);
     /// Stop all animations on a specific layer. Zero fadetime is instant
-    void StopLayer(int layer, float fadeOutTime = 0.0f);
+    void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
     /// Stop all animations. Zero fadetime is instant
     void StopAll(float fadeTime = 0.0f);
     /// Fade animation to target weight. Return true on success
@@ -85,7 +85,7 @@ public:
     bool FadeOthers(const String& name, float targetWeight, float fadeTime);
     
     /// Set animation blending layer priority. Return true on success
-    bool SetLayer(const String& name, int layer);
+    bool SetLayer(const String& name, unsigned char layer);
     /// Set animation start bone. Return true on success
     bool SetStartBone(const String& name, const String& startBoneName);
     /// Set animation time position. Return true on success
@@ -106,7 +106,7 @@ public:
     /// Return whether an animation is fading out
     bool IsFadingOut(const String& name) const;
     /// Return animation blending layer
-    int GetLayer(const String& name) const;
+    unsigned char GetLayer(const String& name) const;
     /// Return animation start bone, or null if no such animation
     Bone* GetStartBone(const String& name) const;
     /// Return animation start bone name, or null if no such animation
@@ -129,9 +129,13 @@ public:
     float GetAutoFade(const String& name) const;
     
     /// Set animations attribute
-    void SetAnimationsAttr(PODVector<unsigned char> value);
+    void SetAnimationsAttr(const PODVector<unsigned char>& value);
+    /// Set network animations attribute
+    void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
     /// Return animations attribute
-    PODVector<unsigned char> GetAnimationsAttr() const;
+    const PODVector<unsigned char>& GetAnimationsAttr() const;
+    /// Return net animations attribute
+    const PODVector<unsigned char>& GetNetAnimationsAttr() const;
     
 protected:
     /// Handle node being assigned
@@ -147,4 +151,6 @@ private:
     
     /// Controlled animations
     Vector<AnimationControl> animations_;
+    /// Attribute buffer for network replication
+    mutable VectorBuffer attrBuffer_;
 };

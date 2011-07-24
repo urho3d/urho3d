@@ -37,6 +37,12 @@
 
 static String noBoneName;
 
+static const unsigned char CTRL_STARTBONE = 0x1;
+static const unsigned char CTRL_LOOPED = 0x2;
+static const unsigned char CTRL_NLERP = 0x4;
+static const unsigned char CTRL_REVERSE = 0x8;
+static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
+
 OBJECTTYPESTATIC(AnimationController);
 
 AnimationController::AnimationController(Context* context) :
@@ -52,7 +58,8 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
 void AnimationController::Update(float timeStep)
@@ -88,14 +95,19 @@ void AnimationController::Update(float timeStep)
             
             // Process weight fade
             float currentWeight = state->GetWeight();
-            if (currentWeight != targetWeight && fadeTime > 0.0f)
+            if (currentWeight != targetWeight)
             {
-                float weightDelta = 1.0f / fadeTime * timeStep;
-                if (currentWeight < targetWeight)
-                    currentWeight = Min(currentWeight + weightDelta, targetWeight);
-                else if (currentWeight > targetWeight)
-                    currentWeight = Max(currentWeight - weightDelta, targetWeight);
-                state->SetWeight(currentWeight);
+                if (fadeTime > 0.0f)
+                {
+                    float weightDelta = 1.0f / fadeTime * timeStep;
+                    if (currentWeight < targetWeight)
+                        currentWeight = Min(currentWeight + weightDelta, targetWeight);
+                    else if (currentWeight > targetWeight)
+                        currentWeight = Max(currentWeight - weightDelta, targetWeight);
+                    state->SetWeight(currentWeight);
+                }
+                else
+                    state->SetWeight(targetWeight);
             }
             
             // Remove if weight zero and target weight zero
@@ -114,7 +126,7 @@ void AnimationController::Update(float timeStep)
     }
 }
 
-bool AnimationController::Play(const String& name, int layer, bool looped, float fadeInTime)
+bool AnimationController::Play(const String& name, unsigned char layer, bool looped, float fadeInTime)
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
@@ -144,19 +156,13 @@ bool AnimationController::Play(const String& name, int layer, bool looped, float
     
     state->SetLayer(layer);
     state->SetLooped(looped);
-    
-    if (fadeInTime > 0.0f)
-    {
-        animations_[index].targetWeight_ = 1.0f;
-        animations_[index].fadeTime_ = fadeInTime;
-    }
-    else
-        state->SetWeight(1.0f);
+    animations_[index].targetWeight_ = 1.0f;
+    animations_[index].fadeTime_ = fadeInTime;
     
     return true;
 }
 
-bool AnimationController::PlayExclusive(const String& name, int layer, bool looped, float fadeTime)
+bool AnimationController::PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime)
 {
     FadeOthers(name, 0.0f, fadeTime);
     return Play(name, layer, looped, fadeTime);
@@ -171,56 +177,29 @@ bool AnimationController::Stop(const String& name, float fadeOutTime)
     unsigned index;
     AnimationState* state;
     FindAnimation(name, index, state);
-    if (fadeOutTime <= 0.0f)
+    if (index != M_MAX_UNSIGNED)
     {
-        if (index != M_MAX_UNSIGNED)
-            animations_.Erase(animations_.Begin() + index);
-        if (state)
-            model->RemoveAnimationState(state);
-    }
-    else
-    {
-        if (index != M_MAX_UNSIGNED)
-        {
-            animations_[index].targetWeight_ = 0.0f;
-            animations_[index].fadeTime_ = fadeOutTime;
-        }
+        animations_[index].targetWeight_ = 0.0f;
+        animations_[index].fadeTime_ = fadeOutTime;
     }
     
     return index != M_MAX_UNSIGNED || state != 0;
 }
 
-void AnimationController::StopLayer(int layer, float fadeOutTime)
+void AnimationController::StopLayer(unsigned char layer, float fadeOutTime)
 {
     AnimatedModel* model = GetComponent<AnimatedModel>();
     if (!model)
         return;
     
-    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
         AnimationState* state = model->GetAnimationState(i->hash_);
-        bool remove = false;
-        
         if (state && state->GetLayer() == layer)
         {
-            if (fadeOutTime <= 0.0f)
-            {
-                remove = true;
-                
-                if (state)
-                    model->RemoveAnimationState(state);
-            }
-            else
-            {
-                i->targetWeight_ = 0.0f;
-                i->fadeTime_ = fadeOutTime;
-            }
+            i->targetWeight_ = 0.0f;
+            i->fadeTime_ = fadeOutTime;
         }
-        
-        if (remove)
-            i = animations_.Erase(i);
-        else
-            ++i;
     }
 }
 
@@ -230,27 +209,10 @@ void AnimationController::StopAll(float fadeOutTime)
     if (!model)
         return;
     
-    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End();)
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
-        bool remove = false;
-        
-        if (fadeOutTime <= 0.0f)
-        {
-            remove = true;
-            AnimationState* state = model->GetAnimationState(i->hash_);
-            if (state)
-                model->RemoveAnimationState(state);
-        }
-        else
-        {
-            i->targetWeight_ = 0.0f;
-            i->fadeTime_ = fadeOutTime;
-        }
-    
-        if (remove)
-            i = animations_.Erase(i);
-        else
-            ++i;
+        i->targetWeight_ = 0.0f;
+        i->fadeTime_ = fadeOutTime;
     }
 }
 
@@ -263,7 +225,7 @@ bool AnimationController::Fade(const String& name, float targetWeight, float fad
         return false;
     
     animations_[index].targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-    animations_[index].fadeTime_ = Max(fadeTime, M_EPSILON);
+    animations_[index].fadeTime_ = fadeTime;
     return true;
 }
 
@@ -276,7 +238,7 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
         return false;
     
     AnimatedModel* model = GetComponent<AnimatedModel>();
-    int layer = state->GetLayer();
+    unsigned char layer = state->GetLayer();
     
     for (unsigned i = 0; i < animations_.Size(); ++i)
     {
@@ -287,14 +249,14 @@ bool AnimationController::FadeOthers(const String& name, float targetWeight, flo
             if (otherState && otherState->GetLayer() == layer)
             {
                 control.targetWeight_ = Clamp(targetWeight, 0.0f, 1.0f);
-                control.fadeTime_ = Max(fadeTime, M_EPSILON);
+                control.fadeTime_ = fadeTime;
             }
         }
     }
     return true;
 }
 
-bool AnimationController::SetLayer(const String& name, int layer)
+bool AnimationController::SetLayer(const String& name, unsigned char layer)
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -347,7 +309,8 @@ bool AnimationController::SetWeight(const String& name, float weight)
         return false;
     
     state->SetWeight(weight);
-    // Stop any ongoing fade
+    // Set the target weight with zero fadetime for network replication
+    animations_[index].targetWeight_ = weight;
     animations_[index].fadeTime_ = 0.0f;
     return true;
 }
@@ -405,7 +368,7 @@ bool AnimationController::IsFadingOut(const String& name) const
         || (!state->IsLooped() && state->GetTime() >= state->GetLength() && animations_[index].autoFadeTime_);
 }
 
-int AnimationController::GetLayer(const String& name) const
+unsigned char AnimationController::GetLayer(const String& name) const
 {
     AnimationState* state = FindAnimationState(name);
     if (!state)
@@ -491,7 +454,7 @@ float AnimationController::GetAutoFade(const String& name) const
     return animations_[index].autoFadeTime_;
 }
 
-void AnimationController::SetAnimationsAttr(PODVector<unsigned char> value)
+void AnimationController::SetAnimationsAttr(const PODVector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     animations_.Resize(buf.ReadVLE());
@@ -505,19 +468,150 @@ void AnimationController::SetAnimationsAttr(PODVector<unsigned char> value)
     }
 }
 
-PODVector<unsigned char> AnimationController::GetAnimationsAttr() const
+void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& value)
 {
-    VectorBuffer buf;
-    buf.WriteVLE(animations_.Size());
+    // To apply animations, the model must exist first (practically, have been added before AnimationController)
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    if (!model)
+        return;
+    
+    MemoryBuffer buf(value);
+    
+    // Check which animations we need to remove
+    HashSet<StringHash> processedAnimations;
+    
+    unsigned numAnimations = buf.ReadVLE();
+    while (numAnimations)
+    {
+        --numAnimations;
+        
+        StringHash animHash = buf.ReadStringHash();
+        unsigned char ctrl = buf.ReadUByte();
+        StringHash startBoneHash;
+        if (ctrl & CTRL_STARTBONE)
+            startBoneHash = buf.ReadStringHash();
+        unsigned char layer = buf.ReadUByte();
+        float speed = (float)buf.ReadUByte() / 32.0f;
+        if (ctrl & CTRL_REVERSE)
+            speed = -speed;
+        float targetWeight = (float)buf.ReadUByte() / 255.0f;
+        float fadeTime = (float)buf.ReadUByte() / 32.0f;
+        float autoFadeTime = (float)buf.ReadUByte() / 32.0f;
+        
+        processedAnimations.Insert(animHash);
+        
+        // Check if the animation state exists. If not, add
+        AnimationState* state = model->GetAnimationState(animHash);
+        if (!state)
+        {
+            Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animHash);
+            state = model->AddAnimationState(newAnimation);
+            if (!state)
+                continue;
+        }
+        
+        if (ctrl & CTRL_STARTBONE)
+            state->SetStartBone(model->GetSkeleton().GetBone(startBoneHash));
+        state->SetLayer(layer);
+        state->SetLooped((ctrl & CTRL_LOOPED) != 0);
+        state->SetUseNlerp((ctrl & CTRL_NLERP) != 0);
+        
+        // Check if the internal control structure exists. If not, add
+        unsigned index;
+        for (index = 0; index < animations_.Size(); ++index)
+        {
+            if (animations_[index].hash_ == animHash)
+                break;
+        }
+        if (index == animations_.Size())
+        {
+            AnimationControl newControl;
+            newControl.hash_ = animHash;
+            animations_.Push(newControl);
+        }
+        
+        AnimationControl& control = animations_[index];
+        control.speed_ = speed;
+        control.targetWeight_ = targetWeight;
+        control.fadeTime_ = fadeTime;
+        control.autoFadeTime_ = autoFadeTime;
+    }
+    
+    // Now set any extra animations to fade out
+    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        if (!processedAnimations.Contains(i->hash_))
+        {
+            i->targetWeight_ = 0.0f;
+            i->fadeTime_ = EXTRA_ANIM_FADEOUT_TIME;
+        }
+    }
+}
+
+const PODVector<unsigned char>& AnimationController::GetAnimationsAttr() const
+{
+    attrBuffer_.Clear();
+    attrBuffer_.WriteVLE(animations_.Size());
     for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
-        buf.WriteStringHash(i->hash_);
-        buf.WriteFloat(i->speed_);
-        buf.WriteFloat(i->targetWeight_);
-        buf.WriteFloat(i->fadeTime_);
-        buf.WriteFloat(i->autoFadeTime_);
+        attrBuffer_.WriteStringHash(i->hash_);
+        attrBuffer_.WriteFloat(i->speed_);
+        attrBuffer_.WriteFloat(i->targetWeight_);
+        attrBuffer_.WriteFloat(i->fadeTime_);
+        attrBuffer_.WriteFloat(i->autoFadeTime_);
     }
-    return buf.GetBuffer();
+    return attrBuffer_.GetBuffer();
+}
+
+const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
+{
+    /// \todo Replicate instant weight or time position changes properly
+    attrBuffer_.Clear();
+    
+    AnimatedModel* model = GetComponent<AnimatedModel>();
+    if (!model)
+    {
+        attrBuffer_.WriteVLE(0);
+        return attrBuffer_.GetBuffer();
+    }
+    
+    unsigned validAnimations = 0;
+    for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        if (model->GetAnimationState(i->hash_))
+            ++validAnimations;
+    }
+    
+    attrBuffer_.WriteVLE(validAnimations);
+    for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        AnimationState* state = model->GetAnimationState(i->hash_);
+        if (!state)
+            continue;
+        
+        unsigned char ctrl = 0;
+        Bone* startBone = state->GetStartBone();
+        if (startBone && startBone != model->GetSkeleton().GetRootBone())
+            ctrl |= CTRL_STARTBONE;
+        if (state->IsLooped())
+            ctrl |= CTRL_LOOPED;
+        if (state->GetUseNlerp())
+            ctrl |= CTRL_NLERP;
+        if (i->speed_ < 0.0f)
+            ctrl |= CTRL_REVERSE;
+        
+        attrBuffer_.WriteStringHash(i->hash_);
+        attrBuffer_.WriteUByte(ctrl);
+        if (ctrl & CTRL_STARTBONE)
+            attrBuffer_.WriteStringHash(startBone->nameHash_);
+        attrBuffer_.WriteUByte(state->GetLayer());
+        attrBuffer_.WriteUByte((unsigned char)Clamp(fabsf(i->speed_) * 32.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteUByte((unsigned char)(i->targetWeight_ * 255.0f));
+        attrBuffer_.WriteUByte((unsigned char)Clamp(i->fadeTime_ * 32.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 32.0f, 0.0f, 255.0f));
+    }
+    
+    return attrBuffer_.GetBuffer();
 }
 
 void AnimationController::OnNodeSet(Node* node)

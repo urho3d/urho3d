@@ -148,7 +148,7 @@ void AnimationState::AddTime(float delta)
     SetTime(time);
 }
 
-void AnimationState::SetLayer(int layer)
+void AnimationState::SetLayer(unsigned char layer)
 {
     if (layer != layer_)
     {

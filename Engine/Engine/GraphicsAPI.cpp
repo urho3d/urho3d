@@ -553,8 +553,8 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "float get_weight() const", asMETHOD(AnimationState, GetWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_time(float)", asMETHOD(AnimationState, SetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_time() const", asMETHOD(AnimationState, GetTime), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationState", "void set_layer(int)", asMETHOD(AnimationState, SetLayer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationState", "int get_layer() const", asMETHOD(AnimationState, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void set_layer(uint8)", asMETHOD(AnimationState, SetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "uint8 get_layer() const", asMETHOD(AnimationState, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_useNlerp(bool)", asMETHOD(AnimationState, SetUseNlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool get_useNlerp() const", asMETHOD(AnimationState, GetUseNlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "Animation@+ get_animation() const", asMETHOD(AnimationState, GetAnimation), asCALL_THISCALL);
@@ -596,14 +596,14 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
 static void RegisterAnimationController(asIScriptEngine* engine)
 {
     RegisterComponent<AnimationController>(engine, "AnimationController");
-    engine->RegisterObjectMethod("AnimationController", "bool Play(const String&in, int, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, Play), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool PlayExclusive(const String&in, int, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, PlayExclusive), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool Play(const String&in, uint8, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, Play), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool PlayExclusive(const String&in, uint8, bool, float fadeTime = 0.0f)", asMETHOD(AnimationController, PlayExclusive), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "void Stop(const String&in, float fadeTime = 0.0f)", asMETHOD(AnimationController, Stop), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "void StopLayer(int, float fadeTime = 0.0f)", asMETHOD(AnimationController, StopLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "void StopLayer(uint8, float fadeTime = 0.0f)", asMETHOD(AnimationController, StopLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "void StopAll(float fadeTime = 0.0f)", asMETHOD(AnimationController, StopAll), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool Fade(const String&in, float, float)", asMETHOD(AnimationController, Fade), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool FadeOthers(const String&in, float, float)", asMETHOD(AnimationController, FadeOthers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool SetLayer(const String&in, int)", asMETHOD(AnimationController, SetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool SetLayer(const String&in, uint8)", asMETHOD(AnimationController, SetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetStartBone(const String&in, const String&in)", asMETHOD(AnimationController, SetStartBone), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetTime(const String&in, float)", asMETHOD(AnimationController, SetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetWeight(const String&in, float)", asMETHOD(AnimationController, SetWeight), asCALL_THISCALL);
@@ -613,7 +613,7 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String&in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String&in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String&in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "int GetLayer(const String&in) const", asMETHOD(AnimationController, GetLayer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "uint8 GetLayer(const String&in) const", asMETHOD(AnimationController, GetLayer), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "const String& GetStartBone(const String&in) const", asMETHOD(AnimationController, GetStartBoneName), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "float GetTime(const String&in) const", asMETHOD(AnimationController, GetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "float GetWeight(const String&in) const", asMETHOD(AnimationController, GetWeight), asCALL_THISCALL);

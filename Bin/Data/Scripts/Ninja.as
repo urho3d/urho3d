@@ -244,13 +244,16 @@ class Ninja : GameObject
         if (throwTime >= 0)
             throwTime -= timeStep;
 
+        // Start fading the attack animation after it has progressed past a certain point
+        if (controller.GetTime("Models/Ninja_Attack1.ani") > 0.1)
+            controller.Fade("Models/Ninja_Attack1.ani", 0.0, 0.5);
+
         if ((controls.IsPressed(CTRL_FIRE, prevControls)) && (throwTime <= 0))
         {
             Vector3 projectileVel = GetAim() * ninjaThrowVelocity;
 
             controller.Play("Models/Ninja_Attack1.ani", LAYER_ATTACK, false, 0.0);
             controller.SetTime("Models/Ninja_Attack1.ani", 0.0); // Always play from beginning
-            controller.Fade("Models/Ninja_Attack1.ani", 0.0, 0.5);
 
             Node@ snowball = SpawnObject(node.position + vel * timeStep + q * ninjaThrowPosition, GetAim(), "SnowBall");
             RigidBody@ snowballBody = snowball.GetComponent("RigidBody");

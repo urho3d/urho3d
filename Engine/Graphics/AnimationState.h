@@ -56,7 +56,7 @@ public:
     /// Modify time position
     void AddTime(float delta);
     /// Set blending layer
-    void SetLayer(int layer);
+    void SetLayer(unsigned char layer);
     /// Set whether to use nlerp instead of slerp for rotation, default false
     void SetUseNlerp(bool enable);
     
@@ -75,7 +75,7 @@ public:
     /// Return animation length
     float GetLength() const;
     /// Return blending layer
-    int GetLayer() const { return layer_; }
+    unsigned char GetLayer() const { return layer_; }
     /// Return whether using nlerp for rotation
     bool GetUseNlerp() const { return useNlerp_; }
     
@@ -100,7 +100,7 @@ private:
     /// Time position
     float time_;
     /// Blending layer
-    int layer_;
+    unsigned char layer_;
     /// Nlerp flag
     bool useNlerp_;
 };

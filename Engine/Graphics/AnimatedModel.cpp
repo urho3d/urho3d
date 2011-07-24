@@ -632,7 +632,7 @@ void AnimatedModel::SetAnimationStatesAttr(PODVector<unsigned char> value)
             state->SetLooped(buf.ReadBool());
             state->SetWeight(buf.ReadFloat());
             state->SetTime(buf.ReadFloat());
-            state->SetLayer(buf.ReadInt());
+            state->SetLayer(buf.ReadUByte());
             state->SetUseNlerp(buf.ReadBool());
         }
         else
