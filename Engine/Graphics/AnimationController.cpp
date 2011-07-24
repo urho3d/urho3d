@@ -38,13 +38,14 @@
 
 static String noBoneName;
 
-static const unsigned char CTRL_STARTBONE = 0x1;
-static const unsigned char CTRL_LOOPED = 0x2;
-static const unsigned char CTRL_NLERP = 0x4;
-static const unsigned char CTRL_SETTIME = 0x8;
-static const unsigned char CTRL_SETWEIGHT = 0x10;
+static const unsigned char CTRL_LOOPED = 0x1;
+static const unsigned char CTRL_NLERP = 0x2;
+static const unsigned char CTRL_STARTBONE = 0x4;
+static const unsigned char CTRL_AUTOFADE = 0x8;
+static const unsigned char CTRL_SETTIME = 0x10;
+static const unsigned char CTRL_SETWEIGHT = 0x20;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
-static const float COMMAND_DURATION = 0.25f;
+static const float COMMAND_STAY_TIME = 0.25f;
 
 OBJECTTYPESTATIC(AnimationController);
 
@@ -118,11 +119,11 @@ void AnimationController::Update(float timeStep)
                 remove = true;
         }
         
-        // Decrement the command durations
-        if (i->setTimeDuration_ > 0.0f)
-            i->setTimeDuration_ = Max(i->setTimeDuration_ - timeStep, 0.0f);
-        if (i->setWeightDuration_ > 0.0f)
-            i->setWeightDuration_ = Max(i->setWeightDuration_ - timeStep, 0.0f);
+        // Decrement the command time-to-live values
+        if (i->setTimeTtl_ > 0.0f)
+            i->setTimeTtl_ = Max(i->setTimeTtl_ - timeStep, 0.0f);
+        if (i->setWeightTtl_ > 0.0f)
+            i->setWeightTtl_ = Max(i->setWeightTtl_ - timeStep, 0.0f);
         
         if (remove)
         {
@@ -299,8 +300,8 @@ bool AnimationController::SetTime(const String& name, float time)
     state->SetTime(time);
     // Prepare "set time" command for network replication
     animations_[index].setTime_ = (unsigned short)(time / state->GetLength() * 65535.0f);
-    animations_[index].setTimeDuration_ = COMMAND_DURATION;
-    ++animations_[index].setTimeRevision_;
+    animations_[index].setTimeTtl_ = COMMAND_STAY_TIME;
+    ++animations_[index].setTimeRev_;
     return true;
 }
 
@@ -328,8 +329,8 @@ bool AnimationController::SetWeight(const String& name, float weight)
     state->SetWeight(weight);
     // Prepare "set weight" command for network replication
     animations_[index].setWeight_ = (unsigned char)(weight * 255.0f);
-    animations_[index].setWeightDuration_ = COMMAND_DURATION;
-    ++animations_[index].setWeightRevision_;
+    animations_[index].setWeightTtl_ = COMMAND_STAY_TIME;
+    ++animations_[index].setWeightRev_;
     return true;
 }
 
@@ -503,51 +504,22 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
     {
         --numAnimations;
         
-        unsigned short setTime;
-        unsigned char setTimeRevision;
-        unsigned char setWeight;
-        unsigned char setWeightRevision;
-        
         StringHash animHash = buf.ReadStringHash();
-        unsigned char ctrl = buf.ReadUByte();
-        StringHash startBoneHash;
-        if (ctrl & CTRL_STARTBONE)
-            startBoneHash = buf.ReadStringHash();
-        unsigned char layer = buf.ReadUByte();
-        float speed = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
-        float targetWeight = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
-        float fadeTime = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade time
-        float autoFadeTime = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade time
-        if (ctrl & CTRL_SETTIME)
-        {
-            setTimeRevision = buf.ReadUByte();
-            setTime = buf.ReadUShort();
-        }
-        if (ctrl & CTRL_SETWEIGHT)
-        {
-            setWeightRevision = buf.ReadUByte();
-            setWeight = buf.ReadUByte();
-        }
-        
         processedAnimations.Insert(animHash);
         
-        // Check if the animation state exists. If not, add
+       // Check if the animation state exists. If not, add new
         AnimationState* state = model->GetAnimationState(animHash);
         if (!state)
         {
             Animation* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animHash);
             state = model->AddAnimationState(newAnimation);
             if (!state)
-                continue;
+            {
+                LOGERROR("Animation update applying aborted due to unknown animation");
+                return;
+            }
         }
-        
-        if (ctrl & CTRL_STARTBONE)
-            state->SetStartBone(model->GetSkeleton().GetBone(startBoneHash));
-        state->SetLayer(layer);
-        state->SetLooped((ctrl & CTRL_LOOPED) != 0);
-        state->SetUseNlerp((ctrl & CTRL_NLERP) != 0);
-        
-        // Check if the internal control structure exists. If not, add
+        // Check if the internal control structure exists. If not, add new
         unsigned index;
         for (index = 0; index < animations_.Size(); ++index)
         {
@@ -561,26 +533,46 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_.Push(newControl);
         }
         
-        AnimationControl& control = animations_[index];
-        control.speed_ = speed;
-        control.targetWeight_ = targetWeight;
-        control.fadeTime_ = fadeTime;
-        control.autoFadeTime_ = autoFadeTime;
-        
-        // Apply the time & weight commands now
-        if ((ctrl & CTRL_SETTIME) && setTimeRevision != control.setTimeRevision_)
+        unsigned char ctrl = buf.ReadUByte();
+        state->SetLayer(buf.ReadUByte());
+        state->SetLooped((ctrl & CTRL_LOOPED) != 0);
+        state->SetUseNlerp((ctrl & CTRL_NLERP) != 0);
+        animations_[index].speed_ = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
+        animations_[index].targetWeight_ = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
+        animations_[index].fadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
+        if (ctrl & CTRL_STARTBONE)
+            state->SetStartBone(model->GetSkeleton().GetBone(buf.ReadStringHash()));
+        else
+            state->SetStartBone(0);
+        if (ctrl & CTRL_AUTOFADE)
+            animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
+        else
+            animations_[index].autoFadeTime_ = 0.0f;
+        if (ctrl & CTRL_SETTIME)
         {
-            control.setTimeRevision_ = setTimeRevision;
-            state->SetTime(((float)setTime / 65535.0f) * state->GetLength());
+            unsigned char setTimeRev = buf.ReadUByte();
+            unsigned short setTime = buf.ReadUShort();
+            // Apply set time command only if revision differs
+            if (setTimeRev != animations_[index].setTimeRev_)
+            {
+                state->SetTime(((float)setTime / 65535.0f) * state->GetLength());
+                animations_[index].setTimeRev_ = setTimeRev;
+            }
         }
-        if ((ctrl & CTRL_SETWEIGHT) && setWeightRevision != control.setWeightRevision_)
+        if (ctrl & CTRL_SETWEIGHT)
         {
-            control.setWeightRevision_ = setWeightRevision;
-            state->SetWeight((float)setWeight / 255.0f);
+            unsigned char setWeightRev = buf.ReadUByte();
+            unsigned char setWeight = buf.ReadUByte();
+            // Apply set weight command only if revision differs
+            if (setWeightRev != animations_[index].setWeightRev_)
+            {
+                state->SetWeight((float)setWeight / 255.0f);
+                animations_[index].setWeightRev_ = setWeightRev;
+            }
         }
     }
     
-    // Now set any extra animations to fade out
+    // Set any extra animations to fade out
     for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
         if (!processedAnimations.Contains(i->hash_))
@@ -608,7 +600,6 @@ const PODVector<unsigned char>& AnimationController::GetAnimationsAttr() const
 
 const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() const
 {
-    /// \todo Replicate instant weight or time position changes properly
     attrBuffer_.Clear();
     
     AnimatedModel* model = GetComponent<AnimatedModel>();
@@ -634,34 +625,37 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
         
         unsigned char ctrl = 0;
         Bone* startBone = state->GetStartBone();
-        if (startBone && startBone != model->GetSkeleton().GetRootBone())
-            ctrl |= CTRL_STARTBONE;
         if (state->IsLooped())
             ctrl |= CTRL_LOOPED;
         if (state->GetUseNlerp())
             ctrl |= CTRL_NLERP;
-        if (i->setTimeDuration_ > 0.0f)
+        if (startBone && startBone != model->GetSkeleton().GetRootBone())
+            ctrl |= CTRL_STARTBONE;
+        if (i->autoFadeTime_ > 0.0f)
+            ctrl |= CTRL_AUTOFADE;
+        if (i->setTimeTtl_ > 0.0f)
             ctrl |= CTRL_SETTIME;
-        if (i->setWeightDuration_ > 0.0f)
+        if (i->setWeightTtl_ > 0.0f)
             ctrl |= CTRL_SETWEIGHT;
         
         attrBuffer_.WriteStringHash(i->hash_);
         attrBuffer_.WriteUByte(ctrl);
-        if (ctrl & CTRL_STARTBONE)
-            attrBuffer_.WriteStringHash(startBone->nameHash_);
         attrBuffer_.WriteUByte(state->GetLayer());
         attrBuffer_.WriteShort((short)Clamp(i->speed_ * 2048.0f, -32767.0f, 32767.0f));
         attrBuffer_.WriteUByte((unsigned char)(i->targetWeight_ * 255.0f));
         attrBuffer_.WriteUByte((unsigned char)Clamp(i->fadeTime_ * 64.0f, 0.0f, 255.0f));
-        attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 64.0f, 0.0f, 255.0f));
+        if (ctrl & CTRL_STARTBONE)
+            attrBuffer_.WriteStringHash(startBone->nameHash_);
+        if (ctrl & CTRL_AUTOFADE)
+            attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 64.0f, 0.0f, 255.0f));
         if (ctrl & CTRL_SETTIME)
         {
-            attrBuffer_.WriteUByte(i->setTimeRevision_);
+            attrBuffer_.WriteUByte(i->setTimeRev_);
             attrBuffer_.WriteUShort(i->setTime_);
         }
         if (ctrl & CTRL_SETWEIGHT)
         {
-            attrBuffer_.WriteUByte(i->setWeightRevision_);
+            attrBuffer_.WriteUByte(i->setWeightRev_);
             attrBuffer_.WriteUByte(i->setWeight_);
         }
     }

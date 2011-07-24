@@ -59,12 +59,16 @@ void AnimationState::SetStartBone(Bone* startBone)
         return;
     
     Skeleton& skeleton = model_->GetSkeleton();
-    const Vector<Bone>& bones = skeleton.GetBones();
     Bone* rootBone = skeleton.GetRootBone();
     if (!rootBone)
         return;
     if (!startBone)
         startBone = rootBone;
+    
+    // Do not reassign if the start bone did not actually change
+    if (startBone == startBone_)
+        return;
+    
     startBone_ = startBone;
     
     trackToBoneMap_.Clear();
@@ -75,7 +79,7 @@ void AnimationState::SetStartBone(Bone* startBone)
     
     for (unsigned i = 0; i < tracks.Size(); ++i)
     {
-        // Include those tracks that are either the startbone itself, or its children
+        // Include those tracks that are either the start bone itself, or its children
         Bone* trackBone = 0;
         const StringHash& nameHash = tracks[i].nameHash_;
         
