@@ -27,6 +27,7 @@
 #include "AnimationController.h"
 #include "AnimationState.h"
 #include "Context.h"
+#include "Log.h"
 #include "MemoryBuffer.h"
 #include "Profiler.h"
 #include "ResourceCache.h"
@@ -40,8 +41,10 @@ static String noBoneName;
 static const unsigned char CTRL_STARTBONE = 0x1;
 static const unsigned char CTRL_LOOPED = 0x2;
 static const unsigned char CTRL_NLERP = 0x4;
-static const unsigned char CTRL_REVERSE = 0x8;
+static const unsigned char CTRL_SETTIME = 0x8;
+static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
+static const float COMMAND_DURATION = 0.25f;
 
 OBJECTTYPESTATIC(AnimationController);
 
@@ -114,6 +117,12 @@ void AnimationController::Update(float timeStep)
             if (state->GetWeight() == 0.0f && (targetWeight == 0.0f || fadeTime == 0.0f))
                 remove = true;
         }
+        
+        // Decrement the command durations
+        if (i->setTimeDuration_ > 0.0f)
+            i->setTimeDuration_ = Max(i->setTimeDuration_ - timeStep, 0.0f);
+        if (i->setWeightDuration_ > 0.0f)
+            i->setWeightDuration_ = Max(i->setWeightDuration_ - timeStep, 0.0f);
         
         if (remove)
         {
@@ -280,11 +289,18 @@ bool AnimationController::SetStartBone(const String& name, const String& startBo
 
 bool AnimationController::SetTime(const String& name, float time)
 {
-    AnimationState* state = FindAnimationState(name);
-    if (!state)
+    unsigned index;
+    AnimationState* state;
+    FindAnimation(name, index, state);
+    if (index == M_MAX_UNSIGNED || !state)
         return false;
     
+    time = Clamp(time, 0.0f, state->GetLength());
     state->SetTime(time);
+    // Prepare "set time" command for network replication
+    animations_[index].setTime_ = (unsigned short)(time / state->GetLength() * 65535.0f);
+    animations_[index].setTimeDuration_ = COMMAND_DURATION;
+    ++animations_[index].setTimeRevision_;
     return true;
 }
 
@@ -308,10 +324,12 @@ bool AnimationController::SetWeight(const String& name, float weight)
     if (index == M_MAX_UNSIGNED || !state)
         return false;
     
+    weight = Clamp(weight, 0.0f, 1.0f);
     state->SetWeight(weight);
-    // Set the target weight with zero fadetime for network replication
-    animations_[index].targetWeight_ = weight;
-    animations_[index].fadeTime_ = 0.0f;
+    // Prepare "set weight" command for network replication
+    animations_[index].setWeight_ = (unsigned char)(weight * 255.0f);
+    animations_[index].setWeightDuration_ = COMMAND_DURATION;
+    ++animations_[index].setWeightRevision_;
     return true;
 }
 
@@ -485,18 +503,31 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
     {
         --numAnimations;
         
+        unsigned short setTime;
+        unsigned char setTimeRevision;
+        unsigned char setWeight;
+        unsigned char setWeightRevision;
+        
         StringHash animHash = buf.ReadStringHash();
         unsigned char ctrl = buf.ReadUByte();
         StringHash startBoneHash;
         if (ctrl & CTRL_STARTBONE)
             startBoneHash = buf.ReadStringHash();
         unsigned char layer = buf.ReadUByte();
-        float speed = (float)buf.ReadUByte() / 32.0f;
-        if (ctrl & CTRL_REVERSE)
-            speed = -speed;
-        float targetWeight = (float)buf.ReadUByte() / 255.0f;
-        float fadeTime = (float)buf.ReadUByte() / 32.0f;
-        float autoFadeTime = (float)buf.ReadUByte() / 32.0f;
+        float speed = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
+        float targetWeight = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
+        float fadeTime = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade time
+        float autoFadeTime = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade time
+        if (ctrl & CTRL_SETTIME)
+        {
+            setTimeRevision = buf.ReadUByte();
+            setTime = buf.ReadUShort();
+        }
+        if (ctrl & CTRL_SETWEIGHT)
+        {
+            setWeightRevision = buf.ReadUByte();
+            setWeight = buf.ReadUByte();
+        }
         
         processedAnimations.Insert(animHash);
         
@@ -535,6 +566,18 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         control.targetWeight_ = targetWeight;
         control.fadeTime_ = fadeTime;
         control.autoFadeTime_ = autoFadeTime;
+        
+        // Apply the time & weight commands now
+        if ((ctrl & CTRL_SETTIME) && setTimeRevision != control.setTimeRevision_)
+        {
+            control.setTimeRevision_ = setTimeRevision;
+            state->SetTime(((float)setTime / 65535.0f) * state->GetLength());
+        }
+        if ((ctrl & CTRL_SETWEIGHT) && setWeightRevision != control.setWeightRevision_)
+        {
+            control.setWeightRevision_ = setWeightRevision;
+            state->SetWeight((float)setWeight / 255.0f);
+        }
     }
     
     // Now set any extra animations to fade out
@@ -597,18 +640,30 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
             ctrl |= CTRL_LOOPED;
         if (state->GetUseNlerp())
             ctrl |= CTRL_NLERP;
-        if (i->speed_ < 0.0f)
-            ctrl |= CTRL_REVERSE;
+        if (i->setTimeDuration_ > 0.0f)
+            ctrl |= CTRL_SETTIME;
+        if (i->setWeightDuration_ > 0.0f)
+            ctrl |= CTRL_SETWEIGHT;
         
         attrBuffer_.WriteStringHash(i->hash_);
         attrBuffer_.WriteUByte(ctrl);
         if (ctrl & CTRL_STARTBONE)
             attrBuffer_.WriteStringHash(startBone->nameHash_);
         attrBuffer_.WriteUByte(state->GetLayer());
-        attrBuffer_.WriteUByte((unsigned char)Clamp(fabsf(i->speed_) * 32.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteShort((short)Clamp(i->speed_ * 2048.0f, -32767.0f, 32767.0f));
         attrBuffer_.WriteUByte((unsigned char)(i->targetWeight_ * 255.0f));
-        attrBuffer_.WriteUByte((unsigned char)Clamp(i->fadeTime_ * 32.0f, 0.0f, 255.0f));
-        attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 32.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteUByte((unsigned char)Clamp(i->fadeTime_ * 64.0f, 0.0f, 255.0f));
+        attrBuffer_.WriteUByte((unsigned char)Clamp(i->autoFadeTime_ * 64.0f, 0.0f, 255.0f));
+        if (ctrl & CTRL_SETTIME)
+        {
+            attrBuffer_.WriteUByte(i->setTimeRevision_);
+            attrBuffer_.WriteUShort(i->setTime_);
+        }
+        if (ctrl & CTRL_SETWEIGHT)
+        {
+            attrBuffer_.WriteUByte(i->setWeightRevision_);
+            attrBuffer_.WriteUByte(i->setWeight_);
+        }
     }
     
     return attrBuffer_.GetBuffer();

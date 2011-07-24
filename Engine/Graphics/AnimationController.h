@@ -38,7 +38,13 @@ struct AnimationControl
         speed_(1.0f),
         targetWeight_(0.0f),
         fadeTime_(0.0f),
-        autoFadeTime_(0.0f)
+        autoFadeTime_(0.0f),
+        setTimeDuration_(0.0f),
+        setWeightDuration_(0.0f),
+        setTime_(0),
+        setTimeRevision_(0),
+        setWeight_(0),
+        setWeightRevision_(0)
     {
     }
 
@@ -52,6 +58,18 @@ struct AnimationControl
     float fadeTime_;
     /// Animation autofade on stop -time, 0 if disabled
     float autoFadeTime_;
+    /// Set time command duration
+    float setTimeDuration_;
+    /// Set weight command duration
+    float setWeightDuration_;
+    /// Set time command
+    unsigned short setTime_;
+    /// Set time command revision
+    unsigned char setTimeRevision_;
+    /// Set weight command
+    unsigned char setWeight_;
+    /// Set weight command revision
+    unsigned char setWeightRevision_;
 };
 
 /// Component that drives an AnimatedModel's animations
