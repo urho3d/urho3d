@@ -123,19 +123,34 @@ static CScriptArray* NetworkGetClientConnections(Network* ptr)
         return 0;
 }
 
-void BroadcastRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
+static void NetworkBroadcastRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
     ptr->BroadcastRemoteEvent(StringHash(eventType), inOrder, eventData);
 }
 
-void BroadcastRemoteSceneEvent(Scene* scene, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
+static void NetworkBroadcastRemoteSceneEvent(Scene* scene, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
     ptr->BroadcastRemoteEvent(scene, StringHash(eventType), inOrder, eventData);
 }
 
-void BroadcastRemoteNodeEvent(Node* node, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
+static void NetworkBroadcastRemoteNodeEvent(Node* node, const String& eventType, bool inOrder, const VariantMap& eventData, Network* ptr)
 {
     ptr->BroadcastRemoteEvent(node, StringHash(eventType), inOrder, eventData);
+}
+
+static void NetworkRegisterRemoteEvent(const String& eventType, Network* ptr)
+{
+    ptr->RegisterRemoteEvent(StringHash(eventType));
+}
+
+static void NetworkUnregisterRemoteEvent(const String& eventType, Network* ptr)
+{
+    ptr->UnregisterRemoteEvent(StringHash(eventType));
+}
+
+static bool NetworkCheckRemoteEvent(const String& eventType, Network* ptr)
+{
+    return ptr->CheckRemoteEvent(StringHash(eventType));
 }
 
 void RegisterNetwork(asIScriptEngine* engine)
@@ -147,9 +162,13 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "void StopServer()", asMETHOD(Network, StopServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, bool, bool, const VectorBuffer&in)", asMETHODPR(Network, BroadcastMessage, (int, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "void BroadcastMessage(int, uint, bool, bool, const VectorBuffer&in)", asMETHODPR(Network, BroadcastMessage, (int, unsigned, bool, bool, const VectorBuffer&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(BroadcastRemoteEvent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Scene@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(BroadcastRemoteSceneEvent), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Node@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(BroadcastRemoteNodeEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Scene@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteSceneEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void BroadcastRemoteEvent(Node@+, const String&in, bool, const VariantMap&in eventData = VariantMap())", asFUNCTION(NetworkBroadcastRemoteNodeEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void RegisterRemoteEvent(const String&in) const", asFUNCTION(NetworkRegisterRemoteEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void UnregisterRemoteEvent(const String&in) const", asFUNCTION(NetworkUnregisterRemoteEvent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Network", "void UnregisterAllRemoteEvents()", asMETHOD(Network, UnregisterAllRemoteEvents), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "bool CheckRemoteEvent(const String&in) const", asFUNCTION(NetworkCheckRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void set_updateFps(int)", asMETHOD(Network, SetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "int get_updateFps() const", asMETHOD(Network, GetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);

@@ -60,12 +60,12 @@ public:
     bool Rename(const String& srcFileName, const String& destFileName);
     /// Delete a file. Return true if successful
     bool Delete(const String& fileName);
-    /// Register a path as being allowed to access
+    /// Register a path as allowed to access. If no paths are registered, all are allowed
     void RegisterPath(const String& pathName);
     
     /// Return the absolute current working directory
     String GetCurrentDir();
-    /// Check if a path is allowed to be accessed. If no paths defined, all are allowed
+    /// Check if a path is allowed to be accessed. If no paths are registered, all are allowed
     bool CheckAccess(const String& pathName);
     /// Check if a file exists
     bool FileExists(const String& fileName);

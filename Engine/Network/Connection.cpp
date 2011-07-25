@@ -28,6 +28,7 @@
 #include "FileSystem.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
+#include "Network.h"
 #include "NetworkEvents.h"
 #include "Profiler.h"
 #include "Protocol.h"
@@ -92,6 +93,12 @@ void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool 
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
+    if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
+    {
+        LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+        return;
+    }
+    
     RemoteEvent queuedEvent;
     queuedEvent.receiverID_ = 0;
     queuedEvent.eventType_ = eventType;
@@ -102,6 +109,12 @@ void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const Varia
 
 void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
+    if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
+    {
+        LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+        return;
+    }
+    
     if (!receiver)
     {
         LOGERROR("Null node for remote node event");
@@ -649,10 +662,15 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
 
 void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
 {
-    /// \todo Check whether the remote event is allowed based on a black- or whitelist
     if (msgID == MSG_REMOTEEVENT)
     {
         StringHash eventType = msg.ReadStringHash();
+        if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
+        {
+            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            return;
+        }
+        
         VariantMap eventData = msg.ReadVariantMap();
         SendEvent(eventType, eventData);
     }
@@ -663,8 +681,15 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
             LOGERROR("Can not receive remote node event without an assigned scene");
             return;
         }
+        
         unsigned nodeID = msg.ReadVLE();
         StringHash eventType = msg.ReadStringHash();
+        if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
+        {
+            LOGWARNING("Discarding not allowed remote event " + eventType.ToString());
+            return;
+        }
+        
         VariantMap eventData = msg.ReadVariantMap();
         Node* receiver = scene_->GetNodeByID(nodeID);
         if (!receiver)

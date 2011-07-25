@@ -296,7 +296,7 @@ public:
     }
     
     /// Return whether contains a pair with key
-    bool Contains(const T& key)
+    bool Contains(const T& key) const
     {
         return FindNode(key) != 0;
     }

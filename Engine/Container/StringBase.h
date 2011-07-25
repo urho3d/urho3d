@@ -354,7 +354,10 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether the string is empty
     bool Empty() const { return length_ == 0; }
-    
+    /// Return comparision result with a string
+    int Compare(const String& str, bool caseSensitive = true) const;
+    /// Return comparision result with a C string
+    int Compare(const char* str, bool caseSensitive = true) const;
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const
     {

@@ -31,8 +31,10 @@
 
 bool ToBool(const String& source)
 {
-    String temp = source.ToLower();
-    if (temp.Find("true") != String::NPOS)
+    if (source.Empty())
+        return false;
+    char first = tolower(source[0]);
+    if (first == 't' || first == 'y' || first == '1')
         return true;
     else
         return false;
@@ -172,25 +174,11 @@ unsigned GetStringListIndex(const String& value, const String* strings, unsigned
 {
     unsigned i = 0;
     
-    if (caseSensitive)
+    while (!strings[i].Empty())
     {
-        while (!strings[i].Empty())
-        {
-            if (value == strings[i])
-                return i;
-            ++i;
-        }
-    }
-    else
-    {
-        String valueLower = value.ToLower();
-        while (!strings[i].Empty())
-        {
-            /// \todo Write an insensitive compare function instead of creating new strings
-            if (valueLower == strings[i].ToLower())
-                return i;
-            ++i;
-        }
+        if (!value.Compare(strings[i], caseSensitive))
+            return i;
+        ++i;
     }
     
     return defaultIndex;

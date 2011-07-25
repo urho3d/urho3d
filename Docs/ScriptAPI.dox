@@ -221,6 +221,7 @@ Methods:<br>
 - String ToUpper() const
 - String ToLower() const
 - String Trimmed() const
+- int Compare(const String&, bool arg1 = true) const
 - String[]@ Split(uint8) const
 - bool ToBool() const
 - float ToFloat() const
@@ -1643,7 +1644,7 @@ Properties:<br>
 - bool looped
 - float weight
 - float time
-- int layer
+- uint8 layer
 - bool useNlerp
 - Animation@ animation (readonly)
 - bool enabled (readonly)
@@ -1713,14 +1714,14 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool Play(const String&, int, bool, float arg3 = 0.0f)
-- bool PlayExclusive(const String&, int, bool, float arg3 = 0.0f)
+- bool Play(const String&, uint8, bool, float arg3 = 0.0f)
+- bool PlayExclusive(const String&, uint8, bool, float arg3 = 0.0f)
 - void Stop(const String&, float arg1 = 0.0f)
-- void StopLayer(int, float arg1 = 0.0f)
+- void StopLayer(uint8, float arg1 = 0.0f)
 - void StopAll(float arg0 = 0.0f)
 - bool Fade(const String&, float, float)
 - bool FadeOthers(const String&, float, float)
-- bool SetLayer(const String&, int)
+- bool SetLayer(const String&, uint8)
 - bool SetStartBone(const String&, const String&)
 - bool SetTime(const String&, float)
 - bool SetWeight(const String&, float)
@@ -1730,7 +1731,7 @@ Methods:<br>
 - bool IsPlaying(const String&) const
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
-- int GetLayer(const String&) const
+- uint8 GetLayer(const String&) const
 - const String& GetStartBone(const String&) const
 - float GetTime(const String&) const
 - float GetWeight(const String&) const
@@ -3468,6 +3469,10 @@ Methods:<br>
 - void BroadcastRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
 - void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
 - void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
+- void RegisterRemoteEvent(const String&) const
+- void UnregisterRemoteEvent(const String&) const
+- void UnregisterAllRemoteEvents()
+- bool CheckRemoteEvent(const String&) const
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3587,14 +3592,14 @@ Properties:<br>
 - uint id (readonly)
 - Node@ node (readonly)
 - float mass
-- Vector3 linearVelocity
+- Vector3& linearVelocity
 - float linearRestThreshold
-- Vector3 angularVelocity
+- Vector3& angularVelocity
 - float angularRestThreshold
 - float angularMaxVelocity
 - bool active
-- Vector3 position
-- Quaternion rotation
+- Vector3& position
+- Quaternion& rotation
 - float linearDampingThreshold
 - float linearDampingScale
 - float angularDampingThreshold

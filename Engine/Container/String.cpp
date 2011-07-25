@@ -560,6 +560,40 @@ unsigned String::FindLast(const String& str, unsigned startPos) const
     return NPOS;
 }
 
+int String::Compare(const String& str, bool caseSensitive) const
+{
+    return Compare(str.CString(), caseSensitive);
+}
+
+int String::Compare(const char* str, bool caseSensitive) const
+{
+    const char* lhs = CString();
+    const char* rhs = str;
+    
+    if (caseSensitive)
+        return strcmp(lhs, rhs);
+    else
+    {
+        if (!lhs || !rhs)
+            return lhs ? 1 : (rhs ? -1 : 0);
+        
+        for (;;)
+        {
+            char l = tolower(*lhs);
+            char r = tolower(*rhs);
+            if (!l || !r)
+                return l ? 1 : (r ? -1 : 0);
+            if (l < r)
+                return -1;
+            if (l > r)
+                return 1;
+            
+            ++lhs;
+            ++rhs;
+        }
+    }
+}
+
 void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength)
 {
     int delta = (int)srcLength - (int)length;

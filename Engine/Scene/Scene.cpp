@@ -262,46 +262,6 @@ void Scene::Clear()
     checksum_ = 0;
 }
 
-
-
-void Scene::Update(float timeStep)
-{
-    if (asyncLoading_)
-    {
-        UpdateAsyncLoading();
-        return;
-    }
-    
-    PROFILE(UpdateScene);
-    
-    using namespace SceneUpdate;
-    
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
-    eventData[P_TIMESTEP] = timeStep;
-    
-    // Update variable timestep logic
-    SendEvent(E_SCENEUPDATE, eventData);
-    
-    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
-    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
-    
-    // Post-update variable timestep logic
-    SendEvent(E_SCENEPOSTUPDATE, eventData);
-    
-    // Update smoothing if enabled (network client scenes)
-    if (IsSmoothed())
-    {
-        PROFILE(UpdateSmoothing);
-        
-        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
-        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
-        
-        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
-    }
-}
-
 void Scene::SetActive(bool enable)
 {
     active_ = enable;
@@ -361,6 +321,44 @@ float Scene::GetAsyncProgress() const
         return 1.0f;
     else
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
+}
+
+void Scene::Update(float timeStep)
+{
+    if (asyncLoading_)
+    {
+        UpdateAsyncLoading();
+        return;
+    }
+    
+    PROFILE(UpdateScene);
+    
+    using namespace SceneUpdate;
+    
+    VariantMap eventData;
+    eventData[P_SCENE] = (void*)this;
+    eventData[P_TIMESTEP] = timeStep;
+    
+    // Update variable timestep logic
+    SendEvent(E_SCENEUPDATE, eventData);
+    
+    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
+    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
+    
+    // Post-update variable timestep logic
+    SendEvent(E_SCENEPOSTUPDATE, eventData);
+    
+    // Update smoothing if enabled (network client scenes)
+    if (IsSmoothed())
+    {
+        PROFILE(UpdateSmoothing);
+        
+        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
+        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
+        
+        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
+    }
 }
 
 unsigned Scene::GetFreeNodeID(CreateMode mode)

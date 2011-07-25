@@ -1573,16 +1573,8 @@ aiNode* FindNode(const String& name, aiNode* rootNode, bool caseSensitive)
 {
     if (!rootNode)
         return 0;
-    if (!caseSensitive)
-    {
-        if (FromAIString(rootNode->mName).ToLower() == name.ToLower())
-            return rootNode;
-    }
-    else
-    {
-        if (name == rootNode->mName.data)
-            return rootNode;
-    }
+    if (!name.Compare(rootNode->mName.data, caseSensitive))
+        return rootNode;
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
     {
         aiNode* found = FindNode(name, rootNode->mChildren[i], caseSensitive);

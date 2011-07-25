@@ -253,7 +253,7 @@ public:
     }
     
     /// Return whether contains a key
-    bool Contains(const T& key)
+    bool Contains(const T& key) const
     {
         return FindNode(key) != 0;
     }

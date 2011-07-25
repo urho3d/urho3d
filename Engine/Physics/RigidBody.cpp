@@ -425,8 +425,7 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     processedBodies.Insert(this);
     inPostStep_ = true;
     
-    // If the parent node has a rigid body, process it first
-    // For now, treat node parented to the Scene as unparented
+    // If the parent node has a rigid body, process it first. For now, treat node parented to the Scene as unparented
     Node* parent = node_->GetParent();
     bool hasParent = parent && parent != node_->GetScene();
     if (hasParent)
@@ -450,7 +449,6 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     else
     {
         // Transform rigid body's world coordinates back to parent's space
-        /// \todo Apply in the correct order (parent first)
         if (!node_->IsSmoothed())
         {
             Matrix3x4 newTransform(parent->GetWorldTransform().Inverse() * Matrix3x4(previousPosition_.Lerp(currentPosition, t),

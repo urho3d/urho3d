@@ -87,8 +87,6 @@ public:
     void StopAsyncLoading();
     /// Clear scene completely of nodes and components
     void Clear();
-    /// Update scene. Called by HandleUpdate
-    void Update(float timeStep);
     /// Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
     /// Set motion smoothing constant
@@ -127,6 +125,8 @@ public:
     /// Return all components
     const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
     
+    /// Update scene. Called by HandleUpdate
+    void Update(float timeStep);
     /// Get free node ID, either non-local or local
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local

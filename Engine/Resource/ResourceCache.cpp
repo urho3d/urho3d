@@ -71,12 +71,11 @@ bool ResourceCache::AddResourcePath(const String& path)
     }
     
     String fixedPath = AddTrailingSlash(path);
-    String pathLower = fixedPath.ToLower();
     
     // Check that the same path does not already exist
     for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
     {
-        if (resourcePaths_[i].ToLower() == pathLower)
+        if (!resourcePaths_[i].Compare(fixedPath, false))
             return true;
     }
     
@@ -135,10 +134,10 @@ bool ResourceCache::AddManualResource(Resource* resource)
 
 void ResourceCache::RemoveResourcePath(const String& path)
 {
-    String fixedPath = AddTrailingSlash(path).ToLower();
+    String fixedPath = AddTrailingSlash(path);
     for (Vector<String>::Iterator i = resourcePaths_.Begin(); i != resourcePaths_.End(); ++i)
     {
-        if (i->ToLower() == fixedPath)
+        if (!i->Compare(path, false))
         {
             resourcePaths_.Erase(i);
             return;
@@ -162,11 +161,9 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResource
 
 void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResources, bool forceRelease)
 {
-    String fileNameLower = fileName.ToLower();
-    
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
-        if ((*i)->GetName().ToLower() == fileNameLower)
+        if (!(*i)->GetName().Compare(fileName, false))
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);
@@ -224,7 +221,6 @@ void ResourceCache::ReleaseResources(ShortStringHash type, bool force)
 
 void ResourceCache::ReleaseResources(ShortStringHash type, const String& partialName, bool force)
 {
-    String partialNameLower = partialName.ToLower();
     bool released = false;
     
     for (Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Begin();
@@ -236,7 +232,7 @@ void ResourceCache::ReleaseResources(ShortStringHash type, const String& partial
                 j != i->second_.resources_.End();)
             {
                 Map<StringHash, SharedPtr<Resource> >::Iterator current = j++;
-                if (current->second_->GetName().Find(partialNameLower) != String::NPOS)
+                if (current->second_->GetName().Find(partialName) != String::NPOS)
                 {
                     // If other references exist, do not release, unless forced
                     if (current->second_.Refs() == 1 || force)

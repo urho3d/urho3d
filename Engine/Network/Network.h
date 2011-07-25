@@ -77,8 +77,12 @@ public:
     void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Set network update FPS
     void SetUpdateFps(int fps);
-    /// Update connections. Called by HandleBeginFrame
-    void Update(float timeStep);
+    /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed
+    void RegisterRemoteEvent(StringHash eventType);
+    /// Unregister a remote event as allowed to be sent and received
+    void UnregisterRemoteEvent(StringHash eventType);
+    /// Unregister all remote events. This results in all being allowed
+    void UnregisterAllRemoteEvents();
     
     /// Return network update FPS
     int GetUpdateFps() const { return updateFps_; }
@@ -90,6 +94,11 @@ public:
     const Map<kNet::MessageConnection*, SharedPtr<Connection> > GetClientConnections() const { return clientConnections_; }
     /// Return whether the server is running
     bool IsServerRunning() const;
+    /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed
+    bool CheckRemoteEvent(StringHash eventType) const;
+    
+    /// Update connections. Called by HandleBeginFrame
+    void Update(float timeStep);
     
 private:
     /// Handle begin frame event
@@ -105,6 +114,8 @@ private:
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections
     Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
+    /// Allowed remote events
+    Set<StringHash> allowedRemoteEvents_;
     /// Network update FPS
     int updateFps_;
     /// Network time interval

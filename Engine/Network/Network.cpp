@@ -340,11 +340,52 @@ void Network::SetUpdateFps(int fps)
     updateAcc_ = 0.0f;
 }
 
+void Network::RegisterRemoteEvent(StringHash eventType)
+{
+    allowedRemoteEvents_.Insert(eventType);
+}
+
+void Network::UnregisterRemoteEvent(StringHash eventType)
+{
+    allowedRemoteEvents_.Erase(eventType);
+}
+
+void Network::UnregisterAllRemoteEvents()
+{
+    allowedRemoteEvents_.Clear();
+}
+
+Connection* Network::GetConnection(kNet::MessageConnection* connection) const
+{
+    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+    if (i != clientConnections_.End())
+        return i->second_;
+    else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
+        return serverConnection_;
+    else
+        return 0;
+}
+
+Connection* Network::GetServerConnection() const
+{
+    return serverConnection_;
+}
+
+bool Network::IsServerRunning() const
+{
+    return network_->GetServer();
+}
+
+bool Network::CheckRemoteEvent(StringHash eventType) const
+{
+    return allowedRemoteEvents_.Empty() || allowedRemoteEvents_.Contains(eventType);
+}
+
 void Network::Update(float timeStep)
 {
     PROFILE(UpdateNetwork);
     
-    // Check if periodic update should be made now
+    // Check if periodic update should happen now
     updateAcc_ += timeStep;
     bool updateNow = updateAcc_ >= updateInterval_;
     
@@ -398,27 +439,6 @@ void Network::Update(float timeStep)
             }
         }
     }
-}
-
-Connection* Network::GetConnection(kNet::MessageConnection* connection) const
-{
-    Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
-    if (i != clientConnections_.End())
-        return i->second_;
-    else if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
-        return serverConnection_;
-    else
-        return 0;
-}
-
-Connection* Network::GetServerConnection() const
-{
-    return serverConnection_;
-}
-
-bool Network::IsServerRunning() const
-{
-    return network_->GetServer();
 }
 
 void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
