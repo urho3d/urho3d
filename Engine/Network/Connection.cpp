@@ -734,11 +734,11 @@ void Connection::ProcessNewNode(Node* node)
     msg_.Clear();
     msg_.WriteVLE(node->GetID());
     
-    NodeReplicationState newNodeState;
-    newNodeState.frameNumber_ = frameNumber_;
+    NodeReplicationState& nodeState = sceneState_[node->GetID()];
+    nodeState.frameNumber_ = frameNumber_;
     
     // Write node's attributes
-    node->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newNodeState.attributes_);
+    node->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, nodeState.attributes_);
     
     // Write node's user variables
     const VariantMap& vars = node->GetVars();
@@ -747,7 +747,7 @@ void Connection::ProcessNewNode(Node* node)
     {
         msg_.WriteShortStringHash(i->first_);
         msg_.WriteVariant(i->second_);
-        newNodeState.vars_[i->first_] = i->second_;
+        nodeState.vars_[i->first_] = i->second_;
     }
     
     // Write node's components
@@ -756,24 +756,20 @@ void Connection::ProcessNewNode(Node* node)
     for (unsigned i = 0; i < components.Size(); ++i)
     {
         Component* component = components[i];
+        // Check if component is not to be replicated
         if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
         
+        ComponentReplicationState& componentState = nodeState.components_[component->GetID()];
+        componentState.frameNumber_ = frameNumber_;
+        componentState.type_ = component->GetType();
+        
         msg_.WriteShortStringHash(component->GetType());
         msg_.WriteVLE(component->GetID());
-        
-        ComponentReplicationState newComponentState;
-        newComponentState.frameNumber_ = frameNumber_;
-        newComponentState.type_ = component->GetType();
-        
-        // Write component's attributes
-        component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newComponentState.attributes_);
-        
-        newNodeState.components_[component->GetID()] = newComponentState;
+        component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
     }
     
     SendMessage(MSG_CREATENODE, true, true, msg_);
-    sceneState_[node->GetID()] = newNodeState;
 }
 
 void Connection::ProcessExistingNode(Node* node)
@@ -835,6 +831,7 @@ void Connection::ProcessExistingNode(Node* node)
     for (unsigned i = 0; i < components.Size(); ++i)
     {
         Component* component = components[i];
+        // Check if component is not to be replicated
         if (component->GetID() >= FIRST_LOCAL_ID)
             continue;
         
@@ -842,20 +839,17 @@ void Connection::ProcessExistingNode(Node* node)
         if (j == nodeState.components_.End())
         {
             // New component
+            ComponentReplicationState& componentState = nodeState.components_[component->GetID()];
+            componentState.frameNumber_ = frameNumber_;
+            componentState.type_ = component->GetType();
+            
             msg_.Clear();
             msg_.WriteVLE(node->GetID());
             msg_.WriteShortStringHash(component->GetType());
             msg_.WriteVLE(component->GetID());
-            
-            ComponentReplicationState newComponentState;
-            newComponentState.frameNumber_ = frameNumber_;
-            newComponentState.type_ = component->GetType();
-            
-            // Write component's attributes
-            component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, newComponentState.attributes_);
+            component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
             
             SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
-            nodeState.components_[component->GetID()] = newComponentState;
         }
         else
         {
