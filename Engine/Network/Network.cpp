@@ -421,6 +421,13 @@ bool Network::IsServerRunning() const
     return network_->GetServer();
 }
 
+void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
+{
+    using namespace BeginFrame;
+    
+    Update(eventData[P_TIMESTEP].GetFloat());
+}
+
 void Network::OnServerConnected()
 {
     serverConnection_->SetConnectPending(false);
@@ -450,11 +457,4 @@ void Network::OnServerDisconnected()
     }
     
     serverConnection_.Reset();
-}
-
-void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
-{
-    using namespace BeginFrame;
-    
-    Update(eventData[P_TIMESTEP].GetFloat());
 }

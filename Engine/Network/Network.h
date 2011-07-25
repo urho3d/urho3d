@@ -92,12 +92,12 @@ public:
     bool IsServerRunning() const;
     
 private:
+    /// Handle begin frame event
+    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     /// Handle server connection
     void OnServerConnected();
     /// Handle server disconnection
     void OnServerDisconnected();
-    /// Handle begin frame event
-    void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
     /// kNet Network instance
     kNet::Network* network_;

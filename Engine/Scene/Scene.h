@@ -75,8 +75,6 @@ public:
     /// Load from XML data. Return true if successful
     virtual bool LoadXML(const XMLElement& source);
     
-    /// Update scene
-    void Update(float timeStep);
     /// Load from an XML file. Return true if successful
     bool LoadXML(Deserializer& source);
     /// Save to an XML file. Return true if successful
@@ -89,6 +87,8 @@ public:
     void StopAsyncLoading();
     /// Clear scene completely of nodes and components
     void Clear();
+    /// Update scene. Called by HandleUpdate
+    void Update(float timeStep);
     /// Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
     /// Set motion smoothing constant

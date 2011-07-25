@@ -93,6 +93,8 @@ bool Scene::Load(Deserializer& source)
         return false;
     }
     
+    LOGINFO("Loading scene from " + source.GetName());
+    
     // Load the whole scene, then perform post-load if successfully loaded
     if (Node::Load(source))
     {
@@ -112,6 +114,10 @@ bool Scene::Save(Serializer& dest)
         return false;
     }
     
+    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    if (ptr)
+        LOGINFO("Saving scene to " + ptr->GetName());
+    
     return Node::Save(dest);
 }
 
@@ -130,44 +136,6 @@ bool Scene::LoadXML(const XMLElement& source)
         return false;
 }
 
-void Scene::Update(float timeStep)
-{
-    if (asyncLoading_)
-    {
-        UpdateAsyncLoading();
-        return;
-    }
-    
-    PROFILE(UpdateScene);
-    
-    using namespace SceneUpdate;
-    
-    VariantMap eventData;
-    eventData[P_SCENE] = (void*)this;
-    eventData[P_TIMESTEP] = timeStep;
-    
-    // Update variable timestep logic
-    SendEvent(E_SCENEUPDATE, eventData);
-    
-    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
-    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
-    
-    // Post-update variable timestep logic
-    SendEvent(E_SCENEPOSTUPDATE, eventData);
-    
-    // Update smoothing if enabled (network client scenes)
-    if (IsSmoothed())
-    {
-        PROFILE(UpdateSmoothing);
-        
-        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
-        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
-        
-        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
-    }
-}
-
 bool Scene::LoadXML(Deserializer& source)
 {
     StopAsyncLoading();
@@ -175,6 +143,8 @@ bool Scene::LoadXML(Deserializer& source)
     SharedPtr<XMLFile> xml(new XMLFile(context_));
     if (!xml->Load(source))
         return false;
+    
+    LOGINFO("Loading scene from " + source.GetName());
     
     // Load the whole scene, then perform post-load if successfully loaded
     if (Node::LoadXML(xml->GetRoot()))
@@ -192,6 +162,10 @@ bool Scene::SaveXML(Serializer& dest)
     XMLElement rootElem = xml->CreateRoot("scene");
     if (!SaveXML(rootElem))
         return false;
+    
+    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    if (ptr)
+        LOGINFO("Saving scene to " + ptr->GetName());
     
     return xml->Save(dest);
 }
@@ -212,6 +186,8 @@ bool Scene::LoadAsync(File* file)
         LOGERROR(file->GetName() + " is not a valid scene file");
         return false;
     }
+    
+    LOGINFO("Loading scene from " + file->GetName());
     
     // Clear the previous scene and load the root level components first
     Clear();
@@ -242,6 +218,8 @@ bool Scene::LoadAsyncXML(File* file)
     SharedPtr<XMLFile> xmlFile(new XMLFile(context_));
     if (!xmlFile->Load(*file))
         return false;
+    
+    LOGINFO("Loading scene from " + file->GetName());
     
     // Clear the previous scene and load the root level components first
     Clear();
@@ -282,6 +260,46 @@ void Scene::Clear()
     RemoveAllComponents();
     fileName_ = String();
     checksum_ = 0;
+}
+
+
+
+void Scene::Update(float timeStep)
+{
+    if (asyncLoading_)
+    {
+        UpdateAsyncLoading();
+        return;
+    }
+    
+    PROFILE(UpdateScene);
+    
+    using namespace SceneUpdate;
+    
+    VariantMap eventData;
+    eventData[P_SCENE] = (void*)this;
+    eventData[P_TIMESTEP] = timeStep;
+    
+    // Update variable timestep logic
+    SendEvent(E_SCENEUPDATE, eventData);
+    
+    // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
+    SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
+    
+    // Post-update variable timestep logic
+    SendEvent(E_SCENEPOSTUPDATE, eventData);
+    
+    // Update smoothing if enabled (network client scenes)
+    if (IsSmoothed())
+    {
+        PROFILE(UpdateSmoothing);
+        
+        float constant = 1.0f - Clamp(powf(2.0f, -timeStep * smoothingConstant_), 0.0f, 1.0f);
+        float squaredSnapThreshold = snapThreshold_ * snapThreshold_;
+        
+        for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+            i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
+    }
 }
 
 void Scene::SetActive(bool enable)

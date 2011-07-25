@@ -709,6 +709,13 @@ String Connection::ToString() const
     return GetAddress() + ":" + String(GetPort());
 }
 
+void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
+{
+    VectorBuffer msg;
+    msg.WriteUInt(scene_->GetChecksum());
+    SendMessage(MSG_SCENELOADED, true, true, msg);
+}
+
 void Connection::ProcessNode(Node* node)
 {
     if (!node)
@@ -899,11 +906,4 @@ void Connection::ProcessExistingNode(Node* node)
             nodeState.components_.Erase(current);
         }
     }
-}
-
-void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
-{
-    VectorBuffer msg;
-    msg.WriteUInt(scene_->GetChecksum());
-    SendMessage(MSG_SCENELOADED, true, true, msg);
 }

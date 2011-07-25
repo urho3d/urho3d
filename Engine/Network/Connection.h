@@ -136,14 +136,14 @@ public:
     String ToString() const;
     
 private:
+    /// Handle scene loaded event
+    void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     /// Process a node for sending a network update. Recurses to process depended on node(s) first
     void ProcessNode(Node* node);
     /// Process a node that the client had not yet received
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received
     void ProcessExistingNode(Node* node);
-    /// Handle scene loaded event
-    void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
     
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
