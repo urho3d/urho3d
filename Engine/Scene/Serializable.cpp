@@ -35,7 +35,7 @@ OBJECTTYPESTATIC(Serializable);
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    inSerialization_(false)
+    loading_(false)
 {
 }
 
@@ -201,7 +201,7 @@ bool Serializable::Load(Deserializer& source)
     if (!attributes)
         return true;
     
-    inSerialization_ = true;
+    loading_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
@@ -212,14 +212,14 @@ bool Serializable::Load(Deserializer& source)
         if (source.IsEof())
         {
             LOGERROR("Could not load " + GetTypeName() + ", stream not open or at end");
-            inSerialization_  = false;
+            loading_  = false;
             return false;
         }
         
         OnSetAttribute(attr, source.ReadVariant(attr.type_));
     }
     
-    inSerialization_ = false;
+    loading_ = false;
     return true;
 }
 
@@ -230,7 +230,6 @@ bool Serializable::Save(Serializer& dest)
         return true;
     
     Variant value;
-    inSerialization_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
@@ -242,12 +241,10 @@ bool Serializable::Save(Serializer& dest)
         if (!dest.WriteVariantData(value))
         {
             LOGERROR("Could not save " + GetTypeName() + ", writing to stream failed");
-            inSerialization_ = false;
             return false;
         }
     }
     
-    inSerialization_ = false;
     return true;
 }
 
@@ -263,7 +260,7 @@ bool Serializable::LoadXML(const XMLElement& source)
     if (!attributes)
         return true;
     
-    inSerialization_ = true;
+    loading_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
@@ -313,7 +310,7 @@ bool Serializable::LoadXML(const XMLElement& source)
             LOGWARNING("Attribute " + String(attr.name_) + " not found in XML data");
     }
     
-    inSerialization_ = false;
+    loading_ = false;
     return true;
 }
 
@@ -330,7 +327,6 @@ bool Serializable::SaveXML(XMLElement& dest)
         return true;
     
     Variant value;
-    inSerialization_ = true;
     
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
@@ -352,7 +348,6 @@ bool Serializable::SaveXML(XMLElement& dest)
             attrElem.SetVariant(value);
     }
     
-    inSerialization_ = false;
     return true;
 }
 

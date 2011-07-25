@@ -604,7 +604,7 @@ void AnimatedModel::SetModelAttr(ResourceRef value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // When loading a scene, set model without creating the bone nodes (will be assigned later during post-load)
-    SetModel(cache->GetResource<Model>(value.id_), !inSerialization_);
+    SetModel(cache->GetResource<Model>(value.id_), !IsLoading());
 }
 
 void AnimatedModel::SetBonesEnabledAttr(PODVector<unsigned char> value)

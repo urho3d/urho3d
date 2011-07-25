@@ -92,10 +92,12 @@ void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool 
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    msg_.Clear();
-    msg_.WriteStringHash(eventType);
-    msg_.WriteVariantMap(eventData);
-    SendMessage(MSG_REMOTEEVENT, true, inOrder, msg_);
+    RemoteEvent queuedEvent;
+    queuedEvent.receiverID_ = 0;
+    queuedEvent.eventType_ = eventType;
+    queuedEvent.eventData_ = eventData;
+    queuedEvent.inOrder_ = inOrder;
+    remoteEvents_.Push(queuedEvent);
 }
 
 void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -116,11 +118,12 @@ void Connection::SendRemoteEvent(Node* receiver, StringHash eventType, bool inOr
         return;
     }
     
-    msg_.Clear();
-    msg_.WriteVLE(receiver->GetID());
-    msg_.WriteStringHash(eventType);
-    msg_.WriteVariantMap(eventData);
-    SendMessage(MSG_REMOTENODEEVENT, true, inOrder, msg_);
+    RemoteEvent queuedEvent;
+    queuedEvent.receiverID_ = receiver->GetID();
+    queuedEvent.eventType_ = eventType;
+    queuedEvent.eventData_ = eventData;
+    queuedEvent.inOrder_ = inOrder;
+    remoteEvents_.Push(queuedEvent);
 }
 
 void Connection::SetScene(Scene* newScene)
@@ -230,6 +233,32 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
     SendMessage(MSG_CONTROLS, CONTROLS_CONTENT_ID, false, false, msg_);
+}
+
+void Connection::SendQueuedRemoteEvents()
+{
+    if (remoteEvents_.Empty())
+        return;
+    
+    for (Vector<RemoteEvent>::ConstIterator i = remoteEvents_.Begin(); i != remoteEvents_.End(); ++i)
+    {
+        msg_.Clear();
+        if (!i->receiverID_)
+        {
+            msg_.WriteStringHash(i->eventType_);
+            msg_.WriteVariantMap(i->eventData_);
+            SendMessage(MSG_REMOTEEVENT, true, i->inOrder_, msg_);
+        }
+        else
+        {
+            msg_.WriteVLE(i->receiverID_);
+            msg_.WriteStringHash(i->eventType_);
+            msg_.WriteVariantMap(i->eventData_);
+            SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_);
+        }
+    }
+    
+    remoteEvents_.Clear();
 }
 
 void Connection::ProcessPendingLatestData()

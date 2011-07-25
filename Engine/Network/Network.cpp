@@ -373,9 +373,12 @@ void Network::Update(float timeStep)
         else if (state == kNet::ConnectionClosed)
             OnServerDisconnected();
         
-        // Send the client update (controls)
+        // Send the client update
         if (updateNow && serverConnection_)
+        {
             serverConnection_->SendClientUpdate();
+            serverConnection_->SendQueuedRemoteEvents();
+        }
     }
     
     // Process client connections if the server has been started
@@ -389,7 +392,10 @@ void Network::Update(float timeStep)
             // Send server updates for each client connection
             for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
+            {
                 i->second_->SendServerUpdate();
+                i->second_->SendQueuedRemoteEvents();
+            }
         }
     }
 }

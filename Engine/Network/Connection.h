@@ -41,6 +41,19 @@ class Node;
 class Scene;
 class Serializable;
 
+/// Queued remote event
+struct RemoteEvent
+{
+    /// Receiver node ID (0 if not a remote node event)
+    unsigned receiverID_;
+    /// Event type
+    StringHash eventType_;
+    /// Event data
+    VariantMap eventData_;
+    /// In order -flag
+    bool inOrder_;
+};
+
 /// Connection in a networked scene
 class Connection : public Object
 {
@@ -78,6 +91,8 @@ public:
     void SendServerUpdate();
     /// Send latest controls from the client. Called by Network
     void SendClientUpdate();
+    /// Send queued remote events. Called by Network
+    void SendQueuedRemoteEvents();
     /// Process pending latest data for nodes and components
     void ProcessPendingLatestData();
     /// Process a LoadScene message from the server. Called by Network
@@ -142,6 +157,8 @@ private:
     Map<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components
     Map<unsigned, PODVector<unsigned char> > componentLatestData_;
+    /// Queued remote events
+    Vector<RemoteEvent> remoteEvents_;
     /// Internal vector for delta update
     PODVector<unsigned char> deltaUpdateBits_;
     /// Internal set for node's user variable changes
