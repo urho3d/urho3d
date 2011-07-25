@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "HashSet.h"
 #include "Node.h"
 #include "PhysicsDefs.h"
 
@@ -129,7 +130,7 @@ private:
     /// Store previous transform for rendering interpolation
     void PreStep();
     /// Interpolate between previous and current transform and store as rendering transform
-    void PostStep(float t);
+    void PostStep(float t, HashSet<RigidBody*>& processedBodies);
     /// Create the body
     void CreateBody();
     /// Remove the body

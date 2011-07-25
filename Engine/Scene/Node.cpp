@@ -548,6 +548,22 @@ void Node::SetParent(Node* parent)
         parent->AddChild(this);
 }
 
+Matrix3x4 Node::GetWorldTargetTransform() const
+{
+    if (!smoothed_)
+        return GetWorldTransform();
+    
+    Matrix3x4 ret(targetPosition_, targetRotation_, scale_);
+    Node* current = parent_;
+    while (current && current != scene_)
+    {
+        ret = Matrix3x4(current->targetPosition_, current->targetRotation_, current->scale_) * ret;
+        current = current->parent_;
+    }
+    
+    return ret;
+}
+
 unsigned Node::GetNumChildren(bool recursive) const
 {
     if (!recursive)
@@ -916,7 +932,7 @@ Node* Node::CreateChild(unsigned id, CreateMode mode)
     return newNode;
 }
 
-void Node::UpdateWorldTransform()
+void Node::UpdateWorldTransform() const
 {
     // For now, assume that the Scene has identity transform so that we skip one matrix multiply. However in the future
     // we may want dynamic root nodes for large worlds

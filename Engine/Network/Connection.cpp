@@ -711,7 +711,7 @@ String Connection::ToString() const
 
 void Connection::ProcessNode(Node* node)
 {
-    if (!node || processedNodes_.Contains(node))
+    if (!node)
         return;
     
     processedNodes_.Insert(node);
@@ -720,7 +720,10 @@ void Connection::ProcessNode(Node* node)
     PODVector<Node*> depends;
     node->GetDependencyNodes(depends);
     for (PODVector<Node*>::ConstIterator i = depends.Begin(); i != depends.End(); ++i)
-        ProcessNode(*i);
+    {
+        if (!processedNodes_.Contains(*i))
+            ProcessNode(*i);
+    }
     
     // Check if the client's scene state already has this node
     if (sceneState_.Find(node->GetID()) != sceneState_.End())

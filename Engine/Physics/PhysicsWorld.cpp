@@ -201,9 +201,10 @@ void PhysicsWorld::Update(float timeStep)
             SendCollisionEvents();
             
             // Interpolate transforms of physics objects
+            processedBodies_.Clear();
             float t = Clamp(timeAcc_ / internalTimeStep, 0.0f, 1.0f);
             for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
-                (*i)->PostStep(t);
+                (*i)->PostStep(t, processedBodies_);
             
             // Send post-step event
             SendEvent(E_PHYSICSPOSTSTEP, eventData);

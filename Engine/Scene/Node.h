@@ -156,19 +156,20 @@ public:
     const Vector3& GetPosition() const { return position_; }
     /// Return rotation
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return unsmoothed (target) position
-    const Vector3& GetTargetPosition() const { return smoothed_ ? targetPosition_ : position_; }
-    /// Return unsmoothed (target) rotation
-    const Quaternion& GetTargetRotation() const { return smoothed_ ? targetRotation_ : rotation_; }
     /// Return direction. Identity rotation equals positive Z
     Vector3 GetDirection() const { return rotation_ * Vector3::FORWARD; }
     /// Return scale
     const Vector3& GetScale() const { return scale_; }
+    /// Return unsmoothed (target) position
+    const Vector3& GetTargetPosition() const { return smoothed_ ? targetPosition_ : position_; }
+    /// Return unsmoothed (target) rotation
+    const Quaternion& GetTargetRotation() const { return smoothed_ ? targetRotation_ : rotation_; }
     /// Return local transform
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
-    
+    /// Return unsmoothed (target) local transform
+    Matrix3x4 GetTargetTransform() const { return Matrix3x4(GetTargetPosition(), GetTargetRotation(), scale_); }
     /// Return world-space position
-    Vector3 GetWorldPosition()
+    Vector3 GetWorldPosition() const
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -177,7 +178,7 @@ public:
     }
     
     /// Return world-space rotation
-    Quaternion GetWorldRotation()
+    Quaternion GetWorldRotation() const
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -186,7 +187,7 @@ public:
     }
     
     /// Return world-space direction
-    Vector3 GetWorldDirection()
+    Vector3 GetWorldDirection() const
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -195,7 +196,7 @@ public:
     }
     
     /// Return world-space scale
-    Vector3 GetWorldScale()
+    Vector3 GetWorldScale() const
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -203,8 +204,26 @@ public:
         return worldTransform_.Scale();
     }
     
+    /// Return world-space unsmoothed (target) position. Is recalculated each time
+    Vector3 GetWorldTargetPosition() const
+    {
+        if (!smoothed_)
+            return GetWorldPosition();
+        else
+            return GetWorldTargetTransform().Translation();
+    }
+    
+    /// Return world-space unsmoothed (target) rotation. Is recalculated each time
+    Quaternion GetWorldTargetRotation() const
+    {
+        if (!smoothed_)
+            return GetWorldRotation();
+        else
+            return GetWorldTargetTransform().Rotation();
+    }
+    
     /// Return world-space transform
-    const Matrix3x4& GetWorldTransform()
+    const Matrix3x4& GetWorldTransform() const
     {
         if (dirty_)
             UpdateWorldTransform();
@@ -212,6 +231,8 @@ public:
         return worldTransform_;
     }
     
+    /// Return world-space unsmoothed (target) transform. Is recalculated each time
+    Matrix3x4 GetWorldTargetTransform() const;
     /// Return whether transform has changed and world transform needs recalculation
     bool IsDirty() const { return dirty_; }
     /// Return whether motion smoothing is enabled
@@ -291,7 +312,7 @@ protected:
     
 private:
     /// Recalculate the world transform
-    void UpdateWorldTransform();
+    void UpdateWorldTransform() const;
     /// Remove child node by iterator
     void RemoveChild(Vector<SharedPtr<Node> >::Iterator i);
     /// Return child nodes recursively
@@ -314,7 +335,7 @@ private:
     /// Scale
     Vector3 scale_;
     /// World-space transform matrix
-    Matrix3x4 worldTransform_;
+    mutable Matrix3x4 worldTransform_;
     /// Target position for network motion smoothing
     Vector3 targetPosition_;
     /// Target rotation for network motion smoothing
@@ -336,7 +357,7 @@ private:
     /// Active smoothing flags
     unsigned char smoothingFlags_;
     /// World transform needs update flag
-    bool dirty_;
+    mutable bool dirty_;
     /// Smoothed motion flag
     bool smoothed_;
 };

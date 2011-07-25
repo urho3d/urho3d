@@ -159,13 +159,13 @@ private:
     Map<unsigned, PODVector<unsigned char> > componentLatestData_;
     /// Queued remote events
     Vector<RemoteEvent> remoteEvents_;
-    /// Internal vector for delta update
+    /// Delta update bits
     PODVector<unsigned char> deltaUpdateBits_;
-    /// Internal set for node's user variable changes
+    /// Node's changed user variables
     HashSet<ShortStringHash> changedVars_;
-    /// Internal set for already processed nodes during an update
+    /// Already processed nodes during a replication update
     HashSet<Node*> processedNodes_;
-    /// Internal map of preallocated variants of correct type per networked object class
+    /// Preallocated variants of correct type per networked object class
     Map<ShortStringHash, Vector<Variant> > classCurrentState_;
     /// Reused message buffer
     VectorBuffer msg_;

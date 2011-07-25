@@ -560,9 +560,10 @@ void CollisionShape::UpdateTransform()
     else
     {
         // No rigid body. Must update the geometry transform manually
-        /// \todo Support parented nodes
-        Vector3 nodePos = node_->GetPosition();
-        Quaternion nodeRot = node_->GetRotation();
+        // Use the target transform in case the node has smoothed motion enabled
+        Matrix3x4 transform = node_->GetWorldTargetTransform();
+        Vector3 nodePos = transform.Translation();
+        Quaternion nodeRot = transform.Rotation();
         Vector3 geomPos = nodePos + (nodeRot * (geometryScale_ * position_));
         Quaternion geomRot = nodeRot * rotation_;
         
@@ -826,8 +827,7 @@ void CollisionShape::CreateGeometry()
         geometry_ = 0;
     }
     
-    /// \todo Support parented nodes
-    geometryScale_ = node_->GetScale();
+    geometryScale_ = node_->GetWorldScale();
     Vector3 size = size_ * geometryScale_;
     dSpaceID space = physicsWorld_->GetSpace();
     
