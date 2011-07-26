@@ -25,6 +25,7 @@
 
 #include "Variant.h"
 
+/// Last sent state of a component for network replication
 struct ComponentReplicationState
 {
     /// Component type
@@ -35,6 +36,7 @@ struct ComponentReplicationState
     unsigned frameNumber_;
 };
 
+/// Last sent state of a node for network replication
 struct NodeReplicationState
 {
     /// Attribute values

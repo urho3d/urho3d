@@ -151,7 +151,7 @@ private:
     VariantMap identity_;
     /// Scene
     WeakPtr<Scene> scene_;
-    /// Scene replication state (as last sent to the client)
+    /// Last sent state of the scene for network replication
     Map<unsigned, NodeReplicationState> sceneState_;
     /// Pending latest data for not yet received nodes
     Map<unsigned, PODVector<unsigned char> > nodeLatestData_;

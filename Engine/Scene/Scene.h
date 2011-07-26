@@ -38,7 +38,7 @@ static const unsigned FIRST_LOCAL_ID = 0x01000000;
 /// Last local node/component ID
 static const unsigned LAST_LOCAL_ID = 0xffffffff;
 
-/// Scene's asynchronous loading progress
+/// Asynchronous loading progress of a scene
 struct AsyncProgress
 {
     /// File for binary mode
