@@ -894,7 +894,7 @@ bool Node::LoadXML(const XMLElement& source, bool readChildren)
 
 Component* Node::CreateComponent(ShortStringHash type, unsigned id, CreateMode mode)
 {
-    // Make sure the object in question is a component
+    // Check that creation succeeds and that the object in fact is a component
     SharedPtr<Component> newComponent = DynamicCast<Component>(context_->CreateObject(type));
     if (!newComponent)
     {

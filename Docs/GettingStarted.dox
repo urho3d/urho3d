@@ -55,6 +55,8 @@ F7          Load scene
 T           Toggle profiling display
 \endverbatim
 
+TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command Urho3D.exe Scripts/TestScene.as server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, eg. Urho3D.exe Scripts/TestScene.as 127.0.0.1
+
 \section Running_NinjaSnowWar NinjaSnowWar
 
 A third-person action game. To start, run NinjaSnowWar.bat in the Bin directory, or use the command Urho3D.exe Scripts/NinjaSnowWar.as
@@ -75,8 +77,10 @@ F4          Toggle octree debug geometry
 
 Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
 
-Starting in headless mode (ChatServer.bat) automatically starts the server. On the client, first type the server address to the text edit box and click
-"Connect." After connecting successfully you can start typing messages; either press return or click "Send" to send them. Press ESC to exit.
+On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages; 
+either press return or click "Send" to send them. Press ESC to exit.
+
+To connect automatically, the server address can also be given on the command line, for example Urho3D.exe Scripts/Chat.as 127.0.0.1
 
 \section Running_Commandline Command line options
 

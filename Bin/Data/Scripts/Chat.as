@@ -1,3 +1,5 @@
+#include "Scripts/Network.as"
+
 Text@ chatHistoryText;
 UIElement@ buttonLayout;
 LineEdit@ textEdit;
@@ -18,15 +20,25 @@ void Start()
     SubscribeToEvent("NetworkMessage", "HandleNetworkMessage");
 
     if (engine.headless)
-    {
         OpenConsoleWindow();
-        HandleStartServer();
-        return;
-    }
+    else
+    {
+        InitUI();
 
-    SubscribeToEvent("LogMessage", "HandleLogMessage");
-    SubscribeToEvent("KeyDown", "HandleKeyDown");
-    InitUI();
+        SubscribeToEvent("LogMessage", "HandleLogMessage");
+        SubscribeToEvent("KeyDown", "HandleKeyDown");
+        SubscribeToEvent(textEdit, "TextFinished", "HandleTextFinished");
+        SubscribeToEvent(sendButton, "Pressed", "HandleSend");
+        SubscribeToEvent(connectButton, "Pressed", "HandleConnect");
+        SubscribeToEvent(disconnectButton, "Pressed", "HandleDisconnect");
+        SubscribeToEvent(startServerButton, "Pressed", "HandleStartServer");
+    }
+    
+    ParseNetworkArguments();
+    if (startServer)
+        network.StartServer(serverPort);
+    if (startClient)
+        network.Connect(serverAddress, serverPort, null);
 }
 
 void InitUI()
@@ -62,12 +74,6 @@ void InitUI()
     connectButton = AddUIButton("Connect", 90);
     disconnectButton = AddUIButton("Disconnect", 100);
     startServerButton = AddUIButton("Start Server", 110);
-
-    SubscribeToEvent(textEdit, "TextFinished", "HandleTextFinished");
-    SubscribeToEvent(sendButton, "Pressed", "HandleSend");
-    SubscribeToEvent(connectButton, "Pressed", "HandleConnect");
-    SubscribeToEvent(disconnectButton, "Pressed", "HandleDisconnect");
-    SubscribeToEvent(startServerButton, "Pressed", "HandleStartServer");
 
     chatHistory.Resize((graphics.height - 20) / chatHistoryText.rowHeight);
 }
@@ -136,7 +142,7 @@ void HandleConnect()
     String address = textEdit.text.Trimmed();
     if (!address.empty)
     {
-        network.Connect(address, 1234, null);
+        network.Connect(address, serverPort, null);
         textEdit.text = "";
     }
 }
@@ -149,7 +155,7 @@ void HandleDisconnect()
 void HandleStartServer()
 {
     if (!network.serverRunning)
-        network.StartServer(1234);
+        network.StartServer(serverPort);
 }
 
 void HandleNetworkMessage(StringHash eventType, VariantMap& eventData)

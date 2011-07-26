@@ -743,9 +743,6 @@ void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& event
 
 void Connection::ProcessNode(Node* node)
 {
-    if (!node)
-        return;
-    
     processedNodes_.Insert(node);
     
     // Process depended upon nodes first
@@ -753,11 +750,12 @@ void Connection::ProcessNode(Node* node)
     node->GetDependencyNodes(depends);
     for (PODVector<Node*>::ConstIterator i = depends.Begin(); i != depends.End(); ++i)
     {
-        if (!processedNodes_.Contains(*i))
+        // Paranoid null check: a component might supply a null dependency
+        if (*i && !processedNodes_.Contains(*i))
             ProcessNode(*i);
     }
     
-    // Check if the client's scene state already has this node
+    // Check if the client's replication state already has this node
     if (sceneState_.Find(node->GetID()) != sceneState_.End())
         ProcessExistingNode(node);
     else

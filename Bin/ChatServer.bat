@@ -1,1 +1,1 @@
-Urho3D.exe Scripts/Chat.as -headless %1 %2 %3 %4 %5 %6 %7 %8
+Urho3D.exe Scripts/Chat.as server -headless %1 %2 %3 %4 %5 %6 %7 %8
