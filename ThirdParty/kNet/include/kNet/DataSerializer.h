@@ -16,9 +16,11 @@
 /** @file DataSerializer.h
 	@brief The class \ref kNet::DataSerializer DataSerializer. Stores POD data to bit streams. */
 
-#include <vector>
+// Modified by Lasse Öörni for Urho3D
+
 #include <cassert>
-#include <string>
+
+#include "StringBase.h"
 
 #include "kNetBuildConfig.h"
 #include "kNet/SharedPtr.h"
@@ -34,7 +36,7 @@ namespace kNet
 
 struct SerializedMessage : public RefCountable
 {
-	std::vector<char> data;
+	PODVector<char> data;
 };
 
 /// DataSerializer is a helper class that can be used to serialize data types to a stream of raw bits 
@@ -59,15 +61,15 @@ public:
 
 	/// Instantiates a new DataSerializer that writes to the given vector. 
 	/// @param maxBytes The maximum number of bytes that the message can take up space.
-	explicit DataSerializer(std::vector<char> &data, size_t maxBytes);
+	explicit DataSerializer(PODVector<char> &data, size_t maxBytes);
 
 	/// Instantiates a new DataSerializer that writes to the given vector, using a message template. 
 	/// @param maxBytes The maximum number of bytes that the message can take up space.
-	DataSerializer(std::vector<char> &data, size_t maxBytes, const SerializedMessageDesc *msgTemplate);
+	DataSerializer(PODVector<char> &data, size_t maxBytes, const SerializedMessageDesc *msgTemplate);
 
 	/// Appends a single element of the passed type. If you are using a serialization template to
 	/// aid in serialization, the type T may be any of the types bit, u8, s8, u16, s16, u32, s32, u64, s64, float, double, 
-	/// const char * or std::string.
+	/// const char * or String.
 	/// If you are not using a serialization template, you may pass in any type that is a POD type and can be reinterpret_casted
 	/// to a u8 buffer and memcpy'd to a byte buffer.
 	template<typename T>
@@ -86,7 +88,7 @@ public:
 	void AddString(const char *str);
 
 	/// See \ref void kNet::DataSerializer::AddString(const char *str); "".
-	void AddString(const std::string &str) { AddString(str.c_str()); }
+	void AddString(const String &str) { AddString(str.CString()); }
 
 	/// Appends the given amount of elements from the passed array.
 	template<typename T>
@@ -166,7 +168,7 @@ void DataSerializer::Add(const T &value)
 
 template<> void DataSerializer::Add<char*>(char * const & value);
 template<> void DataSerializer::Add<const char*>(const char * const & value);
-template<> void DataSerializer::Add<std::string>(const std::string &value);
+template<> void DataSerializer::Add<String>(const String &value);
 
 template<> void DataSerializer::Add<bit>(const bit &value);
 
@@ -250,15 +252,15 @@ public:
 };
 
 template<>
-class TypeSerializer<std::string>
+class TypeSerializer<String>
 {
 public:
-	static size_t Size(const std::string &value)
+	static size_t Size(const String &value)
 	{
-		return value.length()+1;
+		return value.Length()+1;
 	}
 
-	static void SerializeTo(DataSerializer &dst, const std::string &src)
+	static void SerializeTo(DataSerializer &dst, const String &src)
 	{
 #ifdef _DEBUG
 		size_t bitPos = dst.BitsFilled();
@@ -269,7 +271,7 @@ public:
 #endif
 	}
 
-	static void DeserializeFrom(DataDeserializer &src, std::string &dst)
+	static void DeserializeFrom(DataDeserializer &src, String &dst)
 	{
 		dst = src.ReadString();
 	}

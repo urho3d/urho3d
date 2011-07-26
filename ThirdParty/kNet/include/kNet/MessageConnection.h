@@ -16,10 +16,13 @@
 /** @file MessageConnection.h
 	@brief The MessageConnection and ConnectionStatistics classes. */
 
-#include <vector>
-#include <map>
+// Modified by Lasse Öörni for Urho3D
+
 #include <utility>
-#include <set>
+
+#include "Vector.h"
+#include "Map.h"
+#include "Set.h"
 
 #include "kNetBuildConfig.h"
 #include "WaitFreeQueue.h"
@@ -68,7 +71,7 @@ struct ConnectionStatistics
 		bool replyReceived;        ///< True of PingReply has already been received for this.
 	};
 	/// Contains an entry for each recently performed Ping operation, sorted by age (oldest first).
-	std::vector<PingTrack> ping;
+	PODVector<PingTrack> ping;
 
 	/// Remembers both in- and outbound traffic events on the socket.
 	struct TrafficTrack
@@ -82,7 +85,7 @@ struct ConnectionStatistics
 		unsigned long bytesOut;    ///< The total number of bytes the sent datagrams contained. 
 	};
 	/// Contains an entry for each recent traffic event (data in/out) on the connection, sorted by age (oldest first).
-	std::vector<TrafficTrack> traffic;
+	PODVector<TrafficTrack> traffic;
 
 	/// Remembers the send/receive time of a datagram with a certain ID.
 	struct DatagramIDTrack
@@ -91,7 +94,7 @@ struct ConnectionStatistics
 		packet_id_t packetID;
 	};
 	/// Contains an entry for each recently received packet, sorted by age (oldest first).
-	std::vector<DatagramIDTrack> recvPacketIDs;
+	PODVector<DatagramIDTrack> recvPacketIDs;
 };
 
 /// Comparison object that sorts the two messages by their priority (higher priority/smaller number first).
@@ -122,7 +125,7 @@ enum ConnectionState
 };
 
 /// Returns a textual representation of a ConnectionState.
-std::string ConnectionStateToString(ConnectionState state);
+String ConnectionStateToString(ConnectionState state);
 
 // Prevent confusion with Win32 functions
 #ifdef SendMessage
@@ -304,7 +307,7 @@ public:
 	void FreeMessage(NetworkMessage *msg); // [main and worker thread]
 	
 	/// Returns a single-line message describing the connection state.
-	std::string ToString() const; // [main and worker thread]
+	String ToString() const; // [main and worker thread]
 
 	/// Dumps a long multi-line status message of this connection state to stdout.
 	void DumpStatus() const; // [main thread]
@@ -520,15 +523,15 @@ protected:
 	unsigned long outboundReliableMessageNumberCounter; // [worker thread]
 
 	/// A (messageID, contentID) pair.
-	typedef std::pair<u32, u32> MsgContentIDPair;
+	typedef Pair<u32, u32> MsgContentIDPair;
 
-	typedef std::map<MsgContentIDPair, std::pair<packet_id_t, tick_t> > ContentIDReceiveTrack;
+	typedef Map<MsgContentIDPair, Pair<packet_id_t, tick_t> > ContentIDReceiveTrack;
 
 	/// Each (messageID, contentID) pair has a packetID "stamp" associated to them to track 
 	/// and decimate out-of-order received obsoleted messages.
 	ContentIDReceiveTrack inboundContentIDStamps; // [worker thread]
 
-	typedef std::map<MsgContentIDPair, NetworkMessage*> ContentIDSendTrack;
+	typedef Map<MsgContentIDPair, NetworkMessage*> ContentIDSendTrack;
 
 	ContentIDSendTrack outboundContentIDMessages; // [worker thread]
 

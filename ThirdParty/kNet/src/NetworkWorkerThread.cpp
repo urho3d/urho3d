@@ -15,6 +15,8 @@
 /** @file NetworkWorkerThread.cpp
 	@brief */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include <utility>
 
 #ifdef KNET_USE_BOOST
@@ -44,8 +46,8 @@ NetworkWorkerThread::NetworkWorkerThread()
 void NetworkWorkerThread::AddConnection(MessageConnection *connection)
 {
 	workThread.Hold();
-	Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
-	lock->push_back(connection);
+	Lockable<Vector<MessageConnection *> >::LockType lock = connections.Acquire();
+	lock->Push(connection);
 	LOG(LogVerbose, "Added connection %p to NetworkWorkerThread.", connection);
 	workThread.Resume();
 }
@@ -54,12 +56,12 @@ void NetworkWorkerThread::RemoveConnection(MessageConnection *connection)
 {
 	workThread.Hold();
 
-	Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
+	Lockable<Vector<MessageConnection *> >::LockType lock = connections.Acquire();
 
-	for(size_t i = 0; i < lock->size(); ++i)
+	for(size_t i = 0; i < lock->Size(); ++i)
 		if ((*lock)[i] == connection)
 		{
-			lock->erase(lock->begin() + i);
+			lock->Erase(lock->Begin() + i);
 			LOG(LogVerbose, "NetworkWorkerThread::RemoveConnection: Connection %p removed.", connection);
 			workThread.Resume();
 			return;
@@ -71,8 +73,8 @@ void NetworkWorkerThread::RemoveConnection(MessageConnection *connection)
 void NetworkWorkerThread::AddServer(NetworkServer *server)
 {
 	workThread.Hold();
-	Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
-	lock->push_back(server);
+	Lockable<Vector<NetworkServer *> >::LockType lock = servers.Acquire();
+	lock->Push(server);
 	LOG(LogVerbose, "Added server %p to NetworkWorkerThread.", server);
 	workThread.Resume();
 }
@@ -82,15 +84,15 @@ void NetworkWorkerThread::RemoveServer(NetworkServer *server)
 	workThread.Hold();
 
 	PolledTimer timer;
-	Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
+	Lockable<Vector<NetworkServer *> >::LockType lock = servers.Acquire();
 	float lockWait = timer.MSecsElapsed();
 	LOG(LogWaits, "NetworkWorkerThread::RemoveServer: Waited %f msecs to lock servers list.",
 		lockWait);
 
-	for(size_t i = 0; i < lock->size(); ++i)
+	for(size_t i = 0; i < lock->Size(); ++i)
 		if ((*lock)[i] == server)
 		{
-			lock->erase(lock->begin() + i);
+			lock->Erase(lock->Begin() + i);
 			LOG(LogVerbose, "NetworkWorkerThread::RemoveServer: Server %p removed.", server);
 			workThread.Resume();
 			return;
@@ -109,16 +111,16 @@ void NetworkWorkerThread::StopThread()
 	workThread.Stop();
 
 	{
-		Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
-		for(size_t i = 0; i < lock->size(); ++i)
+		Lockable<Vector<NetworkServer *> >::LockType lock = servers.Acquire();
+		for(size_t i = 0; i < lock->Size(); ++i)
 		{
 			LOG(LogError, "NetworkWorkerThread::StopThread: Warning: NetworkServer %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
 			(*lock)[i]->SetWorkerThread(0);
 		}
 	}
 	{
-		Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
-		for(size_t i = 0; i < lock->size(); ++i)
+		Lockable<Vector<MessageConnection *> >::LockType lock = connections.Acquire();
+		for(size_t i = 0; i < lock->Size(); ++i)
 		{
 			LOG(LogError, "NetworkWorkerThread::StopThread: Warning: MessageConnection %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
 			(*lock)[i]->SetWorkerThread(0);
@@ -128,17 +130,17 @@ void NetworkWorkerThread::StopThread()
 
 int NetworkWorkerThread::NumConnections() const
 {
-	return connections.Acquire()->size();
+	return connections.Acquire()->Size();
 }
 
 int NetworkWorkerThread::NumServers() const
 {
-	return servers.Acquire()->size();
+	return servers.Acquire()->Size();
 }
 
 void NetworkWorkerThread::MainLoop()
 {
-	std::vector<MessageConnection*> writeWaitConnections;
+	Vector<MessageConnection*> writeWaitConnections;
 
 	EventArray waitEvents;
 
@@ -149,8 +151,8 @@ void NetworkWorkerThread::MainLoop()
 
 	LOG(LogInfo, "NetworkWorkerThread starting main loop.");
 
-	std::vector<MessageConnection*> connectionList;
-	std::vector<NetworkServer*> serverList;
+	Vector<MessageConnection*> connectionList;
+	Vector<NetworkServer*> serverList;
 
 	while(!workThread.ShouldQuit())
 	{
@@ -159,11 +161,11 @@ void NetworkWorkerThread::MainLoop()
 			break;
 	
 		{
-			Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
+			Lockable<Vector<MessageConnection *> >::LockType lock = connections.Acquire();
 			connectionList = *lock;
 		}
 		{
-			Lockable<std::vector<NetworkServer *> >::LockType serverLock = servers.Acquire();
+			Lockable<Vector<NetworkServer *> >::LockType serverLock = servers.Acquire();
 			serverList = *serverLock;
 		}
 
@@ -175,12 +177,12 @@ void NetworkWorkerThread::MainLoop()
 		int waitTime = maxWaitTime;
 
 		waitEvents.Clear();
-		writeWaitConnections.clear();
+		writeWaitConnections.Clear();
 
 		// Next, build the event array that is used for waiting on the sockets.
 		// At odd indices we will have socket read events, and at even indices the socket write events.
 		// After the events for each connection, we will have the UDP listen sockets for each UDP server connection.
-		for(size_t i = 0; i < connectionList.size(); ++i)
+		for(size_t i = 0; i < connectionList.Size(); ++i)
 		{
 			MessageConnection &connection = *connectionList[i];
 
@@ -189,14 +191,14 @@ void NetworkWorkerThread::MainLoop()
 				connection.UpdateConnection();
 			} catch(const NetException &e)
 			{
-				LOG(LogError, (std::string("kNet::NetException thrown when processing UpdateConnection() for client connection: ") + e.what()).c_str());
+				LOG(LogError, (String("kNet::NetException thrown when processing UpdateConnection() for client connection: ") + e.what()).CString());
 				if (connection.GetSocket())
 					connection.GetSocket()->Close();
 			}
 
 			if (connection.GetConnectionState() == ConnectionClosed || !connection.GetSocket() || !connection.GetSocket()->Connected()) // This does not need to be checked each iteration.
 			{
-				connectionList.erase(connectionList.begin()+i);
+				connectionList.Erase(connectionList.Begin()+i);
 				--i;
 				continue;
 			}
@@ -223,7 +225,7 @@ void NetworkWorkerThread::MainLoop()
 				{
 					int msecsLeftUntilWrite = (int)connection.TimeUntilCanSendPacket();
 					waitTime = min(waitTime, msecsLeftUntilWrite);
-					writeWaitConnections.push_back(&connection);
+					writeWaitConnections.Push(&connection);
 					waitEvents.AddEvent(falseEvent);
 					assert(falseEvent.Test() == false && !falseEvent.IsNull());
 				}
@@ -249,13 +251,13 @@ void NetworkWorkerThread::MainLoop()
 		// In this case, the NetworkServer object handlesg all data reads, but data sends
 		// are still managed by the individual MessageConnection objects.
 		// For TCP servers, this step is not needed, since each connection has its own independent socket.
-		for(size_t i = 0; i < serverList.size(); ++i)
+		for(size_t i = 0; i < serverList.Size(); ++i)
 		{
 			NetworkServer &server = *serverList[i];
 
-			std::vector<Socket *> &listenSockets = server.ListenSockets();
+			Vector<Socket *> &listenSockets = server.ListenSockets();
 
-			for(size_t j = 0; j < listenSockets.size(); ++j)
+			for(size_t j = 0; j < listenSockets.Size(); ++j)
 				if (listenSockets[j]->TransportLayer() == SocketOverUDP)
 				{
 					Event listenEvent = listenSockets[j]->GetOverlappedReceiveEvent();
@@ -281,7 +283,7 @@ void NetworkWorkerThread::MainLoop()
 
 		if (index >= 0 && index < waitEvents.Size()) // An event was triggered?
 		{
-			if ((index >> 1) < (int)connectionList.size())
+			if ((index >> 1) < (int)connectionList.Size())
 			{
 				MessageConnection *connection = connectionList[index>>1];
 				assert(connection);
@@ -298,39 +300,39 @@ void NetworkWorkerThread::MainLoop()
 						connection->SendOutPackets();
 				} catch(const NetException &e)
 				{
-					LOG(LogError, (std::string("kNet::NetException thrown when processing client connection: ") + e.what()).c_str());
+					LOG(LogError, (String("kNet::NetException thrown when processing client connection: ") + e.what()).CString());
 					if (connection->GetSocket())
 						connection->GetSocket()->Close();
 				}
 			}
 			else // A UDP server received a message.
 			{
-				int socketIndex = index - connectionList.size() * 2;
-				if (serverList.size() > 0)
+				int socketIndex = index - connectionList.Size() * 2;
+				if (serverList.Size() > 0)
 				{
 					NetworkServer &server = *serverList[0]; ///\bug In case of multiple servers, this is not correct!
-					std::vector<Socket *> &listenSockets = server.ListenSockets();
-					if (socketIndex < (int)listenSockets.size())
+					Vector<Socket *> &listenSockets = server.ListenSockets();
+					if (socketIndex < (int)listenSockets.Size())
 					{
 						try
 						{
 							server.ReadUDPSocketData(listenSockets[socketIndex]);
 						} catch(const NetException &e)
 						{
-							LOG(LogError, (std::string("kNet::NetException thrown when reading server socket: ") + e.what()).c_str());
+							LOG(LogError, (String("kNet::NetException thrown when reading server socket: ") + e.what()).CString());
 							///\todo Could Close(0) the connection here.
 						}
 					}
 					else
 					{
 						LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: Cannot find server socket to read from: EventArray::Wait returned index %d (socketIndex %d), but "
-							"serverList.size()=%d, connectionList.size()=%d!", index, socketIndex, (int)serverList.size(), (int)connectionList.size());
+							"serverList.Size()=%d, connectionList.Size()=%d!", index, socketIndex, (int)serverList.Size(), (int)connectionList.Size());
 					}
 				}
 				else
 				{
 					LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: EventArray::Wait returned index %d (socketIndex %d), but "
-						"serverList.size()=%d, connectionList.size()=%d!", index, socketIndex, (int)serverList.size(), (int)connectionList.size());
+						"serverList.Size()=%d, connectionList.Size()=%d!", index, socketIndex, (int)serverList.Size(), (int)connectionList.Size());
 				}
 			}
 		}
@@ -338,14 +340,14 @@ void NetworkWorkerThread::MainLoop()
 		// The UDP send throttle timers are not read through events. The writeWaitConnections list
 		// contains a list of UDP connections which are now, or will very soon (in less than 1msec) be ready for writing. 
 		// Poll each and try to send a message.
-		for(size_t i = 0; i < writeWaitConnections.size(); ++i)
+		for(size_t i = 0; i < writeWaitConnections.Size(); ++i)
 		{
 			try
 			{
 				writeWaitConnections[i]->SendOutPackets();
 			} catch(const NetException &e)
 			{
-				LOG(LogError, (std::string("kNet::NetException thrown when sending out a network message: ") + e.what()).c_str());
+				LOG(LogError, (String("kNet::NetException thrown when sending out a network message: ") + e.what()).CString());
 			}
 		}
 	}

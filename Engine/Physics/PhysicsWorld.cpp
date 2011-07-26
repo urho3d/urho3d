@@ -63,6 +63,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     fps_(DEFAULT_FPS),
     maxContacts_(DEFAULT_MAX_CONTACTS),
     bounceThreshold_(DEFAULT_BOUNCE_THRESHOLD),
+    maxNetworkAngularVelocity_(DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY),
     timeAcc_(0.0f),
     randomSeed_(0)
 {

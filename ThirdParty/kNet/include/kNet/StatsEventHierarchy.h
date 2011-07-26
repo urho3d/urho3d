@@ -16,8 +16,10 @@
 /** @file StatsEventHierarchy.h
 	@brief Stores a hierarchy of network events for profiling purposes. */
 
-#include <map>
-#include <string>
+// Modified by Lasse Öörni for Urho3D
+
+#include "Map.h"
+#include "StringBase.h"
 
 #include "kNet/WaitFreeQueue.h"
 #include "kNet/Clock.h"
@@ -40,7 +42,7 @@ struct StatsEvent
 	tick_t time;
 };
 
-inline std::string FirstToken(const char *str, char delimiter, int &nextTokenStart)
+inline String FirstToken(const char *str, char delimiter, int &nextTokenStart)
 {
 	int i = 0;
 	while(str[i] != '\0' && str[i] != delimiter)
@@ -49,20 +51,20 @@ inline std::string FirstToken(const char *str, char delimiter, int &nextTokenSta
 		nextTokenStart = -1;
 	else
 		nextTokenStart = i+1;
-	return std::string(str, str + i);
+	return String(str, i);
 }
 
 class StatsEventHierarchyNode
 {
 public:
-	///\todo To improve performance, don't use a std::string as a key to the map, and replace the map with a more efficient data structure.
-	typedef std::map<std::string, StatsEventHierarchyNode> NodeMap;
+	///\todo To improve performance, don't use a String as a key to the map, and replace the map with a more efficient data structure.
+	typedef Map<String, StatsEventHierarchyNode> NodeMap;
 	NodeMap children;
 
 	WaitFreeQueue<StatsEvent> events;
 
 	/// Specifies the unit of the numeric data in this node.
-	std::string valueType;
+	String valueType;
 
 	StatsEventHierarchyNode()
 	:events(4) // The default size for the queue must be at least four elements (pow2, >2).
@@ -87,8 +89,8 @@ public:
 	{
 		PruneOldEventsThisLevel(ageMSecs);
 
-		for(NodeMap::iterator iter = children.begin(); iter != children.end(); ++iter)
-			iter->second.PruneOldEventsHierarchy(ageMSecs);
+		for(NodeMap::Iterator iter = children.Begin(); iter != children.End(); ++iter)
+			iter->second_.PruneOldEventsHierarchy(ageMSecs);
 	}
 
 	void AddEventToThisLevel(float value, int oldAgeMSecs)
@@ -106,13 +108,13 @@ public:
 	void AddEventToHierarchy(const char *name, float value, const char *valueType, int oldAgeMSecs)
 	{
 		int nextTokenStart = 0;
-		std::string childName = FirstToken(name, '.', nextTokenStart);
-		if (childName.empty())
+		String childName = FirstToken(name, '.', nextTokenStart);
+		if (childName.Empty())
 			AddEventToThisLevel(value, oldAgeMSecs);
 		else
 		{
-			NodeMap::iterator iter = children.find(childName);
-			if (iter == children.end()) 
+			NodeMap::Iterator iter = children.Find(childName);
+			if (iter == children.End())
 				children[childName].valueType = valueType; // To optimize, only copy this field in the first time the node is created.
 			if (nextTokenStart == -1)
 				children[childName].AddEventToThisLevel(value, oldAgeMSecs);
@@ -124,13 +126,13 @@ public:
 	StatsEventHierarchyNode *FindChild(const char *name)
 	{
 		int nextTokenStart = 0;
-		std::string childName = FirstToken(name, '.', nextTokenStart);
-		if (childName.empty())
+		String childName = FirstToken(name, '.', nextTokenStart);
+		if (childName.Empty())
 			return this;
 		else
 		{
-			NodeMap::iterator iter = children.find(childName);
-			if (iter == children.end()) 
+			NodeMap::Iterator iter = children.Find(childName);
+			if (iter == children.End())
 				return 0;
 			if (nextTokenStart == -1)
 				return &children[childName];
@@ -148,8 +150,8 @@ public:
 	{
 		int count = AccumulateTotalCountThisLevel();
 
-		for(NodeMap::const_iterator iter = children.begin(); iter != children.end(); ++iter)
-			count += iter->second.AccumulateTotalCountHierarchy();
+		for(NodeMap::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
+			count += iter->second_.AccumulateTotalCountHierarchy();
 
 		return count;
 	}
@@ -166,8 +168,8 @@ public:
 	{
 		float value = AccumulateTotalValueThisLevel();
 
-		for(NodeMap::const_iterator iter = children.begin(); iter != children.end(); ++iter)
-			value += iter->second.AccumulateTotalValueHierarchy();
+		for(NodeMap::ConstIterator iter = children.Begin(); iter != children.End(); ++iter)
+			value += iter->second_.AccumulateTotalValueHierarchy();
 
 		return value;
 	}

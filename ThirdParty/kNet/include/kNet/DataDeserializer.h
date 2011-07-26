@@ -16,6 +16,8 @@
 /** @file DataDeserializer.h
 	@brief The class \ref kNet::DataDeserializer DataDeserializer. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "kNetBuildConfig.h"
 #include "kNet/Types.h"
 
@@ -74,7 +76,7 @@ public:
 	/// The returned string will only contain ascii values in the range [32, 253], 0x0D, 0x0A, 0x09. Other values will 
 	/// be replaced with a space bar character (0x20). Because of this string validation method, do not use this function
 	/// to extract binary data of any kind (base64-encoded is fine).
-	std::string ReadString();
+	String ReadString();
 
 	/// Reads the given amount of bits and packs them into a u32, which is returned.
 	/// @param numBits the number of bits to read, [1, 32].
@@ -140,7 +142,7 @@ T DataDeserializer::Read()
 	return value;
 }
 
-template<> std::string DataDeserializer::Read<std::string>();
+template<> String DataDeserializer::Read<String>();
 
 template<> bool DataDeserializer::Read<bit>();
 

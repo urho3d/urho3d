@@ -15,6 +15,8 @@
 /** @file FragmentedTransferManager.cpp
 	@brief */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include <cstring>
 
 #ifdef KNET_USE_BOOST
@@ -35,17 +37,17 @@ namespace kNet
 
 void FragmentedSendManager::FragmentedTransfer::AddMessage(NetworkMessage *message)
 {
-	fragments.push_back(message);
+	fragments.Push(message);
 	message->transfer = this;
 }
 
 bool FragmentedSendManager::FragmentedTransfer::RemoveMessage(NetworkMessage *message)
 {
-	for(std::list<NetworkMessage*>::iterator iter = fragments.begin(); iter != fragments.end(); ++iter)
+	for(List<NetworkMessage*>::Iterator iter = fragments.Begin(); iter != fragments.End(); ++iter)
 		if (*iter == message)
 		{
 			message->transfer = 0;
-			fragments.erase(iter);
+			fragments.Erase(iter);
 			LOG(LogVerbose, "Removing message with seqnum %d (fragnum %d) from transfer ID %d (%p).", (int)message->messageNumber, (int)message->fragmentIndex, id, this);
 			return true;
 		}
@@ -54,8 +56,8 @@ bool FragmentedSendManager::FragmentedTransfer::RemoveMessage(NetworkMessage *me
 
 FragmentedSendManager::FragmentedTransfer *FragmentedSendManager::AllocateNewFragmentedTransfer()
 {
-	transfers.push_back(FragmentedTransfer());
-	FragmentedTransfer *transfer = &transfers.back();
+	transfers.Push(FragmentedTransfer());
+	FragmentedTransfer *transfer = &transfers.Back();
 	transfer->id = -1;
 	transfer->totalNumFragments = 0;
 
@@ -67,13 +69,13 @@ FragmentedSendManager::FragmentedTransfer *FragmentedSendManager::AllocateNewFra
 void FragmentedSendManager::FreeFragmentedTransfer(FragmentedTransfer *transfer)
 {
 	// Remove all references from any NetworkMessages to this structure.
-	for(std::list<NetworkMessage*>::iterator iter = transfer->fragments.begin(); iter != transfer->fragments.end(); ++iter)
+	for(List<NetworkMessage*>::Iterator iter = transfer->fragments.Begin(); iter != transfer->fragments.End(); ++iter)
 		(*iter)->transfer = 0;
 
-	for(TransferList::iterator iter = transfers.begin(); iter != transfers.end(); ++iter)
+	for(TransferList::Iterator iter = transfers.Begin(); iter != transfers.End(); ++iter)
 		if (&*iter == transfer)
 		{
-			transfers.erase(iter);
+			transfers.Erase(iter);
 			LOG(LogObjectAlloc, "Freed fragmented transfer ID=%d, numFragments: %d (%p).", transfer->id, (int)transfer->totalNumFragments, transfer);
 			return;
 		}
@@ -89,7 +91,7 @@ void FragmentedSendManager::RemoveMessage(FragmentedTransfer *transfer, NetworkM
 		return;
 	}
 
-	if (transfer->fragments.size() == 0)
+	if (transfer->fragments.Size() == 0)
 		FreeFragmentedTransfer(transfer);
 }
 
@@ -106,7 +108,7 @@ bool FragmentedSendManager::AllocateFragmentedTransferID(FragmentedTransfer &tra
 	while(used)
 	{
 		used = false;
-		for(TransferList::iterator iter = transfers.begin(); iter != transfers.end(); ++iter)
+		for(TransferList::Iterator iter = transfers.Begin(); iter != transfers.End(); ++iter)
 		{
 			if (iter->id == transferID)
 			{
@@ -126,8 +128,8 @@ bool FragmentedSendManager::AllocateFragmentedTransferID(FragmentedTransfer &tra
 
 void FragmentedSendManager::FreeAllTransfers()
 {
-	while(transfers.size() > 0)
-		FreeFragmentedTransfer(&transfers.front());
+	while(transfers.Size() > 0)
+		FreeFragmentedTransfer(&transfers.Front());
 }
 
 void FragmentedReceiveManager::NewFragmentStartReceived(int transferID, int numTotalFragments, const char *data, size_t numBytes)
@@ -141,16 +143,16 @@ void FragmentedReceiveManager::NewFragmentStartReceived(int transferID, int numT
 		return;
 	}
 
-	for(size_t i = 0; i < transfers.size(); ++i)
+	for(size_t i = 0; i < transfers.Size(); ++i)
 		if (transfers[i].transferID == transferID)
 		{
 			LOG(LogError, "An existing transfer with ID %d existed! Deleting it.", transferID);
-			transfers.erase(transfers.begin() + i);
+			transfers.Erase(transfers.Begin() + i);
 			--i;
 		}
 
-	transfers.push_back(ReceiveTransfer());
-	ReceiveTransfer &transfer = transfers.back();
+	transfers.Push(ReceiveTransfer());
+	ReceiveTransfer &transfer = transfers.Back();
 	transfer.transferID = transferID;
 	transfer.numTotalFragments = numTotalFragments;
 
@@ -168,28 +170,28 @@ bool FragmentedReceiveManager::NewFragmentReceived(int transferID, int fragmentN
 		return false;
 	}
 
-	for(size_t i = 0; i < transfers.size(); ++i)
+	for(size_t i = 0; i < transfers.Size(); ++i)
 		if (transfers[i].transferID == transferID)
 		{
 			ReceiveTransfer &transfer = transfers[i];
 
-			for(size_t j = 0; j < transfer.fragments.size(); ++j)
+			for(size_t j = 0; j < transfer.fragments.Size(); ++j)
 				if (transfer.fragments[j].fragmentIndex == fragmentNumber)
 				{
 					LOG(LogError, "A fragment with fragmentNumber %d already exists for transferID %d. Discarding the new fragment! Old size: %db, discarded size: %db",
-						fragmentNumber, transferID, (int)transfer.fragments[j].data.size(), (int)numBytes);
+						fragmentNumber, transferID, (int)transfer.fragments[j].data.Size(), (int)numBytes);
 					return false;
 				}
 
-			transfer.fragments.push_back(ReceiveFragment());
-			ReceiveFragment &fragment = transfer.fragments.back();
+			transfer.fragments.Push(ReceiveFragment());
+			ReceiveFragment &fragment = transfer.fragments.Back();
 			fragment.fragmentIndex = fragmentNumber;
-			fragment.data.insert(fragment.data.end(), data, data + numBytes);
+			fragment.data.Insert(fragment.data.End(), data, data + numBytes);
 
-			if (transfer.fragments.size() >= (size_t)transfer.numTotalFragments)
+			if (transfer.fragments.Size() >= (size_t)transfer.numTotalFragments)
 			{
 				LOG(LogData, "Finished receiving a fragmented transfer that consisted of %d fragments (transferID=%d).",
-					(int)transfer.fragments.size(), transfer.transferID);
+					(int)transfer.fragments.Size(), transfer.transferID);
 				return true;
 			}
 			else
@@ -200,38 +202,38 @@ bool FragmentedReceiveManager::NewFragmentReceived(int transferID, int fragmentN
 	return false;
 }
 
-void FragmentedReceiveManager::AssembleMessage(int transferID, std::vector<char> &assembledData)
+void FragmentedReceiveManager::AssembleMessage(int transferID, PODVector<char> &assembledData)
 {
-	for(size_t i = 0; i < transfers.size(); ++i)
+	for(size_t i = 0; i < transfers.Size(); ++i)
 		if (transfers[i].transferID == transferID)
 		{
 			ReceiveTransfer &transfer = transfers[i];
 			size_t totalSize = 0;
 
-			for(size_t j = 0; j < transfer.fragments.size(); ++j)
-				totalSize += transfer.fragments[j].data.size();
+			for(size_t j = 0; j < transfer.fragments.Size(); ++j)
+				totalSize += transfer.fragments[j].data.Size();
 
-			assembledData.resize(totalSize);
+			assembledData.Resize(totalSize);
 
 			///\todo Sort by fragmentIndex.
 			
 			size_t offset = 0;
-			for(size_t j = 0; j < transfer.fragments.size(); ++j)
+			for(size_t j = 0; j < transfer.fragments.Size(); ++j)
 			{
-				assert(transfer.fragments[j].data.size() > 0);
-				memcpy(&assembledData[offset], &transfer.fragments[j].data[0], transfer.fragments[j].data.size());
-				offset += transfer.fragments[j].data.size();
-				assert(offset <= assembledData.size());
+				assert(transfer.fragments[j].data.Size() > 0);
+				memcpy(&assembledData[offset], &transfer.fragments[j].data[0], transfer.fragments[j].data.Size());
+				offset += transfer.fragments[j].data.Size();
+				assert(offset <= assembledData.Size());
 			}
 		}
 }
 
 void FragmentedReceiveManager::FreeMessage(int transferID)
 {
-	for(size_t i = 0; i < transfers.size(); ++i)
+	for(size_t i = 0; i < transfers.Size(); ++i)
 		if (transfers[i].transferID == transferID)
 		{
-			transfers.erase(transfers.begin() + i);
+			transfers.Erase(transfers.Begin() + i);
 			return;
 		}
 }

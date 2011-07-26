@@ -16,6 +16,8 @@
 /** @file EndPoint.h
 	@brief The class \ref kNet::EndPoint Endpoint. Represents an endpoint of a network connection. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifdef UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -24,7 +26,8 @@
 
 #include <cstring>
 #include <cstdio>
-#include <string>
+
+#include "StringBase.h"
 
 namespace kNet
 {
@@ -63,6 +66,12 @@ struct EndPoint
 		if (port > rhs.port) return false;
 
 		return false;
+	}
+	
+	///\todo Not IPv6-capable.
+	bool operator == (const EndPoint &rhs) const
+	{
+		return ip[0] == rhs.ip[0] && ip[1] == rhs.ip[1] && ip[2] == rhs.ip[2] && ip[3] == rhs.ip[3] && port == rhs.port;
 	}
 
 	///\todo Not IPv6-capable.
@@ -107,19 +116,19 @@ struct EndPoint
 	}
 
 	///\todo Not IPv6-capable.
-	std::string IPToString() const
+	String IPToString() const
 	{
 		char str[256];
 		sprintf(str, "%d.%d.%d.%d", (unsigned int)ip[0], (unsigned int)ip[1], (unsigned int)ip[2], (unsigned int)ip[3]);
-		return std::string(str);
+		return String(str);
 	}
 
 	///\todo Not IPv6-capable.
-	std::string ToString() const
+	String ToString() const
 	{
 		char str[256];
 		sprintf(str, "%d.%d.%d.%d:%d", (unsigned int)ip[0], (unsigned int)ip[1], (unsigned int)ip[2], (unsigned int)ip[3], (unsigned int)port);
-		return std::string(str);
+		return String(str);
 	}
 };
 

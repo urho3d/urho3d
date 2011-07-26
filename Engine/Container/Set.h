@@ -276,7 +276,7 @@ public:
     const T& Back() { return FindLast()->key_; }
     /// Return number of keys
     unsigned Size() const { return size_; }
-    /// Return whether the set is empty
+    /// Return whether set is empty
     bool Empty() const { return size_ == 0; }
     
 private:

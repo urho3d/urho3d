@@ -16,7 +16,10 @@
 /** @file SerializationStructCompiler.h
 	@brief The SerializationStructCompiler class. */
 
-#include <string>
+// Modified by Lasse Öörni for Urho3D
+
+#include "StringBase.h"
+
 #include <fstream>
 
 #include "MessageListParser.h"
@@ -31,7 +34,7 @@ public:
 	void CompileStruct(const SerializedElementDesc &structure, const char *outfile);
 	void CompileMessage(const SerializedMessageDesc &message, const char *outfile);
 
-	static std::string ParseToValidCSymbolName(const char *str);
+	static String ParseToValidCSymbolName(const char *str);
 
 private:
 	void WriteFilePreamble(std::ofstream &out);
@@ -45,7 +48,7 @@ private:
 	void WriteSerializeMemberFunction(/*const std::string &className, */const SerializedElementDesc &elem, int level, std::ofstream &out);
 	void WriteDeserializeMemberFunction(/*const std::string &className, */const SerializedElementDesc &elem, int level, std::ofstream &out);
 
-	static std::string Indent(int level);
+	static String Indent(int level);
 };
 
 } // ~kNet

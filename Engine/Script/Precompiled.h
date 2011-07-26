@@ -24,4 +24,5 @@
 #pragma once
 
 #include "Map.h"
+#include "Set.h"
 #include "StringBase.h"

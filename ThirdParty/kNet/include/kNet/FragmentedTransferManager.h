@@ -17,8 +17,10 @@
 	@brief The classes \ref kNet::FragmentedSendManager FragmentedSendManager and 
 	\ref kNet::FragmentedSendManager FragmentedReceiveManager. For managing partial transfers. */
 
-#include <vector>
-#include <list>
+// Modified by Lasse Öörni for Urho3D
+
+#include "Vector.h"
+#include "List.h"
 
 namespace kNet
 {
@@ -37,7 +39,7 @@ public:
 		/// The total number of fragments in this message.
 		size_t totalNumFragments;
 
-		std::list<NetworkMessage*> fragments;
+		List<NetworkMessage*> fragments;
 
 		void AddMessage(NetworkMessage *message);
 
@@ -45,7 +47,7 @@ public:
 		bool RemoveMessage(NetworkMessage *message);
 	};
 
-	typedef std::list<FragmentedTransfer> TransferList;
+	typedef List<FragmentedTransfer> TransferList;
 	TransferList transfers;
 
 	/// Returns a new FragmentedTransfer. A transferID for this transfer will not have been allocated here.
@@ -70,7 +72,7 @@ public:
 	{
 		int fragmentIndex;
 
-		std::vector<char> data;
+		PODVector<char> data;
 	};
 
 	struct ReceiveTransfer
@@ -79,14 +81,14 @@ public:
 
 		int numTotalFragments;
 
-		std::vector<ReceiveFragment> fragments;
+		Vector<ReceiveFragment> fragments;
 	};
 
-	std::vector<ReceiveTransfer> transfers;
+	Vector<ReceiveTransfer> transfers;
 
 	void NewFragmentStartReceived(int transferID, int numTotalFragments, const char *data, size_t numBytes);
 	bool NewFragmentReceived(int transferID, int fragmentNumber, const char *data, size_t numBytes);
-	void AssembleMessage(int transferID, std::vector<char> &assembledData);
+	void AssembleMessage(int transferID, PODVector<char> &assembledData);
 	void FreeMessage(int transferID);
 };
 

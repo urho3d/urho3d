@@ -321,9 +321,9 @@ public:
     KeyValue& Back() { return FindLast()->pair_; }
     /// Return const last key-value pair
     const KeyValue& Back() const { return FindLast()->pair_; }
-    /// Return number of keys
+    /// Return number of key-value pairs
     unsigned Size() const { return size_; }
-    /// Return whether the map is empty
+    /// Return whether map is empty
     bool Empty() const { return size_ == 0; }
     
 private:

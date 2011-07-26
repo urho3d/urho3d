@@ -98,11 +98,11 @@ public:
         /// Preincrement the pointer
         ConstIterator& operator ++ () { GotoNext(); return *this; }
         /// Postincrement the pointer
-        ConstIterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        ConstIterator operator ++ (int) { ConstIterator it = *this; GotoNext(); return it; }
         /// Predecrement the pointer
         ConstIterator& operator -- () { GotoPrev(); return *this; }
         /// Postdecrement the pointer
-        ConstIterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
+        ConstIterator operator -- (int) { ConstIterator it = *this; GotoPrev(); return it; }
         
         /// Point to the node value
         const T* operator -> () const { return &(static_cast<Node*>(ptr_))->value_; }
@@ -199,10 +199,16 @@ public:
         return false;
     }
     
-    /// Insert an element the end
+    /// Insert an element to the end
     void Push(const T& value)
     {
         InsertNode(Tail(), value);
+    }
+    
+    /// Insert an element to the beginning
+    void PushFront(const T& value)
+    {
+        InsertNode(Head(), value);
     }
     
     /// Insert an element at position
@@ -215,19 +221,28 @@ public:
     void Insert(const Iterator& dest, const List<T>& list)
     {
         Node* destNode = static_cast<Node*>(dest.ptr_);
-        Iterator it = list.Begin();
-        Iterator end = list.End();
+        ConstIterator it = list.Begin();
+        ConstIterator end = list.End();
         while (it != end)
             InsertNode(destNode, *it++);
     }
     
     /// Insert elements by iterators
-    void Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
+    void Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
         Node* destNode = static_cast<Node*>(dest.ptr_);
-        Iterator it = start;
+        ConstIterator it = start;
         while (it != end)
             InsertNode(destNode, *it++);
+    }
+    
+    /// Insert values
+    void Insert(const Iterator& dest, const T* start, const T* end)
+    {
+        Node* destNode = static_cast<Node*>(dest.ptr_);
+        const T* ptr = start;
+        while (ptr != end)
+            InsertNode(destNode, *ptr++);
     }
     
     /// Erase the last element
@@ -235,6 +250,13 @@ public:
     {
         if (size_)
             Erase(--End());
+    }
+    
+    /// Erase the first element
+    void PopFront()
+    {
+        if (size_)
+            Erase(Begin());
     }
     
     /// Erase an element. Return an iterator to the next element
@@ -268,11 +290,15 @@ public:
     Iterator End() { return Iterator(Tail()); }
     /// Return iterator to the end
     ConstIterator End() const { return ConstIterator(Tail()); }
-    /// Return first value
+    /// Return first element
+    T& Front() { return *Begin(); }
+    /// Return const first element
     const T& Front() const { return *Begin(); }
-    /// Return last value
+    /// Return last element
+    T& Back() { return *(--End()); }
+    /// Return const last element
     const T& Back() const { return *(--End()); }
-    /// Return number of values
+    /// Return number of elements
     unsigned Size() const { return size_; }
     /// Return whether list is empty
     bool Empty() const { return size_ == 0; }

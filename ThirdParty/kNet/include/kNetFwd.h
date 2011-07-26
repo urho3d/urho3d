@@ -16,6 +16,8 @@
 /** @file kNetFwd.h
 	@brief Forward-declares all common symbols defined by kNet. */
 
+// Modified by Lasse Öörni for Urho3D
+
 namespace kNet
 {
 	class Clock;
@@ -34,7 +36,6 @@ namespace kNet
 	class NetworkMessage;
 	class NetworkServer;
 	class PolledTimer;
-	class SerializationStructCompiler;
 	class SerializedDataIterator;
 	class Socket;
 	class StatsEventHierarchyNode;

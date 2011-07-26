@@ -15,6 +15,8 @@
 /** @file Thread.cpp
 	@brief Implements platform-generic Thread functions. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
@@ -30,11 +32,9 @@
 namespace kNet
 {
 
-std::string ThreadIdToString(const ThreadId &id)
+String ThreadIdToString(const ThreadId &id)
 {
-	std::stringstream ss;
-	ss << id;
-	return ss.str();
+	return String((unsigned)id);
 }
 
 /// Suspends the thread until 'Resume()' is called. Call this function from the main thread.

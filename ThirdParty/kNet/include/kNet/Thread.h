@@ -16,7 +16,9 @@
 /** @file Thread.h
 	@brief The Thread class. Implements threading either using Boost, native Win32 or pthreads constructs. */
 
-#include <string>
+// Modified by Lasse Öörni for Urho3D
+
+#include "StringBase.h"
 
 #ifdef KNET_USE_BOOST
 #include <boost/thread.hpp>
@@ -54,7 +56,7 @@ typedef boost::thread::id ThreadId;
 typedef pthread_t ThreadId;
 #endif
 
-std::string ThreadIdToString(const ThreadId &id);
+String ThreadIdToString(const ThreadId &id);
 
 class Thread : public RefCountable
 {

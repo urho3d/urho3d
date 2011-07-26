@@ -325,9 +325,9 @@ public:
     const T& Front() const { return *Begin(); }
     /// Return last key
     const T& Back() const { return *(--End()); }
-    /// Return number of keys
+    /// Return number of key-value pairs
     unsigned Size() const { return size_; }
-    /// Return whether set is empty
+    /// Return whether map is empty
     bool Empty() const { return size_ == 0; }
     
 private:

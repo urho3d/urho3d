@@ -16,6 +16,8 @@
 /** @file UDPMessageConnection.h
 	@brief The UDPMessageConnection class. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "MessageConnection.h"
 #include "SequentialIntegerSet.h"
 #include "Array.h"
@@ -80,7 +82,7 @@ public:
 
 	size_t NumOutboundUnackedDatagrams() const { return outboundPacketAckTrack.Size(); }
 
-	size_t NumReceivedUnackedDatagrams() const { return inboundPacketAckTrack.size(); }
+	size_t NumReceivedUnackedDatagrams() const { return inboundPacketAckTrack.Size(); }
 
 	float PacketLossCount() const { return packetLossCount; }
 
@@ -226,7 +228,7 @@ private:
 
 	PolledTimer statsUpdateTimer;
 
-	typedef std::map<packet_id_t, PacketAckTrack> PacketAckTrackMap;
+	typedef Map<packet_id_t, PacketAckTrack> PacketAckTrackMap;
 	/// Contains the messages we have sent out that we are waiting for the other party to Ack.
 //	PacketAckTrackMap outboundPacketAckTrack;
 	typedef WaitFreeQueue<PacketAckTrack> PacketAckTrackQueue;
@@ -253,7 +255,7 @@ private:
 
 	/// Contains the reliable message numbers of all reliable messages we've received.
 	/// Used to detect and discard duplicate messages we've received.
-	std::set<unsigned long> receivedReliableMessages;
+	Set<unsigned long> receivedReliableMessages;
 
 	SequentialIntegerSet receivedPacketIDs;
 	/// Specifies the packet ID of the most recent datagram we sent. Used currently only
@@ -263,9 +265,9 @@ private:
 	// The following are temporary data structures used by various internal routines for processing.
 	// They are created here as members to avoid having to create objects on the stack at each call to 
 	// time-sensitive functions.
-	std::vector<NetworkMessage *> datagramSerializedMessages; // MessageConnection::UDPSendOutPacket()
-	std::vector<NetworkMessage *> skippedMessages; // MessageConnection::UDPSendOutPacket()
-	std::vector<char> assembledData; // MessageConnection::DatagramExtractMessages
+	Vector<NetworkMessage *> datagramSerializedMessages; // MessageConnection::UDPSendOutPacket()
+	Vector<NetworkMessage *> skippedMessages; // MessageConnection::UDPSendOutPacket()
+	PODVector<char> assembledData; // MessageConnection::DatagramExtractMessages
 
 	/// Returns the average number of inbound packet loss, packets/sec.
 	float GetPacketLossCount() const { return packetLossCount; }

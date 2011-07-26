@@ -172,6 +172,10 @@ endif()
 # Add the main kNet include directory root folder to all projects.
 include_directories(./include)
 
+# Urho3D: add the Container library
+include_directories(../../Engine/Container)
+set(kNetLinkLibraries ${kNetLinkLibraries} Container)
+
 if (USE_BOOST)
    find_package(Boost 1.38.0 COMPONENTS thread)
    if (Boost_FOUND)

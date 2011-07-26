@@ -78,6 +78,16 @@ String::String(float value) :
     *this = tempBuffer;
 }
 
+String::String(double value) :
+    length_(0),
+    capacity_(0),
+    buffer_(&endZero)
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%Lg", value);
+    *this = tempBuffer;
+}
+
 String::String(bool value) :
     length_(0),
     capacity_(0),

@@ -15,6 +15,8 @@
 /** @file DataSerializer.cpp
 	@brief */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include <cstring>
 
 #include "kNet/DebugMemoryLeakCheck.h"
@@ -31,7 +33,7 @@ DataSerializer::DataSerializer(size_t maxBytes_)
 
 	maxBytes = maxBytes_;
 	messageData = new SerializedMessage();
-	messageData->data.resize(maxBytes);
+	messageData->data.Resize(maxBytes);
 	data = &messageData->data[0];
 
 	ResetFill();
@@ -46,7 +48,7 @@ DataSerializer::DataSerializer(size_t maxBytes_, const SerializedMessageDesc *ms
 
 	maxBytes = maxBytes_;
 	messageData = new SerializedMessage();
-	messageData->data.resize(maxBytes);
+	messageData->data.Resize(maxBytes);
 	data = &messageData->data[0];
 
 	ResetFill();
@@ -67,24 +69,24 @@ DataSerializer::DataSerializer(char *data_, size_t maxBytes_, const SerializedMe
 	ResetFill();
 }
 
-DataSerializer::DataSerializer(std::vector<char> &data_, size_t maxBytes_)
+DataSerializer::DataSerializer(PODVector<char> &data_, size_t maxBytes_)
 {
-	if (data_.size() < maxBytes_)
-		data_.resize(maxBytes_);
-	if (data_.size() == 0 || maxBytes_ == 0)
-		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized std::vector-based buffer!");
+	if (data_.Size() < maxBytes_)
+		data_.Resize(maxBytes_);
+	if (data_.Size() == 0 || maxBytes_ == 0)
+		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized Vector-based buffer!");
 	data = &data_[0];
 	maxBytes = maxBytes_;
 
 	ResetFill();
 }
 
-DataSerializer::DataSerializer(std::vector<char> &data_, size_t maxBytes_, const SerializedMessageDesc *msgTemplate)
+DataSerializer::DataSerializer(PODVector<char> &data_, size_t maxBytes_, const SerializedMessageDesc *msgTemplate)
 {
-	if (data_.size() < maxBytes_)
-		data_.resize(maxBytes_);
-	if (data_.size() == 0 || maxBytes_ == 0)
-		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized std::vector-based buffer!");
+	if (data_.Size() < maxBytes_)
+		data_.Resize(maxBytes_);
+	if (data_.Size() == 0 || maxBytes_ == 0)
+		throw NetException("Cannot instantiate a DataSerializer object to a zero-sized Vector-based buffer!");
 	data = &data_[0];
 	maxBytes = maxBytes_;
 
@@ -181,7 +183,7 @@ void DataSerializer::Add<const char*>(const char * const & value)
 }
 
 template<>
-void DataSerializer::Add<std::string>(const std::string &value)
+void DataSerializer::Add<String>(const String &value)
 {
 	AddString(value);
 }

@@ -15,7 +15,9 @@
 /** @file NetworkMessage.cpp
 	@brief Represents a serializable network message. */
 
-#include <string.h>
+// Modified by Lasse Öörni for Urho3D
+
+#include "StringBase.h"
 
 #include "kNet/DebugMemoryLeakCheck.h"
 #include "kNet/NetworkMessage.h"

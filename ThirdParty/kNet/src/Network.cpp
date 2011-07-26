@@ -15,8 +15,9 @@
 /** @file Network.cpp
 	@brief */
 
-#include <string>
-#include <sstream>
+// Modified by Lasse Öörni for Urho3D
+
+#include "StringBase.h"
 
 #include <cassert>
 
@@ -46,7 +47,7 @@ namespace kNet
 const int cMaxTCPSendSize = 256 * 1024;
 const int cMaxUDPSendSize = 1400;
 
-std::string Network::GetErrorString(int error)
+String Network::GetErrorString(int error)
 {
 #ifdef WIN32
 	void *lpMsgBuf = 0;
@@ -56,14 +57,14 @@ std::string Network::GetErrorString(int error)
 		0, hresult, 0 /*Default language*/, (LPTSTR) &lpMsgBuf, 0, 0);
 
 	// Copy message to C++ -style string, since the data need to be freed before return.
-	std::stringstream ss;
-	ss << (LPCSTR)lpMsgBuf << "(" << error << ")"; ///\todo Bug: The cast to LPCSTR converts wstr -> str if UNICODE is defined, which will cut out text.
+	String str;
+	str += String((LPCSTR)lpMsgBuf) + "(" + String(error) + ")"; ///\todo Bug: The cast to LPCSTR converts wstr -> str if UNICODE is defined, which will cut out text.
 	LocalFree(lpMsgBuf);
-	return ss.str();
+	return str;
 #else
-	std::stringstream ss;
-	ss << strerror(error) << "(" << error << ")";
-	return ss.str();
+	String str;
+	str += String(strerror(error)) + "(" + error + ")";
+	return str;
 #endif
 }
 
@@ -76,17 +77,17 @@ int Network::GetLastError()
 #endif
 }
 
-std::string Network::GetLastErrorString()
+String Network::GetLastErrorString()
 {
 	return GetErrorString(GetLastError());
 }
 
-std::string FormatBytes(u64 numBytes)
+String FormatBytes(u64 numBytes)
 {
 	return FormatBytes((double)numBytes);
 }
 
-std::string FormatBytes(double numBytes)
+String FormatBytes(double numBytes)
 {
 	char str[256];
 	if (numBytes >= 1000.0 * 1000.0 * 1000.0)
@@ -97,7 +98,7 @@ std::string FormatBytes(double numBytes)
 		sprintf(str, "%.3f KB", (float)(numBytes / 1024.0));
 	else
 		sprintf(str, "%.2f B", (float)numBytes);
-	return std::string(str);
+	return String(str);
 }
 
 Network::Network()
@@ -269,7 +270,7 @@ void Network::Init()
 	int result = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (result != 0)
 	{
-		LOG(LogError, "Network::Init: WSAStartup failed: %s!", GetErrorString(result).c_str());
+		LOG(LogError, "Network::Init: WSAStartup failed: %s!", GetErrorString(result).CString());
 		return;
 	}
 #endif
@@ -285,7 +286,7 @@ void Network::Init()
 	}
 	else
 	{
-		LOG(LogError, "Network::Init: gethostname failed! Error: %s. Using 'localhost' as the local host name", GetLastErrorString().c_str());
+		LOG(LogError, "Network::Init: gethostname failed! Error: %s. Using 'localhost' as the local host name", GetLastErrorString().CString());
 		localHostName = "localhost";
 	}
 }
@@ -295,15 +296,15 @@ NetworkWorkerThread *Network::GetOrCreateWorkerThread()
 	static const int maxConnectionsPerThread = 8;
 
 	// Find an existing thread with sufficiently low load.
-	for(size_t i = 0; i < workerThreads.size(); ++i)
+	for(size_t i = 0; i < workerThreads.Size(); ++i)
 		if (workerThreads[i]->NumConnections() + workerThreads[i]->NumServers() < maxConnectionsPerThread)
 			return workerThreads[i];
 
 	// No appropriate thread found. Create a new one.
 	NetworkWorkerThread *workerThread = new NetworkWorkerThread();
 	workerThread->StartThread();
-	workerThreads.push_back(workerThread);
-	LOG(LogInfo, "Created a new NetworkWorkerThread. There are now %d worker threads.", (int)workerThreads.size());
+	workerThreads.Push(workerThread);
+	LOG(LogInfo, "Created a new NetworkWorkerThread. There are now %d worker threads.", (int)workerThreads.Size());
 	return workerThread;
 }
 
@@ -362,15 +363,15 @@ void Network::CloseWorkerThread(NetworkWorkerThread *workerThread)
 	if (workerThread->NumConnections() + workerThread->NumServers() > 0)
 		LOG(LogError, "Warning: Closing a worker thread %p when it still has %d connections and %d servers to handle.", workerThread, workerThread->NumConnections(), workerThread->NumServers());
 
-	for(size_t i = 0; i < workerThreads.size(); ++i)
+	for(size_t i = 0; i < workerThreads.Size(); ++i)
 		if (workerThreads[i] == workerThread)
 		{
 			// Remove the thread pointer from internal list.
-			std::swap(workerThreads[i], workerThreads[workerThreads.size()-1]);
-			workerThreads.pop_back();
+			Swap(workerThreads[i], workerThreads[workerThreads.Size()-1]);
+			workerThreads.Pop();
 
 			workerThread->StopThread();
-			LOG(LogInfo, "Deleted a NetworkWorkerThread. There are now %d worker threads left.", (int)workerThreads.size());
+			LOG(LogInfo, "Deleted a NetworkWorkerThread. There are now %d worker threads left.", (int)workerThreads.Size());
 			delete workerThread;
 			return;
 		}
@@ -388,38 +389,38 @@ NetworkServer *Network::StartServer(unsigned short port, SocketTransportLayer tr
 		return 0;
 	}
 
-	std::vector<Socket *> listenSockets;
-	listenSockets.push_back(listenSock);
+	Vector<Socket *> listenSockets;
+	listenSockets.Push(listenSock);
 
 	server = new NetworkServer(this, listenSockets);
 	server->RegisterServerListener(serverListener);
 
 	AssignServerToWorkerThread(server);
 
-	LOG(LogInfo, "Server up (%s). Waiting for client to connect.", listenSock->ToString().c_str());
+	LOG(LogInfo, "Server up (%s). Waiting for client to connect.", listenSock->ToString().CString());
 
 	return server;
 }
 
-NetworkServer *Network::StartServer(const std::vector<std::pair<unsigned short, SocketTransportLayer> > &listenPorts, 
+NetworkServer *Network::StartServer(const Vector<Pair<unsigned short, SocketTransportLayer> > &listenPorts, 
 	INetworkServerListener *serverListener, bool allowAddressReuse)
 {
-	if (listenPorts.size() == 0)
+	if (listenPorts.Size() == 0)
 	{
 		LOG(LogError, "Failed to start server, since you did not provide a list of ports to listen to in Network::StartServer()!");
 		return 0;
 	}
 
-	std::vector<Socket *> listenSockets;
+	Vector<Socket *> listenSockets;
 
-	for(size_t i = 0; i < listenPorts.size(); ++i)
+	for(size_t i = 0; i < listenPorts.Size(); ++i)
 	{
-		Socket *listenSock = OpenListenSocket(listenPorts[i].first, listenPorts[i].second, allowAddressReuse);
+		Socket *listenSock = OpenListenSocket(listenPorts[i].first_, listenPorts[i].second_, allowAddressReuse);
 		if (listenSock)
-			listenSockets.push_back(listenSock);
+			listenSockets.Push(listenSock);
 	}
 
-	if (listenSockets.size() == 0)
+	if (listenSockets.Size() == 0)
 	{
 		LOG(LogError, "Failed to start server. No ports to listen to!");
 		return 0;
@@ -432,20 +433,20 @@ NetworkServer *Network::StartServer(const std::vector<std::pair<unsigned short, 
 
 	LOG(LogInfo, "Server up and listening on the following ports: ");
 	{
-		std::stringstream ss;
-		ss << "UDP ";
-		for(size_t i = 0; i < listenSockets.size(); ++i)
+		String str;
+		str += "UDP ";
+		for(size_t i = 0; i < listenSockets.Size(); ++i)
 			if (listenSockets[i]->TransportLayer() == SocketOverUDP)
-				ss << listenSockets[i]->LocalPort() << " ";
-		LOG(LogInfo, ss.str().c_str());
+				str += String(listenSockets[i]->LocalPort()) + " ";
+		LOG(LogInfo, str.CString());
 	}
 	{
-		std::stringstream ss;
-		ss << "TCP ";
-		for(size_t i = 0; i < listenSockets.size(); ++i)
+		String str;
+		str += "TCP ";
+		for(size_t i = 0; i < listenSockets.Size(); ++i)
 			if (listenSockets[i]->TransportLayer() == SocketOverTCP)
-				ss << listenSockets[i]->LocalPort() << " ";
-		LOG(LogInfo, ss.str().c_str());
+				str += String(listenSockets[i]->LocalPort()) + " ";
+		LOG(LogInfo, str.CString());
 	}
 
 	return server;
@@ -471,13 +472,13 @@ void Network::DeleteSocket(Socket *socket)
 		return;
 	}
 
-	for(std::list<Socket>::iterator iter = sockets.begin(); iter != sockets.end(); ++iter)
+	for(List<Socket>::Iterator iter = sockets.Begin(); iter != sockets.End(); ++iter)
 		if (&*iter == socket)
 		{
 			socket->Close();
 			// The Socket pointers MessageConnection objects have are pointers to this list,
 			// so after calling this function with a Socket pointer, the Socket is deleted for good.
-			sockets.erase(iter);
+			sockets.Erase(iter);
 			LOG(LogInfo, "Network::DeleteSocket: Closed socket %p.", socket);
 			return;
 		}
@@ -495,7 +496,7 @@ void Network::CloseConnection(MessageConnection *connection)
 	connection->socket = 0;
 	connection->owner = 0;
 	connection->ownerServer = 0;
-	connections.erase(connection);
+	connections.Erase(connection);
 }
 
 void Network::DeInit()
@@ -504,9 +505,9 @@ void Network::DeInit()
 	PolledTimer timer;
 
 	// Kill all connections.
-	while(connections.size() > 0)
+	while(connections.Size() > 0)
 	{
-		MessageConnection *connection = *connections.begin();
+		MessageConnection *connection = *connections.Begin();
 		CloseConnection(connection); // CloseConnection erases connection from the connections list, so this loop terminates.
 	}
 
@@ -514,14 +515,14 @@ void Network::DeInit()
 	StopServer();
 
 	// Kill all worker threads.
-	while(workerThreads.size() > 0)
-		CloseWorkerThread(workerThreads.front()); // Erases the item from workerThreads, so this loop terminates.
+	while(workerThreads.Size() > 0)
+		CloseWorkerThread(workerThreads.Front()); // Erases the item from workerThreads, so this loop terminates.
 
 	// Clean up any sockets that might be remaining.
-	while(sockets.size() > 0)
+	while(sockets.Size() > 0)
 	{
-		sockets.front().Close();
-		sockets.pop_front();
+		sockets.Front().Close();
+		sockets.PopFront();
 	}
 
 	// Deinitialize network subsystem.
@@ -534,7 +535,7 @@ void Network::DeInit()
 
 void Network::NewMessageConnectionCreated(MessageConnection *connection)
 {
-	connections.insert(connection);
+	connections.Insert(connection);
 }
 
 Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer transport, bool allowAddressReuse)
@@ -554,7 +555,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 	int ret = getaddrinfo(NULL, strPort, &hints, &result);
 	if (ret != 0)
 	{
-		LOG(LogError, "getaddrinfo failed: %s", GetErrorString(ret).c_str());
+		LOG(LogError, "getaddrinfo failed: %s", GetErrorString(ret).CString());
 		return 0;
 	}
 
@@ -563,7 +564,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 
 	if (listenSocket == INVALID_SOCKET)
 	{
-		LOG(LogError, "Error at socket(): %s", GetLastErrorString().c_str());
+		LOG(LogError, "Error at socket(): %s", GetLastErrorString().CString());
 		freeaddrinfo(result);
 		return 0;
 	}
@@ -581,7 +582,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		ret = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
 #endif
 		if (ret != 0)
-			LOG(LogError, "setsockopt to SO_REUSEADDR failed: %s", GetLastErrorString().c_str());
+			LOG(LogError, "setsockopt to SO_REUSEADDR failed: %s", GetLastErrorString().CString());
 	}
 
 	// It is safe to cast to a sockaddr_in, since we've specifically queried for AF_INET addresses.
@@ -594,7 +595,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 	if (ret == KNET_SOCKET_ERROR)
 	{
 		LOG(LogError, "bind failed: %s when trying to bind to port %d with transport %s", 
-			GetLastErrorString().c_str(), (int)port, transport == SocketOverTCP ? "TCP" : "UDP");
+			GetLastErrorString().CString(), (int)port, transport == SocketOverTCP ? "TCP" : "UDP");
 		closesocket(listenSocket);
 		freeaddrinfo(result);
 		return 0;
@@ -609,7 +610,7 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 		ret = listen(listenSocket, SOMAXCONN);
 		if (ret == KNET_SOCKET_ERROR)
 		{
-			LOG(LogError, "Error at listen(): %s", GetLastErrorString().c_str());
+			LOG(LogError, "Error at listen(): %s", GetLastErrorString().CString());
 			closesocket(listenSocket);
 			return 0;
 		}
@@ -622,8 +623,8 @@ Socket *Network::OpenListenSocket(unsigned short port, SocketTransportLayer tran
 	remoteEndPoint.Reset();
 
 	const size_t maxSendSize = (transport == SocketOverTCP ? cMaxTCPSendSize : cMaxUDPSendSize);
-	sockets.push_back(Socket(listenSocket, localEndPoint, localHostName.c_str(), remoteEndPoint, "", transport, ServerListenSocket, maxSendSize));
-	Socket *listenSock = &sockets.back();
+	sockets.Push(Socket(listenSocket, localEndPoint, localHostName.CString(), remoteEndPoint, "", transport, ServerListenSocket, maxSendSize));
+	Socket *listenSock = &sockets.Back();
 	listenSock->SetBlocking(false);
 
 	return listenSock;
@@ -644,7 +645,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	int ret = getaddrinfo(address, strPort, &hints, &result);
 	if (ret != 0)
 	{
-		LOG(LogError, "Network::Connect: getaddrinfo failed: %s", GetErrorString(ret).c_str());
+		LOG(LogError, "Network::Connect: getaddrinfo failed: %s", GetErrorString(ret).CString());
 		return 0;
 	}
 
@@ -657,7 +658,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 #endif
 	if (connectSocket == INVALID_SOCKET)
 	{
-		LOG(LogError, "Network::Connect: Error at socket(): %s", GetLastErrorString().c_str());
+		LOG(LogError, "Network::Connect: Error at socket(): %s", GetLastErrorString().CString());
 		freeaddrinfo(result);
 		return 0;
 	}
@@ -690,7 +691,7 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	if (ret == 0)
 		 localEndPoint = EndPoint::FromSockAddrIn(sockname);
 	else
-		LOG(LogError, "Network::ConnectSocket: getsockname failed: %s!", Network::GetLastErrorString().c_str());
+		LOG(LogError, "Network::ConnectSocket: getsockname failed: %s!", Network::GetLastErrorString().CString());
 
 	EndPoint remoteEndPoint;
 	sockaddr_in peername;
@@ -699,17 +700,17 @@ Socket *Network::ConnectSocket(const char *address, unsigned short port, SocketT
 	if (ret == 0)
 		remoteEndPoint = EndPoint::FromSockAddrIn(peername);
 	else
-		LOG(LogError, "Network::ConnectSocket: getpeername failed: %s!", Network::GetLastErrorString().c_str());
+		LOG(LogError, "Network::ConnectSocket: getpeername failed: %s!", Network::GetLastErrorString().CString());
 
-	std::string remoteHostName = remoteEndPoint.IPToString();
+	String remoteHostName = remoteEndPoint.IPToString();
 
 	const size_t maxSendSize = (transport == SocketOverTCP) ? cMaxTCPSendSize : cMaxUDPSendSize;
-	Socket socket(connectSocket, localEndPoint, localHostName.c_str(), remoteEndPoint, remoteHostName.c_str(), transport, ClientSocket, maxSendSize);
+	Socket socket(connectSocket, localEndPoint, localHostName.CString(), remoteEndPoint, remoteHostName.CString(), transport, ClientSocket, maxSendSize);
 
 	socket.SetBlocking(false);
-	sockets.push_back(socket);
+	sockets.Push(socket);
 
-	Socket *sock = &sockets.back();
+	Socket *sock = &sockets.Back();
 
 	return sock;
 }
@@ -724,10 +725,10 @@ Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port
 	if (transport == SocketOverUDP)
 	{
 		SendUDPConnectDatagram(*socket, connectMessage);
-		LOG(LogInfo, "Network::Connect: Sent a UDP Connection Start datagram to to %s.", socket->ToString().c_str());
+		LOG(LogInfo, "Network::Connect: Sent a UDP Connection Start datagram to to %s.", socket->ToString().CString());
 	}
 	else
-		LOG(LogInfo, "Network::Connect: Connected a TCP socket to %s.", socket->ToString().c_str());
+		LOG(LogInfo, "Network::Connect: Connected a TCP socket to %s.", socket->ToString().CString());
 
 	Ptr(MessageConnection) connection;
 	if (transport == SocketOverTCP)
@@ -738,7 +739,7 @@ Ptr(MessageConnection) Network::Connect(const char *address, unsigned short port
 	connection->RegisterInboundMessageHandler(messageHandler);
 	AssignConnectionToWorkerThread(connection);
 
-	connections.insert(connection);
+	connections.Insert(connection);
 	return connection;
 }
 
@@ -757,19 +758,19 @@ Socket *Network::CreateUDPSlaveSocket(Socket *serverListenSocket, const EndPoint
 		return 0;
 	}
 
-	sockets.push_back(Socket(udpSocket, serverListenSocket->LocalEndPoint(),
+	sockets.Push(Socket(udpSocket, serverListenSocket->LocalEndPoint(),
 		serverListenSocket->LocalAddress(), remoteEndPoint, remoteHostName, SocketOverUDP, ServerClientSocket, cMaxUDPSendSize));
-	Socket *socket = &sockets.back();
+	Socket *socket = &sockets.Back();
 	socket->SetBlocking(false);
 
-	LOG(LogInfo, "Network::CreateUDPSlaveSocket: Connected an UDP socket to %s.", socket->ToString().c_str());
+	LOG(LogInfo, "Network::CreateUDPSlaveSocket: Connected an UDP socket to %s.", socket->ToString().CString());
 	return socket;
 }
 
 Socket *Network::StoreSocket(const Socket &cp)
 {
-	sockets.push_back(cp);
-	return &sockets.back();
+	sockets.Push(cp);
+	return &sockets.Back();
 }
 
 void Network::SendUDPConnectDatagram(Socket &socket, Datagram *connectMessage)

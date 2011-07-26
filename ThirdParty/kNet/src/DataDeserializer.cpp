@@ -15,6 +15,8 @@
 /** @file DataDeserializer.cpp
 	@brief */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include <cassert>
 #include <cstring>
 
@@ -103,7 +105,7 @@ u32 DataDeserializer::GetDynamicElemCount()
 }
 
 template<>
-std::string DataDeserializer::Read<std::string>()
+String DataDeserializer::Read<String>()
 {
 	return ReadString();
 }
@@ -150,24 +152,24 @@ void DataDeserializer::SkipBits(size_t numBits)
 		throw NetException("Not enough bits left in DataDeserializer::SkipBits(2)!");
 }
 
-std::string DataDeserializer::ReadString()
+String DataDeserializer::ReadString()
 {
 	u32 length = (iter ? GetDynamicElemCount() : Read<u8>());
 	if (BitsLeft() < length*8)
 		throw NetException("Not enough bytes left in DataDeserializer::ReadString!");
 
-	std::string str;
+	String str;
 	if (bitOfs == 0)
 	{
-		str.append(data + elemOfs, length);
+		str.Append(data + elemOfs, length);
 		elemOfs += length;
 	}
 	else
 	{
-		std::vector<u8> bytes(length+1);
+		PODVector<u8> bytes(length+1);
 		ReadArray<u8>(&bytes[0], length);
 
-		str.append((char*)&bytes[0], length);
+		str.Append((char*)&bytes[0], length);
 	}
 
 	if (iter)
@@ -176,7 +178,7 @@ std::string DataDeserializer::ReadString()
 
 	// Perform string validation: Replace any offending values with the space bar character.
 	// Valid values: 0x00 (null), 0x09 (tab), 0x0D, 0x0A (newlines), [32, 253] (characters)
-	for(size_t i = 0; i < str.length(); ++i)
+	for(size_t i = 0; i < str.Length(); ++i)
 		if ((unsigned char)str[i] >= 254 || ((unsigned char)str[i] < 32 && str[i] != 0x0D && str[i] != 0x0A && str[i] != 0x09)) // Retain newlines and tab.
 			str[i] = 0x20; // Space bar character
 

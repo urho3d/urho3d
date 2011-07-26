@@ -16,6 +16,8 @@
 /** @file Socket.h
 	@brief The Socket class. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifdef WIN32
 
 #include "kNetBuildConfig.h"
@@ -53,8 +55,8 @@ typedef unsigned int SOCKET;
 }
 #endif
 
-#include <vector>
-#include <list>
+#include "Vector.h"
+#include "List.h"
 
 #include "SharedPtr.h"
 #include "EndPoint.h"
@@ -72,7 +74,7 @@ enum SocketTransportLayer
 	SocketOverTCP
 };
 
-std::string SocketTransportLayerToString(SocketTransportLayer transport);
+String SocketTransportLayerToString(SocketTransportLayer transport);
 
 /// Converts the given string (case-insensitive parsing) to the corresponding SocketTransportLayer enum.
 /// "tcp" & "socketovertcp" -> SocketOverTCP.
@@ -88,7 +90,7 @@ enum SocketType
 	ClientSocket ///< A client-side socket.
 };
 
-std::string SocketTypeToString(SocketType type);
+String SocketTypeToString(SocketType type);
 
 typedef int OverlappedTransferTag;
 
@@ -250,7 +252,7 @@ public:
 	/// Returns the local EndPoint this socket is bound to.
 	const EndPoint &LocalEndPoint() const { return localEndPoint; }
 	/// Returns the local address (local hostname) of the local end point this socket is bound to.
-	const char *LocalAddress() const { return localHostName.c_str(); }
+	const char *LocalAddress() const { return localHostName.CString(); }
 	/// Returns the local port that this socket is bound to.
 	unsigned short LocalPort() const { return localEndPoint.port; }
 
@@ -260,14 +262,14 @@ public:
 	const EndPoint &RemoteEndPoint() const { return remoteEndPoint; }
 	/// Returns the destination address (destination hostname) of the remote end point this socket is connected to.
 	/// If SocketType == ServerListenSocket, returns an empty string.
-	const char *DestinationAddress() const { return remoteHostName.c_str(); }
+	const char *DestinationAddress() const { return remoteHostName.CString(); }
 	/// Returns the destination port of the remote end point this socket is connected to.
 	/// If SocketType == ServerListenSocket, returns 0.
 	unsigned short DestinationPort() const { return remoteEndPoint.port; }
 
 	/// Returns a human-readable representation of this socket, specifying the peer address and port this socket is
 	/// connected to.
-	std::string ToString() const;
+	String ToString() const;
 
 	/// Sets the socket to blocking or nonblocking state.
 	void SetBlocking(bool isBlocking);
@@ -291,7 +293,7 @@ private:
 	/// Specifies the network host name of the local end point (the local system).
 	/// If the local end point does not have a hostname, this field is the string representation of the
 	/// system IP address (one of them, there may be multiple IPs).
-	std::string localHostName;
+	String localHostName;
 	
 	/// Specifies the remote system end point (IP and port) this socket is bound to (== the "peer" address).
 	/// If SocketType == ServerListenSocket or transport == SocketOverUDP, this socket is not bound
@@ -306,7 +308,7 @@ private:
 	/// Specifies the network host name of the remote end point (== the remote system == the "peer").
 	/// If the remote end point does not have a known hostname, this field is the string representation of the
 	/// remote IP address. If SocketType == ServerListenSocket, this field is empty.
-	std::string remoteHostName;
+	String remoteHostName;
 
 	/// Specifies the underlying transport protocol that this Socket is using (TCP or UDP).
 	SocketTransportLayer transport;

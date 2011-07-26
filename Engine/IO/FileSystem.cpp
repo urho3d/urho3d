@@ -147,10 +147,10 @@ int FileSystem::SystemRun(const String& fileName, const Vector<String>& argument
             argPtrs.Push(fixedFileName.CString());
             for (unsigned i = 0; i < arguments.Size(); ++i)
                 argPtrs.Push(arguments[i].CString());
-            argPtrs.Push(0);    
-
-            execvp(argPtrs[0], (char**)&argPtrs[0]);     
-            return -1; // Return -1 if we could not spawn the process 
+            argPtrs.Push(0);
+            
+            execvp(argPtrs[0], (char**)&argPtrs[0]);
+            return -1; // Return -1 if we could not spawn the process
         }
         else if (pid > 0)
         {

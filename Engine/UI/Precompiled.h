@@ -24,4 +24,6 @@
 #pragma once
 
 #include "Map.h"
+#include "Set.h"
+#include "Sort.h"
 #include "StringBase.h"

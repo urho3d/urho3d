@@ -16,6 +16,8 @@
 /** @file NetworkMessage.h
 	@brief The class NetworkMessage. Stores an outbound network message. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "kNetBuildConfig.h"
 #include "LockFreePoolAllocator.h"
 #include "FragmentedTransferManager.h"
@@ -112,7 +114,7 @@ public:
 	bool obsolete;
 
 #ifdef KNET_NETWORK_PROFILING
-	std::string profilerName;
+	String profilerName;
 #endif
 
 	/// Checks if this message is newer than the other message.

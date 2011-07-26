@@ -16,7 +16,9 @@
 /** @file MessageListParser.h
 	@brief The SerializedMessageList class. */
 
-#include <vector>
+// Modified by Lasse Öörni for Urho3D
+
+#include "Vector.h"
 
 #include "BasicSerializedDataTypes.h"
 
@@ -38,7 +40,7 @@ struct SerializedElementDesc
 
 	/// A string version of this type is stored here. This field is used if the type of this element is something 
 	/// else than a basic type.
-	std::string typeString;
+	String typeString;
 
 	/// If true, the number of times this element is instanced is specified in the stream.
 	bool varyingCount;
@@ -48,10 +50,10 @@ struct SerializedElementDesc
 	int count;
 
 	/// The name of this element.
-	std::string name;
+	String name;
 
 	/// If this element denotes a structure (type == SerialStruct), then this vector contains all the child nodes.
-	std::vector<SerializedElementDesc*> elements;
+	Vector<SerializedElementDesc*> elements;
 
 	/// The parent element, or 0 if this is the root element.
 	SerializedElementDesc *parent;
@@ -63,7 +65,7 @@ struct SerializedMessageDesc
 	/// This is a weak pointer to the root element of this message description. The memory is owned by the SerializedMessageList
 	/// where this SerializedMessageDesc belongs to.
 	SerializedElementDesc *data;
-	std::string name;
+	String name;
 	u32 id;
 	bool reliable;
 	bool inOrder;
@@ -83,14 +85,14 @@ public:
 	const SerializedMessageDesc *FindMessageByName(const char *name);
 
 	/// Returns the whole list of messages.
-	const std::list<SerializedMessageDesc> &GetMessages() const { return messages; }
+	const List<SerializedMessageDesc> &GetMessages() const { return messages; }
 
 	/// Returns a flat list of all the message elements.
-	const std::list<SerializedElementDesc> &GetElements() const { return elements; }
+	const List<SerializedElementDesc> &GetElements() const { return elements; }
 
 private:
-	std::list<SerializedElementDesc> elements;
-	std::list<SerializedMessageDesc> messages;
+	List<SerializedElementDesc> elements;
+	List<SerializedMessageDesc> messages;
 
 	SerializedElementDesc *ParseNode(TiXmlElement *node, SerializedElementDesc *parentNode);
 

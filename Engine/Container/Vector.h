@@ -215,7 +215,7 @@ public:
     }
     
     /// Insert a vector partially by iterators
-    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
+    Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
         unsigned pos = dest - Begin();
         if (pos > size_)
@@ -226,6 +226,23 @@ public:
         
         T* destPtr = Buffer() + pos;
         for (Iterator i = start; i != end; ++i)
+            *destPtr++ = *i;
+        
+        return Begin() + pos;
+    }
+    
+    /// Insert values
+    Iterator Insert(const Iterator& dest, const T* start, const T* end)
+    {
+        unsigned pos = dest - Begin();
+        if (pos > size_)
+            pos = size_;
+        unsigned length = end - start;
+        Resize(size_ + length, 0);
+        MoveRange(pos + length, pos, size_ - pos - length);
+        
+        T* destPtr = Buffer() + pos;
+        for (const T* i = start; i != end; ++i)
             *destPtr++ = *i;
         
         return Begin() + pos;
@@ -611,7 +628,7 @@ public:
     }
     
     /// Insert a vector partially by iterators
-    Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end)
+    Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
         unsigned pos = dest - Begin();
         if (pos > size_)
@@ -620,6 +637,23 @@ public:
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
         CopyElements(Buffer() + pos, &(*start), length);
+        
+        return Begin() + pos;
+    }
+    
+    /// Insert values
+    Iterator Insert(const Iterator& dest, const T* start, const T* end)
+    {
+        unsigned pos = dest - Begin();
+        if (pos > size_)
+            pos = size_;
+        unsigned length = end - start;
+        Resize(size_ + length);
+        MoveRange(pos + length, pos, size_ - pos - length);
+        
+        T* destPtr = Buffer() + pos;
+        for (const T* i = start; i != end; ++i)
+            *destPtr++ = *i;
         
         return Begin() + pos;
     }
@@ -736,7 +770,7 @@ public:
     T& Back() { return Buffer()[size_ - 1]; }
     /// Return const last element
     const T& Back() const { return Buffer()[size_ - 1]; }
-    /// Return size of vector
+    /// Return number of elements
     unsigned Size() const { return size_; }
     /// Return capacity of vector
     unsigned Capacity() const { return capacity_; }

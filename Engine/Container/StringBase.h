@@ -94,6 +94,8 @@ public:
     explicit String(unsigned short value);
     /// Construct from a float
     explicit String(float value);
+    /// Construct from a double
+    explicit String(double value);
     /// Construct from a bool
     explicit String(bool value);
     /// Construct from a character

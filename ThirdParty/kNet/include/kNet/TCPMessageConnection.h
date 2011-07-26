@@ -16,6 +16,8 @@
 /** @file TCPMessageConnection.h
 	@brief The TCPMessageConnection class.*/
 
+// Modified by Lasse Öörni for Urho3D
+
 #include "MessageConnection.h"
 #include "RingBuffer.h"
 
@@ -60,7 +62,7 @@ private:
 	void ExtractMessages();
 
 	// The following are temporary data structures used by various internal routines for processing.
-	std::vector<NetworkMessage*> serializedMessages; // MessageConnection::TCPSendOutPacket()
+	Vector<NetworkMessage*> serializedMessages; // MessageConnection::TCPSendOutPacket()
 
 	void PerformDisconnection();
 

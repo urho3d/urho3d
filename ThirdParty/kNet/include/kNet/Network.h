@@ -16,6 +16,8 @@
 /** @file Network.h
 	@brief The class Network. The root point for creating client and server objects. */
 
+// Modified by Lasse Öörni for Urho3D
+
 #ifdef UNIX
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -59,7 +61,7 @@ public:
 	/// @param allowAddressReuse If true, kNet passes the SO_REUSEADDR parameter to the server listen socket before binding 
 	///        the socket to a local port (== before starting the server). This allows the same port to be forcibly reused
 	///        when restarting the server if a crash occurs, without having to wait for the operating system to free up the port.
-	NetworkServer *StartServer(const std::vector<std::pair<unsigned short, SocketTransportLayer> > &listenPorts, INetworkServerListener *serverListener, bool allowAddressReuse);
+	NetworkServer *StartServer(const Vector<Pair<unsigned short, SocketTransportLayer> > &listenPorts, INetworkServerListener *serverListener, bool allowAddressReuse);
 
 	void StopServer();
 
@@ -78,25 +80,25 @@ public:
 	Ptr(MessageConnection) Connect(const char *address, unsigned short port, SocketTransportLayer transport, IMessageHandler *messageHandler, Datagram *connectMessage = 0);
 
 	/// Returns the local host name of the system (the local machine name or the local IP, whatever is specified by the system).
-	const char *LocalAddress() const { return localHostName.c_str(); }
+	const char *LocalAddress() const { return localHostName.CString(); }
 
 	/// Returns the error string associated with the given networking error id.
-	static std::string GetErrorString(int error);
+	static String GetErrorString(int error);
 
 	/// Returns the error string corresponding to the last error that occurred in the networking library.
-	static std::string GetLastErrorString();
+	static String GetLastErrorString();
 
 	/// Returns the error id corresponding to the last error that occurred in the networking library.
 	static int GetLastError();
 
 	/// Returns the amount of currently executing background network worker threads.
-	int NumWorkerThreads() const { return workerThreads.size(); }
+	int NumWorkerThreads() const { return workerThreads.Size(); }
 
 	/// Returns the NetworkServer object, or null if no server has been started.
 	Ptr(NetworkServer) GetServer() { return server; }
 
 	/// Returns all current connections in the system.
-	std::set<MessageConnection *> Connections() const { return connections; }
+	Set<MessageConnection *> Connections() const { return connections; }
 
 	/// Returns the data structure that collects statistics about the whole Network.
 	Lock<StatsEventHierarchyNode> Statistics() { return statistics.Acquire(); }
@@ -104,17 +106,17 @@ public:
 private:
 	/// Specifies the local network address of the system. This name is cached here on initialization
 	/// to avoid multiple queries to namespace providers whenever the name is needed.
-	std::string localHostName;
+	String localHostName;
 
 	/// Maintains the server-related data structures if this computer
 	/// is acting as a server. Otherwise this data is not used.
 	Ptr(NetworkServer) server;
 
 	/// Contains all active sockets in the system.
-	std::list<Socket> sockets;
+	List<Socket> sockets;
 
 	/// Tracks all existing connections in the system.
-	std::set<MessageConnection *> connections;
+	Set<MessageConnection *> connections;
 
 	Lockable<StatsEventHierarchyNode> statistics;
 
@@ -139,7 +141,7 @@ private:
 	/// Stores all the currently running network worker threads. Each thread is assigned
 	/// a list of MessageConnections and NetworkServers to oversee. The worker threads
 	/// then manage the socket reads and writes on these connections.
-	std::vector<NetworkWorkerThread*> workerThreads;
+	Vector<NetworkWorkerThread*> workerThreads;
 
 	/// Examines each currently running worker thread and returns one that has sufficiently low load,
 	/// or creates a new thread and returns it if no such thread exists. The thread is added and maintained
@@ -177,8 +179,8 @@ private:
 };
 
 /// Outputs the given number of bytes formatted to KB or MB suffix for readability.
-std::string FormatBytes(u64 numBytes);
+String FormatBytes(u64 numBytes);
 
-std::string FormatBytes(double numBytes);
+String FormatBytes(double numBytes);
 
 } // ~kNet
