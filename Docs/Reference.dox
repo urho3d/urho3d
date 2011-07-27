@@ -28,13 +28,13 @@ The definition of an Object subclass must contain the OBJECT(className) macro. T
 
 In addition the OBJECTTYPESTATIC(className) macro must appear in a .cpp file to actually define the type identification data. The reason for doing this instead of defining the data directly inside the OBJECT macro as function-static data is thread safety: if the first invocation to an object's GetTypeStatic() or GetTypeNameStatic() was started on several threads simultaneously, the results of function-static data initialization would be erratic.
 
-To register an object factory for a specific type, call the \ref Context::RegisterFactory() "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext() "GetContext()". An example:
+To register an object factory for a specific type, call the \ref Context::RegisterFactory "RegisterFactory()" template function on Context. You can get its pointer from any Object either via the \ref Object::context_ "context_" member variable, or by calling \ref Object::GetContext "GetContext()". An example:
 
 \code
 context_->RegisterFactory<Camera>();
 \endcode
 
-To create an object using a factory, call Context's \ref Context::CreateObject() "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
+To create an object using a factory, call Context's \ref Context::CreateObject "CreateObject()" function. This takes the 16-bit hash of the type name as a parameter. The created object (or null if there was no matching factory registered) will be returned inside a SharedPtr<Object>. For example:
 
 \code
 SharedPtr<Object> newComponent = context_->CreateObject(type));
@@ -43,7 +43,7 @@ SharedPtr<Object> newComponent = context_->CreateObject(type));
 
 \page Subsystems Subsystems
 
-Any Object can be registered to the Context as a subsystem, by using the function \ref Context::RegisterSubsystem() "RegisterSubsystem()". They can then be accessed by any other Object inside the same context by calling \ref Object::GetSubsystem() "GetSubsystem()". Only one instance of each object type can exist as a subsystem.
+Any Object can be registered to the Context as a subsystem, by using the function \ref Context::RegisterSubsystem "RegisterSubsystem()". They can then be accessed by any other Object inside the same context by calling \ref Object::GetSubsystem "GetSubsystem()". Only one instance of each object type can exist as a subsystem.
 
 After Engine initialization, the following subsystems will always exist:
 
@@ -51,7 +51,7 @@ After Engine initialization, the following subsystems will always exist:
 - FileSystem: provides directory operations.
 - Log: provides logging services.
 - ResourceCache: loads resources and keeps them cached for later access.
-- Network: provides UDP networking.
+- Network: provides UDP networking and scene replication.
 - Input: handles keyboard and mouse input. Will be inactive in headless mode.
 - UI: the graphical user interface. Will be inactive in headless mode.
 - Audio: provides sound output. Will be inactive if sound disabled.
@@ -62,9 +62,9 @@ The following subsystems are optional, so GetSubsystem() may return null if they
 - Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
 - Graphics: Manages the application window, the rendering context and resources. Exists if not in headless mode.
 - Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
-- Script: Provides the AngelScript execution environment. Created by calling \ref Engine::InitializeScripting() "InitializeScripting()".
-- Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole() "CreateConsole()".
-- DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud() "CreateDebugHud()".
+- Script: Provides the AngelScript execution environment. Created by calling \ref Engine::InitializeScripting "InitializeScripting()".
+- Console: provides an interactive AngelScript console and log display. Created by calling \ref Engine::CreateConsole "CreateConsole()".
+- DebugHud: displays rendering mode information and statistics and profiling data. Created by calling \ref Engine::CreateDebugHud "CreateDebugHud()".
 
 In script, the subsystems are available through the following global properties:
 time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud. Note that Profiler is not available to script due to its low-level nature.
@@ -152,7 +152,7 @@ Light@ light = lightNode.CreateComponent("Light");
 
 Because components are created using \ref ObjectTypes "object factories", a factory must be registered for each component type.
 
-When created, nodes and components get scene-global integer IDs starting from 1. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
+When created, nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
 
 There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and to decide in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
 
@@ -743,7 +743,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 
 From the UI subsystem you can query the root element, which is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
-Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions.
+Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
 
 \section UI_Defining Defining UI elements in XML
 
@@ -972,17 +972,80 @@ Classes that derive from Serializable can perform automatic serialization to bin
 
 The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
 
-To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()". For example, the components serialize their Resource pointers as ResourceRef or ResourceRefList this way.
+To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
 The attribute system also supports editing by providing human-readable names.
 
 
 \page Network Networking
 
-The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to server(s).
+The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client also specified a blank scene that can be used.
 
-Currently under construction!
+%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by sends controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
+Bidirectional communication between the server and the client can happen either using raw network messages, which are binary-serialized data, or remote events, which operate like ordinary events, but are processed on the receiving end only. Code on the server can send messages or remote events either to one client, all clients assigned into a particular scene, or to all connected clients. In contrast the client can only send messages or remote events to the server, not directly to other clients.
+
+Note that if a particular networked application does not need scene replication, network messages (and remote events that are not targeted) can also be transmitted without assigning the client to a scene. The Chat example does just that: it does not create a scene either on the server or the client.
+
+\section Network_Connecting Connecting to a server
+
+Starting the server and connecting to it both happen through the Network subsystem. See \ref Network::StartServer "StartServer()" and \ref Network::Connect "Connect()". A UDP port must be chosen; the examples use the port 1234.
+
+Note the scene (to be used for replication) and identity VariantMap supplied as parameters when connecting. The identity data can contain for example the user name or credentials, it is completely application-specified. The identity data is sent right after connecting and causes the E_CLIENTIDENTITY event to be sent on the server when received. By subscribing to this event, server code can examine incoming connections and accept or deny them. The default is to accept all connections.
+
+After connecting successfully, client code can get the Connection object representing the server connection, see \ref Network::GetServerConnection "GetServerConnection()". Likewise, on the server a Connection object will be created for each connected client, and these can be iterated through. This object is used to send network messages or remote events to the remote peer, to assign the client into a scene (on the server only), or to disconnect.
+
+\section Network_Replication Scene replication
+
+%Network replication of scene content has been implemented in a straightforward manner, using \ref Serialization "attributes". Nodes and components that have been not been created in local mode - see the CreateMode parameter of \ref Node::CreateChild "CreateChild()" or \ref Node::CreateComponent "CreateComponent()" - will be automatically replicated. Note that a replicated component created into a local node will not be replicated, as the node's locality is checked first.
+
+The CreateMode translates into two different node and component ID ranges - replicated ID's range from 0x1 to 0xffffff, while local ID's range from 0x1000000 to 0xffffffff. This means there is a maximum of 16777215 replicated nodes or components in a scene.
+
+If the scene was originally loaded from a file on the server, the client will also load the scene from the same file first. In this case all predefined, static objects such as the world geometry should be defined as local nodes, so that they are not needlessly retransmitted through the network during the initial update, and do not exhaust the more limited replicated ID range.
+
+There are some things to watch out for:
+
+- After connecting to a server, the client should not create, update or remove non-local nodes or components on its own. However, to create client-side special effects and such, the client can freely manipulate local nodes.
+
+- A Node's \ref Node::GetVars "user variables" VariantMap will be automatically replicated on a per-variable basis. This can be useful in transmitting data shared by several components, for example the player's score or health.
+
+- To implement interpolation, exponential smoothing of the nodes' rendering transforms is enabled on the client. It can be controlled by two properties of the Scene, the smoothing constant and the snap threshold. Snap threshold is the distance between network updates which, if exceeded, causes the node to immediately snap to the end position, instead of moving smoothly. See \ref Scene::SetSmoothingConstant "SetSmoothingConstant()" and \ref Scene::SetSnapThreshold "SetSnapThreshold()".
+
+- Position and rotation are Node attributes, while linear and angular velocities are RigidBody attributes. To cut down on the needed network bandwidth the physics components can be created as local on the server: in this case the client will not see them at all, and will only interpolate motion based on the Node's transform changes. Replicating the actual physics components allows the client to extrapolate using its own physics simulation, and to also perform collision detection, though always non-authoritatively.
+
+- AnimatedModel does not replicate animation by itself. Rather, AnimationController will replicate its command state (such as "fade this animation in, play that animation at 1.5x speed.") To turn off animation replication, create the AnimationController as local. To ensure that also the first animation update will be received correctly, always create the AnimatedModel component first, then the AnimationController.
+
+- Networked attributes can either be in delta update or latest data mode. Delta updates are small incremental changes and must be applied in order, which may cause increased latency if there is a stall in network message delivery eg. due to packet loss. High volume data such as position, rotation and velocities are transmitted as latest data, which does not need ordering, instead this mode simply discards any old data received out of order. Note that node and component creation (when initial attributes need to be sent) and removal can also be considered as delta updates and are therefore applied in order.
+
+- The server code orders replication update messages so that parent nodes are created and updated before their children. Remote events are queued and only sent after the replication update to ensure that if they target a newly created node, it will already exist on the receiving end. However, it is also possible to specify unordered transmission for a remote event, in which case that guarantee does not hold.
+
+- The \ref Node::SetOwner "owner property" of a node can be set in server code to specify the owning Connection (for example, the player that is controlling a specific game object.) This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
+
+- Interest management is yet to be implemented. For now, all updates of non-local nodes and components will be sent to all clients as soon as possible.
+
+\section Network_Controls Client controls update
+
+The Controls structure will be used to send controls information from the client to the server, by default also at 25 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap. It is up to the application code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()". The previous controls are also stored on both ends to allow detecting button state changes.
+
+\section Network_Messages Raw network messages
+
+All network messages have an integer ID. The first ID you can use for custom messages is 20 (lower ID's are either reserved for kNet's internal use or for the scene replication and remote event protocol.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+
+To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
+
+When a message is received, and it is not an internal protocol message, it will be forwarded as the E_NETWORKMESSAGE event. See the Chat example for details of sending and receiving.
+
+For high performance, consider using unordered messages, because for in-order messages there is only a single channel within the connection, and all previous in-order messages must arrive first before a new one can be processed.
+
+\section Network_RemoteEvents Remote events
+
+A remote event consists of its event type (name hash), a flag that tells whether it is to be sent in-order or unordered, and the event data VariantMap. It can optionally target a specific Node in the receiver's scene. This is different from ordinary events, which can optionally target any Object within the execution context.
+
+To send a remote event to a Connection, use its \ref Connection::SendRemoteEvent "SendRemoteEvent()" function. To broadcast remote events to several connections at once (server only), use Network's \ref Network::BroadcastRemoteEvent "BroadcastRemoteEvent()" function.
+
+For safety, allowed remote event types should be registered so that a client can not for example trigger an internal render update event on the server. See \ref Network::RegisterRemoteEvent "RegisterRemoteEvent()". Similarly to file paths, as long as no remote event types are registered, all are allowed.
+
+Like with ordinary events, in script event types are strings instead of name hashes for convenience.
 
 \page Tools Tools
 
