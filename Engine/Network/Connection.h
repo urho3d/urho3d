@@ -180,7 +180,7 @@ private:
     /// Handle scene load failure on the server or client
     void OnSceneLoadFailed();
     /// Handle a package download failure on the client
-    void OnPackageDownloadFailed();
+    void OnPackageDownloadFailed(const String& name);
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none
     void OnPackagesReady();
     

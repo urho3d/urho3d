@@ -726,8 +726,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             // If no further data, this is an error reply
             if (msg.IsEof())
             {
-                LOGERROR("Download of package " + download.name_ + " failed");
-                OnPackageDownloadFailed();
+                OnPackageDownloadFailed(download.name_);
                 return;
             }
             
@@ -737,8 +736,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 download.file_ = new File(context_, GetSubsystem<Network>()->GetPackageCacheDir() + ToStringHex(download.checksum_) + "_" + download.name_, FILE_WRITE);
                 if (!download.file_->IsOpen())
                 {
-                    LOGERROR("Download of package " + download.name_ + " failed");
-                    OnPackageDownloadFailed();
+                    OnPackageDownloadFailed(download.name_);
                     return;
                 }
             }
@@ -754,13 +752,6 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             download.receivedFragments_.Insert(index);
             
             // Check if all fragments received
-            if (download.receivedFragments_.Size() > download.totalFragments_)
-            {
-                LOGERROR("Received extra fragments for package " + download.name_);
-                OnPackageDownloadFailed();
-                return;
-            }
-            
             if (download.receivedFragments_.Size() == download.totalFragments_)
             {
                 LOGINFO("Package " + download.name_ + " downloaded successfully");
@@ -1197,11 +1188,11 @@ void Connection::OnSceneLoadFailed()
     VariantMap eventData;
     eventData[P_CONNECTION] = (void*)this;
     SendEvent(E_NETWORKSCENELOADFAILED, eventData);
-    return;
 }
 
-void Connection::OnPackageDownloadFailed()
+void Connection::OnPackageDownloadFailed(const String& name)
 {
+    LOGERROR("Download of package " + name + " failed");
     // As one package failed, we can not join the scene in any case. Clear the downloads
     downloads_.Clear();
     OnSceneLoadFailed();

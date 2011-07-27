@@ -979,9 +979,9 @@ The attribute system also supports editing by providing human-readable names.
 
 \page Network Networking
 
-The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client also specified a blank scene that can be used.
+The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client specified a blank scene for receiving the updates.
 
-%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by only sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
+%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
 Bidirectional communication between the server and the client can happen either using raw network messages, which are binary-serialized data, or remote events, which operate like ordinary events, but are processed on the receiving end only. Code on the server can send messages or remote events either to one client, all clients assigned into a particular scene, or to all connected clients. In contrast the client can only send messages or remote events to the server, not directly to other clients.
 
