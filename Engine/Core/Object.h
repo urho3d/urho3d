@@ -228,14 +228,8 @@ private:
     public: \
         virtual ShortStringHash GetType() const { return GetTypeStatic(); } \
         virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
-        static ShortStringHash GetTypeStatic() \
-        { \
-            return typeStatic; \
-        } \
-        static const String& GetTypeNameStatic() \
-        { \
-            return typeNameStatic; \
-        } \
+        static ShortStringHash GetTypeStatic() { return typeStatic; } \
+        static const String& GetTypeNameStatic() { return typeNameStatic; } \
 
 #define OBJECTTYPESTATIC(typeName) \
     const ShortStringHash typeName::typeStatic(#typeName); \

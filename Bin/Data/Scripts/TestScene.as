@@ -87,6 +87,18 @@ void InitScene()
     zone.boundingBox = BoundingBox(-1000.0, 1000.0);
 
     {
+        Node@ lightNode = testScene.CreateChild("Light");
+        lightNode.direction = Vector3(0.5, -0.5, 0.5);
+
+        Light@ light = lightNode.CreateComponent("Light");
+        light.lightType = LIGHT_DIRECTIONAL;
+        light.castShadows = true;
+        light.shadowBias = BiasParameters(0.0001, 0.5);
+        light.shadowCascade = CascadeParameters(3, 0.90, 0.2, 200.0);
+        light.specularIntensity = 0.5f;
+    }
+
+    {
         Node@ objectNode = testScene.CreateChild("Floor");
         objectNode.position = Vector3(0.0, -0.5, 0.0);
         objectNode.scale = Vector3(100.0, 0.5, 100.0);
@@ -167,18 +179,6 @@ void InitScene()
 
         AnimationController@ ctrl = objectNode.CreateComponent("AnimationController");
         ctrl.Play("Models/Jack_Walk.ani", 0, true, 0.0f);
-    }
-
-    {
-        Node@ lightNode = testScene.CreateChild("Light");
-        lightNode.direction = Vector3(0.5, -0.5, 0.5);
-
-        Light@ light = lightNode.CreateComponent("Light");
-        light.lightType = LIGHT_DIRECTIONAL;
-        light.castShadows = true;
-        light.shadowBias = BiasParameters(0.0001, 0.5);
-        light.shadowCascade = CascadeParameters(3, 0.90, 0.2, 200.0);
-        light.specularIntensity = 0.5f;
     }
 
     // Enable access to this script file & scene from the console

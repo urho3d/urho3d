@@ -254,23 +254,12 @@ void Network::StopServer()
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg)
 {
-    BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize());
+    BroadcastMessage(msgID, 0, reliable, inOrder, msg.GetData(), msg.GetSize());
 }
 
 void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
 {
-   // Make sure not to use kNet internal message ID's
-    if (msgID <= 0x4 || msgID >= 0x3ffffffe)
-    {
-        LOGERROR("Can not send message with reserved ID");
-        return;
-    }
-    
-    kNet::NetworkServer* server = network_->GetServer();
-    if (server)
-        server->BroadcastMessage(msgID, reliable, inOrder, 0, 0, (const char*)data, numBytes);
-    else
-        LOGERROR("Server not running, can not broadcast messages");
+    BroadcastMessage(msgID, 0, reliable, inOrder, data, numBytes);
 }
 
 void Network::BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg)
@@ -289,7 +278,7 @@ void Network::BroadcastMessage(int msgID, unsigned contentID, bool reliable, boo
     
     kNet::NetworkServer* server = network_->GetServer();
     if (server)
-        server->BroadcastMessage(msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
+        server->BroadcastMessage(msgID, reliable, inOrder, DEFAULT_MSG_PRIORITY, contentID, (const char*)data, numBytes);
     else
         LOGERROR("Server not running, can not broadcast messages");
 }
@@ -400,10 +389,6 @@ void Network::Update(float timeStep)
     if (serverConnection_)
     {
         kNet::MessageConnection* connection = serverConnection_->GetMessageConnection();
-        connection->Process();
-        
-        // Process latest data messages waiting for the correct nodes or components to be created
-        serverConnection_->ProcessPendingLatestData();
         
         // Check for state transitions
         kNet::ConnectionState state = connection->GetConnectionState();
@@ -414,11 +399,20 @@ void Network::Update(float timeStep)
         else if (state == kNet::ConnectionClosed)
             OnServerDisconnected();
         
-        // Send the client update
-        if (updateNow && serverConnection_)
+        if (serverConnection_)
         {
-            serverConnection_->SendClientUpdate();
-            serverConnection_->SendQueuedRemoteEvents();
+            // Receive new messages
+            connection->Process();
+            
+            // Process latest data messages waiting for the correct nodes or components to be created
+            serverConnection_->ProcessPendingLatestData();
+            
+            // Send the client update
+            if (updateNow)
+            {
+                serverConnection_->SendClientUpdate();
+                serverConnection_->SendQueuedRemoteEvents();
+            }
         }
     }
     
@@ -451,6 +445,7 @@ void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 void Network::OnServerConnected()
 {
     serverConnection_->SetConnectPending(false);
+    
     LOGINFO("Connected to server");
     
     // Send the identity map now

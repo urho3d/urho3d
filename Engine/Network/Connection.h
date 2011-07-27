@@ -41,6 +41,9 @@ class Node;
 class Scene;
 class Serializable;
 
+/// Message priority for kNet. For now all messages have same priority
+static const int DEFAULT_MSG_PRIORITY = 100;
+
 /// Queued remote event
 struct RemoteEvent
 {
@@ -66,13 +69,13 @@ public:
     ~Connection();
     
     /// Send a message
-    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
-    /// Send a message
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
-    /// Send a message with content ID
-    void SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+    /// Send a message
+    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
     /// Send a message with content ID
     void SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg);
+    /// Send a message with content ID
+    void SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
     /// Send a remote event
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Send a remote node event

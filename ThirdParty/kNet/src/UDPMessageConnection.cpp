@@ -58,7 +58,7 @@ static const u32 cMaxUDPMessageFragmentSize = 470;
 
 UDPMessageConnection::UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState)
 :MessageConnection(owner, ownerServer, socket, startingState),
-retransmissionTimeout(3.f), smoothedRTT(3.f), rttVariation(0.f), rttCleared(true), // Set RTT initial values as per RFC 2988.
+retransmissionTimeout(3.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothedRTT(3.f), rttVariation(0.f), rttCleared(true), // Set RTT initial values as per RFC 2988.
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
 packetLossRate(0.f), packetLossCount(0.f), datagramOutRatePerSecond(initialDatagramRatePerSecond), 
@@ -268,7 +268,7 @@ void UDPMessageConnection::HandleFlowControl()
 	AssertInWorkerThreadContext();
 
 	// In packets/second.
-	const float totalEstimatedBandwidth = 50; ///\todo Make this estimation dynamic as in UDT or similar.
+	const float totalEstimatedBandwidth = 100; ///\todo Make this estimation dynamic as in UDT or similar.
 	const float additiveIncreaseAggressiveness = 5e-2f;
 
 	const tick_t frameLength = Clock::TicksPerSec() / 100; // in ticks
@@ -301,9 +301,6 @@ void UDPMessageConnection::HandleFlowControl()
 		else
 			lastFrameTime = Clock::Tick();
 	}
-
-	// Do a fixed flow control for testing.
-	datagramSendRate = 100; ///\todo Remove.
 }
 
 void UDPMessageConnection::SendOutPackets()
@@ -569,7 +566,6 @@ MessageConnection::PacketSendResult UDPMessageConnection::SendOutPacket()
 		const tick_t now = Clock::Tick();
 		ack.sendCount = 1;
 		ack.sentTick = now;
-		retransmissionTimeout = 5000.f; ///\todo Remove this.
 		ack.timeoutTick = now + (tick_t)((double)retransmissionTimeout * Clock::TicksPerMillisecond());
 		ack.datagramSendRate = datagramSendRate;
 

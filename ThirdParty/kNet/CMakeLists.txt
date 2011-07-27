@@ -54,7 +54,7 @@ AddCompilationDefine(KNET_ENABLE_WINXP_SUPPORT)
 
 # Enable internal LOG messaging if this flag is enabled. Comment this out to squeeze the last bit of
 # extra performance by avoiding all logging-related string operations.
-AddCompilationDefine(KNET_LOGGING_SUPPORT_ENABLED)
+#AddCompilationDefine(KNET_LOGGING_SUPPORT_ENABLED)
 
 # Enable storing profiling data from different network level events.
 #AddCompilationDefine(KNET_NETWORK_PROFILING)

@@ -57,21 +57,19 @@ Connection::~Connection()
     SetScene(0);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
-{
-    // Make sure not to use kNet internal message ID's
-    if (msgID <= 0x4 || msgID >= 0x3ffffffe)
-    {
-        LOGERROR("Can not send message with reserved ID");
-        return;
-    }
-    
-    connection_->SendMessage(msgID, reliable, inOrder, 0, 0, (const char*)data, numBytes);
-}
-
 void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg)
 {
-    SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize());
+    SendMessage(msgID, 0, reliable, inOrder, msg.GetData(), msg.GetSize());
+}
+
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
+{
+    SendMessage(msgID, 0, reliable, inOrder, data, numBytes);
+}
+
+void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg)
+{
+    SendMessage(msgID, contentID, reliable, inOrder, msg.GetData(), msg.GetSize());
 }
 
 void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
@@ -83,12 +81,7 @@ void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool 
         return;
     }
     
-    connection_->SendMessage(msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
-}
-
-void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg)
-{
-    SendMessage(msgID, contentID, reliable, inOrder, msg.GetData(), msg.GetSize());
+    connection_->SendMessage(msgID, reliable, inOrder, DEFAULT_MSG_PRIORITY, contentID, (const char*)data, numBytes);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)

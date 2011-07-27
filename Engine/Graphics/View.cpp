@@ -665,7 +665,7 @@ void View::GetLitBatches(Drawable* drawable, Light* light, Light* splitLight, Li
             }
         }
         
-        // If no first light pass, get ordinary light pass
+        // If no lit base pass, get ordinary light pass
         if (!pass)
             pass = tech->GetPass(PASS_LIGHT);
         // Skip if material does not receive light at all
@@ -2005,9 +2005,12 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
         break;
         
     case LIGHT_DIRECTIONAL:
-        // If light encompasses whole frustum, no drawing to frustum necessary
+        // If light encompasses whole frustum, no drawing to stencil necessary
         if (light->GetNearSplit() <= camera.GetNearClip() && light->GetFarSplit() >= camera.GetFarClip())
+        {
+            graphics_->SetStencilTest(false);
             return;
+        }
         else
         {
             if (!clear)
@@ -2022,25 +2025,13 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
                 graphics_->SetDepthWrite(false);
                 graphics_->SetCullMode(CULL_NONE);
                 
-                // If the split begins at the near plane (first split), draw at split far plane
-                if (light->GetNearSplit() <= camera.GetNearClip())
-                {
-                    graphics_->SetDepthTest(CMP_GREATEREQUAL);
-                    graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-                    graphics_->SetShaderParameter(VSP_MODEL, farTransform);
-                    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-                    graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
-                }
-                // Otherwise draw at split near plane
-                else
-                {
-                    graphics_->SetDepthTest(CMP_LESSEQUAL);
-                    graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
-                    graphics_->SetShaderParameter(VSP_MODEL, nearTransform);
-                    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
-                    graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
-                }
-                
+                // If the split begins at the near plane (first split), draw at split far plane, otherwise at near plane
+                bool firstSplit = light->GetNearSplit() <= camera.GetNearClip();
+                graphics_->SetDepthTest(firstSplit ? CMP_GREATEREQUAL : CMP_LESSEQUAL);
+                graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
+                graphics_->SetShaderParameter(VSP_MODEL, firstSplit ? farTransform : nearTransform);
+                graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+                graphics_->SetStencilTest(true, CMP_ALWAYS, OP_REF, OP_ZERO, OP_ZERO, 1);
                 graphics_->ClearTransformSources();
                 
                 renderer_->dirLightGeometry_->Draw(graphics_);
