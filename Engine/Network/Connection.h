@@ -36,13 +36,11 @@
 #undef SendMessage
 #endif
 
+class File;
 class MemoryBuffer;
 class Node;
 class Scene;
 class Serializable;
-
-/// Message priority for kNet. For now all messages have same priority
-static const int DEFAULT_MSG_PRIORITY = 100;
 
 /// Queued remote event
 struct RemoteEvent
@@ -55,6 +53,26 @@ struct RemoteEvent
     VariantMap eventData_;
     /// In order -flag
     bool inOrder_;
+};
+
+/// Package file download
+struct PackageDownload
+{
+    /// Construct with defaults
+    PackageDownload();
+    
+    /// Destination file that is used to write the data
+    SharedPtr<File> file_;
+    /// Already received fragments
+    HashSet<unsigned> receivedFragments_;
+    /// Package name
+    String name_;
+    /// Total number of fragments
+    unsigned totalFragments_;
+    /// Checksum
+    unsigned checksum_;
+    /// Download initiated flag
+    bool initiated_;
 };
 
 /// Connection in a networked scene
@@ -104,6 +122,8 @@ public:
     void ProcessSceneChecksumError(int msgID, MemoryBuffer& msg);
     /// Process a scene update message from the server. Called by Network
     void ProcessSceneUpdate(int msgID, MemoryBuffer& msg);
+    /// Process package download related messages. Called by Network
+    void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
     /// Process an Identity message from the client. Called by Network
     void ProcessIdentity(int msgID, MemoryBuffer& msg);
     /// Process a Controls message from the client. Called by Network
@@ -137,6 +157,12 @@ public:
     unsigned short GetPort() const;
     /// Return an address:port string
     String ToString() const;
+    /// Return number of package downloads remaining
+    unsigned GetNumDownloads() const;
+    /// Return name of current package download, or empty if no downloads
+    const String& GetDownloadName() const;
+    /// Return progress of current package download, or 1.0 if no downloads
+    float GetDownloadProgress() const;
     
 private:
     /// Handle scene loaded event
@@ -147,6 +173,16 @@ private:
     void ProcessNewNode(Node* node);
     /// Process a node that the client has already received
     void ProcessExistingNode(Node* node);
+    /// Initiate a package download
+    void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
+    /// Send an error reply for a package download
+    void SendPackageError(const String& name);
+    /// Handle scene load failure on the server or client
+    void OnSceneLoadFailed();
+    /// Handle a package download failure on the client
+    void OnPackageDownloadFailed();
+    /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none
+    void OnPackagesReady();
     
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
@@ -170,6 +206,10 @@ private:
     HashSet<Node*> processedNodes_;
     /// Preallocated variants of correct type per networked object class
     Map<ShortStringHash, Vector<Variant> > classCurrentState_;
+    /// Waiting or ongoing package file downloads
+    Map<StringHash, PackageDownload> downloads_;
+    /// Scene file to load once all packages (if any) have been downloaded
+    String sceneFileName_;
     /// Reused message buffer
     VectorBuffer msg_;
     /// Current controls

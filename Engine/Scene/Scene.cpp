@@ -256,6 +256,7 @@ void Scene::StopAsyncLoading()
 
 void Scene::Clear()
 {
+    StopAsyncLoading();
     RemoveAllChildren();
     RemoveAllComponents();
     fileName_ = String();
@@ -277,10 +278,13 @@ void Scene::SetSnapThreshold(float threshold)
     snapThreshold_ = Max(threshold, 0.0f);
 }
 
-void Scene::AddRequiredPackageFile(PackageFile* file)
+void Scene::AddRequiredPackageFile(PackageFile* package)
 {
-    if (file)
-        requiredPackageFiles_.Push(SharedPtr<PackageFile>(file));
+    // Do not add packages that failed to load
+    if (!package || !package->GetNumFiles())
+        return;
+    
+    requiredPackageFiles_.Push(SharedPtr<PackageFile>(package));
 }
 
 void Scene::ClearRequiredPackageFiles()

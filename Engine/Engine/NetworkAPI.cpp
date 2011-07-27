@@ -85,6 +85,9 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "uint get_numDownloads() const", asMETHOD(Connection, GetNumDownloads), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "const String& get_downloadName() const", asMETHOD(Connection, GetDownloadName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "float get_downloadProgress() const", asMETHOD(Connection, GetDownloadProgress), asCALL_THISCALL);
     
     // Register Variant GetPtr() for Connection
     engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
@@ -171,6 +174,8 @@ void RegisterNetwork(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Network", "bool CheckRemoteEvent(const String&in) const", asFUNCTION(NetworkCheckRemoteEvent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Network", "void set_updateFps(int)", asMETHOD(Network, SetUpdateFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "int get_updateFps() const", asMETHOD(Network, GetUpdateFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "void set_packageCacheDir(const String&in)", asMETHOD(Network, SetPackageCacheDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Network", "const String& get_packageCacheDir() const", asMETHOD(Network, GetPackageCacheDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "bool get_serverRunning() const", asMETHOD(Network, IsServerRunning), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Connection@+ get_serverConnection() const", asMETHOD(Network, GetServerConnection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Network", "Array<Connection@>@ get_clientConnections() const", asFUNCTION(NetworkGetClientConnections), asCALL_CDECL_OBJLAST);

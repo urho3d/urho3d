@@ -83,6 +83,8 @@ public:
     void UnregisterRemoteEvent(StringHash eventType);
     /// Unregister all remote events. This results in all being allowed
     void UnregisterAllRemoteEvents();
+    /// Set the package download cache path
+    void SetPackageCacheDir(const String& path);
     
     /// Return network update FPS
     int GetUpdateFps() const { return updateFps_; }
@@ -96,6 +98,8 @@ public:
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed
     bool CheckRemoteEvent(StringHash eventType) const;
+    /// Return the package download cache path
+    const String& GetPackageCacheDir() const { return packageCacheDir_; }
     
     /// Update connections. Called by HandleBeginFrame
     void Update(float timeStep);
@@ -122,4 +126,6 @@ private:
     float updateInterval_;
     /// Network update time accumulator
     float updateAcc_;
+    /// Package cache path
+    String packageCacheDir_;
 };

@@ -24,6 +24,7 @@
 #include "Precompiled.h"
 #include "Context.h"
 #include "CoreEvents.h"
+#include "FileSystem.h"
 #include "Log.h"
 #include "MemoryBuffer.h"
 #include "Network.h"
@@ -74,6 +75,23 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
         
         switch (id)
         {
+        case MSG_IDENTITY:
+            connection->ProcessIdentity(id, msg);
+            return;
+        
+        case MSG_CONTROLS:
+            connection->ProcessControls(id, msg);
+            return;
+            
+        case MSG_SCENELOADED:
+            connection->ProcessSceneLoaded(id, msg);
+            return;
+            
+        case MSG_REQUESTPACKAGE:
+        case MSG_PACKAGEDATA:
+            connection->ProcessPackageDownload(id, msg);
+            return;
+            
         case MSG_LOADSCENE:
             connection->ProcessLoadScene(id, msg);
             return;
@@ -91,18 +109,6 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::message_id_t 
         case MSG_COMPONENTLATESTDATA:
         case MSG_REMOVECOMPONENT:
             connection->ProcessSceneUpdate(id, msg);
-            return;
-            
-        case MSG_IDENTITY:
-            connection->ProcessIdentity(id, msg);
-            return;
-        
-        case MSG_CONTROLS:
-            connection->ProcessControls(id, msg);
-            return;
-            
-        case MSG_SCENELOADED:
-            connection->ProcessSceneLoaded(id, msg);
             return;
             
         case MSG_REMOTEEVENT:
@@ -342,6 +348,11 @@ void Network::UnregisterRemoteEvent(StringHash eventType)
 void Network::UnregisterAllRemoteEvents()
 {
     allowedRemoteEvents_.Clear();
+}
+
+void Network::SetPackageCacheDir(const String& path)
+{
+    packageCacheDir_ = AddTrailingSlash(path);
 }
 
 Connection* Network::GetConnection(kNet::MessageConnection* connection) const

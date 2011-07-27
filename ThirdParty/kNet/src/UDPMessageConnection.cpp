@@ -268,8 +268,8 @@ void UDPMessageConnection::HandleFlowControl()
 	AssertInWorkerThreadContext();
 
 	// In packets/second.
-	const float totalEstimatedBandwidth = 100; ///\todo Make this estimation dynamic as in UDT or similar.
-	const float additiveIncreaseAggressiveness = 5e-2f;
+	const float totalEstimatedBandwidth = 1000; ///\todo Make this estimation dynamic as in UDT or similar.
+	const float additiveIncreaseAggressiveness = 0.1f;
 
 	const tick_t frameLength = Clock::TicksPerSec() / 100; // in ticks
 	// Additively increase the outbound send rate.

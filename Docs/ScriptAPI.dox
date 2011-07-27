@@ -833,7 +833,7 @@ ResourceCache
 
 Methods:<br>
 - bool AddResourcePath(const String&)
-- void AddPackageFile(PackageFile@)
+- void AddPackageFile(PackageFile@, bool arg1 = false)
 - bool AddManualResource(Resource@)
 - void RemoveResourcePath(const String&)
 - void RemovePackageFile(PackageFile@, bool, bool)
@@ -3455,6 +3455,9 @@ Properties:<br>
 - bool sceneLoaded (readonly)
 - String address (readonly)
 - uint16 port (readonly)
+- uint numDownloads (readonly)
+- String& downloadName (readonly)
+- float downloadProgress (readonly)
 
 
 Network
@@ -3478,6 +3481,7 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - int updateFps
+- String& packageCacheDir
 - bool serverRunning (readonly)
 - Connection@ serverConnection (readonly)
 - Connection@[]@ clientConnections (readonly)

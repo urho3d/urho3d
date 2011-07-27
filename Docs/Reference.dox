@@ -981,7 +981,7 @@ The attribute system also supports editing by providing human-readable names.
 
 The Network library provides reliable and unreliable UDP messaging using kNet. A server can be created that listens for incoming connections, and client connections can be made to the server. After connecting, code running on the server can assign the client into a scene to enable scene replication, provided that when connecting, the client also specified a blank scene that can be used.
 
-%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by sends controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
+%Scene replication is one-directional: the server always has authority and sends scene updates to the client at a fixed update rate, by default 25 FPS. The client responds by only sending controls updates (buttons, yaw and pitch + possible extra data) also at a fixed rate.
 
 Bidirectional communication between the server and the client can happen either using raw network messages, which are binary-serialized data, or remote events, which operate like ordinary events, but are processed on the receiving end only. Code on the server can send messages or remote events either to one client, all clients assigned into a particular scene, or to all connected clients. In contrast the client can only send messages or remote events to the server, not directly to other clients.
 
@@ -1002,6 +1002,8 @@ After connecting successfully, client code can get the Connection object represe
 The CreateMode translates into two different node and component ID ranges - replicated ID's range from 0x1 to 0xffffff, while local ID's range from 0x1000000 to 0xffffffff. This means there is a maximum of 16777215 replicated nodes or components in a scene.
 
 If the scene was originally loaded from a file on the server, the client will also load the scene from the same file first. In this case all predefined, static objects such as the world geometry should be defined as local nodes, so that they are not needlessly retransmitted through the network during the initial update, and do not exhaust the more limited replicated ID range.
+
+The server can be made to transmit needed resource \ref PackageFile "packages" to the client. This requires attaching the package files to the Scene by calling \ref Scene::AddRequiredPackageFile "AddRequiredPackageFile()". On the client, a cache directory for the packages must be chosen before receiving them is possible: see \ref Network::SetPackageCacheDir "SetPackageCacheDir()".
 
 There are some things to watch out for:
 
@@ -1029,7 +1031,7 @@ The Controls structure will be used to send controls information from the client
 
 \section Network_Messages Raw network messages
 
-All network messages have an integer ID. The first ID you can use for custom messages is 20 (lower ID's are either reserved for kNet's internal use or for the scene replication and remote event protocol.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
+All network messages have an integer ID. The first ID you can use for custom messages is 22 (lower ID's are either reserved for kNet's or the %Network library's internal use.) Messages can be sent either unreliably or reliably, in-order or unordered. The data payload is simply raw binary data that can be crafted by using for example VectorBuffer.
 
 To send a message to a Connection, use its \ref Connection::SendMessage "SendMessage()" function. On the server, messages can also be broadcast to all client connections by calling the \ref Network::BroadcastMessage "BroadcastMessage()" function.
 

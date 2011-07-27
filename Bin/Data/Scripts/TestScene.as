@@ -8,6 +8,8 @@ float yaw = 0.0;
 float pitch = 0.0;
 int drawDebug = 0;
 
+Text@ downloadsText;
+
 void Start()
 {
     if (!engine.headless)
@@ -35,10 +37,15 @@ void Start()
     {
         network.StartServer(serverPort);
         SubscribeToEvent("ClientConnected", "HandleClientConnected");
+
+        //PackageFile@ packageFile = PackageFile(fileSystem.programDir + "Data.pak");
+        //cache.AddPackageFile(packageFile);
+        //testScene.AddRequiredPackageFile(packageFile);
     }
     if (startClient)
     {
         testScene.Clear();
+        //network.packageCacheDir = fileSystem.programDir;
         network.Connect(serverAddress, serverPort, testScene);
     }
 }
@@ -63,6 +70,11 @@ void InitUI()
     newCursor.style = uiStyle;
     newCursor.position = IntVector2(graphics.width / 2, graphics.height / 2);
     ui.cursor = newCursor;
+    
+    downloadsText = Text();
+    downloadsText.SetAlignment(HA_CENTER, VA_CENTER);
+    downloadsText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 20);
+    ui.root.AddChild(downloadsText);
 }
 
 void InitScene()
@@ -313,6 +325,19 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
             engine.Exit();
         else
             console.visible = false;
+    }
+
+    // Update package download status
+    if (network.serverConnection !is null)
+    {
+        Connection@ connection = network.serverConnection;
+        if (connection.numDownloads > 0)
+        {
+            downloadsText.text = "Downloads: " + connection.numDownloads + " Current download: " +
+                connection.downloadName + " (" + connection.downloadProgress * 100.0 + "%)";
+        }
+        else if (!downloadsText.text.empty)
+            downloadsText.text = "";
     }
 }
 

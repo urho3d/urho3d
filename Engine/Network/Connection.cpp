@@ -30,14 +30,26 @@
 #include "MemoryBuffer.h"
 #include "Network.h"
 #include "NetworkEvents.h"
+#include "PackageFile.h"
 #include "Profiler.h"
 #include "Protocol.h"
+#include "ResourceCache.h"
 #include "Scene.h"
 #include "SceneEvents.h"
+#include "StringUtils.h"
 
 #include <kNet.h>
 
 #include "DebugNew.h"
+
+static const String noName;
+
+PackageDownload::PackageDownload() :
+    totalFragments_(0),
+    checksum_(0),
+    initiated_(false)
+{
+}
 
 OBJECTTYPESTATIC(Connection);
 
@@ -154,10 +166,19 @@ void Connection::SetScene(Scene* newScene)
     {
         sceneState_.Clear();
         
-        // When scene is assigned on the server, instruct the client to load it
-        /// \todo Download package(s) needed for the scene, if they do not exist already on the client
+        // When scene is assigned on the server, instruct the client to load it. This may require downloading packages
+        const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
+        unsigned numPackages = packages.Size();
         msg_.Clear();
         msg_.WriteString(scene_->GetFileName());
+        msg_.WriteVLE(numPackages);
+        for (unsigned i = 0; i < numPackages; ++i)
+        {
+            PackageFile* package = packages[i];
+            msg_.WriteString(GetFileNameAndExtension(package->GetName()));
+            msg_.WriteUInt(package->GetTotalSize());
+            msg_.WriteUInt(package->GetChecksum());
+        }
         SendMessage(MSG_LOADSCENE, true, true, msg_);
     }
     else
@@ -316,43 +337,89 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
         return;
     }
     
-    String fileName = msg.ReadString();
+    // Store the scene file name we need to eventually load
+    sceneFileName_ = msg.ReadString();
     
-    // Make sure there is no existing async loading, and clear previous pending latest data if any
-    scene_->StopAsyncLoading();
+    // Clear previous scene content, pending latest data, and package downloads if any
+    scene_->Clear();
     nodeLatestData_.Clear();
     componentLatestData_.Clear();
+    downloads_.Clear();
     
-    if (fileName.Empty())
+    // In case we have joined other scenes in this session, remove first all downloaded package files from the resource system
+    // to prevent resource conflicts
+    const String& packageCacheDir = GetSubsystem<Network>()->GetPackageCacheDir();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    Vector<SharedPtr<PackageFile> > packages = cache->GetPackageFiles();
+    for (unsigned i = 0; i < packages.Size(); ++i)
     {
-        scene_->Clear();
-        
-        // If filename is empty, can send the scene loaded reply immediately
-        VectorBuffer replyMsg;
-        replyMsg.WriteUInt(scene_->GetChecksum());
-        SendMessage(MSG_SCENELOADED, true, true, replyMsg);
+        PackageFile* package = packages[i];
+        if (!package->GetName().Find(packageCacheDir))
+            cache->RemovePackageFile(package, true);
     }
-    else
+    
+    // Now check which packages we have in the resource cache or in the download cache, and which we need to download
+    unsigned numPackages = msg.ReadVLE();
+    packages = cache->GetPackageFiles(); // Refresh resource cache's package list after possible removals
+    Vector<String> downloadedPackages;
+    if (!packageCacheDir.Empty())
+        GetSubsystem<FileSystem>()->ScanDir(downloadedPackages, packageCacheDir, "*.*", SCAN_FILES, false);
+    
+    for (unsigned i = 0; i < numPackages; ++i)
     {
-        // Otherwise start the async loading process
-        String extension = GetExtension(fileName);
-        SharedPtr<File> file(new File(context_, fileName));
-        bool success;
+        String name = msg.ReadString();
+        unsigned fileSize = msg.ReadUInt();
+        unsigned checksum = msg.ReadUInt();
+        String checksumString = ToStringHex(checksum);
+        bool found = false;
         
-        if (extension == ".xml")
-            success = scene_->LoadAsyncXML(file);
-        else
-            success = scene_->LoadAsync(file);
-        
-        if (!success)
+        // Check first the resource cache
+        for (unsigned j = 0; j < packages.Size(); ++j)
         {
-            using namespace NetworkSceneLoadFailed;
-            
-            VariantMap eventData;
-            eventData[P_CONNECTION] = (void*)this;
-            SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+            PackageFile* package = packages[j];
+            if (!GetFileNameAndExtension(package->GetName()).Compare(name, false) && package->GetTotalSize() == fileSize &&
+                package->GetChecksum() == checksum)
+            {
+                found = true;
+                break;
+            }
+        }
+        
+        // Then the download cache
+        for (unsigned j = 0; j < downloadedPackages.Size(); ++j)
+        {
+            const String& fileName = downloadedPackages[j];
+            if (!fileName.Find(checksumString) && !fileName.Substring(9).Compare(name, false))
+            {
+                // Name matches. Check filesize and actual checksum to be sure
+                SharedPtr<PackageFile> newPackage(new PackageFile(context_, packageCacheDir + fileName));
+                if (newPackage->GetTotalSize() == fileSize && newPackage->GetChecksum() == checksum)
+                {
+                    // Add the package to the resource cache, as we will need it to load the scene
+                    cache->AddPackageFile(newPackage, true);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        
+        // Need to request a download
+        if (!found)
+        {
+            if (!packageCacheDir.Empty())
+                RequestPackage(name, fileSize, checksum);
+            else
+            {
+                LOGERROR("Can not download required packages, as no package cache path is set");
+                OnSceneLoadFailed();
+                return;
+            }
         }
     }
+    
+    // If no downloads were queued, can load the scene directly
+    if (downloads_.Empty())
+        OnPackagesReady();
 }
 
 void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
@@ -363,11 +430,7 @@ void Connection::ProcessSceneChecksumError(int msgID, MemoryBuffer& msg)
         return;
     }
     
-    using namespace NetworkSceneLoadFailed;
-    
-    VariantMap eventData;
-    eventData[P_CONNECTION] = (void*)this;
-    SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+    OnSceneLoadFailed();
 }
 
 void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
@@ -576,6 +639,157 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     }
 }
 
+void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
+{
+    switch (msgID)
+    {
+    case MSG_REQUESTPACKAGE:
+        if (!IsClient())
+        {
+            LOGWARNING("Received unexpected RequestPackage message from server");
+            return;
+        }
+        else
+        {
+            String name = msg.ReadString();
+            
+            if (!scene_)
+            {
+                LOGWARNING("Received a RequestPackage message without an assigned scene from client " + ToString());
+                return;
+            }
+            
+            // The package must be one of those required by the scene
+            const Vector<SharedPtr<PackageFile> >& packages = scene_->GetRequiredPackageFiles();
+            for (unsigned i = 0; i < packages.Size(); ++i)
+            {
+                PackageFile* package = packages[i];
+                String packageFullName = package->GetName();
+                if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
+                {
+                    SharedPtr<File> file(new File(context_, packageFullName));
+                    if (!file->IsOpen())
+                    {
+                        LOGERROR("Failed to transmit package file " + name);
+                        SendPackageError(name);
+                        return;
+                    }
+                    
+                    LOGINFO("Transmitting package file " + name + " to client " + ToString());
+                    
+                    StringHash nameHash(name);
+                    unsigned totalFragments = (file->GetSize() + PACKAGE_FRAGMENT_SIZE - 1) / PACKAGE_FRAGMENT_SIZE;
+                    unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
+                    
+                    // Now simply read the file fragments and queue them
+                    for (unsigned i = 0; i < totalFragments; ++i)
+                    {
+                        unsigned fragmentSize = Min((int)(file->GetSize() - file->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
+                        file->Read(buffer, fragmentSize);
+                        
+                        msg_.Clear();
+                        msg_.WriteStringHash(nameHash);
+                        msg_.WriteVLE(i);
+                        msg_.Write(buffer, fragmentSize);
+                        SendMessage(MSG_PACKAGEDATA, true, false, msg_);
+                    }
+                    
+                    return;
+                }
+            }
+            
+            LOGERROR("Client requested a nonexisting package file " + name);
+            // Send the name hash only to indicate a failed download
+            SendPackageError(name);
+            return;
+        }
+        break;
+        
+    case MSG_PACKAGEDATA:
+        if (IsClient())
+        {
+            LOGWARNING("Received unexpected PackageData message from client");
+            return;
+        }
+        else
+        {
+            StringHash nameHash = msg.ReadStringHash();
+            
+            Map<StringHash, PackageDownload>::Iterator i = downloads_.Find(nameHash);
+            // In case of being unable to create the package file into the cache, we will still receive all data from the server.
+            // Simply disregard it
+            if (i == downloads_.End())
+                return;
+            
+            PackageDownload& download = i->second_;
+            
+            // If no further data, this is an error reply
+            if (msg.IsEof())
+            {
+                LOGERROR("Download of package " + download.name_ + " failed");
+                OnPackageDownloadFailed();
+                return;
+            }
+            
+            // If file has not yet been opened, try to open now. Prepend the checksum to the filename to allow multiple versions
+            if (!download.file_)
+            {
+                download.file_ = new File(context_, GetSubsystem<Network>()->GetPackageCacheDir() + ToStringHex(download.checksum_) + "_" + download.name_, FILE_WRITE);
+                if (!download.file_->IsOpen())
+                {
+                    LOGERROR("Download of package " + download.name_ + " failed");
+                    OnPackageDownloadFailed();
+                    return;
+                }
+            }
+            
+            // Write the fragment data to the proper index
+            unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
+            unsigned index = msg.ReadVLE();
+            unsigned fragmentSize = msg.GetSize() - msg.GetPosition();
+            
+            msg.Read(buffer, fragmentSize);
+            download.file_->Seek(index * PACKAGE_FRAGMENT_SIZE);
+            download.file_->Write(buffer, fragmentSize);
+            download.receivedFragments_.Insert(index);
+            
+            // Check if all fragments received
+            if (download.receivedFragments_.Size() > download.totalFragments_)
+            {
+                LOGERROR("Received extra fragments for package " + download.name_);
+                OnPackageDownloadFailed();
+                return;
+            }
+            
+            if (download.receivedFragments_.Size() == download.totalFragments_)
+            {
+                LOGINFO("Package " + download.name_ + " downloaded successfully");
+                
+                // Instantiate the package and add to the resource system, as we will need it to load the scene
+                download.file_->Close();
+                SharedPtr<PackageFile> newPackage(new PackageFile(context_, download.file_->GetName()));
+                GetSubsystem<ResourceCache>()->AddPackageFile(newPackage, true);
+                
+                // Then start the next download if there are more
+                downloads_.Erase(i);
+                if (downloads_.Empty())
+                    OnPackagesReady();
+                else
+                {
+                    PackageDownload& nextDownload = downloads_.Begin()->second_;
+                    
+                    LOGINFO("Requesting package " + nextDownload.name_ + " from server");
+                    msg_.Clear();
+                    msg_.WriteString(nextDownload.name_);
+                    SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
+                    nextDownload.initiated_ = true;
+                }
+            }
+        }
+        break;
+    }
+}
+
 void Connection::ProcessIdentity(int msgID, MemoryBuffer& msg)
 {
     if (!IsClient())
@@ -632,14 +846,9 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
     
     if (checksum != scene_->GetChecksum())
     {
-        VectorBuffer replyMsg;
-        SendMessage(MSG_SCENECHECKSUMERROR, true, true, replyMsg);
-        
-        using namespace NetworkSceneLoadFailed;
-        
-        VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)this;
-        SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+        msg_.Clear();
+        SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_);
+        OnSceneLoadFailed();
     }
     else
     {
@@ -725,6 +934,34 @@ unsigned short Connection::GetPort() const
 String Connection::ToString() const
 {
     return GetAddress() + ":" + String(GetPort());
+}
+
+unsigned Connection::GetNumDownloads() const
+{
+    return downloads_.Size();
+}
+
+const String& Connection::GetDownloadName() const
+{
+    for (Map<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
+    {
+        if (i->second_.initiated_)
+            return i->second_.name_;
+    }
+    return noName;
+}
+
+float Connection::GetDownloadProgress() const
+{
+    for (Map<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
+    {
+        if (i->second_.initiated_)
+        {
+            return i->second_.totalFragments_ ? (float)i->second_.receivedFragments_.Size() / (float)i->second_.totalFragments_ :
+                0.0f;
+        }
+    }
+    return 1.0f;
 }
 
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
@@ -921,5 +1158,82 @@ void Connection::ProcessExistingNode(Node* node)
             SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
             nodeState.components_.Erase(current);
         }
+    }
+}
+
+void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned checksum)
+{
+    StringHash nameHash(name);
+    if (downloads_.Contains(nameHash))
+        return; // Download already exists
+    
+    PackageDownload& download = downloads_[nameHash];
+    download.name_ = name;
+    download.totalFragments_ = (fileSize + PACKAGE_FRAGMENT_SIZE - 1) / PACKAGE_FRAGMENT_SIZE;
+    download.checksum_ = checksum;
+    
+    // Start download now only if no existing downloads, else wait for the existing ones to finish
+    if (downloads_.Size() == 1)
+    {
+        LOGINFO("Requesting package " + name + " from server");
+        msg_.Clear();
+        msg_.WriteString(name);
+        SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
+        download.initiated_ = true;
+    }
+}
+
+void Connection::SendPackageError(const String& name)
+{
+    msg_.Clear();
+    msg_.WriteStringHash(StringHash(name));
+    SendMessage(MSG_PACKAGEDATA, true, false, msg_);
+}
+
+void Connection::OnSceneLoadFailed()
+{
+    using namespace NetworkSceneLoadFailed;
+    
+    VariantMap eventData;
+    eventData[P_CONNECTION] = (void*)this;
+    SendEvent(E_NETWORKSCENELOADFAILED, eventData);
+    return;
+}
+
+void Connection::OnPackageDownloadFailed()
+{
+    // As one package failed, we can not join the scene in any case. Clear the downloads
+    downloads_.Clear();
+    OnSceneLoadFailed();
+}
+
+void Connection::OnPackagesReady()
+{
+    if (!scene_)
+        return;
+    
+    if (sceneFileName_.Empty())
+    {
+        scene_->Clear();
+        
+        // If filename is empty, can send the scene loaded reply immediately
+        msg_.Clear();
+        msg_.WriteUInt(scene_->GetChecksum());
+        SendMessage(MSG_SCENELOADED, true, true, msg_);
+    }
+    else
+    {
+        // Otherwise start the async loading process
+        String extension = GetExtension(sceneFileName_);
+        SharedPtr<File> file(new File(context_, sceneFileName_));
+        bool success;
+        
+        if (extension == ".xml")
+            success = scene_->LoadAsyncXML(file);
+        else
+            success = scene_->LoadAsync(file);
+        
+        if (!success)
+            OnSceneLoadFailed();
     }
 }

@@ -127,11 +127,11 @@ public:
         /// Preincrement the pointer
         ConstIterator& operator ++ () { GotoNext(); return *this; }
         /// Postincrement the pointer
-        ConstIterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
+        ConstIterator operator ++ (int) { ConstIterator it = *this; GotoNext(); return it; }
         /// Predecrement the pointer
         ConstIterator& operator -- () { GotoPrev(); return *this; }
         /// Postdecrement the pointer
-        ConstIterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
+        ConstIterator operator -- (int) { ConstIterator it = *this; GotoPrev(); return it; }
         
         /// Point to the pair
         const KeyValue* operator -> () const { return &(static_cast<Node*>(ptr_))->pair_; }

@@ -171,7 +171,8 @@ unsigned File::Read(void* dest, unsigned size)
 
 unsigned File::Seek(unsigned position)
 {
-    if (position > size_)
+    // Allow sparse seeks if writing
+    if (mode_ == FILE_READ && position > size_)
         position = size_;
     
     if (!handle_)

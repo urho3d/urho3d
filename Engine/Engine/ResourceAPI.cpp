@@ -86,7 +86,7 @@ static void RegisterResourceCache(asIScriptEngine* engine)
 {
     RegisterObject<ResourceCache>(engine, "ResourceCache");
     engine->RegisterObjectMethod("ResourceCache", "bool AddResourcePath(const String&in)", asMETHOD(ResourceCache, AddResourcePath), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void AddPackageFile(PackageFile@+)", asMETHOD(ResourceCache, AddPackageFile), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void AddPackageFile(PackageFile@+, bool addAsFirst = false)", asMETHOD(ResourceCache, AddPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool AddManualResource(Resource@+)", asMETHOD(ResourceCache, AddManualResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemoveResourcePath(const String&in)", asMETHOD(ResourceCache, RemoveResourcePath), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);

@@ -160,7 +160,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     Log* log = GetSubsystem<Log>();
     log->Open(logName);
     
-    // Add default resource paths: CoreData package or directory, Data package or directory, system fonts directory
+    // Add default resource paths: CoreData package or directory, Data package or directory
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     String exePath = fileSystem->GetProgramDir();
@@ -172,6 +172,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     }
     else if (fileSystem->DirExists(exePath + "CoreData"))
         cache->AddResourcePath(exePath + "CoreData");
+    
     if (fileSystem->FileExists(exePath + "Data.pak"))
     {
         SharedPtr<PackageFile> package(new PackageFile(context_));

@@ -94,7 +94,7 @@ public:
     /// Set motion smoothing snap threshold
     void SetSnapThreshold(float threshold);
     /// Add a required package file for networking. To be called on the server
-    void AddRequiredPackageFile(PackageFile* file);
+    void AddRequiredPackageFile(PackageFile* package);
     /// Clear required package files
     void ClearRequiredPackageFiles();
     /// Reset specific owner reference from nodes on disconnect
