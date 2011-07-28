@@ -122,6 +122,6 @@ private:
     float updateInterval_;
     /// Network update time accumulator
     float updateAcc_;
-    /// Package cache path
+    /// Package cache directory
     String packageCacheDir_;
 };

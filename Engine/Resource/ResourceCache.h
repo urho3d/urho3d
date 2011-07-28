@@ -57,14 +57,14 @@ public:
     /// Destruct. Free all resources
     virtual ~ResourceCache();
     
-    /// Add a resource load path
-    bool AddResourcePath(const String& path);
+    /// Add a resource load directory
+    bool AddResourceDir(const String& pathName);
     /// Add a package file for loading resources from
     void AddPackageFile(PackageFile* package, bool addAsFirst = false);
     /// Add a manually created resource. Must be uniquely named
     bool AddManualResource(Resource* resource);
-    /// Remove a resource load path
-    void RemoveResourcePath(const String& path);
+    /// Remove a resource load directory
+    void RemoveResourceDir(const String& pathName);
     /// Remove a package file. Optionally release the resources loaded from it
     void RemovePackageFile(PackageFile* package, bool ReleaseResources = true, bool forceRelease = false);
     /// Remove a package file by name. Optionally release the resources loaded from it
@@ -94,8 +94,8 @@ public:
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
     /// Return all loaded resources
     const Map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
-    /// Return added resource load paths
-    const Vector<String>& GetResourcePaths() const { return resourcePaths_; }
+    /// Return added resource load directories
+    const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
     /// Return added package files
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
     /// Template version of returning a resource by name
@@ -117,7 +117,7 @@ public:
     /// Return resource name from hash, or empty if not found
     const String& GetResourceName(StringHash nameHash) const;
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories
-    String GetPreferredResourcePath(const String& path);
+    String GetPreferredResourceDir(const String& path);
     
 private:
     /// Find a resource
@@ -131,8 +131,8 @@ private:
     
     /// Resources by type
     Map<ShortStringHash, ResourceGroup> resourceGroups_;
-    /// Resource load paths
-    Vector<String> resourcePaths_;
+    /// Resource load directories
+    Vector<String> resourceDirs_;
     /// Package files
     Vector<SharedPtr<PackageFile> > packages_;
     /// Mapping of hashes to filenames

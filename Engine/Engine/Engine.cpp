@@ -171,7 +171,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         cache->AddPackageFile(package);
     }
     else if (fileSystem->DirExists(exePath + "CoreData"))
-        cache->AddResourcePath(exePath + "CoreData");
+        cache->AddResourceDir(exePath + "CoreData");
     
     if (fileSystem->FileExists(exePath + "Data.pak"))
     {
@@ -180,7 +180,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
         cache->AddPackageFile(package);
     }
     else if (fileSystem->DirExists(exePath + "Data"))
-        cache->AddResourcePath(exePath + "Data");
+        cache->AddResourceDir(exePath + "Data");
     
     // Initialize graphics & audio output
     if (!headless_)

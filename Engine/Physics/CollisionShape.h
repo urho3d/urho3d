@@ -107,19 +107,19 @@ public:
     /// Clear the collision geometry
     void Clear();
     /// Set as a sphere
-    void SetSphere(float radius, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetSphere(float radius, const Vector3& position, const Quaternion& rotation);
     /// Set as a box
-    void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation);
     /// Set as a cylinder
-    void SetCylinder(float radius, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCylinder(float radius, float height, const Vector3& position, const Quaternion& rotation);
     /// Set as a capsule
-    void SetCapsule(float radius, float height, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetCapsule(float radius, float height, const Vector3& position, const Quaternion& rotation);
     /// Set as a triangle mesh
-    void SetTriangleMesh(Model* model, unsigned lodLevel = M_MAX_UNSIGNED, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
     /// Set as a heightfield
-    void SetHeightfield(Model* model, const IntVector2& pointSize = IntVector2::ZERO, float thickness = 1.0f, unsigned lodLevel = M_MAX_UNSIGNED, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
     /// Set as a convex hull (internally an ODE trimesh as well)
-    void SetConvexHull(Model* model, float skinWidth = 0.0f, unsigned lodLevel = M_MAX_UNSIGNED, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
+    void SetConvexHull(Model* model, float skinWidth, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
     /// Set offset position
     void SetPosition(const Vector3& position);
     /// Set rotation

@@ -23,6 +23,7 @@
 
 #include "Precompiled.h"
 #include "APITemplates.h"
+#include "PackageFile.h"
 #include "ResourceCache.h"
 
 void ArrayToVariantVector(CScriptArray* arr, VariantVector& dest);
@@ -82,28 +83,40 @@ static ResourceCache* GetResourceCache()
     return GetScriptContext()->GetSubsystem<ResourceCache>();
 }
 
+static CScriptArray* ResourceCacheGetResourceDirs(ResourceCache* ptr)
+{
+    return VectorToArray<String>(ptr->GetResourceDirs(), "Array<String>");
+}
+
+static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
+{
+    return SharedPtrVectorToHandleArray<PackageFile>(ptr->GetPackageFiles(), "Array<PackageFile@>");
+}
+
 static void RegisterResourceCache(asIScriptEngine* engine)
 {
     RegisterObject<ResourceCache>(engine, "ResourceCache");
-    engine->RegisterObjectMethod("ResourceCache", "bool AddResourcePath(const String&in)", asMETHOD(ResourceCache, AddResourcePath), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "bool AddResourceDir(const String&in)", asMETHOD(ResourceCache, AddResourceDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void AddPackageFile(PackageFile@+, bool addAsFirst = false)", asMETHOD(ResourceCache, AddPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool AddManualResource(Resource@+)", asMETHOD(ResourceCache, AddManualResource), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void RemoveResourcePath(const String&in)", asMETHOD(ResourceCache, RemoveResourcePath), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool, bool)", asMETHODPR(ResourceCache, RemovePackageFile, (const String&, bool, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResource(const String&in, const String&in, bool)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, bool)", asFUNCTION(ResourceCacheReleaseResources), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, const String&in, bool)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "void ReleaseAllResources(bool)", asMETHOD(ResourceCache, ReleaseAllResources), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void RemoveResourceDir(const String&in)", asMETHOD(ResourceCache, RemoveResourceDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(PackageFile@+, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (PackageFile*, bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void RemovePackageFile(const String&in, bool releaseResources = true, bool forceRelease = false)", asMETHODPR(ResourceCache, RemovePackageFile, (const String&, bool, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResource(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResources), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseResources(const String&in, const String&in, bool force = false)", asFUNCTION(ResourceCacheReleaseResourcesPartial), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "void ReleaseAllResources(bool force = false)", asMETHOD(ResourceCache, ReleaseAllResources), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool ReloadResource(Resource@+)", asMETHOD(ResourceCache, ReloadResource), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool Exists(const String&in) const", asMETHODPR(ResourceCache, Exists, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "File@ GetFile(const String&in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourcePath(const String&in)", asMETHOD(ResourceCache, GetPreferredResourcePath), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourceDir(const String&in)", asMETHOD(ResourceCache, GetPreferredResourceDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_totalMemoryUse() const", asMETHOD(ResourceCache, GetTotalMemoryUse), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ResourceCache", "Array<String>@ get_resourceDirs() const", asFUNCTION(ResourceCacheGetResourceDirs), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Array<PackageFile@>@ get_packageFiles() const", asFUNCTION(ResourceCacheGetPackageFiles), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("ResourceCache@+ get_resourceCache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
     engine->RegisterGlobalFunction("ResourceCache@+ get_cache()", asFUNCTION(GetResourceCache), asCALL_CDECL);
 }
@@ -134,31 +147,11 @@ static void DestructXMLElement(XMLElement* ptr)
     ptr->~XMLElement();
 }
 
-static void XMLElementRemoveChildDefault(XMLElement* ptr)
-{
-    ptr->RemoveChild();
-}
-
-static void XMLElementRemoveChildrenDefault(XMLElement* ptr)
-{
-    ptr->RemoveChildren();
-}
-
 static void XMLElementSetVariantVector(CScriptArray* value, XMLElement* ptr)
 {
     VariantVector src;
     ArrayToVariantVector(value, src);
     ptr->SetVariantVector(src);
-}
-
-static XMLElement XMLElementGetChildDefault(XMLElement* ptr)
-{
-    return ptr->GetChild();
-}
-
-static XMLElement XMLElementGetNextDefault(XMLElement* ptr)
-{
-    return ptr->GetNext();
 }
 
 static CScriptArray* XMLElementGetAttributeNames(XMLElement* ptr)
@@ -180,10 +173,8 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructXMLElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "XMLElement &opAssign(const XMLElement&in)", asMETHOD(XMLElement, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement CreateChild(const String&in)", asMETHOD(XMLElement, CreateChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool RemoveChild()", asFUNCTION(XMLElementRemoveChildDefault), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const String&in, bool)", asMETHOD(XMLElement, RemoveChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool RemoveChildren()", asFUNCTION(XMLElementRemoveChildrenDefault), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("XMLElement", "bool RemoveChildren(const String&in)", asMETHOD(XMLElement,RemoveChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const String&in name = String(), bool last = true)", asMETHOD(XMLElement, RemoveChild), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool RemoveChildren(const String&in name = String())", asMETHOD(XMLElement,RemoveChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetAttribute(const String&in, const String&in)", asMETHOD(XMLElement, SetAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetBool(const String&in, bool)", asMETHOD(XMLElement, SetBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetBoundingBox(const BoundingBox&in)", asMETHOD(XMLElement, SetBoundingBox), asCALL_THISCALL);
@@ -205,10 +196,8 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "String GetAttributes(const String&in) const", asMETHOD(XMLElement, GetAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Array<String>@ GetAttributeNames() const", asFUNCTION(XMLElementGetAttributeNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "bool HasChild(const String&in) const", asMETHOD(XMLElement, HasChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement GetChild() const", asFUNCTION(XMLElementGetChildDefault), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement GetChild(const String&in) const", asMETHOD(XMLElement, GetChild), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement GetNext() const", asFUNCTION(XMLElementGetNextDefault), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("XMLElement", "XMLElement GetNext(const String&in) const", asMETHOD(XMLElement, GetNext), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement GetChild(const String&in name = String()) const", asMETHOD(XMLElement, GetChild), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement GetNext(const String&in name = String()) const", asMETHOD(XMLElement, GetNext), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool GetBool(const String&in) const", asMETHOD(XMLElement, GetBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "BoundingBox GetBoundingBox() const", asMETHOD(XMLElement, GetBoundingBox), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Color GetColor(const String&in) const", asMETHOD(XMLElement, GetColor), asCALL_THISCALL);
@@ -242,7 +231,7 @@ static XMLElement XMLFileGetRootDefault(XMLFile* ptr)
 static void RegisterXMLFile(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("XMLFile", "XMLElement CreateRoot(const String&in)", asMETHOD(XMLFile, CreateRoot), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in)", asMETHOD(XMLFile, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in name = String())", asMETHOD(XMLFile, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement get_root()", asFUNCTION(XMLFileGetRootDefault), asCALL_CDECL_OBJLAST);
 }
 

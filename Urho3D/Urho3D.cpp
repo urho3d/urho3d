@@ -85,7 +85,7 @@ void Run(const char* cmdLine)
         {
             if (arguments[i][0] != '-')
             {
-                scriptFileName = arguments[i];
+                scriptFileName = GetInternalPath(arguments[i]);
                 break;
             }
         }
@@ -114,8 +114,9 @@ void Run(const char* cmdLine)
         context->GetSubsystem<Time>()->SetTimerPeriod(5);
     
         // Execute the Start function from the script file, then run the engine loop until exited
+        // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         engine->InitializeScripting();
-        ScriptFile* scriptFile = context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName);
+        SharedPtr<ScriptFile> scriptFile(context->GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName));
         if (scriptFile && scriptFile->Execute("void Start()"))
         {
             while (!engine->IsExiting())

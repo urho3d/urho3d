@@ -166,7 +166,11 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     if (!compiled_ || !function)
         return false;
     
-    asIScriptContext* context = script_->GetScriptFileContext();
+    // It is possible that executing the function causes us to unload. Therefore do not rely on member variables
+    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
+    Script* scriptSystem = script_;
+    
+    asIScriptContext* context = scriptSystem->GetScriptFileContext();
     if (!context)
     {
         LOGERROR("Maximum script execution nesting level exceeded");
@@ -178,11 +182,11 @@ bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& param
     
     SetParameters(context, function, parameters);
     
-    script_->IncScriptNestingLevel();
+    scriptSystem->IncScriptNestingLevel();
     bool success = context->Execute() >= 0;
     if (unprepare)
         context->Unprepare();
-    script_->DecScriptNestingLevel();
+    scriptSystem->DecScriptNestingLevel();
     
     return success;
 }
@@ -206,7 +210,11 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
     if (!compiled_ || !object || !method)
         return false;
     
-    asIScriptContext* context = script_->GetScriptFileContext();
+    // It is possible that executing the method causes us to unload. Therefore do not rely on member variables
+    // However, we are not prepared for the whole script system getting destroyed during execution (should never happen)
+    Script* scriptSystem = script_;
+    
+    asIScriptContext* context = scriptSystem->GetScriptFileContext();
     if (!context)
     {
         LOGERROR("Maximum script execution nesting level exceeded");
@@ -219,11 +227,11 @@ bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, con
     context->SetObject(object);
     SetParameters(context, method, parameters);
     
-    script_->IncScriptNestingLevel();
+    scriptSystem->IncScriptNestingLevel();
     bool success = context->Execute() >= 0;
     if (unprepare)
         context->Unprepare();
-    script_->DecScriptNestingLevel();
+    scriptSystem->DecScriptNestingLevel();
     
     return success;
 }

@@ -125,7 +125,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void SetCylinder(float, float, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetCylinder), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetCapsule(float, float, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetCapsule), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTriangleMesh(Model@+, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTriangleMesh), asCALL_THISCALL);
-    engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, const IntVector2&in, float, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, uint, uint, float, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, float, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "Model@+ get_model()", asMETHOD(CollisionShape, GetModel), asCALL_THISCALL);

@@ -155,14 +155,14 @@ static Camera* ViewportGetCamera(Viewport* ptr)
     return ptr->camera_;
 }
 
-static bool Texture2DLoad(Image* image, Texture2D* ptr)
+static bool Texture2DLoad(Image* image, bool useAlpha, Texture2D* ptr)
 {
-    return ptr->Load(SharedPtr<Image>(image));
+    return ptr->Load(SharedPtr<Image>(image), useAlpha);
 }
 
-static bool TextureCubeLoad(CubeMapFace face, Image* image, TextureCube* ptr)
+static bool TextureCubeLoad(CubeMapFace face, Image* image, bool useAlpha, TextureCube* ptr)
 {
-    return ptr->Load(face, SharedPtr<Image>(image));
+    return ptr->Load(face, SharedPtr<Image>(image), useAlpha);
 }
 
 static void RegisterTextures(asIScriptEngine* engine)
@@ -231,13 +231,13 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthBuffer() const", asMETHOD(RenderSurface, GetLinkedDepthBuffer), asCALL_THISCALL);
     
     RegisterTexture<Texture2D>(engine, "Texture2D");
-    engine->RegisterObjectMethod("Texture2D", "void SetSize(int, int, uint, TextureUsage)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Texture2D", "bool Load(Image@+)", asFUNCTION(Texture2DLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Texture2D", "void SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2D", "bool Load(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
     
     RegisterTexture<TextureCube>(engine, "TextureCube");
-    engine->RegisterObjectMethod("TextureCube", "void SetSize(int, uint, TextureUsage)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TextureCube", "void SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TextureCube", "bool Load(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurface(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
 }
 
@@ -826,10 +826,10 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer");
-    engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool)", asMETHOD(DebugRenderer, AddLine), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox&in, const Color&in, bool)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddFrustum(const Frustum&in, const Color&in, bool)", asMETHOD(DebugRenderer, AddFrustum), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddLine), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddBoundingBox(const BoundingBox&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddBoundingBox, (const BoundingBox&, const Color&, bool), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddFrustum(const Frustum&in, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddFrustum), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "DebugRenderer@+ get_debugRenderer() const", asFUNCTION(SceneGetDebugRenderer), asCALL_CDECL_OBJLAST);
     engine->RegisterGlobalFunction("DebugRenderer@+ get_debugRenderer()", asFUNCTION(GetDebugRenderer), asCALL_CDECL);
 }

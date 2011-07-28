@@ -236,7 +236,7 @@ Methods:<br>
 - Quaternion ToQuaternion() const
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
-- Vector4 ToVector4() const
+- Vector4 ToVector4(bool arg0 = false) const
 
 Properties:<br>
 - uint length (readonly)
@@ -645,7 +645,7 @@ Properties:<br>
 File
 
 Methods:<br>
-- bool Open(const String&, FileMode)
+- bool Open(const String&, FileMode arg1 = FILE_READ)
 - void Close()
 - bool WriteInt(int)
 - bool WriteShort(int16)
@@ -835,20 +835,20 @@ Properties:<br>
 ResourceCache
 
 Methods:<br>
-- bool AddResourcePath(const String&)
+- bool AddResourceDir(const String&)
 - void AddPackageFile(PackageFile@, bool arg1 = false)
 - bool AddManualResource(Resource@)
-- void RemoveResourcePath(const String&)
-- void RemovePackageFile(PackageFile@, bool, bool)
-- void RemovePackageFile(const String&, bool, bool)
-- void ReleaseResource(const String&, const String&, bool)
-- void ReleaseResources(const String&, bool)
-- void ReleaseResources(const String&, const String&, bool)
-- void ReleaseAllResources(bool)
+- void RemoveResourceDir(const String&)
+- void RemovePackageFile(PackageFile@, bool arg1 = true, bool arg2 = false)
+- void RemovePackageFile(const String&, bool arg1 = true, bool arg2 = false)
+- void ReleaseResource(const String&, const String&, bool arg2 = false)
+- void ReleaseResources(const String&, bool arg1 = false)
+- void ReleaseResources(const String&, const String&, bool arg2 = false)
+- void ReleaseAllResources(bool arg0 = false)
 - bool ReloadResource(Resource@)
 - bool Exists(const String&) const
 - File@ GetFile(const String&)
-- String GetPreferredResourcePath(const String&)
+- String GetPreferredResourceDir(const String&)
 - Resource@ GetResource(const String&, const String&)
 
 Properties:<br>
@@ -857,6 +857,8 @@ Properties:<br>
 - uint[] memoryBudget
 - uint[] memoryUse (readonly)
 - uint totalMemoryUse (readonly)
+- String[]@ resourceDirs (readonly)
+- PackageFile@[]@ packageFiles (readonly)
 
 
 Image
@@ -885,7 +887,7 @@ Methods:<br>
 - bool Load(File@)
 - bool Save(File@)
 - XMLElement CreateRoot(const String&)
-- XMLElement GetRoot(const String&)
+- XMLElement GetRoot(const String& arg0 = String ( ))
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -900,10 +902,8 @@ XMLElement
 
 Methods:<br>
 - XMLElement CreateChild(const String&)
-- bool RemoveChild()
-- bool RemoveChild(const String&, bool)
-- bool RemoveChildren()
-- bool RemoveChildren(const String&)
+- bool RemoveChild(const String& arg0 = String ( ), bool arg1 = true)
+- bool RemoveChildren(const String& arg0 = String ( ))
 - bool SetAttribute(const String&, const String&)
 - bool SetBool(const String&, bool)
 - bool SetBoundingBox(const BoundingBox&)
@@ -925,10 +925,8 @@ Methods:<br>
 - String GetAttributes(const String&) const
 - String[]@ GetAttributeNames() const
 - bool HasChild(const String&) const
-- XMLElement GetChild() const
-- XMLElement GetChild(const String&) const
-- XMLElement GetNext() const
-- XMLElement GetNext(const String&) const
+- XMLElement GetChild(const String& arg0 = String ( )) const
+- XMLElement GetNext(const String& arg0 = String ( )) const
 - bool GetBool(const String&) const
 - BoundingBox GetBoundingBox() const
 - Color GetColor(const String&) const
@@ -1010,10 +1008,10 @@ Methods:<br>
 - void SetScale(float)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
-- void Rotate(const Quaternion&, bool)
-- void Pitch(float, bool)
-- void Yaw(float, bool)
-- void Roll(float, bool)
+- void Rotate(const Quaternion&, bool arg1 = false)
+- void Pitch(float, bool arg1 = false)
+- void Yaw(float, bool arg1 = false)
+- void Roll(float, bool arg1 = false)
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
@@ -1081,10 +1079,10 @@ Methods:<br>
 - void SetScale(float)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
-- void Rotate(const Quaternion&, bool)
-- void Pitch(float, bool)
-- void Yaw(float, bool)
-- void Roll(float, bool)
+- void Rotate(const Quaternion&, bool arg1 = false)
+- void Pitch(float, bool arg1 = false)
+- void Yaw(float, bool arg1 = false)
+- void Roll(float, bool arg1 = false)
 - void Scale(float)
 - void Scale(const Vector3&)
 - Node@ CreateChild(const String& arg0 = "", CreateMode arg1 = REPLICATED)
@@ -1275,8 +1273,8 @@ Methods:<br>
 - bool Save(File@)
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- void SetSize(int, int, uint, TextureUsage)
-- bool Load(Image@)
+- void SetSize(int, int, uint, TextureUsage arg3 = TEXTURE_STATIC)
+- bool Load(Image@, bool arg1 = false)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1306,8 +1304,8 @@ Methods:<br>
 - bool Save(File@)
 - void SetNumLevels(uint)
 - void ClearDataLost()
-- void SetSize(int, uint, TextureUsage)
-- bool Load(CubeMapFace, Image@)
+- void SetSize(int, uint, TextureUsage arg2 = TEXTURE_STATIC)
+- bool Load(CubeMapFace, Image@, bool arg2 = false)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1844,10 +1842,10 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- void AddLine(const Vector3&, const Vector3&, const Color&, bool)
-- void AddBoundingBox(const BoundingBox&, const Color&, bool)
-- void AddFrustum(const Frustum&, const Color&, bool)
-- void AddSkeleton(Skeleton@, const Color&, bool)
+- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
+- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
+- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
+- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -2100,7 +2098,7 @@ Properties:<br>
 Audio
 
 Methods:<br>
-- void SetMode(int, int, bool, bool)
+- void SetMode(int, int, bool, bool arg3 = true)
 - bool Play()
 - void Stop()
 - void SetListenerTransform(const Vector3&, const Quaternion&)
@@ -3550,7 +3548,7 @@ Methods:<br>
 - void SetCylinder(float, float, const Vector3&, const Quaternion&)
 - void SetCapsule(float, float, const Vector3&, const Quaternion&)
 - void SetTriangleMesh(Model@, uint, const Vector3&, const Quaternion&)
-- void SetHeightfield(Model@, const IntVector2&, float, uint, const Vector3&, const Quaternion&)
+- void SetHeightfield(Model@, uint, uint, float, uint, const Vector3&, const Quaternion&)
 - void SetConvexHull(Model@, float, uint, const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&)
 

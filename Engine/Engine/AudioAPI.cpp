@@ -69,7 +69,7 @@ static Audio* GetAudio()
 void RegisterAudio(asIScriptEngine* engine)
 {
     RegisterObject<Audio>(engine, "Audio");
-    engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool interpolate = true)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void SetListenerTransform(const Vector3&in, const Quaternion&in)", asMETHOD(Audio, SetListenerTransform), asCALL_THISCALL);

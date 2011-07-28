@@ -439,7 +439,7 @@ void CollisionShape::SetTriangleMesh(Model* model, unsigned lodLevel, const Vect
     CreateGeometry();
 }
 
-void CollisionShape::SetHeightfield(Model* model, const IntVector2& numPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation)
+void CollisionShape::SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation)
 {
     PROFILE(SetHeightFieldShape);
     
@@ -453,7 +453,7 @@ void CollisionShape::SetHeightfield(Model* model, const IntVector2& numPoints, f
     
     model_ = model;
     shapeType_ = SHAPE_HEIGHTFIELD;
-    numPoints_ = numPoints;
+    numPoints_ = IntVector2(xPoints, zPoints);
     thickness_ = thickness;
     lodLevel_ = lodLevel;
     position_ = position;

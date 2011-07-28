@@ -233,8 +233,8 @@ static void RegisterSerialization(asIScriptEngine* engine)
     
     RegisterObject<File>(engine, "File");
     engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f()", asFUNCTION(ConstructFile), asCALL_CDECL);
-    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
-    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
+    engine->RegisterObjectBehaviour("File", asBEHAVE_FACTORY, "File@+ f(const String&in, FileMode mode = FILE_READ)", asFUNCTION(ConstructFileAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod("File", "bool Open(const String&in, FileMode mode = FILE_READ)", asMETHODPR(File, Open, (const String&, FileMode), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "void Close()", asMETHOD(File, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "FileMode get_mode() const", asMETHOD(File, GetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("File", "bool get_open()", asMETHOD(File, IsOpen), asCALL_THISCALL);

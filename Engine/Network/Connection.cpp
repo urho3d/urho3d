@@ -385,7 +385,7 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
                 SharedPtr<PackageFile> newPackage(new PackageFile(context_, packageCacheDir + fileName));
                 if (newPackage->GetTotalSize() == fileSize && newPackage->GetChecksum() == checksum)
                 {
-                    // Add the package to the resource cache, as we will need it to load the scene
+                    // Add the package to the resource system now, as we will need it to load the scene
                     cache->AddPackageFile(newPackage, true);
                     found = true;
                     break;
@@ -393,14 +393,14 @@ void Connection::ProcessLoadScene(int msgID, MemoryBuffer& msg)
             }
         }
         
-        // Need to request a download
+        // Package not found, need to request a download
         if (!found)
         {
             if (!packageCacheDir.Empty())
                 RequestPackage(name, fileSize, checksum);
             else
             {
-                LOGERROR("Can not download required packages, as no package cache path is set");
+                LOGERROR("Can not download required packages, as package cache directory is not set");
                 OnSceneLoadFailed();
                 return;
             }

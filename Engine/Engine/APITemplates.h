@@ -490,10 +490,10 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Translate(const Vector3&in)", asMETHOD(T, Translate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void TranslateRelative(const Vector3&in)", asMETHOD(T, TranslateRelative), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, bool)", asMETHOD(T, Rotate), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void Pitch(float, bool)", asMETHOD(T, Pitch), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void Yaw(float, bool)", asMETHOD(T, Yaw), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void Roll(float, bool)", asMETHOD(T, Roll), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, bool fixedAxis = false)", asMETHOD(T, Rotate), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Pitch(float, bool fixedAxis = false)", asMETHOD(T, Pitch), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Yaw(float, bool fixedAxis = false)", asMETHOD(T, Yaw), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void Roll(float, bool fixedAxis = false)", asMETHOD(T, Roll), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(float)", asMETHODPR(T, Scale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Scale(const Vector3&in)", asMETHODPR(T, Scale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Node@+ CreateChild(const String&in name = \"\", CreateMode mode = REPLICATED)", asMETHODPR(T, CreateChild, (const String&, CreateMode), Node*), asCALL_THISCALL);

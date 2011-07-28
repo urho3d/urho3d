@@ -61,25 +61,25 @@ ResourceCache::~ResourceCache()
 {
 }
 
-bool ResourceCache::AddResourcePath(const String& path)
+bool ResourceCache::AddResourceDir(const String& pathName)
 {
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (!fileSystem || !fileSystem->DirExists(path))
+    if (!fileSystem || !fileSystem->DirExists(pathName))
     {
-        LOGERROR("Could not open directory " + path);
+        LOGERROR("Could not open directory " + pathName);
         return false;
     }
     
-    String fixedPath = AddTrailingSlash(path);
+    String fixedPath = AddTrailingSlash(pathName);
     
     // Check that the same path does not already exist
-    for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
+    for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
-        if (!resourcePaths_[i].Compare(fixedPath, false))
+        if (!resourceDirs_[i].Compare(fixedPath, false))
             return true;
     }
     
-    resourcePaths_.Push(fixedPath);
+    resourceDirs_.Push(fixedPath);
     
     // Scan the path for files recursively and add their hash-to-name mappings
     Vector<String> fileNames;
@@ -132,14 +132,14 @@ bool ResourceCache::AddManualResource(Resource* resource)
     return true;
 }
 
-void ResourceCache::RemoveResourcePath(const String& path)
+void ResourceCache::RemoveResourceDir(const String& path)
 {
     String fixedPath = AddTrailingSlash(path);
-    for (Vector<String>::Iterator i = resourcePaths_.Begin(); i != resourcePaths_.End(); ++i)
+    for (Vector<String>::Iterator i = resourceDirs_.Begin(); i != resourceDirs_.End(); ++i)
     {
         if (!i->Compare(path, false))
         {
-            resourcePaths_.Erase(i);
+            resourceDirs_.Erase(i);
             return;
         }
     }
@@ -161,9 +161,12 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResource
 
 void ResourceCache::RemovePackageFile(const String& fileName, bool ReleaseResources, bool forceRelease)
 {
+    // Compare the name and extension only, not the path
+    String fileNameNoPath = GetFileNameAndExtension(fileName);
+    
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
-        if (!(*i)->GetName().Compare(fileName, false))
+        if (!GetFileNameAndExtension((*i)->GetName()).Compare(fileNameNoPath, false))
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);
@@ -316,13 +319,13 @@ SharedPtr<File> ResourceCache::GetFile(const String& name)
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
     {
-        for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
+        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
         {
-            if (fileSystem->FileExists(resourcePaths_[i] + name))
+            if (fileSystem->FileExists(resourceDirs_[i] + name))
             {
                 // Construct the file first with full path, then rename it to not contain the resource path,
                 // so that the file's name can be used in further GetFile() calls (for example over the network)
-                SharedPtr<File> file(new File(context_, resourcePaths_[i] + name));
+                SharedPtr<File> file(new File(context_, resourceDirs_[i] + name));
                 file->SetName(name);
                 return file;
             }
@@ -408,9 +411,9 @@ bool ResourceCache::Exists(const String& name) const
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem)
     {
-        for (unsigned i = 0; i < resourcePaths_.Size(); ++i)
+        for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
         {
-            if (fileSystem->FileExists(resourcePaths_[i] + name))
+            if (fileSystem->FileExists(resourceDirs_[i] + name))
                 return true;
         }
     }
@@ -458,7 +461,7 @@ const String& ResourceCache::GetResourceName(StringHash nameHash) const
         return i->second_;
 }
 
-String ResourceCache::GetPreferredResourcePath(const String& path)
+String ResourceCache::GetPreferredResourceDir(const String& path)
 {
     String fixedPath = AddTrailingSlash(path);
     

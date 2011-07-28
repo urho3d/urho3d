@@ -38,14 +38,22 @@ void Start()
         network.StartServer(serverPort);
         SubscribeToEvent("ClientConnected", "HandleClientConnected");
 
-        //PackageFile@ packageFile = PackageFile(fileSystem.programDir + "Data.pak");
-        //cache.AddPackageFile(packageFile);
-        //testScene.AddRequiredPackageFile(packageFile);
+        // Test package download by adding all package files in the cache as requirements for the scene
+        Array<PackageFile@> packages = cache.packageFiles;
+        for (uint i = 0; i < packages.length; ++i)
+            testScene.AddRequiredPackageFile(packages[i]);
     }
     if (startClient)
     {
         testScene.Clear();
-        //network.packageCacheDir = fileSystem.programDir;
+
+        // Test package download. Remove existing Data.pak from resource cache so that it will be downloaded
+        // However, be sure to add the Data directory so that resource requests do not fail in the meanwhile
+        String packageName = fileSystem.programDir + "Data.pak";
+        cache.RemovePackageFile(packageName, false);
+        cache.AddResourceDir(fileSystem.programDir + "Data");
+
+        network.packageCacheDir = fileSystem.programDir;
         network.Connect(serverAddress, serverPort, testScene);
     }
 }
@@ -334,7 +342,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (connection.numDownloads > 0)
         {
             downloadsText.text = "Downloads: " + connection.numDownloads + " Current download: " +
-                connection.downloadName + " (" + connection.downloadProgress * 100.0 + "%)";
+                connection.downloadName + " (" + int(connection.downloadProgress * 100.0 + 0.5) + "%)";
         }
         else if (!downloadsText.text.empty)
             downloadsText.text = "";

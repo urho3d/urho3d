@@ -453,7 +453,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterObjectMethod("String", "Quaternion ToQuaternion() const", asFUNCTION(ToQuaternion), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector2 ToVector2() const", asFUNCTION(ToVector2), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "Vector3 ToVector3() const", asFUNCTION(ToVector3), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("String", "Vector4 ToVector4() const", asFUNCTION(ToVector4), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Vector4 ToVector4(bool allowMissingCoords = false) const", asFUNCTION(ToVector4), asCALL_CDECL_OBJFIRST);
     engine->RegisterGlobalFunction("String ToStringHex(int)", asFUNCTION(ToStringHex), asCALL_CDECL);
 }
 

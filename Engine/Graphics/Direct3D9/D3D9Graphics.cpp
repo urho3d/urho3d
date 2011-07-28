@@ -1996,7 +1996,7 @@ bool Graphics::OpenWindow(int width, int height)
     wc.hInstance     = impl_->instance_;
     wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
     wc.hCursor       = LoadCursor(0, IDC_ARROW);
-    wc.hbrBackground = 0;
+    wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wc.lpszMenuName  = 0;
     wc.lpszClassName = "D3DWindow";
     
