@@ -69,22 +69,12 @@ Connection::~Connection()
     SetScene(0);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority, unsigned contentID)
 {
-    SendMessage(msgID, 0, reliable, inOrder, msg.GetData(), msg.GetSize());
+    SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
-{
-    SendMessage(msgID, 0, reliable, inOrder, data, numBytes);
-}
-
-void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg)
-{
-    SendMessage(msgID, contentID, reliable, inOrder, msg.GetData(), msg.GetSize());
-}
-
-void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority, unsigned contentID)
 {
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
@@ -93,7 +83,7 @@ void Connection::SendMessage(int msgID, unsigned contentID, bool reliable, bool 
         return;
     }
     
-    connection_->SendMessage(msgID, reliable, inOrder, DEFAULT_MSG_PRIORITY, contentID, (const char*)data, numBytes);
+    connection_->SendMessage(msgID, reliable, inOrder, priority, contentID, (const char*)data, numBytes);
 }
 
 void Connection::SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
@@ -179,7 +169,7 @@ void Connection::SetScene(Scene* newScene)
             msg_.WriteUInt(package->GetTotalSize());
             msg_.WriteUInt(package->GetChecksum());
         }
-        SendMessage(MSG_LOADSCENE, true, true, msg_);
+        SendMessage(MSG_LOADSCENE, true, true, msg_, NET_HIGH_PRIORITY);
     }
     else
     {
@@ -239,7 +229,7 @@ void Connection::SendServerUpdate()
             msg_.Clear();
             msg_.WriteVLE(current->first_);
             
-            SendMessage(MSG_REMOVENODE, true, true, msg_);
+            SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
             sceneState_.Erase(current);
         }
     }
@@ -259,7 +249,7 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.yaw_);
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
-    SendMessage(MSG_CONTROLS, CONTROLS_CONTENT_ID, false, false, msg_);
+    SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
 }
 
 void Connection::SendQueuedRemoteEvents()
@@ -274,14 +264,14 @@ void Connection::SendQueuedRemoteEvents()
         {
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
-            SendMessage(MSG_REMOTEEVENT, true, i->inOrder_, msg_);
+            SendMessage(MSG_REMOTEEVENT, true, i->inOrder_, msg_, NET_HIGH_PRIORITY);
         }
         else
         {
             msg_.WriteVLE(i->receiverID_);
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
-            SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_);
+            SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_, NET_HIGH_PRIORITY);
         }
     }
     
@@ -691,7 +681,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                         msg_.WriteStringHash(nameHash);
                         msg_.WriteVLE(i);
                         msg_.Write(buffer, fragmentSize);
-                        SendMessage(MSG_PACKAGEDATA, true, false, msg_);
+                        SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_LOW_PRIORITY);
                     }
                     
                     return;
@@ -772,7 +762,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     LOGINFO("Requesting package " + nextDownload.name_ + " from server");
                     msg_.Clear();
                     msg_.WriteString(nextDownload.name_);
-                    SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
+                    SendMessage(MSG_REQUESTPACKAGE, true, true, msg_, NET_HIGH_PRIORITY);
                     nextDownload.initiated_ = true;
                 }
             }
@@ -838,7 +828,7 @@ void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
     if (checksum != scene_->GetChecksum())
     {
         msg_.Clear();
-        SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_);
+        SendMessage(MSG_SCENECHECKSUMERROR, true, true, msg_, NET_HIGH_PRIORITY);
         OnSceneLoadFailed();
     }
     else
@@ -957,9 +947,9 @@ float Connection::GetDownloadProgress() const
 
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
-    VectorBuffer msg;
-    msg.WriteUInt(scene_->GetChecksum());
-    SendMessage(MSG_SCENELOADED, true, true, msg);
+    msg_.Clear();
+    msg_.WriteUInt(scene_->GetChecksum());
+    SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
 }
 
 void Connection::ProcessNode(Node* node)
@@ -1023,7 +1013,7 @@ void Connection::ProcessNewNode(Node* node)
         component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
     }
     
-    SendMessage(MSG_CREATENODE, true, true, msg_);
+    SendMessage(MSG_CREATENODE, true, true, msg_, NET_HIGH_PRIORITY);
 }
 
 void Connection::ProcessExistingNode(Node* node)
@@ -1066,7 +1056,7 @@ void Connection::ProcessExistingNode(Node* node)
             msg_.WriteVariant(j->second_);
         }
         
-        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_);
+        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_MEDIUM_PRIORITY);
     }
     
     // Send latestdata message if necessary
@@ -1077,7 +1067,7 @@ void Connection::ProcessExistingNode(Node* node)
         msg_.WriteVLE(node->GetID());
         node->WriteLatestDataUpdate(msg_, nodeState.attributes_);
         
-        SendMessage(MSG_NODELATESTDATA, node->GetID(), true, false, msg_);
+        SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_MEDIUM_PRIORITY, node->GetID());
     }
     
     // Check for new or changed components
@@ -1103,7 +1093,7 @@ void Connection::ProcessExistingNode(Node* node)
             msg_.WriteVLE(component->GetID());
             component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
             
-            SendMessage(MSG_CREATECOMPONENT, true, true, msg_);
+            SendMessage(MSG_CREATECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
         }
         else
         {
@@ -1121,7 +1111,7 @@ void Connection::ProcessExistingNode(Node* node)
                 msg_.WriteVLE(component->GetID());
                 component->WriteDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
                 
-                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_);
+                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_MEDIUM_PRIORITY);
             }
             
             // Send latestdata message if necessary
@@ -1132,7 +1122,7 @@ void Connection::ProcessExistingNode(Node* node)
                 msg_.WriteVLE(component->GetID());
                 component->WriteLatestDataUpdate(msg_, componentState.attributes_);
                 
-                SendMessage(MSG_COMPONENTLATESTDATA, component->GetID(), true, false, msg_);
+                SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_MEDIUM_PRIORITY, component->GetID());
             }
         }
     }
@@ -1146,7 +1136,7 @@ void Connection::ProcessExistingNode(Node* node)
             msg_.Clear();
             msg_.WriteVLE(current->first_);
             
-            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_);
+            SendMessage(MSG_REMOVECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
             nodeState.components_.Erase(current);
         }
     }
@@ -1169,7 +1159,7 @@ void Connection::RequestPackage(const String& name, unsigned fileSize, unsigned 
         LOGINFO("Requesting package " + name + " from server");
         msg_.Clear();
         msg_.WriteString(name);
-        SendMessage(MSG_REQUESTPACKAGE, true, true, msg_);
+        SendMessage(MSG_REQUESTPACKAGE, true, true, msg_, NET_HIGH_PRIORITY);
         download.initiated_ = true;
     }
 }
@@ -1178,7 +1168,7 @@ void Connection::SendPackageError(const String& name)
 {
     msg_.Clear();
     msg_.WriteStringHash(StringHash(name));
-    SendMessage(MSG_PACKAGEDATA, true, false, msg_);
+    SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_HIGH_PRIORITY);
 }
 
 void Connection::OnSceneLoadFailed()
@@ -1210,7 +1200,7 @@ void Connection::OnPackagesReady()
         // If filename is empty, can send the scene loaded reply immediately
         msg_.Clear();
         msg_.WriteUInt(scene_->GetChecksum());
-        SendMessage(MSG_SCENELOADED, true, true, msg_);
+        SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
     }
     else
     {

@@ -68,6 +68,7 @@ receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
 	LOG(LogObjectAlloc, "Allocated UDPMessageConnection %p.", this);
+	Initialize();
 }
 
 UDPMessageConnection::~UDPMessageConnection()
@@ -661,13 +662,13 @@ unsigned long UDPMessageConnection::TimeUntilCanSendPacket() const
 {
 	tick_t now = Clock::Tick();
 
-	if (Clock::IsNewer(now, lastDatagramSendTime))
+	const tick_t datagramSendTickDelay = (tick_t)(Clock::TicksPerSec() / datagramSendRate);
+	tick_t nextDatagramSendTime = lastDatagramSendTime + datagramSendTickDelay;
+	
+	if (Clock::IsNewer(now, nextDatagramSendTime))
 		return 0;
 
-	if (Clock::IsNewer(lastDatagramSendTime, now + Clock::TicksPerSec()))
-		lastDatagramSendTime = now + Clock::TicksPerSec();
-
-	return (unsigned long)Clock::TimespanToMillisecondsF(now, lastDatagramSendTime);
+	return (unsigned long)Clock::TimespanToMillisecondsF(now, nextDatagramSendTime);
 }
 
 bool UDPMessageConnection::HaveReceivedPacketID(packet_id_t packetID) const

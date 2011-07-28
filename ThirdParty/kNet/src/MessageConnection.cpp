@@ -107,8 +107,6 @@ bytesInTotal(0), bytesOutTotal(0)
 
 	eventMsgsOutAvailable = CreateNewEvent(EventWaitSignal);
 	assert(eventMsgsOutAvailable.IsValid());
-
-	Initialize();
 }
 
 MessageConnection::~MessageConnection()

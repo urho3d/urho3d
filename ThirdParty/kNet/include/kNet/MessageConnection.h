@@ -557,8 +557,6 @@ protected:
 	/// Private ctor - MessageConnections are instantiated by Network and NetworkServer classes.
 	explicit MessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 
-	virtual void Initialize() {} // [main thread]
-
 	virtual bool HandleMessage(packet_id_t /*packetID*/, u32 /*messageID*/, const char * /*data*/, size_t /*numBytes*/) { return false; } // [main thread]
 };
 

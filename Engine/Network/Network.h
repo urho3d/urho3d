@@ -61,14 +61,10 @@ public:
     bool StartServer(unsigned short port);
     /// Stop the server
     void StopServer();
-    /// Broadcast a message to all client connections
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
-    /// Broadcast a message to all client connections
-    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
     /// Broadcast a message with content ID to all client connections
-    void BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority = 0, unsigned contentID = 0);
     /// Broadcast a message with content ID to all client connections
-    void BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+    void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority = 0, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote event to all client connections in the specific scene

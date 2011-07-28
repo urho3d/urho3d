@@ -258,22 +258,12 @@ void Network::StopServer()
     LOGINFO("Stopped server");
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg)
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority, unsigned contentID)
 {
-    BroadcastMessage(msgID, 0, reliable, inOrder, msg.GetData(), msg.GetSize());
+    BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
-{
-    BroadcastMessage(msgID, 0, reliable, inOrder, data, numBytes);
-}
-
-void Network::BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg)
-{
-    BroadcastMessage(msgID, contentID, reliable, inOrder, msg.GetData(), msg.GetSize());
-}
-
-void Network::BroadcastMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes)
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority, unsigned contentID)
 {
    // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
@@ -284,7 +274,7 @@ void Network::BroadcastMessage(int msgID, unsigned contentID, bool reliable, boo
     
     kNet::NetworkServer* server = network_->GetServer();
     if (server)
-        server->BroadcastMessage(msgID, reliable, inOrder, DEFAULT_MSG_PRIORITY, contentID, (const char*)data, numBytes);
+        server->BroadcastMessage(msgID, reliable, inOrder, priority, contentID, (const char*)data, numBytes);
     else
         LOGERROR("Server not running, can not broadcast messages");
 }
@@ -462,7 +452,7 @@ void Network::OnServerConnected()
     // Send the identity map now
     VectorBuffer msg;
     msg.WriteVariantMap(serverConnection_->GetIdentity());
-    serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg);
+    serverConnection_->SendMessage(MSG_IDENTITY, true, true, msg, NET_HIGH_PRIORITY);
     
     SendEvent(E_SERVERCONNECTED);
 }

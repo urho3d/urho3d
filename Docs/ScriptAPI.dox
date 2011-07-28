@@ -185,6 +185,9 @@
 - uint DD_SOURCE
 - uint DD_TARGET
 - uint DD_SOURCE_AND_TARGET
+- uint NET_LOW_PRIORITY
+- uint NET_MEDIUM_PRIORITY
+- uint NET_HIGH_PRIORITY
 - uint DEBUGHUD_SHOW_NONE
 - uint DEBUGHUD_SHOW_STATS
 - uint DEBUGHUD_SHOW_MODE
@@ -3438,8 +3441,7 @@ Properties:<br>
 Connection
 
 Methods:<br>
-- void SendMessage(int, bool, bool, const VectorBuffer&)
-- void SendMessage(int, uint, bool, bool, const VectorBuffer&)
+- void SendMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0, uint arg5 = 0)
 - void SendRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
 - void SendRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
 - void Disconnect(int arg0 = 0)
@@ -3467,8 +3469,7 @@ Methods:<br>
 - void Disconnect(int arg0 = 0)
 - bool StartServer(uint16)
 - void StopServer()
-- void BroadcastMessage(int, bool, bool, const VectorBuffer&)
-- void BroadcastMessage(int, uint, bool, bool, const VectorBuffer&)
+- void BroadcastMessage(int, bool, bool, const VectorBuffer&, uint arg4 = 0, uint arg5 = 0)
 - void BroadcastRemoteEvent(const String&, bool, const VariantMap& arg2 = VariantMap ( ))
 - void BroadcastRemoteEvent(Scene@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))
 - void BroadcastRemoteEvent(Node@, const String&, bool, const VariantMap& arg3 = VariantMap ( ))

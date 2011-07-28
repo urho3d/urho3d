@@ -87,13 +87,9 @@ public:
     ~Connection();
     
     /// Send a message
-    void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg);
+    void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority = 0, unsigned contentID = 0);
     /// Send a message
-    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
-    /// Send a message with content ID
-    void SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const VectorBuffer& msg);
-    /// Send a message with content ID
-    void SendMessage(int msgID, unsigned contentID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes);
+    void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority = 0, unsigned contentID = 0);
     /// Send a remote event
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Send a remote node event

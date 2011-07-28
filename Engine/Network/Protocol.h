@@ -60,9 +60,13 @@ static const int MSG_REMOTEEVENT = 0x14;
 // Client->server and server->client: remote node event
 static const int MSG_REMOTENODEEVENT = 0x15;
 
-// Fixed message priority for kNet
-static const int DEFAULT_MSG_PRIORITY = 100;
 // Fixed content ID for client controls update
 static const unsigned CONTROLS_CONTENT_ID = 1;
 // Package file fragment size
 static const unsigned PACKAGE_FRAGMENT_SIZE = 1024;
+// Message high priority
+static const unsigned NET_HIGH_PRIORITY = 100;
+// Message medium priority
+static const unsigned NET_MEDIUM_PRIORITY = 50;
+// Message low priority (default)
+static const unsigned NET_LOW_PRIORITY = 0;
