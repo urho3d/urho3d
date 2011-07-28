@@ -252,7 +252,7 @@ void Engine::RunFrame()
     time->BeginFrame(timeStep_);
     
     Render();
-    GetNextTimeStep();
+    ApplyFrameLimit();
     
     time->EndFrame();
 }
@@ -331,9 +331,8 @@ void Engine::DumpResources()
 
 void Engine::Render()
 {
-    Graphics* graphics = GetSubsystem<Graphics>();
-    
     // Do not render if device lost
+    Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics && graphics->BeginFrame())
     {
         GetSubsystem<Renderer>()->Render();
@@ -342,10 +341,8 @@ void Engine::Render()
     }
 }
 
-void Engine::GetNextTimeStep()
+void Engine::ApplyFrameLimit()
 {
-    PROFILE(ApplyFrameLimiter);
-    
     if (!initialized_)
         return;
     
@@ -358,6 +355,8 @@ void Engine::GetNextTimeStep()
     
     if (maxFps)
     {
+        PROFILE(ApplyFrameLimit);
+        
         int targetMax = 1000 / maxFps;
         for (;;)
         {

@@ -532,7 +532,7 @@ const OcclusionBuffer* Renderer::GetOcclusionBuffer(float aspectRatio, bool half
 
 void Renderer::Update(float timeStep)
 {
-    PROFILE(UpdateViewports);
+    PROFILE(UpdateViews);
     
     numViews_ = 0;
     
@@ -595,7 +595,7 @@ void Renderer::Render()
     if (!graphics_)
         return;
     
-    PROFILE(RenderViewports);
+    PROFILE(RenderViews);
     
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy(textureAnisotropy_);

@@ -55,7 +55,9 @@ public:
         /// Test for inequality with another pair
         bool operator != (const KeyValue& rhs) const { return first_ != rhs.first_ || second_ != rhs.second_; }
         
+        /// Key
         const T first_;
+        /// Value
         U second_;
     };
     

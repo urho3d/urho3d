@@ -195,10 +195,10 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
 
 void DebugRenderer::Render()
 {
-    PROFILE(RenderDebugGeometry);
-    
     if (lines_.Empty() && noDepthLines_.Empty())
         return;
+    
+    PROFILE(RenderDebugGeometry);
     
     Graphics* graphics = GetSubsystem<Graphics>();
     Renderer* renderer = GetSubsystem<Renderer>();

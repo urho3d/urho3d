@@ -230,7 +230,8 @@ public:
     
     /// Return the combined amount of instances
     unsigned GetNumInstances() const;
-    
+    /// Return whether the batch group is empty
+    bool IsEmpty() const { return batches_.Empty() && priorityBatchGroups_.Empty() && batchGroups_.Empty(); }
     /// Unsorted non-instanced draw calls
     PODVector<Batch> batches_;
     /// Sorted non-instanced draw calls with priority flag

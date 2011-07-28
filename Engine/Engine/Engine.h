@@ -80,7 +80,7 @@ public:
     /// Render after frame update
     void Render();
     /// Get the timestep for the next frame and sleep for frame limiting if necessary
-    void GetNextTimeStep();
+    void ApplyFrameLimit();
     
 private:
     /// Register object factories and attributes

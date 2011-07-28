@@ -759,17 +759,19 @@ void View::RenderBatchesForward()
         }
     }
     
+    graphics_->SetRenderTarget(0, renderTarget_);
+    graphics_->SetDepthStencil(depthStencil_);
+    graphics_->SetViewport(screenRect_);
+    
+    if (!extraQueue_.IsEmpty())
     {
         // Render extra / custom passes
         PROFILE(RenderExtraPass);
         
-        graphics_->SetRenderTarget(0, renderTarget_);
-        graphics_->SetDepthStencil(depthStencil_);
-        graphics_->SetViewport(screenRect_);
-        
         RenderBatchQueue(extraQueue_);
     }
     
+    if (!transparentQueue_.IsEmpty())
     {
         // Render transparent objects last (both base passes & additive lighting)
         PROFILE(RenderTransparent);
@@ -960,6 +962,7 @@ void View::RenderBatchesDeferred()
         RenderBatchQueue(baseQueue_, true);
     }
     
+    if (!extraQueue_.IsEmpty())
     {
         // Render extra / custom passes
         PROFILE(RenderExtraPass);
@@ -967,6 +970,7 @@ void View::RenderBatchesDeferred()
         RenderBatchQueue(extraQueue_);
     }
     
+    if (!transparentQueue_.IsEmpty())
     {
         // Render transparent objects last (both ambient & additive lighting)
         PROFILE(RenderTransparent);
