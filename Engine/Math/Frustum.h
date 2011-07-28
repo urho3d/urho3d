@@ -70,7 +70,7 @@ public:
     {
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            if (planes_[i].Distance(point) < 0.0)
+            if (planes_[i].Distance(point) < 0.0f)
                 return OUTSIDE;
         }
         
@@ -80,16 +80,13 @@ public:
     /// Test if a sphere is inside, outside or intersects
     Intersection IsInside(const Sphere& sphere) const
     {
-        float radius = sphere.radius_;
         bool allInside = true;
-        
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
             float dist = planes_[i].Distance(sphere.center_);
-            
-            if (dist < -radius)
+            if (dist < -sphere.radius_)
                 return OUTSIDE;
-            if (dist < radius)
+            else if (dist < sphere.radius_)
                 allInside = false;
         }
         
@@ -99,13 +96,9 @@ public:
     /// Test if a sphere if (partially) inside or outside
     Intersection IsInsideFast(const Sphere& sphere) const
     {
-        float radius = sphere.radius_;
-        
         for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
         {
-            float dist = planes_[i].Distance(sphere.center_);
-            
-            if (dist < -radius)
+            if (planes_[i].Distance(sphere.center_) < -sphere.radius_)
                 return OUTSIDE;
         }
         
@@ -126,7 +119,7 @@ public:
             
             if (dist < -absDist)
                 return OUTSIDE;
-            if (dist < absDist)
+            else if (dist < absDist)
                 allInside = false;
         }
         

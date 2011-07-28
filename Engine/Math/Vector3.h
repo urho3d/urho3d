@@ -72,7 +72,6 @@ public:
         x_ = rhs.x_;
         y_ = rhs.y_;
         z_ = rhs.z_;
-        
         return *this;
     }
     
@@ -101,7 +100,6 @@ public:
         x_ += rhs.x_;
         y_ += rhs.y_;
         z_ += rhs.z_;
-        
         return *this;
     }
     
@@ -111,7 +109,6 @@ public:
         x_ -= rhs.x_;
         y_ -= rhs.y_;
         z_ -= rhs.z_;
-        
         return *this;
     }
     
@@ -121,7 +118,6 @@ public:
         x_ *= rhs;
         y_ *= rhs;
         z_ *= rhs;
-        
         return *this;
     }
     
@@ -131,17 +127,16 @@ public:
         x_ *= rhs.x_;
         y_ *= rhs.y_;
         z_ *= rhs.z_;
-        
         return *this;
     }
     
     /// Divide-assign a scalar
     Vector3& operator /= (float rhs)
     {
-        x_ /= rhs;
-        y_ /= rhs;
-        z_ /= rhs;
-        
+        float invRhs = 1.0f / rhs;
+        x_ *= invRhs;
+        y_ *= invRhs;
+        z_ *= invRhs;
         return *this;
     }
     
@@ -151,7 +146,6 @@ public:
         x_ /= rhs.x_;
         y_ /= rhs.y_;
         z_ /= rhs.z_;
-        
         return *this;
     }
     
@@ -159,14 +153,13 @@ public:
     float Normalize()
     {
         float len = Length();
-        if (len < M_EPSILON)
-            return len;
-        
-        float invLen = 1.0f / len;
-        
-        x_ *= invLen;
-        y_ *= invLen;
-        z_ *= invLen;
+        if (len >= M_EPSILON)
+        {
+            float invLen = 1.0f / len;
+            x_ *= invLen;
+            y_ *= invLen;
+            z_ *= invLen;
+        }
         
         return len;
     }
@@ -210,21 +203,14 @@ public:
     Vector3 Normalized() const
     {
         float len = Length();
-        if (len < M_EPSILON)
+        if (len >= M_EPSILON)
+            return *this * (1.0f / len);
+        else
             return *this;
-        
-        float invLen = 1.0f / len;
-        
-        return *this * invLen;
     }
     
     /// Return normalized to unit length using fast inverse square root
-    Vector3 NormalizedFast() const
-    {
-        float invLen = FastInvSqrt(x_ * x_ + y_ * y_ + z_ * z_);
-        
-        return *this * invLen;
-    }
+    Vector3 NormalizedFast() const { return *this * FastInvSqrt(x_ * x_ + y_ * y_ + z_ * z_); }
     
     /// Return float data
     const float* GetData() const { return &x_; }

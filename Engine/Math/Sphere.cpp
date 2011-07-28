@@ -123,7 +123,6 @@ Intersection Sphere::IsInside(const BoundingBox& box) const
     float radiusSquared = radius_ * radius_;
     float distSquared = 0;
     float temp;
-    
     Vector3 min = box.min_;
     Vector3 max = box.max_;
     
@@ -197,7 +196,6 @@ Intersection Sphere::IsInsideFast(const BoundingBox& box) const
     float radiusSquared = radius_ * radius_;
     float distSquared = 0;
     float temp;
-    
     Vector3 min = box.min_;
     Vector3 max = box.max_;
     
@@ -251,9 +249,8 @@ float Sphere::Distance(const Ray& ray) const
     float a = ray.direction_.DotProduct(ray.direction_);
     float b = 2.0f * centeredOrigin.DotProduct(ray.direction_);
     float c = centeredOrigin.DotProduct(centeredOrigin) - squaredRadius;
-    
     float d = b * b - 4.0f * a * c;
-
+    
     // No solution
     if (d < 0.0f)
         return M_INFINITY;

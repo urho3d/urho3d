@@ -64,7 +64,6 @@ float Ray::Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) con
 float Ray::Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const
 {
     float nearest = M_INFINITY;
-    
     const unsigned char* vertices = (const unsigned char*)vertexData;
     
     // 16-bit indices

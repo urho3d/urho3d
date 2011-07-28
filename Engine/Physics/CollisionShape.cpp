@@ -578,7 +578,6 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         return;
     
     Color color(0.0f, 1.0f, 0.0f);
-    
     RigidBody* rigidBody = GetComponent<RigidBody>();
     if (rigidBody && rigidBody->IsActive())
         color = Color(1.0f, 1.0f, 1.0f);

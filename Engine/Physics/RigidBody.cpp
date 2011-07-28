@@ -328,7 +328,6 @@ bool RigidBody::IsActive() const
 void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
-    
     MemoryBuffer buf(value);
     SetAngularVelocity(buf.ReadPackedVector3(maxVelocity));
 }
@@ -336,7 +335,6 @@ void RigidBody::SetNetAngularVelocityAttr(const PODVector<unsigned char>& value)
 const PODVector<unsigned char>& RigidBody::GetNetAngularVelocityAttr() const
 {
     float maxVelocity = physicsWorld_ ? physicsWorld_->GetMaxNetworkAngularVelocity() : DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY;
-    
     attrBuffer_.Clear();
     attrBuffer_.WritePackedVector3(GetAngularVelocity(), maxVelocity);
     return attrBuffer_.GetBuffer();
@@ -531,11 +529,10 @@ void RigidBody::UpdateMass()
     dMass mass;
     dMassSetZero(&mass);
     
-    float density = 1.0f;
-    
     // Get all attached collision shapes to calculate the mass
     PODVector<CollisionShape*> shapes;
     GetComponents<CollisionShape>(shapes);
+    float density = 1.0f;
     
     for (unsigned i = 0; i < shapes.Size(); ++i)
     {

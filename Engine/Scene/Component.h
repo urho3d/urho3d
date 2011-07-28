@@ -57,31 +57,13 @@ public:
     Node* GetNode() const { return node_; }
     
     /// Return parent node's world transform
-    const Matrix3x4& GetWorldTransform() const
-    {
-        if (node_)
-            return node_->GetWorldTransform();
-        else
-            return Matrix3x4::IDENTITY;
-    }
-    
+    const Matrix3x4& GetWorldTransform() const { return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY; }
     /// Return parent node's world position
-    Vector3 GetWorldPosition() const
-    {
-        return GetWorldTransform().Translation();
-    }
-    
+    Vector3 GetWorldPosition() const { return GetWorldTransform().Translation(); }
     /// Return parent node's world rotation
-    Quaternion GetWorldRotation() const
-    {
-        return GetWorldTransform().Rotation();
-    }
-    
+    Quaternion GetWorldRotation() const { return GetWorldTransform().Rotation(); }
     /// Return parent node's world scale
-    Vector3 GetWorldScale() const
-    {
-        return GetWorldTransform().Scale();
-    }
+    Vector3 GetWorldScale() const { return GetWorldTransform().Scale(); }
     
     /// Return components in the same scene node by type
     void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;

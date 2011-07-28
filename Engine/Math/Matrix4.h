@@ -141,7 +141,6 @@ public:
         m31_ = rhs.m31_;
         m32_ = rhs.m32_;
         m33_ = rhs.m33_;
-        
         return *this;
     }
     
@@ -164,7 +163,6 @@ public:
         m31_ = 0.0f;
         m32_ = 0.0f;
         m33_ = 1.0f;
-        
         return *this;
     }
     

@@ -83,7 +83,6 @@ void Log::Write(int level, const String& message)
         return;
     
     inWrite_ = true;
-    
     lastMessage_ = message;
     
     time_t sysTime;
@@ -114,7 +113,6 @@ void Log::WriteRaw(const String& message)
         return;
     
     inWrite_ = true;
-    
     lastMessage_ = message;
     
     printf("%s", message.CString());

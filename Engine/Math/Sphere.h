@@ -61,7 +61,6 @@ public:
         center_ = rhs.center_;
         radius_ = rhs.radius_;
         defined_ = rhs.defined_;
-        
         return *this;
     }
     
@@ -99,6 +98,7 @@ public:
         
         Vector3 offset = point - center_;
         float dist = offset.Length();
+        
         if (dist > radius_)
         {
             float half = (dist - radius_) * 0.5f;
@@ -120,7 +120,6 @@ public:
     Intersection IsInside(const Vector3& point) const
     {
         float distSquared = (point - center_).LengthSquared();
-        
         if (distSquared < radius_ * radius_)
             return INSIDE;
         else
@@ -131,12 +130,12 @@ public:
     Intersection IsInside(const Sphere& sphere) const
     {
         float dist = (sphere.center_ - center_).Length();
-        
         if (dist >= sphere.radius_ + radius_)
             return OUTSIDE;
-        if (dist + sphere.radius_ < radius_)
+        else if (dist + sphere.radius_ < radius_)
             return INSIDE;
-        return INTERSECTS;
+        else
+            return INTERSECTS;
     }
     
     /// Test if another sphere is (partially) inside or outside

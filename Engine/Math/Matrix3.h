@@ -90,7 +90,6 @@ public:
         m20_ = rhs.m20_;
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
-        
         return *this;
     }
     

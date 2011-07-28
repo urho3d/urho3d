@@ -61,7 +61,6 @@ public:
     {
         x_ = rhs.x_;
         y_ = rhs.y_;
-        
         return *this;
     }
     
@@ -89,7 +88,6 @@ public:
     {
         x_ += rhs.x_;
         y_ += rhs.y_;
-        
         return *this;
     }
     
@@ -98,7 +96,6 @@ public:
     {
         x_ -= rhs.x_;
         y_ -= rhs.y_;
-        
         return *this;
     }
     
@@ -107,7 +104,6 @@ public:
     {
         x_ *= rhs;
         y_ *= rhs;
-        
         return *this;
     }
     
@@ -116,16 +112,15 @@ public:
     {
         x_ *= rhs.x_;
         y_ *= rhs.y_;
-        
         return *this;
     }
     
     /// Divide-assign a scalar
     Vector2& operator /= (float rhs)
     {
-        x_ /= rhs;
-        y_ /= rhs;
-        
+        float invRhs = 1.0f / rhs;
+        x_ *= invRhs;
+        y_ *= invRhs;
         return *this;
     }
     
@@ -134,7 +129,6 @@ public:
     {
         x_ /= rhs.x_;
         y_ /= rhs.y_;
-        
         return *this;
     }
     
@@ -142,12 +136,12 @@ public:
     float Normalize()
     {
         float len = Length();
-        if (len < M_EPSILON)
-            return len;
-        
-        float invLen = 1.0f / len;
-        x_ *= invLen;
-        y_ *= invLen;
+        if (len >= M_EPSILON)
+        {
+            float invLen = 1.0f / len;
+            x_ *= invLen;
+            y_ *= invLen;
+        }
         
         return len;
     }
@@ -179,21 +173,14 @@ public:
     Vector2 Normalized() const
     {
         float len = Length();
-        if (len < M_EPSILON)
+        if (len >= M_EPSILON)
+            return *this * (1.0f / len);
+        else
             return *this;
-        
-        float invLen = 1.0f / len;
-        
-        return *this * invLen;
     }
     
     /// Return normalized to unit length using fast inverse square root
-    Vector2 NormalizedFast() const
-    {
-        float invLen = FastInvSqrt(x_ * x_ + y_ * y_);
-        
-        return *this * invLen;
-    }
+    Vector2 NormalizedFast() const { return *this * FastInvSqrt(x_ * x_ + y_ * y_); }
     
     /// Return float data
     const float* GetData() const { return &x_; }
@@ -265,7 +252,6 @@ public:
     {
         x_ += rhs.x_;
         y_ += rhs.y_;
-        
         return *this;
     }
     
@@ -274,7 +260,6 @@ public:
     {
         x_ -= rhs.x_;
         y_ -= rhs.y_;
-        
         return *this;
     }
     
@@ -283,7 +268,6 @@ public:
     {
         x_ *= rhs;
         y_ *= rhs;
-        
         return *this;
     }
     
@@ -292,7 +276,6 @@ public:
     {
         x_ /= rhs;
         y_ /= rhs;
-        
         return *this;
     }
     

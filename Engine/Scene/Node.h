@@ -205,22 +205,9 @@ public:
     }
     
     /// Return world-space unsmoothed (target) position. Is recalculated each time
-    Vector3 GetWorldTargetPosition() const
-    {
-        if (!smoothed_)
-            return GetWorldPosition();
-        else
-            return GetWorldTargetTransform().Translation();
-    }
-    
+    Vector3 GetWorldTargetPosition() const { return smoothed_ ? GetWorldTargetTransform().Translation() : GetWorldPosition(); }
     /// Return world-space unsmoothed (target) rotation. Is recalculated each time
-    Quaternion GetWorldTargetRotation() const
-    {
-        if (!smoothed_)
-            return GetWorldRotation();
-        else
-            return GetWorldTargetTransform().Rotation();
-    }
+    Quaternion GetWorldTargetRotation() const { return smoothed_ ? GetWorldTargetTransform().Rotation() : GetWorldRotation(); }
     
     /// Return world-space transform
     const Matrix3x4& GetWorldTransform() const

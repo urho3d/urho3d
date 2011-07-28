@@ -75,12 +75,10 @@ Frustum& Frustum::operator = (const Frustum& rhs)
 
 void Frustum::Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 {
-    float halfViewSize = tanf(fov * M_DEGTORAD * 0.5f) / zoom;
-    Vector3 near;
-    Vector3 far;
-    
     nearZ = Max(nearZ, 0.0f);
     farZ = Max(farZ, nearZ);
+    float halfViewSize = tanf(fov * M_DEGTORAD * 0.5f) / zoom;
+    Vector3 near, far;
     
     near.z_ = nearZ;
     near.y_ = near.z_ * halfViewSize;
@@ -108,12 +106,10 @@ void Frustum::Define(const Vector3& near, const Vector3& far, const Matrix3x4& t
 
 void Frustum::DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
 {
-    float halfViewSize = orthoSize * 0.5f / zoom;
-    Vector3 near;
-    Vector3 far;
-    
     nearZ = Max(nearZ, 0.0f);
     farZ = Max(farZ, nearZ);
+    float halfViewSize = orthoSize * 0.5f / zoom;
+    Vector3 near, far;
     
     near.z_ = nearZ;
     far.z_ = farZ;
@@ -127,6 +123,7 @@ void Frustum::Transform(const Matrix3& transform)
 {
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         vertices_[i] = transform * vertices_[i];
+    
     UpdatePlanes();
 }
 
@@ -134,28 +131,27 @@ void Frustum::Transform(const Matrix3x4& transform)
 {
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         vertices_[i] = transform * vertices_[i];
+    
     UpdatePlanes();
 }
 
 Frustum Frustum::Transformed(const Matrix3& transform) const
 {
     Frustum transformed;
-    
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         transformed.vertices_[i] = transform * vertices_[i];
-    transformed.UpdatePlanes();
     
+    transformed.UpdatePlanes();
     return transformed;
 }
 
 Frustum Frustum::Transformed(const Matrix3x4& transform) const
 {
     Frustum transformed;
-    
     for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
         transformed.vertices_[i] = transform * vertices_[i];
-    transformed.UpdatePlanes();
     
+    transformed.UpdatePlanes();
     return transformed;
 }
 

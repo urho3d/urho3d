@@ -88,6 +88,7 @@ bool FileSystem::SetCurrentDir(const String& pathName)
         return false;
     }
     #endif
+    
     return true;
 }
 
@@ -220,11 +221,10 @@ bool FileSystem::Copy(const String& srcFileName, const String& destFileName)
         return false;
     
     unsigned fileSize = srcFile->GetSize();
-    
     SharedArrayPtr<unsigned char> buffer(new unsigned char[fileSize]);
+    
     unsigned bytesRead = srcFile->Read(buffer.RawPtr(), fileSize);
     unsigned bytesWritten = destFile->Write(buffer.RawPtr(), fileSize);
-    
     return bytesRead == fileSize && bytesWritten == fileSize;
 }
 
@@ -286,7 +286,6 @@ bool FileSystem::CheckAccess(const String& pathName)
     for (Set<String>::ConstIterator i = allowedPaths_.Begin(); i != allowedPaths_.End(); ++i)
     {
         if (fixedPath.Find(*i) == 0)
-
             return true;
     }
     
@@ -300,6 +299,7 @@ bool FileSystem::FileExists(const String& fileName)
         return false;
     
     String fixedName = GetNativePath(RemoveTrailingSlash(fileName));
+    
     #ifdef WIN32
     DWORD attributes = GetFileAttributes(fixedName.CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || attributes & FILE_ATTRIBUTE_DIRECTORY)
@@ -319,6 +319,7 @@ bool FileSystem::DirExists(const String& pathName)
         return false;
     
     String fixedName = GetNativePath(RemoveTrailingSlash(pathName));
+    
     #ifdef WIN32
     DWORD attributes = GetFileAttributes(fixedName.CString());
     if (attributes == INVALID_FILE_ATTRIBUTES || !(attributes & FILE_ATTRIBUTE_DIRECTORY))
@@ -368,11 +369,13 @@ String FileSystem::GetUserDocumentsDir()
 {
     char pathName[MAX_PATH];
     pathName[0] = 0;
+    
     #ifdef WIN32
     SHGetSpecialFolderPath(0, pathName, CSIDL_PERSONAL, 0);
     #else
     strcpy(pathName, getenv("HOME"));
     #endif
+    
     return AddTrailingSlash(String(pathName));
 }
 
@@ -509,7 +512,6 @@ String AddTrailingSlash(const String& pathName)
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() != '/')
         ret += '/';
-    
     return ret;
 }
 
@@ -519,7 +521,6 @@ String RemoveTrailingSlash(const String& pathName)
     ret.Replace('\\', '/');
     if (!ret.Empty() && ret.Back() == '/')
         ret.Resize(ret.Length() - 1);
-    
     return ret;
 }
 
@@ -536,7 +537,6 @@ String GetInternalPath(const String& pathName)
 {
     String ret = pathName;
     ret.Replace('\\', '/');
-    
     return ret;
 }
 

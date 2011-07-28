@@ -64,7 +64,6 @@ unsigned MemoryBuffer::Read(void* dest, unsigned size)
 {
     if (size + position_ > size_)
         size = size_ - position_;
-    
     if (!size)
         return 0;
     
@@ -98,7 +97,6 @@ unsigned MemoryBuffer::Seek(unsigned position)
         position = size_;
     
     position_ = position;
-    
     return position_;
 }
 
@@ -106,7 +104,6 @@ unsigned MemoryBuffer::Write(const void* data, unsigned size)
 {
     if (size + position_ > size_)
         size = size_ - position_;
-    
     if (!size)
         return 0;
     

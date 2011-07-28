@@ -51,7 +51,6 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
 {
     if (size + position_ > size_)
         size = size_ - position_;
-    
     if (!size)
         return 0;
     
@@ -85,7 +84,6 @@ unsigned VectorBuffer::Seek(unsigned position)
         position = size_;
     
     position_ = position;
-    
     return position_;
 }
 

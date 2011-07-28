@@ -92,7 +92,6 @@ public:
         g_ += rhs.g_;
         b_ += rhs.b_;
         a_ += rhs.a_;
-        
         return *this;
     }
     
@@ -122,7 +121,6 @@ public:
         unsigned g = (unsigned)(Clamp(g_ * 255.0f, 0.0f, 255.0f));
         unsigned b = (unsigned)(Clamp(b_ * 255.0f, 0.0f, 255.0f));
         unsigned a = (unsigned)(Clamp(a_ * 255.0f, 0.0f, 255.0f));
-        
         /// \todo Model data will need to be converted on OpenGL if it has vertex colors
         #ifdef USE_OPENGL
             return (((a) & 0xff) << 24) | (((b) & 0xff) << 16) | (((g) & 0xff) << 8) | ((r) & 0xff);
@@ -180,7 +178,6 @@ public:
     Color interpolate(const ColorFade& next, float time)
     {
         float timeInterval = next.time_ - time_;
-        
         if (timeInterval > 0.0f)
         {
             float t = (time - time_) / timeInterval;

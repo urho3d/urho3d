@@ -92,9 +92,10 @@ inline float Clamp(float value, float min, float max)
 {
     if (value < min)
         return min;
-    if (value > max)
+    else if (value > max)
         return max;
-    return value;
+    else
+        return value;
 }
 
 /// Check whether two floating point values are equal within accuracy
@@ -120,9 +121,10 @@ inline int Clamp(int value, int min, int max)
 {
     if (value < min)
         return min;
-    if (value > max)
+    else if (value > max)
         return max;
-    return value;
+    else
+        return value;
 }
 
 /// Check whether an unsigned integer is a power of two

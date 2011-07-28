@@ -53,7 +53,6 @@ public:
     {
         origin_ = rhs.origin_;
         direction_ = rhs.direction_;
-        
         return *this;
     }
     

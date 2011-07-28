@@ -124,7 +124,6 @@ public:
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
         m23_ = rhs.m23_;
-        
         return *this;
     }
     
@@ -143,7 +142,6 @@ public:
         m21_ = rhs.m21_;
         m22_ = rhs.m22_;
         m23_ = 0.0;
-        
         return *this;
     }
     

@@ -498,11 +498,9 @@ void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)
     // If both geometries are static, no collision
     if (!bodyA && !bodyB)
         return;
-    
     // If the geometries belong to the same body, no collision
     if (bodyA == bodyB)
         return;
-    
     // If the bodies are already connected via other joints, no collision
     if (bodyA && bodyB && dAreConnectedExcluding(bodyA, bodyB, dJointTypeContact))
         return;

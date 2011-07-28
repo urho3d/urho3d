@@ -95,14 +95,12 @@ bool File::Open(const String& fileName, FileMode mode)
     fileName_ = fileName;
     mode_ = mode;
     position_ = 0;
+    offset_ = 0;
+    checksum_ = 0;
     
     fseek((FILE*)handle_, 0, SEEK_END);
     size_ = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
-    
-    offset_ = 0;
-    checksum_ = 0;
-    
     return true;
 }
 
@@ -132,7 +130,6 @@ bool File::Open(PackageFile* package, const String& fileName)
     size_ = entry->size_;
     
     fseek((FILE*)handle_, offset_, SEEK_SET);
-    
     return true;
 }
 
@@ -152,7 +149,6 @@ unsigned File::Read(void* dest, unsigned size)
     
     if (size + position_ > size_)
         size = size_ - position_;
-    
     if (!size)
         return 0;
     
@@ -182,7 +178,6 @@ unsigned File::Seek(unsigned position)
     }
     
     fseek((FILE*)handle_, position + offset_, SEEK_SET);
-    
     position_ = position;
     return position_;
 }
@@ -223,6 +218,8 @@ unsigned File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
+    if (!handle_)
+        return 0;
     
     unsigned oldPos = position_;
     checksum_ = 0;

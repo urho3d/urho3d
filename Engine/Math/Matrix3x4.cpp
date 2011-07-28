@@ -70,21 +70,20 @@ Matrix3x4 Matrix3x4::Inverse() const
         m00_ * m21_ * m12_;
     
     float invDet = 1.0f / det;
+    Matrix3x4 ret;
     
-    Matrix3x4 out;
+    ret.m00_ = (m11_ * m22_ - m21_ * m12_) * invDet;
+    ret.m01_ = -(m01_ * m22_ - m21_ * m02_) * invDet;
+    ret.m02_ = (m01_ * m12_ - m11_ * m02_) * invDet;
+    ret.m03_ = -(m03_ * ret.m00_ + m13_ * ret.m01_ + m23_ * ret.m02_);
+    ret.m10_ = -(m10_ * m22_ - m20_ * m12_) * invDet;
+    ret.m11_ = (m00_ * m22_ - m20_ * m02_) * invDet;
+    ret.m12_ = -(m00_ * m12_ - m10_ * m02_) * invDet;
+    ret.m13_ = -(m03_ * ret.m10_ + m13_ * ret.m11_ + m23_ * ret.m12_);
+    ret.m20_ = (m10_ * m21_ - m20_ * m11_) * invDet;
+    ret.m21_ = -(m00_ * m21_ - m20_ * m01_) * invDet;
+    ret.m22_ = (m00_ * m11_ - m10_ * m01_) * invDet;
+    ret.m23_ = -(m03_ * ret.m20_ + m13_ * ret.m21_ + m23_ * ret.m22_);
     
-    out.m00_ = (m11_ * m22_ - m21_ * m12_) * invDet;
-    out.m01_ = -(m01_ * m22_ - m21_ * m02_) * invDet;
-    out.m02_ = (m01_ * m12_ - m11_ * m02_) * invDet;
-    out.m03_ = -(m03_ * out.m00_ + m13_ * out.m01_ + m23_ * out.m02_);
-    out.m10_ = -(m10_ * m22_ - m20_ * m12_) * invDet;
-    out.m11_ = (m00_ * m22_ - m20_ * m02_) * invDet;
-    out.m12_ = -(m00_ * m12_ - m10_ * m02_) * invDet;
-    out.m13_ = -(m03_ * out.m10_ + m13_ * out.m11_ + m23_ * out.m12_);
-    out.m20_ = (m10_ * m21_ - m20_ * m11_) * invDet;
-    out.m21_ = -(m00_ * m21_ - m20_ * m01_) * invDet;
-    out.m22_ = (m00_ * m11_ - m10_ * m01_) * invDet;
-    out.m23_ = -(m03_ * out.m20_ + m13_ * out.m21_ + m23_ * out.m22_);
-    
-    return out;
+    return ret;
 }

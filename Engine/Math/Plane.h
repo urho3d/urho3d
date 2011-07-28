@@ -96,10 +96,10 @@ public:
     float Distance(const Ray& ray) const
     {
         float d = normal_.DotProduct(ray.direction_);
-        if (fabsf(d) < M_EPSILON)
+        if (fabsf(d) >= M_EPSILON)
+            return (-normal_.DotProduct(ray.origin_) + intercept_) / d;
+        else
             return M_INFINITY;
-        float n = normal_.DotProduct(ray.origin_) + intercept_;
-        return -n / d;
     }
     
     /// Plane normal

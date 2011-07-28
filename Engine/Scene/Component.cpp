@@ -58,18 +58,12 @@ void Component::SetNode(Node* node)
 
 bool Component::HasComponent(ShortStringHash type) const
 {
-    if (node_)
-        return node_->HasComponent(type);
-    else
-        return 0;
+    return node_ ? node_->HasComponent(type) : false;
 }
 
 Component* Component::GetComponent(ShortStringHash type, unsigned index) const
 {
-    if (node_)
-        return node_->GetComponent(type, index);
-    else
-        return 0;
+    return node_ ? node_->GetComponent(type, index) : 0;
 }
 
 void Component::GetComponents(PODVector<Component*>& dest, ShortStringHash type) const

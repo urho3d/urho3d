@@ -111,7 +111,6 @@ void BoundingBox::Transform(const Matrix3& transform)
 {
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5;
-    
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
         fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
@@ -126,7 +125,6 @@ void BoundingBox::Transform(const Matrix3x4& transform)
 {
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5;
-    
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
         fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
@@ -141,7 +139,6 @@ BoundingBox BoundingBox::Transformed(const Matrix3& transform) const
 {
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5;
-    
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
         fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
@@ -155,7 +152,6 @@ BoundingBox BoundingBox::Transformed(const Matrix3x4& transform) const
 {
     Vector3 newCenter = transform * Center();
     Vector3 oldEdge = Size() * 0.5f;
-    
     Vector3 newEdge = Vector3(
         fabsf(transform.m00_) * oldEdge.x_ + fabsf(transform.m01_) * oldEdge.y_ + fabsf(transform.m02_) * oldEdge.z_,
         fabsf(transform.m10_) * oldEdge.x_ + fabsf(transform.m11_) * oldEdge.y_ + fabsf(transform.m12_) * oldEdge.z_,
@@ -175,7 +171,6 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
         projMax.z_ = M_MIN_NEARCLIP;
     
     Vector3 vertices[8];
-    
     vertices[0] = projMin;
     vertices[1] = Vector3(projMax.x_, projMin.y_, projMin.z_);
     vertices[2] = Vector3(projMin.x_, projMax.y_, projMin.z_);
@@ -199,7 +194,6 @@ Intersection BoundingBox::IsInside(const Sphere& sphere) const
 {
     float distSquared = 0;
     float temp;
-    
     const Vector3& center = sphere.center_;
     
     if (center.x_ < min_.x_)
@@ -236,22 +230,17 @@ Intersection BoundingBox::IsInside(const Sphere& sphere) const
     float radius = sphere.radius_;
     if (distSquared >= radius * radius)
         return OUTSIDE;
-    
-    if (center.x_ - radius < min_.x_ || center.x_ + radius > max_.x_)
+    else if (center.x_ - radius < min_.x_ || center.x_ + radius > max_.x_ || center.y_ - radius < min_.y_ ||
+        center.y_ + radius > max_.y_ || center.z_ - radius < min_.z_ || center.z_ + radius > max_.z_)
         return INTERSECTS;
-    if (center.y_ - radius < min_.y_ || center.y_ + radius > max_.y_)
-        return INTERSECTS;
-    if (center.z_ - radius < min_.z_ || center.z_ + radius > max_.z_)
-        return INTERSECTS;
-    
-    return INSIDE;
+    else
+        return INSIDE;
 }
 
 Intersection BoundingBox::IsInsideFast(const Sphere& sphere) const
 {
     float distSquared = 0;
     float temp;
-    
     const Vector3& center = sphere.center_;
     
     if (center.x_ < min_.x_)
@@ -288,8 +277,8 @@ Intersection BoundingBox::IsInsideFast(const Sphere& sphere) const
     float radius = sphere.radius_;
     if (distSquared >= radius * radius)
         return OUTSIDE;
-    
-    return INSIDE;
+    else
+        return INSIDE;
 }
 
 float BoundingBox::Distance(const Ray& ray) const

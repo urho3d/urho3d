@@ -439,11 +439,11 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     case MSG_CREATENODE:
         {
             unsigned nodeID = msg.ReadVLE();
-            // In case of the root node (scene), it may already exist. Do not create in that case
+            // In case of the root node (scene), it should already exist. Do not create in that case
             Node* node = scene_->GetNodeByID(nodeID);
             if (!node)
             {
-                // Add initially to the root level. May be moved later
+                // Add initially to the root level. May be moved as we receive the parent attribute
                 node = scene_->CreateChild(nodeID, REPLICATED);
             }
             
@@ -688,7 +688,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 }
             }
             
-            LOGERROR("Client requested a nonexisting package file " + name);
+            LOGERROR("Client requested an unexpected package file " + name);
             // Send the name hash only to indicate a failed download
             SendPackageError(name);
             return;
@@ -937,10 +937,7 @@ float Connection::GetDownloadProgress() const
     for (Map<StringHash, PackageDownload>::ConstIterator i = downloads_.Begin(); i != downloads_.End(); ++i)
     {
         if (i->second_.initiated_)
-        {
-            return i->second_.totalFragments_ ? (float)i->second_.receivedFragments_.Size() / (float)i->second_.totalFragments_ :
-                0.0f;
-        }
+            return (float)i->second_.receivedFragments_.Size() / (float)i->second_.totalFragments_;
     }
     return 1.0f;
 }

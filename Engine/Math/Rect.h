@@ -65,7 +65,6 @@ public:
         min_ = rhs.min_;
         max_ = rhs.max_;
         defined_ = true;
-        
         return *this;
     }
     
@@ -118,10 +117,14 @@ public:
             defined_ = true;
         }
         
-        if (rect.min_.x_ < min_.x_) min_.x_ = rect.min_.x_;
-        if (rect.min_.y_ < min_.y_) min_.y_ = rect.min_.y_;
-        if (rect.max_.x_ > max_.x_) max_.x_ = rect.max_.x_;
-        if (rect.max_.y_ > max_.y_) max_.y_ = rect.max_.y_;
+        if (rect.min_.x_ < min_.x_)
+            min_.x_ = rect.min_.x_;
+        if (rect.min_.y_ < min_.y_)
+            min_.y_ = rect.min_.y_;
+        if (rect.max_.x_ > max_.x_)
+            max_.x_ = rect.max_.x_;
+        if (rect.max_.y_ > max_.y_)
+            max_.y_ = rect.max_.y_;
     }
     
     /// Return float data
@@ -163,17 +166,9 @@ public:
     }
     
     /// Test for equality with another rect
-    bool operator == (const IntRect& rhs) const
-    {
-        return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_;
-    }
-    
+    bool operator == (const IntRect& rhs) const { return left_ == rhs.left_ && top_ == rhs.top_ && right_ == rhs.right_ && bottom_ == rhs.bottom_; }
     /// Test for inequality with another rect
-    bool operator != (const IntRect& rhs) const
-    {
-        return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_;
-    }
-    
+    bool operator != (const IntRect& rhs) const { return left_ != rhs.left_ || top_ != rhs.top_ || right_ != rhs.right_ || bottom_ != rhs.bottom_; }
     /// Return integer data
     const int* GetData() const { return &left_; }
     /// Return as string

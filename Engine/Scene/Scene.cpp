@@ -540,7 +540,6 @@ void Scene::FinishAsyncLoading()
 void Scene::FinishLoading(Deserializer* source)
 {
     FinishUpdate();
-    
     if (source)
     {
         fileName_ = source->GetName();

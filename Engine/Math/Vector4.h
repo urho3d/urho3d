@@ -77,7 +77,6 @@ public:
         y_ = rhs.y_;
         z_ = rhs.z_;
         w_ = rhs.w_;
-        
         return *this;
     }
     
@@ -107,7 +106,6 @@ public:
         y_ += rhs.y_;
         z_ += rhs.z_;
         w_ += rhs.w_;
-        
         return *this;
     }
     
@@ -118,7 +116,6 @@ public:
         y_ -= rhs.y_;
         z_ -= rhs.z_;
         w_ -= rhs.w_;
-        
         return *this;
     }
     
@@ -129,7 +126,6 @@ public:
         y_ *= rhs;
         z_ *= rhs;
         w_ *= rhs;
-        
         return *this;
     }
     
@@ -140,18 +136,17 @@ public:
         y_ *= rhs.y_;
         z_ *= rhs.z_;
         w_ *= rhs.w_;
-        
         return *this;
     }
     
     /// Divide-assign a scalar
     Vector4& operator /= (float rhs)
     {
-        x_ /= rhs;
-        y_ /= rhs;
-        z_ /= rhs;
-        w_ /= rhs;
-        
+        float invRhs = 1.0f / rhs;
+        x_ *= invRhs;
+        y_ *= invRhs;
+        z_ *= invRhs;
+        w_ *= invRhs;
         return *this;
     }
     
@@ -162,7 +157,6 @@ public:
         y_ /= rhs.y_;
         z_ /= rhs.z_;
         w_ /= rhs.w_;
-        
         return *this;
     }
     

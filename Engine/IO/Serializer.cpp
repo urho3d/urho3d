@@ -107,7 +107,6 @@ bool Serializer::WritePackedVector3(const Vector3& value, float maxAbsCoord)
     coords[0] = (short)(Clamp(value.x_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
     coords[1] = (short)(Clamp(value.y_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
     coords[2] = (short)(Clamp(value.z_, -maxAbsCoord, maxAbsCoord) * v + 0.5f);
-    
     return Write(&coords[0], sizeof coords) == sizeof coords;
 }
 
@@ -141,7 +140,6 @@ bool Serializer::WriteColor(const Color& value)
 bool Serializer::WriteBoundingBox(const BoundingBox& value)
 {
     bool success = true;
-    
     success &= WriteVector3(value.min_);
     success &= WriteVector3(value.max_);
     return success;
@@ -190,7 +188,6 @@ bool Serializer::WriteBuffer(const PODVector<unsigned char>& value)
 bool Serializer::WriteResourceRef(const ResourceRef& value)
 {
     bool success = true;
-    
     success &= WriteShortStringHash(value.type_);
     success &= WriteStringHash(value.id_);
     return success;
@@ -211,8 +208,8 @@ bool Serializer::WriteResourceRefList(const ResourceRefList& value)
 bool Serializer::WriteVariant(const Variant& value)
 {
     bool success = true;
-    
     VariantType type = value.GetType();
+    
     success &= WriteUByte((unsigned char)type);
     success &= WriteVariantData(value);
     return success;
@@ -277,7 +274,6 @@ bool Serializer::WriteVariantData(const Variant& value)
 bool Serializer::WriteVariantVector(const VariantVector& value)
 {
     bool success = true;
-    
     success &= WriteVLE(value.Size());
     for (VariantVector::ConstIterator i = value.Begin(); i != value.End(); ++i)
         success &= WriteVariant(*i);
@@ -287,7 +283,6 @@ bool Serializer::WriteVariantVector(const VariantVector& value)
 bool Serializer::WriteVariantMap(const VariantMap& value)
 {
     bool success = true;
-    
     success &= WriteVLE(value.Size());
     for (VariantMap::ConstIterator i = value.Begin(); i != value.End(); ++i)
     {
@@ -329,7 +324,6 @@ bool Serializer::WriteVLE(unsigned value)
 bool Serializer::WriteLine(const String& value)
 {
     bool success = true;
-    
     success &= Write(value.CString(), value.Length()) == value.Length();
     success &= WriteUByte(13);
     success &= WriteUByte(10);

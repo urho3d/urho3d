@@ -81,7 +81,6 @@ public:
         x_ = rhs.x_;
         y_ = rhs.y_;
         z_ = rhs.z_;
-        
         return *this;
     }
     
@@ -92,7 +91,6 @@ public:
         x_ += rhs.x_;
         y_ += rhs.y_;
         z_ += rhs.z_;
-        
         return *this;
     }
     
@@ -134,14 +132,14 @@ public:
     float Normalize()
     {
         float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
-        if (len < M_EPSILON)
-            return len;
-        
-        float invLen = 1.0f / len;
-        w_ *= invLen;
-        x_ *= invLen;
-        y_ *= invLen;
-        z_ *= invLen;
+        if (len >= M_EPSILON)
+        {
+            float invLen = 1.0f / len;
+            w_ *= invLen;
+            x_ *= invLen;
+            y_ *= invLen;
+            z_ *= invLen;
+        }
         
         return len;
     }
@@ -160,37 +158,31 @@ public:
     Quaternion Normalized() const
     {
         float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
-        if (len < M_EPSILON)
+        if (len >= M_EPSILON)
+            return *this * (1.0f / len);
+        else
             return IDENTITY;
-        
-        float invLen = 1.0f / len;
-        
-        return *this * invLen;
     }
     
     /// Return normalized to unit length, using fast inverse square root
-    Quaternion NormalizedFast() const
-    {
-        float invLen = FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
-        
-        return *this * invLen;
-    }
+    Quaternion NormalizedFast() const { return *this * FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_); }
     
     /// Return inverse
     Quaternion Inverse() const
     {
         float lenSquared = w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_;
-        if (lenSquared < M_EPSILON)
+        if (lenSquared >= M_EPSILON)
+        {
+            float invLenSquared = 1.0f / lenSquared;
+            return Quaternion(
+                w_ * invLenSquared,
+                -x_ * invLenSquared,
+                -y_ * invLenSquared,
+                -z_ * invLenSquared
+            );
+        }
+        else
             return IDENTITY;
-        
-        float invLenSquared = 1.0f / lenSquared;
-        
-        return Quaternion(
-            w_ * invLenSquared,
-            -x_ * invLenSquared,
-            -y_ * invLenSquared,
-            -z_ * invLenSquared
-        );
     }
     
     /// Return squared length

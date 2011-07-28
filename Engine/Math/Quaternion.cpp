@@ -60,7 +60,6 @@ Quaternion::Quaternion(const Vector3& start, const Vector3& end)
 {
     Vector3 normStart = start.Normalized();
     Vector3 normEnd = end.Normalized();
-    
     float d = normStart.DotProduct(normEnd);
     
     if (d > -1.0f + M_EPSILON)
@@ -206,7 +205,6 @@ Matrix3 Quaternion::RotationMatrix() const
 Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
 {
     float cosAngle = DotProduct(rhs);
-    
     // Enable shortest path rotation
     if (cosAngle < 0.0f)
     {
@@ -216,7 +214,6 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
     
     float angle = acosf(cosAngle);
     float sinAngle = sinf(angle);
-    
     float t1, t2;
     
     if (sinAngle > 0.001f)

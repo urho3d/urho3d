@@ -58,7 +58,6 @@ unsigned Deserializer::GetChecksum()
 int Deserializer::ReadInt()
 {
     int ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -66,7 +65,6 @@ int Deserializer::ReadInt()
 short Deserializer::ReadShort()
 {
     short ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -74,7 +72,6 @@ short Deserializer::ReadShort()
 signed char Deserializer::ReadByte()
 {
     signed char ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -82,7 +79,6 @@ signed char Deserializer::ReadByte()
 unsigned Deserializer::ReadUInt()
 {
     unsigned ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -90,7 +86,6 @@ unsigned Deserializer::ReadUInt()
 unsigned short Deserializer::ReadUShort()
 {
     unsigned short ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -98,7 +93,6 @@ unsigned short Deserializer::ReadUShort()
 unsigned char Deserializer::ReadUByte()
 {
     unsigned char ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -114,7 +108,6 @@ bool Deserializer::ReadBool()
 float Deserializer::ReadFloat()
 {
     float ret;
-    
     Read(&ret, sizeof ret);
     return ret;
 }
@@ -122,7 +115,6 @@ float Deserializer::ReadFloat()
 IntRect Deserializer::ReadIntRect()
 {
     IntRect ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -130,7 +122,6 @@ IntRect Deserializer::ReadIntRect()
 IntVector2 Deserializer::ReadIntVector2()
 {
     IntVector2 ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -138,7 +129,6 @@ IntVector2 Deserializer::ReadIntVector2()
 Rect Deserializer::ReadRect()
 {
     Rect ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -146,7 +136,6 @@ Rect Deserializer::ReadRect()
 Vector2 Deserializer::ReadVector2()
 {
     Vector2 ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -154,16 +143,15 @@ Vector2 Deserializer::ReadVector2()
 Vector3 Deserializer::ReadVector3()
 {
     Vector3 ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
 
 Vector3 Deserializer::ReadPackedVector3(float maxAbsCoord)
 {
+    Vector3 ret;
     float invV = maxAbsCoord / 32767.0f;
     short coords[3];
-    Vector3 ret;
     
     Read(&coords[0], sizeof coords);
     ret.x_ = coords[0] * invV;
@@ -175,7 +163,6 @@ Vector3 Deserializer::ReadPackedVector3(float maxAbsCoord)
 Vector4 Deserializer::ReadVector4()
 {
     Vector4 ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -183,7 +170,6 @@ Vector4 Deserializer::ReadVector4()
 Quaternion Deserializer::ReadQuaternion()
 {
     Quaternion ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -205,7 +191,6 @@ Quaternion Deserializer::ReadPackedQuaternion()
 Color Deserializer::ReadColor()
 {
     Color ret;
-    
     Read((void*)ret.GetData(), sizeof ret);
     return ret;
 }
@@ -213,7 +198,6 @@ Color Deserializer::ReadColor()
 BoundingBox Deserializer::ReadBoundingBox()
 {
     BoundingBox ret;
-    
     ret.min_ = ReadVector3();
     ret.max_ = ReadVector3();
     ret.defined_ = true;
@@ -239,7 +223,6 @@ String Deserializer::ReadString()
 String Deserializer::ReadID()
 {
     String ret;
-    
     ret.Resize(4);
     Read(&ret[0], 4);
     return ret;
@@ -248,7 +231,6 @@ String Deserializer::ReadID()
 StringHash Deserializer::ReadStringHash()
 {
     StringHash ret;
-    
     Read((void*)ret.GetData(), sizeof(unsigned));
     return ret;
 }
@@ -256,16 +238,13 @@ StringHash Deserializer::ReadStringHash()
 ShortStringHash Deserializer::ReadShortStringHash()
 {
     ShortStringHash ret;
-    
     Read((void*)ret.GetData(), sizeof(unsigned short));
     return ret;
 }
 
 PODVector<unsigned char> Deserializer::ReadBuffer()
 {
-    PODVector<unsigned char> ret;
-    
-    ret.Resize(ReadVLE());
+    PODVector<unsigned char> ret(ReadVLE());
     if (ret.Size())
         Read(&ret[0], ret.Size());
     return ret;
@@ -274,7 +253,6 @@ PODVector<unsigned char> Deserializer::ReadBuffer()
 ResourceRef Deserializer::ReadResourceRef()
 {
     ResourceRef ret;
-    
     ret.type_ = ReadShortStringHash();
     ret.id_ = ReadStringHash();
     return ret;
@@ -283,7 +261,6 @@ ResourceRef Deserializer::ReadResourceRef()
 ResourceRefList Deserializer::ReadResourceRefList()
 {
     ResourceRefList ret;
-    
     ret.type_ = ReadShortStringHash();
     ret.ids_.Resize(ReadVLE());
     if (ret.ids_.Size())
@@ -354,21 +331,17 @@ Variant Deserializer::ReadVariant(VariantType type)
 
 VariantVector Deserializer::ReadVariantVector()
 {
-    VariantVector ret;
-    
-    unsigned num = ReadVLE();
-    ret.Resize(num);
-    for (unsigned i = 0; i < num; ++i)
+    VariantVector ret(ReadVLE());
+    for (unsigned i = 0; i < ret.Size(); ++i)
         ret[i] = ReadVariant();
-    
     return ret;
 }
 
 VariantMap Deserializer::ReadVariantMap()
 {
     VariantMap ret;
-    
     unsigned num = ReadVLE();
+    
     for (unsigned i = 0; i < num; ++i)
     {
         ShortStringHash key = ReadShortStringHash();

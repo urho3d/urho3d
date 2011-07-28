@@ -83,7 +83,6 @@ public:
         min_ = rhs.min_;
         max_ = rhs.max_;
         defined_ = rhs.defined_;
-        
         return *this;
     }
     
@@ -93,21 +92,14 @@ public:
         min_ = Vector3(rhs.min_, 0.0f);
         max_ = Vector3(rhs.max_, 0.0f);
         defined_ = true;
-        
         return *this;
     }
     
     /// Test for equality with another bounding box
-    bool operator == (const BoundingBox& rhs) const
-    {
-        return (min_ == rhs.min_ && max_ == rhs.max_);
-    }
+    bool operator == (const BoundingBox& rhs) const { return (min_ == rhs.min_ && max_ == rhs.max_); }
     
     /// Test for inequality with another bounding box
-    bool operator != (const BoundingBox& rhs) const
-    {
-        return (min_ != rhs.min_ || max_ != rhs.max_);
-    }
+    bool operator != (const BoundingBox& rhs) const { return (min_ != rhs.min_ || max_ != rhs.max_); }
     
     /// Define from minimum and maximum vectors
     void Define(const Vector3& min, const Vector3& max)
@@ -142,12 +134,18 @@ public:
             return;
         }
         
-        if (point.x_ < min_.x_) min_.x_ = point.x_;
-        if (point.y_ < min_.y_) min_.y_ = point.y_;
-        if (point.z_ < min_.z_) min_.z_ = point.z_;
-        if (point.x_ > max_.x_) max_.x_ = point.x_;
-        if (point.y_ > max_.y_) max_.y_ = point.y_;
-        if (point.z_ > max_.z_) max_.z_ = point.z_;
+        if (point.x_ < min_.x_)
+            min_.x_ = point.x_;
+        if (point.y_ < min_.y_)
+            min_.y_ = point.y_;
+        if (point.z_ < min_.z_)
+            min_.z_ = point.z_;
+        if (point.x_ > max_.x_)
+            max_.x_ = point.x_;
+        if (point.y_ > max_.y_)
+            max_.y_ = point.y_;
+        if (point.z_ > max_.z_)
+            max_.z_ = point.z_;
     }
     
     /// Merge another bounding box
@@ -161,12 +159,18 @@ public:
             return;
         }
     
-        if (box.min_.x_ < min_.x_) min_.x_ = box.min_.x_;
-        if (box.min_.y_ < min_.y_) min_.y_ = box.min_.y_;
-        if (box.min_.z_ < min_.z_) min_.z_ = box.min_.z_;
-        if (box.max_.x_ > max_.x_) max_.x_ = box.max_.x_;
-        if (box.max_.y_ > max_.y_) max_.y_ = box.max_.y_;
-        if (box.max_.z_ > max_.z_) max_.z_ = box.max_.z_;
+        if (box.min_.x_ < min_.x_)
+            min_.x_ = box.min_.x_;
+        if (box.min_.y_ < min_.y_)
+            min_.y_ = box.min_.y_;
+        if (box.min_.z_ < min_.z_)
+            min_.z_ = box.min_.z_;
+        if (box.max_.x_ > max_.x_)
+            max_.x_ = box.max_.x_;
+        if (box.max_.y_ > max_.y_)
+            max_.y_ = box.max_.y_;
+        if (box.max_.z_ > max_.z_)
+            max_.z_ = box.max_.z_;
     }
     
     /// Define from an array of vertices
@@ -205,47 +209,34 @@ public:
     /// Test if a point is inside
     Intersection IsInside(const Vector3& point) const
     {
-        if (point.x_ < min_.x_ || point.x_ > max_.x_)
+        if (point.x_ < min_.x_ || point.x_ > max_.x_ || point.y_ < min_.y_ || point.y_ > max_.y_ ||
+            point.z_ < min_.z_ || point.z_ > max_.z_)
             return OUTSIDE;
-        if (point.y_ < min_.y_ || point.y_ > max_.y_)
-            return OUTSIDE;
-        if (point.z_ < min_.z_ || point.z_ > max_.z_)
-            return OUTSIDE;
-        
-        return INSIDE;
+        else
+            return INSIDE;
     }
     
     /// Test if another bounding box is inside, outside or intersects
     Intersection IsInside(const BoundingBox& box) const
     {
-        if (box.max_.x_ < min_.x_ || box.min_.x_ > max_.x_)
+        if (box.max_.x_ < min_.x_ || box.min_.x_ > max_.x_ || box.max_.y_ < min_.y_ || box.min_.y_ > max_.y_ ||
+            box.max_.z_ < min_.z_ || box.min_.z_ > max_.z_)
             return OUTSIDE;
-        if (box.max_.y_ < min_.y_ || box.min_.y_ > max_.y_)
-            return OUTSIDE;
-        if (box.max_.z_ < min_.z_ || box.min_.z_ > max_.z_)
-            return OUTSIDE;
-        
-        if (box.min_.x_ < min_.x_ || box.max_.x_ > max_.x_)
+        else if (box.min_.x_ < min_.x_ || box.max_.x_ > max_.x_ || box.min_.y_ < min_.y_ || box.max_.y_ > max_.y_ ||
+            box.min_.z_ < min_.z_ || box.max_.z_ > max_.z_)
             return INTERSECTS;
-        if (box.min_.y_ < min_.y_ || box.max_.y_ > max_.y_)
-            return INTERSECTS;
-        if (box.min_.z_ < min_.z_ || box.max_.z_ > max_.z_)
-            return INTERSECTS;
-        
-        return INSIDE;
+        else
+            return INSIDE;
     }
     
     /// Test if another bounding box is (partially) inside or outside
     Intersection IsInsideFast(const BoundingBox& box) const
     {
-        if (box.max_.x_ < min_.x_ || box.min_.x_ > max_.x_)
+        if (box.max_.x_ < min_.x_ || box.min_.x_ > max_.x_ || box.max_.y_ < min_.y_ || box.min_.y_ > max_.y_ ||
+            box.max_.z_ < min_.z_ || box.min_.z_ > max_.z_)
             return OUTSIDE;
-        if (box.max_.y_ < min_.y_ || box.min_.y_ > max_.y_)
-            return OUTSIDE;
-        if (box.max_.z_ < min_.z_ || box.min_.z_ > max_.z_)
-            return OUTSIDE;
-        
-        return INSIDE;
+        else
+            return INSIDE;
     }
     
     /// Test if a sphere is inside, outside or intersects
