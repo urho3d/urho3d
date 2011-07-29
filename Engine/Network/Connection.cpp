@@ -211,55 +211,57 @@ void Connection::Disconnect(int waitMSec)
 
 void Connection::SendServerUpdate()
 {
-    if (!isClient_ || !scene_ || !sceneLoaded_)
-        return;
-    
-    PROFILE(SendServerUpdate);
-    
-    const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
-    
-    // Check for new or changed nodes
-    // Start from the root node (scene) so that the scene-wide components get sent first
-    processedNodes_.Clear();
-    ProcessNode(scene_);
-    
-    // Then go through the rest of the nodes
-    for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-        ProcessNode(i->second_);
-    
-    // Check for removed nodes
-    for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
+    if (scene_ && sceneLoaded_)
     {
-        Map<unsigned, NodeReplicationState>::Iterator current = i++;
-        if (current->second_.frameNumber_ != frameNumber_)
+        PROFILE(SendServerUpdate);
+        
+        const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
+        
+        // Check for new or changed nodes
+        // Start from the root node (scene) so that the scene-wide components get sent first
+        processedNodes_.Clear();
+        ProcessNode(scene_);
+        
+        // Then go through the rest of the nodes
+        for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+            ProcessNode(i->second_);
+        
+        // Check for removed nodes
+        for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
         {
-            msg_.Clear();
-            msg_.WriteVLE(current->first_);
-            
-            // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
-            // would be enough. However, this may be better due to the client not possibly having updated parenting information
-            // at the time of receiving this message
-            SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
-            sceneState_.Erase(current);
+            Map<unsigned, NodeReplicationState>::Iterator current = i++;
+            if (current->second_.frameNumber_ != frameNumber_)
+            {
+                msg_.Clear();
+                msg_.WriteVLE(current->first_);
+                
+                // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
+                // would be enough. However, this may be better due to the client not possibly having updated parenting information
+                // at the time of receiving this message
+                SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
+                sceneState_.Erase(current);
+            }
         }
+        
+        ++frameNumber_;
     }
     
-    ++frameNumber_;
+    SendQueuedRemoteEvents();
 }
 
 void Connection::SendClientUpdate()
 {
-    if (isClient_ || !scene_ || !sceneLoaded_)
-        return;
+    if (scene_ && sceneLoaded_)
+    {
+        msg_.Clear();
+        msg_.WriteUInt(controls_.buttons_);
+        msg_.WriteFloat(controls_.yaw_);
+        msg_.WriteFloat(controls_.pitch_);
+        msg_.WriteVariantMap(controls_.extraData_);
+        SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
+    }
     
-    PROFILE(SendClientUpdate);
-    
-    msg_.Clear();
-    msg_.WriteUInt(controls_.buttons_);
-    msg_.WriteFloat(controls_.yaw_);
-    msg_.WriteFloat(controls_.pitch_);
-    msg_.WriteVariantMap(controls_.extraData_);
-    SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
+    SendQueuedRemoteEvents();
 }
 
 void Connection::SendQueuedRemoteEvents()
@@ -273,6 +275,8 @@ void Connection::SendQueuedRemoteEvents()
     
     if (remoteEvents_.Empty())
         return;
+    
+    PROFILE(SendRemoteEvents);
     
     for (Vector<RemoteEvent>::ConstIterator i = remoteEvents_.Begin(); i != remoteEvents_.End(); ++i)
     {

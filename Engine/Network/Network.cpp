@@ -51,6 +51,7 @@ Network::Network(Context* context) :
     network_ = new kNet::Network();
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Network, HandleBeginFrame));
+    SubscribeToEvent(E_RENDERUPDATE, HANDLER(Network, HandleRenderUpdate));
 }
 
 Network::~Network()
@@ -376,21 +377,16 @@ void Network::Update(float timeStep)
 {
     PROFILE(UpdateNetwork);
     
-    // Check if periodic update should happen now
-    updateAcc_ += timeStep;
-    bool updateNow = updateAcc_ >= updateInterval_;
-    
-    if (updateNow)
-    {
-        // Notify of the impending update to allow for example updated client controls to be set
-        SendEvent(E_NETWORKUPDATE);
-        updateAcc_ = fmodf(updateAcc_, updateInterval_);
-    }
-    
     // Process server connection if it exists
     if (serverConnection_)
     {
         kNet::MessageConnection* connection = serverConnection_->GetMessageConnection();
+        
+        // Receive new messages
+        connection->Process();
+        
+        // Process latest data messages waiting for the correct nodes or components to be created
+        serverConnection_->ProcessPendingLatestData();
         
         // Check for state transitions
         kNet::ConnectionState state = connection->GetConnectionState();
@@ -400,39 +396,40 @@ void Network::Update(float timeStep)
             serverConnection_->Disconnect();
         else if (state == kNet::ConnectionClosed)
             OnServerDisconnected();
-        
-        if (serverConnection_)
-        {
-            // Receive new messages
-            connection->Process();
-            
-            // Process latest data messages waiting for the correct nodes or components to be created
-            serverConnection_->ProcessPendingLatestData();
-            
-            // Send the client update
-            if (updateNow)
-            {
-                serverConnection_->SendClientUpdate();
-                serverConnection_->SendQueuedRemoteEvents();
-            }
-        }
     }
     
-    // Process client connections if the server has been started
+    // Process the network server if started
     kNet::SharedPtr<kNet::NetworkServer> server = network_->GetServer();
     if (server)
-    {
         server->Process();
+}
+
+void Network::PostUpdate(float timeStep)
+{
+    PROFILE(PostUpdateNetwork);
+    
+    // Check if periodic update should happen now
+    updateAcc_ += timeStep;
+    bool updateNow = updateAcc_ >= updateInterval_;
+    
+    if (updateNow)
+    {
+        // Notify of the impending update to allow for example updated client controls to be set
+        SendEvent(E_NETWORKUPDATE);
+        updateAcc_ = fmodf(updateAcc_, updateInterval_);
         
-        if (updateNow)
+        if (IsServerRunning())
         {
             // Send server updates for each client connection
             for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
-            {
                 i->second_->SendServerUpdate();
-                i->second_->SendQueuedRemoteEvents();
-            }
+        }
+        
+        if (serverConnection_)
+        {
+            // Send the client update
+            serverConnection_->SendClientUpdate();
         }
     }
 }
@@ -442,6 +439,13 @@ void Network::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
     using namespace BeginFrame;
     
     Update(eventData[P_TIMESTEP].GetFloat());
+}
+
+void Network::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
+{
+    using namespace RenderUpdate;
+    
+    PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
 void Network::OnServerConnected()

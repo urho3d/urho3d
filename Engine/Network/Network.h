@@ -97,12 +97,16 @@ public:
     /// Return the package download cache path
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
     
-    /// Update connections. Called by HandleBeginFrame
+    /// Process incoming messages from connections. Called by HandleBeginFrame
     void Update(float timeStep);
+    /// Send outgoing messages after frame logic. Called by HandleRenderUpdate
+    void PostUpdate(float timeStep);
     
 private:
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle render update frame event
+    void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle server connection
     void OnServerConnected();
     /// Handle server disconnection

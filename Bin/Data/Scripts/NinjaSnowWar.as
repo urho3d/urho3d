@@ -8,7 +8,7 @@
 #include "Scripts/SnowBall.as"
 #include "Scripts/SnowCrate.as"
 
-const float mouseSensitivity = 0.125;                                                                                           
+const float mouseSensitivity = 0.125;
 const float cameraMinDist = 25;
 const float cameraMaxDist = 500;
 const float cameraSafetyDist = 30;
@@ -81,15 +81,19 @@ void InitAudio()
     if (engine.headless)
         return;
 
-    // Lower mastervolumes slightly
-    audio.masterGain[SOUND_MASTER] = 0.75;
+    // Lower mastervolumes slightly. On the server, turn sound off completely
+    audio.masterGain[SOUND_MASTER] = runServer ? 0.0 : 0.75;
     audio.masterGain[SOUND_MUSIC] = 0.75;
 
-    // Start music playback. Note: the non-positional sound source component does not need to be in the scene
-    Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
-    musicFile.looped = true;
-    musicSource = SoundSource();
-    musicSource.Play(musicFile);
+    // Start music playback (play in singleplayer only to avoid cacophony if testing with multiple connections)
+    // Note: the non-positional sound source component does not need to be in the scene
+    if (singlePlayer)
+    {
+        Sound@ musicFile = cache.GetResource("Sound", "Music/Ninja Gods.ogg");
+        musicFile.looped = true;
+        musicSource = SoundSource();
+        musicSource.Play(musicFile);
+    }
 }
 
 void InitConsole()
@@ -302,7 +306,7 @@ void SpawnPlayer(Connection@ connection)
     if (singlePlayer)
         playerNinja.Create(Vector3(0, 90, 0), Quaternion());
     else
-        playerNinja.Create(Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize), Quaternion(0, Random(360), 0));
+        playerNinja.Create(Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize), Quaternion());
     playerNinja.health = playerNinja.maxHealth = playerHealth;
     playerNinja.side = SIDE_PLAYER;
     // Make sure the player can not shoot on first frame by holding the button down
