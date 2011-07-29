@@ -27,6 +27,7 @@
 #include "HashSet.h"
 #include "Object.h"
 #include "ReplicationState.h"
+#include "Timer.h"
 #include "VectorBuffer.h"
 
 #include <kNetFwd.h>
@@ -102,6 +103,8 @@ public:
     void SetControls(const Controls& newControls);
     /// Set the connection pending status. Called by Network
     void SetConnectPending(bool connectPending);
+    /// Set whether to log data in/out statistics
+    void SetShowStats(bool enable);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
     /// Send scene update messages. Called by Network
@@ -147,6 +150,8 @@ public:
     bool IsConnectPending() const { return connectPending_; }
     /// Return whether the scene is loaded and ready to receive updates from network
     bool IsSceneLoaded() const { return sceneLoaded_; }
+    /// Return whether to log data in/out statistics
+    bool GetShowStats() const { return showStats_; }
     /// Return remote address
     String GetAddress() const;
     /// Return remote port
@@ -159,6 +164,9 @@ public:
     const String& GetDownloadName() const;
     /// Return progress of current package download, or 1.0 if no downloads
     float GetDownloadProgress() const;
+    
+    /// Identity map
+    VariantMap identity_;
     
 private:
     /// Handle scene loaded event
@@ -182,8 +190,6 @@ private:
     
     /// kNet message connection
     kNet::SharedPtr<kNet::MessageConnection> connection_;
-    /// Identity map
-    VariantMap identity_;
     /// Scene
     WeakPtr<Scene> scene_;
     /// Last sent state of the scene for network replication
@@ -212,6 +218,8 @@ private:
     Controls controls_;
     /// Previous controls
     Controls previousControls_;
+    /// Statistics timer
+    Timer statsTimer_;
     /// Update frame number
     unsigned frameNumber_;
     /// Client flag
@@ -220,4 +228,6 @@ private:
     bool connectPending_;
     /// Scene loaded flag
     bool sceneLoaded_;
+    /// Show statistics flag
+    bool showStats_;
 };

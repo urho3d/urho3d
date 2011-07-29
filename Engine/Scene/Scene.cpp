@@ -349,9 +349,6 @@ void Scene::Update(float timeStep)
     // Update scene subsystems. If a physics world is present, it will be updated, triggering fixed timestep logic updates
     SendEvent(E_SCENESUBSYSTEMUPDATE, eventData);
     
-    // Post-update variable timestep logic
-    SendEvent(E_SCENEPOSTUPDATE, eventData);
-    
     // Update smoothing if enabled (network client scenes)
     if (IsSmoothed())
     {
@@ -363,6 +360,9 @@ void Scene::Update(float timeStep)
         for (Map<unsigned, Node*>::ConstIterator i = allNodes_.Begin(); i != allNodes_.End() && i->first_ < FIRST_LOCAL_ID; ++i)
             i->second_->UpdateSmoothing(constant, squaredSnapThreshold);
     }
+    
+    // Post-update variable timestep logic
+    SendEvent(E_SCENEPOSTUPDATE, eventData);
 }
 
 unsigned Scene::GetFreeNodeID(CreateMode mode)

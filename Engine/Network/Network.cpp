@@ -165,7 +165,7 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     
     VariantMap eventData;
     eventData[P_CONNECTION] = (void*)newConnection;
-    SendEvent(E_CLIENTCONNECTED, eventData);
+    newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
 void Network::ClientDisconnected(kNet::MessageConnection* connection)
@@ -176,13 +176,14 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     Map<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
-        LOGINFO("Client " + i->second_->ToString() + " disconnected");
+        Connection* connection = i->second_;
+        LOGINFO("Client " + connection->ToString() + " disconnected");
         
         using namespace ClientDisconnected;
         
         VariantMap eventData;
-        eventData[P_CONNECTION] = (void*)i->second_;
-        SendEvent(E_CLIENTDISCONNECTED, eventData);
+        eventData[P_CONNECTION] = (void*)connection;
+        connection->SendEvent(E_CLIENTDISCONNECTED, eventData);
         
         clientConnections_.Erase(i);
     }

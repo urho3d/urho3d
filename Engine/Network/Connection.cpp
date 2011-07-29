@@ -42,6 +42,7 @@
 
 #include "DebugNew.h"
 
+static const int STATS_INTERVAL_MSEC = 2000;
 static const String noName;
 
 PackageDownload::PackageDownload() :
@@ -59,7 +60,8 @@ Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::Me
     frameNumber_(0),
     isClient_(isClient),
     connectPending_(false),
-    sceneLoaded_(false)
+    sceneLoaded_(false),
+    showStats_(false)
 {
 }
 
@@ -197,6 +199,11 @@ void Connection::SetConnectPending(bool connectPending)
     connectPending_ = connectPending;
 }
 
+void Connection::SetShowStats(bool enable)
+{
+    showStats_ = enable;
+}
+
 void Connection::Disconnect(int waitMSec)
 {
     connection_->Disconnect(waitMSec);
@@ -229,6 +236,9 @@ void Connection::SendServerUpdate()
             msg_.Clear();
             msg_.WriteVLE(current->first_);
             
+            // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
+            // would be enough. However, this may be better due to the client not possibly having updated parenting information
+            // at the time of receiving this message
             SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
             sceneState_.Erase(current);
         }
@@ -254,6 +264,13 @@ void Connection::SendClientUpdate()
 
 void Connection::SendQueuedRemoteEvents()
 {
+    if (showStats_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
+    {
+        statsTimer_.Reset();
+        LOGINFO("Data in " + String(connection_->BytesInPerSec() / 1000.0f) + " KB/s Data out " +
+            String(connection_->BytesOutPerSec() / 1000.0f) + "KB/s");
+    }
+    
     if (remoteEvents_.Empty())
         return;
     
@@ -542,8 +559,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Node* node = scene_->GetNodeByID(nodeID);
             if (node)
                 node->Remove();
-            else
-                LOGWARNING("RemoveNode message received for missing node " + String(nodeID));
             nodeLatestData_.Erase(nodeID);
         }
         break;
@@ -621,8 +636,6 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
             Component* component = scene_->GetComponentByID(componentID);
             if (component)
                 component->Remove();
-            else
-                LOGWARNING("RemoveComponent message received for missing component " + String(componentID));
             componentLatestData_.Erase(componentID);
         }
         break;
@@ -944,6 +957,8 @@ float Connection::GetDownloadProgress() const
 
 void Connection::HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData)
 {
+    sceneLoaded_ = true;
+    
     msg_.Clear();
     msg_.WriteUInt(scene_->GetChecksum());
     SendMessage(MSG_SCENELOADED, true, true, msg_, NET_HIGH_PRIORITY);
@@ -1031,7 +1046,7 @@ void Connection::ProcessExistingNode(Node* node)
         VariantMap::Iterator j = nodeState.vars_.Find(i->first_);
         if (j == nodeState.vars_.End() || i->second_ != j->second_)
         {
-            j->second_ = i->second_;
+            nodeState.vars_[i->first_] = i->second_;
             changedVars_.Insert(i->first_);
             deltaUpdate = true;
         }
@@ -1170,6 +1185,8 @@ void Connection::SendPackageError(const String& name)
 
 void Connection::OnSceneLoadFailed()
 {
+    sceneLoaded_ = false;
+    
     using namespace NetworkSceneLoadFailed;
     
     VariantMap eventData;
@@ -1193,6 +1210,7 @@ void Connection::OnPackagesReady()
     if (sceneFileName_.Empty())
     {
         scene_->Clear();
+        sceneLoaded_ = true;
         
         // If filename is empty, can send the scene loaded reply immediately
         msg_.Clear();

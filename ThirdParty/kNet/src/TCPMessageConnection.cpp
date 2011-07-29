@@ -268,7 +268,7 @@ MessageConnection::PacketSendResult TCPMessageConnection::SendOutPacket()
 		if (!serializedMessages[i]->profilerName.Empty())
 			str += "messageOut." + serializedMessages[i]->profilerName;
 		else
-			str += "messageOut." + String(serializedMessages[i]->id);
+			str += "messageOut." + String((unsigned)serializedMessages[i]->id);
 		ADDEVENT(str.CString(), (float)serializedMessages[i]->Size(), "bytes");
 #endif
 		ClearOutboundMessageWithContentID(serializedMessages[i]);

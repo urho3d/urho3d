@@ -50,14 +50,14 @@ endmacro()
 AddCompilationDefine(KNET_ENABLE_WINXP_SUPPORT)
 
 # If set, extra code is inserted in debug mode to assert that certain thread race conditions don't occur.
-#AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
+AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
 
 # Enable internal LOG messaging if this flag is enabled. Comment this out to squeeze the last bit of
 # extra performance by avoiding all logging-related string operations.
 #AddCompilationDefine(KNET_LOGGING_SUPPORT_ENABLED)
 
 # Enable storing profiling data from different network level events.
-#AddCompilationDefine(KNET_NETWORK_PROFILING)
+AddCompilationDefine(KNET_NETWORK_PROFILING)
 
 if (USE_BOOST)
    AddCompilationDefine(KNET_USE_BOOST)

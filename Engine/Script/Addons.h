@@ -46,6 +46,7 @@ public:
     int GetElementTypeId() const;
     
     void Resize(asUINT numElements);
+    void Clear();
     asUINT GetSize() const;
     bool IsEmpty() const;
     

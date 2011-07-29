@@ -203,6 +203,7 @@ Methods:<br>
 - void Push(const T&)
 - void Pop()
 - void Resize(uint)
+- void Clear()
 
 Properties:<br>
 - uint length (readonly)
@@ -1002,10 +1003,12 @@ Methods:<br>
 - bool SaveXML(XMLElement&)
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
+- void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SetScale(float)
+- void SnapPosition(const Vector3&)
+- void SnapRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -1029,8 +1032,8 @@ Methods:<br>
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&, uint arg1 = 0) const
 - bool HasComponent(const String&) const
-- ScriptObject@ CreateScriptObject(ScriptFile@, const String&)
-- ScriptObject@ CreateScriptObject(const String&, const String&)
+- ScriptObject@ CreateScriptObject(ScriptFile@, const String&, CreateMode arg2 = REPLICATED)
+- ScriptObject@ CreateScriptObject(const String&, const String&, CreateMode arg2 = REPLICATED)
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 
@@ -1073,10 +1076,12 @@ Methods:<br>
 - bool SaveXML(XMLElement&)
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
+- void SetScale(float)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
-- void SetScale(float)
+- void SnapPosition(const Vector3&)
+- void SnapRotation(const Quaternion&)
 - void Translate(const Vector3&)
 - void TranslateRelative(const Vector3&)
 - void Rotate(const Quaternion&, bool arg1 = false)
@@ -3449,15 +3454,18 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - Scene@ scene
+- bool showStats
 - bool client (readonly)
 - bool connected (readonly)
 - bool connectPending (readonly)
 - bool sceneLoaded (readonly)
+- Controls& controls
 - String address (readonly)
 - uint16 port (readonly)
 - uint numDownloads (readonly)
 - String& downloadName (readonly)
 - float downloadProgress (readonly)
+- VariantMap identity
 
 
 Network

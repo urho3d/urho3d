@@ -484,10 +484,12 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
 {
     RegisterSerializable<T>(engine, className);
     RegisterSubclass<Node, T>(engine, "Node", className);
+    engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void SetScale(float)", asMETHODPR(T, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SnapPosition(const Vector3&in)", asMETHODPR(T, SnapPosition, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SnapRotation(const Quaternion&in)", asMETHODPR(T, SnapRotation, (const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Translate(const Vector3&in)", asMETHOD(T, Translate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void TranslateRelative(const Vector3&in)", asMETHOD(T, TranslateRelative), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void Rotate(const Quaternion&in, bool fixedAxis = false)", asMETHOD(T, Rotate), asCALL_THISCALL);

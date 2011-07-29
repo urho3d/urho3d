@@ -19,6 +19,8 @@ class GameObject : ScriptObject
     int maxHealth;
     int side;
     int lastDamageSide;
+    uint lastDamageCreatorID;
+    uint creatorID;
 
     GameObject()
     {
@@ -29,6 +31,11 @@ class GameObject : ScriptObject
         maxHealth = 0;
         side = SIDE_NEUTRAL;
         lastDamageSide = SIDE_NEUTRAL;
+        lastDamageCreatorID = 0;
+        creatorID = 0;
+
+        if (runClient)
+            Print("Warning! Logic object created on client!");
     }
 
     void Create(const Vector3&in position, const Quaternion&in rotation)
@@ -52,6 +59,7 @@ class GameObject : ScriptObject
             return false;
 
         lastDamageSide = origin.side;
+        lastDamageCreatorID = origin.creatorID;
         health -= amount;
         if (health < 0)
             health = 0;
@@ -80,7 +88,7 @@ class GameObject : ScriptObject
         Node@ newNode = scene.CreateChild();
 
         // Create the script object with specified class
-        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, className));
+        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, className, LOCAL));
         if (object !is null)
             object.Create(position, rotation);
 
@@ -97,7 +105,7 @@ class GameObject : ScriptObject
         emitter.parameters = cache.GetResource("XMLFile", effectName);
 
         // Create a GameObject for managing the effect lifetime
-        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject"));
+        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
         object.duration = duration;
 
         return newNode;
@@ -115,7 +123,7 @@ class GameObject : ScriptObject
         source.Play(sound);
 
         // Create a GameObject for managing the sound lifetime
-        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject"));
+        GameObject@ object = cast<GameObject>(newNode.CreateScriptObject(scriptFile, "GameObject", LOCAL));
         object.duration = duration;
 
         return newNode;

@@ -1,13 +1,14 @@
 // Remake of NinjaSnowWar in script
-// Does not support load/save, or multiplayer yet.
 
-#include "Scripts/Ninja.as"
 #include "Scripts/LightFlash.as"
+#include "Scripts/Network.as"
+#include "Scripts/Ninja.as"
+#include "Scripts/Player.as"
 #include "Scripts/Potion.as"
 #include "Scripts/SnowBall.as"
 #include "Scripts/SnowCrate.as"
 
-const float mouseSensitivity = 0.125;
+const float mouseSensitivity = 0.125;                                                                                           
 const float cameraMinDist = 25;
 const float cameraMaxDist = 500;
 const float cameraSafetyDist = 30;
@@ -18,6 +19,7 @@ const int incrementEach = 10;
 const int playerHealth = 20;
 const float enemySpawnRate = 1;
 const float powerupSpawnRate = 15;
+const float spawnAreaSize = 500;
 
 Scene@ gameScene;
 Node@ gameCameraNode;
@@ -31,40 +33,54 @@ SoundSource@ musicSource;
 
 Controls playerControls;
 Controls prevPlayerControls;
+bool singlePlayer = true;
 bool gameOn = false;
 bool drawDebug = false;
 bool drawOctreeDebug = false;
-int score = 0;
-int hiscore = 0;
 int maxEnemies = 0;
 int incrementCounter = 0;
 float enemySpawnTimer = 0;
 float powerupSpawnTimer = 0;
+uint clientNodeID = 0;
+
+Array<Player> players;
+Array<HiscoreEntry> hiscores;
 
 void Start()
 {
     if (engine.headless)
         OpenConsoleWindow();
 
+    ParseNetworkArguments();
+    if (runServer || runClient)
+        singlePlayer = false;
+
     InitAudio();
     InitConsole();
     InitScene();
+    InitNetworking();
     CreateCamera();
     CreateOverlays();
-    StartGame();
 
     SubscribeToEvent("Update", "HandleUpdate");
-    SubscribeToEvent(gameScene.physicsWorld, "PhysicsPreStep", "HandleFixedUpdate");
+    if (gameScene.physicsWorld !is null)
+        SubscribeToEvent(gameScene.physicsWorld, "PhysicsPreStep", "HandleFixedUpdate");
     SubscribeToEvent(gameScene, "ScenePostUpdate", "HandlePostUpdate");
     SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate");
     SubscribeToEvent("Points", "HandlePoints");
     SubscribeToEvent("Kill", "HandleKill");
     SubscribeToEvent("KeyDown", "HandleKeyDown");
     SubscribeToEvent("ScreenMode", "HandleScreenMode");
+
+    if (singlePlayer)
+        StartGame(null);
 }
 
 void InitAudio()
 {
+    if (engine.headless)
+        return;
+
     // Lower mastervolumes slightly
     audio.masterGain[SOUND_MASTER] = 0.75;
     audio.masterGain[SOUND_MUSIC] = 0.75;
@@ -94,6 +110,17 @@ void InitConsole()
 void InitScene()
 {
     gameScene = Scene("NinjaSnowWar");
+    
+    // Set network snap threshold higher, as the world unit is centimeter
+    gameScene.snapThreshold = 100.0;
+
+    // Enable access to this script file & scene from the console
+    script.defaultScene = gameScene;
+    script.defaultScriptFile = scriptFile;
+
+    // For the multiplayer client, do not create the scene, let it load from the server
+    if (runClient)
+        return;
 
     // Create the static level programmatically
     Octree@ octree = gameScene.CreateComponent("Octree");
@@ -115,7 +142,7 @@ void InitScene()
     zone.fogColor = Color(0.2, 0.2, 0.7);
     zone.fogStart = 5000;
     zone.fogEnd = 15000;
-    
+
     Node@ lightNode = gameScene.CreateChild("Sunlight");
     lightNode.rotation = Quaternion(0.888074, 0.325058, -0.325058, 0);
     Light@ light = lightNode.CreateComponent("Light");
@@ -141,14 +168,36 @@ void InitScene()
     Skybox@ skybox = skyNode.CreateComponent("Skybox");
     skybox.model = cache.GetResource("Model", "Models/CloudPlane.mdl");
     skybox.material = cache.GetResource("Material", "Materials/CloudPlane.xml");
+}
 
-    // Enable access to this script file & scene from the console
-    script.defaultScene = gameScene;
-    script.defaultScriptFile = scriptFile;
+void InitNetworking()
+{
+    network.RegisterRemoteEvent("PlayerSpawned");
+    network.RegisterRemoteEvent("RequestRespawn");
+    
+    if (runServer)
+    {
+        network.StartServer(serverPort);
+
+        SubscribeToEvent("ClientIdentity", "HandleClientIdentity");
+        SubscribeToEvent("ClientSceneLoaded", "HandleClientSceneLoaded");
+        SubscribeToEvent("ClientDisconnected", "HandleClientDisconnected");
+        SubscribeToEvent("RequestRespawn", "HandleRequestRespawn");
+    }
+    if (runClient)
+    {
+        VariantMap identity;
+        identity["UserName"] = userName;
+        network.updateFps = 50; // Increase controls send rate for better responsiveness
+        network.Connect(serverAddress, serverPort, gameScene, identity);
+
+        SubscribeToEvent("PlayerSpawned", "HandlePlayerSpawned");
+    }
 }
 
 void CreateCamera()
 {
+    // Note: the camera is not in the scene
     gameCameraNode = Node();
     gameCameraNode.position = Vector3(0, 200, -1000);
 
@@ -220,7 +269,7 @@ void SetMessage(const String&in message)
         messageText.text = message;
 }
 
-void StartGame()
+void StartGame(Connection@ connection)
 {
     // Clear the scene of all existing scripted objects
     {
@@ -229,18 +278,12 @@ void StartGame()
             scriptedNodes[i].Remove();
     }
 
-    Node@ playerNode = gameScene.CreateChild("Player");
-    Ninja@ playerNinja = cast<Ninja>(playerNode.CreateScriptObject(scriptFile, "Ninja"));
-    playerNinja.Create(Vector3(0, 90, 0), Quaternion());
-    playerNinja.health = playerNinja.maxHealth = playerHealth;
-    playerNinja.side = SIDE_PLAYER;
-    // Make sure the player can not shoot on first frame by holding the button down
-    playerNinja.controls = playerNinja.prevControls = playerControls;
+    players.Clear();
+    SpawnPlayer(connection);
 
     ResetAI();
 
     gameOn = true;
-    score = 0;
     maxEnemies = initialMaxEnemies;
     incrementCounter = 0;
     enemySpawnTimer = 0;
@@ -249,6 +292,59 @@ void StartGame()
     playerControls.pitch = 0;
 
     SetMessage("");
+}
+
+void SpawnPlayer(Connection@ connection)
+{
+    // Create the logic object as local, as it only needs to run on server
+    Node@ playerNode = gameScene.CreateChild("Player");
+    Ninja@ playerNinja = cast<Ninja>(playerNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
+    if (singlePlayer)
+        playerNinja.Create(Vector3(0, 90, 0), Quaternion());
+    else
+        playerNinja.Create(Vector3(Random(spawnAreaSize) - spawnAreaSize * 0.5, 90, Random(spawnAreaSize) - spawnAreaSize), Quaternion(0, Random(360), 0));
+    playerNinja.health = playerNinja.maxHealth = playerHealth;
+    playerNinja.side = SIDE_PLAYER;
+    // Make sure the player can not shoot on first frame by holding the button down
+    if (connection is null)
+        playerNinja.controls = playerNinja.prevControls = playerControls;
+    else
+        playerNinja.controls = playerNinja.prevControls = connection.controls;
+
+    // Check if player already exists, in that case just clear the score
+    for (uint i = 0; i < players.length; ++i)
+    {
+        if (players[i].connection is connection)
+        {
+            players[i].score = 0;
+            players[i].nodeID = playerNode.id;
+        }
+    }
+
+    Player newPlayer;
+    newPlayer.connection = connection;
+    if (connection !is null)
+    {
+        newPlayer.name = connection.identity["UserName"].GetString();
+
+        // Send remote event that tells the spawned node's ID
+        // Note: it is important for the event to be in-order so that the node update has been transmitted first
+        VariantMap eventData;
+        eventData["NodeID"] = playerNode.id;
+        connection.SendRemoteEvent("PlayerSpawned", true, eventData);
+    }
+    else
+    {
+        newPlayer.name = "Player";
+
+        // In singleplayer, create also the default hiscore entry immediately
+        HiscoreEntry newHiscore;
+        newHiscore.name = "Player";
+        newHiscore.score = 0;
+        hiscores.Push(newHiscore);
+    }
+    newPlayer.nodeID = playerNode.id;
+    players.Push(newPlayer);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -262,10 +358,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.keyPress[KEY_F4])
         drawOctreeDebug = !drawOctreeDebug;
 
-    if (input.keyPress[KEY_F5])
-        gameScene.Save(File(fileSystem.programDir + "Data/Save.dat", FILE_WRITE));
-
-    if ((input.keyPress['P']) && (!console.visible) && (gameOn))
+    // Allow pause only in singleplayer
+    if (singlePlayer && input.keyPress['P'] && !console.visible && gameOn)
     {
         gameScene.active = !gameScene.active;
         if (!gameScene.active)
@@ -283,26 +377,59 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 
     if (gameScene.active)
+    {
         UpdateControls();
+        CheckEndAndRestart();
+    }
 }
 
 void HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
     float timeStep = eventData["TimeStep"].GetFloat();
 
-    // Spawn new objects and check for end/restart of game
-    SpawnObjects(timeStep);
-    CheckEndAndRestart();
+    // Spawn new objects, singleplayer or server only
+    if (singlePlayer || runServer)
+        SpawnObjects(timeStep);
 }
 
 void HandlePostUpdate()
 {
+    // Not necessary on the server
+    if (runServer)
+        return;
+
     UpdateCamera();
     UpdateStatus();
 }
 
+int FindPlayerIndex(uint nodeID)
+{
+    for (uint i = 0; i < players.length; ++i)
+    {
+        if (players[i].nodeID == nodeID)
+            return i;
+    }
+    return -1;
+}
+
+Node@ FindPlayerNode(uint playerIndex)
+{
+    return gameScene.GetNodeByID(players[playerIndex].nodeID);
+}
+
+Node@ FindOwnNode()
+{
+    if (singlePlayer)
+        return gameScene.GetChild("Player", true);
+    else
+        return gameScene.GetNodeByID(clientNodeID);
+}
+
 void HandlePostRenderUpdate()
 {
+    if (engine.headless)
+        return;
+
     if (drawDebug)
         gameScene.physicsWorld.DrawDebugGeometry(true);
     if (drawOctreeDebug)
@@ -313,9 +440,13 @@ void HandlePoints(StringHash eventType, VariantMap& eventData)
 {
     if (eventData["DamageSide"].GetInt() == SIDE_PLAYER)
     {
-        score += eventData["Points"].GetInt();
-        if (score > hiscore)
-            hiscore = score;
+        // Get node ID of the object that should receive points -> use it to find player index
+        int playerIndex = FindPlayerIndex(eventData["Receiver"].GetInt());
+        if (playerIndex >= 0)
+        {
+            players[playerIndex].score += eventData["Points"].GetInt();
+            CheckHiscore(playerIndex);
+        }
     }
 }
 
@@ -336,6 +467,90 @@ void HandleKill(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void HandleClientIdentity(StringHash eventType, VariantMap& eventData)
+{
+    Connection@ connection = sender;
+    // If user has empty name, invent one
+    if (connection.identity["UserName"].GetString().Trimmed().empty)
+        connection.identity["UserName"] = "user" + RandomInt(999);
+    // Assign scene to begin replicating it to the client
+    connection.scene = gameScene;
+}
+
+void HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData)
+{
+    // Now client is actually ready to begin. If first player, clear the scene and restart the game
+    Connection@ connection = sender;
+    if (players.empty)
+        StartGame(connection);
+    else
+        SpawnPlayer(connection);
+}
+
+void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
+{
+    Connection@ connection = sender;
+    // Erase the player entry, and make the player's ninja commit seppuku (if exists)
+    for (uint i = 0; i < players.length; ++i)
+    {
+        if (players[i].connection is connection)
+        {
+            players[i].connection = null;
+            Node@ playerNode = FindPlayerNode(i);
+            if (playerNode !is null)
+            {
+                Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
+                playerNinja.health = 0;
+                playerNinja.lastDamageSide = SIDE_NEUTRAL; // No-one scores from this
+            }
+            players.Erase(i);
+            return;
+        }
+    }
+}
+
+void HandleRequestRespawn(StringHash eventType, VariantMap& eventData)
+{
+    Connection@ connection = sender;
+    for (uint i = 0; i < players.length; ++i)
+    {
+        if (players[i].connection is connection && FindPlayerNode(i) is null)
+        {
+            SpawnPlayer(connection);
+            return;
+        }
+    }
+}
+
+void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
+{
+    // Store our node ID and mark the game as started
+    clientNodeID = eventData["NodeID"].GetInt();
+    gameOn = true;
+    SetMessage("");
+}
+
+void CheckHiscore(uint playerIndex)
+{
+    for (uint i = 0; i < hiscores.length; ++i)
+    {
+        if (hiscores[i].name == players[playerIndex].name)
+        {
+            if (players[playerIndex].score > hiscores[i].score)
+                hiscores[i].score = players[playerIndex].score;
+            return;
+        }
+    }
+
+    // Not found, create new hiscore entry
+    HiscoreEntry newHiscore;
+    newHiscore.name = players[playerIndex].name;
+    newHiscore.score = players[playerIndex].score;
+    hiscores.Push(newHiscore);
+
+    // Todo: in multiplayer, send updated hiscores to everyone
+}
+
 void SpawnObjects(float timeStep)
 {
     // Spawn powerups
@@ -353,7 +568,7 @@ void SpawnObjects(float timeStep)
 
             Vector3 position(xOffset, 5000, zOffset);
             Node@ crateNode = gameScene.CreateChild();
-            GameObject@ crateObject = cast<GameObject>(crateNode.CreateScriptObject(scriptFile, "SnowCrate"));
+            GameObject@ crateObject = cast<GameObject>(crateNode.CreateScriptObject(scriptFile, "SnowCrate", LOCAL));
             crateObject.Create(position, Quaternion());
         }
     }
@@ -377,7 +592,7 @@ void SpawnObjects(float timeStep)
             Vector3 position(q * Vector3(offset, 1000, -12000));
 
             Node@ enemyNode = gameScene.CreateChild();
-            Ninja@ enemyNinja = cast<Ninja>(enemyNode.CreateScriptObject(scriptFile, "Ninja"));
+            Ninja@ enemyNinja = cast<Ninja>(enemyNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
             enemyNinja.Create(position, q);
             enemyNinja.side = SIDE_ENEMY;
             @enemyNinja.controller = AIController();
@@ -389,63 +604,106 @@ void SpawnObjects(float timeStep)
 
 void CheckEndAndRestart()
 {
-    if ((gameOn) && (gameScene.GetChild("Player", true) is null))
+    // Only check end of game if singleplayer or client
+    if (runServer)
+        return;
+
+    // Check if player node has vanished
+    Node@ playerNode = FindOwnNode();
+    if (gameOn && playerNode is null)
     {
         gameOn = false;
         SetMessage("Press Fire or Jump to restart!");
         return;
     }
 
-    if ((!gameOn) && (playerControls.IsPressed(CTRL_FIRE | CTRL_JUMP, prevPlayerControls)))
-        StartGame();
+    // Check for restart. In singleplayer, restart game. In multiplayer, request respawn
+    if (!gameOn && playerControls.IsPressed(CTRL_FIRE | CTRL_JUMP, prevPlayerControls))
+    {
+        if (singlePlayer)
+            StartGame(null);
+        else
+        {
+            if (network.serverConnection !is null)
+                network.serverConnection.SendRemoteEvent("RequestRespawn", true);
+        }
+    }
 }
 
 void UpdateControls()
 {
-    prevPlayerControls = playerControls;
-    playerControls.Set(CTRL_ALL, false);
-
-    if ((console is null) || (!console.visible))
+    if (singlePlayer || runClient)
     {
-        if (input.keyDown['W'])
-            playerControls.Set(CTRL_UP, true);
-        if (input.keyDown['S'])
-            playerControls.Set(CTRL_DOWN, true);
-        if (input.keyDown['A'])
-            playerControls.Set(CTRL_LEFT, true);
-        if (input.keyDown['D'])
-            playerControls.Set(CTRL_RIGHT, true);
-        if (input.keyDown[KEY_LCTRL])
+        prevPlayerControls = playerControls;
+        playerControls.Set(CTRL_ALL, false);
+
+        if ((console is null) || (!console.visible))
+        {
+            if (input.keyDown['W'])
+                playerControls.Set(CTRL_UP, true);
+            if (input.keyDown['S'])
+                playerControls.Set(CTRL_DOWN, true);
+            if (input.keyDown['A'])
+                playerControls.Set(CTRL_LEFT, true);
+            if (input.keyDown['D'])
+                playerControls.Set(CTRL_RIGHT, true);
+            if (input.keyDown[KEY_LCTRL])
+                playerControls.Set(CTRL_FIRE, true);
+            if (input.keyDown[' '])
+                playerControls.Set(CTRL_JUMP, true);
+        }
+
+        if (input.mouseButtonDown[MOUSEB_LEFT])
             playerControls.Set(CTRL_FIRE, true);
-        if (input.keyDown[' '])
+        if (input.mouseButtonDown[MOUSEB_RIGHT])
             playerControls.Set(CTRL_JUMP, true);
+
+        playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+        playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+        playerControls.pitch = Clamp(playerControls.pitch, -60, 60);
+
+        // In singleplayer, set controls directly on the player's ninja. In multiplayer, transmit to server
+        if (singlePlayer)
+        {
+            Node@ playerNode = gameScene.GetChild("Player", true);
+            if (playerNode !is null)
+            {
+                Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
+                playerNinja.controls = playerControls;
+            }
+        }
+        else if (network.serverConnection !is null)
+            network.serverConnection.controls = playerControls;
     }
 
-    if (input.mouseButtonDown[MOUSEB_LEFT])
-        playerControls.Set(CTRL_FIRE, true);
-    if (input.mouseButtonDown[MOUSEB_RIGHT])
-        playerControls.Set(CTRL_JUMP, true);
-
-    playerControls.yaw += mouseSensitivity * input.mouseMoveX;
-    playerControls.pitch += mouseSensitivity * input.mouseMoveY;
-    playerControls.pitch = Clamp(playerControls.pitch, -60, 60);
-
-    Node@ playerNode = gameScene.GetChild("Player", true);
-    if (playerNode !is null)
+    if (runServer)
     {
-        Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
-        playerNinja.controls = playerControls;
+        // Apply each connection's controls to the ninja they control
+        for (uint i = 0; i < players.length; ++i)
+        {
+            Node@ playerNode = FindPlayerNode(i);
+            if (playerNode !is null)
+            {
+                Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
+                playerNinja.controls = players[i].connection.controls;
+            }
+        }
     }
 }
 
 void UpdateCamera()
 {
-    Node@ playerNode = gameScene.GetChild("Player", true);
+    Node@ playerNode = FindOwnNode();
     if (playerNode is null)
         return;
 
     Vector3 pos = playerNode.position;
     Quaternion dir;
+    
+    // In multiplayer, make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
+    if (runClient)
+        playerNode.SnapRotation(Quaternion(0, playerControls.yaw, 0));
+
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));
     dir = dir * Quaternion(playerControls.pitch, Vector3(1, 0, 0));
 
@@ -472,15 +730,30 @@ void UpdateStatus()
     if (engine.headless)
         return;
 
-    scoreText.text = "Score " + score;
-    hiscoreText.text = "Hiscore " + hiscore;
+    if (singlePlayer)
+    {
+        if (players.length > 0)
+            scoreText.text = "Score " + players[0].score;
+        if (hiscores.length > 0)
+            hiscoreText.text = "Hiscore " + hiscores[0].score;
+    }
 
-    Node@ playerNode = gameScene.GetChild("Player", true);
-    if (playerNode is null)
-        return;
-
-    GameObject@ object = cast<GameObject>(playerNode.scriptObject);
-    healthBar.width = 116 * object.health / playerHealth;
+    Node@ playerNode = FindOwnNode();
+    if (playerNode !is null)
+    {
+        int health = 0;
+        if (singlePlayer)
+        {
+            GameObject@ object = cast<GameObject>(playerNode.scriptObject);
+            health = object.health;
+        }
+        else
+        {
+            // In multiplayer the client does not have script logic components, but health is replicated via node user variables
+            health = playerNode.vars["Health"].GetInt();
+        }
+        healthBar.width = 116 * health / playerHealth;
+    }
 }
 
 void HandleKeyDown(StringHash eventType, VariantMap& eventData)

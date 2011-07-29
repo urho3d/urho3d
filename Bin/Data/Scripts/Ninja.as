@@ -103,6 +103,9 @@ class Ninja : GameObject
 
     void FixedUpdate(float timeStep)
     {
+        // For multiplayer, replicate the health into the node user variables
+        node.vars["Health"] = health;
+
         if (health <= 0)
         {
             DeathUpdate(timeStep);
@@ -260,6 +263,7 @@ class Ninja : GameObject
             snowballBody.linearVelocity = projectileVel;
             GameObject@ snowballObject = cast<GameObject>(snowball.scriptObject);
             snowballObject.side = side;
+            snowballObject.creatorID = node.id;
 
             PlaySound("Sounds/NutThrow.wav");
 
@@ -299,6 +303,7 @@ class Ninja : GameObject
 
             VariantMap eventData;
             eventData["Points"] = ninjaPoints;
+            eventData["Receiver"] = lastDamageCreatorID;
             eventData["DamageSide"] = lastDamageSide;
             SendEvent("Points", eventData);
             SendEvent("Kill", eventData);

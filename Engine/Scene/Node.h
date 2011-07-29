@@ -91,6 +91,10 @@ public:
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// Set transform
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Snap position immediately, even if smoothing enabled
+    void SnapPosition(const Vector3& position);
+    /// Snap rotation immediately, even if smoothing enabled
+    void SnapRotation(const Quaternion& rotation);
     /// Move the scene node
     void Translate(const Vector3& delta);
     /// Move the scene node relative to its rotation

@@ -43,7 +43,7 @@ static bool ScriptFileExecute(const String& declaration, CScriptArray* srcParams
     return ptr->Execute(declaration, destParams);
 }
 
-static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, Node* ptr)
+static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const String& className, CreateMode mode, Node* ptr)
 {
     if (!file)
         return 0;
@@ -64,7 +64,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
         }
     }
     // Then create a new component if not found
-    ScriptInstance* instance = ptr->CreateComponent<ScriptInstance>();
+    ScriptInstance* instance = ptr->CreateComponent<ScriptInstance>(mode);
     instance->CreateObject(file, className);
     return instance->GetScriptObject();
 }
@@ -77,10 +77,10 @@ static void RegisterScriptFile(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(GetScriptContextFile), asCALL_CDECL);
 }
 
-static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, Node* ptr)
+static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
 {
     ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
-    return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, ptr);
+    return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, mode, ptr);
 }
 
 asIScriptObject* NodeGetScriptObject(Node* ptr)
@@ -206,8 +206,8 @@ static void SelfRemove()
 static void RegisterScriptInstance(asIScriptEngine* engine)
 {
     engine->RegisterInterface("ScriptObject");
-    engine->RegisterObjectMethod("Node", "ScriptObject@+ CreateScriptObject(ScriptFile@+, const String&in)", asFUNCTION(NodeCreateScriptObjectWithFile), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Node", "ScriptObject@+ CreateScriptObject(const String&in, const String&in)", asFUNCTION(NodeCreateScriptObject), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Node", "ScriptObject@+ CreateScriptObject(ScriptFile@+, const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateScriptObjectWithFile), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Node", "ScriptObject@+ CreateScriptObject(const String&in, const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "ScriptObject@+ GetScriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "ScriptObject@+ GetScriptObject(const String&in) const", asFUNCTION(NodeGetNamedScriptObject), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Node", "ScriptObject@+ get_scriptObject() const", asFUNCTION(NodeGetScriptObject), asCALL_CDECL_OBJLAST);

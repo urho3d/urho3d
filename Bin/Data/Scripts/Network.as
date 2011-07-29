@@ -1,7 +1,8 @@
-bool startServer = false;
-bool startClient = false;
+bool runServer = false;
+bool runClient = false;
 String serverAddress;
 uint16 serverPort = 1234;
+String userName;
 
 void ParseNetworkArguments()
 {
@@ -13,15 +14,17 @@ void ParseNetworkArguments()
         {
             if (arguments[i] == "server")
             {
-                startServer = true;
-                startClient = false;
+                runServer = true;
+                runClient = false;
                 return;
             }
-            else if (index > 0) // First parameter is script name, so skip that
+            else if (index == 1) // First parameter is script name, so skip that
             {
-                startClient = true;
+                runClient = true;
                 serverAddress = arguments[i];
             }
+            else if (index == 2 && runClient)
+                userName = arguments[i];
             
             ++index;
         }

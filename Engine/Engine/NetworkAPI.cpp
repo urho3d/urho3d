@@ -83,15 +83,20 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "String ToString() const", asMETHOD(Connection, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_scene(Scene@+)", asMETHOD(Connection, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "Scene@+ get_scene() const", asMETHOD(Connection, GetScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void set_showStats(bool)", asMETHOD(Connection, SetShowStats), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_showStats() const", asMETHOD(Connection, GetShowStats), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_client() const", asMETHOD(Connection, IsClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connected() const", asMETHOD(Connection, IsConnected), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connectPending() const", asMETHOD(Connection, IsConnectPending), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void set_controls(const Controls&in)", asMETHOD(Connection, SetControls), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "const Controls& get_controls() const", asMETHOD(Connection, GetControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint get_numDownloads() const", asMETHOD(Connection, GetNumDownloads), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const String& get_downloadName() const", asMETHOD(Connection, GetDownloadName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "float get_downloadProgress() const", asMETHOD(Connection, GetDownloadProgress), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Connection", "VariantMap identity", offsetof(Connection, identity_));
     
     // Register Variant GetPtr() for Connection
     engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);

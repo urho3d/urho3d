@@ -33,7 +33,7 @@ void Start()
     network.RegisterRemoteEvent("SpawnBox");
     
     ParseNetworkArguments();
-    if (startServer)
+    if (runServer)
     {
         network.StartServer(serverPort);
         SubscribeToEvent("ClientConnected", "HandleClientConnected");
@@ -43,7 +43,7 @@ void Start()
         for (uint i = 0; i < packages.length; ++i)
             testScene.AddRequiredPackageFile(packages[i]);
     }
-    if (startClient)
+    if (runClient)
     {
         testScene.Clear();
 
@@ -387,7 +387,7 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         eventData["Rot"] = cameraNode.rotation;
 
         // If we are the client, send the spawn command as a remote event, else send locally
-        if (startClient)
+        if (runClient)
         {
             if (network.serverConnection !is null)
                 network.serverConnection.SendRemoteEvent("SpawnBox", true, eventData);

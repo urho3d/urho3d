@@ -535,7 +535,7 @@ MessageConnection::PacketSendResult UDPMessageConnection::SendOutPacket()
 		if (!datagramSerializedMessages[i]->profilerName.Empty())
 			str += "messageOut." + datagramSerializedMessages[i]->profilerName;
 		else
-			str += "messageOut." + String(datagramSerializedMessages[i]->id);
+			str += "messageOut." + String((unsigned)datagramSerializedMessages[i]->id);
 		ADDEVENT(str.CString(), (float)datagramSerializedMessages[i]->Size(), "bytes");
 		if (datagramSerializedMessages[i]->transfer)
 		{

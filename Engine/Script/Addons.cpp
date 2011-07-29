@@ -263,6 +263,11 @@ void CScriptArray::Resize(asUINT numElements)
     Resize((int)numElements - (int)buffer->numElements, -1);
 }
 
+void CScriptArray::Clear()
+{
+    Resize(0);
+}
+
 // Internal
 void CScriptArray::Resize(int delta, asUINT at)
 {
@@ -564,6 +569,7 @@ void RegisterArray(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Array<T>", "void Push(const T& in)", asMETHOD(CScriptArray, InsertLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Pop()", asMETHOD(CScriptArray, RemoveLast), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "void Resize(uint)", asMETHODPR(CScriptArray, Resize, (asUINT), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Array<T>", "void Clear()", asMETHOD(CScriptArray, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "uint get_length() const", asMETHOD(CScriptArray, GetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Array<T>", "bool get_empty() const", asMETHOD(CScriptArray, IsEmpty), asCALL_THISCALL);
     engine->RegisterDefaultArrayType("Array<T>");

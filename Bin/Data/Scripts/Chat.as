@@ -35,9 +35,9 @@ void Start()
     }
     
     ParseNetworkArguments();
-    if (startServer)
+    if (runServer)
         network.StartServer(serverPort);
-    if (startClient)
+    if (runClient)
         network.Connect(serverAddress, serverPort, null);
 }
 

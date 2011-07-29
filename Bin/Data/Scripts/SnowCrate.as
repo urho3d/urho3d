@@ -51,6 +51,7 @@ class SnowCrate : GameObject
 
             VariantMap eventData;
             eventData["Points"] = snowcratePoints;
+            eventData["Receiver"] = lastDamageCreatorID;
             eventData["DamageSide"] = lastDamageSide;
             SendEvent("Points", eventData);
         

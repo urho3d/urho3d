@@ -264,8 +264,10 @@ bool TextureCube::Load(Deserializer& source)
     
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     
-    if (!graphics_)
-        return false;
+    // In headless mode, do not actually load the texture, just return success
+    Graphics* graphics = GetSubsystem<Graphics>();
+    if (!graphics)
+        return true;
     
     // If over the texture budget, see if materials can be freed to allow textures to be freed
     CheckTextureBudget(GetTypeStatic());

@@ -288,6 +288,25 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
         MarkDirty();
 }
 
+void Node::SnapPosition(const Vector3& position)
+{
+    position_ = position;
+    targetPosition_ = position;
+    smoothingFlags_ &= ~SMOOTH_POSITION;
+    if (!dirty_)
+        MarkDirty();
+}
+
+void Node::SnapRotation(const Quaternion& rotation)
+{
+    rotation_ = rotation;
+    targetRotation_ = rotation;
+    smoothingFlags_ &= ~SMOOTH_ROTATION;
+    rotateCount_ = 0;
+    if (!dirty_)
+        MarkDirty();
+}
+
 void Node::Translate(const Vector3& delta)
 {
     if (!smoothed_)
