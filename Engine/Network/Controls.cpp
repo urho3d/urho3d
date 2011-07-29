@@ -24,6 +24,8 @@
 #include "Precompiled.h"
 #include "Controls.h"
 
+#include "DebugNew.h"
+
 Controls::Controls()
 {
     Reset();

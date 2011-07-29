@@ -32,7 +32,7 @@
 #include <cstring>
 
 #ifndef USE_OPENGL
-#include <Windows.h>
+#include <windows.h>
 #else
 #include <GraphicsImpl.h>
 #endif

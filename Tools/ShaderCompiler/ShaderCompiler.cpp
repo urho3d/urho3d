@@ -34,7 +34,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include <Windows.h>
+#include <windows.h>
 #include <d3d9.h>
 #include <d3dx9shader.h>
 

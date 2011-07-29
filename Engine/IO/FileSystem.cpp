@@ -32,15 +32,11 @@
 #include <cstring>
 
 #ifdef WIN32
-#include <Windows.h>
-#include <Shellapi.h>
+#include <windows.h>
+#include <shellapi.h>
 #include <direct.h>
 #include <process.h>
-// Enable SHGetSpecialFolderPath on MinGW
-#ifndef _MSC_VER
-#define WIN32_IE 0x0400
-#endif
-#include <Shlobj.h>
+#include <shlobj.h>
 #else
 #include <dirent.h>
 #include <errno.h>

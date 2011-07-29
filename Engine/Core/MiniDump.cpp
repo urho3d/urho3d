@@ -32,9 +32,9 @@
 #include <io.h>
 #include <fcntl.h>
 #include <time.h>
-#include <Windows.h>
-#include <DbgHelp.h>
-#include <ShlObj.h>
+#include <windows.h>
+#include <dbghelp.h>
+#include <shlObj.h>
 
 static bool miniDumpWritten = false;
 

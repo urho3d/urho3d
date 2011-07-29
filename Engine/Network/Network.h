@@ -33,7 +33,7 @@
 class MemoryBuffer;
 class Scene;
 
-/// Network subsystem. Manages joining to or hosting networked scenes.
+/// Network subsystem. Manages client-server communications using the UDP protocol
 class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
     OBJECT(Network);
@@ -67,7 +67,7 @@ public:
     void BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority = 0, unsigned contentID = 0);
     /// Broadcast a remote event to all client connections
     void BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Broadcast a remote event to all client connections in the specific scene
+    /// Broadcast a remote event to all client connections in a specific scene
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote node event to all client connections in the scene with this node
     void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());

@@ -76,7 +76,7 @@ struct PackageDownload
     bool initiated_;
 };
 
-/// Connection in a networked scene
+/// Connection to a remote network host
 class Connection : public Object
 {
     OBJECT(Connection);
@@ -228,7 +228,7 @@ private:
     Timer statsTimer_;
     /// Update frame number
     unsigned frameNumber_;
-    /// Client flag
+    /// Client connection flag
     bool isClient_;
     /// Connection pending flag
     bool connectPending_;

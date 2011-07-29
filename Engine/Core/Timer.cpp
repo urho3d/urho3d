@@ -26,8 +26,8 @@
 #include "Timer.h"
 
 #ifdef WIN32
-#include <Windows.h>
-#include <MMSystem.h>
+#include <windows.h>
+#include <mmsystem.h>
 #else
 #include <sys/time.h>
 #include <unistd.h>

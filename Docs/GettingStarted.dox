@@ -2,11 +2,11 @@
 
 \page Building Building Urho3D
 
-Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
+Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
-1) Run cmake in the root directory with your preferred toolchain specified to generate the build files. You can use the batch files or shell scripts provided. Use cmake_vs2008.bat, cmake_vs2010.bat or cmake_mingw.bat on Windows, and cmake_gcc.sh on Linux and Mac OS X.
+1) Run CMake in the root directory with your preferred toolchain specified to generate the build files. You can use the batch files or shell scripts provided: cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and Mac OS X.
 
-2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For gcc, execute make (by default, cmake_mingw.bat or cmake_gcc.sh specify to make a Release build.)
+2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like. For gcc, execute make (by default, cmake_gcc.sh specifies to make a Release build.)
 
 The build process will also compile models and shaders from the Source_Asset directory into Bin/Data/Models & Bin/Data/Shaders. After the build is complete, the programs can be run from the Bin directory.
 
@@ -124,13 +124,13 @@ The libraries are the following:
 - %Scene. Provides Node and Component classes, from which Urho3D scenes are built.
 - %Graphics. Provides application window handling and 3D rendering capabilities.
 - %Input. Provides mouse & keyboard input in both polled and event-based mode.
-- %Network. Provides low-level client-server networking functionality.
+- %Network. Provides client-server networking functionality.
 - %Audio. Provides the audio subsystem and playback of .wav & .ogg sounds in either 2D or 3D.
 - Physics. Provides physics simulation.
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
-Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however due to the cmake build process all the libraries above get automatically linked (as Engine library depends on all of them.)
+Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however due to the CMake build process all the libraries above get automatically linked (as Engine library depends on all of them.)
 
 Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the script subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
 
@@ -322,7 +322,7 @@ target_link_libraries (${TARGET_NAME} Container Core Engine Graphics Input IO Ma
 finalize_exe ()
 \endcode
 
-Before recreating the build files with cmake, create an empty HelloWorld.cpp into the HelloWorld directory. Now you can re-run cmake. If using Visual Studio, the HelloWorld project should now appear in the Urho3D solution, and you can start writing the actual application into HelloWorld.cpp.
+Before recreating the build files with CMake, create an empty HelloWorld.cpp into the HelloWorld directory. Now you can re-run CMake. If using Visual Studio, the HelloWorld project should now appear in the Urho3D solution, and you can start writing the actual application into HelloWorld.cpp.
 
 To start with, we need the include files for all the engine classes we are going to use, plus Windows.h for the WinMain function:
 

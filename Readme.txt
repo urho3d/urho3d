@@ -73,16 +73,16 @@ Get Doxygen from http://www.doxygen.org
 Building
 --------
 
-Urho3D uses cmake (http://www.cmake.org) to build. The process has two steps:
+Urho3D uses CMake (http://www.cmake.org) to build. The process has two steps:
 
-1) Run cmake in the root directory with your preferred toolchain specified to
-generate the build files. You can use the batch files or shell scripts provided.
-Use cmake_vs2008.bat, cmake_vs2010.bat or cmake_mingw.bat on Windows, and
-cmake_gcc.sh on Linux and Mac OS X.
+1) Run CMake in the root directory with your preferred toolchain specified to
+generate the build files. You can use the batch files or shell scripts provided:
+cmake_vs2008.bat or cmake_vs2010.bat on Windows, and cmake_gcc.sh on Linux and 
+Mac OS X.
 
 2) For Visual Studio, open Urho3D.sln and build the configuration(s) you like.
-For gcc, execute make (by default, cmake_mingw.bat or cmake_gcc.sh specify to 
-make a Release build.)
+For gcc, execute make (by default, cmake_gcc.sh specifies to make a Release 
+build.)
 
 The build process will also compile models and shaders from the Source_Asset
 directory into Bin/Data/Models & Bin/Data/Shaders. On Windows & Direct3D9,

@@ -26,7 +26,7 @@
 #include "Matrix3x4.h"
 #include "Node.h"
 
-/// Base class for components. Components can be added to scene nodes
+/// Base class for components. Components can be created to scene nodes
 class Component : public Serializable
 {
     OBJECT(Component);

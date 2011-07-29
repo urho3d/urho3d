@@ -23,7 +23,7 @@
 #include "kNet/NetworkLogging.h"
 
 #define NOMINMAX
-#include <windows.h>
+#include <Windows.h>
 
 namespace kNet
 {
