@@ -4,6 +4,7 @@ class Player
     String name;
     uint nodeID;
     Connection@ connection;
+    Controls lastControls;
 
     Player()
     {

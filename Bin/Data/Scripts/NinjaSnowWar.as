@@ -655,8 +655,12 @@ void SendHiscores(int playerIndex)
 
 void SpawnObjects(float timeStep)
 {
+    // If game not running, run only the random generator
     if (!gameOn)
+    {
+        Random();
         return;
+    }
 
     // Spawn powerups
     powerupSpawnTimer += timeStep;
@@ -683,8 +687,14 @@ void SpawnObjects(float timeStep)
     if (enemySpawnTimer > enemySpawnRate)
     {
         enemySpawnTimer = 0;
-        // Take the player ninja into account
-        int numEnemies = gameScene.GetChildrenWithScript("Ninja", true).length - 1;
+        int numEnemies = 0;        
+        Array<Node@> ninjaNodes = gameScene.GetChildrenWithScript("Ninja", true);
+        for (uint i = 0; i < ninjaNodes.length; ++i)
+        {
+            Ninja@ ninja = cast<Ninja>(ninjaNodes[i].scriptObject);
+            if (ninja.side == SIDE_ENEMY)
+                ++numEnemies;
+        }
 
         if (numEnemies < maxEnemies)
         {
@@ -791,9 +801,10 @@ void UpdateControls()
             else
             {
                 // If player has no ninja, respawn if fire/jump is pressed
-                if (players[i].connection.controls.IsPressed(CTRL_FIRE | CTRL_JUMP, players[i].connection.previousControls))
+                if (players[i].connection.controls.IsPressed(CTRL_FIRE | CTRL_JUMP, players[i].lastControls))
                     SpawnPlayer(players[i].connection);
             }
+            players[i].lastControls = players[i].connection.controls;
         }
     }
 }

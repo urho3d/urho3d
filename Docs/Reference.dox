@@ -1049,7 +1049,7 @@ For now, creation and removal of nodes is always sent immediately, without consu
 
 The Controls structure is used to send controls information from the client to the server, by default also at 25 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap.
 
-It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()". The previous controls are also stored on both ends to allow detecting button state changes.
+It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()".
 
 The controls update message also includes the client's observer position for interest management.
 

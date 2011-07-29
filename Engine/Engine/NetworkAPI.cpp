@@ -91,7 +91,6 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_controls(const Controls&in)", asMETHOD(Connection, SetControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Controls& get_controls() const", asMETHOD(Connection, GetControls), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "const Controls& get_previousControls() const", asMETHOD(Connection, GetPreviousControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_position(const Vector3&in)", asMETHOD(Connection, SetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Vector3& get_position() const", asMETHOD(Connection, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);

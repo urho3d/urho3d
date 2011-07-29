@@ -15,8 +15,11 @@
 /** @file UnixEventArray.cpp
 	@brief */
 
+// Modified by Lasse Öörni for Urho3D
+
 #include <cassert>
 #include <utility>
+#include <algorithm>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -39,7 +42,7 @@ EventArray::EventArray()
 
 int EventArray::Size() const
 {
-	return cachedEvents.size();
+	return cachedEvents.Size();
 }
 
 void EventArray::Clear()
@@ -48,7 +51,7 @@ void EventArray::Clear()
 	FD_ZERO(&writefds);
 	nfds = -1;
 	numAdded = 0;
-	cachedEvents.clear();
+	cachedEvents.Clear();
 }
 
 void EventArray::AddEvent(const Event &e)
@@ -76,7 +79,7 @@ void EventArray::AddEvent(const Event &e)
 
 	// No need to add dummy events to select(), but need to add them to the cached events list to keep
 	// the indices matching.
-	cachedEvents.push_back(e);
+	cachedEvents.Push(e);
 	++numAdded;
 }
 
@@ -108,7 +111,7 @@ int EventArray::Wait(int msecs)
 		return WaitFailed;
 	}
 
-	for(int i = 0; i < cachedEvents.size(); ++i)
+	for(int i = 0; i < cachedEvents.Size(); ++i)
 		switch(cachedEvents[i].Type())
 		{
 		case EventWaitRead:

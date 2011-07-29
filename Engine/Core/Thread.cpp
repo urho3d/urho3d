@@ -106,6 +106,6 @@ void Thread::SetPriority(int priority)
     #else
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
-        pthread_setschedprio(thread, priority);
+        pthread_setschedprio(*thread, priority);
     #endif
 }

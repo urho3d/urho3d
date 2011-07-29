@@ -191,7 +191,6 @@ void Connection::SetIdentity(const VariantMap& identity)
 
 void Connection::SetControls(const Controls& newControls)
 {
-    previousControls_ = controls_;
     controls_ = newControls;
 }
 

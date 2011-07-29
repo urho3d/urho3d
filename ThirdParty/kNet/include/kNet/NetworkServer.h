@@ -195,9 +195,9 @@ void NetworkServer::BroadcastStruct(const SerializableData &data, unsigned long 
 
 	const size_t dataSize = data.Size();
 
-	for(ConnectionMap::Iterator iter = clientsLock->begin(); iter != clientsLock->end(); ++iter)
+	for(ConnectionMap::Iterator iter = clientsLock->Begin(); iter != clientsLock->End(); ++iter)
 	{
-		MessageConnection *connection = iter->second;
+		MessageConnection *connection = iter->second_;
 		assert(connection);
 		if (connection == exclude || !connection->IsWriteOpen())
 			continue;

@@ -142,8 +142,6 @@ public:
     Scene* GetScene() const;
     /// Return the client controls of this connection
     const Controls& GetControls() const { return controls_; }
-    /// Return the previous client controls of this connection
-    const Controls& GetPreviousControls() const { return previousControls_; }
     /// Return the observer position for interest management
     const Vector3& GetPosition() const { return position_; }
     /// Return whether is a client connection
@@ -220,8 +218,6 @@ private:
     VectorBuffer msg_;
     /// Current controls
     Controls controls_;
-    /// Previous controls
-    Controls previousControls_;
     /// Observer position for interest management
     Vector3 position_;
     /// Statistics timer
