@@ -968,14 +968,20 @@ Left, top, right & bottom border widths and spacing between elements can also be
 
 \page Serialization Serialization
 
-Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining attributes. Attributes are stored to the Context per class. Scene load/save is implemented by Node and Component both deriving from Serializable.
+Classes that derive from Serializable can perform automatic serialization to binary or XML format by defining \ref AttributeInfo "Attributes". Attributes are stored to the Context per class. %Scene load/save and network replication are both implemented by Node and Component deriving from Serializable.
 
-The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers.
+The supported attribute types are all those supported by Variant. Attributes can either define a direct memory offset into the object, or setter & getter functions. Zero-based enumerations are also supported, so that the enum values can be stored as text into XML files instead of just numbers. For editing, the attributes also have human-readable names.
 
-To serialize complex structures or other data where simple memory access or calling a setter or getter function is not enough, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
+To implement side effects to attributes, for example that a Node needs to dirty its world transform whenever the local transform changes, the default attribute access functions in Serializable can be overridden. See \ref Serializable::OnSetAttribute "OnSetAttribute()" and \ref Serializable::OnGetAttribute "OnGetAttribute()".
 
-The attribute system also supports editing by providing human-readable names.
+Each attribute can have a combination of the following flags:
 
+- AM_FILE: Is used for file serialization (load/save.)
+- AM_NET: Is used for network replication.
+- AM_LATESTDATA: Frequently changing data for network replication, where only the latest values matter. Used for motion and animation.
+- AM_NOEDIT: Is an internal attribute and is not to be shown for editing.
+
+The default flags are AM_FILE and AM_NET.
 
 \page Network Networking
 
