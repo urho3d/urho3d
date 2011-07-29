@@ -209,7 +209,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+)", asFUNCTION(ConstructViewportSceneCamera), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_CONSTRUCT, "void f(Scene@+, Camera@+, const IntRect&in)", asFUNCTION(ConstructViewportSceneCameraRect), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Viewport", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructViewport), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Viewport", "Viewport &opAssign(const Viewport&in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Viewport", "Viewport& opAssign(const Viewport&in)", asMETHOD(Viewport, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Viewport", "void set_scene(Scene@+)", asFUNCTION(ViewportSetScene), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "void set_camera(Camera@+)", asFUNCTION(ViewportSetCamera), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Viewport", "Scene@+ get_scene() const", asFUNCTION(ViewportGetScene), asCALL_CDECL_OBJLAST);

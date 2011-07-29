@@ -480,7 +480,7 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
     if (!active_ || !scriptFile_ || !scriptObject_)
         return;
     
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(context_->GetHandler()->GetUserData());
+    asIScriptFunction* method = static_cast<asIScriptFunction*>(context_->GetEventHandler()->GetUserData());
     
     VariantVector parameters;
     if (method->GetParamCount() > 0)

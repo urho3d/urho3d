@@ -174,6 +174,12 @@ static void ConstructVariantBuffer(const VectorBuffer& buffer, Variant* ptr)
     new(ptr) Variant(buffer.GetBuffer());
 }
 
+static Variant& VariantAssignBuffer(const VectorBuffer& buffer, Variant* ptr)
+{
+    *ptr = buffer.GetBuffer();
+    return *ptr;
+}
+
 static VectorBuffer VariantGetBuffer(Variant* ptr)
 {
     VectorBuffer ret(ptr->GetBuffer());
@@ -246,7 +252,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer@+, uint)", asFUNCTION(ConstructVectorBufferFromStream), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVectorBuffer), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VectorBuffer", "VectorBuffer &opAssign(const VectorBuffer&in)", asMETHOD(VectorBuffer, operator =), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VectorBuffer", "VectorBuffer& opAssign(const VectorBuffer&in)", asMETHOD(VectorBuffer, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void SetData(Deserializer@+, uint)", asFUNCTION(VectorBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VectorBuffer", "void Clear()", asMETHOD(VectorBuffer, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("VectorBuffer", "void Resize(uint)", asMETHOD(VectorBuffer, Resize), asCALL_THISCALL);
@@ -257,6 +263,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     
     // Register VectorBuffer conversions to Variant
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asFUNCTION(VariantAssignBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asFUNCTION(VariantGetBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asFUNCTION(VariantEqualsBuffer), asCALL_CDECL_OBJLAST);
 }

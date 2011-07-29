@@ -42,6 +42,7 @@ int incrementCounter = 0;
 float enemySpawnTimer = 0;
 float powerupSpawnTimer = 0;
 uint clientNodeID = 0;
+int clientScore = 0;
 
 Array<Player> players;
 Array<HiscoreEntry> hiscores;
@@ -177,6 +178,8 @@ void InitScene()
 void InitNetworking()
 {
     network.RegisterRemoteEvent("PlayerSpawned");
+    network.RegisterRemoteEvent("UpdateScore");
+    network.RegisterRemoteEvent("UpdateHiscores");
 
     if (runServer)
     {
@@ -194,6 +197,8 @@ void InitNetworking()
         network.Connect(serverAddress, serverPort, gameScene, identity);
 
         SubscribeToEvent("PlayerSpawned", "HandlePlayerSpawned");
+        SubscribeToEvent("UpdateScore", "HandleUpdateScore");
+        SubscribeToEvent("UpdateHiscores", "HandleUpdateHiscores");
     }
 }
 
@@ -319,40 +324,53 @@ void SpawnPlayer(Connection@ connection)
     else
         playerNinja.controls = playerNinja.prevControls = connection.controls;
 
-    // Check if player already exists, in that case just clear the score
+    // Check if player entry already exists
+    int playerIndex = -1;
     for (uint i = 0; i < players.length; ++i)
     {
         if (players[i].connection is connection)
         {
-            players[i].score = 0;
-            players[i].nodeID = playerNode.id;
+            playerIndex = i;
+            break;
         }
     }
 
-    Player newPlayer;
-    newPlayer.connection = connection;
+    // Does not exist, create new
+    if (playerIndex < 0)
+    {
+        playerIndex = players.length;
+        players.Resize(players.length + 1);
+        players[playerIndex].connection = connection;
+
+        if (connection !is null)
+        {
+            players[playerIndex].name = connection.identity["UserName"].GetString();
+            // In multiplayer, send current hiscores to the new player
+            SendHiscores(playerIndex);
+        }
+        else
+        {
+            players[playerIndex].name = "Player";
+            // In singleplayer, create also the default hiscore entry immediately
+            HiscoreEntry newHiscore;
+            newHiscore.name = players[playerIndex].name;
+            newHiscore.score = 0;
+            hiscores.Push(newHiscore);
+        }
+    }
+
+    players[playerIndex].nodeID = playerNode.id;
+    players[playerIndex].score = 0;
+
     if (connection !is null)
     {
-        newPlayer.name = connection.identity["UserName"].GetString();
-
-        // Send remote event that tells the spawned node's ID
-        // Note: it is important for the event to be in-order so that the node update has been transmitted first
+        // In multiplayer, send initial score, then send a remote event that tells the spawned node's ID
+        // It is important for the event to be in-order so that the node has been replicated first
+        SendScore(playerIndex);
         VariantMap eventData;
         eventData["NodeID"] = playerNode.id;
         connection.SendRemoteEvent("PlayerSpawned", true, eventData);
     }
-    else
-    {
-        newPlayer.name = "Player";
-
-        // In singleplayer, create also the default hiscore entry immediately
-        HiscoreEntry newHiscore;
-        newHiscore.name = "Player";
-        newHiscore.score = 0;
-        hiscores.Push(newHiscore);
-    }
-    newPlayer.nodeID = playerNode.id;
-    players.Push(newPlayer);
 }
 
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -410,29 +428,6 @@ void HandlePostUpdate()
     UpdateStatus();
 }
 
-int FindPlayerIndex(uint nodeID)
-{
-    for (uint i = 0; i < players.length; ++i)
-    {
-        if (players[i].nodeID == nodeID)
-            return i;
-    }
-    return -1;
-}
-
-Node@ FindPlayerNode(uint playerIndex)
-{
-    return gameScene.GetNodeByID(players[playerIndex].nodeID);
-}
-
-Node@ FindOwnNode()
-{
-    if (singlePlayer)
-        return gameScene.GetChild("Player", true);
-    else
-        return gameScene.GetNodeByID(clientNodeID);
-}
-
 void HandlePostRenderUpdate()
 {
     if (engine.headless)
@@ -453,7 +448,11 @@ void HandlePoints(StringHash eventType, VariantMap& eventData)
         if (playerIndex >= 0)
         {
             players[playerIndex].score += eventData["Points"].GetInt();
-            CheckHiscore(playerIndex);
+            SendScore(playerIndex);
+
+            bool newHiscore = CheckHiscore(playerIndex);
+            if (newHiscore)
+                SendHiscores(-1);
         }
     }
 }
@@ -477,7 +476,7 @@ void HandleKill(StringHash eventType, VariantMap& eventData)
 
 void HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 {
-    Connection@ connection = sender;
+    Connection@ connection = GetEventSender();
     // If user has empty name, invent one
     if (connection.identity["UserName"].GetString().Trimmed().empty)
         connection.identity["UserName"] = "user" + RandomInt(999);
@@ -488,7 +487,7 @@ void HandleClientIdentity(StringHash eventType, VariantMap& eventData)
 void HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData)
 {
     // Now client is actually ready to begin. If first player, clear the scene and restart the game
-    Connection@ connection = sender;
+    Connection@ connection = GetEventSender();
     if (players.empty)
         StartGame(connection);
     else
@@ -497,7 +496,7 @@ void HandleClientSceneLoaded(StringHash eventType, VariantMap& eventData)
 
 void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
 {
-    Connection@ connection = sender;
+    Connection@ connection = GetEventSender();
     // Erase the player entry, and make the player's ninja commit seppuku (if exists)
     for (uint i = 0; i < players.length; ++i)
     {
@@ -533,15 +532,68 @@ void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void CheckHiscore(uint playerIndex)
+void HandleUpdateScore(StringHash eventType, VariantMap& eventData)
+{
+    clientScore = eventData["Score"].GetInt();
+    scoreText.text = "Score " + clientScore;
+}
+
+void HandleUpdateHiscores(StringHash eventType, VariantMap& eventData)
+{
+    VectorBuffer data = eventData["Hiscores"].GetBuffer();
+    hiscores.Resize(data.ReadVLE());
+    for (uint i = 0; i < hiscores.length; ++i)
+    {
+        hiscores[i].name = data.ReadString();
+        hiscores[i].score = data.ReadInt();
+    }
+
+    String allHiscores;
+    for (uint i = 0; i < hiscores.length; ++i)
+        allHiscores += hiscores[i].name + " " + hiscores[i].score + "\n";
+    hiscoreText.text = allHiscores;    
+}
+                      
+int FindPlayerIndex(uint nodeID)
+{
+    for (uint i = 0; i < players.length; ++i)
+    {
+        if (players[i].nodeID == nodeID)
+            return i;
+    }
+    return -1;
+}
+
+Node@ FindPlayerNode(int playerIndex)
+{
+    if (playerIndex >= 0 && playerIndex < int(players.length))
+        return gameScene.GetNodeByID(players[playerIndex].nodeID);
+    else
+        return null;
+}
+
+Node@ FindOwnNode()
+{
+    if (singlePlayer)
+        return gameScene.GetChild("Player", true);
+    else
+        return gameScene.GetNodeByID(clientNodeID);
+}
+
+bool CheckHiscore(int playerIndex)
 {
     for (uint i = 0; i < hiscores.length; ++i)
     {
         if (hiscores[i].name == players[playerIndex].name)
         {
             if (players[playerIndex].score > hiscores[i].score)
+            {
                 hiscores[i].score = players[playerIndex].score;
-            return;
+                SortHiscores();
+                return true;
+            }
+            else
+                return false; // No update to individual hiscore
         }
     }
 
@@ -550,12 +602,62 @@ void CheckHiscore(uint playerIndex)
     newHiscore.name = players[playerIndex].name;
     newHiscore.score = players[playerIndex].score;
     hiscores.Push(newHiscore);
+    SortHiscores();
+    return true;
+}
 
-    // Todo: in multiplayer, send updated hiscores to everyone
+void SortHiscores()
+{
+    for (int i = 1; i < int(hiscores.length); ++i)
+    {
+        HiscoreEntry temp = hiscores[i];
+        int j = i;
+        while (j > 0 && temp.score > hiscores[j - 1].score)
+        {
+            hiscores[j] = hiscores[j - 1];
+            --j;
+        }
+        hiscores[j] = temp;
+    }
+}
+
+void SendScore(int playerIndex)
+{
+    if (!runServer || playerIndex < 0 || playerIndex >= int(players.length))
+        return;
+
+    VariantMap eventData;
+    eventData["Score"] = players[playerIndex].score;
+    players[playerIndex].connection.SendRemoteEvent("UpdateScore", true, eventData);
+}
+
+void SendHiscores(int playerIndex)
+{
+    if (!runServer)
+        return;
+
+    VectorBuffer data;
+    data.WriteVLE(hiscores.length);
+    for (uint i = 0; i < hiscores.length; ++i)
+    {
+        data.WriteString(hiscores[i].name);
+        data.WriteInt(hiscores[i].score);
+    }
+
+    VariantMap eventData;
+    eventData["Hiscores"] = data;
+
+    if (playerIndex >= 0 && playerIndex < int(players.length))
+        players[playerIndex].connection.SendRemoteEvent("UpdateHiscores", true, eventData);
+    else
+        network.BroadcastRemoteEvent(gameScene, "UpdateHiscores", true, eventData); // Send to all in scene
 }
 
 void SpawnObjects(float timeStep)
 {
+    if (!gameOn)
+        return;
+
     // Spawn powerups
     powerupSpawnTimer += timeStep;
     if (powerupSpawnTimer >= powerupSpawnRate)
@@ -706,7 +808,7 @@ void UpdateCamera()
     Quaternion dir;
     
     // In multiplayer, make controls seem more immediate by forcing the current mouse yaw into player ninja's Y-axis rotation
-    if (runClient)
+    if (runClient && playerNode.vars["Health"].GetInt() > 0)
         playerNode.SnapRotation(Quaternion(0, playerControls.yaw, 0));
 
     dir = dir * Quaternion(playerNode.rotation.yaw, Vector3(0, 1, 0));

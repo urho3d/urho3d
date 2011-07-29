@@ -62,29 +62,29 @@ public:
     /// Set current event handler. Called by Object
     void SetEventHandler(EventHandler* handler)
     {
-        handler_ = handler;
+        eventHandler_ = handler;
     }
     
     /// Begin event send
     void BeginSendEvent(Object* sender)
     {
-        senders_.Push(sender);
+        eventSenders_.Push(sender);
     }
     
     /// End event send. Clean up event receivers removed in the meanwhile
     void EndSendEvent()
     {
-        senders_.Pop();
+        eventSenders_.Pop();
     
         // Clean up dirtied event receiver groups when event handling finishes
-        if (senders_.Empty())
+        if (eventSenders_.Empty())
         {
             if (!dirtySpecificReceivers_.Empty())
             {
                 for (Set<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
                     i != dirtySpecificReceivers_.End(); ++i)
                 {
-                    PODVector<Object*>& receivers = specificReceivers_[*i];
+                    PODVector<Object*>& receivers = specificEventReceivers_[*i];
                     for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
@@ -100,7 +100,7 @@ public:
             {
                 for (Set<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
                 {
-                    PODVector<Object*>& receivers = receivers_[*i];
+                    PODVector<Object*>& receivers = eventReceivers_[*i];
                     for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
                     {
                         if (*j == 0)
@@ -134,9 +134,9 @@ public:
     /// Return network replication attributes for all object types
     const Map<ShortStringHash, Vector<AttributeInfo> >& GetAllNetworkAttributes() const { return networkAttributes_; }
     /// Return active event sender. Null outside event handling
-    Object* GetSender() const;
+    Object* GetEventSender() const;
     /// Return active event handler. Set by Object. Null outside event handling
-    EventHandler* GetHandler() const { return handler_; }
+    EventHandler* GetEventHandler() const { return eventHandler_; }
     /// Return object type name from hash, or empty if unknown
     const String& GetTypeName(ShortStringHash type) const;
     /// Template version of returning a subsystem
@@ -160,15 +160,15 @@ public:
     PODVector<Object*>* GetReceivers(Object* sender, StringHash eventType)
     {
         Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = 
-            specificReceivers_.Find(MakePair(sender, eventType));
-        return i != specificReceivers_.End() ? &i->second_ : 0;
+            specificEventReceivers_.Find(MakePair(sender, eventType));
+        return i != specificEventReceivers_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for an event type, or null if they do not exist
     PODVector<Object*>* GetReceivers(StringHash eventType)
     {
-        Map<StringHash, PODVector<Object*> >::Iterator i = receivers_.Find(eventType);
-        return i != receivers_.End() ? &i->second_ : 0;
+        Map<StringHash, PODVector<Object*> >::Iterator i = eventReceivers_.Find(eventType);
+        return i != eventReceivers_.End() ? &i->second_ : 0;
     }
     
 private:
@@ -181,17 +181,17 @@ private:
     /// Network replication attribute descriptions per object type
     Map<ShortStringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events
-    Map<StringHash, PODVector<Object*> > receivers_;
+    Map<StringHash, PODVector<Object*> > eventReceivers_;
     /// Event receivers for specific senders' events
-    Map<Pair<Object*, StringHash>, PODVector<Object*> > specificReceivers_;
+    Map<Pair<Object*, StringHash>, PODVector<Object*> > specificEventReceivers_;
     /// Event sender stack
-    PODVector<Object*> senders_;
+    PODVector<Object*> eventSenders_;
     /// Event types that have had receivers removed during event handling
     Set<StringHash> dirtyReceivers_;
     /// Event types for specific senders that have had receivers removed during event handling
     Set<Pair<Object*, StringHash> > dirtySpecificReceivers_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases
-    WeakPtr<EventHandler> handler_;
+    WeakPtr<EventHandler> eventHandler_;
 };
 
 template <class T> void Context::RegisterFactory()

@@ -41,7 +41,7 @@ void RemoveNamedAttribute(Vector<AttributeInfo>& attributes, const String& name)
 }
 
 Context::Context() :
-    handler_(0)
+    eventHandler_(0)
 {
 }
 
@@ -115,7 +115,7 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
-    PODVector<Object*>& receivers = receivers_[eventType];
+    PODVector<Object*>& receivers = eventReceivers_[eventType];
     for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         // Check if already registered
@@ -128,7 +128,7 @@ void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    PODVector<Object*>& receivers = specificReceivers_[MakePair(sender, eventType)];
+    PODVector<Object*>& receivers = specificEventReceivers_[MakePair(sender, eventType)];
     for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
     {
         if (*j == receiver)
@@ -140,8 +140,8 @@ void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash even
 
 void Context::RemoveEventSender(Object* sender)
 {
-    for (Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = specificReceivers_.Begin();
-        i != specificReceivers_.End();)
+    for (Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator i = specificEventReceivers_.Begin();
+        i != specificEventReceivers_.End();)
     {
         Map<Pair<Object*, StringHash>, PODVector<Object*> >::Iterator current = i++;
         if (current->first_.first_ == sender)
@@ -152,7 +152,7 @@ void Context::RemoveEventSender(Object* sender)
                 if (*j)
                     (*j)->RemoveEventSender(sender);
             }
-            specificReceivers_.Erase(current);
+            specificEventReceivers_.Erase(current);
         }
     }
 }
@@ -168,7 +168,7 @@ void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
         if (*i == receiver)
         {
             // If no event handling going on, can erase the receiver. Otherwise reset the pointer and clean up later
-            if (senders_.Empty())
+            if (eventSenders_.Empty())
                 group->Erase(i);
             else
             {
@@ -190,7 +190,7 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
     {
         if (*i == receiver)
         {
-            if (senders_.Empty())
+            if (eventSenders_.Empty())
                 group->Erase(i);
             else
             {
@@ -211,10 +211,10 @@ Object* Context::GetSubsystem(ShortStringHash type) const
         return 0;
 }
 
-Object* Context::GetSender() const
+Object* Context::GetEventSender() const
 {
-    if (!senders_.Empty())
-        return senders_.Back();
+    if (!eventSenders_.Empty())
+        return eventSenders_.Back();
     else
         return 0;
 }

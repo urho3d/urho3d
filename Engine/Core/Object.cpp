@@ -288,9 +288,9 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
     return eventHandlers_.Find(MakePair(sender, eventType)) != eventHandlers_.End();
 }
 
-Object* Object::GetSender() const
+Object* Object::GetEventSender() const
 {
-    return context_->GetSender();
+    return context_->GetEventSender();
 }
 
 void Object::RemoveEventSender(Object* sender)

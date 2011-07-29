@@ -79,7 +79,7 @@ public:
     /// Return whether has subscribed to a specific sender's event
     bool HasSubscribedToEvent(Object* sender, StringHash eventType) const;
     /// Return active event sender
-    Object* GetSender() const;
+    Object* GetEventSender() const;
     /// Template version of returning a subsystem
     template <class T> T* GetSubsystem() const;
     

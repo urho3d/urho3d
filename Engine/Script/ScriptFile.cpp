@@ -543,7 +543,7 @@ void ScriptFile::HandleScriptEvent(StringHash eventType, VariantMap& eventData)
     if (!compiled_)
         return;
     
-    asIScriptFunction* function = static_cast<asIScriptFunction*>(context_->GetHandler()->GetUserData());
+    asIScriptFunction* function = static_cast<asIScriptFunction*>(context_->GetEventHandler()->GetUserData());
     
     VariantVector parameters;
     if (function->GetParamCount() > 0)
