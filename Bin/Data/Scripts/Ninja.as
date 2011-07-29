@@ -60,10 +60,17 @@ class Ninja : GameObject
         node.position = position;
         node.rotation = rotation;
 
-        // Create model
+        // Setup interest management for networking
+        node.priority = 110.0;
+        node.priorityDistanceFactor = 0.03;
+        node.minPriority = 20.0;
+
+        // Create child node for the model. Copy the owner connection in case it is set
         Node@ modelNode = node.CreateChild();
+        modelNode.owner = node.owner;
         modelNode.position = Vector3(0, -90, 0);
 
+        // Create animated model
         AnimatedModel@ model = modelNode.CreateComponent("AnimatedModel");
         model.model = cache.GetResource("Model", "Models/Ninja.mdl");
         model.material = cache.GetResource("Material", "Materials/Ninja.xml");

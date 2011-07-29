@@ -35,7 +35,7 @@ Urho3D.exe <scriptfilename> [options]
 
 The scripting language used is AngelScript (http://www.angelcode.com/angelscript); the script files have .as extension and need to be placed under either the Data or CoreData subdirectories so that Urho3D.exe can find them. An application script is required to have the function void Start(), which will be executed before starting the engine main loop. It is this function's responsibility to initialize the application and to hook up to any necessary \ref Events "events", such as the update that happens every frame.
 
-Currently, two example application scripts exist:
+Currently, three example application scripts exist:
 
 \section Running_TestScene TestScene
 
@@ -55,7 +55,7 @@ F7          Load scene
 T           Toggle profiling display
 \endverbatim
 
-TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command Urho3D.exe Scripts/TestScene.as server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, eg. Urho3D.exe Scripts/TestScene.as 127.0.0.1
+TestScene also includes a network replication test, where clients can connect, move around as invisible cameras, and create new physics objects. For this, a server needs to be started with the command TestScene.bat server (-headless switch can optionally given so that the server will not open a graphics window) and clients can connect by specifying the server address on the command line, for example TestScene.bat 127.0.0.1
 
 \section Running_NinjaSnowWar NinjaSnowWar
 
@@ -73,14 +73,16 @@ F3          Toggle profiling display
 F4          Toggle octree debug geometry
 \endverbatim
 
+NinjaSnowWar also supports client/server multiplayer. To start the server, run the command NinjaSnowWar server (-headless switch can optionally given so that the server will not open a graphics window.) To connect to a server, specify the server address on the command line, for example NinjaSnowWar.bat 127.0.0.1
+
 \section Running_Chat Chat
 
 Simple client-server chat test application. To start, run Chat.bat or ChatServer.bat in the Bin directory, or use the command Urho3D.exe Scripts/Chat.as
 
-On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages; 
+On the client, first type the server address to the text edit box and click "Connect." After connecting successfully you can start typing messages;
 either press return or click "Send" to send them. Press ESC to exit.
 
-To connect automatically, the server address can also be given on the command line, for example Urho3D.exe Scripts/Chat.as 127.0.0.1
+To connect automatically, the server address can also be given on the command line, for example Chat.bat 127.0.0.1
 
 \section Running_Commandline Command line options
 

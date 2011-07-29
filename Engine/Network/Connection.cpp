@@ -57,11 +57,12 @@ OBJECTTYPESTATIC(Connection);
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
     Object(context),
     connection_(connection),
+    position_(Vector3::ZERO),
     frameNumber_(0),
     isClient_(isClient),
     connectPending_(false),
     sceneLoaded_(false),
-    showStats_(false)
+    logStatistics_(false)
 {
 }
 
@@ -194,14 +195,19 @@ void Connection::SetControls(const Controls& newControls)
     controls_ = newControls;
 }
 
+void Connection::SetPosition(const Vector3& position)
+{
+    position_ = position;
+}
+
 void Connection::SetConnectPending(bool connectPending)
 {
     connectPending_ = connectPending;
 }
 
-void Connection::SetShowStats(bool enable)
+void Connection::SetLogStatistics(bool enable)
 {
-    showStats_ = enable;
+    logStatistics_ = enable;
 }
 
 void Connection::Disconnect(int waitMSec)
@@ -211,62 +217,59 @@ void Connection::Disconnect(int waitMSec)
 
 void Connection::SendServerUpdate()
 {
-    if (scene_ && sceneLoaded_)
+    if (!scene_ || !sceneLoaded_)
+        return;
+    
+    PROFILE(SendServerUpdate);
+    
+    const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
+    
+    // Check for new or changed nodes
+    // Start from the root node (scene) so that the scene-wide components get sent first
+    processedNodes_.Clear();
+    ProcessNode(scene_);
+    
+    // Then go through the rest of the nodes
+    for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
+        ProcessNode(i->second_);
+    
+    // Check for removed nodes
+    for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
     {
-        PROFILE(SendServerUpdate);
-        
-        const Map<unsigned, Node*>& nodes = scene_->GetAllNodes();
-        
-        // Check for new or changed nodes
-        // Start from the root node (scene) so that the scene-wide components get sent first
-        processedNodes_.Clear();
-        ProcessNode(scene_);
-        
-        // Then go through the rest of the nodes
-        for (Map<unsigned, Node*>::ConstIterator i = nodes.Begin(); i != nodes.End() && i->first_ < FIRST_LOCAL_ID; ++i)
-            ProcessNode(i->second_);
-        
-        // Check for removed nodes
-        for (Map<unsigned, NodeReplicationState>::Iterator i = sceneState_.Begin(); i != sceneState_.End();)
+        Map<unsigned, NodeReplicationState>::Iterator current = i++;
+        if (current->second_.frameNumber_ != frameNumber_)
         {
-            Map<unsigned, NodeReplicationState>::Iterator current = i++;
-            if (current->second_.frameNumber_ != frameNumber_)
-            {
-                msg_.Clear();
-                msg_.WriteVLE(current->first_);
-                
-                // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
-                // would be enough. However, this may be better due to the client not possibly having updated parenting information
-                // at the time of receiving this message
-                SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
-                sceneState_.Erase(current);
-            }
+            msg_.Clear();
+            msg_.WriteVLE(current->first_);
+            
+            // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
+            // would be enough. However, this may be better due to the client not possibly having updated parenting information
+            // at the time of receiving this message
+            SendMessage(MSG_REMOVENODE, true, true, msg_, NET_HIGH_PRIORITY);
+            sceneState_.Erase(current);
         }
-        
-        ++frameNumber_;
     }
     
-    SendQueuedRemoteEvents();
+    ++frameNumber_;
 }
 
 void Connection::SendClientUpdate()
 {
-    if (scene_ && sceneLoaded_)
-    {
-        msg_.Clear();
-        msg_.WriteUInt(controls_.buttons_);
-        msg_.WriteFloat(controls_.yaw_);
-        msg_.WriteFloat(controls_.pitch_);
-        msg_.WriteVariantMap(controls_.extraData_);
-        SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
-    }
+    if (!scene_ || !sceneLoaded_)
+        return;
     
-    SendQueuedRemoteEvents();
+    msg_.Clear();
+    msg_.WriteUInt(controls_.buttons_);
+    msg_.WriteFloat(controls_.yaw_);
+    msg_.WriteFloat(controls_.pitch_);
+    msg_.WriteVariantMap(controls_.extraData_);
+    msg_.WriteVector3(position_);
+    SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
 }
 
-void Connection::SendQueuedRemoteEvents()
+void Connection::SendRemoteEvents()
 {
-    if (showStats_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
+    if (logStatistics_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
     {
         statsTimer_.Reset();
         LOGINFO("Data in " + String(connection_->BytesInPerSec() / 1000.0f) + " KB/s Data out " +
@@ -301,7 +304,7 @@ void Connection::SendQueuedRemoteEvents()
 
 void Connection::ProcessPendingLatestData()
 {
-    if (!scene_)
+    if (!scene_ || !sceneLoaded_)
         return;
     
     // Iterate through pending node data and see if we can find the nodes now
@@ -823,7 +826,9 @@ void Connection::ProcessControls(int msgID, MemoryBuffer& msg)
     newControls.yaw_ = msg.ReadFloat();
     newControls.pitch_ = msg.ReadFloat();
     newControls.extraData_ = msg.ReadVariantMap();
+    
     SetControls(newControls);
+    SetPosition(msg.ReadVector3());
 }
 
 void Connection::ProcessSceneLoaded(int msgID, MemoryBuffer& msg)
@@ -995,6 +1000,7 @@ void Connection::ProcessNewNode(Node* node)
     msg_.WriteVLE(node->GetID());
     
     NodeReplicationState& nodeState = sceneState_[node->GetID()];
+    nodeState.priorityAcc_ = 0.0f;
     nodeState.frameNumber_ = frameNumber_;
     
     // Write node's attributes
@@ -1037,9 +1043,14 @@ void Connection::ProcessExistingNode(Node* node)
     NodeReplicationState& nodeState = sceneState_[node->GetID()];
     nodeState.frameNumber_ = frameNumber_;
     
+    // Check from interest management if should update. Owned nodes are always updated at full frequency
+    float distance = (node->GetWorldPosition() - position_).LengthFast();
+    bool doUpdate = node->GetOwner() == this || node->TestPriority(distance, nodeState.priorityAcc_);
+    if (!doUpdate)
+        return;
+    
     // Check if attributes have changed
     bool deltaUpdate, latestData;
-    
     node->PrepareUpdates(deltaUpdateBits_, classCurrentState_[node->GetType()], nodeState.attributes_, deltaUpdate, latestData);
     
     // Check if user variables have changed. Note: variable removal is not supported

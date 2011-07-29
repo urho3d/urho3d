@@ -101,10 +101,12 @@ public:
     void SetIdentity(const VariantMap& identity);
     /// Set new controls. Moves the current controls as previous
     void SetControls(const Controls& newControls);
+    /// Set the observer position for interest management
+    void SetPosition(const Vector3& position);
     /// Set the connection pending status. Called by Network
     void SetConnectPending(bool connectPending);
     /// Set whether to log data in/out statistics
-    void SetShowStats(bool enable);
+    void SetLogStatistics(bool enable);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);
     /// Send scene update messages. Called by Network
@@ -112,7 +114,7 @@ public:
     /// Send latest controls from the client. Called by Network
     void SendClientUpdate();
     /// Send queued remote events. Called by Network
-    void SendQueuedRemoteEvents();
+    void SendRemoteEvents();
     /// Process pending latest data for nodes and components
     void ProcessPendingLatestData();
     /// Process a LoadScene message from the server. Called by Network
@@ -142,6 +144,8 @@ public:
     const Controls& GetControls() const { return controls_; }
     /// Return the previous client controls of this connection
     const Controls& GetPreviousControls() const { return previousControls_; }
+    /// Return the observer position for interest management
+    const Vector3& GetPosition() const { return position_; }
     /// Return whether is a client connection
     bool IsClient() const { return isClient_; }
     /// Return whether is fully connected
@@ -151,7 +155,7 @@ public:
     /// Return whether the scene is loaded and ready to receive updates from network
     bool IsSceneLoaded() const { return sceneLoaded_; }
     /// Return whether to log data in/out statistics
-    bool GetShowStats() const { return showStats_; }
+    bool GetLogStatistics() const { return logStatistics_; }
     /// Return remote address
     String GetAddress() const;
     /// Return remote port
@@ -218,6 +222,8 @@ private:
     Controls controls_;
     /// Previous controls
     Controls previousControls_;
+    /// Observer position for interest management
+    Vector3 position_;
     /// Statistics timer
     Timer statsTimer_;
     /// Update frame number
@@ -229,5 +235,5 @@ private:
     /// Scene loaded flag
     bool sceneLoaded_;
     /// Show statistics flag
-    bool showStats_;
+    bool logStatistics_;
 };

@@ -1023,11 +1023,29 @@ There are some things to watch out for:
 
 - The \ref Node::SetOwner "owner property" of a node can be set in server code to specify the owning Connection (for example, the player that is controlling a specific game object.) This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
-- Interest management is yet to be implemented. For now, all updates of non-local nodes and components will be sent to all clients as soon as possible. There is also no built-in client-side prediction.
+- At least for now, there is no built-in client-side prediction.
+
+\section Network_InterestManagement Interest management
+
+%Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use.
+
+For each Node the following values can be configured: \ref Node::SetPriority "Priority", \ref Node::SetPriorityDistanceFactor "Priority Distance Factor", and \ref Node::SetMinPriority "Minimum Priority".
+
+During each server update, a current priority value is calculated as Priority - Priority Distance Factor * Distance. Additionally, it can never go lower than the minimum priority. This value is then added to an update accumulator. Whenever the update accumulator reaches 100.0, the attribute changes to the node and its components are sent, and the accumulator is reset.
+
+The default values are Priority 100.0, Priority Distance Factor 0.0, and Minimum Priority 0.0, which means that by default, an update is always sent. Additionally, there is a rule that if the node's owner connection is set, the owner always receives updates at full frequency.
+
+Knowing the distance requires the client telling its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection.
+
+For now, creation and removal of nodes is always sent immediately, without consulting the interest management system. This is based on the assumption that nodes' motion updates consume the most bandwidth.
 
 \section Network_Controls Client controls update
 
-The Controls structure will be used to send controls information from the client to the server, by default also at 25 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap. It is up to the application code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()". The previous controls are also stored on both ends to allow detecting button state changes.
+The Controls structure is used to send controls information from the client to the server, by default also at 25 FPS. This includes held down buttons, which is an application-defined 32-bit bitfield, floating point yaw and pitch, and possible extra data (for example the currently selected weapon) stored within a VariantMap.
+
+It is up to the client code to ensure they are kept up-to-date, by calling \ref Connection::SetControls "SetControls()" on the server connection. The event E_NETWORKUPDDATE will be sent to remind of the impending update. The controls can then be inspected on the server side by calling \ref Connection::GetControls "GetControls()". The previous controls are also stored on both ends to allow detecting button state changes.
+
+The controls update message also includes the client's observer position for interest management.
 
 \section Network_Messages Raw network messages
 

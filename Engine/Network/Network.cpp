@@ -423,13 +423,17 @@ void Network::PostUpdate(float timeStep)
             // Send server updates for each client connection
             for (Map<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
                 i != clientConnections_.End(); ++i)
+            {
                 i->second_->SendServerUpdate();
+                i->second_->SendRemoteEvents();
+            }
         }
         
         if (serverConnection_)
         {
             // Send the client update
             serverConnection_->SendClientUpdate();
+            serverConnection_->SendRemoteEvents();
         }
     }
 }

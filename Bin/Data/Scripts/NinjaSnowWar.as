@@ -177,8 +177,7 @@ void InitScene()
 void InitNetworking()
 {
     network.RegisterRemoteEvent("PlayerSpawned");
-    network.RegisterRemoteEvent("RequestRespawn");
-    
+
     if (runServer)
     {
         network.StartServer(serverPort);
@@ -186,7 +185,6 @@ void InitNetworking()
         SubscribeToEvent("ClientIdentity", "HandleClientIdentity");
         SubscribeToEvent("ClientSceneLoaded", "HandleClientSceneLoaded");
         SubscribeToEvent("ClientDisconnected", "HandleClientDisconnected");
-        SubscribeToEvent("RequestRespawn", "HandleRequestRespawn");
     }
     if (runClient)
     {
@@ -292,16 +290,22 @@ void StartGame(Connection@ connection)
     incrementCounter = 0;
     enemySpawnTimer = 0;
     powerupSpawnTimer = 0;
-    playerControls.yaw = 0;
-    playerControls.pitch = 0;
 
-    SetMessage("");
+    if (singlePlayer)
+    {
+        playerControls.yaw = 0;
+        playerControls.pitch = 0;
+        SetMessage("");
+    }
 }
 
 void SpawnPlayer(Connection@ connection)
 {
-    // Create the logic object as local, as it only needs to run on server
+    // Set owner connection. Owned nodes are always updated to the owner at full frequency
     Node@ playerNode = gameScene.CreateChild("Player");
+    playerNode.owner = connection;
+
+     // Create the logic object as local, as it only needs to run on server
     Ninja@ playerNinja = cast<Ninja>(playerNode.CreateScriptObject(scriptFile, "Ninja", LOCAL));
     if (singlePlayer)
         playerNinja.Create(Vector3(0, 90, 0), Quaternion());
@@ -513,25 +517,20 @@ void HandleClientDisconnected(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void HandleRequestRespawn(StringHash eventType, VariantMap& eventData)
-{
-    Connection@ connection = sender;
-    for (uint i = 0; i < players.length; ++i)
-    {
-        if (players[i].connection is connection && FindPlayerNode(i) is null)
-        {
-            SpawnPlayer(connection);
-            return;
-        }
-    }
-}
-
 void HandlePlayerSpawned(StringHash eventType, VariantMap& eventData)
 {
     // Store our node ID and mark the game as started
     clientNodeID = eventData["NodeID"].GetInt();
     gameOn = true;
     SetMessage("");
+
+    // Copy initial yaw from the player node (we should have it replicated now)
+    Node@ playerNode = FindOwnNode();
+    if (playerNode !is null)
+    {
+        playerControls.yaw = playerNode.rotation.yaw;
+        playerControls.pitch = 0;
+    }
 }
 
 void CheckHiscore(uint playerIndex)
@@ -621,17 +620,9 @@ void CheckEndAndRestart()
         return;
     }
 
-    // Check for restart. In singleplayer, restart game. In multiplayer, request respawn
-    if (!gameOn && playerControls.IsPressed(CTRL_FIRE | CTRL_JUMP, prevPlayerControls))
-    {
-        if (singlePlayer)
-            StartGame(null);
-        else
-        {
-            if (network.serverConnection !is null)
-                network.serverConnection.SendRemoteEvent("RequestRespawn", true);
-        }
-    }
+    // Check for restart (singleplayer only)
+    if (!gameOn && singlePlayer && playerControls.IsPressed(CTRL_FIRE | CTRL_JUMP, prevPlayerControls))
+        StartGame(null);
 }
 
 void UpdateControls()
@@ -677,7 +668,11 @@ void UpdateControls()
             }
         }
         else if (network.serverConnection !is null)
+        {
             network.serverConnection.controls = playerControls;
+            // Tell the camera position to server for interest management
+            network.serverConnection.position = gameCameraNode.worldPosition;
+        }
     }
 
     if (runServer)
@@ -690,6 +685,12 @@ void UpdateControls()
             {
                 Ninja@ playerNinja = cast<Ninja>(playerNode.scriptObject);
                 playerNinja.controls = players[i].connection.controls;
+            }
+            else
+            {
+                // If player has no ninja, respawn if fire/jump is pressed
+                if (players[i].connection.controls.IsPressed(CTRL_FIRE | CTRL_JUMP, players[i].connection.previousControls))
+                    SpawnPlayer(players[i].connection);
             }
         }
     }

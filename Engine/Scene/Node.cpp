@@ -48,6 +48,9 @@ Node::Node(Context* context) :
     worldTransform_(Matrix3x4::IDENTITY),
     targetPosition_(Vector3::ZERO),
     targetRotation_(Quaternion::IDENTITY),
+    priority_(100.0f),
+    priorityDistanceFactor_(0.0f),
+    minPriority_(0.0f),
     rotateCount_(0),
     smoothingFlags_(SMOOTH_NONE),
     dirty_(false),
@@ -398,6 +401,26 @@ void Node::Scale(const Vector3& scale)
         MarkDirty();
 }
 
+void Node::SetOwner(Connection* owner)
+{
+    owner_ = owner;
+}
+
+void Node::SetPriority(float priority)
+{
+    priority_ = Max(priority, 0.0f);
+}
+
+void Node::SetPriorityDistanceFactor(float factor)
+{
+    priorityDistanceFactor_ = Max(factor, 0.0f);
+}
+
+void Node::SetMinPriority(float priority)
+{
+    minPriority_ = Max(priority, 0.0f);
+}
+
 void Node::SetSmoothed(bool enable)
 {
     smoothed_ = enable;
@@ -733,9 +756,17 @@ void Node::SetScene(Scene* scene)
     scene_ = scene;
 }
 
-void Node::SetOwner(Connection* owner)
+bool Node::TestPriority(float distance, float& accumulator)
 {
-    owner_ = owner;
+    float currentPriority = Max(priority_ - priorityDistanceFactor_ * distance, minPriority_);
+    accumulator += currentPriority;
+    if (accumulator >= 100.0f)
+    {
+        accumulator = fmodf(accumulator, 100.0f);
+        return true;
+    }
+    else
+        return false;
 }
 
 void Node::SetNetRotationAttr(const PODVector<unsigned char>& value)

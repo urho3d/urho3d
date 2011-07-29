@@ -51,8 +51,8 @@ static void RegisterControls(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Controls", "Controls &opAssign(const Controls&in)", asMETHOD(Controls, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void Reset()", asMETHOD(Controls, Reset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Controls", "void Set(uint, bool)", asMETHOD(Controls, Set), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsDown(uint)", asMETHOD(Controls, IsDown), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls&in)", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "bool IsDown(uint) const", asMETHOD(Controls, IsDown), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Controls", "bool IsPressed(uint, const Controls&in) const", asMETHOD(Controls, IsPressed), asCALL_THISCALL);
     engine->RegisterObjectProperty("Controls", "uint buttons", offsetof(Controls, buttons_));
     engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, yaw_));
     engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, pitch_));
@@ -83,14 +83,17 @@ static void RegisterConnection(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Connection", "String ToString() const", asMETHOD(Connection, ToString), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_scene(Scene@+)", asMETHOD(Connection, SetScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "Scene@+ get_scene() const", asMETHOD(Connection, GetScene), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "void set_showStats(bool)", asMETHOD(Connection, SetShowStats), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Connection", "bool get_showStats() const", asMETHOD(Connection, GetShowStats), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void set_logStatistics(bool)", asMETHOD(Connection, SetLogStatistics), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "bool get_logStatistics() const", asMETHOD(Connection, GetLogStatistics), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_client() const", asMETHOD(Connection, IsClient), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connected() const", asMETHOD(Connection, IsConnected), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_connectPending() const", asMETHOD(Connection, IsConnectPending), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "bool get_sceneLoaded() const", asMETHOD(Connection, IsSceneLoaded), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "void set_controls(const Controls&in)", asMETHOD(Connection, SetControls), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "const Controls& get_controls() const", asMETHOD(Connection, GetControls), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "const Controls& get_previousControls() const", asMETHOD(Connection, GetPreviousControls), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "void set_position(const Vector3&in)", asMETHOD(Connection, SetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Connection", "const Vector3& get_position() const", asMETHOD(Connection, GetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "String get_address() const", asMETHOD(Connection, GetAddress), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint16 get_port() const", asMETHOD(Connection, GetPort), asCALL_THISCALL);
     engine->RegisterObjectMethod("Connection", "uint get_numDownloads() const", asMETHOD(Connection, GetNumDownloads), asCALL_THISCALL);
@@ -100,6 +103,10 @@ static void RegisterConnection(asIScriptEngine* engine)
     
     // Register Variant GetPtr() for Connection
     engine->RegisterObjectMethod("Variant", "Connection@+ GetConnection() const", asFUNCTION(GetVariantPtr<Connection>), asCALL_CDECL_OBJLAST);
+    
+    // Register SetOwner/GetOwner now
+    engine->RegisterObjectMethod("Node", "void set_owner(Connection@+)", asMETHOD(Node, SetOwner), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "Connection@+ get_owner() const", asMETHOD(Node, GetOwner), asCALL_THISCALL);
 }
 
 static Network* GetNetwork()

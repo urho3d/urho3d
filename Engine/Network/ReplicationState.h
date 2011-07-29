@@ -45,6 +45,8 @@ struct NodeReplicationState
     VariantMap vars_;
     /// Components by ID
     Map<unsigned, ComponentReplicationState> components_;
+    /// Interest management priority accumulator
+    float priorityAcc_;
     /// Update frame number
     unsigned frameNumber_;
 };

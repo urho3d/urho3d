@@ -1047,13 +1047,18 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
-- bool smoothed
 - Vector3 worldPosition (readonly)
 - Quaternion worldRotation (readonly)
 - Vector3 worldDirection (readonly)
 - Vector3 worldScale (readonly)
 - Vector3& targetPosition (readonly)
-- Vector3& targetRotation (readonly)
+- Quaternion& targetRotation (readonly)
+- Vector3 worldTargetPosition (readonly)
+- Quaternion worldTrgetRotation (readonly)
+- float priority
+- float priorityDistanceFactor
+- float minPriority
+- bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -1063,6 +1068,7 @@ Properties:<br>
 - String& name
 - Node@ parent
 - Scene@ scene (readonly)
+- Connection@ owner
 - ScriptObject@ scriptObject (readonly)
 - VariantMap vars
 
@@ -1127,13 +1133,18 @@ Properties:<br>
 - Quaternion& rotation
 - Vector3 direction
 - Vector3& scale
-- bool smoothed
 - Vector3 worldPosition (readonly)
 - Quaternion worldRotation (readonly)
 - Vector3 worldDirection (readonly)
 - Vector3 worldScale (readonly)
 - Vector3& targetPosition (readonly)
-- Vector3& targetRotation (readonly)
+- Quaternion& targetRotation (readonly)
+- Vector3 worldTargetPosition (readonly)
+- Quaternion worldTrgetRotation (readonly)
+- float priority
+- float priorityDistanceFactor
+- float minPriority
+- bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
 - uint numAllChildren (readonly)
@@ -3431,8 +3442,8 @@ Controls
 Methods:<br>
 - void Reset()
 - void Set(uint, bool)
-- bool IsDown(uint)
-- bool IsPressed(uint, const Controls&)
+- bool IsDown(uint) const
+- bool IsPressed(uint, const Controls&) const
 
 Properties:<br>
 - uint buttons
@@ -3454,12 +3465,14 @@ Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
 - Scene@ scene
-- bool showStats
+- bool logStatistics
 - bool client (readonly)
 - bool connected (readonly)
 - bool connectPending (readonly)
 - bool sceneLoaded (readonly)
 - Controls& controls
+- Controls& previousControls (readonly)
+- Vector3& position
 - String address (readonly)
 - uint16 port (readonly)
 - uint numDownloads (readonly)

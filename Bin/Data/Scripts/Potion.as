@@ -24,6 +24,11 @@ class Potion : GameObject
         node.position = position;
         node.rotation = rotation;
 
+        // Setup interest management for networking
+        node.priority = 100.0;
+        node.priorityDistanceFactor = 0.05;
+        node.minPriority = 10.0;
+
         // Create model
         StaticModel@ model = node.CreateComponent("StaticModel");
         model.model = cache.GetResource("Model", "Models/Potion.mdl");

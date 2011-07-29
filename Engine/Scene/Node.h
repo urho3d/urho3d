@@ -111,6 +111,14 @@ public:
     void Scale(float scale);
     /// Modify scale
     void Scale(const Vector3& scale);
+    /// Set owner connection for networking
+    void SetOwner(Connection* owner);
+    /// Set base interest management priority for networking. Default is 100 (send updates at full frequency)
+    void SetPriority(float priority);
+    /// Set interest management distance factor for networking. Default is 0 (no effect)
+    void SetPriorityDistanceFactor(float factor);
+    /// Set interest management minimum priority for networking. Default is 0 (no updates when far away enough)
+    void SetMinPriority(float priority);
     /// Enable or disable motion smoothing
     void SetSmoothed(bool enable);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components
@@ -224,6 +232,12 @@ public:
     
     /// Return world-space unsmoothed (target) transform. Is recalculated each time
     Matrix3x4 GetWorldTargetTransform() const;
+    /// Return interest management base priority
+    float GetPriority() const { return priority_; }
+    /// Return interest management distance factor
+    float GetPriorityDistanceFactor() const { return priorityDistanceFactor_; }
+    /// Return interest management minimum priority
+    float GetMinPriority() const { return minPriority_; }
     /// Return whether transform has changed and world transform needs recalculation
     bool IsDirty() const { return dirty_; }
     /// Return whether motion smoothing is enabled
@@ -275,8 +289,8 @@ public:
     void SetID(unsigned id);
     /// Set scene. Called by Scene
     void SetScene(Scene* scene);
-    /// Set owner connection for networking
-    void SetOwner(Connection* owner);
+    /// Increment and test interest management priority accumulator. Return true if should update. Called by Connection
+    bool TestPriority(float distance, float& accumulator);
     /// Set network rotation attribute
     void SetNetRotationAttr(const PODVector<unsigned char>& value);
     /// Set network parent attribute
@@ -343,6 +357,12 @@ private:
     Vector<WeakPtr<Component> > listeners_;
     /// Attribute buffer for network replication
     mutable VectorBuffer attrBuffer_;
+    /// Interest management base priority
+    float priority_;
+    /// Interest management priority distance factor
+    float priorityDistanceFactor_;
+    /// Interest management minimum priority
+    float minPriority_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
     /// Active smoothing flags
