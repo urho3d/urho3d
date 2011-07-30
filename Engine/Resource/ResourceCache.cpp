@@ -514,7 +514,7 @@ const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, Str
 
 void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
 {
-    Set<ShortStringHash> affectedGroups;
+    HashSet<ShortStringHash> affectedGroups;
     
     const Map<String, PackageEntry>& entries = package->GetEntries();
     for (Map<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
@@ -539,7 +539,7 @@ void ResourceCache::ReleasePackageResources(PackageFile* package, bool force)
         }
     }
     
-    for (Set<ShortStringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
+    for (HashSet<ShortStringHash>::Iterator i = affectedGroups.Begin(); i != affectedGroups.End(); ++i)
         UpdateResourceGroup(*i);
 }
 

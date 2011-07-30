@@ -36,6 +36,7 @@
 #include "Profiler.h"
 #include "Scene.h"
 #include "ShaderVariation.h"
+#include "Sort.h"
 #include "Technique.h"
 #include "Texture2D.h"
 #include "TextureCube.h"

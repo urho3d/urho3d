@@ -27,15 +27,6 @@
 #include "TreeBase.h"
 #include "VectorBase.h"
 
-#include "Set.h"
-
-void Test()
-{
-    Set<int> testSet;
-    testSet.Insert(10);
-    testSet.Erase(10);
-}
-
 template<> void Swap<String>(String& first, String& second)
 {
     first.Swap(second);

@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include "HashMap.h"
 #include "HashSet.h"
 #include "Map.h"
-#include "Set.h"
 #include "StringBase.h"
 
 #include <kNet.h>

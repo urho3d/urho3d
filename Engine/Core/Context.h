@@ -24,8 +24,8 @@
 #pragma once
 
 #include "Attribute.h"
+#include "HashSet.h"
 #include "Object.h"
-#include "Set.h"
 
 /// Execution context within a process. Provides access to the subsystems, object factories and attributes, and event receivers
 class Context : public RefCounted
@@ -81,7 +81,7 @@ public:
         {
             if (!dirtySpecificReceivers_.Empty())
             {
-                for (Set<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
+                for (HashSet<Pair<Object*, StringHash> >::Iterator i = dirtySpecificReceivers_.Begin();
                     i != dirtySpecificReceivers_.End(); ++i)
                 {
                     PODVector<Object*>& receivers = specificEventReceivers_[*i];
@@ -98,7 +98,7 @@ public:
             
             if (!dirtyReceivers_.Empty())
             {
-                for (Set<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
+                for (HashSet<StringHash>::Iterator i = dirtyReceivers_.Begin(); i != dirtyReceivers_.End(); ++i)
                 {
                     PODVector<Object*>& receivers = eventReceivers_[*i];
                     for (PODVector<Object*>::Iterator j = receivers.Begin(); j != receivers.End();)
@@ -187,9 +187,9 @@ private:
     /// Event sender stack
     PODVector<Object*> eventSenders_;
     /// Event types that have had receivers removed during event handling
-    Set<StringHash> dirtyReceivers_;
+    HashSet<StringHash> dirtyReceivers_;
     /// Event types for specific senders that have had receivers removed during event handling
-    Set<Pair<Object*, StringHash> > dirtySpecificReceivers_;
+    HashSet<Pair<Object*, StringHash> > dirtySpecificReceivers_;
     /// Active event handler. Not stored in a stack for performance reasons; is needed only in esoteric cases
     WeakPtr<EventHandler> eventHandler_;
 };

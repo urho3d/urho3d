@@ -177,7 +177,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
-    Set<Object*> processed;
+    HashSet<Object*> processed;
     
     context_->BeginSendEvent(this);
     

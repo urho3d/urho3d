@@ -32,7 +32,7 @@ class SnowBall : GameObject
 
         // Setup interest management for networking
         node.priority = 100.0;
-        node.priorityDistanceFactor = 0.04;
+        node.priorityDistanceFactor = 0.02;
         node.minPriority = 25.0;
 
         // Create model
@@ -43,7 +43,6 @@ class SnowBall : GameObject
         model.castShadows = true;
     
         // Create collision shape. Create as local to avoid divergent simulation by the client
-        // (as the client does not have the logic scripts that destroy the snowball immediately on collision)
         CollisionShape@ shape = node.CreateComponent("CollisionShape", LOCAL);
         shape.SetBox(Vector3(15, 15, 15), Vector3(), Quaternion());
         shape.collisionGroup = 1;

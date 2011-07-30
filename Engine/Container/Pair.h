@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include "Hash.h"
+
 /// Pair template class
 template <class T, class U> class Pair
 {
@@ -63,6 +65,9 @@ public:
             return false;
         return second_ > rhs.second_;
     }
+    
+    /// Return hash value for HashSet & HashMap
+    unsigned ToHash() const { return (MakeHash(first_) & 0xffff) | (MakeHash(second_) << 16); }
     
     /// First value
     T first_;

@@ -26,7 +26,6 @@
 #include "Batch.h"
 #include "HashSet.h"
 #include "Object.h"
-#include "Set.h"
 
 class Camera;
 class DebugRenderer;
@@ -66,6 +65,21 @@ struct LitTransparencyCheck
     bool operator == (const LitTransparencyCheck& rhs) const { return light_ == rhs.light_ && drawable_ == rhs.drawable_ && batchIndex_ == rhs.batchIndex_; }
     /// Test for inequality with another lit transparency check
     bool operator != (const LitTransparencyCheck& rhs) const { return light_ != rhs.light_ || drawable_ != rhs.drawable_ || batchIndex_ != rhs.batchIndex_; }
+    
+    /// Test if less than another lit transparency check
+    bool operator < (const LitTransparencyCheck& rhs) const
+    {
+        if (light_ == rhs.light_)
+        {
+            if (drawable_ == rhs.drawable_)
+                return batchIndex_ < rhs.batchIndex_;
+            else
+                return drawable_ < rhs.drawable_;
+        }
+        else
+            return light_ < rhs.light_;
+    }
+    
     /// Return hash value for HashSet & HashMap
     unsigned ToHash() const { return ((unsigned)light_) / sizeof(Light) + ((unsigned)drawable_) / sizeof(Drawable) + batchIndex_; }
     
@@ -220,7 +234,7 @@ private:
     /// Lights
     PODVector<Light*> lights_;
     /// G-buffer size error displayed
-    Set<RenderSurface*> gBufferErrorDisplayed_;
+    HashSet<RenderSurface*> gBufferErrorDisplayed_;
     /// View-global shader parameters
     HashMap<StringHash, Vector4> shaderParameters_;
     

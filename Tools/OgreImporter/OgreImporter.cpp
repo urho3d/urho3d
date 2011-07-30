@@ -650,7 +650,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                 {
                     String name = anim.GetString("name");
                     float length = anim.GetFloat("length");
-                    Set<unsigned> usedPoses;
+                    HashSet<unsigned> usedPoses;
                     XMLElement tracks = anim.GetChild("tracks");
                     if (tracks)
                     {
@@ -688,7 +688,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
                         
                         unsigned bufIndex = 0;
                         
-                        for (Set<unsigned>::Iterator i = usedPoses.Begin(); i != usedPoses.End(); ++i)
+                        for (HashSet<unsigned>::Iterator i = usedPoses.Begin(); i != usedPoses.End(); ++i)
                         {
                             XMLElement pose = poses[*i];
                             unsigned targetSubMesh = pose.GetInt("index");

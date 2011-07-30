@@ -22,3 +22,5 @@
 //
 
 #pragma once
+
+#include "StringBase.h"

@@ -162,6 +162,40 @@ public:
         return *this;
     }
     
+    /// Test for equality with another hash set. Warning: this is much slower than checking equality of two sets
+    bool operator == (const HashSet<T>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return false;
+        
+        ConstIterator i = Begin();
+        while (i != End())
+        {
+            if (!rhs.Contains(*i))
+                return false;
+            ++i;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another hash set. Warning: this is much slower than checking inequality of two sets
+    bool operator != (const HashSet<T>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return true;
+        
+        ConstIterator i = Begin();
+        while (i != End())
+        {
+            if (!rhs.Contains(*i))
+                return true;
+            ++i;
+        }
+        
+        return false;
+    }
+    
     /// Insert a key. Return an iterator to it
     Iterator Insert(const T& key)
     {

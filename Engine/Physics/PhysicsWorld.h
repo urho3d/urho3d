@@ -26,7 +26,6 @@
 #include "Component.h"
 #include "HashSet.h"
 #include "PhysicsDefs.h"
-#include "Set.h"
 #include "Vector3.h"
 
 class CollisionShape;
@@ -224,9 +223,9 @@ private:
     /// Collision contacts (PODVector<dContact>)
     void* contacts_;
     /// Collision pairs on this frame
-    Set<Pair<RigidBody*, RigidBody*> > currentCollisions_;
+    HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new"
-    Set<Pair<RigidBody*, RigidBody*> > previousCollisions_;
+    HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
     /// Already processed rigid bodies during a poststep
     HashSet<RigidBody*> processedBodies_;
     /// Collision infos to be sent as events

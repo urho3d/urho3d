@@ -191,6 +191,42 @@ public:
         return *this;
     }
     
+    /// Test for equality with another hash map. Warning: this is much slower than checking equality of two maps
+    bool operator == (const HashMap<T, U>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return false;
+        
+        ConstIterator i = Begin();
+        while (i != End())
+        {
+            ConstIterator j = rhs.Find(i->first_);
+            if (j == rhs.End() || j->second_ != i->second_)
+                return false;
+            ++i;
+        }
+        
+        return true;
+    }
+    
+    /// Test for inequality with another hash map. Warning: this is much slower than checking inequality of two maps
+    bool operator != (const HashMap<T, U>& rhs) const
+    {
+        if (rhs.size_ != size_)
+            return true;
+        
+        ConstIterator i = Begin();
+        while (i != End())
+        {
+            ConstIterator j = rhs.Find(i->first_);
+            if (j == rhs.End() || j->second_ != i->second_)
+                return true;
+            ++i;
+        }
+        
+        return false;
+    }
+    
     /// Index the map. Create a new pair if key not found
     U& operator [] (const T& key)
     {

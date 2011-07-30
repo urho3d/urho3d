@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "Map.h"
 #include "Ptr.h"
 #include "Variant.h"
 

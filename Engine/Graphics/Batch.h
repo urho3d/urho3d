@@ -23,9 +23,10 @@
 
 #pragma once
 
-#include "HashMap.h"
-#include "MathDefs.h"
 #include "GraphicsDefs.h"
+#include "HashMap.h"
+#include "Map.h"
+#include "MathDefs.h"
 #include "Ptr.h"
 #include "Vector4.h"
 
