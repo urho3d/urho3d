@@ -260,12 +260,14 @@ void Network::StopServer()
     LOGINFO("Stopped server");
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority, unsigned contentID)
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority,
+    unsigned contentID)
 {
     BroadcastMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
 }
 
-void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority, unsigned contentID)
+void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
+    unsigned priority, unsigned contentID)
 {
    // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)

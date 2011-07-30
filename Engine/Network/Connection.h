@@ -196,26 +196,26 @@ private:
     WeakPtr<Scene> scene_;
     /// Last sent state of the scene for network replication
     Map<unsigned, NodeReplicationState> sceneState_;
+    /// Preallocated attribute variants per networked object class for sending updates
+    Map<ShortStringHash, Vector<Variant> > classCurrentState_;
+    /// Waiting or ongoing package file downloads
+    Map<StringHash, PackageDownload> downloads_;
     /// Pending latest data for not yet received nodes
-    Map<unsigned, PODVector<unsigned char> > nodeLatestData_;
+    HashMap<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components
-    Map<unsigned, PODVector<unsigned char> > componentLatestData_;
-    /// Queued remote events
-    Vector<RemoteEvent> remoteEvents_;
-    /// Delta update bits
-    PODVector<unsigned char> deltaUpdateBits_;
+    HashMap<unsigned, PODVector<unsigned char> > componentLatestData_;
     /// Node's changed user variables
     HashSet<ShortStringHash> changedVars_;
     /// Already processed nodes during a replication update
     HashSet<Node*> processedNodes_;
-    /// Preallocated variants of correct type per networked object class
-    Map<ShortStringHash, Vector<Variant> > classCurrentState_;
-    /// Waiting or ongoing package file downloads
-    Map<StringHash, PackageDownload> downloads_;
+    /// Reusable message buffer
+    VectorBuffer msg_;
+    /// Reusable delta update bits
+    PODVector<unsigned char> deltaUpdateBits_;
+    /// Queued remote events
+    Vector<RemoteEvent> remoteEvents_;
     /// Scene file to load once all packages (if any) have been downloaded
     String sceneFileName_;
-    /// Reused message buffer
-    VectorBuffer msg_;
     /// Current controls
     Controls controls_;
     /// Observer position for interest management

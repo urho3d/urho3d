@@ -77,7 +77,8 @@ void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const Vecto
     SendMessage(msgID, reliable, inOrder, msg.GetData(), msg.GetSize(), priority, contentID);
 }
 
-void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority, unsigned contentID)
+void Connection::SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes,
+    unsigned priority, unsigned contentID)
 {
     // Make sure not to use kNet internal message ID's
     if (msgID <= 0x4 || msgID >= 0x3ffffffe)
@@ -307,9 +308,9 @@ void Connection::ProcessPendingLatestData()
         return;
     
     // Iterate through pending node data and see if we can find the nodes now
-    for (Map<unsigned, PODVector<unsigned char> >::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
+    for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = nodeLatestData_.Begin(); i != nodeLatestData_.End();)
     {
-        Map<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
         Node* node = scene_->GetNodeByID(current->first_);
         if (node)
         {
@@ -321,9 +322,9 @@ void Connection::ProcessPendingLatestData()
     }
     
     // Iterate through pending component data and see if we can find the components now
-    for (Map<unsigned, PODVector<unsigned char> >::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
+    for (HashMap<unsigned, PODVector<unsigned char> >::Iterator i = componentLatestData_.Begin(); i != componentLatestData_.End();)
     {
-        Map<unsigned, PODVector<unsigned char> >::Iterator current = i++;
+        HashMap<unsigned, PODVector<unsigned char> >::Iterator current = i++;
         Component* component = scene_->GetComponentByID(current->first_);
         if (component)
         {
