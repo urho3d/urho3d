@@ -220,7 +220,7 @@ String Deserializer::ReadString()
     return ret;
 }
 
-String Deserializer::ReadID()
+String Deserializer::ReadFileID()
 {
     String ret;
     ret.Resize(4);
@@ -373,6 +373,13 @@ unsigned Deserializer::ReadVLE()
     
     byte = ReadUByte();
     ret |= ((unsigned)byte) << 21;
+    return ret;
+}
+
+unsigned Deserializer::ReadNetID()
+{
+    unsigned ret = 0;
+    Read(&ret, 3);
     return ret;
 }
 

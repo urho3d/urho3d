@@ -183,7 +183,7 @@ void Image::RegisterObject(Context* context)
 bool Image::Load(Deserializer& source)
 {
     // Check for DDS compressed format
-    if (source.ReadID() != "DDS ")
+    if (source.ReadFileID() != "DDS ")
     {
         // Not DDS, use STBImage to load other image formats as uncompressed
         source.Seek(0);

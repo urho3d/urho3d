@@ -131,7 +131,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
         ErrorExit("Could not open output file " + fileName);
     
     // Write ID, number of files & placeholder for checksum
-    dest.WriteID("UPAK");
+    dest.WriteFileID("UPAK");
     dest.WriteUInt(entries_.Size());
     dest.WriteUInt(checksum_);
     
@@ -172,7 +172,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     
     // Write header again with correct offsets & checksums
     dest.Seek(0);
-    dest.WriteID("UPAK");
+    dest.WriteFileID("UPAK");
     dest.WriteUInt(entries_.Size());
     dest.WriteUInt(checksum_);
     

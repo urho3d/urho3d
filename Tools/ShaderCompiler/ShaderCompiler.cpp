@@ -47,7 +47,6 @@ enum ShaderType
     Both
 };
 
-
 struct Parameter
 {
     Parameter()
@@ -563,7 +562,7 @@ void CompileVariations(const Shader& baseShader, XMLElement& shaders)
     for (Set<Parameter>::ConstIterator i = textureUnits_.Begin(); i != textureUnits_.End(); ++i)
         textureUnits.Push(*i);
     
-    outFile.WriteID("USHD");
+    outFile.WriteFileID("USHD");
     outFile.WriteShort(baseShader.type_);
     outFile.WriteShort(useSM3_ ? 3 : 2);
     

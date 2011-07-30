@@ -71,7 +71,7 @@ bool Animation::Load(Deserializer& source)
     unsigned memoryUse = 0;
     
     // Check ID
-    if (source.ReadID() != "UANI")
+    if (source.ReadFileID() != "UANI")
     {
         LOGERROR(source.GetName() + " is not a valid animation file");
         return false;
@@ -120,7 +120,7 @@ bool Animation::Load(Deserializer& source)
 bool Animation::Save(Serializer& dest)
 {
     // Write ID, name and length
-    dest.WriteID("UANI");
+    dest.WriteFileID("UANI");
     dest.WriteString(animationName_);
     dest.WriteFloat(length_);
     

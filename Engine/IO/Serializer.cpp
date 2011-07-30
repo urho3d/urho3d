@@ -153,7 +153,7 @@ bool Serializer::WriteString(const String& value)
     return Write(chars, length + 1) == length + 1;
 }
 
-bool Serializer::WriteID(const String& value)
+bool Serializer::WriteFileID(const String& value)
 {
     bool success = true;
     unsigned length = Min((int)value.Length(), 4);
@@ -319,6 +319,11 @@ bool Serializer::WriteVLE(unsigned value)
         data[3] = (value >> 21);
         return Write(data, 4) == 4;
     }
+}
+
+bool Serializer::WriteNetID(unsigned value)
+{
+    return Write(&value, 3) == 3;
 }
 
 bool Serializer::WriteLine(const String& value)

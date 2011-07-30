@@ -873,7 +873,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             ErrorExit("Could not open output file " + outputFileName);
         
         // ID
-        dest.WriteID("UMDL");
+        dest.WriteFileID("UMDL");
         
         // Vertexbuffers
         dest.WriteUInt(vertexBuffers_.Size());
@@ -1028,7 +1028,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                 if (!dest.Open(animationFileName, FILE_WRITE))
                     ErrorExit("Could not open output file " + animationFileName);
                 
-                dest.WriteID("UANI");
+                dest.WriteFileID("UANI");
                 dest.WriteString(newAnimation.name_);
                 dest.WriteFloat(newAnimation.length_);
                 dest.WriteUInt(newAnimation.tracks_.Size());

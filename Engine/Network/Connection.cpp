@@ -240,7 +240,7 @@ void Connection::SendServerUpdate()
         if (current->second_.frameNumber_ != frameNumber_)
         {
             msg_.Clear();
-            msg_.WriteVLE(current->first_);
+            msg_.WriteNetID(current->first_);
             
             // Note: we will send MSG_REMOVENODE redundantly for each node in the hierarchy, even if removing the root node
             // would be enough. However, this may be better due to the client not possibly having updated parenting information
@@ -292,7 +292,7 @@ void Connection::SendRemoteEvents()
         }
         else
         {
-            msg_.WriteVLE(i->receiverID_);
+            msg_.WriteNetID(i->receiverID_);
             msg_.WriteStringHash(i->eventType_);
             msg_.WriteVariantMap(i->eventData_);
             SendMessage(MSG_REMOTENODEEVENT, true, i->inOrder_, msg_, NET_HIGH_PRIORITY);
@@ -315,7 +315,7 @@ void Connection::ProcessPendingLatestData()
         if (node)
         {
             MemoryBuffer msg(current->second_);
-            msg.ReadVLE(); // Skip the node ID
+            msg.ReadNetID(); // Skip the node ID
             node->ReadLatestDataUpdate(msg);
             nodeLatestData_.Erase(current);
         }
@@ -329,7 +329,7 @@ void Connection::ProcessPendingLatestData()
         if (component)
         {
             MemoryBuffer msg(current->second_);
-            msg.ReadVLE(); // Skip the component ID
+            msg.ReadNetID(); // Skip the component ID
             component->ReadLatestDataUpdate(msg);
             component->FinishUpdate();
             componentLatestData_.Erase(current);
@@ -462,7 +462,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
     {
     case MSG_CREATENODE:
         {
-            unsigned nodeID = msg.ReadVLE();
+            unsigned nodeID = msg.ReadNetID();
             // In case of the root node (scene), it should already exist. Do not create in that case
             Node* node = scene_->GetNodeByID(nodeID);
             if (!node)
@@ -496,7 +496,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
                 --numComponents;
                 
                 ShortStringHash type = msg.ReadShortStringHash();
-                unsigned componentID = msg.ReadVLE();
+                unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
                 Component* component = scene_->GetComponentByID(componentID);
@@ -523,7 +523,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_NODEDELTAUPDATE:
         {
-            unsigned nodeID = msg.ReadVLE();
+            unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNodeByID(nodeID);
             if (node)
             {
@@ -546,7 +546,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_NODELATESTDATA:
         {
-            unsigned nodeID = msg.ReadVLE();
+            unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNodeByID(nodeID);
             if (node)
                 node->ReadLatestDataUpdate(msg);
@@ -562,7 +562,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_REMOVENODE:
         {
-            unsigned nodeID = msg.ReadVLE();
+            unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNodeByID(nodeID);
             if (node)
                 node->Remove();
@@ -572,12 +572,12 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_CREATECOMPONENT:
         {
-            unsigned nodeID = msg.ReadVLE();
+            unsigned nodeID = msg.ReadNetID();
             Node* node = scene_->GetNodeByID(nodeID);
             if (node)
             {
                 ShortStringHash type = msg.ReadShortStringHash();
-                unsigned componentID = msg.ReadVLE();
+                unsigned componentID = msg.ReadNetID();
                 
                 // Check if the component by this ID and type already exists in this node
                 Component* component = scene_->GetComponentByID(componentID);
@@ -606,7 +606,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_COMPONENTDELTAUPDATE:
         {
-            unsigned componentID = msg.ReadVLE();
+            unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponentByID(componentID);
             if (component)
             {
@@ -620,7 +620,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_COMPONENTLATESTDATA:
         {
-            unsigned componentID = msg.ReadVLE();
+            unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponentByID(componentID);
             if (component)
             {
@@ -639,7 +639,7 @@ void Connection::ProcessSceneUpdate(int msgID, MemoryBuffer& msg)
         
     case MSG_REMOVECOMPONENT:
         {
-            unsigned componentID = msg.ReadVLE();
+            unsigned componentID = msg.ReadNetID();
             Component* component = scene_->GetComponentByID(componentID);
             if (component)
                 component->Remove();
@@ -699,7 +699,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                         
                         msg_.Clear();
                         msg_.WriteStringHash(nameHash);
-                        msg_.WriteVLE(i);
+                        msg_.WriteUInt(i);
                         msg_.Write(buffer, fragmentSize);
                         SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_LOW_PRIORITY);
                     }
@@ -753,7 +753,7 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
             
             // Write the fragment data to the proper index
             unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
-            unsigned index = msg.ReadVLE();
+            unsigned index = msg.ReadUInt();
             unsigned fragmentSize = msg.GetSize() - msg.GetPosition();
             
             msg.Read(buffer, fragmentSize);
@@ -887,7 +887,7 @@ void Connection::ProcessRemoteEvent(int msgID, MemoryBuffer& msg)
             return;
         }
         
-        unsigned nodeID = msg.ReadVLE();
+        unsigned nodeID = msg.ReadNetID();
         StringHash eventType = msg.ReadStringHash();
         if (!GetSubsystem<Network>()->CheckRemoteEvent(eventType))
         {
@@ -997,7 +997,7 @@ void Connection::ProcessNode(Node* node)
 void Connection::ProcessNewNode(Node* node)
 {
     msg_.Clear();
-    msg_.WriteVLE(node->GetID());
+    msg_.WriteNetID(node->GetID());
     
     NodeReplicationState& nodeState = sceneState_[node->GetID()];
     nodeState.priorityAcc_ = 0.0f;
@@ -1031,7 +1031,7 @@ void Connection::ProcessNewNode(Node* node)
         componentState.type_ = component->GetType();
         
         msg_.WriteShortStringHash(component->GetType());
-        msg_.WriteVLE(component->GetID());
+        msg_.WriteNetID(component->GetID());
         component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
     }
     
@@ -1071,7 +1071,7 @@ void Connection::ProcessExistingNode(Node* node)
     if (deltaUpdate)
     {
         msg_.Clear();
-        msg_.WriteVLE(node->GetID());
+        msg_.WriteNetID(node->GetID());
         node->WriteDeltaUpdate(msg_, deltaUpdateBits_, nodeState.attributes_);
         
         // Write changed variables
@@ -1091,7 +1091,7 @@ void Connection::ProcessExistingNode(Node* node)
     {
         // If at least one latest data attribute changes, send all of them
         msg_.Clear();
-        msg_.WriteVLE(node->GetID());
+        msg_.WriteNetID(node->GetID());
         node->WriteLatestDataUpdate(msg_, nodeState.attributes_);
         
         SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, node->GetID());
@@ -1115,9 +1115,9 @@ void Connection::ProcessExistingNode(Node* node)
             componentState.type_ = component->GetType();
             
             msg_.Clear();
-            msg_.WriteVLE(node->GetID());
+            msg_.WriteNetID(node->GetID());
             msg_.WriteShortStringHash(component->GetType());
-            msg_.WriteVLE(component->GetID());
+            msg_.WriteNetID(component->GetID());
             component->WriteInitialDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
             
             SendMessage(MSG_CREATECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
@@ -1135,7 +1135,7 @@ void Connection::ProcessExistingNode(Node* node)
             if (deltaUpdate)
             {
                 msg_.Clear();
-                msg_.WriteVLE(component->GetID());
+                msg_.WriteNetID(component->GetID());
                 component->WriteDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
                 
                 SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
@@ -1146,7 +1146,7 @@ void Connection::ProcessExistingNode(Node* node)
             {
                 // If at least one latest data attribute changes, send all of them
                 msg_.Clear();
-                msg_.WriteVLE(component->GetID());
+                msg_.WriteNetID(component->GetID());
                 component->WriteLatestDataUpdate(msg_, componentState.attributes_);
                 
                 SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, component->GetID());
@@ -1161,7 +1161,7 @@ void Connection::ProcessExistingNode(Node* node)
         if (current->second_.frameNumber_ != frameNumber_)
         {
             msg_.Clear();
-            msg_.WriteVLE(current->first_);
+            msg_.WriteNetID(current->first_);
             
             SendMessage(MSG_REMOVECOMPONENT, true, true, msg_, NET_HIGH_PRIORITY);
             nodeState.components_.Erase(current);

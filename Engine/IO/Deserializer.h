@@ -93,8 +93,8 @@ public:
     BoundingBox ReadBoundingBox();
     /// Read a null-terminated string
     String ReadString();
-    /// Read a four-letter ID
-    String ReadID();
+    /// Read a four-letter file ID
+    String ReadFileID();
     /// Read a 32-bit StringHash
     StringHash ReadStringHash();
     /// Read a 16-bit ShortStringHash
@@ -115,6 +115,8 @@ public:
     VariantMap ReadVariantMap();
     /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum
     unsigned ReadVLE();
+    /// Read a 24-bit network object ID
+    unsigned ReadNetID();
     /// Read a text line
     String ReadLine();
     

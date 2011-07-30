@@ -80,7 +80,7 @@ bool Model::Load(Deserializer& source)
     PROFILE(LoadModel);
     
     // Check ID
-    if (source.ReadID() != "UMDL")
+    if (source.ReadFileID() != "UMDL")
     {
         LOGERROR(source.GetName() + " is not a valid model file");
         return false;
@@ -283,7 +283,7 @@ bool Model::Save(Serializer& dest)
     }
     
     // Write ID
-    if (!dest.WriteID("UMDL"))
+    if (!dest.WriteFileID("UMDL"))
         return false;
     
     // Write vertex buffers

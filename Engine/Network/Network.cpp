@@ -144,7 +144,7 @@ u32 Network::ComputeContentID(kNet::message_id_t id, const char* data, size_t nu
         {
             // Return the node or component ID, which is first in the message
             MemoryBuffer msg(data, numBytes);
-            return msg.ReadVLE();
+            return msg.ReadNetID();
         }
         
     default:

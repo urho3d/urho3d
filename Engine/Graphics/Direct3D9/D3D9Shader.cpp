@@ -71,7 +71,7 @@ bool Shader::Load(Deserializer& source)
         return false;
     
     // Check ID
-    if (source.ReadID() != "USHD")
+    if (source.ReadFileID() != "USHD")
     {
         LOGERROR(source.GetName() + " is not a valid shader file");
         return false;

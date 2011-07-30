@@ -87,7 +87,7 @@ bool Scene::Load(Deserializer& source)
     StopAsyncLoading();
     
     // Check ID
-    if (source.ReadID() != "USCN")
+    if (source.ReadFileID() != "USCN")
     {
         LOGERROR(source.GetName() + " is not a valid scene file");
         return false;
@@ -108,7 +108,7 @@ bool Scene::Load(Deserializer& source)
 bool Scene::Save(Serializer& dest)
 {
     // Write ID first
-    if (!dest.WriteID("USCN"))
+    if (!dest.WriteFileID("USCN"))
     {
         LOGERROR("Could not save scene, writing to stream failed");
         return false;
@@ -181,7 +181,7 @@ bool Scene::LoadAsync(File* file)
     StopAsyncLoading();
     
     // Check ID
-    if (file->ReadID() != "USCN")
+    if (file->ReadFileID() != "USCN")
     {
         LOGERROR(file->GetName() + " is not a valid scene file");
         return false;

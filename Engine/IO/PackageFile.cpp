@@ -54,7 +54,7 @@ bool PackageFile::Open(const String& fileName)
         return false;
     
     // Check ID, then read the directory
-    if (file->ReadID() != "UPAK")
+    if (file->ReadFileID() != "UPAK")
     {
         LOGERROR(fileName + " is not a valid package file");
         return false;

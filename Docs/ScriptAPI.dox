@@ -37,6 +37,7 @@
 - void UnsubscribeFromEvent(Object@, const String&)
 - void UnsubscribeFromEvents(Object@)
 - void UnsubscribeFromAllEvents()
+- Object@ GetEventSender()
 - void Print(const String&)
 - void Print(int)
 - void Print(uint)
@@ -57,7 +58,6 @@
 \section ScriptAPI_GlobalProperties Global properties
 - String[]@ arguments
 - uint numCpuCores
-- Object@ sender
 - Time@ time
 - Log@ log
 - FileSystem@ fileSystem
@@ -186,7 +186,6 @@
 - uint DD_TARGET
 - uint DD_SOURCE_AND_TARGET
 - uint NET_LOW_PRIORITY
-- uint NET_MEDIUM_PRIORITY
 - uint NET_HIGH_PRIORITY
 - uint DEBUGHUD_SHOW_NONE
 - uint DEBUGHUD_SHOW_STATS
@@ -595,12 +594,13 @@ Methods:<br>
 - bool WriteColor(const Color&)
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteString(const String&)
-- bool WriteID(const String&)
+- bool WriteFileID(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteVariant(const Variant&)
 - bool WriteVariantMap(const VariantMap&)
 - bool WriteVLE(uint)
+- bool WriteNetID(uint)
 - bool WriteLine(const String&)
 
 
@@ -626,12 +626,13 @@ Methods:<br>
 - Color ReadColor()
 - BoundingBox ReadBoundingBox()
 - String ReadString()
-- String ReadID()
+- String ReadFileID()
 - StringHash ReadStringHash()
 - ShortStringHash ReadShortStringHash()
 - Variant ReadVariant()
 - VariantMap ReadVariantMap()
 - uint ReadVLE()
+- uint ReadNetID()
 - String ReadLine()
 - uint Seek(uint)
 
@@ -667,12 +668,13 @@ Methods:<br>
 - bool WriteColor(const Color&)
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteString(const String&)
-- bool WriteID(const String&)
+- bool WriteFileID(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteVariant(const Variant&)
 - bool WriteVariantMap(const VariantMap&)
 - bool WriteVLE(uint)
+- bool WriteNetID(uint)
 - bool WriteLine(const String&)
 - int ReadInt()
 - int16 ReadShort()
@@ -693,12 +695,13 @@ Methods:<br>
 - Color ReadColor()
 - BoundingBox ReadBoundingBox()
 - String ReadString()
-- String ReadID()
+- String ReadFileID()
 - StringHash ReadStringHash()
 - ShortStringHash ReadShortStringHash()
 - Variant ReadVariant()
 - VariantMap ReadVariantMap()
 - uint ReadVLE()
+- uint ReadNetID()
 - String ReadLine()
 - uint Seek(uint)
 
@@ -739,12 +742,13 @@ Methods:<br>
 - bool WriteColor(const Color&)
 - bool WriteBoundingBox(const BoundingBox&)
 - bool WriteString(const String&)
-- bool WriteID(const String&)
+- bool WriteFileID(const String&)
 - bool WriteStringHash(const StringHash&)
 - bool WriteShortStringHash(const ShortStringHash&)
 - bool WriteVariant(const Variant&)
 - bool WriteVariantMap(const VariantMap&)
 - bool WriteVLE(uint)
+- bool WriteNetID(uint)
 - bool WriteLine(const String&)
 - int ReadInt()
 - int16 ReadShort()
@@ -765,12 +769,13 @@ Methods:<br>
 - Color ReadColor()
 - BoundingBox ReadBoundingBox()
 - String ReadString()
-- String ReadID()
+- String ReadFileID()
 - StringHash ReadStringHash()
 - ShortStringHash ReadShortStringHash()
 - Variant ReadVariant()
 - VariantMap ReadVariantMap()
 - uint ReadVLE()
+- uint ReadNetID()
 - String ReadLine()
 - uint Seek(uint)
 
@@ -3471,7 +3476,6 @@ Properties:<br>
 - bool connectPending (readonly)
 - bool sceneLoaded (readonly)
 - Controls& controls
-- Controls& previousControls (readonly)
 - Vector3& position
 - String address (readonly)
 - uint16 port (readonly)

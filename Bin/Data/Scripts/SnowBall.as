@@ -95,7 +95,7 @@ class SnowBall : GameObject
                 if (side != otherObject.side)
                 {
                     otherObject.Damage(this, hitDamage);
-                    // Create a temp entity for the hit sound
+                    // Create a temporary node for the hit sound
                     SpawnSound(node.position, "Sounds/PlayerFistHit.wav", 0.2);
                 }
 
