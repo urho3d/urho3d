@@ -66,7 +66,5 @@ static const unsigned CONTROLS_CONTENT_ID = 1;
 static const unsigned PACKAGE_FRAGMENT_SIZE = 1024;
 // Message high priority
 static const unsigned NET_HIGH_PRIORITY = 100;
-// Message medium priority
-static const unsigned NET_MEDIUM_PRIORITY = 50;
 // Message low priority (default)
 static const unsigned NET_LOW_PRIORITY = 0;

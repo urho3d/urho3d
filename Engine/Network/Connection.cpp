@@ -264,7 +264,7 @@ void Connection::SendClientUpdate()
     msg_.WriteFloat(controls_.pitch_);
     msg_.WriteVariantMap(controls_.extraData_);
     msg_.WriteVector3(position_);
-    SendMessage(MSG_CONTROLS, false, false, msg_, NET_MEDIUM_PRIORITY, CONTROLS_CONTENT_ID);
+    SendMessage(MSG_CONTROLS, false, false, msg_, NET_HIGH_PRIORITY, CONTROLS_CONTENT_ID);
 }
 
 void Connection::SendRemoteEvents()
@@ -1083,7 +1083,7 @@ void Connection::ProcessExistingNode(Node* node)
             msg_.WriteVariant(j->second_);
         }
         
-        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_MEDIUM_PRIORITY);
+        SendMessage(MSG_NODEDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
     }
     
     // Send latestdata message if necessary
@@ -1094,7 +1094,7 @@ void Connection::ProcessExistingNode(Node* node)
         msg_.WriteVLE(node->GetID());
         node->WriteLatestDataUpdate(msg_, nodeState.attributes_);
         
-        SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_MEDIUM_PRIORITY, node->GetID());
+        SendMessage(MSG_NODELATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, node->GetID());
     }
     
     // Check for new or changed components
@@ -1138,7 +1138,7 @@ void Connection::ProcessExistingNode(Node* node)
                 msg_.WriteVLE(component->GetID());
                 component->WriteDeltaUpdate(msg_, deltaUpdateBits_, componentState.attributes_);
                 
-                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_MEDIUM_PRIORITY);
+                SendMessage(MSG_COMPONENTDELTAUPDATE, true, true, msg_, NET_HIGH_PRIORITY);
             }
             
             // Send latestdata message if necessary
@@ -1149,7 +1149,7 @@ void Connection::ProcessExistingNode(Node* node)
                 msg_.WriteVLE(component->GetID());
                 component->WriteLatestDataUpdate(msg_, componentState.attributes_);
                 
-                SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_MEDIUM_PRIORITY, component->GetID());
+                SendMessage(MSG_COMPONENTLATESTDATA, true, false, msg_, NET_HIGH_PRIORITY, component->GetID());
             }
         }
     }

@@ -72,7 +72,6 @@ void SendRemoteNodeEvent(Node* receiver, const String& eventType, bool inOrder, 
 static void RegisterConnection(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("uint NET_LOW_PRIORITY", (void*)&NET_LOW_PRIORITY);
-    engine->RegisterGlobalProperty("uint NET_MEDIUM_PRIORITY", (void*)&NET_MEDIUM_PRIORITY);
     engine->RegisterGlobalProperty("uint NET_HIGH_PRIORITY", (void*)&NET_HIGH_PRIORITY);
     
     RegisterObject<Connection>(engine, "Connection");
