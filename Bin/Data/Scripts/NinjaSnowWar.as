@@ -218,7 +218,7 @@ void CreateCamera()
 
 void CreateOverlays()
 {
-    if (engine.headless)
+    if (engine.headless || runServer)
         return;
 
     int height = graphics.height / 22;
@@ -420,10 +420,6 @@ void HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandlePostUpdate()
 {
-    // Not necessary on the server
-    if (runServer)
-        return;
-
     UpdateCamera();
     UpdateStatus();
 }
@@ -811,6 +807,17 @@ void UpdateControls()
 
 void UpdateCamera()
 {
+    if (engine.headless)
+        return;
+
+    // On the server, use a simple freelook camera
+    if (runServer)
+    {
+        UpdateFreelookCamera();
+        return;
+    }
+
+
     Node@ playerNode = FindOwnNode();
     if (playerNode is null)
         return;
@@ -843,9 +850,33 @@ void UpdateCamera()
     audio.listenerRotation = dir;
 }
 
+void UpdateFreelookCamera()
+{
+    float timeStep = time.timeStep;
+    float speedMultiplier = 1.0;
+    if (input.keyDown[KEY_LSHIFT])
+        speedMultiplier = 5.0;
+    if (input.keyDown[KEY_LCTRL])
+        speedMultiplier = 0.1;
+
+    if (input.keyDown['W'])
+        gameCameraNode.TranslateRelative(Vector3(0, 0, 1000) * timeStep * speedMultiplier);
+    if (input.keyDown['S'])
+        gameCameraNode.TranslateRelative(Vector3(0, 0, -1000) * timeStep * speedMultiplier);
+    if (input.keyDown['A'])
+        gameCameraNode.TranslateRelative(Vector3(-1000, 0, 0) * timeStep * speedMultiplier);
+    if (input.keyDown['D'])
+        gameCameraNode.TranslateRelative(Vector3(1000, 0, 0) * timeStep * speedMultiplier);
+
+    playerControls.yaw += mouseSensitivity * input.mouseMoveX;
+    playerControls.pitch += mouseSensitivity * input.mouseMoveY;
+    playerControls.pitch = Clamp(playerControls.pitch, -90, 90);
+    gameCameraNode.rotation = Quaternion(playerControls.pitch, playerControls.yaw, 0);
+}
+
 void UpdateStatus()
 {
-    if (engine.headless)
+    if (engine.headless || runServer)
         return;
 
     if (singlePlayer)
