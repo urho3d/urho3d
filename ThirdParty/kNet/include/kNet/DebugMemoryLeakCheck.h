@@ -23,14 +23,11 @@
 #include <new>
 #include <crtdbg.h>
 
-// On MSVC2008, include these files beforehand to avoid compilation errors from our operator new redefine.
-#if _MSC_VER == 1500
-#include <ios>
+// include these files beforehand to avoid compilation errors from our operator new redefine.
 #include "List.h"
 #include "Map.h"
 #include "Set.h"
 #include "Vector.h"
-#endif
 
 #ifndef _CRTDBG_MAP_ALLOC
 #define _CRTDBG_MAP_ALLOC
