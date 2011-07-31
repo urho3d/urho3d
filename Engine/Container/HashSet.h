@@ -25,7 +25,7 @@
 
 #include "HashBase.h"
 
-/// Hash-based set template class
+/// Hash set template class
 template <class T> class HashSet : public HashBase
 {
 public:

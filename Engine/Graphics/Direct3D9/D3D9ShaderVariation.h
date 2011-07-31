@@ -45,13 +45,13 @@ public:
     /// Release shader
     virtual void Release();
     
-    /// Set name
+    /// %Set name
     void SetName(const String& name);
-    /// Set bytecode
+    /// %Set bytecode
     void SetByteCode(const SharedArrayPtr<unsigned char>& byteCode);
-    /// Set to use a parameter
+    /// %Set to use a parameter
     void SetUseParameter(StringHash param, bool enable);
-    /// Set to use a texture unit
+    /// %Set to use a texture unit
     void SetUseTextureUnit(TextureUnit unit, bool enable);
     /// Clear parameter and texture unit use flags
     void ClearParameters();

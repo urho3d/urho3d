@@ -71,7 +71,7 @@ public:
     void BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
     /// Broadcast a remote node event to all client connections in the scene with this node
     void BroadcastRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Set network update FPS
+    /// %Set network update FPS
     void SetUpdateFps(int fps);
     /// Register a remote event as allowed to be sent and received. If no events are registered, all are allowed
     void RegisterRemoteEvent(StringHash eventType);
@@ -79,7 +79,7 @@ public:
     void UnregisterRemoteEvent(StringHash eventType);
     /// Unregister all remote events. This results in all being allowed
     void UnregisterAllRemoteEvents();
-    /// Set the package download cache path
+    /// %Set the package download cache path
     void SetPackageCacheDir(const String& path);
     
     /// Return network update FPS
@@ -112,7 +112,7 @@ private:
     /// Handle server disconnection
     void OnServerDisconnected();
     
-    /// kNet Network instance
+    /// kNet instance
     kNet::Network* network_;
     /// Client's server connection
     SharedPtr<Connection> serverConnection_;
@@ -120,12 +120,15 @@ private:
     Map<kNet::MessageConnection*, SharedPtr<Connection> > clientConnections_;
     /// Allowed remote events
     Set<StringHash> allowedRemoteEvents_;
-    /// Network update FPS
+    /// Update FPS
     int updateFps_;
-    /// Network time interval
+    /// Update time interval
     float updateInterval_;
-    /// Network update time accumulator
+    /// Update time accumulator
     float updateAcc_;
     /// Package cache directory
     String packageCacheDir_;
 };
+
+/// Register Network library objects
+void RegisterNetworkLibrary(Context* context);

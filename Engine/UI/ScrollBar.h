@@ -43,22 +43,22 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// React to resize
     virtual void OnResize();
     
-    /// Set orientation type
+    /// %Set orientation type
     void SetOrientation(Orientation orientation);
-    /// Set slider range maximum value (minimum value is always 0)
+    /// %Set slider range maximum value (minimum value is always 0)
     void SetRange(float range);
-    /// Set slider current value
+    /// %Set slider current value
     void SetValue(float value);
     /// Change slider current value by a delta
     void ChangeValue(float delta);
-    /// Set button scroll step
+    /// %Set button scroll step
     void SetScrollStep(float step);
-    /// Set button step factor, can be used to adjust the step for constant pixel size
+    /// %Set button step factor, can be used to adjust the step for constant pixel size
     void SetStepFactor(float factor);
     /// Scroll back one step
     void StepBack();

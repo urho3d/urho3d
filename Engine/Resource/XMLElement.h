@@ -50,47 +50,47 @@ public:
     bool RemoveChild(const String& name = String(), bool last = true);
     /// Remove child elements of certain name, or all child elements if name is empty
     bool RemoveChildren(const String& name = String());
-    /// Set an attribute
+    /// %Set an attribute
     bool SetAttribute(const String& name, const String& value);
-    /// Set a bool attribute
+    /// %Set a bool attribute
     bool SetBool(const String& name, bool value);
-    /// Set a BoundingBox attribute
+    /// %Set a BoundingBox attribute
     bool SetBoundingBox(const BoundingBox& value);
-    /// Set a buffer attribute
+    /// %Set a buffer attribute
     bool SetBuffer(const String& name, const void* data, unsigned size);
-    /// Set a buffer attribute
+    /// %Set a buffer attribute
     bool SetBuffer(const String& name, const PODVector<unsigned char>& value);
-    /// Set a Color attribute
+    /// %Set a Color attribute
     bool SetColor(const String& name, const Color& value);
-    /// Set a float attribute
+    /// %Set a float attribute
     bool SetFloat(const String& name, float value);
-    /// Set an integer attribute
+    /// %Set an integer attribute
     bool SetInt(const String& name, int value);
-    /// Set an IntRect attribute
+    /// %Set an IntRect attribute
     bool SetIntRect(const String& name, const IntRect& value);
-    /// Set an IntVector2 attribute
+    /// %Set an IntVector2 attribute
     bool SetIntVector2(const String& name, const IntVector2& value);
-    /// Set a Rect attribute
+    /// %Set a Rect attribute
     bool SetRect(const String& name, const Rect& value);
-    /// Set a Quaternion attribute
+    /// %Set a Quaternion attribute
     bool SetQuaternion(const String& name, const Quaternion& value);
-    /// Set a string attribute
+    /// %Set a string attribute
     bool SetString(const String& name, const String& value);
-    /// Set a Variant attribute
+    /// %Set a Variant attribute
     bool SetVariant(const Variant& value);
-    /// Set a ResourceRef attribute
+    /// %Set a ResourceRef attribute
     bool SetResourceRef(const ResourceRef& value);
-    /// Set a ResourceRefList attribute
+    /// %Set a ResourceRefList attribute
     bool SetResourceRefList(const ResourceRefList& value);
-    /// Set a VariantVector attribute. Creates child elements as necessary
+    /// %Set a VariantVector attribute. Creates child elements as necessary
     bool SetVariantVector(const VariantVector& value);
-    /// Set a VariantMap attribute. Creates child elements as necessary
+    /// %Set a VariantMap attribute. Creates child elements as necessary
     bool SetVariantMap(const VariantMap& value);
-    /// Set a Vector2 attribute
+    /// %Set a Vector2 attribute
     bool SetVector2(const String& name, const Vector2& value);
-    /// Set a Vector3 attribute
+    /// %Set a Vector3 attribute
     bool SetVector3(const String& name, const Vector3& value);
-    /// Set a Vector4 attribute
+    /// %Set a Vector4 attribute
     bool SetVector4(const String& name, const Vector4& value);
     
     /// Return whether does not refer to an element

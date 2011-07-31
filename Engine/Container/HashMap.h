@@ -26,7 +26,7 @@
 #include "HashBase.h"
 #include "Pair.h"
 
-/// Hash-based map template class
+/// Hash map template class
 template <class T, class U> class HashMap : public HashBase
 {
 public:

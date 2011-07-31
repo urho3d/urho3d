@@ -294,7 +294,7 @@ public:
         Resize(newSize, 0);
     }
     
-    /// Set new capacity
+    /// %Set new capacity
     void Reserve(unsigned newCapacity)
     {
         if (newCapacity < size_)
@@ -724,7 +724,7 @@ public:
         size_ = newSize;
     }
     
-    /// Set new capacity
+    /// %Set new capacity
     void Reserve(unsigned newCapacity)
     {
         if (newCapacity < size_)

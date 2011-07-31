@@ -185,9 +185,9 @@ public:
     void DrawDebugGeometry(bool depthTest);
     
 private:
-    /// Set of drawable objects that require update
+    /// %Set of drawable objects that require update
     HashSet<Drawable*> drawableUpdates_;
-    /// Set of drawable objects that require reinsertion
+    /// %Set of drawable objects that require reinsertion
     HashSet<Drawable*> drawableReinsertions_;
     /// Subdivision level
     unsigned numLevels_;

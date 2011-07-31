@@ -148,7 +148,7 @@ private:
     void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool getShadowCasters);
     /// Check visibility of one shadow caster
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
-    /// Set up initial shadow camera view
+    /// %Set up initial shadow camera view
     void SetupShadowCamera(Light* light, bool shadowOcclusion = false);
     /// Focus shadow camera to use shadow map texture space more optimally
     void FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox);

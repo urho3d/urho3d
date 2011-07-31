@@ -55,19 +55,19 @@ public:
     void Play(Sound* sound, float frequency, float gain, float panning);
     /// Stop playback
     void Stop();
-    /// Set sound type, determines which master gain control it uses
+    /// %Set sound type, determines which master gain control it uses
     void SetSoundType(SoundType type);
-    /// Set frequency
+    /// %Set frequency
     void SetFrequency(float frequency);
-    /// Set gain. 0.0 is silence, 1.0 is full volume
+    /// %Set gain. 0.0 is silence, 1.0 is full volume
     void SetGain(float gain);
-    /// Set attenuation. 1.0 is unaltered. Used for distance attenuated playback
+    /// %Set attenuation. 1.0 is unaltered. Used for distance attenuated playback
     void SetAttenuation(float attenuation);
-    /// Set stereo panning. -1.0 is full left and 1.0 is full right
+    /// %Set stereo panning. -1.0 is full left and 1.0 is full right
     void SetPanning(float panning);
-   /// Set whether sound source will be automatically removed from the scene node when playback stops
+   /// %Set whether sound source will be automatically removed from the scene node when playback stops
     void SetAutoRemove(bool enable);
-    /// Set new playback position
+    /// %Set new playback position
     void SetPlayPosition(signed char* pos);
     
     /// Return sound
@@ -95,16 +95,16 @@ public:
     void PlayLockless(Sound* sound);
     /// Stop sound without locking the audio mutex. Called internally
     void StopLockless();
-    /// Set new playback position without locking the audio mutex. Called internally
+    /// %Set new playback position without locking the audio mutex. Called internally
     void SetPlayPositionLockless(signed char* position);
     /// Update the sound source. Perform subclass specific operations. Called by Sound
     virtual void Update(float timeStep);
     /// Mix sound source output to a 32-bit clipping buffer. Called by Sound
     void Mix(int* dest, unsigned samples, int mixRate, bool stereo, bool interpolate);
     
-    /// Set sound attribute
+    /// %Set sound attribute
     void SetSoundAttr(ResourceRef value);
-    /// Set sound position attribute
+    /// %Set sound position attribute
     void SetPositionAttr(int value);
     /// Return sound attribute
     ResourceRef GetSoundAttr() const;

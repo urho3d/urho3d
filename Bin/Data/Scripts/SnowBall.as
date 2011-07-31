@@ -31,9 +31,10 @@ class SnowBall : GameObject
         node.rotation = rotation;
 
         // Setup interest management for networking
-        node.priority = 100.0;
-        node.priorityDistanceFactor = 0.02;
-        node.minPriority = 25.0;
+        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
+        priority.basePriority = 100.0;
+        priority.distanceFactor = 0.02;
+        priority.minPriority = 25.0;
 
         // Create model
         StaticModel@ model = node.CreateComponent("StaticModel");

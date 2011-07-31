@@ -46,11 +46,11 @@ public:
     /// Release buffer
     virtual void Release();
     
-    /// Set buffer size and dynamic mode. Previous data will be lost
+    /// %Set buffer size and dynamic mode. Previous data will be lost
     bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
-    /// Set all data in the buffer,
+    /// %Set all data in the buffer,
     bool SetData(const void* data);
-    /// Set a data range in the buffer
+    /// %Set a data range in the buffer
     bool SetDataRange(const void* data, unsigned start, unsigned count);
     /// Lock a data range in the buffer. Return pointer to locked data if successful
     void* Lock(unsigned start, unsigned count, LockMode mode);

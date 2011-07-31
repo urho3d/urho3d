@@ -43,21 +43,21 @@ public:
     /// Destruct
     ~AnimationState();
     
-    /// Set start bone
+    /// %Set start bone
     void SetStartBone(Bone* bone);
-    /// Set looping enabled/disabled
+    /// %Set looping enabled/disabled
     void SetLooped(bool looped);
-    /// Set blending weight
+    /// %Set blending weight
     void SetWeight(float weight);
-    /// Set time position
+    /// %Set time position
     void SetTime(float time);
     /// Modify blending weight
     void AddWeight(float delta);
     /// Modify time position
     void AddTime(float delta);
-    /// Set blending layer
+    /// %Set blending layer
     void SetLayer(unsigned char layer);
-    /// Set whether to use nlerp instead of slerp for rotation, default false
+    /// %Set whether to use nlerp instead of slerp for rotation, default false
     void SetUseNlerp(bool enable);
     
     /// Return animation

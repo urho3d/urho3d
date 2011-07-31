@@ -36,23 +36,23 @@ public:
     Zone(Context* context);
     /// Destruct
     virtual ~Zone();
-    /// Register object factory
+    /// Register object factory. Drawable must be registered first
     static void RegisterObject(Context* context);
     
     /// Handle attribute write access
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     
-    /// Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside
+    /// %Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside
     void SetBoundingBox(const BoundingBox& box);
-    /// Set ambient color
+    /// %Set ambient color
     void SetAmbientColor(const Color& color);
-    /// Set fog color
+    /// %Set fog color
     void SetFogColor(const Color& color);
-    /// Set fog start distance
+    /// %Set fog start distance
     void SetFogStart(float start);
-    /// Set fog end distance
+    /// %Set fog end distance
     void SetFogEnd(float end);
-    /// Set zone priority. If camera is inside several zones, the one with highest priority is used
+    /// %Set zone priority. If camera is inside several zones, the one with highest priority is used
     void SetPriority(int priority);
     
     /// Return bounding box

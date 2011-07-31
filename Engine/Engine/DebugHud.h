@@ -49,13 +49,13 @@ public:
     
     /// Update. Called by HandleUpdate()
     void Update(float timeStep);
-    /// Set UI elements' style from an XML file
+    /// %Set UI elements' style from an XML file
     void SetStyle(XMLFile* style);
-    /// Set elements to show
+    /// %Set elements to show
     void SetMode(unsigned mode);
-    /// Set profiler accumulation interval
+    /// %Set profiler accumulation interval
     void SetProfilerInterval(float interval);
-    /// Set whether to show 3D geometry primitive/batch count only. Default false
+    /// %Set whether to show 3D geometry primitive/batch count only. Default false
     void SetUseRendererStats(bool enable);
     /// Toggle elements
     void Toggle(unsigned mode);

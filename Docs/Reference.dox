@@ -1033,17 +1033,17 @@ There are some things to watch out for:
 
 \section Network_InterestManagement Interest management
 
-%Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use.
+%Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use. To use, create the NetworkPriority component to a Node you wish to apply interest management to. The component can be created as local, as it is not important to the clients.
 
-For each Node the following parameters can be set: \ref Node::SetPriority "priority", \ref Node::SetPriorityDistanceFactor "priority distance factor", and \ref Node::SetMinPriority "minimum priority".
+This component has three parameters for controlling the update frequency: \ref NetworkPriority::SetBasePriority "base priority", \ref NetworkPriority::SetDistanceFactor "distance factor", and \ref NetworkPriority::SetMinPriority "minimum priority".
 
-During each server update, a current priority value is calculated as "priority - priority distance factor * distance." Additionally, it can never go lower than the minimum priority. This value is then added to an update accumulator. Whenever the update accumulator reaches 100.0, the attribute changes to the node and its components are sent, and the accumulator is reset.
+A current priority value is calculated on each server update as "base priority - distance factor * distance." Additionally, it can never go lower than the minimum priority. This value is then added to an update accumulator. Whenever the update accumulator reaches 100.0, the attribute changes to the node and its components are sent, and the accumulator is reset.
 
-The default values are priority 100.0, priority distance factor 0.0, and minimum priority 0.0. This means that by default an update is always sent. Additionally, there is a rule that if the node's owner connection is set, the owner always receives updates at full frequency. Note that like the owner connection, the interest management parameters are not replicated to the client.
+The default values are base priority 100.0, distance factor 0.0, and minimum priority 0.0. This means that by default an update is always sent (which is also the case if the node has no NetworkPriority component.) Additionally, there is a rule that the node's owner connection always receives updates at full frequency. This rule can be controlled by calling \ref NetworkPriority::SetAlwaysUpdateOwner "SetAlwaysUpdateOwner()".
 
 Calculating the distance requires the client to tell its current observer position (typically, either the camera's or the player character's world position.) This is accomplished by the client code calling \ref Connection::SetPosition "SetPosition()" on the server connection.
 
-For now, creation and removal of nodes is always sent immediately, without consulting the interest management system. This is based on the assumption that nodes' motion updates consume the most bandwidth.
+For now, creation and removal of nodes is always sent immediately, without consulting interest management. This is based on the assumption that nodes' motion updates consume the most bandwidth.
 
 \section Network_Controls Client controls update
 

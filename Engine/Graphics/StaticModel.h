@@ -37,7 +37,7 @@ public:
     StaticModel(Context* context);
     /// Destruct
     ~StaticModel();
-    /// Register object factory
+    /// Register object factory. Drawable must be registered first
     static void RegisterObject(Context* context);
     
     /// Process renderer raycast
@@ -51,13 +51,13 @@ public:
     /// Draw to occlusion buffer
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
-    /// Set model
+    /// %Set model
     void SetModel(Model* model);
-    /// Set material on all geometries
+    /// %Set material on all geometries
     void SetMaterial(Material* material);
-    /// Set material on one geometry
+    /// %Set material on one geometry
     bool SetMaterial(unsigned index, Material* material);
-    /// Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible
+    /// %Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible
     void SetSoftwareLodLevel(unsigned level);
     
     /// Return model
@@ -71,9 +71,9 @@ public:
     /// Return software LOD level
     unsigned GetSoftwareLodLevel() const { return softwareLodLevel_; }
     
-    /// Set model attribute
+    /// %Set model attribute
     void SetModelAttr(ResourceRef value);
-    /// Set materials attribute
+    /// %Set materials attribute
     void SetMaterialsAttr(ResourceRefList value);
     /// Return model attribute
     ResourceRef GetModelAttr() const;
@@ -83,9 +83,9 @@ public:
 protected:
     /// Update the world bounding box
     virtual void OnWorldBoundingBoxUpdate();
-    /// Set the bounding box
+    /// %Set the bounding box
     void SetBoundingBox(const BoundingBox& box);
-    /// Set number of geometries
+    /// %Set number of geometries
     void SetNumGeometries(unsigned num);
     /// Reset LOD levels
     void ResetLodLevels();

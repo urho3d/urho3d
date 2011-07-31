@@ -532,12 +532,6 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Quaternion& get_targetRotation() const", asMETHOD(T, GetTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldTargetPosition() const", asMETHOD(T, GetWorldTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldTrgetRotation() const", asMETHOD(T, GetWorldTargetRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_priority(float)", asMETHOD(T, SetPriority), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_priority() const", asMETHOD(T, GetPriority), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_priorityDistanceFactor(float)", asMETHOD(T, SetPriorityDistanceFactor), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_priorityDistanceFactor() const", asMETHOD(T, GetPriorityDistanceFactor), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_minPriority(float)", asMETHOD(T, SetMinPriority), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "float get_minPriority() const", asMETHOD(T, GetMinPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_smoothed(bool)", asMETHOD(T, SetSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_smoothed() const", asMETHOD(T, IsSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);

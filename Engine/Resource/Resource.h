@@ -43,9 +43,9 @@ public:
     /// Save resource. Return true if successful
     virtual bool Save(Serializer& dest);
     
-    /// Set name
+    /// %Set name
     void SetName(const String& name);
-    /// Set memory use in bytes, possibly approximate
+    /// %Set memory use in bytes, possibly approximate
     void SetMemoryUse(unsigned size);
     /// Reset last used timer
     void ResetUseTimer();

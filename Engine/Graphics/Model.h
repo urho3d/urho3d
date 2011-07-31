@@ -76,19 +76,19 @@ public:
     /// Save resource. Return true if successful
     virtual bool Save(Serializer& dest);
     
-    /// Set bounding box
+    /// %Set bounding box
     void SetBoundingBox(const BoundingBox& box);
-    /// Set number of geometries
+    /// %Set number of geometries
     void SetNumGeometries(unsigned num);
-    /// Set number of LOD levels in a geometry
+    /// %Set number of LOD levels in a geometry
     bool SetNumGeometryLodLevels(unsigned index, unsigned num);
-    /// Set geometry
+    /// %Set geometry
     bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
-    /// Set skeleton
+    /// %Set skeleton
     void SetSkeleton(const Skeleton& skeleton);
-    /// Set bone mappings when model has more bones than the skinning shader can handle
+    /// %Set bone mappings when model has more bones than the skinning shader can handle
     void SetGeometryBoneMappings(const Vector<PODVector<unsigned> >& mappings);
-    /// Set vertex morphs
+    /// %Set vertex morphs
     void SetMorphs(const Vector<ModelMorph>& morphs);
     
     /// Return bounding box

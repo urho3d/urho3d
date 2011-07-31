@@ -281,7 +281,7 @@ public:
         );
     }
     
-    /// Set translation elements
+    /// %Set translation elements
     void SetTranslation(const Vector3& translation)
     {
         m03_ = translation.x_;
@@ -289,7 +289,7 @@ public:
         m23_ = translation.z_;
     }
     
-    /// Set rotation elements from a 3x3 matrix
+    /// %Set rotation elements from a 3x3 matrix
     void SetRotation(const Matrix3& rotation)
     {
         m00_ = rotation.m00_;

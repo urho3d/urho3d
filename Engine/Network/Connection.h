@@ -99,13 +99,13 @@ public:
     void SetScene(Scene* newScene);
     /// Assign identity. Called by Network
     void SetIdentity(const VariantMap& identity);
-    /// Set new controls. Moves the current controls as previous
+    /// %Set new controls. Moves the current controls as previous
     void SetControls(const Controls& newControls);
-    /// Set the observer position for interest management
+    /// %Set the observer position for interest management
     void SetPosition(const Vector3& position);
-    /// Set the connection pending status. Called by Network
+    /// %Set the connection pending status. Called by Network
     void SetConnectPending(bool connectPending);
-    /// Set whether to log data in/out statistics
+    /// %Set whether to log data in/out statistics
     void SetLogStatistics(bool enable);
     /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
     void Disconnect(int waitMSec = 0);

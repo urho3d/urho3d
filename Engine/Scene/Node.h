@@ -73,23 +73,23 @@ public:
     /// Perform finalization for components and child nodes. Called after scene load, but not for network updates
     virtual void FinishUpdate();
     
-    /// Set name
+    /// %Set name
     void SetName(const String& name);
-    /// Set position
+    /// %Set position
     void SetPosition(const Vector3& position);
-    /// Set rotation
+    /// %Set rotation
     void SetRotation(const Quaternion& rotation);
-    /// Set direction. Positive Z equals identity
+    /// %Set direction. Positive Z equals identity
     void SetDirection(const Vector3& direction);
-    /// Set uniform scale
+    /// %Set uniform scale
     void SetScale(float scale);
-    /// Set scale
+    /// %Set scale
     void SetScale(const Vector3& scale);
-    /// Set transform
+    /// %Set transform
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set transform
+    /// %Set transform
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
-    /// Set transform
+    /// %Set transform
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     /// Snap position immediately, even if smoothing enabled
     void SnapPosition(const Vector3& position);
@@ -111,14 +111,8 @@ public:
     void Scale(float scale);
     /// Modify scale
     void Scale(const Vector3& scale);
-    /// Set owner connection for networking
+    /// %Set owner connection for networking
     void SetOwner(Connection* owner);
-    /// Set base interest management priority for networking. Default is 100 (send updates at full frequency)
-    void SetPriority(float priority);
-    /// Set interest management distance factor for networking. Default is 0 (no effect)
-    void SetPriorityDistanceFactor(float factor);
-    /// Set interest management minimum priority for networking. Default is 0 (no updates when far away enough)
-    void SetMinPriority(float priority);
     /// Enable or disable motion smoothing
     void SetSmoothed(bool enable);
     /// Mark node and child nodes to need world transform recalculation. Notify listener components
@@ -145,7 +139,7 @@ public:
     void RemoveListener(Component* component);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion
     void Remove();
-    /// Set parent scene node. Same as parent->AddChild(this)
+    /// %Set parent scene node. Same as parent->AddChild(this)
     void SetParent(Node* parent);
     /// Template version of creating a component
     template <class T> T* CreateComponent(CreateMode mode = REPLICATED);
@@ -232,12 +226,6 @@ public:
     
     /// Return world-space unsmoothed (target) transform. Is recalculated each time
     Matrix3x4 GetWorldTargetTransform() const;
-    /// Return interest management base priority
-    float GetPriority() const { return priority_; }
-    /// Return interest management distance factor
-    float GetPriorityDistanceFactor() const { return priorityDistanceFactor_; }
-    /// Return interest management minimum priority
-    float GetMinPriority() const { return minPriority_; }
     /// Return whether transform has changed and world transform needs recalculation
     bool IsDirty() const { return dirty_; }
     /// Return whether motion smoothing is enabled
@@ -285,15 +273,13 @@ public:
     /// Template version of checking whether has a specific component
     template <class T> bool HasComponent() const;
     
-    /// Set ID. Called by Scene
+    /// %Set ID. Called by Scene
     void SetID(unsigned id);
-    /// Set scene. Called by Scene
+    /// %Set scene. Called by Scene
     void SetScene(Scene* scene);
-    /// Increment and test interest management priority accumulator. Return true if should update. Called by Connection
-    bool TestPriority(float distance, float& accumulator);
-    /// Set network rotation attribute
+    /// %Set network rotation attribute
     void SetNetRotationAttr(const PODVector<unsigned char>& value);
-    /// Set network parent attribute
+    /// %Set network parent attribute
     void SetNetParentAttr(const PODVector<unsigned char>& value);
     /// Return network rotation attribute
     const PODVector<unsigned char>& GetNetRotationAttr() const;
@@ -357,12 +343,6 @@ private:
     Vector<WeakPtr<Component> > listeners_;
     /// Attribute buffer for network replication
     mutable VectorBuffer attrBuffer_;
-    /// Interest management base priority
-    float priority_;
-    /// Interest management priority distance factor
-    float priorityDistanceFactor_;
-    /// Interest management minimum priority
-    float minPriority_;
     /// Consecutive rotation count for rotation renormalization
     unsigned char rotateCount_;
     /// Active smoothing flags

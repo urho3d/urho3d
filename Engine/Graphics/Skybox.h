@@ -35,7 +35,7 @@ public:
     Skybox(Context* context);
     /// Destruct
     virtual ~Skybox();
-    /// Register object factory
+    /// Register object factory. StaticModel must be registered first
     static void RegisterObject(Context* context);
     
     /// Calculate distance for rendering

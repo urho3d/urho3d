@@ -41,20 +41,20 @@ public:
     
     /// Read bytes from the buffer. Return number of bytes actually read
     virtual unsigned Read(void* dest, unsigned size);
-    /// Set position from the beginning of the buffer
+    /// %Set position from the beginning of the buffer
     virtual unsigned Seek(unsigned position);
     /// Write bytes to the buffer. Return number of bytes actually written
     virtual unsigned Write(const void* data, unsigned size);
     
-    /// Set data from another buffer
+    /// %Set data from another buffer
     void SetData(const PODVector<unsigned char>& data);
-    /// Set data from a memory area
+    /// %Set data from a memory area
     void SetData(const void* data, unsigned size);
-    /// Set data from a stream
+    /// %Set data from a stream
     void SetData(Deserializer& source, unsigned size);
     /// Reset to zero size
     void Clear();
-    /// Set size
+    /// %Set size
     void Resize(unsigned size);
     
     /// Return data

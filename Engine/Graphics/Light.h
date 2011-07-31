@@ -142,7 +142,7 @@ public:
     Light(Context* context);
     /// Destruct
     virtual ~Light();
-    /// Register object factory
+    /// Register object factory. Drawable must be registered first
     static void RegisterObject(Context* context);
     
     /// Calculate distance for rendering
@@ -150,37 +150,37 @@ public:
     /// Add debug geometry to the debug graphics
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Set light type
+    /// %Set light type
     void SetLightType(LightType type);
-    /// Set color
+    /// %Set color
     void SetColor(const Color& color);
-    /// Set specular intensity
+    /// %Set specular intensity
     void SetSpecularIntensity(float intensity);
-    /// Set range
+    /// %Set range
     void SetRange(float range);
-    /// Set spotlight field of view
+    /// %Set spotlight field of view
     void SetFov(float fov);
-    /// Set spotlight aspect ratio
+    /// %Set spotlight aspect ratio
     void SetAspectRatio(float aspectRatio);
-    /// Set fade out start distance
+    /// %Set fade out start distance
     void SetFadeDistance(float distance);
-    /// Set shadow fade out start distance. Only has effect if shadow distance is also non-zero
+    /// %Set shadow fade out start distance. Only has effect if shadow distance is also non-zero
     void SetShadowFadeDistance(float distance);
-    /// Set shadow depth bias parameters
+    /// %Set shadow depth bias parameters
     void SetShadowBias(const BiasParameters& parameters);
-    /// Set directional light cascaded shadow parameters
+    /// %Set directional light cascaded shadow parameters
     void SetShadowCascade(const CascadeParameters& parameters);
-    /// Set shadow map focusing parameters
+    /// %Set shadow map focusing parameters
     void SetShadowFocus(const FocusParameters& parameters);
-    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    /// %Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
-    /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use
+    /// %Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use
     void SetShadowResolution(float resolution);
-    /// Set shadow camera near/far clip distance ratio
+    /// %Set shadow camera near/far clip distance ratio
     void SetShadowNearFarRatio(float nearFarRatio);
-    /// Set range attenuation texture
+    /// %Set range attenuation texture
     void SetRampTexture(Texture* texture);
-    /// Set spotlight attenuation texture
+    /// %Set spotlight attenuation texture
     void SetShapeTexture(Texture* texture);
     
     /// Return light type
@@ -218,19 +218,19 @@ public:
     /// Return spotlight frustum
     Frustum GetFrustum() const;
     
-    /// Set near split distance for directional light
+    /// %Set near split distance for directional light
     void SetNearSplit(float near);
-    /// Set far split distance for directional light
+    /// %Set far split distance for directional light
     void SetFarSplit(float far);
-    /// Set near fade range for directional light
+    /// %Set near fade range for directional light
     void SetNearFadeRange(float range);
-    /// Set far fade range for directional light
+    /// %Set far fade range for directional light
     void SetFarFadeRange(float range);
-    /// Set shadow camera
+    /// %Set shadow camera
     void SetShadowCamera(Camera* camera);
-    /// Set shadow map depth texture
+    /// %Set shadow map depth texture
     void SetShadowMap(Texture2D* shadowMap);
-    /// Set sort value based on intensity at given world position
+    /// %Set sort value based on intensity at given world position
     void SetIntensitySortValue(const Vector3& position);
     /// Copy values from another light
     void CopyFrom(Light* original);
@@ -255,9 +255,9 @@ public:
     /// Return light volume model transform. For directional lights, the view transform must be overridden
     const Matrix3x4& GetVolumeTransform(Camera& camera);
     
-    /// Set ramp texture attribute
+    /// %Set ramp texture attribute
     void SetRampTextureAttr(ResourceRef value);
-    /// Set shape texture attribute
+    /// %Set shape texture attribute
     void SetShapeTextureAttr(ResourceRef value);
     /// Return ramp texture attribute
     ResourceRef GetRampTextureAttr() const;

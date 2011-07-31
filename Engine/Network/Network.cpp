@@ -29,6 +29,7 @@
 #include "MemoryBuffer.h"
 #include "Network.h"
 #include "NetworkEvents.h"
+#include "NetworkPriority.h"
 #include "Profiler.h"
 #include "Protocol.h"
 #include "Scene.h"
@@ -484,4 +485,9 @@ void Network::OnServerDisconnected()
     }
     
     serverConnection_.Reset();
+}
+
+void RegisterNetworkLibrary(Context* context)
+{
+    NetworkPriority::RegisterObject(context);
 }

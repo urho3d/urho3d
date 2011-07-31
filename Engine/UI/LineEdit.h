@@ -43,7 +43,7 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update
     virtual void Update(float timeStep);
@@ -67,21 +67,21 @@ public:
     /// React to losing focus
     virtual void OnDefocus();
     
-    /// Set text
+    /// %Set text
     void SetText(const String& text);
-    /// Set cursor position
+    /// %Set cursor position
     void SetCursorPosition(unsigned position);
-    /// Set cursor blink rate. 0 disables blinking
+    /// %Set cursor blink rate. 0 disables blinking
     void SetCursorBlinkRate(float rate);
-    /// Set maximum text length. 0 for unlimited
+    /// %Set maximum text length. 0 for unlimited
     void SetMaxLength(unsigned length);
-    /// Set echo character for password entry and such. 0 (default) shows the actual text
+    /// %Set echo character for password entry and such. 0 (default) shows the actual text
     void SetEchoCharacter(char c);
-    /// Set whether can move cursor with arrows or mouse, default true
+    /// %Set whether can move cursor with arrows or mouse, default true
     void SetCursorMovable(bool enable);
-    /// Set whether selections are allowed, default true
+    /// %Set whether selections are allowed, default true
     void SetTextSelectable(bool enable);
-    /// Set whether copy-paste operations are allowed, default true
+    /// %Set whether copy-paste operations are allowed, default true
     void SetTextCopyable(bool enable);
     
     /// Return text

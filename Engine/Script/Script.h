@@ -58,11 +58,11 @@ public:
     
     /// Compile and execute a line of script in immediate mode
     bool Execute(const String& line);
-    /// Set immediate mode script file
+    /// %Set immediate mode script file
     void SetDefaultScriptFile(ScriptFile* file);
-    /// Set immediate mode scene
+    /// %Set immediate mode scene
     void SetDefaultScene(Scene* scene);
-    /// Set script engine logging mode, immediate is default
+    /// %Set script engine logging mode, immediate is default
     void SetLogMode(ScriptLogMode mode);
     /// Clear retained mode log messages
     void ClearLogMessages();

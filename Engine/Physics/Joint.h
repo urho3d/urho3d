@@ -60,13 +60,13 @@ public:
     
     /// Remove the joint
     void Clear();
-    /// Set a ball joint
+    /// %Set a ball joint
     bool SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB = 0);
-    /// Set a hinge joint
+    /// %Set a hinge joint
     bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bodyA, RigidBody* bodyB = 0);
-    /// Set joint world position
+    /// %Set joint world position
     void SetPosition(Vector3 position);
-    /// Set joint world axis if applicable
+    /// %Set joint world axis if applicable
     void SetAxis(Vector3 axis);
     
     /// Return physics world
@@ -84,9 +84,9 @@ public:
     /// Return joint world axis
     Vector3 GetAxis() const;
     
-    /// Set body A attribute
+    /// %Set body A attribute
     void SetBodyAAttr(int value);
-    /// Set body B attribute
+    /// %Set body B attribute
     void SetBodyBAttr(int value);
     /// Return body A attribute
     int GetBodyAAttr() const;

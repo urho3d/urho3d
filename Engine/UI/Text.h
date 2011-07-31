@@ -44,32 +44,32 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     /// React to resize
     virtual void OnResize();
     
-    /// Set font and font size
+    /// %Set font and font size
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size
+    /// %Set font and font size
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    /// Set text
+    /// %Set text
     void SetText(const String& text);
-    /// Set row alignment
+    /// %Set row alignment
     void SetTextAlignment(HorizontalAlignment align);
-    /// Set row spacing, 1.0 for original font spacing
+    /// %Set row spacing, 1.0 for original font spacing
     void SetRowSpacing(float spacing);
-    /// Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely
+    /// %Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely
     void SetWordwrap(bool enable);
-    /// Set selection
+    /// %Set selection
     void SetSelection(unsigned start, unsigned length);
     /// Clear selection
     void ClearSelection();
-    /// Set selection background color. Color with 0 alpha (default) disables
+    /// %Set selection background color. Color with 0 alpha (default) disables
     void SetSelectionColor(const Color& color);
-    /// Set hover background color. Color with 0 alpha (default) disables
+    /// %Set hover background color. Color with 0 alpha (default) disables
     void SetHoverColor(const Color& color);
     
     /// Return font

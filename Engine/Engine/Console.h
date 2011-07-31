@@ -44,15 +44,15 @@ public:
     /// Destruct
     ~Console();
     
-    /// Set UI elements' style from an XML file
+    /// %Set UI elements' style from an XML file
     void SetStyle(XMLFile* style);
     /// Show or hide. Showing automatically focuses the line edit
     void SetVisible(bool enable);
     /// Toggle visibility
     void Toggle();
-    /// Set number of displayed rows
+    /// %Set number of displayed rows
     void SetNumRows(unsigned rows);
-    /// Set command history maximum size, 0 disables history
+    /// %Set command history maximum size, 0 disables history
     void SetNumHistoryRows(unsigned rows);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements
     void UpdateElements();

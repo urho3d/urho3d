@@ -86,7 +86,7 @@ struct PhysicsCollisionInfo
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
-/// A physics simulation world
+/// Physics simulation world component. Should be added only to the root scene node
 class PhysicsWorld : public Component
 {
     OBJECT(PhysicsWorld);
@@ -101,35 +101,35 @@ public:
     
     /// Step the simulation forward
     void Update(float timeStep);
-    /// Set simulation steps per second
+    /// %Set simulation steps per second
     void SetFps(int fps);
-    /// Set maximum contacts in one collision
+    /// %Set maximum contacts in one collision
     void SetMaxContacts(unsigned num);
-    /// Set gravity
+    /// %Set gravity
     void SetGravity(Vector3 gravity);
-    /// Set default linear velocity deactivation threshold for new rigid bodies
+    /// %Set default linear velocity deactivation threshold for new rigid bodies
     void SetLinearRestThreshold(float threshold);
-    /// Set default linear velocity damping threshold
+    /// %Set default linear velocity damping threshold
     void SetLinearDampingThreshold(float threshold);
-    /// Set default linear velocity damping scale
+    /// %Set default linear velocity damping scale
     void SetLinearDampingScale(float scale);
-    /// Set default angular velocity deactivation threshold for new rigid bodies
+    /// %Set default angular velocity deactivation threshold for new rigid bodies
     void SetAngularRestThreshold(float threshold);
-    /// Set default angular velocity damping threshold
+    /// %Set default angular velocity damping threshold
     void SetAngularDampingThreshold(float threshold);
-    /// Set default angular velocity damping scale
+    /// %Set default angular velocity damping scale
     void SetAngularDampingScale(float scale);
-    /// Set collision bounce velocity threshold (apply bounce if above)
+    /// %Set collision bounce velocity threshold (apply bounce if above)
     void SetBounceThreshold(float threshold);
-    /// Set maximum angular velocity for network replication
+    /// %Set maximum angular velocity for network replication
     void SetMaxNetworkAngularVelocity(float velocity);
-    /// Set simulation ERP parameter
+    /// %Set simulation ERP parameter
     void SetERP(float erp);
-    /// Set simulation CFM parameter
+    /// %Set simulation CFM parameter
     void SetCFM(float cfm);
-    /// Set depth of contact surface
+    /// %Set depth of contact surface
     void SetContactSurfaceLayer(float depth);
-    /// Set simulation step time accumulator
+    /// %Set simulation step time accumulator
     void SetTimeAccumulator(float time);
     /// Perform a physics world raycast
     void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =

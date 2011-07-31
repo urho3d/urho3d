@@ -61,11 +61,11 @@ public:
     /// Destruct
     ~RenderSurface();
     
-    /// Set viewport for auxiliary view rendering
+    /// %Set viewport for auxiliary view rendering
     void SetViewport(const Viewport& viewport);
-    /// Set linked color buffer
+    /// %Set linked color buffer
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// Set linked depth buffer
+    /// %Set linked depth buffer
     void SetLinkedDepthBuffer(RenderSurface* depthBuffer);
     /// Release surface
     void Release();

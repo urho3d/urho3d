@@ -40,7 +40,7 @@ public:
     void BeginFrame(unsigned mSec);
     /// End frame. Increment total time and send frame end event
     void EndFrame();
-    /// Set the low-resolution timer period in milliseconds. 0 resets to the default period
+    /// %Set the low-resolution timer period in milliseconds. 0 resets to the default period
     void SetTimerPeriod(unsigned mSec);
     
     /// Return frame number, starting from 1 once BeginFrame() is called for the first time

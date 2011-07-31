@@ -59,7 +59,7 @@ public:
     /// Remove event receiver from non-specific events
     void RemoveEventReceiver(Object* receiver, StringHash eventType);
     
-    /// Set current event handler. Called by Object
+    /// %Set current event handler. Called by Object
     void SetEventHandler(EventHandler* handler)
     {
         eventHandler_ = handler;

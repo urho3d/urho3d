@@ -69,7 +69,7 @@ public:
     Drawable(Context* context);
     /// Destruct
     virtual ~Drawable();
-    /// Register object attributes
+    /// Register object attributes. Drawable must be registered first
     static void RegisterObject(Context* context);
     
     /// Process octree raycast
@@ -89,23 +89,23 @@ public:
     /// Draw debug geometry
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Set draw distance
+    /// %Set draw distance
     void SetDrawDistance(float distance);
-    /// Set shadow draw distance
+    /// %Set shadow draw distance
     void SetShadowDistance(float distance);
-    /// Set LOD bias
+    /// %Set LOD bias
     void SetLodBias(float bias);
-    /// Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered
+    /// %Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered
     void SetViewMask(unsigned mask);
-    /// Set light mask. Will be and'ed with light's light mask to see if the object should be lit
+    /// %Set light mask. Will be and'ed with light's light mask to see if the object should be lit
     void SetLightMask(unsigned mask);
-    /// Set maximum number of lights (forward lighting only). Default 0 is unlimited
+    /// %Set maximum number of lights (forward lighting only). Default 0 is unlimited
     void SetMaxLights(unsigned num);
-    /// Set visible flag
+    /// %Set visible flag
     void SetVisible(bool enable);
-    /// Set shadowcaster flag
+    /// %Set shadowcaster flag
     void SetCastShadows(bool enable);
-    /// Set occlusion flag
+    /// %Set occlusion flag
     void SetOccluder(bool enable);
     /// Mark for update before octree reinsertion
     void MarkForUpdate();
@@ -135,7 +135,7 @@ public:
     
     /// Return octree octant
     Octant* GetOctant() const { return octant_; }
-    /// Set sorting value. Called by View
+    /// %Set sorting value. Called by View
     void SetSortValue(float value);
     /// Mark in view this frame. Called by View
     void MarkInView(const FrameInfo& frame);
@@ -143,7 +143,7 @@ public:
     void MarkInShadowView(const FrameInfo& frame);
     /// Clear base pass flags. Also resets light vector
     void ClearBasePass();
-    /// Set base pass flag for a batch
+    /// %Set base pass flag for a batch
     void SetBasePass(unsigned batchIndex);
     /// Add a light, for drawables that limit the maximum light count
     void AddLight(Light* light);

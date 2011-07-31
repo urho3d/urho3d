@@ -25,6 +25,7 @@
 #include "APITemplates.h"
 #include "Controls.h"
 #include "Network.h"
+#include "NetworkPriority.h"
 #include "Protocol.h"
 
 static void ConstructControls(Controls* ptr)
@@ -57,6 +58,17 @@ static void RegisterControls(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Controls", "float yaw", offsetof(Controls, yaw_));
     engine->RegisterObjectProperty("Controls", "float pitch", offsetof(Controls, pitch_));
     engine->RegisterObjectProperty("Controls", "VariantMap extraData", offsetof(Controls, extraData_));
+}
+
+static void RegisterNetworkPriority(asIScriptEngine* engine)
+{
+    RegisterComponent<NetworkPriority>(engine, "NetworkPriority");
+    engine->RegisterObjectMethod("NetworkPriority", "void set_basePriority(float)", asMETHOD(NetworkPriority, SetBasePriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "float get_basePriority() const", asMETHOD(NetworkPriority, GetBasePriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "void set_distanceFactor(float)", asMETHOD(NetworkPriority, SetDistanceFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "float get_distanceFactor() const", asMETHOD(NetworkPriority, GetDistanceFactor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "void set_minPriority(float)", asMETHOD(NetworkPriority, SetMinPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "float get_minPriority() const", asMETHOD(NetworkPriority, GetMinPriority), asCALL_THISCALL);
 }
 
 void SendRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Connection* ptr)
@@ -198,6 +210,7 @@ void RegisterNetwork(asIScriptEngine* engine)
 void RegisterNetworkAPI(asIScriptEngine* engine)
 {
     RegisterControls(engine);
+    RegisterNetworkPriority(engine);
     RegisterConnection(engine);
     RegisterNetwork(engine);
 }

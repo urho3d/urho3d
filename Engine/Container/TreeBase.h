@@ -41,7 +41,7 @@ struct TreeNodeBase
         link_[1] = 0;
     }
     
-    /// Set a child link, adjusting the child's parent as necessary
+    /// %Set a child link, adjusting the child's parent as necessary
     void SetChild(unsigned dir, TreeNodeBase* newChild)
     {
         link_[dir] = newChild;

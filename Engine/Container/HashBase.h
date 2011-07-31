@@ -27,7 +27,7 @@
 #include "Hash.h"
 #include "Swap.h"
 
-/// Hash node base
+/// Hash set/map node base
 struct HashNodeBase
 {
     /// Construct
@@ -46,7 +46,7 @@ struct HashNodeBase
     HashNodeBase* down_;
 };
 
-/// Hash iterator base class
+/// Hash set/map iterator base class
 class HashIteratorBase
 {
 public:

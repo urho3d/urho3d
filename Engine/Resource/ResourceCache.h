@@ -81,7 +81,7 @@ public:
     void ReleaseAllResources(bool force = false);
     /// Reload a resource. Return false and release it if fails
     bool ReloadResource(Resource* resource);
-    /// Set memory budget for a specific resource type, default 0 is unlimited
+    /// %Set memory budget for a specific resource type, default 0 is unlimited
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     
     /// Open and return a file from either the resource load paths or from inside a package file. Return null if fails

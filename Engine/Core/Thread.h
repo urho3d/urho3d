@@ -37,9 +37,9 @@ public:
     
     /// Start running the thread. Return true if successful, or false if already running or if can not create the thread
     bool Start();
-    /// Set the running flag to false and wait for the thread to finish
+    /// %Set the running flag to false and wait for the thread to finish
     void Stop();
-    /// Set thread priority. The thread must have been started first
+    /// %Set thread priority. The thread must have been started first
     void SetPriority(int priority);
     
     /// Return whether thread exists

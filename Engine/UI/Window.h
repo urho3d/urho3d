@@ -55,7 +55,7 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// React to mouse hover
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
@@ -66,11 +66,11 @@ public:
     /// React to mouse drag end
     virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
     
-    /// Set whether can be moved
+    /// %Set whether can be moved
     void SetMovable(bool enable);
-    /// Set whether can be resized
+    /// %Set whether can be resized
     void SetResizable(bool enable);
-    /// Set resize area width at edges
+    /// %Set resize area width at edges
     void SetResizeBorder(const IntRect& rect);
     
     /// Return whether is movable
@@ -83,7 +83,7 @@ public:
 protected:
     /// Identify drag mode (move/resize)
     WindowDragMode GetDragMode(const IntVector2& position) const;
-    /// Set cursor shape based on drag mode
+    /// %Set cursor shape based on drag mode
     void SetCursorShape(WindowDragMode mode, Cursor* cursor) const;
     /// Validate window position
     void ValidatePosition();

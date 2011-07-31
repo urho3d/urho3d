@@ -43,19 +43,19 @@ public:
     /// Destruct
     virtual ~Geometry();
     
-    /// Set number of vertex buffer
+    /// %Set number of vertex buffer
     bool SetNumVertexBuffers(unsigned num);
-    /// Set a vertex buffer by index
+    /// %Set a vertex buffer by index
     bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT);
-    /// Set the index buffer
+    /// %Set the index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
-    /// Set the draw range
+    /// %Set the draw range
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool GetUsedVertexRange = true);
-    /// Set the draw range
+    /// %Set the draw range
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
-    /// Set the LOD distance to report
+    /// %Set the LOD distance to report
     void SetLodDistance(float distance);
-    /// Set vertex and index raw data. Vertex raw data should contain positions only
+    /// %Set vertex and index raw data. Vertex raw data should contain positions only
     void SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData);
     /// Draw
     void Draw(Graphics* graphics);

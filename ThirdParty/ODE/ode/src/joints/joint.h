@@ -148,7 +148,7 @@ struct dxJoint : public dObject
     virtual dJointType type() const = 0;
     virtual size_t size() const = 0;
 
-    /// Set values which are relative with respect to bodies.
+    /// %Set values which are relative with respect to bodies.
     /// Each dxJoint should redefine it if needed.
     virtual void setRelativeValues() {};
 

@@ -56,9 +56,9 @@ public:
     /// Perform finalization after a scene load or network update
     virtual void FinishUpdate() {}
     
-    /// Set attribute by index. Return true if successfully set
+    /// %Set attribute by index. Return true if successfully set
     bool SetAttribute(unsigned index, const Variant& value);
-    /// Set attribute by name. Return true if successfully set
+    /// %Set attribute by name. Return true if successfully set
     bool SetAttribute(const String& name, const Variant& value);
     /// Write initial delta network update (compared to default attribute values) and prepare the last sent state
     void WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);

@@ -386,6 +386,7 @@ void Engine::RegisterObjects()
 {
     RegisterResourceLibrary(context_);
     RegisterSceneLibrary(context_);
+    RegisterNetworkLibrary(context_);
     RegisterGraphicsLibrary(context_);
     RegisterAudioLibrary(context_);
     RegisterUILibrary(context_);

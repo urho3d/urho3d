@@ -70,13 +70,13 @@ public:
     /// Destruct. Close the window and release the Direct3D9 device 
     virtual ~Graphics();
     
-    /// Set window title
+    /// %Set window title
     void SetWindowTitle(const String& windowTitle);
-    /// Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
+    /// %Set screen mode. In deferred rendering modes multisampling means edge filtering instead of MSAA
     bool SetMode(RenderMode mode, int width, int height, bool fullscreen, bool vsync, int multiSample);
-    /// Set screen resolution only
+    /// %Set screen resolution only
     bool SetMode(int width, int height);
-    /// Set rendering mode only
+    /// %Set rendering mode only
     bool SetMode(RenderMode mode);
     /// Toggle between full screen and windowed mode
     bool ToggleFullscreen();
@@ -84,7 +84,7 @@ public:
     void Close();
     /// Take a screenshot
     bool TakeScreenShot(Image& destImage);
-    /// Set whether to flush GPU command queue at the end of each frame. Default true
+    /// %Set whether to flush GPU command queue at the end of each frame. Default true
     void SetFlushGPU(bool enable);
     
     /// Begin frame rendering
@@ -99,35 +99,35 @@ public:
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed, instanced geometry. An instancing vertex buffer must be set
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount, unsigned instanceCount);
-    /// Set vertex buffer
+    /// %Set vertex buffer
     void SetVertexBuffer(VertexBuffer* buffer);
-    /// Set multiple vertex buffers
+    /// %Set multiple vertex buffers
     bool SetVertexBuffers(const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
-    /// Set multiple vertex buffers
+    /// %Set multiple vertex buffers
     bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
-    /// Set index buffer
+    /// %Set index buffer
     void SetIndexBuffer(IndexBuffer* buffer);
-    /// Set shaders
+    /// %Set shaders
     void SetShaders(ShaderVariation* vs, ShaderVariation* ps);
-    /// Set shader bool constants
+    /// %Set shader bool constants
     void SetShaderParameter(StringHash param, const bool* data, unsigned count);
-    /// Set shader float constants
+    /// %Set shader float constants
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
-    /// Set shader int constants
+    /// %Set shader int constants
     void SetShaderParameter(StringHash param, const int* data, unsigned count);
-    /// Set shader float constant
+    /// %Set shader float constant
     void SetShaderParameter(StringHash param, float value);
-    /// Set shader color constant
+    /// %Set shader color constant
     void SetShaderParameter(StringHash param, const Color& color);
-    /// Set shader 3x3 matrix constant
+    /// %Set shader 3x3 matrix constant
     void SetShaderParameter(StringHash param, const Matrix3& matrix);
-    /// Set shader 3D vector constant
+    /// %Set shader 3D vector constant
     void SetShaderParameter(StringHash param, const Vector3& vector);
-    /// Set shader 4x4 matrix constant
+    /// %Set shader 4x4 matrix constant
     void SetShaderParameter(StringHash param, const Matrix4& matrix);
-    /// Set shader 4D vector constant
+    /// %Set shader 4D vector constant
     void SetShaderParameter(StringHash param, const Vector4& vector);
-    /// Set shader 4x3 matrix constant
+    /// %Set shader 4x3 matrix constant
     void SetShaderParameter(StringHash param, const Matrix3x4& matrix);
     /// Define a shader parameter. Called by Shader
     void DefineShaderParameter(StringHash param, ShaderType type, unsigned hwReg);
@@ -139,11 +139,11 @@ public:
     void ClearParameterSources();
     /// Clear remembered transform shader parameter sources
     void ClearTransformSources();
-    /// Set texture
+    /// %Set texture
     void SetTexture(unsigned index, Texture* texture);
-    /// Set default texture filtering mode
+    /// %Set default texture filtering mode
     void SetDefaultTextureFilterMode(TextureFilterMode mode);
-    /// Set texture anisotropy
+    /// %Set texture anisotropy
     void SetTextureAnisotropy(unsigned level);
     /// Reset all render targets and depth buffer (render to back buffer and back buffer depth stencil)
     void ResetRenderTargets();
@@ -151,41 +151,41 @@ public:
     void ResetRenderTarget(unsigned index);
     /// Reset depth stencil
     void ResetDepthStencil();
-    /// Set render target
+    /// %Set render target
     void SetRenderTarget(unsigned index, RenderSurface* renderTarget);
-    /// Set render target
+    /// %Set render target
     void SetRenderTarget(unsigned index, Texture2D* renderTexture);
-    /// Set depth stencil buffer
+    /// %Set depth stencil buffer
     void SetDepthStencil(RenderSurface* depthStencil);
-    /// Set depth stencil buffer
+    /// %Set depth stencil buffer
     void SetDepthStencil(Texture2D* depthTexture);
-    /// Set viewport
+    /// %Set viewport
     void SetViewport(const IntRect& rect);
-    /// Set "view texture" to prevent sampling from the destination render target
+    /// %Set "view texture" to prevent sampling from the destination render target
     void SetViewTexture(Texture* texture);
-    /// Set alpha test
+    /// %Set alpha test
     void SetAlphaTest(bool enable, CompareMode mode = CMP_ALWAYS, float alphaRef = 0.5f);
-    /// Set blending mode
+    /// %Set blending mode
     void SetBlendMode(BlendMode mode);
-    /// Set color write on/off
+    /// %Set color write on/off
     void SetColorWrite(bool enable);
-    /// Set hardware culling mode
+    /// %Set hardware culling mode
     void SetCullMode(CullMode mode);
-    /// Set depth bias
+    /// %Set depth bias
     void SetDepthBias(float constantBias, float slopeScaledBias);
-    /// Set depth compare
+    /// %Set depth compare
     void SetDepthTest(CompareMode mode);
-    /// Set depth write on/off
+    /// %Set depth write on/off
     void SetDepthWrite(bool enable);
-    /// Set polygon fill mode
+    /// %Set polygon fill mode
     void SetFillMode(FillMode mode);
-    /// Set scissor test
+    /// %Set scissor test
     void SetScissorTest(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
-    /// Set scissor test
+    /// %Set scissor test
     void SetScissorTest(bool enable, const IntRect& rect);
-    /// Set stencil test
+    /// %Set stencil test
     void SetStencilTest(bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP, unsigned stencilRef = 0, unsigned stencilMask = M_MAX_UNSIGNED);
-    /// Set vertex buffer stream frequency
+    /// %Set vertex buffer stream frequency
     void SetStreamFrequency(unsigned index, unsigned frequency);
     /// Reset stream frequencies
     void ResetStreamFrequencies();
@@ -203,7 +203,7 @@ public:
     bool DefineColor(unsigned color);
     /// End immediate rendering command and render
     void EndImmediate();
-    /// Set force Shader Model 2 flag. Needs to be set before setting initial screen mode to have effect.
+    /// %Set force Shader Model 2 flag. Needs to be set before setting initial screen mode to have effect.
     void SetForceSM2(bool enable);
     
     /// Return whether rendering initialized

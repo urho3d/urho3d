@@ -106,33 +106,33 @@ public:
     
     /// Clear the collision geometry
     void Clear();
-    /// Set as a sphere
+    /// %Set as a sphere
     void SetSphere(float radius, const Vector3& position, const Quaternion& rotation);
-    /// Set as a box
+    /// %Set as a box
     void SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation);
-    /// Set as a cylinder
+    /// %Set as a cylinder
     void SetCylinder(float radius, float height, const Vector3& position, const Quaternion& rotation);
-    /// Set as a capsule
+    /// %Set as a capsule
     void SetCapsule(float radius, float height, const Vector3& position, const Quaternion& rotation);
-    /// Set as a triangle mesh
+    /// %Set as a triangle mesh
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// Set as a heightfield
+    /// %Set as a heightfield
     void SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// Set as a convex hull (internally an ODE trimesh as well)
+    /// %Set as a convex hull (internally an ODE trimesh as well)
     void SetConvexHull(Model* model, float skinWidth, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// Set offset position
+    /// %Set offset position
     void SetPosition(const Vector3& position);
-    /// Set rotation
+    /// %Set rotation
     void SetRotation(const Quaternion& rotation);
-    /// Set offset transform
+    /// %Set offset transform
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set collision group bits
+    /// %Set collision group bits
     void SetCollisionGroup(unsigned group);
-    /// Set collision mask bits
+    /// %Set collision mask bits
     void SetCollisionMask(unsigned mask);
-    /// Set friction coefficient
+    /// %Set friction coefficient
     void SetFriction(float friction);
-    /// Set bounce coefficient
+    /// %Set bounce coefficient
     void SetBounce(float bounce);
     
     /// Return physics world
@@ -169,7 +169,7 @@ public:
     /// Add debug geometry to the debug graphics
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// Set model attribute
+    /// %Set model attribute
     void SetModelAttr(ResourceRef value);
     /// Return model attribute
     ResourceRef GetModelAttr() const;

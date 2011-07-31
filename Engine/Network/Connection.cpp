@@ -30,6 +30,7 @@
 #include "MemoryBuffer.h"
 #include "Network.h"
 #include "NetworkEvents.h"
+#include "NetworkPriority.h"
 #include "PackageFile.h"
 #include "Profiler.h"
 #include "Protocol.h"
@@ -1043,11 +1044,14 @@ void Connection::ProcessExistingNode(Node* node)
     NodeReplicationState& nodeState = sceneState_[node->GetID()];
     nodeState.frameNumber_ = frameNumber_;
     
-    // Check from interest management if should update. Owned nodes are always updated at full frequency
-    float distance = (node->GetWorldPosition() - position_).LengthFast();
-    bool doUpdate = node->GetOwner() == this || node->TestPriority(distance, nodeState.priorityAcc_);
-    if (!doUpdate)
-        return;
+    // Check from the interest management priority component, if exists, whether should update
+    NetworkPriority* priority = node->GetComponent<NetworkPriority>();
+    if (priority && (!priority->GetAlwaysUpdateOwner() || node->GetOwner() != this))
+    {
+        float distance = (node->GetWorldPosition() - position_).LengthFast();
+        if (!priority->CheckUpdate(distance, nodeState.priorityAcc_))
+            return;
+    }
     
     // Check if attributes have changed
     bool deltaUpdate, latestData;

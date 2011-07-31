@@ -42,15 +42,15 @@ public:
     /// Destruct
     virtual ~Texture();
     
-    /// Set number of requested mip levels. Needs to be called before setting size
+    /// %Set number of requested mip levels. Needs to be called before setting size
     void SetNumLevels(unsigned levels);
-    /// Set filtering mode
+    /// %Set filtering mode
     void SetFilterMode(TextureFilterMode filter);
-    /// Set addressing mode by texture coordinate
+    /// %Set addressing mode by texture coordinate
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
-    /// Set border color for border addressing mode
+    /// %Set border color for border addressing mode
     void SetBorderColor(const Color& color);
-    /// Set backup texture to use when rendering to this texture
+    /// %Set backup texture to use when rendering to this texture
     void SetBackupTexture(Texture* texture);
     /// Clear default pool data lost flag
     void ClearDataLost();

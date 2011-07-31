@@ -60,14 +60,14 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Return UI rendering batches
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
     /// Define a shape
     void DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot);
-    /// Set shape
+    /// %Set shape
     void SetShape(CursorShape shape);
     
     /// Get current shape

@@ -49,7 +49,7 @@ public:
     
     /// Poll for window messages. Called by HandleBeginFrame()
     void Update();
-    /// Set whether ALT-ENTER fullscreen toggle is enabled
+    /// %Set whether ALT-ENTER fullscreen toggle is enabled
     void SetToggleFullscreen(bool enable);
     /// Suppress the next char message
     void SuppressNextChar();

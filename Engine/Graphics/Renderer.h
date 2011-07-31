@@ -171,39 +171,39 @@ public:
     /// Destruct
     virtual ~Renderer();
     
-    /// Set number of viewports to render
+    /// %Set number of viewports to render
     void SetNumViewports(unsigned num);
-    /// Set a viewport
+    /// %Set a viewport
     void SetViewport(unsigned index, const Viewport& viewport);
-    /// Set specular lighting on/off
+    /// %Set specular lighting on/off
     void SetSpecularLighting(bool enable);
-    /// Set shadows on/off
+    /// %Set shadows on/off
     void SetDrawShadows(bool enable);
-    /// Set texture anisotropy
+    /// %Set texture anisotropy
     void SetTextureAnisotropy(int level);
-    /// Set texture filtering
+    /// %Set texture filtering
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// Set texture quality level
+    /// %Set texture quality level
     void SetTextureQuality(int quality);
-    /// Set material quality level
+    /// %Set material quality level
     void SetMaterialQuality(int quality);
-    /// Set shadow map resolution
+    /// %Set shadow map resolution
     void SetShadowMapSize(int size);
-    /// Set shadow map 24-bit depth on/off
+    /// %Set shadow map 24-bit depth on/off
     void SetShadowMapHiresDepth(bool enable);
-    /// Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing
+    /// %Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing
     void SetReuseShadowMaps(bool enable);
-    /// Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first
+    /// %Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first
     void SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter);
-    /// Set dynamic instancing on/off
+    /// %Set dynamic instancing on/off
     void SetDynamicInstancing(bool enable);
-    /// Set deferred rendering edge filter parameters
+    /// %Set deferred rendering edge filter parameters
     void SetEdgeFilter(const EdgeFilterParameters& parameters);
-    /// Set maximum number of occluder trianges
+    /// %Set maximum number of occluder trianges
     void SetMaxOccluderTriangles(int triangles);
-    /// Set occluder buffer width
+    /// %Set occluder buffer width
     void SetOcclusionBufferSize(int size);
-    /// Set required size (1.0 = full screen) for occluders
+    /// %Set required size (1.0 = full screen) for occluders
     void SetOccluderSizeThreshold(float screenSize);
     /// Return number of viewports
     unsigned GetNumViewports() const { return viewports_.Size(); }
@@ -330,7 +330,7 @@ private:
     Light* CreateSplitLight(Light* original);
     /// Allocate a temporary scene node for attaching a split light or a shadow camera
     Node* CreateTempNode();
-    /// Set up a light volume rendering batch
+    /// %Set up a light volume rendering batch
     void SetupLightBatch(Batch& batch);
     /// Draw a full screen quad (either near or far)
     void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);

@@ -77,9 +77,9 @@ public:
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     
 protected:
-    /// Set ID. Called by Scene
+    /// %Set ID. Called by Scene
     void SetID(unsigned id);
-    /// Set scene node. Called by Node when creating the component
+    /// %Set scene node. Called by Node when creating the component
     void SetNode(Node* node);
     
     /// Unique ID within the scene

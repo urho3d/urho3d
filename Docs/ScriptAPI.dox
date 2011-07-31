@@ -1060,9 +1060,6 @@ Properties:<br>
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
 - Quaternion worldTrgetRotation (readonly)
-- float priority
-- float priorityDistanceFactor
-- float minPriority
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -1146,9 +1143,6 @@ Properties:<br>
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
 - Quaternion worldTrgetRotation (readonly)
-- float priority
-- float priorityDistanceFactor
-- float minPriority
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -3455,6 +3449,30 @@ Properties:<br>
 - float yaw
 - float pitch
 - VariantMap extraData
+
+
+NetworkPriority
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+- float basePriority
+- float distanceFactor
+- float minPriority
 
 
 Connection

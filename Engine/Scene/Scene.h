@@ -87,11 +87,11 @@ public:
     void StopAsyncLoading();
     /// Clear scene completely of nodes and components
     void Clear();
-    /// Set active flag. Only active scenes will be updated automatically
+    /// %Set active flag. Only active scenes will be updated automatically
     void SetActive(bool enable);
-    /// Set motion smoothing constant
+    /// %Set motion smoothing constant
     void SetSmoothingConstant(float constant);
-    /// Set motion smoothing snap threshold
+    /// %Set motion smoothing snap threshold
     void SetSnapThreshold(float threshold);
     /// Add a required package file for networking. To be called on the server
     void AddRequiredPackageFile(PackageFile* package);

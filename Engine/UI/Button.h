@@ -40,7 +40,7 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set UI element style from XML data
+    /// %Set UI element style from XML data
     virtual void SetStyle(const XMLElement& element);
     /// Perform UI element update
     virtual void Update(float timeStep);
@@ -51,19 +51,19 @@ public:
     /// React to mouse click
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     
-    /// Set pressed image offset
+    /// %Set pressed image offset
     void SetPressedOffset(const IntVector2& offset);
-    /// Set pressed image offset
+    /// %Set pressed image offset
     void SetPressedOffset(int x, int y);
-    /// Set pressed label offset
+    /// %Set pressed label offset
     void SetLabelOffset(const IntVector2& offset);
-    /// Set pressed label offset
+    /// %Set pressed label offset
     void SetLabelOffset(int x, int y);
-    /// Set repeat properties. Rate 0 (default) disables repeat
+    /// %Set repeat properties. Rate 0 (default) disables repeat
     void SetRepeat(float delay, float rate);
-    /// Set repeat delay
+    /// %Set repeat delay
     void SetRepeatDelay(float delay);
-    /// Set repeat rate
+    /// %Set repeat rate
     void SetRepeatRate(float rate);
     
     /// Return pressed image offset
@@ -76,7 +76,7 @@ public:
     float GetRepeatRate() const { return repeatRate_; }
     
 protected:
-    /// Set new pressed state
+    /// %Set new pressed state
     void SetPressed(bool enable);
     
     /// Pressed image offset

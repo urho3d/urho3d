@@ -45,33 +45,33 @@ public:
     /// Register object factory
     static void RegisterObject(Context* context);
     
-    /// Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic
+    /// %Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic
     void SetMass(float mass);
-    /// Set physics position
+    /// %Set physics position
     void SetPosition(const Vector3& position);
-    /// Set physics rotation
+    /// %Set physics rotation
     void SetRotation(const Quaternion& rotation);
-    /// Set physics transform
+    /// %Set physics transform
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// Set linear velocity
+    /// %Set linear velocity
     void SetLinearVelocity(const Vector3& velocity);
-    /// Set linear velocity deactivation threshold
+    /// %Set linear velocity deactivation threshold
     void SetLinearRestThreshold(float threshold);
-    /// Set linear velocity damping threshold
+    /// %Set linear velocity damping threshold
     void SetLinearDampingThreshold(float threshold);
-    /// Set linear velocity damping scale
+    /// %Set linear velocity damping scale
     void SetLinearDampingScale(float scale);
-    /// Set angular velocity
+    /// %Set angular velocity
     void SetAngularVelocity(const Vector3& angularVelocity);
-    /// Set angular velocity deactivation threshold
+    /// %Set angular velocity deactivation threshold
     void SetAngularRestThreshold(float threshold);
-    /// Set angular velocity damping threshold
+    /// %Set angular velocity damping threshold
     void SetAngularDampingThreshold(float threshold);
-    /// Set angular velocity damping scale
+    /// %Set angular velocity damping scale
     void SetAngularDampingScale(float scale);
-    /// Set maximum angular velocity. Set to 0 to disable rotation
+    /// %Set maximum angular velocity. Set to 0 to disable rotation
     void SetAngularMaxVelocity(float velocity);
-    /// Set rigid body active/inactive state
+    /// %Set rigid body active/inactive state
     void SetActive(bool active);
     /// Apply force to center of mass
     void ApplyForce(const Vector3& force);
@@ -115,7 +115,7 @@ public:
     
     /// Recalculate mass
     void UpdateMass();
-    /// Set network angular velocity attribute
+    /// %Set network angular velocity attribute
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
     /// Return network angular velocity attribute
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;

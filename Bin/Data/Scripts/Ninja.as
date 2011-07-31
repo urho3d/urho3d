@@ -61,9 +61,10 @@ class Ninja : GameObject
         node.rotation = rotation;
 
         // Setup interest management for networking
-        node.priority = 110.0;
-        node.priorityDistanceFactor = 0.03;
-        node.minPriority = 20.0;
+        NetworkPriority@ priority = node.CreateComponent("NetworkPriority", LOCAL);
+        priority.basePriority = 110.0;
+        priority.distanceFactor = 0.03;
+        priority.minPriority = 20.0;
 
         // Create child node for the model. Copy the owner connection in case it is set
         Node@ modelNode = node.CreateChild();

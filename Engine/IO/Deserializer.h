@@ -40,7 +40,7 @@ public:
     
     /// Read bytes from the stream. Return number of bytes actually read
     virtual unsigned Read(void* dest, unsigned size) = 0;
-    /// Set position from the beginning of the stream
+    /// %Set position from the beginning of the stream
     virtual unsigned Seek(unsigned position) = 0;
     /// Return name of the stream
     virtual const String& GetName() const;
