@@ -3473,6 +3473,7 @@ Properties:<br>
 - float basePriority
 - float distanceFactor
 - float minPriority
+- bool alwaysUpdateOwner
 
 
 Connection

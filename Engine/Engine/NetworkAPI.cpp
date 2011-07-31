@@ -69,6 +69,8 @@ static void RegisterNetworkPriority(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NetworkPriority", "float get_distanceFactor() const", asMETHOD(NetworkPriority, GetDistanceFactor), asCALL_THISCALL);
     engine->RegisterObjectMethod("NetworkPriority", "void set_minPriority(float)", asMETHOD(NetworkPriority, SetMinPriority), asCALL_THISCALL);
     engine->RegisterObjectMethod("NetworkPriority", "float get_minPriority() const", asMETHOD(NetworkPriority, GetMinPriority), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "void set_alwaysUpdateOwner(bool)", asMETHOD(NetworkPriority, SetAlwaysUpdateOwner), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NetworkPriority", "bool get_alwaysUpdateOwner() const", asMETHOD(NetworkPriority, GetAlwaysUpdateOwner), asCALL_THISCALL);
 }
 
 void SendRemoteEvent(const String& eventType, bool inOrder, const VariantMap& eventData, Connection* ptr)
