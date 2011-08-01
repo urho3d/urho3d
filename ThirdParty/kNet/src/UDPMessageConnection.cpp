@@ -47,13 +47,14 @@ namespace kNet
 /// The maximum time to wait before acking a packet. If there are enough packets to ack for a full ack message,
 /// acking will be performed earlier. (milliseconds)
 static const float maxAckDelay = 33.f; // (1/30th of a second)
-/// The time counter after which an unacked reliable message will be resent. (UDP only)
-static const float timeOutMilliseconds = 2000.f;//750.f;
 /// The maximum number of datagrams to read in from the socket at one go - after this reads will be throttled
 /// to give time for data sending as well.
 static const int cMaxDatagramsToReadInOneFrame = 2048;
 
-static const u32 cMaxUDPMessageFragmentSize = 470;
+/// Minimum retransmission timeout value (milliseconds)
+static const float minRTOTimeoutValue = 1000.f;
+/// Maximum retransmission timeout value (milliseconds)
+static const float maxRTOTimeoutValue = 4000.f;
 
 UDPMessageConnection::UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState)
 :MessageConnection(owner, ownerServer, socket, startingState),
@@ -152,8 +153,8 @@ void UDPMessageConnection::Initialize()
 {
 	// Set RTT initial values as per RFC 2988.
 	rttCleared = true;
-	retransmissionTimeout = 3.f;
-	smoothedRTT = 3.f;
+	retransmissionTimeout = 3000.f;
+	smoothedRTT = 3000.f;
 	rttVariation = 0.f;
 
 	lastFrameTime = Clock::Tick();
@@ -266,39 +267,44 @@ void UDPMessageConnection::HandleFlowControl()
 	AssertInWorkerThreadContext();
 
 	// In packets/second.
-	const float minBandwidth = 25.f;
+	const float minBandwidthOnLoss = 10.f;
+	const float minBandwidth = 50.f;
 	const float maxBandwidth = 5000.f;
-	const float additiveIncreaseAggressiveness = 10.f;
-	const int framesPerSec = 30;
+	const float decMultiplier = 0.95f;
+	const float incMultiplier = 1.005f;
+	const float incMultiplierMax = 1.035f;
+	const int framesPerSec = 10;
+
+	// If no packets have been sent for a while, drop the actual send rate toward zero (as it is otherwise updated only when packets are sent)
+	const tick_t now = Clock::Tick();
+	if (now - lastDatagramSendTime > Clock::TicksPerSec())
+		actualDatagramSendRate = 0.75f * actualDatagramSendRate;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
-	// If no losses, additively increase or decrease the outbound send rate based on demand
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
-	if (/*numAcksLastFrame > 0 &&*/ numFrames > 0)
+	if (numFrames > 0)
 	{
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
 
-		if (numLossesLastFrame >= 3) // Do not respond to a random single packet losses.
+		if (numLossesLastFrame > 2) // Do not respond to a random single packet losses.
 		{
 			float oldRate = datagramSendRate;
-			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
+			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * decMultiplier));
 			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
-		else // Change send rate based on on utilization
+		else // If no significant losses, change send rate based on on utilization
 		{
-			// If no packets have been sent for a while, drop the actual send rate toward zero (as it is otherwise updated only when packets are sent)
-			const tick_t now = Clock::Tick();
-			if (now - lastDatagramSendTime > Clock::TicksPerSec())
-				actualDatagramSendRate = 0.75f * actualDatagramSendRate;
-
 			float utilization = actualDatagramSendRate / datagramSendRate;
-			float delta = numFrames * additiveIncreaseAggressiveness;
 
-			if (numLossesLastFrame == 0 && utilization > 0.75f)
-				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
+			if (utilization > 0.75f && retransmissionTimeout < maxRTOTimeoutValue)
+			{
+				// When RTO is not yet minimal, or there is slight loss, use less aggressive increase
+				float actualMultiplier = retransmissionTimeout < 1.1f * minRTOTimeoutValue && numLossesLastFrame == 0 ? incMultiplierMax : incMultiplier;
+				datagramSendRate = min(datagramSendRate * actualMultiplier, maxBandwidth);
+			}
 			else if (utilization < 0.25f)
-				datagramSendRate = max(datagramSendRate - delta, minBandwidth);
+				datagramSendRate = max(datagramSendRate * decMultiplier, minBandwidth);
 
 			lowestDatagramSendRateOnPacketLoss = datagramSendRate;
 		}
@@ -1018,15 +1024,12 @@ void UDPMessageConnection::FreeOutboundPacketAckTrack(packet_id_t packetID)
 
 	if (track.sendCount <= 1)
 	{
-		UpdateRTOCounterOnPacketAck((float)Clock::TimespanToSecondsD(track.sentTick, Clock::Tick()));
+		UpdateRTOCounterOnPacketAck((float)Clock::TimespanToMillisecondsD(track.sentTick, Clock::Tick()));
 		++numAcksLastFrame;
 	}
 
 	outboundPacketAckTrack.EraseItemAt(itemIndex);
 }
-
-static const float minRTOTimeoutValue = 1000.f;
-static const float maxRTOTimeoutValue = 5000.f;
 
 /// Adjusts the retransmission timer values as per RFC 2988.
 /// @param rtt The round trip time that was measured on the packet that was just acked.
@@ -1052,20 +1055,9 @@ void UDPMessageConnection::UpdateRTOCounterOnPacketAck(float rtt)
 	}
 	// We add this much constant delay to all RTO timers to avoid too optimistic RTO values
 	// in excellent conditions (localhost, LAN).
-	const float safetyThresholdAdd = 1.f;
 	const float safetyThresholdMul = 2.f;
 
-//	retransmissionTimeout = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, safetyThresholdAdd + safetyThresholdMul * (smoothedRTT + rttVariation)));
-	retransmissionTimeout = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, safetyThresholdAdd + safetyThresholdMul * (smoothedRTT + rttVariation)));
-
-///	const float maxDatagramSendRate = 3000.f;
-	// Update data send rate.
-//	++datagramOutRatePerSecond; // Additive increases.
-//	datagramSendRate = datagramSendRate + 1.f; // Increase by one datagram/successfully sent packet.
-//	datagramSendRate = min(datagramSendRate + 1.f, maxDatagramSendRate); // Increase by one datagram/successfully sent packet.
-
-//	LOG(LogVerbose, "Packet ack event: RTO: %.3f sec., srtt: %.3f sec., rttvar: %.3f sec. datagramSendRate: %.2f", 
-//		retransmissionTimeout, smoothedRTT, rttVariation, datagramSendRate);
+	retransmissionTimeout = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, safetyThresholdMul * (smoothedRTT + rttVariation)));
 }
 
 void UDPMessageConnection::UpdateRTOCounterOnPacketLoss()
@@ -1077,10 +1069,6 @@ void UDPMessageConnection::UpdateRTOCounterOnPacketLoss()
 	retransmissionTimeout = smoothedRTT = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, smoothedRTT * 2.f));
 	// The variation just gives bogus values, so clear it altogether.
 	rttVariation = 0.f;
-
-	// Multiplicative decreases.
-//	datagramOutRatePerSecond = max(1, datagramOutRatePerSecond / 2);
-//	datagramSendRate = max(1.f, datagramSendRate * 0.9f); // At least send one packet/second.
 
 	++numLossesLastFrame;
 
@@ -1239,28 +1227,6 @@ void UDPMessageConnection::ComputePacketLoss()
 void AppendU16ToVector(Vector<char> &data, unsigned long value)
 {
 	data.Insert(data.End(), (const char *)&value, (const char *)&value + 2);
-}
-
-void UDPMessageConnection::SetDatagramInFlowRatePerSecond(int newDatagramReceiveRate, bool internalCall)
-{/*
-	if (newDatagramReceiveRate == datagramInRatePerSecond) // No need to set it multiple times.
-		return;
-
-	if (newDatagramReceiveRate < 5 || newDatagramReceiveRate > 10 * 1024)
-	{
-		LOG(LogError, "Tried to set invalid UDP receive rate %d packets/sec! Ignored.", newDatagramReceiveRate);
-		return;
-	}
-	
-	datagramInRatePerSecond = newDatagramReceiveRate;
-
-	NetworkMessage *msg = StartNewMessage(MsgIdFlowControlRequest);
-	AppendU16ToVector(msg->data, newDatagramReceiveRate);
-	msg->priority = NetworkMessage::cMaxPriority - 1;
-#ifdef KNET_NETWORK_PROFILING
-	msg->profilerName = "FlowControlRequest (3)";
-#endif
-	EndAndQueueMessage(msg, 2, internalCall);*/
 }
 
 bool UDPMessageConnection::HandleMessage(packet_id_t packetID, u32 messageID, const char *data, size_t numBytes)

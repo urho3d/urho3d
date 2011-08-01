@@ -68,8 +68,6 @@ public:
 	UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState);
 	~UDPMessageConnection();
 
-	void SetDatagramInFlowRatePerSecond(int newDatagramReceiveRate, bool internalCall);
-
 	float RetransmissionTimeout() const { return retransmissionTimeout; }
 
 	float DatagramSendRate() const { return datagramSendRate; }
