@@ -462,4 +462,5 @@ void HandleClientConnected(StringHash eventType, VariantMap& eventData)
 {
     Connection@ connection = eventData["Connection"].GetConnection();
     connection.scene = testScene; // Begin scene replication to the client
+    connection.logStatistics = true;
 }

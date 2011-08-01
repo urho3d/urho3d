@@ -273,8 +273,10 @@ void Connection::SendRemoteEvents()
     if (logStatistics_ && statsTimer_.GetMSec(false) > STATS_INTERVAL_MSEC)
     {
         statsTimer_.Reset();
-        LOGINFO("Data in " + String(connection_->BytesInPerSec() / 1000.0f) + " KB/s Data out " +
-            String(connection_->BytesOutPerSec() / 1000.0f) + "KB/s");
+        char statsBuffer[256];
+        sprintf(statsBuffer, "Packets in %d Packets out %d Data in %.3f KB/s Data out %.3f KB/s", (int)connection_->PacketsInPerSec(),
+            (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
+        LOGINFO(statsBuffer);
     }
     
     if (remoteEvents_.Empty())
