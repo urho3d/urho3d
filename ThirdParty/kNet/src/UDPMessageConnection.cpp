@@ -268,7 +268,7 @@ void UDPMessageConnection::HandleFlowControl()
 	// In packets/second.
 	const float minBandwidth = 25.f;
 	const float maxBandwidth = 5000.f;
-	const float additiveIncreaseAggressiveness = 2.0f;
+	const float additiveIncreaseAggressiveness = 2.5f;
 
 	const tick_t frameLength = Clock::TicksPerSec() / 100; // in ticks
 	// If no losses, additively increase or decrease the outbound send rate based on demand
@@ -278,7 +278,7 @@ void UDPMessageConnection::HandleFlowControl()
 		if (numFrames >= 100)
 			numFrames = 100;
 
-		if (numLossesLastFrame > 3) // Do not respond to a random single packet losses.
+		if (numLossesLastFrame >= 3) // Do not respond to a random single packet losses.
 		{
 			float oldRate = datagramSendRate;
 			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * 0.95f)); // Multiplicative decreases.
@@ -295,7 +295,7 @@ void UDPMessageConnection::HandleFlowControl()
 			float utilization = actualDatagramSendRate / datagramSendRate;
 			float delta = numFrames * additiveIncreaseAggressiveness;
 
-			if (utilization > 0.75f)
+			if (numLossesLastFrame <= 1 && utilization > 0.75f)
 				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
 			else if (utilization < 0.25f)
 				datagramSendRate = max(datagramSendRate - delta, minBandwidth);

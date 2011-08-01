@@ -342,7 +342,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         if (connection.numDownloads > 0)
         {
             downloadsText.text = "Downloads: " + connection.numDownloads + " Current download: " +
-                connection.downloadName + " (" + int(connection.downloadProgress * 100.0 + 0.5) + "%)";
+                connection.downloadName + " (" + int(connection.downloadProgress * 100.0) + "%)";
         }
         else if (!downloadsText.text.empty)
             downloadsText.text = "";
