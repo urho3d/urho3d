@@ -232,7 +232,7 @@ This requires a successfully loaded ScriptFile resource, whose \ref ScriptFile::
 ScriptFile* file = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>("Scripts/MyScript.as");
 
 VariantVector parameters;
-parameters.push_back(Variant(100)); // Add an int parameter
+parameters.Push(Variant(100)); // Add an int parameter
 file->Execute("void MyFunction(int)", parameters); // Execute
 \endcode
 
@@ -269,7 +269,7 @@ Subscribing to \ref Events "events" in script behaves differently depending on w
 
 The script object's active/inactive state can be controlled through the \ref ScriptInstance::SetActive "SetActive()" function. When inactive, the scripted update methods or event handlers will not be called. This can be used to reduce CPU load in a large or densely populated scene.
 
-There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject(). These are not actual Node member functions on the C++ side. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
+There are shortcut methods on the script side for creating and accessing a node's script object: node.CreateScriptObject() and node.GetScriptObject() (alternatively, if the node has only one ScriptInstance, and a specific class is not needed, the node's scriptObject property can also be used.) These are not actual Node member functions on the C++ side. CreateScriptObject() takes the script file name (or alternatively, a ScriptFile object handle) and class name as parameters and creates a ScriptInstance component automatically, then creates the script object. For example:
 
 \code
 ScriptObject@ object = node.CreateScriptObject("Scripts/MyClass.as", "MyClass");

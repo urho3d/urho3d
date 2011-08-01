@@ -101,10 +101,6 @@ private:
 	/// @param bytesRead [out] Returns the total number of bytes containes in the datagrams that were read.
 	SocketReadResult UDPReadSocket(size_t &bytesRead); // [worker thread]
 
-	// Congestion control and data rate management:
-	void PerformFlowControl(); // [worker thread]
-	void HandleFlowControlRequestMessage(const char *data, size_t numBytes); // [worker thread]
-
 	void UpdateRTOCounterOnPacketAck(float rtt); // [worker thread]
 	void UpdateRTOCounterOnPacketLoss(); // [worker thread]
 
@@ -157,6 +153,9 @@ private:
 	float datagramSendRate; ///< The number of datagrams/second to send.
 
 	float lowestDatagramSendRateOnPacketLoss;
+
+	/// The currently achieved send rate for purposes flow control
+	float actualDatagramSendRate;
 
 	// These variables correspond to RFC2988, http://tools.ietf.org/html/rfc2988 , section 2.
 	bool rttCleared; ///< If true, smoothedRTT and rttVariation do not contain meaningful values, but "are clear".
@@ -222,6 +221,7 @@ private:
 
 	/// Used to perform flow control on outbound UDP messages.
 	mutable tick_t lastDatagramSendTime; ///\todo. No mutable. Rename to nextDatagramSendTime.
+	mutable tick_t lastActualDatagramSendTime;
 
 	/// Connection control update timer.
 	PolledTimer udpUpdateTimer;
@@ -244,14 +244,6 @@ private:
 
 	// Contains a list of all messages we've received that we need to Ack at some point.
 	PacketAckTrackMap inboundPacketAckTrack;
-
-	/// The number of UDP packets to send out per second.
-	int datagramOutRatePerSecond;
-
-	/// The number of UDP packets to receive per second. Of course the local end of the
-	/// connection cannot directly control this, but it uses the FlowControlRequest
-	/// packet to send it to the other party.
-	int datagramInRatePerSecond;
 
 	/// Contains the reliable message numbers of all reliable messages we've received.
 	/// Used to detect and discard duplicate messages we've received.

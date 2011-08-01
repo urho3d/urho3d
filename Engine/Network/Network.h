@@ -79,7 +79,7 @@ public:
     void UnregisterRemoteEvent(StringHash eventType);
     /// Unregister all remote events. This results in all being allowed
     void UnregisterAllRemoteEvents();
-    /// %Set the package download cache path
+    /// %Set the package download cache directory
     void SetPackageCacheDir(const String& path);
     
     /// Return network update FPS
@@ -94,7 +94,7 @@ public:
     bool IsServerRunning() const;
     /// Return whether a remote event is allowed to be sent and received. If no events are registered, all are allowed
     bool CheckRemoteEvent(StringHash eventType) const;
-    /// Return the package download cache path
+    /// Return the package download cache directory
     const String& GetPackageCacheDir() const { return packageCacheDir_; }
     
     /// Process incoming messages from connections. Called by HandleBeginFrame

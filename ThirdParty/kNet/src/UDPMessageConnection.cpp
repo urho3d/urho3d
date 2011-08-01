@@ -44,7 +44,6 @@ using namespace std;
 namespace kNet
 {
 
-static const int initialDatagramRatePerSecond = 30;
 /// The maximum time to wait before acking a packet. If there are enough packets to ack for a full ack message,
 /// acking will be performed earlier. (milliseconds)
 static const float maxAckDelay = 33.f; // (1/30th of a second)
@@ -61,9 +60,8 @@ UDPMessageConnection::UDPMessageConnection(Network *owner, NetworkServer *ownerS
 retransmissionTimeout(3.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothedRTT(3.f), rttVariation(0.f), rttCleared(true), // Set RTT initial values as per RFC 2988.
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
-packetLossRate(0.f), packetLossCount(0.f), datagramOutRatePerSecond(initialDatagramRatePerSecond), 
-datagramInRatePerSecond(initialDatagramRatePerSecond),
-datagramSendRate(10),
+packetLossRate(0.f), packetLossCount(0.f),
+datagramSendRate(100.f), actualDatagramSendRate(0.f),
 receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
@@ -158,10 +156,9 @@ void UDPMessageConnection::Initialize()
 	smoothedRTT = 3.f;
 	rttVariation = 0.f;
 
-	datagramSendRate = 70.f; // At start, send one datagram per second.
 	lastFrameTime = Clock::Tick();
-
 	lastDatagramSendTime = Clock::Tick();
+	lastActualDatagramSendTime = Clock::Tick();
 }
 
 void UDPMessageConnection::PerformPacketAckSends()
@@ -269,11 +266,12 @@ void UDPMessageConnection::HandleFlowControl()
 	AssertInWorkerThreadContext();
 
 	// In packets/second.
-	const float totalEstimatedBandwidth = 1000; ///\todo Make this estimation dynamic as in UDT or similar.
-	const float additiveIncreaseAggressiveness = 0.1f;
+	const float minBandwidth = 25.f;
+	const float maxBandwidth = 2000.f;
+	const float additiveIncreaseAggressiveness = 5.0f;
 
 	const tick_t frameLength = Clock::TicksPerSec() / 100; // in ticks
-	// Additively increase the outbound send rate.
+	// If no losses, additively increase or decrease the outbound send rate based on demand
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
 	if (/*numAcksLastFrame > 0 &&*/ numFrames > 0)
 	{
@@ -287,13 +285,23 @@ void UDPMessageConnection::HandleFlowControl()
 //			datagramSendRate = max(1.f, datagramSendRate * 0.9f); // Multiplicative decreases.
 			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
-		else // Additive increases.
+		else // Change send rate based on on utilization
 		{
-			float increment = min((float)numFrames * additiveIncreaseAggressiveness * (totalEstimatedBandwidth - datagramSendRate), 1.f);
-			datagramSendRate += increment;
-			datagramSendRate = min(datagramSendRate, totalEstimatedBandwidth);
+			// If no packets have been sent for a while, drop the actual send rate toward zero (as it is otherwise updated only when packets are sent)
+			const tick_t now = Clock::Tick();
+			if (now - lastDatagramSendTime > Clock::TicksPerSec())
+				actualDatagramSendRate = 0.75f * actualDatagramSendRate;
+
+			float utilization = actualDatagramSendRate / datagramSendRate;
+			float delta = numFrames * additiveIncreaseAggressiveness;
+
+			if (utilization > 0.75f)
+				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
+			else if (utilization < 0.25f)
+				datagramSendRate = max(datagramSendRate - delta, minBandwidth);
+
+			//printf("Numframes %d Packets %f Util %f Sendrate %f\n", (int)numFrames, actualDatagramSendRate, utilization, datagramSendRate);
 			lowestDatagramSendRateOnPacketLoss = datagramSendRate;
-//			LOG(LogVerbose, "Incremented sendRate by %.2f to %.2f", increment, datagramSendRate);
 		}
 		numAcksLastFrame = 0;
 		numLossesLastFrame = 0;
@@ -899,6 +907,8 @@ bool UDPMessageConnection::CanSendOutNewDatagram() const
 
 void UDPMessageConnection::NewDatagramSent()
 {
+	tick_t oldLastDatagramSendTime = lastDatagramSendTime;
+
 	const tick_t datagramSendTickDelay = (tick_t)(Clock::TicksPerSec() / datagramSendRate);
 	const tick_t now = Clock::Tick();
 
@@ -906,6 +916,12 @@ void UDPMessageConnection::NewDatagramSent()
 		lastDatagramSendTime += datagramSendTickDelay;
 	else
 		lastDatagramSendTime = now;
+
+	// Calculate running smoothed send rate for flow control utilization determination
+	tick_t datagramInterval = now - lastActualDatagramSendTime;
+	if (datagramInterval > 0)
+		actualDatagramSendRate = min(0.75f * actualDatagramSendRate + 0.25f * (Clock::TicksPerSec() / datagramInterval), datagramSendRate);
+	lastActualDatagramSendTime = now;
 }
 
 void UDPMessageConnection::SendDisconnectMessage(bool isInternal)
@@ -936,31 +952,6 @@ void UDPMessageConnection::SendDisconnectAckMessage()
 	EndAndQueueMessage(msg, 0, true); ///\todo Check this flag!
 
 	LOG(LogInfo, "UDPMessageConnection::SendDisconnectAckMessage: Sent DisconnectAck.");
-}
-
-void UDPMessageConnection::HandleFlowControlRequestMessage(const char *data, size_t numBytes)
-{
-	AssertInWorkerThreadContext();
-	/*
-	if (numBytes != 2)
-	{
-		LOG(LogError, "Malformed FlowControlRequest message received! Size was %d bytes, expected 2 bytes!", (int)numBytes);
-		return;
-	}
-
-	const u16 minOutboundRate = 5;
-	const u16 maxOutboundRate = 10 * 1024;
-	u16 newOutboundRate = *reinterpret_cast<const u16*>(data);
-	if (newOutboundRate < minOutboundRate || newOutboundRate > maxOutboundRate)
-	{
-		LOG(LogError, "Invalid FlowControlRequest rate %d packets/sec received! Ignored. Valid range (%d, %d)", (int)newOutboundRate,
-			(int)minOutboundRate, (int)maxOutboundRate);
-		return;
-	}
-
-//	LOG(LogVerbose, "Received FlowControl message. Adjusting OutRate from %d to %d msgs/sec.", (int)datagramOutRatePerSecond, (int)newOutboundRate);
-
-	datagramOutRatePerSecond = newOutboundRate;*/
 }
 
 int UDPMessageConnection::BiasedBinarySearchFindPacketIndex(PacketAckTrackQueue &queue, int packetID)
@@ -1192,32 +1183,6 @@ void UDPMessageConnection::HandleDisconnectAckMessage()
 	connectionState = ConnectionClosed;
 }
 
-void UDPMessageConnection::PerformFlowControl()
-{
-	AssertInWorkerThreadContext();
-
-	/*
-	// The manual flow control only applies to UDP connections.
-	if (socket->TransportLayer() == SocketOverTCP)
-		return;
-
-	const float maxAllowedPacketLossRate = 0.f;
-	if (GetPacketLossRate() > maxAllowedPacketLossRate)
-	{
-		float newInboundRate = PacketsInPerSec() * (1.f - GetPacketLossRate());
-//		LOG(LogVerbose, "Packet loss rate: %.2f. Adjusting InRate from %d to %d!", GetPacketLossRate(), datagramInRatePerSecond, (int)newInboundRate);
-		SetDatagramInFlowRatePerSecond((int)newInboundRate, true);
-	}
-	else if (PacketsInPerSec() >= (float)datagramInRatePerSecond / 2)
-	{
-		const int flowRateIncr = 50;
-//		LOG(LogVerbose, "Have received %.2f packets in/sec with loss rate of %.2f. Increasing InRate from %d to %d.",
-//			PacketsInPerSec(), GetPacketLossRate(), datagramInRatePerSecond, datagramInRatePerSecond + flowRateIncr);
-		SetDatagramInFlowRatePerSecond(datagramInRatePerSecond + flowRateIncr, true);
-	}
-	*/
-}
-
 void UDPMessageConnection::ComputePacketLoss()
 {
 	AssertInWorkerThreadContext();
@@ -1309,9 +1274,6 @@ bool UDPMessageConnection::HandleMessage(packet_id_t packetID, u32 messageID, co
 	case MsgIdPingReply:
 		return false; // We don't do anything with these messages, the MessageConnection base class handles these.
 
-	case MsgIdFlowControlRequest:
-		HandleFlowControlRequestMessage(data, numBytes);
-		return true;
 	case MsgIdPacketAck:
 		HandlePacketAckMessage(data, numBytes);
 		return true;
