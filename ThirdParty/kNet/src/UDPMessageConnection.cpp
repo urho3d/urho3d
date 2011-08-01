@@ -268,21 +268,21 @@ void UDPMessageConnection::HandleFlowControl()
 	// In packets/second.
 	const float minBandwidth = 25.f;
 	const float maxBandwidth = 5000.f;
-	const float additiveIncreaseAggressiveness = 2.5f;
+	const float additiveIncreaseAggressiveness = 10.f;
+	const int framesPerSec = 30;
 
-	const tick_t frameLength = Clock::TicksPerSec() / 100; // in ticks
+	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
 	// If no losses, additively increase or decrease the outbound send rate based on demand
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
 	if (/*numAcksLastFrame > 0 &&*/ numFrames > 0)
 	{
-		if (numFrames >= 100)
-			numFrames = 100;
+		if (numFrames >= framesPerSec)
+			numFrames = framesPerSec;
 
 		if (numLossesLastFrame >= 3) // Do not respond to a random single packet losses.
 		{
 			float oldRate = datagramSendRate;
-			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * 0.95f)); // Multiplicative decreases.
-//			datagramSendRate = max(1.f, datagramSendRate * 0.9f); // Multiplicative decreases.
+			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
 			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
 		else // Change send rate based on on utilization
@@ -295,7 +295,7 @@ void UDPMessageConnection::HandleFlowControl()
 			float utilization = actualDatagramSendRate / datagramSendRate;
 			float delta = numFrames * additiveIncreaseAggressiveness;
 
-			if (numLossesLastFrame <= 1 && utilization > 0.75f)
+			if (numLossesLastFrame == 0 && utilization > 0.75f)
 				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
 			else if (utilization < 0.25f)
 				datagramSendRate = max(datagramSendRate - delta, minBandwidth);
@@ -304,7 +304,7 @@ void UDPMessageConnection::HandleFlowControl()
 		}
 		numAcksLastFrame = 0;
 		numLossesLastFrame = 0;
-		if (numFrames < 100)
+		if (numFrames < framesPerSec)
 			lastFrameTime += numFrames * frameLength;
 		else
 			lastFrameTime = Clock::Tick();
