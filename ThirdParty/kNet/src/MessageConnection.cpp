@@ -697,16 +697,20 @@ void MessageConnection::EndAndQueueMessage(NetworkMessage *msg, size_t numBytes,
 	}
 	else
 	{
-		if (!outboundAcceptQueue.Insert(msg))
+		if (msg->reliable)
 		{
-			if (msg->reliable) // For nonreliable messages it is not critical if we can't enqueue the message. Just discard it.
+			// If message is reliable, block and retry until succeed to queue
+			while (!outboundAcceptQueue.Insert(msg))
+				kNet::Clock::Sleep(5);
+		}
+		else
+		{
+			// If unreliable, just discard if failed to insert
+			if (!outboundAcceptQueue.Insert(msg))
 			{
-				///\todo Is it possible to check beforehand if this criteria is avoided, or if we are doomed?
-				LOG(LogVerbose, "Critical: Failed to add new reliable message to outboundAcceptQueue! Queue was full. Discarding the message!");
-				assert(false);
+				FreeMessage(msg);
+				return;
 			}
-			FreeMessage(msg);
-			return;
 		}
 		LOG(LogData, "MessageConnection::EndAndQueueMessage: Queued message of size %d bytes and ID 0x%X.", (int)msg->Size(), (int)msg->id);
 	}
