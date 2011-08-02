@@ -56,7 +56,7 @@ struct RemoteEvent
     bool inOrder_;
 };
 
-/// Package file download
+/// Package file receive transfer
 struct PackageDownload
 {
     /// Construct with defaults
@@ -74,6 +74,20 @@ struct PackageDownload
     unsigned checksum_;
     /// Download initiated flag
     bool initiated_;
+};
+
+/// Package file send transfer
+struct PackageUpload
+{
+    /// Construct with defaults
+    PackageUpload();
+    
+    /// Source file that is used to read the rate
+    SharedPtr<File> file_;
+    /// Current fragment index
+    unsigned fragment_;
+    /// Total number of fragments
+    unsigned totalFragments_;
 };
 
 /// Connection to a remote network host
@@ -115,6 +129,8 @@ public:
     void SendClientUpdate();
     /// Send queued remote events. Called by Network
     void SendRemoteEvents();
+    /// Send package files to client. Called by network
+    void SendPackages();
     /// Process pending latest data for nodes and components
     void ProcessPendingLatestData();
     /// Process a LoadScene message from the server. Called by Network
@@ -198,8 +214,10 @@ private:
     Map<unsigned, NodeReplicationState> sceneState_;
     /// Preallocated attribute variants per networked object class for sending updates
     Map<ShortStringHash, Vector<Variant> > classCurrentState_;
-    /// Waiting or ongoing package file downloads
+    /// Waiting or ongoing package file receive transfers
     Map<StringHash, PackageDownload> downloads_;
+    /// Ongoing package send transfers
+    Map<StringHash, PackageUpload> uploads_;
     /// Pending latest data for not yet received nodes
     HashMap<unsigned, PODVector<unsigned char> > nodeLatestData_;
     /// Pending latest data for not yet received components

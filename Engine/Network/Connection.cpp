@@ -53,6 +53,10 @@ PackageDownload::PackageDownload() :
 {
 }
 
+PackageUpload::PackageUpload()
+{
+}
+
 OBJECTTYPESTATIC(Connection);
 
 Connection::Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection) :
@@ -303,6 +307,32 @@ void Connection::SendRemoteEvents()
     }
     
     remoteEvents_.Clear();
+}
+
+void Connection::SendPackages()
+{
+    while (!uploads_.Empty() && connection_->NumOutboundMessagesPending() < 1000)
+    {
+        unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
+        
+        for (Map<StringHash, PackageUpload>::Iterator i = uploads_.Begin(); i != uploads_.End();)
+        {
+            Map<StringHash, PackageUpload>::Iterator current = i++;
+            PackageUpload& upload = current->second_;
+            unsigned fragmentSize = Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
+            upload.file_->Read(buffer, fragmentSize);
+            
+            msg_.Clear();
+            msg_.WriteStringHash(current->first_);
+            msg_.WriteUInt(upload.fragment_++);
+            msg_.Write(buffer, fragmentSize);
+            SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_LOW_PRIORITY);
+            
+            // Check if upload finished
+            if (upload.fragment_ == upload.totalFragments_)
+                uploads_.Erase(current);
+        }
+    }
 }
 
 void Connection::ProcessPendingLatestData()
@@ -680,6 +710,16 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                 String packageFullName = package->GetName();
                 if (!GetFileNameAndExtension(packageFullName).Compare(name, false))
                 {
+                    StringHash nameHash(name);
+                    
+                    // Do not restart upload if already exists
+                    if (uploads_.Contains(nameHash))
+                    {
+                        LOGWARNING("Received a request for package " + name + " already in transfer");
+                        return;
+                    }
+                    
+                    // Try to open the file now
                     SharedPtr<File> file(new File(context_, packageFullName));
                     if (!file->IsOpen())
                     {
@@ -690,23 +730,9 @@ void Connection::ProcessPackageDownload(int msgID, MemoryBuffer& msg)
                     
                     LOGINFO("Transmitting package file " + name + " to client " + ToString());
                     
-                    StringHash nameHash(name);
-                    unsigned totalFragments = (file->GetSize() + PACKAGE_FRAGMENT_SIZE - 1) / PACKAGE_FRAGMENT_SIZE;
-                    unsigned char buffer[PACKAGE_FRAGMENT_SIZE];
-                    
-                    // Now simply read the file fragments and queue them
-                    for (unsigned i = 0; i < totalFragments; ++i)
-                    {
-                        unsigned fragmentSize = Min((int)(file->GetSize() - file->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
-                        file->Read(buffer, fragmentSize);
-                        
-                        msg_.Clear();
-                        msg_.WriteStringHash(nameHash);
-                        msg_.WriteUInt(i);
-                        msg_.Write(buffer, fragmentSize);
-                        SendMessage(MSG_PACKAGEDATA, true, false, msg_, NET_LOW_PRIORITY);
-                    }
-                    
+                    uploads_[nameHash].file_ = file;
+                    uploads_[nameHash].fragment_ = 0;
+                    uploads_[nameHash].totalFragments_ = (file->GetSize() + PACKAGE_FRAGMENT_SIZE - 1) / PACKAGE_FRAGMENT_SIZE;
                     return;
                 }
             }

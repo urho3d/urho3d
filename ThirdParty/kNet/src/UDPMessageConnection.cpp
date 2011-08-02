@@ -272,7 +272,7 @@ void UDPMessageConnection::HandleFlowControl()
 	const float maxBandwidth = 5000.f;
 	const float decMultiplier = 0.95f;
 	const float incMultiplier = 1.005f;
-	const float incMultiplierMax = 1.035f;
+	const float incMultiplierMax = 1.04f;
 	const int framesPerSec = 10;
 
 	// If no packets have been sent for a while, drop the actual send rate toward zero (as it is otherwise updated only when packets are sent)
@@ -287,7 +287,7 @@ void UDPMessageConnection::HandleFlowControl()
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
 
-		if (numLossesLastFrame > 2) // Do not respond to a random single packet losses.
+		if (numLossesLastFrame > 2) // Do not respond to random single packet losses.
 		{
 			float oldRate = datagramSendRate;
 			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * decMultiplier));

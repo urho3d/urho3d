@@ -429,6 +429,7 @@ void Network::PostUpdate(float timeStep)
             {
                 i->second_->SendServerUpdate();
                 i->second_->SendRemoteEvents();
+                i->second_->SendPackages();
             }
         }
         
