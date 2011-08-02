@@ -62,7 +62,7 @@ retransmissionTimeout(3.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothed
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
 packetLossRate(0.f), packetLossCount(0.f),
-datagramSendRate(100.f), actualDatagramSendRate(0.f),
+datagramSendRate(50.f), actualDatagramSendRate(0.f),
 receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
@@ -269,16 +269,8 @@ void UDPMessageConnection::HandleFlowControl()
 	// In packets/second.
 	const float minBandwidthOnLoss = 10.f;
 	const float minBandwidth = 50.f;
-	const float maxBandwidth = 5000.f;
-	const float decMultiplier = 0.95f;
-	const float incMultiplier = 1.005f;
-	const float incMultiplierMax = 1.04f;
+	const float maxBandwidth = 10000.f;
 	const int framesPerSec = 10;
-
-	// If no packets have been sent for a while, drop the actual send rate toward zero (as it is otherwise updated only when packets are sent)
-	const tick_t now = Clock::Tick();
-	if (now - lastDatagramSendTime > Clock::TicksPerSec())
-		actualDatagramSendRate = 0.75f * actualDatagramSendRate;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
@@ -286,25 +278,26 @@ void UDPMessageConnection::HandleFlowControl()
 	{
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
-
-		if (numLossesLastFrame > 2) // Do not respond to random single packet losses.
+		if (numLossesLastFrame > 3) // Do not respond to random single packet losses.
 		{
 			float oldRate = datagramSendRate;
-			datagramSendRate = min(datagramSendRate, max(1.f, lowestDatagramSendRateOnPacketLoss * decMultiplier));
+			datagramSendRate = max(lowestDatagramSendRateOnPacketLoss * 0.95f, minBandwidthOnLoss);
 			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
-		else // If no significant losses, change send rate based on on utilization
+		else // If no significant losses, change send rate based on utilization
 		{
 			float utilization = actualDatagramSendRate / datagramSendRate;
 
-			if (utilization > 0.75f && retransmissionTimeout < maxRTOTimeoutValue)
+			// High utilization: increase sendrate. Base maximum increase on the RTT
+			if (utilization > 0.75f && retransmissionTimeout < maxRTOTimeoutValue * 0.9f)
 			{
-				// When RTO is not yet minimal, or there is slight loss, use less aggressive increase
-				float actualMultiplier = retransmissionTimeout < 1.1f * minRTOTimeoutValue && numLossesLastFrame == 0 ? incMultiplierMax : incMultiplier;
-				datagramSendRate = min(datagramSendRate * actualMultiplier, maxBandwidth);
+				float maxRTT = max(rtt, smoothedRTT);
+				float delta = min(100.f / maxRTT, 10.0f);
+				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
 			}
+			// Low utilization: decrease sendrate
 			else if (utilization < 0.25f)
-				datagramSendRate = max(datagramSendRate * decMultiplier, minBandwidth);
+				datagramSendRate = max(datagramSendRate * 0.95f, minBandwidth);
 
 			lowestDatagramSendRateOnPacketLoss = datagramSendRate;
 		}
