@@ -52,7 +52,7 @@ static const float maxAckDelay = 33.f; // (1/30th of a second)
 static const int cMaxDatagramsToReadInOneFrame = 2048;
 
 /// Minimum retransmission timeout value (milliseconds)
-static const float minRTOTimeoutValue = 1000.f;
+static const float minRTOTimeoutValue = 500.f;
 /// Maximum retransmission timeout value (milliseconds)
 static const float maxRTOTimeoutValue = 4000.f;
 
@@ -62,7 +62,7 @@ retransmissionTimeout(3.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothed
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
 packetLossRate(0.f), packetLossCount(0.f),
-datagramSendRate(50.f), actualDatagramSendRate(0.f),
+datagramSendRate(50.f),
 receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
@@ -159,7 +159,6 @@ void UDPMessageConnection::Initialize()
 
 	lastFrameTime = Clock::Tick();
 	lastDatagramSendTime = Clock::Tick();
-	lastActualDatagramSendTime = Clock::Tick();
 }
 
 void UDPMessageConnection::PerformPacketAckSends()
@@ -242,9 +241,6 @@ void UDPMessageConnection::ProcessPacketTimeouts() // [worker thread]
 			(int)track->packetID, (float)Clock::TimespanToMillisecondsD(track->sentTick, now), (int)track->messages.size());
 		ADDEVENT("datagramsLost", 1, "");
 
-		// Store a new suggestion for a lowered datagram send rate.
-		lowestDatagramSendRateOnPacketLoss = min(lowestDatagramSendRateOnPacketLoss, track->datagramSendRate);
-
 		// Adjust the flow control values on this event.
 		UpdateRTOCounterOnPacketLoss();
 
@@ -270,7 +266,7 @@ void UDPMessageConnection::HandleFlowControl()
 	const float minBandwidthOnLoss = 10.f;
 	const float minBandwidth = 50.f;
 	const float maxBandwidth = 10000.f;
-	const int framesPerSec = 10;
+	const int framesPerSec = 100;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
@@ -278,29 +274,32 @@ void UDPMessageConnection::HandleFlowControl()
 	{
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
-		if (numLossesLastFrame > 3) // Do not respond to random single packet losses.
+			
+		int numUnacked = NumOutboundUnackedDatagrams();
+		float congestion = numUnacked / (max(rtt, 100.f) * 0.001f) / datagramSendRate;
+		
+		// Check if more or less bandwidth is needed
+		///\todo Very simple logic for now
+		bool needMore = outboundQueue.Size() > 10;
+		bool needLess = outboundQueue.Size() == 0;
+		
+		// Need more: increase sendrate if no significant congestion, and not hitting maximum RTO
+		if (needMore && congestion < 1.f && retransmissionTimeout < maxRTOTimeoutValue * 0.9f)
 		{
-			float oldRate = datagramSendRate;
-			datagramSendRate = max(lowestDatagramSendRateOnPacketLoss * 0.95f, minBandwidthOnLoss);
-			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
+			float delta = (1.f - sqrtf(congestion)) * 10.f;
+			datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
 		}
-		else // If no significant losses, change send rate based on utilization
+		// Need less: decrease sendrate if not already at minimum
+		else if (needLess && datagramSendRate > minBandwidth)
+			datagramSendRate = max(datagramSendRate * 0.975f, minBandwidth);
+		
+		// Reduce sendrate on congestion and loss
+		if (congestion > 1.f || numLossesLastFrame > 0)
 		{
-			float utilization = actualDatagramSendRate / datagramSendRate;
-
-			// High utilization: increase sendrate. Base maximum increase on the RTT
-			if (utilization > 0.75f && retransmissionTimeout < maxRTOTimeoutValue * 0.9f)
-			{
-				float maxRTT = max(rtt, smoothedRTT);
-				float delta = min(100.f / maxRTT, 10.0f);
-				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
-			}
-			// Low utilization: decrease sendrate
-			else if (utilization < 0.25f)
-				datagramSendRate = max(datagramSendRate * 0.95f, minBandwidth);
-
-			lowestDatagramSendRateOnPacketLoss = datagramSendRate;
+			float multiplier = max(1.f - max((congestion - 1.f) * 0.005f, numLossesLastFrame * 0.01f), 0.95f);
+			datagramSendRate = max(datagramSendRate * multiplier, minBandwidthOnLoss);
 		}
+		
 		numAcksLastFrame = 0;
 		numLossesLastFrame = 0;
 		if (numFrames < framesPerSec)
@@ -653,15 +652,6 @@ void UDPMessageConnection::DoUpdateConnection()
 
 		udpUpdateTimer.StartMSecs(10.f);
 	}
-
-/*
-	if (statsUpdateTimer.TriggeredOrNotRunning())
-	{
-		///\todo Put this behind a timer - update only once every 1 sec or so.
-		ComputePacketLoss();
-		statsUpdateTimer.StartMSecs(1000.f);
-	}
-*/
 }
 
 unsigned long UDPMessageConnection::TimeUntilCanSendPacket() const
@@ -905,8 +895,6 @@ bool UDPMessageConnection::CanSendOutNewDatagram() const
 
 void UDPMessageConnection::NewDatagramSent()
 {
-	tick_t oldLastDatagramSendTime = lastDatagramSendTime;
-
 	const tick_t datagramSendTickDelay = (tick_t)(Clock::TicksPerSec() / datagramSendRate);
 	const tick_t now = Clock::Tick();
 
@@ -914,12 +902,6 @@ void UDPMessageConnection::NewDatagramSent()
 		lastDatagramSendTime += datagramSendTickDelay;
 	else
 		lastDatagramSendTime = now;
-
-	// Calculate running smoothed send rate for flow control utilization determination
-	tick_t datagramInterval = now - lastActualDatagramSendTime;
-	if (datagramInterval > 0)
-		actualDatagramSendRate = min(0.75f * actualDatagramSendRate + 0.25f * (Clock::TicksPerSec() / datagramInterval), datagramSendRate);
-	lastActualDatagramSendTime = now;
 }
 
 void UDPMessageConnection::SendDisconnectMessage(bool isInternal)

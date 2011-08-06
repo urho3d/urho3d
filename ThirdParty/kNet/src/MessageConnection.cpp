@@ -49,7 +49,7 @@ namespace
 
 	/// The interval at which we send ping messages.
 	///\todo Make this user-defineable.
-	const float pingIntervalMSecs = 1 * 1000.f;
+	const float pingIntervalMSecs = 1000.f;
 	/// The interval at which we update the internal statistics fields.
 	const float statsRefreshIntervalMSecs = 1000.f;
 	/// The time interval after which, if we don't get a response to a PingRequest message, the connection is declared lost.

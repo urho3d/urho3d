@@ -150,11 +150,6 @@ private:
 	/// The flow control algorithm:
 	float datagramSendRate; ///< The number of datagrams/second to send.
 
-	float lowestDatagramSendRateOnPacketLoss;
-
-	/// The currently achieved send rate for purposes flow control
-	float actualDatagramSendRate;
-
 	// These variables correspond to RFC2988, http://tools.ietf.org/html/rfc2988 , section 2.
 	bool rttCleared; ///< If true, smoothedRTT and rttVariation do not contain meaningful values, but "are clear".
 	float smoothedRTT;
@@ -219,20 +214,14 @@ private:
 
 	/// Used to perform flow control on outbound UDP messages.
 	mutable tick_t lastDatagramSendTime; ///\todo. No mutable. Rename to nextDatagramSendTime.
-	mutable tick_t lastActualDatagramSendTime;
 
 	/// Connection control update timer.
 	PolledTimer udpUpdateTimer;
-
-	PolledTimer statsUpdateTimer;
-
+	
 	typedef Map<packet_id_t, PacketAckTrack> PacketAckTrackMap;
 	/// Contains the messages we have sent out that we are waiting for the other party to Ack.
-//	PacketAckTrackMap outboundPacketAckTrack;
 	typedef WaitFreeQueue<PacketAckTrack> PacketAckTrackQueue;
 	PacketAckTrackQueue outboundPacketAckTrack;
-//	typedef OrderedHashTable<PacketAckTrack, PacketAckTrack> PacketAckTrackTable;
-//	PacketAckTrackTable outboundPacketAckTrack;
 
 	static int BiasedBinarySearchFindPacketIndex(UDPMessageConnection::PacketAckTrackQueue &queue, int packetID);
 
