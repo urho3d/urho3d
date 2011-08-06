@@ -266,9 +266,12 @@ void UDPMessageConnection::HandleFlowControl()
 	const float minBandwidthOnLoss = 10.f;
 	const float minBandwidth = 50.f;
 	const float maxBandwidth = 10000.f;
-	const int framesPerSec = 100;
+	const int framesPerSec = 30;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
+	
+	float actualFrameRate = (float)Clock::TicksPerSec() / (float)Clock::TicksInBetween(Clock::Tick(), lastFrameTime);
+	
 	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
 	if (numFrames > 0)
 	{
@@ -287,7 +290,7 @@ void UDPMessageConnection::HandleFlowControl()
 		if (needMore && congestion < 1.f && retransmissionTimeout < maxRTOTimeoutValue * 0.9f)
 		{
 			float delta = (1.f - sqrtf(congestion)) * 10.f;
-			datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
+			datagramSendRate = min(datagramSendRate + numFrames * delta, maxBandwidth);
 		}
 		// Need less: decrease sendrate if not already at minimum
 		else if (needLess && datagramSendRate > minBandwidth)
