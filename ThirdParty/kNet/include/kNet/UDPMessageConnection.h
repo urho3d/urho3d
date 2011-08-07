@@ -149,6 +149,7 @@ private:
 
 	/// The flow control algorithm:
 	float datagramSendRate; ///< The number of datagrams/second to send.
+	float lowestDatagramSendRateOnPacketLoss;
 	int slowModeDelay; ///< Go into slow increase mode for some time on receiving loss
 
 	// These variables correspond to RFC2988, http://tools.ietf.org/html/rfc2988 , section 2.

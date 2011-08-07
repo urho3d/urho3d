@@ -43,7 +43,7 @@
 
 #include "DebugNew.h"
 
-static const int STATS_INTERVAL_MSEC = 1000;
+static const int STATS_INTERVAL_MSEC = 2000;
 static const String noName;
 
 PackageDownload::PackageDownload() :

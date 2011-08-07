@@ -154,7 +154,7 @@ void UDPMessageConnection::Initialize()
 	retransmissionTimeout = 1000.f;
 	smoothedRTT = 1000.f;
 	rttVariation = 0.f;
-	datagramSendRate = 50.f;
+	datagramSendRate = lowestDatagramSendRateOnPacketLoss = 50.f;
 
 	lastFrameTime = Clock::Tick();
 	lastDatagramSendTime = Clock::Tick();
@@ -240,6 +240,9 @@ void UDPMessageConnection::ProcessPacketTimeouts() // [worker thread]
 			(int)track->packetID, (float)Clock::TimespanToMillisecondsD(track->sentTick, now), (int)track->messages.size());
 		ADDEVENT("datagramsLost", 1, "");
 
+		// Store a new suggestion for a lowered datagram send rate.
+		lowestDatagramSendRateOnPacketLoss = min(lowestDatagramSendRateOnPacketLoss, track->datagramSendRate);
+
 		// Adjust the flow control values on this event.
 		UpdateRTOCounterOnPacketLoss();
 
@@ -265,7 +268,7 @@ void UDPMessageConnection::HandleFlowControl()
 	const float minBandwidthOnLoss = 10.f;
 	const float minBandwidth = 50.f;
 	const float maxBandwidth = 10000.f;
-	const int framesPerSec = 30;
+	const int framesPerSec = 10;
 	const int maxSlowModeDelay = 10 * framesPerSec;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
@@ -276,14 +279,18 @@ void UDPMessageConnection::HandleFlowControl()
 	{
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
-			
+
 		int numUnacked = NumOutboundUnackedDatagrams();
-		
-		// Reduce sendrate and go to slow increase mode on loss
-		if (numLossesLastFrame > 0)
+
+		// Reduce sendrate and/or go to slow mode on loss
+		if (numLossesLastFrame > 1)
 		{
-			float multiplier = max(1.f - numLossesLastFrame * 0.01f, 0.95f);
-			datagramSendRate = max(datagramSendRate * multiplier, minBandwidthOnLoss);
+			if (numLossesLastFrame > 2)
+			{
+				float oldRate = datagramSendRate;
+				datagramSendRate = min(datagramSendRate, max(minBandwidthOnLoss, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
+				LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
+			}
 			slowModeDelay = min(slowModeDelay + numLossesLastFrame * framesPerSec, maxSlowModeDelay);
 		}
 		else
@@ -292,24 +299,29 @@ void UDPMessageConnection::HandleFlowControl()
 			///\todo Very simple logic for now, can be improved
 			bool needMore = outboundQueue.Size() > 10;
 			bool needLess = outboundQueue.Size() == 0;
-			
+			float maxRTT = max(rtt, smoothedRTT);
+
 			// Need more: increase sendrate. Factor in RTT and acks
-			if (needMore)
+			if (needMore && numLossesLastFrame == 0)
 			{
-				float maxRTT = max(rtt, smoothedRTT);
-				float delta = (50.f + numAcksLastFrame) / maxRTT;
+				float delta = (50.f + 2.f * numAcksLastFrame) / maxRTT;
 				if (slowModeDelay > 0)
 					delta *= 0.2f;
 				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
+				lowestDatagramSendRateOnPacketLoss = datagramSendRate;
 			}
 			// Need less: decrease sendrate if not already at minimum
 			else if (needLess && datagramSendRate > minBandwidth)
 				datagramSendRate = max(datagramSendRate * 0.98f, minBandwidth);
+
+			// Whenever RTT is more than the minimum RTO value, back off slowly
+			//if (maxRTT > minRTOTimeoutValue && datagramSendRate > minBandwidth)
+			//	datagramSendRate = max(datagramSendRate * 0.999f, minBandwidth);
 		}
-		
+
 		if (slowModeDelay > 0)
 			--slowModeDelay;
-		
+
 		numAcksLastFrame = 0;
 		numLossesLastFrame = 0;
 		lastFrameTime = now;
