@@ -95,7 +95,7 @@ public:
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
     
     /// Mix sound sources into the buffer
-    void MixOutput(void *dest, unsigned mixSamples);
+    void MixOutput(void *dest, unsigned samples);
     
 private:
     /// Handle render update event
@@ -103,7 +103,7 @@ private:
     /// Stop sound output and release the sound buffer
     void Release();
     
-    /// PortAudio stream
+    /// Sound output stream
     void* stream_;
     /// Clipping buffer for mixing
     SharedArrayPtr<int> clipBuffer_;
@@ -111,6 +111,8 @@ private:
     Mutex audioMutex_;
     /// Sample size
     unsigned sampleSize_;
+    /// Clip buffer size in samples
+    unsigned fragmentSize_;
     /// Mixing rate
     int mixRate_;
     /// Stereo flag

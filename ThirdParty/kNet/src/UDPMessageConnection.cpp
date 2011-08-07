@@ -54,15 +54,14 @@ static const int cMaxDatagramsToReadInOneFrame = 2048;
 /// Minimum retransmission timeout value (milliseconds)
 static const float minRTOTimeoutValue = 500.f;
 /// Maximum retransmission timeout value (milliseconds)
-static const float maxRTOTimeoutValue = 4000.f;
+static const float maxRTOTimeoutValue = 5000.f;
 
 UDPMessageConnection::UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState)
 :MessageConnection(owner, ownerServer, socket, startingState),
-retransmissionTimeout(3.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothedRTT(3.f), rttVariation(0.f), rttCleared(true), // Set RTT initial values as per RFC 2988.
+numAcksLastFrame(0), numLossesLastFrame(0), rttVariation(0.f), rttCleared(true),
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
-packetLossRate(0.f), packetLossCount(0.f),
-datagramSendRate(50.f),
+packetLossRate(0.f), packetLossCount(0.f), slowModeDelay(0),
 receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
@@ -151,11 +150,11 @@ UDPMessageConnection::SocketReadResult UDPMessageConnection::ReadSocket(size_t &
 
 void UDPMessageConnection::Initialize()
 {
-	// Set RTT initial values as per RFC 2988.
 	rttCleared = true;
-	retransmissionTimeout = 3000.f;
-	smoothedRTT = 3000.f;
+	retransmissionTimeout = 1000.f;
+	smoothedRTT = 1000.f;
 	rttVariation = 0.f;
+	datagramSendRate = 50.f;
 
 	lastFrameTime = Clock::Tick();
 	lastDatagramSendTime = Clock::Tick();
@@ -267,48 +266,53 @@ void UDPMessageConnection::HandleFlowControl()
 	const float minBandwidth = 50.f;
 	const float maxBandwidth = 10000.f;
 	const int framesPerSec = 30;
+	const int maxSlowModeDelay = 10 * framesPerSec;
 
 	const tick_t frameLength = Clock::TicksPerSec() / framesPerSec; // in ticks
-	
-	float actualFrameRate = (float)Clock::TicksPerSec() / (float)Clock::TicksInBetween(Clock::Tick(), lastFrameTime);
-	
-	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(Clock::Tick(), lastFrameTime) / frameLength);
+	const tick_t now = Clock::Tick();
+
+	unsigned long numFrames = (unsigned long)(Clock::TicksInBetween(now, lastFrameTime) / frameLength);
 	if (numFrames > 0)
 	{
 		if (numFrames >= framesPerSec)
 			numFrames = framesPerSec;
 			
 		int numUnacked = NumOutboundUnackedDatagrams();
-		float congestion = numUnacked / (max(rtt, 100.f) * 0.001f) / datagramSendRate;
 		
-		// Check if more or less bandwidth is needed
-		///\todo Very simple logic for now
-		bool needMore = outboundQueue.Size() > 10;
-		bool needLess = outboundQueue.Size() == 0;
-		
-		// Need more: increase sendrate if no significant congestion, and not hitting maximum RTO
-		if (needMore && congestion < 1.f && retransmissionTimeout < maxRTOTimeoutValue * 0.9f)
+		// Reduce sendrate and go to slow increase mode on loss
+		if (numLossesLastFrame > 0)
 		{
-			float delta = (1.f - sqrtf(congestion)) * 10.f;
-			datagramSendRate = min(datagramSendRate + numFrames * delta, maxBandwidth);
-		}
-		// Need less: decrease sendrate if not already at minimum
-		else if (needLess && datagramSendRate > minBandwidth)
-			datagramSendRate = max(datagramSendRate * 0.975f, minBandwidth);
-		
-		// Reduce sendrate on congestion and loss
-		if (congestion > 1.f || numLossesLastFrame > 0)
-		{
-			float multiplier = max(1.f - max((congestion - 1.f) * 0.005f, numLossesLastFrame * 0.01f), 0.95f);
+			float multiplier = max(1.f - numLossesLastFrame * 0.01f, 0.95f);
 			datagramSendRate = max(datagramSendRate * multiplier, minBandwidthOnLoss);
+			slowModeDelay = min(slowModeDelay + numLossesLastFrame * framesPerSec, maxSlowModeDelay);
 		}
+		else
+		{
+			// Check if more or less bandwidth is needed
+			///\todo Very simple logic for now, can be improved
+			bool needMore = outboundQueue.Size() > 10;
+			bool needLess = outboundQueue.Size() == 0;
+			
+			// Need more: increase sendrate. Factor in RTT and acks
+			if (needMore)
+			{
+				float maxRTT = max(rtt, smoothedRTT);
+				float delta = (50.f + numAcksLastFrame) / maxRTT;
+				if (slowModeDelay > 0)
+					delta *= 0.2f;
+				datagramSendRate = min(datagramSendRate + delta, maxBandwidth);
+			}
+			// Need less: decrease sendrate if not already at minimum
+			else if (needLess && datagramSendRate > minBandwidth)
+				datagramSendRate = max(datagramSendRate * 0.98f, minBandwidth);
+		}
+		
+		if (slowModeDelay > 0)
+			--slowModeDelay;
 		
 		numAcksLastFrame = 0;
 		numLossesLastFrame = 0;
-		if (numFrames < framesPerSec)
-			lastFrameTime += numFrames * frameLength;
-		else
-			lastFrameTime = Clock::Tick();
+		lastFrameTime = now;
 	}
 }
 
@@ -1044,7 +1048,7 @@ void UDPMessageConnection::UpdateRTOCounterOnPacketLoss()
 
 	using namespace std;
 
-	retransmissionTimeout = smoothedRTT = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, smoothedRTT * 2.f));
+	// retransmissionTimeout = smoothedRTT = min(maxRTOTimeoutValue, max(minRTOTimeoutValue, smoothedRTT * 2.f));
 	// The variation just gives bogus values, so clear it altogether.
 	rttVariation = 0.f;
 

@@ -57,7 +57,7 @@ AddCompilationDefine(KNET_THREAD_CHECKING_ENABLED)
 #AddCompilationDefine(KNET_LOGGING_SUPPORT_ENABLED)
 
 # Enable storing profiling data from different network level events.
-AddCompilationDefine(KNET_NETWORK_PROFILING)
+#AddCompilationDefine(KNET_NETWORK_PROFILING)
 
 if (USE_BOOST)
    AddCompilationDefine(KNET_USE_BOOST)

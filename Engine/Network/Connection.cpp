@@ -43,7 +43,7 @@
 
 #include "DebugNew.h"
 
-static const int STATS_INTERVAL_MSEC = 2000;
+static const int STATS_INTERVAL_MSEC = 1000;
 static const String noName;
 
 PackageDownload::PackageDownload() :
@@ -278,7 +278,7 @@ void Connection::SendRemoteEvents()
     {
         statsTimer_.Reset();
         char statsBuffer[256];
-        sprintf(statsBuffer, "Packets in %d Packets out %d Data in %.3f KB/s Data out %.3f KB/s", (int)connection_->PacketsInPerSec(),
+        sprintf(statsBuffer, "RTT %.3f ms Pkt in %d Pkt out %d Data in %.3f KB/s Data out %.3f KB/s", connection_->RoundTripTime(), (int)connection_->PacketsInPerSec(),
             (int)connection_->PacketsOutPerSec(), connection_->BytesInPerSec() / 1000.0f, connection_->BytesOutPerSec() / 1000.0f);
         LOGINFO(statsBuffer);
     }
