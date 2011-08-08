@@ -282,16 +282,12 @@ void UDPMessageConnection::HandleFlowControl()
 
 		int numUnacked = NumOutboundUnackedDatagrams();
 
-		// Reduce sendrate and/or go to slow mode on loss
-		if (numLossesLastFrame > 1)
+		// Reduce sendrate on significant loss
+		if (numLossesLastFrame > 2)
 		{
-			if (numLossesLastFrame > 2)
-			{
-				float oldRate = datagramSendRate;
-				datagramSendRate = min(datagramSendRate, max(minBandwidthOnLoss, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
-				LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
-			}
-			slowModeDelay = min(slowModeDelay + numLossesLastFrame * framesPerSec, maxSlowModeDelay);
+			float oldRate = datagramSendRate;
+			datagramSendRate = min(datagramSendRate, max(minBandwidthOnLoss, lowestDatagramSendRateOnPacketLoss * 0.9f)); // Multiplicative decreases.
+			LOG(LogVerbose, "Received %d losses. datagramSendRate backed to %.2f from %.2f", (int)numLossesLastFrame, datagramSendRate, oldRate);
 		}
 		else
 		{
@@ -314,12 +310,16 @@ void UDPMessageConnection::HandleFlowControl()
 			else if (needLess && datagramSendRate > minBandwidth)
 				datagramSendRate = max(datagramSendRate * 0.98f, minBandwidth);
 
-			// Whenever RTT is more than the minimum RTO value, back off slowly
-			//if (maxRTT > minRTOTimeoutValue && datagramSendRate > minBandwidth)
-			//	datagramSendRate = max(datagramSendRate * 0.999f, minBandwidth);
+			// Whenever slow mode or slight loss is occurring and RTT is more than the minimum RTO value, back off slowly
+			// This is to ensure we do not stay "balanced" in a state where slight loss occurs constantly due to sending too much
+			if ((numLossesLastFrame > 0 || slowModeDelay > 0) && maxRTT > minRTOTimeoutValue && datagramSendRate > minBandwidth)
+				datagramSendRate = max(datagramSendRate * 0.999f, minBandwidth);
 		}
 
-		if (slowModeDelay > 0)
+		// Update the slow mode timer
+		if (numLossesLastFrame > 1)
+			slowModeDelay = min(slowModeDelay + numLossesLastFrame * framesPerSec, maxSlowModeDelay);
+		else if (slowModeDelay > 0)
 			--slowModeDelay;
 
 		numAcksLastFrame = 0;

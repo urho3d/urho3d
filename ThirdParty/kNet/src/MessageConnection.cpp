@@ -1187,7 +1187,7 @@ void MessageConnection::HandlePingReplyMessage(const char *data, size_t numBytes
 			float newRtt = (float)Clock::TicksToMillisecondsD(Clock::TicksInBetween(cs.ping[i].pingReplyTick, cs.ping[i].pingSentTick));
 			cs.ping[i].replyReceived = true;
 			statistics.Unlock();
-			rtt = rttPredictBias * newRtt + (1.f * rttPredictBias) * rtt;
+			rtt = rttPredictBias * newRtt + (1.f - rttPredictBias) * rtt;
 
 			LOG(LogVerbose, "HandlePingReplyMessage: %d.", (int)pingID);
 			return;
