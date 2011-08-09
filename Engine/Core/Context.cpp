@@ -28,16 +28,26 @@
 
 static String noType;
 
-void RemoveNamedAttribute(Vector<AttributeInfo>& attributes, const String& name)
+void RemoveNamedAttribute(Map<ShortStringHash, Vector<AttributeInfo> >& attributes, ShortStringHash objectType, const String& name)
 {
-    for (unsigned i = 0; i < attributes.Size(); ++i)
+    Map<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes.Find(objectType);
+    if (i == attributes.End())
+        return;
+    
+    Vector<AttributeInfo>& infos = i->second_;
+    
+    for (Vector<AttributeInfo>::Iterator j = infos.Begin(); j != infos.End(); ++j)
     {
-        if (attributes[i].name_ == name)
+        if (j->name_ == name)
         {
-            attributes.Erase(i);
-            return;
+            infos.Erase(j);
+            break;
         }
     }
+    
+    // If the vector became empty, erase the object type from the map
+    if (infos.Empty())
+        attributes.Erase(i);
 }
 
 Context::Context() :
@@ -93,13 +103,8 @@ void Context::RegisterAttribute(ShortStringHash objectType, const AttributeInfo&
 
 void Context::RemoveAttribute(ShortStringHash objectType, const String& name)
 {
-    Map<ShortStringHash, Vector<AttributeInfo> >::Iterator i = attributes_.Find(objectType);
-    if (i != attributes_.End())
-        RemoveNamedAttribute(i->second_, name);
-    
-    i = networkAttributes_.Find(objectType);
-    if (i != networkAttributes_.End())
-        RemoveNamedAttribute(i->second_, name);
+    RemoveNamedAttribute(attributes_, objectType, name);
+    RemoveNamedAttribute(networkAttributes_, objectType, name);
 }
 
 void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash derivedType)

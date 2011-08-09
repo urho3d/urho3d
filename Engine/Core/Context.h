@@ -153,7 +153,7 @@ public:
     const Vector<AttributeInfo>* GetNetworkAttributes(ShortStringHash type) const
     {
         Map<ShortStringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
-        return i != attributes_.End() ? &i->second_ : 0;
+        return i != networkAttributes_.End() ? &i->second_ : 0;
     }
     
     /// Return event receivers for a sender and event type, or null if they do not exist
