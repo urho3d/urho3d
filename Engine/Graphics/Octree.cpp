@@ -183,13 +183,10 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
     for (PODVector<Drawable*>::ConstIterator i = drawables_.Begin(); i != drawables_.End(); ++i)
     {
         Drawable* drawable = *i;
-        unsigned flags = drawable->GetDrawableFlags();
         
-        if (!(flags & query.drawableFlags_) || !drawable->IsVisible())
-            continue;
-        if (query.occludersOnly_ && !drawable->IsOccluder())
-            continue;
-        if (query.shadowCastersOnly_ && !drawable->GetCastShadows())
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
+            !drawable->IsVisible() || (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ &&
+            !drawable->GetCastShadows()))
             continue;
         
         if (query.TestDrawable(drawable->GetWorldBoundingBox(), inside) != OUTSIDE)
@@ -217,11 +214,9 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         Drawable* drawable = *i;
         unsigned drawableFlags = drawable->GetDrawableFlags();
         
-        if (!(drawableFlags & query.drawableFlags_) || !drawable->IsVisible())
-            continue;
-        if (query.occludersOnly_ && !drawable->IsOccluder())
-            continue;
-        if (query.shadowCastersOnly_ && !drawable->GetCastShadows())
+        if (!(drawable->GetDrawableFlags() & query.drawableFlags_) || !(drawable->GetViewMask() & query.viewMask_) ||
+            !drawable->IsVisible() || (query.occludersOnly_ && !drawable->IsOccluder()) || (query.shadowCastersOnly_ &&
+            !drawable->GetCastShadows()))
             continue;
         
         float drawableDist = drawable->GetWorldBoundingBox().Distance(query.ray_);
@@ -281,8 +276,11 @@ void Octree::RegisterObject(Context* context)
 {
     context->RegisterFactory<Octree>();
     
-    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, Vector3(-DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE, -DEFAULT_OCTREE_SIZE), AM_DEFAULT);
-    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, Vector3(DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), AM_DEFAULT);
+    Vector3 defaultBoundsMin = Vector3::UNITY * DEFAULT_OCTREE_SIZE;
+    Vector3 defaultBoundsMax = -Vector3::UNITY * DEFAULT_OCTREE_SIZE;
+    
+    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Min", worldBoundingBox_.min_, defaultBoundsMin, AM_DEFAULT);
+    ATTRIBUTE(Octree, VAR_VECTOR3, "Bounding Box Max", worldBoundingBox_.max_, defaultBoundsMax, AM_DEFAULT);
     ATTRIBUTE(Octree, VAR_INT, "Number of Levels", numLevels_, DEFAULT_OCTREE_LEVELS, AM_DEFAULT);
 }
 

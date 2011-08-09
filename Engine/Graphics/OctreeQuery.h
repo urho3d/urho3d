@@ -24,6 +24,7 @@
 #pragma once
 
 #include "BoundingBox.h"
+#include "Drawable.h"
 #include "Frustum.h"
 #include "Ray.h"
 #include "Sphere.h"
@@ -37,9 +38,10 @@ class OctreeQuery
 {
 public:
     /// Construct with result vector, include/exclude flags and whether to get only occluders or shadowcasters
-    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, bool occludersOnly, bool shadowCastersOnly) :
+    OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask, bool occludersOnly, bool shadowCastersOnly) :
         result_(result),
         drawableFlags_(drawableFlags),
+        viewMask_(viewMask),
         occludersOnly_(occludersOnly),
         shadowCastersOnly_(shadowCastersOnly)
     {
@@ -59,6 +61,8 @@ public:
     PODVector<Drawable*>& result_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
+    /// Drawable layers to include
+    unsigned viewMask_;
     /// Get occluders only flag
     bool occludersOnly_;
     /// Get shadowcasters only flag
@@ -70,9 +74,9 @@ class PointOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with point and query parameters
-    PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags, bool occludersOnly = false,
-        bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
+    PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
         point_(point)
     {
     }
@@ -91,9 +95,9 @@ class SphereOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with sphere and query parameters
-    SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags, bool occludersOnly = false,
-        bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
+    SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
         sphere_(sphere)
     {
     }
@@ -112,9 +116,9 @@ class BoxOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with bounding box and query parameters
-    BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags, bool occludersOnly = false,
-        bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
+    BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
         box_(box)
     {
     }
@@ -133,9 +137,9 @@ class FrustumOctreeQuery : public OctreeQuery
 {
 public:
     /// Construct with frustum and query parameters
-    FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags, bool occludersOnly = false,
-        bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
+    FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
+        unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
         frustum_(frustum)
     {
     }
@@ -155,8 +159,9 @@ class OccludedFrustumOctreeQuery : public OctreeQuery
 public:
     /// Construct with frustum, occlusion buffer pointer and query parameters
     OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
-            unsigned char drawableFlags, bool occludersOnly = false, bool shadowCastersOnly = false) :
-        OctreeQuery(result, drawableFlags, occludersOnly, shadowCastersOnly),
+        unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false,
+        bool shadowCastersOnly = false) :
+        OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
         frustum_(frustum),
         buffer_(buffer)
     {
@@ -206,24 +211,28 @@ class RayOctreeQuery
 {
 public:
     /// Construct with ray and query parameters
-    RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, unsigned char drawableFlags, bool occludersOnly = false,
-        bool shadowCastersOnly = false, float maxDistance = M_INFINITY, RayQueryLevel level = RAY_TRIANGLE) :
-        ray_(ray),
+    RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
+        float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, 
+        bool occludersOnly = false, bool shadowCastersOnly = false) :
         result_(result),
-        drawableFlags_(drawableFlags),
-        occludersOnly_(occludersOnly),
-        shadowCastersOnly_(shadowCastersOnly),
+        ray_(ray),
+        level_(level),
         maxDistance_(maxDistance),
-        level_(level)
+        drawableFlags_(drawableFlags),
+        viewMask_(viewMask),
+        occludersOnly_(occludersOnly),
+        shadowCastersOnly_(shadowCastersOnly)
     {
     }
     
-    /// Ray
-    Ray ray_;
     /// Result vector reference
     PODVector<RayQueryResult>& result_;
+    /// Ray
+    Ray ray_;
     /// Drawable flags to include
     unsigned char drawableFlags_;
+    /// Drawable layers to include
+    unsigned viewMask_;
     /// Get occluders only flag
     bool occludersOnly_;
     /// Get shadowcasters only flag

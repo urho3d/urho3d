@@ -426,7 +426,7 @@ bool Graphics::BeginFrame()
     numPrimitives_ = 0;
     numBatches_ = 0;
     
-    SendEvent(E_BEGINRENDER);
+    SendEvent(E_BEGINRENDERING);
     
     return true;
 }
@@ -438,7 +438,7 @@ void Graphics::EndFrame()
     if (!IsInitialized())
         return;
     
-    SendEvent(E_ENDRENDER);
+    SendEvent(E_ENDRENDERING);
     
     glfwSwapBuffers();
 }

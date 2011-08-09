@@ -370,6 +370,7 @@ static void RegisterDrawable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("uint DRAWABLE_GEOMETRY", (void*)&DRAWABLE_GEOMETRY);
     engine->RegisterGlobalProperty("uint DRAWABLE_LIGHT", (void*)&DRAWABLE_LIGHT);
     engine->RegisterGlobalProperty("uint DRAWABLE_ZONE", (void*)&DRAWABLE_ZONE);
+    engine->RegisterGlobalProperty("uint DRAWABLE_ANY", (void*)&DRAWABLE_ANY);
     engine->RegisterGlobalProperty("uint DEFAULT_VIEWMASK", (void*)&DEFAULT_VIEWMASK);
     engine->RegisterGlobalProperty("uint DEFAULT_LIGHTMASK", (void*)&DEFAULT_LIGHTMASK);
     
@@ -854,42 +855,42 @@ static Node* RayQueryResultGetNode(RayQueryResult* ptr)
     return ptr->node_;
 }
 
-static CScriptArray* OctreeRaycast(const Ray& ray, unsigned char drawableFlags, float maxDistance, RayQueryLevel level, Octree* ptr)
+static CScriptArray* OctreeRaycast(const Ray& ray, RayQueryLevel level, float maxDistance, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
     PODVector<RayQueryResult> result;
-    RayOctreeQuery query(result, ray, drawableFlags, false, false, maxDistance, level);
+    RayOctreeQuery query(result, ray, level, maxDistance, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToArray<RayQueryResult>(result, "Array<RayQueryResult>");
 }
 
-static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char drawableFlags, Octree* ptr)
+static CScriptArray* OctreeGetDrawablesPoint(const Vector3& point, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
     PODVector<Drawable*> result;
-    PointOctreeQuery query(result, point, drawableFlags);
+    PointOctreeQuery query(result, point, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
-static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char drawableFlags, Octree* ptr)
+static CScriptArray* OctreeGetDrawablesBox(const BoundingBox& box, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
     PODVector<Drawable*> result;
-    BoxOctreeQuery query(result, box, drawableFlags);
+    BoxOctreeQuery query(result, box, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Drawable@>");
 }
 
-static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned char drawableFlags, Octree* ptr)
+static CScriptArray* OctreeGetDrawablesFrustum(const Frustum& frustum, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
     PODVector<Drawable*> result;
-    FrustumOctreeQuery query(result, frustum, drawableFlags);
+    FrustumOctreeQuery query(result, frustum, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");
 }
 
-static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned char drawableFlags, Octree* ptr)
+static CScriptArray* OctreeGetDrawablesSphere(const Sphere& sphere, unsigned char drawableFlags, unsigned viewMask, Octree* ptr)
 {
     PODVector<Drawable*> result;
-    SphereOctreeQuery query(result, sphere, drawableFlags);
+    SphereOctreeQuery query(result, sphere, drawableFlags, viewMask);
     ptr->GetDrawables(query);
     return VectorToHandleArray<Drawable>(result, "Array<Node@>");
 }
@@ -923,11 +924,11 @@ static void RegisterOctree(asIScriptEngine* engine)
     RegisterComponent<Octree>(engine, "Octree");
     engine->RegisterObjectMethod("Octree", "void Resize(const BoundingBox&in, uint)", asMETHOD(Octree, Resize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "void DrawDebugGeometry(bool) const", asMETHOD(Octree, DrawDebugGeometry), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, uint8, float, RayQueryLevel)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3&in, uint8)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox&in, uint8)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Frustum&in, uint8)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Sphere&in, uint8)", asFUNCTION(OctreeGetDrawablesSphere), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<RayQueryResult>@ Raycast(const Ray&in, RayQueryLevel level = RAY_TRIANGLE, float maxDistance = M_INFINITY, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeRaycast), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Vector3&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesPoint), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const BoundingBox&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesBox), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Frustum&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesFrustum), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Octree", "Array<Node@>@ GetDrawables(const Sphere&in, uint8 drawableFlags = DRAWABLE_ANY, uint viewMask = DEFAULT_VIEWMASK)", asFUNCTION(OctreeGetDrawablesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Octree", "const BoundingBox& get_worldBoundingBox() const", asMETHODPR(Octree, GetWorldBoundingBox, () const, const BoundingBox&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Octree", "uint get_numLevels() const", asMETHOD(Octree, GetNumLevels), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Octree@+ get_octree() const", asFUNCTION(SceneGetOctree), asCALL_CDECL_OBJLAST);

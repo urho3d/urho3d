@@ -573,7 +573,7 @@ bool Graphics::BeginFrame()
     numPrimitives_ = 0;
     numBatches_ = 0;
     
-    SendEvent(E_BEGINRENDER);
+    SendEvent(E_BEGINRENDERING);
     
     return true;
 }
@@ -585,7 +585,7 @@ void Graphics::EndFrame()
     if (!IsInitialized())
         return;
     
-    SendEvent(E_ENDRENDER);
+    SendEvent(E_ENDRENDERING);
     
     // Optionally flush GPU buffer to avoid control lag or framerate fluctuations due to pre-render
     if (impl_->frameQuery_ && flushGPU_)

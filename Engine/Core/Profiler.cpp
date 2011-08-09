@@ -47,6 +47,7 @@ Profiler::Profiler(Context* context) :
     current_ = root_;
     
     SubscribeToEvent(E_BEGINFRAME, HANDLER(Profiler, HandleBeginFrame));
+    SubscribeToEvent(E_ENDFRAME, HANDLER(Profiler, HandleEndFrame));
 }
 
 Profiler::~Profiler()
@@ -173,4 +174,9 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned indent, bo
 void Profiler::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     BeginFrame();
+}
+
+void Profiler::HandleEndFrame(StringHash eventType, VariantMap& eventData)
+{
+    EndFrame();
 }

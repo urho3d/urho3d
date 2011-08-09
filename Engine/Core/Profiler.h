@@ -202,7 +202,7 @@ public:
     
     /// Begin the profiling frame. Called by HandleBeginFrame()
     void BeginFrame();
-    /// End the profiling frame
+    /// End the profiling frame. Called by HandleEndFrame()
     void EndFrame();
     /// Begin a new accumulation period
     void ClearAccumulated();
@@ -217,6 +217,8 @@ private:
     void GetData(ProfilerBlock* block, String& output, unsigned indent, bool showUnused, bool showAccumulated, bool showTotal) const;
     /// Handle begin frame event
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
+    /// Handle end frame event
+    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
     
     /// Current profiling block
     ProfilerBlock* current_;

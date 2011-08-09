@@ -51,11 +51,11 @@ EVENT(E_SCREENMODE, ScreenMode)
 }
 
 /// Frame rendering started
-EVENT(E_BEGINRENDER, BeginRender)
+EVENT(E_BEGINRENDERING, BeginRendering)
 {
 }
 
 /// Frame rendering ended
-EVENT(E_ENDRENDER, EndRender)
+EVENT(E_ENDRENDERING, EndRendering)
 {
 }

@@ -273,7 +273,7 @@ void View::GetDrawables()
     
     // Get zones & find the zone camera is in
     PODVector<Zone*> zones;
-    PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE);
+    PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>& >(zones), cameraPos, DRAWABLE_ZONE, camera_->GetViewMask());
     octree_->GetDrawables(query);
     
     int highestZonePriority = M_MIN_INT;
@@ -293,7 +293,7 @@ void View::GetDrawables()
     
     if (maxOccluderTriangles_ > 0)
     {
-        FrustumOctreeQuery query(occluders_, camera_->GetFrustum(), DRAWABLE_GEOMETRY, true, false);
+        FrustumOctreeQuery query(occluders_, camera_->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(), true, false);
         
         octree_->GetDrawables(query);
         UpdateOccluders(occluders_, camera_);
@@ -317,7 +317,8 @@ void View::GetDrawables()
     else
     {
         // Get geometries & lights using occlusion
-        OccludedFrustumOctreeQuery query(tempDrawables_, camera_->GetFrustum(), buffer, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT);
+        OccludedFrustumOctreeQuery query(tempDrawables_, camera_->GetFrustum(), buffer, DRAWABLE_GEOMETRY | DRAWABLE_LIGHT,
+            camera_->GetViewMask());
         octree_->GetDrawables(query);
     }
     
@@ -327,16 +328,10 @@ void View::GetDrawables()
     sceneViewBox_.min_ = sceneViewBox_.max_ = Vector3::ZERO;
     sceneViewBox_.defined_ = false;
     Matrix3x4 view(camera_->GetInverseWorldTransform());
-    unsigned cameraViewMask = camera_->GetViewMask();
     
     for (unsigned i = 0; i < tempDrawables_.Size(); ++i)
     {
         Drawable* drawable = tempDrawables_[i];
-        
-        // Check view mask
-        if (!(cameraViewMask & drawable->GetViewMask()))
-            continue;
-        
         drawable->UpdateDistance(frame_);
         
         // If draw distance non-zero, check it
@@ -1010,17 +1005,12 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
     float halfViewSize = camera->GetHalfViewSize();
     float invOrthoSize = 1.0f / camera->GetOrthoSize();
     Vector3 cameraPos = camera->GetWorldPosition();
-    unsigned cameraViewMask = camera->GetViewMask();
     
     for (unsigned i = 0; i < occluders.Size(); ++i)
     {
         Drawable* occluder = occluders[i];
         occluder->UpdateDistance(frame_);
         bool erase = false;
-        
-        // Check view mask
-        if (!(cameraViewMask & occluder->GetViewMask()))
-            erase = true;
         
         // Check occluder's draw distance (in main camera view)
         float maxDistance = occluder->GetDrawDistance();
@@ -1127,7 +1117,8 @@ unsigned View::ProcessLight(Light* light)
         SetupShadowCamera(light, true);
         
         // Get occluders, which must be shadow-casting themselves
-        FrustumOctreeQuery query(shadowOccluders_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, true, true);
+        FrustumOctreeQuery query(shadowOccluders_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY, camera_->GetViewMask(), true,
+            true);
         octree_->GetDrawables(query);
         
         UpdateOccluders(shadowOccluders_, shadowCamera);
@@ -1247,14 +1238,15 @@ unsigned View::ProcessLight(Light* light)
                 if (!useOcclusion)
                 {
                     // Get potential shadow casters without occlusion
-                    FrustumOctreeQuery query(tempDrawables_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY);
+                    FrustumOctreeQuery query(tempDrawables_, shadowCamera->GetFrustum(), DRAWABLE_GEOMETRY,
+                        camera_->GetViewMask());
                     octree_->GetDrawables(query);
                 }
                 else
                 {
                     // Get potential shadow casters with occlusion
                     OccludedFrustumOctreeQuery query(tempDrawables_, shadowCamera->GetFrustum(), buffer,
-                        DRAWABLE_GEOMETRY);
+                        DRAWABLE_GEOMETRY, camera_->GetViewMask());
                     octree_->GetDrawables(query);
                 }
                 
@@ -1264,7 +1256,8 @@ unsigned View::ProcessLight(Light* light)
             
         case LIGHT_POINT:
             {
-                SphereOctreeQuery query(tempDrawables_, Sphere(split->GetWorldPosition(), split->GetRange()), DRAWABLE_GEOMETRY);
+                SphereOctreeQuery query(tempDrawables_, Sphere(split->GetWorldPosition(), split->GetRange()), DRAWABLE_GEOMETRY,
+                    camera_->GetViewMask());
                 octree_->GetDrawables(query);
                 ProcessLightQuery(i, tempDrawables_, geometryBox, shadowCasterBox, true, false);
             }
@@ -1273,7 +1266,8 @@ unsigned View::ProcessLight(Light* light)
         case LIGHT_SPOT:
         case LIGHT_SPLITPOINT:
             {
-                FrustumOctreeQuery query(tempDrawables_, splitLights_[i]->GetFrustum(), DRAWABLE_GEOMETRY);
+                FrustumOctreeQuery query(tempDrawables_, splitLights_[i]->GetFrustum(), DRAWABLE_GEOMETRY,
+                    camera_->GetViewMask());
                 octree_->GetDrawables(query);
                 ProcessLightQuery(i, tempDrawables_, geometryBox, shadowCasterBox, true, isSplitShadowed);
             }
@@ -1295,7 +1289,8 @@ unsigned View::ProcessLight(Light* light)
             Camera* shadowCamera = split->GetShadowCamera();
             Texture2D* shadowMap = split->GetShadowMap();
             if (shadowCamera->GetZoom() >= 1.0f)
-                shadowCamera->SetZoom(shadowCamera->GetZoom() * ((float)(shadowMap->GetWidth() - 2) / (float)shadowMap->GetWidth()));
+                shadowCamera->SetZoom(shadowCamera->GetZoom() * ((float)(shadowMap->GetWidth() - 2) /
+                    (float)shadowMap->GetWidth()));
         }
         
         // Update count of total lit geometries & shadow casters
@@ -1359,8 +1354,8 @@ void View::ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& re
         if (light->GetLightType() != LIGHT_DIRECTIONAL)
             lightViewFrustum = camera_->GetSplitFrustum(sceneViewBox_.min_.z_, sceneViewBox_.max_.z_).Transformed(lightView);
         else
-            lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, light->GetNearSplit() - light->GetNearFadeRange()),
-                Min(sceneViewBox_.max_.z_, light->GetFarSplit())).Transformed(lightView);
+            lightViewFrustum = camera_->GetSplitFrustum(Max(sceneViewBox_.min_.z_, light->GetNearSplit() - 
+                light->GetNearFadeRange()), Min(sceneViewBox_.max_.z_, light->GetFarSplit())).Transformed(lightView);
         lightViewFrustumBox.Define(lightViewFrustum);
         
         // Check for degenerate split frustum: in that case there is no need to get shadow casters
@@ -1554,7 +1549,8 @@ void View::SetupShadowCamera(Light* light, bool shadowOcclusion)
             if (light->GetLightType() == LIGHT_SPOT && parameters.zoomOut_)
             {
                 // Make sure the out-zooming does not start while we are inside the spot
-                float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(), 1.0f);
+                float distance = Max((camera_->GetInverseWorldTransform() * light->GetWorldPosition()).z_ - light->GetRange(),
+                    1.0f);
                 float lightPixels = (((float)height_ * light->GetRange() * camera_->GetZoom() * 0.5f) / distance);
                 
                 // Clamp pixel amount to a sufficient minimum to avoid self-shadowing artifacts due to loss of precision

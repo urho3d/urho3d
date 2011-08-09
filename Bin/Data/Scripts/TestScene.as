@@ -447,7 +447,7 @@ void HandlePostRenderUpdate()
     if (ui.GetElementAt(pos, true) is null && testScene.octree !is null)
     {
         Ray cameraRay = camera.GetScreenRay(float(pos.x) / graphics.width, float(pos.y) / graphics.height);
-        Array<RayQueryResult> result = testScene.octree.Raycast(cameraRay, DRAWABLE_GEOMETRY, 250.0, RAY_TRIANGLE);
+        Array<RayQueryResult> result = testScene.octree.Raycast(cameraRay, RAY_TRIANGLE, 250.0, DRAWABLE_GEOMETRY);
         if (result.length > 0)
         {
             Drawable@ object = result[0].drawable;
