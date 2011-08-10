@@ -23,6 +23,8 @@
 
 #include "RefCounted.h"
 
+#include <cassert>
+
 RefCounted::RefCounted() :
     refCount_(new RefCount())
 {
@@ -32,16 +34,16 @@ RefCounted::RefCounted() :
 
 RefCounted::~RefCounted()
 {
-    if (refCount_)
-    {
-        // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
-        refCount_->expired_ = true;
-        --(refCount_->weakRefs_);
-        if (!refCount_->weakRefs_)
-            delete refCount_;
-        
-        refCount_ = 0;
-    }
+    assert(refCount_);
+    assert(refCount_->refs_ == 0);
+    
+    // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
+    refCount_->expired_ = true;
+    --(refCount_->weakRefs_);
+    if (!refCount_->weakRefs_)
+        delete refCount_;
+    
+    refCount_ = 0;
 }
 
 void RefCounted::AddRef()
@@ -51,6 +53,8 @@ void RefCounted::AddRef()
 
 void RefCounted::ReleaseRef()
 {
+    assert(refCount_->refs_ > 0);
+    
     --(refCount_->refs_);
     if (!refCount_->refs_)
         delete this;

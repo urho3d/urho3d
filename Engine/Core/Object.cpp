@@ -29,6 +29,7 @@
 Object::Object(Context* context) :
     context_(context)
 {
+    assert(context_);
 }
 
 Object::~Object()

@@ -144,7 +144,7 @@ void VertexBuffer::OnDeviceLost()
         if (hwData)
         {
             saveData_ = new unsigned char[vertexCount_ * vertexSize_];
-            memcpy(saveData_.RawPtr(), hwData, vertexCount_ * vertexSize_);
+            memcpy(saveData_.Get(), hwData, vertexCount_ * vertexSize_);
         }
         Unlock();
         Release();
@@ -158,7 +158,7 @@ void VertexBuffer::OnDeviceReset()
         Create();
         if (saveData_)
         {
-            SetData(saveData_.RawPtr());
+            SetData(saveData_.Get());
             saveData_.Reset();
         }
     }
@@ -219,7 +219,7 @@ bool VertexBuffer::SetData(const void* data)
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.RawPtr(), data, vertexCount_ * vertexSize_);
+        memcpy(fallbackData_.Get(), data, vertexCount_ * vertexSize_);
         return true;
     }
     
@@ -251,7 +251,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     }
     else if (fallbackData_)
     {
-        memcpy(fallbackData_.RawPtr() + start * vertexSize_, data, vertexCount_ * vertexSize_);
+        memcpy(fallbackData_.Get() + start * vertexSize_, data, vertexCount_ * vertexSize_);
         return true;
     }
     
@@ -313,7 +313,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
         hwData = (unsigned char*)hwData + start * vertexSize_;
     }
     else
-        hwData = fallbackData_.RawPtr() + start * vertexSize_;
+        hwData = fallbackData_.Get() + start * vertexSize_;
     
     locked_ = true;
     return hwData;
@@ -348,7 +348,7 @@ void VertexBuffer::ResetMorphRange(void* lockedMorphRange)
     if (!lockedMorphRange || !morphRangeResetData_)
         return;
     
-    memcpy(lockedMorphRange, morphRangeResetData_.RawPtr(), morphRangeCount_ * vertexSize_);
+    memcpy(lockedMorphRange, morphRangeResetData_.Get(), morphRangeCount_ * vertexSize_);
 }
 
 void VertexBuffer::ClearDataLost()

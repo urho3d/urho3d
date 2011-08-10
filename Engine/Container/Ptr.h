@@ -117,7 +117,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.RawPtr());
+        ptr_ = static_cast<T*>(rhs.Get());
         if (ptr_)
             ptr_->AddRef();
     }
@@ -127,7 +127,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.RawPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Get());
         if (ptr_)
             ptr_->AddRef();
     }
@@ -137,7 +137,7 @@ public:
     /// Check if the pointer is not null
     bool NotNull() const { return ptr_ != 0; }
     /// Return the raw pointer
-    T* RawPtr() const { return ptr_; }
+    T* Get() const { return ptr_; }
     /// Return the object's reference count, or 0 if the pointer is null
     unsigned Refs() const { return ptr_ ? ptr_->Refs() : 0; }
     /// Return the object's weak reference count, or 0 if the pointer is null
@@ -194,7 +194,7 @@ public:
     
     /// Construct from a shared pointer
     WeakPtr(const SharedPtr<T>& rhs) :
-        ptr_(rhs.RawPtr()),
+        ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
@@ -228,12 +228,12 @@ public:
     /// Assign from a shared pointer
     WeakPtr<T>& operator = (const SharedPtr<T>& rhs)
     {
-        if (ptr_ == rhs.RawPtr() && refCount_ == rhs.RefCountPtr())
+        if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
             return *this;
         
         Release();
         
-        ptr_ = rhs.RawPtr();
+        ptr_ = rhs.Get();
         refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -276,7 +276,7 @@ public:
     }
     
     /// Convert to a shared pointer. If expired, return a null shared pointer
-    SharedPtr<T> ToShared() const
+    SharedPtr<T> Lock() const
     {
         if (Expired())
             return SharedPtr<T>();
@@ -285,7 +285,7 @@ public:
     }
     
     /// Return raw pointer. If expired, return null
-    T* RawPtr() const
+    T* Get() const
     {
         if (Expired())
             return 0;
@@ -296,7 +296,7 @@ public:
     /// Point to the object
     T* operator -> () const
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return rawPtr;
     }
@@ -304,7 +304,7 @@ public:
     /// Dereference the object
     T& operator * () const
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return *rawPtr;
     }
@@ -312,7 +312,7 @@ public:
     /// Subscript the object if applicable
     T& operator [] (const int index)
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return (*rawPtr)[index];
     }
@@ -326,7 +326,7 @@ public:
     /// Return true if points to an object which is not expired
     operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if the object is expired
-    operator T* () const { return RawPtr(); }
+    operator T* () const { return Get(); }
     
     /// Reset to null and release the weak reference
     void Reset()
@@ -339,7 +339,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.RawPtr());
+        ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.refCount_;
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -350,7 +350,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.RawPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Get());
         if (ptr_)
         {
             refCount_ = rhs.refCount_;

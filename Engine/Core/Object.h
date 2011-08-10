@@ -114,6 +114,7 @@ public:
     ObjectFactory(Context* context) :
         context_(context)
     {
+        assert(context_);
     }
     
     /// Create an object. Implemented in templated subclasses
@@ -163,6 +164,7 @@ public:
         receiver_(receiver),
         userData_(0)
     {
+        assert(receiver_);
     }
     
     /// Construct with specified receiver and userdata
@@ -170,6 +172,7 @@ public:
         receiver_(receiver),
         userData_(userData)
     {
+        assert(receiver_);
     }
     
     /// Destruct
@@ -201,6 +204,7 @@ public:
         EventHandler(receiver),
         function_(function)
     {
+        assert(function_);
     }
     
     /// Construct with receiver and function pointers and userdata
@@ -208,6 +212,7 @@ public:
         EventHandler(receiver, userData),
         function_(function)
     {
+        assert(function_);
     }
     
     /// Invoke event handler function

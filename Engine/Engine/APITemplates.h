@@ -448,7 +448,7 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
         return 0;
     }
     else
-        return children[index].RawPtr();
+        return children[index].Get();
 }
 
 static CScriptArray* NodeGetChildrenWithScript(bool recursive, Node* ptr)
@@ -472,7 +472,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
         {
             if ((*j)->GetType() == ScriptInstance::GetTypeStatic())
             {
-                ScriptInstance* instance = static_cast<ScriptInstance*>(j->RawPtr());
+                ScriptInstance* instance = static_cast<ScriptInstance*>(j->Get());
                 if (instance->GetClassName() == className)
                     ret.Push(node);
             }

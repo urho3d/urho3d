@@ -105,11 +105,14 @@ public:
         getFunction_(getFunction),
         setFunction_(setFunction)
     {
+        assert(getFunction_);
+        assert(setFunction_);
     }
     
     /// Invoke getter function
     virtual void Get(Serializable* ptr, Variant& dest)
     {
+        assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
@@ -117,6 +120,7 @@ public:
     /// Invoke setter function
     virtual void Set(Serializable* ptr, const Variant& value)
     {
+        assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
         (classPtr->*setFunction_)(value.Get<U>());
     }
@@ -139,11 +143,14 @@ public:
         getFunction_(getFunction),
         setFunction_(setFunction)
     {
+        assert(getFunction_);
+        assert(setFunction_);
     }
     
     /// Invoke getter function
     virtual void Get(Serializable* ptr, Variant& dest)
     {
+        assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
         dest = (classPtr->*getFunction_)();
     }
@@ -151,6 +158,7 @@ public:
     /// Invoke setter function
     virtual void Set(Serializable* ptr, const Variant& value)
     {
+        assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
         (classPtr->*setFunction_)(value.Get<U>());
     }

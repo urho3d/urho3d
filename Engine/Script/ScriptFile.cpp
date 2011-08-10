@@ -336,7 +336,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<char> buffer(new char[dataSize]);
-    source.Read((void*)buffer.RawPtr(), dataSize);
+    source.Read((void*)buffer.Get(), dataSize);
     
     // Pre-parse for includes
     // Adapted from Angelscript's scriptbuilder add-on
@@ -437,7 +437,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     }
     
     // Then add this section
-    if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.RawPtr(), dataSize) < 0)
+    if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Get(), dataSize) < 0)
     {
         LOGERROR("Failed to add script section " + source.GetName());
         return false;

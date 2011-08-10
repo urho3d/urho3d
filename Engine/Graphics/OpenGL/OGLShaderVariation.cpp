@@ -90,7 +90,7 @@ bool ShaderVariation::Create()
         shaderCode += "#define " + defines_[i] + "\n";
     if (!defines_.Empty())
         shaderCode += "\n";
-    shaderCode += String(sourceCode_.RawPtr(), sourceCodeLength_);
+    shaderCode += String(sourceCode_.Get(), sourceCodeLength_);
     
     const char* shaderCStr = shaderCode.CString();
     glShaderSource(object_, 1, &shaderCStr, 0);

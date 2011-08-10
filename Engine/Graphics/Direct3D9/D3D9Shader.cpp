@@ -143,7 +143,7 @@ bool Shader::Load(Deserializer& source)
         if (dataSize)
         {
             SharedArrayPtr<unsigned char> byteCode(new unsigned char[dataSize]);
-            source.Read(byteCode.RawPtr(), dataSize);
+            source.Read(byteCode.Get(), dataSize);
             variation->SetByteCode(byteCode);
         }
         

@@ -79,7 +79,7 @@ bool OcclusionBuffer::SetSize(int width, int height)
     height_ = height;
     // Reserve extra memory in case 3D clipping is not exact
     fullBuffer_ = new int[width * (height + 2)];
-    buffer_ = fullBuffer_.RawPtr() + 1 * width;
+    buffer_ = fullBuffer_.Get() + 1 * width;
     mipBuffers_.Clear();
     
     // Build buffers for mip levels
@@ -220,7 +220,7 @@ void OcclusionBuffer::BuildDepthHierarchy()
         for (int y = 0; y < height; ++y)
         {
             int* src = buffer_ + (y * 2) * width_;
-            DepthValue* dest = mipBuffers_[0].RawPtr() + y * width;
+            DepthValue* dest = mipBuffers_[0].Get() + y * width;
             DepthValue* end = dest + width;
             
             if (y * 2 + 1 < height_)
@@ -264,8 +264,8 @@ void OcclusionBuffer::BuildDepthHierarchy()
         
         for (int y = 0; y < height; ++y)
         {
-            DepthValue* src = mipBuffers_[i - 1].RawPtr() + (y * 2) * prevWidth;
-            DepthValue* dest = mipBuffers_[i].RawPtr() + y * width;
+            DepthValue* src = mipBuffers_[i - 1].Get() + (y * 2) * prevWidth;
+            DepthValue* dest = mipBuffers_[i].Get() + y * width;
             DepthValue* end = dest + width;
             
             if (y * 2 + 1 < prevHeight)
@@ -388,7 +388,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
             int left = rect.left_ >> shift;
             int right = rect.right_ >> shift;
             
-            DepthValue* buffer = mipBuffers_[i].RawPtr();
+            DepthValue* buffer = mipBuffers_[i].Get();
             DepthValue* row = buffer + (rect.top_ >> shift) * width;
             DepthValue* endRow = buffer + (rect.bottom_ >> shift) * width;
             bool allOccluded = true;

@@ -495,7 +495,8 @@ void ProcessVariations(const Shader& baseShader, XMLElement& shaders)
         ErrorExit("Could not open output file " + glslOutFileName);
     for (unsigned i = 0; i < glslCode_.Size(); ++i)
     {
-        outFile.Write(&glslCode_[i][0], glslCode_[i].Length());
+        if (!glslCode_[i].Empty())
+            outFile.Write(&glslCode_[i][0], glslCode_[i].Length());
         outFile.WriteByte(10);
     }
     outFile.Close();

@@ -70,7 +70,7 @@ void Run(const Vector<String>& arguments)
     
     SharedArrayPtr<unsigned char> buffer(new unsigned char[image.GetWidth() * image.GetHeight() * 4]);
     unsigned char* srcData = image.GetData();
-    unsigned char* destData = buffer.RawPtr();
+    unsigned char* destData = buffer.Get();
     
     for (int y = 0; y < image.GetHeight(); ++y)
     {
@@ -91,7 +91,7 @@ void Run(const Vector<String>& arguments)
     }
     
     String tempDestName = arguments[0].Split('.')[0] + ".tga";
-    stbi_write_tga(tempDestName.CString(), image.GetWidth(), image.GetHeight(), 4, buffer.RawPtr());
+    stbi_write_tga(tempDestName.CString(), image.GetWidth(), image.GetHeight(), 4, buffer.Get());
     
     String command = "texconv -f DXT5 -ft DDS -if NONE " + tempDestName;
     int ret = system(command.CString());

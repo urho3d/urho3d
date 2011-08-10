@@ -236,7 +236,7 @@ void SoundSource::SetAutoRemove(bool enable)
 
 bool SoundSource::IsPlaying() const
 {
-    return sound_.RawPtr() != 0;
+    return sound_.Get() != 0;
 }
 
 void SoundSource::SetPlayPosition(signed char* pos)

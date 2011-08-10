@@ -318,7 +318,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     outputParams.suggestedLatency = bufferLengthMSec / 1000.0;
     outputParams.hostApiSpecificStreamInfo = 0;
     
-    if (Pa_OpenStream(&stream_, 0, &outputParams, mixRate, fragmentSize, 0, AudioCallback, this) != paNoError)
+    if (Pa_OpenStream(&stream_, 0, &outputParams, mixRate, fragmentSize_, 0, AudioCallback, this) != paNoError)
     {
         LOGERROR("Failed to open audio stream");
         return false;
@@ -401,7 +401,7 @@ void Audio::Stop()
     
     #ifdef USE_OPENGL
     Pa_StopStream(stream_);
-    else
+    #else
     ((AudioStream*)stream_)->StopPlayback();
     #endif
     
@@ -496,15 +496,15 @@ void Audio::MixOutput(void *dest, unsigned samples)
             clipSamples <<= 1;
         
         // Clear clip buffer
-        memset(clipBuffer_.RawPtr(), 0, clipSamples * sizeof(int));
-        int* clipPtr = clipBuffer_.RawPtr();
+        memset(clipBuffer_.Get(), 0, clipSamples * sizeof(int));
+        int* clipPtr = clipBuffer_.Get();
         
         // Mix samples to clip buffer
         for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
             (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolate_);
         
         // Copy output from clip buffer to destination
-        clipPtr = clipBuffer_.RawPtr();
+        clipPtr = clipBuffer_.Get();
         short* destPtr = (short*)dest;
         while (clipSamples--)
             *destPtr++ = Clamp(*clipPtr++, -32768, 32767);

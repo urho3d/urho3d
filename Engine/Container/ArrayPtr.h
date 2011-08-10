@@ -124,7 +124,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.RawPtr());
+        ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->refs_);
@@ -135,7 +135,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.RawPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Get());
         if (ptr_)
         {
             refCount_ = rhs.RefCountPtr();
@@ -151,7 +151,7 @@ public:
     /// Check if the pointer is not null
     bool NotNull() const { return ptr_ != 0; }
     /// Return the raw pointer
-    T* RawPtr() const { return ptr_; }
+    T* Get() const { return ptr_; }
     /// Return the array's reference count, or 0 if the pointer is null
     unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
     /// Return the array's weak reference count, or 0 if the pointer is null
@@ -223,7 +223,7 @@ public:
     
     /// Construct from a shared array pointer
     WeakArrayPtr(const SharedArrayPtr<T>& rhs) :
-        ptr_(rhs.RawPtr()),
+        ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
     {
         if (refCount_)
@@ -248,12 +248,12 @@ public:
     /// Assign from a shared array pointer
     WeakArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
     {
-        if (ptr_ == rhs.RawPtr() && refCount_ == rhs.RefCountPtr())
+        if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
             return *this;
         
         Release();
         
-        ptr_ = rhs.RawPtr();
+        ptr_ = rhs.Get();
         refCount_ = rhs.RefCountPtr();
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -278,7 +278,7 @@ public:
     }
     
     /// Convert to shared array pointer. If expired, return a null shared array pointer
-    SharedArrayPtr<T> ToShared() const
+    SharedArrayPtr<T> Lock() const
     {
         if (Expired())
             return SharedArrayPtr<T>();
@@ -287,7 +287,7 @@ public:
     }
     
     /// Return raw pointer. If expired, return null
-    T* RawPtr() const
+    T* Get() const
     {
         if (Expired())
             return 0;
@@ -298,7 +298,7 @@ public:
     /// Point to the array
     T* operator -> () const
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return rawPtr;
     }
@@ -306,7 +306,7 @@ public:
     /// Dereference the array
     T& operator * () const
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return *rawPtr;
     }
@@ -314,7 +314,7 @@ public:
     /// Subscript the array
     T& operator [] (const int index)
     {
-        T* rawPtr = RawPtr();
+        T* rawPtr = Get();
         assert(rawPtr);
         return (*rawPtr)[index];
     }
@@ -328,7 +328,7 @@ public:
     /// Return true if points to an array which is not expired
     operator bool () const { return !Expired(); }
     /// Convert to a raw pointer, null if array is expired
-    operator T* () const { return RawPtr(); }
+    operator T* () const { return Get(); }
     
     /// Reset to null and release the weak reference
     void Reset()
@@ -341,7 +341,7 @@ public:
     {
         Release();
         
-        ptr_ = static_cast<T*>(rhs.RawPtr());
+        ptr_ = static_cast<T*>(rhs.Get());
         refCount_ = rhs.refCount_;
         if (refCount_)
             ++(refCount_->weakRefs_);
@@ -352,7 +352,7 @@ public:
     {
         Release();
         
-        ptr_ = dynamic_cast<T*>(rhs.RawPtr());
+        ptr_ = dynamic_cast<T*>(rhs.Get());
         if (ptr_)
         {
             refCount_ = rhs.refCount_;

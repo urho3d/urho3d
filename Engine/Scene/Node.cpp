@@ -463,7 +463,7 @@ void Node::RemoveChild(Node* node)
     
     for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        if (i->RawPtr() == node)
+        if (i->Get() == node)
         {
             RemoveChild(i);
             return;
@@ -633,7 +633,7 @@ void Node::GetChildrenWithComponent(PODVector<Node*>& dest, ShortStringHash type
 
 Node* Node::GetChild(unsigned index) const
 {
-    return index < children_.Size() ? children_[index].RawPtr() : 0;
+    return index < children_.Size() ? children_[index].Get() : 0;
 }
 
 Node* Node::GetChild(const String& name, bool recursive) const
@@ -693,7 +693,7 @@ bool Node::HasComponent(ShortStringHash type) const
 
 Component* Node::GetComponent(unsigned index) const
 {
-    return index < components_.Size() ? components_[index].RawPtr() : 0;
+    return index < components_.Size() ? components_[index].Get() : 0;
 }
 
 Component* Node::GetComponent(ShortStringHash type, unsigned index) const

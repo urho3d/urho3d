@@ -194,8 +194,8 @@ void UI::Update(float timeStep)
                 using namespace DragDropTest;
                 
                 VariantMap eventData;
-                eventData[P_SOURCE] = (void*)dragElement_.RawPtr();
-                eventData[P_TARGET] = (void*)element.RawPtr();
+                eventData[P_SOURCE] = (void*)dragElement_.Get();
+                eventData[P_TARGET] = (void*)element.Get();
                 eventData[P_ACCEPT] = accept;
                 SendEvent(E_DRAGDROPTEST, eventData);
                 accept = eventData[P_ACCEPT].GetBool();
@@ -523,7 +523,7 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
     for (PODVector<UIElement*>::ConstIterator i = children.Begin(); i != children.End(); ++i)
     {
         UIElement* element = *i;
-        if (element != cursor_.RawPtr() && element->IsVisible())
+        if (element != cursor_.Get() && element->IsVisible())
         {
             if (element->IsInside(position, true))
             {
@@ -656,7 +656,7 @@ void UI::HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         using namespace UIMouseClick;
         
         VariantMap eventData;
-        eventData[UIMouseClick::P_ELEMENT] = (void*)element.RawPtr();
+        eventData[UIMouseClick::P_ELEMENT] = (void*)element.Get();
         eventData[UIMouseClick::P_X] = pos.x_;
         eventData[UIMouseClick::P_Y] = pos.y_;
         eventData[UIMouseClick::P_BUTTON] = button;
@@ -701,8 +701,8 @@ void UI::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
                             using namespace DragDropFinish;
                             
                             VariantMap eventData;
-                            eventData[P_SOURCE] = (void*)dragElement_.RawPtr();
-                            eventData[P_TARGET] = (void*)target.RawPtr();
+                            eventData[P_SOURCE] = (void*)dragElement_.Get();
+                            eventData[P_TARGET] = (void*)target.Get();
                             eventData[P_ACCEPT] = accept;
                             SendEvent(E_DRAGDROPFINISH, eventData);
                         }

@@ -58,13 +58,13 @@ bool XMLFile::Load(Deserializer& source)
         return false;
     
     SharedArrayPtr<char> buffer(new char[dataSize + 1]);
-    if (source.Read(buffer.RawPtr(), dataSize) != dataSize)
+    if (source.Read(buffer.Get(), dataSize) != dataSize)
         return false;
     
     buffer[dataSize] = 0;
     
     document_->Clear();
-    document_->Parse(buffer.RawPtr());
+    document_->Parse(buffer.Get());
     if (document_->Error())
     {
         document_->ClearError();

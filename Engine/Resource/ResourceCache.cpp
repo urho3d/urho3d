@@ -285,7 +285,7 @@ bool ResourceCache::ReloadResource(Resource* resource)
     bool success = false;
     SharedPtr<File> file = GetFile(resource->GetName());
     if (file)
-        success = resource->Load(*(file.RawPtr()));
+        success = resource->Load(*(file.Get()));
     
     if (success)
     {
@@ -377,7 +377,7 @@ Resource* ResourceCache::GetResource(ShortStringHash type, StringHash nameHash)
     
     LOGDEBUG("Loading resource " + name);
     resource->SetName(file->GetName());
-    if (!resource->Load(*(file.RawPtr())))
+    if (!resource->Load(*(file.Get())))
         return 0;
     
     // Store to cache
