@@ -463,7 +463,7 @@ void Node::RemoveChild(Node* node)
     
     for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        if (i->Get() == node)
+        if (*i == node)
         {
             RemoveChild(i);
             return;
@@ -538,7 +538,7 @@ void Node::AddListener(Component* component)
     // Check for not adding twice
     for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End(); ++i)
     {
-        if ((*i) == component)
+        if (*i == component)
             return;
     }
     
@@ -552,7 +552,7 @@ void Node::RemoveListener(Component* component)
 {
     for (Vector<WeakPtr<Component> >::Iterator i = listeners_.Begin(); i != listeners_.End(); ++i)
     {
-        if ((*i) == component)
+        if (*i == component)
         {
             listeners_.Erase(i);
             return;

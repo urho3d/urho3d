@@ -64,16 +64,13 @@ public:
     /// Remove a drawable object from this octant
     void RemoveDrawable(Drawable* drawable, bool resetOctant = true)
     {
-        for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
+        PODVector<Drawable*>::Iterator i = drawables_.Find(drawable);
+        if (i != drawables_.End())
         {
-            if (*i == drawable)
-            {
-                if (resetOctant)
-                    drawable->SetOctant(0);
-                drawables_.Erase(i);
-                DecDrawableCount();
-                return;
-            }
+            if (resetOctant)
+                drawable->SetOctant(0);
+            drawables_.Erase(i);
+            DecDrawableCount();
         }
     }
     

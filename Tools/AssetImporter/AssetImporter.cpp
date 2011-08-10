@@ -516,7 +516,7 @@ void CollectBones(OutModel& model)
         aiNode* commonParent = (*rootNodes.Begin())->mParent;
         for (Set<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
         {
-            if ((*i) != commonParent)
+            if (*i != commonParent)
             {
                 if (!commonParent || (*i)->mParent != commonParent)
                     ErrorExit("Skeleton with multiple root nodes found, not supported");

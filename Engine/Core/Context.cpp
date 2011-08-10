@@ -121,12 +121,9 @@ void Context::CopyBaseAttributes(ShortStringHash baseType, ShortStringHash deriv
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
     PODVector<Object*>& receivers = eventReceivers_[eventType];
-    for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
-    {
-        // Check if already registered
-        if (*j == receiver)
-            return;
-    }
+    // Check if already registered
+    if (receivers.Contains(receiver))
+        return;
     
     receivers.Push(receiver);
 }
@@ -134,11 +131,8 @@ void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
     PODVector<Object*>& receivers = specificEventReceivers_[MakePair(sender, eventType)];
-    for (PODVector<Object*>::ConstIterator j = receivers.Begin(); j != receivers.End(); ++j)
-    {
-        if (*j == receiver)
-            return;
-    }
+    if (receivers.Contains(receiver))
+        return;
     
     receivers.Push(receiver);
 }
@@ -168,19 +162,16 @@ void Context::RemoveEventReceiver(Object* receiver, StringHash eventType)
     if (!group)
         return;
     
-    for (PODVector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
+    PODVector<Object*>::Iterator i = group->Find(receiver);
+    if (i != group->End())
     {
-        if (*i == receiver)
+        // If no event handling going on, can erase the receiver. Otherwise reset the pointer and clean up later
+        if (eventSenders_.Empty())
+            group->Erase(i);
+        else
         {
-            // If no event handling going on, can erase the receiver. Otherwise reset the pointer and clean up later
-            if (eventSenders_.Empty())
-                group->Erase(i);
-            else
-            {
-                *i = 0;
-                dirtyReceivers_.Insert(eventType);
-            }
-            return;
+            *i = 0;
+            dirtyReceivers_.Insert(eventType);
         }
     }
 }
@@ -191,19 +182,17 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
     if (!group)
         return;
     
-    for (PODVector<Object*>::Iterator i = group->Begin(); i != group->End(); ++i)
+    PODVector<Object*>::Iterator i = group->Find(receiver);
+    if (i != group->End())
     {
-        if (*i == receiver)
+        if (eventSenders_.Empty())
+            group->Erase(i);
+        else
         {
-            if (eventSenders_.Empty())
-                group->Erase(i);
-            else
-            {
-                *i = 0;
-                dirtySpecificReceivers_.Insert(MakePair(sender, eventType));
-            }
-            return;
+            *i = 0;
+            dirtySpecificReceivers_.Insert(MakePair(sender, eventType));
         }
+        return;
     }
 }
 

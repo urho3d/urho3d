@@ -792,7 +792,7 @@ void UIElement::RemoveChild(UIElement* element)
 {
     for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
     {
-        if ((*i) == element)
+        if (*i == element)
         {
             element->parent_ = 0;
             element->MarkDirty();

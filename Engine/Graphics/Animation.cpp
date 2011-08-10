@@ -180,7 +180,7 @@ const AnimationTrack* Animation::GetTrack(const String& name) const
 {
     for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
-        if ((*i).name_ == name)
+        if (i->name_ == name)
             return &(*i);
     }
     
@@ -191,7 +191,7 @@ const AnimationTrack* Animation::GetTrack(StringHash nameHash) const
 {
     for (Vector<AnimationTrack>::ConstIterator i = tracks_.Begin(); i != tracks_.End(); ++i)
     {
-        if ((*i).nameHash_ == nameHash)
+        if (i->nameHash_ == nameHash)
             return &(*i);
     }
     

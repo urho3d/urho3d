@@ -460,14 +460,9 @@ void Audio::RemoveSoundSource(SoundSource* channel)
 {
     MutexLock Lock(audioMutex_);
     
-    for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-    {
-        if (*i == channel)
-        {
-            soundSources_.Erase(i);
-            return;
-        }
-    }
+    PODVector<SoundSource*>::Iterator i = soundSources_.Find(channel);
+    if (i != soundSources_.End())
+        soundSources_.Erase(i);
 }
 
 #ifdef USE_OPENGL

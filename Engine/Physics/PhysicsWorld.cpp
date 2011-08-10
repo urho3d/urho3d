@@ -362,14 +362,9 @@ void PhysicsWorld::AddRigidBody(RigidBody* body)
 
 void PhysicsWorld::RemoveRigidBody(RigidBody* body)
 {
-    for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
-    {
-        if ((*i) == body)
-        {
-            rigidBodies_.Erase(i);
-            return;
-        }
-    }
+    PODVector<RigidBody*>::Iterator i = rigidBodies_.Find(body);
+    if (i != rigidBodies_.End())
+        rigidBodies_.Erase(i);
 }
 
 void PhysicsWorld::SendCollisionEvents()

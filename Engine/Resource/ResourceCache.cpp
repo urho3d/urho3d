@@ -149,7 +149,7 @@ void ResourceCache::RemovePackageFile(PackageFile* package, bool ReleaseResource
 {
     for (Vector<SharedPtr<PackageFile> >::Iterator i = packages_.Begin(); i != packages_.End(); ++i)
     {
-        if ((*i) == package)
+        if (*i == package)
         {
             if (ReleaseResources)
                 ReleasePackageResources(*i, forceRelease);

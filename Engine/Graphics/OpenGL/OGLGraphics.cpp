@@ -1982,14 +1982,9 @@ void Graphics::AddGPUObject(GPUObject* object)
 
 void Graphics::RemoveGPUObject(GPUObject* object)
 {
-    for (Vector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
-    {
-        if ((*i) == object)
-        {
-            gpuObjects_.Erase(i);
-            return;
-        }
-    }
+    Vector<GPUObject*>::Iterator i = gpuObjects_.Find(object);
+    if (i != gpuObjects_.End())
+        gpuObjects_.Erase(i);
 }
 
 unsigned Graphics::GetAlphaFormat()
