@@ -22,8 +22,8 @@
 #elif defined(WIN32)
 #include <Windows.h>
 #else
+#include <cassert>
 #include <pthread.h>
-#include <assert.h>
 #endif
 
 #include "PolledTimer.h"

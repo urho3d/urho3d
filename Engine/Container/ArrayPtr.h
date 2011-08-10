@@ -26,6 +26,8 @@
 #include "HashBase.h"
 #include "RefCounted.h"
 
+#include <cassert>
+
 /// Shared array pointer template class. Uses non-intrusive reference counting
 template <class T> class SharedArrayPtr
 {
@@ -95,11 +97,11 @@ public:
     }
     
     /// Point to the array
-    T* operator -> () const { return ptr_; }
+    T* operator -> () const { assert(ptr_); return ptr_; }
     /// Dereference the array
-    T& operator * () const { return *ptr_; }
+    T& operator * () const { assert(ptr_); return *ptr_; }
     /// Subscript the array
-    T& operator [] (const int index) { return ptr_[index]; }
+    T& operator [] (const int index) { assert(ptr_); return ptr_[index]; }
     /// Test for equality with another shared array pointer
     bool operator == (const SharedArrayPtr<T>& rhs) const { return ptr_ == rhs.ptr_; }
     /// Test for inequality with another shared array pointer
@@ -296,19 +298,25 @@ public:
     /// Point to the array
     T* operator -> () const
     {
-        return RawPtr();
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return rawPtr;
     }
     
     /// Dereference the array
     T& operator * () const
     {
-        return *RawPtr();
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return *rawPtr;
     }
     
     /// Subscript the array
     T& operator [] (const int index)
     {
-        return (*RawPtr())[index];
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return (*rawPtr)[index];
     }
     
     /// Test for equality with another weak array pointer

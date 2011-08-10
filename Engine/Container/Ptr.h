@@ -25,6 +25,8 @@
 
 #include "RefCounted.h"
 
+#include <cassert>
+
 /// Shared pointer template class. Can point to an object that derives from RefCounted
 template <class T> class SharedPtr
 {
@@ -88,11 +90,11 @@ public:
     }
     
     /// Point to the object
-    T* operator -> () const { return ptr_; }
+    T* operator -> () const { assert(ptr_); return ptr_; }
     /// Dereference the object
-    T& operator * () const { return *ptr_; }
+    T& operator * () const { assert(ptr_); return *ptr_; }
     /// Subscript the object if applicable
-    T& operator [] (const int index) { return ptr_[index]; }
+    T& operator [] (const int index) { assert(ptr_); return ptr_[index]; }
     /// Test for less than with another shared pointer
     bool operator < (const SharedPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
     /// Test for equality with another shared pointer
@@ -294,19 +296,25 @@ public:
     /// Point to the object
     T* operator -> () const
     {
-        return RawPtr();
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return rawPtr;
     }
     
     /// Dereference the object
     T& operator * () const
     {
-        return *RawPtr();
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return *rawPtr;
     }
     
     /// Subscript the object if applicable
     T& operator [] (const int index)
     {
-        return (*RawPtr())[index];
+        T* rawPtr = RawPtr();
+        assert(rawPtr);
+        return (*rawPtr)[index];
     }
     
     /// Test for equality with another weak pointer

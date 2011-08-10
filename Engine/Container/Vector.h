@@ -25,6 +25,7 @@
 
 #include "VectorBase.h"
 
+#include <cassert>
 #include <cstring>
 #include <new>
 
@@ -141,13 +142,13 @@ public:
     }
     
     /// Return element at index
-    T& operator [] (unsigned index) { return Buffer()[index]; }
+    T& operator [] (unsigned index) { assert(index < size_); return Buffer()[index]; }
     /// Return const element at index
-    const T& operator [] (unsigned index) const { return Buffer()[index]; }
+    const T& operator [] (unsigned index) const { assert(index < size_); return Buffer()[index]; }
     /// Return element at index
-    T& At(unsigned index) { return Buffer()[index]; }
+    T& At(unsigned index) { assert(index < size_); return Buffer()[index]; }
     /// Return const element at index
-    const T& At(unsigned index) const { return Buffer()[index]; }
+    const T& At(unsigned index) const { assert(index < size_); return Buffer()[index]; }
 
     /// Add an element at the end
     void Push(const T& value)
@@ -548,13 +549,13 @@ public:
     }
     
     /// Return element at index
-    T& operator [] (unsigned index) { return Buffer()[index]; }
+    T& operator [] (unsigned index) { assert(index < size_); return Buffer()[index]; }
     /// Return const element at index
-    const T& operator [] (unsigned index) const { return Buffer()[index]; }
+    const T& operator [] (unsigned index) const { assert(index < size_); return Buffer()[index]; }
     /// Return element at index
-    T& At(unsigned index) { return Buffer()[index]; }
+    T& At(unsigned index) { assert(index < size_); return Buffer()[index]; }
     /// Return const element at index
-    const T& At(unsigned index) const { return Buffer()[index]; }
+    const T& At(unsigned index) const { assert(index < size_); return Buffer()[index]; }
     
     /// Add an element at the end
     void Push(const T& value)

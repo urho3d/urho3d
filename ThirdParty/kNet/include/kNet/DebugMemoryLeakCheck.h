@@ -23,7 +23,8 @@
 #include <new>
 #include <crtdbg.h>
 
-// include these files beforehand to avoid compilation errors from our operator new redefine.
+// Include these files beforehand to avoid compilation errors from our operator new redefine.
+#include <ios>
 #include "List.h"
 #include "Map.h"
 #include "Set.h"
