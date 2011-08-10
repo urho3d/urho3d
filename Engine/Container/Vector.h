@@ -326,6 +326,30 @@ public:
         Reserve(size_);
     }
     
+    /// Return iterator to value, or to the end if not found
+    Iterator Find(const T& value)
+    {
+        Iterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return const iterator to value, or to the end if not found
+    ConstIterator Find(const T& value) const
+    {
+        ConstIterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return whether contains a specific value
+    bool Contains(const T& value) const
+    {
+        return Find(value) != End();
+    }
+    
     /// Return iterator to the beginning
     Iterator Begin() { return Iterator(Buffer()); }
     /// Return const iterator to the beginning
@@ -348,7 +372,6 @@ public:
     unsigned Capacity() const { return capacity_; }
     /// Return whether vector is empty
     bool Empty() const { return size_ == 0; }
-
     
 private:
     /// Return the buffer with right type
@@ -753,6 +776,30 @@ public:
     void Compact()
     {
         Reserve(size_);
+    }
+    
+    /// Return iterator to value, or to the end if not found
+    Iterator Find(const T& value)
+    {
+        Iterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return const iterator to value, or to the end if not found
+    ConstIterator Find(const T& value) const
+    {
+        ConstIterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return whether contains a specific value
+    bool Contains(const T& value) const
+    {
+        return Find(value) != End();
     }
     
     /// Return iterator to the beginning

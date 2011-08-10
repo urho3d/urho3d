@@ -84,6 +84,8 @@ struct Batch
     unsigned shaderDataSize_;
     /// Distance from camera
     float distance_;
+    /// State sorting key
+    unsigned long long sortKey_;
     /// Geometry type
     GeometryType geometryType_;
     /// Vertex shader index
@@ -92,8 +94,6 @@ struct Batch
     bool overrideView_;
     /// Priority flag
     bool hasPriority_;
-    /// State sorting key
-    unsigned long long sortKey_;
 };
 
 /// Data for one geometry instance

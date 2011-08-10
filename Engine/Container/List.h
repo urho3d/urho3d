@@ -282,6 +282,30 @@ public:
             EraseNode(Head());
     }
     
+    /// Return iterator to value, or to the end if not found
+    Iterator Find(const T& value)
+    {
+        Iterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return const iterator to value, or to the end if not found
+    ConstIterator Find(const T& value) const
+    {
+        ConstIterator i = Begin();
+        while (i != End() && *i != value)
+            ++i;
+        return i;
+    }
+    
+    /// Return whether contains a specific value
+    bool Contains(const T& value) const
+    {
+        return Find(value) != End();
+    }
+    
     /// Return iterator to the first element
     Iterator Begin() { return Iterator(Head()); }
     /// Return iterator to the first element
