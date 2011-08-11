@@ -46,48 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AI_STREAMREADER_H_INCLUDED
 
 #include "ByteSwap.h"
-namespace Assimp	{
-	namespace Intern {
 
-// --------------------------------------------------------------------------------------------
-template <typename T, bool doit>
-struct ByteSwapper	{
-	void operator() (T* inout) {
-		ByteSwap::Swap(inout);
-	}
-};
-
-template <typename T> 
-struct ByteSwapper<T,false>	{
-	void operator() (T*) {
-	}
-};
-
-// --------------------------------------------------------------------------------------------
-template <bool SwapEndianess, typename T, bool RuntimeSwitch>
-struct Getter {
-	void operator() (T* inout, bool le) {
-#ifdef AI_BUILD_BIG_ENDIAN
-		le =  le;
-#else
-		le =  !le;
-#endif
-		if (le) {
-			ByteSwapper<T,(sizeof(T)>1?true:false)> () (inout);
-		}
-		else ByteSwapper<T,false> () (inout);
-	}
-};
-
-template <bool SwapEndianess, typename T> 
-struct Getter<SwapEndianess,T,false> {
-	void operator() (T* inout, bool le) {
-
-		// static branch
-		ByteSwapper<T,(SwapEndianess && sizeof(T)>1)> () (inout);
-	}
-};
-} // end Intern
+namespace Assimp {
 
 // --------------------------------------------------------------------------------------------
 /** Wrapper class around IOStream to allow for consistent reading of binary data in both 
@@ -130,7 +90,8 @@ public:
 		: stream(stream)
 		, le(le)
 	{
-		_Begin();
+		ai_assert(stream); 
+		InternBegin();
 	}
 
 	// ---------------------------------------------------------------------
@@ -138,7 +99,8 @@ public:
 		: stream(boost::shared_ptr<IOStream>(stream))
 		, le(le)
 	{
-		_Begin();
+		ai_assert(stream);
+		InternBegin();
 	}
 
 	// ---------------------------------------------------------------------
@@ -286,11 +248,11 @@ public:
 	/** Setup a temporary read limit
 	 * 
 	 *  @param limit Maximum number of bytes to be read from
-	 *    the beginning of the file. Passing 0xffffffff
+	 *    the beginning of the file. Specifying UINT_MAX
 	 *    resets the limit to the original end of the stream. */
 	void SetReadLimit(unsigned int _limit)	{
 
-		if (0xffffffff == _limit) {
+		if (UINT_MAX == _limit) {
 			limit = end;
 			return;
 		}
@@ -341,8 +303,13 @@ private:
 	}
 
 	// ---------------------------------------------------------------------
-	void _Begin() {
+	void InternBegin() {
 		if (!stream) {
+			// incase someone wonders: StreamReader is frequently invoked with
+			// no prior validation whether the input stream is valid. Since
+			// no one bothers changing the error message, this message here
+			// is passed down to the caller and 'unable to open file'
+			// simply describes best what happened.
 			throw DeadlyImportError("StreamReader: Unable to open file");
 		}
 
@@ -352,8 +319,10 @@ private:
 		}
 
 		current = buffer = new int8_t[s];
-		stream->Read(current,s,1);
-		end = limit = &buffer[s];
+		const size_t read = stream->Read(current,1,s);
+		// (read < s) can only happen if the stream was opened in text mode, in which case FileSize() is not reliable
+		ai_assert(read <= s);
+		end = limit = &buffer[read];
 	}
 
 private:

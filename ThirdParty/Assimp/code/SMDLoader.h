@@ -69,7 +69,7 @@ namespace SMD	{
 */
 struct Vertex
 {
-	Vertex() : iParentNode(0xffffffff)
+	Vertex() : iParentNode(UINT_MAX)
 	 {}
 
 	//! Vertex position, normal and texture coordinate
@@ -106,7 +106,7 @@ struct Face
 struct Bone
 {
 	//! Default constructor
-	Bone() : iParent(0xffffffff), bIsUsed(false)
+	Bone() : iParent(UINT_MAX), bIsUsed(false)
 	{
 	}
 
@@ -172,14 +172,10 @@ struct Bone
 */
 class SMDImporter : public BaseImporter
 {
-	friend class Importer;
-
-protected:
-	/** Constructor to be privately used by Importer */
+public:
 	SMDImporter();
-
-	/** Destructor, private as well */
 	~SMDImporter();
+
 
 public:
 

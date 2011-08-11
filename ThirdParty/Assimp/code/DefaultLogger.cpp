@@ -64,8 +64,10 @@ namespace Assimp	{
 NullLogger DefaultLogger::s_pNullLogger;
 Logger *DefaultLogger::m_pLogger = &DefaultLogger::s_pNullLogger;
 
+static const unsigned int SeverityAll = Logger::Info | Logger::Err | Logger::Warn | Logger::Debugging;
+
 // ----------------------------------------------------------------------------------
-// Represents a logstream + its error severity
+// Represents a log-stream + its error severity
 struct LogStreamInfo
 {
 	unsigned int m_uiErrorSeverity;
@@ -157,47 +159,49 @@ Logger *DefaultLogger::create(const char* name /*= "AssimpLog.txt"*/,
 }
 
 // ----------------------------------------------------------------------------------
-void Logger::debug(const std::string &message)	{
+void Logger::debug(const char* message)	{
 
-	// SECURITY FIX: otherwise it's easy to produce overruns ...
-	if (message.length()>MAX_LOG_MESSAGE_LENGTH) {
+	// SECURITY FIX: otherwise it's easy to produce overruns since
+	// sometimes importers will include data from the input file
+	// (i.e. node names) in their messages.
+	if (strlen(message)>MAX_LOG_MESSAGE_LENGTH) {
 		ai_assert(false);
 		return;
 	}
-	return OnDebug(message.c_str());
+	return OnDebug(message);
 }
 
 // ----------------------------------------------------------------------------------
-void Logger::info(const std::string &message)	{
+void Logger::info(const char* message)	{
 	
-	// SECURITY FIX: otherwise it's easy to produce overruns ...
-	if (message.length()>MAX_LOG_MESSAGE_LENGTH) {
+	// SECURITY FIX: see above
+	if (strlen(message)>MAX_LOG_MESSAGE_LENGTH) {
 		ai_assert(false);
 		return;
 	}
-	return OnInfo(message.c_str());
+	return OnInfo(message);
 }
 	
 // ----------------------------------------------------------------------------------
-void Logger::warn(const std::string &message)	{
+void Logger::warn(const char* message)	{
 	
-	// SECURITY FIX: otherwise it's easy to produce overruns ...
-	if (message.length()>MAX_LOG_MESSAGE_LENGTH) {
+	// SECURITY FIX: see above
+	if (strlen(message)>MAX_LOG_MESSAGE_LENGTH) {
 		ai_assert(false);
 		return;
 	}
-	return OnWarn(message.c_str());
+	return OnWarn(message);
 }
 
 // ----------------------------------------------------------------------------------
-void Logger::error(const std::string &message)	{
+void Logger::error(const char* message)	{
 	
-	// SECURITY FIX: otherwise it's easy to produce overruns ...
-	if (message.length()>MAX_LOG_MESSAGE_LENGTH) {
+	// SECURITY FIX: see above
+	if (strlen(message)>MAX_LOG_MESSAGE_LENGTH) {
 		ai_assert(false);
 		return;
 	}
-	return OnError(message.c_str());
+	return OnError(message);
 }
 
 // ----------------------------------------------------------------------------------
@@ -252,7 +256,7 @@ void DefaultLogger::OnDebug( const char* message )
 	char msg[MAX_LOG_MESSAGE_LENGTH*2];
 	::sprintf(msg,"Debug, T%i: %s", GetThreadID(), message );
 
-	WriteToStreams( msg, Logger::DEBUGGING );
+	WriteToStreams( msg, Logger::Debugging );
 }
 
 // ----------------------------------------------------------------------------------
@@ -262,7 +266,7 @@ void DefaultLogger::OnInfo( const char* message )
 	char msg[MAX_LOG_MESSAGE_LENGTH*2];
 	::sprintf(msg,"Info,  T%i: %s", GetThreadID(), message );
 
-	WriteToStreams( msg , Logger::INFO );
+	WriteToStreams( msg , Logger::Info );
 }
 
 // ----------------------------------------------------------------------------------
@@ -272,7 +276,7 @@ void DefaultLogger::OnWarn( const char* message )
 	char msg[MAX_LOG_MESSAGE_LENGTH*2];
 	::sprintf(msg,"Warn,  T%i: %s", GetThreadID(), message );
 
-	WriteToStreams( msg, Logger::WARN );
+	WriteToStreams( msg, Logger::Warn );
 }
 
 // ----------------------------------------------------------------------------------
@@ -282,18 +286,18 @@ void DefaultLogger::OnError( const char* message )
 	char msg[MAX_LOG_MESSAGE_LENGTH*2];
 	::sprintf(msg,"Error, T%i: %s", GetThreadID(), message );
 
-	WriteToStreams( msg, Logger::ERR );
+	WriteToStreams( msg, Logger::Err );
 }
 
 // ----------------------------------------------------------------------------------
-//	Attachs a new stream
+//	Will attach a new stream
 bool DefaultLogger::attachStream( LogStream *pStream, unsigned int severity )
 {
 	if (!pStream)
 		return false;
 
 	if (0 == severity)	{
-		severity = Logger::INFO | Logger::ERR | Logger::WARN | Logger::DEBUGGING;
+		severity = Logger::Info | Logger::Err | Logger::Warn | Logger::Debugging;
 	}
 
 	for ( StreamIt it = m_StreamArray.begin();
@@ -320,7 +324,7 @@ bool DefaultLogger::detatchStream( LogStream *pStream, unsigned int severity )
 		return false;
 
 	if (0 == severity)	{
-		severity = Logger::INFO | Logger::ERR | Logger::WARN | Logger::DEBUGGING;
+		severity = SeverityAll;
 	}
 	
 	for ( StreamIt it = m_StreamArray.begin();

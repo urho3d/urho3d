@@ -196,15 +196,15 @@ void PretransformVertices::CollectData( aiScene* pcScene, aiNode* pcNode, unsign
 					// copy normals, transform them to worldspace
 					for (unsigned int n = 0; n < pcMesh->mNumVertices;++n)	{
 						pcMeshOut->mNormals[aiCurrent[AI_PTVS_VERTEX]+n] = 
-							m * pcMesh->mNormals[n];
+							(m * pcMesh->mNormals[n]).Normalize();
 					}
 				}
 				if (iVFormat & 0x4)
 				{
 					// copy tangents and bitangents, transform them to worldspace
 					for (unsigned int n = 0; n < pcMesh->mNumVertices;++n)	{
-						pcMeshOut->mTangents  [aiCurrent[AI_PTVS_VERTEX]+n] = m * pcMesh->mTangents[n];
-						pcMeshOut->mBitangents[aiCurrent[AI_PTVS_VERTEX]+n] = m * pcMesh->mBitangents[n];
+						pcMeshOut->mTangents  [aiCurrent[AI_PTVS_VERTEX]+n] = (m * pcMesh->mTangents[n]).Normalize();
+						pcMeshOut->mBitangents[aiCurrent[AI_PTVS_VERTEX]+n] = (m * pcMesh->mBitangents[n]).Normalize();
 					}
 				}
 			}
@@ -334,13 +334,13 @@ void PretransformVertices::ApplyTransform(aiMesh* mesh, const aiMatrix4x4& mat)
 
 			if (mesh->HasNormals()) {
 				for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-					mesh->mNormals[i] = m * mesh->mNormals[i];
+					mesh->mNormals[i] = (m * mesh->mNormals[i]).Normalize();
 				}
 			}
 			if (mesh->HasTangentsAndBitangents()) {
 				for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-					mesh->mTangents[i]   = m * mesh->mTangents[i];
-					mesh->mBitangents[i] = m * mesh->mBitangents[i];
+					mesh->mTangents[i]   = (m * mesh->mTangents[i]).Normalize();
+					mesh->mBitangents[i] = (m * mesh->mBitangents[i]).Normalize();
 				}
 			}
 		}
@@ -353,7 +353,7 @@ void PretransformVertices::BuildWCSMeshes(std::vector<aiMesh*>& out, aiMesh** in
 	unsigned int numIn, aiNode* node)
 {
 	// NOTE:
-	//  aiMesh::mNumBones store original source mesh, or 0xffffffff if not a copy
+	//  aiMesh::mNumBones store original source mesh, or UINT_MAX if not a copy
 	//  aiMesh::mBones store reference to abs. transform we multiplied with
 
 	// process meshes
@@ -364,7 +364,7 @@ void PretransformVertices::BuildWCSMeshes(std::vector<aiMesh*>& out, aiMesh** in
 		if (!mesh->mBones || *reinterpret_cast<aiMatrix4x4*>(mesh->mBones) == node->mTransformation) {
 			// yes, we can.
 			mesh->mBones = reinterpret_cast<aiBone**> (&node->mTransformation);
-			mesh->mNumBones = 0xffffffff;
+			mesh->mNumBones = UINT_MAX;
 		}
 		else {
 		
@@ -537,40 +537,41 @@ void PretransformVertices::Execute( aiScene* pScene)
 			}
 		}
 
-		// now delete all meshes in the scene and build a new mesh list
-		for (unsigned int i = 0; i < pScene->mNumMeshes;++i)
-		{
-			aiMesh* mesh = pScene->mMeshes[i];
-			mesh->mNumBones = 0;
-			mesh->mBones    = NULL;
-
-			// we're reusing the face index arrays. avoid destruction
-			for (unsigned int a = 0; a < mesh->mNumFaces; ++a) {
-				mesh->mFaces[a].mNumIndices = 0;
-				mesh->mFaces[a].mIndices = NULL;
-			}
-
-			delete mesh;
-
-			// Invalidate the contents of the old mesh array. We will most
-			// likely have less output meshes now, so the last entries of 
-			// the mesh array are not overridden. We set them to NULL to 
-			// make sure the developer gets notified when his application
-			// attempts to access these fields ...
-			mesh = NULL;
-		}
-
 		// If no meshes are referenced in the node graph it is possible that we get no output meshes. 
 		if (apcOutMeshes.empty())	{		
-			throw DeadlyImportError("No output meshes: all meshes are orphaned and are not referenced by nodes");
+			throw DeadlyImportError("No output meshes: all meshes are orphaned and are not referenced by any nodes");
 		}
 		else
 		{
+			// now delete all meshes in the scene and build a new mesh list
+			for (unsigned int i = 0; i < pScene->mNumMeshes;++i)
+			{
+				aiMesh* mesh = pScene->mMeshes[i];
+				mesh->mNumBones = 0;
+				mesh->mBones    = NULL;
+
+				// we're reusing the face index arrays. avoid destruction
+				for (unsigned int a = 0; a < mesh->mNumFaces; ++a) {
+					mesh->mFaces[a].mNumIndices = 0;
+					mesh->mFaces[a].mIndices = NULL;
+				}
+
+				delete mesh;
+
+				// Invalidate the contents of the old mesh array. We will most
+				// likely have less output meshes now, so the last entries of 
+				// the mesh array are not overridden. We set them to NULL to 
+				// make sure the developer gets notified when his application
+				// attempts to access these fields ...
+				mesh = NULL;
+			}
+
 			// It is impossible that we have more output meshes than 
 			// input meshes, so we can easily reuse the old mesh array
 			pScene->mNumMeshes = (unsigned int)apcOutMeshes.size();
-			for (unsigned int i = 0; i < pScene->mNumMeshes;++i)
+			for (unsigned int i = 0; i < pScene->mNumMeshes;++i) {
 				pScene->mMeshes[i] = apcOutMeshes[i];
+			}
 		}
 	}
 

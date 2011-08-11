@@ -61,14 +61,10 @@ namespace Assimp	{
  */
 class IRRImporter : public BaseImporter, public IrrlichtBase
 {
-	friend class Importer;
-
-protected:
-	/** Constructor to be privately used by Importer */
+public:
 	IRRImporter();
-
-	/** Destructor, private as well */
 	~IRRImporter();
+
 
 public:
 
@@ -279,7 +275,7 @@ private:
 	 *
 	 *  @param materials Receives an output material
 	 *  @param inmaterials List of input materials
-	 *  @param defMatIdx Default material index - 0xffffffff if not there
+	 *  @param defMatIdx Default material index - UINT_MAX if not present
 	 *  @param mesh Mesh to work on
 	 */
 	void CopyMaterial(std::vector<aiMaterial*>&	 materials,

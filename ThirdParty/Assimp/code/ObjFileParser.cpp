@@ -66,6 +66,8 @@ ObjFileParser::ObjFileParser(std::vector<char> &Data,const std::string &strModel
 	m_uiLine(0),
 	m_pIO( io )
 {
+	std::fill_n(m_buffer,BUFFERSIZE,0);
+
 	// Create the model instance to store all the data
 	m_pModel = new ObjFile::Model();
 	m_pModel->m_ModelName = strModelName;
@@ -188,7 +190,7 @@ void ObjFileParser::copyNextWord(char *pBuffer, size_t length)
 {
 	size_t index = 0;
 	m_DataIt = getNextWord<DataArrayIt>(m_DataIt, m_DataItEnd);
-	while ( !isSeparator(*m_DataIt) && m_DataIt != m_DataItEnd )
+	while ( m_DataIt != m_DataItEnd && !isSeparator(*m_DataIt) )
 	{
 		pBuffer[index] = *m_DataIt;
 		index++;
@@ -262,7 +264,7 @@ void ObjFileParser::getFace()
 	char *pPtr = m_buffer;
 	char *pEnd = &pPtr[BUFFERSIZE];
 	pPtr = getNextToken<char*>(pPtr, pEnd);
-	if (pPtr == '\0')
+	if (pPtr == pEnd || *pPtr == '\0')
 		return;
 
 	std::vector<unsigned int> *pIndices = new std::vector<unsigned int>;
@@ -279,7 +281,7 @@ void ObjFileParser::getFace()
 		if (*pPtr == '\0')
 			break;
 
-		if (*pPtr=='\r')
+		if (*pPtr=='\r' || *pPtr=='\n')
 			break;
 
 		if (*pPtr=='/' )
@@ -372,7 +374,7 @@ void ObjFileParser::getMaterialDesc()
 		return;
 
 	char *pStart = &(*m_DataIt);
-	while ( !isSeparator(*m_DataIt) && m_DataIt != m_DataItEnd )
+	while ( m_DataIt != m_DataItEnd && !isSeparator(*m_DataIt) )
 		++m_DataIt;
 
 	// Get name
@@ -386,6 +388,7 @@ void ObjFileParser::getMaterialDesc()
 	{
 		// Not found, use default material
 		m_pModel->m_pCurrentMaterial = m_pModel->m_pDefaultMaterial;
+		DefaultLogger::get()->error("OBJ: failed to locate material " + strName + ", skipping");
 	}
 	else
 	{
@@ -406,10 +409,9 @@ void ObjFileParser::getMaterialDesc()
 //	Get a comment, values will be skipped
 void ObjFileParser::getComment()
 {
-	bool running = true;
-	while (running)
+	while (m_DataIt != m_DataItEnd)
 	{
-		if ( '\n' == (*m_DataIt) || m_DataIt == m_DataItEnd ) 
+		if ( '\n' == (*m_DataIt))
 		{
 			++m_DataIt;
 			break;
@@ -431,7 +433,7 @@ void ObjFileParser::getMaterialLib()
 		return;
 	
 	char *pStart = &(*m_DataIt);
-	while (!isNewLine(*m_DataIt))
+	while (m_DataIt != m_DataItEnd && !isNewLine(*m_DataIt))
 		m_DataIt++;
 
 	// Check for existence
@@ -465,7 +467,7 @@ void ObjFileParser::getNewMaterial()
 
 	char *pStart = &(*m_DataIt);
 	std::string strMat( pStart, *m_DataIt );
-	while ( isSeparator( *m_DataIt ) )
+	while ( m_DataIt != m_DataItEnd && isSeparator( *m_DataIt ) )
 		m_DataIt++;
 	std::map<std::string, ObjFile::Material*>::iterator it = m_pModel->m_MaterialMap.find( strMat );
 	if ( it == m_pModel->m_MaterialMap.end() )
@@ -516,7 +518,7 @@ void ObjFileParser::getGroupName()
 
 	// Store groupname in group library 
 	char *pStart = &(*m_DataIt);
-	while ( !isSeparator(*m_DataIt) )
+	while ( m_DataIt != m_DataItEnd && !isSeparator(*m_DataIt) )
 		m_DataIt++;
 	std::string strGroupName(pStart, &(*m_DataIt));
 
@@ -524,7 +526,7 @@ void ObjFileParser::getGroupName()
 	if ( m_pModel->m_strActiveGroup != strGroupName )
 	{
 		// Search for already existing entry
-		ObjFile::Model::ConstGroupMapIt it = m_pModel->m_Groups.find(&strGroupName);
+		ObjFile::Model::ConstGroupMapIt it = m_pModel->m_Groups.find(strGroupName);
 		
 		// We are mapping groups into the object structure
 		createObject( strGroupName );
@@ -533,7 +535,7 @@ void ObjFileParser::getGroupName()
 		if (it == m_pModel->m_Groups.end())
 		{
 			std::vector<unsigned int> *pFaceIDArray = new std::vector<unsigned int>;
-			m_pModel->m_Groups[ &strGroupName ] = pFaceIDArray;
+			m_pModel->m_Groups[ strGroupName ] = pFaceIDArray;
 			m_pModel->m_pGroupFaceIDs = (pFaceIDArray);
 		}
 		else
@@ -563,7 +565,7 @@ void ObjFileParser::getObjectName()
 	if (m_DataIt == m_DataItEnd)
 		return;
 	char *pStart = &(*m_DataIt);
-	while ( !isSeparator( *m_DataIt ) )
+	while ( m_DataIt != m_DataItEnd && !isSeparator( *m_DataIt ) )
 		++m_DataIt;
 
 	std::string strObjectName(pStart, &(*m_DataIt));
@@ -641,7 +643,7 @@ bool ObjFileParser::needsNewMesh( const std::string &rMaterialName )
 	bool newMat = false;
 	int matIdx = getMaterialIndex( rMaterialName );
 	int curMatIdx = m_pModel->m_pCurrentMesh->m_uiMaterialIndex;
-	if ( curMatIdx != ObjFile::Mesh::NoMaterial || curMatIdx != matIdx )
+	if ( curMatIdx != int(ObjFile::Mesh::NoMaterial) || curMatIdx != matIdx )
 	{
 		// New material -> only one material per mesh, so we need to create a new 
 		// material

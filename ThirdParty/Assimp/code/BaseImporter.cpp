@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BaseImporter.h"
 #include "FileSystemFilter.h"
 
+#include "Importer.h"
+
 using namespace Assimp;
 
 // ------------------------------------------------------------------------------------------------
@@ -98,7 +100,7 @@ aiScene* BaseImporter::ReadFile(const Importer* pImp, const std::string& pFile, 
 }
 
 // ------------------------------------------------------------------------------------------------
-void BaseImporter::SetupProperties(const Importer* pImp)
+void BaseImporter::SetupProperties(const Importer* /*pImp*/)
 {
 	// the default implementation does nothing
 }
@@ -328,7 +330,7 @@ void BaseImporter::ConvertToUTF8(std::vector<char>& data)
 	if(*((uint16_t*)&data.front()) == 0xFEFF) {
 		DefaultLogger::get()->debug("Found UTF-16 BOM ...");
 
-		const uint16_t* sstart = (uint16_t*)&data.front()+1, *send = (uint16_t*)&data.back()+1;
+		const uint16_t* sstart = (uint16_t*)&data.front()+1, *send = (uint16_t*)(&data.back()+1);
 		char* dstart,*dend;
 		std::vector<char> output;
 		do {

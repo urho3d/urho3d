@@ -55,7 +55,7 @@ public:
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
     /// %Set the LOD distance to report
     void SetLodDistance(float distance);
-    /// %Set vertex and index raw data. Vertex raw data should contain positions only
+    /// %Set vertex and index raw data for CPU access. Vertex raw data should contain positions only
     void SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData);
     /// Draw
     void Draw(Graphics* graphics);

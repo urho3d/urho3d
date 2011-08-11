@@ -55,15 +55,11 @@ namespace Assimp
  * vectors of an object are facing inwards. In this case they will be
  * flipped.
  */
-	class ASSIMP_API FixInfacingNormalsProcess : public BaseProcess
+class ASSIMP_API FixInfacingNormalsProcess : public BaseProcess
 {
-	friend class Importer;
-
-protected:
-	/** Constructor to be privately used by Importer */
+public:
+	
 	FixInfacingNormalsProcess();
-
-	/** Destructor, private as well */
 	~FixInfacingNormalsProcess();
 
 public:

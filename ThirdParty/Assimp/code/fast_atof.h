@@ -7,7 +7,7 @@
 // Adapted to the ASSIMP library because the builtin atof indeed takes AGES to parse a
 // float inside a large string. Before parsing, it does a strlen on the given point.
 // Changes:
-//  22nd October 08 (Aramis_acg): Added temporary cast to double, added strtol10_64
+//  22nd October 08 (Aramis_acg): Added temporary cast to double, added strtoul10_64
 //     to ensure long numbers are handled correctly
 // ------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ const float fast_atof_table[16] =	{  // we write [16] here instead of [] to work
 // ------------------------------------------------------------------------------------
 // Convert a string in decimal format to a number
 // ------------------------------------------------------------------------------------
-inline unsigned int strtol10( const char* in, const char** out=0)
+inline unsigned int strtoul10( const char* in, const char** out=0)
 {
 	unsigned int value = 0;
 
@@ -63,7 +63,7 @@ inline unsigned int strtol10( const char* in, const char** out=0)
 // ------------------------------------------------------------------------------------
 // Convert a string in octal format to a number
 // ------------------------------------------------------------------------------------
-inline unsigned int strtol8( const char* in, const char** out=0)
+inline unsigned int strtoul8( const char* in, const char** out=0)
 {
 	unsigned int value = 0;
 
@@ -83,7 +83,7 @@ inline unsigned int strtol8( const char* in, const char** out=0)
 // ------------------------------------------------------------------------------------
 // Convert a string in hex format to a number
 // ------------------------------------------------------------------------------------
-inline unsigned int strtol16( const char* in, const char** out=0)
+inline unsigned int strtoul16( const char* in, const char** out=0)
 {
 	unsigned int value = 0;
 
@@ -111,11 +111,11 @@ inline unsigned int strtol16( const char* in, const char** out=0)
 
 // ------------------------------------------------------------------------------------
 // Convert just one hex digit
-// Return value is 0xffffffff if the input is not hex
+// Return value is UINT_MAX if the input character is not a hex digit.
 // ------------------------------------------------------------------------------------
 inline unsigned int HexDigitToDecimal(char in)
 {
-	unsigned int out = 0xffffffff;
+	unsigned int out = UINT_MAX;
 	if (in >= '0' && in <= '9')
 		out = in - '0';
 
@@ -125,13 +125,12 @@ inline unsigned int HexDigitToDecimal(char in)
 	else if (in >= 'A' && in <= 'F')
 		out = 10u + in - 'A';
 
-	// return value is 0xffffffff if the input is not a hex digit
+	// return value is UINT_MAX if the input is not a hex digit
 	return out;
 }
 
 // ------------------------------------------------------------------------------------
-// Convert a hex-encoded octet (2 characters processed)
-// Return value is 0xffffffff if the input is not hex
+// Convert a hex-encoded octet (2 characters, i.e. df or 1a).
 // ------------------------------------------------------------------------------------
 inline uint8_t HexOctetToDecimal(const char* in)
 {
@@ -140,15 +139,15 @@ inline uint8_t HexOctetToDecimal(const char* in)
 
 
 // ------------------------------------------------------------------------------------
-// signed variant of strtol10
+// signed variant of strtoul10
 // ------------------------------------------------------------------------------------
-inline int strtol10s( const char* in, const char** out=0)
+inline int strtol10( const char* in, const char** out=0)
 {
 	bool inv = (*in=='-');
 	if (inv || *in=='+')
 		++in;
 
-	int value = strtol10(in,out);
+	int value = strtoul10(in,out);
 	if (inv) {
 		value = -value;
 	}
@@ -161,20 +160,20 @@ inline int strtol10s( const char* in, const char** out=0)
 // 0NNN   - oct
 // NNN    - dec
 // ------------------------------------------------------------------------------------
-inline unsigned int strtol_cppstyle( const char* in, const char** out=0)
+inline unsigned int strtoul_cppstyle( const char* in, const char** out=0)
 {
 	if ('0' == in[0])
 	{
-		return 'x' == in[1] ? strtol16(in+2,out) : strtol8(in+1,out);
+		return 'x' == in[1] ? strtoul16(in+2,out) : strtoul8(in+1,out);
 	}
-	return strtol10(in, out);
+	return strtoul10(in, out);
 }
 
 // ------------------------------------------------------------------------------------
 // Special version of the function, providing higher accuracy and safety
 // It is mainly used by fast_atof to prevent ugly and unwanted integer overflows.
 // ------------------------------------------------------------------------------------
-inline uint64_t strtol10_64( const char* in, const char** out=0, unsigned int* max_inout=0)
+inline uint64_t strtoul10_64( const char* in, const char** out=0, unsigned int* max_inout=0)
 {
 	unsigned int cur = 0;
 	uint64_t value = 0;
@@ -216,7 +215,7 @@ inline uint64_t strtol10_64( const char* in, const char** out=0, unsigned int* m
 }
 
 // Number of relevant decimals for floating-point parsing.
-#define AI_FAST_ATOF_RELAVANT_DECIMALS 6
+#define AI_FAST_ATOF_RELAVANT_DECIMALS 10
 
 // ------------------------------------------------------------------------------------
 //! Provides a fast function for converting a string into a float,
@@ -231,7 +230,7 @@ inline const char* fast_atof_move( const char* c, float& out)
 	if (inv || *c=='+')
 		++c;
 
-	f = (float) strtol10_64 ( c, &c);
+	f = (float) strtoul10_64 ( c, &c);
 	if (*c == '.' || (c[0] == ',' && (c[1] >= '0' || c[1] <= '9'))) // allow for commas, too
 	{
 		++c;
@@ -245,7 +244,7 @@ inline const char* fast_atof_move( const char* c, float& out)
 		// number of digits to be read. AI_FAST_ATOF_RELAVANT_DECIMALS can be a value between
 		// 1 and 15.
 		unsigned int diff = AI_FAST_ATOF_RELAVANT_DECIMALS;
-		double pl = (double) strtol10_64 ( c, &c, &diff );
+		double pl = (double) strtoul10_64 ( c, &c, &diff );
 
 		pl *= fast_atof_table[diff];
 		f += (float)pl;
@@ -260,7 +259,7 @@ inline const char* fast_atof_move( const char* c, float& out)
 		if (einv || *c=='+')
 			++c;
 
-		float exp = (float)strtol10_64(c, &c);
+		float exp = (float)strtoul10_64(c, &c);
 		if (einv)
 			exp *= -1.0f;
 

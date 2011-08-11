@@ -1976,7 +1976,7 @@ void View::DrawSplitLightToStencil(Camera& camera, Light* light, bool clear)
             graphics_->SetColorWrite(false);
             graphics_->SetDepthWrite(false);
             graphics_->SetCullMode(drawBackFaces ? CULL_CW : CULL_CCW);
-            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATER : CMP_LESS);
+            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATEREQUAL : CMP_LESSEQUAL);
             graphics_->SetShaders(renderer_->stencilVS_, renderer_->stencilPS_);
             graphics_->SetShaderParameter(VSP_MODEL, model);
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);

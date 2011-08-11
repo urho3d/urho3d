@@ -1269,7 +1269,6 @@ bool Renderer::CreateShadowMaps()
     }
     
     #ifdef USE_OPENGL
-    
     // Create shadow maps only. Color rendertargets are not needed
     unsigned size = shadowMapSize_;
     for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
@@ -1285,9 +1284,7 @@ bool Renderer::CreateShadowMaps()
         }
         size >>= 1;
     }
-    
     #else
-    
     // Create shadow maps and dummy color rendertargets
     unsigned size = shadowMapSize_;
     for (unsigned i = 0; i < NUM_SHADOWMAP_RESOLUTIONS; ++i)
@@ -1310,7 +1307,6 @@ bool Renderer::CreateShadowMaps()
         }
         size >>= 1;
     }
-    
     #endif
     
     return true;
@@ -1370,7 +1366,7 @@ void Renderer::SetupLightBatch(Batch& batch)
         if (light->GetNearSplit() <= batch.camera_->GetNearClip())
         {
             graphics_->SetCullMode(CULL_NONE);
-            graphics_->SetDepthTest(CMP_GREATER);
+            graphics_->SetDepthTest(CMP_GREATEREQUAL);
             graphics_->SetStencilTest(false);
         }
         else
@@ -1392,7 +1388,7 @@ void Renderer::SetupLightBatch(Batch& batch)
             
             // Re-enable color write, set test for rendering the actual light
             graphics_->SetColorWrite(true);
-            graphics_->SetDepthTest(CMP_GREATER);
+            graphics_->SetDepthTest(CMP_GREATEREQUAL);
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_ZERO, OP_KEEP, OP_ZERO, 1);
         }
     }
@@ -1408,7 +1404,7 @@ void Renderer::SetupLightBatch(Batch& batch)
             bool drawBackFaces = lightViewDist < (lightExtent + batch.camera_->GetNearClip());
             graphics_->SetColorWrite(false);
             graphics_->SetCullMode(drawBackFaces ? CULL_CCW : CULL_CW);
-            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATER : CMP_LESS);
+            graphics_->SetDepthTest(drawBackFaces ? CMP_GREATEREQUAL : CMP_LESSEQUAL);
             graphics_->SetStencilTest(true, CMP_EQUAL, OP_INCR, OP_KEEP, OP_KEEP, 0);
             graphics_->SetShaders(stencilVS_, stencilPS_);
             graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * view);
@@ -1428,7 +1424,7 @@ void Renderer::SetupLightBatch(Batch& batch)
             {
                 // In this case reverse cull mode & depth test and render back faces
                 graphics_->SetCullMode(CULL_CW);
-                graphics_->SetDepthTest(CMP_GREATER);
+                graphics_->SetDepthTest(CMP_GREATEREQUAL);
                 graphics_->SetStencilTest(false);
             }
             else

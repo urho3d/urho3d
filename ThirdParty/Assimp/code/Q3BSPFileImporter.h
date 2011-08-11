@@ -54,14 +54,14 @@ struct Q3BSPModel;
 struct sQ3BSPFace;
 
 }
-
+// ------------------------------------------------------------------------------------------------
 /**	Loader to import BSP-levels from a PK3 archive or from a unpacked BSP-level.
  */
-class Q3BSPFileImporter : BaseImporter
+// ------------------------------------------------------------------------------------------------
+class Q3BSPFileImporter : public BaseImporter
 {
-	friend class Importer;
+public:
 
-protected:
 	///	@brief	Default constructor.
 	Q3BSPFileImporter();
 
@@ -97,6 +97,9 @@ private:
 	bool importTextureFromArchive( const Q3BSP::Q3BSPModel *pModel, Q3BSP::Q3BSPZipArchive *pArchive, aiScene* pScene, 
 		Assimp::MaterialHelper *pMatHelper, int textureId );
 	bool importLightmap( const Q3BSP::Q3BSPModel *pModel, aiScene* pScene, Assimp::MaterialHelper *pMatHelper, int lightmapId );
+	bool importEntities( const Q3BSP::Q3BSPModel *pModel, aiScene* pScene );
+	bool expandFile(  Q3BSP::Q3BSPZipArchive *pArchive, const std::string &rFilename, const std::vector<std::string> &rExtList, 
+		std::string &rFile, std::string &rExt );
 
 private:
 	aiMesh *m_pCurrentMesh;
@@ -105,6 +108,9 @@ private:
 	std::vector<aiTexture*> mTextures;
 };
 
+// ------------------------------------------------------------------------------------------------
+
 } // Namespace Assimp
+
 
 #endif // ASSIMP_Q3BSPFILEIMPORTER_H_INC

@@ -433,7 +433,7 @@ void Discreet3DSImporter::ConvertMeshes(aiScene* pcOut)
 // ------------------------------------------------------------------------------------------------
 // Add a node to the scenegraph and setup its final transformation
 void Discreet3DSImporter::AddNodeToGraph(aiScene* pcSOut,aiNode* pcOut,
-	D3DS::Node* pcIn, aiMatrix4x4& absTrafo)
+	D3DS::Node* pcIn, aiMatrix4x4& /*absTrafo*/)
 {
 	std::vector<unsigned int> iArray;
 	iArray.reserve(3);
@@ -788,9 +788,11 @@ void Discreet3DSImporter::GenerateNodeGraph(aiScene* pcOut)
 	for (unsigned int a = 0; a < pcOut->mNumMeshes;++a)
 		pcOut->mMeshes[a]->mColors[0] = NULL;
 
-	// Now rotate the whole scene 90 degrees around the x axis to convert to internal coordinate system
-	pcOut->mRootNode->mTransformation = aiMatrix4x4(1.f,0.f,0.f,0.f,
-		0.f,0.f,1.f,0.f,0.f,-1.f,0.f,0.f,0.f,0.f,0.f,1.f) * pcOut->mRootNode->mTransformation;
+	pcOut->mRootNode->mTransformation = aiMatrix4x4(
+		1.f,0.f,0.f,0.f,
+		0.f,0.f,1.f,0.f,
+		0.f,-1.f,0.f,0.f,
+		0.f,0.f,0.f,1.f) * pcOut->mRootNode->mTransformation;
 
 	// If the root node is unnamed name it "<3DSRoot>"
 	if (::strstr( pcOut->mRootNode->mName.data, "UNNAMED" ) ||

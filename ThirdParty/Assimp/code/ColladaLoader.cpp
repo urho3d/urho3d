@@ -948,13 +948,14 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
 			}
 
 			// determine which transform step is affected by this channel
-			entry.mTransformIndex = 0xffffffff;
+			entry.mTransformIndex = SIZE_MAX;
 			for( size_t a = 0; a < srcNode->mTransforms.size(); ++a)
 				if( srcNode->mTransforms[a].mID == entry.mTransformId)
 					entry.mTransformIndex = a;
 
-			if( entry.mTransformIndex == 0xffffffff)
+			if( entry.mTransformIndex == SIZE_MAX) {
 				continue;
+			}
 
 			entry.mChannel = &(*cit);
 			entries.push_back( entry);
@@ -1154,18 +1155,18 @@ void ColladaLoader::AddTexture ( Assimp::MaterialHelper& mat, const ColladaParse
 	mat.AddProperty((float*)&sampler.mWeighting , 1,
 		_AI_MATKEY_TEXBLEND_BASE, type, idx);
 
-	// UV source index ... if we didn't resolve the mapping it is actually just 
+	// UV source index ... if we didn't resolve the mapping, it is actually just 
 	// a guess but it works in most cases. We search for the frst occurence of a
 	// number in the channel name. We assume it is the zero-based index into the
 	// UV channel array of all corresponding meshes. It could also be one-based
 	// for some exporters, but we won't care of it unless someone complains about.
-	if (sampler.mUVId != 0xffffffff)
+	if (sampler.mUVId != UINT_MAX)
 		map = sampler.mUVId;
 	else {
 		map = -1;
 		for (std::string::const_iterator it = sampler.mUVChannel.begin();it != sampler.mUVChannel.end(); ++it){
 			if (IsNumeric(*it)) {
-				map = strtol10(&(*it));
+				map = strtoul10(&(*it));
 				break;
 			}
 		}
@@ -1179,7 +1180,7 @@ void ColladaLoader::AddTexture ( Assimp::MaterialHelper& mat, const ColladaParse
 
 // ------------------------------------------------------------------------------------------------
 // Fills materials from the collada material definitions
-void ColladaLoader::FillMaterials( const ColladaParser& pParser, aiScene* pScene)
+void ColladaLoader::FillMaterials( const ColladaParser& pParser, aiScene* /*pScene*/)
 {
 	for (std::vector<std::pair<Collada::Effect*, aiMaterial*> >::iterator it = newMats.begin(),
 		end = newMats.end(); it != end; ++it)
@@ -1271,7 +1272,7 @@ void ColladaLoader::FillMaterials( const ColladaParser& pParser, aiScene* pScene
 
 // ------------------------------------------------------------------------------------------------
 // Constructs materials from the collada material definitions
-void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* pScene)
+void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* /*pScene*/)
 {
 	newMats.reserve(pParser.mMaterialLibrary.size());
 
@@ -1288,16 +1289,6 @@ void ColladaLoader::BuildMaterials( const ColladaParser& pParser, aiScene* pScen
 		Assimp::MaterialHelper* mat = new Assimp::MaterialHelper;
 		aiString name( matIt->first);
 		mat->AddProperty(&name,AI_MATKEY_NAME);
-
-		// MEGA SUPER MONSTER HACK by Alex ... It's all my fault, yes.
-		// We store the reference to the effect in the material and
-		// return ... we'll add the actual material properties later
-		// after we processed all meshes. During mesh processing,
-		// we evaluate vertex input mappings. Afterwards we should be
-		// able to correctly setup source UV channels for textures.
-
-		// ... moved to ColladaLoader::FillMaterials()
-		// *duck*
 
 		// store the material
 		mMaterialIndexByName[matIt->first] = newMats.size();

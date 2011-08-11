@@ -84,8 +84,8 @@ bool ObjFileImporter::CanRead( const std::string& pFile, IOSystem*  pIOHandler ,
 	}
 	else //Check file Header
 	{
-		const char* tokens[] = {"mtllib","usemtl","vt ","vn ","o "};
-		return BaseImporter::SearchFileHeaderForToken(pIOHandler, pFile, tokens, 5);
+		static const char *pTokens[] = { "mtllib", "usemtl", "v ", "vt ", "vn ", "o ", "g ", "s ", "f " };
+		return BaseImporter::SearchFileHeaderForToken(pIOHandler, pFile, pTokens, 9 );
 	}
 }
 
@@ -175,7 +175,7 @@ void ObjFileImporter::CreateDataFromImport(const ObjFile::Model* pModel, aiScene
 // ------------------------------------------------------------------------------------------------
 //	Creates all nodes of the model
 aiNode *ObjFileImporter::createNodes(const ObjFile::Model* pModel, const ObjFile::Object* pObject, 
-									 unsigned int uiMeshIndex,
+									 unsigned int /*uiMeshIndex*/,
 									 aiNode *pParent, aiScene* pScene, 
 									 std::vector<aiMesh*> &MeshArray )
 {
@@ -183,9 +183,11 @@ aiNode *ObjFileImporter::createNodes(const ObjFile::Model* pModel, const ObjFile
 	if ( NULL == pObject )
 		return NULL;
 	
-	// Store older mesh size to be able to computate mesh offsets for new mesh instances
+	// Store older mesh size to be able to computes mesh offsets for new mesh instances
 	const size_t oldMeshSize = MeshArray.size();
 	aiNode *pNode = new aiNode;
+
+	pNode->mName = pObject->m_strObjName;
 	
 	if (pParent != NULL)
 		appendChildToParentNode(pParent, pNode);
@@ -333,14 +335,20 @@ void ObjFileImporter::createVertexArray(const ObjFile::Model* pModel,
 		for ( size_t vertexIndex = 0; vertexIndex < pSourceFace->m_pVertices->size(); vertexIndex++ )
 		{
 			const unsigned int vertex = pSourceFace->m_pVertices->at( vertexIndex );
-			ai_assert( vertex < pModel->m_Vertices.size() );
+			if (vertex >= pModel->m_Vertices.size()) {
+				throw DeadlyImportError("OBJ: vertex index out of range");
+			}
+			
 			pMesh->mVertices[ newIndex ] = pModel->m_Vertices[ vertex ];
 			
 			// Copy all normals 
-			if ( !pSourceFace->m_pNormals->empty() )
+			if ( !pSourceFace->m_pNormals->empty() && !pModel->m_Normals.empty())
 			{
 				const unsigned int normal = pSourceFace->m_pNormals->at( vertexIndex );
-				ai_assert( normal < pModel->m_Normals.size() );
+				if (normal >= pModel->m_Normals.size()) {
+					throw DeadlyImportError("OBJ: vertex normal index out of range");
+				}
+
 				pMesh->mNormals[ newIndex ] = pModel->m_Normals[ normal ];
 			}
 			
@@ -399,8 +407,10 @@ void ObjFileImporter::createMaterials(const ObjFile::Model* pModel, aiScene* pSc
 
 	const unsigned int numMaterials = (unsigned int) pModel->m_MaterialLib.size();
 	pScene->mNumMaterials = 0;
-	if ( pModel->m_MaterialLib.empty() )
+	if ( pModel->m_MaterialLib.empty() ) {
+		DefaultLogger::get()->debug("OBJ: no materials specified");
 		return;
+	}
 	
 	pScene->mMaterials = new aiMaterial*[ numMaterials ];
 	for ( unsigned int matIndex = 0; matIndex < numMaterials; matIndex++ )
@@ -433,7 +443,7 @@ void ObjFileImporter::createMaterials(const ObjFile::Model* pModel, aiScene* pSc
 			break;
 		default:
 			sm = aiShadingMode_Gouraud;
-			DefaultLogger::get()->error("OBJ/MTL: Unexpected illumination model (0-2 recognized)");
+			DefaultLogger::get()->error("OBJ: unexpected illumination model (0-2 recognized)");
 		}
 		mat->AddProperty<int>( &sm, 1, AI_MATKEY_SHADING_MODEL);
 
@@ -489,6 +499,7 @@ void ObjFileImporter::appendChildToParentNode(aiNode *pParent, aiNode *pChild)
 	// Assign parent to child
 	pChild->mParent = pParent;
 	size_t sNumChildren = 0;
+	(void)sNumChildren; // remove warning on release build
 	
 	// If already children was assigned to the parent node, store them in a 
 	std::vector<aiNode*> temp;

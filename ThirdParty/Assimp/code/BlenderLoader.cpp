@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BlenderModifier.h"
 
 #include "StreamReader.h"
-#include "TinyFormatter.h"
 #include "MemoryIOWrapper.h"
 
 // zlib is needed for compressed blend files 
@@ -68,7 +67,7 @@ using namespace Assimp;
 using namespace Assimp::Blender;
 using namespace Assimp::Formatter;
 
-
+template<> const std::string LogFunctions<BlenderImporter>::log_prefix = "BLEND: ";
 static const aiLoaderDesc blenderDesc = {
 	"Blender 3D Importer \nhttp://www.blender3d.org",
 	"Assimp Team",
@@ -128,7 +127,7 @@ const aiLoaderDesc& BlenderImporter::GetInfo () const
 
 // ------------------------------------------------------------------------------------------------
 // Setup configuration properties for the loader
-void BlenderImporter::SetupProperties(const Importer* pImp)
+void BlenderImporter::SetupProperties(const Importer* /*pImp*/)
 {
 	// nothing to be done for the moment
 }
@@ -401,7 +400,7 @@ void BlenderImporter::ConvertBlendFile(aiScene* out, const Scene& in,const FileD
 // ------------------------------------------------------------------------------------------------
 void BlenderImporter::ResolveImage(MaterialHelper* out, const Material* mat, const MTex* tex, const Image* img, ConversionData& conv_data)
 {
-	mat; tex; conv_data;
+	(void)mat; (void)tex; (void)conv_data;
 	aiString name;
 
 	// check if the file contents are bundled with the BLEND file
@@ -419,9 +418,9 @@ void BlenderImporter::ResolveImage(MaterialHelper* out, const Material* mat, con
 
 		while (s >= img->name && *s != '.')--s;
 
-		tex->achFormatHint[0] = s+1>e ? '\0' : s[1];
-		tex->achFormatHint[1] = s+2>e ? '\0' : s[2];
-		tex->achFormatHint[2] = s+3>e ? '\0' : s[3];
+		tex->achFormatHint[0] = s+1>e ? '\0' : ::tolower( s[1] );
+		tex->achFormatHint[1] = s+2>e ? '\0' : ::tolower( s[2] );
+		tex->achFormatHint[2] = s+3>e ? '\0' : ::tolower( s[3] );
 		tex->achFormatHint[3] = '\0';
 
 		// tex->mHeight = 0;
@@ -446,7 +445,7 @@ void BlenderImporter::ResolveImage(MaterialHelper* out, const Material* mat, con
 // ------------------------------------------------------------------------------------------------
 void BlenderImporter::AddSentinelTexture(MaterialHelper* out, const Material* mat, const MTex* tex, ConversionData& conv_data)
 {
-	mat; tex; conv_data;
+	(void)mat; (void)tex; (void)conv_data;
 
 	aiString name;
 	name.length = sprintf(name.data, "Procedural,num=%i,type=%s",conv_data.sentinel_cnt++,
@@ -523,7 +522,7 @@ void BlenderImporter::BuildMaterials(ConversionData& conv_data)
 
 				p->r = p->g = p->b = 0.6f;
 				p->specr = p->specg = p->specb = 0.6f;
-				p->ambir = p->ambig = p->ambib = 0.0f;
+				p->ambr = p->ambg = p->ambb = 0.0f;
 				p->mirr = p->mirg = p->mirb = 0.0f;
 				p->emit = 0.f;
 				p->alpha = 0.f;
@@ -558,15 +557,21 @@ void BlenderImporter::BuildMaterials(ConversionData& conv_data)
 		aiColor3D col(mat->r,mat->g,mat->b);
 		if (mat->r || mat->g || mat->b ) {
 			
-			// Usually, zero diffuse color means no diffuse color at all in the equation - seemingly.
-			// So we ommit this member to express this intent.
+			// Usually, zero diffuse color means no diffuse color at all in the equation.
+			// So we omit this member to express this intent.
 			mout->AddProperty(&col,1,AI_MATKEY_COLOR_DIFFUSE);
 		}
 
 		col = aiColor3D(mat->specr,mat->specg,mat->specb);
 		mout->AddProperty(&col,1,AI_MATKEY_COLOR_SPECULAR);
 
-		col = aiColor3D(mat->ambir,mat->ambig,mat->ambib);
+		// is hardness/shininess set?
+		if( mat->har ) {
+			const float har = mat->har;
+			mout->AddProperty(&har,1,AI_MATKEY_SHININESS);
+		}
+
+		col = aiColor3D(mat->ambr,mat->ambg,mat->ambb);
 		mout->AddProperty(&col,1,AI_MATKEY_COLOR_AMBIENT);
 
 		col = aiColor3D(mat->mirr,mat->mirg,mat->mirb);
@@ -601,7 +606,7 @@ void BlenderImporter::NotSupportedObjectType(const Object* obj, const char* type
 }
 
 // ------------------------------------------------------------------------------------------------
-void BlenderImporter::ConvertMesh(const Scene& in, const Object* obj, const Mesh* mesh, 
+void BlenderImporter::ConvertMesh(const Scene& /*in*/, const Object* /*obj*/, const Mesh* mesh,
 	ConversionData& conv_data, TempArray<std::vector,aiMesh>&  temp
 	) 
 {
@@ -790,7 +795,7 @@ void BlenderImporter::ConvertMesh(const Scene& in, const Object* obj, const Mesh
 
 	// collect texture coordinates, old-style (marked as deprecated in current blender sources)
 	if (mesh->tface) {
-		if (mesh->totface > static_cast<int> ( mesh->mtface.size())) {
+		if (mesh->totface > static_cast<int> ( mesh->tface.size())) {
 			ThrowException("Number of faces is larger than the corresponding UV face array (#2)");
 		}
 		for (std::vector<aiMesh*>::iterator it = temp->begin()+old; it != temp->end(); ++it) {
@@ -848,7 +853,7 @@ void BlenderImporter::ConvertMesh(const Scene& in, const Object* obj, const Mesh
 }
 
 // ------------------------------------------------------------------------------------------------
-aiCamera* BlenderImporter::ConvertCamera(const Scene& in, const Object* obj, const Camera* mesh, ConversionData& conv_data) 
+aiCamera* BlenderImporter::ConvertCamera(const Scene& /*in*/, const Object* /*obj*/, const Camera* /*mesh*/, ConversionData& /*conv_data*/)
 {
 	ScopeGuard<aiCamera> out(new aiCamera());
 
@@ -856,7 +861,7 @@ aiCamera* BlenderImporter::ConvertCamera(const Scene& in, const Object* obj, con
 }
 
 // ------------------------------------------------------------------------------------------------
-aiLight* BlenderImporter::ConvertLight(const Scene& in, const Object* obj, const Lamp* mesh, ConversionData& conv_data) 
+aiLight* BlenderImporter::ConvertLight(const Scene& /*in*/, const Object* /*obj*/, const Lamp* /*mesh*/, ConversionData& /*conv_data*/)
 {
 	ScopeGuard<aiLight> out(new aiLight());
 
@@ -976,30 +981,5 @@ aiNode* BlenderImporter::ConvertNode(const Scene& in, const Object* obj, Convers
 	return node.dismiss();
 }
 
-// ------------------------------------------------------------------------------------------------
-/*static*/ void BlenderImporter::ThrowException(const std::string& msg)
-{
-	throw DeadlyImportError("BLEND: "+msg);
-}
-
-// ------------------------------------------------------------------------------------------------
-/*static*/ void BlenderImporter::LogWarn(const Formatter::format& message)	{
-	DefaultLogger::get()->warn(std::string("BLEND: ")+=message);
-}
-
-// ------------------------------------------------------------------------------------------------
-/*static*/ void BlenderImporter::LogError(const Formatter::format& message)	{
-	DefaultLogger::get()->error(std::string("BLEND: ")+=message);
-}
-
-// ------------------------------------------------------------------------------------------------
-/*static*/ void BlenderImporter::LogInfo(const Formatter::format& message)	{
-	DefaultLogger::get()->info(std::string("BLEND: ")+=message);
-}
-
-// ------------------------------------------------------------------------------------------------
-/*static*/ void BlenderImporter::LogDebug(const Formatter::format& message)	{
-	DefaultLogger::get()->debug(std::string("BLEND: ")+=message);
-}
 
 #endif

@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BaseImporter.h"
 #include "BaseProcess.h"
 
+#include "Importer.h"
+
 using namespace Assimp;
 
 // ------------------------------------------------------------------------------------------------
@@ -90,7 +92,14 @@ void BaseProcess::ExecuteOnScene( Importer* pImp)
 }
 
 // ------------------------------------------------------------------------------------------------
-void BaseProcess::SetupProperties(const Importer* pImp)
+void BaseProcess::SetupProperties(const Importer* /*pImp*/)
 {
 	// the default implementation does nothing
 }
+
+// ------------------------------------------------------------------------------------------------
+bool BaseProcess::RequireVerboseFormat() const
+{
+	return true;
+}
+

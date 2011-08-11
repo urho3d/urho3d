@@ -97,3 +97,28 @@ Contributed updated and improved xcode workspaces
 
 - drparallax
 Contributed the /samples/SimpleAssimpViewX sample
+
+- Carsten Fuchs
+Contributed a fix for the Normalize method in aiQuaternion.
+
+- dbburgess
+Contributes a Android-specific build issue: log the hardware architecture for ARM.
+
+- alfiereinre7
+Contributes a obj-fileparser fix: missing tokens in the obj-token list.
+
+- Roman Kharitonov
+Contributes a fix for the configure script environment.
+
+- Ed Diana
+Contributed AssimpDelphi (/port/AssimpDelphi).
+
+- rdb 
+Contributes a bundle of fixes and improvments for the bsp-importer.
+
+- Mick P
+For contributing the De-bone postprocessing step and filing various bug reports.
+
+- Rosen Diankov
+Contributed patches to build assimp debian packages using cmake.
+

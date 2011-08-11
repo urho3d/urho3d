@@ -156,8 +156,9 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         {
             const Matrix3x4& transform = light_->GetWorldTransform();
             Matrix3x4 spotView(transform.Translation(), transform.Rotation(), 1.0f);
-            
             Matrix4 spotProj(Matrix4::ZERO);
+            Matrix4 texAdjust(Matrix4::IDENTITY);
+            
             // Make the projected light slightly smaller than the shadow map to prevent light spill
             float h = 1.005f / tanf(light_->GetFov() * M_DEGTORAD * 0.5f);
             float w = h / light_->GetAspectRatio();
@@ -166,7 +167,6 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             spotProj.m22_ = 1.0f / Max(light_->GetRange(), M_EPSILON);
             spotProj.m32_ = 1.0f;
             
-            Matrix4 texAdjust(Matrix4::IDENTITY);
             #ifdef USE_OPENGL
             texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
@@ -231,8 +231,10 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         
         if (graphics->NeedParameterUpdate(PSP_SPOTPROJ, light_))
         {
+            Matrix3x4 viewPos(camera_->GetWorldPosition(), Quaternion::IDENTITY, Vector3::UNITY);
             Matrix3x4 spotView(light_->GetWorldPosition(), light_->GetWorldRotation(), 1.0f);
             Matrix4 spotProj(Matrix4::IDENTITY);
+            Matrix4 texAdjust(Matrix4::IDENTITY);
             
             // Make the projected light slightly smaller than the shadow map to prevent light spill
             float h = 1.005f / tanf(light_->GetFov() * M_DEGTORAD * 0.5f);
@@ -242,10 +244,6 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             spotProj.m22_ = 1.0f / Max(light_->GetRange(), M_EPSILON);
             spotProj.m32_ = 1.0f;
             
-            Matrix3x4 viewPos(Matrix3x4::IDENTITY);
-            viewPos.SetTranslation(camera_->GetWorldPosition());
-            
-            Matrix4 texAdjust(Matrix4::IDENTITY);
             #ifdef USE_OPENGL
             texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
             texAdjust.SetScale(Vector3(0.5f, -0.5f, 0.5f));
@@ -270,7 +268,6 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
             Camera* shadowCamera = light_->GetShadowCamera();
             Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
             Matrix4 shadowProj(shadowCamera->GetProjection());
-            
             Matrix4 texAdjust(Matrix4::IDENTITY);
             
             #ifdef USE_OPENGL
@@ -305,13 +302,11 @@ void Batch::Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shad
         if (graphics->NeedParameterUpdate(PSP_SHADOWPROJ, light_))
         {
             Camera* shadowCamera = light_->GetShadowCamera();
+            Matrix3x4 viewPos(camera_->GetWorldPosition(), Quaternion::IDENTITY, Vector3::UNITY);
             Matrix3x4 shadowView(shadowCamera->GetInverseWorldTransform());
             Matrix4 shadowProj(shadowCamera->GetProjection());
-            
-            Matrix3x4 viewPos(Matrix3x4::IDENTITY);
-            viewPos.SetTranslation(camera_->GetWorldPosition());
-            
             Matrix4 texAdjust(Matrix4::IDENTITY);
+            
             #ifdef USE_OPENGL
             texAdjust.SetTranslation(Vector3(0.5f, 0.5f, 0.5f));
             texAdjust.SetScale(Vector3(0.5f, 0.5f, 0.5f));

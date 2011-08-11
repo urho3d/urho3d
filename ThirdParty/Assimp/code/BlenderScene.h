@@ -208,7 +208,8 @@ struct Material : ElemBase {
 
 	float r,g,b WARN;
 	float specr,specg,specb WARN;
-	float ambir,ambig,ambib WARN;
+	short har;
+	float ambr,ambg,ambb WARN;
 	float mirr,mirg,mirb;
 	float emit WARN;
 	float alpha WARN;

@@ -1,10 +1,16 @@
-INCLUDE_DIRECTORIES( code/BoostWorkaround )
-ADD_DEFINITIONS( -DASSIMP_BUILD_BOOST_WORKAROUND )
+#
+# Listing and grouping of all the source files.
+# 1) Set the file lists for each component
+# 2) Create a Source Group for each component, for IDE project orginization
+# 3) Add libassimp using the file lists (eliminates duplication of file names between
+#    source groups and library command)
+#
 
-#
-# Listing and grouping of all the source files for use with IDE project
-# generators.
-#
+INCLUDE_DIRECTORIES( include )
+INCLUDE_DIRECTORIES( code/BoostWorkaround )
+INCLUDE_DIRECTORIES( contrib/unzip )
+ADD_DEFINITIONS( -DASSIMP_BUILD_BOOST_WORKAROUND )
+	
 SET( HEADER_PATH include )
 
 SET( COMPILER_HEADERS
@@ -12,6 +18,7 @@ SET( COMPILER_HEADERS
 	${HEADER_PATH}/Compiler/poppack1.h
 	code/pstdint.h
 )
+SOURCE_GROUP( Compiler FILES ${COMPILER_HEADERS})
 
 SET( PUBLIC_HEADERS
 	${HEADER_PATH}/aiAnim.h
@@ -48,13 +55,17 @@ SET( PUBLIC_HEADERS
 	${HEADER_PATH}/Logger.h
 	${HEADER_PATH}/LogStream.h
 	${HEADER_PATH}/NullLogger.h
+	${HEADER_PATH}/export.h
+	${HEADER_PATH}/export.hpp
 )
 
-SOURCE_GROUP( Compiler FILES	${HEADER_PATH}/Compiler/pushpack1.h
-	${HEADER_PATH}/Compiler/poppack1.h
+SET( Core_SRCS
+	code/Assimp.cpp
+	code/AssimpPCH.cpp
+	code/AssimpPCH.h
 )
 
-SOURCE_GROUP( Boost FILES
+SET( Boost_SRCS
 	code/BoostWorkaround/boost/math/common_factor_rt.hpp
 	code/BoostWorkaround/boost/foreach.hpp
 	code/BoostWorkaround/boost/format.hpp
@@ -62,11 +73,13 @@ SOURCE_GROUP( Boost FILES
 	code/BoostWorkaround/boost/scoped_ptr.hpp
 	code/BoostWorkaround/boost/shared_array.hpp
 	code/BoostWorkaround/boost/shared_ptr.hpp
+	code/BoostWorkaround/boost/make_shared.hpp
 	code/BoostWorkaround/boost/static_assert.hpp
 	code/BoostWorkaround/boost/tuple/tuple.hpp
 )
+SOURCE_GROUP(Boost FILES ${Boost_SRCS})
 
-SOURCE_GROUP( Logging FILES
+SET( Logging_SRCS
 	${HEADER_PATH}/DefaultLogger.h
 	${HEADER_PATH}/IOStream.h
 	${HEADER_PATH}/LogStream.h
@@ -76,22 +89,26 @@ SOURCE_GROUP( Logging FILES
 	code/DefaultLogger.cpp
 	code/FileLogStream.h
 )
+SOURCE_GROUP(Logging FILES ${Logging_SRCS})
 
-SOURCE_GROUP( Common FILES
-	code/aiAssert.cpp
+SET( Common_SRCS
 	code/fast_atof.h
 	code/qnan.h
 	code/BaseImporter.cpp
 	code/BaseImporter.h
 	code/BaseProcess.cpp
 	code/BaseProcess.h
+	code/Importer.h
+	code/ScenePrivate.h
+	code/PostStepRegistry.cpp
+	code/ImporterRegistry.cpp
 	code/ByteSwap.h
-	code/ProcessHelper.h
 	code/DefaultProgressHandler.h
 	code/DefaultIOStream.cpp
 	code/DefaultIOStream.h
 	code/DefaultIOSystem.cpp
 	code/DefaultIOSystem.h
+	code/CInterfaceIOWrapper.h
 	code/Hash.h
 	code/Importer.cpp
 	code/IFF.h
@@ -112,6 +129,8 @@ SOURCE_GROUP( Common FILES
 	code/ScenePreprocessor.h
 	code/SkeletonMeshBuilder.cpp
 	code/SkeletonMeshBuilder.h
+	code/SplitByBoneCountProcess.cpp
+	code/SplitByBoneCountProcess.h
 	code/SmoothingGroups.h
 	code/StandardShapes.cpp
 	code/StandardShapes.h
@@ -125,62 +144,77 @@ SOURCE_GROUP( Common FILES
 	code/LineSplitter.h
 	code/TinyFormatter.h
 	code/Profiler.h
+	code/LogAux.h
 )
+SOURCE_GROUP(Common FILES ${Common_SRCS})
 
-SOURCE_GROUP( 3DS FILES
+SET( 3DS_SRCS
 	code/3DSConverter.cpp
 	code/3DSHelper.h
 	code/3DSLoader.cpp
 	code/3DSLoader.h
 )
+SOURCE_GROUP(3DS FILES ${3DS_SRCS})
 
-SOURCE_GROUP( AC FILES
+SET( AC_SRCS
 	code/ACLoader.cpp
 	code/ACLoader.h
 )
+SOURCE_GROUP( AC FILES ${AC_SRCS})
 
-SOURCE_GROUP( ASE FILES
+SET( ASE_SRCS
 	code/ASELoader.cpp
 	code/ASELoader.h
 	code/ASEParser.cpp
 	code/ASEParser.h
 )
-SOURCE_GROUP( B3D FILES
+SOURCE_GROUP( ASE FILES ${ASE_SRCS})
+
+SET( B3D_SRCS
 	code/B3DImporter.cpp
 	code/B3DImporter.h
 )
+SOURCE_GROUP( B3D FILES ${B3D_SRCS})
 
-SOURCE_GROUP( BVH FILES
+SET( BVH_SRCS
 	code/BVHLoader.cpp
 	code/BVHLoader.h
 )
+SOURCE_GROUP( BVH FILES ${BVH_SRCS})
 
-SOURCE_GROUP( Collada FILES
+SET( Collada_SRCS
 	code/ColladaHelper.h
 	code/ColladaLoader.cpp
 	code/ColladaLoader.h
 	code/ColladaParser.cpp
 	code/ColladaParser.h
+	code/ColladaExporter.h
+	code/ColladaExporter.cpp
 )
+SOURCE_GROUP( Collada FILES ${Collada_SRCS})
 
-SOURCE_GROUP( DXF FILES
+SET( DXF_SRCS
 	code/DXFLoader.cpp
 	code/DXFLoader.h
+	code/DXFHelper.h
 )
+SOURCE_GROUP( DXF FILES ${DXF_SRCS})
 
-SOURCE_GROUP( CSM FILES
+SET( CSM_SRCS
 	code/CSMLoader.cpp
 	code/CSMLoader.h
 )
+SOURCE_GROUP( CSM FILES ${CSM_SRCS})
 
-SOURCE_GROUP( HMP FILES
+SET( HMP_SRCS
 	code/HMPFileData.h
 	code/HMPLoader.cpp
 	code/HMPLoader.h
 	code/HalfLifeFileData.h
 )
+SOURCE_GROUP( HMP FILES ${HMP_SRCS})
 
-SOURCE_GROUP( Irr FILES
+SET( Irr_SRCS
 	code/IRRLoader.cpp
 	code/IRRLoader.h
 	code/IRRMeshLoader.cpp
@@ -188,8 +222,9 @@ SOURCE_GROUP( Irr FILES
 	code/IRRShared.cpp
 	code/IRRShared.h
 )
+SOURCE_GROUP( Irr FILES ${Irr_SRCS})
 
-SOURCE_GROUP( LWO FILES
+SET( LWO_SRCS
 	code/LWOAnimation.cpp
 	code/LWOAnimation.h
 	code/LWOBLoader.cpp
@@ -198,68 +233,85 @@ SOURCE_GROUP( LWO FILES
 	code/LWOLoader.h
 	code/LWOMaterial.cpp
 )
+SOURCE_GROUP( LWO FILES ${LWO_SRCS})
 
-SOURCE_GROUP( LWS FILES
+SET( LWS_SRCS
 	code/LWSLoader.cpp
 	code/LWSLoader.h
 )
+SOURCE_GROUP( LWS FILES ${LWS_SRCS})
 
-SOURCE_GROUP( MD2 FILES
+SET ( M3_SRCS
+	code/M3Importer.cpp
+	code/M3Importer.h
+)
+SOURCE_GROUP( M3 FILES ${M3_SRCS} )
+
+SET( MD2_SRCS
 	code/MD2FileData.h
 	code/MD2Loader.cpp
 	code/MD2Loader.h
 	code/MD2NormalTable.h
 )
+SOURCE_GROUP( MD2 FILES ${MD2_SRCS})
 
-SOURCE_GROUP( MD3 FILES
+SET( MD3_SRCS
 	code/MD3FileData.h
 	code/MD3Loader.cpp
 	code/MD3Loader.h
 )
+SOURCE_GROUP( MD3 FILES ${MD3_SRCS})
 
-SOURCE_GROUP( MD5 FILES
+SET( MD5_SRCS
 	code/MD5Loader.cpp
 	code/MD5Loader.h
 	code/MD5Parser.cpp
 	code/MD5Parser.h
 )
+SOURCE_GROUP( MD5 FILES ${MD5_SRCS})
 
-SOURCE_GROUP( MDC FILES
+SET( MDC_SRCS
 	code/MDCFileData.h
 	code/MDCLoader.cpp
 	code/MDCLoader.h
 	code/MDCNormalTable.h
 )
+SOURCE_GROUP( MDC FILES ${MDC_SRCS})
 
-SOURCE_GROUP( MDL FILES
+SET( MDL_SRCS
 	code/MDLDefaultColorMap.h
 	code/MDLFileData.h
 	code/MDLLoader.cpp
 	code/MDLLoader.h
 	code/MDLMaterialLoader.cpp
 )
+SOURCE_GROUP( MDL FILES ${MDL_SRCS})
 
-SOURCE_GROUP( MaterialSystem FILES
+SET( MaterialSystem_SRCS
 	code/MaterialSystem.cpp
 	code/MaterialSystem.h
 )
+SOURCE_GROUP( MaterialSystem FILES ${MaterialSystem_SRCS})
 
-SOURCE_GROUP( NFF FILES
+SET( NFF_SRCS
 	code/NFFLoader.cpp
 	code/NFFLoader.h
 )
+SOURCE_GROUP( NFF FILES ${NFF_SRCS})
 
-SOURCE_GROUP( NDO FILES
+SET( NDO_SRCS
 	code/NDOLoader.cpp
 	code/NDOLoader.h
 )
+SOURCE_GROUP( NDO FILES ${NDO_SRCS})
 
-SOURCE_GROUP( OFFFormat FILES
+SET( OFFFormat_SRCS
 	code/OFFLoader.cpp
 	code/OFFLoader.h
 )
+SOURCE_GROUP( OFFFormat FILES ${OFFFormat_SRCS})
 
-SOURCE_GROUP( Obj FILES
+SET( Obj_SRCS
 	code/ObjFileData.h
 	code/ObjFileImporter.cpp
 	code/ObjFileImporter.h
@@ -268,33 +320,40 @@ SOURCE_GROUP( Obj FILES
 	code/ObjFileParser.cpp
 	code/ObjFileParser.h
 	code/ObjTools.h
+	code/ObjExporter.h
+	code/ObjExporter.cpp
 )
+SOURCE_GROUP( Obj FILES ${Obj_SRCS})
 
-SOURCE_GROUP( Ogre FILES
+SET( Ogre_SRCS
 	code/OgreImporter.h
 	code/OgreImporter.cpp
 	code/OgreImporterMaterial.cpp
 )
+SOURCE_GROUP( Ogre FILES ${Ogre_SRCS})
 
-SOURCE_GROUP( Ply FILES
+SET( Ply_SRCS
 	code/PlyLoader.cpp
 	code/PlyLoader.h
 	code/PlyParser.cpp
 	code/PlyParser.h
 )
+SOURCE_GROUP( Ply FILES ${Ply_SRCS})
 
-SOURCE_GROUP(MS3D FILES
+SET(MS3D_SRCS
 	code/MS3DLoader.cpp
 	code/MS3DLoader.h
 )
+SOURCE_GROUP( MS3D FILES ${MS3D_SRCS})
 
-SOURCE_GROUP(COB FILES
+SET(COB_SRCS
 	code/COBLoader.cpp
 	code/COBLoader.h
 	code/COBScene.h
 )
+SOURCE_GROUP( COB FILES ${COB_SRCS})
 
-SOURCE_GROUP(BLENDER FILES
+SET(BLENDER_SRCS
 	code/BlenderLoader.cpp
 	code/BlenderLoader.h
 	code/BlenderDNA.cpp
@@ -307,8 +366,26 @@ SOURCE_GROUP(BLENDER FILES
 	code/BlenderModifier.h
 	code/BlenderModifier.cpp
 )
+SOURCE_GROUP( BLENDER FILES ${BLENDER_SRCS})
 
-SOURCE_GROUP( PostProcessing FILES
+SET(IFC_SRCS
+	code/IFCLoader.cpp
+	code/IFCLoader.h
+	code/IFCReaderGen.cpp
+	code/IFCReaderGen.h
+	code/IFCUtil.h
+	code/IFCUtil.cpp
+	code/IFCGeometry.cpp
+	code/IFCMaterial.cpp
+	code/IFCProfile.cpp
+	code/IFCCurve.cpp
+	code/STEPFile.h
+	code/STEPFileReader.h
+	code/STEPFileReader.cpp
+)
+SOURCE_GROUP( IFC FILES ${IFC_SRCS})
+
+SET( PostProcessing_SRCS
 	code/CalcTangentsProcess.cpp
 	code/CalcTangentsProcess.h
 	code/ComputeUVMappingProcess.cpp
@@ -355,14 +432,23 @@ SOURCE_GROUP( PostProcessing FILES
 	code/OptimizeGraph.h
 	code/OptimizeMeshes.cpp
 	code/OptimizeMeshes.h
+	code/DeboneProcess.cpp
+	code/DeboneProcess.h
+	code/ProcessHelper.h
+	code/ProcessHelper.cpp
+	code/PolyTools.h
+	code/MakeVerboseFormat.cpp
+	code/MakeVerboseFormat.h
 )
+SOURCE_GROUP( PostProcessing FILES ${PostProcessing_SRCS})
 
-SOURCE_GROUP( Q3D FILES
+SET( Q3D_SRCS
 	code/Q3DLoader.cpp
 	code/Q3DLoader.h
 )
+SOURCE_GROUP( Q3D FILES ${Q3D_SRCS})
 
-SOURCE_GROUP( Q3BSP FILES
+SET( Q3BSP_SRCS
 	code/Q3BSPFileData.h
 	code/Q3BSPFileParser.h
 	code/Q3BSPFileParser.cpp
@@ -371,43 +457,57 @@ SOURCE_GROUP( Q3BSP FILES
 	code/Q3BSPZipArchive.h
 	code/Q3BSPZipArchive.cpp
 )
+SOURCE_GROUP( Q3BSP FILES ${Q3BSP_SRCS})
 
-SOURCE_GROUP( Raw FILES
+SET( Raw_SRCS
 	code/RawLoader.cpp
 	code/RawLoader.h
 )
+SOURCE_GROUP( Raw FILES ${Raw_SRCS})
 
-SOURCE_GROUP( SMD FILES
+SET( SMD_SRCS
 	code/SMDLoader.cpp
 	code/SMDLoader.h
 )
+SOURCE_GROUP( SMD FILES ${SMD_SRCS})
 
-SOURCE_GROUP( STL FILES
+SET( STL_SRCS
 	code/STLLoader.cpp
 	code/STLLoader.h
+	code/STLExporter.h
+	code/STLExporter.cpp
 )
+SOURCE_GROUP( STL FILES ${STL_SRCS})
 
-SOURCE_GROUP( Unreal FILES
+SET( Unreal_SRCS
 	code/UnrealLoader.cpp
 	code/UnrealLoader.h
 )
+SOURCE_GROUP( Unreal FILES ${Unreal_SRCS})
 
-SOURCE_GROUP( XFile FILES
+SET( XFile_SRCS
 	code/XFileHelper.h
 	code/XFileImporter.cpp
 	code/XFileImporter.h
 	code/XFileParser.cpp
 	code/XFileParser.h
 )
+SOURCE_GROUP( XFile FILES ${XFile_SRCS})
 
-SOURCE_GROUP( Extra FILES
-	code/MakeVerboseFormat.cpp
-	code/MakeVerboseFormat.h
+SET( Exporter_SRCS
+	code/Exporter.cpp
+	code/AssimpCExport.cpp
+	code/BlobIOSystem.h
+)
+SOURCE_GROUP( Exporter FILES ${Exporter_SRCS})
+
+SET( Extra_SRCS
 	code/MD4FileData.h
 )
+SOURCE_GROUP( Extra FILES ${Extra_SRCS})
 
-SOURCE_GROUP( IrrXML FILES
-	irrXMLWrapper.h
+SET( IrrXML_SRCS
+	code/irrXMLWrapper.h
 	contrib/irrXML/CXMLReaderImpl.h
 	contrib/irrXML/heapsort.h
 	contrib/irrXML/irrArray.h
@@ -416,13 +516,24 @@ SOURCE_GROUP( IrrXML FILES
 	contrib/irrXML/irrXML.cpp
 	contrib/irrXML/irrXML.h
 )
+SOURCE_GROUP( IrrXML FILES ${IrrXML_SRCS})
 
-SOURCE_GROUP( ConvertUTF FILES
+SET( ConvertUTF_SRCS
 	contrib/ConvertUTF/ConvertUTF.h
 	contrib/ConvertUTF/ConvertUTF.c
 )
+SOURCE_GROUP( ConvertUTF FILES ${ConvertUTF_SRCS})
 
-SOURCE_GROUP( zlib FILES
+SET( unzip_SRCS
+	contrib/unzip/crypt.h
+	contrib/unzip/ioapi.c
+	contrib/unzip/ioapi.h
+	contrib/unzip/unzip.c
+	contrib/unzip/unzip.h
+)
+SOURCE_GROUP( unzip FILES ${unzip_SRCS})
+
+SET( zlib_SRCS
 	contrib/zlib/adler32.c
 	contrib/zlib/compress.c
 	contrib/zlib/crc32.c
@@ -439,300 +550,81 @@ SOURCE_GROUP( zlib FILES
 	contrib/zlib/trees.c
 	contrib/zlib/trees.h
 	contrib/zlib/zconf.h
-	contrib/zlib/zconf.in.h
 	contrib/zlib/zlib.h
 	contrib/zlib/zutil.c
 	contrib/zlib/zutil.h
 )
+SOURCE_GROUP( zlib FILES ${zlib_SRCS})
 
-SOURCE_GROUP( unzip FILES
-	contrib/unzip/crypt.h
-	contrib/unzip/ioapi.c
-	contrib/unzip/ioapi.h
-	contrib/unzip/unzip.c
-	contrib/unzip/unzip.h
+if ( MSVC80 OR MSVC90 OR MSVC10 )
+	ADD_DEFINITIONS( -D_SCL_SECURE_NO_WARNINGS )
+	ADD_DEFINITIONS( -D_CRT_SECURE_NO_WARNINGS )
+endif ( MSVC80 OR MSVC90 OR MSVC10 )
+
+SET ( SOURCE_FILES
+	# Assimp Files
+	${Core_SRCS}
+	${Common_SRCS}
+	${Logging_SRCS}
+	${Exporter_SRCS}
+	${PostProcessing_SRCS}
+
+	# Model Support
+	${3DS_SRCS}
+	${AC_SRCS}
+	${ASE_SRCS}
+	${B3D_SRCS}
+	${BVH_SRCS}
+	${Collada_SRCS}
+	${DXF_SRCS}
+	${CSM_SRCS}
+	${HMP_SRCS}
+	${Irr_SRCS}
+	${LWO_SRCS}
+	${LWS_SRCS}
+	${M3_SRCS}
+	${MD2_SRCS}
+	${MD3_SRCS}
+	${MD5_SRCS}
+	${MDC_SRCS}
+	${MDL_SRCS}
+	${MaterialSystem_SRCS}
+	${NFF_SRCS}
+	${OFFFormat_SRCS}
+	${Obj_SRCS}
+	${Ogre_SRCS}
+	${Ply_SRCS}
+	${Q3D_SRCS}
+	${Q3BSP_SRCS}
+	${Raw_SRCS}
+	${SMD_SRCS}
+	${STL_SRCS}
+	${Unreal_SRCS}
+	${XFile_SRCS}
+	${Extra_SRCS}
+	${MS3D_SRCS}
+	${COB_SRCS}
+	${BLENDER_SRCS}
+	${NDO_SRCS}
+	${IFC_SRCS}
 )
 
-SET (HEADER_FILES
-	code/3DSHelper.h
-	code/3DSLoader.h
-	code/ACLoader.h
-	code/ASELoader.h
-	code/ASEParser.h
-	code/AssimpPCH.h
-	code/B3DImporter.h
-	code/BVHLoader.h
-	code/BaseImporter.h
-	code/BaseProcess.h
-	code/BlenderScene.h
-	code/BlenderSceneGen.h
-	code/BlenderIntermediate.h
-	code/BlenderLoader.h
-	code/BlenderModifier.h
-	code/BlenderDNA.h
-	code/BlenderDNA.inl
-	code/ByteSwap.h
-	code/CalcTangentsProcess.h
-	code/COBLoader.h
-	code/COBScene.h
-	code/ColladaHelper.h
-	code/ColladaLoader.h
-	code/ColladaParser.h
-	code/ComputeUVMappingProcess.h
-	code/ConvertToLHProcess.h
-	code/DXFLoader.h
-	code/CSMLoader.h
-	code/DefaultIOStream.h
-	code/DefaultIOSystem.h
-	code/DefaultProgressHandler.h
-	code/FileLogStream.h
-    code/FindDegenerates.h
-	code/FindInstancesProcess.h
-	code/FindInvalidDataProcess.h
-	code/FixNormalsStep.h
-	code/GenFaceNormalsProcess.h
-	code/GenVertexNormalsProcess.h
-	code/GenericProperty.h
-	code/HMPFileData.h
-	code/HMPLoader.h
-	code/HalfLifeFileData.h
-	code/Hash.h
-	code/IFF.h
-	code/IRRLoader.h
-	code/IRRMeshLoader.h
-	code/IRRShared.h
-	code/ImproveCacheLocality.h
-	code/JoinVerticesProcess.h
-	code/LimitBoneWeightsProcess.h
-	code/LineSplitter.h
-    code/LWOAnimation.h
-	code/LWOFileData.h
- 	code/LWOLoader.h
-	code/LWSLoader.h
-	code/MakeVerboseFormat.h
-	code/MD2FileData.h
-	code/MD2Loader.h
-	code/MD2NormalTable.h
-	code/MD3FileData.h
-    code/MD3Loader.h
-	code/MD4FileData.h
-	code/MDCLoader.h
-	code/MDCNormalTable.h
-	code/MDLDefaultColorMap.h
-	code/MDLFileData.h
-	code/MaterialSystem.h
-	code/MD5Loader.h
-	code/MD5Parser.h
-	code/MDCFileData.h
-	code/MDLLoader.h
-	code/MS3DLoader.h
-	code/NDOLoader.h
-	code/NFFLoader.h
-	code/OFFLoader.h
-	code/ObjFileData.h
-	code/ObjFileImporter.h
-	code/ObjFileMtlImporter.h
-	code/ObjFileParser.h
-	code/ObjTools.h
-	code/OgreImporter.h
-	code/OptimizeGraph.h
-	code/OptimizeMeshes.h
-	code/ParsingUtils.h
-	code/PlyLoader.h
-	code/PlyParser.h
-	code/PretransformVertices.h
-	code/ProcessHelper.h
-	code/Profiler.h
-	code/RawLoader.h
-	code/RemoveComments.h
-	code/RemoveRedundantMaterials.h
-	code/Q3DLoader.h
-	code/Q3BSPFileData.h
-	code/Q3BSPFileParser.h
-	code/Q3BSPFileImporter.h
-	code/Q3BSPZipArchive.h
-	code/RemoveVCProcess.h
-	code/SGSpatialSort.h
-	code/SMDLoader.h
-	code/STLLoader.h
-	code/SceneCombiner.h
-	code/ScenePreprocessor.h
-	code/SkeletonMeshBuilder.h
-	code/SmoothingGroups.h
-	code/SortByPTypeProcess.h
-	code/SpatialSort.h
-	code/SplitLargeMeshes.h
-	code/StandardShapes.h
-	code/StdOStreamLogStream.h
-	code/StreamReader.h
-	code/StringComparison.h
-	code/Subdivision.h
-	code/TargetAnimation.h
-	code/TerragenLoader.h
-	code/TextureTransform.h
-	code/TinyFormatter.h
-	code/TriangulateProcess.h
-	code/UnrealLoader.h
-	code/ValidateDataStructure.h
-	code/Vertex.h
-	code/VertexTriangleAdjacency.h
-	code/Win32DebugLogStream.h
-	code/XFileHelper.h
-	code/XFileImporter.h
-	code/XFileParser.h
-	code/fast_atof.h
-	code/irrXMLWrapper.h
-	code/qnan.h
-	code/BoostWorkaround/boost/math/common_factor_rt.hpp
-	code/BoostWorkaround/boost/foreach.hpp
-	code/BoostWorkaround/boost/format.hpp
-	code/BoostWorkaround/boost/scoped_array.hpp
-	code/BoostWorkaround/boost/scoped_ptr.hpp
-	code/BoostWorkaround/boost/shared_array.hpp
-	code/BoostWorkaround/boost/shared_ptr.hpp
-	code/BoostWorkaround/boost/static_assert.hpp
-	code/BoostWorkaround/boost/tuple/tuple.hpp
+SET ( CONTRIB_FILES	
+	# Third-party libraries
+	${IrrXML_SRCS}
+	${ConvertUTF_SRCS}
+	${unzip_SRCS}
+	${zlib_SRCS}
+	# Necessary to show the headers in the project when using the VC++ generator:
+	${Boost_SRCS}
+)
+
+ADD_LIBRARY( Assimp STATIC
+    ${SOURCE_FILES}
+    ${CONTRIB_FILES}
 	${PUBLIC_HEADERS}
 	${COMPILER_HEADERS}
 )
-
-SET (SOURCE_FILES
-	code/3DSConverter.cpp
-	code/3DSLoader.cpp
-	code/ACLoader.cpp
-	code/ASELoader.cpp
-	code/ASEParser.cpp
-	code/Assimp.cpp
-	code/AssimpPCH.cpp
-	code/B3DImporter.cpp
-	code/BVHLoader.cpp
-	code/BaseImporter.cpp
-	code/BaseProcess.cpp
-	code/BlenderLoader.cpp
-	code/BlenderDNA.cpp
-	code/BlenderScene.cpp
-	code/BlenderModifier.cpp
-	code/CalcTangentsProcess.cpp
-	code/COBLoader.cpp
-	code/ColladaLoader.cpp
-	code/ColladaParser.cpp
-	code/ComputeUVMappingProcess.cpp
-	code/ConvertToLHProcess.cpp
-	code/DXFLoader.cpp
-	code/CSMLoader.cpp
-	code/DefaultIOStream.cpp
-	code/DefaultIOSystem.cpp
-	code/DefaultLogger.cpp
-	code/FindDegenerates.cpp
-	code/FindInstancesProcess.cpp
-	code/FindInvalidDataProcess.cpp
-	code/FixNormalsStep.cpp
-	code/GenFaceNormalsProcess.cpp
-	code/GenVertexNormalsProcess.cpp
-	code/HMPLoader.cpp
-	code/IRRLoader.cpp
-	code/IRRMeshLoader.cpp
-	code/IRRShared.cpp
-	code/Importer.cpp
-	code/ImproveCacheLocality.cpp
-	code/JoinVerticesProcess.cpp
-	code/LWOAnimation.cpp
-	code/LWOBLoader.cpp
-	code/LWOLoader.cpp
-	code/LWOMaterial.cpp
-	code/LWSLoader.cpp
-	code/LimitBoneWeightsProcess.cpp
-	code/MakeVerboseFormat.cpp
-	code/MD2Loader.cpp
-	code/MD3Loader.cpp
-	code/MD5Loader.cpp
-	code/MD5Parser.cpp
-	code/MDCLoader.cpp
-	code/MDLLoader.cpp
-	code/MDLMaterialLoader.cpp
-	code/MS3DLoader.cpp
-	code/MaterialSystem.cpp
-	code/NDOLoader.cpp
-	code/NFFLoader.cpp
-	code/OFFLoader.cpp
-	code/ObjFileImporter.cpp
-	code/ObjFileMtlImporter.cpp
-	code/ObjFileParser.cpp
-	code/OgreImporter.cpp
-	code/OgreImporterMaterial.cpp
-	code/OptimizeGraph.cpp
-	code/OptimizeMeshes.cpp
-	code/PlyLoader.cpp
-	code/PlyParser.cpp
-	code/PretransformVertices.cpp
-	code/Q3DLoader.cpp
-	code/Q3BSPFileParser.cpp
-	code/Q3BSPFileImporter.cpp
-	code/Q3BSPZipArchive.cpp
-	code/RawLoader.cpp
-	code/RemoveComments.cpp
-	code/RemoveRedundantMaterials.cpp
-	code/RemoveVCProcess.cpp
-	code/SGSpatialSort.cpp
-	code/SMDLoader.cpp
-	code/STLLoader.cpp
-	code/SceneCombiner.cpp
-	code/ScenePreprocessor.cpp
-	code/SkeletonMeshBuilder.cpp
-	code/SortByPTypeProcess.cpp
-	code/SpatialSort.cpp
-	code/SplitLargeMeshes.cpp
-	code/StandardShapes.cpp
-	code/Subdivision.cpp
-	code/TargetAnimation.cpp
-	code/TerragenLoader.cpp
-	code/TextureTransform.cpp
-	code/TriangulateProcess.cpp
-	code/UnrealLoader.cpp
-	code/ValidateDataStructure.cpp
-	code/VertexTriangleAdjacency.cpp
-	code/XFileImporter.cpp
-	code/XFileParser.cpp
-	code/aiAssert.cpp
-)
-
-SET (CONTRIB_FILES
-	contrib/irrXML/CXMLReaderImpl.h
-	contrib/irrXML/heapsort.h
-	contrib/irrXML/irrArray.h
-	contrib/irrXML/irrString.h
-	contrib/irrXML/irrTypes.h
-	contrib/irrXML/irrXML.cpp
-	contrib/irrXML/irrXML.h
-	contrib/zlib/adler32.c
-	contrib/zlib/compress.c
-	contrib/zlib/crc32.c
-	contrib/zlib/crc32.h
-	contrib/zlib/deflate.c
-	contrib/zlib/deflate.h
-	contrib/zlib/inffast.c
-	contrib/zlib/inffast.h
-	contrib/zlib/inffixed.h
-	contrib/zlib/inflate.c
-	contrib/zlib/inflate.h
-	contrib/zlib/inftrees.c
-	contrib/zlib/inftrees.h
-	contrib/zlib/trees.c
-	contrib/zlib/trees.h
-	contrib/zlib/zconf.h
-	contrib/zlib/zconf.in.h
-	contrib/zlib/zlib.h
-	contrib/zlib/zutil.c
-	contrib/zlib/zutil.h
-	contrib/ConvertUTF/ConvertUTF.c
-	contrib/unzip/crypt.h
-	contrib/unzip/ioapi.c
-	contrib/unzip/ioapi.h
-	contrib/unzip/unzip.c
-	contrib/unzip/unzip.h
-)
-
-ADD_LIBRARY ( Assimp STATIC ${HEADER_FILES} ${SOURCE_FILES} ${CONTRIB_FILES} )
 
 if (MSVC)
     foreach(FILE ${SOURCE_FILES})

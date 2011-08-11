@@ -1101,7 +1101,7 @@ bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
     HashMap<StringHash, ShaderParameterInfo>::Iterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return false;
-        
+    
     if (i->second_.type_ == VS)
     {
         if (vertexShader_ && vertexShader_->HasParameter(param) && i->second_.lastSource_ != source)

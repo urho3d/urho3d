@@ -90,14 +90,14 @@ extern "C" {
  *  Supported number of vertex color sets per mesh. */
 
 #ifndef AI_MAX_NUMBER_OF_COLOR_SETS
-#	define AI_MAX_NUMBER_OF_COLOR_SETS 0x4
+#	define AI_MAX_NUMBER_OF_COLOR_SETS 0x8
 #endif // !! AI_MAX_NUMBER_OF_COLOR_SETS
 
 /** @def AI_MAX_NUMBER_OF_TEXTURECOORDS
  *  Supported number of texture coord sets (UV(W) channels) per mesh */
 
 #ifndef AI_MAX_NUMBER_OF_TEXTURECOORDS
-#	define AI_MAX_NUMBER_OF_TEXTURECOORDS 0x4
+#	define AI_MAX_NUMBER_OF_TEXTURECOORDS 0x8
 #endif // !! AI_MAX_NUMBER_OF_TEXTURECOORDS
 
 // ---------------------------------------------------------------------------
@@ -516,8 +516,7 @@ struct aiMesh
 	* point or line primitives are undefined and set to qNaN.  See
 	* the #mNormals member for a detailled discussion of qNaNs.
 	* @note If the mesh contains tangents, it automatically also 
-	* contains bitangents (the bitangent is just the cross product of
-	* tangent and normal vectors). 
+	* contains bitangents.
 	*/
 	C_STRUCT aiVector3D* mTangents;
 
@@ -626,6 +625,8 @@ struct aiMesh
 			mColors[a] = NULL;
 		mNumBones = 0; mBones = NULL;
 		mMaterialIndex = 0;
+		mNumAnimMeshes = 0;
+		mAnimMeshes = NULL;
 	}
 
 	//! Deletes all storage allocated for the mesh

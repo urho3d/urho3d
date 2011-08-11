@@ -76,7 +76,7 @@ struct NodeAttachmentInfo
 		:	node			(NULL)
 		,	attachToNode	(NULL)
 		,	resolved		(false)
-		,	src_idx			(0xffffffff)
+		,	src_idx			(SIZE_MAX)
 	{}
 
 	NodeAttachmentInfo(aiNode* _scene, aiNode* _attachToNode,size_t idx)
@@ -303,7 +303,7 @@ public:
 	 *  @param dest Receives a pointer to the destination scene
 	 *  @param src Source scene - remains unmodified.
 	 */
-	static void CopyScene(aiScene** dest,aiScene* source);
+	static void CopyScene(aiScene** dest,const aiScene* source,bool allocate = true);
 
 
 	// -------------------------------------------------------------------
@@ -316,7 +316,7 @@ public:
 	 *  @param dest Receives a pointer to the destination scene
 	 *  @param src Source scene - remains unmodified.
 	 */
-	static void CopySceneFlat(aiScene** dest,aiScene* source);
+	static void CopySceneFlat(aiScene** dest,const aiScene* source);
 
 
 	// -------------------------------------------------------------------

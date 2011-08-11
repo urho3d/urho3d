@@ -71,8 +71,8 @@ aiReturn aiGetMaterialProperty(const aiMaterial* pMat,
 
 		if (prop /* just for safety ... */
 			&& 0 == strcmp( prop->mKey.data, pKey ) 
-			&& (0xffffffff == type  || prop->mSemantic == type) /* 0xffffffff is a wildcard, but this is undocumented :-) */ 
-			&& (0xffffffff == index || prop->mIndex == index))
+			&& (UINT_MAX == type  || prop->mSemantic == type) /* UINT_MAX is a wildcard, but this is undocumented :-) */ 
+			&& (UINT_MAX == index || prop->mIndex == index))
 		{
 			*pPropOut = pMat->mProperties[i];
 			return AI_SUCCESS;
@@ -209,7 +209,7 @@ aiReturn aiGetMaterialIntegerArray(const aiMaterial* pMat,
 		const char* cur =  prop->mData+4;
 		ai_assert(prop->mDataLength>=5 && !prop->mData[prop->mDataLength-1]);
 		for (unsigned int a = 0; ;++a) {	
-			pOut[a] = strtol10s(cur,&cur);
+			pOut[a] = strtol10(cur,&cur);
 			if(a==iWrite-1) {
 				break;
 			}
@@ -469,7 +469,7 @@ aiReturn MaterialHelper::AddBinaryProperty (const void* pInput,
 	ai_assert (0 != pSizeInBytes);
 
 	// first search the list whether there is already an entry with this key
-	unsigned int iOutIndex = 0xffffffff;
+	unsigned int iOutIndex = UINT_MAX;
 	for (unsigned int i = 0; i < mNumProperties;++i)	{
 		aiMaterialProperty* prop = mProperties[i];
 
@@ -497,7 +497,7 @@ aiReturn MaterialHelper::AddBinaryProperty (const void* pInput,
 	ai_assert ( MAXLEN > pcNew->mKey.length);
 	strcpy( pcNew->mKey.data, pKey );
 
-	if (0xffffffff != iOutIndex)	{
+	if (UINT_MAX != iOutIndex)	{
 		mProperties[iOutIndex] = pcNew;
 		return AI_SUCCESS;
 	}

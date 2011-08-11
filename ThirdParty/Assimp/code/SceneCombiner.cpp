@@ -243,17 +243,17 @@ void SceneCombiner::MergeScenes(aiScene** _dest, aiScene* master,
 	ai_assert(NULL != _dest);
 
 	// if _dest points to NULL allocate a new scene. Otherwise clear the old and reuse it
-	if (srcList.empty())
-	{
-		if (*_dest)
-		{
+	if (srcList.empty())	{
+		if (*_dest)	{
 			(*_dest)->~aiScene();
 			SceneCombiner::CopySceneFlat(_dest,master);
 		}
 		else *_dest = master;
 		return;
 	}
-	if (*_dest)(*_dest)->~aiScene();
+	if (*_dest) {
+		(*_dest)->~aiScene();
+	}
 	else *_dest = new aiScene();
 
 	aiScene* dest = *_dest;
@@ -265,20 +265,22 @@ void SceneCombiner::MergeScenes(aiScene** _dest, aiScene* master,
 	}
 
 	// this helper array specifies which scenes are duplicates of others
-	std::vector<unsigned int> duplicates(src.size(),0xffffffff);
+	std::vector<unsigned int> duplicates(src.size(),UINT_MAX);
 
 	// this helper array is used as lookup table several times
 	std::vector<unsigned int> offset(src.size());
 
 	// Find duplicate scenes
-	for (unsigned int i = 0; i < src.size();++i)
-	{
-		if (duplicates[i] != i && duplicates[i] != 0xffffffff)continue;
+	for (unsigned int i = 0; i < src.size();++i) {
+		if (duplicates[i] != i && duplicates[i] != UINT_MAX) {
+			continue;
+		}
+			
 		duplicates[i] = i;
-		for ( unsigned int a = i+1; a < src.size(); ++a)
-		{
-			if (src[i].scene == src[a].scene)
+		for ( unsigned int a = i+1; a < src.size(); ++a)	{
+			if (src[i].scene == src[a].scene) {
 				duplicates[a] = i;
+			}
 		}
 	}
 
@@ -404,7 +406,7 @@ void SceneCombiner::MergeScenes(aiScene** _dest, aiScene* master,
 							aiString& s = *((aiString*)prop->mData);
 							if ('*' == s.data[0])	{
 								// Offset the index and write it back ..
-								const unsigned int idx = strtol10(&s.data[1]) + offset[n];
+								const unsigned int idx = strtoul10(&s.data[1]) + offset[n];
 								ASSIMP_itoa10(&s.data[1],sizeof(s.data)-1,idx);
 							}
 						}
@@ -745,7 +747,7 @@ void SceneCombiner::MergeBones(aiMesh* out,std::vector<aiMesh*>::const_iterator 
 
 // ------------------------------------------------------------------------------------------------
 // Merge a list of meshes
-void SceneCombiner::MergeMeshes(aiMesh** _out,unsigned int flags,
+void SceneCombiner::MergeMeshes(aiMesh** _out,unsigned int /*flags*/,
 	std::vector<aiMesh*>::const_iterator begin,
 	std::vector<aiMesh*>::const_iterator end)
 {
@@ -880,7 +882,7 @@ void SceneCombiner::MergeMeshes(aiMesh** _out,unsigned int flags,
 
 // ------------------------------------------------------------------------------------------------
 template <typename Type>
-inline void CopyPtrArray (Type**& dest, Type** src, unsigned int num)
+inline void CopyPtrArray (Type**& dest, const Type* const * src, unsigned int num)
 {
 	if (!num)
 	{
@@ -888,8 +890,9 @@ inline void CopyPtrArray (Type**& dest, Type** src, unsigned int num)
 		return;
 	}
 	dest = new Type*[num];
-	for (unsigned int i = 0; i < num;++i)
+	for (unsigned int i = 0; i < num;++i) {
 		SceneCombiner::Copy(&dest[i],src[i]);
+	}
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -904,7 +907,7 @@ inline void GetArrayCopy (Type*& dest, unsigned int num )
 }
 
 // ------------------------------------------------------------------------------------------------
-void SceneCombiner::CopySceneFlat(aiScene** _dest,aiScene* src)
+void SceneCombiner::CopySceneFlat(aiScene** _dest,const aiScene* src)
 {
 	// reuse the old scene or allocate a new?
 	if (*_dest)(*_dest)->~aiScene();
@@ -914,11 +917,15 @@ void SceneCombiner::CopySceneFlat(aiScene** _dest,aiScene* src)
 }
 
 // ------------------------------------------------------------------------------------------------
-void SceneCombiner::CopyScene(aiScene** _dest,aiScene* src)
+void SceneCombiner::CopyScene(aiScene** _dest,const aiScene* src,bool allocate)
 {
 	ai_assert(NULL != _dest && NULL != src);
 
-	aiScene* dest = *_dest = new aiScene();
+	if (allocate) {
+		*_dest = new aiScene();
+	}
+	aiScene* dest = *_dest; 
+	ai_assert(dest);
 
 	// copy animations
 	dest->mNumAnimations = src->mNumAnimations;
@@ -955,6 +962,9 @@ void SceneCombiner::CopyScene(aiScene** _dest,aiScene* src)
 
 	// and keep the flags ...
 	dest->mFlags = src->mFlags;
+
+	// source private data might be NULL if the scene is user-allocated (i.e. for use with the export API)
+	ScenePriv(dest)->mPPStepsApplied = ScenePriv(src) ? ScenePriv(src)->mPPStepsApplied : NULL;
 }
 
 // ------------------------------------------------------------------------------------------------

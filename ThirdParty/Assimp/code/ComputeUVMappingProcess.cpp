@@ -98,7 +98,7 @@ inline unsigned int FindEmptyUVChannel (aiMesh* mesh)
 		if (!mesh->mTextureCoords[m])return m;
 	
 	DefaultLogger::get()->error("Unable to compute UV coordinates, no free UV slot found");
-	return 0xffffffff;
+	return UINT_MAX;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -380,7 +380,7 @@ void ComputeUVMappingProcess::ComputePlaneMapping(aiMesh* mesh,const aiVector3D&
 }
 
 // ------------------------------------------------------------------------------------------------
-void ComputeUVMappingProcess::ComputeBoxMapping(aiMesh* mesh, aiVector3D* out)
+void ComputeUVMappingProcess::ComputeBoxMapping(aiMesh* /*mesh*/, aiVector3D* /*out*/)
 {
 	DefaultLogger::get()->error("Mapping type currently not implemented");
 }
@@ -455,7 +455,7 @@ void ComputeUVMappingProcess::Execute( aiScene* pScene)
 						{
 							aiMesh* mesh = pScene->mMeshes[m];
 							unsigned int outIdx;
-							if ( mesh->mMaterialIndex != i || ( outIdx = FindEmptyUVChannel(mesh) ) == 0xffffffff ||
+							if ( mesh->mMaterialIndex != i || ( outIdx = FindEmptyUVChannel(mesh) ) == UINT_MAX ||
 								!mesh->mNumVertices)
 							{
 								continue;

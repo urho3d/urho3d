@@ -178,12 +178,14 @@ bool BlenderModifier_Mirror :: IsActive (const ModifierData& modin)
 
 // ------------------------------------------------------------------------------------------------
 void  BlenderModifier_Mirror :: DoIt(aiNode& out, ConversionData& conv_data,  const ElemBase& orig_modifier, 
-	const Scene& in,
+	const Scene& /*in*/,
 	const Object& orig_object ) 
 {
 	// hijacking the ABI, see the big note in BlenderModifierShowcase::ApplyModifiers()
 	const MirrorModifierData& mir = static_cast<const MirrorModifierData&>(orig_modifier);
 	ai_assert(mir.modifier.type == ModifierData::eModifierType_Mirror);
+
+	conv_data.meshes->reserve(conv_data.meshes->size() + out.mNumMeshes);
 
 	// XXX not entirely correct, mirroring on two axes results in 4 distinct objects in blender ...
 
@@ -271,7 +273,7 @@ bool BlenderModifier_Subdivision :: IsActive (const ModifierData& modin)
 
 // ------------------------------------------------------------------------------------------------
 void  BlenderModifier_Subdivision :: DoIt(aiNode& out, ConversionData& conv_data,  const ElemBase& orig_modifier, 
-	const Scene& in,
+	const Scene& /*in*/,
 	const Object& orig_object ) 
 {
 	// hijacking the ABI, see the big note in BlenderModifierShowcase::ApplyModifiers()
