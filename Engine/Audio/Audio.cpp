@@ -36,6 +36,8 @@
 #ifdef USE_OPENGL
 #include <portaudio.h>
 #else
+#define DIRECTSOUND_VERSION 0x0800
+
 #include "Thread.h"
 #include "Timer.h"
 
@@ -57,6 +59,7 @@ static unsigned numInstances = 0;
 static int AudioCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 #else
+/// DirectSound audio output stream
 class AudioStream : public Thread
 {
 public:
