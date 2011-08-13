@@ -41,10 +41,10 @@ class Matrix3x4;
 class ShaderVariation;
 class VertexBuffer;
 
-/// Description of a 3D geometry draw call
+/// Description of a 3D geometry draw call.
 struct Batch
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     Batch() :
         light_(0),
         shaderData_(0),
@@ -55,127 +55,127 @@ struct Batch
     {
     }
     
-    /// Calculate sort key, which consists of priority flag, light, pass and geometry
+    /// Calculate sort key, which consists of priority flag, light, pass and geometry.
     void CalculateSortKey();
-    /// Prepare for rendering
+    /// Prepare for rendering.
     void Prepare(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters, bool setModelTransform = true) const;
-    /// Prepare and draw
+    /// Prepare and draw.
     void Draw(Graphics* graphics, const HashMap<StringHash, Vector4>& shaderParameters) const;
     
-    /// Geometry
+    /// Geometry.
     Geometry* geometry_;
-    /// Model world transform
+    /// Model world transform.
     const Matrix3x4* worldTransform_;
-    /// Camera
+    /// Camera.
     Camera* camera_;
-    /// Light that affects the geometry, if any
+    /// Light that affects the geometry, if any.
     Light* light_;
-    /// Material
+    /// Material.
     Material* material_;
-    /// Material pass
+    /// Material pass.
     Pass* pass_;
-    /// Vertex shader
+    /// Vertex shader.
     ShaderVariation* vertexShader_;
-    /// Pixel shader
+    /// Pixel shader.
     ShaderVariation* pixelShader_;
-    /// Vertex shader data
+    /// Vertex shader data.
     const float* shaderData_;
-    /// Vertex shader data size in floats
+    /// Vertex shader data size in floats.
     unsigned shaderDataSize_;
-    /// Distance from camera
+    /// Distance from camera.
     float distance_;
-    /// State sorting key
+    /// State sorting key.
     unsigned long long sortKey_;
-    /// Geometry type
+    /// Geometry type.
     GeometryType geometryType_;
-    /// Vertex shader index
+    /// Vertex shader index.
     unsigned char vertexShaderIndex_;
-    /// Override view transform flag
+    /// Override view transform flag.
     bool overrideView_;
-    /// Priority flag
+    /// Priority flag.
     bool hasPriority_;
 };
 
-/// Data for one geometry instance
+/// Data for one geometry instance.
 struct InstanceData
 {
-    /// Construct undefined
+    /// Construct undefined.
     InstanceData()
     {
     }
     
-    /// Construct with transform and distance
+    /// Construct with transform and distance.
     InstanceData(const Matrix3x4* worldTransform, float distance) :
         worldTransform_(worldTransform),
         distance_(distance)
     {
     }
     
-    /// World transform
+    /// World transform.
     const Matrix3x4* worldTransform_;
-    /// Distance from camera
+    /// Distance from camera.
     float distance_;
 };
 
-/// Instanced 3D geometry draw call
+/// Instanced 3D geometry draw call.
 struct BatchGroup
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     BatchGroup() :
         startIndex_(M_MAX_UNSIGNED)
     {
     }
     
-    /// Destruct
+    /// Destruct.
     ~BatchGroup()
     {
     }
     
-    /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms
+    /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
     void SetTransforms(void* lockedData, unsigned& freeIndex);
-    /// Prepare and draw
+    /// Prepare and draw.
     void Draw(Graphics* graphics, VertexBuffer* instanceBuffer, const HashMap<StringHash, Vector4>& shaderParameters) const;
     
-    /// Geometry
+    /// Geometry.
     Geometry* geometry_;
-    /// Instance data
+    /// Instance data.
     PODVector<InstanceData> instances_;
-    /// Camera
+    /// Camera.
     Camera* camera_;
-    /// Light that affects the geometry, if any
+    /// Light that affects the geometry, if any.
     Light* light_;
-    /// Material
+    /// Material.
     Material* material_;
-    /// Material pass
+    /// Material pass.
     Pass* pass_;
-    /// Vertex shader
+    /// Vertex shader.
     ShaderVariation* vertexShader_;
-    /// Pixel shader
+    /// Pixel shader.
     ShaderVariation* pixelShader_;
-    /// Vertex shader index
+    /// Vertex shader index.
     unsigned char vertexShaderIndex_;
-    /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set
+    /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
     unsigned startIndex_;
 };
 
-/// Instanced draw call key
+/// Instanced draw call key.
 struct BatchGroupKey
 {
-    /// Light that affects the geometry, if any
+    /// Light that affects the geometry, if any.
     Light* light_;
-    /// Material pass
+    /// Material pass.
     Pass* pass_;
-    /// Material
+    /// Material.
     Material* material_;
-    /// Geometry
+    /// Geometry.
     Geometry* geometry_;
     
-    /// Test for equality with another batch group key
+    /// Test for equality with another batch group key.
     bool operator == (const BatchGroupKey& rhs) const { return light_ == rhs.light_ && pass_ == rhs.pass_ && material_ == rhs.material_ && geometry_ == rhs.geometry_; }
-    /// Test for inequality with another batch group key
+    /// Test for inequality with another batch group key.
     bool operator != (const BatchGroupKey& rhs) const { return light_ != rhs.light_ || pass_ != rhs.pass_ || material_ != rhs.material_ || geometry_ != rhs.geometry_; }
     
-    /// Test if less than another batch group key
+    /// Test if less than another batch group key.
     bool operator < (const BatchGroupKey& rhs) const
     {
         if (light_ == rhs.light_)
@@ -194,7 +194,7 @@ struct BatchGroupKey
             return light_ < rhs.light_;
     }
     
-    /// Test if greater than another batch group key
+    /// Test if greater than another batch group key.
     bool operator > (const BatchGroupKey& rhs) const
     {
         if (light_ == rhs.light_)
@@ -214,48 +214,48 @@ struct BatchGroupKey
     }
 };
 
-/// Queue that contains both instanced and non-instanced draw calls
+/// Queue that contains both instanced and non-instanced draw calls.
 struct BatchQueue
 {
 public:
-    /// Clear everything
+    /// Clear everything.
     void Clear();
-    /// Add a batch, with instancing if possible
+    /// Add a batch, with instancing if possible.
     void AddBatch(const Batch& batch, bool noInstancing = false);
-    /// Sort non-instanced draw calls back to front
+    /// Sort non-instanced draw calls back to front.
     void SortBackToFront();
-    /// Sort instanced and non-instanced draw calls front to back
+    /// Sort instanced and non-instanced draw calls front to back.
     void SortFrontToBack();
-    /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms
+    /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
     void SetTransforms(void* lockedData, unsigned& freeIndex);
     
-    /// Return the combined amount of instances
+    /// Return the combined amount of instances.
     unsigned GetNumInstances() const;
-    /// Return whether the batch group is empty
+    /// Return whether the batch group is empty.
     bool IsEmpty() const { return batches_.Empty() && priorityBatchGroups_.Empty() && batchGroups_.Empty(); }
-    /// Unsorted non-instanced draw calls
+    /// Unsorted non-instanced draw calls.
     PODVector<Batch> batches_;
-    /// Sorted non-instanced draw calls with priority flag
+    /// Sorted non-instanced draw calls with priority flag.
     PODVector<Batch*> sortedPriorityBatches_;
-    /// Sorted non-instanced draw calls
+    /// Sorted non-instanced draw calls.
     PODVector<Batch*> sortedBatches_;
-    /// Instanced draw calls with priority flag
+    /// Instanced draw calls with priority flag.
     Map<BatchGroupKey, BatchGroup> priorityBatchGroups_;
-    /// Instanced draw calls
+    /// Instanced draw calls.
     Map<BatchGroupKey, BatchGroup> batchGroups_;
 };
 
 /// Queue for light related draw calls
 struct LightBatchQueue
 {
-    /// Light drawable
+    /// Light drawable.
     Light* light_;
-    /// Shadowcaster draw calls
+    /// Shadowcaster draw calls.
     BatchQueue shadowBatches_;
-    /// Lit geometry draw calls
+    /// Lit geometry draw calls.
     BatchQueue litBatches_;
-    /// Light volume draw calls, should be only one
+    /// Light volume draw calls, should be only one.
     PODVector<Batch> volumeBatches_;
-    /// Last split flag for clearing the stencil buffer
+    /// Last split flag for clearing the stencil buffer.
     bool lastSplit_;
 };

@@ -27,10 +27,10 @@
 #include "Hash.h"
 #include "Swap.h"
 
-/// Hash set/map node base
+/// Hash set/map node base.
 struct HashNodeBase
 {
-    /// Construct
+    /// Construct.
     HashNodeBase() :
         prev_(0),
         next_(0),
@@ -38,57 +38,57 @@ struct HashNodeBase
     {
     }
     
-    /// Previous node
+    /// Previous node.
     HashNodeBase* prev_;
-    /// Next node
+    /// Next node.
     HashNodeBase* next_;
-    /// Next node in the bucket
+    /// Next node in the bucket.
     HashNodeBase* down_;
 };
 
-/// Hash set/map iterator base class
+/// Hash set/map iterator base class.
 class HashIteratorBase
 {
 public:
-    /// Construct
+    /// Construct.
     explicit HashIteratorBase(HashNodeBase* ptr) :
         ptr_(ptr)
     {
     }
 
-    /// Test for equality with another iterator
+    /// Test for equality with another iterator.
     bool operator == (const HashIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Test for inequality with another iterator
+    /// Test for inequality with another iterator.
     bool operator != (const HashIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
 
-    /// Go to the next node
+    /// Go to the next node.
     void GotoNext()
     {
         if (ptr_)
             ptr_ = ptr_->next_;
     }
 
-    /// Go to the previous node
+    /// Go to the previous node.
     void GotoPrev()
     {
         if (ptr_)
             ptr_ = ptr_->prev_;
     }
 
-    /// Node pointer
+    /// Node pointer.
     HashNodeBase* ptr_;
 };
 
-/// Hash set/map base class
+/// Hash set/map base class.
 class HashBase
 {
 public:
-    /// Initial amount of buckets
+    /// Initial amount of buckets.
     static const unsigned MIN_BUCKETS = 8;
-    /// Maximum load factor
+    /// Maximum load factor.
     static const unsigned MAX_LOAD_FACTOR = 4;
     
-    /// Construct
+    /// Construct.
     HashBase() :
         ptrs_(0),
         allocator_(0),
@@ -97,7 +97,7 @@ public:
     {
     }
 
-    /// Swap with another hash set or map
+    /// Swap with another hash set or map.
     void Swap(HashBase& rhs)
     {
         ::Swap(head_, rhs.head_);
@@ -109,16 +109,16 @@ public:
     }
 
 protected:
-    /// List head node pointer
+    /// List head node pointer.
     HashNodeBase* head_;
-    /// List tail node pointer
+    /// List tail node pointer.
     HashNodeBase* tail_;
-    /// Bucket head pointers
+    /// Bucket head pointers.
     HashNodeBase** ptrs_;
-    /// Node allocator
+    /// Node allocator.
     AllocatorBlock* allocator_;
-    /// Number of nodes
+    /// Number of nodes.
     unsigned size_;
-    /// Number of buckets
+    /// Number of buckets.
     unsigned numBuckets_;
 };

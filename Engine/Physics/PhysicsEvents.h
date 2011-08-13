@@ -25,21 +25,21 @@
 
 #include "Object.h"
 
-/// Physics world is about to be stepped
+/// Physics world is about to be stepped.
 EVENT(E_PHYSICSPRESTEP, PhysicsPreStep)
 {
     PARAM(P_WORLD, World);                // PhysicsWorld pointer
     PARAM(P_TIMESTEP, TimeStep);          // float
 }
 
-/// Physics world has been stepped
+/// Physics world has been stepped.
 EVENT(E_PHYSICSPOSTSTEP, PhysicsPostStep)
 {
     PARAM(P_WORLD, World);                // PhysicsWorld pointer
     PARAM(P_TIMESTEP, TimeStep);          // float
 }
 
-/// Physics collision occurred
+/// Physics collision occurred.
 EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
 {
     PARAM(P_WORLD, World);                // PhysicsWorld pointer
@@ -51,7 +51,7 @@ EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
     PARAM(P_CONTACTS, Contacts);          // Buffer containing position, normal, depth, velocity for each contact
 }
 
-/// Physics collision occurred (sent to the participating scene nodes)
+/// Physics collision occurred (sent to the participating scene nodes.)
 EVENT(E_NODECOLLISION, NodeCollision)
 {
     PARAM(P_SHAPE, Shape);                // CollisionShape pointer

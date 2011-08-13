@@ -26,37 +26,37 @@
 #include "MathDefs.h"
 #include "StringBase.h"
 
-/// Two-dimensional vector
+/// Two-dimensional vector.
 class Vector2
 {
 public:
-    /// Construct an undefined vector
+    /// Construct undefined.
     Vector2()
     {
     }
     
-    /// Copy-construct from another vector
+    /// Copy-construct from another vector.
     Vector2(const Vector2& vector) :
         x_(vector.x_),
         y_(vector.y_)
     {
     }
     
-    /// Construct from coordinates
+    /// Construct from coordinates.
     Vector2(float x, float y) :
         x_(x),
         y_(y)
     {
     }
     
-    /// Construct from a float array
+    /// Construct from a float array.
     Vector2(const float* data) :
         x_(data[0]),
         y_(data[1])
     {
     }
     
-    /// Assign from another vector
+    /// Assign from another vector.
     Vector2& operator = (const Vector2& rhs)
     {
         x_ = rhs.x_;
@@ -64,26 +64,26 @@ public:
         return *this;
     }
     
-    /// Test for equality with another vector
+    /// Test for equality with another vector.
     bool operator == (const Vector2& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_); }
-    /// Test for inequality with another vector
+    /// Test for inequality with another vector.
     bool operator != (const Vector2& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_); }
-    /// Add a vector
+    /// Add a vector.
     Vector2 operator + (const Vector2& rhs) const { return Vector2(x_ + rhs.x_, y_ + rhs.y_); }
-    /// Return negation
+    /// Return negation.
     Vector2 operator - () const { return Vector2(-x_, -y_); }
-    /// Subtract a vector
+    /// Subtract a vector.
     Vector2 operator - (const Vector2& rhs) const { return Vector2(x_ - rhs.x_, y_ - rhs.y_); }
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Vector2 operator * (float rhs) const { return Vector2(x_ * rhs, y_ * rhs); }
-    /// Multiply with a vector
+    /// Multiply with a vector.
     Vector2 operator * (const Vector2& rhs) const { return Vector2(x_ * rhs.x_, y_ * rhs.y_); }
-    /// Divide by a scalar
+    /// Divide by a scalar.
     Vector2 operator / (float rhs) const { return Vector2(x_ / rhs, y_ / rhs); }
-    /// Divide by a vector
+    /// Divide by a vector.
     Vector2 operator / (const Vector2& rhs) const { return Vector2(x_ / rhs.x_, y_ / rhs.y_); }
     
-    /// Add-assign a vector
+    /// Add-assign a vector.
     Vector2& operator += (const Vector2& rhs)
     {
         x_ += rhs.x_;
@@ -91,7 +91,7 @@ public:
         return *this;
     }
     
-    /// Subtract-assign a vector
+    /// Subtract-assign a vector.
     Vector2& operator -= (const Vector2& rhs)
     {
         x_ -= rhs.x_;
@@ -99,7 +99,7 @@ public:
         return *this;
     }
     
-    /// Multiply-assign a scalar
+    /// Multiply-assign a scalar.
     Vector2& operator *= (float rhs)
     {
         x_ *= rhs;
@@ -107,7 +107,7 @@ public:
         return *this;
     }
     
-    /// Multiply-assign a vector
+    /// Multiply-assign a vector.
     Vector2& operator *= (const Vector2& rhs)
     {
         x_ *= rhs.x_;
@@ -115,7 +115,7 @@ public:
         return *this;
     }
     
-    /// Divide-assign a scalar
+    /// Divide-assign a scalar.
     Vector2& operator /= (float rhs)
     {
         float invRhs = 1.0f / rhs;
@@ -124,7 +124,7 @@ public:
         return *this;
     }
     
-    /// Divide-assign a vector
+    /// Divide-assign a vector.
     Vector2& operator /= (const Vector2& rhs)
     {
         x_ /= rhs.x_;
@@ -132,7 +132,7 @@ public:
         return *this;
     }
     
-    /// Normalize to unit length and return the previous length
+    /// Normalize to unit length and return the previous length.
     float Normalize()
     {
         float len = Length();
@@ -146,7 +146,7 @@ public:
         return len;
     }
     
-    /// Normalize to unit length using fast inverse square root
+    /// Normalize to unit length using fast inverse square root.
     void NormalizeFast()
     {
         float invLen = FastInvSqrt(x_ * x_ + y_ * y_);
@@ -154,22 +154,22 @@ public:
         y_ *= invLen;
     }
     
-    /// Return length
+    /// Return length.
     float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
-    /// Return length using fast square root
+    /// Return length using fast square root.
     float LengthFast() const { return FastSqrt(x_ * x_ + y_ * y_); }
-    /// Return squared length
+    /// Return squared length.
     float LengthSquared() const { return x_ * x_ + y_ * y_; }
-    /// Calculate dot product
+    /// Calculate dot product.
     float DotProduct(const Vector2& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_; }
-    /// Calculate absolute dot product
+    /// Calculate absolute dot product.
     float AbsDotProduct(const Vector2& rhs) const { return fabsf(x_ * rhs.x_) + fabsf(y_ * rhs.y_); }
-    /// Return absolute vector
+    /// Return absolute vector.
     Vector2 Abs() const { return Vector2(fabsf(x_), fabsf(y_)); }
-    /// Linear interpolation with another vector
+    /// Linear interpolation with another vector.
     Vector2 Lerp(const Vector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     
-    /// Return normalized to unit length
+    /// Return normalized to unit length.
     Vector2 Normalized() const
     {
         float len = Length();
@@ -179,75 +179,75 @@ public:
             return *this;
     }
     
-    /// Return normalized to unit length using fast inverse square root
+    /// Return normalized to unit length using fast inverse square root.
     Vector2 NormalizedFast() const { return *this * FastInvSqrt(x_ * x_ + y_ * y_); }
     
-    /// Return float data
+    /// Return float data.
     const float* GetData() const { return &x_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// X coordinate
+    /// X coordinate.
     float x_;
-    /// Y coordinate
+    /// Y coordinate.
     float y_;
     
-    /// Zero vector
+    /// Zero vector.
     static const Vector2 ZERO;
-    /// (-1,0) vector
+    /// (-1,0) vector.
     static const Vector2 LEFT;
-    /// (1,0) vector
+    /// (1,0) vector.
     static const Vector2 RIGHT;
-    /// (0,1) vector
+    /// (0,1) vector.
     static const Vector2 UP;
-    /// (0,-1) vector
+    /// (0,-1) vector.
     static const Vector2 DOWN;
-    /// (1,1) vector
+    /// (1,1) vector.
     static const Vector2 UNITY;
 };
 
 /// Multiply Vector2 with a scalar
 inline Vector2 operator * (float lhs, const Vector2& rhs) { return rhs * lhs; }
 
-/// Two-dimensional vector with integer values
+/// Two-dimensional vector with integer values.
 class IntVector2
 {
 public:
-    /// Construct an undefined vector
+    /// Construct undefined.
     IntVector2()
     {
     }
     
-    /// Construct from coordinates
+    /// Construct from coordinates.
     IntVector2(int x, int y) :
         x_(x),
         y_(y)
     {
     }
     
-    /// Copy-construct from another vector
+    /// Copy-construct from another vector.
     IntVector2(const IntVector2& rhs) :
         x_(rhs.x_),
         y_(rhs.y_)
     {
     }
     
-    /// Test for equality with another vector
+    /// Test for equality with another vector.
     bool operator == (const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
-    /// Test for inequality with another vector
+    /// Test for inequality with another vector.
     bool operator != (const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
-    /// Add a vector
+    /// Add a vector.
     IntVector2 operator + (const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
-    /// Return negation
+    /// Return negation.
     IntVector2 operator - () const { return IntVector2(-x_, -y_); }
-    /// Subtract a vector
+    /// Subtract a vector.
     IntVector2 operator - (const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     IntVector2 operator * (int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
-    /// Divide by a scalar
+    /// Divide by a scalar.
     IntVector2 operator / (int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
     
-    /// Add-assign a vector
+    /// Add-assign a vector.
     IntVector2& operator += (const IntVector2& rhs)
     {
         x_ += rhs.x_;
@@ -255,7 +255,7 @@ public:
         return *this;
     }
     
-    /// Subtract-assign a vector
+    /// Subtract-assign a vector.
     IntVector2& operator -= (const IntVector2& rhs)
     {
         x_ -= rhs.x_;
@@ -263,7 +263,7 @@ public:
         return *this;
     }
     
-    /// Multiply-assign a scalar
+    /// Multiply-assign a scalar.
     IntVector2& operator *= (int rhs)
     {
         x_ *= rhs;
@@ -271,7 +271,7 @@ public:
         return *this;
     }
     
-    /// Divide-assign a scalar
+    /// Divide-assign a scalar.
     IntVector2& operator /= (int rhs)
     {
         x_ /= rhs;
@@ -279,19 +279,19 @@ public:
         return *this;
     }
     
-    /// Return integer data
+    /// Return integer data.
     const int* GetData() const { return &x_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// X coordinate
+    /// X coordinate.
     int x_;
-    /// Y coordinate
+    /// Y coordinate.
     int y_;
     
-    /// Zero vector
+    /// Zero vector.
     static const IntVector2 ZERO;
 };
 
-/// Multiply IntVector2 with a scalar
+/// Multiply IntVector2 with a scalar.
 inline IntVector2 operator * (int lhs, const IntVector2& rhs) { return rhs * lhs; }

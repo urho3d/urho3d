@@ -86,6 +86,8 @@ bool Model::Load(Deserializer& source)
         return false;
     }
     
+    bool headless = GetSubsystem<Graphics>() == 0;
+    
     geometries_.Clear();
     geometryBoneMappings_.Clear();
     morphs_.Clear();
@@ -111,19 +113,43 @@ bool Model::Load(Deserializer& source)
         buffer->SetMorphRange(morphStart, morphCount);
         
         unsigned vertexSize = buffer->GetVertexSize();
-        unsigned char* data = (unsigned char*)buffer->Lock(0, vertexCount, LOCK_NORMAL);
-        if (data)
+        if (!headless)
         {
-            source.Read(data, vertexCount * vertexSize);
-            // If there is a morph range, make a copy of the data so that the morph range can be reset
-            if (morphCount)
+            unsigned char* data = (unsigned char*)buffer->Lock(0, vertexCount, LOCK_NORMAL);
+            if (data)
             {
-                SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
-                memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
-                buffer->SetMorphRangeResetData(morphResetData);
-            }
+                source.Read(data, vertexCount * vertexSize);
+                // If there is a morph range, make a copy of the data so that the morph range can be reset
+                if (morphCount)
+                {
+                    SharedArrayPtr<unsigned char> morphResetData(new unsigned char[morphCount * vertexSize]);
+                    memcpy(morphResetData.Get(), &data[morphStart * vertexSize], morphCount * vertexSize);
+                    buffer->SetMorphRangeResetData(morphResetData);
+                }
             
-            // Copy the raw position data for CPU-side operations
+                // Copy the raw position data for CPU-side operations
+                SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
+                float* rawDest = (float*)rawVertexData.Get();
+                for (unsigned i = 0; i < vertexCount; ++i)
+                {
+                    float* rawSrc = (float*)&data[i * vertexSize];
+                    *rawDest++ = *rawSrc++;
+                    *rawDest++ = *rawSrc++;
+                    *rawDest++ = *rawSrc++;
+                }
+                rawVertexDatas.Push(rawVertexData);
+                
+                buffer->Unlock();
+            }
+            else
+                return false;
+        }
+        else
+        {
+            // In headless mode only store the raw position data for CPU operations
+            SharedArrayPtr<unsigned char> data(new unsigned char[vertexCount * vertexSize]);
+            source.Read(data.Get(), vertexCount * vertexSize);
+            
             SharedArrayPtr<unsigned char> rawVertexData(new unsigned char[3 * sizeof(float) * vertexCount]);
             float* rawDest = (float*)rawVertexData.Get();
             for (unsigned i = 0; i < vertexCount; ++i)
@@ -134,11 +160,7 @@ bool Model::Load(Deserializer& source)
                 *rawDest++ = *rawSrc++;
             }
             rawVertexDatas.Push(rawVertexData);
-            
-            buffer->Unlock();
         }
-        else
-            return false;
         
         vertexBuffers_.Push(buffer);
     }
@@ -153,20 +175,30 @@ bool Model::Load(Deserializer& source)
         SharedPtr<IndexBuffer> buffer(new IndexBuffer(context_));
         buffer->SetSize(indexCount, indexSize > sizeof(unsigned short));
         
-        unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
-        if (data)
+        if (!headless)
         {
-            source.Read(data, indexCount * indexSize);
+            unsigned char* data = (unsigned char*)buffer->Lock(0, indexCount, LOCK_NORMAL);
+            if (data)
+            {
+                source.Read(data, indexCount * indexSize);
             
-            // Copy the raw index data for CPU-side operations
-            SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
-            memcpy(rawIndexData.Get(), data, indexSize * indexCount);
-            rawIndexDatas.Push(rawIndexData);
+                // Copy the raw index data for CPU-side operations
+                SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
+                memcpy(rawIndexData.Get(), data, indexSize * indexCount);
+                rawIndexDatas.Push(rawIndexData);
             
-            buffer->Unlock();
+                buffer->Unlock();
+            }
+            else
+                return false;
         }
         else
-            return false;
+        {
+            // In headless mode only store the raw index data for CPU operations
+            SharedArrayPtr<unsigned char> rawIndexData(new unsigned char[indexSize * indexCount]);
+            source.Read(rawIndexData.Get(), indexSize * indexCount);
+            rawIndexDatas.Push(rawIndexData);
+        }
         
         indexBuffers_.Push(buffer);
     }

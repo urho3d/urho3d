@@ -25,54 +25,58 @@
 
 #include "Object.h"
 
-/// Logging levels
+/// Debug message level. By default only shown in debug mode.
 static const int LOG_DEBUG = 0;
+/// Informative message level.
 static const int LOG_INFO = 1;
+/// Warning message level.
 static const int LOG_WARNING = 2;
+/// Error message level.
 static const int LOG_ERROR = 3;
+/// Disable all log messages.
 static const int LOG_NONE = 4;
 
 class File;
 
-/// Log file subsystem
+/// Log file subsystem.
 class Log : public Object
 {
     OBJECT(Log);
     
 public:
-    /// Construct
+    /// Construct.
     Log(Context* context);
-    /// Destruct. Close the log file if open
+    /// Destruct. Close the log file if open.
     virtual ~Log();
     
-    /// Open the log file
+    /// Open the log file.
     void Open(const String& fileName);
-    /// Write to the log. If logging level is higher than the level of the message, the message is ignored
+    /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
     void Write(int level, const String& message);
-    /// Write raw output to the log
+    /// Write raw output to the log.
     void WriteRaw(const String& message);
-    /// %Set logging level
+    /// %Set logging level.
     void SetLevel(int level);
     
-    /// Return logging level
+    /// Return logging level.
     int GetLevel() const { return level_; }
-    /// Return last log message
+    /// Return last log message.
     const String& GetLastMessage() const { return lastMessage_; }
     
 private:
-    /// Log file
+    /// Log file.
     SharedPtr<File> logFile_;
-    /// Last log message
+    /// Last log message.
     String lastMessage_;
-    /// Logging level
+    /// Logging level.
     int level_;
-    /// In write flag to prevent recursion
+    /// In write flag to prevent recursion.
     bool inWrite_;
 };
 
-/// Write to the log (static)
+/// Write to the log (static.)
 void WriteToLog(Context* context, int level, const String& message);
-/// Write raw output to the log (static)
+/// Write raw output to the log (static.)
 void WriteToLogRaw(Context* context, const String& message);
 
 #define LOGDEBUG(message) WriteToLog(context_, LOG_DEBUG, message)

@@ -27,85 +27,85 @@
 
 class Model;
 
-/// Static model component
+/// Static model component.
 class StaticModel : public Drawable
 {
     OBJECT(StaticModel);
     
 public:
-    /// Construct
+    /// Construct.
     StaticModel(Context* context);
-    /// Destruct
+    /// Destruct.
     ~StaticModel();
-    /// Register object factory. Drawable must be registered first
+    /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process renderer raycast
+    /// Process renderer raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Prepare geometry for rendering
+    /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return number of batches
+    /// Return number of batches.
     virtual unsigned GetNumBatches();
-    /// Return rendering batch
+    /// Return rendering batch.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
-    /// Draw to occlusion buffer
+    /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
     
-    /// %Set model
+    /// %Set model.
     void SetModel(Model* model);
-    /// %Set material on all geometries
+    /// %Set material on all geometries.
     void SetMaterial(Material* material);
-    /// %Set material on one geometry
+    /// %Set material on one geometry.
     bool SetMaterial(unsigned index, Material* material);
-    /// %Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible
+    /// %Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible.
     void SetSoftwareLodLevel(unsigned level);
     
-    /// Return model
+    /// Return model.
     Model* GetModel() const { return model_; }
-    /// Return model's bounding box
+    /// Return model's bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return number of geometries
+    /// Return number of geometries.
     unsigned GetNumGeometries() const { return geometries_.Size(); }
-    /// Return material by geometry index
+    /// Return material by geometry index.
     Material* GetMaterial(unsigned index) const;
-    /// Return software LOD level
+    /// Return software LOD level.
     unsigned GetSoftwareLodLevel() const { return softwareLodLevel_; }
     
-    /// %Set model attribute
+    /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
-    /// %Set materials attribute
+    /// %Set materials attribute.
     void SetMaterialsAttr(ResourceRefList value);
-    /// Return model attribute
+    /// Return model attribute.
     ResourceRef GetModelAttr() const;
-    /// Return materials attribute
+    /// Return materials attribute.
     ResourceRefList GetMaterialsAttr() const;
     
 protected:
-    /// Update the world bounding box
+    /// Update the world bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-    /// %Set the bounding box
+    /// %Set the bounding box.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set number of geometries
+    /// %Set number of geometries.
     void SetNumGeometries(unsigned num);
-    /// Reset LOD levels
+    /// Reset LOD levels.
     void ResetLodLevels();
-    /// Choose LOD levels based on distance
+    /// Choose LOD levels based on distance.
     void CalculateLodLevels();
     
-    /// Model
+    /// Model.
     SharedPtr<Model> model_;
-    /// Bounding box
+    /// Bounding box.
     BoundingBox boundingBox_;
-    /// Geometries
+    /// Geometries.
     Vector<Vector<SharedPtr<Geometry> > > geometries_;
-    /// LOD levels
+    /// LOD levels.
     PODVector<unsigned> lodLevels_;
-    /// Materials
+    /// Materials.
     Vector<SharedPtr<Material> > materials_;
-    /// Software LOD level, used in raycast and occlusion
+    /// Software LOD level, used in raycast and occlusion.
     unsigned softwareLodLevel_;
     
 private:
-    /// Handle model reload finished
+    /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
 };

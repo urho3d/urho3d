@@ -25,7 +25,7 @@
 
 #include "BillboardSet.h"
 
-/// Determines the emitter shape
+/// Determines the emitter shape.
 enum EmitterType
 {
     EMITTER_POINT,
@@ -33,31 +33,33 @@ enum EmitterType
     EMITTER_BOX
 };
 
-/// One particle in the particle system
+/// One particle in the particle system.
 struct Particle
 {
-    /// Velocity
+    /// Velocity.
     Vector3 velocity_;
-    /// Original billboard size
+    /// Original billboard size.
     Vector2 size_;
-    /// Time elapsed from creation
+    /// Time elapsed from creation.
     float timer_;
-    /// Lifetime
+    /// Lifetime.
     float timeToLive_;
-    /// Size scaling value
+    /// Size scaling value.
     float scale_;
-    /// Rotation speed
+    /// Rotation speed.
     float rotationSpeed_;
-    /// Current color fade index
+    /// Current color fade index.
     unsigned colorIndex_;
-    /// Current texture animation index
+    /// Current texture animation index.
     unsigned texIndex_;
 };
 
-/// Texture animation
+/// Texture animation definition.
 struct TextureAnimation
 {
+    /// UV coordinates.
     Rect uv_;
+    /// Time.
     float time_;
 };
 
@@ -65,129 +67,129 @@ class ResourceCache;
 class XMLFile;
 class XMLElement;
 
-/// Particle emitter component
+/// Particle emitter component.
 class ParticleEmitter : public BillboardSet
 {
     OBJECT(ParticleEmitter);
     
 public:
-    /// Construct
+    /// Construct.
     ParticleEmitter(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ParticleEmitter();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Update the particle system. Is called from HandleScenePostUpdate()
+    /// Update the particle system. Is called from HandleScenePostUpdate().
     void Update(float timeStep);
-    /// Load emitter parameters from an XML file. Return true if successful
+    /// Load emitter parameters from an XML file. Return true if successful.
     bool LoadParameters(XMLFile* file);
-    /// %Set emitter active/inactive state and optionally reset active/inactive timer
+    /// %Set emitter active/inactive state and optionally reset active/inactive timer.
     void SetActive(bool enable, bool resetPeriod = false);
     
-    /// Return parameter XML file
+    /// Return parameter XML file.
     XMLFile* GetParameters() const { return parameterSource_; }
-    /// Return number of particles
+    /// Return number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
-    /// Return whether emitter is active
+    /// Return whether emitter is active.
     bool IsActive() const { return active_; }
     
-    /// %Set parameter source attribute
+    /// %Set parameter source attribute.
     void SetParameterSourceAttr(ResourceRef value);
-    /// %Set particles attribute
+    /// %Set particles attribute.
     void SetParticlesAttr(PODVector<unsigned char> value);
-    /// Return parameter source attribute
+    /// Return parameter source attribute.
     ResourceRef GetParameterSourceAttr() const;
-    /// Return particles attribute
+    /// Return particles attribute.
     PODVector<unsigned char> GetParticlesAttr() const;
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
-    /// %Set number of particles
+    /// %Set number of particles.
     void SetNumParticles(int num);
-    /// %Set color of particles
+    /// %Set color of particles.
     void SetParticleColor(const Color& color);
-    /// %Set color fade of particles
+    /// %Set color fade of particles.
     void SetParticleColors(const Vector<ColorFade>& colors);
-    /// Create a new particle. Return true if there was room
+    /// Create a new particle. Return true if there was room.
     bool EmitNewParticle();
-    /// Return a free particle index
+    /// Return a free particle index.
     unsigned GetFreeParticle() const;
-    /// Read a float range from an XML element
+    /// Read a float range from an XML element.
     void GetFloatMinMax(const XMLElement& element, float& minValue, float& maxValue);
-    /// Read a Vector2 range from an XML element
+    /// Read a Vector2 range from an XML element.
     void GetVector2MinMax(const XMLElement& element, Vector2& minValue, Vector2& maxValue);
-    /// Read a Vector3 from an XML element
+    /// Read a Vector3 from an XML element.
     void GetVector3MinMax(const XMLElement& element, Vector3& minValue, Vector3& maxValue);
     
 private:
-    /// Handle scene post-update event
+    /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Parameter XML file
+    /// Parameter XML file.
     SharedPtr<XMLFile> parameterSource_;
-    /// Particles
+    /// Particles.
     PODVector<Particle> particles_;
-    /// Color fade range
+    /// Color fade range.
     Vector<ColorFade> colors_;
-    /// Texture animation
+    /// Texture animation.
     Vector<TextureAnimation> textureAnimation_;
-    /// Emitter shape
+    /// Emitter shape.
     EmitterType emitterType_;
-    /// Emitter size
+    /// Emitter size.
     Vector3 emitterSize_;
-    /// Particle direction minimum
+    /// Particle direction minimum.
     Vector3 directionMin_;
-    /// Particle direction maximum
+    /// Particle direction maximum.
     Vector3 directionMax_;
-    /// Particle constant force
+    /// Particle constant force.
     Vector3 constanceForce_;
-    /// Particle size minimum
+    /// Particle size minimum.
     Vector2 sizeMin_;
-    /// Particle size maximum
+    /// Particle size maximum.
     Vector2 sizeMax_;
-    /// Particle velocity damping force
+    /// Particle velocity damping force.
     float dampingForce_;
-    /// Emitter radius if spherical
+    /// Emitter radius if spherical.
     float emitterRadius_;
-    /// Active/inactive period timer
+    /// Active/inactive period timer.
     float periodTimer_;
-    /// New particle emission timer
+    /// New particle emission timer.
     float emissionTimer_;
-    /// Active period
+    /// Active period.
     float activeTime_;
-    /// Inactive period
+    /// Inactive period.
     float inactiveTime_;
-    /// Emission interval minimum
+    /// Emission interval minimum.
     float intervalMin_;
-    /// Emission interval maximum
+    /// Emission interval maximum.
     float intervalMax_;
-    /// Particle time to live minimum
+    /// Particle time to live minimum.
     float timeToLiveMin_;
-    /// Particle time to live maximum
+    /// Particle time to live maximum.
     float timeToLiveMax_;
-    /// Particle velocity minimum
+    /// Particle velocity minimum.
     float velocityMin_;
-    /// Particle velocityy maximum
+    /// Particle velocityy maximum.
     float velocityMax_;
-    /// Particle rotation angle minimum
+    /// Particle rotation angle minimum.
     float rotationMin_;
-    /// Particle rotation angle maximum
+    /// Particle rotation angle maximum.
     float rotationMax_;
-    /// Particle rotation speed minimum
+    /// Particle rotation speed minimum.
     float rotationSpeedMin_;
-    /// Particle rotation speed maximum
+    /// Particle rotation speed maximum.
     float rotationSpeedMax_;
-    /// Particle size additive parameter
+    /// Particle size additive parameter.
     float sizeAdd_;
-    /// Particle size multiplicative parameter
+    /// Particle size multiplicative parameter.
     float sizeMul_;
-    /// Emitter active/inactive state
+    /// Emitter active/inactive state.
     bool active_;
-    /// Update when invisible flag
+    /// Update when invisible flag.
     bool updateInvisible_;
-    /// Rendering renderer framenumber on which was last updated
+    /// Rendering renderer framenumber on which was last updated.
     unsigned lastUpdateFrameNumber_;
 };

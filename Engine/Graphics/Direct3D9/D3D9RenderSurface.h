@@ -34,18 +34,18 @@ class Texture;
 /// Viewport definition either for a RenderSurface or the backbuffer
 struct Viewport
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     Viewport();
-    /// Construct with a full rectangle
+    /// Construct with a full rectangle.
     Viewport(Scene* scene, Camera* camera);
-    /// Construct with a specified rectangle
+    /// Construct with a specified rectangle.
     Viewport(Scene* scene, Camera* camera, const IntRect& rect);
     
-    /// Scene pointer
+    /// Scene pointer.
     WeakPtr<Scene> scene_;
-    /// Camera pointer
+    /// Camera pointer.
     WeakPtr<Camera> camera_;
-    /// Viewport rectangle
+    /// Viewport rectangle.
     IntRect rect_;
 };
 
@@ -56,46 +56,46 @@ class RenderSurface : public RefCounted
     friend class TextureCube;
     
 public:
-    /// Construct with parent texture
+    /// Construct with parent texture.
     RenderSurface(Texture* parentTexture);
-    /// Destruct
+    /// Destruct.
     ~RenderSurface();
     
-    /// %Set viewport for auxiliary view rendering
+    /// %Set viewport for auxiliary view rendering.
     void SetViewport(const Viewport& viewport);
-    /// %Set linked color buffer
+    /// %Set linked color buffer.
     void SetLinkedRenderTarget(RenderSurface* renderTarget);
-    /// %Set linked depth buffer
+    /// %Set linked depth buffer.
     void SetLinkedDepthBuffer(RenderSurface* depthBuffer);
-    /// Release surface
+    /// Release surface.
     void Release();
     
-    /// Return parent texture
+    /// Return parent texture.
     Texture* GetParentTexture() const { return parentTexture_; }
-    /// Return Direct3D surface
+    /// Return Direct3D surface.
     void* GetSurface() const { return surface_; }
-    /// Return width
+    /// Return width.
     int GetWidth() const;
-    /// Return height
+    /// Return height.
     int GetHeight() const;
-    /// Return usage
+    /// Return usage.
     TextureUsage GetUsage() const;
-    /// Return auxiliary view rendering viewport
+    /// Return auxiliary view rendering viewport.
     const Viewport& GetViewport() const { return viewport_; }
-    /// Return linked color buffer
+    /// Return linked color buffer.
     RenderSurface* GetLinkedRenderTarget() const { return linkedRenderTarget_; }
-    /// Return linked depth buffer
+    /// Return linked depth buffer.
     RenderSurface* GetLinkedDepthBuffer() const { return linkedDepthBuffer_; }
     
 private:
-    /// Parent texture
+    /// Parent texture.
     Texture* parentTexture_;
-    /// Direct3D surface
+    /// Direct3D surface.
     void* surface_;
-    /// Viewport
+    /// Viewport.
     Viewport viewport_;
-    /// Linked color buffer
+    /// Linked color buffer.
     WeakPtr<RenderSurface> linkedRenderTarget_;
-    /// Linked depth buffer
+    /// Linked depth buffer.
     WeakPtr<RenderSurface> linkedDepthBuffer_;
 };

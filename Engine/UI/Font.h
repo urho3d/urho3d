@@ -34,64 +34,64 @@ static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
 static const int FONT_DPI = 96;
 
-/// Font glyph description
+/// Font glyph description.
 struct FontGlyph
 {
-    /// X position in texture
+    /// X position in texture.
     short x_;
-    /// Y position in texture
+    /// Y position in texture.
     short y_;
-    /// Width
+    /// Width.
     short width_;
-    /// Height
+    /// Height.
     short height_;
-    /// Glyph X offset from origin
+    /// Glyph X offset from origin.
     short offsetX_;
-    /// Glyph Y offset from origin
+    /// Glyph Y offset from origin.
     short offsetY_;
-    /// Horizontal advance
+    /// Horizontal advance.
     short advanceX_;
 };
 
-/// Font face description
+/// Font face description.
 struct FontFace
 {
-    /// Point size
+    /// Point size.
     int pointSize_;
-    /// Row height
+    /// Row height.
     int rowHeight_;
-    /// Texture
+    /// Texture.
     SharedPtr<Texture> texture_;
-    /// Glyph index mapping
+    /// Glyph index mapping.
     unsigned short glyphIndex_[MAX_FONT_CHARS];
-    /// Glyphs
+    /// Glyphs.
     PODVector<FontGlyph> glyphs_;
 };
 
-/// Font resource
+/// Font resource.
 class Font : public Resource
 {
     OBJECT(Font);
     
 public:
-    /// Construct
+    /// Construct.
     Font(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Font();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Return font face. Pack and render to a texture if not rendered yet. Return null on error
+    /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     const FontFace* GetFace(int pointSize);
     
 private:
-    /// Created faces
+    /// Created faces.
     Map<int, FontFace> faces_;
-    /// Font data
+    /// Font data.
     SharedArrayPtr<unsigned char> fontData_;
-    /// Size of font data
+    /// Size of font data.
     unsigned fontDataSize_;
 };

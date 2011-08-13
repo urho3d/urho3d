@@ -31,69 +31,69 @@
 class Graphics;
 class ShaderVariation;
 
-/// Shader parameter definition
+/// Shader parameter definition.
 struct ShaderParameter
 {
-    /// Uniform location
+    /// Uniform location.
     int location_;
-    /// Element type
+    /// Element type.
     unsigned type_;
-    /// Last parameter source
+    /// Last parameter source.
     const void* lastSource_;
 };
 
-/// Linked shader program on the GPU
+/// Linked shader program on the GPU.
 class ShaderProgram : public RefCounted, public GPUObject
 {
 public:
-    /// Construct
+    /// Construct.
     ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, ShaderVariation* pixelShader);
-    /// Destruct
+    /// Destruct.
     ~ShaderProgram();
     
-    /// Release shader program
+    /// Release shader program.
     virtual void Release();
     
-    /// Link the shaders and examine the uniforms and samplers used. Return true if successful
+    /// Link the shaders and examine the uniforms and samplers used. Return true if successful.
     bool Link();
-    /// Check whether needs a parameter update
+    /// Check whether needs a parameter update.
     bool NeedParameterUpdate(StringHash param, const void* source, unsigned frame);
-    /// Clear a specific remembered parameter source
+    /// Clear a specific remembered parameter source.
     void ClearParameterSource(StringHash param);
     
-    /// Return the vertex shader
+    /// Return the vertex shader.
     ShaderVariation* GetVertexShader() const;
-    /// Return the pixel shader
+    /// Return the pixel shader.
     ShaderVariation* GetPixelShader() const;
-    /// Return whether uses a shader parameter
+    /// Return whether uses a shader parameter.
     bool HasParameter(StringHash param) const;
-    /// Return whether uses a texture unit
+    /// Return whether uses a texture unit.
     bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
-    /// Return the info for a shader parameter, or null if does not exist
+    /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
-    /// Return the vertex attribute bindings
+    /// Return the vertex attribute bindings.
     const int* GetAttributeLocations() const { return attributeLocations_; }
-    /// Return whether successfully linked
+    /// Return whether successfully linked.
     bool IsLinked() const { return linked_; }
-    /// Return linker output
+    /// Return linker output.
     const String& GetLinkerOutput() const { return linkerOutput_; }
     
 private:
-    /// Vertex shader
+    /// Vertex shader.
     WeakPtr<ShaderVariation> vertexShader_;
-    /// Pixel shader
+    /// Pixel shader.
     WeakPtr<ShaderVariation> pixelShader_;
-    /// Shader parameters
+    /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
-    /// Shader parameters global frame number
+    /// Shader parameters global frame number.
     unsigned lastParameterFrame_;
-    /// Texture unit use
+    /// Texture unit use.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
-    /// Vertex attribute bindings
+    /// Vertex attribute bindings.
     int attributeLocations_[MAX_VERTEX_ELEMENTS];
-    /// Shader link error string
+    /// Shader link error string.
     String linkerOutput_;
-    /// Linked flag
+    /// Linked flag.
     bool linked_;
     
 };

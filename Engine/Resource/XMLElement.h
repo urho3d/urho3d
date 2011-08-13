@@ -31,148 +31,148 @@
 class TiXmlElement;
 class XMLFile;
 
-/// Element in an XML file
+/// Element in an XML file.
 class XMLElement
 {
 public:
-    /// Construct null element
+    /// Construct null element.
     XMLElement();
-    /// Construct with document and element pointers
+    /// Construct with document and element pointers.
     XMLElement(XMLFile* file, TiXmlElement* element);
-    /// Copy-construct from another element
+    /// Copy-construct from another element.
     XMLElement(const XMLElement& rhs);
-    /// Destruct
+    /// Destruct.
     ~XMLElement();
     
-    /// Create a child element
+    /// Create a child element.
     XMLElement CreateChild(const String& name);
-    /// Remove a child element, either first or last of them if several exist
+    /// Remove a child element, either first or last of them if several exist.
     bool RemoveChild(const String& name = String(), bool last = true);
-    /// Remove child elements of certain name, or all child elements if name is empty
+    /// Remove child elements of certain name, or all child elements if name is empty.
     bool RemoveChildren(const String& name = String());
-    /// %Set an attribute
+    /// %Set an attribute.
     bool SetAttribute(const String& name, const String& value);
-    /// %Set a bool attribute
+    /// %Set a bool attribute.
     bool SetBool(const String& name, bool value);
-    /// %Set a BoundingBox attribute
+    /// %Set a BoundingBox attribute.
     bool SetBoundingBox(const BoundingBox& value);
-    /// %Set a buffer attribute
+    /// %Set a buffer attribute.
     bool SetBuffer(const String& name, const void* data, unsigned size);
-    /// %Set a buffer attribute
+    /// %Set a buffer attribute.
     bool SetBuffer(const String& name, const PODVector<unsigned char>& value);
-    /// %Set a Color attribute
+    /// %Set a color attribute.
     bool SetColor(const String& name, const Color& value);
-    /// %Set a float attribute
+    /// %Set a float attribute.
     bool SetFloat(const String& name, float value);
-    /// %Set an integer attribute
+    /// %Set an integer attribute.
     bool SetInt(const String& name, int value);
-    /// %Set an IntRect attribute
+    /// %Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
-    /// %Set an IntVector2 attribute
+    /// %Set an IntVector2 attribute.
     bool SetIntVector2(const String& name, const IntVector2& value);
-    /// %Set a Rect attribute
+    /// %Set a Rect attribute.
     bool SetRect(const String& name, const Rect& value);
-    /// %Set a Quaternion attribute
+    /// %Set a quaternion attribute.
     bool SetQuaternion(const String& name, const Quaternion& value);
-    /// %Set a string attribute
+    /// %Set a string attribute.
     bool SetString(const String& name, const String& value);
-    /// %Set a Variant attribute
+    /// %Set a variant attribute.
     bool SetVariant(const Variant& value);
-    /// %Set a ResourceRef attribute
+    /// %Set a resource reference attribute.
     bool SetResourceRef(const ResourceRef& value);
-    /// %Set a ResourceRefList attribute
+    /// %Set a resource referene list attribute.
     bool SetResourceRefList(const ResourceRefList& value);
-    /// %Set a VariantVector attribute. Creates child elements as necessary
+    /// %Set a variant vector attribute. Creates child elements as necessary.
     bool SetVariantVector(const VariantVector& value);
-    /// %Set a VariantMap attribute. Creates child elements as necessary
+    /// %Set a variant map attribute. Creates child elements as necessary.
     bool SetVariantMap(const VariantMap& value);
-    /// %Set a Vector2 attribute
+    /// %Set a Vector2 attribute.
     bool SetVector2(const String& name, const Vector2& value);
-    /// %Set a Vector3 attribute
+    /// %Set a Vector3 attribute.
     bool SetVector3(const String& name, const Vector3& value);
-    /// %Set a Vector4 attribute
+    /// %Set a Vector4 attribute.
     bool SetVector4(const String& name, const Vector4& value);
     
-    /// Return whether does not refer to an element
+    /// Return whether does not refer to an element.
     bool IsNull() const { return element_ == 0; }
-    /// Return whether refers to an element
+    /// Return whether refers to an element.
     bool NotNull() const { return element_ != 0; }
-    /// Return true if refers to an element
+    /// Return true if refers to an element.
     operator bool () const { return element_ != 0; }
-    /// Return element name
+    /// Return element name.
     String GetName() const;
-    /// Return element contents
+    /// Return element contents.
     String GetText() const;
-    /// Return whether has a child element
+    /// Return whether has a child element.
     bool HasChild(const String& name) const;
-    /// Return child element, or null if missing
+    /// Return child element, or null if missing.
     XMLElement GetChild(const String& name = String()) const;
-    /// Return next sibling element
+    /// Return next sibling element.
     XMLElement GetNext(const String& name = String()) const;
-    /// Return parent element
+    /// Return parent element.
     XMLElement GetParent() const;
-    /// Return number of attributes
+    /// Return number of attributes.
     unsigned GetNumAttributes() const;
-    /// Return whether has an attribute
+    /// Return whether has an attribute.
     bool HasAttribute(const String& name) const;
-    /// Return attribute, or empty if missing
+    /// Return attribute, or empty if missing.
     String GetAttribute(const String& name) const;
-    /// Return names of all attributes
+    /// Return names of all attributes.
     Vector<String> GetAttributeNames() const;
-    /// Return bool attribute, or false if missing
+    /// Return bool attribute, or false if missing.
     bool GetBool(const String& name) const;
-    /// Return buffer attribute, or empty if missing
+    /// Return buffer attribute, or empty if missing.
     PODVector<unsigned char> GetBuffer(const String& name) const;
-    /// Copy buffer attribute into a supplied buffer. Return false if not big enough
+    /// Copy buffer attribute into a supplied buffer. Return true if buffer was large enough.
     bool GetBuffer(const String& name, void* dest, unsigned size) const;
-    /// Return bounding box attribute, or empty if missing
+    /// Return bounding box attribute, or empty if missing.
     BoundingBox GetBoundingBox() const;
-    /// Return a Color attribute, or default if missing
+    /// Return a color attribute, or default if missing.
     Color GetColor(const String& name) const;
-    /// Return a float attribute, or zero if missing
+    /// Return a float attribute, or zero if missing.
     float GetFloat(const String& name) const;
-    /// Return an integer attribute, or zero if missing
+    /// Return an integer attribute, or zero if missing.
     int GetInt(const String& name) const;
-    /// Return an IntRect attribute, or default if missing
+    /// Return an IntRect attribute, or default if missing.
     IntRect GetIntRect(const String& name) const;
-    /// Return an IntVector2 attribute, or default if missing
+    /// Return an IntVector2 attribute, or default if missing.
     IntVector2 GetIntVector2(const String& name) const;
-    /// Return a Rect attribute, or default if missing
+    /// Return a Rect attribute, or default if missing.
     Rect GetRect(const String& name) const;
-    /// Return a Quaternion attribute, or default if missing
+    /// Return a quaternion attribute, or default if missing.
     Quaternion GetQuaternion(const String& name) const;
-    /// Return a string attribute, or empty if missing
+    /// Return a string attribute, or empty if missing.
     String GetString(const String& name) const;
-    /// Return a string attribute in lowercase, or empty if missing
+    /// Return a string attribute in lowercase, or empty if missing.
     String GetStringLower(const String& name) const;
-    /// Return a string attribute in uppercase, or empty if missing
+    /// Return a string attribute in uppercase, or empty if missing.
     String GetStringUpper(const String& name) const;
-    /// Return a Variant attribute, or empty if missing
+    /// Return a variant attribute, or empty if missing.
     Variant GetVariant() const;
-    /// Return a ResourceRef attribute, or empty if missing
+    /// Return a resource reference attribute, or empty if missing.
     ResourceRef GetResourceRef() const;
-    /// Return a ResourceRefList attribute, or empty if missing
+    /// Return a resource reference list attribute, or empty if missing.
     ResourceRefList GetResourceRefList() const;
-    /// Return a VariantVector attribute, or empty if missing
+    /// Return a variant vector attribute, or empty if missing.
     VariantVector GetVariantVector() const;
-    /// Return a VariantMap attribute, or empty if missing
+    /// Return a variant map attribute, or empty if missing.
     VariantMap GetVariantMap() const;
-    /// Return a Vector2 attribute, or default if missing
+    /// Return a Vector2 attribute, or default if missing.
     Vector2 GetVector2(const String& name) const;
-    /// Return a Vector3 attribute, or default if missing
+    /// Return a Vector3 attribute, or default if missing.
     Vector3 GetVector3(const String& name) const;
-    /// Return a Vector4 attribute, or default if missing
+    /// Return a Vector4 attribute, or default if missing.
     Vector4 GetVector4(const String& name) const;
-    /// Return any Vector attribute as Vector4. Missing coordinates will be zero
+    /// Return any Vector attribute as Vector4. Missing coordinates will be zero.
     Vector4 GetVector(const String& name) const;
-    /// Return XML file
+    /// Return XML file.
     XMLFile* GetFile() const;
-    /// Return TinyXML element
+    /// Return TinyXML element.
     TiXmlElement* GetElement() const { return element_; }
     
 private:
-    /// XML file
+    /// XML file.
     WeakPtr<XMLFile> file_;
-    /// TinyXML element
+    /// TinyXML element.
     TiXmlElement* element_;
 };

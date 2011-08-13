@@ -33,75 +33,75 @@ class Text;
 class UIElement;
 class XMLFile;
 
-/// Console window with log history and AngelScript prompt
+/// Console window with log history and AngelScript prompt.
 class Console : public Object
 {
     OBJECT(Console);
     
 public:
-    /// Construct
+    /// Construct.
     Console(Context* context);
-    /// Destruct
+    /// Destruct.
     ~Console();
     
-    /// %Set UI elements' style from an XML file
+    /// %Set UI elements' style from an XML file.
     void SetStyle(XMLFile* style);
-    /// Show or hide. Showing automatically focuses the line edit
+    /// Show or hide. Showing automatically focuses the line edit.
     void SetVisible(bool enable);
-    /// Toggle visibility
+    /// Toggle visibility.
     void Toggle();
-    /// %Set number of displayed rows
+    /// %Set number of displayed rows.
     void SetNumRows(unsigned rows);
-    /// %Set command history maximum size, 0 disables history
+    /// %Set command history maximum size, 0 disables history.
     void SetNumHistoryRows(unsigned rows);
-    /// Update elements to layout properly. Call this after manually adjusting the sub-elements
+    /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
     
-    /// Return the UI style file
+    /// Return the UI style file.
     XMLFile* GetStyle() const { return style_; }
-    /// Return the background element
+    /// Return the background element.
     BorderImage* GetBackground() const { return background_; }
-    /// Return the line edit element
+    /// Return the line edit element.
     LineEdit* GetLineEdit() const { return lineEdit_; }
-    /// Return whether is visible
+    /// Return whether is visible.
     bool IsVisible() const;
-    /// Return number of displayed rows
+    /// Return number of displayed rows.
     unsigned GetNumRows() const { return rows_.Size(); }
-    /// Return history maximum size
+    /// Return history maximum size.
     unsigned GetNumHistoryRows() const { return historyRows_; }
-    /// Return current history position
+    /// Return current history position.
     unsigned GetHistoryPosition() const { return historyPosition_; }
-    /// Return history row at index
+    /// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
     
 private:
-    /// Handle enter pressed on the line edit
+    /// Handle enter pressed on the line edit.
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
-    /// Handle unhandled key on the line edit for scrolling the history
+    /// Handle unhandled key on the line edit for scrolling the history.
     void HandleLineEditKey(StringHash eventType, VariantMap& eventData);
-    /// Handle rendering window resize
+    /// Handle rendering window resize.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle a log message
+    /// Handle a log message.
     void HandleLogMessage(StringHash eventType, VariantMap& eventData);
     
-    /// UI style file
+    /// UI style file.
     SharedPtr<XMLFile> style_;
-    /// Background
+    /// Background.
     SharedPtr<BorderImage> background_;
-    /// Container for text rows
+    /// Container for text rows.
     SharedPtr<UIElement> rowContainer_;
-    /// Text rows
+    /// Text rows.
     Vector<SharedPtr<Text> > rows_;
-    /// Line edit
+    /// Line edit.
     SharedPtr<LineEdit> lineEdit_;
-    /// Command history
+    /// Command history.
     Vector<String> history_;
-    /// Current row being edited
+    /// Current row being edited.
     String current_Row;
-    /// Command history maximum rows
+    /// Command history maximum rows.
     unsigned historyRows_;
-    /// Command history current position
+    /// Command history current position.
     unsigned historyPosition_;
-    /// Currently printing a log message -flag
+    /// Currently printing a log message flag.
     bool inLogMessage_;
 };

@@ -27,30 +27,30 @@
 
 class Graphics;
 
-/// Base class for GPU resources
+/// Base class for GPU resources.
 class GPUObject
 {
 public:
-    /// Construct with graphics subsystem pointer
+    /// Construct with graphics subsystem pointer.
     GPUObject(Graphics* graphics);
-    /// Destruct. Remove from the Graphics
+    /// Destruct. Remove from the Graphics.
     virtual ~GPUObject();
     
-    /// OpenGL context will be destroyed. Save data if necessary and release the GPU resource
+    /// OpenGL context will be destroyed. Save data if necessary and release the GPU resource.
     virtual void OnDeviceLost();
-    /// Screen mode change or OpenGL context recreation is complete. Recreate the GPU resource and restore data
+    /// Screen mode change or OpenGL context recreation is complete. Recreate the GPU resource and restore data.
     virtual void OnDeviceReset() {}
-    /// Unconditionally release the GPU resource
+    /// Unconditionally release the GPU resource.
     virtual void Release() {}
     
-    /// Return the graphics subsystem
+    /// Return the graphics subsystem.
     Graphics* GetGraphics() const { return graphics_; }
-    /// Return the object's OpenGL handle
+    /// Return the object's OpenGL handle.
     unsigned GetGPUObject() const { return object_; }
     
 protected:
-    /// Graphics subsystem
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Object handle
+    /// Object handle.
     unsigned object_;
 };

@@ -26,97 +26,97 @@
 #include "Resource.h"
 #include "ArrayPtr.h"
 
-/// Sound resource
+/// Sound resource.
 class Sound : public Resource
 {
     OBJECT(Sound);
     
 public:
-    /// Construct
+    /// Construct.
     Sound(Context* context);
-    /// Destruct and free sound data
+    /// Destruct and free sound data.
     virtual ~Sound();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// Load raw sound data
+    /// Load raw sound data.
     bool LoadRaw(Deserializer& source);
-    /// Load WAV format sound data
+    /// Load WAV format sound data.
     bool LoadWav(Deserializer& source);
-    /// Load Ogg Vorbis format sound data. Does not Decode at load, will be Decoded while playing
+    /// Load Ogg Vorbis format sound data. Does not decode at load, but will be rather be decoded while playing.
     bool LoadOggVorbis(Deserializer& source);
-    /// %Set sound size in bytes. Also resets the sound to be uncompressed and one-shot
+    /// %Set sound size in bytes. Also resets the sound to be uncompressed and one-shot.
     void SetSize(unsigned dataSize);
-    /// %Set uncompressed sound data
+    /// %Set uncompressed sound data.
     void SetData(const void* data, unsigned dataSize);
-    /// %Set uncompressed sound data format
+    /// %Set uncompressed sound data format.
     void SetFormat(unsigned frequency, bool sixteenBit, bool stereo);
-    /// %Set loop on/off. If loop is enabled, sets the full sound as loop range
+    /// %Set loop on/off. If loop is enabled, sets the full sound as loop range.
     void SetLooped(bool enable);
-    /// Define loop
+    /// Define loop.
     void SetLoop(unsigned repeatOffset, unsigned endOffset);
-    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot)
+    /// Fix interpolation by copying data from loop start to loop end (looped), or adding silence (oneshot.)
     void FixInterpolation();
     
-    /// Create and return a Decoder. Return null if fails
+    /// Create and return a Decoder. Return null if fails.
     void* AllocateDecoder();
-    /// Decode compressed audio data. Return number of actually Decoded bytes
+    /// Decode compressed audio data. Return number of actually decoded bytes.
     unsigned Decode(void* Decoder, signed char* dest, unsigned bytes);
-    /// Rewind Decoder to beginning of audio data
+    /// Rewind the decoder to beginning of audio data.
     void RewindDecoder(void* Decoder);
-    /// Free Decoder
+    /// Free the decoder.
     void FreeDecoder(void* Decoder);
     
-    /// Return sound data start
+    /// Return sound data start.
     signed char* GetStart() const { return data_.Get(); }
-    /// Return loop start
+    /// Return loop start.
     signed char* GetRepeat() const { return repeat_; }
-    /// Return sound data end
+    /// Return sound data end.
     signed char* GetEnd() const { return end_; }
-    /// Return length in seconds
+    /// Return length in seconds.
     float GetLength() const;
-    /// Return total sound data size
+    /// Return total sound data size.
     unsigned GetDataSize() const { return dataSize_; }
-    /// Return sample size
+    /// Return sample size.
     unsigned GetSampleSize() const;
-    /// Return default frequency
+    /// Return default frequency as a float.
     float GetFrequency() { return (float)frequency_; }
-    /// Return default frequency
+    /// Return default frequency as an integer.
     unsigned GetIntFrequency() { return frequency_; }
-    /// Return whether is looped
+    /// Return whether is looped.
     bool IsLooped() const { return looped_; }
-    /// Return whether data is sixteen bit
+    /// Return whether data is sixteen bit.
     bool IsSixteenBit() const { return sixteenBit_; }
-    /// Return whether data is stereo
+    /// Return whether data is stereo.
     bool IsStereo() const { return stereo_; }
-    /// Return whether is compressed in Ogg Vorbis format
+    /// Return whether is compressed in Ogg Vorbis format.
     bool IsCompressed() const { return compressed_; }
     
 private:
-    /// Load optional parameters from an XML file
+    /// Load optional parameters from an XML file.
     void LoadParameters();
     
-    /// Sound data
+    /// Sound data.
     SharedArrayPtr<signed char> data_;
-    /// Loop start
+    /// Loop start.
     signed char* repeat_;
-    /// Sound data end
+    /// Sound data end.
     signed char* end_;
-    /// Sound data size in bytes
+    /// Sound data size in bytes.
     unsigned dataSize_;
-    /// Default frequency
+    /// Default frequency.
     unsigned frequency_;
-    /// Looped flag
+    /// Looped flag.
     bool looped_;
-    /// Sixteen bit flag
+    /// Sixteen bit flag.
     bool sixteenBit_;
-    /// Stereo flag
+    /// Stereo flag.
     bool stereo_;
-    /// Compressed flag
+    /// Compressed flag.
     bool compressed_;
-    /// Compressed sound length
+    /// Compressed sound length.
     float compressedLength_;
 };

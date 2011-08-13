@@ -32,91 +32,91 @@ class Ray;
 class Graphics;
 class VertexBuffer;
 
-/// Defines one or more vertex buffers, an index buffer and a draw range
+/// Defines one or more vertex buffers, an index buffer and a draw range.
 class Geometry : public Object
 {
     OBJECT(Geometry);
     
 public:
-    /// Construct with one empty vertex buffer
+    /// Construct with one empty vertex buffer.
     Geometry(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Geometry();
     
-    /// %Set number of vertex buffer
+    /// %Set number of vertex buffer.
     bool SetNumVertexBuffers(unsigned num);
-    /// %Set a vertex buffer by index
+    /// %Set a vertex buffer by index.
     bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT);
-    /// %Set the index buffer
+    /// %Set the index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
-    /// %Set the draw range
+    /// %Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool GetUsedVertexRange = true);
-    /// %Set the draw range
+    /// %Set the draw range.
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount);
-    /// %Set the LOD distance to report
+    /// %Set the LOD distance.
     void SetLodDistance(float distance);
-    /// %Set vertex and index raw data for CPU access. Vertex raw data should contain positions only
+    /// %Set vertex and index raw data for CPU access. Vertex raw data should contain positions only.
     void SetRawData(const SharedArrayPtr<unsigned char>& vertexData, const SharedArrayPtr<unsigned char>& indexData);
-    /// Draw
+    /// Draw.
     void Draw(Graphics* graphics);
     
-    /// Return all vertex buffers
+    /// Return all vertex buffers.
     const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffers_; }
-    /// Return vertex element masks
+    /// Return vertex element masks.
     const PODVector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
-    /// Return number of vertex buffers
+    /// Return number of vertex buffers.
     unsigned GetNumVertexBuffers() const { return vertexBuffers_.Size(); }
-    /// Return vertex buffer by index
+    /// Return vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
-    /// Return vertex element mask by index
+    /// Return vertex element mask by index.
     unsigned GetVertexElementMask(unsigned index) const;
-    /// Return the index buffer
+    /// Return the index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
-    /// Return primitive type
+    /// Return primitive type.
     PrimitiveType GetPrimitiveType() const { return primitiveType_; }
-    /// Return start index
+    /// Return start index.
     unsigned GetIndexStart() const { return indexStart_; }
-    /// Return number of indices
+    /// Return number of indices.
     unsigned GetIndexCount() const { return indexCount_; }
-    /// Return first used vertex
+    /// Return first used vertex.
     unsigned GetVertexStart() const { return vertexStart_; }
-    /// Return number of used vertices
+    /// Return number of used vertices.
     unsigned GetVertexCount() const { return vertexCount_; }
-    /// Return LOD distance
+    /// Return LOD distance.
     float GetLodDistance() const { return lodDistance_; }
-    /// Return buffers' combined hash value for state sorting
+    /// Return buffers' combined hash value for state sorting.
     unsigned short GetBufferHash() const;
-    /// Return raw vertex and index data for CPU operations, or null pointers if not available
+    /// Return raw vertex and index data for CPU operations, or null pointers if not available.
     void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize);
-    /// Return ray hit distance or infinity if no hit. Requires raw data to be set
+    /// Return ray hit distance or infinity if no hit. Requires raw data to be set.
     float GetDistance(const Ray& ray);
     
 private:
-    /// Locate vertex buffer with position data
+    /// Locate vertex buffer with position data.
     void GetPositionBufferIndex();
     
-    /// Vertex buffers
+    /// Vertex buffers.
     Vector<SharedPtr<VertexBuffer> > vertexBuffers_;
-    /// Vertex element masks
+    /// Vertex element masks.
     PODVector<unsigned> elementMasks_;
-    /// Index buffer
+    /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
-    /// Primitive type
+    /// Primitive type.
     PrimitiveType primitiveType_;
-    /// Start index
+    /// Start index.
     unsigned indexStart_;
-    /// Number of indices
+    /// Number of indices.
     unsigned indexCount_;
-    /// First used vertex
+    /// First used vertex.
     unsigned vertexStart_;
-    /// Number of used vertices
+    /// Number of used vertices.
     unsigned vertexCount_;
-    /// Index of vertex buffer with position data
+    /// Index of vertex buffer with position data.
     unsigned positionBufferIndex_;
-    /// LOD distance
+    /// LOD distance.
     float lodDistance_;
-    /// Raw vertex data (positions only) for CPU operations
+    /// Raw vertex data (positions only) for CPU operations.
     SharedArrayPtr<unsigned char> rawVertexData_;
-    /// Raw index data for CPU operations
+    /// Raw index data for CPU operations.
     SharedArrayPtr<unsigned char> rawIndexData_;
 };

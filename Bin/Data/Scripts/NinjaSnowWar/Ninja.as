@@ -1,5 +1,5 @@
-#include "Scripts/GameObject.as"
-#include "Scripts/AIController.as"
+#include "Scripts/NinjaSnowWar/GameObject.as"
+#include "Scripts/NinjaSnowWar/AIController.as"
 
 const int LAYER_MOVE = 0;
 const int LAYER_ATTACK = 1;

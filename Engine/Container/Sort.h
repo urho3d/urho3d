@@ -31,7 +31,7 @@ static const int QUICKSORT_THRESHOLD = 16;
 // Based on Comparison of several sorting algorithms by Juha Nieminen
 // http://warp.povusers.org/SortComparison/
 
-/// Perform insertion sort on an array
+/// Perform insertion sort on an array.
 template <class T> void InsertionSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
     for (RandomAccessIterator<T> i = begin + 1; i < end; ++i)
@@ -47,7 +47,7 @@ template <class T> void InsertionSort(RandomAccessIterator<T> begin, RandomAcces
     }
 }
 
-/// Perform insertion sort on an array using a compare function
+/// Perform insertion sort on an array using a compare function.
 template <class T, class U> void InsertionSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
     for (RandomAccessIterator<T> i = begin + 1; i < end; ++i)
@@ -63,7 +63,7 @@ template <class T, class U> void InsertionSort(RandomAccessIterator<T> begin, Ra
     }
 }
 
-/// Perform quick sort initial pass on an array. Does not sort fully
+/// Perform quick sort initial pass on an array. Does not sort fully.
 template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
     while (end - begin > QUICKSORT_THRESHOLD)
@@ -94,7 +94,7 @@ template <class T> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAc
     }
 }
 
-/// Perform quick sort initial pass on an array using a compare function. Does not sort fully
+/// Perform quick sort initial pass on an array using a compare function. Does not sort fully.
 template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
     while (end - begin > QUICKSORT_THRESHOLD)
@@ -125,14 +125,14 @@ template <class T, class U> void InitialQuickSort(RandomAccessIterator<T> begin,
     }
 }
 
-/// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize
+/// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize.
 template <class T> void Sort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end)
 {
     InitialQuickSort(begin, end);
     InsertionSort(begin, end);
 }
 
-/// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize, using a compare function
+/// Sort in ascending order using quicksort for initial passes, then an insertion sort to finalize, using a compare function.
 template <class T, class U> void Sort(RandomAccessIterator<T> begin, RandomAccessIterator<T> end, U compare)
 {
     InitialQuickSort(begin, end, compare);

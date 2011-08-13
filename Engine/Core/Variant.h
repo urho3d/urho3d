@@ -29,7 +29,7 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
-/// Supported variable types for Variant
+/// Supported variable types for Variant.
 enum VariantType
 {
     VAR_NONE = 0,
@@ -50,7 +50,7 @@ enum VariantType
     VAR_VARIANTMAP
 };
 
-/// Union for holding all the possible Variant values
+/// Union for holding all the possible Variant values.
 struct VariantValue
 {
     union
@@ -66,258 +66,256 @@ struct VariantValue
     float w_;
 };
 
-/// Typed resource reference
+/// Typed resource reference.
 struct ResourceRef
 {
-    /// Construct
+    /// Construct.
     ResourceRef()
     {
     }
     
-    /// Construct with type only and empty id
+    /// Construct with type only and empty id.
     ResourceRef(ShortStringHash type) :
         type_(type)
     {
     }
     
-    /// Construct with type and id
+    /// Construct with type and id.
     ResourceRef(ShortStringHash type, StringHash id) :
         type_(type),
         id_(id)
     {
     }
     
-    // Construct from another ResourceRef
+    // Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
         id_(rhs.id_)
     {
     }
     
-    /// Object type
+    /// Object type.
     ShortStringHash type_;
-    /// Object identifier, for example name hash
+    /// Object identifier, for example name hash.
     StringHash id_;
     
-    /// Test for equality with another reference
+    /// Test for equality with another reference.
     bool operator == (const ResourceRef& rhs) const { return type_ == rhs.type_ && id_ == rhs.id_; }
-    
-    /// Test for inequality with another reference
+    /// Test for inequality with another reference.
     bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || id_ != rhs.id_; }
 };
 
-/// List of resource references of a specific type
+/// List of resource references of a specific type.
 struct ResourceRefList
 {
-    /// Construct
+    /// Construct.
     ResourceRefList()
     {
     }
     
-    /// Construct with type only
+    /// Construct with type only.
     ResourceRefList(ShortStringHash type) :
         type_(type)
     {
     }
-    /// Construct with type and id list
+    /// Construct with type and id list.
     ResourceRefList(ShortStringHash type, const Vector<StringHash>& ids) :
         type_(type),
         ids_(ids)
     {
     }
     
-    /// Object type
+    /// Object type.
     ShortStringHash type_;
-    /// List of object identifiers, for example name hashes
+    /// List of object identifiers, for example name hashes.
     Vector<StringHash> ids_;
     
-    /// Test for equality with another reference list
+    /// Test for equality with another reference list.
     bool operator == (const ResourceRefList& rhs) const { return type_ == rhs.type_ && ids_ == rhs.ids_; }
-    
-    /// Test for inequality with another reference list
+    /// Test for inequality with another reference list.
     bool operator != (const ResourceRefList& rhs) const { return type_ != rhs.type_ || ids_ != rhs.ids_; }
 };
 
 class Variant;
 
-/// Vector of variants
+/// Vector of variants.
 typedef Vector<Variant> VariantVector;
-/// Map of variants
+/// Map of variants.
 typedef HashMap<ShortStringHash, Variant> VariantMap;
 
-/// Variable that supports a fixed set of types
+/// Variable that supports a fixed set of types.
 class Variant
 {
 public:
-    /// Construct with none value
+    /// Construct empty.
     Variant() :
         type_(VAR_NONE)
     {
     }
     
-    /// Construct from integer
+    /// Construct from integer.
     Variant(int value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from unsigned integer
+    /// Construct from unsigned integer.
     Variant(unsigned value) :
         type_(VAR_NONE)
     {
         *this = (int)value;
     }
     
-    /// Construct from a string hash (convert to integer)
+    /// Construct from a string hash (convert to integer.)
     Variant(const StringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.GetValue();
     }
     
-    /// Construct from a short string hash (convert to integer)
+    /// Construct from a short string hash (convert to integer.)
     Variant(const ShortStringHash& value) :
         type_(VAR_NONE)
     {
         *this = (int)value.GetValue();
     }
     
-    /// Construct from a bool
+    /// Construct from a bool.
     Variant(bool value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a float
+    /// Construct from a float.
     Variant(float value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a Vector2
+    /// Construct from a Vector2.
     Variant(const Vector2& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a Vector3
+    /// Construct from a Vector3.
     Variant(const Vector3& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a Vector4
+    /// Construct from a Vector4.
     Variant(const Vector4& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a Quaternion
+    /// Construct from a quaternion.
     Variant(const Quaternion& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a Color
+    /// Construct from a color.
     Variant(const Color& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a string
+    /// Construct from a string.
     Variant(const String& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a C string
+    /// Construct from a C string.
     Variant(const char* value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a buffer
+    /// Construct from a buffer.
     Variant(const PODVector<unsigned char>& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a pointer
+    /// Construct from a pointer.
     Variant(void* value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from an object reference
+    /// Construct from a resource reference.
     Variant(const ResourceRef& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from an object reference list
+    /// Construct from a resource reference list.
     Variant(const ResourceRefList& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a variant vector
+    /// Construct from a variant vector.
     Variant(const VariantVector& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from a variant map
+    /// Construct from a variant map.
     Variant(const VariantMap& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Construct from type and value
+    /// Construct from type and value.
     Variant(const String& type, const String& value) :
         type_(VAR_NONE)
     {
         FromString(type, value);
     }
     
-    /// Copy-construct from another variant
+    /// Copy-construct from another variant.
     Variant(const Variant& value) :
         type_(VAR_NONE)
     {
         *this = value;
     }
     
-    /// Destruct
+    /// Destruct.
     ~Variant()
     {
         SetType(VAR_NONE);
     }
     
-    /// Reset to none type
+    /// Reset to empty.
     void Clear()
     {
         SetType(VAR_NONE);
     }
     
-    /// Assign from another variant
+    /// Assign from another variant.
     Variant& operator = (const Variant& rhs);
     
-    /// Assign from an integer
+    /// Assign from an integer.
     Variant& operator = (int rhs)
     {
         SetType(VAR_INT);
@@ -325,7 +323,7 @@ public:
         return *this;
     }
     
-    /// Assign from an unsigned integer
+    /// Assign from an unsigned integer.
     Variant& operator = (unsigned rhs)
     {
         SetType(VAR_INT);
@@ -333,7 +331,7 @@ public:
         return *this;
     }
     
-    /// Assign from a StringHash (convert to integer)
+    /// Assign from a StringHash (convert to integer.)
     Variant& operator = (const StringHash& rhs)
     {
         SetType(VAR_INT);
@@ -349,7 +347,7 @@ public:
         return *this;
     }
     
-    /// Assign from a bool
+    /// Assign from a bool.
     Variant& operator = (bool rhs)
     {
         SetType(VAR_BOOL);
@@ -357,7 +355,7 @@ public:
         return *this;
     }
     
-    /// Assign from a float
+    /// Assign from a float.
     Variant& operator = (float rhs)
     {
         SetType(VAR_FLOAT);
@@ -365,7 +363,7 @@ public:
         return *this;
     }
     
-    /// Assign from a Vector2
+    /// Assign from a Vector2.
     Variant& operator = (const Vector2& rhs)
     {
         SetType(VAR_VECTOR2);
@@ -373,7 +371,7 @@ public:
         return *this;
     }
     
-    /// Assign from a Vector3
+    /// Assign from a Vector3.
     Variant& operator = (const Vector3& rhs)
     {
         SetType(VAR_VECTOR3);
@@ -381,7 +379,7 @@ public:
         return *this;
     }
     
-    /// Assign from a Vector4
+    /// Assign from a Vector4.
     Variant& operator = (const Vector4& rhs)
     {
         SetType(VAR_VECTOR4);
@@ -389,7 +387,7 @@ public:
         return *this;
     }
     
-    /// Assign from a Quaternion
+    /// Assign from a quaternion.
     Variant& operator = (const Quaternion& rhs)
     {
         SetType(VAR_QUATERNION);
@@ -397,7 +395,7 @@ public:
         return *this;
     }
     
-    /// Assign from a Color
+    /// Assign from a color.
     Variant& operator = (const Color& rhs)
     {
         SetType(VAR_COLOR);
@@ -405,7 +403,7 @@ public:
         return *this;
     }
     
-    /// Assign from a string
+    /// Assign from a string.
     Variant& operator = (const String& rhs)
     {
         SetType(VAR_STRING);
@@ -413,7 +411,7 @@ public:
         return *this;
     }
     
-    /// Assign from a C string
+    /// Assign from a C string.
     Variant& operator = (const char* rhs)
     {
         SetType(VAR_STRING);
@@ -421,7 +419,7 @@ public:
         return *this;
     }
 
-    /// Assign from a buffer
+    /// Assign from a buffer.
     Variant& operator = (const PODVector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
@@ -429,7 +427,7 @@ public:
         return *this;
     }
     
-    /// Assign from a pointer
+    /// Assign from a pointer.
     Variant& operator = (void* rhs)
     {
         SetType(VAR_PTR);
@@ -437,7 +435,7 @@ public:
         return *this;
     }
     
-    /// Assign from an object reference
+    /// Assign from a resource reference.
     Variant& operator = (const ResourceRef& rhs)
     {
         SetType(VAR_RESOURCEREF);
@@ -445,7 +443,7 @@ public:
         return *this;
     }
     
-    /// Assign from an object reference list
+    /// Assign from a resource reference list.
     Variant& operator = (const ResourceRefList& rhs)
     {
         SetType(VAR_RESOURCEREFLIST);
@@ -453,7 +451,7 @@ public:
         return *this;
     }
     
-    /// Assign from a variant vector
+    /// Assign from a variant vector.
     Variant& operator = (const VariantVector& rhs)
     {
         SetType(VAR_VARIANTVECTOR);
@@ -461,7 +459,7 @@ public:
         return *this;
     }
     
-    /// Assign from a variant map
+    /// Assign from a variant map.
     Variant& operator = (const VariantMap& rhs)
     {
         SetType(VAR_VARIANTMAP);
@@ -469,13 +467,12 @@ public:
         return *this;
     }
     
-    /// Test for equality with another variant
+    /// Test for equality with another variant.
     bool operator == (const Variant& rhs) const;
-    
-    /// Test for inequality with another variant
+    /// Test for inequality with another variant.
     bool operator != (const Variant& rhs) const { return !(*this == rhs); }
     
-    /// Test for equality with an integer. To return true, both the type and value must match
+    /// Test for equality with an integer. To return true, both the type and value must match.
     bool operator == (int rhs) const
     {
         if (type_ == VAR_INT)
@@ -484,7 +481,7 @@ public:
             return false;
     }
     
-    /// Test for equality with an unsigned integer. To return true, both the type and value must match
+    /// Test for equality with an unsigned integer. To return true, both the type and value must match.
     bool operator == (unsigned rhs) const
     {
         if (type_ == VAR_INT)
@@ -493,7 +490,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a bool. To return true, both the type and value must match
+    /// Test for equality with a bool. To return true, both the type and value must match.
     bool operator == (bool rhs) const
     {
         if (type_ == VAR_BOOL)
@@ -502,7 +499,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a float. To return true, both the type and value must match
+    /// Test for equality with a float. To return true, both the type and value must match.
     bool operator == (float rhs) const
     {
         if (type_ == VAR_FLOAT)
@@ -511,7 +508,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a Vector2. To return true, both the type and value must match
+    /// Test for equality with a Vector2. To return true, both the type and value must match.
     bool operator == (const Vector2& rhs) const
     {
         if (type_ == VAR_VECTOR2)
@@ -520,7 +517,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a Vector3. To return true, both the type and value must match
+    /// Test for equality with a Vector3. To return true, both the type and value must match.
     bool operator == (const Vector3& rhs) const
     {
         if (type_ == VAR_VECTOR3)
@@ -529,7 +526,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a Vector4. To return true, both the type and value must match
+    /// Test for equality with a Vector4. To return true, both the type and value must match.
     bool operator == (const Vector4& rhs) const
     {
         if (type_ == VAR_VECTOR4)
@@ -538,7 +535,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a Quaternion. To return true, both the type and value must match
+    /// Test for equality with a quaternion. To return true, both the type and value must match.
     bool operator == (const Quaternion& rhs) const
     {
         if (type_ == VAR_QUATERNION)
@@ -547,7 +544,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a Color. To return true, both the type and value must match
+    /// Test for equality with a color. To return true, both the type and value must match.
     bool operator == (const Color& rhs) const
     {
         if (type_ == VAR_COLOR)
@@ -556,7 +553,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a string. To return true, both the type and value must match
+    /// Test for equality with a string. To return true, both the type and value must match.
     bool operator == (const String& rhs) const
     {
         if (type_ == VAR_STRING)
@@ -565,7 +562,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a buffer. To return true, both the type and value must match
+    /// Test for equality with a buffer. To return true, both the type and value must match.
     bool operator == (const PODVector<unsigned char>& rhs) const
     {
         if (type_ == VAR_BUFFER)
@@ -574,7 +571,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a pointer. To return true, both the type and value must match
+    /// Test for equality with a pointer. To return true, both the type and value must match.
     bool operator == (void* rhs) const
     {
         if (type_ == VAR_PTR)
@@ -583,7 +580,7 @@ public:
             return false;
     }
     
-    /// Test for equality with an object reference. To return true, both the type and value must match
+    /// Test for equality with a resource reference. To return true, both the type and value must match.
     bool operator == (const ResourceRef& rhs) const
     {
         if (type_ == VAR_RESOURCEREF)
@@ -592,7 +589,7 @@ public:
             return false;
     }
     
-    /// Test for equality with an object reference list. To return true, both the type and value must match
+    /// Test for equality with a resource reference list. To return true, both the type and value must match.
     bool operator == (const ResourceRefList& rhs) const
     {
         if (type_ == VAR_RESOURCEREFLIST)
@@ -601,7 +598,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a variant vector. To return true, both the type and value must match
+    /// Test for equality with a variant vector. To return true, both the type and value must match.
     bool operator == (const VariantVector& rhs) const
     {
         if (type_ == VAR_VARIANTVECTOR)
@@ -610,7 +607,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a variant map. To return true, both the type and value must match
+    /// Test for equality with a variant map. To return true, both the type and value must match.
     bool operator == (const VariantMap& rhs) const
     {
         if (type_ == VAR_VARIANTMAP)
@@ -619,7 +616,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a StringHash. To return true, both the type and value must match
+    /// Test for equality with a StringHash. To return true, both the type and value must match.
     bool operator == (const StringHash& rhs) const
     {
         if (type_ == VAR_INT)
@@ -628,7 +625,7 @@ public:
             return false;
     }
     
-    /// Test for equality with a ShortStringHash. To return true, both the type and value must match
+    /// Test for equality with a ShortStringHash. To return true, both the type and value must match.
     bool operator == (const ShortStringHash& rhs) const
     {
         if (type_ == VAR_INT)
@@ -637,47 +634,47 @@ public:
             return false;
     }
     
-    /// Test for inequality with an integer
+    /// Test for inequality with an integer.
     bool operator != (int rhs) const { return !(*this == rhs); }
-    /// Test for inequality with an unsigned integer
+    /// Test for inequality with an unsigned integer.
     bool operator != (unsigned rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a bool
+    /// Test for inequality with a bool.
     bool operator != (bool rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a float
+    /// Test for inequality with a float.
     bool operator != (float rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a Vector2
+    /// Test for inequality with a Vector2.
     bool operator != (const Vector2& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a Vector3
+    /// Test for inequality with a Vector3.
     bool operator != (const Vector3& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with an Vector4
+    /// Test for inequality with an Vector4.
     bool operator != (const Vector4& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a Quaternion
+    /// Test for inequality with a Quaternion.
     bool operator != (const Quaternion& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a string
+    /// Test for inequality with a string.
     bool operator != (const String& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a buffer
+    /// Test for inequality with a buffer.
     bool operator != (const PODVector<unsigned char>& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a pointer
+    /// Test for inequality with a pointer.
     bool operator != (void* rhs) const { return !(*this == rhs); }
-    /// Test for inequality with an object reference
+    /// Test for inequality with a resource reference.
     bool operator != (const ResourceRef& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with an object reference list
+    /// Test for inequality with a resource reference list.
     bool operator != (const ResourceRefList& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a variant vector
+    /// Test for inequality with a variant vector.
     bool operator != (const VariantVector& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a variant map
+    /// Test for inequality with a variant map.
     bool operator != (const VariantMap& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a StringHash
+    /// Test for inequality with a StringHash.
     bool operator != (const StringHash& rhs) const { return !(*this == rhs); }
-    /// Test for inequality with a ShortStringHash
+    /// Test for inequality with a ShortStringHash.
     bool operator != (const ShortStringHash& rhs) const { return !(*this == rhs); }
     
-    /// %Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported
+    /// %Set from type and value strings. Pointers will be set to null, and VariantBuffer or VariantMap types are not supported.
     void FromString(const String& type, const String& value);
-    /// %Set buffer type from a memory area
+    /// %Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
     
-    /// Return int or zero on type mismatch
+    /// Return int or zero on type mismatch.
     int GetInt() const
     {
         if (type_ != VAR_INT)
@@ -685,7 +682,7 @@ public:
         return value_.int_;
     }
     
-    /// Return unsigned int or zero on type mismatch
+    /// Return unsigned int or zero on type mismatch.
     int GetUInt() const
     {
         if (type_ != VAR_INT)
@@ -693,7 +690,7 @@ public:
         return (unsigned)value_.int_;
     }
     
-    /// Return StringHash or zero on type mismatch
+    /// Return StringHash or zero on type mismatch.
     StringHash GetStringHash() const
     {
         if (type_ != VAR_INT)
@@ -701,7 +698,7 @@ public:
         return StringHash(value_.int_);
     }
     
-    /// Return ShortStringHash or zero on type mismatch
+    /// Return ShortStringHash or zero on type mismatch.
     ShortStringHash GetShortStringHash() const
     {
         if (type_ != VAR_INT)
@@ -709,7 +706,7 @@ public:
         return ShortStringHash(value_.int_);
     }
     
-    /// Return bool or false on type mismatch
+    /// Return bool or false on type mismatch.
     bool GetBool() const
     {
         if (type_ != VAR_BOOL)
@@ -717,7 +714,7 @@ public:
         return value_.bool_;
     }
     
-    /// Return float or zero on type mismatch
+    /// Return float or zero on type mismatch.
     float GetFloat() const
     {
         if (type_ != VAR_FLOAT)
@@ -725,7 +722,7 @@ public:
         return value_.float_;
     }
     
-    /// Return Vector2 or zero on type mismatch
+    /// Return Vector2 or zero on type mismatch.
     const Vector2& GetVector2() const
     {
         if (type_ != VAR_VECTOR2)
@@ -733,7 +730,7 @@ public:
         return *reinterpret_cast<const Vector2*>(&value_);
     }
     
-    /// Return Vector3 or zero on type mismatch
+    /// Return Vector3 or zero on type mismatch.
     const Vector3& GetVector3() const
     {
         if (type_ != VAR_VECTOR3)
@@ -741,7 +738,7 @@ public:
         return *reinterpret_cast<const Vector3*>(&value_);
     }
     
-    /// Return Vector4 or zero on type mismatch
+    /// Return Vector4 or zero on type mismatch.
     const Vector4& GetVector4() const
     {
         if (type_ != VAR_VECTOR4)
@@ -749,7 +746,7 @@ public:
         return *reinterpret_cast<const Vector4*>(&value_);
     }
     
-    /// Return Quaternion or identity on type mismatch
+    /// Return quaternion or identity on type mismatch.
     const Quaternion& GetQuaternion() const
     {
         if (type_ != VAR_QUATERNION)
@@ -757,7 +754,7 @@ public:
         return *reinterpret_cast<const Quaternion*>(&value_);
     }
     
-    /// Return Color or default on type mismatch
+    /// Return color or default on type mismatch.
     const Color& GetColor() const
     {
         if (type_ != VAR_COLOR)
@@ -765,7 +762,7 @@ public:
         return *reinterpret_cast<const Color*>(&value_);
     }
     
-    /// Return string or empty on type mismatch
+    /// Return string or empty on type mismatch.
     const String& GetString() const
     {
         if (type_ != VAR_STRING)
@@ -773,7 +770,7 @@ public:
         return *reinterpret_cast<const String*>(value_.ptr_);
     }
     
-    /// Return buffer or empty on type mismatch
+    /// Return buffer or empty on type mismatch.
     const PODVector<unsigned char>& GetBuffer() const
     {
         if (type_ != VAR_BUFFER)
@@ -781,7 +778,7 @@ public:
         return *reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_);
     }
     
-    /// Return pointer or null on type mismatch
+    /// Return pointer or null on type mismatch.
     void* GetPtr() const
     {
         if (type_ != VAR_PTR)
@@ -789,7 +786,7 @@ public:
         return value_.ptr_;
     }
     
-    /// Return ResourceRef or empty on type mismatch
+    /// Return a resource reference or empty on type mismatch.
     const ResourceRef& GetResourceRef() const
     {
         if (type_ != VAR_RESOURCEREF)
@@ -797,7 +794,7 @@ public:
         return *reinterpret_cast<ResourceRef*>(value_.ptr_);
     }
     
-    /// Return ResourceRefList or empty on type mismatch
+    /// Return a resource reference list or empty on type mismatch.
     const ResourceRefList& GetResourceRefList() const
     {
         if (type_ != VAR_RESOURCEREFLIST)
@@ -805,7 +802,7 @@ public:
         return *reinterpret_cast<ResourceRefList*>(value_.ptr_);
     }
     
-    /// Return VariantVector or empty on type mismatch
+    /// Return a variant vector or empty on type mismatch.
     const VariantVector& GetVariantVector() const
     {
         if (type_ != VAR_VARIANTVECTOR)
@@ -813,7 +810,7 @@ public:
         return *reinterpret_cast<VariantVector*>(value_.ptr_);
     }
     
-    /// Return VariantMap or empty on type mismatch
+    /// Return a variant map or empty on type mismatch
     const VariantMap& GetVariantMap() const
     {
         if (type_ != VAR_VARIANTMAP)
@@ -821,40 +818,40 @@ public:
         return *reinterpret_cast<VariantMap*>(value_.ptr_);
     }
 
-    /// Return the value, template version
+    /// Return the value, template version.
     template <class T> T Get() const;
-    /// Return type
+    /// Return type.
     VariantType GetType() const { return type_; }
-    /// Return type name
+    /// Return type name.
     const String& GetTypeName() const;
-    /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty
+    /// Convert value to string. Pointers are returned as null, and VariantBuffer or VariantMap are not supported and return empty.
     String ToString() const;
     
-    /// Return type name for enum value
+    /// Return type name for enum value.
     static const String& GetTypeName(VariantType type);
     
-    /// Empty variant
+    /// Empty variant.
     static const Variant EMPTY;
     
 private:
-    /// %Set new type and allocate/deallocate memory as necessary
+    /// %Set new type and allocate/deallocate memory as necessary.
     void SetType(VariantType newType);
     
-    /// Variant type
+    /// Variant type.
     VariantType type_;
-    /// Variant value
+    /// Variant value.
     VariantValue value_;
     
-    /// Empty string
+    /// Empty string.
     static const String emptyString;
-    /// Empty buffer
+    /// Empty buffer.
     static const PODVector<unsigned char> emptyBuffer;
-    /// Empty object reference
+    /// Empty resource reference.
     static const ResourceRef emptyResourceRef;
-    /// Empty object reference list
+    /// Empty resource reference list.
     static const ResourceRefList emptyResourceRefList;
-    /// Empty variant map
+    /// Empty variant map.
     static const VariantMap emptyVariantMap;
-    /// Empty variant vector
+    /// Empty variant vector.
     static const VariantVector emptyVariantVector;
 };

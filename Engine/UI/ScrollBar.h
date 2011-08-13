@@ -28,7 +28,7 @@
 class Button;
 class Slider;
 
-/// Scroll bar UI element with forward and back buttons
+/// Scroll bar UI element with forward and back buttons.
 class ScrollBar : public UIElement
 {
     OBJECT(ScrollBar);
@@ -36,79 +36,79 @@ class ScrollBar : public UIElement
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     ScrollBar(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ScrollBar();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
     
-    /// %Set orientation type
+    /// %Set orientation type.
     void SetOrientation(Orientation orientation);
-    /// %Set slider range maximum value (minimum value is always 0)
+    /// %Set slider range maximum value (minimum value is always 0.)
     void SetRange(float range);
-    /// %Set slider current value
+    /// %Set slider current value.
     void SetValue(float value);
-    /// Change slider current value by a delta
+    /// Change slider current value by a delta.
     void ChangeValue(float delta);
-    /// %Set button scroll step
+    /// %Set button scroll step.
     void SetScrollStep(float step);
-    /// %Set button step factor, can be used to adjust the step for constant pixel size
+    /// %Set button step factor, can be used to adjust the step for constant pixel size.
     void SetStepFactor(float factor);
-    /// Scroll back one step
+    /// Scroll back one step.
     void StepBack();
-    /// Scroll forward one step
+    /// Scroll forward one step.
     void StepForward();
     
-    /// Return scrollbar orientation
+    /// Return scrollbar orientation.
     Orientation GetOrientation() const;
-    /// Return slider range
+    /// Return slider range.
     float GetRange() const;
-    /// Return slider current value
+    /// Return slider current value.
     float GetValue() const;
-    /// Return button scroll step
+    /// Return button scroll step.
     float GetScrollStep() const { return scrollStep_; }
-    /// Return button step factor
+    /// Return button step factor.
     float GetStepFactor() const { return stepFactor_; }
-    /// Return scroll step multiplied by factor
+    /// Return scroll step multiplied by factor.
     float GetEffectiveScrollStep() const;
-    /// Return back button element
+    /// Return back button element.
     Button* GetBackButton() const { return backButton_; }
-    /// Return forward button element
+    /// Return forward button element.
     Button* GetForwardButton() const { return forwardButton_; }
-    /// Return slider element
+    /// Return slider element.
     Slider* GetSlider() const { return slider_; }
     
 protected:
-    /// Back button
+    /// Back button.
     SharedPtr<Button> backButton_;
-    /// Forward button
+    /// Forward button.
     SharedPtr<Button> forwardButton_;
-    /// Slider
+    /// Slider.
     SharedPtr<Slider> slider_;
-    /// Scroll step
+    /// Scroll step.
     float scrollStep_;
-    /// Step factor
+    /// Step factor.
     float stepFactor_;
-    /// Left button image rect
+    /// Left button image rect.
     IntRect leftRect_;
-    /// Right button image rect
+    /// Right button image rect.
     IntRect rightRect_;
-    /// Up button image rect
+    /// Up button image rect.
     IntRect upRect_;
-    /// Down button image rect
+    /// Down button image rect.
     IntRect downRect_;
     
 private:
-    /// Handle back button pressed
+    /// Handle back button pressed.
     void HandleBackButtonPressed(StringHash eventType, VariantMap& eventData);
-    /// Handle forward button pressed
+    /// Handle forward button pressed.
     void HandleForwardButtonPressed(StringHash eventType, VariantMap& eventData);
-    /// Handle slider movement
+    /// Handle slider movement.
     void HandleSliderChanged(StringHash eventType, VariantMap& eventData);
 };

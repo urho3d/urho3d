@@ -29,44 +29,44 @@
 class Deserializer;
 class Serializer;
 
-/// Base class for resources
+/// Base class for resources.
 class Resource : public Object
 {
     OBJECT(Resource);
     
 public:
-    /// Construct
+    /// Construct.
     Resource(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful
+    /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set name
+    /// %Set name.
     void SetName(const String& name);
-    /// %Set memory use in bytes, possibly approximate
+    /// %Set memory use in bytes, possibly approximate.
     void SetMemoryUse(unsigned size);
-    /// Reset last used timer
+    /// Reset last used timer.
     void ResetUseTimer();
     
-    /// Return name
+    /// Return name.
     const String& GetName() const { return name_; }
-    /// Return name hash
+    /// Return name hash.
     StringHash GetNameHash() const { return nameHash_; }
-    /// Return memory use in bytes, possibly approximate
+    /// Return memory use in bytes, possibly approximate.
     unsigned GetMemoryUse() const { return memoryUse_; }
-    /// Return time since last use in milliseconds. If referred to elsewhere than in the resource cache, returns always zero
+    /// Return time since last use in milliseconds. If referred to elsewhere than in the resource cache, returns always zero.
     unsigned GetUseTimer();
     
 private:
-    /// Name
+    /// Name.
     String name_;
-    /// Name hash
+    /// Name hash.
     StringHash nameHash_;
-    /// Last used timer
+    /// Last used timer.
     Timer useTimer_;
-    /// Memory use in bytes
+    /// Memory use in bytes.
     unsigned memoryUse_;
 };
 

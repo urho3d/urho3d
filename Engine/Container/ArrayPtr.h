@@ -28,18 +28,18 @@
 
 #include <cassert>
 
-/// Shared array pointer template class. Uses non-intrusive reference counting
+/// Shared array pointer template class. Uses non-intrusive reference counting.
 template <class T> class SharedArrayPtr
 {
 public:
-    /// Construct a null shared array pointer
+    /// Construct a null shared array pointer.
     SharedArrayPtr() :
         ptr_(0),
         refCount_(0)
     {
     }
     
-    /// Copy-construct from another shared array pointer
+    /// Copy-construct from another shared array pointer.
     SharedArrayPtr(const SharedArrayPtr<T>& rhs) :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
@@ -48,7 +48,7 @@ public:
             ++(refCount_->refs_);
     }
     
-    /// Construct from a raw pointer
+    /// Construct from a raw pointer.
     explicit SharedArrayPtr(T* ptr) :
         ptr_(ptr),
         refCount_(new RefCount())
@@ -56,13 +56,13 @@ public:
         ++(refCount_->refs_);
     }
     
-    /// Destruct. Release the array reference
+    /// Destruct. Release the array reference.
     ~SharedArrayPtr()
     {
         Release();
     }
     
-    /// Assign from another shared array pointer
+    /// Assign from another shared array pointer.
     SharedArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
     {
         if (ptr_ == rhs.ptr_)
@@ -78,7 +78,7 @@ public:
         return *this;
     }
     
-    /// Assign from a raw pointer
+    /// Assign from a raw pointer.
     SharedArrayPtr<T>& operator = (T* ptr)
     {
         if (ptr_ == ptr)
@@ -96,30 +96,27 @@ public:
         return *this;
     }
     
-    /// Point to the array
+    /// Point to the array.
     T* operator -> () const { assert(ptr_); return ptr_; }
-    /// Dereference the array
+    /// Dereference the array.
     T& operator * () const { assert(ptr_); return *ptr_; }
-    /// Subscript the array
+    /// Subscript the array.
     T& operator [] (const int index) { assert(ptr_); return ptr_[index]; }
-    /// Test for equality with another shared array pointer
+    /// Test for equality with another shared array pointer.
     bool operator == (const SharedArrayPtr<T>& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Test for inequality with another shared array pointer
+    /// Test for inequality with another shared array pointer.
     bool operator != (const SharedArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_; }
-    /// Test for less than with another array pointer
+    /// Test for less than with another array pointer.
     bool operator < (const SharedArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
-    /// Return true if points to an array
+    /// Return true if points to an array.
     operator bool () const { return ptr_ != 0; }
-    /// Convert to a raw pointer
+    /// Convert to a raw pointer.
     operator T* () const { return ptr_; }
     
-    /// Reset to null and release the array reference
-    void Reset()
-    {
-        Release();
-    }
+    /// Reset to null and release the array reference.
+    void Reset() { Release(); }
     
-    /// Perform a static cast from a shared array pointer of another type
+    /// Perform a static cast from a shared array pointer of another type.
     template <class U> void StaticCast(const SharedArrayPtr<U>& rhs)
     {
         Release();
@@ -130,7 +127,7 @@ public:
             ++(refCount_->refs_);
     }
     
-    /// Perform a dynatic cast from a shared array pointer of another type
+    /// Perform a dynatic cast from a shared array pointer of another type.
     template <class U> void DynamicCast(const SharedArrayPtr<U>& rhs)
     {
         Release();
@@ -146,26 +143,26 @@ public:
             refCount_ = 0;
     }
     
-    /// Check if the pointer is null
+    /// Check if the pointer is null.
     bool Null() const { return ptr_ == 0; }
-    /// Check if the pointer is not null
+    /// Check if the pointer is not null.
     bool NotNull() const { return ptr_ != 0; }
-    /// Return the raw pointer
+    /// Return the raw pointer.
     T* Get() const { return ptr_; }
-    /// Return the array's reference count, or 0 if the pointer is null
+    /// Return the array's reference count, or 0 if the pointer is null.
     unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
-    /// Return the array's weak reference count, or 0 if the pointer is null
+    /// Return the array's weak reference count, or 0 if the pointer is null.
     unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
-    /// Return pointer to the RefCount structure
+    /// Return pointer to the RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     
 private:
-    /// Prevent direct assignment from a shared array pointer of different type
+    /// Prevent direct assignment from a shared array pointer of different type.
     template <class U> SharedArrayPtr<T>& operator = (const SharedArrayPtr<U>& rhs);
     
-    /// Release the array reference and delete it and the RefCount structure as applicable
+    /// Release the array reference and delete it and the RefCount structure if necessary.
     void Release()
     {
         if (refCount_)
@@ -188,13 +185,13 @@ private:
         refCount_ = 0;
     }
     
-    /// Pointer to the array
+    /// Pointer to the array.
     T* ptr_;
-    /// Pointer to the RefCount structure
+    /// Pointer to the RefCount structure.
     RefCount* refCount_;
 };
 
-/// Perform a static cast from one shared array pointer type to another
+/// Perform a static cast from one shared array pointer type to another.
 template <class T, class U> SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>& ptr)
 {
     SharedArrayPtr<T> ret;
@@ -202,7 +199,7 @@ template <class T, class U> SharedArrayPtr<T> StaticCast(const SharedArrayPtr<U>
     return ret;
 }
 
-/// Perform a dynamic cast from one shared array pointer type to another
+/// Perform a dynamic cast from one shared array pointer type to another.
 template <class T, class U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U>& ptr)
 {
     SharedArrayPtr<T> ret;
@@ -210,18 +207,18 @@ template <class T, class U> SharedArrayPtr<T> DynamicCast(const SharedArrayPtr<U
     return ret;
 }
 
-/// Weak array pointer template class. Uses non-intrusive reference counting
+/// Weak array pointer template class. Uses non-intrusive reference counting.
 template <class T> class WeakArrayPtr
 {
 public:
-    /// Construct a null weak array pointer
+    /// Construct a null weak array pointer.
     WeakArrayPtr() :
         ptr_(0),
         refCount_(0)
     {
     }
     
-    /// Construct from a shared array pointer
+    /// Construct from a shared array pointer.
     WeakArrayPtr(const SharedArrayPtr<T>& rhs) :
         ptr_(rhs.Get()),
         refCount_(rhs.RefCountPtr())
@@ -230,7 +227,7 @@ public:
             ++(refCount_->weakRefs_);
     }
     
-    /// Copy-construct from another weak array pointer
+    /// Copy-construct from another weak array pointer.
     WeakArrayPtr(const WeakArrayPtr<T>& rhs) :
         ptr_(rhs.ptr_),
         refCount_(rhs.refCount_)
@@ -239,13 +236,13 @@ public:
             ++(refCount_->weakRefs_);
     }
     
-    /// Destruct. Release the weak reference to the array
+    /// Destruct. Release the weak reference to the array.
     ~WeakArrayPtr()
     {
         Release();
     }
     
-    /// Assign from a shared array pointer
+    /// Assign from a shared array pointer.
     WeakArrayPtr<T>& operator = (const SharedArrayPtr<T>& rhs)
     {
         if (ptr_ == rhs.Get() && refCount_ == rhs.RefCountPtr())
@@ -261,7 +258,7 @@ public:
         return *this;
     }
     
-    /// Assign from another weak array pointer
+    /// Assign from another weak array pointer.
     WeakArrayPtr<T>& operator = (const WeakArrayPtr<T>& rhs)
     {
         if (ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_)
@@ -277,7 +274,7 @@ public:
         return *this;
     }
     
-    /// Convert to shared array pointer. If expired, return a null shared array pointer
+    /// Convert to shared array pointer. If expired, return a null shared array pointer.
     SharedArrayPtr<T> Lock() const
     {
         if (Expired())
@@ -286,7 +283,7 @@ public:
             return SharedArrayPtr<T>(ptr_, refCount_);
     }
     
-    /// Return raw pointer. If expired, return null
+    /// Return raw pointer. If expired, return null.
     T* Get() const
     {
         if (Expired())
@@ -295,7 +292,7 @@ public:
             return ptr_;
     }
     
-    /// Point to the array
+    /// Point to the array.
     T* operator -> () const
     {
         T* rawPtr = Get();
@@ -303,7 +300,7 @@ public:
         return rawPtr;
     }
     
-    /// Dereference the array
+    /// Dereference the array.
     T& operator * () const
     {
         T* rawPtr = Get();
@@ -311,7 +308,7 @@ public:
         return *rawPtr;
     }
     
-    /// Subscript the array
+    /// Subscript the array.
     T& operator [] (const int index)
     {
         T* rawPtr = Get();
@@ -319,24 +316,21 @@ public:
         return (*rawPtr)[index];
     }
     
-    /// Test for equality with another weak array pointer
+    /// Test for equality with another weak array pointer.
     bool operator == (const WeakArrayPtr<T>& rhs) const { return ptr_ == rhs.ptr_ && refCount_ == rhs.refCount_; }
-    /// Test for inequality with another weak array pointer
+    /// Test for inequality with another weak array pointer.
     bool operator != (const WeakArrayPtr<T>& rhs) const { return ptr_ != rhs.ptr_ || refCount_ != rhs.refCount_; }
-    /// Test for less than with another weak array pointer
+    /// Test for less than with another weak array pointer.
     bool operator < (const WeakArrayPtr<T>& rhs) const { return ptr_ < rhs.ptr_; }
-    /// Return true if points to an array which is not expired
+    /// Return true if points to an array which is not expired.
     operator bool () const { return !Expired(); }
-    /// Convert to a raw pointer, null if array is expired
+    /// Convert to a raw pointer, null if array is expired.
     operator T* () const { return Get(); }
     
-    /// Reset to null and release the weak reference
-    void Reset()
-    {
-        Release();
-    }
+    /// Reset to null and release the weak reference.
+    void Reset() { Release(); }
     
-    /// Perform a static cast from a weak array pointer of another type
+    /// Perform a static cast from a weak array pointer of another type.
     template <class U> void StaticCast(const WeakArrayPtr<U>& rhs)
     {
         Release();
@@ -347,7 +341,7 @@ public:
             ++(refCount_->weakRefs_);
     }
     
-    /// Perform a dynamic cast from a weak array pointer of another type
+    /// Perform a dynamic cast from a weak array pointer of another type.
     template <class U> void DynamicCast(const WeakArrayPtr<U>& rhs)
     {
         Release();
@@ -363,26 +357,26 @@ public:
             refCount_ = 0;
     }
     
-    /// Check if the pointer is null
+    /// Check if the pointer is null.
     bool Null() const { return refCount_ == 0; }
-    /// Check if the pointer is not null
+    /// Check if the pointer is not null.
     bool NotNull() const { return refCount_ != 0; }
-    /// Return the array's reference count, or 0 if null pointer or if array is expired
+    /// Return the array's reference count, or 0 if null pointer or if array is expired.
     unsigned Refs() const { return refCount_ ? refCount_->refs_ : 0; }
-    /// Return the array's weak reference count
+    /// Return the array's weak reference count.
     unsigned WeakRefs() const { return refCount_ ? refCount_->weakRefs_ : 0; }
-    /// Return whether the array has expired. If null pointer, always return true
+    /// Return whether the array has expired. If null pointer, always return true.
     bool Expired() const { return refCount_ ? refCount_->expired_ : true; }
-    /// Return pointer to RefCount structure
+    /// Return pointer to RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return ((unsigned)ptr_) / sizeof(T); }
     
 private:
-    /// Prevent direct assignment from a weak array pointer of different type
+    /// Prevent direct assignment from a weak array pointer of different type.
     template <class U> WeakArrayPtr<T>& operator = (const WeakArrayPtr<U>& rhs);
     
-    /// Release the weak reference. Delete the Refcount structure if the array has expired and this was the last weak reference
+    /// Release the weak reference. Delete the Refcount structure if necessary.
     void Release()
     {
         if (refCount_)
@@ -398,13 +392,13 @@ private:
         refCount_ = 0;
     }
     
-    /// Pointer to the array
+    /// Pointer to the array.
     T* ptr_;
-    /// Pointer to the RefCount structure
+    /// Pointer to the RefCount structure.
     RefCount* refCount_;
 };
 
-/// Perform a static cast from one weak array pointer type to another
+/// Perform a static cast from one weak array pointer type to another.
 template <class T, class U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& ptr)
 {
     WeakArrayPtr<T> ret;
@@ -412,7 +406,7 @@ template <class T, class U> WeakArrayPtr<T> StaticCast(const WeakArrayPtr<U>& pt
     return ret;
 }
 
-/// Perform a dynamic cast from one weak pointer type to another
+/// Perform a dynamic cast from one weak pointer type to another.
 template <class T, class U> WeakArrayPtr<T> DynamicCast(const WeakArrayPtr<U>& ptr)
 {
     WeakArrayPtr<T> ret;

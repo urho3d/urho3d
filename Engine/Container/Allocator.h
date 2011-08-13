@@ -28,42 +28,42 @@
 struct AllocatorBlock;
 struct AllocatorNode;
 
-/// Allocator memory block
+/// Allocator memory block.
 struct AllocatorBlock
 {
-    /// Node data size
+    /// Node data size.
     unsigned nodeSize_;
-    /// Number of nodes in this block
+    /// Number of nodes in this block.
     unsigned capacity_;
-    /// First free node
+    /// First free node.
     AllocatorNode* free_;
-    /// Next allocator block
+    /// Next allocator block.
     AllocatorBlock* next_;
-    /// Nodes follow
+    /// Nodes follow.
 };
 
-/// Allocator node
+/// Allocator node.
 struct AllocatorNode
 {
-    /// Next free node
+    /// Next free node.
     AllocatorNode* next_;
-    /// Data follows
+    /// Data follows.
 };
 
-/// Initialize a fixed-size allocator with the node size and initial capacity
+/// Initialize a fixed-size allocator with the node size and initial capacity.
 AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity = 1);
-/// Uninitialize a fixed-size allocator. Frees all blocks in the chain
+/// Uninitialize a fixed-size allocator. Frees all blocks in the chain.
 void AllocatorUninitialize(AllocatorBlock* allocator);
-/// Reserve a node. Creates a new block if necessary
+/// Reserve a node. Creates a new block if necessary.
 void* AllocatorReserve(AllocatorBlock* allocator);
-/// Free a node. Does not free any blocks
+/// Free a node. Does not free any blocks.
 void AllocatorFree(AllocatorBlock* allocator, void* ptr);
 
-/// Template allocator class. Allocates fixed-size objects of a specific class
+/// Template allocator class. Allocates fixed-size objects of a specific class.
 template <class T> class Allocator
 {
 public:
-    /// Construct
+    /// Construct.
     Allocator(unsigned initialCapacity = 0) :
         allocator_(0)
     {
@@ -71,13 +71,13 @@ public:
             allocator_ = AllocatorInitialize(sizeof(T), initialCapacity);
     }
     
-    /// Destruct
+    /// Destruct.
     ~Allocator()
     {
         AllocatorUninitialize(allocator_);
     }
     
-    /// Reserve and default-construct an object
+    /// Reserve and default-construct an object.
     T* Reserve()
     {
         if (!allocator_)
@@ -88,7 +88,7 @@ public:
         return newObject;
     }
     
-    /// Reserve and copy-construct an object
+    /// Reserve and copy-construct an object.
     T* Reserve(const T& object)
     {
         if (!allocator_)
@@ -99,7 +99,7 @@ public:
         return newObject;
     }
     
-    /// Destruct and free an object
+    /// Destruct and free an object.
     void Free(T* object)
     {
         (object)->~T();
@@ -107,11 +107,11 @@ public:
     }
     
 private:
-    /// Prevent copy construction
+    /// Prevent copy construction.
     Allocator(const Allocator<T>& rhs);
-    /// Prevent assignment
+    /// Prevent assignment.
     Allocator<T>& operator = (const Allocator<T>& rhs);
     
-    /// Allocator block
+    /// Allocator block.
     AllocatorBlock* allocator_;
 };

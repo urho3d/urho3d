@@ -28,32 +28,32 @@
 #include "Ptr.h"
 #include "Vector3.h"
 
-/// Skeletal animation keyframe
+/// Skeletal animation keyframe.
 struct AnimationKeyFrame
 {
-    /// Keyframe time
+    /// Keyframe time.
     float time_;
-    /// Bone position
+    /// Bone position.
     Vector3 position_;
-    /// Bone rotation
+    /// Bone rotation.
     Quaternion rotation_;
-    /// Bone scale
+    /// Bone scale.
     Vector3 scale_;
 };
 
-/// Skeletal animation track, stores keyframes of a single bone
+/// Skeletal animation track, stores keyframes of a single bone.
 struct AnimationTrack
 {
-    /// Return keyframe index based on time and previous index
+    /// Return keyframe index based on time and previous index.
     void GetKeyFrameIndex(float time, unsigned& index) const;
     
-    /// Bone name
+    /// Bone name.
     String name_;
-    /// Bone name hash
+    /// Bone name hash.
     StringHash nameHash_;
-    /// Bitmask of included data (position, rotation, scale)
+    /// Bitmask of included data (position, rotation, scale.)
     unsigned char channelMask_;
-    /// Keyframes
+    /// Keyframes.
     Vector<AnimationKeyFrame> keyFrames_;
 };
 
@@ -61,55 +61,55 @@ static const unsigned char CHANNEL_POSITION = 0x1;
 static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
 
-/// Skeletal animation resource
+/// Skeletal animation resource.
 class Animation : public Resource
 {
     OBJECT(Animation);
     
 public:
-    /// Construct
+    /// Construct.
     Animation(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Animation();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful
+    /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set animation name
+    /// %Set animation name.
     void SetAnimationName(const String& name);
-    /// %Set animation length
+    /// %Set animation length.
     void SetLength(float length);
-    /// %Set all animation tracks
+    /// %Set all animation tracks.
     void SetTracks(const Vector<AnimationTrack>& tracks);
     
-    /// Return animation name
+    /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }
-    /// Return animation name hash
+    /// Return animation name hash.
     StringHash GetAnimationNameHash() const { return animationNameHash_; }
-    /// Return animation length
+    /// Return animation length.
     float GetLength() const { return length_; }
-    /// Return all animation tracks
+    /// Return all animation tracks.
     const Vector<AnimationTrack>& GetTracks() const { return tracks_; }
-    /// Return number of animation tracks
+    /// Return number of animation tracks.
     unsigned GetNumTracks() const;
-    /// Return animation track by index
+    /// Return animation track by index.
     const AnimationTrack* GetTrack(unsigned index) const;
-    /// Return animation track by bone name
+    /// Return animation track by bone name.
     const AnimationTrack* GetTrack(const String& name) const;
-    /// Return animation track by bone name hash
+    /// Return animation track by bone name hash.
     const AnimationTrack* GetTrack(StringHash nameHash) const;
     
 private:
-    /// Animation name
+    /// Animation name.
     String animationName_;
-    /// Animation name hash
+    /// Animation name hash.
     StringHash animationNameHash_;
-    /// Animation length
+    /// Animation length.
     float length_;
-    /// Animation tracks
+    /// Animation tracks.
     Vector<AnimationTrack> tracks_;
 };

@@ -39,7 +39,7 @@
 #include <angelscript.h>
 #include <cstring>
 
-/// Template function for dynamic cast between two script classes
+/// Template function for dynamic cast between two script classes.
 template <class T, class U> U* RefCast(T* t)
 {
     if (!t)
@@ -48,7 +48,7 @@ template <class T, class U> U* RefCast(T* t)
     return dynamic_cast<U*>(t);
 }
 
-/// Template function for returning a Variant pointer type cast to specific class
+/// Template function for returning a Variant pointer type cast to specific class.
 template <class T> T* GetVariantPtr(Variant* ptr)
 {
     // An attempt at type safety. Probably can not guarantee that this could not be made to invoke UDB
@@ -60,7 +60,7 @@ template <class T> T* GetVariantPtr(Variant* ptr)
         return 0;
 }
 
-/// Template function for Vector to array conversion
+/// Template function for Vector to array conversion.
 template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -78,7 +78,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
         return 0;
 }
 
-/// Template function for PODVector to array conversion
+/// Template function for PODVector to array conversion.
 template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -96,7 +96,7 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
         return 0;
 }
 
-/// Template function for Vector to handle array conversion
+/// Template function for Vector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -120,7 +120,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
         return 0;
 }
 
-/// Template function for PODVector to handle array conversion
+/// Template function for PODVector to handle array conversion.
 template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -144,7 +144,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
         return 0;
 }
 
-/// Template function for shared pointer Vector to handle array conversion
+/// Template function for shared pointer Vector to handle array conversion.
 template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<SharedPtr<T> >& vector, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -168,7 +168,7 @@ template <class T> CScriptArray* SharedPtrVectorToHandleArray(const Vector<Share
         return 0;
 }
 
-/// Template function for Set to array conversion
+/// Template function for Set to array conversion.
 template <class T> CScriptArray* SetToArray(const Set<T>& set, const char* arrayName)
 {
     asIScriptContext *context = asGetActiveContext();
@@ -190,7 +190,7 @@ template <class T> CScriptArray* SetToArray(const Set<T>& set, const char* array
         return 0;
 }
 
-/// Template function for registering implicit casts between base and subclass
+/// Template function for registering implicit casts between base and subclass.
 template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const char* classNameT, const char* classNameU)
 {
     if (!strcmp(classNameT, classNameU))
@@ -203,7 +203,7 @@ template <class T, class U> void RegisterSubclass(asIScriptEngine* engine, const
     engine->RegisterObjectBehaviour(classNameU, asBEHAVE_IMPLICIT_REF_CAST, declReturnT.CString(), asFUNCTION((RefCast<U, T>)), asCALL_CDECL_OBJLAST);
 }
 
-/// Template function for registering a class derived from Serializer
+/// Template function for registering a class derived from Serializer.
 template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* className)
 {
     engine->RegisterObjectMethod(className, "bool WriteInt(int)", asMETHODPR(T, WriteInt, (int), bool), asCALL_THISCALL);
@@ -235,7 +235,7 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "bool WriteLine(const String&in)", asMETHODPR(T, WriteLine, (const String&), bool), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from Deserializer
+/// Template function for registering a class derived from Deserializer.
 template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char* className)
 {
     engine->RegisterObjectMethod(className, "int ReadInt()", asMETHODPR(T, ReadInt, (), int), asCALL_THISCALL);
@@ -273,7 +273,7 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool get_eof() const", asMETHODPR(T, IsEof, () const, bool), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from RefCounted
+/// Template function for registering a class derived from RefCounted.
 template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* className)
 {
     engine->RegisterObjectType(className, 0, asOBJ_REF);
@@ -281,7 +281,7 @@ template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* 
     engine->RegisterObjectBehaviour(className, asBEHAVE_RELEASE, "void f()", asMETHODPR(T, ReleaseRef, (), void), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from Object
+/// Template function for registering a class derived from Object.
 template <class T> void RegisterObject(asIScriptEngine* engine, const char* className)
 {
     engine->RegisterObjectType(className, 0, asOBJ_REF);
@@ -304,14 +304,14 @@ template <class T> T* ConstructNamedObject(const String& name)
     return object;
 }
 
-/// Template function for registering a default constructor for a class derived from Object
+/// Template function for registering a default constructor for a class derived from Object.
 template <class T> void RegisterObjectConstructor(asIScriptEngine* engine, const char* className)
 {
     String declFactory(String(className) + "@+ f()");
     engine->RegisterObjectBehaviour(className, asBEHAVE_FACTORY, declFactory.CString(), asFUNCTION(ConstructObject<T>), asCALL_CDECL);
 }
 
-/// Template function for registering a named constructor for a class derived from Object
+/// Template function for registering a named constructor for a class derived from Object.
 template <class T> void RegisterNamedObjectConstructor(asIScriptEngine* engine, const char* className)
 {
     String declFactoryWithName(String(className) + "@+ f(const String&in)");
@@ -348,7 +348,7 @@ static bool SerializableSave(File* file, Serializable* ptr)
         return false;
 }
 
-/// Template function for registering a class derived from Serializable
+/// Template function for registering a class derived from Serializable.
 template <class T> void RegisterSerializable(asIScriptEngine* engine, const char* className)
 {
     RegisterObject<T>(engine, className);
@@ -365,7 +365,7 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     RegisterSubclass<Object, T>(engine, "Serializable", className);
 }
 
-/// Template function for registering a class derived from Component
+/// Template function for registering a class derived from Component.
 template <class T> void RegisterComponent(asIScriptEngine* engine, const char* className, bool nodeRegistered = true)
 {
     RegisterSerializable<T>(engine, className);
@@ -482,7 +482,7 @@ static CScriptArray* NodeGetChildrenWithClassName(const String& className, bool 
     return VectorToHandleArray<Node>(ret, "Array<Node@>");
 }
 
-/// Template function for registering a class derived from Node
+/// Template function for registering a class derived from Node.
 template <class T> void RegisterNode(asIScriptEngine* engine, const char* className)
 {
     RegisterSerializable<T>(engine, className);
@@ -563,7 +563,7 @@ static bool ResourceSave(File* file, XMLFile* ptr)
         return false;
 }
 
-/// Template function for registering a class derived from Resource
+/// Template function for registering a class derived from Resource.
 template <class T> void RegisterResource(asIScriptEngine* engine, const char* className)
 {
     RegisterObject<T>(engine, className);
@@ -592,7 +592,7 @@ static bool DrawableIsInView(Drawable* ptr)
     return ptr->IsInView(frame.frameNumber_);
 }
 
-/// Template function for registering a class derived from Drawable
+/// Template function for registering a class derived from Drawable.
 template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* className)
 {
     RegisterComponent<T>(engine, className);
@@ -617,7 +617,7 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
     engine->RegisterObjectMethod(className, "const BoundingBox& get_worldBoundingBox()", asMETHOD(T, GetWorldBoundingBox), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from SoundSource
+/// Template function for registering a class derived from SoundSource.
 template <class T> void RegisterSoundSource(asIScriptEngine* engine, const char* className)
 {
     RegisterComponent<T>(engine, className);
@@ -643,7 +643,7 @@ template <class T> void RegisterSoundSource(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "bool get_playing() const", asMETHOD(T, IsPlaying), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from Texture
+/// Template function for registering a class derived from Texture.
 template <class T> void RegisterTexture(asIScriptEngine* engine, const char* className)
 {
     RegisterResource<T>(engine, className);
@@ -668,7 +668,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "bool get_dataLost() const", asMETHOD(T, IsDataLost), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from UIElement
+/// Template function for registering a class derived from UIElement.
 template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className)
 {
     RegisterObject<T>(engine, className);
@@ -774,7 +774,7 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectProperty(className, "VariantMap vars", offsetof(T, vars_));
 }
 
-/// Template function for registering a class derived from BorderImage
+/// Template function for registering a class derived from BorderImage.
 template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char* className)
 {
     RegisterUIElement<T>(engine, className);
@@ -790,7 +790,7 @@ template <class T> void RegisterBorderImage(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "const IntVector2& get_hoverOffset() const", asMETHOD(T, GetHoverOffset), asCALL_THISCALL);
 }
 
-/// Template function for registering a class derived from Button
+/// Template function for registering a class derived from Button.
 template <class T> void RegisterButton(asIScriptEngine* engine, const char* className)
 {
     RegisterBorderImage<T>(engine, className);

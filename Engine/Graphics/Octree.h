@@ -37,23 +37,23 @@ static const int NUM_OCTANTS = 8;
 class Octant
 {
 public:
-    /// Construct
+    /// Construct.
     Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* root);
-    /// Destruct. Move drawables to root if available (detach if not) and free child octants
+    /// Destruct. Move drawables to root if available (detach if not) and free child octants.
     virtual ~Octant();
     
-    /// Return or create a child octant
+    /// Return or create a child octant.
     Octant* GetOrCreateChild(unsigned index);
-    /// Delete child octant
+    /// Delete child octant.
     void DeleteChild(unsigned index);
-    /// Delete child octant by pointer
+    /// Delete child octant by pointer.
     void DeleteChild(Octant* octant);
-    /// Insert a drawable object by checking for fit recursively
+    /// Insert a drawable object by checking for fit recursively.
     void InsertDrawable(Drawable* drawable);
-    /// Check if a drawable object fits
+    /// Check if a drawable object fits.
     bool CheckDrawableSize(Drawable* drawable) const;
     
-    /// Add a drawable object to this octant
+    /// Add a drawable object to this octant.
     void AddDrawable(Drawable* drawable)
     {
         drawable->SetOctant(this);
@@ -61,7 +61,7 @@ public:
         IncDrawableCount();
     }
     
-    /// Remove a drawable object from this octant
+    /// Remove a drawable object from this octant.
     void RemoveDrawable(Drawable* drawable, bool resetOctant = true)
     {
         PODVector<Drawable*>::Iterator i = drawables_.Find(drawable);
@@ -74,33 +74,33 @@ public:
         }
     }
     
-    /// Return world bounding box
+    /// Return world bounding box.
     const BoundingBox& GetWorldBoundingBox() const { return worldBoundingBox_; }
-    /// Return bounding box used for fitting drawable objects
+    /// Return bounding box used for fitting drawable objects.
     const BoundingBox& GetCullingBox() const { return cullingBox_; }
-    /// Return subdivision level
+    /// Return subdivision level.
     unsigned GetLevel() const { return level_; }
-    /// Return parent octant
+    /// Return parent octant.
     Octant* GetParent() const { return parent_; }
-    /// Return octree root
+    /// Return octree root.
     Octree* GetRoot() const { return root_; }
-    /// Return true if there are no drawable objects in this octant and child octants
+    /// Return true if there are no drawable objects in this octant and child octants.
     bool IsEmpty() { return numDrawables_ == 0; }
     
-    /// Reset root pointer recursively. Called when the whole octree is being destroyed
+    /// Reset root pointer recursively. Called when the whole octree is being destroyed.
     void ResetRoot();
-    /// Draw bounds to the debug graphics recursively
+    /// Draw bounds to the debug graphics recursively.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
 protected:
-    /// Return drawable objects by a query, called internally
+    /// Return drawable objects by a query, called internally.
     void GetDrawablesInternal(OctreeQuery& query, bool inside) const;
-    /// Return drawable objects by a ray query, called internally
+    /// Return drawable objects by a ray query, called internally.
     void GetDrawablesInternal(RayOctreeQuery& query) const;
-    /// Free child octants. If drawable objects still exist, move them to root
+    /// Free child octants. If drawable objects still exist, move them to root.
     void Release();
     
-    /// Increase drawable object count recursively
+    /// Increase drawable object count recursively.
     void IncDrawableCount()
     {
         ++numDrawables_;
@@ -108,7 +108,7 @@ protected:
             parent_->IncDrawableCount();
     }
     
-    /// Decrease drawable object count recursively and remove octant if it becomes empty
+    /// Decrease drawable object count recursively and remove octant if it becomes empty.
     void DecDrawableCount()
     {
         Octant* parent = parent_;
@@ -124,21 +124,21 @@ protected:
             parent->DecDrawableCount();
     }
     
-    /// World bounding box
+    /// World bounding box.
     BoundingBox worldBoundingBox_;
-    /// Bounding box used for drawable object fitting
+    /// Bounding box used for drawable object fitting.
     BoundingBox cullingBox_;
-    /// Subdivision level
+    /// Subdivision level.
     unsigned level_;
-    /// Parent octant
+    /// Parent octant.
     Octant* parent_;
-    /// Child octants
+    /// Child octants.
     Octant* children_[NUM_OCTANTS];
-    /// Octree root
+    /// Octree root.
     Octree* root_;
-    /// Drawable objects
+    /// Drawable objects.
     PODVector<Drawable*> drawables_;
-    /// Number of drawable objects in this octant and child octants
+    /// Number of drawable objects in this octant and child octants.
     unsigned numDrawables_;
 };
 
@@ -148,44 +148,44 @@ class Octree : public Component, public Octant
     OBJECT(Octree);
     
 public:
-    /// Construct
+    /// Construct.
     Octree(Context* context);
-    /// Destruct
+    /// Destruct.
     ~Octree();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Handle attribute change
+    /// Handle attribute change.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     
-    /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root
+    /// Resize octree. If octree is not empty, drawable objects will be temporarily moved to the root.
     void Resize(const BoundingBox& box, unsigned numLevels);
-    /// Update and reinsert drawable objects
+    /// Update and reinsert drawable objects.
     void Update(const FrameInfo& frame);
     
-    /// Return drawable objects by a query
+    /// Return drawable objects by a query.
     void GetDrawables(OctreeQuery& query) const;
-    /// Return drawable objects by a ray query
+    /// Return drawable objects by a ray query.
     void GetDrawables(RayOctreeQuery& query) const;
-    /// Return subdivision levels
+    /// Return subdivision levels.
     unsigned GetNumLevels() const { return numLevels_; }
     
-    /// Mark drawable object as requiring an update
+    /// Mark drawable object as requiring an update.
     void QueueUpdate(Drawable* drawable);
-    /// Mark drawable object as requiring a reinsertion
+    /// Mark drawable object as requiring a reinsertion.
     void QueueReinsertion(Drawable* drawable);
-    /// Remove drawable object from update list
+    /// Remove drawable object from update list.
     void CancelUpdate(Drawable* drawable);
-    /// Remove drawable object from reinsertion list
+    /// Remove drawable object from reinsertion list.
     void CancelReinsertion(Drawable* drawable);
-    /// Add debug geometry to the debug graphics
+    /// Add debug geometry to the debug graphics.
     void DrawDebugGeometry(bool depthTest);
     
 private:
-    /// %Set of drawable objects that require update
+    /// %Set of drawable objects that require update.
     HashSet<Drawable*> drawableUpdates_;
-    /// %Set of drawable objects that require reinsertion
+    /// %Set of drawable objects that require reinsertion.
     HashSet<Drawable*> drawableReinsertions_;
-    /// Subdivision level
+    /// Subdivision level.
     unsigned numLevels_;
 };

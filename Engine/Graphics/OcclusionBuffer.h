@@ -36,10 +36,12 @@ class VertexBuffer;
 struct Edge;
 struct Gradients;
 
-/// Occlusion hierarchy depth range
+/// Occlusion hierarchy depth range.
 struct DepthValue
 {
+    /// Minimum value.
     int min_;
+    /// Maximum value.
     int max_;
 };
 
@@ -48,111 +50,111 @@ static const int OCCLUSION_DEFAULT_MAX_TRIANGLES = 5000;
 static const float OCCLUSION_X_SCALE = 65536.0f;
 static const float OCCLUSION_Z_SCALE = 16777216.0f;
 
-/// Software graphics for occlusion
+/// Software renderer for occlusion.
 class OcclusionBuffer : public Object
 {
     OBJECT(OcclusionBuffer);
     
 public:
-    /// Construct
+    /// Construct.
     OcclusionBuffer(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~OcclusionBuffer();
     
-    /// %Set occlusion buffer size
+    /// %Set occlusion buffer size.
     bool SetSize(int width, int height);
-    /// %Set camera view to render from
+    /// %Set camera view to render from.
     void SetView(Camera* camera);
-    /// %Set maximum triangles to render
+    /// %Set maximum triangles to render.
     void SetMaxTriangles(unsigned triangles);
-    /// %Set culling mode
+    /// %Set culling mode.
     void SetCullMode(CullMode mode);
-    /// Reset number of triangles
+    /// Reset number of triangles.
     void Reset();
-    /// Clear buffer
+    /// Clear the buffer.
     void Clear();
-    /// Draw triangle mesh to buffer
+    /// Draw a triangle mesh to the buffer.
     bool Draw(const Matrix3x4& model, const unsigned char* vertexData, unsigned vertexSize, const unsigned char* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount);
-    /// Build reduced size mip levels
+    /// Build reduced size mip levels.
     void BuildDepthHierarchy();
     
-    /// Return highest level depth values
+    /// Return highest level depth values.
     int* GetBuffer() const { return buffer_; }
-    /// Return view transform matrix
+    /// Return view transform matrix.
     const Matrix3x4& GetView() const { return view_; }
-    /// Return projection matrix
+    /// Return projection matrix.
     const Matrix4& GetProjection() const { return projection_; }
-    /// Return buffer width
+    /// Return buffer width.
     int GetWidth() const { return width_; }
-    /// Return buffer height
+    /// Return buffer height.
     int GetHeight() const { return height_; }
-    /// Return number of rendered triangles
+    /// Return number of rendered triangles.
     unsigned GetNumTriangles() const { return numTriangles_; }
-    /// Return maximum number of triangles
+    /// Return maximum number of triangles.
     unsigned GetMaxTriangles() const { return max_Triangles; }
-    /// Return culling mode
+    /// Return culling mode.
     CullMode GetCullMode() const { return cullMode_; }
-    /// Test a bounding box for visibility. For best performance, build depth hierarchy first
+    /// Test a bounding box for visibility. For best performance, build depth hierarchy first.
     bool IsVisible(const BoundingBox& worldSpaceBox) const;
     
 private:
-    /// Apply modelview transform to vertex
+    /// Apply modelview transform to vertex.
     inline Vector4 ModelTransform(const Matrix4& transform, const Vector3& vertex) const;
-    /// Apply projection and viewport transform to vertex
+    /// Apply projection and viewport transform to vertex.
     inline Vector3 ViewportTransform(const Vector4& vertex) const;
-    /// Clip an edge
+    /// Clip an edge.
     inline Vector4 ClipEdge(const Vector4& v0, const Vector4& v1, float d0, float d1) const;
-    /// Check facing of a triangle
+    /// Check facing of a triangle.
     inline bool CheckFacing(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Calculate viewport transform
+    /// Calculate viewport transform.
     void CalculateViewport();
-    /// Draw a triangle
+    /// Draw a triangle.
     void DrawTriangle(Vector4* vertices);
-    /// Clip vertices against a plane
+    /// Clip vertices against a plane.
     void ClipVertices(const Vector4& plane, Vector4* vertices, bool* triangles, unsigned& numTriangles);
-    /// Draw a clipped triangle
+    /// Draw a clipped triangle.
     void DrawTriangle2D(const Vector3* vertices);
     
-    /// Highest level depth buffer
+    /// Highest level depth buffer.
     int* buffer_;
-    /// Buffer width
+    /// Buffer width.
     int width_;
-    /// Buffer height
+    /// Buffer height.
     int height_;
-    /// Number of rendered triangles
+    /// Number of rendered triangles.
     unsigned numTriangles_;
-    /// Maximum number of triangles
+    /// Maximum number of triangles.
     unsigned max_Triangles;
-    /// Culling mode
+    /// Culling mode.
     CullMode cullMode_;
-    /// Depth hierarchy needs update flag
+    /// Depth hierarchy needs update flag.
     bool depthHierarchyDirty_;
-    /// View transform matrix
+    /// View transform matrix.
     Matrix3x4 view_;
-    /// Projection matrix
+    /// Projection matrix.
     Matrix4 projection_;
-    /// Combined view and projection matrix
+    /// Combined view and projection matrix.
     Matrix4 viewProj_;
-    /// Near clip distance
+    /// Near clip distance.
     float nearClip_;
-    /// Far clip distance
+    /// Far clip distance.
     float farClip_;
-    /// Depth bias to apply
+    /// Depth bias to apply.
     float depthBias_;
-    /// X scaling for viewport transform
+    /// X scaling for viewport transform.
     float scaleX_;
-    /// Y scaling for viewport transform
+    /// Y scaling for viewport transform.
     float scaleY_;
-    /// X offset for viewport transform
+    /// X offset for viewport transform.
     float offsetX_;
-    /// Y offset for viewport transform
+    /// Y offset for viewport transform.
     float offsetY_;
-    /// Combined X projection and viewport transform
+    /// Combined X projection and viewport transform.
     float projOffsetScaleX_;
-    /// Combined Y projection and viewport transform
+    /// Combined Y projection and viewport transform.
     float projOffsetScaleY_;
-    /// Highest level buffer with safety padding
+    /// Highest level buffer with safety padding.
     SharedArrayPtr<int> fullBuffer_;
-    /// Reduced size depth buffers
+    /// Reduced size depth buffers.
     Vector<SharedArrayPtr<DepthValue> > mipBuffers_;
 };

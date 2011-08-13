@@ -43,211 +43,211 @@ class Node;
 class Scene;
 class Serializable;
 
-/// Queued remote event
+/// Queued remote event.
 struct RemoteEvent
 {
-    /// Receiver node ID (0 if not a remote node event)
+    /// Receiver node ID (0 if not a remote node event.)
     unsigned receiverID_;
-    /// Event type
+    /// Event type.
     StringHash eventType_;
-    /// Event data
+    /// Event data.
     VariantMap eventData_;
-    /// In order -flag
+    /// In order flag.
     bool inOrder_;
 };
 
-/// Package file receive transfer
+/// Package file receive transfer.
 struct PackageDownload
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     PackageDownload();
     
-    /// Destination file that is used to write the data
+    /// Destination file.
     SharedPtr<File> file_;
-    /// Already received fragments
+    /// Already received fragments.
     HashSet<unsigned> receivedFragments_;
-    /// Package name
+    /// Package name.
     String name_;
-    /// Total number of fragments
+    /// Total number of fragments.
     unsigned totalFragments_;
-    /// Checksum
+    /// Checksum.
     unsigned checksum_;
-    /// Download initiated flag
+    /// Download initiated flag.
     bool initiated_;
 };
 
-/// Package file send transfer
+/// Package file send transfer.
 struct PackageUpload
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     PackageUpload();
     
-    /// Source file that is used to read the rate
+    /// Source file.
     SharedPtr<File> file_;
-    /// Current fragment index
+    /// Current fragment index.
     unsigned fragment_;
     /// Total number of fragments
     unsigned totalFragments_;
 };
 
-/// Connection to a remote network host
+/// Connection to a remote network host.
 class Connection : public Object
 {
     OBJECT(Connection);
     
 public:
-    /// Construct with context and kNet message connection pointers
+    /// Construct with context and kNet message connection pointers.
     Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
-    /// Destruct
+    /// Destruct.
     ~Connection();
     
-    /// Send a message
+    /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned priority = 0, unsigned contentID = 0);
-    /// Send a message
+    /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const unsigned char* data, unsigned numBytes, unsigned priority = 0, unsigned contentID = 0);
-    /// Send a remote event
+    /// Send a remote event.
     void SendRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Send a remote node event
+    /// Send a remote node event.
     void SendRemoteEvent(Node* receiver, StringHash eventType, bool inOrder, const VariantMap& eventData = VariantMap());
-    /// Assign scene. On the server, this will cause the client to load it
+    /// Assign scene. On the server, this will cause the client to load it.
     void SetScene(Scene* newScene);
-    /// Assign identity. Called by Network
+    /// Assign identity. Called by Network.
     void SetIdentity(const VariantMap& identity);
-    /// %Set new controls. Moves the current controls as previous
+    /// %Set new controls. Moves the current controls as previous.
     void SetControls(const Controls& newControls);
-    /// %Set the observer position for interest management
+    /// %Set the observer position for interest management.
     void SetPosition(const Vector3& position);
-    /// %Set the connection pending status. Called by Network
+    /// %Set the connection pending status. Called by Network.
     void SetConnectPending(bool connectPending);
-    /// %Set whether to log data in/out statistics
+    /// %Set whether to log data in/out statistics.
     void SetLogStatistics(bool enable);
-    /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish
+    /// Disconnect. If wait time is non-zero, will block while waiting for disconnect to finish.
     void Disconnect(int waitMSec = 0);
-    /// Send scene update messages. Called by Network
+    /// Send scene update messages. Called by Network.
     void SendServerUpdate();
-    /// Send latest controls from the client. Called by Network
+    /// Send latest controls from the client. Called by Network.
     void SendClientUpdate();
-    /// Send queued remote events. Called by Network
+    /// Send queued remote events. Called by Network.
     void SendRemoteEvents();
-    /// Send package files to client. Called by network
+    /// Send package files to client. Called by network.
     void SendPackages();
-    /// Process pending latest data for nodes and components
+    /// Process pending latest data for nodes and components.
     void ProcessPendingLatestData();
-    /// Process a LoadScene message from the server. Called by Network
+    /// Process a LoadScene message from the server. Called by Network.
     void ProcessLoadScene(int msgID, MemoryBuffer& msg);
-    /// Process a SceneChecksumError message from the server. Called by Network
+    /// Process a SceneChecksumError message from the server. Called by Network.
     void ProcessSceneChecksumError(int msgID, MemoryBuffer& msg);
-    /// Process a scene update message from the server. Called by Network
+    /// Process a scene update message from the server. Called by Network.
     void ProcessSceneUpdate(int msgID, MemoryBuffer& msg);
-    /// Process package download related messages. Called by Network
+    /// Process package download related messages. Called by Network.
     void ProcessPackageDownload(int msgID, MemoryBuffer& msg);
-    /// Process an Identity message from the client. Called by Network
+    /// Process an Identity message from the client. Called by Network.
     void ProcessIdentity(int msgID, MemoryBuffer& msg);
-    /// Process a Controls message from the client. Called by Network
+    /// Process a Controls message from the client. Called by Network.
     void ProcessControls(int msgID, MemoryBuffer& msg);
-    /// Process a SceneLoaded message from the client. Called by Network
+    /// Process a SceneLoaded message from the client. Called by Network.
     void ProcessSceneLoaded(int msgID, MemoryBuffer& msg);
-    /// Process a remote event message from the client or server. Called by Network
+    /// Process a remote event message from the client or server. Called by Network.
     void ProcessRemoteEvent(int msgID, MemoryBuffer& msg);
     
-    /// Return the kNet message connection
+    /// Return the kNet message connection.
     kNet::MessageConnection* GetMessageConnection() const;
-    /// Return client identity
+    /// Return client identity.
     const VariantMap& GetIdentity() const { return identity_; }
-    /// Return the scene used by this connection
+    /// Return the scene used by this connection.
     Scene* GetScene() const;
-    /// Return the client controls of this connection
+    /// Return the client controls of this connection.
     const Controls& GetControls() const { return controls_; }
-    /// Return the observer position for interest management
+    /// Return the observer position for interest management.
     const Vector3& GetPosition() const { return position_; }
-    /// Return whether is a client connection
+    /// Return whether is a client connection.
     bool IsClient() const { return isClient_; }
-    /// Return whether is fully connected
+    /// Return whether is fully connected.
     bool IsConnected() const;
-    /// Return whether connection is pending
+    /// Return whether connection is pending.
     bool IsConnectPending() const { return connectPending_; }
-    /// Return whether the scene is loaded and ready to receive updates from network
+    /// Return whether the scene is loaded and ready to receive server updates.
     bool IsSceneLoaded() const { return sceneLoaded_; }
-    /// Return whether to log data in/out statistics
+    /// Return whether to log data in/out statistics.
     bool GetLogStatistics() const { return logStatistics_; }
-    /// Return remote address
+    /// Return remote address.
     String GetAddress() const;
-    /// Return remote port
+    /// Return remote port.
     unsigned short GetPort() const;
-    /// Return an address:port string
+    /// Return an address:port string.
     String ToString() const;
-    /// Return number of package downloads remaining
+    /// Return number of package downloads remaining.
     unsigned GetNumDownloads() const;
-    /// Return name of current package download, or empty if no downloads
+    /// Return name of current package download, or empty if no downloads.
     const String& GetDownloadName() const;
-    /// Return progress of current package download, or 1.0 if no downloads
+    /// Return progress of current package download, or 1.0 if no downloads.
     float GetDownloadProgress() const;
     
-    /// Identity map
+    /// Identity map.
     VariantMap identity_;
     
 private:
-    /// Handle scene loaded event
+    /// Handle scene loaded event.
     void HandleAsyncLoadFinished(StringHash eventType, VariantMap& eventData);
-    /// Process a node for sending a network update. Recurses to process depended on node(s) first
+    /// Process a node for sending a network update. Recurses to process depended on node(s) first.
     void ProcessNode(Node* node);
-    /// Process a node that the client had not yet received
+    /// Process a node that the client had not yet received.
     void ProcessNewNode(Node* node);
-    /// Process a node that the client has already received
+    /// Process a node that the client has already received.
     void ProcessExistingNode(Node* node);
-    /// Initiate a package download
+    /// Initiate a package download.
     void RequestPackage(const String& name, unsigned fileSize, unsigned checksum);
-    /// Send an error reply for a package download
+    /// Send an error reply for a package download.
     void SendPackageError(const String& name);
-    /// Handle scene load failure on the server or client
+    /// Handle scene load failure on the server or client.
     void OnSceneLoadFailed();
-    /// Handle a package download failure on the client
+    /// Handle a package download failure on the client.
     void OnPackageDownloadFailed(const String& name);
-    /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none
+    /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
     
-    /// kNet message connection
+    /// kNet message connection.
     kNet::SharedPtr<kNet::MessageConnection> connection_;
-    /// Scene
+    /// Scene.
     WeakPtr<Scene> scene_;
-    /// Last sent state of the scene for network replication
+    /// Last sent state of the scene for network replication.
     Map<unsigned, NodeReplicationState> sceneState_;
-    /// Preallocated attribute variants per networked object class for sending updates
+    /// Preallocated attribute variants per networked object class for sending updates.
     Map<ShortStringHash, Vector<Variant> > classCurrentState_;
-    /// Waiting or ongoing package file receive transfers
+    /// Waiting or ongoing package file receive transfers.
     Map<StringHash, PackageDownload> downloads_;
-    /// Ongoing package send transfers
+    /// Ongoing package send transfers.
     Map<StringHash, PackageUpload> uploads_;
-    /// Pending latest data for not yet received nodes
+    /// Pending latest data for not yet received nodes.
     HashMap<unsigned, PODVector<unsigned char> > nodeLatestData_;
-    /// Pending latest data for not yet received components
+    /// Pending latest data for not yet received components.
     HashMap<unsigned, PODVector<unsigned char> > componentLatestData_;
-    /// Node's changed user variables
+    /// Node's changed user variables.
     HashSet<ShortStringHash> changedVars_;
-    /// Already processed nodes during a replication update
+    /// Already processed nodes during a replication update.
     HashSet<Node*> processedNodes_;
-    /// Reusable message buffer
+    /// Reusable message buffer.
     VectorBuffer msg_;
-    /// Reusable delta update bits
+    /// Reusable delta update bits.
     PODVector<unsigned char> deltaUpdateBits_;
-    /// Queued remote events
+    /// Queued remote events.
     Vector<RemoteEvent> remoteEvents_;
-    /// Scene file to load once all packages (if any) have been downloaded
+    /// Scene file to load once all packages (if any) have been downloaded.
     String sceneFileName_;
-    /// Current controls
+    /// Current controls.
     Controls controls_;
-    /// Observer position for interest management
+    /// Observer position for interest management.
     Vector3 position_;
-    /// Statistics timer
+    /// Statistics timer.
     Timer statsTimer_;
-    /// Update frame number
+    /// Update frame number.
     unsigned frameNumber_;
-    /// Client connection flag
+    /// Client connection flag.
     bool isClient_;
-    /// Connection pending flag
+    /// Connection pending flag.
     bool connectPending_;
-    /// Scene loaded flag
+    /// Scene loaded flag.
     bool sceneLoaded_;
-    /// Show statistics flag
+    /// Show statistics flag.
     bool logStatistics_;
 };

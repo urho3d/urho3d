@@ -25,28 +25,28 @@
 
 #include "StaticModel.h"
 
-/// Static model component with fixed position in relation to the camera
+/// Static model component with fixed position in relation to the camera.
 class Skybox : public StaticModel
 {
     OBJECT(Skybox);
     
 public:
-    /// Construct
+    /// Construct.
     Skybox(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Skybox();
-    /// Register object factory. StaticModel must be registered first
+    /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance for rendering
+    /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Return rendering batch
+    /// Return rendering batch.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
     
 protected:
-    /// Update world-space bounding box
+    /// Update world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
-    /// Custom world transform
+    /// Custom world transform.
     Matrix3x4 customWorldTransform_;
 };

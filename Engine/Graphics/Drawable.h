@@ -45,20 +45,20 @@ class OcclusionBuffer;
 class Octant;
 class RayOctreeQuery;
 
-/// Rendering frame update parameters
+/// Rendering frame update parameters.
 struct FrameInfo
 {
-    /// Frame number
+    /// Frame number.
     unsigned frameNumber_;
-    /// Time elapsed since last frame
+    /// Time elapsed since last frame.
     float timeStep_;
-    /// Viewport size
+    /// Viewport size.
     IntVector2 viewSize_;
-    /// Camera being used
+    /// Camera being used.
     Camera* camera_;
 };
 
-/// Base class for visible components
+/// Base class for visible components.
 class Drawable : public Component
 {
     OBJECT(Drawable);
@@ -66,160 +66,160 @@ class Drawable : public Component
     friend class Octant;
     
 public:
-    /// Construct
+    /// Construct.
     Drawable(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Drawable();
-    /// Register object attributes. Drawable must be registered first
+    /// Register object attributes. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Process octree raycast
+    /// Process octree raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Update before octree reinsertion. Needs to be requested with MarkForUpdate()
+    /// Update before octree reinsertion. Needs to be requested with MarkForUpdate().
     virtual void Update(const FrameInfo& frame) {}
-    /// Calculate distance for rendering
+    /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare geometry for rendering
+    /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame) {}
-    /// Return number of rendering batches
+    /// Return number of rendering batches.
     virtual unsigned GetNumBatches() { return 0; }
-    /// Return rendering batch
+    /// Return rendering batch.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch) {}
-    /// Draw to occlusion buffer
+    /// Draw to occlusion buffer.
     virtual bool DrawOcclusion(OcclusionBuffer* buffer) { return true; }
-    /// Draw debug geometry
+    /// Draw debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set draw distance
+    /// %Set draw distance.
     void SetDrawDistance(float distance);
-    /// %Set shadow draw distance
+    /// %Set shadow draw distance.
     void SetShadowDistance(float distance);
-    /// %Set LOD bias
+    /// %Set LOD bias.
     void SetLodBias(float bias);
-    /// %Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered
+    /// %Set view mask. Will be and'ed with camera's view mask to see if the object should be rendered.
     void SetViewMask(unsigned mask);
-    /// %Set light mask. Will be and'ed with light's light mask to see if the object should be lit
+    /// %Set light mask. Will be and'ed with light's light mask to see if the object should be lit.
     void SetLightMask(unsigned mask);
-    /// %Set maximum number of lights (forward lighting only). Default 0 is unlimited
+    /// %Set maximum number of lights (forward lighting only). Default 0 is unlimited.
     void SetMaxLights(unsigned num);
-    /// %Set visible flag
+    /// %Set visible flag.
     void SetVisible(bool enable);
-    /// %Set shadowcaster flag
+    /// %Set shadowcaster flag.
     void SetCastShadows(bool enable);
-    /// %Set occlusion flag
+    /// %Set occlusion flag.
     void SetOccluder(bool enable);
-    /// Mark for update before octree reinsertion
+    /// Mark for update before octree reinsertion.
     void MarkForUpdate();
     
-    /// Return world bounding box
+    /// Return world bounding box.
     const BoundingBox& GetWorldBoundingBox();
-    /// Return drawable flags
+    /// Return drawable flags.
     unsigned char GetDrawableFlags() const { return drawableFlags_; }
-    /// Return draw distance
+    /// Return draw distance.
     float GetDrawDistance() const { return drawDistance_; }
-    /// Return shadow draw distance
+    /// Return shadow draw distance.
     float GetShadowDistance() const { return shadowDistance_; }
-    /// Return LOD bias
+    /// Return LOD bias.
     float GetLodBias() const { return lodBias_; }
-    /// Return view mask
+    /// Return view mask.
     unsigned GetViewMask() const { return viewMask_; }
-    /// Return light mask
+    /// Return light mask.
     unsigned GetLightMask() const { return lightMask_; }
-    /// Return maximum number of lights
+    /// Return maximum number of lights.
     unsigned GetMaxLights() const { return maxLights_; }
-    /// Return visible flag
+    /// Return visible flag.
     bool IsVisible() const { return visible_; }
-    /// Return shadowcaster flag
+    /// Return shadowcaster flag.
     bool GetCastShadows() const { return castShadows_; }
-    /// Return occlusion flag
+    /// Return occlusion flag.
     bool IsOccluder() const { return occluder_; }
     
-    /// Return octree octant
+    /// Return octree octant.
     Octant* GetOctant() const { return octant_; }
-    /// %Set sorting value. Called by View
+    /// %Set sorting value. Called by View.
     void SetSortValue(float value);
-    /// Mark in view this frame. Called by View
+    /// Mark in view this frame. Called by View.
     void MarkInView(const FrameInfo& frame);
-    /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View
+    /// Mark in a shadow camera view this frame. If an actual view is already set, does not override it. Called by View.
     void MarkInShadowView(const FrameInfo& frame);
-    /// Clear base pass flags. Also resets light vector
+    /// Clear base pass flags. Also resets light vector.
     void ClearBasePass();
-    /// %Set base pass flag for a batch
+    /// %Set base pass flag for a batch.
     void SetBasePass(unsigned batchIndex);
-    /// Add a light, for drawables that limit the maximum light count
+    /// Add a light, for drawables that limit the maximum light count.
     void AddLight(Light* light);
-    /// Sort and limit lights to maximum allowed
+    /// Sort and limit lights to maximum allowed.
     void LimitLights();
-    /// Return distance from camera
+    /// Return distance from camera.
     float GetDistance() const { return distance_; }
-    /// Return LOD scaled distance from camera
+    /// Return LOD scaled distance from camera.
     float GetLodDistance() const { return lodDistance_; }
-    /// Return sorting value
+    /// Return sorting value.
     float GetSortValue() const { return sortValue_; }
-    /// Return whether is in view this frame
+    /// Return whether is in view this frame.
     bool IsInView(unsigned frameNumber) const;
-    /// Return whether is visible in a specific view this frame
+    /// Return whether is visible in a specific view this frame.
     bool IsInView(const FrameInfo& frame) const;
-    /// Return whether has a base pass
+    /// Return whether has a base pass.
     bool HasBasePass(unsigned batchIndex) const { return (basePassFlags_ & (1 << batchIndex)) != 0; }
-    /// Return lights
+    /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Handle node transform being dirtied
+    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    /// Recalculate world bounding box
+    /// Recalculate world bounding box.
     virtual void OnWorldBoundingBoxUpdate() = 0;
-    /// Add to octree
+    /// Add to octree.
     void AddToOctree();
-    /// Remove from octree
+    /// Remove from octree.
     void RemoveFromOctree();
-    /// Move into another octree octant
+    /// Move into another octree octant.
     void SetOctant(Octant* octant) { octant_ = octant; }
     
-    /// Octree octant
+    /// Octree octant.
     Octant* octant_;
-    /// World bounding box
+    /// World bounding box.
     BoundingBox worldBoundingBox_;
-    /// Draw distance
+    /// Draw distance.
     float drawDistance_;
-    /// Shadow distance
+    /// Shadow distance.
     float shadowDistance_;
-    /// LOD bias
+    /// LOD bias.
     float lodBias_;
-    /// View mask
+    /// View mask.
     unsigned viewMask_;
-    /// Light mask
+    /// Light mask.
     unsigned lightMask_;
-    /// Maximum lights
+    /// Maximum lights.
     unsigned maxLights_;
-    /// Drawable flags
+    /// Drawable flags.
     unsigned char drawableFlags_;
-    /// Visible flag
+    /// Visible flag.
     bool visible_;
-    /// Shadowcaster flag
+    /// Shadowcaster flag.
     bool castShadows_;
-    /// Occluder flag
+    /// Occluder flag.
     bool occluder_;
-    /// Current distance to camera
+    /// Current distance to camera.
     float distance_;
-    /// LOD scaled distance
+    /// LOD scaled distance.
     float lodDistance_;
-    /// Current sort value
+    /// Current sort value.
     float sortValue_;
-    /// Last visible frame number
+    /// Last visible frame number.
     unsigned viewFrameNumber_;
-    /// Base pass flags per batch index
+    /// Base pass flags per batch index.
     unsigned basePassFlags_;
-    /// Last camera rendered from. Not safe to dereference
+    /// Last camera rendered from. Not safe to dereference.
     Camera* viewCamera_;
-    /// Lights affecting this drawable, when light count is limited
+    /// Lights affecting this drawable, when light count is limited.
     PODVector<Light*> lights_;
-    /// Bounding box dirty flag
+    /// Bounding box dirty flag.
     bool worldBoundingBoxDirty_;
-    /// Lod levels dirty flag
+    /// Lod levels dirty flag.
     bool lodLevelsDirty_;
 };
 

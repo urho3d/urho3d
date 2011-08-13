@@ -1,4 +1,4 @@
-#include "Scripts/GameObject.as"
+#include "Scripts/NinjaSnowWar/GameObject.as"
 
 const int potionHealAmount = 5;
 const float potionMass = 10;

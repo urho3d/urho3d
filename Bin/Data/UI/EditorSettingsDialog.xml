@@ -1,0 +1,129 @@
+<element type="Window" name="CameraDialog">
+    <movable enable="true" />
+    <layout mode="vertical" spacing="4" border="6 6 6 6" />
+    <element>
+        <fixedheight value="16" />
+        <layout mode="horizontal" />
+        <element type="Text">
+            <text value="Editor camera settings" />
+        </element>
+        <element type="Button" style="CloseButton" name="CloseButton" />
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Near clip distance" />
+        </element>
+        <element type="LineEdit" name="NearClipEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Far clip distance" />
+        </element>
+        <element type="LineEdit" name="FarClipEdit">
+            <fixedwidth value="80" />
+         </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Field of view" />
+        </element>
+        <element type="LineEdit" name="FOVEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="Movement speed" />
+        </element>
+        <element type="LineEdit" name="SpeedEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider">
+        <fixedheight value="4" />
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="20" />
+        <element type="Text">
+            <text value="New node distance" />
+        </element>
+        <element type="LineEdit" name="DistanceEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Node move step" />
+        </element>
+        <element type="CheckBox" name="MoveSnapToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <fixedwidth value="34" />
+            <text value="Snap" />
+        </element>
+        <element type="LineEdit" name="MoveStepEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Node rotate step" />
+        </element>
+        <element type="CheckBox" name="RotateSnapToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <fixedwidth value="34" />
+            <text value="Snap" />
+        </element>
+        <element type="LineEdit" name="RotateStepEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="Text">
+            <text value="Node scale step" />
+        </element>
+        <element type="CheckBox" name="ScaleSnapToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <fixedwidth value="34" />
+            <text value="Snap" />
+        </element>
+        <element type="LineEdit" name="ScaleStepEdit">
+            <fixedwidth value="80" />
+        </element>
+    </element>
+    <element>
+        <fixedheight value="17" />
+        <layout mode="horizontal" spacing="8" />
+        <element type="CheckBox" name="LocalIDToggle">
+            <fixedsize value="16 16" />
+        </element>
+        <element type="Text">
+            <text value="Use local entity IDs on import" />
+        </element>
+    </element>
+</element>

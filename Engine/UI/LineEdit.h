@@ -28,7 +28,7 @@
 class Font;
 class Text;
 
-/// Single-line text editor UI element
+/// Single-line text editor UI element.
 class LineEdit : public BorderImage
 {
     OBJECT(LineEdit);
@@ -36,109 +36,109 @@ class LineEdit : public BorderImage
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     LineEdit(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~LineEdit();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Perform UI element update
+    /// Perform UI element update.
     virtual void Update(float timeStep);
     
-    /// React to mouse click
+    /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start
+    /// React to mouse drag start.
     virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag motion
+    /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to drag and drop test. Return true to signal that the drop is acceptable
+    /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
-    /// React to drag and drop finish. Return true to signal that the drop was accepted
+    /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
-    /// React to a key press
+    /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to a key press translated to a character
+    /// React to a key press translated to a character.
     virtual void OnChar(unsigned char c, int buttons, int qualifiers);
-    /// React to gaining focus
+    /// React to gaining focus.
     virtual void OnFocus();
-    /// React to losing focus
+    /// React to losing focus.
     virtual void OnDefocus();
     
-    /// %Set text
+    /// %Set text.
     void SetText(const String& text);
-    /// %Set cursor position
+    /// %Set cursor position.
     void SetCursorPosition(unsigned position);
-    /// %Set cursor blink rate. 0 disables blinking
+    /// %Set cursor blink rate. 0 disables blinking.
     void SetCursorBlinkRate(float rate);
-    /// %Set maximum text length. 0 for unlimited
+    /// %Set maximum text length. 0 for unlimited.
     void SetMaxLength(unsigned length);
-    /// %Set echo character for password entry and such. 0 (default) shows the actual text
+    /// %Set echo character for password entry and such. 0 (default) shows the actual text.
     void SetEchoCharacter(char c);
-    /// %Set whether can move cursor with arrows or mouse, default true
+    /// %Set whether can move cursor with arrows or mouse, default true.
     void SetCursorMovable(bool enable);
-    /// %Set whether selections are allowed, default true
+    /// %Set whether selections are allowed, default true.
     void SetTextSelectable(bool enable);
-    /// %Set whether copy-paste operations are allowed, default true
+    /// %Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
     
-    /// Return text
+    /// Return text.
     const String& GetText() const { return line_; }
-    /// Return cursor position
+    /// Return cursor position.
     unsigned GetCursorPosition() const { return cursorPosition_; }
-    /// Return cursor blink rate
+    /// Return cursor blink rate.
     float GetCursorBlinkRate() const { return cursorBlinkRate_; }
-    /// Return maximum text length
+    /// Return maximum text length.
     unsigned GetMaxLength() const { return maxLength_; }
-    /// Return echo character
+    /// Return echo character.
     char GetEchoCharacter() const { return echoCharacter_; }
-    /// Return whether can move cursor with arrows or mouse
+    /// Return whether can move cursor with arrows or mouse.
     bool IsCursorMovable() const { return cursorMovable_; }
-    /// Return whether selections are allowed
+    /// Return whether selections are allowed.
     bool IsTextSelectable() const { return textSelectable_; }
-    /// Return whether copy-paste operations are allowed
+    /// Return whether copy-paste operations are allowed.
     bool IsTextCopyable() const { return textCopyable_; }
-    /// Return text element
+    /// Return text element.
     Text* GetTextElement() const { return text_; }
-    /// Return cursor element
+    /// Return cursor element.
     BorderImage* GetCursor() const { return cursor_; }
     
 protected:
-    /// Update displayed text
+    /// Update displayed text.
     void UpdateText();
-    /// Update cursor position and restart cursor blinking
+    /// Update cursor position and restart cursor blinking.
     void UpdateCursor();
-    /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found
+    /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
     unsigned GetCharIndex(const IntVector2& position);
     
-    /// Text element
+    /// Text element.
     SharedPtr<Text> text_;
-    /// Cursor element
+    /// Cursor element.
     SharedPtr<BorderImage> cursor_;
-    /// Text line
+    /// Text line.
     String line_;
-    /// Last known text font
+    /// Last used text font.
     Font* lastFont_;
-    /// Last known text size
+    /// Last used text size.
     int lastFontSize_;
-    /// Text edit cursor position
+    /// Text edit cursor position.
     unsigned cursorPosition_;
-    /// Drag start edit cursor position
+    /// Drag start edit cursor position.
     unsigned dragStartCursor_;
-    /// Cursor blink rate
+    /// Cursor blink rate.
     float cursorBlinkRate_;
-    /// Cursor blink timer
+    /// Cursor blink timer.
     float cursorBlinkTimer_;
-    /// Maximum text length
+    /// Maximum text length.
     unsigned maxLength_;
-    /// Echo character
+    /// Echo character.
     char echoCharacter_;
-    /// Cursor movable flag
+    /// Cursor movable flag.
     bool cursorMovable_;
-    /// Text selectable flag
+    /// Text selectable flag.
     bool textSelectable_;
-    /// Copy-paste enable flag
+    /// Copy-paste enable flag.
     bool textCopyable_;
 };

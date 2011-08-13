@@ -34,116 +34,116 @@ class UIElement;
 class XMLElement;
 class XMLFile;
 
-/// UI subsystem. Manages the graphical user interface
+/// UI subsystem. Manages the graphical user interface.
 class UI : public Object
 {
     OBJECT(UI);
     
 public:
-    /// Construct
+    /// Construct.
     UI(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~UI();
     
-    /// %Set cursor UI element
+    /// %Set cursor UI element.
     void SetCursor(Cursor* cursor);
-    /// %Set focused UI element
+    /// %Set focused UI element.
     void SetFocusElement(UIElement* element);
-    /// Clear the UI (excluding the cursor)
+    /// Clear the UI (excluding the cursor.)
     void Clear();
-    /// Update the UI logic. Called by HandlePostUpdate()
+    /// Update the UI logic. Called by HandlePostUpdate().
     void Update(float timeStep);
-    /// Update the UI for rendering. Called by HandleRenderUpdate()
+    /// Update the UI for rendering. Called by HandleRenderUpdate().
     void RenderUpdate();
-    /// Render the UI
+    /// Render the UI.
     void Render();
-    /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element
+    /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
     SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
-    /// %Set clipboard text
+    /// %Set clipboard text.
     void SetClipBoardText(const String& text);
     
-    /// Return root UI elemenet
+    /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
-    /// Return cursor
+    /// Return cursor.
     Cursor* GetCursor() const { return cursor_; }
-    /// Return UI element at screen coordinates
+    /// Return UI element at screen coordinates.
     UIElement* GetElementAt(const IntVector2& position, bool activeOnly = true);
-    /// Return UI element at screen coordinates
+    /// Return UI element at screen coordinates.
     UIElement* GetElementAt(int x, int y, bool activeOnly = true);
-    /// Return focused element
+    /// Return focused element.
     UIElement* GetFocusElement() const;
-    /// Return topmost enabled root-level element
+    /// Return topmost enabled root-level element.
     UIElement* GetFrontElement() const;
-    /// Return cursor position
+    /// Return cursor position.
     IntVector2 GetCursorPosition();
-    /// Return clipboard text
+    /// Return clipboard text.
     const String& GetClipBoardText() const { return clipBoard_; }
     
 private:
-    /// Initialize when screen mode initially set
+    /// Initialize when screen mode initially se.
     void Initialize();
-    /// Update UI element logic recursively
+    /// Update UI element logic recursively.
     void Update(float timeStep, UIElement* element);
-    /// Generate batches from an UI element recursively
+    /// Generate batches from an UI element recursively.
     void GetBatches(UIElement* element, IntRect currentScissor);
-    /// Return UI element at screen position recursively
+    /// Return UI element at screen position recursively.
     void GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly);
-    /// Load a UI layout from an XML file recursively
+    /// Load a UI layout from an XML file recursively.
     void LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFile);
-    /// Handle screen mode event
+    /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse move event
+    /// Handle mouse move event.
     void HandleMouseMove(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse button down event
+    /// Handle mouse button down event.
     void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse button up event
+    /// Handle mouse button up event.
     void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData);
-    /// Handle mouse wheel event
+    /// Handle mouse wheel event.
     void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
-    /// Handle keypress event
+    /// Handle keypress event.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-    /// Handle character event
+    /// Handle character event.
     void HandleChar(StringHash eventType, VariantMap& eventData);
-    /// Handle logic post-update event
+    /// Handle logic post-update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle render update event
+    /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Graphics
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Resource cache
+    /// Resource cache subsystem.
     WeakPtr<ResourceCache> cache_;
-    /// Vertex shader for no texture
+    /// Vertex shader for no texture.
     SharedPtr<ShaderVariation> noTextureVS_;
-    /// Vertex shader for diffuse texture
+    /// Vertex shader for diffuse texture.
     SharedPtr<ShaderVariation> diffTextureVS_;
-    /// Pixel shader for no texture
+    /// Pixel shader for no texture.
     SharedPtr<ShaderVariation> noTexturePS_;
-    /// Pixel shader for diffuse texture
+    /// Pixel shader for diffuse texture.
     SharedPtr<ShaderVariation> diffTexturePS_;
-    /// Pixel shader for alpha texture
+    /// Pixel shader for alpha texture.
     SharedPtr<ShaderVariation> alphaTexturePS_;
-    /// UI root element
+    /// UI root element.
     SharedPtr<UIElement> rootElement_;
-    /// Cursor
+    /// Cursor.
     SharedPtr<Cursor> cursor_;
-    /// UI element being dragged
+    /// UI element being dragged.
     WeakPtr<UIElement> dragElement_;
-    /// Element to defocus on the next update
+    /// Element to defocus on the next update.
     WeakPtr<UIElement> defocusElement_;
-    /// UI rendering batches
+    /// UI rendering batches.
     PODVector<UIBatch> batches_;
-    /// UI rendering quads
+    /// UI rendering quads.
     PODVector<UIQuad> quads_;
-    /// Clipboard text
+    /// Clipboard text.
     String clipBoard_;
-    /// Mouse buttons held down
+    /// Mouse buttons held down.
     int mouseButtons_;
-    /// Qualifier keys held down
+    /// Qualifier keys held down.
     int qualifiers_;
-    /// Initialized flag
+    /// Initialized flag.
     bool initialized_;
 };
 
-/// Register UI library objects
+/// Register UI library objects.
 void RegisterUILibrary(Context* context);

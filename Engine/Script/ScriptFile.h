@@ -37,73 +37,73 @@ class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
 
-/// Script file resource
+/// Script file resource.
 class ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);
     
 public:
-    /// Construct
+    /// Construct.
     ScriptFile(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ScriptFile();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Add an event handler. Called by script exposed version of SubscribeToEvent()
+    /// Add an event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
-    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
+    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
     
-    /// Query for a function by declaration and execute if found
+    /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = VariantVector(), bool unprepare = true);
-    /// Execute a function
+    /// Execute a function.
     bool Execute(asIScriptFunction* function, const VariantVector& parameters = VariantVector(), bool unprepare = true);
-    /// Query for an object method by declaration and execute if found
+    /// Query for an object method by declaration and execute if found.
     bool Execute(asIScriptObject* object, const String& declaration, const VariantVector& parameters =
         VariantVector(), bool unprepare = true);
-    /// Execute an object method
+    /// Execute an object method.
     bool Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters = VariantVector(),
         bool unprepare = true);
-    /// Create a script object
+    /// Create a script object.
     asIScriptObject* CreateObject(const String& className);
     
-    /// Return script module
+    /// Return script module.
     asIScriptModule* GetScriptModule() const { return scriptModule_; }
-    /// Return a function by declaration. Will be stored to a search cache so that further searches should be faster
+    /// Return a function by declaration. Will be stored to a search cache so that further searches should be faster.
     asIScriptFunction* GetFunction(const String& declaration);
-    /// Return an object method by declaration
+    /// Return an object method by declaration.
     asIScriptFunction* GetMethod(asIScriptObject* object, const String& declaration);
-    /// Return whether script compiled successfully
+    /// Return whether script compiled successfully.
     bool IsCompiled() const { return compiled_; }
     
 private:
-    /// Add a script section, checking for includes recursively. Return true if successful
+    /// Add a script section, checking for includes recursively. Return true if successful.
     bool AddScriptSection(asIScriptEngine* engine, Deserializer& source);
-    /// %Set parameters for a function or method
+    /// %Set parameters for a function or method.
     void SetParameters(asIScriptContext* context, asIScriptFunction* function, const VariantVector& parameters);
-    /// Release the script module
+    /// Release the script module.
     void ReleaseModule();
-    /// Handle an event in script
+    /// Handle an event in script.
     void HandleScriptEvent(StringHash eventType, VariantMap& eventData);
     
-    /// Script subsystem
+    /// Script subsystem.
     SharedPtr<Script> script_;
-    /// Script module
+    /// Script module.
     asIScriptModule* scriptModule_;
-    /// Compiled flag
+    /// Compiled flag.
     bool compiled_;
-    /// Encountered include files during script file loading
+    /// Encountered include files during script file loading.
     Set<String> includeFiles_;
-    /// Search cache for checking whether script classes implement "ScriptObject" interface
+    /// Search cache for checking whether script classes implement "ScriptObject" interface.
     Map<asIObjectType*, bool> checkedClasses_;
-    /// Search cache for functions
+    /// Search cache for functions.
     Map<String, asIScriptFunction*> functions_;
-    /// Search cache for methods
+    /// Search cache for methods.
     Map<asIObjectType*, Map<String, asIScriptFunction*> > methods_;
 };
 
-/// Get currently executing script file
+/// Get currently executing script file.
 ScriptFile* GetScriptContextFile();

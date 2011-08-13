@@ -81,7 +81,7 @@ void ScriptInstance::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptData, SetScriptData, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
 }
 
 void ScriptInstance::FinishUpdate()
@@ -259,6 +259,17 @@ void ScriptInstance::SetFixedUpdateAccAttr(float value)
     fixedPostUpdateAcc_ = value;
 }
 
+void ScriptInstance::SetScriptDataAttr(PODVector<unsigned char> data)
+{
+    if (scriptObject_ && methods_[METHOD_LOAD])
+    {
+        MemoryBuffer buf(data);
+        VariantVector parameters;
+        parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
+    }
+}
+
 ResourceRef ScriptInstance::GetScriptFileAttr() const
 {
     return GetResourceRef(scriptFile_, ScriptFile::GetTypeStatic());
@@ -280,6 +291,20 @@ PODVector<unsigned char> ScriptInstance::GetDelayedMethodCallsAttr() const
 float ScriptInstance::GetFixedUpdateAccAttr() const
 {
     return fixedUpdateAcc_;
+}
+
+PODVector<unsigned char> ScriptInstance::GetScriptDataAttr() const
+{
+    if (!scriptObject_ || !methods_[METHOD_SAVE])
+        return PODVector<unsigned char>();
+    else
+    {
+        VectorBuffer buf;
+        VariantVector parameters;
+        parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
+        return buf.GetBuffer();
+    }
 }
 
 void ScriptInstance::CreateObject()
@@ -351,31 +376,6 @@ void ScriptInstance::GetSupportedMethods()
                     SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(ScriptInstance, HandlePhysicsPostStep));
             }
         }
-    }
-}
-
-PODVector<unsigned char> ScriptInstance::GetScriptData() const
-{
-    if (!scriptObject_ || !methods_[METHOD_SAVE])
-        return PODVector<unsigned char>();
-    else
-    {
-        VectorBuffer buf;
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Serializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_SAVE], parameters);
-        return buf.GetBuffer();
-    }
-}
-
-void ScriptInstance::SetScriptData(PODVector<unsigned char> data)
-{
-    if (scriptObject_ && methods_[METHOD_LOAD])
-    {
-        MemoryBuffer buf(data);
-        VariantVector parameters;
-        parameters.Push(Variant((void*)static_cast<Deserializer*>(&buf)));
-        scriptFile_->Execute(scriptObject_, methods_[METHOD_LOAD], parameters);
     }
 }
 

@@ -29,7 +29,7 @@
 #include <GL/glfw3.h>
 #endif
 
-/// Mouse button pressed
+/// Mouse button pressed.
 EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {
     PARAM(P_BUTTON, Button);              // int
@@ -37,7 +37,7 @@ EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Mouse button released
+/// Mouse button released.
 EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 {
     PARAM(P_BUTTON, Button);              // int
@@ -45,7 +45,7 @@ EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Mouse moved
+/// Mouse moved.
 EVENT(E_MOUSEMOVE, MouseMove)
 {
     PARAM(P_DX, DX);                      // int
@@ -54,7 +54,7 @@ EVENT(E_MOUSEMOVE, MouseMove)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Mouse wheel moved
+/// Mouse wheel moved.
 EVENT(E_MOUSEWHEEL, MouseWheel)
 {
     PARAM(P_WHEEL, Wheel);                // int
@@ -62,7 +62,7 @@ EVENT(E_MOUSEWHEEL, MouseWheel)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Key pressed
+/// Key pressed.
 EVENT(E_KEYDOWN, KeyDown)
 {
     PARAM(P_KEY, Key);                    // int
@@ -71,7 +71,7 @@ EVENT(E_KEYDOWN, KeyDown)
     PARAM(P_REPEAT, Repeat);              // bool
 }
 
-/// Key released
+/// Key released.
 EVENT(E_KEYUP, KeyUp)
 {
     PARAM(P_KEY, Key);                    // int
@@ -79,12 +79,19 @@ EVENT(E_KEYUP, KeyUp)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Character typed on the keyboard
+/// Character typed on the keyboard.
 EVENT(E_CHAR, Char)
 {
     PARAM(P_CHAR, Char);                  // int
     PARAM(P_BUTTONS, Buttons);            // int
     PARAM(P_QUALIFIERS, Qualifiers);      // int
+}
+
+/// Application activation state changed.
+EVENT(E_ACTIVATION, Activation)
+{
+    PARAM(P_ACTIVE, Active);              // bool
+    PARAM(P_MINIMIZED, Minimized);        // bool
 }
 
 static const int MOUSEB_LEFT = 1;

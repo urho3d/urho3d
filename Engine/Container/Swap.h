@@ -29,7 +29,7 @@ class String;
 class TreeBase;
 class VectorBase;
 
-/// Swap two values
+/// Swap two values.
 template<class T> inline void Swap(T& first, T& second)
 {
     T temp = first;

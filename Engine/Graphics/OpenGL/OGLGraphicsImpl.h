@@ -31,33 +31,33 @@
 
 class Context;
 
-/// Graphics implementation
+/// Graphics subsystem implementation. Holds API-specific objects.
 class GraphicsImpl
 {
     friend class Graphics;
     
 public:
-    /// Construct
+    /// Construct.
     GraphicsImpl();
     
 private:
-    /// GLFW window
+    /// GLFW window.
     GLFWwindow window_;
-    /// Active texture unit
+    /// Active texture unit.
     unsigned activeTexture_;
-    /// Active draw buffers
+    /// Active draw buffers.
     unsigned drawBuffers_;
-    /// Frame buffer object. Reused whenever rendering to a texture
+    /// Frame buffer object. Reused whenever rendering to a texture.
     unsigned fbo_;
-    /// Vertex attributes in use
+    /// Vertex attributes in use.
     unsigned enabledAttributes_;
-    /// Current pixel format
+    /// Current pixel format.
     int pixelFormat_;
-    /// Current depth bits
+    /// Current depth bits.
     int depthBits_;
-    /// Backbuffer depth bits
+    /// Backbuffer depth bits.
     int windowDepthBits_;
-    /// FBO bound flag
+    /// FBO bound flag.
     bool fboBound_;
 };
 

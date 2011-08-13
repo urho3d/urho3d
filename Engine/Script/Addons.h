@@ -29,7 +29,7 @@
 
 struct SArrayBuffer;
 
-/// Script array type
+/// Script array type.
 class CScriptArray
 {
 public:
@@ -82,7 +82,7 @@ protected:
     void Destruct(SArrayBuffer* buf, asUINT start, asUINT end);
 };
 
-/// Register the array type to script
+/// Register the array type to script.
 void RegisterArray(asIScriptEngine* engine);
-/// Register String to script
+/// Register String to script.
 void RegisterString(asIScriptEngine* engine);

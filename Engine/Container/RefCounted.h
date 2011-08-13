@@ -23,10 +23,10 @@
 
 #pragma once
 
-/// Reference count structure
+/// Reference count structure.
 struct RefCount
 {
-    /// Initialize reference counts to zero and expired status to false
+    /// Construct.
     RefCount() :
         refs_(0),
         weakRefs_(0),
@@ -34,40 +34,40 @@ struct RefCount
     {
     }
     
-    /// Reference count
+    /// Reference count.
     unsigned refs_;
-    /// Weak reference count
+    /// Weak reference count.
     unsigned weakRefs_;
-    /// Expired status for the object
+    /// Expired status for the object.
     bool expired_;
 };
 
-/// Base class for objects that can be pointed to by SharedPtr or WeakPtr. These are noncopyable and non-assignable
+/// Base class for objects that can be pointed to by SharedPtr or WeakPtr. These are noncopyable and non-assignable.
 class RefCounted
 {
 public:
-    /// Construct. Allocate the reference count structure and set an initial self weak reference
+    /// Construct. Allocate the reference count structure and set an initial self weak reference.
     RefCounted();
-    /// Destruct. Mark as expired and also delete the reference count structure if no outside weak references exist
+    /// Destruct. Mark as expired and also delete the reference count structure if no outside weak references exist.
     virtual ~RefCounted();
     
-    /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting
+    /// Increment reference count. Can also be called outside of a SharedPtr for traditional reference counting.
     void AddRef();
-    /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting
+    /// Decrement reference count and delete self if no more references. Can also be called outside of a SharedPtr for traditional reference counting.
     void ReleaseRef();
-    /// Return reference count
+    /// Return reference count.
     unsigned Refs() const;
-    /// Return weak reference count
+    /// Return weak reference count.
     unsigned WeakRefs() const;
-    /// Return pointer to the reference count structure
+    /// Return pointer to the reference count structure.
     RefCount* RefCountPtr() { return refCount_; }
-
+    
 private:
-    /// Prevent copy construction
+    /// Prevent copy construction.
     RefCounted(const RefCounted& rhs);
-    /// Prevent assignment
+    /// Prevent assignment.
     RefCounted& operator = (const RefCounted& rhs);
     
-    /// Pointer to the reference count structure
+    /// Pointer to the reference count structure.
     RefCount* refCount_;
 };

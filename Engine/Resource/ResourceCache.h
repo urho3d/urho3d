@@ -28,114 +28,114 @@
 
 class PackageFile;
 
-/// Container of resources with specific type
+/// Container of resources with specific type.
 struct ResourceGroup
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     ResourceGroup() :
         memoryBudget_(0),
         memoryUse_(0)
     {
     }
     
-    /// Memory budget
+    /// Memory budget.
     unsigned memoryBudget_;
-    /// Current memory use
+    /// Current memory use.
     unsigned memoryUse_;
-    /// Resources
+    /// Resources.
     Map<StringHash, SharedPtr<Resource> > resources_;
 };
 
-/// Resource cache subsystem. Loads resources on demand and stores them for later access
+/// Resource cache subsystem. Loads resources on demand and stores them for later access.
 class ResourceCache : public Object
 {
     OBJECT(ResourceCache);
     
 public:
-    /// Construct
+    /// Construct.
     ResourceCache(Context* context);
-    /// Destruct. Free all resources
+    /// Destruct. Free all resources.
     virtual ~ResourceCache();
     
-    /// Add a resource load directory
+    /// Add a resource load directory.
     bool AddResourceDir(const String& pathName);
-    /// Add a package file for loading resources from
+    /// Add a package file for loading resources from.
     void AddPackageFile(PackageFile* package, bool addAsFirst = false);
-    /// Add a manually created resource. Must be uniquely named
+    /// Add a manually created resource. Must be uniquely named.
     bool AddManualResource(Resource* resource);
-    /// Remove a resource load directory
+    /// Remove a resource load directory.
     void RemoveResourceDir(const String& pathName);
-    /// Remove a package file. Optionally release the resources loaded from it
+    /// Remove a package file. Optionally release the resources loaded from it.
     void RemovePackageFile(PackageFile* package, bool ReleaseResources = true, bool forceRelease = false);
-    /// Remove a package file by name. Optionally release the resources loaded from it
+    /// Remove a package file by name. Optionally release the resources loaded from it.
     void RemovePackageFile(const String& fileName, bool ReleaseResources = true, bool forceRelease = false);
-    /// Release a resource by name
+    /// Release a resource by name.
     void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
-    /// Release a resource by name hash
+    /// Release a resource by name hash.
     void ReleaseResource(ShortStringHash type, StringHash nameHash, bool force = false); 
-    /// Release all resources of a specific type
+    /// Release all resources of a specific type.
     void ReleaseResources(ShortStringHash type, bool force = false);
-    /// Release resources of a specific type and partial name
+    /// Release resources of a specific type and partial name.
     void ReleaseResources(ShortStringHash type, const String& partialName, bool force = false);
-    /// Release all resources
+    /// Release all resources.
     void ReleaseAllResources(bool force = false);
-    /// Reload a resource. Return false and release it if fails
+    /// Reload a resource. Return false and release it if fails.
     bool ReloadResource(Resource* resource);
-    /// %Set memory budget for a specific resource type, default 0 is unlimited
+    /// %Set memory budget for a specific resource type, default 0 is unlimited.
     void SetMemoryBudget(ShortStringHash type, unsigned budget);
     
-    /// Open and return a file from either the resource load paths or from inside a package file. Return null if fails
+    /// Open and return a file from either the resource load paths or from inside a package file. Return null if fails.
     SharedPtr<File> GetFile(const String& name);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if fails
+    /// Return a resource by type and name. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, const String& name);
-    /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails
+    /// Return a resource by type and name hash. Load if not loaded yet. Return null if fails.
     Resource* GetResource(ShortStringHash type, StringHash nameHash);
-    /// Return all loaded resources of a specific type
+    /// Return all loaded resources of a specific type.
     void GetResources(PODVector<Resource*>& result, ShortStringHash type) const;
-    /// Return all loaded resources
+    /// Return all loaded resources.
     const Map<ShortStringHash, ResourceGroup>& GetAllResources() const { return resourceGroups_; }
-    /// Return added resource load directories
+    /// Return added resource load directories.
     const Vector<String>& GetResourceDirs() const { return resourceDirs_; }
-    /// Return added package files
+    /// Return added package files.
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
-    /// Template version of returning a resource by name
+    /// Template version of returning a resource by name.
     template <class T> T* GetResource(const String& name);
-    /// Template version of returning a resource by name hash
+    /// Template version of returning a resource by name hash.
     template <class T> T* GetResource(StringHash nameHash);
-    /// Template version of returning loaded resources of a specific type
+    /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
-    /// Return whether a file exists by name
+    /// Return whether a file exists by name.
     bool Exists(const String& name) const;
-    /// Return whether a file exists by name hash
+    /// Return whether a file exists by name hash.
     bool Exists(StringHash nameHash) const;
-    /// Return memory budget for a resource type
+    /// Return memory budget for a resource type.
     unsigned GetMemoryBudget(ShortStringHash type) const;
-    /// Return total memory use for a resource type
+    /// Return total memory use for a resource type.
     unsigned GetMemoryUse(ShortStringHash type) const;
-    /// Return total memory use for all resources
+    /// Return total memory use for all resources.
     unsigned GetTotalMemoryUse() const;
-    /// Return resource name from hash, or empty if not found
+    /// Return resource name from hash, or empty if not found.
     const String& GetResourceName(StringHash nameHash) const;
-    /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories
+    /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path);
     
 private:
-    /// Find a resource
+    /// Find a resource.
     const SharedPtr<Resource>& FindResource(ShortStringHash type, StringHash nameHash);
-    /// Release resources loaded from a package file
+    /// Release resources loaded from a package file.
     void ReleasePackageResources(PackageFile* package, bool force = false);
-    /// Update a resource group. Recalculate memory use and release resources if over memory budget
+    /// Update a resource group. Recalculate memory use and release resources if over memory budget.
     void UpdateResourceGroup(ShortStringHash type);
-    /// Store a hash-to-name mapping
+    /// Store a hash-to-name mapping.
     void StoreNameHash(const String& name);
     
-    /// Resources by type
+    /// Resources by type.
     Map<ShortStringHash, ResourceGroup> resourceGroups_;
-    /// Resource load directories
+    /// Resource load directories.
     Vector<String> resourceDirs_;
-    /// Package files
+    /// Package files.
     Vector<SharedPtr<PackageFile> > packages_;
-    /// Mapping of hashes to filenames
+    /// Mapping of hashes to filenames.
     Map<StringHash, String> hashToName_;
 };
 
@@ -165,5 +165,5 @@ template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
     }
 }
 
-/// Register Resource library subsystems and objects
+/// Register Resource library subsystems and objects.
 void RegisterResourceLibrary(Context* context);

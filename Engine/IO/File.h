@@ -27,7 +27,7 @@
 #include "Serializer.h"
 #include "Object.h"
 
-/// File open mode
+/// File open mode.
 enum FileMode
 {
     FILE_READ = 0,
@@ -37,57 +37,57 @@ enum FileMode
 
 class PackageFile;
 
-/// File opened either through the filesystem or from within a package file
+/// File opened either through the filesystem or from within a package file.
 class File : public Object, public Deserializer, public Serializer
 {
     OBJECT(File);
     
 public:
-    /// Construct
+    /// Construct.
     File(Context* context);
-    /// Construct and open a filesystem file
+    /// Construct and open a filesystem file.
     File(Context* context, const String& fileName, FileMode mode = FILE_READ);
-    /// Construct and open from a package file
+    /// Construct and open from a package file.
     File(Context* context, PackageFile* package, const String& fileName);
-    /// Destruct. Close the file if open
+    /// Destruct. Close the file if open.
     virtual ~File();
     
-    /// Read bytes from the file. Return number of bytes actually read
+    /// Read bytes from the file. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
-    /// %Set position from the beginning of the file
+    /// %Set position from the beginning of the file.
     virtual unsigned Seek(unsigned position);
-    /// Write bytes to the file. Return number of bytes actually written
+    /// Write bytes to the file. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size);
-    /// Return the file name
+    /// Return the file name.
     virtual const String& GetName() const { return fileName_; }
-    /// Return a checksum of the file contents, using the SDBM hash algorithm
+    /// Return a checksum of the file contents using the SDBM hash algorithm.
     virtual unsigned GetChecksum();
     
-    /// Open a filesystem file. Return true if successful
+    /// Open a filesystem file. Return true if successful.
     bool Open(const String& fileName, FileMode mode = FILE_READ);
-    /// Open from within a package file. Return true if successful
+    /// Open from within a package file. Return true if successful.
     bool Open(PackageFile* package, const String& fileName);
-    /// Close the file
+    /// Close the file.
     void Close();
-    /// Change the file name. Used by the resource system
+    /// Change the file name. Used by the resource system.
     void SetName(const String& name);
     
-    /// Return the open mode
+    /// Return the open mode.
     FileMode GetMode() const { return mode_; }
-    /// Return whether is open
+    /// Return whether is open.
     bool IsOpen() const { return handle_ != 0; }
-    /// Return the file handle
+    /// Return the file handle.
     void* GetHandle() const { return handle_; }
     
 private:
-    /// File name
+    /// File name.
     String fileName_;
-    /// Open mode
+    /// Open mode.
     FileMode mode_;
-    /// File handle
+    /// File handle.
     void* handle_;
-    /// Start position within a package file, 0 for regular files
+    /// Start position within a package file, 0 for regular files.
     unsigned offset_;
-    /// Content checksum
+    /// Content checksum.
     unsigned checksum_;
 };

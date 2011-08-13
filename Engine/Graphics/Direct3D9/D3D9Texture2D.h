@@ -35,40 +35,40 @@ class Texture2D : public Texture
     OBJECT(Texture2D);
     
 public:
-    /// Construct
+    /// Construct.
     Texture2D(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Texture2D();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Release default pool resources
+    /// Release default pool resources.
     virtual void OnDeviceLost();
-    /// Recreate default pool resources
+    /// Recreate default pool resources.
     virtual void OnDeviceReset();
-    /// Release texture
+    /// Release texture.
     virtual void Release();
     
-    /// %Set size, format and usage. Zero size will follow application window size. Return true if successful
+    /// %Set size, format and usage. Zero size will follow application window size. Return true if successful.
     bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-    /// %Set data either partially or fully on a mip level. Return true if successful
+    /// %Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
-    /// Load from an image. Return true if successful
+    /// Load from an image. Return true if successful.
     bool Load(SharedPtr<Image> image, bool useAlpha = false);
     
-    /// Get data from a mip level. The destination buffer must be big enough. Return true if successful
+    /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
-    /// Return render surface
+    /// Return render surface.
     RenderSurface* GetRenderSurface() const { return renderSurface_; }
     
 private:
-    /// Create texture
+    /// Create texture.
     bool Create();
     
-    /// Render surface
+    /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
-    /// Follow window size flag
+    /// Follow window size flag.
     bool followWindowSize_;
 };

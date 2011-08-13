@@ -26,7 +26,7 @@
 #include "Matrix3x4.h"
 #include "Node.h"
 
-/// Base class for components. Components can be created to scene nodes
+/// Base class for components. Components can be created to scene nodes.
 class Component : public Serializable
 {
     OBJECT(Component);
@@ -36,64 +36,57 @@ class Component : public Serializable
     friend class Scene;
     
 public:
-    /// Construct
+    /// Construct.
     Component(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Component();
     
-    /// Handle scene node being assigned at creation
+    /// Handle scene node being assigned at creation.
     virtual void OnNodeSet(Node* node) {};
-    /// Handle scene node transform dirtied
+    /// Handle scene node transform dirtied.
     virtual void OnMarkedDirty(Node* node) {};
-    /// Return the depended on nodes to order network updates
+    /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest) {};
     
-    /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion
+    /// Remove from the scene node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
     
-    /// Return ID
+    /// Return ID.
     unsigned GetID() const { return id_; }
-    /// Get scene node
+    /// Get scene node.
     Node* GetNode() const { return node_; }
     
-    /// Return parent node's world transform
+    /// Return parent node's world transform.
     const Matrix3x4& GetWorldTransform() const { return node_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY; }
-    /// Return parent node's world position
+    /// Return parent node's world position.
     Vector3 GetWorldPosition() const { return GetWorldTransform().Translation(); }
-    /// Return parent node's world rotation
+    /// Return parent node's world rotation.
     Quaternion GetWorldRotation() const { return GetWorldTransform().Rotation(); }
-    /// Return parent node's world scale
+    /// Return parent node's world scale.
     Vector3 GetWorldScale() const { return GetWorldTransform().Scale(); }
     
-    /// Return components in the same scene node by type
+    /// Return components in the same scene node by type.
     void GetComponents(PODVector<Component*>& dest, ShortStringHash type) const;
-    /// Return component in the same scene node by type. The optional index allows to specify which component, if there are several
+    /// Return component in the same scene node by type. The optional index allows to specify which component, if there are several.
     Component* GetComponent(ShortStringHash type, unsigned index = 0) const;
-    /// Return whether the same scene node has a specific component
+    /// Return whether the same scene node has a specific component.
     bool HasComponent(ShortStringHash type) const;
-    /// Template version of returning a component in the same scene node by type
+    /// Template version of returning a component in the same scene node by type.
     template <class T> T* GetComponent(unsigned index = 0) const;
-    /// Template version of returning components in the same scene node by type
+    /// Template version of returning components in the same scene node by type.
     template <class T> void GetComponents(PODVector<T*>& dest) const;
     
 protected:
-    /// %Set ID. Called by Scene
+    /// %Set ID. Called by Scene.
     void SetID(unsigned id);
-    /// %Set scene node. Called by Node when creating the component
+    /// %Set scene node. Called by Node when creating the component.
     void SetNode(Node* node);
     
-    /// Unique ID within the scene
+    /// Unique ID within the scene.
     unsigned id_;
-    /// Scene node
+    /// Scene node.
     Node* node_;
 };
 
-template <class T> T* Component::GetComponent(unsigned index) const
-{
-    return static_cast<T*>(GetComponent(T::GetTypeStatic(), index));
-}
-
-template <class T> void Component::GetComponents(PODVector<T*>& dest) const
-{
-    GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic());
-}
+template <class T> T* Component::GetComponent(unsigned index) const { return static_cast<T*>(GetComponent(T::GetTypeStatic(), index)); }
+template <class T> void Component::GetComponents(PODVector<T*>& dest) const { GetComponents(reinterpret_cast<PODVector<Component*>&>(dest), T::GetTypeStatic()); }

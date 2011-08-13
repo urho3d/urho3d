@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Slider bar UI element
+/// Slider bar UI element.
 class Slider : public BorderImage
 {
     OBJECT(Slider);
@@ -33,62 +33,62 @@ class Slider : public BorderImage
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     Slider(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Slider();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Perform UI element update
+    /// Perform UI element update.
     virtual void Update(float timeStep);
-    /// React to mouse hover
+    /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start
+    /// React to mouse drag start.
     virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag motion
+    /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag end
+    /// React to mouse drag end.
     virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
     
-    /// %Set orientation type
+    /// %Set orientation type.
     void SetOrientation(Orientation orientation);
-    /// %Set slider range maximum value (minimum value is always 0)
+    /// %Set slider range maximum value (minimum value is always 0.)
     void SetRange(float range);
-    /// %Set slider current value
+    /// %Set slider current value.
     void SetValue(float value);
-    /// Change value by a delta
+    /// Change value by a delta.
     void ChangeValue(float delta);
     
-    /// Return orientation type
+    /// Return orientation type.
     Orientation GetOrientation() const { return orientation_; }
-    /// Return slider range
+    /// Return slider range.
     float GetRange() const { return range_; }
-    /// Return slider current value
+    /// Return slider current value.
     float GetValue() const { return value_; }
-    /// Return knob element
+    /// Return knob element.
     BorderImage* GetKnob() const { return knob_; }
     
 protected:
-    /// Update slider knob position & size
+    /// Update slider knob position & size.
     void UpdateSlider();
     
-    /// Slider knob
+    /// Slider knob.
     SharedPtr<BorderImage> knob_;
-    /// Orientation
+    /// Orientation.
     Orientation orientation_;
-    /// Slider range
+    /// Slider range.
     float range_;
-    /// Slider current value
+    /// Slider current value.
     float value_;
-    /// Internal flag of whether the slider is being dragged
+    /// Internal flag of whether the slider is being dragged.
     bool dragSlider_;
-    /// Original mouse cursor position at drag start
+    /// Original mouse cursor position at drag start.
     IntVector2 dragStartCursor_;
-    /// Original slider position at drag start
+    /// Original slider position at drag start.
     IntVector2 dragStartPosition_;
 };

@@ -121,6 +121,10 @@ void Run(const char* cmdLine)
         {
             while (!engine->IsExiting())
                 engine->RunFrame();
+            
+            // Run the optional shutdown function
+            if (scriptFile->GetFunction("void Stop()"))
+                scriptFile->Execute("void Stop()");
         }
         else
         {

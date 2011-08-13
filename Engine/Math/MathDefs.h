@@ -43,7 +43,7 @@ static const float M_INFINITY = (float)HUGE_VAL;
 static const float M_DEGTORAD = (float)M_PI / 180.0f;
 static const float M_RADTODEG = 1.0f / M_DEGTORAD;
 
-/// Intersection test result
+/// Intersection test result.
 enum Intersection
 {
     OUTSIDE,
@@ -51,43 +51,20 @@ enum Intersection
     INSIDE
 };
 
-/// Linear interpolation between two float values
-inline float Lerp(float lhs, float rhs, float t)
-{
-    return lhs * (1.0f - t) + rhs * t;
-}
+/// Linear interpolation between two float values.
+inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive.)
+inline float Random() { return (rand() & 32767) / 32768.0f; }
+/// Return a random float between 0.0 and range, inclusive.
+inline float Random(float range) { return (rand() & 32767) * range / 32767.0f; }
+/// Return a random integer between 0 and range, inclusive.
+inline int Random(int range) { return ((rand() & 32767) * range + 16384) / 32767; }
+/// Return the smaller of two floats.
+inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
+/// Return the larger of two floats.
+inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return a random float between 0.0 (inclusive) and 1.0 (exclusive)
-inline float Random()
-{
-    return (rand() & 32767) / 32768.0f;
-}
-
-/// Return a random float between 0.0 and range, inclusive
-inline float Random(float range)
-{
-    return (rand() & 32767) * range / 32767.0f;
-}
-
-/// Return a random integer between 0 and range, inclusive
-inline int Random(int range)
-{
-    return ((rand() & 32767) * range + 16384) / 32767;
-}
-
-/// Return the smaller of two floats
-inline float Min(float lhs, float rhs)
-{
-    return lhs < rhs ? lhs : rhs;
-}
-
-/// Return the larger of two floats
-inline float Max(float lhs, float rhs)
-{
-    return lhs > rhs ? lhs : rhs;
-}
-
-/// Clamp a float to a range
+/// Clamp a float to a range.
 inline float Clamp(float value, float min, float max)
 {
     if (value < min)
@@ -98,25 +75,14 @@ inline float Clamp(float value, float min, float max)
         return value;
 }
 
-/// Check whether two floating point values are equal within accuracy
-inline bool Equals(float lhs, float rhs)
-{
-    return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs;
-}
+/// Check whether two floating point values are equal within accuracy.
+inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
+/// Return the smaller of two integers.
+inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
+/// Return the larger of two integers.
+inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return the smaller of two integers
-inline int Min(int lhs, int rhs)
-{
-    return lhs < rhs ? lhs : rhs;
-}
-
-/// Return the larger of two integers
-inline int Max(int lhs, int rhs)
-{
-    return lhs > rhs ? lhs : rhs;
-}
-
-/// Clamp an integer to a range
+/// Clamp an integer to a range.
 inline int Clamp(int value, int min, int max)
 {
     if (value < min)
@@ -127,7 +93,7 @@ inline int Clamp(int value, int min, int max)
         return value;
 }
 
-/// Check whether an unsigned integer is a power of two
+/// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
 {
     if (!value)
@@ -137,7 +103,7 @@ inline bool IsPowerOfTwo(unsigned value)
     return value == 1;
 }
 
-/// Round up to next power of two
+/// Round up to next power of two.
 inline unsigned NextPowerOfTwo(unsigned value)
 {
     unsigned ret = 1;
@@ -146,7 +112,7 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ret;
 }
 
-/// Fast square root
+/// Fast square root.
 inline float FastSqrt(float x)
 {
     union
@@ -162,7 +128,7 @@ inline float FastSqrt(float x)
     return u.f;
 }
 
-/// Fast inverse square root
+/// Fast inverse square root.
 inline float FastInvSqrt(float x)
 {
     union
@@ -178,8 +144,5 @@ inline float FastInvSqrt(float x)
     return x;
 }
 
-/// Update a hash with the given 8-bit value using the SDBM algorithm
-inline unsigned SDBMHash(unsigned hash, unsigned char c)
-{
-    return c + (hash << 6) + (hash << 16) - hash;
-}
+/// Update a hash with the given 8-bit value using the SDBM algorithm.
+inline unsigned SDBMHash(unsigned hash, unsigned char c) { return c + (hash << 6) + (hash << 16) - hash; }

@@ -25,16 +25,16 @@
 
 #include "Vector2.h"
 
-/// Three-dimensional vector
+/// Three-dimensional vector.
 class Vector3
 {
 public:
-    /// Construct an undefined vector
+    /// Construct undefined.
     Vector3()
     {
     }
     
-    /// Copy-construct from another vector
+    /// Copy-construct from another vector.
     Vector3(const Vector3& vector) :
         x_(vector.x_),
         y_(vector.y_),
@@ -42,7 +42,7 @@ public:
     {
     }
     
-    /// Construct from a two-dimensional vector and the Z coordinate
+    /// Construct from a two-dimensional vector and the Z coordinate.
     Vector3(const Vector2& vector, float z) :
         x_(vector.x_),
         y_(vector.y_),
@@ -50,7 +50,7 @@ public:
     {
     }
     
-    /// Construct from coordinates
+    /// Construct from coordinates.
     Vector3(float x, float y, float z) :
         x_(x),
         y_(y),
@@ -58,7 +58,7 @@ public:
     {
     }
     
-    /// Construct from a float array
+    /// Construct from a float array.
     Vector3(const float* data) :
         x_(data[0]),
         y_(data[1]),
@@ -66,7 +66,7 @@ public:
     {
     }
     
-    /// Assign from another vector
+    /// Assign from another vector.
     Vector3& operator = (const Vector3& rhs)
     {
         x_ = rhs.x_;
@@ -75,26 +75,26 @@ public:
         return *this;
     }
     
-    /// Test for equality with another vector
+    /// Test for equality with another vector.
     bool operator == (const Vector3& rhs) const { return Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
-    /// Test for inequality with another vector
+    /// Test for inequality with another vector.
     bool operator != (const Vector3& rhs) const { return !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_); }
-    /// Add a vector
+    /// Add a vector.
     Vector3 operator + (const Vector3& rhs) const { return Vector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
-    /// Return negation
+    /// Return negation.
     Vector3 operator - () const { return Vector3(-x_, -y_, -z_); }
-    /// Subtract a vector
+    /// Subtract a vector.
     Vector3 operator - (const Vector3& rhs) const { return Vector3(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_); }
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Vector3 operator * (float rhs) const { return Vector3(x_ * rhs, y_ * rhs, z_ * rhs); }
-    /// Multiply with a vector
+    /// Multiply with a vector.
     Vector3 operator * (const Vector3& rhs) const { return Vector3(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_); }
-    /// Divide by a scalar
+    /// Divide by a scalar.
     Vector3 operator / (float rhs) const { return Vector3(x_ / rhs, y_ / rhs, z_ / rhs); }
-    /// Divide by a vector
+    /// Divide by a vector.
     Vector3 operator / (const Vector3& rhs) const { return Vector3(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_); }
     
-    /// Add-assign a vector
+    /// Add-assign a vector.
     Vector3& operator += (const Vector3& rhs)
     {
         x_ += rhs.x_;
@@ -103,7 +103,7 @@ public:
         return *this;
     }
     
-    /// Subtract-assign a vector
+    /// Subtract-assign a vector.
     Vector3& operator -= (const Vector3& rhs)
     {
         x_ -= rhs.x_;
@@ -112,7 +112,7 @@ public:
         return *this;
     }
     
-    /// Multiply-assign a scalar
+    /// Multiply-assign a scalar.
     Vector3& operator *= (float rhs)
     {
         x_ *= rhs;
@@ -121,7 +121,7 @@ public:
         return *this;
     }
     
-    /// Multiply-assign a vector
+    /// Multiply-assign a vector.
     Vector3& operator *= (const Vector3& rhs)
     {
         x_ *= rhs.x_;
@@ -130,7 +130,7 @@ public:
         return *this;
     }
     
-    /// Divide-assign a scalar
+    /// Divide-assign a scalar.
     Vector3& operator /= (float rhs)
     {
         float invRhs = 1.0f / rhs;
@@ -140,7 +140,7 @@ public:
         return *this;
     }
     
-    /// Divide-assign a vector
+    /// Divide-assign a vector.
     Vector3& operator /= (const Vector3& rhs)
     {
         x_ /= rhs.x_;
@@ -149,7 +149,7 @@ public:
         return *this;
     }
     
-    /// Normalize to unit length and return the previous length
+    /// Normalize to unit length and return the previous length.
     float Normalize()
     {
         float len = Length();
@@ -164,7 +164,7 @@ public:
         return len;
     }
     
-    /// Normalize to unit length using fast inverse square root
+    /// Normalize to unit length using fast inverse square root.
     void NormalizeFast()
     {
         float invLen = FastInvSqrt(x_ * x_ + y_ * y_ + z_ * z_);
@@ -173,18 +173,18 @@ public:
         z_ *= invLen;
     }
     
-    /// Return length
+    /// Return length.
     float Length() const { return sqrtf(x_ * x_ + y_ * y_ + z_ * z_); }
-    /// Return length using fast square root
+    /// Return length using fast square root.
     float LengthFast() const { return FastSqrt(x_ * x_ + y_ * y_ + z_ * z_); }
-    /// Return squared length
+    /// Return squared length.
     float LengthSquared() const { return x_ * x_ + y_ * y_ + z_ * z_; }
-    /// Calculate dot product
+    /// Calculate dot product.
     float DotProduct(const Vector3& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
-    /// Calculate absolute dot product
+    /// Calculate absolute dot product.
     float AbsDotProduct(const Vector3& rhs) const { return fabsf(x_ * rhs.x_) + fabsf(y_ * rhs.y_) + fabsf(z_ * rhs.z_); }
     
-    /// Calculate cross product
+    /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
     {
         return Vector3(
@@ -194,12 +194,12 @@ public:
         );
     }
     
-    /// Return absolute vector
+    /// Return absolute vector.
     Vector3 Abs() const { return Vector3(fabsf(x_), fabsf(y_), fabsf(z_)); }
-    /// Linear interpolation with another vector
+    /// Linear interpolation with another vector.
     Vector3 Lerp(const Vector3& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
     
-    /// Return normalized to unit length
+    /// Return normalized to unit length.
     Vector3 Normalized() const
     {
         float len = Length();
@@ -209,38 +209,38 @@ public:
             return *this;
     }
     
-    /// Return normalized to unit length using fast inverse square root
+    /// Return normalized to unit length using fast inverse square root.
     Vector3 NormalizedFast() const { return *this * FastInvSqrt(x_ * x_ + y_ * y_ + z_ * z_); }
     
-    /// Return float data
+    /// Return float data.
     const float* GetData() const { return &x_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// X coordinate
+    /// X coordinate.
     float x_;
-    /// Y coordinate
+    /// Y coordinate.
     float y_;
-    /// Z coordinate
+    /// Z coordinate.
     float z_;
     
-    /// Zero vector
+    /// Zero vector.
     static const Vector3 ZERO;
-    /// (-1,0,0) vector
+    /// (-1,0,0) vector.
     static const Vector3 LEFT;
-    /// (1,0,0) vector
+    /// (1,0,0) vector.
     static const Vector3 RIGHT;
-    /// (0,1,0) vector
+    /// (0,1,0) vector.
     static const Vector3 UP;
-    /// (0,-1,0) vector
+    /// (0,-1,0) vector.
     static const Vector3 DOWN;
-    /// (0,0,1) vector
+    /// (0,0,1) vector.
     static const Vector3 FORWARD;
-    /// (0,0,-1) vector
+    /// (0,0,-1) vector.
     static const Vector3 BACK;
-    /// (1,1,1) vector
+    /// (1,1,1) vector.
     static const Vector3 UNITY;
 };
 
-/// Multiply Vector3 with a scalar
+/// Multiply Vector3 with a scalar.
 inline Vector3 operator * (float lhs, const Vector3& rhs) { return rhs * lhs; }

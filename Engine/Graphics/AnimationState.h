@@ -34,73 +34,73 @@ class Skeleton;
 struct AnimationTrack;
 struct Bone;
 
-/// Animation instance in an animated model
+/// Animation instance in an animated model.
 class AnimationState : public RefCounted
 {
 public:
-    /// Construct with animated model and animation pointers
+    /// Construct with animated model and animation pointers.
     AnimationState(AnimatedModel* model, Animation* animation);
-    /// Destruct
+    /// Destruct.
     ~AnimationState();
     
-    /// %Set start bone
+    /// %Set start bone.
     void SetStartBone(Bone* bone);
-    /// %Set looping enabled/disabled
+    /// %Set looping enabled/disabled.
     void SetLooped(bool looped);
-    /// %Set blending weight
+    /// %Set blending weight.
     void SetWeight(float weight);
-    /// %Set time position
+    /// %Set time position.
     void SetTime(float time);
-    /// Modify blending weight
+    /// Modify blending weight.
     void AddWeight(float delta);
-    /// Modify time position
+    /// Modify time position.
     void AddTime(float delta);
-    /// %Set blending layer
+    /// %Set blending layer.
     void SetLayer(unsigned char layer);
-    /// %Set whether to use nlerp instead of slerp for rotation, default false
+    /// %Set whether to use nlerp instead of slerp for rotation, default false.
     void SetUseNlerp(bool enable);
     
-    /// Return animation
+    /// Return animation.
     Animation* GetAnimation() const { return animation_; }
-    /// Return start bone
+    /// Return start bone.
     Bone* GetStartBone() const;
-    /// Return whether weight is nonzero
+    /// Return whether weight is nonzero.
     bool IsEnabled() const { return weight_ > 0.0f; }
-    /// Return whether looped
+    /// Return whether looped.
     bool IsLooped() const { return looped_; }
-    /// Return blending weight
+    /// Return blending weight.
     float GetWeight() const { return weight_; }
-    /// Return time position
+    /// Return time position.
     float GetTime() const { return time_; }
-    /// Return animation length
+    /// Return animation length.
     float GetLength() const;
-    /// Return blending layer
+    /// Return blending layer.
     unsigned char GetLayer() const { return layer_; }
-    /// Return whether using nlerp for rotation
+    /// Return whether using nlerp for rotation.
     bool GetUseNlerp() const { return useNlerp_; }
     
-    /// Apply to the animated model's skeleton. Called by AnimatedModel
+    /// Apply to the animated model's skeleton. Called by AnimatedModel.
     void Apply();
     
 private:
-    /// Animated model
+    /// Animated model.
     WeakPtr<AnimatedModel> model_;
-    /// Animation
+    /// Animation.
     SharedPtr<Animation> animation_;
-    /// Start bone
+    /// Start bone.
     Bone* startBone_;
-    /// Mapping of animation track indices to bones
+    /// Mapping of animation track indices to bones.
     HashMap<unsigned, Bone*> trackToBoneMap_;
-    /// Last keyframe on each animation track for optimized keyframe search
+    /// Last keyframe on each animation track for optimized keyframe search.
     PODVector<unsigned> lastKeyFrame_;
-    /// Looped flag
+    /// Looped flag.
     bool looped_;
-    /// Blending weight
+    /// Blending weight.
     float weight_;
-    /// Time position
+    /// Time position.
     float time_;
-    /// Blending layer
+    /// Blending layer.
     unsigned char layer_;
-    /// Nlerp flag
+    /// Nlerp flag.
     bool useNlerp_;
 };

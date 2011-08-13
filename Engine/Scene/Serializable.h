@@ -30,77 +30,77 @@ class Deserializer;
 class Serializer;
 class XMLElement;
 
-/// Base class for objects with automatic serialization through attributes
+/// Base class for objects with automatic serialization through attributes.
 class Serializable : public Object
 {
     OBJECT(Serializable);
     
 public:
-    /// Construct
+    /// Construct.
     Serializable(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Serializable();
     
-    /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor
+    /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor
+    /// Handle attribute read access. Default implementation reads the variable at offset, or invokes the get accessor.
     virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest);
-    /// Load from binary data. Return true if successful
+    /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save as binary data. Return true if successful
+    /// Save as binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
-    /// Load from XML data. Return true if successful
+    /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source);
-    /// Save as XML data. Return true if successful
+    /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest);
-    /// Perform finalization after a scene load or network update
+    /// Perform finalization after a scene load or network update.
     virtual void FinishUpdate() {}
     
-    /// %Set attribute by index. Return true if successfully set
+    /// %Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
-    /// %Set attribute by name. Return true if successfully set
+    /// %Set attribute by name. Return true if successfully set.
     bool SetAttribute(const String& name, const Variant& value);
-    /// Write initial delta network update (compared to default attribute values) and prepare the last sent state
+    /// Write initial delta network update (compared to default attribute values) and prepare the last sent state.
     void WriteInitialDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
-    /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate()
+    /// Prepare delta and latest data network updates. Needs a previously prepared last sent state from WriteInitialDeltaUpdate().
     void PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& classCurrentState, Vector<Variant>& replicationState, bool& deltaUpdate, bool& latestData);
-    /// Write a delta network update prepared with PrepareUpdates()
+    /// Write a delta network update prepared with PrepareUpdates().
     void WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& deltaUpdateBits, Vector<Variant>& replicationState);
-    /// Write a latestdata network update prepared with PrepareUpdates()
+    /// Write a latestdata network update prepared with PrepareUpdates().
     void WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& replicationState);
-    /// Read and apply a network delta update
+    /// Read and apply a network delta update.
     void ReadDeltaUpdate(Deserializer& source, PODVector<unsigned char>& deltaUpdateBits);
-    /// Read and apply a network latest data update
+    /// Read and apply a network latest data update.
     void ReadLatestDataUpdate(Deserializer& source);
     
-    /// Return attribute value by index. Return empty if illegal index
+    /// Return attribute value by index. Return empty if illegal index.
     Variant GetAttribute(unsigned index);
-    /// Return attribute value by name. Return empty if not found
+    /// Return attribute value by name. Return empty if not found.
     Variant GetAttribute(const String& name);
-    /// Return number of attributes
+    /// Return number of attributes.
     unsigned GetNumAttributes() const;
-    /// Return number of network replication attributes
+    /// Return number of network replication attributes.
     unsigned GetNumNetworkAttributes() const;
-    /// Return attribute descriptions, or null if none defined
+    /// Return attribute descriptions, or null if none defined.
     const Vector<AttributeInfo>* GetAttributes() const;
-    /// Return network replication attribute descriptions, or null if none defined
+    /// Return network replication attribute descriptions, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes() const;
-    /// Return whether is loading attributes from a file. Is false during network deserialization
+    /// Return whether is loading attributes from a file. Is false during network deserialization.
     bool IsLoading() const { return loading_; }
     
 protected:
-    /// Is loading flag
+    /// Is loading flag.
     bool loading_;
 };
 
-/// Template implementation of the attribute accessor invoke helper class
+/// Template implementation of the attribute accessor invoke helper class.
 template <class T, class U> class AttributeAccessorImpl : public AttributeAccessor
 {
 public:
     typedef U (T::*GetFunctionPtr)() const;
     typedef void (T::*SetFunctionPtr)(U);
     
-    /// Construct with function pointers
+    /// Construct with function pointers.
     AttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
         getFunction_(getFunction),
         setFunction_(setFunction)
@@ -109,7 +109,7 @@ public:
         assert(setFunction_);
     }
     
-    /// Invoke getter function
+    /// Invoke getter function.
     virtual void Get(Serializable* ptr, Variant& dest)
     {
         assert(ptr);
@@ -117,7 +117,7 @@ public:
         dest = (classPtr->*getFunction_)();
     }
     
-    /// Invoke setter function
+    /// Invoke setter function.
     virtual void Set(Serializable* ptr, const Variant& value)
     {
         assert(ptr);
@@ -125,20 +125,20 @@ public:
         (classPtr->*setFunction_)(value.Get<U>());
     }
     
-    /// Class-specific pointer to getter function
+    /// Class-specific pointer to getter function.
     GetFunctionPtr getFunction_;
-    /// Class-specific pointer to setter function
+    /// Class-specific pointer to setter function.
     SetFunctionPtr setFunction_;
 };
 
-/// Template implementation of the attribute accessor invoke helper class using const references
+/// Template implementation of the attribute accessor invoke helper class using const references.
 template <class T, class U> class RefAttributeAccessorImpl : public AttributeAccessor
 {
 public:
     typedef const U& (T::*GetFunctionPtr)() const;
     typedef void (T::*SetFunctionPtr)(const U&);
     
-    /// Construct with function pointers
+    /// Construct with function pointers.
     RefAttributeAccessorImpl(GetFunctionPtr getFunction, SetFunctionPtr setFunction) :
         getFunction_(getFunction),
         setFunction_(setFunction)
@@ -147,7 +147,7 @@ public:
         assert(setFunction_);
     }
     
-    /// Invoke getter function
+    /// Invoke getter function.
     virtual void Get(Serializable* ptr, Variant& dest)
     {
         assert(ptr);
@@ -155,7 +155,7 @@ public:
         dest = (classPtr->*getFunction_)();
     }
     
-    /// Invoke setter function
+    /// Invoke setter function.
     virtual void Set(Serializable* ptr, const Variant& value)
     {
         assert(ptr);
@@ -163,9 +163,9 @@ public:
         (classPtr->*setFunction_)(value.Get<U>());
     }
     
-    /// Class-specific pointer to getter function
+    /// Class-specific pointer to getter function.
     GetFunctionPtr getFunction_;
-    /// Class-specific pointer to setter function
+    /// Class-specific pointer to setter function.
     SetFunctionPtr setFunction_;
 };
 

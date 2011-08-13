@@ -1,12 +1,12 @@
 // Remake of NinjaSnowWar in script
 
-#include "Scripts/LightFlash.as"
-#include "Scripts/Network.as"
-#include "Scripts/Ninja.as"
-#include "Scripts/Player.as"
-#include "Scripts/Potion.as"
-#include "Scripts/SnowBall.as"
-#include "Scripts/SnowCrate.as"
+#include "Scripts/NinjaSnowWar/LightFlash.as"
+#include "Scripts/NinjaSnowWar/Ninja.as"
+#include "Scripts/NinjaSnowWar/Player.as"
+#include "Scripts/NinjaSnowWar/Potion.as"
+#include "Scripts/NinjaSnowWar/SnowBall.as"
+#include "Scripts/NinjaSnowWar/SnowCrate.as"
+#include "Scripts/Utilities/Network.as"
 
 const float mouseSensitivity = 0.125;
 const float cameraMinDist = 25;

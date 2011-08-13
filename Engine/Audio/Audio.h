@@ -34,102 +34,102 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// Audio subsystem. Uses PortAudio for the actual sound output
+/// Audio subsystem. Uses either DirectSound or PortAudio for the actual sound output.
 class Audio : public Object
 {
     OBJECT(Audio);
     
 public:
-    /// Construct
+    /// Construct.
     Audio(Context* context);
-    /// Destruct. Terminate the audio thread and free the audio buffer
+    /// Destruct. Terminate the audio thread and free the audio buffer.
     virtual ~Audio();
     
-    /// Initialize sound output with specified buffer length and output mode
+    /// Initialize sound output with specified buffer length and output mode.
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolate = true);
     /// Run update on sound sources. Not required for continued playback, but frees unused sound sources & sounds and updates 3D positions.
     void Update(float timeStep);
-    /// Restart sound output
+    /// Restart sound output.
     bool Play();
-    /// Suspend sound output
+    /// Suspend sound output.
     void Stop();
     /// %Set master gain on a specific sound type such as sound effects, music or voice.
     void SetMasterGain(SoundType type, float gain);
-    /// %Set listener position
+    /// %Set listener position.
     void SetListenerPosition(const Vector3& position);
-    /// %Set listener rotation
+    /// %Set listener rotation.
     void SetListenerRotation(const Quaternion& rotation);
-    /// %Set listener position and rotation
+    /// %Set listener position and rotation.
     void SetListenerTransform(const Vector3& position, const Quaternion& rotation);
-    /// Stop any sound source playing a certain sound clip
+    /// Stop any sound source playing a certain sound clip.
     void StopSound(Sound* sound);
     
-    /// Return byte size of one sample
+    /// Return byte size of one sample.
     unsigned GetSampleSize() const { return sampleSize_; }
-    /// Return mixing rate
+    /// Return mixing rate.
     int GetMixRate() const { return mixRate_; }
-    /// Return whether output is stereo
+    /// Return whether output is stereo.
     bool IsStereo() const { return stereo_; }
-    /// Return whether output is interpolated
+    /// Return whether output is interpolated.
     bool IsInterpolated() const { return interpolate_; }
-    /// Return whether audio is being output
+    /// Return whether audio is being output.
     bool IsPlaying() const { return playing_; }
-    /// Return whether an audio stream has been reserved
+    /// Return whether an audio stream has been reserved.
     bool IsInitialized() const { return stream_ != 0; }
-    /// Return master gain for a specific sound source type
+    /// Return master gain for a specific sound source type.
     float GetMasterGain(SoundType type) const;
-    /// Return listener position
+    /// Return listener position.
     const Vector3& GetListenerPosition() const { return listenerPosition_; }
-    /// Return listener rotation
+    /// Return listener rotation.
     const Quaternion& GetListenerRotation() const { return listenerRotation_; }
-    /// Return all sound sources
+    /// Return all sound sources.
     const PODVector<SoundSource*>& GetSoundSources() const { return soundSources_; }
     
-    /// Add a sound source to keep track of. Called by SoundSource
+    /// Add a sound source to keep track of. Called by SoundSource.
     void AddSoundSource(SoundSource* soundSource);
-    /// Remove a sound source. Called by SoundSource
+    /// Remove a sound source. Called by SoundSource.
     void RemoveSoundSource(SoundSource* soundSource);
-    /// Return audio thread mutex
+    /// Return audio thread mutex.
     Mutex& GetMutex() { return audioMutex_; }
-    /// Return sound type specific gain multiplied by master gain
+    /// Return sound type specific gain multiplied by master gain.
     float GetSoundSourceMasterGain(SoundType type) const { return masterGain_[SOUND_MASTER] * masterGain_[type]; }
     
-    /// Mix sound sources into the buffer
+    /// Mix sound sources into the buffer.
     void MixOutput(void *dest, unsigned samples);
     
 private:
-    /// Handle render update event
+    /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    /// Stop sound output and release the sound buffer
+    /// Stop sound output and release the sound buffer.
     void Release();
     
-    /// Sound output stream
+    /// Sound output stream.
     void* stream_;
-    /// Clipping buffer for mixing
+    /// Clipping buffer for mixing.
     SharedArrayPtr<int> clipBuffer_;
-    /// Audio thread mutex
+    /// Audio thread mutex.
     Mutex audioMutex_;
-    /// Sample size
+    /// Sample size.
     unsigned sampleSize_;
-    /// Clip buffer size in samples
+    /// Clip buffer size in samples.
     unsigned fragmentSize_;
-    /// Mixing rate
+    /// Mixing rate.
     int mixRate_;
-    /// Stereo flag
+    /// Stereo flag.
     bool stereo_;
-    /// Interpolation flag
+    /// Interpolation flag.
     bool interpolate_;
-    /// Playing flag
+    /// Playing flag.
     bool playing_;
-    /// Master gain by sound source type
+    /// Master gain by sound source type.
     float masterGain_[MAX_SOUND_TYPES];
-    /// Sound sources
+    /// Sound sources.
     PODVector<SoundSource*> soundSources_;
-    /// Listener position
+    /// Listener position.
     Vector3 listenerPosition_;
-    /// Listener rotation
+    /// Listener rotation.
     Quaternion listenerRotation_;
 };
 
-/// Register Sound library objects
+/// Register Sound library objects.
 void RegisterAudioLibrary(Context* context);

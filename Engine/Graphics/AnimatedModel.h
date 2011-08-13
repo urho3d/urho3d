@@ -31,7 +31,7 @@ class Animation;
 class AnimationState;
 class DebugRenderer;
 
-/// Animated model component
+/// Animated model component.
 class AnimatedModel : public StaticModel
 {
     OBJECT(AnimatedModel);
@@ -39,171 +39,171 @@ class AnimatedModel : public StaticModel
     friend class AnimationState;
     
 public:
-    /// Construct
+    /// Construct.
     AnimatedModel(Context* context);
-    /// Destruct. Free the animation states
+    /// Destruct.
     virtual ~AnimatedModel();
-    /// Register object factory. Drawable must be registered first
+    /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Perform finalization after a scene load or network update
+    /// Perform finalization after a scene load or network update.
     virtual void FinishUpdate();
-    /// Process renderer raycast
+    /// Process renderer raycast.
     virtual void ProcessRayQuery(RayOctreeQuery& query, float initialDistance);
-    /// Update before octree reinsertion. Animation is updated here
+    /// Update before octree reinsertion. Animation is updated here.
     virtual void Update(const FrameInfo& frame);
-    /// Calculate distance for rendering
+    /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Prepare geometry for rendering
+    /// Prepare geometry for rendering.
     virtual void UpdateGeometry(const FrameInfo& frame);
-    /// Return rendering batch
+    /// Return rendering batch.
     virtual void GetBatch(const FrameInfo& frame, unsigned batchIndex, Batch& batch);
-    /// Add debug geometry to the debug graphics
+    /// Add debug geometry to the debug graphics.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set model
+    /// %Set model.
     void SetModel(Model* model, bool createBones = true);
-    /// Add an animation
+    /// Add an animation.
     AnimationState* AddAnimationState(Animation* animation);
-    /// Remove an animation by animation pointer
+    /// Remove an animation by animation pointer.
     void RemoveAnimationState(Animation* animation);
-    /// Remove an animation by animation name
+    /// Remove an animation by animation name.
     void RemoveAnimationState(const String& animationName);
-    /// Remove an animation by animation name hash
+    /// Remove an animation by animation name hash.
     void RemoveAnimationState(StringHash animationNameHash);
-    /// Remove an animation by AnimationState pointer
+    /// Remove an animation by AnimationState pointer.
     void RemoveAnimationState(AnimationState* state);
-    /// Remove all animations
+    /// Remove all animations.
     void RemoveAllAnimationStates();
-    /// %Set animation LOD bias
+    /// %Set animation LOD bias.
     void SetAnimationLodBias(float bias);
-    /// %Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible)
+    /// %Set animation LOD distance factor when not visible (default 0 = do not update at all when invisible.)
     void SetInvisibleLodFactor(float factor);
-    /// %Set vertex morph weight by index
+    /// %Set vertex morph weight by index.
     void SetMorphWeight(unsigned index, float weight);
-    /// %Set vertex morph weight by name
+    /// %Set vertex morph weight by name.
     void SetMorphWeight(const String& name, float weight);
-    /// %Set vertex morph weight by name hash
+    /// %Set vertex morph weight by name hash.
     void SetMorphWeight(StringHash nameHash, float weight);
-    /// Reset all vertex morphs to zero
+    /// Reset all vertex morphs to zero.
     void ResetMorphWeights();
     
-    /// Return skeleton
+    /// Return skeleton.
     Skeleton& GetSkeleton() { return skeleton_; }
-    /// Return all animation states
+    /// Return all animation states.
     const Vector<SharedPtr<AnimationState> >& GetAnimationStates() const { return animationStates_; }
-    /// Return number of animation states
+    /// Return number of animation states.
     unsigned GetNumAnimationStates() const { return animationStates_.Size(); }
-    /// Return animation state by animation pointer
+    /// Return animation state by animation pointer.
     AnimationState* GetAnimationState(Animation* animation) const;
-    /// Return animation state by animation name
+    /// Return animation state by animation name.
     AnimationState* GetAnimationState(const String& animationName) const;
-    /// Return animation state by animation name hash
+    /// Return animation state by animation name hash.
     AnimationState* GetAnimationState(const StringHash animationNameHash) const;
-    /// Return animation state by index
+    /// Return animation state by index.
     AnimationState* GetAnimationState(unsigned index) const;
-    /// Return animation LOD bias
+    /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
-    /// Return animation LOD distance factor when not visible
+    /// Return animation LOD distance factor when not visible.
     float GetInvisibleLodFactor() const { return invisibleLodFactor_; }
-    /// Return all vertex morphs
+    /// Return all vertex morphs.
     const Vector<ModelMorph>& GetMorphs() const { return morphs_; }
-    /// Return all morph vertex buffers
+    /// Return all morph vertex buffers.
     const Vector<SharedPtr<VertexBuffer> >& GetMorphVertexBuffers() const { return morphVertexBuffers_; }
-    /// Return number of vertex morphs
+    /// Return number of vertex morphs.
     unsigned GetNumMorphs() const { return morphs_.Size(); }
-    /// Return vertex morph weight by index
+    /// Return vertex morph weight by index.
     float GetMorphWeight(unsigned index) const;
-    /// Return vertex morph weight by name
+    /// Return vertex morph weight by name.
     float GetMorphWeight(const String& name) const;
-    /// Return vertex morph weight by name hash
+    /// Return vertex morph weight by name hash.
     float GetMorphWeight(StringHash nameHash) const;
-    /// Return whether is the master (first) animated model
+    /// Return whether is the master (first) animated model.
     bool IsMaster() const { return isMaster_; }
     
-    /// %Set model attribute
+    /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
-    /// %Set bones' animation enabled attribute
+    /// %Set bones' animation enabled attribute.
     void SetBonesEnabledAttr(PODVector<unsigned char> value);
-    /// %Set animation states attribute
+    /// %Set animation states attribute.
     void SetAnimationStatesAttr(PODVector<unsigned char> value);
-    /// Return model attribute
+    /// Return model attribute.
     ResourceRef GetModelAttr() const;
-    /// Return bones' animation enabled attribute
+    /// Return bones' animation enabled attribute.
     PODVector<unsigned char> GetBonesEnabledAttr() const;
-    /// Return animation states attribute
+    /// Return animation states attribute.
     PODVector<unsigned char> GetAnimationStatesAttr() const;
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Handle node transform being dirtied
+    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
-    /// Update world-space bounding box
+    /// Update world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Assign skeleton and animation bone node references as a postprocess. Called by FinishUpdate
+    /// Assign skeleton and animation bone node references as a postprocess. Called by FinishUpdate.
     void AssignBoneNodes();
-    /// Mark animation and skinning to require an update
+    /// Mark animation and skinning to require an update.
     void MarkAnimationDirty();
-    /// Mark animation and skinning to require a forced update (blending order changed)
+    /// Mark animation and skinning to require a forced update (blending order changed.)
     void MarkAnimationOrderDirty();
-    /// Mark morphs to require an update
+    /// Mark morphs to require an update.
     void MarkMorphsDirty();
-    /// %Set skeleton
+    /// %Set skeleton.
     void SetSkeleton(const Skeleton& skeleton, bool createBones);
-    /// Refresh mapping of subgeometry bone indices
+    /// Refresh mapping of subgeometry bone indices.
     void RefreshGeometryBoneMappings();
-    /// Clone geometries as required
+    /// Clone geometries as required.
     void cloneGeometries();
-    /// Recalculate animations. Called from updateNode()
+    /// Recalculate animations. Called from UpdateNode().
     void UpdateAnimation(const FrameInfo& frame);
-    /// Recalculate skinning
+    /// Recalculate skinning.
     void UpdateSkinning();
-    /// Reapply all vertex morphs
+    /// Reapply all vertex morphs.
     void UpdateMorphs();
-    /// Apply a vertex morph
+    /// Apply a vertex morph.
     void ApplyMorph(VertexBuffer* buffer, void* lockedMorphRange, const VertexBufferMorph& morph, float weight);
-    /// Handle model reload finished
+    /// Handle model reload finished.
     void HandleModelReloadFinished(StringHash eventType, VariantMap& eventData);
     
-    /// Skeleton
+    /// Skeleton.
     Skeleton skeleton_;
-    /// Morph vertex buffers
+    /// Morph vertex buffers.
     Vector<SharedPtr<VertexBuffer> > morphVertexBuffers_;
-    /// Vertex morphs
+    /// Vertex morphs.
     Vector<ModelMorph> morphs_;
-    /// Animation states
+    /// Animation states.
     Vector<SharedPtr<AnimationState> > animationStates_;
-    /// Skinning matrices
+    /// Skinning matrices.
     PODVector<Matrix3x4> skinMatrices_;
-    /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage
+    /// Mapping of subgeometry bone indices, used if more bones than skinning shader can manage.
     Vector<PODVector<unsigned> > geometryBoneMappings_;
-    /// Subgeometry skinning matrices, used if more bones than skinning shader can manage
+    /// Subgeometry skinning matrices, used if more bones than skinning shader can manage.
     Vector<PODVector<Matrix3x4> > geometrySkinMatrices_;
-    /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage
+    /// Subgeometry skinning matrix pointers, if more bones than skinning shader can manage.
     Vector<PODVector<Matrix3x4*> > geometrySkinMatrixPtrs_;
-    /// The frame number animation LOD distance was last calculated on
+    /// The frame number animation LOD distance was last calculated on.
     unsigned animationLodFrameNumber_;
-    /// Animation LOD bias
+    /// Animation LOD bias.
     float animationLodBias_;
-    /// Animation LOD timer
+    /// Animation LOD timer.
     float animationLodTimer_;
-    /// Animation LOD distance, the minimum of all LOD view distances last frame
+    /// Animation LOD distance, the minimum of all LOD view distances last frame.
     float animationLodDistance_;
-    /// Animation LOD distance factor when not visible
+    /// Animation LOD distance factor when not visible.
     float invisibleLodFactor_;
-    /// Animation dirty flag
+    /// Animation dirty flag.
     bool animationDirty_;
-    /// Animation order dirty flag
+    /// Animation order dirty flag.
     bool animationOrderDirty_;
-    /// Vertex morphs dirty flag
+    /// Vertex morphs dirty flag.
     bool morphsDirty_;
-    /// Skinning dirty flag
+    /// Skinning dirty flag.
     bool skinningDirty_;
-    /// Master model flag
+    /// Master model flag.
     bool isMaster_;
-    /// Bone nodes assignment pending flag
+    /// Bone nodes assignment pending flag.
     bool assignBonesPending_;
 };

@@ -34,9 +34,10 @@ class Deserializer;
 class ResourceCache;
 class Serializer;
 
-/// Bone in a skeleton
+/// Bone in a skeleton.
 struct Bone
 {
+    /// Construct with defaults.
     Bone() :
         parentIndex_(0),
         collisionMask_(0),
@@ -48,70 +49,70 @@ struct Bone
     {
     }
     
-    /// Bone name
+    /// Bone name.
     String name_;
-    /// Bone name hash
+    /// Bone name hash.
     StringHash nameHash_;
-    /// Parent bone index
+    /// Parent bone index.
     unsigned parentIndex_;
-    /// Reset position
+    /// Reset position.
     Vector3 initialPosition_;
-    /// Reset rotation
+    /// Reset rotation.
     Quaternion initialRotation_;
-    /// Reset scale
+    /// Reset scale.
     Vector3 initialScale_;
-    /// Offset matrix
+    /// Offset matrix.
     Matrix3x4 offsetMatrix_;
-    /// Animation enable flag
+    /// Animation enable flag.
     bool animated_;
-    /// Supported collision types
+    /// Supported collision types.
     unsigned char collisionMask_;
-    /// Radius
+    /// Radius.
     float radius_;
-    /// Bounding box
+    /// Bounding box.
     BoundingBox boundingBox_;
-    /// Scene node
+    /// Scene node.
     WeakPtr<Node> node_;
 };
 
-/// Hierarchical collection of bones
+/// Hierarchical collection of bones.
 class Skeleton
 {
 public:
-    /// Construct an empty skeleton
+    /// Construct an empty skeleton.
     Skeleton();
-    /// Destruct
+    /// Destruct.
     ~Skeleton();
     
-    /// Read from a stream. Return true if successful
+    /// Read from a stream. Return true if successful.
     bool Load(Deserializer& source);
-    /// Write to a stream. Return true if successful
+    /// Write to a stream. Return true if successful.
     bool Save(Serializer& dest);
-    /// Define from another skeleton
+    /// Define from another skeleton.
     void Define(const Skeleton& src);
-    /// Clear bones
+    /// Clear bones.
     void ClearBones();
-    /// Reset all animating bones to initial positions
+    /// Reset all animating bones to initial positions.
     void Reset();
     
-    /// Return all bones
+    /// Return all bones.
     const Vector<Bone>& GetBones() const { return bones_; }
-    /// Return modifiable bones
+    /// Return modifiable bones.
     Vector<Bone>& GetModifiableBones() { return bones_; }
-    /// Return number of bones
+    /// Return number of bones.
     unsigned GetNumBones() const { return bones_.Size(); }
-    /// Return root bone
+    /// Return root bone.
     Bone* GetRootBone();
-    /// Return bone by index
+    /// Return bone by index.
     Bone* GetBone(unsigned index);
-    /// Return bone by name
+    /// Return bone by name.
     Bone* GetBone(const String& boneName);
-    /// Return bone by name hash
+    /// Return bone by name hash.
     Bone* GetBone(StringHash boneNameHash);
     
 private:
-    /// Bones
+    /// Bones.
     Vector<Bone> bones_;
-    /// Root bone index
+    /// Root bone index.
     unsigned rootBoneIndex_;
 };

@@ -25,7 +25,7 @@
 
 #include "Vector2.h"
 
-/// Two-dimensional bounding rectangle
+/// Two-dimensional bounding rectangle.
 class Rect
 {
 public:
@@ -147,7 +147,7 @@ public:
     static const Rect ZERO;
 };
 
-/// Two-dimensional bounding rectangle with integer values
+/// Two-dimensional bounding rectangle with integer values.
 class IntRect
 {
 public:

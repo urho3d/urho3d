@@ -34,115 +34,115 @@ static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLFile;
 
-/// Base class for texture resources
+/// Base class for texture resources.
 class Texture : public Resource, public GPUObject
 {
 public:
-    /// Construct
+    /// Construct.
     Texture(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Texture();
     
-    /// Set number of requested mipmap levels. Needs to be called before setting size
+    /// Set number of requested mipmap levels. Needs to be called before setting size.
     void SetNumLevels(unsigned levels);
-    /// Set filtering mode
+    /// Set filtering mode.
     void SetFilterMode(TextureFilterMode filter);
-    /// Set addressing mode by texture coordinate
+    /// Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
-    /// Set shadow compare mode, OpenGL only
+    /// Set shadow compare mode, OpenGL only.
     void SetShadowCompare(bool enable);
-    /// Set border color for border addressing mode
+    /// Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
-    /// Set backup texture to use when rendering to this texture
+    /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
-    /// Dirty the parameters
+    /// Dirty the parameters.
     void SetParametersDirty();
     /// Clear data lost flag. No-op on OpenGL.
     void ClearDataLost();
-    /// Update changed parameters to OpenGL. Called by Graphics when binding the texture
+    /// Update changed parameters to OpenGL. Called by Graphics when binding the texture.
     void UpdateParameters();
 
-    /// Return texture's OpenGL target
+    /// Return texture's OpenGL target.
     unsigned GetTarget() const { return target_; }
-    /// Return texture format
+    /// Return texture format.
     unsigned GetFormat() const { return format_; }
-    /// Return number of mipmap levels
+    /// Return number of mipmap levels.
     unsigned GetLevels() const { return levels_; }
-    /// Return OpenGL depth bits
+    /// Return OpenGL depth bits.
     int GetDepthBits() const { return depthBits_; }
-    /// Return width
+    /// Return width.
     int GetWidth() const { return width_; }
-    /// Return height
+    /// Return height.
     int GetHeight() const { return height_; }
-    /// Return whether data is lost. Always false on OpenGL
+    /// Return whether data is lost. Always false on OpenGL.
     bool IsDataLost() const { return false; }
-    /// Return whether parameters are dirty
+    /// Return whether parameters are dirty.
     bool GetParametersDirty() const { return parametersDirty_; }
-    /// Return filtering mode
+    /// Return filtering mode.
     TextureFilterMode GetFilterMode() const { return filterMode_; }
-    /// Return addressing mode by texture coordinate
+    /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
-    /// Return whether shadow compare is enabled, OpenGL only
+    /// Return whether shadow compare is enabled, OpenGL only.
     bool GetShadowCompare() const { return shadowCompare_; }
-     /// Return border color
+     /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
-    /// Return backup texture
+    /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
-    /// Return mip level width, or 0 if level does not exist
+    /// Return mip level width, or 0 if level does not exist.
     int GetLevelWidth(unsigned level) const;
-    /// Return mip level width, or 0 if level does not exist
+    /// Return mip level width, or 0 if level does not exist.
     int GetLevelHeight(unsigned level) const;
-    /// Return texture usage type
+    /// Return texture usage type.
     TextureUsage GetUsage() const;
-    /// Return data size in bytes for a rectangular region
+    /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
-    /// Return data size in bytes for a pixel or block row
+    /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
-    /// Return API-specific compressed texture format
+    /// Return API-specific compressed texture format.
     static unsigned GetDXTFormat(CompressedFormat format);
-    /// Return the non-internal texture format corresponding to an OpenGL internal format
+    /// Return the non-internal texture format corresponding to an OpenGL internal format.
     static unsigned GetExternalFormat(unsigned format);
-    /// Return the data type corresponding to an OpenGL internal format
+    /// Return the data type corresponding to an OpenGL internal format.
     static unsigned GetDataType(unsigned format);
     
 protected:
-    /// Load parameters
+    /// Load parameters.
     void LoadParameters();
-    /// Load parameters from an XML file
+    /// Load parameters from an XML file.
     void LoadParameters(XMLFile* xml);
-    /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references
+    /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(ShortStringHash type);
     
-    /// OpenGL target
+    /// OpenGL target.
     unsigned target_;
-    /// Texture format
+    /// Texture format.
     unsigned format_;
-    /// Current mipmap levels
+    /// Current mipmap levels.
     unsigned levels_;
-    /// Requested mipmap levels
+    /// Requested mipmap levels.
     unsigned requestedLevels_;
-    /// Texture's OpenGL depth bits (depth textures only)
+    /// Texture's OpenGL depth bits (depth textures only.)
     int depthBits_;
-    /// Texture width
+    /// Texture width.
     int width_;
-    /// Texture height
+    /// Texture height.
     int height_;
-    /// Dynamic flag
+    /// Dynamic flag.
     bool dynamic_;
-    /// Shadow compare mode, OpenGL only
+    /// Shadow compare mode, OpenGL only.
     bool shadowCompare_;
-    /// Parameters dirty flag
+    /// Parameters dirty flag.
     bool parametersDirty_;
-    /// Filtering mode
+    /// Filtering mode.
     TextureFilterMode filterMode_;
-    /// Addressing mode
+    /// Addressing mode.
     TextureAddressMode addressMode_[MAX_COORDS];
-    /// Mipmaps to skip when loading
+    /// Mipmaps to skip when loading.
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
-    /// Border color
+    /// Border color.
     Color borderColor_;
-    /// Backup texture
+    /// Backup texture.
     SharedPtr<Texture> backupTexture_;
-    /// Save data per mip level
+    /// Save data per mip level.
     Vector<SharedArrayPtr<unsigned char> > savedLevels_;
 };

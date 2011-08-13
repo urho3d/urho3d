@@ -26,21 +26,21 @@
 #include "HashBase.h"
 #include "StringHash.h"
 
-/// Rendering mode
+/// Rendering mode.
 enum RenderMode
 {
     RENDER_FORWARD = 0,
     RENDER_DEFERRED
 };
 
-/// Primitive type
+/// Primitive type.
 enum PrimitiveType
 {
     TRIANGLE_LIST = 0,
     LINE_LIST
 };
 
-/// Geometry type
+/// Geometry type.
 enum GeometryType
 {
     GEOM_STATIC = 0,
@@ -50,7 +50,7 @@ enum GeometryType
     MAX_GEOMETRYTYPES
 };
 
-/// Blending mode
+/// Blending mode.
 enum BlendMode
 {
     BLEND_REPLACE = 0,
@@ -63,7 +63,7 @@ enum BlendMode
     MAX_BLENDMODES
 };
 
-/// Depth or stencil compare mode
+/// Depth or stencil compare mode.
 enum CompareMode
 {
     CMP_ALWAYS = 0,
@@ -76,7 +76,7 @@ enum CompareMode
     MAX_COMPAREMODES
 };
 
-/// Culling mode
+/// Culling mode.
 enum CullMode
 {
     CULL_NONE = 0,
@@ -85,14 +85,14 @@ enum CullMode
     MAX_CULLMODES
 };
 
-/// Fill mode
+/// Fill mode.
 enum FillMode
 {
     FILL_SOLID = 0,
     FILL_WIREFRAME
 };
 
-/// Stencil operation
+/// Stencil operation.
 enum StencilOp
 {
     OP_KEEP = 0,
@@ -102,7 +102,7 @@ enum StencilOp
     OP_DECR
 };
 
-/// Buffer lock mode
+/// Buffer lock mode.
 enum LockMode
 {
     LOCK_NORMAL,
@@ -111,7 +111,7 @@ enum LockMode
     LOCK_READONLY
 };
 
-/// Vertex elements
+/// Vertex elements.
 enum VertexElement
 {
     ELEMENT_POSITION = 0,
@@ -130,7 +130,7 @@ enum VertexElement
     MAX_VERTEX_ELEMENTS
 };
 
-/// Texture filtering mode
+/// Texture filtering mode.
 enum TextureFilterMode
 {
     FILTER_NEAREST = 0,
@@ -141,7 +141,7 @@ enum TextureFilterMode
     MAX_FILTERMODES
 };
 
-/// Texture addressing mode
+/// Texture addressing mode.
 enum TextureAddressMode
 {
     ADDRESS_WRAP = 0,
@@ -151,7 +151,7 @@ enum TextureAddressMode
     MAX_ADDRESSMODES
 };
 
-/// Texture coordinates
+/// Texture coordinates.
 enum TextureCoordinate
 {
     COORD_U = 0,
@@ -160,7 +160,7 @@ enum TextureCoordinate
     MAX_COORDS
 };
 
-/// Texture usage types
+/// Texture usage types.
 enum TextureUsage
 {
     TEXTURE_STATIC = 0,
@@ -169,7 +169,7 @@ enum TextureUsage
     TEXTURE_DEPTHSTENCIL
 };
 
-/// Rendering passes
+/// Rendering passes.
 enum PassType
 {
     PASS_GBUFFER,
@@ -181,7 +181,7 @@ enum PassType
     MAX_PASSES
 };
 
-/// Cube map faces
+/// Cube map faces.
 enum CubeMapFace
 {
     FACE_POSITIVE_X = 0,
@@ -193,7 +193,7 @@ enum CubeMapFace
     MAX_CUBEMAP_FACES
 };
 
-/// Shader types
+/// Shader types.
 enum ShaderType
 {
     VS = 0,
@@ -236,7 +236,7 @@ extern StringHash PSP_SHADOWINTENSITY;
 extern StringHash PSP_SHADOWPROJ;
 extern StringHash PSP_SPOTPROJ;
 
-/// Texture units
+/// Texture units.
 enum TextureUnit
 {
     TU_DIFFUSE = 0,

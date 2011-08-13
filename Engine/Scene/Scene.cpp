@@ -37,6 +37,7 @@ static const int ASYNC_LOAD_MIN_FPS = 50;
 static const int ASYNC_LOAD_MAX_MSEC = (int)(1000.0f / ASYNC_LOAD_MIN_FPS);
 static const float DEFAULT_SMOOTHING_CONSTANT = 50.0f;
 static const float DEFAULT_SNAP_THRESHOLD = 1.0f;
+static const String emptyVarName;
 
 OBJECTTYPESTATIC(Scene);
 
@@ -80,6 +81,7 @@ void Scene::RegisterObject(Context* context)
     ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_FLOAT, "Motion Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
     ATTRIBUTE(Scene, VAR_FLOAT, "Motion Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "User Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String(), AM_FILE | AM_NOEDIT);
 }
 
 bool Scene::Load(Deserializer& source)
@@ -301,6 +303,21 @@ void Scene::ResetOwner(Connection* owner)
     }
 }
 
+void Scene::RegisterVar(const String& name)
+{
+    varNames_[ShortStringHash(name)] = name;
+}
+
+void Scene::UnregisterVar(const String& name)
+{
+    varNames_.Erase(ShortStringHash(name));
+}
+
+void Scene::UnregisterAllVars()
+{
+    varNames_.Clear();
+}
+
 Node* Scene::GetNodeByID(unsigned id) const
 {
     Map<unsigned, Node*>::ConstIterator i = allNodes_.Find(id);
@@ -325,6 +342,12 @@ float Scene::GetAsyncProgress() const
         return 1.0f;
     else
         return (float)asyncProgress_.loadedNodes_ / (float)asyncProgress_.totalNodes_;
+}
+
+const String& Scene::GetVarName(ShortStringHash hash) const
+{
+    Map<ShortStringHash, String>::ConstIterator i = varNames_.Find(hash);
+    return i != varNames_.End() ? i->second_ : emptyVarName;
 }
 
 void Scene::Update(float timeStep)
@@ -471,6 +494,29 @@ void Scene::ComponentRemoved(Component* component)
     
     allComponents_.Erase(component->GetID());
     component->SetID(0);
+}
+
+void Scene::SetVarNamesAttr(String value)
+{
+    Vector<String> varNames = value.Split(';');
+    
+    varNames_.Clear();
+    for (Vector<String>::ConstIterator i = varNames.Begin(); i != varNames.End(); ++i)
+        varNames_[ShortStringHash(*i)] = *i;
+}
+
+String Scene::GetVarNamesAttr() const
+{
+    String ret;
+    
+    for (Map<ShortStringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
+    {
+        if (i != varNames_.Begin())
+            ret += ';';
+        ret += i->second_;
+    }
+    
+    return ret;
 }
 
 void Scene::HandleUpdate(StringHash eventType, VariantMap& eventData)

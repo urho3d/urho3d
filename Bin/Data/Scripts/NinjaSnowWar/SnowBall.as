@@ -1,4 +1,4 @@
-#include "Scripts/GameObject.as"
+#include "Scripts/NinjaSnowWar/GameObject.as"
 
 const float snowballMass = 10;
 const float snowballFriction = 0.5;

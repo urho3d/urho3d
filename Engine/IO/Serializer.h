@@ -41,79 +41,79 @@ struct ResourceRefList;
 typedef Vector<Variant> VariantVector;
 typedef HashMap<ShortStringHash, Variant> VariantMap;
 
-/// Abstract stream for writing
+/// Abstract stream for writing.
 class Serializer
 {
 public:
-    /// Destruct
+    /// Destruct.
     virtual ~Serializer();
     
-    /// Write bytes to the stream. Return number of bytes actually written
+    /// Write bytes to the stream. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size) = 0;
     
-    /// Write a 32-bit integer
+    /// Write a 32-bit integer.
     bool WriteInt(int value);
-    /// Write a 16-bit integer
+    /// Write a 16-bit integer.
     bool WriteShort(short value);
-    /// Write an 8-bit integer
+    /// Write an 8-bit integer.
     bool WriteByte(signed char value);
-    /// Write a 32-bit unsigned integer
+    /// Write a 32-bit unsigned integer.
     bool WriteUInt(unsigned value);
-    /// Write a 16-bit unsigned integer
+    /// Write a 16-bit unsigned integer.
     bool WriteUShort(unsigned short value);
-    /// Write an 8-bit unsigned integer
+    /// Write an 8-bit unsigned integer.
     bool WriteUByte(unsigned char value);
-    /// Write a bool
+    /// Write a bool.
     bool WriteBool(bool value);
-    /// Write a float
+    /// Write a float.
     bool WriteFloat(float value);
-    /// Write an IntRect
+    /// Write an IntRect.
     bool WriteIntRect(const IntRect& value);
-    /// Write an IntVector2
+    /// Write an IntVector2.
     bool WriteIntVector2(const IntVector2& value);
-    /// Write a Rect
+    /// Write a Rect.
     bool WriteRect(const Rect& value);
-    /// Write a Vector2
+    /// Write a Vector2.
     bool WriteVector2(const Vector2& value);
-    /// Write a Vector3
+    /// Write a Vector3.
     bool WriteVector3(const Vector3& value);
-    /// Write a Vector3 packed into 3 x 16 bits with the specified maximum absolute range
+    /// Write a Vector3 packed into 3 x 16 bits with the specified maximum absolute range.
     bool WritePackedVector3(const Vector3& value, float maxAbsCoord);
-    /// Write a Vector4
+    /// Write a Vector4.
     bool WriteVector4(const Vector4& value);
-    /// Write a Quaternion
+    /// Write a quaternion.
     bool WriteQuaternion(const Quaternion& value);
-    /// Write a Quaternion with each component packed in 16 bits
+    /// Write a quaternion with each component packed in 16 bits.
     bool WritePackedQuaternion(const Quaternion& value);
-    /// Write a Color
+    /// Write a color.
     bool WriteColor(const Color& value);
-    /// Write a BoundingBox
+    /// Write a bounding box.
     bool WriteBoundingBox(const BoundingBox& value);
-    /// Write a null-terminated string
+    /// Write a null-terminated string.
     bool WriteString(const String& value);
-    /// Write a four-letter file ID. If the string is not long enough, spaces will be appended
+    /// Write a four-letter file ID. If the string is not long enough, spaces will be appended.
     bool WriteFileID(const String& value);
-    /// Write a 32-bit StringHash
+    /// Write a 32-bit StringHash.
     bool WriteStringHash(const StringHash& value);
-    /// Write a 16-bit ShortStringHash
+    /// Write a 16-bit ShortStringHash.
     bool WriteShortStringHash(const ShortStringHash& value);
-    /// Write a buffer, with size encoded as VLE
+    /// Write a buffer, with size encoded as VLE.
     bool WriteBuffer(const PODVector<unsigned char>& buffer);
-    /// Write a resource reference
+    /// Write a resource reference.
     bool WriteResourceRef(const ResourceRef& value);
-    /// Write a resource reference list
+    /// Write a resource reference list.
     bool WriteResourceRefList(const ResourceRefList& value);
-    /// Write a Variant
+    /// Write a variant.
     bool WriteVariant(const Variant& value);
-    /// Write a Variant without the type information
+    /// Write a variant without the type information.
     bool WriteVariantData(const Variant& value);
-    /// Write a variant vector
+    /// Write a variant vector.
     bool WriteVariantVector(const VariantVector& value);
-    /// Write a variant map
+    /// Write a variant map.
     bool WriteVariantMap(const VariantMap& value);
-    /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum
+    /// Write a variable-length encoded unsigned integer, which can use 29 bits maximum.
     bool WriteVLE(unsigned value);
-    /// Write a 24-bit network object ID
+    /// Write a 24-bit network object ID.
     bool WriteNetID(unsigned value);
     /// Write a text line. Char codes 13 & 10 will be automatically appended.
     bool WriteLine(const String& value);

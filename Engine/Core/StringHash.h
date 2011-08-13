@@ -25,42 +25,42 @@
 
 #include "StringBase.h"
 
-/// 32-bit hash value for a string
+/// 32-bit hash value for a string.
 class StringHash
 {
 public:
-    /// Construct with zero value
+    /// Construct with zero value.
     StringHash() :
         value_(0)
     {
     }
     
-    /// Copy-construct from another hash
+    /// Copy-construct from another hash.
     StringHash(const StringHash& rhs) :
         value_(rhs.value_)
     {
     }
     
-    /// Construct with an initial value
+    /// Construct with an initial value.
     explicit StringHash(unsigned value) :
         value_(value)
     {
     }
     
-    /// Construct from a C string case-insensitively
+    /// Construct from a C string case-insensitively.
     explicit StringHash(const char* str);
     
-    /// Construct from a string case-insensitively
+    /// Construct from a string case-insensitively.
     explicit StringHash(const String& str);
     
-    /// Assign from another hash
+    /// Assign from another hash.
     StringHash& operator = (const StringHash& rhs)
     {
         value_ = rhs.value_;
         return *this;
     }
     
-    /// Add a hash
+    /// Add a hash.
     StringHash operator + (const StringHash& rhs) const
     {
         StringHash ret;
@@ -68,84 +68,84 @@ public:
         return ret;
     }
     
-    /// Add-assign a hash
+    /// Add-assign a hash.
     StringHash& operator += (const StringHash& rhs)
     {
         value_ += rhs.value_;
         return *this;
     }
     
-    // Test for equality with another hash
+    // Test for equality with another hash.
     bool operator == (const StringHash& rhs) const { return value_ == rhs.value_; }
-    /// Test for inequality with another hash
+    /// Test for inequality with another hash.
     bool operator != (const StringHash& rhs) const { return value_ != rhs.value_; }
-    /// Test if less than another hash
+    /// Test if less than another hash.
     bool operator < (const StringHash& rhs) const { return value_ < rhs.value_; }
-    /// Test if greater than another hash
+    /// Test if greater than another hash.
     bool operator > (const StringHash& rhs) const { return value_ > rhs.value_; }
-    /// Return true if nonzero hash value
+    /// Return true if nonzero hash value.
     operator bool () const { return value_ != 0; }
-    /// Return hash value
+    /// Return hash value.
     unsigned GetValue() const { return value_; }
-    /// Return unsigned data
+    /// Return unsigned data.
     const unsigned* GetData() const { return &value_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return value_; }
     
-    /// Calculate hash value case-insensitively from a C string
+    /// Calculate hash value case-insensitively from a C string.
     static unsigned Calculate(const char* str);
     
-    /// Zero hash
+    /// Zero hash.
     static const StringHash ZERO;
     
 private:
-    /// Hash value
+    /// Hash value.
     unsigned value_;
 };
 
-/// 16-bit hash value for a string
+/// 16-bit hash value for a string.
 class ShortStringHash
 {
 public:
-    /// Construct with zero hash value
+    /// Construct with zero hash value.
     ShortStringHash() :
         value_(0)
     {
     }
     
-    /// Copy-construct from another hash value
+    /// Copy-construct from another hash value.
     ShortStringHash(const ShortStringHash& rhs) :
         value_(rhs.value_)
     {
     }
     
-    /// Copy-construct from another 32-bit hash value (ignore the high bits)
+    /// Copy-construct from another 32-bit hash value (ignore the high bits.)
     explicit ShortStringHash(const StringHash& rhs) :
         value_(rhs.GetValue())
     {
     }
     
-    /// Construct with an initial value
+    /// Construct with an initial value.
     explicit ShortStringHash(unsigned short value) :
         value_(value)
     {
     }
 
-    /// Construct from a C string case-insensitively
+    /// Construct from a C string case-insensitively.
     explicit ShortStringHash(const char* str);
-    /// Construct from a string case-insensitively
+    /// Construct from a string case-insensitively.
     explicit ShortStringHash(const String& str);
     
-    /// Assign from another hash
+    /// Assign from another hash.
     ShortStringHash& operator = (const ShortStringHash& rhs)
     {
         value_ = rhs.value_;
         return *this;
     }
     
-    /// Add a hash
+    /// Add a hash.
     ShortStringHash operator + (const ShortStringHash& rhs) const
     {
         ShortStringHash ret;
@@ -153,40 +153,40 @@ public:
         return ret;
     }
     
-    // Add-assign a hash
+    // Add-assign a hash.
     ShortStringHash& operator += (const ShortStringHash& rhs)
     {
         value_ += rhs.value_;
         return *this;
     }
     
-    /// Test for equality with another hash
+    /// Test for equality with another hash.
     bool operator == (const ShortStringHash& rhs) const { return value_ == rhs.value_; }
-    /// Test for inequality with another hash
+    /// Test for inequality with another hash.
     bool operator != (const ShortStringHash& rhs) const { return value_ != rhs.value_; }
-    /// Test if less than another hash
+    /// Test if less than another hash.
     bool operator < (const ShortStringHash& rhs) const { return value_ < rhs.value_; }
-    /// Test if greater than another hash
+    /// Test if greater than another hash.
     bool operator > (const ShortStringHash& rhs) const { return value_ > rhs.value_; }
-    /// Return true if nonzero hash value
+    /// Return true if nonzero hash value.
     operator bool () const { return value_ != 0; }
-    /// Return hash value
+    /// Return hash value.
     unsigned short GetValue() const { return value_; }
-    /// Return unsigned short data
+    /// Return unsigned short data.
     const unsigned short* GetData() const { return &value_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return value_; }
     
-    /// Calculate hash value case-insensitively from a C string
+    /// Calculate hash value case-insensitively from a C string.
     static unsigned short Calculate(const char* str);
     
-    /// Zero hash
+    /// Zero hash.
     static const ShortStringHash ZERO;
     
 private:
-    /// Hash value
+    /// Hash value.
     unsigned short value_;
 };
 

@@ -1,4 +1,4 @@
-#include "Scripts/GameObject.as"
+#include "Scripts/NinjaSnowWar/GameObject.as"
 
 class LightFlash : GameObject
 {

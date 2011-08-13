@@ -51,7 +51,7 @@ static const int NUM_SHADOWMAP_RESOLUTIONS = 3;
 static const int MIN_INSTANCES = 4;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
 
-/// Light vertex shader variations
+/// Light vertex shader variations.
 enum LightVSVariation
 {
     LVS_NONE = 0,
@@ -61,7 +61,7 @@ enum LightVSVariation
     MAX_LIGHT_VS_VARIATIONS
 };
 
-/// Light pixel shader variations
+/// Light pixel shader variations.
 enum LightPSVariation
 {
     LPS_NONE = 0,
@@ -83,7 +83,7 @@ enum LightPSVariation
     MAX_LIGHT_PS_VARIATIONS
 };
 
-/// Deferred light volume vertex shader variations
+/// Deferred light volume vertex shader variations.
 enum DeferredLightVSVariation
 {
     DLVS_NONE = 0,
@@ -93,7 +93,7 @@ enum DeferredLightVSVariation
     MAX_DEFERRED_LIGHT_VS_VARIATIONS
 };
 
-/// Deferred light volume pixels shader variations
+/// Deferred light volume pixels shader variations.
 enum DeferredLightPSVariation
 {
     DLPS_NONE = 0,
@@ -131,15 +131,15 @@ enum DeferredLightPSVariation
     MAX_DEFERRED_LIGHT_PS_VARIATIONS
 };
 
-/// Deferred rendering edge filter parameters
+/// Deferred rendering edge filter parameters.
 struct EdgeFilterParameters
 {
-    /// Construct as undefined
+    /// Construct undefined.
     EdgeFilterParameters()
     {
     }
     
-    /// Construct with initial values
+    /// Construct with initial values.
     EdgeFilterParameters(float radius, float threshold, float strength) :
         radius_(radius),
         threshold_(threshold),
@@ -147,18 +147,18 @@ struct EdgeFilterParameters
     {
     }
     
-    //! Validate parameters
+    //! Validate parameters.
     void Validate();
     
-    //! Radius for calculating luminance gradient
+    //! Radius for calculating luminance gradient.
     float radius_;
-    //! Luminance difference threshold needed to pass pixel
+    //! Luminance difference threshold needed to pass pixel.
     float threshold_;
-    //! Filter strength
+    //! Filter strength.
     float strength_;
 };
 
-/// High-level rendering subsystem. Manages drawing of 3D views
+/// High-level rendering subsystem. Manages drawing of 3D views.
 class Renderer : public Object
 {
     OBJECT(Object);
@@ -166,281 +166,281 @@ class Renderer : public Object
     friend class View;
     
 public:
-    /// Construct
+    /// Construct.
     Renderer(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Renderer();
     
-    /// %Set number of viewports to render
+    /// %Set number of viewports to render.
     void SetNumViewports(unsigned num);
-    /// %Set a viewport
+    /// %Set a viewport.
     void SetViewport(unsigned index, const Viewport& viewport);
-    /// %Set specular lighting on/off
+    /// %Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// %Set shadows on/off
+    /// %Set shadows on/off.
     void SetDrawShadows(bool enable);
-    /// %Set texture anisotropy
+    /// %Set texture anisotropy.
     void SetTextureAnisotropy(int level);
-    /// %Set texture filtering
+    /// %Set texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
-    /// %Set texture quality level
+    /// %Set texture quality level.
     void SetTextureQuality(int quality);
-    /// %Set material quality level
+    /// %Set material quality level.
     void SetMaterialQuality(int quality);
-    /// %Set shadow map resolution
+    /// %Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// %Set shadow map 24-bit depth on/off
+    /// %Set shadow map 24-bit depth on/off.
     void SetShadowMapHiresDepth(bool enable);
-    /// %Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing
+    /// %Set reuse of shadowmaps. Default is true, disabling allows transparent geometry shadowing.
     void SetReuseShadowMaps(bool enable);
-    /// %Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first
+    /// %Set number of full, half and quarter size shadowmaps. Only has effect if reuse of shadowmaps is disabled first.
     void SetNumShadowMaps(unsigned full, unsigned half, unsigned quarter);
-    /// %Set dynamic instancing on/off
+    /// %Set dynamic instancing on/off.
     void SetDynamicInstancing(bool enable);
-    /// %Set deferred rendering edge filter parameters
+    /// %Set deferred rendering edge filter parameters.
     void SetEdgeFilter(const EdgeFilterParameters& parameters);
-    /// %Set maximum number of occluder trianges
+    /// %Set maximum number of occluder trianges.
     void SetMaxOccluderTriangles(int triangles);
-    /// %Set occluder buffer width
+    /// %Set occluder buffer width.
     void SetOcclusionBufferSize(int size);
-    /// %Set required size (1.0 = full screen) for occluders
+    /// %Set required size (1.0 = full screen) for occluders.
     void SetOccluderSizeThreshold(float screenSize);
-    /// Return number of viewports
+    /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
-    /// Return viewport
+    /// Return viewport.
     const Viewport& GetViewport(unsigned index) const;
-    /// Return whether specular lighting is enabled
+    /// Return whether specular lighting is enabled.
     bool GetSpecularLighting() const { return specularLighting_; }
-    /// Return whether drawing shadows is enabled
+    /// Return whether drawing shadows is enabled.
     bool GetDrawShadows() const { return drawShadows_; }
-    /// Return texture anisotropy
+    /// Return texture anisotropy.
     int GetTextureAnisotropy() const { return textureAnisotropy_; }
-    /// Return texture filtering
+    /// Return texture filtering.
     TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
-    /// Return texture quality level
+    /// Return texture quality level.
     int GetTextureQuality() const { return textureQuality_; }
-    /// Return material quality level
+    /// Return material quality level.
     int GetMaterialQuality() const { return materialQuality_; }
-    /// Return shadow map resolution
+    /// Return shadow map resolution.
     int GetShadowMapSize() const { return shadowMapSize_; }
-    /// Return whether shadow maps use 24-bit depth
+    /// Return whether shadow maps use 24-bit depth.
     bool GetShadowMapHiresDepth() const { return shadowMapHiresDepth_; }
-    /// Return whether shadow maps are reused
+    /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
-    /// Return number of full resolution shadow maps
+    /// Return number of full resolution shadow maps.
     unsigned GetNumFullShadowMaps() const { return shadowMaps_[0].Size(); }
-    /// Return number of half resolution shadow maps
+    /// Return number of half resolution shadow maps.
     unsigned GetNumHalfShadowMaps() const { return shadowMaps_[1].Size(); }
-    /// Return number of quarter resolution shadow maps
+    /// Return number of quarter resolution shadow maps.
     unsigned GetNumQuarterShadowMaps() const { return shadowMaps_[2].Size(); }
-    /// Return whether dynamic instancing is in use
+    /// Return whether dynamic instancing is in use.
     bool GetDynamicInstancing() const { return dynamicInstancing_; }
-    /// Return deferred rendering edge filter parameters
+    /// Return deferred rendering edge filter parameters.
     const EdgeFilterParameters& GetEdgeFilter() const { return edgeFilter_; }
-    /// Return maximum number of occluder triangles
+    /// Return maximum number of occluder triangles.
     int GetMaxOccluderTriangles() const { return maxOccluderTriangles_; }
-    /// Return occlusion buffer width
+    /// Return occlusion buffer width.
     int GetOcclusionBufferSize() const { return occlusionBufferSize_; }
-    /// Return occluder screen size threshold
+    /// Return occluder screen size threshold.
     float GetOccluderSizeThreshold() const { return occluderSizeThreshold_; }
-    /// Return number of views rendered
+    /// Return number of views rendered.
     unsigned GetNumViews() const { return numViews_; }
-    /// Return number of primitives rendered
+    /// Return number of primitives rendered.
     unsigned GetNumPrimitives() const { return numPrimitives_; }
-    /// Return number of batches rendered
+    /// Return number of batches rendered.
     unsigned GetNumBatches() const { return numBatches_; }
-    /// Return number of geometries rendered
+    /// Return number of geometries rendered.
     unsigned GetNumGeometries(bool allViews = false) const;
-    /// Return number of lights rendered
+    /// Return number of lights rendered.
     unsigned GetNumLights(bool allViews = false) const;
-    /// Return number of shadow maps rendered
+    /// Return number of shadow maps rendered.
     unsigned GetNumShadowMaps(bool allViews = false) const;
-    /// Return number of occluders rendered
+    /// Return number of occluders rendered.
     unsigned GetNumOccluders(bool allViews = false) const;
-    /// Return number of directional light shadow occluders rendered
+    /// Return number of directional light shadow occluders rendered.
     unsigned GetNumShadowOccluders(bool allViews = false) const;
-    /// Return an occlusion buffer for inspection
+    /// Return an occlusion buffer for inspection.
     const OcclusionBuffer* GetOcclusionBuffer(float aspectRatio, bool halfResolution = false);
-    /// Return the default zone
+    /// Return the default zone.
     Zone* GetDefaultZone() const { return defaultZone_; }
-    /// Return the default material
+    /// Return the default material.
     Material* GetDefaultMaterial() const { return defaultMaterial_; }
-    /// Return the default range attenuation texture
+    /// Return the default range attenuation texture.
     Texture2D* GetDefaultLightRamp() const { return defaultLightRamp_; }
-    /// Return the default spotlight attenuation texture
+    /// Return the default spotlight attenuation texture.
     Texture2D* GetDefaultLightSpot() const { return defaultLightSpot; }
-    /// Return a vertex shader by name
+    /// Return a vertex shader by name.
     ShaderVariation* GetVertexShader(const String& name, bool checkExists = false) const;
-    /// Return a pixel shader by name
+    /// Return a pixel shader by name.
     ShaderVariation* GetPixelShader(const String& name, bool checkExists = false) const;
-    /// Return the frame update parameters
+    /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() { return frame_; }
     
-    /// Update for rendering. Called by handleRenderUpdate()
+    /// Update for rendering. Called by HandleRenderUpdate().
     void Update(float timeStep);
-    /// Render. Called by Engine
+    /// Render. Called by Engine.
     void Render();
-    /// Add debug geometry to the debug graphics(s)
+    /// Add debug geometry to the debug graphics(s).
     void DrawDebugGeometry(bool depthTest);
     
 private:
-    /// Initialize when screen mode initially set
+    /// Initialize when screen mode initially set.
     void Initialize();
-    /// Clear views from previous frame
+    /// Clear views from previous frame.
     void ResetViews();
-    /// Add a view. Return true if successful
+    /// Add a view. Return true if successful.
     bool AddView(RenderSurface* renderTarget, const Viewport& viewport);
-    /// Return an occlusion buffer for use
+    /// Return an occlusion buffer for use.
     OcclusionBuffer* GetOrCreateOcclusionBuffer(Camera* camera, int maxOccluderTriangles, bool halfResolution = false);
-    /// Return volume geometry for a light
+    /// Return volume geometry for a light.
     Geometry* GetLightGeometry(Light* light);
-    /// Return shadow map by resolution. If shadow map reuse is disabled, a different map is returned each time
+    /// Return shadow map by resolution. If shadow map reuse is disabled, a different map is returned each time.
     Texture2D* GetShadowMap(float resolution);
-    /// Reset shadow map use count
+    /// Reset shadow map use count.
     void ResetShadowMapUseCount();
-    /// Get a shader program
+    /// Get a shader program.
     ShaderVariation* GetShader(const String& name, const String& extension, bool checkExists) const;
-    /// Choose shaders for a batch
+    /// Choose shaders for a batch.
     void SetBatchShaders(Batch& batch, Technique* technique, Pass* pass, bool allowShadows = true);
-    /// Choose light volume shaders for a batch
+    /// Choose light volume shaders for a batch.
     void SetLightVolumeShaders(Batch& batch);
-    /// Reload shaders
+    /// Reload shaders.
     void LoadShaders();
-    /// Reload shaders for a material technique
+    /// Reload shaders for a material technique.
     void LoadMaterialShaders(Technique* technique);
-    /// Reload shaders for a material pass
+    /// Reload shaders for a material pass.
     void LoadPassShaders(Technique* technique, PassType pass, bool allowShadows = true);
-    /// Release shaders used in materials
+    /// Release shaders used in materials.
     void ReleaseMaterialShaders();
-    /// Reload textures
+    /// Reload textures.
     void ReloadTextures();
-    /// Create light volume geometries
+    /// Create light volume geometries.
     void CreateGeometries();
-    /// Create instancing vertex buffer
+    /// Create instancing vertex buffer.
     void CreateInstancingBuffer();
-    /// Ensure sufficient size of the instancing vertex buffer. Return true if successful
+    /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
-    /// Create shadow maps. Return true if successful
+    /// Create shadow maps. Return true if successful.
     bool CreateShadowMaps();
-    /// Split a light into several for shadow mapping
+    /// Split a light into several for shadow mapping.
     unsigned SplitLight(Light* light);
-    /// Allocate a shadow camera and a scene node for it
+    /// Allocate a shadow camera and a scene node for it.
     Camera* CreateShadowCamera();
-    /// Allocate (if necessary) and clone a light. Attach it to a temporary scene node
+    /// Allocate (if necessary) and clone a light. Attach it to a temporary scene node.
     Light* CreateSplitLight(Light* original);
-    /// Allocate a temporary scene node for attaching a split light or a shadow camera
+    /// Allocate a temporary scene node for attaching a split light or a shadow camera.
     Node* CreateTempNode();
-    /// %Set up a light volume rendering batch
+    /// %Set up a light volume rendering batch.
     void SetupLightBatch(Batch& batch);
-    /// Draw a full screen quad (either near or far)
+    /// Draw a full screen quad (either near or far.)
     void DrawFullScreenQuad(Camera& camera, ShaderVariation* vs, ShaderVariation* ps, bool nearQuad, const HashMap<StringHash, Vector4>& shaderParameters);
-    /// Handle screen mode event
+    /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle render update event
+    /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// Graphics
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Resource cache
+    /// Resource cache subsystem.
     WeakPtr<ResourceCache> cache_;
-    /// Default zone
+    /// Default zone.
     SharedPtr<Zone> defaultZone_;
-    /// Directional light geometry
+    /// Directional light geometry.
     SharedPtr<Geometry> dirLightGeometry_;
-    /// Point light volume geometry
+    /// Point light volume geometry.
     SharedPtr<Geometry> pointLightGeometry_;
-    /// Spot light volume geometry
+    /// Spot light volume geometry.
     SharedPtr<Geometry> spotLightGeometry_;
-    /// Instance stream vertex buffer
+    /// Instance stream vertex buffer.
     SharedPtr<VertexBuffer> instancingBuffer_;
-    /// Default material
+    /// Default material.
     SharedPtr<Material> defaultMaterial_;
-    /// Default range attenuation texture
+    /// Default range attenuation texture.
     SharedPtr<Texture2D> defaultLightRamp_;
-    /// Default spotlight attenuation texture
+    /// Default spotlight attenuation texture.
     SharedPtr<Texture2D> defaultLightSpot;
-    /// Shadow maps by resolution
+    /// Shadow maps by resolution.
     Vector<SharedPtr<Texture2D> > shadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
-    /// Shadow map dummy color textures by resolution
+    /// Shadow map dummy color textures by resolution.
     SharedPtr<Texture2D> colorShadowMaps_[NUM_SHADOWMAP_RESOLUTIONS];
-    /// Shadow map use count if reusing is disabled. Is reset for each view
+    /// Shadow map use count if reusing is disabled. Is reset for each view.
     unsigned shadowMapUseCount_[NUM_SHADOWMAP_RESOLUTIONS];
-    /// Stencil rendering vertex shader
+    /// Stencil rendering vertex shader.
     SharedPtr<ShaderVariation> stencilVS_;
-    /// Stencil rendering pixel shader
+    /// Stencil rendering pixel shader.
     SharedPtr<ShaderVariation> stencilPS_;
-    /// Light vertex shaders
+    /// Light vertex shaders.
     Vector<SharedPtr<ShaderVariation> > lightVS_;
-    /// Light pixel shaders
+    /// Light pixel shaders.
     Vector<SharedPtr<ShaderVariation> > lightPS_;
-    /// Reusable shadow cameras
+    /// Reusable shadow cameras.
     Vector<SharedPtr<Camera> > shadowCameraStore_;
-    /// Reusable split lights
+    /// Reusable split lights.
     Vector<SharedPtr<Light> > splitLightStore_;
-    /// Reusable temporary scene nodes
+    /// Reusable temporary scene nodes.
     Vector<SharedPtr<Node> > tempNodeStore_;
-    /// Occlusion buffers
+    /// Occlusion buffers.
     HashMap<int, SharedPtr<OcclusionBuffer> > occlusionBuffers_;
-    /// Viewports
+    /// Viewports.
     Vector<Viewport> viewports_;
-    /// Views
+    /// Views.
     Vector<SharedPtr<View> > views_;
-    /// Octrees that have been updated during the frame
+    /// Octrees that have been updated during the frame.
     HashSet<Octree*> updateOctrees_;
-    /// Techniques for which missing shader error has been displayed
+    /// Techniques for which missing shader error has been displayed.
     HashSet<Technique*> shaderErrorDisplayed_;
-    /// Vertex shader format
+    /// Vertex shader format.
     String vsFormat_;
-    /// Pixel shader format
+    /// Pixel shader format.
     String psFormat_;
-    /// Base directory for shaders
+    /// Base directory for shaders.
     String shaderPath_;
-    /// Number of views
+    /// Number of views.
     unsigned numViews_;
-    /// Number of shadow cameras
+    /// Number of shadow cameras.
     unsigned numShadowCameras_;
-    /// Number of split lights
+    /// Number of split lights.
     unsigned numSplitLights_;
-    /// Number of temporary scene nodes
+    /// Number of temporary scene nodes.
     unsigned numTempNodes_;
-    /// Number of primitives (3D geometry only)
+    /// Number of primitives (3D geometry only.)
     unsigned numPrimitives_;
-    /// Number of batches (3D geometry only)
+    /// Number of batches (3D geometry only.)
     unsigned numBatches_;
-    /// Specular lighting flag
+    /// Specular lighting flag.
     bool specularLighting_;
-    /// Draw shadows flag
+    /// Draw shadows flag.
     bool drawShadows_;
-    /// Texture anisotropy level
+    /// Texture anisotropy level.
     int textureAnisotropy_;
-    /// Texture filtering mode
+    /// Texture filtering mode.
     TextureFilterMode textureFilterMode_;
-    /// Texture quality level
+    /// Texture quality level.
     int textureQuality_;
-    /// Material quality level
+    /// Material quality level.
     int materialQuality_;
-    /// Shadow map resolution
+    /// Shadow map resolution.
     int shadowMapSize_;
-    /// Shadow map 24-bit depth flag
+    /// Shadow map 24-bit depth flag.
     bool shadowMapHiresDepth_;
-    /// Shadow map reuse flag
+    /// Shadow map reuse flag.
     bool reuseShadowMaps_;
-    /// Dynamic instancing flag
+    /// Dynamic instancing flag.
     bool dynamicInstancing_;
-    /// Deferred rendering edge filter parameters
+    /// Deferred rendering edge filter parameters.
     EdgeFilterParameters edgeFilter_;
-    /// Maximum occluder triangles
+    /// Maximum occluder triangles.
     int maxOccluderTriangles_;
-    /// Occlusion buffer width
+    /// Occlusion buffer width.
     int occlusionBufferSize_;
-    /// Occluder screen size threshold
+    /// Occluder screen size threshold.
     float occluderSizeThreshold_;
-    /// Frame number on which shaders last changed
+    /// Frame number on which shaders last changed.
     unsigned shadersChangedFrameNumber_;
-    /// Frame info for rendering
+    /// Frame info for rendering.
     FrameInfo frame_;
-    /// Shaders need reloading flag
+    /// Shaders need reloading flag.
     bool shadersDirty_;
-    /// Initialized flag
+    /// Initialized flag.
     bool initialized_;
 };

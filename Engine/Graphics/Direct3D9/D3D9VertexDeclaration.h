@@ -35,11 +35,11 @@ class VertexBuffer;
 /// Element in the vertex declaration
 struct VertexDeclarationElement
 {
-    /// Stream index
+    /// Stream index.
     unsigned stream_;
-    /// Element type
+    /// Element type.
     VertexElement element_;
-    /// Element offset
+    /// Element offset.
     unsigned offset_;
 };
 
@@ -47,24 +47,24 @@ struct VertexDeclarationElement
 class VertexDeclaration : public RefCounted
 {
 public:
-    /// Construct with graphics subsystem pointer and vertex element mask
+    /// Construct with graphics subsystem pointer and vertex element mask.
     VertexDeclaration(Graphics* graphics, unsigned elementMask);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
+    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on.
     VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on
+    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on.
     VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
-    /// Destruct
+    /// Destruct.
     ~VertexDeclaration();
     
-    /// Return Direct3D vertex declaration
+    /// Return Direct3D vertex declaration.
     IDirect3DVertexDeclaration9* GetDeclaration() const { return declaration_; }
     
 private:
-    /// Create declaration
+    /// Create declaration.
     void Create(Graphics* graphics, const PODVector<VertexDeclarationElement>& elements);
-    /// Release declaration
+    /// Release declaration.
     void Release();
     
-    /// Direct3D vertex declaration
+    /// Direct3D vertex declaration.
     IDirect3DVertexDeclaration9* declaration_;
 };

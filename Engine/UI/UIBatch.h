@@ -33,40 +33,40 @@ class ShaderVariation;
 class Texture;
 class UIElement;
 
-/// UI rendering quad
+/// UI rendering quad.
 struct UIQuad
 {
-    /// Left coordinate
+    /// Left coordinate.
     int left_;
-    /// Top coordinate
+    /// Top coordinate.
     int top_;
-    /// Right coordinate
+    /// Right coordinate.
     int right_;
-    /// Bottom coordinate
+    /// Bottom coordinate.
     int bottom_;
-    /// Left texture coordinate
+    /// Left texture coordinate.
     short leftUV_;
-    /// Top texture coordinate
+    /// Top texture coordinate.
     short topUV_;
-    /// Right texture coordinate
+    /// Right texture coordinate.
     short rightUV_;
-    /// Bottom texture coordinate
+    /// Bottom texture coordinate.
     short bottomUV_;
-    /// Top left color
+    /// Top left color.
     unsigned topLeftColor_;
-    /// Top right color
+    /// Top right color.
     unsigned topRightColor_;
-    /// Bottom left color
+    /// Bottom left color.
     unsigned bottomLeftColor_;
-    /// Bottom right color
+    /// Bottom right color.
     unsigned bottomRightColor_;
 };
 
-/// UI rendering draw call
+/// UI rendering draw call.
 class UIBatch
 {
 public:
-    /// Construct with defaults
+    /// Construct with defaults.
     UIBatch() :
         texture_(0),
         quads_(0),
@@ -75,34 +75,34 @@ public:
     {
     }
     
-    /// Begin adding quads
+    /// Begin adding quads.
     void Begin(PODVector<UIQuad>* quads);
-    /// Add a quad
+    /// Add a quad.
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY);
-    /// Add a quad with scaled texture
+    /// Add a quad with scaled texture.
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight);
-    /// Add a quad with custom color
+    /// Add a quad with custom color.
     void AddQuad(UIElement& element, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight, const Color& color);
-    /// Merge with another batch
+    /// Merge with another batch.
     bool Merge(const UIBatch& batch);
-    /// Draw
+    /// Draw.
     void Draw(Graphics* graphics) const;
     
-    /// Add or merge a batch
+    /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);
-    /// Return an interpolated color for an UI element
+    /// Return an interpolated color for an UI element.
     static unsigned GetInterpolatedColor(UIElement& element, int x, int y);
     
-    /// Blending mode
+    /// Blending mode.
     BlendMode blendMode_;
-    /// Scissor rectangle
+    /// Scissor rectangle.
     IntRect scissor_;
-    /// Texture
+    /// Texture.
     Texture* texture_;
-    /// Quads
+    /// Quads.
     PODVector<UIQuad>* quads_;
-    /// Quad start index
+    /// Quad start index.
     unsigned quadStart_;
-    /// Number of quads
+    /// Number of quads.
     unsigned quadCount_;
 };

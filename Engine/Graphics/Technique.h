@@ -28,79 +28,79 @@
 
 class ShaderVariation;
 
-/// Material rendering pass, which defines shaders and render state
+/// Material rendering pass, which defines shaders and render state.
 class Pass
 {
 public:
-    /// Construct with defaults
+    /// Construct with defaults.
     Pass();
-    /// Construct with pass type
+    /// Construct with pass type.
     Pass(PassType type);
-    /// Destruct
+    /// Destruct.
     ~Pass();
     
-    /// %Set alpha masking hint on/off
+    /// %Set alpha masking hint on/off.
     void SetAlphaMask(bool enable);
-    /// %Set alpha test on/off
+    /// %Set alpha test on/off.
     void SetAlphaTest(bool enable);
-    /// %Set blend mode
+    /// %Set blend mode.
     void SetBlendMode(BlendMode mode);
-    /// %Set depth compare mode
+    /// %Set depth compare mode.
     void SetDepthTestMode(CompareMode mode);
-    /// %Set depth write on/off
+    /// %Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// %Set vertex shader name
+    /// %Set vertex shader name.
     void SetVertexShader(const String& name);
-    /// %Set pixel shader name
+    /// %Set pixel shader name.
     void SetPixelShader(const String& name);
-    /// Reset shader pointers
+    /// Reset shader pointers.
     void ReleaseShaders();
     
-    /// Return pass type
+    /// Return pass type.
     PassType GetType() const { return type_; }
-    /// Return alpha masking hint
+    /// Return alpha masking hint.
     bool GetAlphaMask() const { return alphaMask_; }
-    /// Return alpha test mode
+    /// Return alpha test mode.
     bool GetAlphaTest() const { return alphaTest_; }
-    /// Return blend mode
+    /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
-    /// Return depth compare mode
+    /// Return depth compare mode.
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
-    /// Return depth write mode
+    /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
-    /// Return vertex shader name
+    /// Return vertex shader name.
     const String& GetVertexShaderName() const { return vertexShaderName_; }
-    /// Return pixel shader name
+    /// Return pixel shader name.
     const String& GetPixelShaderName() const { return pixelShaderName_; }
-    /// Return vertex shaders
+    /// Return vertex shaders.
     Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
-    /// Return pixel shaders
+    /// Return pixel shaders.
     Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
     
 private:
-    /// Pass type
+    /// Pass type.
     PassType type_;
-    /// Alpha masking hint
+    /// Alpha masking hint.
     bool alphaMask_;
-    /// Alpha test mode
+    /// Alpha test mode.
     bool alphaTest_;
-    /// Blend mode
+    /// Blend mode.
     BlendMode blendMode_;
-    /// Depth compare mode
+    /// Depth compare mode.
     CompareMode depthTestMode_;
-    /// Depth write mode
+    /// Depth write mode.
     bool depthWrite_;
-    /// Vertex shader name
+    /// Vertex shader name.
     String vertexShaderName_;
-    /// Pixel shader name
+    /// Pixel shader name.
     String pixelShaderName_;
-    /// Vertex shaders
+    /// Vertex shaders.
     Vector<SharedPtr<ShaderVariation> > vertexShaders_;
-    /// Pixel shaders
+    /// Pixel shaders.
     Vector<SharedPtr<ShaderVariation> > pixelShaders_;
 };
 
-/// Material technique. Consists of several passes
+/// Material technique. Consists of several passes.
 class Technique : public Resource
 {
     OBJECT(Technique);
@@ -108,35 +108,32 @@ class Technique : public Resource
     friend class Renderer;
     
 public:
-    /// Construct
+    /// Construct.
     Technique(Context* context);
-    /// Destruct
+    /// Destruct.
     ~Technique();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// %Set whether requires Shader Model 3
+    /// %Set whether requires Shader Model 3.
     void SetIsSM3(bool enable);
-    /// Create a new pass
+    /// Create a new pass.
     Pass* CreatePass(PassType pass);
-    /// Remove a pass
+    /// Remove a pass.
     void RemovePass(PassType pass);
-    /// Reset shader pointers in all passes
+    /// Reset shader pointers in all passes.
     void ReleaseShaders();
     
     /// Mark shaders loaded this frame
     void MarkShadersLoaded(unsigned frameNumber);
     
-    /// Return whether has a pass
-    bool HasPass(PassType pass) const
-    {
-        return passes_.Find(pass) != passes_.End();
-    }
+    /// Return whether has a pass.
+    bool HasPass(PassType pass) const { return passes_.Find(pass) != passes_.End(); }
     
-    /// Return a pass
+    /// Return a pass.
     Pass* GetPass(PassType pass)
     {
         Map<PassType, Pass>::Iterator i = passes_.Find(pass);
@@ -146,21 +143,21 @@ public:
             return 0;
     }
     
-    /// Return whether requires Shader Model 3
+    /// Return whether requires Shader Model 3.
     bool IsSM3() const { return isSM3_; }
-    /// Return all passes
+    /// Return all passes.
     const Map<PassType, Pass>& GetPasses() const { return passes_; }
-    /// Return last shaders loaded frame number
+    /// Return last shaders loaded frame number.
     unsigned GetShadersLoadedFrameNumber() const { return shadersLoadedFrameNumber_; }
     
-    /// Return name for pass
+    /// Return name for pass.
     static const String& GetPassName(PassType pass);
     
 private:
-    /// Require Shader Model 3 flag
+    /// Require Shader Model 3 flag.
     bool isSM3_;
-    /// Last shaders loaded frame number
+    /// Last shaders loaded frame number.
     unsigned shadersLoadedFrameNumber_;
-    /// Passes
+    /// Passes.
     Map<PassType, Pass> passes_;
 };

@@ -26,67 +26,67 @@
 #include "Allocator.h"
 #include "Swap.h"
 
-/// List node base
+/// List node base.
 struct ListNodeBase
 {
-    /// Construct
+    /// Construct.
     ListNodeBase() :
         prev_(0),
         next_(0)
     {
     }
     
-    /// Previous node
+    /// Previous node.
     ListNodeBase* prev_;
-    /// Next node
+    /// Next node.
     ListNodeBase* next_;
 };
 
-/// List iterator base class
+/// List iterator base class.
 class ListIteratorBase
 {
 public:
-    /// Construct
+    /// Construct.
     explicit ListIteratorBase(ListNodeBase* ptr) :
         ptr_(ptr)
     {
     }
     
-    /// Test for equality with another iterator
+    /// Test for equality with another iterator.
     bool operator == (const ListIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Test for inequality with another iterator
+    /// Test for inequality with another iterator.
     bool operator != (const ListIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
-    /// Go to the next node
+    /// Go to the next node.
     void GotoNext()
     {
         if (ptr_)
             ptr_ = ptr_->next_;
     }
     
-    /// Go to the previous node
+    /// Go to the previous node.
     void GotoPrev()
     {
         if (ptr_)
             ptr_ = ptr_->prev_;
     }
     
-    /// Node pointer
+    /// Node pointer.
     ListNodeBase* ptr_;
 };
 
-/// Linked list base class
+/// Linked list base class.
 class ListBase
 {
 public:
-    /// Construct
+    /// Construct.
     ListBase() :
         allocator_(0),
         size_(0)
     {
     }
     
-    /// Swap with another linked list
+    /// Swap with another linked list.
     void Swap(ListBase& rhs)
     {
         ::Swap(head_, rhs.head_);
@@ -96,12 +96,12 @@ public:
     }
     
 protected:
-    /// Head node pointer
+    /// Head node pointer.
     ListNodeBase* head_;
-    /// Tail node pointer
+    /// Tail node pointer.
     ListNodeBase* tail_;
-    /// Node allocator
+    /// Node allocator.
     AllocatorBlock* allocator_;
-    /// Number of nodes
+    /// Number of nodes.
     unsigned size_;
 };

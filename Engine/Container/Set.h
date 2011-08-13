@@ -28,111 +28,111 @@
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
-/// Set template class using a red-black tree
+/// Set template class using a red-black tree.
 template <class T> class Set : public TreeBase
 {
 public:
-    /// Set node
+    /// Set node.
     struct Node : public TreeNodeBase
     {
-        // Construct undefined
+        // Construct undefined.
         Node()
         {
         }
         
-        // Construct with key
+        // Construct with key.
         Node(const T& key) :
             key_(key)
         {
         }
         
-        /// Key
+        /// Key.
         T key_;
         
-        /// Return parent node
+        /// Return parent node.
         Node* Parent() const { return static_cast<Node*>(parent_); }
-        /// Return the left or right child
+        /// Return the left or right child.
         Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
-    /// Set iterator
+    /// Set iterator.
     class Iterator : public TreeIteratorBase
     {
     public:
-        // Construct
+        // Construct.
         Iterator(Node* ptr) :
             TreeIteratorBase(ptr)
         {
         }
         
-        /// Preincrement the pointer
+        /// Preincrement the pointer.
         Iterator& operator ++ () { GotoNext(); return *this; }
-        /// Postincrement the pointer
+        /// Postincrement the pointer.
         Iterator operator ++ (int) { Iterator it = *this; GotoNext(); return it; }
-        /// Predecrement the pointer
+        /// Predecrement the pointer.
         Iterator& operator -- () { GotoPrev(); return *this; }
-        /// Postdecrement the pointer
+        /// Postdecrement the pointer.
         Iterator operator -- (int) { Iterator it = *this; GotoPrev(); return it; }
         
-        /// Point to the key
+        /// Point to the key.
         const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
-        /// Dereference the key
+        /// Dereference the key.
         const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
     
-    /// Set const iterator
+    /// Set const iterator.
     class ConstIterator : public TreeIteratorBase
     {
     public:
-        // Construct
+        /// Construct.
         ConstIterator(Node* ptr) :
             TreeIteratorBase(ptr)
         {
         }
         
-        // Construct from a non-const iterator
+        // Construct from a non-const iterator.
         ConstIterator(const Iterator& it) :
             TreeIteratorBase(it.ptr_)
         {
         }
         
-        /// Assign from a non-const iterator
+        /// Assign from a non-const iterator.
         ConstIterator& operator = (const Iterator& rhs) { ptr_ = rhs.ptr_; return *this; }
-        /// Preincrement the pointer
+        /// Preincrement the pointer.
         ConstIterator& operator ++ () { GotoNext(); return *this; }
-        /// Postincrement the pointer
+        /// Postincrement the pointer.
         ConstIterator operator ++ (int) { ConstIterator it = *this; GotoNext(); return it; }
-        /// Predecrement the pointer
+        /// Predecrement the pointer.
         ConstIterator& operator -- () { GotoPrev(); return *this; }
-        /// Postdecrement the pointer
+        /// Postdecrement the pointer.
         ConstIterator operator -- (int) { ConstIterator it = *this; GotoPrev(); return it; }
         
-        /// Point to the key
+        /// Point to the key.
         const T* operator -> () const { return &(static_cast<Node*>(ptr_))->key_; }
-        /// Dereference the key
+        /// Dereference the key.
         const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
     
-    /// Construct empty set
+    /// Construct empty.
     Set()
     {
     }
     
-    /// Construct from another set
+    /// Construct from another set.
     Set(const Set<T>& set)
     {
         allocator_ = AllocatorInitialize(sizeof(Node), set.Size());
         *this = set;
     }
     
-    /// Destruct the set
+    /// Destruct.
     ~Set()
     {
         Clear();
         AllocatorUninitialize(allocator_);
     }
     
-    /// Assign a set
+    /// Assign a set.
     Set& operator = (const Set<T>& set)
     {
         Clear();
@@ -141,21 +141,21 @@ public:
         return *this;
     }
     
-    /// Add-assign a value
+    /// Add-assign a value.
     Set& operator += (const T& rhs)
     {
         Insert(rhs);
         return *this;
     }
     
-    /// Add-assign a set
+    /// Add-assign a set.
     Set& operator += (const Set<T>& rhs)
     {
         Insert(rhs);
         return *this;
     }
     
-    /// Test for equality with another set
+    /// Test for equality with another set.
     bool operator == (const Set<T>& rhs) const
     {
         if (rhs.size_ != size_)
@@ -174,7 +174,7 @@ public:
         return true;
     }
     
-    /// Test for inequality with another set
+    /// Test for inequality with another set.
     bool operator != (const Set<T>& rhs) const
     {
         if (rhs.size_ != size_)
@@ -193,35 +193,25 @@ public:
         return false;
     }
     
-    /// Clear the set
+    /// Clear the set.
     void Clear()
     {
         Node* root = Root();
         if (!root)
             return;
+        
         EraseNodes(root);
         root_ = 0;
     }
     
-    /// Insert a key. Return iterator to the value
-    Iterator Insert(const T& key)
-    {
-        return Iterator(InsertNode(key));
-    }
+    /// Insert a key. Return iterator to the value.
+    Iterator Insert(const T& key) { return Iterator(InsertNode(key)); }
+    /// Insert a set.
+    void Insert(const Set<T>& set) { Insert(set.Begin(), set.End()); }
+    /// Insert a key by iterator. Return iterator to the value.
+    Iterator Insert(const ConstIterator& it) { return Iterator(InsertNode(*it)); }
     
-    /// Insert a set
-    void Insert(const Set<T>& set)
-    {
-        Insert(set.Begin(), set.End());
-    }
-    
-    /// Insert a key by iterator. Return iterator to the value
-    Iterator Insert(const ConstIterator& it)
-    {
-        return Iterator(InsertNode(*it));
-    }
-    
-    /// Insert a range by iterators
+    /// Insert a range by iterators.
     void Insert(const ConstIterator& start, const ConstIterator& end)
     {
         ConstIterator it = start;
@@ -229,19 +219,12 @@ public:
             InsertNode(*it++);
     }
     
-    /// Erase a key. Return true if was found
-    bool Erase(const T& key)
-    {
-        return EraseNode(key);
-    }
+    /// Erase a key. Return true if was found.
+    bool Erase(const T& key) { return EraseNode(key); }
+    /// Erase a key by iterator.
+    void Erase(const Iterator& it) { EraseNode(*it); }
     
-    /// Erase a key by iterator
-    void Erase(const Iterator& it)
-    {
-        EraseNode(*it);
-    }
-    
-    /// Erase a range by iterators
+    /// Erase a range by iterators.
     void Erase(const Iterator& start, const Iterator& end)
     {
         Iterator it = start;
@@ -252,38 +235,34 @@ public:
         }
     }
     
-    /// Return whether contains a key
-    bool Contains(const T& key) const
-    {
-        return FindNode(key) != 0;
-    }
-    
-    /// Return iterator to the node with key, or end iterator if not found
+    /// Return whether contains a key.
+    bool Contains(const T& key) const { return FindNode(key) != 0; }
+    /// Return iterator to the node with key, or end iterator if not found.
     Iterator Find(const T& key) { Node* node = FindNode(key); return node ? Iterator(node) : End(); }
-    /// Return const iterator to the node with key, or null iterator if not found
+    /// Return const iterator to the node with key, or null iterator if not found.
     ConstIterator Find(const T& key) const { Node* node = FindNode(key); return node ? ConstIterator(node) : End(); }
-    /// Return iterator to the beginning
+    /// Return iterator to the beginning.
     Iterator Begin() { return Iterator(FindFirst()); }
-    /// Return const iterator to the beginning
+    /// Return const iterator to the beginning.
     ConstIterator Begin() const { return ConstIterator(FindFirst()); }
-    /// Return iterator to the end
+    /// Return iterator to the end.
     Iterator End() { return ++Iterator(FindLast()); }
-    /// Return const iterator to the end
+    /// Return const iterator to the end.
     ConstIterator End() const { return ++ConstIterator(FindLast()); }
-    /// Return first key
+    /// Return first key.
     const T& Front() { return FindFirst()->key_; }
-    /// Return last key
+    /// Return last key.
     const T& Back() { return FindLast()->key_; }
-    /// Return number of keys
+    /// Return number of keys.
     unsigned Size() const { return size_; }
-    /// Return whether set is empty
+    /// Return whether set is empty.
     bool Empty() const { return size_ == 0; }
     
 private:
-    /// Return the root pointer with correct type
+    /// Return the root pointer with correct type.
     Node* Root() const { return reinterpret_cast<Node*>(root_); }
     
-    /// Find the node with smallest key
+    /// Find the node with smallest key.
     Node* FindFirst() const
     {
         Node* node = Root();
@@ -292,7 +271,7 @@ private:
         return node;
     }
     
-    /// Find the node with largest key
+    /// Find the node with largest key.
     Node* FindLast() const
     {
         Node* node = Root();
@@ -301,7 +280,7 @@ private:
         return node;
     }
     
-    /// Find a node with key. Return null if not found
+    /// Find a node with key. Return null if not found.
     Node* FindNode(const T& key) const
     {
         Node* node = Root();
@@ -315,7 +294,7 @@ private:
         return 0;
     }
     
-    /// Insert a node and return a pointer to it
+    /// Insert a node and return a pointer to it.
     Node* InsertNode(const T& key)
     {
         Node* ret = 0;
@@ -386,7 +365,7 @@ private:
         return ret;
     }
     
-    /// Erase a node. Return true if was erased
+    /// Erase a node. Return true if was erased.
     bool EraseNode(const T& key)
     {
         if (!root_)
@@ -469,7 +448,7 @@ private:
         return removed;
     }
     
-    /// Erase the nodes recursively
+    /// Erase the nodes recursively.
     void EraseNodes(Node* node)
     {
         Node* left = node->Child(0);
@@ -483,7 +462,7 @@ private:
             EraseNodes(right);
     }
     
-    /// Reserve a node
+    /// Reserve a node.
     Node* ReserveNode()
     {
         if (!allocator_)
@@ -494,7 +473,7 @@ private:
         return newNode;
     }
     
-    /// Reserve a node with specified key
+    /// Reserve a node with specified key.
     Node* ReserveNode(const T& key)
     {
         if (!allocator_)
@@ -504,7 +483,7 @@ private:
         return newNode;
     }
     
-    /// Free a node
+    /// Free a node.
     void FreeNode(Node* node)
     {
         (node)->~Node();

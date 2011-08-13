@@ -25,16 +25,16 @@
 
 #include "Vector3.h"
 
-/// 3x3 matrix for rotation and scaling
+/// 3x3 matrix for rotation and scaling.
 class Matrix3
 {
 public:
-    /// Construct an undefined matrix
+    /// Construct undefined.
     Matrix3()
     {
     }
     
-    /// Copy-construct from another matrix
+    /// Copy-construct from another matrix.
     Matrix3(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -48,7 +48,7 @@ public:
     {
     }
     
-    /// Construct from values
+    /// Construct from values.
     Matrix3(float v00, float v01, float v02,
             float v10, float v11, float v12,
             float v20, float v21, float v22) :
@@ -64,7 +64,7 @@ public:
     {
     }
     
-    /// Construct from a float array
+    /// Construct from a float array.
     Matrix3(float* data) :
         m00_(data[0]),
         m01_(data[1]),
@@ -78,7 +78,7 @@ public:
     {
     }
     
-    /// Assign from another matrix
+    /// Assign from another matrix.
     Matrix3& operator = (const Matrix3& rhs)
     {
         m00_ = rhs.m00_;
@@ -93,7 +93,7 @@ public:
         return *this;
     }
     
-    /// Multiply a Vector3
+    /// Multiply a Vector3.
     Vector3 operator * (const Vector3& rhs) const
     {
         return Vector3(
@@ -103,7 +103,7 @@ public:
         );
     }
     
-    /// Add a matrix
+    /// Add a matrix.
     Matrix3 operator + (const Matrix3& rhs) const
     {
         return Matrix3(
@@ -119,7 +119,7 @@ public:
         );
     }
     
-    /// Subtract a matrix
+    /// Subtract a matrix.
     Matrix3 operator - (const Matrix3& rhs) const
     {
         return Matrix3(
@@ -135,7 +135,7 @@ public:
         );
     }
     
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Matrix3 operator * (float rhs) const
     {
         return Matrix3(
@@ -151,7 +151,7 @@ public:
         );
     }
     
-    /// Multiply a matrix
+    /// Multiply a matrix.
     Matrix3 operator * (const Matrix3& rhs) const
     {
         return Matrix3(
@@ -167,7 +167,7 @@ public:
         );
     }
     
-    /// %Set scaling elements
+    /// %Set scaling elements.
     void SetScale(const Vector3& scale)
     {
         m00_ = scale.x_;
@@ -175,7 +175,7 @@ public:
         m22_ = scale.z_;
     }
     
-    /// %Set uniform scaling elements
+    /// %Set uniform scaling elements.
     void SetScale(float scale)
     {
         m00_ = scale;
@@ -183,7 +183,7 @@ public:
         m22_ = scale;
     }
     
-    /// Return the scaling part
+    /// Return the scaling part.
     Vector3 Scale() const
     {
         return Vector3(
@@ -193,7 +193,7 @@ public:
         );
     }
     
-    /// Return transpose
+    /// Return transpose.
     Matrix3 Transpose() const
     {
         return Matrix3(
@@ -209,7 +209,7 @@ public:
         );
     }
     
-    /// Return scaled by a vector
+    /// Return scaled by a vector.
     Matrix3 Scaled(const Vector3& scale) const
     {
         return Matrix3(
@@ -225,10 +225,10 @@ public:
         );
     }
     
-    /// Return inverse
+    /// Return inverse.
     Matrix3 Inverse() const;
     
-    /// Return float data
+    /// Return float data.
     const float* GetData() const { return &m00_; }
     
     float m00_;
@@ -241,11 +241,11 @@ public:
     float m21_;
     float m22_;
     
-    /// Zero matrix
+    /// Zero matrix.
     static const Matrix3 ZERO;
-    /// Identity matrix
+    /// Identity matrix.
     static const Matrix3 IDENTITY;
 };
 
-/// Multiply a 3x3 matrix with a scalar
+/// Multiply a 3x3 matrix with a scalar.
 inline Matrix3 operator * (float lhs, const Matrix3& rhs) { return rhs * lhs; }

@@ -35,99 +35,99 @@ class asIScriptModule;
 
 struct asSMessageInfo;
 
-/// Script engine logging mode
+/// Script engine logging mode.
 enum ScriptLogMode
 {
     LOGMODE_IMMEDIATE = 0,
     LOGMODE_RETAINED
 };
 
-/// Maximum function/method nesting level
+/// Maximum function/method nesting level.
 static const unsigned MAX_SCRIPT_NESTING_LEVEL = 32;
 
-/// Script subsystem. Allows execution of AngelScript
+/// Script subsystem. Allows execution of AngelScript.
 class Script : public Object
 {
     OBJECT(Script);
     
 public:
-    /// Construct
+    /// Construct.
     Script(Context* context);
-    /// Destruct. Release the AngelScript engine
+    /// Destruct. Release the AngelScript engine.
     ~Script();
     
-    /// Compile and execute a line of script in immediate mode
+    /// Compile and execute a line of script in immediate mode.
     bool Execute(const String& line);
-    /// %Set immediate mode script file
+    /// %Set immediate mode script file.
     void SetDefaultScriptFile(ScriptFile* file);
-    /// %Set immediate mode scene
+    /// %Set immediate mode scene.
     void SetDefaultScene(Scene* scene);
-    /// %Set script engine logging mode, immediate is default
+    /// %Set script engine logging mode, immediate is default.
     void SetLogMode(ScriptLogMode mode);
-    /// Clear retained mode log messages
+    /// Clear retained mode log messages.
     void ClearLogMessages();
-    /// Print the whole script API (all registered classes, methods and properties) to the log
+    /// Print the whole script API (all registered classes, methods and properties) to the log.
     void DumpAPI();
-    /// Log a message from the script engine
+    /// Log a message from the script engine.
     void MessageCallback(const asSMessageInfo* msg);
-    /// Handle a script exception
+    /// Handle a script exception.
     void ExceptionCallback(asIScriptContext* context);
     
-    /// Return the AngelScript engine
+    /// Return the AngelScript engine.
     asIScriptEngine* GetScriptEngine() const { return scriptEngine_; }
-    /// Return immediate execution script context
+    /// Return immediate execution script context.
     asIScriptContext* GetImmediateContext() const { return immediateContext_; }
-    /// Return a script function/method execution context for the current execution nesting level
+    /// Return a script function/method execution context for the current execution nesting level.
     asIScriptContext* GetScriptFileContext() const;
-    /// Return immediate mode script file
+    /// Return immediate mode script file.
     ScriptFile* GetDefaultScriptFile() const;
-    /// Return immediate mode scene
+    /// Return immediate mode scene.
     Scene* GetDefaultScene() const;
-    /// Query for an inbuilt object type by constant declaration. Can not be used for script types
+    /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
     asIObjectType* GetObjectType(const char* declaration);
-    /// Return logging mode
+    /// Return logging mode.
     ScriptLogMode GetLogMode() const { return logMode_; }
-    /// Return retained mode log messages
+    /// Return retained mode log messages.
     const String& GetLogMessages() const { return logMessages_; }
     
-    /// Increase script nesting level
+    /// Increase script nesting level.
     void IncScriptNestingLevel() { ++scriptNestingLevel_; }
-    /// Decrease script nesting level
+    /// Decrease script nesting level.
     void DecScriptNestingLevel() { --scriptNestingLevel_; }
-    /// Return current script nesting level
+    /// Return current script nesting level.
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
-    /// Return script module to script file map
+    /// Return script module to script file map.
     Map<asIScriptModule*, ScriptFile*>& GetModuleMap() { return moduleMap_; }
-    /// Return script object to script instance map
+    /// Return script object to script instance map.
     Map<void*, ScriptInstance*>& GetObjectMap() { return objectMap_; }
     
 private:
-    /// Output a sanitated row of script API
+    /// Output a sanitated row of script API.
     void OutputAPIRow(const String& row, bool removeReference = false);
     
-    /// AngelScript engine
+    /// AngelScript engine.
     asIScriptEngine* scriptEngine_;
-    /// Immediate execution script context
+    /// Immediate execution script context.
     asIScriptContext* immediateContext_;
-    /// Immediate execution script file
+    /// Immediate execution script file.
     WeakPtr<ScriptFile> defaultScriptFile_;
-    /// Immediate execution scene
+    /// Immediate execution scene.
     WeakPtr<Scene> defaultScene_;
-    /// Script function/method execution contexts
+    /// Script function/method execution contexts.
     Vector<asIScriptContext*> scriptFileContexts_;
-    /// Map of script modules to script files
+    /// Map of script modules to script files.
     Map<asIScriptModule*, ScriptFile*> moduleMap_;
-    /// Map of script objects to script instance components
+    /// Map of script objects to script instance components.
     Map<void*, ScriptInstance*> objectMap_;
-    /// Search cache for inbuilt object types (constant declaration)
+    /// Search cache for inbuilt object types.
     Map<const char*, asIObjectType*> objectTypes_;
-    /// Script engine logging mode
+    /// Script engine logging mode.
     ScriptLogMode logMode_;
-    /// Retained mode log messages
+    /// Retained mode log messages.
     String logMessages_;
-    /// Current script execution nesting level
+    /// Current script execution nesting level.
     unsigned scriptNestingLevel_;
 };
 
-/// Register Script library objects
+/// Register Script library objects.
 void RegisterScriptLibrary(Context* context);

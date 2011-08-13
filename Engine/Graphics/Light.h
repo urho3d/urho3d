@@ -32,7 +32,7 @@ class Texture;
 class Texture2D;
 class TextureCube;
 
-/// Light types
+/// Light types.
 enum LightType
 {
     LIGHT_DIRECTIONAL = 0,
@@ -41,39 +41,39 @@ enum LightType
     LIGHT_SPLITPOINT
 };
 
-/// Shadow depth bias parameters
+/// Shadow depth bias parameters.
 struct BiasParameters
 {
-    /// Construct as undefined
+    /// Construct undefined.
     BiasParameters()
     {
     }
     
-    /// Construct with initial values
+    /// Construct with initial values.
     BiasParameters(float constantBias, float slopeScaledBias) :
         constantBias_(constantBias),
         slopeScaledBias_(slopeScaledBias)
     {
     }
     
-    /// Validate parameters
+    /// Validate parameters.
     void Validate();
     
-    /// Constant bias
+    /// Constant bias.
     float constantBias_;
-    /// Slope scaled bias
+    /// Slope scaled bias.
     float slopeScaledBias_;
 };
 
-/// Cascaded shadow map parameters
+/// Cascaded shadow map parameters.
 struct CascadeParameters
 {
-    /// Construct as undefined
+    /// Construct undefined.
     CascadeParameters()
     {
     }
     
-    /// Construct with initial values
+    /// Construct with initial values.
     CascadeParameters(unsigned splits, float lambda, float splitFadeRange, float shadowRange) :
         splits_(splits),
         lambda_(lambda),
@@ -82,28 +82,28 @@ struct CascadeParameters
     {
     }
     
-    /// Validate parameters
+    /// Validate parameters.
     void Validate();
     
-    /// Number of splits
+    /// Number of splits.
     unsigned splits_;
-    /// Split lambda
+    /// Split lambda.
     float lambda_;
-    /// Fade range between splits
+    /// Fade range between splits.
     float splitFadeRange_;
-    /// Maximum shadow distance
+    /// Maximum shadow distance.
     float shadowRange_;
 };
 
-/// Shadow map focusing parameters
+/// Shadow map focusing parameters.
 struct FocusParameters
 {
-    /// Construct as undefined
+    /// Construct undefined.
     FocusParameters()
     {
     }
     
-    /// Construct with initial values
+    /// Construct with initial values.
     FocusParameters(bool focus, bool nonUniform, bool zoomOut, float quantize, float minView) :
         focus_(focus),
         nonUniform_(nonUniform),
@@ -113,18 +113,18 @@ struct FocusParameters
     {
     }
     
-    /// Validate parameters
+    /// Validate parameters.
     void Validate();
     
-    /// Focus flag
+    /// Focus flag.
     bool focus_;
-    /// Non-uniform focusing flag
+    /// Non-uniform focusing flag.
     bool nonUniform_;
-    /// Zoom out flag
+    /// Zoom out flag.
     bool zoomOut_;
-    /// Focus quantization
+    /// Focus quantization.
     float quantize_;
-    /// Minimum view size
+    /// Minimum view size.
     float minView_;
 };
 
@@ -132,189 +132,189 @@ static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const float SHADOW_DEFAULT_NEARCLIP = 0.1f;
 
-/// Light component
+/// Light component.
 class Light : public Drawable
 {
     OBJECT(Light);
     
 public:
-    /// Construct
+    /// Construct.
     Light(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Light();
-    /// Register object factory. Drawable must be registered first
+    /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Calculate distance for rendering
+    /// Calculate distance for rendering.
     virtual void UpdateDistance(const FrameInfo& frame);
-    /// Add debug geometry to the debug graphics
+    /// Add debug geometry to the debug graphics.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set light type
+    /// %Set light type.
     void SetLightType(LightType type);
-    /// %Set color
+    /// %Set color.
     void SetColor(const Color& color);
-    /// %Set specular intensity
+    /// %Set specular intensity.
     void SetSpecularIntensity(float intensity);
-    /// %Set range
+    /// %Set range.
     void SetRange(float range);
-    /// %Set spotlight field of view
+    /// %Set spotlight field of view.
     void SetFov(float fov);
-    /// %Set spotlight aspect ratio
+    /// %Set spotlight aspect ratio.
     void SetAspectRatio(float aspectRatio);
-    /// %Set fade out start distance
+    /// %Set fade out start distance.
     void SetFadeDistance(float distance);
-    /// %Set shadow fade out start distance. Only has effect if shadow distance is also non-zero
+    /// %Set shadow fade out start distance. Only has effect if shadow distance is also non-zero.
     void SetShadowFadeDistance(float distance);
-    /// %Set shadow depth bias parameters
+    /// %Set shadow depth bias parameters.
     void SetShadowBias(const BiasParameters& parameters);
-    /// %Set directional light cascaded shadow parameters
+    /// %Set directional light cascaded shadow parameters.
     void SetShadowCascade(const CascadeParameters& parameters);
-    /// %Set shadow map focusing parameters
+    /// %Set shadow map focusing parameters.
     void SetShadowFocus(const FocusParameters& parameters);
     /// %Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
-    /// %Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use
+    /// %Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
     void SetShadowResolution(float resolution);
-    /// %Set shadow camera near/far clip distance ratio
+    /// %Set shadow camera near/far clip distance ratio.
     void SetShadowNearFarRatio(float nearFarRatio);
-    /// %Set range attenuation texture
+    /// %Set range attenuation texture.
     void SetRampTexture(Texture* texture);
-    /// %Set spotlight attenuation texture
+    /// %Set spotlight attenuation texture.
     void SetShapeTexture(Texture* texture);
     
-    /// Return light type
+    /// Return light type.
     LightType GetLightType() const { return lightType_; }
-    /// Return color
+    /// Return color.
     const Color& GetColor() const { return color_; }
-    /// Return specular intensity
+    /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
-    /// Return range
+    /// Return range.
     float GetRange() const { return range_; }
-    /// Return spotlight field of view
+    /// Return spotlight field of view.
     float GetFov() const { return fov_; }
-    /// Return spotlight aspect ratio
+    /// Return spotlight aspect ratio.
     float GetAspectRatio() const { return aspectRatio_; }
-    /// Return fade start distance
+    /// Return fade start distance.
     float GetFadeDistance() const { return fadeDistance_; }
-   /// Return shadow fade start distance
+   /// Return shadow fade start distance.
     float GetShadowFadeDistance() const { return shadowFadeDistance_; }
-    /// Return shadow depth bias parameters
+    /// Return shadow depth bias parameters.
     const BiasParameters& GetShadowBias() const { return shadowBias_; }
-    /// Return directional light cascaded shadow parameters
+    /// Return directional light cascaded shadow parameters.
     const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
-    /// Return shadow map focus parameters
+    /// Return shadow map focus parameters.
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
-    /// Return shadow intensity
+    /// Return shadow intensity.
     float GetShadowIntensity() const { return shadowIntensity_; }
-    /// Return shadow resolution
+    /// Return shadow resolution.
     float GetShadowResolution() const { return shadowResolution_; }
-    /// Return shadow camera near/far clip distance ratio
+    /// Return shadow camera near/far clip distance ratio.
     float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
-    /// Return range attenuation texture
+    /// Return range attenuation texture.
     Texture* GetRampTexture() const { return rampTexture_; }
-    /// Return spotlight attenuation texture
+    /// Return spotlight attenuation texture.
     Texture* GetShapeTexture() const { return shapeTexture_; }
-    /// Return spotlight frustum
+    /// Return spotlight frustum.
     Frustum GetFrustum() const;
     
-    /// %Set near split distance for directional light
+    /// %Set near split distance for directional light.
     void SetNearSplit(float near);
-    /// %Set far split distance for directional light
+    /// %Set far split distance for directional light.
     void SetFarSplit(float far);
-    /// %Set near fade range for directional light
+    /// %Set near fade range for directional light.
     void SetNearFadeRange(float range);
-    /// %Set far fade range for directional light
+    /// %Set far fade range for directional light.
     void SetFarFadeRange(float range);
-    /// %Set shadow camera
+    /// %Set shadow camera.
     void SetShadowCamera(Camera* camera);
-    /// %Set shadow map depth texture
+    /// %Set shadow map depth texture.
     void SetShadowMap(Texture2D* shadowMap);
-    /// %Set sort value based on intensity at given world position
+    /// %Set sort value based on intensity at given world position.
     void SetIntensitySortValue(const Vector3& position);
-    /// Copy values from another light
+    /// Copy values from another light.
     void CopyFrom(Light* original);
-    /// Return near split distance
+    /// Return near split distance.
     float GetNearSplit() const { return nearSplit_; }
-    /// Return far split distance
+    /// Return far split distance.
     float GetFarSplit() const { return farSplit_; }
-    /// Return near fade range
+    /// Return near fade range.
     float GetNearFadeRange() const { return nearFadeRange_; }
-    /// Return far fade range
+    /// Return far fade range.
     float GetFarFadeRange() const { return farFadeRange_; }
-    /// Return shadow camera. Not safe to dereference outside rendering
+    /// Return shadow camera. Not safe to dereference outside rendering.
     Camera* GetShadowCamera() { return shadowCamera_; }
-    /// Return shadow map
+    /// Return shadow map.
     Texture2D* GetShadowMap() const { return shadowMap_; }
-    /// Return original light (split lights only)
+    /// Return original light (split lights only.)
     Light* GetOriginalLight() const { return originalLight_; }
-    /// Return volume safety extent of spot or point light
+    /// Return volume safety extent of spot or point light.
     float GetVolumeExtent() const;
-    /// Return directional light quad transform for either near or far split
+    /// Return directional light quad transform for either near or far split.
     Matrix3x4 GetDirLightTransform(Camera& camera, bool getNearQuad = false);
-    /// Return light volume model transform. For directional lights, the view transform must be overridden
+    /// Return light volume model transform. For directional lights, the view transform must be overridden.
     const Matrix3x4& GetVolumeTransform(Camera& camera);
     
-    /// %Set ramp texture attribute
+    /// %Set ramp texture attribute.
     void SetRampTextureAttr(ResourceRef value);
-    /// %Set shape texture attribute
+    /// %Set shape texture attribute.
     void SetShapeTextureAttr(ResourceRef value);
-    /// Return ramp texture attribute
+    /// Return ramp texture attribute.
     ResourceRef GetRampTextureAttr() const;
-    /// Return shape texture attribute
+    /// Return shape texture attribute.
     ResourceRef GetShapeTextureAttr() const;
     
 protected:
-    /// Update world-space bounding box
+    /// Update world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
 private:
-    /// Light type
+    /// Light type.
     LightType lightType_;
-    /// Color
+    /// Color.
     Color color_;
-    /// Specular intensity
+    /// Specular intensity.
     float specularIntensity_;
-    /// Range
+    /// Range.
     float range_;
-    /// Spotlight field of view
+    /// Spotlight field of view.
     float fov_;
-    /// Spotlight aspect ratio
+    /// Spotlight aspect ratio.
     float aspectRatio_;
-    /// Fade start distance
+    /// Fade start distance.
     float fadeDistance_;
-    /// Shadow fade start distance
+    /// Shadow fade start distance.
     float shadowFadeDistance_;
-    /// Shadow depth bias parameters
+    /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
-    /// Directional light cascaded shadow parameters
+    /// Directional light cascaded shadow parameters.
     CascadeParameters shadowCascade_;
-    /// Shadow map focus parameters
+    /// Shadow map focus parameters.
     FocusParameters shadowFocus_;
-    /// Custom world transform for the light volume
+    /// Custom world transform for the light volume.
     Matrix3x4 volumeTransform_;
-    /// Shadow intensity
+    /// Shadow intensity.
     float shadowIntensity_;
-    /// Shadow resolution
+    /// Shadow resolution.
     float shadowResolution_;
-    /// Shadow camera near/far clip distance ratio
+    /// Shadow camera near/far clip distance ratio.
     float shadowNearFarRatio_;
-    /// Directional light near split distance
+    /// Directional light near split distance.
     float nearSplit_;
-    /// Directional light far split distance
+    /// Directional light far split distance.
     float farSplit_;
-    /// Directional light near fade range
+    /// Directional light near fade range.
     float nearFadeRange_;
-    /// Directional light far fade range
+    /// Directional light far fade range.
     float farFadeRange_;
-    /// Range attenuation texture
+    /// Range attenuation texture.
     SharedPtr<Texture> rampTexture_;
-    /// Spotlight attenuation texture
+    /// Spotlight attenuation texture.
     SharedPtr<Texture> shapeTexture_;
-    /// Shadow camera
+    /// Shadow camera.
     Camera* shadowCamera_;
-    /// Shadow map
+    /// Shadow map.
     Texture2D* shadowMap_;
-    /// Original light for splitting
+    /// Original light for splitting.
     Light* originalLight_;
 };

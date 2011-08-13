@@ -27,7 +27,7 @@
 #include "PhysicsDefs.h"
 #include "Vector3.h"
 
-/// Supported joint types
+/// Supported joint types.
 enum JointType
 {
     JOINT_NONE = 0,
@@ -38,80 +38,80 @@ enum JointType
 class PhysicsWorld;
 class RigidBody;
 
-/// Physics joint component. Connects two rigid bodies together, or one rigid body to a static point
+/// Physics joint component. Connects two rigid bodies together, or one rigid body to a static point.
 class Joint : public Component
 {
     OBJECT(Joint);
     
 public:
-    /// Construct
+    /// Construct.
     Joint(Context* context);
-    /// Destruct
+    /// Destruct.
     ~Joint();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
+    /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Perform finalization after a scene load or network update
+    /// Perform finalization after a scene load or network update.
     virtual void FinishUpdate();
-    /// Return the depended on nodes to order network updates
+    /// Return the depended on nodes to order network updates.
     virtual void GetDependencyNodes(PODVector<Node*>& dest);
     
-    /// Remove the joint
+    /// Remove the joint.
     void Clear();
-    /// %Set a ball joint
+    /// %Set a ball joint.
     bool SetBall(const Vector3& position, RigidBody* bodyA, RigidBody* bodyB = 0);
-    /// %Set a hinge joint
+    /// %Set a hinge joint.
     bool SetHinge(const Vector3& position, const Vector3& axis, RigidBody* bodyA, RigidBody* bodyB = 0);
-    /// %Set joint world position
+    /// %Set joint world position.
     void SetPosition(Vector3 position);
-    /// %Set joint world axis if applicable
+    /// %Set joint world axis if applicable.
     void SetAxis(Vector3 axis);
     
-    /// Return physics world
+    /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-    /// Return the first rigid body
+    /// Return the first rigid body.
     RigidBody* GetBodyA() const { return bodyA_; }
-    /// Return the second rigid body
+    /// Return the second rigid body.
     RigidBody* GetBodyB() const { return bodyB_; }
-    /// Return joint type
+    /// Return joint type.
     JointType GetJointType() const { return type_; }
-    /// Return the ODE joint ID
+    /// Return the ODE joint ID.
     dJointID GetJoint() const { return joint_; }
-    /// Return joint world position
+    /// Return joint world position.
     Vector3 GetPosition() const;
-    /// Return joint world axis
+    /// Return joint world axis.
     Vector3 GetAxis() const;
     
-    /// %Set body A attribute
+    /// %Set body A attribute.
     void SetBodyAAttr(int value);
-    /// %Set body B attribute
+    /// %Set body B attribute.
     void SetBodyBAttr(int value);
-    /// Return body A attribute
+    /// Return body A attribute.
     int GetBodyAAttr() const;
-    /// Return body B attribute
+    /// Return body B attribute.
     int GetBodyBAttr() const;
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
 private:
-    /// Physics world
-    SharedPtr<PhysicsWorld> physicsWorld_;
-    /// First rigid body
-    SharedPtr<RigidBody> bodyA_;
-    /// Second rigid body
-    SharedPtr<RigidBody> bodyB_;
-    /// Joint type
+    /// Physics world.
+    WeakPtr<PhysicsWorld> physicsWorld_;
+    /// First rigid body.
+    WeakPtr<RigidBody> bodyA_;
+    /// Second rigid body.
+    WeakPtr<RigidBody> bodyB_;
+    /// Joint type.
     JointType type_;
-    /// ODE joint ID
+    /// ODE joint ID.
     dJointID joint_;
-    /// Joint position for creation during post-load
+    /// Joint position for creation during post-load.
     Vector3 position_;
-    /// Joint axis for creation during post-load
+    /// Joint axis for creation during post-load.
     Vector3 axis_;
-    /// Recreate joint flag
+    /// Recreate joint flag.
     bool recreateJoint_;
 };

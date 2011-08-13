@@ -26,33 +26,33 @@
 #include "Ptr.h"
 #include "Variant.h"
 
-/// Attribute used for file serialization
+/// Attribute used for file serialization.
 static const unsigned AM_FILE = 0x1;
-/// Attribute used for network replication
+/// Attribute used for network replication.
 static const unsigned AM_NET = 0x2;
-/// Attribute used for both file serialization and network replication (default)
+/// Attribute used for both file serialization and network replication (default.)
 static const unsigned AM_DEFAULT = 0x3;
-/// Attribute should use latest data grouping instead of delta update in network replication
+/// Attribute should use latest data grouping instead of delta update in network replication.
 static const unsigned AM_LATESTDATA = 0x4;
-/// Attribute should not be shown in the editor
+/// Attribute should not be shown in the editor.
 static const unsigned AM_NOEDIT = 0x8;
 
 class Serializable;
 
-/// Internal helper class for invoking attribute accessors
+/// Internal helper class for invoking attribute accessors.
 class AttributeAccessor : public RefCounted
 {
 public:
-    /// Get the attribute
+    /// Get the attribute.
     virtual void Get(Serializable* ptr, Variant& dest) {}
-    /// %Set the attribute
+    /// %Set the attribute.
     virtual void Set(Serializable* ptr, const Variant& src) {}
 };
 
-/// Description of an automatically serializable variable
+/// Description of an automatically serializable variable.
 struct AttributeInfo
 {
-    /// Construct empty
+    /// Construct empty.
     AttributeInfo() :
         type_(VAR_NONE),
         offset_(0),
@@ -61,7 +61,7 @@ struct AttributeInfo
     {
     }
     
-    /// Construct offset attribute
+    /// Construct offset attribute.
     AttributeInfo(VariantType type, const char* name, unsigned offset, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
@@ -72,7 +72,7 @@ struct AttributeInfo
     {
     }
     
-   /// Construct offset enum attribute
+    /// Construct offset enum attribute.
     AttributeInfo(VariantType type, const char* name, unsigned offset, const String* enumNames, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
@@ -83,7 +83,7 @@ struct AttributeInfo
     {
     }
     
-    /// Construct accessor attribute
+    /// Construct accessor attribute.
     AttributeInfo(VariantType type, const char* name, AttributeAccessor* accessor, const Variant& defaultValue, unsigned mode) :
         type_(type),
         name_(name),
@@ -95,18 +95,18 @@ struct AttributeInfo
     {
     }
     
-    /// Attribute type
+    /// Attribute type.
     VariantType type_;
-    /// Name
+    /// Name.
     String name_;
-    /// Byte offset from start of object
+    /// Byte offset from start of object.
     unsigned offset_;
-    /// Enum string names
+    /// Enum string names.
     const String* enumNames_;
-    /// Helper object for accessor mode
+    /// Helper object for accessor mode.
     SharedPtr<AttributeAccessor> accessor_;
-    /// Default value for network replication
+    /// Default value for network replication.
     Variant defaultValue_;
-    /// Attribute mode: whether to use for serialization, network replication, or both
+    /// Attribute mode: whether to use for serialization, network replication, or both.
     unsigned mode_;
 };

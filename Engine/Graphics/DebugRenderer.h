@@ -37,15 +37,15 @@ class Matrix3x4;
 class Renderer;
 class Skeleton;
 
-/// Debug rendering line
+/// Debug rendering line.
 struct DebugLine
 {
-    /// Construct as undefined
+    /// Construct undefined.
     DebugLine()
     {
     }
     
-    /// Construct with start and end positions and color
+    /// Construct with start and end positions and color.
     DebugLine(const Vector3& start, const Vector3& end, unsigned color) :
         start_(start),
         end_(end),
@@ -53,63 +53,63 @@ struct DebugLine
     {
     }
     
-    /// Start position
+    /// Start position.
     Vector3 start_;
-    /// End position
+    /// End position.
     Vector3 end_;
-    /// Color
+    /// Color.
     unsigned color_;
 };
 
-/// Debug geometry rendering component. Should be added only to the root scene node
+/// Debug geometry rendering component. Should be added only to the root scene node.
 class DebugRenderer : public Component
 {
     OBJECT(DebugRenderer);
     
 public:
-    /// Construct
+    /// Construct.
     DebugRenderer(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~DebugRenderer();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling
+    /// %Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling.
     void SetView(Camera* camera);
-    /// Add a line
+    /// Add a line.
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
-    /// Add a bounding box
+    /// Add a bounding box.
     void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
-    /// Add a bounding box with transform
+    /// Add a bounding box with transform.
     void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
-    /// Add a frustum
+    /// Add a frustum.
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
-    /// Add a skeleton
+    /// Add a skeleton.
     void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true);
-    /// Render all debug lines. The viewport and rendertarget should be set before
+    /// Render all debug lines. The viewport and rendertarget should be set before.
     void Render();
     
-    /// Return the view transform
+    /// Return the view transform.
     const Matrix3x4& GetView() const { return view_; }
-    /// Return the projection transform
+    /// Return the projection transform.
     const Matrix4& GetProjection() const { return projection_; }
-    /// Return the view frustum
+    /// Return the view frustum.
     const Frustum& GetFrustum() const { return frustum_; }
-    /// Check whether a bounding box is inside the view frustum
+    /// Check whether a bounding box is inside the view frustum.
     bool IsInside(const BoundingBox& box) const;
     
 private:
-    /// Handle end of frame. Clear debug geometry
+    /// Handle end of frame. Clear debug geometry.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
     
-    /// Lines rendered with depth test
+    /// Lines rendered with depth test.
     PODVector<DebugLine> lines_;
-    /// Lines rendered without depth test
+    /// Lines rendered without depth test.
     PODVector<DebugLine> noDepthLines_;
-    /// View transform
+    /// View transform.
     Matrix3x4 view_;
-    /// Projection transform
+    /// Projection transform.
     Matrix4 projection_;
-    /// View frustum
+    /// View frustum.
     Frustum frustum_;
 };

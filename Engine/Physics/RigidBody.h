@@ -30,7 +30,7 @@
 class DebugRenderer;
 class PhysicsWorld;
 
-/// Physics rigid body component
+/// Physics rigid body component.
 class RigidBody : public Component
 {
     OBJECT(RigidBody);
@@ -38,116 +38,116 @@ class RigidBody : public Component
     friend class PhysicsWorld;
     
 public:
-    /// Construct
+    /// Construct.
     RigidBody(Context* context);
-    /// Destruct. Free the rigid body and geometries
+    /// Destruct. Free the rigid body and geometries.
     virtual ~RigidBody();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic
+    /// %Set mass. Zero mass (or the lack of collision shapes) makes the body kinematic.
     void SetMass(float mass);
-    /// %Set physics position
+    /// %Set physics position.
     void SetPosition(const Vector3& position);
-    /// %Set physics rotation
+    /// %Set physics rotation.
     void SetRotation(const Quaternion& rotation);
-    /// %Set physics transform
+    /// %Set physics transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set linear velocity
+    /// %Set linear velocity.
     void SetLinearVelocity(const Vector3& velocity);
-    /// %Set linear velocity deactivation threshold
+    /// %Set linear velocity deactivation threshold.
     void SetLinearRestThreshold(float threshold);
-    /// %Set linear velocity damping threshold
+    /// %Set linear velocity damping threshold.
     void SetLinearDampingThreshold(float threshold);
-    /// %Set linear velocity damping scale
+    /// %Set linear velocity damping scale.
     void SetLinearDampingScale(float scale);
-    /// %Set angular velocity
+    /// %Set angular velocity.
     void SetAngularVelocity(const Vector3& angularVelocity);
-    /// %Set angular velocity deactivation threshold
+    /// %Set angular velocity deactivation threshold.
     void SetAngularRestThreshold(float threshold);
-    /// %Set angular velocity damping threshold
+    /// %Set angular velocity damping threshold.
     void SetAngularDampingThreshold(float threshold);
-    /// %Set angular velocity damping scale
+    /// %Set angular velocity damping scale.
     void SetAngularDampingScale(float scale);
-    /// %Set maximum angular velocity. Set to 0 to disable rotation
+    /// %Set maximum angular velocity. Set to 0 to disable rotation.
     void SetAngularMaxVelocity(float velocity);
-    /// %Set rigid body active/inactive state
+    /// %Set rigid body active/inactive state.
     void SetActive(bool active);
-    /// Apply force to center of mass
+    /// Apply force to center of mass.
     void ApplyForce(const Vector3& force);
-    /// Apply force at position
+    /// Apply force at position.
     void ApplyForceAtPosition(const Vector3& force, const Vector3& position);
-    /// Apply torque
+    /// Apply torque.
     void ApplyTorque(const Vector3& torque);
-    /// Reset accumulated forces
+    /// Reset accumulated forces.
     void ResetForces();
     
-    /// Return physics world
+    /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-    /// Return mass
+    /// Return mass.
     float GetMass() const { return mass_; }
-    /// Return ODE body ID
+    /// Return ODE body ID.
     dBodyID GetBody() const { return body_; }
-    /// Return physics position
+    /// Return physics position.
     const Vector3& GetPosition() const;
-    /// Return physics rotation
+    /// Return physics rotation.
     const Quaternion& GetRotation() const;
-    /// Return linear velocity
+    /// Return linear velocity.
     const Vector3& GetLinearVelocity() const;
-    /// Return linear velocity deactivation threshold
+    /// Return linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
-    /// Return linear velocity damping threshold
+    /// Return linear velocity damping threshold.
     float GetLinearDampingThreshold() const;
-    /// Return linear velocity damping scale
+    /// Return linear velocity damping scale.
     float GetLinearDampingScale() const;
-    /// Return angular velocity
+    /// Return angular velocity.
     const Vector3& GetAngularVelocity() const;
-    /// Return angular velocity deactivation threshold
+    /// Return angular velocity deactivation threshold.
     float GetAngularRestThreshold() const;
-    /// Return angular velocity damping threshold
+    /// Return angular velocity damping threshold.
     float GetAngularDampingThreshold() const;
-    /// Return angular velocity damping scale
+    /// Return angular velocity damping scale.
     float GetAngularDampingScale() const;
-    /// Return maximum angular velocity
+    /// Return maximum angular velocity.
     float GetAngularMaxVelocity() const;
-    /// Return whether body is active
+    /// Return whether body is active.
     bool IsActive() const;
     
-    /// Recalculate mass
+    /// Recalculate mass.
     void UpdateMass();
-    /// %Set network angular velocity attribute
+    /// %Set network angular velocity attribute.
     void SetNetAngularVelocityAttr(const PODVector<unsigned char>& value);
-    /// Return network angular velocity attribute
+    /// Return network angular velocity attribute.
     const PODVector<unsigned char>& GetNetAngularVelocityAttr() const;
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Handle node transform being dirtied
+    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     
 private:
-    /// Store previous transform for rendering interpolation
+    /// Store previous transform for rendering interpolation.
     void PreStep();
-    /// Interpolate between previous and current transform and store as rendering transform
+    /// Interpolate between previous and current transform and store as rendering transform.
     void PostStep(float t, HashSet<RigidBody*>& processedBodies);
-    /// Create the body
+    /// Create the body.
     void CreateBody();
-    /// Remove the body
+    /// Remove the body.
     void ReleaseBody();
     
-    /// Physics world
-    SharedPtr<PhysicsWorld> physicsWorld_;
-    /// Mass
+    /// Physics world.
+    WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Mass.
     float mass_;
-    /// ODE body ID
+    /// ODE body ID.
     dBodyID body_;
-    /// Previous position for rendering interpolation
+    /// Previous position for rendering interpolation.
     Vector3 previousPosition_;
-    /// Previous rotation for rendering interpolation
+    /// Previous rotation for rendering interpolation.
     Quaternion previousRotation_;
-    /// Attribute buffer for network replication
+    /// Attribute buffer for network replication.
     mutable VectorBuffer attrBuffer_;
-    /// Poststep flag
+    /// Poststep flag.
     bool inPostStep_;
 };

@@ -33,11 +33,11 @@ class OcclusionBuffer;
 class Drawable;
 class Node;
 
-/// Base class for octree queries
+/// Base class for octree queries.
 class OctreeQuery
 {
 public:
-    /// Construct with result vector, include/exclude flags and whether to get only occluders or shadowcasters
+    /// Construct with query parameters.
     OctreeQuery(PODVector<Drawable*>& result, unsigned char drawableFlags, unsigned viewMask, bool occludersOnly, bool shadowCastersOnly) :
         result_(result),
         drawableFlags_(drawableFlags),
@@ -47,33 +47,33 @@ public:
     {
     }
     
-    /// Destruct
+    /// Destruct.
     virtual ~OctreeQuery()
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const = 0;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const = 0;
     
-    /// Result vector reference
+    /// Result vector reference.
     PODVector<Drawable*>& result_;
-    /// Drawable flags to include
+    /// Drawable flags to include.
     unsigned char drawableFlags_;
-    /// Drawable layers to include
+    /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get occluders only flag
+    /// Get occluders only flag.
     bool occludersOnly_;
-    /// Get shadowcasters only flag
+    /// Get shadowcasters only flag.
     bool shadowCastersOnly_;
 };
 
-/// Point octree query
+/// Point octree query.
 class PointOctreeQuery : public OctreeQuery
 {
 public:
-    /// Construct with point and query parameters
+    /// Construct with point and query parameters.
     PointOctreeQuery(PODVector<Drawable*>& result, const Vector3& point, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
@@ -81,20 +81,20 @@ public:
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
-    /// Point
+    /// Point.
     Vector3 point_;
 };
 
-/// Sphere octree query
+/// Sphere octree query.
 class SphereOctreeQuery : public OctreeQuery
 {
 public:
-    /// Construct with sphere and query parameters
+    /// Construct with sphere and query parameters.
     SphereOctreeQuery(PODVector<Drawable*>& result, const Sphere& sphere, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
@@ -102,20 +102,20 @@ public:
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
-    /// Sphere
+    /// Sphere.
     Sphere sphere_;
 };
 
-/// Bounding box octree query
+/// Bounding box octree query.
 class BoxOctreeQuery : public OctreeQuery
 {
 public:
-    /// Construct with bounding box and query parameters
+    /// Construct with bounding box and query parameters.
     BoxOctreeQuery(PODVector<Drawable*>& result, const BoundingBox& box, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
@@ -123,20 +123,20 @@ public:
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
-    /// Bounding box
+    /// Bounding box.
     BoundingBox box_;
 };
 
-/// Frustum octree query
+/// Frustum octree query.
 class FrustumOctreeQuery : public OctreeQuery
 {
 public:
-    /// Construct with frustum and query parameters
+    /// Construct with frustum and query parameters.
     FrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, unsigned char drawableFlags = DRAWABLE_ANY,
         unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false, bool shadowCastersOnly = false) :
         OctreeQuery(result, drawableFlags, viewMask, occludersOnly, shadowCastersOnly),
@@ -144,20 +144,20 @@ public:
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
     
-    /// Frustum
+    /// Frustum.
     Frustum frustum_;
 };
 
-/// Frustum octree query with occlusion
+/// Frustum octree query with occlusion.
 class OccludedFrustumOctreeQuery : public OctreeQuery
 {
 public:
-    /// Construct with frustum, occlusion buffer pointer and query parameters
+    /// Construct with frustum, occlusion buffer pointer and query parameters.
     OccludedFrustumOctreeQuery(PODVector<Drawable*>& result, const Frustum& frustum, OcclusionBuffer* buffer,
         unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, bool occludersOnly = false,
         bool shadowCastersOnly = false) :
@@ -167,18 +167,18 @@ public:
     {
     }
     
-    /// Intersection test for an octant
+    /// Intersection test for an octant.
     virtual Intersection TestOctant(const BoundingBox& box, bool inside) const;
-    /// Intersection test for a drawable
+    /// Intersection test for a drawable.
     virtual Intersection TestDrawable(const BoundingBox& box, bool inside) const;
     
-    /// Frustum
+    /// Frustum.
     Frustum frustum_;
-    /// Occlusion buffer
+    /// Occlusion buffer.
     OcclusionBuffer* buffer_;
 };
 
-/// Graphics raycast detail level
+/// Graphics raycast detail level.
 enum RayQueryLevel
 {
     RAY_AABB_NOSUBOBJECTS = 0,
@@ -187,30 +187,30 @@ enum RayQueryLevel
     RAY_TRIANGLE
 };
 
-/// Raycast result
+/// Raycast result.
 struct RayQueryResult
 {
-    /// Construct
+    /// Construct.
     RayQueryResult() :
         subObject_(M_MAX_UNSIGNED)
     {
     }
     
-    /// Drawable
+    /// Drawable.
     Drawable* drawable_;
-    /// Scene node
+    /// Scene node.
     Node* node_;
-    /// Distance from ray origin
+    /// Distance from ray origin.
     float distance_;
-    /// Drawable specific subobject if applicable
+    /// Drawable specific subobject if applicable.
     unsigned subObject_;
 };
 
-/// Ray octree query
+/// Raycast octree query.
 class RayOctreeQuery
 {
 public:
-    /// Construct with ray and query parameters
+    /// Construct with ray and query parameters.
     RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
         float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK, 
         bool occludersOnly = false, bool shadowCastersOnly = false) :
@@ -225,20 +225,20 @@ public:
     {
     }
     
-    /// Result vector reference
+    /// Result vector reference.
     PODVector<RayQueryResult>& result_;
-    /// Ray
+    /// Ray.
     Ray ray_;
-    /// Drawable flags to include
+    /// Drawable flags to include.
     unsigned char drawableFlags_;
-    /// Drawable layers to include
+    /// Drawable layers to include.
     unsigned viewMask_;
-    /// Get occluders only flag
+    /// Get occluders only flag.
     bool occludersOnly_;
-    /// Get shadowcasters only flag
+    /// Get shadowcasters only flag.
     bool shadowCastersOnly_;
-    /// Maximum ray distance
+    /// Maximum ray distance.
     float maxDistance_;
-    /// Raycast detail level
+    /// Raycast detail level.
     RayQueryLevel level_;
 };

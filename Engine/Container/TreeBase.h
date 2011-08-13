@@ -29,10 +29,10 @@
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
-/// Red-black tree node base
+/// Red-black tree node base.
 struct TreeNodeBase
 {
-    /// Construct
+    /// Construct.
     TreeNodeBase() :
         parent_(0),
         isRed_(true)
@@ -41,7 +41,7 @@ struct TreeNodeBase
         link_[1] = 0;
     }
     
-    /// %Set a child link, adjusting the child's parent as necessary
+    /// %Set a child link, adjusting the child's parent as necessary.
     void SetChild(unsigned dir, TreeNodeBase* newChild)
     {
         link_[dir] = newChild;
@@ -49,45 +49,42 @@ struct TreeNodeBase
             newChild->parent_ = this;
     }
     
-    /// Parent node
+    /// Parent node.
     TreeNodeBase* parent_;
-    /// Child links
+    /// Child links.
     TreeNodeBase* link_[2];
-    /// Color flag
+    /// Color flag.
     bool isRed_;
 };
 
-/// Red-black tree iterator base class
+/// Red-black tree iterator base class.
 class TreeIteratorBase
 {
 public:
-    /// Construct
+    /// Construct.
     TreeIteratorBase() :
         ptr_(0),
         prev_(0)
     {
     }
     
-    /// Construct with a node pointer
+    /// Construct with a node pointer.
     TreeIteratorBase(TreeNodeBase* ptr) :
         ptr_(ptr),
         prev_(0)
     {
     }
     
-    /// Test for equality with another iterator
+    /// Test for equality with another iterator.
     bool operator == (const TreeIteratorBase& rhs) const { return ptr_ == rhs.ptr_; }
-    /// Test for inequality with another iterator
+    /// Test for inequality with another iterator.
     bool operator != (const TreeIteratorBase& rhs) const { return ptr_ != rhs.ptr_; }
     
-    /// Go to the next node
+    /// Go to the next node.
     void GotoNext()
     {
         if (!ptr_)
-        {
-            prev_ = 0;
             return;
-        }
         
         prev_ = ptr_;
         
@@ -105,7 +102,7 @@ public:
             ptr_ = ptr_->link_[0];
     }
     
-    /// Go to the previous node
+    /// Go to the previous node.
     void GotoPrev()
     {
         if (!ptr_)
@@ -131,17 +128,17 @@ public:
             ptr_ = ptr_->link_[1];
     }
     
-    /// Current node pointer
+    /// Current node pointer.
     TreeNodeBase* ptr_;
-    /// Previous node pointer, needed to back from the end
+    /// Previous node pointer, needed to go back from the end.
     TreeNodeBase* prev_;
 };
 
-/// Red-black tree base class
+/// Red-black tree base class.
 class TreeBase
 {
 public:
-    /// Construct
+    /// Construct.
     TreeBase() :
         root_(0),
         allocator_(0),
@@ -149,7 +146,7 @@ public:
     {
     }
     
-    /// Swap with another tree
+    /// Swap with another tree.
     void Swap(TreeBase& rhs)
     {
         ::Swap(root_, rhs.root_);
@@ -158,10 +155,10 @@ public:
     }
     
 protected:
-    /// Check whether a node is red
+    /// Check whether a node is red.
     bool IsRed(TreeNodeBase* node) const { return node && node->isRed_; }
     
-    /// Single rotation
+    /// Single rotation.
     TreeNodeBase* RotateSingle(TreeNodeBase* node, unsigned dir)
     {
         TreeNodeBase* save = node->link_[!dir];
@@ -175,17 +172,17 @@ protected:
         return save;
     }
     
-    /// Double rotation
+    /// Double rotation.
     TreeNodeBase* RotateDouble(TreeNodeBase* node, unsigned dir)
     {
         node->SetChild(!dir, RotateSingle(node->link_[!dir], !dir));
         return RotateSingle(node, dir);
     }
     
-    /// Root node
+    /// Root node.
     TreeNodeBase* root_;
-    /// Node allocator
+    /// Node allocator.
     AllocatorBlock* allocator_;
-    /// Number of nodes
+    /// Number of nodes.
     unsigned size_;
 };

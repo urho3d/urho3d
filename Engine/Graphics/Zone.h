@@ -32,59 +32,59 @@ class Zone : public Drawable
     OBJECT(Zone);
     
 public:
-    /// Construct
+    /// Construct.
     Zone(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Zone();
-    /// Register object factory. Drawable must be registered first
+    /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
+    /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     
-    /// %Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside
+    /// %Set bounding box. Will be used as an oriented bounding box to test whether the camera is inside.
     void SetBoundingBox(const BoundingBox& box);
-    /// %Set ambient color
+    /// %Set ambient color.
     void SetAmbientColor(const Color& color);
-    /// %Set fog color
+    /// %Set fog color.
     void SetFogColor(const Color& color);
-    /// %Set fog start distance
+    /// %Set fog start distance.
     void SetFogStart(float start);
-    /// %Set fog end distance
+    /// %Set fog end distance.
     void SetFogEnd(float end);
-    /// %Set zone priority. If camera is inside several zones, the one with highest priority is used
+    /// %Set zone priority. If camera is inside several zones, the one with highest priority is used.
     void SetPriority(int priority);
     
-    /// Return bounding box
+    /// Return bounding box.
     const BoundingBox& GetBoundingBox() const { return boundingBox_; }
-    /// Return ambient color
+    /// Return ambient color.
     const Color& GetAmbientColor() const { return ambientColor_; }
-    /// Return fog color
+    /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
-    /// Return fog start distance
+    /// Return fog start distance.
     float GetFogStart() const { return fogStart_; }
-    /// Return fog end distance
+    /// Return fog end distance.
     float GetFogEnd() const { return fogEnd_; }
-    /// Return zone priority
+    /// Return zone priority.
     int GetPriority() const { return priority_; }
     
-    /// Check whether a point is inside
+    /// Check whether a point is inside.
     virtual bool IsInside(const Vector3& point);
     
 protected:
-    /// Update world-space bounding box
+    /// Update world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     
-    /// Bounding box
+    /// Bounding box.
     BoundingBox boundingBox_;
-    /// Ambient color
+    /// Ambient color.
     Color ambientColor_;
-    /// Fog color
+    /// Fog color.
     Color fogColor_;
-    /// Fog start distance
+    /// Fog start distance.
     float fogStart_;
-    /// Fog end distance
+    /// Fog end distance.
     float fogEnd_;
-    /// Zone priority
+    /// Zone priority.
     int priority_;
 };

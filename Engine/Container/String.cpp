@@ -191,6 +191,20 @@ String::Iterator String::Replace(const String::Iterator& start, const String::It
     return Begin() + pos;
 }
 
+String String::Replaced(char replaceThis, char replaceWith) const
+{
+    String ret(*this);
+    ret.Replace(replaceThis, replaceWith);
+    return ret;
+}
+
+String String::Replaced(const String& replaceThis, const String& replaceWith) const
+{
+    String ret(*this);
+    ret.Replace(replaceThis, replaceWith);
+    return ret;
+}
+
 void String::Append(const String& str)
 {
     *this += str;

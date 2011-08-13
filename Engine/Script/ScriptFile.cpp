@@ -432,7 +432,12 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     for (unsigned i = 0; i < includeFiles.Size(); ++i)
     {
         SharedPtr<File> file = cache->GetFile(includeFiles[i]);
-        if (!AddScriptSection(engine, *file))
+        if (file)
+        {
+            if (!AddScriptSection(engine, *file))
+                return false;
+        }
+        else
             return false;
     }
     

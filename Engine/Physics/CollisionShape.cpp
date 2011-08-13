@@ -915,6 +915,9 @@ void CollisionShape::CreateGeometry()
 
 void CollisionShape::ReleaseGeometry(bool notifyBody)
 {
+    if (!physicsWorld_)
+        return;
+    
     if (geometry_)
     {
         dGeomDestroy(geometry_);
@@ -923,8 +926,7 @@ void CollisionShape::ReleaseGeometry(bool notifyBody)
     
     model_.Reset();
     geometryData_.Reset();
-    if (physicsWorld_)
-        physicsWorld_->CleanupGeometryCache();
+    physicsWorld_->CleanupGeometryCache();
     
     // If rigid body component exists, let it recalculate its mass now
     if (notifyBody)

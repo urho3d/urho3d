@@ -1,4 +1,4 @@
-#include "Scripts/Network.as"
+#include "Scripts/Utilities/Network.as"
 
 Text@ chatHistoryText;
 UIElement@ buttonLayout;

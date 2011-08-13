@@ -64,7 +64,7 @@ bool Thread::Start()
 {
     // Check if already running
     if (handle_)
-        return true;
+        return false;
     
     shouldRun_ = true;
     #ifdef WIN32

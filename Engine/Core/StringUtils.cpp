@@ -31,13 +31,16 @@
 
 bool ToBool(const String& source)
 {
-    if (source.Empty())
-        return false;
-    char first = tolower(source[0]);
-    if (first == 't' || first == 'y' || first == '1')
-        return true;
-    else
-        return false;
+    for (unsigned i = 0; i < source.Length(); ++i)
+    {
+        char c = tolower(source[0]);
+        if (c == 't' || c == 'y' || c == '1')
+            return true;
+        else if (c != ' ' && c != '\t')
+            break;
+    }
+    
+    return false;
 }
 
 int ToInt(const String& source)

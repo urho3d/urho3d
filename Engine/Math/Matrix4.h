@@ -26,16 +26,16 @@
 #include "Quaternion.h"
 #include "Vector4.h"
 
-/// 4x4 matrix for arbitrary linear transforms including projection
+/// 4x4 matrix for arbitrary linear transforms including projection.
 class Matrix4
 {
 public:
-    /// Construct an undefined matrix
+    /// Construct undefined.
     Matrix4()
     {
     }
     
-    /// Copy-construct from another matrix
+    /// Copy-construct from another matrix.
     Matrix4(const Matrix4& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -56,7 +56,7 @@ public:
     {
     }
     
-    /// Copy-cnstruct from a 3x3 matrix and set the extra elements to identity
+    /// Copy-cnstruct from a 3x3 matrix and set the extra elements to identity.
     Matrix4(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -77,7 +77,7 @@ public:
     {
     }
     
-    // Construct from values
+    // Construct from values.
     Matrix4(float v00, float v01, float v02, float v03,
             float v10, float v11, float v12, float v13,
             float v20, float v21, float v22, float v23,
@@ -101,7 +101,7 @@ public:
     {
     }
     
-    /// Construct from a float array
+    /// Construct from a float array.
     Matrix4(float* data) :
         m00_(data[0]),
         m01_(data[1]),
@@ -122,7 +122,7 @@ public:
     {
     }
     
-    /// Assign from another matrix
+    /// Assign from another matrix.
     Matrix4& operator = (const Matrix4& rhs)
     {
         m00_ = rhs.m00_;
@@ -144,7 +144,7 @@ public:
         return *this;
     }
     
-    /// Assign from a 3x3 matrix. Set the extra elements to identity
+    /// Assign from a 3x3 matrix. Set the extra elements to identity.
     Matrix4& operator = (const Matrix3& rhs)
     {
         m00_ = rhs.m00_;
@@ -166,7 +166,7 @@ public:
         return *this;
     }
     
-    /// Multiply a Vector3 which is assumed to represent position
+    /// Multiply a Vector3 which is assumed to represent position.
     Vector3 operator * (const Vector3& rhs) const
     {
         float invW = 1.0f / (m30_ * rhs.x_ + m31_ * rhs.y_ + m32_ * rhs.z_ + m33_);
@@ -178,7 +178,7 @@ public:
         );
     }
     
-    /// Multiply a Vector4
+    /// Multiply a Vector4.
     Vector4 operator * (const Vector4& rhs) const
     {
         return Vector4(
@@ -189,7 +189,7 @@ public:
         );
     }
     
-    /// Add a matrix
+    /// Add a matrix.
     Matrix4 operator + (const Matrix4& rhs) const
     {
         return Matrix4(
@@ -212,7 +212,7 @@ public:
         );
     }
     
-    /// Subtract a matrix
+    /// Subtract a matrix.
     Matrix4 operator - (const Matrix4& rhs) const
     {
         return Matrix4(
@@ -235,7 +235,7 @@ public:
         );
     }
     
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Matrix4 operator * (float rhs) const
     {
         return Matrix4(
@@ -258,7 +258,7 @@ public:
         );
     }
     
-    /// Multiply a matrix
+    /// Multiply a matrix.
     Matrix4 operator * (const Matrix4& rhs) const
     {
         return Matrix4(
@@ -281,7 +281,7 @@ public:
         );
     }
     
-    /// %Set translation elements
+    /// %Set translation elements.
     void SetTranslation(const Vector3& translation)
     {
         m03_ = translation.x_;
@@ -289,7 +289,7 @@ public:
         m23_ = translation.z_;
     }
     
-    /// %Set rotation elements from a 3x3 matrix
+    /// %Set rotation elements from a 3x3 matrix.
     void SetRotation(const Matrix3& rotation)
     {
         m00_ = rotation.m00_;
@@ -303,7 +303,7 @@ public:
         m22_ = rotation.m22_;
     }
     
-    // Set scaling elements
+    // Set scaling elements.
     void SetScale(const Vector3& scale)
     {
         m00_ = scale.x_;
@@ -311,7 +311,7 @@ public:
         m22_ = scale.z_;
     }
     
-    // Set uniform scaling elements
+    // Set uniform scaling elements.
     void SetScale(float scale)
     {
         m00_ = scale;
@@ -319,7 +319,7 @@ public:
         m22_ = scale;
     }
     
-    /// Return the combined rotation and scaling matrix
+    /// Return the combined rotation and scaling matrix.
     Matrix3 ToMatrix3() const
     {
         return Matrix3(
@@ -335,7 +335,7 @@ public:
         );
     }
     
-    /// Return the rotation matrix with scaling removed
+    /// Return the rotation matrix with scaling removed.
     Matrix3 RotationMatrix() const
     {
         Vector3 invScale(
@@ -347,7 +347,7 @@ public:
         return ToMatrix3().Scaled(invScale);
     }
     
-    /// Return the translation part
+    /// Return the translation part.
     Vector3 Translation() const
     {
         return Vector3(
@@ -357,11 +357,8 @@ public:
         );
     }
     
-    /// Return the rotation part
-    Quaternion Rotation() const
-    {
-        return Quaternion(RotationMatrix());
-    }
+    /// Return the rotation part.
+    Quaternion Rotation() const { return Quaternion(RotationMatrix()); }
     
     /// Return the scaling part
     Vector3 Scale() const
@@ -398,7 +395,6 @@ public:
     
     /// Return decomposition to translation, rotation and scale
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
-    
     /// Return inverse
     Matrix4 Inverse() const;
     
@@ -422,9 +418,9 @@ public:
     float m32_;
     float m33_;
     
-    /// Zero matrix
+    /// Zero matrix.
     static const Matrix4 ZERO;
-    /// Identity matrix
+    /// Identity matrix.
     static const Matrix4 IDENTITY;
 };
 

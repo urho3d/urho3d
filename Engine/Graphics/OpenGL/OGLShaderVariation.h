@@ -31,51 +31,51 @@
 class Shader;
 class ShaderProgram;
 
-/// Shader object on the GPU
+/// Shader object on the GPU.
 class ShaderVariation : public RefCounted, public GPUObject
 {
 public:
-    /// Construct
+    /// Construct.
     ShaderVariation(Shader* shader, ShaderType type);
-    /// Destruct
+    /// Destruct.
     virtual ~ShaderVariation();
     
-    /// Release the shader
+    /// Release the shader.
     virtual void Release();
     
-    /// Compile the shader. Return true if successful
+    /// Compile the shader. Return true if successful.
     bool Create();
-    /// Set name
+    /// Set name.
     void SetName(const String& name);
-    /// Set source code
+    /// Set source code.
     void SetSourceCode(const SharedArrayPtr<char>& code, unsigned length);
-    /// Set defines
+    /// Set defines.
     void SetDefines(const Vector<String>& defines);
     
-    /// Return shader type
+    /// Return shader type.
     ShaderType GetShaderType() const { return shaderType_; }
-    /// Return full shader name
+    /// Return full shader name.
     const String& GetName() const { return name_; }
-    /// Return defines
+    /// Return defines.
     const Vector<String>& GetDefines() const { return defines_; }
-    /// Return whether successfully compiled
+    /// Return whether successfully compiled.
     bool IsCompiled() const { return compiled_; }
-    /// Return compile error/warning string
+    /// Return compile error/warning string.
     const String& GetCompilerOutput() const { return compilerOutput_; }
     
 private:
-    /// Shader type
+    /// Shader type.
     ShaderType shaderType_;
-    /// Full shader name
+    /// Full shader name.
     String name_;
-    /// GLSL source code
+    /// GLSL source code.
     SharedArrayPtr<char> sourceCode_;
-    /// Source code length
+    /// Source code length.
     unsigned sourceCodeLength_;
-    /// Defines to use in compiling
+    /// Defines to use in compiling.
     Vector<String> defines_;
-    /// Shader compile error string
+    /// Shader compile error string.
     String compilerOutput_;
-    /// Compiled flag
+    /// Compiled flag.
     bool compiled_;
 };

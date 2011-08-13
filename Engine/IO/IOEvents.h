@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-/// Log message event
+/// Log message event.
 EVENT(E_LOGMESSAGE, LogMessage)
 {
     PARAM(P_MESSAGE, Message);          // string

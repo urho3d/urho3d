@@ -25,7 +25,7 @@
 
 #include "Button.h"
 
-/// Menu UI element that optionally shows a popup
+/// Menu UI element that optionally shows a popup.
 class Menu : public Button
 {
     OBJECT(Menu);
@@ -33,57 +33,57 @@ class Menu : public Button
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     Menu(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Menu();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// React to the popup being shown
+    /// React to the popup being shown.
     virtual void OnShowPopup();
     
-    /// %Set popup element to show on selection
+    /// %Set popup element to show on selection.
     void SetPopup(UIElement* element);
-    /// %Set popup element offset
+    /// %Set popup element offset.
     void SetPopupOffset(const IntVector2& offset);
-    /// %Set popup element offset
+    /// %Set popup element offset.
     void SetPopupOffset(int x, int y);
-    /// Force the popup to show or hide
+    /// Force the popup to show or hide.
     void ShowPopup(bool enable);
-    /// %Set accelerator key (set zero key code to disable)
+    /// %Set accelerator key (set zero key code to disable.)
     void SetAccelerator(int key, int qualifiers);
     
-    /// Return popup element
+    /// Return popup element.
     UIElement* GetPopup() const { return popup_; }
-    /// Return popup element offset
+    /// Return popup element offset.
     const IntVector2& GetPopupOffset() const { return popupOffset_; }
-    /// Return whether popup is open
+    /// Return whether popup is open.
     bool GetShowPopup() const { return showPopup_; }
-    /// Return accelerator key code, 0 if disabled
+    /// Return accelerator key code, 0 if disabled.
     int GetAcceleratorKey() const { return acceleratorKey_; }
-    /// Return accelerator qualifiers
+    /// Return accelerator qualifiers.
     int GetAcceleratorQualifiers() const { return acceleratorQualifiers_; }
     
 protected:
-    /// Popup element
+    /// Popup element.
     SharedPtr<UIElement> popup_;
-    /// Popup element offset
+    /// Popup element offset.
     IntVector2 popupOffset_;
-    /// Show popup flag
+    /// Show popup flag.
     bool showPopup_;
-    /// Accelerator key code
+    /// Accelerator key code.
     int acceleratorKey_;
-    /// Accelerator qualifiers
+    /// Accelerator qualifiers.
     int acceleratorQualifiers_;
     
 private:
-    /// Handle press and release for selection and toggling popup visibility
+    /// Handle press and release for selection and toggling popup visibility.
     void HandlePressedReleased(StringHash eventType, VariantMap& eventData);
-    /// Handle UI focus change to check for hiding the popup
+    /// Handle UI focus change to check for hiding the popup.
     void HandleFocusChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle keypress for checking accelerator
+    /// Handle keypress for checking accelerator.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };

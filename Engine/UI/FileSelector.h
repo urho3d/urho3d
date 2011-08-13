@@ -37,140 +37,140 @@ class UIElement;
 class Window;
 class XMLFile;
 
-/// File selector's list entry (file or directory)
+/// File selector's list entry (file or directory.)
 struct FileSelectorEntry
 {
-    /// Name
+    /// Name.
     String name_;
-    /// Directory flag
+    /// Directory flag.
     bool directory_;
 };
 
-/// File selector dialog
+/// File selector dialog.
 class FileSelector : public Object
 {
     OBJECT(FileSelector);
     
 public:
-    /// Construct
+    /// Construct.
     FileSelector(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~FileSelector();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set fileselector UI style
+    /// %Set fileselector UI style.
     void SetStyle(XMLFile* style);
-    /// %Set title text
+    /// %Set title text.
     void SetTitle(const String& text);
-    /// %Set button texts
+    /// %Set button texts.
     void SetButtonTexts(const String& okText, const String& cancelText);
-    /// %Set current path
+    /// %Set current path.
     void SetPath(const String& path);
-    /// %Set current filename
+    /// %Set current filename.
     void SetFileName(const String& fileName);
-    /// %Set filters
+    /// %Set filters.
     void SetFilters(const Vector<String>& filters, unsigned defaultIndex);
-    /// %Set directory selection mode. Default false
+    /// %Set directory selection mode. Default false.
     void SetDirectoryMode(bool enable);
-    /// Update elements to layout properly. Call this after manually adjusting the sub-elements
+    /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
     
-    /// Return the UI style file
+    /// Return the UI style file.
     XMLFile* GetStyle() const { return style_; }
-    /// Return fileselector window
+    /// Return fileselector window.
     Window* GetWindow() const { return window_; }
-    /// Return window title text
+    /// Return window title text.
     Text* GetTitleText() const { return titleText_; }
-    /// Return file list
+    /// Return file list.
     ListView* GetFileList() const { return fileList_; }
-    /// Return path editor
+    /// Return path editor.
     LineEdit* GetPathEdit() const { return pathEdit_; }
-    /// Return filename editor
+    /// Return filename editor.
     LineEdit* GetFileNameEdit() const { return fileNameEdit_; }
-    /// Return filter dropdown
+    /// Return filter dropdown.
     DropDownList* GetFilterList() const { return filterList_; }
-    /// Return OK button
+    /// Return OK button.
     Button* GetOKButton() const { return okButton_; }
-    /// Return cancel button
+    /// Return cancel button.
     Button* GetCancelButton() const { return cancelButton_; }
-    /// Return close button
+    /// Return close button.
     Button* GetCloseButton() const { return closeButton_; }
-    /// Return current path
+    /// Return current path.
     const String& GetPath() const { return path_; }
-    /// Return current filename
+    /// Return current filename.
     const String& GetFileName() const;
-    /// Return current filter
+    /// Return current filter.
     const String& GetFilter() const;
-    /// Return current filter index
+    /// Return current filter index.
     unsigned GetFilterIndex() const;
-    /// Return directory mode flag
+    /// Return directory mode flag.
     bool GetDirectoryMode() const { return directoryMode_; }
     
 private:
-    /// %Set the text of an edit field and ignore the resulting event
+    /// %Set the text of an edit field and ignore the resulting event.
     void SetLineEditText(LineEdit* edit, const String& text);
-    /// Refresh the directory listing
+    /// Refresh the directory listing.
     void RefreshFiles();
-    /// Enter a directory or confirm a file. Return true if a directory entered
+    /// Enter a directory or confirm a file. Return true if a directory entered.
     bool EnterFile();
-    /// Handle filter changed
+    /// Handle filter changed.
     void HandleFilterChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle path edited
+    /// Handle path edited.
     void HandlePathChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle file selected from the list
+    /// Handle file selected from the list.
     void HandleFileSelected(StringHash eventType, VariantMap& eventData);
-    /// Handle file doubleclicked from the list (enter directory / OK the file selection)
+    /// Handle file doubleclicked from the list (enter directory / OK the file selection.)
     void HandleFileDoubleClicked(StringHash eventType, VariantMap& eventData);
-    /// Handle file list key pressed
+    /// Handle file list key pressed.
     void HandleFileListKey(StringHash eventType, VariantMap& eventData);
-    /// Handle OK button pressed
+    /// Handle OK button pressed.
     void HandleOKPressed(StringHash eventType, VariantMap& eventData);
-    /// Handle cancel button pressed
+    /// Handle cancel button pressed.
     void HandleCancelPressed(StringHash eventType, VariantMap& eventData);
     
-    /// UI subsystem
+    /// UI subsystem.
     SharedPtr<UI> ui_;
-    /// UI style file
+    /// UI style file.
     SharedPtr<XMLFile> style_;
-    /// Fileselector window
+    /// Fileselector window.
     SharedPtr<Window> window_;
-    /// Title layout
+    /// Title layout.
     SharedPtr<UIElement> titleLayout;
-    /// Window title text
+    /// Window title text.
     SharedPtr<Text> titleText_;
-    /// File list
+    /// File list.
     SharedPtr<ListView> fileList_;
-    /// Path editor
+    /// Path editor.
     SharedPtr<LineEdit> pathEdit_;
-    /// Filename editor
+    /// Filename editor.
     SharedPtr<LineEdit> fileNameEdit_;
-    /// Filter dropdown
+    /// Filter dropdown.
     SharedPtr<DropDownList> filterList_;
-    /// OK button
+    /// OK button.
     SharedPtr<Button> okButton_;
-    /// OK button text
+    /// OK button text.
     SharedPtr<Text> okButtonText_;
-    /// Cancel button
+    /// Cancel button.
     SharedPtr<Button> cancelButton_;
-    /// Cancel button text
+    /// Cancel button text.
     SharedPtr<Text> cancelButtonText_;
-    /// Close button
+    /// Close button.
     SharedPtr<Button> closeButton_;
-    /// Filename and filter layout
+    /// Filename and filter layout.
     SharedPtr<UIElement> fileNameLayout_;
-    /// Button layout
+    /// Button layout.
     SharedPtr<UIElement> buttonLayout_;
-    /// Current path
+    /// Current directory.
     String path_;
-    /// Filters
+    /// Filters.
     Vector<String> filters_;
-    /// File entries
+    /// File entries.
     Vector<FileSelectorEntry> fileEntries_;
-    /// Filter used to get the file list
+    /// Filter used to get the file list.
     String lastUsedFilter_;
-    /// Directory mode flag
+    /// Directory mode flag.
     bool directoryMode_;
-    /// Ignore events flag, used when changing line edits manually
+    /// Ignore events flag, used when changing line edits manually.
     bool ignoreEvents_;
 };

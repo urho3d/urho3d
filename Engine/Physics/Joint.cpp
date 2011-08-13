@@ -111,7 +111,7 @@ void Joint::GetDependencyNodes(PODVector<Node*>& dest)
 
 void Joint::Clear()
 {
-    if (joint_)
+    if (joint_ && physicsWorld_)
     {
         dJointDestroy(joint_);
         joint_ = 0;

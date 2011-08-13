@@ -32,14 +32,14 @@
 
 static const int CONVERSION_BUFFER_LENGTH = 128;
 
-/// String class
+/// String class.
 class String
 {
 public:
     typedef RandomAccessIterator<char> Iterator;
     typedef RandomAccessConstIterator<char> ConstIterator;
     
-    /// Construct empty
+    /// Construct empty.
     String() :
         length_(0),
         capacity_(0),
@@ -47,7 +47,7 @@ public:
     {
     }
     
-    /// Construct from another string
+    /// Construct from another string.
     String(const String& str) :
         length_(0),
         capacity_(0),
@@ -56,7 +56,7 @@ public:
         *this = str;
     }
     
-    /// Construct from a C string
+    /// Construct from a C string.
     String(const char* str) :
         length_(0),
         capacity_(0),
@@ -65,7 +65,7 @@ public:
         *this = str;
     }
     
-    /// Construct from a C string
+    /// Construct from a C string.
     String(char* str) :
         length_(0),
         capacity_(0),
@@ -74,7 +74,7 @@ public:
         *this = (const char*)str;
     }
     
-    /// Construct from a char array and length
+    /// Construct from a char array and length.
     String(const char* str, unsigned length) :
         length_(0),
         capacity_(0),
@@ -84,26 +84,26 @@ public:
         CopyChars(buffer_, str, length);
     }
     
-    /// Construct from an integer
+    /// Construct from an integer.
     explicit String(int value);
-    /// Construct from a short integer
+    /// Construct from a short integer.
     explicit String(short value);
-    /// Construct from an unsigned integer
+    /// Construct from an unsigned integer.
     explicit String(unsigned value);
-    /// Construct from an unsigned short integer
+    /// Construct from an unsigned short integer.
     explicit String(unsigned short value);
-    /// Construct from a float
+    /// Construct from a float.
     explicit String(float value);
-    /// Construct from a double
+    /// Construct from a double.
     explicit String(double value);
-    /// Construct from a bool
+    /// Construct from a bool.
     explicit String(bool value);
-    /// Construct from a character
+    /// Construct from a character.
     explicit String(char value);
-    /// Construct from a character and fill length
+    /// Construct from a character and fill length.
     explicit String(char value, unsigned length);
     
-    /// Construct from a convertable value
+    /// Construct from a convertable value.
     template <class T> explicit String(const T& value) :
         length_(0),
         capacity_(0),
@@ -112,14 +112,14 @@ public:
         *this = value.ToString();
     }
     
-    /// Destruct
+    /// Destruct.
     ~String()
     {
         if (capacity_)
             delete[] buffer_;
     }
     
-    /// Assign a string
+    /// Assign a string.
     String& operator = (const String& rhs)
     {
         Resize(rhs.length_);
@@ -128,7 +128,7 @@ public:
         return *this;
     }
     
-    /// Assign a C string
+    /// Assign a C string.
     String& operator = (const char* rhs)
     {
         unsigned rhsLength = GetCStringLength(rhs);
@@ -138,7 +138,7 @@ public:
         return *this;
     }
     
-    /// Add-assign a string
+    /// Add-assign a string.
     String& operator += (const String& rhs)
     {
         unsigned oldLength = length_;
@@ -148,7 +148,7 @@ public:
         return *this;
     }
     
-    /// Add-assign a C string
+    /// Add-assign a C string.
     String& operator += (const char* rhs)
     {
         unsigned rhsLength = GetCStringLength(rhs);
@@ -159,7 +159,7 @@ public:
         return *this;
     }
     
-    /// Add-assign a character
+    /// Add-assign a character.
     String& operator += (char rhs)
     {
         unsigned oldLength = length_;
@@ -169,22 +169,22 @@ public:
         return *this;
     }
     
-    /// Add-assign an integer
+    /// Add-assign an integer.
     String& operator += (int rhs);
-    /// Add-assign a short integer
+    /// Add-assign a short integer.
     String& operator += (short rhs);
-    /// Add-assign an unsigned integer
+    /// Add-assign an unsigned integer.
     String& operator += (unsigned rhs);
-    /// Add-assign a short unsigned integer
+    /// Add-assign a short unsigned integer.
     String& operator += (unsigned short rhs);
-    /// Add-assign a float
+    /// Add-assign a float.
     String& operator += (float rhs);
-    /// Add-assign a bool
+    /// Add-assign a bool.
     String& operator += (bool rhs);
-    /// Add-assign an arbitraty type
+    /// Add-assign an arbitraty type.
     template <class T> String operator += (const T& rhs) { return *this += rhs.ToString(); }
     
-    /// Add a string
+    /// Add a string.
     String operator + (const String& rhs) const
     {
         String ret;
@@ -195,7 +195,7 @@ public:
         return ret;
     }
     
-    /// Add a C string
+    /// Add a C string.
     String operator + (const char* rhs) const
     {
         unsigned rhsLength = GetCStringLength(rhs);
@@ -207,7 +207,7 @@ public:
         return ret;
     }
     
-    /// Add a character
+    /// Add a character.
     String operator + (char rhs) const
     {
         String ret(*this);
@@ -216,151 +216,123 @@ public:
         return ret;
     }
     
-    /// Test for equality with another string
-    bool operator == (const String& rhs) const
-    {
-        return strcmp(CString(), rhs.CString()) == 0;
-    }
-    
-    /// Test for inequality with another string
-    bool operator != (const String& rhs) const
-    {
-        return strcmp(CString(), rhs.CString()) != 0;
-    }
-    
-    /// Test if string is less than another string
-    bool operator < (const String& rhs) const
-    {
-        return strcmp(CString(), rhs.CString()) < 0;
-    }
-    
-    /// Test if string is greater than another string
-    bool operator > (const String& rhs) const
-    {
-        return strcmp(CString(), rhs.CString()) > 0;
-    }
-    
-    /// Test for equality with a C string
-    bool operator == (const char* rhs) const
-    {
-        return strcmp(CString(), rhs) == 0;
-    }
-    
-    /// Test for inequality with a C string
-    bool operator != (const char* rhs) const
-    {
-        return strcmp(CString(), rhs) != 0;
-    }
-    
-    /// Test if string is less than a C string
-    bool operator < (const char* rhs) const
-    {
-        return strcmp(CString(), rhs) < 0;
-    }
-    
-    /// Test if string is greater than a C string
-    bool operator > (const char* rhs) const
-    {
-        return strcmp(CString(), rhs) > 0;
-    }
-    
-    /// Return char at index
+    /// Test for equality with another string.
+    bool operator == (const String& rhs) const { return strcmp(CString(), rhs.CString()) == 0; }
+    /// Test for inequality with another string.
+    bool operator != (const String& rhs) const { return strcmp(CString(), rhs.CString()) != 0; }
+    /// Test if string is less than another string.
+    bool operator < (const String& rhs) const { return strcmp(CString(), rhs.CString()) < 0; }
+    /// Test if string is greater than another string.
+    bool operator > (const String& rhs) const { return strcmp(CString(), rhs.CString()) > 0; }
+    /// Test for equality with a C string.
+    bool operator == (const char* rhs) const { return strcmp(CString(), rhs) == 0; }
+    /// Test for inequality with a C string.
+    bool operator != (const char* rhs) const { return strcmp(CString(), rhs) != 0; }
+    /// Test if string is less than a C string.
+    bool operator < (const char* rhs) const { return strcmp(CString(), rhs) < 0; }
+    /// Test if string is greater than a C string.
+    bool operator > (const char* rhs) const { return strcmp(CString(), rhs) > 0; }
+    /// Return char at index.
     char& operator [] (unsigned index) { assert(index < length_); return buffer_[index]; }
-    /// Return const char at index
+    /// Return const char at index.
     const char& operator [] (unsigned index) const { assert(index < length_); return buffer_[index]; }
-    /// Return char at index
+    /// Return char at index.
     char& At(unsigned index) { assert(index < length_); return buffer_[index]; }
-    /// Return const char at index
+    /// Return const char at index.
     const char& At(unsigned index) const { assert(index < length_); return buffer_[index]; }
     
-    /// Replace all occurrences of a character
+    /// Replace all occurrences of a character.
     void Replace(char replaceThis, char replaceWith);
-    /// Replace all occurrences of a string
+    /// Replace all occurrences of a string.
     void Replace(const String& replaceThis, const String& replaceWith);
-    /// Replace a substring
+    /// Replace a substring.
     void Replace(unsigned pos, unsigned length, const String& replaceWith);
-    /// Replace a substring by iterators
+    /// Replace a substring by iterators.
     Iterator Replace(const Iterator& start, const Iterator& end, const String& replaceWith);
-    /// Append a string
+    /// Return a string with all occurrences of a character replaced.
+    String Replaced(char replaceThis, char replaceWith) const;
+    /// Return a string with all occurrences of a string replaced.
+    String Replaced(const String& replaceThis, const String& replaceWith) const;
+    /// Append a string.
     void Append(const String& str);
-    /// Append a C string
+    /// Append a C string.
     void Append(const char* str);
-    /// Append a character
+    /// Append a character.
     void Append(char c);
-    /// Append characters
+    /// Append characters.
     void Append(const char* str, unsigned length);
-    /// Insert a string
+    /// Insert a string.
     void Insert(unsigned pos, const String& str);
-    /// Insert a character
+    /// Insert a character.
     void Insert(unsigned pos, char c);
-    /// Insert a string using an iterator
+    /// Insert a string using an iterator.
     Iterator Insert(const Iterator& dest, const String& str);
-    /// Insert a string partially by iterators
+    /// Insert a string partially by iterators.
     Iterator Insert(const Iterator& dest, const Iterator& start, const Iterator& end);
-    /// Insert a character using an iterator
+    /// Insert a character using an iterator.
     Iterator Insert(const Iterator& dest, char c);
-    /// Erase a substring
+    /// Erase a substring.
     void Erase(unsigned pos, unsigned length = 1);
-    /// Erase a character by iterator
+    /// Erase a character by iterator.
     Iterator Erase(const Iterator& it);
-    /// Erase a substring by iterators
+    /// Erase a substring by iterators.
     Iterator Erase(const Iterator& start, const Iterator& end);
-    /// Resize the string
+    /// Resize the string.
     void Resize(unsigned newLength);
-    /// %Set new capacity
+    /// %Set new capacity.
     void Reserve(unsigned newCapacity);
-    /// Reallocate so that no extra memory is used
+    /// Reallocate so that no extra memory is used.
     void Compact();
-    /// Clear the string
+    /// Clear the string.
     void Clear();
-    /// Swap with another string
+    /// Swap with another string.
     void Swap(String& str);
     
-    /// Return iterator to the beginning
+    /// Return iterator to the beginning.
     Iterator Begin() { return Iterator(buffer_); }
-    /// Return const iterator to the beginning
+    /// Return const iterator to the beginning.
     ConstIterator Begin() const { return ConstIterator(buffer_); }
-    /// Return iterator to the end
+    /// Return iterator to the end.
     Iterator End() { return Iterator(buffer_ + length_); }
-    /// Return const iterator to the end
+    /// Return const iterator to the end.
     ConstIterator End() const { return ConstIterator(buffer_ + length_); }
-    /// Return first char, or 0 if empty
+    /// Return first char, or 0 if empty.
     char Front() const { return buffer_[0]; }
-    /// Return last char, or 0 if empty
+    /// Return last char, or 0 if empty.
     char Back() const { return length_ ? buffer_[length_ - 1] : buffer_[0]; }
-    /// Return a substring from position to end
+    /// Return a substring from position to end.
     String Substring(unsigned pos) const;
-    /// Return a substring with length from position
+    /// Return a substring with length from position.
     String Substring(unsigned pos, unsigned length) const;
-    /// Return string with whitespace trimmed from the beginning and the end
+    /// Return string with whitespace trimmed from the beginning and the end.
     String Trimmed() const;
-    /// Return string in uppercase
+    /// Return string in uppercase.
     String ToUpper() const;
-    /// Return string in lowercase
+    /// Return string in lowercase.
     String ToLower() const;
-    /// Split string by a separator char
+    /// Split string by a separator char.
     Vector<String> Split(char separator) const;
-    /// Find the first occurrence of a string, or NPOS if not found
+    /// Find the first occurrence of a string, or NPOS if not found.
     unsigned Find(const String& str, unsigned startPos = 0) const;
-    /// Find the first occurrence of a character, or NPOS if not found
+    /// Find the first occurrence of a character, or NPOS if not found.
     unsigned Find(char c, unsigned startPos = 0) const;
-    /// Find the last occurrence of a string, or NPOS if not found
+    /// Find the last occurrence of a string, or NPOS if not found.
     unsigned FindLast(const String& str, unsigned startPos = NPOS) const;
-    /// Find the last occurrence of a character, or NPOS if not found
+    /// Find the last occurrence of a character, or NPOS if not found.
     unsigned FindLast(char c, unsigned startPos = NPOS) const;
-    /// Return the C string
+    /// Return the C string.
     const char* CString() const { return buffer_; }
-    /// Return length
+    /// Return length.
     unsigned Length() const { return length_; }
-    /// Return buffer capacity
+    /// Return buffer capacity.
     unsigned Capacity() const { return capacity_; }
-    /// Return whether the string is empty
+    /// Return whether the string is empty.
     bool Empty() const { return length_ == 0; }
-    /// Return comparision result with a string
+    /// Return comparision result with a string.
     int Compare(const String& str, bool caseSensitive = true) const;
-    /// Return comparision result with a C string
+    /// Return comparision result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const
     {
         unsigned hash = 0;
@@ -374,20 +346,20 @@ public:
         return hash;
     }
     
-    /// Position for "not found"
+    /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;
-    /// Initial dynamic allocation size
+    /// Initial dynamic allocation size.
     static const unsigned MIN_CAPACITY = 8;
     
 private:
-    /// Move a range of characters within the string
+    /// Move a range of characters within the string.
     void MoveRange(unsigned dest, unsigned src, unsigned count)
     {
         if (count)
             memmove(buffer_ + dest, buffer_ + src, count);
     }
     
-    /// Copy chars from one buffer to another
+    /// Copy chars from one buffer to another.
     static void CopyChars(char* dest, const char* src, unsigned count)
     {
         #ifdef _MSC_VER
@@ -404,7 +376,7 @@ private:
         #endif
     }
     
-    /// Return length of a C string
+    /// Return length of a C string.
     static unsigned GetCStringLength(const char* str)
     {
         if (!str)
@@ -419,21 +391,21 @@ private:
         #endif
     }
     
-    /// Replace a substring with another substring
+    /// Replace a substring with another substring.
     void Replace(unsigned pos, unsigned length, const char* srcStart, unsigned srcLength);
     
-    /// String length
+    /// String length.
     unsigned length_;
-    /// Capacity, zero if buffer not allocated
+    /// Capacity, zero if buffer not allocated.
     unsigned capacity_;
-    /// String buffer, null if not allocated
+    /// String buffer, null if not allocated.
     char* buffer_;
     
-    /// End zero for empty strings
+    /// End zero for empty strings.
     static char endZero;
 };
 
-/// Add a string to a C string
+/// Add a string to a C string.
 inline String operator + (const char* lhs, const String& rhs)
 {
     String ret(lhs);

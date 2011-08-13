@@ -31,7 +31,7 @@ class ScriptFile;
 class asIScriptFunction;
 class asIScriptObject;
 
-/// Inbuilt scripted component methods
+/// Inbuilt scripted component methods.
 enum ScriptInstanceMethod
 {
     METHOD_START = 0,
@@ -46,141 +46,141 @@ enum ScriptInstanceMethod
     MAX_SCRIPT_METHODS
 };
 
-/// Delay-executed method call
+/// Delay-executed method call.
 struct DelayedMethodCall
 {
-    /// Delay time remaining until execution
+    /// Delay time remaining until execution.
     float delay_;
-    /// Method declaration
+    /// Method declaration.
     String declaration_;
-    /// Parameters
+    /// Parameters.
     VariantVector parameters_;
 };
 
-/// Scripted component
+/// Script object component.
 class ScriptInstance : public Component, public ScriptEventListener
 {
     OBJECT(ScriptInstance);
     
 public:
-    /// Construct
+    /// Construct.
     ScriptInstance(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ScriptInstance();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Perform post-load after the whole scene has been loaded
+    /// Perform post-load after the whole scene has been loaded.
     virtual void FinishUpdate();
-    /// Add an event handler. Called by script exposed version of SubscribeToEvent()
+    /// Add an event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName);
-    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
+    /// Add an event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName);
     
-    /// Create object of certain class from the script file. Return true if successful
+    /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
-    /// %Set script file only. Recreate object if necessary
+    /// %Set script file only. Recreate object if necessary.
     void SetScriptFile(ScriptFile* scriptFile);
-    /// %Set class name only. Recreate object if necessary
+    /// %Set class name only. Recreate object if necessary.
     void SetClassName(const String& className);
-    /// Enable or disable scripted updates and event handlers
+    /// Enable or disable scripted updates and event handlers.
     void SetActive(bool active);
-    /// %Set fixed updates per second. 0 (default) uses the physics frame rate
+    /// %Set fixed updates per second. 0 (default) uses the physics frame rate.
     void SetFixedUpdateFps(int fps);
-    /// Query for a method by declaration and execute if found
+    /// Query for a method by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = VariantVector());
-    /// Execute a method
+    /// Execute a method.
     bool Execute(asIScriptFunction* method, const VariantVector& parameters = VariantVector());
-    /// Add a delay-executed method call
+    /// Add a delay-executed method call.
     void DelayedExecute(float delay, const String& declaration, const VariantVector& parameters = VariantVector());
-    /// Clear pending delay-executed method calls
+    /// Clear pending delay-executed method calls.
     void ClearDelayedExecute();
     
-    /// Return script file
+    /// Return script file.
     ScriptFile* GetScriptFile() const { return scriptFile_; }
-    /// Return script object
+    /// Return script object.
     asIScriptObject* GetScriptObject() const { return scriptObject_; }
-    /// Return class name
+    /// Return class name.
     const String& GetClassName() const { return className_; }
-    /// Return whether scripted updates and event handlers are enabled
+    /// Return whether scripted updates and event handlers are enabled.
     bool IsActive() const { return active_; }
-    /// Return fixed updates per second
+    /// Return fixed updates per second.
     int GetFixedUpdateFps() const { return fixedUpdateFps_; }
     
-    /// %Set script file attribute
+    /// %Set script file attribute.
     void SetScriptFileAttr(ResourceRef value);
-    /// %Set delayed method calls attribute
+    /// %Set delayed method calls attribute.
     void SetDelayedMethodCallsAttr(PODVector<unsigned char> value);
-    /// %Set fixed update time accumulator attribute
+    /// %Set fixed update time accumulator attribute.
     void SetFixedUpdateAccAttr(float value);
-    /// Return script file attribute
+    /// %Set script data attribute by calling a script function.
+    void SetScriptDataAttr(PODVector<unsigned char> data);
+    /// Return script file attribute.
     ResourceRef GetScriptFileAttr() const;
-    /// Return delayed method calls attribute
+    /// Return delayed method calls attribute.
     PODVector<unsigned char> GetDelayedMethodCallsAttr() const;
-    /// Return fixed update time accumulator attribute
+    /// Return fixed update time accumulator attribute.
     float GetFixedUpdateAccAttr() const;
+    /// Get script data attribute by calling a script function.
+    PODVector<unsigned char> GetScriptDataAttr() const;
     
 private:
-    /// (Re)create the script object and check for supported methods if successfully created
+    /// (Re)create the script object and check for supported methods if successfully created.
     void CreateObject();
-    /// Release the script object
+    /// Release the script object.
     void ReleaseObject();
-    /// Clear supported methods
+    /// Clear supported methods.
     void ClearMethods();
-    /// Check for supported methods
+    /// Check for supported methods.
     void GetSupportedMethods();
-    /// Get script object's serialization data by calling a script function
-    PODVector<unsigned char> GetScriptData() const;
-    /// %Set script object's serialization data by calling a script function
-    void SetScriptData(PODVector<unsigned char> data);
-    /// Handle scene update event
+    /// Handle scene update event.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle scene post-update event
+    /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
-    /// Handle physics pre-step event
+    /// Handle physics pre-step event.
     void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData);
-    /// Handle physics post-step event
+    /// Handle physics post-step event.
     void HandlePhysicsPostStep(StringHash eventType, VariantMap& eventData);
-    /// Handle an event in script
+    /// Handle an event in script.
     void HandleScriptEvent(StringHash eventType, VariantMap& eventData);
-    /// Handle script file reload start
+    /// Handle script file reload start.
     void HandleScriptFileReload(StringHash eventType, VariantMap& eventData);
-    /// Handle script file reload finished
+    /// Handle script file reload finished.
     void HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData);
     
-    /// Script subsystem
+    /// Script subsystem.
     SharedPtr<Script> script_;
-    /// Script file
+    /// Script file.
     WeakPtr<ScriptFile> scriptFile_;
-    /// Script object
+    /// Script object.
     asIScriptObject* scriptObject_;
-    /// Class name
+    /// Class name.
     String className_;
-    /// Pointers to supported inbuilt methods
+    /// Pointers to supported inbuilt methods.
     asIScriptFunction* methods_[MAX_SCRIPT_METHODS];
-    /// Active flag
+    /// Active flag.
     bool active_;
-    /// Fixed update FPS
+    /// Fixed update FPS.
     int fixedUpdateFps_;
-    /// Fixed update time interval
+    /// Fixed update time interval.
     float fixedUpdateInterval_;
-    /// Fixed update time accumulator
+    /// Fixed update time accumulator.
     float fixedUpdateAcc_;
-    /// Fixed post update time accumulator
+    /// Fixed post update time accumulator.
     float fixedPostUpdateAcc_;
-    /// Delayed method calls
+    /// Delayed method calls.
     Vector<DelayedMethodCall> delayedMethodCalls_;
 };
 
-/// Return the Urho3D context of the active script context
+/// Return the Urho3D context of the active script context.
 Context* GetScriptContext();
-/// Return the ScriptInstance of the active script context
+/// Return the ScriptInstance of the active script context.
 ScriptInstance* GetScriptContextInstance();
-/// Return the scene node of the active script context
+/// Return the scene node of the active script context.
 Node* GetScriptContextNode();
-/// Return the scene of the active script context
+/// Return the scene of the active script context.
 Scene* GetScriptContextScene();
-/// Return the event listener of the active script context
+/// Return the event listener of the active script context.
 ScriptEventListener* GetScriptContextEventListener();
-/// Return the event listener of the active script context as an Object pointer
+/// Return the event listener of the active script context as an Object pointer.
 Object* GetScriptContextEventListenerObject();

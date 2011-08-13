@@ -89,7 +89,6 @@ static void RegisterScene(asIScriptEngine* engine)
     RegisterNode<Scene>(engine, "Scene");
     RegisterObjectConstructor<Scene>(engine, "Scene");
     RegisterNamedObjectConstructor<Scene>(engine, "Scene");
-    engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool LoadXML(File@+)", asFUNCTION(SceneLoadXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool SaveXML(File@+)", asFUNCTION(SceneSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Scene", "bool LoadAsync(File@+)", asMETHOD(Scene, LoadAsync), asCALL_THISCALL);
@@ -98,8 +97,13 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void Clear()", asMETHOD(Scene, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHOD(Scene, RegisterVar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHOD(Scene, UnregisterVar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Component@+ GetComponentByID(uint)", asMETHOD(Scene, GetComponentByID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNodeByID(uint)", asMETHOD(Scene, GetNodeByID), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "const String& GetVarName(ShortStringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_active(bool)", asMETHOD(Scene, SetActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_active() const", asMETHOD(Scene, IsActive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_smoothingConstant(float)", asMETHOD(Scene, SetSmoothingConstant), asCALL_THISCALL);

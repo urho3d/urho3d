@@ -28,33 +28,33 @@
 
 class TiXmlDocument;
 
-/// XML document resource
+/// XML document resource.
 class XMLFile : public Resource
 {
     OBJECT(XMLFile);
     
 public:
-    /// Construct
+    /// Construct.
     XMLFile(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~XMLFile();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful. Only supports saving to a File
+    /// Save resource. Return true if successful. Only supports saving to a File.
     virtual bool Save(Serializer& dest);
     
-    /// Clear the document and create a root element
+    /// Clear the document and create a root element.
     XMLElement CreateRoot(const String& name);
     
-    /// Return the root element, with optionally specified name. Return null element if not found
+    /// Return the root element, with optionally specified name. Return null element if not found.
     XMLElement GetRoot(const String& name = String());
-    /// Return the TinyXML document
+    /// Return the TinyXML document.
     TiXmlDocument* GetDocument() const { return document_; }
     
 private:
-    /// TinyXML document
+    /// TinyXML document.
     TiXmlDocument* document_;
 };

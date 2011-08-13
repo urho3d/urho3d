@@ -25,12 +25,12 @@
 
 #include "Object.h"
 
-/// Interface class for event listeners that forward events to script
+/// Interface class for event listeners that forward events to script.
 class ScriptEventListener
 {
 public:
-    /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent()
+    /// Add a scripted event handler. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(StringHash eventType, const String& handlerName) = 0;
-    /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent()
+    /// Add a scripted event handler for a specific sender. Called by script exposed version of SubscribeToEvent().
     virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) = 0;
 };

@@ -29,17 +29,17 @@ class BoundingBox;
 class Frustum;
 class Ray;
 
-/// Sphere in three-dimensional space
+/// Sphere in three-dimensional space.
 class Sphere
 {
 public:
-    /// Construct an undefined sphere
+    /// Construct undefined.
     Sphere() :
         defined_(false)
     {
     }
     
-    /// Copy-construct from another sphere
+    /// Copy-construct from another sphere.
     Sphere(const Sphere& sphere) :
         center_(sphere.center_),
         radius_(sphere.radius_),
@@ -47,7 +47,7 @@ public:
     {
     }
     
-    /// Construct from center and radius
+    /// Construct from center and radius.
     Sphere(const Vector3& center, float radius) :
         center_(center),
         radius_(radius),
@@ -55,7 +55,7 @@ public:
     {
     }
     
-    /// Assign from another sphere
+    /// Assign from another sphere.
     Sphere& operator = (const Sphere& rhs)
     {
         center_ = rhs.center_;
@@ -64,13 +64,12 @@ public:
         return *this;
     }
     
-    /// Test for equality with another sphere
+    /// Test for equality with another sphere.
     bool operator == (const Sphere& rhs) const { return center_ == rhs.center_ && radius_ == rhs.radius_; }
-    
-    /// Test for inequality with another sphere
+    /// Test for inequality with another sphere.
     bool operator != (const Sphere& rhs) const { return center_ != rhs.center_ || radius_ != rhs.radius_; }
     
-    /// Define from center and radius
+    /// Define from center and radius.
     void Define(const Vector3& center, float radius)
     {
         center_ = center;
@@ -78,14 +77,14 @@ public:
         defined_ = true;
     }
     
-    /// Define from an array of vertices
+    /// Define from an array of vertices.
     void Define(const Vector3* vertices, unsigned count);
-    /// Define from a boundingBox
+    /// Define from a bounding box.
     void Define(const BoundingBox& box);
-    /// Define from a frustum
+    /// Define from a frustum.
     void Define(const Frustum& frustum);
     
-    /// Merge a point
+    /// Merge a point.
     void Merge(const Vector3& point)
     {
         if (!defined_)
@@ -107,16 +106,16 @@ public:
         }
     }
     
-    /// Merge an array of vertices
+    /// Merge an array of vertices.
     void Merge(const Vector3* vertices, unsigned count);
-    /// Merge a bounding box
+    /// Merge a bounding box.
     void Merge(const BoundingBox& box);
-    /// Merge a frustum
+    /// Merge a frustum.
     void Merge(const Frustum& frustum);
-    /// Merge a sphere
+    /// Merge a sphere.
     void Merge(const Sphere& sphere);
     
-    /// Test if a point is inside
+    /// Test if a point is inside.
     Intersection IsInside(const Vector3& point) const
     {
         float distSquared = (point - center_).LengthSquared();
@@ -126,7 +125,7 @@ public:
             return OUTSIDE;
     }
     
-    /// Test if another sphere is inside, outside or intersects
+    /// Test if another sphere is inside, outside or intersects.
     Intersection IsInside(const Sphere& sphere) const
     {
         float dist = (sphere.center_ - center_).Length();
@@ -138,7 +137,7 @@ public:
             return INTERSECTS;
     }
     
-    /// Test if another sphere is (partially) inside or outside
+    /// Test if another sphere is (partially) inside or outside.
     Intersection IsInsideFast(const Sphere& sphere) const
     {
         float distSquared = (sphere.center_ - center_).LengthSquared();
@@ -150,17 +149,17 @@ public:
             return INSIDE;
     }
     
-    /// Test if a bounding box is inside, outside or intersects
+    /// Test if a bounding box is inside, outside or intersects.
     Intersection IsInside(const BoundingBox& box) const;
-    /// Test if a bounding box is (partially) inside or outside
+    /// Test if a bounding box is (partially) inside or outside.
     Intersection IsInsideFast(const BoundingBox& box) const;
-    /// Return distance to a ray, or infinity if no intersection
+    /// Return distance to a ray, or infinity if no intersection.
     float Distance(const Ray& ray) const;
     
-    /// Sphere center
+    /// Sphere center.
     Vector3 center_;
-    /// Sphere radius
+    /// Sphere radius.
     float radius_;
-    /// Defined flag
+    /// Defined flag.
     bool defined_;
 };

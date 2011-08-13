@@ -23,7 +23,7 @@
 
 #pragma once
 
-/// SoundSource type enumeration for master gain control
+/// SoundSource type enumeration for master gain control.
 enum SoundType
 {
     SOUND_MASTER = 0,

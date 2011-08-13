@@ -34,58 +34,56 @@ class IndexBuffer : public Object, public GPUObject
     OBJECT(IndexBuffer);
     
 public:
-    /// Construct
+    /// Construct.
     IndexBuffer(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~IndexBuffer();
     
-    /// Release default pool resources
+    /// Release default pool resources.
     virtual void OnDeviceLost();
-    /// Recreate default pool resources
+    /// Recreate default pool resources.
     virtual void OnDeviceReset();
-    /// Release buffer
+    /// Release buffer.
     virtual void Release();
     
-    /// %Set buffer size and dynamic mode. Previous data will be lost
+    /// %Set buffer size and dynamic mode. Previous data will be lost.
     bool SetSize(unsigned indexCount, bool largeIndices, bool dynamic = false);
-    /// %Set all data in the buffer,
+    /// %Set all data in the buffer.
     bool SetData(const void* data);
-    /// %Set a data range in the buffer
+    /// %Set a data range in the buffer.
     bool SetDataRange(const void* data, unsigned start, unsigned count);
-    /// Lock a data range in the buffer. Return pointer to locked data if successful
+    /// Lock a data range in the buffer. Return pointer to locked data if successful.
     void* Lock(unsigned start, unsigned count, LockMode mode);
-    /// Unlock buffer
+    /// Unlock buffer.
     void Unlock();
-    /// Clear data lost flag
+    /// Clear data lost flag.
     void ClearDataLost();
     
-    /// Return whether is dynamic
+    /// Return whether is dynamic.
     bool IsDynamic() const;
-    /// Return whether default pool data lost
+    /// Return whether default pool data lost.
     bool IsDataLost() const { return dataLost_; }
-    /// Return number of indices
+    /// Return number of indices.
     unsigned GetIndexCount() const {return indexCount_; }
-    /// Return index size
+    /// Return index size.
     unsigned GetIndexSize() const { return indexSize_; }
-    /// Return used vertex range from index range
+    /// Return used vertex range from index range.
     bool GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount);
     
 private:
-    /// Create buffer
+    /// Create buffer.
     bool Create();
     
-    /// Fallback data when operating with a null graphics subsystem
-    SharedArrayPtr<unsigned char> fallbackData_;
-    /// Memory pool
+    /// Memory pool.
     unsigned pool_;
-    /// Usage type
+    /// Usage type.
     unsigned usage_;
-    /// Number of indices
+    /// Number of indices.
     unsigned indexCount_;
-    /// Index size
+    /// Index size.
     unsigned indexSize_;
-    /// Buffer locked flag
+    /// Buffer locked flag.
     bool locked_;
-    /// Default pool data lost flag
+    /// Default pool data lost flag.
     bool dataLost_;
 };

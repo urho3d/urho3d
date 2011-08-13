@@ -29,34 +29,34 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
-/// Parse a bool from a string. Check for the substring "true" case-insensitively
+/// Parse a bool from a string. Check for the first non-empty character (converted to lowercase) being either 't', 'y' or '1'.
 bool ToBool(const String& source);
-/// Parse a float from a string
+/// Parse a float from a string.
 float ToFloat(const String& source);
-/// Parse an integer from a string
+/// Parse an integer from a string.
 int ToInt(const String& source);
-/// Parse an unsigned integer from a string
+/// Parse an unsigned integer from a string.
 unsigned ToUInt(const String& source);
-/// Parse a Color from a string
+/// Parse a Color from a string.
 Color ToColor(const String& source);
-/// Parse an IntRect from a string
+/// Parse an IntRect from a string.
 IntRect ToIntRect(const String& source);
-/// Parse an IntVector2 from a string
+/// Parse an IntVector2 from a string.
 IntVector2 ToIntVector2(const String& source);
-/// Parse a Quaternion from a string. If only 3 components specified, convert Euler angles (degrees) to quaternion
+/// Parse a Quaternion from a string. If only 3 components specified, convert Euler angles (degrees) to quaternion.
 Quaternion ToQuaternion(const String& source);
-/// Parse a Rect from a string
+/// Parse a Rect from a string.
 Rect ToRect(const String& source);
-/// Parse a Vector2 from a string
+/// Parse a Vector2 from a string.
 Vector2 ToVector2(const String& source);
-/// Parse a Vector3 from a string
+/// Parse a Vector3 from a string.
 Vector3 ToVector3(const String& source);
-/// Parse a Vector4 from a string
+/// Parse a Vector4 from a string.
 Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
-/// Convert a pointer to string (returns hexadecimal)
+/// Convert a pointer to string (returns hexadecimal.)
 String ToString(void* value);
-/// Convert an unsigned integer to string as hexadecimal
+/// Convert an unsigned integer to string as hexadecimal.
 String ToStringHex(unsigned value);
 
-/// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated
+/// Return an index to a string list corresponding to the given string, or a default value if not found. The string list must be empty-terminated.
 unsigned GetStringListIndex(const String& value, const String* strings, unsigned defaultIndex, bool caseSensitive = false);

@@ -29,7 +29,7 @@
 
 class Graphics;
 
-/// Input subsystem. Converts operating system window messages to input state and events
+/// Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
 {
     #ifdef USE_OPENGL
@@ -42,109 +42,109 @@ class Input : public Object
     OBJECT(Input);
     
 public:
-    /// Construct
+    /// Construct.
     Input(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Input();
     
-    /// Poll for window messages. Called by HandleBeginFrame()
+    /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
-    /// %Set whether ALT-ENTER fullscreen toggle is enabled
+    /// %Set whether ALT-ENTER fullscreen toggle is enabled.
     void SetToggleFullscreen(bool enable);
-    /// Suppress the next char message
+    /// Suppress the next char message.
     void SuppressNextChar();
     
-    /// Check if a key is held down
+    /// Check if a key is held down.
     bool GetKeyDown(int key) const;
-    /// Check if a key has been pressed on this frame
+    /// Check if a key has been pressed on this frame.
     bool GetKeyPress(int key) const;
-    /// Check if a mouse button is held down
+    /// Check if a mouse button is held down.
     bool GetMouseButtonDown(int button) const;
-    /// Check if a mouse button has been pressed on this frame
+    /// Check if a mouse button has been pressed on this frame.
     bool GetMouseButtonPress(int button) const;
-    /// Check if a qualifier key is held down
+    /// Check if a qualifier key is held down.
     bool GetQualifierDown(int qualifier) const;
-    /// Check if a qualifier key has been pressed on this frame
+    /// Check if a qualifier key has been pressed on this frame.
     bool GetQualifierPress(int qualifier) const;
-    /// Return the currently held down qualifiers
+    /// Return the currently held down qualifiers.
     int GetQualifiers() const;
-    /// Return mouse movement since last frame
+    /// Return mouse movement since last frame.
     const IntVector2& GetMouseMove() const { return mouseMove_; }
-    /// Return horizontal mouse movement since last frame
+    /// Return horizontal mouse movement since last frame.
     int GetMouseMoveX() const { return mouseMove_.x_; }
-    /// Return vertical mouse movement since last frame
+    /// Return vertical mouse movement since last frame.
     int GetMouseMoveY() const { return mouseMove_.y_; }
-    /// Return mouse wheel movement since last frame
+    /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
-    /// Return whether fullscreen Toggle is enabled
+    /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }
-    /// Return whether application window is active
+    /// Return whether application window is active.
     bool IsActive() { return active_; }
-    /// Return whether application window is minimized
+    /// Return whether application window is minimized.
     bool IsMinimized() { return minimized_; }
     
 private:
-    /// Initialize when screen mode initially set
+    /// Initialize when screen mode initially set.
     void Initialize();
-    /// Activate the application
+    /// Activate the application.
     void MakeActive();
-    /// Deactivate the application
+    /// Deactivate the application.
     void MakeInactive();
-    /// Clear input state
+    /// Clear input state.
     void ResetState();
-    /// Handle a mouse button change
+    /// Handle a mouse button change.
     void SetMouseButton(int button, bool newState);
-    /// Handle a key change
+    /// Handle a key change.
     void SetKey(int key, bool newState);
-    /// Handle mousewheel change
+    /// Handle mousewheel change.
     void SetMouseWheel(int delta);
     #ifndef USE_OPENGL
-    /// Internal function to clip the mouse cursor to the window
+    /// Internal function to clip the mouse cursor to the window.
     void SetClipCursor(bool enable);
-    /// Internal function to set the mouse cursor position
+    /// Internal function to set the mouse cursor position.
     void SetCursorPosition(const IntVector2& position);
-    /// Internal function to show/hide the mouse cursor
+    /// Internal function to show/hide the mouse cursor.
     void SetCursorVisible(bool enable);
-    /// Handle window message event
+    /// Handle window message event.
     void HandleWindowMessage(StringHash eventType, VariantMap& eventData);
     #endif
-    /// Internal function to get the mouse cursor position
+    /// Internal function to get the mouse cursor position.
     IntVector2 GetCursorPosition() const;
-    /// Handle screen mode event
+    /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    /// Handle frame start event
+    /// Handle frame start event.
     void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
     
-    /// Graphics
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Key down state
+    /// Key down state.
     HashSet<int> keyDown_;
-    /// Key pressed state
+    /// Key pressed state.
     HashSet<int> keyPress_;
-    /// Mouse buttons' down state
+    /// Mouse buttons' down state.
     unsigned mouseButtonDown_;
-    /// Mouse buttons' pressed state
+    /// Mouse buttons' pressed state.
     unsigned mouseButtonPress_;
-    /// Last mouse position for calculating movement
+    /// Last mouse position for calculating movement.
     IntVector2 lastCursorPosition_;
-    /// Last mouse wheel position for calculating movement
+    /// Last mouse wheel position for calculating movement.
     int lastWheelPosition_;
-    /// Mouse movement since last frame
+    /// Mouse movement since last frame.
     IntVector2 mouseMove_;
-    /// Mouse wheel movement since last frame
+    /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
-    /// Mouse cursor show/hide flag
+    /// Mouse cursor show/hide flag.
     bool showCursor_;
-    /// Fullscreen Toggle flag
+    /// Fullscreen toggle flag.
     bool toggleFullscreen_;
-    /// Active flag
+    /// Active flag.
     bool active_;
-    /// Minimized flag
+    /// Minimized flag.
     bool minimized_;
-    /// Activated on this frame flag
+    /// Activated on this frame flag.
     bool activated_;
-    /// Next char message suppress flag
+    /// Next char message suppress flag.
     bool suppressNextChar_;
-    /// Initialized flag
+    /// Initialized flag.
     bool initialized_;
 };

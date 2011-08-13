@@ -27,23 +27,23 @@
 
 class Mutex;
 
-/// Display an error dialog with the specified title and message
+/// Display an error dialog with the specified title and message.
 void ErrorDialog(const char* title, const char* message);
-/// Exit the application with an error message to the console
+/// Exit the application with an error message to the console.
 void ErrorExit(const String& message, int exitCode = 1);
-/// Open a console window
+/// Open a console window.
 void OpenConsoleWindow();
-/// Print to the console. A newline will be added automatically
+/// Print to the console. A newline will be added automatically.
 void PrintLine(const String& str);
-/// Print to the console. A newline will be added automatically
+/// Print to the console. A newline will be added automatically.
 void PrintLine(const char* str);
-/// Return the static library init/shutdown mutex
+/// Return the static library init/shutdown mutex.
 Mutex& GetStaticMutex();
-/// Parse arguments from the command line
+/// Parse arguments from the command line.
 const Vector<String>& ParseArguments(const char* cmdLine);
-/// Return previously parsed arguments
+/// Return previously parsed arguments.
 const Vector<String>& GetArguments();
-/// Read input from the console window. Return empty if no input
+/// Read input from the console window. Return empty if no input.
 String GetConsoleInput();
-/// Return the number of (logical) CPU cores
+/// Return the number of (logical) CPU cores.
 unsigned GetNumCPUCores();

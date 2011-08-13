@@ -25,30 +25,30 @@
 
 #include "Vector3.h"
 
-/// Infinite straight line in three-dimensional space
+/// Infinite straight line in three-dimensional space.
 class Ray
 {
 public:
-    /// Construct an undefined ray
+    /// Construct undefined.
     Ray()
     {
     }
     
-    /// Construct from origin and direction. The direction must be Normalized
+    /// Construct from origin and direction. The direction must be normalized.
     Ray(const Vector3& origin, const Vector3& direction) :
         origin_(origin),
         direction_(direction)
     {
     }
     
-    /// Copy-construct from another ray
+    /// Copy-construct from another ray.
     Ray(const Ray& ray) :
         origin_(ray.origin_),
         direction_(ray.direction_)
     {
     }
     
-    /// Assign from another ray
+    /// Assign from another ray.
     Ray& operator = (const Ray& rhs)
     {
         origin_ = rhs.origin_;
@@ -56,28 +56,27 @@ public:
         return *this;
     }
     
-    /// Check for equality with another ray
+    /// Check for equality with another ray.
     bool operator == (const Ray& rhs) const { return origin_ == rhs.origin_ && direction_ == rhs.direction_; }
-    
-    /// Check for inequality with another ray
+    /// Check for inequality with another ray.
     bool operator != (const Ray& rhs) const { return origin_ != rhs.origin_ || direction_ != rhs.direction_; }
     
-    /// Define from origin and direction. The direction will be Normalized
+    /// Define from origin and direction. The direction will be normalized.
     void Define(const Vector3& origin, const Vector3& direction)
     {
         origin_ = origin;
         direction_ = direction.Normalized();
     }
     
-    /// Project a point on the ray
+    /// Project a point on the ray.
     Vector3 Project(const Vector3& point) const;
-    /// Return minimum distance to a triangle, or infinity if no hit
+    /// Return minimum distance to a triangle, or infinity if no hit.
     float Distance(const Vector3& v0, const Vector3& v1, const Vector3& v2) const;
-    /// Return minimum distance to a triangle mesh defined by vertex and index data
+    /// Return minimum distance to a triangle mesh defined by vertex and index data.
     float Distance(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount) const;
     
-    /// Ray origin
+    /// Ray origin.
     Vector3 origin_;
-    /// Ray direction
+    /// Ray direction.
     Vector3 direction_;
 };

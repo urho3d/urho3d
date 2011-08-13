@@ -531,17 +531,13 @@ String GetParentPath(const String& path)
 
 String GetInternalPath(const String& pathName)
 {
-    String ret = pathName;
-    ret.Replace('\\', '/');
-    return ret;
+    return pathName.Replaced('\\', '/');
 }
 
 String GetNativePath(const String& pathName)
 {
 #ifdef WIN32
-    String ret = pathName;
-    ret.Replace('/', '\\');
-    return ret;
+    return pathName.Replaced('/', '\\');
 #else
     return pathName;
 #endif

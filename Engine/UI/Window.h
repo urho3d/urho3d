@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Window movement and resizing modes
+/// Window movement and resizing modes.
 enum WindowDragMode
 {
     DRAG_NONE,
@@ -40,7 +40,7 @@ enum WindowDragMode
     DRAG_RESIZE_LEFT
 };
 
-/// Window UI element that can optionally by moved or resized
+/// Window UI element that can optionally by moved or resized.
 class Window : public BorderImage
 {
     OBJECT(Window);
@@ -48,60 +48,60 @@ class Window : public BorderImage
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     Window(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Window();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// React to mouse hover
+    /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start
+    /// React to mouse drag start.
     virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag motion
+    /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag end
+    /// React to mouse drag end.
     virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
     
-    /// %Set whether can be moved
+    /// %Set whether can be moved.
     void SetMovable(bool enable);
-    /// %Set whether can be resized
+    /// %Set whether can be resized.
     void SetResizable(bool enable);
-    /// %Set resize area width at edges
+    /// %Set resize area width at edges.
     void SetResizeBorder(const IntRect& rect);
     
-    /// Return whether is movable
+    /// Return whether is movable.
     bool IsMovable() const { return movable_; }
-    /// Return whether is resizable
+    /// Return whether is resizable.
     bool IsResizable() const { return resizable_; }
-    /// Return resize area width at edges
+    /// Return resize area width at edges.
     const IntRect& GetResizeBorder() const { return resizeBorder_; }
     
 protected:
-    /// Identify drag mode (move/resize)
+    /// Identify drag mode (move/resize.)
     WindowDragMode GetDragMode(const IntVector2& position) const;
-    /// %Set cursor shape based on drag mode
+    /// %Set cursor shape based on drag mode.
     void SetCursorShape(WindowDragMode mode, Cursor* cursor) const;
-    /// Validate window position
+    /// Validate window position.
     void ValidatePosition();
-    /// Check whether alignment supports moving and resizing
+    /// Check whether alignment supports moving and resizing.
     bool CheckAlignment() const;
     
-    /// Movable flag
+    /// Movable flag.
     bool movable_;
-    /// Resizable flag
+    /// Resizable flag.
     bool resizable_;
-    /// Resize area width at edges
+    /// Resize area width at edges.
     IntRect resizeBorder_;
-    /// Current drag mode
+    /// Current drag mode.
     WindowDragMode dragMode_;
-    /// Mouse position at drag start
+    /// Mouse position at drag start.
     IntVector2 dragStartCursor_;
-    /// Original position at drag start
+    /// Original position at drag start.
     IntVector2 dragStartPosition_;
-    /// Original size at drag start
+    /// Original size at drag start.
     IntVector2 dragStartSize_;
 };

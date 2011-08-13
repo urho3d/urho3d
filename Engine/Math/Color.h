@@ -27,11 +27,11 @@
 
 class String;
 
-/// RGBA color
+/// RGBA color.
 class Color
 {
 public:
-    /// Construct with default values (opaque white)
+    /// Construct with default values (opaque white.)
     Color() :
         r_(1.0f),
         g_(1.0f),
@@ -40,7 +40,7 @@ public:
     {
     }
     
-    /// Copy-construct from another color
+    /// Copy-construct from another color.
     Color(const Color& color) :
         r_(color.r_),
         g_(color.g_),
@@ -49,7 +49,7 @@ public:
     {
     }
     
-    /// Construct from another color and modify the alpha
+    /// Construct from another color and modify the alpha.
     Color(const Color& color, float a) :
         r_(color.r_),
         g_(color.g_),
@@ -58,7 +58,7 @@ public:
     {
     }
     
-    /// Construct from RGB values and set alpha fully opaque
+    /// Construct from RGB values and set alpha fully opaque.
     Color(float r, float g, float b) :
         r_(r),
         g_(g),
@@ -67,7 +67,7 @@ public:
     {
     }
     
-    /// Construct from RGBA values
+    /// Construct from RGBA values.
     Color(float r, float g, float b, float a) :
         r_(r),
         g_(g),
@@ -76,16 +76,16 @@ public:
     {
     }
     
-    /// Test for equality with another color
+    /// Test for equality with another color.
     bool operator == (const Color& rhs) const { return Equals(r_, rhs.r_) && Equals(g_, rhs.g_) && Equals(b_, rhs.b_) && Equals(a_, rhs.a_); }
-    /// Test for inequality with another color
+    /// Test for inequality with another color.
     bool operator != (const Color& rhs) const { return !Equals(r_, rhs.r_) || !Equals(g_, rhs.g_) || !Equals(b_, rhs.b_) || !Equals(a_, rhs.a_); }
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Color operator * (float rhs) const { return Color(r_ * rhs, g_ * rhs, b_ * rhs, a_ * rhs); }
-    /// Add a color
+    /// Add a color.
     Color operator + (const Color& rhs) const { return Color(r_ + rhs.r_, g_ + rhs.g_, b_ + rhs.b_, a_ + rhs.a_); }
     
-    /// Add-assign a color
+    /// Add-assign a color.
     Color& operator += (const Color& rhs)
     {
         r_ += rhs.r_;
@@ -95,14 +95,14 @@ public:
         return *this;
     }
     
-    /// Return float data
+    /// Return float data.
     const float* GetData() const { return &r_; }
-    /// Return RGB values as a Vector3
+    /// Return RGB values as a Vector3.
     Vector3 RGBValues() const { return Vector3(r_, g_, b_); }
-    /// Return approximate intensity
+    /// Return approximate intensity.
     float Intensity() const { return RGBValues().DotProduct(Vector3(0.333f, 0.333f, 0.333f)); }
     
-    /// Linear interpolation with another color
+    /// Linear interpolation with another color.
     Color Lerp(const Color& rhs, float t) const
     {
         float invT = 1.0f - t;
@@ -114,7 +114,7 @@ public:
         );
     }
     
-    /// Return color packed to a 32-bit integer. Only the range [0, 1] is supported for components
+    /// Return color packed to a 32-bit integer. Only the range [0, 1] is supported for components.
     unsigned ToUInt() const
     {
         unsigned r = (unsigned)(Clamp(r_ * 255.0f, 0.0f, 255.0f));
@@ -129,52 +129,52 @@ public:
         #endif
     }
     
-    /// Return as a four-dimensional vector
+    /// Return as a four-dimensional vector.
     Vector4 ToVector4() const { return Vector4(r_, g_, b_, a_); }
     
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// Red value
+    /// Red value.
     float r_;
-    /// Green value
+    /// Green value.
     float g_;
-    /// Blue value
+    /// Blue value.
     float b_;
-    /// Alpha value
+    /// Alpha value.
     float a_;
     
-    /// Opaque white color
+    /// Opaque white color.
     static const Color WHITE;
-    /// Opaque black color
+    /// Opaque black color.
     static const Color BLACK;
 };
 
-/// Color-time pair for color interpolation
+/// Color-time pair for color interpolation.
 class ColorFade
 {
 public:
-    /// Construct with default color and zero time
+    /// Construct with default color and zero time.
     ColorFade() :
         time_(0.0f)
     {
     }
     
-    /// Construct with a color and zero time
+    /// Construct with a color and zero time.
     ColorFade(const Color& color) :
         color_(color),
         time_(0.0f)
     {
     }
     
-    /// Construct from a color and time
+    /// Construct from a color and time.
     ColorFade(const Color& color, float time) :
         color_(color),
         time_(time)
     {
     }
     
-    /// Return interpolated value with another color-time pair, at the time specified
+    /// Return interpolated value with another color-time pair, at the time specified.
     Color interpolate(const ColorFade& next, float time)
     {
         float timeInterval = next.time_ - time_;
@@ -187,8 +187,8 @@ public:
             return next.color_;
     }
     
-    /// Color
+    /// Color.
     Color color_;
-    /// Time
+    /// Time.
     float time_;
 };

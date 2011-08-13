@@ -23,35 +23,35 @@
 
 #pragma once
 
-/// Operating system mutual exclusion primitive
+/// Operating system mutual exclusion primitive.
 class Mutex
 {
 public:
-    /// Construct
+    /// Construct.
     Mutex();
-    /// Destruct
+    /// Destruct.
     ~Mutex();
     
-    /// Acquire the mutex. Block if already acquired
+    /// Acquire the mutex. Block if already acquired.
     void Acquire();
-    /// Release the mutex
+    /// Release the mutex.
     void Release();
     
 private:
-    /// Critical section
+    /// Critical section.
     void* criticalSection_;
 };
 
-/// Lock that automatically acquires and releases a mutex
+/// Lock that automatically acquires and releases a mutex.
 class MutexLock
 {
 public:
-    /// Construct and acquire the mutex
+    /// Construct and acquire the mutex.
     MutexLock(Mutex& mutex);
-    /// Destruct. Release the mutex
+    /// Destruct. Release the mutex.
     ~MutexLock();
     
 private:
-    /// Mutex reference
+    /// Mutex reference.
     Mutex& mutex_;
 };

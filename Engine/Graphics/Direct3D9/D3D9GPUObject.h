@@ -31,26 +31,26 @@ class Graphics;
 class GPUObject
 {
 public:
-    /// Construct with graphics subsystem pointer
+    /// Construct with graphics subsystem pointer.
     GPUObject(Graphics* graphics);
-    /// Destruct. Remove from the Graphics
+    /// Destruct. Remove from the graphics subsystem.
     virtual ~GPUObject();
     
-    /// Release default pool resources
+    /// Release default pool resources.
     virtual void OnDeviceLost() {}
-    /// Recreate default pool resources
+    /// Recreate default pool resources.
     virtual void OnDeviceReset() {}
-    /// Unconditionally release the GPU resource
+    /// Unconditionally release the GPU resource.
     virtual void Release() {}
     
-    /// Return the graphics subsystem
+    /// Return the graphics subsystem.
     Graphics* GetGraphics() const { return graphics_; }
-    /// Return Direct3D object
+    /// Return Direct3D object.
     void* GetGPUObject() const { return object_; }
     
 protected:
-    /// Graphics subsystem
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Direct3D object
+    /// Direct3D object.
     void* object_;
 };

@@ -23,31 +23,31 @@
 
 #pragma once
 
-/// Operating system thread
+/// Operating system thread.
 class Thread
 {
 public:
-    /// Construct. Does not start the thread yet
+    /// Construct. Does not start the thread yet.
     Thread();
-    /// Destruct. If running, stop and wait for thread to finish
+    /// Destruct. If running, stop and wait for thread to finish.
     ~Thread();
     
-    /// The function to run in the thread
+    /// The function to run in the thread.
     virtual void ThreadFunction() = 0;
     
-    /// Start running the thread. Return true if successful, or false if already running or if can not create the thread
+    /// Start running the thread. Return true if successful, or false if already running or if can not create the thread.
     bool Start();
-    /// %Set the running flag to false and wait for the thread to finish
+    /// %Set the running flag to false and wait for the thread to finish.
     void Stop();
-    /// %Set thread priority. The thread must have been started first
+    /// %Set thread priority. The thread must have been started first.
     void SetPriority(int priority);
     
     /// Return whether thread exists
     bool IsStarted() const { return handle_ != 0; }
     
 protected:
-    /// Thread handle
+    /// Thread handle.
     void* handle_;
-    /// Running flag
+    /// Running flag.
     volatile bool shouldRun_;
 };

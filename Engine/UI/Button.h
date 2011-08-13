@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Pushbutton UI element
+/// Pushbutton UI element.
 class Button : public BorderImage
 {
     OBJECT(Button);
@@ -33,62 +33,62 @@ class Button : public BorderImage
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     Button(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Button();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Perform UI element update
+    /// Perform UI element update.
     virtual void Update(float timeStep);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
-    /// React to mouse hover
+    /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse click
+    /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     
-    /// %Set pressed image offset
+    /// %Set pressed image offset.
     void SetPressedOffset(const IntVector2& offset);
-    /// %Set pressed image offset
+    /// %Set pressed image offset.
     void SetPressedOffset(int x, int y);
-    /// %Set pressed label offset
+    /// %Set pressed label offset.
     void SetLabelOffset(const IntVector2& offset);
-    /// %Set pressed label offset
+    /// %Set pressed label offset.
     void SetLabelOffset(int x, int y);
-    /// %Set repeat properties. Rate 0 (default) disables repeat
+    /// %Set repeat properties. Rate 0 (default) disables repeat.
     void SetRepeat(float delay, float rate);
-    /// %Set repeat delay
+    /// %Set repeat delay.
     void SetRepeatDelay(float delay);
-    /// %Set repeat rate
+    /// %Set repeat rate.
     void SetRepeatRate(float rate);
     
-    /// Return pressed image offset
+    /// Return pressed image offset.
     const IntVector2& GetPressedOffset() const { return pressedOffset_; }
-    /// Return pressed label offset
+    /// Return pressed label offset.
     const IntVector2& GetLabelOffset() const { return labelOffset_; }
-    /// Return repeat delay
+    /// Return repeat delay.
     float GetRepeatDelay() const { return repeatDelay_; }
-    /// Return repeat rate
+    /// Return repeat rate.
     float GetRepeatRate() const { return repeatRate_; }
     
 protected:
-    /// %Set new pressed state
+    /// %Set new pressed state.
     void SetPressed(bool enable);
     
-    /// Pressed image offset
+    /// Pressed image offset.
     IntVector2 pressedOffset_;
-    /// Pressed label offset
+    /// Pressed label offset.
     IntVector2 labelOffset_;
-    /// Repeat delay
+    /// Repeat delay.
     float repeatDelay_;
-    /// Repeat rate
+    /// Repeat rate.
     float repeatRate_;
-    /// Repeat timer
+    /// Repeat timer.
     float repeatTimer_;
-    /// Current pressed state
+    /// Current pressed state.
     bool pressed_;
 };

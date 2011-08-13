@@ -28,34 +28,35 @@
 
 class Ray;
 
-/// Surface in three-dimensional space
+/// Surface in three-dimensional space.
 class Plane
 {
 public:
-    /// Construct an undefined plane
+    /// Construct undefined.
     Plane()
     {
     }
     
-    /// Copy-construct from another plane
+    /// Copy-construct from another plane.
     Plane(const Plane& plane) :
         normal_(plane.normal_),
         intercept_(plane.intercept_)
     {
     }
     
-    /// Construct from 3 vertices
+    /// Construct from 3 vertices.
     Plane(const Vector3& v0, const Vector3& v1, const Vector3& v2)
     {
         Define(v0, v1, v2);
     }
-    /// Construct from a normal vector and a point on the plane
+    
+    /// Construct from a normal vector and a point on the plane.
     Plane(const Vector3& normal, const Vector3& point)
     {
         Define(normal, point);
     }
     
-    /// Define from 3 vertices
+    /// Define from 3 vertices.
     void Define(const Vector3& v0, const Vector3& v1, const Vector3& v2)
     {
         Vector3 dist1 = v1 - v0;
@@ -66,6 +67,7 @@ public:
         intercept_ = -normal_.DotProduct(v0);
     }
 
+    /// Define from a normal and a point.
     void Define(const Vector3& normal, const Vector3& point)
     {
         normal_ = normal;
@@ -73,26 +75,19 @@ public:
         intercept_ = -normal_.DotProduct(point);
     }
     
-    /// Return distance to a point
-    float Distance(const Vector3& point) const
-    {
-        return normal_.DotProduct(point) + intercept_;
-    }
+    /// Return distance to a point.
+    float Distance(const Vector3& point) const { return normal_.DotProduct(point) + intercept_; }
+    /// Return absolute distance to a point.
+    float AbsDistance(const Vector3& point) const { return normal_.AbsDotProduct(point); }
     
-    /// Return absolute distance to a point
-    float AbsDistance(const Vector3& point) const
-    {
-        return normal_.AbsDotProduct(point);
-    }
-    
-    /// Return absolute distance to a point which has only positive coordinates
+    /// Return absolute distance to a point which has only positive coordinates.
     float AbsDistanceFast(const Vector3& absPoint) const
     {
         // Point must contain only positive X, Y, Z
         return absNormal_.DotProduct(absPoint);
     }
     
-    /// Return ray hit distance, or infinity if no hit
+    /// Return ray hit distance, or infinity if no hit.
     float Distance(const Ray& ray) const
     {
         float d = normal_.DotProduct(ray.direction_);
@@ -102,10 +97,10 @@ public:
             return M_INFINITY;
     }
     
-    /// Plane normal
+    /// Plane normal.
     Vector3 normal_;
-    /// Plane absolute normal
+    /// Plane absolute normal.
     Vector3 absNormal_;
-    /// Plane intercept parameter
+    /// Plane intercept parameter.
     float intercept_;
 };

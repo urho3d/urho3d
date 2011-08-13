@@ -27,102 +27,102 @@
 #include "Rect.h"
 #include "Variant.h"
 
-/// Abstract stream for reading
+/// Abstract stream for reading.
 class Deserializer
 {
 public:
-    /// Construct with zero size
+    /// Construct with zero size.
     Deserializer();
-    /// Construct with defined size
+    /// Construct with defined size.
     Deserializer(unsigned size);
-    /// Destruct
+    /// Destruct.
     virtual ~Deserializer();
     
-    /// Read bytes from the stream. Return number of bytes actually read
+    /// Read bytes from the stream. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size) = 0;
-    /// %Set position from the beginning of the stream
+    /// %Set position from the beginning of the stream.
     virtual unsigned Seek(unsigned position) = 0;
-    /// Return name of the stream
+    /// Return name of the stream.
     virtual const String& GetName() const;
-    /// Return a checksum if applicable
+    /// Return a checksum if applicable.
     virtual unsigned GetChecksum();
-    /// Return current position
+    /// Return current position.
     unsigned GetPosition() const { return position_; }
-    /// Return size
+    /// Return size.
     unsigned GetSize() const { return size_; }
-    /// Return whether the end of stream has been reached
+    /// Return whether the end of stream has been reached.
     bool IsEof() const { return position_ >= size_; }
     
-    /// Read a 32-bit integer
+    /// Read a 32-bit integer.
     int ReadInt();
-    /// Read a 16-bit integer
+    /// Read a 16-bit integer.
     short ReadShort();
-    /// Read an 8-bit integer
+    /// Read an 8-bit integer.
     signed char ReadByte();
-    /// Read a 32-bit unsigned integer
+    /// Read a 32-bit unsigned integer.
     unsigned ReadUInt();
-    /// Read a 16-bit unsigned integer
+    /// Read a 16-bit unsigned integer.
     unsigned short ReadUShort();
-    /// Read an 8-bit unsigned integer
+    /// Read an 8-bit unsigned integer.
     unsigned char ReadUByte();
-    /// Read a bool
+    /// Read a bool.
     bool ReadBool();
-    /// Read a float
+    /// Read a float.
     float ReadFloat();
-    /// Read an IntRect
+    /// Read an IntRect.
     IntRect ReadIntRect();
-    /// Read an IntVector2
+    /// Read an IntVector2.
     IntVector2 ReadIntVector2();
-    /// Read a Rect
+    /// Read a Rect.
     Rect ReadRect();
-    /// Read a Vector2
+    /// Read a Vector2.
     Vector2 ReadVector2();
-    /// Read a Vector3
+    /// Read a Vector3.
     Vector3 ReadVector3();
-    /// Read a Vector3 packed into 3 x 16 bits with the specified maximum absolute range
+    /// Read a Vector3 packed into 3 x 16 bits with the specified maximum absolute range.
     Vector3 ReadPackedVector3(float maxAbsCoord);
-    /// Read a Vector4
+    /// Read a Vector4.
     Vector4 ReadVector4();
-    /// Read a Quaternion
+    /// Read a quaternion.
     Quaternion ReadQuaternion();
-    /// Read a Quaternion with each component packed in 16 bits
+    /// Read a quaternion with each component packed in 16 bits.
     Quaternion ReadPackedQuaternion();
-    /// Read a Color
+    /// Read a color.
     Color ReadColor();
-    /// Read a BoundingBox
+    /// Read a bounding box.
     BoundingBox ReadBoundingBox();
-    /// Read a null-terminated string
+    /// Read a null-terminated string.
     String ReadString();
-    /// Read a four-letter file ID
+    /// Read a four-letter file ID.
     String ReadFileID();
-    /// Read a 32-bit StringHash
+    /// Read a 32-bit StringHash.
     StringHash ReadStringHash();
-    /// Read a 16-bit ShortStringHash
+    /// Read a 16-bit ShortStringHash.
     ShortStringHash ReadShortStringHash();
-    /// Read a buffer with size encoded as VLE
+    /// Read a buffer with size encoded as VLE.
     PODVector<unsigned char> ReadBuffer();
-    /// Read a resource reference
+    /// Read a resource reference.
     ResourceRef ReadResourceRef();
-    /// Read a resource reference list
+    /// Read a resource reference list.
     ResourceRefList ReadResourceRefList();
-    /// Read a Variant
+    /// Read a variant.
     Variant ReadVariant();
-    /// Read a Variant whose type is already known
+    /// Read a variant whose type is already known.
     Variant ReadVariant(VariantType type);
-    /// Read a vector of Variants
+    /// Read a variant vector.
     VariantVector ReadVariantVector();
-    /// Read a map of Variants
+    /// Read a variant map.
     VariantMap ReadVariantMap();
-    /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum
+    /// Read a variable-length encoded unsigned integer, which can use 29 bits maximum.
     unsigned ReadVLE();
-    /// Read a 24-bit network object ID
+    /// Read a 24-bit network object ID.
     unsigned ReadNetID();
-    /// Read a text line
+    /// Read a text line.
     String ReadLine();
     
 protected:
-    /// Stream position
+    /// Stream position.
     unsigned position_;
-    /// Stream size
+    /// Stream size.
     unsigned size_;
 };

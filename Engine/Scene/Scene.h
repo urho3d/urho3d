@@ -29,31 +29,27 @@
 class File;
 class PackageFile;
 
-/// First replicated node/component ID
 static const unsigned FIRST_REPLICATED_ID = 0x1;
-/// Last replicated node/component ID
 static const unsigned LAST_REPLICATED_ID = 0xffffff;
-/// First local node/component ID
 static const unsigned FIRST_LOCAL_ID = 0x01000000;
-/// Last local node/component ID
 static const unsigned LAST_LOCAL_ID = 0xffffffff;
 
-/// Asynchronous loading progress of a scene
+/// Asynchronous loading progress of a scene.
 struct AsyncProgress
 {
-    /// File for binary mode
+    /// File for binary mode.
     SharedPtr<File> file_;
-    /// XML file for XML mode
+    /// XML file for XML mode.
     SharedPtr<XMLFile> xmlFile_;
-    /// Current XML element for XML mode
+    /// Current XML element for XML mode.
     XMLElement xmlElement_;
-    /// Loaded root-level nodes
+    /// Loaded root-level nodes.
     unsigned loadedNodes_;
-    /// Total root-level nodes
+    /// Total root-level nodes.
     unsigned totalNodes_;
 };
 
-/// Root scene node, represents the whole scene
+/// Root scene node, represents the whole scene.
 class Scene : public Node
 {
     OBJECT(Scene);
@@ -61,124 +57,138 @@ class Scene : public Node
     using Node::SaveXML;
     
 public:
-    /// Construct
+    /// Construct.
     Scene(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Scene();
-    /// Register object factory. Node must be registered first
+    /// Register object factory. Node must be registered first.
     static void RegisterObject(Context* context);
     
-    /// Load from binary data. Return true if successful
+    /// Load from binary data. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save to binary data. Return true if successful
+    /// Save to binary data. Return true if successful.
     virtual bool Save(Serializer& dest);
-    /// Load from XML data. Return true if successful
+    /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source);
     
-    /// Load from an XML file. Return true if successful
+    /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
-    /// Save to an XML file. Return true if successful
+    /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest);
-    /// Load from a binary file asynchronously. Return true if started successfully
+    /// Load from a binary file asynchronously. Return true if started successfully.
     bool LoadAsync(File* file);
-    /// Load from an XML file asynchronously. Return true if started successfully
+    /// Load from an XML file asynchronously. Return true if started successfully.
     bool LoadAsyncXML(File* file);
-    /// Stop asynchronous loading
+    /// Stop asynchronous loading.
     void StopAsyncLoading();
-    /// Clear scene completely of nodes and components
+    /// Clear scene completely of nodes and components.
     void Clear();
-    /// %Set active flag. Only active scenes will be updated automatically
+    /// %Set active flag. Only active scenes will be updated automatically.
     void SetActive(bool enable);
-    /// %Set motion smoothing constant
+    /// %Set network client motion smoothing constant.
     void SetSmoothingConstant(float constant);
-    /// %Set motion smoothing snap threshold
+    /// %Set network client motion smoothing snap threshold.
     void SetSnapThreshold(float threshold);
-    /// Add a required package file for networking. To be called on the server
+    /// Add a required package file for networking. To be called on the server.
     void AddRequiredPackageFile(PackageFile* package);
-    /// Clear required package files
+    /// Clear required package files.
     void ClearRequiredPackageFiles();
-    /// Reset specific owner reference from nodes on disconnect
+    /// Reset specific owner reference from nodes on disconnect.
     void ResetOwner(Connection* owner);
+    /// Register a node user variable hash reverse mapping (for editing.)
+    void RegisterVar(const String& name);
+    /// Unregister a node user variable hash reverse mapping.
+    void UnregisterVar(const String& name);
+    /// Clear all registered node user variable hash reverse mappings.
+    void UnregisterAllVars();
     
-    /// Return node from the whole scene by ID, or null if not found
+    /// Return node from the whole scene by ID, or null if not found.
     Node* GetNodeByID(unsigned id) const;
-    /// Return component from the whole scene by ID, or null if not found
+    /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponentByID(unsigned id) const;
-    /// Return active flag
+    /// Return active flag.
     bool IsActive() const { return active_; }
-    /// Return asynchronous loading flag
+    /// Return asynchronous loading flag.
     bool IsAsyncLoading() const { return asyncLoading_; }
-    /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress
+    /// Return asynchronous loading progress between 0.0 and 1.0, or 1.0 if not in progress.
     float GetAsyncProgress() const;
-    /// Return source file name
+    /// Return source file name.
     const String& GetFileName() const { return fileName_; }
-    /// Return source file checksum
+    /// Return source file checksum.
     unsigned GetChecksum() const { return checksum_; }
-    /// Return motion smoothing constant
+    /// Return motion smoothing constant.
     float GetSmoothingConstant() const { return smoothingConstant_; }
-    /// Return motion smoothing snap threshold
+    /// Return motion smoothing snap threshold.
     float GetSnapThreshold() const { return snapThreshold_; }
-    /// Return required package files
+    /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
-    /// Return all nodes
+    /// Return all nodes.
     const Map<unsigned, Node*>& GetAllNodes() const { return allNodes_; }
-    /// Return all components
+    /// Return all components.
     const Map<unsigned, Component*>& GetAllComponents() const { return allComponents_; }
+    /// Return a node var name, or empty if not registered.
+    const String& GetVarName(ShortStringHash hash) const;
     
-    /// Update scene. Called by HandleUpdate
+    /// Update scene. Called by HandleUpdate.
     void Update(float timeStep);
-    /// Get free node ID, either non-local or local
+    /// Get free node ID, either non-local or local.
     unsigned GetFreeNodeID(CreateMode mode);
-    /// Get free component ID, either non-local or local
+    /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
-    /// Node added. Assign scene pointer and add to ID map
+    /// Node added. Assign scene pointer and add to ID map.
     void NodeAdded(Node* node);
-    /// Node removed. Remove from ID map
+    /// Node removed. Remove from ID map.
     void NodeRemoved(Node* node);
-    /// Component added. Add to ID map
+    /// Component added. Add to ID map.
     void ComponentAdded(Component* component);
-    /// Component removed. Remove from ID map
+    /// Component removed. Remove from ID map.
     void ComponentRemoved(Component* component);
+    /// Set node user variable reverse mappings.
+    void SetVarNamesAttr(String value);
+    /// Return node user variable reverse mappings.
+    String GetVarNamesAttr() const;
     
 private:
-    /// Handle the logic update event to update the scene, if active
+    /// Handle the logic update event to update the scene, if active.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    /// Update asynchronous loading
+    /// Update asynchronous loading.
     void UpdateAsyncLoading();
-    /// Finish asynchronous loading
+    /// Finish asynchronous loading.
     void FinishAsyncLoading();
-    /// Finish loading
+    /// Finish loading.
     void FinishLoading(Deserializer* source);
     
-    /// Map of scene nodes by ID
+    /// Map of scene nodes by ID.
     Map<unsigned, Node*> allNodes_;
-    /// Map of components by ID
+    /// Map of components by ID.
     Map<unsigned, Component*> allComponents_;
-    /// Asynchronous loading progress
+    /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
-    /// Source file name
+    /// Source file name.
     String fileName_;
-    /// Required package files for networking
+    /// Required package files for networking.
     Vector<SharedPtr<PackageFile> > requiredPackageFiles_;
-    /// Next free non-local node ID
+    /// Registered node user variable reverse mappings.
+    Map<ShortStringHash, String> varNames_;
+    /// Next free non-local node ID.
     unsigned replicatedNodeID_;
-    /// Next free local node ID
+    /// Next free local node ID.
     unsigned localNodeID_;
-    /// Next free non-local component ID
+    /// Next free non-local component ID.
     unsigned replicatedComponentID_;
-    /// Next free local component ID
+    /// Next free local component ID.
     unsigned localComponentID_;
-    /// Scene source file checksum
+    /// Scene source file checksum.
     unsigned checksum_;
-    /// Motion smoothing constant
+    /// Motion smoothing constant.
     float smoothingConstant_;
-    /// Motion smoothing snap threshold
+    /// Motion smoothing snap threshold.
     float snapThreshold_;
-    /// Active flag
+    /// Active flag.
     bool active_;
-    /// Asynchronous loading flag
+    /// Asynchronous loading flag.
     bool asyncLoading_;
 };
 
-/// Register Scene library objects
+/// Register Scene library objects.
 void RegisterSceneLibrary(Context* context);

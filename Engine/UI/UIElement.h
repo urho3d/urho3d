@@ -28,7 +28,7 @@
 #include "Vector2.h"
 #include "XMLFile.h"
 
-/// UI element horizontal alignment
+/// UI element horizontal alignment.
 enum HorizontalAlignment
 {
     HA_LEFT = 0,
@@ -36,7 +36,7 @@ enum HorizontalAlignment
     HA_RIGHT
 };
 
-/// UI element vertical alignment
+/// UI element vertical alignment.
 enum VerticalAlignment
 {
     VA_TOP = 0,
@@ -44,7 +44,7 @@ enum VerticalAlignment
     VA_BOTTOM
 };
 
-/// UI element corners
+/// UI element corners.
 enum Corner
 {
     C_TOPLEFT = 0,
@@ -54,397 +54,396 @@ enum Corner
     MAX_UIELEMENT_CORNERS
 };
 
-/// UI element orientation
+/// UI element orientation.
 enum Orientation
 {
     O_HORIZONTAL = 0,
     O_VERTICAL
 };
 
-/// UI element focus mode
+/// UI element focus mode.
 enum FocusMode
 {
-    /// Is not focusable and does not affect existing focus
+    /// Is not focusable and does not affect existing focus.
     FM_NOTFOCUSABLE = 0,
-    /// Resets focus when clicked
+    /// Resets focus when clicked.
     FM_RESETFOCUS,
-    /// Is focusable
+    /// Is focusable.
     FM_FOCUSABLE,
-    /// Is focusable and also defocusable by pressing ESC
+    /// Is focusable and also defocusable by pressing ESC.
     FM_FOCUSABLE_DEFOCUSABLE
 };
 
-/// Layout operation mode
+/// Layout operation mode.
 enum LayoutMode
 {
-    /// No layout operations will be performed
+    /// No layout operations will be performed.
     LM_FREE = 0,
-    /// Layout child elements horizontally and resize them to fit. Resize element if necessary
+    /// Layout child elements horizontally and resize them to fit. Resize element if necessary.
     LM_HORIZONTAL,
-    /// Layout child elements vertically and resize them to fit. Resize element if necessary
+    /// Layout child elements vertically and resize them to fit. Resize element if necessary.
     LM_VERTICAL
 };
 
-/// Drag and drop disabled
+/// Drag and drop disabled.
 static const unsigned DD_DISABLED = 0x0;
-/// Drag and drop source flag
+/// Drag and drop source flag.
 static const unsigned DD_SOURCE = 0x1;
-/// Drag and drop target flag
+/// Drag and drop target flag.
 static const unsigned DD_TARGET = 0x2;
-/// Drag and drop source and target
+/// Drag and drop source and target.
 static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
 class ResourceCache;
 class asIScriptEngine;
 
-/// Base class for UI elements
+/// Base class for UI elements.
 class UIElement : public Object
 {
     OBJECT(Element);
     
 public:
-    /// Construct
+    /// Construct.
     UIElement(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~UIElement();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Perform UI element update
+    /// Perform UI element update.
     virtual void Update(float timeStep);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
-    /// React to mouse hover
+    /// React to mouse hover.
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse click
+    /// React to mouse click.
     virtual void OnClick(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag start
+    /// React to mouse drag start.
     virtual void OnDragStart(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag motion
+    /// React to mouse drag motion.
     virtual void OnDragMove(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
-    /// React to mouse drag end
+    /// React to mouse drag end.
     virtual void OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, Cursor* cursor);
-    /// React to drag and drop test. Return true to signal that the drop is acceptable
+    /// React to drag and drop test. Return true to signal that the drop is acceptable.
     virtual bool OnDragDropTest(UIElement* source);
-    /// React to drag and drop finish. Return true to signal that the drop was accepted
+    /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
-    /// React to mouse wheel
+    /// React to mouse wheel.
     virtual void OnWheel(int delta, int buttons, int qualifiers);
-    /// React to a key press
+    /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to a key press translated to a character
+    /// React to a key press translated to a character.
     virtual void OnChar(unsigned char c, int buttons, int qualifiers);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
-    /// React to gaining focus
+    /// React to gaining focus.
     virtual void OnFocus();
-    /// React to losing focus
+    /// React to losing focus.
     virtual void OnDefocus();
     
-    /// %Set name
+    /// %Set name.
     void SetName(const String& name);
-    /// %Set position
+    /// %Set position.
     void SetPosition(const IntVector2& position);
-    /// %Set position
+    /// %Set position.
     void SetPosition(int x, int y);
-    /// %Set size
+    /// %Set size.
     void SetSize(const IntVector2& size);
-    /// %Set size
+    /// %Set size.
     void SetSize(int width, int height);
-    /// %Set width only
+    /// %Set width only.
     void SetWidth(int width);
-    /// %Set height only
+    /// %Set height only.
     void SetHeight(int height);
-    /// %Set minimum size
+    /// %Set minimum size.
     void SetMinSize(const IntVector2& minSize);
-    /// %Set minimum size
+    /// %Set minimum size.
     void SetMinSize(int width, int height);
-    /// %Set minimum width
+    /// %Set minimum width.
     void SetMinWidth(int width);
-    /// %Set minimum height
+    /// %Set minimum height.
     void SetMinHeight(int height);
-    /// %Set maximum size
+    /// %Set maximum size.
     void SetMaxSize(const IntVector2& maxSize);
-    /// %Set maximum size
+    /// %Set maximum size.
     void SetMaxSize(int width, int height);
-    /// %Set maximum width
+    /// %Set maximum width.
     void SetMaxWidth(int width);
-    /// %Set maximum height
+    /// %Set maximum height.
     void SetMaxHeight(int height);
-    /// %Set fixed size
+    /// %Set fixed size.
     void SetFixedSize(const IntVector2& size);
-    /// %Set fixed size
+    /// %Set fixed size.
     void SetFixedSize(int width, int height);
-    /// %Set fixed width
+    /// %Set fixed width.
     void SetFixedWidth(int width);
-    /// %Set fixed height
+    /// %Set fixed height.
     void SetFixedHeight(int height);
-    /// %Set horizontal and vertical alignment
+    /// %Set horizontal and vertical alignment.
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
-    /// %Set horizontal alignment
+    /// %Set horizontal alignment.
     void SetHorizontalAlignment(HorizontalAlignment align);
-    /// %Set vertical alignment
+    /// %Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// %Set child element clipping border
+    /// %Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
-    /// %Set color on all corners
+    /// %Set color on all corners.
     void SetColor(const Color& color);
-    /// %Set color on one corner
+    /// %Set color on one corner.
     void SetColor(Corner corner, const Color& color);
-    /// %Set priority
+    /// %Set priority.
     void SetPriority(int priority);
-    /// %Set opacity
+    /// %Set opacity.
     void SetOpacity(float opacity);
-    /// %Set whether should be brought to front when focused
+    /// %Set whether should be brought to front when focused.
     void SetBringToFront(bool enable);
-    /// %Set whether should be put to background when another element is focused
+    /// %Set whether should be put to background when another element is focused.
     void SetBringToBack(bool enable);
-    /// %Set whether should clip child elements
+    /// %Set whether should clip child elements.
     void SetClipChildren(bool enable);
-    /// %Set whether reacts to input
+    /// %Set whether reacts to input.
     void SetActive(bool enable);
-    /// %Set whether is focused. Usually called by UI. If called manually, other elements should be defocused
+    /// %Set whether is focused. Usually called by UI. If called manually, other elements should be defocused.
     void SetFocus(bool enable);
-    /// %Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect
+    /// %Set selected mode. Actual meaning is element dependent, for example constant hover or pressed effect.
     void SetSelected(bool enable);
-    /// %Set whether is visible
+    /// %Set whether is visible.
     void SetVisible(bool enable);
-    /// %Set focus mode
+    /// %Set focus mode.
     void SetFocusMode(FocusMode mode);
-    /// %Set drag and drop flags
+    /// %Set drag and drop flags.
     void SetDragDropMode(unsigned mode);
-    /// %Set style from an XML file. Find the style element by name
+    /// %Set style from an XML file. Find the style element by name.
     void SetStyle(XMLFile* file, const String& typeName);
-    /// %Set style from an XML file. Find the style element automatically
+    /// %Set style from an XML file. Find the style element automatically.
     void SetStyleAuto(XMLFile* file);
-    /// %Set layout
+    /// %Set layout.
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
-    /// %Set layout mode only
+    /// %Set layout mode only.
     void SetLayoutMode(LayoutMode mode);
-    /// %Set layout spacing
+    /// %Set layout spacing.
     void SetLayoutSpacing(int spacing);
-    /// %Set layout border
+    /// %Set layout border.
     void SetLayoutBorder(const IntRect& border);
-    /// Manually update layout. Should not be necessary in most cases, but is provided for completeness
+    /// Manually update layout. Should not be necessary in most cases, but is provided for completeness.
     void UpdateLayout();
-    /// Disable automatic layout update. Should only be used if there are performance problems
+    /// Disable automatic layout update. Should only be used if there are performance problems.
     void DisableLayoutUpdate();
-    /// Enable automatic layout update
+    /// Enable automatic layout update.
     void EnableLayoutUpdate();
-    /// Bring UI element to front
+    /// Bring UI element to front.
     void BringToFront();
-    /// Add a child element
+    /// Add a child element.
     void AddChild(UIElement* element);
-    /// Insert a child element into a specific position in the child list
+    /// Insert a child element into a specific position in the child list.
     void InsertChild(unsigned index, UIElement* element);
-    /// Remove a child element
+    /// Remove a child element.
     void RemoveChild(UIElement* element);
-    /// Remove all child elements
+    /// Remove all child elements.
     void RemoveAllChildren();
-    /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion
+    /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// %Set parent element. Same as parent->AddChild(this)
+    /// %Set parent element. Same as parent->AddChild(this).
     void SetParent(UIElement* parent);
     
-    /// Return name
+    /// Return name.
     const String& GetName() const { return name_; }
-    /// Return position
+    /// Return position.
     const IntVector2& GetPosition() const { return position_; }
-    /// Return screen position
+    /// Return screen position.
     IntVector2 GetScreenPosition();
-    /// Return size
+    /// Return size.
     const IntVector2& GetSize() const { return size_; }
-    /// Return width
+    /// Return width.
     int GetWidth() const { return size_.x_; }
-    /// Return height
+    /// Return height.
     int GetHeight() const { return size_.y_; }
-    /// Return minimum size
+    /// Return minimum size.
     const IntVector2& GetMinSize() const { return minSize_; }
-    /// Return minimum width
+    /// Return minimum width.
     int GetMinWidth() const { return minSize_.x_; }
-    /// Return minimum height
+    /// Return minimum height.
     int GetMinHeight() const { return minSize_.y_; }
-    /// Return maximum size
+    /// Return maximum size.
     const IntVector2& GetMaxSize() const { return maxSize_; }
-    /// Return minimum width
+    /// Return minimum width.
     int GetMaxWidth() const { return maxSize_.x_; }
-    /// Return minimum height
+    /// Return minimum height.
     int GetMaxHeight() const { return maxSize_.y_; }
-    /// Return child element offset
+    /// Return child element offset.
     const IntVector2& GetChildOffset() const { return childOffset_; }
-    /// Return horizontal alignment
+    /// Return horizontal alignment.
     HorizontalAlignment GetHorizontalAlignment() const { return horizontalAlignment_; }
-    /// Return vertical alignment
+    /// Return vertical alignment.
     VerticalAlignment GetVerticalAlignment() const { return verticalAlignment_; }
-    /// Return child element clipping border
+    /// Return child element clipping border.
     const IntRect& GetClipBorder() const { return clipBorder_; }
-    /// Return corner color
+    /// Return corner color.
     const Color& GetColor(Corner corner) const { return color_[corner]; }
-    /// Return priority
+    /// Return priority.
     int GetPriority() const { return priority_; }
-    /// Return opacity
+    /// Return opacity.
     float GetOpacity() const { return opacity_; }
-    /// Return derived opacity (affected by parent elements)
+    /// Return derived opacity (affected by parent elements.)
     float GetDerivedOpacity();
-    /// Return whether should be brought to front when focused
+    /// Return whether should be brought to front when focused.
     bool GetBringToFront() const { return bringToFront_; }
-    /// Return whether should be put to background when another element is focused
+    /// Return whether should be put to background when another element is focused.
     bool GetBringToBack() const { return bringToBack_; }
-    /// Return whether should clip child elements
+    /// Return whether should clip child elements.
     bool GetClipChildren() const { return clipChildren_; }
-    /// Return whether has focus
+    /// Return whether has focus.
     bool HasFocus() const { return focus_; }
-    /// Return whether reacts to input
+    /// Return whether reacts to input.
     bool IsActive() const { return active_; }
-    /// Return whether is selected. Actual meaning is element dependent
+    /// Return whether is selected. Actual meaning is element dependent.
     bool IsSelected() const { return selected_; }
-    /// Return whether is visible
+    /// Return whether is visible.
     bool IsVisible() const { return visible_; }
-    /// Return whether the cursor is hovering on this element
+    /// Return whether the cursor is hovering on this element.
     bool IsHovering() const { return hovering_; }
-    /// Return whether has different color in at least one corner
+    /// Return whether has different color in at least one corner.
     bool HasColorGradient() const { return colorGradient_; }
-    /// Return focus mode
+    /// Return focus mode.
     FocusMode GetFocusMode() const { return focusMode_; }
-    /// Return drag and drop flags
+    /// Return drag and drop flags.
     unsigned GetDragDropMode() const { return dragDropMode_; }
-    /// Return layout mode
+    /// Return layout mode.
     LayoutMode GetLayoutMode() const { return layoutMode_; }
-    /// Return layout spacing
+    /// Return layout spacing.
     int GetLayoutSpacing() const { return layoutSpacing_; }
-    /// Return layout border
+    /// Return layout border.
     const IntRect& GetLayoutBorder() const { return layoutBorder_; }
-    /// Return number of child elements
+    /// Return number of child elements.
     unsigned GetNumChildren(bool recursive = false) const;
-    /// Return child element by index
+    /// Return child element by index.
     UIElement* GetChild(unsigned index) const;
-    /// Return child element by name
+    /// Return child element by name.
     UIElement* GetChild(const String& name, bool recursive = false) const;
-    /// Return all child elements
+    /// Return all child elements.
     PODVector<UIElement*> GetChildren(bool recursive = false) const;
-    /// Return parent element
+    /// Return parent element.
     UIElement* GetParent() const { return parent_; }
-    /// Return root element
+    /// Return root element.
     UIElement* GetRoot() const;
-    /// Return precalculated 32-bit color. Only valid when no gradient
+    /// Return precalculated 32-bit color. Only valid when no gradient.
     unsigned GetUIntColor();
-    /// Return user variables
+    /// Return user variables.
     VariantMap& GetVars() { return vars_; }
     
-    /// Convert screen coordinates to element coordinates
+    /// Convert screen coordinates to element coordinates.
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
-    /// Convert element coordinates to screen coordinates
+    /// Convert element coordinates to screen coordinates.
     IntVector2 ElementToScreen(const IntVector2& position);
-    /// Return whether a point (either in element or screen coordinates) is inside the element
+    /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
-    /// Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children
+    /// Return whether a point (either in element or screen coordinates) is inside the combined rect of element and its children.
     bool IsInsideCombined(IntVector2 position, bool isScreen);
-    /// Return combined screen coordinate rect of element and its children
+    /// Return combined screen coordinate rect of element and its children.
     IntRect GetCombinedScreenRect();
     
-    /// %Set child offset
+    /// %Set child offset.
     void SetChildOffset(const IntVector2& offset);
-    /// %Set hovering state
+    /// %Set hovering state.
     void SetHovering(bool enable);
-    /// Adjust scissor for rendering
+    /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
-    /// Get UI rendering batches with a specified offset. Also recurses to child elements
+    /// Get UI rendering batches with a specified offset. Also recurses to child elements.
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, IntRect
         currentScissor);
     
-    /// User variables
+    /// User variables.
     VariantMap vars_;
     
 protected:
-    /// Mark screen position as needing an update
+    /// Mark screen position as needing an update.
     void MarkDirty();
     
-    /// Name
+    /// Name.
     String name_;
-    /// Child elements
+    /// Child elements.
     Vector<SharedPtr<UIElement> > children_;
-    /// Parent element
+    /// Parent element.
     UIElement* parent_;
-    /// Child element clipping border
+    /// Child element clipping border.
     IntRect clipBorder_;
-    /// Colors
+    /// Colors.
     Color color_[MAX_UIELEMENT_CORNERS];
-    /// Priority
+    /// Priority.
     int priority_;
-    /// Bring to front when focused flag
+    /// Bring to front when focused flag.
     bool bringToFront_;
-    /// Bring to back when defocused flag
+    /// Bring to back when defocused flag.
     bool bringToBack_;
-    /// Clip children flag
+    /// Clip children flag.
     bool clipChildren_;
-    /// Focused flag
+    /// Focused flag.
     bool focus_;
-    /// Input enabled flag
+    /// Input enabled flag.
     bool active_;
-    /// Selected flag
+    /// Selected flag.
     bool selected_;
-    /// Visible flag
+    /// Visible flag.
     bool visible_;
-    /// Hovering flag
+    /// Hovering flag.
     bool hovering_;
-    /// Focus mode
+    /// Focus mode.
     FocusMode focusMode_;
-    /// Drag and drop flags
+    /// Drag and drop flags.
     unsigned dragDropMode_;
-    /// Layout mode
+    /// Layout mode.
     LayoutMode layoutMode_;
-    /// Layout spacing
+    /// Layout spacing.
     int layoutSpacing_;
-    /// Layout borders
+    /// Layout borders.
     IntRect layoutBorder_;
-    /// Resize nesting level to prevent multiple events and endless loop
+    /// Resize nesting level to prevent multiple events and endless loop.
     unsigned resizeNestingLevel_;
-    /// Layout update nesting level to prevent endless loop
+    /// Layout update nesting level to prevent endless loop.
     unsigned layoutNestingLevel_;
     
 private:
-    /// Return child elements recursively
+    /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
-    /// Calculate layout width for resizing the parent element
+    /// Calculate layout width for resizing the parent element.
     int CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing);
-    /// Calculate child widths/positions in the layout
-    void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes,
-        const PODVector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
-    /// Get child element constant position in a layout
+    /// Calculate child widths/positions in the layout.
+    void CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes, const PODVector<int>& minSizes, const PODVector<int>& maxSizes, int targetWidth, int begin, int end, int spacing);
+    /// Get child element constant position in a layout.
     IntVector2 GetLayoutChildPosition(UIElement* child);
     
-    /// Position
+    /// Position.
     IntVector2 position_;
-    /// Screen position
+    /// Screen position.
     IntVector2 screenPosition_;
-    /// Size
+    /// Size.
     IntVector2 size_;
-    /// Minimum size
+    /// Minimum size.
     IntVector2 minSize_;
-    /// Maximum size
+    /// Maximum size.
     IntVector2 maxSize_;
-    /// Child elements' offset. Used internally
+    /// Child elements' offset. Used internally.
     IntVector2 childOffset_;
-    /// Horizontal alignment
+    /// Horizontal alignment.
     HorizontalAlignment horizontalAlignment_;
-    /// Vertical alignment
+    /// Vertical alignment.
     VerticalAlignment verticalAlignment_;
-    /// Opacity
+    /// Opacity.
     float opacity_;
-    /// Derived opacity
+    /// Derived opacity.
     float derivedOpacity_;
-    /// Screen position dirty flag
-    bool positionDirty_;
-    /// Derived opacity dirty flag
-    bool opacityDirty_;
-    /// Derived color dirty flag (only used when no gradient)
-    bool derivedColorDirty_;
-    /// Has color gradient flag
-    bool colorGradient_;
-    /// Precalculated 32-bit color
+    /// Precalculated 32-bit color.
     unsigned uintColor_;
+    /// Screen position dirty flag.
+    bool positionDirty_;
+    /// Derived opacity dirty flag.
+    bool opacityDirty_;
+    /// Derived color dirty flag (only used when no gradient.)
+    bool derivedColorDirty_;
+    /// Has color gradient flag.
+    bool colorGradient_;
 };

@@ -135,11 +135,11 @@ Variable timestep logic updates are preferable to fixed timestep, because they a
 
 \page SceneModel %Scene model
 
-Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale) and a name, but no other functionality. Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating different \ref Component "Components" into the nodes by calling \ref Node::CreateComponent "CreateComponent()".
+Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID, and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
 
-Components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
+\section SceneModel_Components Components
 
-As with events, in C++ components are identified by type name hashes, and template forms of the component creation and retrieval functions exist for convenience. For example:
+Rendering 3D objects, sound playback, physics and scripted logic updates are all enabled by creating different \ref Component "Components" into the nodes by calling \ref Node::CreateComponent "CreateComponent()". As with events, in C++ components are identified by type name hashes, and template forms of the component creation and retrieval functions exist for convenience. For example:
 
 \code
 Light* light = lightNode->CreateComponent<Light>();
@@ -152,14 +152,6 @@ Light@ light = lightNode.CreateComponent("Light");
 
 Because components are created using \ref ObjectTypes "object factories", a factory must be registered for each component type.
 
-When created, nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
-
-There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and to decide in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
-
-Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details.
-
-%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
-
 Components created into the Scene itself have a special role: to implement scene-wide functionality. They should be created before all other components, and include the following:
 
 - Octree: implements spatial partitioning and accelerated visibility queries. Without this 3D objects can not be rendered.
@@ -168,9 +160,27 @@ Components created into the Scene itself have a special role: to implement scene
 
 "Ordinary" components like Light, Camera or StaticModel should not be created directly into the Scene, but rather into child nodes.
 
-A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
+\section SceneModel_Identification Identification and scene hierarchy
 
-It is also legal to create a Node that does not belong to a scene. This particularly useful with cameras, because then the Camera will not be serialized along with the actual scene, which is perhaps not always wanted.
+Unlike nodes, components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
+
+When created, both nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
+
+There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
+
+Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details.
+
+%Scene nodes can be freely reparented. In contrast components are always created to the node they belong to, and can not be moved between nodes. Both child nodes and components are stored using SharedPtr containers; this means that detaching a child node from its parent or removing a component will also destroy it, if no other references to it exist. Both Node & Component provide the \ref Node::Remove() "Remove()" function to accomplish this without having to go through the parent. Note that no operations on the node or component in question are safe after calling that function.
+
+It is also legal to create a Node that does not belong to a scene. This is particularly useful with cameras, because then the camera will not be serialized along with the actual scene, which is perhaps not always wanted.
+
+\section SceneModel_Update Scene updates and serialization
+
+A Scene can be either active or inactive (paused.) Active scenes will be automatically updated on each main loop iteration. 
+
+Scenes can be loaded and saved in either binary or XML format; see \ref Serialization "Serialization" for details.
+
+\section SceneModel_FurtherInformation Further information
 
 For more information on the component-based scene model, see for example http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/.
 
@@ -284,6 +294,8 @@ Much of the Urho3D classes are exposed to scripts, however things that require l
 - Public member variables are exposed without the underscore appended. For example x, y, z in Vector3.
 
 - Whenever only a single parameter is needed, setter and getter functions are replaced with properties. Such properties start with a lowercase letter. If an index parameter is needed, the property will be indexed. Indexed properties are in plural.
+
+- The element count property of arrays and other dynamic structures such as VariantMap and ResourceRefList is called "length", though the corresponding C++ function is usually Size().
 
 - Subsystems exist as global properties: time, fileSystem, log, cache, network, input, ui, audio, engine, graphics, renderer, script, console, debugHud.
 

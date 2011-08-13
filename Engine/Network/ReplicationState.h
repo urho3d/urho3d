@@ -25,28 +25,28 @@
 
 #include "Variant.h"
 
-/// Last sent state of a component for network replication
+/// Last sent state of a component for network replication.
 struct ComponentReplicationState
 {
-    /// Component type
+    /// Component type.
     ShortStringHash type_;
-    /// Attribute values
+    /// Attribute values.
     Vector<Variant> attributes_;
-    /// Update frame number
+    /// Update frame number.
     unsigned frameNumber_;
 };
 
-/// Last sent state of a node for network replication
+/// Last sent state of a node for network replication.
 struct NodeReplicationState
 {
-    /// Attribute values
+    /// Attribute values.
     Vector<Variant> attributes_;
-    /// User variables
+    /// User variables.
     VariantMap vars_;
-    /// Components by ID
+    /// Components by ID.
     Map<unsigned, ComponentReplicationState> components_;
-    /// Interest management priority accumulator
+    /// Interest management priority accumulator.
     float priorityAcc_;
-    /// Update frame number
+    /// Update frame number.
     unsigned frameNumber_;
 };

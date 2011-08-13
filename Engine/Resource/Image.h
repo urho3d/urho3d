@@ -26,7 +26,7 @@
 #include "Resource.h"
 #include "ArrayPtr.h"
 
-/// Supported compressed image formats
+/// Supported compressed image formats.
 enum CompressedFormat
 {
     CF_NONE = 0,
@@ -35,10 +35,10 @@ enum CompressedFormat
     CF_DXT5
 };
 
-/// Compressed image mip level
+/// Compressed image mip level.
 struct CompressedLevel
 {
-    /// Construct as empty
+    /// Construct empty.
     CompressedLevel() :
         data_(0),
         width_(0),
@@ -50,82 +50,82 @@ struct CompressedLevel
     {
     }
     
-    /// Image data
+    /// Image data.
     unsigned char* data_;
-    /// Width
+    /// Width.
     int width_;
-    /// Height
+    /// Height.
     int height_;
-    /// Block size in bytes
+    /// Block size in bytes.
     unsigned blockSize_;
-    /// Total data size in bytes
+    /// Total data size in bytes.
     unsigned dataSize_;
-    /// Row size in bytes
+    /// Row size in bytes.
     unsigned rowSize_;
-    /// Number of rows
+    /// Number of rows.
     unsigned rows_;
 };
 
-/// Image resource
+/// Image resource.
 class Image : public Resource
 {
     OBJECT(Image);
     
 public:
-    /// Construct an empty image
+    /// Construct empty.
     Image(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Image();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
     
-    /// %Set size and number of color components
+    /// %Set size and number of color components.
     void SetSize(int width, int height, unsigned components);
-    /// %Set data
+    /// %Set data.
     void SetData(const unsigned char* pixelData);
-    /// Save in BMP format. Return true if successful
+    /// Save in BMP format. Return true if successful.
     bool SaveBMP(const String& fileName);
-    /// Save in TGA format. Return true if successful
+    /// Save in TGA format. Return true if successful.
     bool SaveTGA(const String& fileName);
     
-    /// Return width
+    /// Return width.
     int GetWidth() const { return width_; }
-    /// Return height
+    /// Return height.
     int GetHeight() const { return height_; }
-    /// Return number of color components
+    /// Return number of color components.
     unsigned GetComponents() const { return components_; }
-    /// Return pixel data
+    /// Return pixel data.
     unsigned char* GetData() const { return data_; }
-    /// Return whether is compressed
+    /// Return whether is compressed.
     bool IsCompressed() const { return compressedFormat_ != CF_NONE; }
-    /// Return compressed format
+    /// Return compressed format.
     CompressedFormat GetCompressedFormat() const { return compressedFormat_; }
-    /// Return number of compressed mip levels
+    /// Return number of compressed mip levels.
     unsigned GetNumCompressedLevels() const { return numCompressedLevels_; }
-    /// Return next mip level by bilinear filtering
+    /// Return next mip level by bilinear filtering.
     SharedPtr<Image> GetNextLevel() const;
-    /// Return a compressed mip level
+    /// Return a compressed mip level.
     CompressedLevel GetCompressedLevel(unsigned index) const;
     
 private:
-    /// Decode an image using stb_image
+    /// Decode an image using stb_image.
     static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components);
-    /// Free an image file's pixel data
+    /// Free an image file's pixel data.
     static void FreeImageData(unsigned char* pixelData);
     
-    /// Width
+    /// Width.
     int width_;
-    /// Height
+    /// Height.
     int height_;
-    /// Number of color components
+    /// Number of color components.
     unsigned components_;
-    /// Number of compressed mip levels
+    /// Number of compressed mip levels.
     unsigned numCompressedLevels_;
-    /// Compressed format
+    /// Compressed format.
     CompressedFormat compressedFormat_;
-    /// Pixel data
+    /// Pixel data.
     SharedArrayPtr<unsigned char> data_;
 };

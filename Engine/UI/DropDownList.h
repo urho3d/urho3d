@@ -27,7 +27,7 @@
 
 class ListView;
 
-/// Menu UI element that displays a popup list view
+/// Menu UI element that displays a popup list view.
 class DropDownList : public Menu
 {
     OBJECT(DropDownList)
@@ -35,61 +35,61 @@ class DropDownList : public Menu
     using UIElement::SetStyle;
     
 public:
-    /// Construct with name
+    /// Construct.
     DropDownList(Context* context);
-    /// Destruct
+    /// Destruct.
     ~DropDownList();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
-    /// React to the popup being shown
+    /// React to the popup being shown.
     virtual void OnShowPopup();
     
-    /// Add item to the end of the list
+    /// Add item to the end of the list.
     void AddItem(UIElement* item);
-    /// Insert item to a specific position
+    /// Insert item to a specific position.
     void InsertItem(unsigned index, UIElement* item);
-    /// Remove specific item
+    /// Remove specific item.
     void RemoveItem(UIElement* item);
-    /// Remove item at index
+    /// Remove item at index.
     void RemoveItem(unsigned index);
-    /// Remove all items
+    /// Remove all items.
     void RemoveAllItems();
-    /// %Set selection
+    /// %Set selection.
     void SetSelection(unsigned index);
-    /// %Set whether popup should be automatically resized to match the dropdown button width
+    /// %Set whether popup should be automatically resized to match the dropdown button width.
     void SetResizePopup(bool enable);
     
-    /// Return number of items
+    /// Return number of items.
     unsigned GetNumItems() const;
-    /// Return item at index
+    /// Return item at index.
     UIElement* GetItem(unsigned index) const;
-    /// Return all items
+    /// Return all items.
     PODVector<UIElement*> GetItems() const;
-    /// Return selection index, or M_MAX_UNSIGNED if none selected
+    /// Return selection index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
-    /// Return selected item, or null if none selected
+    /// Return selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
-    /// Return listview element
+    /// Return listview element.
     ListView* GetListView() const { return listView_; }
-    /// Return selected item placeholder element
+    /// Return selected item placeholder element.
     UIElement* GetPlaceholder() const { return placeholder_; }
-    /// Return whether popup should be automatically resized
+    /// Return whether popup should be automatically resized.
     bool GetResizePopup() const { return resizePopup_; }
     
 protected:
-    /// Listview element
+    /// Listview element.
     SharedPtr<ListView> listView_;
-    /// Selected item placeholder element
+    /// Selected item placeholder element.
     SharedPtr<UIElement> placeholder_;
-    /// Resize popup flag
+    /// Resize popup flag.
     bool resizePopup_;
     
 private:
-    /// Handle listview item selected event
+    /// Handle listview item selected event.
     void HandleItemSelected(StringHash eventType, VariantMap& eventData);
 };

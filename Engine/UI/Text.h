@@ -29,7 +29,7 @@ static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
 
-/// Text UI element
+/// Text UI element.
 class Text : public UIElement
 {
     OBJECT(Text);
@@ -37,108 +37,108 @@ class Text : public UIElement
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     Text(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Text();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
     
-    /// %Set font and font size
+    /// %Set font and font size.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// %Set font and font size
+    /// %Set font and font size.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    /// %Set text
+    /// %Set text.
     void SetText(const String& text);
-    /// %Set row alignment
+    /// %Set row alignment.
     void SetTextAlignment(HorizontalAlignment align);
-    /// %Set row spacing, 1.0 for original font spacing
+    /// %Set row spacing, 1.0 for original font spacing.
     void SetRowSpacing(float spacing);
-    /// %Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely
+    /// %Set wordwrap. In wordwrap mode the text element will respect its current width. Otherwise it resizes itself freely.
     void SetWordwrap(bool enable);
-    /// %Set selection
+    /// %Set selection.
     void SetSelection(unsigned start, unsigned length);
-    /// Clear selection
+    /// Clear selection.
     void ClearSelection();
-    /// %Set selection background color. Color with 0 alpha (default) disables
+    /// %Set selection background color. Color with 0 alpha (default) disables.
     void SetSelectionColor(const Color& color);
-    /// %Set hover background color. Color with 0 alpha (default) disables
+    /// %Set hover background color. Color with 0 alpha (default) disables.
     void SetHoverColor(const Color& color);
     
-    /// Return font
+    /// Return font.
     Font* GetFont() const { return font_; }
-    /// Return font size
+    /// Return font size.
     int GetFontSize() const { return fontSize_; }
-    /// Return text
+    /// Return text.
     const String& GetText() const { return text_; }
-    /// Return row alignment
+    /// Return row alignment.
     HorizontalAlignment GetTextAlignment() const { return textAlignment_; }
-    /// Return row spacing
+    /// Return row spacing.
     float GetRowSpacing() const { return rowSpacing_; }
-    /// Return wordwrap mode
+    /// Return wordwrap mode.
     bool GetWordwrap() const { return wordWrap_; }
-    /// Return selection start
+    /// Return selection start.
     unsigned GetSelectionStart() const { return selectionStart_; }
-    /// Return selection length
+    /// Return selection length.
     unsigned GetSelectionLength() const { return selectionLength_; }
-    /// Return selection background color
+    /// Return selection background color.
     const Color& GetSelectionColor() const { return selectionColor_; }
-    /// Return hover background color
+    /// Return hover background color.
     const Color& GetHoverColor() const { return hoverColor_; }
-    /// Return row height
+    /// Return row height.
     int GetRowHeight() const { return rowHeight_; }
-    /// Return number of rows
+    /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
-    /// Return width of each row
+    /// Return width of each row.
     const PODVector<int>& GetRowWidths() const { return rowWidths_; }
-    /// Return position of each character
+    /// Return position of each character.
     const PODVector<IntVector2>& GetCharPositions() const { return charPositions_; }
-    /// Return size of each character
+    /// Return size of each character.
     const PODVector<IntVector2>& GetCharSizes() const { return charSizes_; }
     
 protected:
-    /// Update text when text, font or spacing changed
+    /// Update text when text, font or spacing changed.
     void UpdateText(bool inResize = false);
-    /// Validate text selection to be within the text
+    /// Validate text selection to be within the text.
     void ValidateSelection();
-    /// Return row start X position
+    /// Return row start X position.
     int GetRowStartPosition(unsigned rowIndex) const;
     
-    /// Font
+    /// Font.
     SharedPtr<Font> font_;
-    /// Font size
+    /// Font size.
     int fontSize_;
-    /// Text
+    /// Text.
     String text_;
-    /// Text modified into printed form
+    /// Text modified into printed form.
     String printText_;
-    /// Row alignment
+    /// Row alignment.
     HorizontalAlignment textAlignment_;
-    /// Row spacing
+    /// Row spacing.
     float rowSpacing_;
-    /// Wordwrap mode
+    /// Wordwrap mode.
     bool wordWrap_;
-    /// Selection start
+    /// Selection start.
     unsigned selectionStart_;
-    /// Selection length
+    /// Selection length.
     unsigned selectionLength_;
-    /// Selection background color
+    /// Selection background color.
     Color selectionColor_;
-    /// Hover background color
+    /// Hover background color.
     Color hoverColor_;
-    /// Row height
+    /// Row height.
     int rowHeight_;
-    /// Row widths
+    /// Row widths.
     PODVector<int> rowWidths_;
-    /// Positions of each character
+    /// Positions of each character.
     PODVector<IntVector2> charPositions_;
-    /// Sizes of each character
+    /// Sizes of each character.
     PODVector<IntVector2> charSizes_;
 };

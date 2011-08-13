@@ -499,7 +499,7 @@ void RigidBody::CreateBody()
 
 void RigidBody::ReleaseBody()
 {
-    if (!body_)
+    if (!body_ || !physicsWorld_)
         return;
     
     PODVector<CollisionShape*> shapes;

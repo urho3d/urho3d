@@ -26,18 +26,18 @@
 #include "ScrollView.h"
 #include "Set.h"
 
-/// ListView selection highlight mode
+/// ListView selection highlight mode.
 enum HighlightMode
 {
-    /// Never highlight selections
+    /// Never highlight selections.
     HM_NEVER,
-    /// Highlight when focused
+    /// Highlight when focused.
     HM_FOCUS,
-    /// Highlight always
+    /// Highlight always.
     HM_ALWAYS
 };
 
-/// Scrollable list UI element
+/// Scrollable list UI element.
 class ListView : public ScrollView
 {
     OBJECT(ListView);
@@ -45,116 +45,116 @@ class ListView : public ScrollView
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     ListView(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ListView();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Perform UI element update
+    /// Perform UI element update.
     virtual void Update(float timeStep);
-    /// React to a key press
+    /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
-    /// React to defocus
+    /// React to defocus.
     virtual void OnDefocus();
-    /// React to focus
+    /// React to focus.
     virtual void OnFocus();
     
-    /// Add item to the end of the list
+    /// Add item to the end of the list.
     void AddItem(UIElement* item);
-    /// Insert item at a specific position
+    /// Insert item at a specific position.
     void InsertItem(unsigned index, UIElement* item);
-    /// Remove specific item. In hierarchy mode will also remove any children
+    /// Remove specific item. In hierarchy mode will also remove any children.
     void RemoveItem(UIElement* item);
-    /// Remove item at index. In hierarchy mode will also remove any children
+    /// Remove item at index. In hierarchy mode will also remove any children.
     void RemoveItem(unsigned index);
-    /// Remove all items
+    /// Remove all items.
     void RemoveAllItems();
-    /// %Set selection
+    /// %Set selection.
     void SetSelection(unsigned index);
-    /// %Set multiple selected items. If multiselect disabled, sets only the first
+    /// %Set multiple selected items. If multiselect disabled, sets only the first.
     void SetSelections(const Set<unsigned>& indices);
-    /// Add item to the selection, multiselect mode only
+    /// Add item to the selection, multiselect mode only.
     void AddSelection(unsigned index);
-    /// Remove item from the selection
+    /// Remove item from the selection.
     void RemoveSelection(unsigned index);
-    /// Toggle selection of an item
+    /// Toggle selection of an item.
     void ToggleSelection(unsigned index);
-    /// Move selection by a delta and clamp at list ends. If additive (multiselect only), will add to the existing selection
+    /// Move selection by a delta and clamp at list ends. If additive (multiselect only), will add to the existing selection.
     void ChangeSelection(int delta, bool additive = false);
-    /// Clear selection
+    /// Clear selection.
     void ClearSelection();
-    /// %Set selected items' highlight mode
+    /// %Set selected items' highlight mode.
     void SetHighlightMode(HighlightMode mode);
-    /// Enable multiselect
+    /// Enable multiselect.
     void SetMultiselect(bool enable);
-    /// Enable hierarchy mode. Allows hiding/showing items that have "indent" userdata
+    /// Enable hierarchy mode. Allows hiding/showing items that have "indent" userdata.
     void SetHierarchyMode(bool enable);
-    /// Enable clearing of selection on defocus
+    /// Enable clearing of selection on defocus.
     void SetClearSelectionOnDefocus(bool enable);
-    /// %Set item doubleclick interval in seconds
+    /// %Set item doubleclick interval in seconds.
     void SetDoubleClickInterval(float interval);
-    /// Show or hide child items starting from index. Only has effect in hierarchy mode
+    /// Show or hide child items starting from index. Only has effect in hierarchy mode.
     void SetChildItemsVisible(unsigned index, bool enable);
-    /// Show or hide all child items. Only has effect in hierarchy mode
+    /// Show or hide all child items. Only has effect in hierarchy mode.
     void SetChildItemsVisible(bool enable);
-    /// Toggle child items' visibility starting from index. Only has effect in hierarchy mode
+    /// Toggle child items' visibility starting from index. Only has effect in hierarchy mode.
     void ToggleChildItemsVisible(unsigned index);
     
-    /// Return number of items
+    /// Return number of items.
     unsigned GetNumItems() const;
-    /// Return item at index
+    /// Return item at index.
     UIElement* GetItem(unsigned index) const;
-    /// Return all items
+    /// Return all items.
     PODVector<UIElement*> GetItems() const;
-    /// Return first selected index, or M_MAX_UNSIGNED if none selected
+    /// Return first selected index, or M_MAX_UNSIGNED if none selected.
     unsigned GetSelection() const;
-    /// Return all selected indices
+    /// Return all selected indices.
     Set<unsigned> GetSelections() const { return selections_; }
-    /// Return first selected item, or null if none selected
+    /// Return first selected item, or null if none selected.
     UIElement* GetSelectedItem() const;
-    /// Return all selected items
+    /// Return all selected items.
     PODVector<UIElement*> GetSelectedItems() const;
-    /// Return highlight mode
+    /// Return highlight mode.
     HighlightMode GetHighlightMode() const { return highlightMode_; }
-    /// Return whether multiselect enabled
+    /// Return whether multiselect enabled.
     bool GetMultiselect() const { return multiselect_; }
-    /// Return whether selection is cleared on defocus
+    /// Return whether selection is cleared on defocus.
     bool GetClearSelectionOnDefocus() const { return clearSelectionOnDefocus_; }
-    /// Return whether hierarchy mode enabled
+    /// Return whether hierarchy mode enabled.
     bool GetHierarchyMode() const { return hierarchyMode_; }
-    /// Return item doubleclick interval in seconds
+    /// Return item doubleclick interval in seconds.
     float GetDoubleClickInterval() const { return doubleClickInterval_; }
     
 protected:
-    /// Update selection effect when selection or focus changes
+    /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
-    /// Ensure full visibility of the item
+    /// Ensure full visibility of the item.
     void EnsureItemVisibility(unsigned index);
     
-    /// Current selection
+    /// Current selection.
     Set<unsigned> selections_;
-    /// Highlight mode
+    /// Highlight mode.
     HighlightMode highlightMode_;
-    /// Multiselect flag
+    /// Multiselect flag.
     bool multiselect_;
-    /// Hierarchy mode flag
+    /// Hierarchy mode flag.
     bool hierarchyMode_;
-    /// Clear selection on defocus flag
+    /// Clear selection on defocus flag.
     bool clearSelectionOnDefocus_;
-    /// Doubleclick interval
+    /// Doubleclick interval.
     float doubleClickInterval_;
-    /// Doubleclick timer
+    /// Doubleclick timer.
     float doubleClickTimer_;
-    /// Last clicked item
+    /// Last clicked item.
     unsigned lastClickedItem_;
     
 private:
-    /// Handle global UI mouseclick to check for selection change
+    /// Handle global UI mouseclick to check for selection change.
     void HandleUIMouseClick(StringHash eventType, VariantMap& eventData);
 };

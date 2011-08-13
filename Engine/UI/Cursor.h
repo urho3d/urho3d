@@ -25,6 +25,7 @@
 
 #include "BorderImage.h"
 
+/// Cursor shapes recognized by the UI subsystem.
 enum CursorShape
 {
     CS_NORMAL = 0,
@@ -37,15 +38,18 @@ enum CursorShape
     CS_MAX_SHAPES
 };
 
-/// Cursor image and hotspot information
+/// Cursor image and hotspot information.
 struct CursorShapeInfo
 {
+    /// Texture.
     SharedPtr<Texture> texture_;
+    /// Image rectangle.
     IntRect imageRect_;
+    /// Hotspot coordinates.
     IntVector2 hotSpot_;
 };
 
-/// Mouse cursor UI element
+/// Mouse cursor UI element.
 class Cursor : public BorderImage
 {
     OBJECT(Cursor);
@@ -53,29 +57,29 @@ class Cursor : public BorderImage
     using UIElement::SetStyle;
     
 public:
-    /// Construct with name
+    /// Construct.
     Cursor(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Cursor();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
-    /// Define a shape
+    /// Define a shape.
     void DefineShape(CursorShape shape, Texture* texture, const IntRect& imageRect, const IntVector2& hotSpot);
-    /// %Set shape
+    /// %Set current shape.
     void SetShape(CursorShape shape);
     
-    /// Get current shape
+    /// Get current shape.
     CursorShape GetShape() const { return shape_; }
     
 protected:
-    /// Current shape index
+    /// Current shape index.
     CursorShape shape_;
-    /// Shape definitions
+    /// Shape definitions.
     CursorShapeInfo shapeInfos_[CS_MAX_SHAPES];
 };

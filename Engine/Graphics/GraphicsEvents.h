@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-/// Operating system window message
+/// Operating system window message.
 EVENT(E_WINDOWMESSAGE, WindowMessage)
 {
     PARAM(P_WINDOW, Window);              // int
@@ -35,14 +35,7 @@ EVENT(E_WINDOWMESSAGE, WindowMessage)
     PARAM(P_HANDLED, Handled);            // bool
 }
 
-/// Application activation state changed. Sent by the Input subsystem
-EVENT(E_ACTIVATION, Activation)
-{
-    PARAM(P_ACTIVE, Active);              // bool
-    PARAM(P_MINIMIZED, Minimized);        // bool
-}
-
-/// New screen mode set
+/// New screen mode set.
 EVENT(E_SCREENMODE, ScreenMode)
 {
     PARAM(P_WIDTH, Width);                // int
@@ -50,12 +43,12 @@ EVENT(E_SCREENMODE, ScreenMode)
     PARAM(P_FULLSCREEN, Fullscreen);      // bool
 }
 
-/// Frame rendering started
+/// Frame rendering started.
 EVENT(E_BEGINRENDERING, BeginRendering)
 {
 }
 
-/// Frame rendering ended
+/// Frame rendering ended.
 EVENT(E_ENDRENDERING, EndRendering)
 {
 }

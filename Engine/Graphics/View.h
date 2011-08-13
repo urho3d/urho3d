@@ -38,22 +38,24 @@ struct Viewport;
 
 static const int MAX_LIGHT_SPLITS = 6;
 
-/// Geometry view space depth minimum and maximum values
+/// Geometry view space depth minimum and maximum values.
 struct GeometryDepthBounds
 {
+    /// Minimum value.
     float min_;
+    /// Maximum value.
     float max_;
 };
 
-/// Helper structure for checking whether a transparent object is already lit by a certain light
+/// Helper structure for checking whether a transparent object is already lit by a certain light.
 struct LitTransparencyCheck
 {
-    /// Construct undefined
+    /// Construct undefined.
     LitTransparencyCheck()
     {
     }
     
-    /// Construct
+    /// Construct.
     LitTransparencyCheck(Light* light, Drawable* drawable, unsigned batchIndex) :
         light_(light),
         drawable_(drawable),
@@ -61,12 +63,12 @@ struct LitTransparencyCheck
     {
     }
     
-    /// Test for equality with another lit transparency check
+    /// Test for equality with another lit transparency check.
     bool operator == (const LitTransparencyCheck& rhs) const { return light_ == rhs.light_ && drawable_ == rhs.drawable_ && batchIndex_ == rhs.batchIndex_; }
-    /// Test for inequality with another lit transparency check
+    /// Test for inequality with another lit transparency check.
     bool operator != (const LitTransparencyCheck& rhs) const { return light_ != rhs.light_ || drawable_ != rhs.drawable_ || batchIndex_ != rhs.batchIndex_; }
     
-    /// Test if less than another lit transparency check
+    /// Test if less than another lit transparency check.
     bool operator < (const LitTransparencyCheck& rhs) const
     {
         if (light_ == rhs.light_)
@@ -80,174 +82,177 @@ struct LitTransparencyCheck
             return light_ < rhs.light_;
     }
     
-    /// Return hash value for HashSet & HashMap
+    /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return ((unsigned)light_) / sizeof(Light) + ((unsigned)drawable_) / sizeof(Drawable) + batchIndex_; }
     
+    /// Light.
     Light* light_;
+    /// Lit drawable.
     Drawable* drawable_;
+    /// Batch index.
     unsigned batchIndex_;
 };
 
-/// A rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras
+/// 3D rendering view. Includes the main view(s) and any auxiliary views, but not shadow cameras.
 class View : public Object
 {
     OBJECT(View);
     
 public:
-    /// Construct
+    /// Construct.
     View(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~View();
     
-    /// Define with rendertarget and viewport. Return true if successful
+    /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, const Viewport& viewport);
-    /// Update culling and construct rendering batches
+    /// Update culling and construct rendering batches.
     void Update(const FrameInfo& frame);
-    /// Render batches
+    /// Render batches.
     void Render();
     
-    /// Return octree
+    /// Return octree.
     Octree* GetOctree() const { return octree_; }
-    /// Return camera
+    /// Return camera.
     Camera* GetCamera() const { return camera_; }
-    /// Return zone
+    /// Return zone.
     Zone* GetZone() const { return zone_; }
-    /// Return the render target. 0 if using the backbuffer
+    /// Return the render target. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
-    /// Return the depth stencil. 0 if using the backbuffer's depth stencil
+    /// Return the depth stencil. 0 if using the backbuffer's depth stencil.
     RenderSurface* GetDepthStencil() const { return depthStencil_; }
-    /// Return geometry objects
+    /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
-    /// Return occluder objects
+    /// Return occluder objects.
     const PODVector<Drawable*>& GetOccluders() const { return occluders_; }
-    /// Return directional light shadow rendering occluders
+    /// Return directional light shadow rendering occluders.
     const PODVector<Drawable*>& GetShadowOccluders() const { return shadowOccluders_; }
-    /// Return lights
+    /// Return lights.
     const PODVector<Light*>& GetLights() const { return lights_; }
-    /// Return light batch queues
+    /// Return light batch queues.
     const Vector<LightBatchQueue>& GetLightQueues() const { return lightQueues_; }
     
 private:
-    /// Query the octree for scene nodes
+    /// Query the octree for drawable objects.
     void GetDrawables();
-    /// Construct batches from the scene nodes
+    /// Construct batches from the drawable objects.
     void GetBatches();
-    /// Get lit batches for a certain light and drawable
+    /// Get lit batches for a certain light and drawable.
     void GetLitBatches(Drawable* drawable, Light* light, Light* SplitLight, LightBatchQueue* lightQueue, HashSet<LitTransparencyCheck>& litTransparencies);
-    /// Render batches, forward mode
+    /// Render batches, forward mode.
     void RenderBatchesForward();
-    /// Render batches, deferred mode
+    /// Render batches, deferred mode.
     void RenderBatchesDeferred();
-    /// Query for occluders as seen from a camera
+    /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
-    /// Draw occluders to occlusion buffer
+    /// Draw occluders to occlusion buffer.
     void DrawOccluders(OcclusionBuffer* buffer, const PODVector<Drawable*>& occluders);
-    /// Query for lit geometries and shadow casters for a light
+    /// Query for lit geometries and shadow casters for a light.
     unsigned ProcessLight(Light* light);
-    /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility
+    /// Generate combined bounding boxes for lit geometries and shadow casters and check shadow caster visibility.
     void ProcessLightQuery(unsigned splitIndex, const PODVector<Drawable*>& result, BoundingBox& geometryBox, BoundingBox& shadowSpaceBox, bool getLitGeometries, bool getShadowCasters);
-    /// Check visibility of one shadow caster
+    /// Check visibility of one shadow caster.
     bool IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, Camera* shadowCamera, const Matrix3x4& lightView, const Frustum& lightViewFrustum, const BoundingBox& lightViewFrustumBox);
-    /// %Set up initial shadow camera view
+    /// %Set up initial shadow camera view.
     void SetupShadowCamera(Light* light, bool shadowOcclusion = false);
-    /// Focus shadow camera to use shadow map texture space more optimally
+    /// Focus shadow camera to use shadow map texture space more optimally.
     void FocusShadowCamera(Light* light, const BoundingBox& geometryBox, const BoundingBox& shadowCasterBox);
-    /// Quantize the directional light shadow camera view to eliminate artefacts
+    /// Quantize the directional light shadow camera view to eliminate artefacts.
     void QuantizeDirShadowCamera(Light* light, const BoundingBox& viewBox);
-    /// Optimize light rendering by setting up a scissor rectangle
+    /// Optimize light rendering by setting up a scissor rectangle.
     void OptimizeLightByScissor(Light* light);
-    /// Return scissor rectangle for a light
+    /// Return scissor rectangle for a light.
     const Rect& GetLightScissor(Light* light);
-    /// Split directional or point light for shadow rendering
+    /// Split directional or point light for shadow rendering.
     unsigned SplitLight(Light* light);
-    /// Return material technique, considering the drawable's LOD distance
+    /// Return material technique, considering the drawable's LOD distance.
     Technique* GetTechnique(Drawable* drawable, Material*& material);
-    /// Check if material should render an auxiliary view (if it has a camera attached)
+    /// Check if material should render an auxiliary view (if it has a camera attached.)
     void CheckMaterialForAuxView(Material* material);
-    /// Sort all batches
+    /// Sort all batches.
     void SortBatches();
-    /// Prepare instancing buffer by filling it with all instance transforms
+    /// Prepare instancing buffer by filling it with all instance transforms.
     void PrepareInstancingBuffer();
-    /// Calculate view-global shader parameters
+    /// Calculate view-global shader parameters.
     void CalculateShaderParameters();
-    /// Draw a split light to stencil buffer
+    /// Draw a split light to stencil buffer.
     void DrawSplitLightToStencil(Camera& camera, Light* light, bool clear = false);
-    /// Draw everything in a batch queue, priority batches first
+    /// Draw everything in a batch queue, priority batches first.
     void RenderBatchQueue(const BatchQueue& queue, bool useScissor = false, bool disableScissor = true);
-    /// Draw a forward (shadowed) light batch queue
+    /// Draw a forward (shadowed) light batch queue.
     void RenderForwardLightBatchQueue(const BatchQueue& queue, Light* forwardQueueLight);
-    /// Render a shadow map
+    /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     
-    /// Graphics
+    /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
-    /// Renderer
+    /// Renderer subsystem.
     WeakPtr<Renderer> renderer_;
-    /// Octree to use
+    /// Octree to use.
     Octree* octree_;
-    /// Camera to use
+    /// Camera to use.
     Camera* camera_;
-    /// Zone to get global rendering settings from
+    /// Zone to get global rendering settings from.
     Zone* zone_;
-    /// Color buffer to use
+    /// Color buffer to use.
     RenderSurface* renderTarget_;
-    /// Depth buffer to use
+    /// Depth buffer to use.
     RenderSurface* depthStencil_;
-    /// Screen rectangle
+    /// Screen rectangle.
     IntRect screenRect_;
-    /// Render target width
+    /// Render target width.
     int width_;
-    /// Render target height
+    /// Render target height.
     int height_;
-    /// Rendering mode
+    /// Rendering mode.
     RenderMode mode_;
-    /// Draw shadows flag
+    /// Draw shadows flag.
     bool drawShadows_;
-    /// Material quality level
+    /// Material quality level.
     int materialQuality_;
-    /// Maximum number of occluder triangles
+    /// Maximum number of occluder triangles.
     int maxOccluderTriangles_;
-    /// Information of the frame being rendered
+    /// Information of the frame being rendered.
     FrameInfo frame_;
-    /// Combined bounding box of visible geometries
+    /// Combined bounding box of visible geometries.
     BoundingBox sceneBox_;
-    /// Combined bounding box of visible geometries in view space
+    /// Combined bounding box of visible geometries in view space.
     BoundingBox sceneViewBox_;
-    /// Cache for light scissor queries
+    /// Cache for light scissor queries.
     Map<Light*, Rect> lightScissorCache_;
-    /// Current split lights being processed
+    /// Current split lights being processed.
     Light* splitLights_[MAX_LIGHT_SPLITS];
-    /// Current lit geometries being processed
+    /// Current lit geometries being processed.
     PODVector<Drawable*> litGeometries_[MAX_LIGHT_SPLITS];
-    /// Current shadow casters being processed
+    /// Current shadow casters being processed.
     PODVector<Drawable*> shadowCasters_[MAX_LIGHT_SPLITS];
-    /// Temporary drawable query result
+    /// Temporary drawable query result.
     PODVector<Drawable*> tempDrawables_;
-    /// Geometry objects
+    /// Geometry objects.
     PODVector<Drawable*> geometries_;
-    /// Occluder objects
+    /// Occluder objects.
     PODVector<Drawable*> occluders_;
-    /// Directional light shadow rendering occluders
+    /// Directional light shadow rendering occluders.
     PODVector<Drawable*> shadowOccluders_;
-    /// Depth minimum and maximum values for visible geometries
+    /// Depth minimum and maximum values for visible geometries.
     PODVector<GeometryDepthBounds> geometryDepthBounds_;
-    /// Lights
+    /// Lights.
     PODVector<Light*> lights_;
-    /// G-buffer size error displayed
+    /// Render surfaces for which a G-buffer size error has already been logged, to prevent log spam.
     HashSet<RenderSurface*> gBufferErrorDisplayed_;
-    /// View-global shader parameters
+    /// View-global shader parameters.
     HashMap<StringHash, Vector4> shaderParameters_;
     
-    /// G-buffer batches
+    /// G-buffer batches.
     BatchQueue gBufferQueue_;
-    /// Base pass batches
+    /// Base pass batches.
     BatchQueue baseQueue_;
-    /// Extra pass batches
+    /// Extra pass batches.
     BatchQueue extraQueue_;
-    /// Transparent geometry batches
+    /// Transparent geometry batches.
     BatchQueue transparentQueue_;
-    /// Unshadowed light volume batches
+    /// Unshadowed light volume batches.
     BatchQueue noShadowLightQueue_;
-    /// Shadowed light queues
+    /// Shadowed light queues.
     Vector<LightBatchQueue> lightQueues_;
 };

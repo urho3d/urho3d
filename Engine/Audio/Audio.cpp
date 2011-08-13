@@ -59,11 +59,11 @@ static unsigned numInstances = 0;
 static int AudioCallback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData);
 #else
-/// DirectSound audio output stream
+/// DirectSound audio output stream.
 class AudioStream : public Thread
 {
 public:
-    /// Construct
+    /// Construct.
     AudioStream(Audio* owner) :
         owner_(owner),
         dsObject_(0),
@@ -71,7 +71,7 @@ public:
     {
     }
     
-    /// Destruct
+    /// Destruct.
     ~AudioStream()
     {
         Close();
@@ -83,7 +83,7 @@ public:
         }
     }
     
-    /// Create the DirectSound buffer
+    /// Create the DirectSound buffer.
     bool Open(unsigned windowHandle, int bufferLengthMSec, int mixRate, bool stereo)
     {
         Close();
@@ -125,7 +125,7 @@ public:
         return dsObject_->CreateSoundBuffer(&bufferDesc, &dsBuffer_, 0) == DS_OK;
     }
     
-    /// Destroy the DirectSound buffer
+    /// Destroy the DirectSound buffer.
     void Close()
     {
         StopPlayback();
@@ -137,7 +137,7 @@ public:
         }
     }
     
-    /// Start playback
+    /// Start playback.
     bool StartPlayback()
     {
         if (IsStarted())
@@ -166,14 +166,14 @@ public:
             return false;
     }
     
-    /// Stop playback
+    /// Stop playback.
     void StopPlayback()
     {
         if (dsBuffer_ && IsStarted())
             Stop();
     }
     
-    /// Mixing thread function
+    /// Mixing thread function.
     void ThreadFunction()
     {
         DWORD playCursor = 0;
@@ -240,17 +240,17 @@ public:
     }
     
 private:
-    /// Audio subsystem
+    /// Audio subsystem.
     Audio* owner_;
-    /// DirectSound interface
+    /// DirectSound interface.
     IDirectSound* dsObject_;
-    /// DirectSound buffer
+    /// DirectSound buffer.
     IDirectSoundBuffer* dsBuffer_;
-    /// Sound buffer size in bytes
+    /// Sound buffer size in bytes.
     unsigned bufferSize_;
-    /// Sound buffer sample size
+    /// Sound buffer sample size.
     unsigned sampleSize_;
-    /// Playing flag
+    /// Playing flag.
     bool playing_;
 };
 #endif

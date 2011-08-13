@@ -27,19 +27,19 @@
 
 class XMLElement;
 
-/// Controls sent over the network
+/// Controls sent over the network.
 class Controls
 {
 public:
-    /// Construct
+    /// Construct.
     Controls();
-    /// Destruct
+    /// Destruct.
     ~Controls();
     
-    /// Reset to initial state
+    /// Reset to initial state.
     void Reset();
     
-    /// %Set or release button(s)
+    /// %Set or release buttons.
     void Set(unsigned buttons, bool down = true)
     {
         if (down)
@@ -48,24 +48,21 @@ public:
             buttons_ &= ~buttons;
     }
     
-    /// Check if a button is held down
+    /// Check if a button is held down.
     bool IsDown(unsigned button) const
     {
         return (buttons_ & button) != 0;
     }
     
-    /// Check if a button was pressed on this frame. Requires previous frame's controls
-    bool IsPressed(unsigned button, const Controls& previousControls) const
-    {
-        return (buttons_ & button) != 0 && (previousControls.buttons_ & button) == 0;
-    }
+    /// Check if a button was pressed on this frame. Requires previous frame's controls.
+    bool IsPressed(unsigned button, const Controls& previousControls) const { return (buttons_ & button) != 0 && (previousControls.buttons_ & button) == 0; }
     
-    /// Button state
+    /// Button state.
     unsigned buttons_;
-    /// Mouse yaw
+    /// Mouse yaw.
     float yaw_;
-    /// Mouse pitch
+    /// Mouse pitch.
     float pitch_;
-    /// Extra control data
+    /// Extra control data.
     VariantMap extraData_;
 };

@@ -41,200 +41,200 @@ class XMLElement;
 struct HeightfieldData;
 struct TriangleMeshData;
 
-/// Physics raycast hit
+/// Physics raycast hit.
 struct PhysicsRaycastResult
 {
-    /// Hit position
+    /// Hit position.
     Vector3 position_;
-    /// Hit normal
+    /// Hit normal.
     Vector3 normal_;
-    /// Hit distance from ray origin
+    /// Hit distance from ray origin.
     float distance_;
-    /// Scene node
+    /// Scene node.
     Node* node_;
 };
 
 /// Internal physics contact info
 struct PhysicsContactInfo
 {
-    /// World position
+    /// World position.
     Vector3 position_;
-    /// World normal from perspective of first rigid body
+    /// World normal from perspective of first rigid body.
     Vector3 normal_;
-    /// Penetration depth
+    /// Penetration depth.
     float depth_;
-    /// Velocity
+    /// Velocity.
     float velocity_;
 };
 
-/// Internal physics collision info
+/// Internal physics collision info.
 struct PhysicsCollisionInfo
 {
-    /// First scene node
+    /// First scene node.
     WeakPtr<Node> nodeA_;
-    /// Second scene node
+    /// Second scene node.
     WeakPtr<Node> nodeB_;
-    /// First collision shape
+    /// First collision shape.
     WeakPtr<CollisionShape> shapeA_;
-    /// Second collision shape
+    /// Second collision shape.
     WeakPtr<CollisionShape> shapeB_;
-    /// New collision flag
+    /// New collision flag.
     bool newCollision_;
-    /// Contacts
+    /// Contacts.
     PODVector<PhysicsContactInfo> contacts_;
 };
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
-/// Physics simulation world component. Should be added only to the root scene node
+/// Physics simulation world component. Should be added only to the root scene node.
 class PhysicsWorld : public Component
 {
     OBJECT(PhysicsWorld);
     
 public:
-    /// Construct
+    /// Construct.
     PhysicsWorld(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~PhysicsWorld();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Step the simulation forward
+    /// Step the simulation forward.
     void Update(float timeStep);
-    /// %Set simulation steps per second
+    /// %Set simulation steps per second.
     void SetFps(int fps);
-    /// %Set maximum contacts in one collision
+    /// %Set maximum contacts in one collision.
     void SetMaxContacts(unsigned num);
-    /// %Set gravity
+    /// %Set gravity.
     void SetGravity(Vector3 gravity);
-    /// %Set default linear velocity deactivation threshold for new rigid bodies
+    /// %Set default linear velocity deactivation threshold for new rigid bodies.
     void SetLinearRestThreshold(float threshold);
-    /// %Set default linear velocity damping threshold
+    /// %Set default linear velocity damping threshold.
     void SetLinearDampingThreshold(float threshold);
-    /// %Set default linear velocity damping scale
+    /// %Set default linear velocity damping scale.
     void SetLinearDampingScale(float scale);
-    /// %Set default angular velocity deactivation threshold for new rigid bodies
+    /// %Set default angular velocity deactivation threshold for new rigid bodies.
     void SetAngularRestThreshold(float threshold);
-    /// %Set default angular velocity damping threshold
+    /// %Set default angular velocity damping threshold.
     void SetAngularDampingThreshold(float threshold);
-    /// %Set default angular velocity damping scale
+    /// %Set default angular velocity damping scale.
     void SetAngularDampingScale(float scale);
-    /// %Set collision bounce velocity threshold (apply bounce if above)
+    /// %Set collision bounce velocity threshold (apply bounce if above.)
     void SetBounceThreshold(float threshold);
-    /// %Set maximum angular velocity for network replication
+    /// %Set maximum angular velocity for network replication.
     void SetMaxNetworkAngularVelocity(float velocity);
-    /// %Set simulation ERP parameter
+    /// %Set simulation ERP parameter.
     void SetERP(float erp);
-    /// %Set simulation CFM parameter
+    /// %Set simulation CFM parameter.
     void SetCFM(float cfm);
-    /// %Set depth of contact surface
+    /// %Set depth of contact surface.
     void SetContactSurfaceLayer(float depth);
-    /// %Set simulation step time accumulator
+    /// %Set simulation step time accumulator.
     void SetTimeAccumulator(float time);
-    /// Perform a physics world raycast
+    /// Perform a physics world raycast.
     void Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask =
         M_MAX_UNSIGNED);
     
-    /// Return ODE world ID
+    /// Return ODE world ID.
     dWorldID GetWorld() const { return physicsWorld_; }
-    /// Return ODE space ID
+    /// Return ODE space ID.
     dSpaceID GetSpace() const { return space_; }
-    /// Return gravity
+    /// Return gravity.
     Vector3 GetGravity() const;
-    /// Return simulation steps per second
+    /// Return simulation steps per second.
     int GetFps() const { return fps_; }
-    /// Return maximum contacts per collision
+    /// Return maximum contacts per collision.
     unsigned GetMaxContacts() const { return maxContacts_; }
-    /// Return default linear velocity deactivation threshold
+    /// Return default linear velocity deactivation threshold.
     float GetLinearRestThreshold() const;
-    /// Return default linear velocity damping threshold
+    /// Return default linear velocity damping threshold.
     float GetLinearDampingThreshold() const;
-    /// Return default linear velocity damping scale
+    /// Return default linear velocity damping scale.
     float GetLinearDampingScale() const;
-    /// Return default angular velocity damping threshold
+    /// Return default angular velocity damping threshold.
     float GetAngularRestThreshold() const;
-    /// Return default angular velocity damping threshold
+    /// Return default angular velocity damping threshold.
     float GetAngularDampingThreshold() const;
-    /// Return default angular velocity damping scale
+    /// Return default angular velocity damping scale.
     float GetAngularDampingScale() const;
-    /// Return collision bounce velocity threshold
+    /// Return collision bounce velocity threshold.
     float GetBounceThreshold() const { return bounceThreshold_; }
-    /// Return maximum angular velocity for network replication
+    /// Return maximum angular velocity for network replication.
     float GetMaxNetworkAngularVelocity() const { return maxNetworkAngularVelocity_; }
-    /// Return simulation ERP parameter
+    /// Return simulation ERP parameter.
     float GetERP() const;
-    /// Return simulation CFM parameter
+    /// Return simulation CFM parameter.
     float GetCFM() const;
-    /// Return depth of contact surface
+    /// Return depth of contact surface.
     float GetContactSurfaceLayer() const;
-    /// Return simulation step time accumulator
+    /// Return simulation step time accumulator.
     float GetTimeAccumulator() const { return timeAcc_; }
     
-    /// Add a rigid body to keep track of. Called by RigidBody
+    /// Add a rigid body to keep track of. Called by RigidBody.
     void AddRigidBody(RigidBody* body);
-    /// Remove a rigid body. Called by RigidBody
+    /// Remove a rigid body. Called by RigidBody.
     void RemoveRigidBody(RigidBody* body);
-    /// Send accumulated collision events
+    /// Send accumulated collision events.
     void SendCollisionEvents();
-    /// Add debug geometry to the debug graphics
+    /// Add debug geometry to the debug graphics.
     void DrawDebugGeometry(bool depthTest);
     
-    /// Clean up the geometry cache
+    /// Clean up the geometry cache.
     void CleanupGeometryCache();
-    /// Return the triangle mesh cache
+    /// Return the triangle mesh cache.
     Map<String, SharedPtr<TriangleMeshData> >& GetTriangleMeshCache() { return triangleMeshCache_; }
-    /// Return the heightfield cache
+    /// Return the heightfield cache.
     Map<String, SharedPtr<HeightfieldData> >& GetHeightfieldCache() { return heightfieldCache_; }
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
     
 private:
-    /// ODE collision callback
+    /// ODE collision callback.
     static void NearCallback(void *userData, dGeomID geomA, dGeomID geomB);
-    /// ODE raycast callback
+    /// ODE raycast callback.
     static void RaycastCallback(void *userData, dGeomID geomA, dGeomID geomB);
-    /// Handle the scene subsystem update event, step simulation here
+    /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
     
-    /// ODE world ID
+    /// ODE world ID.
     dWorldID physicsWorld_;
-    /// ODE space ID
+    /// ODE space ID.
     dSpaceID space_;
-    /// ODE ray geometry ID (for raycast)
+    /// ODE ray geometry ID (for raycast.)
     dGeomID rayGeometry_;
-    /// ODE contact joint group ID
+    /// ODE contact joint group ID.
     dJointGroupID contactJoints_;
-    /// Simulation steps per second
+    /// Simulation steps per second.
     unsigned fps_;
-    /// Maximum contacts per collision
+    /// Maximum contacts per collision.
     unsigned maxContacts_;
-    /// Collision bounce velocity threshold
+    /// Collision bounce velocity threshold.
     float bounceThreshold_;
-    /// Maximum angular velocity for network replication
+    /// Maximum angular velocity for network replication.
     float maxNetworkAngularVelocity_;
-    /// Simulation step time accumulator
+    /// Simulation step time accumulator.
     float timeAcc_;
-    /// Simulation random seed
+    /// Simulation random seed.
     unsigned randomSeed_;
-    /// Rigid bodies
+    /// Rigid bodies.
     PODVector<RigidBody*> rigidBodies_;
-    /// Collision contacts (PODVector<dContact>)
+    /// Collision contacts (PODVector<dContact>.)
     void* contacts_;
-    /// Collision pairs on this frame
+    /// Collision pairs on this frame.
     HashSet<Pair<RigidBody*, RigidBody*> > currentCollisions_;
-    /// Collision pairs on the previous frame. Used to check if a collision is "new"
+    /// Collision pairs on the previous frame. Used to check if a collision is "new."
     HashSet<Pair<RigidBody*, RigidBody*> > previousCollisions_;
-    /// Already processed rigid bodies during a poststep
+    /// Already processed rigid bodies during a poststep.
     HashSet<RigidBody*> processedBodies_;
-    /// Collision infos to be sent as events
+    /// Collision infos to be sent as events.
     Vector<PhysicsCollisionInfo> collisionInfos_;
-    /// Cache for triangle mesh geometries
+    /// Cache for triangle mesh geometries.
     Map<String, SharedPtr<TriangleMeshData> > triangleMeshCache_;
-    /// Cache for heightfield geometries
+    /// Cache for heightfield geometries.
     Map<String, SharedPtr<HeightfieldData> > heightfieldCache_;
 };
 
-/// Register Physics library objects
+/// Register Physics library objects.
 void RegisterPhysicsLibrary(Context* context);

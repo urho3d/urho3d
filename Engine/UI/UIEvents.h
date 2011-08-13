@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-/// Mouse click in the UI
+/// Mouse click in the UI.
 EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -36,7 +36,7 @@ EVENT(E_UIMOUSECLICK, UIMouseClick)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Drag and drop test
+/// Drag and drop test.
 EVENT(E_DRAGDROPTEST, DragDropTest)
 {
     PARAM(P_SOURCE, Source);              // UIElement pointer
@@ -44,7 +44,7 @@ EVENT(E_DRAGDROPTEST, DragDropTest)
     PARAM(P_ACCEPT, Accept);              // bool
 };
 
-/// Drag and drop finish
+/// Drag and drop finish.
 EVENT(E_DRAGDROPFINISH, DragDropFinish)
 {
     PARAM(P_SOURCE, Source);              // UIElement pointer
@@ -52,14 +52,14 @@ EVENT(E_DRAGDROPFINISH, DragDropFinish)
     PARAM(P_ACCEPT, Accept);              // bool
 };
 
-/// Focus element changed
+/// Focus element changed.
 EVENT(E_FOCUSCHANGED, FocusChanged)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
     PARAM(P_ORIGINALELEMENT, Element);    // UIElement pointer
 }
 
-/// UI element resized
+/// UI element resized.
 EVENT(E_RESIZED, Resized)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -67,38 +67,38 @@ EVENT(E_RESIZED, Resized)
     PARAM(P_HEIGHT, Height);              // int
 }
 
-/// UI element visibility changed
+/// UI element visibility changed.
 EVENT(E_VISIBLECHANGED, VisibleChanged)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
     PARAM(P_VISIBLE, Visible);            // bool
 }
 
-/// UI element focused
+/// UI element focused.
 EVENT(E_FOCUSED, Focused)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-/// UI element defocused
+/// UI element defocused.
 EVENT(E_DEFOCUSED, Defocused)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-/// UI button pressed
+/// UI button pressed.
 EVENT(E_PRESSED, Pressed)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-/// UI button was pressed, then released
+/// UI button was pressed, then released.
 EVENT(E_RELEASED, Released)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-/// UI checkbox Toggled
+/// UI checkbox toggled.
 EVENT(E_TOGGLED, Toggled)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -112,14 +112,14 @@ EVENT(E_SLIDERCHANGED, SliderChanged)
     PARAM(P_VALUE, Value);                // float
 }
 
-/// UI scrollbar value changed
+/// UI scrollbar value changed.
 EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
     PARAM(P_VALUE, Value);                // float
 }
 
-/// UI scrollview position changed
+/// UI scrollview position changed.
 EVENT(E_VIEWCHANGED, ViewChanged)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -141,13 +141,13 @@ EVENT(E_TEXTFINISHED, TextFinished)
     PARAM(P_TEXT, Text);                  // string
 }
 
-/// Menu selected
+/// Menu selected.
 EVENT(E_MENUSELECTED, MenuSelected)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
 }
 
-/// Listview or DropDownList item selected
+/// Listview or DropDownList item selected.
 EVENT(E_ITEMSELECTED, Iteselected_)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -161,14 +161,14 @@ EVENT(E_ITEMDESELECTED, ItemDeselected)
     PARAM(P_SELECTION, Selection);        // int
 }
 
-/// Listview item doubleclicked
+/// Listview item doubleclicked.
 EVENT(E_ITEMDOUBLECLICKED, ItemDoubleClicked)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
     PARAM(P_SELECTION, Selection);        // int
 }
 
-/// LineEdit or Listview unhandled key pressed
+/// LineEdit or ListView unhandled key pressed.
 EVENT(E_UNHANDLEDKEY, UnhandledKey)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
@@ -177,7 +177,7 @@ EVENT(E_UNHANDLEDKEY, UnhandledKey)
     PARAM(P_QUALIFIERS, Qualifiers);      // int
 }
 
-/// Fileselector choice
+/// Fileselector choice.
 EVENT(E_FILESELECTED, FileSelected)
 {
     PARAM(P_FILENAME, FileName);          // string

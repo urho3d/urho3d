@@ -25,17 +25,17 @@
 
 #include "Object.h"
 
-/// Resource reloading started
+/// Resource reloading started.
 EVENT(E_RELOADSTARTED, ReloadStarted)
 {
 }
 
-/// Resource reloading finished successfully
+/// Resource reloading finished successfully.
 EVENT(E_RELOADFINISHED, ReloadFinished)
 {
 }
 
-/// Resource reloading failed
+/// Resource reloading failed.
 EVENT(E_RELOADFAILED, ReloadFailed)
 {
 }

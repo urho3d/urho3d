@@ -171,6 +171,8 @@ void VertexBuffer::Release()
         if (!graphics_)
             return;
         
+        Unlock();
+        
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
@@ -180,8 +182,6 @@ void VertexBuffer::Release()
         glDeleteBuffers(1, &object_);
         object_ = 0;
     }
-    
-    fallbackData_.Reset();
 }
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
@@ -217,11 +217,6 @@ bool VertexBuffer::SetData(const void* data)
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         return true;
     }
-    else if (fallbackData_)
-    {
-        memcpy(fallbackData_.Get(), data, vertexCount_ * vertexSize_);
-        return true;
-    }
     
     return false;
 }
@@ -249,11 +244,6 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, vertexCount_ * vertexSize_, data);
         return true;
     }
-    else if (fallbackData_)
-    {
-        memcpy(fallbackData_.Get() + start * vertexSize_, data, vertexCount_ * vertexSize_);
-        return true;
-    }
     
     return false;
 }
@@ -278,7 +268,7 @@ void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& d
 
 void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if (!object_ && !fallbackData_)
+    if (!object_)
         return 0;
     
     if (locked_)
@@ -300,20 +290,15 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     else if (mode == LOCK_NORMAL)
         glLockMode = GL_READ_WRITE;
     
-    if (object_)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        // If locking the whole buffer in discard mode, create a new data store
-        if (mode == LOCK_DISCARD && count == vertexCount_)
-            glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-        
-        hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
-        if (!hwData)
-            return 0;
-        hwData = (unsigned char*)hwData + start * vertexSize_;
-    }
-    else
-        hwData = fallbackData_.Get() + start * vertexSize_;
+    glBindBuffer(GL_ARRAY_BUFFER, object_);
+    // If locking the whole buffer in discard mode, create a new data store
+    if (mode == LOCK_DISCARD && count == vertexCount_)
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    
+    hwData = glMapBuffer(GL_ARRAY_BUFFER, glLockMode);
+    if (!hwData)
+        return 0;
+    hwData = (unsigned char*)hwData + start * vertexSize_;
     
     locked_ = true;
     return hwData;
@@ -323,11 +308,8 @@ void VertexBuffer::Unlock()
 {
     if (locked_)
     {
-        if (object_)
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, object_);
-            glUnmapBuffer(GL_ARRAY_BUFFER);
-        }
+        glBindBuffer(GL_ARRAY_BUFFER, object_);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
         locked_ = false;
     }
 }
@@ -407,16 +389,14 @@ bool VertexBuffer::Create()
         return true;
     }
     
-    if (graphics_)
-    {
-        if (!object_)
-            glGenBuffers(1, &object_);
-        
-        glBindBuffer(GL_ARRAY_BUFFER, object_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
-    }
-    else
-        fallbackData_ = new unsigned char[vertexCount_ * vertexSize_];
+    if (!graphics_)
+        return false;
+    
+    if (!object_)
+        glGenBuffers(1, &object_);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, object_);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     
     return true;
 }

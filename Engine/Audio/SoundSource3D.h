@@ -27,43 +27,43 @@
 
 class Audio;
 
-/// Sound source component with three-dimensional position
+/// Sound source component with three-dimensional position.
 class SoundSource3D : public SoundSource
 {
     OBJECT(SoundSource3D);
     
 public:
-    /// Construct
+    /// Construct.
     SoundSource3D(Context* context);
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Update sound source
+    /// Update sound source.
     virtual void Update(float timeStep);
     
-    /// %Set attenuation parameters
+    /// %Set attenuation parameters.
     void SetDistanceAttenuation(float nearDistance, float farDistance, float rolloffFactor);
-    /// %Set near distance. Distances closer than this do not have an effect
+    /// %Set near distance. Distances closer than this do not have an effect.
     void SetNearDistance(float distance);
-    /// %Set far distance. Beyond this sound will be completely attenuated
+    /// %Set far distance. Beyond this sound will be completely attenuated.
     void SetFarDistance(float distance);
-    /// %Set rolloff power factor, defines attenuation function shape
+    /// %Set rolloff power factor, defines attenuation function shape.
     void SetRolloffFactor(float factor);
-    /// Calculate attenuation and panning based on current position and listener position
+    /// Calculate attenuation and panning based on current position and listener position.
     void CalculateAttenuation();
     
-    /// Return near distance
+    /// Return near distance.
     float GetNearDistance() const { return nearDistance_; }
-    /// Return far distance
+    /// Return far distance.
     float GetFarDistance() const { return farDistance_; }
-    /// Return rolloff power factor
+    /// Return rolloff power factor.
     float RollAngleoffFactor() const { return rolloffFactor_; }
     
 protected:
-    /// Near distance
+    /// Near distance.
     float nearDistance_;
-    /// Far distance
+    /// Far distance.
     float farDistance_;
-    /// Rolloff power factor
+    /// Rolloff power factor.
     float rolloffFactor_;
 };

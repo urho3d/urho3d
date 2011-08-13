@@ -34,7 +34,7 @@ class Geometry;
 class Model;
 class PhysicsWorld;
 
-/// Collision shape type
+/// Collision shape type.
 enum ShapeType
 {
     SHAPE_NONE = 0,
@@ -47,177 +47,177 @@ enum ShapeType
     SHAPE_CONVEXHULL
 };
 
-/// Base class for collision shape geometry data
+/// Base class for collision shape geometry data.
 struct CollisionGeometryData : public RefCounted
 {
     /// Original model name
     String modelName_;
 };
 
-/// Triangle mesh geometry data
+/// Triangle mesh geometry data.
 struct TriangleMeshData : public CollisionGeometryData
 {
-    /// Construct from a model
+    /// Construct from a model.
     TriangleMeshData(Model* model, bool makeConvexHull, float thickness, unsigned lodLevel, const Vector3& scale);
-    /// Destruct. Free geometry data
+    /// Destruct. Free geometry data.
     ~TriangleMeshData();
     
-    /// ODE trimesh geometry ID
+    /// ODE trimesh geometry ID.
     dTriMeshDataID triMesh_;
-    /// Vertex data
+    /// Vertex data.
     SharedArrayPtr<Vector3> vertexData_;
-    /// Index data
+    /// Index data.
     SharedArrayPtr<unsigned> indexData_;
-    /// Number of indices
+    /// Number of indices.
     unsigned indexCount_;
 };
 
-/// Heightfield geometry data
+/// Heightfield geometry data.
 struct HeightfieldData : public CollisionGeometryData
 {
-    /// Construct from a model
+    /// Construct from a model.
     HeightfieldData(Model* model, IntVector2 numPoints, float thickness, unsigned lodLevel, const Vector3& scale);
-    /// Destruct. Free geometry data
+    /// Destruct. Free geometry data.
     ~HeightfieldData();
     
-    /// ODE heightfield geometry ID
+    /// ODE heightfield geometry ID.
     dHeightfieldDataID heightfield_;
-    /// Height values
+    /// Height values.
     SharedArrayPtr<float> heightData_;
 };
 
-/// Physics collision shape component
+/// Physics collision shape component.
 class CollisionShape : public Component
 {
     OBJECT(CollisionShape);
     
 public:
-    /// Construct
+    /// Construct.
     CollisionShape(Context* context);
-    /// Destruct. Free the geometry data and clean up unused data from the geometry data cache
+    /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
     virtual ~CollisionShape();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Handle attribute write access
+    /// Handle attribute write access.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
-    /// Perform finalization after a scene load or network update
+    /// Perform finalization after a scene load or network update.
     virtual void FinishUpdate();
     
-    /// Clear the collision geometry
+    /// Clear the collision geometry.
     void Clear();
-    /// %Set as a sphere
+    /// %Set as a sphere.
     void SetSphere(float radius, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a box
+    /// %Set as a box.
     void SetBox(const Vector3& size, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a cylinder
+    /// %Set as a cylinder.
     void SetCylinder(float radius, float height, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a capsule
+    /// %Set as a capsule.
     void SetCapsule(float radius, float height, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a triangle mesh
+    /// %Set as a triangle mesh.
     void SetTriangleMesh(Model* model, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a heightfield
+    /// %Set as a heightfield.
     void SetHeightfield(Model* model, unsigned xPoints, unsigned zPoints, float thickness, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// %Set as a convex hull (internally an ODE trimesh as well)
+    /// %Set as a convex hull (internally an ODE trimesh as well.)
     void SetConvexHull(Model* model, float skinWidth, unsigned lodLevel, const Vector3& position, const Quaternion& rotation);
-    /// %Set offset position
+    /// %Set offset position.
     void SetPosition(const Vector3& position);
-    /// %Set rotation
+    /// %Set rotation.
     void SetRotation(const Quaternion& rotation);
-    /// %Set offset transform
+    /// %Set offset transform.
     void SetTransform(const Vector3& position, const Quaternion& rotation);
-    /// %Set collision group bits
+    /// %Set collision group bits.
     void SetCollisionGroup(unsigned group);
-    /// %Set collision mask bits
+    /// %Set collision mask bits.
     void SetCollisionMask(unsigned mask);
-    /// %Set friction coefficient
+    /// %Set friction coefficient.
     void SetFriction(float friction);
-    /// %Set bounce coefficient
+    /// %Set bounce coefficient.
     void SetBounce(float bounce);
     
-    /// Return physics world
+    /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-    /// Return model (trimesh & heightfield only)
+    /// Return model (trimesh & heightfield only.)
     Model* GetModel() const { return model_; }
-    /// Return shape type
+    /// Return shape type.
     ShapeType GetShapeType() const { return shapeType_; }
-    /// Return ODE geometry
+    /// Return ODE geometry.
     dGeomID GetGeometry() const { return geometry_; }
-    /// Return unscaled shape size
+    /// Return unscaled shape size.
     const Vector3& GetSize() const { return size_; }
-    /// Return number of points in X & Z dimensions (heightfield only)
+    /// Return number of points in X & Z dimensions (heightfield only.)
     IntVector2 GetNumPoints() const { return numPoints_; }
-    /// Return thickness (convex hull & heightfield only)
+    /// Return thickness (convex hull & heightfield only.)
     float GetThickness() const { return thickness_; }
-    /// Return model LOD level (trimesh & heightfield only)
+    /// Return model LOD level (trimesh & heightfield only.)
     unsigned GetLodLevel() const { return lodLevel_; }
-    /// Return offset position
+    /// Return offset position.
     const Vector3& GetPosition() const { return position_; }
-    /// Return rotation
+    /// Return rotation.
     const Quaternion& GetRotation() const { return rotation_; }
-    /// Return collision group bits
+    /// Return collision group bits.
     unsigned GetCollisionGroup() const { return collisionGroup_; }
-    /// Return collision mask bits
+    /// Return collision mask bits.
     unsigned GetCollisionMask() const { return collisionMask_; }
-    /// Return friction coefficient
+    /// Return friction coefficient.
     float GetFriction() const { return friction_; }
-    /// Return bounce coefficient
+    /// Return bounce coefficient.
     float GetBounce() const { return bounce_; }
     
-    /// Update geometry transform and associate with rigid body if available
+    /// Update geometry transform and associate with rigid body if available.
     void UpdateTransform();
-    /// Add debug geometry to the debug graphics
+    /// Add debug geometry to the debug graphics.
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     
-    /// %Set model attribute
+    /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
-    /// Return model attribute
+    /// Return model attribute.
     ResourceRef GetModelAttr() const;
     
 protected:
-    /// Handle node being assigned
+    /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
-    /// Handle node transform being dirtied
+    /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
     
 private:
-    /// Create new geometry
+    /// Create new geometry.
     void CreateGeometry();
-    /// Remove existing geometry
+    /// Remove existing geometry.
     void ReleaseGeometry(bool notifyBody = true);
     
-    /// Physics world
-    SharedPtr<PhysicsWorld> physicsWorld_;
-    /// Model for trimesh & heightfield geometry
+    /// Physics world.
+    WeakPtr<PhysicsWorld> physicsWorld_;
+    /// Model for trimesh & heightfield geometry.
     SharedPtr<Model> model_;
-    /// Geometry data for trimesh & heightfield geometry
+    /// Geometry data for trimesh & heightfield geometry.
     SharedPtr<CollisionGeometryData> geometryData_;
-    /// ODE geometry
+    /// ODE geometry.
     dGeomID geometry_;
-    /// Shape type
+    /// Shape type.
     ShapeType shapeType_;
-    /// Unscaled size of shape
+    /// Unscaled size of shape.
     Vector3 size_;
-    /// Number of heightfield points in X & Z dimensions
+    /// Number of heightfield points in X & Z dimensions.
     IntVector2 numPoints_;
-    /// Thickness
+    /// Thickness.
     float thickness_;
-    /// LOD level
+    /// LOD level.
     unsigned lodLevel_;
-    /// Offset position
+    /// Offset position.
     Vector3 position_;
-    /// Rotation
+    /// Rotation.
     Quaternion rotation_;
-    /// Scene node scale used to create the geometry
+    /// Scene node scale used to create the geometry.
     Vector3 geometryScale_;
-    /// Collision group bits
+    /// Collision group bits.
     unsigned collisionGroup_;
-    /// Collision mask bits
+    /// Collision mask bits.
     unsigned collisionMask_;
-    /// Friction coefficient
+    /// Friction coefficient.
     float friction_;
-    /// Bounce coefficient
+    /// Bounce coefficient.
     float bounce_;
-    /// Recreate geometry flag
+    /// Recreate geometry flag.
     bool recreateGeometry_;
 };

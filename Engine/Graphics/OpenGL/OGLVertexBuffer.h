@@ -27,108 +27,106 @@
 #include "GraphicsDefs.h"
 #include "ArrayPtr.h"
 
-/// Hardware vertex buffer
+/// Hardware vertex buffer.
 class VertexBuffer : public Object, public GPUObject
 {
     OBJECT(VertexBuffer);
     
 public:
-    /// Construct
+    /// Construct.
     VertexBuffer(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~VertexBuffer();
     
-    /// Save data and release the buffer
+    /// Save data and release the buffer.
     virtual void OnDeviceLost();
-    /// Recreate the buffer from saved data
+    /// Recreate the buffer from saved data.
     virtual void OnDeviceReset();
-    /// Release the buffer
+    /// Release the buffer.
     virtual void Release();
     
-    /// Set size and vertex elements and dynamic mode. Previous data will be lost
+    /// Set size and vertex elements and dynamic mode. Previous data will be lost.
     bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false);
-    /// Set all data in the buffer
+    /// Set all data in the buffer.
     bool SetData(const void* data);
-    /// Set a data range in the buffer
+    /// Set a data range in the buffer.
     bool SetDataRange(const void* data, unsigned first, unsigned count);
-    /// Set the vertex range to use for morphing
+    /// Set the vertex range to use for morphing.
     bool SetMorphRange(unsigned start, unsigned count);
-    /// Set data to be used for resetting the morph vertex range
+    /// Set data to be used for resetting the morph vertex range.
     void SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& data);
-    /// Lock a data range in the buffer. Return pointer to locked data if successful
+    /// Lock a data range in the buffer. Return pointer to locked data if successful.
     void* Lock(unsigned start, unsigned count, LockMode mode);
-    /// Unlock buffer
+    /// Unlock buffer.
     void Unlock();
-    /// Lock the morph vertex range. Return pointer to locked data if successful
+    /// Lock the morph vertex range. Return pointer to locked data if successful.
     void* LockMorphRange();
-    /// Reset the morph vertex range. Needs to be locked first
+    /// Reset the morph vertex range. Needs to be locked first.
     void ResetMorphRange(void* lockedMorphRange);
-    /// Clear data lost flag. No-op on OpenGL
+    /// Clear data lost flag. No-op on OpenGL.
     void ClearDataLost();
     
-    /// Return whether is dynamic
+    /// Return whether is dynamic.
     bool IsDynamic() const { return dynamic_; }
-    /// Return whether data is lost. Always false on OpenGL
+    /// Return whether data is lost. Always false on OpenGL.
     bool IsDataLost() const { return false; }
-    /// Return number of vertices
+    /// Return number of vertices.
     unsigned GetVertexCount() const {return vertexCount_; }
-    /// Return vertex size
+    /// Return vertex size.
     unsigned GetVertexSize() const { return vertexSize_; }
-    /// Return bitmask of vertex elements
+    /// Return bitmask of vertex elements.
     unsigned GetElementMask() const { return elementMask_; }
-    /// Return offset of a specified element within a vertex
+    /// Return offset of a specified element within a vertex.
     unsigned GetElementOffset(VertexElement element) const { return elementOffset_[element]; }
-    /// Return morph vertex range start
+    /// Return morph vertex range start.
     unsigned GetMorphRangeStart() const { return morphRangeStart_; }
-    /// Return number of vertices in the morph range
+    /// Return number of vertices in the morph range.
     unsigned GetMorphRangeCount() const { return morphRangeCount_; }
-    /// Return morph vertex range reset data
+    /// Return morph vertex range reset data.
     const SharedArrayPtr<unsigned char>& GetMorphRangeResetData() { return morphRangeResetData_; }
-    /// Return whether has a morph vertex range defined
+    /// Return whether has a morph vertex range defined.
     bool HasMorphRange() const { return morphRangeCount_ > 0; }
-    /// Return buffer hash for state sorting
+    /// Return buffer hash for state sorting.
     unsigned long long GetHash(unsigned streaindex_, unsigned useMask);
     
-    /// Return vertex size corresponding to a vertex element mask
+    /// Return vertex size corresponding to a vertex element mask.
     static unsigned GetVertexSize(unsigned elementMask);
     
-    /// Vertex element sizes in bytes
+    /// Vertex element sizes in bytes.
     static const unsigned elementSize[];
-    /// Vertex element OpenGL types
+    /// Vertex element OpenGL types.
     static const unsigned elementType[];
-    /// Vertex element OpenGL component counts
+    /// Vertex element OpenGL component counts.
     static const unsigned elementComponents[];
-    /// Vertex element OpenGL normalization
+    /// Vertex element OpenGL normalization.
     static const unsigned elementNormalize[];
-    /// Vertex element names
+    /// Vertex element names.
     static const String elementName[];
     
 private:
-    /// Update offsets of vertex elements
+    /// Update offsets of vertex elements.
     void UpdateOffsets();
-    /// Create buffer
+    /// Create buffer.
     bool Create();
     
-    /// Fallback data when operating with a null graphics subsystem
-    SharedArrayPtr<unsigned char> fallbackData_;
-    /// Morph vertex range reset data
+    /// Morph vertex range reset data.
     SharedArrayPtr<unsigned char> morphRangeResetData_;
-    /// Save data when OpenGL context needs to be destroyed and recreated
+    /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
-    /// Number of vertices
+    /// Number of vertices.
     unsigned vertexCount_;
-    /// Vertex size
+    /// Vertex size.
     unsigned vertexSize_;
-    /// Vertex element bitmask
+    /// Vertex element bitmask.
     unsigned elementMask_;
-    /// Vertex element offsets
+    /// Vertex element offsets.
     unsigned elementOffset_[MAX_VERTEX_ELEMENTS];
-    /// Morph vertex range start
+    /// Morph vertex range start.
     unsigned morphRangeStart_;
-    /// Number of vertices in the morph range
+    /// Number of vertices in the morph range.
     unsigned morphRangeCount_;
-    /// Dynamic flag
+    /// Dynamic flag.
     bool dynamic_;
-    /// Locked flag
+    /// Locked flag.
     bool locked_;
 };

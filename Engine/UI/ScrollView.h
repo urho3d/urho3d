@@ -28,7 +28,7 @@
 class BorderImage;
 class ScrollBar;
 
-/// Scrollable UI element for showing a (possibly large) child element
+/// Scrollable UI element for showing a (possibly large) child element.
 class ScrollView : public UIElement
 {
     OBJECT(ScrollView);
@@ -36,80 +36,80 @@ class ScrollView : public UIElement
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     ScrollView(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~ScrollView();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// React to mouse wheel
+    /// React to mouse wheel.
     virtual void OnWheel(int delta, int buttons, int qualifiers);
-    /// React to a key press
+    /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
-    /// React to resize
+    /// React to resize.
     virtual void OnResize();
     
-    /// %Set content element
+    /// %Set content element.
     void SetContentElement(UIElement* element);
-    /// %Set view offset from the top-left corner
+    /// %Set view offset from the top-left corner.
     void SetViewPosition(const IntVector2& position);
-    /// %Set view offset from the top-left corner
+    /// %Set view offset from the top-left corner.
     void SetViewPosition(int x, int y);
-    /// %Set scrollbars' visibility
+    /// %Set scrollbars' visibility.
     void SetScrollBarsVisible(bool horizontal, bool vertical);
-    /// %Set arrow key scroll step. Also sets it on the scrollbars
+    /// %Set arrow key scroll step. Also sets it on the scrollbars.
     void SetScrollStep(float step);
-    /// %Set arrow key page step
+    /// %Set arrow key page step.
     void SetPageStep(float step);
     
-    /// Return view offset from the top-left corner
+    /// Return view offset from the top-left corner.
     const IntVector2& GetViewPosition() const { return viewPosition_; }
-    /// Return content element
+    /// Return content element.
     UIElement* GetContentElement() const { return contentElement_; }
-    /// Return horizontal scroll bar
+    /// Return horizontal scroll bar.
     ScrollBar* GetHorizontalScrollBar() const { return horizontalScrollBar_; }
-    /// Return vertical scroll bar
+    /// Return vertical scroll bar.
     ScrollBar* GetVerticalScrollBar() const { return verticalScrollBar_; }
-    /// Return scroll panel
+    /// Return scroll panel.
     BorderImage* GetScrollPanel() const { return scrollPanel_; }
-    /// Return arrow key scroll step
+    /// Return arrow key scroll step.
     float GetScrollStep() const;
-    /// Return arrow key page step
+    /// Return arrow key page step.
     float GetPageStep() const { return pageStep_; }
     
 protected:
-    /// Update view size from the content element
+    /// Update view size from the content element.
     void UpdateViewSize();
-    /// Update the scrollbars' ranges and positions
+    /// Update the scrollbars' ranges and positions.
     void UpdateScrollBars();
-    /// Limit and update the view with a new position
+    /// Limit and update the view with a new position.
     void UpdateView(const IntVector2& position);
     
-    /// Content element
+    /// Content element.
     SharedPtr<UIElement> contentElement_;
-    /// Horizontal scroll bar
+    /// Horizontal scroll bar.
     SharedPtr<ScrollBar> horizontalScrollBar_;
-    /// Vertical scroll bar
+    /// Vertical scroll bar.
     SharedPtr<ScrollBar> verticalScrollBar_;
-    /// Scroll panel element
+    /// Scroll panel element.
     SharedPtr<BorderImage> scrollPanel_;
-    /// Current view offset from the top-left corner
+    /// Current view offset from the top-left corner.
     IntVector2 viewPosition_;
-    /// Total view size
+    /// Total view size.
     IntVector2 viewSize_;
-    /// Arrow key page step
+    /// Arrow key page step.
     float pageStep_;
-    /// Ignore scrollbar events flag. Used to prevent possible endless loop when setting position
+    /// Ignore scrollbar events flag. Used to prevent possible endless loop when setting position.
     bool ignoreEvents_;
     
 private:
-    /// Handle scrollbar value changed
+    /// Handle scrollbar value changed.
     void HandleScrollBarChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle scrollbar visibility changed
+    /// Handle scrollbar visibility changed.
     void HandleScrollBarVisibleChanged(StringHash eventType, VariantMap& eventData);
-    /// Handle content element resized
+    /// Handle content element resized.
     void HandleElementResized(StringHash eventType, VariantMap& eventData);
 };

@@ -196,7 +196,7 @@ bool Material::Load(Deserializer& source)
     memoryUse += shaderParameters_.Size() * sizeof(MaterialShaderParameter);
     
     SetMemoryUse(memoryUse);
-    Update();
+    CheckOcclusion();
     return true;
 }
 
@@ -255,7 +255,7 @@ void Material::SetTechnique(unsigned index, Technique* technique, unsigned quali
         return;
     
     techniques_[index] = TechniqueEntry(technique, qualityLevel, lodDistance);
-    Update();
+    CheckOcclusion();
 }
 
 void Material::SetShaderParameter(const String& name, const Vector4& value)
@@ -380,7 +380,7 @@ const String& Material::GetTextureUnitName(TextureUnit unit)
     return textureUnitNames[unit];
 }
 
-void Material::Update()
+void Material::CheckOcclusion()
 {
     // Determine occlusion by checking the first pass of each technique
     occlusion_ = false;

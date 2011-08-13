@@ -37,87 +37,87 @@ class XMLFile;
 class Texture : public Resource, public GPUObject
 {
 public:
-    /// Construct
+    /// Construct.
     Texture(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~Texture();
     
-    /// %Set number of requested mip levels. Needs to be called before setting size
+    /// %Set number of requested mip levels. Needs to be called before setting size.
     void SetNumLevels(unsigned levels);
-    /// %Set filtering mode
+    /// %Set filtering mode.
     void SetFilterMode(TextureFilterMode filter);
-    /// %Set addressing mode by texture coordinate
+    /// %Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
-    /// %Set border color for border addressing mode
+    /// %Set border color for border addressing mode.
     void SetBorderColor(const Color& color);
-    /// %Set backup texture to use when rendering to this texture
+    /// %Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
-    /// Clear default pool data lost flag
+    /// Clear default pool data lost flag.
     void ClearDataLost();
     
-    /// Return texture format
+    /// Return texture format.
     unsigned GetFormat() const { return format_; }
-    /// Return number of mip levels
+    /// Return number of mip levels.
     unsigned GetLevels() const { return levels_; }
-    /// Return width
+    /// Return width.
     int GetWidth() const { return width_; }
-    /// Return height
+    /// Return height.
     int GetHeight() const { return height_; }
-    /// Return whether default pool data is lost
+    /// Return whether default pool data is lost.
     bool IsDataLost() const { return dataLost_; }
-    /// Return filtering mode
+    /// Return filtering mode.
     TextureFilterMode GetFilterMode() const { return filterMode_; }
-    /// Return addressing mode by texture coordinate
+    /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
-    /// Return border color
+    /// Return border color.
     const Color& GetBorderColor() const { return borderColor_; }
-    /// Return backup texture
+    /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
-    /// Return mip level width, or 0 if level does not exist
+    /// Return mip level width, or 0 if level does not exist.
     int GetLevelWidth(unsigned level) const;
-    /// Return mip level width, or 0 if level does not exist
+    /// Return mip level width, or 0 if level does not exist.
     int GetLevelHeight(unsigned level) const;
-    /// Return texture usage type
+    /// Return texture usage type.
     TextureUsage GetUsage() const;
-    /// Return data size in bytes for a rectangular region
+    /// Return data size in bytes for a rectangular region.
     unsigned GetDataSize(int width, int height) const;
-    /// Return data size in bytes for a pixel or block row
+    /// Return data size in bytes for a pixel or block row.
     unsigned GetRowDataSize(int width) const;
-    /// Return API-specific DXT compressed texture format
+    /// Return API-specific DXT compressed texture format.
     static unsigned GetDXTFormat(CompressedFormat format);
     
 protected:
-    /// Load parameters
+    /// Load parameters.
     void LoadParameters();
-    /// Load parameters from an XML file
+    /// Load parameters from an XML file.
     void LoadParameters(XMLFile* xml);
-    /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references
+    /// Check whether texture memory budget has been exceeded. Free unused materials in that case to release the texture references.
     void CheckTextureBudget(ShortStringHash type);
     
-    /// Texture format
+    /// Texture format.
     unsigned format_;
-    /// Memory pool
+    /// Memory pool.
     unsigned pool_;
-    /// Texture usage type
+    /// Texture usage type.
     unsigned usage_;
-    /// Current mip levels
+    /// Current mip levels.
     unsigned levels_;
-    /// Requested mip levels
+    /// Requested mip levels.
     unsigned requestedLevels_;
-    /// Texture width
+    /// Texture width.
     int width_;
-    /// Texture height
+    /// Texture height.
     int height_;
-    /// Default pool data lost flag
+    /// Default pool data lost flag.
     bool dataLost_;
-    /// Filtering mode
+    /// Filtering mode.
     TextureFilterMode filterMode_;
-    /// Addressing mode
+    /// Addressing mode.
     TextureAddressMode addressMode_[MAX_COORDS];
-    /// Mipmaps to skip when loading
+    /// Mipmaps to skip when loading.
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
-    /// Border color
+    /// Border color.
     Color borderColor_;
-    /// Backup texture
+    /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

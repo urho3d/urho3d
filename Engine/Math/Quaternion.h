@@ -25,11 +25,11 @@
 
 #include "Matrix3.h"
 
-/// Rotation represented as a four-dimensional normalized vector
+/// Rotation represented as a four-dimensional normalized vector.
 class Quaternion
 {
 public:
-    /// Construct identity quaternion
+    /// Construct identity quaternion.
     Quaternion() :
         w_(1.0f),
         x_(0.0f),
@@ -38,7 +38,7 @@ public:
     {
     }
     
-    /// Copy-construct from another quaternion
+    /// Copy-construct from another quaternion.
     Quaternion(const Quaternion& quat) :
         w_(quat.w_),
         x_(quat.x_),
@@ -47,7 +47,7 @@ public:
     {
     }
     
-    /// Construct from values
+    /// Construct from values.
     Quaternion(float w, float x, float y, float z) :
         w_(w),
         x_(x),
@@ -56,7 +56,7 @@ public:
     {
     }
     
-    /// Construct from a float array
+    /// Construct from a float array.
     Quaternion(const float* data) :
         w_(data[0]),
         x_(data[1]),
@@ -65,16 +65,16 @@ public:
     {
     }
     
-    /// Construct from an angle (in degrees) and axis
+    /// Construct from an angle (in degrees) and axis.
     Quaternion(float angle, const Vector3& axis);
-    /// Construct from Euler angles (in degrees)
+    /// Construct from Euler angles (in degrees.)
     Quaternion(float x, float y, float z);
-    /// Construct from the rotation difference between two vectors
+    /// Construct from the rotation difference between two vectors.
     Quaternion(const Vector3& start, const Vector3& end);
-    /// Construct from a rotation matrix
+    /// Construct from a rotation matrix.
     Quaternion(const Matrix3& matrix);
     
-    /// Assign from another quaternion
+    /// Assign from another quaternion.
     Quaternion& operator = (const Quaternion& rhs)
     {
         w_ = rhs.w_;
@@ -84,7 +84,7 @@ public:
         return *this;
     }
     
-    /// Add-assign a quaternion
+    /// Add-assign a quaternion.
     Quaternion& operator += (const Quaternion& rhs)
     {
         w_ += rhs.w_;
@@ -94,20 +94,20 @@ public:
         return *this;
     }
     
-    /// Test for equality with another quaternion
+    /// Test for equality with another quaternion.
     bool operator == (const Quaternion& rhs) const { return Equals(w_, rhs.w_) && Equals(x_, rhs.x_) && Equals(y_, rhs.y_) && Equals(z_, rhs.z_); }
-    /// Test for inequality with another quaternion
+    /// Test for inequality with another quaternion.
     bool operator != (const Quaternion& rhs) const { return !Equals(w_, rhs.w_) || !Equals(x_, rhs.x_) || !Equals(y_, rhs.y_) || !Equals(z_, rhs.z_); }
-    /// Multiply with a scalar
+    /// Multiply with a scalar.
     Quaternion operator * (float rhs) const { return Quaternion(w_ * rhs, x_ * rhs, y_ * rhs, z_ * rhs); }
-    /// Return negation
+    /// Return negation.
     Quaternion operator - () const { return Quaternion(-w_, -x_, -y_, -z_); }
-    /// Add a quaternion
+    /// Add a quaternion.
     Quaternion operator + (const Quaternion& rhs) const { return Quaternion(w_ + rhs.w_, x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
-    /// Subtract a quaternion
+    /// Subtract a quaternion.
     Quaternion operator - (const Quaternion& rhs) const { return Quaternion(w_ - rhs.w_, x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_); }
     
-    /// Multiply a quaternion
+    /// Multiply a quaternion.
     Quaternion operator * (const Quaternion& rhs) const
     {
         return Quaternion(
@@ -118,7 +118,7 @@ public:
         );
     }
     
-    /// Multiply a Vector3
+    /// Multiply a Vector3.
     Vector3 operator * (const Vector3& rhs) const
     {
         Vector3 qVec(x_,y_,z_);
@@ -128,7 +128,7 @@ public:
         return rhs + 2.0f * (cross1 * w_ + cross2);
     }
     
-    /// Normalize to unit length and return the previous length
+    /// Normalize to unit length and return the previous length.
     float Normalize()
     {
         float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
@@ -144,7 +144,7 @@ public:
         return len;
     }
     
-    /// Normalize to unit length using fast inverse square root
+    /// Normalize to unit length using fast inverse square root.
     void NormalizeFast()
     {
         float invLen = FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
@@ -154,7 +154,7 @@ public:
         z_ *= invLen;
     }
     
-    /// Return normalized to unit length
+    /// Return normalized to unit length.
     Quaternion Normalized() const
     {
         float len = sqrtf(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_);
@@ -164,10 +164,10 @@ public:
             return IDENTITY;
     }
     
-    /// Return normalized to unit length, using fast inverse square root
+    /// Return normalized to unit length, using fast inverse square root.
     Quaternion NormalizedFast() const { return *this * FastInvSqrt(w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_); }
     
-    /// Return inverse
+    /// Return inverse.
     Quaternion Inverse() const
     {
         float lenSquared = w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_;
@@ -185,41 +185,41 @@ public:
             return IDENTITY;
     }
     
-    /// Return squared length
+    /// Return squared length.
     float LengthSquared() const { return w_ * w_ + x_ * x_ + y_ * y_ + z_ * z_; }
-    /// Calculate dot product
+    /// Calculate dot product.
     float DotProduct(const Quaternion& rhs) const { return w_ * rhs.w_ + x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
-    /// Normalized interpolation with another quaternion
+    /// Normalized interpolation with another quaternion.
     Quaternion Nlerp(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).Normalized(); }
-    /// Normalized interpolation with another quaternion, using fast inverse square root
+    /// Normalized interpolation with another quaternion, using fast inverse square root.
     Quaternion NlerpFast(const Quaternion& rhs, float t) const { return (*this * (1.0f - t) + rhs * t).NormalizedFast(); }
     
-    /// Return Euler angles in degrees
+    /// Return Euler angles in degrees.
     Vector3 EulerAngles() const;
-    /// Return yaw angle in degrees
+    /// Return yaw angle in degrees.
     float YawAngle() const;
-    /// Return pitch angle in degrees
+    /// Return pitch angle in degrees.
     float PitchAngle() const;
-    /// Return roll angle in degrees
+    /// Return roll angle in degrees.
     float RollAngle() const;
-    /// Return the rotation matrix that corresponds to this quaternion
+    /// Return the rotation matrix that corresponds to this quaternion.
     Matrix3 RotationMatrix() const;
-    /// Spherical interpolation with another quaternion
+    /// Spherical interpolation with another quaternion.
     Quaternion Slerp(Quaternion rhs, float t) const;
-    /// Return float data
+    /// Return float data.
     const float* GetData() const { return &w_; }
-    /// Return as string
+    /// Return as string.
     String ToString() const;
     
-    /// W coordinate
+    /// W coordinate.
     float w_;
-    /// X coordinate
+    /// X coordinate.
     float x_;
-    /// Y coordinate
+    /// Y coordinate.
     float y_;
-    /// Z coordinate
+    /// Z coordinate.
     float z_;
     
-    /// Identity quaternion
+    /// Identity quaternion.
     static const Quaternion IDENTITY;
 };

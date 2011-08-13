@@ -749,6 +749,8 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "const uint8 &opIndex(uint) const", asFUNCTION(StringCharAt), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "void Replace(uint8, uint8)", asMETHODPR(String, Replace, (char, char), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void Replace(const String&in, const String&in)", asMETHODPR(String, Replace, (const String&, const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Replaced(uint8, uint8) const", asMETHODPR(String, Replaced, (char, char) const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "String Replaced(const String&in, const String&in) const", asMETHODPR(String, Replaced, (const String&, const String&) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void Resize(uint)", asFUNCTION(StringResize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "int Find(const String& in, uint start = 0) const", asMETHODPR(String, Find, (const String&, unsigned) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "int Find(uint8, uint start = 0) const", asMETHODPR(String, Find, (char, unsigned) const, unsigned), asCALL_THISCALL);

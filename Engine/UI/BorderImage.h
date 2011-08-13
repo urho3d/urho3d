@@ -28,7 +28,7 @@
 class Texture;
 class Texture2D;
 
-/// Image UI element with optional border
+/// Image UI element with optional border.
 class BorderImage : public UIElement
 {
     OBJECT(BorderImage);
@@ -36,50 +36,50 @@ class BorderImage : public UIElement
     using UIElement::SetStyle;
     
 public:
-    /// Construct
+    /// Construct.
     BorderImage(Context* context);
-    /// Destruct
+    /// Destruct.
     virtual ~BorderImage();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// %Set UI element style from XML data
+    /// %Set UI element style from XML data.
     virtual void SetStyle(const XMLElement& element);
-    /// Return UI rendering batches
+    /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor);
     
-    /// %Set textures
+    /// %Set textures.
     void SetTexture(Texture* texture);
-    /// %Set part of texture to use as the image
+    /// %Set part of texture to use as the image.
     void SetImageRect(const IntRect& rect);
-    /// Use whole texture as the image
+    /// Use whole texture as the image.
     void SetFullImageRect();
-    /// %Set image border dimensions
+    /// %Set image border dimensions.
     void SetBorder(const IntRect& rect);
-    /// %Set offset to image rectangle used on hover
+    /// %Set offset to image rectangle used on hover.
     void SetHoverOffset(const IntVector2& offset);
-    /// %Set offset to image rectangle used on hover
+    /// %Set offset to image rectangle used on hover.
     void SetHoverOffset(int x, int y);
     
-    /// Return texture
+    /// Return texture.
     Texture* GetTexture() const { return texture_; }
-    /// Return image rectangle
+    /// Return image rectangle.
     const IntRect& GetImageRect() const { return imageRect_; }
-    /// Return image border dimensions
+    /// Return image border dimensions.
     const IntRect& GetBorder() const { return border_; }
-    /// Return offset to image rectangle used on hover
+    /// Return offset to image rectangle used on hover.
     const IntVector2& GetHoverOffset() const { return hoverOffset_; }
     
 protected:
-    /// Return UI rendering batches with offset to image rectangle
+    /// Return UI rendering batches with offset to image rectangle.
     void GetBatches(PODVector<UIBatch>& batches, PODVector<UIQuad>& quads, const IntRect& currentScissor, const IntVector2& offset);
     
-    /// Texture
+    /// Texture.
     SharedPtr<Texture> texture_;
-    /// Image rectangle
+    /// Image rectangle.
     IntRect imageRect_;
-    /// Image border dimensions
+    /// Image border dimensions.
     IntRect border_;
-    /// Offset to image rectangle on hover
+    /// Offset to image rectangle on hover.
     IntVector2 hoverOffset_;
 };

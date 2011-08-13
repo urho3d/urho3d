@@ -26,29 +26,29 @@
 class Context;
 class asIScriptEngine;
 
-/// Register the Math library to script
+/// Register the Math library to script.
 void RegisterMathAPI(asIScriptEngine* engine);
-/// Register the Core library to script
+/// Register the Core library to script.
 void RegisterCoreAPI(asIScriptEngine* engine);
-/// Register the IO library to script
+/// Register the IO library to script.
 void RegisterIOAPI(asIScriptEngine* engine);
-/// Register the Resource library to script
+/// Register the Resource library to script.
 void RegisterResourceAPI(asIScriptEngine* engine);
-/// Register the Scene library to script
+/// Register the Scene library to script.
 void RegisterSceneAPI(asIScriptEngine* engine);
-/// Register the Graphics library to script
+/// Register the Graphics library to script.
 void RegisterGraphicsAPI(asIScriptEngine* engine);
-/// Register the Input library to script
+/// Register the Input library to script.
 void RegisterInputAPI(asIScriptEngine* engine);
-/// Register the Audio library to script
+/// Register the Audio library to script.
 void RegisterAudioAPI(asIScriptEngine* engine);
-/// Register the UI library to script
+/// Register the UI library to script.
 void RegisterUIAPI(asIScriptEngine* engine);
-/// Register the Network library to script
+/// Register the Network library to script.
 void RegisterNetworkAPI(asIScriptEngine* engine);
-/// Register the Physics library to script
+/// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);
-/// Register the Script library to script
+/// Register the Script library to script.
 void RegisterScriptAPI(asIScriptEngine* engine);
-/// Register the Engine library to script
+/// Register the Engine library to script.
 void RegisterEngineAPI(asIScriptEngine* engine);

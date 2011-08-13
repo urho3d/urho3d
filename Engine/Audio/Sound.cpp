@@ -35,7 +35,7 @@
 
 #include "DebugNew.h"
 
-/// WAV format header
+/// WAV format header.
 struct WavHeader
 {
     unsigned char riffText_[4];

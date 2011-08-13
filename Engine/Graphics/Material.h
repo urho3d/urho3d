@@ -34,120 +34,120 @@ class Texture;
 class Texture2D;
 class TextureCube;
 
-/// Material's shader parameter definition
+/// Material's shader parameter definition.
 struct MaterialShaderParameter
 {
-    /// Name
+    /// Name.
     String name_;
-    /// Value
+    /// Value.
     Vector4 value_;
 };
 
-/// Material's technique list entry
+/// Material's technique list entry.
 struct TechniqueEntry
 {
-    /// Construct with defaults
+    /// Construct with defaults.
     TechniqueEntry();
-    /// Construct with parameters
+    /// Construct with parameters.
     TechniqueEntry(Technique* technique, unsigned qualityLevel, float lodDistance);
-    /// Destruct
+    /// Destruct.
     ~TechniqueEntry();
     
-    /// Technique
+    /// Technique.
     SharedPtr<Technique> technique_;
-    /// Quality level
+    /// Quality level.
     int qualityLevel_;
-    /// LOD distance
+    /// LOD distance.
     float lodDistance_;
 };
 
-/// Describes how to render 3D geometries
+/// Describes how to render 3D geometries.
 class Material : public Resource
 {
     OBJECT(Material);
     
 public:
-    /// Construct
+    /// Construct.
     Material(Context* context);
-    /// Destruct
+    /// Destruct.
     ~Material();
-    /// Register object factory
+    /// Register object factory.
     static void RegisterObject(Context* context);
     
-    /// Load resource. Return true if successful
+    /// Load resource. Return true if successful.
     virtual bool Load(Deserializer& source);
-    /// Save resource. Return true if successful
+    /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest);
     
-    /// %Set number of techniques
+    /// %Set number of techniques.
     void SetNumTechniques(unsigned num);
-    /// %Set technique
+    /// %Set technique.
     void SetTechnique(unsigned index, Technique* technique, unsigned qualityLevel = 0, float lodDistance = 0.0f);
-    /// %Set shader parameter
+    /// %Set shader parameter.
     void SetShaderParameter(const String& name, const Vector4& value);
-    /// %Set texture
+    /// %Set texture.
     void SetTexture(TextureUnit unit, Texture* texture);
-    /// %Set texture coordinate transform
+    /// %Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, const Vector2& repeat);
-    /// %Set texture coordinate transform
+    /// %Set texture coordinate transform.
     void SetUVTransform(const Vector2& offset, float rotation, float repeat);
-    /// %Set culling mode
+    /// %Set culling mode.
     void SetCullMode(CullMode mode);
-    /// %Set culling mode for shadows
+    /// %Set culling mode for shadows.
     void SetShadowCullMode(CullMode mode);
-    /// Remove a shader parameter
+    /// Remove a shader parameter.
     void RemoveShaderParameter(const String& name);
-    /// Reset all shader pointers
+    /// Reset all shader pointers.
     void ReleaseShaders();
-    /// Clone material
+    /// Clone material.
     SharedPtr<Material> Clone(const String& cloneName = String()) const;
-    /// Mark material for auxiliary view rendering
+    /// Mark material for auxiliary view rendering.
     void MarkForAuxView(unsigned frameNumber);
     
-    /// Return number of techniques
+    /// Return number of techniques.
     unsigned GetNumTechniques() const { return techniques_.Size(); }
-    /// Return all techniques
+    /// Return all techniques.
     const Vector<TechniqueEntry>& GetTechniques() const { return techniques_; }
-    /// Return technique entry by index
+    /// Return technique entry by index.
     const TechniqueEntry& GetTechniqueEntry(unsigned index) const;
-    /// Return technique by index
+    /// Return technique by index.
     Technique* GetTechnique(unsigned index) const;
-    /// Return pass by technique index and pass type
+    /// Return pass by technique index and pass type.
     Pass* GetPass(unsigned index, PassType pass) const;
-    /// Return all textures
+    /// Return all textures.
     const Vector<SharedPtr<Texture> >& GetTextures() const { return textures_; }
-    /// Return texture by unit
+    /// Return texture by unit.
     Texture* GetTexture(TextureUnit unit) const;
-    /// Return all shader parameters
+    /// Return all shader parameters.
     const HashMap<StringHash, MaterialShaderParameter>& GetShaderParameters() const { return shaderParameters_; }
-    /// Return normal culling mode
+    /// Return normal culling mode.
     CullMode GetCullMode() const { return cullMode_; }
-    /// Return culling mode for shadows
+    /// Return culling mode for shadows.
     CullMode GetShadowCullMode() const { return shadowCullMode_; }
-    /// Return last auxiliary view rendered frame number
+    /// Return last auxiliary view rendered frame number.
     unsigned GetAuxViewFrameNumber() const { return auxViewFrameNumber_; }
-    /// Return whether should render occlusion
+    /// Return whether should render occlusion.
     bool GetOcclusion() const { return occlusion_; }
     
-    /// Return name for texture unit
+    /// Return name for texture unit.
     static const String& GetTextureUnitName(TextureUnit unit);
     
 private:
-    /// Re-evaluate occlusion rendering
-    void Update();
+    /// Re-evaluate occlusion rendering.
+    void CheckOcclusion();
     
-    /// Techniques
+    /// Techniques.
     Vector<TechniqueEntry> techniques_;
-    /// Textures
+    /// Textures.
     Vector<SharedPtr<Texture> > textures_;
-    /// Shader parameters
+    /// Shader parameters.
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
-    /// Normal culling mode
+    /// Normal culling mode.
     CullMode cullMode_;
-    /// Culling mode for shadow rendering
+    /// Culling mode for shadow rendering.
     CullMode shadowCullMode_;
-    /// Last auxiliary view rendered frame number
+    /// Last auxiliary view rendered frame number.
     unsigned auxViewFrameNumber_;
-    /// Render occlusion flag
+    /// Render occlusion flag.
     bool occlusion_;
 };
