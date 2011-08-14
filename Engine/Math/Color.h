@@ -146,6 +146,14 @@ public:
     
     /// Opaque white color.
     static const Color WHITE;
+    /// Opaque yellow color.
+    static const Color YELLOW;
+    /// Opaque red color.
+    static const Color RED;
+    /// Opaque green color.
+    static const Color GREEN;
+    /// Opaque green color.
+    static const Color BLUE;
     /// Opaque black color.
     static const Color BLACK;
 };

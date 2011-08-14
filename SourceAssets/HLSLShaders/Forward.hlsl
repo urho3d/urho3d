@@ -4,6 +4,11 @@
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
 
+// Use branching if the pixel shader is expensive
+#if defined(SM3) && (defined(SPECULAR) || defined(SHADOW))
+    #define BRANCHING
+#endif
+
 void VS(float4 iPos : POSITION,
     float3 iNormal : NORMAL,
     #ifdef NORMALMAP
@@ -117,7 +122,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         diffColor *= iColor;
     #endif
 
-    #if (!defined(VOLUMETRIC)) && ((defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT)))
+    #if !defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
 
         float3 lightColor;
         float3 lightDir;
@@ -137,7 +142,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
             diff = GetDiffusePointOrSpot(normal, iWorldPos.xyz, lightDir, lightVec);
         #endif
 
-        #ifdef SM3
+        #ifdef BRANCHING
         if (diff > 0.0)
         {
         #endif
@@ -145,7 +150,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos);
         #endif
-
+        
         #ifdef SPOTLIGHT
             lightColor = iSpotPos.w > 0.0 ? tex2Dproj(sLightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #else
@@ -175,7 +180,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
             oColor = float4(GetLitFog(finalColor, iWorldPos.w), diffColor.a);
         #endif
 
-        #ifdef SM3
+        #ifdef BRANCHING
         }
         else
         {
@@ -186,12 +191,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
             oColor = float4(0.0, 0.0, 0.0, diffColor.a);
         #endif
         }
-
         #endif
 
     #else
 
-        #if (defined(VOLUMETRIC)) && ((defined(DIRLIGHT)) || (defined(POINTLIGHT)) || (defined(SPOTLIGHT)))
+        #if defined(VOLUMETRIC) && (defined(DIRLIGHT) || defined(POINTLIGHT) || defined(SPOTLIGHT))
 
             float3 lightColor;
             float3 lightVec;

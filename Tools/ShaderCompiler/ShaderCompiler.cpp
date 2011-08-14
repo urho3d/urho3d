@@ -662,6 +662,13 @@ void Compile(CompiledVariation* variation)
     }
     else
     {
+        // Print warnings if any
+        if (errorMsgs && errorMsgs->GetBufferSize())
+        {
+            String warning((const char*)errorMsgs->GetBufferPointer(), errorMsgs->GetBufferSize());
+            printf("WARNING: %s\n", warning.CString());
+        }
+        
         CopyStrippedCode(variation->byteCode_, shaderCode->GetBufferPointer(), shaderCode->GetBufferSize());
         
         // Parse the constant table for constants and texture units

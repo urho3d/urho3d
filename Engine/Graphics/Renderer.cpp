@@ -976,7 +976,7 @@ void Renderer::SetLightVolumeShaders(Batch& batch)
     if (light->GetShadowMap())
         psi += DLPS_SHADOW;
     
-    if (specularLighting_ && light->GetSpecularIntensity() > 0.0)
+    if (specularLighting_ && light->GetSpecularIntensity() > 0.0f)
         psi += DLPS_SPEC;
     
     if (batch.camera_->IsOrthographic())

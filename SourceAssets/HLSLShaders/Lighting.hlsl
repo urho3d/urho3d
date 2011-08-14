@@ -1,3 +1,5 @@
+#pragma warning(disable:3571)
+
 float GetDiffuseDir(float3 normal, out float3 lightDir)
 {
     lightDir = cLightDir;

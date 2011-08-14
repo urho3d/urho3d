@@ -78,6 +78,8 @@ public:
     void SetView(Camera* camera);
     /// Add a line.
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
+    /// Add a line with color already converted to unsigned.
+    void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true);
     /// Add a bounding box.
     void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
     /// Add a bounding box with transform.

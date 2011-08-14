@@ -72,6 +72,14 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Colo
         noDepthLines_.Push(DebugLine(start, end, color.ToUInt()));
 }
 
+void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest)
+{
+    if (depthTest)
+        lines_.Push(DebugLine(start, end, color));
+    else
+        noDepthLines_.Push(DebugLine(start, end, color));
+}
+
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
 {
     const Vector3& min = box.min_;
