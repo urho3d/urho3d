@@ -29,7 +29,7 @@
 
 class Image;
 
-/// 2D texture resource
+/// 2D texture resource.
 class Texture2D : public Texture
 {
     OBJECT(Texture2D);

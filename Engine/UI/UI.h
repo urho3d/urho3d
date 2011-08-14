@@ -34,7 +34,7 @@ class UIElement;
 class XMLElement;
 class XMLFile;
 
-/// UI subsystem. Manages the graphical user interface.
+/// %UI subsystem. Manages the graphical user interface.
 class UI : public Object
 {
     OBJECT(UI);

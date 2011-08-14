@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Slider bar UI element.
+/// %Slider bar %UI element.
 class Slider : public BorderImage
 {
     OBJECT(Slider);

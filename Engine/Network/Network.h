@@ -33,7 +33,7 @@
 class MemoryBuffer;
 class Scene;
 
-/// Network subsystem. Manages client-server communications using the UDP protocol.
+/// %Network subsystem. Manages client-server communications using the UDP protocol.
 class Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
     OBJECT(Network);

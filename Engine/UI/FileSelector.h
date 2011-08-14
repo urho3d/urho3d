@@ -37,7 +37,7 @@ class UIElement;
 class Window;
 class XMLFile;
 
-/// File selector's list entry (file or directory.)
+/// %File selector's list entry (file or directory.)
 struct FileSelectorEntry
 {
     /// Name.
@@ -46,7 +46,7 @@ struct FileSelectorEntry
     bool directory_;
 };
 
-/// File selector dialog.
+/// %File selector dialog.
 class FileSelector : public Object
 {
     OBJECT(FileSelector);

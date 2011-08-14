@@ -26,7 +26,7 @@
 #include "ScrollView.h"
 #include "Set.h"
 
-/// ListView selection highlight mode.
+/// %ListView selection highlight mode.
 enum HighlightMode
 {
     /// Never highlight selections.
@@ -37,7 +37,7 @@ enum HighlightMode
     HM_ALWAYS
 };
 
-/// Scrollable list UI element.
+/// Scrollable list %UI element.
 class ListView : public ScrollView
 {
     OBJECT(ListView);

@@ -54,7 +54,7 @@ struct Particle
     unsigned texIndex_;
 };
 
-/// Texture animation definition.
+/// %Texture animation definition.
 struct TextureAnimation
 {
     /// UV coordinates.
@@ -67,7 +67,7 @@ class ResourceCache;
 class XMLFile;
 class XMLElement;
 
-/// Particle emitter component.
+/// %Particle emitter component.
 class ParticleEmitter : public BillboardSet
 {
     OBJECT(ParticleEmitter);

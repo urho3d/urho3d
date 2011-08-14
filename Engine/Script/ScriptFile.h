@@ -37,7 +37,7 @@ class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
 
-/// Script file resource.
+/// %Script file resource.
 class ScriptFile : public Resource, public ScriptEventListener
 {
     OBJECT(ScriptFile);

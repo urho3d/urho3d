@@ -29,7 +29,7 @@ static const int DEFAULT_FONT_SIZE = 12;
 
 class Font;
 
-/// Text UI element.
+/// %Text %UI element.
 class Text : public UIElement
 {
     OBJECT(Text);

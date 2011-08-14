@@ -28,7 +28,7 @@
 class Button;
 class Slider;
 
-/// Scroll bar UI element with forward and back buttons.
+/// Scroll bar %UI element with forward and back buttons.
 class ScrollBar : public UIElement
 {
     OBJECT(ScrollBar);

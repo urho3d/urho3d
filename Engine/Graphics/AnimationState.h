@@ -34,7 +34,7 @@ class Skeleton;
 struct AnimationTrack;
 struct Bone;
 
-/// Animation instance in an animated model.
+/// %Animation instance in an animated model.
 class AnimationState : public RefCounted
 {
 public:

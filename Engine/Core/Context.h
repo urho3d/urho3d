@@ -27,7 +27,7 @@
 #include "HashSet.h"
 #include "Object.h"
 
-/// Execution context within a process. Provides access to the subsystems, object factories and attributes, and event receivers.
+/// Urho3D execution context. Provides access to subsystems, object factories and attributes, and event receivers.
 class Context : public RefCounted
 {
 public:

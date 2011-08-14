@@ -29,7 +29,7 @@
 
 class Graphics;
 
-/// Input subsystem. Converts operating system window messages to input state and events.
+/// %Input subsystem. Converts operating system window messages to input state and events.
 class Input : public Object
 {
     #ifdef USE_OPENGL

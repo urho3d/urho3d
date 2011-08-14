@@ -34,7 +34,7 @@ class Deserializer;
 class ResourceCache;
 class Serializer;
 
-/// Bone in a skeleton.
+/// %Bone in a skeleton.
 struct Bone
 {
     /// Construct with defaults.

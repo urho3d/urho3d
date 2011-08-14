@@ -28,11 +28,11 @@
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
-/// Set template class using a red-black tree.
+/// %Set template class using a red-black tree.
 template <class T> class Set : public TreeBase
 {
 public:
-    /// Set node.
+    /// %Set node.
     struct Node : public TreeNodeBase
     {
         // Construct undefined.
@@ -55,7 +55,7 @@ public:
         Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
-    /// Set iterator.
+    /// %Set iterator.
     class Iterator : public TreeIteratorBase
     {
     public:
@@ -80,7 +80,7 @@ public:
         const T& operator * () const { return (static_cast<Node*>(ptr_))->key_; }
     };
     
-    /// Set const iterator.
+    /// %Set const iterator.
     class ConstIterator : public TreeIteratorBase
     {
     public:

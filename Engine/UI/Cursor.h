@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Cursor shapes recognized by the UI subsystem.
+/// %Cursor shapes recognized by the UI subsystem.
 enum CursorShape
 {
     CS_NORMAL = 0,
@@ -38,7 +38,7 @@ enum CursorShape
     CS_MAX_SHAPES
 };
 
-/// Cursor image and hotspot information.
+/// %Cursor image and hotspot information.
 struct CursorShapeInfo
 {
     /// Texture.
@@ -49,7 +49,7 @@ struct CursorShapeInfo
     IntVector2 hotSpot_;
 };
 
-/// Mouse cursor UI element.
+/// Mouse cursor %UI element.
 class Cursor : public BorderImage
 {
     OBJECT(Cursor);

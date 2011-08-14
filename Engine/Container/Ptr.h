@@ -27,7 +27,7 @@
 
 #include <cassert>
 
-/// Shared pointer template class. Can point to an object that derives from RefCounted.
+/// Shared pointer template class with intrusive reference counting.
 template <class T> class SharedPtr
 {
 public:
@@ -178,7 +178,7 @@ template <class T, class U> SharedPtr<T> DynamicCast(const SharedPtr<U>& ptr)
     return ret;
 }
 
-/// Weak pointer template class. Can point to an object that derives from RefCounted, but does not keep it alive.
+/// Weak pointer template class with intrusive reference counting. Does not keep the object pointed to alive.
 template <class T> class WeakPtr
 {
 public:

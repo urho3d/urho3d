@@ -29,11 +29,11 @@
 // Based on Red Black Trees by Julienne Walker
 // http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 
-/// Map template class using a red-black tree.
+/// %Map template class using a red-black tree.
 template <class T, class U> class Map : public TreeBase
 {
 public:
-    /// Map key-value pair with const key.
+    /// %Map key-value pair with const key.
     class KeyValue
     {
     public:
@@ -61,7 +61,7 @@ public:
         U second_;
     };
     
-    /// Map node.
+    /// %Map node.
     struct Node : public TreeNodeBase
     {
         /// Construct undefined.
@@ -84,7 +84,7 @@ public:
         Node* Child(unsigned dir) const { return static_cast<Node*>(link_[dir]); }
     };
     
-    /// Map iterator.
+    /// %Map iterator.
     class Iterator : public TreeIteratorBase
     {
     public:
@@ -109,7 +109,7 @@ public:
         KeyValue& operator * () const { return (static_cast<Node*>(ptr_))->pair_; }
     };
     
-    /// Map const iterator.
+    /// %Map const iterator.
     class ConstIterator : public TreeIteratorBase
     {
     public:

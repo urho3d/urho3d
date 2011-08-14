@@ -28,7 +28,7 @@
 #include <windows.h>
 #include <d3d9.h>
 
-/// Graphics implementation. Contains the main Direct3D9 objects
+/// %Graphics implementation. Holds API-specific objects.
 class GraphicsImpl
 {
     friend class Graphics;

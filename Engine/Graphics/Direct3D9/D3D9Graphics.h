@@ -48,10 +48,10 @@ class VertexDeclaration;
 
 static const int IMMEDIATE_BUFFER_DEFAULT_SIZE = 1024;
 
-/// Shader parameter information
-struct ShaderParameterInfo
+/// %Shader parameter definition.
+struct ShaderParameter
 {
-    /// Shader type.
+    /// %Shader type.
     ShaderType type_;
     /// Hardware register.
     unsigned register_;
@@ -59,7 +59,7 @@ struct ShaderParameterInfo
     const void* lastSource_;
 };
 
-/// Graphics subsystem. Manages the Direct3D9 device, application window, rendering state and GPU resources
+/// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
 {
     OBJECT(Graphics);
@@ -474,7 +474,7 @@ private:
     /// Pixel shader in use.
     ShaderVariation* pixelShader_;
     /// Shader parameters.
-    HashMap<StringHash, ShaderParameterInfo> shaderParameters_;
+    HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
     /// Deferred rendering destination render target.

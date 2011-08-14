@@ -31,7 +31,7 @@
 
 class Shader;
 
-/// Vertex or pixel shader on the GPU
+/// Vertex or pixel shader on the GPU.
 class ShaderVariation : public RefCounted, public GPUObject
 {
 public:

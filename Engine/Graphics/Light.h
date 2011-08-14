@@ -32,7 +32,7 @@ class Texture;
 class Texture2D;
 class TextureCube;
 
-/// Light types.
+/// %Light types.
 enum LightType
 {
     LIGHT_DIRECTIONAL = 0,
@@ -132,7 +132,7 @@ static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const float SHADOW_DEFAULT_NEARCLIP = 0.1f;
 
-/// Light component.
+/// %Light component.
 class Light : public Drawable
 {
     OBJECT(Light);

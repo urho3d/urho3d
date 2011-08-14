@@ -33,7 +33,7 @@ class ShaderVariation;
 class Texture;
 class UIElement;
 
-/// UI rendering quad.
+/// %UI rendering quad.
 struct UIQuad
 {
     /// Left coordinate.
@@ -62,7 +62,7 @@ struct UIQuad
     unsigned bottomRightColor_;
 };
 
-/// UI rendering draw call.
+/// %UI rendering draw call.
 class UIBatch
 {
 public:

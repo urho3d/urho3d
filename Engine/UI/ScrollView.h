@@ -28,7 +28,7 @@
 class BorderImage;
 class ScrollBar;
 
-/// Scrollable UI element for showing a (possibly large) child element.
+/// Scrollable %UI element for showing a (possibly large) child element.
 class ScrollView : public UIElement
 {
     OBJECT(ScrollView);

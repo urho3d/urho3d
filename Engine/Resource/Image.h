@@ -66,7 +66,7 @@ struct CompressedLevel
     unsigned rows_;
 };
 
-/// Image resource.
+/// %Image resource.
 class Image : public Resource
 {
     OBJECT(Image);

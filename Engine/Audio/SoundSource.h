@@ -32,7 +32,7 @@ class Sound;
 // Compressed audio decode buffer length in milliseconds
 static const int DECODE_BUFFER_LENGTH = 100;
 
-/// Sound source component with stereo position.
+/// %Sound source component with stereo position.
 class SoundSource : public Component
 {
     OBJECT(SoundSource);

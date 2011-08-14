@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-/// File entry within the package file.
+/// %File entry within the package file.
 struct PackageEntry
 {
     /// Offset from the beginning.

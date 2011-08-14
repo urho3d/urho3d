@@ -36,13 +36,13 @@
 
 #include "DebugNew.h"
 
-/// FreeType library subsystem
+/// FreeType library subsystem.
 class FreeTypeLibrary : public Object
 {
     OBJECT(FreeTypeLibrary);
     
 public:
-    /// Construct
+    /// Construct.
     FreeTypeLibrary(Context* context) :
         Object(context)
     {
@@ -51,7 +51,7 @@ public:
             LOGERROR("Could not initialize FreeType library");
     }
     
-    /// Destruct
+    /// Destruct.
     virtual ~FreeTypeLibrary()
     {
         FT_Done_FreeType(mLibrary);
@@ -60,7 +60,7 @@ public:
     FT_Library getLibrary() const { return mLibrary; }
     
 private:
-    /// FreeType library
+    /// FreeType library.
     FT_Library mLibrary;
 };
 

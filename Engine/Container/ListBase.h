@@ -26,7 +26,7 @@
 #include "Allocator.h"
 #include "Swap.h"
 
-/// List node base.
+/// %List node base.
 struct ListNodeBase
 {
     /// Construct.
@@ -42,7 +42,7 @@ struct ListNodeBase
     ListNodeBase* next_;
 };
 
-/// List iterator base class.
+/// %List iterator base class.
 class ListIteratorBase
 {
 public:

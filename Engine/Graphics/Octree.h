@@ -33,7 +33,7 @@ class RayOctreeQuery;
 
 static const int NUM_OCTANTS = 8;
 
-/// Octree octant
+/// %Octree octant
 class Octant
 {
 public:
@@ -142,7 +142,7 @@ protected:
     unsigned numDrawables_;
 };
 
-/// Octree component. Should be added only to the root scene node
+/// %Octree component. Should be added only to the root scene node
 class Octree : public Component, public Octant
 {
     OBJECT(Octree);

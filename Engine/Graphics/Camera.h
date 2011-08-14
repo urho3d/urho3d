@@ -33,7 +33,7 @@ static const unsigned VOF_LOW_MATERIAL_QUALITY = 0x1;
 static const unsigned VOF_DISABLE_SHADOWS = 0x2;
 static const unsigned VOF_DISABLE_OCCLUSION = 0x4;
 
-/// Camera component.
+/// %Camera component.
 class Camera : public Component
 {
     OBJECT(Camera);

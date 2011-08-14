@@ -28,10 +28,10 @@
 struct AllocatorBlock;
 struct AllocatorNode;
 
-/// Allocator memory block.
+/// %Allocator memory block.
 struct AllocatorBlock
 {
-    /// Node data size.
+    /// Size of a node.
     unsigned nodeSize_;
     /// Number of nodes in this block.
     unsigned capacity_;
@@ -42,7 +42,7 @@ struct AllocatorBlock
     /// Nodes follow.
 };
 
-/// Allocator node.
+/// %Allocator node.
 struct AllocatorNode
 {
     /// Next free node.
@@ -59,7 +59,7 @@ void* AllocatorReserve(AllocatorBlock* allocator);
 /// Free a node. Does not free any blocks.
 void AllocatorFree(AllocatorBlock* allocator, void* ptr);
 
-/// Template allocator class. Allocates fixed-size objects of a specific class.
+/// %Allocator template class. Allocates objects of a specific class.
 template <class T> class Allocator
 {
 public:

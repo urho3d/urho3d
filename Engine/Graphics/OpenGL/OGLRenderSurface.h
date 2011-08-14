@@ -31,7 +31,7 @@ class Camera;
 class Scene;
 class Texture;
 
-/// Viewport definition either for a RenderSurface or the backbuffer.
+/// %Viewport definition either for a render surface or the backbuffer.
 struct Viewport
 {
     /// Construct with defaults.
@@ -49,7 +49,7 @@ struct Viewport
     IntRect rect_;
 };
 
-/// Color or depth stencil surface that can be rendered into.
+/// %Color or depth stencil surface that can be rendered into.
 class RenderSurface : public RefCounted
 {
     friend class Texture2D;

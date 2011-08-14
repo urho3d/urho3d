@@ -34,7 +34,7 @@ class AudioImpl;
 class Sound;
 class SoundSource;
 
-/// Audio subsystem. Uses either DirectSound or PortAudio for the actual sound output.
+/// %Audio subsystem. Uses either DirectSound or PortAudio for the actual sound output.
 class Audio : public Object
 {
     OBJECT(Audio);

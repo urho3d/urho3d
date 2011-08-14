@@ -32,7 +32,7 @@
 
 static const int CONVERSION_BUFFER_LENGTH = 128;
 
-/// String class.
+/// %String class.
 class String
 {
 public:

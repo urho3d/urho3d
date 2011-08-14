@@ -28,7 +28,7 @@
 class Font;
 class Text;
 
-/// Single-line text editor UI element.
+/// Single-line text editor %UI element.
 class LineEdit : public BorderImage
 {
     OBJECT(LineEdit);

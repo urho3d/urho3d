@@ -72,7 +72,7 @@ struct AnimationControl
     unsigned char setWeightRev_;
 };
 
-/// Component that drives an AnimatedModel's animations.
+/// %Component that drives an AnimatedModel's animations.
 class AnimationController : public Component
 {
     OBJECT(AnimationController);

@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// UI element that can be toggled between unchecked and checked state.
+/// %UI element that can be toggled between unchecked and checked state.
 class CheckBox : public BorderImage
 {
     OBJECT(CheckBox);

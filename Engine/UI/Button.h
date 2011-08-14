@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Pushbutton UI element.
+/// Pushbutton %UI element.
 class Button : public BorderImage
 {
     OBJECT(Button);

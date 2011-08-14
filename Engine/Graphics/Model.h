@@ -58,7 +58,7 @@ struct ModelMorph
     Map<unsigned, VertexBufferMorph> buffers_;
 };
 
-/// Model resource.
+/// 3D model resource.
 class Model : public Resource
 {
     OBJECT(Model);

@@ -26,7 +26,7 @@
 #include "Resource.h"
 #include "ArrayPtr.h"
 
-/// Sound resource.
+/// %Sound resource.
 class Sound : public Resource
 {
     OBJECT(Sound);

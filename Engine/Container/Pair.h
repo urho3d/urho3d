@@ -25,7 +25,7 @@
 
 #include "Hash.h"
 
-/// Pair template class.
+/// %Pair template class.
 template <class T, class U> class Pair
 {
 public:

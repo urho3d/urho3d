@@ -29,7 +29,7 @@ class BoundingBox;
 class Frustum;
 class Ray;
 
-/// Sphere in three-dimensional space.
+/// %Sphere in three-dimensional space.
 class Sphere
 {
 public:

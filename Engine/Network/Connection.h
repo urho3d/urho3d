@@ -90,7 +90,7 @@ struct PackageUpload
     unsigned totalFragments_;
 };
 
-/// Connection to a remote network host.
+/// %Connection to a remote network host.
 class Connection : public Object
 {
     OBJECT(Connection);

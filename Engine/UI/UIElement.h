@@ -28,7 +28,7 @@
 #include "Vector2.h"
 #include "XMLFile.h"
 
-/// UI element horizontal alignment.
+/// %UI element horizontal alignment.
 enum HorizontalAlignment
 {
     HA_LEFT = 0,
@@ -36,7 +36,7 @@ enum HorizontalAlignment
     HA_RIGHT
 };
 
-/// UI element vertical alignment.
+/// %UI element vertical alignment.
 enum VerticalAlignment
 {
     VA_TOP = 0,
@@ -44,7 +44,7 @@ enum VerticalAlignment
     VA_BOTTOM
 };
 
-/// UI element corners.
+/// %UI element corners.
 enum Corner
 {
     C_TOPLEFT = 0,
@@ -54,14 +54,14 @@ enum Corner
     MAX_UIELEMENT_CORNERS
 };
 
-/// UI element orientation.
+/// %UI element orientation.
 enum Orientation
 {
     O_HORIZONTAL = 0,
     O_VERTICAL
 };
 
-/// UI element focus mode.
+/// %UI element focus mode.
 enum FocusMode
 {
     /// Is not focusable and does not affect existing focus.
@@ -98,7 +98,7 @@ class Cursor;
 class ResourceCache;
 class asIScriptEngine;
 
-/// Base class for UI elements.
+/// Base class for %UI elements.
 class UIElement : public Object
 {
     OBJECT(Element);

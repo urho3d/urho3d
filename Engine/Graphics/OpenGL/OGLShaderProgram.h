@@ -31,7 +31,7 @@
 class Graphics;
 class ShaderVariation;
 
-/// Shader parameter definition.
+/// %Shader parameter definition.
 struct ShaderParameter
 {
     /// Uniform location.

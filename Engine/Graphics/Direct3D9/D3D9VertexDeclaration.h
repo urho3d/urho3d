@@ -32,7 +32,7 @@
 class Graphics;
 class VertexBuffer;
 
-/// Element in the vertex declaration
+/// Element in the vertex declaration.
 struct VertexDeclarationElement
 {
     /// Stream index.
@@ -43,15 +43,15 @@ struct VertexDeclarationElement
     unsigned offset_;
 };
 
-/// Vertex declaration
+/// Vertex declaration.
 class VertexDeclaration : public RefCounted
 {
 public:
-    /// Construct with graphics subsystem pointer and vertex element mask.
+    /// Construct with vertex element mask.
     VertexDeclaration(Graphics* graphics, unsigned elementMask);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on.
+    /// Construct with vertex buffers and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, const Vector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
-    /// Construct with graphics subsystem pointer and vertex buffers to base declaration on.
+    /// Construct with vertex buffers (shared pointer vector) and element masks to base declaration on.
     VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
     /// Destruct.
     ~VertexDeclaration();

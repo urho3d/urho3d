@@ -27,7 +27,7 @@
 
 class XMLElement;
 
-/// Controls sent over the network.
+/// %Controls sent over the network.
 class Controls
 {
 public:

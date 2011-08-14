@@ -44,14 +44,14 @@
 #define FOURCC_DXT4 (MAKEFOURCC('D','X','T','4'))
 #define FOURCC_DXT5 (MAKEFOURCC('D','X','T','5'))
 
-/// DirectDraw surface color key
+/// DirectDraw surface color key.
 struct DDColorKey
 {
     unsigned dwColorSpaceLowValue_;
     unsigned dwColorSpaceHighValue_;
 };
 
-/// DirectDraw surface pixel format
+/// DirectDraw surface pixel format.
 struct DDPixelFormat
 {
     unsigned dwSize_;
@@ -105,7 +105,7 @@ struct DDPixelFormat
     };
 };
 
-/// DirectDraw surface capabilities
+/// DirectDraw surface capabilities.
 struct DDSCaps2
 {
     unsigned dwCaps_;
@@ -118,7 +118,7 @@ struct DDSCaps2
     };
 };
 
-/// DirectDraw surface description
+/// DirectDraw surface description.
 struct DDSurfaceDesc2
 {
     unsigned dwSize_;

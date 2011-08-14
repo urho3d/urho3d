@@ -35,9 +35,10 @@
 
 #include "DebugNew.h"
 
-/// Script object property info for script API dump
+/// %Object property info for scripting API dump.
 struct PropertyInfo
 {
+    /// Construct.
     PropertyInfo() :
         read_(false),
         write_(false),
@@ -45,10 +46,15 @@ struct PropertyInfo
     {
     }
     
+    /// Property name.
     String name_;
+    /// Property data type.
     String type_;
+    /// Reading supported flag.
     bool read_;
+    /// Writing supported flag.
     bool write_;
+    /// Indexed flag.
     bool indexed_;
 };
 

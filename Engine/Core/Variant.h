@@ -29,7 +29,7 @@
 #include "StringHash.h"
 #include "Vector4.h"
 
-/// Supported variable types for Variant.
+/// Variant's supported types.
 enum VariantType
 {
     VAR_NONE = 0,
@@ -50,7 +50,7 @@ enum VariantType
     VAR_VARIANTMAP
 };
 
-/// Union for holding all the possible Variant values.
+/// Union for holding all the possible variant values.
 struct VariantValue
 {
     union
@@ -105,7 +105,7 @@ struct ResourceRef
     bool operator != (const ResourceRef& rhs) const { return type_ != rhs.type_ || id_ != rhs.id_; }
 };
 
-/// List of resource references of a specific type.
+/// %List of typed resource references.
 struct ResourceRefList
 {
     /// Construct.

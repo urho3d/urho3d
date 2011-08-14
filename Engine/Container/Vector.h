@@ -29,7 +29,7 @@
 #include <cstring>
 #include <new>
 
-/// Vector template class.
+/// %Vector template class.
 template <class T> class Vector : public VectorBase
 {
 public:
@@ -436,7 +436,7 @@ private:
     }
 };
 
-/// Vector template class for POD types. Does not call constructors or destructors and uses block move.
+/// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
 template <class T> class PODVector : public VectorBase
 {
 public:

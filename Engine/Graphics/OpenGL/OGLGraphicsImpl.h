@@ -31,7 +31,7 @@
 
 class Context;
 
-/// Graphics subsystem implementation. Holds API-specific objects.
+/// %Graphics subsystem implementation. Holds API-specific objects.
 class GraphicsImpl
 {
     friend class Graphics;

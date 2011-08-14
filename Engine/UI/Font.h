@@ -34,7 +34,7 @@ static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_TEXTURE_MAX_SIZE = 2048;
 static const int FONT_DPI = 96;
 
-/// Font glyph description.
+/// %Font glyph description.
 struct FontGlyph
 {
     /// X position in texture.
@@ -53,7 +53,7 @@ struct FontGlyph
     short advanceX_;
 };
 
-/// Font face description.
+/// %Font face description.
 struct FontFace
 {
     /// Point size.
@@ -68,7 +68,7 @@ struct FontFace
     PODVector<FontGlyph> glyphs_;
 };
 
-/// Font resource.
+/// %Font resource.
 class Font : public Resource
 {
     OBJECT(Font);

@@ -33,7 +33,7 @@ class Text;
 class UIElement;
 class XMLFile;
 
-/// Console window with log history and AngelScript prompt.
+/// %Console window with log history and AngelScript prompt.
 class Console : public Object
 {
     OBJECT(Console);

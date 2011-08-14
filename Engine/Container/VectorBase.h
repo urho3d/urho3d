@@ -123,7 +123,7 @@ public:
     T* ptr_;
 };
 
-/// Vector base class.
+/// %Vector base class.
 class VectorBase
 {
 public:

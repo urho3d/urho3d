@@ -943,7 +943,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
 void Graphics::SetShaderParameter(StringHash param, const bool* data, unsigned count)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -955,7 +955,7 @@ void Graphics::SetShaderParameter(StringHash param, const bool* data, unsigned c
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -967,7 +967,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
 
 void Graphics::SetShaderParameter(StringHash param, const int* data, unsigned count)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -979,7 +979,7 @@ void Graphics::SetShaderParameter(StringHash param, const int* data, unsigned co
 
 void Graphics::SetShaderParameter(StringHash param, float value)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -998,7 +998,7 @@ void Graphics::SetShaderParameter(StringHash param, float value)
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1010,7 +1010,7 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1037,7 +1037,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 
 void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1056,7 +1056,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1068,7 +1068,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1080,7 +1080,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 {
-    HashMap<StringHash, ShaderParameterInfo>::ConstIterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::ConstIterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return;
     
@@ -1098,7 +1098,7 @@ void Graphics::DefineShaderParameter(StringHash param, ShaderType type, unsigned
 
 bool Graphics::NeedParameterUpdate(StringHash param, const void* source)
 {
-    HashMap<StringHash, ShaderParameterInfo>::Iterator i = shaderParameters_.Find(param);
+    HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Find(param);
     if (i == shaderParameters_.End())
         return false;
     
@@ -1129,7 +1129,7 @@ bool Graphics::NeedTextureUnit(TextureUnit unit)
 
 void Graphics::ClearParameterSources()
 {
-    for (HashMap<StringHash, ShaderParameterInfo>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
+    for (HashMap<StringHash, ShaderParameter>::Iterator i = shaderParameters_.Begin(); i != shaderParameters_.End(); ++i)
         i->second_.lastSource_ = (const void*)M_MAX_UNSIGNED;
 }
 

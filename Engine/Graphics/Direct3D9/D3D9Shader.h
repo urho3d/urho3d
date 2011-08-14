@@ -27,7 +27,7 @@
 
 class ShaderVariation;
 
-/// Shader resource consisting of several shader variations
+/// %Shader resource consisting of several shader variations.
 class Shader : public Resource
 {
     OBJECT(Shader);

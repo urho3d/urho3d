@@ -25,7 +25,7 @@
 
 #include "Component.h"
 
-/// Network interest management settings component.
+/// %Network interest management settings component.
 class NetworkPriority : public Component
 {
     OBJECT(NetworkPriority);

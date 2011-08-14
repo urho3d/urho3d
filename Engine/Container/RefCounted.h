@@ -42,7 +42,7 @@ struct RefCount
     bool expired_;
 };
 
-/// Base class for objects that can be pointed to by SharedPtr or WeakPtr. These are noncopyable and non-assignable.
+/// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
 class RefCounted
 {
 public:

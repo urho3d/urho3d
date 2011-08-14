@@ -32,15 +32,6 @@
 #include "Shader.h"
 #include "ShaderVariation.h"
 
-/// Shader constant (uniform or sampler) structure for loading
-struct Constant
-{
-    /// Parameter name
-    String name_;
-    /// Constant register or sampler
-    unsigned register_;
-};
-
 OBJECTTYPESTATIC(Shader);
 
 Shader::Shader(Context* context) :
@@ -81,32 +72,32 @@ bool Shader::Load(Deserializer& source)
     shaderType_ = (ShaderType)source.ReadShort();
     isSM3_ = (source.ReadShort() == 3);
     
-    Vector<Constant> parameters;
-    Vector<Constant> textureUnits;
+    Vector<Pair<String, unsigned char> > parameters;
+    Vector<Pair<String, unsigned char> > textureUnits;
     
     // Read the parameters and texture units used by this shader; use information is specified in terms of them
     unsigned numParameters = source.ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
     {
-        Constant newParameter;
-        newParameter.name_ = source.ReadString();
-        newParameter.register_ = source.ReadUByte();
+        Pair<String, unsigned char> newParameter;
+        newParameter.first_ = source.ReadString();
+        newParameter.second_ = source.ReadUByte();
         parameters.Push(newParameter);
         
-        graphics->DefineShaderParameter(StringHash(newParameter.name_), shaderType_, newParameter.register_);
+        graphics->DefineShaderParameter(StringHash(newParameter.first_), shaderType_, newParameter.second_);
     }
     
     unsigned numTextureUnits = source.ReadUInt();
     for (unsigned i = 0; i < numTextureUnits; ++i)
     {
-        Constant newTextureUnit;
-        newTextureUnit.name_ = source.ReadString();
-        newTextureUnit.register_ = source.ReadUByte();
+        Pair<String, unsigned char> newTextureUnit;
+        newTextureUnit.first_ = source.ReadString();
+        newTextureUnit.second_ = source.ReadUByte();
         textureUnits.Push(newTextureUnit);
         
-        TextureUnit tuIndex = graphics->GetTextureUnit(newTextureUnit.name_);
+        TextureUnit tuIndex = graphics->GetTextureUnit(newTextureUnit.first_);
         if (tuIndex == MAX_TEXTURE_UNITS)
-            LOGWARNING("Unknown texture unit " + newTextureUnit.name_);
+            LOGWARNING("Unknown texture unit " + newTextureUnit.first_);
     }
     
     // Read the variations
@@ -125,14 +116,14 @@ bool Shader::Load(Deserializer& source)
         for (unsigned j = 0; j < numParameters; ++j)
         {
             if (source.ReadBool())
-                variation->SetUseParameter(StringHash(parameters[j].name_), true);
+                variation->SetUseParameter(StringHash(parameters[j].first_), true);
         }
         
         for (unsigned j = 0; j < numTextureUnits; ++j)
         {
             if (source.ReadBool())
             {
-                TextureUnit tuIndex = graphics->GetTextureUnit(textureUnits[j].name_);
+                TextureUnit tuIndex = graphics->GetTextureUnit(textureUnits[j].first_);
                 if (tuIndex != MAX_TEXTURE_UNITS)
                     variation->SetUseTextureUnit(tuIndex, true);
             }

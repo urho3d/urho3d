@@ -27,7 +27,7 @@
 
 class Graphics;
 
-/// Base class for GPU resources
+/// Base class for GPU resources.
 class GPUObject
 {
 public:

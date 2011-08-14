@@ -45,7 +45,7 @@ enum ScriptLogMode
 /// Maximum function/method nesting level.
 static const unsigned MAX_SCRIPT_NESTING_LEVEL = 32;
 
-/// Script subsystem. Allows execution of AngelScript.
+/// Scripting subsystem. Allows execution of AngelScript.
 class Script : public Object
 {
     OBJECT(Script);

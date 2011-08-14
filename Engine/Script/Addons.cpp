@@ -29,7 +29,7 @@
 
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
 
-/// Script array buffer
+/// %Script array buffer.
 struct SArrayBuffer
 {
     asDWORD numElements;

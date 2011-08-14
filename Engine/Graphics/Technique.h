@@ -28,7 +28,7 @@
 
 class ShaderVariation;
 
-/// Material rendering pass, which defines shaders and render state.
+/// %Material rendering pass, which defines shaders and render state.
 class Pass
 {
 public:
@@ -100,7 +100,7 @@ private:
     Vector<SharedPtr<ShaderVariation> > pixelShaders_;
 };
 
-/// Material technique. Consists of several passes.
+/// %Material technique. Consists of several passes.
 class Technique : public Resource
 {
     OBJECT(Technique);

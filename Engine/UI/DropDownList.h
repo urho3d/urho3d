@@ -27,7 +27,7 @@
 
 class ListView;
 
-/// Menu UI element that displays a popup list view.
+/// %Menu %UI element that displays a popup list view.
 class DropDownList : public Menu
 {
     OBJECT(DropDownList)

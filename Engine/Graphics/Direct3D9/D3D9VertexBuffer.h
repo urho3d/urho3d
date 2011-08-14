@@ -27,7 +27,7 @@
 #include "GraphicsDefs.h"
 #include "ArrayPtr.h"
 
-/// Hardware vertex buffer
+/// Hardware vertex buffer.
 class VertexBuffer : public Object, public GPUObject
 {
     OBJECT(VertexBuffer);

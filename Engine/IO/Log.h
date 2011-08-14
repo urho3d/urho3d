@@ -38,7 +38,7 @@ static const int LOG_NONE = 4;
 
 class File;
 
-/// Log file subsystem.
+/// Logging subsystem.
 class Log : public Object
 {
     OBJECT(Log);

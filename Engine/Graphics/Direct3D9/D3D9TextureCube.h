@@ -30,7 +30,7 @@
 class Deserializer;
 class Image;
 
-/// Cube texture resource
+/// Cube texture resource.
 class TextureCube : public Texture
 {
     OBJECT(TextureCube);

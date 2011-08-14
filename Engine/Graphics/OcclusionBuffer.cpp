@@ -643,10 +643,10 @@ void OcclusionBuffer::ClipVertices(const Vector4& plane, Vector4* vertices, bool
 // Code based on Chris Hecker's Perspective Texture Mapping series in the Game Developer magazine
 // Also available online at http://chrishecker.com/Miscellaneous_Technical_Articles
 
-/// Gradients of a software rasterized triangle
+/// %Gradients of a software rasterized triangle.
 struct Gradients
 {
-    /// Construct from vertices
+    /// Construct from vertices.
     Gradients(const Vector3* vertices)
     {
         float invdX = 1.0f / (((vertices[1].x_ - vertices[2].x_) *
@@ -656,27 +656,27 @@ struct Gradients
         
         float invdY = -invdX;
         
-        mDInvZdX = invdX * (((vertices[1].z_ - vertices[2].z_) * (vertices[0].y_ - vertices[2].y_)) -
+        dInvZdX_ = invdX * (((vertices[1].z_ - vertices[2].z_) * (vertices[0].y_ - vertices[2].y_)) -
             ((vertices[0].z_ - vertices[2].z_) * (vertices[1].y_ - vertices[2].y_)));
         
-        mDInvZdY = invdY * (((vertices[1].z_ - vertices[2].z_) * (vertices[0].x_ - vertices[2].x_)) -
+        dInvZdY_ = invdY * (((vertices[1].z_ - vertices[2].z_) * (vertices[0].x_ - vertices[2].x_)) -
             ((vertices[0].z_ - vertices[2].z_) * (vertices[1].x_ - vertices[2].x_)));
         
-        mDInvZdXInt = (int)mDInvZdX;
+        dInvZdXInt_ = (int)dInvZdX_;
     }
     
-    /// Integer horizontal gradient
-    int mDInvZdXInt;
-    /// Horizontal gradient
-    float mDInvZdX;
-    /// Vertical gradient
-    float mDInvZdY;
+    /// Integer horizontal gradient.
+    int dInvZdXInt_;
+    /// Horizontal gradient.
+    float dInvZdX_;
+    /// Vertical gradient.
+    float dInvZdY_;
 };
 
-/// Edge of a software rasterized triangle
+/// %Edge of a software rasterized triangle.
 struct Edge
 {
-    /// Construct from gradients and top & bottom vertices
+    /// Construct from gradients and top & bottom vertices.
     Edge(const Gradients& gradients, const Vector3& top, const Vector3& bottom, int topY)
     {
         float slope = (bottom.x_ - top.x_) / (bottom.y_ - top.y_);
@@ -684,19 +684,19 @@ struct Edge
         float xPreStep = slope * yPreStep;
         
         x_ = (int)((xPreStep + top.x_) * OCCLUSION_X_SCALE);
-        x_Step = (int)(slope * OCCLUSION_X_SCALE);
-        mInvZ = (int)(top.z_ + xPreStep * gradients.mDInvZdX + yPreStep * gradients.mDInvZdY);
-        mInvZStep = (int)(slope * gradients.mDInvZdX + gradients.mDInvZdY);
+        xStep_ = (int)(slope * OCCLUSION_X_SCALE);
+        invZ_ = (int)(top.z_ + xPreStep * gradients.dInvZdX_ + yPreStep * gradients.dInvZdY_);
+        invZStep_ = (int)(slope * gradients.dInvZdX_ + gradients.dInvZdY_);
     }
     
-    /// X coordinate
+    /// X coordinate.
     int x_;
-    /// X coordinate step
-    int x_Step;
-    /// Inverse Z
-    int mInvZ;
-    /// Inverse Z step
-    int mInvZStep;
+    /// X coordinate step.
+    int xStep_;
+    /// Inverse Z.
+    int invZ_;
+    /// Inverse Z step.
+    int invZStep_;
 };
 
 void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
@@ -773,20 +773,20 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         int* endRow = buffer_ + middleY * width_;
         while (row < endRow)
         {
-            int invZ = topToBottom.mInvZ;
+            int invZ = topToBottom.invZ_;
             int* dest = row + (topToBottom.x_ >> 16);
             int* end = row + (topToMiddle.x_ >> 16);
             while (dest < end)
             {
                 if (invZ < *dest)
                     *dest = invZ;
-                invZ += gradients.mDInvZdXInt;
+                invZ += gradients.dInvZdXInt_;
                 ++dest;
             }
             
-            topToBottom.x_ += topToBottom.x_Step;
-            topToBottom.mInvZ += topToBottom.mInvZStep;
-            topToMiddle.x_ += topToMiddle.x_Step;
+            topToBottom.x_ += topToBottom.xStep_;
+            topToBottom.invZ_ += topToBottom.invZStep_;
+            topToMiddle.x_ += topToMiddle.xStep_;
             row += width_;
         }
         
@@ -795,20 +795,20 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         endRow = buffer_ + bottoy_ * width_;
         while (row < endRow)
         {
-            int invZ = topToBottom.mInvZ;
+            int invZ = topToBottom.invZ_;
             int* dest = row + (topToBottom.x_ >> 16);
             int* end = row + (middleToBottom.x_ >> 16);
             while (dest < end)
             {
                 if (invZ < *dest)
                     *dest = invZ;
-                invZ += gradients.mDInvZdXInt;
+                invZ += gradients.dInvZdXInt_;
                 ++dest;
             }
             
-            topToBottom.x_ += topToBottom.x_Step;
-            topToBottom.mInvZ += topToBottom.mInvZStep;
-            middleToBottom.x_ += middleToBottom.x_Step;
+            topToBottom.x_ += topToBottom.xStep_;
+            topToBottom.invZ_ += topToBottom.invZStep_;
+            middleToBottom.x_ += middleToBottom.xStep_;
             row += width_;
         }
     }
@@ -819,20 +819,20 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         int* endRow = buffer_ + middleY * width_;
         while (row < endRow)
         {
-            int invZ = topToMiddle.mInvZ;
+            int invZ = topToMiddle.invZ_;
             int* dest = row + (topToMiddle.x_ >> 16);
             int* end = row + (topToBottom.x_ >> 16);
             while (dest < end)
             {
                 if (invZ < *dest)
                     *dest = invZ;
-                invZ += gradients.mDInvZdXInt;
+                invZ += gradients.dInvZdXInt_;
                 ++dest;
             }
             
-            topToMiddle.x_ += topToMiddle.x_Step;
-            topToMiddle.mInvZ += topToMiddle.mInvZStep;
-            topToBottom.x_ += topToBottom.x_Step;
+            topToMiddle.x_ += topToMiddle.xStep_;
+            topToMiddle.invZ_ += topToMiddle.invZStep_;
+            topToBottom.x_ += topToBottom.xStep_;
             row += width_;
         }
         
@@ -841,20 +841,20 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices)
         endRow = buffer_ + bottoy_ * width_;
         while (row < endRow)
         {
-            int invZ = middleToBottom.mInvZ;
+            int invZ = middleToBottom.invZ_;
             int* dest = row + (middleToBottom.x_ >> 16);
             int* end = row + (topToBottom.x_ >> 16);
             while (dest < end)
             {
                 if (invZ < *dest)
                     *dest = invZ;
-                invZ += gradients.mDInvZdXInt;
+                invZ += gradients.dInvZdXInt_;
                 ++dest;
             }
             
-            middleToBottom.x_ += middleToBottom.x_Step;
-            middleToBottom.mInvZ += middleToBottom.mInvZStep;
-            topToBottom.x_ += topToBottom.x_Step;
+            middleToBottom.x_ += middleToBottom.xStep_;
+            middleToBottom.invZ_ += middleToBottom.invZStep_;
+            topToBottom.x_ += topToBottom.xStep_;
             row += width_;
         }
     }

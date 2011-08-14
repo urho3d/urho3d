@@ -33,7 +33,7 @@ static const int MAX_TEXTURE_QUALITY_LEVELS = 3;
 
 class XMLFile;
 
-/// Base class for texture resources
+/// Base class for texture resources.
 class Texture : public Resource, public GPUObject
 {
 public:

@@ -25,7 +25,7 @@
 
 #include "BorderImage.h"
 
-/// Window movement and resizing modes.
+/// %Window movement and resizing modes.
 enum WindowDragMode
 {
     DRAG_NONE,
@@ -40,7 +40,7 @@ enum WindowDragMode
     DRAG_RESIZE_LEFT
 };
 
-/// Window UI element that can optionally by moved or resized.
+/// %Window %UI element that can optionally by moved or resized.
 class Window : public BorderImage
 {
     OBJECT(Window);

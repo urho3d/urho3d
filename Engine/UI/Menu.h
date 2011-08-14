@@ -25,7 +25,7 @@
 
 #include "Button.h"
 
-/// Menu UI element that optionally shows a popup.
+/// %Menu %UI element that optionally shows a popup.
 class Menu : public Button
 {
     OBJECT(Menu);

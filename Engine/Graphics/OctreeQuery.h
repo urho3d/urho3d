@@ -90,7 +90,7 @@ public:
     Vector3 point_;
 };
 
-/// Sphere octree query.
+/// %Sphere octree query.
 class SphereOctreeQuery : public OctreeQuery
 {
 public:
@@ -132,7 +132,7 @@ public:
     BoundingBox box_;
 };
 
-/// Frustum octree query.
+/// %Frustum octree query.
 class FrustumOctreeQuery : public OctreeQuery
 {
 public:
@@ -153,7 +153,7 @@ public:
     Frustum frustum_;
 };
 
-/// Frustum octree query with occlusion.
+/// %Frustum octree query with occlusion.
 class OccludedFrustumOctreeQuery : public OctreeQuery
 {
 public:

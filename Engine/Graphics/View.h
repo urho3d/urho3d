@@ -38,7 +38,7 @@ struct Viewport;
 
 static const int MAX_LIGHT_SPLITS = 6;
 
-/// Geometry view space depth minimum and maximum values.
+/// %Geometry view space depth minimum and maximum values.
 struct GeometryDepthBounds
 {
     /// Minimum value.

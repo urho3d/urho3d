@@ -45,7 +45,7 @@ static const unsigned SMOOTH_POSITION = 1;
 /// Ongoing rotation smoothing.
 static const unsigned SMOOTH_ROTATION = 2;
 
-/// Scene node that may contain components and child nodes.
+/// %Scene node that may contain components and child nodes.
 class Node : public Serializable
 {
     OBJECT(Node);

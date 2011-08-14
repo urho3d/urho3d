@@ -103,7 +103,6 @@ Urho3D.exe understands the following command line options:
 -noshadows  Disable rendering of shadows
 -nosound    Disable sound output
 -noip       Disable sound mixing interpolation
--8bit       Force 8-bit audio output
 -sm2        Force SM2.0 rendering
 \endverbatim
 
@@ -130,9 +129,9 @@ The libraries are the following:
 - %Script. Provides scripting support using the AngelScript language.
 - %Engine. Instantiates the subsystems from the libraries above, and manages the main loop iteration.
 
-Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however due to the CMake build process all the libraries above get automatically linked (as Engine library depends on all of them.)
+Urho3D.exe uses just the Engine & Script libraries to start up the subsystems and to load the script file specified on the command line; however all of the libraries above get automatically linked as Engine library depends on all of them.
 
-Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the script subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
+Although Urho3D.exe itself is geared towards running a scripted application, it is also possible to use the engine through C++ only. When the scripting subsystem initialization is completely skipped, the resulting executable will also be significantly smaller.
 
 The third-party libraries are used for the following functionality:
 
@@ -193,7 +192,7 @@ Scene@ helloScene;
 
 Now we can define the Start() function. First of all we create the 3D scene. Note the lack of "new" keyword. Then we branch off to further initialization functions that will be explained below.
 
-Note: Urho3D has modified AngelScript to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the line would have to read "@helloScene = Scene()".
+Urho3D has modified AngelScript to allow object handle assignment without the @ symbol, if the object in question does not support value assignment. None of the Urho3D reference-counted objects, such as Scene, support value assignment. In unmodified AngelScript the first line of Start() would have to read "@helloScene = Scene()".
 
 \code
 void Start()

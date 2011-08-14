@@ -49,7 +49,7 @@ class VertexBuffer;
 
 typedef Map<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
-/// Graphics subsystem. Manages the application window, rendering state and GPU resources.
+/// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class Graphics : public Object
 {
     OBJECT(Graphics);

@@ -28,7 +28,7 @@
 #include "GraphicsDefs.h"
 #include "ArrayPtr.h"
 
-/// Hardware index buffer
+/// Hardware index buffer.
 class IndexBuffer : public Object, public GPUObject
 {
     OBJECT(IndexBuffer);

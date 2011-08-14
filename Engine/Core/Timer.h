@@ -25,7 +25,7 @@
 
 #include "Object.h"
 
-/// Time and frame counter subsystem.
+/// %Time and frame counter subsystem.
 class Time : public Object
 {
     OBJECT(Time);

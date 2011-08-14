@@ -57,7 +57,7 @@ struct DelayedMethodCall
     VariantVector parameters_;
 };
 
-/// Script object component.
+/// %Script object component.
 class ScriptInstance : public Component, public ScriptEventListener
 {
     OBJECT(ScriptInstance);

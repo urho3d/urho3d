@@ -46,7 +46,7 @@ struct ResourceGroup
     Map<StringHash, SharedPtr<Resource> > resources_;
 };
 
-/// Resource cache subsystem. Loads resources on demand and stores them for later access.
+/// %Resource cache subsystem. Loads resources on demand and stores them for later access.
 class ResourceCache : public Object
 {
     OBJECT(ResourceCache);

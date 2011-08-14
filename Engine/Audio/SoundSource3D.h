@@ -27,7 +27,7 @@
 
 class Audio;
 
-/// Sound source component with three-dimensional position.
+/// %Sound source component with three-dimensional position.
 class SoundSource3D : public SoundSource
 {
     OBJECT(SoundSource3D);

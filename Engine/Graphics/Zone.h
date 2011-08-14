@@ -26,7 +26,7 @@
 #include "Color.h"
 #include "Drawable.h"
 
-/// Component that describes global rendering properties
+/// %Component that describes global rendering properties
 class Zone : public Drawable
 {
     OBJECT(Zone);

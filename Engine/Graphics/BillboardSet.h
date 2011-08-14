@@ -50,7 +50,7 @@ struct Billboard
     float sortDistance_;
 };
 
-/// Billboard component.
+/// %Billboard component.
 class BillboardSet : public Drawable
 {
     OBJECT(BillboardSet);

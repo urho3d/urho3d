@@ -61,7 +61,7 @@ public:
     void ClearDataLost();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture.
     void UpdateParameters();
-
+    
     /// Return texture's OpenGL target.
     unsigned GetTarget() const { return target_; }
     /// Return texture format.
