@@ -63,6 +63,8 @@ Here we implement only the C++ interface (Assimp::Exporter).
 #include "MakeVerboseFormat.h"
 #include "ConvertToLHProcess.h"
 
+#include <memory>
+
 namespace Assimp {
 
 // PostStepRegistry.cpp
