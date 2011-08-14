@@ -103,7 +103,8 @@ void Thread::SetPriority(int priority)
     #ifdef WIN32
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
-    #else
+    #endif
+    #ifdef __linux__
     pthread_t* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);
