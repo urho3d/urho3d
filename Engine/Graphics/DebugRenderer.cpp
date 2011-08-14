@@ -92,24 +92,24 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
     Vector3 v4(max.x_, min.y_, max.z_);
     Vector3 v5(min.x_, max.y_, max.z_);
     
-    unsigned d3dColor = color.ToUInt();
+    unsigned uintColor = color.ToUInt();
     
     PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->Push(DebugLine(min, v0, d3dColor));
-    dest->Push(DebugLine(v0, v1, d3dColor));
-    dest->Push(DebugLine(v1, v2, d3dColor));
-    dest->Push(DebugLine(v2, min, d3dColor));
-    dest->Push(DebugLine(v3, v4, d3dColor));
-    dest->Push(DebugLine(v4, max, d3dColor));
-    dest->Push(DebugLine(max, v5, d3dColor));
-    dest->Push(DebugLine(v5, v3, d3dColor));
-    dest->Push(DebugLine(min, v3, d3dColor));
-    dest->Push(DebugLine(v0, v4, d3dColor));
-    dest->Push(DebugLine(v1, max, d3dColor));
-    dest->Push(DebugLine(v2, v5, d3dColor));
+    dest->Push(DebugLine(min, v0, uintColor));
+    dest->Push(DebugLine(v0, v1, uintColor));
+    dest->Push(DebugLine(v1, v2, uintColor));
+    dest->Push(DebugLine(v2, min, uintColor));
+    dest->Push(DebugLine(v3, v4, uintColor));
+    dest->Push(DebugLine(v4, max, uintColor));
+    dest->Push(DebugLine(max, v5, uintColor));
+    dest->Push(DebugLine(v5, v3, uintColor));
+    dest->Push(DebugLine(min, v3, uintColor));
+    dest->Push(DebugLine(v0, v4, uintColor));
+    dest->Push(DebugLine(v1, max, uintColor));
+    dest->Push(DebugLine(v2, v5, uintColor));
 }
 
 void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
@@ -126,47 +126,47 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
     Vector3 v6(transform * Vector3(max.x_, max.y_, max.z_));
     Vector3 v7(transform * Vector3(min.x_, max.y_, max.z_));
     
-    unsigned d3dColor = color.ToUInt();
+    unsigned uintColor = color.ToUInt();
     
     PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->Push(DebugLine(v0, v1, d3dColor));
-    dest->Push(DebugLine(v1, v2, d3dColor));
-    dest->Push(DebugLine(v2, v3, d3dColor));
-    dest->Push(DebugLine(v3, v0, d3dColor));
-    dest->Push(DebugLine(v4, v5, d3dColor));
-    dest->Push(DebugLine(v5, v6, d3dColor));
-    dest->Push(DebugLine(v6, v7, d3dColor));
-    dest->Push(DebugLine(v7, v4, d3dColor));
-    dest->Push(DebugLine(v0, v4, d3dColor));
-    dest->Push(DebugLine(v1, v5, d3dColor));
-    dest->Push(DebugLine(v2, v6, d3dColor));
-    dest->Push(DebugLine(v3, v7, d3dColor));
+    dest->Push(DebugLine(v0, v1, uintColor));
+    dest->Push(DebugLine(v1, v2, uintColor));
+    dest->Push(DebugLine(v2, v3, uintColor));
+    dest->Push(DebugLine(v3, v0, uintColor));
+    dest->Push(DebugLine(v4, v5, uintColor));
+    dest->Push(DebugLine(v5, v6, uintColor));
+    dest->Push(DebugLine(v6, v7, uintColor));
+    dest->Push(DebugLine(v7, v4, uintColor));
+    dest->Push(DebugLine(v0, v4, uintColor));
+    dest->Push(DebugLine(v1, v5, uintColor));
+    dest->Push(DebugLine(v2, v6, uintColor));
+    dest->Push(DebugLine(v3, v7, uintColor));
 }
 
 void DebugRenderer::AddFrustum(const Frustum& frustum, const Color& color, bool depthTest)
 {
     const Vector3* vertices = frustum.vertices_;
-    unsigned d3dColor = color.ToUInt();
+    unsigned uintColor = color.ToUInt();
     
     PODVector<DebugLine>* dest = &lines_;
     if (!depthTest)
         dest = &noDepthLines_;
     
-    dest->Push(DebugLine(vertices[0], vertices[1], d3dColor));
-    dest->Push(DebugLine(vertices[1], vertices[2], d3dColor));
-    dest->Push(DebugLine(vertices[2], vertices[3], d3dColor));
-    dest->Push(DebugLine(vertices[3], vertices[0], d3dColor));
-    dest->Push(DebugLine(vertices[4], vertices[5], d3dColor));
-    dest->Push(DebugLine(vertices[5], vertices[6], d3dColor));
-    dest->Push(DebugLine(vertices[6], vertices[7], d3dColor));
-    dest->Push(DebugLine(vertices[7], vertices[4], d3dColor));
-    dest->Push(DebugLine(vertices[0], vertices[4], d3dColor));
-    dest->Push(DebugLine(vertices[1], vertices[5], d3dColor));
-    dest->Push(DebugLine(vertices[2], vertices[6], d3dColor));
-    dest->Push(DebugLine(vertices[3], vertices[7], d3dColor));
+    dest->Push(DebugLine(vertices[0], vertices[1], uintColor));
+    dest->Push(DebugLine(vertices[1], vertices[2], uintColor));
+    dest->Push(DebugLine(vertices[2], vertices[3], uintColor));
+    dest->Push(DebugLine(vertices[3], vertices[0], uintColor));
+    dest->Push(DebugLine(vertices[4], vertices[5], uintColor));
+    dest->Push(DebugLine(vertices[5], vertices[6], uintColor));
+    dest->Push(DebugLine(vertices[6], vertices[7], uintColor));
+    dest->Push(DebugLine(vertices[7], vertices[4], uintColor));
+    dest->Push(DebugLine(vertices[0], vertices[4], uintColor));
+    dest->Push(DebugLine(vertices[1], vertices[5], uintColor));
+    dest->Push(DebugLine(vertices[2], vertices[6], uintColor));
+    dest->Push(DebugLine(vertices[3], vertices[7], uintColor));
 }
 
 void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest)

@@ -583,7 +583,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         color = &Color::WHITE;
     else
         color = &Color::GREEN;
-    unsigned colorUInt = color->ToUInt();
+    unsigned uintColor = color->ToUInt();
     
     // Drawing all the debug geometries of a large world may be expensive (especially triangle meshes)
     // so check the geometry AABB against the debug geometry frustum first
@@ -621,13 +621,13 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 
                 start = transform * Vector3(a, b, 0.0f);
                 end = transform * Vector3(c, d, 0.0f);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 start = transform * Vector3(a, 0.0f, b);
                 end = transform * Vector3(c, 0.0f, d);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 start = transform * Vector3(0.0f, a, b);
                 end = transform * Vector3(0.0f, c, d);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
             }
         }
         break;
@@ -658,30 +658,30 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 
                 start = transform * Vector3(a, b, 0.5f * length);
                 end = transform * Vector3(c, d, 0.5f * length);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 start = transform * Vector3(a, b, -0.5f * length);
                 end = transform * Vector3(c, d, -0.5f * length);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 if (!(i & 1))
                 {
                     start = transform * Vector3(a, b, 0.5f * length);
                     end = transform * Vector3(a, b, -0.5f * length);
-                    debug->AddLine(start, end, colorUInt, depthTest);
+                    debug->AddLine(start, end, uintColor, depthTest);
                 }
                 if (b > -M_EPSILON)
                 {
                     start = transform * Vector3(a, 0.0f, b + 0.5f * length);
                     end = transform * Vector3(c, 0.0f, d + 0.5f * length);
-                    debug->AddLine(start, end, colorUInt, depthTest);
+                    debug->AddLine(start, end, uintColor, depthTest);
                     start = transform * Vector3(0.0f, a, b + 0.5f * length);
                     end = transform * Vector3(0.0f, c, d + 0.5f * length);
-                    debug->AddLine(start, end, colorUInt, depthTest);
+                    debug->AddLine(start, end, uintColor, depthTest);
                     start = transform * Vector3(a, 0.0f, -b - 0.5f * length);
                     end = transform * Vector3(c, 0.0f, -d - 0.5f * length);
-                    debug->AddLine(start, end, colorUInt, depthTest);
+                    debug->AddLine(start, end, uintColor, depthTest);
                     start = transform * Vector3(0.0f, a, -b - 0.5f * length);
                     end = transform * Vector3(0.0f, c, -d - 0.5f * length);
-                    debug->AddLine(start, end, colorUInt, depthTest);
+                    debug->AddLine(start, end, uintColor, depthTest);
                 }
             }
         }
@@ -703,13 +703,13 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 
                 start = transform * Vector3(a, b, 0.5f * length);
                 end = transform * Vector3(c, d, 0.5f * length);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 start = transform * Vector3(a, b, -0.5f * length);
                 end = transform * Vector3(c, d, -0.5f * length);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
                 start = transform * Vector3(a, b, 0.5f * length);
                 end = transform * Vector3(a, b, -0.5f * length);
-                debug->AddLine(start, end, colorUInt, depthTest);
+                debug->AddLine(start, end, uintColor, depthTest);
             }
         }
         break;
@@ -729,9 +729,9 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 Vector3 v1 = transform * vertices[indices[i + 1]];
                 Vector3 v2 = transform * vertices[indices[i + 2]];
                 
-                debug->AddLine(v0, v1, colorUInt, depthTest);
-                debug->AddLine(v1, v2, colorUInt, depthTest);
-                debug->AddLine(v2, v0, colorUInt, depthTest);
+                debug->AddLine(v0, v1, uintColor, depthTest);
+                debug->AddLine(v1, v2, uintColor, depthTest);
+                debug->AddLine(v2, v0, uintColor, depthTest);
             }
         }
         break;
@@ -755,8 +755,8 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                     Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                     Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
                     Vector3 c = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
-                    debug->AddLine(a, b, colorUInt, depthTest);
-                    debug->AddLine(a, c, colorUInt, depthTest);
+                    debug->AddLine(a, b, uintColor, depthTest);
+                    debug->AddLine(a, c, uintColor, depthTest);
                 }
             }
             for (unsigned z = 0; z < zPoints - 1; ++z)
@@ -765,7 +765,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 
                 Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                 Vector3 b = transform * Vector3(xBase + x * xSpacing, heights[(z + 1) * xPoints + x], zBase + (z + 1) * zSpacing);
-                debug->AddLine(a, b, colorUInt, depthTest);
+                debug->AddLine(a, b, uintColor, depthTest);
             }
             for (unsigned x = 0; x < xPoints - 1; ++x)
             {
@@ -773,7 +773,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 
                 Vector3 a = transform * Vector3(xBase + x * xSpacing, heights[z * xPoints + x], zBase + z * zSpacing);
                 Vector3 b = transform * Vector3(xBase + (x + 1) * xSpacing, heights[z * xPoints + x + 1], zBase + z * zSpacing);
-                debug->AddLine(a, b, colorUInt, depthTest);
+                debug->AddLine(a, b, uintColor, depthTest);
             }
         }
         break;
