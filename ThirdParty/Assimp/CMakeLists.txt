@@ -620,18 +620,20 @@ SET ( CONTRIB_FILES
 )
 
 ADD_LIBRARY( Assimp STATIC
-    ${SOURCE_FILES}
-    ${CONTRIB_FILES}
+	${SOURCE_FILES}
+	${CONTRIB_FILES}
 	${PUBLIC_HEADERS}
 	${COMPILER_HEADERS}
 )
 
 if (MSVC)
     foreach(FILE ${SOURCE_FILES})
-        if (${FILE} MATCHES "AssimpPCH.cpp$")
-            set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YcAssimpPCH.h")
-        else()
-            set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YuAssimpPCH.h")
-        endif()
+        if (${FILE} MATCHES "[A-Za-z0-9 _/]*[.]cpp")
+            if (${FILE} MATCHES "AssimpPCH.cpp$")
+                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YcAssimpPCH.h")
+            else ()
+                set_source_files_properties(${FILE} PROPERTIES COMPILE_FLAGS "/YuAssimpPCH.h")
+            endif ()
+        endif ()
     endforeach ()
 endif ()
