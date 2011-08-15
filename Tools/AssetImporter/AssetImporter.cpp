@@ -1081,12 +1081,12 @@ void BuildAndSaveScene(OutScene& scene)
     
     if (createZone_)
     {
-        Node* zoneNode = outScene->CreateChild("Zone");
+        Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
         Zone* zone = zoneNode->CreateComponent<Zone>();
         zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
         zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
         
-        Node* lightNode = outScene->CreateChild("GlobalLight");
+        Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
         Light* light = lightNode->CreateComponent<Light>();
         light->SetLightType(LIGHT_DIRECTIONAL);
         lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
@@ -1099,7 +1099,7 @@ void BuildAndSaveScene(OutScene& scene)
         const OutModel& model = scene.models_[scene.nodeModelIndices_[i]];
         
         // Create a static model component for each node
-        Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName));
+        Node* modelNode = outScene->CreateChild(FromAIString(scene.nodes_[i]->mName), localIDs_ ? LOCAL : REPLICATED);
         StaticModel* staticModel = modelNode->CreateComponent<StaticModel>();
         
         // Create a dummy model so that the reference can be stored

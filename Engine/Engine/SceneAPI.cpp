@@ -79,6 +79,23 @@ static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)
     return SharedPtrVectorToHandleArray<PackageFile>(ptr->GetRequiredPackageFiles(), "Array<PackageFile@>");
 }
 
+static CScriptArray* GetAvailableComponents(Scene* ptr)
+{
+    const Map<ShortStringHash, SharedPtr<ObjectFactory> >& factories = GetScriptContext()->GetObjectFactories();
+    Vector<String> components;
+    
+    // Simply try to create each of the objects, and check which derive from Component.
+    // This assumes that creating any of them does not have harmful side-effects
+    for (Map<ShortStringHash, SharedPtr<ObjectFactory> >::ConstIterator i = factories.Begin(); i != factories.End(); ++i)
+    {
+        SharedPtr<Object> object = i->second_->CreateObject();
+        if (dynamic_cast<Component*>(object.Get()))
+            components.Push(object->GetTypeName());
+    }
+    
+    return VectorToArray<String>(components, "Array<String>");
+}
+
 static void RegisterScene(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint FIRST_REPLICATED_ID", (void*)&FIRST_REPLICATED_ID);
@@ -120,6 +137,8 @@ static void RegisterScene(asIScriptEngine* engine)
     
     // Register Variant GetPtr() for Scene
     engine->RegisterObjectMethod("Variant", "Scene@+ GetScene() const", asFUNCTION(GetVariantPtr<Scene>), asCALL_CDECL_OBJLAST);
+
+    engine->RegisterGlobalFunction("Array<String>@ GetAvailableComponents()", asFUNCTION(GetAvailableComponents), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

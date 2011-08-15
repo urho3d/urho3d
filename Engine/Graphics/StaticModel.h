@@ -55,7 +55,7 @@ public:
     void SetModel(Model* model);
     /// %Set material on all geometries.
     void SetMaterial(Material* material);
-    /// %Set material on one geometry.
+    /// %Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
     /// %Set software LOD level, used in raycast and occlusion. By default (M_MAX_UNSIGNED) same as visible.
     void SetSoftwareLodLevel(unsigned level);

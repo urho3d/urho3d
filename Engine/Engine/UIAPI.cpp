@@ -384,10 +384,11 @@ static void RegisterFileSelector(asIScriptEngine* engine)
 {
     RegisterObject<FileSelector>(engine, "FileSelector");
     RegisterObjectConstructor<FileSelector>(engine, "FileSelector");
-    engine->RegisterObjectMethod("FileSelector", "void SetTitle(const String&in)", asMETHOD(FileSelector, SetTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void SetButtonTexts(const String&in, const String&in)", asMETHOD(FileSelector, SetButtonTexts), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void SetFilters(Array<String>@+, uint)", asFUNCTION(FileSelectorSetFilters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("FileSelector", "void UpdateElements()", asMETHOD(FileSelector, UpdateElements), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "void set_title(const String&in)", asMETHOD(FileSelector, SetTitle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("FileSelector", "const String& get_title() const", asMETHOD(FileSelector, GetTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void set_path(const String&in)", asMETHOD(FileSelector, SetPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "const String& get_path() const", asMETHOD(FileSelector, GetPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("FileSelector", "void set_fileName(const String&in)", asMETHOD(FileSelector, SetFileName), asCALL_THISCALL);

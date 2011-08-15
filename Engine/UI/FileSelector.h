@@ -80,7 +80,7 @@ public:
     XMLFile* GetStyle() const { return style_; }
     /// Return fileselector window.
     Window* GetWindow() const { return window_; }
-    /// Return window title text.
+    /// Return window title text element.
     Text* GetTitleText() const { return titleText_; }
     /// Return file list.
     ListView* GetFileList() const { return fileList_; }
@@ -96,6 +96,8 @@ public:
     Button* GetCancelButton() const { return cancelButton_; }
     /// Return close button.
     Button* GetCloseButton() const { return closeButton_; }
+    /// Return window title.
+    const String& GetTitle() const;
     /// Return current path.
     const String& GetPath() const { return path_; }
     /// Return current filename.

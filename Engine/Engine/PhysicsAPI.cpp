@@ -128,6 +128,7 @@ static void RegisterCollisionShape(asIScriptEngine* engine)
     engine->RegisterObjectMethod("CollisionShape", "void SetHeightfield(Model@+, uint, uint, float, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetHeightfield), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetConvexHull(Model@+, float, uint, const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetConvexHull), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHOD(CollisionShape, SetTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod("CollisionShape", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(CollisionShape, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "Model@+ get_model()", asMETHOD(CollisionShape, GetModel), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "ShapeType get_shapeType()", asMETHOD(CollisionShape, GetShapeType), asCALL_THISCALL);
     engine->RegisterObjectMethod("CollisionShape", "void set_position(const Vector3&in)", asMETHOD(CollisionShape, SetPosition), asCALL_THISCALL);

@@ -5252,13 +5252,16 @@ int asCCompiler::DoAssignment(asSExprContext *ctx, asSExprContext *lctx, asSExpr
 		}
 
 		// It is not allowed to do a handle assignment on a property accessor that
-		//  doesn't take a handle in the set accessor.
-		if( lctx->property_set && 
-			lctx->type.isExplicitHandle && 
-			!engine->scriptFunctions[lctx->property_set]->parameterTypes[0].IsObjectHandle() )
+		// doesn't take a handle in the set accessor.
+		// Urho3D: check the last argument, not the first (in case of indexed properties)
+		if( lctx->property_set && lctx->type.isExplicitHandle)
 		{
-			Error(TXT_HANDLE_ASSIGN_ON_NON_HANDLE_PROP, opNode);
-			return -1;
+			asCArray<asCDataType>& parameterTypes = engine->scriptFunctions[lctx->property_set]->parameterTypes;
+			if( !parameterTypes[parameterTypes.GetLength() - 1].IsObjectHandle() )
+			{
+				Error(TXT_HANDLE_ASSIGN_ON_NON_HANDLE_PROP, opNode);
+				return -1;
+			}
 		}
 
 		MergeExprBytecodeAndType(ctx, lctx);

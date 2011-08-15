@@ -110,7 +110,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "bool Exists(const String&in) const", asMETHODPR(ResourceCache, Exists, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "File@ GetFile(const String&in)", asFUNCTION(ResourceCacheGetFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "String GetPreferredResourceDir(const String&in)", asMETHOD(ResourceCache, GetPreferredResourceDir), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(ShortStringHash, StringHash)", asFUNCTION(ResourceCacheGetResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetResource(const String&in, const String&in)", asMETHODPR(ResourceCache, GetResource, (ShortStringHash, StringHash), Resource*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
@@ -193,7 +194,7 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool SetVector4(const String&in, const Vector3&in)", asMETHOD(XMLElement, SetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "uint GetNumAttributes() const", asMETHOD(XMLElement, GetNumAttributes), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool HasAttribute(const String&in) const", asMETHOD(XMLElement, HasAttribute), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "String GetAttributes(const String&in) const", asMETHOD(XMLElement, GetAttribute), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "String GetAttribute(const String&in) const", asMETHOD(XMLElement, GetAttribute), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Array<String>@ GetAttributeNames() const", asFUNCTION(XMLElementGetAttributeNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "bool HasChild(const String&in) const", asMETHOD(XMLElement, HasChild), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement GetChild(const String&in name = String()) const", asMETHOD(XMLElement, GetChild), asCALL_THISCALL);
@@ -217,7 +218,7 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "Vector4 GetVector4(const String&in) const", asMETHOD(XMLElement, GetVector4), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_name() const", asMETHOD(XMLElement, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "String get_text() const", asMETHOD(XMLElement, GetText), asCALL_THISCALL);
-    engine->RegisterObjectMethod("XMLElement", "bool get_null() const", asMETHOD(XMLElement, IsNull), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool get_isNull() const", asMETHOD(XMLElement, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool get_notNull() const", asMETHOD(XMLElement, NotNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement get_parent() const", asMETHOD(XMLElement, GetParent), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLFile@+ get_file() const", asMETHOD(XMLElement, GetFile), asCALL_THISCALL);

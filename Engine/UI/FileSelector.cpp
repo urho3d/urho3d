@@ -277,6 +277,11 @@ void FileSelector::UpdateElements()
     buttonLayout_->SetFixedHeight(Max(okButton_->GetHeight(), cancelButton_->GetHeight()));
 }
 
+const String& FileSelector::GetTitle() const
+{
+    return titleText_->GetText();
+}
+
 const String& FileSelector::GetFileName() const
 {
     return fileNameEdit_->GetText();

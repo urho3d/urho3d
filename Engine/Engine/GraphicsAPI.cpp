@@ -58,7 +58,7 @@ static void RegisterCamera(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Camera", "void set_farClip(float)", asMETHOD(Camera, SetFarClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_farClip() const", asMETHOD(Camera, GetFarClip), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_fov(float)", asMETHOD(Camera, SetFov), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Camera", "float get_fov() const", asMETHOD(Camera, SetFov), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Camera", "float get_fov() const", asMETHOD(Camera, GetFov), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_orthoSize(float)", asMETHODPR(Camera, SetOrthoSize, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "float get_orthoSize() const", asMETHOD(Camera, GetOrthoSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Camera", "void set_aspectRatio(float)", asMETHOD(Camera, SetAspectRatio), asCALL_THISCALL);
@@ -338,8 +338,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "Technique@+ get_technique(uint)", asMETHOD(Material, GetTechnique), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_shaderParameter(const String&in, const Vector4&in)", asMETHOD(Material, SetShaderParameter), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Vector4 get_shaderParameter(const String&in) const", asFUNCTION(MaterialGetShaderParameter), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Material", "void set_texture(TextureUnit, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Material", "Texture@+ get_texture(TextureUnit) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_cullMode(CullMode)", asMETHOD(Material, SetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHOD(Material, GetCullMode), asCALL_THISCALL);
@@ -943,6 +943,7 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterMaterial(engine);
     RegisterModel(engine);
     RegisterAnimation(engine);
+    RegisterDebugRenderer(engine);
     RegisterDrawable(engine);
     RegisterLight(engine);
     RegisterZone(engine);
@@ -952,7 +953,6 @@ void RegisterGraphicsAPI(asIScriptEngine* engine)
     RegisterAnimationController(engine);
     RegisterBillboardSet(engine);
     RegisterParticleEmitter(engine);
-    RegisterDebugRenderer(engine);
     RegisterOctree(engine);
     RegisterGraphics(engine);
     RegisterRenderer(engine);

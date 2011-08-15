@@ -332,6 +332,11 @@ static void ConstructQuaternionEuler(float angleX, float angleY, float angleZ, Q
     new(ptr) Quaternion(angleX, angleY, angleZ);
 }
 
+static void ConstructQuaternionEulerVector(const Vector3& angles, Quaternion* ptr)
+{
+    new(ptr) Quaternion(angles.x_, angles.y_, angles.z_);
+}
+
 static void ConstructQuaternionRotation(const Vector3& start, const Vector3& end, Quaternion* ptr)
 {
     new(ptr) Quaternion(start, end);
@@ -345,6 +350,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructQuaternionInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, const Vector3&in)", asFUNCTION(ConstructQuaternionAngleAxis), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(ConstructQuaternionEuler), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructQuaternionEulerVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(ConstructQuaternionRotation), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Quaternion", "Quaternion& opAssign(const Quaternion&in)", asMETHOD(Quaternion, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion& opAddAssign(const Quaternion&in)", asMETHOD(Quaternion, operator +=), asCALL_THISCALL);

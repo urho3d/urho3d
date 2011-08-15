@@ -597,7 +597,8 @@ template <class T> void RegisterDrawable(asIScriptEngine* engine, const char* cl
 {
     RegisterComponent<T>(engine, className);
     RegisterSubclass<Drawable, T>(engine, "Drawable", className);
-    engine->RegisterObjectMethod(className, "bool IsInView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(T, DrawDebugGeometry), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_inView() const", asFUNCTION(DrawableIsInView), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_castShadows(bool)", asMETHOD(T, SetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_castShadows() const", asMETHOD(T, GetCastShadows), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_occluder(bool)", asMETHOD(T, SetOccluder), asCALL_THISCALL);
