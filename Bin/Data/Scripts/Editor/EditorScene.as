@@ -140,7 +140,7 @@ void ReloadResources()
         cache.ReloadResource(sceneResources[i]);
 }
 
-void LoadScene(String fileName)
+void LoadScene(const String&in fileName)
 {
     // Always load the scene from the filesystem, not from resource paths
     if (!fileSystem.FileExists(fileName))
@@ -148,6 +148,10 @@ void LoadScene(String fileName)
         log.Error("No such scene " + fileName);
         return;
     }
+
+    File file(fileName, FILE_READ);
+    if (!file.open)
+        return;
 
     // Clear the old scene
     selectedComponent = null;
@@ -157,13 +161,12 @@ void LoadScene(String fileName)
     // Add the new resource path
     SetResourcePath(cache.GetPreferredResourceDir(GetPath(fileName)));
 
-    File file(fileName, FILE_READ);
     String extension = GetExtension(fileName);
     if (extension != ".xml")
         editorScene.Load(file);
     else
         editorScene.LoadXML(file);
-    
+
     sceneFileName = fileName;
     sceneModified = false;
     runPhysics = false;
@@ -173,7 +176,7 @@ void LoadScene(String fileName)
     ResetCamera();
 }
 
-void SaveScene(String fileName)
+void SaveScene(const String&in fileName)
 {
     if (fileName.empty || GetFileName(fileName).empty)
         return;
@@ -267,7 +270,7 @@ void ScenePostRenderUpdate()
     SceneRaycast(false);
 }
 
-void sceneMouseClick()
+void SceneMouseClick()
 {
     SceneRaycast(true);
 }

@@ -101,7 +101,7 @@ class asIScriptEngine;
 /// Base class for %UI elements.
 class UIElement : public Object
 {
-    OBJECT(Element);
+    OBJECT(UIElement);
     
 public:
     /// Construct.

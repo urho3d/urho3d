@@ -768,7 +768,7 @@ The XML data for each UI element follows. Everything is optional and defaults wi
 \subsection UI_UIElement UIElement
 
 \code
-<element name="ElementName" type="Element" >
+<element name="ElementName" type="UIElement" >
     <position value="x y" />
     <size value="x y" />
     <width value="x" />

@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 	@brief The main file of kNet that #includes all the commonly used headers for the the 
 	       client application. This file is ideal to be added to a PCH. If you are not using a PCH,
 	       #including the individual files when necessary is most likely faster. */
-
-// Modified by Lasse Öörni for Urho3D
 
 #include "kNetBuildConfig.h"
 #include "kNetFwd.h"
@@ -45,6 +43,7 @@
 #include "kNet/NetworkMessage.h"
 #include "kNet/NetworkServer.h"
 #include "kNet/PolledTimer.h"
+#include "kNet/SerializationStructCompiler.h"
 #include "kNet/SerializedDataIterator.h"
 #include "kNet/SharedPtr.h"
 #include "kNet/Socket.h"

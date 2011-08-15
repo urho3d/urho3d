@@ -322,6 +322,9 @@ SharedPtr<UIElement> UI::LoadLayout(XMLFile* file, XMLFile* styleFile)
     }
     
     String type = rootElem.GetString("type");
+    if (type.Empty())
+        type = "UIElement";
+    
     root = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
     if (!root)
     {
@@ -546,6 +549,9 @@ void UI::LoadLayout(UIElement* current, const XMLElement& elem, XMLFile* styleFi
     {
         // Create element
         String type = childElem.GetString("type");
+        if (type.Empty())
+            type = "UIElement";
+        
         SharedPtr<UIElement> child = DynamicCast<UIElement>(context_->CreateObject(ShortStringHash(type)));
         if (!child)
         {

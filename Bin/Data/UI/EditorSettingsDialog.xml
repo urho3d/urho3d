@@ -1,11 +1,11 @@
-<element type="Window" name="CameraDialog">
+<element type="Window" name="EditorSettingsDialog">
     <movable enable="true" />
     <layout mode="vertical" spacing="4" border="6 6 6 6" />
     <element>
         <fixedheight value="16" />
         <layout mode="horizontal" />
         <element type="Text">
-            <text value="Editor camera settings" />
+            <text value="Editor settings" />
         </element>
         <element type="Button" style="CloseButton" name="CloseButton" />
     </element>

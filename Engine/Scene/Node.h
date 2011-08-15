@@ -346,8 +346,8 @@ private:
     mutable VectorBuffer attrBuffer_;
     /// Consecutive rotation count for rotation renormalization.
     unsigned char rotateCount_;
-    /// Active smoothing flags.
-    unsigned char smoothingFlags_;
+    /// Active smoothing operations bitmask.
+    unsigned char smoothingMask_;
     /// World transform needs update flag.
     mutable bool dirty_;
     /// Smoothed motion flag.

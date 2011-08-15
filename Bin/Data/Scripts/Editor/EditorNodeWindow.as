@@ -83,9 +83,8 @@ void CreateNodeWindow()
     resourceEditors.push(ResourceEditorData("ScriptInstance", "script", "name", "ScriptFile", ".as"));
     resourceEditors.push(ResourceEditorData("ParticleEmitter", "emitter", "name", "XMLFile", ".xml"));
 
-    subscribeToEvent(nodeWindow.getChild("CloseButton", true), "Released", "hideNodeWindow");
-    subscribeToEvent(nodeWindow.getChild("EntityNameEdit", true), "TextFinished", "editEntityName");
-    subscribeToEvent(nodeWindow.getChild("ComponentNameEdit", true), "TextFinished", "editComponentName");
+    subscribeToEvent(nodeWindow.getChild("CloseButton", true), "Released", "HideNodeWindow");
+    subscribeToEvent(nodeWindow.getChild("NodeNameEdit", true), "TextFinished", "EditNodeName");
     */
 }
 

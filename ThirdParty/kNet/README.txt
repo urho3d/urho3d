@@ -2,6 +2,8 @@
 
 kNet is a low-level networking protocol library designed for bit-efficient realtime streaming of custom application-specified messages on top of TCP or UDP. kNet is written in C++.
 
+
+
    Supported Platforms.
 
 kNet has been tested to build on the following platforms:
@@ -9,9 +11,11 @@ kNet has been tested to build on the following platforms:
  - Windows 7 & Visual Studio 2008 Standard
  - Ubuntu 9.04 & GCC 4.4.1
 
+
+
    Building kNet.
 
-kNet uses cmake (2.6 or newer) as its build system. On Linux it depends on boost v1.38.0 or newer for threading support. On Windows a CMake flag USE_BOOST can be used to specify whether to depend on boost or not. By default USE_BOOST is on.
+kNet uses cmake (2.6 or newer) as its build system. On Linux it can use pthreads or boost v1.38.0 or newer for threading support. On Windows a CMake flag USE_BOOST can be used to specify whether to depend on boost or not. By default USE_BOOST is on.
 
 Windows:
  - Install cmake. 
@@ -32,3 +36,26 @@ Linux:
  - run 'make'.
 
 The project output files are placed in the directory kNet/lib.
+
+
+
+   Contributors.
+
+The following people have contributed to the project:
+
+   Toni Alatalo
+   Jukka Jylänki
+   Erno Kuusela
+   Ali Kämäräinen
+   Jonne Nauha
+   Ville Saarinen
+   Cvetan Stefanovski
+   Kari Vatjus-Anttila
+   Lasse Öörni
+
+
+
+   Links.
+
+There exists a Wireshark dissector plugin for kNet: http://chiru.cie.fi/chiru-sharedfolder/knet-tundra-v.0.0.8.tar.gz .
+A SCTP -enabled branch of kNet is being developed at https://bitbucket.org/karivatj/knet-sctp/ .

@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -58,15 +58,18 @@ static const float maxRTOTimeoutValue = 5000.f;
 
 UDPMessageConnection::UDPMessageConnection(Network *owner, NetworkServer *ownerServer, Socket *socket, ConnectionState startingState)
 :MessageConnection(owner, ownerServer, socket, startingState),
-numAcksLastFrame(0), numLossesLastFrame(0), rttVariation(0.f), rttCleared(true),
+retransmissionTimeout(1000.f), numAcksLastFrame(0), numLossesLastFrame(0), smoothedRTT(1000.f), rttVariation(0.f), rttCleared(true), // Set RTT initial values as per RFC 2988.
 lastReceivedInOrderPacketID(0), 
 lastSentInOrderPacketID(0), datagramPacketIDCounter(1),
-packetLossRate(0.f), packetLossCount(0.f), slowModeDelay(0),
+packetLossRate(0.f), packetLossCount(0.f), 
+datagramSendRate(50.f), lowestDatagramSendRateOnPacketLoss(50.f), slowModeDelay(0),
 receivedPacketIDs(64 * 1024), outboundPacketAckTrack(1024),
 previousReceivedPacketID(0), queuedInboundDatagrams(128)
 {
 	LOG(LogObjectAlloc, "Allocated UDPMessageConnection %p.", this);
-	Initialize();
+
+	lastFrameTime = Clock::Tick();
+	lastDatagramSendTime = Clock::Tick();
 }
 
 UDPMessageConnection::~UDPMessageConnection()
@@ -146,18 +149,6 @@ UDPMessageConnection::SocketReadResult UDPMessageConnection::ReadSocket(size_t &
 	if (bytesRead > 0)
 		LOG(LogData, "Received %d bytes from UDP socket.", (int)bytesRead);
 	return SocketReadOK;
-}
-
-void UDPMessageConnection::Initialize()
-{
-	rttCleared = true;
-	retransmissionTimeout = 1000.f;
-	smoothedRTT = 1000.f;
-	rttVariation = 0.f;
-	datagramSendRate = lowestDatagramSendRateOnPacketLoss = 50.f;
-
-	lastFrameTime = Clock::Tick();
-	lastDatagramSendTime = Clock::Tick();
 }
 
 void UDPMessageConnection::PerformPacketAckSends()

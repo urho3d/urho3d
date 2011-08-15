@@ -119,6 +119,9 @@ void ListView::SetStyle(const XMLElement& element)
         AddSelection(selectionElem.GetInt("value"));
         selectionElem = selectionElem.GetNext("selection");
     }
+    
+    // Set the container's layout border to match scroll panel clipping, so that elements are not left partially hidden
+    contentElement_->SetLayoutBorder(scrollPanel_->GetClipBorder());
 }
 
 void ListView::Update(float timeStep)
@@ -250,8 +253,7 @@ void ListView::OnResize()
     ScrollView::OnResize();
     
     // Set the content element width to match the scrollpanel
-    const IntRect& clipBorder = scrollPanel_->GetClipBorder();
-    contentElement_->SetWidth(scrollPanel_->GetWidth() - clipBorder.left_ - clipBorder.right_);
+    contentElement_->SetWidth(scrollPanel_->GetWidth());
 }
 
 void ListView::OnFocus()

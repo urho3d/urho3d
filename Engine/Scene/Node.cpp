@@ -49,7 +49,7 @@ Node::Node(Context* context) :
     targetPosition_(Vector3::ZERO),
     targetRotation_(Quaternion::IDENTITY),
     rotateCount_(0),
-    smoothingFlags_(SMOOTH_NONE),
+    smoothingMask_(SMOOTH_NONE),
     dirty_(false),
     smoothed_(false)
 {
@@ -193,7 +193,7 @@ void Node::SetPosition(const Vector3& position)
     else
     {
         targetPosition_ = position;
-        smoothingFlags_ |= SMOOTH_POSITION;
+        smoothingMask_ |= SMOOTH_POSITION;
     }
 }
 
@@ -208,7 +208,7 @@ void Node::SetRotation(const Quaternion& rotation)
     else
     {
         targetRotation_ = rotation;
-        smoothingFlags_ |= SMOOTH_ROTATION;
+        smoothingMask_ |= SMOOTH_ROTATION;
     }
     rotateCount_ = 0;
 }
@@ -245,7 +245,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation)
     {
         targetPosition_ = position;
         targetRotation_ = rotation;
-        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+        smoothingMask_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
     }
     rotateCount_ = 0;
 }
@@ -261,7 +261,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, flo
     {
         targetPosition_ = position;
         targetRotation_ = rotation;
-        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+        smoothingMask_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
     }
     rotateCount_ = 0;
     scale_ = Vector3(scale, scale, scale);
@@ -280,7 +280,7 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
     {
         targetPosition_ = position;
         targetRotation_ = rotation;
-        smoothingFlags_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
+        smoothingMask_ |= SMOOTH_POSITION | SMOOTH_ROTATION;
     }
     rotateCount_ = 0;
     scale_ = scale;
@@ -292,7 +292,7 @@ void Node::SnapPosition(const Vector3& position)
 {
     position_ = position;
     targetPosition_ = position;
-    smoothingFlags_ &= ~SMOOTH_POSITION;
+    smoothingMask_ &= ~SMOOTH_POSITION;
     if (!dirty_)
         MarkDirty();
 }
@@ -301,7 +301,7 @@ void Node::SnapRotation(const Quaternion& rotation)
 {
     rotation_ = rotation;
     targetRotation_ = rotation;
-    smoothingFlags_ &= ~SMOOTH_ROTATION;
+    smoothingMask_ &= ~SMOOTH_ROTATION;
     rotateCount_ = 0;
     if (!dirty_)
         MarkDirty();
@@ -318,7 +318,7 @@ void Node::Translate(const Vector3& delta)
     else
     {
         targetPosition_ += delta;
-        smoothingFlags_ |= SMOOTH_POSITION;
+        smoothingMask_ |= SMOOTH_POSITION;
     }
 }
 
@@ -333,7 +333,7 @@ void Node::TranslateRelative(const Vector3& delta)
     else
     {
         targetPosition_ += targetRotation_ * delta;
-        smoothingFlags_ |= SMOOTH_POSITION;
+        smoothingMask_ |= SMOOTH_POSITION;
     }
 }
 
@@ -352,7 +352,7 @@ void Node::Rotate(const Quaternion& delta, bool fixedAxis)
             targetRotation_ = targetRotation_ * delta;
         else
             targetRotation_ = delta * targetRotation_;
-        smoothingFlags_ |= SMOOTH_ROTATION;
+        smoothingMask_ |= SMOOTH_ROTATION;
     }
     
     ++rotateCount_;
@@ -801,10 +801,10 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
 
 void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
 {
-    if (!smoothed_ || !smoothingFlags_)
+    if (!smoothed_ || !smoothingMask_)
         return;
     
-    if (smoothingFlags_ & SMOOTH_POSITION)
+    if (smoothingMask_ & SMOOTH_POSITION)
     {
         // If position snaps, snap everything to the end
         float delta = (position_ - targetPosition_).LengthSquared();
@@ -814,18 +814,18 @@ void Node::UpdateSmoothing(float constant, float squaredSnapThreshold)
         if (delta < M_EPSILON || constant >= 1.0f)
         {
             position_ = targetPosition_;
-            smoothingFlags_ &= ~SMOOTH_POSITION;
+            smoothingMask_ &= ~SMOOTH_POSITION;
         }
         else
             position_ = position_.Lerp(targetPosition_, constant);
     }
-    if (smoothingFlags_ & SMOOTH_ROTATION)
+    if (smoothingMask_ & SMOOTH_ROTATION)
     {
         float delta = (rotation_ - targetRotation_).LengthSquared();
         if (delta < M_EPSILON || constant >= 1.0f)
         {
             rotation_ = targetRotation_;
-            smoothingFlags_ &= ~SMOOTH_ROTATION;
+            smoothingMask_ &= ~SMOOTH_ROTATION;
         }
         else
             rotation_ = rotation_.Slerp(targetRotation_, constant);

@@ -40,18 +40,17 @@ Object::~Object()
 
 void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, VariantMap& eventData)
 {
-    // Make a weak pointer to self to check for destruction during event handling
-    WeakPtr<Object> self(this);
+    // Make a copy of the context pointer in case the object is destroyed during event handler invocation
+    Context* context = context_;
     
     // Check first the specific event handlers, which have priority
     Map<Pair<Object*, StringHash>, SharedPtr<EventHandler> >::ConstIterator i = eventHandlers_.Find(
         MakePair(sender, eventType));
     if (i != eventHandlers_.End())
     {
-        context_->SetEventHandler(i->second_);
+        context->SetEventHandler(i->second_);
         i->second_->Invoke(eventType, eventData);
-        if (!self.Expired())
-            context_->SetEventHandler(0);
+        context->SetEventHandler(0);
         return;
     }
     
@@ -59,10 +58,9 @@ void Object::OnEvent(Object* sender, bool broadcast, StringHash eventType, Varia
     i = eventHandlers_.Find(MakePair((Object*)0, eventType));
     if (i != eventHandlers_.End())
     {
-        context_->SetEventHandler(i->second_);
+        context->SetEventHandler(i->second_);
         i->second_->Invoke(eventType, eventData);
-        if (!self.Expired())
-            context_->SetEventHandler(0);
+        context->SetEventHandler(0);
     }
 }
 
@@ -178,12 +176,13 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 {
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
+    Context* context = context_;
     HashSet<Object*> processed;
     
-    context_->BeginSendEvent(this);
+    context->BeginSendEvent(this);
     
     // Check first the specific event receivers
-    const PODVector<Object*>* group = context_->GetReceivers(this, eventType);
+    const PODVector<Object*>* group = context->GetReceivers(this, eventType);
     if (group)
     {
         unsigned numReceivers = group->Size();
@@ -197,7 +196,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 receiver->OnEvent(this, true, eventType, eventData);
                 if (self.Expired())
                 {
-                    context_->EndSendEvent();
+                    context->EndSendEvent();
                     return;
                 }
             }
@@ -205,7 +204,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
     
     // Then the non-specific receivers
-    group = context_->GetReceivers(eventType);
+    group = context->GetReceivers(eventType);
     if (group)
     {
         unsigned numReceivers = group->Size();
@@ -219,7 +218,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     receiver->OnEvent(this, true, eventType, eventData);
                     if (self.Expired())
                     {
-                        context_->EndSendEvent();
+                        context->EndSendEvent();
                         return;
                     }
                 }
@@ -236,7 +235,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     receiver->OnEvent(this, true, eventType, eventData);
                     if (self.Expired())
                     {
-                        context_->EndSendEvent();
+                        context->EndSendEvent();
                         return;
                     }
                 }
@@ -244,7 +243,7 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         }
     }
     
-    context_->EndSendEvent();
+    context->EndSendEvent();
 }
 
 void Object::SendEvent(Object* receiver, StringHash eventType)
@@ -252,10 +251,11 @@ void Object::SendEvent(Object* receiver, StringHash eventType)
     if (receiver)
     {
         VariantMap noEventData;
+        Context* context = context_;
         
-        context_->BeginSendEvent(this);
+        context->BeginSendEvent(this);
         receiver->OnEvent(this, false, eventType, noEventData);
-        context_->EndSendEvent();
+        context->EndSendEvent();
     }
 }
 
@@ -263,9 +263,11 @@ void Object::SendEvent(Object* receiver, StringHash eventType, VariantMap& event
 {
     if (receiver)
     {
-        context_->BeginSendEvent(this);
+        Context* context = context_;
+        
+        context->BeginSendEvent(this);
         receiver->OnEvent(this, false, eventType, eventData);
-        context_->EndSendEvent();
+        context->EndSendEvent();
     }
 }
 

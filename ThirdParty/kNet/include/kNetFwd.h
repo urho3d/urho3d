@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 
 /** @file kNetFwd.h
 	@brief Forward-declares all common symbols defined by kNet. */
-
-// Modified by Lasse Öörni for Urho3D
 
 namespace kNet
 {
@@ -36,6 +34,7 @@ namespace kNet
 	class NetworkMessage;
 	class NetworkServer;
 	class PolledTimer;
+	class SerializationStructCompiler;
 	class SerializedDataIterator;
 	class Socket;
 	class StatsEventHierarchyNode;

@@ -198,7 +198,7 @@ void EditRotateStep(StringHash eventType, VariantMap& eventData)
         edit.text = String(rotateStep);
 }
 
-void editScaleStep(StringHash eventType, VariantMap& eventData)
+void EditScaleStep(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetUIElement();
     scaleStep = Max(edit.text.ToFloat(), 0.0);
@@ -212,19 +212,19 @@ void EditMoveSnap(StringHash eventType, VariantMap& eventData)
     moveSnap = edit.checked;
 }
 
-void editRotateSnap(StringHash eventType, VariantMap& eventData)
+void EditRotateSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     rotateSnap = edit.checked;
 }
 
-void editScaleSnap(StringHash eventType, VariantMap& eventData)
+void EditScaleSnap(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     scaleSnap = edit.checked;
 }
 
-void editUseLocalIDs(StringHash eventType, VariantMap& eventData)
+void EditUseLocalIDs(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetUIElement();
     useLocalIDs = edit.checked;
@@ -232,11 +232,11 @@ void editUseLocalIDs(StringHash eventType, VariantMap& eventData)
 
 void CreateStatsBar()
 {
-    Font@ font = cache.GetResource("Font", "cour.ttf");
-    
+    Font@ font = cache.GetResource("Font", "Fonts/Anonymous Pro.ttf");
+
     renderStatsText = Text();
     cameraPosText = Text();
-    
+
     if (ui.root.width >= 1024)
     {
         SetupStatsBarText(renderStatsText, font, 0, 20, HA_LEFT);
@@ -253,7 +253,7 @@ void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment
 {
     text.position = IntVector2(x, y);
     text.horizontalAlignment = align;
-    text.SetFont(font, 9);
+    text.SetFont(font, 11);
     text.color = Color(1, 1, 0);
     text.priority = -100;
     ui.root.AddChild(text);
@@ -266,8 +266,8 @@ void UpdateStats(float timeStep)
         " Batches: " + renderer.numBatches +
         " Lights: " + renderer.numLights[true] +
         " Shadowmaps: " + renderer.numShadowMaps[true] +
-        " Occluders: " + renderer.numOccluders[true] + renderer.numShadowOccluders[true]);
-    
+        " Occluders: " + renderer.numOccluders[true] + " / " + renderer.numShadowOccluders[true]);
+
     Vector3 cameraPos = cameraNode.position;
     String xText(cameraPos.x);
     String yText(cameraPos.y);

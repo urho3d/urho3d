@@ -22,9 +22,9 @@ void CreateUI()
     CreateStatsBar();
     CreateConsole();
     
-    SubscribeToEvent("ScreenMode", "resizeUI");
-    SubscribeToEvent("MenuSelected", "handleMenuSelected");
-    SubscribeToEvent("KeyDown", "handleKeyDown");
+    SubscribeToEvent("ScreenMode", "ResizeUI");
+    SubscribeToEvent("MenuSelected", "HandleMenuSelected");
+    SubscribeToEvent("KeyDown", "HandleKeyDown");
 }
 
 void ResizeUI()
@@ -341,7 +341,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
     
-    if (key == 220)
+    if (key == KEY_F1)
     {
         console.Toggle();
         input.SuppressNextChar();
@@ -355,11 +355,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             front.visible = false;
     }
 
-    if (key == KEY_F1)
-        ToggleRenderingDebug();
     if (key == KEY_F2)
-        TogglePhysicsDebug();
+        ToggleRenderingDebug();
     if (key == KEY_F3)
+        TogglePhysicsDebug();
+    if (key == KEY_F4)
         ToggleOctreeDebug();
         
     if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)

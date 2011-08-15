@@ -318,13 +318,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
         if (input.keyPress[KEY_F5])
         {
-            File@ xmlFile = File("scene.xml", FILE_WRITE);
+            File@ xmlFile = File("Data/Scene.xml", FILE_WRITE);
             testScene.SaveXML(xmlFile);
         }
 
         if (input.keyPress[KEY_F7])
         {
-            File@ xmlFile = File("scene.xml", FILE_READ);
+            File@ xmlFile = File("Data/Scene.xml", FILE_READ);
             if (xmlFile.open)
                 testScene.LoadXML(xmlFile);
         }

@@ -42,9 +42,9 @@ void CreateSceneWindow()
         newComponentList.AddItem(choice);
     }
 
-    SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "hideSceneWindow");
-    SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "expandSceneHierarchy");
-    SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "collapseSceneHierarchy");
+    SubscribeToEvent(sceneWindow.GetChild("CloseButton", true), "Released", "HideSceneWindow");
+    SubscribeToEvent(sceneWindow.GetChild("ExpandAllButton", true), "Released", "ExpandSceneHierarchy");
+    SubscribeToEvent(sceneWindow.GetChild("CollapseAllButton", true), "Released", "CollapseSceneHierarchy");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemSelected", "HandleNodeListSelectionChange");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "ItemDeselected", "HandleNodeListSelectionChange");
     SubscribeToEvent(sceneWindow.GetChild("NodeList", true), "UnHandledKey", "HandleNodeListKey");
@@ -71,7 +71,7 @@ void ExpandSceneHierarchy()
     list.SetChildItemsVisible(true);
 }
 
-void collapseSceneHierarchy()
+void CollapseSceneHierarchy()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.SetChildItemsVisible(false);

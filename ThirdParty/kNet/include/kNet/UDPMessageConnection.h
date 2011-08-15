@@ -1,4 +1,4 @@
-/* Copyright 2010 Jukka Jylänki
+/* Copyright The kNet Project.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -255,8 +255,6 @@ private:
 
 	/// Returns the percentage of inbound packets that are being lost, [0, 1].
 	float GetPacketLossRate() const { return packetLossRate; }
-
-	void Initialize();
 
 	void DumpConnectionStatus() const;
 
