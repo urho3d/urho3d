@@ -54,10 +54,7 @@ LineEdit::LineEdit(Context* context) :
     text_ = new Text(context_);
     cursor_ = new BorderImage(context_);
     AddChild(text_);
-    AddChild(cursor_);
-    
-    // Show cursor on top of text
-    cursor_->SetPriority(1);
+    text_->AddChild(cursor_);
 }
 
 LineEdit::~LineEdit()
@@ -104,6 +101,9 @@ void LineEdit::SetStyle(const XMLElement& element)
         if (text.Length())
             SetEchoCharacter(text[0]);
     }
+    
+    // Set the text's position to match clipping, so that text left edge is not left partially hidden
+    text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
 }
 
 void LineEdit::Update(float timeStep)
@@ -524,8 +524,9 @@ void LineEdit::UpdateCursor()
     if (charPositions.Size())
         x = cursorPosition_ < charPositions.Size() ? charPositions[cursorPosition_].x_ : charPositions.Back().x_;
     
-    cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
+    cursor_->SetPosition(x, 0);
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
+    text_->SetPosition(clipBorder_.left_, clipBorder_.top_);
     
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
@@ -535,6 +536,8 @@ void LineEdit::UpdateCursor()
         sx = x - right;
     if (x - sx < left)
         sx = x - left;
+    if (sx < 0)
+        sx = 0;
     SetChildOffset(IntVector2(-sx, 0));
     
     // Restart blinking

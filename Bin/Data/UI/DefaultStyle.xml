@@ -117,7 +117,6 @@
         <clipborder value="1 1 1 1" />
         <hoveroffset value="0 16" />
         <text>
-            <position value="1 1" />
             <font name="Fonts/Anonymous Pro.ttf" size="11" />
             <hovercolor value="0.45 0.70 0.45" />
             <selectioncolor value="0.70 0.70 0.70" />
