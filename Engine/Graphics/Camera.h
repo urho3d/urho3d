@@ -123,6 +123,8 @@ public:
     float GetDistanceSquared(const Vector3& worldPos);
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
+    /// Return if projection parameters are valid for rendering and raycasting
+    bool IsProjectionValid() const;
     
     /// Return inverse world transform, also known as the view matrix.
     Matrix3x4 GetInverseWorldTransform() const { return GetWorldTransform().Inverse(); }

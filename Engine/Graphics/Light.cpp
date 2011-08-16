@@ -331,10 +331,14 @@ Matrix3x4 Light::GetDirLightTransform(Camera& camera, bool getNearQuad)
         distance = Max(nearSplit_ - nearFadeRange_, nearClip);
     else
         distance = Min(farSplit_, farClip);
+    
     if (!camera.IsOrthographic())
         farVector *= (distance / farClip);
     else
         farVector.z_ *= (distance / farClip);
+    
+    // Set an epsilon from clip planes due to possible inaccuracy
+    farVector.z_ = Clamp(farVector.z_, (1.0f + M_LARGE_EPSILON) * nearClip, (1.0f - M_LARGE_EPSILON) * farClip);
     
     return  Matrix3x4(Vector3(0.0f, 0.0f, farVector.z_), Quaternion::IDENTITY, Vector3(farVector.x_, farVector.y_, 1.0f));
 }

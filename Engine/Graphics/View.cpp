@@ -182,6 +182,11 @@ void View::Update(const FrameInfo& frame)
     noShadowLightQueue_.Clear();
     lightQueues_.Clear();
     
+    // Do not update if camera projection is illegal
+    // (there is a possibility of crash if occlusion is used and it can not clip properly)
+    if (!camera_->IsProjectionValid())
+        return;
+    
     // Set automatic aspect ratio if required
     if (camera_->GetAutoAspectRatio())
         camera_->SetAspectRatio((float)frame_.viewSize_.x_ / (float)frame_.viewSize_.y_);
@@ -1713,7 +1718,7 @@ unsigned View::SplitLight(Light* light)
         
         unsigned splits = cascade.splits_;
         if (splits > MAX_LIGHT_SPLITS - 1)
-            splits = MAX_LIGHT_SPLITS;
+            splits = MAX_LIGHT_SPLITS - 1;
         
         // Orthographic view actually has near clip 0, but clamp it to a theoretical minimum
         float farClip = Min(cascade.shadowRange_, camera_->GetFarClip()); // Shadow range end
@@ -1756,9 +1761,8 @@ unsigned View::SplitLight(Light* light)
             splitLight->SetNearFadeRange(nearFadeRange);
             splitLight->SetFarSplit(farSplit);
             
-            // The final split will not fade
-            if (createExtraSplit || i < splits - 1)
-                splitLight->SetFarFadeRange(farFadeRange);
+            // If not creating an extra split, the final split should not fade
+            splitLight->SetFarFadeRange((createExtraSplit || i < splits - 1) ? farFadeRange : 0.0f);
             
             // Create an extra unshadowed split if necessary
             if (createExtraSplit && i == splits - 1)
@@ -1941,11 +1945,13 @@ void View::CalculateShaderParameters()
 {
     Time* time = GetSubsystem<Time>();
     
-    float fogStart = zone_->GetFogStart();
-    float fogEnd = zone_->GetFogEnd();
-    float fogRange = Max(fogEnd - fogStart, M_EPSILON);
     float farClip = camera_->GetFarClip();
     float nearClip = camera_->GetNearClip();
+    float fogStart = Min(zone_->GetFogStart(), farClip);
+    float fogEnd = Min(zone_->GetFogEnd(), farClip);
+    if (fogStart >= fogEnd * (1.0f - M_LARGE_EPSILON))
+        fogStart = fogEnd * (1.0f - M_LARGE_EPSILON);
+    float fogRange = Max(fogEnd - fogStart, M_EPSILON);
     Vector4 fogParams(fogStart / farClip, fogEnd / farClip, 1.0f / (fogRange / farClip), 0.0f);
     Vector4 elapsedTime((time->GetTotalMSec() & 0x3fffff) / 1000.0f, 0.0f, 0.0f, 0.0f);
     

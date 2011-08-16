@@ -36,6 +36,7 @@ static const unsigned M_MIN_UNSIGNED = 0x00000000;
 static const unsigned M_MAX_UNSIGNED = 0xffffffff;
 
 static const float M_EPSILON = 0.000001f;
+static const float M_LARGE_EPSILON = 0.00005f;
 static const float M_MIN_NEARCLIP = 0.01f;
 static const float M_MAX_FOV = 160.0f;
 static const float M_LARGE_VALUE = 100000000.0f;

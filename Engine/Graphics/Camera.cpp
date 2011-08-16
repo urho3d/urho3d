@@ -76,12 +76,12 @@ void Camera::RegisterObject(Context* context)
 
 void Camera::SetNearClip(float nearClip)
 {
-    nearClip_ = Max(nearClip, 0.0f);
+    nearClip_ = Max(nearClip, M_MIN_NEARCLIP);
 }
 
 void Camera::SetFarClip(float farClip)
 {
-    farClip_ = Max(farClip, 0.0f);
+    farClip_ = Max(farClip, M_MIN_NEARCLIP);
 }
 
 void Camera::SetFov(float fov)
@@ -182,6 +182,16 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip)
 
 Ray Camera::GetScreenRay(float x, float y)
 {
+    Ray ret;
+    
+    // If projection is invalid, just return a ray pointing forward
+    if (!IsProjectionValid())
+    {
+        ret.origin_ = GetWorldPosition();
+        ret.direction_ = GetForwardVector();
+        return ret;
+    }
+    
     Matrix4 viewProjInverse = (GetProjection() * GetInverseWorldTransform()).Inverse();
     
     // The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0) & flip Y axis
@@ -196,11 +206,9 @@ Ray Camera::GetScreenRay(float x, float y)
     Vector3 far(x, y, 1.0f);
     #endif
     
-    Ray ray;
-    ray.origin_ = viewProjInverse * near;
-    ray.direction_ = ((viewProjInverse * far) - ray.origin_).Normalized();
-    
-    return ray;
+    ret.origin_ = viewProjInverse * near;
+    ret.direction_ = ((viewProjInverse * far) - ret.origin_).Normalized();
+    return ret;
 }
 
 Frustum Camera::GetFrustum() const
@@ -343,4 +351,9 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
         return distance / d;
     else
         return orthoSize_ / d;
+}
+
+bool Camera::IsProjectionValid() const
+{
+    return farClip_ > GetNearClip();
 }

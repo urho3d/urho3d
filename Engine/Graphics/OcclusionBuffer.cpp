@@ -322,9 +322,6 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     // Project to screen. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;
     
-    // Subtract a small bias to prevent self-occlusion artifacts
-    // (need for bias results from different floating point transformations producing different errors)
-    vertices[0].z_ -= depthBias_;
     if (vertices[0].z_ <= nearClip_)
         return true;
     
@@ -337,8 +334,6 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     // Project the rest
     for (unsigned i = 1; i < 8; ++i)
     {
-        // Subtract a small bias to prevent self-occlusion artifacts
-        vertices[i].z_ -= depthBias_;
         if (vertices[i].z_ <= nearClip_)
             return true;
         
@@ -376,7 +371,7 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     if (rect.bottom_ >= height_)
         rect.bottom_ = height_ - 1;
     
-    int z = ((int)(minZ * OCCLUSION_Z_SCALE));
+    int z = ((int)(minZ * OCCLUSION_Z_SCALE)) - OCCLUSION_DEPTH_BIAS;
     
     if (!depthHierarchyDirty_)
     {
