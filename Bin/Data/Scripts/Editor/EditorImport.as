@@ -191,7 +191,8 @@ void ImportTundraScene(const String&in fileName)
         for (uint i = 0; i < materialNames.length; ++i)
             model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
 
-        UpdateSceneWindow(false);
+        UpdateSceneWindow();
+        CollapseSceneHierarchy();
         
         entityElem = entityElem.GetNext("entity");
     }

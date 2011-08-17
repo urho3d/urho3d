@@ -34,8 +34,9 @@ void CreateScene()
 
     if (sceneWindow !is null)
     {
-        UpdateSceneWindow(false);
+        UpdateSceneWindow();
         UpdateNodeWindow();
+        CollapseSceneHierarchy();
     }
 
     runPhysics = false;
@@ -171,8 +172,9 @@ void LoadScene(const String&in fileName)
     sceneModified = false;
     runPhysics = false;
     UpdateWindowTitle();
-    UpdateSceneWindow(false);
+    UpdateSceneWindow();
     UpdateNodeWindow();
+    CollapseSceneHierarchy();
     ResetCamera();
 }
 
@@ -209,37 +211,6 @@ void EndModify(uint nodeID)
         sceneModified = true;
         UpdateWindowTitle();
     }
-}
-
-String GetNodeTitle(Node@ node, int indent)
-{
-    String indentStr;
-    String localStr;
-    indentStr.Resize(indent);
-    for (int i = 0; i < indent; ++i)
-        indentStr[i] = ' ';
-    
-    if (node.id >= FIRST_LOCAL_ID)
-        localStr = " (LOCAL)";
-
-    if (node.name.empty)
-        return indentStr + "Node " + node.id + localStr;
-    else
-        return indentStr + node.name + localStr;
-}
-
-String GetComponentTitle(Component@ component, int indent)
-{
-    String indentStr;
-    String localStr;
-    indentStr.Resize(indent);
-    for (int i = 0; i < indent; ++i)
-        indentStr[i] = ' ';
-    
-    if (node.id >= FIRST_LOCAL_ID)
-        localStr = " (LOCAL)";
-
-    return indentStr + component.typeName + localStr;
 }
 
 void ScenePostRenderUpdate()

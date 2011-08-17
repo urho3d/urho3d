@@ -21,7 +21,8 @@ void CreateSceneWindow()
     int height = Min(ui.root.height - 60, 500);
     sceneWindow.SetSize(300, height);
     sceneWindow.SetPosition(20, 40);
-    UpdateSceneWindow(false);
+    UpdateSceneWindow();
+    CollapseSceneHierarchy();
 
     DropDownList@ newNodeList = sceneWindow.GetChild("NewNodeList", true);
     for (uint i = 0; i < newNodeChoices.length; ++i)
@@ -77,13 +78,13 @@ void CollapseSceneHierarchy()
     list.SetChildItemsVisible(false);
 }
 
-void UpdateSceneWindow(bool showComponents)
+void UpdateSceneWindow()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     list.contentElement.DisableLayoutUpdate();
     list.RemoveAllItems();
 
-    UpdateSceneWindowRecursive(editorScene, showComponents);
+    UpdateSceneWindowNodeRecursive(0, editorScene);
 
     list.contentElement.EnableLayoutUpdate();
     list.contentElement.UpdateLayout();
@@ -92,37 +93,37 @@ void UpdateSceneWindow(bool showComponents)
     copyBuffer.CreateRoot("none");
 }
 
-void UpdateSceneWindowRecursive(Node@ node, bool showComponents)
+uint UpdateSceneWindowNodeRecursive(uint itemIndex, Node@ node)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
-    Array<Node@> nodes = node.GetChildren(false);
-    for (uint i = 0; i < nodes.length; ++i)
-    {
-        uint itemIndex = list.numItems;
-        Node@ node = nodes[i];
+    itemIndex = UpdateSceneWindowNode(itemIndex, node);
 
-        UpdateSceneWindowNode(itemIndex, node);
-        list.SetChildItemsVisible(itemIndex, showComponents);
-        UpdateSceneWindowRecursive(node, showComponents);
+    for (uint i = 0; i < node.numChildren; ++i)
+    {
+        Node@ childNode = node.children[i];
+        itemIndex = UpdateSceneWindowNodeRecursive(itemIndex, childNode);
     }
+
+    return itemIndex;
 }
 
-void UpdateSceneWindowNode(uint itemIndex, Node@ node)
+uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     // Remove old item if exists
+    /// \todo Recursive update bugs and removes nodes
     uint numItems = list.numItems;
     if (itemIndex < numItems)
         list.RemoveItem(itemIndex);
-
     if (node is null)
-        return;
+        return itemIndex;
 
     if (itemIndex >= numItems)
     {
         // Scan for correct place to insert at
+        /// \todo This logic is not correct for parented nodes
         uint nodeID = node.id;
         for (itemIndex = 0; itemIndex < numItems; ++itemIndex)
         {
@@ -144,14 +145,16 @@ void UpdateSceneWindowNode(uint itemIndex, Node@ node)
 
     list.InsertItem(itemIndex, text);
 
-    uint listAddIndex = itemIndex + 1;
+    ++itemIndex;
 
     for (uint j = 0; j < node.numComponents; ++j)
     {
         Component@ component = node.components[j];
-        AddComponentToSceneWindow(component, indent + 1, listAddIndex);
-        ++listAddIndex;
+        AddComponentToSceneWindow(component, indent + 1, itemIndex);
+        ++itemIndex;
     }
+
+    return itemIndex;
 }
 
 void UpdateSceneWindowNodeOnly(uint itemIndex, Node@ node)
@@ -178,7 +181,7 @@ void UpdateSceneWindowNodeOnly(Node@ node)
     UpdateSceneWindowNodeOnly(index, node);
 }
 
-void AddComponentToSceneWindow(Component@ component, int indent, uint listAddIndex)
+void AddComponentToSceneWindow(Component@ component, int indent, uint compItemIndex)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
@@ -189,20 +192,7 @@ void AddComponentToSceneWindow(Component@ component, int indent, uint listAddInd
     text.vars["ComponentID"] = component.id;
     text.vars["Indent"] = indent;
     text.text = GetComponentTitle(component, indent);
-    list.InsertItem(listAddIndex, text);
-}
-
-int GetNodeIndent(Node@ node)
-{
-    int indent = 0;
-    for (;;)
-    {
-        if (node.parent is null || node.parent is editorScene)
-            break;
-        ++indent;
-        node = node.parent;
-    }
-    return indent;
+    list.InsertItem(compItemIndex, text);
 }
 
 uint GetNodeListIndex(Node@ node)
@@ -239,7 +229,7 @@ uint GetNodeListIndex(Node@ node, uint startPos)
         if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetInt() == int(nodeID))
             return i;
     }
-    
+
     return NO_ITEM;
 }
 
@@ -284,10 +274,53 @@ uint GetComponentListIndex(Component@ component)
         if (item.vars["Type"].GetInt() == ITEM_COMPONENT && uint(item.vars["ComponentID"].GetInt()) == component.id)
             return i;
     }
-    
+
     return NO_ITEM;
 }
 
+int GetNodeIndent(Node@ node)
+{
+    int indent = 0;
+    for (;;)
+    {
+        if (node.parent is null)
+            break;
+        ++indent;
+        node = node.parent;
+    }
+    return indent;
+}
+
+String GetNodeTitle(Node@ node, int indent)
+{
+    String indentStr;
+    String localStr;
+    indentStr.Resize(indent);
+    for (int i = 0; i < indent; ++i)
+        indentStr[i] = ' ';
+    
+    if (node.id >= FIRST_LOCAL_ID)
+        localStr = ", LOCAL";
+
+    if (node.name.empty)
+        return indentStr + node.typeName + " (" + node.id + localStr + ")";
+    else
+        return indentStr + node.typeName + " (" + node.name + localStr +")";
+}
+
+String GetComponentTitle(Component@ component, int indent)
+{
+    String indentStr;
+    String localStr;
+    indentStr.Resize(indent);
+    for (int i = 0; i < indent; ++i)
+        indentStr[i] = ' ';
+    
+    if (component.id >= FIRST_LOCAL_ID)
+        localStr = " (LOCAL)";
+
+    return indentStr + component.typeName + localStr;
+}
 
 void SelectComponent(Component@ component)
 {
