@@ -113,25 +113,11 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     // Remove old item if exists
-    /// \todo Recursive update bugs and removes nodes
     uint numItems = list.numItems;
     if (itemIndex < numItems)
         list.RemoveItem(itemIndex);
     if (node is null)
         return itemIndex;
-
-    if (itemIndex >= numItems)
-    {
-        // Scan for correct place to insert at
-        /// \todo This logic is not correct for parented nodes
-        uint nodeID = node.id;
-        for (itemIndex = 0; itemIndex < numItems; ++itemIndex)
-        {
-            UIElement@ item = list.items[itemIndex];
-            if (uint(item.vars["NodeID"].GetInt()) > nodeID)
-                break;
-        }
-    }
 
     int indent = GetNodeIndent(node);
 
@@ -298,14 +284,14 @@ String GetNodeTitle(Node@ node, int indent)
     indentStr.Resize(indent);
     for (int i = 0; i < indent; ++i)
         indentStr[i] = ' ';
-    
+
     if (node.id >= FIRST_LOCAL_ID)
-        localStr = ", LOCAL";
+        localStr = ", Local";
 
     if (node.name.empty)
         return indentStr + node.typeName + " (" + node.id + localStr + ")";
     else
-        return indentStr + node.typeName + " (" + node.name + localStr +")";
+        return indentStr + node.name + " (" + node.id + localStr + ")";
 }
 
 String GetComponentTitle(Component@ component, int indent)
@@ -317,7 +303,7 @@ String GetComponentTitle(Component@ component, int indent)
         indentStr[i] = ' ';
     
     if (component.id >= FIRST_LOCAL_ID)
-        localStr = " (LOCAL)";
+        localStr = " (Local)";
 
     return indentStr + component.typeName + localStr;
 }
@@ -338,14 +324,26 @@ void SelectComponent(Component@ component)
         return;
     }
 
+    // Go in the parent chain up to the first non-root level to make sure the chain is expanded
+    for (;;)
+    {
+        Node@ parent = node.parent;
+        if (node is editorScene || parent is editorScene || parent is null)
+            break;
+        node = parent;
+    }
+
     uint numItems = list.numItems;
     uint nodeItem = GetNodeListIndex(node);
     uint componentItem = GetComponentListIndex(component);
 
     if ((nodeItem < numItems) && (componentItem < numItems))
     {
-        // Make sure the selected node is expanded
-        list.SetChildItemsVisible(nodeItem, true);
+        // Expand the node chain now, but do not expand the whole scene in case the component was in the root
+        list.items[nodeItem].visible = true;
+        if (nodeItem != 0)
+            list.SetChildItemsVisible(nodeItem, true);
+        list.items[componentItem].visible = true;
         // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
         list.selection = componentItem;
     }

@@ -233,9 +233,9 @@ void ScenePostRenderUpdate()
     
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
-    if (physicsDebug)
+    if (physicsDebug && editorScene.physicsWorld !is null)
         editorScene.physicsWorld.DrawDebugGeometry(true);
-    if (octreeDebug)
+    if (octreeDebug && editorScene.octree !is null)
         editorScene.octree.DrawDebugGeometry(true);
     
     SceneRaycast(false);
@@ -248,6 +248,9 @@ void SceneMouseClick()
 
 void SceneRaycast(bool mouseClick)
 {
+    if (editorScene.octree is null)
+        return;
+    
     DebugRenderer@ debug = editorScene.debugRenderer;
     IntVector2 pos = ui.cursorPosition;
 
@@ -260,7 +263,8 @@ void SceneRaycast(bool mouseClick)
         if (!result.empty)
         {
             drawable = result[0].drawable;
-            drawable.DrawDebugGeometry(debug, false);
+            if (debug !is null)
+                drawable.DrawDebugGeometry(debug, false);
         }
         if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
             SelectComponent(drawable);

@@ -356,11 +356,17 @@ void ListView::RemoveItem(unsigned index)
 
 void ListView::RemoveAllItems()
 {
+    contentElement_->DisableLayoutUpdate();
+    
     unsigned numItems = GetNumItems();
     for (unsigned i = 0; i < numItems; ++i)
         contentElement_->GetChild(i)->SetSelected(false);
     contentElement_->RemoveAllChildren();
     ClearSelection();
+    
+    contentElement_->EnableLayoutUpdate();
+    contentElement_->UpdateLayout();
+    OnResize();
 }
 
 void ListView::SetSelection(unsigned index)
@@ -543,6 +549,8 @@ void ListView::SetChildItemsVisible(unsigned index, bool enable)
     if (!hierarchyMode_ || index >= numItems)
         return;
     
+    contentElement_->DisableLayoutUpdate();
+    
     int baseIndent = GetItemIndent(GetItem(index));
     
     for (unsigned i = index + 1; i < numItems; ++i)
@@ -553,6 +561,10 @@ void ListView::SetChildItemsVisible(unsigned index, bool enable)
         else
             break;
     }
+    
+    contentElement_->EnableLayoutUpdate();
+    contentElement_->UpdateLayout();
+    OnResize();
 }
 
 void ListView::SetChildItemsVisible(bool enable)
