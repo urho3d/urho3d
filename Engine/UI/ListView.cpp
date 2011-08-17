@@ -588,6 +588,8 @@ void ListView::ToggleChildItemsVisible(unsigned index)
     if (!hierarchyMode_ || index >= numItems)
         return;
     
+    contentElement_->DisableLayoutUpdate();
+    
     int baseIndent = GetItemIndent(GetItem(index));
     bool firstChild = true;
     UIElement* prevItem = 0;
@@ -609,6 +611,10 @@ void ListView::ToggleChildItemsVisible(unsigned index)
         
         prevItem = item;
     }
+    
+    contentElement_->EnableLayoutUpdate();
+    contentElement_->UpdateLayout();
+    OnResize();
 }
 
 unsigned ListView::GetNumItems() const
