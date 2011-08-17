@@ -216,7 +216,9 @@ void EndModify(uint nodeID)
 void ScenePostRenderUpdate()
 {
     DebugRenderer@ debug = editorScene.debugRenderer;
-    
+    if (debug is null)
+        return;
+
     // Visualize current selection (either drawables or collisionshapes can be visualized)
     if (selectedComponent !is null)
     {
@@ -230,7 +232,7 @@ void ScenePostRenderUpdate()
                 shape.DrawDebugGeometry(debug, false);
         }
     }
-    
+
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
     if (physicsDebug && editorScene.physicsWorld !is null)

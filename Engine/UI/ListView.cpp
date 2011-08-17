@@ -390,7 +390,7 @@ void ListView::SetSelections(const Set<unsigned>& indices)
             Set<unsigned>::Iterator current = i++;
             selections_.Erase(current);
             
-            using namespace Iteselected_;
+            using namespace ItemSelected;
             
             VariantMap eventData;
             eventData[P_ELEMENT] = (void*)this;
@@ -412,7 +412,7 @@ void ListView::SetSelections(const Set<unsigned>& indices)
             {
                 selections_.Insert(*i);
                 
-                using namespace Iteselected_;
+                using namespace ItemSelected;
                 
                 VariantMap eventData;
                 eventData[P_ELEMENT] = (void*)this;

@@ -148,7 +148,7 @@ EVENT(E_MENUSELECTED, MenuSelected)
 }
 
 /// Listview or DropDownList item selected.
-EVENT(E_ITEMSELECTED, Iteselected_)
+EVENT(E_ITEMSELECTED, ItemSelected)
 {
     PARAM(P_ELEMENT, Element);            // UIElement pointer
     PARAM(P_SELECTION, Selection);        // int

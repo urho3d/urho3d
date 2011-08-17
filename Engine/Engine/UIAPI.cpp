@@ -348,7 +348,7 @@ static void RegisterDropDownList(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ getPopup() const", asMETHOD(DropDownList, GetPopup), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "int get_acceleratorKey() const", asMETHOD(DropDownList, GetAcceleratorKey), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "int get_acceleratorQualifiers() const", asMETHOD(DropDownList, GetAcceleratorQualifiers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("DropDownList", "uint get_numItems() const", asMETHOD(DropDownList, GetSelection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DropDownList", "uint get_numItems() const", asMETHOD(DropDownList, GetNumItems), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ get_items(uint) const", asMETHOD(DropDownList, GetItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "UIElement@+ get_selectedItem() const", asMETHOD(DropDownList, GetSelectedItem), asCALL_THISCALL);
     engine->RegisterObjectMethod("DropDownList", "ListView@+ get_listView() const", asMETHOD(DropDownList, GetListView), asCALL_THISCALL);

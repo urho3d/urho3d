@@ -38,7 +38,7 @@ void ImportModel(const String&in fileName)
             fileSystem.Delete(materialListName);
         }
 
-        UpdateAndFocusNewNode(newNode);
+        UpdateAndFocusNode(newNode);
     }
 }
 

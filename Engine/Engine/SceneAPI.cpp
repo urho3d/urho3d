@@ -25,6 +25,7 @@
 #include "APITemplates.h"
 #include "PackageFile.h"
 #include "Scene.h"
+#include "Sort.h"
 
 static void RegisterSerializable(asIScriptEngine* engine)
 {
@@ -93,6 +94,7 @@ static CScriptArray* GetAvailableComponents(Scene* ptr)
             components.Push(object->GetTypeName());
     }
     
+    Sort(components.Begin(), components.End());
     return VectorToArray<String>(components, "Array<String>");
 }
 

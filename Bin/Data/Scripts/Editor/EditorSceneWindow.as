@@ -84,28 +84,13 @@ void UpdateSceneWindow()
     list.contentElement.DisableLayoutUpdate();
     list.RemoveAllItems();
 
-    UpdateSceneWindowNodeRecursive(0, editorScene);
+    UpdateSceneWindowNode(0, editorScene);
 
     list.contentElement.EnableLayoutUpdate();
     list.contentElement.UpdateLayout();
 
     // Clear copybuffer when whole window refreshed
     copyBuffer.CreateRoot("none");
-}
-
-uint UpdateSceneWindowNodeRecursive(uint itemIndex, Node@ node)
-{
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-
-    itemIndex = UpdateSceneWindowNode(itemIndex, node);
-
-    for (uint i = 0; i < node.numChildren; ++i)
-    {
-        Node@ childNode = node.children[i];
-        itemIndex = UpdateSceneWindowNodeRecursive(itemIndex, childNode);
-    }
-
-    return itemIndex;
 }
 
 uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
@@ -133,11 +118,19 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
 
     ++itemIndex;
 
+    // Update components first
     for (uint j = 0; j < node.numComponents; ++j)
     {
         Component@ component = node.components[j];
         AddComponentToSceneWindow(component, indent + 1, itemIndex);
         ++itemIndex;
+    }
+
+    // Then update child nodes recursively
+    for (uint i = 0; i < node.numChildren; ++i)
+    {
+        Node@ childNode = node.children[i];
+        itemIndex = UpdateSceneWindowNode(itemIndex, childNode);
     }
 
     return itemIndex;
@@ -240,6 +233,7 @@ Component@ GetListComponent(UIElement@ item)
 {
     if (item is null)
         return null;
+
     if (item.vars["Type"].GetInt() != ITEM_COMPONENT)
         return null;
 
@@ -372,6 +366,8 @@ void HandleNodeListKey(StringHash eventType, VariantMap& eventData)
     Node@ node = GetListNode(index);
     Component@ component = GetListComponent(index);
     uint nodeItem = GetNodeListIndex(node, index);
+    
+    /// \todo Implement actual functionality
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
@@ -393,14 +389,14 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
     // Now perform the action
     Node@ sourceNode = editorScene.GetNode(uint(source.vars["NodeID"].GetInt()));
-    Node@ tarGetNode = editorScene.GetNode(uint(target.vars["NodeID"].GetInt()));
+    Node@ targetNode = editorScene.GetNode(uint(target.vars["NodeID"].GetInt()));
     Component@ sourceComponent = getListComponent(source);
 
     // Move component into another node, and/or make unparented
     if (target.vars["Type"].GetInt() == ITEM_NODE)
     {
         // Within same node
-        if (sourceNode is tarGetNode)
+        if (sourceNode is targetNode)
         {
             beginModify(sourceNode.id);
 
@@ -415,10 +411,10 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         else
         {
             beginModify(sourceNode.id);
-            beginModify(tarGetNode.id);
+            beginModify(targetNode.id);
 
             sourceNode.removeComponent(sourceComponent);
-            tarGetNode.addComponent(sourceComponent);
+            targetNode.addComponent(sourceComponent);
 
             Node@ sourceNode = cast<Node>(sourceComponent);
             
@@ -433,31 +429,31 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
                 for (uint i = 0; i < allChildren.length; ++i)
                 {
                     sourceNode.removeComponent(allChildren[i]);
-                    tarGetNode.addComponent(allChildren[i]);
+                    targetNode.addComponent(allChildren[i]);
                 }
             }
 
             updateSceneWindowNode(sourceNode);
-            updateSceneWindowNode(tarGetNode);
+            updateSceneWindowNode(targetNode);
 
-            endModify(tarGetNode.id);
+            endModify(targetNode.id);
             endModify(sourceNode.id);
         }
     }
     else
     {
         Node@ sourceNode = getListComponent(source);
-        Node@ tarGetNode = getListComponent(target);
+        Node@ targetNode = getListComponent(target);
 
         // Reparent a node
         // Node is different: also move to different node
-        if (tarGetNode !is sourceNode)
+        if (targetNode !is sourceNode)
         {
             beginModify(sourceNode.id);
-            beginModify(tarGetNode.id);
+            beginModify(targetNode.id);
 
             sourceNode.removeComponent(sourceNode);
-            tarGetNode.addComponent(sourceNode);
+            targetNode.addComponent(sourceNode);
 
             // Move also all children of the source node to the target node to keep the hierarchy consistent
             // (note: under the current scene model, programmatically such limitation does not exist)
@@ -465,21 +461,21 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
             for (uint i = 0; i < allChildren.length; ++i)
             {
                 sourceNode.removeComponent(allChildren[i]);
-                tarGetNode.addComponent(allChildren[i]);
+                targetNode.addComponent(allChildren[i]);
             }
 
             // Set transform so that the world transform stays through the parent change
             Vector3 newPos;
             Quaternion newRot;
             Vector3 newScale;
-            calculateNewTransform(sourceNode, tarGetNode, newPos, newRot, newScale);
-            tarGetNode.addChild(sourceNode);
+            calculateNewTransform(sourceNode, targetNode, newPos, newRot, newScale);
+            targetNode.addChild(sourceNode);
             sourceNode.SetTransform(newPos, newRot, newScale);
 
             updateSceneWindowNode(sourceNode);
-            updateSceneWindowNode(tarGetNode);
+            updateSceneWindowNode(targetNode);
 
-            endModify(tarGetNode.id);
+            endModify(targetNode.id);
             endModify(sourceNode.id);
         }
         // Node is same: only need to reparent
@@ -490,8 +486,8 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
             Vector3 newPos;
             Quaternion newRot;
             Vector3 newScale;
-            calculateNewTransform(sourceNode, tarGetNode, newPos, newRot, newScale);
-            tarGetNode.addChild(sourceNode);
+            calculateNewTransform(sourceNode, targetNode, newPos, newRot, newScale);
+            targetNode.addChild(sourceNode);
             sourceNode.SetTransform(newPos, newRot, newScale);
 
             updateSceneWindowNode(sourceNode);
@@ -507,13 +503,13 @@ bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
 {
     /*
     Node@ sourceNode = editorScene.GetNode(uint(source.vars["NodeID"].GetInt()));
-    Node@ tarGetNode = editorScene.GetNode(uint(target.vars["NodeID"].GetInt()));
+    Node@ targetNode = editorScene.GetNode(uint(target.vars["NodeID"].GetInt()));
     Node@ sourceNode = getListComponent(source);
 
     // Move component into another node, or make unparented
     if (target.vars["Type"].GetInt() == ITEM_NODE)
     {
-        if (sourceNode !is tarGetNode)
+        if (sourceNode !is targetNode)
             return true;
         if ((sourceNode !is null) && (sourceNode.GetParent() !is null))
             return true;
@@ -521,16 +517,16 @@ bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
     }
 
     // Reparent a node
-    Node@ tarGetNode = getListComponent(target);
-    if ((sourceNode is null) || (tarGetNode is null))
+    Node@ targetNode = getListComponent(target);
+    if ((sourceNode is null) || (targetNode is null))
         return false;
-    if (sourceNode.GetParent() is tarGetNode)
+    if (sourceNode.GetParent() is targetNode)
         return false;
     // Check for looped parent-child assignment
     Array<Node@> allChildren = sourceNode.GetChildren(NODE_ANY, true);
     for (uint i = 0; i < allChildren.length; ++i)
     {
-        if (allChildren[i] is tarGetNode)
+        if (allChildren[i] is targetNode)
             return false;
     }
     return true;
@@ -552,49 +548,52 @@ void CalculateNewTransform(Node@ source, Node@ target, Vector3& pos, Quaternion&
     pos = inverseTargetWorldScale * (inverseTargetWorldRot * (sourceWorldPos - target.worldPosition));
 }
 
-void UpdateAndFocusNewNode(Node@ newNode)
+void UpdateAndFocusNode(Node@ node)
 {
-    /*
-    updateSceneWindowNode(newNode);
-    uint index = GetNodeListIndex(newNode);
+    UpdateSceneWindowNode(node);
+    uint index = GetNodeListIndex(node);
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.SetSelection(index);
-    */
+    list.selection = index;
+}
+
+void UpdateAndFocusComponent(Component@ component)
+{
+    UpdateSceneWindowNode(component.node);
+    uint index = GetComponentListIndex(component);
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    list.selection = index;
 }
 
 void HandleCreateNode(StringHash eventType, VariantMap& eventData)
 {
-    /*
+    Print("CreateNode");
     DropDownList@ list = eventData["Element"].GetUIElement();
-    uint mode = list.GetSelection();
-    if (mode > list.numItems)
+    uint mode = list.selection;
+    if (mode >= list.numItems)
         return;
-    bool local = (mode == 1);
-    
-    Node@ newNode = editorScene.createNode("", local);
-    updateAndFocusNewNode(newNode);
-    */
+
+    Node@ newNode = editorScene.CreateChild("", mode == 0 ? REPLICATED : LOCAL);
+    // Set the new node a certain distance from the camera
+    newNode.position = GetNewNodePosition();
+
+    UpdateAndFocusNode(newNode);
 }
 
 void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
 {
-    /*
     if (selectedNode is null)
         return;
 
     DropDownList@ list = eventData["Element"].GetUIElement();
-    Text@ text = list.GetSelectedItem();
+    Text@ text = list.selectedItem;
     if (text is null)
         return;
 
-    Component@ newComponent = selectedNode.createComponent(text.GetText(), "");
-    // If component is a scene node, set it to a certain distance from camera
-    Node@ newNode = cast<Node>(newComponent);
-    if (newNode !is null)
-        newNode.SetPosition(getNewNodePosition());
+    // For now, make a local node's all components local
+    /// \todo Allow to specify the createmode
+    Component@ newComponent = selectedNode.CreateComponent(text.text, selectedNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
 
-    UpdateSceneWindowNode(selectedNode);
-    */
+    UpdateAndFocusComponent(newComponent);
 }
 
 bool CheckSceneWindowFocus(bool allowNoElement)
@@ -776,7 +775,7 @@ void ScenePaste()
         
         endModify(newNodeID);
         
-        updateAndFocusNewNode(newNode);
+        updateAndFocusNode(newNode);
     }
     */
 }

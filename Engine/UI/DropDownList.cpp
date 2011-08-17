@@ -217,7 +217,7 @@ void DropDownList::HandleItemSelected(StringHash eventType, VariantMap& eventDat
         ShowPopup(false);
     
     // Send the event forward
-    using namespace Iteselected_;
+    using namespace ItemSelected;
     
     VariantMap newEventData;
     newEventData[P_ELEMENT] = (void*)this;
