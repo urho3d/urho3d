@@ -192,8 +192,7 @@ void ImportTundraScene(const String&in fileName)
             model.materials[i] = cache.GetResource("Material", "Materials/" + materialNames[i].Replaced(".material", ".xml"));
 
         UpdateSceneWindow();
-        CollapseSceneHierarchy();
-        
+
         entityElem = entityElem.GetNext("entity");
     }
 }

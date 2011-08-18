@@ -366,7 +366,6 @@ void ListView::RemoveAllItems()
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
-    OnResize();
 }
 
 void ListView::SetSelection(unsigned index)
@@ -564,7 +563,6 @@ void ListView::SetChildItemsVisible(unsigned index, bool enable)
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
-    OnResize();
 }
 
 void ListView::SetChildItemsVisible(bool enable)
@@ -614,7 +612,6 @@ void ListView::ToggleChildItemsVisible(unsigned index)
     
     contentElement_->EnableLayoutUpdate();
     contentElement_->UpdateLayout();
-    OnResize();
 }
 
 unsigned ListView::GetNumItems() const
@@ -770,9 +767,6 @@ void ListView::HandleUIMouseClick(StringHash eventType, VariantMap& eventData)
             
             if (isDoubleClick)
             {
-                if (hierarchyMode_)
-                    ToggleChildItemsVisible(i);
-                
                 VariantMap eventData;
                 eventData[ItemDoubleClicked::P_ELEMENT] = (void*)this;
                 eventData[ItemDoubleClicked::P_SELECTION] = i;

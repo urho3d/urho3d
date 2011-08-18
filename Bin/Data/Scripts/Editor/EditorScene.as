@@ -36,7 +36,6 @@ void CreateScene()
     {
         UpdateSceneWindow();
         UpdateNodeWindow();
-        CollapseSceneHierarchy();
     }
 
     runPhysics = false;
@@ -174,7 +173,6 @@ void LoadScene(const String&in fileName)
     UpdateWindowTitle();
     UpdateSceneWindow();
     UpdateNodeWindow();
-    CollapseSceneHierarchy();
     ResetCamera();
 }
 
