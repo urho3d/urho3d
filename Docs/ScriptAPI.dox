@@ -51,6 +51,7 @@
 - String RemoveTrailingSlash(const String&)
 - String GetParentPath(const String&)
 - String GetInternalPath(const String&)
+- String[]@ GetAvailableComponents()
 - void DelayedExecute(float, const String&, const Variant[]@)
 - void DelayedExecute(float, const String&)
 - void ClearDelayedExecute()
@@ -215,6 +216,8 @@ String
 Methods:<br>
 - void Replace(uint8, uint8)
 - void Replace(const String&, const String&)
+- String Replaced(uint8, uint8) const
+- String Replaced(const String&, const String&) const
 - void Resize(uint)
 - int Find(const String&, uint arg1 = 0) const
 - int Find(uint8, uint arg1 = 0) const
@@ -492,6 +495,8 @@ Methods:<br>
 - const Quaternion& GetQuaternion() const
 - const Color& GetColor() const
 - const String& GetString() const
+- const ResourceRef& GetResourceRef() const
+- const ResourceRefList& GetResourceRefList() const
 - Variant[]@ GetVariantVector() const
 - const VariantMap& GetVariantMap() const
 - void FromString(const String&, const String&)
@@ -857,6 +862,7 @@ Methods:<br>
 - File@ GetFile(const String&)
 - String GetPreferredResourceDir(const String&)
 - Resource@ GetResource(const String&, const String&)
+- Resource@ GetResource(ShortStringHash, StringHash)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -929,7 +935,7 @@ Methods:<br>
 - bool SetVector4(const String&, const Vector3&)
 - uint GetNumAttributes() const
 - bool HasAttribute(const String&) const
-- String GetAttributes(const String&) const
+- String GetAttribute(const String&) const
 - String[]@ GetAttributeNames() const
 - bool HasChild(const String&) const
 - XMLElement GetChild(const String& arg0 = String ( )) const
@@ -955,7 +961,7 @@ Methods:<br>
 Properties:<br>
 - String name (readonly)
 - String text (readonly)
-- bool null (readonly)
+- bool isNull (readonly)
 - bool notNull (readonly)
 - XMLElement parent (readonly)
 - XMLFile@ file (readonly)
@@ -1030,6 +1036,7 @@ Methods:<br>
 - void Remove()
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
+- void RemoveComponent(Component@)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1060,7 +1067,7 @@ Properties:<br>
 - Vector3& targetPosition (readonly)
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
-- Quaternion worldTrgetRotation (readonly)
+- Quaternion worldTargetRotation (readonly)
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -1106,6 +1113,7 @@ Methods:<br>
 - void Remove()
 - Component@ CreateComponent(const String&, CreateMode arg1 = REPLICATED)
 - Component@ GetOrCreateComponent(const String&, CreateMode arg1 = REPLICATED)
+- void RemoveComponent(Component@)
 - Node@[]@ GetChildren(bool arg0 = false) const
 - Node@[]@ GetChildrenWithComponent(const String&, bool arg1 = false) const
 - Node@[]@ GetChildrenWithScript(bool arg0 = false) const
@@ -1114,7 +1122,6 @@ Methods:<br>
 - Component@[]@ GetComponents(const String&) const
 - Component@ GetComponent(const String&, uint arg1 = 0) const
 - bool HasComponent(const String&) const
-- void Update(float)
 - bool LoadXML(File@)
 - bool SaveXML(File@)
 - bool LoadAsync(File@)
@@ -1123,8 +1130,13 @@ Methods:<br>
 - void Clear()
 - void AddRequiredPackageFile(PackageFile@)
 - void ClearRequiredPackageFiles()
+- void RegisterVar(const String&)
+- void UnregisterVar(const String&)
+- void UnregisterAllVars(const String&)
 - Component@ GetComponentByID(uint)
 - Node@ GetNodeByID(uint)
+- const String& GetVarName(ShortStringHash) const
+- void Update(float)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1143,7 +1155,7 @@ Properties:<br>
 - Vector3& targetPosition (readonly)
 - Quaternion& targetRotation (readonly)
 - Vector3 worldTargetPosition (readonly)
-- Quaternion worldTrgetRotation (readonly)
+- Quaternion worldTargetRotation (readonly)
 - bool smoothed
 - uint id (readonly)
 - uint numChildren (readonly)
@@ -1394,7 +1406,7 @@ Properties:<br>
 - uint numTechniques
 - Technique@[] technique (readonly)
 - Vector4[] shaderParameter
-- Texture@[] texture
+- Texture@[] textures
 - bool occlusion (readonly)
 - CullMode cullMode
 - CullMode shadowCullMode
@@ -1436,6 +1448,31 @@ Properties:<br>
 - uint numTracks (readonly)
 
 
+DebugRenderer
+
+Methods:<br>
+- bool Load(File@)
+- bool Save(File@)
+- bool LoadXML(const XMLElement&)
+- bool SaveXML(XMLElement&)
+- bool SetAttribute(const String&, const Variant&)
+- Variant GetAttribute(const String&)
+- void Remove()
+- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
+- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
+- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
+- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
+
+Properties:<br>
+- ShortStringHash type (readonly)
+- String& typeName (readonly)
+- uint numAttributes (readonly)
+- Variant[] attributes
+- AttributeInfo&[] attributeInfos (readonly)
+- uint id (readonly)
+- Node@ node (readonly)
+
+
 Drawable
 
 Methods:<br>
@@ -1446,7 +1483,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1456,6 +1493,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1503,7 +1541,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1513,6 +1551,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1551,7 +1590,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1561,6 +1600,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1588,7 +1628,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1598,6 +1638,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1624,7 +1665,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -1634,6 +1675,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1678,7 +1720,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - AnimationState@ AddAnimationState(Animation@)
 - void RemoveAnimationState(Animation@)
 - void RemoveAnimationState(const String&)
@@ -1699,6 +1741,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1789,7 +1832,7 @@ Methods:<br>
 - bool SetAttribute(const String&, const Variant&)
 - Variant GetAttribute(const String&)
 - void Remove()
-- bool IsInView() const
+- void DrawDebugGeometry(DebugRenderer@, bool)
 - void Updated()
 
 Properties:<br>
@@ -1800,6 +1843,7 @@ Properties:<br>
 - AttributeInfo&[] attributeInfos (readonly)
 - uint id (readonly)
 - Node@ node (readonly)
+- bool inView (readonly)
 - bool castShadows
 - bool occluder
 - bool visible
@@ -1846,31 +1890,6 @@ Properties:<br>
 - XMLFile@ parameters
 - bool active (readonly)
 - uint numParticles (readonly)
-
-
-DebugRenderer
-
-Methods:<br>
-- bool Load(File@)
-- bool Save(File@)
-- bool LoadXML(const XMLElement&)
-- bool SaveXML(XMLElement&)
-- bool SetAttribute(const String&, const Variant&)
-- Variant GetAttribute(const String&)
-- void Remove()
-- void AddLine(const Vector3&, const Vector3&, const Color&, bool arg3 = true)
-- void AddBoundingBox(const BoundingBox&, const Color&, bool arg2 = true)
-- void AddFrustum(const Frustum&, const Color&, bool arg2 = true)
-- void AddSkeleton(Skeleton@, const Color&, bool arg2 = true)
-
-Properties:<br>
-- ShortStringHash type (readonly)
-- String& typeName (readonly)
-- uint numAttributes (readonly)
-- Variant[] attributes
-- AttributeInfo&[] attributeInfos (readonly)
-- uint id (readonly)
-- Node@ node (readonly)
 
 
 RayQueryResult
@@ -3394,7 +3413,6 @@ Properties:<br>
 FileSelector
 
 Methods:<br>
-- void SetTitle(const String&)
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
 - void UpdateElements()
@@ -3402,6 +3420,7 @@ Methods:<br>
 Properties:<br>
 - ShortStringHash type (readonly)
 - String& typeName (readonly)
+- String& title
 - String& path
 - String& fileName
 - bool directoryMode
@@ -3596,6 +3615,7 @@ Methods:<br>
 - void SetHeightfield(Model@, uint, uint, float, uint, const Vector3&, const Quaternion&)
 - void SetConvexHull(Model@, float, uint, const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&)
+- void DrawDebugGeometry(DebugRenderer@, bool)
 
 Properties:<br>
 - ShortStringHash type (readonly)
@@ -3805,3 +3825,4 @@ Properties:<br>
 - bool headless (readonly)
 
 */
+[Thu Aug 18 21:45:37 2011] INFO: Saving scene to Data/Scene.xml

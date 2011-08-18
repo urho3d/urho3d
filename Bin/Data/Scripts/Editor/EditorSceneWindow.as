@@ -110,8 +110,7 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
     // Remove old item if exists
-    uint numItems = list.numItems;
-    if (itemIndex < numItems && list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)
+    if (itemIndex < list.numItems && list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)
         list.RemoveItem(itemIndex);
     if (node is null)
         return itemIndex;
@@ -391,15 +390,8 @@ void HandleNodeListItemDoubleClick(StringHash eventType, VariantMap& eventData)
 void HandleNodeListKey(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
-
-    ListView@ list = sceneWindow.GetChild("NodeList", true);
-
-    uint index = list.selection;
-    Node@ node = GetListNode(index);
-    Component@ component = GetListComponent(index);
-    uint nodeItem = GetNodeListIndex(node, index);
-
-    /// \todo Implement actual functionality
+    
+    /// \todo Add required functionality
 }
 
 void HandleDragDropTest(StringHash eventType, VariantMap& eventData)
@@ -550,56 +542,53 @@ bool CheckSceneWindowFocus(bool allowNoElement)
 
 void SceneDelete()
 {
-    /*
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    uint index = list.GetSelection();
+    uint index = list.selection;
     uint nodeIndex = GetNodeListIndex(selectedNode);
     
     // Remove component
-    if ((selectedNode !is null) && (selectedComponent !is null))
+    if (selectedNode !is null && selectedComponent !is null)
     {
-        if (!checkSceneWindowFocus(true))
+        if (!CheckSceneWindowFocus(true))
+            return;
+
+        // For the sake of sanity, do not allow to delete the octree from the scene
+        if (selectedNode is editorScene && selectedComponent.typeName == "Octree" && selectedComponent is selectedNode.GetComponents("Octree")[0])
             return;
 
         uint id = selectedNode.id;
-        beginModify(id);
-        selectedNode.removeComponent(selectedComponent);
-        endModify(id);
-        
-        // If component is a node, remove it from the parent node
-        Node@ node = cast<Node>(selectedComponent);
-        if ((node !is null) && (node.GetParent() !is null))
-            node.GetParent().removeChild(node, true);
-        
-        @selectedComponent = null;
-        
-        updateSceneWindowNode(nodeIndex, selectedNode);
-        
+        BeginModify(id);
+        selectedNode.RemoveComponent(selectedComponent);
+        EndModify(id);
+
+        UpdateSceneWindowNode(nodeIndex, selectedNode);
+
         // Select the next item in the same index
-        list.SetSelection(index);
+        list.selection = index;
     }
-    // Remove node
-    else if ((selectedNode !is null) && (selectedComponent is null))
+    // Remove (parented) node
+    else if (selectedNode !is null && selectedComponent is null)
     {
-        // Node operations are dangerous. Require the scene hierarchy to be focused
-        if (!checkSceneWindowFocus(false))
+        // Require the scene hierarchy to be focused
+        if (!CheckSceneWindowFocus(false))
+            return;
+        if (selectedNode.parent is null)
             return;
 
         uint id = selectedNode.id;
 
-        beginModify(id);
-        editorScene.removeNode(selectedNode);
-        endModify(id);
+        BeginModify(id);
+        selectedNode.Remove();
+        EndModify(id);
 
-        @selectedComponent = null;
-        @selectedNode = null;
+        selectedComponent = null;
+        selectedNode = null;
 
-        updateSceneWindowNode(nodeIndex, null);
+        UpdateSceneWindowNode(nodeIndex, null);
 
         // Select the next item in the same index
-        list.SetSelection(index);
+        list.selection = index;
     }
-    */
 }
 
 void SceneCut()

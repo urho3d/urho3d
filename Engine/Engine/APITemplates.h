@@ -508,6 +508,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ CreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeCreateComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetOrCreateComponent(const String&in, CreateMode mode = REPLICATED)", asFUNCTION(NodeGetOrCreateComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "void RemoveComponent(Component@+)", asMETHOD(T, RemoveComponent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
@@ -531,7 +532,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "const Vector3& get_targetPosition() const", asMETHOD(T, GetTargetPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Quaternion& get_targetRotation() const", asMETHOD(T, GetTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldTargetPosition() const", asMETHOD(T, GetWorldTargetPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Quaternion get_worldTrgetRotation() const", asMETHOD(T, GetWorldTargetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Quaternion get_worldTargetRotation() const", asMETHOD(T, GetWorldTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_smoothed(bool)", asMETHOD(T, SetSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_smoothed() const", asMETHOD(T, IsSmoothed), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);
