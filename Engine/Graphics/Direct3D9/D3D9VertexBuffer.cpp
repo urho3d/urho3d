@@ -118,6 +118,8 @@ void VertexBuffer::Release()
         ((IDirect3DVertexBuffer9*)object_)->Release();
         object_ = 0;
     }
+    
+    fallbackData_.Reset();
 }
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
@@ -191,7 +193,7 @@ void VertexBuffer::SetMorphRangeResetData(const SharedArrayPtr<unsigned char>& d
 
 void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if (!object_)
+    if (!object_ && !fallbackData_)
         return 0;
 
     if (locked_)
@@ -207,20 +209,26 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     }
     
     void* hwData = 0;
-    DWORD flags = 0;
     
-    if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
-        flags = D3DLOCK_DISCARD;
-    if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
-        flags = D3DLOCK_NOOVERWRITE;
-    if (mode == LOCK_READONLY)
-        flags = D3DLOCK_READONLY;
-    
-    if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
+    if (object_)
     {
-        LOGERROR("Could not lock vertex buffer");
-        return 0;
+        DWORD flags = 0;
+        
+        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_DISCARD;
+        if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_NOOVERWRITE;
+        if (mode == LOCK_READONLY)
+            flags = D3DLOCK_READONLY;
+        
+        if (FAILED(((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags)))
+        {
+            LOGERROR("Could not lock vertex buffer");
+            return 0;
+        }
     }
+    else
+        hwData = fallbackData_.Get() + start * vertexSize_;
     
     locked_ = true;
     return hwData;
@@ -230,7 +238,8 @@ void VertexBuffer::Unlock()
 {
     if (locked_)
     {
-        ((IDirect3DVertexBuffer9*)object_)->Unlock();
+        if (object_)
+            ((IDirect3DVertexBuffer9*)object_)->Unlock();
         locked_ = false;
     }
 }
@@ -314,21 +323,24 @@ bool VertexBuffer::Create()
     
     if (!vertexCount_ || !elementMask_)
         return true;
-    if (!graphics_)
-        return false;
     
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-    if (!device || FAILED(device->CreateVertexBuffer(
-        vertexCount_ * vertexSize_,
-        usage_,
-        0,
-        (D3DPOOL)pool_,
-        (IDirect3DVertexBuffer9**)&object_,
-        0)))
+    if (graphics_)
     {
-        LOGERROR("Could not create vertex buffer");
-        return false;
+        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        if (!device || FAILED(device->CreateVertexBuffer(
+            vertexCount_ * vertexSize_,
+            usage_,
+            0,
+            (D3DPOOL)pool_,
+            (IDirect3DVertexBuffer9**)&object_,
+            0)))
+        {
+            LOGERROR("Could not create vertex buffer");
+            return false;
+        }
     }
+    else
+        fallbackData_ = new unsigned char[vertexCount_ * vertexSize_];
     
     return true;
 }

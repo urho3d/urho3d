@@ -23,6 +23,7 @@
 
 #include "Animation.h"
 #include "Context.h"
+#include "DebugRenderer.h"
 #include "File.h"
 #include "FileSystem.h"
 #include "Geometry.h"
@@ -1070,7 +1071,6 @@ void BuildAndSaveScene(OutScene& scene)
     PrintLine("Writing scene");
     
     SharedPtr<Scene> outScene(new Scene(context_));
-    outScene->SetName(GetFileName(scene.outName_));
     
     /// \todo Make the physics properties configurable
     PhysicsWorld* physicsWorld = outScene->CreateComponent<PhysicsWorld>();
@@ -1078,6 +1078,8 @@ void BuildAndSaveScene(OutScene& scene)
     
     /// \todo Make the octree properties configurable, or detect from the scene contents
     Octree* octree = outScene->CreateComponent<Octree>();
+    
+    DebugRenderer* debug = outScene->CreateComponent<DebugRenderer>();
     
     if (createZone_)
     {

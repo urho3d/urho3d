@@ -74,6 +74,8 @@ private:
     /// Create buffer.
     bool Create();
     
+    /// Fallback data when operating with a null graphics subsystem.
+    SharedArrayPtr<unsigned char> fallbackData_;
     /// Memory pool.
     unsigned pool_;
     /// Usage type.

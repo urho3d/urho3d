@@ -72,7 +72,7 @@ public:
     /// Release a resource by name.
     void ReleaseResource(ShortStringHash type, const String& name, bool force = false);
     /// Release a resource by name hash.
-    void ReleaseResource(ShortStringHash type, StringHash nameHash, bool force = false); 
+    void ReleaseResource(ShortStringHash type, StringHash nameHash, bool force = false);
     /// Release all resources of a specific type.
     void ReleaseResources(ShortStringHash type, bool force = false);
     /// Release resources of a specific type and partial name.
@@ -118,6 +118,8 @@ public:
     const String& GetResourceName(StringHash nameHash) const;
     /// Return either the path itself or its parent, based on which of them has recognized resource subdirectories.
     String GetPreferredResourceDir(const String& path);
+    /// Store a hash-to-name mapping.
+    void StoreNameHash(const String& name);
     
 private:
     /// Find a resource.
@@ -126,8 +128,6 @@ private:
     void ReleasePackageResources(PackageFile* package, bool force = false);
     /// Update a resource group. Recalculate memory use and release resources if over memory budget.
     void UpdateResourceGroup(ShortStringHash type);
-    /// Store a hash-to-name mapping.
-    void StoreNameHash(const String& name);
     
     /// Resources by type.
     Map<ShortStringHash, ResourceGroup> resourceGroups_;

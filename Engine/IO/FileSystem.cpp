@@ -124,6 +124,11 @@ int FileSystem::SystemCommand(const String& commandLine)
 
 int FileSystem::SystemRun(const String& fileName, const Vector<String>& arguments)
 {
+    String fullLine = fileName + " ";
+    for (unsigned i = 0; i < arguments.Size(); ++i)
+        fullLine += arguments[i] + " ";
+    LOGINFO("SystemRun: " + fullLine);
+    
     if (allowedPaths_.Empty())
     {
         String fixedFileName = GetNativePath(fileName);

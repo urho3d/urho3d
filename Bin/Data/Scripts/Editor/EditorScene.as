@@ -23,7 +23,7 @@ void CreateScene()
     selectedNode = null;
 
     // Create a scene with default values, these will be overridden when loading scenes
-    editorScene = Scene("Urho3D Editor");
+    editorScene = Scene("");
     Octree@ octree = editorScene.CreateComponent("Octree");
     PhysicsWorld@ physicsWorld = editorScene.CreateComponent("PhysicsWorld");
     octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
@@ -180,8 +180,6 @@ void SaveScene(const String&in fileName)
 {
     if (fileName.empty || GetFileName(fileName).empty)
         return;
-
-    editorScene.name = GetFileName(fileName);
 
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);

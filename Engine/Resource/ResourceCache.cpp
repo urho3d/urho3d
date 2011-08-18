@@ -501,6 +501,14 @@ String ResourceCache::GetPreferredResourceDir(const String& path)
     return fixedPath;
 }
 
+void ResourceCache::StoreNameHash(const String& name)
+{
+    if (name.Empty())
+        return;
+    
+    hashToName_[StringHash(name)] = name;
+}
+
 const SharedPtr<Resource>& ResourceCache::FindResource(ShortStringHash type, StringHash nameHash)
 {
     Map<ShortStringHash, ResourceGroup>::Iterator i = resourceGroups_.Find(type);
@@ -582,14 +590,6 @@ void ResourceCache::UpdateResourceGroup(ShortStringHash type)
         else
             break;
     }
-}
-
-void ResourceCache::StoreNameHash(const String& name)
-{
-    if (name.Empty())
-        return;
-    
-    hashToName_[StringHash(name)] = name;
 }
 
 void RegisterResourceLibrary(Context* context)

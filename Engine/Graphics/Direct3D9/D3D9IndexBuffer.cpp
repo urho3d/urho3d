@@ -79,6 +79,8 @@ void IndexBuffer::Release()
         ((IDirect3DIndexBuffer9*)object_)->Release();
         object_ = 0;
     }
+    
+    fallbackData_.Reset();
 }
 
 bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
@@ -127,7 +129,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count)
 
 void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
 {
-    if (!object_)
+    if (!object_ && !fallbackData_)
         return 0;
 
     if (locked_)
@@ -143,20 +145,26 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, LockMode mode)
     }
     
     void* hwData = 0;
-    DWORD flags = 0;
     
-    if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
-        flags = D3DLOCK_DISCARD;
-    if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
-        flags = D3DLOCK_NOOVERWRITE;
-    if (mode == LOCK_READONLY)
-        flags = D3DLOCK_READONLY;
-        
-    if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
+    if (object_)
     {
-        LOGERROR("Could not lock index buffer");
-        return 0;
+        DWORD flags = 0;
+        
+        if (mode == LOCK_DISCARD && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_DISCARD;
+        if (mode == LOCK_NOOVERWRITE && usage_ & D3DUSAGE_DYNAMIC)
+            flags = D3DLOCK_NOOVERWRITE;
+        if (mode == LOCK_READONLY)
+            flags = D3DLOCK_READONLY;
+        
+        if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
+        {
+            LOGERROR("Could not lock index buffer");
+            return 0;
+        }
     }
+    else
+        hwData = fallbackData_.Get() + start * indexSize_;
     
     locked_ = true;
     return hwData;
@@ -166,7 +174,8 @@ void IndexBuffer::Unlock()
 {
     if (locked_)
     {
-        ((IDirect3DIndexBuffer9*)object_)->Unlock();
+        if (object_)
+            ((IDirect3DIndexBuffer9*)object_)->Unlock();
         locked_ = false;
     }
 }
@@ -227,21 +236,24 @@ bool IndexBuffer::Create()
     
     if (!indexCount_)
         return true;
-    if (!graphics_)
-        return false;
     
-    IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-    if (!device || FAILED(device->CreateIndexBuffer(
-        indexCount_ * indexSize_,
-        usage_,
-        indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
-        (D3DPOOL)pool_,
-        (IDirect3DIndexBuffer9**)&object_,
-        0)))
+    if (graphics_)
     {
-        LOGERROR("Could not create index buffer");
-        return false;
+        IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
+        if (!device || FAILED(device->CreateIndexBuffer(
+            indexCount_ * indexSize_,
+            usage_,
+            indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
+            (D3DPOOL)pool_,
+            (IDirect3DIndexBuffer9**)&object_,
+            0)))
+        {
+            LOGERROR("Could not create index buffer");
+            return false;
+        }
     }
+    else
+        fallbackData_ = new unsigned char[indexCount_ * indexSize_];
     
     return true;
 }

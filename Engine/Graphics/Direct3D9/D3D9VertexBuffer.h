@@ -103,6 +103,8 @@ private:
     /// Create buffer.
     bool Create();
     
+    /// Fallback data when operating with a null graphics subsystem.
+    SharedArrayPtr<unsigned char> fallbackData_;
     /// Morph vertex range reset data.
     SharedArrayPtr<unsigned char> morphRangeResetData_;
     /// Memory pool.

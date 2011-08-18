@@ -74,6 +74,8 @@ private:
     /// Create buffer.
     bool Create();
     
+    /// Fallback data when operating with a null graphics subsystem.
+    SharedArrayPtr<unsigned char> fallbackData_;
     /// Save data when OpenGL context needs to be destroyed and recreated.
     SharedArrayPtr<unsigned char> saveData_;
     /// Number of indices.

@@ -64,7 +64,7 @@ void ImportScene(const String&in fileName)
         {
             String currentFileName = sceneFileName;
             LoadScene(tempSceneName);
-            fileSystem.Delete(tempSceneName);
+            fileSystem.Delete(tempSceneName);          
             sceneFileName = currentFileName;
             UpdateWindowTitle();
         }
