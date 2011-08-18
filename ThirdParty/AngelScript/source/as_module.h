@@ -87,6 +87,8 @@ struct sObjectTypePair
 //       then it should simply replace the bytecode within the functions without
 //       changing the values of existing global properties, etc.
 
+// TODO: interface: Should have user data in the modules as well. This may be 
+//                  used to store extra information, such as meta-data and source code files
 
 class asCModule : public asIScriptModule
 {

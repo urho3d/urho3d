@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2007 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -48,6 +48,7 @@ asCTypeInfo::asCTypeInfo()
 	isVariable            = false;
 	isExplicitHandle      = false;
 	qwordValue            = 0;
+	isLValue              = false;
 }
 
 void asCTypeInfo::Set(const asCDataType &dt)
@@ -60,6 +61,7 @@ void asCTypeInfo::Set(const asCDataType &dt)
 	isVariable       = false;
 	isExplicitHandle = false;
 	qwordValue       = 0;
+	isLValue         = false;
 }
 
 void asCTypeInfo::SetVariable(const asCDataType &dt, int stackOffset, bool isTemporary)

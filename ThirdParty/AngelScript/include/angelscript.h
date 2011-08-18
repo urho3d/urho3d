@@ -56,8 +56,8 @@ BEGIN_AS_NAMESPACE
 
 // AngelScript version
 
-#define ANGELSCRIPT_VERSION        22100
-#define ANGELSCRIPT_VERSION_STRING "2.21.0"
+#define ANGELSCRIPT_VERSION        22101
+#define ANGELSCRIPT_VERSION_STRING "2.21.1"
 
 // Data types
 
@@ -115,6 +115,7 @@ enum asEObjTypeFlags
 	asOBJ_NOHANDLE                   = 0x10,
 	asOBJ_SCOPED                     = 0x20,
 	asOBJ_TEMPLATE                   = 0x40,
+	asOBJ_ASHANDLE                   = 0x80,
 	asOBJ_APP_CLASS                  = 0x100,
 	asOBJ_APP_CLASS_CONSTRUCTOR      = 0x200,
 	asOBJ_APP_CLASS_DESTRUCTOR       = 0x400,
@@ -137,7 +138,7 @@ enum asEObjTypeFlags
 	asOBJ_APP_CLASS_K                = (asOBJ_APP_CLASS + asOBJ_APP_CLASS_COPY_CONSTRUCTOR),
 	asOBJ_APP_PRIMITIVE              = 0x2000,
 	asOBJ_APP_FLOAT                  = 0x4000,
-	asOBJ_MASK_VALID_FLAGS           = 0x7F7F,
+	asOBJ_MASK_VALID_FLAGS           = 0x7FFF,
 	asOBJ_SCRIPT_OBJECT              = 0x10000
 };
 
@@ -208,22 +209,22 @@ enum asERetCodes
 // Context states
 enum asEContextState
 {
-    asEXECUTION_FINISHED      = 0,
-    asEXECUTION_SUSPENDED     = 1,
-    asEXECUTION_ABORTED       = 2,
-    asEXECUTION_EXCEPTION     = 3,
-    asEXECUTION_PREPARED      = 4,
-    asEXECUTION_UNINITIALIZED = 5,
-    asEXECUTION_ACTIVE        = 6,
-    asEXECUTION_ERROR         = 7
+	asEXECUTION_FINISHED      = 0,
+	asEXECUTION_SUSPENDED     = 1,
+	asEXECUTION_ABORTED       = 2,
+	asEXECUTION_EXCEPTION     = 3,
+	asEXECUTION_PREPARED      = 4,
+	asEXECUTION_UNINITIALIZED = 5,
+	asEXECUTION_ACTIVE        = 6,
+	asEXECUTION_ERROR         = 7
 };
 
 // Message types
 enum asEMsgType
 {
-    asMSGTYPE_ERROR       = 0,
-    asMSGTYPE_WARNING     = 1,
-    asMSGTYPE_INFORMATION = 2
+	asMSGTYPE_ERROR       = 0,
+	asMSGTYPE_WARNING     = 1,
+	asMSGTYPE_INFORMATION = 2
 };
 
 // Garbage collector flags
@@ -840,8 +841,8 @@ public:
 	virtual asIScriptEngine *GetEngine() const = 0;
 
 	// Memory management
-	virtual int AddRef() const = 0;
-	virtual int Release() const = 0;
+	virtual int              AddRef() const = 0;
+	virtual int              Release() const = 0;
 
 	virtual int              GetId() const = 0;
 	virtual asEFuncType      GetFuncType() const = 0;
@@ -869,8 +870,8 @@ public:
 	virtual asDWORD         *GetByteCode(asUINT *length = 0) = 0;
 
 	// User data
-	virtual void *SetUserData(void *userData) = 0;
-	virtual void *GetUserData() const = 0;
+	virtual void            *SetUserData(void *userData) = 0;
+	virtual void            *GetUserData() const = 0;
 
 protected:
 	virtual ~asIScriptFunction() {};

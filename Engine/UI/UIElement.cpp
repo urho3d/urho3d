@@ -770,9 +770,17 @@ void UIElement::AddChild(UIElement* element)
 
 void UIElement::InsertChild(unsigned index, UIElement* element)
 {
-    // Check for illegal parent assignments
-    if (!element || element == this || element->parent_ == this || parent_ == element)
+    // Check for illegal or redundant parent assignment
+    if (!element || element == this || element->parent_ == this)
         return;
+     // Check for possible cyclic parent assignment
+    UIElement* parent = parent_;
+    while (parent)
+    {
+        if (parent == element)
+            return;
+        parent = parent->parent_;
+    }
     
     // Add first, then remove from old parent, to ensure the element does not get deleted
     if (index >= children_.Size())

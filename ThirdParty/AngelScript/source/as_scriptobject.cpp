@@ -341,6 +341,7 @@ int asCScriptObject::GetTypeId() const
 
 int asCScriptObject::GetPropertyCount() const
 {
+	// TODO: interface: Should return asUINT, as the function cannot fail
 	return (int)objType->properties.GetLength();
 }
 

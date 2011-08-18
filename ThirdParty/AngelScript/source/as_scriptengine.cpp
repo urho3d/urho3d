@@ -1207,7 +1207,11 @@ int asCScriptEngine::RegisterObjectType(const char *name, int byteSize, asDWORD 
 	{
 		// Cannot use reference flags
 		// TODO: template: Should be possible to register a value type as template type
-		if( flags & (asOBJ_REF | asOBJ_GC | asOBJ_SCOPED) )
+		if( flags & (asOBJ_REF | asOBJ_GC | asOBJ_SCOPED | asOBJ_TEMPLATE) )
+			return ConfigError(asINVALID_ARG);
+
+		// flags are exclusive
+		if( (flags & asOBJ_POD) && (flags & asOBJ_ASHANDLE) )
 			return ConfigError(asINVALID_ARG);
 
 		// If the app type is given, we must validate the flags
@@ -1786,13 +1790,15 @@ int asCScriptEngine::RegisterBehaviourToObjectType(asCObjectType *objectType, as
 	else if( behaviour == asBEHAVE_REF_CAST ||
 	         behaviour == asBEHAVE_IMPLICIT_REF_CAST )
 	{
-		// Verify parameter count
-		if( func.parameterTypes.GetLength() != 0 )
-			return ConfigError(asINVALID_DECLARATION);
+		// There are two allowed signatures
+		//  1. obj @f()
+		//  2. void f(?&out)
 
-		// Verify return type
-		if( !func.returnType.IsObjectHandle() )
+		if( !(func.parameterTypes.GetLength() == 0 && func.returnType.IsObjectHandle()) &&
+			!(func.parameterTypes.GetLength() == 1 && func.parameterTypes[0].GetTokenType() == ttQuestion && func.inOutFlags[0] == asTM_OUTREF && func.returnType.GetTokenType() == ttVoid) )
+		{
 			return ConfigError(asINVALID_DECLARATION);
+		}
 
 		// TODO: verify that the same cast is not registered already (cosnt or non-const is treated the same for the return type)
 
@@ -3214,9 +3220,15 @@ void asCScriptEngine::GCEnumCallback(void *reference)
 
 
 // TODO: multithread: The mapTypeIdToDataType must be protected with critical sections in all functions that access it
-int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dt) const
+int asCScriptEngine::GetTypeIdFromDataType(const asCDataType &dtIn) const
 {
-	if( dt.IsNullHandle() ) return 0;
+	if( dtIn.IsNullHandle() ) return 0;
+
+	// ASHANDLE is mimicking a handle, but it really is a value 
+	// type so only the non-handle form should be registered.
+	asCDataType dt(dtIn);
+	if( dt.GetObjectType() && dt.GetObjectType()->flags & asOBJ_ASHANDLE )
+		dt.MakeHandle(false);
 
 	// Urho3D: check first for cached id in the type itself
 	int typeId = dt.GetCachedTypeId();
@@ -3353,6 +3365,7 @@ int asCScriptEngine::GetSizeOfPrimitiveType(int typeId) const
 	return dt->GetSizeInMemoryBytes();
 }
 
+// TODO: interface: Should be able to take a pointer to asIObjectType directly
 void *asCScriptEngine::CreateScriptObject(int typeId)
 {
 	// Make sure the type id is for an object type, and not a primitive or a handle
@@ -3424,6 +3437,7 @@ void asCScriptEngine::CopyScriptObject(void *dstObj, void *srcObj, int typeId)
 	}
 }
 
+// TODO: interface: Should be able to take a pointer to asIObjectType directly
 void asCScriptEngine::AddRefScriptObject(void *obj, int typeId)
 {
 	// Make sure it is not a null pointer
@@ -3446,6 +3460,7 @@ void asCScriptEngine::AddRefScriptObject(void *obj, int typeId)
 	}
 }
 
+// TODO: interface: Should be able to take a pointer to asIObjectType directly
 void asCScriptEngine::ReleaseScriptObject(void *obj, int typeId)
 {
 	// Make sure it is not a null pointer

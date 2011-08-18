@@ -111,7 +111,7 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
 
     // Remove old item if exists
     uint numItems = list.numItems;
-    if (itemIndex < numItems)
+    if (itemIndex < numItems && list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)
         list.RemoveItem(itemIndex);
     if (node is null)
         return itemIndex;

@@ -438,9 +438,17 @@ Node* Node::CreateChild(const String& name, CreateMode mode)
 
 void Node::AddChild(Node* node)
 {
-    // Check for illegal parent assignments, including attempt to reparent the scene
-    if (!node || node == this || node->parent_ == this || parent_ == node || scene_ == node)
+    // Check for illegal or redundant parent assignment
+    if (!node || node == this || node->parent_ == this)
         return;
+    // Check for possible cyclic parent assignment
+    Node* parent = parent_;
+    while (parent)
+    {
+        if (parent == node)
+            return;
+        parent = parent->parent_;
+    }
     
     // Add first, then remove from old parent, to ensure the node does not get deleted
     children_.Push(SharedPtr<Node>(node));

@@ -97,11 +97,13 @@ public:
 
 	// Global functions
 	virtual int RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
+	// TODO: interface: Should return asUINT
 	virtual int GetGlobalFunctionCount() const;
 	virtual int GetGlobalFunctionIdByIndex(asUINT index) const;
 
 	// Global properties
 	virtual int RegisterGlobalProperty(const char *declaration, void *pointer);
+	// TODO: interface: Should return asUINT
 	virtual int GetGlobalPropertyCount() const;
 	virtual int GetGlobalPropertyByIndex(asUINT index, const char **name, int *typeId = 0, bool *isConst = 0, const char **configGroup = 0, void **pointer = 0) const;
 	
@@ -112,6 +114,7 @@ public:
 	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv);
 	virtual int            RegisterInterface(const char *name);
 	virtual int            RegisterInterfaceMethod(const char *intf, const char *declaration);
+	// TODO: interface: Should return asUINT
 	virtual int            GetObjectTypeCount() const;
 	virtual asIObjectType *GetObjectTypeByIndex(asUINT index) const;
 	
@@ -126,6 +129,7 @@ public:
 	// Enums
 	virtual int         RegisterEnum(const char *type);
 	virtual int         RegisterEnumValue(const char *type, const char *name, int value);
+	// TODO: interface: Should return asUINT
 	virtual int         GetEnumCount() const;
 	virtual const char *GetEnumByIndex(asUINT index, int *enumTypeId, const char **configGroup = 0) const;
 	virtual int         GetEnumValueCount(int enumTypeId) const;
@@ -133,11 +137,13 @@ public:
 
 	// Funcdefs
 	virtual int                RegisterFuncdef(const char *decl);
+	// TODO: interface: Should return asUINT
 	virtual int                GetFuncdefCount() const;
 	virtual asIScriptFunction *GetFuncdefByIndex(asUINT index, const char **configGroup = 0) const;
 
 	// Typedefs
 	virtual int         RegisterTypedef(const char *type, const char *decl);
+	// TODO: interface: Should return asUINT
 	virtual int         GetTypedefCount() const;
 	virtual const char *GetTypedefByIndex(asUINT index, int *typeId, const char **configGroup = 0) const;
 

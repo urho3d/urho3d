@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2010 Andreas Jonsson
+   Copyright (c) 2003-2011 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -222,9 +222,10 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 		// Only reference types are allowed to be handles, 
 		// but not nohandle reference types, and not scoped references (except when returned from registered function)
 		// funcdefs are special reference types, and support handles
+		// value types with asOBJ_ASHANDLE are treated as a handle
 		if( !funcDef && 
 			(!objectType || 
-			!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE)) || 
+			!((objectType->flags & asOBJ_REF) || (objectType->flags & asOBJ_TEMPLATE_SUBTYPE) || (objectType->flags & asOBJ_ASHANDLE)) || 
 			(objectType->flags & asOBJ_NOHANDLE) || 
 			((objectType->flags & asOBJ_SCOPED) && !acceptHandleForScope)) )
 			return -1;
@@ -313,6 +314,10 @@ bool asCDataType::CanBeInstanciated() const
 		 ((objectType->flags & asOBJ_NOHANDLE) ||  // the ref type doesn't support handles or
 		  (!IsObjectHandle() &&                    // it's not a handle and
 		   objectType->beh.factories.GetLength() == 0))) ) // the ref type cannot be instanciated
+		return false;
+
+	// An ASHANDLE type can only be declared as a handle, even though it is a value type
+	if( IsObject() && (objectType->flags & asOBJ_ASHANDLE) && !IsObjectHandle() )
 		return false;
 
 	return true;

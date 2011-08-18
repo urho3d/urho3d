@@ -1800,7 +1800,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 	if( func->objectType )
 	{
 		fprintf(file, " %.3d: %s this\n", 0, func->objectType->name.AddressOf());
-		offset += AS_PTR_SIZE;
+		offset -= AS_PTR_SIZE;
 	}
 	for( n = 0; n < func->parameterTypes.GetLength(); n++ )
 	{
@@ -1816,7 +1816,7 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 		if( !found )
 			fprintf(file, " %.3d: %s {noname param}\n", offset, func->parameterTypes[n].Format().AddressOf());
 
-		offset += func->parameterTypes[n].GetSizeOnStackDWords();
+		offset -= func->parameterTypes[n].GetSizeOnStackDWords();
 	}
 	for( n = 0; n < func->objVariablePos.GetLength(); n++ )
 	{

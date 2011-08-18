@@ -567,9 +567,10 @@ void *asCModule::GetAddressOfGlobalVar(asUINT index)
 	if( index >= scriptGlobals.GetLength() )
 		return 0;
 
-	// TODO: value types shouldn't need dereferencing
 	// For object variables it's necessary to dereference the pointer to get the address of the value
-	if( scriptGlobals[index]->type.IsObject() && !scriptGlobals[index]->type.IsObjectHandle() )
+	if( scriptGlobals[index]->type.IsObject() && 
+		(!scriptGlobals[index]->type.IsObjectHandle() || 
+		 (scriptGlobals[index]->type.GetObjectType()->flags & asOBJ_ASHANDLE)) )
 		return *(void**)(scriptGlobals[index]->GetAddressOfValue());
 
 	return (void*)(scriptGlobals[index]->GetAddressOfValue());

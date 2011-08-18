@@ -2807,7 +2807,9 @@ asCDataType asCBuilder::CreateDataTypeFromNode(asCScriptNode *node, asCScriptCod
 						// Check if the subtype is a type or the template's subtype
 						// if it is the template's subtype then this is the actual template type,
 						// orderwise it is a template instance.
-						asCDataType subType = CreateDataTypeFromNode(n, file, false, ot);
+						// Only do this for application registered interface, as the 
+						// scripts cannot implement templates.
+						asCDataType subType = CreateDataTypeFromNode(n, file, false, module ? 0 : ot);
 						if( subType.GetObjectType() != ot->templateSubType.GetObjectType() )
 						{
 							// This is a template instance

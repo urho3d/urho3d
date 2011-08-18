@@ -207,6 +207,17 @@ void asCContext::DetachEngine()
 	// Free all resources
 	Unprepare();
 
+	// Free the stack blocks
+	for( asUINT n = 0; n < stackBlocks.GetLength(); n++ )
+	{
+		if( stackBlocks[n] )
+		{
+			asDELETEARRAY(stackBlocks[n]);
+		}
+	}
+	stackBlocks.SetLength(0);
+	stackBlockSize = 0;
+
 	// Clean the user data
 	if( userData && engine->cleanContextFunc )
 		engine->cleanContextFunc(this);
@@ -281,6 +292,7 @@ int asCContext::Prepare(int funcID)
 
 		if( stackSize > stackBlockSize )
 		{
+			// Free old stack blocks so new ones can be allocted
 			for( asUINT n = 0; n < stackBlocks.GetLength(); n++ )
 				if( stackBlocks[n] )
 				{
@@ -369,16 +381,6 @@ int asCContext::Unprepare()
 	// Reset status
 	status = asEXECUTION_UNINITIALIZED;
 
-	// Deallocate the stack blocks
-	for( asUINT n = 0; n < stackBlocks.GetLength(); n++ )
-	{
-		if( stackBlocks[n] )
-		{
-			asDELETEARRAY(stackBlocks[n]);
-		}
-	}
-	stackBlocks.SetLength(0);
-	stackBlockSize = 0;
 	regs.stackFramePointer = 0;
 	regs.stackPointer = 0;
 	stackIndex = 0;
