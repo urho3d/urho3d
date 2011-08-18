@@ -6,8 +6,9 @@ const int ITEM_COMPONENT = 2;
 const uint NO_ITEM = 0xffffffff;
 
 Window@ sceneWindow;
-uint copyBufferNodeID = 0;
 XMLFile copyBuffer;
+bool copyBufferLocal;
+bool copyBufferExpanded;
 
 void CreateSceneWindow()
 {
@@ -93,13 +94,9 @@ void CollapseSceneHierarchy()
 void UpdateSceneWindow()
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.contentElement.DisableLayoutUpdate();
     list.RemoveAllItems();
 
     UpdateSceneWindowNode(0, editorScene);
-
-    list.contentElement.EnableLayoutUpdate();
-    list.contentElement.UpdateLayout();
 
     // Clear copybuffer when whole window refreshed
     copyBuffer.CreateRoot("none");
@@ -109,8 +106,13 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
 
+    // Whenever we're updating the root, disable layout update to optimize speed
+    if (node is editorScene)
+        list.contentElement.DisableLayoutUpdate();
+
     // Remove old item if exists
-    if (itemIndex < list.numItems && list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)
+    if (itemIndex < list.numItems && (node is null || (list.items[itemIndex].vars["Type"].GetInt() == ITEM_NODE &&
+        list.items[itemIndex].vars["NodeID"].GetUInt() == node.id)))
         list.RemoveItem(itemIndex);
     if (node is null)
         return itemIndex;
@@ -146,6 +148,13 @@ uint UpdateSceneWindowNode(uint itemIndex, Node@ node)
     {
         Node@ childNode = node.children[i];
         itemIndex = UpdateSceneWindowNode(itemIndex, childNode);
+    }
+
+    // Re-enable layout update (and do manual layout) now
+    if (node is editorScene)
+    {
+        list.contentElement.EnableLayoutUpdate();
+        list.contentElement.UpdateLayout();
     }
 
     return itemIndex;
@@ -201,8 +210,36 @@ uint GetNodeListIndex(Node@ node)
     for (uint i = 0; i < numItems; ++i)
     {
         UIElement@ item = list.items[i];
-        if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetInt() == int(nodeID))
+        if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetUInt() == nodeID)
             return i;
+    }
+
+    return NO_ITEM;
+}
+
+uint GetParentAddIndex(Node@ node)
+{
+    if (node is null || node.parent is null)
+        return NO_ITEM;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    uint numItems = list.numItems;
+    uint parentID = node.parent.id;
+
+    for (uint i = 0; i < numItems; ++i)
+    {
+        UIElement@ item = list.items[i];
+        if (item.vars["Type"].GetInt() == ITEM_NODE && item.vars["NodeID"].GetUInt() == parentID)
+        {
+            int indent = item.vars["Indent"].GetInt();
+            for (uint j = i + 1; j < numItems; ++j)
+            {
+                // Scan for the next node on this or lower level; that is the place to insert the new child node
+                if (list.items[j].vars["Indent"].GetInt() <= indent)
+                    return j;
+            }
+            return numItems;
+        }
     }
 
     return NO_ITEM;
@@ -317,6 +354,43 @@ String GetComponentTitle(Component@ component, int indent)
     return indentStr + component.typeName + localStr;
 }
 
+void SelectNode(Node@ node)
+{
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+
+    if (node is null)
+    {
+        list.ClearSelection();
+        return;
+    }
+                                
+    uint nodeItem = GetNodeListIndex(node);
+
+    // Go in the parent chain up to the first non-root level to make sure the chain is expanded
+    for (;;)
+    {
+        Node@ parent = node.parent;
+        if (node is editorScene || parent is editorScene || parent is null)
+            break;
+        node = parent;
+    }
+    
+    uint numItems = list.numItems;
+    uint parentItem = GetNodeListIndex(node);
+
+    if (nodeItem < numItems)
+    {
+        // Expand the node chain now, but do not expand the whole scene in case the component was in the root
+        list.items[nodeItem].visible = true;
+        if (parentItem != 0 && parentItem < numItems)
+            list.SetChildItemsVisible(parentItem, true);
+        // This causes an event to be sent, in response we set selectedComponent & selectedNode, and refresh editors
+        list.selection = nodeItem;
+    }
+    else
+        list.ClearSelection();
+}
+
 void SelectComponent(Component@ component)
 {
     ListView@ list = sceneWindow.GetChild("NodeList", true);
@@ -346,7 +420,7 @@ void SelectComponent(Component@ component)
     uint nodeItem = GetNodeListIndex(node);
     uint componentItem = GetComponentListIndex(component);
 
-    if ((nodeItem < numItems) && (componentItem < numItems))
+    if (nodeItem < numItems && componentItem < numItems)
     {
         // Expand the node chain now, but do not expand the whole scene in case the component was in the root
         list.items[nodeItem].visible = true;
@@ -415,8 +489,8 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 
     // Perform the reparenting
     // Set transform so that the world transform stays through the parent change
-    BeginModify(sourceNode.id);
     BeginModify(targetNode.id);
+    BeginModify(sourceNode.id);
 
     Vector3 newPos;
     Quaternion newRot;
@@ -440,14 +514,13 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     // Update the node list now. If a node was moved into the root, this potentially refreshes the whole scene window.
     // Therefore disable layout update first
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    list.contentElement.DisableLayoutUpdate();
 
     uint sourceIndex = GetNodeListIndex(sourceNode);
+    bool expanded = SaveExpandedStatus(sourceIndex);
     list.RemoveItem(sourceIndex);
-    UpdateSceneWindowNode(targetNode);
-
-    list.contentElement.EnableLayoutUpdate();
-    list.contentElement.UpdateLayout();
+    uint addIndex = GetParentAddIndex(sourceNode);
+    UpdateSceneWindowNode(addIndex, sourceNode);
+    RestoreExpandedStatus(addIndex, expanded);
 }
 
 bool TestSceneWindowElements(UIElement@ source, UIElement@ target)
@@ -499,7 +572,6 @@ void UpdateAndFocusComponent(Component@ component)
 
 void HandleCreateNode(StringHash eventType, VariantMap& eventData)
 {
-    Print("CreateNode");
     DropDownList@ list = eventData["Element"].GetUIElement();
     uint mode = list.selection;
     if (mode >= list.numItems)
@@ -529,31 +601,32 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
     UpdateAndFocusComponent(newComponent);
 }
 
-bool CheckSceneWindowFocus(bool allowNoElement)
+bool CheckSceneWindowFocus()
 {
+    // When we do scene operations based on key shortcuts, make sure either the 3D scene or the node list is focused,
+    // not for example a file selector
     ListView@ list = sceneWindow.GetChild("NodeList", true);
-    UIElement@ focusElement = ui.focusElement;
-    if (focusElement is list)
+    if (ui.focusElement is list || ui.focusElement is null)
         return true;
-    if (focusElement !is null)
+    else
         return false;
-    return allowNoElement;
 }
 
 void SceneDelete()
 {
+    if (selectedNode is null || !CheckSceneWindowFocus())
+        return;
+
     ListView@ list = sceneWindow.GetChild("NodeList", true);
     uint index = list.selection;
     uint nodeIndex = GetNodeListIndex(selectedNode);
-    
-    // Remove component
-    if (selectedNode !is null && selectedComponent !is null)
-    {
-        if (!CheckSceneWindowFocus(true))
-            return;
 
+    // Remove component
+    if (selectedComponent !is null)
+    {
         // For the sake of sanity, do not allow to delete the octree from the scene
-        if (selectedNode is editorScene && selectedComponent.typeName == "Octree" && selectedComponent is selectedNode.GetComponents("Octree")[0])
+        if (selectedNode is editorScene && selectedComponent.typeName == "Octree" && selectedComponent is
+            selectedNode.GetComponents("Octree")[0])
             return;
 
         uint id = selectedNode.id;
@@ -567,11 +640,8 @@ void SceneDelete()
         list.selection = index;
     }
     // Remove (parented) node
-    else if (selectedNode !is null && selectedComponent is null)
+    else
     {
-        // Require the scene hierarchy to be focused
-        if (!CheckSceneWindowFocus(false))
-            return;
         if (selectedNode.parent is null)
             return;
 
@@ -599,114 +669,89 @@ void SceneCut()
 
 void SceneCopy()
 {
-    /*
+    if (selectedNode is null || !CheckSceneWindowFocus())
+        return;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+
     // Copy component
-    if ((selectedNode !is null) && (selectedComponent !is null))
+    if (selectedNode !is null && selectedComponent !is null)
     {
-        if (!checkSceneWindowFocus(true))
-            return;
-        
-        XMLElement rootElem = copyBuffer.createRootElement("component");
-        selectedComponent.saveXML(rootElem);
-        
-        // If component is a node, save the world transform instead, and delete the parent reference
-        Node@ node = cast<Node>(selectedComponent);
-        if (node !is null)
-        {
-            XMLElement transformElem = rootElem.GetChildElement("transform");
-            transformElem.SetVector3("pos", node.worldPosition);
-            transformElem.SetVector3("rot", node.worldRotation.GetEulerAngles());
-            transformElem.SetVector3("scale", node.worldScale);
-            rootElem.removeChildElement("parent", false);
-        }
-        
-        copyBufferNodeID = selectedNode.id;
+        XMLElement rootElem = copyBuffer.CreateRoot("component");
+        selectedComponent.SaveXML(rootElem);
+        // Note: component type has to be saved manually
+        rootElem.SetString("type", selectedComponent.typeName);
+        copyBufferLocal = selectedComponent.id >= FIRST_LOCAL_ID;
     }
-    // Copy node
-    else if ((selectedNode !is null) && (selectedComponent is null))
+    // Copy node. The root node can not be copied
+    else if (selectedNode !is null && selectedComponent is null && selectedNode !is editorScene)
     {
-        if (!checkSceneWindowFocus(false))
-            return;
-        
-        XMLElement rootElem = copyBuffer.createRootElement("node");
-        selectedNode.saveXML(rootElem);
-        copyBufferNodeID = selectedNode.id;
+        XMLElement rootElem = copyBuffer.CreateRoot("node");
+        selectedNode.SaveXML(rootElem);
+        copyBufferLocal = selectedNode.id >= FIRST_LOCAL_ID;
+        copyBufferExpanded = SaveExpandedStatus(GetNodeListIndex(selectedNode));
     }
-    */
 }
 
 void ScenePaste()
 {
-    /*
-    XMLElement rootElem = copyBuffer.GetRootElement();
-    String mode = rootElem.GetName();
-    
-    if ((mode == "component") && (selectedNode !is null))
+    if (selectedNode is null || !CheckSceneWindowFocus())
+        return;
+
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    XMLElement rootElem = copyBuffer.root;
+    String mode = rootElem.name;
+
+    if (mode == "component")
     {
-        if (!checkSceneWindowFocus(true))
-            return;
-        
-        beginModify(selectedNode.id);
-        
-        Component@ newComponent = selectedNode.createComponent(rootElem.GetAttribute("type"), rootElem.GetAttribute("name"));
+        BeginModify(selectedNode.id);
+        // If copied component was local, make the new local too
+        Component@ newComponent = selectedNode.CreateComponent(rootElem.GetAttribute("type"), copyBufferLocal ? LOCAL :
+            REPLICATED);
         if (newComponent is null)
-            return;
-        newComponent.loadXML(rootElem);
-        newComponent.postLoad();
-        
-        // If component is a scene node, parent it to the selected component if exists
-        Node@ selectedNode = cast<Node>(selectedComponent);
-        Node@ newNode = cast<Node>(newComponent);
-        if ((newNode !is null) && (selectedNode !is null))
         {
-            Vector3 pos;
-            Quaternion rot;
-            Vector3 scale;
-            calculateNewTransform(newNode, selectedNode, pos, rot, scale);
-            newNode.SetTransform(pos, rot, scale);
-            selectedNode.addChild(newNode);
+            EndModify(selectedNode.id);
+            return;
         }
-        
-        endModify(selectedNode.id);
-        
-        updateSceneWindowNode(selectedNode);
+        newComponent.LoadXML(rootElem);
+        newComponent.FinishUpdate();
+        EndModify(selectedNode.id);
+
+        UpdateSceneWindowNode(selectedNode);
+        list.selection = GetComponentListIndex(newComponent);
     }
     else if (mode == "node")
     {
-        if (!checkSceneWindowFocus(false))
-            return;
-        
+        // Make the paste go always to the root node, no matter of the selected node
+        BeginModify(editorScene.id);
         // If copied node was local, make the new local too
-        Node@ newNode = editorScene.createNode(rootElem.GetAttribute("name"), copyBufferNodeID >= 65536);
-        uint newNodeID = newNode.id;
-        
-        beginModify(newNodeID);
+        Node@ newNode = editorScene.CreateChild("", copyBufferLocal ? LOCAL : REPLICATED);
+        BeginModify(newNode.id);
+        newNode.LoadXML(rootElem);
+        newNode.FinishUpdate();
+        EndModify(newNode.id);
+        EndModify(editorScene.id);
 
-        // Before loading, rewrite scene node references to the copied node
-        XMLElement compElem = rootElem.GetChildElement("component");
-        bool rewrite = false;
-        while (compElem.notNull())
-        {
-            XMLElement parentElem = compElem.GetChildElement("parent");
-            if ((parentElem.notNull()) && (uint(parentElem.GetInt("id")) == copyBufferNodeID))
-            {
-                parentElem.SetInt("id", newNodeID);
-                rewrite = true;
-            }
-            compElem = compElem.GetNextElement("component");
-        }
-        
-        // If we modified the copybuffer, change the "stored ID" value to reflect the change
-        if (rewrite)
-            copyBufferNodeID = newNode.id;
-        
-        newNode.loadXML(rootElem);
-        newNode.postLoad();
-        
-        endModify(newNodeID);
-        
-        updateAndFocusNode(newNode);
+        uint addIndex = GetParentAddIndex(newNode);
+        UpdateSceneWindowNode(addIndex, newNode);
+        RestoreExpandedStatus(addIndex, copyBufferExpanded);
+        list.selection = addIndex;
     }
-    */
 }
 
+bool SaveExpandedStatus(uint itemIndex)
+{
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    uint nextIndex = itemIndex + 1;
+    if (nextIndex < list.numItems && list.items[nextIndex].vars["Indent"].GetInt() > list.items[itemIndex].vars["Indent"].GetInt()
+        && list.items[nextIndex].visible == false)
+        return false;
+    else
+        return true;
+}
+
+void RestoreExpandedStatus(uint itemIndex, bool expanded)
+{
+    ListView@ list = sceneWindow.GetChild("NodeList", true);
+    list.SetChildItemsVisible(itemIndex, expanded);
+}

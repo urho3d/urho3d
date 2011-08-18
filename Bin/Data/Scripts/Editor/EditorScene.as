@@ -228,6 +228,19 @@ void ScenePostRenderUpdate()
                 shape.DrawDebugGeometry(debug, false);
         }
     }
+    else if (selectedNode !is null)
+    {
+        // If only a node selected, not a component, visualize the first drawable component encountered
+        for (uint i = 0; i < selectedNode.numComponents; ++i)
+        {
+            Drawable@ drawable = cast<Drawable>(selectedNode.components[i]);
+            if (drawable !is null)
+            {
+                drawable.DrawDebugGeometry(debug, false);
+                break;
+            }
+        }
+    }
 
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
@@ -265,7 +278,7 @@ void SceneRaycast(bool mouseClick)
                 drawable.DrawDebugGeometry(debug, false);
         }
         if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
-            SelectComponent(drawable);
+            SelectNode(drawable.node);
     }
 }
 
