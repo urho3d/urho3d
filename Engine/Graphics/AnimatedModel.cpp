@@ -100,7 +100,7 @@ void AnimatedModel::FinishUpdate()
 void AnimatedModel::ProcessRayQuery(RayOctreeQuery& query, float initialDistance)
 {
     // If no bones or no bone-level testing, use the Drawable test
-    if (!skeleton_.GetNumBones() || query.level_ < RAY_AABB)
+    if (query.level_ < RAY_AABB || !skeleton_.GetRootBone() || !skeleton_.GetRootBone()->node_)
     {
         Drawable::ProcessRayQuery(query, initialDistance);
         return;

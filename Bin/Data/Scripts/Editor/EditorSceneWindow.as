@@ -624,11 +624,6 @@ void SceneDelete()
     // Remove component
     if (selectedComponent !is null)
     {
-        // For the sake of sanity, do not allow to delete the octree from the scene
-        if (selectedNode is editorScene && selectedComponent.typeName == "Octree" && selectedComponent is
-            selectedNode.GetComponents("Octree")[0])
-            return;
-
         uint id = selectedNode.id;
         BeginModify(id);
         selectedNode.RemoveComponent(selectedComponent);
