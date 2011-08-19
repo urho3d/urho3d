@@ -1133,7 +1133,7 @@ void BuildAndSaveScene(OutScene& scene)
                     dummyMat->SetName(matName);
                     cache->AddManualResource(dummyMat);
                 }
-                staticModel->SetMaterial(cache->GetResource<Material>(matName));
+                staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
             }
         }
     }
