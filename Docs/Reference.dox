@@ -194,7 +194,9 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Model
 - Material
 - ScriptFile
+- Shader
 - Sound
+- Technique
 - Texture2D
 - TextureCube
 - XMLFile
@@ -217,7 +219,9 @@ The same in script would look like this (note the use of a property instead of a
 healthBar.texture = cache.GetResource("Texture2D", "Textures/HealthBarBorder.png");
 \endcode
 
-Resources can also be created manually and stored to the resource cache as if they had been loaded from disk.
+Resources can also be created manually and stored to the resource cache as if they had been loaded from disk. 
+
+Memory budgets can be set per resource type: if resources consume more memory than allowed, the oldest resources will be removed from the cache if not in use anymore. By default the memory budgets are set to unlimited.
 
 
 \page Scripting Scripting
