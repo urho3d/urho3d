@@ -8,7 +8,7 @@ Scene@ editorScene;
 String sceneFileName;
 String sceneResourcePath;
 bool sceneModified = false;
-bool runPhysics = false;
+bool runUpdate = false;
 bool renderingDebug = false;
 bool physicsDebug = false;
 bool octreeDebug = false;
@@ -29,7 +29,7 @@ void CreateScene()
     octree.Resize(BoundingBox(-1000.0, 1000.0), 8);
     editorScene.CreateComponent("DebugRenderer");
 
-    // Always pause the scene for now
+    // Always pause the scene, and do updates manually
     editorScene.active = false;
 
     if (sceneWindow !is null)
@@ -38,7 +38,7 @@ void CreateScene()
         UpdateNodeWindow();
     }
 
-    runPhysics = false;
+    runUpdate = false;
     sceneFileName = "";
     UpdateWindowTitle();
     CreateCamera();
@@ -167,9 +167,12 @@ void LoadScene(const String&in fileName)
     else
         editorScene.LoadXML(file);
 
+    // Always pause the scene, and do updates manually
+    editorScene.active = false;
+
     sceneFileName = fileName;
     sceneModified = false;
-    runPhysics = false;
+    runUpdate = false;
     UpdateWindowTitle();
     UpdateSceneWindow();
     UpdateNodeWindow();
@@ -181,6 +184,9 @@ void SaveScene(const String&in fileName)
     if (fileName.empty || GetFileName(fileName).empty)
         return;
 
+    // Unpause when saving so that there are no surprises when trying to use the scene
+    editorScene.active = true;
+
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
     if (extension != ".xml")
@@ -188,9 +194,17 @@ void SaveScene(const String&in fileName)
     else
         editorScene.SaveXML(file);
 
+    editorScene.active = false;
+
     sceneFileName = fileName;
     sceneModified = false;
     UpdateWindowTitle();
+}
+
+void UpdateScene(float timeStep)
+{
+    if (runUpdate)
+        editorScene.Update(timeStep);
 }
 
 void BeginModify(uint nodeID)
@@ -297,7 +311,7 @@ void ToggleOctreeDebug()
     octreeDebug = !octreeDebug;
 }
 
-void TogglePhysics()
+void ToggleUpdate()
 {
-    runPhysics = !runPhysics;
+    runUpdate  = !runUpdate;
 }

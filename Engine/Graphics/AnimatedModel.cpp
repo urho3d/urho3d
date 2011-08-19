@@ -734,7 +734,7 @@ void AnimatedModel::AssignBoneNodes()
         i->node_ = boneNode;
     }
     
-    // Re-assign the same start bone to get the proper bone node this time
+    // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;

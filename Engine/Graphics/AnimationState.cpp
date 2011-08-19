@@ -65,8 +65,8 @@ void AnimationState::SetStartBone(Bone* startBone)
     if (!startBone)
         startBone = rootBone;
     
-    // Do not reassign if the start bone did not actually change
-    if (startBone == startBone_)
+    // Do not reassign if the start bone did not actually change, and we already have valid bone nodes
+    if (startBone == startBone_ && !trackToBoneMap_.Empty())
         return;
     
     startBone_ = startBone;

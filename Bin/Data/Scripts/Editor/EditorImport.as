@@ -30,7 +30,7 @@ void ImportModel(const String&in fileName)
             for (uint i = 0; i < newModel.numGeometries; ++i)
             {
                 if (!list.eof)
-                    @newModel.materials[i] = cache.GetResource("Material", list.ReadLine());
+                    newModel.materials[i] = cache.GetResource("Material", list.ReadLine());
                 else
                     break;
             }

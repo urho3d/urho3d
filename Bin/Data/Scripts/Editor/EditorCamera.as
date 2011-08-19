@@ -276,7 +276,7 @@ void UpdateStats(float timeStep)
     yText.Resize(8);
     zText.Resize(8);
     
-    cameraPosText.text = moveModeText[moveMode] + "Physics: " + (runPhysics ? "Running " : "Paused  ") + " Camera pos: " + xText
+    cameraPosText.text = moveModeText[moveMode] + "Updates: " + (runUpdate ? "Running " : "Paused  ") + " Camera pos: " + xText
         + " " + yText + " " + zText + " ";
     
     renderStatsText.size = renderStatsText.minSize;

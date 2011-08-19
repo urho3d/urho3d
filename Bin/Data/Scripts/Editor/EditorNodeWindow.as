@@ -24,7 +24,7 @@ class EnumEditorData
         componentType = componentType_;
         categoryName = categoryName_;
         attributeName = attributeName_;
-        @choices = choices_;
+        choices = choices_;
     }
 }
 
@@ -62,7 +62,7 @@ void CreateNodeWindow()
     if (nodeWindow !is null)
         return;
 
-    @nodeWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/NodeWindow.xml"), uiStyle);
+    nodeWindow = ui.loadLayout(cache.getResource("XMLFile", "UI/NodeWindow.xml"), uiStyle);
     ui.root.addChild(nodeWindow);
     int height = min(ui.root.getHeight() - 60, 500);
     nodeWindow.setSize(300, height);

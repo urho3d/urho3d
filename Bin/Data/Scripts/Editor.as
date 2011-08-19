@@ -53,8 +53,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     MoveCamera(timeStep);
     UpdateStats(timeStep);
-
-    // Todo: allow to stop physics
+    UpdateScene(timeStep);
 }
 
 void LoadConfig()

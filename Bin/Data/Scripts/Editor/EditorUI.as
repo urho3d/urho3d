@@ -12,7 +12,7 @@ String uiImportPath;
 
 void CreateUI()
 {
-    @uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
+    uiStyle = cache.GetResource("XMLFile", "UI/DefaultStyle.xml");
 
     CreateCursor();
     CreateMenuBar();                                                                              
@@ -42,7 +42,7 @@ void CreateCursor()
 
 void CreateMenuBar()
 {
-    @uiMenuBar = BorderImage("MenuBar");
+    uiMenuBar = BorderImage("MenuBar");
     uiMenuBar.active = true;
     uiMenuBar.SetStyle(uiStyle, "EditorMenuBar");
     uiMenuBar.SetLayout(LM_HORIZONTAL, 4, IntRect(2, 2, 2, 2));
@@ -74,7 +74,7 @@ void CreateMenuBar()
         editPopup.AddChild(CreateMenuItem("Paste", 'V', QUAL_CTRL));
         editPopup.AddChild(CreateMenuItem("Delete", KEY_DELETE, 0));
         editPopup.AddChild(CreateMenuDivider());
-        editPopup.AddChild(CreateMenuItem("Toggle physics", 'P', QUAL_CTRL));
+        editPopup.AddChild(CreateMenuItem("Toggle updates", 'P', QUAL_CTRL));
         uiMenuBar.AddChild(editMenu);
     }
     
@@ -144,7 +144,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
 {
     // Within the editor UI, the file selector is a kind of a "singleton". When the previous one is overwritten, also 
     // the events subscribed from it are disconnected, so new ones are safe to subscribe.
-    @uiFileSelector = FileSelector();
+    uiFileSelector = FileSelector();
     uiFileSelector.style = uiStyle;
     uiFileSelector.title = title;
     uiFileSelector.path = initialPath;
@@ -156,7 +156,7 @@ void CreateFileSelector(const String&in title, const String&in ok, const String&
 
 void CloseFileSelector()
 {
-    @uiFileSelector = null;
+    uiFileSelector = null;
 }
 
 void CreateConsole()
@@ -264,9 +264,9 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
     if (action == "Delete")
         SceneDelete();
     
-    if (action == "Toggle physics")
-        TogglePhysics();
-    
+    if (action == "Toggle updates")
+        ToggleUpdate();
+
     if (action == "Exit")
         engine.Exit();
 }
