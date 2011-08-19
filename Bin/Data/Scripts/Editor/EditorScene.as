@@ -290,9 +290,9 @@ void SceneRaycast(bool mouseClick)
             drawable = result[0].drawable;
             if (debug !is null)
                 drawable.DrawDebugGeometry(debug, false);
+            if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
+                SelectNode(drawable.node);
         }
-        if (mouseClick && input.mouseButtonPress[MOUSEB_LEFT])
-            SelectNode(drawable.node);
     }
 }
 

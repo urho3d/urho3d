@@ -484,14 +484,14 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
         {
             while (j != children.End() && (*j)->GetPriority() == currentPriority)
             {
-                if ((*j)->IsVisible())
+                if (IsVisible(*j, currentScissor))
                     (*j)->GetBatches(batches_, quads_, currentScissor);
                 ++j;
             }
             // Now recurse into the children
             while (i != j)
             {
-                if ((*i)->IsVisible())
+                if (IsVisible(*i, currentScissor))
                     GetBatches(*i, currentScissor);
                 ++i;
             }
@@ -506,12 +506,28 @@ void UI::GetBatches(UIElement* element, IntRect currentScissor)
         {
             if ((*i)->IsVisible())
             {
-                (*i)->GetBatches(batches_, quads_, currentScissor);
+                if (IsVisible(*i, currentScissor))
+                    (*i)->GetBatches(batches_, quads_, currentScissor);
                 GetBatches(*i, currentScissor);
             }
             ++i;
         }
     }
+}
+
+bool UI::IsVisible(UIElement* element, const IntRect& currentScissor)
+{
+    // First check element's visibility
+    if (!element->IsVisible())
+        return false;
+
+    // Then check element dimensions against the scissor rectangle
+    const IntVector2& screenPos = element->GetScreenPosition();
+    if (screenPos.x_ >= currentScissor.right_ || screenPos.x_ + element->GetWidth() <= currentScissor.left_ ||
+        screenPos.y_ >= currentScissor.bottom_ || screenPos.y_ + element->GetHeight() <= currentScissor.top_)
+        return false;
+    else
+        return true;
 }
 
 void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& position, bool activeOnly)

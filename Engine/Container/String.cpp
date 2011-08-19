@@ -584,6 +584,16 @@ unsigned String::FindLast(const String& str, unsigned startPos) const
     return NPOS;
 }
 
+bool String::StartsWith(const String& str) const
+{
+    return Find(str) == 0;
+}
+
+bool String::EndsWith(const String& str) const
+{
+    return Find(str) == Length() - str.Length();
+}
+
 int String::Compare(const String& str, bool caseSensitive) const
 {
     return Compare(str.CString(), caseSensitive);

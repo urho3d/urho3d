@@ -310,16 +310,20 @@ public:
     String ToUpper() const;
     /// Return string in lowercase.
     String ToLower() const;
-    /// Split string by a separator char.
+    /// Return substrings split by a separator char.
     Vector<String> Split(char separator) const;
-    /// Find the first occurrence of a string, or NPOS if not found.
+    /// Return index to the first occurrence of a string, or NPOS if not found.
     unsigned Find(const String& str, unsigned startPos = 0) const;
-    /// Find the first occurrence of a character, or NPOS if not found.
+    /// Return index to the first occurrence of a character, or NPOS if not found.
     unsigned Find(char c, unsigned startPos = 0) const;
-    /// Find the last occurrence of a string, or NPOS if not found.
+    /// Return index to the last occurrence of a string, or NPOS if not found.
     unsigned FindLast(const String& str, unsigned startPos = NPOS) const;
-    /// Find the last occurrence of a character, or NPOS if not found.
+    /// Return index to the last occurrence of a character, or NPOS if not found.
     unsigned FindLast(char c, unsigned startPos = NPOS) const;
+    /// Return whether starts with a string.
+    bool StartsWith(const String& str) const;
+    /// Return whether ends with a string.
+    bool EndsWith(const String& str) const;
     /// Return the C string.
     const char* CString() const { return buffer_; }
     /// Return length.

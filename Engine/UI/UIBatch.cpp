@@ -43,7 +43,7 @@ void UIBatch::AddQuad(UIElement& element, int x, int y, int width, int height, i
 {
     if (!quads_)
         return;
-    
+   
     UIQuad quad;
     const IntVector2& screenPos = element.GetScreenPosition();
     
@@ -219,6 +219,7 @@ void UIBatch::Draw(Graphics* graphics) const
             *dest++ = topLeftUV.x_; *dest++ = bottomRightUV.y_;
             
             *dest++ = bottomRight.x_; *dest++ = topLeft.y_; *dest++ = 0.0f;
+
             *((unsigned*)dest) = quads[i].topRightColor_; dest++;
             *dest++ = bottomRightUV.x_; *dest++ = topLeftUV.y_;
             
