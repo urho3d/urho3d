@@ -97,11 +97,11 @@ public:
     /// %Set parameter source attribute.
     void SetParameterSourceAttr(ResourceRef value);
     /// %Set particles attribute.
-    void SetParticlesAttr(PODVector<unsigned char> value);
+    void SetParticlesAttr(VariantVector value);
     /// Return parameter source attribute.
     ResourceRef GetParameterSourceAttr() const;
     /// Return particles attribute.
-    PODVector<unsigned char> GetParticlesAttr() const;
+    VariantVector GetParticlesAttr() const;
     
 protected:
     /// Handle node being assigned.

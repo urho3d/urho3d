@@ -84,8 +84,8 @@ void AnimatedModel::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_RESOURCEREFLIST, "Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()), AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_FLOAT, "Animation LOD Bias", animationLodBias_, 1.0f, AM_DEFAULT);
     ATTRIBUTE(AnimatedModel, VAR_INT, "Raycast/Occlusion LOD Level", softwareLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_BUFFER, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimatedModel, VAR_VARIANTVECTOR, "Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }
 
 void AnimatedModel::FinishUpdate()
@@ -607,36 +607,33 @@ void AnimatedModel::SetModelAttr(ResourceRef value)
     SetModel(cache->GetResource<Model>(value.id_), !IsLoading());
 }
 
-void AnimatedModel::SetBonesEnabledAttr(PODVector<unsigned char> value)
+void AnimatedModel::SetBonesEnabledAttr(VariantVector value)
 {
-    MemoryBuffer buf(value);
     Vector<Bone>& bones = skeleton_.GetModifiableBones();
-    unsigned numBones = buf.ReadVLE();
-    for (unsigned i = 0; i < numBones && i < bones.Size(); ++i)
-        bones[i].animated_ = buf.ReadBool();
+    for (unsigned i = 0; i < bones.Size() && i < value.Size(); ++i)
+        bones[i].animated_ = value[i].GetBool();
 }
 
-void AnimatedModel::SetAnimationStatesAttr(PODVector<unsigned char> value)
+void AnimatedModel::SetAnimationStatesAttr(VariantVector value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    // The animation states will at first be created without bone node references
     RemoveAllAnimationStates();
-    MemoryBuffer buf(value);
-    unsigned numAnimations = buf.ReadVLE();
-    for (unsigned i = 0; i < numAnimations; ++i)
+    unsigned index = 0;
+    while (index < value.Size())
     {
-        AnimationState* state = AddAnimationState(cache->GetResource<Animation>(buf.ReadStringHash()));
+        const ResourceRef& animRef = value[index++].GetResourceRef();
+        AnimationState* state = AddAnimationState(cache->GetResource<Animation>(animRef.id_));
         if (state)
         {
-            state->SetStartBone(skeleton_.GetBone(buf.ReadStringHash()));
-            state->SetLooped(buf.ReadBool());
-            state->SetWeight(buf.ReadFloat());
-            state->SetTime(buf.ReadFloat());
-            state->SetLayer(buf.ReadUByte());
-            state->SetUseNlerp(buf.ReadBool());
+            state->SetStartBone(skeleton_.GetBone(value[index++].GetStringHash()));
+            state->SetLooped(value[index++].GetBool());
+            state->SetWeight(value[index++].GetFloat());
+            state->SetTime(value[index++].GetFloat());
+            state->SetLayer(value[index++].GetInt());
+            state->SetUseNlerp(value[index++].GetBool());
         }
         else
-            buf.Seek(sizeof(StringHash) + 1 + sizeof(float) + sizeof(float) + sizeof(int) + 1);
+            index += 6;
     }
 }
 
@@ -645,33 +642,31 @@ ResourceRef AnimatedModel::GetModelAttr() const
     return GetResourceRef(model_, Model::GetTypeStatic());
 }
 
-PODVector<unsigned char> AnimatedModel::GetBonesEnabledAttr() const
+VariantVector AnimatedModel::GetBonesEnabledAttr() const
 {
-    VectorBuffer buf;
+    VariantVector ret;
     const Vector<Bone>& bones = skeleton_.GetBones();
-    buf.WriteVLE(bones.Size());
     for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
-        buf.WriteBool(i->animated_);
-    return buf.GetBuffer();
+        ret.Push(i->animated_);
+    return ret;
 }
 
-PODVector<unsigned char> AnimatedModel::GetAnimationStatesAttr() const
+VariantVector AnimatedModel::GetAnimationStatesAttr() const
 {
-    VectorBuffer buf;
-    buf.WriteVLE(animationStates_.Size());
+    VariantVector ret;
     for (Vector<SharedPtr<AnimationState> >::ConstIterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
     {
         AnimationState* state = *i;
         Bone* startBone = state->GetStartBone();
-        buf.WriteStringHash(state->GetAnimation()->GetNameHash());
-        buf.WriteStringHash(startBone ? startBone->nameHash_ : StringHash());
-        buf.WriteBool(state->IsLooped());
-        buf.WriteFloat(state->GetWeight());
-        buf.WriteFloat(state->GetTime());
-        buf.WriteInt(state->GetLayer());
-        buf.WriteBool(state->GetUseNlerp());
+        ret.Push(ResourceRef(Animation::GetTypeStatic(), state->GetAnimation()->GetNameHash()));
+        ret.Push(startBone ? startBone->nameHash_ : StringHash());
+        ret.Push(state->IsLooped());
+        ret.Push(state->GetWeight());
+        ret.Push(state->GetTime());
+        ret.Push((int)state->GetLayer());
+        ret.Push(state->GetUseNlerp());
     }
-    return buf.GetBuffer();
+    return ret;
 }
 
 void AnimatedModel::OnNodeSet(Node* node)

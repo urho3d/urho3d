@@ -80,7 +80,8 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_RESOURCEREF, "Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Billboards", GetBillboardsAttr, SetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE);
+    REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 
 void BillboardSet::UpdateDistance(const FrameInfo& frame)
@@ -209,7 +210,24 @@ void BillboardSet::SetMaterialAttr(ResourceRef value)
     SetMaterial(cache->GetResource<Material>(value.id_));
 }
 
-void BillboardSet::SetBillboardsAttr(PODVector<unsigned char> value)
+void BillboardSet::SetBillboardsAttr(VariantVector value)
+{
+    unsigned index = 0;
+    SetNumBillboards(value[index++].GetInt());
+    for (PODVector<Billboard>::Iterator i = billboards_.Begin(); i != billboards_.End() && index < value.Size(); ++i)
+    {
+        i->position_ = value[index++].GetVector3();
+        i->size_ = value[index++].GetVector2();
+        Vector4 uv = value[index++].GetVector4();
+        i->uv_ = Rect(uv.x_, uv.y_, uv.z_, uv.w_);
+        i->color_ = value[index++].GetColor();
+        i->rotation_ = value[index++].GetFloat();
+        i->enabled_ = value[index++].GetBool();
+    }
+    Updated();
+}
+
+void BillboardSet::SetNetBillboardsAttr(const PODVector<unsigned char>& value)
 {
     MemoryBuffer buf(value);
     unsigned numBillboards = buf.ReadVLE();
@@ -231,20 +249,36 @@ ResourceRef BillboardSet::GetMaterialAttr() const
     return GetResourceRef(material_, Material::GetTypeStatic());
 }
 
-PODVector<unsigned char> BillboardSet::GetBillboardsAttr() const
+VariantVector BillboardSet::GetBillboardsAttr() const
 {
-    VectorBuffer buf;
-    buf.WriteVLE(billboards_.Size());
+    VariantVector ret;
+    ret.Push(billboards_.Size());
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
     {
-        buf.WriteVector3(i->position_);
-        buf.WriteVector2(i->size_);
-        buf.WriteRect(i->uv_);
-        buf.WriteColor(i->color_);
-        buf.WriteFloat(i->rotation_);
-        buf.WriteBool(i->enabled_);
+        ret.Push(i->position_);
+        ret.Push(i->size_);
+        ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
+        ret.Push(i->color_);
+        ret.Push(i->rotation_);
+        ret.Push(i->enabled_);
     }
-    return buf.GetBuffer();
+    return ret;
+}
+
+const PODVector<unsigned char>& BillboardSet::GetNetBillboardsAttr() const
+{
+    attrBuffer_.Clear();
+    attrBuffer_.WriteVLE(billboards_.Size());
+    for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
+    {
+        attrBuffer_.WriteVector3(i->position_);
+        attrBuffer_.WriteVector2(i->size_);
+        attrBuffer_.WriteRect(i->uv_);
+        attrBuffer_.WriteColor(i->color_);
+        attrBuffer_.WriteFloat(i->rotation_);
+        attrBuffer_.WriteBool(i->enabled_);
+    }
+    return attrBuffer_.GetBuffer();
 }
 
 void BillboardSet::OnMarkedDirty(Node* node)

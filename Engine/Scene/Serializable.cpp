@@ -25,7 +25,6 @@
 #include "Context.h"
 #include "Deserializer.h"
 #include "Log.h"
-#include "ResourceCache.h"
 #include "Serializable.h"
 #include "Serializer.h"
 #include "XMLElement.h"
@@ -298,20 +297,8 @@ bool Serializable::LoadXML(const XMLElement& source)
                         LOGWARNING("Unknown enum value " + value + " in attribute " + String(attr.name_));
                 }
                 else
-                {
-                    // If attribute is ResourceRef or ResourceRefList, add the resources' hash mappings to the resource cache
-                    // in case we are loading yet unknown resources created during runtime
-                    if (attr.type_ == VAR_RESOURCEREF || attr.type_ == VAR_RESOURCEREFLIST)
-                    {
-                        ResourceCache* cache = GetSubsystem<ResourceCache>();
-                        Vector<String> refs = attrElem.GetString("value").Split(';');
-                        for (unsigned i = 1; i < refs.Size(); ++i)
-                            cache->StoreNameHash(refs[i]);
-                    }
-                    
                     OnSetAttribute(attr, attrElem.GetVariant());
-                }
-
+                
                 found = true;
                 break;
             }

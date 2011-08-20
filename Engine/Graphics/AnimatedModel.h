@@ -124,15 +124,15 @@ public:
     /// %Set model attribute.
     void SetModelAttr(ResourceRef value);
     /// %Set bones' animation enabled attribute.
-    void SetBonesEnabledAttr(PODVector<unsigned char> value);
+    void SetBonesEnabledAttr(VariantVector value);
     /// %Set animation states attribute.
-    void SetAnimationStatesAttr(PODVector<unsigned char> value);
+    void SetAnimationStatesAttr(VariantVector value);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Return bones' animation enabled attribute.
-    PODVector<unsigned char> GetBonesEnabledAttr() const;
+    VariantVector GetBonesEnabledAttr() const;
     /// Return animation states attribute.
-    PODVector<unsigned char> GetAnimationStatesAttr() const;
+    VariantVector GetAnimationStatesAttr() const;
     
 protected:
     /// Handle node being assigned.

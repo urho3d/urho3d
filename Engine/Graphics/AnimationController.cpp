@@ -62,7 +62,7 @@ void AnimationController::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimationController>();
     
-    REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Animations", GetAnimationsAttr, SetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(AnimationController, VAR_VARIANTVECTOR, "Animations", GetAnimationsAttr, SetAnimationsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
     REF_ACCESSOR_ATTRIBUTE(AnimationController, VAR_BUFFER, "Network Animations", GetNetAnimationsAttr, SetNetAnimationsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_LATESTDATA | AM_NOEDIT);
 }
 
@@ -473,17 +473,19 @@ float AnimationController::GetAutoFade(const String& name) const
     return animations_[index].autoFadeTime_;
 }
 
-void AnimationController::SetAnimationsAttr(const PODVector<unsigned char>& value)
+void AnimationController::SetAnimationsAttr(VariantVector value)
 {
-    MemoryBuffer buf(value);
-    animations_.Resize(buf.ReadVLE());
-    for (Vector<AnimationControl>::Iterator i = animations_.Begin(); i != animations_.End(); ++i)
+    animations_.Clear();
+    unsigned index = 0;
+    while (index < value.Size())
     {
-        i->hash_ = buf.ReadStringHash();
-        i->speed_ = buf.ReadFloat();
-        i->targetWeight_ = buf.ReadFloat();
-        i->fadeTime_ = buf.ReadFloat();
-        i->autoFadeTime_ = buf.ReadFloat();
+        AnimationControl newControl;
+        newControl.hash_ = value[index++].GetStringHash();
+        newControl.speed_ = value[index++].GetFloat();
+        newControl.targetWeight_ = value[index++].GetFloat();
+        newControl.fadeTime_ = value[index++].GetFloat();
+        newControl.autoFadeTime_ = value[index++].GetFloat();
+        animations_.Push(newControl);
     }
 }
 
@@ -583,19 +585,18 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
     }
 }
 
-const PODVector<unsigned char>& AnimationController::GetAnimationsAttr() const
+VariantVector AnimationController::GetAnimationsAttr() const
 {
-    attrBuffer_.Clear();
-    attrBuffer_.WriteVLE(animations_.Size());
+    VariantVector ret;
     for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
     {
-        attrBuffer_.WriteStringHash(i->hash_);
-        attrBuffer_.WriteFloat(i->speed_);
-        attrBuffer_.WriteFloat(i->targetWeight_);
-        attrBuffer_.WriteFloat(i->fadeTime_);
-        attrBuffer_.WriteFloat(i->autoFadeTime_);
+        ret.Push(i->hash_);
+        ret.Push(i->speed_);
+        ret.Push(i->targetWeight_);
+        ret.Push(i->fadeTime_);
+        ret.Push(i->autoFadeTime_);
     }
-    return attrBuffer_.GetBuffer();
+    return ret;
 }
 
 const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() const

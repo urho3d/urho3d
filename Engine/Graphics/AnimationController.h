@@ -147,12 +147,12 @@ public:
     float GetAutoFade(const String& name) const;
     
     /// %Set animations attribute.
-    void SetAnimationsAttr(const PODVector<unsigned char>& value);
-    /// %Set network animations attribute.
+    void SetAnimationsAttr(VariantVector value);
+    /// %Set animations attribute for network replication.
     void SetNetAnimationsAttr(const PODVector<unsigned char>& value);
     /// Return animations attribute.
-    const PODVector<unsigned char>& GetAnimationsAttr() const;
-    /// Return net animations attribute.
+    VariantVector GetAnimationsAttr() const;
+    /// Return animations attribute for network replication.
     const PODVector<unsigned char>& GetNetAnimationsAttr() const;
     
 protected:

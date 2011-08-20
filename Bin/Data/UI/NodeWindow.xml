@@ -1,4 +1,4 @@
-<element type="Window" name="ComponentWindow">
+<element type="Window" name="NodeWindow">
     <movable enable="true" />
     <resizable enable="true" />
     <resizeborder value="6 6 6 6" />
@@ -17,14 +17,8 @@
     <element type="Text" name="NodeTitle">
         <fixedheight value="16" />
     </element>
-    <element>
-        <fixedheight value="16" />
-        <layout mode="horizontal" />
-        <element type="Text">
-            <fixedwidth value="50" />
-            <text value="Name" />
-        </element>
-        <element type="LineEdit" name="NodeNameEdit" />
+    <element type="ListView" name="NodeAttributeList">
+        <highlight value="always" />
     </element>
     <element type="BorderImage" style="EditorDivider">
         <fixedheight value="4" />
@@ -32,7 +26,7 @@
     <element type="Text" name="ComponentTitle">
         <fixedheight value="16" />
     </element>
-    <element type="ListView" name="AttributeList">
+    <element type="ListView" name="ComponentAttributeList">
         <highlight value="always" />
     </element>
 </element>

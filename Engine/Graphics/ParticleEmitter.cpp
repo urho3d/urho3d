@@ -86,8 +86,8 @@ void ParticleEmitter::RegisterObject(Context* context)
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Period Timer", periodTimer_, 0.0f, AM_DEFAULT);
     ATTRIBUTE(ParticleEmitter, VAR_FLOAT, "Emission Timer", emissionTimer_, 0.0f, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_RESOURCEREF, "Parameter Source", GetParameterSourceAttr, SetParameterSourceAttr, ResourceRef, ResourceRef(XMLFile::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BUFFER, "Particles", GetParticlesAttr, SetParticlesAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
-    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_BUFFER, "Billboards", GetBillboardsAttr, SetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ParticleEmitter, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE | AM_NOEDIT);
 }
 
 void ParticleEmitter::Update(float timeStep)
@@ -365,20 +365,20 @@ void ParticleEmitter::SetParameterSourceAttr(ResourceRef value)
     LoadParameters(cache->GetResource<XMLFile>(value.id_));
 }
 
-void ParticleEmitter::SetParticlesAttr(PODVector<unsigned char> value)
+void ParticleEmitter::SetParticlesAttr(VariantVector value)
 {
-    MemoryBuffer buf(value);
-    SetNumParticles(buf.ReadVLE());
-    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End(); ++i)
+    unsigned index = 0;
+    SetNumParticles(value[index++].GetInt());
+    for (PODVector<Particle>::Iterator i = particles_.Begin(); i != particles_.End() && index < value.Size(); ++i)
     {
-        i->velocity_ = buf.ReadVector3();
-        i->size_ = buf.ReadVector2();
-        i->timer_ = buf.ReadFloat();
-        i->timeToLive_ = buf.ReadFloat();
-        i->scale_ = buf.ReadFloat();
-        i->rotationSpeed_ = buf.ReadFloat();
-        i->colorIndex_ = buf.ReadVLE();
-        i->texIndex_ = buf.ReadVLE();
+        i->velocity_ = value[index++].GetVector3();
+        i->size_ = value[index++].GetVector2();
+        i->timer_ = value[index++].GetFloat();
+        i->timeToLive_ = value[index++].GetFloat();
+        i->scale_ = value[index++].GetFloat();
+        i->rotationSpeed_ = value[index++].GetFloat();
+        i->colorIndex_ = value[index++].GetInt();
+        i->texIndex_ = value[index++].GetInt();
     }
 }
 
@@ -387,22 +387,22 @@ ResourceRef ParticleEmitter::GetParameterSourceAttr() const
     return GetResourceRef(parameterSource_, XMLFile::GetTypeStatic());
 }
 
-PODVector<unsigned char> ParticleEmitter::GetParticlesAttr() const
+VariantVector ParticleEmitter::GetParticlesAttr() const
 {
-    VectorBuffer buf;
-    buf.WriteVLE(particles_.Size());
+    VariantVector ret;
+    ret.Push(particles_.Size());
     for (PODVector<Particle>::ConstIterator i = particles_.Begin(); i != particles_.End(); ++i)
     {
-        buf.WriteVector3(i->velocity_);
-        buf.WriteVector2(i->size_);
-        buf.WriteFloat(i->timer_);
-        buf.WriteFloat(i->timeToLive_);
-        buf.WriteFloat(i->scale_);
-        buf.WriteFloat(i->rotationSpeed_);
-        buf.WriteVLE(i->colorIndex_);
-        buf.WriteVLE(i->texIndex_);
+        ret.Push(i->velocity_);
+        ret.Push(i->size_);
+        ret.Push(i->timer_);
+        ret.Push(i->timeToLive_);
+        ret.Push(i->scale_);
+        ret.Push(i->rotationSpeed_);
+        ret.Push(i->colorIndex_);
+        ret.Push(i->texIndex_);
     }
-    return buf.GetBuffer();
+    return ret;
 }
 
 void ParticleEmitter::OnNodeSet(Node* node)

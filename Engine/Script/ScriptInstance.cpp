@@ -80,8 +80,8 @@ void ScriptInstance::RegisterObject(Context* context)
     ATTRIBUTE(ScriptInstance, VAR_BOOL, "Active", active_, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_INT, "Fixed Update FPS", GetFixedUpdateFps, SetFixedUpdateFps, int, 0, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_FLOAT, "Time Accumulator", GetFixedUpdateAccAttr, SetFixedUpdateAccAttr, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE);
-    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Delayed Method Calls", GetDelayedMethodCallsAttr, SetDelayedMethodCallsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_FILE | AM_NOEDIT);
+    ACCESSOR_ATTRIBUTE(ScriptInstance, VAR_BUFFER, "Script Data", GetScriptDataAttr, SetScriptDataAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_DEFAULT | AM_NOEDIT);
 }
 
 void ScriptInstance::FinishUpdate()
@@ -316,6 +316,7 @@ void ScriptInstance::CreateObject()
     if (scriptObject_)
     {
         script_->GetObjectMap()[(void*)scriptObject_] = this;
+        ClearDelayedExecute();
         GetSupportedMethods();
         if (methods_[METHOD_START])
             scriptFile_->Execute(scriptObject_, methods_[METHOD_START]);

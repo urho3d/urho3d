@@ -107,11 +107,15 @@ public:
     /// %Set material attribute.
     void SetMaterialAttr(ResourceRef value);
     /// %Set billboards attribute.
-    void SetBillboardsAttr(PODVector<unsigned char> value);
+    void SetBillboardsAttr(VariantVector value);
+    /// %Set billboards attribute for network replication.
+    void SetNetBillboardsAttr(const PODVector<unsigned char>& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
     /// Return billboards attribute.
-    PODVector<unsigned char> GetBillboardsAttr() const;
+    VariantVector GetBillboardsAttr() const;
+    /// Return billboards attribute for network replication.
+    const PODVector<unsigned char>& GetNetBillboardsAttr() const;
     
 protected:
     /// Transform has changed. Mark billboards dirty if necessary.
@@ -160,4 +164,6 @@ private:
     Vector3 previousOffset_;
     /// Billboard pointers for sorting.
     Vector<Billboard*> sortedBillboards_;
+    /// Attribute buffer for network replication.
+    mutable VectorBuffer attrBuffer_;
 };
