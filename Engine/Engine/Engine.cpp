@@ -84,6 +84,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     bool sound = true;
     bool stereo = true;
     bool interpolate = true;
+    bool flush = true;
     
     for (unsigned i = 0; i < arguments.Size(); ++i)
     {
@@ -105,6 +106,8 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
                 stereo = false;
             else if (argument == "noshadows")
                 shadows = false;
+            else if (argument == "noflush")
+                flush = false;
             else if (argument == "sm2")
                 forceSM2 = true;
             else
@@ -186,6 +189,7 @@ bool Engine::Initialize(const String& windowTitle, const String& logName, const 
     if (!headless_)
     {
         Graphics* graphics = GetSubsystem<Graphics>();
+        graphics->SetFlushGPU(flush);
         graphics->SetForceSM2(forceSM2);
         graphics->SetWindowTitle(windowTitle);
         if (!graphics->SetMode(mode, width, height, fullscreen, vsync, multiSample))

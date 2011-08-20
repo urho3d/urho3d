@@ -99,6 +99,7 @@ Urho3D.exe understands the following command line options:
 -deferred   Use deferred rendering
 -b<length>  Sound buffer length in milliseconds
 -r<freq>    Mixing frequency in Hz
+-noflush    Disable GPU command queue flushing
 -nolimit    Disable frame limiter
 -noshadows  Disable rendering of shadows
 -nosound    Disable sound output

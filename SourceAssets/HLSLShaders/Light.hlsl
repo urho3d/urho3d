@@ -4,11 +4,6 @@
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
 
-// Use branching if the pixel shader is expensive
-#if defined(SM3) && (defined(SPECULAR) || defined(SHADOW))
-    #define BRANCHING
-#endif
-
 void VS(float4 iPos : POSITION,
     #ifdef DIRLIGHT
         out float2 oScreenPos : TEXCOORD0,
@@ -91,11 +86,6 @@ void PS(
         diff = GetDiffusePointOrSpot(normal, worldPos, lightDir, lightVec);
     #endif
 
-    #ifdef BRANCHING
-    if (diff > 0.0)
-    {
-    #endif
-
     #ifdef SHADOW
         float4 shadowPos = mul(float4(worldPos, 1.0), cShadowProjPS);
         diff *= GetShadow(shadowPos);
@@ -119,11 +109,5 @@ void PS(
     #else
         float3 finalColor = diff * diffInput.rgb * lightColor;
         oColor = float4(finalColor, 0.0);
-    #endif
-
-    #ifdef BRANCHING
-    }
-    else
-        oColor = 0.0;
     #endif
 }
