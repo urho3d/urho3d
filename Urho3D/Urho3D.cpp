@@ -89,7 +89,7 @@ void Run(const char* cmdLine)
                 break;
             }
         }
-    
+        
         // Show usage if not found
         if (scriptFileName.Empty())
         {
@@ -100,7 +100,7 @@ void Run(const char* cmdLine)
             );
             return;
         }
-    
+        
         // Create the execution context and the engine
         SharedPtr<Context> context(new Context());
         SharedPtr<Engine> engine(new Engine(context));
@@ -109,10 +109,10 @@ void Run(const char* cmdLine)
             ErrorDialog("Urho3D", context->GetSubsystem<Log>()->GetLastMessage().CString());
             return;
         }
-    
+        
         // Set 5 ms timer period to allow accurate FPS limiting up to 200 FPS
         context->GetSubsystem<Time>()->SetTimerPeriod(5);
-    
+        
         // Execute the Start function from the script file, then run the engine loop until exited
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
         engine->InitializeScripting();

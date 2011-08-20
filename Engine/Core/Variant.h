@@ -24,7 +24,7 @@
 #pragma once
 
 #include "Color.h"
-#include "HashMap.h"
+#include "Map.h"
 #include "Quaternion.h"
 #include "StringHash.h"
 #include "Vector4.h"
@@ -50,7 +50,7 @@ enum VariantType
     VAR_VARIANTMAP
 };
 
-/// Union for holding all the possible variant values.
+/// Union for the possible variant values. Also stores non-POD objects such as String which must not exceed 16 bytes in size.
 struct VariantValue
 {
     union
@@ -141,7 +141,7 @@ class Variant;
 /// Vector of variants.
 typedef Vector<Variant> VariantVector;
 /// Map of variants.
-typedef HashMap<ShortStringHash, Variant> VariantMap;
+typedef Map<ShortStringHash, Variant> VariantMap;
 
 /// Variable that supports a fixed set of types.
 class Variant
@@ -407,7 +407,7 @@ public:
     Variant& operator = (const String& rhs)
     {
         SetType(VAR_STRING);
-        *(reinterpret_cast<String*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<String*>(&value_)) = rhs;
         return *this;
     }
     
@@ -415,7 +415,7 @@ public:
     Variant& operator = (const char* rhs)
     {
         SetType(VAR_STRING);
-        *(reinterpret_cast<String*>(value_.ptr_)) = String(rhs);
+        *(reinterpret_cast<String*>(&value_)) = String(rhs);
         return *this;
     }
 
@@ -423,7 +423,7 @@ public:
     Variant& operator = (const PODVector<unsigned char>& rhs)
     {
         SetType(VAR_BUFFER);
-        *(reinterpret_cast<PODVector<unsigned char>*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<PODVector<unsigned char>*>(&value_)) = rhs;
         return *this;
     }
     
@@ -439,7 +439,7 @@ public:
     Variant& operator = (const ResourceRef& rhs)
     {
         SetType(VAR_RESOURCEREF);
-        *(reinterpret_cast<ResourceRef*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<ResourceRef*>(&value_)) = rhs;
         return *this;
     }
     
@@ -447,7 +447,7 @@ public:
     Variant& operator = (const ResourceRefList& rhs)
     {
         SetType(VAR_RESOURCEREFLIST);
-        *(reinterpret_cast<ResourceRefList*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<ResourceRefList*>(&value_)) = rhs;
         return *this;
     }
     
@@ -455,7 +455,7 @@ public:
     Variant& operator = (const VariantVector& rhs)
     {
         SetType(VAR_VARIANTVECTOR);
-        *(reinterpret_cast<VariantVector*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<VariantVector*>(&value_)) = rhs;
         return *this;
     }
     
@@ -463,7 +463,7 @@ public:
     Variant& operator = (const VariantMap& rhs)
     {
         SetType(VAR_VARIANTMAP);
-        *(reinterpret_cast<VariantMap*>(value_.ptr_)) = rhs;
+        *(reinterpret_cast<VariantMap*>(&value_)) = rhs;
         return *this;
     }
     
@@ -557,7 +557,7 @@ public:
     bool operator == (const String& rhs) const
     {
         if (type_ == VAR_STRING)
-            return *(reinterpret_cast<const String*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const String*>(&value_)) == rhs;
         else
             return false;
     }
@@ -566,7 +566,7 @@ public:
     bool operator == (const PODVector<unsigned char>& rhs) const
     {
         if (type_ == VAR_BUFFER)
-            return *(reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const PODVector<unsigned char>*>(&value_)) == rhs;
         else
             return false;
     }
@@ -584,7 +584,7 @@ public:
     bool operator == (const ResourceRef& rhs) const
     {
         if (type_ == VAR_RESOURCEREF)
-            return *(reinterpret_cast<ResourceRef*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const ResourceRef*>(&value_)) == rhs;
         else
             return false;
     }
@@ -593,7 +593,7 @@ public:
     bool operator == (const ResourceRefList& rhs) const
     {
         if (type_ == VAR_RESOURCEREFLIST)
-            return *(reinterpret_cast<ResourceRefList*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const ResourceRefList*>(&value_)) == rhs;
         else
             return false;
     }
@@ -602,7 +602,7 @@ public:
     bool operator == (const VariantVector& rhs) const
     {
         if (type_ == VAR_VARIANTVECTOR)
-            return *(reinterpret_cast<VariantVector*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const VariantVector*>(&value_)) == rhs;
         else
             return false;
     }
@@ -611,7 +611,7 @@ public:
     bool operator == (const VariantMap& rhs) const
     {
         if (type_ == VAR_VARIANTMAP)
-            return *(reinterpret_cast<VariantMap*>(value_.ptr_)) == rhs;
+            return *(reinterpret_cast<const VariantMap*>(&value_)) == rhs;
         else
             return false;
     }
@@ -767,7 +767,7 @@ public:
     {
         if (type_ != VAR_STRING)
             return emptyString;
-        return *reinterpret_cast<const String*>(value_.ptr_);
+        return *reinterpret_cast<const String*>(&value_);
     }
     
     /// Return buffer or empty on type mismatch.
@@ -775,7 +775,7 @@ public:
     {
         if (type_ != VAR_BUFFER)
             return emptyBuffer;
-        return *reinterpret_cast<const PODVector<unsigned char>*>(value_.ptr_);
+        return *reinterpret_cast<const PODVector<unsigned char>*>(&value_);
     }
     
     /// Return pointer or null on type mismatch.
@@ -791,7 +791,7 @@ public:
     {
         if (type_ != VAR_RESOURCEREF)
             return emptyResourceRef;
-        return *reinterpret_cast<ResourceRef*>(value_.ptr_);
+        return *reinterpret_cast<const ResourceRef*>(&value_);
     }
     
     /// Return a resource reference list or empty on type mismatch.
@@ -799,7 +799,7 @@ public:
     {
         if (type_ != VAR_RESOURCEREFLIST)
             return emptyResourceRefList;
-        return *reinterpret_cast<ResourceRefList*>(value_.ptr_);
+        return *reinterpret_cast<const ResourceRefList*>(&value_);
     }
     
     /// Return a variant vector or empty on type mismatch.
@@ -807,7 +807,7 @@ public:
     {
         if (type_ != VAR_VARIANTVECTOR)
             return emptyVariantVector;
-        return *reinterpret_cast<VariantVector*>(value_.ptr_);
+        return *reinterpret_cast<const VariantVector*>(&value_);
     }
     
     /// Return a variant map or empty on type mismatch
@@ -815,7 +815,7 @@ public:
     {
         if (type_ != VAR_VARIANTMAP)
             return emptyVariantMap;
-        return *reinterpret_cast<VariantMap*>(value_.ptr_);
+        return *reinterpret_cast<const VariantMap*>(&value_);
     }
 
     /// Return the value, template version.

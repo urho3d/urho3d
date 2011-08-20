@@ -476,10 +476,6 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
     if (classCurrentState.Empty())
         classCurrentState.Resize(numAttributes);
     
-    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
-    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
-        deltaUpdateBits[i] = 0;
-    
     for (unsigned i = 0; i < numAttributes; ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
@@ -493,7 +489,15 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
                 latestData = true;
             else
             {
-                deltaUpdate = true;
+                if (deltaUpdate == false)
+                {
+                    // Clear the deltaupdate bits in a lazy manner when first needed
+                    deltaUpdate = true;
+                    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
+                    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
+                        deltaUpdateBits[i] = 0;
+                }
+                
                 deltaUpdateBits[i >> 3] |= 1 << (i & 7);
             }
         }
@@ -512,8 +516,6 @@ void Serializable::WriteDeltaUpdate(Serializer& dest, PODVector<unsigned char>& 
     
     for (unsigned i = 0; i < numAttributes; ++i)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        
         if (deltaUpdateBits[i >> 3] & (1 << (i & 7)))
             dest.WriteVariantData(replicationState[i]);
     }
@@ -528,9 +530,7 @@ void Serializable::WriteLatestDataUpdate(Serializer& dest, Vector<Variant>& repl
     
     for (unsigned i = 0; i < numAttributes; ++i)
     {
-        const AttributeInfo& attr = attributes->At(i);
-        
-        if (attr.mode_ & AM_LATESTDATA)
+        if (attributes->At(i).mode_ & AM_LATESTDATA)
             dest.WriteVariantData(replicationState[i]);
     }
 }
