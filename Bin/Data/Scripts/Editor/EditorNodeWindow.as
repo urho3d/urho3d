@@ -58,7 +58,7 @@ void CreateNodeWindow()
     int height = Min(ui.root.height - 60, 500);
     nodeWindow.SetSize(300, height);
     nodeWindow.SetPosition(ui.root.width - 20 - nodeWindow.width, 40);
-    nodeWindow.visible = true;
+    nodeWindow.BringToFront();
     UpdateNodeWindow();
 
     SubscribeToEvent(nodeWindow.GetChild("CloseButton", true), "Released", "HideNodeWindow");

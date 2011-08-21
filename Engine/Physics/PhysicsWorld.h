@@ -198,6 +198,8 @@ private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
     
+    /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
+    WeakPtr<Scene> scene_;
     /// ODE world ID.
     dWorldID physicsWorld_;
     /// ODE space ID.

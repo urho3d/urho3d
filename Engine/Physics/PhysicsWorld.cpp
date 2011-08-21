@@ -75,6 +75,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
         ++numInstances;
     }
     
+    // Create the world, the collision space, and contact joint group
     physicsWorld_ = dWorldCreate();
     space_ = dHashSpaceCreate(0);
     contactJoints_ = dJointGroupCreate(0);
@@ -90,10 +91,38 @@ PhysicsWorld::PhysicsWorld(Context* context) :
 
 PhysicsWorld::~PhysicsWorld()
 {
-    // Forcibly remove any cached geometries that still remain
+    if (scene_)
+    {
+        // Force all remaining joints, rigidbodies and collisionshapes to release themselves
+        PODVector<Node*> nodes;
+        PODVector<Joint*> joints;
+        PODVector<CollisionShape*> collisionShapes;
+        
+        scene_->GetChildrenWithComponent(nodes, Joint::GetTypeStatic(), true);
+        for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+        {
+            (*i)->GetComponents<Joint>(joints);
+            for (PODVector<Joint*>::Iterator j = joints.Begin(); j != joints.End(); ++j)
+                (*j)->Clear();
+        }
+        
+        for (PODVector<RigidBody*>::Iterator i = rigidBodies_.Begin(); i != rigidBodies_.End(); ++i)
+            (*i)->ReleaseBody();
+        
+        scene_->GetChildrenWithComponent(nodes, CollisionShape::GetTypeStatic(), true);
+        for (PODVector<Node*>::Iterator i = nodes.Begin(); i != nodes.End(); ++i)
+        {
+            (*i)->GetComponents<CollisionShape>(collisionShapes);
+            for (PODVector<CollisionShape*>::Iterator j = collisionShapes.Begin(); j != collisionShapes.End(); ++j)
+                (*j)->Clear();
+        }
+    }
+    
+    // Remove any cached geometries that still remain
     triangleMeshCache_.Clear();
     heightfieldCache_.Clear();
     
+    // Destroy the global ODE objects
     if (contactJoints_)
     {
         dJointGroupDestroy(contactJoints_);
@@ -121,6 +150,7 @@ PhysicsWorld::~PhysicsWorld()
         physicsWorld_ = 0;
     }
     
+    // Finally shut down ODE if this was the last instance
     {
         MutexLock lock(GetStaticMutex());
         
@@ -482,7 +512,10 @@ void PhysicsWorld::OnNodeSet(Node* node)
 {
     // Subscribe to the scene subsystem update, which will trigger the physics simulation step
     if (node)
+    {
+        scene_ = node->GetScene();
         SubscribeToEvent(node, E_SCENESUBSYSTEMUPDATE, HANDLER(PhysicsWorld, HandleSceneSubsystemUpdate));
+    }
 }
 
 void PhysicsWorld::NearCallback(void *userData, dGeomID geomA, dGeomID geomB)

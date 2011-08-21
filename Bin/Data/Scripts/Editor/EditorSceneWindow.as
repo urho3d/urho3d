@@ -22,6 +22,7 @@ void CreateSceneWindow()
     int height = Min(ui.root.height - 60, 500);
     sceneWindow.SetSize(300, height);
     sceneWindow.SetPosition(20, 40);
+    sceneWindow.BringToFront();
     UpdateSceneWindow();
 
     DropDownList@ newNodeList = sceneWindow.GetChild("NewNodeList", true);
@@ -613,6 +614,10 @@ void HandleCreateComponent(StringHash eventType, VariantMap& eventData)
     if (text is null)
         return;
 
+    // If this is the root node, do not allow to create duplicate scene-global components
+    if (selectedNode is editorScene && CheckForExistingGlobalComponent(selectedNode, text.text))
+        return;
+
     // For now, make a local node's all components local
     /// \todo Allow to specify the createmode
     Component@ newComponent = selectedNode.CreateComponent(text.text, selectedNode.id < FIRST_LOCAL_ID ? REPLICATED : LOCAL);
@@ -631,6 +636,14 @@ bool CheckSceneWindowFocus()
         return false;
 }
 
+bool CheckForExistingGlobalComponent(Node@ node, const String&in typeName)
+{
+    if (typeName != "Octree" && typeName != "PhysicsWorld" && typeName != "DebugRenderer")
+        return false;
+    else
+        return node.HasComponent(typeName);
+}
+
 void SceneDelete()
 {
     if (selectedNode is null || !CheckSceneWindowFocus())
@@ -643,6 +656,11 @@ void SceneDelete()
     // Remove component
     if (selectedComponent !is null)
     {
+        // Do not allow to remove the Octree, PhysicsWorld or DebugRenderer from the root node
+        if (selectedNode is editorScene && (selectedComponent.typeName == "Octree" || selectedComponent.typeName == 
+            "PhysicsWorld" || selectedComponent.typeName == "DebugRenderer"))
+            return;
+
         uint id = selectedNode.id;
         BeginModify(id);
         selectedNode.RemoveComponent(selectedComponent);
@@ -719,6 +737,11 @@ void ScenePaste()
     if (mode == "component")
     {
         BeginModify(selectedNode.id);
+        
+        // If this is the root node, do not allow to create duplicate scene-global components
+        if (selectedNode is editorScene && CheckForExistingGlobalComponent(selectedNode, rootElem.GetAttribute("type")))
+            return;
+
         // If copied component was local, make the new local too
         Component@ newComponent = selectedNode.CreateComponent(rootElem.GetAttribute("type"), copyBufferLocal ? LOCAL :
             REPLICATED);
