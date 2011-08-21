@@ -2,7 +2,7 @@
 
 Window@ nodeWindow;
 
-const uint MAX_ATTRNAME_LENGTH = 28;
+const uint MIN_NODE_ATTRIBUTES = 4;
 const uint MAX_NODE_ATTRIBUTES = 8;
 
 class ResourcePicker
@@ -27,7 +27,24 @@ class ResourcePicker
     }
 }
 
+class VectorStruct
+{
+    String componentTypeName;
+    String attributeName;
+    Array<String> variableNames;
+    uint restartIndex;
+
+    VectorStruct(const String&in componentTypeName_, const String&in attributeName_, const Array<String>@ variableNames_, uint restartIndex_)
+    {
+        componentTypeName = componentTypeName_;
+        attributeName = attributeName_;
+        variableNames = variableNames_;
+        restartIndex = restartIndex_;
+    }
+}
+
 Array<ResourcePicker@> resourcePickers;
+Array<VectorStruct@> vectorStructs;
 
 bool inLoadAttributeEditor = false;
 uint resourcePickID = 0;
@@ -41,7 +58,7 @@ void CreateNodeWindow()
     if (nodeWindow !is null)
         return;
 
-    // Fill resource editor data
+    // Fill resource picker data
     resourcePickers.Push(ResourcePicker("Model", "*.mdl"));
     resourcePickers.Push(ResourcePicker("Material", "*.xml"));
     Array<String> textureFilters;
@@ -53,6 +70,17 @@ void CreateNodeWindow()
     resourcePickers.Push(ResourcePicker("Animation", "*.ani"));
     resourcePickers.Push(ResourcePicker("ScriptFile", "*.as"));
     resourcePickers.Push(ResourcePicker("XMLFile", "*.xml"));
+
+    // Fill vector structure data
+    Array<String> billboardVariables;
+    billboardVariables.Push("Number Of Billboards");
+    billboardVariables.Push("   Position");
+    billboardVariables.Push("   Size");
+    billboardVariables.Push("   UV Coordinates");
+    billboardVariables.Push("   Color");
+    billboardVariables.Push("   Rotation");
+    billboardVariables.Push("   Is Enabled");
+    vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));
 
     nodeWindow = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorNodeWindow.xml"), uiStyle);
     ui.root.AddChild(nodeWindow);
@@ -102,6 +130,9 @@ void UpdateNodeWindow()
         componentTitle.text = GetComponentTitle(selectedComponent, 0);
 
     UpdateAttributes(true);
+
+    if (selectedNode !is null || selectedComponent !is null)
+        nodeWindow.visible = true;
 }
 
 void UpdateAttributes(bool fullUpdate)
@@ -123,8 +154,20 @@ void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdat
             fullUpdate = true;
     }
 
+    // Remember the old scroll position so that a full update does not feel as jarring
+    IntVector2 oldViewPos = list.viewPosition;
+
     if (fullUpdate)
+    {
         list.RemoveAllItems();
+
+        // Resize the node editor according to the number of variables, up to a certain maximum
+        if (list.name == "NodeAttributeList")
+        {
+            uint maxAttrs = Clamp(count, MIN_NODE_ATTRIBUTES, MAX_NODE_ATTRIBUTES);
+            list.SetFixedHeight(maxAttrs * 18 + 2);
+        }
+    }
 
     if (serializable is null)
         return;
@@ -141,14 +184,8 @@ void UpdateAttributes(Serializable@ serializable, ListView@ list, bool fullUpdat
         LoadAttributeEditor(list, serializable, i);
     }
     
-    // Resize the node editor according to the number of variables, up to a certain maximum
-    if (fullUpdate && serializable.typeName != "Component")
-    {
-        uint maxAttrs = count;
-        if (maxAttrs > MAX_NODE_ATTRIBUTES)
-            maxAttrs = MAX_NODE_ATTRIBUTES;
-        list.SetFixedHeight(maxAttrs * 18 + 2);
-    }
+    if (fullUpdate)
+        list.viewPosition = oldViewPos;
 }
 
 void EditAttribute(StringHash eventType, VariantMap& eventData)
@@ -164,9 +201,10 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
         return;
 
     uint index = attrEdit.vars["Index"].GetUInt();
+    uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
     bool intermediateEdit = eventType == StringHash("TextChanged");
 
-    StoreAttributeEditorDirect(parent, serializable, index);
+    StoreAttributeEditor(parent, serializable, index, subIndex);
     // Some attributes need the finish step to take effect. This is often to avoid some expensive operation,
     // but while editing every change should happen instantly
     serializable.FinishUpdate();
@@ -197,6 +235,8 @@ uint GetAttributeEditorCount(Serializable@ serializable)
                 count += 2;
             else if (info.type == VAR_RESOURCEREFLIST)
                 count += 2 * serializable.attributes[i].GetResourceRefList().length;
+            else if (info.type == VAR_VARIANTVECTOR && GetVectorStruct(serializable, i) !is null)
+                count += serializable.attributes[i].GetVariantVector().length;
             else if (info.type == VAR_VARIANTMAP)
                 count += serializable.attributes[i].GetVariantMap().length;
             else
@@ -207,30 +247,29 @@ uint GetAttributeEditorCount(Serializable@ serializable)
     return count;
 }
 
-UIElement@ CreateAttributeEditorTextBar(ListView@ list, String name)
+UIElement@ CreateAttributeEditorParentTitle(ListView@ list, String name)
 {
-    UIElement@ editorBar = UIElement();
-    editorBar.SetLayout(LM_HORIZONTAL);
-    editorBar.SetFixedHeight(18);
-    list.AddItem(editorBar);
+    UIElement@ editorParent = UIElement();
+    editorParent.SetLayout(LM_HORIZONTAL);
+    editorParent.SetFixedHeight(18);
+    list.AddItem(editorParent);
 
     Text@ attrNameText = Text();
     attrNameText.SetStyle(uiStyle, "EditorAttributeText");
     attrNameText.text = name;
-    editorBar.AddChild(attrNameText);
+    editorParent.AddChild(attrNameText);
 
-    return editorBar;
+    return editorParent;
 }
 
-UIElement@ CreateAttributeEditorBar(ListView@ list, String name, uint index, uint subIndex)
+UIElement@ CreateAttributeEditorParent(ListView@ list, String name, uint index, uint subIndex)
 {
-    if (name.length > MAX_ATTRNAME_LENGTH)
-        name.Resize(MAX_ATTRNAME_LENGTH);
-
-    UIElement@ editorBar = UIElement("Edit" + String(index) + "_" + String(subIndex));
-    editorBar.SetLayout(LM_HORIZONTAL);
-    editorBar.SetFixedHeight(18);
-    list.AddItem(editorBar);
+    UIElement@ editorParent = UIElement("Edit" + String(index) + "_" + String(subIndex));
+    editorParent.vars["Index"] = index;
+    editorParent.vars["SubIndex"] = subIndex;
+    editorParent.SetLayout(LM_HORIZONTAL);
+    editorParent.SetFixedHeight(18);
+    list.AddItem(editorParent);
 
     if (!name.empty)
     {
@@ -238,10 +277,22 @@ UIElement@ CreateAttributeEditorBar(ListView@ list, String name, uint index, uin
         attrNameText.SetStyle(uiStyle, "EditorAttributeText");
         attrNameText.text = name;
         attrNameText.SetFixedWidth(125);
-        editorBar.AddChild(attrNameText);
+        editorParent.AddChild(attrNameText);
     }
 
-    return editorBar;
+    return editorParent;
+}
+
+LineEdit@ CreateAttributeLineEdit(UIElement@ parent, Serializable@ serializable, uint index, uint subIndex)
+{
+    LineEdit@ attrEdit = LineEdit();
+    attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
+    attrEdit.SetFixedHeight(16);
+    attrEdit.vars["Index"] = index;
+    attrEdit.vars["SubIndex"] = subIndex;
+    SetAttributeEditorID(attrEdit, serializable);
+    parent.AddChild(attrEdit);
+    return attrEdit;
 }
 
 void SetAttributeEditorID(UIElement@ attrEdit, Serializable@ serializable)
@@ -265,81 +316,76 @@ Serializable@ GetAttributeEditorTarget(UIElement@ attrEdit)
         return null;
 }
 
-UIElement@ GetAttributeEditorBar(ListView@ list, uint index, uint subIndex)
+UIElement@ GetAttributeEditorParent(UIElement@ parent, uint index, uint subIndex)
 {
-    return list.GetChild("Edit" + String(index) + "_" + String(subIndex), true);
+    return parent.GetChild("Edit" + String(index) + "_" + String(subIndex), true);
+}
+
+VectorStruct@ GetVectorStruct(Serializable@ serializable, uint index)
+{
+    AttributeInfo info = serializable.attributeInfos[index];
+    for (uint i = 0; i < vectorStructs.length; ++i)
+    {
+        if (vectorStructs[i].componentTypeName == serializable.typeName && vectorStructs[i].attributeName ==
+            info.name)
+            return vectorStructs[i];
+    }
+    return null;
 }
 
 void CreateAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
 {
     AttributeInfo info = serializable.attributeInfos[index];
+    CreateAttributeEditor(list, serializable, info.name, info.type, info.enumNames, index, 0);
+}
 
-    if (info.type == VAR_STRING)
+UIElement@ CreateAttributeEditor(ListView@ list, Serializable@ serializable, const String&in name, VariantType type, Array<String>@ enumNames, uint index, uint subIndex)
+{
+    UIElement@ parent;
+
+    if (type == VAR_STRING)
     {
-        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
-
-        LineEdit@ attrEdit = LineEdit();
-        attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-        attrEdit.SetFixedHeight(16);
-        attrEdit.vars["Index"] = index;
-        SetAttributeEditorID(attrEdit, serializable);
-        parent.AddChild(attrEdit);
+        parent = CreateAttributeEditorParent(list, name, index, subIndex);
+        LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializable, index, subIndex);
         SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
     }
-
-    if (info.type == VAR_BOOL)
+    if (type == VAR_BOOL)
     {
-        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
-
+        parent = CreateAttributeEditorParent(list, name, index, subIndex);
         CheckBox@ attrEdit = CheckBox();
         attrEdit.style = uiStyle;
         attrEdit.SetFixedSize(16, 16);
         attrEdit.vars["Index"] = index;
+        attrEdit.vars["SubIndex"] = subIndex;
         SetAttributeEditorID(attrEdit, serializable);
         parent.AddChild(attrEdit);
         SubscribeToEvent(attrEdit, "Toggled", "EditAttribute");
     }
-
-    if ((info.type >= VAR_FLOAT && info.type <= VAR_VECTOR4) || info.type == VAR_QUATERNION || info.type == VAR_COLOR)
+    if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR)
     {
-        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
-
-        uint numCoords = info.type - VAR_FLOAT + 1;
-        if (info.type == VAR_QUATERNION)
+        parent = CreateAttributeEditorParent(list, name, index, subIndex);
+        uint numCoords = type - VAR_FLOAT + 1;
+        if (type == VAR_QUATERNION)
             numCoords = 3;
-        if (info.type == VAR_COLOR)
+        if (type == VAR_COLOR)
             numCoords = 4;
 
         for (uint i = 0; i < numCoords; ++i)
         {
-            LineEdit@ attrEdit = LineEdit();
-            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.SetFixedHeight(16);
-            attrEdit.vars["Index"] = index;
-            attrEdit.vars["Coord"] = i;
-            SetAttributeEditorID(attrEdit, serializable);
-            parent.AddChild(attrEdit);
+            LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializable, index, subIndex);
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
             SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         }
     }
-
-    if (info.type == VAR_INT)
+    if (type == VAR_INT)
     {
-        UIElement@ parent = CreateAttributeEditorBar(list, info.name, index, 0);
-
+        parent = CreateAttributeEditorParent(list, name, index, subIndex);
         // Check for enums
-        Array<String>@ enumNames = info.enumNames;
-        if (enumNames.empty)
+        if (enumNames is null || enumNames.empty)
         {
             // No enums, create a numeric editor
-            LineEdit@ attrEdit = LineEdit();
-            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.SetFixedHeight(16);
-            attrEdit.vars["Index"] = index;
-            SetAttributeEditorID(attrEdit, serializable);
-            parent.AddChild(attrEdit);
+            LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializable, index, subIndex);
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
             SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         }
@@ -350,14 +396,14 @@ void CreateAttributeEditor(ListView@ list, Serializable@ serializable, uint inde
             attrEdit.SetFixedHeight(16);
             attrEdit.resizePopup = true;
             attrEdit.vars["Index"] = index;
+            attrEdit.vars["SubIndex"] = subIndex;
             SetAttributeEditorID(attrEdit, serializable);
 
             for (uint i = 0; i < enumNames.length; ++i)
             {
-                // Check for certain internal enums and break
+                // Hack: check for certain internal enums and break
                 if (enumNames[i] == "Master" || enumNames[i] == "SplitPoint")
                     break;
-
                 Text@ choice = Text();
                 choice.SetStyle(uiStyle, "EditorEnumAttributeText");
                 choice.text = enumNames[i];
@@ -367,105 +413,103 @@ void CreateAttributeEditor(ListView@ list, Serializable@ serializable, uint inde
             SubscribeToEvent(attrEdit, "ItemSelected", "EditAttribute");
         }
     }
-
-    if (info.type == VAR_RESOURCEREF || info.type == VAR_RESOURCEREFLIST)
+    if (type == VAR_RESOURCEREF)
     {
-        uint numRefs = 1;
-        // Otherwise we do not yet query the attribute values at this point, but for reflist we must know
-        // the number of resources
-        if (info.type == VAR_RESOURCEREFLIST)
-            numRefs = serializable.attributes[index].GetResourceRefList().length;
+        ShortStringHash resourceType = serializable.attributeInfos[index].type == VAR_RESOURCEREF ?
+            serializable.attributes[index].GetResourceRef().type : serializable.attributes[index].GetResourceRefList().type;
 
+        // Create the resource name on a separate non-interactive line to allow for more space
+        CreateAttributeEditorParentTitle(list, name);
+
+        parent = CreateAttributeEditorParent(list, "", index, subIndex);
+
+        UIElement@ spacer = UIElement();
+        spacer.SetFixedSize(10, 16);
+        parent.AddChild(spacer);
+
+        LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializable, index, subIndex);
+        attrEdit.vars["Type"] = resourceType.value;
+        SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+
+        UIElement@ spacer2 = UIElement();
+        spacer2.SetFixedSize(4, 16);
+        parent.AddChild(spacer2);
+
+        Button@ pickButton = Button();
+        pickButton.style = uiStyle;
+        pickButton.SetFixedSize(36, 16);
+        pickButton.vars["Index"] = index;
+        pickButton.vars["SubIndex"] = subIndex;
+        SetAttributeEditorID(pickButton, serializable);
+
+        Text@ pickButtonText = Text();
+        pickButtonText.SetStyle(uiStyle, "EditorAttributeText");
+        pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
+        pickButtonText.text = "Pick";
+        pickButton.AddChild(pickButtonText);
+        parent.AddChild(pickButton);
+        SubscribeToEvent(pickButton, "Released", "PickResource");
+
+        UIElement@ spacer3 = UIElement();
+        spacer3.SetFixedSize(4, 16);
+        parent.AddChild(spacer3);
+
+        Button@ openButton = Button();
+        openButton.style = uiStyle;
+        openButton.SetFixedSize(36, 16);
+        openButton.vars["Index"] = index;
+        openButton.vars["SubIndex"] = subIndex;
+        SetAttributeEditorID(openButton, serializable);
+
+        Text@ openButtonText = Text();
+        openButtonText.SetStyle(uiStyle, "EditorAttributeText");
+        openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
+        openButtonText.text = "Open";
+        openButton.AddChild(openButtonText);
+        parent.AddChild(openButton);
+        SubscribeToEvent(openButton, "Released", "OpenResource");
+    }
+    if (type == VAR_RESOURCEREFLIST)
+    {
+        uint numRefs = serializable.attributes[index].GetResourceRefList().length;
         for (uint i = 0; i < numRefs; ++i)
+            CreateAttributeEditor(list, serializable, name, VAR_RESOURCEREF, null, index, i);
+    }
+    if (type == VAR_VARIANTVECTOR)
+    {
+        VectorStruct@ vectorStruct = GetVectorStruct(serializable, index);
+        if (vectorStruct is null)
+            return null;
+        uint nameIndex = 0;
+
+        Array<Variant>@ vector = serializable.attributes[index].GetVariantVector();
+        for (uint i = 0; i < vector.length; ++i)
         {
-            // Create the resource name on a separate non-interactive line to allow for more space
-            if (numRefs == 1)
-                CreateAttributeEditorTextBar(list, info.name);
-            else
-                CreateAttributeEditorTextBar(list, info.name + " " + String(i + 1));
-
-            UIElement@ parent = CreateAttributeEditorBar(list, "", index, i);
-
-            UIElement@ spacer = UIElement();
-            spacer.SetFixedSize(12, 16);
-            parent.AddChild(spacer);
-
-            LineEdit@ attrEdit = LineEdit();
-            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.SetFixedHeight(16);
-            attrEdit.vars["Index"] = index;
-            attrEdit.vars["SubIndex"] = i;
-            SetAttributeEditorID(attrEdit, serializable);
-            parent.AddChild(attrEdit);
-            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
-
-            UIElement@ spacer2 = UIElement();
-            spacer2.SetFixedSize(4, 16);
-            parent.AddChild(spacer2);
-
-            Button@ pickButton = Button();
-            pickButton.style = uiStyle;
-            pickButton.SetFixedSize(36, 16);
-            pickButton.vars["Index"] = index;
-            pickButton.vars["SubIndex"] = i;
-            SetAttributeEditorID(pickButton, serializable);
-
-            Text@ pickButtonText = Text();
-            pickButtonText.SetStyle(uiStyle, "EditorAttributeText");
-            pickButtonText.SetAlignment(HA_CENTER, VA_CENTER);
-            pickButtonText.text = "Pick";
-            pickButton.AddChild(pickButtonText);
-            parent.AddChild(pickButton);
-            SubscribeToEvent(pickButton, "Released", "PickResource");
-    
-            UIElement@ spacer3 = UIElement();
-            spacer3.SetFixedSize(4, 16);
-            parent.AddChild(spacer3);
-
-            Button@ openButton = Button();
-            openButton.style = uiStyle;
-            openButton.SetFixedSize(36, 16);
-            openButton.vars["Index"] = index;
-            openButton.vars["SubIndex"] = i;
-            SetAttributeEditorID(openButton, serializable);
-    
-            Text@ openButtonText = Text();
-            openButtonText.SetStyle(uiStyle, "EditorAttributeText");
-            openButtonText.SetAlignment(HA_CENTER, VA_CENTER);
-            openButtonText.text = "Open";
-            openButton.AddChild(openButtonText);
-            parent.AddChild(openButton);
-            SubscribeToEvent(openButton, "Released", "OpenResource");
+            CreateAttributeEditor(list, serializable, vectorStruct.variableNames[nameIndex], vector[i].type, null, index, i);
+            ++nameIndex;
+            if (nameIndex >= vectorStruct.variableNames.length)
+                nameIndex = vectorStruct.restartIndex;
         }
     }
-    
-    if (info.type == VAR_VARIANTMAP)
+    if (type == VAR_VARIANTMAP)
     {
         VariantMap map = serializable.attributes[index].GetVariantMap();
         Array<ShortStringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
             Variant value = map[keys[i]];
-
-            UIElement@ parent = CreateAttributeEditorBar(list, editorScene.GetVarName(keys[i]) + " (" + value.typeName + ")", index, i);
-
-            LineEdit@ attrEdit = LineEdit();
-            attrEdit.SetStyle(uiStyle, "EditorAttributeEdit");
-            attrEdit.SetFixedHeight(16);
-            attrEdit.vars["Index"] = index;
-            attrEdit.vars["SubIndex"] = i;
-            attrEdit.vars["Key"] = keys[i].value;
-            SetAttributeEditorID(attrEdit, serializable);
-            parent.AddChild(attrEdit);
-            SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
-            SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
+            parent = CreateAttributeEditor(list, serializable, editorScene.GetVarName(keys[i]) + " (Var)", value.type, null, index, i);
+            // Add the variant key to the parent
+            parent.vars["Key"] = keys[i].value;
         }
     }
+
+    return parent;
 }
 
 void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
 {
-    UIElement@ parent = GetAttributeEditorBar(list, index, 0);
+    UIElement@ parent = GetAttributeEditorParent(list, index, 0);
     if (parent is null)
         return;
 
@@ -473,25 +517,31 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
 
     AttributeInfo info = serializable.attributeInfos[index];
     Variant value = serializable.attributes[index];
+    LoadAttributeEditor(parent, value, value.type, info.enumNames);
 
-    if (info.type == VAR_STRING)
+    inLoadAttributeEditor = false;
+}
+
+void LoadAttributeEditor(UIElement@ parent, Variant value, VariantType type, Array<String>@ enumNames)
+{
+    uint index = parent.vars["Index"].GetUInt();
+    
+    if (type == VAR_STRING)
     {
         LineEdit@ attrEdit = parent.children[1];
         attrEdit.text = value.GetString();
-        attrEdit.cursorPosition = 0;
     }
-    if (info.type == VAR_BOOL)
+    if (type == VAR_BOOL)
     {
         CheckBox@ attrEdit = parent.children[1];
         attrEdit.checked = value.GetBool();
     }
-    if (info.type == VAR_FLOAT)
+    if (type == VAR_FLOAT)
     {
         LineEdit@ attrEdit = parent.children[1];
         attrEdit.text = String(value.GetFloat());
-        attrEdit.cursorPosition = 0;
     }
-    if (info.type == VAR_VECTOR2)
+    if (type == VAR_VECTOR2)
     {
         Vector2 vec = value.GetVector2();
         LineEdit@ attrEditX = parent.children[1];
@@ -501,7 +551,7 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
         attrEditX.cursorPosition = 0;
         attrEditY.cursorPosition = 0;
     }
-    if (info.type == VAR_VECTOR3)
+    if (type == VAR_VECTOR3)
     {
         Vector3 vec = value.GetVector3();
         LineEdit@ attrEditX = parent.children[1];
@@ -514,7 +564,7 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
         attrEditY.cursorPosition = 0;
         attrEditZ.cursorPosition = 0;     
     }
-    if (info.type == VAR_VECTOR4)
+    if (type == VAR_VECTOR4)
     {
         Vector4 vec = value.GetVector4();
         LineEdit@ attrEditX = parent.children[1];
@@ -530,7 +580,7 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
         attrEditZ.cursorPosition = 0;
         attrEditW.cursorPosition = 0;      
     }
-    if (info.type == VAR_COLOR)
+    if (type == VAR_COLOR)
     {
         Color col = value.GetColor();
         LineEdit@ attrEditR = parent.children[1];
@@ -541,12 +591,8 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
         attrEditG.text = String(col.g);
         attrEditB.text = String(col.b);
         attrEditA.text = String(col.a);
-        attrEditR.cursorPosition = 0;
-        attrEditG.cursorPosition = 0;
-        attrEditB.cursorPosition = 0;
-        attrEditA.cursorPosition = 0;
     }
-    if (info.type == VAR_QUATERNION)
+    if (type == VAR_QUATERNION)
     {
         Vector3 vec = value.GetQuaternion().eulerAngles;
         LineEdit@ attrEditX = parent.children[1];
@@ -559,14 +605,12 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
         attrEditY.cursorPosition = 0;
         attrEditZ.cursorPosition = 0;
     }
-    if (info.type == VAR_INT)
+    if (type == VAR_INT)
     {
-        Array<String>@ enumNames = info.enumNames;
-        if (enumNames.empty)
+        if (enumNames is null || enumNames.empty)
         {
             LineEdit@ attrEdit = parent.children[1];
             attrEdit.text = String(value.GetInt());
-            attrEdit.cursorPosition = 0;
         }
         else
         {
@@ -574,18 +618,19 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
             attrEdit.selection = value.GetInt();
         }
     }
-    if (info.type == VAR_RESOURCEREF)
+    if (type == VAR_RESOURCEREF)
     {
         LineEdit@ attrEdit = parent.children[1];
         attrEdit.text = cache.GetResourceName(value.GetResourceRef().id);
         attrEdit.cursorPosition = 0;
     }
-    if (info.type == VAR_RESOURCEREFLIST)
+    if (type == VAR_RESOURCEREFLIST)
     {
+        UIElement@ list = parent.parent;
         ResourceRefList refList = value.GetResourceRefList();
         for (uint subIndex = 0; subIndex < refList.length; ++subIndex)
         {
-            parent = GetAttributeEditorBar(list, index, subIndex);
+            parent = GetAttributeEditorParent(list, index, subIndex);
             if (parent is null)
                 break;
             LineEdit@ attrEdit = parent.children[1];
@@ -593,135 +638,149 @@ void LoadAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
             attrEdit.cursorPosition = 0;
         }
     }
-    if (info.type == VAR_VARIANTMAP)
+    if (type == VAR_VARIANTVECTOR)
     {
+        UIElement@ list = parent.parent;
+        Array<Variant>@ vector = value.GetVariantVector();
+        for (uint i = 0; i < vector.length; ++i)
+        {
+            parent = GetAttributeEditorParent(list, index, i);
+            if (parent is null)
+                break;
+            LoadAttributeEditor(parent, vector[i], vector[i].type, null);
+        }
+    }
+    if (type == VAR_VARIANTMAP)
+    {
+        UIElement@ list = parent.parent;
         VariantMap map = value.GetVariantMap();
         Array<ShortStringHash>@ keys = map.keys;
         for (uint i = 0; i < keys.length; ++i)
         {
-            Variant value = map[keys[i]];
-            parent = GetAttributeEditorBar(list, index, i);
+            parent = GetAttributeEditorParent(list, index, i);
             if (parent is null)
                 break;
-            Text@ name = parent.children[0];
-            LineEdit@ attrEdit = parent.children[1];
-            // In case we overwrite the variable with another of different type, update also the name + type
-            name.text = editorScene.GetVarName(keys[i]) + " (" + value.typeName + ")";
-            attrEdit.text = value.ToString();
-            attrEdit.cursorPosition = 0;
+            Variant value = map[keys[i]];
+            LoadAttributeEditor(parent, value, value.type, null);
         }
     }
-
-    inLoadAttributeEditor = false;
 }
 
-void StoreAttributeEditor(ListView@ list, Serializable@ serializable, uint index)
-{
-    UIElement@ parent = GetAttributeEditorBar(list, index, 0);
-    if (parent is null)
-        return;
-    StoreAttributeEditorDirect(parent, serializable, index);
-}
-
-void StoreAttributeEditorDirect(UIElement@ parent, Serializable@ serializable, uint index)
+void StoreAttributeEditor(UIElement@ parent, Serializable@ serializable, uint index, uint subIndex)
 {
     AttributeInfo info = serializable.attributeInfos[index];
-    
-    if (info.type == VAR_STRING)
+
+    if (info.type == VAR_RESOURCEREFLIST)
+    {
+        ResourceRefList refList = serializable.attributes[index].GetResourceRefList();
+        Variant newValue = GetEditorValue(parent, VAR_RESOURCEREF, null);
+        ResourceRef ref = newValue.GetResourceRef();
+        refList.ids[subIndex] = ref.id;
+        serializable.attributes[index] = Variant(refList);
+    }
+    else if (info.type == VAR_VARIANTVECTOR)
+    {
+        Array<Variant>@ vector = serializable.attributes[index].GetVariantVector();
+        Variant newValue = GetEditorValue(parent, vector[subIndex].type, null);
+        vector[subIndex] = newValue;
+        serializable.attributes[index] = Variant(vector);
+    }
+    else if (info.type == VAR_VARIANTMAP)
+    {
+        VariantMap map = serializable.attributes[index].GetVariantMap();
+        ShortStringHash key(parent.vars["Key"].GetUInt());
+        Variant newValue = GetEditorValue(parent, map[key].type, null);
+        map[key] = newValue;
+        serializable.attributes[index] = Variant(map);
+    }
+    else
+    {
+        Variant newValue = GetEditorValue(parent, info.type, info.enumNames);
+        serializable.attributes[index] = newValue;
+    }
+}
+
+Variant GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumNames)
+{
+    if (type == VAR_STRING)
     {
         LineEdit@ attrEdit = parent.children[1];
-        serializable.attributes[index] = Variant(attrEdit.text.Trimmed());
+        return Variant(attrEdit.text.Trimmed());
     }
-    if (info.type == VAR_BOOL)
+    if (type == VAR_BOOL)
     {
         CheckBox@ attrEdit = parent.children[1];
-        serializable.attributes[index] = Variant(attrEdit.checked);
+        return Variant(attrEdit.checked);
     }
-    if (info.type == VAR_FLOAT)
+    if (type == VAR_FLOAT)
     {
         LineEdit@ attrEdit = parent.children[1];
-        serializable.attributes[index] = Variant(attrEdit.text.ToFloat());
+        return Variant(attrEdit.text.ToFloat());
     }
-    if (info.type == VAR_VECTOR2)
+    if (type == VAR_VECTOR2)
     {
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         Vector2 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat());
-        serializable.attributes[index] = Variant(vec);
+        return Variant(vec);
     }
-    if (info.type == VAR_VECTOR3)
+    if (type == VAR_VECTOR3)
     {
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
         Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
-        serializable.attributes[index] = Variant(vec);
+        return Variant(vec);
     }
-    if (info.type == VAR_VECTOR4)
+    if (type == VAR_VECTOR4)
     {
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
         LineEdit@ attrEditW = parent.children[4];
         Vector4 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat(), attrEditW.text.ToFloat());
-        serializable.attributes[index] = Variant(vec);
+        return Variant(vec);
     }
-    if (info.type == VAR_COLOR)
+    if (type == VAR_COLOR)
     {
         LineEdit@ attrEditR = parent.children[1];
         LineEdit@ attrEditG = parent.children[2];
         LineEdit@ attrEditB = parent.children[3];
         LineEdit@ attrEditA = parent.children[4];
         Color col(attrEditR.text.ToFloat(), attrEditG.text.ToFloat(), attrEditB.text.ToFloat(), attrEditA.text.ToFloat());
-        serializable.attributes[index] = Variant(col);
+        return Variant(col);
     }
-    if (info.type == VAR_QUATERNION)
+    if (type == VAR_QUATERNION)
     {
         LineEdit@ attrEditX = parent.children[1];
         LineEdit@ attrEditY = parent.children[2];
         LineEdit@ attrEditZ = parent.children[3];
         Vector3 vec(attrEditX.text.ToFloat(), attrEditY.text.ToFloat(), attrEditZ.text.ToFloat());
-        serializable.attributes[index] = Variant(Quaternion(vec));
+        return Variant(Quaternion(vec));
     }
-    if (info.type == VAR_INT)
+    if (type == VAR_INT)
     {
-        if (info.enumNames.empty)
+        if (enumNames is null || enumNames.empty)
         {
             LineEdit@ attrEdit = parent.children[1];
-            serializable.attributes[index] = Variant(attrEdit.text.ToInt());
+            return Variant(attrEdit.text.ToInt());
         }
         else
         {
             DropDownList@ attrEdit = parent.children[1];
-            serializable.attributes[index] = Variant(attrEdit.selection);
+            return Variant(attrEdit.selection);
         }
     }
-    if (info.type == VAR_RESOURCEREF)
+    if (type == VAR_RESOURCEREF)
     {
         LineEdit@ attrEdit = parent.children[1];
-        ResourceRef ref = serializable.attributes[index].GetResourceRef();
+        ResourceRef ref;
         ref.id = StringHash(attrEdit.text.Trimmed());
-        serializable.attributes[index] = Variant(ref);
+        ref.type = ShortStringHash(attrEdit.vars["Type"].GetUInt());
+        return Variant(ref);
     }
-    if (info.type == VAR_RESOURCEREFLIST)
-    {
-        LineEdit@ attrEdit = parent.children[1];
-        uint subIndex = attrEdit.vars["SubIndex"].GetUInt();
-        ResourceRefList refList = serializable.attributes[index].GetResourceRefList();
-        refList.ids[subIndex] = StringHash(attrEdit.text.Trimmed());
-        serializable.attributes[index] = Variant(refList);
-    }
-    if (info.type == VAR_VARIANTMAP)
-    {
-        LineEdit@ attrEdit = parent.children[1];
-        ShortStringHash key(attrEdit.vars["Key"].GetUInt());
-        VariantMap map = serializable.attributes[index].GetVariantMap();
-        String existingType = map[key].typeName;
-        Variant newValue;
-        newValue.FromString(existingType, attrEdit.text.Trimmed());
-        map[key] = newValue;
-        serializable.attributes[index] = Variant(map);
-    }
+    
+    return Variant();
 }
 
 ResourcePicker@ GetResourcePicker(const String&in resourceType)
@@ -909,8 +968,10 @@ void CreateNewVariable(StringHash eventType, VariantMap& eventData)
         break;
     }
 
+    // If we overwrite an existing variable, must recreate the editor(s) for the correct type
+    bool overwrite = selectedNode.vars.Contains(sanitatedVarName);
     selectedNode.vars[sanitatedVarName] = newValue;
-    UpdateAttributes(false);
+    UpdateAttributes(overwrite);
 }
 
 void DeleteVariable(StringHash eventType, VariantMap& eventData)

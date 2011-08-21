@@ -34,7 +34,7 @@
 
 #include "DebugNew.h"
 
-static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 OBJECTTYPESTATIC(Drawable);
 
@@ -88,7 +88,7 @@ void Drawable::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
-    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     if (newLodDistance != lodDistance_)

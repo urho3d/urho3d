@@ -73,14 +73,15 @@ Scene::~Scene()
 void Scene::RegisterObject(Context* context)
 {
     context->RegisterFactory<Scene>();
-    context->CopyBaseAttributes<Node, Scene>();
     
+    REF_ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "Name", GetName, SetName, String, String(), AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
+    ATTRIBUTE(Scene, VAR_VARIANTMAP, "Variables", vars_, VariantMap(), AM_FILE); // Network replication of vars uses custom data
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Node ID", replicatedNodeID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Replicated Component ID", replicatedComponentID_, FIRST_REPLICATED_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Node ID", localNodeID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
     ATTRIBUTE(Scene, VAR_INT, "Next Local Component ID", localComponentID_, FIRST_LOCAL_ID, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Smoothing Constant", smoothingConstant_, DEFAULT_SMOOTHING_CONSTANT, AM_DEFAULT);
-    ATTRIBUTE(Scene, VAR_FLOAT, "Snap Threshold", snapThreshold_, DEFAULT_SNAP_THRESHOLD, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(Scene, VAR_STRING, "User Variable Names", GetVarNamesAttr, SetVarNamesAttr, String, String(), AM_FILE | AM_NOEDIT);
 }
 

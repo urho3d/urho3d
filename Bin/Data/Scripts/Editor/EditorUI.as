@@ -356,8 +356,11 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
             console.visible = false;
         else if (uiFileSelector !is null && front is uiFileSelector.window)
             CloseFileSelector();
-        else if (front is editorSettingsDialog || front is sceneWindow || front is nodeWindow)
+        else if (front is settingsDialog || front is sceneWindow || front is nodeWindow)
+        {
+            ui.focusElement = null;
             front.visible = false;
+        }
     }
 
     if (key == KEY_F2)
@@ -366,7 +369,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         TogglePhysicsDebug();
     if (key == KEY_F4)
         ToggleOctreeDebug();
-        
+
     if (eventData["Qualifiers"].GetInt() == QUAL_CTRL)
     {
         if (key == '1')

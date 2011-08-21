@@ -2,7 +2,7 @@
 
 Node@ cameraNode;
 Camera@ camera;
-Window@ editorSettingsDialog;
+Window@ settingsDialog;
 
 enum ObjectMoveMode
 {
@@ -55,82 +55,82 @@ void ResetCamera()
 
 void CreateEditorSettingsDialog()
 {
-    if (!(editorSettingsDialog is null))
+    if (!(settingsDialog is null))
         return;
     
-    editorSettingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"), uiStyle);
-    ui.root.AddChild(editorSettingsDialog);
-    CenterDialog(editorSettingsDialog);
+    settingsDialog = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorSettingsDialog.xml"), uiStyle);
+    ui.root.AddChild(settingsDialog);
+    CenterDialog(settingsDialog);
     UpdateEditorSettingsDialog();
     HideEditorSettingsDialog();
 }
 
 void UpdateEditorSettingsDialog()
 {
-    if (editorSettingsDialog is null)
+    if (settingsDialog is null)
         return;
 
-    LineEdit@ nearClipEdit = editorSettingsDialog.GetChild("NearClipEdit", true);
+    LineEdit@ nearClipEdit = settingsDialog.GetChild("NearClipEdit", true);
     nearClipEdit.text = String(camera.nearClip);
     
-    LineEdit@ farClipEdit = editorSettingsDialog.GetChild("FarClipEdit", true);
+    LineEdit@ farClipEdit = settingsDialog.GetChild("FarClipEdit", true);
     farClipEdit.text = String(camera.farClip);
     
-    LineEdit@ fovEdit = editorSettingsDialog.GetChild("FOVEdit", true);
+    LineEdit@ fovEdit = settingsDialog.GetChild("FOVEdit", true);
     fovEdit.text = String(camera.fov);
 
-    LineEdit@ speedEdit = editorSettingsDialog.GetChild("SpeedEdit", true);
+    LineEdit@ speedEdit = settingsDialog.GetChild("SpeedEdit", true);
     speedEdit.text = String(cameraBaseSpeed);
 
-    LineEdit@ distanceEdit = editorSettingsDialog.GetChild("DistanceEdit", true);
+    LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
     distanceEdit.text = String(newNodeDistance);
 
-    LineEdit@ moveStepEdit = editorSettingsDialog.GetChild("MoveStepEdit", true);
+    LineEdit@ moveStepEdit = settingsDialog.GetChild("MoveStepEdit", true);
     moveStepEdit.text = String(moveStep);
-    CheckBox@ moveSnapToggle = editorSettingsDialog.GetChild("MoveSnapToggle", true);
+    CheckBox@ moveSnapToggle = settingsDialog.GetChild("MoveSnapToggle", true);
     moveSnapToggle.checked = moveSnap;
 
-    LineEdit@ rotateStepEdit = editorSettingsDialog.GetChild("RotateStepEdit", true);
+    LineEdit@ rotateStepEdit = settingsDialog.GetChild("RotateStepEdit", true);
     rotateStepEdit.text = String(rotateStep);
-    CheckBox@ rotateSnapToggle = editorSettingsDialog.GetChild("RotateSnapToggle", true);
+    CheckBox@ rotateSnapToggle = settingsDialog.GetChild("RotateSnapToggle", true);
     rotateSnapToggle.checked = rotateSnap;
 
-    LineEdit@ scaleStepEdit = editorSettingsDialog.GetChild("ScaleStepEdit", true);
+    LineEdit@ scaleStepEdit = settingsDialog.GetChild("ScaleStepEdit", true);
     scaleStepEdit.text = String(scaleStep);
-    CheckBox@ scaleSnapToggle = editorSettingsDialog.GetChild("ScaleSnapToggle", true);
+    CheckBox@ scaleSnapToggle = settingsDialog.GetChild("ScaleSnapToggle", true);
     scaleSnapToggle.checked = scaleSnap;
 
-    CheckBox@ localIDToggle = editorSettingsDialog.GetChild("LocalIDToggle", true);
+    CheckBox@ localIDToggle = settingsDialog.GetChild("LocalIDToggle", true);
     localIDToggle.checked = useLocalIDs;
 
-    CheckBox@ pickComponentsToggle = editorSettingsDialog.GetChild("PickComponentsToggle", true);
+    CheckBox@ pickComponentsToggle = settingsDialog.GetChild("PickComponentsToggle", true);
     pickComponentsToggle.checked = pickComponents;
 
-    CheckBox@ pickUsingPhysicsToggle = editorSettingsDialog.GetChild("PickUsingPhysicsToggle", true);
+    CheckBox@ pickUsingPhysicsToggle = settingsDialog.GetChild("PickUsingPhysicsToggle", true);
     pickUsingPhysicsToggle.checked = pickUsingPhysics;
 
-    DropDownList@ textureQualityEdit = editorSettingsDialog.GetChild("TextureQualityEdit", true);
+    DropDownList@ textureQualityEdit = settingsDialog.GetChild("TextureQualityEdit", true);
     textureQualityEdit.selection = renderer.textureQuality;
 
-    DropDownList@ materialQualityEdit = editorSettingsDialog.GetChild("MaterialQualityEdit", true);
+    DropDownList@ materialQualityEdit = settingsDialog.GetChild("MaterialQualityEdit", true);
     materialQualityEdit.selection = renderer.materialQuality;
 
-    DropDownList@ shadowQualityEdit = editorSettingsDialog.GetChild("ShadowQualityEdit", true);
+    DropDownList@ shadowQualityEdit = settingsDialog.GetChild("ShadowQualityEdit", true);
     shadowQualityEdit.selection = GetShadowQuality();
 
-    LineEdit@ maxOccluderTrianglesEdit = editorSettingsDialog.GetChild("MaxOccluderTrianglesEdit", true);
+    LineEdit@ maxOccluderTrianglesEdit = settingsDialog.GetChild("MaxOccluderTrianglesEdit", true);
     maxOccluderTrianglesEdit.text = String(renderer.maxOccluderTriangles);
 
-    CheckBox@ specularLightingToggle = editorSettingsDialog.GetChild("SpecularLightingToggle", true);
+    CheckBox@ specularLightingToggle = settingsDialog.GetChild("SpecularLightingToggle", true);
     specularLightingToggle.checked = renderer.specularLighting;
 
-    CheckBox@ dynamicInstancingToggle = editorSettingsDialog.GetChild("DynamicInstancingToggle", true);
+    CheckBox@ dynamicInstancingToggle = settingsDialog.GetChild("DynamicInstancingToggle", true);
     dynamicInstancingToggle.checked = renderer.dynamicInstancing;
 
-    CheckBox@ shadowMapHiresDepthToggle = editorSettingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
+    CheckBox@ shadowMapHiresDepthToggle = settingsDialog.GetChild("ShadowMapHiresDepthToggle", true);
     shadowMapHiresDepthToggle.checked = renderer.shadowMapHiresDepth;
 
-    CheckBox@ frameLimiterToggle = editorSettingsDialog.GetChild("FrameLimiterToggle", true);
+    CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
 
     if (!subscribedToCameraEdits)
@@ -166,7 +166,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
         SubscribeToEvent(shadowMapHiresDepthToggle, "Toggled", "EditShadowMapHiresDepth");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
-        SubscribeToEvent(editorSettingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
+        SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         subscribedToCameraEdits = true;
     }
 }
@@ -174,13 +174,13 @@ void UpdateEditorSettingsDialog()
 void ShowEditorSettingsDialog()
 {
     UpdateEditorSettingsDialog();
-    editorSettingsDialog.visible = true;
-    editorSettingsDialog.BringToFront();
+    settingsDialog.visible = true;
+    settingsDialog.BringToFront();
 }
 
 void HideEditorSettingsDialog()
 {
-    editorSettingsDialog.visible = false;
+    settingsDialog.visible = false;
 }
 
 void EditCameraNearClip(StringHash eventType, VariantMap& eventData)

@@ -40,7 +40,8 @@
 
 #include "DebugNew.h"
 
-static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+static const float INV_SQRT_TWO = 1.0f / sqrtf(2.0f);
 
 inline bool CompareBillboards(Billboard* lhs, Billboard* rhs)
 {
@@ -84,8 +85,8 @@ void BillboardSet::RegisterObject(Context* context)
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Position", IsRelative, SetRelative, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Relative Scale", IsScaled, SetScaled, bool, true, AM_DEFAULT);
     ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BOOL, "Sort By Distance", IsSorted, SetSorted, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE);
     COPY_BASE_ATTRIBUTES(BillboardSet, Drawable);
+    ACCESSOR_ATTRIBUTE(BillboardSet, VAR_VARIANTVECTOR, "Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, VariantVector(), AM_FILE);
     REF_ACCESSOR_ATTRIBUTE(BillboardSet, VAR_BUFFER, "Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>, PODVector<unsigned char>(), AM_NET | AM_NOEDIT);
 }
 
@@ -112,7 +113,7 @@ void BillboardSet::UpdateDistance(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(worldPos);
     
     // Calculate scaled distance for animation LOD
-    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     // If there are no billboards, the size becomes zero, and LOD'ed updates no longer happen. Disable LOD in that case
     if (scale > M_EPSILON)
         lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
@@ -302,23 +303,18 @@ void BillboardSet::OnWorldBoundingBoxUpdate()
     
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();
-    const Vector3& worldScale = worldTransform.Scale();
+    Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::UNITY;
     
     for (unsigned i = 0; i < billboards_.Size(); ++i)
     {
         if (!billboards_[i].enabled_)
             continue;
         
-        float maxSize;
-        if (!scaled_)
-            maxSize = Max(billboards_[i].size_.x_, billboards_[i].size_.y_);
-        else
-            maxSize = Max(billboards_[i].size_.x_ * worldScale.x_, billboards_[i].size_.y_ * worldScale.y_);
-        
-        if (!relative_)
-            worldBoundingBox_.Merge(Sphere(billboards_[i].position_, maxSize));
-        else
-            worldBoundingBox_.Merge(Sphere(worldTransform * billboards_[i].position_, maxSize));
+        float size = INV_SQRT_TWO * (billboards_[i].size_.x_ * billboardScale.x_ + billboards_[i].size_.y_ * billboardScale.y_);
+        Vector3 center = billboardTransform * billboards_[i].position_;
+        Vector3 edge = Vector3::UNITY * size;
+        worldBoundingBox_.Merge(BoundingBox(center - edge, center + edge));
         
         ++enabledBillboards;
     }
@@ -385,6 +381,8 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     unsigned numBillboards = billboards_.Size();
     unsigned enabledBillboards = 0;
     const Matrix3x4& worldTransform = GetWorldTransform();
+    Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
+    Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::UNITY;
     
     // First check number of enabled billboards
     for (unsigned i = 0; i < numBillboards; ++i)
@@ -404,12 +402,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         {
             sortedBillboards_[index++] = &billboard;
             if (sorted_)
-            {
-                if (!relative_)
-                    billboard.sortDistance_ = frame.camera_->GetDistanceSquared(billboards_[i].position_);
-                else
-                    billboard.sortDistance_ = frame.camera_->GetDistanceSquared(worldTransform * billboards_[i].position_);
-            }
+                billboard.sortDistance_ = frame.camera_->GetDistanceSquared(billboardTransform * billboards_[i].position_);
         }
     }
     
@@ -434,22 +427,12 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         if (!billboard.enabled_)
             continue;
         
-        Vector3 position;
-        if (!relative_)
-            position = billboard.position_;
-        else
-            position = worldTransform * billboard.position_;
-        
-        Vector2 size;
-        if (!scaled_)
-            size = billboard.size_;
-        else
-            size = Vector2(billboard.size_.x_ * worldScale.x_, billboard.size_.y_ * worldScale.y_);
-        
+        Vector3 position(billboardTransform * billboard.position_);
+        Vector2 size(billboard.size_.x_ * billboardScale.x_, billboard.size_.y_ * billboardScale.y_);
         unsigned color = billboard.color_.ToUInt();
+        float angleRad = billboard.rotation_ * M_DEGTORAD;
         
         float rotationMatrix[2][2];
-        float angleRad = billboard.rotation_ * M_DEGTORAD;
         rotationMatrix[0][0] = cosf(angleRad);
         rotationMatrix[0][1] = sinf(angleRad);
         rotationMatrix[1][0] = -rotationMatrix[0][1];

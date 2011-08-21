@@ -46,7 +46,7 @@
 
 #include "DebugNew.h"
 
-static const Vector3 dotScale(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+static const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
@@ -195,7 +195,7 @@ void AnimatedModel::Update(const FrameInfo& frame)
         if (drawDistance_ > 0.0f && distance > drawDistance_)
             return;
         // Multiply the distance by a constant so that invisible nodes don't update that often
-        float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
+        float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
         animationLodDistance_ = frame.camera_->GetLodDistance(distance, scale, lodBias_) * invisibleLodFactor_;
     }
     
@@ -206,7 +206,7 @@ void AnimatedModel::UpdateDistance(const FrameInfo& frame)
 {
     distance_ = frame.camera_->GetDistance(GetWorldPosition());
     
-    float scale = GetWorldBoundingBox().Size().DotProduct(dotScale);
+    float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     float newLodDistance = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     
     // If model is rendered from several views, use the minimum LOD distance for animation LOD
