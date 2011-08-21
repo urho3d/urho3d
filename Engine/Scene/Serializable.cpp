@@ -459,6 +459,10 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
         return;
     unsigned numAttributes = attributes->Size();
     
+    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
+    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
+        deltaUpdateBits[i] = 0;
+    
     // If class-specific current state has not been previously used, resize it now
     if (classCurrentState.Empty())
         classCurrentState.Resize(numAttributes);
@@ -476,15 +480,7 @@ void Serializable::PrepareUpdates(PODVector<unsigned char>& deltaUpdateBits, Vec
                 latestData = true;
             else
             {
-                if (deltaUpdate == false)
-                {
-                    // Clear the deltaupdate bits in a lazy manner when first needed
-                    deltaUpdate = true;
-                    deltaUpdateBits.Resize((numAttributes + 7) >> 3);
-                    for (unsigned i = 0; i < deltaUpdateBits.Size(); ++i)
-                        deltaUpdateBits[i] = 0;
-                }
-                
+                deltaUpdate = true;
                 deltaUpdateBits[i >> 3] |= 1 << (i & 7);
             }
         }

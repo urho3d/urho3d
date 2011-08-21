@@ -759,17 +759,30 @@ void Node::SetNetParentAttr(const PODVector<unsigned char>& value)
         return;
     
     MemoryBuffer buf(value);
-    unsigned baseNodeID = buf.ReadVLE();
-    if (!baseNodeID)
+    // If nothing in the buffer, parent is the root node
+    if (buf.IsEof())
         return;
     
-    if (baseNodeID < FIRST_LOCAL_ID)
-        SetParent(scene->GetNodeByID(baseNodeID));
+    unsigned baseNodeID = buf.ReadNetID();
+    Node* baseNode = scene->GetNodeByID(baseNodeID);
+    if (!baseNode)
+    {
+        LOGWARNING("Failed to find parent node " + String(baseNodeID));
+        return;
+    }
+    
+    // If buffer contains just an ID, the parent is replicated
+    if (buf.IsEof())
+        baseNode->AddChild(this);
     else
     {
-        Node* baseNode = scene->GetNodeByID(baseNodeID);
-        if (baseNode)
-            SetParent(baseNode->GetChild(buf.ReadStringHash(), true));
+        // Else the parent is local and we must find it recursively by name hash
+        StringHash nameHash = buf.ReadStringHash();
+        Node* parent = baseNode->GetChild(nameHash, true);
+        if (!parent)
+            LOGWARNING("Failed to find parent node with name hash " + nameHash.ToString());
+        else
+            parent->AddChild(this);
     }
 }
 
@@ -784,11 +797,12 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
 {
     attrBuffer_.Clear();
     Scene* scene = GetScene();
-    if (scene && parent_)
+    if (scene && parent_ && parent_ != scene)
     {
+        // If parent is replicated, can write the ID directly
         unsigned parentID = parent_->GetID();
         if (parentID < FIRST_LOCAL_ID)
-            attrBuffer_.WriteVLE(parentID);
+            attrBuffer_.WriteNetID(parentID);
         else
         {
             // Parent is local: traverse hierarchy to find a non-local base node
@@ -797,12 +811,11 @@ const PODVector<unsigned char>& Node::GetNetParentAttr() const
             while (current->GetID() >= FIRST_LOCAL_ID)
                 current = current->GetParent();
             
+            // Then write the base node ID and the parent's name hash
             attrBuffer_.WriteVLE(current->GetID());
             attrBuffer_.WriteStringHash(parent_->GetNameHash());
         }
     }
-    else
-        attrBuffer_.WriteVLE(0);
     
     return attrBuffer_.GetBuffer();
 }

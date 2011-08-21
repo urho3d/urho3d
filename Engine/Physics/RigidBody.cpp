@@ -429,8 +429,11 @@ void RigidBody::PostStep(float t, HashSet<RigidBody*>& processedBodies)
     if (hasParent)
     {
         RigidBody* parentBody = parent->GetComponent<RigidBody>();
-        if (!processedBodies.Contains(parentBody))
-            parentBody->PostStep(t, processedBodies);
+        if (parentBody)
+        {
+            if (!processedBodies.Contains(parentBody))
+                parentBody->PostStep(t, processedBodies);
+        }
     }
     
     // Apply the physics transform to rendering transform now
