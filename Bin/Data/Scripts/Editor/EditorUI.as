@@ -237,7 +237,7 @@ void HandleMenuSelected(StringHash eventType, VariantMap& eventData)
         
         if (action == "Run script")
         {
-            CreateFileSelector("Run script", "Import", "Cancel", uiScriptPath, uiScriptFilter, 0);
+            CreateFileSelector("Run script", "Run", "Cancel", uiScriptPath, uiScriptFilter, 0);
             SubscribeToEvent(uiFileSelector, "FileSelected", "HandleRunScript");
         }
 
